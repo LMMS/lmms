@@ -1,0 +1,122 @@
+%define _suse		%(if [ -f /etc/SuSE-release ] ; then echo 1 ; else echo 0 ; fi)
+
+
+Name:		@PACKAGE@
+Version:	@VERSION@
+Release:	0
+Summary:	powerful sequencer-, synthesizer- and sample-studio for Linux
+Summary(de):	Leistungsfaehiges Sequenzer-, Synthesizer- und Sample-Studio fuer Linux
+License:	GPL
+URL:		http://lmms.sourceforge.net/
+Group:		Applications/Multimedia/Sound
+Packager:	Tobias Doerffel <tobydox@users.sourceforge.net>
+Provides:	lmms = %{version}-%{release}
+%if %_suse
+BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make alsa
+BuildRequires:	alsa-devel SDL SDL-devel SDL_sound libvorbis libvorbis-devel
+BuildRequires:	libsamplerate libsamplerate-devel libsndfile libsndfile-devel
+BuildRequires:	jack-devel
+BuildRequires:	qt3 qt3-devel qt3-devel-tools
+Requires:	qt3 alsa SDL_sound libvorbis libsamplerate libsndfile jack
+%endif
+Requires:	lmms-data
+Source:		%{name}-%{version}.tar.gz
+BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
+Prefix:		%{_prefix}
+
+
+%description
+LMMS aims to be a free alternative to popular (but commercial and closed-
+source) programs like FruityLoops, Cubase and Logic giving you the ability of
+producing music with your computer by creating/synthesizing sounds, arranging
+samples, playing live with keyboard and much more...
+
+LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+sample-/song-/effect-management) and those of powerful synthesizers and
+samplers in a modern, user-friendly and easy to use graphical user-interface.
+
+LMMS is still in heavy development, so with this version please don't expect a
+complete, ready and bugfree program!!
+
+
+%description -l de
+LMMS ist eine freie Alternative zu bekannten (aber kommerziellen und
+Closed-Source-) Programmen wie FruityLoops, Cubase und Logic, die Ihnen die
+Moeglichkeit geben, mit Ihrem Computer Musik zu produzieren, indem Sie
+Klaenge kreieren/synthetisieren, Samples anordnen, mit dem Keyboard live
+spielen usw....
+
+LMMS kombiniert die Funktionen eines Tracker-/Sequenzer-Programms (Pattern-/
+Kanal-/Sample-/Song-/Effekt-Management) und die von leistungsfaehigen
+Synthesizern und Samplern in einer modernen, benutzerfreundlichen und einfach zu
+benutzenden grafischen Oberflaeche.
+
+Derzeit befindet sich LMMS komplett in Entwicklung. Also erwarten Sie bitte mit
+dieser Version nicht ein vollstaendiges, fertiges und fehlerfreies Programm!!
+
+
+%package data
+Summary:	samples, presets, demo-projects and localization-files for LMMS
+Summary(de):	Samples, Presets, Demo-Projekte und Lokalisierungsdateien fuer LMMS
+Group:		Applications/Multimedia/Sound
+Provides:	lmms-data = %{version}-%{release}
+
+%description data
+This package contains platform-independent data and resources for Linux
+MultiMedia Studio (LMMS), e.g. samples, presets and demo-projects.
+
+
+%description data -l de
+Dieses Paket beinhaltet plattform-unabhaengige Daten und Resourcen fuer Linux
+MultiMedia Studio (LMMS), wie z.B. Samples, Presets und Demo-Projekte.
+
+
+%prep
+%setup -n %{name}-%{version}
+
+
+%build
+CXXFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix}
+
+make
+
+
+%install
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+
+%pre
+%post
+%preun
+%postun
+
+
+%files
+%defattr(-,root,root)
+%{_bindir}/lmms
+
+
+%files data
+%defattr(-,root,root)
+%{_datadir}/lmms/
+
+
+
+%changelog
+* Tue Sep 20 2005 Tobias Doerffel
+- added JACK-dependencies
+
+* Fri Jul 22 2005 Tobias Doerffel
+- added more dependencies for builds under SuSE
+
+* Sat Jun 25 2005 Tobias Doerffel
+- splitted package into lmms and lmms-data
+- additional requirements
+- updated project-homepage and email-address of packager
+
+* Thu May 12 2005 Tobias Doerffel
+- created lmms.spec.in
+

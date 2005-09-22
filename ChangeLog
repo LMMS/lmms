@@ -1,0 +1,1124 @@
+2005-09-21	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	made 0.1.1 release
+
+2005-09-20	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/about_dialog.h:
+	* src/core/about_dialog.cpp:
+	no need for passing parent when creating about-dialog
+
+	* src/core/song_editor.cpp:
+	- different usage of question-box in songEditor::mayChangeProject()
+	  because of bugs with several qt-versions...
+	- when exporting song, do use baseName( TRUE ) instead of baseName()
+	  for determining base-name of rendered file
+
+	* src/core/lmms_main_win.cpp:
+	- display filename before app-name in window-title
+	- only use basename of filename in window-title
+	- added message referring to LMMS-homepage when clicking on
+	  Help/Help
+
+	* src/core/export_song_dialog.cpp:
+	use lmmsMainWin::resetWindowTitle() for resetting window-title
+	after export is done
+
+	* src/widgets/knob.cpp:
+	do not add tooltips to knobs - clicking on knob has quite the same
+	effect so tooltips are just annoying
+
+	* src/core/browser.cpp:
+	when matching file-name, always convert them to lower case for also
+	handling files like foo.WAV
+
+	* src/core/config_mgr.cpp:
+	added setValue(...)-call for saving working-directory after setting
+	up everything - fixes bug with empty browsers after fresh personal
+	installation of LMMS
+
+2005-09-19	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	made 0.1.0 release
+
+2005-09-18	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/tracks/bb_track.cpp:
+	revised paintEvent()-method -> bb-TCO's are now painted with a gradient!
+
+	* src/core/song_editor.cpp:
+	- call bbEditor::stop before playing to make sure play-button in
+	  bb-editor is properly reset
+	- call realignTracks() with parameter TRUE in wheelEvent(...)
+	- some hacks for making pause-button work...
+
+	* src/core/track_container.cpp:
+	added parameter _complete_update to trackContainer::realignTracks()
+	to be able to hide and show all tracks which is neccessary e.g.
+	after having changed pixels-per-tact-property -> zooming in song-editor
+	works now well
+
+	* src/core/setup_dialog.cpp:
+	added message-box telling the user to restart LMMS
+
+	* include/midi_alsa_raw.h:
+	* include/midi_device.h:
+	* include/midi_oss.h:
+	* include/midi_dummy.h:
+	* include/mixer.h:
+	* include/setup_dialog.h:
+	* src/core/mixer.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/midi/midi_alsa_raw.cpp:
+	* src/midi/midi_device.cpp:
+	* src/midi/midi_oss.cpp:
+	made it possible to select and setup MIDI-device
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	- many cleanups, coding style improvements etc.
+	- added new behaviour for controlling knob -> move cursor up/down for
+	  changing value
+	- replaced usage of status-bar by text-float-widget
+
+	* include/text_float.h:
+	* src/widgets/text_float.cpp:
+	took text-float from Rosegarden
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	- fixed bug in configManager::setValue(): new value-pair was always
+	  pushed back, even if it already existed, so result of value() didn't
+	  change until restart
+	- moved widget-creation-code from ctor to new method createWidgets()
+	  which fixes problems with unlocalized strings in wizard because
+	  embed::loadTranslation() calls configManager::inst()->localeDir()
+	  for determining path to localization files - this call created all
+	  wizard-widgets before actual localization was loaded...
+
+2005-09-17	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/setup_dialog.cpp:
+	added switches for disabling tooltips and turning on classical knob-
+	behaviour
+
+	* include/led_checkbox.h:
+	* src/widget/led_checkbox.cpp:
+	added LED-check-box
+
+2005-09-16	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/mixer.cpp:
+	clear output-buffers in ctor before using them -> avoids awful noises
+	at startup
+
+	* src/core/mixer.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/tracks/channel_track.cpp:
+	* src/tracks/sample_track.cpp:
+	use given frame-parameter in methods playing sample-buffers instead
+	of mixer::framesPerAudioBuffer() -> no clicks at tact-border because
+	of odd sample-frame-count
+
+	* src/core/lmms_main_win.cpp:
+	call presetPreviewPlayHandle::cleanUp() in dtor -> fixes segfault which
+	which occured at exit if you previewed a channel during session
+
+	* include/preset_preview_play_handle.h:
+	* src/core/preset_preview_play_handle.cpp:
+	added cleanUp()-method which deletes blind track-container containing
+	preset-preview-channel
+
+	* src/soundgenerators/triple_oscillator.cpp:
+	- unified much code by defining setChecked when compiling with Qt 3
+	- also set file-name of user-defined-wave as tool-tip when loading
+	  settings
+
+	* most files in src/:
+	use new tooltip-system - removes qt3/qt4-compat-code
+
+	* include/tooltip.h:
+	* src/widget/tooltip.cpp:
+	added tooltip-namespace with method "add(...)" for allowing transparent
+	usage of tooltips, so there's no difference to code using tooltips
+	whether it is compiled with Qt 3 or Qt 4
+
+2005-09-14	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/mixer.h:
+	* include/note_play_handle.h:
+	* include/play_handle.h:
+	* src/core/mixer.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/channel_track.cpp:
+	added play-handle-invalidating-feature making it possible to
+	invalidate notes of which the objects they depend on do not exist
+	anymore or things like that. for example channel-track-dtor
+	invalidates all note-play-handles linked with according channel
+	-> no segfault when deleting channel-track
+
+	* src/core/track_container.cpp:
+	pause mixer before removing track -> no segfault
+
+	* src/lib/mmp.cpp:
+	initialize m_type in mmp::multimediaProject( projectTypes )
+
+	* src/lib/buffer_allocator.cpp:
+	added mutex for better protection against parallel accesses from
+	several threads - fixes some segfaults
+
+	* src/core/lmms_main_win.cpp:
+	improved ~lmmsMainWin() which now first instructs mixer to quit it's
+	thread for avoiding spurious usages of objects to be destroyed
+	afterwards -> no segfault at the end
+
+	* src/core/export_song_dialog.cpp:
+	* src/tracks/pattern.cpp:
+	cleaned up exporting/freezing mechanisms by using mixer's new methods
+	play() and pause()
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	cleaned up mixer-thread syncing stuff by reorganizing mutexes and
+	replacing m_waitMutex by m_safetySyncMutex as well as according methods
+	lockWaitMutex() and unlockWaitMutex() by play() and pause()
+
+	* src/core/setup_dialog.cpp:
+	tell config-manager to save it's config-file when setupDialog is
+	destroyed
+
+2005-09-13	Stephane Thomas <sthomas@nerim.net>
+
+	* locale/fr.ts:
+	added French translation
+
+2005-09-13	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/lmms_main_win.cpp:
+	- show setup-dialog if LMMS is started first time or mixer uses dummy-
+	  audio-driver
+	- added setup-dialog-entry to settings-menu
+
+	* src/lib/mmp.cpp:
+	if saving preset, check whether file-name contains suffix ".cs.xml"
+	and add it if neccessary
+
+	* include/midi_alsa_raw.h:
+	* src/midi/midi_alsa_raw.cpp:
+	* src/midi/midi_device.cpp:
+	- changed everything (including file-names) from midiAlsa to midiALSARaw
+	- added terminate()-call in dtor for terminating thread properly
+
+	* include/tab_bar.h:
+	* src/widget/tab_bar.cpp:
+	- added flag for addTab(...)-method indicating whether to use given
+	  text as caption or just as tooltip
+	- reduced #ifdef QT4-macros by defining some names when compiling
+	  with Qt3
+
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	added help-button in audio-setup-tab and improved geometry-stuff
+
+	* include/audio_alsa.h:
+	* include/audio_oss.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	added probeDevice()-method which eases determining device-name in
+	either actual audio-class as well as in it's setup-widget
+
+2005-09-11	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/mixer.cpp:
+	use new audio-settings-technology for opening audio-device
+
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	added setup-dialog for general-, audio- and MIDI-settings
+
+	* include/audio_alsa.h:
+	* include/audio_device.h:
+	* include/audio_dummy.h:
+	* include/audio_jack.h:
+	* include/audio_oss.h:
+	* include/audio_sdl.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_sdl.cpp:
+	added setup-widget-technology making it possible to have audio-device-
+	specific setup-widgets which can be used in setup-dialog etc.
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	added stepping-functionality
+
+	* include/tab_widget.h:
+	* src/widgets/tab_widget.cpp:
+	pass caption to constructor instead of using fixed text
+
+	* include/tab_bar.h:
+	* src/widgets/tab_bar.cpp:
+	- added direction-parameter in constructor
+	- added exclusive-property
+	- addTab(...) returns now pointer to tab-button which gives caller
+	  possibility to modify the button
+
+	* src/core/mixer.cpp:
+	save frames-per-audio-buffer-value in ctor if not set yet instead
+	of saving it in dtor
+
+	* src/lib/embed.cpp:
+	do not return null-pixmap if pixmap not found
+
+2005-09-10	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* resources/setup_audio.png:
+	* resources/setup_general.png:
+	* resources/setup_midi.png:
+	added icons to be used in setup-dialog
+
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_sample_recorder.cpp:
+	use auto-cleaning pointer in createSampleBuffer(...) (fixes memory-leak
+	in ALSA-driver)
+
+	* include/buffer_allocator.h:
+	added simple class for auto-cleaning pointers
+
+	* src/core/mixer.cpp:
+	- added delete-calls in mixer::tryAudioDevices()
+	- init s_instanceOfMe-member in dtor, otherwise LMMS hangs up
+
+	* locale/:
+	* artwork/:
+	moved translations and some artwork-stuff into locale- and artwork-
+	directory which is going to be installed into
+	LMMS-data-dir (/usr/share/lmms etc.) and shrinks executable
+
+	* src/lib/embed.cpp:
+	added possibility to have resources in external files instead of being
+	linked into executable
+
+	* configure.in:
+	- use macro AS_HELP_STRING for formatting help-strings
+	- removed --with-latency option as it is not needed anymore
+
+2005-09-06	Alireza	<dr.alireza@gmail.com>
+
+	* resources/ir.ts:
+	added Persian translation
+
+2005-09-04	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/audio/audio_oss.cpp:
+	- read device-name from config-file before evaluating environment-
+	  variables etc.
+	- fixed bugs with device-probing (after dev-file was searched, there	
+	  was no open(...)-call again so it always failed if the first open(...)
+	  didn't work
+
+	* src/audio/audio_alsa.cpp:
+	read device-name from config-file before evaluating environment-
+	variables or using "default"
+
+	* src/core/lmms_main_win.cpp:
+	call bufferAllocator::cleanUp( 0 ) for destroying all allocated buffers
+
+	* include/buffer_allocator.h:
+	* src/lib/buffer_allocator.cpp:
+	- added clean-up-technique which removes least used buffers if
+	  buffer-size exceeds limits (which depends on mixer's buffer-size)
+	- added field to bufDesc indicating usage of this buf - used by
+	  alloc-method for determining most used, free and matching buffer
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	made lcdSpinBox controlable by scroll-wheel
+
+	* src/widgets/knob.cpp:
+	do not center knob if width of label is greater than actual knob
+
+	* src/audio/audio_sample_recorder.cpp:
+	use bufferAllocator instead of new[]/delete[]
+
+	* src/core/mixer.cpp:
+	- read value for frames-per-audio-buffer out of config-file and save
+	  it at exit
+	- free buffer at exit
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	added value() and setValue()-method which offers all components of LMMS
+	an easy way for loading/saving their settings at startup/exit
+
+2005-09-02	Mario Izquierdo <mariodebian@gmail.com>
+2005-09-02	Johnny Saenz <saenzac@hotmail.com>
+
+	* resources/es.ts:
+	added Spanish translation
+
+2005-09-02	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* most files:
+	finished changes began on 2005-08-29
+
+	* include/buffer_allocator.h:
+	* src/lib/buffer_allocator.cpp:
+	- only return aligned pointers
+	- small changes in API
+
+	* resources/de.ts:
+	completed German translation
+
+2005-08-29	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* most files:
+	begin to use new bufferAllocator instead of old buffer-types and
+	use mixer-method for determining current number of frames per
+	audio-buffer
+
+	* include/mixer.h:
+	types audioBuffer and surroundAudioBuffer don't exist anymore as well
+	as the constant FRAMES_PER_AUDIO_BUFFER - use
+	mixer::inst()->framesPerAudioBuffer() instead
+
+2005-08-28	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	replaced QSpinBox by lcdSpinBox for BPM-spinbox
+
+	* include/tab_bar.h:
+	* src/widgets/tab_bar.cpp:
+	removed function-parameter _font_size for tabBar::addTab(...)
+
+	* most files:
+	- replaced QFont::setPointSize()-calls by according pointSize()-calls
+	  which makes LMMS usable at any DPI-resolution
+	- changes for Qt4-compatibility
+
+	* include/misc.h:
+	* include/template.h:
+	moved misc.h to template.h and added template-function pointSize
+	which sets a DPI-independent size for a given font
+
+	* src/tracks/channel_track.cpp:
+	use labeling-feature of LCD-spinbox and removed old QLabel and
+	layouting-stuff
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	- fixed bug: when moving mouse up, value was not updated properly
+	- added labeling-feature
+	- added valueChanged()-signal
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	set m_arpDirection correct when loading older settings
+
+2005-08-27	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/channel_track.h:
+	* src/tracks/channel_track.cpp:
+	use new LCD-spinbox for effect-spinbox
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	added LCD-spinbox, an improved QLCDNumber with ability of user-input
+
+	* src/core/main.cpp:
+	changed highlight- and text-color to dark white instead of glaring green
+	for many people didn't like it...
+
+	* include/audio_jack.h:
+	* src/audio/audio_jack.cpp:
+	- read and observe buf-size from JACK, so that writeBufferToDev() can
+	  wait accordingly to it - now JACK-transport also works if buf-sizes
+	  of LMMS and JACK are different
+	- also free buffers in destructor and not just throw them out of list
+
+2005-08-26	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/audio_jack.h:
+	* src/audio/audio_jack.cpp:
+	- also work with older versions which do not have jack_client_open()
+	- fixed bugs
+	- use bufferAllocator instead of new[] and delete[] in time-critical
+	  functions
+
+	* include/buffer_allocator.h:
+	* src/lib/buffer_allocator.cpp:
+	added bufferAllocator which is an optimized internal memory-manager
+
+2005-08-24	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/audio_jack.h:
+	* src/audio/audio_jack.cpp:
+	beginning of support for JACK-transport
+
+	* src/audio/audio_sdl.cpp:
+	fixed memory leak - m_outputBuffer was not deleted in destructor
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	completed usage of switchable groupboxes by saving groupbox-states
+	and evaluating them in processNote()
+
+2005-08-22	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* resources/afp_artwork.png:
+	small improvements for better usability and internationalization
+
+	* src/soundgenerators/audio_file_processor.cpp:
+	- cleanups and small improvements concerning painting
+	- added missing tooltips
+	- moved open-sample-button right to filename-display-bar
+
+	* src/widgets/pixmap_button.cpp:
+	changed default-pixmaps to led_yellow.png and led_off.png
+
+	* resources/pattern_bg.png:
+	resized from 2x43 to 2x25
+
+	* src/core/name_label.cpp:
+	decreased default-font
+
+	* include/track.h:
+	decreased size of track-settings-widget from 256 to 224
+
+	* include/channel_track.h:
+	* src/tracks/channel_track.cpp:
+	- use labeling-feature of knob for labeling volume-knob
+	- use smaller surroundArea in track-settings-widget and smaller
+	  channel-button with smaller font
+
+	* src/core/surround_area.cpp:
+	made surroundArea working with different widget-sizes than default size
+
+	* resources/background_artwork.png:
+	made bg-image more pale
+
+	* include/bb_editor.h:
+	* src/core/bb_editor.cpp:
+	changed painting-behaviour and made button-bg-gfx's obsolete by using
+	specialBgHandlingWidget
+
+	* include/groupbox.h:
+	* src/widgets/groupbox.cpp:
+	improved groupbox by adding animation and more
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	- use knobs new labeling-feature
+	- use new tab-widget for target-widgets
+
+	* include/tab_widget.h:
+	* src/widgets/tab_widget.cpp:
+	added own tab-widget which looks much cooler than Qt's one
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	- using now new groupbox-widget and reorganized knob/switch-positions
+	- revised arpeggio-direction-buttons
+	- use knobs new labeling-feature
+	- removed obsolete headers
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	added labeling-feature for automatically labeling knobs with given
+	text
+
+
+2005-08-21	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/widgets/side_bar_widget.cpp:
+	* src/tracks/channel_track.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/main.cpp:
+	* src/core/browser.cpp:
+	replaced painting-device-dependent method setPixelSize by setPointSize
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	now using new group-box which looks much cooler and is more usable
+
+	* include/groupbox.h:
+	* src/widgets/groupbox.cpp:
+	added own groupbox-widget with state-LED
+
+	* src/widgets/pixmap_button.cpp:
+	delete m_bgPixmap in destructor
+
+	* include/spc_bg_hndl_widget.h:
+	- made member m_backgroundPixmap to normal QPixmap instead of pointer to
+	  it which also fixes a memory leak as dtor didn't delete the pixmap
+	- also use erase-pixmap of widget if available
+
+	* include/oscillator.h:
+	- made shape-functions using phase()-function for determining phase of
+	  sample
+	- made oscillator::phase() using modff instead of floorf-math which
+	  makes the whole thing up to 20% faster
+
+	* src/core/about_dialog.cpp:
+	added URL of project-page of LMMS
+
+	* src/core/song_editor.cpp:
+	create new project if file given in cmd-line is not read-/usable
+
+	* include/export_project_dialog.h:
+	* include/song_editor.h:
+	* src/core/main.cpp:
+	* src/core/song_editor.cpp:
+	added --render command-line-switch to render file and quit as soon as
+	job is done - very good for benchmarks
+
+	* src/core/main.cpp:
+	added --version command-line-switch
+
+2005-08-20	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/lmms_main_win.cpp:
+	- extended filter for sample-browser
+	- added home- and root-browser for being able to load songs, presets,
+	  samples etc. from somewhere else than within lmms-working-directory
+
+2005-07-27	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/lmms_main_win.cpp:
+	* src/core/track_container.cpp:
+	* src/core/track.cpp:
+	by completing destructors and fixing some other small bugs there's
+	finally no seg-fault when quitting app! (the bug annoying for months...)
+
+	* include/track_container.h:
+	all public-slots were made to normal public and FASTCALLed functions
+	since they aren't connected to a signal anywhere and it just blows up
+	qt-moc-code
+
+	* include/sample_track.h:
+	made method sampleTCO::changeLength(...) FASTCALLed since it's virtual
+	and method in base-class is also FASTCALLed - eliminates crash when
+	resizing sample
+
+	* include/track.h:
+	* src/core/track.cpp:
+	removed unsused method setTrackWidgetHeight( int )
+
+2005-07-26	Pedro Lopez-Cabanillas <pedro.lopez.cabanillas@gmail.com>
+
+	* src/core/browser.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/lmms_main_win.cpp:
+	* src/core/main.cpp:
+	* src/core/song_editor.cpp:
+	* src/lib/mmp.cpp:
+	* src/tracks/pattern.cpp:
+	* src/widgets/project_notes.cpp:
+	small changes for compatibility with Qt 3.1
+
+	* src/midi/midi_alsa.cpp:
+	* src/midi/midi_oss.cpp:
+	added MIDIDEV-environment variable for being able to choose a MIDI
+	device different from the default one
+
+2005-07-24	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/midi_mapper.h:
+	* src/midi/midi_mapper.cpp:
+	added MIDI-mapper to be used in combination with midiDevice's and/or
+	MIDI-Out-Plugin which can read MIDI-maps added before
+
+	* midi-maps/*map:
+	added MIDI-maps from KMid
+
+	* include/midi_dummy.h:
+	* src/midi/midi_device.cpp:
+	added dummy MIDI-driver for not crashing if no MIDI-device is available
+
+	* src/core/piano_roll.cpp:
+	- go to start of pattern when pressing home-key
+	- added support for zooming
+
+	* src/core/song_editor.cpp:
+	- fixed bug with loop-points by setting current-frame-var to zero to
+	  force reset of it
+	- added auto-scrolling ability
+	- fixed bug which caused horizontal scrollbar to have an undefined
+	  max-value after starting up LMMS
+	- go to start of pattern when pressing home-key
+ 
+2005-07-23	Alexey Kouznetsov <alexey.kouznetsov@gmail.com>
+
+	* resources/ru.ts:
+	added Russian translation
+
+2005-07-23	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/piano_roll.cpp:
+	scroll back when stopping and play-position changes to invisible area
+
+	* include/time_line.h:
+	* src/core/song_editor.cpp:
+	* src/core/time_line.cpp:
+	added control-buttons to time-line making it possible to control
+	things like auto-scrolling, looping and play-position after stop
+
+	* src/midi/midi_device.cpp:
+	limit volume between 0 and 127 when sending out note-on-event
+
+2005-07-21	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/nstate_button.h:
+	* src/widgets/nstate_button.cpp:
+	added widget nStateButton which is a button able to have n different
+	states with according pixmaps and tooltips
+
+	* resources/back_to_zero.png:
+	* resources/keep_stop_position.png:
+	* resources/back_to_start.png:
+	* resources/loop_points_off.png:
+	* resources/loop_points_on.png:
+	* resources/autoscroll_off.png:
+	* resources/autoscroll_on.png:
+	added pixmaps for buttons to be used in time-line as soon as possible
+
+	* lmms-0.1.0rc1.tar.bz2:
+	release of Release Candidate 1 of LMMS 0.1.0
+
+2005-07-20	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/midi/midi_file.cpp:
+	- proper handling of note-on-events which velocity 0 -> treat like
+	  note-off-events makes it now possible to import a much larger amount
+	  of MIDI-files
+	- added progress-dialog when importing MIDI-file
+
+	* src/core/song_editor.cpp:
+	horizontal scrollbar is now placed some pixels above lower edge so that
+	it doesn't take action when resizing song-editor-window at lower edge
+
+	* src/core/track_container.cpp:
+	added progress-dialog for loading project and according
+	qApp->processEvents()-call -> LMMS now isn't blocked anymore while
+	loading project
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	fixed bugs caused by changes made before for scroll-wheel-support
+
+2005-07-19	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	added better scroll-wheel support which increases/decreases knob-value
+	by 20th of range (e.g 0.05 if knob is ranged between 0 and 1)
+
+2005-07-17	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* projects/:
+	added "covers"-dir and added "Preludium and Fuge A-Minor" by J.S.Bach
+	to it as first covered project ;-)
+
+	* src/core/note_play_handle.cpp:
+	- fixed bad bug in notePlayHandle::play(): instead of directly being
+	  deleted, sub-notes were given to mixer to be removed when they played
+	  completely but since these sub-notes are not known to mixer, it
+	  couldn't delete them
+	- always call channelTrack::deleteNotePluginData() in
+	  noteplayhandle-dtor even if pointer to note-plugin-data is NULL so
+	  that all plugins are notified when note is done (midiOut-plugin
+	  needs that for sending note-off-events!)
+
+	* include/midi_out.h:
+	* src/soundgenerators/midi_out.cpp:
+	new plugin midiOut which sends all notes on this channel out to
+	external midi-device this is especially cool for playing arpeggio for
+	key pressed on external midi-device!!
+ 
+	* src/soundgenerators/plucked_string_synth.cpp:
+	removed unneccesary inclusion of qpainter-header
+
+	* include/midi_file.h:
+	* src/midi/midi_file.cpp:
+	* src/core/lmms_main_win.cpp:
+	* src/core/song_editor.cpp:
+	added support for importing MIDI-file (very experimental!!)
+
+	* include/midi.h:
+	* include/midi_device.h:
+	moved general MIDI-stuff from midi_device.h to midi.h
+
+	* src/audio/audio_file_device.cpp:
+	added missing arg()-call to QMessageBox::critical()-call in
+	audioFileDevice-ctor
+
+2005-07-16	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/config_mgr.cpp:
+	added shortcuts to navigation-buttons
+	
+2005-07-14	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/piano_roll.cpp:
+	only play notes while editing if we're not in play-mode
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	when exporting always render one additional tact at the end so that
+	we don't cut off notes with delay etc.
+
+2005-07-12	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	- successful compilation with GCC 4.0.1 ;-)
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	fixed bug responsible for playing base-notes of chords all time
+	if any arpeggio selected was selected
+
+2005-07-11	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* resources/source/wizard_files.xcf:
+	* resources/wizard_files.png:
+	updated project-file-icon in image
+
+	* src/core/config_mgr.cpp:
+	- ask user whether to re-run setup-wizard if config-file indicates
+	  different version of LMMS
+	- removed redundant assignment in configManager::loadConfigFile()
+	- added additional layout for having space at the left and right side
+	- increased font-size of title
+
+	* Makefile.am:
+	install LMMS-icon into LMMS-data-dir
+
+	* lmms-0.1.0beta.tar.bz2:
+	made beta-release of 0.1.0 and announced it on kde-apps.org
+
+2005-07-10	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* presets/TripleOscillator/:
+	added cool Church Organ preset and improved Xylophon preset
+
+	* resources/de.ts:
+	updated German translations and cleaned up all obsolete translations 
+	and context which shrinks the file by 50K...
+
+	* samples/instruments/:
+	removed vibraphone01.ogg because of poor quality
+
+	* src/core/piano_roll.cpp:
+	- do not set what's-this-texts as tooltips for play/stop-button
+	- added tooltip and what's-this-text to record-button
+	- display message in piano-roll how to open a pattern if none is opened
+	- always set window-title, even if no pattern is opened
+
+	* src/core/mixer.cpp:
+	using iterators in second loop in mixer::run() leads to crashes, so
+	an optimized version of the old code is used now again...
+
+	* src/core/lmms_main_win.cpp:
+	added tool-buttons for new project, open/save project etc. and added
+	popup-menu to new-button containing projects in template-directory
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	- changed remaining method-names containing "[Ss]ong" to "[Pp]roject"
+	- toggle channel-button after adding channel-track
+
+	* include/export_project_dialog.h:
+	* src/core/export_project_dialog.cpp:
+	renamed from export_song_dialog.ext to export_project_dialog.ext
+
+2005-07-09	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* all files:
+	now all source-code-files but some single exceptions do not have more
+	than 80 characters per line and also were made to conform one
+	programming-style 
+
+	* include/sgs:
+	wrote sane soundgenerator-plugin-scanner using bash-scripting which
+	replaces old, dirty and exaggerated c++-program and is also fully
+	portable
+
+	* include/lmms_main_win.h:
+	* include/song_editor.h:
+	* src/core/lmms_main_win.cpp:
+	* src/core/song_editor.cpp:
+	renamed methods newFile, openFile etc. to createNewProject, openProject
+	etc.
+
+	* resources/source/:
+	- renamed filenew.png, fileopen.png etc. to project_new.png etc.
+	- replaced song_file.png by project_file.png which has a new file-icon
+	  with LMMS-logo inside
+	- replaced preset_file.png by new graphic where the star is inside
+	  of a file-icon
+
+	* resources/source/lmms_logo.svg:
+	made logo Inkscape 0.41 compatible (had problems with gradients since
+	logo originally had been made with Inkscape 0.39)
+
+	* src/widgets/project_notes.cpp:
+	removed unneccessary name-strings for QActions
+
+	* resources/project_notes.png:
+	replaced 16x16-icon with 22x22-icon to provide big enough icon for
+	toolbar which needs 22x22-icons
+
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/tracks/bb_track.cpp:
+	do not crash if either there're no bb-tracks but bb-editor has tracks
+	or there're bb-tracks but bb-editor contains no tracks
+
+	* src/core/mixer.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/pattern.cpp:
+	rewrote loops using vectors to use iterators instead of indices etc.
+	which makes it all a bit smaller and faster since we do not always have
+	to access the current element using the []-operator
+
+2005-07-08	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/core/envelope_tab_widget.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/widgets/knob.cpp:
+	small fixes for making compilable with qt4
+
+	* configure.in:
+	* projects/:
+	added directories "tutorials" and "recorded_loops"
+
+2005-07-07	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/bb_track.h:
+	added FASTCALL to moveLocation(...) and changeLength(...) which fixes
+	crash-bug
+
+	* src/core/song_editor.cpp:
+	do not confirm overwriting file if new project was just saved
+
+	* samples/:
+	added a lot of new samples from wikisource and others
+
+2005-07-06	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/project_notes.h:
+	* src/core/song_editor.cpp:
+	* src/widgets/project_notes.cpp:
+	clear project-notes when clearing song (new/open file etc.)
+
+	* src/tracks/pattern.cpp:
+	ask user when he tries to freeze a pattern of a muted channel whether he
+	wants to continue since freezing a pattern of a muted channel makes no
+	sense (you're rendering silence!)
+
+	* include/piano_roll:
+	* src/core/piano_roll.cpp:
+	- added possibility to edit the volume of notes
+	- removed all bool-variables indicating whether an action is being
+	  performed at the moment and introduced m_action, indicating
+	  one of the actions defined in (also new) enum editActions
+	- replaced m_startTone and m_startOctave with one variable m_startKey,
+	  which makes a lot of code unneccessary
+	- rewrote loops using note-vectors to use iterators instead of
+	  indices and vector::size()
+	- renamed m_evolutionHeight to m_notesEditHeight
+	- replaced QMouseEvent::pos().[xy]()-calls with QMouseEvent::[xy]()
+	- pianoRoll::getKey() does now take y-position (int) as parameter
+	  instead of QPoint since it only needs y-position
+	- use new setKey()/key()-member of note everywhere where it is possible
+
+	* include/note.h:
+	added setKey()- and key()-member which setting/getting absolute key
+	of note
+
+2005-07-05	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	* projects/:
+	categorized projects in "cool_songs", "demos", "misc" and "templates"
+	so that we don't annoy the user with a lot projects in his/her project-
+	root - have to fill up "templates" with project-templates, e.g.
+	basic drum-kit, accoustic drum-kit etc.
+
+	* most files:
+	added FASTCALL-attributes to functions taking at least one parameter
+
+	* include/audio_file_processor.h:
+	* include/plucked_string_synth.h:
+	* include/triple_oscillator.h:
+	moved deleteNotePluginData()-method into according cpp-files which
+	makes including note_play_handle.h obsolete
+
+	* include/audio_file_processor.h:
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	* src/soundgenerators/audio_file_processor.cpp:
+	added support for saving sample-rate-conversion-state in m_pluginData
+	of a note which fixes bug making clicks in sound when playing a sample
+	simultanously at different pitches
+
+	* configure.in:
+	check whether compiler knows floorf and powf and if not, define them
+	to floor/pow
+
+2005-07-04	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* most files:
+	made LMMS compiling (and working) with Qt 3.0, GCC 2.95 and other old
+	libs (compiled it under Knoppix 3.1)
+
+	* include/misc.h:
+	changed names of abs, min, max, limit to myAbs, myMin etc. for not
+	conflicting with functions of STL with the same name
+
+	* configure.in:
+	* src/lib/sample_buffer.cpp:
+	added support for versions of libsndfile < 1.0.11 since API has changed
+	in libsndfile 1.0.11
+
+2005-07-03	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* resources/control_env_amount_active.png:
+	* resources/control_env_amount_inactive.png:
+	* include/envelope_and_lfo_widget.h:
+	* src/core/envelope_and_lfo_widget.cpp:
+	it's now possible to control the amount of an envelope with the
+	according LFO by toggling new button (otherwise the level of the LFO is
+	added to the level of the envelope as it always has been)
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	now you can toggle the amount of an envelope/LFO between 0 and 1 by
+	clicking on according graph
+
+	* all files:
+	updated mail-address in header
+
+	* src/audio/audio_device.cpp:
+	always use SURROUND_CHANNELS as channel-count for libsrc since
+	resampling is done on surround-buffers - fixes bug which was
+	responsible for producing useless noise when exporting file in
+	high-quality-mode
+
+	* src/core/export_song_dialog.cpp:
+	made "high-quality-mode"-switch working (disabled for some reason
+	in 0.0.9...)
+
+	* src/core/mixer.cpp:
+	when restoring audio-device, also restore quality-level
+
+	* include/bb_editor.h:
+	* src/core/bb_editor.cpp:
+	cleaned up a lot because there was still much code from times when
+	the track-technology didn't exist and which isn't now used any more
+
+	* src/audio/audio_alsa.cpp:
+	added support for 48 KHz soundcards
+
+2005-07-02	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	* src/lib/sample_buffer.cpp:
+	made it possible to compile LMMS without SDL_sound, reorganized
+	sample-decoding and added libsndfile- and libvorbis-support
+
+	* include/midi_time.h:
+	added operators "=", "+=", "-=" and implemented copy-ctor
+
+	* include/piano_roll.h:
+	made currentPattern() a const method and added validPattern()
+
+	* src/tracks/pattern.cpp:
+	optimized addNote() function which uses m_note.push_back() for notes
+	beyond last note
+
+	* src/core/piano_roll.cpp:
+	* src/tracks/pattern.cpp:
+	when pattern is destroyed it checks whether it is currently opened in
+	piano-roll and if so pattern lets piano-roll set its pointer to current
+	pattern to NULL. piano-roll does now always check whether current
+	pattern is not NULL. in this case it denies any actions. fixes bug which
+	led to crash when having piano-roll open while deleting pattern (e.g.
+	creating new file, opening file etc.)
+
+2005-07-01	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* all files:
+	replaced "location" in names of functions/variables by "position"
+	for more clear and unified names
+
+	* include/piano_roll.h:
+	* include/timeline.h:
+	* src/core/piano_roll.cpp:
+	* src/core/timeline.cpp:
+	added support for autoscroll in piano-roll when playing/recording
+	pattern
+
+2005-06-30	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/channel_track.h:
+	* include/midi_device.h
+	* include/mixer.h:
+	* include/pattern.h:
+	* src/core/piano_roll.cpp:
+	* src/midi/midi_device.cpp:
+	* src/tracks/channel_track.cpp:
+	added support for recording notes from MIDI-device (e.g. MIDI-keyboard
+	or virtual channel-piano) in a pattern using the piano-roll
+
+	* include/pattern.h
+	* src/core/song_editor.cpp:
+	fixed bug which led to crash: when pattern was played in non-looping
+	mode song-editor always called pattern::finishFreeze() even if there
+	actually was no pattern-freezing-process -> added isFreezing() which
+	is called by song-editor for checking whether pattern is being freezed
+	before calling finishFreeze()
+
+	* src/core/lmms_main_win.cpp:
+	* src/lib/sample_buffer.cpp:
+	when showing open-file-dialog, use QFileDialog::selectedFiles()[0]
+	instead of QFileDialog::selectedFile() because selectedFile() returns
+	incorrect file-name if user clicked on the file and then on
+	"Open"-button instead of double-clicking file
+
+	* src/audio/audio_oss.cpp:
+	* src/soundgenerators/triple_oscillator.cpp:
+	* src/tracks/channel_track.cpp:
+	added #include <stdlib.h> for solving problems with undeclared
+	functions getenv() and rand() on some distributions (e.g Slackware)
+
+	* src/core/track.cpp:
+	* src/soundgenerators/triple_oscillator.cpp:
+	* src/tracks/channel_track.cpp:
+	added missing #include "debug.h" for solving problems with undeclared
+	assert() because of not included assert.h
+
+2005-06-29	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	* include/audio_sdl.h:
+	* src/lib/sample_buffer.cpp:
+	if SDL/SDL.h does not exist, search for it in SDL10, SDL11 etc. and
+	include according headers in source-files (solves problems on FreeBSD)
+
+	* README:
+	updated everything a bit...
+
+2005-06-28	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/envelope_tab_widget.h:
+	* src/core/envelope_tab_widget.cpp:
+	use button instead of knob for turning filter on/off
+
+2005-06-27	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* samples/effects/Makefile.am:
+	don't install effect-samples into directory of basses-samples
+
+ 

@@ -1,0 +1,97 @@
+Linux MultiMedia Studio 0.1.0
+=============================
+
+Copyright (c) 2004-2005 by Tobias Doerffel
+
+
+The whole program is free software; you can redistribute it and/or modify 
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA  02111-1307, USA
+
+
+
+What is LMMS??
+--------------
+
+LMMS aims to be a free alternative to popular (but commercial and closed-
+source) programs like FruityLoops, Cubase and Logic giving you the ability of
+producing music with your computer by creating/synthesizing sounds, arranging
+samples, playing live with keyboard and much more...
+
+LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+sample-/song-/effect-management) and those of powerful synthesizers and
+samplers in a modern, user-friendly and easy to use graphical user-interface.
+
+LMMS is still in heavy development, so with this version please don't expect a
+complete, ready and bugfree program!!
+
+
+
+Requirements
+------------
+
+The most important requirement is for sure a fast computer, so don't try to get
+LMMS working on a pentium one with 60 MHz... ;-) So you should have at least
+500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
+(LMMS is currently developed on a PIII 450 MHz...!!)
+
+Required libraries are:
+
+- Qt 3.2 or higher (tested up to 4.0.0) with devel-files
+- SDL_sound (tested with 0.1.5 & 1.0.1) with devel-files
+
+Optional, but strongly recommended:
+- libvorbis with devel-files
+- libalsa with devel-files
+- SDL with devel-files
+- libsamplerate with devel-files
+
+For compiling you should have an up to date GCC with g++.
+LMMS has been (successfully) tested under Debian Sarge 3.1, Fedora Core 2-4,
+and SuSE Linux 9.0-9.3 with Qt 3.[23].x and Qt 4.0.0.
+It was compiled using GCC 3.3.x, GCC 3.4.x and GCC 4.0.0.
+
+If you have problems with compiling or running LMMS, find any bug or have
+suggestions and so on, please feel free to e-mail me (for mail-address see
+below)!
+
+
+
+
+Help developing LMMS
+--------------------
+
+If you are interested in LMMS, it's programming, artwork, testing, writing
+demo-songs, (and improving this f**** README...) or something like that,
+you're welcome to participate on the development of LMMS!
+
+Just e-mail me: tobydox@users.sourceforge.net
+
+The project-homepage of LMMS and mailingslists can be found at
+http://lmms.sourceforge.net
+
+
+Before coding a new big feature, please always post your idea and suggestions
+about your feature and about the actual implementation to the
+LMMS-devel-mailinglist (lmms-devel@lists.sourceforge.net) and wait for replies
+or email me! Maybe there're different ideas, improvements, hints or maybe your
+feature is not welcome/needed at the moment (but for sure this will be very
+seldom).
+
+If you coded your feature, make sure, that it is running properly with the
+newest available version of LMMS and that it also runs with different
+configurations (e.g. different latency, disabled surround-support, missing
+package(s) etc.). Important is also, that you comment your
+source so that other people can fix bugs or improve your feature! 
+
+

@@ -1,0 +1,40 @@
+- make usable with Qt4
+- make LMMS an ALSA-sequencer-client
+- adchannel-toolbutton -> popup-menu with available soundgenerator-plugins
+- tempo-based arpeggio
+- pre-listen when opening sample with QFileDialog
+- level-meters in output-graph and channel-track
+- panning-editing in piano-roll
+- use midi-maps
+- process program-/channel-change-events from MIDI-files
+- setup MIDI-channel and -program in MIDI-Out
+- speed up painting of sampleTCO
+- save window-positions, -states and -sizes in files
+- solve problems with different keyboard-layouts when playing channel-track with pc-keyboard
+- balance env+lfo
+- autosave every 1 minute
+- audioDummy: always wait until the stuff normally would have been written (=simulate blocking IO)
+- plucked-string-synth: knob for metallic -> use noise as wave-shape
+- finish qt4-port and make LMMS usable when compiling with Qt4
+- rewrite export-project-dialog using layout-mechanism
+- dynamic pitch-change
+- make piano-roll use the global clipboard??
+- add languages:
+	- Dutch
+	- Italian
+	- ...any other welcome
+
+
+
+Things to be done anytime in the future
+- effect-board -> live-fx from input
+- event-system
+- chord-editor?
+- WAVE/OGG/MP3-Import -> FFT-analysis -> write notes
+- FLP-Import
+- classical note-edit-window -> also ability of printing and maybe later scanning & recognition of notes
+- add FLAC as export-format?
+- support of LADSPA for all plugins
+- better commented source...
+- optimize, optimize, optimize.....
+
