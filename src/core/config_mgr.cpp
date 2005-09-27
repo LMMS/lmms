@@ -71,7 +71,7 @@
 
 #include "config_mgr.h"
 #include "embed.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 

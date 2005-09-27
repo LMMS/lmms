@@ -24,7 +24,7 @@
 
 #include "tab_bar.h"
 #include "tab_button.h"
-#include "templates.h"
+#include "gui_templates.h"
 #include "tooltip.h"
 
 #ifndef QT4
@@ -68,7 +68,7 @@ tabButton * tabBar::addTab( QWidget * _w, const QString & _text, int _id,
 		// then remove it
 		removeTab( _id );
 	}
-	QString caption = ( _text_is_tooltip ) ? "" : _text;
+	QString caption = ( _text_is_tooltip ) ? QString( "" ) : _text;
 	// create tab-button
 	tabButton * b = new tabButton( caption, _id, this );
 	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );

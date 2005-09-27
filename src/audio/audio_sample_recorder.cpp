@@ -45,7 +45,7 @@ audioSampleRecorder::audioSampleRecorder( Uint32 _sample_rate, Uint32 _channels,
 
 audioSampleRecorder::~audioSampleRecorder()
 {
-	while( !m_buffers.isEmpty() )
+	while( !m_buffers.empty() )
 	{
 		bufferAllocator::free( m_buffers.front().first );
 		m_buffers.erase( m_buffers.begin() );

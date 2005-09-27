@@ -41,7 +41,7 @@
 
 
 #include "text_float.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 

@@ -50,6 +50,7 @@
 #include "bb_track.h"
 #include "lmms_main_win.h"
 #include "mixer.h"
+#include "song_editor.h"
 
 
 
@@ -215,6 +216,7 @@ void trackContainer::removeTrack( track * _track )
 		mixer::inst()->play();
 
 		realignTracks();
+		songEditor::inst()->setModified();
 	}
 }
 

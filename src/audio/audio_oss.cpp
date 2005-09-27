@@ -22,6 +22,11 @@
  */
 
 
+#include "audio_oss.h"
+
+
+#ifdef OSS_SUPPORT
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -39,10 +44,10 @@
 #endif
 
 
-#include "audio_oss.h"
 #include "buffer_allocator.h"
 #include "endian_handling.h"
 #include "lcd_spinbox.h"
+#include "gui_templates.h"
 #include "templates.h"
 
 
@@ -63,12 +68,12 @@
 #include <stdlib.h>
 #endif
 
-#ifdef OSS_USE_SOUNDCARD_H
-/* This is installed on some systems */
-#include <soundcard.h>
-#else
-/* This is recommended by OSS */
+#ifdef HAVE_SYS_SOUNDCARD_H
+// This is recommended by OSS
 #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+// This is installed on some systems
+#include <soundcard.h>
 #endif
 
 
@@ -326,4 +331,6 @@ void audioOSS::setupWidget::saveSettings( void )
 				QString::number( m_channels->value() ) );
 }
 
+
+#endif
 

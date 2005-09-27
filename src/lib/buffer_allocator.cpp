@@ -96,7 +96,11 @@ const int BUFFER_ALIGN_MASK = BUFFER_ALIGN - 1;
 void bufferAllocator::cleanUp( Uint16 _level )
 {
 	// first insert all unused bufs into an array
+#if QT_VERSION >= 0x030100
 	vvector<bufDesc> bufsToRemove;
+#else
+	vlist<bufDesc> bufsToRemove;
+#endif
 	for( bufIt it = s_buffers.begin(); it != s_buffers.end(); ++it )
 	{
 		if( ( *it ).free )

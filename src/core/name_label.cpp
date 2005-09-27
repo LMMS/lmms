@@ -41,9 +41,8 @@
 #include "rename_dialog.h"
 #include "bb_editor.h"
 #include "bb_track.h"
-#include "templates.h"
+#include "gui_templates.h"
 
-#include "name_label.moc"
 
 
 nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent,
@@ -151,3 +150,9 @@ void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	rename();
 }
+
+
+
+
+#include "name_label.moc"
+

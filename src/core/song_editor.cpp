@@ -736,13 +736,14 @@ int songEditor::masterPitch( void ) const
 
 void songEditor::doActions( void )
 {
-	while( !m_actions.isEmpty() )
+	while( !m_actions.empty() )
 	{
-		timeLine * tl = m_playPos[m_playMode].m_timeLine;
 		switch( m_actions.front() )
 		{
 			case ACT_STOP_PLAY:
 			{
+				timeLine * tl =
+					m_playPos[m_playMode].m_timeLine;
 				m_playing = FALSE;
 				if( tl != NULL )
 				{
@@ -825,11 +826,15 @@ void songEditor::doActions( void )
 			case ACT_PLAY_TRACK:
 			case ACT_PLAY_BB:
 			case ACT_PLAY_PATTERN:
+			{
+				timeLine * tl =
+					m_playPos[m_playMode].m_timeLine;
 				if( tl != NULL )
 				{
 					tl->savePos( m_playPos[m_playMode] );
 				}
 				break;
+			}
 
 			// keep GCC happy...
 			default:
@@ -891,7 +896,7 @@ void songEditor::processNextBuffer( void )
 
 	}
 
-	if( tv.isEmpty() == TRUE )
+	if( tv.empty() == TRUE )
 	{
 		return;
 	}
@@ -972,6 +977,7 @@ void songEditor::processNextBuffer( void )
 					m_playPos[m_playMode].currentFrame();
 		}
 
+		// loop through all tracks and play them if they're not muted
 		for( trackVector::iterator it = tv.begin(); it != tv.end();
 									++it )
 		{

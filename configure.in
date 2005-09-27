@@ -2,9 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1, tobydox@users.sourceforge.net)
-#AC_INIT(acinclude.m4)
-AM_INIT_AUTOMAKE(lmms, 0.1.1)
+AC_INIT(lmms, 0.1.1-cvs20050927, tobydox@users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20050927)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -54,7 +53,7 @@ done
 
 
 AH_TEMPLATE(SDL_SDL_H, [Define to location of SDL.h])
-AH_TEMPLATE(SDL_SDL_AUDIO_H, [Define to location of SD_audio.h])
+AH_TEMPLATE(SDL_SDL_AUDIO_H, [Define to location of SDL_audio.h])
 AH_TEMPLATE(SDL_SDL_SOUND_H, [Define to location of SDL_sound.h])
 
 OLD_LIBS="$LIBS"
@@ -65,7 +64,7 @@ AC_ARG_WITH(sdl,
 	AS_HELP_STRING([--without-sdl],
 			[disable support for SDL-audio-output]), ,
  	[ with_sdlaudio=yes ])
-AH_TEMPLATE(HAVE_SDL_SDL_AUDIO_H, [Define to 1 if you have the $SDL_INC_PATH/SDL_audio.h header file.])
+AH_TEMPLATE(HAVE_SDL_SDL_AUDIO_H, [Define to 1 if you have the <$SDL_INC_PATH/SDL_audio.h> header file.])
 if test "x$with_sdlaudio" = "xyes" -a ! -z "$SDL_INC_PATH"; then
 	AC_CHECK_HEADER($SDL_INC_PATH/SDL_audio.h, HAVE_SDL_SDL_AUDIO_H="true")
 	AC_CHECK_LIB([SDL], [SDL_OpenAudio], HAVE_LIBSDL="true", HAVE_SDL_SDL_AUDIO_H="")
@@ -83,7 +82,7 @@ AC_ARG_WITH(sdlsound,
 	AS_HELP_STRING([--without-sdlsound],
 			[disable support for reading samples via SDL_sound]), ,
  	[ with_sdlsound=yes ])
-AH_TEMPLATE(HAVE_SDL_SDL_SOUND_H, [Define to 1 if you have the $SDL_INCL_PATH/SDL_sound.h header file.])
+AH_TEMPLATE(HAVE_SDL_SDL_SOUND_H, [Define to 1 if you have the <$SDL_INCL_PATH/SDL_sound.h> header file.])
 if test "x$with_sdlsound" = "xyes" -a ! -z "$SDL_INC_PATH"; then
 	AC_CHECK_HEADER($SDL_INC_PATH/SDL_sound.h, HAVE_SDL_SDL_SOUND_H="true")
 	AC_CHECK_LIB([SDL_sound], [Sound_Init], HAVE_LIBSDL_SOUND="true", HAVE_SDL_SDL_SOUND_H="")
@@ -103,7 +102,7 @@ AC_ARG_WITH(asound,
 	AS_HELP_STRING([--without-asound],
 			[disable support for ALSA-sound-output]), ,
  	[ with_asound=yes ])
-AH_TEMPLATE(HAVE_ALSA_ASOUNDLIB_H, [Define to 1 if you have the alsa/asoundlib.h header file.])
+AH_TEMPLATE(HAVE_ALSA_ASOUNDLIB_H, [Define to 1 if you have the <alsa/asoundlib.h> header file.])
 if test "x$with_asound" = "xyes" ; then
 	AC_CHECK_HEADER(alsa/asoundlib.h, HAVE_ALSA_ASOUNDLIB_H="true")
 	AC_CHECK_LIB([asound], [snd_pcm_open], HAVE_LIBASOUND="true", HAVE_ALSA_ASOUNDLIB_H="")
@@ -114,12 +113,31 @@ fi
 AM_CONDITIONAL(HAVE_LIBASOUND, test ! -z "$HAVE_ALSA_ASOUNDLIB_H")
 
 
+# check for OSS
+AC_ARG_WITH(oss,
+	AS_HELP_STRING([--without-oss],
+			[disable support for OSS-sound-output]), ,
+ 	[ with_oss=yes ])
+AH_TEMPLATE(HAVE_SYS_SOUNDCARD_H, [Define to 1 if you have the <sys/soundcard.h> header file.])
+AH_TEMPLATE(HAVE_SOUNDCARD_H, [Define to 1 if you have the <soundcard.h> header file.])
+if test "x$with_oss" = "xyes" ; then
+	AC_CHECK_HEADER(sys/soundcard.h, HAVE_SYS_SOUNDCARD_H="true")
+	AC_CHECK_HEADER(soundcard.h, HAVE_SOUNDCARD_H="true")
+fi
+if test ! -z "$HAVE_SYS_SOUNDCARD_H" ; then
+	AC_DEFINE(HAVE_SYS_SOUNDCARD_H)
+fi
+if test ! -z "$HAVE_SOUNDCARD_H" ; then
+	AC_DEFINE(HAVE_SOUNDCARD_H)
+fi
+
+
 # check for JACK
 AC_ARG_WITH(jack,
 	AS_HELP_STRING([--without-jack],
 			[disable support for JACK-transport]), ,
  	[ with_jack=yes ])
-AH_TEMPLATE(HAVE_JACK_JACK_H, [Define to 1 if you have the jack/jack.h header file.])
+AH_TEMPLATE(HAVE_JACK_JACK_H, [Define to 1 if you have the <jack/jack.h> header file.])
 AH_TEMPLATE(OLD_JACK, [Define to 1 if your JACK-version doesnt know about jack_client_open() etc.])
 if test "x$with_jack" = "xyes" ; then
 	AC_CHECK_HEADER(jack/jack.h, HAVE_JACK_JACK_H="true")
@@ -140,9 +158,9 @@ AC_ARG_WITH(vorbis,
  	AS_HELP_STRING([--without-vorbis],
 		[disable support for exporting song to OGG-files]), ,
  	[ with_vorbis=yes ])
-AH_TEMPLATE(HAVE_VORBIS_CODEC_H, [Define to 1 if you have the vorbis/codec.h header file.])
-AH_TEMPLATE(HAVE_VORBIS_VORBISENC_H, [Define to 1 if you have the vorbis/vorbisenc.h header file.])
-AH_TEMPLATE(HAVE_VORBIS_VORBISFILE_H, [Define to 1 if you have the vorbis/vorbisfile.h header file.])
+AH_TEMPLATE(HAVE_VORBIS_CODEC_H, [Define to 1 if you have the <vorbis/codec.h> header file.])
+AH_TEMPLATE(HAVE_VORBIS_VORBISENC_H, [Define to 1 if you have the <vorbis/vorbisenc.h> header file.])
+AH_TEMPLATE(HAVE_VORBIS_VORBISFILE_H, [Define to 1 if you have the <vorbis/vorbisfile.h> header file.])
 if test "x$with_vorbis" = "xyes" ; then
 	OGG_SUPPORT="true"
 	AC_CHECK_HEADER(vorbis/codec.h, HAVE_VORBIS_CODEC_H="true",OGG_SUPPORT="")
@@ -163,7 +181,7 @@ AC_ARG_WITH(src,
 	AS_HELP_STRING([--without-libsrc],
 		[disable support for resampling via libsamplerate]), ,
  	[ with_libsrc=yes ])
-AH_TEMPLATE(HAVE_SAMPLERATE_H, [Define to 1 if you have the samplerate.h header file.])
+AH_TEMPLATE(HAVE_SAMPLERATE_H, [Define to 1 if you have the <samplerate.h> header file.])
 if test "x$with_libsrc" = "xyes" ; then
 	AC_CHECK_HEADER(samplerate.h, HAVE_SAMPLERATE_H="true")
 	AC_CHECK_LIB([samplerate], [src_simple], HAVE_LIBSRC="true", HAVE_SAMPLERATE_H="")
@@ -179,7 +197,7 @@ AC_ARG_WITH(src,
  	AS_HELP_STRING([--without-libsf],
 		[disable support for importing files via libsndfile]), ,
  	[ with_libsf=yes ])
-AH_TEMPLATE(HAVE_SNDFILE_H, [Define to 1 if you have the sndfile.h header file.])
+AH_TEMPLATE(HAVE_SNDFILE_H, [Define to 1 if you have the <sndfile.h> header file.])
 if test "x$with_libsf" = "xyes" ; then
 	AC_CHECK_HEADER(sndfile.h, HAVE_SNDFILE_H="true")
 	AC_CHECK_LIB([sndfile], [sf_command], HAVE_LIBSF="true", HAVE_SNDFILE_H="")
@@ -283,6 +301,14 @@ AC_TRY_LINK([#include <math.h>], [ fabsf ],
 	AC_DEFINE(fabsf, fabs)
 		)
 
+AC_MSG_CHECKING([whether logf is known by compiler])
+AH_TEMPLATE(logf, [Define to lof if logf is not known])
+AC_TRY_LINK([#include <math.h>], [ logf ],
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT([no - will use log instead])
+	AC_DEFINE(logf, log)
+		)
+
 
 # check whether to enable debugging-code
 AC_MSG_CHECKING([whether to enable debugging-code])
@@ -356,21 +382,7 @@ with_warnings="false"
 echo
 echo
 
-
-if test -z "$OGG_SUPPORT" ; then
-	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
-	echo " ========================"
-	echo " ="
-	echo " = You don't seem to have libvorbis installed and/or libvorbis-development-"
-	echo " = package is missing. This will disable support for exporting songs to"
-	echo " = OGG-files! If also SDL_sound is missing, you'll not be able to use the "
-	echo " = samples coming with LMMS since libsndfile currently has no OGG-support!"
-	echo " = Consider installing the missing packages for using the full power of LMMS."
-	echo " ="
-	with_warnings="true"
-fi
-
+PLUGINS_TO_BUILD=""
 
 
 if test -z "$HAVE_ALSA_ASOUNDLIB_H" ; then
@@ -380,10 +392,11 @@ if test -z "$HAVE_ALSA_ASOUNDLIB_H" ; then
 	echo " ="
 	echo " = You don't seem to have ALSA-library installed and/or ALSA-lib-development-"
 	echo " = package is missing. This will disable support for sound-output via ALSA!"
-	echo " = If you use ALSA-driver for your soundcard there will be no sound-output!"
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* ALSA for audio- and MIDI-input/output"
 fi
 
 
@@ -400,7 +413,29 @@ if test -z "$HAVE_JACK_JACK_H" ; then
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* JACK for audio-input/output"
 fi
+
+
+
+
+if test -z "$HAVE_SOUNDCARD_H" -a -z "$HAVE_SYS_SOUNDCARD_H" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have soundcard.h which is neccessary for outputting "
+	echo " = sound via OSS under Linux/BSD/Solaris."
+	echo " = This will also disable support for MIDI using OSS."
+	echo " = If you're building for a different platform or do not need OSS-support, you"
+	echo " = can ignore this warning."
+	echo " ="
+	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* OSS for audio- and MIDI-input/output"
+fi
+
 
 
 
@@ -411,14 +446,33 @@ if test -z "$HAVE_SDL_SDL_AUDIO_H" ; then
 	echo " ="
 	echo " = You don't seem to have SDL-library installed and/or SDL-lib-development-"
 	echo " = package is missing. This will disable support for sound-output via SDL, "
-	echo " = which is important, if you're using sound-daemons (arts, ESD, JACK etc.)"
+	echo " = which is important, if you're using sound-daemons (arts, ESD etc.)"
 	echo " = When compiling without SDL, you'll always have to kill your sound-daemon"
 	echo " = before using LMMS...!"
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SDL for audio-output"
 fi
 
+
+
+if test -z "$OGG_SUPPORT" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have libvorbis installed and/or libvorbis-development-"
+	echo " = package is missing. This will disable support for exporting songs to"
+	echo " = OGG-files! If SDL_sound is missing too, you'll not be able to use the "
+	echo " = samples coming with LMMS since libsndfile currently has no OGG-support!"
+	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " ="
+	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libvorbis for encoding/decoding OGG-files"
+fi
 
 
 
@@ -433,6 +487,8 @@ if test -z "$HAVE_SDL_SDL_SOUND_H" ; then
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SDL_sound for sample-decoding"
 fi
 
 
@@ -450,6 +506,8 @@ if test -z "$HAVE_SNDFILE_H" ; then
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsndfile for sample-decoding"
 fi
 
 
@@ -467,11 +525,14 @@ if test -z "$HAVE_SAMPLERATE_H" ; then
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsamplerate for internal samplerate-conversion"
 fi
 
 
-
-
+echo
+echo
+echo "LMMS will be able to use $PLUGINS_TO_BUILD" | sed -e "s/\\\n/\n/g" | sed -e "s/\\\t/\t/g" | sed -e "s/\\\\\*/\*/g"
 echo
 echo
 echo " ============================"

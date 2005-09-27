@@ -57,6 +57,7 @@
 #include "oscillator.h"
 #include "debug.h"
 #include "tooltip.h"
+#include "gui_templates.h"
 
 
 // how long should be each envelope-segment maximal (e.g. attack)?

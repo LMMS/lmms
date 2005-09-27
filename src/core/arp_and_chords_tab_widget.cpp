@@ -52,6 +52,7 @@
 #include "pixmap_button.h"
 #include "knob.h"
 #include "tooltip.h"
+#include "gui_templates.h"
 
 
 #ifdef HAVE_STDLIB_H
@@ -324,28 +325,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 	m_arpDirectionLbl->setFont( pointSize<6>( m_arpDirectionLbl->font() ) );
 
 
-/*	m_arpOffBtn = new pixmapButton( m_arpGroupBox );
-	m_arpOffBtn->move( 10, 87 );
-	m_arpOffBtn->setActiveGraphic( embed::getIconPixmap( "arp_off_on" ) );
-	m_arpOffBtn->setInactiveGraphic( embed::getIconPixmap(
-							"arp_off_off" ) );
-#ifdef QT4
-	m_arpOffBtn->setChecked( TRUE );
-#else
-	m_arpOffBtn->setOn( TRUE );
-#endif
-#ifndef QT4
-	m_arpOffBtn->setBackgroundMode( Qt::PaletteBackground );
-#endif
-#ifdef QT4
-	m_arpOffBtn->setToolTip(
-#else
-	toolTip::add( m_arpOffBtn,
-#endif
-		tr( "arpeggio direction = none = no arpeggio" ) );
-	connect( m_arpOffBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( arpOffToggled( bool ) ) );*/
-
 
 	m_arpUpBtn = new pixmapButton( m_arpGroupBox );
 	m_arpUpBtn->move( 80, 70 );
@@ -403,7 +382,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 					SLOT( arpRandomToggled( bool ) ) );
 
 	QButtonGroup * m_arpDirections_group = new QButtonGroup( this );
-//	m_arpDirections_group->addButton( m_arpOffBtn );
 	m_arpDirections_group->addButton( m_arpUpBtn );
 	m_arpDirections_group->addButton( m_arpDownBtn );
 	m_arpDirections_group->addButton( m_arpUpAndDownBtn );

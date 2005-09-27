@@ -34,7 +34,6 @@ namespace toolTip
 {
 
 	void add( QWidget * _w, const QString & _txt );
-	//void remove( QWidget * _w );
 
 } ;
 

@@ -22,16 +22,16 @@
  */
 
 
-
 #include "audio_jack.h"
+
+
+#ifdef JACK_SUPPORT
 
 #ifdef HAVE_UNISTD_H
 // for usleep
 #include <unistd.h>
 #endif
 
-
-#ifdef JACK_SUPPORT
 
 #ifdef QT4
 
@@ -46,12 +46,13 @@
 #endif
 
 
-
 #include "debug.h"
 #include "templates.h"
+#include "gui_templates.h"
 #include "buffer_allocator.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
+
 
 
 audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
@@ -240,7 +241,7 @@ void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 #ifdef HAVE_UNISTD_H
 #ifdef HAVE_USLEEP
 		// just wait and give cpu-time to other processes
-		usleep( 500 );
+		usleep( 200 );
 #endif
 #endif
 	}
@@ -309,6 +310,21 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		done += todo;
 		_this->m_frameSync -= todo;
 	}
+
+	// we have to clear the part of the buffers, we could not fill because
+	// no usable data is left, otherwise there's baaaaaad noise... ;-)
+	if( done < _nframes )
+	{
+		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
+		{
+			jack_default_audio_sample_t * b = outbufs[ch];
+			for( Uint32 frame = done; frame < _nframes; ++frame )
+			{
+				b[frame] = 0.0f;
+			}
+		}
+	}
+
 	_this->m_bufMutex.unlock();
 
 	return( 0 );

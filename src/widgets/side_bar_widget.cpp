@@ -41,12 +41,12 @@
 
 #include "side_bar_widget.h"
 #include "types.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 
 sideBarWidget::sideBarWidget( const QString & _title, const QPixmap & _icon,
-								QWidget * _parent ) :
+							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_title( _title ),
 	m_icon( _icon )

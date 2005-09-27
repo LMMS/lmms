@@ -40,7 +40,7 @@
 
 #include "midi_alsa_raw.h"
 #include "config_mgr.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 #ifdef ALSA_SUPPORT

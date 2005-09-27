@@ -30,14 +30,10 @@
 #ifdef QT4
 
 #include <QtAlgorithms>
-#include <QX11Info>
-#include <QFont>
 
 #else
 
 #include <qtl.h>
-#include <qpaintdevice.h>
-#include <qfont.h>
 
 #endif
 
@@ -83,19 +79,6 @@ inline T tLimit( const T & x, const T & x1, const T & x2 )
 	return( tMin<T>( tMax<T>( x, tMin<T>( x1, x2 ) ),
 							tMax<T>( x1, x2 ) ) );
 	
-}
-
-
-template<int SIZE>
-inline QFont pointSize( QFont _f )
-{
-	const int DPI = 96;
-#ifdef QT4
-	_f.setPointSizeF( SIZE * DPI / QX11Info::appDpiX() );
-#else
-	_f.setPointSizeFloat( SIZE * DPI / QPaintDevice::x11AppDpiX() );
-#endif
-	return( _f );
 }
 
 

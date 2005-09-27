@@ -22,6 +22,11 @@
  */
 
 
+#include "midi_oss.h"
+
+#ifdef OSS_SUPPORT
+
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -38,9 +43,8 @@
 #endif
 
 
-#include "midi_oss.h"
 #include "config_mgr.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 
@@ -72,9 +76,12 @@ midiOSS::midiOSS( channelTrack * _ct ) :
 
 midiOSS::~midiOSS()
 {
-	m_quit = TRUE;
-	wait( 500 );
-	terminate();
+	if( running() )
+	{
+		m_quit = TRUE;
+		wait( 500 );
+		terminate();
+	}
 }
 
 
@@ -161,4 +168,7 @@ void midiOSS::setupWidget::saveSettings( void )
 							m_device->text() );
 }
 
+
+
+#endif
 

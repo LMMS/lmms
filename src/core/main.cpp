@@ -45,7 +45,7 @@
 #include "config_mgr.h"
 #include "export_project_dialog.h"
 #include "song_editor.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 #if QT_VERSION >= 0x030100

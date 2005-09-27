@@ -40,13 +40,17 @@
 
 #endif
 
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
 #include <math.h>
 
 
 #include "group_box.h"
 #include "embed.h"
 #include "spc_bg_hndl_widget.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 QPixmap * groupBox::s_ledBg = NULL;

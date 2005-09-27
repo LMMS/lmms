@@ -51,6 +51,7 @@
 #include "pattern.h"
 #include "channel_track.h"
 #include "templates.h"
+#include "gui_templates.h"
 #include "embed.h"
 #include "piano_roll.h"
 #include "track_container.h"
@@ -748,7 +749,7 @@ note * pattern::addNote( const note & _new_note )
 {
 	note * new_note = new note( _new_note );
 
-	if( m_notes.size() == 0 || m_notes.last()->pos() <= new_note->pos() )
+	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
 		m_notes.push_back( new_note );
 	}

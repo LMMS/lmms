@@ -34,6 +34,7 @@
 
 #else
 
+#include <qmap.h>
 #include <qpair.h>
 #include <qfile.h>
 

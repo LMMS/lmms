@@ -51,7 +51,7 @@
 #include "group_box.h"
 #include "tab_widget.h"
 #include "embed.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 const int TARGETS_TABWIDGET_X = 4;
@@ -71,7 +71,7 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
+const char * targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 {
 	{ envelopeTabWidget::tr( "VOLUME" ), "vol" },
 /*	envelopeTabWidget::tr( "Pan" ),
@@ -512,7 +512,8 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 	{
 		QDomElement target_de = _doc.createElement(
 						m_envLFOWidgets[i]->nodeName() +
-						targetNames[i][1].toLower() );
+					QString(
+						targetNames[i][1] ).toLower() );
 		m_envLFOWidgets[i]->saveSettings( _doc, target_de );
 		etw_de.appendChild( target_de );
 	}
@@ -542,7 +543,7 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 			{
 				if( node.nodeName() ==
 						m_envLFOWidgets[i]->nodeName() +
-						targetNames[i][1].toLower() )
+					QString( targetNames[i][1] ).toLower() )
 				{
 					m_envLFOWidgets[i]->loadSettings(
 							node.toElement() );

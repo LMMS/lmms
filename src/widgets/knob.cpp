@@ -65,10 +65,11 @@
 #include "midi_device.h"
 #include "embed.h"
 #include "spc_bg_hndl_widget.h"
-//#include "tooltip.h"
 #include "config_mgr.h"
 #include "text_float.h"
 #include "mixer.h"
+#include "gui_templates.h"
+#include "templates.h"
 
 
 const int WHEEL_DELTA = 120;

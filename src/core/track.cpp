@@ -420,9 +420,9 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 
 void trackContentWidget::removeAllTCOs( void )
 {
-	while( !m_trackContentObjects.isEmpty() )
+	while( !m_trackContentObjects.empty() )
 	{
-		delete m_trackContentObjects.first();
+		delete m_trackContentObjects.front();
 		m_trackContentObjects.erase( m_trackContentObjects.begin() );
 	}
 }

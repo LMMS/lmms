@@ -111,9 +111,10 @@ mixer::mixer() :
 
 	m_silence = bufferAllocator::alloc<sampleFrame>(
 						m_framesPerAudioBuffer );
+#ifndef DISABLE_SURROUND
 	m_surroundSilence = bufferAllocator::alloc<surroundSampleFrame>(
 						m_framesPerAudioBuffer );
-
+#endif
 	for( Uint32 frame = 0; frame < m_framesPerAudioBuffer; ++frame )
 	{
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -151,6 +152,11 @@ mixer::~mixer()
 			bufferAllocator::free( m_samplePackets[i].m_buffer );
 		}
 	}
+
+	bufferAllocator::free( m_silence );
+#ifndef DISABLE_SURROUND
+	bufferAllocator::free( m_surroundSilence );
+#endif
 }
 
 
@@ -181,16 +187,16 @@ void mixer::run( void )
 		// remove all play-handles that have to be deleted and delete
 		// them if they still exist...
 		// maybe this algorithm could be optimized...
-		while( !m_playHandlesToRemove.isEmpty() )
+		while( !m_playHandlesToRemove.empty() )
 		{
 			playHandleVector::iterator it = m_playHandles.begin();
 
 			while( it != m_playHandles.end() )
 			{
-				if( *it == m_playHandlesToRemove.first() )
+				if( *it == m_playHandlesToRemove.front() )
 				{
 					m_playHandles.erase( it );
-					delete m_playHandlesToRemove.first();
+					delete m_playHandlesToRemove.front();
 					break;
 				}
 				++it;

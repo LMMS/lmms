@@ -256,24 +256,17 @@ void bbEditor::closeEvent( QCloseEvent * _ce )
 
 
 
-/*void bbEditor::paintEvent( QPaintEvent * )
-{
-}*/
-
-
-
-
 void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
 		if( songEditor::inst()->playing() )
 		{
-			stop ();
+			stop();
 		}
 		else
 		{
-			play ();
+			play();
 		}
 	}
 	else if ( _ke->key() == Qt::Key_Plus )
@@ -347,6 +340,7 @@ void bbEditor::updateBackground( void )
 
 
 
+
 void bbEditor::play( void )
 {
 	if( songEditor::inst()->playing() )
@@ -362,7 +356,7 @@ void bbEditor::play( void )
 		{
 			songEditor::inst()->pause();
 			m_playButton->setInactiveGraphic(
-						embed::getIconPixmap("play") );
+					embed::getIconPixmap( "play" ) );
 		}
 	}
 	else if( songEditor::inst()->paused() )
@@ -428,7 +422,7 @@ void bbEditor::createTCOsForBB( csize _bb )
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
 	{
-		while( ( *it )->numOfTCOs() < _bb+1 )
+		while( ( *it )->numOfTCOs() < _bb + 1 )
 		{
 			midiTime position = midiTime( ( *it )->numOfTCOs(), 0 );
 			trackContentObject * tco = ( *it )->addTCO(

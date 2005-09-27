@@ -39,7 +39,7 @@
 
 
 #include "tab_widget.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 

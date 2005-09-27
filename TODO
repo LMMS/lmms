@@ -1,3 +1,5 @@
+- add select-boxes for zooming in song-editor and piano-roll
+- use own scrollview for capturing wheel-events
 - make usable with Qt4
 - make LMMS an ALSA-sequencer-client
 - adchannel-toolbutton -> popup-menu with available soundgenerator-plugins

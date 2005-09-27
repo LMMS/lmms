@@ -165,7 +165,7 @@ void timeLine::updatePosition( const midiTime & )
 #ifndef QT4
 		qApp->lock();
 #endif
-		update();
+		paintEvent( NULL );
 #ifndef QT4
 		qApp->unlock();
 #endif

@@ -25,6 +25,11 @@
 #ifndef _MIDI_OSS_H
 #define _MIDI_OSS_H
 
+#include "audio_oss.h"
+
+#ifdef OSS_SUPPORT
+
+
 #include <qthread.h>
 #include <qfile.h>
 
@@ -74,6 +79,8 @@ private:
 	volatile bool m_quit;
 
 } ;
+
+#endif
 
 
 #endif

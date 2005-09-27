@@ -95,7 +95,6 @@ public:
 
 
 protected slots:
-//	void arpOffToggled( bool );
 	void arpUpToggled( bool );
 	void arpDownToggled( bool );
 	void arpUpAndDownToggled( bool );
@@ -127,12 +126,13 @@ private:
 	knob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
 	QLabel * m_arpDirectionLbl;
-	//pixmapButton * m_arpOffBtn;
+
 	pixmapButton * m_arpUpBtn;
 	pixmapButton * m_arpDownBtn;
 	pixmapButton * m_arpUpAndDownBtn;
 	pixmapButton * m_arpRandomBtn;
 
 } ;
+
 
 #endif

@@ -43,7 +43,7 @@
 #include "buffer_allocator.h"
 #include "debug.h"
 #include "config_mgr.h"
-#include "templates.h"
+#include "gui_templates.h"
 
 
 
@@ -58,7 +58,7 @@ audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
 {
 	_success_ful = FALSE;
 
-	// if device is set, we set AUDIODEV-environment-variable, so that
+/*	// if device is set, we set AUDIODEV-environment-variable, so that
 	// SDL can evaluate and use it
 	QString dev = configManager::inst()->value( "audiosdl", "device" );
 	if( dev != "" )
@@ -69,7 +69,7 @@ audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
 #else
 			ascii() ) );
 #endif
-	}
+	}*/
 
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )

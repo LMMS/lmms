@@ -59,7 +59,7 @@ nStateButton::~nStateButton()
 {
 	while( m_states.size() )
 	{
-		delete m_states.first().first;
+		delete m_states.front().first;
 		m_states.erase( m_states.begin() );
 	}
 }

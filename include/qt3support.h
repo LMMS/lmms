@@ -170,6 +170,35 @@ typedef int csize;
 
 typedef unsigned int csize;
 
+// some compat-stuff for older qt-versions...
+#if QT_VERSION < 0x030100
+
+#define wasCanceled wasCancelled
+
+#include <qmutex.h>
+
+// Qt 3.0.x doesn't have QMutexLocker, so we implement it on our own...
+class QMutexLocker
+{
+public:
+	QMutexLocker( QMutex * _m ) :
+		m_mutex( _m )
+	{
+		m_mutex->lock();
+	}
+	~QMutexLocker()
+	{
+		m_mutex->unlock();
+	}
+
+private:
+    QMutex * m_mutex;
+
+} ;
+
+
+#endif
+
 
 #endif
 

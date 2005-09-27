@@ -220,6 +220,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/knob.h				\
 		$(srcdir)/include/browser.h				\
 		$(srcdir)/include/templates.h				\
+		$(srcdir)/include/gui_templates.h			\
 		$(srcdir)/include/surround_area.h			\
 		$(srcdir)/include/kmultitabbar.h			\
 		$(srcdir)/include/side_bar.h				\

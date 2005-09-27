@@ -51,7 +51,7 @@
 #include "crystal_button.h"
 #include "pixmap_button.h"
 #include "note_play_handle.h"
-#include "templates.h"
+#include "gui_templates.h"
 #include "timeline.h"
 #include "channel_track.h"
 #include "tooltip.h"
@@ -469,7 +469,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 	noteVector & notes = m_pattern->notes();
 	int central_key = 0;
-	if( notes.isEmpty() == FALSE )
+	if( notes.empty() == FALSE )
 	{
 		// determine the central key so that we can scroll to it
 		int total_notes = 0;
@@ -2202,15 +2202,15 @@ void pianoRoll::copySelectedNotes( void )
 	noteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
-	if( selected_notes.isEmpty() == FALSE )
+	if( selected_notes.empty() == FALSE )
 	{
-		midiTime start_pos( selected_notes.first()->pos().getTact(),
+		midiTime start_pos( selected_notes.front()->pos().getTact(),
 									0 );
 		for( noteVector::iterator it = selected_notes.begin();
 			it != selected_notes.end(); ++it )
 		{
 			m_notesToCopy.push_back( new note( **it ) );
-			m_notesToCopy.last()->setPos( m_notesToCopy.last()->pos(
+			m_notesToCopy.back()->setPos( m_notesToCopy.back()->pos(
 								start_pos ) );
 		}
 	}
@@ -2237,22 +2237,22 @@ void pianoRoll::cutSelectedNotes( void )
 	noteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
-	if( selected_notes.isEmpty() == FALSE )
+	if( selected_notes.empty() == FALSE )
 	{
 		songEditor::inst()->setModified();
 
-		midiTime start_pos( selected_notes.first()->pos().getTact(),
+		midiTime start_pos( selected_notes.front()->pos().getTact(),
 									0 );
 
-		while( selected_notes.isEmpty() == FALSE )
+		while( selected_notes.empty() == FALSE )
 		{
-			note * new_note = new note( *selected_notes.first() );
+			note * new_note = new note( *selected_notes.front() );
 			new_note->setPos( new_note->pos( start_pos ) );
 			m_notesToCopy.push_back( new_note );
 
 			// note (the memory of it) is also deleted by
 			// pattern::removeNote(...) so we don't have to do that
-			m_pattern->removeNote( selected_notes.first() );
+			m_pattern->removeNote( selected_notes.front() );
 			selected_notes.erase( selected_notes.begin() );
 		}
 	}
@@ -2271,7 +2271,7 @@ void pianoRoll::pasteNotes( void )
 		return;
 	}
 
-	if( m_notesToCopy.isEmpty() == FALSE )
+	if( m_notesToCopy.empty() == FALSE )
 	{
 		for( noteVector::iterator it = m_notesToCopy.begin();
 					it != m_notesToCopy.end(); ++it )
@@ -2302,11 +2302,11 @@ void pianoRoll::deleteSelectedNotes( void )
 	noteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
-	const bool update_after_delete = !selected_notes.isEmpty();
+	const bool update_after_delete = !selected_notes.empty();
 
-	while( selected_notes.isEmpty() == FALSE )
+	while( selected_notes.empty() == FALSE )
 	{
-		m_pattern->removeNote( selected_notes.first() );
+		m_pattern->removeNote( selected_notes.front() );
 		selected_notes.erase( selected_notes.begin() );
 	}
 

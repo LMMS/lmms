@@ -25,10 +25,18 @@
 #ifndef _AUDIO_OSS_H
 #define _AUDIO_OSS_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#if defined HAVE_SYS_SOUNDCARD_H || defined HAVE_SOUNDCARD_H
+
+#define OSS_SUPPORT
+
+
 #include "audio_device.h"
 #include "tab_widget.h"
 
-#define OSS_SUPPORT
 
 
 class lcdSpinBox;
@@ -75,5 +83,7 @@ private:
 
 } ;
 
+
+#endif
 
 #endif

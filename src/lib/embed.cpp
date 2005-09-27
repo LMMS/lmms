@@ -97,26 +97,31 @@ QString getText( const char * _name )
 
 void loadTranslation( const QString & _tname )
 {
-#if QT_VERSION >= 0x030100
+	QTranslator * t = new QTranslator( 0 );
 	QString name = _tname + ".qm";
+
+#if QT_VERSION >= 0x030100
+
 #ifdef QT4
 	const embedDesc & e = findEmbeddedData( name.toAscii().constData() );
 #else
 	const embedDesc & e = findEmbeddedData( name.ascii() );
 #endif
-	QTranslator * t = new QTranslator( 0 );
 	// not found?
 	if( QString( e.name ) != name )
 	{
+#endif
 		// then look whether translation is in data-dir
 		t->load( name, configManager::inst()->localeDir() );
+#if QT_VERSION >= 0x030100
 	}
 	else
 	{
 		t->load( e.data, (int) e.size );
 	}
-	qApp->installTranslator( t );
 #endif
+
+	qApp->installTranslator( t );
 }
 
 

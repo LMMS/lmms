@@ -104,7 +104,11 @@ public:
 	}
 	static inline float phase( float _sample )
 	{
+#ifndef modff
 		float t;
+#else
+		double t;
+#endif
 		return( modff( _sample, &t ) );
 		//return( _sample - floorf( _sample ) );
 	}

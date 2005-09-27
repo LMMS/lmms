@@ -50,10 +50,3 @@ void toolTip::add( QWidget * _w, const QString & _txt )
 	}
 }
 
-
-/*
-void toolTip::remove( QWidget * _w )
-{
-	QToolTip::remove( _w );
-}
-*/

@@ -49,7 +49,7 @@
 #include "tab_bar.h"
 #include "tab_button.h"
 #include "tab_widget.h"
-#include "templates.h"
+#include "gui_templates.h"
 #include "mixer.h"
 #include "config_mgr.h"
 #include "embed.h"

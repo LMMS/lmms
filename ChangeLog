@@ -1,3 +1,54 @@
+2005-09-25	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/audio/audio_jack.cpp:
+	- decreased wait-time from 0.5 ms to 0.2 ms in writeBufferToDev(...)
+	- clear part of buffers that could not be filled for avoiding bad
+	  noise in case there's no data from sound-render-thread, because it is
+	  locked or got no cpu-time for some reason
+
+	* src/core/timeline.cpp:
+	do not call update() in updatePosition, call paintEvent() directly
+	instead - hopefully fixes the "unexspected Xlib async replies"
+	which occured in some seldom cases because now there're no events
+	generated anymore
+
+	* resources/source/songeditor.svg:
+	* resources/songeditor.png:
+	created a new song-editor-icon
+
+	* src/core/song_editor.cpp:
+	do not save play-pos from previous play-mode when beginning to play
+	in different play-mode - fixes bug in timeline behaviour "back to start"
+
+2005-09-24	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* configure.in:
+	* include/audio_oss.h:
+	* include/midi_oss.h:
+	* src/audio/audio_oss.cpp:
+	* src/midi/midi_oss.cpp:
+	made LMMS compiling and working without OSS - configure detects
+	whether soundcard.h is available
+
+	* include/gui_templates.h:
+	made template pointSize(...) platform-independent by not using x11-
+	specific qt-classes/-functions
+
+	* include/templates.h:
+	moved pointSize-function with all the headers it depends on into
+	gui_templates.h
+
+	* src/core/mixer.cpp:
+	- do not initialize member m_surroundSilence if surround is disabled
+	- free silence-buffers in dtor
+
+	* src/tracks/bb_track.cpp:
+	when drawing gradient skip first and last line as a rect is painted
+	over it afterwards
+
+	* src/core/track_container.cpp:
+	set modified-state for song when removing track
+
 2005-09-21	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* configure.in:

@@ -42,9 +42,6 @@
 #endif
 
 
-#include "templates.h"
-
-
 class QPixmap;
 class textFloat;
 

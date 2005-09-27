@@ -44,12 +44,11 @@
 #include "bb_track.h"
 #include "song_editor.h"
 #include "bb_editor.h"
-#include "templates.h"
+#include "gui_templates.h"
 #include "name_label.h"
 #include "embed.h"
 #include "rename_dialog.h"
 
-#include "bb_track.moc"
 
 
 QMap<bbTrack *, bbTrack::bbInfoStruct> bbTrack::s_bbNums;
@@ -164,10 +163,10 @@ void bbTCO::paintEvent( QPaintEvent * )
 	QPainter p( &pm );
 
 	// COOL gradient ;-)
-	for( int y = 0; y < height(); ++y )
+	for( int y = 1; y < height() - 1; ++y )
 	{
 		p.setPen( col.light( 130 - y * 60 / height() ) );
-		p.drawLine( 0, y, width(), y );
+		p.drawLine( 1, y, width() - 1, y );
 	}
 	//pm.fill( col );
 #endif
@@ -507,3 +506,9 @@ void bbTrack::clickedTrackLabel( void )
 	bbEditor::inst()->setCurrentBB( s_bbNums[this].num );
 	bbEditor::inst()->show();
 }
+
+
+
+
+#include "bb_track.moc"
+

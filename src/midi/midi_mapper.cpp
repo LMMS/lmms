@@ -73,7 +73,14 @@ midiMapper::midiMapper( const QString & _map ) :
 			continue;
 		}
 		QString line( buf );
+#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
+#else
+		if( line.contains( '\n' ) )
+		{
+			line = line.left( line.length() - 1 );
+		}
+#endif
 		if( line.left( 6 ) == "DEFINE" )
 		{
 			if( line.section( ' ', 1, 1 ) == "PATCHMAP" )
@@ -117,18 +124,28 @@ void midiMapper::readPatchMap( QFile & _f )
 			continue;
 		}
 		QString line( buf );
+#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
+#else
+		if( line.contains( '\n' ) )
+		{
+			line = line.left( line.length() - 1 );
+		}
+#endif
 		if( line.left( 3 ) == "END" )
 		{
 			return;
 		}
-		if( QString( line ).replace( ' ', "" )[0] == '#' )
+		if( line[0] == '#' )
 		{
 			continue;
 		}
 		m_patchMap[prog_idx].first = line.section( '=', 1, 1 ).toInt();
-		m_patchMap[prog_idx].second = line.section( '=', 0, 0 ).
-							replace( ' ', "" );
+		m_patchMap[prog_idx].second = line.section( '=', 0, 0 )
+#if QT_VERSION >= 0x030100
+							.replace( ' ', "" )
+#endif
+						;
 		++prog_idx;
 	}
 }
@@ -148,12 +165,19 @@ void midiMapper::readDrumsetKeyMap( QFile & _f )
 			continue;
 		}
 		QString line( buf );
+#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
+#else
+		if( line.contains( '\n' ) )
+		{
+			line = line.left( line.length() - 1 );
+		}
+#endif
 		if( line.left( 3 ) == "END" )
 		{
 			return;
 		}
-		if( QString( line ).replace( ' ', "" )[0] == '#' )
+		if( line[0] == '#' )
 		{
 			continue;
 		}
@@ -164,8 +188,11 @@ void midiMapper::readDrumsetKeyMap( QFile & _f )
 
 			m_drumsetKeyMap[key].second = line.mid( 4 ).
 							section( '=', 0, 0 ).
-							section( ' ', 1, 1 ).
-							replace( ' ', "" );
+							section( ' ', 1, 1 )
+#if QT_VERSION >= 0x030100
+							.replace( ' ', "" )
+#endif
+							;
 		}
 		++key;
 	}
@@ -185,12 +212,19 @@ void midiMapper::readChannelMap( QFile & _f )
 			continue;
 		}
 		QString line( buf );
+#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
+#else
+		if( line.contains( '\n' ) )
+		{
+			line = line.left( line.length() - 1 );
+		}
+#endif
 		if( line.left( 3 ) == "END" )
 		{
 			return;
 		}
-		if( QString( line ).replace( ' ', "" )[0] == '#' )
+		if( line[0] == '#' )
 		{
 			continue;
 		}
