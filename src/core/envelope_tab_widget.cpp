@@ -71,7 +71,7 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const char * targetNames[envelopeTabWidget::TARGET_COUNT][2] =
+static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 {
 	{ envelopeTabWidget::tr( "VOLUME" ), "vol" },
 /*	envelopeTabWidget::tr( "Pan" ),

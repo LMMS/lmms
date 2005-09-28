@@ -171,9 +171,13 @@ typedef int csize;
 typedef unsigned int csize;
 
 // some compat-stuff for older qt-versions...
-#if QT_VERSION < 0x030100
+#if QT_VERSION < 0x030200
 
 #define wasCanceled wasCancelled
+
+#endif
+
+#if QT_VERSION < 0x030100
 
 #include <qmutex.h>
 

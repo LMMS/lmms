@@ -190,7 +190,7 @@ const int CHORDS_GROUPBOX_HEIGHT = 65;
 const int ARP_GROUPBOX_X = CHORDS_GROUPBOX_X;
 const int ARP_GROUPBOX_Y = 10 + CHORDS_GROUPBOX_Y + CHORDS_GROUPBOX_HEIGHT;
 const int ARP_GROUPBOX_WIDTH = CHORDS_GROUPBOX_WIDTH;
-const int ARP_GROUPBOX_HEIGHT = 180 - ARP_GROUPBOX_Y;
+const int ARP_GROUPBOX_HEIGHT = 200 - ARP_GROUPBOX_Y;
 
 
 
@@ -208,7 +208,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 
 	m_chordsComboBox = new QComboBox( m_chordsGroupBox );
 	m_chordsComboBox->setFont( pointSize<9>( m_chordsComboBox->font() ) );
-	m_chordsComboBox->setGeometry( 10, 25, 100, 22 );
+	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
@@ -224,7 +224,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setRange( 1.0, 9.0, 1.0 );
 	m_chordRangeKnob->setValue( 1.0, TRUE );
-	m_chordRangeKnob->move( 123, 23 );
+	m_chordRangeKnob->move( 164, 24 );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " +
 							tr( "octave(s)" ) );
 #ifdef QT4
@@ -259,7 +259,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 			"possible chords, you can select." ) );
 	m_arpComboBox = new QComboBox( m_arpGroupBox );
 	m_arpComboBox->setFont( pointSize<9>( m_arpComboBox->font() ) );
-	m_arpComboBox->setGeometry( 10, 25, 100, 22 );
+	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
@@ -274,7 +274,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setRange( 1.0, 9.0, 1.0 );
 	m_arpRangeKnob->setValue( 1.0, TRUE );
-	m_arpRangeKnob->move( 124, 24 );
+	m_arpRangeKnob->move( 164, 24 );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " +
 							tr( "octave(s)" ) );
 #ifdef QT4
@@ -291,7 +291,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setRange( 10.0, 1000.0, 1.0 );
 	m_arpTimeKnob->setValue( 100.0, TRUE );
-	m_arpTimeKnob->move( 164, 24 );
+	m_arpTimeKnob->move( 164, 70 );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +
 								tr( "ms" ) );
 #ifdef QT4
@@ -308,7 +308,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setRange( 1.0, 200.0, 1.0 );
 	m_arpGateKnob->setValue( 100.0, TRUE );
-	m_arpGateKnob->move( 204, 24 );
+	m_arpGateKnob->move( 204, 70 );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
 #ifdef QT4
 	m_arpGateKnob->setWhatsThis(
@@ -327,7 +327,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 
 
 	m_arpUpBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpBtn->move( 80, 70 );
+	m_arpUpBtn->move( 70, 70 );
 	m_arpUpBtn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	m_arpUpBtn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
 #ifdef QT4
@@ -343,7 +343,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 						SLOT( arpUpToggled( bool ) ) );
 
 	m_arpDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpDownBtn->move( 100, 70 );
+	m_arpDownBtn->move( 90, 70 );
 	m_arpDownBtn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	m_arpDownBtn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_down_off" ) );
@@ -355,7 +355,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 					SLOT( arpDownToggled( bool ) ) );
 
 	m_arpUpAndDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpAndDownBtn->move( 120, 70 );
+	m_arpUpAndDownBtn->move( 110, 70 );
 	m_arpUpAndDownBtn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
 	m_arpUpAndDownBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -369,7 +369,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 					SLOT( arpUpAndDownToggled( bool ) ) );
 
 	m_arpRandomBtn = new pixmapButton( m_arpGroupBox );
-	m_arpRandomBtn->move( 140, 70 );
+	m_arpRandomBtn->move( 130, 70 );
 	m_arpRandomBtn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
 	m_arpRandomBtn->setInactiveGraphic( embed::getIconPixmap(

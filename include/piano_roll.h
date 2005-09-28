@@ -53,6 +53,7 @@ class pattern;
 class notePlayHandle;
 class pixmapButton;
 class timeLine;
+class lmmsMainWin;
 
 
 
@@ -225,6 +226,9 @@ private:
 	pianoRoll( void );
 	pianoRoll( const pianoRoll & );
 	~pianoRoll();
+
+
+	friend class lmmsMainWin;
 
 
 signals:

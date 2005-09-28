@@ -1,3 +1,20 @@
+2005-09-27	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* projects/cool_songs/TobyDox-TheFourthDimension.xml:
+	added another song...
+
+	* include/qt3support.h:
+	Qt 3.1-support
+
+	* include/audio_alsa.h:
+	define macro ALSA_PCM_NEW_HW_PARAMS_API for working with older ALSA-
+	versions which offer old and new HW-param-API - we're using the new one
+
+2005-09-26	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* many files:
+	make LMMS compile with Qt 3.0 and GCC 2.95
+
 2005-09-25	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* src/audio/audio_jack.cpp:
@@ -9,8 +26,8 @@
 	* src/core/timeline.cpp:
 	do not call update() in updatePosition, call paintEvent() directly
 	instead - hopefully fixes the "unexspected Xlib async replies"
-	which occured in some seldom cases because now there're no events
-	generated anymore
+	which occured in some seldom cases because there were paint-events
+	generated - something that must not be done in other threads...
 
 	* resources/source/songeditor.svg:
 	* resources/songeditor.png:

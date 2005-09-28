@@ -42,6 +42,10 @@
 
 #endif
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
 
 #include "config_mgr.h"
 #include "gui_templates.h"
@@ -118,7 +122,7 @@ void midiOSS::sendByte( Uint8 _c )
 
 void midiOSS::run( void )
 {
-	while( m_quit == FALSE )
+	while( m_quit == FALSE && m_midiDev.isOpen() )
 	{
 #ifdef QT4
 		char c;

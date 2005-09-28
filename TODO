@@ -1,3 +1,5 @@
+- make channel-track-window use tab-widget instead of tab-bar
+- capture wheel-event in tab-widget for switching pages
 - add select-boxes for zooming in song-editor and piano-roll
 - use own scrollview for capturing wheel-events
 - make usable with Qt4
