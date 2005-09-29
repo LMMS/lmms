@@ -1,4 +1,40 @@
+2005-09-28	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	added combo-box for selecting zooming-factor
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	added combo-box for selecting zooming-factor
+
+	* include/led_checkbox.h:
+	* src/widgets/led_checkbox.cpp:
+	added methods for querying and setting state
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	better alignment of widgets inside each of this tabs
+
+	* src/tracks/channel_track.cpp:
+	finished improving GUI of channel-track-window by using tabWidget
+	instead of tabBar for plugin-, env/lfo- and arp-widgets
+
+	* include/envelope_and_lfo_widget.h:
+	* src/core/envelope_and_lfo_widget.cpp:
+	use ledCheckBox'es instead of pixmapButton's with QLabel's
+
+	* include/tab_widget.h:
+	* src/widgets/tab_widget.cpp:
+	made tabWidget more powerful:
+	- use indexed tabs
+	- different painting if no caption was defined
+	- switch tabs if wheel-events occurs
+
 2005-09-27	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/tracks/channel_track.cpp:
+	began improving GUI of channel-track-window
 
 	* projects/cool_songs/TobyDox-TheFourthDimension.xml:
 	added another song...

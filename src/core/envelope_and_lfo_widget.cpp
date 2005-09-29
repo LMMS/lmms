@@ -58,6 +58,7 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "gui_templates.h"
+#include "led_checkbox.h"
 
 
 // how long should be each envelope-segment maximal (e.g. attack)?
@@ -66,8 +67,8 @@ const float SECS_PER_ENV_SEGMENT = 5.0f;
 const float SECS_PER_LFO_OSCILLATION = 20.0f;
 
 
-const int env_graph_x = 8;
-const int env_graph_y = 8;
+const int env_graph_x = 6;
+const int env_graph_y = 6;
 
 const int env_knobs_y = 43;
 const int env_knobs_lbl_y = env_knobs_y+35;
@@ -83,7 +84,7 @@ const int amount_knob_x = release_knob_x+knob_x_spacing;
 const float time_unit_width = 36.0;
 
 
-const int lfo_graph_x = 8;
+const int lfo_graph_x = 6;
 const int lfo_graph_y = env_knobs_lbl_y+14;
 const int lfo_knob_y = lfo_graph_y-2;
 const int lfo_knobs_lbl_y = lfo_knob_y+35;
@@ -409,54 +410,34 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	lfo_shapes_algo_group->hide();
 #endif
 
-	m_x100Btn = new pixmapButton( this );
-	m_x100Btn->move( lfo_predelay_knob_x, lfo_graph_y + 36 );
-	m_x100Btn->setBgGraphic( specialBgHandlingWidget::getBackground(
-								m_x100Btn ) );
-
-/*	m_x100Btn->setActiveGraphic( embed::getIconPixmap( "x100_active" ) );
-	m_x100Btn->setInactiveGraphic( embed::getIconPixmap(
-							"x100_inactive" ) );*/
-	m_x100Btn->setBgGraphic(
-			specialBgHandlingWidget::getBackground( m_x100Btn ) );
+	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
+	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
+	m_x100Cb->move( lfo_predelay_knob_x, lfo_graph_y + 36 );
 #ifdef QT4
-	m_x100Btn->setWhatsThis(
+	m_x100Cb->setWhatsThis(
 #else
-	QWhatsThis::add( m_x100Btn,
+	QWhatsThis::add( m_x100Cb,
 #endif
 		tr( "Click here if the frequency of this LFO should be "
 						"multiplied with 100." ) );
-	toolTip::add( m_x100Btn, tr( "multiply LFO-frequency with 100" ) );
-	connect( m_x100Btn, SIGNAL( toggled( bool ) ), this,
+	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
+	connect( m_x100Cb, SIGNAL( toggled( bool ) ), this,
 						SLOT( x100Toggled( bool ) ) );
 
-	QLabel * x100_lbl = new QLabel( tr( "FREQ x 100" ), this );
-	x100_lbl->setFont( pointSize<6>( x100_lbl->font() ) );
-	x100_lbl->move( m_x100Btn->x() + 16, m_x100Btn->y() );
-	x100_lbl->setFixedHeight( 10 );
 
-	m_controlEnvAmountBtn = new pixmapButton( this );
-	m_controlEnvAmountBtn->move( lfo_predelay_knob_x, lfo_graph_y + 54 );
-	m_controlEnvAmountBtn->setBgGraphic(
-			specialBgHandlingWidget::getBackground(
-						m_controlEnvAmountBtn ) );
-/*	m_controlEnvAmountBtn->setActiveGraphic( embed::getIconPixmap(
-						"control_env_amount_active" ) );
-	m_controlEnvAmountBtn->setInactiveGraphic( embed::getIconPixmap(
-					"control_env_amount_inactive" ) );*/
+	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
+									this );
+	m_controlEnvAmountCb->move( lfo_predelay_knob_x, lfo_graph_y + 54 );
+	m_controlEnvAmountCb->setFont( pointSize<6>(
+					m_controlEnvAmountCb->font() ) );
 #ifdef QT4
-	m_controlEnvAmountBtn ->setWhatsThis(
+	m_controlEnvAmountCb ->setWhatsThis(
 #else
-	QWhatsThis::add( m_controlEnvAmountBtn,
+	QWhatsThis::add( m_controlEnvAmountCb,
 #endif
 		tr( "Click here to make the envelope-amount controlled by this "
 								"LFO." ) );
-	QLabel * cea_lbl = new QLabel( tr( "MODULATE ENV-AMOUNT" ), this );
-	cea_lbl->setFont( pointSize<6>( cea_lbl->font() ) );
-	cea_lbl->move( m_controlEnvAmountBtn->x() + 16,
-						m_controlEnvAmountBtn->y() );
-	cea_lbl->setFixedSize( 110, 10 );
-	toolTip::add( m_controlEnvAmountBtn,
+	toolTip::add( m_controlEnvAmountCb,
 				tr( "control envelope-amount by this LFO" ) );
 
 
@@ -534,7 +515,7 @@ float FASTCALL envelopeAndLFOWidget::level( Uint32 _frame,
 	}
 	if( _frame < m_pahdFrames )
 	{
-		if( m_controlEnvAmountBtn->isChecked() )
+		if( m_controlEnvAmountCb->isChecked() )
 		{
 			return( m_pahdEnv[_frame] * ( 0.5f +
 					lfoLevel( _frame, _frame_offset ) ) );
@@ -550,7 +531,7 @@ float FASTCALL envelopeAndLFOWidget::level( Uint32 _frame,
 		_frame -= _release_begin;
 		if( _frame < m_rFrames )
 		{
-			if( m_controlEnvAmountBtn->isChecked() )
+			if( m_controlEnvAmountCb->isChecked() )
 			{
 				return( m_rEnv[_frame] * ( 0.5f +
 					lfoLevel( _frame, _frame_offset ) ) );
@@ -566,7 +547,7 @@ float FASTCALL envelopeAndLFOWidget::level( Uint32 _frame,
 			return( 0.0f );
 		}
 	}
-	if( m_controlEnvAmountBtn->isChecked() )
+	if( m_controlEnvAmountCb->isChecked() )
 	{
 		return( m_sustainLevel * ( 0.5f +
 					lfoLevel( _frame, _frame_offset ) ) );
@@ -600,9 +581,9 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & ,
 	_parent.setAttribute( "lamt", QString::number(
 						m_lfoAmountKnob->value() ) );
 	_parent.setAttribute( "x100", QString::number(
-						m_x100Btn->isChecked() ) );
+						m_x100Cb->isChecked() ) );
 	_parent.setAttribute( "ctlenvamt", QString::number(
-					m_controlEnvAmountBtn->isChecked() ) );
+					m_controlEnvAmountCb->isChecked() ) );
 }
 
 
@@ -625,8 +606,8 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_lfoAttackKnob->setValue( _this.attribute( "latt" ).toFloat() );
 	m_lfoSpeedKnob->setValue( _this.attribute( "lspd" ).toFloat() );
 	m_lfoAmountKnob->setValue( _this.attribute( "lamt" ).toFloat() );
-	m_x100Btn->setChecked( _this.attribute( "x100" ).toInt() );
-	m_controlEnvAmountBtn->setChecked( _this.attribute(
+	m_x100Cb->setChecked( _this.attribute( "x100" ).toInt() );
+	m_controlEnvAmountCb->setChecked( _this.attribute(
 							"ctlenvamt" ).toInt() );
 
 	switch( m_lfoShape )
@@ -760,7 +741,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 
 	float osc_frames = m_lfoOscillationFrames;
 
-	if( m_x100Btn->isChecked() )
+	if( m_x100Cb->isChecked() )
 	{
 		osc_frames *= 100.0f;
 	}
@@ -972,7 +953,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 		m_lfoOscillationFrames = static_cast<Uint32>(
 						frames_per_lfo_oscillation *
 						m_lfoSpeedKnob->value() );
-		if( m_x100Btn->isChecked() )
+		if( m_x100Cb->isChecked() )
 		{
 			m_lfoOscillationFrames /= 100;
 		}

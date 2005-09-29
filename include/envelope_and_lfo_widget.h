@@ -49,11 +49,12 @@
 #include "spc_bg_hndl_widget.h"
 
 
-class envelopeTabWidget;
-class pixmapButton;
-class knob;
 class QPaintEvent;
 class QPixmap;
+class envelopeTabWidget;
+class knob;
+class ledCheckBox;
+class pixmapButton;
 
 
 
@@ -145,8 +146,8 @@ private:
 	pixmapButton * m_sqrLfoBtn;
 	static QPixmap * s_lfoGraph;
 
-	pixmapButton * m_x100Btn;
-	pixmapButton * m_controlEnvAmountBtn;
+	ledCheckBox * m_x100Cb;
+	ledCheckBox * m_controlEnvAmountCb;
 
 	Uint32 m_lfoPredelayFrames;
 	Uint32 m_lfoAttackFrames;

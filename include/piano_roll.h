@@ -44,9 +44,10 @@
 #include "note.h"
 
 
-class QScrollBar;
+class QComboBox;
 class QPainter;
 class QPixmap;
+class QScrollBar;
 
 class crystalButton;
 class pattern;
@@ -122,6 +123,8 @@ protected slots:
 
 	void updatePosition( const midiTime & _t );
 
+	void zoomingChanged( const QString & _zfac );
+
 
 private:
 
@@ -179,6 +182,9 @@ private:
 	crystalButton * m_cutButton;
 	crystalButton * m_copyButton;
 	crystalButton * m_pasteButton;
+
+	QComboBox * m_zoomingComboBox;
+
 
 	pattern * m_pattern;
 	QScrollBar * m_leftRightScroll;

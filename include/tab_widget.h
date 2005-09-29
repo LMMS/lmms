@@ -30,30 +30,52 @@
 #ifdef QT4
 
 #include <QWidget>
-#include <QVector>
+#include <QMap>
 
 #else
 
 #include <qwidget.h>
-#include <qvaluevector.h>
+#include <qmap.h>
+
+#include "spc_bg_hndl_widget.h"
 
 #endif
 
 
+
 class tabWidget : public QWidget
+#ifndef QT4
+					, public specialBgHandlingWidget
+#endif
 {
 	Q_OBJECT
 public:
 	tabWidget( const QString & _caption, QWidget * _parent );
 	~tabWidget();
 
-	void addTab( QWidget * _w, const QString & _name );
+	void addTab( QWidget * _w, const QString & _name, int _idx = -1 );
+
+	inline void setActiveTab( int _idx )
+	{
+		if( m_widgets.contains( _idx ) )
+		{
+			m_activeTab = _idx;
+			m_widgets[m_activeTab].w->raise();
+			update();
+		}
+	}
+
+	inline int activeTab( void ) const
+	{
+		return( m_activeTab );
+	}
 
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void wheelEvent( QWheelEvent * _we );
 
 
 private:
@@ -63,10 +85,10 @@ private:
 		QString name;	// name for widget
 		int nwidth;	// width of name when painting
 	} ;
-	typedef vvector<widgetDesc> widgetStack;
+	typedef QMap<int, widgetDesc> widgetStack;
 
 	widgetStack m_widgets;
-	int m_curWidget;
+	int m_activeTab;
 	QString m_caption;
 
 } ;

@@ -45,6 +45,7 @@
 #include <QStatusBar>
 #include <QAction>
 #include <QToolBar>
+#include <QComboBox>
 
 #else
 
@@ -58,6 +59,7 @@
 #include <qlabel.h>
 #include <qtoolbutton.h>
 #include <qstatusbar.h>
+#include <qcombobox.h>
 
 #endif
 
@@ -116,13 +118,13 @@ songEditor::songEditor() :
 	m_controlPressed( FALSE )
 {
 	// hack, because code called out of this function uses
-	// songEditor::inst(), which assigns s_instanceOfMe after return
-	// of this function...
+	// songEditor::inst(), which assigns s_instanceOfMe this function
+	// returns...
 	s_instanceOfMe = this;
 
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
-	setGeometry( 10, 10, 640, 300 );
+	setGeometry( 10, 10, 680, 300 );
 	show();
 
 #ifdef QT4
@@ -442,9 +444,26 @@ songEditor::songEditor() :
 							"removed." ) );
 #endif
 
+	edit_tb->addSeparator();
+
+	// setup zooming-stuff
+	m_zoomingComboBox = new QComboBox( edit_tb );
+	m_zoomingComboBox->setGeometry( 580, 10, 60, 20 );
+	for( int i = 0; i < 7; ++i )
+	{
+		m_zoomingComboBox->insertItem( QString::number( 25 *
+					static_cast<int>( powf( 2.0f, i ) ) ) +
+									"%" );
+	}
+	m_zoomingComboBox->setCurrentText( "100%" );
+	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
+			this, SLOT( zoomingChanged( const QString & ) ) );
+
+
+
 	m_projectNotes = new projectNotes();
 	m_projectNotes->resize( 300, 200 );
-	m_projectNotes->move( 640, 10 );
+	m_projectNotes->move( 700, 10 );
 	m_projectNotes->show();
 
 
@@ -601,8 +620,14 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		{
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
+		// update combobox with zooming-factor
+		m_zoomingComboBox->setCurrentText( QString::number(
+					static_cast<int>( pixelsPerTact() *
+				100 / DEFAULT_PIXELS_PER_TACT ) ) +"%" );
+		// update timeline
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
 							pixelsPerTact() );
+		// and make sure, all TCO's are resized and relocated
 		realignTracks( TRUE );
 	} 
 	else if( m_shiftPressed )
@@ -712,6 +737,17 @@ void songEditor::updatePosition( const midiTime & _t )
 		}
 		m_scrollBack = FALSE;
 	}
+}
+
+
+
+
+void songEditor::zoomingChanged( const QString & _zfac )
+{
+	setPixelsPerTact( _zfac.left( _zfac.length() - 1 ).toInt() *
+					DEFAULT_PIXELS_PER_TACT / 100 );
+	m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact( pixelsPerTact() );
+	realignTracks( TRUE );
 }
 
 

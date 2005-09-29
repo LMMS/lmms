@@ -53,6 +53,29 @@ public:
 						ledColors _color = YELLOW );
 	virtual ~ledCheckBox();
 
+#ifdef QT4
+	inline virtual bool isChecked( void ) const
+	{
+		return( checkState() == Qt::Checked );
+	}
+#else
+	inline virtual bool isOn( void ) const
+	{
+		return( state() == On );
+	}
+#endif
+#ifdef QT4
+	inline virtual void setChecked( bool _on )
+#else
+	inline virtual void setOn( bool _on )
+#endif
+	{
+		if( _on != isChecked() )
+		{
+			toggle();
+		}
+	}
+
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );

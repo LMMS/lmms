@@ -44,12 +44,14 @@
 #include "types.h"
 
 
+class QComboBox;
 class QLabel;
 class QPixmap;
 class QPushButton;
 class QScrollBar;
 class QSlider;
 class QToolButton;
+
 class exportProjectDialog;
 class lcdSpinBox;
 class pattern;
@@ -243,6 +245,8 @@ protected slots:
 
 	void updatePosition( const midiTime & _t );
 
+	void zoomingChanged( const QString & _zfac );
+
 
 private:
 	songEditor();
@@ -288,6 +292,7 @@ private:
 	QToolButton * m_insertTactButton;
 	QToolButton * m_removeTactButton;
 
+	QComboBox * m_zoomingComboBox;
 
 
 	QString m_fileName;

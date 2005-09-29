@@ -1,7 +1,6 @@
-- make channel-track-window use tab-widget instead of tab-bar
-- capture wheel-event in tab-widget for switching pages
-- add select-boxes for zooming in song-editor and piano-roll
 - use own scrollview for capturing wheel-events
+- add note-len- and note-alignment-selectbox to piano-roll
+- only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
 - make usable with Qt4
 - make LMMS an ALSA-sequencer-client
 - adchannel-toolbutton -> popup-menu with available soundgenerator-plugins

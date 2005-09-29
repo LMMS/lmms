@@ -32,12 +32,14 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QComboBox>
 
 #else
 
 #include <qapplication.h>
 #include <qbuttongroup.h>
 #include <qpainter.h>
+#include <qcombobox.h>
 
 #define setChecked setOn
 
@@ -111,6 +113,8 @@ pianoRoll::pianoRollKeyTypes pianoRoll::prKeyOrder[] =
 } ;
 
 
+const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * MAX_BEATS_PER_TACT;
+
 
 pianoRoll::pianoRoll( void ) :
 	QWidget( lmmsMainWin::inst()->workspace() ),
@@ -122,7 +126,7 @@ pianoRoll::pianoRoll( void ) :
 	m_moveStartKey( 0 ),
 	m_moveStartTact64th( 0 ),
 	m_notesEditHeight( 100 ),
-	m_ppt( KEY_LINE_HEIGHT * MAX_BEATS_PER_TACT ),
+	m_ppt( DEFAULT_PR_PPT ),
 	m_lenOfNewNotes( midiTime( 0, 16 ) ),
 	m_shiftPressed( FALSE ),
 	m_controlPressed( FALSE ),
@@ -411,6 +415,21 @@ pianoRoll::pianoRoll( void ) :
 #endif
 		tr( "If you click here, the notes from the clipboard will be "
 			"pasted at the first visible tact." ) );
+
+
+
+	// setup zooming-stuff
+	m_zoomingComboBox = new QComboBox( this );
+	m_zoomingComboBox->setGeometry( 580, 10, 60, 20 );
+	for( int i = 0; i < 6; ++i )
+	{
+		m_zoomingComboBox->insertItem( QString::number( 25 *
+					static_cast<int>( powf( 2.0f, i ) ) ) +
+									"%" );
+	}
+	m_zoomingComboBox->setCurrentText( "100%" );
+	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
+			this, SLOT( zoomingChanged( const QString & ) ) );
 
 
 	// setup our actual window
@@ -1910,6 +1929,11 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		{
 			m_ppt /= 2;
 		}
+		// update combobox with zooming-factor
+		m_zoomingComboBox->setCurrentText( QString::number(
+					static_cast<int>( m_ppt * 100 /
+						DEFAULT_PR_PPT ) ) +"%" );
+		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
@@ -2339,6 +2363,20 @@ void pianoRoll::updatePosition( const midiTime & _t )
 		}
 		m_scrollBack = FALSE;
 	}
+}
+
+
+
+
+void pianoRoll::zoomingChanged( const QString & _zfac )
+{
+	m_ppt = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
+#ifdef LMMS_DEBUG
+	assert( m_ppt > 0 );
+#endif
+	m_timeLine->setPixelsPerTact( m_ppt );
+	update();
+
 }
 
 

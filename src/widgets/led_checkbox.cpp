@@ -35,9 +35,6 @@
 #include <qfontmetrics.h>
 #include <qpainter.h>
 
-#define setChecked setOn
-#define isChecked isOn
-
 #endif
 
 
@@ -103,11 +100,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 #endif
 	p.drawPixmap( 0, 0, specialBgHandlingWidget::getBackground( this ) );
 
-#ifdef QT4
-	if( checkState() == Qt::Checked )
-#else
-	if( state() == On )
-#endif
+	if( isChecked() == TRUE )
 	{
 		p.drawPixmap( 0, 0, *m_ledOnPixmap );
 	}
@@ -124,7 +117,4 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 #endif
 }
 
-
-#undef setChecked
-#undef isChecked
 

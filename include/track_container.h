@@ -1,5 +1,6 @@
 /*
- * track_container.h - base-class for all track-containers like Playlist-Editor, BB-Editor...
+ * track_container.h - base-class for all track-containers like Song-Editor,
+ *                     BB-Editor...
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -45,6 +46,8 @@
 #include "track.h"
 #include "settings.h"
 
+
+const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
 
 
 class trackContainer : public QMainWindow, public settings

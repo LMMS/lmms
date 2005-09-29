@@ -54,8 +54,6 @@
 
 
 
-const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
-
 
 trackContainer::trackContainer() :
 	QMainWindow( lmmsMainWin::inst()->workspace()

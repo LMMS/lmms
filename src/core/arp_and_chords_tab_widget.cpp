@@ -183,9 +183,9 @@ arpAndChordsTabWidget::chord arpAndChordsTabWidget::s_chords[] =
 } ;
 
 
-const int CHORDS_GROUPBOX_X = 5;
+const int CHORDS_GROUPBOX_X = 4;
 const int CHORDS_GROUPBOX_Y = 5;
-const int CHORDS_GROUPBOX_WIDTH = 240;
+const int CHORDS_GROUPBOX_WIDTH = 238;
 const int CHORDS_GROUPBOX_HEIGHT = 65;
 const int ARP_GROUPBOX_X = CHORDS_GROUPBOX_X;
 const int ARP_GROUPBOX_Y = 10 + CHORDS_GROUPBOX_Y + CHORDS_GROUPBOX_HEIGHT;
