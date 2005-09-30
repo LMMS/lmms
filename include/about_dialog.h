@@ -52,8 +52,8 @@ public:
 
 
 protected:
-	void keyPressEvent( QKeyEvent * _ke );
-	void resizeEvent( QResizeEvent * _re );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void resizeEvent( QResizeEvent * _re );
 
 
 private:

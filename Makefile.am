@@ -60,7 +60,6 @@ lmms_MOC =						\
 		./knob.moc				\
 		./lcd_spinbox.moc			\
 		./lmms_main_win.moc			\
-		./midi_out.moc				\
 		./mixer.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
@@ -68,7 +67,6 @@ lmms_MOC =						\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
 		./pixmap_button.moc			\
-		./plucked_string_synth.moc		\
 		./project_notes.moc			\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
@@ -81,7 +79,7 @@ lmms_MOC =						\
 		./surround_area.moc			\
 		./tab_bar.moc				\
 		./tab_button.moc			\
-		./tab_widget.moc				\
+		./tab_widget.moc			\
 		./timeline.moc				\
 		./track_container.moc			\
 		./track.moc				\
@@ -90,8 +88,6 @@ lmms_MOC =						\
 
 
 BUILT_SOURCES = $(lmms_MOC)
-
-#lmms_TRANSLATIONS = $(wildcard $(srcdir)/locale/*.qm $(srcdir)/locale/*.ts)
 
 lmms_EMBEDDED_RESOURCES = $(wildcard $(srcdir)/resources/*png AUTHORS COPYING)
 
@@ -127,7 +123,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/note_play_handle.cpp			\
 		$(srcdir)/src/core/piano_roll.cpp			\
 		$(srcdir)/src/core/piano_widget.cpp			\
-		$(srcdir)/src/core/plugin_management.cpp		\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp	\
 		$(srcdir)/src/core/sample_play_handle.cpp		\
 		$(srcdir)/src/core/setup_dialog.cpp			\
@@ -148,10 +143,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_file.cpp			\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
 		$(srcdir)/src/midi/midi_oss.cpp				\
-		$(srcdir)/src/soundgenerators/audio_file_processor.cpp	\
-		$(srcdir)/src/soundgenerators/midi_out.cpp		\
-		$(srcdir)/src/soundgenerators/plucked_string_synth.cpp	\
-		$(srcdir)/src/soundgenerators/triple_oscillator.cpp	\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
@@ -261,12 +252,11 @@ lmms_SOURCES =								\
 		$(srcdir)/include/tooltip.h				\
 		$(srcdir)/include/led_checkbox.h			\
 		$(srcdir)/include/text_float.h				\
-		$(srcdir)/include/setup_dialog.h
+		$(srcdir)/include/setup_dialog.h			\
+		$(srcdir)/include/empty_sg_plugin.h
 
 
-EXTRA_DIST =								\
-		$(lmms_EMBEDDED_RESOURCES)				\
-		$(srcdir)/include/sgs
+EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)
 
 
 CLEANFILES = $(lmms_MOC) ./embedded_resources.h
@@ -299,7 +289,17 @@ if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD)
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) -laudiofileprocessor -ldl
+lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
 
 SUBDIRS = artwork locale midi-maps presets projects samples
 
+
+
+pkglib_LTLIBRARIES= libaudiofileprocessor.la libmidiout.la libpluckedstringsynth.la libtripleoscillator.la
+
+
+libaudiofileprocessor_la_SOURCES = src/soundgenerators/audio_file_processor.cpp
+libmidiout_la_SOURCES = src/soundgenerators/midi_out.cpp
+libpluckedstringsynth_la_SOURCES = src/soundgenerators/plucked_string_synth.cpp
+libtripleoscillator_la_SOURCES = src/soundgenerators/triple_oscillator.cpp

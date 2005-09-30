@@ -25,8 +25,6 @@
 #include "oscillator.h"
 
 
-const sampleFrame zero_frame = { 0.0f, 0.0f };
-
 
 oscillator::oscillator( modulationAlgos _modulation_algo, float _freq,
 				Sint16 _phase_offset, float _volume_factor,
@@ -35,7 +33,7 @@ oscillator::oscillator( modulationAlgos _modulation_algo, float _freq,
 	m_volumeFactor(_volume_factor),
 	m_phaseOffset(_phase_offset),
 	m_subOsc(_sub_osc),
-	m_userWaveData( &zero_frame ),
+	m_userWaveData( &ZERO_FRAME ),
 	m_userWaveFrames( 1 )
 {
 
@@ -189,7 +187,7 @@ generateOscillatorCodeFor( userWaveOsc, userWaveSample );
 
 
 
-oscillator * FASTCALL oscillator::createNewOsc( waveShapes _wave_shape,
+oscillator * oscillator::createOsc( waveShapes _wave_shape,
 					modulationAlgos _modulation_algo,
 					float _freq, Sint16 _phase_offset,
 					float _volume_factor,

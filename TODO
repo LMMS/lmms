@@ -1,3 +1,4 @@
+- proper dlclos()ing of sg-plugins
 - use own scrollview for capturing wheel-events
 - add note-len- and note-alignment-selectbox to piano-roll
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.

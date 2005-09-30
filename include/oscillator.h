@@ -44,6 +44,8 @@ typedef void ( oscillator:: * oscFuncPtr )
 			( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl );
 
 
+const sampleFrame ZERO_FRAME = { 0.0f, 0.0f } ;
+
 
 class oscillator
 {
@@ -74,8 +76,16 @@ public:
 	}
 	inline void setUserWave( const sampleFrame * _data, Uint32 _frames )
 	{
-		m_userWaveData = _data;
-		m_userWaveFrames = _frames;
+		if( m_userWaveFrames > 0 )
+		{
+			m_userWaveData = _data;
+			m_userWaveFrames = _frames;
+		}
+		else
+		{
+			m_userWaveData = &ZERO_FRAME;
+			m_userWaveFrames = 1;
+		}
 	}
 	inline void update( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )
 	{
@@ -90,7 +100,7 @@ public:
 		recalcOscCoeff( phase( v ) );
 	}
 
-	static oscillator * FASTCALL createNewOsc( waveShapes _wave_shape,
+	static oscillator * FASTCALL createOsc( waveShapes _wave_shape,
 				modulationAlgos _modulation_algo, float _freq,
 				Sint16 _phase_offset, float _volume_factor,
 						oscillator * _m_subOsc = NULL );
@@ -102,6 +112,7 @@ public:
 		// check whether v2 is in next period
 		return( floorf( v2 ) > floorf( v1 ) );
 	}
+
 	static inline float phase( float _sample )
 	{
 #ifndef modff
@@ -112,6 +123,7 @@ public:
 		return( modff( _sample, &t ) );
 		//return( _sample - floorf( _sample ) );
 	}
+
 	// now follow the wave-shape-routines...
 	static inline sampleType sinSample( float _sample )
 	{

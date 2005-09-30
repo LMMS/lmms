@@ -76,7 +76,7 @@ tabWidget::~tabWidget()
 void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 {
 	widgetDesc d = { _w, _name, fontMetrics().width( _name ) + 10 } ;
-	if( _idx < 0 || m_widgets.contains( _idx ) == TRUE )
+	if( _idx < 0/* || m_widgets.contains( _idx ) == TRUE*/ )
 	{
 		while( m_widgets.contains( ++_idx ) == TRUE )
 		{
@@ -85,6 +85,7 @@ void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 	m_widgets[_idx] = d;
 	_w->setFixedSize( width() - 4, height() - 14 );
 	_w->move( 2, 12 );
+	_w->show();
 
 	if( m_widgets.contains( m_activeTab ) )
 	{

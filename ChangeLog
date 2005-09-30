@@ -1,3 +1,42 @@
+2005-09-29	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/widgets/tab_widget.cpp:
+	fixed bugs when adding widget with already existing index
+
+	* Makefile.am:
+	* include/midi_out.h:
+	* include/plucked_string_synth.h:
+	* src/soundgenerators/midi_out.cpp:
+	* src/soundgenerators/plucked_string_synth.cpp:
+	classes midiOut and pluckedStringSynth do not have slots or signals,
+	so Q_OBJECT-macros were removed and MOC-code isn't compiled anymore
+
+	* include/sgs:
+	* src/core/plugin_management.cpp:
+	removed because not needed anymore with new plugin-system
+
+	* configure.in:
+	* Makefile.am:
+	* include/audio_file_processor.h:
+	* include/channel_track.h:
+	* include/midi_out.h:
+	* include/plucked_string_synth.h:
+	* include/sound_generator.h:
+	* include/triple_oscillator.h:
+	* src/core/browser.cpp:
+	* src/core/sound_generator.cpp:
+	* src/core/song_editor.cpp:
+	* src/midi/midi_file.cpp:
+	* src/soundgenerators/*:
+	* src/tracks/channel_track.cpp:
+	made all sound-generator-plugins shared libraries loaded at runtime,
+	which gives much more flexibility because you can load songs/presets
+	from people having other plugins just by adding according lib*.so file
+	to /usr/lib - no need to recompile!
+
+	* inlude/empty_sg_plugin.h:
+	added empty sound-generator plugin
+
 2005-09-28	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* include/song_editor.h:

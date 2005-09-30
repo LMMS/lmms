@@ -97,6 +97,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %files
 %defattr(-,root,root)
 %{_bindir}/lmms
+%{_libdir}/lmms/
 
 
 %files data

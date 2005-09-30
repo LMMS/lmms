@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20050928, tobydox@users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20050928)
+AC_INIT(lmms, 0.1.1-cvs20050929, tobydox@users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20050929)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -11,6 +11,8 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LN_S
+AC_PROG_GCC_TRADITIONAL
+AC_PROG_LIBTOOL
 
 
 AC_PATH_XTRA
@@ -20,7 +22,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h])
+AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h dlfcn.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -33,7 +35,6 @@ AC_C_BIGENDIAN
 
 # checks for library functions.
 AC_FUNC_ALLOCA
-AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_TYPE_SIGNAL

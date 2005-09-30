@@ -26,6 +26,8 @@
 #include <config.h>
 #endif
 
+#include <math.h>
+
 
 #include "qt3support.h"
 
@@ -87,8 +89,6 @@
 
 #include "debug.h"
 
-
-#include "triple_oscillator.h"
 
 
 extern QString file_to_load;
@@ -1295,7 +1295,7 @@ void songEditor::addChannelTrack( void )
 #ifdef LMMS_DEBUG
 	assert( t != NULL );
 #endif
-	t->loadPluginSettings( tripleOscillator::defaultSettings() );
+	t->loadPlugin( "tripleoscillator" );
 	t->toggledChannelButton( TRUE );
 	t->show();
 }
@@ -1427,12 +1427,12 @@ void songEditor::createNewProject( void )
 
 	track * t;
 	t = track::createTrack( track::CHANNEL_TRACK, this );
-	dynamic_cast< channelTrack * >( t )->loadPluginSettings(
-					tripleOscillator::defaultSettings() );
+	dynamic_cast< channelTrack * >( t )->loadPlugin(
+					"tripleoscillator" );
 	track::createTrack( track::SAMPLE_TRACK, this );
 	t = track::createTrack( track::CHANNEL_TRACK, bbEditor::inst() );
-	dynamic_cast< channelTrack * >( t )->loadPluginSettings(
-					tripleOscillator::defaultSettings() );
+	dynamic_cast< channelTrack * >( t )->loadPlugin(
+						"tripleoscillator" );
 	track::createTrack( track::BB_TRACK, this );
 
 	setBPM( DEFAULT_BPM );
