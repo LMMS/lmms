@@ -94,7 +94,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	QPainter p( this );
 #else
 	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
+	//draw_pm.fill( this, rect().topLeft() );
 
 	QPainter p( &draw_pm, this );
 #endif

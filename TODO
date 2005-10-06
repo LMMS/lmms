@@ -5,7 +5,6 @@
 - make usable with Qt4
 - make LMMS an ALSA-sequencer-client
 - adchannel-toolbutton -> popup-menu with available soundgenerator-plugins
-- tempo-based arpeggio
 - pre-listen when opening sample with QFileDialog
 - level-meters in output-graph and channel-track
 - panning-editing in piano-roll

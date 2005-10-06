@@ -53,7 +53,7 @@
 #include "knob.h"
 #include "tooltip.h"
 #include "gui_templates.h"
-
+#include "tempo_sync_knob.h"
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -286,7 +286,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
 			"The selected arpeggio will be played within specified "
 			"amount of octaves." ) );
 
-	m_arpTimeKnob = new knob( knobBright_26, m_arpGroupBox,
+	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
 							tr( "Arpeggio time" ) );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setRange( 10.0, 1000.0, 1.0 );
@@ -634,6 +634,9 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 					m_arpGateKnob->value() ) );
 	elw_de.setAttribute( "arpdir", QString::number(
 					m_arpDirection ) );
+	elw_de.setAttribute( "arpsyncmode", QString::number(
+					( int ) m_arpTimeKnob->getSyncMode() ) );
+
 
 	_parent.appendChild( elw_de );
 }
@@ -661,6 +664,8 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpGateKnob->setValue( _this.attribute( "arpgate" ).toFloat() );
 	m_arpDirection = static_cast<arpDirections>(
 					_this.attribute( "arpdir" ).toInt() );
+	m_arpTimeKnob->setSyncMode( 
+				( tempoSyncMode ) _this.attribute( "arpsyncmode" ).toInt() );
 
 	m_arpGroupBox->setState( m_arpDirection != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );

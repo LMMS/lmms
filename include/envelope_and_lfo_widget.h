@@ -55,7 +55,7 @@ class envelopeTabWidget;
 class knob;
 class ledCheckBox;
 class pixmapButton;
-
+class tempoSyncKnob;
 
 
 class envelopeAndLFOWidget : public QWidget, public settings,
@@ -138,7 +138,7 @@ private:
 	// LFO-stuff
 	knob * m_lfoPredelayKnob;
 	knob * m_lfoAttackKnob;
-	knob * m_lfoSpeedKnob;
+	tempoSyncKnob * m_lfoSpeedKnob;
 	knob * m_lfoAmountKnob;
 	pixmapButton * m_sinLfoBtn;
 	pixmapButton * m_triangleLfoBtn;

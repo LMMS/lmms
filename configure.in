@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20050929, tobydox@users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20050929)
+AC_INIT(lmms, 0.1.1-cvs20051005, tobydox@users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051005)
 
 AM_CONFIG_HEADER(config.h)
 

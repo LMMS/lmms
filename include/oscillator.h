@@ -103,8 +103,7 @@ public:
 	static oscillator * FASTCALL createOsc( waveShapes _wave_shape,
 				modulationAlgos _modulation_algo, float _freq,
 				Sint16 _phase_offset, float _volume_factor,
-						oscillator * _m_subOsc = NULL );
-
+						oscillator * _m_subOsc = NULL ); 
 	inline bool syncOk( void )
 	{
 		const float v1 = m_sample * m_oscCoeff;
@@ -112,19 +111,20 @@ public:
 		// check whether v2 is in next period
 		return( floorf( v2 ) > floorf( v1 ) );
 	}
+#define	FLOAT_TO_INT(in,out)		\
+	register const float round_const = -0.5f;			\
+	__asm__ __volatile__ ("fadd %%st,%%st(0)\n"		\
+				"fadd	%2\n"			\
+				"fistpl	%0\n"			\
+				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;
 
-	static inline float phase( float _sample )
+	static inline float phase( const float _sample )
 	{
-#ifndef modff
-		float t;
-#else
-		double t;
-#endif
-		return( modff( _sample, &t ) );
-		//return( _sample - floorf( _sample ) );
+		return( _sample - static_cast<int>( _sample ) );
 	}
 
 	// now follow the wave-shape-routines...
+
 	static inline sampleType sinSample( float _sample )
 	{
 		return( sinf( _sample * static_cast<sampleType>( 2.0f * M_PI
@@ -157,7 +157,7 @@ public:
 
 	static inline sampleType moogSawSample( float _sample )
 	{
-		const float ph= phase( _sample );
+		const float ph = phase( _sample );
 		if( ph < 0.5f )
 		{
 			return( -1.0f + ph * 4.0f );

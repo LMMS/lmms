@@ -38,6 +38,7 @@
 #include "mixer.h"
 #include "templates.h"
 
+const int MOOG_VOLTAGE = 40000;
 
 template<Uint8 CHANNELS = DEFAULT_CHANNELS>
 class basicFilters
@@ -53,9 +54,22 @@ public:
 		NOTCH,
 		ALLPASS,
 		MOOG,
-		DOUBLE_LOWPASS,
-		DOUBLE_MOOG
+		MOOG2,
+		SIMPLE_FLT_CNT,
+		DOUBLE_LOWPASS	= 16+LOWPASS,
+		DOUBLE_MOOG	= 16+MOOG,
+		DOUBLE_MOOG2	= 16+MOOG2
 	} ;
+
+	static inline filterTypes getFilterType( const int _idx )
+	{
+		if( _idx < SIMPLE_FLT_CNT )
+		{
+			return( static_cast<filterTypes>( _idx ) );
+		}
+		return( static_cast<filterTypes>( DOUBLE_LOWPASS + _idx -
+							SIMPLE_FLT_CNT ) );
+	}
 
 	inline basicFilters( const float _sampleRate ) :
 		m_b0a0( 0.0f ),
@@ -87,40 +101,112 @@ public:
 	inline sampleType update( sampleType _in0, Uint8 _chnl )
 	{
 		sampleType out;
-		if( m_type != MOOG )
+		switch( m_type )
 		{
-			// filter
-			out = m_b0a0*_in0 + m_b1a0*m_in1[_chnl] +
-				m_b2a0*m_in2[_chnl] - m_a1a0*m_ou1[_chnl] -
-				m_a2a0*m_ou2[_chnl];
-   
-			// push in/out buffers
-			m_in2[_chnl] = m_in1[_chnl];
-			m_in1[_chnl] = _in0;
-			m_ou2[_chnl] = m_ou1[_chnl];
-  
-			m_ou1[_chnl] = out;
-		}
-		else
-		{
-			sampleType x = _in0 - m_r*m_y4[_chnl];
+			case MOOG:
+			case DOUBLE_MOOG:
+			{
+				sampleType x = _in0 - m_r*m_y4[_chnl];
 
-			// Four cascaded onepole filters (bilinear transform)
-			m_y1[_chnl] = x*m_p + m_oldx[_chnl]*m_p -
+				// four cascaded onepole filters
+				// (bilinear transform)
+				m_y1[_chnl] = x*m_p + m_oldx[_chnl]*m_p -
 								m_k*m_y1[_chnl];
-			m_y2[_chnl] = m_y1[_chnl]*m_p+m_oldy1[_chnl]*m_p -
-								m_k*m_y2[_chnl];
-			m_y3[_chnl] = m_y2[_chnl]*m_p+m_oldy2[_chnl]*m_p -
-								m_k*m_y3[_chnl];
-			m_y4[_chnl] = m_y3[_chnl]*m_p+m_oldy3[_chnl]*m_p -
-								m_k*m_y4[_chnl];
+				m_y2[_chnl] = m_y1[_chnl]*m_p+m_oldy1[_chnl]*
+							m_p - m_k*m_y2[_chnl];
+				m_y3[_chnl] = m_y2[_chnl]*m_p+m_oldy2[_chnl]*
+							m_p - m_k*m_y3[_chnl];
+				m_y4[_chnl] = m_y3[_chnl]*m_p+m_oldy3[_chnl]*
+							m_p - m_k*m_y4[_chnl];
 
-			m_oldx[_chnl] = x;
-			m_oldy1[_chnl] = m_y1[_chnl];
-			m_oldy2[_chnl] = m_y2[_chnl];
-			m_oldy3[_chnl] = m_y3[_chnl];
-			out = m_y4[_chnl] - m_y4[_chnl] * m_y4[_chnl] *
-						m_y4[_chnl] * ( 1.0f/6.0f );
+				m_oldx[_chnl] = x;
+				m_oldy1[_chnl] = m_y1[_chnl];
+				m_oldy2[_chnl] = m_y2[_chnl];
+				m_oldy3[_chnl] = m_y3[_chnl];
+				out = m_y4[_chnl] - m_y4[_chnl] * m_y4[_chnl] *
+						m_y4[_chnl] * ( 1.0f / 6.0f );
+				break;
+			}
+			case MOOG2:
+			case DOUBLE_MOOG2:
+			{
+				const float x1 = ( _in0 - m_r *
+						m_oldx[_chnl] ) / MOOG_VOLTAGE;
+				const float tanh1 = tanhf( x1 );
+				const float x2 = m_oldy1[_chnl] / MOOG_VOLTAGE;
+				const float tanh2 = tanhf( x2 );
+				m_y1[_chnl] = m_oldy1[_chnl] + m_p *
+							( tanh1 - tanh2 );
+				m_oldy1[_chnl] = m_y1[_chnl];
+				m_y2[_chnl] = m_oldy2[_chnl] + m_p *
+						( tanhf( m_y1[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_oldy2[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_oldy2[_chnl] = m_y2[_chnl];
+				m_y3[_chnl] = m_oldy3[_chnl] + m_p *
+						( tanhf( m_y2[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_oldy3[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_oldy3[_chnl] = m_y3[_chnl];
+				m_y4[_chnl] = m_ou1[_chnl] + m_p *
+						( tanhf( m_y3[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_ou1[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_ou1[_chnl] = m_y4[_chnl];
+
+				m_oldx[_chnl] = ( m_y4[_chnl] +
+							m_ou2[_chnl] ) * 0.5f;
+				m_ou2[_chnl] = m_y4[_chnl];
+
+				// the same code again...
+				m_y1[_chnl] = m_oldy1[_chnl] + m_p *
+							( tanh1 - tanh2 );
+				m_oldy1[_chnl] = m_y1[_chnl];
+				m_y2[_chnl] = m_oldy2[_chnl] + m_p *
+						( tanhf( m_y1[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_oldy2[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_oldy2[_chnl] = m_y2[_chnl];
+				m_y3[_chnl] = m_oldy3[_chnl] + m_p *
+						( tanhf( m_y2[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_oldy3[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_oldy3[_chnl] = m_y3[_chnl];
+				m_y4[_chnl] = m_ou1[_chnl] + m_p *
+						( tanhf( m_y3[_chnl] /
+							MOOG_VOLTAGE ) -
+						tanhf( m_ou1[_chnl] /
+							MOOG_VOLTAGE ) );
+				m_ou1[_chnl] = m_y4[_chnl];
+
+				m_oldx[_chnl] = ( m_y4[_chnl] +
+							m_ou2[_chnl] ) * 0.5f;
+				m_ou2[_chnl] = m_y4[_chnl];
+
+				out = m_oldx[_chnl];
+				break;
+			}
+
+			default:
+				// filter
+				out = m_b0a0*_in0 +
+						m_b1a0*m_in1[_chnl] +
+						m_b2a0*m_in2[_chnl] -
+						m_a1a0*m_ou1[_chnl] -
+						m_a2a0*m_ou2[_chnl];
+   
+				// push in/out buffers
+				m_in2[_chnl] = m_in1[_chnl];
+				m_in1[_chnl] = _in0;
+				m_ou2[_chnl] = m_ou1[_chnl];
+
+				m_ou1[_chnl] = out;
+				break;
 		}
 		if( m_subFilter != NULL )
 		{
@@ -140,13 +226,9 @@ public:
 		_freq = tMax( _freq, 0.01f );// limit freq for not getting
 					      // bad noise out of the filter...
 
-		if( m_type == MOOG || m_type == DOUBLE_MOOG )
+		switch( m_type )
 		{
-			const float f = 2 * _freq / m_sampleRate; // [0 - 1]
-			m_k = 3.6f*f - 1.6f*f*f - 1; // (Empirical tunning)
-			m_p = (m_k+1)*0.5f;
-			m_r = _q*powf( M_E, ( ( 1-m_p ) * 1.386249f ) );
-			if( m_type == DOUBLE_MOOG )
+			case DOUBLE_MOOG:
 			{
 				if( m_subFilter == NULL )
 				{
@@ -157,78 +239,121 @@ public:
 				m_subFilter->calcFilterCoeffs( MOOG, _freq,
 									_q );
 			}
-		}
-		else
-		{
-			// other filters
-			const float omega	= 2.0f * M_PI * _freq /
-								m_sampleRate;
-			const float tsin	= sinf( omega );
-			const float tcos	= cosf( omega );
-			//float alpha;
-  
-			//if (q_is_bandwidth)
-			//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/tsin);
-			//else
-			const float alpha = tsin / ( 2.0f*_q );
 
-			const float a0 = 1.0f / ( 1.0f+alpha );
-   
-			if( m_type == LOWPASS || m_type == DOUBLE_LOWPASS )
+			case MOOG:
 			{
-				m_b0a0 = ((1.0f-tcos)/2.0f)*a0;
-				m_b1a0 = (1.0f-tcos)*a0;
-				m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
-				m_a1a0 = (-2.0f*tcos)*a0;
-				if( m_type == DOUBLE_LOWPASS )
+				// [ 0 - 1 ]
+				const float f = 2 * _freq / m_sampleRate;
+				// (Empirical tunning)
+				m_k = 3.6f*f - 1.6f*f*f - 1;
+				m_p = (m_k+1)*0.5f;
+				m_r = _q*powf( M_E, ( ( 1-m_p ) * 1.386249f ) );
+				break;
+			}
+
+			case DOUBLE_MOOG2:
+			{
+				if( m_subFilter == NULL )
 				{
-					if( m_subFilter == NULL )
+					m_subFilter =
+						new basicFilters<CHANNELS>(
+								m_sampleRate );
+				}
+				m_subFilter->calcFilterCoeffs( MOOG2, _freq,
+									_q );
+			}
+
+			case MOOG2:
+			{
+				const float kfc = 2 * _freq / m_sampleRate;
+				const float kf = _freq / m_sampleRate;
+				const float kfcr = 1.8730 * ( kfc*kfc*kfc ) +
+							0.4955 * ( kfc*kfc ) +
+							0.6490 * kfc + 0.9988;
+				const float kacr = -3.9364 * ( kfc*kfc ) +
+							1.8409 * kfc + 0.9968;
+				m_p = MOOG_VOLTAGE * ( 1 - expf( -2.0 * M_PI *
+								kfcr * kf ) );
+				m_r = 4 * _q * kacr;
+				break;
+			}
+
+			default:
+			{
+				// other filters
+				const float omega	= 2.0f * M_PI * _freq /
+								m_sampleRate;
+				const float tsin	= sinf( omega );
+				const float tcos	= cosf( omega );
+				//float alpha;
+  
+				//if (q_is_bandwidth)
+				//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
+				//					tsin);
+				//else
+				const float alpha = tsin / ( 2.0f * _q );
+
+				const float a0 = 1.0f / ( 1.0f+alpha );
+   
+				if( m_type == LOWPASS ||
+						m_type == DOUBLE_LOWPASS )
+				{
+					m_b0a0 = ((1.0f-tcos)/2.0f)*a0;
+					m_b1a0 = (1.0f-tcos)*a0;
+					m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
+					m_a1a0 = (-2.0f*tcos)*a0;
+					if( m_type == DOUBLE_LOWPASS )
 					{
-						m_subFilter =
+						if( m_subFilter == NULL )
+						{
+							m_subFilter =
 				new basicFilters<CHANNELS>( m_sampleRate );
-					}
-					m_subFilter->calcFilterCoeffs( LOWPASS,
+						}
+						m_subFilter->calcFilterCoeffs(
+									LOWPASS,
 									_freq,
 									_q );
+					}
 				}
+				else if( m_type == HIPASS )
+				{
+					m_b0a0 = ((1.0f+tcos)/2.0f)*a0;
+					m_b1a0 = (-1.0f-tcos)*a0;
+					m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
+					m_a1a0 = (-2.0f*tcos)*a0;
+				}
+				else if( m_type == BANDPASS_CSG )
+				{
+					m_b0a0 = (tsin/2.0f)*a0;
+					m_b1a0 = 0.0f;
+					m_b2a0 = (-tsin/2.0f)*a0;
+					m_a1a0 = (-2.0f*tcos)*a0;
+				}
+				else if( m_type == BANDPASS_CZPG )
+				{
+					m_b0a0 = alpha*a0;
+					m_b1a0 = 0.0f;
+					m_b2a0 = (-alpha)*a0;
+					m_a1a0 = (-2.0f*tcos)*a0;
+				}
+				else if( m_type == NOTCH )
+				{
+					m_b0a0 = a0;
+					m_b1a0 = (-2.0f*tcos)*a0;
+					m_b2a0 = a0;
+					m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
+				}
+				else if( m_type == ALLPASS )
+				{
+					m_b0a0 = (1.0f-alpha)*a0;
+					m_b1a0 = (-2.0f*tcos)*a0;
+					m_b2a0 = 1.0;//(1.0f+alpha)*a0;
+					m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
+					//m_a2a0 = m_b0a0;//(1.0f-alpha)*a0;
+				}
+				m_a2a0 = (1.0f-alpha)*a0;
+				break;
 			}
-			else if( m_type == HIPASS )
-			{
-				m_b0a0 = ((1.0f+tcos)/2.0f)*a0;
-				m_b1a0 = (-1.0f-tcos)*a0;
-				m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
-				m_a1a0 = (-2.0f*tcos)*a0;
-			}
-			else if( m_type == BANDPASS_CSG )
-			{
-				m_b0a0 = (tsin/2.0f)*a0;
-				m_b1a0 = 0.0f;
-				m_b2a0 = (-tsin/2.0f)*a0;
-				m_a1a0 = (-2.0f*tcos)*a0;
-			}
-			else if( m_type == BANDPASS_CZPG )
-			{
-				m_b0a0 = alpha*a0;
-				m_b1a0 = 0.0f;
-				m_b2a0 = (-alpha)*a0;
-				m_a1a0 = (-2.0f*tcos)*a0;
-			}
-			else if( m_type == NOTCH )
-			{
-				m_b0a0 = a0;
-				m_b1a0 = (-2.0f*tcos)*a0;
-				m_b2a0 = a0;
-				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
-			}
-			else if( m_type == ALLPASS )
-			{
-				m_b0a0 = (1.0f-alpha)*a0;
-				m_b1a0 = (-2.0f*tcos)*a0;
-				m_b2a0 = 1.0;//(1.0f+alpha)*a0;
-				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
-				//m_a2a0 = m_b0a0;//(1.0f-alpha)*a0;
-			}
-			m_a2a0 = (1.0f-alpha)*a0;
 		}
 	}
 

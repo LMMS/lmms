@@ -46,13 +46,15 @@
 #include "types.h"
 
 
+class QComboBox;
+class QPixmap;
+
 class channelTrack;
 class groupBox;
 class knob;
-class pixmapButton;
-class QComboBox;
-class QPixmap;
 class notePlayHandle;
+class pixmapButton;
+class tempoSyncKnob;
 
 
 const int MAX_CHORD_POLYPHONY = 10;
@@ -123,7 +125,7 @@ private:
 	groupBox * m_arpGroupBox;
 	QComboBox * m_arpComboBox;
 	knob * m_arpRangeKnob;
-	knob * m_arpTimeKnob;
+	tempoSyncKnob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
 	QLabel * m_arpDirectionLbl;
 

@@ -59,7 +59,7 @@
 #include "tooltip.h"
 #include "gui_templates.h"
 #include "led_checkbox.h"
-
+#include "tempo_sync_knob.h"
 
 // how long should be each envelope-segment maximal (e.g. attack)?
 const float SECS_PER_ENV_SEGMENT = 5.0f;
@@ -297,7 +297,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_lfoAttackKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_lfoSpeedKnob = new knob( knobBright_26, this, tr( "LFO-speed" ) );
+	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this, tr( "LFO-speed" ) ,
+						20000.0 );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
 	m_lfoSpeedKnob->setValue( 0.1, TRUE );
@@ -584,6 +585,8 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & ,
 						m_x100Cb->isChecked() ) );
 	_parent.setAttribute( "ctlenvamt", QString::number(
 					m_controlEnvAmountCb->isChecked() ) );
+	_parent.setAttribute( "lfosyncmode", QString::number(
+					( int ) m_lfoSpeedKnob->getSyncMode() ) );
 }
 
 
@@ -609,6 +612,8 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_x100Cb->setChecked( _this.attribute( "x100" ).toInt() );
 	m_controlEnvAmountCb->setChecked( _this.attribute(
 							"ctlenvamt" ).toInt() );
+	m_lfoSpeedKnob->setSyncMode( ( tempoSyncMode ) _this.attribute(
+							"lfosyncmode" ).toInt() );
 
 	switch( m_lfoShape )
 	{

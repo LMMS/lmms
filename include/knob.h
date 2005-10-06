@@ -1,7 +1,8 @@
 /*
  * knob.h - powerful knob-widget
  *
- * This file is based on the knob-widget of the Qwt Widget Library by Josef Wilgen
+ * This file is based on the knob-widget of the Qwt Widget Library by
+ * Josef Wilgen
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -132,8 +133,11 @@ protected:
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 
-  
-private:
+
+// TODO: Need to figure out what is really used by tempoSyncKnob
+// to get the private/protected attributes sorted out.  Right
+// now, just make everything protected.
+//private:
 	void layoutKnob( bool _update = TRUE );
 	float getValue( const QPoint & _p );
 	void getScrollMode( const QPoint & _p, int & _scroll_mode,

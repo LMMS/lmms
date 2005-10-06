@@ -609,6 +609,7 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
+	_we->accept();
 	if( m_controlPressed )
 	{
 		if( _we->delta() > 0 )
@@ -757,6 +758,7 @@ void songEditor::setBPM( int _new_bpm )
 {
 	m_bpmSpinBox->setValue( tLimit( _new_bpm, MIN_BPM, MAX_BPM ) );
 	setModified();
+	emit bpmChanged( _new_bpm );
 }
 
 
@@ -1329,6 +1331,13 @@ float songEditor::framesPerTact( void ) const
 			m_bpmSpinBox->value() );
 }
 
+
+
+
+int songEditor::getBPM( void )
+{
+	return( m_bpmSpinBox->value() );
+}
 
 
 

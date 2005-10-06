@@ -80,6 +80,7 @@ lmms_MOC =						\
 		./tab_bar.moc				\
 		./tab_button.moc			\
 		./tab_widget.moc			\
+		./tempo_sync_knob.moc			\
 		./timeline.moc				\
 		./track_container.moc			\
 		./track.moc				\
@@ -161,6 +162,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/tab_bar.cpp			\
 		$(srcdir)/src/widgets/tab_widget.cpp			\
 		$(srcdir)/src/widgets/text_float.cpp			\
+		$(srcdir)/src/widgets/tempo_sync_knob.cpp		\
 		$(srcdir)/src/widgets/tooltip.cpp			\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
 		$(srcdir)/include/pch.h					\
@@ -252,6 +254,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/tooltip.h				\
 		$(srcdir)/include/led_checkbox.h			\
 		$(srcdir)/include/text_float.h				\
+		$(srcdir)/include/tempo_sync_knob.h			\
 		$(srcdir)/include/setup_dialog.h			\
 		$(srcdir)/include/empty_sg_plugin.h
 

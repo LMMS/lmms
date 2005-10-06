@@ -1,3 +1,48 @@
+2005-10-05	Dany McRae	<khjklujn@yahoo.com>
+
+	* resources/note_double_whole.png:
+	* resources/note_eighth.png:
+	* resources/note_half.png:
+	* resources/note_none.png:
+	* resources/note_quarter.png:
+	* resources/note_sixteenth.png:
+	* resources/note_thirtysecond.png:
+	* resources/note_whole.png:
+	* resources/xclock.png:
+	added icons for context-menu of tempoSyncKnob
+
+	* src/widgets/lcd_spinbox.cpp:
+	emit valueChanged()-signal in wheelEvent()-method
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	- added getBPM()-method
+	- emit signal if BPM is changed
+
+	* include/arp_and_chords_tab_widget.h:
+	* include/envelope_and_lfo_widget.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	use new tempoSyncKnob-widget instead of traditional time-knob
+
+	* include/tempo_sync_knob.h:
+	* src/widgets/tempo_sync_knob.cpp:
+	added tempo-sync-knob which automatically converts fixed note-length's
+	to a fixed time in ms everytime BPM is changed
+
+2005-10-03	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/basic_filters.h:
+	- added another moog-filter which sounds a bit better but needs MUCH
+	  more CPU-time...
+	- cleaned up different filter-code-branches
+
+2005-10-02	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/oscillator.h:
+	cast to int instead of floor()ing value in oscillator::phase() which
+	makes the whole thing faster again...
+
 2005-09-29	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* src/widgets/tab_widget.cpp:

@@ -166,7 +166,9 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
+	_we->accept();
 	setValue( value() + _we->delta() / 120 * m_step );
+	emit valueChanged( value() );
 }
 
 

@@ -154,6 +154,8 @@ public:
 		return( m_playPos[_pm] );
 	}
 
+	int getBPM( void );
+
 	// every function that replaces current file (e.g. creates new file,
 	// opens another file...) has to call this before and may only process
 	// if this function returns true

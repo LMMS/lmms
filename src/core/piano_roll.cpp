@@ -1918,6 +1918,7 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * )
 
 void pianoRoll::wheelEvent( QWheelEvent * _we )
 {
+	_we->accept();
 	if( m_controlPressed )
 	{
 		if( _we->delta() > 0 )
