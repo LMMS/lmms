@@ -53,7 +53,9 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 							ledColors _color ) :
-	QCheckBox( _text, _parent )
+	QWidget( _parent ),
+	m_checked( FALSE ),
+	m_text( _text )
 {
 	if( _color >= TOTAL_COLORS || _color < YELLOW )
 	{
@@ -67,7 +69,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
 #ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
+	setBackgroundMode( Qt::PaletteBackground );
 #endif
 
 	setFont( pointSize<7>( font() ) );
@@ -83,6 +85,38 @@ ledCheckBox::~ledCheckBox()
 {
 	delete m_ledOnPixmap;
 	delete m_ledOffPixmap;
+}
+
+
+
+
+void ledCheckBox::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::LeftButton )
+	{
+		toggle();
+	}
+}
+	
+	
+	
+	
+void ledCheckBox::toggle( void )
+{
+	m_checked = !m_checked;
+	update();
+	emit( toggled( m_checked ) );
+}
+
+
+
+
+void ledCheckBox::setChecked( bool _on )
+{
+	if( _on != isChecked() )
+	{
+		toggle();
+	}
 }
 
 
@@ -118,3 +152,5 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 }
 
 
+
+#include "led_checkbox.moc"

@@ -29,11 +29,11 @@
 
 #ifdef QT4
 
-#include <QCheckBox>
+#include <QWidget>
 
 #else
 
-#include <qcheckbox.h>
+#include <qwidget.h>
 
 #endif
 
@@ -41,8 +41,9 @@
 class QPixmap;
 
 
-class ledCheckBox : public QCheckBox
+class ledCheckBox : public QWidget
 {
+	Q_OBJECT
 public:
 	enum ledColors
 	{
@@ -53,37 +54,36 @@ public:
 						ledColors _color = YELLOW );
 	virtual ~ledCheckBox();
 
-#ifdef QT4
-	inline virtual bool isChecked( void ) const
+
+	inline bool isChecked( void ) const
 	{
-		return( checkState() == Qt::Checked );
-	}
-#else
-	inline virtual bool isOn( void ) const
-	{
-		return( state() == On );
-	}
-#endif
-#ifdef QT4
-	inline virtual void setChecked( bool _on )
-#else
-	inline virtual void setOn( bool _on )
-#endif
-	{
-		if( _on != isChecked() )
-		{
-			toggle();
-		}
+		return( m_checked );
 	}
 
+	inline const QString & text( void )
+	{
+		return( m_text );
+	}
+
+
+public slots:
+	void toggle( void );
+	void setChecked( bool _on );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void mousePressEvent( QMouseEvent * _me );
 
 
 private:
 	QPixmap * m_ledOnPixmap;
 	QPixmap * m_ledOffPixmap;
+	
+	bool m_checked;
+	QString m_text;
+	
+signals:
+	void toggled( bool );
 
 } ;
 

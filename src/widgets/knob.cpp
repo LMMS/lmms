@@ -298,6 +298,7 @@ float knob::getValue( const QPoint & _p )
 		}
 		return( new_value );
 	}
+
 	return( ( _p.y() - m_origMousePos.y() ) * m_step );
 }
 
@@ -444,13 +445,29 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 
 
-//! Emits a valueChanged() signal if necessary
-void knob::buttonReleased( void )
+//! Mouse Move Event handler
+void knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( ( !m_tracking ) || ( value() != m_prevValue ) )
+	if( m_scrollMode == ScrMouse )
 	{
-		emit valueChanged( value() );
+		setPosition( _me->pos() );
+		if( value() != m_prevValue )
+		{
+			emit sliderMoved( value() );
+			if( !configManager::inst()->value( "knobs",
+						"classicalusability").toInt() )
+			{
+				QCursor::setPos( mapToGlobal(
+							m_origMousePos ) );
+			}
+		}
 	}
+	songEditor::inst()->setModified();
+
+	s_textFloat->setText( m_hintTextBeforeValue +
+						QString::number( value() ) +
+							m_hintTextAfterValue );
+
 }
 
 
@@ -493,56 +510,6 @@ void knob::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void knob::setPosition( const QPoint & _p )
-{
-	if( configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-	{
-		setNewValue( getValue( _p ) - m_mouseOffset, 1 );
-	}
-	else
-	{
-		setNewValue( m_value - getValue( _p ), 1 );
-	}
-}
-
-
-
-
-void knob::setTracking( bool _enable )
-{
-	m_tracking = _enable;
-}
-
-
-
-
-//! Mouse Move Event handler
-void knob::mouseMoveEvent( QMouseEvent * _me )
-{
-	if( m_scrollMode == ScrMouse )
-	{
-		setPosition( _me->pos() );
-		if( value() != m_prevValue )
-		{
-			emit sliderMoved( value() );
-		}
-		if( !configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-		{
-			QCursor::setPos( mapToGlobal( m_origMousePos ) );
-		}
-	}
-	songEditor::inst()->setModified();
-
-	s_textFloat->setText( m_hintTextBeforeValue +
-						QString::number( value() ) +
-							m_hintTextAfterValue );
-
-}
-
-
-
 //! Qt wheel event
 void knob::wheelEvent( QWheelEvent * _me )
 {
@@ -568,6 +535,43 @@ void knob::wheelEvent( QWheelEvent * _me )
 		emit sliderMoved( value() );
 	}
 }
+
+
+
+
+//! Emits a valueChanged() signal if necessary
+void knob::buttonReleased( void )
+{
+	if( ( !m_tracking ) || ( value() != m_prevValue ) )
+	{
+		emit valueChanged( value() );
+	}
+}
+
+
+
+
+void knob::setPosition( const QPoint & _p )
+{
+	if( configManager::inst()->value( "knobs", "classicalusability"
+								).toInt() )
+	{
+		setNewValue( getValue( _p ) - m_mouseOffset, 1 );
+	}
+	else
+	{
+		setNewValue( m_value - getValue( _p ), 1 );
+	}
+}
+
+
+
+
+void knob::setTracking( bool _enable )
+{
+	m_tracking = _enable;
+}
+
 
 
 

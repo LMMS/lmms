@@ -208,12 +208,12 @@ public:
 	}
 
 
-	inline void pause( void )
+	void pause( void )
 	{
 		m_safetySyncMutex.lock();
 	}
 
-	inline void play( void )
+	void play( void )
 	{
 		m_safetySyncMutex.unlock();
 	}

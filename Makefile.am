@@ -59,6 +59,7 @@ lmms_MOC =						\
 		./group_box.moc				\
 		./knob.moc				\
 		./lcd_spinbox.moc			\
+		./led_checkbox.moc			\
 		./lmms_main_win.moc			\
 		./mixer.moc				\
 		./name_label.moc			\

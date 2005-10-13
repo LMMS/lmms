@@ -1,3 +1,12 @@
+2005-10-12	Dany McRae	<khjklujn@yahoo.com>
+
+	* Makefile.am:
+	* include/led_checkbox.h:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/widgets/led_checkbox.cpp:
+	inherit ledCheckBox from QWidget instead of QCheckBox since it sometimes
+	caused graphic-errors when running on KDE with Baghira-style...
+
 2005-10-05	Dany McRae	<khjklujn@yahoo.com>
 
 	* resources/note_double_whole.png:

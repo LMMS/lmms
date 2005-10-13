@@ -43,9 +43,6 @@
 #include <qdom.h>
 #include <qlabel.h>
 
-#define isChecked isOn
-#define setChecked setOn
-
 #endif
 
 
@@ -341,10 +338,11 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"sin_wave_active" ) );
 	m_sinLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-	m_sinLfoBtn->setChecked( TRUE );
 #ifdef QT4
+	m_sinLfoBtn->setChecked( TRUE );
 	m_sinLfoBtn->setWhatsThis(
 #else
+	m_sinLfoBtn->setOn( TRUE );
 	QWhatsThis::add( m_sinLfoBtn,
 #endif
 		tr( "Click here if you want a sine-wave for current "
@@ -618,19 +616,35 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	switch( m_lfoShape )
 	{
 		case SIN:
+#ifdef QT4
 			m_sinLfoBtn->setChecked( TRUE );
+#else
+			m_sinLfoBtn->setOn( TRUE );
+#endif
 			break;
 
 		case TRIANGLE:
+#ifdef QT4
 			m_triangleLfoBtn->setChecked( TRUE );
+#else
+			m_triangleLfoBtn->setOn( TRUE );
+#endif
 			break;
 
 		case SAW:
+#ifdef QT4
 			m_sawLfoBtn->setChecked( TRUE );
+#else
+			m_sawLfoBtn->setOn( TRUE );
+#endif
 			break;
 
 		case SQUARE:
+#ifdef QT4
 			m_sqrLfoBtn->setChecked( TRUE );
+#else
+			m_sqrLfoBtn->setOn( TRUE );
+#endif
 			break;
 	}
 
