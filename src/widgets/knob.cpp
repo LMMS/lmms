@@ -162,8 +162,6 @@ void knob::setHintText( const QString & _txt_before,
 {
 	m_hintTextBeforeValue = _txt_before;
 	m_hintTextAfterValue = _txt_after;
-/*	toolTip::add( this, m_hintTextBeforeValue + QString::number( value() ) +
-						m_hintTextAfterValue );*/
 }
 
 
@@ -253,8 +251,6 @@ void knob::valueChange( void )
 {
 	recalcAngle();
 	update();
-/*	toolTip::add( this, m_hintTextBeforeValue + QString::number( value() ) +
-						m_hintTextAfterValue );*/
 	if( m_tracking )
 	{
 		emit valueChanged( value() );
@@ -474,22 +470,25 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 
 
 //! Mouse Release Event handler
-void knob::mouseReleaseEvent( QMouseEvent * _me )
+void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	m_scrollMode = ScrNone;
-	buttonReleased();
+	if( m_scrollMode != ScrNone )
+	{
+		m_scrollMode = ScrNone;
+		buttonReleased();
+	}
 
 	switch( m_scrollMode )
 	{
 		case ScrMouse:
-			setPosition( _me->pos() );
+			//setPosition( _me->pos() );
 			m_direction = 0;
 			m_mouseOffset = 0;
-			emit sliderReleased ();
+			emit sliderReleased();
 			break;
 
 		case ScrDirect:
-			setPosition( _me->pos() );
+			//setPosition( _me->pos() );
 			m_direction = 0;
 			m_mouseOffset = 0;
 			break;
@@ -526,9 +525,6 @@ void knob::wheelEvent( QWheelEvent * _me )
 	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
-
-/*	toolTip::add( this, m_hintTextBeforeValue+QString::number( value() ) +
-						m_hintTextAfterValue );*/
 
 	if( value() != m_prevValue )
 	{
@@ -727,6 +723,12 @@ void knob::setStep( float _vstep )
 
 void knob::contextMenuEvent( QContextMenuEvent * )
 {
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
 	QMenu contextMenu( this );
 #ifdef QT4
 	contextMenu.setTitle( accessibleName() );

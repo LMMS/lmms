@@ -58,6 +58,7 @@ lmms_MOC =						\
 		./kmultitabbar.moc			\
 		./group_box.moc				\
 		./knob.moc				\
+		./ladspa_sine_1063.moc			\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./lmms_main_win.moc			\
@@ -137,6 +138,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/embed.cpp				\
+		$(srcdir)/src/lib/ladspa_manager.cpp			\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
@@ -257,7 +259,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/text_float.h				\
 		$(srcdir)/include/tempo_sync_knob.h			\
 		$(srcdir)/include/setup_dialog.h			\
-		$(srcdir)/include/empty_sg_plugin.h
+		$(srcdir)/include/empty_sg_plugin.h			\
+		$(srcdir)/include/ladspa_manager.h
 
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)
@@ -300,10 +303,11 @@ SUBDIRS = artwork locale midi-maps presets projects samples
 
 
 
-pkglib_LTLIBRARIES= libaudiofileprocessor.la libmidiout.la libpluckedstringsynth.la libtripleoscillator.la
+pkglib_LTLIBRARIES= libaudiofileprocessor.la libsine1063oscillator.la libmidiout.la libpluckedstringsynth.la libtripleoscillator.la
 
 
 libaudiofileprocessor_la_SOURCES = src/soundgenerators/audio_file_processor.cpp
+libsine1063oscillator_la_SOURCES = src/soundgenerators/ladspa_sine_1063.cpp
 libmidiout_la_SOURCES = src/soundgenerators/midi_out.cpp
 libpluckedstringsynth_la_SOURCES = src/soundgenerators/plucked_string_synth.cpp
 libtripleoscillator_la_SOURCES = src/soundgenerators/triple_oscillator.cpp

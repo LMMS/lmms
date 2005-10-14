@@ -1,10 +1,12 @@
+- toolbar-redesign in song-editor, bb-editor and piano-roll!!!
+- addchannel-toolbutton -> popup-menu with available soundgenerator-plugins
+- solve problem with knob-control-precision
+- built-in VST-support
 - proper dlclos()ing of sg-plugins
 - use own scrollview for capturing wheel-events
 - add note-len- and note-alignment-selectbox to piano-roll
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
-- make usable with Qt4
 - make LMMS an ALSA-sequencer-client
-- adchannel-toolbutton -> popup-menu with available soundgenerator-plugins
 - pre-listen when opening sample with QFileDialog
 - level-meters in output-graph and channel-track
 - panning-editing in piano-roll
@@ -13,7 +15,7 @@
 - setup MIDI-channel and -program in MIDI-Out
 - speed up painting of sampleTCO
 - save window-positions, -states and -sizes in files
-- solve problems with different keyboard-layouts when playing channel-track with pc-keyboard
+- solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()
 - balance env+lfo
 - autosave every 1 minute
 - audioDummy: always wait until the stuff normally would have been written (=simulate blocking IO)
@@ -23,9 +25,11 @@
 - dynamic pitch-change
 - make piano-roll use the global clipboard??
 - add languages:
-	- Dutch
 	- Italian
-	- ...any other welcome
+	- Swedish
+	- Norwegian
+	- Greece
+	- ...
 
 
 
@@ -37,7 +41,6 @@ Things to be done anytime in the future
 - FLP-Import
 - classical note-edit-window -> also ability of printing and maybe later scanning & recognition of notes
 - add FLAC as export-format?
-- support of LADSPA for all plugins
 - better commented source...
 - optimize, optimize, optimize.....
 

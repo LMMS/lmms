@@ -1,3 +1,30 @@
+2005-10-13	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/audio/audio_jack.cpp:
+	do not fill up buffers if JACK-transport is not rolling but at the same
+	time always handle frame-syncing-var in JACK-callback, even if JACK-
+	transport is not rolling - fixes several bugs like lockups when
+	removing tracks while JACK-server is pausing...
+
+	* src/widgets/knob.cpp:
+	fixed bug which caused hidden mouse-cursor forever when pressing right
+	mouse-button while left one is pressed
+
+	* src/lib/ladspa_manager.cpp:
+	use /usr/lib/ladspa as default-directory if env-var LADSPA_PATH is not
+	set
+
+	* src/soundgenerators/*.cpp:
+	removed obsolete defaultSettings()-method from each soundgenerator
+
+2005-10-13	Dany McRae	<khjklujn@yahoo.com>
+
+	* include/ladspa_manager.h
+	* include/ladspa_sine_1063.h
+	* src/lib/ladspa_manager.cpp:
+	* src/soundgenerators/ladspa_sine_1063.cpp:
+	added LADSPA-support and a simple soundgenerator for testing-purposes
+
 2005-10-12	Dany McRae	<khjklujn@yahoo.com>
 
 	* Makefile.am:

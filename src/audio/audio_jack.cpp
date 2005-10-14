@@ -218,24 +218,29 @@ void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 {
 	m_bufMutex.lock();
 
-	vvector<bufset> bufs;
-	for( Uint8 chnl = 0; chnl < channels(); ++chnl )
+	jack_transport_state_t ts = jack_transport_query( m_client, NULL );
+	if( ts == JackTransportRolling )
 	{
-		sampleType * buf = bufferAllocator::alloc<sampleType>(
-								_frames );
-		for( Uint32 frame = 0; frame < _frames; ++frame )
+		vvector<bufset> bufs;
+		for( Uint8 chnl = 0; chnl < channels(); ++chnl )
 		{
-			buf[frame] = _ab[frame][chnl] * _master_output;
+			sampleType * buf = bufferAllocator::alloc<sampleType>(
+								_frames );
+			for( Uint32 frame = 0; frame < _frames; ++frame )
+			{
+				buf[frame] = _ab[frame][chnl] * _master_output;
+			}
+			bufset b = { buf, _frames } ;
+			bufs.push_back( b );
 		}
-		bufset b = { buf, _frames } ;
-		bufs.push_back( b );
+		m_bufferSets.push_back( bufs );
 	}
-	m_bufferSets.push_back( bufs );
+
 	m_frameSync += _frames;
 
 	m_bufMutex.unlock();
 
-	// now wait until data has been collected by processCallback()
+	// now wait until data has been collected/skipped by processCallback()
 	while( m_frameSync > m_jackBufSize )
 	{
 #ifdef HAVE_UNISTD_H
@@ -261,6 +266,16 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 									NULL );
 	if( ts != JackTransportRolling )
 	{
+		// always decrease frame-sync-var as we would do it if running
+		// in normal mode, so that the mixer-thread does up
+		if( _nframes < _this->m_frameSync )
+		{
+			_this->m_frameSync -= _nframes;
+		}
+		else
+		{
+			_this->m_frameSync = 0;
+		}
 		return( 0 );
 	}
 
