@@ -186,7 +186,7 @@ bool audioFileOgg::startEncoding( void )
 
 void FASTCALL audioFileOgg::writeBufferToDev( surroundSampleFrame * _ab,
 						Uint32 _frames,
-						float _master_output )
+						float _master_gain )
 {
 	int eos = 0;
 
@@ -197,7 +197,7 @@ void FASTCALL audioFileOgg::writeBufferToDev( surroundSampleFrame * _ab,
 	{
 		for( Uint8 chnl = 0; chnl < channels(); ++chnl )
 		{
-			buffer[chnl][frame] = _ab[frame][chnl] * _master_output;
+			buffer[chnl][frame] = _ab[frame][chnl] * _master_gain;
 		}
 	}
 

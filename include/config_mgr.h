@@ -105,6 +105,11 @@ public:
 	{
 		return( m_lmmsDataDir + LOCALE_PATH );
 	}
+	const QString & pluginDir( void ) const
+	{
+		return( m_lmmsPluginDir );
+	}
+
 
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
@@ -148,6 +153,7 @@ private:
 	const QString m_lmmsRcFile;
 	QString m_lmmsWorkingDir;
 	QString m_lmmsDataDir;
+	QString m_lmmsPluginDir;
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

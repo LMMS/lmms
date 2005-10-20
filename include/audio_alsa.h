@@ -80,7 +80,7 @@ public:
 private:
 	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
 						Uint32 _frames,
-						float _master_output );
+						float _master_gain );
 
 	int FASTCALL setHWParams( Uint32 _sample_rate, Uint32 _channels,
 						snd_pcm_access_t _access );

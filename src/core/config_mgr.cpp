@@ -163,10 +163,19 @@ configManager::configManager( void ) :
 	m_lmmsDataDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/share/lmms/" ),
 #else
-	// hardcode since qt 3.0 doesn't know something like
-	// applicationDirPath and implmeneting own function would be senseless
-	// since real support for qt 3.0 is senseless too ;-)
+	// hardcode since qt < 3.2 doesn't know something like
+	// applicationDirPath and implementing own function would be senseless
+	// since real support for qt < 3.2 is senseless too ;-)
 	m_lmmsDataDir( "/usr/share/lmms" ),
+#endif
+#if QT_VERSION >= 0x030200
+	m_lmmsPluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
+							"/lib/lmms/" ),
+#else
+	// hardcode since qt < 3.2 doesn't know something like
+	// applicationDirPath and implementing own function would be senseless
+	// since real support for qt < 3.2 is senseless too ;-)
+	m_lmmsPluginDir( "/usr/lib/lmms" ),
 #endif
 	m_currentPage( 0 )
 {

@@ -31,6 +31,12 @@
 #include <config.h>
 #endif
 
+#ifdef HAVE_LADSPA_H
+
+#define LADSPA_SUPPORT
+
+#include <ladspa.h>
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -49,8 +55,9 @@
 
 #endif
 
-#include <ladspa.h>
+
 #include "types.h"
+
 
 typedef QPair<QString, QString> ladspaKey;
 
@@ -188,7 +195,7 @@ public:
 	
 	
 	/* The following methods are convenience functions for use during
-	development.  A real soundGenerator should use the getDescriptor()
+	development.  A real instrument should use the getDescriptor()
 	method and implement the plug-in manipulations internally to avoid
 	the overhead associated with QMap lookups. */
 	
@@ -326,5 +333,7 @@ private:
 	typedef QMap<ladspaKey, ladspaManagerDescription *> ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;
 };
-	
+
+#endif
+
 #endif

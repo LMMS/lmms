@@ -1,18 +1,20 @@
-- toolbar-redesign in song-editor, bb-editor and piano-roll!!!
-- addchannel-toolbutton -> popup-menu with available soundgenerator-plugins
+- complete toolbar-redesign in song-editor, bb-editor and piano-roll!!!
+- dnd everywhere: presets, samples (afp/sample-track), TCO's, knob-values
+- save/load parameters of VST-plugin
+- move VST-code into separate class which can use several backends (libfst, dssi-vst and vst-server) -> add libfst/dssi-vst/vstserver-check to configure.in
+- somehow avoid hidden plugin-descriptor-widgets if height of window is too small -> add scrollbar
+- use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
+- pattern freeze -> do not endless loop if looping-points are enabled
 - solve problem with knob-control-precision
-- built-in VST-support
-- proper dlclos()ing of sg-plugins
-- use own scrollview for capturing wheel-events
 - add note-len- and note-alignment-selectbox to piano-roll
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
 - make LMMS an ALSA-sequencer-client
+	- use midi-maps
+	- process program-/channel-change-events from MIDI-files
+	- setup MIDI-channel and -program in MIDI-Out
 - pre-listen when opening sample with QFileDialog
 - level-meters in output-graph and channel-track
 - panning-editing in piano-roll
-- use midi-maps
-- process program-/channel-change-events from MIDI-files
-- setup MIDI-channel and -program in MIDI-Out
 - speed up painting of sampleTCO
 - save window-positions, -states and -sizes in files
 - solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()

@@ -294,14 +294,6 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void bbEditor::wheelEvent( QWheelEvent * _we )
-{
-	lmmsMainWin::inst()->workspace()->wheelEvent( _we );
-}
-
-
-
-
 void bbEditor::resizeEvent( QResizeEvent * _re )
 {
 	updateBackground();

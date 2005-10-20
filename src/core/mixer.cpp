@@ -211,27 +211,6 @@ void mixer::run( void )
 		// while we're acting...
 		m_safetySyncMutex.lock();
 
-/*		following code is faster but unstable since using iterators
-		while deleting from vector is dangerous and often leads to
-		undefined results...
-
-		playHandleVector::iterator it = m_playHandles.begin();
-		while( it != m_playHandles.end() )
-		{
-			if( ( *it )->done() )
-			{
-				// delete all play-handles which have
-				// played completely now
-				delete *it;
-				m_playHandles.erase( it );
-			}
-			else
-			{
-				// play all uncompletely-played play-handles...
-				( *it )->play();
-				++it;
-			}
-		}*/
 		csize idx = 0;
 		while( idx < m_playHandles.size() )
 		{

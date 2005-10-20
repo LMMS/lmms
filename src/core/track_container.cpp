@@ -51,7 +51,9 @@
 #include "lmms_main_win.h"
 #include "mixer.h"
 #include "song_editor.h"
-
+#include "string_pair_drag.h"
+#include "channel_track.h"
+#include "mmp.h"
 
 
 
@@ -69,15 +71,9 @@ trackContainer::trackContainer() :
 	lmmsMainWin::inst()->workspace()->addWindow( this );
 #endif
 
-	m_scrollArea = new QScrollArea( this );
-	m_scrollArea->setFrameStyle( QFrame::NoFrame );
-	m_scrollArea->setHorizontalScrollBarPolicy( 
-#ifdef QT4
-						Qt::ScrollBarAlwaysOff
-#else
-						QScrollArea::AlwaysOff
-#endif
-					);
+	m_scrollArea = new scrollArea( this );
+
+	setAcceptDrops( TRUE );
 }
 
 
@@ -157,7 +153,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 		if( node.isElement() )
 		{
-			track::createTrack( node.toElement(), this );
+			track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
 	}
@@ -176,7 +172,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 void trackContainer::cloneTrack( track * _track )
 {
-	track::cloneTrack( _track );
+	track::clone( _track );
 }
 
 
@@ -372,6 +368,41 @@ void trackContainer::resizeEvent( QResizeEvent * )
 
 
 
+void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	stringPairDrag::processDragEnterEvent( _dee, "preset,plugin" );
+}
+
+
+
+
+void trackContainer::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "plugin" )
+	{
+		channelTrack * ct = dynamic_cast<channelTrack *>(
+				track::create( track::CHANNEL_TRACK,
+								this ) );
+		ct->loadInstrument( value );
+		ct->toggledChannelButton( TRUE );
+	}
+	else if( type == "preset" )
+	{
+		multimediaProject mmp( value );
+		channelTrack * ct = dynamic_cast<channelTrack *>(
+				track::create( track::CHANNEL_TRACK,
+								this ) );
+		ct->loadTrackSpecificSettings( mmp.content().firstChild().
+								toElement() );
+		ct->toggledChannelButton( TRUE );
+	}
+}
+
+
+
+
 void trackContainer::updateScrollArea( void )
 {
 	m_scrollArea->resize( tMax( m_scrollArea->parentWidget()->width() - 
@@ -379,6 +410,45 @@ void trackContainer::updateScrollArea( void )
 				tMax( m_scrollArea->parentWidget()->height() -
 					m_scrollArea->y() - 2, 0 ) );
 	//m_scrollArea->updateContents();
+}
+
+
+
+
+trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
+	QScrollArea( _parent )
+{
+	setFrameStyle( QFrame::NoFrame );
+	setHorizontalScrollBarPolicy( 
+#ifdef QT4
+					Qt::ScrollBarAlwaysOff
+#else
+					QScrollArea::AlwaysOff
+#endif
+					);
+}
+
+
+
+
+trackContainer::scrollArea::~scrollArea()
+{
+}
+
+
+
+
+void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
+{
+	// always pass wheel-event to parent-widget (song-editor
+	// bb-editor etc.) because they might want to use it for zooming
+	// or scrolling left/right if a modifier-key is pressed, otherwise
+	// they do not accept it and we pass it up to QScrollArea
+	dynamic_cast<trackContainer *>( parentWidget() )->wheelEvent( _we );
+	if( !_we->isAccepted() )
+	{
+		QScrollArea::wheelEvent( _we );
+	}
 }
 
 

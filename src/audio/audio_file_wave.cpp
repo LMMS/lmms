@@ -88,11 +88,11 @@ bool audioFileWave::startEncoding( void )
 
 void FASTCALL audioFileWave::writeBufferToDev( surroundSampleFrame * _ab,
 							Uint32 _frames,
-							float _master_output )
+							float _master_gain )
 {
 	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
 							_frames * channels() );
-	int bytes = convertToS16( _ab, _frames, _master_output, outbuf,
+	int bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
 							!isLittleEndian() );
 	writeData( outbuf, bytes );
 

@@ -115,7 +115,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	multimediaProject mmp( _preset_file );
 	if( s_globalChannelTrack == NULL )
 	{
-		track * t = track::createTrack( track::CHANNEL_TRACK,
+		track * t = track::create( track::CHANNEL_TRACK,
 						blindTrackContainer::inst() );
 		s_globalChannelTrack = dynamic_cast<channelTrack *>( t );
 #ifdef LMMS_DEBUG

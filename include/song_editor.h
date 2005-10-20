@@ -229,7 +229,6 @@ protected:
 protected slots:
 	void insertTact( void );
 	void removeTact( void );
-	void addChannelTrack( void );
 	void addBBTrack( void );
 	void addSampleTrack( void );
 	void scrolled( int _new_pos );

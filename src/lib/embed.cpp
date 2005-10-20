@@ -43,8 +43,14 @@
 #include "config_mgr.h"
 
 
+
+#ifndef PLUGIN_NAME
 namespace embed
+#else
+namespace PLUGIN_NAME
+#endif
 {
+
 
 #include "embedded_resources.h"
 
@@ -55,10 +61,10 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 	{
 		QString name = QString( _name ) + ".png";
 #ifdef QT4
-		const embedDesc & e = findEmbeddedData(
+		const embed::descriptor & e = findEmbeddedData(
 						name.toAscii().constData() );
 #else
-		const embedDesc & e = findEmbeddedData( name.ascii() );
+		const embed::descriptor & e = findEmbeddedData( name.ascii() );
 #endif
 		// not found?
 		if( QString( e.name ) != name )
@@ -88,10 +94,9 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 
 QString getText( const char * _name )
 {
-	const embedDesc & e = findEmbeddedData( _name );
+	const embed::descriptor & e = findEmbeddedData( _name );
 	return( QString::fromLatin1( (const char *) e.data, e.size ) );
 }
-
 
 
 
@@ -103,9 +108,10 @@ void loadTranslation( const QString & _tname )
 #if QT_VERSION >= 0x030100
 
 #ifdef QT4
-	const embedDesc & e = findEmbeddedData( name.toAscii().constData() );
+	const embed::descriptor & e = findEmbeddedData(
+						name.toAscii().constData() );
 #else
-	const embedDesc & e = findEmbeddedData( name.ascii() );
+	const embed::descriptor & e = findEmbeddedData( name.ascii() );
 #endif
 	// not found?
 	if( QString( e.name ) != name )
@@ -126,3 +132,4 @@ void loadTranslation( const QString & _tname )
 
 
 }
+

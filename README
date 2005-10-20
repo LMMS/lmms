@@ -1,4 +1,4 @@
-Linux MultiMedia Studio 0.1.2
+Linux MultiMedia Studio 0.1.1
 ==============================
 
 Copyright (c) 2004-2005 by Tobias Doerffel and others
@@ -41,13 +41,13 @@ Requirements
 ------------
 
 The most important requirement is for sure a fast computer, so don't try to get
-LMMS working on a pentium I with 60 MHz... ;-) So you should have at least
-500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
-(LMMS is currently developed on a PIII 450 MHz...!!)
+LMMS working on a pentium I with 60 MHz... ;-) Therefore you should have at
+least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
+
 
 Required libraries are:
 
-- Qt 3.2 or higher (tested up to 4.0.0) with devel-files
+- Qt 3.0 (3.2 recommended) or higher (tested up to 4.0.0) with devel-files
 
 Optional, but strongly recommended:
 - libvorbis with devel-files
@@ -57,6 +57,7 @@ Optional, but strongly recommended:
 - libsamplerate with devel-files
 - libsndfile with devel-files
 - JACK with devel-files
+- libfst + header-files from Steinberg SDK
 
 For compiling you should have an up to date GCC with g++.
 LMMS has been (successfully) tested under Debian Sarge 3.1, Fedora Core 2-4,
@@ -83,16 +84,16 @@ can be found at
 http://lmms.sourceforge.net
 
 
-Before coding a new big feature, please always post your idea and suggestions
+Details on development can be found at
+
+http://lmms.sourceforge.net/development.php
+
+or in the Wiki:
+
+http://wiki.mindrules.net
+
+Before coding a new big feature, please ALWAYS post your idea and suggestions
 about your feature and about the actual implementation to the
 LMMS-devel-mailinglist (lmms-devel@lists.sourceforge.net) and wait for replies!
 Maybe there're different ideas, improvements, hints or maybe your feature is
 not welcome/needed at the moment (but for sure this will be very seldom).
-
-If you coded your feature, make sure, that it is running properly with the
-newest available version of LMMS and that it also runs with different
-configurations (e.g. disabled surround-support, missing package(s) etc.).
-Important is also, that you comment your source so that other people can fix
-bugs or improve your feature! 
-
-

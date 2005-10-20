@@ -57,6 +57,7 @@
 class audioDevice;
 class midiDevice;
 class lmmsMainWin;
+class plugin;
 
 
 const int DEFAULT_BUFFER_SIZE = 512;
@@ -174,7 +175,8 @@ public:
 		m_playHandlesToRemove.push_back( _ph );
 	}
 
-	void FASTCALL checkValidityOfPlayHandles( void );
+	void checkValidityOfPlayHandles( void );
+
 
 
 	inline int sampleRate( void )
@@ -317,7 +319,6 @@ private:
 	volatile float m_masterOutput;
 
 	volatile bool m_quit;
-
 
 
 	audioDevice * m_audioDev;

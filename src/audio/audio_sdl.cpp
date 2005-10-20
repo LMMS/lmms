@@ -125,10 +125,10 @@ audioSDL::~audioSDL()
 
 
 void audioSDL::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-						float _master_output )
+						float _master_gain )
 {
 	m_bufMutex.lock();
-	convertToS16( _ab, _frames, _master_output, m_buffer,
+	convertToS16( _ab, _frames, _master_gain, m_buffer,
 							m_convertEndian );
 	m_bufMutex.unlock();
 	// before returning make sure, callback was called, so we're synced

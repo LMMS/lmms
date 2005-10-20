@@ -97,7 +97,7 @@ int main( int argc, char * * argv )
 		e->cname = convertFileNameToCIdentifier( e->name );
 		embedded_data.push_back( e );
 		std::string s;
-		std::cout << "static const unsigned char " << e->cname <<
+		std::cout << "const unsigned char " << e->cname <<
 								"_data[] = {";
 		embedData( data, fsize, std::cout );
 		std::cout << std::endl << "};" << std::endl << std::endl;
@@ -106,7 +106,7 @@ int main( int argc, char * * argv )
 
 	if( embedded_data.size() > 0 )
 	{
-		std::cout << "static const unsigned char dummy_data[] ="
+		std::cout << "const unsigned char dummy_data[] ="
 					"{ 0x00 };" << std::endl << std::endl;
 		embed * dummy = new embed;
 		dummy->size = 1;
@@ -114,14 +114,15 @@ int main( int argc, char * * argv )
 		dummy->cname = convertFileNameToCIdentifier( "dummy" );
 		embedded_data.push_back( dummy );
 
-		std::cout << "#include <string.h>" << std::endl;
-		std::cout << "static struct embedDesc" << std::endl
-				<< "{" << std::endl
+		std::cout << "#include <string.h>" << std::endl << std::endl;
+		std::cout << "#include \"embed.h\"" << std::endl << std::endl;
+		std::cout << "embed::descriptor embed_vec[] = {" << std::endl;
+/*				<< "{" << std::endl
 				<< "	int size;" << std::endl
 				<< "	const unsigned char * data;" <<
 								std::endl
 				<< "	const char * name;" << std::endl
-				<< "} embed_vec[] = {" << std::endl;
+				<< "} embed_vec[] = {" << std::endl;*/
 		while( embedded_data.size() > 0 )
 		{
 			embed * e = embedded_data[0];
@@ -133,9 +134,9 @@ int main( int argc, char * * argv )
 		}
 		std::cout << "	{ 0, 0, 0 }" << std::endl << "};" << std::endl
 								<< std::endl
-				<< "static const embedDesc & findEmbeddedData( "
-					"const char * _name )" << std::endl
-				<< "{" << std::endl
+				<< "const embed::descriptor & "
+				   "findEmbeddedData( const char * _name )"
+				<< std::endl << "{" << std::endl
 				<< "	for( int i = 0; embed_vec[i].data; "
 							"i++ )" << std::endl
 				<< "	{" << std::endl

@@ -214,7 +214,7 @@ audioJACK::~audioJACK()
 
 
 void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-						float _master_output )
+							float _master_gain )
 {
 	m_bufMutex.lock();
 
@@ -228,7 +228,7 @@ void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 								_frames );
 			for( Uint32 frame = 0; frame < _frames; ++frame )
 			{
-				buf[frame] = _ab[frame][chnl] * _master_output;
+				buf[frame] = _ab[frame][chnl] * _master_gain;
 			}
 			bufset b = { buf, _frames } ;
 			bufs.push_back( b );
@@ -246,7 +246,10 @@ void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 #ifdef HAVE_UNISTD_H
 #ifdef HAVE_USLEEP
 		// just wait and give cpu-time to other processes
-		usleep( 200 );
+ 		// 	tobydox 20051019: causes LMMS to hang up when locking
+		//			  several other mutexes, so skip it
+		//usleep( 200 );
+
 #endif
 #endif
 	}
@@ -264,6 +267,8 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 #endif
 	jack_transport_state_t ts = jack_transport_query( _this->m_client,
 									NULL );
+	_this->m_bufMutex.lock();
+
 	if( ts != JackTransportRolling )
 	{
 		// always decrease frame-sync-var as we would do it if running
@@ -276,6 +281,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		{
 			_this->m_frameSync = 0;
 		}
+		_this->m_bufMutex.unlock();
 		return( 0 );
 	}
 
@@ -289,7 +295,6 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 					_this->m_outputPorts[ch], _nframes );
 	}
 
-	_this->m_bufMutex.lock();
 
 	jack_nframes_t done = 0;
 	while( done < _nframes )

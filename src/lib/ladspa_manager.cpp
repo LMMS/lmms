@@ -23,26 +23,31 @@
  */
 
 
+#include "ladspa_manager.h"
+
+#ifdef LADSPA_SUPPORT
+
+
 #ifdef QT4
 
 #include <QDir>
 #include <QFileInfo>
-#include <QPair>
 
 #else
 
 #include <qdir.h>
 #include <qfileinfo.h>
-#include <qpair.h>
 
 #endif
 
-#include <ladspa.h>
+
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
+#endif
+
 #include <math.h>
 
 
-#include "ladspa_manager.h"
 
 
 ladspaManager * ladspaManager::s_instanceOfMe = NULL;
@@ -55,19 +60,25 @@ ladspaManager::ladspaManager( void )
 	
 	// TODO Need to move the search path definition to the config file to have
 	// more control over where it tries to find the plugins.
-	QStringList ladspaDirectories = QStringList::split( QString( ":" ),
+	QStringList ladspaDirectories = QStringList::split( ':',
 					QString( getenv( "LADSPA_PATH" ) ) );
 	// set default-directory if nothing is specified...
 	if( ladspaDirectories.isEmpty() )
 	{
 		ladspaDirectories.push_back( "/usr/lib/ladspa" );
+		ladspaDirectories.push_back( "/usr/local/lib/ladspa" );
 	}
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
 		    it != ladspaDirectories.end(); ++it )
 	{
 		QDir directory( ( *it ) );
 		const QFileInfoList * list = directory.entryInfoList();
-		
+		// if directory doesn't exist or isn't readable, we get NULL which
+		// would crash LMMS...
+		if( list == NULL )
+		{
+			continue;
+		}
 		for( QFileInfoList::iterator file = list->begin();
 					file != list->end(); ++file )
 		{
@@ -841,4 +852,7 @@ void FASTCALL ladspaManager::cleanup( const ladspaKey & _plugin,
 		}
 	}
 }
+
+
+#endif
 

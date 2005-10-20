@@ -19,13 +19,12 @@ rpm: $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE).spec
 endif
 
 
-noinst_PROGRAMS= bin2res
-bin2res_SOURCES = buildtools/bin2res.cpp
+
+SUBDIRS = artwork buildtools locale midi-maps plugins presets projects samples
 
 
 INCLUDES = -I$(srcdir)/include -I.
 bin_PROGRAMS = lmms
-
 
 
 AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
@@ -33,10 +32,10 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 
 %.moc: $(srcdir)/include/%.h
 	$(MOC) -o $@ $<
-	
+
 %.ts: 
-	$(LUPDATE) $(lmms_SOURCES) -ts locale/$@
-	
+	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name *.cpp` -ts locale/$@
+
 %.qm: %.ts
 	$(LRELEASE) $<
 
@@ -45,20 +44,18 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 lmms_MOC =						\
 		./about_dialog.moc			\
 		./arp_and_chords_tab_widget.moc		\
-		./audio_file_processor.moc		\
 		./bb_editor.moc				\
 		./bb_track.moc				\
-		./browser.moc				\
 		./channel_track.moc			\
 		./config_mgr.moc			\
 		./crystal_button.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
-		./kmultitabbar.moc			\
+		./file_browser.moc			\
 		./group_box.moc				\
+		./kmultitabbar.moc			\
 		./knob.moc				\
-		./ladspa_sine_1063.moc			\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./lmms_main_win.moc			\
@@ -69,6 +66,7 @@ lmms_MOC =						\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
 		./pixmap_button.moc			\
+		./plugin_browser.moc			\
 		./project_notes.moc			\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
@@ -77,7 +75,6 @@ lmms_MOC =						\
 		./side_bar.moc				\
 		./side_bar_widget.moc			\
 		./song_editor.moc			\
-		./sound_generator.moc			\
 		./surround_area.moc			\
 		./tab_bar.moc				\
 		./tab_button.moc			\
@@ -86,7 +83,6 @@ lmms_MOC =						\
 		./timeline.moc				\
 		./track_container.moc			\
 		./track.moc				\
-		./triple_oscillator.moc			\
 		./visualization_widget.moc
 
 
@@ -94,8 +90,8 @@ BUILT_SOURCES = $(lmms_MOC)
 
 lmms_EMBEDDED_RESOURCES = $(wildcard $(srcdir)/resources/*png AUTHORS COPYING)
 
-./embedded_resources.h: $(lmms_EMBEDDED_RESOURCES) bin2res
-	$(top_builddir)/bin2res $(lmms_EMBEDDED_RESOURCES) > $@
+./embedded_resources.h: $(lmms_EMBEDDED_RESOURCES)
+	$(top_builddir)/buildtools/bin2res $(lmms_EMBEDDED_RESOURCES) > $@
 
 ./embed.o: ./embedded_resources.h
 
@@ -113,11 +109,12 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/about_dialog.cpp			\
 		$(srcdir)/src/core/arp_and_chords_tab_widget.cpp	\
 		$(srcdir)/src/core/bb_editor.cpp			\
-		$(srcdir)/src/core/browser.cpp				\
 		$(srcdir)/src/core/config_mgr.cpp			\
 		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
 		$(srcdir)/src/core/envelope_tab_widget.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
+		$(srcdir)/src/core/file_browser.cpp			\
+		$(srcdir)/src/core/instrument.cpp			\
 		$(srcdir)/src/core/lmms_main_win.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/mixer.cpp				\
@@ -126,11 +123,12 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/note_play_handle.cpp			\
 		$(srcdir)/src/core/piano_roll.cpp			\
 		$(srcdir)/src/core/piano_widget.cpp			\
+		$(srcdir)/src/core/plugin.cpp				\
+		$(srcdir)/src/core/plugin_browser.cpp			\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp	\
 		$(srcdir)/src/core/sample_play_handle.cpp		\
 		$(srcdir)/src/core/setup_dialog.cpp			\
 		$(srcdir)/src/core/song_editor.cpp			\
-		$(srcdir)/src/core/sound_generator.cpp			\
 		$(srcdir)/src/core/track.cpp				\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
@@ -142,6 +140,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
+		$(srcdir)/src/lib/string_pair_drag.cpp			\
 		$(srcdir)/src/midi/midi_alsa_raw.cpp			\
 		$(srcdir)/src/midi/midi_device.cpp			\
 		$(srcdir)/src/midi/midi_file.cpp			\
@@ -189,16 +188,14 @@ lmms_SOURCES =								\
 		$(srcdir)/include/volume.h				\
 		$(srcdir)/include/panning.h				\
 		$(srcdir)/include/song_editor.h				\
-		$(srcdir)/include/sound_generator.h			\
-		$(srcdir)/include/audio_file_processor.h		\
+		$(srcdir)/include/plugin.h				\
+		$(srcdir)/include/instrument.h				\
 		$(srcdir)/include/midi_time.h				\
 		$(srcdir)/include/bb_editor.h				\
 		$(srcdir)/include/piano_widget.h			\
 		$(srcdir)/include/effect_board.h			\
 		$(srcdir)/include/pixmap_button.h			\
-		$(srcdir)/include/triple_oscillator.h			\
 		$(srcdir)/include/settings.h				\
-		$(srcdir)/include/plucked_string_synth.h		\
 		$(srcdir)/include/rename_dialog.h			\
 		$(srcdir)/include/export_project_dialog.h		\
 		$(srcdir)/include/note_play_handle.h			\
@@ -214,7 +211,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/group_box.h				\
 		$(srcdir)/include/tab_widget.h				\
 		$(srcdir)/include/knob.h				\
-		$(srcdir)/include/browser.h				\
+		$(srcdir)/include/file_browser.h			\
+		$(srcdir)/include/plugin_browser.h			\
 		$(srcdir)/include/templates.h				\
 		$(srcdir)/include/gui_templates.h			\
 		$(srcdir)/include/surround_area.h			\
@@ -248,7 +246,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/preset_preview_play_handle.h		\
 		$(srcdir)/include/sample_play_handle.h			\
 		$(srcdir)/include/midi.h				\
-		$(srcdir)/include/midi_out.h				\
 		$(srcdir)/include/nstate_button.h			\
 		$(srcdir)/include/midi_dummy.h				\
 		$(srcdir)/include/midi_mapper.h				\
@@ -259,7 +256,10 @@ lmms_SOURCES =								\
 		$(srcdir)/include/text_float.h				\
 		$(srcdir)/include/tempo_sync_knob.h			\
 		$(srcdir)/include/setup_dialog.h			\
-		$(srcdir)/include/empty_sg_plugin.h			\
+		$(srcdir)/include/dummy_plugin.h			\
+		$(srcdir)/include/dummy_instrument.h			\
+		$(srcdir)/include/instrument_play_handle.h		\
+		$(srcdir)/include/string_pair_drag.h			\
 		$(srcdir)/include/ladspa_manager.h
 
 
@@ -296,18 +296,6 @@ if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) -laudiofileprocessor -ldl
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) -lfst -ldl
 lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
 
-SUBDIRS = artwork locale midi-maps presets projects samples
-
-
-
-pkglib_LTLIBRARIES= libaudiofileprocessor.la libsine1063oscillator.la libmidiout.la libpluckedstringsynth.la libtripleoscillator.la
-
-
-libaudiofileprocessor_la_SOURCES = src/soundgenerators/audio_file_processor.cpp
-libsine1063oscillator_la_SOURCES = src/soundgenerators/ladspa_sine_1063.cpp
-libmidiout_la_SOURCES = src/soundgenerators/midi_out.cpp
-libpluckedstringsynth_la_SOURCES = src/soundgenerators/plucked_string_synth.cpp
-libtripleoscillator_la_SOURCES = src/soundgenerators/triple_oscillator.cpp

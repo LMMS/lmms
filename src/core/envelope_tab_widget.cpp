@@ -153,10 +153,7 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track,
 	m_filterComboBox->addItem( tr( "Notch" ) );
 	m_filterComboBox->addItem( tr( "Allpass" ) );
 	m_filterComboBox->addItem( tr( "Moog" ) );
-	m_filterComboBox->addItem( tr( "Moog 2" ) );
 	m_filterComboBox->addItem( tr( "2x LowPass" ) );
-	m_filterComboBox->addItem( tr( "2x Moog" ) );
-	m_filterComboBox->addItem( tr( "2x Moog 2" ) );
 
 #ifdef QT4
 	m_filterComboBox->setWhatsThis(

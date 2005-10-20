@@ -163,6 +163,7 @@ int main( int argc, char * * argv )
 		e->show();
 		e->exportBtnClicked();
 	}
+
 	return( app.exec() );
 }
 

@@ -227,7 +227,7 @@ public:
 public slots:
 	void changePosition( const midiTime & _new_pos = -1 );
 	void cloneTrack( void );
-	void deleteTrack( void );
+	void removeTrack( void );
 	void moveTrackUp( void );
 	void moveTrackDown( void );
 	void setMuted( bool _muted );
@@ -271,11 +271,10 @@ public:
 
 	track( trackContainer * _tc );
 	virtual ~track();
-	static track * FASTCALL createTrack( trackTypes _tt,
+	static track * FASTCALL create( trackTypes _tt, trackContainer * _tc );
+	static track * FASTCALL create( const QDomElement & _this,
 							trackContainer * _tc );
-	static track * FASTCALL createTrack( const QDomElement & _this,
-							trackContainer * _tc );
-	static track * FASTCALL cloneTrack( track * _track );
+	static track * FASTCALL clone( track * _track );
 
 	tact length( void ) const;
 

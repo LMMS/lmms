@@ -352,16 +352,6 @@ songEditor::songEditor() :
 							"toolbar_bg" ) );
 	edit_tb->setErasePixmap( embed::getIconPixmap( "toolbar_bg" ) );*/
 #ifdef QT4
-	a = edit_tb->addAction( embed::getIconPixmap( "add_channel_track" ), "",
-					this, SLOT( addChannelTrack() ) );
-	a->setToolTip( tr( "Add channel-track" ) );
-#else
-	m_addChannelTrackButton = new QToolButton( embed::getIconPixmap(
-					"add_channel_track" ), "", "",
-					this, SLOT( addChannelTrack() ),
-					edit_tb );
-#endif
-#ifdef QT4
 	a = edit_tb->addAction( embed::getIconPixmap( "add_bb_track" ), "",
 						this, SLOT( addBBTrack() ) );
 	a->setToolTip( tr( "Add beat/bassline" ) );
@@ -414,7 +404,6 @@ songEditor::songEditor() :
 
 	toolTip::add( m_playButton, tr( "Play/pause song (Space)" ) );
 	toolTip::add( m_stopButton, tr( "Stop playing song (Space)" ) );
-	toolTip::add( m_addChannelTrackButton, tr( "Add channel-track" ) );
 	toolTip::add( m_addBBTrackButton, tr( "Add beat/bassline" ) );
 	toolTip::add( m_addSampleTrackButton, tr( "Add sample-track" ) );
 	toolTip::add( m_insertTactButton, tr( "Insert tact at current tact "
@@ -609,7 +598,6 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
-	_we->accept();
 	if( m_controlPressed )
 	{
 		if( _we->delta() > 0 )
@@ -636,6 +624,12 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
 	}
+	else
+	{
+		_we->ignore();
+		return;
+	}
+	_we->accept();
 }
 
 
@@ -1290,24 +1284,9 @@ void songEditor::removeTact( void )
 
 
 
-void songEditor::addChannelTrack( void )
-{
-	channelTrack * t = dynamic_cast< channelTrack * >(
-			track::createTrack( track::CHANNEL_TRACK, this ) );
-#ifdef LMMS_DEBUG
-	assert( t != NULL );
-#endif
-	t->loadPlugin( "tripleoscillator" );
-	t->toggledChannelButton( TRUE );
-	t->show();
-}
-
-
-
-
 void songEditor::addBBTrack( void )
 {
-	track * t = track::createTrack( track::BB_TRACK, this );
+	track * t = track::create( track::BB_TRACK, this );
 	if( dynamic_cast<bbTrack *>( t ) != NULL )
 	{
 		dynamic_cast<bbTrack *>( t )->clickedTrackLabel();
@@ -1319,7 +1298,7 @@ void songEditor::addBBTrack( void )
 
 void songEditor::addSampleTrack( void )
 {
-	(void) track::createTrack( track::SAMPLE_TRACK, this );
+	(void) track::create( track::SAMPLE_TRACK, this );
 }
 
 
@@ -1435,14 +1414,14 @@ void songEditor::createNewProject( void )
 	clearProject();
 
 	track * t;
-	t = track::createTrack( track::CHANNEL_TRACK, this );
-	dynamic_cast< channelTrack * >( t )->loadPlugin(
+	t = track::create( track::CHANNEL_TRACK, this );
+	dynamic_cast< channelTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
-	track::createTrack( track::SAMPLE_TRACK, this );
-	t = track::createTrack( track::CHANNEL_TRACK, bbEditor::inst() );
-	dynamic_cast< channelTrack * >( t )->loadPlugin(
+	track::create( track::SAMPLE_TRACK, this );
+	t = track::create( track::CHANNEL_TRACK, bbEditor::inst() );
+	dynamic_cast< channelTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
-	track::createTrack( track::BB_TRACK, this );
+	track::create( track::BB_TRACK, this );
 
 	setBPM( DEFAULT_BPM );
 	m_masterVolumeSlider->setValue( 100 );

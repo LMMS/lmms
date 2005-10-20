@@ -1,5 +1,6 @@
 /*
- * volume.h - declaration of some constants and types, concerning the volume of a note
+ * volume.h - declaration of some constants and types, concerning the volume
+ *            of a note
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>

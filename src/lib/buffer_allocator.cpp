@@ -188,7 +188,7 @@ void * bufferAllocator::allocBytes( Uint32 _bytes )
 	}
 
 
-	// nothing so far, so we'll alloc a new (aligned) buf
+	// got nothing so far, so we'll alloc a new (aligned) buf
 	bufDesc d = { FALSE, new char[_bytes + BUFFER_ALIGN], NULL, _bytes, 0 };
 	d.buf = (void *)( (size_t) d.origPtr + ( BUFFER_ALIGN -
 						( (size_t) d.origPtr &

@@ -83,10 +83,10 @@ public:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce );
-	void keyPressEvent (QKeyEvent * _ke);
-	void wheelEvent( QWheelEvent * _we );
-	void resizeEvent( QResizeEvent * _re );
+	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void resizeEvent( QResizeEvent * _re );
+
 	void updateBackground( void );
 
 

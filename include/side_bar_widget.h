@@ -48,7 +48,7 @@ class sideBarWidget : public QWidget
 public:
 	sideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent );
-	~sideBarWidget();
+	virtual ~sideBarWidget();
 	inline const QPixmap & icon( void ) const
 	{
 		return( m_icon );
@@ -60,9 +60,9 @@ public:
 
 
 protected:
-	void paintEvent( QPaintEvent * _pe );
-	void resizeEvent( QResizeEvent * _re );
-	inline void contextMenuEvent( QContextMenuEvent * )
+	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re );
+	inline virtual void contextMenuEvent( QContextMenuEvent * )
 	{
 	}
 

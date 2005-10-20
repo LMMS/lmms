@@ -29,6 +29,7 @@
 
 #include <QPainter>
 #include <QMouseEvent>
+
 #else
 
 #include <qpainter.h>
@@ -87,9 +88,9 @@ void pixmapButton::paintEvent( QPaintEvent * )
 	}
 
 #ifdef QT4
-	if( isChecked() )
+	if( isChecked() || isDown() )
 #else
-	if( isOn() )
+	if( isOn() || isDown() )
 #endif
 	{
 		if( m_activePixmap != NULL )

@@ -54,11 +54,9 @@ public:
 		NOTCH,
 		ALLPASS,
 		MOOG,
-		MOOG2,
 		SIMPLE_FLT_CNT,
 		DOUBLE_LOWPASS	= 16+LOWPASS,
-		DOUBLE_MOOG	= 16+MOOG,
-		DOUBLE_MOOG2	= 16+MOOG2
+		DOUBLE_MOOG	= 16+MOOG
 	} ;
 
 	static inline filterTypes getFilterType( const int _idx )
@@ -127,7 +125,7 @@ public:
 						m_y4[_chnl] * ( 1.0f / 6.0f );
 				break;
 			}
-			case MOOG2:
+/*			case MOOG2:
 			case DOUBLE_MOOG2:
 			{
 				const float x1 = ( _in0 - m_r *
@@ -190,7 +188,7 @@ public:
 
 				out = m_oldx[_chnl];
 				break;
-			}
+			}*/
 
 			default:
 				// filter
@@ -251,7 +249,7 @@ public:
 				break;
 			}
 
-			case DOUBLE_MOOG2:
+/*			case DOUBLE_MOOG2:
 			{
 				if( m_subFilter == NULL )
 				{
@@ -276,7 +274,7 @@ public:
 								kfcr * kf ) );
 				m_r = 4 * _q * kacr;
 				break;
-			}
+			}*/
 
 			default:
 			{

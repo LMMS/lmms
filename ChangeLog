@@ -1,3 +1,144 @@
+2005-10-19	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	added possibility of opening plugins instead of hardcoding them ;-)
+
+	* include/track.h:
+	renamed createTrack() and cloneTrack() to create() and clone()
+
+	* include/track_container.h:
+	* src/core/track_container.cpp:
+	receive drop-events -> add channel with instrument/preset
+
+	* src/audio/audio_jack.cpp:
+	removed usleep() out of loop in audioJACK::writeBufferToDev() since it
+	caused LMMS to hang e.g when removing a track
+
+	* src/core/plugin_browser.cpp:
+	show hand-cursor if over a plugin-description-widget
+
+	* src/widgets/pixmap_button.cpp:
+	if pixmap-button is set non-checkable, draw active-graphic if pressed
+	down and inactive one in normal state
+
+	* include/lmms_main_win.h:
+	* src/core/lmms_main_win.cpp:
+	own workspace for making wheelEvent(...) is now obsolete -> removed
+
+	* include/track_container.h:
+	* src/core/song_editor.cpp:
+	* src/core/track_container.cpp:
+	added own scroll-area for capturing special wheel-events where a
+	modifier-key (shift, control etc.) is pressed
+
+	* src/core/song_editor.cpp:
+	removed add-channel-button as it is obsolete after adding plugin-browser
+
+	* resources/:
+	improved icons such as project_*.png and sample-track-related icons
+
+2005-10-18	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/channel_track.h:
+	* src/tracks/channel_track.cpp:
+	- moved channelButton-implementation to channel_track.src
+	- added support for receiving drop-events, which makes channel-track
+	  to load either the given instrument or the given preset
+
+	* src/core/plugin_browser.cpp:
+	* include/plugin_browser.h:
+	added cool plugin-browser, which displays all available instrument-
+	plugins which are draggable to a channel-window/button
+
+	* include/string_pair_drag.h:
+	* src/lib/string_pair_drag.cpp:
+	added drag'n'drop-implementation for dragging string-pairs (key/value)
+	which provides a standard-interface, although drag'n'drop has changed a
+	lot in Qt 4
+
+	* src/widgets/crystal_button.cpp:
+	made mouseMoveEvent()-method much more effective
+
+	* Makefile.am:
+	* buildtools/Makefile.am:
+	build buildtools in subdir instead of top-build-directory - solves
+	dependendy problems with bin2res
+
+	* src/core/file_browser.cpp:
+	do not depend on typeinfo of audioFileProcessor anymore by using
+	new setParameter()-method
+
+	* include/plugin.h:
+	added setParameter() and getParameter()-methods for making LMMS able to
+	set parameters of a specific plugin without knowing anything about it
+
+2005-10-17	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* buildtools/bin2res.cpp:
+	* include/embed.h:
+	* src/lib/embed.cpp:
+	- declaration of embedded-data-descriptor is now located in embed.h and
+	  part of namespace embed
+	- added support for local embedded-resources which is important for
+	  plugins containing their own images etc., so data and access-methods
+	  are stored into namespace PLUGIN_NAME
+
+	* include/plugin.h:
+	* src/core/plugin.cpp:
+	added logo-field to descriptor-structure and simplified method for
+	getting descriptors of all plugins
+
+	* include/basic_filters.h:
+	removed Moog-2-filter as it is only very CPU-intensive without any
+	significant difference to sound of normal Moog-filter
+
+2005-10-16	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/lib/ladspa_manager.cpp:
+	skip not existing/unreadable directories when searching for plugins
+
+	* include/vestige.h:
+	* src/plugins/vestige.cpp:
+	make use of new instrument-play-handle
+
+	* include/channel_track.h:
+	* src/core/browser.cpp:
+	* src/core/song_editor.cpp:
+	* src/midi/midi_file.cpp:
+	* src/tracks/channel_track.cpp:
+	renamed loadPlugin() to loadInstrument()
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	added pluginDir()-method
+
+	* include/instrument_play_handle.h:
+	added another play-handle for playing instruments which do not
+	produce sound for each note
+
+	* src/plugins/:
+	renamed directory soundgenerators to plugins and modified all plugins
+	for working with revised plugin-system
+
+	* include/instrument.h:
+	* include/plugin.h:
+	* src/core/instrument.cpp:
+	* src/core/plugin.cpp:
+	splitted code from instrument up into class plugin and class instrument
+	and revised plugin-system
+
+	* include/instrument.h:
+	* src/core/instrument.cpp:
+	renamed files soundgenerator.* to instrument.* as well as class-name
+
+2005-10-15	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/vestige.h:
+	* src/soundgenerators/vestige.cpp:
+	new plugin "VeSTige" for handling VST-plugins - VERY experimental,
+	but at least, we get some sound out of these strange dll-files ;-)
+
 2005-10-13	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* src/audio/audio_jack.cpp:

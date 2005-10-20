@@ -93,10 +93,13 @@ public:
 
 
 protected:
+	virtual void resizeEvent( QResizeEvent * );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+
 	constTrackVector tracks( void ) const;
 	trackVector tracks( void );
 
-	virtual void resizeEvent( QResizeEvent * );
 
 	midiTime m_currentPosition;
 
@@ -106,15 +109,32 @@ protected slots:
 
 
 private:
-	QScrollArea * m_scrollArea;
+
+	class scrollArea : public QScrollArea
+	{
+	public:
+		scrollArea( trackContainer * _parent );
+		virtual ~scrollArea();
+
+	protected:
+		virtual void wheelEvent( QWheelEvent * _we );
+
+	} ;
+
+
+	scrollArea * m_scrollArea;
 	typedef vvector<trackWidget *> trackWidgetVector; 
 
 	trackWidgetVector m_trackWidgets;
 	float m_ppt;
 
 
+	friend class scrollArea;
+
+
 signals:
 	void positionChanged( const midiTime & _pos );
+
 
 } ;
 

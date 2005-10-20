@@ -70,7 +70,7 @@ audioDevice::~audioDevice()
 
 
 void audioDevice::writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
-				Uint32 _src_sample_rate, float _master_output )
+				Uint32 _src_sample_rate, float _master_gain )
 {
 	// make sure, no other thread is accessing device
 	lock();
@@ -82,12 +82,12 @@ void audioDevice::writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
 							_frames * channels() );
 		resample( _ab, _frames, temp, _src_sample_rate, m_sampleRate );
 		writeBufferToDev( temp, _frames * m_sampleRate /
-					_src_sample_rate, _master_output );
+					_src_sample_rate, _master_gain );
 		bufferAllocator::free( temp );
 	}
 	else
 	{
-		writeBufferToDev( _ab, _frames, _master_output );
+		writeBufferToDev( _ab, _frames, _master_gain );
 	}
 	// release lock
 	unlock();
@@ -240,7 +240,7 @@ LP_FILTER_COEFFS[tap] * lp_hist[( oldest + tap ) % LP_FILTER_TAPS][chnl];
 
 
 int FASTCALL audioDevice::convertToS16( surroundSampleFrame * _ab,
-					Uint32 _frames, float _master_output,
+					Uint32 _frames, float _master_gain,
 					outputSampleType * _output_buffer,
 					bool _convert_endian )
 {
@@ -251,7 +251,7 @@ int FASTCALL audioDevice::convertToS16( surroundSampleFrame * _ab,
 			( _output_buffer + frame * channels() )[chnl] =
 				static_cast<outputSampleType>(
 					mixer::clip( _ab[frame][chnl] *
-							_master_output ) *
+							_master_gain ) *
 						OUTPUT_SAMPLE_MULTIPLIER );
 		}
 	}

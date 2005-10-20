@@ -607,10 +607,10 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 						"", &m_trackOperationsWidget );
 	deltr_btn->setGeometry( 1, 1+TRACK_OP_BTN_HEIGHT, TRACK_OP_BTN_WIDTH,
 							TRACK_OP_BTN_HEIGHT );
-	connect( deltr_btn, SIGNAL( clicked() ), this, SLOT( deleteTrack() ) );
+	connect( deltr_btn, SIGNAL( clicked() ), this, SLOT( removeTrack() ) );
 	connect( deltr_btn, SIGNAL( clicked() ), deltr_btn,
 							SLOT( clearFocus() ) );
-	toolTip::add( deltr_btn, tr( "Delete this track" ) );
+	toolTip::add( deltr_btn, tr( "Remove this track" ) );
 
 	QPushButton * muptr_btn = new QPushButton( embed::getIconPixmap(
 							"arp_up_on", 12, 12 ),
@@ -718,7 +718,7 @@ void trackWidget::cloneTrack( void )
 
 
 
-void trackWidget::deleteTrack( void )
+void trackWidget::removeTrack( void )
 {
 	m_track->getTrackContainer()->removeTrack( m_track );
 }
@@ -873,7 +873,7 @@ track::~track()
 
 
 
-track * FASTCALL track::createTrack( trackTypes _tt, trackContainer * _tc )
+track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 {
 	switch( _tt )
 	{
@@ -891,10 +891,10 @@ track * FASTCALL track::createTrack( trackTypes _tt, trackContainer * _tc )
 
 
 
-track * FASTCALL track::createTrack( const QDomElement & _this,
+track * FASTCALL track::create( const QDomElement & _this,
 							trackContainer * _tc )
 {
-	track * t = createTrack( static_cast<trackTypes>( _this.attribute(
+	track * t = create( static_cast<trackTypes>( _this.attribute(
 						"type" ).toInt() ), _tc );
 #ifdef LMMS_DEBUG
 	assert( t != NULL );
@@ -906,13 +906,13 @@ track * FASTCALL track::createTrack( const QDomElement & _this,
 
 
 
-track * FASTCALL track::cloneTrack( track * _track )
+track * FASTCALL track::clone( track * _track )
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
 	_track->saveSettings( doc, parent );
 	QDomElement e = parent.firstChild().toElement();
-	return( createTrack( e, _track->getTrackContainer() ) );
+	return( create( e, _track->getTrackContainer() ) );
 }
 
 

@@ -278,11 +278,11 @@ QString audioOSS::probeDevice( void )
 
 
 void audioOSS::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-							float _master_output )
+							float _master_gain )
 {
 	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
 							_frames * channels() );
-	int bytes = convertToS16( _ab, _frames, _master_output, outbuf,
+	int bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
 							m_convertEndian );
 	write( m_audioFD, outbuf, bytes );
 

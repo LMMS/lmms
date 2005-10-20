@@ -68,7 +68,7 @@ public:
 
 	void FASTCALL writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
 							Uint32 _src_sample_rate,
-							float _master_output );
+							float _master_gain );
 
 	inline Uint32 sampleRate( void ) const
 	{
@@ -104,12 +104,12 @@ public:
 protected:
 	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
 						Uint32 _frames,
-						float _master_output ) = 0;
+						float _master_gain ) = 0;
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int FASTCALL convertToS16( surroundSampleFrame * _ab, Uint32 _frames,
-					float _master_output,
+					float _master_gain,
 					outputSampleType * _output_buffer,
 					bool _convert_endian = FALSE );
 

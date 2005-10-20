@@ -175,13 +175,13 @@ int audioALSA::handleError( int _err )
 
 
 void audioALSA::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-							float _master_output )
+							float _master_gain )
 {
 	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
 							_frames * channels() );
 	bufferAllocator::autoCleaner<> ac( outbuf );
 
-	convertToS16( _ab, _frames, _master_output, outbuf,
+	convertToS16( _ab, _frames, _master_gain, outbuf,
 					m_littleEndian != isLittleEndian() );
 
 	Uint32 frame = 0;
