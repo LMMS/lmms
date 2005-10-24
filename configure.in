@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051019, tobydox@users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051019)
+AC_INIT(lmms, 0.1.1-cvs20051023, tobydox@users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051023)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -152,6 +152,32 @@ if test ! -z "$HAVE_JACK_JACK_H" ; then
 	AC_DEFINE(HAVE_JACK_JACK_H)
 fi
 AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
+
+
+# check for VST-backends (currently only libfst is supported)
+AC_ARG_WITH(vst,
+	AS_HELP_STRING([--without-vst],
+			[disable support for VST-plugin-hosting]), ,
+ 	[ with_vst=yes ])
+AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <vst/aeffectx.h> header file.])
+AH_TEMPLATE(HAVE_FST_H, [Define to 1 if you have the <fst.h> header file.])
+if test "x$with_vst" = "xyes" ; then
+	AC_CHECK_HEADER(vst/aeffectx.h, HAVE_VST_AEFFECTX_H="true")
+	AC_CHECK_HEADER(fst.h, HAVE_FST_H="true")
+	AC_CHECK_LIB([fst], [fst_init], HAVE_LIBFST="true", HAVE_FST_H="")
+fi
+if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
+	AC_DEFINE(HAVE_VST_AEFFECTX_H)
+	if test ! -z "$HAVE_FST_H" ; then
+		AC_DEFINE(HAVE_FST_H)
+		FST_OK_BUT_VST_HEADERS_MISSING=""
+	else
+		FST_OK_BUT_VST_HEADERS_MISSING="true"
+	fi
+else
+	HAVE_FST_H=""
+fi
+AM_CONDITIONAL(HAVE_LIBFST, test ! -z "$HAVE_FST_H")
 
 
 # check for vorbis-lib
@@ -541,6 +567,49 @@ else
 fi
 
 
+
+if test ! -z "$FST_OK_BUT_VST_HEADERS_MISSING" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You seem to have a proper libfst-installation, but the header-files"
+	echo " = (AEffect.h and aeffectx.h) from Steinberg-SDK are missing or not present"
+	echo " = in /usr/include/vst. We cannot distribute them as they're licensed under"
+	echo " = a non-GPL-compatible license, so you'll have to download them at"
+	echo " ="
+	echo " =       ftp://ext2asio:sdk1ext@ftp.pinnaclesys.com/SDK"
+	echo " ="
+	echo " = and put the mentioned files into /usr/include."
+	echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
+	echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
+	echo " = ignore this warning."
+	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " ="
+	with_warnings="true"
+else
+	if test ! -z "$HAVE_FST_H" ; then
+		PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libfst for hosting VST-plugins"
+	else
+		echo " ========================"
+		echo " ===  LMMS - WARNING  ======================================================="
+		echo " ========================"
+		echo " ="
+		echo " = You don't seem to have installed libfst, which is neccessary for building"
+		echo " = LMMS with support for built-in VST-plugin. Furthermore LMMS needs"
+		echo " = header-files (AEffect.h and aeffectx.h) from Steinberg-SDK, which are"
+		echo " = likely to be installed by libfst, so after having coped with libfst-"
+		echo " = installation (which is a mess... ;-), everything should be alright."
+		echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
+		echo " = warning."
+		echo " = Consider installing the missing packages for using the full power of LMMS."
+		echo " ="
+		with_warnings="true"
+	fi
+fi
+
+
+
 echo
 echo
 echo "LMMS will be able to use $PLUGINS_TO_BUILD" | sed -e "s/\\\n/\n/g" | sed -e "s/\\\t/\t/g" | sed -e "s/\\\\\*/\*/g"
@@ -562,7 +631,7 @@ else
 fi
 echo " ="
 echo " = If there're problems while compiling LMMS, please send a mail to "
-echo " = tobydox@users.sourceforge.net!"
+echo " = tobydox [at] users.sourceforge.net!"
 echo " ="
 echo
 

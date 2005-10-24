@@ -117,6 +117,10 @@ void ledCheckBox::setChecked( bool _on )
 	{
 		toggle();
 	}
+	else
+	{
+		emit( toggled( m_checked ) );
+	}
 }
 
 

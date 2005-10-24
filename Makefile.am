@@ -62,6 +62,7 @@ lmms_MOC =						\
 		./mixer.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
+		./midi_tab_widget.moc			\
 		./pattern.moc				\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
@@ -117,6 +118,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/instrument.cpp			\
 		$(srcdir)/src/core/lmms_main_win.cpp			\
 		$(srcdir)/src/core/main.cpp				\
+		$(srcdir)/src/core/midi_tab_widget.cpp			\
 		$(srcdir)/src/core/mixer.cpp				\
 		$(srcdir)/src/core/name_label.cpp			\
 		$(srcdir)/src/core/note.cpp				\
@@ -142,10 +144,11 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
 		$(srcdir)/src/lib/string_pair_drag.cpp			\
 		$(srcdir)/src/midi/midi_alsa_raw.cpp			\
-		$(srcdir)/src/midi/midi_device.cpp			\
+		$(srcdir)/src/midi/midi_client.cpp			\
 		$(srcdir)/src/midi/midi_file.cpp			\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
 		$(srcdir)/src/midi/midi_oss.cpp				\
+		$(srcdir)/src/midi/midi_port.cpp			\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
@@ -190,7 +193,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/song_editor.h				\
 		$(srcdir)/include/plugin.h				\
 		$(srcdir)/include/instrument.h				\
-		$(srcdir)/include/midi_time.h				\
 		$(srcdir)/include/bb_editor.h				\
 		$(srcdir)/include/piano_widget.h			\
 		$(srcdir)/include/effect_board.h			\
@@ -227,10 +229,14 @@ lmms_SOURCES =								\
 		$(srcdir)/include/name_label.h				\
 		$(srcdir)/include/play_handle.h				\
 		$(srcdir)/include/mmp.h					\
-		$(srcdir)/include/midi_device.h				\
-		$(srcdir)/include/midi_file.h				\
+		$(srcdir)/include/midi.h				\
 		$(srcdir)/include/midi_alsa_raw.h			\
+		$(srcdir)/include/midi_client.h				\
+		$(srcdir)/include/midi_event_processor.h		\
+		$(srcdir)/include/midi_file.h				\
 		$(srcdir)/include/midi_oss.h				\
+		$(srcdir)/include/midi_port.h				\
+		$(srcdir)/include/midi_time.h				\
 		$(srcdir)/include/clipboard.h				\
 		$(srcdir)/include/types.h				\
 		$(srcdir)/include/qt3support.h				\
@@ -245,7 +251,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/endian_handling.h			\
 		$(srcdir)/include/preset_preview_play_handle.h		\
 		$(srcdir)/include/sample_play_handle.h			\
-		$(srcdir)/include/midi.h				\
 		$(srcdir)/include/nstate_button.h			\
 		$(srcdir)/include/midi_dummy.h				\
 		$(srcdir)/include/midi_mapper.h				\
@@ -260,7 +265,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/dummy_instrument.h			\
 		$(srcdir)/include/instrument_play_handle.h		\
 		$(srcdir)/include/string_pair_drag.h			\
-		$(srcdir)/include/ladspa_manager.h
+		$(srcdir)/include/ladspa_manager.h			\
+		$(srcdir)/include/midi_tab_widget.h
 
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)
@@ -296,6 +302,10 @@ if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) -lfst -ldl
+if HAVE_LIBFST
+LIB_FST_LDADD = -lfst
+endif
+
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_FST_LDADD) -ldl
 lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
 

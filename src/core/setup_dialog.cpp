@@ -328,11 +328,11 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 #ifdef QT4
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-					mixer::inst()->midiDevName() ) );
+					mixer::inst()->midiClientName() ) );
 #else
-	m_midiInterfaces->setCurrentText( mixer::inst()->midiDevName() );
+	m_midiInterfaces->setCurrentText( mixer::inst()->midiClientName() );
 #endif
-	m_midiIfaceSetupWidgets[mixer::inst()->midiDevName()]->show();
+	m_midiIfaceSetupWidgets[mixer::inst()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );

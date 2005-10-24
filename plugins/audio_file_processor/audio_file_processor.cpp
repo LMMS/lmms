@@ -68,7 +68,7 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"AudioFileProcessor",
-	QT_TRANSLATE_NOOP( "plugin",
+	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"simple sampler with various settings for "
 				"using samples (e.g. drums) in a channel" ),
 	"Tobias Doerffel <tobydox@users.sf.net>",
@@ -185,9 +185,9 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ) );
-	m_startKnob->setRange( 0, 1.0, 0.00001 );
+	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
-	m_startKnob->setValue( 0.0, TRUE );
+	m_startKnob->setValue( 0.0f, TRUE );
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setLabel( tr( "START" ) );
 	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
@@ -204,9 +204,9 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"than the sample between start- and end-point." ) );
 
 	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ) );
-	m_endKnob->setRange( 0, 1.0, 0.00001 );
+	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
-	m_endKnob->setValue( 1.0, TRUE );
+	m_endKnob->setValue( 1.0f, TRUE );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setLabel( tr( "END" ) );
 	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,

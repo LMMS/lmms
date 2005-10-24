@@ -14,7 +14,6 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="audiofileprocessor"
 MOC_FILES = ./audio_file_processor.moc
 
 BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
-
 EMBEDDED_RESOURCES = $(wildcard *png)
 
 ./embedded_resources.h: $(EMBEDDED_RESOURCES)

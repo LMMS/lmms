@@ -1,5 +1,5 @@
 /*
- * midi_alsa_raw.h - midi-device-driver for RawMIDI via ALSA
+ * midi_alsa_raw.h - midi-client for RawMIDI via ALSA
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -50,17 +50,17 @@
 #endif
 
 
-#include "midi_device.h"
+#include "midi_client.h"
 
 
 struct pollfd;
 class QLineEdit;
 
 
-class midiALSARaw : public midiDevice, public QThread
+class midiALSARaw : public midiRawClient, public QThread
 {
 public:
-	midiALSARaw( channelTrack * _ct = NULL );
+	midiALSARaw( void );
 	~midiALSARaw();
 
 	static QString probeDevice( void );
@@ -73,7 +73,7 @@ public:
 	}
 
 
-	class setupWidget : public midiDevice::setupWidget
+	class setupWidget : public midiRawClient::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -88,8 +88,8 @@ public:
 
 
 protected:
-	virtual void FASTCALL sendByte( Uint8 _c );
-	virtual void FASTCALL run( void );
+	virtual void FASTCALL sendByte( const Uint8 _c );
+	virtual void run( void );
 
 
 private:

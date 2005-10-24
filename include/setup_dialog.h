@@ -40,7 +40,7 @@
 #endif
 
 #include "audio_device.h"
-#include "midi_device.h"
+#include "midi_client.h"
 
 
 class QComboBox;
@@ -98,7 +98,7 @@ private:
 
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;
-	typedef QMap<QString, midiDevice::setupWidget *> mswMap;
+	typedef QMap<QString, midiClient::setupWidget *> mswMap;
 
 	QComboBox * m_audioInterfaces;
 	aswMap m_audioIfaceSetupWidgets;

@@ -119,6 +119,9 @@ private:
 	protected:
 		virtual void wheelEvent( QWheelEvent * _we );
 
+	private:
+		trackContainer * m_trackContainer;
+
 	} ;
 
 

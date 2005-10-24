@@ -1,3 +1,65 @@
+2005-10-23	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/widgets/led_checkbox.cpp:
+	also emit toggled()-signal if state actually wasn't changed
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	- display special strings if value is a certain number
+	- support for disabled-state (gray/no input)
+
+	* include/midi_tab_widget.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/tracks/channel_track.cpp:
+	added new tab "MIDI" for being able to setup MIDI-related stuff for
+	each channel
+
+	* include/channel_track.h:
+	* include/midi*:
+	* include/piano_widget.h:
+	* include/setup_dialog.h:
+	* src/core/mixer.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/song_editor.cpp:
+	* src/midi/midi*:
+	* src/tracks/channel_track.cpp:
+	coded a completely new, powerful and clean MIDI-system which e.g. makes
+	it possible to mask MIDI-events for each channel and to receive and send
+	(timed!) MIDI-events on a separate MIDI-port for each channel, which
+	only makes sense if using non-raw (sequenced) MIDI-client - currently
+	none existing, but ALSA-sequencer-support is in progress
+
+	* include/midi_device.h:
+	* src/midi/midi_device.cpp:
+	removed
+
+2005-10-21	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/widgets/tempo_sync_knob.cpp:
+	do not implement the same code as knob does in mouseMoveEvent() - call
+	knob::mouseMoveEvent() instead
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	cleaned up a lot and fixed some bugs
+
+2005-10-20	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* include/song_editor.h:
+	decreased MAX_BPM to 999 since BPM-LCD-spinbox is intended to have
+	only three digits while 1000 has four of them... ;-)
+
+	* include/track_container.h:
+	* src/core/track_container.cpp:
+	trackContainer::scrollArea-class has now m_trackContainer-member
+	for storing parent which makes cast of parent-widget to track-container
+	(which sometimes failed...) obsolete
+
+	* configure.in:
+	check for libfst and present VST-SDK header-files
+
 2005-10-19	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* plugins/vestige/vestige.h:

@@ -67,7 +67,7 @@ plugin::descriptor vestige_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"VeSTige",
-	QT_TRANSLATE_NOOP( "plugin",
+	QT_TRANSLATE_NOOP( "pluginBrowser",
 			"experimental VST-hoster for using VST-plugins "
 							"within LMMS" ),
 	"Tobias Doerffel <tobydox@users.sf.net>",

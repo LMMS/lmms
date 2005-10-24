@@ -61,16 +61,7 @@ public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name );
 	virtual ~knob();
 
-	enum ScrollMode
-	{
-		ScrNone,
-		ScrMouse,
-		ScrTimer,
-		ScrDirect,
-		ScrPage
-	} ;
     
-	void setTracking( bool _enable );
 	void setHintText( const QString & _txt_before,
 						const QString & _txt_after );
 	void setLabel( const QString & _txt );
@@ -110,6 +101,7 @@ public slots:
 	void reset( void );
 	void copyValue( void );
 	void pasteValue( void );
+	void enterValue( void );
 	void connectToMidiDevice( void );
 	void displayHelp( void );
 
@@ -127,6 +119,7 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 
@@ -140,8 +133,6 @@ protected:
 //private:
 	void layoutKnob( bool _update = TRUE );
 	float getValue( const QPoint & _p );
-	void getScrollMode( const QPoint & _p, int & _scroll_mode,
-							int & _direction );
 	void recalcAngle( void );
     
 	void valueChange( void );
@@ -150,25 +141,20 @@ protected:
 
 	void buttonReleased( void );
 
-	void setNewValue( float x, int align = 0 );
+	void setNewValue( float _x, bool _align = FALSE );
 
 
 	static float s_copiedValue;
 	static textFloat * s_textFloat;
 
 
-	int m_knobWidth;
-	int m_scrollMode;
 	float m_mouseOffset;
-	int m_direction;
-	int m_tracking;
 	QPoint m_origMousePos;
+	bool m_buttonPressed;
 
 
 	float m_angle;
-	float m_oldAngle;
 	float m_totalAngle;
-	float m_nTurns;
 
 	QPixmap * m_knobPixmap;
 	int m_knobNum;

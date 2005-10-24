@@ -156,7 +156,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	f.setBold( FALSE );
 	p.setFont( pointSize<7>( f ) );
 	QStringList words = QStringList::split( ' ',
-				plugin::tr( m_pluginDescriptor.description ) );
+			pluginBrowser::tr( m_pluginDescriptor.description ) );
 	for( QStringList::iterator it = words.begin(); it != words.end(); ++it )
 	{
 		if( ( *it ).contains( '-' ) )

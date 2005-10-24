@@ -70,6 +70,7 @@ public slots:
 	void toggle( void );
 	void setChecked( bool _on );
 
+
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void mousePressEvent( QMouseEvent * _me );

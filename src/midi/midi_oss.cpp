@@ -1,5 +1,5 @@
 /*
- * midi_oss.cpp - simple midi-device-driver for OSS
+ * midi_oss.cpp - OSS-raw-midi-client
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -52,8 +52,8 @@
 
 
 
-midiOSS::midiOSS( channelTrack * _ct ) :
-	midiDevice( _ct ),
+midiOSS::midiOSS( void ) :
+	midiRawClient(),
 	QThread(),
 	m_midiDev( probeDevice() ),
 	m_quit( FALSE )
@@ -108,7 +108,7 @@ QString midiOSS::probeDevice( void )
 
 
 
-void midiOSS::sendByte( Uint8 _c )
+void midiOSS::sendByte( const Uint8 _c )
 {
 #ifdef QT4
 	m_midiDev.putChar( _c );
@@ -130,14 +130,10 @@ void midiOSS::run( void )
 		{
 			continue;
 		}
-		const midiEvent * midi_event = parseData( c );
+		parseData( c );
 #else
-		const midiEvent * midi_event = parseData( m_midiDev.getch() );
+		parseData( m_midiDev.getch() );
 #endif
-		if( midi_event != NULL )
-		{
-			processInEvent( *midi_event );
-		}
 	}
 }
 
@@ -146,7 +142,7 @@ void midiOSS::run( void )
 
 
 midiOSS::setupWidget::setupWidget( QWidget * _parent ) :
-	midiDevice::setupWidget( midiOSS::name(), _parent )
+	midiRawClient::setupWidget( midiOSS::name(), _parent )
 {
 	m_device = new QLineEdit( midiOSS::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

@@ -416,7 +416,8 @@ void trackContainer::updateScrollArea( void )
 
 
 trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
-	QScrollArea( _parent )
+	QScrollArea( _parent ),
+	m_trackContainer( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
 	setHorizontalScrollBarPolicy( 
@@ -444,7 +445,7 @@ void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
 	// bb-editor etc.) because they might want to use it for zooming
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
-	dynamic_cast<trackContainer *>( parentWidget() )->wheelEvent( _we );
+	m_trackContainer->wheelEvent( _we );
 	if( !_we->isAccepted() )
 	{
 		QScrollArea::wheelEvent( _we );

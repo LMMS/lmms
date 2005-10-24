@@ -46,17 +46,25 @@
 #endif
 
 
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+
+#include <math.h>
+
+
 #include "piano_roll.h"
 #include "song_editor.h"
 #include "pattern.h"
 #include "embed.h"
 #include "crystal_button.h"
 #include "pixmap_button.h"
-#include "note_play_handle.h"
+#include "templates.h"
 #include "gui_templates.h"
 #include "timeline.h"
 #include "channel_track.h"
 #include "tooltip.h"
+#include "midi.h"
 
 
 extern tones whiteKeys[];	// defined in piano_widget.cpp
@@ -518,10 +526,10 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// remove all connections to other channel-tracks
 	disconnect( this, SLOT( recordNote( const note & ) ) );
 
-	// and now connect to noetFromMidiDeviceDone of channel so that
-	// we receive note-off-events from midi-keyboard for recording it
+	// and now connect to noteDone()-signal of channel so that
+	// we receive note-off-events from it's midi-port for recording it
 	connect( m_pattern->getChannelTrack(),
-			SIGNAL( noteFromMidiDeviceDone( const note & ) ),
+			SIGNAL( noteDone( const note & ) ),
 			this, SLOT( recordNote( const note & ) ) );
 
 	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
@@ -1260,7 +1268,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					songEditor::inst()->playing() == FALSE )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ) );
+					midiEvent( NOTE_ON, 0, key_num, vol ),
+								midiTime() );
 		}
 	}
 }
@@ -1276,12 +1285,13 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
 				midiEvent( NOTE_OFF, 0,
-						m_currentNote->key() ) );
+					m_currentNote->key() ), midiTime() );
 		}
 		else
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, getKey( _me->y() ) ) );
+				midiEvent( NOTE_OFF, 0, getKey( _me->y() ) ),
+								midiTime() );
 		}
 	}
 
@@ -1325,7 +1335,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			edit_note == FALSE )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, released_key ) );
+				midiEvent( NOTE_OFF, 0, released_key ),
+								midiTime() );
 			if(
 #ifdef QT4
 				_me->buttons() &
@@ -1340,7 +1351,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
-							DEFAULT_VOLUME ) );
+							DEFAULT_VOLUME ),
+								midiTime() );
 			}
 		}
 		if( _me->x() <= WHITE_KEY_WIDTH )
@@ -1361,12 +1373,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								MIN_VOLUME,
 								MAX_VOLUME );
 				m_currentNote->setVolume( vol );
-				if( m_pattern->getChannelTrack()->keyPressed(
-						m_currentNote->key() ) == TRUE )
-				{
-	 m_pattern->getChannelTrack()->noteForKey( m_currentNote->key()
-							)->setVolume( vol );
-				}
+				m_pattern->getChannelTrack()->processInEvent(
+					midiEvent( KEY_PRESSURE, 0, key_num,
+									vol ),
+								midiTime() );
 			}
 		}
 		else if( m_currentNote != NULL &&

@@ -61,11 +61,13 @@ enum midiEventTypes
 } ;
 
 
+const Sint8 MIDI_CHANNEL_COUNT = 16;
+
 
 struct midiEvent
 {
 	midiEvent( midiEventTypes _type = MIDI_ACTIVE_SENSING,
-			Uint8 _channel = 0,
+			Sint8 _channel = 0,
 			Uint16 _param1 = 0,
 			Uint16 _param2 = 0 ) :
 		m_type( _type ),
@@ -75,7 +77,8 @@ struct midiEvent
 		m_data.m_param[0] = _param1;
 		m_data.m_param[1] = _param2;
 	}
-	midiEvent( midiEventTypes _type, char * _sysex_data, int _data_len ) :
+	midiEvent( midiEventTypes _type, const char * _sysex_data,
+							int _data_len ) :
 		m_type( _type ),
 		m_channel( 0 ),
 		m_sysExData( _sysex_data )
@@ -92,14 +95,14 @@ struct midiEvent
 	}
 
 	midiEventTypes m_type;		// MIDI event type
-	Uint8 m_channel;		// MIDI channel
+	Sint8 m_channel;		// MIDI channel
 	union
 	{
 		Uint16 m_param[2];	// first/second parameter (key/velocity)
 		int m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
-	char * m_sysExData;
+	const char * m_sysExData;
 
 } ;
 

@@ -63,7 +63,7 @@ class visualizationWidget;
 
 const int MIN_BPM = 10;
 const int DEFAULT_BPM = 140;
-const int MAX_BPM = 1000;
+const int MAX_BPM = 999;
 const Uint16 MAX_SONG_LENGTH = 9999;
 
 

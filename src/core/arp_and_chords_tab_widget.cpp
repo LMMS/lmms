@@ -44,6 +44,11 @@
 #endif
 
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
+
 #include "arp_and_chords_tab_widget.h"
 #include "embed.h"
 #include "note_play_handle.h"
@@ -54,10 +59,7 @@
 #include "tooltip.h"
 #include "gui_templates.h"
 #include "tempo_sync_knob.h"
-
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
+#include "channel_track.h"
 
 
 
@@ -194,12 +196,10 @@ const int ARP_GROUPBOX_HEIGHT = 200 - ARP_GROUPBOX_Y;
 
 
 
-arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track,
-							QWidget * _parent ) :
-	QWidget( _parent ),
+arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
+	QWidget( _channel_track->tabWidgetParent() ),
 	settings(),
-	m_arpDirection( UP ),
-	m_channelTrack( _channel_track )
+	m_arpDirection( UP )
 {
 	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
@@ -604,41 +604,41 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	QDomElement elw_de = _doc.createElement( nodeName() );
-	elw_de.setAttribute( "chorddisabled", QString::number(
+	QDomElement act_de = _doc.createElement( nodeName() );
+	act_de.setAttribute( "chorddisabled", QString::number(
 					!m_chordsGroupBox->isActive() ) );
 #ifdef QT4
-	elw_de.setAttribute( "chord", QString::number(
+	act_de.setAttribute( "chord", QString::number(
 					m_chordsComboBox->currentIndex() ) );
 #else
-	elw_de.setAttribute( "chord", QString::number(
+	act_de.setAttribute( "chord", QString::number(
 					m_chordsComboBox->currentItem() ) );
 #endif
-	elw_de.setAttribute( "chordrange", QString::number(
+	act_de.setAttribute( "chordrange", QString::number(
 					m_chordRangeKnob->value() ) );
 
-	elw_de.setAttribute( "arpdisabled", QString::number(
+	act_de.setAttribute( "arpdisabled", QString::number(
 						!m_arpGroupBox->isActive() ) );
 #ifdef QT4
-	elw_de.setAttribute( "arp", QString::number(
+	act_de.setAttribute( "arp", QString::number(
 					m_arpComboBox->currentIndex() ) );
 #else
-	elw_de.setAttribute( "arp", QString::number(
+	act_de.setAttribute( "arp", QString::number(
 					m_arpComboBox->currentItem() ) );
 #endif
-	elw_de.setAttribute( "arprange", QString::number(
+	act_de.setAttribute( "arprange", QString::number(
 					m_arpRangeKnob->value() ) );
-	elw_de.setAttribute( "arptime", QString::number(
+	act_de.setAttribute( "arptime", QString::number(
 					m_arpTimeKnob->value() ) );
-	elw_de.setAttribute( "arpgate", QString::number(
+	act_de.setAttribute( "arpgate", QString::number(
 					m_arpGateKnob->value() ) );
-	elw_de.setAttribute( "arpdir", QString::number(
+	act_de.setAttribute( "arpdir", QString::number(
 					m_arpDirection ) );
-	elw_de.setAttribute( "arpsyncmode", QString::number(
-					( int ) m_arpTimeKnob->getSyncMode() ) );
+	act_de.setAttribute( "arpsyncmode", QString::number(
+				( int ) m_arpTimeKnob->getSyncMode() ) );
 
 
-	_parent.appendChild( elw_de );
+	_parent.appendChild( act_de );
 }
 
 

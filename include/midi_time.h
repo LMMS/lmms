@@ -32,13 +32,13 @@
 class midiTime
 {
 public:
-	inline midiTime( tact _tact, tact64th _tact_64th ) :
+	inline midiTime( const tact _tact, const tact64th _tact_64th ) :
 		m_tact( _tact ),
 		m_tact64th( _tact_64th )
 	{
 	}
 
-	inline midiTime( Sint32 _abs = 0 ) :
+	inline midiTime( const Sint32 _abs = 0 ) :
 		m_tact( _abs / 64 ),
 		m_tact64th( _abs % 64 )
 	{
@@ -97,7 +97,7 @@ public:
 	}
 
 	// calculate number of frame that are needed this time
-	inline Uint32 frames( float _frames_per_tact ) const
+	inline Uint32 frames( const float _frames_per_tact ) const
 	{
 		if( m_tact >= 0 )
 		{
@@ -108,6 +108,13 @@ public:
 							64.0f ) );
 		}
 		return( 0 );
+	}
+
+	static inline midiTime fromFrames( Uint32 _frames,
+						const float _frames_per_tact )
+	{
+		return( midiTime( static_cast<Sint32>( _frames * 64.0f /
+							_frames_per_tact ) ) );
 	}
 
 

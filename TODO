@@ -1,8 +1,12 @@
+- arpeggio: send midi-out-events via channel-track
+- tooltips for controls in MIDI-tab
+- sample-track: sane bg and wave-color
 - complete toolbar-redesign in song-editor, bb-editor and piano-roll!!!
 - dnd everywhere: presets, samples (afp/sample-track), TCO's, knob-values
-- save/load parameters of VST-plugin
+- DSSI-support
 - move VST-code into separate class which can use several backends (libfst, dssi-vst and vst-server) -> add libfst/dssi-vst/vstserver-check to configure.in
-- somehow avoid hidden plugin-descriptor-widgets if height of window is too small -> add scrollbar
+- save/load parameters of VST-plugin
+- somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
 - pattern freeze -> do not endless loop if looping-points are enabled
 - solve problem with knob-control-precision

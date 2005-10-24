@@ -1,7 +1,6 @@
 /*
- * envelope_tab_widget.h - declaration of class envelopeTabWidget which
- *                         provides UI- and DSP-code for using envelopes, LFOs
- *                         and a filter
+ * midi_tab_widget.h - tab-widget in channel-track-window for setting up
+ *                     MIDI-related stuff
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -24,8 +23,8 @@
  */
 
 
-#ifndef _ENVELOPE_TAB_WIDGET_H
-#define _ENVELOPE_TAB_WIDGET_H
+#ifndef _MIDI_TAB_WIDGET_H
+#define _MIDI_TAB_WIDGET_H
 
 #include "qt3support.h"
 
@@ -39,46 +38,29 @@
 
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "settings.h"
-#include "basic_filters.h"
-#include "envelope_and_lfo_widget.h"
 
 
 class QComboBox;
-class groupBox;
-class tabWidget;
-class QLabel;
-class knob;
-class pixmapButton;
+class QPixmap;
+
 class channelTrack;
-class notePlayHandle;
+class tabWidget;
+class ledCheckBox;
+class lcdSpinBox;
+class midiPort;
 
 
-class envelopeTabWidget : public QWidget, public settings
+class midiTabWidget : public QWidget, public settings
 {
 	Q_OBJECT
 public:
-	envelopeTabWidget( channelTrack * _channel_track );
-	virtual ~envelopeTabWidget();
-
-	void FASTCALL processAudioBuffer( sampleFrame * _ab, Uint32 _frames,
-							notePlayHandle * _n );
-
-	enum targets
-	{
-		VOLUME,
-/*		PANNING,
-		PITCH,*/
-		CUT,
-		RES,
-		TARGET_COUNT
-	} ;
-
-	Uint32 envFrames( void );
-	Uint32 releaseFrames( void );
-
-	float FASTCALL volumeLevel( notePlayHandle * _n, Uint32 _frame );
+	midiTabWidget( channelTrack * _channel_track, midiPort * _port );
+	~midiTabWidget();
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -86,20 +68,29 @@ public:
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "eldata" );
+		return( "midi" );
 	}
 
 
+
+protected slots:
+	void inputChannelChanged( int );
+	void outputChannelChanged( int );
+	void midiPortModeToggled( bool );
+
+
 private:
-	tabWidget * m_targetsTabWidget;
-	envelopeAndLFOWidget * m_envLFOWidgets[TARGET_COUNT];
+	channelTrack * m_channelTrack;
+	midiPort * m_midiPort;
 
-	// filter-stuff
-	groupBox * m_filterGroupBox;
-	QComboBox * m_filterComboBox;
-	knob * m_filterCutKnob;
-	knob * m_filterResKnob;
-
+	tabWidget * m_setupTabWidget;
+	lcdSpinBox * m_inputChannelSpinBox;
+	lcdSpinBox * m_outputChannelSpinBox;
+	ledCheckBox * m_receiveCheckBox;
+	ledCheckBox * m_sendCheckBox;
+	ledCheckBox * m_routeCheckBox;
+ 
 } ;
+
 
 #endif

@@ -49,20 +49,13 @@
 
 #endif
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
 
 #include "tempo_sync_knob.h"
 #include "song_editor.h"
-#include "midi_device.h"
 #include "embed.h"
 #include "tooltip.h"
 #include "config_mgr.h"
 #include "text_float.h"
-
-
-const int WHEEL_DELTA = 120;
 
 
 
@@ -171,59 +164,19 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 void tempoSyncKnob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_scrollMode == ScrMouse )
-	{
-		m_tempoSyncMode = NO_SYNC;
-		calculateTempoSyncTime( songEditor::inst()->getBPM() );
-		
-		setPosition( _me->pos() );
-		if( value() != m_prevValue )
-		{
-			emit sliderMoved( value() );
-		}
-		if( !configManager::inst()->value( "knobs", "classicalusability"
-						 ).toInt() )
-		{
-			QCursor::setPos( mapToGlobal( m_origMousePos ) );
-		}
-	}
-	songEditor::inst()->setModified();
-
-	s_textFloat->setText( m_hintTextBeforeValue +
-			QString::number( value() ) +
-			m_hintTextAfterValue );
-
+	m_tempoSyncMode = NO_SYNC;
+	calculateTempoSyncTime( songEditor::inst()->getBPM() );
+	knob::mouseMoveEvent( _me );
 }
 
 
 
 
-void tempoSyncKnob::wheelEvent( QWheelEvent * _me )
+void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
 {
-	_me->accept();
-	const int inc = _me->delta() / WHEEL_DELTA;
-	incPages( inc );
-	
+	knob::wheelEvent( _we );
 	m_tempoSyncMode = NO_SYNC;
 	calculateTempoSyncTime( songEditor::inst()->getBPM() );
-			
-	songEditor::inst()->setModified();
-
-	s_textFloat->reparent( this );
-	s_textFloat->setText( m_hintTextBeforeValue +
-			QString::number( value() ) +
-			m_hintTextAfterValue );
-	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-			QPoint( m_knobPixmap->width() + 2, 0 ) );
-	s_textFloat->setVisibilityTimeOut( 1000 );
-
-	toolTip::add( this, m_hintTextBeforeValue+QString::number( value() ) +
-			m_hintTextAfterValue );
-
-	if( value() != m_prevValue )
-	{
-		emit sliderMoved( value() );
-	}
 }
 
 
@@ -283,7 +236,7 @@ void tempoSyncKnob::calculateTempoSyncTime( int _bpm )
 				conversionFactor = 8.0;
 				break;
 			default:
-				printf( "arpAndChordsTabWidget::calculateTempoSyncTime: invalid tempoSyncMode" );
+				printf( "tempoSyncKnob::calculateTempoSyncTime: invalid tempoSyncMode" );
 				break;
 		}
 		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ),

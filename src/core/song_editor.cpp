@@ -75,7 +75,7 @@
 #include "bb_track.h"
 #include "channel_track.h"
 #include "mmp.h"
-#include "midi_device.h"
+#include "midi_client.h"
 #include "timeline.h"
 #include "pattern.h"
 #include "piano_roll.h"

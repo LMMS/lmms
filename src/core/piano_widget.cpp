@@ -40,7 +40,8 @@
 
 #include "piano_widget.h"
 #include "channel_track.h"
-#include "note_play_handle.h"
+#include "midi.h"
+#include "templates.h"
 #include "embed.h"
 
 
@@ -104,6 +105,11 @@ pianoWidget::pianoWidget (channelTrack * _parent ) :
 	{
 		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap(
 							"black_key_pressed" ) );
+	}
+
+	for( int i = 0; i < NOTES_PER_OCTAVE * OCTAVES; ++i )
+	{
+		m_pressedKeys[i] = FALSE;
 	}
 
 #ifdef QT4
@@ -231,7 +237,9 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 			}
 			// set note on
 			m_channelTrack->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ) );
+					midiEvent( NOTE_ON, 0, key_num, vol ),
+								midiTime() );
+			m_pressedKeys[key_num] = TRUE;
 		}
 		else
 		{
@@ -255,7 +263,8 @@ void pianoWidget::mouseReleaseEvent( QMouseEvent * _me )
 	int released_key = getKeyFromMouse( _me->pos() );
 
 	m_channelTrack->processInEvent(
-				midiEvent ( NOTE_OFF, 0, released_key ) );
+			midiEvent( NOTE_OFF, 0, released_key, 0 ), midiTime() );
+	m_pressedKeys[released_key] = FALSE;
 
 	// and let the user see that he released a key... :)
 	update();
@@ -294,7 +303,9 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 	if( key_num != released_key )
 	{
 		m_channelTrack->processInEvent(
-				midiEvent( NOTE_OFF, 0, released_key ) );
+				midiEvent( NOTE_OFF, 0, released_key, 0 ),
+								midiTime() );
+		m_pressedKeys[released_key] = FALSE;
 #ifdef QT4
 		if( _me->buttons() & Qt::LeftButton )
 #else
@@ -304,7 +315,9 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 			if( _me->pos().y() > PIANO_BASE )
 			{
 				m_channelTrack->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ) );
+					midiEvent( NOTE_ON, 0, key_num, vol ),
+								midiTime() );
+				m_pressedKeys[key_num] = TRUE;
 			}
 			else
 			{
@@ -317,9 +330,11 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 		// and let the user see that he pressed a key... :)
 		update();
 	}
-	else if( m_channelTrack->keyPressed( key_num ) == TRUE )
+	else if( m_pressedKeys[key_num] == TRUE )
 	{
-		m_channelTrack->noteForKey( key_num )->setVolume( vol );
+		m_channelTrack->processInEvent(
+				midiEvent( KEY_PRESSURE, 0, key_num, vol ),
+								midiTime() );
 	}
 
 }
@@ -376,7 +391,9 @@ void pianoWidget::keyPressEvent( QKeyEvent * _ke )
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
 		m_channelTrack->processInEvent(
-			midiEvent( NOTE_ON, 0, key_num, DEFAULT_VOLUME ) );
+			midiEvent( NOTE_ON, 0, key_num, DEFAULT_VOLUME ),
+								midiTime() );
+		m_pressedKeys[key_num] = TRUE;
 		update();
 	}
 	else
@@ -395,7 +412,9 @@ void pianoWidget::keyReleaseEvent( QKeyEvent * _ke )
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
 		m_channelTrack->processInEvent(
-					midiEvent( NOTE_OFF, 0, key_num ) );
+					midiEvent( NOTE_OFF, 0, key_num, 0 ),
+								midiTime() );
+		m_pressedKeys[key_num] = FALSE;
 		update();
 	}
 	else
@@ -407,25 +426,19 @@ void pianoWidget::keyReleaseEvent( QKeyEvent * _ke )
 
 
 
-void pianoWidget::focusInEvent( QFocusEvent * )
-{
-	mixer::inst()->getMIDIDevice()->setChannelTrack( m_channelTrack );
-}
-
-
-
-
 void pianoWidget::focusOutEvent( QFocusEvent * )
 {
-	// if we loose focus, we HAVE to note off all "running" notes because
+	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
 	// hang otherwise
 	for( int i = 0; i < NOTES_PER_OCTAVE * OCTAVES; ++i )
 	{
-		if( m_channelTrack->keyPressed( i ) )
+		if( m_pressedKeys[i] == TRUE )
 		{
 			m_channelTrack->processInEvent(
-						midiEvent( NOTE_OFF, 0, i ) );
+						midiEvent( NOTE_OFF, 0, i, 0 ),
+								midiTime() );
+			m_pressedKeys[i] = FALSE;
 		}
 	}
 	update();
@@ -531,7 +544,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 
 		// draw pressed or not pressed key, depending on state of
 		// current key
-		if( m_channelTrack->keyPressed( cur_key ) == TRUE )
+		if( m_pressedKeys[cur_key] == TRUE )
 		{
 			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPressedPm );
 		}
@@ -562,7 +575,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 	if( s_key > 0 &&
 		KEY_ORDER[(tones)( --s_key ) % NOTES_PER_OCTAVE] == BLACK_KEY )
 	{
-		if( m_channelTrack->keyPressed( s_key ) == TRUE )
+		if( m_pressedKeys[s_key] == TRUE )
 		{
 			p.drawPixmap( 0 - WHITE_KEY_WIDTH / 2, PIANO_BASE,
 							*s_blackKeyPressedPm );
@@ -581,7 +594,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 		{
 			// draw pressed or not pressed key, depending on
 			// state of current key
-			if( m_channelTrack->keyPressed( cur_key ) == TRUE )
+			if( m_pressedKeys[cur_key] == TRUE )
 			{
 				p.drawPixmap( x + WHITE_KEY_WIDTH / 2,
 								PIANO_BASE,

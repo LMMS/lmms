@@ -1,5 +1,5 @@
 /*
- * midi_oss.h - OSS-raw-midi-client
+ * midi_event_processor.h - base-class for midi-processing classes
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -22,65 +22,38 @@
  */
 
 
-#ifndef _MIDI_OSS_H
-#define _MIDI_OSS_H
+#ifndef _MIDI_EVENT_PROCESSOR_H
+#define _MIDI_EVENT_PROCESSOR_H
 
-#include "audio_oss.h"
-
-#ifdef OSS_SUPPORT
-
-
-#include <qthread.h>
-#include <qfile.h>
-
-#include "midi_client.h"
-
-
-class QLineEdit;
-
-
-class midiOSS : public midiRawClient, public QThread
-{
-public:
-	midiOSS( void );
-	~midiOSS();
-
-	static QString probeDevice( void );
-
-
-	inline static QString name( void )
-	{
-		return( setupWidget::tr( "OSS Raw-MIDI (Open Sound System)" ) );
-	}
-
-
-	class setupWidget : public midiRawClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings( void );
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
-
-
-protected:
-	virtual void FASTCALL sendByte( const Uint8 _c );
-	virtual void run( void );
-
-
-private:
-	QFile m_midiDev;
-
-	volatile bool m_quit;
-
-} ;
-
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
 
+
+#include "midi_time.h"
+
+
+class midiEvent;
+
+
+// all classes being able to process MIDI-events should inherit from this
+class midiEventProcessor
+{
+public:
+	inline midiEventProcessor( void )
+	{
+	}
+
+	virtual inline ~midiEventProcessor()
+	{
+	}
+
+	// to be implemented by inheriting classes
+	virtual void FASTCALL processInEvent( const midiEvent & _me,
+						const midiTime & _time ) = 0;
+	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+						const midiTime & _time ) = 0;
+
+} ;
 
 #endif

@@ -52,6 +52,8 @@
 #include "tab_widget.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "channel_track.h"
+
 
 
 const int TARGETS_TABWIDGET_X = 4;
@@ -82,11 +84,9 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
  
 
 
-envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	settings(),
-	m_channelTrack( _channel_track )
+envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
+	QWidget( _channel_track->tabWidgetParent() ),
+	settings()
 {
 
 	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );

@@ -1,5 +1,5 @@
 /*
- * midi_alsa_raw.cpp - midi-device-driver for RawMIDI via ALSA
+ * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -46,8 +46,8 @@
 #ifdef ALSA_SUPPORT
 
 
-midiALSARaw::midiALSARaw( channelTrack * _ct ) :
-	midiDevice( _ct ),
+midiALSARaw::midiALSARaw( void ) :
+	midiRawClient(),
 	QThread(),
 	m_inputp( &m_input ),
 	m_outputp( &m_output ),
@@ -184,14 +184,12 @@ void midiALSARaw::run( void )
 			break;
 		}
 		if( err == 0 )
+		{
 			continue;
+		}
 		for( int i = 0; i < err; ++i )
 		{
-			const midiEvent * midi_event = parseData( buf[i] );
-			if( midi_event != NULL )
-			{
-				processInEvent( *midi_event );
-			}
+			parseData( buf[i] );
 		}
 	}
 
@@ -201,7 +199,7 @@ void midiALSARaw::run( void )
 
 
 midiALSARaw::setupWidget::setupWidget( QWidget * _parent ) :
-	midiDevice::setupWidget( midiALSARaw::name(), _parent )
+	midiRawClient::setupWidget( midiALSARaw::name(), _parent )
 {
 	m_device = new QLineEdit( midiALSARaw::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

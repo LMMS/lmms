@@ -32,7 +32,7 @@
 #include "config_mgr.h"
 
 #include "audio_device.h"
-#include "midi_device.h"
+#include "midi_client.h"
 
 // platform-specific audio-interface-classes
 #include "audio_alsa.h"
@@ -100,7 +100,7 @@ mixer::mixer() :
 
 
 	m_audioDev = tryAudioDevices();
-	m_midiDev = tryMIDIDevices();
+	m_midiClient = tryMIDIClients();
 
 
 	for( int i = 0; i < MAX_SAMPLE_PACKETS; ++i )
@@ -303,7 +303,7 @@ void mixer::run( void )
 // all remaining notes etc. would be played until their end
 void mixer::clear( void )
 {
-	m_midiDev->noteOffAll();
+	// TODO: m_midiClient->noteOffAll();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
@@ -639,17 +639,18 @@ audioDevice * mixer::tryAudioDevices( void )
 
 
 
-midiDevice * mixer::tryMIDIDevices( void )
+midiClient * mixer::tryMIDIClients( void )
 {
-	QString dev_name = configManager::inst()->value( "mixer", "mididev" );
+	QString client_name = configManager::inst()->value( "mixer",
+								"midiclient" );
 
 #ifdef ALSA_SUPPORT
-	if( dev_name == midiALSARaw::name() || dev_name == "" )
+	if( client_name == midiALSARaw::name() || client_name == "" )
 	{
 		midiALSARaw * malsa = new midiALSARaw();
 		if( malsa->isRunning() )
 		{
-			m_midiDevName = midiALSARaw::name();
+			m_midiClientName = midiALSARaw::name();
 			return( malsa );
 		}
 		delete malsa;
@@ -657,22 +658,22 @@ midiDevice * mixer::tryMIDIDevices( void )
 #endif
 
 #ifdef OSS_SUPPORT
-	if( dev_name == midiOSS::name() || dev_name == "" )
+	if( client_name == midiOSS::name() || client_name == "" )
 	{
 		midiOSS * moss = new midiOSS();
 		if( moss->isRunning() )
 		{
-			m_midiDevName = midiOSS::name();
+			m_midiClientName = midiOSS::name();
 			return( moss );
 		}
 		delete moss;
 	}
 #endif
 
-	printf( "Couldn't open a MIDI-device, neither with ALSA nor with "
-		"OSS. Will use dummy-MIDI-device.\n" );
+	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
+		"OSS. Will use dummy-MIDI-client.\n" );
 
-	m_midiDevName = midiDummy::name();
+	m_midiClientName = midiDummy::name();
 
 	return( new midiDummy() );
 }

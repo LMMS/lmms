@@ -55,7 +55,7 @@
 
 
 class audioDevice;
-class midiDevice;
+class midiClient;
 class lmmsMainWin;
 class plugin;
 
@@ -153,15 +153,15 @@ public:
 	void restoreAudioDevice( void );
 
 
-	// MIDI-device-stuff
-	inline const QString & midiDevName( void ) const
+	// MIDI-client-stuff
+	inline const QString & midiClientName( void ) const
 	{
-		return( m_midiDevName );
+		return( m_midiClientName );
 	}
 
-	inline midiDevice * getMIDIDevice( void )
+	inline midiClient * getMIDIClient( void )
 	{
-		return( m_midiDev );
+		return( m_midiClient );
 	}
 
 
@@ -289,7 +289,7 @@ private:
 
 
 	audioDevice * tryAudioDevices( void );
-	midiDevice * tryMIDIDevices( void );
+	midiClient * tryMIDIClients( void );
 
 
 
@@ -326,8 +326,8 @@ private:
 	QString m_audioDevName;
 
 
-	midiDevice * m_midiDev;
-	QString m_midiDevName;
+	midiClient * m_midiClient;
+	QString m_midiClientName;
 
 
 	QMutex m_safetySyncMutex;

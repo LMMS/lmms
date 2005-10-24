@@ -26,15 +26,16 @@
 #define _MIDI_DUMMY_H
 
 
-#include "midi_device.h"
+#include "midi_client.h"
+#include "midi_port.h"
 #include "tab_widget.h"
 
 
-class midiDummy : public midiDevice
+class midiDummy : public midiRawClient
 {
 public:
 	midiDummy() :
-		midiDevice()
+		midiRawClient()
 	{
 	}
 	~midiDummy()
@@ -47,11 +48,11 @@ public:
 	}
 
 
-	class setupWidget : public midiDevice::setupWidget
+	class setupWidget : public midiClient::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			midiDevice::setupWidget( midiDummy::name(), _parent )
+			midiRawClient::setupWidget( midiDummy::name(), _parent )
 		{
 		}
 
@@ -67,7 +68,7 @@ public:
 
 
 protected:
-	virtual void FASTCALL sendByte( Uint8 )
+	virtual void FASTCALL sendByte( const Uint8 )
 	{
 	}
 

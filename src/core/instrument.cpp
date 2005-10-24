@@ -28,7 +28,7 @@
 
 
 instrument::instrument( channelTrack * _channel_track, const QString & _name ) :
-	QWidget( _channel_track->pluginParent() ),
+	QWidget( _channel_track->tabWidgetParent() ),
 	plugin( _name, INSTRUMENT ),
 	m_channelTrack( _channel_track ),
 	m_valid( TRUE )

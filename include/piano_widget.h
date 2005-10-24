@@ -62,18 +62,17 @@ class pianoWidget : public QWidget
 	Q_OBJECT
 public:
 	pianoWidget( channelTrack * _channel_track );
-	~pianoWidget();
+	virtual ~pianoWidget();
 
 
 protected:
-	void paintEvent( QPaintEvent * );
-	void mousePressEvent( QMouseEvent * me );
-	void mouseReleaseEvent( QMouseEvent * me );
-	void mouseMoveEvent( QMouseEvent * me );
-	void keyPressEvent( QKeyEvent * ke );
-	void keyReleaseEvent( QKeyEvent * ke );
-	void focusInEvent( QFocusEvent * _fe );
-	void focusOutEvent( QFocusEvent * _fe );
+	virtual void paintEvent( QPaintEvent * );
+	virtual void mousePressEvent( QMouseEvent * me );
+	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void mouseMoveEvent( QMouseEvent * me );
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+	virtual void focusOutEvent( QFocusEvent * _fe );
 
 
 private:
@@ -86,6 +85,8 @@ private:
 	static QPixmap * s_whiteKeyPressedPm;
 	static QPixmap * s_blackKeyPressedPm;
 	
+	bool m_pressedKeys[NOTES_PER_OCTAVE * OCTAVES];
+
 	QScrollBar * m_pianoScroll;
 	channelTrack * m_channelTrack;
 	tones m_startTone;			// first key when drawing

@@ -64,9 +64,8 @@ class arpAndChordsTabWidget : public QWidget, public settings
 {
 	Q_OBJECT
 public:
-	arpAndChordsTabWidget( channelTrack * _channel_track,
-							QWidget * _parent );
-	~arpAndChordsTabWidget();
+	arpAndChordsTabWidget( channelTrack * _channel_track );
+	virtual ~arpAndChordsTabWidget();
 
 	static struct chord
 	{
@@ -113,8 +112,6 @@ private:
 		UP_AND_DOWN,
 		RANDOM
 	} m_arpDirection;
-
-	channelTrack * m_channelTrack;
 
 	// chord-stuff
 	groupBox * m_chordsGroupBox;

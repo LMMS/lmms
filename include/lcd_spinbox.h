@@ -30,13 +30,17 @@
 #ifdef QT4
 
 #include <QLCDNumber>
+#include <QMap>
 
 #else
 
 #include <qlcdnumber.h>
+#include <qmap.h>
 
 #endif
 
+
+class QLabel;
 
 
 class lcdSpinBox : public QWidget
@@ -56,6 +60,15 @@ public:
 	void setValue( int _value );
 	void setLabel( const QString & _txt );
 
+	inline void addTextForValue( int _val, const QString & _text )
+	{
+		m_textForValue[_val] = _text;
+	}
+
+
+public slots:
+	virtual void setEnabled( bool _on );
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -65,6 +78,8 @@ protected:
 
 
 private:
+	QMap<int, QString> m_textForValue;
+
 	int m_value;
 	int m_minValue;
 	int m_maxValue;

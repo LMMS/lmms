@@ -54,7 +54,7 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"PluckedStringSynth",
-	QT_TRANSLATE_NOOP( "plugin",
+	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"cheap synthesis of guitar/harp-like sounds" ),
 	"Tobias Doerffel <tobydox@users.sf.net>",
 	0x0100,

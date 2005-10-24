@@ -58,15 +58,8 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 	m_number->setFrameShape( QFrame::Panel );
 	m_number->setFrameShadow( QFrame::Sunken );
 	m_number->setSegmentStyle( QLCDNumber::Flat );
-#ifdef QT4
-	QPalette pal = m_number->palette();
-	pal.setColor( QPalette::Background, QColor( 32, 32, 32 ) );
-	pal.setColor( QPalette::Foreground, QColor( 255, 180, 0 ) );
-	m_number->setPalette( pal );
-#else
-	m_number->setPaletteBackgroundColor( QColor( 32, 32, 32 ) );
-	m_number->setPaletteForegroundColor( QColor( 255, 180, 0 ) );
-#endif
+	setEnabled( TRUE );
+
 	// value is automatically limited to given range
 	setValue( 0 );
 
@@ -95,12 +88,15 @@ void lcdSpinBox::setValue( int _value )
 {
 	_value = ( ( tLimit( _value, m_minValue, m_maxValue ) - m_minValue ) /
 						m_step ) * m_step + m_minValue;
-	QString s = QString::number( _value );
-	while( (int) s.length() < m_number->numDigits() )
+	QString s = m_textForValue[_value];
+	if( s == "" )
 	{
-		s = "0" + s;
+		s = QString::number( _value );
+		while( (int) s.length() < m_number->numDigits() )
+		{
+			s = "0" + s;
+		}
 	}
-
 	m_number->display( s );
 }
 
@@ -127,6 +123,28 @@ void lcdSpinBox::setLabel( const QString & _txt )
 
 
 
+void lcdSpinBox::setEnabled( bool _on )
+{
+	QColor fg( 255, 180, 0 );
+	if( _on == FALSE )
+	{
+		fg = QColor( 160, 160, 160 );
+	}
+#ifdef QT4
+	QPalette pal = m_number->palette();
+	pal.setColor( QPalette::Background, QColor( 32, 32, 32 ) );
+	pal.setColor( QPalette::Foreground, fg );
+	m_number->setPalette( pal );
+#else
+	m_number->setPaletteBackgroundColor( QColor( 32, 32, 32 ) );
+	m_number->setPaletteForegroundColor( fg );
+#endif
+	QWidget::setEnabled( _on );
+}
+
+
+
+
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton && _me->y() < m_number->height()  )
@@ -135,6 +153,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 		QApplication::setOverrideCursor( Qt::BlankCursor );
 	}
 }
+
 
 
 

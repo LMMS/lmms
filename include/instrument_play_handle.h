@@ -1,5 +1,5 @@
 /*
- * midi_oss.h - OSS-raw-midi-client
+ * instrument_play_handle.h - play-handle for playing an instrument
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -22,65 +22,50 @@
  */
 
 
-#ifndef _MIDI_OSS_H
-#define _MIDI_OSS_H
+#ifndef _INSTRUMENT_PLAY_HANDLE_H
+#define _INSTRUMENT_PLAY_HANDLE_H
 
-#include "audio_oss.h"
-
-#ifdef OSS_SUPPORT
-
-
-#include <qthread.h>
-#include <qfile.h>
-
-#include "midi_client.h"
+#include "play_handle.h"
+#include "instrument.h"
 
 
-class QLineEdit;
-
-
-class midiOSS : public midiRawClient, public QThread
+class instrumentPlayHandle : public playHandle
 {
 public:
-	midiOSS( void );
-	~midiOSS();
-
-	static QString probeDevice( void );
-
-
-	inline static QString name( void )
+	inline instrumentPlayHandle( instrument * _instrument ) :
+		playHandle(),
+		m_instrument( _instrument )
 	{
-		return( setupWidget::tr( "OSS Raw-MIDI (Open Sound System)" ) );
+	}
+
+	inline virtual ~instrumentPlayHandle()
+	{
 	}
 
 
-	class setupWidget : public midiRawClient::setupWidget
+	inline virtual void play( void )
 	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		m_instrument->play();
+	}
 
-		virtual void saveSettings( void );
+	inline virtual bool done( void ) const
+	{
+		return( m_instrument == NULL );
+	}
 
-	private:
-		QLineEdit * m_device;
-
-	} ;
-
-
-protected:
-	virtual void FASTCALL sendByte( const Uint8 _c );
-	virtual void run( void );
+	inline virtual void checkValidity( void )
+	{
+		if( !m_instrument->valid() )
+		{
+			m_instrument = NULL;
+		}
+	}
 
 
 private:
-	QFile m_midiDev;
-
-	volatile bool m_quit;
+	instrument * m_instrument;
 
 } ;
-
-#endif
 
 
 #endif
