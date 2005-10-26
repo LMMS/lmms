@@ -27,7 +27,7 @@
 
 // don't know why following line is neccessary, it's a bug in qt-headers -
 // otherwise LMMS sometimes fails to compile
-//#include <qmap.h>
+#include <qmap.h>
 
 #include <qglobal.h>
 //#include <qpair.h>

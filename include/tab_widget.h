@@ -34,8 +34,8 @@
 
 #else
 
-#include <qwidget.h>
 #include <qmap.h>
+#include <qwidget.h>
 
 #include "spc_bg_hndl_widget.h"
 
