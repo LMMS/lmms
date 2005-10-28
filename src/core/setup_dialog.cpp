@@ -89,13 +89,16 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 
 
 
+
 setupDialog::setupDialog( configTabs _tab_to_open ) :
 	QDialog(),
 	m_bufferSize( mixer::inst()->framesPerAudioBuffer() ),
 	m_disableToolTips( configManager::inst()->value( "tooltips",
 							"disabled" ).toInt() ),
 	m_classicalKnobUsability( configManager::inst()->value( "knobs",
-						"classicalusability" ).toInt() )
+					"classicalusability" ).toInt() ),
+	m_gimpLikeWindows( configManager::inst()->value( "app",
+						"gimplikewindows" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -156,7 +159,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 60 );
+	misc_tw->setFixedHeight( 76 );
 
 	ledCheckBox * disable_tooltips = new ledCheckBox(
 					tr( "Disable tooltips (no spurious "
@@ -167,6 +170,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	connect( disable_tooltips, SIGNAL( toggled( bool ) ),
 			this, SLOT( toggleToolTips( bool ) ) );
 
+
 	ledCheckBox * classical_knob_usability = new ledCheckBox(
 					tr( "Classical knob usability (move "
 						"cursor around knob to change "
@@ -176,6 +180,15 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	classical_knob_usability->setChecked( m_classicalKnobUsability );
 	connect( classical_knob_usability, SIGNAL( toggled( bool ) ),
 			this, SLOT( toggleKnobUsability( bool ) ) );
+
+
+	ledCheckBox * gimp_like_windows = new ledCheckBox(
+					tr( "GIMP-like windows (no MDI)" ),
+								misc_tw );
+	gimp_like_windows->move( 10, 54 );
+	gimp_like_windows->setChecked( m_gimpLikeWindows );
+	connect( gimp_like_windows, SIGNAL( toggled( bool ) ),
+			this, SLOT( toggleGIMPLikeWindows( bool ) ) );
 
 
 	gen_layout->addWidget( bufsize_tw );
@@ -417,6 +430,8 @@ void setupDialog::accept( void )
 					QString::number( m_disableToolTips ) );
 	configManager::inst()->setValue( "knobs", "classicalusability",
 				QString::number( m_classicalKnobUsability ) );
+	configManager::inst()->setValue( "app", "gimplikewindows",
+				QString::number( m_gimpLikeWindows ) );
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
@@ -585,6 +600,13 @@ void setupDialog::toggleKnobUsability( bool _classical )
 	m_classicalKnobUsability = _classical;
 }
 
+
+
+
+void setupDialog::toggleGIMPLikeWindows( bool _enabled )
+{
+	m_gimpLikeWindows =  _enabled;
+}
 
 
 

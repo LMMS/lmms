@@ -124,8 +124,14 @@ songEditor::songEditor() :
 
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
-	setGeometry( 10, 10, 680, 300 );
-	show();
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		setGeometry( 10, 10, 680, 300 );
+	}
+	else
+	{
+		setGeometry( 210, 10, 580, 300 );
+	}
 
 #ifdef QT4
 	setFocusPolicy( Qt::StrongFocus );
@@ -134,9 +140,9 @@ songEditor::songEditor() :
 #endif
 	setFocus();
 
-
 	QWidget * cw = new QWidget( this );
 	setCentralWidget( cw );
+
 
 	// create time-line
 	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
@@ -449,10 +455,18 @@ songEditor::songEditor() :
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
 
+	show();
 
 	m_projectNotes = new projectNotes();
 	m_projectNotes->resize( 300, 200 );
-	m_projectNotes->move( 700, 10 );
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		m_projectNotes->move( 700, 10 );
+	}
+	else
+	{
+		m_projectNotes->move( 800, 10 );
+	}
 	m_projectNotes->show();
 
 
@@ -498,15 +512,18 @@ void songEditor::paintEvent( QPaintEvent * _pe )
 // responsible for moving scrollbars after resizing
 void songEditor::resizeEvent( QResizeEvent * _re )
 {
-	m_leftRightScroll->setGeometry( 0,
+	if( centralWidget() != NULL )
+	{
+		m_leftRightScroll->setGeometry( 0,
 					centralWidget()->height() - 2 -
 								SCROLLBAR_SIZE,
 					centralWidget()->width() -
 								SCROLLBAR_SIZE,
 					SCROLLBAR_SIZE );
 
-	m_playPos[PLAY_SONG].m_timeLine->setFixedWidth(
+		m_playPos[PLAY_SONG].m_timeLine->setFixedWidth(
 						centralWidget()->width() );
+	}
 	trackContainer::resizeEvent( _re );
 }
 

@@ -74,8 +74,6 @@
 #include "templates.h"
 
 
-const int WHEEL_DELTA = 120;
-
 
 static double MinRelStep = 1.0e-10;
 static double DefaultRelStep = 1.0e-2;
@@ -468,7 +466,7 @@ void knob::mouseDoubleClickEvent( QMouseEvent * )
 void knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	const int inc = _we->delta() / WHEEL_DELTA;
+	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
 	incValue( inc );
 	songEditor::inst()->setModified();
 

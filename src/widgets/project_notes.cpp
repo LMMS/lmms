@@ -1,5 +1,5 @@
 /*
- * project_notes.h - header for project-notes-editor
+ * project_notes.cpp - implementation of project-notes-editor
  *
  * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
@@ -20,6 +20,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 
 #include "qt3support.h"
 
@@ -113,6 +114,9 @@ projectNotes::projectNotes() :
 void projectNotes::clear( void )
 {
 	m_edit->setHtml( tr( "Put down your project notes here." ) );
+	m_edit->selectAll( TRUE );
+	m_edit->setTextColor( QColor( 224, 224, 224 ) );
+	m_edit->selectAll( FALSE );
 }
 
 

@@ -286,6 +286,7 @@ void vestigeInstrument::play( void )
 			events.events[i] = (VstEvent *) &cur_events[i];
 		}
 		events.numEvents = cur_events.size();
+		printf( "VeSTige: posting %d events\n", cur_events.size());
 		events.reserved = 0;
 		m_fst->plugin->dispatcher( m_fst->plugin, effProcessEvents,
 							0, 0, &events, 0.0f );

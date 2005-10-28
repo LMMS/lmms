@@ -38,7 +38,6 @@
 #include <qprogressdialog.h>
 
 #define setValue setProgress
-#define value progress
 #define maximum totalSteps
 
 #endif
@@ -54,6 +53,7 @@
 #include "string_pair_drag.h"
 #include "channel_track.h"
 #include "mmp.h"
+#include "config_mgr.h"
 
 
 
@@ -68,13 +68,18 @@ trackContainer::trackContainer() :
 	m_ppt( DEFAULT_PIXELS_PER_TACT )
 {
 #ifdef QT4
-	lmmsMainWin::inst()->workspace()->addWindow( this );
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		lmmsMainWin::inst()->workspace()->addWindow( this );
+	}
 #endif
 
 	m_scrollArea = new scrollArea( this );
+	m_scrollArea->show();
 
 	setAcceptDrops( TRUE );
 }
+
 
 
 
@@ -128,10 +133,11 @@ void trackContainer::loadSettings( const QDomElement & _this )
 	}
 	else
 	{
-		start_val = pd->value();
 #ifdef QT4
+		start_val = pd->value();
 		pd->setMaximum( pd->maximum() + _this.childNodes().count() );
 #else
+		start_val = pd->progress();
 		pd->setTotalSteps( pd->maximum() + _this.childNodes().count() );
 #endif
 	}
@@ -139,10 +145,11 @@ void trackContainer::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		pd->setValue( pd->value() + 1 );
 #ifdef QT4
+		pd->setValue( pd->value() + 1 );
 		qApp->processEvents( QEventLoop::AllEvents, 100 );
 #else
+		pd->setValue( pd->progress() + 1 );
 		qApp->processEvents( 100 );
 #endif
 
@@ -458,5 +465,4 @@ void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
 #include "track_container.moc"
 
 #undef setValue
-#undef value
 #undef maximum

@@ -34,7 +34,7 @@
 
 #else
 
-#include <qvector.h>
+#include <qvaluevector.h>
 
 #endif
 

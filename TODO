@@ -1,3 +1,4 @@
+- check ladspa-header
 - arpeggio: send midi-out-events via channel-track
 - tooltips for controls in MIDI-tab
 - sample-track: sane bg and wave-color

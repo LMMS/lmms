@@ -147,7 +147,19 @@ int main( int argc, char * * argv )
 #ifndef QT4
 	app.setMainWidget( lmmsMainWin::inst() );
 #endif
-	lmmsMainWin::inst()->showMaximized();
+	// MDI-mode?
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		// then maximize
+		lmmsMainWin::inst()->showMaximized();
+	}
+	else
+	{
+		// otherwise arrange at top-left edge of screen
+		lmmsMainWin::inst()->show();
+		lmmsMainWin::inst()->move( 0, 0 );
+		lmmsMainWin::inst()->resize( 200, 500 );
+	}
 
 
 #if QT_VERSION >= 0x030200

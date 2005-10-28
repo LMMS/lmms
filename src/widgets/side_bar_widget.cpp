@@ -68,7 +68,7 @@ sideBarWidget::~sideBarWidget()
 
 void sideBarWidget::paintEvent( QPaintEvent * )
 {
-	const Uint16 TITLE_FONT_HEIGHT = 16;
+	const Uint16 TITLE_FONT_HEIGHT = 13;
 
 #ifdef QT4
 	QPainter p( this );
@@ -76,7 +76,7 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 #else
 	QPixmap draw_pm( rect().size() );
 	draw_pm.fill( QApplication::palette().color( QPalette::Normal,
-							QColorGroup::Background ) );
+						QColorGroup::Background ) );
 
 	QPainter p( &draw_pm, this );
 	p.fillRect( 0, 0, width(), 27, QApplication::palette().color(

@@ -358,57 +358,63 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 void fileBrowser::sendToActiveChannel( void )
 {
-	// get all windows opened in the workspace
-	QWidgetList pl = lmmsMainWin::inst()->workspace()->windowList(
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		// get all windows opened in the workspace
+		QWidgetList pl = lmmsMainWin::inst()->workspace()->windowList(
 #if QT_VERSION >= 0x030200
 						QWorkspace::StackingOrder
 #endif
 									);
 #ifdef QT4
-	QListIterator<QWidget *> w( pl );
-	w.toBack();
-	// now we travel through the window-list until we find a channel-track
-	while( w.hasPrevious() )
-	{
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		QListIterator<QWidget *> w( pl );
+		w.toBack();
+		// now we travel through the window-list until we find a
+		// channel-track
+		while( w.hasPrevious() )
+		{
+			channelTrack * ct = dynamic_cast<channelTrack *>(
 								w.previous() );
 #else
-	QWidget * w = pl.last();
-	// now we travel through the window-list until we find a channel-track
-	while( w != NULL )
-	{
-		channelTrack * ct = dynamic_cast<channelTrack *>( w );
-#endif
-		if( ct != NULL && ct->isHidden() == FALSE )
+		QWidget * w = pl.last();
+		// now we travel through the window-list until we find a
+		// channel-track
+		while( w != NULL )
 		{
-			// ok, it's a channel-track, so we can apply the
-			// sample or the preset
-			if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
+			channelTrack * ct = dynamic_cast<channelTrack *>( w );
+#endif
+			if( ct != NULL && ct->isHidden() == FALSE )
 			{
-				instrument * afp = ct->loadInstrument(
-							"audiofileprocessor" );
-				if( afp != NULL )
+				// ok, it's a channel-track, so we can apply the
+				// sample or the preset
+				if( m_contextMenuItem->type() ==
+							fileItem::SAMPLE_FILE )
 				{
-					afp->setParameter( "audiofile",
+					instrument * afp = ct->loadInstrument(
+							"audiofileprocessor" );
+					if( afp != NULL )
+					{
+						afp->setParameter( "audiofile",
 						m_contextMenuItem->fullName() );
+					}
 				}
-			}
-			else if( m_contextMenuItem->type() ==
+				else if( m_contextMenuItem->type() ==
 							fileItem::PRESET_FILE )
-			{
-				multimediaProject mmp(
+				{
+					multimediaProject mmp(
 						m_contextMenuItem->fullName() );
-				ct->loadTrackSpecificSettings(
+					ct->loadTrackSpecificSettings(
 								mmp.content().
 								firstChild().
 								toElement() );
+				}
+				ct->toggledChannelButton( TRUE );
+				break;
 			}
-			ct->toggledChannelButton( TRUE );
-			break;
-		}
 #ifndef QT4
-		w = pl.prev();
+			w = pl.prev();
 #endif
+		}
 	}
 }
 

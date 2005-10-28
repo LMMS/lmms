@@ -39,6 +39,7 @@
 
 #endif
 
+
 #include "audio_device.h"
 #include "midi_client.h"
 
@@ -84,6 +85,7 @@ private slots:
 
 	void toggleToolTips( bool _disabled );
 	void toggleKnobUsability( bool _classical );
+	void toggleGIMPLikeWindows( bool _enabled );
 
 
 private:
@@ -95,6 +97,7 @@ private:
 
 	bool m_disableToolTips;
 	bool m_classicalKnobUsability;
+	bool m_gimpLikeWindows;
 
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;

@@ -1,3 +1,23 @@
+2005-10-28	Tobias Doerffel	<tobydox@users.sourceforge.net>
+
+	* src/widgets/project_notes.cpp:
+	set initial text to bright gray, since black text on a very dark back-
+	ground isn't very readable...
+
+	* include/lmms_main_win.h:
+	* include/setup_dialog.h:
+	* src/core/bb_editor.cpp:
+	* src/core/lmms_main_win.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/song_editor.cpp:
+	* src/widgets/project_notes.cpp:
+	added support for GIMP-like usability, i.e. no MDI
+
+	* src/core/song_editor.cpp:
+	* src/core/bb_editor.cpp:
+	reorder some code in constructor for not crashing if window is
+	shown while constructor is still running
+
 2005-10-23	Tobias Doerffel	<tobydox@users.sourceforge.net>
 
 	* src/widgets/led_checkbox.cpp:

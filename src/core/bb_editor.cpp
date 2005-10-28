@@ -63,17 +63,23 @@ QPixmap * bbEditor::s_titleArtwork = NULL;
 bbEditor::bbEditor() :
 	trackContainer()
 {
-	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
-	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
-					BBE_PPT + 2 * TCO_BORDER_WIDTH );
-	setGeometry( 10, 340, minimumWidth(), 300 );
-	show();
-
 	if( s_titleArtwork == NULL )
 	{
 		s_titleArtwork = new QPixmap( embed::getIconPixmap(
 						"bb_editor_title_artwork" ) );
+	}
+
+	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
+	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
+					BBE_PPT + 2 * TCO_BORDER_WIDTH );
+	if( lmmsMainWin::inst()->workspace() != NULL )
+	{
+		setGeometry( 10, 340, minimumWidth(), 300 );
+	}
+	else
+	{
+		setGeometry( 210, 340, minimumWidth(), 300 );
 	}
 
 	containerWidget()->move( 0, 47 );
@@ -122,6 +128,8 @@ bbEditor::bbEditor() :
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
+
+	show();
 }
 
 
@@ -321,6 +329,7 @@ void bbEditor::updateBackground( void )
 	p.fillRect( 0, 0, width(), s_titleArtwork->height(),
 						QColor( 74, 125, 213 ) );
 	p.drawPixmap( 0, 0, *s_titleArtwork );
+
 #ifdef QT4
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( draw_pm ) );
