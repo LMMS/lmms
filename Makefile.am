@@ -62,6 +62,7 @@ lmms_MOC =						\
 		./mixer.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
+		./midi_alsa_seq.moc			\
 		./midi_tab_widget.moc			\
 		./pattern.moc				\
 		./piano_roll.moc			\
@@ -144,6 +145,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
 		$(srcdir)/src/lib/string_pair_drag.cpp			\
 		$(srcdir)/src/midi/midi_alsa_raw.cpp			\
+		$(srcdir)/src/midi/midi_alsa_seq.cpp			\
 		$(srcdir)/src/midi/midi_client.cpp			\
 		$(srcdir)/src/midi/midi_file.cpp			\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
@@ -266,7 +268,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/instrument_play_handle.h		\
 		$(srcdir)/include/string_pair_drag.h			\
 		$(srcdir)/include/ladspa_manager.h			\
-		$(srcdir)/include/midi_tab_widget.h
+		$(srcdir)/include/midi_tab_widget.h			\
+		$(srcdir)/include/midi_alsa_seq.h
 
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)

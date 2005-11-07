@@ -2,7 +2,7 @@
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -43,6 +43,7 @@
 
 // platform-specific midi-interface-classes
 #include "midi_alsa_raw.h"
+#include "midi_alsa_seq.h"
 #include "midi_oss.h"
 #include "midi_dummy.h"
 
@@ -141,6 +142,7 @@ mixer::mixer() :
 mixer::~mixer()
 {
 	delete m_audioDev;
+	delete m_midiClient;
 
 	bufferAllocator::free( m_buffer1 );
 	bufferAllocator::free( m_buffer2 );
@@ -645,15 +647,26 @@ midiClient * mixer::tryMIDIClients( void )
 								"midiclient" );
 
 #ifdef ALSA_SUPPORT
+	if( client_name == midiALSASeq::name() || client_name == "" )
+	{
+		midiALSASeq * malsas = new midiALSASeq();
+		if( malsas->isRunning() )
+		{
+			m_midiClientName = midiALSASeq::name();
+			return( malsas );
+		}
+		delete malsas;
+	}
+
 	if( client_name == midiALSARaw::name() || client_name == "" )
 	{
-		midiALSARaw * malsa = new midiALSARaw();
-		if( malsa->isRunning() )
+		midiALSARaw * malsar = new midiALSARaw();
+		if( malsar->isRunning() )
 		{
 			m_midiClientName = midiALSARaw::name();
-			return( malsa );
+			return( malsar );
 		}
-		delete malsa;
+		delete malsar;
 	}
 #endif
 

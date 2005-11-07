@@ -2,7 +2,7 @@
  * midi_client.h - base-class for MIDI-clients like ALSA-sequencer-client
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,18 +53,25 @@ public:
 	midiClient( void );
 	virtual ~midiClient();
 
-	virtual midiPort * FASTCALL createPort( midiEventProcessor * _mep,
-					const QString & _desired_name ) = 0;
-
+	// to be implemented by sub-classes
 	virtual void FASTCALL processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port ) = 0;
 
-	// validate port-name by trying to change port name in underlying MIDI-
-	// subsystem
-	virtual void FASTCALL validatePortName( midiPort * _port ) = 0;
+	// inheriting classes can re-implement this for being able to update
+	// their internal port-structures etc.
+	virtual void FASTCALL applyPortMode( midiPort * _port );
+	virtual void FASTCALL applyPortName( midiPort * _port );
 
-	void FASTCALL removePort( midiPort * _port );
+	// inheriting classes can re-implement this although it's actually not
+	// neccessary, because they can catch port-mode-changes and do their
+	// stuff as soon as port-mode changes from DUMMY to something else
+	// re-implemented methods HAVE to call addPort() of base-class!!
+	virtual midiPort * FASTCALL addPort( midiEventProcessor * _mep,
+						const QString & _name );
+
+	// re-implemented methods HAVE to call removePort() of base-class!!
+	virtual void FASTCALL removePort( midiPort * _port );
 
 	static midiClient * openMidiClient( void );
 
@@ -88,12 +95,6 @@ public:
 
 
 protected:
-	inline void addPort( midiPort * _port )
-	{
-		m_midiPorts.push_back( _port );
-	}
-
-
 	vvector<midiPort *> m_midiPorts;
 
 } ;
@@ -112,11 +113,6 @@ public:
 
 
 protected:
-	virtual midiPort * FASTCALL createPort( midiEventProcessor * _mep,
-						const QString & _desired_name );
-
-	virtual void FASTCALL validatePortName( midiPort * _port );
-
 	void FASTCALL parseData( const Uint8 _c );
 
 	virtual void FASTCALL sendByte( const Uint8 _c ) = 0;
@@ -124,7 +120,7 @@ protected:
 
 private:
 	void processParsedEvent();
-	void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void FASTCALL processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port );
 
@@ -148,6 +144,6 @@ private:
 	} m_midiParseData;
 } ;
 
-
-
+*/
 #endif
+

@@ -2,7 +2,7 @@
  * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -102,7 +102,7 @@ midiALSARaw::~midiALSARaw()
 
 QString midiALSARaw::probeDevice( void )
 {
-	QString dev = configManager::inst()->value( "midialsa", "device" );
+	QString dev = configManager::inst()->value( "midialsaraw", "device" );
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -221,7 +221,7 @@ midiALSARaw::setupWidget::~setupWidget()
 
 void midiALSARaw::setupWidget::saveSettings( void )
 {
-	configManager::inst()->setValue( "midialsa", "device",
+	configManager::inst()->setValue( "midialsaraw", "device",
 							m_device->text() );
 }
 

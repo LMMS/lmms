@@ -2,7 +2,7 @@
  * setup_dialog.cpp - dialog for setting up LMMS
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -67,6 +67,7 @@
 
 // platform-specific midi-interface-classes
 #include "midi_alsa_raw.h"
+#include "midi_alsa_seq.h"
 #include "midi_oss.h"
 #include "midi_dummy.h"
 
@@ -314,6 +315,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	//msw_layout->setAutoAdd( TRUE );
 
 #ifdef ALSA_SUPPORT
+	m_midiIfaceSetupWidgets[midiALSASeq::name()] =
+					new midiALSASeq::setupWidget( msw );
 	m_midiIfaceSetupWidgets[midiALSARaw::name()] =
 					new midiALSARaw::setupWidget( msw );
 #endif

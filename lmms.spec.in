@@ -9,7 +9,7 @@ Summary(de):	Leistungsfaehiges Sequenzer-, Synthesizer- und Sample-Studio fuer L
 License:	GPL
 URL:		http://lmms.sourceforge.net/
 Group:		Applications/Multimedia/Sound
-Packager:	Tobias Doerffel <tobydox@users.sourceforge.net>
+Packager:	Tobias Doerffel <tobydox/at/users.sourceforge.net>
 Provides:	lmms = %{version}-%{release}
 %if %_suse
 BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make alsa

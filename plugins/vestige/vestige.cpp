@@ -2,7 +2,7 @@
  * vestige.cpp - instrument-plugin for hosting VST-plugins
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -70,7 +70,7 @@ plugin::descriptor vestige_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 			"experimental VST-hoster for using VST-plugins "
 							"within LMMS" ),
-	"Tobias Doerffel <tobydox@users.sf.net>",
+	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::INSTRUMENT,
 	PLUGIN_NAME::findEmbeddedData( "logo.png" )

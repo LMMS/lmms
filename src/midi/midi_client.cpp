@@ -2,7 +2,7 @@
  * midi_client.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
  * Linux MultiMedia Studio
- * Copyright (_c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (_c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This program is free software; you can redistribute it and/or
@@ -32,11 +32,12 @@
 /*#include "midi_mapper.h"*/
 #include "templates.h"
 #include "midi_port.h"
+#include "note.h"
 
-
-#include "midi_alsa_raw.h"
+/*#include "midi_alsa_raw.h"
+#include "midi_alsa_seq.h"
 #include "midi_oss.h"
-#include "midi_dummy.h"
+#include "midi_dummy.h"*/
 
 
 
@@ -49,7 +50,31 @@ midiClient::midiClient( void )
 
 midiClient::~midiClient()
 {
-	//TODO: noteOffAll();
+	//TODO: noteOffAll(); / clear all ports
+}
+
+
+
+
+void midiClient::applyPortMode( midiPort * )
+{
+}
+
+
+
+
+void midiClient::applyPortName( midiPort * )
+{
+}
+
+
+
+midiPort * midiClient::addPort( midiEventProcessor * _mep,
+							const QString & _name )
+{
+	midiPort * port = new midiPort( this, _mep, _name );
+	m_midiPorts.push_back( port );
+	return( port );
 }
 
 
@@ -72,7 +97,6 @@ void midiClient::removePort( midiPort * _port )
 
 
 
-
 midiRawClient::midiRawClient() :
 	midiClient()
 {
@@ -82,26 +106,6 @@ midiRawClient::midiRawClient() :
 
 
 midiRawClient::~midiRawClient()
-{
-}
-
-
-
-
-midiPort * FASTCALL midiRawClient::createPort( midiEventProcessor * _mep,
-						const QString & _desired_name )
-{
-	midiPort * mp = new midiPort( this, _mep, _desired_name );
-	addPort( mp );
-	return( mp );
-}
-
-
-
-
-// raw-MIDI-clients to not have real ports, therefore the name doesn't matter
-// and we can dummy-implement validation-method
-void midiRawClient::validatePortName( midiPort * )
 {
 }
 
@@ -264,6 +268,7 @@ void midiRawClient::processOutEvent( const midiEvent & _me,
 	{
 		case NOTE_ON:
 		case NOTE_OFF:
+		case KEY_PRESSURE:
 			if( _port->outputChannel() >= 0 )
 			{
 				sendByte( _me.m_type | _port->outputChannel() );
@@ -287,6 +292,8 @@ void midiRawClient::processOutEvent( const midiEvent & _me,
 			break;
 
 		default:
+			printf( "midiRawClient: unhandled MIDI-event %d\n",
+							(int) _me.m_type );
 			break;
 	}
 }
@@ -327,7 +334,7 @@ Uint8 midiRawClient::eventLength( const Uint8 _event )
 {
 	if ( _event < 0xF0 )
 	{
-		return( REMAINS_80E0[( ( _event - 0x80 ) >>4 ) & 0x0F] );
+		return( REMAINS_80E0[( ( _event - 0x80 ) >> 4 ) & 0x0F] );
 	}
 	else if ( _event < 0xF7 )
 	{

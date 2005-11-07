@@ -2,7 +2,7 @@
  * audio_file_processor.cpp - instrument for using audio-files
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -71,7 +71,7 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"simple sampler with various settings for "
 				"using samples (e.g. drums) in a channel" ),
-	"Tobias Doerffel <tobydox@users.sf.net>",
+	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::INSTRUMENT,
 	PLUGIN_NAME::findEmbeddedData( "logo.png" )

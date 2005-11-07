@@ -3,7 +3,7 @@
  *               sequencing system
  *
  * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -73,22 +73,14 @@ public:
 		return( m_name );
 	}
 
-	inline void setName( const QString & _name )
-	{
-		m_name = _name;
-	}
-
-	void FASTCALL trySetName( const QString & _name );
+	void FASTCALL setName( const QString & _name );
 
 	inline modes mode( void ) const
 	{
 		return( m_mode );
 	}
 
-	inline void setMode( modes _mode )
-	{
-		m_mode = _mode;
-	}
+	void setMode( modes _mode );
 
 	inline Sint8 inputChannel( void ) const
 	{

@@ -3,7 +3,7 @@
  *                 sequencing system
  *
  * Linux MultiMedia Studio
- * Copyright (_c) 2004-2005 Tobias Doerffel <tobydox@users.sourceforge.net>
+ * Copyright (_c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This program is free software; you can redistribute it and/or
@@ -50,10 +50,19 @@ midiPort::~midiPort()
 
 
 
-void midiPort::trySetName( const QString & _name )
+void midiPort::setName( const QString & _name )
 {
-	setName( _name );
-	m_midiClient->validatePortName( this );
+	m_name = _name;
+	m_midiClient->applyPortName( this );
+}
+
+
+
+
+void midiPort::setMode( modes _mode )
+{
+	m_mode = _mode;
+	m_midiClient->applyPortMode( this );
 }
 
 
