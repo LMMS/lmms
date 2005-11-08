@@ -1,3 +1,9 @@
+2005-11-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/midi/midi_alsa_seq.cpp:
+	use relative instead of absolute scheduling for events which makes
+	MIDI-out working
+
 2005-10-31	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/midi_alsa_seq.h:

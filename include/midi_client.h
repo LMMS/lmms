@@ -144,6 +144,5 @@ private:
 	} m_midiParseData;
 } ;
 
-*/
 #endif
 
