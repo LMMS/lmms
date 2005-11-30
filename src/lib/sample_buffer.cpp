@@ -1,8 +1,9 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -261,20 +262,22 @@ m_data[frame][chnl] = buf[idx] * fac;
 		else
 		{
 			m_data = new sampleFrame[1];
-			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			memset( m_data, 0, sizeof( *m_data ) * 1 );
+/*			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
 				m_data[0][chnl] = 0.0f;
-			}
+			}*/
 			m_frames = 1;
 		}
 	}
 	else
 	{
 		m_data = new sampleFrame[1];
-		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		memset( m_data, 0, sizeof( *m_data ) * 1 );
+/*		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			m_data[0][chnl] = 0.0f;
-		}
+		}*/
 		m_frames = 1;
 	}
 

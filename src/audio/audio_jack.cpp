@@ -1,8 +1,9 @@
 /*
  * audio_jack.cpp - support for JACK-transport
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,11 +38,13 @@
 
 #include <QLineEdit>
 #include <QLabel>
+#include <QMessageBox>
 
 #else
 
 #include <qlineedit.h>
 #include <qlabel.h>
+#include <qmessagebox.h>
 
 #endif
 
@@ -117,14 +120,15 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 	// set process-callback
 	jack_set_process_callback( m_client, processCallback, this );
 
+	m_jackBufSize = jack_get_buffer_size( m_client );
+
 	// we need to know about buffer-size changes to know how long to block
 	// in writeToDev()-method
 	jack_set_buffer_size_callback( m_client, bufSizeCallback, this );
 
 	// set shutdown-callback
-	//jack_on_shutdown( m_client, shutdown, this );
+	jack_on_shutdown( m_client, shutdownCallback, this );
 
-	m_jackBufSize = jack_get_buffer_size( m_client );
 
 
 	if( jack_get_sample_rate( m_client ) != sampleRate() )
@@ -161,6 +165,19 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 		return;
 	}
 
+
+	// make sure, JACK transport is rolling
+	if( jack_transport_query( m_client, NULL ) != JackTransportRolling )
+	{
+		jack_transport_start( m_client );
+	}
+
+
+	// try to sync JACK's and LMMS's buffer-size
+	jack_set_buffer_size( m_client, mixer::inst()->framesPerAudioBuffer() );
+
+
+
 	const char * * ports = jack_get_ports( m_client, NULL, NULL,
 						JackPortIsPhysical |
 						JackPortIsInput );
@@ -186,6 +203,7 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 
 	free( ports );
 
+
 	_success_ful = TRUE;
 }
 
@@ -194,8 +212,11 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 
 audioJACK::~audioJACK()
 {
-	jack_deactivate( m_client );
-	jack_client_close( m_client );
+	if( m_client != NULL )
+	{
+		jack_deactivate( m_client );
+		jack_client_close( m_client );
+	}
 
 	while( m_bufferSets.size() )
 	{
@@ -216,6 +237,11 @@ audioJACK::~audioJACK()
 void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 							float _master_gain )
 {
+	if( m_client == NULL )
+	{
+		return;
+	}
+
 	m_bufMutex.lock();
 
 	jack_transport_state_t ts = jack_transport_query( m_client, NULL );
@@ -258,9 +284,32 @@ void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
 
 
 
+void audioJACK::registerPort( audioPort * )
+{
+}
+
+
+
+
+void audioJACK::unregisterPort( audioPort * _port )
+{
+}
+
+
+
+
+void audioJACK::renamePort( audioPort *, const QString & )
+{
+}
+
+
+
+
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
 	audioJACK * _this = static_cast<audioJACK *>( _udata );
+
+/*	printf( "%f\n", jack_cpu_load( _this->m_client ) );*/
 
 #ifdef LMMS_DEBUG
 	assert( _this != NULL );
@@ -272,7 +321,8 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	if( ts != JackTransportRolling )
 	{
 		// always decrease frame-sync-var as we would do it if running
-		// in normal mode, so that the mixer-thread does up
+		// in normal mode, so that the mixer-thread knows when to
+		// proceed
 		if( _nframes < _this->m_frameSync )
 		{
 			_this->m_frameSync -= _nframes;
@@ -331,17 +381,20 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		_this->m_frameSync -= todo;
 	}
 
-	// we have to clear the part of the buffers, we could not fill because
-	// no usable data is left, otherwise there's baaaaaad noise... ;-)
+	// we have to clear the part of the buffers, if we could not fill
+	// because no usable data is left, otherwise there's baaaaaad
+	// noise... ;-)
 	if( done < _nframes )
 	{
 		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
 		{
 			jack_default_audio_sample_t * b = outbufs[ch];
-			for( Uint32 frame = done; frame < _nframes; ++frame )
+			memset( b + done, 0,
+					sizeof( *b ) * ( _nframes - done ) );
+/*			for( Uint32 frame = done; frame < _nframes; ++frame )
 			{
 				b[frame] = 0.0f;
-			}
+			}*/
 		}
 	}
 
@@ -364,6 +417,23 @@ int audioJACK::bufSizeCallback( jack_nframes_t _nframes, void * _udata )
 
 	return( 0 );
 }
+
+
+
+
+void audioJACK::shutdownCallback( void * _udata )
+{
+	audioJACK * _this = static_cast<audioJACK *>( _udata );
+	_this->m_client = NULL;
+/*	QMessageBox::information( 0, setupWidget::tr( "JACK-server down" ),
+					setupWidget::tr( "You seem to have "
+						"shutdown JACK-server, so "
+						"LMMS is unable to proceed. "
+						"You should save your project "
+						"and restart LMMS!" ),
+					QMessageBox::Ok );*/
+}
+
 
 
 

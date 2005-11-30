@@ -1,8 +1,9 @@
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -92,6 +93,29 @@ void audioDevice::writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
 	// release lock
 	unlock();
 }
+
+
+
+
+void audioDevice::registerPort( audioPort * )
+{
+}
+
+
+
+
+void audioDevice::unregisterPort( audioPort * _port )
+{
+}
+
+
+
+
+void audioDevice::renamePort( audioPort *, const QString & )
+{
+}
+
+
 
 
 #ifndef HAVE_SAMPLERATE_H

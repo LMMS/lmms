@@ -2,8 +2,9 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,6 +45,7 @@
 
 
 class nameLabel;
+class audioPort;
 class QLabel;
 //class sampleTCOSettingsDialog;
 
@@ -144,6 +146,7 @@ public slots:
 
 private:
 	nameLabel * m_trackLabel;
+	audioPort * m_audioPort;
 
 } ;
 

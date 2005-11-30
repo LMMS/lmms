@@ -1,3 +1,4 @@
+- fix audio/midi-settings stuff/translation
 - check ladspa-header
 - arpeggio: send midi-out-events via channel-track
 - tooltips for controls in MIDI-tab

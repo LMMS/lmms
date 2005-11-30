@@ -1,10 +1,9 @@
 /*
  * tempo_sync_knob.h - adds bpm to ms conversion for knob class
  *
- * This derived from the knob-widget by Tobias Doerffel
+ * Copyright (c) 2005 Danny McRae <khjklujn@yahoo.com>
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Danny McRae <khjklujn@yahoo.com>
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public

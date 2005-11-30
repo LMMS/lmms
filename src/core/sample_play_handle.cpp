@@ -1,8 +1,9 @@
 /*
  * sample_play_handle.cpp - implementation of class samplePlayHandle
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,6 +31,8 @@
 #include "sample_play_handle.h"
 #include "sample_buffer.h"
 #include "buffer_allocator.h"
+#include "audio_port.h"
+
 
 
 samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
@@ -37,9 +40,12 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
 	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
-	m_frame( 0 )
+	m_frame( 0 ),
+	m_audioPort( new audioPort( "samplePlayHandle" ) )
 {
 }
+
+
 
 
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
@@ -47,7 +53,8 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	m_sampleBuffer( _sample_buffer ),
 	m_ownSampleBuffer( FALSE ),
 	m_doneMayReturnTrue( TRUE ),
-	m_frame( 0 )
+	m_frame( 0 ),
+	m_audioPort( new audioPort( "samplePlayHandle" ) )
 {
 }
 
@@ -59,6 +66,7 @@ samplePlayHandle::~samplePlayHandle()
 	{
 		delete m_sampleBuffer;
 	}
+	delete m_audioPort;
 }
 
 
@@ -80,8 +88,8 @@ void samplePlayHandle::play( void )
 #endif
 			} ;
 	m_sampleBuffer->play( buf, m_frame );
-	mixer::inst()->addBuffer( buf, mixer::inst()->framesPerAudioBuffer(),
-									0, v );
+	mixer::inst()->bufferToPort( buf, mixer::inst()->framesPerAudioBuffer(),
+							0, v, m_audioPort );
 
 	bufferAllocator::free( buf );
 

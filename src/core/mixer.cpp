@@ -1,8 +1,9 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,6 +31,7 @@
 #include "buffer_allocator.h"
 #include "debug.h"
 #include "config_mgr.h"
+#include "audio_port.h"
 
 #include "audio_device.h"
 #include "midi_client.h"
@@ -59,13 +61,11 @@ mixer::mixer() :
 	QObject(),
 #endif
 	QThread(),
-	m_silence(),
+/*	m_silence(),
 #ifndef DISABLE_SURROUND
 	m_surroundSilence(),
-#endif
+#endif*/
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
-	m_buffer1( NULL ),
-	m_buffer2( NULL ),
 	m_curBuf( NULL ),
 	m_nextBuf( NULL ),
 	m_discardCurBuf( FALSE ),
@@ -91,26 +91,17 @@ mixer::mixer() :
 				QString::number( m_framesPerAudioBuffer ) );
 	}
 
-	m_buffer1 = bufferAllocator::alloc<surroundSampleFrame>(
+	m_curBuf = bufferAllocator::alloc<surroundSampleFrame>(
 						m_framesPerAudioBuffer );
-	m_buffer2 = bufferAllocator::alloc<surroundSampleFrame>(
+	m_nextBuf = bufferAllocator::alloc<surroundSampleFrame>(
 						m_framesPerAudioBuffer );
-
-	m_curBuf = m_buffer1;
-	m_nextBuf = m_buffer2;
 
 
 	m_audioDev = tryAudioDevices();
 	m_midiClient = tryMIDIClients();
 
 
-	for( int i = 0; i < MAX_SAMPLE_PACKETS; ++i )
-	{
-		m_samplePackets[i].m_buffer = NULL;
-		m_samplePackets[i].m_state = samplePacket::UNUSED;
-	}
-
-	m_silence = bufferAllocator::alloc<sampleFrame>(
+/*	m_silence = bufferAllocator::alloc<sampleFrame>(
 						m_framesPerAudioBuffer );
 #ifndef DISABLE_SURROUND
 	m_surroundSilence = bufferAllocator::alloc<surroundSampleFrame>(
@@ -128,11 +119,11 @@ mixer::mixer() :
 			m_surroundSilence[frame][chnl] = 0.0f;
 		}
 #endif
-	}
+	}*/
 
 	// now clear our two output-buffers before using them...
-	clearAudioBuffer( m_buffer1, m_framesPerAudioBuffer );
-	clearAudioBuffer( m_buffer2, m_framesPerAudioBuffer );
+	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
+	clearAudioBuffer( m_nextBuf, m_framesPerAudioBuffer );
 
 }
 
@@ -144,21 +135,14 @@ mixer::~mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
-	bufferAllocator::free( m_buffer1 );
-	bufferAllocator::free( m_buffer2 );
+	bufferAllocator::free( m_curBuf );
+	bufferAllocator::free( m_nextBuf );
 
-	for( int i = 0; i < MAX_SAMPLE_PACKETS; ++i )
-	{
-		if( m_samplePackets[i].m_state != samplePacket::UNUSED )
-		{
-			bufferAllocator::free( m_samplePackets[i].m_buffer );
-		}
-	}
 
-	bufferAllocator::free( m_silence );
+/*	bufferAllocator::free( m_silence );
 #ifndef DISABLE_SURROUND
 	bufferAllocator::free( m_surroundSilence );
-#endif
+#endif*/
 }
 
 
@@ -235,32 +219,15 @@ void mixer::run( void )
 
 		songEditor::inst()->processNextBuffer();
 
-		// check for samples-packets that have to be mixed in
-		// the current audio-buffer
-		for( int i = 0; i < MAX_SAMPLE_PACKETS; ++i )
+		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
+						it != m_audioPorts.end(); ++it )
 		{
-			if( m_samplePackets[i].m_state == samplePacket::READY )
+			if( ( *it )->m_bufferUsage != audioPort::NONE )
 			{
-				if( m_samplePackets[i].m_framesAhead <=
-							m_framesPerAudioBuffer )
-				{
-					// found one! mix it...
-					mixSamplePacket( &m_samplePackets[i] );
-					// now this audio-sample can be used
-					// again
-					bufferAllocator::free(
-						m_samplePackets[i].m_buffer );
-					m_samplePackets[i].m_state =
-							samplePacket::UNUSED;
-				}
-				else
-				{
-					m_samplePackets[i].m_framesAhead -=
-							m_framesPerAudioBuffer;
-				}
-
+				processBuffer( ( *it )->firstBuffer(),
+						( *it )->nextFxChannel() );
+				( *it )->nextPeriod();
 			}
-
 		}
 
 		if( !m_discardCurBuf )
@@ -280,7 +247,7 @@ void mixer::run( void )
 		}
 
 		emit nextAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
-
+		usleep( 1 );		// give time to other threads/processes
 
 		m_safetySyncMutex.unlock();
 
@@ -318,7 +285,8 @@ void mixer::clear( void )
 
 void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
 {
-	if( _frames == m_framesPerAudioBuffer )
+	memset( _ab, 0, sizeof( *_ab ) * _frames );
+/*	if( _frames == m_framesPerAudioBuffer )
 	{
 		memcpy( _ab, m_silence, m_framesPerAudioBuffer *
 							BYTES_PER_FRAME );
@@ -332,7 +300,7 @@ void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
 				_ab[frame][ch] = 0.0f;
 			}
 		}
-	}
+	}*/
 }
 
 
@@ -341,7 +309,8 @@ void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
 void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 								Uint32 _frames )
 {
-	if( _frames == m_framesPerAudioBuffer )
+	memset( _ab, 0, sizeof( *_ab ) * _frames );
+/*	if( _frames == m_framesPerAudioBuffer )
 	{
 		memcpy( _ab, m_surroundSilence, m_framesPerAudioBuffer *
 						BYTES_PER_SURROUND_FRAME );
@@ -355,59 +324,52 @@ void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 				_ab[frame][ch] = 0.0f;
 			}
 		}
-	}
+	}*/
 }
 #endif
 
 
 
-void FASTCALL mixer::addBuffer( sampleFrame * _buf, Uint32 _frames,
+void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 						Uint32 _frames_ahead,
-						volumeVector & _volume_vector )
+						volumeVector & _volume_vector,
+						audioPort * _port )
 {
-#ifdef LMMS_DEBUG
-	bool success = FALSE;
-#endif
-	for ( Uint16 i = 0; i < MAX_SAMPLE_PACKETS; ++i )
+	Uint32 start_frame = _frames_ahead % m_framesPerAudioBuffer;
+	Uint32 end_frame = start_frame + _frames;
+	Uint32 loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
+	for( Uint32 frame = start_frame; frame < loop1_frame; ++frame )
 	{
-		if( m_samplePackets[i].m_state == samplePacket::UNUSED )
+		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
 		{
-			m_samplePackets[i].m_state = samplePacket::FILLING;
-			m_samplePackets[i].m_frames = _frames;//m_framesPerAudioBuffer;
-			m_samplePackets[i].m_framesDone  = 0;
-			m_samplePackets[i].m_framesAhead  = _frames_ahead;
-
-			m_samplePackets[i].m_buffer =
-				bufferAllocator::alloc<surroundSampleFrame>(
-						m_framesPerAudioBuffer );
-			// now we have to make a surround-buffer out of a
-			// stereo-buffer (could be done more easily if there
-			// would be no volume-vector...)
-			for( Uint32 frame = 0; frame < _frames/*m_framesPerAudioBuffer*/;
-								++frame )
-			{
-				for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS;
-									++chnl )
-				{
-			m_samplePackets[i].m_buffer[frame][chnl] =
-					_buf[frame][chnl%DEFAULT_CHANNELS] *
+			_port->firstBuffer()[frame][chnl] +=
+					_buf[frame - start_frame][chnl %
+							DEFAULT_CHANNELS] *
 						_volume_vector.vol[chnl];
-				}
-			}
-
-			m_samplePackets[i].m_state = samplePacket::READY;
-#ifdef LMMS_DEBUG
-			success = TRUE;
-#endif
-			break;
 		}
 	}
-#ifdef LMMS_DEBUG
-	if( success == FALSE )
+	if( end_frame > m_framesPerAudioBuffer )
 	{
-		qWarning( "No sample-packets left in mixer::addBuffer(...)!\n" );
+		Uint32 frames_done = m_framesPerAudioBuffer - start_frame;
+		end_frame = tMin( end_frame -= m_framesPerAudioBuffer,
+						m_framesPerAudioBuffer );
+		for( Uint32 frame = 0; frame < end_frame; ++frame )
+		{
+			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+			{
+				_port->secondBuffer()[frame][chnl] +=
+					_buf[frames_done + frame][chnl %
+							DEFAULT_CHANNELS] *
+						_volume_vector.vol[chnl];
+			}
+		}
+		_port->m_bufferUsage = audioPort::BOTH;
 	}
-#endif
+	else if( _port->m_bufferUsage == audioPort::NONE )
+	{
+		_port->m_bufferUsage = audioPort::FIRST;
+	}
+
 }
 
 
@@ -506,51 +468,6 @@ void mixer::checkValidityOfPlayHandles( void )
 	}
 }
 
-
-
-
-void FASTCALL mixer::mixSamplePacket( samplePacket * _sp )
-{
-	Uint32 start_frame = _sp->m_framesAhead % m_framesPerAudioBuffer;
-	Uint32 end_frame = start_frame + _sp->m_frames;//m_framesPerAudioBuffer;
-
-	if( end_frame <= m_framesPerAudioBuffer )
-	{
-		for( Uint32 frame = start_frame; frame < end_frame; ++frame )
-		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
-			{
-				m_curBuf[frame][chnl] +=
-					_sp->m_buffer[frame-start_frame][chnl];
-			}
-		}
-	}
-	else
-	{
-		for( Uint32 frame = start_frame; frame <
-					m_framesPerAudioBuffer; ++frame )
-		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
-			{
-				m_curBuf[frame][chnl] +=
-					_sp->m_buffer[frame-start_frame][chnl];
-			}
-		}
-
-		Uint32 frames_done = m_framesPerAudioBuffer - start_frame;
-		end_frame = tMin( end_frame -= m_framesPerAudioBuffer,
-						m_framesPerAudioBuffer );
-
-		for( Uint32 frame = 0; frame < end_frame; ++frame )
-		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
-			{
-				m_nextBuf[frame][chnl] +=
-					_sp->m_buffer[frames_done+frame][chnl];
-			}
-		}
-	}
-}
 
 
 
@@ -691,6 +608,20 @@ midiClient * mixer::tryMIDIClients( void )
 	return( new midiDummy() );
 }
 
+
+
+
+void mixer::processBuffer( surroundSampleFrame * _buf, fxChnl/* _fx_chnl */ )
+{
+	// TODO: effect-implementation
+	for( Uint32 frame = 0; frame < m_framesPerAudioBuffer; ++frame )
+	{
+		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+		{
+			m_curBuf[frame][chnl] += _buf[frame][chnl];
+		}
+	}
+}
 
 
 #include "mixer.moc"

@@ -1,9 +1,10 @@
 /*
  * midi_client.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Linux MultiMedia Studio
- * Copyright (_c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
+ *
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public

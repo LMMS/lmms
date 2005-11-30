@@ -2,8 +2,9 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -47,6 +48,7 @@
 #include "templates.h"
 #include "buffer_allocator.h"
 #include "tooltip.h"
+#include "audio_port.h"
 
 
 
@@ -283,8 +285,9 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 
 
-sampleTrack::sampleTrack( trackContainer * _tc )
-	: track( _tc )
+sampleTrack::sampleTrack( trackContainer * _tc ) :
+	track( _tc ),
+	m_audioPort( new audioPort( tr( "Sample track" ) ) )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
@@ -303,6 +306,7 @@ sampleTrack::sampleTrack( trackContainer * _tc )
 
 sampleTrack::~sampleTrack()
 {
+	delete m_audioPort;
 }
 
 
@@ -348,10 +352,11 @@ bool FASTCALL sampleTrack::play( const midiTime & _start, Uint32 _start_frame,
 					static_cast<Uint32>( _start.getTact() *
 									fpt ),
 					_frames );
-			mixer::inst()->addBuffer( buf, _frames, _frame_base +
+			mixer::inst()->bufferToPort( buf, _frames, _frame_base +
 							static_cast<Uint32>(
 					st->startPosition().getTact64th() *
-							fpt / 64.0f ), v );
+							fpt / 64.0f ), v,
+							m_audioPort );
 		}
 	}
 

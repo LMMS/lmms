@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051107, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051107)
+AC_INIT(lmms, 0.1.1-cvs20051129, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051129)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -22,7 +22,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h dlfcn.h ladspa.h])
+AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h dlfcn.h ladspa.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -32,6 +32,7 @@ AC_HEADER_TIME
 AC_STRUCT_TM
 AC_C_VOLATILE
 AC_C_BIGENDIAN
+AC_CHECK_TYPES([mode_t, off_t, pid_t, size_t, ssize_t, long long])
 
 # checks for library functions.
 AC_FUNC_ALLOCA
@@ -39,7 +40,8 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_TYPE_SIGNAL
 
-AC_CHECK_FUNCS([usleep])
+AC_CHECK_FUNCS([usleep pipe sprintf])
+
 
 
 # search for include-path of SDL (just for supporting the FreeBSD-guys.... ;-)
@@ -59,6 +61,8 @@ AH_TEMPLATE(SDL_SDL_SOUND_H, [Define to location of SDL_sound.h])
 
 OLD_LIBS="$LIBS"
 LIBS="$LIBS -lpthread"
+
+AC_CHECK_FUNCS([pthread_getattr_np])
 
 # check for SDL-lib
 AC_ARG_WITH(sdl,
@@ -154,30 +158,25 @@ fi
 AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 
 
-# check for VST-backends (currently only libfst is supported)
+# check for proper wine-installation and existing steinberg headers
 AC_ARG_WITH(vst,
-	AS_HELP_STRING([--without-vst],
-			[disable support for VST-plugin-hosting]), ,
- 	[ with_vst=yes ])
+	AS_HELP_STRING([--with-vst],
+			[enable support for VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
 AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <vst/aeffectx.h> header file.])
-AH_TEMPLATE(HAVE_FST_H, [Define to 1 if you have the <fst.h> header file.])
 if test "x$with_vst" = "xyes" ; then
 	AC_CHECK_HEADER(vst/aeffectx.h, HAVE_VST_AEFFECTX_H="true")
-	AC_CHECK_HEADER(fst.h, HAVE_FST_H="true")
-	AC_CHECK_LIB([fst], [fst_init], HAVE_LIBFST="true", HAVE_FST_H="")
-fi
-if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
-	AC_DEFINE(HAVE_VST_AEFFECTX_H)
-	if test ! -z "$HAVE_FST_H" ; then
-		AC_DEFINE(HAVE_FST_H)
-		FST_OK_BUT_VST_HEADERS_MISSING=""
-	else
-		FST_OK_BUT_VST_HEADERS_MISSING="true"
+	AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
+	AC_CHECK_LIB([wine], [wine_init])
+	if test ! -z "$WINEGCC" ; then
+		if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
+			WINE_OK_BUT_VST_INCOMPLETE=""
+			AC_DEFINE(HAVE_VST_AEFFECTX_H)
+		else
+			WINE_OK_BUT_VST_INCOMPLETE="true"
+		fi
 	fi
-else
-	HAVE_FST_H=""
 fi
-AM_CONDITIONAL(HAVE_LIBFST, test ! -z "$HAVE_FST_H")
+AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINEGCC")
 
 
 # check for vorbis-lib
@@ -567,47 +566,57 @@ else
 fi
 
 
-
-if test ! -z "$FST_OK_BUT_VST_HEADERS_MISSING" ; then
+if test "x$with_vst" = "xno" ; then
 	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ===  LMMS - INFORMATION  ==================================================="
 	echo " ========================"
 	echo " ="
-	echo " = You seem to have a proper libfst-installation, but the header-files"
-	echo " = (AEffect.h and aeffectx.h) from Steinberg-SDK are missing or not present"
-	echo " = in /usr/include/vst. We cannot distribute them as they're licensed under"
-	echo " = a non-GPL-compatible license, so you'll have to download them at"
+	echo " = If you want VST-support within LMMS, please pass"
 	echo " ="
-	echo " =       ftp://ext2asio:sdk1ext@ftp.pinnaclesys.com/SDK"
+	echo " = --with-vst"
 	echo " ="
-	echo " = and put the mentioned files into /usr/include."
-	echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
-	echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
-	echo " = ignore this warning."
-	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " = to configure, since it is disabled per default!"
 	echo " ="
-	with_warnings="true"
 else
-	if test ! -z "$HAVE_FST_H" ; then
-		PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libfst for hosting VST-plugins"
-	else
+
+	if test ! -z "$WINE_OK_BUT_VST_INCOMPLETE" ; then
 		echo " ========================"
 		echo " ===  LMMS - WARNING  ======================================================="
 		echo " ========================"
 		echo " ="
-		echo " = You don't seem to have installed libfst, which is neccessary for building"
-		echo " = LMMS with support for built-in VST-plugin. Furthermore LMMS needs"
-		echo " = header-files (AEffect.h and aeffectx.h) from Steinberg-SDK, which are"
-		echo " = likely to be installed by libfst, so after having coped with libfst-"
-		echo " = installation (which is a mess... ;-), everything should be alright."
-		echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
-		echo " = warning."
+		echo " = You seem to have a proper WINE-installation, but the header-files"
+		echo " = (AEffect.h and aeffectx.h) from Steinberg-VST-SDK are missing or not present"
+		echo " = in /usr/include/vst. We cannot distribute them as they're licensed under"
+		echo " = a GPL-incompatible license, so you'll have to download them at"
+		echo " ="
+		echo " =       ftp://ext2asio:sdk1ext@ftp.pinnaclesys.com/SDK"
+		echo " ="
+		echo " = and put the mentioned files into /usr/include/vst."
+		echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
+		echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
+		echo " = ignore this warning."
 		echo " = Consider installing the missing packages for using the full power of LMMS."
 		echo " ="
 		with_warnings="true"
+	else
+		if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
+			PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* it's own VST-server for hosting VST-plugins"
+		else
+			echo " ========================"
+			echo " ===  LMMS - WARNING  ======================================================="
+			echo " ========================"
+			echo " ="
+			echo " = You don't seem to have installed WINE or it's development-packages (headers,"
+			echo " = (winegcc etc.) which is neccessary for building LMMS with built-in"
+			echo " = VST-support."
+			echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
+			echo " = warning."
+			echo " = Consider installing the missing packages for using the full power of LMMS."
+			echo " ="
+			with_warnings="true"
+		fi
 	fi
 fi
-
 
 
 echo

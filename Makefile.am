@@ -23,7 +23,7 @@ endif
 SUBDIRS = artwork buildtools locale midi-maps plugins presets projects samples
 
 
-INCLUDES = -I$(srcdir)/include -I.
+INCLUDES = -I$(srcdir)/include -I. -I/usr/include/wine -I/usr/include/wine/windows
 bin_PROGRAMS = lmms
 
 
@@ -70,6 +70,7 @@ lmms_MOC =						\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
+		./qxembed.moc				\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
 		./sample_track.moc			\
@@ -106,6 +107,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/audio/audio_file_wave.cpp			\
 		$(srcdir)/src/audio/audio_jack.cpp			\
 		$(srcdir)/src/audio/audio_oss.cpp			\
+		$(srcdir)/src/audio/audio_port.cpp			\
 		$(srcdir)/src/audio/audio_sample_recorder.cpp		\
 		$(srcdir)/src/audio/audio_sdl.cpp			\
 		$(srcdir)/src/core/about_dialog.cpp			\
@@ -164,6 +166,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
 		$(srcdir)/src/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/widgets/project_notes.cpp			\
+		$(srcdir)/src/widgets/qxembed.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
 		$(srcdir)/src/widgets/side_bar_widget.cpp		\
 		$(srcdir)/src/widgets/tab_bar.cpp			\
@@ -269,7 +272,10 @@ lmms_SOURCES =								\
 		$(srcdir)/include/string_pair_drag.h			\
 		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/midi_tab_widget.h			\
+		$(srcdir)/include/audio_port.h				\
+		$(srcdir)/include/qxembed.h				\
 		$(srcdir)/include/midi_alsa_seq.h
+
 
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)
@@ -303,10 +309,6 @@ endif
 
 if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
-endif
-
-if HAVE_LIBFST
-LIB_FST_LDADD = -lfst
 endif
 
 lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_FST_LDADD) -ldl

@@ -1,8 +1,9 @@
 /*
  * mixer.h - audio-device-independent mixer for LMMS
  *
- * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,19 +53,17 @@
 #include "panning.h"
 #include "note.h"
 #include "play_handle.h"
+#include "effect_board.h"
 
 
 class audioDevice;
 class midiClient;
 class lmmsMainWin;
 class plugin;
+class audioPort;
 
 
 const int DEFAULT_BUFFER_SIZE = 512;
-
-const Uint16 MAX_SAMPLE_PACKETS = 256;	// how many parallel audio-samples-
-					// buffers shall be maximal exist and
-					// mixed together?
 
 const Uint8  DEFAULT_CHANNELS = 2;
 
@@ -79,7 +78,7 @@ const Uint8  QUALITY_LEVELS = 2;
 const Uint32 DEFAULT_QUALITY_LEVEL = 0;
 const Uint32 HIGH_QUALITY_LEVEL = DEFAULT_QUALITY_LEVEL+1;
 extern Uint32 SAMPLE_RATES[QUALITY_LEVELS];
-const Uint32 DEFAULT_SAMPLE_RATE = 44100;//SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
+const Uint32 DEFAULT_SAMPLE_RATE = 44100;
 
 
 typedef sampleType sampleFrame[DEFAULT_CHANNELS];
@@ -123,9 +122,10 @@ public:
 	}
 
 
-	void FASTCALL addBuffer( sampleFrame * _buf, Uint32 _frames,
+	void FASTCALL bufferToPort( sampleFrame * _buf, Uint32 _frames,
 						Uint32 _framesAhead,
-						volumeVector & _volumeVector );
+						volumeVector & _volumeVector,
+						audioPort * _port );
 	inline Uint32 framesPerAudioBuffer( void ) const
 	{
 		return( m_framesPerAudioBuffer );
@@ -151,7 +151,30 @@ public:
 
 	void FASTCALL setAudioDevice( audioDevice * _dev, bool _hq );
 	void restoreAudioDevice( void );
+	inline audioDevice * audioDev( void )
+	{
+		return( m_audioDev );
+	}
 
+
+	// audio-port-stuff
+	inline void addAudioPort( audioPort * _port )
+	{
+		pause();
+		m_audioPorts.push_back( _port );
+		play();
+	}
+
+	inline void removeAudioPort( audioPort * _port )
+	{
+		vvector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
+							m_audioPorts.end(),
+							_port );
+		if( it != m_audioPorts.end() )
+		{
+			m_audioPorts.erase( it );
+		}
+	}
 
 	// MIDI-client-stuff
 	inline const QString & midiClientName( void ) const
@@ -246,22 +269,6 @@ signals:
 
 
 private:
-	struct samplePacket
-	{
-		surroundSampleFrame * m_buffer;	// actual buffer for
-						// wave-data
-		Uint32 m_frames;
-		Uint32 m_framesDone;
-		Uint32 m_framesAhead;		// number of frames, the buffer 
-						// should be mixed ahead
-		volume m_vol;
-		panning m_pan;
-		enum samplePacketStates
-		{
-			READY, FILLING, UNUSED
-		} m_state;
-	} ;
-
 
 	static mixer * s_instanceOfMe;
 
@@ -272,39 +279,28 @@ private:
 
 
 	// we don't allow to create mixer by using copy-ctor
-	mixer( const mixer & ) :
-#ifndef QT4
-		QObject(),
-#endif
-		QThread(),
-		m_curBuf( m_buffer1 ),
-		m_nextBuf( m_buffer2 )
+	mixer( const mixer & )
 	{
 	}
 
 	virtual void run( void );
 
 
-	void FASTCALL mixSamplePacket( samplePacket * _sp );
-
-
 	audioDevice * tryAudioDevices( void );
 	midiClient * tryMIDIClients( void );
 
+	void processBuffer( surroundSampleFrame * _buf, fxChnl _fx_chnl );
 
 
-	sampleFrame * m_silence;
+/*	sampleFrame * m_silence;
 #ifndef DISABLE_SURROUND
 	surroundSampleFrame * m_surroundSilence;// cool, silence in surround ;-)
-#endif
+#endif*/
 
 
-	samplePacket m_samplePackets[MAX_SAMPLE_PACKETS];
+	vvector<audioPort *> m_audioPorts;
 
 	Uint32 m_framesPerAudioBuffer;
-
-	surroundSampleFrame * m_buffer1;
-	surroundSampleFrame * m_buffer2;
 
 	surroundSampleFrame * m_curBuf;
 	surroundSampleFrame * m_nextBuf;

@@ -1,4 +1,4 @@
-if HAVE_LIBFST
+if VST_SUPPORT
 VESTIGE_SUBDIR=vestige
 endif
 

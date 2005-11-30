@@ -1,10 +1,9 @@
 /*
  * tempo_sync_knob.h - adds bpm to ms conversion for knob class
  *
- * This file is derived from the knob-widget by Tobias Doerffel
- *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Danny McRae <khjklujn@yahoo.com>
+ * Copyright (c) 2005 Danny McRae <khjklujn@yahoo.com>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -60,8 +59,8 @@
 
 
 
-tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
-				float _scale ) :
+tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
+					const QString & _name, float _scale ) :
 	knob( _knob_num, _parent, _name ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
@@ -115,9 +114,10 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	int menuId;
 	menuId = syncMenu->addAction( embed::getIconPixmap( "note_none" ),
 					tr( "No Sync" ),
-					     this, SLOT( setTempoSync( int ) ) );
+					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) NO_SYNC );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
+	menuId = syncMenu->addAction( embed::getIconPixmap(
+							"note_double_whole" ),
 					tr( "Eight beats" ),
 					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) DOUBLE_WHOLE_NOTE );
@@ -135,18 +135,20 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	syncMenu->setItemParameter( menuId, ( int ) QUARTER_NOTE );
 	menuId = syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
 					tr( "8th note" ),
-					     this, SLOT( setTempoSync( int ) ) );
+					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) EIGHTH_NOTE );
 	menuId = syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
 					tr( "16th note" ),
-					     this, SLOT( setTempoSync( int ) ) );
+					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) SIXTEENTH_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_thirtysecond" ),
+	menuId = syncMenu->addAction( embed::getIconPixmap(
+							"note_thirtysecond" ),
 					tr( "32nd note" ),
-					     this, SLOT( setTempoSync( int ) ) );
+					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) THIRTYSECOND_NOTE );
 	
-	contextMenu.addMenu( m_tempoSyncIcon, m_tempoSyncDescription, syncMenu );
+	contextMenu.addMenu( m_tempoSyncIcon, m_tempoSyncDescription,
+								syncMenu );
 	contextMenu.addSeparator();
 	
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
@@ -201,42 +203,57 @@ void tempoSyncKnob::calculateTempoSyncTime( int _bpm )
 		switch( m_tempoSyncMode )
 		{
 			case DOUBLE_WHOLE_NOTE:
-				m_tempoSyncDescription = tr( "Synced to Eight Beats" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_double_whole" );
+				m_tempoSyncDescription = tr(
+						"Synced to Eight Beats" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_double_whole" );
 				conversionFactor = 0.125;
 				break;
 			case WHOLE_NOTE:
-				m_tempoSyncDescription = tr( "Synced to Whole Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_whole" );
+				m_tempoSyncDescription = tr(
+						"Synced to Whole Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_whole" );
 				conversionFactor = 0.25;
 				break;
 			case HALF_NOTE:
-				m_tempoSyncDescription = tr( "Synced to Half Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_half" );
+				m_tempoSyncDescription = tr(
+							"Synced to Half Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_half" );
 				conversionFactor = 0.5;
 				break;
 			case QUARTER_NOTE:
-				m_tempoSyncDescription = tr( "Synced to Quarter Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_quarter" );
+				m_tempoSyncDescription = tr(
+						"Synced to Quarter Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_quarter" );
 				conversionFactor = 1.0;
 				break;
 			case EIGHTH_NOTE:
-				m_tempoSyncDescription = tr( "Synced to 8th Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_eighth" );
+				m_tempoSyncDescription = tr(
+							"Synced to 8th Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_eighth" );
 				conversionFactor = 2.0;
 				break;
 			case SIXTEENTH_NOTE:
-				m_tempoSyncDescription = tr( "Synced to 16th Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_sixteenth" );
+				m_tempoSyncDescription = tr(
+							"Synced to 16th Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_sixteenth" );
 				conversionFactor = 4.0;
 				break;
 			case THIRTYSECOND_NOTE:
-				m_tempoSyncDescription = tr( "Synced to 32nd Note" );
-				m_tempoSyncIcon = embed::getIconPixmap( "note_thirtysecond" );
+				m_tempoSyncDescription = tr(
+							"Synced to 32nd Note" );
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_thirtysecond" );
 				conversionFactor = 8.0;
 				break;
 			default:
-				printf( "tempoSyncKnob::calculateTempoSyncTime: invalid tempoSyncMode" );
+				printf( "tempoSyncKnob::calculateTempoSyncTime"
+						": invalid tempoSyncMode" );
 				break;
 		}
 		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ),

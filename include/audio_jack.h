@@ -1,8 +1,9 @@
 /*
  * audio_jack.h - support for JACK-transport
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -93,10 +94,13 @@ private:
 						Uint32 _frames,
 						float _master_gain );
 
-	void clearBuffer( void );
+	virtual void registerPort( audioPort * _port );
+	virtual void unregisterPort( audioPort * _port );
+	virtual void renamePort( audioPort * _port, const QString & _name );
 
 	static int processCallback( jack_nframes_t _nframes, void * _udata );
 	static int bufSizeCallback( jack_nframes_t _nframes, void * _udata );
+	static void shutdownCallback( void * _udata );
 
 
 	jack_client_t * m_client;

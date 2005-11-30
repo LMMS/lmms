@@ -1,8 +1,9 @@
 /*
  * audio_device.h - base-class for audio-devices, used by LMMS-mixer
  *
- * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,10 +30,12 @@
 
 #ifdef QT4
 
+#include <QPair>
 #include <QMutex>
 
 #else
 
+#include <qpair.h>
 #include <qmutex.h>
 
 #endif
@@ -48,6 +51,11 @@
 
 #include "mixer.h"
 #include "tab_widget.h"
+
+
+
+class audioPort;
+
 
 
 class audioDevice
@@ -66,9 +74,21 @@ public:
 		m_devMutex.unlock();
 	}
 
+	// called by mixer for writing final output-buffer with given sample-
+	// rate and master-gain
 	void FASTCALL writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
 							Uint32 _src_sample_rate,
 							float _master_gain );
+
+
+	// if audio-driver supports ports, classes inherting audioPort
+	// (e.g. channel-tracks) can register themselves for making
+	// audio-driver able to collect their individual output and provide
+	// them at a specific port - currently only supported by JACK
+	virtual void registerPort( audioPort * _port );
+	virtual void unregisterPort( audioPort * _port );
+	virtual void renamePort( audioPort * _port, const QString & _name );
+
 
 	inline Uint32 sampleRate( void ) const
 	{
@@ -102,6 +122,7 @@ public:
 
 
 protected:
+	// to be implemented by audio-driver - last step in a mixer period
 	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
 						Uint32 _frames,
 						float _master_gain ) = 0;
@@ -121,6 +142,7 @@ protected:
 	void FASTCALL resample( surroundSampleFrame * _src, Uint32 _frames,
 					surroundSampleFrame * _dst,
 					Uint32 _src_sr, Uint32 _dst_sr );
+
 	inline void setSampleRate( Uint32 _new_sr )
 	{
 		m_sampleRate = _new_sr;

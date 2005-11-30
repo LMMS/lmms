@@ -1,8 +1,9 @@
 /*
- * visualization_widget.cpp - widget for visualization of waves
+ * visualization_widget.cpp - widget for visualization of sound-data
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -64,13 +65,14 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
 	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
 
-	for( Uint32 frame = 0; frame < frames; ++frame )
+	mixer::inst()->clearAudioBuffer( m_buffer, frames );
+/*	for( Uint32 frame = 0; frame < frames; ++frame )
 	{
 		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
 		{
 			m_buffer[frame][chnl] = 0.0f;
 		}
-	}
+	}*/
 
 	setFixedSize( s_background.width(), s_background.height() );
 

@@ -1,8 +1,9 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -99,7 +100,7 @@ struct midiEvent
 	union
 	{
 		Uint16 m_param[2];	// first/second parameter (key/velocity)
-		int m_sysExDataLen;	// len of m_sysExData
+		Uint32 m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
 	const char * m_sysExData;

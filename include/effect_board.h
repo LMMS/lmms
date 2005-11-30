@@ -1,8 +1,9 @@
 /*
  * effect_board.h - stuff for effect-board
  *
- * Linux MultiMedia Studio
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +25,12 @@
 #ifndef _EFFECT_BOARD_H
 #define _EFFECT_BOARD_H
 
+
 const int MIN_EFFECT_CHANNEL = 0;
 const int MAX_EFFECT_CHANNEL = 63;
-const int DEFAULT_EFFECT_CHANNEL = (MIN_EFFECT_CHANNEL);
+const int DEFAULT_EFFECT_CHANNEL = MIN_EFFECT_CHANNEL;
+
+typedef Sint8 fxChnl;
+
 
 #endif

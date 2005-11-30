@@ -1,8 +1,9 @@
 /*
  * plugin.cpp - implemenation of plugin-class including plugin-loader
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -93,7 +94,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 #else
 					ascii()
 #endif
-					, RTLD_LAZY );
+					, RTLD_NOW );
 	if( handle == NULL )
 	{
 		QMessageBox::information( NULL,
@@ -132,7 +133,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
-	const QFileInfoList * list = directory.entryInfoList( "*.so" );
+	const QFileInfoList * list = directory.entryInfoList( "lib*.so" );
 	if( list == NULL )
 	{
 		return;
@@ -141,7 +142,7 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 						file != list->end(); ++file )
 	{
 		void * handle = dlopen( ( *file )->absFilePath().latin1(),
-								RTLD_LAZY );
+								RTLD_NOW );
 		char * msg = dlerror();
 		if( msg != NULL || handle == NULL )
 		{

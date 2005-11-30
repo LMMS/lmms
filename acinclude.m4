@@ -264,3 +264,13 @@ AC_SUBST(QT_GUILINK)
 AC_SUBST(QASSISTANTCLIENT_LDADD)
 
 ])
+
+
+dnl **** Link C code with an assembly file ****
+dnl
+dnl Usage: WINE_TRY_ASM_LINK(asm-code,includes,function,[action-if-found,[action-if-not-found]])
+dnl
+AC_DEFUN([WINE_TRY_ASM_LINK],
+[AC_TRY_LINK([void ac_asm(void) { asm([$1]); }
+[$2]],[$3],[$4],[$5])])
+

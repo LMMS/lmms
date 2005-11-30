@@ -1,8 +1,9 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Linux MultiMedia Studio
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +31,7 @@
 
 #ifdef QT4
 
-#include <QVector>
+#include <qvector>
 
 #else
 
@@ -39,13 +40,13 @@
 #endif
 
 
-#include <fst.h>
-#include <vst/aeffectx.h>
-
+#include "fstclient.h"
 #include "spc_bg_hndl_widget.h"
 
 
 class pixmapButton;
+class QPushButton;
+class remoteVSTPlugin;
 class QPixmap;
 
 
@@ -74,6 +75,7 @@ public:
 
 protected slots:
 	void openPlugin( void );
+	void toggleGUI( void );
 
 
 protected:
@@ -83,25 +85,16 @@ protected:
 private:
 	void closePlugin( void );
 
-	void enqueueEvent( const midiEvent & _e, Uint32 _frames_ahead = 0 );
-
-	static long hostCallback( AEffect *, long, long, long, void *, float );
-
-
-	static bool s_initialized;
-	static bool s_threadAdopted;
 	static QPixmap * s_artwork;
 
 
-	FSTHandle * m_handle;
-	FST * m_fst;
-
-	vvector<VstMidiEvent> m_midiEvents;
+	remoteVSTPlugin * m_plugin;
 
 
 	pixmapButton * m_openPluginButton;
+	QPushButton * m_toggleGUIButton;
 
-	QString m_plugin;
+	QString m_pluginDLL;
 
 
 } ;

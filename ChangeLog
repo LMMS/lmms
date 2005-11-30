@@ -1,3 +1,66 @@
+2005-11-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	changes for working with new VST-framework
+
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstserver.h:
+	* plugins/vestige/fstclient.cpp:
+	* plugins/vestige/fstserver.cpp:
+	* plugins/vestige/fstcore.c:
+	* plugins/vestige/communication.h:
+	added new VST-framework (client-server-architecture) based on XFST
+
+	* include/qxembed.h
+	* src/widgets/qxembed.cpp:
+	added QXEmbed-widget which is neccessary for embedding VST-plugin
+
+2005-11-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/mixer.cpp:
+	added usleep()-call for realizing usable threading and solve problems
+	with 100%-CPU-usage
+
+2005-11-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/channel_track.h:
+	* include/sample_play_handle.h:
+	* include/sample_track.h:
+	* src/core/sample_play_handle.cpp:
+	* src/tracks/channel_track.cpp:
+	* src/tracks/sample_track.cpp:
+	made things work with audio-ports
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	completely revised internal mixing-engine make it working with
+	the new audio-ports, which results in a much cleaner, faster and more
+	powerful mixing-engine
+
+	* include/audio_port.h:
+	* src/audio/audio_port.cpp:
+	added so called audio-ports which are important for transporting sound
+	from it's origin through the mixer and the effect-board (the latter
+	one isn't existing yet but coming quite soon) - another important
+	point is ability of having output-ports for each channel/sample-track
+	with JACK
+
+	* src/tracks/channel_track.cpp:
+	translate default-channel-name "Default"
+
+	* src/audio/audio_jack.cpp:
+	- sync JACK's buffer-size with LMMS's one
+	- start JACK-transport if not already done
+
+	* include/mixer.h:
+	* src/audio/audio_jack.cpp:
+	* src/core/mixer.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/widgets/visualization_widget.cpp:
+	use memset() for clearing buffers - obsoletes usage of silence-buffers
+	in mixer
+
 2005-11-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/midi/midi_alsa_seq.cpp:
