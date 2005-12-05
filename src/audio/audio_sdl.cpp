@@ -50,11 +50,8 @@
 
 audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
 	audioDevice( _sample_rate, DEFAULT_CHANNELS ),
-	m_buffer( bufferAllocator::alloc<outputSampleType>(
-					mixer::inst()->framesPerAudioBuffer() *
-					channels() ) ),
-	m_bufMutex(),
-	m_callbackMutex(),
+	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
+				mixer::inst()->framesPerAudioBuffer() ) ),
 	m_convertEndian( FALSE )
 {
 	_success_ful = FALSE;
@@ -99,11 +96,6 @@ audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
 	}
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
-	clearS16Buffer( m_buffer, m_audioHandle.samples );
-
-	// start playing
-	SDL_PauseAudio( 0 );
-
 	_success_ful = TRUE;
 }
 
@@ -112,31 +104,31 @@ audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
 
 audioSDL::~audioSDL()
 {
-	SDL_PauseAudio( 1 );
+	stopProcessing();
 	SDL_CloseAudio();
 	SDL_Quit();
-
-	m_bufMutex.lock();
-	bufferAllocator::free( m_buffer );
-	m_bufMutex.unlock();
+	bufferAllocator::free( m_outBuf );
 }
 
 
 
 
-
-void audioSDL::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-						float _master_gain )
+void audioSDL::startProcessing( void )
 {
-	m_bufMutex.lock();
-	convertToS16( _ab, _frames, _master_gain, m_buffer,
-							m_convertEndian );
-	m_bufMutex.unlock();
-	// before returning make sure, callback was called, so we're synced
-	// with it (otherwise it could be that (if there's not much to render)
-	// this function is called several times although we had to wait until
-	// we can proceed with next audio-output)
-	m_callbackMutex.lock();
+	SDL_PauseAudio( 0 );
+	SDL_UnlockAudio();
+}
+
+
+
+
+void audioSDL::stopProcessing( void )
+{
+	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
+	{
+		SDL_LockAudio();
+		SDL_PauseAudio( 1 );
+	}
 }
 
 
@@ -150,21 +142,12 @@ void audioSDL::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 	assert( _this != NULL );
 #endif
 
-	_this->m_bufMutex.lock();
+	const Uint32 frames = _this->getNextBuffer( _this->m_outBuf );
 
-	// writeBufferToDev() prepared everything for us, so we just have
-	// to do a memcpy() :-)
-	memcpy( _buf, _this->m_buffer, _len );
-
-	// clear our output buffer, so that we don't output the same noise
-	// when being called again without that writeBufferToDev() was called
-	// (e.g. if there's too much to render)
-	_this->clearS16Buffer( _this->m_buffer, _this->m_audioHandle.samples );
-
-	_this->m_bufMutex.unlock();
-
-	// we got our last buffer, so we let writeBufferToDev() return
-	_this->m_callbackMutex.unlock();
+	_this->convertToS16( _this->m_outBuf, frames,
+						mixer::inst()->masterGain(),
+						(outputSampleType *)( _buf ),
+						_this->m_convertEndian );
 }
 
 

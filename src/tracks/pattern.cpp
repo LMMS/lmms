@@ -31,7 +31,6 @@
 #include <QMenu>
 #include <QProgressBar>
 #include <QPushButton>
-#include <QTimer>
 #include <QMessageBox>
 #include <QImage>
 #include <QMouseEvent>
@@ -42,7 +41,6 @@
 #include <qpopupmenu.h>
 #include <qprogressbar.h>
 #include <qpushbutton.h>
-#include <qtimer.h>
 #include <qmessagebox.h>
 #include <qimage.h>
 
@@ -79,9 +77,8 @@ pattern::pattern ( channelTrack * _channel_track ) :
 	m_name( _channel_track->name() ),
 	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
-	m_freezeRecorder( NULL ),
-	m_freezeStatusDialog( NULL ),
-	m_freezeStatusUpdateTimer( NULL )
+	m_freezing( FALSE ),
+	m_freezeAborted( FALSE )
 {
 	initPixmaps();
 
@@ -118,7 +115,8 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
 	m_frozenPatternMutex(),
-	m_frozenPattern( NULL )
+	m_frozenPattern( NULL ),
+	m_freezeAborted( FALSE )
 {
 	initPixmaps();
 
@@ -573,7 +571,8 @@ void pattern::freeze( void )
 					    ( 0, tr( "Channel muted" ),
 						tr( "The channel this pattern "
 							"belongs to is "
-							"currently muted, so "
+							"currently muted "
+							"therefore "
 							"freezing makes no "
 							"sense! Do you still "
 							"want to continue?" ),
@@ -594,15 +593,17 @@ void pattern::freeze( void )
 		unfreeze();
 	}
 
-	mixer::inst()->pause();
-
+	// create and install audio-sample-recorder
 	bool b;
-	m_freezeRecorder = new audioSampleRecorder(
-						mixer::inst()->sampleRate(),
-							DEFAULT_CHANNELS, b );
-	mixer::inst()->setAudioDevice( m_freezeRecorder,
+	// we cannot create local copy, because at a later stage
+	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
+	// audioSampleRecorder would be destroyed two times...
+	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
+			mixer::inst()->sampleRate(), DEFAULT_CHANNELS, b );
+	mixer::inst()->setAudioDevice( freeze_recorder,
 						mixer::inst()->highQuality() );
 
+	// prepare stuff for playing correct things later
 	songEditor::inst()->playPattern( this, FALSE );
 	songEditor::playPos & ppp = songEditor::inst()->getPlayPos(
 						songEditor::PLAY_PATTERN );
@@ -610,19 +611,41 @@ void pattern::freeze( void )
 	ppp.setTact64th( 0 );
 	ppp.setCurrentFrame( 0 );
 	ppp.m_timeLineUpdate = FALSE;
-	m_freezeStatusDialog = new patternFreezeStatusDialog;
-	connect( m_freezeStatusDialog, SIGNAL( aborted() ), this,
-							SLOT( abortFreeze() ) );
 
-	m_freezeStatusUpdateTimer = new QTimer( this );
-	connect( m_freezeStatusUpdateTimer, SIGNAL( timeout() ), this,
-					SLOT( updateFreezeStatusDialog() ) );
+	// create status-dialog
+	patternFreezeStatusDialog status_dlg;
+	status_dlg.show();
+	connect( &status_dlg, SIGNAL( aborted() ),
+						this, SLOT( abortFreeze() ) );
 
-	m_freezeStatusUpdateTimer->start( 50 );
+	m_freezeAborted = FALSE;
+	m_freezing = TRUE;
 
-	m_freezeStatusDialog->show();
+	// now render everything
+	while( ppp < length() && m_freezeAborted == FALSE )
+	{
+		freeze_recorder->processNextBuffer();
+		status_dlg.setProgress( ppp * 100 / length() );
+		qApp->processEvents();
+	}
 
-	mixer::inst()->play();
+	m_freezing = FALSE;
+
+	// reset song-editor settings
+	songEditor::inst()->stop();
+	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
+						).m_timeLineUpdate = TRUE;
+
+	// create final sample-buffer if freezing was successful
+	if( m_freezeAborted == FALSE )
+	{
+		m_frozenPatternMutex.lock();
+		freeze_recorder->createSampleBuffer( &m_frozenPattern );
+		m_frozenPatternMutex.unlock();
+	}
+
+	// restore original audio-device
+	mixer::inst()->restoreAudioDevice();
 }
 
 
@@ -642,62 +665,9 @@ void pattern::unfreeze( void )
 
 
 
-void pattern::updateFreezeStatusDialog( void )
-{
-	m_freezeStatusDialog->setProgress( songEditor::inst()->getPlayPos(
-						songEditor::PLAY_PATTERN ) *
-							100 / length() );
-	m_frozenPatternMutex.lock();
-
-	// finishFreeze called?
-	if( m_freezeRecorder == NULL )
-	{
-		// then we're done and destroy the timer and the dialog
-		delete m_freezeStatusUpdateTimer;
-		delete m_freezeStatusDialog;
-		m_freezeStatusUpdateTimer = NULL;
-		m_freezeStatusDialog = NULL;
-	}
-
-	m_frozenPatternMutex.unlock();
-}
-
-
-
-
-void pattern::finishFreeze( void )
-{
-	songEditor::inst()->stop();
-
-	m_frozenPatternMutex.lock();
-
-	m_freezeRecorder->createSampleBuffer( &m_frozenPattern );
-
-	mixer::inst()->restoreAudioDevice();
-	m_freezeRecorder = NULL;
-
-	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
-						).m_timeLineUpdate = TRUE;
-
-	m_frozenPatternMutex.unlock();
-}
-
-
-
-
 void pattern::abortFreeze( void )
 {
-	songEditor::inst()->stop();
-
-	m_frozenPatternMutex.lock();
-
-	mixer::inst()->restoreAudioDevice();
-	m_freezeRecorder = NULL;
-
-	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
-						).m_timeLineUpdate = TRUE;
-
-	m_frozenPatternMutex.unlock();
+	m_freezeAborted = TRUE;
 }
 
 
@@ -788,7 +758,7 @@ void pattern::removeNote( const note * _note_to_del )
 	noteVector::iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it ) == _note_to_del )
+		if( *it == _note_to_del )
 		{
 			delete *it;
 			m_notes.erase( it );
@@ -961,7 +931,8 @@ void pattern::loadSettings( const QDomElement & _this )
 
 
 
-patternFreezeStatusDialog::patternFreezeStatusDialog( void )
+patternFreezeStatusDialog::patternFreezeStatusDialog( void ) :
+	QDialog()
 {
 	setWindowTitle( tr( "Freezing pattern..." ) );
 #if QT_VERSION >= 0x030200
@@ -980,6 +951,7 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( void )
 	m_cancelBtn = new QPushButton( embed::getIconPixmap( "cancel" ),
 							tr( "Cancel" ), this );
 	m_cancelBtn->setGeometry( 50, 38, 120, 28 );
+	m_cancelBtn->show();
 	connect( m_cancelBtn, SIGNAL( clicked() ), this,
 						SLOT( cancelBtnClicked() ) );
 }

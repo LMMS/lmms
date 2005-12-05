@@ -54,7 +54,7 @@
 
 
 midiOSS::midiOSS( void ) :
-	midiRawClient(),
+	midiClientRaw(),
 	QThread(),
 	m_midiDev( probeDevice() ),
 	m_quit( FALSE )
@@ -143,7 +143,7 @@ void midiOSS::run( void )
 
 
 midiOSS::setupWidget::setupWidget( QWidget * _parent ) :
-	midiRawClient::setupWidget( midiOSS::name(), _parent )
+	midiClientRaw::setupWidget( midiOSS::name(), _parent )
 {
 	m_device = new QLineEdit( midiOSS::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

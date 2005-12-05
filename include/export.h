@@ -27,10 +27,11 @@
 
 #include "types.h"
 
-class audioDevice;
+
+class audioFileDevice;
 
 
-typedef audioDevice * ( * getDeviceInst)( Uint32 _sample_rate,
+typedef audioFileDevice * ( * getDeviceInst)( Uint32 _sample_rate,
 						Uint32 _channels,
 						bool & _success_ful,
 						const QString & _file,
@@ -48,6 +49,7 @@ enum fileTypes
 } ;
 
 
+
 struct fileEncodeDevice
 {
 	fileTypes m_fileType;
@@ -55,6 +57,7 @@ struct fileEncodeDevice
 	const char * m_extension;
 	getDeviceInst m_getDevInst;
 } ;
+
 
 extern fileEncodeDevice fileEncodeDevices[];
 

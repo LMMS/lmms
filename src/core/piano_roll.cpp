@@ -34,6 +34,7 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #include <QComboBox>
+#include <QLayout>
 
 #else
 
@@ -41,6 +42,7 @@
 #include <qbuttongroup.h>
 #include <qpainter.h>
 #include <qcombobox.h>
+#include <qlayout.h>
 
 #define setChecked setOn
 
@@ -56,9 +58,9 @@
 
 #include "piano_roll.h"
 #include "song_editor.h"
+#include "lmms_main_win.h"
 #include "pattern.h"
 #include "embed.h"
-#include "crystal_button.h"
 #include "pixmap_button.h"
 #include "templates.h"
 #include "gui_templates.h"
@@ -66,6 +68,7 @@
 #include "channel_track.h"
 #include "tooltip.h"
 #include "midi.h"
+#include "tool_button.h"
 
 
 extern tones whiteKeys[];	// defined in piano_widget.cpp
@@ -88,7 +91,7 @@ const int KEY_LINE_HEIGHT = 12;
 const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * NOTES_PER_OCTAVE;	// = 12 * 12;
 
 const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
-const int PR_TOP_MARGIN = 66;
+const int PR_TOP_MARGIN = 48;
 
 // width of area used for resizing (the grip at the end of a note)
 const int RESIZE_AREA_WIDTH = 3;
@@ -106,8 +109,6 @@ pianoRoll * pianoRoll::s_instanceOfMe = NULL;
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
 QPixmap * pianoRoll::s_whiteKeyBigPm = NULL;
 QPixmap * pianoRoll::s_blackKeyPm = NULL;
-QPixmap * pianoRoll::s_artwork1 = NULL;
-QPixmap * pianoRoll::s_artwork2 = NULL;
 QPixmap * pianoRoll::s_toolDraw = NULL;
 QPixmap * pianoRoll::s_toolErase = NULL;
 QPixmap * pianoRoll::s_toolSelect = NULL;
@@ -160,16 +161,6 @@ pianoRoll::pianoRoll( void ) :
 		s_blackKeyPm = new QPixmap( embed::getIconPixmap(
 							"pr_black_key" ) );
 	}
-	if( s_artwork1 == NULL )
-	{
-		s_artwork1 = new QPixmap( embed::getIconPixmap(
-							"pr_artwork1" ) );
-	}
-	if( s_artwork2 == NULL )
-	{
-		s_artwork2 = new QPixmap( embed::getIconPixmap(
-							"pr_artwork2" ) );
-	}
 	if( s_toolDraw == NULL )
 	{
 		s_toolDraw = new QPixmap( embed::getIconPixmap(
@@ -196,39 +187,39 @@ pianoRoll::pianoRoll( void ) :
 	lmmsMainWin::inst()->workspace()->addWindow( this );
 #endif
 
+	// add time-line
+	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
+					songEditor::inst()->getPlayPos(
+						songEditor::PLAY_PATTERN ),
+						m_currentPosition, this );
+	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
+		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
+			this, SLOT( updatePosition( const midiTime & ) ) );
+
+
+	m_toolBar = new QWidget( this );
+	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->move( 0, 0 );
+	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
+							"toolbar_bg" ) );
+
+	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+
+
 	// init control-buttons at the top
-	m_playButton = new pixmapButton( this );
-	m_playButton->move( 8, 7 );
-	m_playButton->setCheckable( FALSE );
-	m_playButton->setActiveGraphic( embed::getIconPixmap( "play" ) );
-	m_playButton->setInactiveGraphic( embed::getIconPixmap( "play" ) );
-	m_playButton->setBgGraphic( embed::getIconPixmap( "pr_play_ctrl_bg" ) );
-	connect( m_playButton, SIGNAL( clicked() ), this, SLOT( play() ) );
 
-	m_recordButton = new pixmapButton( this );
-	m_recordButton->move( 50, 7 );
-	m_recordButton->setCheckable( FALSE );
-	m_recordButton->setActiveGraphic( embed::getIconPixmap( "record" ) );
-	m_recordButton->setInactiveGraphic( embed::getIconPixmap( "record" ) );
-	m_recordButton->setBgGraphic(
-				embed::getIconPixmap( "pr_play_ctrl_bg" ) );
-	connect( m_recordButton, SIGNAL( clicked() ), this, SLOT( record() ) );
+	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+				tr( "Play/pause current pattern (Space)" ),
+					this, SLOT( play() ), m_toolBar );
 
-	m_stopButton = new pixmapButton( this );
-	m_stopButton->move( 92, 7 );
-	m_stopButton->setCheckable( FALSE );
-	m_stopButton->setActiveGraphic( embed::getIconPixmap( "stop" ) );
-	m_stopButton->setInactiveGraphic( embed::getIconPixmap( "stop" ) );
-	m_stopButton->setBgGraphic( embed::getIconPixmap( "pr_play_ctrl_bg" ) );
-	connect( m_stopButton, SIGNAL( clicked() ), this, SLOT( stop() ) );
+	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
+			tr( "Record notes from MIDI-device/channel-piano" ),
+					this, SLOT( record() ), m_toolBar );
 
-	toolTip::add( m_playButton,
-			tr( "Play/pause current pattern (Space)" ) );
-	toolTip::add( m_recordButton,
-			tr( "Record notes from MIDI-device to current "
-								"pattern" ) );
-	toolTip::add( m_stopButton,
-			tr( "Stop playing of current pattern (Space)" ) );
+	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+				tr( "Stop playing of current pattern (Space)" ),
+					this, SLOT( stop() ), m_toolBar );
 
 #ifdef QT4
 	m_playButton->setWhatsThis(
@@ -246,8 +237,8 @@ pianoRoll::pianoRoll( void ) :
 		tr( "Click here, if you want to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
-			 "all notes you play will be written to this pattern "
-			"and you can edit, play etc. them afterwards." ) );
+			"all notes you play will be written to this pattern "
+			"and you can play and edit them afterwards." ) );
 #ifdef QT4
 	m_stopButton->setWhatsThis(
 #else
@@ -269,33 +260,31 @@ pianoRoll::pianoRoll( void ) :
 						SLOT( verScrolled( int ) ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-						"pr_tool_draw" ), this );
-	m_drawButton->move( 170, 1 );
-	m_drawButton->setActiveButtonBg( embed::getIconPixmap(
-						"pr_tool_bg_inset" ) );
+	m_drawButton = new toolButton( embed::getIconPixmap( "pr_tool_draw" ),
+					tr( "Draw mode (D)" ),
+					this, SLOT( drawButtonToggled() ),
+					m_toolBar );
+	m_drawButton->setCheckable( TRUE );
 	m_drawButton->setChecked( TRUE );
 
-	m_eraseButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-						"pr_tool_erase" ), this );
-	m_eraseButton->move( 220, 1 );
-	m_eraseButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
-	m_selectButton = new crystalButton( embed::getIconPixmap(
-						"pr_tool_bg" ),
-						embed::getIconPixmap(
-						"pr_tool_select" ), this );
-	m_selectButton->move( 270, 1 );
-	m_selectButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
-	m_moveButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-						"pr_tool_move" ), this );
-	m_moveButton->move( 320, 1 );
-	m_moveButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
+	m_eraseButton = new toolButton( embed::getIconPixmap( "pr_tool_erase" ),
+					tr( "Erase mode (E)" ),
+					this, SLOT( eraseButtonToggled() ),
+					m_toolBar );
+	m_eraseButton->setCheckable( TRUE );
+
+	m_selectButton = new toolButton( embed::getIconPixmap(
+							"pr_tool_select" ),
+					tr( "Select mode (S)" ),
+					this, SLOT( selectButtonToggled() ),
+					m_toolBar );
+	m_selectButton->setCheckable( TRUE );
+
+	m_moveButton = new toolButton( embed::getIconPixmap( "pr_tool_move" ),
+					tr( "Move selection mode (M)" ),
+					this, SLOT( moveButtonToggled() ),
+					m_toolBar );
+	m_moveButton->setCheckable( TRUE );
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
@@ -307,26 +296,6 @@ pianoRoll::pianoRoll( void ) :
 	tool_button_group->hide();
 #endif
 
-	connect( m_drawButton, SIGNAL( toggled( bool ) ), this,
-					SLOT( drawButtonToggled( bool ) ) );
-	connect( m_eraseButton, SIGNAL( toggled( bool ) ), this,
-					SLOT( eraseButtonToggled( bool ) ) );
-	connect( m_selectButton, SIGNAL( toggled( bool ) ), this,
-					SLOT( selectButtonToggled( bool ) ) );
-	connect( m_moveButton, SIGNAL( toggled( bool ) ), this,
-					SLOT( moveButtonToggled( bool ) ) );
-
-	toolTip::add( m_drawButton,
-			tr( "Click if you want to draw, resize or move single "
-							"notes (= key 'D')" ) );
-	toolTip::add( m_eraseButton,
-			tr( "Click if you want to erase single notes "
-							"(= key 'E')" ) );
-	toolTip::add( m_selectButton,
-			tr( "Click if you want to select notes (= key 'S')" ) );
-	toolTip::add( m_moveButton,
-			tr( "Click if you want to move selected notes "
-							"(= key 'M')" ) );
 #ifdef QT4
 	m_drawButton->setWhatsThis(
 #else
@@ -365,42 +334,22 @@ pianoRoll::pianoRoll( void ) :
 			"mode. You can also press 'M' on your keyboard to "
 			"activate this mode." ) );
 
+	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
+					tr( "Cut selected notes (Ctrl+X)" ),
+					this, SLOT( cutSelectedNotes() ),
+					m_toolBar );
 
-	m_cutButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-							"pr_edit_cut" ), this );
-	m_cutButton->move( 390, 1 );
-	m_cutButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
-	m_cutButton->setCheckable( FALSE );
-	m_copyButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-							"pr_edit_copy" ),
-									this );
-	m_copyButton->move( 440, 1 );
-	m_copyButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
-	m_copyButton->setCheckable( FALSE );
-	m_pasteButton = new crystalButton( embed::getIconPixmap( "pr_tool_bg" ),
-						embed::getIconPixmap(
-							"pr_edit_paste" ),
-									this );
-	m_pasteButton->move( 490, 1 );
-	m_pasteButton->setActiveButtonBg( embed::getIconPixmap(
-							"pr_tool_bg_inset" ) );
-	m_pasteButton->setCheckable( FALSE );
+	m_copyButton = new toolButton( embed::getIconPixmap( "edit_copy" ),
+					tr( "Copy selected notes (Ctrl+C)" ),
+					this, SLOT( copySelectedNotes() ),
+					m_toolBar );
 
-	connect( m_cutButton, SIGNAL( clicked() ), this,
-						SLOT( cutSelectedNotes() ) );
-	connect( m_copyButton, SIGNAL( clicked() ), this,
-						SLOT( copySelectedNotes() ) );
-	connect( m_pasteButton, SIGNAL( clicked() ), this,
-						SLOT( pasteNotes() ) );
+	m_pasteButton = new toolButton( embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste notes from clipboard "
+								"(Ctrl+V)" ),
+					this, SLOT( pasteNotes() ),
+					m_toolBar );
 
-	toolTip::add( m_cutButton, tr( "Cut selected notes (Ctrl+X)" ) );
-	toolTip::add( m_copyButton, tr( "Copy selected notes (Ctrl+C)" ) );
-	toolTip::add( m_pasteButton, tr( "Paste notes from clipboard "
-								"(Ctrl+V)" ) );
 #ifdef QT4
 	m_cutButton->setWhatsThis(
 #else
@@ -427,9 +376,10 @@ pianoRoll::pianoRoll( void ) :
 
 
 
+
 	// setup zooming-stuff
-	m_zoomingComboBox = new QComboBox( this );
-	m_zoomingComboBox->setGeometry( 580, 10, 60, 20 );
+	m_zoomingComboBox = new QComboBox( m_toolBar );
+	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
 	for( int i = 0; i < 6; ++i )
 	{
 		m_zoomingComboBox->insertItem( QString::number( 25 *
@@ -440,6 +390,26 @@ pianoRoll::pianoRoll( void ) :
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
+
+
+	tb_layout->addSpacing( 5 );
+	tb_layout->addWidget( m_playButton );
+	tb_layout->addWidget( m_recordButton );
+	tb_layout->addWidget( m_stopButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_drawButton );
+	tb_layout->addWidget( m_eraseButton );
+	tb_layout->addWidget( m_selectButton );
+	tb_layout->addWidget( m_moveButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_cutButton );
+	tb_layout->addWidget( m_copyButton );
+	tb_layout->addWidget( m_pasteButton );
+	tb_layout->addSpacing( 10 );
+	m_timeLine->addToolButtons( m_toolBar );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_zoomingComboBox );
+	tb_layout->addStretch();
 
 	// setup our actual window
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
@@ -453,15 +423,6 @@ pianoRoll::pianoRoll( void ) :
 
 	hide();
 
-	// add time-line
-	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 48, m_ppt,
-					songEditor::inst()->getPlayPos(
-						songEditor::PLAY_PATTERN ),
-						m_currentPosition, this );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
-		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
-			this, SLOT( updatePosition( const midiTime & ) ) );
 }
 
 
@@ -785,7 +746,7 @@ void pianoRoll::paintEvent( QPaintEvent * )
 
 
 	// draw artwork-stuff
-	p.drawPixmap( 0, 0, *s_artwork1 );
+/*	p.drawPixmap( 0, 0, *s_artwork1 );
 
 	int artwork_x = s_artwork1->width();
 
@@ -793,10 +754,11 @@ void pianoRoll::paintEvent( QPaintEvent * )
 	{
 		p.drawPixmap( artwork_x, 0, *s_artwork2 );
 		artwork_x += s_artwork2->width();
-	}
+	}*/
 
 
-	// set clipping area, because we may not draw on keyboard...
+	// set clipping area, because we are not allowed to paint over
+	// keyboard...
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width()-WHITE_KEY_WIDTH,
 				height()-PR_TOP_MARGIN-PR_BOTTOM_MARGIN );
 
@@ -1027,6 +989,7 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 
 	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
 					).m_timeLine->setFixedWidth( width() );
+	m_toolBar->setFixedWidth( width() );
 }
 
 
@@ -1977,26 +1940,24 @@ void pianoRoll::play( void )
 		{
 			songEditor::inst()->stop();
 			songEditor::inst()->playPattern( m_pattern );
-			m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+			m_playButton->setPixmap( embed::getIconPixmap(
+								"pause" ) );
 		}
 		else
 		{
 			songEditor::inst()->pause();
-			m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "play" ) );
+			m_playButton->setPixmap( embed::getIconPixmap(
+								"play" ) );
 		}
 	}
 	else if( songEditor::inst()->paused() )
 	{
 		songEditor::inst()->resumeFromPause();
-		m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
 		songEditor::inst()->playPattern( m_pattern );
 	}
 }
@@ -2025,7 +1986,7 @@ void pianoRoll::record( void )
 void pianoRoll::stop( void )
 {
 	songEditor::inst()->stop();
-	m_playButton->setInactiveGraphic( embed::getIconPixmap( "play" ) );
+	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 	m_recording = FALSE;
 	m_scrollBack = TRUE;
@@ -2071,53 +2032,44 @@ void pianoRoll::verScrolled( int _new_pos )
 
 
 
-void pianoRoll::drawButtonToggled( bool _on )
+void pianoRoll::drawButtonToggled( void )
 {
-	if( _on )
-	{
-		m_editMode = DRAW;
-		removeSelection();
-		update();
-	}
-}
-
-
-
-void pianoRoll::eraseButtonToggled( bool _on )
-{
-	if( _on )
-	{
-		m_editMode = ERASE;
-		removeSelection();
-		update();
-	}
+	m_editMode = DRAW;
+	removeSelection();
+	update();
 }
 
 
 
 
-void pianoRoll::selectButtonToggled( bool _on )
+void pianoRoll::eraseButtonToggled( void )
 {
-	if( _on )
-	{
-		m_editMode = SELECT;
-		removeSelection();
-		update();
-	}
+	m_editMode = ERASE;
+	removeSelection();
+	update();
 }
 
 
 
-void pianoRoll::moveButtonToggled( bool _on )
+
+void pianoRoll::selectButtonToggled( void )
 {
-	if( _on )
-	{
-		m_editMode = MOVE;
-		m_selNotesForMove.clear();
-		getSelectedNotes( m_selNotesForMove );
-		update();
-	}
+	m_editMode = SELECT;
+	removeSelection();
+	update();
 }
+
+
+
+
+void pianoRoll::moveButtonToggled( void )
+{
+	m_editMode = MOVE;
+	m_selNotesForMove.clear();
+	getSelectedNotes( m_selNotesForMove );
+	update();
+}
+
 
 
 

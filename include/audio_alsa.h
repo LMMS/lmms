@@ -48,7 +48,7 @@ class lcdSpinBox;
 class QLineEdit;
 
 
-class audioALSA : public audioDevice
+class audioALSA : public audioDevice, public QThread
 {
 public:
 	audioALSA( Uint32 _sample_rate, bool & _success_ful );
@@ -79,9 +79,9 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
-						Uint32 _frames,
-						float _master_gain );
+	virtual void startProcessing( void );
+	virtual void stopProcessing( void );
+	virtual void run( void );
 
 	int FASTCALL setHWParams( Uint32 _sample_rate, Uint32 _channels,
 						snd_pcm_access_t _access );
@@ -98,6 +98,7 @@ private:
 	snd_pcm_sw_params_t * m_swParams;
 
 	bool m_littleEndian;
+	volatile bool m_quit;
 
 } ;
 

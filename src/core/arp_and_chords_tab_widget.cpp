@@ -39,6 +39,7 @@
 #include <qdom.h>
 #include <qlabel.h>
 #include <qcombobox.h>
+#include <qwhatsthis.h>
 
 #define setChecked setOn
 

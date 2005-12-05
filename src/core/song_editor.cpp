@@ -44,11 +44,12 @@
 #include <QStatusBar>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QToolButton>
 #include <QStatusBar>
 #include <QAction>
 #include <QToolBar>
 #include <QComboBox>
+#include <QLayout>
+#include <QToolButton>
 
 #else
 
@@ -60,9 +61,10 @@
 #include <qdom.h>
 #include <qslider.h>
 #include <qlabel.h>
-#include <qtoolbutton.h>
 #include <qstatusbar.h>
 #include <qcombobox.h>
+#include <qlayout.h>
+#include <qtoolbutton.h>
 
 #endif
 
@@ -87,13 +89,13 @@
 #include "midi_file.h"
 #include "lcd_spinbox.h"
 #include "tooltip.h"
+#include "tool_button.h"
 
 #include "debug.h"
 
 
 
 extern QString file_to_load;
-extern QString file_to_render;
 
 
 const int SCROLLBAR_SIZE = 16;
@@ -114,7 +116,6 @@ songEditor::songEditor() :
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE ),
 	m_scrollBack( FALSE ),
-	m_epd( NULL ),
 	m_shiftPressed( FALSE ),
 	m_controlPressed( FALSE )
 {
@@ -147,7 +148,7 @@ songEditor::songEditor() :
 
 	// create time-line
 	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
-					DEFAULT_SETTINGS_WIDGET_WIDTH, 0,
+					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
 					pixelsPerTact(), m_playPos[PLAY_SONG],
 					m_currentPosition, cw );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
@@ -156,75 +157,41 @@ songEditor::songEditor() :
 	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
+	// create toolbar
+	m_toolBar = new QWidget( cw );
+	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->move( 0, 0 );
+	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
+							"toolbar_bg" ) );
+
+	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+
+
 #ifdef QT4
 	containerWidget()->setParent( cw );
 #else
 	containerWidget()->reparent( cw, 0, QPoint( 0, 0 ) );
 #endif
-	containerWidget()->move( 0, tl->height() );
+	containerWidget()->move( 0, m_toolBar->height() + tl->height() );
 
 
-	QToolBar * song_control = new QToolBar( tr( "Song control" ), this );
-#ifdef QT4
-	addToolBar( Qt::TopToolBarArea, song_control );
-#else
-	addDockWindow( song_control, tr( "Song control" ), Qt::DockTop,
-			FALSE );
-#endif
-/*	song_control->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-	song_control->setErasePixmap( embed::getIconPixmap( "toolbar_bg" ) );*/
-
-#ifdef QT4
-	QAction * a;
-
-	a = song_control->addAction( embed::getIconPixmap( "play" ),
-						tr( "Play song (Space)" ),
-						this, SLOT( play() ) );
-	a->setToolTip( tr( "Play/pause song (Space)" ) );
-	a->setWhatsThis( tr( "Click here, if you want to play your whole song. "
-				"Playing will be started at the song-position-"
-				"marker (green). You can also move it while "
-				"playing." ) );
-#else
-	m_playButton = new QToolButton( embed::getIconPixmap( "play" ),
-					tr( "Play song (Space)" ),
-					QString::null, this, SLOT( play() ),
-					song_control );
-#endif
-#ifdef QT4
-	a = song_control->addAction( embed::getIconPixmap( "stop" ),
-						tr( "Stop song (Space)" ),
-						this, SLOT( stop() ) );
-	a->setToolTip( tr( "Stop song (Space)" ) );
-	a->setWhatsThis( tr( "Click here, if you want to stop playing of your "
-				"song. The song-position-marker will be set to "
-				"the start of your song." ) );
-#else
-	m_stopButton = new QToolButton( embed::getIconPixmap( "stop" ),
-					tr( "Stop song (Space)" ),
-					QString::null, this, SLOT( stop() ),
-					song_control );
-#endif
-
-
-	song_control->addSeparator();
+	QToolBar * main_tb = lmmsMainWin::inst()->mainToolBar();
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 10, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
 
 
-	QLabel * bpm_label = new QLabel( song_control );
+	QLabel * bpm_label = new QLabel( main_tb );
 	bpm_label->setPixmap( embed::getIconPixmap( "clock" ) );
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 8, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 8, 1 );
 
 
-	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, song_control );
+	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, main_tb );
 #ifdef QT4
-	song_control->addWidget( m_bpmSpinBox );
-	song_control->addWidget( bpm_label );
+	main_tb->addWidget( m_bpmSpinBox );
+	main_tb->addWidget( bpm_label );
 #endif
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
@@ -244,26 +211,26 @@ songEditor::songEditor() :
 			"should be played within four minutes)." ) );
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 10, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
 
 
-	song_control->addSeparator();
+	main_tb->addSeparator();
 
 
-	QLabel * master_vol_lbl = new QLabel( song_control );
+	QLabel * master_vol_lbl = new QLabel( main_tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
 #ifdef QT4
-	m_masterVolumeSlider = new QSlider( Qt::Vertical, song_control );
+	m_masterVolumeSlider = new QSlider( Qt::Vertical, main_tb );
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 10 );
 	m_masterVolumeSlider->setValue( 100 );
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-	song_control->addWidget( master_vol_lbl );
-	song_control->addWidget( m_masterVolumeSlider );
+	main_tb->addWidget( master_vol_lbl );
+	main_tb->addWidget( m_masterVolumeSlider );
 #else
 	m_masterVolumeSlider = new QSlider( 0, 200, 10, 100, Qt::Vertical,
-								song_control );
+								main_tb );
 	m_masterVolumeSlider->setTickPosition( QSlider::Left );
 #endif
 	m_masterVolumeSlider->setFixedSize( 26, 48 );
@@ -281,22 +248,22 @@ songEditor::songEditor() :
 
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 10, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
 
-	QLabel * master_pitch_lbl = new QLabel( song_control );
+	QLabel * master_pitch_lbl = new QLabel( main_tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
 #ifdef QT4
-	m_masterPitchSlider = new QSlider( Qt::Vertical, song_control );
+	m_masterPitchSlider = new QSlider( Qt::Vertical, main_tb );
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setValue( 0 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-	song_control->addWidget( master_pitch_lbl );
-	song_control->addWidget( m_masterPitchSlider );
+	main_tb->addWidget( master_pitch_lbl );
+	main_tb->addWidget( m_masterPitchSlider );
 #else
 	m_masterPitchSlider = new QSlider( -12, 12, 1, 0, Qt::Vertical,
-						song_control );
+						main_tb);
 	m_masterPitchSlider->setTickPosition( QSlider::Left );
 #endif
 	m_masterPitchSlider->setFixedSize( 26, 48 );
@@ -312,28 +279,117 @@ songEditor::songEditor() :
 			SLOT( masterPitchReleased() ) );
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 5, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
 
-	song_control->addSeparator();
+	main_tb->addSeparator();
 
 	// spacer-item
-	( new QWidget( song_control ) )->setFixedSize( 5, 1 );
+	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
 
 	m_masterOutputGraph = new visualizationWidget( embed::getIconPixmap(
-					"output_graph" ), song_control ); 
+					"output_graph" ), main_tb ); 
 #ifdef QT4
-	song_control->addWidget( m_masterOutputGraph );
+	main_tb->addWidget( m_masterOutputGraph );
 #endif
-	// live high-quality mode switching is somewhat experimental so we don't
-	// offer it...
-/*	QToolButton * hq = new QToolButton(
-					embed::getIconPixmap( "presetfile" ),
+	// spacer-item
+	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
+
+	main_tb->addSeparator();
+
+	QToolButton * hq = new QToolButton(
+					embed::getIconPixmap( "hq_mode" ),
 					tr( "High quality mode" ),
 					QString::null, NULL, NULL,
-					song_control );
+					main_tb );
 	hq->setToggleButton( TRUE );
 	connect( hq, SIGNAL( toggled( bool ) ), mixer::inst(),
-					SLOT( setHighQuality( bool ) ) );*/
+					SLOT( setHighQuality( bool ) ) );
+
+
+
+	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+					tr( "Play song (Space)" ),
+					this, SLOT( play() ), m_toolBar );
+
+	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+					tr( "Stop song (Space)" ),
+					this, SLOT( stop() ), m_toolBar );
+
+	m_addBBTrackButton = new toolButton( embed::getIconPixmap(
+						"add_bb_track" ),
+						tr( "Add beat/bassline" ),
+						this, SLOT( addBBTrack() ),
+						m_toolBar );
+
+	m_addSampleTrackButton = new toolButton( embed::getIconPixmap(
+					"add_sample_track" ),
+					tr( "Add sample-track" ),
+					this, SLOT( addSampleTrack() ),
+					m_toolBar );
+
+	m_insertBarButton = new toolButton( embed::getIconPixmap(
+						"insert_bar" ),
+						tr( "Insert bar "
+							"(Shift+Insert)" ),
+						this, SLOT( insertBar() ),
+						m_toolBar );
+
+	m_removeBarButton = new toolButton( embed::getIconPixmap(
+						"remove_bar" ),
+					tr( "Remove bar (Shift+Delete)" ),
+						this, SLOT( removeBar() ),
+						m_toolBar );
+#ifdef QT4
+#else
+	QWhatsThis::add( m_playButton, tr( "Click here, if you want to play "
+						"your whole song. Playing will "
+						"be started at the "
+						"song-position-marker (green). "
+						"You can also move it while "
+						"playing." ) );
+	QWhatsThis::add( m_stopButton, tr ( "Click here, if you want to stop "
+						"playing of your song. The "
+						"song-position-marker will be "
+						"set to the start of your song."
+			) );
+	QWhatsThis::add( m_insertBarButton, tr( "If you click here, a "
+							"bar will "
+							"be inserted at the "
+							"current bar." ) );
+	QWhatsThis::add( m_removeBarButton, tr( "If you click here, the "
+							"current bar will be "
+							"removed." ) );
+#endif
+
+
+	// setup zooming-stuff
+	m_zoomingComboBox = new QComboBox( m_toolBar );
+	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
+	for( int i = 0; i < 7; ++i )
+	{
+		m_zoomingComboBox->insertItem( QString::number( 25 *
+					static_cast<int>( powf( 2.0f, i ) ) ) +
+									"%" );
+	}
+	m_zoomingComboBox->setCurrentText( "100%" );
+	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
+			this, SLOT( zoomingChanged( const QString & ) ) );
+
+
+	tb_layout->addSpacing( 5 );
+	tb_layout->addWidget( m_playButton );
+	tb_layout->addWidget( m_stopButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_addBBTrackButton );
+	tb_layout->addWidget( m_addSampleTrackButton );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_insertBarButton );
+	tb_layout->addWidget( m_removeBarButton );
+	tb_layout->addSpacing( 10 );
+	tl->addToolButtons( m_toolBar );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_zoomingComboBox );
+	tb_layout->addStretch();
 
 
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, cw );
@@ -348,112 +404,6 @@ songEditor::songEditor() :
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
 			SLOT( scrolled( int ) ) );
 
-
-	QToolBar * edit_tb = new QToolBar( tr( "Edit" ), this );
-#ifdef QT4
-	addToolBar( Qt::TopToolBarArea, edit_tb );
-#else
-	addDockWindow( edit_tb, tr( "Edit" ), Qt::DockTop, FALSE );
-#endif
-/*	edit_tb->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-	edit_tb->setErasePixmap( embed::getIconPixmap( "toolbar_bg" ) );*/
-#ifdef QT4
-	a = edit_tb->addAction( embed::getIconPixmap( "add_bb_track" ), "",
-						this, SLOT( addBBTrack() ) );
-	a->setToolTip( tr( "Add beat/bassline" ) );
-#else
-	m_addBBTrackButton = new QToolButton( embed::getIconPixmap(
-						"add_bb_track" ), "", "",
-						this, SLOT( addBBTrack() ),
-						edit_tb );
-#endif
-#ifdef QT4
-	a = edit_tb->addAction( embed::getIconPixmap( "add_sample_track" ), "",
-				this, SLOT( addSampleTrack() ) );
-	a->setToolTip( tr( "Add sample-track" ) );
-#else
-	m_addSampleTrackButton = new QToolButton( embed::getIconPixmap(
-					"add_sample_track" ), "", "",
-					this, SLOT( addSampleTrack() ),
-					edit_tb );
-
-#endif
-
-	edit_tb->addSeparator();
-
-#ifdef QT4
-	a = edit_tb->addAction( embed::getIconPixmap( "se_insert_tact" ), "",
-						this, SLOT( insertTact() ) );
-	a->setToolTip( tr( "Insert bar at current tact (Shift+Insert)" ) );
-	a->setWhatsThis( tr( "If you click here, a tact will be inserted at "
-				"the current tact." ) );
-#else
-	m_insertTactButton = new QToolButton( embed::getIconPixmap(
-						"se_insert_tact" ), "", "",
-						this, SLOT( insertTact() ),
-						edit_tb );
-#endif
-#ifdef QT4
-	a = edit_tb->addAction( embed::getIconPixmap( "se_remove_tact" ), "",
-						this, SLOT( removeTact() ) );
-	a->setToolTip( tr( "Remove bar at current tact (Shift+Delete)" ) );
-	a->setWhatsThis( tr( "If you click here, the tact at the current tact "
-							"will be removed." ) );
-#else
-	m_removeTactButton = new QToolButton( embed::getIconPixmap(
-						"se_remove_tact" ), "", "",
-						this, SLOT( removeTact() ),
-						edit_tb );
-#endif
-
-	// add tooltips and whats-this-texts to all buttons
-
-	toolTip::add( m_playButton, tr( "Play/pause song (Space)" ) );
-	toolTip::add( m_stopButton, tr( "Stop playing song (Space)" ) );
-	toolTip::add( m_addBBTrackButton, tr( "Add beat/bassline" ) );
-	toolTip::add( m_addSampleTrackButton, tr( "Add sample-track" ) );
-	toolTip::add( m_insertTactButton, tr( "Insert tact at current tact "
-						"(Shift+Insert)" ) );
-	toolTip::add( m_removeTactButton, tr( "Remove tact at current tact "
-						"(Shift+Delete)" ) );
-#ifdef QT4
-#else
-	QWhatsThis::add( m_playButton, tr( "Click here, if you want to play "
-						"your whole song. Playing will "
-						"be started at the "
-						"song-position-marker (green). "
-						"You can also move it while "
-						"playing." ) );
-	QWhatsThis::add( m_stopButton, tr ( "Click here, if you want to stop "
-						"playing of your song. The "
-						"song-position-marker will be "
-						"set to the start of your song."
-			) );
-	QWhatsThis::add( m_insertTactButton, tr( "If you click here, a "
-							"tact will "
-							"be inserted at the "
-							"current tact." ) );
-	QWhatsThis::add( m_removeTactButton, tr( "If you click here, the "
-							"tact at the "
-							"current tact will be "
-							"removed." ) );
-#endif
-
-	edit_tb->addSeparator();
-
-	// setup zooming-stuff
-	m_zoomingComboBox = new QComboBox( edit_tb );
-	m_zoomingComboBox->setGeometry( 580, 10, 60, 20 );
-	for( int i = 0; i < 7; ++i )
-	{
-		m_zoomingComboBox->insertItem( QString::number( 25 *
-					static_cast<int>( powf( 2.0f, i ) ) ) +
-									"%" );
-	}
-	m_zoomingComboBox->setCurrentText( "100%" );
-	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingChanged( const QString & ) ) );
 
 
 	show();
@@ -524,6 +474,7 @@ void songEditor::resizeEvent( QResizeEvent * _re )
 
 		m_playPos[PLAY_SONG].m_timeLine->setFixedWidth(
 						centralWidget()->width() );
+		m_toolBar->setFixedWidth( centralWidget()->width() );
 	}
 	trackContainer::resizeEvent( _re );
 }
@@ -553,12 +504,12 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	if( _ke->modifiers() & Qt::ShiftModifier &&
 		_ke->key() == Qt::Key_Insert )
 	{
-		insertTact();
+		insertBar();
 	}
 	else if( _ke->modifiers() & Qt::ShiftModifier &&
 		_ke->key() == Qt::Key_Delete )
 	{
-		removeTact();
+		removeBar();
 	}
 	else if( _ke->key() == Qt::Key_Left )
 	{
@@ -655,7 +606,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 
 void songEditor::masterVolumeChanged( int _new_val )
 {
-	mixer::inst()->setMasterOutput( 2.0f - _new_val / 100.0f );
+	mixer::inst()->setMasterGain( 2.0f - _new_val / 100.0f );
 	setModified();
 }
 
@@ -718,14 +669,6 @@ void songEditor::masterPitchMoved( int _new_val )
 void songEditor::masterPitchReleased( void )
 {
 	lmmsMainWin::inst()->statusBar()->clearMessage();
-}
-
-
-
-
-void songEditor::toggleHQMode( void )
-{
-	//mixer::inst()->setHighQuality (hq_btn->isChecked());
 }
 
 
@@ -953,7 +896,9 @@ void songEditor::processNextBuffer( void )
 
 	// check for looping-mode and act if neccessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
-	if( tl != NULL && m_exporting == FALSE && tl->loopPointsEnabled() )
+	if( tl != NULL && m_exporting == FALSE && tl->loopPointsEnabled() &&
+		!( m_playMode == PLAY_PATTERN &&
+		  		m_patternToPlay->freezing() == TRUE ) )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
@@ -1055,33 +1000,6 @@ void songEditor::processNextBuffer( void )
 		m_exporting == FALSE )
 	{
 		m_playPos[m_playMode].m_timeLine->updatePosition(); 
-	}
-
-	if( m_exporting == TRUE )
-	{
-		tact tacts = lengthInTacts() + 1;
-		if( m_playPos[PLAY_SONG].getTact() >= tacts )
-		{
-			// now pause the mixer - method
-			// exportProjectDialog::redrawProgressBar() which is
-			// called every 100 ms will find out that export
-			// is done and will act according to this
-			mixer::inst()->pause();
-		}
-		else
-		{
-			m_epd->updateProgressBar(
-					( m_playPos[PLAY_SONG].getTact() * 64 +
-					m_playPos[PLAY_SONG].getTact64th() ) * 
-						100 / ( tacts * 64 ) );
-		}
-	}
-
-	if( m_playMode == PLAY_PATTERN && m_loopPattern == FALSE &&
-		m_patternToPlay->isFreezing() == TRUE &&
-		m_playPos[PLAY_PATTERN] > m_patternToPlay->length() )
-	{
-		m_patternToPlay->finishFreeze();
 	}
 }
 
@@ -1263,12 +1181,6 @@ void songEditor::stopExport( void )
 {
 	stop();
 	m_exporting = FALSE;
-
-	// if we rendered file from cmd-line quit after export
-	if( file_to_render != "" )
-	{
-		qApp->quit();
-	}
 }
 
 
@@ -1276,7 +1188,7 @@ void songEditor::stopExport( void )
 
 
 
-void songEditor::insertTact( void )
+void songEditor::insertBar( void )
 {
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
@@ -1289,7 +1201,7 @@ void songEditor::insertTact( void )
 
 
 
-void songEditor::removeTact( void )
+void songEditor::removeBar( void )
 {
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
@@ -1640,15 +1552,7 @@ void songEditor::exportProject( void )
 
 	if( m_fileName != "" )
 	{
-#ifdef QT4
-		base_filename = QFileInfo( m_fileName ).absolutePath() + "/" +
-					QFileInfo( m_fileName
-							).completeBaseName();
-#else
-		base_filename = QFileInfo( m_fileName ).dirPath() + "/" +
-					QFileInfo( m_fileName ).baseName(
-									TRUE );
-#endif
+		base_filename = baseName( m_fileName );
 	}
 	else
 	{
@@ -1709,12 +1613,9 @@ void songEditor::exportProject( void )
 		{
 			return;
 		}
-
-		m_epd = new exportProjectDialog( export_file_name,
+		exportProjectDialog epd( export_file_name,
 							lmmsMainWin::inst() );
-		m_epd->exec();
-		delete m_epd;
-		m_epd = NULL;
+		epd.exec();
 	}
 }
 

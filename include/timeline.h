@@ -50,6 +50,22 @@ class timeLine : public QWidget
 {
 	Q_OBJECT
 public:
+	enum autoScrollStates
+	{
+		AUTOSCROLL_ENABLED, AUTOSCROLL_DISABLED
+	} ;
+
+	enum loopPointStates
+	{
+		LOOP_POINTS_DISABLED, LOOP_POINTS_ENABLED
+	} ;
+
+	enum behaviourAtStopStates
+	{
+		BACK_TO_ZERO, BACK_TO_START, KEEP_STOP_POSITION
+	} ;
+
+
 	timeLine( int _xoff, int _yoff, float _ppt, songEditor::playPos & _pos,
 				const midiTime & _begin, QWidget * _parent );
 	~timeLine();
@@ -59,15 +75,16 @@ public:
 		return( m_pos );
 	}
 
-	enum behaviourAtStopStates
+	behaviourAtStopStates behaviourAtStop( void ) const
 	{
-		BACK_TO_ZERO, BACK_TO_START, KEEP_STOP_POSITION
-	} ;
+		return( m_behaviourAtStop );
+	}
 
+	bool loopPointsEnabled( void ) const
+	{
+		return( m_loopPoints == LOOP_POINTS_ENABLED );
+	}
 
-	behaviourAtStopStates behaviourAtStop( void ) const;
-
-	bool loopPointsEnabled( void ) const;
 	inline const midiTime & loopBegin( void ) const
 	{
 		return( ( m_loopPos[0] < m_loopPos[1] ) ?
@@ -94,10 +111,14 @@ public:
 		update();
 	}
 
+	void addToolButtons( QWidget * _tool_bar );
+
 
 public slots:
 	void updatePosition( const midiTime & = 0 );
+	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
+	void toggleBehaviourAtStop( int _n );
 
 
 protected:
@@ -114,14 +135,14 @@ private:
 							m_ppt / 64.0f ) );
 	}
 
-
 	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
 	static QPixmap * s_loopPointPixmap;
+	static QPixmap * s_loopPointDisabledPixmap;
 
-	nStateButton * m_autoScroll;
-	nStateButton * m_loopPoints;
-	nStateButton * m_behaviourAtStop;
+	autoScrollStates m_autoScroll;
+	loopPointStates m_loopPoints;
+	behaviourAtStopStates m_behaviourAtStop;
 
 	int m_xOffset;
 	int m_posMarkerX;
@@ -139,17 +160,6 @@ private:
 	} m_action;
 
 	int m_moveXOff;
-
-
-	enum autoScrollStates
-	{
-		AUTOSCROLL_ENABLED, AUTOSCROLL_DISABLED
-	} ;
-
-	enum loopPointStates
-	{
-		LOOP_POINTS_DISABLED, LOOP_POINTS_ENABLED
-	} ;
 
 
 signals:

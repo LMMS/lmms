@@ -35,10 +35,6 @@
 #include "midi_port.h"
 #include "note.h"
 
-/*#include "midi_alsa_raw.h"
-#include "midi_alsa_seq.h"
-#include "midi_oss.h"
-#include "midi_dummy.h"*/
 
 
 
@@ -98,7 +94,7 @@ void midiClient::removePort( midiPort * _port )
 
 
 
-midiRawClient::midiRawClient() :
+midiClientRaw::midiClientRaw() :
 	midiClient()
 {
 }
@@ -106,14 +102,14 @@ midiRawClient::midiRawClient() :
 
 
 
-midiRawClient::~midiRawClient()
+midiClientRaw::~midiClientRaw()
 {
 }
 
 
 
 
-void midiRawClient::parseData( const Uint8 _c )
+void midiClientRaw::parseData( const Uint8 _c )
 {
 	/*********************************************************************/
 	/* 'Process' system real-time messages                               */
@@ -248,7 +244,7 @@ void midiRawClient::parseData( const Uint8 _c )
 
 
 
-void midiRawClient::processParsedEvent()
+void midiClientRaw::processParsedEvent()
 {
 	for( csize i = 0; i < m_midiPorts.size(); ++i )
 	{
@@ -260,7 +256,7 @@ void midiRawClient::processParsedEvent()
 
 
 
-void midiRawClient::processOutEvent( const midiEvent & _me,
+void midiClientRaw::processOutEvent( const midiEvent & _me,
 							const midiTime & ,
 							const midiPort * _port )
 {
@@ -293,7 +289,7 @@ void midiRawClient::processOutEvent( const midiEvent & _me,
 			break;
 
 		default:
-			printf( "midiRawClient: unhandled MIDI-event %d\n",
+			printf( "midiClientRaw: unhandled MIDI-event %d\n",
 							(int) _me.m_type );
 			break;
 	}
@@ -331,7 +327,7 @@ const Uint8 REMAINS_80E0[] =
 
 // Returns the length of the MIDI message starting with _event.
 // Taken from Nagano Daisuke's USB-MIDI driver
-Uint8 midiRawClient::eventLength( const Uint8 _event )
+Uint8 midiClientRaw::eventLength( const Uint8 _event )
 {
 	if ( _event < 0xF0 )
 	{

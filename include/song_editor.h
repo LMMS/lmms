@@ -40,7 +40,6 @@
 #endif
 
 
-#include "lmms_main_win.h"
 #include "track_container.h"
 #include "types.h"
 
@@ -48,18 +47,16 @@
 class QComboBox;
 class QLabel;
 class QPixmap;
-class QPushButton;
 class QScrollBar;
 class QSlider;
-class QToolButton;
 
-class exportProjectDialog;
 class lcdSpinBox;
+class lmmsMainWin;
 class pattern;
 class projectNotes;
 class timeLine;
+class toolButton;
 class visualizationWidget;
-
 
 
 const int MIN_BPM = 10;
@@ -142,18 +139,19 @@ public:
 		return( m_exporting == TRUE &&
 			m_playPos[PLAY_SONG].getTact() >= lengthInTacts() + 1 );
 	}
-	inline void setExportProjectDialog( exportProjectDialog * _epd )
-	{
-		m_epd = _epd;
-	}
+
 	inline playModes playMode( void ) const
 	{
 		return( m_playMode );
 	}
+
 	inline playPos & getPlayPos( playModes _pm )
 	{
 		return( m_playPos[_pm] );
 	}
+
+	tact lengthInTacts( void ) const;
+
 
 	int getBPM( void );
 
@@ -228,8 +226,8 @@ protected:
 
 
 protected slots:
-	void insertTact( void );
-	void removeTact( void );
+	void insertBar( void );
+	void removeBar( void );
 	void addBBTrack( void );
 	void addSampleTrack( void );
 	void scrolled( int _new_pos );
@@ -243,7 +241,6 @@ protected slots:
 	void masterPitchPressed( void );
 	void masterPitchMoved( int _new_val );
 	void masterPitchReleased( void );
-	void toggleHQMode( void );
 
 	void updatePosition( const midiTime & _t );
 
@@ -264,7 +261,6 @@ private:
 	}
 
 	midiTime length( void ) const;
-	tact lengthInTacts( void ) const;
 	inline tact64th currentTact64th( void ) const
 	{
 		return( m_playPos[m_playMode].getTact64th() );
@@ -278,8 +274,10 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 
-	QToolButton * m_playButton;
-	QToolButton * m_stopButton;
+	QWidget * m_toolBar;
+
+	toolButton * m_playButton;
+	toolButton * m_stopButton;
 	lcdSpinBox * m_bpmSpinBox;
 
 	QSlider * m_masterVolumeSlider;
@@ -288,11 +286,10 @@ private:
 	visualizationWidget * m_masterOutputGraph;
 
 
-	QToolButton * m_addChannelTrackButton;
-	QToolButton * m_addBBTrackButton;
-	QToolButton * m_addSampleTrackButton;
-	QToolButton * m_insertTactButton;
-	QToolButton * m_removeTactButton;
+	toolButton * m_addBBTrackButton;
+	toolButton * m_addSampleTrackButton;
+	toolButton * m_insertBarButton;
+	toolButton * m_removeBarButton;
 
 	QComboBox * m_zoomingComboBox;
 
@@ -314,8 +311,6 @@ private:
 
 	bool m_scrollBack;
 
-	exportProjectDialog * m_epd;
-
 
 	projectNotes * m_projectNotes;
 
@@ -336,7 +331,7 @@ private:
 
 
 
-	friend lmmsMainWin::~lmmsMainWin();
+	friend class lmmsMainWin;
 
 
 

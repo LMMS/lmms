@@ -52,6 +52,14 @@ typedef int csize;
 #define vvector QVector
 #define vlist QList 
 
+#include <QFileInfo>
+
+inline QString baseName( const QString & _file )
+{
+	return( QFileInfo( _file ).absolutePath() + "/" +
+			QFileInfo( _file ).completeBaseName() );
+}
+
 
 #else
 
@@ -73,7 +81,6 @@ typedef int csize;
 
 // QMenu/QPopupMenu
 #define addAction insertItem
-//#define addSeparator insertSeparator
 
 
 // QFile/QIODevice
@@ -115,15 +122,8 @@ typedef int csize;
 #define setTextVisible setPercentageVisible
 
 
-// QFileInfo
-//#define completeSuffix extension
-//#define suffix() extension( FALSE )
-
-
 // QComboBox
 #define addItem insertItem
-//#define currentIndex currentItem
-//#define setCurrentIndex setCurrentItem
 
 
 // QString
@@ -148,7 +148,6 @@ typedef int csize;
 #define NoFilter DefaultFilter
 #define homePath homeDirPath
 #define rootPath rootDirPath
-//#define absolutePath absPath
 
 
 // QToolButton
@@ -177,6 +176,17 @@ typedef unsigned int csize;
 #define wasCanceled wasCancelled
 
 #endif
+
+#include <qfileinfo.h>
+
+
+inline QString baseName( const QString & _file )
+{
+	return( QFileInfo( _file ).dirPath() + "/" +
+			QFileInfo( _file ).baseName( TRUE ) );
+}
+
+
 
 #if QT_VERSION < 0x030100
 

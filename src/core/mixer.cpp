@@ -57,21 +57,12 @@ mixer * mixer::s_instanceOfMe = NULL;
 
 
 mixer::mixer() :
-#ifndef QT4
 	QObject(),
-#endif
-	QThread(),
-/*	m_silence(),
-#ifndef DISABLE_SURROUND
-	m_surroundSilence(),
-#endif*/
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
 	m_curBuf( NULL ),
 	m_nextBuf( NULL ),
-	m_discardCurBuf( FALSE ),
 	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
-	m_masterOutput( 1.0f ),
-	m_quit( FALSE ),
+	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL )
 {
@@ -101,29 +92,11 @@ mixer::mixer() :
 	m_midiClient = tryMIDIClients();
 
 
-/*	m_silence = bufferAllocator::alloc<sampleFrame>(
-						m_framesPerAudioBuffer );
-#ifndef DISABLE_SURROUND
-	m_surroundSilence = bufferAllocator::alloc<surroundSampleFrame>(
-						m_framesPerAudioBuffer );
-#endif
-	for( Uint32 frame = 0; frame < m_framesPerAudioBuffer; ++frame )
-	{
-		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			m_silence[frame][chnl] = 0.0f;
-		}
-#ifndef DISABLE_SURROUND
-		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
-		{
-			m_surroundSilence[frame][chnl] = 0.0f;
-		}
-#endif
-	}*/
-
 	// now clear our two output-buffers before using them...
 	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
 	clearAudioBuffer( m_nextBuf, m_framesPerAudioBuffer );
+
+	m_audioDev->startProcessing();
 
 }
 
@@ -137,132 +110,98 @@ mixer::~mixer()
 
 	bufferAllocator::free( m_curBuf );
 	bufferAllocator::free( m_nextBuf );
-
-
-/*	bufferAllocator::free( m_silence );
-#ifndef DISABLE_SURROUND
-	bufferAllocator::free( m_surroundSilence );
-#endif*/
 }
 
 
 
 
-void mixer::quitThread( void )
+void mixer::stopProcessing( void )
 {
-	// make sure there're no mutexes locked anymore...
-	m_safetySyncMutex.unlock();
-	m_devMutex.unlock();
-
-	// now tell mixer-thread to quit
-	m_quit = TRUE;
-
-	wait( 1000 );
-	terminate();
+	m_audioDev->stopProcessing();
 }
 
 
 
 
-void mixer::run( void )
+const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
-
-	while( m_quit == FALSE )
+	// remove all play-handles that have to be deleted and delete
+	// them if they still exist...
+	// maybe this algorithm could be optimized...
+	while( !m_playHandlesToRemove.empty() )
 	{
+		playHandleVector::iterator it = m_playHandles.begin();
 
-		// remove all play-handles that have to be deleted and delete
-		// them if they still exist...
-		// maybe this algorithm could be optimized...
-		while( !m_playHandlesToRemove.empty() )
+		while( it != m_playHandles.end() )
 		{
-			playHandleVector::iterator it = m_playHandles.begin();
-
-			while( it != m_playHandles.end() )
+			if( *it == m_playHandlesToRemove.front() )
 			{
-				if( *it == m_playHandlesToRemove.front() )
-				{
-					m_playHandles.erase( it );
-					delete m_playHandlesToRemove.front();
-					break;
-				}
-				++it;
+				m_playHandles.erase( it );
+				delete m_playHandlesToRemove.front();
+				break;
 			}
-
-			m_playHandlesToRemove.erase(
-						m_playHandlesToRemove.begin() );
-
+			++it;
 		}
 
-		// now we have to make sure no other thread does anything bad
-		// while we're acting...
-		m_safetySyncMutex.lock();
+		m_playHandlesToRemove.erase(
+					m_playHandlesToRemove.begin() );
+	}
 
-		csize idx = 0;
-		while( idx < m_playHandles.size() )
+	// now we have to make sure no other thread does anything bad
+	// while we're acting...
+	m_mixMutex.lock();
+
+	// now swap the buffers... current buffer becomes next (last)
+	// buffer and the next buffer becomes current (first) buffer
+	qSwap( m_curBuf, m_nextBuf );
+
+	// clear last audio-buffer
+	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
+
+
+	csize idx = 0;
+	while( idx < m_playHandles.size() )
+	{
+		register playHandle * n = m_playHandles[idx];
+		if( n->done() )
 		{
-			register playHandle * n = m_playHandles[idx];
-			if( n->done() )
-			{
-				// delete all play-handles which have
-				// played completely now
-				delete n;
-				m_playHandles.erase( m_playHandles.begin() +
-									idx );
-			}
-			else
-			{
-				// play all uncompletely-played play-handles...
-				n->play();
-				++idx;
-			}
-		}
-
-		songEditor::inst()->processNextBuffer();
-
-		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
-						it != m_audioPorts.end(); ++it )
-		{
-			if( ( *it )->m_bufferUsage != audioPort::NONE )
-			{
-				processBuffer( ( *it )->firstBuffer(),
-						( *it )->nextFxChannel() );
-				( *it )->nextPeriod();
-			}
-		}
-
-		if( !m_discardCurBuf )
-		{
-			m_devMutex.lock();
-			// write actual data to our current output-device
-			// (blocking!)
-			m_audioDev->writeBuffer( m_curBuf,
-							m_framesPerAudioBuffer,
-						SAMPLE_RATES[m_qualityLevel],
-							m_masterOutput );
-			m_devMutex.unlock();
+			// delete all play-handles which have
+			// played completely now
+			delete n;
+			m_playHandles.erase( m_playHandles.begin() +
+								idx );
 		}
 		else
 		{
-			m_discardCurBuf = FALSE;
+			// play all uncompletely-played play-handles...
+			n->play();
+			++idx;
 		}
-
-		emit nextAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
-		usleep( 1 );		// give time to other threads/processes
-
-		m_safetySyncMutex.unlock();
-
-
-		// clear last audio-buffer
-		clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
-
-		// now swap the buffers... current buffer becomes next (last)
-		// buffer and the next buffer becomes current (first) buffer
-		qSwap( m_curBuf, m_nextBuf );
-
-		// and trigger LFOs
-		envelopeAndLFOWidget::triggerLFO();
 	}
 
+	songEditor::inst()->processNextBuffer();
+
+	for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
+					it != m_audioPorts.end(); ++it )
+	{
+		if( ( *it )->m_bufferUsage != audioPort::NONE )
+		{
+			processBuffer( ( *it )->firstBuffer(),
+					( *it )->nextFxChannel() );
+			( *it )->nextPeriod();
+		}
+	}
+
+
+	emit nextAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
+
+	m_mixMutex.unlock();
+
+
+	// and trigger LFOs
+	envelopeAndLFOWidget::triggerLFO();
+
+	return( m_curBuf );
 }
 
 
@@ -286,21 +225,6 @@ void mixer::clear( void )
 void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
 {
 	memset( _ab, 0, sizeof( *_ab ) * _frames );
-/*	if( _frames == m_framesPerAudioBuffer )
-	{
-		memcpy( _ab, m_silence, m_framesPerAudioBuffer *
-							BYTES_PER_FRAME );
-	}
-	else
-	{
-		for( Uint32 frame = 0; frame < _frames; ++frame )
-		{
-			for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				_ab[frame][ch] = 0.0f;
-			}
-		}
-	}*/
 }
 
 
@@ -310,21 +234,6 @@ void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 								Uint32 _frames )
 {
 	memset( _ab, 0, sizeof( *_ab ) * _frames );
-/*	if( _frames == m_framesPerAudioBuffer )
-	{
-		memcpy( _ab, m_surroundSilence, m_framesPerAudioBuffer *
-						BYTES_PER_SURROUND_FRAME );
-	}
-	else
-	{
-		for( Uint32 frame = 0; frame < _frames; ++frame )
-		{
-			for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				_ab[frame][ch] = 0.0f;
-			}
-		}
-	}*/
 }
 #endif
 
@@ -377,8 +286,6 @@ void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 
 void mixer::setHighQuality( bool _hq_on )
 {
-	m_safetySyncMutex.lock();
-
 	// delete (= close) our audio-device
 	delete m_audioDev;
 
@@ -393,8 +300,7 @@ void mixer::setHighQuality( bool _hq_on )
 	}
 	// and re-open device
 	m_audioDev = tryAudioDevices();
-
-	m_safetySyncMutex.unlock();
+	m_audioDev->startProcessing();
 
 	emit( sampleRateChanged() );
 
@@ -405,8 +311,7 @@ void mixer::setHighQuality( bool _hq_on )
 
 void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 {
-
-	m_devMutex.lock();
+	m_audioDev->stopProcessing();
 
 	m_oldAudioDev = m_audioDev;
 
@@ -423,9 +328,6 @@ void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 
 	m_qualityLevel = _hq ? 1 : 0;
 	emit sampleRateChanged();
-
-	m_devMutex.unlock();
-
 }
 
 
@@ -433,11 +335,10 @@ void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 
 void mixer::restoreAudioDevice( void )
 {
-	m_devMutex.lock();
-
 	if( m_oldAudioDev != NULL )
 	{
-		delete m_audioDev;
+		delete m_audioDev;	// dtor automatically calls
+					// stopProcessing()
 		m_audioDev = m_oldAudioDev;
 		for( Uint8 qli = 0; qli < QUALITY_LEVELS; ++qli )
 		{
@@ -449,10 +350,8 @@ void mixer::restoreAudioDevice( void )
 			}
 		}
 		m_oldAudioDev = NULL;
-		m_discardCurBuf = TRUE;
+		m_audioDev->startProcessing();
 	}
-
-	m_devMutex.unlock();
 }
 
 
@@ -474,8 +373,6 @@ void mixer::checkValidityOfPlayHandles( void )
 
 audioDevice * mixer::tryAudioDevices( void )
 {
-	//m_discardCurBuf = TRUE;
-
 	bool success_ful = FALSE;
 	audioDevice * dev = NULL;
 	QString dev_name = configManager::inst()->value( "mixer", "audiodev" );

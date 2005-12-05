@@ -44,7 +44,7 @@ class lcdSpinBox;
 class QLineEdit;
 
 
-class audioOSS : public audioDevice
+class audioOSS : public audioDevice, public QThread
 {
 public:
 	audioOSS( Uint32 _sample_rate, bool & _success_ful );
@@ -74,13 +74,14 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
-						Uint32 _frames,
-						float _master_gain );
+	virtual void startProcessing( void );
+	virtual void stopProcessing( void );
+	virtual void run( void );
 
 	int m_audioFD;
 
 	bool m_convertEndian;
+	volatile bool m_quit;
 
 } ;
 

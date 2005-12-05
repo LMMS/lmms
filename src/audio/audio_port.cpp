@@ -35,13 +35,15 @@ audioPort::audioPort( const QString & _name ) :
 	m_secondBuffer( bufferAllocator::alloc<surroundSampleFrame>(
 				mixer::inst()->framesPerAudioBuffer() ) ),
 	m_extOutputEnabled( FALSE ),
-	m_nextFxChannel( -1 )
+	m_nextFxChannel( -1 ),
+	m_name( "unnamed port" )
 {
 	mixer::inst()->clearAudioBuffer( m_firstBuffer,
 					mixer::inst()->framesPerAudioBuffer() );
 	mixer::inst()->clearAudioBuffer( m_secondBuffer,
 					mixer::inst()->framesPerAudioBuffer() );
 	mixer::inst()->addAudioPort( this );
+	setExtOutputEnabled( TRUE );
 }
 
 
@@ -95,6 +97,7 @@ void audioPort::setExtOutputEnabled( bool _enabled )
 
 void audioPort::setName( const QString & _name )
 {
-	mixer::inst()->audioDev()->renamePort( this, _name );
+	m_name = _name;
+	mixer::inst()->audioDev()->renamePort( this );
 }
 

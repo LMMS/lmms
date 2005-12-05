@@ -62,7 +62,7 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
+	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
 							Uint32 _frames,
 							float _master_gain );
 

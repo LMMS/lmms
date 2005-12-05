@@ -1,3 +1,98 @@
+2005-12-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/midi_alsa_raw.h:
+	* include/midi_client.h:
+	* include/midi_dummy.h:
+	* include/midi_oss.h:
+	* src/midi/midi_alsa_raw.cpp:
+	* src/midi/midi_client.cpp:
+	* src/midi/midi_oss.cpp:
+	renamed class midiRawClient to midiClientRaw
+	
+	* include/pattern.h:
+	* src/core/song_editor.cpp:
+	* src/tracks/pattern.cpp:
+	do not hang in endless loop when rendering pattern with enabled
+	looping-points
+
+	* src/core/time_line.cpp:
+	align looping-points on bars
+
+	* include/bb_editor.h:
+	* include/piano_roll.h:
+	* include/song_editor.h:
+	* include/timeline.h:
+	* include/tool_button.h:
+	* src/core/bb_editor.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/timeline.cpp:
+	redesigned toolbars of song-editor, bb-editor and piano-roll - now
+	they're looking really cool and especially time-line-features are much
+	more usable
+
+	* include/song_editor.cpp:
+	* src/core/lmms_main_win.cpp:
+	* src/core/song_editor.cpp:
+	- added main-toolbar at bottom of screen and moved several widgets from
+	  song-editor-toolbar into it
+	- added high-quality-button for switching to 88200/96000 Hz
+
+	* src/widgets/tab_widget.cpp:
+	reversed scroll-wheel-direction for changing tab
+
+2005-12-03	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/main.cpp:
+	- better handling of command-line options
+	- added help switch
+	- fixed bugs concerning rendering from command-line
+
+	* include/audio_alsa.h:
+	* include/audio_device.h:
+	* include/audio_dummy.h:
+	* include/audio_file_device.h:
+	* include/audio_file_ogg.h:
+	* include/audio_file_wave.h
+	* include/audio_jack.h:
+	* include/audio_oss.h:
+	* include/audio_sdl.h:
+	* include/export.h:
+	* include/export_project_dialog.h:
+	* include/mixer.h:
+	* include/pattern.h
+	* include/song_editor.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_file_device.cpp:
+	* src/audio/audio_file_ogg.cpp:
+	* src/audio/audio_file_wave.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_sdl.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/lmms_main_win.cpp:
+	* src/core/main.cpp:
+	* src/core/mixer.cpp:
+	* src/core/song_editor.cpp:
+	* src/track/pattern.cpp:
+	changed architecture of mixer-system from push- to pull-architecture
+	which makes almost all things (song-export, pattern-freezing etc.) much
+	easier and also results in a better performance (especially when using
+	JACK) - additionally LMMS doesn't take 100% CPU anymore
+
+2005-12-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/config_mgr.cpp:
+	do not try to re-run wizard in case of version mismatches
+
+	* configure.in:
+	* plugins/Makefile.am:
+	* presets/Makefile.am:
+	dropped ladspa_sine_1063-plugin as it is only for experimental
+	purposes
+
 2005-11-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* plugins/vestige/vestige.h:

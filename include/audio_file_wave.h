@@ -41,7 +41,7 @@ public:
 			Uint16 _min_bitrate, Uint16 _max_bitrate );
 	virtual ~audioFileWave();
 
-	static audioDevice * getInst( Uint32 _sample_rate, Uint32 _channels,
+	static audioFileDevice * getInst( Uint32 _sample_rate, Uint32 _channels,
 					bool & _success_ful,
 					const QString & _file, bool _use_vbr,
 					Uint16 _nom_bitrate,
@@ -56,7 +56,7 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
+	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
 						Uint32 _frames,
 						float _master_gain );
 
@@ -82,8 +82,6 @@ private:
 		char data_chunk_id[4];		// "data"
 		Uint32 data_bytes;		// total size of sample-data
 	} m_waveFileHeader;
-
-	//outputSampleType * m_outputBuffer;
 
 } ;
 

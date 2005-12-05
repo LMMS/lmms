@@ -38,7 +38,9 @@
 
 audioDevice::audioDevice( Uint32 _sample_rate, Uint8 _channels ) :
 	m_sampleRate( _sample_rate ),
-	m_channels( _channels )
+	m_channels( _channels ),
+	m_buffer( bufferAllocator::alloc<surroundSampleFrame>(
+				mixer::inst()->framesPerAudioBuffer() ) )
 {
 #ifdef HAVE_SAMPLERATE_H
 	int error;
@@ -64,34 +66,46 @@ audioDevice::~audioDevice()
 #ifdef HAVE_SAMPLERATE_H
 	src_delete( m_srcState );
 #endif
+	bufferAllocator::free( m_buffer );
 	unlock();
 }
 
 
 
 
-void audioDevice::writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
-				Uint32 _src_sample_rate, float _master_gain )
+void audioDevice::processNextBuffer( void )
 {
+	const Uint32 frames = getNextBuffer( m_buffer );
+	writeBuffer( m_buffer, frames, mixer::inst()->masterGain() );
+}
+
+
+
+
+Uint32 audioDevice::getNextBuffer( surroundSampleFrame * _ab )
+{
+	Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const surroundSampleFrame * b = mixer::inst()->renderNextBuffer();
+
 	// make sure, no other thread is accessing device
 	lock();
-	// now were save to access the device
-	if( _src_sample_rate != m_sampleRate )
+
+	// now were safe to access the device
+	if( mixer::inst()->sampleRate() != m_sampleRate )
 	{
-		surroundSampleFrame * temp = 
-				bufferAllocator::alloc<surroundSampleFrame>(
-							_frames * channels() );
-		resample( _ab, _frames, temp, _src_sample_rate, m_sampleRate );
-		writeBufferToDev( temp, _frames * m_sampleRate /
-					_src_sample_rate, _master_gain );
-		bufferAllocator::free( temp );
+		resample( b, frames, _ab, mixer::inst()->sampleRate(),
+								m_sampleRate );
+		frames = frames * m_sampleRate / mixer::inst()->sampleRate();
 	}
 	else
 	{
-		writeBufferToDev( _ab, _frames, _master_gain );
+		memcpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
 	}
+
 	// release lock
 	unlock();
+
+	return( frames );
 }
 
 
@@ -111,7 +125,7 @@ void audioDevice::unregisterPort( audioPort * _port )
 
 
 
-void audioDevice::renamePort( audioPort *, const QString & )
+void audioDevice::renamePort( audioPort * )
 {
 }
 
@@ -150,7 +164,8 @@ const float LP_FILTER_COEFFS[LP_FILTER_TAPS] =
 #endif
 
 
-void FASTCALL audioDevice::resample( surroundSampleFrame * _src, Uint32 _frames,
+void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
+						Uint32 _frames,
 						surroundSampleFrame * _dst,
 						Uint32 _src_sr, Uint32 _dst_sr )
 {
@@ -161,7 +176,7 @@ void FASTCALL audioDevice::resample( surroundSampleFrame * _src, Uint32 _frames,
 	}
 	m_srcData.input_frames = _frames;
 	m_srcData.output_frames = _frames;
-	m_srcData.data_in = _src[0];
+	m_srcData.data_in = (float *) _src[0];
 	m_srcData.data_out = _dst[0];
 	m_srcData.src_ratio = (float) _dst_sr / _src_sr;
 
@@ -172,7 +187,7 @@ void FASTCALL audioDevice::resample( surroundSampleFrame * _src, Uint32 _frames,
 							src_strerror( error ) );
 	}
 #else
-	if( _src_sr == 2*SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+	if( _src_sr == 2 * SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 	{
 		// we use a simple N-tap FIR-Filter with
 		// precalculated/-designed LP-Coeffs

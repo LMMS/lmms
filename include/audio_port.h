@@ -80,6 +80,11 @@ public:
 		m_nextFxChannel = _chnl;
 	}
 
+	const QString & name( void ) const
+	{
+		return( m_name );
+	}
+
 	void setName( const QString & _new_name );
 
 	enum bufferUsages
@@ -93,6 +98,8 @@ private:
 	surroundSampleFrame * m_secondBuffer;
 	bool m_extOutputEnabled;
 	fxChnl m_nextFxChannel;
+
+	QString m_name;
 
 } ;
 

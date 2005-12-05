@@ -28,12 +28,6 @@
 
 #ifdef JACK_SUPPORT
 
-#ifdef HAVE_UNISTD_H
-// for usleep
-#include <unistd.h>
-#endif
-
-
 #ifdef QT4
 
 #include <QLineEdit>
@@ -55,6 +49,7 @@
 #include "buffer_allocator.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
+#include "audio_port.h"
 
 
 
@@ -62,10 +57,13 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
+	m_client( NULL ),
+	m_stopped( FALSE ),
+	m_processCallbackMutex(),
+	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
+				mixer::inst()->framesPerAudioBuffer() ) ),
 	m_framesDoneInCurBuf( 0 ),
-	m_frameSync( 0 ),
-	m_jackBufSize( 0 ),
-	m_bufMutex()
+	m_framesToDoInCurBuf( 0 )
 {
 	_success_ful = FALSE;
 
@@ -120,12 +118,6 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 	// set process-callback
 	jack_set_process_callback( m_client, processCallback, this );
 
-	m_jackBufSize = jack_get_buffer_size( m_client );
-
-	// we need to know about buffer-size changes to know how long to block
-	// in writeToDev()-method
-	jack_set_buffer_size_callback( m_client, bufSizeCallback, this );
-
 	// set shutdown-callback
 	jack_on_shutdown( m_client, shutdownCallback, this );
 
@@ -140,7 +132,7 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 
 	for( Uint8 ch = 0; ch < channels(); ++ch )
 	{
-		QString name = QString( "master_out_" ) +
+		QString name = QString( "master out " ) +
 				( ( ch % 2 ) ? "R" : "L" ) +
 				QString::number( ch / 2 + 1 );
 		m_outputPorts.push_back( jack_port_register( m_client,
@@ -212,80 +204,62 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 
 audioJACK::~audioJACK()
 {
+	while( m_portMap.size() )
+	{
+		unregisterPort( m_portMap.begin().key() );
+	}
+
 	if( m_client != NULL )
 	{
 		jack_deactivate( m_client );
 		jack_client_close( m_client );
 	}
 
-	while( m_bufferSets.size() )
-	{
-		while( m_bufferSets.front().size() )
-		{
-			bufferAllocator::free(
-					m_bufferSets.front().front().buf );
-			m_bufferSets.front().erase(
-						m_bufferSets.front().begin() );
-		}
-		m_bufferSets.erase( m_bufferSets.begin() );
-	}
+	bufferAllocator::free( m_outBuf );
+
 }
 
 
 
 
-void audioJACK::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-							float _master_gain )
+void audioJACK::startProcessing( void )
 {
-	if( m_client == NULL )
-	{
-		return;
-	}
-
-	m_bufMutex.lock();
-
-	jack_transport_state_t ts = jack_transport_query( m_client, NULL );
-	if( ts == JackTransportRolling )
-	{
-		vvector<bufset> bufs;
-		for( Uint8 chnl = 0; chnl < channels(); ++chnl )
-		{
-			sampleType * buf = bufferAllocator::alloc<sampleType>(
-								_frames );
-			for( Uint32 frame = 0; frame < _frames; ++frame )
-			{
-				buf[frame] = _ab[frame][chnl] * _master_gain;
-			}
-			bufset b = { buf, _frames } ;
-			bufs.push_back( b );
-		}
-		m_bufferSets.push_back( bufs );
-	}
-
-	m_frameSync += _frames;
-
-	m_bufMutex.unlock();
-
-	// now wait until data has been collected/skipped by processCallback()
-	while( m_frameSync > m_jackBufSize )
-	{
-#ifdef HAVE_UNISTD_H
-#ifdef HAVE_USLEEP
-		// just wait and give cpu-time to other processes
- 		// 	tobydox 20051019: causes LMMS to hang up when locking
-		//			  several other mutexes, so skip it
-		//usleep( 200 );
-
-#endif
-#endif
-	}
+	m_stopped = FALSE;
 }
 
 
 
 
-void audioJACK::registerPort( audioPort * )
+void audioJACK::stopProcessing( void )
 {
+	m_stopped = TRUE;
+}
+
+
+
+
+void audioJACK::registerPort( audioPort * _port )
+{
+	return;
+/*	// make sure, port is not already registered
+	unregisterPort( _port );
+	const QString name[2] = { _port->name() + " L",
+					_port->name() + " R" } ;
+
+	m_processCallbackMutex.lock();
+	for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+	{
+		m_portMap[_port].ports[ch] = jack_port_register( m_client,
+						name[ch].
+#ifdef QT4
+							toAscii().constData(),
+#else
+							ascii(),
+#endif
+				JACK_DEFAULT_AUDIO_TYPE,
+				JackPortIsOutput, 0 );
+	}
+	m_processCallbackMutex.unlock();*/
 }
 
 
@@ -293,13 +267,45 @@ void audioJACK::registerPort( audioPort * )
 
 void audioJACK::unregisterPort( audioPort * _port )
 {
+	return;
+/*	if( m_portMap.contains( _port ) )
+	{
+		m_processCallbackMutex.lock();
+		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		{
+			if( m_portMap[_port].ports[ch] != NULL )
+			{
+				jack_port_unregister( m_client,
+						m_portMap[_port].ports[ch] );
+			}
+		}
+		m_portMap.erase( m_portMap.find( _port ) );
+		m_processCallbackMutex.unlock();
+	}*/
 }
 
 
 
 
-void audioJACK::renamePort( audioPort *, const QString & )
+void audioJACK::renamePort( audioPort * _port )
 {
+	return;
+/*	if( m_portMap.contains( _port ) )
+	{
+		const QString name[2] = { _port->name() + " L",
+					_port->name() + " R" };
+		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		{
+			jack_port_set_name( m_portMap[_port].ports[ch],
+						name[ch].
+#ifdef QT4
+							toAscii().constData()
+#else
+							ascii()
+#endif
+					) ;
+		}
+	}*/
 }
 
 
@@ -308,6 +314,7 @@ void audioJACK::renamePort( audioPort *, const QString & )
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
 	audioJACK * _this = static_cast<audioJACK *>( _udata );
+	_this->m_processCallbackMutex.lock();
 
 /*	printf( "%f\n", jack_cpu_load( _this->m_client ) );*/
 
@@ -316,104 +323,78 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 #endif
 	jack_transport_state_t ts = jack_transport_query( _this->m_client,
 									NULL );
-	_this->m_bufMutex.lock();
-
-	if( ts != JackTransportRolling )
-	{
-		// always decrease frame-sync-var as we would do it if running
-		// in normal mode, so that the mixer-thread knows when to
-		// proceed
-		if( _nframes < _this->m_frameSync )
-		{
-			_this->m_frameSync -= _nframes;
-		}
-		else
-		{
-			_this->m_frameSync = 0;
-		}
-		_this->m_bufMutex.unlock();
-		return( 0 );
-	}
 
 	vvector<jack_default_audio_sample_t *> outbufs( _this->channels(),
 									NULL );
-	Uint8 ch = 0;
+	Uint8 chnl = 0;
 	for( vvector<jack_default_audio_sample_t *>::iterator it =
-			outbufs.begin(); it != outbufs.end(); ++it, ++ch )
+			outbufs.begin(); it != outbufs.end(); ++it, ++chnl )
 	{
 		*it = (jack_default_audio_sample_t *) jack_port_get_buffer(
-					_this->m_outputPorts[ch], _nframes );
+					_this->m_outputPorts[chnl], _nframes );
 	}
 
+/*	const Uint32 frames = tMin<Uint32>( _nframes,
+					mixer::inst()->framesPerAudioBuffer() );
+	for( jackPortMap::iterator it = _this->m_portMap.begin();
+					it != _this->m_portMap.end(); ++it )
+	{
+		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		{
+			if( it.data().ports[ch] == NULL )
+			{
+				continue;
+			}
+			jack_default_audio_sample_t * buf =
+			(jack_default_audio_sample_t *) jack_port_get_buffer(
+							it.data().ports[ch],
+								_nframes );
+			for( Uint32 frame = 0; frame < frames; ++frame )
+			{
+				buf[frame] = it.key()->firstBuffer()[ch][frame];
+			}
+		}
+	}*/
 
 	jack_nframes_t done = 0;
-	while( done < _nframes )
+	while( done < _nframes && _this->m_stopped == FALSE )
 	{
-		if( _this->m_bufferSets.size() == 0 )
-		{
-			break;
-		}
-		jack_nframes_t todo = tMin( _nframes - done,
-					_this->m_bufferSets.front()[0].frames -
+		jack_nframes_t todo = tMin<jack_nframes_t>(
+						_nframes,
+						_this->m_framesToDoInCurBuf -
 						_this->m_framesDoneInCurBuf );
-		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
+		if( ts == JackTransportRolling )
 		{
-			memcpy( outbufs[ch] + done,
-				_this->m_bufferSets.front()[ch].buf +
-					_this->m_framesDoneInCurBuf,
-					sizeof( jack_default_audio_sample_t ) *
-									todo );
-		}
-		_this->m_framesDoneInCurBuf += todo;
-		if( _this->m_framesDoneInCurBuf >=
-					_this->m_bufferSets.front()[0].frames )
-		{
-			for( Uint8 ch = 0; ch < _this->channels(); ++ch )
+			for( Uint8 chnl = 0; chnl < _this->channels(); ++chnl )
 			{
-				bufferAllocator::free(
-					_this->m_bufferSets.front()[ch].buf );
+				for( Uint32 frame = 0; frame < todo; ++frame )
+				{
+					outbufs[chnl][done+frame] = 
+		_this->m_outBuf[_this->m_framesDoneInCurBuf+frame][chnl] *
+						mixer::inst()->masterGain();
+				}
 			}
-			_this->m_bufferSets.erase(
-						_this->m_bufferSets.begin() );
-			_this->m_framesDoneInCurBuf = 0;
 		}
 		done += todo;
-		_this->m_frameSync -= todo;
+		_this->m_framesDoneInCurBuf += todo;
+		if( _this->m_framesDoneInCurBuf == _this->m_framesToDoInCurBuf )
+		{
+			_this->m_framesToDoInCurBuf = _this->getNextBuffer(
+							_this->m_outBuf );
+			_this->m_framesDoneInCurBuf = 0;
+		}
 	}
 
-	// we have to clear the part of the buffers, if we could not fill
-	// because no usable data is left, otherwise there's baaaaaad
-	// noise... ;-)
-	if( done < _nframes )
+	if( ts != JackTransportRolling || _this->m_stopped == TRUE )
 	{
 		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
 		{
 			jack_default_audio_sample_t * b = outbufs[ch];
-			memset( b + done, 0,
-					sizeof( *b ) * ( _nframes - done ) );
-/*			for( Uint32 frame = done; frame < _nframes; ++frame )
-			{
-				b[frame] = 0.0f;
-			}*/
+			memset( b, 0, sizeof( *b ) * _nframes );
 		}
 	}
 
-	_this->m_bufMutex.unlock();
-
-	return( 0 );
-}
-
-
-
-
-int audioJACK::bufSizeCallback( jack_nframes_t _nframes, void * _udata )
-{
-	audioJACK * _this = static_cast<audioJACK *>( _udata );
-
-#ifdef LMMS_DEBUG
-	assert( _this != NULL );
-#endif
-	_this->m_jackBufSize = _nframes;
+	_this->m_processCallbackMutex.unlock();
 
 	return( 0 );
 }

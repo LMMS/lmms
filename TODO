@@ -1,23 +1,21 @@
+to be done as soon as possible:
+
+- add note-len- and note-alignment-selectbox to piano-roll
+- make it possible in bb-editor to add single beats to beat-patterns
+- MIDI/note-debug!!
+- select connected midi-device in midi-setup-tabwidget
 - fix audio/midi-settings stuff/translation
-- check ladspa-header
 - arpeggio: send midi-out-events via channel-track
 - tooltips for controls in MIDI-tab
 - sample-track: sane bg and wave-color
-- complete toolbar-redesign in song-editor, bb-editor and piano-roll!!!
 - dnd everywhere: presets, samples (afp/sample-track), TCO's, knob-values
 - DSSI-support
-- move VST-code into separate class which can use several backends (libfst, dssi-vst and vst-server) -> add libfst/dssi-vst/vstserver-check to configure.in
 - save/load parameters of VST-plugin
 - somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
-- pattern freeze -> do not endless loop if looping-points are enabled
-- solve problem with knob-control-precision
-- add note-len- and note-alignment-selectbox to piano-roll
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
-- make LMMS an ALSA-sequencer-client
-	- use midi-maps
-	- process program-/channel-change-events from MIDI-files
-	- setup MIDI-channel and -program in MIDI-Out
+- use midi-maps
+- process program-/channel-change-events from MIDI-files
 - pre-listen when opening sample with QFileDialog
 - level-meters in output-graph and channel-track
 - panning-editing in piano-roll
@@ -32,7 +30,7 @@
 - rewrite export-project-dialog using layout-mechanism
 - dynamic pitch-change
 - make piano-roll use the global clipboard??
-- add languages:
+- add more localizations:
 	- Italian
 	- Swedish
 	- Norwegian
@@ -41,14 +39,12 @@
 
 
 
-Things to be done anytime in the future
+to be done somewhen in the future:
 - effect-board -> live-fx from input
-- event-system
+- event/automation-system
 - chord-editor?
 - WAVE/OGG/MP3-Import -> FFT-analysis -> write notes
 - FLP-Import
 - classical note-edit-window -> also ability of printing and maybe later scanning & recognition of notes
 - add FLAC as export-format?
-- better commented source...
-- optimize, optimize, optimize.....
 

@@ -740,7 +740,7 @@ bool configManager::loadConfigFile( void )
 
 	// get the head information from the DOM
 	QDomElement root = dom_tree.documentElement();
-	if( root.isElement() )
+/*	if( root.isElement() )
 	{
 		QString cfg_file_ver = root.toElement().attribute( "version" );
 		if( ( cfg_file_ver.length() == 0 || cfg_file_ver != VERSION ) &&
@@ -771,7 +771,7 @@ bool configManager::loadConfigFile( void )
 				return( loadConfigFile() );
 			}
 		}
-	}
+	}*/
 
 	QDomNode node = root.firstChild();
 

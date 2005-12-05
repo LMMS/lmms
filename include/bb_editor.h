@@ -33,7 +33,7 @@
 #include "lmms_main_win.h"
 
 
-class pixmapButton;
+class toolButton;
 class songEditor;
 class QPixmap;
 
@@ -88,8 +88,6 @@ protected:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void resizeEvent( QResizeEvent * _re );
 
-	void updateBackground( void );
-
 
 protected slots:
 	void play( void );
@@ -105,10 +103,11 @@ private:
 
 
 	static bbEditor * s_instanceOfMe;
-	static QPixmap * s_titleArtwork;
 
-	pixmapButton * m_playButton;
-	pixmapButton * m_stopButton;
+	QWidget * m_toolBar;
+
+	toolButton * m_playButton;
+	toolButton * m_stopButton;
 
 
 	friend class songEditor;

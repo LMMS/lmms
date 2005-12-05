@@ -58,7 +58,7 @@ struct pollfd;
 class QLineEdit;
 
 
-class midiALSARaw : public midiRawClient, public QThread
+class midiALSARaw : public midiClientRaw, public QThread
 {
 public:
 	midiALSARaw( void );
@@ -74,7 +74,7 @@ public:
 	}
 
 
-	class setupWidget : public midiRawClient::setupWidget
+	class setupWidget : public midiClientRaw::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

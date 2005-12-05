@@ -48,7 +48,7 @@
 
 
 midiALSARaw::midiALSARaw( void ) :
-	midiRawClient(),
+	midiClientRaw(),
 	QThread(),
 	m_inputp( &m_input ),
 	m_outputp( &m_output ),
@@ -200,7 +200,7 @@ void midiALSARaw::run( void )
 
 
 midiALSARaw::setupWidget::setupWidget( QWidget * _parent ) :
-	midiRawClient::setupWidget( midiALSARaw::name(), _parent )
+	midiClientRaw::setupWidget( midiALSARaw::name(), _parent )
 {
 	m_device = new QLineEdit( midiALSARaw::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

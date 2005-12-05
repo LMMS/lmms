@@ -44,12 +44,14 @@
 #include <QMutex>
 #include <QVector>
 #include <QList>
+#include <QMap>
 
 #else
 
 #include <qmutex.h>
 #include <qvaluevector.h>
 #include <qvaluelist.h>
+#include <qmap.h>
 
 #endif
 
@@ -90,34 +92,38 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
-						Uint32 _frames,
-						float _master_gain );
+	virtual void startProcessing( void );
+	virtual void stopProcessing( void );
 
 	virtual void registerPort( audioPort * _port );
 	virtual void unregisterPort( audioPort * _port );
-	virtual void renamePort( audioPort * _port, const QString & _name );
+	virtual void renamePort( audioPort * _port );
 
 	static int processCallback( jack_nframes_t _nframes, void * _udata );
-	static int bufSizeCallback( jack_nframes_t _nframes, void * _udata );
 	static void shutdownCallback( void * _udata );
 
 
 	jack_client_t * m_client;
+
+	bool m_stopped;
+
+	QMutex m_processCallbackMutex;
+
 	vvector<jack_port_t *> m_outputPorts;
-	struct bufset
+	surroundSampleFrame * m_outBuf;
+
+
+	Uint32 m_framesDoneInCurBuf;
+	Uint32 m_framesToDoInCurBuf;
+
+
+	struct stereoPort
 	{
-		sampleType * buf;
-		Uint32 frames;
+		jack_port_t * ports[2];
 	} ;
 
-	vlist<vvector<bufset> > m_bufferSets;
-	Uint32 m_framesDoneInCurBuf;
-	volatile Uint32 m_frameSync;
-
-	Uint32 m_jackBufSize;
-
-	QMutex m_bufMutex;
+	typedef QMap<audioPort *, stereoPort> jackPortMap;
+	jackPortMap m_portMap;
 
 } ;
 

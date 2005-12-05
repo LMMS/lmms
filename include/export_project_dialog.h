@@ -62,7 +62,6 @@ class exportProjectDialog : public QDialog
 public:
 	exportProjectDialog( const QString & _file_name, QWidget * _parent );
 	~exportProjectDialog();
-	void FASTCALL updateProgressBar( int _new_val );
 
 
 public slots:
@@ -77,10 +76,16 @@ protected:
 private slots:
 	void changedType( const QString & );
 	void cancelBtnClicked( void );
-	void redrawProgressBar( void );
 
 
 private:
+	void finishProjectExport( void );
+	void abortProjectExport( void );
+
+	static fileTypes FASTCALL getFileTypeFromExtension( const QString &
+									_ext );
+	static Sint16 s_availableBitrates[];
+
 	QString m_fileName;
 	QLabel * m_typeLbl;
 	QComboBox * m_typeCombo;
@@ -92,20 +97,9 @@ private:
 	QPushButton * m_exportBtn;
 	QPushButton * m_cancelBtn;
 	QProgressBar * m_exportProgressBar;
+
 	fileTypes m_fileType;
 	bool m_deleteFile;
-	int m_oldProgressVal;
-	int m_progressVal;
-
-	QTimer * m_progressBarUpdateTimer;
-
-	static Sint16 s_availableBitrates[];
-
-	void finishProjectExport( void );
-	void abortProjectExport( void );
-
-	static fileTypes FASTCALL getFileTypeFromExtension( const QString &
-									_ext );
 
 } ;
 

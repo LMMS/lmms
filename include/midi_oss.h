@@ -40,7 +40,7 @@
 class QLineEdit;
 
 
-class midiOSS : public midiRawClient, public QThread
+class midiOSS : public midiClientRaw, public QThread
 {
 public:
 	midiOSS( void );
@@ -55,7 +55,7 @@ public:
 	}
 
 
-	class setupWidget : public midiRawClient::setupWidget
+	class setupWidget : public midiClientRaw::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

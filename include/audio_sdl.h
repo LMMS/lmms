@@ -37,18 +37,6 @@
 #endif
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QMutex>
-
-#else
-
-#include <qmutex.h>
-
-#endif
-
 #include SDL_SDL_H
 #include SDL_SDL_AUDIO_H
 
@@ -87,20 +75,14 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
-						Uint32 _frames,
-						float _master_gain );
-
-	void clearBuffer( void );
+	virtual void startProcessing( void );
+	virtual void stopProcessing( void );
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 
 	SDL_AudioSpec m_audioHandle;
 
-	outputSampleType * m_buffer;
-
-	QMutex m_bufMutex;
-	QMutex m_callbackMutex;
+	surroundSampleFrame * m_outBuf;
 
 	bool m_convertEndian;
 

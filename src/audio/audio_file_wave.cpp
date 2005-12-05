@@ -1,5 +1,5 @@
 /*
- * audio_file_wave.cpp - Audio-device which encodes wave-stream and writes it
+ * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -87,7 +87,7 @@ bool audioFileWave::startEncoding( void )
 
 
 
-void FASTCALL audioFileWave::writeBufferToDev( surroundSampleFrame * _ab,
+void FASTCALL audioFileWave::writeBuffer( surroundSampleFrame * _ab,
 							Uint32 _frames,
 							float _master_gain )
 {

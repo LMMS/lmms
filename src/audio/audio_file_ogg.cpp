@@ -1,5 +1,5 @@
 /*
- * audio_file_ogg.cpp - Audio-device which encodes wave-stream and writes it
+ * audio_file_ogg.cpp - audio-device which encodes wave-stream and writes it
  *                      into an OGG-file. This is used for song-export.
  *
  * This file is based on encode.c from vorbis-tools-source, for more information
@@ -26,17 +26,6 @@
  *
  */
 
-
-/* OggEnc
- **
- ** This program is distributed under the GNU General Public License, version 2.
- ** A copy of this license is included with this source.
- **
- ** Copyright 2000-2002, Michael Smith <msmith@labyrinth.net.au>
- **
- ** Portions from Vorbize, (c) Kenneth Arnold <kcarnold@yahoo.com>
- ** and libvorbis examples, (c) Monty <monty@xiph.org>
- **/
 
 
 #include <qpair.h>
@@ -84,7 +73,7 @@ inline int audioFileOgg::writePage( void )
 bool audioFileOgg::startEncoding( void )
 {
 	vorbis_comment vc;
-	char * comments = "Cool=This song was written with Linux "
+	char * comments = "Cool=This song has been made using Linux "
 							"MultiMedia Studio";
 	int comment_length = strlen( comments );
 
@@ -185,7 +174,7 @@ bool audioFileOgg::startEncoding( void )
 
 
 
-void FASTCALL audioFileOgg::writeBufferToDev( surroundSampleFrame * _ab,
+void FASTCALL audioFileOgg::writeBuffer( surroundSampleFrame * _ab,
 						Uint32 _frames,
 						float _master_gain )
 {
@@ -253,7 +242,7 @@ void FASTCALL audioFileOgg::writeBufferToDev( surroundSampleFrame * _ab,
 void audioFileOgg::finishEncoding( void )
 {
 	// just for flushing buffers...
-	writeBufferToDev( NULL, 0, 0.0f );
+	writeBuffer( NULL, 0, 0.0f );
 
 	// clean up
 	ogg_stream_clear( &m_os );

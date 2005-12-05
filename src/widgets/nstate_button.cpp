@@ -44,13 +44,10 @@
 
 
 nStateButton::nStateButton( QWidget * _parent ) :
-	QWidget( _parent ),
+	QPushButton( _parent ),
 	m_generalToolTip( "" ),
 	m_curState( -1 )
 {
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 }
 
 
@@ -75,7 +72,7 @@ void nStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 	if( m_states.size() == 1 )
 	{
 		// then resize ourself
-		resize( _pm.width(), _pm.height() );
+		setFixedSize( _pm.width() + 6, _pm.height() + 6 );
 		// and set state to first pixmap
 		changeState( 0 );
 	}
@@ -96,15 +93,17 @@ void nStateButton::changeState( int _n )
 					m_generalToolTip;
 		toolTip::add( this, _tooltip );
 
-		emit stateChanged( m_curState );
+		setPixmap( *m_states[m_curState].first );
 
-		update();
+		emit changedState( m_curState );
+
+/*		update();*/
 	}
 }
 
 
 
-
+/*
 void nStateButton::paintEvent( QPaintEvent * )
 {
 #ifdef QT4
@@ -125,7 +124,7 @@ void nStateButton::paintEvent( QPaintEvent * )
 	bitBlt( this, rect().topLeft(), &draw_pm );
 #endif
 }
-
+*/
 
 
 
@@ -135,6 +134,7 @@ void nStateButton::mousePressEvent( QMouseEvent * _me )
 	{
 		changeState( ( ++m_curState ) % m_states.size() );
 	}
+	QPushButton::mousePressEvent( _me );
 }
 
 

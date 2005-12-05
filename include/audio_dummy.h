@@ -68,13 +68,8 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame *,
-						Uint32 /*_frames*/, float )
-	{
-		//usleep( (Uint32)( _frames * 1000.0f * 1000.0f /
-		//					DEFAULT_SAMPLE_RATE ) );
-	}
-
+	// TODO: derive from QThread and call getNextBuffer() in an
+	// endless loop
 } ;
 
 

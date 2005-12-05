@@ -54,6 +54,7 @@ public:
 	virtual ~audioFileDevice();
 
 
+
 protected:
 	int FASTCALL writeData( const void * _data, int _len );
 	void seekToBegin( void );

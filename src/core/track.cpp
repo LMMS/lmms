@@ -40,6 +40,8 @@
 #include <qdom.h>
 #include <qpopupmenu.h>
 #include <qlayout.h>
+#include <qcursor.h>
+#include <qwhatsthis.h>
 
 #endif
 
@@ -594,7 +596,7 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 
 
 	QPushButton * clntr_btn = new QPushButton( embed::getIconPixmap(
-						"pr_edit_copy", 12, 12 ),
+						"edit_copy", 12, 12 ),
 									"",
 						&m_trackOperationsWidget );
 	clntr_btn->setGeometry( 1, 1, TRACK_OP_BTN_WIDTH, TRACK_OP_BTN_HEIGHT );

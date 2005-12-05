@@ -96,7 +96,7 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 
 
 
-void audioSampleRecorder::writeBufferToDev( surroundSampleFrame * _ab,
+void audioSampleRecorder::writeBuffer( surroundSampleFrame * _ab,
 							Uint32 _frames, float )
 {
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );

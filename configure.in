@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051129, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051129)
+AC_INIT(lmms, 0.1.1-cvs20051204, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051204)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -61,8 +61,6 @@ AH_TEMPLATE(SDL_SDL_SOUND_H, [Define to location of SDL_sound.h])
 
 OLD_LIBS="$LIBS"
 LIBS="$LIBS -lpthread"
-
-AC_CHECK_FUNCS([pthread_getattr_np])
 
 # check for SDL-lib
 AC_ARG_WITH(sdl,
@@ -158,10 +156,10 @@ fi
 AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 
 
-# check for proper wine-installation and existing steinberg headers
+# check for proper wine-installation and existing Steinberg headers
 AC_ARG_WITH(vst,
 	AS_HELP_STRING([--with-vst],
-			[enable support for VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
+			[enable support for builtin VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
 AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <vst/aeffectx.h> header file.])
 if test "x$with_vst" = "xyes" ; then
 	AC_CHECK_HEADER(vst/aeffectx.h, HAVE_VST_AEFFECTX_H="true")
@@ -251,11 +249,11 @@ AM_CONDITIONAL(HAVE_LIBSF, test ! -z "$HAVE_SNDFILE_H")
 
 AC_ARG_WITH(nosmpdecs,
 	AS_HELP_STRING([--without-sample-decoders],
-			[force compiling LMMS even if libraries for sample-decoding were found]),
+			[force compiling LMMS even if no usable libraries for sample-decoding were found]),
  	[ with_smpdecs=yes ])
 
 if test -z "$HAVE_SND_FILE" -a -z "$HAVE_SDL_SDL_SOUND_H" -a -z "$OGG_SUPPORT" -a ! -z "$with_smpdecs"; then
-	AC_MSG_ERROR([*** neither libsndfile nor SDL_sound nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples, so please install at least one of the packages and try again! Use --without-sample-decoders to force compiling LMMS.])
+	AC_MSG_ERROR([*** neither libsndfile nor SDL_sound nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples so please install at least one of the packages and try again! Use --without-sample-decoders to force compiling without any sample-decoding-libraries.])
 fi
 
 
@@ -388,7 +386,6 @@ AC_CONFIG_FILES([Makefile
 		 presets/AudioFileProcessor/Makefile
 		 presets/MIDI-Out/Makefile
 		 presets/PluckedStringSynth/Makefile
-		 presets/Sine1063Oscillator/Makefile
 		 presets/TripleOscillator/Makefile
 		 presets/VeSTige/Makefile
 		 projects/Makefile

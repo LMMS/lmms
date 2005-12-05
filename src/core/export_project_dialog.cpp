@@ -32,10 +32,10 @@
 #include <QProgressBar>
 #include <QComboBox>
 #include <QCheckBox>
-#include <QTimer>
 #include <QLabel>
 #include <QPushButton>
 #include <QCloseEvent>
+#include <QApplication>
 
 #else
 
@@ -44,19 +44,23 @@
 #include <qprogressbar.h>
 #include <qcombobox.h>
 #include <qcheckbox.h>
-#include <qtimer.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
+#include <qapplication.h>
 
 #endif
 
 
 #include "export_project_dialog.h"
 #include "song_editor.h"
+#include "lmms_main_win.h"
 #include "embed.h"
 
 #include "audio_file_wave.h"
 #include "audio_file_ogg.h"
+
+
+extern QString file_to_render;
 
 
 fileEncodeDevice fileEncodeDevices[] =
@@ -129,9 +133,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	QDialog( _parent ),
 	m_fileName( _file_name ),
 	m_hourglassLbl( NULL ),
-	m_exportProgressBar( NULL ),
-	m_deleteFile( FALSE ),
-	m_oldProgressVal( -1 )
+	m_deleteFile( FALSE )
 {
 #ifdef QT4
 	m_fileType = getFileTypeFromExtension( "." +
@@ -312,35 +314,6 @@ void exportProjectDialog::exportBtnClicked( void )
 	{
 		if( fileEncodeDevices[idx].m_fileType == m_fileType )
 		{
-			bool success_ful = FALSE;
-			audioDevice * dev = fileEncodeDevices[idx].m_getDevInst(
-							DEFAULT_SAMPLE_RATE,
-							DEFAULT_CHANNELS,
-							success_ful,
-							m_fileName,
-							m_vbrCb->isChecked(),
-					m_kbpsCombo->currentText().toInt(),
-					m_kbpsCombo->currentText().toInt() - 64,
-					m_kbpsCombo->currentText().toInt() + 64
-				);
-			if( success_ful == FALSE )
-			{
-				QMessageBox::information( this,
-					tr( "Export failed" ),
-					tr( "The project-export failed, "
-						"because the output-file/-"
-						"device could not be opened.\n"
-						"Make sure, you have write "
-						"access to the selected "
-						"file/device!" ),
-							QMessageBox::Ok );
-				return;
-			}
-			mixer::inst()->pause();
-			mixer::inst()->setAudioDevice( dev,
-							m_hqmCb->isChecked() );
-			songEditor::inst()->startExport();
-			mixer::inst()->play();
 			break;
 		}
 		++idx;
@@ -350,6 +323,32 @@ void exportProjectDialog::exportBtnClicked( void )
 	{
 		return;
 	}
+
+	bool success_ful = FALSE;
+	audioFileDevice * dev = fileEncodeDevices[idx].m_getDevInst(
+							DEFAULT_SAMPLE_RATE,
+							DEFAULT_CHANNELS,
+							success_ful,
+							m_fileName,
+							m_vbrCb->isChecked(),
+					m_kbpsCombo->currentText().toInt(),
+					m_kbpsCombo->currentText().toInt() - 64,
+					m_kbpsCombo->currentText().toInt() + 64
+				);
+	if( success_ful == FALSE )
+	{
+		QMessageBox::information( this,
+					tr( "Export failed" ),
+					tr( "The project-export failed, "
+						"because the output-file/-"
+						"device could not be opened.\n"
+						"Make sure, you have write "
+						"access to the selected "
+						"file/device!" ),
+							QMessageBox::Ok );
+		return;
+	}
+
 
 	setWindowTitle( tr( "Exporting project to %1" ).arg(
 					QFileInfo( m_fileName ).fileName() ) );
@@ -379,11 +378,40 @@ void exportProjectDialog::exportBtnClicked( void )
 
 	m_cancelBtn->move( CANCEL_X_WHILE_EXPORT, CANCEL_Y_WHILE_EXPORT );
 
-	m_progressBarUpdateTimer = new QTimer( this );
-	connect( m_progressBarUpdateTimer, SIGNAL( timeout() ), this,
-						SLOT( redrawProgressBar() ) );
-	m_progressBarUpdateTimer->start( 100 );
 
+
+	mixer::inst()->setAudioDevice( dev, m_hqmCb->isChecked() );
+	songEditor::inst()->startExport();
+
+
+	songEditor::playPos & pp = songEditor::inst()->getPlayPos(
+							songEditor::PLAY_SONG );
+
+	while( songEditor::inst()->exportDone() == FALSE &&
+				songEditor::inst()->exporting() == TRUE )
+	{
+		dev->processNextBuffer();
+		int pval = pp * 100 /
+			( ( songEditor::inst()->lengthInTacts() + 1 ) * 64 );
+#ifdef QT4
+		m_exportProgressBar->setValue( pval );
+#else
+		m_exportProgressBar->setProgress( pval );
+#endif
+		// update lmms-main-win-caption
+		lmmsMainWin::inst()->setWindowTitle( tr( "Rendering:" ) + " " +
+						QString::number( pval ) + "%" );
+		// process paint-events etc.
+		qApp->processEvents();
+	}
+
+	// if m_deleteFile == TRUE, user aborted export and finalization-
+	// routines were already called, so we only need to call them if
+	// export went through without any problems
+	if( m_deleteFile == FALSE )
+	{
+		finishProjectExport();
+	}
 }
 
 
@@ -398,19 +426,6 @@ void exportProjectDialog::cancelBtnClicked( void )
 		abortProjectExport();
 		return;
 	}
-
-	// if the user aborted export-process, the file has to be deleted
-	if( m_deleteFile )
-	{
-		QFile( m_fileName ).remove();
-	}
-
-	// restore window-title
-	lmmsMainWin::inst()->resetWindowTitle(); 
-
-	// let's close us...
-	accept();
-
 }
 
 
@@ -419,7 +434,6 @@ void exportProjectDialog::cancelBtnClicked( void )
 // called whenever there's a reason for aborting song-export (like user-input)
 void exportProjectDialog::abortProjectExport( void )
 {
-	mixer::inst()->pause();
 	m_deleteFile = TRUE;
 
 	finishProjectExport();
@@ -430,51 +444,30 @@ void exportProjectDialog::abortProjectExport( void )
 
 void exportProjectDialog::finishProjectExport( void )
 {
-	m_progressBarUpdateTimer->stop();
-	delete m_progressBarUpdateTimer;
-
 	mixer::inst()->restoreAudioDevice();
+
+	// if the user aborted export-process, the file has to be deleted
+	if( m_deleteFile )
+	{
+		QFile( m_fileName ).remove();
+	}
+
+	// restore window-title
+	lmmsMainWin::inst()->resetWindowTitle(); 
+
 	songEditor::inst()->stopExport();
 
-	mixer::inst()->play();
-
-	// this method does the final cleanup...
-	cancelBtnClicked();
-}
-
-
-
-
-void exportProjectDialog::redrawProgressBar( void )
-{
-	if( m_progressVal != m_oldProgressVal )
+	// if we rendered file from command line, quit after export
+	if( file_to_render != "" )
 	{
-#ifdef QT4
-		m_exportProgressBar->setValue( m_progressVal );
-#else
-		m_exportProgressBar->setProgress( m_progressVal );
-#endif
-		// update lmms-main-win-caption
-		lmmsMainWin::inst()->setWindowTitle( tr( "Rendering:" ) + " " +
-				QString::number( m_progressVal ) + "%" );
-		m_oldProgressVal = m_progressVal;
+		// qApp->quit(); - doesn't work for some reason...
+		exit( 0 );
 	}
 
-	if( songEditor::inst()->exportDone() == TRUE ||
-				songEditor::inst()->exporting() == FALSE )
-	{
-		finishProjectExport();
-	}
-
+	// let's close us...
+	accept();
 }
 
-
-
-
-void exportProjectDialog::updateProgressBar( int _new_val )
-{
-	m_progressVal = _new_val;
-}
 
 
 

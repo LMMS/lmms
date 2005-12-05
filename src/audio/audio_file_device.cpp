@@ -39,6 +39,7 @@
 
 #include "audio_file_device.h"
 #include "export_project_dialog.h"
+#include "buffer_allocator.h"
 
 
 audioFileDevice::audioFileDevice( Uint32 _sample_rate, Uint8 _channels,

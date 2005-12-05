@@ -1,5 +1,5 @@
 /*
- * midi_dummy.h - dummy MIDI-driver
+ * tool_button.h - declaration of class toolButton 
  *
  * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,57 +23,47 @@
  */
 
 
-#ifndef _MIDI_DUMMY_H
-#define _MIDI_DUMMY_H
+#ifndef _TOOL_BUTTON_H
+#define _TOOL_BUTTON_H 
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "qt3support.h"
+
+#ifdef QT4
+
+#include <QPushButton>
+
+#else
+
+#include <qpushbutton.h>
+
+#endif
+
+#include "tooltip.h"
 
 
-#include "midi_client.h"
-#include "midi_port.h"
-#include "tab_widget.h"
-
-
-class midiDummy : public midiClientRaw
+class toolButton : public QPushButton
 {
 public:
-	midiDummy() :
-		midiClientRaw()
+	toolButton( const QPixmap & _pixmap, const QString & _tooltip,
+			QObject * _receiver, const char * _slot,
+			QWidget * _parent ) :
+		QPushButton( _parent )
 	{
+		connect( this, SIGNAL( clicked() ), _receiver, _slot );
+		toolTip::add( this, _tooltip );
+		setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
+		setFixedSize( 30, 30 );
+		setPixmap( _pixmap );
 	}
-	~midiDummy()
-	{
-	}
 
-	inline static QString name( void )
-	{
-		return( setupWidget::tr( "Dummy (no MIDI support)" ) );
-	}
-
-
-	class setupWidget : public midiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent ) :
-			midiClientRaw::setupWidget( midiDummy::name(), _parent )
-		{
-		}
-
-		virtual ~setupWidget()
-		{
-		}
-
-		virtual void saveSettings( void )
-		{
-		}
-
-	} ;
-
-
-protected:
-	virtual void FASTCALL sendByte( const Uint8 )
+	~toolButton()
 	{
 	}
 
 } ;
-
 
 #endif

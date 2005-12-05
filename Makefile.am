@@ -48,7 +48,6 @@ lmms_MOC =						\
 		./bb_track.moc				\
 		./channel_track.moc			\
 		./config_mgr.moc			\
-		./crystal_button.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
@@ -157,7 +156,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
-		$(srcdir)/src/widgets/crystal_button.cpp		\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
@@ -212,7 +210,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/envelope_and_lfo_widget.h		\
 		$(srcdir)/include/about_dialog.h			\
 		$(srcdir)/include/oscillator.h				\
-		$(srcdir)/include/crystal_button.h			\
 		$(srcdir)/include/arp_and_chords_tab_widget.h		\
 		$(srcdir)/include/export.h				\
 		$(srcdir)/include/group_box.h				\
@@ -274,6 +271,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/midi_tab_widget.h			\
 		$(srcdir)/include/audio_port.h				\
 		$(srcdir)/include/qxembed.h				\
+		$(srcdir)/include/tool_button.h				\
 		$(srcdir)/include/midi_alsa_seq.h
 
 

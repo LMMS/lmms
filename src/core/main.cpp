@@ -61,17 +61,37 @@ int main( int argc, char * * argv )
 {
 	QApplication app( argc, argv );
 
+	QString extension = "wav";
+
 	for( int i = 1; i < app.argc(); ++i )
 	{
 		if( QString( app.argv()[i] ) == "--version" ||
 					QString( app.argv()[i] ) == "-v" )
 		{
-			printf( "\n%s\n\n"
+			printf( "\nLinux MultiMedia Studio %s\n\n"
+	"Copyright (c) 2004-2005 Tobias Doerffel and others.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
-	"version 2 of the License, or (at your option) any later version.\n\n",
-							PACKAGE_STRING );
+	"version 2 of the License, or (at your option) any later version.\n\n"
+	"Try \"%s --help\" for more information.\n\n", PACKAGE_VERSION,
+								argv[0] );
+			return( 0 );
+		}
+		else if( app.argc() > i &&
+				( QString( app.argv()[i] ) == "--help" ||
+					QString( app.argv()[i] ) == "-h" ) )
+		{
+			printf( "\nLinux MultiMedia Studio %s\n"
+	"Copyright (c) 2004-2005 Tobias Doerffel and others.\n\n"
+	"usage: lmms [ -r <file_to_render> [ -o <format> ] [ -h ] "
+							"[ <file_to_load> ]\n"
+	"-r, --render			render given file.\n"
+	"-o, --output-format <format>	specify format of render-output where\n"
+	"				format is either 'wav' or 'ogg'.\n"
+	"-v, --version			show version information and exit.\n"
+	"-h, --help			show this usage message and exit.\n\n",
+							PACKAGE_VERSION );
 			return( 0 );
 		}
 		else if( app.argc() > i &&
@@ -79,13 +99,41 @@ int main( int argc, char * * argv )
 					QString( app.argv()[i] ) == "-r" ) )
 		{
 			file_to_load = QString( app.argv()[i+1] );
-			file_to_render = QString( app.argv()[i+1] ) + ".wav";
+			file_to_render = baseName( file_to_load ) + ".";
+			++i;
+		}
+		else if( app.argc() > i &&
+			( QString( app.argv()[i] ) == "--output-format" ||
+					QString( app.argv()[i] ) == "-o" ) )
+		{
+			extension = QString( app.argv()[i+1] );
+			if( extension != "wav" && extension != "ogg" )
+			{
+				printf( "\nInvalid output format %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", app.argv()[i+1],
+								argv[0] );
+				return( -1 );
+			}
+			++i;
 		}
 		else
 		{
+			if( app.argv()[i][0] == '-' )
+			{
+				printf( "\nInvalid option %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", app.argv()[i],
+								argv[0] );
+				return( -1 );
+			}
 			file_to_load = app.argv()[i];
 		}
 	}
+
+	if( file_to_render != "" )
+	{
+		file_to_render += extension;
+	}
+
 
 	QString pos =
 #ifdef QT4
@@ -172,7 +220,6 @@ int main( int argc, char * * argv )
 		exportProjectDialog * e = new exportProjectDialog(
 							file_to_render,
 							lmmsMainWin::inst() );
-		songEditor::inst()->setExportProjectDialog( e );
 		e->show();
 		e->exportBtnClicked();
 	}

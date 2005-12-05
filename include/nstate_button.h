@@ -34,14 +34,14 @@
 
 #ifdef QT4
 
-#include <QWidget>
+#include <QPushButton>
 #include <QPixmap>
 #include <QVector>
 #include <QPair>
 
 #else
 
-#include <qwidget.h>
+#include <qpushbutton.h>
 #include <qpixmap.h>
 #include <qvaluevector.h>
 #include <qpair.h>
@@ -49,7 +49,7 @@
 #endif
 
 
-class nStateButton : public QWidget
+class nStateButton : public QPushButton
 {
 	Q_OBJECT
 public:
@@ -73,11 +73,11 @@ public slots:
 
 
 signals:
-	void stateChanged( int _n );
+	void changedState( int _n );
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+/*	virtual void paintEvent( QPaintEvent * _pe );*/
 	virtual void mousePressEvent( QMouseEvent * _me );
 
 

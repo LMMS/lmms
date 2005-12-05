@@ -50,10 +50,9 @@ class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class crystalButton;
+class toolButton;
 class pattern;
 class notePlayHandle;
-class pixmapButton;
 class timeLine;
 class lmmsMainWin;
 
@@ -112,10 +111,10 @@ protected slots:
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
 
-	void drawButtonToggled( bool = FALSE );
-	void eraseButtonToggled( bool = FALSE );
-	void selectButtonToggled( bool = FALSE );
-	void moveButtonToggled( bool = FALSE );
+	void drawButtonToggled( void );
+	void eraseButtonToggled( void );
+	void selectButtonToggled( void );
+	void moveButtonToggled( void );
 
 	void copySelectedNotes( void );
 	void cutSelectedNotes( void );
@@ -160,8 +159,6 @@ private:
 
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;
-	static QPixmap * s_artwork1;
-	static QPixmap * s_artwork2;
 	static QPixmap * s_blackKeyPm;
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
@@ -171,18 +168,20 @@ private:
 	static pianoRollKeyTypes prKeyOrder[];
 
 
-	pixmapButton * m_playButton;
-	pixmapButton * m_recordButton;
-	pixmapButton * m_stopButton;
+	QWidget * m_toolBar;
 
-	crystalButton * m_drawButton;
-	crystalButton * m_eraseButton;
-	crystalButton * m_selectButton;
-	crystalButton * m_moveButton;
+	toolButton * m_playButton;
+	toolButton * m_recordButton;
+	toolButton * m_stopButton;
 
-	crystalButton * m_cutButton;
-	crystalButton * m_copyButton;
-	crystalButton * m_pasteButton;
+	toolButton * m_drawButton;
+	toolButton * m_eraseButton;
+	toolButton * m_selectButton;
+	toolButton * m_moveButton;
+
+	toolButton * m_cutButton;
+	toolButton * m_copyButton;
+	toolButton * m_pasteButton;
 
 	QComboBox * m_zoomingComboBox;
 

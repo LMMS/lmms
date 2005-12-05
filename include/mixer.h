@@ -34,14 +34,12 @@
 
 #ifdef QT4
 
-#include <QThread>
 #include <QMutex>
 #include <QVector>
 
 #else
 
 #include <qobject.h>
-#include <qthread.h>
 #include <qmutex.h>
 #include <qvaluevector.h>
 
@@ -104,11 +102,7 @@ const octaves BASE_OCTAVE = OCTAVE_4;
 
 
 
-class mixer : 
-#ifndef QT4
-		public QObject,
-#endif
-		public QThread
+class mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -202,20 +196,20 @@ public:
 
 
 
-	inline int sampleRate( void )
+	inline Uint32 sampleRate( void )
 	{
 		return( SAMPLE_RATES[m_qualityLevel] );
 	}
 
 
-	inline float masterOutput( void ) const
+	inline float masterGain( void ) const
 	{
-		return( m_masterOutput );
+		return( m_masterGain );
 	}
 
-	inline void setMasterOutput( float _mo )
+	inline void setMasterGain( float _mo )
 	{
-		m_masterOutput = _mo;
+		m_masterGain = _mo;
 	}
 
 
@@ -235,12 +229,12 @@ public:
 
 	void pause( void )
 	{
-		m_safetySyncMutex.lock();
+		m_mixMutex.lock();
 	}
 
 	void play( void )
 	{
-		m_safetySyncMutex.unlock();
+		m_mixMutex.unlock();
 	}
 
 
@@ -259,6 +253,8 @@ public:
 	}
 
 
+	const surroundSampleFrame * renderNextBuffer( void );
+
 public slots:
 	void setHighQuality( bool _hq_on = FALSE );
 
@@ -275,7 +271,7 @@ private:
 	mixer();
 	~mixer();
 
-	void quitThread( void );
+	void stopProcessing( void );
 
 
 	// we don't allow to create mixer by using copy-ctor
@@ -283,7 +279,6 @@ private:
 	{
 	}
 
-	virtual void run( void );
 
 
 	audioDevice * tryAudioDevices( void );
@@ -291,11 +286,6 @@ private:
 
 	void processBuffer( surroundSampleFrame * _buf, fxChnl _fx_chnl );
 
-
-/*	sampleFrame * m_silence;
-#ifndef DISABLE_SURROUND
-	surroundSampleFrame * m_surroundSilence;// cool, silence in surround ;-)
-#endif*/
 
 
 	vvector<audioPort *> m_audioPorts;
@@ -305,16 +295,16 @@ private:
 	surroundSampleFrame * m_curBuf;
 	surroundSampleFrame * m_nextBuf;
 
-	bool m_discardCurBuf;
+/*	bool m_discardCurBuf;*/
 
 
 	playHandleVector m_playHandles;
 	playHandleVector m_playHandlesToRemove;
 
 	Uint8 m_qualityLevel;
-	volatile float m_masterOutput;
+	volatile float m_masterGain;
 
-	volatile bool m_quit;
+/*	volatile bool m_quit;*/
 
 
 	audioDevice * m_audioDev;
@@ -326,8 +316,8 @@ private:
 	QString m_midiClientName;
 
 
-	QMutex m_safetySyncMutex;
-	QMutex m_devMutex;
+	QMutex m_mixMutex;
+/*	QMutex m_devMutex;*/
 
 
 	friend class lmmsMainWin;

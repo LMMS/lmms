@@ -32,11 +32,13 @@
 
 #include <QPair>
 #include <QMutex>
+#include <QThread>
 
 #else
 
 #include <qpair.h>
 #include <qmutex.h>
+#include <qthread.h>
 
 #endif
 
@@ -74,12 +76,6 @@ public:
 		m_devMutex.unlock();
 	}
 
-	// called by mixer for writing final output-buffer with given sample-
-	// rate and master-gain
-	void FASTCALL writeBuffer( surroundSampleFrame * _ab, Uint32 _frames,
-							Uint32 _src_sample_rate,
-							float _master_gain );
-
 
 	// if audio-driver supports ports, classes inherting audioPort
 	// (e.g. channel-tracks) can register themselves for making
@@ -87,7 +83,7 @@ public:
 	// them at a specific port - currently only supported by JACK
 	virtual void registerPort( audioPort * _port );
 	virtual void unregisterPort( audioPort * _port );
-	virtual void renamePort( audioPort * _port, const QString & _name );
+	virtual void renamePort( audioPort * _port );
 
 
 	inline Uint32 sampleRate( void ) const
@@ -100,6 +96,15 @@ public:
 		return( m_channels );
 	}
 
+	void processNextBuffer( void );
+
+	virtual void startProcessing( void )
+	{
+	}
+
+	virtual void stopProcessing( void )
+	{
+	}
 
 
 	class setupWidget : public tabWidget
@@ -122,10 +127,16 @@ public:
 
 
 protected:
-	// to be implemented by audio-driver - last step in a mixer period
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
+	// subclasses can overload this for being used in conjunction with
+	// processNextBuffer()
+	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
 						Uint32 _frames,
-						float _master_gain ) = 0;
+						float _master_gain )
+	{
+	}
+
+	// called by according driver for fetching new sound-data
+	Uint32 FASTCALL getNextBuffer( surroundSampleFrame * _ab );
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
@@ -139,7 +150,8 @@ protected:
 					Uint32 _frames );
 
 	// resample given buffer from samplerate _src_src to samplerate _dst_src
-	void FASTCALL resample( surroundSampleFrame * _src, Uint32 _frames,
+	void FASTCALL resample( const surroundSampleFrame * _src,
+					Uint32 _frames,
 					surroundSampleFrame * _dst,
 					Uint32 _src_sr, Uint32 _dst_sr );
 
@@ -158,6 +170,8 @@ private:
 	SRC_DATA m_srcData;
 	SRC_STATE * m_srcState;
 #endif
+
+	surroundSampleFrame * m_buffer;
 
 } ;
 

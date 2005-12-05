@@ -30,10 +30,12 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QCloseEvent>
+#include <QLayout>
 
 #else
 
 #include <qpainter.h>
+#include <qlayout.h>
 
 #endif
 
@@ -41,13 +43,12 @@
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "embed.h"
-#include "pixmap_button.h"
+#include "tool_button.h"
 #include "track_container.h"
 #include "bb_track.h"
 #include "name_label.h"
 #include "templates.h"
 #include "debug.h"
-#include "spc_bg_hndl_widget.h"
 #include "tooltip.h"
 
 
@@ -57,18 +58,22 @@ const int BBE_PPT = 192;
 
 
 bbEditor * bbEditor::s_instanceOfMe = NULL;
-QPixmap * bbEditor::s_titleArtwork = NULL;
 
 
 
 bbEditor::bbEditor() :
 	trackContainer()
 {
-	if( s_titleArtwork == NULL )
-	{
-		s_titleArtwork = new QPixmap( embed::getIconPixmap(
-						"bb_editor_title_artwork" ) );
-	}
+	// create toolbar
+	m_toolBar = new QWidget( this );
+	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->move( 0, 0 );
+	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
+							"toolbar_bg" ) );
+
+	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+
+
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
@@ -83,33 +88,19 @@ bbEditor::bbEditor() :
 		setGeometry( 210, 340, minimumWidth(), 300 );
 	}
 
-	containerWidget()->move( 0, 47 );
+	containerWidget()->move( 0, 32 );
 	setPixelsPerTact( BBE_PPT );
-	updateBackground();
-
-	m_playButton = new pixmapButton( this );
-	m_playButton->move( 96, 7 );
-	m_playButton->setCheckable( FALSE );
-	m_playButton->setActiveGraphic( embed::getIconPixmap( "play" ) );
-	m_playButton->setInactiveGraphic( embed::getIconPixmap( "play" ) );
-	m_playButton->setBgGraphic( specialBgHandlingWidget::getBackground(
-							m_playButton ) );
-	connect( m_playButton, SIGNAL( clicked() ), this, SLOT( play() ) );
-
-	m_stopButton = new pixmapButton( this );
-	m_stopButton->move( 136, 7 );
-	m_stopButton->setCheckable( FALSE );
-	m_stopButton->setActiveGraphic( embed::getIconPixmap( "stop" ) );
-	m_stopButton->setInactiveGraphic( embed::getIconPixmap( "stop" ) );
-	m_stopButton->setBgGraphic( specialBgHandlingWidget::getBackground(
-							m_playButton ) );
-	connect( m_stopButton, SIGNAL( clicked() ), this, SLOT( stop() ) );
 
 
-	toolTip::add( m_playButton,
-			tr( "Play/pause current beat/bassline (Space)" ) );
-	toolTip::add( m_stopButton,
-			tr( "Stop playing of current beat/bassline (Space)" ) );
+	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+			tr( "Play/pause current beat/bassline (Space)" ),
+					this, SLOT( play() ), m_toolBar );
+
+	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+			tr( "Stop playing of current beat/bassline (Space)" ),
+					this, SLOT( stop() ), m_toolBar );
+
+
 #ifdef QT4
 	m_playButton->setWhatsThis(
 #else
@@ -126,9 +117,15 @@ bbEditor::bbEditor() :
 		tr( "Click here, if you want to stop playing of current "
 							"beat/bassline." ) );
 
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
+	QLabel * l = new QLabel( m_toolBar );
+	l->setPixmap( embed::getIconPixmap( "drum" ) );
+
+	tb_layout->addSpacing( 5 );
+	tb_layout->addWidget( m_playButton );
+	tb_layout->addWidget( m_stopButton );
+	tb_layout->addStretch();
+	tb_layout->addWidget( l );
+	tb_layout->addSpacing( 15 );
 
 	show();
 }
@@ -305,39 +302,11 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 
 void bbEditor::resizeEvent( QResizeEvent * _re )
 {
-	updateBackground();
 	setPixelsPerTact( width() - ( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH + 2 *
 					TCO_BORDER_WIDTH ) );
 	trackContainer::resizeEvent( _re );
-}
-
-
-
-
-void bbEditor::updateBackground( void )
-{
-	QPixmap draw_pm( size() );
-#ifdef QT4
-	draw_pm.fill( containerWidget()->palette().brush(
-				containerWidget()->backgroundRole() ).color() );
-#else
-	draw_pm.fill( containerWidget()->paletteBackgroundColor() );
-#endif
-
-	QPainter p( &draw_pm );
-
-	p.fillRect( 0, 0, width(), s_titleArtwork->height(),
-						QColor( 74, 125, 213 ) );
-	p.drawPixmap( 0, 0, *s_titleArtwork );
-
-#ifdef QT4
-	QPalette pal = palette();
-	pal.setBrush( backgroundRole(), QBrush( draw_pm ) );
-	setPalette( pal );
-#else
-	setErasePixmap( draw_pm );
-#endif
+	m_toolBar->setFixedWidth( width() );
 }
 
 
@@ -351,26 +320,24 @@ void bbEditor::play( void )
 		{
 			songEditor::inst()->stop();
 			songEditor::inst()->playBB();
-			m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+			m_playButton->setPixmap( embed::getIconPixmap(
+								"pause" ) );
 		}
 		else
 		{
 			songEditor::inst()->pause();
-			m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "play" ) );
+			m_playButton->setPixmap( embed::getIconPixmap(
+								"play" ) );
 		}
 	}
 	else if( songEditor::inst()->paused() )
 	{
 		songEditor::inst()->resumeFromPause();
-		m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		m_playButton->setInactiveGraphic(
-					embed::getIconPixmap( "pause" ) );
+		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
 		songEditor::inst()->playBB();
 	}
 
@@ -382,7 +349,7 @@ void bbEditor::play( void )
 void bbEditor::stop( void )
 {
 	songEditor::inst()->stop();
-	m_playButton->setInactiveGraphic( embed::getIconPixmap( "play" ) );
+	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 }
 

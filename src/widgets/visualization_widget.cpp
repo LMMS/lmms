@@ -129,7 +129,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	if( m_enabled )
 	{
-		float master_output = mixer::inst()->masterOutput();
+		float master_output = mixer::inst()->masterGain();
 		Uint16 w = width()-4;
 		float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		Uint16 x_base = 2;

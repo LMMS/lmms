@@ -74,7 +74,8 @@ midiALSASeq::midiALSASeq( void ) :
 	m_queueID = snd_seq_alloc_queue( m_seqHandle );
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_alloca( &tempo );
-	snd_seq_queue_tempo_set_tempo( tempo, 6000000 / songEditor::inst()->getBPM() );
+	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
+						songEditor::inst()->getBPM() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 
@@ -154,10 +155,10 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 			break;
 
 		case NOTE_OFF:
-			snd_seq_ev_set_note( &ev,
+			snd_seq_ev_set_noteoff( &ev,
 						_port->outputChannel(),
 						_me.key() + NOTES_PER_OCTAVE,
-						_me.velocity(), 500 );
+						_me.velocity() );
 			break;
 
 		case KEY_PRESSURE:

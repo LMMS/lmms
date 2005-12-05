@@ -31,11 +31,13 @@
 #include <QPainter>
 #include <QApplication>
 #include <QMouseEvent>
+#include <QLayout>
 
 #else
 
 #include <qpainter.h>
 #include <qapplication.h>
+#include <qlayout.h>
 
 #endif
 
@@ -44,18 +46,23 @@
 #include "nstate_button.h"
 #include "embed.h"
 #include "templates.h"
+#include "nstate_button.h"
 
 
 
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
 QPixmap * timeLine::s_loopPointPixmap = NULL;
+QPixmap * timeLine::s_loopPointDisabledPixmap = NULL;
 
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			songEditor::playPos & _pos, const midiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
+	m_autoScroll( AUTOSCROLL_ENABLED ),
+	m_loopPoints( LOOP_POINTS_DISABLED ),
+	m_behaviourAtStop( BACK_TO_ZERO ),
 	m_xOffset( _xoff ),
 	m_posMarkerX( 0 ),
 	m_ppt( _ppt ),
@@ -84,40 +91,16 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 							"loop_point" ) );
 	}
 
+	if( s_loopPointDisabledPixmap == NULL)
+	{
+		s_loopPointDisabledPixmap = new QPixmap( embed::getIconPixmap(
+						"loop_point_disabled" ) );
+	}
+
 	move( 0, _yoff );
 	setFixedHeight( s_timeLinePixmap->height() );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
-
-
-	m_autoScroll = new nStateButton( this );
-	m_autoScroll->move( 3, 3 );
-	m_autoScroll->setGeneralToolTip( tr( "Enable/disable "
-							"auto-scrolling" ) );
-	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
-	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
-
-	m_loopPoints = new nStateButton( this );
-	m_loopPoints->move( 20, 3 );
-	m_loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
-	m_loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
-	m_loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
-	connect( m_loopPoints, SIGNAL( stateChanged( int ) ), this,
-					SLOT( toggleLoopPoints( int ) ) );
-
-	m_behaviourAtStop = new nStateButton( this );
-	m_behaviourAtStop ->move( 37, 3 );
-	m_behaviourAtStop ->addState( embed::getIconPixmap( "back_to_zero" ),
-					tr( "After stopping go back to begin" )
-									);
-	m_behaviourAtStop ->addState( embed::getIconPixmap(
-							"back_to_start" ),
-					tr( "After stopping go back to "
-						"position at which playing was "
-						"started" ) );
-	m_behaviourAtStop ->addState( embed::getIconPixmap(
-						"keep_stop_position" ),
-					tr( "After stopping keep position" ) );
 
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
@@ -139,18 +122,45 @@ timeLine::~timeLine()
 
 
 
-timeLine::behaviourAtStopStates timeLine::behaviourAtStop( void ) const
+void timeLine::addToolButtons( QWidget * _tool_bar )
 {
-	return( static_cast<behaviourAtStopStates>(
-						m_behaviourAtStop->state() ) );
-}
+	nStateButton * m_autoScroll = new nStateButton( _tool_bar );
+	m_autoScroll->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
+	m_autoScroll->setGeneralToolTip( tr( "Enable/disable "
+							"auto-scrolling" ) );
+	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
+	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
+	connect( m_autoScroll, SIGNAL( changedState( int ) ), this,
+					SLOT( toggleAutoScroll( int ) ) );
 
+	nStateButton * m_loopPoints = new nStateButton( _tool_bar );
+	m_loopPoints->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
+	m_loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
+	m_loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
+	m_loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
+	connect( m_loopPoints, SIGNAL( changedState( int ) ), this,
+					SLOT( toggleLoopPoints( int ) ) );
 
+	nStateButton * m_behaviourAtStop = new nStateButton( _tool_bar );
+	m_behaviourAtStop->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
+	m_behaviourAtStop ->addState( embed::getIconPixmap( "back_to_zero" ),
+					tr( "After stopping go back to begin" )
+									);
+	m_behaviourAtStop ->addState( embed::getIconPixmap(
+							"back_to_start" ),
+					tr( "After stopping go back to "
+						"position at which playing was "
+						"started" ) );
+	m_behaviourAtStop ->addState( embed::getIconPixmap(
+						"keep_stop_position" ),
+					tr( "After stopping keep position" ) );
+	connect( m_behaviourAtStop, SIGNAL( changedState( int ) ), this,
+					SLOT( toggleBehaviourAtStop( int ) ) );
 
-
-bool timeLine::loopPointsEnabled( void ) const
-{
-	return( m_loopPoints->state() == LOOP_POINTS_ENABLED );
+	QBoxLayout * layout = dynamic_cast<QBoxLayout *>( _tool_bar->layout() );
+	layout->addWidget( m_autoScroll );
+	layout->addWidget( m_loopPoints );
+	layout->addWidget( m_behaviourAtStop );
 }
 
 
@@ -170,7 +180,7 @@ void timeLine::updatePosition( const midiTime & )
 #ifndef QT4
 		qApp->unlock();
 #endif
-		if( m_autoScroll->state() == AUTOSCROLL_ENABLED )
+		if( m_autoScroll == AUTOSCROLL_ENABLED )
 		{
 			emit positionChanged( m_pos );
 		}
@@ -180,9 +190,26 @@ void timeLine::updatePosition( const midiTime & )
 
 
 
+void timeLine::toggleAutoScroll( int _n )
+{
+	m_autoScroll = static_cast<autoScrollStates>( _n );
+}
+
+
+
+
 void timeLine::toggleLoopPoints( int _n )
 {
+	m_loopPoints = static_cast<loopPointStates>( _n );
 	update();
+}
+
+
+
+
+void timeLine::toggleBehaviourAtStop( int _n )
+{
+	m_behaviourAtStop = static_cast<behaviourAtStopStates>( _n );
 }
 
 
@@ -205,13 +232,11 @@ void timeLine::paintEvent( QPaintEvent * )
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 	p.setPen( QColor( 0, 0, 0 ) );
 
-	if( m_loopPoints->state() == LOOP_POINTS_ENABLED )
-	{
-		p.drawPixmap( markerX( m_loopPos[0] ), 7,
-							*s_loopPointPixmap );
-		p.drawPixmap( markerX( m_loopPos[1] ), 7,
-							*s_loopPointPixmap );
-	}
+	const QPixmap & lpoint = loopPointsEnabled() ?
+						*s_loopPointPixmap :
+						*s_loopPointDisabledPixmap;
+	p.drawPixmap( markerX( m_loopPos[0] ), 7, lpoint );
+	p.drawPixmap( markerX( m_loopPos[1] ), 7, lpoint );
 
 
 	tact tact_num = m_begin.getTact();
@@ -225,7 +250,11 @@ void timeLine::paintEvent( QPaintEvent * )
 		if( ( tact_num - 1 ) %
 			tMax( 1, static_cast<int>( 64.0f / m_ppt ) ) == 0 )
 		{
-			p.drawText( x + static_cast<int>( i * m_ppt ), 16,
+			p.setPen( QColor( 224, 224, 224 ) );
+			p.drawText( x + static_cast<int>( i * m_ppt ) + 1, 15,
+						QString::number( tact_num ) );
+			p.setPen( QColor( 0, 0, 0 ) );
+			p.drawText( x + static_cast<int>( i * m_ppt ), 14,
 						QString::number( tact_num ) );
 		}
 	}
@@ -249,10 +278,6 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	}
 	if( _me->button() == Qt::RightButton )
 	{
-		if( m_loopPoints->state() != LOOP_POINTS_ENABLED )
-		{
-			return;
-		}
 		if( _me->x() >= markerX( loopBegin() ) &&
 				_me->x() <= markerX( loopBegin() ) +
 						s_loopPointPixmap->width() )
@@ -300,12 +325,12 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 			break;
 
 		case MOVE_LOOP_BEGIN:
-			m_loopPos[0] = t;
+			m_loopPos[0] = t.getTact() * 64;
 			update();
 			break;
 
 		case MOVE_LOOP_END:
-			m_loopPos[1] = t;
+			m_loopPos[1] = t.getTact() * 64;
 			update();
 			break;
 

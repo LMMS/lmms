@@ -48,7 +48,7 @@ public:
 			Uint16 _min_bitrate, Uint16 _max_bitrate );
 	~audioFileOgg();
 
-	static audioDevice * getInst( Uint32 _sample_rate, Uint32 _channels,
+	static audioFileDevice * getInst( Uint32 _sample_rate, Uint32 _channels,
 							bool & _success_ful,
 							const QString & _file,
 							bool _use_vbr,
@@ -63,7 +63,7 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBufferToDev( surroundSampleFrame * _ab,
+	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
 							Uint32 _frames,
 							float _master_gain );
 

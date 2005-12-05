@@ -53,12 +53,9 @@
 
 class channelTrack;
 class sampleBuffer;
-class audioSampleRecorder;
-class QTimer;
 class QProgressBar;
 class QPushButton;
 class QPixmap;
-class patternFreezeStatusDialog; 
 
 
 
@@ -72,7 +69,7 @@ class pattern : public trackContentObject
 public:
 	enum patternTypes
 	{
-		BEAT_PATTERN, MELODY_PATTERN/*, EVENT_PATTERN*/
+		BEAT_PATTERN, MELODY_PATTERN/*, AUTOMATION_PATTERN*/
 	} ;
 
 	pattern( channelTrack * _channel_track );
@@ -83,9 +80,13 @@ public:
 
 
 	virtual midiTime length( void ) const;
+
 	note * FASTCALL addNote( const note & _new_note );
+
 	void FASTCALL removeNote( const note * _note_to_del );
+
 	note * FASTCALL rearrangeNote( const note * _note_to_proc );
+
 	void clearNotes( void );
 	
 	inline noteVector & notes( void )
@@ -98,32 +99,39 @@ public:
 		return( m_patternType );
 	}
 	void FASTCALL setType( patternTypes _new_pattern_type );
+
+
 	inline const QString & name( void ) const
 	{
 		return( m_name );
 	}
+
 	inline void setName( const QString & _name )
 	{
 		m_name = _name;
 		update();
 	}
+
+
 	inline channelTrack * getChannelTrack( void )
 	{
 		return( m_channelTrack );
 	}
 
+
 	// functions which are part of freezing-feature
+	inline bool freezing( void ) const
+	{
+		return( m_freezing );
+	}
+	
 	inline bool frozen( void ) const
 	{
 		return( m_frozenPattern != NULL );
 	}
+
 	void FASTCALL playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
 							Uint32 _frames );
-	inline bool isFreezing( void ) const
-	{
-		return( m_freezeRecorder != NULL );
-	}
-	void finishFreeze( void );
 
 
 	note * FASTCALL noteAt( int _note_num );
@@ -147,7 +155,6 @@ protected slots:
 	void changeName( void );
 	void freeze( void );
 	void unfreeze( void );
-	void updateFreezeStatusDialog( void );
 	void abortFreeze( void );
 
 
@@ -177,9 +184,9 @@ private:
 
 	QMutex m_frozenPatternMutex;
 	sampleBuffer * m_frozenPattern;
-	audioSampleRecorder * m_freezeRecorder;
-	patternFreezeStatusDialog * m_freezeStatusDialog;
-	QTimer * m_freezeStatusUpdateTimer;
+	bool m_freezing;
+	volatile bool m_freezeAborted;
+
 } ;
 
 

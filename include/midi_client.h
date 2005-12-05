@@ -102,15 +102,14 @@ protected:
 
 
 
-
 const Uint8 RAW_MIDI_PARSE_BUF_SIZE = 16;
 
 
-class midiRawClient : public midiClient
+class midiClientRaw : public midiClient
 {
 public:
-	midiRawClient( void );
-	~midiRawClient();
+	midiClientRaw( void );
+	virtual ~midiClientRaw();
 
 
 protected:

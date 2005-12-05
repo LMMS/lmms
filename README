@@ -1,10 +1,10 @@
 Linux MultiMedia Studio 0.1.1
 ==============================
 
-Copyright (c) 2004-2005 by Tobias Doerffel and others
+Copyright (c) 2004-2005 by Tobias Doerffel and others.
 
 
-The whole program is free software; you can redistribute it and/or modify 
+This program is free software; you can redistribute it and/or modify 
 it under the terms of the GNU General Public License as published by the
 Free Software Foundation; either version 2 of the License, or (at your option)
 any later version.
@@ -26,9 +26,9 @@ What is LMMS??
 LMMS aims to be a free alternative to popular (but commercial and closed-
 source) programs like FruityLoops, Cubase and Logic giving you the ability of
 producing music with your computer by creating/synthesizing sounds, arranging
-samples, playing live with keyboard and much more...
+samples, using effects, playing live with keyboard and much more...
 
-LMMS combines the features of a tracker-/sequencer-program (pattern-/channel-/
+LMMS combines the features of a sequencer-program (pattern-/channel-/
 sample-/song-/effect-management) and those of powerful synthesizers and
 samplers in a modern, user-friendly and easy to use graphical user-interface.
 
@@ -47,28 +47,42 @@ least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 
 Required libraries are:
 
-- multihreaded version of Qt 3.0 (3.2 recommended) or higher (tested up to
-  4.0.0) with devel-files
+- multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher (tested
+  up to 4.0.0) with devel-files
 
 Optional, but strongly recommended:
+- JACK with devel-files
 - libvorbis with devel-files
 - libalsa with devel-files
 - SDL_sound (tested with 0.1.5 & 1.0.1) with devel-files
 - SDL with devel-files
 - libsamplerate with devel-files
 - libsndfile with devel-files
-- JACK with devel-files
-- libfst + header-files from Steinberg SDK
+- WINE, WINE-devel-files + header-files from Steinberg SDK
 
 For compiling you should have an up to date GCC with g++.
-LMMS has been (successfully) tested under Debian Sarge 3.1, Fedora Core 2-4,
-and SuSE Linux 9.0-9.3 with Qt 3.[23].x and Qt 4.0.0.
-It was compiled using GCC 3.3.x, GCC 3.4.x and GCC 4.0.x.
+LMMS has been (successfully) tested under Debian Sarge 3.1 / unstable,
+Fedora Core 2-4, and SuSE Linux 9.0-9.3 with Qt 3.[23].x and Qt 4.0.0.
+It was compiled using GCC 2.95, 3.3.x, GCC 3.4.x and GCC 4.0.x.
 
 If you have problems with compiling or running LMMS, find any bug or have
 suggestions and so on, please feel free to e-mail me (for mail-address see
 below)!
 
+
+
+Building
+--------
+
+See INSTALL for information on how to build LMMS.
+
+Please also take a look at
+
+./configure --help
+
+There you'll see a lot of options which partly might be interesting for you.
+For example if you want to build LMMS with VST-support, you have to run
+configure with --with-vst switch. Otherwise LMMS support won't be built!
 
 
 

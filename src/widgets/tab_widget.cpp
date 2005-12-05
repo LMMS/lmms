@@ -209,7 +209,7 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 void tabWidget::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	int dir = ( _we->delta() > 0 ) ? 1 : -1;
+	int dir = ( _we->delta() < 0 ) ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<csize>( tab ) < m_widgets.count() )
 	{

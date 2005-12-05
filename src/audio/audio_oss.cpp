@@ -95,7 +95,8 @@ audioOSS::audioOSS( Uint32 _sample_rate, bool & _success_ful ) :
 	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
 					"audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
-	m_convertEndian( FALSE )
+	m_convertEndian( FALSE ),
+	m_quit( FALSE )
 {
 	_success_ful = FALSE;
 
@@ -231,6 +232,7 @@ audioOSS::audioOSS( Uint32 _sample_rate, bool & _success_ful ) :
 
 audioOSS::~audioOSS()
 {
+	stopProcessing();
 	close( m_audioFD );
 }
 
@@ -278,15 +280,52 @@ QString audioOSS::probeDevice( void )
 
 
 
-void audioOSS::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-							float _master_gain )
+void audioOSS::startProcessing( void )
 {
-	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
-							_frames * channels() );
-	int bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
-							m_convertEndian );
-	write( m_audioFD, outbuf, bytes );
+	if( !running() )
+	{
+		start();
+	}
+}
 
+
+
+
+void audioOSS::stopProcessing( void )
+{
+	if( running() )
+	{
+		m_quit = TRUE;
+		wait( 500 );
+		terminate();
+	}
+}
+
+
+
+
+void audioOSS::run( void )
+{
+	surroundSampleFrame * temp =
+			bufferAllocator::alloc<surroundSampleFrame>(
+					mixer::inst()->framesPerAudioBuffer() );
+	outputSampleType * outbuf =
+				bufferAllocator::alloc<outputSampleType>(
+					mixer::inst()->framesPerAudioBuffer() *
+								channels() );
+	m_quit = FALSE;
+
+	while( m_quit == FALSE )
+	{
+		const Uint32 frames = getNextBuffer( temp );
+
+		int bytes = convertToS16( temp, frames,
+				mixer::inst()->masterGain(), outbuf,
+							m_convertEndian );
+		write( m_audioFD, outbuf, bytes );
+	}
+
+	bufferAllocator::free( temp );
 	bufferAllocator::free( outbuf );
 }
 

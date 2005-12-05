@@ -61,7 +61,8 @@ audioALSA::audioALSA( Uint32 _sample_rate, bool & _success_ful ) :
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_littleEndian( isLittleEndian() )
+	m_littleEndian( isLittleEndian() ),
+	m_quit( FALSE )
 {
 	_success_ful = FALSE;
 
@@ -105,6 +106,7 @@ audioALSA::audioALSA( Uint32 _sample_rate, bool & _success_ful ) :
 
 audioALSA::~audioALSA()
 {
+	stopProcessing();
 	if( m_handle != NULL )
 	{
 		snd_pcm_close( m_handle );
@@ -175,40 +177,77 @@ int audioALSA::handleError( int _err )
 
 
 
-void audioALSA::writeBufferToDev( surroundSampleFrame * _ab, Uint32 _frames,
-							float _master_gain )
+void audioALSA::startProcessing( void )
 {
-	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
-							_frames * channels() );
-	bufferAllocator::autoCleaner<> ac( outbuf );
+	if( !running() )
+	{
+		start();
+	}
+}
 
-	convertToS16( _ab, _frames, _master_gain, outbuf,
+
+
+
+void audioALSA::stopProcessing( void )
+{
+	if( running() )
+	{
+		m_quit = TRUE;
+		wait( 500 );
+		terminate();
+	}
+}
+
+
+
+
+void audioALSA::run( void )
+{
+	surroundSampleFrame * temp =
+			bufferAllocator::alloc<surroundSampleFrame>(
+					mixer::inst()->framesPerAudioBuffer() );
+	outputSampleType * outbuf =
+				bufferAllocator::alloc<outputSampleType>(
+					mixer::inst()->framesPerAudioBuffer() *
+								channels() );
+	m_quit = FALSE;
+
+	while( m_quit == FALSE )
+	{
+		const Uint32 frames = getNextBuffer( temp );
+
+		convertToS16( temp, frames, mixer::inst()->masterGain(), outbuf,
 					m_littleEndian != isLittleEndian() );
 
-	Uint32 frame = 0;
+		Uint32 frame = 0;
+		outputSampleType * ptr = outbuf;
 
-	while( frame < _frames )
-	{
-		int err = snd_pcm_writei( m_handle, outbuf, _frames );
-
-		if( err == -EAGAIN )
+		while( frame < frames )
 		{
-			continue;
-		}
+			int err = snd_pcm_writei( m_handle, ptr, frames );
 
-		if( err < 0 )
-		{
-			if( handleError( err ) < 0 )
+			if( err == -EAGAIN )
 			{
-				printf( "Write error: %s\n",
-							snd_strerror( err ) );
-				return;
+				usleep( 10 );
+				continue;
 			}
-			break;	// skip this buffer
+
+			if( err < 0 )
+			{
+				if( handleError( err ) < 0 )
+				{
+					printf( "Write error: %s\n",
+							snd_strerror( err ) );
+				}
+				break;	// skip this buffer
+			}
+			ptr += err * channels();
+			frame += err;
 		}
-		outbuf += err * channels();
-		frame += err;
 	}
+
+	bufferAllocator::free( temp );
+	bufferAllocator::free( outbuf );
 }
 
 
