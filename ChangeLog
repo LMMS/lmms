@@ -1,3 +1,29 @@
+2005-12-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/note_play_handle.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	* src/tracks/channel_track.cpp:
+	moved output-MIDI-event-generation-code from channel-track to
+	note-play-handles for covering arpeggio/chords and having exactly
+	timed events - makes it now possible to control other MIDI-based
+	synths etc. from patterns (which was not possible before because
+	of a small bug) - will drop MIDI-out-plugin very soon as it isn't
+	needed anymore
+
+2005-12-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	- when moving mouse draw a bar at current key
+	- re-enabled mouse-tracking for cursor-changes when mouse is over tail
+	  of note etc.
+
+	* resources/zoom.png:
+	* src/core/song_editor.cpp:
+	* src/core/piano_roll.cpp:
+	added small zoom-icon to zoom-combobox
+
 2005-12-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/midi_alsa_raw.h:

@@ -238,7 +238,8 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 			}
 			// set note on
 			m_channelTrack->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ),
+					midiEvent( NOTE_ON, 0, key_num,
+							vol * 127 / 100 ),
 								midiTime() );
 			m_pressedKeys[key_num] = TRUE;
 		}

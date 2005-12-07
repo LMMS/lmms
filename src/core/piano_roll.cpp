@@ -35,6 +35,7 @@
 #include <QWheelEvent>
 #include <QComboBox>
 #include <QLayout>
+#include <QLabel>
 
 #else
 
@@ -43,6 +44,7 @@
 #include <qpainter.h>
 #include <qcombobox.h>
 #include <qlayout.h>
+#include <qlabel.h>
 
 #define setChecked setOn
 
@@ -141,6 +143,7 @@ pianoRoll::pianoRoll( void ) :
 	m_shiftPressed( FALSE ),
 	m_controlPressed( FALSE ),
 	m_startKey( INITIAL_START_KEY ),
+	m_keyMouseOver( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( DRAW ),
 	m_scrollBack( FALSE )
@@ -376,6 +379,8 @@ pianoRoll::pianoRoll( void ) :
 
 
 
+	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
 	m_zoomingComboBox = new QComboBox( m_toolBar );
@@ -407,7 +412,9 @@ pianoRoll::pianoRoll( void ) :
 	tb_layout->addWidget( m_pasteButton );
 	tb_layout->addSpacing( 10 );
 	m_timeLine->addToolButtons( m_toolBar );
-	tb_layout->addSpacing( 10 );
+	tb_layout->addSpacing( 15 );
+	tb_layout->addWidget( zoom_lbl );
+	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_zoomingComboBox );
 	tb_layout->addStretch();
 
@@ -419,7 +426,7 @@ pianoRoll::pianoRoll( void ) :
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
-	//setMouseTracking( TRUE );
+	setMouseTracking( TRUE );
 
 	hide();
 
@@ -674,7 +681,14 @@ void pianoRoll::paintEvent( QPaintEvent * )
 		}
 		// draw key-line
 		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
-
+		if( key == m_keyMouseOver )
+		{
+			p.fillRect( WHITE_KEY_WIDTH, key_line_y -
+							KEY_LINE_HEIGHT,
+					width() - WHITE_KEY_WIDTH,
+					KEY_LINE_HEIGHT,
+					QColor( 64, 64, 64 ) );
+		}
 		++key;
 	}
 
@@ -1232,7 +1246,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					songEditor::inst()->playing() == FALSE )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ),
+					midiEvent( NOTE_ON, 0, key_num,
+							vol * 127 / 100 ),
 								midiTime() );
 		}
 	}
@@ -1249,12 +1264,12 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
 				midiEvent( NOTE_OFF, 0,
-					m_currentNote->key() ), midiTime() );
+					m_currentNote->key(), 0 ), midiTime() );
 		}
 		else
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, getKey( _me->y() ) ),
+				midiEvent( NOTE_OFF, 0, getKey( _me->y() ), 0 ),
 								midiTime() );
 		}
 	}
@@ -1289,6 +1304,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					PR_BOTTOM_MARGIN - m_notesEditHeight );
 
 		int key_num = getKey( _me->y() );
+		m_keyMouseOver = key_num;
 		int x = _me->x();
 
 		// is the calculated key different from current key?
@@ -1296,10 +1312,16 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		// but is still on the same key)
 		if( key_num != released_key &&
 			m_action != CHANGE_NOTE_VOLUME &&
-			edit_note == FALSE )
+			edit_note == FALSE &&
+#ifdef QT4
+			_me->buttons() &
+#else
+			_me->state() ==
+#endif
+					Qt::LeftButton )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, released_key ),
+				midiEvent( NOTE_OFF, 0, released_key, 0 ),
 								midiTime() );
 			if(
 #ifdef QT4
@@ -1315,7 +1337,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
-							DEFAULT_VOLUME ),
+						DEFAULT_VOLUME * 127 / 100 ),
 								midiTime() );
 			}
 		}
@@ -1339,7 +1361,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_currentNote->setVolume( vol );
 				m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( KEY_PRESSURE, 0, key_num,
-									vol ),
+							vol * 127 / 100 ),
 								midiTime() );
 			}
 		}

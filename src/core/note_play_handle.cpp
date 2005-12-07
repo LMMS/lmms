@@ -29,6 +29,9 @@
 #include "note_play_handle.h"
 #include "channel_track.h"
 #include "envelope_tab_widget.h"
+#include "midi.h"
+#include "midi_port.h"
+#include "song_editor.h"
 
 
 notePlayHandle::notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
@@ -50,6 +53,15 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
 	m_muted( FALSE )
 {
 	setFrames( _frames );
+	// send MIDI-note-on-event
+	m_channelTrack->processOutEvent( midiEvent( NOTE_ON,
+				m_channelTrack->m_midiPort->outputChannel(),
+					key(),
+				(Uint16) ( ( getVolume() / 100.0f ) *
+				( m_channelTrack->getVolume() / 100.0f ) *
+								127 ) ),
+				midiTime::fromFrames( m_framesAhead,
+					songEditor::inst()->framesPerTact() ) );
 }
 
 
@@ -57,6 +69,11 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
 
 notePlayHandle::~notePlayHandle()
 {
+	if( m_released == FALSE )
+	{
+		noteOff( 0 );
+	}
+
 	if( m_channelTrack != NULL )
 	{
 		m_channelTrack->deleteNotePluginData( this );
@@ -205,6 +222,13 @@ void notePlayHandle::noteOff( Uint32 _s )
 	{
 		m_releaseFramesToDo =
 				m_channelTrack->m_envWidget->releaseFrames();
+		// send MIDI-note-off-event
+		m_channelTrack->processOutEvent( midiEvent( NOTE_OFF,
+				m_channelTrack->m_midiPort->outputChannel(),
+								key(), 0 ),
+						midiTime::fromFrames(
+							m_framesBeforeRelease,
+					songEditor::inst()->framesPerTact() ) );
 	}
 	else
 	{

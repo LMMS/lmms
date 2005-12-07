@@ -362,6 +362,9 @@ songEditor::songEditor() :
 #endif
 
 
+	QLabel * zoom_lbl = new QLabel( m_toolBar );
+	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+
 	// setup zooming-stuff
 	m_zoomingComboBox = new QComboBox( m_toolBar );
 	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
@@ -387,7 +390,9 @@ songEditor::songEditor() :
 	tb_layout->addWidget( m_removeBarButton );
 	tb_layout->addSpacing( 10 );
 	tl->addToolButtons( m_toolBar );
-	tb_layout->addSpacing( 10 );
+	tb_layout->addSpacing( 15 );
+	tb_layout->addWidget( zoom_lbl );
+	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_zoomingComboBox );
 	tb_layout->addStretch();
 

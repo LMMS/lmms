@@ -1,8 +1,8 @@
 to be done as soon as possible:
 
+- fix midi-channel-selection stuff and add possibility to select destination-MIDI-port inside LMMS
 - add note-len- and note-alignment-selectbox to piano-roll
 - make it possible in bb-editor to add single beats to beat-patterns
-- MIDI/note-debug!!
 - select connected midi-device in midi-setup-tabwidget
 - fix audio/midi-settings stuff/translation
 - arpeggio: send midi-out-events via channel-track

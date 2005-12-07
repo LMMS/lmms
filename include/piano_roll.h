@@ -215,7 +215,7 @@ private:
 	bool m_controlPressed;
 
 	int m_startKey;			// first key when drawing
-
+	int m_keyMouseOver;
 	int m_lastKey;
 
 	noteVector m_notesToCopy;
