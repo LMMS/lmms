@@ -46,7 +46,7 @@
 #include "settings.h"
 
 
-class QComboBox;
+class QMenu;
 class QPixmap;
 
 class channelTrack;
@@ -78,7 +78,10 @@ protected slots:
 	void inputChannelChanged( int );
 	void outputChannelChanged( int );
 	void midiPortModeToggled( bool );
-
+	void readablePortsChanged( void );
+	void writeablePortsChanged( void );
+	void activatedReadablePort( int _id );
+	void activatedWriteablePort( int _id );
 
 private:
 	channelTrack * m_channelTrack;
@@ -90,6 +93,8 @@ private:
 	ledCheckBox * m_receiveCheckBox;
 	ledCheckBox * m_sendCheckBox;
 	ledCheckBox * m_routeCheckBox;
+	QMenu * m_readablePorts;
+	QMenu * m_writeablePorts;
  
 } ;
 

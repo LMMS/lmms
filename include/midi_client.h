@@ -31,10 +31,12 @@
 #ifdef QT4
 
 #include <QVector>
+#include <QStringList>
 
 #else
 
 #include <qvaluevector.h>
+#include <qstringlist.h>
 
 #endif
 
@@ -74,6 +76,38 @@ public:
 	// re-implemented methods HAVE to call removePort() of base-class!!
 	virtual void FASTCALL removePort( midiPort * _port );
 
+
+	// returns whether client works with raw-MIDI, only needs to be
+	// re-implemented by midiClientRaw for returning TRUE
+	inline virtual bool isRaw( void ) const
+	{
+		return( FALSE );
+	}
+
+	// if not raw-client, return all readable/writeable ports
+	virtual const QStringList & readablePorts( void ) const;
+	virtual const QStringList & writeablePorts( void ) const;
+
+	// (un)subscribe given midiPort to/from destination-port 
+	virtual void subscribeReadablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe = FALSE );
+	virtual void subscribeWriteablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe = FALSE );
+
+	// qobject-derived classes can use this for make a slot being
+	// connected to signal of non-raw-MIDI-client if port-lists change
+	virtual void connectRPChanged( QObject *, const char * )
+	{
+	}
+
+	virtual void connectWPChanged( QObject *, const char * )
+	{
+	}
+
+	// tries to open either MIDI-driver from config-file or (if it fails)
+	// any other working
 	static midiClient * openMidiClient( void );
 
 
@@ -102,6 +136,7 @@ protected:
 
 
 
+
 const Uint8 RAW_MIDI_PARSE_BUF_SIZE = 16;
 
 
@@ -111,22 +146,34 @@ public:
 	midiClientRaw( void );
 	virtual ~midiClientRaw();
 
+	// we are raw-clients for sure!
+	inline virtual bool isRaw( void ) const
+	{
+		return( TRUE );
+	}
+
 
 protected:
+	// generic raw-MIDI-parser which generates appropriate MIDI-events
 	void FASTCALL parseData( const Uint8 _c );
 
+	// to be implemented by actual client-implementation
 	virtual void FASTCALL sendByte( const Uint8 _c ) = 0;
 
 
 private:
+	// this does MIDI-event-process
 	void processParsedEvent();
 	virtual void FASTCALL processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port );
 
+	// small helper function returning length of a certain event - this
+	// is neccessary for parsing raw-MIDI-data
 	static Uint8 FASTCALL eventLength( const Uint8 _event );
 
 
+	// data being used for parsing
 	struct midiParserData
 	{
 		Uint8 m_status;		// identifies the type of event, that
@@ -142,7 +189,9 @@ private:
 					// buffer for incoming data
 		midiEvent m_midiEvent;	// midi-event 
 	} m_midiParseData;
+
 } ;
+
 
 #endif
 

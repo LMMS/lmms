@@ -51,11 +51,17 @@
 
 
 midiALSASeq::midiALSASeq( void ) :
+#ifndef QT4
+	QObject(),
+#endif
 	midiClient(),
 	QThread(),
 	m_seqHandle( NULL ),
 	m_queueID( -1 ),
-	m_quit( FALSE )
+	m_quit( FALSE ),
+	m_portListUpdateTimer( this ),
+	m_readablePorts(),
+	m_writeablePorts()
 {
 	int err;
 	if( ( err = snd_seq_open( &m_seqHandle,
@@ -71,6 +77,7 @@ midiALSASeq::midiALSASeq( void ) :
 	}
 	snd_seq_set_client_name( m_seqHandle, "LMMS" );
 
+
 	m_queueID = snd_seq_alloc_queue( m_seqHandle );
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_alloca( &tempo );
@@ -83,6 +90,14 @@ midiALSASeq::midiALSASeq( void ) :
 	changeQueueTempo( songEditor::inst()->getBPM() );
 	connect( songEditor::inst(), SIGNAL( bpmChanged( int ) ),
 			this, SLOT( changeQueueTempo( int ) ) );
+
+	// initial list-update
+	updatePortList();
+
+	connect( &m_portListUpdateTimer, SIGNAL( timeout() ),
+					this, SLOT( updatePortList() ) );
+	// we check for port-changes every second
+	m_portListUpdateTimer.start( 1000 );
 
 	start( 
 #if QT_VERSION >= 0x030200	
@@ -315,6 +330,87 @@ void midiALSASeq::removePort( midiPort * _port )
 
 
 
+void midiALSASeq::subscribeReadablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe )
+{
+	if( m_portIDs.contains( _port ) == FALSE ||
+		( _port->mode() != midiPort::INPUT &&
+		  _port->mode() != midiPort::DUPLEX ) )
+	{
+		return;
+	}
+	snd_seq_addr_t sender;
+	if( snd_seq_parse_address( m_seqHandle, &sender,
+					_dest.section( ' ', 0, 0 ).ascii() ) )
+	{
+		printf( "error parsing sender-address!!\n" );
+		return;
+	}
+	snd_seq_port_info_t * port_info;
+	snd_seq_port_info_malloc( &port_info );
+	snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][0], port_info );
+	const snd_seq_addr_t * dest = snd_seq_port_info_get_addr( port_info );
+	snd_seq_port_subscribe_t * subs;
+	snd_seq_port_subscribe_alloca( &subs );
+	snd_seq_port_subscribe_set_sender( subs, &sender );
+	snd_seq_port_subscribe_set_dest( subs, dest );
+	if( _unsubscribe )
+	{
+		snd_seq_unsubscribe_port( m_seqHandle, subs );
+	}
+	else
+	{
+		snd_seq_subscribe_port( m_seqHandle, subs );
+	}
+	snd_seq_port_info_free( port_info );
+}
+
+
+
+
+void midiALSASeq::subscribeWriteablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe )
+{
+	if( m_portIDs.contains( _port ) == FALSE ||
+		( _port->mode() != midiPort::OUTPUT &&
+		  _port->mode() != midiPort::DUPLEX ) )
+	{
+		return;
+	}
+	snd_seq_addr_t dest;
+	if( snd_seq_parse_address( m_seqHandle, &dest,
+					_dest.section( ' ', 0, 0 ).ascii() ) )
+	{
+		printf( "error parsing dest-address!!\n" );
+		return;
+	}
+	snd_seq_port_info_t * port_info;
+	snd_seq_port_info_malloc( &port_info );
+	snd_seq_get_port_info( m_seqHandle, ( m_portIDs[_port][1] == -1 ) ?
+						m_portIDs[_port][0] :
+						m_portIDs[_port][1],
+						port_info );
+	const snd_seq_addr_t * sender = snd_seq_port_info_get_addr( port_info );
+	snd_seq_port_subscribe_t * subs;
+	snd_seq_port_subscribe_alloca( &subs );
+	snd_seq_port_subscribe_set_sender( subs, sender );
+	snd_seq_port_subscribe_set_dest( subs, &dest );
+	if( _unsubscribe )
+	{
+		snd_seq_unsubscribe_port( m_seqHandle, subs );
+	}
+	else
+	{
+		snd_seq_subscribe_port( m_seqHandle, subs );
+	}
+	snd_seq_port_info_free( port_info );
+}
+
+
+
+
 void midiALSASeq::run( void )
 {
 	while( m_quit == FALSE )
@@ -331,10 +427,12 @@ void midiALSASeq::run( void )
 				dest = m_portIDs.keys()[i];
 			}
 		}
+
 		if( dest == NULL )
 		{
 			continue;
 		}
+
 		switch( ev->type )
 		{
 			case SND_SEQ_EVENT_NOTEON:
@@ -343,7 +441,8 @@ void midiALSASeq::run( void )
 							ev->data.note.note -
 							NOTES_PER_OCTAVE,
 							ev->data.note.velocity
-							), midiTime( ev->time.tick) );
+							),
+						midiTime( ev->time.tick ) );
 				break;
 
 			case SND_SEQ_EVENT_NOTEOFF:
@@ -352,7 +451,8 @@ void midiALSASeq::run( void )
 							ev->data.note.note -
 							NOTES_PER_OCTAVE,
 							ev->data.note.velocity
-							), midiTime( ev->time.tick) );
+							),
+						midiTime( ev->time.tick) );
 				break;
 
 			case SND_SEQ_EVENT_KEYPRESS:
@@ -373,6 +473,7 @@ void midiALSASeq::run( void )
 						"event %d\n", ev->type );
 				break;
 		}
+
 	}
 
 }
@@ -387,6 +488,83 @@ void midiALSASeq::changeQueueTempo( int _bpm )
 	snd_seq_drain_output( m_seqHandle );
 }
 
+
+
+
+void midiALSASeq::updatePortList( void )
+{
+	QStringList readable_ports;
+	QStringList writeable_ports;
+
+	// get input- and output-ports
+	snd_seq_client_info_t * cinfo;
+	snd_seq_port_info_t * pinfo;
+
+	snd_seq_client_info_alloca( &cinfo );
+	snd_seq_port_info_alloca( &pinfo );
+
+	snd_seq_client_info_set_client( cinfo, -1 );
+	while( snd_seq_query_next_client( m_seqHandle, cinfo ) >= 0 )
+	{
+		int client = snd_seq_client_info_get_client( cinfo );
+
+		snd_seq_port_info_set_client( pinfo, client );
+		snd_seq_port_info_set_port( pinfo, -1 );
+		while( snd_seq_query_next_port( m_seqHandle, pinfo ) >= 0 )
+		{
+			// we need both READ and SUBS_READ
+			if( ( snd_seq_port_info_get_capability( pinfo )
+			     & ( SND_SEQ_PORT_CAP_READ |
+					SND_SEQ_PORT_CAP_SUBS_READ ) ) ==
+					( SND_SEQ_PORT_CAP_READ |
+					  	SND_SEQ_PORT_CAP_SUBS_READ ) )
+			{
+				readable_ports.push_back( 
+					QString( "%1:%2 %3:%4" ).
+					arg( snd_seq_port_info_get_client(
+								pinfo ) ).
+					arg( snd_seq_port_info_get_port(
+								pinfo ) ).
+					arg( snd_seq_client_info_get_name(
+								cinfo ) ).
+					arg( snd_seq_port_info_get_name(
+								pinfo ) ) );
+			}
+			if( ( snd_seq_port_info_get_capability( pinfo )
+			     & ( SND_SEQ_PORT_CAP_WRITE |
+					SND_SEQ_PORT_CAP_SUBS_WRITE ) ) ==
+					( SND_SEQ_PORT_CAP_WRITE |
+					  	SND_SEQ_PORT_CAP_SUBS_WRITE ) )
+			{
+				writeable_ports.push_back( 
+					QString( "%1:%2 %3:%4" ).
+					arg( snd_seq_port_info_get_client(
+								pinfo ) ).
+					arg( snd_seq_port_info_get_port(
+								pinfo ) ).
+					arg( snd_seq_client_info_get_name(
+								cinfo ) ).
+					arg( snd_seq_port_info_get_name(
+								pinfo ) ) );
+			}
+		}
+	}
+
+/*	snd_seq_client_info_free( cinfo );
+	snd_seq_port_info_free( pinfo );*/
+
+	if( m_readablePorts != readable_ports )
+	{
+		m_readablePorts = readable_ports;
+		emit( readablePortsChanged() );
+	}
+
+	if( m_writeablePorts != writeable_ports )
+	{
+		m_writeablePorts = writeable_ports;
+		emit( writeablePortsChanged() );
+	}
+}
 
 
 

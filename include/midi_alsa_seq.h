@@ -43,11 +43,13 @@
 #ifdef QT4
 
 #include <QThread>
+#include <QTimer>
 
 #else
 
 #include <qobject.h>
 #include <qthread.h>
+#include <qtimer.h>
 
 #endif
 
@@ -91,6 +93,38 @@ public:
 	virtual void FASTCALL removePort( midiPort * _port );
 
 
+	// list seq-ports from ALSA 
+	inline virtual const QStringList & readablePorts( void ) const
+	{
+		return( m_readablePorts );
+	}
+
+	virtual const QStringList & writeablePorts( void ) const
+	{
+		return( m_writeablePorts );
+	}
+
+	// (un)subscribe given midiPort to/from destination-port 
+	virtual void subscribeReadablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe = FALSE );
+	virtual void subscribeWriteablePort( midiPort * _port,
+						const QString & _dest,
+						bool _unsubscribe = FALSE );
+	virtual void connectRPChanged( QObject * _receiver,
+							const char * _member )
+	{
+		connect( this, SIGNAL( readablePortsChanged() ),
+							_receiver, _member );
+	}
+
+	virtual void connectWPChanged( QObject * _receiver,
+							const char * _member )
+	{
+		connect( this, SIGNAL( writeablePortsChanged() ),
+							_receiver, _member );
+	}
+
 
 	class setupWidget : public midiClient::setupWidget
 	{
@@ -108,6 +142,7 @@ public:
 
 private slots:
 	void changeQueueTempo( int _bpm );
+	void updatePortList( void );
 
 
 private:
@@ -126,6 +161,16 @@ private:
 	int m_queueID;
 
 	volatile bool m_quit;
+
+
+	QTimer m_portListUpdateTimer;
+	QStringList m_readablePorts;
+	QStringList m_writeablePorts;
+
+
+signals:
+	void readablePortsChanged( void );
+	void writeablePortsChanged( void );
 
 } ;
 

@@ -1,3 +1,15 @@
+2005-12-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/midi_alsa_seq.h:
+	* include/midi_client.h:
+	* include/midi_tab_widget.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/midi/midi_client.cpp:
+	added support for easy MIDI-port-subscription inside LMMS by just
+	selecting according source-/destination-port from a menu in
+	MIDI-setup-tab in each channel-window
+
 2005-12-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/note_play_handle.cpp:

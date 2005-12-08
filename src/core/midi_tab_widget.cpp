@@ -29,10 +29,16 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
+#include <QListBox>
+#include <QMenu>
+#include <QToolButton>
 
 #else
 
 #include <qdom.h>
+#include <qlistbox.h>
+#include <qpopupmenu.h>
+#include <qtoolbutton.h>
 
 #endif
 
@@ -45,7 +51,7 @@
 #include "lcd_spinbox.h"
 #include "tooltip.h"
 #include "song_editor.h"
-
+#include "midi_client.h"
 
 
 
@@ -58,7 +64,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
-	m_setupTabWidget->setGeometry( 4, 5, 238, 130 );
+	m_setupTabWidget->setGeometry( 4, 5, 238, 180 );
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
@@ -75,7 +81,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->move( 190, 60 );
+	m_outputChannelSpinBox->move( 190, 90 );
 	connect( m_outputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( outputChannelChanged( int ) ) );
 
@@ -91,7 +97,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 
 	m_sendCheckBox = new ledCheckBox( tr( "SEND MIDI-EVENTS" ),
 							m_setupTabWidget );
-	m_sendCheckBox->move( 10, 64 );
+	m_sendCheckBox->move( 10, 94 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
@@ -102,7 +108,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 							m_setupTabWidget );
 	m_routeCheckBox->setChecked(
 				m_channelTrack->midiEventRoutingEnabled() );
-	m_routeCheckBox->move( 10, 100 );
+	m_routeCheckBox->move( 10, 150 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 		m_channelTrack, SLOT( toggleMidiEventRouting( bool ) ) );
 
@@ -112,6 +118,41 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	m_sendCheckBox->setChecked( m == midiPort::OUTPUT ||
 							m == midiPort::DUPLEX );
 
+	midiClient * mc = mixer::inst()->getMIDIClient();
+	// non-raw-clients have ports we can subscribe to!
+	if( mc->isRaw() == FALSE )
+	{
+		m_readablePorts = new QMenu( m_setupTabWidget );
+		m_readablePorts->setCheckable( TRUE );
+		connect( m_readablePorts, SIGNAL( activated( int ) ),
+				this, SLOT( activatedReadablePort( int ) ) );
+
+		m_writeablePorts = new QMenu( m_setupTabWidget );
+		m_writeablePorts->setCheckable( TRUE );
+		connect( m_writeablePorts, SIGNAL( activated( int ) ),
+				this, SLOT( activatedWriteablePort( int ) ) );
+
+		// fill menus
+		readablePortsChanged();
+		writeablePortsChanged();
+
+		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
+		rp_btn->setText( tr( "RECEIVE FROM" ) );
+		rp_btn->setGeometry( 24, 52, 140, 24 );
+		rp_btn->setPopup( m_readablePorts );
+		rp_btn->setPopupDelay( 1 );
+
+		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
+		wp_btn->setText( tr( "SEND TO" ) );
+		wp_btn->setGeometry( 24, 112, 140, 24 );
+		wp_btn->setPopup( m_writeablePorts );
+		wp_btn->setPopupDelay( 1 );
+
+		// we want to get informed about port-changes!
+		mc->connectRPChanged( this, SLOT( readablePortsChanged() ) );
+		mc->connectWPChanged( this, SLOT( writeablePortsChanged() ) );
+	}
+	
 }
 
 
@@ -191,6 +232,103 @@ void midiTabWidget::midiPortModeToggled( bool )
 }
 
 
+
+
+void midiTabWidget::readablePortsChanged( void )
+{
+	// first save all selected ports
+	QStringList selected_ports;
+	for( csize i = 0; i < m_readablePorts->count(); ++i )
+	{
+		int id = m_readablePorts->idAt( i );
+		if( m_readablePorts->isItemChecked( id ) )
+		{
+			selected_ports.push_back( m_readablePorts->text( id ) );
+		}
+	}
+
+	m_readablePorts->clear();
+	const QStringList & rp = mixer::inst()->getMIDIClient()->
+								readablePorts();
+	// now insert new ports and restore selections
+	for( QStringList::const_iterator it = rp.begin(); it != rp.end(); ++it )
+	{
+		int id = m_readablePorts->insertItem( *it );
+		if( selected_ports.find( *it ) != selected_ports.end() )
+		{
+			m_readablePorts->setItemChecked( id, TRUE );
+		}
+	}
+}
+
+
+
+
+void midiTabWidget::writeablePortsChanged( void )
+{
+	// first save all selected ports
+	QStringList selected_ports;
+	for( csize i = 0; i < m_writeablePorts->count(); ++i )
+	{
+		int id = m_writeablePorts->idAt( i );
+		if( m_writeablePorts->isItemChecked( id ) )
+		{
+			selected_ports.push_back( m_writeablePorts->text(
+									id ) );
+		}
+	}
+
+	m_writeablePorts->clear();
+	const QStringList & wp = mixer::inst()->getMIDIClient()->
+							writeablePorts();
+	// now insert new ports and restore selections
+	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
+	{
+		int id = m_writeablePorts->insertItem( *it );
+		if( selected_ports.find( *it ) != selected_ports.end() )
+		{
+			m_writeablePorts->setItemChecked( id, TRUE );
+		}
+	}
+}
+
+
+
+
+void midiTabWidget::activatedReadablePort( int _id )
+{
+	// make sure, MIDI-port is configured for input
+	if( m_readablePorts->isItemChecked( _id ) == FALSE &&
+		m_midiPort->mode() != midiPort::INPUT &&
+		m_midiPort->mode() != midiPort::DUPLEX )
+	{
+		m_receiveCheckBox->setChecked( TRUE );
+	}
+	m_readablePorts->setItemChecked( _id,
+				!m_readablePorts->isItemChecked( _id ) );
+	mixer::inst()->getMIDIClient()->subscribeReadablePort(
+				m_midiPort, m_readablePorts->text( _id ),
+				!m_readablePorts->isItemChecked( _id ) );
+}
+
+
+
+
+void midiTabWidget::activatedWriteablePort( int _id )
+{
+	// make sure, MIDI-port is configured for output
+	if( m_writeablePorts->isItemChecked( _id ) == FALSE &&
+		m_midiPort->mode() != midiPort::OUTPUT &&
+		m_midiPort->mode() != midiPort::DUPLEX )
+	{
+		m_sendCheckBox->setChecked( TRUE );
+	}
+	m_writeablePorts->setItemChecked( _id,
+				!m_writeablePorts->isItemChecked( _id ) );
+	mixer::inst()->getMIDIClient()->subscribeWriteablePort(
+				m_midiPort, m_writeablePorts->text( _id ),
+				!m_writeablePorts->isItemChecked( _id ) );
+}
 
 
 #include "midi_tab_widget.moc"
