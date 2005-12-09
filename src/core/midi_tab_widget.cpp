@@ -52,6 +52,7 @@
 #include "tooltip.h"
 #include "song_editor.h"
 #include "midi_client.h"
+#include "embed.h"
 
 
 
@@ -60,7 +61,9 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	QWidget( _channel_track->tabWidgetParent() ),
 	settings(),
 	m_channelTrack( _channel_track ),
-	m_midiPort( _port )
+	m_midiPort( _port ),
+	m_readablePorts( NULL ),
+	m_writeablePorts( NULL )
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
@@ -72,7 +75,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setValue( m_midiPort->inputChannel() + 1 );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_inputChannelSpinBox->move( 190, 30 );
+	m_inputChannelSpinBox->move( 28, 52 );
 	connect( m_inputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( inputChannelChanged( int ) ) );
 
@@ -81,7 +84,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->move( 190, 90 );
+	m_outputChannelSpinBox->move( 28, 112 );
 	connect( m_outputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( outputChannelChanged( int ) ) );
 
@@ -137,14 +140,18 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 		writeablePortsChanged();
 
 		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
-		rp_btn->setText( tr( "RECEIVE FROM" ) );
-		rp_btn->setGeometry( 24, 52, 140, 24 );
+		rp_btn->setTextLabel( tr( "MIDI-devices to receive "
+						"MIDI-events from" ) );
+		rp_btn->setIconSet( embed::getIconPixmap( "midi_in" ) );
+		rp_btn->setGeometry( 186, 34, 40, 40 );
 		rp_btn->setPopup( m_readablePorts );
 		rp_btn->setPopupDelay( 1 );
 
 		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
-		wp_btn->setText( tr( "SEND TO" ) );
-		wp_btn->setGeometry( 24, 112, 140, 24 );
+		wp_btn->setTextLabel( tr( "MIDI-devices to send MIDI-events "
+								"to" ) );
+		wp_btn->setPixmap( embed::getIconPixmap( "midi_out" ) );
+		wp_btn->setGeometry( 186, 94, 40, 40 );
 		wp_btn->setPopup( m_writeablePorts );
 		wp_btn->setPopupDelay( 1 );
 
@@ -228,6 +235,29 @@ void midiTabWidget::midiPortModeToggled( bool )
 	m_midiPort->setMode( modeTable[m_receiveCheckBox->isChecked()]
 					[m_sendCheckBox->isChecked()] );
 
+	// check whether we have to dis-check items in connection-menu
+	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == FALSE )
+	{
+		for( csize i = 0; i < m_readablePorts->count(); ++i )
+		{
+			int id = m_readablePorts->idAt( i );
+			if( m_readablePorts->isItemChecked( id ) )
+			{
+				activatedReadablePort( id );
+			}
+		}
+	}
+	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == FALSE )
+	{
+		for( csize i = 0; i < m_writeablePorts->count(); ++i )
+		{
+			int id = m_writeablePorts->idAt( i );
+			if( m_writeablePorts->isItemChecked( id ) )
+			{
+				activatedWriteablePort( id );
+			}
+		}
+	}
 	songEditor::inst()->setModified();
 }
 

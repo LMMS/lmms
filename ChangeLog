@@ -1,3 +1,14 @@
+2005-12-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/midi_tab_widget.cpp:
+	- always un-check items in port-menus when disabling receceiving or
+	  sending MIDI-events
+	- small GUI improvements
+
+	* resources/midi_in.png:
+	* resources/midi_out.png:
+	added icons for MIDI-input- and MIDI-output-port-selection
+
 2005-12-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/midi_alsa_seq.h:

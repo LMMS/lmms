@@ -1,6 +1,7 @@
 to be done as soon as possible:
 
-- save connections in midi-tab-widget and debug it (when disabling input/output, automatically unsubscribe all ports!)
+- do not allow to connect output-port of channel to own input-port!
+- save connections in midi-tab-widget
 - add note-len- and note-alignment-selectbox to piano-roll
 - make it possible in bb-editor to add single beats to beat-patterns
 - fix audio/midi-settings stuff/translation
