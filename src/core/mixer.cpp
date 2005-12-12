@@ -23,6 +23,12 @@
  */
 
 
+#include <config.h>
+
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
 #include "mixer.h"
 #include "play_handle.h"
 #include "song_editor.h"
@@ -53,6 +59,39 @@
 
 Uint32 SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
+
+class microTimer
+{
+public:
+	microTimer( void )
+	{
+		reset();
+	}
+
+	~microTimer()
+	{
+	}
+
+	void reset( void )
+	{
+		gettimeofday( &begin, NULL );
+	}
+
+	Uint32 elapsed( void ) const
+	{
+		struct timeval now;
+		gettimeofday( &now, NULL );
+		return( ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
+					( now.tv_usec - begin.tv_usec ) );
+	}
+
+private:
+	struct timeval begin;
+
+} ;
+
+
+
 mixer * mixer::s_instanceOfMe = NULL;
 
 
@@ -61,6 +100,7 @@ mixer::mixer() :
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
 	m_curBuf( NULL ),
 	m_nextBuf( NULL ),
+	m_cpuLoad( 0 ),
 	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
@@ -125,6 +165,12 @@ void mixer::stopProcessing( void )
 
 const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
+	microTimer timer;
+
+	// now we have to make sure no other thread does anything bad
+	// while we're acting...
+	m_mixMutex.lock();
+
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
@@ -146,10 +192,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		m_playHandlesToRemove.erase(
 					m_playHandlesToRemove.begin() );
 	}
-
-	// now we have to make sure no other thread does anything bad
-	// while we're acting...
-	m_mixMutex.lock();
 
 	// now swap the buffers... current buffer becomes next (last)
 	// buffer and the next buffer becomes current (first) buffer
@@ -200,6 +242,10 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	// and trigger LFOs
 	envelopeAndLFOWidget::triggerLFO();
+
+	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
+							m_framesPerAudioBuffer;
+	m_cpuLoad = tLimit( (int) ( new_cpu_load + m_cpuLoad ) / 2, 0, 100 );
 
 	return( m_curBuf );
 }

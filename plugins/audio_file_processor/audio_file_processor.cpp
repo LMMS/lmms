@@ -487,7 +487,7 @@ void audioFileProcessor::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
 	copyBlt( &m_graph, 0, 0, s_artwork, 2, 172, m_graph.width(),
-								m_graph.height() );
+							m_graph.height() );
 	QPainter p( &m_graph );
 	m_sampleBuffer.drawWaves( p, QRect( 2, 2, m_graph.width() - 4,
 							m_graph.height() - 4 ),
@@ -541,20 +541,20 @@ void audioFileProcessor::ampKnobChanged( float _val )
 
 void audioFileProcessor::setStartAndEndKnob( float _s, float _e )
 {
-	// because the signal-handlers of valuechanges of start- and end-knob
+/*	// because the signal-handlers of valuechanges of start- and end-knob
 	// do range checking, depending on value of the other knob, we have to
 	// disconnect the signal-handlers, set then the values, connect again
 	// and then let the changes take effect...
 	m_startKnob->disconnect();
-	m_endKnob->disconnect();
+	m_endKnob->disconnect();*/
 	m_startKnob->setValue( _s );
 	m_endKnob->setValue( _e );
-	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
+/*	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( startKnobChanged( float ) ) );
 	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( endKnobChanged( float ) ) );
-	m_startKnob->setValue( _s );
-	m_endKnob->setValue( _e );
+					SLOT( endKnobChanged( float ) ) );*/
+	startKnobChanged( _s );
+	endKnobChanged( _e );
 }
 
 

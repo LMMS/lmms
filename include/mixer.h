@@ -125,6 +125,10 @@ public:
 		return( m_framesPerAudioBuffer );
 	}
 
+	inline Uint8 cpuLoad( void ) const
+	{
+		return( m_cpuLoad );
+	}
 
 	inline bool highQuality( void ) const
 	{
@@ -295,16 +299,13 @@ private:
 	surroundSampleFrame * m_curBuf;
 	surroundSampleFrame * m_nextBuf;
 
-/*	bool m_discardCurBuf;*/
-
+	Uint8 m_cpuLoad;
 
 	playHandleVector m_playHandles;
 	playHandleVector m_playHandlesToRemove;
 
 	Uint8 m_qualityLevel;
-	volatile float m_masterGain;
-
-/*	volatile bool m_quit;*/
+	float m_masterGain;
 
 
 	audioDevice * m_audioDev;
@@ -317,7 +318,6 @@ private:
 
 
 	QMutex m_mixMutex;
-/*	QMutex m_devMutex;*/
 
 
 	friend class lmmsMainWin;

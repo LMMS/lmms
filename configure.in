@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051208, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051208)
+AC_INIT(lmms, 0.1.1-cvs20051211, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051211)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -383,7 +383,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/vestige/Makefile
 		 presets/Makefile
 		 presets/AudioFileProcessor/Makefile
-		 presets/MIDI-Out/Makefile
 		 presets/PluckedStringSynth/Makefile
 		 presets/TripleOscillator/Makefile
 		 presets/VeSTige/Makefile

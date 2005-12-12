@@ -1,3 +1,82 @@
+2005-12-11	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/lmms_main_win.cpp:
+	* src/lib/mmp.cpp:
+	- default file-extension is now "mmp" (MultiMedia Project) instead of
+	  "xml" for being able to associate mmp-files with LMMS in
+	  file-managers etc. - futhermore LMMS-file-browser is much faster now
+	  because it does not have to examine each file
+	- file-extension for song-templates is now "mpt" (MultiMedia Project
+	  Template)
+
+	* include/cpuload_widget.h:
+	* src/widgets/cpuload_widget.cpp:
+	added cool CPU-load-widget displaying LMMS's current CPU-usage
+
+	* src/core/note_play_handle.cpp:
+	always check validity of sub-notes as they might not be known to mixer
+	and therefore not invalidated in certain situations which made LMMS
+	crashing (e.g. when deleting a channel-track which was current playing
+	some arpeggio-notes)
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	start separate thread for freezing pattern as this doesn't block the
+	GUI-thread and user is now able to cancel pattern-freezing (which was
+	not possible after last rewrite a few days ago)
+
+	* include/timeline.h:
+	* src/core/timeline.cpp:
+	use timer for periodically screen-updates - locking QApplication-mutex
+	isn't neccessary anymore which makes LMMS not to hang when creating
+	new song while playing etc.
+
+	* src/core/piano_roll.cpp:
+	when settings time-line-position, call setTact( 0 ) and
+	setTact64th( 0 )-members instead of pos() = 0 (the latter one leads
+	to crashes)
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	update start- and end-frames of sample-buffer when loading settings
+
+2005-12-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/lmms_main_win.h:
+	* include/song_editor.h:
+	* src/core/lmms_main_win.cpp:
+	* src/core/song_editor.cpp:
+	* resources/toolbar_bg.png:
+	* resources/main_toolbar_bg.png:
+	heavy improvements on toolbars
+
+	* include/nstate_button.h:
+	* src/widgets/nstate_button.cpp:
+	base-class is now toolButton instead of QPushButton
+
+	* include/tool_button.h:
+	* src/widgets/tool_button.cpp:
+	- moved implemenation of toolButton into cpp-file
+	- added highlighting during mouse-over
+	- do not connect clicked()-signal if receiver and/or slot are NULL
+
+2005-12-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/channel_track.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	added support for saving and restoring MIDI-connections of a channel
+	in ordinary channel-preset-data
+
+	* include/channel_track.h:
+	* include/midi_tab_widget.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/tracks/channel_track.cpp:
+	dropped support for switchable MIDI-event-routing as it is done per
+	default and actually makes no sense...
+
+	* src/midi/midi_port.cpp:
+	do not process MIDI-out-event if channel = -1
+
 2005-12-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/midi_tab_widget.cpp:

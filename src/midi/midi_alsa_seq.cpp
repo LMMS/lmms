@@ -114,7 +114,7 @@ midiALSASeq::~midiALSASeq()
 	if( running() )
 	{
 		m_quit = TRUE;
-		wait( 500 );
+		wait( 1000 );
 		terminate();
 
 		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );

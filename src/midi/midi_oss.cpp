@@ -84,7 +84,7 @@ midiOSS::~midiOSS()
 	if( running() )
 	{
 		m_quit = TRUE;
-		wait( 500 );
+		wait( 1000 );
 		terminate();
 	}
 }

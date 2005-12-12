@@ -27,12 +27,7 @@
 
 #ifdef QT4
 
-#include <QPainter>
 #include <QMouseEvent>
-
-#else
-
-#include <qpainter.h>
 
 #endif
 
@@ -44,7 +39,7 @@
 
 
 nStateButton::nStateButton( QWidget * _parent ) :
-	QPushButton( _parent ),
+	toolButton( _parent ),
 	m_generalToolTip( "" ),
 	m_curState( -1 )
 {
@@ -103,38 +98,13 @@ void nStateButton::changeState( int _n )
 
 
 
-/*
-void nStateButton::paintEvent( QPaintEvent * )
-{
-#ifdef QT4
-	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
-
-	QPainter p( &draw_pm, this );
-#endif
-
-	if( m_curState >= 0 && m_curState < (int) m_states.size() )
-	{
-		p.drawPixmap( 0, 0, *m_states[m_curState].first );
-	}
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
-}
-*/
-
-
-
 void nStateButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton && m_states.size() )
 	{
 		changeState( ( ++m_curState ) % m_states.size() );
 	}
-	QPushButton::mousePressEvent( _me );
+	toolButton::mousePressEvent( _me );
 }
 
 

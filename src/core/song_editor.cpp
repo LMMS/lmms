@@ -46,10 +46,8 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QAction>
-#include <QToolBar>
 #include <QComboBox>
 #include <QLayout>
-#include <QToolButton>
 
 #else
 
@@ -64,7 +62,6 @@
 #include <qstatusbar.h>
 #include <qcombobox.h>
 #include <qlayout.h>
-#include <qtoolbutton.h>
 
 #endif
 
@@ -90,6 +87,7 @@
 #include "lcd_spinbox.h"
 #include "tooltip.h"
 #include "tool_button.h"
+#include "cpuload_widget.h"
 
 #include "debug.h"
 
@@ -157,42 +155,13 @@ songEditor::songEditor() :
 	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
-	// create toolbar
-	m_toolBar = new QWidget( cw );
-	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->move( 0, 0 );
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
 
-	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+	// add some essential widgets to global tool-bar 
+	QWidget * tb = lmmsMainWin::inst()->toolBar();
 
+	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
 
-#ifdef QT4
-	containerWidget()->setParent( cw );
-#else
-	containerWidget()->reparent( cw, 0, QPoint( 0, 0 ) );
-#endif
-	containerWidget()->move( 0, m_toolBar->height() + tl->height() );
-
-
-	QToolBar * main_tb = lmmsMainWin::inst()->mainToolBar();
-
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
-
-
-	QLabel * bpm_label = new QLabel( main_tb );
-	bpm_label->setPixmap( embed::getIconPixmap( "clock" ) );
-
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 8, 1 );
-
-
-	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, main_tb );
-#ifdef QT4
-	main_tb->addWidget( m_bpmSpinBox );
-	main_tb->addWidget( bpm_label );
-#endif
+	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb );
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
 							SLOT( setBPM( int ) ) );
@@ -210,30 +179,37 @@ songEditor::songEditor() :
 			"should be played within a minute (or how many tacts "
 			"should be played within four minutes)." ) );
 
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
+	int col = lmmsMainWin::inst()->addWidgetToToolBar( m_bpmSpinBox, 0 );
 
 
-	main_tb->addSeparator();
+	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
+						tr( "High quality mode" ),
+						NULL, NULL, tb );
+	hq_btn->setToggleButton( TRUE );
+	connect( hq_btn, SIGNAL( toggled( bool ) ), mixer::inst(),
+					SLOT( setHighQuality( bool ) ) );
+	hq_btn->setFixedWidth( 42 );
+	lmmsMainWin::inst()->addWidgetToToolBar( hq_btn, 1, col );
 
 
-	QLabel * master_vol_lbl = new QLabel( main_tb );
+	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+
+
+
+	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
 #ifdef QT4
-	m_masterVolumeSlider = new QSlider( Qt::Vertical, main_tb );
+	m_masterVolumeSlider = new QSlider( Qt::Vertical, tb );
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 10 );
 	m_masterVolumeSlider->setValue( 100 );
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-	main_tb->addWidget( master_vol_lbl );
-	main_tb->addWidget( m_masterVolumeSlider );
 #else
-	m_masterVolumeSlider = new QSlider( 0, 200, 10, 100, Qt::Vertical,
-								main_tb );
+	m_masterVolumeSlider = new QSlider( 0, 200, 10, 100, Qt::Vertical, tb );
 	m_masterVolumeSlider->setTickPosition( QSlider::Left );
 #endif
-	m_masterVolumeSlider->setFixedSize( 26, 48 );
+	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
 	toolTip::add( m_masterVolumeSlider, tr( "master output volume" ) );
 
@@ -246,27 +222,26 @@ songEditor::songEditor() :
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterVolumeReleased() ) );
 
+	lmmsMainWin::inst()->addWidgetToToolBar( master_vol_lbl );
+	lmmsMainWin::inst()->addWidgetToToolBar( m_masterVolumeSlider );
 
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 10, 1 );
 
-	QLabel * master_pitch_lbl = new QLabel( main_tb );
+	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+
+	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
 #ifdef QT4
-	m_masterPitchSlider = new QSlider( Qt::Vertical, main_tb );
+	m_masterPitchSlider = new QSlider( Qt::Vertical, tb );
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setValue( 0 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-	main_tb->addWidget( master_pitch_lbl );
-	main_tb->addWidget( m_masterPitchSlider );
 #else
-	m_masterPitchSlider = new QSlider( -12, 12, 1, 0, Qt::Vertical,
-						main_tb);
+	m_masterPitchSlider = new QSlider( -12, 12, 1, 0, Qt::Vertical, tb );
 	m_masterPitchSlider->setTickPosition( QSlider::Left );
 #endif
-	m_masterPitchSlider->setFixedSize( 26, 48 );
+	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
 	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( valueChanged( int ) ), this,
@@ -278,35 +253,45 @@ songEditor::songEditor() :
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
 
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
+	lmmsMainWin::inst()->addWidgetToToolBar( master_pitch_lbl );
+	lmmsMainWin::inst()->addWidgetToToolBar( m_masterPitchSlider );
 
-	main_tb->addSeparator();
+	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
 
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
+	// create widget for visualization- and cpu-load-widget
+	QWidget * vc_w = new QWidget( tb );
+	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
 
-	m_masterOutputGraph = new visualizationWidget( embed::getIconPixmap(
-					"output_graph" ), main_tb ); 
+	vcw_layout->addStretch();
+	vcw_layout->addWidget( new visualizationWidget(
+			embed::getIconPixmap( "output_graph" ), vc_w ) ); 
+
+	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
+	vcw_layout->addStretch();
+
+	lmmsMainWin::inst()->addWidgetToToolBar( vc_w );
+
+
+	// create own toolbar
+	m_toolBar = new QWidget( cw );
+	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->move( 0, 0 );
+	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
+							"toolbar_bg" ) );
+
+	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+
+
 #ifdef QT4
-	main_tb->addWidget( m_masterOutputGraph );
+	containerWidget()->setParent( cw );
+#else
+	containerWidget()->reparent( cw, 0, QPoint( 0, 0 ) );
 #endif
-	// spacer-item
-	( new QWidget( main_tb ) )->setFixedSize( 5, 1 );
-
-	main_tb->addSeparator();
-
-	QToolButton * hq = new QToolButton(
-					embed::getIconPixmap( "hq_mode" ),
-					tr( "High quality mode" ),
-					QString::null, NULL, NULL,
-					main_tb );
-	hq->setToggleButton( TRUE );
-	connect( hq, SIGNAL( toggled( bool ) ), mixer::inst(),
-					SLOT( setHighQuality( bool ) ) );
+	containerWidget()->move( 0, m_toolBar->height() + tl->height() );
 
 
 
+	// fill own tool-bar
 	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
@@ -817,7 +802,8 @@ void songEditor::doActions( void )
 		}
 
 		// a second switch for saving pos when starting to play
-		// anything
+		// anything (need pos for restoring it later in certain
+		// timeline-modes)
 		switch( m_actions.front() )
 		{
 			case ACT_PLAY_SONG:
@@ -1241,7 +1227,7 @@ void songEditor::addSampleTrack( void )
 
 float songEditor::framesPerTact( void ) const
 {
-	return( mixer::inst()->sampleRate() * 60.0f * MAIN_BEATS_PER_TACT /
+	return( mixer::inst()->sampleRate() * 60.0f * BEATS_PER_TACT /
 			m_bpmSpinBox->value() );
 }
 
@@ -1316,7 +1302,6 @@ void songEditor::clearProject( void )
 		// access non existing data (as you can see in the next lines,
 		// all data is cleared!)
 		stop();
-		doActions();
 	}
 
 	// make sure all running notes are cleared, otherwise the whole
@@ -1324,6 +1309,7 @@ void songEditor::clearProject( void )
 	//mixer::inst()->clear();
 	while( mixer::inst()->haveNoRunningNotes() == FALSE )
 	{
+/*		qApp->processEvents();*/
 	}
 
 	trackVector tv = tracks();

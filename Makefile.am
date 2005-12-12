@@ -48,6 +48,7 @@ lmms_MOC =						\
 		./bb_track.moc				\
 		./channel_track.moc			\
 		./config_mgr.moc			\
+		./cpuload_widget.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
@@ -156,6 +157,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
+		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
@@ -171,6 +173,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/tab_widget.cpp			\
 		$(srcdir)/src/widgets/text_float.cpp			\
 		$(srcdir)/src/widgets/tempo_sync_knob.cpp		\
+		$(srcdir)/src/widgets/tool_button.cpp			\
 		$(srcdir)/src/widgets/tooltip.cpp			\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
 		$(srcdir)/include/pch.h					\
@@ -272,6 +275,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/audio_port.h				\
 		$(srcdir)/include/qxembed.h				\
 		$(srcdir)/include/tool_button.h				\
+		$(srcdir)/include/cpuload_widget.h			\
 		$(srcdir)/include/midi_alsa_seq.h
 
 

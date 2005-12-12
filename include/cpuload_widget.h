@@ -1,5 +1,6 @@
 /*
- * tool_button.h - declaration of class toolButton 
+ * cpuload_widget.h - widget for displaying CPU-load (partly based on
+ *                    Hydrogen's CPU-load-widget)
  *
  * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,63 +24,56 @@
  */
 
 
-#ifndef _TOOL_BUTTON_H
-#define _TOOL_BUTTON_H 
+#ifndef _CPULOAD_WIDGET_H
+#define _CPULOAD_WIDGET_H
 
 #include "qt3support.h"
 
 #ifdef QT4
 
-#include <QToolButton>
-#include <QColor>
+#include <QWidget>
+#include <QPixmap>
+#include <QTimer>
 
 #else
 
-#include <qtoolbutton.h>
-#include <qcolor.h>
+#include <qwidget.h>
+#include <qpixmap.h>
+#include <qtimer.h>
 
 #endif
 
+#include "types.h"
 
-class toolButton : public QToolButton
+
+class cpuloadWidget : public QWidget
 {
+	Q_OBJECT
 public:
-	toolButton( const QPixmap & _pixmap, const QString & _tooltip,
-			QObject * _receiver, const char * _slot,
-			QWidget * _parent );
-
-	inline toolButton( QWidget * _parent ) :
-		QToolButton( _parent ),
-		m_colorStandard( s_stdColor ),
-		m_colorHighlighted( s_hlColor )
-	{
-	}
-
-	~toolButton();
-
-	inline void setStandardColor( const QColor & _color )
-	{
-		m_colorStandard = _color;
-	}
-
-	inline void setHighlightedColor( const QColor & _color )
-	{
-		m_colorHighlighted = _color;
-	}
+	cpuloadWidget( QWidget * _parent );
+	~cpuloadWidget();
 
 
 protected:
-	virtual void enterEvent( QEvent * _ev );
-	virtual void leaveEvent( QEvent * _ev );
+	void paintEvent( QPaintEvent * _ev );
+
+
+protected slots:
+	void updateCpuLoad();
 
 
 private:
-	static const QColor s_stdColor;
-	static const QColor s_hlColor;
+	Uint8 m_currentLoad;
 
-	QColor m_colorStandard;
-	QColor m_colorHighlighted;
+	QPixmap m_temp;
+	QPixmap m_background;
+	QPixmap m_leds;
+
+	bool m_changed;
+
+	QTimer m_updateTimer;
 
 } ;
+
 
 #endif

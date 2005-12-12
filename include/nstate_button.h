@@ -34,22 +34,21 @@
 
 #ifdef QT4
 
-#include <QPushButton>
 #include <QPixmap>
 #include <QVector>
 #include <QPair>
 
 #else
 
-#include <qpushbutton.h>
 #include <qpixmap.h>
 #include <qvaluevector.h>
 #include <qpair.h>
 
 #endif
 
+#include "tool_button.h"
 
-class nStateButton : public QPushButton
+class nStateButton : public toolButton
 {
 	Q_OBJECT
 public:
@@ -77,7 +76,6 @@ signals:
 
 
 protected:
-/*	virtual void paintEvent( QPaintEvent * _pe );*/
 	virtual void mousePressEvent( QMouseEvent * _me );
 
 

@@ -35,6 +35,7 @@
 #include <QWidget>
 #include <QMutex>
 #include <QDialog>
+#include <QThread>
 
 #else
 
@@ -42,6 +43,7 @@
 #include <qwidget.h>
 #include <qmutex.h>
 #include <qdialog.h>
+#include <qthread.h>
 
 #endif
 
@@ -51,16 +53,18 @@
 #include "mixer.h"
 
 
-class channelTrack;
-class sampleBuffer;
 class QProgressBar;
 class QPushButton;
 class QPixmap;
 
+class channelTrack;
+class patternFreezeThread;
+class sampleBuffer;
 
 
-const int MAX_BEATS_PER_TACT = 16;
-const int MAIN_BEATS_PER_TACT = 4;
+const int DEFAULT_STEPS_PER_TACT = 16;
+const int BEATS_PER_TACT = 4;
+
 
 
 class pattern : public trackContentObject
@@ -75,6 +79,9 @@ public:
 	pattern( channelTrack * _channel_track );
 	pattern( const pattern & _pat_to_copy ) FASTCALL;
 	virtual ~pattern();
+
+	void init( void );
+
 
 	virtual void FASTCALL movePosition( const midiTime & _pos );
 
@@ -130,6 +137,8 @@ public:
 		return( m_frozenPattern != NULL );
 	}
 
+	// if channel-track recognizes that this pattern is frozen, it calls
+	// this instead of playing all the notes
 	void FASTCALL playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
 							Uint32 _frames );
 
@@ -150,12 +159,16 @@ public:
 protected slots:
 	void openInPianoRoll( bool _c );
 	void openInPianoRoll( void );
+
 	void clear( void );
 	void resetName( void );
 	void changeName( void );
 	void freeze( void );
 	void unfreeze( void );
 	void abortFreeze( void );
+
+	void addSteps( int _n );
+	void removeSteps( int _n );
 
 
 protected:
@@ -174,18 +187,29 @@ private:
 	static QPixmap * s_stepBtnOffLight;
 	static QPixmap * s_frozen;
 
-	static void initPixmaps( void );
 
-
+	// general stuff
 	channelTrack * m_channelTrack;
+
 	patternTypes m_patternType;
 	QString m_name;
-	noteVector m_notes;
 
+	// data-stuff
+	noteVector m_notes;
+	int m_steps;
+
+	// pattern freezing
 	QMutex m_frozenPatternMutex;
 	sampleBuffer * m_frozenPattern;
 	bool m_freezing;
 	volatile bool m_freezeAborted;
+
+
+	// as in Qt4 QThread is inherits from QObject and our base
+	// trackContentObject is a QWidget (=QObject), we cannot inherit from
+	// QThread. That's why we have to put pattern-freezing into separate
+	// thread-class -> patternFreezeThread
+	friend class patternFreezeThread;
 
 } ;
 
@@ -196,7 +220,7 @@ class patternFreezeStatusDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	patternFreezeStatusDialog();
+	patternFreezeStatusDialog( QThread * _thread );
 	~patternFreezeStatusDialog();
 
 	void FASTCALL setProgress( int _p );
@@ -208,15 +232,41 @@ protected:
 
 protected slots:
 	void cancelBtnClicked( void );
+	void updateProgress( void );
 
 
 private:
 	QProgressBar * m_progressBar;
 	QPushButton * m_cancelBtn;
 
+	QThread * m_freezeThread;
+
+	int m_progress;
+
 
 signals:
 	void aborted( void );
+
+} ;
+
+
+
+
+
+class patternFreezeThread : public QThread
+{
+public:
+	patternFreezeThread( pattern * _pattern );
+	virtual ~patternFreezeThread();
+
+
+protected:
+	virtual void run( void );
+
+
+private:
+	pattern * m_pattern;
+	patternFreezeStatusDialog * m_statusDlg;
 
 } ;
 

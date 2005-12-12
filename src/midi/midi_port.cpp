@@ -85,7 +85,7 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
 	if( ( mode() == OUTPUT || mode() == DUPLEX ) &&
-		( outputChannel() == _me.m_channel || outputChannel() == -1 ) )
+		( outputChannel() == _me.m_channel && outputChannel() != -1 ) )
 	{
 		m_midiClient->processOutEvent( _me, _time, this );
 	}

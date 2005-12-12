@@ -1,5 +1,6 @@
 /*
- * file_browser.cpp - implementation of the project-, preset- and sample-file-browser
+ * file_browser.cpp - implementation of the project-, preset- and
+ *                    sample-file-browser
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -718,7 +719,7 @@ void fileItem::determineFileType( void )
 #else
 	QString ext = QFileInfo( fullName() ).extension( FALSE ).toLower();
 #endif
-	if( ext == "mmp" )
+	if( ext == "mmp" || ext == "mpt" )
 	{
 		m_type = SONG_FILE;
 	}

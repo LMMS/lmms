@@ -119,6 +119,7 @@ public slots:
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
 	void toggleBehaviourAtStop( int _n );
+	void checkForUpdatedPosition( void );
 
 
 protected:
@@ -143,6 +144,8 @@ private:
 	autoScrollStates m_autoScroll;
 	loopPointStates m_loopPoints;
 	behaviourAtStopStates m_behaviourAtStop;
+
+	bool m_changedPosition;
 
 	int m_xOffset;
 	int m_posMarkerX;

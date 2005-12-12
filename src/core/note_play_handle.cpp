@@ -57,9 +57,10 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
 	m_channelTrack->processOutEvent( midiEvent( NOTE_ON,
 				m_channelTrack->m_midiPort->outputChannel(),
 					key(),
+				tLimit<Uint16>(
 				(Uint16) ( ( getVolume() / 100.0f ) *
 				( m_channelTrack->getVolume() / 100.0f ) *
-								127 ) ),
+							127 ), 0, 127 ) ),
 				midiTime::fromFrames( m_framesAhead,
 					songEditor::inst()->framesPerTact() ) );
 }
@@ -201,6 +202,13 @@ void notePlayHandle::checkValidity( void )
 			m_channelTrack->trackType() == track::NULL_TRACK )
 	{
 		m_channelTrack = NULL;
+	}
+	// sub-notes might not be registered at mixer (for example arpeggio-
+	// notes), so they wouldn't invalidate them-selves
+	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+						it != m_subNotes.end(); ++it )
+	{
+		( *it )->checkValidity();
 	}
 }
 

@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QImage>
 #include <QMouseEvent>
+#include <QTimer>
 
 #else
 
@@ -43,6 +44,10 @@
 #include <qpushbutton.h>
 #include <qmessagebox.h>
 #include <qimage.h>
+#include <qtimer.h>
+
+#define addSeparator insertSeparator
+#define addMenu insertItem
 
 #endif
 
@@ -75,35 +80,13 @@ pattern::pattern ( channelTrack * _channel_track ) :
 	m_channelTrack( _channel_track ),
 	m_patternType( BEAT_PATTERN ),
 	m_name( _channel_track->name() ),
+	m_steps( DEFAULT_STEPS_PER_TACT ),
 	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
 	m_freezing( FALSE ),
 	m_freezeAborted( FALSE )
 {
-	initPixmaps();
-
-	setFixedHeight( s_patternBg->height() + 4 );
-
-#ifndef QT4
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
-
-	if( m_patternType == BEAT_PATTERN )
-	{
-		for( int i = 0; i < MAX_BEATS_PER_TACT; ++i )
-		{
-			m_notes.push_back( new note( midiTime( 0 ),
-							midiTime( i*4 ) ) );
-		}
-	}
-
-	changeLength( length() );
-
-	setAutoResizeEnabled( FALSE );
-
-	toolTip::add( this,
-		tr( "double-click to open this pattern in piano-roll" ) );
+	init();
 }
 
 
@@ -114,27 +97,18 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	m_channelTrack( _pat_to_copy.m_channelTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
+	m_steps( _pat_to_copy.m_steps ),
 	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
 	m_freezeAborted( FALSE )
 {
-	initPixmaps();
-
 	for( noteVector::const_iterator it = _pat_to_copy.m_notes.begin();
 					it != _pat_to_copy.m_notes.end(); ++it )
 	{
 		m_notes.push_back( new note( **it ) );
 	}
 
-	setFixedHeight( s_patternBg->height() + 4 );
-
-#ifndef QT4
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
-
-	changeLength( length() );
-	setAutoResizeEnabled( FALSE );
+	init();
 }
 
 
@@ -162,7 +136,7 @@ pattern::~pattern()
 
 
 
-void pattern::initPixmaps( void )
+void pattern::init( void )
 {
 	if( s_patternBg == NULL )
 	{
@@ -188,6 +162,21 @@ void pattern::initPixmaps( void )
 	{
 		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
 	}
+
+	ensureBeatNotes();
+
+#ifndef QT4
+	// set background-mode for flicker-free redraw
+	setBackgroundMode( Qt::NoBackground );
+#endif
+
+	setFixedHeight( s_patternBg->height() + 4 );
+	changeLength( length() );
+
+	setAutoResizeEnabled( FALSE );
+
+	toolTip::add( this,
+		tr( "double-click to open this pattern in piano-roll" ) );
 }
 
 
@@ -222,32 +211,47 @@ void pattern::constructContextMenu( QMenu * _cm )
 	_cm->insertSeparator( 1 );
 #endif
 
-#ifdef QT4
 	_cm->addSeparator();
-#else
-	_cm->insertSeparator();
-#endif
+
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
 			tr( "Clear all notes" ), this, SLOT( clear() ) );
-#ifdef QT4
 	_cm->addSeparator();
-#else
-	_cm->insertSeparator();
-#endif
+
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
 	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
 						this, SLOT( changeName() ) );
-#ifdef QT4
 	_cm->addSeparator();
-#else
-	_cm->insertSeparator();
-#endif
+
 	_cm->addAction( embed::getIconPixmap( "freeze" ),
 		( m_frozenPattern != NULL )? tr( "Refreeze" ) : tr( "Freeze" ),
 						this, SLOT( freeze() ) );
 	_cm->addAction( embed::getIconPixmap( "unfreeze" ), tr( "Unfreeze" ),
 						this, SLOT( unfreeze() ) );
+
+	_cm->addSeparator();
+
+	QMenu * add_step_menu = new QMenu( this );
+	QMenu * remove_step_menu = new QMenu( this );
+	for( int i = 1; i <= 16; i *= 2 )
+	{
+		const QString label = ( i == 1 ) ?
+					tr( "1 step" ) :
+					tr( "%1 steps" ).arg( i );
+		
+		int menu_id = add_step_menu->addAction( label, this,
+						SLOT( addSteps( int ) ) );
+		add_step_menu->setItemParameter( menu_id, i );
+		menu_id = remove_step_menu->addAction( label, this,
+						SLOT( removeSteps( int ) ) );
+		remove_step_menu->setItemParameter( menu_id, i );
+	}
+	
+	_cm->addMenu( embed::getIconPixmap( "step_btn_add" ),
+					tr( "Add steps" ), add_step_menu );
+	_cm->addMenu( embed::getIconPixmap( "step_btn_remove" ),
+				tr( "Remove steps" ), remove_step_menu );
+
 }
 
 
@@ -256,13 +260,14 @@ void pattern::constructContextMenu( QMenu * _cm )
 void pattern::ensureBeatNotes( void )
 {
 	// make sure, that all step-note exist
-	for( int i = 0; i < MAX_BEATS_PER_TACT; ++i )
+	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = FALSE;
 		for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
-			if( ( *it )->pos() == i * 4 && ( *it )->length() <= 0 )
+			if( ( *it )->pos() == i * BEATS_PER_TACT &&
+							( *it )->length() <= 0 )
 			{
 				found = TRUE;
 				break;
@@ -270,7 +275,8 @@ void pattern::ensureBeatNotes( void )
 		}
 		if( found == FALSE )
 		{
-			addNote( note( midiTime( 0 ), midiTime( i * 4 ) ) );
+			addNote( note( midiTime( 0 ), midiTime( i *
+							BEATS_PER_TACT ) ) );
 		}
 	}
 }
@@ -383,45 +389,47 @@ void pattern::paintEvent( QPaintEvent * )
 			}
 		}
 	}
-	else if( m_patternType == pattern::BEAT_PATTERN && ppt >= 192 )
+	else if( m_patternType == pattern::BEAT_PATTERN &&
+			( ppt >= 192 || m_steps != DEFAULT_STEPS_PER_TACT ) )
 	{
 		QPixmap stepon;
 		QPixmap stepoff;
 		QPixmap stepoffl;
+		int steps = length() / BEATS_PER_TACT;
 #ifdef QT4
-		stepon = s_stepBtnOn->scaled( width() / 16,
+		stepon = s_stepBtnOn->scaled( width() / steps,
 						s_stepBtnOn->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( width() / 16,
+		stepoff = s_stepBtnOff->scaled( width() / steps,
 						s_stepBtnOff->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( width() / 16,
+		stepoffl = s_stepBtnOffLight->scaled( width() / steps,
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 #else
 		stepon.convertFromImage( s_stepBtnOn->convertToImage().scale(
-				width() / 16, s_stepBtnOn->height() ) );
+				width() / steps, s_stepBtnOn->height() ) );
 		stepoff.convertFromImage( s_stepBtnOff->convertToImage().scale(
-				width() / 16, s_stepBtnOff->height() ) );
+				width() / steps, s_stepBtnOff->height() ) );
 		stepoffl.convertFromImage( s_stepBtnOffLight->convertToImage().
-			scale( width() / 16, s_stepBtnOffLight->height() ) );
+					scale( width() / steps,
+						s_stepBtnOffLight->height() ) );
 #endif
 		for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
 			Sint16 no = it - m_notes.begin();
 			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
-									ppt /
-							m_notes.size() );
+							width() / steps );
 			Sint16 y = height() - s_stepBtnOn->height() - 1;
 			if( ( *it )->length() < 0 )
 			{
 				p.drawPixmap( x, y, stepon );
 			}
-			else if( ( no / 4 ) % 2 )
+			else if( ( no / BEATS_PER_TACT ) % 2 )
 			{
 				p.drawPixmap( x, y, stepoff );
 			}
@@ -459,11 +467,18 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if( m_patternType == pattern::BEAT_PATTERN && pixelsPerTact() >= 192 &&
+	if( m_patternType == pattern::BEAT_PATTERN &&
+		( pixelsPerTact() >= 192 ||
+		  			m_steps != DEFAULT_STEPS_PER_TACT ) &&
 		_me->y() > height() - s_stepBtnOn->height() )
 	{
-		note * n = m_notes[( _me->x() - TCO_BORDER_WIDTH ) * 16 /
-								width() ];
+		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
+					length() / BEATS_PER_TACT / width();
+		if( step >= m_steps )
+		{
+			return;
+		}
+		note * n = m_notes[step];
 		if( n->length() < 0 )
 		{
 			n->setLength( 0 );
@@ -491,7 +506,8 @@ void pattern::mouseDoubleClickEvent( QMouseEvent * _me )
 	}
 	if( m_patternType == pattern::MELODY_PATTERN ||
 		!( m_patternType == pattern::BEAT_PATTERN &&
-		pixelsPerTact() >= 192 &&
+		( pixelsPerTact() >= 192 ||
+		  			m_steps != DEFAULT_STEPS_PER_TACT ) &&
 		_me->y() > height() - s_stepBtnOn->height() ) )
 	{
 		openInPianoRoll();
@@ -593,59 +609,8 @@ void pattern::freeze( void )
 		unfreeze();
 	}
 
-	// create and install audio-sample-recorder
-	bool b;
-	// we cannot create local copy, because at a later stage
-	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
-	// audioSampleRecorder would be destroyed two times...
-	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
-			mixer::inst()->sampleRate(), DEFAULT_CHANNELS, b );
-	mixer::inst()->setAudioDevice( freeze_recorder,
-						mixer::inst()->highQuality() );
+	new patternFreezeThread( this );
 
-	// prepare stuff for playing correct things later
-	songEditor::inst()->playPattern( this, FALSE );
-	songEditor::playPos & ppp = songEditor::inst()->getPlayPos(
-						songEditor::PLAY_PATTERN );
-	ppp.setTact( 0 );
-	ppp.setTact64th( 0 );
-	ppp.setCurrentFrame( 0 );
-	ppp.m_timeLineUpdate = FALSE;
-
-	// create status-dialog
-	patternFreezeStatusDialog status_dlg;
-	status_dlg.show();
-	connect( &status_dlg, SIGNAL( aborted() ),
-						this, SLOT( abortFreeze() ) );
-
-	m_freezeAborted = FALSE;
-	m_freezing = TRUE;
-
-	// now render everything
-	while( ppp < length() && m_freezeAborted == FALSE )
-	{
-		freeze_recorder->processNextBuffer();
-		status_dlg.setProgress( ppp * 100 / length() );
-		qApp->processEvents();
-	}
-
-	m_freezing = FALSE;
-
-	// reset song-editor settings
-	songEditor::inst()->stop();
-	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
-						).m_timeLineUpdate = TRUE;
-
-	// create final sample-buffer if freezing was successful
-	if( m_freezeAborted == FALSE )
-	{
-		m_frozenPatternMutex.lock();
-		freeze_recorder->createSampleBuffer( &m_frozenPattern );
-		m_frozenPatternMutex.unlock();
-	}
-
-	// restore original audio-device
-	mixer::inst()->restoreAudioDevice();
 }
 
 
@@ -673,6 +638,41 @@ void pattern::abortFreeze( void )
 
 
 
+void pattern::addSteps( int _n )
+{
+	m_steps += _n;
+	ensureBeatNotes();
+	update();
+}
+
+
+
+
+void pattern::removeSteps( int _n )
+{
+	if( _n < m_steps )
+	{
+		for( int i = m_steps - _n; i < m_steps; ++i )
+		{
+			for( noteVector::iterator it = m_notes.begin();
+						it != m_notes.end(); ++it )
+			{
+				if( ( *it )->pos() == i * BEATS_PER_TACT &&
+							( *it )->length() <= 0 )
+				{
+					removeNote( *it );
+					break;
+				}
+			}
+		}
+		m_steps -= _n;
+		update();
+	}
+}
+
+
+
+
 void pattern::playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
 								Uint32 _frames )
 {
@@ -692,9 +692,12 @@ midiTime pattern::length( void ) const
 {
 	if( m_patternType == BEAT_PATTERN )
 	{
-		// TODO: remove this limitation later by adding 
-		// "Add step to pattern"-option
-		return( 64 );
+		if( m_steps % DEFAULT_STEPS_PER_TACT == 0 )
+		{
+			return( m_steps * BEATS_PER_TACT );
+		}
+		return( ( m_steps / DEFAULT_STEPS_PER_TACT + 1 ) *
+				DEFAULT_STEPS_PER_TACT * BEATS_PER_TACT );
 	}
 
 	Sint32 max_length = 0;
@@ -920,6 +923,13 @@ void pattern::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
         }
+
+	m_steps = _this.attribute( "steps" ).toInt();
+	if( m_steps == 0 )
+	{
+		m_steps = DEFAULT_STEPS_PER_TACT;
+	}
+
 	ensureBeatNotes();
 /*	if( _this.attribute( "frozen" ).toInt() )
 	{
@@ -931,8 +941,15 @@ void pattern::loadSettings( const QDomElement & _this )
 
 
 
-patternFreezeStatusDialog::patternFreezeStatusDialog( void ) :
-	QDialog()
+
+
+
+
+
+
+patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
+	QDialog(),
+	m_freezeThread( _thread )
 {
 	setWindowTitle( tr( "Freezing pattern..." ) );
 #if QT_VERSION >= 0x030200
@@ -954,6 +971,17 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( void ) :
 	m_cancelBtn->show();
 	connect( m_cancelBtn, SIGNAL( clicked() ), this,
 						SLOT( cancelBtnClicked() ) );
+	show();
+
+	QTimer * update_timer = new QTimer( this );
+	connect( update_timer, SIGNAL( timeout() ),
+					this, SLOT( updateProgress() ) );
+	update_timer->start( 100 );
+
+	setWFlags( getWFlags() | Qt::WDestructiveClose );
+
+	connect( this, SIGNAL( aborted() ), this, SLOT( reject() ) );
+
 }
 
 
@@ -961,6 +989,8 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( void ) :
 
 patternFreezeStatusDialog::~patternFreezeStatusDialog()
 {
+	m_freezeThread->wait();
+	delete m_freezeThread;
 }
 
 
@@ -969,11 +999,7 @@ patternFreezeStatusDialog::~patternFreezeStatusDialog()
 
 void patternFreezeStatusDialog::setProgress( int _p )
 {
-#ifdef QT4
-	m_progressBar->setValue( _p );
-#else
-	m_progressBar->setProgress( _p );
-#endif
+	m_progress = _p;
 }
 
 
@@ -991,6 +1017,109 @@ void patternFreezeStatusDialog::closeEvent( QCloseEvent * _ce )
 void patternFreezeStatusDialog::cancelBtnClicked( void )
 {
 	emit( aborted() );
+	done( -1 );
+}
+
+
+
+
+void patternFreezeStatusDialog::updateProgress( void )
+{
+	if( m_progress < 0 )
+	{
+		done( 0 );
+	}
+	else
+	{
+#ifdef QT4
+		m_progressBar->setValue( m_progress );
+#else
+		m_progressBar->setProgress( m_progress );
+#endif
+	}
+}
+
+
+
+
+
+
+
+
+patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
+	QThread(),
+	m_pattern( _pattern )
+{
+	m_statusDlg = new patternFreezeStatusDialog( this );
+	QObject::connect( m_statusDlg, SIGNAL( aborted() ),
+					m_pattern, SLOT( abortFreeze() ) );
+
+	start();
+}
+
+
+
+
+patternFreezeThread::~patternFreezeThread()
+{
+}
+
+
+
+
+void patternFreezeThread::run( void )
+{
+	// create and install audio-sample-recorder
+	bool b;
+	// we cannot create local copy, because at a later stage
+	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
+	// audioSampleRecorder would be destroyed two times...
+	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
+			mixer::inst()->sampleRate(), DEFAULT_CHANNELS, b );
+	mixer::inst()->setAudioDevice( freeze_recorder,
+						mixer::inst()->highQuality() );
+
+	// prepare stuff for playing correct things later
+	songEditor::inst()->playPattern( m_pattern, FALSE );
+	songEditor::playPos & ppp = songEditor::inst()->getPlayPos(
+						songEditor::PLAY_PATTERN );
+	ppp.setTact( 0 );
+	ppp.setTact64th( 0 );
+	ppp.setCurrentFrame( 0 );
+	ppp.m_timeLineUpdate = FALSE;
+
+	// create status-dialog
+	m_pattern->m_freezeAborted = FALSE;
+	m_pattern->m_freezing = TRUE;
+
+	// now render everything
+	while( ppp < m_pattern->length() &&
+					m_pattern->m_freezeAborted == FALSE )
+	{
+		freeze_recorder->processNextBuffer();
+		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
+	}
+
+	m_pattern->m_freezing = FALSE;
+
+	// reset song-editor settings
+	songEditor::inst()->stop();
+	ppp.m_timeLineUpdate = TRUE;
+
+	// create final sample-buffer if freezing was successful
+	if( m_pattern->m_freezeAborted == FALSE )
+	{
+		m_pattern->m_frozenPatternMutex.lock();
+		freeze_recorder->createSampleBuffer(
+						&m_pattern->m_frozenPattern );
+		m_pattern->m_frozenPatternMutex.unlock();
+	}
+
+	// restore original audio-device
+	mixer::inst()->restoreAudioDevice();
+
+	m_statusDlg->setProgress( -1 );	// we're finished
+
 }
 
 

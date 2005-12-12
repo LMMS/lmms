@@ -47,10 +47,12 @@
 
 
 
-multimediaProject::typeDescStruct multimediaProject::s_types[multimediaProject::PROJ_TYPE_COUNT] =
+multimediaProject::typeDescStruct
+		multimediaProject::s_types[multimediaProject::PROJ_TYPE_COUNT] =
 {
 	{ multimediaProject::UNKNOWN, "unknown" },
 	{ multimediaProject::SONG_PROJECT, "song" },
+	{ multimediaProject::SONG_PROJECT_TEMPLATE, "songtemplate" },
 	{ multimediaProject::CHANNEL_SETTINGS, "channelsettings" },
 	{ multimediaProject::EFFECT_SETTINGS, "effectsettings" },
 	{ multimediaProject::VIDEO_PROJECT, "video" },
@@ -176,9 +178,19 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 			fn += ".cs.xml";
 		}
 	}
-	else if( fn.section( '.',-1 ) != "xml" )
+	else if( type() == SONG_PROJECT )
 	{
-		fn += ".xml";
+		if( fn.section( '.',-1 ) != "mmp" )
+		{
+			fn += ".mmp";
+		}
+	}
+	else if( type() == SONG_PROJECT_TEMPLATE )
+	{
+		if( fn.section( '.',-1 ) != "mpt" )
+		{
+			fn += ".mpt";
+		}
 	}
 
 

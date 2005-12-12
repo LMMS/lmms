@@ -67,7 +67,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
-	m_setupTabWidget->setGeometry( 4, 5, 238, 180 );
+	m_setupTabWidget->setGeometry( 4, 5, 238, 160 );
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
@@ -106,14 +106,6 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
-
-	m_routeCheckBox = new ledCheckBox( tr( "SEND RECEIVED MIDI-EVENTS" ),
-							m_setupTabWidget );
-	m_routeCheckBox->setChecked(
-				m_channelTrack->midiEventRoutingEnabled() );
-	m_routeCheckBox->move( 10, 150 );
-	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
-		m_channelTrack, SLOT( toggleMidiEventRouting( bool ) ) );
 
 	midiPort::modes m = m_midiPort->mode();
 	m_receiveCheckBox->setChecked( m == midiPort::INPUT ||
@@ -183,8 +175,44 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 					m_receiveCheckBox->isChecked() ) );
 	mw_de.setAttribute( "send", QString::number(
 					m_sendCheckBox->isChecked() ) );
-	mw_de.setAttribute( "route", QString::number(
-					m_routeCheckBox->isChecked() ) );
+
+	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
+	{
+		QString rp;
+		for( csize i = 0; i < m_readablePorts->count(); ++i )
+		{
+			int id = m_readablePorts->idAt( i );
+			if( m_readablePorts->isItemChecked( id ) )
+			{
+				rp += m_readablePorts->text( id ) + ",";
+			}
+		}
+		// cut off comma
+		if( rp.length() > 0 )
+		{
+			rp.truncate( rp.length() - 1 );
+		}
+		mw_de.setAttribute( "inports", rp );
+	}
+
+	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == TRUE )
+	{
+		QString wp;
+		for( csize i = 0; i < m_writeablePorts->count(); ++i )
+		{
+			int id = m_writeablePorts->idAt( i );
+			if( m_writeablePorts->isItemChecked( id ) )
+			{
+				wp += m_writeablePorts->text( id ) + ",";
+			}
+		}
+		// cut off comma
+		if( wp.length() > 0 )
+		{
+			wp.truncate( wp.length() - 1 );
+		}
+		mw_de.setAttribute( "outports", wp );
+	}
 
 	_parent.appendChild( mw_de );
 }
@@ -200,7 +228,40 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 								).toInt() );
 	m_receiveCheckBox->setChecked( _this.attribute( "receive" ).toInt() );
 	m_sendCheckBox->setChecked( _this.attribute( "send" ).toInt() );
-	m_routeCheckBox->setChecked( _this.attribute( "route" ).toInt() );
+
+	// restore connections
+
+	QStringList rp = QStringList::split( ',', _this.attribute(
+								"inports" ) );
+	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
+	{
+		for( csize i = 0; i < m_readablePorts->count(); ++i )
+		{
+			int id = m_readablePorts->idAt( i );
+			if( m_readablePorts->isItemChecked( id ) !=
+				( rp.find( m_readablePorts->text( id ) ) !=
+								rp.end() ) )
+			{
+				activatedReadablePort( id );
+			}
+		}
+	}
+
+	QStringList wp = QStringList::split( ',', _this.attribute(
+								"outports" ) );
+	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == TRUE )
+	{
+		for( csize i = 0; i < m_writeablePorts->count(); ++i )
+		{
+			int id = m_writeablePorts->idAt( i );
+			if( m_writeablePorts->isItemChecked( id ) !=
+				( wp.find( m_writeablePorts->text( id ) ) !=
+								wp.end() ) )
+			{
+				activatedWriteablePort( id );
+			}
+		}
+	}
 }
 
 

@@ -125,7 +125,7 @@ pianoRoll::pianoRollKeyTypes pianoRoll::prKeyOrder[] =
 } ;
 
 
-const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * MAX_BEATS_PER_TACT;
+const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
 pianoRoll::pianoRoll( void ) :
@@ -779,9 +779,9 @@ void pianoRoll::paintEvent( QPaintEvent * )
 	// draw vertical raster
 	int tact_16th = m_currentPosition / 4;
 	int offset = ( m_currentPosition % 4 ) * m_ppt /
-							MAX_BEATS_PER_TACT / 4;
+						DEFAULT_STEPS_PER_TACT / 4;
 	for( int x = WHITE_KEY_WIDTH - offset; x < width();
-			x += m_ppt/MAX_BEATS_PER_TACT, ++tact_16th )
+			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
 	{
 		if( x >= WHITE_KEY_WIDTH )
 		{
@@ -1800,8 +1800,9 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		{
 			if( ( m_timeLine->pos() -= 16 ) < 0 )
 			{
-				m_timeLine->pos() = 0;
-			}		
+				m_timeLine->pos().setTact( 0 );
+				m_timeLine->pos().setTact64th( 0 );
+			}
 			m_timeLine->updatePosition();
 			break;
 		}
@@ -1890,7 +1891,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos() = 0;
+			m_timeLine->pos().setTact( 0 );
+			m_timeLine->pos().setTact64th( 0 );
 			m_timeLine->updatePosition();
 			break;
 
@@ -1920,7 +1922,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		if( _we->delta() > 0 )
 		{
 			m_ppt = tMin( m_ppt * 2, KEY_LINE_HEIGHT *
-						MAX_BEATS_PER_TACT * 8 );
+						DEFAULT_STEPS_PER_TACT * 8 );
 		}
 		else if( m_ppt >= 72 )
 		{

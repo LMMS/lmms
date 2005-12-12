@@ -92,7 +92,7 @@ private:
 	lcdSpinBox * m_outputChannelSpinBox;
 	ledCheckBox * m_receiveCheckBox;
 	ledCheckBox * m_sendCheckBox;
-	ledCheckBox * m_routeCheckBox;
+
 	QMenu * m_readablePorts;
 	QMenu * m_writeablePorts;
  

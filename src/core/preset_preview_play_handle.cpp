@@ -44,6 +44,8 @@
 #include "track_container.h"
 #include "mmp.h"
 #include "debug.h"
+#include "midi_port.h"
+
 
 
 // invisible track-container which is needed as parents for preview-channels
@@ -126,12 +128,15 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	s_globalChannelTrack->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
+	// make sure, our preset-preview-track does not appear in any MIDI-
+	// devices list, so just disable receiving/sending MIDI-events at all
+	s_globalChannelTrack->m_midiPort->setMode( midiPort::DUMMY );
+
 	// create temporary note
 	note n( 0, 0, static_cast<tones>( A ),
 				static_cast<octaves>( DEFAULT_OCTAVE-1 ), 100 );
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle( s_globalChannelTrack, 0, ~0, &n );
-	//m_previewNote->setFrames( mixer::inst()->sampleRate() );
 
 
 	s_globalPreviewNote = m_previewNote;
@@ -151,7 +156,6 @@ presetPreviewPlayHandle::~presetPreviewPlayHandle()
 	}
 	delete m_previewNote;
 	s_globalDataMutex->unlock();
-	//blindTrackContainer::inst()->removeTrack( m_channelTrack );
 }
 
 

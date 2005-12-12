@@ -32,18 +32,19 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QLayout>
+#include <QTimer>
 
 #else
 
 #include <qpainter.h>
 #include <qapplication.h>
 #include <qlayout.h>
+#include <qtimer.h>
 
 #endif
 
 
 #include "timeline.h"
-#include "nstate_button.h"
 #include "embed.h"
 #include "templates.h"
 #include "nstate_button.h"
@@ -63,6 +64,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_autoScroll( AUTOSCROLL_ENABLED ),
 	m_loopPoints( LOOP_POINTS_DISABLED ),
 	m_behaviourAtStop( BACK_TO_ZERO ),
+	m_changedPosition( TRUE ),
 	m_xOffset( _xoff ),
 	m_posMarkerX( 0 ),
 	m_ppt( _ppt ),
@@ -109,6 +111,10 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_pos.m_timeLine = this;
 
 	updatePosition();
+	QTimer * update_timer = new QTimer( this );
+	connect( update_timer, SIGNAL( timeout() ), this,
+					SLOT( checkForUpdatedPosition() ) );
+	update_timer->start( 50 );
 }
 
 
@@ -173,13 +179,7 @@ void timeLine::updatePosition( const midiTime & )
 	if( new_x != m_posMarkerX )
 	{
 		m_posMarkerX = new_x;
-#ifndef QT4
-		qApp->lock();
-#endif
-		paintEvent( NULL );
-#ifndef QT4
-		qApp->unlock();
-#endif
+		m_changedPosition = TRUE;
 		if( m_autoScroll == AUTOSCROLL_ENABLED )
 		{
 			emit positionChanged( m_pos );
@@ -210,6 +210,18 @@ void timeLine::toggleLoopPoints( int _n )
 void timeLine::toggleBehaviourAtStop( int _n )
 {
 	m_behaviourAtStop = static_cast<behaviourAtStopStates>( _n );
+}
+
+
+
+
+void timeLine::checkForUpdatedPosition( void )
+{
+	if( m_changedPosition == TRUE )
+	{
+		repaint();
+		m_changedPosition = FALSE;
+	}
 }
 
 

@@ -56,7 +56,6 @@ class pattern;
 class projectNotes;
 class timeLine;
 class toolButton;
-class visualizationWidget;
 
 
 const int MIN_BPM = 10;
@@ -282,8 +281,6 @@ private:
 
 	QSlider * m_masterVolumeSlider;
 	QSlider * m_masterPitchSlider;
-
-	visualizationWidget * m_masterOutputGraph;
 
 
 	toolButton * m_addBBTrackButton;
