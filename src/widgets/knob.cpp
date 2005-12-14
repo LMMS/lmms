@@ -754,12 +754,20 @@ void knob::pasteValue( void )
 void knob::enterValue( void )
 {
 	bool ok;
-	float new_val = QInputDialog::getDouble( accessibleName(),
+	float new_val = QInputDialog::getDouble(
+#ifdef QT4
+					this,
+#endif
+					accessibleName(),
 					tr( "Please enter a new value between "
 						"%1 and %2:" ).arg(
 						minValue() ).arg( maxValue() ),
 					value(), minValue(), maxValue(),
-					4, &ok, this );
+					4, &ok
+#ifndef QT4
+					, this
+#endif
+						);
 	if( ok )
 	{
 		setValue( new_val );

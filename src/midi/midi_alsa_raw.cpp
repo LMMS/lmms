@@ -86,7 +86,7 @@ midiALSARaw::midiALSARaw( void ) :
 
 midiALSARaw::~midiALSARaw()
 {
-	if( running() )
+	if( isRunning() )
 	{
 		m_quit = TRUE;
 		wait( 1000 );

@@ -486,9 +486,14 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 void audioFileProcessor::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
+#ifdef QT4
+	QPainter p( &m_graph );
+	p.drawPixmap( 2, 172, m_graph );
+#else
 	copyBlt( &m_graph, 0, 0, s_artwork, 2, 172, m_graph.width(),
 							m_graph.height() );
 	QPainter p( &m_graph );
+#endif
 	m_sampleBuffer.drawWaves( p, QRect( 2, 2, m_graph.width() - 4,
 							m_graph.height() - 4 ),
 								m_drawMethod );

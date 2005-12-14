@@ -179,7 +179,7 @@ int audioALSA::handleError( int _err )
 
 void audioALSA::startProcessing( void )
 {
-	if( !running() )
+	if( !isRunning() )
 	{
 		start();
 	}
@@ -190,7 +190,7 @@ void audioALSA::startProcessing( void )
 
 void audioALSA::stopProcessing( void )
 {
-	if( running() )
+	if( isRunning() )
 	{
 		m_quit = TRUE;
 		wait( 1000 );

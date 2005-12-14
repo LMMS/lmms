@@ -71,6 +71,14 @@ inline QString baseName( const QString & _file )
 #define QAbstractButton QButton
 #define QScrollArea QScrollView
 
+#define Q3ListView QListView
+#define Q3ListViewItem QListViewItem
+#define Q3ScrollView QScrollView
+
+#define QMatrix QWMatrix
+#define QIcon QIconSet
+
+
 // QWidget
 #define setWindowTitle setCaption
 #define setWindowIcon setIcon
@@ -108,6 +116,7 @@ inline QString baseName( const QString & _file )
 
 // QAbstractButton/QButton
 #define setCheckable setToggleButton
+#define setShortcut setAccel
 
 
 // QInputEvent/QKeyEvent
@@ -150,6 +159,10 @@ inline QString baseName( const QString & _file )
 #define rootPath rootDirPath
 
 
+// QFileInfo
+#define absoluteFilePath absFilePath
+
+
 // QToolButton
 #define setMenu setPopup
 
@@ -158,15 +171,16 @@ inline QString baseName( const QString & _file )
 #define transformed xForm
 
 
-#define Q3ListView QListView
-#define Q3ListViewItem QListViewItem
-#define Q3ScrollView QScrollView
+// QGridLayout
+#define setColumnStretch setColStretch
+#define columnCount numCols
+#define setColumnMinimumWidth setColSpacing
 
-#define QMatrix QWMatrix
-#define QIcon QIconSet
 
+// Qt-namespace
 #define ShiftModifier ShiftButton
 #define ControlModifier ControlButton
+
 
 typedef unsigned int csize;
 

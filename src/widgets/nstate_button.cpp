@@ -88,7 +88,7 @@ void nStateButton::changeState( int _n )
 					m_generalToolTip;
 		toolTip::add( this, _tooltip );
 
-		setPixmap( *m_states[m_curState].first );
+		setIcon( *m_states[m_curState].first );
 
 		emit changedState( m_curState );
 

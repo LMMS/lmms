@@ -47,9 +47,7 @@
 
 tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-#ifndef QT4
 	specialBgHandlingWidget( QColor( 96, 96, 96 ) ),
-#endif
 	m_activeTab( 0 ),
 	m_caption( _caption )
 {

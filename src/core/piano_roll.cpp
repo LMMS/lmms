@@ -204,8 +204,15 @@ pianoRoll::pianoRoll( void ) :
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
+#ifdef QT4
+	QPalette pal;
+	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
+				embed::getIconPixmap( "toolbar_bg" ) ) );
+	m_toolBar->setPalette( pal );
+#else
 	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
 							"toolbar_bg" ) );
+#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 
@@ -387,11 +394,16 @@ pianoRoll::pianoRoll( void ) :
 	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingComboBox->insertItem( QString::number( 25 *
+		m_zoomingComboBox->addItem( QString::number( 25 *
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
+#ifdef QT4
+	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
+								"100%" ) );
+#else
 	m_zoomingComboBox->setCurrentText( "100%" );
+#endif
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
@@ -1928,10 +1940,18 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		{
 			m_ppt /= 2;
 		}
+#ifdef QT4
+		// update combobox with zooming-factor
+		m_zoomingComboBox->setCurrentIndex(
+				m_zoomingComboBox->findText( QString::number(
+					static_cast<int>( m_ppt * 100 /
+						DEFAULT_PR_PPT ) ) +"%" ) );
+#else
 		// update combobox with zooming-factor
 		m_zoomingComboBox->setCurrentText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" );
+#endif
 		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
@@ -1964,24 +1984,23 @@ void pianoRoll::play( void )
 		{
 			songEditor::inst()->stop();
 			songEditor::inst()->playPattern( m_pattern );
-			m_playButton->setPixmap( embed::getIconPixmap(
+			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
 			songEditor::inst()->pause();
-			m_playButton->setPixmap( embed::getIconPixmap(
-								"play" ) );
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
 	}
 	else if( songEditor::inst()->paused() )
 	{
 		songEditor::inst()->resumeFromPause();
-		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 		songEditor::inst()->playPattern( m_pattern );
 	}
 }
@@ -2010,7 +2029,7 @@ void pianoRoll::record( void )
 void pianoRoll::stop( void )
 {
 	songEditor::inst()->stop();
-	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
+	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 	m_recording = FALSE;
 	m_scrollBack = TRUE;

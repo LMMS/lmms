@@ -36,6 +36,8 @@
 #define ALSA_SUPPORT
 #endif
 
+#endif
+
 #include <alsa/asoundlib.h>
 
 #include "qt3support.h"
@@ -147,7 +149,7 @@ private slots:
 
 private:
 	virtual void run( void );
-
+#ifdef ALSA_SUPPORT
 
 	snd_seq_t * m_seqHandle;
 	struct ports
@@ -161,7 +163,7 @@ private:
 	int m_queueID;
 
 	volatile bool m_quit;
-
+#endif
 
 	QTimer m_portListUpdateTimer;
 	QStringList m_readablePorts;
@@ -176,4 +178,3 @@ signals:
 
 #endif
 
-#endif

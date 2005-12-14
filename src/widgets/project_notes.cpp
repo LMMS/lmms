@@ -36,6 +36,7 @@
 #include <QFontDatabase>
 #include <QComboBox>
 #include <QColorDialog>
+#include <QTextCursor>
 
 #else
 
@@ -115,9 +116,15 @@ projectNotes::projectNotes() :
 void projectNotes::clear( void )
 {
 	m_edit->setHtml( tr( "Put down your project notes here." ) );
+#ifdef QT4
+	m_edit->selectAll();
+	m_edit->setTextColor( QColor( 224, 224, 224 ) );
+	m_edit->setTextCursor( QTextCursor() );
+#else
 	m_edit->selectAll( TRUE );
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
 	m_edit->selectAll( FALSE );
+#endif
 }
 
 

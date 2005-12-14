@@ -30,7 +30,6 @@
 
 #ifdef QT4
 
-#include <QPaintDevice>
 #include <QApplication>
 #include <QFont>
 #include <QDesktopWidget>
@@ -53,7 +52,7 @@ inline QFont pointSize( QFont _f )
 	static const int DPI = 96;
 #ifdef QT4
 	_f.setPointSizeF( SIZE * DPI /
-			QPaintDevice( QApplication::desktop() ).logicalDpiY() );
+			QApplication::desktop()->logicalDpiY() );
 #else
 	_f.setPointSizeFloat( SIZE * DPI /
 			QPaintDeviceMetrics( qApp->desktop() ).logicalDpiY() );

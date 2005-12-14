@@ -45,6 +45,10 @@
 //        <http://lists.kde.org/?l=kfm-devel&w=2&r=1&s=qxembed&q=b>
 // 
 
+#include "qt3support.h"
+
+#ifndef QT4
+
 
 #include <qapplication.h>
 #include <qptrlist.h>
@@ -1356,4 +1360,5 @@ void QXEmbed::reparent( QWidget * parent, WFlags f, const QPoint & p, bool showI
 
 // for KDE
 #include "qxembed.moc"
+#endif
 #endif // Q_WS_X11

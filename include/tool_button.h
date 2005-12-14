@@ -66,7 +66,12 @@ public:
 	{
 		m_colorHighlighted = _color;
 	}
-
+#ifndef QT4
+	inline void setIcon( const QPixmap & _icon )
+	{
+		setIconSet( _icon );
+	}
+#endif
 
 protected:
 	virtual void enterEvent( QEvent * _ev );
@@ -83,3 +88,4 @@ private:
 } ;
 
 #endif
+

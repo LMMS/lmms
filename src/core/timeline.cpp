@@ -131,7 +131,6 @@ timeLine::~timeLine()
 void timeLine::addToolButtons( QWidget * _tool_bar )
 {
 	nStateButton * m_autoScroll = new nStateButton( _tool_bar );
-	m_autoScroll->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
 	m_autoScroll->setGeneralToolTip( tr( "Enable/disable "
 							"auto-scrolling" ) );
 	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
@@ -140,7 +139,6 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 					SLOT( toggleAutoScroll( int ) ) );
 
 	nStateButton * m_loopPoints = new nStateButton( _tool_bar );
-	m_loopPoints->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
 	m_loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
 	m_loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	m_loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
@@ -148,7 +146,6 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 					SLOT( toggleLoopPoints( int ) ) );
 
 	nStateButton * m_behaviourAtStop = new nStateButton( _tool_bar );
-	m_behaviourAtStop->setPaletteBackgroundColor( QColor( 224, 224, 224 ) );
 	m_behaviourAtStop ->addState( embed::getIconPixmap( "back_to_zero" ),
 					tr( "After stopping go back to begin" )
 									);

@@ -38,16 +38,13 @@
 #include <qwidget.h>
 #include <qmap.h>
 
+#endif
+
+
 #include "spc_bg_hndl_widget.h"
 
-#endif
 
-
-
-class tabWidget : public QWidget
-#ifndef QT4
-					, public specialBgHandlingWidget
-#endif
+class tabWidget : public QWidget, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:

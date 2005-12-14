@@ -185,7 +185,7 @@ songEditor::songEditor() :
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
-	hq_btn->setToggleButton( TRUE );
+	hq_btn->setCheckable( TRUE );
 	connect( hq_btn, SIGNAL( toggled( bool ) ), mixer::inst(),
 					SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
@@ -276,8 +276,15 @@ songEditor::songEditor() :
 	m_toolBar = new QWidget( cw );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
+#ifdef QT4
+	QPalette pal;
+	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
+				embed::getIconPixmap( "toolbar_bg" ) ) );
+	m_toolBar->setPalette( pal );
+#else
 	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
 							"toolbar_bg" ) );
+#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 
@@ -355,11 +362,16 @@ songEditor::songEditor() :
 	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_zoomingComboBox->insertItem( QString::number( 25 *
+		m_zoomingComboBox->addItem( QString::number( 25 *
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
+#ifdef QT4
+	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
+								"100%" ) );
+#else
 	m_zoomingComboBox->setCurrentText( "100%" );
+#endif
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
@@ -568,10 +580,18 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		{
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
+#ifdef QT4
+		// update combobox with zooming-factor
+		m_zoomingComboBox->setCurrentIndex(
+				m_zoomingComboBox->findText( QString::number(
+					static_cast<int>( pixelsPerTact() *
+				100 / DEFAULT_PIXELS_PER_TACT ) ) +"%" ) );
+#else
 		// update combobox with zooming-factor
 		m_zoomingComboBox->setCurrentText( QString::number(
 					static_cast<int>( pixelsPerTact() *
 				100 / DEFAULT_PIXELS_PER_TACT ) ) +"%" );
+#endif
 		// update timeline
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
 							pixelsPerTact() );

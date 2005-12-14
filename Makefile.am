@@ -273,10 +273,10 @@ lmms_SOURCES =								\
 		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/midi_tab_widget.h			\
 		$(srcdir)/include/audio_port.h				\
-		$(srcdir)/include/qxembed.h				\
 		$(srcdir)/include/tool_button.h				\
 		$(srcdir)/include/cpuload_widget.h			\
-		$(srcdir)/include/midi_alsa_seq.h
+		$(srcdir)/include/midi_alsa_seq.h			\
+		$(srcdir)/include/qxembed.h
 
 
 

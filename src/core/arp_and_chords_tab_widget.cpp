@@ -667,7 +667,8 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpDirection = static_cast<arpDirections>(
 					_this.attribute( "arpdir" ).toInt() );
 	m_arpTimeKnob->setSyncMode( 
-				( tempoSyncMode ) _this.attribute( "arpsyncmode" ).toInt() );
+		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
+						 "arpsyncmode" ).toInt() );
 
 	m_arpGroupBox->setState( m_arpDirection != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );

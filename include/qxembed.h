@@ -22,6 +22,10 @@
 #ifndef QXEMBED_H
 #define QXEMBED_H
 
+#include "qt3support.h"
+
+#ifndef QT4
+
 #include <qwidget.h>
 /*#include <kdelibs_export.h>*/
 
@@ -230,5 +234,6 @@ private:
 };
 
 
+#endif
 #endif
 #endif

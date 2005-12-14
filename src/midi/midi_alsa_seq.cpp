@@ -111,7 +111,7 @@ midiALSASeq::midiALSASeq( void ) :
 
 midiALSASeq::~midiALSASeq()
 {
-	if( running() )
+	if( isRunning() )
 	{
 		m_quit = TRUE;
 		wait( 1000 );
@@ -251,7 +251,11 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 				m_portIDs[_port][i] =
 						snd_seq_create_simple_port(
 							m_seqHandle,
+#ifdef QT4
+					_port->name().toAscii().constData(),
+#else
 							_port->name().ascii(),
+#endif
 							caps[i],
 						SND_SEQ_PORT_TYPE_MIDI_GENERIC |
 						SND_SEQ_PORT_TYPE_APPLICATION );
@@ -300,7 +304,13 @@ void midiALSASeq::applyPortName( midiPort * _port )
 		snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_set_name( port_info,
-						_port->name().ascii() );
+						_port->name().
+#ifdef QT4
+							toAscii().constData()
+#else
+							ascii()
+#endif
+							);
 		snd_seq_set_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_free( port_info );
@@ -342,7 +352,13 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 	}
 	snd_seq_addr_t sender;
 	if( snd_seq_parse_address( m_seqHandle, &sender,
-					_dest.section( ' ', 0, 0 ).ascii() ) )
+					_dest.section( ' ', 0, 0 ).
+#ifdef QT4
+					toAscii().constData()
+#else
+					ascii()
+#endif
+								) )
 	{
 		printf( "error parsing sender-address!!\n" );
 		return;
@@ -381,7 +397,13 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	}
 	snd_seq_addr_t dest;
 	if( snd_seq_parse_address( m_seqHandle, &dest,
-					_dest.section( ' ', 0, 0 ).ascii() ) )
+					_dest.section( ' ', 0, 0 ).
+#ifdef QT4
+					toAscii().constData()
+#else
+					ascii()
+#endif
+								) )
 	{
 		printf( "error parsing dest-address!!\n" );
 		return;

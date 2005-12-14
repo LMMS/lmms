@@ -29,14 +29,13 @@
 
 #include <QLabel>
 #include <QPainter>
-/*#include <QScrollArea>*/
 #include <QCursor>
+#include <QMouseEvent>
 
 #else
 
 #include <qlabel.h>
 #include <qpainter.h>
-/*#include <qscrollview.h>*/
 #include <qcursor.h>
 
 #endif
@@ -60,7 +59,9 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 
 	addContentWidget( m_view );
 
-	QVBoxLayout * view_layout = new QVBoxLayout( m_view, 5, 10 );
+	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
+	view_layout->setMargin( 5 );
+	view_layout->setSpacing( 10 );
 
 
 	QLabel * hint = new QLabel( tr( "You can drag an instrument-plugin "
@@ -70,7 +71,11 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 					"corresponding channel-button." ),
 								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
-	hint->setAlignment( hint->alignment() | WordBreak );
+#ifdef QT4
+	hint->setWordWrap( TRUE );
+#else
+	hint->setAlignment( hint->alignment() | Qt::WordBreak );
+#endif
 	view_layout->addWidget( hint );
 
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
@@ -113,7 +118,7 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
-	setCursor( PointingHandCursor );
+	setCursor( Qt::PointingHandCursor );
 }
 
 
@@ -156,19 +161,32 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 
 	f.setBold( FALSE );
 	p.setFont( pointSize<7>( f ) );
+#ifdef QT4
+	QStringList words = pluginBrowser::tr(
+				m_pluginDescriptor.description ).split( ' ' );
+#else
 	QStringList words = QStringList::split( ' ',
 			pluginBrowser::tr( m_pluginDescriptor.description ) );
+#endif
 	for( QStringList::iterator it = words.begin(); it != words.end(); ++it )
 	{
 		if( ( *it ).contains( '-' ) )
 		{
+#ifdef QT4
+			QStringList splitted_word = it->split( '-' );
+#else
 			QStringList splitted_word = QStringList::split( '-',
 									*it );
+#endif
 			QStringList::iterator orig_it = it;
 			for( QStringList::iterator it2 = splitted_word.begin();
 					it2 != splitted_word.end(); ++it2 )
 			{
+#ifdef QT4
+				if( it2 == --splitted_word.end() )
+#else
 				if( it2 == splitted_word.fromLast() )
+#endif
 				{
 					words.insert( it, *it2 );
 				}

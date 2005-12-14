@@ -133,15 +133,33 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
-	const QFileInfoList * list = directory.entryInfoList( "lib*.so" );
-	if( list == NULL )
+#ifdef QT4
+	QFileInfoList list = directory.entryInfoList( QStringList(
+								"lib*.so" ) );
+#else
+	const QFileInfoList * lp = directory.entryInfoList( "lib*.so" );
+	// if directory doesn't exist or isn't readable, we get NULL which would
+	// crash LMMS...
+	if( lp == NULL )
 	{
 		return;
 	}
-	for( QFileInfoList::iterator file = list->begin();
-						file != list->end(); ++file )
+	QFileInfoList list = *lp;
+#endif
+	for( QFileInfoList::iterator file = list.begin();
+						file != list.end(); ++file )
 	{
-		void * handle = dlopen( ( *file )->absFilePath().latin1(),
+#ifdef QT4
+		const QFileInfo & f = *file;
+#else
+		const QFileInfo & f = **file;
+#endif
+		void * handle = dlopen( f.absoluteFilePath().
+#ifdef QT4
+							toAscii().constData(),
+#else
+							ascii(),
+#endif
 								RTLD_NOW );
 		char * msg = dlerror();
 		if( msg != NULL || handle == NULL )
@@ -156,10 +174,16 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 			printf( "plugin-loader: %s\n", msg );
 			continue;
 		}
-		QString desc_name = ( *file )->fileName().mid( 3 ).section(
-					'.', 0, 0 ) + "_plugin_descriptor";
+		QString desc_name = f.fileName().mid( 3 ).section( '.', 0, 0 ) +
+							"_plugin_descriptor";
 		descriptor * plugin_desc =
-			(descriptor *) dlsym( handle, desc_name.ascii() );
+			(descriptor *) dlsym( handle, desc_name.
+#ifdef QT4
+					      toAscii().constData()
+#else
+					      ascii()
+#endif
+					      );
 		msg = dlerror();
 		if( msg != NULL || plugin_desc == NULL )
 		{

@@ -611,8 +611,9 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_x100Cb->setChecked( _this.attribute( "x100" ).toInt() );
 	m_controlEnvAmountCb->setChecked( _this.attribute(
 							"ctlenvamt" ).toInt() );
-	m_lfoSpeedKnob->setSyncMode( ( tempoSyncMode ) _this.attribute(
-							"lfosyncmode" ).toInt() );
+	m_lfoSpeedKnob->setSyncMode(
+		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
+						"lfosyncmode" ).toInt() );
 
 	switch( m_lfoShape )
 	{

@@ -46,7 +46,7 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	}
 	toolTip::add( this, _tooltip );
 	setFixedSize( 30, 30 );
-	setPixmap( _pixmap );
+	setIcon( _pixmap );
 	leaveEvent( NULL );
 }
 
@@ -59,9 +59,16 @@ toolButton::~toolButton()
 
 
 
+
 void toolButton::enterEvent( QEvent * )
 {
+#ifdef QT4
+	QPalette pal;
+	pal.setColor( backgroundRole(), m_colorHighlighted );
+	setPalette( pal );
+#else
 	setPaletteBackgroundColor( m_colorHighlighted );
+#endif
 }
 
 
@@ -69,6 +76,12 @@ void toolButton::enterEvent( QEvent * )
 
 void toolButton::leaveEvent( QEvent * )
 {
+#ifdef QT4
+	QPalette pal;
+	pal.setColor( backgroundRole(), m_colorStandard );
+	setPalette( pal );
+#else
 	setPaletteBackgroundColor( m_colorStandard );
+#endif
 }
 

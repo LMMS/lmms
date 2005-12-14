@@ -53,9 +53,10 @@
 #include "mixer.h"
 
 
+class QAction;
+class QPixmap;
 class QProgressBar;
 class QPushButton;
-class QPixmap;
 
 class channelTrack;
 class patternFreezeThread;
@@ -167,6 +168,8 @@ protected slots:
 	void unfreeze( void );
 	void abortFreeze( void );
 
+	void addSteps( QAction * _item );
+	void removeSteps( QAction * _item );
 	void addSteps( int _n );
 	void removeSteps( int _n );
 

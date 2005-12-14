@@ -282,7 +282,7 @@ QString audioOSS::probeDevice( void )
 
 void audioOSS::startProcessing( void )
 {
-	if( !running() )
+	if( !isRunning() )
 	{
 		start();
 	}
@@ -293,7 +293,7 @@ void audioOSS::startProcessing( void )
 
 void audioOSS::stopProcessing( void )
 {
-	if( running() )
+	if( isRunning() )
 	{
 		m_quit = TRUE;
 		wait( 1000 );

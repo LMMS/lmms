@@ -105,7 +105,7 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 
 	m_openPluginButton = new pixmapButton( this );
 	m_openPluginButton->setCheckable( FALSE );
-	m_openPluginButton->setCursor( PointingHandCursor );
+	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 200, 70 );
 	m_openPluginButton->setActiveGraphic( embed::getIconPixmap(
 							"project_open_down" ) );

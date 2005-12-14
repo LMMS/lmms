@@ -68,8 +68,14 @@ bbEditor::bbEditor() :
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
+#ifdef QT4
+	QPalette pal;
+	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
+				embed::getIconPixmap( "toolbar_bg" ) ) );
+	m_toolBar->setPalette( pal );
+#else
+	m_toolBar->setErasePixmap( embed::getIconPixmap( "toolbar_bg" ) );
+#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 
@@ -320,24 +326,24 @@ void bbEditor::play( void )
 		{
 			songEditor::inst()->stop();
 			songEditor::inst()->playBB();
-			m_playButton->setPixmap( embed::getIconPixmap(
+			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
 			songEditor::inst()->pause();
-			m_playButton->setPixmap( embed::getIconPixmap(
+			m_playButton->setIcon( embed::getIconPixmap(
 								"play" ) );
 		}
 	}
 	else if( songEditor::inst()->paused() )
 	{
 		songEditor::inst()->resumeFromPause();
-		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
-		m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 		songEditor::inst()->playBB();
 	}
 
@@ -349,7 +355,7 @@ void bbEditor::play( void )
 void bbEditor::stop( void )
 {
 	songEditor::inst()->stop();
-	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
+	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 }
 

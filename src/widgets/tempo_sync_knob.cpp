@@ -109,7 +109,35 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 							m_hintTextAfterValue ),
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
-	
+#ifdef QT4
+	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
+						m_tempoSyncDescription );
+	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( setTempoSync( QAction * ) ) );
+	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
+				tr( "No Sync" ) )->setData( (int) NO_SYNC );
+	syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
+				tr( "Eight beats" ) )->setData(
+						(int) DOUBLE_WHOLE_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
+					tr( "Whole note" ) )->setData(
+						(int) WHOLE_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_half" ),
+					tr( "Half note" ) )->setData(
+						(int) HALF_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
+					tr( "Quarter note" ) )->setData(
+						(int) QUARTER_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
+					tr( "8th note" ) )->setData(
+						(int) EIGHTH_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
+					tr( "16th note" ) )->setData(
+					(int) SIXTEENTH_NOTE );
+	syncMenu->addAction( embed::getIconPixmap( "note_thirtysecond" ),
+					tr( "32nd note" ) )->setData(
+					(int) THIRTYSECOND_NOTE );
+#else
 	QMenu * syncMenu = new QMenu( this );
 	int menuId;
 	menuId = syncMenu->addAction( embed::getIconPixmap( "note_none" ),
@@ -149,6 +177,8 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	
 	contextMenu.addMenu( m_tempoSyncIcon, m_tempoSyncDescription,
 								syncMenu );
+#endif
+
 	contextMenu.addSeparator();
 	
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
@@ -182,6 +212,19 @@ void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
 }
 
 
+
+#ifdef QT4
+
+void tempoSyncKnob::setTempoSync( QAction * _item )
+{
+	setTempoSync( _item->data().toInt() );
+}
+
+#else
+
+void tempoSyncKnob::setTempoSync( QAction * ) { }
+
+#endif
 
 
 void tempoSyncKnob::setTempoSync( int _note_type )
@@ -278,7 +321,7 @@ void tempoSyncKnob::calculateTempoSyncTime( int _bpm )
 
 
 
-tempoSyncMode tempoSyncKnob::getSyncMode( void )
+tempoSyncKnob::tempoSyncMode tempoSyncKnob::getSyncMode( void )
 {
 	return( m_tempoSyncMode );
 }

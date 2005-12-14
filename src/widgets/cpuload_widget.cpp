@@ -24,6 +24,19 @@
  */
 
 
+#include "qt3support.h"
+
+#ifdef QT4
+
+#include <QPainter>
+
+#else
+
+#include <qpainter.h>
+
+#endif
+
+
 #include "cpuload_widget.h"
 #include "embed.h"
 #include "mixer.h"
@@ -40,7 +53,7 @@ cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
 {
 	setFixedSize( m_background.width(), m_background.height() );
 
-	m_temp.resize( width(), height() );
+	m_temp = QPixmap( width(), height() );
 
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );
@@ -63,7 +76,7 @@ cpuloadWidget::~cpuloadWidget()
 
 void cpuloadWidget::paintEvent( QPaintEvent *  )
 {
-	if( m_changed == TRUE )
+/*	if( m_changed == TRUE )
 	{
 		m_changed = FALSE;
 
@@ -76,7 +89,22 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 			( m_leds.width() * m_currentLoad / 300 ) * 3,
 						m_leds.height(), CopyROP );
 	}
-	bitBlt( this, 0, 0, &m_temp, 0, 0, width(), height(), CopyROP );
+	bitBlt( this, 0, 0, &m_temp, 0, 0, width(), height(), CopyROP );*/
+	if( m_changed == TRUE )
+	{
+		m_changed = FALSE;
+
+		QPainter p( &m_temp );
+		// background
+		p.drawPixmap( 0, 0, m_background );
+
+		// leds
+		p.drawPixmap( 23, 3, m_leds, 0, 0,
+				( m_leds.width() * m_currentLoad / 300 ) * 3,
+							m_leds.height() );
+	}
+	QPainter p( this );
+	p.drawPixmap( 0, 0, m_temp );
 }
 
 

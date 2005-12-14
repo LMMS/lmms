@@ -31,6 +31,7 @@
 #include <Qt/QtXml>
 #include <QApplication>
 #include <QProgressDialog>
+#include <QWheelEvent>
 
 #else
 

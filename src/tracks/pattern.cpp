@@ -231,27 +231,44 @@ void pattern::constructContextMenu( QMenu * _cm )
 
 	_cm->addSeparator();
 
+#ifdef QT4
+	QMenu * add_step_menu = _cm->addMenu(
+					embed::getIconPixmap( "step_btn_add" ),
+							tr( "Add steps" ) );
+	QMenu * remove_step_menu = _cm->addMenu(
+				embed::getIconPixmap( "step_btn_remove" ),
+							tr( "Remove steps" ) );
+	connect( add_step_menu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( addSteps( QAction * ) ) );
+	connect( remove_step_menu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( removeSteps( QAction * ) ) );
+#else
 	QMenu * add_step_menu = new QMenu( this );
 	QMenu * remove_step_menu = new QMenu( this );
+#endif
 	for( int i = 1; i <= 16; i *= 2 )
 	{
 		const QString label = ( i == 1 ) ?
 					tr( "1 step" ) :
 					tr( "%1 steps" ).arg( i );
-		
+#ifdef QT4
+		add_step_menu->addAction( label );
+		remove_step_menu->addAction( label );
+#else
 		int menu_id = add_step_menu->addAction( label, this,
 						SLOT( addSteps( int ) ) );
 		add_step_menu->setItemParameter( menu_id, i );
 		menu_id = remove_step_menu->addAction( label, this,
 						SLOT( removeSteps( int ) ) );
 		remove_step_menu->setItemParameter( menu_id, i );
+#endif
 	}
-	
+#ifndef QT4
 	_cm->addMenu( embed::getIconPixmap( "step_btn_add" ),
 					tr( "Add steps" ), add_step_menu );
 	_cm->addMenu( embed::getIconPixmap( "step_btn_remove" ),
 				tr( "Remove steps" ), remove_step_menu );
-
+#endif
 }
 
 
@@ -638,6 +655,32 @@ void pattern::abortFreeze( void )
 
 
 
+#ifdef QT4
+
+void pattern::addSteps( QAction * _item )
+{
+	addSteps( _item->text().toInt() );
+}
+
+
+
+
+void pattern::removeSteps( QAction * _item )
+{
+	removeSteps( _item->text().toInt() );
+}
+
+
+
+#else
+
+void pattern::addSteps( QAction * ) { }
+void pattern::removeSteps( QAction * ) { }
+
+#endif
+
+
+
 void pattern::addSteps( int _n )
 {
 	m_steps += _n;
@@ -978,8 +1021,11 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 					this, SLOT( updateProgress() ) );
 	update_timer->start( 100 );
 
+#ifdef QT4
+	setAttribute( Qt::WA_DeleteOnClose, TRUE );
+#else
 	setWFlags( getWFlags() | Qt::WDestructiveClose );
-
+#endif
 	connect( this, SIGNAL( aborted() ), this, SLOT( reject() ) );
 
 }

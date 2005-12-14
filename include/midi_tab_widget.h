@@ -48,6 +48,7 @@
 
 class QMenu;
 class QPixmap;
+class QAction;
 
 class channelTrack;
 class tabWidget;
@@ -80,6 +81,9 @@ protected slots:
 	void midiPortModeToggled( bool );
 	void readablePortsChanged( void );
 	void writeablePortsChanged( void );
+	void activatedReadablePort( QAction * _item );
+	void activatedWriteablePort( QAction * _item );
+	// Qt3-version
 	void activatedReadablePort( int _id );
 	void activatedWriteablePort( int _id );
 

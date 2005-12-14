@@ -26,6 +26,13 @@
 
 #include "string_pair_drag.h"
 
+#ifdef QT4
+
+#include <QMimeData>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+
+#endif
 
 
 stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
@@ -68,21 +75,17 @@ void stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	{
 		return;
 	}
-	QString txt = _dee->mimeData()->data();
-#else
-	QString txt = _dee->encodedData( "lmms/stringpair" );
-#endif
-	bool accepted = QStringList::split( ',', _allowed_keys ).contains(
-						txt.section( ':', 0, 0 ) );
-#ifdef QT4
-	if( accepted )
+	QString txt = _dee->mimeData()->data( "lmms/stringpair" );
+	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
 	}
 #else
+	QString txt = _dee->encodedData( "lmms/stringpair" );
+	bool accepted = QStringList::split( ',', _allowed_keys ).contains(
+						txt.section( ':', 0, 0 ) );
 	_dee->accept( accepted );
 #endif
-
 }
 
 
@@ -91,7 +94,8 @@ void stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 QString stringPairDrag::decodeKey( QDropEvent * _de )
 {
 #ifdef QT4
-	return( QString( _de->mimeData()->data() ).section( ':', 0, 0 ) );
+	return( QString( _de->mimeData()->data( "lmms/stringpair"
+						) ).section( ':', 0, 0 ) );
 #else
 	return( QString( _de->encodedData( "lmms/stringpair" ) ).section(
 								':', 0, 0 ) );
@@ -104,7 +108,8 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
 #ifdef QT4
-	return( QString( _de->mimeData()->data() ).section( ':', 1, 1 ) );
+	return( QString( _de->mimeData()->data( "lmms/stringpair"
+						) ).section( ':', 1, 1 ) );
 #else
 	return( QString( _de->encodedData( "lmms/stringpair" ) ).section(
 								':', 1, 1 ) );

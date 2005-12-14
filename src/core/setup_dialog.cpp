@@ -361,7 +361,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	midi_layout->addStretch();
 
 
-#ifndef QT
+#ifndef QT4
 #define setIcon setPixmap
 #endif
 

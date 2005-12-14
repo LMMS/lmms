@@ -29,7 +29,6 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QListBox>
 #include <QMenu>
 #include <QToolButton>
 
@@ -39,6 +38,9 @@
 #include <qlistbox.h>
 #include <qpopupmenu.h>
 #include <qtoolbutton.h>
+
+#define setIcon setPixmap
+#define setText setTextLabel
 
 #endif
 
@@ -118,34 +120,52 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	if( mc->isRaw() == FALSE )
 	{
 		m_readablePorts = new QMenu( m_setupTabWidget );
+#ifdef QT4
+		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( activatedReadablePort( QAction * ) ) );
+#else
 		m_readablePorts->setCheckable( TRUE );
 		connect( m_readablePorts, SIGNAL( activated( int ) ),
 				this, SLOT( activatedReadablePort( int ) ) );
+#endif
 
 		m_writeablePorts = new QMenu( m_setupTabWidget );
+#ifdef QT4
+		connect( m_writeablePorts, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( activatedWriteablePort( QAction * ) ) );
+#else
 		m_writeablePorts->setCheckable( TRUE );
 		connect( m_writeablePorts, SIGNAL( activated( int ) ),
 				this, SLOT( activatedWriteablePort( int ) ) );
+#endif
 
 		// fill menus
 		readablePortsChanged();
 		writeablePortsChanged();
 
 		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
-		rp_btn->setTextLabel( tr( "MIDI-devices to receive "
+		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
-		rp_btn->setIconSet( embed::getIconPixmap( "midi_in" ) );
+		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
 		rp_btn->setGeometry( 186, 34, 40, 40 );
-		rp_btn->setPopup( m_readablePorts );
+		rp_btn->setMenu( m_readablePorts );
+#ifdef QT4
+		rp_btn->setPopupMode( QToolButton::InstantPopup );
+#else
 		rp_btn->setPopupDelay( 1 );
+#endif
 
 		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
-		wp_btn->setTextLabel( tr( "MIDI-devices to send MIDI-events "
+		wp_btn->setText( tr( "MIDI-devices to send MIDI-events "
 								"to" ) );
-		wp_btn->setPixmap( embed::getIconPixmap( "midi_out" ) );
+		wp_btn->setIcon( embed::getIconPixmap( "midi_out" ) );
 		wp_btn->setGeometry( 186, 94, 40, 40 );
-		wp_btn->setPopup( m_writeablePorts );
+		wp_btn->setMenu( m_writeablePorts );
+#ifdef QT4
+		wp_btn->setPopupMode( QToolButton::InstantPopup );
+#else
 		wp_btn->setPopupDelay( 1 );
+#endif
 
 		// we want to get informed about port-changes!
 		mc->connectRPChanged( this, SLOT( readablePortsChanged() ) );
@@ -179,6 +199,17 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
 		QString rp;
+#ifdef QT4
+		QList<QAction *> actions = m_readablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() )
+			{
+				rp += ( *it )->text() + ",";
+			}
+		}
+#else
 		for( csize i = 0; i < m_readablePorts->count(); ++i )
 		{
 			int id = m_readablePorts->idAt( i );
@@ -187,6 +218,7 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 				rp += m_readablePorts->text( id ) + ",";
 			}
 		}
+#endif
 		// cut off comma
 		if( rp.length() > 0 )
 		{
@@ -198,6 +230,17 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == TRUE )
 	{
 		QString wp;
+#ifdef QT4
+		QList<QAction *> actions = m_writeablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() )
+			{
+				wp += ( *it )->text() + ",";
+			}
+		}
+#else
 		for( csize i = 0; i < m_writeablePorts->count(); ++i )
 		{
 			int id = m_writeablePorts->idAt( i );
@@ -206,6 +249,7 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 				wp += m_writeablePorts->text( id ) + ",";
 			}
 		}
+#endif
 		// cut off comma
 		if( wp.length() > 0 )
 		{
@@ -231,10 +275,23 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 
 	// restore connections
 
-	QStringList rp = QStringList::split( ',', _this.attribute(
-								"inports" ) );
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
+#ifdef QT4
+		QStringList rp = _this.attribute( "inports" ).split( ',' );
+		QList<QAction *> actions = m_readablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() !=
+				( rp.indexOf( ( *it )->text() ) != -1 ) )
+			{
+				activatedReadablePort( *it );
+			}
+		}
+#else
+		QStringList rp = QStringList::split( ',',
+						_this.attribute( "inports" ) );
 		for( csize i = 0; i < m_readablePorts->count(); ++i )
 		{
 			int id = m_readablePorts->idAt( i );
@@ -245,12 +302,26 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 				activatedReadablePort( id );
 			}
 		}
+#endif
 	}
 
-	QStringList wp = QStringList::split( ',', _this.attribute(
-								"outports" ) );
 	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == TRUE )
 	{
+#ifdef QT4
+		QStringList wp = _this.attribute( "outports" ).split( ',' );
+		QList<QAction *> actions = m_writeablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() !=
+				( wp.indexOf( ( *it )->text() ) != -1 ) )
+			{
+				activatedWriteablePort( *it );
+			}
+		}
+#else
+		QStringList wp = QStringList::split( ',',
+						_this.attribute( "outports" ) );
 		for( csize i = 0; i < m_writeablePorts->count(); ++i )
 		{
 			int id = m_writeablePorts->idAt( i );
@@ -261,6 +332,7 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 				activatedWriteablePort( id );
 			}
 		}
+#endif
 	}
 }
 
@@ -299,25 +371,49 @@ void midiTabWidget::midiPortModeToggled( bool )
 	// check whether we have to dis-check items in connection-menu
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == FALSE )
 	{
+#ifdef QT4
+		QList<QAction *> actions = m_readablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() == TRUE )
+			{
+				activatedReadablePort( *it );
+			}
+		}
+#else
 		for( csize i = 0; i < m_readablePorts->count(); ++i )
 		{
 			int id = m_readablePorts->idAt( i );
-			if( m_readablePorts->isItemChecked( id ) )
+			if( m_readablePorts->isItemChecked( id ) == TRUE )
 			{
 				activatedReadablePort( id );
 			}
 		}
+#endif
 	}
 	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == FALSE )
 	{
+#ifdef QT4
+		QList<QAction *> actions = m_writeablePorts->actions();
+		for( QList<QAction *>::iterator it = actions.begin();
+						it != actions.end(); ++it )
+		{
+			if( ( *it )->isChecked() == TRUE )
+			{
+				activatedWriteablePort( *it );
+			}
+		}
+#else
 		for( csize i = 0; i < m_writeablePorts->count(); ++i )
 		{
 			int id = m_writeablePorts->idAt( i );
-			if( m_writeablePorts->isItemChecked( id ) )
+			if( m_writeablePorts->isItemChecked( id ) == TRUE )
 			{
 				activatedWriteablePort( id );
 			}
 		}
+#endif
 	}
 	songEditor::inst()->setModified();
 }
@@ -329,14 +425,26 @@ void midiTabWidget::readablePortsChanged( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
+#ifdef QT4
+	QList<QAction *> actions = m_readablePorts->actions();
+	for( QList<QAction *>::iterator it = actions.begin();
+					it != actions.end(); ++it )
+	{
+		if( ( *it )->isChecked() == TRUE )
+		{
+			selected_ports.push_back( ( *it )->text() );
+		}
+	}
+#else
 	for( csize i = 0; i < m_readablePorts->count(); ++i )
 	{
 		int id = m_readablePorts->idAt( i );
-		if( m_readablePorts->isItemChecked( id ) )
+		if( m_readablePorts->isItemChecked( id ) == TRUE )
 		{
 			selected_ports.push_back( m_readablePorts->text( id ) );
 		}
 	}
+#endif
 
 	m_readablePorts->clear();
 	const QStringList & rp = mixer::inst()->getMIDIClient()->
@@ -344,11 +452,19 @@ void midiTabWidget::readablePortsChanged( void )
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = rp.begin(); it != rp.end(); ++it )
 	{
+#ifdef QT4
+		QAction * item = m_readablePorts->addAction( *it );
+		if( selected_ports.indexOf( *it ) != -1 )
+		{
+			item->setChecked( TRUE );
+		}
+#else
 		int id = m_readablePorts->insertItem( *it );
 		if( selected_ports.find( *it ) != selected_ports.end() )
 		{
 			m_readablePorts->setItemChecked( id, TRUE );
 		}
+#endif
 	}
 }
 
@@ -359,15 +475,27 @@ void midiTabWidget::writeablePortsChanged( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
+#ifdef QT4
+	QList<QAction *> actions = m_writeablePorts->actions();
+	for( QList<QAction *>::iterator it = actions.begin();
+					it != actions.end(); ++it )
+	{
+		if( ( *it )->isChecked() == TRUE )
+		{
+			selected_ports.push_back( ( *it )->text() );
+		}
+	}
+#else
 	for( csize i = 0; i < m_writeablePorts->count(); ++i )
 	{
 		int id = m_writeablePorts->idAt( i );
-		if( m_writeablePorts->isItemChecked( id ) )
+		if( m_writeablePorts->isItemChecked( id ) == TRUE )
 		{
 			selected_ports.push_back( m_writeablePorts->text(
 									id ) );
 		}
 	}
+#endif
 
 	m_writeablePorts->clear();
 	const QStringList & wp = mixer::inst()->getMIDIClient()->
@@ -375,15 +503,62 @@ void midiTabWidget::writeablePortsChanged( void )
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
 	{
+#ifdef QT4
+		QAction * item = m_writeablePorts->addAction( *it );
+		if( selected_ports.indexOf( *it ) != -1 )
+		{
+			item->setChecked( TRUE );
+		}
+#else
 		int id = m_writeablePorts->insertItem( *it );
 		if( selected_ports.find( *it ) != selected_ports.end() )
 		{
 			m_writeablePorts->setItemChecked( id, TRUE );
 		}
+#endif
 	}
 }
 
 
+
+
+#ifdef QT4
+void midiTabWidget::activatedReadablePort( QAction * _item )
+{
+	// make sure, MIDI-port is configured for input
+	if( _item->isChecked() == FALSE &&
+		m_midiPort->mode() != midiPort::INPUT &&
+		m_midiPort->mode() != midiPort::DUPLEX )
+	{
+		m_receiveCheckBox->setChecked( TRUE );
+	}
+	_item->setChecked( !_item->isChecked() );
+	mixer::inst()->getMIDIClient()->subscribeReadablePort( m_midiPort,
+				_item->text(), !_item->isChecked() );
+}
+
+
+
+
+void midiTabWidget::activatedWriteablePort( QAction * _item )
+{
+	// make sure, MIDI-port is configured for output
+	if( _item->isChecked() == FALSE &&
+		m_midiPort->mode() != midiPort::OUTPUT &&
+		m_midiPort->mode() != midiPort::DUPLEX )
+	{
+		m_sendCheckBox->setChecked( TRUE );
+	}
+	_item->setChecked( !_item->isChecked() );
+	mixer::inst()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
+				_item->text(), !_item->isChecked() );
+}
+
+
+void midiTabWidget::activatedReadablePort( int ) { }
+void midiTabWidget::activatedWriteablePort( int ) { }
+
+#else
 
 
 void midiTabWidget::activatedReadablePort( int _id )
@@ -420,6 +595,12 @@ void midiTabWidget::activatedWriteablePort( int _id )
 				m_midiPort, m_writeablePorts->text( _id ),
 				!m_writeablePorts->isItemChecked( _id ) );
 }
+
+
+void midiTabWidget::activatedReadablePort( QAction * ) { }
+void midiTabWidget::activatedWriteablePort( QAction * ) { }
+
+#endif
 
 
 #include "midi_tab_widget.moc"

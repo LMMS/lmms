@@ -595,7 +595,7 @@ void directory::setOpen( bool _o )
 			if( cur_file[0] != '.' && !QFileInfo(
 						thisDir.absolutePath() + "/" +
 							cur_file ).isDir() &&
-				thisDir.match( m_filter, cur_file.lower() )
+				thisDir.match( m_filter, cur_file.toLower() )
 				/*QDir::match( FILE_FILTER, cur_file )*/ )
 #else
 			if( cur_file[0] != '.' && !QFileInfo(

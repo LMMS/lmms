@@ -39,6 +39,8 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 
+#define value data
+
 #endif
 
 
@@ -59,10 +61,15 @@ ladspaManager::ladspaManager( void )
 	LADSPA_Descriptor_Function descriptorFunction;
 	void * pluginHandle;
 	
-	// TODO Need to move the search path definition to the config file to have
-	// more control over where it tries to find the plugins.
+	// TODO Need to move the search path definition to the config file to
+	// have more control over where it tries to find the plugins.
+#ifdef QT4
+	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
+								split( ' ' );
+#else
 	QStringList ladspaDirectories = QStringList::split( ':',
 					QString( getenv( "LADSPA_PATH" ) ) );
+#endif
 	// set default-directory if nothing is specified...
 	if( ladspaDirectories.isEmpty() )
 	{
@@ -73,18 +80,33 @@ ladspaManager::ladspaManager( void )
 		    it != ladspaDirectories.end(); ++it )
 	{
 		QDir directory( ( *it ) );
-		const QFileInfoList * list = directory.entryInfoList();
-		// if directory doesn't exist or isn't readable, we get NULL which
-		// would crash LMMS...
-		if( list == NULL )
+#ifdef QT4
+		QFileInfoList list = directory.entryInfoList();
+#else
+		const QFileInfoList * lp = directory.entryInfoList();
+		// if directory doesn't exist or isn't readable, we get NULL
+		// which would crash LMMS...
+		if( lp == NULL )
 		{
 			continue;
 		}
-		for( QFileInfoList::iterator file = list->begin();
-					file != list->end(); ++file )
+		QFileInfoList list = *lp;
+#endif
+		for( QFileInfoList::iterator file = list.begin();
+						file != list.end(); ++file )
 		{
-			pluginHandle = dlopen( ( *file )->absFilePath().latin1(),
-						RTLD_LAZY );
+#ifdef QT4
+			const QFileInfo & f = *file;
+#else
+			const QFileInfo & f = **file;
+#endif
+			pluginHandle = dlopen( f.absoluteFilePath().
+#ifdef QT4
+							toAscii().constData(),
+#else
+							ascii(),
+#endif
+								RTLD_LAZY );
 			if( pluginHandle ) 
 			{
 				dlerror();
@@ -95,14 +117,19 @@ ladspaManager::ladspaManager( void )
 				if( dlerror() == NULL && descriptorFunction )
 				{
 					addPlugins( pluginHandle, 
-						descriptorFunction,
-						( *file )->fileName() );
+							descriptorFunction,
+							f.fileName() );
 				}
 				else
 				{
 					dlclose( ( void * ) 
-						( *file )->absFilePath().latin1()
-							);
+						f.absoluteFilePath().
+#ifdef QT4
+							toAscii().constData()
+#else
+							ascii()
+#endif
+									);
 				}
 			}
 		}
@@ -117,7 +144,7 @@ ladspaManager::~ladspaManager()
 	for( ladspaManagerMapType::Iterator it = m_ladspaManagerMap.begin();
 		it != m_ladspaManagerMap.end(); ++it )
 	{
-		dlclose( it.data()->pluginHandle );
+		dlclose( it.value()->pluginHandle );
 	}
 	m_ladspaManagerMap.clear();
 }
@@ -853,6 +880,9 @@ void FASTCALL ladspaManager::cleanup( const ladspaKey & _plugin,
 		}
 	}
 }
+
+
+#undef value
 
 
 #endif

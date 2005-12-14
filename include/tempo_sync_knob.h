@@ -28,7 +28,7 @@
 
 #ifdef QT4
 
-#include <QPixmap.h>
+#include <QPixmap>
 
 #else
 
@@ -39,23 +39,26 @@
 #include "knob.h"
 
 
-enum tempoSyncMode
-{
-	NO_SYNC,
-	DOUBLE_WHOLE_NOTE,
-	WHOLE_NOTE,
-	HALF_NOTE,
-	QUARTER_NOTE,
-	EIGHTH_NOTE,
-	SIXTEENTH_NOTE,
-	THIRTYSECOND_NOTE
-} ;
+class QAction;
 
-	
+
 class tempoSyncKnob : public knob
 {
 	Q_OBJECT
 public:
+	enum tempoSyncMode
+	{
+		NO_SYNC,
+		DOUBLE_WHOLE_NOTE,
+		WHOLE_NOTE,
+		HALF_NOTE,
+		QUARTER_NOTE,
+		EIGHTH_NOTE,
+		SIXTEENTH_NOTE,
+		THIRTYSECOND_NOTE
+	} ;
+
+
 	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name, 
 			float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
@@ -82,6 +85,7 @@ signals:
 
 public slots:
 	void setTempoSync( int _note_type );
+	void setTempoSync( QAction * _item );
 
 
 protected:
