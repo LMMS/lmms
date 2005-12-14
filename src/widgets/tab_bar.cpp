@@ -48,6 +48,11 @@ tabBar::tabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 #endif
 	m_exclusive( FALSE )
 {
+	m_layout->setMargin( 0 );
+	m_layout->setSpacing( 0 );
+#ifdef QT4
+	setLayout( m_layout );
+#endif
 }
 
 

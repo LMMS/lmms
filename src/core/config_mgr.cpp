@@ -196,6 +196,7 @@ configManager::~configManager()
 void configManager::createWidgets( void )
 {
 	m_mainLayout = new QHBoxLayout( this );
+	m_mainLayout->setMargin( 0 );
 	m_mainLayout->setSpacing( 10 );
 	m_mainLayout->addSpacing( 8 );
 #ifdef QT4
@@ -204,6 +205,7 @@ void configManager::createWidgets( void )
 
 	m_contentWidget = new QWidget( this );
 	m_contentLayout = new QVBoxLayout( m_contentWidget );
+	m_contentLayout->setMargin( 0 );
 	m_contentLayout->setSpacing( 10 );
 	m_contentLayout->addSpacing( 8 );
 #ifdef QT4
@@ -224,8 +226,14 @@ void configManager::createWidgets( void )
 
 
 	QWidget * button_widget = new QWidget( m_contentWidget );
+	button_widget->setFixedHeight( 40 );
 	m_buttonLayout = new QHBoxLayout( button_widget );
+	m_buttonLayout->setMargin( 0 );
+	m_buttonLayout->setSpacing( 0 );
 	m_buttonLayout->addStretch( 1 );
+#ifdef QT4
+	button_widget->setLayout( m_buttonLayout );
+#endif
 
 	m_cancelButton = new QPushButton( tr( "&Cancel" ), button_widget );
 	m_backButton = new QPushButton( tr( "< &Back" ), button_widget );
@@ -256,7 +264,11 @@ void configManager::createWidgets( void )
 
 	m_pageIntro = new QWidget( m_contentWidget );
 	QHBoxLayout * intro_layout = new QHBoxLayout( m_pageIntro );
+	intro_layout->setMargin( 0 );
 	intro_layout->setSpacing( 15 );
+#ifdef QT4
+	m_pageIntro->setLayout( intro_layout );
+#endif
 
 	QLabel * intro_logo_lbl = new QLabel( m_pageIntro );
 	intro_logo_lbl->setPixmap( embed::getIconPixmap( "wizard_intro" ) );
@@ -288,6 +300,7 @@ void configManager::createWidgets( void )
 
 	m_pageWorkingDir = new QWidget( m_contentWidget );
 	QHBoxLayout * workingdir_layout = new QHBoxLayout( m_pageWorkingDir );
+	workingdir_layout->setMargin( 0 );
 	workingdir_layout->setSpacing( 15 );
 
 	QLabel * workingdir_logo_lbl = new QLabel( m_pageWorkingDir );
@@ -299,6 +312,8 @@ void configManager::createWidgets( void )
 	QWidget * workingdir_content = new QWidget( m_pageWorkingDir );
 	QVBoxLayout * workingdir_content_layout = new QVBoxLayout(
 							workingdir_content );
+	workingdir_content_layout->setMargin( 0 );
+	workingdir_content_layout->setSpacing( 0 );
 
 	QLabel * workingdir_txt_lbl = new QLabel(
 				tr( "When working with LMMS there needs to "
@@ -318,6 +333,7 @@ void configManager::createWidgets( void )
 	QHBoxLayout * workingdir_input_fields_layout = new QHBoxLayout(
 						workingdir_input_fields );
 	workingdir_input_fields_layout->setSpacing( 10 );
+	workingdir_input_fields_layout->setMargin( 0 );
 
 	m_wdLineEdit = new QLineEdit( m_lmmsWorkingDir,
 						workingdir_input_fields );
@@ -346,10 +362,15 @@ void configManager::createWidgets( void )
 	m_pageFiles = new QWidget( m_contentWidget );
 	QHBoxLayout * files_layout = new QHBoxLayout( m_pageFiles );
 	files_layout->setSpacing( 15 );
+	files_layout->setMargin( 0 );
 
 	QWidget * files_content = new QWidget( m_pageFiles );
 	QVBoxLayout * files_content_layout = new QVBoxLayout( files_content );
 	files_content_layout->setSpacing( 10 );
+	files_content_layout->setMargin( 0 );
+#ifdef QT4
+	files_content->setLayout( files_content_layout );
+#endif
 
 	QLabel * files_logo_lbl = new QLabel( m_pageFiles );
 	files_logo_lbl->setPixmap( embed::getIconPixmap( "wizard_files" ) );
@@ -380,6 +401,8 @@ void configManager::createWidgets( void )
 	QWidget * samples_widget = new QWidget( files_content );
 	QHBoxLayout * samples_layout = new QHBoxLayout( samples_widget );
 	samples_layout->setSpacing( 5 );
+	samples_layout->setMargin( 0 );
+
 	QLabel * samples_pic_lbl = new QLabel( samples_widget );
 	samples_pic_lbl->setPixmap( embed::getIconPixmap( "sound_file" ) );
 	QLabel * samples_txt_lbl = new QLabel( tr( "samples:" ),
@@ -409,6 +432,8 @@ void configManager::createWidgets( void )
 	QWidget * presets_widget = new QWidget( files_content );
 	QHBoxLayout * presets_layout = new QHBoxLayout( presets_widget );
 	presets_layout->setSpacing( 5 );
+	presets_layout->setMargin( 0 );
+
 	QLabel * presets_pic_lbl = new QLabel( presets_widget );
 	presets_pic_lbl->setPixmap( embed::getIconPixmap( "preset_file" ) );
 	QLabel * presets_txt_lbl = new QLabel( tr( "presets:" ),
@@ -438,6 +463,8 @@ void configManager::createWidgets( void )
 	QWidget * projects_widget = new QWidget( files_content );
 	QHBoxLayout * projects_layout = new QHBoxLayout( projects_widget );
 	projects_layout->setSpacing( 5 );
+	projects_layout->setMargin( 0 );
+
 	QLabel * projects_pic_lbl = new QLabel( projects_widget );
 	projects_pic_lbl->setPixmap( embed::getIconPixmap( "project_file" ) );
 	QLabel * projects_txt_lbl = new QLabel( tr( "demo projects:" ),

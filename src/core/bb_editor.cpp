@@ -74,11 +74,12 @@ bbEditor::bbEditor() :
 				embed::getIconPixmap( "toolbar_bg" ) ) );
 	m_toolBar->setPalette( pal );
 #else
-	m_toolBar->setErasePixmap( embed::getIconPixmap( "toolbar_bg" ) );
+	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
+							"toolbar_bg" ) );
 #endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
-
+	tb_layout->setMargin( 0 );
 
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );

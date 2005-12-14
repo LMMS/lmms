@@ -98,10 +98,13 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 		// background
 		p.drawPixmap( 0, 0, m_background );
 
-		// leds
-		p.drawPixmap( 23, 3, m_leds, 0, 0,
-				( m_leds.width() * m_currentLoad / 300 ) * 3,
+		int w = ( m_leds.width() * m_currentLoad / 300 ) * 3;
+		if( w > 0 )
+		{
+			// leds
+			p.drawPixmap( 23, 3, m_leds, 0, 0, w,
 							m_leds.height() );
+		}
 	}
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_temp );

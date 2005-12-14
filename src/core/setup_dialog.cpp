@@ -106,8 +106,12 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	setWindowTitle( tr( "Setup LMMS" ) );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
+	vlayout->setSpacing( 0 );
+	vlayout->setMargin( 0 );
 	QWidget * settings = new QWidget( this );
 	QHBoxLayout * hlayout = new QHBoxLayout( settings );
+	hlayout->setSpacing( 0 );
+	hlayout->setMargin( 0 );
 
 	m_tabBar = new tabBar( settings, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( TRUE );
@@ -119,6 +123,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 200 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
+	gen_layout->setSpacing( 0 );
+	gen_layout->setMargin( 0 );
 	labelWidget( general, tr( "General settings" ) );
 
 	tabWidget * bufsize_tw = new tabWidget( tr( "BUFFER SIZE" ), general );
@@ -204,6 +210,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	QWidget * audio = new QWidget( ws );
 	audio->setFixedSize( 360, 200 );
 	QVBoxLayout * audio_layout = new QVBoxLayout( audio );
+	audio_layout->setSpacing( 0 );
+	audio_layout->setMargin( 0 );
 	labelWidget( audio, tr( "Audio settings" ) );
 
 	tabWidget * audioiface_tw = new tabWidget( tr( "AUDIO INTERFACE" ),
@@ -229,6 +237,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 #endif
 
 	QHBoxLayout * asw_layout = new QHBoxLayout( asw );
+	asw_layout->setSpacing( 0 );
+	asw_layout->setMargin( 0 );
 	//asw_layout->setAutoAdd( TRUE );
 
 #ifdef JACK_SUPPORT
@@ -288,6 +298,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	QWidget * midi = new QWidget( ws );
 	QVBoxLayout * midi_layout = new QVBoxLayout( midi );
+	midi_layout->setSpacing( 0 );
+	midi_layout->setMargin( 0 );
 	labelWidget( midi, tr( "MIDI settings" ) );
 
 	tabWidget * midiiface_tw = new tabWidget( tr( "MIDI INTERFACE" ),
@@ -313,6 +325,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 #endif
 
 	QHBoxLayout * msw_layout = new QHBoxLayout( msw );
+	msw_layout->setSpacing( 0 );
+	msw_layout->setMargin( 0 );
 	//msw_layout->setAutoAdd( TRUE );
 
 #ifdef ALSA_SUPPORT
@@ -384,6 +398,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	QWidget * buttons = new QWidget( this );
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
+	btn_layout->setSpacing( 0 );
+	btn_layout->setMargin( 0 );
 	QPushButton * ok_btn = new QPushButton( embed::getIconPixmap( "apply" ),
 						tr( "OK" ), buttons );
 	connect( ok_btn, SIGNAL( clicked() ), this, SLOT( accept() ) );

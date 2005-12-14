@@ -215,6 +215,8 @@ pianoRoll::pianoRoll( void ) :
 #endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+	tb_layout->setMargin( 0 );
+	tb_layout->setSpacing( 0 );
 
 
 	// init control-buttons at the top

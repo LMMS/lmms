@@ -261,6 +261,8 @@ songEditor::songEditor() :
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
+	vcw_layout->setMargin( 0 );
+	vcw_layout->setSpacing( 0 );
 
 	vcw_layout->addStretch();
 	vcw_layout->addWidget( new visualizationWidget(
@@ -287,7 +289,8 @@ songEditor::songEditor() :
 #endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
-
+	tb_layout->setMargin( 0 );
+	tb_layout->setSpacing( 0 );
 
 #ifdef QT4
 	containerWidget()->setParent( cw );
