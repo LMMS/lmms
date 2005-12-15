@@ -227,7 +227,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 					songEditor::tr( "Could not write file "
 							"%1. You probably are "
 							"not permitted to "
-							"write to this file. "
+							"write to this file.\n"
 							"Please make sure you "
 							"have write-access to "
 							"the file and try "

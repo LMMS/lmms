@@ -52,7 +52,9 @@ textFloat::textFloat( QWidget * _parent ) :
 	, "textFloat", WStyle_Customize  | WStyle_NoBorder | WStyle_StaysOnTop
 #endif
 		),
-	m_text( "" )
+	m_title( "" ),
+	m_text( "" ),
+	m_pixmap()
 {
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
@@ -66,8 +68,39 @@ textFloat::textFloat( QWidget * _parent ) :
 
 
 
+void textFloat::setTitle( const QString & _title )
+{
+	m_title = _title;
+	repaint();
+}
+
+
+
+
+void textFloat::setText( const QString & _text )
+{
+	m_text = _text;
+	repaint();
+}
+
+
+
+
+void textFloat::setPixmap( const QPixmap & _pixmap )
+{
+	m_pixmap = _pixmap;
+	repaint();
+}
+
+
+
+
 void textFloat::reparent( QWidget * _new_parent )
 {
+	if( _new_parent == NULL )
+	{
+		return;
+	}
 	QPoint position = _new_parent->pos();
 
 	// Get position and reparent to either top level or dialog
@@ -112,6 +145,56 @@ void textFloat::setVisibilityTimeOut( int _msecs )
 
 
 
+textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
+					QWidget * _parent, int _add_y_margin )
+{
+#ifdef QT4
+	QWidget * mw = QApplication::activeWindow();
+#else
+	QWidget * mw = qApp->mainWidget();
+#endif
+	textFloat * tf = new textFloat( ( _parent == NULL ) ? mw : _parent );
+	if( _parent != NULL )
+	{
+		tf->move( _parent->mapTo( _parent->topLevelWidget(),
+							QPoint( 0, 0 ) ) +
+				QPoint( _parent->width() + 2, 0 ) );
+	}
+	else
+	{
+		tf->move( 32, mw->height() - 24 - _add_y_margin );
+	}
+	tf->setText( _msg );
+	tf->show();
+	if( _timeout > 0 )
+	{
+#ifdef QT4
+		tf->setAttribute( Qt::WA_DeleteOnClose, TRUE );
+#else
+		tf->setWFlags( tf->getWFlags() | Qt::WDestructiveClose );
+#endif
+		QTimer::singleShot( _timeout, tf, SLOT( close() ) );
+	}
+	return( tf );
+}
+
+
+
+
+textFloat * textFloat::displayMessage( const QString & _title,
+					const QString & _msg,
+					const QPixmap & _pixmap,
+					int _timeout, QWidget * _parent )
+{
+	textFloat * tf = displayMessage( _msg, _timeout, _parent, 16 );
+	tf->setTitle( _title );
+	tf->setPixmap( _pixmap );
+	return( tf );
+}
+
+
+
+
 void textFloat::paintEvent( QPaintEvent * _pe )
 {
 #ifdef QT4
@@ -121,18 +204,50 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 	QPainter p( &draw_pm );
 #endif
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.setBrush( QColor( 255, 255, 255 ) );
+	p.setBrush( QColor( 224, 224, 224 ) );
 
 	p.setFont( pointSize<8>( p.font() ) );
 
 	QFontMetrics metrics( p.fontMetrics() );
 	QRect textBound = metrics.boundingRect( m_text );
-
+	if( m_title != "" )
+	{
+		QFont f = p.font();
+		f.setBold( TRUE );
+		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
+		if( title_w > textBound.width() )
+		{
+			textBound.setWidth( textBound.width() + title_w );
+		}
+		textBound.setHeight( textBound.height() * 2 + 10 );
+	}
+	if( m_pixmap.isNull() == FALSE )
+	{
+		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
+	}
 	resize( textBound.width() + 5, textBound.height() + 5 );
 	p.drawRect( rect() );
 
 	p.setPen( Qt::black );
-	p.drawText( 2, 10, m_text );
+	// small message?
+	if( m_title == "" )
+	{
+		p.drawText( 2, 10, m_text );
+	}
+	else
+	{
+		int text_x = 2;
+		if( m_pixmap.isNull() == FALSE )
+		{
+			p.drawPixmap( 5, 5, m_pixmap );
+			text_x += m_pixmap.width() + 8;
+		}
+		p.drawText( text_x, 28, m_text );
+		QFont f = p.font();
+		f.setBold( TRUE );
+		p.setFont( f );
+		p.drawText( text_x, 12, m_title );
+	}
 
 #ifndef QT4
 	bitBlt( this, rect().topLeft(), &draw_pm );
@@ -142,10 +257,9 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 
 
 
-void textFloat::setText( const QString & _text )
+void textFloat::mousePressEvent( QMouseEvent * )
 {
-	m_text = _text;
-	repaint();
+	close();
 }
 
 

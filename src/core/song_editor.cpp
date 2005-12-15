@@ -41,7 +41,6 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QSlider>
-#include <QStatusBar>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QStatusBar>
@@ -88,6 +87,7 @@
 #include "tooltip.h"
 #include "tool_button.h"
 #include "cpuload_widget.h"
+#include "text_float.h"
 
 #include "debug.h"
 
@@ -202,11 +202,11 @@ songEditor::songEditor() :
 #ifdef QT4
 	m_masterVolumeSlider = new QSlider( Qt::Vertical, tb );
 	m_masterVolumeSlider->setRange( 0, 200 );
-	m_masterVolumeSlider->setPageStep( 10 );
+	m_masterVolumeSlider->setPageStep( 1 );
 	m_masterVolumeSlider->setValue( 100 );
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 #else
-	m_masterVolumeSlider = new QSlider( 0, 200, 10, 100, Qt::Vertical, tb );
+	m_masterVolumeSlider = new QSlider( 0, 200, 1, 100, Qt::Vertical, tb );
 	m_masterVolumeSlider->setTickPosition( QSlider::Left );
 #endif
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
@@ -221,6 +221,8 @@ songEditor::songEditor() :
 			SLOT( masterVolumeMoved( int ) ) );
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterVolumeReleased() ) );
+
+	m_mvsStatus = new textFloat( m_masterVolumeSlider );
 
 	lmmsMainWin::inst()->addWidgetToToolBar( master_vol_lbl );
 	lmmsMainWin::inst()->addWidgetToToolBar( m_masterVolumeSlider );
@@ -252,6 +254,8 @@ songEditor::songEditor() :
 			SLOT( masterPitchMoved( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
+
+	m_mpsStatus = new textFloat( m_masterPitchSlider );
 
 	lmmsMainWin::inst()->addWidgetToToolBar( master_pitch_lbl );
 	lmmsMainWin::inst()->addWidgetToToolBar( m_masterPitchSlider );
@@ -619,6 +623,12 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 
 void songEditor::masterVolumeChanged( int _new_val )
 {
+	if( m_mvsStatus->isShown() == FALSE )
+	{
+		masterVolumeMoved( _new_val );
+		m_mvsStatus->reparent( m_masterVolumeSlider );
+		m_mvsStatus->setVisibilityTimeOut( 1000 );
+	}
 	mixer::inst()->setMasterGain( 2.0f - _new_val / 100.0f );
 	setModified();
 }
@@ -628,6 +638,8 @@ void songEditor::masterVolumeChanged( int _new_val )
 
 void songEditor::masterVolumePressed( void )
 {
+	m_mvsStatus->reparent( m_masterVolumeSlider );
+	m_mvsStatus->show();
 	masterVolumeMoved( m_masterVolumeSlider->value() );
 }
 
@@ -636,9 +648,8 @@ void songEditor::masterVolumePressed( void )
 
 void songEditor::masterVolumeMoved( int _new_val )
 {
-	lmmsMainWin::inst()->statusBar()->showMessage( tr(
-						"Master output volume:" ) +
-				" " + QString::number( 200 - _new_val ) + "%" );
+	m_mvsStatus->setText( tr( "Master output volume: %1%" ).arg( 200 -
+								_new_val ) );
 }
 
 
@@ -646,7 +657,7 @@ void songEditor::masterVolumeMoved( int _new_val )
 
 void songEditor::masterVolumeReleased( void )
 {
-	lmmsMainWin::inst()->statusBar()->clearMessage();
+	m_mvsStatus->hide();
 }
 
 
@@ -654,6 +665,12 @@ void songEditor::masterVolumeReleased( void )
 
 void songEditor::masterPitchChanged( int _new_val )
 {
+	if( m_mpsStatus->isShown() == FALSE )
+	{
+		masterPitchMoved( _new_val );
+		m_mpsStatus->reparent( m_masterPitchSlider );
+		m_mpsStatus->setVisibilityTimeOut( 1000 );
+	}
 	setModified();
 }
 
@@ -662,6 +679,8 @@ void songEditor::masterPitchChanged( int _new_val )
 
 void songEditor::masterPitchPressed( void )
 {
+	m_mpsStatus->reparent( m_masterPitchSlider );
+	m_mpsStatus->show();
 	masterPitchMoved( m_masterPitchSlider->value() );
 }
 
@@ -670,9 +689,8 @@ void songEditor::masterPitchPressed( void )
 
 void songEditor::masterPitchMoved( int _new_val )
 {
-	lmmsMainWin::inst()->statusBar()->showMessage( tr(
-						"Master output pitch:" ) +
-		" " + QString::number( -_new_val ) + " " + tr( "semitones" ) );
+	m_mpsStatus->setText( tr( "Master pitch: %1 semitones").arg(
+								-_new_val ) );
 
 }
 
@@ -681,7 +699,7 @@ void songEditor::masterPitchMoved( int _new_val )
 
 void songEditor::masterPitchReleased( void )
 {
-	lmmsMainWin::inst()->statusBar()->clearMessage();
+	m_mpsStatus->hide();
 }
 
 
@@ -1501,15 +1519,19 @@ bool songEditor::saveProject( void )
 	{
 		m_modified = FALSE;
 
-		lmmsMainWin::inst()->statusBar()->showMessage(
-					tr( "%1 saved." ).arg( m_fileName ),
-									3000 );
+		textFloat::displayMessage( tr( "Project saved" ),
+					tr( "The project %1 is now saved."
+							).arg( m_fileName ),
+				embed::getIconPixmap( "project_save", 24, 24 ),
+									2000 );
 		lmmsMainWin::inst()->resetWindowTitle( "" );
 	}
 	else
 	{
-		lmmsMainWin::inst()->statusBar()->showMessage(
-					tr( "Project NOT saved." ), 3000 );
+		textFloat::displayMessage( tr( "Project NOT saved." ),
+				tr( "The project %1 could not be saved!" ).arg(
+							m_fileName ),
+				embed::getIconPixmap( "error" ), 4000 );
 		return( FALSE );
 	}
 	return( TRUE );
@@ -1536,25 +1558,24 @@ bool FASTCALL songEditor::saveProjectAs( const QString & _file_name )
 
 
 
+
 void songEditor::importProject( void )
 {
 #ifdef QT4
-		QFileDialog ofd( this, tr( "Import file" ), "",
+	QFileDialog ofd( this, tr( "Import file" ), "",
 					tr( "MIDI-files (*.mid)" ) );
 #else
-		QFileDialog ofd( QString::null,
-					tr( "MIDI-files (*.mid)" ),
+	QFileDialog ofd( QString::null, tr( "MIDI-files (*.mid)" ),
 							this, "", TRUE );
-		ofd.setWindowTitle( tr( "Import file" ) );
+	ofd.setWindowTitle( tr( "Import file" ) );
 #endif
-		ofd.setDirectory( configManager::inst()->projectsDir() );
-		ofd.setFileMode( QFileDialog::ExistingFiles );
-		if( ofd.exec () == QDialog::Accepted &&
-						!ofd.selectedFiles().isEmpty() )
-		{
-			midiFile mf( ofd.selectedFiles()[0] );
-			mf.importToTrackContainer( this );
-		}
+	ofd.setDirectory( configManager::inst()->projectsDir() );
+	ofd.setFileMode( QFileDialog::ExistingFiles );
+	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+	{
+		midiFile mf( ofd.selectedFiles()[0] );
+		mf.importToTrackContainer( this );
+	}
 }
 
 
@@ -1632,9 +1653,6 @@ void songEditor::exportProject( void )
 		epd.exec();
 	}
 }
-
-
-
 
 
 

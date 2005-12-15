@@ -51,6 +51,7 @@
 #include "debug.h"
 #include "gui_templates.h"
 #include "instrument.h"
+#include "text_float.h"
 
 
 
@@ -211,10 +212,22 @@ void fileBrowser::itemPressed( int _btn, QListViewItem * i, const QPoint &, int 
 		}
 		if( f->type() == fileItem::SAMPLE_FILE )
 		{
+			textFloat * tf = textFloat::displayMessage(
+					tr( "Loading sample" ),
+					tr( "Please wait, loading sample for "
+						"preview..." ),
+					embed::getIconPixmap( "sound_file",
+								24, 24 ), 0 );
+#ifdef QT4
+			qApp->processEvents( QEventLoop::AllEvents );
+#else
+			qApp->processEvents();
+#endif
 			samplePlayHandle * s = new samplePlayHandle(
 								f->fullName() );
 			s->setDoneMayReturnTrue( FALSE );
 			m_previewPlayHandle = s;
+			delete tf;
 		}
 		else if( f->type() == fileItem::PRESET_FILE )
 		{

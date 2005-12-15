@@ -1,3 +1,44 @@
+2005-12-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/file_browser.cpp:
+	display text-float while loading sample for preview
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	fixed bug which caused LMMS to crash when playing notes on
+	audio-file-processor, which was created out of preset containing link
+	to file which doesn't exist
+
+	* src/core/song_editor.cpp:
+	use text-floats instead of status-bar
+
+	* src/core/lmms_main_win.cpp:
+	removed status-bar
+
+	* plugins/vestige/vestige.cpp:
+	show text-float while loading plugin
+
+	* include/text_float.h:
+	* src/widgets/text_float.cpp:
+	heavy improvements on text-float-widget which is now also able to
+	display messages with title and pixmap and offers two static methods
+	for displaying a certain message
+
+	* src/tracks/channel_track.cpp:
+	set project modified after accepting drops of presets/plugins
+
+	* include/instrument_play_handle.h:
+	check for m_instrument being NULL because play-handle might be
+	invalidated and thus crash when referencing NULL-ptr
+
+	* most files:
+	continued improving Qt4-support
+
+2005-12-13	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* most files:
+	made LMMS compatible with Qt4 again after heavy development under Qt3
+	led to incompatibility with Qt4
+
 2005-12-11	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/lmms_main_win.cpp:

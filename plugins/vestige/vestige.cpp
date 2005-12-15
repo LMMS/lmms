@@ -58,7 +58,7 @@
 #include "tooltip.h"
 #include "spc_bg_hndl_widget.h"
 #include "vestige.h"
-
+#include "text_float.h"
 
 #include "embed.cpp"
 
@@ -190,9 +190,15 @@ void vestigeInstrument::setParameter( const QString & _param,
 		closePlugin();
 
 		m_pluginDLL = _value;
+		textFloat * tf = textFloat::displayMessage(
+				tr( "Loading plugin" ),
+				tr( "Please wait while loading VST-plugin..." ),
+				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
+			0 );
 		m_plugin = new remoteVSTPlugin( m_pluginDLL );
 		if( m_plugin->failed() )
 		{
+			delete tf;
 			QMessageBox::information( this,
 					tr( "Failed loading VST-plugin" ),
 					tr( "The VST-plugin %1 could not "
@@ -219,6 +225,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 		}*/
 		m_plugin->showEditor();
 		update();
+		delete tf;
 	}
 }
 

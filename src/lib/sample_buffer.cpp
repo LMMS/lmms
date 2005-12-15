@@ -171,7 +171,14 @@ void sampleBuffer::update( bool _keep_settings )
 		{
 			m_frames = m_origFrames;
 			m_startFrame = 0;
-			m_endFrame = m_frames-1;
+			if( m_frames > 0 )
+			{
+				m_endFrame = m_frames - 1;
+			}
+			else
+			{
+				m_endFrame = 0;
+			}
 		}
 	}
 	else if( m_audioFile != "" )
@@ -217,7 +224,14 @@ void sampleBuffer::update( bool _keep_settings )
 			{
 				// update frame-variables
 				m_startFrame = 0;
-				m_endFrame = m_frames - 1;
+				if( m_frames > 0 )
+				{
+					m_endFrame = m_frames - 1;
+				}
+				else
+				{
+					m_endFrame = 0;
+				}
 			}
 
 			// following code transforms int-samples into
@@ -262,23 +276,19 @@ m_data[frame][chnl] = buf[idx] * fac;
 		else
 		{
 			m_data = new sampleFrame[1];
-			memset( m_data, 0, sizeof( *m_data ) * 1 );
-/*			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-			{
-				m_data[0][chnl] = 0.0f;
-			}*/
+			memset( m_data, 0, sizeof( *m_data ) );
 			m_frames = 1;
+			m_startFrame = 0;
+			m_endFrame = 1;
 		}
 	}
 	else
 	{
 		m_data = new sampleFrame[1];
 		memset( m_data, 0, sizeof( *m_data ) * 1 );
-/*		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			m_data[0][chnl] = 0.0f;
-		}*/
 		m_frames = 1;
+		m_startFrame = 0;
+		m_endFrame = 1;
 	}
 
 	m_dataMutex.unlock();
@@ -582,13 +592,6 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	{
 		return( FALSE );
 	}
-	// this holds the number of the first frame to play
-	const Uint32 play_frame = m_startFrame + ( _start_frame %
-					total_frames_for_current_pitch );
-
-	// this holds the number of remaining frames in current loop
-	Uint32 frames_for_loop = total_frames_for_current_pitch -
-						( play_frame - m_startFrame );
 
 	// do we have frames left?? this is only important when not in
 	// looping-mode because in looping-mode we loop to start-frame...
@@ -596,6 +599,14 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	{
 		return( FALSE );
 	}
+
+	// this holds the number of the first frame to play
+	const Uint32 play_frame = m_startFrame + ( _start_frame %
+					total_frames_for_current_pitch );
+
+	// this holds the number of remaining frames in current loop
+	Uint32 frames_for_loop = total_frames_for_current_pitch -
+						( play_frame - m_startFrame );
 
 	// make sure, data isn't accessed in any other way (e.g. deleting
 	// of this buffer...)

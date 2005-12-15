@@ -54,6 +54,7 @@ class lcdSpinBox;
 class lmmsMainWin;
 class pattern;
 class projectNotes;
+class textFloat;
 class timeLine;
 class toolButton;
 
@@ -281,7 +282,8 @@ private:
 
 	QSlider * m_masterVolumeSlider;
 	QSlider * m_masterPitchSlider;
-
+	textFloat * m_mvsStatus;
+	textFloat * m_mpsStatus;
 
 	toolButton * m_addBBTrackButton;
 	toolButton * m_addSampleTrackButton;

@@ -57,7 +57,7 @@ cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
 
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );
-	m_updateTimer.start( 100 );	// update player control at 10 fps
+	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
 
 #ifndef QT4
 	setBackgroundMode( NoBackground );
@@ -76,32 +76,19 @@ cpuloadWidget::~cpuloadWidget()
 
 void cpuloadWidget::paintEvent( QPaintEvent *  )
 {
-/*	if( m_changed == TRUE )
-	{
-		m_changed = FALSE;
-
-		// background
-		bitBlt( &m_temp, 0, 0, &m_background, 0, 0, width(), height(),
-								CopyROP );
-
-		// leds
-		bitBlt( &m_temp, 23, 3, &m_leds, 0, 0,
-			( m_leds.width() * m_currentLoad / 300 ) * 3,
-						m_leds.height(), CopyROP );
-	}
-	bitBlt( this, 0, 0, &m_temp, 0, 0, width(), height(), CopyROP );*/
 	if( m_changed == TRUE )
 	{
 		m_changed = FALSE;
 
 		QPainter p( &m_temp );
-		// background
 		p.drawPixmap( 0, 0, m_background );
 
+		// as load-indicator consists of small 2-pixel wide leds with
+		// 1 pixel spacing, we have to make sure, only whole leds are
+		// shown which we achieve by the following formula
 		int w = ( m_leds.width() * m_currentLoad / 300 ) * 3;
 		if( w > 0 )
 		{
-			// leds
 			p.drawPixmap( 23, 3, m_leds, 0, 0, w,
 							m_leds.height() );
 		}
@@ -116,9 +103,13 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 void cpuloadWidget::updateCpuLoad()
 {
 	// smooth load-values a bit
-	m_currentLoad = ( m_currentLoad + mixer::inst()->cpuLoad() ) / 2;
-	m_changed = TRUE;
-	update();
+	Uint8 new_load = ( m_currentLoad + mixer::inst()->cpuLoad() ) / 2;
+	if( new_load != m_currentLoad )
+	{
+		m_currentLoad = new_load;
+		m_changed = TRUE;
+		update();
+	}
 }
 
 

@@ -53,6 +53,8 @@ public:
 		m_colorStandard( s_stdColor ),
 		m_colorHighlighted( s_hlColor )
 	{
+		// setup colors
+		leaveEvent( NULL );
 	}
 
 	~toolButton();
@@ -66,12 +68,14 @@ public:
 	{
 		m_colorHighlighted = _color;
 	}
+
 #ifndef QT4
 	inline void setIcon( const QPixmap & _icon )
 	{
 		setIconSet( _icon );
 	}
 #endif
+
 
 protected:
 	virtual void enterEvent( QEvent * _ev );

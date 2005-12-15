@@ -389,7 +389,6 @@ void audioFileProcessor::playNote( notePlayHandle * _n )
 	const float note_freq = getChannelTrack()->frequency( _n ) /
 						( mixer::inst()->sampleRate() /
 							DEFAULT_SAMPLE_RATE );
-
 	if( m_sampleBuffer.play( buf, _n->totalFramesPlayed(),
 					frames, note_freq,
 					m_loopButton->isChecked(),
@@ -586,8 +585,16 @@ void audioFileProcessor::endKnobChanged( float _new_value )
 {
 	if( _new_value > m_startKnob->value() )
 	{
-		m_sampleBuffer.setEndFrame( static_cast<Uint32>( _new_value *
+		if( _new_value * m_sampleBuffer.frames() >= 1.0f )
+		{
+			m_sampleBuffer.setEndFrame( static_cast<Uint32>(
+							_new_value *
 						m_sampleBuffer.frames() ) - 1 );
+		}
+		else
+		{
+			m_sampleBuffer.setEndFrame( 0 );
+		}
 	}
 	else
 	{

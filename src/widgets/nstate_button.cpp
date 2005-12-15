@@ -52,7 +52,6 @@ nStateButton::~nStateButton()
 {
 	while( m_states.size() )
 	{
-		delete m_states.front().first;
 		m_states.erase( m_states.begin() );
 	}
 }
@@ -62,7 +61,7 @@ nStateButton::~nStateButton()
 
 void nStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 {
-	m_states.push_back( qMakePair( new QPixmap( _pm ), _tooltip ) );
+	m_states.push_back( qMakePair( _pm, _tooltip ) );
 	// first inserted pixmap?
 	if( m_states.size() == 1 )
 	{
@@ -88,11 +87,9 @@ void nStateButton::changeState( int _n )
 					m_generalToolTip;
 		toolTip::add( this, _tooltip );
 
-		setIcon( *m_states[m_curState].first );
+		setIcon( m_states[m_curState].first );
 
 		emit changedState( m_curState );
-
-/*		update();*/
 	}
 }
 

@@ -31,10 +31,12 @@
 #ifdef QT4
 
 #include <QWidget>
+#include <QPixmap>
 
 #else
 
 #include <qwidget.h>
+#include <qpixmap.h>
 
 #endif
 
@@ -47,19 +49,36 @@ public:
 	{
 	}
 
+	void setTitle( const QString & _title );
 	void setText( const QString & _text );
+	void setPixmap( const QPixmap & _pixmap );
 
 	void reparent( QWidget * _new_parent );
 
 	void setVisibilityTimeOut( int _msecs );
 
 
+	static textFloat * displayMessage( const QString & _msg,
+						int _timeout = 2000,
+						QWidget * _parent = NULL,
+						int _add_y_margin = 0 );
+	static textFloat * displayMessage( const QString & _title,
+						const QString & _msg,
+						const QPixmap & _pixmap =
+								QPixmap(),
+						int _timeout = 2000,
+						QWidget * _parent = NULL );
+
+
 protected:
 	virtual void paintEvent( QPaintEvent * _me );
+	virtual void mousePressEvent( QMouseEvent * _me );
 
 
 private:
+	QString m_title;
 	QString m_text;
+	QPixmap m_pixmap;
 
 } ;
 

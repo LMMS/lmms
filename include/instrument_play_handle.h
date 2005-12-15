@@ -46,7 +46,10 @@ public:
 
 	inline virtual void play( void )
 	{
-		m_instrument->play();
+		if( m_instrument != NULL )
+		{
+			m_instrument->play();
+		}
 	}
 
 	inline virtual bool done( void ) const
@@ -56,7 +59,7 @@ public:
 
 	inline virtual void checkValidity( void )
 	{
-		if( !m_instrument->valid() )
+		if( m_instrument != NULL && !m_instrument->valid() )
 		{
 			m_instrument = NULL;
 		}

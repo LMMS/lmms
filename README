@@ -48,7 +48,7 @@ least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 Required libraries are:
 
 - multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher (tested
-  up to 4.0.0) with devel-files
+  up to 4.0.1) with devel-files
 
 Optional, but strongly recommended:
 - JACK with devel-files

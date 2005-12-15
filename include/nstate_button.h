@@ -48,6 +48,7 @@
 
 #include "tool_button.h"
 
+
 class nStateButton : public toolButton
 {
 	Q_OBJECT
@@ -80,7 +81,7 @@ protected:
 
 
 private:
-	vvector<QPair<QPixmap *, QString> > m_states;
+	vvector<QPair<QPixmap, QString> > m_states;
 	QString m_generalToolTip;
 
 	int m_curState;
