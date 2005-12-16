@@ -1,3 +1,8 @@
+2005-12-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/audio_alsa.h:
+	do not include alsa-headers if they do not exist...
+
 2005-12-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/file_browser.cpp:

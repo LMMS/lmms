@@ -623,7 +623,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 
 void songEditor::masterVolumeChanged( int _new_val )
 {
-	if( m_mvsStatus->isShown() == FALSE )
+	if( m_mvsStatus->isVisible() == FALSE )
 	{
 		masterVolumeMoved( _new_val );
 		m_mvsStatus->reparent( m_masterVolumeSlider );
@@ -665,7 +665,7 @@ void songEditor::masterVolumeReleased( void )
 
 void songEditor::masterPitchChanged( int _new_val )
 {
-	if( m_mpsStatus->isShown() == FALSE )
+	if( m_mpsStatus->isVisible() == FALSE )
 	{
 		masterPitchMoved( _new_val );
 		m_mpsStatus->reparent( m_masterPitchSlider );

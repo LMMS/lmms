@@ -36,9 +36,9 @@
 #define ALSA_SUPPORT
 #endif
 
-#endif
-
 #include <alsa/asoundlib.h>
+
+#endif
 
 #include "qt3support.h"
 

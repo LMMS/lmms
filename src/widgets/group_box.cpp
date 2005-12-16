@@ -223,7 +223,7 @@ void groupBox::updatePixmap( void )
 #ifdef QT4
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );
-	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );
+/*	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );*/
 	setPalette( pal );
 #else
 	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
