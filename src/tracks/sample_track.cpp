@@ -249,6 +249,10 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 	}
 	sampletco_de.setAttribute( "len", QString::number( length() ) );
 	sampletco_de.setAttribute( "src", sampleFile() );
+	if( sampleFile() == "" )
+	{
+		sampletco_de.setAttribute( "data", m_sampleBuffer.toBase64() );
+	}
 	// TODO: start- and end-frame
 	_parent.appendChild( sampletco_de );
 }
@@ -262,8 +266,12 @@ void FASTCALL sampleTCO::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	changeLength( _this.attribute( "len" ).toInt() );
 	setSampleFile( _this.attribute( "src" ) );
+	if( sampleFile() == "" )
+	{
+		m_sampleBuffer.loadFromBase64( _this.attribute( "data" ) );
+	}
+	changeLength( _this.attribute( "len" ).toInt() );
 }
 
 
