@@ -504,7 +504,7 @@ audioDevice * mixer::tryAudioDevices( void )
 midiClient * mixer::tryMIDIClients( void )
 {
 	QString client_name = configManager::inst()->value( "mixer",
-								"midiclient" );
+								"mididev" );
 
 #ifdef ALSA_SUPPORT
 	if( client_name == midiALSASeq::name() || client_name == "" )

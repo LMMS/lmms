@@ -1,3 +1,103 @@
+2005-12-18	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/tracks/pattern.cpp:
+	use Sint32 instead of Sint16 for determining central key, otherwise we
+	might get overflows when having a lot of notes
+
+	* src/tracks/sample_track.cpp:
+	draw zero-line if sample is shorter than TCO
+
+	* src/core/track.cpp:
+	display text-float with current position/size when moving/resizing TCO
+
+	* src/core/song_editor.cpp:
+	do correct positioning for text-floats for master-volume/-pitch
+
+	* include/envelope_and_lfo_widget.h:
+	* src/core/envelope_and_lfo_widget.cpp:
+	added support for user-defined wave-shapes - the user just has to drag
+	an audio-sample into envelope/lfo-widget and that's all ;-)
+
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	make sound-buffer of frozen pattern draggable to sample in
+	sample-track
+
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	support for base64-encoding of sample-data into a QString
+
+	* src/core/track_container.cpp:
+	import MIDI-file to itself when getting according drag'n'drop-request
+
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	receive drop-events (set dragged sample etc.)
+
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstclient.cpp:
+	renamed removeVSTPlugin::write/readValue to write/readValueS for
+	compiling even with buggy GCC 3.x
+
+	* include/file_browser.h:
+	* src/core/file_browser.cpp:
+	made up all that drag'n'drop-stuff, you're now able to drag samples
+	and presets directly to according channel, sample etc.
+
+2005-12-17	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/bb_editor.h:
+	* include/pattern.h:
+	* src/core/bb_editor.cpp:
+	* src/tracks/pattern.cpp:
+	always update according bb-tracks when changing pattern/it's length
+
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	drag'n'drop everywhere - now you can drag every track-content-object
+	(e.g. a pattern) to every other track-content-object of the same type
+	or to a free place in an according track or just in another
+	track-container
+
+	* include/mmp.h:
+	* src/lib/mmp.cpp:
+	allow additionally to load data from given string instead of file
+
+	* include/timeline.h:
+	* src/core/timeline.cpp:
+	- disable magnetic loop-points when pressing control
+	- set start-point directly to given position when pressing middle
+	  mouse-button, do the same for end-point of shift is pressed at the
+	  same time
+
+	* include/piano_roll.h:
+	* include/song_editor.h:
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	use modifier-key-states from lmmsMainWin instead of monitoring them on
+	it's own
+
+	* include/lmms_main_win.h:
+	* src/core/lmms_main_win.cpp:
+	capture key-events and save states of shift, control- and alt-key
+	everytime it changes - other widgets can use this for querying whether
+	one of these modifier-keys is pressed
+
+2005-12-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* configure.in:
+	added better LADSPA-check and fixed some other small things
+
+	* src/core/mixer.cpp:
+	query attribute "mididev" instead of "midiclient" for determining
+	selected MIDI-device - fixes bug with apparently non-selectable
+	MIDI-device/-client
+
+	* src/core/plugin.cpp:
+	* src/lib/ladspa_manager.cpp:
+	load plugins using QLibrary instead of platform-dependent dl-functions
+
 2005-12-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/audio_alsa.h:

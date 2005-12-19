@@ -280,7 +280,7 @@ lmms_SOURCES =								\
 
 
 
-EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES)
+EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) aeffectx_h_fix.patch
 
 
 CLEANFILES = $(lmms_MOC) ./embedded_resources.h

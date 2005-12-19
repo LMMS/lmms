@@ -1,18 +1,16 @@
 to be done as soon as possible:
 
+- MIDI-program/MIDI-mapping/process program-/channel-change-events from MIDI-files
 - do not allow to connect output-port of channel to own input-port!
 - add note-len- and note-alignment-selectbox to piano-roll
 - fix audio/midi-settings stuff/translation
 - tooltips for controls in MIDI-tab
-- sample-track: sane bg and wave-color
-- dnd everywhere: presets, samples (afp/sample-track), TCO's, knob-values
+- dnd: knob-values
 - DSSI-support
 - save/load parameters of VST-plugin
 - somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
-- use midi-maps
-- process program-/channel-change-events from MIDI-files
 - pre-listen when opening sample with QFileDialog
 - level-meters in output-graph and channel-track
 - panning-editing in piano-roll

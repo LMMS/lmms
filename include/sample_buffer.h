@@ -67,7 +67,10 @@ public:
 		DOTS
 	} ;
 
-	sampleBuffer( const QString & _audio_file = "" );
+	// constructor which either loads sample _audio_file or decodes
+	// base64-data out of string
+	sampleBuffer( const QString & _audio_file = "",
+						bool _is_base64_data = FALSE );
 	sampleBuffer( const sampleFrame * _data, Uint32 _frames );
 	
 	~sampleBuffer();
@@ -112,10 +115,12 @@ public:
 
 	QString openAudioFile( void ) const;
 
+	QString toBase64( void ) const;
 
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
+	void loadFromBase64( const QString & _data );
 	void setStartFrame( Uint32 _s );
 	void setEndFrame( Uint32 _e );
 	void setAmplification( float _a );

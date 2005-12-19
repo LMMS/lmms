@@ -1,6 +1,5 @@
 /*
- * playpos_marker.cpp - class timeLine, representing a time-line with
- *                      position marker
+ * timeline.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -48,6 +47,8 @@
 #include "embed.h"
 #include "templates.h"
 #include "nstate_button.h"
+#include "lmms_main_win.h"
+#include "text_float.h"
 
 
 
@@ -71,6 +72,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_pos( _pos ),
 	m_begin( _begin ),
 	m_savedPos( -1 ),
+	m_hint( NULL ),
 	m_action( NONE ),
 	m_moveXOff( 0 )
 {
@@ -123,6 +125,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 timeLine::~timeLine()
 {
 	m_pos.m_timeLine = NULL;
+	delete m_hint;
 }
 
 
@@ -244,8 +247,8 @@ void timeLine::paintEvent( QPaintEvent * )
 	const QPixmap & lpoint = loopPointsEnabled() ?
 						*s_loopPointPixmap :
 						*s_loopPointDisabledPixmap;
-	p.drawPixmap( markerX( m_loopPos[0] ), 7, lpoint );
-	p.drawPixmap( markerX( m_loopPos[1] ), 7, lpoint );
+	p.drawPixmap( markerX( loopBegin() ), 7, lpoint );
+	p.drawPixmap( markerX( loopEnd() ), 7, lpoint );
 
 
 	tact tact_num = m_begin.getTact();
@@ -292,14 +295,39 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 						s_loopPointPixmap->width() )
 		{
 			m_action = MOVE_LOOP_BEGIN;
-			m_moveXOff = s_loopPointPixmap->width() / 2;
 		}
 		else if( _me->x() >= markerX( loopEnd() ) &&
 				_me->x() <= markerX( loopEnd() ) +
 						s_loopPointPixmap->width() )
 		{
 			m_action = MOVE_LOOP_END;
+		}
+		if( m_action != NONE )
+		{
 			m_moveXOff = s_loopPointPixmap->width() / 2;
+		}
+	}
+	else if( _me->button() == Qt::MidButton )
+	{
+		const midiTime t = m_begin +
+				static_cast<Sint32>( _me->x() * 64 / m_ppt );
+		Uint8 pmin = 0;
+		Uint8 pmax = 1;
+		m_action = MOVE_LOOP_BEGIN;
+		if( m_loopPos[pmin] > m_loopPos[pmax] )
+		{
+			qSwap( pmin, pmax );
+			m_action = MOVE_LOOP_END;
+		}
+		if( lmmsMainWin::isShiftPressed() == TRUE )
+		{
+			m_loopPos[pmax] = t;
+			m_action = ( m_action == MOVE_LOOP_BEGIN ) ?
+						MOVE_LOOP_END : MOVE_LOOP_BEGIN;
+		}
+		else
+		{
+			m_loopPos[pmin] = t;
 		}
 	}
 	else
@@ -313,6 +341,14 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 		{
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
+	}
+	if( m_action == MOVE_LOOP_BEGIN || m_action == MOVE_LOOP_END )
+	{
+		delete m_hint;
+		m_hint = textFloat::displayMessage( tr( "Hint" ),
+					tr( "Press <Ctrl> to disable magnetic "
+							"loop-points." ),
+					embed::getIconPixmap( "hint" ), 0 );
 	}
 	mouseMoveEvent( _me );
 }
@@ -334,14 +370,27 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 			break;
 
 		case MOVE_LOOP_BEGIN:
-			m_loopPos[0] = t.getTact() * 64;
-			update();
-			break;
-
 		case MOVE_LOOP_END:
-			m_loopPos[1] = t.getTact() * 64;
+		{
+			Uint8 i = m_action - MOVE_LOOP_BEGIN;
+			if( lmmsMainWin::isCtrlPressed() == TRUE )
+			{
+				// no ctrl-press-hint when having ctrl pressed
+				delete m_hint;
+				m_hint = NULL;
+				m_loopPos[i] = t;
+			}
+			else
+			{
+				m_loopPos[i] = t.getTact() * 64;
+				if( t.getTact64th() >= 32 )
+				{
+					m_loopPos[i] += 64;
+				}
+			}
 			update();
 			break;
+		}
 
 		default:
 			break;
@@ -353,6 +402,8 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 
 void timeLine::mouseReleaseEvent( QMouseEvent * _me )
 {
+	delete m_hint;
+	m_hint = NULL;
 	m_action = NONE;
 }
 

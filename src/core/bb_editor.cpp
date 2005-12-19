@@ -258,6 +258,18 @@ void bbEditor::removeBB( csize _bb )
 
 
 
+void bbEditor::updateBBTrack( trackContentObject * _tco )
+{
+	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
+	if( t != NULL )
+	{
+		t->getTrackContentWidget()->updateTCOs();
+	}
+}
+
+
+
+
 // close-handler for bb-editor-window because closing of bb-editor isn't allowed
 // instead of closing it's being hidden
 void bbEditor::closeEvent( QCloseEvent * _ce )

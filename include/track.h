@@ -57,14 +57,15 @@
 #include "settings.h"
 
 
+class QMenu;
+
+class pixmapButton;
+class textFloat;
 class track;
 class trackContainer;
 class trackContentWidget;
 class trackWidget;
-class pixmapButton;
-class QMenu;
 
-typedef QWidget trackSettingsWidget;
 typedef QWidget trackOperationsWidget;
 
 
@@ -107,13 +108,17 @@ public slots:
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void contextMenuEvent( QContextMenuEvent * _cme );
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
+	virtual void contextMenuEvent( QContextMenuEvent * _cme );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void leaveEvent( QEvent * _e );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
+
 	void setAutoResizeEnabled( bool _e = FALSE );
 	float pixelsPerTact( void );
 
@@ -125,6 +130,8 @@ protected slots:
 
 
 private:
+	static textFloat * s_textFloat;
+
 	track * m_track;
 	midiTime m_startPosition;
 	midiTime m_length;
@@ -172,6 +179,8 @@ public slots:
 
 
 protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -179,6 +188,9 @@ protected:
 
 
 private:
+	track * getTrack( void );
+	midiTime getPosition( int _mouse_x );
+
 	typedef vvector<trackContentObject *> tcoVector;
 
 	tcoVector m_trackContentObjects;
@@ -186,6 +198,28 @@ private:
 	Uint16 m_pixelsPerTact;
 
 } ;
+
+
+
+
+
+class trackSettingsWidget : public QWidget
+{
+public:
+	trackSettingsWidget( trackWidget * _parent );
+	~trackSettingsWidget();
+
+
+protected:
+	virtual void mousePressEvent( QMouseEvent * _me );
+
+
+private:
+	trackWidget * m_trackWidget;
+
+} ;
+
+
 
 
 
@@ -202,26 +236,32 @@ public:
 	{
 		return( m_track );
 	}
+
 	inline track * getTrack( void )
 	{
 		return( m_track );
 	}
+
 	inline const trackSettingsWidget & getTrackSettingsWidget( void ) const
 	{
 		return( m_trackSettingsWidget );
 	}
+
 	inline const trackContentWidget & getTrackContentWidget( void ) const
 	{
 		return( m_trackContentWidget );
 	}
+
 	inline trackSettingsWidget & getTrackSettingsWidget( void )
 	{
 		return( m_trackSettingsWidget );
 	}
+
 	inline trackContentWidget & getTrackContentWidget( void )
 	{
 		return( m_trackContentWidget );
 	}
+
 	bool muted( void ) const;
 
 
@@ -236,8 +276,11 @@ public slots:
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re );
+
 	midiTime FASTCALL endPosition( const midiTime & _pos_start );
 
 
@@ -285,7 +328,7 @@ public:
 	}
 
 	// pure virtual functions
-	virtual trackTypes trackType( void ) const = 0;
+	virtual trackTypes type( void ) const = 0;
 
 	virtual bool FASTCALL play( const midiTime & _start,
 						Uint32 _start_frame,
@@ -322,22 +365,27 @@ public:
 	{
 		return( m_trackWidget );
 	}
+
 	inline trackContainer * getTrackContainer( void )
 	{
 		return( m_trackContainer );
 	}
+
 	inline const trackSettingsWidget * getTrackSettingsWidget( void ) const
 	{
 		return( &m_trackWidget->getTrackSettingsWidget() );
 	}
+
 	inline const trackContentWidget * getTrackContentWidget( void ) const
 	{
 		return( &m_trackWidget->getTrackContentWidget() );
 	}
+
 	inline trackSettingsWidget * getTrackSettingsWidget( void )
 	{
 		return( &m_trackWidget->getTrackSettingsWidget() );
 	}
+
 	inline trackContentWidget * getTrackContentWidget( void )
 	{
 		return( &m_trackWidget->getTrackContentWidget() );

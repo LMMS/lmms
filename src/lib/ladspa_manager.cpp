@@ -33,20 +33,18 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QLibrary>
 
 #else
 
 #include <qdir.h>
 #include <qfileinfo.h>
+#include <qlibrary.h>
 
 #define value data
 
 #endif
 
-
-#ifdef HAVE_DLFCN_H
-#include <dlfcn.h>
-#endif
 
 #include <math.h>
 
@@ -58,14 +56,11 @@ ladspaManager * ladspaManager::s_instanceOfMe = NULL;
 
 ladspaManager::ladspaManager( void )
 {
-	LADSPA_Descriptor_Function descriptorFunction;
-	void * pluginHandle;
-	
 	// TODO Need to move the search path definition to the config file to
 	// have more control over where it tries to find the plugins.
 #ifdef QT4
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
-								split( ' ' );
+								split( ':' );
 #else
 	QStringList ladspaDirectories = QStringList::split( ':',
 					QString( getenv( "LADSPA_PATH" ) ) );
@@ -100,7 +95,8 @@ ladspaManager::ladspaManager( void )
 #else
 			const QFileInfo & f = **file;
 #endif
-			pluginHandle = dlopen( f.absoluteFilePath().
+			QLibrary plugin_lib( f.absoluteFilePath() );
+/*			pluginHandle = dlopen( f.absoluteFilePath().
 #ifdef QT4
 							toAscii().constData(),
 #else
@@ -109,18 +105,22 @@ ladspaManager::ladspaManager( void )
 								RTLD_LAZY );
 			if( pluginHandle ) 
 			{
-				dlerror();
-				descriptorFunction
-						= ( LADSPA_Descriptor_Function )
-						dlsym( pluginHandle,
+				dlerror();*/
+			if( plugin_lib.load() == TRUE )
+			{
+				LADSPA_Descriptor_Function descriptorFunction =
+		( LADSPA_Descriptor_Function ) plugin_lib.resolve(
 							"ladspa_descriptor" );
-				if( dlerror() == NULL && descriptorFunction )
+				if( /*dlerror() == NULL &&*/
+					descriptorFunction != NULL )
 				{
-					addPlugins( pluginHandle, 
-							descriptorFunction,
-							f.fileName() );
+#ifndef QT4
+					plugin_lib.setAutoUnload( FALSE );
+#endif
+					addPlugins( descriptorFunction,
+								f.fileName() );
 				}
-				else
+/*				else
 				{
 					dlclose( ( void * ) 
 						f.absoluteFilePath().
@@ -130,7 +130,7 @@ ladspaManager::ladspaManager( void )
 							ascii()
 #endif
 									);
-				}
+				}*/
 			}
 		}
 	}
@@ -141,20 +141,21 @@ ladspaManager::ladspaManager( void )
 
 ladspaManager::~ladspaManager()
 {
-	for( ladspaManagerMapType::Iterator it = m_ladspaManagerMap.begin();
+	// we trust in auto-unloading-mechanisms of OS
+/*	for( ladspaManagerMapType::Iterator it = m_ladspaManagerMap.begin();
 		it != m_ladspaManagerMap.end(); ++it )
 	{
 		dlclose( it.value()->pluginHandle );
 	}
-	m_ladspaManagerMap.clear();
+	m_ladspaManagerMap.clear();*/
 }
 
 
 
 
-void FASTCALL ladspaManager::addPlugins( void * _plugin_handle, 
-					LADSPA_Descriptor_Function _descriptor_func,
-					const QString & _file )
+void FASTCALL ladspaManager::addPlugins(
+				LADSPA_Descriptor_Function _descriptor_func,
+							const QString & _file )
 {
 	const LADSPA_Descriptor * descriptor;
 	long pluginIndex = 0;
@@ -163,7 +164,6 @@ void FASTCALL ladspaManager::addPlugins( void * _plugin_handle,
 	{
 		ladspaManagerDescription * plugIn = 
 				new ladspaManagerDescription;
-		plugIn->pluginHandle = _plugin_handle;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		
@@ -180,10 +180,11 @@ QString FASTCALL ladspaManager::getLabel( const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor = 
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( QString( descriptor->Label ) );
 	}
 	else
@@ -199,10 +200,11 @@ bool FASTCALL ladspaManager::hasRealTimeDependency( const ladspaKey &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( LADSPA_IS_REALTIME( descriptor->Properties ) );
 	}
 	else
@@ -218,10 +220,11 @@ bool FASTCALL ladspaManager::isInplaceBroken( const ladspaKey &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( LADSPA_IS_INPLACE_BROKEN( descriptor->Properties ) );
 	}
 	else
@@ -237,10 +240,11 @@ bool FASTCALL ladspaManager::isRealTimeCapable( const ladspaKey &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( LADSPA_IS_HARD_RT_CAPABLE( descriptor->Properties ) );
 	}
 	else
@@ -256,10 +260,11 @@ QString FASTCALL ladspaManager::getName( const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( QString( descriptor->Name ) );
 	}
 	else
@@ -275,10 +280,11 @@ QString FASTCALL ladspaManager::getMaker( const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( QString( descriptor->Maker ) );
 	}
 	else
@@ -294,10 +300,11 @@ QString FASTCALL ladspaManager::getCopyright( const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( QString( descriptor->Copyright ) );
 	}
 	else
@@ -313,10 +320,11 @@ Uint32 FASTCALL ladspaManager::getPortCount( const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( descriptor->PortCount );
 	}
 	else
@@ -329,15 +337,16 @@ Uint32 FASTCALL ladspaManager::getPortCount( const ladspaKey & _plugin )
 
 
 bool FASTCALL ladspaManager::isPortInput( const ladspaKey & _plugin, 
-						Uint32 _port )
+								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		&& _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		
 		return( LADSPA_IS_PORT_INPUT
 				( descriptor->PortDescriptors[_port] ) );
@@ -352,15 +361,16 @@ bool FASTCALL ladspaManager::isPortInput( const ladspaKey & _plugin,
 
 
 bool FASTCALL ladspaManager::isPortOutput( const ladspaKey & _plugin, 
-						Uint32 _port )
+								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		
 		return( LADSPA_IS_PORT_OUTPUT
 				( descriptor->PortDescriptors[_port] ) );
@@ -374,15 +384,17 @@ bool FASTCALL ladspaManager::isPortOutput( const ladspaKey & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isPortAudio( const ladspaKey & _plugin, Uint32 _port )
+bool FASTCALL ladspaManager::isPortAudio( const ladspaKey & _plugin,
+								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		
 		return( LADSPA_IS_PORT_AUDIO
 				( descriptor->PortDescriptors[_port] ) );
@@ -397,15 +409,16 @@ bool FASTCALL ladspaManager::isPortAudio( const ladspaKey & _plugin, Uint32 _por
 
 
 bool FASTCALL ladspaManager::isPortControl( const ladspaKey & _plugin, 
-						Uint32 _port )
+								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		
 		return( LADSPA_IS_PORT_CONTROL
 				( descriptor->PortDescriptors[_port] ) );
@@ -426,14 +439,14 @@ bool FASTCALL ladspaManager::areHintsSampleRateDependent(
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_SAMPLE_RATE
-				( hintDescriptor ) );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		return( LADSPA_IS_HINT_SAMPLE_RATE ( hintDescriptor ) );
 	}
 	else
 	{
@@ -450,14 +463,14 @@ float FASTCALL ladspaManager::getLowerBound( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		if( LADSPA_IS_HINT_BOUNDED_BELOW
-				( hintDescriptor ) )
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		if( LADSPA_IS_HINT_BOUNDED_BELOW( hintDescriptor ) )
 		{
 			return( descriptor->PortRangeHints[_port].LowerBound );
 		}
@@ -480,14 +493,14 @@ float FASTCALL ladspaManager::getUpperBound( const ladspaKey & _plugin,									
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		if( LADSPA_IS_HINT_BOUNDED_ABOVE
-				  ( hintDescriptor ) )
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		if( LADSPA_IS_HINT_BOUNDED_ABOVE( hintDescriptor ) )
 		{
 			return( descriptor->PortRangeHints[_port].LowerBound );
 		}
@@ -506,19 +519,19 @@ float FASTCALL ladspaManager::getUpperBound( const ladspaKey & _plugin,									
 
 
 bool FASTCALL ladspaManager::isPortToggled( const ladspaKey & _plugin, 
-						Uint32 _port )
+								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_TOGGLED
-				( hintDescriptor ) );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		return( LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
 	}
 	else
 	{
@@ -535,21 +548,23 @@ float FASTCALL ladspaManager::getDefaultSetting( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
 		switch( hintDescriptor & LADSPA_HINT_DEFAULT_MASK ) 
 		{
 			case LADSPA_HINT_DEFAULT_NONE:
 				return( -999e-99 );
 			case LADSPA_HINT_DEFAULT_MINIMUM:
-				return( descriptor->PortRangeHints[_port].LowerBound );
+				return( descriptor->PortRangeHints[_port].
+								LowerBound );
 			case LADSPA_HINT_DEFAULT_LOW:
 				if( LADSPA_IS_HINT_LOGARITHMIC
-						( hintDescriptor )) 
+							( hintDescriptor ) )
 				{
 					return( exp( log( descriptor->PortRangeHints[_port].LowerBound ) 
 						* 0.75
@@ -620,14 +635,14 @@ bool FASTCALL ladspaManager::isLogarithmic( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_LOGARITHMIC
-				( hintDescriptor ) );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		return( LADSPA_IS_HINT_LOGARITHMIC( hintDescriptor ) );
 	}
 	else
 	{
@@ -644,14 +659,14 @@ bool FASTCALL ladspaManager::isInteger( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		LADSPA_PortRangeHintDescriptor hintDescriptor
-				= descriptor->PortRangeHints[_port].HintDescriptor;
-		return( LADSPA_IS_HINT_INTEGER
-				( hintDescriptor ) );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) );
 	}
 	else
 	{
@@ -668,11 +683,12 @@ QString FASTCALL ladspaManager::getPortName( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+
 		return( QString( descriptor->PortNames[_port] ) );
 	}
 	else
@@ -684,15 +700,16 @@ QString FASTCALL ladspaManager::getPortName( const ladspaKey & _plugin,
 
 
 
-const void * FASTCALL ladspaManager::getImplementationData( const ladspaKey & 
-								_plugin )
+const void * FASTCALL ladspaManager::getImplementationData(
+						const ladspaKey & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( descriptor->ImplementationData );
 	}
 	else
@@ -709,10 +726,11 @@ const LADSPA_Descriptor * FASTCALL ladspaManager::getDescriptor(
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		return( descriptor );
 	}
 	else
@@ -729,11 +747,13 @@ LADSPA_Handle FASTCALL ladspaManager::instantiate( const ladspaKey & _plugin,
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		return( ( descriptor->instantiate ) ( descriptor, _sample_rate ) );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		return( ( descriptor->instantiate )
+						( descriptor, _sample_rate ) );
 	}
 	else
 	{
@@ -752,13 +772,15 @@ void FASTCALL ladspaManager::connectPort( const ladspaKey & _plugin,
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		&& _port < getPortCount( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		if( descriptor->connect_port != NULL )
 		{
-			( descriptor->connect_port ) ( _instance, _port, _data_location );
+			( descriptor->connect_port )
+					( _instance, _port, _data_location );
 		}
 	}
 }
@@ -771,10 +793,11 @@ void FASTCALL ladspaManager::activate( const ladspaKey & _plugin,
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		if( descriptor->activate != NULL )
 		{
 			( descriptor->activate ) ( _instance );
@@ -785,15 +808,17 @@ void FASTCALL ladspaManager::activate( const ladspaKey & _plugin,
 
 
 
-void FASTCALL ladspaManager::run( const ladspaKey & _plugin, LADSPA_Handle _instance,
-				Uint32 _sample_count )
+void FASTCALL ladspaManager::run( const ladspaKey & _plugin,
+							LADSPA_Handle _instance,
+							Uint32 _sample_count )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		if( descriptor->run != NULL )
 		{
 			( descriptor->run ) ( _instance, _sample_count );
@@ -805,17 +830,18 @@ void FASTCALL ladspaManager::run( const ladspaKey & _plugin, LADSPA_Handle _inst
 
 
 void FASTCALL ladspaManager::runAdding( const ladspaKey & _plugin, 
-					LADSPA_Handle _instance,
-					Uint32 _sample_count )
+							LADSPA_Handle _instance,
+							Uint32 _sample_count )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->run_adding!=NULL
-			  && descriptor->set_run_adding_gain!=NULL )
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		if( descriptor->run_adding != NULL &&
+			  	descriptor->set_run_adding_gain != NULL )
 		{
 			( descriptor->run_adding ) ( _instance, _sample_count );
 		}
@@ -826,19 +852,21 @@ void FASTCALL ladspaManager::runAdding( const ladspaKey & _plugin,
 
 
 void FASTCALL ladspaManager::setRunAddingGain( const ladspaKey & _plugin, 
-						LADSPA_Handle _instance,
-						LADSPA_Data _gain )
+							LADSPA_Handle _instance,
+							LADSPA_Data _gain )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
-		if( descriptor->run_adding!=NULL
-				  && descriptor->set_run_adding_gain!=NULL )
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		if( descriptor->run_adding != NULL &&
+				  descriptor->set_run_adding_gain != NULL )
 		{
-			( descriptor->set_run_adding_gain ) ( _instance, _gain );
+			( descriptor->set_run_adding_gain )
+							( _instance, _gain );
 		}
 	}
 }
@@ -851,10 +879,11 @@ void FASTCALL ladspaManager::deactivate( const ladspaKey & _plugin,
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		if( descriptor->deactivate != NULL )
 		{
 			( descriptor->deactivate ) ( _instance );
@@ -866,14 +895,15 @@ void FASTCALL ladspaManager::deactivate( const ladspaKey & _plugin,
 
 
 void FASTCALL ladspaManager::cleanup( const ladspaKey & _plugin, 
-					LADSPA_Handle _instance )
+						LADSPA_Handle _instance )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
-		LADSPA_Descriptor_Function descriptorFunction
-				= m_ladspaManagerMap[_plugin]->descriptorFunction;
-		const LADSPA_Descriptor * descriptor 
-				= descriptorFunction( m_ladspaManagerMap[_plugin]->index );
+		LADSPA_Descriptor_Function descriptorFunction =
+				m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
 		if( descriptor->cleanup != NULL )
 		{
 			( descriptor->cleanup ) ( _instance );

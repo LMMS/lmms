@@ -76,6 +76,8 @@ protected:
 
 
 private:
+	void updateSize( void );
+
 	QString m_title;
 	QString m_text;
 	QPixmap m_pixmap;

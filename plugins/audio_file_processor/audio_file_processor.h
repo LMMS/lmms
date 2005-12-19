@@ -86,7 +86,9 @@ protected slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void paintEvent( QPaintEvent * );
 
 
 private:

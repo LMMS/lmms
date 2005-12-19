@@ -102,13 +102,20 @@ public:
 		return( m_notes );
 	}
 
+	note * FASTCALL noteAt( int _note_num );
+
+	void FASTCALL setNoteAt( int _note_num, note _new_note );
+
+	// pattern-type stuff
 	inline patternTypes type( void ) const
 	{
 		return( m_patternType );
 	}
 	void FASTCALL setType( patternTypes _new_pattern_type );
+	void checkType( void );
 
 
+	// pattern-name functions
 	inline const QString & name( void ) const
 	{
 		return( m_name );
@@ -118,12 +125,6 @@ public:
 	{
 		m_name = _name;
 		update();
-	}
-
-
-	inline channelTrack * getChannelTrack( void )
-	{
-		return( m_channelTrack );
 	}
 
 
@@ -143,17 +144,18 @@ public:
 	void FASTCALL playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
 							Uint32 _frames );
 
-
-	note * FASTCALL noteAt( int _note_num );
-	void FASTCALL setNoteAt( int _note_num, note _new_note );
-	void checkType( void );
-
+	// settings-management
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "pattern" );
+	}
+
+	inline channelTrack * getChannelTrack( void )
+	{
+		return( m_channelTrack );
 	}
 
 
@@ -175,12 +177,13 @@ protected slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * _pe );
-	void mousePressEvent( QMouseEvent * _me );
-	void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void constructContextMenu( QMenu * );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 
 	void ensureBeatNotes( void );
+	void updateBBTrack( void );
 
 
 private:

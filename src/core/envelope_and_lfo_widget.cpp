@@ -58,6 +58,11 @@
 #include "gui_templates.h"
 #include "led_checkbox.h"
 #include "tempo_sync_knob.h"
+#include "string_pair_drag.h"
+#include "mmp.h"
+#include "text_float.h"
+
+
 
 // how long should be each envelope-segment maximal (e.g. attack)?
 const float SECS_PER_ENV_SEGMENT = 5.0f;
@@ -65,33 +70,32 @@ const float SECS_PER_ENV_SEGMENT = 5.0f;
 const float SECS_PER_LFO_OSCILLATION = 20.0f;
 
 
-const int env_graph_x = 6;
-const int env_graph_y = 6;
+const int ENV_GRAPH_X = 6;
+const int ENV_GRAPH_Y = 6;
 
-const int env_knobs_y = 43;
-const int env_knobs_lbl_y = env_knobs_y+35;
-const int knob_x_spacing = 32;
-const int predelay_knob_x = 6;
-const int attack_knob_x = predelay_knob_x+knob_x_spacing;
-const int hold_knob_x = attack_knob_x+knob_x_spacing;
-const int decay_knob_x = hold_knob_x+knob_x_spacing;
-const int sustain_knob_x = decay_knob_x+knob_x_spacing;
-const int release_knob_x = sustain_knob_x+knob_x_spacing;
-const int amount_knob_x = release_knob_x+knob_x_spacing;
+const int ENV_KNOBS_Y = 43;
+const int ENV_KNOBS_LBL_Y = ENV_KNOBS_Y+35;
+const int KNOB_X_SPACING = 32;
+const int PREDELAY_KNOB_X = 6;
+const int ATTACK_KNOB_X = PREDELAY_KNOB_X+KNOB_X_SPACING;
+const int HOLD_KNOB_X = ATTACK_KNOB_X+KNOB_X_SPACING;
+const int DECAY_KNOB_X = HOLD_KNOB_X+KNOB_X_SPACING;
+const int SUSTAIN_KNOB_X = DECAY_KNOB_X+KNOB_X_SPACING;
+const int RELEASE_KNOB_X = SUSTAIN_KNOB_X+KNOB_X_SPACING;
+const int AMOUNT_KNOB_X = RELEASE_KNOB_X+KNOB_X_SPACING;
 
-const float time_unit_width = 36.0;
+const float TIME_UNIT_WIDTH = 36.0;
 
 
-const int lfo_graph_x = 6;
-const int lfo_graph_y = env_knobs_lbl_y+14;
-const int lfo_knob_y = lfo_graph_y-2;
-const int lfo_knobs_lbl_y = lfo_knob_y+35;
-const int lfo_predelay_knob_x = lfo_graph_x + 100;
-const int lfo_attack_knob_x = lfo_predelay_knob_x+knob_x_spacing;
-const int lfo_speed_knob_x = lfo_attack_knob_x+knob_x_spacing;
-const int lfo_amount_knob_x = lfo_speed_knob_x+knob_x_spacing;
-const int lfo_shapes_x = lfo_graph_x;//predelay_knob_x;
-const int lfo_shapes_y = lfo_graph_y + 50;
+const int LFO_GRAPH_X = 6;
+const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
+const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
+const int LFO_PREDELAY_KNOB_X = LFO_GRAPH_X + 100;
+const int LFO_ATTACK_KNOB_X = LFO_PREDELAY_KNOB_X+KNOB_X_SPACING;
+const int LFO_SPEED_KNOB_X = LFO_ATTACK_KNOB_X+KNOB_X_SPACING;
+const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
+const int LFO_SHAPES_X = LFO_GRAPH_X;//PREDELAY_KNOB_X;
+const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
 
 QPixmap * envelopeAndLFOWidget::s_envGraph = NULL;
@@ -132,7 +136,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_predelayKnob->setValue( 0.0, TRUE );
-	m_predelayKnob->move( predelay_knob_x, env_knobs_y );
+	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
 #ifdef QT4
 	m_predelayKnob->setWhatsThis(
@@ -149,7 +153,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_attackKnob->setValue( 0.0, TRUE );
-	m_attackKnob->move( attack_knob_x, env_knobs_y );
+	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
 #ifdef QT4
 	m_attackKnob->setWhatsThis(
@@ -168,7 +172,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->setRange( 0.0, 1.0, 0.001 );
 	m_holdKnob->setValue( 0.5, TRUE );
-	m_holdKnob->move( hold_knob_x, env_knobs_y );
+	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
 #ifdef QT4
 	m_holdKnob->setWhatsThis(
@@ -186,7 +190,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_decayKnob->setValue( 0.5, TRUE );
-	m_decayKnob->move( decay_knob_x, env_knobs_y );
+	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
 #ifdef QT4
 	m_decayKnob->setWhatsThis(
@@ -205,7 +209,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->setRange( 0.0, 1.0, 0.001 );
 	m_sustainKnob->setValue( 0.5, TRUE );
-	m_sustainKnob->move( sustain_knob_x, env_knobs_y );
+	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
 #ifdef QT4
 	m_sustainKnob->setWhatsThis(
@@ -223,7 +227,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->setRange( 0.0, 1.0, 0.001 );
 	m_releaseKnob->setValue( 0.1, TRUE );
-	m_releaseKnob->move( release_knob_x, env_knobs_y );
+	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
 	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
 #ifdef QT4
 	m_releaseKnob->setWhatsThis(
@@ -243,7 +247,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_amountKnob->setValue( 0.0, TRUE );
-	m_amountKnob->move( amount_knob_x, env_graph_y );
+	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 #ifdef QT4
 	m_amountKnob->setWhatsThis(
@@ -264,7 +268,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoPredelayKnob->setValue( 0.0, TRUE );
-	m_lfoPredelayKnob->move( lfo_predelay_knob_x, lfo_knob_y );
+	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "LFO-predelay:" ) + " ", "" );
 #ifdef QT4
 	m_lfoPredelayKnob->setWhatsThis(
@@ -282,7 +286,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoAttackKnob->setValue( 0.0, TRUE );
-	m_lfoAttackKnob->move( lfo_attack_knob_x, lfo_knob_y );
+	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
 #ifdef QT4
 	m_lfoAttackKnob->setWhatsThis(
@@ -295,12 +299,12 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_lfoAttackKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this, tr( "LFO-speed" ) ,
-						20000.0 );
+	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
+						tr( "LFO-speed" ), 20000.0 );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
 	m_lfoSpeedKnob->setValue( 0.1, TRUE );
-	m_lfoSpeedKnob->move( lfo_speed_knob_x, lfo_knob_y );
+	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
 #ifdef QT4
 	m_lfoSpeedKnob->setWhatsThis(
@@ -318,7 +322,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_lfoAmountKnob->setValue( 0.0, TRUE );
-	m_lfoAmountKnob->move( lfo_amount_knob_x, lfo_knob_y );
+	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 #ifdef QT4
 	m_lfoAmountKnob->setWhatsThis(
@@ -334,23 +338,22 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_sinLfoBtn = new pixmapButton( this );
-	m_sinLfoBtn->move( lfo_shapes_x, lfo_shapes_y );
+	m_sinLfoBtn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	m_sinLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
 	m_sinLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-#ifdef QT4
 	m_sinLfoBtn->setChecked( TRUE );
+#ifdef QT4
 	m_sinLfoBtn->setWhatsThis(
 #else
-	m_sinLfoBtn->setOn( TRUE );
 	QWhatsThis::add( m_sinLfoBtn,
 #endif
 		tr( "Click here if you want a sine-wave for current "
 							"oscillator." ) );
 
 	m_triangleLfoBtn = new pixmapButton( this );
-	m_triangleLfoBtn->move( lfo_shapes_x+15, lfo_shapes_y );
+	m_triangleLfoBtn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	m_triangleLfoBtn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
 	m_triangleLfoBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -364,7 +367,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"oscillator." ) );
 
 	m_sawLfoBtn = new pixmapButton( this );
-	m_sawLfoBtn->move( lfo_shapes_x+30, lfo_shapes_y );
+	m_sawLfoBtn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	m_sawLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
 	m_sawLfoBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -378,7 +381,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"oscillator." ) );
 
 	m_sqrLfoBtn = new pixmapButton( this );
-	m_sqrLfoBtn->move( lfo_shapes_x+45, lfo_shapes_y );
+	m_sqrLfoBtn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	m_sqrLfoBtn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
 	m_sqrLfoBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -391,6 +394,21 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a square-wave for current "
 							"oscillator." ) );
 
+	m_usrLfoBtn = new pixmapButton( this );
+	m_usrLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
+	m_usrLfoBtn->setActiveGraphic( embed::getIconPixmap(
+							"usr_wave_active" ) );
+	m_usrLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+							"usr_wave_inactive" ) );
+#ifdef QT4
+	m_usrLfoBtn->setWhatsThis(
+#else
+	QWhatsThis::add( m_usrLfoBtn,
+#endif
+		tr( "Click here if you want a user-defined wave for current "
+			"oscillator. Afterwards drag an according sample-"
+			"file into LFO-graph." ) );
+
 	connect( m_sinLfoBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( lfoSinWaveCh( bool ) ) );
 	connect( m_triangleLfoBtn, SIGNAL( toggled( bool ) ), this,
@@ -399,12 +417,15 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					SLOT( lfoSawWaveCh( bool ) ) );
 	connect( m_sqrLfoBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( lfoSquareWaveCh( bool ) ) );
+	connect( m_usrLfoBtn, SIGNAL( toggled( bool ) ), this,
+					SLOT( lfoUserWaveCh( bool ) ) );
 
 	QButtonGroup * lfo_shapes_algo_group = new QButtonGroup( this );
 	lfo_shapes_algo_group->addButton( m_sinLfoBtn );
 	lfo_shapes_algo_group->addButton( m_triangleLfoBtn );
 	lfo_shapes_algo_group->addButton( m_sawLfoBtn );
 	lfo_shapes_algo_group->addButton( m_sqrLfoBtn );
+	lfo_shapes_algo_group->addButton( m_usrLfoBtn );
 	lfo_shapes_algo_group->setExclusive( TRUE );
 #ifndef QT4
 	lfo_shapes_algo_group->hide();
@@ -412,7 +433,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
-	m_x100Cb->move( lfo_predelay_knob_x, lfo_graph_y + 36 );
+	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 #ifdef QT4
 	m_x100Cb->setWhatsThis(
 #else
@@ -427,7 +448,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
 									this );
-	m_controlEnvAmountCb->move( lfo_predelay_knob_x, lfo_graph_y + 54 );
+	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSize<6>(
 					m_controlEnvAmountCb->font() ) );
 #ifdef QT4
@@ -445,6 +466,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	// set background-mode for flicker-free redraw
 	setBackgroundMode( Qt::NoBackground );
 #endif
+	setAcceptDrops( TRUE );
 
 	connect( mixer::inst(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateSampleVars() ) );
@@ -585,7 +607,8 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & ,
 	_parent.setAttribute( "ctlenvamt", QString::number(
 					m_controlEnvAmountCb->isChecked() ) );
 	_parent.setAttribute( "lfosyncmode", QString::number(
-					( int ) m_lfoSpeedKnob->getSyncMode() ) );
+				( int ) m_lfoSpeedKnob->getSyncMode() ) );
+	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
 }
 
 
@@ -614,39 +637,28 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_lfoSpeedKnob->setSyncMode(
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						"lfosyncmode" ).toInt() );
+	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	switch( m_lfoShape )
 	{
 		case SIN:
-#ifdef QT4
 			m_sinLfoBtn->setChecked( TRUE );
-#else
-			m_sinLfoBtn->setOn( TRUE );
-#endif
 			break;
 
 		case TRIANGLE:
-#ifdef QT4
 			m_triangleLfoBtn->setChecked( TRUE );
-#else
-			m_triangleLfoBtn->setOn( TRUE );
-#endif
 			break;
 
 		case SAW:
-#ifdef QT4
 			m_sawLfoBtn->setChecked( TRUE );
-#else
-			m_sawLfoBtn->setOn( TRUE );
-#endif
 			break;
 
 		case SQUARE:
-#ifdef QT4
 			m_sqrLfoBtn->setChecked( TRUE );
-#else
-			m_sqrLfoBtn->setOn( TRUE );
-#endif
+			break;
+
+		case USER:
+			m_usrLfoBtn->setChecked( TRUE );
 			break;
 	}
 
@@ -656,6 +668,78 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	update();
 }
 
+
+
+
+void envelopeAndLFOWidget::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() != Qt::LeftButton )
+	{
+		return;
+	}
+
+	if( QRect( ENV_GRAPH_X, ENV_GRAPH_Y, s_envGraph->width(),
+			s_envGraph->height() ).contains( _me->pos() ) == TRUE )
+	{
+		if( m_amountKnob->value() < 1.0f )
+		{
+			m_amountKnob->setValue( 1.0f );
+		}
+		else
+		{
+			m_amountKnob->setValue( 0.0f );
+		}
+		updateSampleVars();
+	}
+	else if( QRect( LFO_GRAPH_X, LFO_GRAPH_Y, s_lfoGraph->width(),
+			s_lfoGraph->height() ).contains( _me->pos() ) == TRUE )
+	{
+		if( m_lfoAmountKnob->value() < 1.0f )
+		{
+			m_lfoAmountKnob->setValue( 1.0f );
+		}
+		else
+		{
+			m_lfoAmountKnob->setValue( 0.0f );
+		}
+		updateSampleVars();
+	}
+}
+
+
+
+
+void envelopeAndLFOWidget::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	stringPairDrag::processDragEnterEvent( _dee,
+					QString( "samplefile,tco_%1" ).arg(
+							track::SAMPLE_TRACK ) );
+}
+
+
+
+
+void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "samplefile" )
+	{
+		m_userWave.setAudioFile( stringPairDrag::decodeValue( _de ) );
+		m_usrLfoBtn->setChecked( TRUE );
+		lfoUserWaveCh( TRUE );
+		_de->accept();
+	}
+	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
+	{
+		multimediaProject mmp( value, FALSE );
+		m_userWave.setAudioFile( mmp.content().firstChild().toElement().
+							attribute( "src" ) );
+		m_usrLfoBtn->setChecked( TRUE );
+		lfoUserWaveCh( TRUE );
+		_de->accept();
+	}
+}
 
 
 
@@ -680,9 +764,9 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<6>( p.font() ) );
 
 	// draw envelope-graph
-	p.drawPixmap( env_graph_x, env_graph_y, *s_envGraph );
+	p.drawPixmap( ENV_GRAPH_X, ENV_GRAPH_Y, *s_envGraph );
 	// draw LFO-graph
-	p.drawPixmap( lfo_graph_x, lfo_graph_y, *s_lfoGraph );
+	p.drawPixmap( LFO_GRAPH_X, LFO_GRAPH_Y, *s_lfoGraph );
 
 
 	p.setFont( pointSize<8>( p.font() ) );
@@ -697,19 +781,19 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	const QColor end_points_color( 0xFF, 0xBF, 0x22 );
 	const QColor end_points_bg_color( 0, 0, 2 );
 
-	const int y_base = env_graph_y + s_envGraph->height() - 3;
+	const int y_base = ENV_GRAPH_Y + s_envGraph->height() - 3;
 	const int avail_height = s_envGraph->height() - 6;
 	
-	int x1 = env_graph_x + 2 + static_cast<int>( m_predelayKnob->value() *
-							time_unit_width );
+	int x1 = ENV_GRAPH_X + 2 + static_cast<int>( m_predelayKnob->value() *
+							TIME_UNIT_WIDTH );
 	int x2 = x1 + static_cast<int>( m_attackKnob->value() *
-							time_unit_width );
+							TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base, x2, y_base - avail_height );
 	p.fillRect( x1 - 1, y_base - 2, 4, 4, end_points_bg_color );
 	p.fillRect( x1, y_base - 1, 2, 2, end_points_color );
 	x1 = x2;
-	x2 = x1 + static_cast<int>( m_holdKnob->value() * time_unit_width );
+	x2 = x1 + static_cast<int>( m_holdKnob->value() * TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base - avail_height, x2, y_base - avail_height );
 	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
@@ -718,7 +802,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	x1 = x2;
 	x2 = x1 + static_cast<int>( ( m_decayKnob->value() *
 						m_sustainKnob->value() ) *
-							time_unit_width );
+							TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base-avail_height, x2, static_cast<int>( y_base -
 								avail_height +
@@ -727,7 +811,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 							end_points_bg_color );
 	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
 	x1 = x2;
-	x2 = x1 + static_cast<int>( m_releaseKnob->value() * time_unit_width );
+	x2 = x1 + static_cast<int>( m_releaseKnob->value() * TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, static_cast<int>( y_base - avail_height +
 						m_sustainKnob->value() *
@@ -744,10 +828,10 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	p.fillRect( x2, y_base - 1, 2, 2, end_points_color );
 
 
-	int lfo_graph_w = s_lfoGraph->width() - 6;	// substract border
-	int lfo_graph_h = s_lfoGraph->height() - 6;	// substract border
-	int graph_x_base = lfo_graph_x + 3;
-	int graph_y_base = lfo_graph_y + 3 + lfo_graph_h / 2;
+	int LFO_GRAPH_W = s_lfoGraph->width() - 6;	// substract border
+	int LFO_GRAPH_H = s_lfoGraph->height() - 6;	// substract border
+	int graph_x_base = LFO_GRAPH_X + 3;
+	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
 					mixer::inst()->sampleRate() / 10;
@@ -772,10 +856,10 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 #else
 	int old_y = 0;
 #endif
-	for( int x = 0; x <= lfo_graph_w; ++x )
+	for( int x = 0; x <= LFO_GRAPH_W; ++x )
 	{
 		float val = 0.0;
-		float cur_sample = x*frames_for_graph/lfo_graph_w;
+		float cur_sample = x * frames_for_graph / LFO_GRAPH_W;
 		if( static_cast<Uint32>( cur_sample ) > m_lfoPredelayFrames )
 		{
 			float phase = ( cur_sample -= m_lfoPredelayFrames ) /
@@ -795,6 +879,10 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 				case SQUARE:
 					val = oscillator::squareSample( phase );
 					break;
+				case USER:
+					val = oscillator::userWaveSample( phase,
+							m_userWave.data(),
+							m_userWave.frames() );
 			}
 			if( (Uint32) cur_sample <= m_lfoAttackFrames )
 			{
@@ -802,12 +890,12 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 			}
 		}
 #ifdef QT4
-		float cur_y = -lfo_graph_h / 2.0f * val;
+		float cur_y = -LFO_GRAPH_H / 2.0f * val;
 		p.drawLine( QLineF( graph_x_base + x - 1, graph_y_base + old_y,
 						graph_x_base + x,
 						graph_y_base + cur_y ) );
 #else
-		int cur_y = static_cast<int>( -lfo_graph_h / 2.0f * val );
+		int cur_y = static_cast<int>( -LFO_GRAPH_H / 2.0f * val );
 		p.drawLine( graph_x_base + x - 1, graph_y_base + old_y,
 				graph_x_base + x, graph_y_base + cur_y );
 #endif
@@ -818,53 +906,15 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
 						m_lfoSpeedKnob->value() *
 								1000.0f );
-	p.drawText( lfo_graph_x + 4, lfo_graph_y + s_lfoGraph->height() - 6,
+	p.drawText( LFO_GRAPH_X + 4, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 							tr( "ms/LFO:" ) );
-	p.drawText( lfo_graph_x + 52, lfo_graph_y + s_lfoGraph->height() - 6,
+	p.drawText( LFO_GRAPH_X + 52, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 						QString::number( ms_per_osc ) );
 
 #ifndef QT4
 	// blit drawn pixmap to actual widget
 	bitBlt( this, rect().topLeft(), &pm );
 #endif
-}
-
-
-
-
-void envelopeAndLFOWidget::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() != Qt::LeftButton )
-	{
-		return;
-	}
-
-	if( QRect( env_graph_x, env_graph_y, s_envGraph->width(),
-			s_envGraph->height() ).contains( _me->pos() ) == TRUE )
-	{
-		if( m_amountKnob->value() < 1.0f )
-		{
-			m_amountKnob->setValue( 1.0f );
-		}
-		else
-		{
-			m_amountKnob->setValue( 0.0f );
-		}
-		updateSampleVars();
-	}
-	else if( QRect( lfo_graph_x, lfo_graph_y, s_lfoGraph->width(),
-			s_lfoGraph->height() ).contains( _me->pos() ) == TRUE )
-	{
-		if( m_lfoAmountKnob->value() < 1.0f )
-		{
-			m_lfoAmountKnob->setValue( 1.0f );
-		}
-		else
-		{
-			m_lfoAmountKnob->setValue( 0.0f );
-		}
-		updateSampleVars();
-	}
 }
 
 
@@ -1023,7 +1073,12 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 						m_lfoShapeData[frame] =
 				oscillator::sawSample( phase );
 						break;
-
+					case USER:
+						m_lfoShapeData[frame] =
+				oscillator::userWaveSample( phase,
+							m_userWave.data(),
+							m_userWave.frames() );
+						break;
 					case SIN:
 					default:
 						m_lfoShapeData[frame] =
@@ -1113,8 +1168,25 @@ void envelopeAndLFOWidget::lfoSquareWaveCh( bool _on )
 
 
 
-#undef isChecked
-#undef setChecked
+void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
+{
+	if( _on )
+	{
+		if( m_userWave.frames() <= 1 )
+		{
+			textFloat::displayMessage( tr( "Hint" ),
+				tr( "Drag a sample from somewhere and drop "
+					"it in this window." ),
+					embed::getIconPixmap( "hint" ), 3000 );
+		}
+		m_lfoShape = USER;
+	}
+	songEditor::inst()->setModified();
+
+	update();
+}
+
+
 
 
 #include "envelope_and_lfo_widget.moc"

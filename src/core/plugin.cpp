@@ -23,25 +23,19 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#ifdef HAVE_DLFCN_H
-#include <dlfcn.h>
-#endif
-
 #include "qt3support.h"
 
 #ifdef QT4
 
 #include <QMessageBox>
 #include <QDir>
+#include <QLibrary>
 
 #else
 
 #include <qmessagebox.h>
 #include <qdir.h>
+#include <qlibrary.h>
 
 #endif
 
@@ -87,15 +81,16 @@ QString plugin::getParameter( const QString & )
 
 plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 {
-#ifdef HAVE_DLFCN_H
+/*#ifdef HAVE_DLFCN_H
 	void * handle = dlopen( QString( "lib" + _plugin_name + ".so" ).
 #ifdef QT4
 					toAscii().constData()
 #else
 					ascii()
 #endif
-					, RTLD_NOW );
-	if( handle == NULL )
+					, RTLD_NOW );*/
+	QLibrary plugin_lib( _plugin_name );
+	if( /*handle == NULL*/ plugin_lib.load() == FALSE )
 	{
 		QMessageBox::information( NULL,
 					mixer::tr( "Plugin not found" ),
@@ -105,13 +100,17 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 						QMessageBox::Default );
 		return( new dummyPlugin() );
 	}
-	dlerror();
+	instantiationHook inst_hook = ( instantiationHook ) plugin_lib.resolve(
+							"lmms_plugin_main" );
+/*	dlerror();
 	instantiationHook inst_hook = ( instantiationHook )( dlsym( handle,
 							"lmms_plugin_main" ) );
 	char * error = dlerror();
 	if( error != NULL )
 	{
-		printf( "%s\n", error );
+		printf( "%s\n", error );*/
+	if( inst_hook == NULL )
+	{
 		QMessageBox::information( NULL,
 				mixer::tr( "Error while loading plugin" ),
 				mixer::tr( "Failed loading plugin \"%1\"!"
@@ -120,11 +119,14 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 						QMessageBox::Default );
 		return( new dummyPlugin() );
 	}
+#ifndef QT4
+	plugin_lib.setAutoUnload( FALSE );
+#endif
 	plugin * inst = inst_hook( _data );
 	//dlclose( handle );
 	return( inst );
-#endif
-	return( new dummyPlugin() );
+/*#endif
+	return( new dummyPlugin() );*/
 }
 
 
@@ -134,8 +136,8 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
 #ifdef QT4
-	QFileInfoList list = directory.entryInfoList( QStringList(
-								"lib*.so" ) );
+	QFileInfoList list = directory.entryInfoList(
+						QStringList( "lib*.so" ) );
 #else
 	const QFileInfoList * lp = directory.entryInfoList( "lib*.so" );
 	// if directory doesn't exist or isn't readable, we get NULL which would
@@ -154,6 +156,16 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 #else
 		const QFileInfo & f = **file;
 #endif
+		QLibrary plugin_lib( f.absoluteFilePath() );
+		if( plugin_lib.load() == FALSE ||
+			plugin_lib.resolve( "lmms_plugin_main" ) == NULL )
+		{
+			continue;
+		}
+#ifndef QT4
+		plugin_lib.setAutoUnload( FALSE );
+#endif
+/*
 		void * handle = dlopen( f.absoluteFilePath().
 #ifdef QT4
 							toAscii().constData(),
@@ -173,11 +185,26 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 		{
 			printf( "plugin-loader: %s\n", msg );
 			continue;
-		}
-		QString desc_name = f.fileName().mid( 3 ).section( '.', 0, 0 ) +
+		}*/
+		QString desc_name = f.fileName().section( '.', 0, 0 ) +
 							"_plugin_descriptor";
-		descriptor * plugin_desc =
-			(descriptor *) dlsym( handle, desc_name.
+		if( desc_name.left( 3 ) == "lib" )
+		{
+			desc_name = desc_name.mid( 3 );
+		}
+		descriptor * plugin_desc = (descriptor *) plugin_lib.resolve(
+						desc_name.
+#ifdef QT4
+							toAscii().constData()
+#else
+							ascii()
+#endif
+								);
+		if( plugin_desc == NULL )
+		{
+			continue;
+		}
+/*			(descriptor *) dlsym( handle, desc_name.
 #ifdef QT4
 					      toAscii().constData()
 #else
@@ -189,7 +216,7 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 		{
 			printf( "plugin-loader: %s\n", msg );
 			continue;
-		}
+		}*/
 		_plugin_descs.push_back( *plugin_desc );
 		//dlclose( handle );
 	}

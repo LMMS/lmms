@@ -56,6 +56,7 @@
 #include "channel_track.h"
 #include "mmp.h"
 #include "config_mgr.h"
+#include "midi_file.h"
 
 
 
@@ -309,7 +310,7 @@ unsigned int trackContainer::countTracks( track::trackTypes _tt ) const
 	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{
-		if( ( *it )->getTrack()->trackType() == _tt ||
+		if( ( *it )->getTrack()->type() == _tt ||
 					_tt == track::TOTAL_TRACK_TYPES )
 		{
 			++cnt;
@@ -379,7 +380,10 @@ void trackContainer::resizeEvent( QResizeEvent * )
 
 void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "preset,plugin" );
+	stringPairDrag::processDragEnterEvent( _dee,
+		QString( "presetfile,instrument,midifile,track_%1,track_%2" ).
+						arg( track::CHANNEL_TRACK ).
+						arg( track::SAMPLE_TRACK ) );
 }
 
 
@@ -389,15 +393,16 @@ void trackContainer::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
-	if( type == "plugin" )
+	if( type == "instrument" )
 	{
 		channelTrack * ct = dynamic_cast<channelTrack *>(
 				track::create( track::CHANNEL_TRACK,
 								this ) );
 		ct->loadInstrument( value );
 		ct->toggledChannelButton( TRUE );
+		_de->accept();
 	}
-	else if( type == "preset" )
+	else if( type == "presetfile" )
 	{
 		multimediaProject mmp( value );
 		channelTrack * ct = dynamic_cast<channelTrack *>(
@@ -406,6 +411,22 @@ void trackContainer::dropEvent( QDropEvent * _de )
 		ct->loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );
 		ct->toggledChannelButton( TRUE );
+		_de->accept();
+	}
+	else if( type == "midifile" )
+	{
+		midiFile mf( value );
+		mf.importToTrackContainer( this );
+		_de->accept();
+	}
+	else if( type.left( 6 ) == "track_" )
+	{
+		multimediaProject mmp( value, FALSE );
+		track::create( mmp.content().firstChild().toElement(), this );
+		// after adding a track, we have to make sure, actual editor
+		// can setup new track (e.g. adding TCO's (bbEditor does so))
+		updateAfterTrackAdd();
+		_de->accept();
 	}
 }
 
@@ -415,7 +436,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 void trackContainer::updateScrollArea( void )
 {
 	m_scrollArea->resize( tMax( m_scrollArea->parentWidget()->width() - 
-					m_scrollArea->x()-2, 0 ),
+					m_scrollArea->x() - 2, 0 ),
 				tMax( m_scrollArea->parentWidget()->height() -
 					m_scrollArea->y() - 2, 0 ) );
 	//m_scrollArea->updateContents();

@@ -49,6 +49,7 @@
 #include "buffer_allocator.h"
 #include "tooltip.h"
 #include "audio_port.h"
+#include "string_pair_drag.h"
 
 
 
@@ -130,35 +131,38 @@ void sampleTCO::updateLength( int )
 
 
 
-void sampleTCO::paintEvent( QPaintEvent * )
+void sampleTCO::dragEnterEvent( QDragEnterEvent * _dee )
 {
-#ifdef QT4
-	QPainter p( this );
-	p.fillRect( rect(), QColor( 0, 64, 255 ) );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	pm.fill( QColor( 0, 64, 255 ) );
-	// and a painter for it
-	QPainter p( &pm );
-#endif
-
-	if( getTrack()->muted() )
+	if( stringPairDrag::processDragEnterEvent( _dee,
+					"samplefile,sampledata" ) == FALSE )
 	{
-		p.setPen( QColor( 160, 160, 160 ) );
+		trackContentObject::dragEnterEvent( _dee );
+	}
+}
+
+
+
+
+void sampleTCO::dropEvent( QDropEvent * _de )
+{
+	if( stringPairDrag::decodeKey( _de ) == "samplefile" )
+	{
+		setSampleFile( stringPairDrag::decodeValue( _de ) );
+		_de->accept();
+	}
+	else if( stringPairDrag::decodeKey( _de ) == "sampledata" )
+	{
+		m_sampleBuffer.loadFromBase64(
+					stringPairDrag::decodeValue( _de ) );
+		songEditor::inst()->setModified();
+		updateLength();
+		update();
+		_de->accept();
 	}
 	else
 	{
-		p.setPen( QColor( 0, 0, 128 ) );
+		trackContentObject::dropEvent( _de );
 	}
-	p.drawRect( 0, 0, width(), height() );
-	m_sampleBuffer.drawWaves( p, QRect( 1, 1, tMax( tMin( width() - 3,
-					static_cast<int>( getSampleLength() *
-						pixelsPerTact() / 64 ) ), 1 ),
-						height() - 4 ) );
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -177,6 +181,49 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
+void sampleTCO::paintEvent( QPaintEvent * )
+{
+#ifdef QT4
+	QPainter p( this );
+#else
+	// create pixmap for whole widget
+	QPixmap pm( size() );
+	// and a painter for it
+	QPainter p( &pm );
+#endif
+	QPixmap bg = embed::getIconPixmap( "sample_track_bg" );
+	for( Sint16 x = 1; x < width() - 1; x += 10 )
+	{
+		p.drawPixmap( x, 1, bg );
+	}
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawRect( 0, 0, width(), height() );
+	if( getTrack()->muted() )
+	{
+		p.setPen( QColor( 128, 128, 128 ) );
+	}
+	else
+	{
+		p.setPen( QColor( 64, 224, 160 ) );
+	}
+	QRect r = QRect( 1, 1,
+			tMax( static_cast<int>( getSampleLength() *
+				pixelsPerTact() / 64 ), 1 ), height() - 4 );
+	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
+	m_sampleBuffer.drawWaves( p, r );
+	if( r.width() < width() - 1 )
+	{
+		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
+				width() - 2, r.y() + r.height() / 2 );
+	}
+#ifndef QT4
+	bitBlt( this, rect().topLeft(), &pm );
+#endif
+}
+
+
+
+
 midiTime sampleTCO::getSampleLength( void ) const
 {
 	return( static_cast<Sint32>( m_sampleBuffer.frames() /
@@ -187,7 +234,8 @@ midiTime sampleTCO::getSampleLength( void ) const
 
 
 
-void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
+							QDomElement & _parent )
 {
 	QDomElement sampletco_de = _doc.createElement( nodeName() );
 	if( _parent.nodeName() == "clipboard" )
@@ -312,7 +360,7 @@ sampleTrack::~sampleTrack()
 
 
 
-track::trackTypes sampleTrack::trackType( void ) const
+track::trackTypes sampleTrack::type( void ) const
 {
 	return( SAMPLE_TRACK );
 }

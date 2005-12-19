@@ -111,6 +111,8 @@ KMultiTabBarInternal::KMultiTabBarInternal(QWidget *parent, Qt::Orientation o):Q
 		box->setFixedHeight(24);
 		setFixedHeight(24);
 	}
+	mainLayout->setMargin( 0 );
+	mainLayout->setSpacing( 0 );
 	addChild(box);
 	setFrameStyle(NoFrame);
 #ifndef QT4
@@ -220,7 +222,6 @@ void KMultiTabBarInternal::resizeEvent(QResizeEvent *ev) {
 	if ( (m_style==KMultiTabBar::KDEV3) ||
 		(m_style==KMultiTabBar::KDEV3ICON) ){
 		box->setGeometry(0,0,width(),height());
-	printf("resizevent\n");
 		int lines=1;
 		int space;
 		int tmp=0;

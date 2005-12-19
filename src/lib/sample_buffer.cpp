@@ -79,9 +79,10 @@
 
 
 
-sampleBuffer::sampleBuffer( const QString & _audio_file ) :
+sampleBuffer::sampleBuffer( const QString & _audio_file,
+							bool _is_base64_data ) :
 	QObject(),
-	m_audioFile( _audio_file ),
+	m_audioFile( ( _is_base64_data == TRUE ) ? "" : _audio_file ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
 	m_data( NULL ),
@@ -99,6 +100,10 @@ sampleBuffer::sampleBuffer( const QString & _audio_file ) :
 #ifdef HAVE_SAMPLERATE_H
 	initResampling();
 #endif
+	if( _is_base64_data == TRUE )
+	{
+		loadFromBase64( _audio_file );
+	}
 	update();
 }
 
@@ -769,8 +774,9 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 
 void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 {
-	_p.setClipRect( _dr );
-	_p.setPen (QColor(0x22, 0xFF, 0x44));
+//	_p.setClipRect( _dr );
+//	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
+	//_p.setPen( QColor( 64, 224, 160 ) );
 #ifdef QT4
 	// TODO: save and restore aa-settings
 	_p.setRenderHint( QPainter::Antialiasing );
@@ -778,12 +784,12 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 	const int w = _dr.width();
 	const int h = _dr.height();
 
-	const Uint16 y_base = h/2+_dr.y();
-	const float y_space = h/2;
+	const Uint16 y_base = h / 2 + _dr.y();
+	const float y_space = h / 2;
 
 	if( m_data == NULL || m_frames == 0 )
 	{
-		_p.drawLine( _dr.x(), y_base, _dr.x()+w, y_base );
+		_p.drawLine( _dr.x(), y_base, _dr.x() + w, y_base );
 		return;
 	}
 	else if( _dm == LINE_CONNECT )
@@ -819,11 +825,11 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 		{
 			const int x = static_cast<int>( frame /
 							(float) m_frames * w ) +
-					_dr.x();
+								_dr.x();
 			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
 				const Uint16 y = y_base +
-			static_cast<Uint16>( m_data[frame][chnl]*y_space );
+			static_cast<Uint16>( m_data[frame][chnl] * y_space );
 				_p.drawLine( old_x, old_y[chnl], x, y );
 				old_y[chnl] = y;
 			}
@@ -840,12 +846,11 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
 				_p.drawPoint( x, y_base +
-					static_cast<Uint16>(
-						m_data[frame][chnl]*y_space ) );
+			static_cast<Uint16>( m_data[frame][chnl] * y_space ) );
 			}
 		}
 	}
-	_p.setClipping( FALSE );
+//	_p.setClipping( FALSE );
 }
 
 
@@ -948,6 +953,85 @@ QString sampleBuffer::openAudioFile( void ) const
 
 
 
+QString sampleBuffer::toBase64( void ) const
+{
+	if( m_data == NULL || m_frames == 0 )
+	{
+		return( "" );
+	}
+#ifdef QT4
+	return( QByteArray::toBase64( QByteArray( m_data, m_frames ) ) );
+#else
+	// code mostly taken from
+	// qt-x11-opensource-src-4.0.1/src/corelib/tools/qbytearray.cpp
+
+	const char alphabet[] = "ABCDEFGH" "IJKLMNOP" "QRSTUVWX" "YZabcdef"
+				"ghijklmn" "opqrstuv" "wxyz0123" "456789+/";
+	const char padchar = '=';
+	int padlen = 0;
+
+	Uint32 ssize = m_frames * sizeof( sampleFrame );
+	Uint32 dsize = ( ( ssize * 4 ) / 3 ) + 3;
+	const Uint8 * src = (const Uint8 *) m_data;
+	char * ptr = new char[dsize + 1];
+	char * out = ptr;
+
+	Uint32 i = 0;
+	while( i < ssize )
+	{
+		int chunk = 0;
+		chunk |= int( src[i++] ) << 16;
+		if( i == dsize )
+		{
+			padlen = 2;
+		}
+		else
+		{
+			chunk |= int( src[i++] ) << 8;
+			if( i == ssize )
+			{
+				padlen = 1;
+			}
+			else
+			{
+				chunk |= int( src[i++] );
+			}
+		}
+
+		int j = ( chunk & 0x00fc0000 ) >> 18;
+		int k = ( chunk & 0x0003f000 ) >> 12;
+		int l = ( chunk & 0x00000fc0 ) >> 6;
+		int m = ( chunk & 0x0000003f );
+		*out++ = alphabet[j];
+		*out++ = alphabet[k];
+		if( padlen > 1 )
+		{
+			*out++ = padchar;
+		}
+		else
+		{
+			*out++ = alphabet[l];
+		}
+		if( padlen > 0 )
+		{
+			*out++ = padchar;
+		}
+		else
+		{
+			*out++ = alphabet[m];
+		}
+	}
+	// terminate string
+	ptr[dsize] = 0;
+	QString s( ptr );
+	delete[] ptr;
+	return( s );
+#endif
+}
+
+
+
+
 void sampleBuffer::setAudioFile( const QString & _audio_file )
 {
 	m_audioFile = _audio_file;
@@ -964,6 +1048,74 @@ void sampleBuffer::setAudioFile( const QString & _audio_file )
 									"" );
 #endif
 	}
+	update();
+}
+
+
+
+
+void sampleBuffer::loadFromBase64( const QString & _data )
+{
+	delete[] m_origData;
+
+	m_origFrames = _data.length() * 3 / ( 4 * sizeof( sampleFrame ) ); 
+	m_origData = new sampleFrame[m_origFrames];
+#ifdef QT4
+	QByteArray data = QByteArray::fromBase64( _audio_file.toAscii() );
+	memcpy( m_origData, data.data(), data.size() );
+#else
+	// code mostly taken from
+	// qt-x11-opensource-src-4.0.1/src/corelib/tools/qbytearray.cpp
+	unsigned int buf = 0;
+	int nbits = 0;
+	const char * src = _data.ascii();
+	char * dst = (char *) m_origData;
+	csize ssize = _data.length();
+	int offset = 0;
+
+	for( csize i = 0; i < ssize; ++i )
+	{
+		int ch = src[i];
+		int d;
+
+		if( ch >= 'A' && ch <= 'Z' )
+		{
+			d = ch - 'A';
+		}
+		else if( ch >= 'a' && ch <= 'z' )
+		{
+			d = ch - 'a' + 26;
+		}
+		else if( ch >= '0' && ch <= '9' )
+		{
+			d = ch - '0' + 52;
+		}
+		else if( ch == '+' )
+		{
+			d = 62;
+		}
+		else if( ch == '/' )
+		{
+			d = 63;
+		}
+		else
+		{
+			d = -1;
+		}
+
+		if( d != -1 )
+		{
+			buf = ( buf << 6 ) | d;
+			nbits += 6;
+			if( nbits >= 8 )
+			{
+				nbits -= 8;
+				dst[offset++] = buf >> nbits;
+				buf &= ( 1 << nbits ) - 1;
+			}
+		}
+	}
+#endif
 	update();
 }
 

@@ -90,7 +90,6 @@ protected:
 	void mouseReleaseEvent( QMouseEvent * _me );
 	void mouseMoveEvent( QMouseEvent * _me );
 	void keyPressEvent( QKeyEvent * _ke );
-	void keyReleaseEvent( QKeyEvent * _ke );
 	void wheelEvent( QWheelEvent * _we );
 
 	int FASTCALL getKey( int _y );
@@ -210,9 +209,6 @@ private:
 	int m_totalKeysToScroll;
 
 	midiTime m_lenOfNewNotes;
-
-	bool m_shiftPressed;
-	bool m_controlPressed;
 
 	int m_startKey;			// first key when drawing
 	int m_keyMouseOver;

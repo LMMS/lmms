@@ -199,7 +199,7 @@ void notePlayHandle::play( void )
 void notePlayHandle::checkValidity( void )
 {
 	if( m_channelTrack != NULL &&
-			m_channelTrack->trackType() == track::NULL_TRACK )
+				m_channelTrack->type() == track::NULL_TRACK )
 	{
 		m_channelTrack = NULL;
 	}

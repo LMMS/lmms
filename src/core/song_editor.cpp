@@ -109,13 +109,12 @@ songEditor::songEditor() :
 	m_exporting( FALSE ),
 	m_playing( FALSE ),
 	m_paused( FALSE ),
+	m_loadingProject( FALSE ),
 	m_playMode( PLAY_SONG ),
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE ),
-	m_scrollBack( FALSE ),
-	m_shiftPressed( FALSE ),
-	m_controlPressed( FALSE )
+	m_scrollBack( FALSE )
 {
 	// hack, because code called out of this function uses
 	// songEditor::inst(), which assigns s_instanceOfMe this function
@@ -211,7 +210,7 @@ songEditor::songEditor() :
 #endif
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-	toolTip::add( m_masterVolumeSlider, tr( "master output volume" ) );
+	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( valueChanged( int ) ), this,
 			SLOT( masterVolumeChanged( int ) ) );
@@ -223,6 +222,8 @@ songEditor::songEditor() :
 			SLOT( masterVolumeReleased() ) );
 
 	m_mvsStatus = new textFloat( m_masterVolumeSlider );
+	m_mvsStatus->setTitle( tr( "Master volume" ) );
+	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
 	lmmsMainWin::inst()->addWidgetToToolBar( master_vol_lbl );
 	lmmsMainWin::inst()->addWidgetToToolBar( m_masterVolumeSlider );
@@ -256,6 +257,8 @@ songEditor::songEditor() :
 			SLOT( masterPitchReleased() ) );
 
 	m_mpsStatus = new textFloat( m_masterPitchSlider );
+	m_mpsStatus->setTitle( tr( "Master pitch" ) );
+	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
 	lmmsMainWin::inst()->addWidgetToToolBar( master_pitch_lbl );
 	lmmsMainWin::inst()->addWidgetToToolBar( m_masterPitchSlider );
@@ -493,30 +496,15 @@ void songEditor::resizeEvent( QResizeEvent * _re )
 
 void songEditor::keyPressEvent( QKeyEvent * _ke )
 {
-	if( _ke->key() == Qt::Key_Shift )
-	{
-		m_shiftPressed = TRUE;
-	}
-	else
-	{
-		m_shiftPressed = FALSE;
-	}
-	if( _ke->key() == Qt::Key_Control )
-	{
-		m_controlPressed = TRUE;
-	}
-	else
-	{
-		m_controlPressed = FALSE;
-	}
-
-	if( _ke->modifiers() & Qt::ShiftModifier &&
-		_ke->key() == Qt::Key_Insert )
+	if( /*_ke->modifiers() & Qt::ShiftModifier*/
+		lmmsMainWin::isShiftPressed() == TRUE &&
+						_ke->key() == Qt::Key_Insert )
 	{
 		insertBar();
 	}
-	else if( _ke->modifiers() & Qt::ShiftModifier &&
-		_ke->key() == Qt::Key_Delete )
+	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
+			lmmsMainWin::isShiftPressed() == TRUE &&
+						_ke->key() == Qt::Key_Delete )
 	{
 		removeBar();
 	}
@@ -557,7 +545,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else
 	{
-		_ke->ignore();
+		QWidget::keyPressEvent( _ke );
 	}
 }
 
@@ -576,7 +564,7 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( m_controlPressed )
+	if( lmmsMainWin::isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -592,12 +580,12 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		m_zoomingComboBox->setCurrentIndex(
 				m_zoomingComboBox->findText( QString::number(
 					static_cast<int>( pixelsPerTact() *
-				100 / DEFAULT_PIXELS_PER_TACT ) ) +"%" ) );
+				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" ) );
 #else
 		// update combobox with zooming-factor
 		m_zoomingComboBox->setCurrentText( QString::number(
 					static_cast<int>( pixelsPerTact() *
-				100 / DEFAULT_PIXELS_PER_TACT ) ) +"%" );
+				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" );
 #endif
 		// update timeline
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
@@ -605,7 +593,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks( TRUE );
 	} 
-	else if( m_shiftPressed )
+	else if( lmmsMainWin::isShiftPressed() == TRUE )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -623,10 +611,14 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 
 void songEditor::masterVolumeChanged( int _new_val )
 {
-	if( m_mvsStatus->isVisible() == FALSE )
+	masterVolumeMoved( _new_val );
+	if( m_mvsStatus->isVisible() == FALSE && m_loadingProject == FALSE )
 	{
-		masterVolumeMoved( _new_val );
 		m_mvsStatus->reparent( m_masterVolumeSlider );
+		m_mvsStatus->move( m_masterVolumeSlider->mapTo(
+					m_masterVolumeSlider->topLevelWidget(),
+							QPoint( 0, 0 ) ) +
+			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
 	mixer::inst()->setMasterGain( 2.0f - _new_val / 100.0f );
@@ -639,6 +631,10 @@ void songEditor::masterVolumeChanged( int _new_val )
 void songEditor::masterVolumePressed( void )
 {
 	m_mvsStatus->reparent( m_masterVolumeSlider );
+	m_mvsStatus->move( m_masterVolumeSlider->mapTo(
+					m_masterVolumeSlider->topLevelWidget(),
+							QPoint( 0, 0 ) ) +
+			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 	m_mvsStatus->show();
 	masterVolumeMoved( m_masterVolumeSlider->value() );
 }
@@ -648,8 +644,7 @@ void songEditor::masterVolumePressed( void )
 
 void songEditor::masterVolumeMoved( int _new_val )
 {
-	m_mvsStatus->setText( tr( "Master output volume: %1%" ).arg( 200 -
-								_new_val ) );
+	m_mvsStatus->setText( tr( "Value: %1%" ).arg( 200 - _new_val ) );
 }
 
 
@@ -665,10 +660,14 @@ void songEditor::masterVolumeReleased( void )
 
 void songEditor::masterPitchChanged( int _new_val )
 {
-	if( m_mpsStatus->isVisible() == FALSE )
+	masterPitchMoved( _new_val );
+	if( m_mpsStatus->isVisible() == FALSE && m_loadingProject == FALSE )
 	{
-		masterPitchMoved( _new_val );
 		m_mpsStatus->reparent( m_masterPitchSlider );
+		m_mpsStatus->move( m_masterPitchSlider->mapTo(
+					m_masterPitchSlider->topLevelWidget(),
+							QPoint( 0, 0 ) ) +
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 		m_mpsStatus->setVisibilityTimeOut( 1000 );
 	}
 	setModified();
@@ -680,6 +679,10 @@ void songEditor::masterPitchChanged( int _new_val )
 void songEditor::masterPitchPressed( void )
 {
 	m_mpsStatus->reparent( m_masterPitchSlider );
+	m_mpsStatus->move( m_masterPitchSlider->mapTo(
+					m_masterPitchSlider->topLevelWidget(),
+							QPoint( 0, 0 ) ) +
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
 	masterPitchMoved( m_masterPitchSlider->value() );
 }
@@ -689,8 +692,7 @@ void songEditor::masterPitchPressed( void )
 
 void songEditor::masterPitchMoved( int _new_val )
 {
-	m_mpsStatus->setText( tr( "Master pitch: %1 semitones").arg(
-								-_new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( -_new_val ) );
 
 }
 
@@ -957,7 +959,7 @@ void songEditor::processNextBuffer( void )
 	while( total_frames_played < mixer::inst()->framesPerAudioBuffer() )
 	{
 		Uint32 played_frames = mixer::inst()->framesPerAudioBuffer() -
-					total_frames_played;
+							total_frames_played;
 
 		// did we play a whole tact?
 		if( m_playPos[m_playMode].currentFrame() >= frames_per_tact )
@@ -1019,9 +1021,8 @@ void songEditor::processNextBuffer( void )
 
 		// update frame-counters
 		total_frames_played += played_frames;
-		m_playPos[m_playMode].setCurrentFrame(
-					m_playPos[m_playMode].currentFrame() +
-					played_frames );
+		m_playPos[m_playMode].setCurrentFrame( played_frames +
+					m_playPos[m_playMode].currentFrame() );
 		m_playPos[m_playMode].setTact64th(
 					( m_playPos[m_playMode].currentFrame() *
 						64 / frames_per_tact) % 64 );
@@ -1350,7 +1351,11 @@ void songEditor::clearProject( void )
 	//mixer::inst()->clear();
 	while( mixer::inst()->haveNoRunningNotes() == FALSE )
 	{
-/*		qApp->processEvents();*/
+#ifdef QT4
+		QApplication::processEvents( QEventLoop::AllEvents );
+#else
+		qApp->processEvents();
+#endif
 	}
 
 	trackVector tv = tracks();
@@ -1385,9 +1390,11 @@ void songEditor::createNewProject( void )
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
 
+	m_loadingProject = TRUE;
 	setBPM( DEFAULT_BPM );
 	m_masterVolumeSlider->setValue( 100 );
 	m_masterPitchSlider->setValue( 0 );
+	m_loadingProject = FALSE;
 
 	m_fileName = m_oldFileName = "";
 
@@ -1418,6 +1425,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 	clearProject();
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
+
+	m_loadingProject = TRUE;
 
 	multimediaProject mmp( m_fileName );
 	// if file could not be opened, head-node is null and we create
@@ -1451,7 +1460,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 				else
 				{
 					m_masterVolumeSlider->setValue(
-						DEFAULT_VOLUME );
+							DEFAULT_VOLUME );
 				}
 			}
 			else if( node.nodeName() == "masterpitch" )
@@ -1484,6 +1493,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 
 	m_modified = FALSE;
 	m_leftRightScroll->setValue( 0 );
+
+	m_loadingProject = FALSE;
 
 	lmmsMainWin::inst()->resetWindowTitle( "" );
 }

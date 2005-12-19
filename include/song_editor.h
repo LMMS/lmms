@@ -27,26 +27,12 @@
 #ifndef _SONG_EDITOR_H
 #define _SONG_EDITOR_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QMap>
-
-#else
-
-#include <qmap.h>
-
-#endif
-
-
 #include "track_container.h"
 #include "types.h"
 
 
 class QComboBox;
 class QLabel;
-class QPixmap;
 class QScrollBar;
 class QSlider;
 
@@ -301,6 +287,8 @@ private:
 	volatile bool m_playing;
 	volatile bool m_paused;
 
+	bool m_loadingProject;
+
 	playModes m_playMode;
 	playPos m_playPos[PLAY_MODE_CNT];
 
@@ -323,11 +311,6 @@ private:
 	vvector<ACTIONS> m_actions;
 
 	void doActions( void );
-
-
-	bool m_shiftPressed;
-	bool m_controlPressed;
-
 
 
 	friend class lmmsMainWin;

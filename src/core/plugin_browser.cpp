@@ -233,8 +233,8 @@ void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		new stringPairDrag( "plugin", m_pluginDescriptor.name, m_logo,
-									this );
+		new stringPairDrag( "instrument", m_pluginDescriptor.name,
+								m_logo, this );
 		m_mouseOver = FALSE;
 		update();
 	}

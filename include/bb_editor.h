@@ -82,6 +82,8 @@ public:
 
 	void FASTCALL swapBB( csize _bb1, csize _bb2 );
 
+	void updateBBTrack( trackContentObject * _tco );
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );

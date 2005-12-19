@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051215, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051215)
+AC_INIT(lmms, 0.1.1-cvs20051218, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051218)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -22,7 +22,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h dlfcn.h ladspa.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h])
+AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -156,7 +156,7 @@ fi
 AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 
 
-# check for proper wine-installation and existing Steinberg headers
+# check for proper WINE-installation and existing Steinberg headers
 AC_ARG_WITH(vst,
 	AS_HELP_STRING([--with-vst],
 			[enable support for builtin VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
@@ -175,6 +175,20 @@ if test "x$with_vst" = "xyes" ; then
 	fi
 fi
 AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINEGCC")
+
+
+# check for LADSPA-SDK
+AC_ARG_WITH(src,
+	AS_HELP_STRING([--without-ladspa],
+		[disable support for LADSPA-support]), ,
+ 	[ with_ladspa=yes ])
+AH_TEMPLATE(HAVE_LADSPA_H, [Define to 1 if you have the <ladspa.h> header file.])
+if test "x$with_ladspa" = "xyes" ; then
+	AC_CHECK_HEADER(ladspa.h, HAVE_LADSPA_H="true")
+fi
+if test ! -z "$HAVE_LADSPA_H" ; then
+	AC_DEFINE(HAVE_LADSPA_H)
+fi
 
 
 # check for vorbis-lib
@@ -201,7 +215,7 @@ AM_CONDITIONAL(HAVE_LIBVORBIS, test ! -z "$OGG_SUPPORT")
 
 
 # check for libsamplerate
-AC_ARG_WITH(src,
+AC_ARG_WITH(libsrc,
 	AS_HELP_STRING([--without-libsrc],
 		[disable support for resampling via libsamplerate]), ,
  	[ with_libsrc=yes ])
@@ -217,7 +231,7 @@ AM_CONDITIONAL(HAVE_LIBSRC, test ! -z "$HAVE_SAMPLERATE_H")
 
 
 # libsndfile-stuff
-AC_ARG_WITH(src,
+AC_ARG_WITH(sndfile,
  	AS_HELP_STRING([--without-libsf],
 		[disable support for importing files via libsndfile]), ,
  	[ with_libsf=yes ])
@@ -364,7 +378,7 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-CXXFLAGS="$CXXFLAGS -g0"
+# CXXFLAGS="$CXXFLAGS -g0"
 if test $CXX == "g++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall -fno-exceptions"
 fi
@@ -542,6 +556,24 @@ fi
 
 
 
+# not yet...
+#if test -z "$HAVE_LADSPA_H" ; then
+#	echo " ========================"
+#	echo " ===  LMMS - WARNING  ======================================================="
+#	echo " ========================"
+#	echo " ="
+#	echo " = You don't seem to have installed LADSPA-SDK which is neccessary for"
+#	echo " = building LMMS with LADSPA support. LADSPA-support is very useful"
+#	echo " = as you're able to use a lot of LADSPA-effects inside LMMS."
+#	echo " = Consider installing the missing packages for using the full power of LMMS."
+#	echo " ="
+#	with_warnings="true"
+#else
+#	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA-plugins"
+#fi
+
+
+
 
 if test -z "$HAVE_SAMPLERATE_H" ; then
 	echo " ========================"
@@ -585,7 +617,8 @@ else
 		echo " ="
 		echo " =       ftp://ext2asio:sdk1ext@ftp.pinnaclesys.com/SDK"
 		echo " ="
-		echo " = and put the mentioned files into /usr/include/vst."
+		echo " = and put the mentioned files into /usr/include/vst. Make sure, they're"
+		echo " = patched with file aeffectx_h_fix.patch!"
 		echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
 		echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
 		echo " = ignore this warning."
@@ -601,7 +634,7 @@ else
 			echo " ========================"
 			echo " ="
 			echo " = You don't seem to have installed WINE or it's development-packages (headers,"
-			echo " = (winegcc etc.) which is neccessary for building LMMS with built-in"
+			echo " = winegcc etc.) which are neccessary for building LMMS with built-in"
 			echo " = VST-support."
 			echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
 			echo " = warning."

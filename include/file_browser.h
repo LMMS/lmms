@@ -50,9 +50,11 @@
 
 
 class fileItem;
-class trackContainer;
-class QPixmap;
+class listView;
 class playHandle;
+class QPixmap;
+class trackContainer;
+
 
 
 class fileBrowser : public sideBarWidget
@@ -69,49 +71,58 @@ public slots:
 	void reloadTree( void );
 
 
-protected:
-	void keyPressEvent( QKeyEvent * _ke );
-
-
 protected slots:
 #ifdef QT4
-	void itemPressed( int btn, Q3ListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void itemReleased( int btn, Q3ListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void itemDoubleClicked( Q3ListViewItem * _i, const QPoint & _pos,
-								int _col );
 	void contextMenuRequest( Q3ListViewItem * _i, const QPoint & _pos,
 								int _col );
 #else
-	void itemPressed( int btn, QListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void itemReleased( int btn, QListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void itemDoubleClicked( QListViewItem * _i, const QPoint & _pos,
-								int _col );
 	void contextMenuRequest( QListViewItem * _i, const QPoint & _pos,
 								int _col );
 #endif
-	void selectionChanged( void );
 	void sendToActiveChannel( void );
 	void openInNewChannelSE( void );
 	void openInNewChannelBBE( void );
-	void renameItem( void );
 
 
 private:
+	virtual void keyPressEvent( QKeyEvent * _ke );
 	void openInNewChannel( trackContainer * _tc );
 
-	Q3ListView * m_l;
+	listView * m_l;
 	fileItem * m_contextMenuItem;
 
 	QString m_path;
 	QString m_filter;
 
+
+} ;
+
+
+
+
+class listView : public Q3ListView
+{
+	Q_OBJECT
+public:
+	listView( QWidget * _parent );
+	~listView();
+
+
+protected:
+	virtual void contentsMouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void contentsMousePressEvent( QMouseEvent * _me );
+	virtual void contentsMouseMoveEvent( QMouseEvent * _me );
+	virtual void contentsMouseReleaseEvent( QMouseEvent * _me );
+
+
+private:
+	bool m_mousePressed;
+	QPoint m_pressPos;
+
 	playHandle * m_previewPlayHandle;
 
 } ;
+
 
 
 
@@ -159,6 +170,7 @@ private:
 
 
 
+
 class fileItem : public Q3ListViewItem
 {
 public:
@@ -178,7 +190,7 @@ public:
 
 	enum fileTypes
 	{
-		SONG_FILE, PRESET_FILE, SAMPLE_FILE, UNKNOWN
+		PROJECT_FILE, PRESET_FILE, SAMPLE_FILE, MIDI_FILE, UNKNOWN
 	} ;
 	
 	inline fileTypes type( void )
@@ -191,9 +203,10 @@ private:
 	void initPixmapStuff( void );
 	void determineFileType( void );
 
-	static QPixmap * s_songFilePixmap;
+	static QPixmap * s_projectFilePixmap;
 	static QPixmap * s_presetFilePixmap;
 	static QPixmap * s_sampleFilePixmap;
+	static QPixmap * s_midiFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 	
 	QPixmap * m_pix;

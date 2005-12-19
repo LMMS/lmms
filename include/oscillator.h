@@ -98,7 +98,7 @@ public:
 		// phase (otherwise we'll get clicks in the audio-stream)
 		const float v = m_sample * m_oscCoeff;
 		m_freq = _new_freq;
-		recalcOscCoeff( phase( v ) );
+		recalcOscCoeff( fraction( v ) );
 	}
 
 	static oscillator * FASTCALL createOsc( waveShapes _wave_shape,
@@ -112,14 +112,14 @@ public:
 		// check whether v2 is in next period
 		return( floorf( v2 ) > floorf( v1 ) );
 	}
-#define	FLOAT_TO_INT(in,out)		\
+/*#define	FLOAT_TO_INT(in,out)		\
 	register const float round_const = -0.5f;			\
 	__asm__ __volatile__ ("fadd %%st,%%st(0)\n"		\
 				"fadd	%2\n"			\
 				"fistpl	%0\n"			\
-				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;
+				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;*/
 
-	static inline float phase( const float _sample )
+	static inline float fraction( const float _sample )
 	{
 		return( _sample - static_cast<int>( _sample ) );
 	}
@@ -134,7 +134,7 @@ public:
 
 	static inline sampleType triangleSample( float _sample )
 	{
-		const float ph = phase( _sample );
+		const float ph = fraction( _sample );
 		if( ph <= 0.25f )
 		{
 			return( ph * 4.0f );
@@ -148,17 +148,17 @@ public:
 
 	static inline sampleType sawSample( float _sample )
 	{
-		return( -1.0f + phase( _sample ) * 2.0f );
+		return( -1.0f + fraction( _sample ) * 2.0f );
 	}
 
 	static inline sampleType squareSample( float _sample )
 	{
-		return( ( phase( _sample ) > 0.5f ) ? -1.0f : 1.0f );
+		return( ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f );
 	}
 
 	static inline sampleType moogSawSample( float _sample )
 	{
-		const float ph = phase( _sample );
+		const float ph = fraction( _sample );
 		if( ph < 0.5f )
 		{
 			return( -1.0f + ph * 4.0f );
@@ -168,7 +168,7 @@ public:
 
 	static inline sampleType expSample( float _sample )
 	{
-		float ph = phase( _sample );
+		float ph = fraction( _sample );
 		if( ph > 0.5f )
 		{
 			ph = 1.0f - ph;
@@ -181,14 +181,20 @@ public:
 		return( 1.0f - 2.0f * ( ( float )rand() * ( 1.0f /
 								RAND_MAX ) ) );
 	}
+	static inline sampleType userWaveSample( float _sample,
+		const sampleFrame * _user_wave, Uint32 _user_wave_frames )
+	{
+		const float frame = fraction( _sample ) * _user_wave_frames;
+		const Uint32 f1 = static_cast<Uint32>( frame );
+		const Uint32 f2 = ( f1 + 1 ) % _user_wave_frames;
+		return( linearInterpolate( _user_wave[f1][0],
+						_user_wave[f2][0],
+						fraction( frame ) ) );
+	}
 	inline sampleType userWaveSample( float _sample )
 	{
-		const float frame = phase( _sample ) * m_userWaveFrames;
-		const Uint32 f1 = static_cast<Uint32>( frame );
-		const Uint32 f2 = ( f1 + 1 ) % m_userWaveFrames;
-		return( linearInterpolate( m_userWaveData[f1][0],
-						m_userWaveData[f2][0],
-						frame - floorf( frame ) ) );
+		return( userWaveSample( _sample, m_userWaveData,
+							m_userWaveFrames ) );
 	}
 
 

@@ -77,8 +77,11 @@ public slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * );
-	void mouseDoubleClickEvent( QMouseEvent * );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void mouseDoubleClickEvent( QMouseEvent * );
+	virtual void paintEvent( QPaintEvent * );
+
 	midiTime getSampleLength( void ) const;
 
 
@@ -122,7 +125,7 @@ public:
 	sampleTrack( trackContainer * _tc );
 	virtual ~sampleTrack();
 
-	virtual trackTypes trackType( void ) const;
+	virtual trackTypes type( void ) const;
 	virtual bool FASTCALL play( const midiTime & _start,
 					Uint32 _start_frame, Uint32 _frames,
 					Uint32 _frame_base,

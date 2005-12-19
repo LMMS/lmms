@@ -34,7 +34,6 @@ class KMultiTabBarTab;
 
 #include <QWidget>
 #include <QMenu>
-//#include <QVBoxWidget>
 #include <QString>
 #include <QBoxLayout>
 #include <QList>

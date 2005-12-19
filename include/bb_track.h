@@ -101,7 +101,7 @@ public:
 	bbTrack( trackContainer * _tc );
 	virtual ~bbTrack();
 
-	virtual trackTypes trackType( void ) const;
+	virtual trackTypes type( void ) const;
 	virtual bool FASTCALL play( const midiTime & _start,
 					Uint32 _start_frame, Uint32 _frames,
 					Uint32 _frame_base,

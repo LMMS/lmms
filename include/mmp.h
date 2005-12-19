@@ -51,6 +51,7 @@ public:
 		SONG_PROJECT,
 		SONG_PROJECT_TEMPLATE,
 		CHANNEL_SETTINGS,
+		DRAG_N_DROP_DATA,
 		EFFECT_SETTINGS,
 		VIDEO_PROJECT,		// will come later...
 		BURN_PROJECT,		// will come later...
@@ -59,7 +60,8 @@ public:
 	} ;
 
 
-	multimediaProject( const QString & _in_file_name );
+	multimediaProject( const QString & _in_file_name,
+						bool _is_filename = TRUE );
 	multimediaProject( projectTypes _project_type );
 	~multimediaProject();
 

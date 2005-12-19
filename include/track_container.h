@@ -94,9 +94,9 @@ public:
 
 
 protected:
-	virtual void resizeEvent( QResizeEvent * );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
+	virtual void resizeEvent( QResizeEvent * );
 
 	constTrackVector tracks( void ) const;
 	trackVector tracks( void );

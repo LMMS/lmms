@@ -63,6 +63,8 @@ textFloat::textFloat( QWidget * _parent ) :
 	reparent( parentWidget() );
 	resize( 20, 20 );
 	hide();
+
+	setFont( pointSize<8>( font() ) );
 }
 
 
@@ -71,7 +73,7 @@ textFloat::textFloat( QWidget * _parent ) :
 void textFloat::setTitle( const QString & _title )
 {
 	m_title = _title;
-	repaint();
+	updateSize();
 }
 
 
@@ -80,7 +82,7 @@ void textFloat::setTitle( const QString & _title )
 void textFloat::setText( const QString & _text )
 {
 	m_text = _text;
-	repaint();
+	updateSize();
 }
 
 
@@ -89,7 +91,7 @@ void textFloat::setText( const QString & _text )
 void textFloat::setPixmap( const QPixmap & _pixmap )
 {
 	m_pixmap = _pixmap;
-	repaint();
+	updateSize();
 }
 
 
@@ -105,8 +107,7 @@ void textFloat::reparent( QWidget * _new_parent )
 
 	// Get position and reparent to either top level or dialog
 	//
-	while( _new_parent->parentWidget() && !_new_parent->isTopLevel()
-		&&
+	while( _new_parent->parentWidget() && !_new_parent->isTopLevel() &&
 #ifdef QT4
 			!_new_parent->windowType() == Qt::Dialog
 #else
@@ -162,7 +163,7 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 	}
 	else
 	{
-		tf->move( 32, mw->height() - 24 - _add_y_margin );
+		tf->move( 32, mw->height() - 28 - _add_y_margin );
 	}
 	tf->setText( _msg );
 	tf->show();
@@ -208,27 +209,9 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 
 	p.setFont( pointSize<8>( p.font() ) );
 
-	QFontMetrics metrics( p.fontMetrics() );
-	QRect textBound = metrics.boundingRect( m_text );
-	if( m_title != "" )
-	{
-		QFont f = p.font();
-		f.setBold( TRUE );
-		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
-		if( title_w > textBound.width() )
-		{
-			textBound.setWidth( textBound.width() + title_w );
-		}
-		textBound.setHeight( textBound.height() * 2 + 10 );
-	}
-	if( m_pixmap.isNull() == FALSE )
-	{
-		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
-	}
-	resize( textBound.width() + 5, textBound.height() + 5 );
 	p.drawRect( rect() );
 
-	p.setPen( Qt::black );
+//	p.setPen( Qt::black );
 	// small message?
 	if( m_title == "" )
 	{
@@ -261,6 +244,34 @@ void textFloat::mousePressEvent( QMouseEvent * )
 {
 	close();
 }
+
+
+
+
+void textFloat::updateSize( void )
+{
+	QFontMetrics metrics( font() );
+	QRect textBound = metrics.boundingRect( m_text );
+	if( m_title != "" )
+	{
+		QFont f = font();
+		f.setBold( TRUE );
+		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
+		if( title_w > textBound.width() )
+		{
+			textBound.setWidth( title_w );
+		}
+		textBound.setHeight( textBound.height() * 2 + 14 );
+	}
+	if( m_pixmap.isNull() == FALSE )
+	{
+		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
+	}
+	resize( textBound.width() + 5, textBound.height() + 5 );
+	//move( QPoint( parentWidget()->width() + 5, 5 ) );
+	repaint();
+}
+
 
 
 #undef setParent

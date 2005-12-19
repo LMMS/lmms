@@ -86,7 +86,7 @@ bbTCO::~bbTCO()
 
 void bbTCO::movePosition( const midiTime & _pos )
 {
-	// bb-playlist-entries are always aligned on tact-boundaries
+	// bb-playlist-entries are always aligned at tact-boundaries
 	trackContentObject::movePosition( midiTime( _pos.getTact(), 0 ) );
 }
 
@@ -95,7 +95,7 @@ void bbTCO::movePosition( const midiTime & _pos )
 
 void bbTCO::changeLength( const midiTime & _length )
 {
-	// the length of bb-playlist-entries is always a multiple of one tact
+	// the length of a bb-playlist-entry is always a multiple of one tact
 	trackContentObject::changeLength( midiTime( _length.getTact(), 0 ) );
 }
 
@@ -298,6 +298,9 @@ bbTrack::bbTrack( trackContainer * _tc )
 	: track( _tc )
 {
 	getTrackWidget()->setFixedHeight( 32 );
+	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
+	// too), so disable it
+	getTrackWidget()->setAcceptDrops( FALSE );
 
 	csize bbNum = s_bbNums.size();
 	bbInfoStruct bis = { bbNum, "" };
@@ -342,7 +345,7 @@ bbTrack::~bbTrack()
 
 
 
-track::trackTypes bbTrack::trackType( void ) const
+track::trackTypes bbTrack::type( void ) const
 {
 	return( BB_TRACK );
 }

@@ -54,6 +54,7 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::SONG_PROJECT, "song" },
 	{ multimediaProject::SONG_PROJECT_TEMPLATE, "songtemplate" },
 	{ multimediaProject::CHANNEL_SETTINGS, "channelsettings" },
+	{ multimediaProject::DRAG_N_DROP_DATA, "dnddata" },
 	{ multimediaProject::EFFECT_SETTINGS, "effectsettings" },
 	{ multimediaProject::VIDEO_PROJECT, "video" },
 	{ multimediaProject::BURN_PROJECT, "burn" },
@@ -86,19 +87,22 @@ multimediaProject::multimediaProject( projectTypes _project_type ) :
 
 
 
-multimediaProject::multimediaProject( const QString & _in_file_name ) :
+multimediaProject::multimediaProject( const QString & _in_file_name,
+							bool _is_filename ) :
 	QDomDocument(),
 	m_content(),
 	m_head()
 {
 	QFile in_file( _in_file_name );
-#ifdef QT4
-	if( !in_file.open( QIODevice::ReadOnly ) )
-#else
-	if( !in_file.open( IO_ReadOnly ) )
-#endif
+	if( _is_filename == TRUE )
 	{
-		QMessageBox::critical( NULL,
+#ifdef QT4
+		if( !in_file.open( QIODevice::ReadOnly ) )
+#else
+		if( !in_file.open( IO_ReadOnly ) )
+#endif
+		{
+			QMessageBox::critical( NULL,
 					songEditor::tr( "Could not open file" ),
 					songEditor::tr( "Could not open "
 							"file %1. You probably "
@@ -109,15 +113,17 @@ multimediaProject::multimediaProject( const QString & _in_file_name ) :
 							"access to the file "
 							"and try again."
 						).arg( _in_file_name ) );
-		return;
+			return;
+		}
 	}
-
 	QString error_msg;
 	int line;
 	int col;
-	if( !setContent( &in_file, &error_msg, &line, &col ) )
+	if( _is_filename == TRUE )
 	{
-		QMessageBox::critical( NULL, songEditor::tr( "Error in "
+		if( !setContent( &in_file, &error_msg, &line, &col ) )
+		{
+			QMessageBox::critical( NULL, songEditor::tr( "Error in "
 							"multimedia-project" ),
 					songEditor::tr( "The multimedia-"
 							"project %1 seems to "
@@ -127,9 +133,19 @@ multimediaProject::multimediaProject( const QString & _in_file_name ) :
 							"possible data from "
 							"this file."
 						).arg( _in_file_name ) );
-		return;
+			return;
+		}
+		in_file.close();
 	}
-	in_file.close();
+	else
+	{
+		if( !setContent( _in_file_name, &error_msg, &line, &col ) )
+		{
+			printf( "multimediaProject: error parsing XML-data "
+					"directly given to constructor!\n" );
+			return;
+		}
+	}
 
 
 	QDomElement root = documentElement();

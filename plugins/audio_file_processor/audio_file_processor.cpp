@@ -57,6 +57,8 @@
 #include "pixmap_button.h"
 #include "knob.h"
 #include "tooltip.h"
+#include "string_pair_drag.h"
+#include "mmp.h"
 
 #include "embed.cpp"
 
@@ -277,6 +279,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 
 	setBackgroundMode( Qt::NoBackground );
 #endif
+	setAcceptDrops( TRUE );
 }
 
 
@@ -413,6 +416,36 @@ void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 
 
 
+void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	stringPairDrag::processDragEnterEvent( _dee,
+		QString( "samplefile,tco_%1" ).arg( track::SAMPLE_TRACK ) );
+}
+
+
+
+
+void audioFileProcessor::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "samplefile" )
+	{
+		setAudioFile( stringPairDrag::decodeValue( _de ) );
+		_de->accept();
+	}
+	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
+	{
+		multimediaProject mmp( value, FALSE );
+		setAudioFile( mmp.content().firstChild().toElement().
+							attribute( "src" ) );
+		_de->accept();
+	}
+}
+
+
+
+
 void audioFileProcessor::paintEvent( QPaintEvent * )
 {
 #ifdef QT4
@@ -493,6 +526,7 @@ void audioFileProcessor::sampleUpdated( void )
 							m_graph.height() );
 	QPainter p( &m_graph );
 #endif
+	p.setPen( QColor( 64, 255, 160 ) );
 	m_sampleBuffer.drawWaves( p, QRect( 2, 2, m_graph.width() - 4,
 							m_graph.height() - 4 ),
 								m_drawMethod );

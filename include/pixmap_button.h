@@ -52,10 +52,16 @@ class pixmapButton : public QPushButton
 public:
 	pixmapButton( QWidget * _parent );
 	virtual ~pixmapButton();
-	virtual void FASTCALL setActiveGraphic( const QPixmap & _pm );
-	virtual void FASTCALL setInactiveGraphic( const QPixmap & _pm,
+	void FASTCALL setActiveGraphic( const QPixmap & _pm );
+	void FASTCALL setInactiveGraphic( const QPixmap & _pm,
 							bool _update = TRUE );
 	void FASTCALL setBgGraphic( const QPixmap & _pm );
+#ifndef QT4
+	inline void setChecked( bool _on )
+	{
+		setOn( _on );
+	}
+#endif
 
 
 signals:

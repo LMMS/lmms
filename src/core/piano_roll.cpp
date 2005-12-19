@@ -140,8 +140,6 @@ pianoRoll::pianoRoll( void ) :
 	m_notesEditHeight( 100 ),
 	m_ppt( DEFAULT_PR_PPT ),
 	m_lenOfNewNotes( midiTime( 0, 16 ) ),
-	m_shiftPressed( FALSE ),
-	m_controlPressed( FALSE ),
 	m_startKey( INITIAL_START_KEY ),
 	m_keyMouseOver( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
@@ -1781,23 +1779,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 {
-	if( _ke->key() == Qt::Key_Shift )
-	{
-		m_shiftPressed = TRUE;
-	}
-	else
-	{
-		m_shiftPressed = FALSE;
-	}
-	if( _ke->key() == Qt::Key_Control )
-	{
-		m_controlPressed = TRUE;
-	}
-	else
-	{
-		m_controlPressed = FALSE;
-	}
-
 	switch( _ke->key() )
 	{
 		case Qt::Key_Up:
@@ -1919,19 +1900,10 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void pianoRoll::keyReleaseEvent( QKeyEvent * )
-{
-	m_shiftPressed = FALSE;
-	m_controlPressed = FALSE;
-}
-
-
-
-
 void pianoRoll::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( m_controlPressed )
+	if( lmmsMainWin::isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -1958,7 +1930,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( m_shiftPressed )
+	else if( lmmsMainWin::isShiftPressed() )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() * 2 / 15 );

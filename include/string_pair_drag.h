@@ -54,7 +54,7 @@ public:
 					const QPixmap & _icon, QWidget * _w );
 	~stringPairDrag();
 
-	static void processDragEnterEvent( QDragEnterEvent * _dee,
+	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );

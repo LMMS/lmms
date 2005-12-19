@@ -140,7 +140,7 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 	else
 	{
 		emit clicked();
-		//QLabel::mousePressEvent( _me );
+		QLabel::mousePressEvent( _me );
 	}
 }
 

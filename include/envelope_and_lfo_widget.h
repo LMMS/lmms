@@ -48,15 +48,18 @@
 #include "settings.h"
 #include "types.h"
 #include "spc_bg_hndl_widget.h"
+#include "sample_buffer.h"
 
 
 class QPaintEvent;
 class QPixmap;
+
 class envelopeTabWidget;
 class knob;
 class ledCheckBox;
 class pixmapButton;
 class tempoSyncKnob;
+
 
 
 class envelopeAndLFOWidget : public QWidget, public settings,
@@ -97,8 +100,10 @@ public slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * _pe );
-	void mousePressEvent( QMouseEvent * _me );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 
 	float FASTCALL lfoLevel( Uint32 _frame, Uint32 _frame_offset ) const;
 
@@ -109,10 +114,14 @@ protected slots:
 	void lfoTriangleWaveCh( bool );
 	void lfoSawWaveCh( bool );
 	void lfoSquareWaveCh( bool );
+	void lfoUserWaveCh( bool );
 	void x100Toggled( bool );
 
 
 private:
+	static QPixmap * s_envGraph;
+	static QPixmap * s_lfoGraph;
+
 	static Uint32 s_lfoFrame;
 
 	bool   m_used;
@@ -125,7 +134,6 @@ private:
 	knob * m_sustainKnob;
 	knob * m_releaseKnob;
 	knob * m_amountKnob;
-	static QPixmap * s_envGraph;
 
 	float  m_sustainLevel;
 	float  m_amount;
@@ -145,7 +153,7 @@ private:
 	pixmapButton * m_triangleLfoBtn;
 	pixmapButton * m_sawLfoBtn;
 	pixmapButton * m_sqrLfoBtn;
-	static QPixmap * s_lfoGraph;
+	pixmapButton * m_usrLfoBtn;
 
 	ledCheckBox * m_x100Cb;
 	ledCheckBox * m_controlEnvAmountCb;
@@ -156,13 +164,15 @@ private:
 	float m_lfoAmount;
 	bool m_lfoAmountIsZero;
 	float * m_lfoShapeData;
+	sampleBuffer m_userWave;
 
 	enum lfoShapes
 	{
 		SIN,
 		TRIANGLE,
 		SAW,
-		SQUARE
+		SQUARE,
+		USER
 	} m_lfoShape;
 
 	volatile bool m_busy;

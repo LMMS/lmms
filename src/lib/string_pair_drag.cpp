@@ -49,10 +49,10 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 	QMimeData * m = new QMimeData();
 	m->setData( "lmms/stringpair", txt.toAscii() );
 	setMimeData( m );
-	start( /*Qt::CopyAction*/ Qt::IgnoreAction );
+	start( Qt::IgnoreAction );
 #else
 	setEncodedData( txt.utf8() );
-	drag();
+	drag( QDragObject::DragDefault );
 #endif
 }
 
@@ -67,7 +67,7 @@ stringPairDrag::~stringPairDrag()
 
 
 
-void stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
+bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
 #ifdef QT4
@@ -79,12 +79,15 @@ void stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
+		return( TRUE );
 	}
+	return( FALSE );
 #else
 	QString txt = _dee->encodedData( "lmms/stringpair" );
 	bool accepted = QStringList::split( ',', _allowed_keys ).contains(
 						txt.section( ':', 0, 0 ) );
 	_dee->accept( accepted );
+	return( accepted );
 #endif
 }
 

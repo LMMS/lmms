@@ -44,6 +44,7 @@
 
 class QPixmap;
 class nStateButton;
+class textFloat;
 
 
 class timeLine : public QWidget
@@ -90,6 +91,7 @@ public:
 		return( ( m_loopPos[0] < m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1] );
 	}
+
 	inline const midiTime & loopEnd( void ) const
 	{
 		return( ( m_loopPos[0] > m_loopPos[1] ) ?
@@ -136,6 +138,7 @@ private:
 							m_ppt / 64.0f ) );
 	}
 
+
 	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
 	static QPixmap * s_loopPointPixmap;
@@ -155,6 +158,9 @@ private:
 	midiTime m_loopPos[2];
 
 	midiTime m_savedPos;
+
+
+	textFloat * m_hint;
 
 
 	enum actions
