@@ -226,7 +226,8 @@ void trackContentObject::leaveEvent( QEvent * _e )
 
 void trackContentObject::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton && lmmsMainWin::isCtrlPressed() )
+	if( _me->button() == Qt::LeftButton &&
+					lmmsMainWin::isCtrlPressed() == TRUE )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
 		saveSettings( mmp, mmp.content() );

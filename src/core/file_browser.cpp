@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QMenu>
+#include <Q3Header>
 
 #else
 

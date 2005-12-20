@@ -73,7 +73,7 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 #ifdef QT4
 	if( !_dee->mimeData()->hasFormat( "lmms/stringpair" ) )
 	{
-		return;
+		return( FALSE );
 	}
 	QString txt = _dee->mimeData()->data( "lmms/stringpair" );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )

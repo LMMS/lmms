@@ -32,6 +32,7 @@
 #include <QBitmap>
 #include <Qt/QtXml>
 #include <QFileInfo>
+#include <QDropEvent>
 
 #else
 

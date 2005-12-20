@@ -37,6 +37,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFile>
+#include <QBuffer>
 
 #else
 
@@ -46,6 +47,7 @@
 #include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qfile.h>
+#include <qbuffer.h>
 
 #if QT_VERSION < 0x030100
 #include <qregexp.h>
@@ -68,6 +70,14 @@
 #include <vorbis/vorbisfile.h>
 #endif
 
+#ifdef HAVE_FLAC_STREAM_ENCODER_H
+#include <FLAC/stream_encoder.h>
+#endif
+
+#ifdef HAVE_FLAC_STREAM_DECODER_H
+#include <FLAC/stream_decoder.h>
+#endif
+
 
 #include "sample_buffer.h"
 #include "interpolation.h"
@@ -76,6 +86,16 @@
 #include "config_mgr.h"
 #include "endian_handling.h"
 #include "debug.h"
+
+
+#ifndef QT4
+
+#define write writeBlock
+#define read readBlock
+#define seek at 
+#define pos at
+
+#endif
 
 
 
@@ -379,9 +399,6 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 // callback-functions for reading ogg-file
 
 #ifndef QT4
-#define read readBlock
-#define seek at 
-#define pos at
 #endif
 
 size_t qfileReadCallback( void * _ptr, size_t _size, size_t _n, void * _udata )
@@ -429,9 +446,6 @@ long qfileTellCallback( void * _udata )
 	return( static_cast<QFile *>( _udata )->pos() );
 }
 
-#undef read
-#undef seek
-#undef pos
 
 
 
@@ -951,6 +965,39 @@ QString sampleBuffer::openAudioFile( void ) const
 }
 
 
+#undef HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
+#ifdef HAVE_FLAC_STREAM_ENCODER_H
+FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
+					const FLAC__StreamEncoder *
+								/*_encoder*/,
+					const FLAC__byte _buffer[], 
+					unsigned int/* _samples*/,
+					unsigned int _bytes,
+					unsigned int/* _current_frame*/,
+					void * _client_data )
+{
+	if( _bytes == 0 )
+	{
+		return( FLAC__STREAM_ENCODER_WRITE_STATUS_OK );
+	}
+	return( ( static_cast<QBuffer *>( _client_data )->write(
+				(const char *) _buffer, _bytes ) == -1 ) ?
+				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR :
+				FLAC__STREAM_ENCODER_WRITE_STATUS_OK );
+}
+
+
+void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
+					const FLAC__StreamMetadata *
+								/* _metadata*/,
+					void * /*_client_data*/ )
+{
+/*	QBuffer * b = static_cast<QBuffer *>( _client_data );
+	b->seek( 0 );
+	b->write( (const char *) _metadata, sizeof( *_metadata ) );*/
+}
+
+#endif
 
 
 QString sampleBuffer::toBase64( void ) const
@@ -959,9 +1006,68 @@ QString sampleBuffer::toBase64( void ) const
 	{
 		return( "" );
 	}
+#ifdef HAVE_FLAC_STREAM_ENCODER_H
+	const Uint32 FRAMES_PER_BUF = 1024;
+
+	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
+	FLAC__stream_encoder_set_channels( flac_enc, DEFAULT_CHANNELS );
+	FLAC__stream_encoder_set_blocksize( flac_enc, FRAMES_PER_BUF );
+	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, TRUE );
+//	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, TRUE );
+	FLAC__stream_encoder_set_sample_rate( flac_enc,
+						mixer::inst()->sampleRate() );
+	QBuffer ba_writer;
+	ba_writer.open( IO_WriteOnly );
+
+	FLAC__stream_encoder_set_client_data( flac_enc, &ba_writer );
+	FLAC__stream_encoder_set_write_callback( flac_enc,
+					flacStreamEncoderWriteCallback );
+	FLAC__stream_encoder_set_metadata_callback( flac_enc,
+					flacStreamEncoderMetadataCallback );
+	FLAC__stream_encoder_init( flac_enc );
+	Uint32 frame_cnt = 0;
+	while( frame_cnt < m_frames )
+	{
+		Uint32 remaining = tMin<Uint32>( FRAMES_PER_BUF,
+							m_frames - frame_cnt );
+		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
+		for( Uint32 f = 0; f < remaining; ++f )
+		{
+			for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			{
+				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
+					mixer::clip( m_data[f][ch] ) *
+						OUTPUT_SAMPLE_MULTIPLIER );
+			}
+		}
+		FLAC__stream_encoder_process_interleaved( flac_enc, buf,
+								remaining );
+		frame_cnt += remaining;
+	}
+	FLAC__stream_encoder_finish( flac_enc );
+	FLAC__stream_encoder_delete( flac_enc );
+	ba_writer.close();
 #ifdef QT4
-	return( QByteArray::toBase64( QByteArray( m_data, m_frames ) ) );
+	return( QByteArray::toBase64( ba_writer.data() ) );
 #else
+	QByteArray ba = ba_writer.buffer();
+	const Uint32 ssize = ba.size();
+	const Uint8 * src = (const Uint8 *) ba.data();
+#endif
+
+#else	/* HAVE_FLAC_STREAM_ENCODER_H */
+
+#ifdef QT4
+	return( QByteArray( (const char *) m_data, m_frames ).toBase64() );
+#else
+	const Uint32 ssize = m_frames * sizeof( sampleFrame );
+	const Uint8 * src = (const Uint8 *) m_data;
+#endif
+
+#endif	/* HAVE_FLAC_STREAM_ENCODER_H */
+
+
+#ifndef QT4
 	// code mostly taken from
 	// qt-x11-opensource-src-4.0.1/src/corelib/tools/qbytearray.cpp
 
@@ -970,9 +1076,7 @@ QString sampleBuffer::toBase64( void ) const
 	const char padchar = '=';
 	int padlen = 0;
 
-	Uint32 ssize = m_frames * sizeof( sampleFrame );
-	Uint32 dsize = ( ( ssize * 4 ) / 3 ) + 3;
-	const Uint8 * src = (const Uint8 *) m_data;
+	const Uint32 dsize = ( ( ssize * 4 ) / 3 ) + 3;
 	char * ptr = new char[dsize + 1];
 	char * out = ptr;
 
@@ -1061,7 +1165,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	m_origFrames = _data.length() * 3 / ( 4 * sizeof( sampleFrame ) ); 
 	m_origData = new sampleFrame[m_origFrames];
 #ifdef QT4
-	QByteArray data = QByteArray::fromBase64( _audio_file.toAscii() );
+	QByteArray data = QByteArray::fromBase64( _data.toAscii() );
 	memcpy( m_origData, data.data(), data.size() );
 #else
 	// code mostly taken from
@@ -1174,6 +1278,11 @@ void sampleBuffer::deleteResamplingData( void * * _ptr )
 	*_ptr = NULL;
 }
 
+
+#undef write
+#undef read
+#undef seek
+#undef pos
 
 
 #include "sample_buffer.moc"

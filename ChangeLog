@@ -1,5 +1,8 @@
 2005-12-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
+	* src/widgets/knob.cpp:
+	made knob ready for drag'n'drop of values
+
 	* src/tracks/sample_track.cpp:
 	load and save/load sample-data which doesn't come from sample in/from
 	XML-node (base64-encoded)

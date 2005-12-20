@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.1-cvs20051218, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051218)
+AC_INIT(lmms, 0.1.1-cvs20051219, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.1-cvs20051219)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -212,6 +212,25 @@ if test ! -z "$OGG_SUPPORT" ; then
 	AC_DEFINE(HAVE_VORBIS_VORBISFILE_H)
 fi
 AM_CONDITIONAL(HAVE_LIBVORBIS, test ! -z "$OGG_SUPPORT")
+
+
+# check for libFLAC
+AC_ARG_WITH(flac,
+	AS_HELP_STRING([--without-flac],
+		[disable support for internal encoding/decoding with FLAC]), ,
+ 	[ with_flac=yes ])
+AH_TEMPLATE(HAVE_FLAC_STREAM_ENCODER_H, [Define to 1 if you have the <FLAC/stream_encoder.h> header file.])
+AH_TEMPLATE(HAVE_FLAC_STREAM_DECODER_H, [Define to 1 if you have the <FLAC/stream_decoder.h> header file.])
+if test "x$with_flac" = "xyes" ; then
+	AC_CHECK_HEADER(FLAC/stream_encoder.h, HAVE_FLAC_STREAM_ENCODER_H="true")
+	AC_CHECK_HEADER(FLAC/stream_decoder.h, HAVE_FLAC_STREAM_DECODER_H="true")
+	AC_CHECK_LIB([FLAC], [FLAC__stream_encoder_new], HAVE_LIBFLAC="true")
+fi
+if test ! -z "$HAVE_FLAC_STREAM_ENCODER_H" -a ! -z "$HAVE_FLAC_STREAM_DECODER_H" -a ! -z "$HAVE_LIBFLAC"; then
+	AC_DEFINE(HAVE_FLAC_STREAM_ENCODER_H)
+	AC_DEFINE(HAVE_FLAC_STREAM_DECODER_H)
+fi
+AM_CONDITIONAL(HAVE_LIBFLAC, test ! -z "$HAVE_LIBFLAC")
 
 
 # check for libsamplerate

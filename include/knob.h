@@ -115,14 +115,16 @@ signals:
     
 
 protected:
-	virtual void paintEvent( QPaintEvent * _me );
-	virtual void resizeEvent( QResizeEvent * _me );
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _me );
+	virtual void resizeEvent( QResizeEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
 
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );

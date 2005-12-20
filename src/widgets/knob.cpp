@@ -73,6 +73,7 @@
 #include "mixer.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "string_pair_drag.h"
 
 
 
@@ -111,6 +112,8 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	{
 		s_textFloat = new textFloat( this );
 	}
+
+	setAcceptDrops( TRUE );
 
 #ifdef QT4
 	setAccessibleName( _name );
@@ -294,14 +297,6 @@ void knob::rangeChange()
 
 
 
-void knob::resizeEvent( QResizeEvent * )
-{
-	layoutKnob( FALSE );
-}
-
-
-
-
 // Recalculate the slider's geometry and layout based on
 // the current rect and fonts.
 void knob::layoutKnob( bool _update_geometry )
@@ -313,40 +308,6 @@ void knob::layoutKnob( bool _update_geometry )
 	}
 }
 
-
-
-
-void knob::paintEvent( QPaintEvent * _me )
-{
-	QRect ur = _me->rect();
-#ifndef QT4
-	if( ur.isValid() )
-	{
-#endif
-#ifdef QT4
-		QPainter p( this );
-#else
-		QPixmap pix( ur.size() );
-		pix.fill( this, ur.topLeft() );
-		QPainter p( &pix, this );
-#endif
-		p.translate( -ur.x(), -ur.y() );
-		drawKnob( &p );
-		if( m_label != "" )
-		{
-			p.setFont( pointSize<6>( p.font() ) );
-			p.setPen( QColor( 255, 255, 255 ) );
-			p.drawText( width() / 2 -
-				QFontMetrics( p.font() ).width( m_label ) / 2,
-					height() - 2, m_label );
-		}
-#ifndef QT4
-		p.end();
-		bitBlt( this, ur.topLeft(), &pix );
-	}
-#endif
-
-}
 
 
 
@@ -370,10 +331,77 @@ void knob::recalcAngle( void )
 
 
 
+void knob::contextMenuEvent( QContextMenuEvent * )
+{
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
+	QMenu contextMenu( this );
+#ifdef QT4
+	contextMenu.setTitle( accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( accessibleName() ) + "</b></font>", this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+	contextMenu.addAction( embed::getIconPixmap( "reload" ),
+				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
+							m_hintTextAfterValue ),
+							this, SLOT( reset() ) );
+	contextMenu.addSeparator();
+	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
+				tr( "&Copy value (%1%2)" ).arg( value() ).arg(
+							m_hintTextAfterValue ),
+						this, SLOT( copyValue() ) );
+	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+				tr( "&Paste value (%1%2)"
+						).arg( s_copiedValue ).arg(
+							m_hintTextAfterValue ),
+				this, SLOT( pasteValue() ) );
+	contextMenu.addSeparator();
+	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
+						SLOT( connectToMidiDevice() ) );
+	contextMenu.addSeparator();
+	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
+						this, SLOT( displayHelp() ) );
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
+void knob::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	stringPairDrag::processDragEnterEvent( _dee, "float_value" );
+}
+
+
+
+
+void knob::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "float_value" )
+	{
+		setValue( value.toFloat() );
+		_de->accept();
+	}
+}
+
+
+
+
 //! Mouse press event handler
 void knob::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton )
+	if( _me->button() == Qt::LeftButton &&
+				lmmsMainWin::inst()->isCtrlPressed() == FALSE )
 	{
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -398,6 +426,12 @@ void knob::mousePressEvent( QMouseEvent * _me )
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = TRUE;
+	}
+	else if( _me->button() == Qt::LeftButton &&
+					lmmsMainWin::isCtrlPressed() == TRUE )
+	{
+		new stringPairDrag( "float_value", QString::number( value() ),
+							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
@@ -458,6 +492,49 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 void knob::mouseDoubleClickEvent( QMouseEvent * )
 {
 	enterValue();
+}
+
+
+
+
+void knob::paintEvent( QPaintEvent * _me )
+{
+	QRect ur = _me->rect();
+#ifndef QT4
+	if( ur.isValid() )
+	{
+#endif
+#ifdef QT4
+		QPainter p( this );
+#else
+		QPixmap pix( ur.size() );
+		pix.fill( this, ur.topLeft() );
+		QPainter p( &pix, this );
+#endif
+		p.translate( -ur.x(), -ur.y() );
+		drawKnob( &p );
+		if( m_label != "" )
+		{
+			p.setFont( pointSize<6>( p.font() ) );
+			p.setPen( QColor( 255, 255, 255 ) );
+			p.drawText( width() / 2 -
+				QFontMetrics( p.font() ).width( m_label ) / 2,
+					height() - 2, m_label );
+		}
+#ifndef QT4
+		p.end();
+		bitBlt( this, ur.topLeft(), &pix );
+	}
+#endif
+
+}
+
+
+
+
+void knob::resizeEvent( QResizeEvent * )
+{
+	layoutKnob( FALSE );
 }
 
 
@@ -662,50 +739,6 @@ void knob::setStep( float _vstep )
 	{
 		m_step = newStep;
 	}
-}
-
-
-
-
-void knob::contextMenuEvent( QContextMenuEvent * )
-{
-	// for the case, the user clicked right while pressing left mouse-
-	// button, the context-menu appears while mouse-cursor is still hidden
-	// and it isn't shown again until user does something which causes
-	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( NULL );
-
-	QMenu contextMenu( this );
-#ifdef QT4
-	contextMenu.setTitle( accessibleName() );
-#else
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
-	contextMenu.addAction( embed::getIconPixmap( "reload" ),
-				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
-							m_hintTextAfterValue ),
-							this, SLOT( reset() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-				tr( "&Copy value (%1%2)" ).arg( value() ).arg(
-							m_hintTextAfterValue ),
-						this, SLOT( copyValue() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-				tr( "&Paste value (%1%2)"
-						).arg( s_copiedValue ).arg(
-							m_hintTextAfterValue ),
-				this, SLOT( pasteValue() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
-						SLOT( connectToMidiDevice() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
-	contextMenu.exec( QCursor::pos() );
 }
 
 

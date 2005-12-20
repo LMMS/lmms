@@ -5,7 +5,6 @@ to be done as soon as possible:
 - add note-len- and note-alignment-selectbox to piano-roll
 - fix audio/midi-settings stuff/translation
 - tooltips for controls in MIDI-tab
-- dnd: knob-values
 - DSSI-support
 - save/load parameters of VST-plugin
 - somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar

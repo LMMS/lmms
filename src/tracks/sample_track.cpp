@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QPainter>
 #include <Qt/QtXml>
+#include <QDropEvent>
 
 #else
 
