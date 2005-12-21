@@ -1,3 +1,21 @@
+2005-12-20	Danny McRae	<khjklujn/at/yahoo.com>
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	be able to change volume of step in bb-editor via mouse wheel and
+	change color of step-button accordingly
+
+2005-12-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/lib/sample_buffer.cpp:
+	first implementation of FLAC-encoding/decoding for compressing buffers
+	before encoding them to base64 which results in smaller XML-files -
+	currently disabled as it's still buggy and unusable
+
+	* src/lib/buffer_allocator.cpp:
+	in cleanup-method use list instead of vector for pool of buffers to be
+	removed - fixes crash with Qt4
+
 2005-12-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/widgets/knob.cpp:
@@ -717,7 +735,7 @@
 	* src/soundgenerators/*.cpp:
 	removed obsolete defaultSettings()-method from each soundgenerator
 
-2005-10-13	Dany McRae	<khjklujn@yahoo.com>
+2005-10-13	Danny McRae	<khjklujn/at/yahoo.com>
 
 	* include/ladspa_manager.h
 	* include/ladspa_sine_1063.h
@@ -725,7 +743,7 @@
 	* src/soundgenerators/ladspa_sine_1063.cpp:
 	added LADSPA-support and a simple soundgenerator for testing-purposes
 
-2005-10-12	Dany McRae	<khjklujn@yahoo.com>
+2005-10-12	Danny McRae	<khjklujn/at/yahoo.com>
 
 	* Makefile.am:
 	* include/led_checkbox.h:
@@ -734,7 +752,7 @@
 	inherit ledCheckBox from QWidget instead of QCheckBox since it sometimes
 	caused graphic-errors when running on KDE with Baghira-style...
 
-2005-10-05	Dany McRae	<khjklujn@yahoo.com>
+2005-10-05	Danny McRae	<khjklujn/at/yahoo.com>
 
 	* resources/note_double_whole.png:
 	* resources/note_eighth.png:
@@ -1113,7 +1131,7 @@
 	tell config-manager to save it's config-file when setupDialog is
 	destroyed
 
-2005-09-13	Stephane Thomas <sthomas@nerim.net>
+2005-09-13	Stephane Thomas <sthomas/at/nerim.net>
 
 	* locale/fr.ts:
 	added French translation
@@ -1231,7 +1249,7 @@
 	- use macro AS_HELP_STRING for formatting help-strings
 	- removed --with-latency option as it is not needed anymore
 
-2005-09-06	Alireza	<dr.alireza@gmail.com>
+2005-09-06	Alireza	<dr.alireza/at/gmail.com>
 
 	* resources/ir.ts:
 	added Persian translation
@@ -1279,8 +1297,8 @@
 	added value() and setValue()-method which offers all components of LMMS
 	an easy way for loading/saving their settings at startup/exit
 
-2005-09-02	Mario Izquierdo <mariodebian@gmail.com>
-2005-09-02	Johnny Saenz <saenzac@hotmail.com>
+2005-09-02	Mario Izquierdo <mariodebian/at/gmail.com>
+2005-09-02	Johnny Saenz <saenzac/at/hotmail.com>
 
 	* resources/es.ts:
 	added Spanish translation
@@ -1531,7 +1549,7 @@
 	* src/core/track.cpp:
 	removed unsused method setTrackWidgetHeight( int )
 
-2005-07-26	Pedro Lopez-Cabanillas <pedro.lopez.cabanillas@gmail.com>
+2005-07-26	Pedro Lopez-Cabanillas <pedro.lopez.cabanillas/at/gmail.com>
 
 	* src/core/browser.cpp:
 	* src/core/config_mgr.cpp:
@@ -1574,7 +1592,7 @@
 	  max-value after starting up LMMS
 	- go to start of pattern when pressing home-key
  
-2005-07-23	Alexey Kouznetsov <alexey.kouznetsov@gmail.com>
+2005-07-23	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
 
 	* resources/ru.ts:
 	added Russian translation

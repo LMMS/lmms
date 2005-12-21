@@ -97,11 +97,7 @@ const int BUFFER_ALIGN_MASK = BUFFER_ALIGN - 1;
 void bufferAllocator::cleanUp( Uint16 _level )
 {
 	// first insert all unused bufs into an array
-#if QT_VERSION >= 0x030100
-	vvector<bufDesc> bufsToRemove;
-#else
 	vlist<bufDesc> bufsToRemove;
-#endif
 	for( bufIt it = s_buffers.begin(); it != s_buffers.end(); ++it )
 	{
 		if( ( *it ).free )
@@ -114,11 +110,10 @@ void bufferAllocator::cleanUp( Uint16 _level )
 	// ( operator<(...) compares bufDesc::timesUsed )
 	qSort( bufsToRemove );
 
-	const Uint16 todo = tMin<Uint16>( s_buffers.size() - _level,
+	const Sint16 todo = tMin<Sint16>( s_buffers.size() - _level,
 						bufsToRemove.size() );
-
 	// now cleanup the first n elements of sorted array
-	for( Uint16 i = 0; i < todo ; ++i )
+	for( Sint16 i = 0; i < todo; ++i )
 	{
 		delete[] bufsToRemove[i].origPtr;
 		s_buffers.erase( qFind( s_buffers.begin(), s_buffers.end(),

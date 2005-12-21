@@ -180,6 +180,7 @@ protected:
 	virtual void constructContextMenu( QMenu * );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void wheelEvent( QWheelEvent * _we );
 	virtual void paintEvent( QPaintEvent * _pe );
 
 	void ensureBeatNotes( void );
@@ -189,6 +190,7 @@ protected:
 private:
 	static QPixmap * s_patternBg;
 	static QPixmap * s_stepBtnOn;
+	static QPixmap * s_stepBtnOverlay;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 	static QPixmap * s_frozen;

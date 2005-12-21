@@ -70,6 +70,7 @@
 
 QPixmap * pattern::s_patternBg = NULL;
 QPixmap * pattern::s_stepBtnOn = NULL;
+QPixmap * pattern::s_stepBtnOverlay = NULL;
 QPixmap * pattern::s_stepBtnOff = NULL;
 QPixmap * pattern::s_stepBtnOffLight = NULL;
 QPixmap * pattern::s_frozen = NULL;
@@ -148,7 +149,12 @@ void pattern::init( void )
 	if( s_stepBtnOn == NULL )
 	{
 		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
-							"step_btn_on" ) );
+							"step_btn_on_100" ) );
+	}
+	if( s_stepBtnOverlay == NULL )
+	{
+		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
+						"step_btn_on_yellow" ) );
 	}
 	if( s_stepBtnOff == NULL )
 	{
@@ -178,7 +184,8 @@ void pattern::init( void )
 	setAutoResizeEnabled( FALSE );
 
 	toolTip::add( this,
-		tr( "double-click to open this pattern in piano-roll" ) );
+		tr( "double-click to open this pattern in piano-roll\n"
+			"use mouse wheel to set volume" ) );
 }
 
 
@@ -744,7 +751,7 @@ void pattern::mouseDoubleClickEvent( QMouseEvent * _me )
 		!( m_patternType == pattern::BEAT_PATTERN &&
 		( pixelsPerTact() >= 192 ||
 		  			m_steps != DEFAULT_STEPS_PER_TACT ) &&
-		_me->y() > height() - s_stepBtnOn->height() ) )
+		_me->y() > height() - s_stepBtnOff->height() ) )
 	{
 		openInPianoRoll();
 	} 
@@ -757,17 +764,17 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 {
 /*	if( _me->button() != Qt::LeftButton )
 	{
-		return;
-	}*/
+	return;
+}*/
 
 	if( _me->button() == Qt::LeftButton &&
-		m_patternType == pattern::BEAT_PATTERN &&
-		( pixelsPerTact() >= 192 ||
-		  			m_steps != DEFAULT_STEPS_PER_TACT ) &&
-		_me->y() > height() - s_stepBtnOn->height() )
+		   m_patternType == pattern::BEAT_PATTERN &&
+		   ( pixelsPerTact() >= 192 ||
+		   m_steps != DEFAULT_STEPS_PER_TACT ) &&
+		   _me->y() > height() - s_stepBtnOff->height() )
 	{
 		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
-					length() / BEATS_PER_TACT / width();
+				length() / BEATS_PER_TACT / width();
 		if( step >= m_steps )
 		{
 			return;
@@ -785,16 +792,68 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 		update();
 	}
 	else if( m_frozenPattern != NULL && _me->button() == Qt::LeftButton &&
-					lmmsMainWin::isShiftPressed() == TRUE )
+			lmmsMainWin::isShiftPressed() == TRUE )
 	{
 		new stringPairDrag( "sampledata",
-					m_frozenPattern->toBase64(),
-					embed::getIconPixmap( "freeze" ),
-									this );
+				    m_frozenPattern->toBase64(),
+				    embed::getIconPixmap( "freeze" ),
+				    this );
 	}
 	else
 	{
 		trackContentObject::mousePressEvent( _me );
+	}
+}
+
+
+
+
+void pattern::wheelEvent( QWheelEvent * _we )
+{
+/*	if( _me->button() != Qt::LeftButton )
+	{
+	return;
+}*/
+
+	if( m_patternType == pattern::BEAT_PATTERN &&
+		   ( pixelsPerTact() >= 192 ||
+		   m_steps != DEFAULT_STEPS_PER_TACT ) &&
+		   _we->y() > height() - s_stepBtnOff->height() )
+	{
+		int step = ( _we->x() - TCO_BORDER_WIDTH ) *
+				length() / BEATS_PER_TACT / width();
+		if( step >= m_steps )
+		{
+			return;
+		}
+		note * n = m_notes[step];
+		Uint8 vol = n->getVolume();
+		
+		if( n->length() == 0 && _we->delta() > 0 )
+		{
+			n->setLength( -64 );
+			n->setVolume( 5 );
+		}
+		else if( _we->delta() > 0 )
+		{
+			if( vol < 95 )
+			{
+				n->setVolume( vol + 5 );
+			}
+		}
+		else
+		{
+			if( vol > 5 )
+			{
+				n->setVolume( vol - 5 );
+			}
+			else
+			{
+				n->setLength( 0 );
+			}
+		}
+		songEditor::inst()->setModified();
+		update();
 	}
 }
 
@@ -909,14 +968,20 @@ void pattern::paintEvent( QPaintEvent * )
 			( ppt >= 192 || m_steps != DEFAULT_STEPS_PER_TACT ) )
 	{
 		QPixmap stepon;
+		QPixmap stepoverlay;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		int steps = length() / BEATS_PER_TACT;
+		
 #ifdef QT4
 		stepon = s_stepBtnOn->scaled( width() / steps,
-						s_stepBtnOn->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
+					      s_stepBtnOn->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepoverlay = s_stepBtnOverlay->scaled( width() / steps,
+					      s_stepBtnOn->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
 		stepoff = s_stepBtnOff->scaled( width() / steps,
 						s_stepBtnOff->height(),
 						Qt::IgnoreAspectRatio,
@@ -926,8 +991,12 @@ void pattern::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 #else
-		stepon.convertFromImage( s_stepBtnOn->convertToImage().scale(
+		stepon.convertFromImage( 
+				s_stepBtnOn->convertToImage().scale(
 				width() / steps, s_stepBtnOn->height() ) );
+		stepoverlay.convertFromImage( 
+				s_stepBtnOverlay->convertToImage().scale(
+				width() / steps, s_stepBtnOverlay->height() ) );
 		stepoff.convertFromImage( s_stepBtnOff->convertToImage().scale(
 				width() / steps, s_stepBtnOff->height() ) );
 		stepoffl.convertFromImage( s_stepBtnOffLight->convertToImage().
@@ -940,10 +1009,21 @@ void pattern::paintEvent( QPaintEvent * )
 			Sint16 no = it - m_notes.begin();
 			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
 							width() / steps );
-			Sint16 y = height() - s_stepBtnOn->height() - 1;
+			Sint16 y = height() - s_stepBtnOff->height() - 1;
+			
+			Uint8 vol = ( *it )->getVolume();
+			
 			if( ( *it )->length() < 0 )
 			{
-				p.drawPixmap( x, y, stepon );
+				for( int i = 0; i < vol / 5 + 1; ++i )
+				{
+					p.drawPixmap( x, y, stepon );
+				}
+				for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
+									++i )
+				{
+					p.drawPixmap( x, y, stepoverlay );
+				}
 			}
 			else if( ( no / BEATS_PER_TACT ) % 2 )
 			{
