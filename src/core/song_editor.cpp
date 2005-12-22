@@ -1540,7 +1540,7 @@ bool songEditor::saveProject( void )
 	else
 	{
 		textFloat::displayMessage( tr( "Project NOT saved." ),
-				tr( "The project %1 could not be saved!" ).arg(
+				tr( "The project %1 was not saved!" ).arg(
 							m_fileName ),
 				embed::getIconPixmap( "error" ), 4000 );
 		return( FALSE );

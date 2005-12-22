@@ -26,6 +26,11 @@
 #ifndef _TAB_WIDGET_H
 #define _TAB_WIDGET_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -51,17 +56,10 @@ public:
 	tabWidget( const QString & _caption, QWidget * _parent );
 	~tabWidget();
 
-	void addTab( QWidget * _w, const QString & _name, int _idx = -1 );
+	void FASTCALL addTab( QWidget * _w, const QString & _name,
+								int _idx = -1 );
 
-	inline void setActiveTab( int _idx )
-	{
-		if( m_widgets.contains( _idx ) )
-		{
-			m_activeTab = _idx;
-			m_widgets[m_activeTab].w->raise();
-			update();
-		}
-	}
+	void FASTCALL setActiveTab( int _idx );
 
 	inline int activeTab( void ) const
 	{

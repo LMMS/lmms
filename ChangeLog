@@ -1,9 +1,29 @@
+2005-12-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/lib/sample_buffer.cpp:
+	- first try to use libsndfile instead of SDL_sound for decoding sample
+	  as SDL_sound sometimes doesn't handle samples (raw- and FLAC-files)
+	  the correct way and returns unusable data while libsndfile seems to
+	  work quite fine with these samples
+	- when using libsamplerate, use linear-interpolation per default
+	  instead of zero-order-hold-resampling which results in MUCH higher 
+	  quality when resampling as it produces much less artifacts
+
+	* src/core/file_browser.cpp:
+	classify files with extension "flac" as samples
+
+	* src/widgets/tab_widget.cpp:
+	hide all other tabs when changing active tab - neccessary for working
+	with Qt 4.1
+
 2005-12-20	Danny McRae	<khjklujn/at/yahoo.com>
 
+	* resources/step_btn_on_100.png:
+	* resources/step_btn_yellow.png:
 	* include/pattern.h:
 	* src/tracks/pattern.cpp:
-	be able to change volume of step in bb-editor via mouse wheel and
-	change color of step-button accordingly
+	make it possible to change volume of steps in bb-editor using mouse
+	wheel and which changes color of step-button accordingly
 
 2005-12-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 

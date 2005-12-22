@@ -185,7 +185,7 @@ void pattern::init( void )
 
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
-			"use mouse wheel to set volume" ) );
+			"use mouse wheel to set volume of a step" ) );
 }
 
 
@@ -810,11 +810,6 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 
 void pattern::wheelEvent( QWheelEvent * _we )
 {
-/*	if( _me->button() != Qt::LeftButton )
-	{
-	return;
-}*/
-
 	if( m_patternType == pattern::BEAT_PATTERN &&
 		   ( pixelsPerTact() >= 192 ||
 		   m_steps != DEFAULT_STEPS_PER_TACT ) &&
@@ -1015,6 +1010,7 @@ void pattern::paintEvent( QPaintEvent * )
 			
 			if( ( *it )->length() < 0 )
 			{
+				p.drawPixmap( x, y, stepoff );
 				for( int i = 0; i < vol / 5 + 1; ++i )
 				{
 					p.drawPixmap( x, y, stepon );

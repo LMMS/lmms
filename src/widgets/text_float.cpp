@@ -43,6 +43,7 @@
 
 #include "text_float.h"
 #include "gui_templates.h"
+#include "lmms_main_win.h"
 
 
 
@@ -151,6 +152,10 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 {
 #ifdef QT4
 	QWidget * mw = QApplication::activeWindow();
+	if( mw == NULL )
+	{
+		mw = lmmsMainWin::inst();
+	}
 #else
 	QWidget * mw = qApp->mainWidget();
 #endif

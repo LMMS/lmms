@@ -89,7 +89,27 @@ void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 	if( m_widgets.contains( m_activeTab ) )
 	{
 		// make sure new tab doesn't overlap current widget
+		m_widgets[m_activeTab].w->show();
 		m_widgets[m_activeTab].w->raise();
+	}
+}
+
+
+
+
+void tabWidget::setActiveTab( int _idx )
+{
+	if( m_widgets.contains( _idx ) )
+	{
+		int old_active = m_activeTab;
+		m_activeTab = _idx;
+		m_widgets[m_activeTab].w->raise();
+		m_widgets[m_activeTab].w->show();
+		if( old_active != _idx && m_widgets.contains( old_active ) )
+		{
+			m_widgets[old_active].w->hide();
+		}
+		update();
 	}
 }
 
@@ -108,8 +128,7 @@ void tabWidget::mousePressEvent( QMouseEvent * _me )
 			if( _me->x() >= cx &&
 					_me->x() <= cx + ( *it ).nwidth )
 			{
-				( *it ).w->raise();
-				m_activeTab = it.key();
+				setActiveTab( it.key() );
 				update();
 				return;
 			}

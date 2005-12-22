@@ -160,7 +160,11 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 
 void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 {
+#ifdef QT4
+	if( _me->buttons() & Qt::LeftButton )
+#else
 	if( _me->modifiers() == Qt::LeftButton )
+#endif
 	{
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )

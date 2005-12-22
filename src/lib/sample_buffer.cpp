@@ -144,7 +144,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, Uint32 _frames ) :
 	m_dataMutex()
 {
 	m_origData = new sampleFrame[_frames];
-	memcpy( m_origData, _data, _frames*BYTES_PER_FRAME );
+	memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 	m_origFrames = _frames;
 #ifdef SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
@@ -225,16 +225,16 @@ void sampleBuffer::update( bool _keep_settings )
 		Sint16 * buf = NULL;
 		Uint8 channels;
 
-#ifdef SDL_SDL_SOUND_H
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleSDL( f, buf, channels );
-		}
-#endif
 #ifdef HAVE_SNDFILE_H
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleSF( f, buf, channels );
+		}
+#endif
+#ifdef SDL_SDL_SOUND_H
+		if( m_frames == 0 )
+		{
+			m_frames = decodeSampleSDL( f, buf, channels );
 		}
 #endif
 #ifdef HAVE_VORBIS_VORBISFILE_H
@@ -338,7 +338,7 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 
 	Sound_Sample * snd_sample = Sound_NewSampleFromFile( _f,
 						&STD_AUDIO_INFO, 16384 );
-	// file not found?
+	// file found?
 	if( snd_sample != NULL )
 	{
 		// let SDL_sound decode our file to requested format
@@ -561,12 +561,10 @@ SRC_STATE * sampleBuffer::createResamplingContext( void )
 {
 	int error;
 	SRC_STATE * state;
-	if( ( state = src_new(
-#ifdef HQ_SINC
-					SRC_SINC_MEDIUM_QUALITY,
-#else
-					SRC_ZERO_ORDER_HOLD,
-#endif
+	if( ( state = src_new(/*
+		( mixer::inst()->highQuality() == TRUE ) ?
+					SRC_SINC_FASTEST :*/
+					SRC_LINEAR,
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 	{
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
@@ -598,7 +596,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 		return( FALSE );
 	}
 
-	const float freq_factor = 1.0f / (BASE_FREQ / _freq);
+	const double freq_factor = (double) _freq / (double) BASE_FREQ;
 	const Sint16 freq_diff = static_cast<Sint16>( BASE_FREQ - _freq );
 
 	Uint32 frames_to_process = _frames;
@@ -635,11 +633,21 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	{
 		frames_to_process = frames_for_loop;
 	}
-
+	const Uint32 f1 = static_cast<Uint32>( play_frame * freq_factor );
+/*	Uint32 f2 = 0;
+	while( f2 < f1 )
+	{
+		f2 += frames_to_process * freq_factor;
+	}
+	if( f2 > f1 && f2 >= frames_to_process )
+	{
+		f2 -= frames_to_process * freq_factor;
+	}*/
+//	static int foo = 0;
 	// calc pointer of first frame
-	sampleFrame * start_frame = (sampleFrame *) m_data +
-					static_cast<Uint32>( play_frame *
-								freq_factor );
+	sampleFrame * start_frame = (sampleFrame *) m_data + f1;
+	//printf("diff:%d %f  %d f2: %d  input: %d\n", f2 -foo, play_frame * freq_factor, static_cast<Uint32>( play_frame * freq_factor ), f2, (Uint32)( frames_for_loop * freq_factor ) );
+//	foo = f2;
 	sampleFrame * loop_start = start_frame;
 
 	// check whether we have to change pitch...
@@ -670,7 +678,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 #else
 		Uint32 src_frame_base = 0;
 		// check whether we're in high-quality-mode
-		if( mixer::inst()->highQuality() )
+		if( mixer::inst()->highQuality() == TRUE )
 		{
 			// we are, so let's use cubic interpolation...
 			for( Uint32 frame = 0; frame < frames_to_process;
