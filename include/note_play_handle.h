@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,9 +46,9 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
-					Uint32 _frames, note * n,
-					bool _arp_note = FALSE ) FASTCALL;
+	notePlayHandle( channelTrack * _chnl_trk, const Uint32 _frames_ahead,
+					const Uint32 _frames, note * _n,
+					const bool _arp_note = FALSE ) FASTCALL;
 	~notePlayHandle();
 
 

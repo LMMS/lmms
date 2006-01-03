@@ -16,49 +16,12 @@ inline T readValue( int _fd = 0 )
 
 
 
+
 template<typename T>
 inline void writeValue( const T & _i, int _fd = 1 )
 {
 	write( _fd, &_i, sizeof( _i ) );
 }
-
-
-enum vstRemoteCommands
-{
-	// client -> server
-	LOAD_VST_PLUGIN = 0,
-	CLOSE_VST_PLUGIN,
-	PROCESS = 10,
-	ENQUEUE_MIDI_EVENT = 11,
-	SET_SAMPLE_RATE = 20,
-	SET_BUFFER_SIZE,
-	GET_SHM_KEY_AND_SIZE,
-	GET_VST_VERSION = 30,
-	GET_NAME,
-	GET_VENDOR_STRING,
-	GET_PRODUCT_STRING,
-
-	// server -> client
-	SET_SHM_KEY_AND_SIZE = 100,
-	SET_INPUT_COUNT,
-	SET_OUTPUT_COUNT,
-	SET_XID,
-	INITIALIZATION_DONE,
-	FAILED_LOADING_PLUGIN,
-	QUIT_ACK,
-	GET_SAMPLE_RATE = 110,
-	GET_BUFFER_SIZE,
-	GET_BPM,
-	SET_VST_VERSION,
-	SET_NAME,
-	SET_VENDOR_STRING,
-	SET_PRODUCT_STRING,
-	PROCESS_DONE = 120,
-
-	DEBUG_MSG = 200,
-	UNDEFINED_CMD
-
-} ;
 
 
 
@@ -82,6 +45,75 @@ static inline void writeString( const char * _str, int _fd = 1 )
 	writeValue<Sint16>( len, _fd );
 	write( _fd, _str, len );
 }
+
+
+
+
+struct vstParameterDumpItem
+{
+	Sint32 index;
+	char shortLabel[8];
+	float value;
+} ;
+
+
+
+
+// summarized version of VstParameterProperties-struct - useful because client
+// doesn't have to know about the latter one
+struct vstParamProperties
+{
+	char label[64];
+	char shortLabel[8];
+	char categoryLabel[24];
+	float minValue;
+	float maxValue;
+	float step;
+	Sint16 category;
+} ;
+
+
+enum vstRemoteCommands
+{
+	// client -> server
+	VST_LOAD_PLUGIN = 0,
+	VST_CLOSE_PLUGIN,
+	VST_SHOW_EDITOR,
+	VST_PROCESS,
+	VST_ENQUEUE_MIDI_EVENT,
+	VST_SAMPLE_RATE,
+	VST_BUFFER_SIZE,
+	VST_BPM,
+	VST_GET_PARAMETER_COUNT = 20,
+	VST_GET_PARAMETER_DUMP,
+	VST_SET_PARAMETER_DUMP,
+	VST_GET_PARAMETER_PROPERTIES,
+
+	// server -> client
+	VST_INITIALIZATION_DONE = 100,
+	VST_FAILED_LOADING_PLUGIN,
+	VST_QUIT_ACK,
+	VST_SHM_KEY_AND_SIZE,
+	VST_INPUT_COUNT,
+	VST_OUTPUT_COUNT,
+	VST_PLUGIN_XID,
+	VST_PROCESS_DONE,
+	VST_PLUGIN_NAME,
+	VST_PLUGIN_VERSION,
+	VST_PLUGIN_VENDOR_STRING,
+	VST_PLUGIN_PRODUCT_STRING,
+	VST_PARAMETER_COUNT,
+	VST_PARAMETER_DUMP,
+	VST_PARAMETER_PROPERTIES,
+	VST_GET_SAMPLE_RATE = 120,
+	VST_GET_BUFFER_SIZE,
+
+	VST_DEBUG_MSG = 200,
+	VST_UNDEFINED_CMD
+
+} ;
+
+
 
 
 #endif

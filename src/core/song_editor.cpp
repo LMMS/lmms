@@ -1269,8 +1269,11 @@ void songEditor::addSampleTrack( void )
 
 float songEditor::framesPerTact( void ) const
 {
+	// when fooling around with tempo while playing, we sometimes get
+	// 0 here which leads to FP-exception, so handle it separately
+	const int bpm = tMax( 1, m_bpmSpinBox->value() );
 	return( mixer::inst()->sampleRate() * 60.0f * BEATS_PER_TACT /
-			m_bpmSpinBox->value() );
+								bpm );
 }
 
 
@@ -1348,7 +1351,7 @@ void songEditor::clearProject( void )
 
 	// make sure all running notes are cleared, otherwise the whole
 	// thing will end up in a SIGSEGV...
-	//mixer::inst()->clear();
+	mixer::inst()->clear( TRUE );
 	while( mixer::inst()->haveNoRunningNotes() == FALSE )
 	{
 #ifdef QT4
@@ -1508,17 +1511,15 @@ bool songEditor::saveProject( void )
 	multimediaProject mmp( multimediaProject::SONG_PROJECT );
 
 	QDomElement bpm = mmp.createElement( "bpm" );
-	bpm.setAttribute( "value", QString::number( m_bpmSpinBox->value() ) );
+	bpm.setAttribute( "value", m_bpmSpinBox->value() );
 	mmp.head().appendChild( bpm );
 
 	QDomElement mv = mmp.createElement( "mastervol" );
-	mv.setAttribute( "value", QString::number( 200 -
-					m_masterVolumeSlider->value() ) );
+	mv.setAttribute( "value", 200 - m_masterVolumeSlider->value() );
 	mmp.head().appendChild( mv );
 
 	QDomElement mp = mmp.createElement( "masterpitch" );
-	mp.setAttribute( "value", QString::number(
-					m_masterPitchSlider->value() ) );
+	mp.setAttribute( "value", m_masterPitchSlider->value() );
 	mmp.head().appendChild( mp );
 
 

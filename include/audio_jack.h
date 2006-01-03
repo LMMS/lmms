@@ -72,7 +72,7 @@ public:
 
 	inline static QString name( void )
 	{
-		return( setupWidget::tr( "JACK (Jack Audio Connection Kit)" ) );
+		return( setupWidget::tr( "JACK (JACK Audio Connection Kit)" ) );
 	}
 
 

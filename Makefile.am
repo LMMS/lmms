@@ -52,6 +52,7 @@ lmms_MOC =						\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
+		./fade_button.moc			\
 		./file_browser.moc			\
 		./group_box.moc				\
 		./kmultitabbar.moc			\
@@ -84,6 +85,7 @@ lmms_MOC =						\
 		./tab_widget.moc			\
 		./tempo_sync_knob.moc			\
 		./timeline.moc				\
+		./tool_button.moc			\
 		./track_container.moc			\
 		./track.moc				\
 		./visualization_widget.moc
@@ -158,6 +160,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
+		$(srcdir)/src/widgets/fade_button.cpp			\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
@@ -276,6 +279,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/tool_button.h				\
 		$(srcdir)/include/cpuload_widget.h			\
 		$(srcdir)/include/midi_alsa_seq.h			\
+		$(srcdir)/include/micro_timer.h				\
+		$(srcdir)/include/fade_button.h				\
 		$(srcdir)/include/qxembed.h
 
 

@@ -2,7 +2,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        play-engine
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,10 +34,14 @@
 #include "song_editor.h"
 
 
-notePlayHandle::notePlayHandle( channelTrack * _chnl_trk, Uint32 _frames_ahead,
-				Uint32 _frames, note * n, bool _arp_note ) :
-	playHandle(),
-	note( *n ),
+
+notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
+						const Uint32 _frames_ahead,
+						const Uint32 _frames,
+						note * _n,
+						const bool _arp_note ) :
+	playHandle( NOTE_PLAY_HANDLE ),
+	note( *_n ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_channelTrack( _chnl_trk ),
@@ -201,6 +205,13 @@ void notePlayHandle::checkValidity( void )
 	if( m_channelTrack != NULL &&
 				m_channelTrack->type() == track::NULL_TRACK )
 	{
+		// track-type being track::NULL_TRACK indicates a track whose
+		// removal is in progress, so we have to invalidate ourself
+		if( m_released == FALSE )
+		{
+			noteOff( 0 );
+		}
+		m_channelTrack->deleteNotePluginData( this );
 		m_channelTrack = NULL;
 	}
 	// sub-notes might not be registered at mixer (for example arpeggio-

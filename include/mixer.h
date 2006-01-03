@@ -242,7 +242,7 @@ public:
 	}
 
 
-	void clear( void );
+	void FASTCALL clear( bool _everything = FALSE );
 
 
 	void FASTCALL clearAudioBuffer( sampleFrame * _ab, Uint32 _frames );

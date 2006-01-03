@@ -1,7 +1,7 @@
 /*
  * plugin.h - class plugin, the base-class and generic interface for all plugins
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -85,21 +85,25 @@ public:
 	} ;
 
 	// contructor of a plugin
-	//	_name: public name of plugin
-	//	_type: one of the plugin-types defined above
-	plugin( const QString & _public_name, pluginTypes _type );
+	plugin( const descriptor * _descriptor );
 	virtual ~plugin();
 
-	// returns the name, the plugin passed to plugin-constructor
-	inline const QString & publicName( void ) const
+	// returns public-name out of descriptor
+	inline QString publicName( void ) const
 	{
-		return( m_publicName );
+		return( m_descriptor->public_name );
 	}
 
-	// return type
+	// return plugin-type
 	inline pluginTypes type( void ) const
 	{
-		return( m_type );
+		return( m_descriptor->type );
+	}
+
+	// return plugin-descriptor for further information
+	inline const descriptor * getDescriptor( void ) const
+	{
+		return( m_descriptor );
 	}
 
 	// plugins can overload this for making other classes able to change
@@ -122,8 +126,7 @@ public:
 					vvector<descriptor> & _plugin_descs );
 
 private:
-	const QString m_publicName;
-	const pluginTypes m_type;
+	const descriptor * m_descriptor;
 
 	// pointer to instantiation-function in plugin
 	typedef plugin * ( * instantiationHook )( void * );

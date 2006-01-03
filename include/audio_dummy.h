@@ -27,19 +27,22 @@
 #define _AUDIO_DUMMY_H
 
 #include "audio_device.h"
+#include "micro_timer.h"
 
 
-class audioDummy : public audioDevice
+class audioDummy : public audioDevice, public QThread
 {
 public:
 	audioDummy( Uint32 _sample_rate, bool & _success_ful ) :
-		audioDevice( _sample_rate, DEFAULT_CHANNELS )
+		audioDevice( _sample_rate, DEFAULT_CHANNELS ),
+		m_quit( FALSE )
 	{
 		_success_ful = TRUE;
 	}
 
 	virtual ~audioDummy()
 	{
+		stopProcessing();
 	}
 
 	inline static QString name( void )
@@ -68,8 +71,43 @@ public:
 
 
 private:
-	// TODO: derive from QThread and call getNextBuffer() in an
-	// endless loop
+	virtual void startProcessing( void )
+	{
+		start();
+	}
+
+	virtual void stopProcessing( void )
+	{
+		if( isRunning() )
+		{
+			m_quit = TRUE;
+			wait( 1000 );
+			terminate();
+		}
+	}
+
+	virtual void run( void )
+	{
+		microTimer timer;
+		while( m_quit == FALSE )
+		{
+			timer.reset();
+			processNextBuffer();
+			const Sint32 microseconds = static_cast<Sint32>(
+					mixer::inst()->framesPerAudioBuffer() *
+					1000000.0f /
+						mixer::inst()->sampleRate() -
+							timer.elapsed() );
+			if( microseconds > 0 )
+			{
+				usleep( microseconds );
+			}
+		}
+	}
+
+
+	volatile bool m_quit;
+
 } ;
 
 

@@ -397,7 +397,7 @@ void pattern::playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
 void pattern::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	QDomElement pattern_de = _doc.createElement( nodeName() );
-	pattern_de.setAttribute( "type", QString::number( m_patternType ) );
+	pattern_de.setAttribute( "type", m_patternType );
 	pattern_de.setAttribute( "name", m_name );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
@@ -405,16 +405,15 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	if( _parent.nodeName() == "clipboard" ||
 					_parent.nodeName() == "dnddata" )
 	{
-		pattern_de.setAttribute( "pos", QString::number( -1 ) );
+		pattern_de.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		pattern_de.setAttribute( "pos", QString::number(
-							startPosition() ) );
+		pattern_de.setAttribute( "pos", startPosition() );
 	}
-	pattern_de.setAttribute( "len", QString::number( length() ) );
-	pattern_de.setAttribute( "frozen", QString::number(
-						m_frozenPattern != NULL ) );
+	pattern_de.setAttribute( "len", length() );
+	pattern_de.setAttribute( "steps", m_steps );
+	pattern_de.setAttribute( "frozen", m_frozenPattern != NULL );
 	_parent.appendChild( pattern_de );
 
 	// now save settings of all notes
@@ -850,6 +849,11 @@ void pattern::wheelEvent( QWheelEvent * _we )
 		}
 		songEditor::inst()->setModified();
 		update();
+		_we->accept();
+	}
+	else
+	{
+		trackContentObject::wheelEvent( _we );
 	}
 }
 

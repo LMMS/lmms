@@ -583,31 +583,22 @@ float FASTCALL envelopeAndLFOWidget::level( Uint32 _frame,
 void envelopeAndLFOWidget::saveSettings( QDomDocument & ,
 							QDomElement & _parent )
 {
-	_parent.setAttribute( "pdel", QString::number(
-						m_predelayKnob->value() ) );
-	_parent.setAttribute( "att", QString::number( m_attackKnob->value() ) );
-	_parent.setAttribute( "hold", QString::number( m_holdKnob->value() ) );
-	_parent.setAttribute( "dec", QString::number( m_decayKnob->value() ) );
-	_parent.setAttribute( "sus", QString::number(
-						m_sustainKnob->value() ) );
-	_parent.setAttribute( "rel", QString::number(
-						m_releaseKnob->value() ) );
-	_parent.setAttribute( "amt", QString::number( m_amountKnob->value() ) );
-	_parent.setAttribute( "lshp", QString::number( m_lfoShape ) );
-	_parent.setAttribute( "lpdel", QString::number(
-						m_lfoPredelayKnob->value() ) );
-	_parent.setAttribute( "latt", QString::number(
-						m_lfoAttackKnob->value() ) );
-	_parent.setAttribute( "lspd", QString::number(
-						m_lfoSpeedKnob->value() ) );
-	_parent.setAttribute( "lamt", QString::number(
-						m_lfoAmountKnob->value() ) );
-	_parent.setAttribute( "x100", QString::number(
-						m_x100Cb->isChecked() ) );
-	_parent.setAttribute( "ctlenvamt", QString::number(
-					m_controlEnvAmountCb->isChecked() ) );
-	_parent.setAttribute( "lfosyncmode", QString::number(
-				( int ) m_lfoSpeedKnob->getSyncMode() ) );
+	_parent.setAttribute( "pdel", m_predelayKnob->value() );
+	_parent.setAttribute( "att", m_attackKnob->value() );
+	_parent.setAttribute( "hold", m_holdKnob->value() );
+	_parent.setAttribute( "dec", m_decayKnob->value() );
+	_parent.setAttribute( "sus", m_sustainKnob->value() );
+	_parent.setAttribute( "rel", m_releaseKnob->value() );
+	_parent.setAttribute( "amt", m_amountKnob->value() );
+	_parent.setAttribute( "lshp", m_lfoShape );
+	_parent.setAttribute( "lpdel", m_lfoPredelayKnob->value() );
+	_parent.setAttribute( "latt", m_lfoAttackKnob->value() );
+	_parent.setAttribute( "lspd", m_lfoSpeedKnob->value() );
+	_parent.setAttribute( "lamt", m_lfoAmountKnob->value() );
+	_parent.setAttribute( "x100", m_x100Cb->isChecked() );
+	_parent.setAttribute( "ctlenvamt", m_controlEnvAmountCb->isChecked() );
+	_parent.setAttribute( "lfosyncmode",
+					( int ) m_lfoSpeedKnob->getSyncMode() );
 	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
 }
 

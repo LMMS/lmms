@@ -43,6 +43,9 @@
 #endif
 
 
+#include <stdlib.h>
+
+
 #include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"

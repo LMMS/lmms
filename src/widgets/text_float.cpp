@@ -158,6 +158,10 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 	}
 #else
 	QWidget * mw = qApp->mainWidget();
+	if( mw == NULL )
+	{
+		mw = qApp->desktop();
+	}
 #endif
 	textFloat * tf = new textFloat( ( _parent == NULL ) ? mw : _parent );
 	if( _parent != NULL )

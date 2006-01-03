@@ -226,7 +226,7 @@ void fileBrowser::sendToActiveChannel( void )
 							"audiofileprocessor" );
 					if( afp != NULL )
 					{
-						afp->setParameter( "audiofile",
+						afp->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
 					}
 				}
@@ -265,7 +265,7 @@ void fileBrowser::openInNewChannel( trackContainer * _tc )
 		instrument * afp = ct->loadInstrument( "audiofileprocessor" );
 		if( afp != NULL )
 		{
-			afp->setParameter( "audiofile",
+			afp->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
 		}
 		ct->toggledChannelButton( TRUE );
@@ -354,7 +354,8 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 							"audiofileprocessor" );
 			if( afp != NULL )
 			{
-				afp->setParameter( "audiofile", f->fullName() );
+				afp->setParameter( "samplefile",
+								f->fullName() );
 			}
 			ct->toggledChannelButton( TRUE );
 		}

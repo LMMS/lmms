@@ -2,7 +2,7 @@
  * dummy_instrument.h - instrument used as fallback if an instrument couldn't
  *                      be loaded
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,7 @@ class dummyInstrument : public instrument
 {
 public:
 	inline dummyInstrument( channelTrack * _channel_track ) :
-		instrument( _channel_track, "Dummy instrument" )
+		instrument( _channel_track, NULL )
 	{
 	}
 

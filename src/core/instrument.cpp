@@ -28,13 +28,18 @@
 #include "dummy_instrument.h"
 
 
-instrument::instrument( channelTrack * _channel_track, const QString & _name ) :
+instrument::instrument( channelTrack * _channel_track,
+					const descriptor * _descriptor ) :
 	QWidget( _channel_track->tabWidgetParent() ),
-	plugin( _name, INSTRUMENT ),
+	plugin( _descriptor ),
 	m_channelTrack( _channel_track ),
 	m_valid( TRUE )
 {
 	setFixedSize( 250, 250 );
+	QPixmap logo;
+	logo.loadFromData( getDescriptor()->logo.data,
+						getDescriptor()->logo.size );
+	m_channelTrack->setWindowIcon( logo );
 }
 
 

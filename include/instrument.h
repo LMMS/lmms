@@ -2,7 +2,7 @@
  * instrument.h - declaration of class instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -60,7 +60,8 @@ class notePlayHandle;
 class instrument : public QWidget, public plugin
 {
 public:
-	instrument( channelTrack * _channel_track, const QString & _name );
+	instrument( channelTrack * _channel_track,
+					const descriptor * _descriptor );
 	virtual ~instrument();
 
 	// if the plugin doesn't play each note, it can create an instrument-
@@ -68,7 +69,7 @@ public:
 	// output buffer only once per mixer-period
 	virtual void play( void );
 
-	// must be overloaded by actual plugin
+	// to be overloaded by actual plugin
 	virtual void FASTCALL playNote( notePlayHandle * note_to_play );
 
 	// needed for deleting plugin-specific-data of a note - plugin has to

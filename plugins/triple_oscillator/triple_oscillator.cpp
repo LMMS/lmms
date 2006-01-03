@@ -1,7 +1,7 @@
 /*
  * triple_oscillator.cpp - powerful instrument with three oscillators
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -77,14 +77,14 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 
  
 tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
-	instrument( _channel_track,
-			tripleoscillator_plugin_descriptor.public_name ),
+	instrument( _channel_track, &tripleoscillator_plugin_descriptor ),
 	m_modulationAlgo1( oscillator::MIX ),
 	m_modulationAlgo2( oscillator::MIX )
 {
 #ifdef QT4
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 #else
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
@@ -92,7 +92,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_fm1OscBtn = new pixmapButton( this );
 	m_fm1OscBtn->move( 80, 50 );
-	m_fm1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
+	m_fm1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"fm_active" ) );
 	m_fm1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
 	m_fm1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
@@ -105,7 +106,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_am1OscBtn = new pixmapButton( this );
 	m_am1OscBtn->move( 120, 50 );
-	m_am1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
+	m_am1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"am_active" ) );
 	m_am1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
 	m_am1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
@@ -118,11 +120,12 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_mix1OscBtn = new pixmapButton( this );
 	m_mix1OscBtn->move( 160, 50 );
-	m_mix1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
+	m_mix1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"mix_active" ) );
 	m_mix1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	m_mix1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-						createHeuristicMask() ) );
+	m_mix1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+					"btn_mask" ).createHeuristicMask() ) );
 	connect( m_mix1OscBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( mix1BtnToggled( bool ) ) );
 	toolTip::add( m_mix1OscBtn, tr( "mix output of oscillator 1 & 2" ) );
@@ -133,8 +136,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 							"sync_active" ) );
 	m_sync1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	m_sync1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-						createHeuristicMask() ) );
+	m_sync1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+					"btn_mask" ).createHeuristicMask() ) );
 	connect( m_sync1OscBtn, SIGNAL( toggled( bool ) ), this, SLOT(
 						sync1BtnToggled( bool ) ) );
 	toolTip::add( m_sync1OscBtn, tr( "synchronize oscillator 1 with "
@@ -169,7 +172,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_fm2OscBtn = new pixmapButton( this );
 	m_fm2OscBtn->move( 80, 70 );
-	m_fm2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
+	m_fm2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"fm_active" ) );
 	m_fm2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
 	m_fm2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
@@ -182,8 +186,10 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_am2OscBtn = new pixmapButton( this );
 	m_am2OscBtn->move( 120, 70 );
-	m_am2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
-	m_am2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("am_inactive" ) );
+	m_am2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"am_active" ) );
+	m_am2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"am_inactive" ) );
 	m_am2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
 	connect( m_am2OscBtn, SIGNAL( toggled( bool ) ), this,
@@ -194,11 +200,12 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 	m_mix2OscBtn = new pixmapButton( this );
 	m_mix2OscBtn->move( 160, 70 );
-	m_mix2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
+	m_mix2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"mix_active" ) );
 	m_mix2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	m_mix2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-						createHeuristicMask() ) );
+	m_mix2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+					"btn_mask" ).createHeuristicMask() ) );
 	connect( m_mix2OscBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( mix2BtnToggled( bool ) ) );
 	toolTip::add( m_mix2OscBtn, tr("mix output of oscillator 2 & 3" ) );
@@ -209,8 +216,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 							"sync_active" ) );
 	m_sync2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	m_sync2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-						createHeuristicMask() ) );
+	m_sync2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+					"btn_mask" ).createHeuristicMask() ) );
 	connect( m_sync2OscBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( sync2BtnToggled( bool ) ) );
 	toolTip::add( m_sync2OscBtn, tr( "synchronize oscillator 2 with "

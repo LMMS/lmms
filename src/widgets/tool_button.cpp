@@ -48,6 +48,8 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	setFixedSize( 30, 30 );
 	setIcon( _pixmap );
 	leaveEvent( NULL );
+	connect( this, SIGNAL( toggled( bool ) ), this,
+						SLOT( toggledBool( bool ) ) );
 }
 
 
@@ -84,4 +86,19 @@ void toolButton::leaveEvent( QEvent * )
 	setPaletteBackgroundColor( m_colorStandard );
 #endif
 }
+
+
+
+
+void toolButton::toggledBool( bool _on )
+{
+	if( _on == TRUE )
+	{
+		emit( clicked() );
+	}
+}
+
+
+
+#include "tool_button.moc"
 

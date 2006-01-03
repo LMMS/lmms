@@ -1,8 +1,9 @@
 /*
  * string_pair_drag.cpp - class stringPairDrag which provides general support
- *                        for drag'n'drop of string-pairs
+ *                        for drag'n'drop of string-pairs and which is the base
+ *                        for all drag'n'drop-actions within LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,6 +26,7 @@
 
 
 #include "string_pair_drag.h"
+#include "lmms_main_win.h"
 
 #ifdef QT4
 
@@ -61,6 +63,9 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 
 stringPairDrag::~stringPairDrag()
 {
+	// during a drag, we might have lost key-press-events, so reset
+	// modifiers of main-win
+	lmmsMainWin::inst()->clearKeyModifiers();
 	// TODO: do we have to delete anything???
 }
 
@@ -81,6 +86,7 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 		_dee->acceptProposedAction();
 		return( TRUE );
 	}
+	_dee->ignore();
 	return( FALSE );
 #else
 	QString txt = _dee->encodedData( "lmms/stringpair" );

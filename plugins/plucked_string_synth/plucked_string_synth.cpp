@@ -1,7 +1,7 @@
 /*
  * plucked_string_synth.cpp - instrument which uses the Karplus-Strong-algorithm
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -70,8 +70,7 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 // add distortion
 
 pluckedStringSynth::pluckedStringSynth( channelTrack * _channel_track ) :
-	instrument( _channel_track,
-			pluckedstringsynth_plugin_descriptor.public_name )
+	instrument( _channel_track, &pluckedstringsynth_plugin_descriptor )
 {
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ) );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );

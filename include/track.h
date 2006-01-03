@@ -58,6 +58,7 @@
 
 
 class QMenu;
+class QPushButton;
 
 class pixmapButton;
 class textFloat;
@@ -66,7 +67,7 @@ class trackContainer;
 class trackContentWidget;
 class trackWidget;
 
-typedef QWidget trackOperationsWidget;
+typedef QWidget trackSettingsWidget;
 
 
 
@@ -111,12 +112,13 @@ protected:
 	virtual void constructContextMenu( QMenu * )
 	{
 	}
+
 	virtual void contextMenuEvent( QContextMenuEvent * _cme );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void leaveEvent( QEvent * _e );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 	void setAutoResizeEnabled( bool _e = FALSE );
@@ -203,19 +205,38 @@ private:
 
 
 
-class trackSettingsWidget : public QWidget
+class trackOperationsWidget : public QWidget
 {
+	Q_OBJECT
 public:
-	trackSettingsWidget( trackWidget * _parent );
-	~trackSettingsWidget();
+	trackOperationsWidget( trackWidget * _parent );
+	~trackOperationsWidget();
+
+	bool muted( void ) const;
+
+
+public slots:
+	void setMuted( bool _muted );
 
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
+
+
+private slots:
+	void cloneTrack( void );
+	void removeTrack( void );
+	void muteBtnRightClicked( void );
 
 
 private:
+	static QPixmap * s_grip;
+
 	trackWidget * m_trackWidget;
+
+	QPushButton * m_trackOps;
+	pixmapButton * m_muteBtn;
 
 } ;
 
@@ -242,6 +263,12 @@ public:
 		return( m_track );
 	}
 
+	inline const trackOperationsWidget & getTrackOperationsWidget( void )
+									const
+	{
+		return( m_trackOperationsWidget );
+	}
+
 	inline const trackSettingsWidget & getTrackSettingsWidget( void ) const
 	{
 		return( m_trackSettingsWidget );
@@ -250,6 +277,11 @@ public:
 	inline const trackContentWidget & getTrackContentWidget( void ) const
 	{
 		return( m_trackContentWidget );
+	}
+
+	inline trackOperationsWidget & getTrackOperationsWidget( void )
+	{
+		return( m_trackOperationsWidget );
 	}
 
 	inline trackSettingsWidget & getTrackSettingsWidget( void )
@@ -262,22 +294,22 @@ public:
 		return( m_trackContentWidget );
 	}
 
-	bool muted( void ) const;
-
+	bool isMovingTrack( void ) const
+	{
+		return( m_movingTrack );
+	}
+	
 
 public slots:
 	void changePosition( const midiTime & _new_pos = -1 );
-	void cloneTrack( void );
-	void removeTrack( void );
-	void moveTrackUp( void );
-	void moveTrackDown( void );
-	void setMuted( bool _muted );
-	void muteBtnRightClicked( void );
 
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
@@ -291,7 +323,8 @@ private:
 	trackSettingsWidget m_trackSettingsWidget;
 	trackContentWidget m_trackContentWidget;
 
-	pixmapButton * m_muteBtn;
+	bool m_movingTrack;
+	Sint16 m_initialMouseX;
 
 } ;
 
@@ -324,8 +357,14 @@ public:
 
 	inline bool muted( void ) const
 	{
-		return( m_trackWidget->muted() );
+		return( m_trackWidget->getTrackOperationsWidget().muted() );
 	}
+
+	inline void setMuted( bool _muted )
+	{
+		m_trackWidget->getTrackOperationsWidget().setMuted( _muted );
+	}
+
 
 	// pure virtual functions
 	virtual trackTypes type( void ) const = 0;

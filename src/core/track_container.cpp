@@ -57,6 +57,7 @@
 #include "mmp.h"
 #include "config_mgr.h"
 #include "midi_file.h"
+#include "instrument.h"
 
 
 
@@ -304,6 +305,25 @@ void trackContainer::realignTracks( bool _complete_update )
 
 
 
+const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
+{
+	int y_cnt = 0;
+	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
+					it != m_trackWidgets.end(); ++it )
+	{
+		const int y_cnt1 = y_cnt;
+		y_cnt += ( *it )->height();
+		if( _y >= y_cnt1 && _y < y_cnt )
+		{
+			return( *it );
+		}
+	}
+	return( NULL );
+}
+
+
+
+
 unsigned int trackContainer::countTracks( track::trackTypes _tt ) const
 {
 	unsigned int cnt = 0;
@@ -327,7 +347,7 @@ void trackContainer::setMutedOfAllTracks( bool _muted )
 	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{
-		( *it )->setMuted( _muted );
+		( *it )->getTrack()->setMuted( _muted );
 	}
 }
 
@@ -381,7 +401,8 @@ void trackContainer::resizeEvent( QResizeEvent * )
 void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,instrument,midifile,track_%1,track_%2" ).
+		QString( "presetfile,sampledata,samplefile,instrument,midifile,"
+					"track_%1,track_%2" ).
 						arg( track::CHANNEL_TRACK ).
 						arg( track::SAMPLE_TRACK ) );
 }
@@ -399,6 +420,16 @@ void trackContainer::dropEvent( QDropEvent * _de )
 				track::create( track::CHANNEL_TRACK,
 								this ) );
 		ct->loadInstrument( value );
+		ct->toggledChannelButton( TRUE );
+		_de->accept();
+	}
+	else if( type == "sampledata" || type == "samplefile" )
+	{
+		channelTrack * ct = dynamic_cast<channelTrack *>(
+				track::create( track::CHANNEL_TRACK,
+								this ) );
+		instrument * i = ct->loadInstrument( "audiofileprocessor" );
+		i->setParameter( type, value );
 		ct->toggledChannelButton( TRUE );
 		_de->accept();
 	}

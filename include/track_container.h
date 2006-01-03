@@ -55,28 +55,35 @@ class trackContainer : public QMainWindow, public settings
 {
 	Q_OBJECT
 public:
-	trackContainer();
+	trackContainer( void );
 	~trackContainer();
+
 	inline QWidget * containerWidget( void )
 	{
 		return( m_scrollArea );
 	}
+
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
+
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
+
 
 	inline float pixelsPerTact( void ) const
 	{
 		return( m_ppt );
 	}
+
 	inline const midiTime & currentPosition( void ) const
 	{
 		return( m_currentPosition );
 	}
+
 	virtual bool fixedTCOs( void ) const
 	{
 		return( FALSE );
 	}
+
 	unsigned int FASTCALL countTracks( track::trackTypes _tt =
 					track::TOTAL_TRACK_TYPES ) const;
 
@@ -91,6 +98,8 @@ public:
 	void FASTCALL moveTrackUp( track * _track );
 	void FASTCALL moveTrackDown( track * _track );
 	void FASTCALL realignTracks( bool _complete_update = FALSE );
+
+	const trackWidget * trackWidgetAt( const int _y ) const;
 
 
 protected:

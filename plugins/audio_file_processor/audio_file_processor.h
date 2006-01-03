@@ -2,7 +2,7 @@
  * audio_file_processor.h - declaration of class audioFileProcessor
  *                          (instrument-plugin for using audio-files)
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

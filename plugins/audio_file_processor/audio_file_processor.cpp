@@ -89,8 +89,7 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 
 
 audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
-	instrument( _channel_track,
-			audiofileprocessor_plugin_descriptor.public_name ),
+	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_sampleBuffer( "" ),
 	m_drawMethod( sampleBuffer::LINE_CONNECT )
@@ -298,6 +297,10 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 {
 	QDomElement afp_de = _doc.createElement( nodeName() );
 	afp_de.setAttribute( "src", m_sampleBuffer.audioFile() );
+	if( m_sampleBuffer.audioFile() == "" )
+	{
+		afp_de.setAttribute( "sampledata", m_sampleBuffer.toBase64() );
+	}
 	afp_de.setAttribute( "sframe", QString::number(
 						m_sampleBuffer.startFrame() /
 					(float)m_sampleBuffer.frames() ) );
@@ -317,7 +320,14 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 
 void audioFileProcessor::loadSettings( const QDomElement & _this )
 {
-	setAudioFile( _this.attribute( "src" ) );
+	if( _this.attribute( "src" ) != "" )
+	{
+		setAudioFile( _this.attribute( "src" ) );
+	}
+	else if( _this.attribute( "sampledata" ) != "" )
+	{
+		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+	}
 	setStartAndEndKnob( _this.attribute( "sframe" ).toFloat(),
 				_this.attribute( "eframe" ).toFloat() );  
 	m_reverseButton->setChecked( _this.attribute( "reversed" ).toInt() );
@@ -339,9 +349,13 @@ QString audioFileProcessor::nodeName( void ) const
 void audioFileProcessor::setParameter( const QString & _param,
 							const QString & _value )
 {
-	if( _param == "audiofile" )
+	if( _param == "samplefile" )
 	{
 		setAudioFile( _value );
+	}
+	else if( _param == "sampledata" )
+	{
+		m_sampleBuffer.loadFromBase64( _value );
 	}
 }
 

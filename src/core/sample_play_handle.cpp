@@ -36,7 +36,7 @@
 
 
 samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
-	playHandle(),
+	playHandle( SAMPLE_PLAY_HANDLE ),
 	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
 	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
@@ -49,7 +49,7 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 
 
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
-	playHandle(),
+	playHandle( SAMPLE_PLAY_HANDLE ),
 	m_sampleBuffer( _sample_buffer ),
 	m_ownSampleBuffer( FALSE ),
 	m_doneMayReturnTrue( TRUE ),

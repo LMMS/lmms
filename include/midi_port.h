@@ -81,7 +81,7 @@ public:
 		return( m_mode );
 	}
 
-	void setMode( modes _mode );
+	void FASTCALL setMode( modes _mode );
 
 	inline Sint8 inputChannel( void ) const
 	{

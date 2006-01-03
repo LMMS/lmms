@@ -46,9 +46,9 @@
 #endif
 
 
-#ifdef HAVE_STDLIB_H
+/*#ifdef HAVE_STDLIB_H*/
 #include <stdlib.h>
-#endif
+/*#endif*/
 
 
 #include "arp_and_chords_tab_widget.h"
@@ -607,37 +607,26 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement act_de = _doc.createElement( nodeName() );
-	act_de.setAttribute( "chorddisabled", QString::number(
-					!m_chordsGroupBox->isActive() ) );
+	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
 #ifdef QT4
-	act_de.setAttribute( "chord", QString::number(
-					m_chordsComboBox->currentIndex() ) );
+	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
 #else
-	act_de.setAttribute( "chord", QString::number(
-					m_chordsComboBox->currentItem() ) );
+	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
 #endif
-	act_de.setAttribute( "chordrange", QString::number(
-					m_chordRangeKnob->value() ) );
+	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
 
-	act_de.setAttribute( "arpdisabled", QString::number(
-						!m_arpGroupBox->isActive() ) );
+	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
 #ifdef QT4
-	act_de.setAttribute( "arp", QString::number(
-					m_arpComboBox->currentIndex() ) );
+	act_de.setAttribute( "arp", m_arpComboBox->currentIndex() );
 #else
-	act_de.setAttribute( "arp", QString::number(
-					m_arpComboBox->currentItem() ) );
+	act_de.setAttribute( "arp", m_arpComboBox->currentItem() );
 #endif
-	act_de.setAttribute( "arprange", QString::number(
-					m_arpRangeKnob->value() ) );
-	act_de.setAttribute( "arptime", QString::number(
-					m_arpTimeKnob->value() ) );
-	act_de.setAttribute( "arpgate", QString::number(
-					m_arpGateKnob->value() ) );
-	act_de.setAttribute( "arpdir", QString::number(
-					m_arpDirection ) );
-	act_de.setAttribute( "arpsyncmode", QString::number(
-				( int ) m_arpTimeKnob->getSyncMode() ) );
+	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
+	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
+	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
+	act_de.setAttribute( "arpdir", m_arpDirection );
+	act_de.setAttribute( "arpsyncmode",
+					( int ) m_arpTimeKnob->getSyncMode() );
 
 
 	_parent.appendChild( act_de );

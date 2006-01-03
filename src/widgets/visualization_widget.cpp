@@ -56,30 +56,23 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
-	m_enabled( FALSE )
+	m_enabled( TRUE )
 {
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
+	setFixedSize( s_background.width(), s_background.height() );
+
 
 	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
 	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
 
 	mixer::inst()->clearAudioBuffer( m_buffer, frames );
-/*	for( Uint32 frame = 0; frame < frames; ++frame )
-	{
-		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
-		{
-			m_buffer[frame][chnl] = 0.0f;
-		}
-	}*/
-
-	setFixedSize( s_background.width(), s_background.height() );
 
 
 	m_updateTimer = new QTimer( this );
 	connect( m_updateTimer, SIGNAL( timeout() ), this, SLOT( update() ) );
-	if( m_enabled )
+	if( m_enabled == TRUE )
 	{
 		m_updateTimer->start( UPDATE_TIME );
 	}
@@ -106,7 +99,7 @@ visualizationWidget::~visualizationWidget()
 void visualizationWidget::setAudioBuffer( const surroundSampleFrame * _ab,
 								Uint32 _frames )
 {
-	if( m_enabled )
+	if( m_enabled == TRUE )
 	{
 		memcpy( m_buffer, *_ab, _frames * BYTES_PER_SURROUND_FRAME);
 	}
@@ -121,13 +114,12 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 	QPainter p( this );
 #else
 	QPixmap draw_pm( rect().size() );
-	//draw_pm.fill( this, rect().topLeft() );
 
 	QPainter p( &draw_pm, this );
 #endif
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_enabled )
+	if( m_enabled == TRUE )
 	{
 		float master_output = mixer::inst()->masterGain();
 		Uint16 w = width()-4;
@@ -203,7 +195,7 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton )
 	{
 		m_enabled = !m_enabled;
-		if( m_enabled )
+		if( m_enabled == TRUE )
 		{
 			m_updateTimer->start( UPDATE_TIME );
 		}

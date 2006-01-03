@@ -1,11 +1,12 @@
 to be done as soon as possible:
 
+- debug arpeggio with certain times (TB303-arp!)
+- fix bug with recording on arpeggio-channel
 - do not skip samples because of rounding when resampling in src/lib/sample_buffer.cpp
 - MIDI-program/MIDI-mapping/process program-/channel-change-events from MIDI-files
 - do not allow to connect output-port of channel to own input-port!
 - add note-len- and note-alignment-selectbox to piano-roll
 - DSSI-support
-- save/load parameters of VST-plugin
 - somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
@@ -17,7 +18,6 @@ to be done as soon as possible:
 - solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()
 - balance env+lfo
 - autosave every 1 minute
-- audioDummy: always wait until the stuff normally would have been written (=simulate blocking IO)
 - plucked-string-synth: knob for metallic -> use noise as wave-shape
 - finish qt4-port and make LMMS usable when compiling with Qt4
 - rewrite export-project-dialog using layout-mechanism

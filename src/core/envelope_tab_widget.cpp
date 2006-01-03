@@ -493,19 +493,13 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 {
 	QDomElement etw_de = _doc.createElement( nodeName() );
 #ifdef QT4
-	etw_de.setAttribute( "ftype", QString::number(
-					m_filterComboBox->currentIndex() ) );
+	etw_de.setAttribute( "ftype", m_filterComboBox->currentIndex() );
 #else
-	etw_de.setAttribute( "ftype", QString::number(
-					m_filterComboBox->currentItem() ) );
+	etw_de.setAttribute( "ftype", m_filterComboBox->currentItem() );
 #endif
-	etw_de.setAttribute( "fcut", QString::number(
-						m_filterCutKnob->value() ) );
-	etw_de.setAttribute( "fres", QString::number(
-						m_filterResKnob->value() ) );
-	etw_de.setAttribute( "fwet", QString::number(
-						/*m_filterState->isChecked()*/
-					m_filterGroupBox->isActive() ) );
+	etw_de.setAttribute( "fcut", m_filterCutKnob->value() );
+	etw_de.setAttribute( "fres", m_filterResKnob->value() );
+	etw_de.setAttribute( "fwet", m_filterGroupBox->isActive() );
 	_parent.appendChild( etw_de );
 
 	for( int i = 0; i < TARGET_COUNT; ++i )

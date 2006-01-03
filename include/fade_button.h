@@ -1,5 +1,5 @@
 /*
- * instrument_play_handle.h - play-handle for playing an instrument
+ * fade_button.h - declaration of class fadeButton 
  *
  * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,53 +23,55 @@
  */
 
 
-#ifndef _INSTRUMENT_PLAY_HANDLE_H
-#define _INSTRUMENT_PLAY_HANDLE_H
+#ifndef _FADE_BUTTON_H
+#define _FADE_BUTTON_H 
 
-#include "play_handle.h"
-#include "instrument.h"
+#include "qt3support.h"
+
+#ifdef QT4
+
+#include <QButton>
+#include <QColor>
+
+#else
+
+#include <qbutton.h>
+#include <qcolor.h>
+
+#endif
 
 
-class instrumentPlayHandle : public playHandle
+
+class fadeButton : public QButton
 {
+	Q_OBJECT
 public:
-	inline instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( INSTRUMENT_PLAY_HANDLE ),
-		m_instrument( _instrument )
-	{
-	}
+	fadeButton( const QColor & _normal_color, const QColor &
+					_activated_color, QWidget * _parent );
 
-	inline virtual ~instrumentPlayHandle()
-	{
-	}
+	virtual ~fadeButton();
 
 
-	inline virtual void play( void )
-	{
-		if( m_instrument != NULL )
-		{
-			m_instrument->play();
-		}
-	}
+public slots:
+	void activate( void );
+	void reset( void );
 
-	inline virtual bool done( void ) const
-	{
-		return( m_instrument == NULL );
-	}
 
-	inline virtual void checkValidity( void )
-	{
-		if( m_instrument != NULL && !m_instrument->valid() )
-		{
-			m_instrument = NULL;
-		}
-	}
+protected:
+	virtual void paintEvent( QPaintEvent * _pe );
+
+
+private slots:
+	void nextState( void );
 
 
 private:
-	instrument * m_instrument;
+	float m_state;
+	QColor m_normalColor;
+	QColor m_activatedColor;
 
 } ;
 
 
 #endif
+

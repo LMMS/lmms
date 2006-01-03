@@ -1,7 +1,7 @@
 Linux MultiMedia Studio 0.1.2
 ==============================
 
-Copyright (c) 2004-2005 by Tobias Doerffel and others.
+Copyright (c) 2004-2006 by Tobias Doerffel and others.
 
 
 This program is free software; you can redistribute it and/or modify 
@@ -45,7 +45,7 @@ LMMS working on a pentium I with 60 MHz... ;-) Therefore you should have at
 least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 
 
-Required libraries are:
+Required libraries:
 
 - multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher (tested
   up to 4.1.0) with devel-files

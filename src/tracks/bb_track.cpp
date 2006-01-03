@@ -62,7 +62,6 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 								QString( "" ) ),
 	m_color( _c.isValid() ? _c : QColor( 64, 128, 255 ) )
 {
-	//setPaletteBackgroundColor( QColor( 64, 128, 255 ) );
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
@@ -79,24 +78,6 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 
 bbTCO::~bbTCO()
 {
-}
-
-
-
-
-void bbTCO::movePosition( const midiTime & _pos )
-{
-	// bb-playlist-entries are always aligned at tact-boundaries
-	trackContentObject::movePosition( midiTime( _pos.getTact(), 0 ) );
-}
-
-
-
-
-void bbTCO::changeLength( const midiTime & _length )
-{
-	// the length of a bb-playlist-entry is always a multiple of one tact
-	trackContentObject::changeLength( midiTime( _length.getTact(), 0 ) );
 }
 
 
@@ -169,7 +150,6 @@ void bbTCO::paintEvent( QPaintEvent * )
 		p.setPen( col.light( 130 - y * 60 / height() ) );
 		p.drawLine( 1, y, width() - 1, y );
 	}
-	//pm.fill( col );
 #endif
 
 	tact t = bbEditor::inst()->lengthOfBB( bbTrack::numOfBBTrack(
@@ -208,15 +188,14 @@ void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	bbtco_de.setAttribute( "name", m_name );
 	if( _parent.nodeName() == "clipboard" )
 	{
-		bbtco_de.setAttribute( "pos", QString::number( -1 ) );
+		bbtco_de.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		bbtco_de.setAttribute( "pos",
-					QString::number( startPosition() ) );
+		bbtco_de.setAttribute( "pos", startPosition() );
 	}
-	bbtco_de.setAttribute( "len", QString::number( length() ) );
-	bbtco_de.setAttribute( "color", QString::number( m_color.rgb() ) );
+	bbtco_de.setAttribute( "len", length() );
+	bbtco_de.setAttribute( "color", m_color.rgb() );
 	_parent.appendChild( bbtco_de );
 }
 

@@ -43,6 +43,7 @@
 
 class toolButton : public QToolButton
 {
+	Q_OBJECT
 public:
 	toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 			QObject * _receiver, const char * _slot,
@@ -57,7 +58,7 @@ public:
 		leaveEvent( NULL );
 	}
 
-	~toolButton();
+	virtual ~toolButton();
 
 	inline void setStandardColor( const QColor & _color )
 	{
@@ -80,6 +81,10 @@ public:
 protected:
 	virtual void enterEvent( QEvent * _ev );
 	virtual void leaveEvent( QEvent * _ev );
+
+
+private slots:
+	void toggledBool( bool _on );
 
 
 private:

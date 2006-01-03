@@ -55,9 +55,6 @@ public:
 	bbTCO( track * _track, const QColor & _c = QColor() );
 	virtual ~bbTCO();
 
-	virtual void FASTCALL movePosition( const midiTime & _pos );
-	virtual void FASTCALL changeLength( const midiTime & _length );
-
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );

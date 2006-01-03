@@ -71,7 +71,7 @@
 #include "tooltip.h"
 #include "midi.h"
 #include "tool_button.h"
-
+#include "text_float.h"
 
 extern tones whiteKeys[];	// defined in piano_widget.cpp
 
@@ -130,6 +130,8 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 pianoRoll::pianoRoll( void ) :
 	QWidget( lmmsMainWin::inst()->workspace() ),
+	m_paintPixmap(),
+	m_cursorInside( FALSE ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -522,7 +524,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 
 inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
-					Sint16 _width, bool _is_selected )
+					Sint16 _width, const bool _is_selected )
 {
 	++_x;
 	++_y;
@@ -564,38 +566,15 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 
 
 
-void pianoRoll::removeSelection( void )
+void pianoRoll::update( void )
 {
-	m_selectStartTact64th = 0;
-	m_selectedTact64th = 0;
-	m_selectStartKey = 0;
-	m_selectedKeys = 0;
-}
-
-
-
-
-void pianoRoll::closeEvent( QCloseEvent * _ce )
-{
-	QApplication::restoreOverrideCursor();
-	hide();
-	_ce->ignore ();
-}
-
-
-
-
-void pianoRoll::paintEvent( QPaintEvent * )
-{
-#ifdef QT4
-	QPainter p( this );
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( QColor( 0, 0, 0 ) );//, rect().topLeft());
-
-	QPainter p( &draw_pm, this );
-#endif
+	if( m_paintPixmap.isNull() == TRUE ||
+					m_paintPixmap.size() != rect().size() )
+	{
+		m_paintPixmap = QPixmap( rect().size() );
+	}
+	m_paintPixmap.fill( QColor( 0, 0, 0 ) );
+	QPainter p( &m_paintPixmap, this );
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -693,14 +672,6 @@ void pianoRoll::paintEvent( QPaintEvent * )
 		}
 		// draw key-line
 		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
-		if( key == m_keyMouseOver )
-		{
-			p.fillRect( WHITE_KEY_WIDTH, key_line_y -
-							KEY_LINE_HEIGHT,
-					width() - WHITE_KEY_WIDTH,
-					KEY_LINE_HEIGHT,
-					QColor( 64, 64, 64 ) );
-		}
 		++key;
 	}
 
@@ -771,22 +742,11 @@ void pianoRoll::paintEvent( QPaintEvent * )
 			QColor( 0, 0, 0 ) );
 
 
-	// draw artwork-stuff
-/*	p.drawPixmap( 0, 0, *s_artwork1 );
-
-	int artwork_x = s_artwork1->width();
-
-	while( artwork_x < width() )
-	{
-		p.drawPixmap( artwork_x, 0, *s_artwork2 );
-		artwork_x += s_artwork2->width();
-	}*/
-
-
 	// set clipping area, because we are not allowed to paint over
 	// keyboard...
-	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width()-WHITE_KEY_WIDTH,
-				height()-PR_TOP_MARGIN-PR_BOTTOM_MARGIN );
+	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+				width() - WHITE_KEY_WIDTH,
+				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN  );
 
 	// draw vertical raster
 	int tact_16th = m_currentPosition / 4;
@@ -824,7 +784,7 @@ void pianoRoll::paintEvent( QPaintEvent * )
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
 				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
-					PR_BOTTOM_MARGIN );
+							PR_BOTTOM_MARGIN );
 
 	// setup selection-vars
 	int sel_pos_start = m_selectStartTact64th;
@@ -950,96 +910,175 @@ void pianoRoll::paintEvent( QPaintEvent * )
 #else
 	m_leftRightScroll->setSteps( 1, l );
 #endif
-/*
-	// draw current edit-mode-icon below the cursor
-	switch( m_editMode )
-	{
-		case DRAW:
-			p.drawPixmap( mapFromGlobal( QCursor::pos() ),
-								*s_toolDraw );
-			break;
-		case ERASE:
-			p.drawPixmap( mapFromGlobal( QCursor::pos() ),
-								*s_toolErase );
-			break;
-		case SELECT:
-			p.drawPixmap( mapFromGlobal( QCursor::pos() ),
-								*s_toolSelect );
-			break;
-		case MOVE:
-			p.drawPixmap( mapFromGlobal( QCursor::pos() ),
-								*s_toolMove );
-			break;
-	}*/
 
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
+	QWidget::update();
 }
 
 
 
 
-// responsible for moving/resizing scrollbars after window-resizing
-void pianoRoll::resizeEvent( QResizeEvent * )
+void pianoRoll::removeSelection( void )
 {
-
-	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH, height() -
-								SCROLLBAR_SIZE,
-					width()-WHITE_KEY_WIDTH,
-							SCROLLBAR_SIZE );
-	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, PR_TOP_MARGIN,
-						SCROLLBAR_SIZE,
-						height() - PR_TOP_MARGIN -
-						SCROLLBAR_SIZE );
-
-	int total_pixels = OCTAVE_HEIGHT * OCTAVES - ( height() -
-					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
-							m_notesEditHeight );
-	m_totalKeysToScroll = total_pixels * NOTES_PER_OCTAVE / OCTAVE_HEIGHT;
-
-	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
-#ifdef QT4
-	m_topBottomScroll->setSingleStep( 1 );
-	m_topBottomScroll->setPageStep( 20 );
-#else
-	m_topBottomScroll->setSteps( 1, 20 );
-#endif
-
-	if( m_startKey > m_totalKeysToScroll )
-	{
-		m_startKey = m_totalKeysToScroll;
-	}
-	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
-
-	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
-					).m_timeLine->setFixedWidth( width() );
-	m_toolBar->setFixedWidth( width() );
+	m_selectStartTact64th = 0;
+	m_selectedTact64th = 0;
+	m_selectStartKey = 0;
+	m_selectedKeys = 0;
 }
 
 
 
 
-int pianoRoll::getKey( int _y )
+void pianoRoll::closeEvent( QCloseEvent * _ce )
 {
-	int key_line_y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
-	// pressed key on piano
-	int key_num = ( key_line_y - _y ) / KEY_LINE_HEIGHT;
-	key_num += m_startKey;
+	QApplication::restoreOverrideCursor();
+	hide();
+	_ce->ignore ();
+}
 
-	// some range-checking-stuff
-	if( key_num < 0 )
+
+
+
+void pianoRoll::enterEvent( QEvent * _e )
+{
+	m_cursorInside = TRUE;
+	QWidget::enterEvent( _e );
+}
+
+
+
+
+void pianoRoll::keyPressEvent( QKeyEvent * _ke )
+{
+	switch( _ke->key() )
 	{
-		key_num = 0;
-	}
+		case Qt::Key_Up:
+			m_topBottomScroll->setValue(
+					m_topBottomScroll->value() - 1 );
+			break;
 
-	if( key_num >= NOTES_PER_OCTAVE * OCTAVES )
+		case Qt::Key_Down:
+			m_topBottomScroll->setValue(
+					m_topBottomScroll->value() + 1 );
+			break;
+
+		case Qt::Key_Left:
+		{
+			if( ( m_timeLine->pos() -= 16 ) < 0 )
+			{
+				m_timeLine->pos().setTact( 0 );
+				m_timeLine->pos().setTact64th( 0 );
+			}
+			m_timeLine->updatePosition();
+			break;
+		}
+		case Qt::Key_Right:
+		{
+			m_timeLine->pos() += 16;
+			m_timeLine->updatePosition();
+			break;
+		}
+
+		case Qt::Key_C:
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				copySelectedNotes();
+			}
+			else
+			{
+				_ke->ignore();
+			}
+			break;
+
+		case Qt::Key_X:
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				cutSelectedNotes();
+			}
+			else
+			{
+				_ke->ignore();
+			}
+			break;
+
+		case Qt::Key_V:
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				pasteNotes();
+			}
+			else
+			{
+				_ke->ignore();
+			}
+			break;
+
+		case Qt::Key_A:
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				m_selectButton->setChecked( TRUE );
+				selectAll();
+				update();
+			}
+			else
+			{
+				_ke->ignore();
+			}
+			break;
+
+		case Qt::Key_D:
+			m_drawButton->setChecked( TRUE );
+			break;
+
+		case Qt::Key_E:
+			m_eraseButton->setChecked( TRUE );
+			break;
+
+		case Qt::Key_S:
+			m_selectButton->setChecked( TRUE );
+			break;
+
+		case Qt::Key_M:
+			m_moveButton->setChecked( TRUE );
+			break;
+
+		case Qt::Key_Delete:
+			deleteSelectedNotes();
+			break;
+
+		case Qt::Key_Space:
+			if( songEditor::inst()->playing() )
+			{
+				stop();
+			}
+			else
+			{
+				play();
+			}
+			break;
+
+		case Qt::Key_Home:
+			m_timeLine->pos().setTact( 0 );
+			m_timeLine->pos().setTact64th( 0 );
+			m_timeLine->updatePosition();
+			break;
+
+		default:
+			_ke->ignore();
+			break;
+	}
+}
+
+
+
+
+void pianoRoll::leaveEvent( QEvent * _e )
+{
+	while( QApplication::overrideCursor() != NULL )
 	{
-		key_num = NOTES_PER_OCTAVE * OCTAVES - 1;
+		QApplication::restoreOverrideCursor();
 	}
+	m_cursorInside = FALSE;
 
-	return( m_lastKey = key_num );
+	QWidget::leaveEvent( _e );
 }
 
 
@@ -1324,6 +1363,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		// but is still on the same key)
 		if( key_num != released_key &&
 			m_action != CHANGE_NOTE_VOLUME &&
+			m_action != MOVE_SELECTION &&
 			edit_note == FALSE &&
 #ifdef QT4
 			_me->buttons() &
@@ -1344,6 +1384,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				Qt::LeftButton &&
 				m_action != RESIZE_NOTE &&
 				m_action != SELECT_NOTES &&
+				m_action != MOVE_SELECTION &&
 				m_recording == FALSE &&
 				songEditor::inst()->playing() == FALSE )
 			{
@@ -1355,7 +1396,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		if( _me->x() <= WHITE_KEY_WIDTH )
 		{
-			update();
+			QWidget::update();
 			return;
 		}
 		x -= WHITE_KEY_WIDTH;
@@ -1427,7 +1468,13 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			songEditor::inst()->setModified();
 
 		}
-		else if( _me->button() == Qt::NoButton && m_editMode == DRAW )
+		else if(
+#ifdef QT4
+			_me->buttons() &
+#else
+			_me->state() ==
+#endif
+					Qt::NoButton && m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
 
@@ -1771,130 +1818,108 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		QApplication::restoreOverrideCursor();
 	}
 
-	update();
+	if(
+#ifdef QT4
+			_me->buttons() &
+#else
+			_me->state() ==
+#endif
+						Qt::NoButton )
+	{
+		QWidget::update();
+	}
+	else
+	{
+		update();
+	}
 }
 
 
 
 
-void pianoRoll::keyPressEvent( QKeyEvent * _ke )
+void pianoRoll::paintEvent( QPaintEvent * )
 {
-	switch( _ke->key() )
+#ifdef QT4
+	QPainter p( this );
+#else
+	QPixmap draw_pm( size() );
+	draw_pm.fill( QColor( 0, 0, 0 ) );
+
+	QPainter p( &draw_pm, this );
+#endif
+	p.drawPixmap( 0, 0, m_paintPixmap );
+
+	if( m_cursorInside == TRUE )
 	{
-		case Qt::Key_Up:
-			m_topBottomScroll->setValue(
-					m_topBottomScroll->value() - 1 );
-			break;
-
-		case Qt::Key_Down:
-			m_topBottomScroll->setValue(
-					m_topBottomScroll->value() + 1 );
-			break;
-
-		case Qt::Key_Left:
+		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
+				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
+					m_notesEditHeight - PR_BOTTOM_MARGIN );
+		if( validPattern() == TRUE )
 		{
-			if( ( m_timeLine->pos() -= 16 ) < 0 )
-			{
-				m_timeLine->pos().setTact( 0 );
-				m_timeLine->pos().setTact64th( 0 );
-			}
-			m_timeLine->updatePosition();
-			break;
-		}
-		case Qt::Key_Right:
-		{
-			m_timeLine->pos() += 16;
-			m_timeLine->updatePosition();
-			break;
+			p.fillRect( 10, height() + 3 - PR_BOTTOM_MARGIN -
+				m_notesEditHeight - KEY_LINE_HEIGHT *
+					( m_keyMouseOver - m_startKey + 1 ),
+				width() - 10, KEY_LINE_HEIGHT - 7,
+							QColor( 64, 64, 64 ) );
 		}
 
-		case Qt::Key_C:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				copySelectedNotes();
-			}
-			else
-			{
-				_ke->ignore();
-			}
-			break;
-
-		case Qt::Key_X:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				cutSelectedNotes();
-			}
-			else
-			{
-				_ke->ignore();
-			}
-			break;
-
-		case Qt::Key_V:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				pasteNotes();
-			}
-			else
-			{
-				_ke->ignore();
-			}
-			break;
-
-		case Qt::Key_A:
-			if( _ke->modifiers() & Qt::ControlModifier )
-			{
-				m_selectButton->setChecked( TRUE );
-				selectAll();
-				update();
-			}
-			else
-			{
-				_ke->ignore();
-			}
-			break;
-
-		case Qt::Key_D:
-			m_drawButton->setChecked( TRUE );
-			break;
-
-		case Qt::Key_E:
-			m_eraseButton->setChecked( TRUE );
-			break;
-
-		case Qt::Key_S:
-			m_selectButton->setChecked( TRUE );
-			break;
-
-		case Qt::Key_M:
-			m_moveButton->setChecked( TRUE );
-			break;
-
-		case Qt::Key_Delete:
-			deleteSelectedNotes();
-			break;
-
-		case Qt::Key_Space:
-			if( songEditor::inst()->playing() )
-			{
-				stop();
-			}
-			else
-			{
-				play();
-			}
-			break;
-
-		case Qt::Key_Home:
-			m_timeLine->pos().setTact( 0 );
-			m_timeLine->pos().setTact64th( 0 );
-			m_timeLine->updatePosition();
-			break;
-
-		default:
-			_ke->ignore();
-			break;
+		const QPixmap * cursor = NULL;
+		// draw current edit-mode-icon below the cursor
+		switch( m_editMode )
+		{
+			case DRAW: cursor = s_toolDraw; break;
+			case ERASE: cursor = s_toolErase; break;
+			case SELECT: cursor = s_toolSelect; break;
+			case MOVE: cursor = s_toolMove; break;
+		}
+		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
+								*cursor );
 	}
+
+#ifndef QT4
+	// and blit all the drawn stuff on the screen...
+	bitBlt( this, rect().topLeft(), &draw_pm );
+#endif
+}
+
+
+
+
+// responsible for moving/resizing scrollbars after window-resizing
+void pianoRoll::resizeEvent( QResizeEvent * )
+{
+
+	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH, height() -
+								SCROLLBAR_SIZE,
+					width()-WHITE_KEY_WIDTH,
+							SCROLLBAR_SIZE );
+	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, PR_TOP_MARGIN,
+						SCROLLBAR_SIZE,
+						height() - PR_TOP_MARGIN -
+						SCROLLBAR_SIZE );
+
+	int total_pixels = OCTAVE_HEIGHT * OCTAVES - ( height() -
+					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
+							m_notesEditHeight );
+	m_totalKeysToScroll = total_pixels * NOTES_PER_OCTAVE / OCTAVE_HEIGHT;
+
+	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
+#ifdef QT4
+	m_topBottomScroll->setSingleStep( 1 );
+	m_topBottomScroll->setPageStep( 20 );
+#else
+	m_topBottomScroll->setSteps( 1, 20 );
+#endif
+
+	if( m_startKey > m_totalKeysToScroll )
+	{
+		m_startKey = m_totalKeysToScroll;
+	}
+	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
+
+	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
+					).m_timeLine->setFixedWidth( width() );
+	m_toolBar->setFixedWidth( width() );
 }
 
 
@@ -1940,6 +1965,30 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		m_topBottomScroll->setValue( m_topBottomScroll->value() -
 							_we->delta() / 30 );
 	}
+}
+
+
+
+
+int pianoRoll::getKey( int _y )
+{
+	int key_line_y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
+	// pressed key on piano
+	int key_num = ( key_line_y - _y ) / KEY_LINE_HEIGHT;
+	key_num += m_startKey;
+
+	// some range-checking-stuff
+	if( key_num < 0 )
+	{
+		key_num = 0;
+	}
+
+	if( key_num >= NOTES_PER_OCTAVE * OCTAVES )
+	{
+		key_num = NOTES_PER_OCTAVE * OCTAVES - 1;
+	}
+
+	return( m_lastKey = key_num );
 }
 
 
@@ -2218,6 +2267,10 @@ void pianoRoll::copySelectedNotes( void )
 			m_notesToCopy.back()->setPos( m_notesToCopy.back()->pos(
 								start_pos ) );
 		}
+		textFloat::displayMessage( tr( "Notes copied" ),
+				tr( "All selected notes were copied to the "
+								"clipboard." ),
+				embed::getIconPixmap( "edit_copy" ), 2000 );
 	}
 }
 

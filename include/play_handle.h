@@ -47,12 +47,26 @@
 class playHandle
 {
 public:
-	inline playHandle( void )
+	enum types
+	{
+		NOTE_PLAY_HANDLE, INSTRUMENT_PLAY_HANDLE, SAMPLE_PLAY_HANDLE,
+		PRESET_PREVIEW_PLAY_HANDLE
+	} ;
+
+	inline playHandle( types _type ) :
+		m_type( _type )
 	{
 	}
+
 	virtual inline ~playHandle()
 	{
 	}
+
+	inline types type( void ) const
+	{
+		return( m_type );
+	}
+
 	virtual void play( void ) = 0;
 	virtual bool done( void ) const = 0;
 
@@ -67,6 +81,7 @@ public:
 
 
 private:
+	types m_type;
 
 } ;
 

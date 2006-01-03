@@ -33,11 +33,13 @@
 
 #include <QWidget>
 #include <QVector>
+#include <QPixmap>
 
 #else
 
 #include <qwidget.h>
 #include <qvaluevector.h>
+#include <qpixmap.h>
 
 #endif
 
@@ -72,25 +74,38 @@ public:
 	}
 
 	void FASTCALL setCurrentPattern( pattern * _new_pattern );
+
+	inline bool isRecording( void ) const
+	{
+		return( m_recording );
+	}
+
 	inline const pattern * currentPattern( void ) const
 	{
 		return( m_pattern );
 	}
+
 	inline bool validPattern( void ) const
 	{
 		return( m_pattern != NULL );
 	}
 
 
+public slots:
+	virtual void update( void );
+
+
 protected:
-	void closeEvent( QCloseEvent * _ce );
-	void paintEvent( QPaintEvent * _pe );
-	void resizeEvent( QResizeEvent * _re );
-	void mousePressEvent( QMouseEvent * _me );
-	void mouseReleaseEvent( QMouseEvent * _me );
-	void mouseMoveEvent( QMouseEvent * _me );
-	void keyPressEvent( QKeyEvent * _ke );
-	void wheelEvent( QWheelEvent * _we );
+	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void enterEvent( QEvent * _e );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void leaveEvent( QEvent * _e );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void wheelEvent( QWheelEvent * _we );
 
 	int FASTCALL getKey( int _y );
 	inline void drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
@@ -154,6 +169,12 @@ private:
 	} ;
 
 
+	pianoRoll( void );
+	pianoRoll( const pianoRoll & );
+	~pianoRoll();
+
+
+
 	static pianoRoll * s_instanceOfMe;
 
 	static QPixmap * s_whiteKeyBigPm;
@@ -183,6 +204,9 @@ private:
 	toolButton * m_pasteButton;
 
 	QComboBox * m_zoomingComboBox;
+
+	QPixmap m_paintPixmap;
+	bool m_cursorInside;
 
 
 	pattern * m_pattern;
@@ -224,10 +248,6 @@ private:
 	timeLine * m_timeLine;
 	bool m_scrollBack;
 
-
-	pianoRoll( void );
-	pianoRoll( const pianoRoll & );
-	~pianoRoll();
 
 
 	friend class lmmsMainWin;

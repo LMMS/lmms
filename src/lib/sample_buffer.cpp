@@ -1,7 +1,7 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -159,6 +159,35 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, Uint32 _frames ) :
 
 
 
+sampleBuffer::sampleBuffer( Uint32 _frames ) :
+	QObject(),
+	m_audioFile( "" ),
+	m_origData( NULL ),
+	m_origFrames( 0 ),
+	m_data( NULL ),
+	m_frames( 0 ),
+	m_startFrame( 0 ),
+	m_endFrame( 0 ),
+	m_amplification( 1.0f ),
+	m_reversed( FALSE ),
+	m_dataMutex()
+{
+	m_origData = new sampleFrame[_frames];
+	memset( m_origData, 0, _frames * BYTES_PER_FRAME );
+	m_origFrames = _frames;
+#ifdef SDL_SDL_SOUND_H
+	// init sound-file-system of SDL
+	Sound_Init();
+#endif
+#ifdef HAVE_SAMPLERATE_H
+	initResampling();
+#endif
+	update();
+}
+
+
+
+
 sampleBuffer::~sampleBuffer()
 {
 	m_dataMutex.lock();
@@ -166,11 +195,12 @@ sampleBuffer::~sampleBuffer()
 	m_origData = NULL;
 	delete[] m_data;
 	m_data = NULL;
-	m_dataMutex.unlock();
 
 #ifdef HAVE_SAMPLERATE_H
 	quitResampling();
 #endif
+
+	m_dataMutex.unlock();
 }
 
 
@@ -223,45 +253,36 @@ void sampleBuffer::update( bool _keep_settings )
 				file.ascii();
 #endif
 		Sint16 * buf = NULL;
-		Uint8 channels;
+		Uint8 channels = DEFAULT_CHANNELS;
+		Uint32 samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
 
 #ifdef HAVE_SNDFILE_H
 		if( m_frames == 0 )
 		{
-			m_frames = decodeSampleSF( f, buf, channels );
-		}
-#endif
-#ifdef SDL_SDL_SOUND_H
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleSDL( f, buf, channels );
+			m_frames = decodeSampleSF( f, buf, channels,
+								samplerate );
 		}
 #endif
 #ifdef HAVE_VORBIS_VORBISFILE_H
 		if( m_frames == 0 )
 		{
-			m_frames = decodeSampleOGG( f, buf, channels );
+			m_frames = decodeSampleOGGVorbis( f, buf, channels,
+								samplerate );
+		}
+#endif
+#ifdef SDL_SDL_SOUND_H
+		if( m_frames == 0 )
+		{
+			m_frames = decodeSampleSDL( f, buf, channels,
+								samplerate );
 		}
 #endif
 		if( m_frames > 0 && buf != NULL )
 		{
-			if( _keep_settings == FALSE )
-			{
-				// update frame-variables
-				m_startFrame = 0;
-				if( m_frames > 0 )
-				{
-					m_endFrame = m_frames - 1;
-				}
-				else
-				{
-					m_endFrame = 0;
-				}
-			}
-
 			// following code transforms int-samples into
 			// float-samples and does amplifying & reversing
-			float fac = m_amplification / 32767.0f;
+			const float fac = m_amplification /
+						OUTPUT_SAMPLE_MULTIPLIER;
 			m_data = new sampleFrame[m_frames];
 
 			// if reversing is on, we also reverse when
@@ -297,9 +318,39 @@ m_data[frame][chnl] = buf[idx] * fac;
 
 			delete[] buf;
 
+			// do samplerate-conversion if sample-decoder didn't
+			// convert sample-rate to our default-samplerate
+			if( samplerate != SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+			{
+				sampleBuffer * resampled = resample( this,
+								samplerate,
+					SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] );
+				delete[] m_data;
+				m_frames = resampled->frames();
+				m_data = new sampleFrame[m_frames];
+				memcpy( m_data, resampled->data(), m_frames *
+							sizeof( sampleFrame ) );
+				delete resampled;
+			}
+
+			if( _keep_settings == FALSE )
+			{
+				// update frame-variables
+				m_startFrame = 0;
+				if( m_frames > 0 )
+				{
+					m_endFrame = m_frames - 1;
+				}
+				else
+				{
+					m_endFrame = 0;
+				}
+			}
 		}
 		else
 		{
+			// sample couldn't be decoded, create buffer containing
+			// one sample-frame
 			m_data = new sampleFrame[1];
 			memset( m_data, 0, sizeof( *m_data ) );
 			m_frames = 1;
@@ -309,6 +360,8 @@ m_data[frame][chnl] = buf[idx] * fac;
 	}
 	else
 	{
+		// neither an audio-file nor a buffer to copy from, so create
+		// buffer containing one sample-frame
 		m_data = new sampleFrame[1];
 		memset( m_data, 0, sizeof( *m_data ) * 1 );
 		m_frames = 1;
@@ -326,13 +379,14 @@ m_data[frame][chnl] = buf[idx] * fac;
 
 #ifdef SDL_SDL_SOUND_H
 Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels )
+							Uint8 & _channels,
+							Uint32 & _samplerate )
 {
 	Sound_AudioInfo STD_AUDIO_INFO =
 	{
 		AUDIO_S16SYS,
-		DEFAULT_CHANNELS,
-		SAMPLE_RATES[DEFAULT_QUALITY_LEVEL]
+		_channels,
+		_samplerate,
 	} ;
 	Uint32 frames = 0;
 
@@ -343,7 +397,8 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 	{
 		// let SDL_sound decode our file to requested format
 		( void )Sound_DecodeAll( snd_sample );
-		_channels = STD_AUDIO_INFO.channels;
+		_channels = snd_sample->actual.channels;
+		_samplerate = snd_sample->actual.rate;
 		frames = snd_sample->buffer_size / ( BYTES_PER_OUTPUT_SAMPLE *
 								_channels );
 		_buf = new Sint16[frames * _channels];
@@ -360,7 +415,8 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 
 #ifdef HAVE_SNDFILE_H
 Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels )
+							Uint8 & _channels,
+							Uint32 & _samplerate )
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
@@ -377,6 +433,7 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 		_buf = new Sint16[sf_info.channels * frames];
 		frames = sf_read_short( snd_file, _buf, frames );
 		_channels = sf_info.channels;
+		_samplerate = sf_info.samplerate;
 
 		sf_close( snd_file );
 	}
@@ -384,7 +441,7 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 	{
 #ifdef DEBUG_LMMS
 		printf( "sampleBuffer::decodeSampleSF(): could not load "
-			"sample %s: %s\n", _f, sf_strerror( NULL ) );
+				"sample %s: %s\n", _f, sf_strerror( NULL ) );
 #endif
 	}
 	return( frames );
@@ -397,9 +454,6 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 #ifdef HAVE_VORBIS_VORBISFILE_H
 
 // callback-functions for reading ogg-file
-
-#ifndef QT4
-#endif
 
 size_t qfileReadCallback( void * _ptr, size_t _size, size_t _n, void * _udata )
 {
@@ -449,8 +503,9 @@ long qfileTellCallback( void * _udata )
 
 
 
-Uint32 sampleBuffer::decodeSampleOGG( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels )
+Uint32 sampleBuffer::decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
+							Uint8 & _channels,
+							Uint32 & _samplerate )
 {
 	static ov_callbacks callbacks =
 	{
@@ -482,20 +537,20 @@ Uint32 sampleBuffer::decodeSampleOGG( const char * _f, Sint16 * & _buf,
 		switch( err )
 		{
 			case OV_EREAD:
-				printf( "sampleBuffer::decodeSampleOgg(): "
-						"media read error\n" );
+				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+						" media read error\n" );
 				break;
 			case OV_ENOTVORBIS:
-				printf( "sampleBuffer::decodeSampleOgg(): "
-						"not an Ogg Vorbis file\n" );
+/*				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+					" not an Ogg Vorbis file\n" );*/
 				break;
 			case OV_EVERSION:
-				printf( "sampleBuffer::decodeSampleOgg(): "
-						"vorbis version mismatch\n" );
+				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+						" vorbis version mismatch\n" );
 				break;
 			case OV_EBADHEADER:
-				printf( "sampleBuffer::decodeSampleOgg(): "
-					"invalid Vorbis bitstream header\n" );
+				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+					" invalid Vorbis bitstream header\n" );
 				break;
 			case OV_EFAULT:
 				printf( "sampleBuffer::decodeSampleOgg(): "
@@ -509,6 +564,8 @@ Uint32 sampleBuffer::decodeSampleOGG( const char * _f, Sint16 * & _buf,
 	ov_pcm_seek( &vf, 0 );
 
    	_channels = ov_info( &vf, -1 )->channels;
+   	_samplerate = ov_info( &vf, -1 )->rate;
+
 	ogg_int64_t total = ov_pcm_total( &vf, -1 );
 
 	_buf = new Sint16[total * _channels];
@@ -517,7 +574,7 @@ Uint32 sampleBuffer::decodeSampleOGG( const char * _f, Sint16 * & _buf,
 
 	do
 	{
-		bytes_read = ov_read( &vf, (char *)&_buf[frames * _channels],
+		bytes_read = ov_read( &vf, (char *) &_buf[frames * _channels],
 					( total - frames ) * _channels *
 							sizeof( Sint16 ),
 					isLittleEndian()? 0 : 1,
@@ -694,7 +751,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 						total_frames_for_current_pitch;
 				}
 
-				const float src_frame_idx = frame*freq_factor;
+				const float src_frame_idx = frame * freq_factor;
 				Uint32 frame_num = static_cast<Uint32>(
 						src_frame_idx) - src_frame_base;
 				const float frac_pos = src_frame_idx -
@@ -912,35 +969,35 @@ QString sampleBuffer::openAudioFile( void ) const
 	// set filters
 #ifdef QT4
 	QStringList types;
-	types << tr( "All Audio-Files (*.wav *.ogg *.voc *.aif *.aiff *.au "
-								"*.raw)" )
+	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.voc *.aif *.aiff "
+								"*.au *.raw)" )
 		<< tr( "Wave-Files (*.wav)" )
 		<< tr( "OGG-Files (*.ogg)" )
+		<< tr( "FLAC-Files (*.flac)" )
 		//<< tr( "MP3-Files (*.mp3)" )
 		//<< tr( "MIDI-Files (*.mid)" )
 		<< tr( "VOC-Files (*.voc)" )
 		<< tr( "AIFF-Files (*.aif *.aiff)" )
 		<< tr( "AU-Files (*.au)" )
 		<< tr( "RAW-Files (*.raw)" )
-		//<< tr( "FLAC-Files (*.flac)" )
 		//<< tr( "MOD-Files (*.mod)" )
 		;
 	ofd.setFilters( types );
 #else
-	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.voc *.aif *.aiff "
-							"*.au *.raw)" ) );
+	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.voc *.aif "
+						"*.aiff *.au *.raw)" ) );
 	ofd.addFilter( tr( "Wave-Files (*.wav)" ) );
 	ofd.addFilter( tr( "OGG-Files (*.ogg)" ) );
+	ofd.addFilter( tr( "FLAC-Files (*.flac)" ) );
 	//ofd.addFilter (tr("MP3-Files (*.mp3)"));
-	//ofd.addFilter (tr("MIDI-Files (*.mid)"));
+	//ofd.addFilter (tr("MIDI-Files (*.mid)"));^
 	ofd.addFilter( tr( "VOC-Files (*.voc)" ) );
 	ofd.addFilter( tr( "AIFF-Files (*.aif *.aiff)" ) );
 	ofd.addFilter( tr( "AU-Files (*.au)" ) );
 	ofd.addFilter( tr( "RAW-Files (*.raw)" ) );
-	//ofd.addFilter (tr("FLAC-Files (*.flac)"));
 	//ofd.addFilter (tr("MOD-Files (*.mod)"));
-	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.voc *.aif "
-						"*.aiff *.au *.raw)" ) );
+	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.voc "
+						"*.aif *.aiff *.au *.raw)" ) );
 #endif
 	if( m_audioFile != "" )
 	{
@@ -1016,6 +1073,8 @@ QString sampleBuffer::toBase64( void ) const
 	{
 		return( "" );
 	}
+	// the following code is quite confusing as we have to handle four
+	// different configs (no flac/qt3, no flac/qt4, flac/qt3, flac/qt4)
 #ifdef HAVE_FLAC_STREAM_ENCODER_H
 	const Uint32 FRAMES_PER_BUF = 1152;
 
@@ -1150,6 +1209,69 @@ QString sampleBuffer::toBase64( void ) const
 	delete[] ptr;
 	return( s );
 #endif
+}
+
+
+
+
+sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
+							const Uint32 _frames,
+							const Uint32 _src_sr,
+							const Uint32 _dst_sr )
+{
+	const Uint32 dst_frames = static_cast<Uint32>( _frames /
+					(float) _src_sr * (float) _dst_sr );
+	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
+	sampleFrame * dst_buf = dst_sb->m_origData;
+#ifdef HAVE_SAMPLERATE_H
+	// yeah, libsamplerate, let's rock with sinc-interpolation!
+	int error;
+	SRC_STATE * state;
+	if( ( state = src_new( SRC_SINC_MEDIUM_QUALITY,
+					DEFAULT_CHANNELS, &error ) ) != NULL )
+	{
+		SRC_DATA src_data;
+		src_data.end_of_input = 0;
+		src_data.data_in = _data[0];
+		src_data.data_out = dst_buf[0];
+		src_data.input_frames = _frames;
+		src_data.output_frames = dst_frames;
+		src_data.src_ratio = (float) _dst_sr / _src_sr;
+		int error;
+		if( ( error = src_process( state, &src_data ) ) )
+		{
+			printf( "sampleBuffer: error while resampling: %s\n",
+							src_strerror( error ) );
+		}
+		src_delete( state );
+	}
+	else
+	{
+		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
+	}
+#else
+	// no libsamplerate, so do simple cubic interpolation
+	for( Uint32 frame = 0; frame < dst_frames; ++frame )
+	{
+		const float src_frame_float = frame * (float) _src_sr / _dst_sr;
+		const float frac_pos = src_frame_float -
+					static_cast<Uint32>( src_frame_float );
+		const Uint32 src_frame = tLimit<Uint32>(
+					static_cast<Uint32>( src_frame_float ),
+							1, _frames - 2 );
+		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		{
+			dst_buf[frame][ch] = cubicInterpolate(
+						_data[src_frame - 1][ch],
+						_data[src_frame + 0][ch],
+						_data[src_frame + 1][ch],
+						_data[src_frame + 2][ch],
+								frac_pos );
+		}
+	}
+#endif
+	dst_sb->update();
+	return( dst_sb );
 }
 
 
@@ -1375,6 +1497,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
+	m_audioFile = "";
 	update();
 #ifndef QT4
 //	delete[] dst;

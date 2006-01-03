@@ -166,12 +166,12 @@ void note::setPanning( panning _panning )
 void note::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	QDomElement note_de = _doc.createElement( "note" );
-	note_de.setAttribute( "tone", QString::number( m_tone ) );
-	note_de.setAttribute( "oct", QString::number( m_octave ) );
-	note_de.setAttribute( "vol", QString::number( m_volume ) );
-	note_de.setAttribute( "pan", QString::number( m_panning ) );
-	note_de.setAttribute( "len", QString::number( m_length ) );
-	note_de.setAttribute( "pos", QString::number( m_pos ) );
+	note_de.setAttribute( "tone", m_tone );
+	note_de.setAttribute( "oct", m_octave );
+	note_de.setAttribute( "vol", m_volume );
+	note_de.setAttribute( "pan", m_panning );
+	note_de.setAttribute( "len", m_length );
+	note_de.setAttribute( "pos", m_pos );
 	_parent.appendChild( note_de );
 }
 

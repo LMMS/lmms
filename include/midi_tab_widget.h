@@ -2,7 +2,7 @@
  * midi_tab_widget.h - tab-widget in channel-track-window for setting up
  *                     MIDI-related stuff
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -74,11 +74,13 @@ public:
 	}
 
 
+public slots:
+	void midiPortModeToggled( bool = FALSE );
+
 
 protected slots:
 	void inputChannelChanged( int );
 	void outputChannelChanged( int );
-	void midiPortModeToggled( bool );
 	void readablePortsChanged( void );
 	void writeablePortsChanged( void );
 	void activatedReadablePort( QAction * _item );
@@ -99,7 +101,9 @@ private:
 
 	QMenu * m_readablePorts;
 	QMenu * m_writeablePorts;
- 
+
+	friend class channelTrack;
+
 } ;
 
 

@@ -241,14 +241,13 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 	QDomElement sampletco_de = _doc.createElement( nodeName() );
 	if( _parent.nodeName() == "clipboard" )
 	{
-		sampletco_de.setAttribute( "pos", QString::number( -1 ) );
+		sampletco_de.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		sampletco_de.setAttribute( "pos", QString::number(
-							startPosition() ) );
+		sampletco_de.setAttribute( "pos", startPosition() );
 	}
-	sampletco_de.setAttribute( "len", QString::number( length() ) );
+	sampletco_de.setAttribute( "len", length() );
 	sampletco_de.setAttribute( "src", sampleFile() );
 	if( sampleFile() == "" )
 	{

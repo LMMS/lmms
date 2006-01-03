@@ -1,7 +1,7 @@
 /*
- * plugin.cpp - implemenation of plugin-class including plugin-loader
+ * plugin.cpp - implementation of plugin-class including plugin-loader
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,12 +46,29 @@
 #include "dummy_plugin.h"
 
 
+static embed::descriptor dummy_embed = { 0, NULL, "" } ;
 
-plugin::plugin( const QString & _public_name, pluginTypes _type ) :
-	settings(),
-	m_publicName( _public_name ),
-	m_type( _type )
+static plugin::descriptor dummy_plugin_descriptor =
 {
+	"dummy",
+	"dummy",
+	QT_TRANSLATE_NOOP( "pluginBrowser", "no description" ),
+	"Tobias Doerffel <tobydox/at/users.sf.net>",
+	0x0100,
+	plugin::UNDEFINED,
+	dummy_embed
+} ;
+
+
+
+plugin::plugin( const descriptor * _descriptor ) :
+	settings(),
+	m_descriptor( _descriptor )
+{
+	if( m_descriptor == NULL )
+	{
+		m_descriptor = &dummy_plugin_descriptor;
+	}
 }
 
 
@@ -89,7 +106,8 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 					ascii()
 #endif
 					, RTLD_NOW );*/
-	QLibrary plugin_lib( _plugin_name );
+	QLibrary plugin_lib( configManager::inst()->pluginDir()  +
+							_plugin_name );
 	if( /*handle == NULL*/ plugin_lib.load() == FALSE )
 	{
 		QMessageBox::information( NULL,

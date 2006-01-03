@@ -1,5 +1,5 @@
 /*
- * instrument_play_handle.h - play-handle for playing an instrument
+ * micro_timer.h - simple high-precision timer
  *
  * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,51 +23,46 @@
  */
 
 
-#ifndef _INSTRUMENT_PLAY_HANDLE_H
-#define _INSTRUMENT_PLAY_HANDLE_H
+#ifndef _MICRO_TIMER
+#define _MICRO_TIMER
 
-#include "play_handle.h"
-#include "instrument.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
 
 
-class instrumentPlayHandle : public playHandle
+class microTimer
 {
 public:
-	inline instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( INSTRUMENT_PLAY_HANDLE ),
-		m_instrument( _instrument )
+	inline microTimer( void )
+	{
+		reset();
+	}
+
+	inline ~microTimer()
 	{
 	}
 
-	inline virtual ~instrumentPlayHandle()
+	inline void reset( void )
 	{
+		gettimeofday( &begin, NULL );
 	}
 
-
-	inline virtual void play( void )
+	inline Uint32 elapsed( void ) const
 	{
-		if( m_instrument != NULL )
-		{
-			m_instrument->play();
-		}
-	}
-
-	inline virtual bool done( void ) const
-	{
-		return( m_instrument == NULL );
-	}
-
-	inline virtual void checkValidity( void )
-	{
-		if( m_instrument != NULL && !m_instrument->valid() )
-		{
-			m_instrument = NULL;
-		}
+		struct timeval now;
+		gettimeofday( &now, NULL );
+		return( ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
+					( now.tv_usec - begin.tv_usec ) );
 	}
 
 
 private:
-	instrument * m_instrument;
+	struct timeval begin;
 
 } ;
 

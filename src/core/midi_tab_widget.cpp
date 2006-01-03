@@ -2,7 +2,7 @@
  * midi_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                       MIDI-related stuff
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -80,15 +80,17 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	m_inputChannelSpinBox->move( 28, 52 );
 	connect( m_inputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( inputChannelChanged( int ) ) );
+	inputChannelChanged( m_inputChannelSpinBox->value() );
 
-	m_outputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
+	m_outputChannelSpinBox = new lcdSpinBox( 1, MIDI_CHANNEL_COUNT, 3,
 							m_setupTabWidget );
-	m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
+	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->move( 28, 112 );
 	connect( m_outputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( outputChannelChanged( int ) ) );
+	outputChannelChanged( m_outputChannelSpinBox->value() );
 
 
 	m_receiveCheckBox = new ledCheckBox( tr( "RECEIVE MIDI-EVENTS" ),
@@ -109,17 +111,20 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	midiPort::modes m = m_midiPort->mode();
+	const midiPort::modes m = m_midiPort->mode();
 	m_receiveCheckBox->setChecked( m == midiPort::INPUT ||
 							m == midiPort::DUPLEX );
 	m_sendCheckBox->setChecked( m == midiPort::OUTPUT ||
 							m == midiPort::DUPLEX );
 
+	// when using with non-raw-clients we can provide buttons showing
+	// our port-menus when being clicked
 	midiClient * mc = mixer::inst()->getMIDIClient();
-	// non-raw-clients have ports we can subscribe to!
 	if( mc->isRaw() == FALSE )
 	{
 		m_readablePorts = new QMenu( m_setupTabWidget );
+		m_readablePorts->setFont( pointSize<9>(
+						m_readablePorts->font() ) );
 #ifdef QT4
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( activatedReadablePort( QAction * ) ) );
@@ -130,6 +135,8 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 #endif
 
 		m_writeablePorts = new QMenu( m_setupTabWidget );
+		m_writeablePorts->setFont( pointSize<9>(
+						m_writeablePorts->font() ) );
 #ifdef QT4
 		connect( m_writeablePorts, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( activatedWriteablePort( QAction * ) ) );
@@ -187,14 +194,10 @@ midiTabWidget::~midiTabWidget()
 void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	QDomElement mw_de = _doc.createElement( nodeName() );
-	mw_de.setAttribute( "inputchannel", QString::number(
-					m_inputChannelSpinBox->value() ) );
-	mw_de.setAttribute( "outputchannel", QString::number(
-					m_outputChannelSpinBox->value() ) );
-	mw_de.setAttribute( "receive", QString::number(
-					m_receiveCheckBox->isChecked() ) );
-	mw_de.setAttribute( "send", QString::number(
-					m_sendCheckBox->isChecked() ) );
+	mw_de.setAttribute( "inputchannel", m_inputChannelSpinBox->value() );
+	mw_de.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
+	mw_de.setAttribute( "receive", m_receiveCheckBox->isChecked() );
+	mw_de.setAttribute( "send", m_sendCheckBox->isChecked() );
 
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
@@ -599,6 +602,10 @@ void midiTabWidget::activatedWriteablePort( int _id )
 
 void midiTabWidget::activatedReadablePort( QAction * ) { }
 void midiTabWidget::activatedWriteablePort( QAction * ) { }
+
+
+#undef setIcon
+#undef setText
 
 #endif
 

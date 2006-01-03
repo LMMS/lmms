@@ -23,12 +23,6 @@
  */
 
 
-#include <config.h>
-
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
 #include "mixer.h"
 #include "play_handle.h"
 #include "song_editor.h"
@@ -38,6 +32,9 @@
 #include "debug.h"
 #include "config_mgr.h"
 #include "audio_port.h"
+#include "sample_play_handle.h"
+#include "piano_roll.h"
+#include "micro_timer.h"
 
 #include "audio_device.h"
 #include "midi_client.h"
@@ -58,38 +55,6 @@
 
 
 Uint32 SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
-
-
-class microTimer
-{
-public:
-	microTimer( void )
-	{
-		reset();
-	}
-
-	~microTimer()
-	{
-	}
-
-	void reset( void )
-	{
-		gettimeofday( &begin, NULL );
-	}
-
-	Uint32 elapsed( void ) const
-	{
-		struct timeval now;
-		gettimeofday( &now, NULL );
-		return( ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
-					( now.tv_usec - begin.tv_usec ) );
-	}
-
-private:
-	struct timeval begin;
-
-} ;
-
 
 
 mixer * mixer::s_instanceOfMe = NULL;
@@ -167,6 +132,18 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
 	microTimer timer;
 
+	static songEditor::playPos last_metro_pos = -1;
+
+	songEditor::playPos p = songEditor::inst()->getPlayPos(
+						songEditor::PLAY_PATTERN );
+	if( songEditor::inst()->playMode() == songEditor::PLAY_PATTERN &&
+		pianoRoll::inst()->isRecording() == TRUE &&
+		p != last_metro_pos && p.getTact64th() % 16 == 0 )
+	{
+		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg" ) );
+		last_metro_pos = p;
+	}
+
 	// now we have to make sure no other thread does anything bad
 	// while we're acting...
 	m_mixMutex.lock();
@@ -205,10 +182,9 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	while( idx < m_playHandles.size() )
 	{
 		register playHandle * n = m_playHandles[idx];
+		// delete play-handle if it played completely
 		if( n->done() )
 		{
-			// delete all play-handles which have
-			// played completely now
 			delete n;
 			m_playHandles.erase( m_playHandles.begin() +
 								idx );
@@ -255,13 +231,21 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 // removes all play-handles. this is neccessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
-void mixer::clear( void )
+void mixer::clear( bool _everything )
 {
 	// TODO: m_midiClient->noteOffAll();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
-		m_playHandlesToRemove.push_back( *it );
+		// we must not delete instrument-play-handles as they exist
+		// during the whole lifetime of an instrument - exception if
+		// parameter _everything is true (which is the case when
+		// clearing song for example)
+		if( _everything == TRUE ||
+			( *it )->type() != playHandle::INSTRUMENT_PLAY_HANDLE )
+		{
+			m_playHandlesToRemove.push_back( *it );
+		}
 	}
 }
 
@@ -290,9 +274,10 @@ void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 						volumeVector & _volume_vector,
 						audioPort * _port )
 {
-	Uint32 start_frame = _frames_ahead % m_framesPerAudioBuffer;
+	const Uint32 start_frame = _frames_ahead % m_framesPerAudioBuffer;
 	Uint32 end_frame = start_frame + _frames;
-	Uint32 loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
+	const Uint32 loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
+
 	for( Uint32 frame = start_frame; frame < loop1_frame; ++frame )
 	{
 		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
@@ -303,6 +288,7 @@ void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 						_volume_vector.vol[chnl];
 		}
 	}
+
 	if( end_frame > m_framesPerAudioBuffer )
 	{
 		Uint32 frames_done = m_framesPerAudioBuffer - start_frame;
@@ -318,10 +304,12 @@ void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 						_volume_vector.vol[chnl];
 			}
 		}
+		// we used both buffers so set flags
 		_port->m_bufferUsage = audioPort::BOTH;
 	}
 	else if( _port->m_bufferUsage == audioPort::NONE )
 	{
+		// only first buffer touched
 		_port->m_bufferUsage = audioPort::FIRST;
 	}
 
@@ -344,6 +332,7 @@ void mixer::setHighQuality( bool _hq_on )
 	{
 		m_qualityLevel = DEFAULT_QUALITY_LEVEL;
 	}
+
 	// and re-open device
 	m_audioDev = tryAudioDevices();
 	m_audioDev->startProcessing();
@@ -423,20 +412,6 @@ audioDevice * mixer::tryAudioDevices( void )
 	audioDevice * dev = NULL;
 	QString dev_name = configManager::inst()->value( "mixer", "audiodev" );
 
-#ifdef OSS_SUPPORT
-	if( dev_name == audioOSS::name() || dev_name == "" )
-	{
-		dev = new audioOSS( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-								success_ful );
-		if( success_ful )
-		{
-			m_audioDevName = audioOSS::name();
-			return( dev );
-		}
-		delete dev;
-	}
-#endif
-
 #ifdef ALSA_SUPPORT
 	if( dev_name == audioALSA::name() || dev_name == "" )
 	{
@@ -445,6 +420,21 @@ audioDevice * mixer::tryAudioDevices( void )
 		if( success_ful )
 		{
 			m_audioDevName = audioALSA::name();
+			return( dev );
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef OSS_SUPPORT
+	if( dev_name == audioOSS::name() || dev_name == "" )
+	{
+		dev = new audioOSS( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
+								success_ful );
+		if( success_ful )
+		{
+			m_audioDevName = audioOSS::name();
 			return( dev );
 		}
 		delete dev;

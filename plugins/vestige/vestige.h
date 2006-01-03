@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,16 +31,15 @@
 
 #ifdef QT4
 
-#include <QVector>
+#include <QMutex>
 
 #else
 
-#include <qvaluevector.h>
+#include <qmutex.h>
 
 #endif
 
 
-#include "fstclient.h"
 #include "spc_bg_hndl_widget.h"
 
 
@@ -76,6 +75,8 @@ public:
 protected slots:
 	void openPlugin( void );
 	void toggleGUI( void );
+	void noteOffAll( void );
+	void changeBPM( int _new_val );
 
 
 protected:
@@ -89,6 +90,7 @@ private:
 
 
 	remoteVSTPlugin * m_plugin;
+	QMutex m_pluginMutex;
 
 
 	pixmapButton * m_openPluginButton;

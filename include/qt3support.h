@@ -82,6 +82,7 @@ inline QString baseName( const QString & _file )
 // QWidget
 #define setWindowTitle setCaption
 #define setWindowIcon setIcon
+#define windowIcon icon
 #define isExplicitlyHidden isHidden
 #define accessibleName name
 #define ensurePolished constPolish
@@ -116,6 +117,7 @@ inline QString baseName( const QString & _file )
 
 // QAbstractButton/QButton
 #define setCheckable setToggleButton
+#define isCheckable isToggleButton
 #define setShortcut setAccel
 
 

@@ -99,7 +99,7 @@ QMutex * presetPreviewPlayHandle::s_globalDataMutex = NULL;
 
 presetPreviewPlayHandle::presetPreviewPlayHandle(
 						const QString & _preset_file ) :
-	playHandle(),
+	playHandle( PRESET_PREVIEW_PLAY_HANDLE ),
 	m_previewNote( NULL )
 {
 	if( s_globalDataMutex == NULL )

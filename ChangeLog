@@ -1,3 +1,280 @@
+2006-01-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/vestige.cpp:
+	set vestige-logo as window-icon of plugin-GUI-window
+
+	* src/core/instrument.cpp:
+	set logo of plugin as window-icon of channel-track
+
+	* include/dummy_instrument.h:
+	* include/dummy_plugin.h:
+	* include/instrument.h:
+	* include/plugin.h:
+	* src/core/instrument.cpp:
+	* src/core/plugin.cpp:
+	small changes in plugin-API: plugin now always has to pass pointer to
+	plugin-descriptor to plugin-dtor to make the latter one able to
+	provide several information
+
+	* src/core/plugin.cpp:
+	search for plugin-libs in configManager::pluginDir() which is
+	$prefix/lib/lmms - hopefully solves problems with finding plugins on
+	some systems
+
+	* include/channel_track.h:
+	* include/midi_tab_widget.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/tracks/channel_track.cpp:
+	when using Raw-MIDI-client, make items "MIDI input/output" checkable
+	and enable/disable MIDI-input/output accordingly if user
+	checked/unchecked it and update check-state if user changed MIDI-mode
+	in midi-tab-widget in channel-track
+
+	* src/core/midi_tab_widget.cpp:
+	set MIDI-output-channel to 1 per default
+
+	* src/lib/sample_buffer.cpp:
+	added flac-files to filter of file-selection-dialog
+
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	when invalidating note-play-handle, do some stuff which actually would
+	be done by dtor if m_channelTrack wouldn't be NULL
+
+2006-01-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/track.cpp:
+	added tooltip to track-op-widget telling the user something about
+	drag'n'drop-functionality...
+
+	* include/lmms_main_win.h:
+	* src/core/lmms_main_win.cpp:
+	* src/lib/string_pair_drag.cpp:
+	if main-window looses focus or a drag is completed, clear
+	key-modifiers of LMMS-main-window, because we might have lost
+	key-release-events in these cases and therefore our modifier-state-map
+	could be incorrect - fixes several bugs concerning drag'n'drop
+
+	* README:
+	* src/core/about_dialog.cpp:
+	extended copyright from 2005 to 2006 - Happy New Year!
+
+2005-12-31	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/channel_track.h:
+	* src/tracks/channel_track.cpp:
+	removed surround-area in track-settings-widget and added button with
+	MIDI-connection-menu instead
+
+2005-12-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	revised all the things around track-operations:
+	- tracks are now directly movable via the grip at the beginning of a
+	  track - replaces "move up/down"-buttons and is much more usable
+	- actions (clone/delete track) are now part of a popup-menu
+
+	* src/core/lmms_main_win.cpp:
+	- corrected file-description at the beginning
+	- add space at left side before adding tool-buttons
+
+	* src/core/midi_tab_widget.cpp:
+	use smaller font for connection-selection-menu
+
+2005-12-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/widgets/fade_button.cpp:
+	do not update() directly in nextState(), use QTimer instead for avoiding
+	xlib-threading-errors
+
+2005-12-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/communication.h:
+	* plugins/vestige/fstclient.cpp:
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstserver.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	- support for telling plugin current BPM, also catches BPM-changes
+	- handle plugins without GUI correctly
+	
+	* include/tool_button.h:
+	* src/widgets/tool_button.cpp:
+	catch toggle-signals to emit clicked()-signal which is neccessary if a
+	button is checked using setChecked()-method and not by the user -
+	fixes some bugs with piano-roll
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	- show text-float after user copied notes
+	- do not play note when just moving selection
+	- when update()ing paint everything in a pixmap which is painted in
+	  paintEvent() - saves all the repaints everytime mouse-cursor is moved
+	  and makes painting tool-cursor possible again
+
+	* src/tracks/channel_track.cpp:
+	corrected calculation in channelTrack::masterKey()
+
+2005-12-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	always reset cursor when receiving leave-event
+
+	* include/channel_track.h:
+	* src/tracks/channel_track.cpp:
+	use new fade-button as MIDI-event-indicator as well as simple
+	play-default-tone-button
+
+	* include/fade_button.h:
+	* src/widgets/fade_button.cpp:
+	added fade-button which can be activated and fades back to
+	default-color afterwards
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/note.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/channel_track.cpp:
+	* src/tracks/sample_track.cpp:
+	do not use QString::number() for saving scalar value with
+	setAttribute() as it is obsolete
+
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	start audio-thread with QThread::HightestPriority for having less xruns
+
+	* src/tracks/pattern.cpp:
+	save m_steps-property, otherwise restoring it in loadSettings() makes
+	no sense... - fixes bug which caused LMMS to always reset number of
+	steps to 16 when loading files, even if the user created patterns
+	containing more than 16 steps
+
+	* include/audio_dummy.h:
+	- fixed missing implementation of thread running the whole time and
+	  calling audioDevice::processNextBuffer() -> fixes bugs & lockups when
+	  using audio-dummy-driver
+	- thread now always waits the amount of time that is left for the
+	  current buffer, so if rendering of current buffer went faster than
+	  in realtime, the song doesn't play at a higher speed
+
+2005-12-26	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/vestige.cpp:
+	determine real key of note using channelTrack::masterKey
+
+	* include/micro_timer.h:
+	moved micro-timer-class from mixer.cpp in separate header for being
+	available to all modules of LMMS
+
+	* src/core/mixer.cpp:
+	added metronome-sounds when recording in piano-roll
+
+	* src/lib/sample_buffer.cpp:
+	- added resample()-method for resampling whole sample-buffer
+	- after libsndfile try to load sample with libvorbis instead of
+	  SDL_sound as the latter one seems to be buggy on few systems and
+	  leads to unexpected crashes
+	- if sample-decoder doesn't resample sample automatically, do it
+	  afterwards using resample()
+
+	* src/core/track_container.cpp:
+	accept drops of type samplefile and sampledata too and create new
+	channel-track with AudioFileProcessor
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	save/load sample-data which was dragged on plugin in settings
+
+	* src/core/track.cpp:
+	display correct length and now additionally start- and end-position of
+	track-content-object
+
+	* include/bb_track.h:
+	* src/tracks/bb_track.cpp:
+	do not align position and length of bb-track-objects on tact-boundaries
+	as it offers an interesting new feature (incomplete/start beats etc.!)
+
+2005-12-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/widgets/visualization_widget.cpp:
+	enable visualization-widget per default
+
+	* plugins/vestige/vestige.cpp:
+	- do not crash when loading settings with empty plugin-attribute (e.g.
+	  older projects/presets)
+	- set channel-name according to plugin-name
+	- added note-off-button for being able to note off hanging notes
+	  (which sometimes occurs in combination with arpeggios)
+
+2005-12-24	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/vestige.cpp:
+	use new parameter-saving/loading-feature when saving/loading settings
+
+	* plugins/vestige/communication.h:
+	* plugins/vestige/fstclient.cpp:
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstserver.cpp:
+	* plugins/vestige/fstserver.h:
+	* plugins/vestige/fstcore.c:
+	- added support for saving/loading parameters which almost completes
+	  LMMS's rudimentary VST-support
+	- support for querying parameter-properties
+	- some changes in initialization of plugin
+
+	* src/tracks/pattern.cpp:
+	pass unused wheel-events to trackContentObect for being able to scroll
+	within song-editor
+
+2005-12-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/fstcore.c:
+	a lot of clean-ups and other bug-fixes making VeSTige almost usable
+	and stable
+
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstclient.cpp:
+	save PID of children when fork()ing XFST-server which is used for
+	sending SIGTERM when destroying everything
+
+	* plugins/vestige/communication.h:
+	* plugins/vestige/fstclient.cpp:
+	* plugins/vestige/fstserver.cpp:
+	* plugins/vestige/fstcore.c:
+	do not show editor until client created x11-embed-widget - solves
+	problems with not-embedded plugins under KDE
+
+	* plugins/vestige/fstserver.cpp:
+	rewrote MIDI-enqueueing-code as the old one was very buggy and
+	unreliable
+
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	added mutex for plugin which solves some problems
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	per default clear all play-handles but instrument-play-handles in
+	mixer::clear() as instrument-playhandles normally exist during the
+	whole life-time of a certain plugin and must not be deleted when just
+	stopping song etc.
+
+	* include/play_handle.h:
+	added type-information, so every derived class has to pass a
+	type-constant to playHandle-constructor
+
+2005-12-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* configure.in:
+	made 0.1.2 release
+
 2005-12-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/lib/sample_buffer.cpp:

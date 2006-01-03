@@ -1,7 +1,7 @@
 /*
  * about_dialog.cpp - implementation of about-dialog
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -65,13 +65,13 @@ aboutDialog::aboutDialog() :
 
 	m_appNameLbl = new QLabel( tr( "Linux MultiMedia Studio %1"
 						).arg( VERSION ), this );
-	m_appNameLbl->setGeometry( 80, 30, 240, 20 );
+	m_appNameLbl->setGeometry( 80, 30, 280, 20 );
 
 	m_aboutTabs = new QTabWidget( this );
 
 	QLabel * about_lbl = new QLabel( tr( "LMMS - A powerful "
 						"synthesizer-studio\n\n"
-						"Copyright (c) 2004-2005 "
+						"Copyright (c) 2004-2006 "
 						"LMMS-Developers\n\n"
 						"http://lmms.sourceforge.net" )
 #ifndef QT4
