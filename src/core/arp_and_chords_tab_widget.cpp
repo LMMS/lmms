@@ -639,9 +639,6 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement act_de = _doc.createElement( nodeName() );
-<<<<<<< arp_and_chords_tab_widget.cpp
-	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
-=======
 	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
 #ifdef QT4
 	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
@@ -649,32 +646,6 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
 #endif
 	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
-
-	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
->>>>>>> 1.11
-#ifdef QT4
-<<<<<<< arp_and_chords_tab_widget.cpp
-	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
-=======
-	act_de.setAttribute( "arp", m_arpComboBox->currentIndex() );
->>>>>>> 1.11
-#else
-<<<<<<< arp_and_chords_tab_widget.cpp
-	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
-=======
-	act_de.setAttribute( "arp", m_arpComboBox->currentItem() );
->>>>>>> 1.11
-#endif
-<<<<<<< arp_and_chords_tab_widget.cpp
-	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
-=======
-	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
-	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
-	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
-	act_de.setAttribute( "arpdir", m_arpDirection );
-	act_de.setAttribute( "arpsyncmode",
-					( int ) m_arpTimeKnob->getSyncMode() );
->>>>>>> 1.11
 
 	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
 #ifdef QT4

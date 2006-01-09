@@ -1,7 +1,7 @@
 /*
  * qt3support.h - layer for supporting Qt3
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -77,6 +77,7 @@ inline QString baseName( const QString & _file )
 
 #define QMatrix QWMatrix
 #define QIcon QIconSet
+#define QAbstractButton QButton
 
 
 // QWidget

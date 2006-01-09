@@ -1,7 +1,7 @@
 /*
  * fade_button.cpp - implementation of fade-button
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@
 
 fadeButton::fadeButton( const QColor & _normal_color,
 			const QColor & _activated_color, QWidget * _parent ) :
-	QButton( _parent ),
+	QAbstractButton( _parent ),
 	m_state( 0.0f ),
 	m_normalColor( _normal_color ),
 	m_activatedColor( _activated_color )

@@ -853,7 +853,6 @@ void pattern::wheelEvent( QWheelEvent * _we )
 		}
 		songEditor::inst()->setModified();
 		update();
-<<<<<<< pattern.cpp
 		if( pianoRoll::inst()->currentPattern() == this )
 		{
 			pianoRoll::inst()->update();
@@ -863,13 +862,6 @@ void pattern::wheelEvent( QWheelEvent * _we )
 	else
 	{
 		trackContentObject::wheelEvent( _we );
-=======
-		_we->accept();
-	}
-	else
-	{
-		trackContentObject::wheelEvent( _we );
->>>>>>> 1.12
 	}
 }
 

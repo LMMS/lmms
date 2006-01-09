@@ -524,12 +524,8 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 
 inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
-<<<<<<< piano_roll.cpp
 					Sint16 _width, const bool _is_selected,
 						const bool _is_step_note )
-=======
-					Sint16 _width, const bool _is_selected )
->>>>>>> 1.14
 {
 	++_x;
 	++_y;
@@ -583,7 +579,7 @@ void pianoRoll::update( void )
 		m_paintPixmap = QPixmap( rect().size() );
 	}
 	m_paintPixmap.fill( QColor( 0, 0, 0 ) );
-	QPainter p( &m_paintPixmap, this );
+	QPainter p( &m_paintPixmap );
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -934,7 +930,6 @@ void pianoRoll::update( void )
 
 void pianoRoll::removeSelection( void )
 {
-<<<<<<< piano_roll.cpp
 	m_selectStartTact64th = 0;
 	m_selectedTact64th = 0;
 	m_selectStartKey = 0;
@@ -942,29 +937,8 @@ void pianoRoll::removeSelection( void )
 }
 
 
-=======
-	m_selectStartTact64th = 0;
-	m_selectedTact64th = 0;
-	m_selectStartKey = 0;
-	m_selectedKeys = 0;
-}
-
->>>>>>> 1.14
 
 
-<<<<<<< piano_roll.cpp
-void pianoRoll::closeEvent( QCloseEvent * _ce )
-{
-	QApplication::restoreOverrideCursor();
-	hide();
-	_ce->ignore ();
-}
-
-=======
->>>>>>> 1.14
-
-<<<<<<< piano_roll.cpp
-=======
 void pianoRoll::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
@@ -973,7 +947,6 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 }
 
 
->>>>>>> 1.14
 
 
 void pianoRoll::enterEvent( QEvent * _e )
@@ -1103,27 +1076,14 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			_ke->ignore();
 			break;
 	}
-<<<<<<< piano_roll.cpp
 }
 
 
-=======
-}
-
->>>>>>> 1.14
-
-<<<<<<< piano_roll.cpp
-
-void pianoRoll::leaveEvent( QEvent * _e )
-{
-	while( QApplication::overrideCursor() != NULL )
-=======
 
 
 void pianoRoll::leaveEvent( QEvent * _e )
 {
 	while( QApplication::overrideCursor() != NULL )
->>>>>>> 1.14
 	{
 		QApplication::restoreOverrideCursor();
 	}

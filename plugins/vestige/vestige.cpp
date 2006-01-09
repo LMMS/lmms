@@ -133,7 +133,7 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide VST-GUI" ), this );
 	m_toggleGUIButton->setGeometry( 20, 120, 160, 24 );
-	m_toggleGUIButton->setIconSet( embed::getIconPixmap( "zoom" ) );
+	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
@@ -148,7 +148,7 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 150, 160, 24 );
-	note_off_all_btn->setIconSet( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
@@ -227,7 +227,11 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc,
 		for( QMap<QString, QString>::const_iterator it = dump.begin();
 							it != dump.end(); ++it )
 		{
+#ifdef QT4
+			vst_de.setAttribute( it.key(), it.value() );
+#else
 			vst_de.setAttribute( it.key(), it.data() );
+#endif
 		}
 	}
 	m_pluginMutex.unlock();
@@ -303,8 +307,13 @@ void vestigeInstrument::setParameter( const QString & _param,
 		}
 		if( m_plugin->pluginWidget() != NULL )
 		{
+#ifdef QT4
+			m_plugin->pluginWidget()->setWindowIcon(
+					getChannelTrack()->windowIcon() );
+#else
 			m_plugin->pluginWidget()->setWindowIcon(
 					*( getChannelTrack()->windowIcon() ) );
+#endif
 		}
 		m_pluginMutex.unlock();
 		update();

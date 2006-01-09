@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QButton>
+#include <QAbstractButton>
 #include <QColor>
 
 #else
@@ -42,7 +42,7 @@
 
 
 
-class fadeButton : public QButton
+class fadeButton : public QAbstractButton
 {
 	Q_OBJECT
 public:
