@@ -1,7 +1,7 @@
 /*
  * config_mgr.h - class configManager, a class for managing LMMS-configuration
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -82,35 +82,45 @@ public:
 		return( s_instanceOfMe );
 	}
 
-	const QString & lmmsWorkingDir( void ) const
+	const QString & workingDir( void ) const
 	{
-		return( m_lmmsWorkingDir );
-	}
-	QString projectsDir( void ) const
-	{
-		return( m_lmmsWorkingDir + PROJECTS_PATH );
-	}
-	QString presetsDir( void ) const
-	{
-		return( m_lmmsWorkingDir + PRESETS_PATH );
-	}
-	QString samplesDir( void ) const
-	{
-		return( m_lmmsWorkingDir + SAMPLES_PATH );
-	}
-	QString artworkDir( void ) const
-	{
-		return( m_lmmsDataDir + ARTWORK_PATH );
-	}
-	QString localeDir( void ) const
-	{
-		return( m_lmmsDataDir + LOCALE_PATH );
-	}
-	const QString & pluginDir( void ) const
-	{
-		return( m_lmmsPluginDir );
+		return( m_workingDir );
 	}
 
+	QString projectsDir( void ) const
+	{
+		return( m_workingDir + PROJECTS_PATH );
+	}
+
+	QString presetsDir( void ) const
+	{
+		return( m_workingDir + PRESETS_PATH );
+	}
+
+	QString samplesDir( void ) const
+	{
+		return( m_workingDir + SAMPLES_PATH );
+	}
+
+	QString artworkDir( void ) const
+	{
+		return( m_dataDir + ARTWORK_PATH );
+	}
+
+	QString localeDir( void ) const
+	{
+		return( m_dataDir + LOCALE_PATH );
+	}
+
+	const QString & pluginDir( void ) const
+	{
+		return( m_pluginDir );
+	}
+
+	const QString & vstDir( void ) const
+	{
+		return( m_vstDir );
+	}
 
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
@@ -121,9 +131,13 @@ public:
 	void saveConfigFile( void );
 
 
+public slots:
+	void setWorkingDir( const QString & _wd );
+	void setVSTDir( const QString & _wd );
+
+
 protected slots:
 	void openWorkingDir( void );
-	void setWorkingDir( const QString & _wd );
 
 	virtual void accept( void );
 
@@ -152,9 +166,10 @@ private:
 
 
 	const QString m_lmmsRcFile;
-	QString m_lmmsWorkingDir;
-	QString m_lmmsDataDir;
-	QString m_lmmsPluginDir;
+	QString m_workingDir;
+	QString m_dataDir;
+	QString m_pluginDir;
+	QString m_vstDir;
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

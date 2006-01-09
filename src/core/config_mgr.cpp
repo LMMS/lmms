@@ -1,7 +1,7 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,6 +58,8 @@
 #include <qbuttongroup.h>
 #include <qradiobutton.h>
 #include <qapplication.h>
+
+#define absolutePath absPath
 
 #ifndef __USE_XOPEN_EXTENDED
 #define __USE_XOPEN_EXTENDED
@@ -153,31 +155,27 @@ configManager * configManager::s_instanceOfMe = NULL;
 
 configManager::configManager( void ) :
 	QDialog(),
-#ifdef QT4
 	m_lmmsRcFile( QDir::home().absolutePath() + "/.lmmsrc.xml" ),
-	m_lmmsWorkingDir( QDir::home().absolutePath() + "/lmms" ),
-#else
-	m_lmmsRcFile( QDir::home().absPath() + "/.lmmsrc.xml" ),
-	m_lmmsWorkingDir( QDir::home().absPath() + "/lmms" ),
-#endif
+	m_workingDir( QDir::home().absolutePath() + "/lmms" ),
 #if QT_VERSION >= 0x030200
-	m_lmmsDataDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
+	m_dataDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/share/lmms/" ),
 #else
 	// hardcode since qt < 3.2 doesn't know something like
 	// applicationDirPath and implementing own function would be senseless
 	// since real support for qt < 3.2 is senseless too ;-)
-	m_lmmsDataDir( "/usr/share/lmms" ),
+	m_dataDir( "/usr/share/lmms" ),
 #endif
 #if QT_VERSION >= 0x030200
-	m_lmmsPluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
+	m_pluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/lib/lmms/" ),
 #else
 	// hardcode since qt < 3.2 doesn't know something like
 	// applicationDirPath and implementing own function would be senseless
 	// since real support for qt < 3.2 is senseless too ;-)
-	m_lmmsPluginDir( "/usr/lib/lmms" ),
+	m_pluginDir( "/usr/lib/lmms" ),
 #endif
+	m_vstDir( QDir::home().absolutePath() ),
 	m_currentPage( 0 )
 {
 }
@@ -335,8 +333,7 @@ void configManager::createWidgets( void )
 	workingdir_input_fields_layout->setSpacing( 10 );
 	workingdir_input_fields_layout->setMargin( 0 );
 
-	m_wdLineEdit = new QLineEdit( m_lmmsWorkingDir,
-						workingdir_input_fields );
+	m_wdLineEdit = new QLineEdit( m_workingDir, workingdir_input_fields );
 	connect( m_wdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( setWorkingDir( const QString & ) ) );
 
@@ -516,12 +513,11 @@ void configManager::openWorkingDir( void )
 {
 #ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
-					tr( "Choose LMMS-working-directory" ),
-							m_lmmsWorkingDir );
+					tr( "Choose LMMS working directory" ),
+								m_workingDir );
 #else
-	QString new_dir = QFileDialog::getExistingDirectory( m_lmmsWorkingDir,
-									0, 0,
-					tr( "Choose LMMS-working-directory" ),
+	QString new_dir = QFileDialog::getExistingDirectory( m_workingDir, 0, 0,
+					tr( "Choose LMMS working directory" ),
 									TRUE );
 #endif
 	if( new_dir != QString::null )
@@ -535,7 +531,15 @@ void configManager::openWorkingDir( void )
 
 void configManager::setWorkingDir( const QString & _wd )
 {
-	m_lmmsWorkingDir = _wd;
+	m_workingDir = _wd;
+}
+
+
+
+
+void configManager::setVSTDir( const QString & _vd )
+{
+	m_vstDir = _vd;
 }
 
 
@@ -543,11 +547,11 @@ void configManager::setWorkingDir( const QString & _wd )
 
 void configManager::accept( void )
 {
-	if( m_lmmsWorkingDir.right( 1 ) != "/" )
+	if( m_workingDir.right( 1 ) != "/" )
 	{
-		m_lmmsWorkingDir += '/';
+		m_workingDir += '/';
 	}
-	if( !QDir( m_lmmsWorkingDir ).exists() )
+	if( !QDir( m_workingDir ).exists() )
 	{
 		if( QMessageBox::
 #if QT_VERSION >= 0x030200
@@ -562,7 +566,7 @@ void configManager::accept( void )
 					QMessageBox::Yes, QMessageBox::No )
 			== QMessageBox::Yes )
 		{
-			mkPath( m_lmmsWorkingDir );
+			mkPath( m_workingDir );
 		}
 		else
 		{
@@ -570,23 +574,21 @@ void configManager::accept( void )
 			return;
 		}
 	}
-	processFilesRecursively( m_lmmsDataDir + "samples/", m_lmmsWorkingDir +
+	processFilesRecursively( m_dataDir + "samples/", m_workingDir +
 								"samples/",
 					m_samplesCopyRB->isChecked() ?
 								&copyFile :
 								&linkFile );
-	processFilesRecursively( m_lmmsDataDir + "presets/", m_lmmsWorkingDir +
+	processFilesRecursively( m_dataDir + "presets/", m_workingDir +
 								"presets/",
 					m_presetsCopyRB->isChecked() ?
 								&copyFile :
 								&linkFile );
-	processFilesRecursively( m_lmmsDataDir + "projects/", m_lmmsWorkingDir +
+	processFilesRecursively( m_dataDir + "projects/", m_workingDir +
 								"projects/",
 					m_projectsCopyRB->isChecked() ?
 								&copyFile :
 								&linkFile );
-	setValue( "paths", "workingdir", m_lmmsWorkingDir );
-
 	saveConfigFile();
 
 	QDialog::accept();
@@ -825,7 +827,13 @@ bool configManager::loadConfigFile( void )
 		node = node.nextSibling();
 	}
 
-	m_lmmsWorkingDir = value( "paths", "workingdir" );
+	m_workingDir = value( "paths", "workingdir" );
+	m_vstDir = value( "paths", "vstdir" );
+
+	if( m_vstDir == "" )
+	{
+		m_vstDir = QDir::home().absolutePath();
+	}
 
 	return( TRUE );
 }
@@ -835,6 +843,9 @@ bool configManager::loadConfigFile( void )
 
 void configManager::saveConfigFile( void )
 {
+	setValue( "paths", "workingdir", m_workingDir );
+	setValue( "paths", "vstdir", m_vstDir );
+
 	QDomDocument doc( "lmms-config-file" );
 
 	QDomElement lmms_config = doc.createElement( "lmms" );

@@ -2,7 +2,7 @@
  * piano_widget.cpp - implementation of piano-widget used in channel-window
  *                    for testing channel
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -119,7 +119,7 @@ pianoWidget::pianoWidget (channelTrack * _parent ) :
 									4 );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
-	m_pianoScroll->setValue( OCTAVE_3*WHITE_KEYS_PER_OCTAVE );
+	m_pianoScroll->setValue( OCTAVE_3 * WHITE_KEYS_PER_OCTAVE );
 #else
 	// create scrollbar below piano-widget...
 	m_pianoScroll = new QScrollBar( 0, WHITE_KEYS_PER_OCTAVE *

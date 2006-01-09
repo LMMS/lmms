@@ -38,6 +38,7 @@ class channelTrack;
 class notePlayHandle;
 
 typedef vvector<notePlayHandle *> notePlayHandleVector;
+typedef vvector<const notePlayHandle *> constNotePlayHandleVector;
 
 
 class notePlayHandle : public playHandle, public note
@@ -138,6 +139,11 @@ public:
 		return( m_arpNote );
 	}
 
+	inline void setArpNote( bool _on )
+	{
+		m_arpNote = _on;
+	}
+
 	// returns whether note is base-note for arpeggio
 	inline bool arpBaseNote( void ) const
 	{
@@ -150,6 +156,17 @@ public:
 	}
 
 	void mute( void );
+
+	// returns index of note-play-handle in vector of note-play-handles 
+	// belonging to this channel
+	int index( void ) const;
+
+	// note-play-handles belonging to given channel
+	static constNotePlayHandleVector nphsOfChannelTrack(
+						const channelTrack * _ct );
+
+	// return whether given note-play-handle is equal to *this
+	bool operator==( const notePlayHandle & _nph ) const;
 
 
 private:

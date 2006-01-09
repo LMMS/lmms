@@ -2,7 +2,7 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -96,7 +96,9 @@ public:
 		tones _tone = A, octaves _octave = DEFAULT_OCTAVE,
 		volume _volume = DEFAULT_VOLUME,
 		panning _panning = DEFAULT_PANNING ) FASTCALL;
+
 	~note();
+
 	void FASTCALL setLength( const midiTime & _length );
 	void FASTCALL setPos( const midiTime & _pos );
 	void FASTCALL setTone( tones _tone = C );
@@ -104,38 +106,47 @@ public:
 	void FASTCALL setKey( int _key );
 	void FASTCALL setVolume( volume _volume = DEFAULT_VOLUME );
 	void FASTCALL setPanning( panning _panning = DEFAULT_PANNING );
+
 	inline midiTime endPos( void ) const
 	{
 		return( m_pos + m_length);
 	}
+
 	inline const midiTime & length( void ) const
 	{
 		return( m_length );
 	}
+
 	inline const midiTime & pos( void ) const
 	{
 		return( m_pos );
 	}
+
 	inline midiTime pos( midiTime _base_pos ) const
 	{
 		return( m_pos - _base_pos );
 	}
+
 	inline tones tone( void ) const
 	{
 		return( m_tone );
 	}
+
 	inline octaves octave( void ) const
 	{
 		return( m_octave );
 	}
+
 	inline int key( void ) const
 	{
 		return( m_octave * NOTES_PER_OCTAVE + m_tone );
 	}
+
 	inline volume getVolume( void ) const
 	{
 		return( m_volume );
 	}
+
 	inline panning getPanning( void ) const
 	{
 		return( m_panning );

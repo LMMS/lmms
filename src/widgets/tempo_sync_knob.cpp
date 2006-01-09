@@ -1,7 +1,8 @@
 /*
- * tempo_sync_knob.h - adds bpm to ms conversion for knob class
+ * tempo_sync_knob.cpp - adds bpm to ms conversion for knob class
  *
- * Copyright (c) 2005 Danny McRae <khjklujn@yahoo.com>
+ * Copyright (c) 2005 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,21 +28,15 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QPalette>
-#include <QBitmap>
 #include <QLabel>
-#include <QStatusBar>
 #include <QMouseEvent>
 #include <QMenu>
-#include <QStatusBar>
-#include <QFontMetrics>
-#include <QApplication>
 
 #else
 
 #include <qlabel.h>
 #include <qpopupmenu.h>
+#include <qcursor.h>
 
 #define addSeparator insertSeparator
 #define addMenu insertItem
@@ -52,9 +47,6 @@
 #include "tempo_sync_knob.h"
 #include "song_editor.h"
 #include "embed.h"
-#include "tooltip.h"
-#include "config_mgr.h"
-#include "text_float.h"
 
 
 

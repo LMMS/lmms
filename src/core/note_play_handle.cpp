@@ -32,6 +32,7 @@
 #include "midi.h"
 #include "midi_port.h"
 #include "song_editor.h"
+#include "piano_widget.h"
 
 
 
@@ -57,6 +58,7 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
 	m_muted( FALSE )
 {
 	setFrames( _frames );
+	m_channelTrack->m_pianoWidget->setKeyState( key(), TRUE );
 	// send MIDI-note-on-event
 	m_channelTrack->processOutEvent( midiEvent( NOTE_ON,
 				m_channelTrack->m_midiPort->outputChannel(),
@@ -241,6 +243,7 @@ void notePlayHandle::noteOff( Uint32 _s )
 	{
 		m_releaseFramesToDo =
 				m_channelTrack->m_envWidget->releaseFrames();
+		m_channelTrack->m_pianoWidget->setKeyState( key(), FALSE );
 		// send MIDI-note-off-event
 		m_channelTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_channelTrack->m_midiPort->outputChannel(),
@@ -300,4 +303,73 @@ void notePlayHandle::mute( void )
 	}
 	m_muted = TRUE;
 }
+
+
+
+
+int notePlayHandle::index( void ) const
+{
+	const playHandleVector & phv = mixer::inst()->playHandles();
+	int idx = 0;
+	for( constPlayHandleVector::const_iterator it = phv.begin();
+							it != phv.end(); ++it )
+	{
+		const notePlayHandle * nph =
+				dynamic_cast<const notePlayHandle *>( *it );
+		if( nph == NULL || nph->m_channelTrack != m_channelTrack ||
+						nph->released() == TRUE )
+		{
+			continue;
+		}
+		if( nph == this )
+		{
+			break;
+		}
+		++idx;
+	}
+	return( idx );
+}
+
+
+
+
+constNotePlayHandleVector notePlayHandle::nphsOfChannelTrack(
+						const channelTrack * _ct )
+{
+	const playHandleVector & phv = mixer::inst()->playHandles();
+	constNotePlayHandleVector cnphv;
+
+	for( constPlayHandleVector::const_iterator it = phv.begin();
+							it != phv.end(); ++it )
+	{
+		const notePlayHandle * nph =
+				dynamic_cast<const notePlayHandle *>( *it );
+		if( nph != NULL && nph->m_channelTrack == _ct &&
+						nph->released() == FALSE )
+		{
+			cnphv.push_back( nph );
+		}
+	}
+	return( cnphv );
+}
+
+
+
+bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
+{
+	return( length() == _nph.length() &&
+			pos() == _nph.pos() &&
+			key() == _nph.key() &&
+			getVolume() == _nph.getVolume() &&
+			getPanning() == _nph.getPanning() &&
+			m_channelTrack == _nph.m_channelTrack &&
+			m_frames == _nph.m_frames &&
+			m_framesAhead == _nph.m_framesAhead &&
+			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
+			m_released == _nph.m_released &&
+			m_baseNote == _nph.m_baseNote &&
+			m_arpNote == _nph.m_arpNote &&
+			m_muted == _nph.m_muted );
+}
+
 

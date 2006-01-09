@@ -2,7 +2,7 @@
  * play_handle.h - base-class playHandle which is needed by
  *                 LMMS-Player-Engine
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -87,6 +87,7 @@ private:
 
 
 typedef vvector<playHandle *> playHandleVector;
+typedef vvector<const playHandle *> constPlayHandleVector;
 
 
 #endif

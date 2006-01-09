@@ -1,7 +1,7 @@
 /*
  * audio_device.h - base-class for audio-devices, used by LMMS-mixer
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -112,7 +112,7 @@ public:
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
 			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-							_caption ), _parent )
+						_caption ).toUpper(), _parent )
 		{
 		}
 

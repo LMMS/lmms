@@ -2,7 +2,7 @@
  * arp_and_chords_tab_widget.cpp - widget for use in arp/chord-tab of 
  *                                 channel-window
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,8 +41,6 @@
 #include <qcombobox.h>
 #include <qwhatsthis.h>
 
-#define setChecked setOn
-
 #endif
 
 
@@ -62,6 +60,7 @@
 #include "gui_templates.h"
 #include "tempo_sync_knob.h"
 #include "channel_track.h"
+#include "led_checkbox.h"
 
 
 
@@ -153,9 +152,9 @@ arpAndChordsTabWidget::chord arpAndChordsTabWidget::s_chords[] =
 	{ arpAndChordsTabWidget::tr( "Diminished" ), { 0, 2, 3, 5, 6, 8, 9,
 								11, -1 } },
 	{ arpAndChordsTabWidget::tr( "Major pentatonic" ), { 0, 2, 4, 7, 10,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Minor pentatonic" ), { 0, 3, 5, 7, 10,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
 	{ arpAndChordsTabWidget::tr( "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9,
 								11, -1 } },
@@ -164,7 +163,7 @@ arpAndChordsTabWidget::chord arpAndChordsTabWidget::s_chords[] =
 	{ arpAndChordsTabWidget::tr( "Blues" ), { 0, 3, 5, 6, 7, 10, -1 } },
 	{ arpAndChordsTabWidget::tr( "Arabic" ), { 0, 1, 4, 5, 7, 8, 11, -1 } },
 	{ arpAndChordsTabWidget::tr( "Enigmatic" ), { 0, 1, 4, 6, 8, 10, 11,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Neopolitan" ), { 0, 1, 3, 5, 7, 9, 11,
 								-1 } },
 	{ arpAndChordsTabWidget::tr( "Neopolitan minor" ), { 0, 1, 3, 5, 7, 9,
@@ -173,14 +172,14 @@ arpAndChordsTabWidget::chord arpAndChordsTabWidget::s_chords[] =
 								11, -1 } },
 	{ arpAndChordsTabWidget::tr( "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
 	{ arpAndChordsTabWidget::tr( "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
 	{ arpAndChordsTabWidget::tr( "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10,
-								-1 } },
+									-1 } },
 	{ arpAndChordsTabWidget::tr( "Locrian" ), { 0, 1, 3, 5, 6, 8, 10,
-								-1 } },
+									-1 } },
 
 	{ "", { -1, -1 } }
 
@@ -323,13 +322,13 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"can make cool staccato-arpeggios." ) );
 
 	m_arpDirectionLbl = new QLabel( tr( "DIRECTION:" ), m_arpGroupBox );
-	m_arpDirectionLbl->setGeometry( 10, 70, 64, 8 );
-	m_arpDirectionLbl->setFont( pointSize<6>( m_arpDirectionLbl->font() ) );
+	m_arpDirectionLbl->setGeometry( 10, 60, 64, 8 );
+	m_arpDirectionLbl->setFont( pointSize<7>( m_arpDirectionLbl->font() ) );
 
 
 
 	m_arpUpBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpBtn->move( 70, 70 );
+	m_arpUpBtn->move( 70, 60 );
 	m_arpUpBtn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	m_arpUpBtn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
 #ifdef QT4
@@ -345,7 +344,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 						SLOT( arpUpToggled( bool ) ) );
 
 	m_arpDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpDownBtn->move( 90, 70 );
+	m_arpDownBtn->move( 90, 60 );
 	m_arpDownBtn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	m_arpDownBtn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_down_off" ) );
@@ -357,7 +356,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 					SLOT( arpDownToggled( bool ) ) );
 
 	m_arpUpAndDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpAndDownBtn->move( 110, 70 );
+	m_arpUpAndDownBtn->move( 110, 60 );
 	m_arpUpAndDownBtn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
 	m_arpUpAndDownBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -371,7 +370,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 					SLOT( arpUpAndDownToggled( bool ) ) );
 
 	m_arpRandomBtn = new pixmapButton( m_arpGroupBox );
-	m_arpRandomBtn->move( 130, 70 );
+	m_arpRandomBtn->move( 130, 60 );
 	m_arpRandomBtn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
 	m_arpRandomBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -392,6 +391,10 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 #ifndef QT4
 	m_arpDirections_group->hide();
 #endif
+
+	m_sortMode = new ledCheckBox( tr( "SORT-MODE" ), m_arpGroupBox );
+	m_sortMode->move( 10, 90 );
+
 }
 
 
@@ -485,28 +488,40 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	const int selected_arp = m_arpComboBox->currentItem();
 #endif
 
+	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfChannelTrack(
+							_n->getChannelTrack() );
+	// VERY unlikely, but better check this before ending in a crash
+	if( cnphv.size() == 0 )
+	{
+		return;
+	}
+
 	const int cur_chord_size = getChordSize( s_chords[selected_arp] );
-	const int total_range = (int)( cur_chord_size *
-						m_arpRangeKnob->value() );
+	const int range = (int)( cur_chord_size * m_arpRangeKnob->value() );
+	const int total_range = range * cnphv.size();
+
 	// number of frames that every note should be played
 	const Uint32 arp_frames = (Uint32)( m_arpTimeKnob->value() / 1000.0f *
 						mixer::inst()->sampleRate() );
 	const Uint32 gated_frames = (Uint32)( m_arpGateKnob->value() *
 							arp_frames / 100.0f );
+
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame = _n->totalFramesPlayed() + arp_frames - 1;
+	int cur_frame = ( ( m_sortMode->isChecked() == TRUE ) ?
+				cnphv.first()->totalFramesPlayed() :
+				_n->totalFramesPlayed() )
+							+ arp_frames - 1;
 	// used for loop
 	Uint32 frames_processed = 0;
-	// len for all arp-notes (depending on arp-time)
 
 	while( frames_processed < mixer::inst()->framesPerAudioBuffer() )
 	{
 		const Uint32 remaining_frames_for_cur_arp = arp_frames -
 						( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
-		if( remaining_frames_for_cur_arp >=
+		if( remaining_frames_for_cur_arp >
 					mixer::inst()->framesPerAudioBuffer() )
 		{
 			// then we don't have to do something!
@@ -518,36 +533,46 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// init with zero
 		int cur_arp_idx = 0;
 
+		if( m_sortMode->isChecked() == TRUE &&
+				( ( cur_frame / arp_frames ) % total_range ) /
+					range != (csize) _n->index() )
+		{
+			// update counters
+			frames_processed += arp_frames;
+			cur_frame += arp_frames;
+			break;
+		}
+
 		// process according to arpeggio-direction...
 		if( m_arpDirection == UP )
 		{
-			cur_arp_idx = ( cur_frame / arp_frames ) % total_range;
+			cur_arp_idx = ( cur_frame / arp_frames ) % range;
 		}
 		else if( m_arpDirection == DOWN )
 		{
-			cur_arp_idx = total_range - ( cur_frame / arp_frames ) %
-						total_range - 1;
+			cur_arp_idx = range - ( cur_frame / arp_frames ) %
+								range - 1;
 		}
-		else if( m_arpDirection == UP_AND_DOWN && total_range > 1 )
+		else if( m_arpDirection == UP_AND_DOWN && range > 1 )
 		{
 			// imagine, we had to play the arp once up and then
-			// once down -> makes 2 * total_range possible notes...
+			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
 			cur_arp_idx = ( cur_frame / arp_frames ) %
-							( total_range * 2 - 2 );
-			// if greater than total_range, we have to play down...
+							( range * 2 - 2 );
+			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= total_range )
+			if( cur_arp_idx >= range )
 			{
-				cur_arp_idx = total_range - cur_arp_idx %
-							( total_range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx %
+							( range - 1 ) - 1;
 			}
 		}
 		else if( m_arpDirection == RANDOM )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = (int)( total_range * ( (float) rand() /
+			cur_arp_idx = (int)( range * ( (float) rand() /
 							(float) RAND_MAX ) );
 		}
 
@@ -584,20 +609,27 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// and is_arp_note=TRUE
 		notePlayHandle * note_play_handle = new notePlayHandle(
 						_n->getChannelTrack(),
-						_n->framesAhead() +
+					( ( m_sortMode->isChecked() == TRUE ) ?
+						cnphv.first()->framesAhead() :
+						_n->framesAhead() ) +
 							frames_processed,
 						gated_frames,
 						&new_note,
 						TRUE );
 
-		// add sub-note to base-note, now all stuff is done by
-		// notePlayHandle::play_note()
+		// add sub-note to base-note - now all stuff is done by
+		// notePlayHandle::playNote()
 		_n->addSubNote( note_play_handle );
 
 		// update counters
 		frames_processed += arp_frames;
 		cur_frame += arp_frames;
 	}
+
+	// make sure, note is handled as arp-base-note, even if we didn't add a
+	// sub-note so far
+	_n->setArpNote( TRUE );
+
 }
 
 
@@ -607,6 +639,9 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement act_de = _doc.createElement( nodeName() );
+<<<<<<< arp_and_chords_tab_widget.cpp
+	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
+=======
 	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
 #ifdef QT4
 	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
@@ -614,6 +649,32 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
 #endif
 	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
+
+	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
+>>>>>>> 1.11
+#ifdef QT4
+<<<<<<< arp_and_chords_tab_widget.cpp
+	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
+=======
+	act_de.setAttribute( "arp", m_arpComboBox->currentIndex() );
+>>>>>>> 1.11
+#else
+<<<<<<< arp_and_chords_tab_widget.cpp
+	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
+=======
+	act_de.setAttribute( "arp", m_arpComboBox->currentItem() );
+>>>>>>> 1.11
+#endif
+<<<<<<< arp_and_chords_tab_widget.cpp
+	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
+=======
+	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
+	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
+	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
+	act_de.setAttribute( "arpdir", m_arpDirection );
+	act_de.setAttribute( "arpsyncmode",
+					( int ) m_arpTimeKnob->getSyncMode() );
+>>>>>>> 1.11
 
 	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
 #ifdef QT4
@@ -628,7 +689,7 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	act_de.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
-
+	act_de.setAttribute( "sortmode", m_sortMode->isChecked() );
 	_parent.appendChild( act_de );
 }
 
@@ -658,6 +719,8 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpTimeKnob->setSyncMode( 
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
+
+	m_sortMode->setChecked( _this.attribute( "sortmode" ).toInt() );
 
 	m_arpGroupBox->setState( m_arpDirection != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );

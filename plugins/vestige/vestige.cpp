@@ -388,7 +388,7 @@ void vestigeInstrument::openPlugin( void )
 	}
 	else
 	{
-		dir = QDir::home().path();
+		dir = configManager::inst()->vstDir();
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );

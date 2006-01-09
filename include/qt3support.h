@@ -139,6 +139,7 @@ inline QString baseName( const QString & _file )
 
 // QString
 #define toLower lower
+#define toUpper upper
 
 
 // QTextEdit

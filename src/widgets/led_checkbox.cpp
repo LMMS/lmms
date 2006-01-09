@@ -1,7 +1,7 @@
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -148,7 +148,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 		p.drawPixmap( 0, 0, *m_ledOffPixmap );
 	}
 
-	p.drawText( m_ledOffPixmap->width() + 2, 10, text() );
+	p.drawText( m_ledOffPixmap->width() + 2, 8, text() );
 
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...

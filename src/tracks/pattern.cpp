@@ -1,7 +1,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005 Danny McRae <khjklujn@yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -790,6 +790,10 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 		}
 		songEditor::inst()->setModified();
 		update();
+		if( pianoRoll::inst()->currentPattern() == this )
+		{
+			pianoRoll::inst()->update();
+		}
 	}
 	else if( m_frozenPattern != NULL && _me->button() == Qt::LeftButton &&
 			lmmsMainWin::isShiftPressed() == TRUE )
@@ -849,11 +853,23 @@ void pattern::wheelEvent( QWheelEvent * _we )
 		}
 		songEditor::inst()->setModified();
 		update();
+<<<<<<< pattern.cpp
+		if( pianoRoll::inst()->currentPattern() == this )
+		{
+			pianoRoll::inst()->update();
+		}
 		_we->accept();
 	}
 	else
 	{
 		trackContentObject::wheelEvent( _we );
+=======
+		_we->accept();
+	}
+	else
+	{
+		trackContentObject::wheelEvent( _we );
+>>>>>>> 1.12
 	}
 }
 

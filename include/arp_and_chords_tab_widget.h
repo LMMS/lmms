@@ -2,7 +2,7 @@
  * arp_and_chords_tab_widget.h - declaration of class arpAndChordWidget which
  *                               provides code for using arpeggio and chords
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,6 +53,7 @@ class QPixmap;
 class channelTrack;
 class groupBox;
 class knob;
+class ledCheckBox;
 class notePlayHandle;
 class pixmapButton;
 class tempoSyncKnob;
@@ -131,6 +132,8 @@ private:
 	pixmapButton * m_arpDownBtn;
 	pixmapButton * m_arpUpAndDownBtn;
 	pixmapButton * m_arpRandomBtn;
+
+	ledCheckBox * m_sortMode;
 
 } ;
 

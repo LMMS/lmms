@@ -524,7 +524,12 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 
 inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
+<<<<<<< piano_roll.cpp
+					Sint16 _width, const bool _is_selected,
+						const bool _is_step_note )
+=======
 					Sint16 _width, const bool _is_selected )
+>>>>>>> 1.14
 {
 	++_x;
 	++_y;
@@ -536,7 +541,11 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 	}
 
 	QColor current_color( 0xFF, 0xB0, 0x00 );
-	if( _is_selected )
+	if( _is_step_note == TRUE )
+	{
+		current_color.setRgb( 0, 255, 0 );
+	}
+	else if( _is_selected == TRUE )
 	{
 		current_color.setRgb( 0x00, 0x40, 0xC0 );
 	}
@@ -815,10 +824,15 @@ void pianoRoll::update( void )
 		{
 			Sint32 len_tact_64th = ( *it )->length();
 
-			if( len_tact_64th <= 0 )
+			if( len_tact_64th == 0 )
 			{
 				continue;
 			}
+			else if( len_tact_64th < 0 )
+			{
+				len_tact_64th = 4;
+			}
+
 			const int key = ( *it )->key() - m_startKey + 1;
 
 			Sint32 pos_tact_64th = ( *it )->pos();
@@ -865,7 +879,8 @@ void pianoRoll::update( void )
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width,
-								is_selected );
+								is_selected,
+							( *it )->length() < 0 );
 			}
 			// draw volume-line of note
 			p.setPen( QPen( QColor( 0, 255, 0 ), NE_LINE_WIDTH ) );
@@ -919,6 +934,7 @@ void pianoRoll::update( void )
 
 void pianoRoll::removeSelection( void )
 {
+<<<<<<< piano_roll.cpp
 	m_selectStartTact64th = 0;
 	m_selectedTact64th = 0;
 	m_selectStartKey = 0;
@@ -926,8 +942,29 @@ void pianoRoll::removeSelection( void )
 }
 
 
+=======
+	m_selectStartTact64th = 0;
+	m_selectedTact64th = 0;
+	m_selectStartKey = 0;
+	m_selectedKeys = 0;
+}
+
+>>>>>>> 1.14
 
 
+<<<<<<< piano_roll.cpp
+void pianoRoll::closeEvent( QCloseEvent * _ce )
+{
+	QApplication::restoreOverrideCursor();
+	hide();
+	_ce->ignore ();
+}
+
+=======
+>>>>>>> 1.14
+
+<<<<<<< piano_roll.cpp
+=======
 void pianoRoll::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
@@ -936,6 +973,7 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 }
 
 
+>>>>>>> 1.14
 
 
 void pianoRoll::enterEvent( QEvent * _e )
@@ -1065,14 +1103,27 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			_ke->ignore();
 			break;
 	}
+<<<<<<< piano_roll.cpp
 }
 
 
+=======
+}
+
+>>>>>>> 1.14
+
+<<<<<<< piano_roll.cpp
+
+void pianoRoll::leaveEvent( QEvent * _e )
+{
+	while( QApplication::overrideCursor() != NULL )
+=======
 
 
 void pianoRoll::leaveEvent( QEvent * _e )
 {
 	while( QApplication::overrideCursor() != NULL )
+>>>>>>> 1.14
 	{
 		QApplication::restoreOverrideCursor();
 	}
@@ -1122,14 +1173,18 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			// loop through whole note-vector...
 			while( it != notes.end() )
 			{
+				midiTime len = ( *it )->length();
+				if( len < 0 )
+				{
+					len = 4;
+				}
 				// and check whether the user clicked on an
 				// existing note or an edit-line
 				if( pos_tact_64th >= ( *it )->pos() &&
-				    	( *it )->length() > 0 &&
+						len > 0 &&
 					(
 					( edit_note == FALSE &&
-					pos_tact_64th <= ( *it )->pos() +
-							( *it )->length() &&
+					pos_tact_64th <= ( *it )->pos() + len &&
 					( *it )->key() == key_num )
 					||
 					( edit_note == TRUE &&
@@ -1202,7 +1257,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				// clicked at the "tail" of the note?
 				if( pos_tact_64th > m_currentNote->pos() +
 						m_currentNote->length() -
-							RESIZE_AREA_WIDTH )
+							RESIZE_AREA_WIDTH &&
+						m_currentNote->length() > 0 )
 				{
 					// then resize the note
 					m_action = RESIZE_NOTE;
@@ -1237,10 +1293,17 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				play_note = FALSE;
 				if( it != notes.end() )
 				{
-					m_pattern->removeNote( *it );
+					if( ( *it )->length() > 0 )
+					{
+						m_pattern->removeNote( *it );
+					}
+					else
+					{
+						( *it )->setLength( 0 );
+						m_pattern->update();
+					}
+					songEditor::inst()->setModified();
 				}
-
-				songEditor::inst()->setModified();
 			}
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == SELECT )
@@ -1497,7 +1560,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			    		pos_tact_64th <= ( *it )->pos() +
 							( *it )->length() &&
 					( *it )->key() == key_num &&
-					(*it )->length() > 0 )
+					( *it )->length() > 0 )
 				{
 					break;
 				}
@@ -1509,7 +1572,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			if( it != notes.end() )
 			{
 				// cursor at the "tail" of the note?
-				if( pos_tact_64th > ( *it )->pos() +
+				if( ( *it )->length() > 0 &&
+					pos_tact_64th > ( *it )->pos() +
 						( *it )->length() -
 							RESIZE_AREA_WIDTH )
 				{

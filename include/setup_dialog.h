@@ -47,6 +47,7 @@
 
 class QComboBox;
 class QLabel;
+class QLineEdit;
 class QSlider;
 
 class tabBar;
@@ -75,6 +76,10 @@ private slots:
 	void resetBufSize( void );
 	void displayBufSizeHelp( void );
 
+	// directory settings widget
+	void setWorkingDir( const QString & _wd );
+	void setVSTDir( const QString & _vd );
+
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
 	void displayAudioHelp( void );
@@ -89,6 +94,10 @@ private slots:
 	void toggleGIMPLikeWindows( bool _enabled );
 
 
+	void openWorkingDir( void );
+	void openVSTDir( void );
+
+
 private:
 	tabBar * m_tabBar;
 
@@ -99,6 +108,13 @@ private:
 	bool m_disableToolTips;
 	bool m_classicalKnobUsability;
 	bool m_gimpLikeWindows;
+
+
+	QLineEdit * m_wdLineEdit;
+	QLineEdit * m_vdLineEdit;
+
+	QString m_workingDir;
+	QString m_vstDir;
 
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;

@@ -1,7 +1,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,6 +33,8 @@
 #include <QWhatsThis>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QLineEdit>
+#include <QFileDialog>
 
 #else
 
@@ -42,6 +44,8 @@
 #include <qwhatsthis.h>
 #include <qcombobox.h>
 #include <qmessagebox.h>
+#include <qlineedit.h>
+#include <qfiledialog.h>
 
 #endif
 
@@ -100,10 +104,13 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_classicalKnobUsability( configManager::inst()->value( "knobs",
 					"classicalusability" ).toInt() ),
 	m_gimpLikeWindows( configManager::inst()->value( "app",
-						"gimplikewindows" ).toInt() )
+						"gimplikewindows" ).toInt() ),
+	m_workingDir( configManager::inst()->workingDir() ),
+	m_vstDir( configManager::inst()->vstDir() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
+	setModal( TRUE );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -203,6 +210,59 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( misc_tw );
 	gen_layout->addStretch();
+
+
+
+	QWidget * directories = new QWidget( ws );
+	directories->setFixedSize( 360, 200 );
+	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
+	dir_layout->setSpacing( 0 );
+	dir_layout->setMargin( 0 );
+	labelWidget( directories, tr( "Directories" ) );
+
+	// working-dir
+	tabWidget * lmms_wd_tw = new tabWidget( tr(
+					"LMMS working directory" ).toUpper(),
+								directories );
+	lmms_wd_tw->setFixedHeight( 56 );
+
+	m_wdLineEdit = new QLineEdit( m_workingDir, lmms_wd_tw );
+	m_wdLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_wdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+				SLOT( setWorkingDir( const QString & ) ) );
+
+	QPushButton * workingdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+							"", lmms_wd_tw );
+	workingdir_select_btn->setFixedSize( 24, 24 );
+	workingdir_select_btn->move( 320, 20 );
+	connect( workingdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openWorkingDir() ) );
+
+	// vst-dir
+	tabWidget * vst_tw = new tabWidget( tr(
+					"VST-plugin directory" ).toUpper(),
+								directories );
+	vst_tw->setFixedHeight( 56 );
+
+	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
+	m_vdLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_vdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setVSTDir( const QString & ) ) );
+
+	QPushButton * vstdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", vst_tw );
+	vstdir_select_btn->setFixedSize( 24, 24 );
+	vstdir_select_btn->move( 320, 20 );
+	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openVSTDir() ) );
+
+	dir_layout->addWidget( lmms_wd_tw );
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( vst_tw );
+	dir_layout->addStretch();
+
 
 
 
@@ -381,9 +441,12 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	m_tabBar->addTab( general, tr( "General settings" ), 0, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap( "setup_general" ) );
-	m_tabBar->addTab( audio, tr( "Audio settings" ), 1, FALSE, TRUE
+	m_tabBar->addTab( directories, tr( "Directories" ), 1, FALSE, TRUE 
+			)->setIcon( embed::getIconPixmap(
+							"setup_directories" ) );
+	m_tabBar->addTab( audio, tr( "Audio settings" ), 2, FALSE, TRUE
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( midi, tr( "MIDI settings" ), 2, TRUE, TRUE
+	m_tabBar->addTab( midi, tr( "MIDI settings" ), 3, TRUE, TRUE
 			)->setIcon( embed::getIconPixmap( "setup_midi" ) );
 
 #undef setIcon
@@ -452,6 +515,10 @@ void setupDialog::accept( void )
 				QString::number( m_classicalKnobUsability ) );
 	configManager::inst()->setValue( "app", "gimplikewindows",
 				QString::number( m_gimpLikeWindows ) );
+
+	configManager::inst()->setWorkingDir( m_workingDir );
+	configManager::inst()->setVSTDir( m_vstDir );
+
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
@@ -526,6 +593,64 @@ void setupDialog::displayBufSizeHelp( void )
 					"especially on older computers or "
 					"systems with a non-realtime "
 					"kernel." ) );
+}
+
+
+
+
+void setupDialog::openWorkingDir( void )
+{
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+					tr( "Choose LMMS working directory" ),
+							m_workingDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_workingDir,
+									0, 0,
+					tr( "Choose LMMS working directory" ),
+									TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		m_wdLineEdit->setText( new_dir );
+	}
+}
+
+
+
+
+void setupDialog::setWorkingDir( const QString & _wd )
+{
+	m_workingDir = _wd;
+}
+
+
+
+
+void setupDialog::openVSTDir( void )
+{
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+				tr( "Choose your VST-plugin directory" ),
+							m_vstDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_vstDir,
+									0, 0,
+				tr( "Choose your VST-plugin directory" ),
+									TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		m_vdLineEdit->setText( new_dir );
+	}
+}
+
+
+
+
+void setupDialog::setVSTDir( const QString & _vd )
+{
+	m_vstDir = _vd;
 }
 
 

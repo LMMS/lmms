@@ -2,7 +2,7 @@
  * piano_roll.h - declaration of class pianoRoll which is a window where you
  *                can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -108,8 +108,10 @@ protected:
 	virtual void wheelEvent( QWheelEvent * _we );
 
 	int FASTCALL getKey( int _y );
-	inline void drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
-					Sint16 _width, bool _is_selected );
+	static inline void drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
+					Sint16 _width,
+					const bool _is_selected,
+					const bool _is_step_note );
 	void removeSelection( void );
 	void selectAll( void );
 	void FASTCALL getSelectedNotes( noteVector & _selected_notes );
