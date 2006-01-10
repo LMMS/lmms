@@ -105,6 +105,9 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 					"classicalusability" ).toInt() ),
 	m_gimpLikeWindows( configManager::inst()->value( "app",
 						"gimplikewindows" ).toInt() ),
+	m_noWizard( configManager::inst()->value( "app", "nowizard" ).toInt() ),
+	m_noMsgAfterSetup( configManager::inst()->value( "app",
+						"nomsgaftersetup" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() )
 {
@@ -125,10 +128,10 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-	ws->setFixedSize( 360, 200 );
+	ws->setFixedSize( 360, 240 );
 
 	QWidget * general = new QWidget( ws );
-	general->setFixedSize( 360, 200 );
+	general->setFixedSize( 360, 240 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
 	gen_layout->setSpacing( 0 );
 	gen_layout->setMargin( 0 );
@@ -174,7 +177,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 76 );
+	misc_tw->setFixedHeight( 110 );
 
 	ledCheckBox * disable_tooltips = new ledCheckBox(
 					tr( "Disable tooltips (no spurious "
@@ -204,6 +207,25 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	gimp_like_windows->setChecked( m_gimpLikeWindows );
 	connect( gimp_like_windows, SIGNAL( toggled( bool ) ),
 			this, SLOT( toggleGIMPLikeWindows( bool ) ) );
+
+
+	ledCheckBox * no_wizard = new ledCheckBox(
+					tr( "Do not show wizard after "
+						"up-/downgrade" ), misc_tw );
+	no_wizard->move( 10, 72 );
+	no_wizard->setChecked( m_noWizard );
+	connect( no_wizard, SIGNAL( toggled( bool ) ),
+					this, SLOT( toggleNoWizard( bool ) ) );
+
+
+	ledCheckBox * no_msg = new ledCheckBox(
+					tr( "Do not show message after "
+						"closing this dialog" ),
+								misc_tw );
+	no_msg->move( 10, 90 );
+	no_msg->setChecked( m_noMsgAfterSetup );
+	connect( no_msg, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleNoMsgAfterSetup( bool ) ) );
 
 
 	gen_layout->addWidget( bufsize_tw );
@@ -515,6 +537,10 @@ void setupDialog::accept( void )
 				QString::number( m_classicalKnobUsability ) );
 	configManager::inst()->setValue( "app", "gimplikewindows",
 				QString::number( m_gimpLikeWindows ) );
+	configManager::inst()->setValue( "app", "nowizard",
+				QString::number( m_noWizard ) );
+	configManager::inst()->setValue( "app", "nomsgaftersetup",
+				QString::number( m_noMsgAfterSetup ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -543,11 +569,14 @@ void setupDialog::accept( void )
 	configManager::inst()->saveConfigFile();
 
 	QDialog::accept();
-	QMessageBox::information( NULL, tr( "Restart LMMS" ),
+	if( m_noMsgAfterSetup == FALSE )
+	{
+		QMessageBox::information( NULL, tr( "Restart LMMS" ),
 					tr( "Please note that most changes "
 						"won't take effect until "
 						"you restart LMMS!" ),
 					QMessageBox::Ok );
+	}
 }
 
 
@@ -750,8 +779,25 @@ void setupDialog::toggleKnobUsability( bool _classical )
 
 void setupDialog::toggleGIMPLikeWindows( bool _enabled )
 {
-	m_gimpLikeWindows =  _enabled;
+	m_gimpLikeWindows = _enabled;
 }
+
+
+
+
+void setupDialog::toggleNoWizard( bool _enabled )
+{
+	m_noWizard = _enabled;
+}
+
+
+
+
+void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
+{
+	m_noMsgAfterSetup = _enabled;
+}
+
 
 
 

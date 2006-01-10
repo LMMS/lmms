@@ -1,7 +1,7 @@
 /*
  * setup_dialog.h - dialog for setting up LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -92,6 +92,8 @@ private slots:
 	void toggleToolTips( bool _disabled );
 	void toggleKnobUsability( bool _classical );
 	void toggleGIMPLikeWindows( bool _enabled );
+	void toggleNoWizard( bool _enabled );
+	void toggleNoMsgAfterSetup( bool _enabled );
 
 
 	void openWorkingDir( void );
@@ -108,6 +110,8 @@ private:
 	bool m_disableToolTips;
 	bool m_classicalKnobUsability;
 	bool m_gimpLikeWindows;
+	bool m_noWizard;
+	bool m_noMsgAfterSetup;
 
 
 	QLineEdit * m_wdLineEdit;

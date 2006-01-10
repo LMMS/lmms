@@ -737,7 +737,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	}
 
 	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
-					"to begin a new drag'n'drop-action" ) );
+				"to begin a new drag'n'drop-action." ) );
 
 	QMenu * to_menu = new QMenu( this );
 	to_menu->setFont( pointSize<9>( to_menu->font() ) );
@@ -753,7 +753,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 								"", this );
 	m_trackOps->setGeometry( 12, 1, 28, 28 );
 	m_trackOps->setMenu( to_menu );
-	toolTip::add( m_trackOps, tr( "Operations for this track" ) );
+	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
 
 	m_muteBtn = new pixmapButton( this );

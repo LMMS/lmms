@@ -769,38 +769,6 @@ bool configManager::loadConfigFile( void )
 
 	// get the head information from the DOM
 	QDomElement root = dom_tree.documentElement();
-	if( root.isElement() )
-	{
-		QString cfg_file_ver = root.toElement().attribute( "version" );
-		if( ( cfg_file_ver.length() == 0 || cfg_file_ver != VERSION ) &&
-			QMessageBox::
-#if QT_VERSION >= 0x030200
-				question
-#else
-				information
-#endif
-				( 0, tr( "Version mismatches" ),
-					tr( "Accordingly to the information in "
-						"your LMMS-configuration-file "
-						"you seem\nto have run a "
-						"different (probably older) "
-						"version of LMMS before.\n"
-						"It is recommended to run the "
-						"setup-wizard again to ensure "
-						"that\nthe latest samples, "
-						"presets, demo-projects etc. "
-						"are installed in your\n"
-						"LMMS-working-directory. "
-						"Run the setup-wizard now?" ),
-					QMessageBox::Yes, QMessageBox::No )
-			== QMessageBox::Yes )
-		{
-			if( exec() )
-			{
-				return( loadConfigFile() );
-			}
-		}
-	}
 
 	QDomNode node = root.firstChild();
 
@@ -833,6 +801,40 @@ bool configManager::loadConfigFile( void )
 	if( m_vstDir == "" )
 	{
 		m_vstDir = QDir::home().absolutePath();
+	}
+
+	if( root.isElement() )
+	{
+		QString cfg_file_ver = root.toElement().attribute( "version" );
+		if( ( cfg_file_ver.length() == 0 || cfg_file_ver != VERSION ) &&
+				value( "app", "nowizard" ).toInt() == FALSE &&
+			QMessageBox::
+#if QT_VERSION >= 0x030200
+				question
+#else
+				information
+#endif
+				( 0, tr( "Version mismatches" ),
+					tr( "Accordingly to the information in "
+						"your LMMS-configuration-file "
+						"you seem\nto have run a "
+						"different (probably older) "
+						"version of LMMS before.\n"
+						"It is recommended to run the "
+						"setup-wizard again to ensure "
+						"that\nthe latest samples, "
+						"presets, demo-projects etc. "
+						"are installed in your\n"
+						"LMMS-working-directory. "
+						"Run the setup-wizard now?" ),
+					QMessageBox::Yes, QMessageBox::No )
+			== QMessageBox::Yes )
+		{
+			if( exec() )
+			{
+				return( loadConfigFile() );
+			}
+		}
 	}
 
 	return( TRUE );

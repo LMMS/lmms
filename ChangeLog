@@ -1,3 +1,11 @@
+2006-01-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/setup_dialog.h:
+	* src/core/config_mgr.cpp:
+	* src/core/setup_dialog.cpp:
+	made appearence of two dialogs switchable (question whether to re-run
+	wizard after up-/downgrade and message after accepting setup-dialog)
+
 2006-01-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/piano_roll.h:
@@ -34,7 +42,7 @@
 	certain arpeggio-times
 
 	* src/core/lmms_main_win.cpp:
-	commented out code for creating effect-board-window
+	commented out code for creating effect-board-window-button
 
 	* src/core/channel_track.cpp:
 	removed inclusion of paths.h which isn't part of LMMS for quite a long
