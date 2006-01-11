@@ -1,3 +1,13 @@
+2006-01-10	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
+
+	* locale/ru.ts:
+	updated Russian translation
+
+2006-01-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/piano_roll.cpp:
+	update pattern after changing volume of step-note
+
 2006-01-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/setup_dialog.h:

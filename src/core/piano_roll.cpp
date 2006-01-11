@@ -2,7 +2,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1435,6 +1435,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								MIN_VOLUME,
 								MAX_VOLUME );
 				m_currentNote->setVolume( vol );
+				m_pattern->update();
 				m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( KEY_PRESSURE, 0, key_num,
 							vol * 127 / 100 ),
