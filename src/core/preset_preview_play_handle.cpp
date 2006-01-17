@@ -2,7 +2,7 @@
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,13 +79,16 @@ private:
 	{
 		hide();
 	}
-	~blindTrackContainer()
+
+	virtual ~blindTrackContainer()
 	{
 	}
+
 
 	static blindTrackContainer * s_instanceOfMe;
 
 	friend void presetPreviewPlayHandle::cleanUp( void );
+
 } ;
 
 
@@ -94,7 +97,7 @@ blindTrackContainer * blindTrackContainer::s_instanceOfMe = NULL;
 
 channelTrack * presetPreviewPlayHandle::s_globalChannelTrack = NULL;
 notePlayHandle * presetPreviewPlayHandle::s_globalPreviewNote = NULL;
-QMutex * presetPreviewPlayHandle::s_globalDataMutex = NULL;
+QMutex presetPreviewPlayHandle::s_globalDataMutex;
 
 
 presetPreviewPlayHandle::presetPreviewPlayHandle(
@@ -102,12 +105,13 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	playHandle( PRESET_PREVIEW_PLAY_HANDLE ),
 	m_previewNote( NULL )
 {
-	if( s_globalDataMutex == NULL )
+/*	if( s_globalDataMutex == NULL )
 	{
 		s_globalDataMutex = new QMutex;
 	}
 
-	s_globalDataMutex->lock();
+	s_globalDataMutex->lock();*/
+	s_globalDataMutex.lock();
 
 	if( s_globalPreviewNote != NULL )
 	{
@@ -141,7 +145,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 	s_globalPreviewNote = m_previewNote;
 
-	s_globalDataMutex->unlock();
+	s_globalDataMutex.unlock();
 }
 
 
@@ -149,21 +153,13 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 presetPreviewPlayHandle::~presetPreviewPlayHandle()
 {
-	s_globalDataMutex->lock();
+	s_globalDataMutex.lock();
 	if( m_previewNote->muted() == FALSE )
 	{
 		s_globalPreviewNote = NULL;
 	}
 	delete m_previewNote;
-	s_globalDataMutex->unlock();
-}
-
-
-
-
-void presetPreviewPlayHandle::cleanUp( void )
-{
-	delete blindTrackContainer::inst();
+	s_globalDataMutex.unlock();
 }
 
 
@@ -181,4 +177,32 @@ bool presetPreviewPlayHandle::done( void ) const
 {
 	return( m_previewNote->muted() );
 }
+
+
+
+
+void presetPreviewPlayHandle::cleanUp( void )
+{
+	delete blindTrackContainer::inst();
+}
+
+
+
+
+constNotePlayHandleVector presetPreviewPlayHandle::nphsOfChannelTrack(
+						const channelTrack * _ct )
+{
+	constNotePlayHandleVector cnphv;
+	s_globalDataMutex.lock();
+	if( s_globalPreviewNote != NULL &&
+			s_globalPreviewNote->getChannelTrack() == _ct )
+	{
+		cnphv.push_back( s_globalPreviewNote );
+	}
+	s_globalDataMutex.unlock();
+	return( cnphv );
+}
+
+
+
 

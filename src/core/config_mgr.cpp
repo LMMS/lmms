@@ -780,7 +780,7 @@ bool configManager::loadConfigFile( void )
 			stringPairVector attr;
 			QDomNamedNodeMap node_attr =
 						node.toElement().attributes();
-			for( unsigned int i = 0; i < node_attr.count(); ++i )
+			for( csize i = 0; i < node_attr.count(); ++i )
 			{
 				QDomNode n = node_attr.item( i );
 				if( n.isAttr() )

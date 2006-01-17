@@ -109,7 +109,12 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_noMsgAfterSetup( configManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
-	m_vstDir( configManager::inst()->vstDir() )
+	m_vstDir( configManager::inst()->vstDir() ),
+	m_disableChActInd( configManager::inst()->value( "ui",
+				"disablechannelactivityindicators" ).toInt() ),
+	m_manualChPiano( configManager::inst()->value( "ui",
+					"manualchannelpiano" ).toInt() )
+					
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -288,6 +293,42 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 
+	QWidget * performance = new QWidget( ws );
+	performance->setFixedSize( 360, 200 );
+	QVBoxLayout * perf_layout = new QVBoxLayout( performance );
+	perf_layout->setSpacing( 0 );
+	perf_layout->setMargin( 0 );
+	labelWidget( performance, tr( "Performance settings" ) );
+
+	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
+						"performance" ).toUpper(),
+								performance );
+	ui_fx_tw->setFixedHeight( 70 );
+
+	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
+				tr( "Disable channel activity indicators" ),
+								ui_fx_tw );
+	disable_ch_act_ind->move( 10, 20 );
+	disable_ch_act_ind->setChecked( m_disableChActInd );
+	connect( disable_ch_act_ind, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisableChActInd( bool ) ) );
+
+
+	ledCheckBox * manual_ch_piano = new ledCheckBox(
+			tr( "Only press keys on channel-piano manually" ),
+								ui_fx_tw );
+	manual_ch_piano->move( 10, 40 );
+	manual_ch_piano->setChecked( m_manualChPiano );
+	connect( manual_ch_piano, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleManualChPiano( bool ) ) );
+
+
+
+
+	perf_layout->addWidget( ui_fx_tw );
+	perf_layout->addStretch();
+
+
 
 	QWidget * audio = new QWidget( ws );
 	audio->setFixedSize( 360, 200 );
@@ -297,7 +338,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	labelWidget( audio, tr( "Audio settings" ) );
 
 	tabWidget * audioiface_tw = new tabWidget( tr( "AUDIO INTERFACE" ),
-								audio );
+									audio );
 	audioiface_tw->setFixedHeight( 60 );
 
 	m_audioInterfaces = new QComboBox( audioiface_tw );
@@ -466,9 +507,12 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_tabBar->addTab( directories, tr( "Directories" ), 1, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap(
 							"setup_directories" ) );
-	m_tabBar->addTab( audio, tr( "Audio settings" ), 2, FALSE, TRUE
+	m_tabBar->addTab( performance, tr( "Performance settings" ), 2, FALSE,
+				TRUE )->setIcon( embed::getIconPixmap(
+							"setup_performance" ) );
+	m_tabBar->addTab( audio, tr( "Audio settings" ), 3, FALSE, TRUE
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( midi, tr( "MIDI settings" ), 3, TRUE, TRUE
+	m_tabBar->addTab( midi, tr( "MIDI settings" ), 4, TRUE, TRUE
 			)->setIcon( embed::getIconPixmap( "setup_midi" ) );
 
 #undef setIcon
@@ -541,6 +585,11 @@ void setupDialog::accept( void )
 				QString::number( m_noWizard ) );
 	configManager::inst()->setValue( "app", "nomsgaftersetup",
 				QString::number( m_noMsgAfterSetup ) );
+	configManager::inst()->setValue( "ui",
+					"disablechannelactivityindicators",
+					QString::number( m_disableChActInd ) );
+	configManager::inst()->setValue( "ui", "manualchannelpiano",
+					QString::number( m_manualChPiano ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -590,7 +639,7 @@ void setupDialog::setBufferSize( int _value )
 	}
 
 	m_bufferSize = _value * 64;
-	m_bufSizeLbl->setText( tr( "FRAMES: %1\nLATENCY: %2 ms" ).arg(
+	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
 						mixer::inst()->sampleRate(),
@@ -622,6 +671,62 @@ void setupDialog::displayBufSizeHelp( void )
 					"especially on older computers or "
 					"systems with a non-realtime "
 					"kernel." ) );
+}
+
+
+
+
+void setupDialog::toggleToolTips( bool _disabled )
+{
+	m_disableToolTips = _disabled;
+}
+
+
+
+
+void setupDialog::toggleKnobUsability( bool _classical )
+{
+	m_classicalKnobUsability = _classical;
+}
+
+
+
+
+void setupDialog::toggleGIMPLikeWindows( bool _enabled )
+{
+	m_gimpLikeWindows = _enabled;
+}
+
+
+
+
+void setupDialog::toggleNoWizard( bool _enabled )
+{
+	m_noWizard = _enabled;
+}
+
+
+
+
+void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
+{
+	m_noMsgAfterSetup = _enabled;
+}
+
+
+
+
+void setupDialog::toggleDisableChActInd( bool _disabled )
+{
+	m_disableChActInd = _disabled;
+}
+
+
+
+
+void setupDialog::toggleManualChPiano( bool _enabled )
+{
+	m_manualChPiano = _enabled;
 }
 
 
@@ -756,46 +861,6 @@ void setupDialog::displayMIDIHelp( void )
 					"Below you see a box which offers "
 					"controls to setup the selected "
 					"MIDI-interface." ) );
-}
-
-
-
-
-void setupDialog::toggleToolTips( bool _disabled )
-{
-	m_disableToolTips = _disabled;
-}
-
-
-
-
-void setupDialog::toggleKnobUsability( bool _classical )
-{
-	m_classicalKnobUsability = _classical;
-}
-
-
-
-
-void setupDialog::toggleGIMPLikeWindows( bool _enabled )
-{
-	m_gimpLikeWindows = _enabled;
-}
-
-
-
-
-void setupDialog::toggleNoWizard( bool _enabled )
-{
-	m_noWizard = _enabled;
-}
-
-
-
-
-void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
-{
-	m_noMsgAfterSetup = _enabled;
 }
 
 

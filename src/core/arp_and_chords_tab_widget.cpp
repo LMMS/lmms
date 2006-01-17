@@ -41,6 +41,9 @@
 #include <qcombobox.h>
 #include <qwhatsthis.h>
 
+#define setCurrentIndex setCurrentItem
+#define currentIndex currentItem
+
 #endif
 
 
@@ -61,6 +64,7 @@
 #include "tempo_sync_knob.h"
 #include "channel_track.h"
 #include "led_checkbox.h"
+#include "preset_preview_play_handle.h"
 
 
 
@@ -208,7 +212,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 						CHORDS_GROUPBOX_HEIGHT );
 
 	m_chordsComboBox = new QComboBox( m_chordsGroupBox );
-	m_chordsComboBox->setFont( pointSize<9>( m_chordsComboBox->font() ) );
+	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
@@ -259,7 +263,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
 	m_arpComboBox = new QComboBox( m_arpGroupBox );
-	m_arpComboBox->setFont( pointSize<9>( m_arpComboBox->font() ) );
+	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
@@ -270,6 +274,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 #endif
 						) );
 	}
+
+
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
 						tr( "Arpeggio range" ) );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
@@ -321,8 +327,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"arpeggio-tone that should be played. With this you "
 			"can make cool staccato-arpeggios." ) );
 
-	m_arpDirectionLbl = new QLabel( tr( "DIRECTION:" ), m_arpGroupBox );
-	m_arpDirectionLbl->setGeometry( 10, 60, 64, 8 );
+	m_arpDirectionLbl = new QLabel( tr( "Direction:" ), m_arpGroupBox );
+	m_arpDirectionLbl->setGeometry( 10, 60, 64, 10 );
 	m_arpDirectionLbl->setFont( pointSize<7>( m_arpDirectionLbl->font() ) );
 
 
@@ -392,9 +398,21 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpDirections_group->hide();
 #endif
 
-	m_sortMode = new ledCheckBox( tr( "SORT-MODE" ), m_arpGroupBox );
-	m_sortMode->move( 10, 90 );
+/*	m_sortMode = new ledCheckBox( tr( "Sort-mode" ), m_arpGroupBox );
+	m_sortMode->move( 10, 90 );*/
 
+	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
+	mode_lbl->setGeometry( 10, 90, 64, 10 );
+	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
+
+	m_arpModeComboBox = new QComboBox( m_arpGroupBox );
+	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
+	m_arpModeComboBox->setGeometry( 70, 87, 80, 22 );
+
+	m_arpModeComboBox->addItem( tr( "Free" ) );
+	m_arpModeComboBox->addItem( tr( "Sort" ) );
+	m_arpModeComboBox->addItem( tr( "Sync" ) );
+	m_arpModeComboBox->setCurrentItem( 0 );
 }
 
 
@@ -421,11 +439,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 					m_chordsGroupBox->isActive() == TRUE )
 	{
 		// then insert sub-notes for chord
-#ifdef QT4
 		const int selected_chord = m_chordsComboBox->currentIndex();
-#else
-		const int selected_chord = m_chordsComboBox->currentItem();
-#endif
+
 		for( int octave_cnt = 0;
 			octave_cnt < m_chordRangeKnob->value(); ++octave_cnt )
 		{
@@ -482,18 +497,21 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	}
 
 
-#ifdef QT4
 	const int selected_arp = m_arpComboBox->currentIndex();
-#else
-	const int selected_arp = m_arpComboBox->currentItem();
-#endif
 
 	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfChannelTrack(
 							_n->getChannelTrack() );
-	// VERY unlikely, but better check this before ending in a crash
-	if( cnphv.size() == 0 )
+	if( m_arpModeComboBox->currentIndex() != FREE && cnphv.size() == 0 )
 	{
-		return;
+		// maybe we're playing only a preset-preview-note?
+		cnphv = presetPreviewPlayHandle::nphsOfChannelTrack(
+							_n->getChannelTrack() );
+		if( cnphv.size() == 0 )
+		{
+			// still nothing found here, so lets return
+			//return;
+			cnphv.push_back( _n );
+		}
 	}
 
 	const int cur_chord_size = getChordSize( s_chords[selected_arp] );
@@ -509,7 +527,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame = ( ( m_sortMode->isChecked() == TRUE ) ?
+	int cur_frame = ( ( m_arpModeComboBox->currentIndex() != FREE ) ?
 				cnphv.first()->totalFramesPlayed() :
 				_n->totalFramesPlayed() )
 							+ arp_frames - 1;
@@ -533,14 +551,14 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// init with zero
 		int cur_arp_idx = 0;
 
-		if( m_sortMode->isChecked() == TRUE &&
+		if( m_arpModeComboBox->currentIndex() == SORT &&
 				( ( cur_frame / arp_frames ) % total_range ) /
-					range != (csize) _n->index() )
+					range != (Uint32) _n->index() )
 		{
 			// update counters
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
-			break;
+			continue;
 		}
 
 		// process according to arpeggio-direction...
@@ -609,7 +627,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// and is_arp_note=TRUE
 		notePlayHandle * note_play_handle = new notePlayHandle(
 						_n->getChannelTrack(),
-					( ( m_sortMode->isChecked() == TRUE ) ?
+					( ( m_arpModeComboBox->currentIndex() !=
+					    				FREE ) ?
 						cnphv.first()->framesAhead() :
 						_n->framesAhead() ) +
 							frames_processed,
@@ -628,8 +647,10 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	// make sure, note is handled as arp-base-note, even if we didn't add a
 	// sub-note so far
-	_n->setArpNote( TRUE );
-
+	if( m_arpModeComboBox->currentIndex() != FREE )
+	{
+		_n->setArpNote( TRUE );
+	}
 }
 
 
@@ -640,19 +661,11 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 {
 	QDomElement act_de = _doc.createElement( nodeName() );
 	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
-#ifdef QT4
 	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
-#else
-	act_de.setAttribute( "chord", m_chordsComboBox->currentItem() );
-#endif
 	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
 
 	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
-#ifdef QT4
 	act_de.setAttribute( "arp", m_arpComboBox->currentIndex() );
-#else
-	act_de.setAttribute( "arp", m_arpComboBox->currentItem() );
-#endif
 	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
 	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
 	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
@@ -660,7 +673,7 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	act_de.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
-	act_de.setAttribute( "sortmode", m_sortMode->isChecked() );
+	act_de.setAttribute( "arpmode", m_arpModeComboBox->currentIndex() );
 	_parent.appendChild( act_de );
 }
 
@@ -671,17 +684,9 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 {
 	m_chordsGroupBox->setState( !_this.attribute
 						( "chorddisabled" ).toInt() );
-#ifdef QT4
 	m_chordsComboBox->setCurrentIndex( _this.attribute( "chord" ).toInt() );
-#else
-	m_chordsComboBox->setCurrentItem( _this.attribute( "chord" ).toInt() );
-#endif
 	m_chordRangeKnob->setValue( _this.attribute( "chordrange" ).toFloat() );
-#ifdef QT4
 	m_arpComboBox->setCurrentIndex( _this.attribute( "arp" ).toInt() );
-#else
-	m_arpComboBox->setCurrentItem( _this.attribute( "arp" ).toInt() );
-#endif
 	m_arpRangeKnob->setValue( _this.attribute( "arprange" ).toFloat() );
 	m_arpTimeKnob->setValue( _this.attribute( "arptime" ).toFloat() );
 	m_arpGateKnob->setValue( _this.attribute( "arpgate" ).toFloat() );
@@ -691,7 +696,8 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
 
-	m_sortMode->setChecked( _this.attribute( "sortmode" ).toInt() );
+	m_arpModeComboBox->setCurrentIndex( _this.attribute( "arpmode"
+								).toInt() );
 
 	m_arpGroupBox->setState( m_arpDirection != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );
@@ -766,6 +772,8 @@ void arpAndChordsTabWidget::arpRandomToggled( bool _on )
 
 
 #undef setChecked
+#undef currentIndex
+#undef setCurrentIndex
 
 #include "arp_and_chords_tab_widget.moc"
 

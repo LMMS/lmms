@@ -2093,8 +2093,14 @@ void pianoRoll::recordNote( const note & _n )
 		note n( _n );
 		n.setPos( songEditor::inst()->getPlayPos(
 				songEditor::PLAY_PATTERN ) - n.length() );
+#ifndef QT4
+		qApp->lock();
+#endif
 		m_pattern->addNote( n );
 		update();
+#ifndef QT4
+		qApp->unlock();
+#endif
 		songEditor::inst()->setModified();
 	}
 }

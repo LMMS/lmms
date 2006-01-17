@@ -164,7 +164,7 @@ int main( int argc, char * * argv )
 	pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
 	pal.setColor( QPalette::Button, QColor( 160, 160, 160 ) );
 	pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
-	pal.setColor( QPalette::Highlight, QColor( 255, 224, 224 ) );
+	pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
 	pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
 #else
 	pal.setColor( QColorGroup::Background, QColor( 128, 128, 128 ) );

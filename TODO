@@ -1,10 +1,9 @@
 to be done as soon as possible:
 
-- debug arpeggio with certain times (TB303-arp!)
-- fix bug with recording on arpeggio-channel
-- do not skip samples because of rounding when resampling in src/lib/sample_buffer.cpp
+- performance-settings
+- arp-sync-mode
+- do not skip samples because of rounding-errors when resampling in src/lib/sample_buffer.cpp
 - MIDI-program/MIDI-mapping/process program-/channel-change-events from MIDI-files
-- do not allow to connect output-port of channel to own input-port!
 - add note-len- and note-alignment-selectbox to piano-roll
 - DSSI-support
 - somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar

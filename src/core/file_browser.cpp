@@ -319,7 +319,7 @@ listView::listView( QWidget * _parent ) :
 	setSorting( -1 );
 	setShowToolTips( TRUE );
 
-	setFont( pointSize<8>( font() ) );
+	setFont( pointSizeF( font(), 7.5f ) );
 }
 
 

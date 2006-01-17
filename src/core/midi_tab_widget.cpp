@@ -93,7 +93,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	outputChannelChanged( m_outputChannelSpinBox->value() );
 
 
-	m_receiveCheckBox = new ledCheckBox( tr( "RECEIVE MIDI-EVENTS" ),
+	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
 							m_setupTabWidget );
 	m_receiveCheckBox->move( 10, 34 );
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
@@ -102,7 +102,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	m_sendCheckBox = new ledCheckBox( tr( "SEND MIDI-EVENTS" ),
+	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
 							m_setupTabWidget );
 	m_sendCheckBox->move( 10, 94 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),

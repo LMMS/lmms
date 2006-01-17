@@ -56,6 +56,7 @@ lmms_MOC =						\
 		./file_browser.moc			\
 		./group_box.moc				\
 		./kmultitabbar.moc			\
+		./kmultitabbar-qt3.moc			\
 		./knob.moc				\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
@@ -227,6 +228,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/gui_templates.h			\
 		$(srcdir)/include/surround_area.h			\
 		$(srcdir)/include/kmultitabbar.h			\
+		$(srcdir)/include/kmultitabbar-qt3.h			\
 		$(srcdir)/include/side_bar.h				\
 		$(srcdir)/include/side_bar_widget.h			\
 		$(srcdir)/include/track.h				\

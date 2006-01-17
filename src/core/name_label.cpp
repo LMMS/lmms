@@ -51,7 +51,7 @@ nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent,
 	QLabel( _initial_name, _parent ),
 	m_pm( _pm )
 {
-#ifndef QT4
+#ifdef QT3
 	setBackgroundMode( Qt::NoBackground );
 #endif
 }
@@ -100,6 +100,7 @@ void nameLabel::paintEvent( QPaintEvent * )
 {
 #ifdef QT4
 	QPainter p( this );
+	p.fillRect( rect(), palette().color( backgroundRole() ) );
 #else
 	QPixmap draw_pm( rect().size() );
 	draw_pm.fill( this, rect().topLeft() );

@@ -1,7 +1,7 @@
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -101,7 +101,7 @@ midiALSASeq::midiALSASeq( void ) :
 
 	start( 
 #if QT_VERSION >= 0x030200	
-	    	QThread::LowPriority 
+	    	QThread::IdlePriority 
 #endif
 					);
 }

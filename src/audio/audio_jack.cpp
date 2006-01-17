@@ -1,7 +1,7 @@
 /*
  * audio_jack.cpp - support for JACK-transport
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -108,7 +108,9 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 #endif
 					jack_get_client_name( m_client ) );
 	}
-#else
+
+#else /* OLD_JACK */
+
 	m_client = jack_client_new( client_name.
 #ifdef QT4
 						toAscii().constData()
@@ -116,6 +118,12 @@ audioJACK::audioJACK( Uint32 _sample_rate, bool & _success_ful ) :
 						ascii()
 #endif
 					);
+	if( m_client == NULL )
+	{
+		printf( "jack_client_new() failed\n" );
+		return;
+	}
+
 #endif
 
 	// set process-callback

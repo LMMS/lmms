@@ -34,9 +34,17 @@
 #include <qpair.h>
 
 #if QT_VERSION >= 0x040000
+
 #ifndef QT4
 #define QT4
 #endif
+
+#else
+
+#ifndef QT3
+#define QT3
+#endif
+
 #endif
 
 

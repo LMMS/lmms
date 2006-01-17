@@ -115,6 +115,13 @@ private:
 		RANDOM
 	} m_arpDirection;
 
+	enum arpModes
+	{
+		FREE,
+		SORT,
+		SYNC
+	} ;
+
 	// chord-stuff
 	groupBox * m_chordsGroupBox;
 	QComboBox * m_chordsComboBox;
@@ -133,7 +140,7 @@ private:
 	pixmapButton * m_arpUpAndDownBtn;
 	pixmapButton * m_arpRandomBtn;
 
-	ledCheckBox * m_sortMode;
+	QComboBox * m_arpModeComboBox;
 
 } ;
 

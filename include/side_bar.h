@@ -1,7 +1,7 @@
 /*
  * side_bar.h - code for side-bar in LMMS
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,10 +47,11 @@ class sideBar : public KMultiTabBar
 {
 	Q_OBJECT
 public:
-	sideBar( Qt::Orientation _o, QWidget * _parent ) :
-		KMultiTabBar( _o, _parent )
+	sideBar( KMultiTabBarMode _m, QWidget * _parent ) :
+		KMultiTabBar( _m, _parent )
 	{
 	}
+
 	virtual ~sideBar()
 	{
 	}

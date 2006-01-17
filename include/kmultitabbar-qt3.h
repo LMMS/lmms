@@ -1,8 +1,8 @@
 /***************************************************************************
                           kmultitabbar.h -  description
                              -------------------
-    begin                :  2001
-    copyright            : (C) 2001,2002,2003 by Joseph Wenninger <jowenn@kde.org>
+    begin              :  2001
+    copyright          : (C) 2001,2002,2003 by Joseph Wenninger <jowenn@kde.org>
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,24 +18,33 @@
 
     You should have received a copy of the GNU Library General Public License
     along with this library; see the file COPYING.LIB.  If not, write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA 02110-1301, USA.
+    the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.
  ***************************************************************************/
 
-#ifndef _KMultitabbar_h_
-#define _KMultitabbar_h_
+#ifndef _KMultitabbar_qt3_h_
+#define _KMultitabbar_qt3_h_
 
-#ifndef QT3
+#include "qt3support.h"
 
-#include <QLayout>
-#include <QString>
-#include <QList>
-#include <QPushButton>
+#include <qscrollview.h>
+#include <qvbox.h>
+#include <qhbox.h>
+#include <qabstractlayout.h>
+#include <qstring.h>
+#include <qptrlist.h>
+#include <qpushbutton.h>
+
+class KMultiTabBarButton;
+class KMultiTabBarTab;
+
+typedef QPtrList<KMultiTabBarButton> buttonList;
+typedef QPtrList<KMultiTabBarTab> tabList;
+
 
 class QPixmap;
 class QPainter;
 class QFrame;
-class QMenu;
 
 class KMultiTabBarPrivate;
 class KMultiTabBarTabPrivate;
@@ -53,18 +62,18 @@ class KMultiTabBar: public QWidget
 {
 	Q_OBJECT
 public:
-       enum KMultiTabBarMode{Horizontal, Vertical};
-       enum KMultiTabBarPosition{Left, Right, Top, Bottom};
+	enum KMultiTabBarMode{ Horizontal, Vertical };
+	enum KMultiTabBarPosition{Left, Right, Top, Bottom};
 
 	/**
-	 * The list of available styles for KMultiTabBar
-	 *   - VSNET - Visual Studio .Net like (only show the text of active tabs
-	 *   - KDEV3 - Kdevelop 3 like (always show the text)
-	 *   - KONQSBC - konqy's classic sidebar style (unthemed) (currently disabled)
+	 * VSNET == Visual Studio .Net like (only show the text of active tabs
+	 * KDEV3 == Kdevelop 3 like (always show the text)
+	 * KONQSBC == konqy's classic sidebar style (unthemed), this one is disabled
+	 * 	at the moment, but will be renabled soon too
 	 */
 	enum KMultiTabBarStyle{VSNET=0, KDEV3=1, KONQSBC=2, KDEV3ICON=3,STYLELAST=0xffff};
 
-        KMultiTabBar(KMultiTabBarMode bm,QWidget *parent=0 );
+	KMultiTabBar(KMultiTabBarMode m,QWidget *parent=0);
 	virtual ~KMultiTabBar();
 
 	/**
@@ -76,8 +85,8 @@ public:
 	 * @param popup A popup menu which should be displayed if the button is clicked
 	 * @param not_used_yet will be used for a popup text in the future
 	 */
- 	int appendButton(const QPixmap &pic,int id=-1,QMenu* popup=0,const QString& not_used_yet=QString());
-	/**
+ 	int appendButton(const QPixmap &pic,int id=-1,QMenu* popup=0,const QString& not_used_yet=QString::null);
+	/** 
          * remove a button with the given ID
 	 */
 	void removeButton(int id);
@@ -87,7 +96,7 @@ public:
 	 * @param id an arbitrary ID which can be used later on to identify the tab
 	 * @param text if a mode with text is used it will be the tab text, otherwise a mouse over hint
 	 */
-	int appendTab(const QPixmap &pic,int id=-1,const QString& text=QString());
+	int appendTab(const QPixmap &pic,int id=-1,const QString& text=QString::null);
 	/**
 	 * remove a tab with a given ID
 	 */
@@ -117,27 +126,17 @@ public:
 	 */
 	void setPosition(KMultiTabBarPosition pos);
 	/**
-	 * get the tabbar position.
-	 * @return position
-	 */
-	KMultiTabBarPosition position() const;
-	/**
 	 * set the display style of the tabs
 	 */
 	void setStyle(KMultiTabBarStyle style);
 	/**
-	 * get the display style of the tabs
-	 * @return display style
-	 */
-	KMultiTabBarStyle tabStyle() const;
-	/**
 	 * be carefull, don't delete tabs yourself and don't delete the list itself
 	 */
-        QList<KMultiTabBarTab *>* tabs();
+        tabList * tabs();
 	/**
 	 * be carefull, don't delete buttons yourself and don't delete the list itself
 	 */
-	QList<KMultiTabBarButton *>* buttons();
+	buttonList * buttons();
 
 	/**
 	 * might vanish, not sure yet
@@ -151,7 +150,7 @@ private:
 	class KMultiTabBarInternal *m_internal;
 	QBoxLayout *m_l;
 	QFrame *m_btnTabSep;
-	QList<KMultiTabBarButton *> m_buttons;
+	buttonList m_buttons;
 	KMultiTabBarPosition m_position;
 	KMultiTabBarPrivate *d;
 };
@@ -229,6 +228,10 @@ public:
 	 */
 	void showActiveTabText(bool show);
 	void resize(){ setSize( neededSize() ); }
+	virtual inline const QColorGroup & palette( void ) const
+	{
+		return( colorGroup() );
+	}
 private:
 	bool m_showActiveTabText;
 	int m_expandedSize;
@@ -238,7 +241,6 @@ protected:
 	void setSize(int);
 	int neededSize();
 	void updateState();
-	virtual void paintEvent(QPaintEvent *);
 	virtual void drawButton(QPainter *);
 	virtual void drawButtonLabel(QPainter *);
 	void drawButtonStyled(QPainter *);
@@ -251,66 +253,44 @@ public slots:
 	virtual void setIcon(const QString&);
 	virtual void setIcon(const QPixmap&);
 };
-/***************************************************************************
-                          kmultitabbar_p.h -  description
-                             -------------------
-    begin                :  2003
-    copyright            : (C) 2003 by Joseph Wenninger <jowenn@kde.org>
- ***************************************************************************/
-
-/***************************************************************************
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
-
-    You should have received a copy of the GNU Library General Public License
-    along with this library; see the file COPYING.LIB.  If not, write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA 02110-1301, USA.
- ***************************************************************************/
 
 
-class KMultiTabBarInternal: public QWidget
+
+class KMultiTabBarInternal: public Q3ScrollView
 {
         Q_OBJECT
 public:
-        KMultiTabBarInternal(QWidget *parent,KMultiTabBar::KMultiTabBarMode bm);
-        int appendTab(const QPixmap &,int=-1,const QString& =QString());
+        KMultiTabBarInternal(QWidget *parent, KMultiTabBar::KMultiTabBarMode m);
+        int appendTab(const QPixmap &,int=-1,const QString& =QString::null);
         KMultiTabBarTab *tab(int) const;
         void removeTab(int);
         void setPosition(enum KMultiTabBar::KMultiTabBarPosition pos);
         void setStyle(enum KMultiTabBar::KMultiTabBarStyle style);
         void showActiveTabTexts(bool show);
-        QList<KMultiTabBarTab *>* tabs(){return &m_tabs;}
+        tabList * tabs(){return &m_tabs;}
+	virtual inline const QColorGroup & palette( void ) const
+	{
+		return( colorGroup() );
+	}
 private:
         friend class KMultiTabBar;
         QWidget *box;
 	QBoxLayout *mainLayout;
-        QList<KMultiTabBarTab *> m_tabs;
+        tabList m_tabs;
         enum KMultiTabBar::KMultiTabBarPosition m_position;
         bool m_showActiveTabTexts;
         enum  KMultiTabBar::KMultiTabBarStyle m_style;
 	int m_expandedTabSize;
 	int m_lines;
-	KMultiTabBar::KMultiTabBarMode m_barMode;
 protected:
-	virtual bool eventFilter(QObject *,QEvent*);
-//        virtual void paintEvent( QPaintEvent * );
-
+        /**
+         * [contentsM|m]ousePressEvent are reimplemented from QScrollView
+         * in order to ignore all mouseEvents on the viewport, so that the
+         * parent can handle them.
+         */
+        virtual void contentsMousePressEvent(QMouseEvent *);
+        virtual void mousePressEvent(QMouseEvent *);
 	virtual void resizeEvent(QResizeEvent *);
 };
-
-
-#else
-
-#include "kmultitabbar-qt3.h"
-
-#endif
 
 #endif

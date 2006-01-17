@@ -1,7 +1,7 @@
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -196,7 +196,8 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 	}
 	else if( type() == SONG_PROJECT )
 	{
-		if( fn.section( '.',-1 ) != "mmp" )
+		if( fn.section( '.', -1 ) != "mmp" &&
+						fn.section( '.', -1 ) != "mpt" )
 		{
 			fn += ".mmp";
 		}

@@ -920,12 +920,10 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	m_initialMouseX( -1 )
 {
 #ifdef QT4
-	{
-		QPalette pal;
-		pal.setColor( m_trackOperationsWidget.backgroundRole(),
+	QPalette pal;
+	pal.setColor( m_trackOperationsWidget.backgroundRole(),
 						QColor( 128, 128, 128 ) );
-		m_trackOperationsWidget.setPalette( pal );
-	}
+	m_trackOperationsWidget.setPalette( pal );
 #else
 	m_trackOperationsWidget.setPaletteBackgroundColor(
 						QColor( 128, 128, 128 ) );
@@ -934,9 +932,8 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 
 
 #ifdef QT4
-	QPalette pal;
 	pal.setColor( m_trackSettingsWidget.backgroundRole(),
-						QColor( 64, 64, 64 ) );
+							QColor( 64, 64, 64 ) );
 	m_trackSettingsWidget.setPalette( pal );
 #else
 	m_trackSettingsWidget.setPaletteBackgroundColor( QColor( 64, 64, 64 ) );

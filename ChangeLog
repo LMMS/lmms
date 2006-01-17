@@ -1,3 +1,72 @@
+2006-01-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/lib/mmp.cpp:
+	do not add "mmp"-extensions if there's already "mpt" (multimedia-
+	project-template) as extension
+
+	* include/arp_and_chords_tab_widget.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	- added new sync-mode to arpeggiator
+	- arpeggiator-modes are now selectable from combobox
+
+2006-01-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/file_browser.cpp:
+	use 7.5 instead of 8 as font-size
+
+	* src/widgets/led_checkbox.cpp:
+	use 7.5 instead of 7 as font-size
+
+	* include/gui_templates.h:
+	- added more precise pointSizeF()-method
+	- more precise point-size-calculation for pointSize()-method which
+	  makes all fonts inside LMMS a bit bigger and everything more
+	  readable
+
+	* include/setup_dialog.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/tracks/channel_track.cpp:
+	added switches for disabling several UI-effects for a better
+	performance even on older hardware
+
+	* include/preset_preview_play_handle.h:
+	* src/core/preset_preview_play_handle.cpp:
+	global-data-mutex is not a pointer anymore, instead it's a normal
+	QMutex - fixes crashes with sort-arpeggio if no preset was previewed
+	before
+
+2006-01-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/widgets/kmultitabbar.cpp:
+	made KMultiTabBar working with Qt4
+
+	* src/audio/audio_jack.cpp:
+	return if connection to JACK-server failed with old JACK-API
+	(jack_client_new(...)) - fixes crash when using old JACK-API with
+	LMMS and JACK-server is not running
+
+	* include/preset_preview_play_handle.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	as preset-note-play-handle is not registered at mixer, it cannot be
+	returned in notePlayHandle::nphsOfChannelTrack() and therefore
+	previewing presets with sort-mode arpeggios doesn't work - now the
+	arpeggiator also checks preview-note for being the only note there
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	fixed some bugs in arpeggiator
+
+	* src/core/piano_roll.cpp:
+	lock qapp-thread in recordNote() - hopefully fixes some
+	xlib-async-errors
+
+	* src/tracks/channel_track.cpp:
+	- do not process note-on-out-events if according key is already pressed
+	- when invalidating note-play-handles, also reset m_notes-array for not
+	  crashing when applying another preset while key is pressed and
+	  released afterwards
+
 2006-01-10	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
 
 	* locale/ru.ts:

@@ -33,6 +33,7 @@
 #include "midi_port.h"
 #include "song_editor.h"
 #include "piano_widget.h"
+#include "config_mgr.h"
 
 
 
@@ -58,7 +59,11 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
 	m_muted( FALSE )
 {
 	setFrames( _frames );
-	m_channelTrack->m_pianoWidget->setKeyState( key(), TRUE );
+	if( !configManager::inst()->value( "ui",
+						"manualchannelpiano" ).toInt() )
+	{
+		m_channelTrack->m_pianoWidget->setKeyState( key(), TRUE );
+	}
 	// send MIDI-note-on-event
 	m_channelTrack->processOutEvent( midiEvent( NOTE_ON,
 				m_channelTrack->m_midiPort->outputChannel(),
@@ -243,7 +248,12 @@ void notePlayHandle::noteOff( Uint32 _s )
 	{
 		m_releaseFramesToDo =
 				m_channelTrack->m_envWidget->releaseFrames();
-		m_channelTrack->m_pianoWidget->setKeyState( key(), FALSE );
+		if( !configManager::inst()->value( "ui",
+						"manualchannelpiano" ).toInt() )
+		{
+			m_channelTrack->m_pianoWidget->setKeyState( key(),
+									FALSE );
+		}
 		// send MIDI-note-off-event
 		m_channelTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_channelTrack->m_midiPort->outputChannel(),

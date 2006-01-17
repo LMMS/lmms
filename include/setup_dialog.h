@@ -59,11 +59,12 @@ class setupDialog : public QDialog
 public:
 	enum configTabs
 	{
-		GENERAL_SETTINGS, AUDIO_SETTINGS, MIDI_SETTINGS
+		GENERAL_SETTINGS, DIRECTORY_SETTINGS, PERFORMANCE_SETTINGS,
+		AUDIO_SETTINGS, MIDI_SETTINGS
 	} ;
 
 	setupDialog( configTabs _tab_to_open = GENERAL_SETTINGS );
-	~setupDialog();
+	virtual ~setupDialog();
 
 
 protected slots:
@@ -100,6 +101,10 @@ private slots:
 	void openVSTDir( void );
 
 
+	void toggleDisableChActInd( bool _disabled );
+	void toggleManualChPiano( bool _enabled );
+
+
 private:
 	tabBar * m_tabBar;
 
@@ -119,6 +124,10 @@ private:
 
 	QString m_workingDir;
 	QString m_vstDir;
+
+
+	bool m_disableChActInd;
+	bool m_manualChPiano;
 
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;

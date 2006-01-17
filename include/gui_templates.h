@@ -1,7 +1,7 @@
 /*
  * gui_templates.h - GUI-specific templates
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,20 @@
 // the same size in pixels
 template<int SIZE>
 inline QFont pointSize( QFont _f )
+{
+	static const int DPI = 96;
+#ifdef QT4
+	_f.setPointSizeF( (float) SIZE * DPI /
+			QApplication::desktop()->logicalDpiY() );
+#else
+	_f.setPointSizeFloat( (float) SIZE * DPI /
+			QPaintDeviceMetrics( qApp->desktop() ).logicalDpiY() );
+#endif
+	return( _f );
+}
+
+
+inline QFont pointSizeF( QFont _f, float SIZE )
 {
 	static const int DPI = 96;
 #ifdef QT4

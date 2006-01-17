@@ -73,8 +73,8 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	setBackgroundMode( Qt::PaletteBackground );
 #endif
 
-	setFont( pointSize<7>( font() ) );
-	setFixedSize( m_ledOffPixmap->width() + 6 +
+	setFont( pointSizeF( font(), 7.5f ) );
+	setFixedSize( m_ledOffPixmap->width() + 4 +
 					QFontMetrics( font() ).width( text() ),
 			m_ledOffPixmap->height() );
 }

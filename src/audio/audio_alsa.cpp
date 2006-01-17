@@ -1,7 +1,7 @@
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -182,8 +182,12 @@ void audioALSA::startProcessing( void )
 	if( !isRunning() )
 	{
 		start(
+#ifdef QT4
+			QThread::HighPriority
+#else
 #if QT_VERSION >= 0x030200
 			QThread::HighestPriority
+#endif
 #endif
 							);
 	}

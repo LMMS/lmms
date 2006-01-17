@@ -9,7 +9,7 @@ AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [defau
 # Check that QTDIR is defined or that --with-qtdir given
 if test x"$QTDIR" = x ; then
 	# some usual Qt-locations
-	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 usr/local/qt /usr/local/qt3 /usr/local/qt31/ /usr/local/qt32 /usr/local/qt33 /usr/X11R6 /usr/local/Trolltech/Qt-4.0.0"
+	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 usr/local/qt /usr/local/qt3 /usr/local/qt31/ /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0"
 else
 	QT_SEARCH=$QTDIR
 	QTDIR=""
@@ -141,6 +141,7 @@ case "${host}" in
 		QT_IS_MT="yes"
 		QT_LIB="-lQtCore -lQtGui -lQtXml -lQt3Support"
 	else
+        	QT_CXXFLAGS="-DQT3 $QT_CXXFLAGS"
 	        if test "x`ls $QTDIR/lib/libqt-mt.* 2> /dev/null`" != x ; then
 	            QT_LIB="-lqt-mt"
 	            QT_IS_MT="yes"
