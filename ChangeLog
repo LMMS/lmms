@@ -1,3 +1,11 @@
+2006-01-19	Andreas M. Brandmaier <andy/at/brandmaier.de>
+
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/graph.h:
+	* plugins/bit_invader/graph.cpp:
+	added "BitInvader"-plugin, a usereditable wavetable-synthesizer
+
 2006-01-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/lib/mmp.cpp:
