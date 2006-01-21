@@ -95,7 +95,6 @@ bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, floa
 	interpolation = _interpolation;
 
 	// init variables
-//	sample_length = static_cast<int>(_val1);
 
 	sample_length = length;
 	sample_shape = new float[sample_length];
@@ -223,9 +222,9 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	m_graph->move(55,120);
 	m_graph->setSamplePointer( sample_shape, sample_length );
 
-	QPixmap p = embed::getIconPixmap("wavegraph") ;
+	QPixmap p = PLUGIN_NAME::getIconPixmap("wavegraph") ;
 
-	m_graph->setBackground( &p );
+	m_graph->setBackground( p );
 
 	connect( m_graph, SIGNAL ( sampleSizeChanged( float ) ), 
 		this, SLOT (sampleSizeChanged( float ) ) );
@@ -295,6 +294,22 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 			this, SLOT ( sqrWaveClicked( void ) ) );
 		connect( whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( noiseWaveClicked( void ) ) );
+
+
+		smoothBtn = new pixmapButton( this );
+		smoothBtn->move( 55, 225 );
+		smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"smooth" ) );
+		smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"smooth" ) );
+		smoothBtn->setChecked( TRUE );
+		toolTip::add( smoothBtn,
+				tr( "Click here to "
+						"smooth waveform." ) );
+
+		connect( smoothBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( smoothClicked( void ) ) );		
+
 
 #ifdef QT4
 	QPalette pal;
@@ -518,6 +533,33 @@ void bitInvader::normalizeToggle( bool value )
 QString bitInvader::nodeName( void ) const
 {
 	return( bitinvader_plugin_descriptor.name );
+}
+
+
+void bitInvader::smoothClicked( void )
+{
+	// store values in temporary array
+	float* temp = new float[sample_length];
+	for (int i=0; i < sample_length; i++)
+	{
+			temp[i] = sample_shape[i];
+	}
+	
+
+	// Smoothing
+	sample_shape[0] = temp[0]+temp[sample_length-1] * 0.5f;
+	for ( int i=1; i < sample_length; i++)
+	{
+		sample_shape[i] = (temp[i-1] + temp[i]) * 0.5f; 	
+	}
+
+
+	// Clean up
+	delete[] temp;
+	
+	// paint
+	update();
+	m_graph->update();
 }
 
 

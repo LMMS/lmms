@@ -90,8 +90,11 @@ public:
 public slots:
         void sampleSizeChanged( float _new_sample_length );
         void sampleChanged( void );
+
         void interpolationToggle( bool value );
         void normalizeToggle( bool value );
+        void smoothClicked( void  );
+
         void sinWaveClicked( void );
         void triangleWaveClicked( void );
         void sqrWaveClicked( void );
@@ -111,6 +114,7 @@ private:
 	pixmapButton * sqrWaveBtn;
 	pixmapButton * sawWaveBtn;
 	pixmapButton * whiteNoiseWaveBtn;
+	pixmapButton * smoothBtn;
 
 	static QPixmap * s_artwork;
 
