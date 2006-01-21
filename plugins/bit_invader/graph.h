@@ -60,7 +60,7 @@ public:
 
 	void setSamplePointer( float * pointer, int length );
 
-	void setBackground ( QPixmap * pixmap );
+	void setBackground ( const QPixmap & _pixmap );
 
 signals:
 	void sampleSizeChanged( float f );
@@ -72,7 +72,7 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 
 private:
-	QPixmap * m_background;
+	QPixmap m_background;
 	
 	
 	float *samplePointer;

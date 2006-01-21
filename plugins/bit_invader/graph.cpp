@@ -50,7 +50,7 @@ graph::graph( const QString & _text, QWidget * _parent) :
 	QWidget( _parent )
 {
 
-	m_background = 0;
+	m_background = NULL;
 
 	setFixedSize( 128, 101 );
 		
@@ -63,20 +63,20 @@ graph::graph( const QString & _text, QWidget * _parent) :
 
 graph::~graph()
 {
-	delete m_background;
+//	delete m_background;
 }
 
-void graph::setBackground( QPixmap * pixmap )
+void graph::setBackground( const QPixmap &_pixmap )
 {
-//	m_background = pixmap;
-//	setErasePixmap ( *m_background );
+	m_background = _pixmap;
+	setErasePixmap ( m_background );
 
 }
 
-void graph::setSamplePointer( float * pointer, int length )
+void graph::setSamplePointer( float * _pointer, int _length )
 {
-	samplePointer = pointer;
-	sampleLength = length;
+	samplePointer = _pointer;
+	sampleLength = _length;
 }
 
 void graph::mouseMoveEvent ( QMouseEvent * _me )
@@ -143,9 +143,9 @@ void graph::paintEvent( QPaintEvent * )
 	QPainter p( &draw_pm, this );
 #endif
 
-	if (m_background != 0) {
-		p.drawPixmap( 0, 0, *m_background );
-	}
+//	if (m_background != NULL) {
+		p.drawPixmap( 0, 0, m_background );
+//	}
 	
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 
