@@ -219,10 +219,10 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	emit( sinWaveClicked() );
 
 	m_graph = new graph( "", this );
-	m_graph->move(55,120);
+	m_graph->move(53,118);	// 55,120 - 2px border
 	m_graph->setSamplePointer( sample_shape, sample_length );
 
-	QPixmap p = PLUGIN_NAME::getIconPixmap("wavegraph") ;
+	QPixmap p = PLUGIN_NAME::getIconPixmap("wavegraph3") ;
 
 	m_graph->setBackground( p );
 

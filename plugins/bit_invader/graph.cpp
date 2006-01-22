@@ -52,7 +52,7 @@ graph::graph( const QString & _text, QWidget * _parent) :
 
 	m_background = NULL;
 
-	setFixedSize( 128, 101 );
+	setFixedSize( 132, 104 );
 		
 
 	
@@ -149,17 +149,17 @@ void graph::paintEvent( QPaintEvent * )
 	
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 
-	p.drawLine( sampleLength, 0, sampleLength, 100);
+	p.drawLine( 1+sampleLength, 2, 1+sampleLength, 102);
 
 //	float xscale = 200.0 / sampleLength;
 	float xscale = 1.0;
 
 	for (int i=0; i < sampleLength-1; i++)
 	{
-		p.drawLine(static_cast<int>(i*xscale), 
-			   static_cast<int>(-samplePointer[i]*50) + 50, 
-			static_cast<int>((i+1)*xscale), 
-			static_cast<int>(-samplePointer[i+1]*50 + 50)
+		p.drawLine(2+static_cast<int>(i*xscale), 
+			   2+static_cast<int>(-samplePointer[i]*50) + 50, 
+			2+static_cast<int>((i+1)*xscale), 
+			2+static_cast<int>(-samplePointer[i+1]*50 + 50)
 			);
 	}
 
