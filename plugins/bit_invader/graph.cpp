@@ -35,6 +35,7 @@
 
 #include <qfontmetrics.h>
 #include <qpainter.h>
+#include <qcursor.h>
 
 #endif
 
@@ -46,16 +47,22 @@
 
 using namespace std;
 
+
+
 graph::graph( const QString & _text, QWidget * _parent) :
 	QWidget( _parent )
 {
 
 	m_background = NULL;
+	m_mouseDown = false;
 
 	setFixedSize( 132, 104 );
-		
-
 	
+
+#ifndef QT4
+	setBackgroundMode( NoBackground );
+#endif
+		
 }
 
 
@@ -63,13 +70,12 @@ graph::graph( const QString & _text, QWidget * _parent) :
 
 graph::~graph()
 {
-//	delete m_background;
 }
 
 void graph::setBackground( const QPixmap &_pixmap )
 {
 	m_background = _pixmap;
-	setErasePixmap ( m_background );
+//	setErasePixmap ( m_background );
 
 }
 
@@ -82,53 +88,77 @@ void graph::setSamplePointer( float * _pointer, int _length )
 void graph::mouseMoveEvent ( QMouseEvent * _me )
 {
 
-
         // get position
         int x = _me->x();
-        if (x < 0) { return; }
-        if (x > sampleLength) { return; }
-
 	int y = _me->y();
-	if (y < 0) { return; }
-	if (y >= 100) { return; }
 
-	y = 100 - y;
 
-        samplePointer[x] = (y-50.0)/50.0;
+	// avoid mouse leaps
+	int diff = x - m_lastCursorX;
+	
+	if (diff >= 1) {
+		x = m_lastCursorX + 1;
+	} else if (diff <= 1) {
+		x = m_lastCursorX - 1;
+	} else {
+		x = m_lastCursorX;
+	}
+//	QCursor::setPos( 1, 1 );
 
-	emit sampleChanged();
 
+	
+
+	changeSampleAt( x, y );
+
+	// update mouse
+	m_lastCursorX = x;
 	
 }
 
 void graph::mousePressEvent( QMouseEvent * _me )
 {
-/*	if( _me->button() == Qt::LeftButton )
-	{
-		toggle();
-	}*/
-
+	// toggle mouse state
+	m_mouseDown = true;
 
 	// get position
 	int x = _me->x();
-	if (x < 0) { return; }
-	if (x > sampleLength) { return; }
-
 	int y = _me->y();
-	if (y < 0) { return; }
-	if (y >= 100) { return; }
 
-	y = 100 - y;
+	changeSampleAt( x,y );
 
-	samplePointer[x] = (y-50.0)/50.0;
+	// toggle mouse state
+	m_mouseDown = true;	
+//	setCursor( QCursor::BlankCursor );
+	m_lastCursorX = x;
+}
 
+void graph::changeSampleAt(int _x, int _y)
+{
+	// consider border of background image
+	_x -= 2;
+	_y -= 2;
+
+        // boundary check
+        if (_x < 0) { return; }
+        if (_x > sampleLength) { return; }
+	if (_y < 0) { return; }
+	if (_y >= 100) { return; }
+	_y = 100 - _y;
+
+	// change sample shape
+        samplePointer[_x] = (_y-50.0)/50.0;
 	emit sampleChanged();
-	
+
 
 }
+
+void graph::mouseReleaseEvent( QMouseEvent * _me )
+{
+	// toggle mouse state
+	m_mouseDown = false;
+	setCursor( QCursor::ArrowCursor );
+}	
 	
-	
-void sampleChanged() {}	
 
 
 void graph::paintEvent( QPaintEvent * )
@@ -138,7 +168,7 @@ void graph::paintEvent( QPaintEvent * )
 	QPainter p( this );
 #else
 	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
+//	draw_pm.fill( this, rect().topLeft() );
 	
 	QPainter p( &draw_pm, this );
 #endif
@@ -163,6 +193,8 @@ void graph::paintEvent( QPaintEvent * )
 			);
 	}
 
+	// draw Pointer
+	// mapFromGlobal( QCursor::pos() );
 
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...

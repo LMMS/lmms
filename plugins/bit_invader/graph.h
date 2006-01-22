@@ -32,11 +32,13 @@
 
 #include <QWidget>
 #include <QPixmap>
+#include <QCursor>
 
 #else
 
 #include <qwidget.h>
 #include <qpixmap.h>
+#include <qcursor.h>
 #endif
 
 
@@ -70,13 +72,20 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 private:
+
+	void changeSampleAt(int _x, int _y);
+
 	QPixmap m_background;
 	
 	
 	float *samplePointer;
 	int sampleLength;
+
+	bool m_mouseDown;
+	int m_lastCursorX;
 	
 //signals:
 //	void toggled( bool );
