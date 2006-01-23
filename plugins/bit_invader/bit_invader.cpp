@@ -547,7 +547,7 @@ void bitInvader::smoothClicked( void )
 	
 
 	// Smoothing
-	sample_shape[0] = temp[0]+temp[sample_length-1] * 0.5f;
+	sample_shape[0] = ( temp[0]+temp[sample_length-1] ) * 0.5f;
 	for ( int i=1; i < sample_length; i++)
 	{
 		sample_shape[i] = (temp[i-1] + temp[i]) * 0.5f; 	

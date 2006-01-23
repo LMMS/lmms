@@ -42,9 +42,6 @@
 #include <qdom.h>
 #include <qfileinfo.h>
 
-#define isChecked isOn
-#define setChecked setOn
-
 #endif
 
 
@@ -681,10 +678,6 @@ plugin * lmms_plugin_main( void * _data )
 
 }
 
-
-
-#undef isChecked
-#undef isOn
 
 #include "audio_file_processor.moc"
 
