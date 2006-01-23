@@ -128,7 +128,7 @@ void graph::mousePressEvent( QMouseEvent * _me )
 
 	// toggle mouse state
 	m_mouseDown = true;	
-//	setCursor( QCursor::BlankCursor );
+	setCursor( QCursor::BlankCursor );
 	m_lastCursorX = x;
 }
 
@@ -157,6 +157,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 	// toggle mouse state
 	m_mouseDown = false;
 	setCursor( QCursor::ArrowCursor );
+	update();
 }	
 	
 
@@ -194,7 +195,12 @@ void graph::paintEvent( QPaintEvent * )
 	}
 
 	// draw Pointer
-	// mapFromGlobal( QCursor::pos() );
+	if (m_mouseDown) {
+		QPoint cursor = mapFromGlobal( QCursor::pos() );
+		p.setPen( QColor( 0xAA, 0xFF, 0x00 ) );
+		p.drawLine( 2, cursor.y(), 130, cursor.y() );
+		p.drawLine( cursor.x(), 2, cursor.x(), 102 );
+	}
 
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
