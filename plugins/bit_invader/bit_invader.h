@@ -44,7 +44,7 @@
 #include "spc_bg_hndl_widget.h"
 #include "graph.h"
 #include "led_checkbox.h"
-
+#include "oscillator.h"
 
 class knob;
 class notePlayHandle;
@@ -67,7 +67,8 @@ private:
 	float* sample_shape;
 	float sample_step;	
 
-	bool interpolation;	
+	bool interpolation;
+	
 } ;
 
 class bitInvader : public instrument, public specialBgHandlingWidget
@@ -128,6 +129,8 @@ private:
 	bool interpolation;	                
 	bool normalize;
 	float normalizeFactor;
+	
+	oscillator * m_osc;
 } ;
 
 

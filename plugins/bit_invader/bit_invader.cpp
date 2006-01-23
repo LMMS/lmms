@@ -64,6 +64,8 @@ using namespace std;
 #include "knob.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
+#include "song_editor.h"
+#include "oscillator.h"
 
 #include "embed.cpp"
 
@@ -350,6 +352,72 @@ void bitInvader::paintEvent( QPaintEvent * )
 
 void bitInvader::sinWaveClicked( void )
 {
+	// generate a Sinus wave using static oscillator-method
+        for (int i=0; i < sample_length; i++)
+        {
+	    sample_shape[i] = oscillator::sinSample( i/static_cast<float>(sample_length) );
+        }
+	
+	sampleChanged();
+}
+
+void bitInvader::triangleWaveClicked( void )
+{
+	// generate a Triangle wave using static oscillator-method
+        for (int i=0; i < sample_length; i++)
+        {
+	    sample_shape[i] = oscillator::triangleSample( i/static_cast<float>(sample_length) );
+        }
+	
+	sampleChanged();
+
+}
+
+
+void bitInvader::sawWaveClicked( void )
+{
+	// generate a Saw wave using static oscillator-method
+	for (int i=0; i < sample_length; i++)
+        {
+	    sample_shape[i] = oscillator::sawSample( i/static_cast<float>(sample_length) );
+        }
+        
+        sampleChanged();
+}
+
+void bitInvader::sqrWaveClicked( void )
+{
+	// generate a Sqr wave using static oscillator-method
+	for (int i=0; i < sample_length; i++)
+        {
+	    sample_shape[i] = oscillator::squareSample( i/static_cast<float>(sample_length) );
+        }
+        
+        sampleChanged();
+
+}
+
+void bitInvader::noiseWaveClicked( void )
+{
+	// generate a Noise wave using static oscillator-method
+	for (int i=0; i < sample_length; i++)
+        {
+	    sample_shape[i] = oscillator::noiseSample( i/static_cast<float>(sample_length) );
+        }
+        
+        sampleChanged();
+
+}
+
+
+/*
+
+	deprecated code
+	
+	was replaced by static oscillator methods
+
+void bitInvader::sinWaveClicked( void )
+{
 	// generate sample data
         for (int i=0; i < sample_length; i++)
         {
@@ -359,7 +427,6 @@ void bitInvader::sinWaveClicked( void )
 
         sampleChanged();
 }
-
 
 void bitInvader::triangleWaveClicked( void )
 {
@@ -440,6 +507,10 @@ void bitInvader::noiseWaveClicked( void)
 	                                
 }
 
+
+*/
+
+
 bitInvader::~bitInvader()
 {
 }
@@ -516,17 +587,25 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	}
 	
 	update();
-//	m_graph->update();
+
+	songEditor::inst()->setModified();
+
 }
 
 void bitInvader::interpolationToggle( bool value )
 {
       	interpolation = value;
+
+      	songEditor::inst()->setModified();
+      	
 }
         
 void bitInvader::normalizeToggle( bool value )
 {
        	normalize = value;
+
+      	songEditor::inst()->setModified();
+
 }
 
 
@@ -560,6 +639,10 @@ void bitInvader::smoothClicked( void )
 	// paint
 	update();
 	m_graph->update();
+
+      	songEditor::inst()->setModified();
+
+
 }
 
 
@@ -653,14 +736,14 @@ void bitInvader::sampleSizeChanged( float _new_sample_length )
 	
 	}
 
-//   sample_length = static_cast<int>(value);
-//    delete[] sample_shape;
-//    sample_shape = new float[sample_length];
                
-  	// ** repaint             
-               
-	    m_graph->setSamplePointer( sample_shape, sample_length );
-	    m_graph->repaint();
+  	// update sample graph        
+       	m_graph->setSamplePointer( sample_shape, sample_length );
+	m_graph->update();
+	    
+	// set Song modified
+       	songEditor::inst()->setModified();
+
 }                                                
                                                
 void bitInvader::sampleChanged()
@@ -674,12 +757,13 @@ void bitInvader::sampleChanged()
 	}
 	normalizeFactor = 1.0 / max;
 
-//	cout << "MAX:" << max << "\tnormalizeFactor : " << normalizeFactor << endl;
 
 	// update
         if (m_graph != NULL) {
              m_graph->update();
 	}
+
+       	songEditor::inst()->setModified();
                                 
 }
 
