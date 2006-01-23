@@ -1,3 +1,13 @@
+2006-01-23	Andreas Brandmaier <andy/at/brandmaier.de>
+
+	* plugins/bit_invader/bit_invader.cpp
+	* plugins/bit_invader/bit_invader.h
+	* plugins/bit_invader/graph.cpp
+	* plugins/bit_invader/graph.h
+	improved mouse handling.
+	replaced waveform generation methods by those
+	of toby's oscillator class.
+
 2006-01-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/timeline.h:
@@ -77,6 +87,12 @@
 	* src/core/track_container.cpp:
 	fixed all that stuff with annoying scrollbars which partly hid important
 	widgets
+
+2006-01-21	Andreas Brandmaier <andy/at/brandmaier.de>
+
+	* plugins/bit_invader/bit_invader.cpp
+	* plugins/bit_invader/bit_invader.h
+	added smooth button
 
 2006-01-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
