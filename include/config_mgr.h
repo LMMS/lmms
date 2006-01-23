@@ -66,6 +66,7 @@ const QString PROJECTS_PATH = "projects/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString ARTWORK_PATH = "artwork/";
+const QString TRACK_ICON_PATH = "artwork/track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
@@ -105,6 +106,11 @@ public:
 	QString artworkDir( void ) const
 	{
 		return( m_dataDir + ARTWORK_PATH );
+	}
+
+	QString trackIconsDir( void ) const
+	{
+		return( m_dataDir + TRACK_ICON_PATH );
 	}
 
 	QString localeDir( void ) const

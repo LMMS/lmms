@@ -3,7 +3,7 @@
  *                         provides UI- and DSP-code for using envelopes, LFOs
  *                         and a filter
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,14 +46,15 @@
 #include "envelope_and_lfo_widget.h"
 
 
-class QComboBox;
-class groupBox;
-class tabWidget;
 class QLabel;
-class knob;
-class pixmapButton;
+
 class channelTrack;
+class comboBox;
+class groupBox;
+class knob;
 class notePlayHandle;
+class pixmapButton;
+class tabWidget;
 
 
 class envelopeTabWidget : public QWidget, public settings
@@ -97,7 +98,7 @@ private:
 
 	// filter-stuff
 	groupBox * m_filterGroupBox;
-	QComboBox * m_filterComboBox;
+	comboBox * m_filterComboBox;
 	knob * m_filterCutKnob;
 	knob * m_filterResKnob;
 

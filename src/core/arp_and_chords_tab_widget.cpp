@@ -31,18 +31,13 @@
 #include <Qt/QtXml>
 #include <QButtonGroup>
 #include <QLabel>
-#include <QComboBox>
 
 #else
 
 #include <qbuttongroup.h>
 #include <qdom.h>
 #include <qlabel.h>
-#include <qcombobox.h>
 #include <qwhatsthis.h>
-
-#define setCurrentIndex setCurrentItem
-#define currentIndex currentItem
 
 #endif
 
@@ -65,6 +60,7 @@
 #include "channel_track.h"
 #include "led_checkbox.h"
 #include "preset_preview_play_handle.h"
+#include "combobox.h"
 
 
 
@@ -197,7 +193,7 @@ const int CHORDS_GROUPBOX_HEIGHT = 65;
 const int ARP_GROUPBOX_X = CHORDS_GROUPBOX_X;
 const int ARP_GROUPBOX_Y = 10 + CHORDS_GROUPBOX_Y + CHORDS_GROUPBOX_HEIGHT;
 const int ARP_GROUPBOX_WIDTH = CHORDS_GROUPBOX_WIDTH;
-const int ARP_GROUPBOX_HEIGHT = 200 - ARP_GROUPBOX_Y;
+const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 
 
@@ -211,7 +207,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
 
-	m_chordsComboBox = new QComboBox( m_chordsGroupBox );
+	m_chordsComboBox = new comboBox( m_chordsGroupBox );
 	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -262,7 +258,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"not played at the same time. Typical arpeggios are "
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
-	m_arpComboBox = new QComboBox( m_arpGroupBox );
+	m_arpComboBox = new comboBox( m_arpGroupBox );
 	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -334,15 +330,11 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 
 
 	m_arpUpBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpBtn->move( 70, 60 );
+	m_arpUpBtn->move( 10, 74 );
 	m_arpUpBtn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	m_arpUpBtn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
-#ifdef QT4
 	m_arpUpBtn->setChecked( TRUE );
-#else
-	m_arpUpBtn->setOn( TRUE );
-#endif
-#ifndef QT4
+#ifdef QT3
 	m_arpUpBtn->setBackgroundMode( Qt::PaletteBackground );
 #endif
 	toolTip::add( m_arpUpBtn, tr( "arpeggio direction = up" ) );
@@ -350,11 +342,11 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 						SLOT( arpUpToggled( bool ) ) );
 
 	m_arpDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpDownBtn->move( 90, 60 );
+	m_arpDownBtn->move( 30, 74 );
 	m_arpDownBtn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	m_arpDownBtn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_down_off" ) );
-#ifndef QT4
+#ifdef QT3
 	m_arpDownBtn->setBackgroundMode( Qt::PaletteBackground );
 #endif
 	toolTip::add( m_arpDownBtn, tr( "arpeggio direction = down" ) );
@@ -362,12 +354,12 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 					SLOT( arpDownToggled( bool ) ) );
 
 	m_arpUpAndDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpAndDownBtn->move( 110, 60 );
+	m_arpUpAndDownBtn->move( 50, 74 );
 	m_arpUpAndDownBtn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
 	m_arpUpAndDownBtn->setInactiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_off" ) );
-#ifndef QT4
+#ifdef QT3
 	m_arpUpAndDownBtn->setBackgroundMode( Qt::PaletteBackground );
 #endif
 	toolTip::add( m_arpUpAndDownBtn,
@@ -376,12 +368,12 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 					SLOT( arpUpAndDownToggled( bool ) ) );
 
 	m_arpRandomBtn = new pixmapButton( m_arpGroupBox );
-	m_arpRandomBtn->move( 130, 60 );
+	m_arpRandomBtn->move( 70, 74 );
 	m_arpRandomBtn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
 	m_arpRandomBtn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_random_off" ) );
-#ifndef QT4
+#ifdef QT3
 	m_arpRandomBtn->setBackgroundMode( Qt::PaletteBackground );
 #endif
 	toolTip::add( m_arpRandomBtn, tr( "arpeggio direction = random" ) );
@@ -394,25 +386,25 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpDirections_group->addButton( m_arpUpAndDownBtn );
 	m_arpDirections_group->addButton( m_arpRandomBtn );
 	m_arpDirections_group->setExclusive( TRUE );
-#ifndef QT4
+#ifdef QT3
 	m_arpDirections_group->hide();
 #endif
 
-/*	m_sortMode = new ledCheckBox( tr( "Sort-mode" ), m_arpGroupBox );
-	m_sortMode->move( 10, 90 );*/
-
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
-	mode_lbl->setGeometry( 10, 90, 64, 10 );
+	mode_lbl->setGeometry( 10, 104, 64, 10 );
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
-	m_arpModeComboBox = new QComboBox( m_arpGroupBox );
+	m_arpModeComboBox = new comboBox( m_arpGroupBox );
 	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
-	m_arpModeComboBox->setGeometry( 70, 87, 80, 22 );
+	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
-	m_arpModeComboBox->addItem( tr( "Free" ) );
-	m_arpModeComboBox->addItem( tr( "Sort" ) );
-	m_arpModeComboBox->addItem( tr( "Sync" ) );
-	m_arpModeComboBox->setCurrentItem( 0 );
+	m_arpModeComboBox->addItem( tr( "Free" ),
+					embed::getIconPixmap( "arp_free" ) );
+	m_arpModeComboBox->addItem( tr( "Sort" ),
+					embed::getIconPixmap( "arp_sort" ) );
+	m_arpModeComboBox->addItem( tr( "Sync" ),
+					embed::getIconPixmap( "arp_sync" ) );
+	m_arpModeComboBox->setCurrentIndex( 0 );
 }
 
 
@@ -770,10 +762,6 @@ void arpAndChordsTabWidget::arpRandomToggled( bool _on )
 
 
 
-
-#undef setChecked
-#undef currentIndex
-#undef setCurrentIndex
 
 #include "arp_and_chords_tab_widget.moc"
 

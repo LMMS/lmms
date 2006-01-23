@@ -1,7 +1,9 @@
 to be done as soon as possible:
 
-- performance-settings
-- arp-sync-mode
+- disable auto-cleanup of bufferAllocator during memory-expensive operations (pattern-freezing etc.)
+- autosave every 30s (configurable!) and offer recovery at startup after crash
+- make piano-roll use rubberband instead of implementing a simple one on it's own
+- level-meters in output-graph and channel-track
 - do not skip samples because of rounding-errors when resampling in src/lib/sample_buffer.cpp
 - MIDI-program/MIDI-mapping/process program-/channel-change-events from MIDI-files
 - add note-len- and note-alignment-selectbox to piano-roll
@@ -10,20 +12,17 @@ to be done as soon as possible:
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
 - pre-listen when opening sample with QFileDialog
-- level-meters in output-graph and channel-track
 - panning-editing in piano-roll
 - speed up painting of sampleTCO
 - save window-positions, -states and -sizes in files
 - solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()
 - balance env+lfo
-- autosave every 1 minute
 - plucked-string-synth: knob for metallic -> use noise as wave-shape
 - finish qt4-port and make LMMS usable when compiling with Qt4
 - rewrite export-project-dialog using layout-mechanism
 - dynamic pitch-change
 - make piano-roll use the global clipboard??
 - add more localizations:
-	- Italian
 	- Swedish
 	- Norwegian
 	- Greece

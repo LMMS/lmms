@@ -33,7 +33,6 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QWheelEvent>
-#include <QComboBox>
 #include <QLayout>
 #include <QLabel>
 
@@ -42,11 +41,8 @@
 #include <qapplication.h>
 #include <qbuttongroup.h>
 #include <qpainter.h>
-#include <qcombobox.h>
 #include <qlayout.h>
 #include <qlabel.h>
-
-#define setChecked setOn
 
 #endif
 
@@ -72,6 +68,8 @@
 #include "midi.h"
 #include "tool_button.h"
 #include "text_float.h"
+#include "combobox.h"
+
 
 extern tones whiteKeys[];	// defined in piano_widget.cpp
 
@@ -167,22 +165,22 @@ pianoRoll::pianoRoll( void ) :
 	if( s_toolDraw == NULL )
 	{
 		s_toolDraw = new QPixmap( embed::getIconPixmap(
-							"pr_tool_draw" ) );
+							"edit_draw" ) );
 	}
 	if( s_toolErase == NULL )
 	{
 		s_toolErase= new QPixmap( embed::getIconPixmap(
-							"pr_tool_erase" ) );
+							"edit_erase" ) );
 	}
 	if( s_toolSelect == NULL )
 	{
 		s_toolSelect = new QPixmap( embed::getIconPixmap(
-							"pr_tool_select" ) );
+							"edit_select" ) );
 	}
 	if( s_toolMove == NULL )
 	{
 		s_toolMove = new QPixmap( embed::getIconPixmap(
-							"pr_tool_move" ) );
+							"edit_move" ) );
 	}
 
 #ifdef QT4
@@ -272,27 +270,27 @@ pianoRoll::pianoRoll( void ) :
 						SLOT( verScrolled( int ) ) );
 
 	// init edit-buttons at the top
-	m_drawButton = new toolButton( embed::getIconPixmap( "pr_tool_draw" ),
+	m_drawButton = new toolButton( embed::getIconPixmap( "edit_draw" ),
 					tr( "Draw mode (D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
 	m_drawButton->setCheckable( TRUE );
 	m_drawButton->setChecked( TRUE );
 
-	m_eraseButton = new toolButton( embed::getIconPixmap( "pr_tool_erase" ),
+	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
 	m_eraseButton->setCheckable( TRUE );
 
 	m_selectButton = new toolButton( embed::getIconPixmap(
-							"pr_tool_select" ),
+							"edit_select" ),
 					tr( "Select mode (S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
 	m_selectButton->setCheckable( TRUE );
 
-	m_moveButton = new toolButton( embed::getIconPixmap( "pr_tool_move" ),
+	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
 					tr( "Move selection mode (M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
@@ -392,20 +390,17 @@ pianoRoll::pianoRoll( void ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new QComboBox( m_toolBar );
-	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
+	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 6; ++i )
 	{
 		m_zoomingComboBox->addItem( QString::number( 25 *
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
-#ifdef QT4
 	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
 								"100%" ) );
-#else
-	m_zoomingComboBox->setCurrentText( "100%" );
-#endif
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
@@ -573,10 +568,9 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 
 void pianoRoll::update( void )
 {
-	if( m_paintPixmap.isNull() == TRUE ||
-					m_paintPixmap.size() != rect().size() )
+	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
 	{
-		m_paintPixmap = QPixmap( rect().size() );
+		m_paintPixmap = QPixmap( size() );
 	}
 	m_paintPixmap.fill( QColor( 0, 0, 0 ) );
 	QPainter p( &m_paintPixmap );
@@ -755,7 +749,7 @@ void pianoRoll::update( void )
 
 	// draw vertical raster
 	int tact_16th = m_currentPosition / 4;
-	int offset = ( m_currentPosition % 4 ) * m_ppt /
+	const int offset = ( m_currentPosition % 4 ) * m_ppt /
 						DEFAULT_STEPS_PER_TACT / 4;
 	for( int x = WHITE_KEY_WIDTH - offset; x < width();
 			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
@@ -1964,18 +1958,11 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		{
 			m_ppt /= 2;
 		}
-#ifdef QT4
 		// update combobox with zooming-factor
 		m_zoomingComboBox->setCurrentIndex(
 				m_zoomingComboBox->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" ) );
-#else
-		// update combobox with zooming-factor
-		m_zoomingComboBox->setCurrentText( QString::number(
-					static_cast<int>( m_ppt * 100 /
-						DEFAULT_PR_PPT ) ) +"%" );
-#endif
 		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
@@ -2445,8 +2432,6 @@ void pianoRoll::zoomingChanged( const QString & _zfac )
 }
 
 
-
-#undef setChecked
 
 
 #include "piano_roll.moc"

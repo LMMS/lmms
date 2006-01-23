@@ -2,7 +2,7 @@
  * name_label.cpp - implementation of class nameLabel, a label which
  *                  is renamable by double-clicking it
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,10 +30,13 @@
 
 #include <QPainter>
 #include <QMouseEvent>
+#include <QFileDialog>
 
 #else
 
 #include <qpainter.h>
+#include <qfiledialog.h>
+#include <qimage.h>
 
 #endif
 
@@ -43,13 +46,14 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "gui_templates.h"
+#include "config_mgr.h"
 
 
 
-nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent,
-							const QPixmap & _pm ) :
+nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent ) :
 	QLabel( _initial_name, _parent ),
-	m_pm( _pm )
+	m_pixmap(),
+	m_pixmapFile( "" )
 {
 #ifdef QT3
 	setBackgroundMode( Qt::NoBackground );
@@ -65,17 +69,99 @@ nameLabel::~nameLabel()
 
 
 
-const QPixmap * nameLabel::pixmap( void ) const
+void nameLabel::setPixmap( const QPixmap & _pixmap )
 {
-	return( &m_pm );
+	m_pixmap = _pixmap;
 }
 
 
 
 
-void nameLabel::setPixmap( const QPixmap & _pm )
+void nameLabel::setPixmapFile( const QString & _file )
 {
-	m_pm = _pm;
+	m_pixmapFile = _file;
+	if( QFileInfo( m_pixmapFile ).isRelative() )
+	{
+		m_pixmap = QPixmap( configManager::inst()->trackIconsDir() +
+								m_pixmapFile );
+	}
+	else
+	{
+		m_pixmap = QPixmap( m_pixmapFile );
+	}
+	emit( pixmapChanged() );
+	update();
+}
+
+
+
+
+void nameLabel::selectPixmap( void )
+{
+#ifdef QT4
+	QFileDialog ofd( NULL, tr( "Select icon" ) );
+#else
+	QFileDialog ofd( QString::null, QString::null, NULL, "", TRUE );
+	ofd.setWindowTitle( tr( "Select icon" ) );
+#endif
+
+	QString dir;
+	if( m_pixmapFile != "" )
+	{
+		QString f = m_pixmapFile;
+		if( QFileInfo( f ).isRelative() )
+		{
+			f = configManager::inst()->trackIconsDir() + f;
+		}
+#ifdef QT4
+		dir = QFileInfo( f ).absolutePath();
+#else
+		dir = QFileInfo( f ).dirPath( TRUE );
+#endif
+	}
+	else
+	{
+		dir = configManager::inst()->trackIconsDir();
+	}
+	// change dir to position of previously opened file
+	ofd.setDirectory( dir );
+	ofd.setFileMode( QFileDialog::ExistingFiles );
+
+	// set filters
+#ifdef QT4
+	QStringList types;
+	types << tr( "All images (*.png *.jpg *.jpeg *.gif *.bmp)" );
+	ofd.setFilters( types );
+#else
+	ofd.addFilter( tr( "All images (*.png *.jpg *.jpeg *.gif *.bmp)" ) );
+	ofd.setSelectedFilter( tr( "All images (*.png *.jpg *.jpeg *.gif "
+								"*.bmp)" ) );
+#endif
+	if( m_pixmapFile != "" )
+	{
+		// select previously opened file
+		ofd.selectFile( QFileInfo( m_pixmapFile ).fileName() );
+	}
+
+	if ( ofd.exec () == QDialog::Accepted )
+	{
+		if( ofd.selectedFiles().isEmpty() )
+		{
+			return;
+		}
+		QString pf = ofd.selectedFiles()[0];
+		if( !QFileInfo( pf ).isRelative() )
+		{
+#if QT_VERSION >= 0x030100
+			pf = pf.replace( configManager::inst()->trackIconsDir(),
+									"" );
+#else
+			pf = pf.replace( QRegExp(
+				configManager::inst()->trackIconsDir() ), "" );
+#endif
+		}
+		setPixmapFile( pf );
+	}
 }
 
 
@@ -90,42 +176,8 @@ void nameLabel::rename( void )
 	{
 		setText( txt );
 		emit nameChanged( txt );
+		emit nameChanged();
 	}
-}
-
-
-
-
-void nameLabel::paintEvent( QPaintEvent * )
-{
-#ifdef QT4
-	QPainter p( this );
-	p.fillRect( rect(), palette().color( backgroundRole() ) );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
-
-	QPainter p( &draw_pm, this );
-#endif
-	p.setFont( pointSize<8>( p.font() ) );
-
-	QFontMetrics fm( font() );
-
-	p.drawPixmap( 4, ( height() - m_pm.height() ) / 2, m_pm );
-	p.setPen( QColor( 0, 224, 0 ) );
-	bbTrack * bbt = bbTrack::findBBTrack( bbEditor::inst()->currentBB() );
-	if( bbt != NULL && bbt->getTrackSettingsWidget() ==
-			dynamic_cast<trackSettingsWidget *>( parentWidget() ) )
-	{
-		p.setPen( QColor( 255, 255, 255 ) );
-	}
-	p.drawText( m_pm.width() + 8, height() / 2 + fm.height() / 2 - 4,
-								text() );
-
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 
@@ -136,7 +188,16 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 
 	if( _me->button() == Qt::RightButton )
 	{
-		rename();
+		QSize s( m_pixmap.width(), m_pixmap.height() );
+		s.scale( width(), height(), QSize::ScaleMin );
+		if( _me->x() > 4 + s.width() )
+		{
+			rename();
+		}
+		else
+		{
+			selectPixmap();
+		}
 	}
 	else
 	{
@@ -150,7 +211,67 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 
 void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 {
-	rename();
+	QSize s( m_pixmap.width(), m_pixmap.height() );
+	s.scale( width(), height(), QSize::ScaleMin );
+	if( _me->x() > 4 + s.width() )
+	{
+		rename();
+	}
+	else
+	{
+		selectPixmap();
+	}
+}
+
+
+
+
+void nameLabel::paintEvent( QPaintEvent * )
+{
+#ifdef QT4
+	QPainter p( this );
+	p.fillRect( rect(), palette().color( backgroundRole() ) );
+#else
+	QPixmap draw_pm( size() );
+	draw_pm.fill( this, rect().topLeft() );
+
+	QPainter p( &draw_pm, this );
+#endif
+	p.setFont( pointSize<8>( p.font() ) );
+
+	int x = 4;
+	if( m_pixmap.isNull() == FALSE )
+	{
+		QPixmap pm = m_pixmap;
+		if( pm.height() > height() )
+		{
+#ifndef QT3
+			pm = pm.scaledToHeight( height(),
+						Qt::SmoothTransformation );
+#else
+			pm.convertFromImage( pm.convertToImage().smoothScale(
+							pm.width(), height(),
+							QImage::ScaleMin ) );
+#endif
+		}
+		p.drawPixmap( x, ( height() - pm.height() ) / 2, pm );
+		x += 4 + pm.width();
+	}
+
+	p.setPen( QColor( 0, 224, 0 ) );
+	bbTrack * bbt = bbTrack::findBBTrack( bbEditor::inst()->currentBB() );
+	if( bbt != NULL && bbt->getTrackSettingsWidget() ==
+			dynamic_cast<trackSettingsWidget *>( parentWidget() ) )
+	{
+		p.setPen( QColor( 255, 255, 255 ) );
+	}
+	p.drawText( x, height() / 2 + p.fontMetrics().height() / 2 - 4,
+								text() );
+
+#ifndef QT4
+	// and blit all the drawn stuff on the screen...
+	bitBlt( this, rect().topLeft(), &draw_pm );
+#endif
 }
 
 

@@ -55,6 +55,7 @@
 #include "types.h"
 #include "midi_time.h"
 #include "settings.h"
+#include "rubberband.h"
 
 
 class QMenu;
@@ -76,7 +77,7 @@ const Uint16 TRACK_OP_WIDTH = 70;
 const Uint16 TCO_BORDER_WIDTH = 1;
 
 
-class trackContentObject : public QWidget, public settings
+class trackContentObject : public selectableObject, public settings
 {
 	Q_OBJECT
 public:
@@ -99,7 +100,9 @@ public:
 	{
 		return( m_length );
 	}
+
 	bool fixedTCOs( void );
+
 	virtual void FASTCALL movePosition( const midiTime & _pos );
 	virtual void FASTCALL changeLength( const midiTime & _length );
 
@@ -132,13 +135,17 @@ protected slots:
 
 
 private:
+	enum actions
+	{
+		NONE, MOVE, MOVE_SELECTION, RESIZE
+	} ;
+
 	static textFloat * s_textFloat;
 
 	track * m_track;
 	midiTime m_startPosition;
 	midiTime m_length;
-	bool m_moving;
-	bool m_resizing;
+	actions m_action;
 	bool m_autoResize;
 	Sint16 m_initialMouseX;
 
@@ -167,10 +174,12 @@ public:
 	{
 		return( m_pixelsPerTact );
 	}
+
 	inline void setPixelsPerTact( Uint16 _ppt )
 	{
 		m_pixelsPerTact = _ppt;
 	}
+
 	tact length( void ) const;
 
 
@@ -184,8 +193,7 @@ protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
 
@@ -296,9 +304,11 @@ public:
 
 	bool isMovingTrack( void ) const
 	{
-		return( m_movingTrack );
+		return( m_action == MOVE_TRACK );
 	}
 	
+	virtual void repaint( void );
+
 
 public slots:
 	void changePosition( const midiTime & _new_pos = -1 );
@@ -317,14 +327,17 @@ protected:
 
 
 private:
+	enum actions
+	{
+		NONE, MOVE_TRACK, RESIZE_TRACK
+	} ;
 	track * m_track;
 
 	trackOperationsWidget m_trackOperationsWidget;
 	trackSettingsWidget m_trackSettingsWidget;
 	trackContentWidget m_trackContentWidget;
 
-	bool m_movingTrack;
-	Sint16 m_initialMouseX;
+	actions m_action;
 
 } ;
 

@@ -47,17 +47,16 @@
 #include "note.h"
 
 
-class QComboBox;
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class toolButton;
-class pattern;
-class notePlayHandle;
-class timeLine;
+class comboBox;
 class lmmsMainWin;
-
+class notePlayHandle;
+class pattern;
+class timeLine;
+class toolButton;
 
 
 class pianoRoll : public QWidget
@@ -205,7 +204,7 @@ private:
 	toolButton * m_copyButton;
 	toolButton * m_pasteButton;
 
-	QComboBox * m_zoomingComboBox;
+	comboBox * m_zoomingComboBox;
 
 	QPixmap m_paintPixmap;
 	bool m_cursorInside;

@@ -2,7 +2,7 @@
  * pattern.cpp - implementation of class pattern which holds notes
  *
  * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2005 Danny McRae <khjklujn@yahoo.com>
+ * Copyright (c) 2005 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -69,7 +69,6 @@
 #include "string_pair_drag.h"
 
 
-QPixmap * pattern::s_patternBg = NULL;
 QPixmap * pattern::s_stepBtnOn = NULL;
 QPixmap * pattern::s_stepBtnOverlay = NULL;
 QPixmap * pattern::s_stepBtnOff = NULL;
@@ -78,9 +77,10 @@ QPixmap * pattern::s_frozen = NULL;
 
 
 
-
 pattern::pattern ( channelTrack * _channel_track ) :
 	trackContentObject( _channel_track ),
+	m_paintPixmap(),
+	m_needsUpdate( TRUE ),
 	m_channelTrack( _channel_track ),
 	m_patternType( BEAT_PATTERN ),
 	m_name( _channel_track->name() ),
@@ -98,6 +98,8 @@ pattern::pattern ( channelTrack * _channel_track ) :
 
 pattern::pattern( const pattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_channelTrack ),
+	m_paintPixmap(),
+	m_needsUpdate( TRUE ),
 	m_channelTrack( _pat_to_copy.m_channelTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
@@ -142,31 +144,30 @@ pattern::~pattern()
 
 void pattern::init( void )
 {
-	if( s_patternBg == NULL )
-	{
-		s_patternBg = new QPixmap( embed::getIconPixmap(
-							"pattern_bg" ) );
-	}
 	if( s_stepBtnOn == NULL )
 	{
 		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
 							"step_btn_on_100" ) );
 	}
+
 	if( s_stepBtnOverlay == NULL )
 	{
 		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
 						"step_btn_on_yellow" ) );
 	}
+
 	if( s_stepBtnOff == NULL )
 	{
 		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
 							"step_btn_off" ) );
 	}
+
 	if( s_stepBtnOffLight == NULL )
 	{
 		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
 						"step_btn_off_light" ) );
 	}
+
 	if( s_frozen == NULL )
 	{
 		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
@@ -174,28 +175,19 @@ void pattern::init( void )
 
 	ensureBeatNotes();
 
+	changeLength( length() );
+
 #ifndef QT4
 	// set background-mode for flicker-free redraw
 	setBackgroundMode( Qt::NoBackground );
 #endif
 
-	setFixedHeight( s_patternBg->height() + 4 );
-	changeLength( length() );
-
+	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( FALSE );
 
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
 			"use mouse wheel to set volume of a step" ) );
-}
-
-
-
-
-void pattern::movePosition( const midiTime & _pos )
-{
-	// patterns are always aligned on tact-boundaries
-	trackContentObject::movePosition( midiTime( _pos.getTact(), 0 ) );
 }
 
 
@@ -319,6 +311,10 @@ void pattern::clearNotes( void )
 	m_notes.clear();
 	checkType();
 	update();
+	if( pianoRoll::inst()->currentPattern() == this )
+	{
+		pianoRoll::inst()->update();
+	}
 }
 
 
@@ -474,6 +470,15 @@ void pattern::loadSettings( const QDomElement & _this )
 
 
 
+void pattern::update( void )
+{
+	m_needsUpdate = TRUE;
+	changeLength( length() );
+	trackContentObject::update();
+}
+
+
+
 
 void pattern::openInPianoRoll( void )
 {
@@ -488,7 +493,6 @@ void pattern::openInPianoRoll( bool )
 	pianoRoll::inst()->setCurrentPattern( this );
 	pianoRoll::inst()->show();
 	pianoRoll::inst()->setFocus();
-	return;
 }
 
 
@@ -582,6 +586,7 @@ void pattern::unfreeze( void )
 		delete m_frozenPattern;
 		m_frozenPattern = NULL;
 		m_frozenPatternMutex.unlock();
+		update();
 	}
 }
 
@@ -870,22 +875,54 @@ void pattern::wheelEvent( QWheelEvent * _we )
 
 void pattern::paintEvent( QPaintEvent * )
 {
+	if( m_needsUpdate == FALSE )
+	{
+		QPainter p( this );
+		p.drawPixmap( 0, 0, m_paintPixmap );
+		return;
+	}
+
 	changeLength( length() );
 
-#ifdef QT4
-	QPainter p( this );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
+	m_needsUpdate = FALSE;
 
-	// and a painter for it
-	QPainter p( &pm );
+	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
+	{
+		m_paintPixmap = QPixmap( size() );
+	}
+
+	QPainter p( &m_paintPixmap );
+#ifdef QT4
+	// TODO: gradient!
+#else
+	for( int y = 1; y < height() / 2; ++y )
+	{
+		const int gray = 96 - y * 192 / height();
+		if( isSelected() == TRUE )
+		{
+			p.setPen( QColor( 0, 0, 128 + gray ) );
+		}
+		else
+		{
+			p.setPen( QColor( gray, gray, gray ) );
+		}
+		p.drawLine( 1, y, width() - 1, y );
+	}
+	for( int y = height() / 2; y < height() - 1; ++y )
+	{
+		const int gray = ( y - height() / 2 ) * 192 / height();
+		if( isSelected() == TRUE )
+		{
+			p.setPen( QColor( 0, 0, 128 + gray ) );
+		}
+		else
+		{
+			p.setPen( QColor( gray, gray, gray ) );
+		}
+		p.drawLine( 1, y, width() - 1, y );
+	}
 #endif
 
-	for( Sint16 x = 2; x < width() - 1; x += 2 )
-	{
-		p.drawPixmap( x, 2, *s_patternBg );
-	}
 	p.setPen( QColor( 57, 69, 74 ) );
 	p.drawLine( 0, 0, width(), 0 );
 	p.drawLine( 0, 0, 0, height() );
@@ -896,7 +933,7 @@ void pattern::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 2, height() - 2 );
 
-	float ppt = pixelsPerTact();
+	const float ppt = pixelsPerTact();
 
 	if( m_patternType == pattern::MELODY_PATTERN )
 	{
@@ -920,7 +957,7 @@ void pattern::paintEvent( QPaintEvent * )
 			{
 				central_key = central_key / total_notes;
 
-				Sint16 central_y = s_patternBg->height() / 2;
+				Sint16 central_y = height() / 2;
 				Sint16 y_base = central_y + TCO_BORDER_WIDTH -1;
 
 				const Sint16 x_base = TCO_BORDER_WIDTH;
@@ -929,12 +966,13 @@ void pattern::paintEvent( QPaintEvent * )
 				for( tact tact_num = 1; tact_num <
 						length().getTact(); ++tact_num )
 				{
-					p.drawLine( x_base + static_cast<int>(
-								ppt*tact_num ),
-							TCO_BORDER_WIDTH,
-							x_base +
-					static_cast<int>( ppt * tact_num ),
-							height() - 2 *
+					p.drawLine(
+						x_base + static_cast<int>(
+							ppt * tact_num ) - 1,
+						TCO_BORDER_WIDTH,
+						x_base + static_cast<int>(
+							ppt * tact_num ) - 1,
+						height() - 2 *
 							TCO_BORDER_WIDTH );
 				}
 				if( getTrack()->muted() )
@@ -973,42 +1011,42 @@ void pattern::paintEvent( QPaintEvent * )
 		}
 	}
 	else if( m_patternType == pattern::BEAT_PATTERN &&
-			( ppt >= 192 || m_steps != DEFAULT_STEPS_PER_TACT ) )
+			( ppt >= 96 || m_steps != DEFAULT_STEPS_PER_TACT ) )
 	{
 		QPixmap stepon;
 		QPixmap stepoverlay;
 		QPixmap stepoff;
 		QPixmap stepoffl;
-		int steps = length() / BEATS_PER_TACT;
-		
+		const int steps = length() / BEATS_PER_TACT;
+		const int w = width() - 2 * TCO_BORDER_WIDTH;
 #ifdef QT4
-		stepon = s_stepBtnOn->scaled( width() / steps,
+		stepon = s_stepBtnOn->scaled( w / steps,
 					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
-		stepoverlay = s_stepBtnOverlay->scaled( width() / steps,
+		stepoverlay = s_stepBtnOverlay->scaled( w / steps,
 					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( width() / steps,
+		stepoff = s_stepBtnOff->scaled( w / steps,
 						s_stepBtnOff->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( width() / steps,
+		stepoffl = s_stepBtnOffLight->scaled( w / steps,
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 #else
 		stepon.convertFromImage( 
 				s_stepBtnOn->convertToImage().scale(
-				width() / steps, s_stepBtnOn->height() ) );
+					w / steps, s_stepBtnOn->height() ) );
 		stepoverlay.convertFromImage( 
 				s_stepBtnOverlay->convertToImage().scale(
-				width() / steps, s_stepBtnOverlay->height() ) );
+				w / steps, s_stepBtnOverlay->height() ) );
 		stepoff.convertFromImage( s_stepBtnOff->convertToImage().scale(
-				width() / steps, s_stepBtnOff->height() ) );
+					w / steps, s_stepBtnOff->height() ) );
 		stepoffl.convertFromImage( s_stepBtnOffLight->convertToImage().
-					scale( width() / steps,
+					scale( w / steps,
 						s_stepBtnOffLight->height() ) );
 #endif
 		for( noteVector::iterator it = m_notes.begin();
@@ -1016,7 +1054,7 @@ void pattern::paintEvent( QPaintEvent * )
 		{
 			Sint16 no = it - m_notes.begin();
 			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
-							width() / steps );
+								w / steps );
 			Sint16 y = height() - s_stepBtnOff->height() - 1;
 			
 			Uint8 vol = ( *it )->getVolume();
@@ -1055,10 +1093,11 @@ void pattern::paintEvent( QPaintEvent * )
 		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
 	}
 
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
+	p.end();
+
+	p.begin( this );
+	p.drawPixmap( 0, 0, m_paintPixmap );
+
 }
 
 
@@ -1223,6 +1262,7 @@ patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
 
 patternFreezeThread::~patternFreezeThread()
 {
+	m_pattern->update();
 }
 
 

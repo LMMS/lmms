@@ -1,7 +1,7 @@
 /*
  * bb_editor.cpp - basic main-window for editing of beats and basslines
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,6 +50,7 @@
 #include "templates.h"
 #include "debug.h"
 #include "tooltip.h"
+#include "combobox.h"
 
 
 
@@ -85,7 +86,8 @@ bbEditor::bbEditor() :
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
-					BBE_PPT + 2 * TCO_BORDER_WIDTH );
+				BBE_PPT + 2 * TCO_BORDER_WIDTH +
+				DEFAULT_SCROLLBAR_SIZE );
 	if( lmmsMainWin::inst()->workspace() != NULL )
 	{
 		setGeometry( 10, 340, minimumWidth(), 300 );
@@ -127,9 +129,16 @@ bbEditor::bbEditor() :
 	QLabel * l = new QLabel( m_toolBar );
 	l->setPixmap( embed::getIconPixmap( "drum" ) );
 
+	m_bbComboBox = new comboBox( m_toolBar );
+	m_bbComboBox->setFixedSize( 200, 22 );
+	connect( m_bbComboBox, SIGNAL( currentIndexChanged( int ) ),
+				this, SLOT( setCurrentBB( int ) ) );
+
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
 	tb_layout->addWidget( m_stopButton );
+	tb_layout->addSpacing( 20 );
+	tb_layout->addWidget( m_bbComboBox );
 	tb_layout->addStretch();
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
@@ -155,10 +164,15 @@ csize bbEditor::currentBB( void ) const
 
 
 
-void bbEditor::setCurrentBB( csize _bb )
+void bbEditor::setCurrentBB( int _bb )
 {
+	if( m_bbComboBox->currentIndex() != _bb )
+	{
+		m_bbComboBox->setCurrentIndex( _bb );
+	}
+
 	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( _bb );
+	createTCOsForBB( static_cast<csize>( _bb ) );
 
 	realignTracks();
 
@@ -169,7 +183,8 @@ void bbEditor::setCurrentBB( csize _bb )
 		bbTrack::findBBTrack( i )->trackLabel()->update();
 	}
 
-	emit positionChanged( m_currentPosition = midiTime( _bb, 0 ) );
+	emit positionChanged( m_currentPosition = midiTime(
+					static_cast<csize>( _bb ), 0 ) );
 }
 
 
@@ -270,6 +285,22 @@ void bbEditor::updateBBTrack( trackContentObject * _tco )
 
 
 
+void bbEditor::updateComboBox( void )
+{
+	m_bbComboBox->clear();
+
+	for( csize i = 0; i < numOfBBs(); ++i )
+	{
+		bbTrack * bbt = bbTrack::findBBTrack( i );
+		m_bbComboBox->addItem( bbt->trackLabel()->text(),
+					bbt->trackLabel()->pixmap() );
+	}
+	m_bbComboBox->setCurrentIndex( currentBB() );
+}
+
+
+
+
 // close-handler for bb-editor-window because closing of bb-editor isn't allowed
 // instead of closing it's being hidden
 void bbEditor::closeEvent( QCloseEvent * _ce )
@@ -323,9 +354,19 @@ void bbEditor::resizeEvent( QResizeEvent * _re )
 {
 	setPixelsPerTact( width() - ( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH + 2 *
-					TCO_BORDER_WIDTH ) );
+					TCO_BORDER_WIDTH +
+					DEFAULT_SCROLLBAR_SIZE ) );
 	trackContainer::resizeEvent( _re );
 	m_toolBar->setFixedWidth( width() );
+}
+
+
+
+
+QRect bbEditor::scrollAreaRect( void ) const
+{
+	return( QRect( 0, 0, (int) pixelsPerTact(),
+					height() - m_toolBar->height() ) );
 }
 
 
@@ -431,6 +472,7 @@ void bbEditor::swapBB( csize _bb1, csize _bb2 )
 	{
 		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
 	}
+	updateComboBox();
 }
 
 

@@ -2,7 +2,7 @@
  * track_container.h - base-class for all track-containers like Song-Editor,
  *                     BB-Editor...
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,9 +46,12 @@
 
 #include "track.h"
 #include "settings.h"
+#include "rubberband.h"
 
 
 const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
+
+const Uint16 DEFAULT_SCROLLBAR_SIZE = 16;
 
 
 class trackContainer : public QMainWindow, public settings
@@ -102,14 +105,38 @@ public:
 	const trackWidget * trackWidgetAt( const int _y ) const;
 
 
+	virtual bool allowRubberband( void ) const;
+
+	inline bool rubberBandActive( void ) const
+	{
+		return( m_rubberBand->isVisible() );
+	}
+
+	inline vvector<selectableObject *> selectedObjects( void )
+	{
+		if( allowRubberband() == TRUE )
+		{
+			return( m_rubberBand->selectedObjects() );
+		}
+		return( vvector<selectableObject *>() );
+	}
+
+
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
 	constTrackVector tracks( void ) const;
 	trackVector tracks( void );
 
+	virtual QRect scrollAreaRect( void ) const
+	{
+		return( rect() );
+	}
 
 	midiTime m_currentPosition;
 
@@ -140,6 +167,9 @@ private:
 
 	trackWidgetVector m_trackWidgets;
 	float m_ppt;
+
+	rubberBand * m_rubberBand;
+	QPoint m_origin;
 
 
 	friend class scrollArea;

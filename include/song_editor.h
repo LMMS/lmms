@@ -2,7 +2,7 @@
  * song_editor.h - declaration of class songEditor, a window where you can
  *                 setup your songs
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,27 +29,26 @@
 
 #include "track_container.h"
 #include "types.h"
+#include "tool_button.h"
 
 
-class QComboBox;
 class QLabel;
 class QScrollBar;
 class QSlider;
 
+class comboBox;
 class lcdSpinBox;
 class lmmsMainWin;
 class pattern;
 class projectNotes;
 class textFloat;
 class timeLine;
-class toolButton;
 
 
 const int MIN_BPM = 10;
 const int DEFAULT_BPM = 140;
 const int MAX_BPM = 999;
 const Uint16 MAX_SONG_LENGTH = 9999;
-
 
 
 class songEditor : public trackContainer
@@ -204,11 +203,18 @@ public slots:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce );
-	void resizeEvent( QResizeEvent * _re );
-	void keyPressEvent( QKeyEvent * _ke );
-	void wheelEvent( QWheelEvent * _we );
-	void paintEvent( QPaintEvent * _pe );
+	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void resizeEvent( QResizeEvent * _re );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void paintEvent( QPaintEvent * _pe );
+
+	virtual QRect scrollAreaRect( void ) const;
+
+	virtual bool allowRubberband( void ) const
+	{
+		return( m_editModeButton->isChecked() );
+	}
 
 
 protected slots:
@@ -231,6 +237,8 @@ protected slots:
 	void updatePosition( const midiTime & _t );
 
 	void zoomingChanged( const QString & _zfac );
+
+	void doActions( void );
 
 
 private:
@@ -273,10 +281,11 @@ private:
 
 	toolButton * m_addBBTrackButton;
 	toolButton * m_addSampleTrackButton;
-	toolButton * m_insertBarButton;
-	toolButton * m_removeBarButton;
 
-	QComboBox * m_zoomingComboBox;
+	toolButton * m_drawModeButton;
+	toolButton * m_editModeButton;
+
+	comboBox * m_zoomingComboBox;
 
 
 	QString m_fileName;
@@ -309,8 +318,6 @@ private:
 		ACT_PLAY_PATTERN, ACT_PAUSE, ACT_RESUME_FROM_PAUSE
 	} ;
 	vvector<ACTIONS> m_actions;
-
-	void doActions( void );
 
 
 	friend class lmmsMainWin;

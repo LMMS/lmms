@@ -1,7 +1,7 @@
 /*
  * bb_editor.h - declaration of class bbEditor, a basic-component of LMMS
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,9 +33,11 @@
 #include "lmms_main_win.h"
 
 
-class toolButton;
-class songEditor;
 class QPixmap;
+
+class comboBox;
+class songEditor;
+class toolButton;
 
 
 class bbEditor : public trackContainer
@@ -71,7 +73,6 @@ public:
 	}
 
 	csize currentBB( void ) const;
-	void FASTCALL setCurrentBB( csize _bb );
 	tact FASTCALL lengthOfBB( csize _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
@@ -85,10 +86,17 @@ public:
 	void updateBBTrack( trackContentObject * _tco );
 
 
+public slots:
+	void updateComboBox( void );
+	void setCurrentBB( int _bb );
+
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void resizeEvent( QResizeEvent * _re );
+
+	virtual QRect scrollAreaRect( void ) const;
 
 
 protected slots:
@@ -110,6 +118,8 @@ private:
 
 	toolButton * m_playButton;
 	toolButton * m_stopButton;
+
+	comboBox * m_bbComboBox;
 
 
 	friend class songEditor;

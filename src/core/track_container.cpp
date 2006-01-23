@@ -58,18 +58,22 @@
 #include "config_mgr.h"
 #include "midi_file.h"
 #include "instrument.h"
+#include "rubberband.h"
 
 
 
 trackContainer::trackContainer() :
 	QMainWindow( lmmsMainWin::inst()->workspace()
-#ifndef QT4
+#ifdef QT3
 				, 0, Qt::WStyle_Title
 #endif
 			 ),
 	settings(),
 	m_currentPosition( 0, 0 ),
-	m_ppt( DEFAULT_PIXELS_PER_TACT )
+	m_scrollArea( new scrollArea( this ) ),
+	m_ppt( DEFAULT_PIXELS_PER_TACT ),
+	m_rubberBand( new rubberBand( m_scrollArea ) ),
+	m_origin()
 {
 #ifdef QT4
 	if( lmmsMainWin::inst()->workspace() != NULL )
@@ -78,8 +82,8 @@ trackContainer::trackContainer() :
 	}
 #endif
 
-	m_scrollArea = new scrollArea( this );
 	m_scrollArea->show();
+	m_rubberBand->hide();
 
 	setAcceptDrops( TRUE );
 }
@@ -281,23 +285,20 @@ void trackContainer::realignTracks( bool _complete_update )
 	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{
-		if( _complete_update )
-		{
-			( *it )->hide();
-		}
 		( *it )->show();
+		( *it )->repaint();
 #ifdef QT4
 		( *it )->move( 0, y );
 #else
 		m_scrollArea->moveChild( *it, 0, y );
 #endif
-		( *it )->resize( width(), ( *it )->height() );
+		( *it )->resize( width() - DEFAULT_SCROLLBAR_SIZE,
+				 			( *it )->height() );
 		( *it )->changePosition( m_currentPosition );
 		y += ( *it )->height();
 	}
-#ifndef QT4
-	m_scrollArea->resizeContents( m_scrollArea->parentWidget()->width(),
-									y );
+#ifdef QT3
+	m_scrollArea->resizeContents( width() - DEFAULT_SCROLLBAR_SIZE, y );
 #endif
 	updateScrollArea();
 }
@@ -319,6 +320,14 @@ const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
 		}
 	}
 	return( NULL );
+}
+
+
+
+
+bool trackContainer::allowRubberband( void ) const
+{
+	return( FALSE );
 }
 
 
@@ -390,14 +399,6 @@ void trackContainer::setPixelsPerTact( Uint16 _ppt )
 
 
 
-void trackContainer::resizeEvent( QResizeEvent * )
-{
-	realignTracks();
-}
-
-
-
-
 void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
@@ -464,13 +465,56 @@ void trackContainer::dropEvent( QDropEvent * _de )
 
 
 
+void trackContainer::mousePressEvent( QMouseEvent * _me )
+{
+	if( allowRubberband() == TRUE )
+	{
+		m_origin = m_scrollArea->mapFromParent( _me->pos() );
+		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
+		m_rubberBand->show();
+	}
+}
+
+
+
+
+void trackContainer::mouseMoveEvent( QMouseEvent * _me )
+{
+	if( rubberBandActive() == TRUE )
+	{
+		m_rubberBand->setGeometry( QRect( m_origin,
+				m_scrollArea->mapFromParent( _me->pos() ) ).
+								normalized() );
+	}
+}
+
+
+
+
+void trackContainer::mouseReleaseEvent( QMouseEvent * _me )
+{
+	m_rubberBand->hide();
+}
+
+
+
+
+
+void trackContainer::resizeEvent( QResizeEvent * )
+{
+	realignTracks();
+}
+
+
+
+
 void trackContainer::updateScrollArea( void )
 {
-	m_scrollArea->resize( tMax( m_scrollArea->parentWidget()->width() - 
+	m_scrollArea->resize( width(), scrollAreaRect().height() );
+/*	m_scrollArea->resize( tMax( m_scrollArea->parentWidget()->width() - 
 					m_scrollArea->x() - 2, 0 ),
 				tMax( m_scrollArea->parentWidget()->height() -
-					m_scrollArea->y() - 2, 0 ) );
-	//m_scrollArea->updateContents();
+					m_scrollArea->y() - 2, 0 ) );*/
 }
 
 
@@ -486,6 +530,13 @@ trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
 					Qt::ScrollBarAlwaysOff
 #else
 					QScrollArea::AlwaysOff
+#endif
+					);
+	setVerticalScrollBarPolicy( 
+#ifdef QT4
+					Qt::ScrollBarAlwaysOn
+#else
+					QScrollArea::AlwaysOn
 #endif
 					);
 }

@@ -1,3 +1,117 @@
+2006-01-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/timeline.h:
+	* src/core/song_editor.cpp:
+	* src/core/timeline.cpp:
+	updates are now completely done by timeline/QTimer without being
+	called from song-editor out of non-GUI-thread which caused segfaults
+	etc. sometimes
+
+	* include/name_label.h:
+	* src/core/name_label.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/sample_track.cpp:
+	added support for user-defined track-icons
+
+	* artwork/track_icons/*png:
+	added several icons to be used as track-icons
+
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	do not hide track for completely repainting it, use special method for
+	it
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	only repaint if neccessary, otherwise just paint the pixmap we painted
+	before
+
+	* include/bb_editor.h:
+	* src/core/bb_editor.cpp:
+	added combobox for selecting bb-track inside bb-editor
+
+	* include/combobox.h:
+	* src/widgets/combobox.cpp:
+	- added clear()-method
+	- do not crash when having no items
+	- scale pixmap to fit into combobox
+	- place menu below combobox if possible
+
+2006-01-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	added support for used-defined track-height by pressing <Shift> and
+	move mouse (with pressed button)
+
+	* include/song_editor.h:
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	take advantage of new rubberband:
+	- selecting track-content-objects of any type either via rubberband or
+	  by clicking while pressing <Ctrl>
+	- move selected track-content-objects
+	- delete selected track-content-objects
+
+	* include/rubberband.h:
+	* src/widgets/rubberband.cpp:
+	added rubberband which either acts as wrapper for Qt4's QRubberBand or
+	as a widget imitating a rubberband
+
+	* include/track.h:
+	* src/core/track.cpp:
+	draw vertical lines for each bar
+
+	* include/bb_editor.h:
+	* include/song_editor.h:
+	* include/track_container.h:
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	fixed all that stuff with annoying scrollbars which partly hid important
+	widgets
+
+2006-01-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/tracks/pattern.cpp:
+	also update after clearing all notes
+
+	* include/piano_roll.h:
+	* include/song_editor.h:
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	use new combobox for zooming-comboboxes
+
+	* include/export_project_dialog.h:
+	* src/core/export_project_dialog.cpp:
+	- reject() dialog when pressing cancel
+	- use new combobox
+
+	* include/arp_and_chords_tab_widget.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	use new combobox with according arpeggio-mode-icons
+
+	* include/envelope_tab_widget.h:
+	* src/core/envelope_tab_widget.cpp:
+	* resources/filter_2lp.png:
+	* resources/filter_ap.png:
+	* resources/filter_bp.png:
+	* resources/filter_hp.png:
+	* resources/filter_lp.png:
+	use new combobox with according filter-icons
+
+	* include/combobox.h:
+	* src/widgets/combobox.cpp:
+	added own cool-looking combobox with menu-extension which basically
+	has the same API as QComboBox
+
 2006-01-19	Andreas M. Brandmaier <andy/at/brandmaier.de>
 
 	* plugins/bit_invader/bit_invader.h:

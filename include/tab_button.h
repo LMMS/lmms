@@ -1,7 +1,7 @@
 /*
  * tab_button.h - declaration of class tabButton
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,10 +52,22 @@ public:
 		connect( this, SIGNAL( clicked() ), this,
 						SLOT( slotClicked() ) );
 	}
-	virtual ~tabButton()
+
+	~tabButton()
 	{
 	}
 
+#ifdef QT3
+	inline void setChecked( bool _on )
+	{
+		setOn( _on );
+	}
+
+	inline bool isChecked( void ) const
+	{
+		return( isOn() );
+	}
+#endif
 
 signals:
 	void clicked( int );

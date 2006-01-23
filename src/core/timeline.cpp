@@ -112,10 +112,9 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 
 	m_pos.m_timeLine = this;
 
-	updatePosition();
 	QTimer * update_timer = new QTimer( this );
-	connect( update_timer, SIGNAL( timeout() ), this,
-					SLOT( checkForUpdatedPosition() ) );
+	connect( update_timer, SIGNAL( timeout() ),
+					this, SLOT( updatePosition() ) );
 	update_timer->start( 50 );
 }
 
@@ -184,6 +183,7 @@ void timeLine::updatePosition( const midiTime & )
 		{
 			emit positionChanged( m_pos );
 		}
+		update();
 	}
 }
 
@@ -210,18 +210,6 @@ void timeLine::toggleLoopPoints( int _n )
 void timeLine::toggleBehaviourAtStop( int _n )
 {
 	m_behaviourAtStop = static_cast<behaviourAtStopStates>( _n );
-}
-
-
-
-
-void timeLine::checkForUpdatedPosition( void )
-{
-	if( m_changedPosition == TRUE )
-	{
-		repaint();
-		m_changedPosition = FALSE;
-	}
 }
 
 

@@ -47,10 +47,10 @@
 #include "types.h"
 
 
-class QComboBox;
 class QPixmap;
 
 class channelTrack;
+class comboBox;
 class groupBox;
 class knob;
 class ledCheckBox;
@@ -124,12 +124,12 @@ private:
 
 	// chord-stuff
 	groupBox * m_chordsGroupBox;
-	QComboBox * m_chordsComboBox;
+	comboBox * m_chordsComboBox;
 	knob * m_chordRangeKnob;
 
 	// arpeggio-stuff
 	groupBox * m_arpGroupBox;
-	QComboBox * m_arpComboBox;
+	comboBox * m_arpComboBox;
 	knob * m_arpRangeKnob;
 	tempoSyncKnob * m_arpTimeKnob;
 	knob * m_arpGateKnob;
@@ -140,7 +140,7 @@ private:
 	pixmapButton * m_arpUpAndDownBtn;
 	pixmapButton * m_arpRandomBtn;
 
-	QComboBox * m_arpModeComboBox;
+	comboBox * m_arpModeComboBox;
 
 } ;
 

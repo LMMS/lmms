@@ -36,6 +36,7 @@
 #include <QMutex>
 #include <QDialog>
 #include <QThread>
+#include <QPixmap>
 
 #else
 
@@ -44,6 +45,7 @@
 #include <qmutex.h>
 #include <qdialog.h>
 #include <qthread.h>
+#include <qpixmap.h>
 
 #endif
 
@@ -54,7 +56,6 @@
 
 
 class QAction;
-class QPixmap;
 class QProgressBar;
 class QPushButton;
 
@@ -82,9 +83,6 @@ public:
 	virtual ~pattern();
 
 	void init( void );
-
-
-	virtual void FASTCALL movePosition( const midiTime & _pos );
 
 
 	virtual midiTime length( void ) const;
@@ -159,6 +157,10 @@ public:
 	}
 
 
+public slots:
+	virtual void update( void );
+
+
 protected slots:
 	void openInPianoRoll( bool _c );
 	void openInPianoRoll( void );
@@ -180,21 +182,27 @@ protected:
 	virtual void constructContextMenu( QMenu * );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _we );
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re )
+	{
+		m_needsUpdate = TRUE;
+		trackContentObject::resizeEvent( _re );
+	}
+	virtual void wheelEvent( QWheelEvent * _we );
 
 	void ensureBeatNotes( void );
 	void updateBBTrack( void );
 
 
 private:
-	static QPixmap * s_patternBg;
 	static QPixmap * s_stepBtnOn;
 	static QPixmap * s_stepBtnOverlay;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 	static QPixmap * s_frozen;
 
+	QPixmap m_paintPixmap;
+	bool m_needsUpdate;
 
 	// general stuff
 	channelTrack * m_channelTrack;

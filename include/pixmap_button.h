@@ -1,7 +1,7 @@
 /*
  * pixmap_button.h - declaration of class pixmapButton
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,10 +56,16 @@ public:
 	void FASTCALL setInactiveGraphic( const QPixmap & _pm,
 							bool _update = TRUE );
 	void FASTCALL setBgGraphic( const QPixmap & _pm );
-#ifndef QT4
+
+#ifdef QT3
 	inline void setChecked( bool _on )
 	{
 		setOn( _on );
+	}
+
+	inline bool isChecked( void ) const
+	{
+		return( isOn() );
 	}
 #endif
 

@@ -1005,7 +1005,7 @@ QString sampleBuffer::openAudioFile( void ) const
 		ofd.selectFile( QFileInfo( m_audioFile ).fileName() );
 	}
 
-	if ( ofd.exec () == QDialog::Accepted )
+	if( ofd.exec () == QDialog::Accepted )
 	{
 		if( ofd.selectedFiles().isEmpty() )
 		{

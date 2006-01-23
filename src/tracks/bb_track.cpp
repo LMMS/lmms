@@ -1,7 +1,7 @@
 /*
- * bb_track.cpp - implementation of class bbTrack
+ * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,10 +49,11 @@
 #include "name_label.h"
 #include "embed.h"
 #include "rename_dialog.h"
+#include "templates.h"
 
 
 
-QMap<bbTrack *, bbTrack::bbInfoStruct> bbTrack::s_bbNums;
+bbTrack::infoMap bbTrack::s_infoMap;
 
 
 bbTCO::bbTCO( track * _track, const QColor & _c ) :
@@ -134,6 +135,11 @@ void bbTCO::paintEvent( QPaintEvent * )
 	{
 		col = QColor( 160, 160, 160 );
 	}
+	if( isSelected() == TRUE )
+	{
+		col = QColor( tMax( col.red() - 128, 0 ),
+					tMax( col.green() - 128, 0 ), 255 );
+	}
 #ifdef QT4
 	QPainter p( this );
 	// TODO: set according brush/pen for gradient!
@@ -154,10 +160,10 @@ void bbTCO::paintEvent( QPaintEvent * )
 
 	tact t = bbEditor::inst()->lengthOfBB( bbTrack::numOfBBTrack(
 								getTrack() ) );
-	if( length().getTact() > 1 && t > 0 )
+	if( length() > 64 && t > 0 )
 	{
-		for( int x = TCO_BORDER_WIDTH + static_cast<int>( t *
-						pixelsPerTact() ); x < width();
+		for( int x = static_cast<int>( t * pixelsPerTact() );
+								x < width();
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
 			p.setPen( col.light( 80 ) );
@@ -273,25 +279,33 @@ void bbTCO::changeColor( void )
 
 
 
-bbTrack::bbTrack( trackContainer * _tc )
-	: track( _tc )
+bbTrack::bbTrack( trackContainer * _tc ) :
+	track( _tc )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
 	// too), so disable it
 	getTrackWidget()->setAcceptDrops( FALSE );
 
-	csize bbNum = s_bbNums.size();
-	bbInfoStruct bis = { bbNum, "" };
-	s_bbNums[this] = bis;
+	csize bbNum = s_infoMap.size();
+	s_infoMap[this] = bbNum;
+
 	m_trackLabel = new nameLabel( tr( "Beat/Bassline %1" ).arg( bbNum ),
-					getTrackSettingsWidget(),
-					embed::getIconPixmap( "bb_track" ) );
-	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
+						getTrackSettingsWidget() );
+	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
+	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
+									29 );
 	m_trackLabel->show();
-	connect( m_trackLabel, SIGNAL( clicked() ), this,
-						SLOT( clickedTrackLabel() ) );
+	connect( m_trackLabel, SIGNAL( clicked() ),
+			this, SLOT( clickedTrackLabel() ) );
+	connect( m_trackLabel, SIGNAL( nameChanged() ),
+			bbEditor::inst(), SLOT( updateComboBox() ) );
+	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
+			bbEditor::inst(), SLOT( updateComboBox() ) );
+
+
 	bbEditor::inst()->setCurrentBB( bbNum );
+	bbEditor::inst()->updateComboBox();
 
 	_tc->updateAfterTrackAdd();
 }
@@ -301,24 +315,24 @@ bbTrack::bbTrack( trackContainer * _tc )
 
 bbTrack::~bbTrack()
 {
-	csize bb = s_bbNums[this].num;
+	csize bb = s_infoMap[this];
 	bbEditor::inst()->removeBB( bb );
-	for( QMap<bbTrack *, bbTrack::bbInfoStruct>::iterator it =
-				s_bbNums.begin(); it != s_bbNums.end(); ++it )
+	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
+									++it )
 	{
 #ifdef QT4
-		if( it.value().num > bb )
+		if( it.value() > bb )
 		{
-			--it.value().num;
+			--it.value();
 		}
 #else
-		if( it.data().num > bb )
+		if( it.data() > bb )
 		{
-			--it.data().num;
+			--it.data();
 		}
 #endif
 	}
-	s_bbNums.remove( this );
+	s_infoMap.remove( this );
 }
 
 
@@ -340,7 +354,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start, Uint32 _start_frame,
 	{
 		return( bbEditor::inst()->play( _start, _start_frame, _frames,
 							_frame_base,
-							s_bbNums[this].num ) );
+							s_infoMap[this] ) );
 	}
 
 	vlist<trackContentObject *> tcos;
@@ -368,7 +382,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start, Uint32 _start_frame,
 		return( bbEditor::inst()->play( _start - lastPosition,
 							_start_frame, _frames,
 							_frame_base,
-							s_bbNums[this].num ) );
+							s_infoMap[this] ) );
 	}
 	return( FALSE );
 }
@@ -402,10 +416,11 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	QDomElement bbt_de = _doc.createElement( nodeName() );
 	bbt_de.setAttribute( "name", m_trackLabel->text() );
-/*	bbt_de.setAttribute( "current", s_bbNums[this].num ==
+	bbt_de.setAttribute( "icon", m_trackLabel->pixmapFile() );
+/*	bbt_de.setAttribute( "current", s_infoMap[this] ==
 					bbEditor::inst()->currentBB() );*/
 	_parent.appendChild( bbt_de );
-	if( s_bbNums[this].num == 0 &&
+	if( s_infoMap[this] == 0 &&
 				_parent.parentNode().nodeName() != "clone" )
 	{
 		bbEditor::inst()->saveSettings( _doc, bbt_de );
@@ -418,6 +433,10 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	m_trackLabel->setText( _this.attribute( "name" ) );
+	if( _this.attribute( "icon" ) != "" )
+	{
+		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
+	}
 	if( _this.firstChild().isElement() )
 	{
 		bbEditor::inst()->loadSettings(
@@ -428,7 +447,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	help at all....
 	if( _this.attribute( "current" ).toInt() )
 	{
-		bbEditor::inst()->setCurrentBB( s_bbNums[this].num );
+		bbEditor::inst()->setCurrentBB( s_infoMap[this] );
 	}*/
 }
 
@@ -438,14 +457,13 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 // return pointer to bbTrack specified by _bb_num
 bbTrack * bbTrack::findBBTrack( csize _bb_num )
 {
-	for( QMap<bbTrack *, bbTrack::bbInfoStruct>::iterator it =
-							s_bbNums.begin();
-		it != s_bbNums.end(); ++it )
+	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
+									++it )
 	{
 #ifdef QT4
-		if( it.value().num == _bb_num )
+		if( it.value() == _bb_num )
 #else
-		if( it.data().num == _bb_num )
+		if( it.data() == _bb_num )
 #endif
 		{
 			return( it.key() );
@@ -461,7 +479,7 @@ csize bbTrack::numOfBBTrack( track * _track )
 {
 	if( dynamic_cast<bbTrack *>( _track ) != NULL )
 	{
-		return( s_bbNums[dynamic_cast<bbTrack *>( _track )].num );
+		return( s_infoMap[dynamic_cast<bbTrack *>( _track )] );
 	}
 	return( 0 );
 }
@@ -475,9 +493,9 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 	bbTrack * t2 = dynamic_cast<bbTrack *>( _track2 );
 	if( t1 != NULL && t2 != NULL )
 	{
-		qSwap( s_bbNums[t1].num, s_bbNums[t2].num );
-		bbEditor::inst()->swapBB( s_bbNums[t1].num, s_bbNums[t2].num );
-		bbEditor::inst()->setCurrentBB( s_bbNums[t2].num );
+		qSwap( s_infoMap[t1], s_infoMap[t2] );
+		bbEditor::inst()->swapBB( s_infoMap[t1], s_infoMap[t2] );
+		bbEditor::inst()->setCurrentBB( s_infoMap[t2] );
 	}
 }
 
@@ -486,7 +504,7 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 
 void bbTrack::clickedTrackLabel( void )
 {
-	bbEditor::inst()->setCurrentBB( s_bbNums[this].num );
+	bbEditor::inst()->setCurrentBB( s_infoMap[this] );
 	bbEditor::inst()->show();
 }
 

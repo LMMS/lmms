@@ -43,9 +43,6 @@
 #include <qcursor.h>
 #include <qwhatsthis.h>
 
-#define setChecked setOn
-#define isChecked isOn
-
 #endif
 
 
@@ -73,6 +70,7 @@ const Sint16 RESIZE_GRIP_WIDTH = 4;
 const Uint16 TRACK_OP_BTN_WIDTH = 20;
 const Uint16 TRACK_OP_BTN_HEIGHT = 14;
 
+const Uint16 MINIMAL_TRACK_HEIGHT = 32;
 
 
 textFloat * trackContentObject::s_textFloat = NULL;
@@ -82,16 +80,15 @@ textFloat * trackContentObject::s_textFloat = NULL;
 // trackContentObject
 // ===========================================================================
 trackContentObject::trackContentObject( track * _track ) :
-	QWidget( _track->getTrackContentWidget()
-#ifndef QT4
-		, NULL, Qt::WDestructiveClose
+	selectableObject( _track->getTrackContentWidget()
+#ifdef QT3
+		, Qt::WDestructiveClose
 #endif
  		),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
-	m_moving( FALSE ),
-	m_resizing( FALSE ),
+	m_action( NONE ),
 	m_autoResize( FALSE ),
 	m_initialMouseX( 0 )
 {
@@ -172,9 +169,10 @@ float trackContentObject::pixelsPerTact( void )
 {
 	if( fixedTCOs() )
 	{
-		return( getTrack()->getTrackContentWidget()->width() -
-				2 * TCO_BORDER_WIDTH ) /
-				tMax<float>( length().getTact(), 1.0f );
+		return( ( getTrack()->getTrackContentWidget()->width() -
+				2 * TCO_BORDER_WIDTH -
+						DEFAULT_SCROLLBAR_SIZE ) /
+				tMax<float>( length().getTact(), 1.0f ) );
 	}
 	return( getTrack()->getTrackContainer()->pixelsPerTact() );
 }
@@ -229,7 +227,32 @@ void trackContentObject::leaveEvent( QEvent * _e )
 
 void trackContentObject::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton &&
+	if( m_track->getTrackContainer()->allowRubberband() == TRUE &&
+					_me->button() == Qt::LeftButton )
+	{
+		if( m_track->getTrackContainer()->rubberBandActive() == FALSE )
+		{
+			if( lmmsMainWin::isCtrlPressed() == TRUE )
+			{
+				setSelected( !isSelected() );
+			}
+			else if( isSelected() == TRUE )
+			{
+				m_action = MOVE_SELECTION;
+				m_initialMouseX = _me->x();
+			}
+		}
+		else
+		{
+			selectableObject::mousePressEvent( _me );
+		}
+		return;
+	}
+	else if( lmmsMainWin::isShiftPressed() == TRUE )
+	{
+		selectableObject::mousePressEvent( _me );
+	}
+	else if( _me->button() == Qt::LeftButton &&
 					lmmsMainWin::isCtrlPressed() == TRUE )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
@@ -257,14 +280,14 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		
 		if( _me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
-			m_moving = TRUE;
+			m_action = MOVE;
 			QCursor c( Qt::SizeAllCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current position" ) );
 		}
 		else if( m_autoResize == FALSE )
 		{
-			m_resizing = TRUE;
+			m_action = RESIZE;
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current length" ) );
@@ -289,9 +312,9 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 {
 	const float ppt = m_track->getTrackContainer()->pixelsPerTact();
-	if( m_moving == TRUE )
+	if( m_action == MOVE )
 	{
-		int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
+		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
 		movePosition( tMax( 0, (Sint32) m_track->getTrackContainer()->
 							currentPosition() +
 					static_cast<int>( x * 64 / ppt ) ) );
@@ -302,7 +325,38 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( -2 - s_textFloat->width(), 8 ) );
 	}
-	else if( m_resizing == TRUE )
+	else if( m_action == MOVE_SELECTION )
+	{
+		const int dx = _me->x() - m_initialMouseX;
+		vvector<selectableObject *> so =
+				m_track->getTrackContainer()->selectedObjects();
+		vvector<trackContentObject *> tcos;
+		midiTime smallest_pos;
+		// find out smallest position of all selected objects for not
+		// moving an object before zero
+		for( vvector<selectableObject *>::iterator it = so.begin();
+							it != so.end(); ++it )
+		{
+			trackContentObject * tco =
+				dynamic_cast<trackContentObject *>( *it );
+			if( tco == NULL )
+			{
+				continue;
+			}
+			tcos.push_back( tco );
+			smallest_pos = tMin<Sint32>( smallest_pos,
+					(Sint32)tco->startPosition() +
+					static_cast<int>( dx * 64 / ppt ) );
+		}
+		for( vvector<trackContentObject *>::iterator it = tcos.begin();
+							it != tcos.end(); ++it )
+		{
+			( *it )->movePosition( ( *it )->startPosition() +
+					static_cast<int>( dx * 64 / ppt ) -
+								smallest_pos );
+		}
+	}
+	else if( m_action == RESIZE )
 	{
 		changeLength( tMax( 64,
 				static_cast<int>( _me->x() * 64 / ppt ) ) );
@@ -344,10 +398,10 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 
 void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 {
+	m_action = NONE;
 	s_textFloat->hide();
 	leaveEvent( NULL );
-	m_moving = FALSE;
-	m_resizing = FALSE;
+	selectableObject::mouseReleaseEvent( _me );
 }
 
 
@@ -448,7 +502,6 @@ trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 #else
 	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
 #endif
-	setMouseTracking( TRUE );
 	setAcceptDrops( TRUE );
 }
 
@@ -609,6 +662,7 @@ void trackContentWidget::updateTCOs( void )
 	for( tcoVector::iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
+		( *it )->setFixedHeight( height() - 2 );
 		( *it )->update();
 	}
 }
@@ -638,7 +692,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
 		multimediaProject mmp( value, FALSE );
-		// at least save position before getting to moved to somewhere
+		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
 		tco->loadSettings( mmp.content().firstChild().toElement() );
 		tco->movePosition( position );
@@ -653,7 +707,15 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 
 void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton &&
+	if( getTrack()->getTrackContainer()->allowRubberband() == TRUE )
+	{
+		QWidget::mousePressEvent( _me );
+	}
+	else if( lmmsMainWin::isShiftPressed() == TRUE )
+	{
+		QWidget::mousePressEvent( _me );
+	}
+	else if( _me->button() == Qt::LeftButton &&
 			getTrack()->getTrackContainer()->fixedTCOs() == FALSE )
 	{
 		const midiTime position = getPosition( _me->x() );
@@ -666,27 +728,33 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-void trackContentWidget::mouseMoveEvent( QMouseEvent * _me )
+void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
-	// if user moved TCO out of visible area, TCO doesn't receive
-	// mouse-events, so we have to do it here
-	while( QApplication::overrideCursor() != NULL )
+#ifdef QT4
+	QPainter p( this );
+	p.fillRect( rect(), QColor( 96, 96, 96 ) );
+#else
+	// create pixmap for whole widget
+	QPixmap pm( rect().size() );
+	pm.fill( QColor( 96, 96, 96 ) );
+
+	// and a painter for it
+	QPainter p( &pm );
+#endif
+	const trackContainer * tc = getTrack()->getTrackContainer();
+	const int offset = (int)( ( tc->currentPosition() % 4 ) *
+							tc->pixelsPerTact() );
+	// draw vertical lines
+	p.setPen( QColor( 128, 128, 128 ) );
+	for( int x = -offset; x < width(); x += (int) tc->pixelsPerTact() )
 	{
-		QApplication::restoreOverrideCursor();
+		p.drawLine( x, 0, x, height() );
 	}
-}
 
-
-
-
-void trackContentWidget::mouseReleaseEvent( QMouseEvent * _me )
-{
-	// if user moved TCO out of visible area, TCO doesn't receive
-	// mouseRelease-events...
-	while( QApplication::overrideCursor() != NULL )
-	{
-		QApplication::restoreOverrideCursor();
-	}
+#ifndef QT4
+	// blit drawn pixmap to actual widget
+	bitBlt( this, rect().topLeft(), &pm );
+#endif
 }
 
 
@@ -759,7 +827,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	m_muteBtn = new pixmapButton( this );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "mute_on" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "mute_off" ) );
-	m_muteBtn->move( 44, 8 );
+	m_muteBtn->move( 44, 4 );
 	m_muteBtn->show();
 	connect( m_muteBtn, SIGNAL( toggled( bool ) ), this,
 						SLOT( setMuted( bool ) ) );
@@ -814,7 +882,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 				&m_trackWidget->getTrackSettingsWidget() ),
 									this );
 	}
-	else if( _me->button() == Qt::LeftButton && _me->x() < 10 )
+	else if( _me->button() == Qt::LeftButton )
 	{
 		// track-widget (parent-widget) initiates track-move
 		_me->ignore();
@@ -841,14 +909,8 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 	if( m_trackWidget->isMovingTrack() == FALSE )
 	{
 		p.drawPixmap( 2, 2, *s_grip );
-/*		if( m_trackOps->isVisible() == FALSE )
-		{*/
-			m_trackOps->show();
-/*		}
-		if( m_muteBtn->isVisible() == FALSE )
-		{*/
-			m_muteBtn->show();
-//		}
+		m_trackOps->show();
+		m_muteBtn->show();
 	}
 	else
 	{
@@ -895,9 +957,9 @@ void trackOperationsWidget::setMuted( bool _muted )
 void trackOperationsWidget::muteBtnRightClicked( void )
 {
 	const bool m = muted();	// next function might modify our mute-state,
-				// so save it
-	m_trackWidget->getTrack()->getTrackContainer()->setMutedOfAllTracks(
-									m );
+				// so save it now
+	m_trackWidget->getTrack()->getTrackContainer()->
+						setMutedOfAllTracks( m );
 	setMuted( !m );
 }
 
@@ -916,8 +978,7 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	m_trackOperationsWidget( this ),
 	m_trackSettingsWidget( this ),
 	m_trackContentWidget( this ),
-	m_movingTrack( FALSE ),
-	m_initialMouseX( -1 )
+	m_action( NONE )
 {
 #ifdef QT4
 	QPalette pal;
@@ -937,11 +998,12 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	m_trackSettingsWidget.setPalette( pal );
 #else
 	m_trackSettingsWidget.setPaletteBackgroundColor( QColor( 64, 64, 64 ) );
+
+
 	// set background-mode for flicker-free redraw
 	setBackgroundMode( Qt::NoBackground );
 #endif
 	setAcceptDrops( TRUE );
-	setMouseTracking( TRUE );
 }
 
 
@@ -949,6 +1011,15 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 
 trackWidget::~trackWidget()
 {
+}
+
+
+
+
+void trackWidget::repaint( void )
+{
+	m_trackContentWidget.repaint();
+	QWidget::repaint();
 }
 
 
@@ -1022,15 +1093,30 @@ void trackWidget::dropEvent( QDropEvent * _de )
 
 void trackWidget::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton )
+	if( m_track->getTrackContainer()->allowRubberband() == TRUE )
 	{
-		m_movingTrack = TRUE;
-		m_initialMouseX = _me->x();
+		QWidget::mousePressEvent( _me );
+	}
+	else if( _me->button() == Qt::LeftButton )
+	{
+		if( lmmsMainWin::isShiftPressed() == TRUE )
+		{
+			m_action = RESIZE_TRACK;
+			QCursor::setPos( mapToGlobal( QPoint( _me->x(),
+								height() ) ) );
+			QCursor c( Qt::SizeVerCursor);
+			QApplication::setOverrideCursor( c );
+		}
+		else
+		{
+			m_action = MOVE_TRACK;
 
-		QCursor c( Qt::SizeAllCursor );
-		QApplication::setOverrideCursor( c );
-
-		m_trackOperationsWidget.update();
+			QCursor c( Qt::SizeAllCursor );
+			QApplication::setOverrideCursor( c );
+			// update because in move-mode, all elements in
+			// track-op-widgets are hidden as a visual feedback
+			m_trackOperationsWidget.update();
+		}
 
 		_me->accept();
 	}
@@ -1045,7 +1131,11 @@ void trackWidget::mousePressEvent( QMouseEvent * _me )
 
 void trackWidget::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_movingTrack == TRUE )
+	if( m_track->getTrackContainer()->allowRubberband() == TRUE )
+	{
+		QWidget::mouseMoveEvent( _me );
+	}
+	else if( m_action == MOVE_TRACK )
 	{
 		trackContainer * tc = m_track->getTrackContainer();
 		// look which track-widget the mouse-cursor is over
@@ -1065,6 +1155,11 @@ void trackWidget::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 	}
+	else if( m_action == RESIZE_TRACK )
+	{
+		setFixedHeight( tMax<int>( _me->y(), MINIMAL_TRACK_HEIGHT ) );
+		m_track->getTrackContainer()->realignTracks();
+	}
 }
 
 
@@ -1072,12 +1167,14 @@ void trackWidget::mouseMoveEvent( QMouseEvent * _me )
 
 void trackWidget::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_movingTrack = FALSE;
+	m_action = NONE;
 	while( QApplication::overrideCursor() != NULL )
 	{
 		QApplication::restoreOverrideCursor();
 	}
 	m_trackOperationsWidget.update();
+
+	QWidget::mouseReleaseEvent( _me );
 }
 
 
@@ -1226,6 +1323,7 @@ void FASTCALL track::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	QDomElement track_de = _doc.createElement( "track" );
 	track_de.setAttribute( "type", type() );
 	track_de.setAttribute( "muted", muted() );
+	track_de.setAttribute( "height", m_trackWidget->height() );
 	_parent.appendChild( track_de );
 
 	// let actual track (channelTrack, bbTrack, sampleTrack etc.) save
@@ -1275,6 +1373,12 @@ void FASTCALL track::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
         }
+
+	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT )
+	{
+		m_trackWidget->setFixedHeight(
+					_this.attribute( "height" ).toInt() );
+	}
 }
 
 
@@ -1375,13 +1479,6 @@ void FASTCALL track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
 }
 
 
-
-#ifndef QT4
-
-#undef isChecked
-#undef setChecked
-
-#endif
 
 
 #include "track.moc"

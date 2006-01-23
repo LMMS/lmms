@@ -88,11 +88,7 @@ void pixmapButton::paintEvent( QPaintEvent * )
 		p.drawPixmap( 0, 0, *m_bgPixmap );
 	}
 
-#ifdef QT4
 	if( isChecked() || isDown() )
-#else
-	if( isOn() || isDown() )
-#endif
 	{
 		if( m_activePixmap != NULL )
 		{

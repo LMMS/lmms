@@ -1,7 +1,7 @@
 /*
  * tab_bar.cpp - implementation of tab-bar
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,8 +31,6 @@
 #ifndef QT4
 
 #define value data
-#define setChecked setOn
-#define isChecked isOn
 #define removeWidget remove
 
 #endif
@@ -256,8 +254,6 @@ bool tabBar::allHidden( void )
 
 
 #undef value
-#undef setChecked
-#undef isChecked
 #undef removeWidget
 
 

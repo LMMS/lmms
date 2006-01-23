@@ -69,7 +69,7 @@ inline QString baseName( const QString & _file )
 }
 
 
-#else
+#else /* QT3 */
 
 
 #define vvector QValueVector
@@ -117,6 +117,7 @@ inline QString baseName( const QString & _file )
 
 // QScrollView/QScrollArea
 #define setHorizontalScrollBarPolicy setHScrollBarMode
+#define setVerticalScrollBarPolicy setVScrollBarMode
 
 
 // QScrollBar
@@ -187,6 +188,10 @@ inline QString baseName( const QString & _file )
 #define setColumnStretch setColStretch
 #define columnCount numCols
 #define setColumnMinimumWidth setColSpacing
+
+
+// QRect
+#define normalized normalize
 
 
 // Qt-namespace

@@ -1,7 +1,7 @@
 /*
  * song_editor.cpp - basic window for editing song
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,8 +45,8 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QAction>
-#include <QComboBox>
 #include <QLayout>
+#include <QButtonGroup>
 
 #else
 
@@ -59,8 +59,8 @@
 #include <qslider.h>
 #include <qlabel.h>
 #include <qstatusbar.h>
-#include <qcombobox.h>
 #include <qlayout.h>
+#include <qbuttongroup.h>
 
 #endif
 
@@ -88,6 +88,7 @@
 #include "tool_button.h"
 #include "cpuload_widget.h"
 #include "text_float.h"
+#include "combobox.h"
 
 #include "debug.h"
 
@@ -95,8 +96,6 @@
 
 extern QString file_to_load;
 
-
-const int SCROLLBAR_SIZE = 16;
 
 
 songEditor * songEditor::s_instanceOfMe = NULL;
@@ -329,18 +328,28 @@ songEditor::songEditor() :
 					this, SLOT( addSampleTrack() ),
 					m_toolBar );
 
-	m_insertBarButton = new toolButton( embed::getIconPixmap(
-						"insert_bar" ),
-						tr( "Insert bar "
-							"(Shift+Insert)" ),
-						this, SLOT( insertBar() ),
-						m_toolBar );
+	m_drawModeButton = new toolButton( embed::getIconPixmap(
+								"edit_draw" ),
+							tr( "Draw mode" ),
+							NULL, NULL, m_toolBar );
+	m_drawModeButton->setCheckable( TRUE );
+	m_drawModeButton->setChecked( TRUE );
 
-	m_removeBarButton = new toolButton( embed::getIconPixmap(
-						"remove_bar" ),
-					tr( "Remove bar (Shift+Delete)" ),
-						this, SLOT( removeBar() ),
-						m_toolBar );
+	m_editModeButton = new toolButton( embed::getIconPixmap(
+								"edit_arrow" ),
+					tr( "Edit mode (select and move)" ),
+							NULL, NULL, m_toolBar );
+	m_editModeButton->setCheckable( TRUE );
+
+	QButtonGroup * tool_button_group = new QButtonGroup( this );
+	tool_button_group->addButton( m_drawModeButton );
+	tool_button_group->addButton( m_editModeButton );
+	tool_button_group->setExclusive( TRUE );
+#ifndef QT4
+	tool_button_group->hide();
+#endif
+
+
 #ifdef QT4
 #else
 	QWhatsThis::add( m_playButton, tr( "Click here, if you want to play "
@@ -354,13 +363,13 @@ songEditor::songEditor() :
 						"song-position-marker will be "
 						"set to the start of your song."
 			) );
-	QWhatsThis::add( m_insertBarButton, tr( "If you click here, a "
+/*	QWhatsThis::add( m_insertBarButton, tr( "If you click here, a "
 							"bar will "
 							"be inserted at the "
 							"current bar." ) );
 	QWhatsThis::add( m_removeBarButton, tr( "If you click here, the "
 							"current bar will be "
-							"removed." ) );
+							"removed." ) );*/
 #endif
 
 
@@ -368,20 +377,17 @@ songEditor::songEditor() :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new QComboBox( m_toolBar );
-	m_zoomingComboBox->setGeometry( 580, 4, 80, 24 );
+	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox->setFixedSize( 80, 22 );
+	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
 	{
 		m_zoomingComboBox->addItem( QString::number( 25 *
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
-#ifdef QT4
 	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
 								"100%" ) );
-#else
-	m_zoomingComboBox->setCurrentText( "100%" );
-#endif
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
@@ -393,8 +399,8 @@ songEditor::songEditor() :
 	tb_layout->addWidget( m_addBBTrackButton );
 	tb_layout->addWidget( m_addSampleTrackButton );
 	tb_layout->addSpacing( 10 );
-	tb_layout->addWidget( m_insertBarButton );
-	tb_layout->addWidget( m_removeBarButton );
+	tb_layout->addWidget( m_drawModeButton );
+	tb_layout->addWidget( m_editModeButton );
 	tb_layout->addSpacing( 10 );
 	tl->addToolButtons( m_toolBar );
 	tb_layout->addSpacing( 15 );
@@ -407,14 +413,14 @@ songEditor::songEditor() :
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, cw );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
-#ifdef QT4
+#ifndef QT3
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( 20 );
 #else
 	m_leftRightScroll->setSteps( 1, 20 );
 #endif
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-			SLOT( scrolled( int ) ) );
+	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
+					this, SLOT( scrolled( int ) ) );
 
 
 
@@ -472,17 +478,31 @@ void songEditor::paintEvent( QPaintEvent * _pe )
 
 
 
+QRect songEditor::scrollAreaRect( void ) const
+{
+	if( centralWidget() == NULL )
+	{
+		return( rect() );
+	}
+	return( QRect( 0, 0, centralWidget()->width(),
+			centralWidget()->height() - m_toolBar->height() -
+			m_playPos[PLAY_SONG].m_timeLine->height() -
+			DEFAULT_SCROLLBAR_SIZE ) );
+}
+
+
+
+
 // responsible for moving scrollbars after resizing
 void songEditor::resizeEvent( QResizeEvent * _re )
 {
 	if( centralWidget() != NULL )
 	{
 		m_leftRightScroll->setGeometry( 0,
-					centralWidget()->height() - 2 -
-								SCROLLBAR_SIZE,
-					centralWidget()->width() -
-								SCROLLBAR_SIZE,
-					SCROLLBAR_SIZE );
+					centralWidget()->height() -
+							DEFAULT_SCROLLBAR_SIZE,
+					centralWidget()->width(),
+					DEFAULT_SCROLLBAR_SIZE );
 
 		m_playPos[PLAY_SONG].m_timeLine->setFixedWidth(
 						centralWidget()->width() );
@@ -575,18 +595,11 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		{
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
-#ifdef QT4
 		// update combobox with zooming-factor
 		m_zoomingComboBox->setCurrentIndex(
 				m_zoomingComboBox->findText( QString::number(
 					static_cast<int>( pixelsPerTact() *
 				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" ) );
-#else
-		// update combobox with zooming-factor
-		m_zoomingComboBox->setCurrentText( QString::number(
-					static_cast<int>( pixelsPerTact() *
-				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" );
-#endif
 		// update timeline
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
 							pixelsPerTact() );
@@ -1028,16 +1041,11 @@ void songEditor::processNextBuffer( void )
 						64 / frames_per_tact) % 64 );
 	}
 
-	if( m_playPos[m_playMode].m_timeLine != NULL &&
-		m_playPos[m_playMode].m_timeLineUpdate == TRUE &&
-		m_exporting == FALSE )
+	if( m_exporting == FALSE )
 	{
-		m_playPos[m_playMode].m_timeLine->updatePosition(); 
+		updateTimeLinePosition();
 	}
 }
-
-
-
 
 
 
@@ -1147,7 +1155,9 @@ void songEditor::updateTimeLinePosition( void )
 	if( m_playPos[m_playMode].m_timeLine != NULL &&
 		m_playPos[m_playMode].m_timeLineUpdate == TRUE )
 	{
-		m_playPos[m_playMode].m_timeLine->updatePosition();
+/*		QTimer::singleShot( 1, m_playPos[m_playMode].m_timeLine,
+						SLOT( updatePosition() ) );*/
+		//m_playPos[m_playMode].m_timeLine->updatePosition();
 	}
 }
 

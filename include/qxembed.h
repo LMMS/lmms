@@ -27,7 +27,6 @@
 #ifndef QT4
 
 #include <qwidget.h>
-/*#include <kdelibs_export.h>*/
 
 
 #ifdef Q_WS_X11

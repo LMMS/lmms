@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.2-cvs20060119, tobydox/at/users.sourceforge.net)
-AM_INIT_AUTOMAKE(lmms, 0.1.2-cvs20060119)
+AC_INIT(lmms, 0.1.2-cvs20060122, tobydox/at/users.sourceforge.net)
+AM_INIT_AUTOMAKE(lmms, 0.1.2-cvs20060122)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -405,6 +405,7 @@ fi
 
 AC_CONFIG_FILES([Makefile
 		 artwork/Makefile
+		 artwork/track_icons/Makefile
 		 buildtools/Makefile
 		 locale/Makefile
 		 midi-maps/Makefile

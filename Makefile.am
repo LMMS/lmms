@@ -47,6 +47,7 @@ lmms_MOC =						\
 		./bb_editor.moc				\
 		./bb_track.moc				\
 		./channel_track.moc			\
+		./combobox.moc				\
 		./config_mgr.moc			\
 		./cpuload_widget.moc			\
 		./envelope_and_lfo_widget.moc		\
@@ -72,6 +73,7 @@ lmms_MOC =						\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
+		./rubberband.moc			\
 		./qxembed.moc				\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
@@ -160,6 +162,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
+		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/fade_button.cpp			\
 		$(srcdir)/src/widgets/group_box.cpp			\
@@ -170,6 +173,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
 		$(srcdir)/src/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/widgets/project_notes.cpp			\
+		$(srcdir)/src/widgets/rubberband.cpp			\
 		$(srcdir)/src/widgets/qxembed.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
 		$(srcdir)/src/widgets/side_bar_widget.cpp		\
@@ -283,6 +287,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/midi_alsa_seq.h			\
 		$(srcdir)/include/micro_timer.h				\
 		$(srcdir)/include/fade_button.h				\
+		$(srcdir)/include/combobox.h				\
+		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/qxembed.h
 
 

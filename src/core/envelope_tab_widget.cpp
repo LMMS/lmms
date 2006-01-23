@@ -2,7 +2,7 @@
  * envelope_tab_widget.cpp - widget for use in envelope/lfo/filter-tab of
  *                           channel-window
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,18 +28,13 @@
 
 #ifdef QT4
 
-#include <QComboBox>
 #include <Qt/QtXml>
 #include <QWhatsThis>
 
 #else
 
-#include <qcombobox.h>
 #include <qdom.h>
 #include <qwhatsthis.h>
-
-#define isChecked isOn
-#define setChecked setOn
 
 #endif
 
@@ -54,6 +49,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "channel_track.h"
+#include "combobox.h"
 
 
 
@@ -142,19 +138,27 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
-	m_filterComboBox = new QComboBox( m_filterGroupBox );
-	m_filterComboBox->setGeometry( 20, 20, 100, 22 );
+	m_filterComboBox = new comboBox( m_filterGroupBox );
+	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
 
-	m_filterComboBox->addItem( tr( "LowPass" ) );
-	m_filterComboBox->addItem( tr( "HiPass" ) );
-	m_filterComboBox->addItem( tr( "BandPass csg" ) );
-	m_filterComboBox->addItem( tr( "BandPass czpg" ) );
-	m_filterComboBox->addItem( tr( "Notch" ) );
-	m_filterComboBox->addItem( tr( "Allpass" ) );
-	m_filterComboBox->addItem( tr( "Moog" ) );
-	m_filterComboBox->addItem( tr( "2x LowPass" ) );
+	m_filterComboBox->addItem( tr( "LowPass" ),
+					embed::getIconPixmap( "filter_lp" ) );
+	m_filterComboBox->addItem( tr( "HiPass" ),
+					embed::getIconPixmap( "filter_hp" ) );
+	m_filterComboBox->addItem( tr( "BandPass csg" ),
+					embed::getIconPixmap( "filter_bp" ) );
+	m_filterComboBox->addItem( tr( "BandPass czpg" ),
+					embed::getIconPixmap( "filter_bp" ) );
+	m_filterComboBox->addItem( tr( "Notch" ),
+				embed::getIconPixmap( "filter_notch" ) );
+	m_filterComboBox->addItem( tr( "Allpass" ),
+					embed::getIconPixmap( "filter_ap" ) );
+	m_filterComboBox->addItem( tr( "Moog" ),
+					embed::getIconPixmap( "filter_lp" ) );
+	m_filterComboBox->addItem( tr( "2x LowPass" ),
+					embed::getIconPixmap( "filter_2lp" ) );
 
 #ifdef QT4
 	m_filterComboBox->setWhatsThis(
@@ -264,18 +268,14 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab, Uint32 _frames,
 						mixer::inst()->sampleRate() );
 	}
 
-	if( /*m_filterState->isChecked()*/ m_filterGroupBox->isActive() )
+	if( m_filterGroupBox->isActive() )
 	{
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
-		basicFilters<>::filterTypes filter = basicFilters<>::getFilterType( m_filterComboBox->
-#ifdef QT4
-				currentIndex()
-#else
-				currentItem()
-#endif
-			 );
+		basicFilters<>::filterTypes filter =
+				basicFilters<>::getFilterType(
+					m_filterComboBox->currentIndex() );
 
 		if( m_envLFOWidgets[VOLUME]->used() &&
 			m_envLFOWidgets[CUT]->used() &&
@@ -492,11 +492,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement etw_de = _doc.createElement( nodeName() );
-#ifdef QT4
 	etw_de.setAttribute( "ftype", m_filterComboBox->currentIndex() );
-#else
-	etw_de.setAttribute( "ftype", m_filterComboBox->currentItem() );
-#endif
 	etw_de.setAttribute( "fcut", m_filterCutKnob->value() );
 	etw_de.setAttribute( "fres", m_filterResKnob->value() );
 	etw_de.setAttribute( "fwet", m_filterGroupBox->isActive() );
@@ -518,11 +514,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 
 void envelopeTabWidget::loadSettings( const QDomElement & _this )
 {
-#ifdef QT4
 	m_filterComboBox->setCurrentIndex( _this.attribute( "ftype" ).toInt() );
-#else
-	m_filterComboBox->setCurrentItem( _this.attribute( "ftype" ).toInt() );
-#endif
 	m_filterCutKnob->setValue( _this.attribute( "fcut" ).toFloat() );
 	m_filterResKnob->setValue( _this.attribute( "fres" ).toFloat() );
 /*	m_filterState->setChecked( _this.attribute( "fwet" ).toInt() );*/
@@ -549,9 +541,6 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 }
 
 
-
-#undef isChecked
-#undef setChecked
 
 
 #include "envelope_tab_widget.moc"

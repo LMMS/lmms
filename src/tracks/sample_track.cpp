@@ -2,7 +2,7 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -186,17 +186,29 @@ void sampleTCO::paintEvent( QPaintEvent * )
 {
 #ifdef QT4
 	QPainter p( this );
+	// TODO: set according brush/pen for gradient!
+	p.fillRect( rect(), QColor( 64, 64, 64 ) );
 #else
 	// create pixmap for whole widget
 	QPixmap pm( size() );
 	// and a painter for it
 	QPainter p( &pm );
-#endif
-	QPixmap bg = embed::getIconPixmap( "sample_track_bg" );
-	for( Sint16 x = 1; x < width() - 1; x += 10 )
+
+	for( int y = 1; y < height() - 1; ++y )
 	{
-		p.drawPixmap( x, 1, bg );
+		const int gray = 96 - y * 96 / height();
+		if( isSelected() == TRUE )
+		{
+			p.setPen( QColor( 0, 0, 128 + gray ) );
+		}
+		else
+		{
+			p.setPen( QColor( gray, gray, gray ) );
+		}
+		p.drawLine( 1, y, width() - 1, y );
 	}
+#endif
+
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 0, 0, width(), height() );
 	if( getTrack()->muted() )
@@ -348,9 +360,8 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
-						getTrackSettingsWidget(),
-						embed::getIconPixmap(
-							"sample_track" ) );
+						getTrackSettingsWidget() );
+	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
 	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
 
@@ -438,6 +449,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	QDomElement st_de = _doc.createElement( nodeName() );
 	st_de.setAttribute( "name", m_trackLabel->text() );
+	st_de.setAttribute( "icon", m_trackLabel->pixmapFile() );
 	_parent.appendChild( st_de );
 }
 
@@ -447,6 +459,10 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	m_trackLabel->setText( _this.attribute( "name" ) );
+	if( _this.attribute( "icon" ) != "" )
+	{
+		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
+	}
 }
 
 

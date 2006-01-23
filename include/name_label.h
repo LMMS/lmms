@@ -2,7 +2,7 @@
  * name_label.h - class nameLabel, a label which is renamable by
  *                double-clicking it
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,20 +46,32 @@ class nameLabel : public QLabel
 {
 	Q_OBJECT
 public:
-	nameLabel( const QString & _initial_name, QWidget * _parent,
-					const QPixmap & _pm = QPixmap() );
+	nameLabel( const QString & _initial_name, QWidget * _parent );
 	~nameLabel();
-	const QPixmap * pixmap( void ) const;
+
+	const QPixmap & pixmap( void ) const
+	{
+		return( m_pixmap );
+	}
+
+	const QString & pixmapFile( void ) const
+	{
+		return( m_pixmapFile );
+	}
 
 
 public slots:
-	void setPixmap( const QPixmap & _pm );
+	void setPixmap( const QPixmap & _pixmap );
+	void setPixmapFile( const QString & _file );
 	void rename( void );
+	void selectPixmap( void );
 
 
 signals:
-	void nameChanged( const QString & _new_name );
 	void clicked( void );
+	void nameChanged( void );
+	void nameChanged( const QString & _new_name );
+	void pixmapChanged( void );
 
 
 protected:
@@ -69,7 +81,8 @@ protected:
 
 
 private:
-	QPixmap m_pm;
+	QPixmap m_pixmap;
+	QString m_pixmapFile;
 
 } ;
 

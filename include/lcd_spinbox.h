@@ -1,7 +1,7 @@
 /*
  * lcd_spinbox.h - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,7 +58,6 @@ public:
 		return( m_number->intValue() );
 	}
 
-	void setValue( int _value );
 	void setLabel( const QString & _txt );
 
 	inline void addTextForValue( int _val, const QString & _text )
@@ -68,6 +67,7 @@ public:
 
 
 public slots:
+	void setValue( int _value );
 	virtual void setEnabled( bool _on );
 
 

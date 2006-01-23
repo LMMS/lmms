@@ -1,7 +1,7 @@
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,8 +30,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressBar>
-#include <QComboBox>
-#include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QCloseEvent>
@@ -42,8 +40,6 @@
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 #include <qprogressbar.h>
-#include <qcombobox.h>
-#include <qcheckbox.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qapplication.h>
@@ -54,6 +50,8 @@
 #include "export_project_dialog.h"
 #include "song_editor.h"
 #include "lmms_main_win.h"
+#include "combobox.h"
+#include "led_checkbox.h"
 #include "embed.h"
 
 #include "audio_file_wave.h"
@@ -87,7 +85,7 @@ const int LABEL_MARGIN = 6;
 const int LABEL_X = 10;
 const int LABEL_WIDTH = 48;
 const int TYPE_STUFF_Y = 10;
-const int TYPE_HEIGHT = 26;
+const int TYPE_HEIGHT = 22;
 const int TYPE_COMBO_WIDTH = 256;
 const int KBPS_STUFF_Y = TYPE_STUFF_Y + TYPE_HEIGHT + LABEL_MARGIN + 6;
 const int KBPS_HEIGHT = TYPE_HEIGHT;
@@ -151,7 +149,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new QComboBox( this );
+	m_typeCombo = new comboBox( this );
 	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
 					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
 								TYPE_HEIGHT );
@@ -165,13 +163,8 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 				tr( fileEncodeDevices[idx].m_description ) );
 		++idx;
 	}
-#ifdef QT4
 	m_typeCombo->setCurrentIndex( m_typeCombo->findText( tr(
 			fileEncodeDevices[m_fileType].m_description ) ) );
-#else
-	m_typeCombo->setCurrentText( tr(
-				fileEncodeDevices[m_fileType].m_description ) );
-#endif
 
 
 	// kbps-ui-stuff
@@ -179,7 +172,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new QComboBox( this );
+	m_kbpsCombo = new comboBox( this );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
@@ -191,21 +184,17 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 						s_availableBitrates[idx] ) );
 		++idx;
 	}
-#ifdef QT4
 	m_typeCombo->setCurrentIndex( m_typeCombo->findText(
 						QString::number( 128 ) ) );
-#else
-	m_kbpsCombo->setCurrentText( QString::number( 128 ) );
-#endif
 
 
-	m_vbrCb = new QCheckBox( tr( "variable bitrate" ), this );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
 	m_vbrCb->setChecked( TRUE );
 
 
-	m_hqmCb = new QCheckBox( tr( "use high-quality-mode (recommened)" ),
+	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
 									this );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
@@ -278,12 +267,16 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void exportProjectDialog::closeEvent (QCloseEvent * _ce)
+void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
 	if( songEditor::inst()->exporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
+	}
+	else
+	{
+		QDialog::closeEvent( _ce );
 	}
 }
 
@@ -426,6 +419,7 @@ void exportProjectDialog::cancelBtnClicked( void )
 		abortProjectExport();
 		return;
 	}
+	reject();
 }
 
 

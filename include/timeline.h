@@ -69,7 +69,7 @@ public:
 
 	timeLine( int _xoff, int _yoff, float _ppt, songEditor::playPos & _pos,
 				const midiTime & _begin, QWidget * _parent );
-	~timeLine();
+	virtual ~timeLine();
 
 	inline songEditor::playPos & pos( void )
 	{
@@ -117,11 +117,14 @@ public:
 
 
 public slots:
-	void updatePosition( const midiTime & = 0 );
+	void updatePosition( const midiTime & );
+	void updatePosition( void )
+	{
+		updatePosition( midiTime() );
+	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
 	void toggleBehaviourAtStop( int _n );
-	void checkForUpdatedPosition( void );
 
 
 protected:

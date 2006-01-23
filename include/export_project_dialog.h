@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,6 @@
 #include <config.h>
 #endif
 
-
 #include "qt3support.h"
 
 #ifdef QT4
@@ -44,15 +43,15 @@
 
 #endif
 
-
 #include "export.h"
 
 
 class QLabel;
 class QPushButton;
-class QComboBox;
 class QProgressBar;
-class QCheckBox;
+
+class comboBox;
+class ledCheckBox;
 class pixmapButton;
 
 
@@ -88,11 +87,11 @@ private:
 
 	QString m_fileName;
 	QLabel * m_typeLbl;
-	QComboBox * m_typeCombo;
+	comboBox * m_typeCombo;
 	QLabel * m_kbpsLbl;
-	QComboBox * m_kbpsCombo;
-	QCheckBox * m_vbrCb;
-	QCheckBox * m_hqmCb;
+	comboBox * m_kbpsCombo;
+	ledCheckBox * m_vbrCb;
+	ledCheckBox * m_hqmCb;
 	QLabel * m_hourglassLbl;
 	QPushButton * m_exportBtn;
 	QPushButton * m_cancelBtn;
