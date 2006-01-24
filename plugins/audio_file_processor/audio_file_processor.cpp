@@ -296,7 +296,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	afp_de.setAttribute( "src", m_sampleBuffer.audioFile() );
 	if( m_sampleBuffer.audioFile() == "" )
 	{
-		afp_de.setAttribute( "sampledata", m_sampleBuffer.toBase64() );
+		QString s;
+		afp_de.setAttribute( "sampledata", m_sampleBuffer.toBase64( s ) );
 	}
 	afp_de.setAttribute( "sframe", QString::number(
 						m_sampleBuffer.startFrame() /

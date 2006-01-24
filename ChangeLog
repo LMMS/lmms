@@ -1,14 +1,25 @@
+2006-01-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	use new base64-code
+
+	* include/base64.h:
+	* src/lib/base64.cpp:
+	added methods for encoding/decoding binary data to/from base64-encoded
+	data (wrapper-implementation for Qt4)
+
 2006-01-23	Andreas Brandmaier <andy/at/brandmaier.de>
 
-	* plugins/bit_invader/bit_invader.cpp
-	* plugins/bit_invader/bit_invader.h
-	* plugins/bit_invader/graph.cpp
-	* plugins/bit_invader/graph.h
-	improved mouse handling.
-	replaced waveform generation methods by those
-	of toby's oscillator class.
-	added user-loadable waveform
-	code cleanup
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/graph.cpp:
+	* plugins/bit_invader/graph.h:
+	- improved mouse handling.
+	- replaced waveform generation methods by those of toby's oscillator class
+	- added user-loadable waveform
+	- code cleanup
 
 2006-01-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 

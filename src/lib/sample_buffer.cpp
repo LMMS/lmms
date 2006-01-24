@@ -85,6 +85,7 @@
 #include "templates.h"
 #include "config_mgr.h"
 #include "endian_handling.h"
+#include "base64.h"
 #include "debug.h"
 
 
@@ -1067,14 +1068,14 @@ void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
 #endif
 
 
-QString sampleBuffer::toBase64( void ) const
+
+QString & sampleBuffer::toBase64( QString & _dst ) const
 {
 	if( m_data == NULL || m_frames == 0 )
 	{
-		return( "" );
+		return( _dst = "" );
 	}
-	// the following code is quite confusing as we have to handle four
-	// different configs (no flac/qt3, no flac/qt4, flac/qt3, flac/qt4)
+
 #ifdef HAVE_FLAC_STREAM_ENCODER_H
 	const Uint32 FRAMES_PER_BUF = 1152;
 
@@ -1124,91 +1125,19 @@ QString sampleBuffer::toBase64( void ) const
 	FLAC__stream_encoder_delete( flac_enc );
 	printf("%d %d\n", frame_cnt, (int)ba_writer.size() );
 	ba_writer.close();
-#ifdef QT4
-	return( ba_writer.data().toBase64() );
-#else
-	QByteArray ba = ba_writer.buffer();
-	const Uint32 ssize = ba.size();
-	const Uint8 * src = (const Uint8 *) ba.data();
-#endif
+
+	base64::encode( ba_writer.buffer().data(), ba_writer.buffer().size(),
+									_dst );
+
 
 #else	/* HAVE_FLAC_STREAM_ENCODER_H */
 
-#ifdef QT4
-	return( QByteArray( (const char *) m_data, m_frames *
-					sizeof( sampleFrame ) ).toBase64() );
-#else
-	const Uint32 ssize = m_frames * sizeof( sampleFrame );
-	const Uint8 * src = (const Uint8 *) m_data;
-#endif
+	base64::encode( (const char *) m_data,
+					m_frames * sizeof( sampleFrame ), _dst );
 
 #endif	/* HAVE_FLAC_STREAM_ENCODER_H */
 
-
-#ifndef QT4
-	// code mostly taken from
-	// qt-x11-opensource-src-4.0.1/src/corelib/tools/qbytearray.cpp
-
-	const char alphabet[] = "ABCDEFGH" "IJKLMNOP" "QRSTUVWX" "YZabcdef"
-				"ghijklmn" "opqrstuv" "wxyz0123" "456789+/";
-	const char padchar = '=';
-	int padlen = 0;
-
-	const Uint32 dsize = ( ( ssize * 4 ) / 3 ) + 3;
-	char * ptr = new char[dsize + 1];
-	char * out = ptr;
-
-	Uint32 i = 0;
-	while( i < ssize )
-	{
-		Uint32 chunk = 0;
-		chunk |= Uint32( src[i++] ) << 16;
-		if( i == dsize )
-		{
-			padlen = 2;
-		}
-		else
-		{
-			chunk |= Uint32( src[i++] ) << 8;
-			if( i == ssize )
-			{
-				padlen = 1;
-			}
-			else
-			{
-				chunk |= Uint32( src[i++] );
-			}
-		}
-
-		Uint32 j = ( chunk & 0x00fc0000 ) >> 18;
-		Uint32 k = ( chunk & 0x0003f000 ) >> 12;
-		Uint32 l = ( chunk & 0x00000fc0 ) >> 6;
-		Uint32 m = ( chunk & 0x0000003f );
-		*out++ = alphabet[j];
-		*out++ = alphabet[k];
-		if( padlen > 1 )
-		{
-			*out++ = padchar;
-		}
-		else
-		{
-			*out++ = alphabet[l];
-		}
-		if( padlen > 0 )
-		{
-			*out++ = padchar;
-		}
-		else
-		{
-			*out++ = alphabet[m];
-		}
-	}
-	// terminate string
-	ptr[out - ptr] = 0;
-	QString s( ptr );
-	delete[] ptr;
-	return( s );
-#endif
+	return( _dst );
 }
 
 
@@ -1393,71 +1322,19 @@ void flacStreamDecoderErrorCallback( const FLAC__StreamDecoder *,
 
 void sampleBuffer::loadFromBase64( const QString & _data )
 {
-#ifdef QT4
-	QByteArray orig_data = QByteArray::fromBase64( _data.toAscii() );
-#else
-	const char * src = _data.ascii();
-	csize ssize = _data.length();
-	csize dsize = ( _data.length() * 3 ) / 4;
-	char * dst = new char[dsize]; 
+	char * dst = NULL;
+	int dsize = 0;
+	base64::decode( _data, &dst, &dsize );
 
-	// code mostly taken from
-	// qt-x11-opensource-src-4.0.1/src/corelib/tools/qbytearray.cpp
-	unsigned int buf = 0;
-	int nbits = 0;
-	int offset = 0;
-
-	for( csize i = 0; i < ssize; ++i )
-	{
-		int ch = src[i];
-		int d;
-
-		if( ch >= 'A' && ch <= 'Z' )
-		{
-			d = ch - 'A';
-		}
-		else if( ch >= 'a' && ch <= 'z' )
-		{
-			d = ch - 'a' + 26;
-		}
-		else if( ch >= '0' && ch <= '9' )
-		{
-			d = ch - '0' + 52;
-		}
-		else if( ch == '+' )
-		{
-			d = 62;
-		}
-		else if( ch == '/' )
-		{
-			d = 63;
-		}
-		else
-		{
-			d = -1;
-		}
-
-		if( d != -1 )
-		{
-			buf = ( buf << 6 ) | (Uint32)d;
-			nbits += 6;
-			if( nbits >= 8 )
-			{
-				nbits -= 8;
-				dst[offset++] = buf >> nbits;
-				buf &= ( 1 << nbits ) - 1;
-			}
-		}
-	}
-	QByteArray orig_data;
-	orig_data.setRawData( dst, dsize );
-#endif
 #ifdef HAVE_FLAC_STREAM_DECODER_H
 
-#ifdef QT4
+#ifndef QT3
+	QByteArray orig_data = QByteArray::fromRawData( dst, dsize );
 	QBuffer ba_reader( &orig_data );
 	ba_reader.open( QBuffer::ReadOnly );
 #else
+	QByteArray orig_data;
+	orig_data.setRawData( dst, dsize );
 	QBuffer ba_reader( orig_data );
 	ba_reader.open( IO_ReadOnly );
 #endif
@@ -1490,18 +1367,31 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	FLAC__stream_decoder_finish( flac_dec );
 	FLAC__stream_decoder_delete( flac_dec );
 
+	ba_reader.close();
+
 	orig_data = ba_writer.buffer();
 	printf("%d\n", (int) orig_data.size() );
-#endif
+
 	m_origFrames = orig_data.size() / sizeof( sampleFrame ); 
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
+
+#else /* HAVE_FLAC_STREAM_DECODER_H */
+
+	m_origFrames = dsize / sizeof( sampleFrame ); 
+	delete[] m_origData;
+	m_origData = new sampleFrame[m_origFrames];
+	memcpy( m_origData, dst, dsize );
+
+#endif
+
+#ifndef QT3
+	delete[] dst;
+#endif
+
 	m_audioFile = "";
 	update();
-#ifndef QT4
-//	delete[] dst;
-#endif
 }
 
 

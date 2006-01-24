@@ -143,6 +143,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
+		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/embed.cpp				\
@@ -289,6 +290,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/fade_button.h				\
 		$(srcdir)/include/combobox.h				\
 		$(srcdir)/include/rubberband.h				\
+		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/qxembed.h
 
 

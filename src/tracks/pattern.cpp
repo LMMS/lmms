@@ -803,10 +803,9 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 	else if( m_frozenPattern != NULL && _me->button() == Qt::LeftButton &&
 			lmmsMainWin::isShiftPressed() == TRUE )
 	{
-		new stringPairDrag( "sampledata",
-				    m_frozenPattern->toBase64(),
-				    embed::getIconPixmap( "freeze" ),
-				    this );
+		QString s;
+		new stringPairDrag( "sampledata", m_frozenPattern->toBase64( s ),
+				    embed::getIconPixmap( "freeze" ), this );
 	}
 	else
 	{

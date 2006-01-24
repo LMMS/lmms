@@ -263,7 +263,8 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 	sampletco_de.setAttribute( "src", sampleFile() );
 	if( sampleFile() == "" )
 	{
-		sampletco_de.setAttribute( "data", m_sampleBuffer.toBase64() );
+		QString s;
+		sampletco_de.setAttribute( "data", m_sampleBuffer.toBase64( s ) );
 	}
 	// TODO: start- and end-frame
 	_parent.appendChild( sampletco_de );
