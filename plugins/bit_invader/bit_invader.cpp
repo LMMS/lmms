@@ -606,11 +606,17 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	// Load sample shape
 	delete[] sample_shape;
 	sample_shape = new float[sample_length];
-	QString sampleString = _this.attribute( "sampleShape ");
+	QString sampleString = _this.attribute( "sampleShape");
 	int size = 0;
 	char * dst = 0;
 	base64::decode( sampleString, &dst, &size );
 	memcpy( sample_shape, dst, size  );
+
+	cout << sampleString.ascii() << endl;
+	for (int i=0; i < sample_length; i++)
+	{
+		cout << sample_shape[i] << endl;
+	}
 
 	// Load LED normalize 
 	if ( _this.attribute( "interpolation" ).toInt() == 1 ) {
