@@ -66,7 +66,7 @@ using namespace std;
 #include "tooltip.h"
 #include "song_editor.h"
 #include "oscillator.h"
-
+#include "sample_buffer.h"
 #include "embed.cpp"
 
 
@@ -285,6 +285,16 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
+		usrWaveBtn = new pixmapButton( this );
+		usrWaveBtn->move( 188, 200 );
+		usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+							"usr_wave_active" ) );
+		usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+							"usr_wave_inactive" ) );
+		toolTip::add( usrWaveBtn,
+				tr( "Click here if you want a user-defined "
+				"wave-shape for current oscillator." ) );
+
 
 		connect( sinWaveBtn, SIGNAL (clicked ( void ) ),
 			this, SLOT ( sinWaveClicked( void ) ) );
@@ -296,6 +306,9 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 			this, SLOT ( sqrWaveClicked( void ) ) );
 		connect( whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( noiseWaveClicked( void ) ) );
+		connect( usrWaveBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( usrWaveClicked( void ) ) );
+		
 
 
 		smoothBtn = new pixmapButton( this );
@@ -324,7 +337,7 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 }
 
 
-
+/*
 void bitInvader::paintEvent( QPaintEvent * )
 {
 #ifdef QT4
@@ -348,7 +361,7 @@ void bitInvader::paintEvent( QPaintEvent * )
 
 
 }
-
+*/
 
 void bitInvader::sinWaveClicked( void )
 {
@@ -408,6 +421,35 @@ void bitInvader::noiseWaveClicked( void )
         sampleChanged();
 
 }
+
+void bitInvader::usrWaveClicked( void )
+{
+	// zero sample_shape
+	for (int i = 0; i < sample_length; i++)
+	{
+		sample_shape[i] = 0;
+	}
+
+	// load user shape
+	sampleBuffer buffer;
+	QString af = buffer.openAudioFile();
+	if ( af != "" )
+	{
+		buffer.setAudioFile( af );
+		
+		// copy buffer data
+		sample_length = min( sample_length, static_cast<int>(buffer.frames()) );		 
+		for ( int i = 0; i < sample_length; i++ )
+		{
+//			sample_shape = (float*)buffer.data();
+			sample_shape[i] = (float)*buffer.data()[i];
+		}
+	}
+	
+	sampleChanged();
+		
+}
+
 
 
 /*

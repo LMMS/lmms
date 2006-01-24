@@ -101,10 +101,11 @@ public slots:
         void sqrWaveClicked( void );
         void sawWaveClicked( void );
         void noiseWaveClicked( void );
-
+        void usrWaveClicked( void );
+/*
 protected:
 	virtual void paintEvent( QPaintEvent * );
-
+*/
 
 private:
 	knob * m_pickKnob;
@@ -116,6 +117,7 @@ private:
 	pixmapButton * sawWaveBtn;
 	pixmapButton * whiteNoiseWaveBtn;
 	pixmapButton * smoothBtn;
+	pixmapButton * usrWaveBtn;
 
 	static QPixmap * s_artwork;
 
