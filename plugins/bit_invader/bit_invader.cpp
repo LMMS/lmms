@@ -627,7 +627,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	
 	update();
 
-	songEditor::inst()->setModified();
+//	songEditor::inst()->setModified();
 
 }
 
