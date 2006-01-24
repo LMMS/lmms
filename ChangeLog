@@ -7,6 +7,8 @@
 	improved mouse handling.
 	replaced waveform generation methods by those
 	of toby's oscillator class.
+	added user-loadable waveform
+	code cleanup
 
 2006-01-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
