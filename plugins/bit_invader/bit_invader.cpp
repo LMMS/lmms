@@ -68,7 +68,7 @@ using namespace std;
 #include "oscillator.h"
 #include "sample_buffer.h"
 #include "embed.cpp"
-
+#include "base64.h"
 
 
 extern "C"
@@ -572,15 +572,12 @@ void bitInvader::saveSettings( QDomDocument & _doc,
 	// Save sample length
 	to_de.setAttribute( "sampleLength", QString::number( sample_length ) );
 
-	// Save sample shape
-	for( int i = 0; i < sample_length; ++i )
-	{
-		QString is = QString::number( i );
-		to_de.setAttribute( "s"+is, QString::number( sample_shape[i] ) );
-	}
-
-	// save sampleLength knob
-	to_de.setAttribute( "knob1", m_pickKnob->value() );
+	// Save sample shape base64-encoded
+	QString sampleString;
+	base64::encode( (const char *)sample_shape, 
+		sample_length * sizeof(float), sampleString );
+	to_de.setAttribute( "sampleShape", sampleString );
+	
 
 	// save LED normalize 
 	to_de.setAttribute( "interpolation", m_interpolationToggle->isChecked() );
@@ -598,22 +595,22 @@ void bitInvader::saveSettings( QDomDocument & _doc,
 
 void bitInvader::loadSettings( const QDomElement & _this )
 {
-	// Load knobs  (fires change SIGNAL?)
-	m_pickKnob->setValue( _this.attribute("knob1").toFloat() );
 
 
 	// Load sample length
 	sample_length = _this.attribute( "sampleLength" ).toInt() ;
 
-	// Load sample shape
-	delete[] sample_shape;		//TODO: necessary?
-	sample_shape = new float[sample_length];
-	for( int i = 0; i < sample_length; ++i )
-	{
-		QString is = QString::number( i );
+	// Load knobs  (fires change SIGNAL?)
+	m_pickKnob->setValue( static_cast<float>(sample_length) );
 
-		sample_shape[i] = _this.attribute( "s"+is ).toFloat();
-	}
+	// Load sample shape
+	delete[] sample_shape;
+	sample_shape = new float[sample_length];
+	QString sampleString = _this.attribute( "sampleShape ");
+	int size = 0;
+	char * dst = 0;
+	base64::decode( sampleString, &dst, &size );
+	memcpy( sample_shape, dst, size  );
 
 	// Load LED normalize 
 	if ( _this.attribute( "interpolation" ).toInt() == 1 ) {

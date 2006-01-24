@@ -1,3 +1,13 @@
+2006-01-24	Andreas Brandmaier <andy/at/brandmaier.de>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* presets/BitInvader
+	changed sample buffer encoding in presets
+	to base64
+	added BitInvader various presets
+
+
 2006-01-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/sample_buffer.h:
