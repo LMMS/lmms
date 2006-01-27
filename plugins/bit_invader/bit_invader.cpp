@@ -580,7 +580,8 @@ void bitInvader::saveSettings( QDomDocument & _doc,
 	
 
 	// save LED normalize 
-	to_de.setAttribute( "interpolation", m_interpolationToggle->isChecked() );
+	to_de.setAttribute( "interpolation",
+					m_interpolationToggle->isChecked() );
 	
 	// save LED 
 	to_de.setAttribute( "normalize", m_normalizeToggle->isChecked() );
@@ -619,18 +620,10 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	}
 
 	// Load LED normalize 
-	if ( _this.attribute( "interpolation" ).toInt() == 1 ) {
-		m_interpolationToggle->setChecked( true );
-	} else {
-		m_interpolationToggle->setChecked( false );	
-	}
+	m_interpolationToggle->setChecked( _this.attribute(
+						"interpolation" ).toInt() );
 	// Load LED 
-	if ( _this.attribute( "normalize" ).toInt() == 1) {
-		m_normalizeToggle->setChecked( true );	
-	} else {
-		m_normalizeToggle->setChecked( false );	
-	}
-	
+	m_normalizeToggle->setChecked( _this.attribute( "normalize" ).toInt() );
 	update();
 
 //	songEditor::inst()->setModified();
