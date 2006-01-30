@@ -177,7 +177,7 @@ void * bufferAllocator::allocBytes( Uint32 _bytes )
 	// processes like pattern-freezing because this way we do not have to
 	// search for a free buffer in an array, containing several
 	// 10.000 buffers
-	if( s_freeBufs > s_buffers.size() / 10 )
+	if( (csize) s_freeBufs > s_buffers.size() / 10 )
 	{
 		bufIt free_buf = s_buffers.end();
 
