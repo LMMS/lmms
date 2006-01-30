@@ -83,6 +83,7 @@ void graph::setSamplePointer( float * _pointer, int _length )
 {
 	samplePointer = _pointer;
 	sampleLength = _length;
+	update();
 }
 
 void graph::mouseMoveEvent ( QMouseEvent * _me )

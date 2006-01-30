@@ -613,11 +613,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	base64::decode( sampleString, &dst, &size );
 	memcpy( sample_shape, dst, size  );
 
-	cout << sampleString.ascii() << endl;
-	for (int i=0; i < sample_length; i++)
-	{
-		cout << sample_shape[i] << endl;
-	}
+       	m_graph->setSamplePointer( sample_shape, sample_length );
 
 	// Load LED normalize 
 	m_interpolationToggle->setChecked( _this.attribute(
@@ -657,11 +653,7 @@ void bitInvader::smoothClicked( void )
 {
 	// store values in temporary array
 	float* temp = new float[sample_length];
-	for (int i=0; i < sample_length; i++)
-	{
-			temp[i] = sample_shape[i];
-	}
-	
+	memcpy( temp, sample_shape, sizeof( float ) * sample_length );
 
 	// Smoothing
 	sample_shape[0] = ( temp[0]+temp[sample_length-1] ) * 0.5f;
@@ -777,8 +769,7 @@ void bitInvader::sampleSizeChanged( float _new_sample_length )
                
   	// update sample graph        
        	m_graph->setSamplePointer( sample_shape, sample_length );
-	m_graph->update();
-	    
+
 	// set Song modified
        	songEditor::inst()->setModified();
 
@@ -791,7 +782,7 @@ void bitInvader::sampleChanged()
 	float max = 0;
 	for (int i=0; i < sample_length; i++)
 	{
-		if (fabs(sample_shape[i]) > max) { max = fabs(sample_shape[i]); }
+		if (fabsf(sample_shape[i]) > max) { max = fabs(sample_shape[i]); }
 	}
 	normalizeFactor = 1.0 / max;
 
@@ -813,8 +804,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
-	return( new bitInvader(
-				static_cast<channelTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<channelTrack *>( _data ) ) );
 }
 
 

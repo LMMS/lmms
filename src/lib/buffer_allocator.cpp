@@ -2,7 +2,7 @@
  * buffer_allocator.cpp - namespace bufferAllocator providing routines for own
  *                        optimized memory-management for audio-buffers
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -66,7 +66,7 @@ inline bool operator<( const bufDesc & _bd1, const bufDesc & _bd2 )
 	return( _bd1.timesUsed < _bd2.timesUsed );
 }
 
-#ifdef QT4
+#ifndef QT3
 
 inline bool operator==( const bufDesc & _bd1, const bufDesc & _bd2 )
 {
@@ -86,7 +86,9 @@ inline bool operator!=( const bufDesc & _bd1, const bufDesc & _bd2 )
 static vlist<bufDesc> s_buffers;
 typedef vlist<bufDesc>::iterator bufIt;
 
-QMutex s_buffersMutex;
+static int s_freeBufs = 0;
+static bool s_autoCleanupDisabled = FALSE;
+static QMutex s_buffersMutex;
 
 
 const int BUFFER_ALIGN = 16;
@@ -112,13 +114,16 @@ void bufferAllocator::cleanUp( Uint16 _level )
 
 	const Sint16 todo = tMin<Sint16>( s_buffers.size() - _level,
 						bufsToRemove.size() );
+
 	// now cleanup the first n elements of sorted array
 	for( Sint16 i = 0; i < todo; ++i )
 	{
 		delete[] bufsToRemove[i].origPtr;
 		s_buffers.erase( qFind( s_buffers.begin(), s_buffers.end(),
 							bufsToRemove[i] ) );
+		--s_freeBufs;
 	}
+
 #ifdef LMMS_DEBUG
 	//printf( "cleaned up %d buffers\n", todo );
 #endif
@@ -138,17 +143,23 @@ void bufferAllocator::free( void * _buf )
 		{
 			++( *it ).timesUsed;
 			( *it ).free = TRUE;
+			++s_freeBufs;
 			break;
 		}
 	}
 
 	// do clean-up if neccessary
-	static Uint16 CLEANUP_LEVEL = static_cast<Uint16>( 512 / ( logf(
+	static const Uint32 CLEANUP_LEVEL = static_cast<Uint32>( 768 / ( logf(
 				mixer::inst()->framesPerAudioBuffer() ) /
 								logf( 2 ) ) );
-	if( s_buffers.size() > CLEANUP_LEVEL )
+	static int count = 0;
+	// only cleanup every 10th time, because otherwise there's a lot of
+	// overhead e.g. when freeing a lot of single buffers
+	if( s_autoCleanupDisabled == FALSE &&
+			s_buffers.size() > CLEANUP_LEVEL && ++count > 10 )
 	{
 		cleanUp( CLEANUP_LEVEL );
+		count = 0;
 	}
 
 	s_buffersMutex.unlock();
@@ -161,26 +172,37 @@ void * bufferAllocator::allocBytes( Uint32 _bytes )
 {
 	QMutexLocker ml( &s_buffersMutex );
 
-	bufIt free_buf = s_buffers.end();
-
-	// look whether there's a buffer matching to the one wanted and
-	// find out the most used one (higher chances for being in CPU-cache)
-	for( bufIt it = s_buffers.begin(); it != s_buffers.end(); ++it )
+	// there's a low probability that we find a matching buffer, if there're
+	// less than 2 bufs available, so do not search - this speeds up
+	// processes like pattern-freezing because this way we do not have to
+	// search for a free buffer in an array, containing several
+	// 10.000 buffers
+	if( s_freeBufs > s_buffers.size() / 10 )
 	{
-		if( ( *it ).free && ( *it ).bytes == _bytes )
+		bufIt free_buf = s_buffers.end();
+
+		// look whether there's a buffer matching to the one wanted and
+		// find out the most used one (higher chances for being in CPU-
+		// cache)
+		for( bufIt it = s_buffers.begin(); it != s_buffers.end(); ++it )
 		{
-			if( free_buf == s_buffers.end() ||
-				( *it ).timesUsed > ( *free_buf ).timesUsed )
+			if( ( *it ).free && ( *it ).bytes == _bytes )
 			{
-				free_buf = it;
+				if( free_buf == s_buffers.end() ||
+					( *it ).timesUsed >
+						( *free_buf ).timesUsed )
+				{
+					free_buf = it;
+				}
 			}
 		}
-	}
 
-	if( free_buf != s_buffers.end() )
-	{
-		( *free_buf ).free = FALSE;
-		return( ( *free_buf ).buf );
+		if( free_buf != s_buffers.end() )
+		{
+			--s_freeBufs;
+			( *free_buf ).free = FALSE;
+			return( ( *free_buf ).buf );
+		}
 	}
 
 
@@ -194,4 +216,10 @@ void * bufferAllocator::allocBytes( Uint32 _bytes )
 }
 
 
+
+
+void bufferAllocator::disableAutoCleanup( bool _disabled )
+{
+	s_autoCleanupDisabled = _disabled;
+}
 

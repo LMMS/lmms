@@ -1,12 +1,33 @@
+2006-01-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	- call graph::setSamplePointer() after loading settings
+	- memcpy() samples in bitInvader::smoothClicked() instead of copying
+	  them in a loop
+
+	* plugins/bit_invader/graph.cpp:
+	- update after settings new sample
+
+	* src/tracks/pattern.cpp:
+	- disable auto-cleanup during pattern-freeze
+	- initialize member m_progress in patternFreezeStatusDialig-dtor - fixes
+	  bug which sometimes closed the window before actual freezing was
+	  started
+
+	* include/buffer_allocator.h:
+	* src/lib/buffer_allocator.cpp:
+	- added possibility to disable auto-cleanup at certain times e.g. when
+	  freezing a pattern
+	- cleanup only every 10th free()-call for decreasing overhead
+	- only start searching for free bufs if there're enough remaining
+
 2006-01-24	Andreas Brandmaier <andy/at/brandmaier.de>
 
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/bit_invader/bit_invader.h:
 	* presets/BitInvader:
-	- changed sample buffer encoding in presets
-	- to base64
+	- changed sample buffer encoding in presets to base64
 	- added BitInvader various presets
-
 
 2006-01-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
@@ -1712,7 +1733,7 @@
 
 	* include/song_editor.h:
 	* src/core/song_editor.cpp:
-	added combo-box for selecting zooming-factor
+	added combo-box for selectinf zooming-factor
 
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:

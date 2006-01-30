@@ -2,7 +2,7 @@
  * buffer_allocator.h - namespace bufferAllocator providing routines for own
  *                      optimized memory-management for audio-buffers
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,9 +46,14 @@ namespace bufferAllocator
 		return( (T *) allocBytes( sizeof( T ) * _n ) );
 	}
 
+	// free given buffer
 	void FASTCALL free( void * _buf );
 
+	// try to cleanup _level unused buffers
 	void FASTCALL cleanUp( Uint16 _level );
+
+	// disable autocleanup-mechanisms
+	void FASTCALL disableAutoCleanup( bool _disabled );
 
 
 	// simple class for automatically freeing buffer in complex functions

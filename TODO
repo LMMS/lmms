@@ -1,6 +1,5 @@
 to be done as soon as possible:
 
-- disable auto-cleanup of bufferAllocator during memory-expensive operations (pattern-freezing etc.)
 - autosave every 30s (configurable!) and offer recovery at startup after crash
 - make piano-roll use rubberband instead of implementing a simple one on it's own
 - level-meters in output-graph and channel-track
@@ -16,7 +15,7 @@ to be done as soon as possible:
 - speed up painting of sampleTCO
 - save window-positions, -states and -sizes in files
 - solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()
-- balance env+lfo
+- panning env+lfo
 - plucked-string-synth: knob for metallic -> use noise as wave-shape
 - finish qt4-port and make LMMS usable when compiling with Qt4
 - rewrite export-project-dialog using layout-mechanism

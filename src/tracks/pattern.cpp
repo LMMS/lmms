@@ -67,6 +67,7 @@
 #include "tooltip.h"
 #include "bb_editor.h"
 #include "string_pair_drag.h"
+#include "buffer_allocator.h"
 
 
 QPixmap * pattern::s_stepBtnOn = NULL;
@@ -1145,7 +1146,8 @@ void pattern::updateBBTrack( void )
 
 patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 	QDialog(),
-	m_freezeThread( _thread )
+	m_freezeThread( _thread ),
+	m_progress( 0 )
 {
 	setWindowTitle( tr( "Freezing pattern..." ) );
 #if QT_VERSION >= 0x030200
@@ -1249,6 +1251,7 @@ patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
 	QThread(),
 	m_pattern( _pattern )
 {
+	// create status-dialog
 	m_statusDlg = new patternFreezeStatusDialog( this );
 	QObject::connect( m_statusDlg, SIGNAL( aborted() ),
 					m_pattern, SLOT( abortFreeze() ) );
@@ -1269,6 +1272,8 @@ patternFreezeThread::~patternFreezeThread()
 
 void patternFreezeThread::run( void )
 {
+	bufferAllocator::disableAutoCleanup( TRUE );
+
 	// create and install audio-sample-recorder
 	bool b;
 	// we cannot create local copy, because at a later stage
@@ -1288,9 +1293,9 @@ void patternFreezeThread::run( void )
 	ppp.setCurrentFrame( 0 );
 	ppp.m_timeLineUpdate = FALSE;
 
-	// create status-dialog
 	m_pattern->m_freezeAborted = FALSE;
 	m_pattern->m_freezing = TRUE;
+
 
 	// now render everything
 	while( ppp < m_pattern->length() &&
@@ -1299,6 +1304,7 @@ void patternFreezeThread::run( void )
 		freeze_recorder->processNextBuffer();
 		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
 	}
+
 
 	m_pattern->m_freezing = FALSE;
 
@@ -1314,6 +1320,8 @@ void patternFreezeThread::run( void )
 						&m_pattern->m_frozenPattern );
 		m_pattern->m_frozenPatternMutex.unlock();
 	}
+
+	bufferAllocator::disableAutoCleanup( FALSE );
 
 	// restore original audio-device
 	mixer::inst()->restoreAudioDevice();
