@@ -1,3 +1,18 @@
+2006-01-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/vestige/fstclient.h:
+	* plugins/vestige/fstclient.cpp:
+	- renamed to lvsl_client.*
+	- when waiting for plugin to have finished process()ing, usleep() some
+	  micro-seconds for allowing better scheduling
+
+	* plugins/vestige/lvsl_server.c:
+	- merged code from fstserver.cpp, fstserver.h and fstcore.c into one
+	  source-file and removed rests of the old FST-API which makes all
+	  the VST-code MUCH more cleaner and less redundant (LVSL = LMMS VST
+	  Support Layer)
+	- VST SDK 2.4 compatibility (no need to fix headers with 2.4!)
+
 2006-01-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* plugins/bit_invader/bit_invader.cpp:
@@ -6,7 +21,7 @@
 	  them in a loop
 
 	* plugins/bit_invader/graph.cpp:
-	- update after settings new sample
+	- update after setting new sample
 
 	* src/tracks/pattern.cpp:
 	- disable auto-cleanup during pattern-freeze

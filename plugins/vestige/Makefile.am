@@ -21,19 +21,26 @@ EMBEDDED_RESOURCES = $(wildcard *png)
 EXTRA_DIST = $(EMBEDDED_RESOURCES)
 
 
-CLEANFILES = $(MOC_FILES) ./embedded_resources.h xfst.exe.so
 
 pkglib_LTLIBRARIES = libvestige.la
 
-libvestige_la_SOURCES = vestige.cpp vestige.h fstclient.cpp fstclient.h
+libvestige_la_SOURCES = vestige.cpp vestige.h lvsl_client.cpp lvsl_client.h
 
 $(libvestige_la_SOURCES): ./embedded_resources.h 
 
 
-CC = winegcc
-pkglib_PROGRAMS = xfst_server
-xfst_server_SOURCES = fstserver.cpp fstcore.c fstserver.h communication.h
-xfst_server_LDFLAGS = -mwindows -L/usr/X11R6/lib -lX11 -lpthread -o $(pkglib_PROGRAMS)
-xfst_server_LINK = wineg++
+
+CC = wineg++
+pkglib_PROGRAMS = lvsl_server
+lvsl_server_SOURCES = lvsl_server.c communication.h
+lvsl_server_LDFLAGS = -mwindows -L/usr/X11R6/lib -lX11 -lpthread -o $(pkglib_PROGRAMS)
+lvsl_server_LINK = wineg++
 nobase_pkglib_DATA = $(pkglib_PROGRAMS).exe.so
+
+CLEANFILES = $(MOC_FILES) ./embedded_resources.h $(nobase_pkglib_DATA)
+
+
+install-exec-hook:
+	cd $(DESTDIR)$(pkglibdir) ; \
+	strip $(nobase_pkglib_DATA)
 

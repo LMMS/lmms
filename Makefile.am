@@ -295,7 +295,7 @@ lmms_SOURCES =								\
 
 
 
-EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) aeffectx_h_fix.patch
+EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) vst_sdk23_headers.diff
 
 
 CLEANFILES = $(lmms_MOC) ./embedded_resources.h

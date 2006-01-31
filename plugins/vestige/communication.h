@@ -1,8 +1,14 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#include <string.h>
+#endif
+
 #include <string>
 
 

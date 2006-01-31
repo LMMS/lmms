@@ -59,7 +59,7 @@
 #include "spc_bg_hndl_widget.h"
 #include "vestige.h"
 #include "text_float.h"
-#include "fstclient.h"
+#include "lvsl_client.h"
 
 #include "embed.cpp"
 

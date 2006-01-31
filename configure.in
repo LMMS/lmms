@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.2-cvs20060129, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.2-cvs20060129)
+AC_INIT(lmms, 0.1.2-cvs20060130, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.2-cvs20060130)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -162,16 +162,15 @@ AC_ARG_WITH(vst,
 			[enable support for builtin VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
 AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <aeffectx.h> header file.])
 if test "x$with_vst" = "xyes" ; then
+
+	ORIG_CFLAGS=$CFLAGS
+	ORIG_CPPFLAGS=$CPPFLAGS
+	CFLAGS="$CLFAGS -I./include"
+	CPPFLAGS="$CPPFLAGS -I./include"
 	AC_CHECK_HEADER(aeffectx.h, HAVE_VST_AEFFECTX_H="true")
-	if test -z "$HAVE_VST_AEFFECTX_H" ; then
-		ORIG_CFLAGS=$CFLAGS
-		ORIG_CPPFLAGS=$CPPFLAGS
-		CFLAGS="$CLFAGS -I./include"
-		CPPFLAGS="$CPPFLAGS -I./include"
-		AC_CHECK_HEADER(aeffectx.h, HAVE_VST_AEFFECTX_H="true")
-		CFLAGS="$ORIG_CFLAGS"
-		CPPFLAGS="$ORIG_CPPFLAGS"
-	fi
+	CFLAGS="$ORIG_CFLAGS"
+	CPPFLAGS="$ORIG_CPPFLAGS"
+
 	AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
 	AC_CHECK_LIB([wine], [wine_init])
 	if test ! -z "$WINEGCC" ; then
@@ -649,8 +648,8 @@ else
 		echo " = http://www.steinberg.de/Steinberg/ygrabit/vstsdk/OnlineDoc/source/common/AEffect.h"
 		echo " = http://www.steinberg.de/Steinberg/ygrabit/vstsdk/OnlineDoc/source/common/aeffectx.h"
 		echo " ="
-		echo " = and put the mentioned files into /usr/include/ or ./include. Make sure, they're"
-		echo " = patched with file vst_sdk23_headers.diff!"
+		echo " = and put the mentioned files into /usr/include/ or ./include. Make sure,"
+		echo "= they're patched with file vst_sdk23_headers.diff!"
 		echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
 		echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
 		echo " = ignore this warning."
