@@ -137,12 +137,22 @@ vvector<selectableObject *> rubberBand::selectableObjects( void ) const
 	{
 		return( so );
 	}
+#ifndef QT3
+	QList<selectableObject *> l =
+			parentWidget()->findChildren<selectableObject *>();
+	for( QList<selectableObject *>::iterator it = l.begin(); it != l.end();
+									++it )
+	{
+		so.push_back( *it );
+	}
+#else
 	QObjectList * l = parentWidget()->queryList( "selectableObject" );
 	for( QObjectListIt it = *l; it.current() != NULL; ++it )
 	{
 		so.push_back( static_cast<selectableObject *>( *it ) );
 	}
 	delete l;
+#endif
 	return( so );
 }
 

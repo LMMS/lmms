@@ -34,6 +34,7 @@
 #include <QPixmap>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QMouseEvent>
 
 #else
 
@@ -113,7 +114,7 @@ void comboBox::addItem( const QString & _item, const QPixmap & _pixmap )
 	for( vvector<item>::iterator it = m_items.begin();
 						it != m_items.end(); ++it )
 	{
-		m_menu.addItem( ( *it ).second, ( *it ).first
+		m_menu.addAction( ( *it ).second, ( *it ).first
 		// when using Qt3, we pass item-index as id for using
 		// it in setItem( int ) as index
 #ifdef QT3

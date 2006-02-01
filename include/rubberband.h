@@ -51,7 +51,11 @@ public:
 				, WFlags _f
 #endif
 						) :
-		QWidget( _parent, NULL, _f ),
+		QWidget( _parent
+#ifdef QT3
+				, NULL, _f
+#endif
+				),
 		m_selected( FALSE )
 	{
 	}

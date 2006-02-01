@@ -189,7 +189,11 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::RightButton )
 	{
 		QSize s( m_pixmap.width(), m_pixmap.height() );
+#ifndef QT3
+		s.scale( width(), height(), Qt::KeepAspectRatio );
+#else
 		s.scale( width(), height(), QSize::ScaleMin );
+#endif
 		if( _me->x() > 4 + s.width() )
 		{
 			rename();
@@ -212,7 +216,11 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	QSize s( m_pixmap.width(), m_pixmap.height() );
+#ifndef QT3
+	s.scale( width(), height(), Qt::KeepAspectRatio );
+#else
 	s.scale( width(), height(), QSize::ScaleMin );
+#endif
 	if( _me->x() > 4 + s.width() )
 	{
 		rename();

@@ -39,7 +39,7 @@
 namespace base64
 {
 #ifndef QT3
-	inline encode( const char * _data, const int _size, QString & _dst )
+	inline void encode( const char * _data, const int _size, QString & _dst )
 	{
 		_dst = QByteArray( _data, _size ).toBase64();
 	}

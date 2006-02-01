@@ -1,7 +1,7 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -69,7 +69,7 @@ int main( int argc, char * * argv )
 					QString( app.argv()[i] ) == "-v" )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n\n"
-	"Copyright (c) 2004-2005 Tobias Doerffel and others.\n\n"
+	"Copyright (c) 2004-2006 Tobias Doerffel and others.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
@@ -83,7 +83,7 @@ int main( int argc, char * * argv )
 					QString( app.argv()[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
-	"Copyright (c) 2004-2005 Tobias Doerffel and others.\n\n"
+	"Copyright (c) 2004-2006 Tobias Doerffel and others.\n\n"
 	"usage: lmms [ -r <file_to_render> [ -o <format> ] [ -h ] "
 							"[ <file_to_load> ]\n"
 	"-r, --render			render given file.\n"

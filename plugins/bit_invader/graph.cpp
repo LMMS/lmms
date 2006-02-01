@@ -129,7 +129,11 @@ void graph::mousePressEvent( QMouseEvent * _me )
 
 	// toggle mouse state
 	m_mouseDown = true;	
+#ifndef QT3
+	setCursor( Qt::BlankCursor );
+#else
 	setCursor( QCursor::BlankCursor );
+#endif
 	m_lastCursorX = x;
 }
 
@@ -157,7 +161,11 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 {
 	// toggle mouse state
 	m_mouseDown = false;
+#ifndef QT3
+	setCursor( Qt::ArrowCursor );
+#else
 	setCursor( QCursor::ArrowCursor );
+#endif
 	update();
 }	
 	

@@ -40,6 +40,8 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 	$(LRELEASE) $<
 
 
+man1_MANS = lmms.1
+
 
 lmms_MOC =						\
 		./about_dialog.moc			\
@@ -295,7 +297,7 @@ lmms_SOURCES =								\
 
 
 
-EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) vst_sdk23_headers.diff
+EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) vst_sdk23_headers.diff lmms.1
 
 
 CLEANFILES = $(lmms_MOC) ./embedded_resources.h
@@ -329,5 +331,5 @@ LIB_SF_LDADD = -lsndfile
 endif
 
 lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_FST_LDADD) -ldl
-lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
+# lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
 

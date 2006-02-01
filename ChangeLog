@@ -1,3 +1,25 @@
+2006-02-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* configure.in:
+	made 0.1.3 release
+
+	* lmms.1:
+	added manpage (taken from debian-package and updated)
+
+	* include/base64.h:
+	* include/rubberband.h:
+	* plugins/bit_invader/graph.cpp:
+	* src/core/name_label.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/rubberband.cpp:
+	Qt4-compat fixes
+
+	* locale/de.ts:
+	updated German translation
+
+	* src/core/main.cpp:
+	updated copyright-notice in help-text
+
 2006-01-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* plugins/vestige/fstclient.h:
@@ -194,7 +216,7 @@
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/bit_invader/graph.h:
 	* plugins/bit_invader/graph.cpp:
-	added "BitInvader"-plugin, a usereditable wavetable-synthesizer
+	added "BitInvader"-plugin, an usereditable wavetable-synthesizer
 
 2006-01-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
@@ -607,7 +629,6 @@
 	* configure.in:
 	made 0.1.2 release
 
-=======
 2006-01-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* plugins/vestige/vestige.cpp:
