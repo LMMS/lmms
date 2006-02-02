@@ -118,7 +118,9 @@ public:
 		{
 			return( m_rubberBand->selectedObjects() );
 		}
-		return( vvector<selectableObject *>() );
+		//return( vvector<selectableObject *>() );
+		vvector<selectableObject *> foo;
+		return( foo );
 	}
 
 

@@ -106,8 +106,8 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 					ascii()
 #endif
 					, RTLD_NOW );*/
-	QLibrary plugin_lib( configManager::inst()->pluginDir()  +
-							_plugin_name );
+	QLibrary plugin_lib( configManager::inst()->pluginDir() +
+								_plugin_name );
 	if( /*handle == NULL*/ plugin_lib.load() == FALSE )
 	{
 		QMessageBox::information( NULL,

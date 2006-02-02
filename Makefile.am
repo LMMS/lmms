@@ -331,5 +331,6 @@ LIB_SF_LDADD = -lsndfile
 endif
 
 lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_FST_LDADD) -ldl
-# lmms_LDFLAGS = -rdynamic -rpath $(pkglibdir)
+lmms_LDFLAGS = -rdynamic
+#-rpath $(pkglibdir)
 

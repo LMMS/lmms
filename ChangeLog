@@ -1,3 +1,14 @@
+2006-02-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* configure.in:
+	made 0.1.4 release
+
+	* Makefile.am:
+	added -rdynamic-switch again to make LMMS able to load plugins
+
+	* include/track_container.h:
+	fixed bug which caused LMMS not being compilable using GCC 3
+
 2006-02-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* configure.in:
