@@ -431,8 +431,12 @@ void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 
 void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee,
-		QString( "samplefile,tco_%1" ).arg( track::SAMPLE_TRACK ) );
+	if( stringPairDrag::processDragEnterEvent( _dee,
+		QString( "samplefile,tco_%1" ).arg( track::SAMPLE_TRACK ) ) ==
+									FALSE )
+	{
+		_dee->ignore();
+	}
 }
 
 
@@ -444,7 +448,7 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 	QString value = stringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		setAudioFile( stringPairDrag::decodeValue( _de ) );
+		setAudioFile( value );
 		_de->accept();
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
@@ -453,6 +457,10 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 		setAudioFile( mmp.content().firstChild().toElement().
 							attribute( "src" ) );
 		_de->accept();
+	}
+	else
+	{
+		_de->ignore();
 	}
 }
 
