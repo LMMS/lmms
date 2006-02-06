@@ -1,3 +1,14 @@
+2006-02-06	Andreas Brandmaier <andy/at/brandmaier.de>
+
+	* plugins/bitinvader/bitinvader.cpp
+	* plugins/bitinvader/bitinvader.h
+	* plugins/bitinvader/graph.cpp
+	* plugins/bitinvader/graph.h
+	- code cleanup
+	- added drag&drop support to wavegraph
+	- added new BitInvader presets and improved old ones
+	
+	
 2006-02-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/basic_filters.h:

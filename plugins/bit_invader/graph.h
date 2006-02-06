@@ -49,20 +49,12 @@ class graph : public QWidget
 {
 	Q_OBJECT
 public:
-/*	enum ledColors
-	{
-		YELLOW, GREEN, TOTAL_COLORS
-	} ;
-*/
-	graph( const QString & _txt, QWidget * _parent//,
-						//ledColors _color = YELLOW 
-						);
+	graph( const QString & _txt, QWidget * _parent );
 	virtual ~graph();
 
-
 	void setSamplePointer( float * pointer, int length );
-
 	void setBackground ( const QPixmap & _pixmap );
+	void graph::loadSampleFromFile( QString filename );
 
 signals:
 	void sampleSizeChanged( float f );
@@ -70,6 +62,8 @@ signals:
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -86,9 +80,6 @@ private:
 
 	bool m_mouseDown;
 	int m_lastCursorX;
-	
-//signals:
-//	void toggled( bool );
 
 } ;
 

@@ -108,8 +108,7 @@ protected:
 */
 
 private:
-	knob * m_pickKnob;
-	knob * m_pickupKnob;
+	knob * m_sampleLengthKnob;
 
 	pixmapButton * sinWaveBtn;
 	pixmapButton * triangleWaveBtn;

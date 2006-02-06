@@ -41,7 +41,8 @@
 
 
 #include "graph.h"
-
+#include "string_pair_drag.h"
+#include "sample_buffer.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -53,11 +54,12 @@ graph::graph( const QString & _text, QWidget * _parent) :
 	QWidget( _parent )
 {
 
-	m_background = NULL;
+//	m_background = 0; TODO
 	m_mouseDown = false;
 
 	setFixedSize( 132, 104 );
 	
+	setAcceptDrops( TRUE );
 
 #ifndef QT4
 	setBackgroundMode( NoBackground );
@@ -75,8 +77,6 @@ graph::~graph()
 void graph::setBackground( const QPixmap &_pixmap )
 {
 	m_background = _pixmap;
-//	setErasePixmap ( m_background );
-
 }
 
 void graph::setSamplePointer( float * _pointer, int _length )
@@ -86,11 +86,32 @@ void graph::setSamplePointer( float * _pointer, int _length )
 	update();
 }
 
+void graph::loadSampleFromFile( const QString filename )
+{
+	// zero sample_shape
+	for (int i = 0; i < sampleLength; i++)
+	{
+		samplePointer[i] = 0;
+	}
+	
+	// load user shape
+	sampleBuffer buffer;
+	buffer.setAudioFile( filename );
+		
+	// copy buffer data
+	sampleLength = min( sampleLength, static_cast<int>(buffer.frames()) );		 
+	for ( int i = 0; i < sampleLength; i++ )
+	{
+		samplePointer[i] = (float)*buffer.data()[i];
+	}
+	
+}
+
 void graph::mouseMoveEvent ( QMouseEvent * _me )
 {
 
-        // get position
-        int x = _me->x();
+    // get position
+    int x = _me->x();
 	int y = _me->y();
 
 
@@ -104,10 +125,6 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 	} else {
 		x = m_lastCursorX;
 	}
-//	QCursor::setPos( 1, 1 );
-
-
-	
 
 	changeSampleAt( x, y );
 
@@ -143,15 +160,15 @@ void graph::changeSampleAt(int _x, int _y)
 	_x -= 2;
 	_y -= 2;
 
-        // boundary check
-        if (_x < 0) { return; }
-        if (_x > sampleLength) { return; }
+    // boundary check
+    if (_x < 0) { return; }
+    if (_x > sampleLength) { return; }
 	if (_y < 0) { return; }
 	if (_y >= 100) { return; }
 	_y = 100 - _y;
 
 	// change sample shape
-        samplePointer[_x] = (_y-50.0)/50.0;
+    samplePointer[_x] = (_y-50.0)/50.0;
 	emit sampleChanged();
 
 
@@ -218,6 +235,27 @@ void graph::paintEvent( QPaintEvent * )
 
 }
 
+
+void graph::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+
+	if( type == "samplefile" )
+	{
+		loadSampleFromFile( value );
+		_de->accept();
+	}
+}
+
+void graph::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	if( stringPairDrag::processDragEnterEvent( _dee,
+		QString( "samplefile" ) ) == FALSE )
+	{
+		_dee->ignore();
+	}
+}
 
 
 #include "graph.moc"

@@ -113,11 +113,7 @@ bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, floa
 	sample_step = static_cast<float>( sample_length / 
 			((float)mixer::inst()->sampleRate() / _pitch) );
 	
-/*	cout << "Sample length: " << sample_length << endl <<
-		"Sample rate  : " << mixer::inst()->sampleRate() << endl <<
-		"Frequency    : " << _pitch << endl <<
-		"Sample step  : " << sample_step << endl;
-*/
+
 }
 
 
@@ -194,13 +190,13 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	}
 
 
-	m_pickKnob = new knob( knobDark_28, this, tr( "Samplelength" ) );
-	m_pickKnob->setRange( 8, 128, 1 );
- 	m_pickKnob->setValue( 128, TRUE );
-	m_pickKnob->move( 10, 120 );
-	m_pickKnob->setHintText( tr( "Sample Length" ) + " ", "" );
+	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ) );
+	m_sampleLengthKnob->setRange( 8, 128, 1 );
+ 	m_sampleLengthKnob->setValue( 128, TRUE );
+	m_sampleLengthKnob->move( 10, 120 );
+	m_sampleLengthKnob->setHintText( tr( "Sample Length" ) + " ", "" );
 
-	connect( m_pickKnob, SIGNAL( valueChanged( float ) ),
+	connect( m_sampleLengthKnob, SIGNAL( valueChanged( float ) ),
 		this, SLOT ( sampleSizeChanged( float ) ) 
 		);
 
@@ -216,13 +212,14 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	connect( m_normalizeToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( normalizeToggle( bool ) ) );
 
-	sample_length = 128;
-	sample_shape = new float[128];
-	emit( sinWaveClicked() );
 
 	m_graph = new graph( "", this );
 	m_graph->move(53,118);	// 55,120 - 2px border
-	m_graph->setSamplePointer( sample_shape, sample_length );
+	m_graph->setCursor( QCursor( Qt::CrossCursor ) );
+
+	toolTip::add( m_graph, tr ( "Draw your own waveform here"
+				"by dragging your mouse onto this graph"
+	));
 
 	QPixmap p = PLUGIN_NAME::getIconPixmap("wavegraph3") ;
 
@@ -334,6 +331,14 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 #else
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
+
+
+	sample_length = 128;
+	sample_shape = new float[128];
+	m_graph->setSamplePointer( sample_shape, sample_length );
+	emit( sinWaveClicked() );
+	
+
 }
 
 
@@ -377,7 +382,7 @@ void bitInvader::sinWaveClicked( void )
 void bitInvader::triangleWaveClicked( void )
 {
 	// generate a Triangle wave using static oscillator-method
-        for (int i=0; i < sample_length; i++)
+    for (int i=0; i < sample_length; i++)
         {
 	    sample_shape[i] = oscillator::triangleSample( i/static_cast<float>(sample_length) );
         }
@@ -391,22 +396,22 @@ void bitInvader::sawWaveClicked( void )
 {
 	// generate a Saw wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-        {
+    {
 	    sample_shape[i] = oscillator::sawSample( i/static_cast<float>(sample_length) );
-        }
+    }
         
-        sampleChanged();
+    sampleChanged();
 }
 
 void bitInvader::sqrWaveClicked( void )
 {
 	// generate a Sqr wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-        {
+    {
 	    sample_shape[i] = oscillator::squareSample( i/static_cast<float>(sample_length) );
-        }
+    }
         
-        sampleChanged();
+    sampleChanged();
 
 }
 
@@ -414,11 +419,11 @@ void bitInvader::noiseWaveClicked( void )
 {
 	// generate a Noise wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-        {
+    {
 	    sample_shape[i] = oscillator::noiseSample( i/static_cast<float>(sample_length) );
-        }
+    }
         
-        sampleChanged();
+    sampleChanged();
 
 }
 
@@ -441,7 +446,6 @@ void bitInvader::usrWaveClicked( void )
 		sample_length = min( sample_length, static_cast<int>(buffer.frames()) );		 
 		for ( int i = 0; i < sample_length; i++ )
 		{
-//			sample_shape = (float*)buffer.data();
 			sample_shape[i] = (float)*buffer.data()[i];
 		}
 	}
@@ -602,7 +606,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	sample_length = _this.attribute( "sampleLength" ).toInt() ;
 
 	// Load knobs  (fires change SIGNAL?)
-	m_pickKnob->setValue( static_cast<float>(sample_length) );
+	m_sampleLengthKnob->setValue( static_cast<float>(sample_length) );
 
 	// Load sample shape
 	delete[] sample_shape;
@@ -693,10 +697,7 @@ void bitInvader::playNote( notePlayHandle * _n )
 		}
 		
 		_n->m_pluginData = new bSynth( sample_shape, sample_length,freq
-					, interpolation, factor
-							//, m_pickKnob->value()
-							//m_pickupKnob->value() 
-							);
+					, interpolation, factor	);
 	}
 
 	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
