@@ -3,7 +3,7 @@
  *                           surround-audio-buffers into RAM, maybe later
  *                           also harddisk
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,12 +33,12 @@
 
 #ifdef QT4
 
-#include <QVector>
+#include <QList>
 #include <QPair>
 
 #else
 
-#include <qvaluevector.h>
+#include <qvaluelist.h>
 #include <qpair.h>
 
 #endif
@@ -53,21 +53,21 @@ class sampleBuffer;
 class audioSampleRecorder : public audioDevice
 {
 public:
-	audioSampleRecorder( Uint32 _sample_rate, Uint32 _channels,
-							bool & _success_ful );
-	~audioSampleRecorder();
+	audioSampleRecorder( const sample_rate_t _sample_rate,
+				const ch_cnt_t _channels, bool & _success_ful );
+	virtual ~audioSampleRecorder();
 
-	Uint32 framesRecorded( void ) const;
+	f_cnt_t framesRecorded( void ) const;
 	void FASTCALL createSampleBuffer( sampleBuffer * * _sample_buf ) const;
 
 
 private:
-	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
-							Uint32 _frames,
-							float _master_gain );
+	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+						const fpab_t _frames,
+						const float _master_gain );
 
-	typedef vvector<QPair<sampleFrame *, Uint32> > bufferVector;
-	bufferVector m_buffers;
+	typedef vlist<QPair<sampleFrame *, fpab_t> > bufferList;
+	bufferList m_buffers;
 
 } ;
 

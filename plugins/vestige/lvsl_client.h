@@ -144,14 +144,13 @@ private:
 	Sint16 processNextMessage( void );
 
 	void FASTCALL setShmKeyAndSize( const Uint16 _key, const size_t _size );
-	void FASTCALL setPluginXID( const Sint32 _plugin_xid );
-
 
 
 	bool m_failed;
 	QString m_plugin;
 	QWidget * m_pluginWidget;
-	Sint32 m_pluginWID;
+	Sint32 m_pluginXID;
+	QSize m_pluginGeometry;
 
 	int m_pluginPID;
 	int m_pipes[2][2];

@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.4, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.4)
+AC_INIT(lmms, 0.1.4-cvs20060205, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060205)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -22,7 +22,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h])
+AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h sched.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -167,6 +167,8 @@ if test "x$with_vst" = "xyes" ; then
 	ORIG_CPPFLAGS=$CPPFLAGS
 	CFLAGS="$CLFAGS -I./include"
 	CPPFLAGS="$CPPFLAGS -I./include"
+	ORIG_CC="$CC"
+	CC="$CXX"
 	AC_CHECK_HEADER(aeffectx.h, HAVE_VST_AEFFECTX_H="true")
 	CFLAGS="$ORIG_CFLAGS"
 	CPPFLAGS="$ORIG_CPPFLAGS"
@@ -181,6 +183,7 @@ if test "x$with_vst" = "xyes" ; then
 			WINE_OK_BUT_VST_INCOMPLETE="true"
 		fi
 	fi
+	CC="$ORIG_CC"
 fi
 AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINEGCC")
 

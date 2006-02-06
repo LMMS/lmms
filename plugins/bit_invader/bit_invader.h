@@ -56,7 +56,7 @@ public:
 	bSynth(float* sample, int length, float _pitch, bool _interpolation, float factor);
 	virtual ~bSynth();
 	
-	sampleType nextStringSample();	
+	sample_t nextStringSample();	
 
 
 private:

@@ -41,6 +41,11 @@
 
 #endif
 
+#ifdef HAVE_SCHED_H
+#include <sched.h>
+#endif
+
+
 #include "lmms_main_win.h"
 #include "embed.h"
 #include "config_mgr.h"
@@ -223,6 +228,17 @@ int main( int argc, char * * argv )
 		e->show();
 		e->exportBtnClicked();
 	}
+
+#ifdef HAVE_SCHED_H
+	struct sched_param sparam;
+	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
+				sched_get_priority_min( SCHED_FIFO ) ) / 2;
+	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
+	{
+		printf( "could not set realtime priority.\n" );
+	}
+#endif
+
 
 	return( app.exec() );
 }

@@ -126,7 +126,7 @@ bSynth::~bSynth()
 	delete[] sample_shape;
 }
 
-sampleType bSynth::nextStringSample( void )
+sample_t bSynth::nextStringSample( void )
 {
 
 	
@@ -135,7 +135,7 @@ sampleType bSynth::nextStringSample( void )
 		sample_realindex -= sample_length;
 	}
 
-	sampleType sample;
+	sample_t sample;
 
 	if (interpolation) {
 
@@ -705,7 +705,7 @@ void bitInvader::playNote( notePlayHandle * _n )
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( Uint32 frame = 0; frame < frames; ++frame )
 	{
-		const sampleType cur = ps->nextStringSample();
+		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			buf[frame][chnl] = cur;

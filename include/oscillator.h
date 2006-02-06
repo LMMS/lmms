@@ -1,7 +1,7 @@
 /*
  * oscillator.h - header-file for oscillator.cpp, a powerful oscillator-class
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,8 @@
 class oscillator;
 
 typedef void ( oscillator:: * oscFuncPtr )
-			( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl );
+		( sampleFrame * _ab, const fpab_t _frames,
+		  				const ch_cnt_t _chnl );
 
 
 const sampleFrame ZERO_FRAME = { 0.0f, 0.0f } ;
@@ -68,14 +69,16 @@ public:
 		FREQ_MODULATION, AMP_MODULATION, MIX, SYNC
 	} ;
 
-	oscillator( modulationAlgos _modulation_algo, float _freq,
-				Sint16 _phase_offset, float _volume_factor,
-				oscillator * _m_subOsc );
-	inline virtual ~oscillator()
+	oscillator( const modulationAlgos _modulation_algo, const float _freq,
+			const Sint16 _phase_offset, const float _volume_factor,
+					oscillator * _m_subOsc ) FASTCALL;
+	virtual ~oscillator()
 	{
 		delete m_subOsc;
 	}
-	inline void setUserWave( const sampleFrame * _data, Uint32 _frames )
+
+	inline void setUserWave( const sampleFrame * _data,
+							const f_cnt_t _frames )
 	{
 		if( m_userWaveFrames > 0 )
 		{
@@ -88,11 +91,14 @@ public:
 			m_userWaveFrames = 1;
 		}
 	}
-	inline void update( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )
+
+	inline void update( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
 	{
 		( this->*m_callUpdate )( _ab, _frames, _chnl );
 	}
-	inline void setNewFreq( float _new_freq )
+
+	inline void setNewFreq( const float _new_freq )
 	{
 		// save current state - we need it later for restoring same
 		// phase (otherwise we'll get clicks in the audio-stream)
@@ -101,9 +107,11 @@ public:
 		recalcOscCoeff( fraction( v ) );
 	}
 
-	static oscillator * FASTCALL createOsc( waveShapes _wave_shape,
-				modulationAlgos _modulation_algo, float _freq,
-				Sint16 _phase_offset, float _volume_factor,
+	static oscillator * FASTCALL createOsc( const waveShapes _wave_shape,
+					const modulationAlgos _modulation_algo,
+					const float _freq,
+					const Sint16 _phase_offset,
+					const float _volume_factor,
 						oscillator * _m_subOsc = NULL ); 
 	inline bool syncOk( void )
 	{
@@ -126,13 +134,12 @@ public:
 
 	// now follow the wave-shape-routines...
 
-	static inline sampleType sinSample( float _sample )
+	static inline sample_t sinSample( const float _sample )
 	{
-		return( sinf( _sample * static_cast<sampleType>( 2.0f * M_PI
-									) ) );
+		return( sinf( _sample * 2.0f * M_PI ) );
 	}
 
-	static inline sampleType triangleSample( float _sample )
+	static inline sample_t triangleSample( const float _sample )
 	{
 		const float ph = fraction( _sample );
 		if( ph <= 0.25f )
@@ -146,17 +153,17 @@ public:
 		return( ph * 4.0f - 4.0f );
 	}
 
-	static inline sampleType sawSample( float _sample )
+	static inline sample_t sawSample( const float _sample )
 	{
 		return( -1.0f + fraction( _sample ) * 2.0f );
 	}
 
-	static inline sampleType squareSample( float _sample )
+	static inline sample_t squareSample( const float _sample )
 	{
 		return( ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f );
 	}
 
-	static inline sampleType moogSawSample( float _sample )
+	static inline sample_t moogSawSample( const float _sample )
 	{
 		const float ph = fraction( _sample );
 		if( ph < 0.5f )
@@ -166,7 +173,7 @@ public:
 		return( 1.0f - 2.0f * ph );
 	}
 
-	static inline sampleType expSample( float _sample )
+	static inline sample_t expSample( const float _sample )
 	{
 		float ph = fraction( _sample );
 		if( ph > 0.5f )
@@ -176,22 +183,25 @@ public:
 		return( -1.0f + 8.0f * ph * ph );
 	}
 
-	static inline sampleType noiseSample( float )
+	static inline sample_t noiseSample( const float )
 	{
 		return( 1.0f - 2.0f * ( ( float )rand() * ( 1.0f /
 								RAND_MAX ) ) );
 	}
-	static inline sampleType userWaveSample( float _sample,
-		const sampleFrame * _user_wave, Uint32 _user_wave_frames )
+
+	static inline sample_t userWaveSample( const float _sample,
+					const sampleFrame * _user_wave,
+					const f_cnt_t _user_wave_frames )
 	{
 		const float frame = fraction( _sample ) * _user_wave_frames;
-		const Uint32 f1 = static_cast<Uint32>( frame );
-		const Uint32 f2 = ( f1 + 1 ) % _user_wave_frames;
+		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
+		const f_cnt_t f2 = ( f1 + 1 ) % _user_wave_frames;
 		return( linearInterpolate( _user_wave[f1][0],
 						_user_wave[f2][0],
 						fraction( frame ) ) );
 	}
-	inline sampleType userWaveSample( float _sample )
+
+	inline sample_t userWaveSample( const float _sample )
 	{
 		return( userWaveSample( _sample, m_userWaveData,
 							m_userWaveFrames ) );
@@ -203,28 +213,34 @@ protected:
 	float m_volumeFactor;
 	Sint16 m_phaseOffset;
 	oscillator * m_subOsc;
-	Uint32 m_sample;
+	f_cnt_t m_sample;
 	float m_oscCoeff;
 	sampleFrame const * m_userWaveData;
-	Uint32 m_userWaveFrames;
+	f_cnt_t m_userWaveFrames;
 	oscFuncPtr m_callUpdate;
 
 
-	virtual void FASTCALL updateNoSub( sampleFrame * _ab, Uint32 _frames,
-							Uint8 _chnl ) = 0;
-	virtual void FASTCALL updateFM( sampleFrame * _ab, Uint32 _frames,
-							Uint8 _chnl ) = 0;
-	virtual void FASTCALL updateAM( sampleFrame * _ab, Uint32 _frames,
-							Uint8 _chnl ) = 0;
-	virtual void FASTCALL updateMix( sampleFrame * _ab, Uint32 _frames,
-							Uint8 _chnl ) = 0;
-	virtual void FASTCALL updateSync( sampleFrame * _ab, Uint32 _frames,
-							Uint8 _chnl ) = 0;
+	virtual void FASTCALL updateNoSub( sampleFrame * _ab,
+						const fpab_t _frames,
+						const ch_cnt_t _chnl ) = 0;
+	virtual void FASTCALL updateFM( sampleFrame * _ab,
+						const fpab_t _frames,
+						const ch_cnt_t _chnl ) = 0;
+	virtual void FASTCALL updateAM( sampleFrame * _ab,
+						const fpab_t _frames,
+						const ch_cnt_t _chnl ) = 0;
+	virtual void FASTCALL updateMix( sampleFrame * _ab,
+						const fpab_t _frames,
+						const ch_cnt_t _chnl ) = 0;
+	virtual void FASTCALL updateSync( sampleFrame * _ab,
+						const fpab_t _frames,
+						const ch_cnt_t _chnl ) = 0;
 
 	inline void sync( void )
 	{
 		m_sample = 0;
 	}
+
 	void FASTCALL recalcOscCoeff( const float _additional_phase_offset =
 									0.0 );
 

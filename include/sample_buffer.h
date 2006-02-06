@@ -71,15 +71,16 @@ public:
 	// base64-data out of string
 	sampleBuffer( const QString & _audio_file = "",
 						bool _is_base64_data = FALSE );
-	sampleBuffer( const sampleFrame * _data, Uint32 _frames );
-	sampleBuffer( Uint32 _frames );
+	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
+	sampleBuffer( const f_cnt_t _frames );
 	
 	~sampleBuffer();
 
-	bool FASTCALL play( sampleFrame * _ab, Uint32 _start_frame,
-				Uint32 _frames =
+	bool FASTCALL play( sampleFrame * _ab, const f_cnt_t _start_frame,
+				const fpab_t _frames =
 					mixer::inst()->framesPerAudioBuffer(),
-				float _freq = BASE_FREQ, bool _looped = FALSE,
+				const float _freq = BASE_FREQ,
+				const bool _looped = FALSE,
 				void * * _resampling_data = NULL );
 
 	void FASTCALL drawWaves( QPainter & _p, QRect _dr,
@@ -90,17 +91,17 @@ public:
 		return( m_audioFile );
 	}
 
-	inline Uint32 startFrame( void ) const
+	inline f_cnt_t startFrame( void ) const
 	{
 		return( m_startFrame );
 	}
 
-	inline Uint32 endFrame( void ) const
+	inline f_cnt_t endFrame( void ) const
 	{
 		return( m_endFrame );
 	}
 
-	inline Uint32 frames( void ) const
+	inline f_cnt_t frames( void ) const
 	{
 		return( m_frames );
 	}
@@ -128,14 +129,14 @@ public:
 
 
 	static sampleBuffer * FASTCALL resample( sampleFrame * _data,
-							const Uint32 _frames,
-							const Uint32 _src_sr,
-							const Uint32 _dst_sr );
+						const f_cnt_t _frames,
+						const sample_rate_t _src_sr,
+						const sample_rate_t _dst_sr );
 
 	static inline sampleBuffer * FASTCALL resample(
-						sampleBuffer * _buf,
-						const Uint32 _src_sr,
-						const Uint32 _dst_sr )
+						const sampleBuffer * _buf,
+						const sample_rate_t _src_sr,
+						const sample_rate_t _dst_sr )
 	{
 		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
 								_dst_sr ) );
@@ -145,8 +146,8 @@ public:
 public slots:
 	void setAudioFile( const QString & _audio_file );
 	void loadFromBase64( const QString & _data );
-	void setStartFrame( Uint32 _s );
-	void setEndFrame( Uint32 _e );
+	void setStartFrame( const f_cnt_t _s );
+	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
 	void setReversed( bool _on );
 
@@ -155,28 +156,31 @@ private:
 	void FASTCALL update( bool _keep_settings = FALSE );
 
 #ifdef SDL_SDL_SOUND_H
-	Uint32 FASTCALL decodeSampleSDL( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _sample_rate );
+	f_cnt_t FASTCALL decodeSampleSDL( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _sample_rate );
 #endif
 #ifdef HAVE_SNDFILE_H
-	Uint32 FASTCALL decodeSampleSF( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _sample_rate );
+	f_cnt_t FASTCALL decodeSampleSF( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _sample_rate );
 #endif
 #ifdef HAVE_VORBIS_VORBISFILE_H
-	Uint32 FASTCALL decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _sample_rate );
+	f_cnt_t FASTCALL decodeSampleOGGVorbis( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _sample_rate );
 #endif
 
 	QString m_audioFile;
 	sampleFrame * m_origData;
-	Uint32 m_origFrames;
+	f_cnt_t m_origFrames;
 	sampleFrame * m_data;
-	Uint32 m_frames;
-	Uint32 m_startFrame;
-	Uint32 m_endFrame;
+	f_cnt_t m_frames;
+	f_cnt_t m_startFrame;
+	f_cnt_t m_endFrame;
 	float m_amplification;
 	bool m_reversed;
 	QMutex m_dataMutex;

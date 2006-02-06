@@ -46,16 +46,16 @@ public:
 		pluckSynth::freeDelayLine( m_lowerRail );
 	}
 
-	inline sampleType nextStringSample( void )
+	inline sample_t nextStringSample( void )
 	{
 		// Output at pickup position
-		sampleType outsamp = rgDlAccess( m_upperRail, m_pickupLoc );
+		sample_t outsamp = rgDlAccess( m_upperRail, m_pickupLoc );
 		outsamp += lgDlAccess( m_lowerRail, m_pickupLoc );
 
 		// Sample traveling into "bridge"
-		sampleType ym0 = lgDlAccess( m_lowerRail, 1 );
+		sample_t ym0 = lgDlAccess( m_lowerRail, 1 );
 		// Sample to "nut"
-		sampleType ypM = rgDlAccess( m_upperRail,
+		sample_t ypM = rgDlAccess( m_upperRail,
 						m_upperRail->length - 2 );
 
 		// String state update
@@ -72,10 +72,10 @@ public:
 private:
 	struct delayLine
 	{
-		sampleType * data;
+		sample_t * data;
 		int length;
-		sampleType * pointer;
-		sampleType * end;
+		sample_t * pointer;
+		sample_t * end;
 	} ;
 
 	delayLine * m_upperRail;
@@ -100,9 +100,9 @@ private:
 	* wave travels one sample to the left), turning the previous
 	* position into an "effective" x = L position for the next
 	* iteration. */
-	static inline void lgDlUpdate( delayLine * _dl, sampleType _insamp )
+	static inline void lgDlUpdate( delayLine * _dl, sample_t _insamp )
 	{
-		register sampleType * ptr = _dl->pointer;
+		register sample_t * ptr = _dl->pointer;
 		*ptr = _insamp;
 		++ptr;
 		if( ptr > _dl->end )
@@ -118,9 +118,9 @@ private:
 	* "effective" x = 0 position for the next iteration.  The
 	* "bridge-reflected" sample from lower delay-line is then placed
 	* into this position. */
-	static inline void rgDlUpdate( delayLine * _dl, sampleType _insamp )
+	static inline void rgDlUpdate( delayLine * _dl, sample_t _insamp )
 	{
-		register sampleType * ptr = _dl->pointer;    
+		register sample_t * ptr = _dl->pointer;    
 		--ptr;
 		if( ptr < _dl->data )
 		{
@@ -133,9 +133,9 @@ private:
 	/* dlAccess(dl, position);
 	* Returns sample "position" samples into delay-line's past.
 	* Position "0" points to the most recently inserted sample. */
-	static inline sampleType dlAccess( delayLine * _dl, int _position )
+	static inline sample_t dlAccess( delayLine * _dl, int _position )
 	{
-		sampleType * outpos = _dl->pointer + _position;
+		sample_t * outpos = _dl->pointer + _position;
 		while( outpos < _dl->data )
 		{
 			outpos += _dl->length;
@@ -163,7 +163,7 @@ private:
 	* is equal to the current upper delay-line pointer position (x = 0).
 	* In a right-going delay-line, position increases to the right, and
 	* delay increases to the right => left = past and right = future. */
-	static inline sampleType rgDlAccess( delayLine * _dl, int _position )
+	static inline sample_t rgDlAccess( delayLine * _dl, int _position )
 	{
 		return( dlAccess( _dl, _position ) );
 	}
@@ -173,14 +173,14 @@ private:
 	* is equal to the current lower delay-line pointer position (x = 0).
 	* In a left-going delay-line, position increases to the right, and
 	* delay DEcreases to the right => left = future and right = past. */
-	static inline sampleType lgDlAccess( delayLine * _dl, int _position )
+	static inline sample_t lgDlAccess( delayLine * _dl, int _position )
 	{
 		return( dlAccess( _dl, _position ) );
 	}
 
-	static inline sampleType bridgeReflection( sampleType _insamp )
+	static inline sample_t bridgeReflection( sample_t _insamp )
 	{
-		static sampleType state = 0.0f; // filter memory
+		static sample_t state = 0.0f; // filter memory
 		// Implement a one-pole lowpass with feedback coefficient = 0.5
 		return( state = state*0.5f + _insamp*0.5f );
 	}

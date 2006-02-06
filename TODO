@@ -1,5 +1,7 @@
 to be done as soon as possible:
 
+- fix qtimer-problem /channel-activity-LEDs
+- make color-scheme switchable: LMMS / user
 - autosave every 30s (configurable!) and offer recovery at startup after crash
 - make piano-roll use rubberband instead of implementing a simple one on it's own
 - level-meters in output-graph and channel-track

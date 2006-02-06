@@ -1,7 +1,7 @@
 /*
  * types.h - typedefs for common types that are used in the whole app
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,9 +22,9 @@
  *
  */
 
+
 #ifndef _TYPES_H
 #define _TYPES_H
-
 
 typedef unsigned char	Uint8;
 typedef signed char	Sint8;
@@ -42,8 +42,16 @@ typedef Uint8 volume;
 typedef Sint8 panning;
 
 
-typedef float sampleType;
-typedef Sint16 outputSampleType;
+typedef float sample_t;			// standard sample-type
+typedef Sint16 int_sample_t;		// 16-bit-int-sample
 
+
+typedef Uint32 sample_rate_t;		// sample-rate
+typedef Uint16 fpab_t;			// frames per audio-buffer (0-16384)
+typedef Uint32 f_cnt_t;			// standard frame-count
+typedef Uint8 ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
+typedef Uint16 bpm_t;			// tempo (MIN_BPM to MAX_BPM)
+typedef Uint16 bitrate_t;		// bitrate in kbps
+typedef Sint8 fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
 #endif

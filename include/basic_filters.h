@@ -2,9 +2,9 @@
  * basic_filters.h - simple but powerful filter-class with most used filters
  *
  * original file by ??? 
- * modified and enhanced by Tobias Doerffel, 2004
+ * modified and enhanced by Tobias Doerffel
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,9 +39,9 @@
 #include "mixer.h"
 #include "templates.h"
 
-const int MOOG_VOLTAGE = 40000;
+//const int MOOG_VOLTAGE = 40000;
 
-template<Uint8 CHANNELS = DEFAULT_CHANNELS>
+template<ch_cnt_t CHANNELS = DEFAULT_CHANNELS>
 class basicFilters
 {
 public:
@@ -70,17 +70,17 @@ public:
 							SIMPLE_FLT_CNT ) );
 	}
 
-	inline basicFilters( const float _sampleRate ) :
+	inline basicFilters( const sample_rate_t _sample_rate ) :
 		m_b0a0( 0.0f ),
 		m_b1a0( 0.0f ),
 		m_b2a0( 0.0f ),
 		m_a1a0( 0.0f ),
 		m_a2a0( 0.0f ),
-		m_sampleRate( _sampleRate ),
+		m_sampleRate( 1.0f / _sample_rate ),
 		m_subFilter( NULL )
 	{
 		// reset in/out history
-		for( Uint8 _chnl = 0; _chnl < CHANNELS; ++_chnl )
+		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )
 		{
 			// reset in/out history for simple filters
 			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
@@ -97,15 +97,15 @@ public:
 		delete m_subFilter;
 	}
 
-	inline sampleType update( sampleType _in0, Uint8 _chnl )
+	inline sample_t update( sample_t _in0, ch_cnt_t _chnl )
 	{
-		sampleType out;
+		sample_t out;
 		switch( m_type )
 		{
 			case MOOG:
 			case DOUBLE_MOOG:
 			{
-				sampleType x = _in0 - m_r*m_y4[_chnl];
+				sample_t x = _in0 - m_r*m_y4[_chnl];
 
 				// four cascaded onepole filters
 				// (bilinear transform)
@@ -207,10 +207,12 @@ public:
 				m_ou1[_chnl] = out;
 				break;
 		}
+
 		if( m_subFilter != NULL )
 		{
 			return( m_subFilter->update( out, _chnl ) );
 		}
+
 		// Clipper band limited sigmoid
 		return( out );
 	}
@@ -233,7 +235,7 @@ public:
 				{
 					m_subFilter =
 						new basicFilters<CHANNELS>(
-								m_sampleRate );
+			static_cast<sample_rate_t>( 1.0f / m_sampleRate ) );
 				}
 				m_subFilter->calcFilterCoeffs( MOOG, _freq,
 									_q );
@@ -242,7 +244,7 @@ public:
 			case MOOG:
 			{
 				// [ 0 - 1 ]
-				const float f = 2 * _freq / m_sampleRate;
+				const float f = 2 * _freq * m_sampleRate;
 				// (Empirical tunning)
 				m_k = 3.6f*f - 1.6f*f*f - 1;
 				m_p = (m_k+1)*0.5f;
@@ -256,7 +258,7 @@ public:
 				{
 					m_subFilter =
 						new basicFilters<CHANNELS>(
-								m_sampleRate );
+							1.0f / m_sampleRate );
 				}
 				m_subFilter->calcFilterCoeffs( MOOG2, _freq,
 									_q );
@@ -264,8 +266,8 @@ public:
 
 			case MOOG2:
 			{
-				const float kfc = 2 * _freq / m_sampleRate;
-				const float kf = _freq / m_sampleRate;
+				const float kfc = 2 * _freq * m_sampleRate;
+				const float kf = _freq * m_sampleRate;
 				const float kfcr = 1.8730 * ( kfc*kfc*kfc ) +
 							0.4955 * ( kfc*kfc ) +
 							0.6490 * kfc + 0.9988;
@@ -280,7 +282,7 @@ public:
 			default:
 			{
 				// other filters
-				const float omega	= 2.0f * M_PI * _freq /
+				const float omega	= 2.0f * M_PI * _freq *
 								m_sampleRate;
 				const float tsin	= sinf( omega );
 				const float tcos	= cosf( omega );
@@ -290,14 +292,14 @@ public:
 				//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
 				//					tsin);
 				//else
-				const float alpha = tsin / ( 2.0f * _q );
+				const float alpha = 0.5f * tsin / _q;
 
-				const float a0 = 1.0f / ( 1.0f+alpha );
+				const float a0 = 1.0f / ( 1.0f + alpha );
    
 				if( m_type == LOWPASS ||
 						m_type == DOUBLE_LOWPASS )
 				{
-					m_b0a0 = ((1.0f-tcos)/2.0f)*a0;
+					m_b0a0 = ((1.0f-tcos)*0.5f)*a0;
 					m_b1a0 = (1.0f-tcos)*a0;
 					m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
 					m_a1a0 = (-2.0f*tcos)*a0;
@@ -306,26 +308,25 @@ public:
 						if( m_subFilter == NULL )
 						{
 							m_subFilter =
-				new basicFilters<CHANNELS>( m_sampleRate );
+		new basicFilters<CHANNELS>( static_cast<sample_rate_t>(
+							1.0f / m_sampleRate ) );
 						}
 						m_subFilter->calcFilterCoeffs(
-									LOWPASS,
-									_freq,
-									_q );
+							LOWPASS, _freq, _q );
 					}
 				}
 				else if( m_type == HIPASS )
 				{
-					m_b0a0 = ((1.0f+tcos)/2.0f)*a0;
+					m_b0a0 = ((1.0f+tcos)*0.5f)*a0;
 					m_b1a0 = (-1.0f-tcos)*a0;
 					m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
 					m_a1a0 = (-2.0f*tcos)*a0;
 				}
 				else if( m_type == BANDPASS_CSG )
 				{
-					m_b0a0 = (tsin/2.0f)*a0;
+					m_b0a0 = tsin*0.5f*a0;
 					m_b1a0 = 0.0f;
-					m_b2a0 = (-tsin/2.0f)*a0;
+					m_b2a0 = -tsin*0.5f*a0;
 					m_a1a0 = (-2.0f*tcos)*a0;
 				}
 				else if( m_type == BANDPASS_CZPG )
@@ -364,7 +365,7 @@ private:
 	// coeffs for moog-filter
 	float m_r, m_p, m_k;
 
-	typedef sampleType frame[CHANNELS];
+	typedef sample_t frame[CHANNELS];
 
 	// in/out history
 	frame m_ou1, m_ou2, m_in1, m_in2;

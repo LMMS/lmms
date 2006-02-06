@@ -1,7 +1,7 @@
 /*
  * audio_oss.h - device-class that implements OSS-PCM-output
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,8 +47,8 @@ class QLineEdit;
 class audioOSS : public audioDevice, public QThread
 {
 public:
-	audioOSS( Uint32 _sample_rate, bool & _success_ful );
-	~audioOSS();
+	audioOSS( const sample_rate_t _sample_rate, bool & _success_ful );
+	virtual ~audioOSS();
 
 	inline static QString name( void )
 	{

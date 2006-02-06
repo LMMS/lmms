@@ -3,7 +3,7 @@
  *                             surround-audio-buffers into RAM, maybe later
  *                             also harddisk
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,8 @@
 
 
 
-audioSampleRecorder::audioSampleRecorder( Uint32 _sample_rate, Uint32 _channels,
+audioSampleRecorder::audioSampleRecorder( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels,
 							bool & _success_ful ) :
 	audioDevice( _sample_rate, _channels ),
 	m_buffers()
@@ -59,10 +60,10 @@ audioSampleRecorder::~audioSampleRecorder()
 Uint32 audioSampleRecorder::framesRecorded( void ) const
 {
 	Uint32 frames = 0;
-	for( bufferVector::const_iterator it = m_buffers.begin();
+	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
 	{
-		frames += it->second;
+		frames += ( *it ).second;
 	}
 	return( frames );
 }
@@ -73,7 +74,7 @@ Uint32 audioSampleRecorder::framesRecorded( void ) const
 void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 									const
 {
-	Uint32 frames = framesRecorded();
+	f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
 	sampleFrame * data = bufferAllocator::alloc<sampleFrame>( frames );
 	// make sure buffer is cleaned up properly at the end...
@@ -83,11 +84,12 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 	assert( data != NULL );
 #endif
 	// now copy all buffers into big buffer
-	for( bufferVector::const_iterator it = m_buffers.begin();
+	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
 	{
-		memcpy( data, it->first, it->second * sizeof( sampleFrame ) );
-		data += it->second;
+		memcpy( data, ( *it ).first, ( *it ).second *
+							sizeof( sampleFrame ) );
+		data += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
 	*_sample_buf = new sampleBuffer( ac.ptr(), frames );
@@ -96,13 +98,13 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 
 
 
-void audioSampleRecorder::writeBuffer( surroundSampleFrame * _ab,
-							Uint32 _frames, float )
+void audioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
+					const fpab_t _frames, const float )
 {
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );
-	for( Uint32 frame = 0; frame < _frames; ++frame )
+	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
-		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			buf[frame][chnl] = _ab[frame][chnl];
 		}

@@ -1,7 +1,7 @@
 /*
  * audio_sdl.h - device-class that performs PCM-output via SDL
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,8 +51,8 @@ class QLineEdit;
 class audioSDL : public audioDevice
 {
 public:
-	audioSDL( Uint32 _sample_rate, bool & _success_ful );
-	~audioSDL();
+	audioSDL( const sample_rate_t _sample_rate, bool & _success_ful );
+	virtual ~audioSDL();
 
 	inline static QString name( void )
 	{

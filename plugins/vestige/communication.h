@@ -1,3 +1,29 @@
+/*
+ * communication.h - header file defining stuff concerning communication between
+ *                   LVSL-server and -client
+ *
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ */
+
+
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
@@ -79,6 +105,18 @@ struct vstParamProperties
 } ;
 
 
+enum hostLanguages
+{
+	LVSL_LANG_ENGLISH = 1,
+	LVSL_LANG_GERMAN,
+	LVSL_LANG_FRENCH,
+	LVSL_LANG_ITALIAN,
+	LVSL_LANG_SPANISH,
+	LVSL_LANG_JAPANESE
+} ;
+
+
+
 enum vstRemoteCommands
 {
 	// client -> server
@@ -90,6 +128,7 @@ enum vstRemoteCommands
 	VST_SAMPLE_RATE,
 	VST_BUFFER_SIZE,
 	VST_BPM,
+	VST_LANGUAGE,
 	VST_GET_PARAMETER_COUNT = 20,
 	VST_GET_PARAMETER_DUMP,
 	VST_SET_PARAMETER_DUMP,
@@ -103,6 +142,7 @@ enum vstRemoteCommands
 	VST_INPUT_COUNT,
 	VST_OUTPUT_COUNT,
 	VST_PLUGIN_XID,
+	VST_PLUGIN_EDITOR_GEOMETRY,
 	VST_PROCESS_DONE,
 	VST_PLUGIN_NAME,
 	VST_PLUGIN_VERSION,

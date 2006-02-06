@@ -64,7 +64,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	setFixedSize( s_background.width(), s_background.height() );
 
 
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
 	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
 
 	mixer::inst()->clearAudioBuffer( m_buffer, frames );
@@ -78,9 +78,9 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	}
 
 	connect( mixer::inst(), SIGNAL( nextAudioBuffer(
-				const surroundSampleFrame *, Uint32 ) ),
+				const surroundSampleFrame *, const fpab_t ) ),
 		this, SLOT( setAudioBuffer(
-				const surroundSampleFrame *, Uint32 ) ) );
+				const surroundSampleFrame *, const fpab_t ) ) );
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
 							"master-output" ) );
@@ -97,7 +97,7 @@ visualizationWidget::~visualizationWidget()
 
 
 void visualizationWidget::setAudioBuffer( const surroundSampleFrame * _ab,
-								Uint32 _frames )
+							const fpab_t _frames )
 {
 	if( m_enabled == TRUE )
 	{
@@ -136,12 +136,12 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 		float max_level = 0.0;
 
-		const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+		const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
 
 		// analyse wave-stream for max-level
-		for( Uint32 frame = 0; frame < frames; ++frame )
+		for( fpab_t frame = 0; frame < frames; ++frame )
 		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
 			{
 				if( tAbs<float>( m_buffer[frame][chnl] ) >
 								max_level )
@@ -166,7 +166,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		}
 
 		// now draw all that stuff
-		for( Uint32 frame = 0; frame < frames; ++frame )
+		for( fpab_t frame = 0; frame < frames; ++frame )
 		{
 			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{

@@ -35,6 +35,8 @@
 #else
 
 #include <qapplication.h>
+#include <qlocale.h>
+
 #include "qxembed.h"
 
 #define QX11EmbedWidget QXEmbed
@@ -80,11 +82,12 @@
 
 
 
+
 remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 	m_failed( TRUE ),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
-	m_pluginWID( 0 ),
+	m_pluginXID( 0 ),
 	m_pluginPID( -1 ),
 	m_serverInFD( -1 ),
 	m_serverOutFD( -1 ),
@@ -132,6 +135,20 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 	m_serverOutFD = m_pipes[0][1];
 
 	lock();
+
+	writeValueS<Sint16>( VST_LANGUAGE );
+	hostLanguages hlang = LVSL_LANG_ENGLISH;
+	switch( QLocale::system().language() )
+	{
+		case QLocale::German: hlang = LVSL_LANG_GERMAN; break;
+		case QLocale::French: hlang = LVSL_LANG_FRENCH; break;
+		case QLocale::Italian: hlang = LVSL_LANG_ITALIAN; break;
+		case QLocale::Spanish: hlang = LVSL_LANG_SPANISH; break;
+		case QLocale::Japanese: hlang = LVSL_LANG_JAPANESE; break;
+		default: break;
+	}
+	writeValueS<hostLanguages>( hlang );
+	
 	writeValueS<Sint16>( VST_LOAD_PLUGIN );
 	writeStringS( m_plugin.
 #ifdef QT4
@@ -210,8 +227,6 @@ remoteVSTPlugin::~remoteVSTPlugin()
 
 
 
-#include <X11/Xlib.h>
-
 
 void remoteVSTPlugin::showEditor( void )
 {
@@ -220,29 +235,21 @@ void remoteVSTPlugin::showEditor( void )
 		m_pluginWidget->show();
 		return;
 	}
-	if( m_pluginWID == 0 )
+
+	if( m_pluginXID == 0 )
 	{
 		return;
 	}
 
-	XWindowAttributes attr;
-	XGetWindowAttributes(
-#ifdef QT4
-				QX11Info::display(),
-#else
-				qt_xdisplay(),
-#endif
-							m_pluginWID, &attr );
-
 	m_pluginWidget = new QWidget( lmmsMainWin::inst()->workspace() );
-	m_pluginWidget->setFixedSize( attr.width, attr.height );
+	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
+	m_pluginWidget->show();
 
 	QX11EmbedWidget * xe = new QX11EmbedWidget( m_pluginWidget );
-	xe->embedInto( m_pluginWID );
-	xe->setFixedSize( attr.width, attr.height );
+	xe->embedInto( m_pluginXID );
+	xe->setFixedSize( m_pluginGeometry );
 	//xe->setAutoDelete( FALSE );
-	m_pluginWidget->show();
 	xe->show();
 
 	lock();
@@ -267,14 +274,14 @@ void remoteVSTPlugin::hideEditor( void )
 void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 							sampleFrame * _out_buf )
 {
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
 
 	if( m_shm == NULL )
 	{
 		// m_shm being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
-		// information like SHM-key etc.) until we process
-		// messages in later stage of this procedure
+		// information like SHM-key etc.) until we process messages
+		// in a later stage of this procedure
 		if( m_shmSize == 0 && messagesLeft() == TRUE )
 		{
 			(void) processNextMessage();
@@ -285,15 +292,15 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 
 	memset( m_shm, 0, m_shmSize );
 
-	Uint8 inputs = tMax<Uint8>( m_inputCount, DEFAULT_CHANNELS );
+	ch_cnt_t inputs = tMax<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
 	if( _in_buf != NULL && inputs > 0 )
 	{
-		for( Uint8 ch = 0; ch < inputs; ++ch )
+		for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 		{
-			for( Uint32 frame = 0; frame < frames; ++frame )
+			for( fpab_t frame = 0; frame < frames; ++frame )
 			{
-				m_shm[ch*frames+frame] = _in_buf[frame][ch];
+				m_shm[ch * frames + frame] = _in_buf[frame][ch];
 			}
 		}
 	}
@@ -307,19 +314,21 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 		// wait until server signals that process()ing is done
 		while( processNextMessage() != VST_PROCESS_DONE )
 		{
-			// allow better scheduling (we're just waiting)
+			// hopefully scheduler gives process-time to plugin...
 			usleep( 10 );
 		}
 
-		Uint8 outputs = tMax<Uint8>( m_outputCount, DEFAULT_CHANNELS );
+		ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
+							DEFAULT_CHANNELS );
 		if( outputs != DEFAULT_CHANNELS )
 		{
-			// clear buffer, if plugin doesn't fill up both channels
+			// clear buffer, if plugin didn't fill up both channels
 			mixer::inst()->clearAudioBuffer( _out_buf, frames );
 		}
-		for( Uint8 ch = 0; ch < outputs; ++ch )
+
+		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
 		{
-			for( Uint32 frame = 0; frame < frames; ++frame )
+			for( fpab_t frame = 0; frame < frames; ++frame )
 			{
 				_out_buf[frame][ch] = m_shm[(m_inputCount+ch)*
 								frames+frame];
@@ -376,7 +385,7 @@ void remoteVSTPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 	for( QMap<QString, QString>::const_iterator it = _pdump.begin();
 						it != _pdump.end(); ++it )
 	{
-		vstParameterDumpItem dump_item =
+		const vstParameterDumpItem dump_item =
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
@@ -397,6 +406,7 @@ void remoteVSTPlugin::setShmKeyAndSize( Uint16 _key, size_t _size )
 		m_shm = NULL;
 		m_shmSize = 0;
 	}
+
 	// only called for detaching SHM?
 	if( _size == 0 )
 	{
@@ -413,14 +423,6 @@ void remoteVSTPlugin::setShmKeyAndSize( Uint16 _key, size_t _size )
 		m_shm = (float *) shmat( shm_id, 0, 0 );
 		// TODO: error-checking
 	}
-}
-
-
-
-
-void remoteVSTPlugin::setPluginXID( const Sint32 _plugin_xid )
-{
-	m_pluginWID = _plugin_xid;
 }
 
 
@@ -462,13 +464,14 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 		case VST_GET_SAMPLE_RATE:
 			writeValueS<Sint16>( VST_SAMPLE_RATE );
 			// handle is the same
-			writeValueS<Sint32>( mixer::inst()->sampleRate() );
+			writeValueS<sample_rate_t>(
+						mixer::inst()->sampleRate() );
 			break;
 
 		case VST_GET_BUFFER_SIZE:
 			writeValueS<Sint16>( VST_BUFFER_SIZE );
 			// handle is the same
-			writeValueS<Uint32>(
+			writeValueS<fpab_t>(
 					mixer::inst()->framesPerAudioBuffer() );
 			break;
 
@@ -481,16 +484,35 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 		}
 
 		case VST_INPUT_COUNT:
-			m_inputCount = readValueS<Uint8>();
+			m_inputCount = readValueS<ch_cnt_t>();
 			break;
 
 		case VST_OUTPUT_COUNT:
-			m_outputCount = readValueS<Uint8>();
+			m_outputCount = readValueS<ch_cnt_t>();
 			break;
 
 		case VST_PLUGIN_XID:
-			setPluginXID( readValueS<Sint32>() );
+			m_pluginXID = readValueS<Sint32>();
 			break;
+
+		case VST_PLUGIN_EDITOR_GEOMETRY:
+		{
+			const Sint16 w = readValueS<Sint16>();
+			const Sint16 h = readValueS<Sint16>();
+			m_pluginGeometry = QSize( w, h );
+			if( m_pluginWidget != NULL )
+			{
+				m_pluginWidget->setFixedSize(
+							m_pluginGeometry );
+				if( m_pluginWidget->childAt( 0, 0 ) != NULL )
+				{
+					m_pluginWidget->childAt( 0, 0
+						)->setFixedSize(
+							m_pluginGeometry );
+				}
+			}
+			break;
+		}
 
 		case VST_PLUGIN_NAME:
 			m_name = readStringS().c_str();

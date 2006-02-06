@@ -63,7 +63,8 @@ class audioPort;
 class audioDevice
 {
 public:
-	audioDevice( Uint32 _sample_rate, Uint8 _channels );
+	audioDevice( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels );
 	virtual ~audioDevice();
 
 	inline void lock( void )
@@ -86,12 +87,12 @@ public:
 	virtual void renamePort( audioPort * _port );
 
 
-	inline Uint32 sampleRate( void ) const
+	inline sample_rate_t sampleRate( void ) const
 	{
 		return( m_sampleRate );
 	}
 
-	Uint8 channels( void ) const
+	ch_cnt_t channels( void ) const
 	{
 		return( m_channels );
 	}
@@ -127,43 +128,45 @@ public:
 
 
 protected:
-	// subclasses can overload this for being used in conjunction with
+	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
-						Uint32 _frames,
-						float _master_gain )
+	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+						const fpab_t _frames,
+						const float _master_gain )
 	{
 	}
 
 	// called by according driver for fetching new sound-data
-	Uint32 FASTCALL getNextBuffer( surroundSampleFrame * _ab );
+	fpab_t FASTCALL getNextBuffer( surroundSampleFrame * _ab );
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int FASTCALL convertToS16( surroundSampleFrame * _ab, Uint32 _frames,
-					float _master_gain,
-					outputSampleType * _output_buffer,
-					bool _convert_endian = FALSE );
+	Uint32 FASTCALL convertToS16( const surroundSampleFrame * _ab,
+					const fpab_t _frames,
+					const float _master_gain,
+					int_sample_t * _output_buffer,
+					const bool _convert_endian = FALSE );
 
 	// clear given signed-int-16-buffer
-	void FASTCALL clearS16Buffer( outputSampleType * _outbuf,
-					Uint32 _frames );
+	void FASTCALL clearS16Buffer( int_sample_t * _outbuf,
+							const fpab_t _frames );
 
-	// resample given buffer from samplerate _src_src to samplerate _dst_src
+	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
 	void FASTCALL resample( const surroundSampleFrame * _src,
-					Uint32 _frames,
+					const fpab_t _frames,
 					surroundSampleFrame * _dst,
-					Uint32 _src_sr, Uint32 _dst_sr );
+					const sample_rate_t _src_sr,
+					const sample_rate_t _dst_sr );
 
-	inline void setSampleRate( Uint32 _new_sr )
+	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
 	}
 
 
 private:
-	Uint32 m_sampleRate;
-	Uint8 m_channels;
+	sample_rate_t m_sampleRate;
+	ch_cnt_t m_channels;
 	QMutex m_devMutex;
 
 #ifdef HAVE_SAMPLERATE_H

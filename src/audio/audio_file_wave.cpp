@@ -2,7 +2,7 @@
  * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,10 +32,13 @@
 #include <cstring>
 
 
-audioFileWave::audioFileWave( Uint32 _sample_rate, Uint32 _channels,
-				bool & _success_ful, const QString & _file,
-				bool _use_vbr, Uint16 _nom_bitrate,
-				Uint16 _min_bitrate, Uint16 _max_bitrate ) :
+audioFileWave::audioFileWave( const sample_rate_t _sample_rate,
+				const ch_cnt_t _channels, bool & _success_ful,
+				const QString & _file,
+				const bool _use_vbr,
+				const bitrate_t _nom_bitrate,
+				const bitrate_t _min_bitrate,
+				const bitrate_t _max_bitrate ) :
 	audioFileDevice( _sample_rate, _channels, _file, _use_vbr,
 				_nom_bitrate, _min_bitrate, _max_bitrate )
 {
@@ -67,14 +70,13 @@ bool audioFileWave::startEncoding( void )
 	memcpy( m_waveFileHeader.wave_fmt_str, "WAVEfmt ", 8 );
 	m_waveFileHeader.bitrate_1 =
 		m_waveFileHeader.bitrate_2 =
-			swap16IfBE( BYTES_PER_OUTPUT_SAMPLE * 8 );
+			swap16IfBE( BYTES_PER_INT_SAMPLE * 8 );
 	m_waveFileHeader.uncompressed = swap16IfBE( 1 );
 	m_waveFileHeader.channels = swap16IfBE( channels() );
 	m_waveFileHeader.sample_rate = swap32IfBE( sampleRate() );
 	m_waveFileHeader.bytes_per_second = swap32IfBE( sampleRate() *
-						BYTES_PER_OUTPUT_SAMPLE *
-								channels() );
-	m_waveFileHeader.block_alignment = swap16IfBE( BYTES_PER_OUTPUT_SAMPLE *
+					BYTES_PER_INT_SAMPLE * channels() );
+	m_waveFileHeader.block_alignment = swap16IfBE( BYTES_PER_INT_SAMPLE *
 								channels() );
 	memcpy ( m_waveFileHeader.data_chunk_id, "data", 4 );
 	m_waveFileHeader.data_bytes = swap32IfBE( 0 );
@@ -87,13 +89,13 @@ bool audioFileWave::startEncoding( void )
 
 
 
-void FASTCALL audioFileWave::writeBuffer( surroundSampleFrame * _ab,
-							Uint32 _frames,
-							float _master_gain )
+void FASTCALL audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
+						const fpab_t _frames,
+						const float _master_gain )
 {
-	outputSampleType * outbuf = bufferAllocator::alloc<outputSampleType>(
+	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
 							_frames * channels() );
-	int bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
+	Uint32 bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
 							!isLittleEndian() );
 	writeData( outbuf, bytes );
 

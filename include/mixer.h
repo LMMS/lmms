@@ -61,26 +61,31 @@ class plugin;
 class audioPort;
 
 
-const int DEFAULT_BUFFER_SIZE = 512;
+const fpab_t DEFAULT_BUFFER_SIZE = 512;
 
-const Uint8  DEFAULT_CHANNELS = 2;
+const ch_cnt_t DEFAULT_CHANNELS = 2;
 
-const Uint8  SURROUND_CHANNELS =
+const ch_cnt_t SURROUND_CHANNELS =
 #ifndef DISABLE_SURROUND
 				4;
 #else
 				2;
 #endif
 
-const Uint8  QUALITY_LEVELS = 2;
-const Uint32 DEFAULT_QUALITY_LEVEL = 0;
-const Uint32 HIGH_QUALITY_LEVEL = DEFAULT_QUALITY_LEVEL+1;
-extern Uint32 SAMPLE_RATES[QUALITY_LEVELS];
-const Uint32 DEFAULT_SAMPLE_RATE = 44100;
+
+enum qualityLevels
+{
+	DEFAULT_QUALITY_LEVEL,
+	HIGH_QUALITY_LEVEL,
+	QUALITY_LEVELS
+} ;
+
+extern sample_rate_t SAMPLE_RATES[QUALITY_LEVELS];
+const sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
 
 
-typedef sampleType sampleFrame[DEFAULT_CHANNELS];
-typedef sampleType surroundSampleFrame[SURROUND_CHANNELS];
+typedef sample_t sampleFrame[DEFAULT_CHANNELS];
+typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 
 typedef struct
 {
@@ -88,10 +93,10 @@ typedef struct
 } volumeVector;
 
 
-const Uint32 BYTES_PER_SAMPLE = sizeof( sampleType );
-const Uint32 BYTES_PER_FRAME = sizeof( sampleFrame );
-const Uint32 BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
-const Uint32 BYTES_PER_OUTPUT_SAMPLE = sizeof( outputSampleType );
+const Uint8 BYTES_PER_SAMPLE = sizeof( sample_t );
+const Uint8 BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
+const Uint8 BYTES_PER_FRAME = sizeof( sampleFrame );
+const Uint8 BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
@@ -116,11 +121,13 @@ public:
 	}
 
 
-	void FASTCALL bufferToPort( sampleFrame * _buf, Uint32 _frames,
-						Uint32 _framesAhead,
-						volumeVector & _volumeVector,
-						audioPort * _port );
-	inline Uint32 framesPerAudioBuffer( void ) const
+	void FASTCALL bufferToPort( const sampleFrame * _buf,
+					const fpab_t _frames,
+					const fpab_t _framesAhead,
+					const volumeVector & _volumeVector,
+							audioPort * _port );
+
+	inline fpab_t framesPerAudioBuffer( void ) const
 	{
 		return( m_framesPerAudioBuffer );
 	}
@@ -205,7 +212,7 @@ public:
 
 
 
-	inline Uint32 sampleRate( void )
+	inline sample_rate_t sampleRate( void )
 	{
 		return( SAMPLE_RATES[m_qualityLevel] );
 	}
@@ -222,7 +229,7 @@ public:
 	}
 
 
-	static inline sampleType clip( sampleType _s )
+	static inline sample_t clip( const sample_t _s )
 	{
 		if( _s > 1.0f )
 		{
@@ -238,22 +245,31 @@ public:
 
 	void pause( void )
 	{
-		m_mixMutex.lock();
+		if( m_mixMutexLockLevel == 0 )
+		{
+			m_mixMutex.lock();
+		}
+		++m_mixMutexLockLevel;
 	}
 
 	void play( void )
 	{
-		m_mixMutex.unlock();
+		if( m_mixMutexLockLevel == 1 )
+		{
+			m_mixMutex.unlock();
+		}
+		--m_mixMutexLockLevel;
 	}
 
 
-	void FASTCALL clear( bool _everything = FALSE );
+	void FASTCALL clear( const bool _everything = FALSE );
 
 
-	void FASTCALL clearAudioBuffer( sampleFrame * _ab, Uint32 _frames );
+	void FASTCALL clearAudioBuffer( sampleFrame * _ab,
+							const f_cnt_t _frames );
 #ifndef DISABLE_SURROUND
 	void FASTCALL clearAudioBuffer( surroundSampleFrame * _ab,
-							Uint32 _frames );
+							const f_cnt_t _frames );
 #endif
 
 	inline bool haveNoRunningNotes( void ) const
@@ -264,13 +280,15 @@ public:
 
 	const surroundSampleFrame * renderNextBuffer( void );
 
+
 public slots:
 	void setHighQuality( bool _hq_on = FALSE );
 
 
 signals:
 	void sampleRateChanged( void );
-	void nextAudioBuffer( const surroundSampleFrame *, Uint32 _frames );
+	void nextAudioBuffer( const surroundSampleFrame *,
+						const fpab_t _frames );
 
 
 private:
@@ -293,13 +311,14 @@ private:
 	audioDevice * tryAudioDevices( void );
 	midiClient * tryMIDIClients( void );
 
-	void processBuffer( surroundSampleFrame * _buf, fxChnl _fx_chnl );
+	void processBuffer( const surroundSampleFrame * _buf,
+						const fx_ch_t _fx_chnl );
 
 
 
 	vvector<audioPort *> m_audioPorts;
 
-	Uint32 m_framesPerAudioBuffer;
+	fpab_t m_framesPerAudioBuffer;
 
 	surroundSampleFrame * m_curBuf;
 	surroundSampleFrame * m_nextBuf;
@@ -309,7 +328,7 @@ private:
 	playHandleVector m_playHandles;
 	playHandleVector m_playHandlesToRemove;
 
-	Uint8 m_qualityLevel;
+	qualityLevels m_qualityLevel;
 	float m_masterGain;
 
 
@@ -323,6 +342,7 @@ private:
 
 
 	QMutex m_mixMutex;
+	Uint8 m_mixMutexLockLevel;
 
 
 	friend class lmmsMainWin;

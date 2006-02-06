@@ -1,7 +1,7 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -54,7 +54,7 @@
 
 
 
-Uint32 SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
+sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
 
 mixer * mixer::s_instanceOfMe = NULL;
@@ -69,7 +69,9 @@ mixer::mixer() :
 	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
-	m_oldAudioDev( NULL )
+	m_oldAudioDev( NULL ),
+	m_mixMutex(),
+	m_mixMutexLockLevel( 0 )
 {
 	// small hack because code calling mixer::inst() is called out of ctor
 	s_instanceOfMe = this;
@@ -252,7 +254,8 @@ void mixer::clear( bool _everything )
 
 
 
-void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
+void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
+							const f_cnt_t _frames )
 {
 	memset( _ab, 0, sizeof( *_ab ) * _frames );
 }
@@ -261,7 +264,7 @@ void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab, Uint32 _frames )
 
 #ifndef DISABLE_SURROUND
 void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
-								Uint32 _frames )
+							const f_cnt_t _frames )
 {
 	memset( _ab, 0, sizeof( *_ab ) * _frames );
 }
@@ -269,18 +272,19 @@ void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 
 
 
-void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
-						Uint32 _frames_ahead,
-						volumeVector & _volume_vector,
+void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
+					const fpab_t _frames,
+					const fpab_t _frames_ahead,
+					const volumeVector & _volume_vector,
 						audioPort * _port )
 {
-	const Uint32 start_frame = _frames_ahead % m_framesPerAudioBuffer;
-	Uint32 end_frame = start_frame + _frames;
-	const Uint32 loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
+	const fpab_t start_frame = _frames_ahead % m_framesPerAudioBuffer;
+	fpab_t end_frame = start_frame + _frames;
+	const fpab_t loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
 
-	for( Uint32 frame = start_frame; frame < loop1_frame; ++frame )
+	for( fpab_t frame = start_frame; frame < loop1_frame; ++frame )
 	{
-		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
 		{
 			_port->firstBuffer()[frame][chnl] +=
 					_buf[frame - start_frame][chnl %
@@ -291,12 +295,13 @@ void FASTCALL mixer::bufferToPort( sampleFrame * _buf, Uint32 _frames,
 
 	if( end_frame > m_framesPerAudioBuffer )
 	{
-		Uint32 frames_done = m_framesPerAudioBuffer - start_frame;
+		fpab_t frames_done = m_framesPerAudioBuffer - start_frame;
 		end_frame = tMin( end_frame -= m_framesPerAudioBuffer,
 						m_framesPerAudioBuffer );
-		for( Uint32 frame = 0; frame < end_frame; ++frame )
+		for( fpab_t frame = 0; frame < end_frame; ++frame )
 		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
+									++chnl )
 			{
 				_port->secondBuffer()[frame][chnl] +=
 					_buf[frames_done + frame][chnl %
@@ -361,7 +366,7 @@ void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 		m_audioDev = _dev;
 	}
 
-	m_qualityLevel = _hq ? 1 : 0;
+	m_qualityLevel = _hq ? HIGH_QUALITY_LEVEL : DEFAULT_QUALITY_LEVEL;
 	emit sampleRateChanged();
 }
 
@@ -375,11 +380,13 @@ void mixer::restoreAudioDevice( void )
 		delete m_audioDev;	// dtor automatically calls
 					// stopProcessing()
 		m_audioDev = m_oldAudioDev;
-		for( Uint8 qli = 0; qli < QUALITY_LEVELS; ++qli )
+		for( Uint8 qli = DEFAULT_QUALITY_LEVEL;
+						qli < QUALITY_LEVELS; ++qli )
 		{
 			if( SAMPLE_RATES[qli] == m_audioDev->sampleRate() )
 			{
-				m_qualityLevel = qli;
+				m_qualityLevel =
+					static_cast<qualityLevels>( qli );
 				emit sampleRateChanged();
 				break;
 			}
@@ -544,12 +551,13 @@ midiClient * mixer::tryMIDIClients( void )
 
 
 
-void mixer::processBuffer( surroundSampleFrame * _buf, fxChnl/* _fx_chnl */ )
+void mixer::processBuffer( const surroundSampleFrame * _buf,
+						fx_ch_t/* _fx_chnl */ )
 {
 	// TODO: effect-implementation
-	for( Uint32 frame = 0; frame < m_framesPerAudioBuffer; ++frame )
+	for( fpab_t frame = 0; frame < m_framesPerAudioBuffer; ++frame )
 	{
-		for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
 		{
 			m_curBuf[frame][chnl] += _buf[frame][chnl];
 		}

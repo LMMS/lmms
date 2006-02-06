@@ -1,7 +1,7 @@
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,7 +36,8 @@
 
 
 
-audioDevice::audioDevice( Uint32 _sample_rate, Uint8 _channels ) :
+audioDevice::audioDevice( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels ) :
 	m_sampleRate( _sample_rate ),
 	m_channels( _channels ),
 	m_buffer( bufferAllocator::alloc<surroundSampleFrame>(
@@ -75,16 +76,16 @@ audioDevice::~audioDevice()
 
 void audioDevice::processNextBuffer( void )
 {
-	const Uint32 frames = getNextBuffer( m_buffer );
+	const fpab_t frames = getNextBuffer( m_buffer );
 	writeBuffer( m_buffer, frames, mixer::inst()->masterGain() );
 }
 
 
 
 
-Uint32 audioDevice::getNextBuffer( surroundSampleFrame * _ab )
+fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 {
-	Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	fpab_t frames = mixer::inst()->framesPerAudioBuffer();
 	const surroundSampleFrame * b = mixer::inst()->renderNextBuffer();
 
 	// make sure, no other thread is accessing device
@@ -165,9 +166,10 @@ const float LP_FILTER_COEFFS[LP_FILTER_TAPS] =
 
 
 void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
-						Uint32 _frames,
+						const fpab_t _frames,
 						surroundSampleFrame * _dst,
-						Uint32 _src_sr, Uint32 _dst_sr )
+						const sample_rate_t _src_sr,
+						const sample_rate_t _dst_sr )
 {
 #ifdef HAVE_SAMPLERATE_H
 	if( m_srcState == NULL )
@@ -247,18 +249,20 @@ void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
 		} ;
 		static Uint8 oldest = 0;
 
-		for( Uint32 frame = 0; frame < _frames; ++frame )
+		for( fpab_t frame = 0; frame < _frames; ++frame )
 		{
-			for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
+									++chnl )
 			{
 				lp_hist[oldest][chnl] = _src[frame][chnl];
-				if( frame % 2==0 )
+				if( frame % 2 == 0 )
 				{
-					_dst[frame/2][chnl] = 0.0f;
+					const fpab_t f = frame / 2;
+					_dst[f][chnl] = 0.0f;
 					for( Uint8 tap = 0;
 						tap < LP_FILTER_TAPS; ++tap )
 					{
-						_dst[frame / 2][chnl] +=
+						_dst[f][chnl] +=
 LP_FILTER_COEFFS[tap] * lp_hist[( oldest + tap ) % LP_FILTER_TAPS][chnl];
 					}
 				}
@@ -278,17 +282,18 @@ LP_FILTER_COEFFS[tap] * lp_hist[( oldest + tap ) % LP_FILTER_TAPS][chnl];
 
 
 
-int FASTCALL audioDevice::convertToS16( surroundSampleFrame * _ab,
-					Uint32 _frames, float _master_gain,
-					outputSampleType * _output_buffer,
-					bool _convert_endian )
+Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
+						const fpab_t _frames,
+						const float _master_gain,
+						int_sample_t * _output_buffer,
+						const bool _convert_endian )
 {
-	for( Uint32 frame = 0; frame < _frames; ++frame )
+	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
-		for( Uint8 chnl = 0; chnl < channels(); ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
 			( _output_buffer + frame * channels() )[chnl] =
-				static_cast<outputSampleType>(
+				static_cast<int_sample_t>(
 					mixer::clip( _ab[frame][chnl] *
 							_master_gain ) *
 						OUTPUT_SAMPLE_MULTIPLIER );
@@ -296,34 +301,34 @@ int FASTCALL audioDevice::convertToS16( surroundSampleFrame * _ab,
 	}
 	if( _convert_endian )
 	{
-		for( Uint32 frame = 0; frame < _frames; ++frame )
+		for( fpab_t frame = 0; frame < _frames; ++frame )
 		{
-			for( Uint8 chnl = 0; chnl < channels(); ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
 				Sint8 * ptr = reinterpret_cast<Sint8 *>(
 						_output_buffer +
 						frame * channels() +
 								chnl );
-				*(outputSampleType *)ptr =
-					( ( outputSampleType )*ptr << 8
+				*(int_sample_t *)ptr =
+					( ( int_sample_t )*ptr << 8
 								) |
-					( ( outputSampleType ) *
+					( ( int_sample_t ) *
 							( ptr+1 ) );
 			}
 		}
 	}
-	return( _frames * channels() * BYTES_PER_OUTPUT_SAMPLE );
+	return( _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
 
 
 
-void FASTCALL audioDevice::clearS16Buffer( outputSampleType * _outbuf,
-							Uint32 _frames )
+void FASTCALL audioDevice::clearS16Buffer( int_sample_t * _outbuf,
+							const fpab_t _frames )
 {
 #ifdef LMMS_DEBUG
 	assert( _outbuf != NULL );
 #endif
-	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_OUTPUT_SAMPLE );
+	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 

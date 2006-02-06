@@ -131,7 +131,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 
 
 
-sampleBuffer::sampleBuffer( const sampleFrame * _data, Uint32 _frames ) :
+sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	QObject(),
 	m_audioFile( "" ),
 	m_origData( NULL ),
@@ -160,7 +160,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, Uint32 _frames ) :
 
 
 
-sampleBuffer::sampleBuffer( Uint32 _frames ) :
+sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	QObject(),
 	m_audioFile( "" ),
 	m_origData( NULL ),
@@ -253,9 +253,9 @@ void sampleBuffer::update( bool _keep_settings )
 #else
 				file.ascii();
 #endif
-		Sint16 * buf = NULL;
-		Uint8 channels = DEFAULT_CHANNELS;
-		Uint32 samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
+		int_sample_t * buf = NULL;
+		ch_cnt_t channels = DEFAULT_CHANNELS;
+		sample_rate_t samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
 
 #ifdef HAVE_SNDFILE_H
 		if( m_frames == 0 )
@@ -290,28 +290,28 @@ void sampleBuffer::update( bool _keep_settings )
 			// scaling
 			if( m_reversed )
 			{
-				for( Uint32 frame = 0; frame < m_frames;
+				for( f_cnt_t frame = 0; frame < m_frames;
 								++frame )
 				{
-					for( Uint8 chnl = 0;
+					for( ch_cnt_t chnl = 0;
 							chnl < DEFAULT_CHANNELS;
 									++chnl )
 					{
-const Uint32 idx = ( m_frames - frame ) * channels + ( chnl % channels );
+const f_cnt_t idx = ( m_frames - frame ) * channels + ( chnl % channels );
 m_data[frame][chnl] = buf[idx] * fac;
 					}
 				}
 			}
 			else
 			{
-				for( Uint32 frame = 0; frame < m_frames;
+				for( f_cnt_t frame = 0; frame < m_frames;
 								++frame )
 				{
-					for( Uint8 chnl = 0;
+					for( ch_cnt_t chnl = 0;
 							chnl < DEFAULT_CHANNELS;
 									++chnl )
 					{
-		const Uint32 idx = frame * channels + ( chnl % channels );
+		const f_cnt_t idx = frame * channels + ( chnl % channels );
 		m_data[frame][chnl] = buf[idx] * fac;
 					}
 				}
@@ -379,9 +379,10 @@ m_data[frame][chnl] = buf[idx] * fac;
 
 
 #ifdef SDL_SDL_SOUND_H
-Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _samplerate )
+f_cnt_t sampleBuffer::decodeSampleSDL( const char * _f,
+					int_sample_t * & _buf,
+					ch_cnt_t & _channels,
+					sample_rate_t & _samplerate )
 {
 	Sound_AudioInfo STD_AUDIO_INFO =
 	{
@@ -389,7 +390,7 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 		_channels,
 		_samplerate,
 	} ;
-	Uint32 frames = 0;
+	f_cnt_t frames = 0;
 
 	Sound_Sample * snd_sample = Sound_NewSampleFromFile( _f,
 						&STD_AUDIO_INFO, 16384 );
@@ -400,9 +401,9 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 		( void )Sound_DecodeAll( snd_sample );
 		_channels = snd_sample->actual.channels;
 		_samplerate = snd_sample->actual.rate;
-		frames = snd_sample->buffer_size / ( BYTES_PER_OUTPUT_SAMPLE *
+		frames = snd_sample->buffer_size / ( BYTES_PER_INT_SAMPLE *
 								_channels );
-		_buf = new Sint16[frames * _channels];
+		_buf = new int_sample_t[frames * _channels];
 		memcpy( _buf, snd_sample->buffer, snd_sample->buffer_size );
 
 		Sound_FreeSample( snd_sample );
@@ -415,13 +416,14 @@ Uint32 sampleBuffer::decodeSampleSDL( const char * _f, Sint16 * & _buf,
 
 
 #ifdef HAVE_SNDFILE_H
-Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _samplerate )
+f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
+					int_sample_t * & _buf,
+					ch_cnt_t & _channels,
+					sample_rate_t & _samplerate )
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
-	Uint32 frames = 0;
+	f_cnt_t frames = 0;
 #ifdef OLD_SNDFILE
 	if( ( snd_file = sf_open_read( _f, &sf_info ) ) != NULL )
 	{
@@ -431,7 +433,7 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 	{
 		frames = sf_info.frames;
 #endif
-		_buf = new Sint16[sf_info.channels * frames];
+		_buf = new int_sample_t[sf_info.channels * frames];
 		frames = sf_read_short( snd_file, _buf, frames );
 		_channels = sf_info.channels;
 		_samplerate = sf_info.samplerate;
@@ -458,7 +460,7 @@ Uint32 sampleBuffer::decodeSampleSF( const char * _f, Sint16 * & _buf,
 
 size_t qfileReadCallback( void * _ptr, size_t _size, size_t _n, void * _udata )
 {
-	return( static_cast<QFile *>( _udata )->read( (char*)_ptr,
+	return( static_cast<QFile *>( _udata )->read( (char*) _ptr,
 								_size * _n ) );
 }
 
@@ -504,9 +506,10 @@ long qfileTellCallback( void * _udata )
 
 
 
-Uint32 sampleBuffer::decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
-							Uint8 & _channels,
-							Uint32 & _samplerate )
+f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _samplerate )
 {
 	static ov_callbacks callbacks =
 	{
@@ -518,7 +521,7 @@ Uint32 sampleBuffer::decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
 
 	OggVorbis_File vf;
 
-	Uint32 frames = 0;
+	f_cnt_t frames = 0;
 
 	QFile * f = new QFile( _f );
 #ifdef QT4
@@ -569,7 +572,7 @@ Uint32 sampleBuffer::decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
 
 	ogg_int64_t total = ov_pcm_total( &vf, -1 );
 
-	_buf = new Sint16[total * _channels];
+	_buf = new int_sample_t[total * _channels];
 	int bitstream = 0;
 	long bytes_read = 0;
 
@@ -577,14 +580,14 @@ Uint32 sampleBuffer::decodeSampleOGGVorbis( const char * _f, Sint16 * & _buf,
 	{
 		bytes_read = ov_read( &vf, (char *) &_buf[frames * _channels],
 					( total - frames ) * _channels *
-							sizeof( Sint16 ),
-					isLittleEndian()? 0 : 1,
-					sizeof( Sint16 ), 1, &bitstream );
+							BYTES_PER_INT_SAMPLE,
+					isLittleEndian() ? 0 : 1,
+					BYTES_PER_INT_SAMPLE, 1, &bitstream );
 		if( bytes_read < 0 )
 		{
 			break;
 		}
-		frames += bytes_read / ( _channels * sizeof( Sint16 ) );
+		frames += bytes_read / ( _channels * BYTES_PER_INT_SAMPLE );
 	}
 	while( bytes_read != 0 && bitstream == 0 );
 
@@ -642,10 +645,12 @@ void sampleBuffer::destroyResamplingContext( SRC_STATE * _context )
 
 
 
-bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
-						Uint32 _frames, float _freq,
-						bool _looped,
-						void * * _resampling_data )
+bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
+					const f_cnt_t _start_frame,
+					const fpab_t _frames,
+					const float _freq,
+					const bool _looped,
+					void * * _resampling_data )
 {
 	mixer::inst()->clearAudioBuffer( _ab, _frames );
 
@@ -657,10 +662,10 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	const double freq_factor = (double) _freq / (double) BASE_FREQ;
 	const Sint16 freq_diff = static_cast<Sint16>( BASE_FREQ - _freq );
 
-	Uint32 frames_to_process = _frames;
+	fpab_t frames_to_process = _frames;
 
 	// calculate how many frames we have in requested pitch
-	const Uint32 total_frames_for_current_pitch = static_cast<Uint32>( (
+	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
 						m_endFrame - m_startFrame ) /
 								freq_factor );
 	if( total_frames_for_current_pitch == 0 )
@@ -676,11 +681,11 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	}
 
 	// this holds the number of the first frame to play
-	const Uint32 play_frame = m_startFrame + ( _start_frame %
+	const f_cnt_t play_frame = m_startFrame + ( _start_frame %
 					total_frames_for_current_pitch );
 
 	// this holds the number of remaining frames in current loop
-	Uint32 frames_for_loop = total_frames_for_current_pitch -
+	f_cnt_t frames_for_loop = total_frames_for_current_pitch -
 						( play_frame - m_startFrame );
 
 	// make sure, data isn't accessed in any other way (e.g. deleting
@@ -691,7 +696,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 	{
 		frames_to_process = frames_for_loop;
 	}
-	const Uint32 f1 = static_cast<Uint32>( play_frame * freq_factor );
+	const f_cnt_t f1 = static_cast<f_cnt_t>( play_frame * freq_factor );
 /*	Uint32 f2 = 0;
 	while( f2 < f1 )
 	{
@@ -723,7 +728,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 		}
 		m_srcData.data_in = start_frame[0];
 		m_srcData.data_out = _ab[0];
-		m_srcData.input_frames = static_cast<Uint32>( frames_for_loop *
+		m_srcData.input_frames = static_cast<f_cnt_t>( frames_for_loop *
 								freq_factor );
 		m_srcData.output_frames = frames_to_process;
 		m_srcData.src_ratio = 1.0 / freq_factor;
@@ -734,12 +739,12 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 						src_strerror( error ) );
 		}
 #else
-		Uint32 src_frame_base = 0;
+		f_cnt_t src_frame_base = 0;
 		// check whether we're in high-quality-mode
 		if( mixer::inst()->highQuality() == TRUE )
 		{
 			// we are, so let's use cubic interpolation...
-			for( Uint32 frame = 0; frame < frames_to_process;
+			for( f_cnt_t frame = 0; frame < frames_to_process;
 								++frame )
 			{
 				// current loop done?
@@ -753,10 +758,10 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 				}
 
 				const float src_frame_idx = frame * freq_factor;
-				Uint32 frame_num = static_cast<Uint32>(
+				f_cnt_t frame_num = static_cast<f_cnt_t>(
 						src_frame_idx) - src_frame_base;
 				const float frac_pos = src_frame_idx -
-					static_cast<Uint32>( src_frame_idx );
+					static_cast<f_cnt_t>( src_frame_idx );
 
 				// because of cubic interpolation we have to
 				// access start_frame[frame_num-1], so make
@@ -766,7 +771,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 				{
 					frame_num = 1;
 				}
-				for ( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS;
+				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
 									++chnl )
 				{
 					_ab[frame][chnl] = cubicInterpolate(
@@ -782,10 +787,10 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 		{
 			// just normal mode, so we can use linear
 			// interpolation...
-			for( Uint32 frame = 0; frame < frames_to_process;
+			for( f_cnt_t frame = 0; frame < frames_to_process;
 								++frame )
 			{
-				if( _looped && ( frame-src_frame_base ) >
+				if( _looped && ( frame - src_frame_base ) >
 							frames_for_loop )
 				{
 					start_frame = loop_start;
@@ -794,11 +799,11 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 						total_frames_for_current_pitch;
 				}
 				const float src_frame_idx = frame * freq_factor;
-				const Uint32 frame_num = (Uint32)src_frame_idx -
-							src_frame_base + 0;
+				const f_cnt_t frame_num =
+					(f_cnt_t)src_frame_idx-src_frame_base;
 				const float frac_pos = src_frame_idx -
-							(Uint32) src_frame_idx;
-				for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS;
+							(f_cnt_t) src_frame_idx;
+				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
 									++chnl )
 				{
 					_ab[frame][chnl] = linearInterpolate(
@@ -816,7 +821,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, Uint32 _start_frame,
 		// as is into pitched-copy-buffer
 		if( _looped && frames_for_loop < frames_to_process )
 		{
-			Uint32 total_frames_copied = 0;
+			f_cnt_t total_frames_copied = 0;
 			while( total_frames_copied < frames_to_process )
 			{
 				memcpy( _ab[total_frames_copied], start_frame,
@@ -878,13 +883,14 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 		float old_x = _dr.x();
 		float old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 	
-		float fpp = tMax<float>( tMin<float>( m_frames / (float)w,
+		const float fpp = tMax<float>( tMin<float>( m_frames / (float)w,
 								20.0f ), 1.0f );
 		
 		for( float frame = 0; frame < m_frames; frame += fpp )
 		{
 			const float x = frame*w / m_frames + _dr.x();
-			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
+									++chnl )
 			{
 				const float y = y_base +
 			m_data[static_cast<int>( frame )][chnl] * y_space;
@@ -898,15 +904,15 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 		int old_x = _dr.x();
 		int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 	
-		Uint32 fpp = tMax<Uint32>( tMin<Uint32>( m_frames / w, 20 ),
-									1 );
+		const f_cnt_t fpp = tMax<f_cnt_t>( tMin<f_cnt_t>( m_frames / w,
+								20 ), 1 );
 
-		for( Uint32 frame = 0; frame < m_frames; frame += fpp )
+		for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
 		{
 			const int x = static_cast<int>( frame /
 							(float) m_frames * w ) +
 								_dr.x();
-			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
 				const Uint16 y = y_base +
 			static_cast<Uint16>( m_data[frame][chnl] * y_space );
@@ -920,10 +926,10 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 	}
 	else if( _dm == DOTS )
 	{
-		for( Uint32 frame = 0; frame < m_frames; ++frame )
+		for( f_cnt_t frame = 0; frame < m_frames; ++frame )
 		{
-			const int x = frame*w / m_frames + _dr.x();
-			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			const int x = frame * w / m_frames + _dr.x();
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
 				_p.drawPoint( x, y_base +
 			static_cast<Uint16>( m_data[frame][chnl] * y_space ) );
@@ -1077,7 +1083,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 	}
 
 #ifdef HAVE_FLAC_STREAM_ENCODER_H
-	const Uint32 FRAMES_PER_BUF = 1152;
+	const f_cnt_t FRAMES_PER_BUF = 1152;
 
 	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
 	FLAC__stream_encoder_set_channels( flac_enc, DEFAULT_CHANNELS );
@@ -1102,15 +1108,15 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 	{
 		printf( "error within FLAC__stream_encoder_init()!\n" );
 	}
-	Uint32 frame_cnt = 0;
+	f_cnt_t frame_cnt = 0;
 	while( frame_cnt < m_frames )
 	{
-		Uint32 remaining = tMin<Uint32>( FRAMES_PER_BUF,
+		f_cnt_t remaining = tMin<f_cnt_t>( FRAMES_PER_BUF,
 							m_frames - frame_cnt );
 		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
-		for( Uint32 f = 0; f < remaining; ++f )
+		for( f_cnt_t f = 0; f < remaining; ++f )
 		{
-			for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
 					mixer::clip( m_data[f+frame_cnt][ch] ) *
@@ -1144,11 +1150,11 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 
 
 sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
-							const Uint32 _frames,
-							const Uint32 _src_sr,
-							const Uint32 _dst_sr )
+						const f_cnt_t _frames,
+						const sample_rate_t _src_sr,
+						const sample_rate_t _dst_sr )
 {
-	const Uint32 dst_frames = static_cast<Uint32>( _frames /
+	const f_cnt_t dst_frames = static_cast<f_cnt_t>( _frames /
 					(float) _src_sr * (float) _dst_sr );
 	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
 	sampleFrame * dst_buf = dst_sb->m_origData;
@@ -1165,7 +1171,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 		src_data.data_out = dst_buf[0];
 		src_data.input_frames = _frames;
 		src_data.output_frames = dst_frames;
-		src_data.src_ratio = (float) _dst_sr / _src_sr;
+		src_data.src_ratio = (double) _dst_sr / _src_sr;
 		int error;
 		if( ( error = src_process( state, &src_data ) ) )
 		{
@@ -1180,15 +1186,15 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 	}
 #else
 	// no libsamplerate, so do simple cubic interpolation
-	for( Uint32 frame = 0; frame < dst_frames; ++frame )
+	for( f_cnt_t frame = 0; frame < dst_frames; ++frame )
 	{
 		const float src_frame_float = frame * (float) _src_sr / _dst_sr;
 		const float frac_pos = src_frame_float -
-					static_cast<Uint32>( src_frame_float );
-		const Uint32 src_frame = tLimit<Uint32>(
-					static_cast<Uint32>( src_frame_float ),
+					static_cast<f_cnt_t>( src_frame_float );
+		const f_cnt_t src_frame = tLimit<f_cnt_t>(
+					static_cast<f_cnt_t>( src_frame_float ),
 							1, _frames - 2 );
-		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			dst_buf[frame][ch] = cubicInterpolate(
 						_data[src_frame - 1][ch],
@@ -1282,8 +1288,8 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 		return( FLAC__STREAM_DECODER_WRITE_STATUS_ABORT );
 	}
 
-	const Uint32 frames = _frame->header.blocksize;
-	for( Uint32 frame = 0; frame < frames; ++frame )
+	const f_cnt_t frames = _frame->header.blocksize;
+	for( f_cnt_t frame = 0; frame < frames; ++frame )
 	{
 		sampleFrame sframe = { _buffer[0][frame] /
 						OUTPUT_SAMPLE_MULTIPLIER,
@@ -1397,7 +1403,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 
 
-void sampleBuffer::setStartFrame( Uint32 _s )
+void sampleBuffer::setStartFrame( const f_cnt_t _s )
 {
 	// don't set this parameter while playing
 	m_dataMutex.lock();
@@ -1408,7 +1414,7 @@ void sampleBuffer::setStartFrame( Uint32 _s )
 
 
 
-void sampleBuffer::setEndFrame( Uint32 _e )
+void sampleBuffer::setEndFrame( const f_cnt_t _e )
 {
 	// don't set this parameter while playing
 	m_dataMutex.lock();

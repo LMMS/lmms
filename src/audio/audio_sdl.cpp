@@ -48,7 +48,7 @@
 
 
 
-audioSDL::audioSDL( Uint32 _sample_rate, bool & _success_ful ) :
+audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful ) :
 	audioDevice( _sample_rate, DEFAULT_CHANNELS ),
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
 				mixer::inst()->framesPerAudioBuffer() ) ),
@@ -142,11 +142,11 @@ void audioSDL::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 	assert( _this != NULL );
 #endif
 
-	const Uint32 frames = _this->getNextBuffer( _this->m_outBuf );
+	const fpab_t frames = _this->getNextBuffer( _this->m_outBuf );
 
 	_this->convertToS16( _this->m_outBuf, frames,
 						mixer::inst()->masterGain(),
-						(outputSampleType *)( _buf ),
+						(int_sample_t *)( _buf ),
 						_this->m_convertEndian );
 }
 

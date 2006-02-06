@@ -2,7 +2,7 @@
  * audio_file_device.h - base-class for audio-device-classes which write 
  *                       their output into a file
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,34 +47,40 @@
 class audioFileDevice : public audioDevice
 {
 public:
-	audioFileDevice( Uint32 _sample_rate, Uint8 _channels,
-				const QString & _file, bool _use_vbr,
-				Uint16 _nom_bitrate, Uint16 _min_bitrate,
-				Uint16 _max_bitrate );
+	audioFileDevice( const sample_rate_t _sample_rate,
+				const ch_cnt_t _channels, const QString & _file,
+				const bool _use_vbr,
+				const bitrate_t _nom_bitrate,
+				const bitrate_t _min_bitrate,
+				const bitrate_t _max_bitrate );
 	virtual ~audioFileDevice();
 
 
 
 protected:
-	int FASTCALL writeData( const void * _data, int _len );
+	Sint32 FASTCALL writeData( const void * _data, Sint32 _len );
 	void seekToBegin( void );
 
 	inline bool useVBR( void ) const
 	{
 		return( m_useVbr );
 	}
-	inline Uint16 nominalBitrate( void ) const
+
+	inline bitrate_t nominalBitrate( void ) const
 	{
 		return( m_nomBitrate );
 	}
-	inline Uint16 minBitrate( void ) const
+
+	inline bitrate_t minBitrate( void ) const
 	{
 		return( m_minBitrate );
 	}
-	inline Uint16 maxBitrate( void ) const
+
+	inline bitrate_t maxBitrate( void ) const
 	{
 		return( m_maxBitrate );
 	}
+
 	inline bool outputFileOpened( void ) const
 	{
 		return( m_outputFile.isOpen() );
@@ -86,9 +92,9 @@ private:
 
 	bool m_useVbr;
 
-	Uint16 m_nomBitrate;
-	Uint16 m_minBitrate;
-	Uint16 m_maxBitrate;
+	bitrate_t m_nomBitrate;
+	bitrate_t m_minBitrate;
+	bitrate_t m_maxBitrate;
 
 } ;
 

@@ -2,7 +2,7 @@
  * audio_file_wave.h - Audio-device which encodes wave-stream and writes it
  *                     into an WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,29 +35,35 @@
 class audioFileWave : public audioFileDevice
 {
 public:
-	audioFileWave( Uint32 _sample_rate, Uint32 _channels,
-			bool & _success_ful, const QString & _file,
-			bool _use_vbr, Uint16 _nom_bitrate,
-			Uint16 _min_bitrate, Uint16 _max_bitrate );
+	audioFileWave( const sample_rate_t _sample_rate,
+			const ch_cnt_t _channels,
+			bool & _success_ful,
+			const QString & _file,
+			const bool _use_vbr,
+			const bitrate_t _nom_bitrate,
+			const bitrate_t _min_bitrate,
+			const bitrate_t _max_bitrate );
 	virtual ~audioFileWave();
 
-	static audioFileDevice * getInst( Uint32 _sample_rate, Uint32 _channels,
-					bool & _success_ful,
-					const QString & _file, bool _use_vbr,
-					Uint16 _nom_bitrate,
-					Uint16 _min_bitrate,
-					Uint16 _max_bitrate )
+	static audioFileDevice * getInst( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels,
+						bool & _success_ful,
+						const QString & _file,
+						const bool _use_vbr,
+						const bitrate_t _nom_bitrate,
+						const bitrate_t _min_bitrate,
+						const bitrate_t _max_bitrate )
 	{
 		return( new audioFileWave( _sample_rate, _channels,
 						_success_ful, _file, _use_vbr,
 						_nom_bitrate, _min_bitrate,
-						_max_bitrate ) );
+							_max_bitrate ) );
 	}
 
 
 private:
-	virtual void FASTCALL writeBuffer( surroundSampleFrame * _ab,
-						Uint32 _frames,
+	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+						const fpab_t _frames,
 						float _master_gain );
 
 	bool startEncoding( void );

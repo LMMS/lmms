@@ -65,7 +65,7 @@ protected:
 
 
 protected slots:
-	void setAudioBuffer( const surroundSampleFrame * _ab, Uint32 _frames );
+	void setAudioBuffer( const surroundSampleFrame * _ab, const fpab_t _frames );
 
 
 private:
@@ -73,7 +73,6 @@ private:
 
 	bool m_enabled;
 	surroundSampleFrame * m_buffer;
-	Uint32 m_frames;
 
 	QTimer * m_updateTimer;
 

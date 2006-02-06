@@ -1,7 +1,7 @@
 /*
  * export.h - header which is needed for song-export
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,14 +31,14 @@
 class audioFileDevice;
 
 
-typedef audioFileDevice * ( * getDeviceInst)( Uint32 _sample_rate,
-						Uint32 _channels,
+typedef audioFileDevice * ( * getDeviceInst)( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels,
 						bool & _success_ful,
 						const QString & _file,
-						bool _use_vbr,
-						Uint16 _nom_bitrate,
-						Uint16 _min_bitrate,
-						Uint16 _max_bitrate );
+						const bool _use_vbr,
+						const bitrate_t _nom_bitrate,
+						const bitrate_t _min_bitrate,
+						const bitrate_t _max_bitrate );
 
 
 enum fileTypes

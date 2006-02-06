@@ -1,7 +1,7 @@
 /*
  * audio_port.h - base-class for objects providing sound at a port
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -71,14 +71,16 @@ public:
 
 	// next effect-channel after this audio-port
 	// (-1 = none  0 = master)
-	inline fxChnl nextFxChannel( void ) const
+	inline fx_ch_t nextFxChannel( void ) const
 	{
 		return( m_nextFxChannel );
 	}
-	void setNextFxChannel( fxChnl _chnl )
+
+	void setNextFxChannel( const fx_ch_t _chnl )
 	{
 		m_nextFxChannel = _chnl;
 	}
+
 
 	const QString & name( void ) const
 	{
@@ -86,6 +88,7 @@ public:
 	}
 
 	void setName( const QString & _new_name );
+
 
 	enum bufferUsages
 	{
@@ -97,7 +100,7 @@ private:
 	surroundSampleFrame * m_firstBuffer;
 	surroundSampleFrame * m_secondBuffer;
 	bool m_extOutputEnabled;
-	fxChnl m_nextFxChannel;
+	fx_ch_t m_nextFxChannel;
 
 	QString m_name;
 

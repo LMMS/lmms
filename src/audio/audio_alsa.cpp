@@ -54,9 +54,9 @@
 
 
 
-audioALSA::audioALSA( Uint32 _sample_rate, bool & _success_ful ) :
-	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
-					"audioalsa", "channels" ).toInt(),
+audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful ) :
+	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
+		configManager::inst()->value( "audioalsa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
 	m_handle( NULL ),
 	m_hwParams( NULL ),
@@ -214,21 +214,20 @@ void audioALSA::run( void )
 	surroundSampleFrame * temp =
 			bufferAllocator::alloc<surroundSampleFrame>(
 					mixer::inst()->framesPerAudioBuffer() );
-	outputSampleType * outbuf =
-				bufferAllocator::alloc<outputSampleType>(
+	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
 					mixer::inst()->framesPerAudioBuffer() *
 								channels() );
 	m_quit = FALSE;
 
 	while( m_quit == FALSE )
 	{
-		const Uint32 frames = getNextBuffer( temp );
+		const f_cnt_t frames = getNextBuffer( temp );
 
 		convertToS16( temp, frames, mixer::inst()->masterGain(), outbuf,
 					m_littleEndian != isLittleEndian() );
 
-		Uint32 frame = 0;
-		outputSampleType * ptr = outbuf;
+		f_cnt_t frame = 0;
+		int_sample_t * ptr = outbuf;
 
 		while( frame < frames )
 		{
@@ -261,7 +260,8 @@ void audioALSA::run( void )
 
 
 
-int audioALSA::setHWParams( Uint32 _sample_rate, Uint32 _channels,
+int audioALSA::setHWParams( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels,
 						snd_pcm_access_t _access )
 {
 	int err, dir;

@@ -1,7 +1,7 @@
 /*
  * oscillator.cpp - implementation of powerful oscillator-class
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,17 +27,16 @@
 
 
 
-oscillator::oscillator( modulationAlgos _modulation_algo, float _freq,
-				Sint16 _phase_offset, float _volume_factor,
-				oscillator * _sub_osc ) :
-	m_freq(_freq),
-	m_volumeFactor(_volume_factor),
-	m_phaseOffset(_phase_offset),
-	m_subOsc(_sub_osc),
+oscillator::oscillator( const modulationAlgos _modulation_algo,
+			const float _freq, const Sint16 _phase_offset,
+			const float _volume_factor, oscillator * _sub_osc ) :
+	m_freq( _freq ),
+	m_volumeFactor( _volume_factor ),
+	m_phaseOffset( _phase_offset ),
+	m_subOsc( _sub_osc ),
 	m_userWaveData( &ZERO_FRAME ),
 	m_userWaveFrames( 1 )
 {
-
 	if( m_subOsc != NULL )
 	{
 		switch( _modulation_algo )
@@ -70,9 +69,10 @@ oscillator::oscillator( modulationAlgos _modulation_algo, float _freq,
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
 #define defineNoSubUpdateFor(x,getSampleFunction) 			\
-void x::updateNoSub( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
+void x::updateNoSub( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl )	\
 {									\
-	for( Uint16 frame = 0; frame < _frames; ++frame )		\
+	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
 					m_oscCoeff ) * m_volumeFactor;	\
@@ -82,10 +82,11 @@ void x::updateNoSub( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
 
 // do fm by using sub-osc as modulator
 #define defineFMUpdateFor(x,getSampleFunction)				\
-void x::updateFM( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
+void x::updateFM( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl )	\
 {									\
 	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( Uint16 frame = 0; frame < _frames; ++frame )		\
+	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
 							m_oscCoeff +	\
@@ -103,10 +104,11 @@ void x::updateFM( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
 
 // do am by using sub-osc as modulator
 #define defineAMUpdateFor(x,getSampleFunction)				\
-void x::updateAM( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
+void x::updateAM( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl )	\
 {									\
 	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( Uint16 frame = 0; frame < _frames; ++frame )		\
+	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] *= getSampleFunction( ++m_sample *	\
 					m_oscCoeff ) * m_volumeFactor;	\
@@ -116,10 +118,11 @@ void x::updateAM( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
 
 // do mix by using sub-osc as mix-sample
 #define defineMixUpdateFor(x,getSampleFunction)				\
-void x::updateMix( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
+void x::updateMix( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl )	\
 {									\
 	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( Uint16 frame = 0; frame < _frames; ++frame )		\
+	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] += getSampleFunction( ++m_sample *	\
 					m_oscCoeff ) * m_volumeFactor;	\
@@ -130,9 +133,10 @@ void x::updateMix( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
 #define defineSyncUpdateFor(x,getSampleFunction)			\
-void x::updateSync( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
+void x::updateSync( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl )	\
 {									\
-	for( Uint16 frame = 0; frame < _frames ; ++frame )		\
+	for( fpab_t frame = 0; frame < _frames ; ++frame )		\
 	{								\
 		if( m_subOsc->syncOk() )				\
 		{							\
@@ -149,24 +153,28 @@ void x::updateSync( sampleFrame * _ab, Uint32 _frames, Uint8 _chnl )	\
 class x : public oscillator						\
 {									\
 public:									\
-	x( modulationAlgos modulation_algo, float _freq, Sint16 _phase_offset, \
-			float _volume_factor, oscillator * _sub_osc) :	\
-	oscillator (modulation_algo, _freq, _phase_offset, _volume_factor, \
-								_sub_osc ) \
+	x( const modulationAlgos modulation_algo, const float _freq,	\
+		const Sint16 _phase_offset, const float _volume_factor,	\
+				oscillator * _sub_osc ) FASTCALL :	\
+	oscillator( modulation_algo, _freq, _phase_offset,		\
+					_volume_factor, _sub_osc )	\
+	{								\
+	}								\
+	virtual ~x()							\
 	{								\
 	}								\
 									\
 protected:								\
-	void updateNoSub( sampleFrame * _ab, Uint32 _frames,		\
-							Uint8 _chnl );	\
-	void updateFM( sampleFrame * _ab, Uint32 _frames,		\
-							Uint8 _chnl );	\
-	void updateAM( sampleFrame * _ab, Uint32 _frames,		\
-							Uint8 _chnl );	\
-	void updateMix( sampleFrame * _ab, Uint32 _frames,		\
-							Uint8 _chnl );	\
-	void updateSync( sampleFrame * _ab, Uint32 _frames,		\
-							Uint8 _chnl );	\
+	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,	\
+						const ch_cnt_t _chnl );	\
+	void updateFM( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl );	\
+	void updateAM( sampleFrame * _ab, const fpab_t _frames,		\
+						const ch_cnt_t _chnl );	\
+	void updateMix( sampleFrame * _ab, const fpab_t _frames,	\
+						const ch_cnt_t _chnl );	\
+	void updateSync( sampleFrame * _ab, const fpab_t _frames,	\
+						const ch_cnt_t _chnl );	\
 									\
 } ;									\
 									\
@@ -188,10 +196,11 @@ generateOscillatorCodeFor( userWaveOsc, userWaveSample );
 
 
 
-oscillator * oscillator::createOsc( waveShapes _wave_shape,
-					modulationAlgos _modulation_algo,
-					float _freq, Sint16 _phase_offset,
-					float _volume_factor,
+oscillator * oscillator::createOsc( const waveShapes _wave_shape,
+					const modulationAlgos _modulation_algo,
+					const float _freq,
+					const Sint16 _phase_offset,
+					const float _volume_factor,
 							oscillator * _sub_osc )
 {
 	switch( _wave_shape )
@@ -244,7 +253,7 @@ void oscillator::recalcOscCoeff( const float additional_phase_offset )
 {
 	m_oscCoeff = m_freq / static_cast<float>( mixer::inst()->sampleRate() );
 
-	m_sample = static_cast<Uint32>( ( m_phaseOffset * ( 1.0f / 360.0f ) +
+	m_sample = static_cast<f_cnt_t>( ( m_phaseOffset * ( 1.0f / 360.0f ) +
 						additional_phase_offset ) *
 						( mixer::inst()->sampleRate() /
 								m_freq ) );

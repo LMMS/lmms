@@ -1,7 +1,7 @@
 /*
  * effect_board.h - stuff for effect-board
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,15 +22,14 @@
  *
  */
 
+
 #ifndef _EFFECT_BOARD_H
 #define _EFFECT_BOARD_H
 
+#include "types.h"
 
-const int MIN_EFFECT_CHANNEL = 0;
-const int MAX_EFFECT_CHANNEL = 63;
-const int DEFAULT_EFFECT_CHANNEL = MIN_EFFECT_CHANNEL;
-
-typedef Sint8 fxChnl;
-
+const fx_ch_t MIN_EFFECT_CHANNEL = 0;
+const fx_ch_t MAX_EFFECT_CHANNEL = 63;
+const fx_ch_t DEFAULT_EFFECT_CHANNEL = MIN_EFFECT_CHANNEL;
 
 #endif

@@ -91,9 +91,9 @@
 
 
 
-audioOSS::audioOSS( Uint32 _sample_rate, bool & _success_ful ) :
-	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
-					"audiooss", "channels" ).toInt(),
+audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful ) :
+	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
+		configManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
 	m_convertEndian( FALSE ),
 	m_quit( FALSE )
@@ -124,9 +124,9 @@ audioOSS::audioOSS( Uint32 _sample_rate, bool & _success_ful ) :
 	}
 
 	int frag_spec;
-	for( frag_spec = 0; static_cast<unsigned int>( 0x01 << frag_spec ) <
+	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
 		mixer::inst()->framesPerAudioBuffer() * channels() *
-							BYTES_PER_OUTPUT_SAMPLE;
+							BYTES_PER_INT_SAMPLE;
 		++frag_spec )
 	{
 	}
@@ -317,8 +317,7 @@ void audioOSS::run( void )
 	surroundSampleFrame * temp =
 			bufferAllocator::alloc<surroundSampleFrame>(
 					mixer::inst()->framesPerAudioBuffer() );
-	outputSampleType * outbuf =
-				bufferAllocator::alloc<outputSampleType>(
+	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
 					mixer::inst()->framesPerAudioBuffer() *
 								channels() );
 	m_quit = FALSE;

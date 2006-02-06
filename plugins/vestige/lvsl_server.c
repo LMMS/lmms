@@ -56,17 +56,17 @@
 #include <signal.h>
 #endif
 
+#ifdef HAVE_SCHED_H
+#include <sched.h>
+#endif
+
+
 #include <windows.h>
 #include <wine/exception.h>
 
 
-#include <vector>
+#include <list>
 #include <string>
-
-
-#include "types.h"
-#include "midi.h"
-#include "communication.h"
 
 
 #include <aeffectx.h>
@@ -89,6 +89,11 @@ struct ERect
 #endif
 
 
+#include "types.h"
+#include "midi.h"
+#include "communication.h"
+
+
 #ifdef HAVE_TLS
 static __thread int ejmpbuf_valid = false;
 static __thread jmp_buf ejmpbuf;
@@ -96,6 +101,9 @@ static __thread jmp_buf ejmpbuf;
 static pthread_key_t ejmpbuf_valid_key;
 static pthread_key_t ejmpbuf_key;
 #endif
+
+
+static hostLanguages hlang = LVSL_LANG_ENGLISH;
 
 
 class VSTPlugin;
@@ -140,20 +148,21 @@ public:
 	// enqueue given MIDI-event to be processed the next time process() is
 	// called
 	void enqueueMidiEvent( const midiEvent & _event,
-						const Uint32 _frames_ahead );
+						const f_cnt_t _frames_ahead );
 
 	// set given sample-rate for plugin
-	void setSampleRate( const Sint32 _rate )
+	void setSampleRate( const sample_rate_t _rate )
 	{
 		m_plugin->dispatcher( m_plugin, effSetSampleRate, 0, 0, NULL, 
 							    (float) _rate );
+		m_sampleRate = _rate;
 	}
 
 	// set given block-size for plugin
-	void setBlockSize( const Uint32 _bsize );
+	void setBlockSize( const fpab_t _bsize );
 
 	// set given tempo
-	void setBPM( const Uint16 _bpm )
+	void setBPM( const bpm_t _bpm )
 	{
 		m_bpm = _bpm;
 	}
@@ -184,13 +193,13 @@ public:
 	void getParameterProperties( const Sint32 _idx );
 
 	// number of inputs
-	Uint8 inputCount( void ) const
+	ch_cnt_t inputCount( void ) const
 	{
 		return( m_plugin->numInputs );
 	}
 
 	// number of outputs
-	Uint8 outputCount( void ) const
+	ch_cnt_t outputCount( void ) const
 	{
 		return( m_plugin->numOutputs );
 	}
@@ -224,22 +233,26 @@ private:
 
 	AEffect * m_plugin;
 	HWND m_window;
-	int m_windowXID;
+	Sint32 m_windowXID;
+	Sint16 m_windowWidth;
+	Sint16 m_windowHeight;
 
 	pthread_mutex_t m_lock;
 	pthread_cond_t m_windowStatusChange;
 	DWORD m_guiThreadID;
 
 
-	Uint32 m_blockSize;
+	fpab_t m_blockSize;
 	float * m_shm;
 
 	float * * m_inputs;
 	float * * m_outputs;
 
-	std::vector<VstMidiEvent> m_midiEvents;
+	std::list<VstMidiEvent> m_midiEvents;
 
-	Uint16 m_bpm;
+	bpm_t m_bpm;
+	sample_rate_t m_sampleRate;
+	double m_currentSamplePos;
 
 } ;
 
@@ -252,6 +265,8 @@ VSTPlugin::VSTPlugin( const std::string & _plugin_file ) :
 	m_plugin( NULL ),
 	m_window( NULL ),
 	m_windowXID( 0 ),
+	m_windowWidth( 0 ),
+	m_windowHeight( 0 ),
 	m_lock(),
 	m_windowStatusChange(),
 	m_guiThreadID( 0 ),
@@ -260,7 +275,9 @@ VSTPlugin::VSTPlugin( const std::string & _plugin_file ) :
 	m_inputs( NULL ),
 	m_outputs( NULL ),
 	m_midiEvents(),
-	m_bpm( 0 )
+	m_bpm( 0 ),
+	m_sampleRate( 44100 ),
+	m_currentSamplePos( 0 )
 {
 	if( load( _plugin_file ) == false )
 	{
@@ -292,6 +309,13 @@ VSTPlugin::VSTPlugin( const std::string & _plugin_file ) :
 	// now post some information about our plugin
 	writeValue<Sint16>( VST_PLUGIN_XID );
 	writeValue<Sint32>( m_windowXID );
+
+	if( m_windowXID != 0 )
+	{
+		writeValue<Sint16>( VST_PLUGIN_EDITOR_GEOMETRY );
+		writeValue<Sint16>( m_windowWidth );
+		writeValue<Sint16>( m_windowHeight );
+	}
 
 	writeValue<Sint16>( VST_PLUGIN_NAME );
 	writeString( pluginName() );
@@ -364,9 +388,9 @@ bool VSTPlugin::load( const std::string & _plugin_file )
 	m_shortName = basename( tmp );
 	free( tmp );
 
-	typedef AEffect * ( * mainEntry )( audioMasterCallback );
+	typedef AEffect * ( __stdcall * mainEntry )( audioMasterCallback );
 	mainEntry main_entry = (mainEntry) GetProcAddress( m_libInst,
-							"main" );
+								"main" );
 	if( main_entry == NULL )
 	{
 		return( false );
@@ -402,19 +426,22 @@ void VSTPlugin::process( void )
 		// dispatcher-call, so we create static copies of the
 		// data and post them
 #define MIDI_EVENT_BUFFER_COUNT		1024
-		static char event_buf[sizeof(VstMidiEvent * ) *
+		static char event_buf[sizeof( VstMidiEvent * ) *
 						MIDI_EVENT_BUFFER_COUNT +
 							sizeof( VstEvents )];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
 		VstEvents * events = (VstEvents *) event_buf;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
-		for( unsigned int i = 0; i < m_midiEvents.size(); ++i )
+		Sint16 idx = 0;
+		for( std::list<VstMidiEvent>::iterator it =
+							m_midiEvents.begin();
+					it != m_midiEvents.end(); ++it, ++idx )
 		{
-			memcpy( &vme[i], &m_midiEvents[i],
-						sizeof( VstMidiEvent ) );
-			events->events[i] = (VstEvent *) &vme[i];
+			memcpy( &vme[idx], &*it, sizeof( VstMidiEvent ) );
+			events->events[idx] = (VstEvent *) &vme[idx];
 		}
+
 		m_midiEvents.clear();
 		m_plugin->dispatcher( m_plugin, effProcessEvents, 0, 0, events,
 									0.0f );
@@ -422,15 +449,14 @@ void VSTPlugin::process( void )
 
 	// now we're ready to fetch sound from VST-plugin
 
-	for( int i = 0; i < inputCount(); ++i )
+	for( ch_cnt_t i = 0; i < inputCount(); ++i )
 	{
 		m_inputs[i] = &m_shm[i * m_blockSize];
 	}
 
-	for( int i = 0; i < outputCount(); ++i )
+	for( ch_cnt_t i = 0; i < outputCount(); ++i )
 	{
-		m_outputs[i] = &m_shm[( i + inputCount() ) *
-							m_blockSize];
+		m_outputs[i] = &m_shm[( i + inputCount() ) * m_blockSize];
 	}
 
 #ifdef OLD_VST_SDK
@@ -449,6 +475,8 @@ void VSTPlugin::process( void )
 	}
 #endif
 
+	m_currentSamplePos += m_blockSize;
+
 	writeValue<Sint16>( VST_PROCESS_DONE );
 
 	// give plugin some idle-time for GUI-update and so on...
@@ -460,7 +488,7 @@ void VSTPlugin::process( void )
 
 
 void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
-						const Uint32 _frames_ahead )
+						const f_cnt_t _frames_ahead )
 {
 	VstMidiEvent event;
 
@@ -484,12 +512,13 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 
 
 
-void VSTPlugin::setBlockSize( const Uint32 _bsize )
+void VSTPlugin::setBlockSize( const Uint16 _bsize )
 {
 	if( _bsize == m_blockSize )
 	{
 		return;
 	}
+
 	m_blockSize = _bsize;
 	resizeSharedMemory();
 	m_plugin->dispatcher( m_plugin, effSetBlockSize, 0, _bsize, NULL,
@@ -612,7 +641,7 @@ void VSTPlugin::resizeSharedMemory( void )
 	int shm_id;
 	Uint16 shm_key = 0;
 	while( ( shm_id = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-						0666 ) ) == -1 )
+								0666 ) ) == -1 )
 	{
 	}
 
@@ -628,10 +657,10 @@ void VSTPlugin::resizeSharedMemory( void )
 	}
 
 	writeValue<Sint16>( VST_INPUT_COUNT );
-	writeValue<Uint8>( inputCount() );
+	writeValue<ch_cnt_t>( inputCount() );
 
 	writeValue<Sint16>( VST_OUTPUT_COUNT );
-	writeValue<Uint8>( outputCount() );
+	writeValue<ch_cnt_t>( outputCount() );
 
 	writeValue<Sint16>( VST_SHM_KEY_AND_SIZE );
 	writeValue<Uint16>( shm_key );
@@ -648,6 +677,13 @@ void VSTPlugin::resizeSharedMemory( void )
 #endif
 
 
+/* TODO:
+ * - complete audioMasterGetTime-handling (bars etc.)
+ * - implement audioMasterProcessEvents
+ * - audioMasterGetVendorVersion: return LMMS-version (config.h!)
+ * - audioMasterGetDirectory: return either VST-plugin-dir or LMMS-workingdir
+ * - audioMasterOpenFileSelector: show QFileDialog?
+ */
 VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 					VstInt32 _index, VstIntPtr _value,
 						void * _ptr, float _opt )
@@ -664,8 +700,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterVersion:
 			//SHOW_CALLBACK( "amc: audioMasterVersion\n" );
-			// vst version, currently 2 (0 for older)
-			return( 2 );
+			return( 2300 );
 
 		case audioMasterCurrentId:	
 			SHOW_CALLBACK( "amc: audioMasterCurrentId\n" );
@@ -682,7 +717,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			return( 0 );
 
 		case audioMasterPinConnected:		
-			SHOW_CALLBACK( "amc: audioMasterPinConnected\n" );
+			//SHOW_CALLBACK( "amc: audioMasterPinConnected\n" );
 			// inquire if an input or output is beeing connected;
 			// index enumerates input or output counting from zero:
 			// value is 0 for input and != 0 otherwise. note: the
@@ -699,8 +734,8 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 
-			_timeInfo.samplePos = 0;
-			// TODO: _timeInfo.sampleRate = mixer::inst()->sampleRate();
+			_timeInfo.samplePos = plugin->m_currentSamplePos;
+			_timeInfo.sampleRate = plugin->m_sampleRate;
 			_timeInfo.flags = 0;
 			_timeInfo.tempo = plugin->m_bpm;
 			_timeInfo.timeSigNumerator = 4;
@@ -717,7 +752,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterIOChanged:
 			plugin->resizeSharedMemory();
-			SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
+			//SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
 			// numInputs and/or numOutputs has changed
 			return( 0 );
 
@@ -725,21 +760,22 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 		case audioMasterWantMidi:
 			//SHOW_CALLBACK( "amc: audioMasterWantMidi\n" );
 			// <value> is a filter which is currently ignored
-			return( 0 );
+			return( 1 );
 
 		case audioMasterSetTime:
 			SHOW_CALLBACK( "amc: audioMasterSetTime\n" );
 			// VstTimenfo* in <ptr>, filter in <value>, not
 			// supported
+			return( 0 );
 
 		case audioMasterTempoAt:
-			SHOW_CALLBACK( "amc: audioMasterTempoAt\n" );
+			//SHOW_CALLBACK( "amc: audioMasterTempoAt\n" );
 			return( plugin->m_bpm * 10000 );
 
 		case audioMasterGetNumAutomatableParameters:
 			SHOW_CALLBACK( "amc: audioMasterGetNumAutomatable"
 							"Parameters\n" );
-			return( 0 );
+			return( 5000 );
 
 		case audioMasterGetParameterQuantization:	
 			SHOW_CALLBACK( "amc: audioMasterGetParameter\n"
@@ -748,12 +784,12 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			// or 1 if full single float precision is maintained
 			// in automation. parameter index in <value> (-1: all,
 			// any)
-			return( 0 );
+			return( 1 );
 
 		case audioMasterNeedIdle:
 			//SHOW_CALLBACK( "amc: audioMasterNeedIdle\n" );
 			// plug needs idle calls (outside its editor window)
-			return( 0 );
+			return( 1 );
 
 		case audioMasterGetPreviousPlug:
 			SHOW_CALLBACK( "amc: audioMasterGetPreviousPlug\n" );
@@ -805,30 +841,37 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 #endif
 
 		case audioMasterSizeWindow:
-			// TODO using lmms-main-window-size
-			SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
-			// index: width, value: height
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
+			if( plugin->m_window == 0 )
+			{
+				return( 0 );
+			}
+			plugin->m_windowWidth = _index;
+			plugin->m_windowHeight = _value;
+			SetWindowPos( plugin->m_window, 0, 0, 0,
+					_index + 8, _value + 26,
+					SWP_NOACTIVATE | SWP_NOMOVE |
+					SWP_NOOWNERZORDER | SWP_NOZORDER );
+			writeValue<Sint16>( VST_PLUGIN_EDITOR_GEOMETRY );
+			writeValue<Sint16>( plugin->m_windowWidth );
+			writeValue<Sint16>( plugin->m_windowHeight );
+			return( 1 );
 
 		case audioMasterGetSampleRate:
-			// TODO using mixer-call
-			SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
+			return( plugin->m_sampleRate );
 
 		case audioMasterGetBlockSize:
-			// TODO using mixer-call
-			SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
+			return( plugin->m_blockSize );
 
 		case audioMasterGetInputLatency:
-			// TODO using mixer-call
-			SHOW_CALLBACK( "amc: audioMasterGetInputLatency\n" );
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterGetInputLatency\n" );
+			return( plugin->m_blockSize );
 
 		case audioMasterGetOutputLatency:
-			// TODO using mixer-call
-			SHOW_CALLBACK( "amc: audioMasterGetOutputLatency\n" );
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterGetOutputLatency\n" );
+			return( plugin->m_blockSize );
 
 		case audioMasterGetCurrentProcessLevel:
 			SHOW_CALLBACK( "amc: audioMasterGetCurrentProcess"
@@ -876,22 +919,22 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			return( 0 );
 
 		case audioMasterGetVendorString:
-			SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
+			//SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
 			// fills <ptr> with a string identifying the vendor
 			// (max 64 char)
-			strcpy( (char *) _ptr, "LAD");
-			return( 0 );
+			strcpy( (char *) _ptr, "Tobias Doerffel & others");
+			return( 1 );
 
 		case audioMasterGetProductString:
-			SHOW_CALLBACK( "amc: audioMasterGetProductString\n" );
+			//SHOW_CALLBACK( "amc: audioMasterGetProductString\n" );
 			// fills <ptr> with a string with product name
 			// (max 64 char)
-			strcpy( (char *) _ptr, "XFST-Server" );
-			return( 0 );
+			strcpy( (char *) _ptr,
+					"LMMS VST Support Layer (LVSL)" );
+			return( 1 );
 
 		case audioMasterGetVendorVersion:
 			SHOW_CALLBACK( "amc: audioMasterGetVendorVersion\n" );
-			// TODO
 			// returns vendor-specific version
 			return( 1000 );
 
@@ -901,19 +944,18 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			return( 0 );
 		
 		case audioMasterCanDo:
-			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
-			// string in ptr, see below
-			return( 0 );
-		
+			//SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
+			return( !strcmp( (char *) _ptr, "sendVstEvents" ) ||
+				!strcmp( (char *) _ptr, "sendVstMidiEvent" ) ||
+				!strcmp( (char *) _ptr, "sendVstTimeInfo" ) ||
+				!strcmp( (char *) _ptr, "sizeWindow" ) );
+
 		case audioMasterGetLanguage:
-			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
-			// TODO
-			// see enum
-			return( 0 );
+			//SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
+			return( hlang );
 
 		case audioMasterGetDirectory:
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
-			// TODO
 			// get plug directory, FSSpec on MAC, else char*
 			return( 0 );
 		
@@ -1015,7 +1057,7 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 		return( 1 );
 	}
 
-	_this->m_windowXID = (int) GetPropA( _this->m_window,
+	_this->m_windowXID = (Sint32) GetPropA( _this->m_window,
 						"__wine_x11_whole_window" );
 
 
@@ -1026,13 +1068,18 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 	_this->m_plugin->dispatcher( _this->m_plugin, effEditGetRect, 0, 0,
 								&er, 0 );
 
-/*	const int width = er->right - er->left;
-	const int height = er->bottom - er->top;*/
+	_this->m_windowWidth = er->right - er->left;
+	_this->m_windowHeight = er->bottom - er->top;
 		
-	SetWindowPos( _this->m_window, 0, 0, 0, er->right - er->left + 8,
-			er->bottom-er->top + 26, SWP_NOACTIVATE | SWP_NOREDRAW |
-						SWP_NOMOVE | SWP_NOZORDER );
+	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
+			_this->m_windowHeight + 26,
+			SWP_NOACTIVATE /*| SWP_NOREDRAW*/ | SWP_NOMOVE |
+			SWP_NOOWNERZORDER | SWP_NOZORDER );
+#ifdef HAVE_TLS
+	ejmpbuf_valid = false;
+#else
 	*ejmpbuf_valid = false;
+#endif
 
 	pthread_cond_signal( &_this->m_windowStatusChange );
 
@@ -1050,7 +1097,9 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 			switch( msg.wParam )
 			{
 				case SHOW_EDITOR:
-					ShowWindow( _this->m_window, SW_SHOW );
+					ShowWindow( _this->m_window,
+								SW_SHOWNORMAL );
+					UpdateWindow( _this->m_window );
 					break;
 
 				case CLOSE_PLUGIN:
@@ -1098,6 +1147,17 @@ int main( void )
 		return( -1 );
 	}
 
+#ifdef HAVE_SCHED_H
+	// try to set realtime-priority
+	struct sched_param sparam;
+	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
+				sched_get_priority_min( SCHED_FIFO ) ) / 2;
+	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
+	{
+		lvsMessage( "could not set realtime priority for VST-server" );
+	}
+#endif
+
 	Sint16 cmd;
 	while( ( cmd = readValue<Sint16>() ) != VST_CLOSE_PLUGIN )
 	{
@@ -1118,22 +1178,27 @@ int main( void )
 			case VST_ENQUEUE_MIDI_EVENT:
 			{
 				const midiEvent ev = readValue<midiEvent>();
-				const Uint32 fr_ahead = readValue<Uint32>();
+				const f_cnt_t fr_ahead = readValue<f_cnt_t>();
 				plugin->enqueueMidiEvent( ev, fr_ahead );
 				break;
 			}
 
 			case VST_SAMPLE_RATE:
-				plugin->setSampleRate( readValue<Sint32>() );
+				plugin->setSampleRate(
+						readValue<sample_rate_t>() );
 				break;
 
 
 			case VST_BUFFER_SIZE:
-				plugin->setBlockSize( readValue<Uint32>() );
+				plugin->setBlockSize( readValue<fpab_t>() );
 				break;
 
 			case VST_BPM:
-				plugin->setBPM( readValue<Uint16>() );
+				plugin->setBPM( readValue<bpm_t>() );
+				break;
+
+			case VST_LANGUAGE:
+				hlang = readValue<hostLanguages>();
 				break;
 
 			case VST_GET_PARAMETER_DUMP:

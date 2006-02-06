@@ -148,7 +148,7 @@ void pluckedStringSynth::playNote( notePlayHandle * _n )
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );
 	for( Uint32 frame = 0; frame < frames; ++frame )
 	{
-		const sampleType cur = ps->nextStringSample();
+		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			buf[frame][chnl] = cur;
@@ -178,7 +178,7 @@ pluckSynth::delayLine * FASTCALL pluckSynth::initDelayLine( int _len )
 	dl->length = _len;
 	if( _len > 0 )
 	{
-		dl->data = new sampleType[_len];
+		dl->data = new sample_t[_len];
 	}
 	else
 	{

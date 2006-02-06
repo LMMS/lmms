@@ -2,7 +2,7 @@
  * audio_file_device.cpp - base-class for audio-device-classes which write
  *                         their output into a file
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,12 +42,13 @@
 #include "buffer_allocator.h"
 
 
-audioFileDevice::audioFileDevice( Uint32 _sample_rate, Uint8 _channels,
-						const QString & _file,
-						bool _use_vbr,
-						Uint16 _nom_bitrate,
-						Uint16 _min_bitrate,
-						Uint16 _max_bitrate ) :
+audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,
+					const ch_cnt_t _channels,
+					const QString & _file,
+					const bool _use_vbr,
+					const bitrate_t _nom_bitrate,
+					const bitrate_t _min_bitrate,
+					const bitrate_t _max_bitrate ) :
 	audioDevice( _sample_rate, _channels),
 	m_outputFile( _file ),
 	m_useVbr( _use_vbr ),
@@ -86,12 +87,12 @@ audioFileDevice::~audioFileDevice()
 
 
 
-int audioFileDevice::writeData( const void * _data, int _len )
+Sint32 audioFileDevice::writeData( const void * _data, Sint32 _len )
 {
 #ifdef QT4
-	return( m_outputFile.write( (const char *)_data, _len ) );
+	return( m_outputFile.write( (const char *) _data, _len ) );
 #else
-	return( m_outputFile.writeBlock( (const char *)_data, _len ) );
+	return( m_outputFile.writeBlock( (const char *) _data, _len ) );
 #endif
 }
 

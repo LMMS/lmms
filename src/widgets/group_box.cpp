@@ -188,17 +188,18 @@ void groupBox::animate( void )
 
 void groupBox::updatePixmap( void )
 {
+	QColor bg_color = QApplication::palette().active().background();
 	QPixmap pm( size() );
-	pm.fill( QColor( 96, 96, 96 ) );
+	pm.fill( bg_color.dark( 132 ) );
 
 	QPainter p( &pm );
 
 	// outer rect
-	p.setPen( QColor( 64, 64, 64 ) );
+	p.setPen( bg_color.dark( 200 ) );
 	p.drawRect( 0, 0, width(), height() );
 
 	// brighter line at bottom/right
-	p.setPen( QColor( 160, 160, 160 ) );
+	p.setPen( bg_color.light( 125 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
@@ -206,17 +207,18 @@ void groupBox::updatePixmap( void )
 	p.drawPixmap( 2, 2, *s_ledBg );
 
 	// draw groupbox-titlebar
-	p.fillRect( 2, 2, width() - 4, 9, QColor( 30, 45, 60 ) );
+	p.fillRect( 2, 2, width() - 4, 9, bg_color.dark( 300 ) );
 
 	// draw line below titlebar
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setPen( bg_color.dark( 400 ) );
 	p.drawLine( 2 + s_ledBg->width(), 11, width() - 3, 11 );
 
 	// black inner rect
 	p.drawRect( 1, 1, width() - 2, height() - 2 );
 
 
-	p.setPen( QColor( 255, 255, 255 ) );
+	//p.setPen( QColor( 255, 255, 255 ) );
+	p.setPen( colorGroup().highlight() );
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 
@@ -226,7 +228,7 @@ void groupBox::updatePixmap( void )
 /*	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );*/
 	setPalette( pal );
 #else
-	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
+	setPaletteBackgroundColor( bg_color.dark( 132 ) );
 	setErasePixmap( pm );
 #endif
 }

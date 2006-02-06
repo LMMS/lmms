@@ -522,7 +522,7 @@ trackContentObject * FASTCALL trackContentWidget::getTCO( csize _tco_num )
 		return( m_trackContentObjects[_tco_num] );
 	}
 	printf( "called trackContentWidget::getTCO( %d, TRUE ), "
-			" but TCO %d doesn't exist\n", _tco_num, _tco_num );
+			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
 	return( getTrack()->addTCO( getTrack()->createTCO( _tco_num * 64 ) ) );
 //	return( NULL );
 }
@@ -1264,18 +1264,28 @@ track::~track()
 
 track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 {
+	// while adding track, pause mixer for not getting into any trouble
+	// because of track being not created completely so far
+	mixer::inst()->pause();
+
+	track * t = NULL;
+
 	switch( _tt )
 	{
-		case CHANNEL_TRACK: return( new channelTrack( _tc ) );
-		case BB_TRACK: return( new bbTrack( _tc ) );
-		case SAMPLE_TRACK: return( new sampleTrack( _tc ) );
+		case CHANNEL_TRACK: t = new channelTrack( _tc ); break;
+		case BB_TRACK: t = new bbTrack( _tc ); break;
+		case SAMPLE_TRACK: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
 		default: break;
 	}
-	qFatal( "Attempt to create track with invalid type %d!",
-						static_cast<int>( _tt ) );
-	return( NULL );
+
+	assert( t != NULL );
+
+	// allow mixer to continue
+	mixer::inst()->play();
+
+	return( t );
 }
 
 
@@ -1286,9 +1296,6 @@ track * FASTCALL track::create( const QDomElement & _this,
 {
 	track * t = create( static_cast<trackTypes>( _this.attribute(
 						"type" ).toInt() ), _tc );
-#ifdef LMMS_DEBUG
-	assert( t != NULL );
-#endif
 	t->loadSettings( _this );
 	return( t );
 }

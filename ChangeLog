@@ -1,3 +1,43 @@
+2006-02-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/basic_filters.h:
+	small optimizations: do not divide by 2.0, instead multiply with 0.5
+
+	* src/core/main.cpp:
+	set SCHED_FIFO-priority for LMMS if possible
+
+	* plugins/vestige/communication.h:
+	* plugins/vestige/lvsl_client.cpp:
+	* plugins/vestige/lvsl_server.c:
+	- set SCHED_FIFO-priority for VST-server if possible
+	- no X-calls needed anymore
+	- more complete host-callback-implementation
+	- support for geometry-changes of plugin
+	- use std::list instead of std::vector for enqueing MIDI-events (faster)
+	- support for telling plugin system's language
+
+	* configure.in:
+	when checking for VST-SDK-headers, use C++ compiler instead of
+	C-compilers as headers fail to compile with it
+
+2006-02-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/types.h:
+	* most files:
+	more strict typing -> types for samplerate, bpm, frame-count,
+	channel-count etc.
+
+	* src/core/track.cpp:
+	when creating a track, pause mixer for not causing any trouble because
+	of incompletely initialized track etc. - fixes several crashes when
+	adding track while playing
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	more "intelligent" mix-mutex-management for allow multiple pause()-
+	calls without ending in deadlock or crash because of mutex being
+	unlocked to early
+
 2006-02-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* configure.in:
