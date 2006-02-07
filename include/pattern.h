@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -78,7 +78,7 @@ public:
 		BEAT_PATTERN, MELODY_PATTERN/*, AUTOMATION_PATTERN*/
 	} ;
 
-	pattern( channelTrack * _channel_track );
+	pattern( channelTrack * _channel_track ) FASTCALL;
 	pattern( const pattern & _pat_to_copy ) FASTCALL;
 	virtual ~pattern();
 

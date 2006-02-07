@@ -1,5 +1,6 @@
 to be done as soon as possible:
 
+- separate GUI and data/sound-processing-code
 - fix qtimer-problem /channel-activity-LEDs
 - make color-scheme switchable: LMMS / user
 - autosave every 30s (configurable!) and offer recovery at startup after crash

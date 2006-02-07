@@ -195,7 +195,14 @@ public:
 
 	inline void addPlayHandle( playHandle * _ph )
 	{
-		m_playHandles.push_back( _ph );
+		if( criticalXRuns() == FALSE )
+		{
+			m_playHandles.push_back( _ph );
+		}
+		else
+		{
+			delete _ph;
+		}
 	}
 
 	inline void removePlayHandle( playHandle * _ph )
@@ -223,7 +230,7 @@ public:
 		return( m_masterGain );
 	}
 
-	inline void setMasterGain( float _mo )
+	inline void setMasterGain( const float _mo )
 	{
 		m_masterGain = _mo;
 	}
@@ -277,6 +284,7 @@ public:
 		return( m_playHandles.size() == 0 );
 	}
 
+	bool criticalXRuns( void ) const;
 
 	const surroundSampleFrame * renderNextBuffer( void );
 

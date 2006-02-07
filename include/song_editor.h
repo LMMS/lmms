@@ -119,6 +119,8 @@ public:
 		return( m_exporting );
 	}
 
+	bool realTimeTask( void ) const;
+
 	inline bool exportDone( void ) const
 	{
 		return( m_exporting == TRUE &&

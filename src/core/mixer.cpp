@@ -130,6 +130,15 @@ void mixer::stopProcessing( void )
 
 
 
+bool mixer::criticalXRuns( void ) const
+{
+	return( ( m_cpuLoad >= 98 &&
+				songEditor::inst()->realTimeTask() == TRUE ) );
+}
+
+
+
+
 const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
 	microTimer timer;
@@ -168,8 +177,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			++it;
 		}
 
-		m_playHandlesToRemove.erase(
-					m_playHandlesToRemove.begin() );
+		m_playHandlesToRemove.erase( m_playHandlesToRemove.begin() );
 	}
 
 	// now swap the buffers... current buffer becomes next (last)
@@ -179,36 +187,38 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	// clear last audio-buffer
 	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
 
-
-	csize idx = 0;
-	while( idx < m_playHandles.size() )
+//	if( criticalXRuns() == FALSE )
 	{
-		register playHandle * n = m_playHandles[idx];
-		// delete play-handle if it played completely
-		if( n->done() )
+		csize idx = 0;
+		while( idx < m_playHandles.size() )
 		{
-			delete n;
-			m_playHandles.erase( m_playHandles.begin() +
-								idx );
+			register playHandle * n = m_playHandles[idx];
+			// delete play-handle if it played completely
+			if( n->done() )
+			{
+				delete n;
+				m_playHandles.erase( m_playHandles.begin() +
+									idx );
+			}
+			else
+			{
+				// play all uncompletely-played play-handles...
+				n->play();
+				++idx;
+			}
 		}
-		else
-		{
-			// play all uncompletely-played play-handles...
-			n->play();
-			++idx;
-		}
-	}
 
-	songEditor::inst()->processNextBuffer();
+		songEditor::inst()->processNextBuffer();
 
-	for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
-					it != m_audioPorts.end(); ++it )
-	{
-		if( ( *it )->m_bufferUsage != audioPort::NONE )
+		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
+						it != m_audioPorts.end(); ++it )
 		{
-			processBuffer( ( *it )->firstBuffer(),
-					( *it )->nextFxChannel() );
-			( *it )->nextPeriod();
+			if( ( *it )->m_bufferUsage != audioPort::NONE )
+			{
+				processBuffer( ( *it )->firstBuffer(),
+						( *it )->nextFxChannel() );
+				( *it )->nextPeriod();
+			}
 		}
 	}
 
@@ -329,14 +339,8 @@ void mixer::setHighQuality( bool _hq_on )
 	delete m_audioDev;
 
 	// set new quality-level...
-	if( _hq_on == TRUE )
-	{
-		m_qualityLevel = HIGH_QUALITY_LEVEL;
-	}
-	else
-	{
-		m_qualityLevel = DEFAULT_QUALITY_LEVEL;
-	}
+	m_qualityLevel = ( _hq_on == TRUE ) ? HIGH_QUALITY_LEVEL :
+							DEFAULT_QUALITY_LEVEL;
 
 	// and re-open device
 	m_audioDev = tryAudioDevices();

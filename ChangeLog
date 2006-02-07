@@ -1,3 +1,12 @@
+2006-02-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* include/mixer.h:
+	* include/song_editor.h:
+	* src/core/mixer.cpp:
+	* src/core/song_editor.cpp:
+	simple xrun-detection - do not accept new note-play-handles if xruns
+	are detected
+
 2006-02-06	Andreas Brandmaier <andy/at/brandmaier.de>
 
 	* plugins/bitinvader/bitinvader.cpp

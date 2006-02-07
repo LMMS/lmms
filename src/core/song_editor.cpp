@@ -1050,6 +1050,13 @@ void songEditor::processNextBuffer( void )
 
 
 
+bool songEditor::realTimeTask( void ) const
+{
+	return( !( m_exporting == TRUE || ( m_playMode == PLAY_PATTERN &&
+		  		m_patternToPlay->freezing() == TRUE ) ) );
+}
+
+
 
 
 void songEditor::play( void )
