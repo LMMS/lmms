@@ -44,16 +44,17 @@
 #include "midi.h"
 #include "midi_event_processor.h"
 #include "tab_widget.h"
+#include "engine.h"
 
 
 class midiPort;
 
 
 // base-class for all MIDI-clients
-class midiClient
+class midiClient : public engineObject
 {
 public:
-	midiClient( void );
+	midiClient( engine * _engine );
 	virtual ~midiClient();
 
 	// to be implemented by sub-classes
@@ -143,7 +144,7 @@ const Uint8 RAW_MIDI_PARSE_BUF_SIZE = 16;
 class midiClientRaw : public midiClient
 {
 public:
-	midiClientRaw( void );
+	midiClientRaw( engine * _engine );
 	virtual ~midiClientRaw();
 
 	// we are raw-clients for sure!

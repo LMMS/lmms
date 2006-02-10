@@ -96,9 +96,10 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 
 
 
-setupDialog::setupDialog( configTabs _tab_to_open ) :
+setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	QDialog(),
-	m_bufferSize( mixer::inst()->framesPerAudioBuffer() ),
+	engineObject( _engine ),
+	m_bufferSize( eng()->getMixer()->framesPerAudioBuffer() ),
 	m_disableToolTips( configManager::inst()->value( "tooltips",
 							"disabled" ).toInt() ),
 	m_classicalKnobUsability( configManager::inst()->value( "knobs",
@@ -401,11 +402,11 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	}
 #ifdef QT4
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-					mixer::inst()->audioDevName() ) );
+					eng()->getMixer()->audioDevName() ) );
 #else
-	m_audioInterfaces->setCurrentText( mixer::inst()->audioDevName() );
+	m_audioInterfaces->setCurrentText( eng()->getMixer()->audioDevName() );
 #endif
-	m_audioIfaceSetupWidgets[mixer::inst()->audioDevName()]->show();
+	m_audioIfaceSetupWidgets[eng()->getMixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( audioInterfaceChanged( const QString & ) ) );
@@ -482,11 +483,11 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 #ifdef QT4
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-					mixer::inst()->midiClientName() ) );
+					eng()->getMixer()->midiClientName() ) );
 #else
-	m_midiInterfaces->setCurrentText( mixer::inst()->midiClientName() );
+	m_midiInterfaces->setCurrentText( eng()->getMixer()->midiClientName() );
 #endif
-	m_midiIfaceSetupWidgets[mixer::inst()->midiClientName()]->show();
+	m_midiIfaceSetupWidgets[eng()->getMixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );
@@ -642,7 +643,7 @@ void setupDialog::setBufferSize( int _value )
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
-						mixer::inst()->sampleRate(),
+						eng()->getMixer()->sampleRate(),
 						0, 'f', 1 ) );
 }
 

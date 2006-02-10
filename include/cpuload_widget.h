@@ -2,7 +2,7 @@
  * cpuload_widget.h - widget for displaying CPU-load (partly based on
  *                    Hydrogen's CPU-load-widget)
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,18 +44,19 @@
 #endif
 
 #include "types.h"
+#include "engine.h"
 
 
-class cpuloadWidget : public QWidget
+class cpuloadWidget : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	cpuloadWidget( QWidget * _parent );
-	~cpuloadWidget();
+	cpuloadWidget( QWidget * _parent, engine * _engine );
+	virtual ~cpuloadWidget();
 
 
 protected:
-	void paintEvent( QPaintEvent * _ev );
+	virtual void paintEvent( QPaintEvent * _ev );
 
 
 protected slots:

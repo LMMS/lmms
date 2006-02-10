@@ -27,31 +27,49 @@
 #ifndef _PRESET_PREVIEW_PLAY_HANDLE_H
 #define _PRESET_PREVIEW_PLAY_HANDLE_H
 
-#include "note_play_handle.h"
+#include "qt3support.h"
+
+#ifdef QT4
+
+#include <QMutex>
+#include <QMap>
+
+#else
 
 #include <qmutex.h>
+#include <qmap.h>
 
+#endif
+
+
+#include "note_play_handle.h"
+
+
+class previewTrackContainer;
 class channelTrack;
-class QMutex;
 
 
 class presetPreviewPlayHandle : public playHandle
 {
 public:
-	presetPreviewPlayHandle( const QString & _preset_file );
+	presetPreviewPlayHandle( const QString & _preset_file,
+						engine * _engine ) FASTCALL;
 	virtual ~presetPreviewPlayHandle();
 
 	virtual void play( void );
 	virtual bool done( void ) const;
 
-	static void cleanUp( void );
+	static void cleanUp( engine * _engine );
 	static constNotePlayHandleVector nphsOfChannelTrack(
 						const channelTrack * _ct );
 
 private:
-	static channelTrack * s_globalChannelTrack;
-	static notePlayHandle * s_globalPreviewNote;
-	static QMutex s_globalDataMutex;
+	inline previewTrackContainer * previewTC( void )
+	{
+		return( s_previewTCs[eng()] );
+	}
+
+	static QMap<const engine *, previewTrackContainer *> s_previewTCs;
 
 	notePlayHandle * m_previewNote;
 

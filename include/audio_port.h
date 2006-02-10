@@ -43,10 +43,10 @@
 #include "effect_board.h"
 
 
-class audioPort
+class audioPort : public engineObject
 {
 public:
-	audioPort( const QString & _name );
+	audioPort( const QString & _name, engine * _engine );
 	~audioPort();
 
 	inline surroundSampleFrame * firstBuffer( void )

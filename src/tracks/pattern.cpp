@@ -68,6 +68,7 @@
 #include "bb_editor.h"
 #include "string_pair_drag.h"
 #include "buffer_allocator.h"
+#include "main_window.h"
 
 
 QPixmap * pattern::s_stepBtnOn = NULL;
@@ -123,9 +124,9 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 
 pattern::~pattern()
 {
-	if( pianoRoll::inst()->currentPattern() == this )
+	if( eng()->getPianoRoll()->currentPattern() == this )
 	{
-		pianoRoll::inst()->setCurrentPattern( NULL );
+		eng()->getPianoRoll()->setCurrentPattern( NULL );
 	}
 	for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -312,9 +313,9 @@ void pattern::clearNotes( void )
 	m_notes.clear();
 	checkType();
 	update();
-	if( pianoRoll::inst()->currentPattern() == this )
+	if( eng()->getPianoRoll()->currentPattern() == this )
 	{
-		pianoRoll::inst()->update();
+		eng()->getPianoRoll()->update();
 	}
 }
 
@@ -377,8 +378,8 @@ void pattern::checkType( void )
 
 
 
-void pattern::playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
-								Uint32 _frames )
+void pattern::playFrozenData( sampleFrame * _ab, const f_cnt_t _start_frame,
+							const fpab_t _frames )
 {
 	m_frozenPatternMutex.lock();
 	if( m_frozenPattern != NULL )
@@ -491,9 +492,9 @@ void pattern::openInPianoRoll( void )
 
 void pattern::openInPianoRoll( bool )
 {
-	pianoRoll::inst()->setCurrentPattern( this );
-	pianoRoll::inst()->show();
-	pianoRoll::inst()->setFocus();
+	eng()->getPianoRoll()->setCurrentPattern( this );
+	eng()->getPianoRoll()->show();
+	eng()->getPianoRoll()->setFocus();
 }
 
 
@@ -527,7 +528,7 @@ void pattern::changeName( void )
 
 void pattern::freeze( void )
 {
-	if( songEditor::inst()->playing() )
+	if( eng()->getSongEditor()->playing() )
 	{
 		QMessageBox::information( 0, tr( "Cannot freeze pattern" ),
 						tr( "The pattern currently "
@@ -794,19 +795,21 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 		{
 			n->setLength( -64 );
 		}
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		update();
-		if( pianoRoll::inst()->currentPattern() == this )
+		if( eng()->getPianoRoll()->currentPattern() == this )
 		{
-			pianoRoll::inst()->update();
+			eng()->getPianoRoll()->update();
 		}
 	}
 	else if( m_frozenPattern != NULL && _me->button() == Qt::LeftButton &&
-			lmmsMainWin::isShiftPressed() == TRUE )
+			eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
 		QString s;
-		new stringPairDrag( "sampledata", m_frozenPattern->toBase64( s ),
-				    embed::getIconPixmap( "freeze" ), this );
+		new stringPairDrag( "sampledata",
+					m_frozenPattern->toBase64( s ),
+					    embed::getIconPixmap( "freeze" ),
+					    this, eng() );
 	}
 	else
 	{
@@ -856,11 +859,11 @@ void pattern::wheelEvent( QWheelEvent * _we )
 				n->setLength( 0 );
 			}
 		}
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		update();
-		if( pianoRoll::inst()->currentPattern() == this )
+		if( eng()->getPianoRoll()->currentPattern() == this )
 		{
-			pianoRoll::inst()->update();
+			eng()->getPianoRoll()->update();
 		}
 		_we->accept();
 	}
@@ -1132,9 +1135,9 @@ void pattern::ensureBeatNotes( void )
 
 void pattern::updateBBTrack( void )
 {
-	if( getTrack()->getTrackContainer() == bbEditor::inst() )
+	if( getTrack()->getTrackContainer() == eng()->getBBEditor() )
 	{
-		bbEditor::inst()->updateBBTrack( this );
+		eng()->getBBEditor()->updateBBTrack( this );
 	}
 }
 
@@ -1249,6 +1252,7 @@ void patternFreezeStatusDialog::updateProgress( void )
 
 patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
 	QThread(),
+	engineObject( _pattern->eng() ),
 	m_pattern( _pattern )
 {
 	// create status-dialog
@@ -1280,13 +1284,15 @@ void patternFreezeThread::run( void )
 	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
 	// audioSampleRecorder would be destroyed two times...
 	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
-			mixer::inst()->sampleRate(), DEFAULT_CHANNELS, b );
-	mixer::inst()->setAudioDevice( freeze_recorder,
-						mixer::inst()->highQuality() );
+						eng()->getMixer()->sampleRate(),
+							DEFAULT_CHANNELS, b,
+							eng()->getMixer() );
+	eng()->getMixer()->setAudioDevice( freeze_recorder,
+					eng()->getMixer()->highQuality() );
 
 	// prepare stuff for playing correct things later
-	songEditor::inst()->playPattern( m_pattern, FALSE );
-	songEditor::playPos & ppp = songEditor::inst()->getPlayPos(
+	eng()->getSongEditor()->playPattern( m_pattern, FALSE );
+	songEditor::playPos & ppp = eng()->getSongEditor()->getPlayPos(
 						songEditor::PLAY_PATTERN );
 	ppp.setTact( 0 );
 	ppp.setTact64th( 0 );
@@ -1309,7 +1315,7 @@ void patternFreezeThread::run( void )
 	m_pattern->m_freezing = FALSE;
 
 	// reset song-editor settings
-	songEditor::inst()->stop();
+	eng()->getSongEditor()->stop();
 	ppp.m_timeLineUpdate = TRUE;
 
 	// create final sample-buffer if freezing was successful
@@ -1324,7 +1330,7 @@ void patternFreezeThread::run( void )
 	bufferAllocator::disableAutoCleanup( FALSE );
 
 	// restore original audio-device
-	mixer::inst()->restoreAudioDevice();
+	eng()->getMixer()->restoreAudioDevice();
 
 	m_statusDlg->setProgress( -1 );	// we're finished
 

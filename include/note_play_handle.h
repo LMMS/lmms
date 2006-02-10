@@ -27,8 +27,6 @@
 #ifndef _NOTE_PLAY_HANDLE_H
 #define _NOTE_PLAY_HANDLE_H
 
-#include <qpair.h>
-
 #include "play_handle.h"
 #include "basic_filters.h"
 #include "note.h"
@@ -47,10 +45,10 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	notePlayHandle( channelTrack * _chnl_trk, const Uint32 _frames_ahead,
-					const Uint32 _frames, note * _n,
+	notePlayHandle( channelTrack * _chnl_trk, const f_cnt_t _frames_ahead,
+					const f_cnt_t _frames, note * _n,
 					const bool _arp_note = FALSE ) FASTCALL;
-	~notePlayHandle();
+	virtual ~notePlayHandle();
 
 
 	virtual void play( void );
@@ -65,34 +63,34 @@ public:
 	virtual void checkValidity( void );
 
 
-	void FASTCALL noteOff( Uint32 _s = 0 );
+	void FASTCALL noteOff( const f_cnt_t _s = 0 );
 
-	inline Uint32 framesBeforeRelease( void ) const
+	inline f_cnt_t framesBeforeRelease( void ) const
 	{
 		return( m_framesBeforeRelease );
 	}
 
-	inline Uint32 releaseFramesDone( void ) const
+	inline f_cnt_t releaseFramesDone( void ) const
 	{
 		return( m_releaseFramesDone );
 	}
 
-	Uint32 actualReleaseFramesToDo( void ) const;
+	f_cnt_t actualReleaseFramesToDo( void ) const;
 
 	// returns how many samples this note is aligned ahead, i.e.
 	// at which position it is inserted in the according buffer
-	inline Uint32 framesAhead( void ) const
+	inline f_cnt_t framesAhead( void ) const
 	{
 		return ( m_framesAhead );
 	}
 
 	// returns total numbers of frames to play
-	inline Uint32 frames( void ) const
+	inline f_cnt_t frames( void ) const
 	{
 		return( m_frames );
 	}
 
-	void setFrames( Uint32 _frames );
+	void setFrames( const f_cnt_t _frames );
 
 	// returns whether note was released
 	inline bool released( void ) const
@@ -101,13 +99,13 @@ public:
 	}
 
 	// returns total numbers of played frames
-	inline Uint32 totalFramesPlayed( void ) const
+	inline f_cnt_t totalFramesPlayed( void ) const
 	{
 		return( m_totalFramesPlayed );
 	}
 
 	// returns volume-level at frame _frame (envelope/LFO)
-	float FASTCALL volumeLevel( Uint32 _frame );
+	float FASTCALL volumeLevel( const f_cnt_t _frame );
 
 	// adds note-play-handle _n as subnote
 	inline void addSubNote( notePlayHandle * _n )
@@ -139,7 +137,7 @@ public:
 		return( m_arpNote );
 	}
 
-	inline void setArpNote( bool _on )
+	inline void setArpNote( const bool _on )
 	{
 		m_arpNote = _on;
 	}
@@ -172,17 +170,17 @@ public:
 private:
 	channelTrack * m_channelTrack;	// needed for calling
 					// channelTrack::playNote
-	Uint32 m_frames;		// total frames to play
-	Uint32 m_framesAhead;		// numbers of frames ahead in buffer
+	f_cnt_t m_frames;		// total frames to play
+	f_cnt_t m_framesAhead;		// numbers of frames ahead in buffer
 					// to mix in
-	Uint32 m_totalFramesPlayed;	// total frame-counter - used for
+	f_cnt_t m_totalFramesPlayed;	// total frame-counter - used for
 					// figuring out whether a whole note
 					// has been played
-	Uint32 m_framesBeforeRelease;	// number of frames after which note
+	f_cnt_t m_framesBeforeRelease;	// number of frames after which note
 					// is released
-	Uint32 m_releaseFramesToDo;	// total numbers of frames to be
+	f_cnt_t m_releaseFramesToDo;	// total numbers of frames to be
 					// played after release
-	Uint32 m_releaseFramesDone;	// number of frames done after
+	f_cnt_t m_releaseFramesDone;	// number of frames done after
 					// release of note
 	notePlayHandleVector m_subNotes;// used for chords and arpeggios
 	bool m_released;		// indicates whether note is released

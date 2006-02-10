@@ -29,6 +29,7 @@
 
 
 class audioFileDevice;
+class mixer;
 
 
 typedef audioFileDevice * ( * getDeviceInst)( const sample_rate_t _sample_rate,
@@ -38,7 +39,8 @@ typedef audioFileDevice * ( * getDeviceInst)( const sample_rate_t _sample_rate,
 						const bool _use_vbr,
 						const bitrate_t _nom_bitrate,
 						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate );
+						const bitrate_t _max_bitrate,
+						mixer * _mixer );
 
 
 enum fileTypes

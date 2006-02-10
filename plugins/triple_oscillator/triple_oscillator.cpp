@@ -38,6 +38,7 @@
 #include <qbitmap.h>
 #include <qpainter.h>
 #include <qdom.h>
+#include <qwhatsthis.h>
 
 #define setChecked setOn
 
@@ -53,6 +54,7 @@
 #include "buffer_allocator.h"
 #include "debug.h"
 #include "tooltip.h"
+#include "sample_buffer.h"
 
 #include "embed.cpp"
 
@@ -81,6 +83,11 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 	m_modulationAlgo1( oscillator::MIX ),
 	m_modulationAlgo2( oscillator::MIX )
 {
+	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
+	{
+		m_osc[i].m_sampleBuffer = new sampleBuffer( eng() );
+	}
+
 #ifdef QT4
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
@@ -258,10 +265,10 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		
 		// setup volume-knob
 		m_osc[i].volKnob = new knob( knobSmall_17, this, tr(
-						"Osc %1 volume" ).arg( i+1 ) );
+					"Osc %1 volume" ).arg( i+1 ), eng() );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-		m_osc[i].volKnob->setValue( DEFAULT_VOLUME, TRUE );
+		m_osc[i].volKnob->setValue( DEFAULT_VOLUME / 3, TRUE );
 		m_osc[i].volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 #ifdef QT4
@@ -277,7 +284,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobSmall_17, this,
-					tr( "Osc %1 panning" ).arg( i + 1 ) );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setValue( DEFAULT_PANNING, TRUE );
@@ -295,7 +302,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 		// setup coarse-knob
 		m_osc[i].coarseKnob = new knob( knobSmall_17, this,
-				tr("Osc %1 coarse detuning").arg( i + 1 ) );
+				tr("Osc %1 coarse detuning").arg( i + 1 ),
+								eng() );
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
 						2 * NOTES_PER_OCTAVE, 1.0f );
@@ -316,7 +324,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 		// setup knob for left fine-detuning
 		m_osc[i].fineLKnob = new knob( knobSmall_17, this,
-				tr( "Osc %1 fine detuning left" ).arg( i+1 ) );
+				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
+									eng() );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineLKnob->setValue( 0.0f, TRUE );
@@ -338,7 +347,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		// setup knob for right fine-detuning
 		m_osc[i].fineRKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 fine detuning right"
-							).arg( i + 1 ) );
+							).arg( i + 1 ), eng() );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineRKnob->setValue( 0.0f, TRUE );
@@ -359,7 +368,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		// setup phase-offset-knob
 		m_osc[i].phaseOffsetKnob = new knob( knobSmall_17, this,
 							tr( "Osc %1 phase-"
-							"offset" ).arg( i+1 ) );
+							"offset" ).arg( i+1 ),
+									eng() );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
 		m_osc[i].phaseOffsetKnob->setRange( 0.0f, 360.0f, 1.0f );
 		m_osc[i].phaseOffsetKnob->setValue( 0.0f, TRUE );
@@ -384,8 +394,8 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		// setup stereo-phase-detuning-knob
 		m_osc[i].stereoPhaseDetuningKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 stereo phase-"
-							"detuning" ).arg( i+1 )
-							);
+							"detuning" ).arg( i+1 ),
+									eng() );
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
 		m_osc[i].stereoPhaseDetuningKnob->setRange( 0.0f, 360.0f,
 									1.0f );
@@ -601,6 +611,10 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 
 tripleOscillator::~tripleOscillator()
 {
+	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
+	{
+		delete m_osc[i].m_sampleBuffer;
+	}
 }
 
 
@@ -633,7 +647,7 @@ void tripleOscillator::saveSettings( QDomDocument & _doc,
 		to_de.setAttribute( "wavetype" + is, QString::number(
 							m_osc[i].waveShape ) );
 		to_de.setAttribute( "userwavefile" + is,
-					m_osc[i].m_sampleBuffer.audioFile() );
+					m_osc[i].m_sampleBuffer->audioFile() );
 	}
 
 	_parent.appendChild( to_de );
@@ -669,7 +683,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 						"phoffset" + is ).toFloat() );
 		m_osc[i].stereoPhaseDetuningKnob->setValue( _this.attribute(
 						"stphdetun" + is ).toFloat() );
-		m_osc[i].m_sampleBuffer.setAudioFile( _this.attribute(
+		m_osc[i].m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
 		switch( _this.attribute( "wavetype" + is ).toInt() )
 		{
@@ -693,7 +707,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 				break;
 			case oscillator::USER_DEF_WAVE:
 				toolTip::add( m_osc[i].usrWaveBtn,
-					m_osc[i].m_sampleBuffer.audioFile() );
+					m_osc[i].m_sampleBuffer->audioFile() );
 				m_osc[i].usrWaveBtn->setChecked( TRUE );
 				break;
 			case oscillator::SIN_WAVE:
@@ -762,14 +776,16 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() +
 				m_osc[i].stereoPhaseDetuningKnob->value() ),
-								vol_fac_l );
+								vol_fac_l,
+					eng()->getMixer()->sampleRate() );
 				oscs_r[i] = oscillator::createOsc(
 						m_osc[i].waveShape,
 						oscillator::MIX,
 						freq*osc_detuning_r,
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() ),
-								vol_fac_r );
+								vol_fac_r,
+					eng()->getMixer()->sampleRate() );
 			}
 			else
 			{
@@ -780,7 +796,9 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() +
 				m_osc[i].stereoPhaseDetuningKnob->value() ),
-						vol_fac_l, oscs_l[i + 1] );
+								vol_fac_l,
+					eng()->getMixer()->sampleRate(),
+							oscs_l[i + 1] );
 				oscs_r[i] = oscillator::createOsc(
 						m_osc[i].waveShape,
 						getModulationAlgo( i + 1 ),
@@ -788,17 +806,18 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() ),
 								vol_fac_r,
+					eng()->getMixer()->sampleRate(),
 								oscs_r[i + 1] );
 			}
 
 			if( m_osc[i].waveShape == oscillator::USER_DEF_WAVE )
 			{
 				oscs_l[i]->setUserWave(
-					m_osc[i].m_sampleBuffer.data(),
-					m_osc[i].m_sampleBuffer.frames() );
+					m_osc[i].m_sampleBuffer->data(),
+					m_osc[i].m_sampleBuffer->frames() );
 				oscs_r[i]->setUserWave(
-					m_osc[i].m_sampleBuffer.data(),
-					m_osc[i].m_sampleBuffer.frames() );
+					m_osc[i].m_sampleBuffer->data(),
+					m_osc[i].m_sampleBuffer->frames() );
 			}
 
 		}
@@ -813,7 +832,7 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 	oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData
 								)->oscRight;
 
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 	
 	osc_l->update( buf, frames, 0 );
@@ -857,7 +876,7 @@ void tripleOscillator::setModulationAlgo(
 		m_modulationAlgo2 = _new_modulation_algo;
 	}
 
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -881,7 +900,7 @@ oscillator::modulationAlgos tripleOscillator::getModulationAlgo( int _n )
 void tripleOscillator::doSinWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::SIN_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -890,7 +909,7 @@ void tripleOscillator::doSinWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doTriangleWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::TRIANGLE_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -899,7 +918,7 @@ void tripleOscillator::doTriangleWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doSawWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::SAW_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -908,7 +927,7 @@ void tripleOscillator::doSawWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doSqrWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::SQUARE_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -917,7 +936,7 @@ void tripleOscillator::doSqrWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doMoogSawWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::MOOG_SAW_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -926,7 +945,7 @@ void tripleOscillator::doMoogSawWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doExpWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::EXP_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -935,7 +954,7 @@ void tripleOscillator::doExpWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doWhiteNoiseWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::WHITE_NOISE_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -944,7 +963,7 @@ void tripleOscillator::doWhiteNoiseWaveBtn( oscillatorData * _osc )
 void tripleOscillator::doUsrWaveBtn( oscillatorData * _osc )
 {
 	_osc->waveShape = oscillator::USER_DEF_WAVE;
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -992,15 +1011,15 @@ void tripleOscillator::osc01UserDefWaveCh( bool _on )
 
 void tripleOscillator::osc01UserDefWaveDblClick( void )
 {
-	QString af = m_osc[0].m_sampleBuffer.openAudioFile();
+	QString af = m_osc[0].m_sampleBuffer->openAudioFile();
 	if( af != "" )
 	{
-		m_osc[0].m_sampleBuffer.setAudioFile( af );
+		m_osc[0].m_sampleBuffer->setAudioFile( af );
 /*#ifndef QT4
 		toolTip::remove( m_osc[0].usrWaveBtn );
 #endif*/
 		toolTip::add( m_osc[0].usrWaveBtn,
-					m_osc[0].m_sampleBuffer.audioFile() );
+					m_osc[0].m_sampleBuffer->audioFile() );
 	}
 }
 
@@ -1049,15 +1068,15 @@ void tripleOscillator::osc02UserDefWaveCh( bool _on )
 
 void tripleOscillator::osc02UserDefWaveDblClick( void )
 {
-	QString af = m_osc[1].m_sampleBuffer.openAudioFile();
+	QString af = m_osc[1].m_sampleBuffer->openAudioFile();
 	if( af != "" )
 	{
-		m_osc[1].m_sampleBuffer.setAudioFile( af );
+		m_osc[1].m_sampleBuffer->setAudioFile( af );
 /*#ifndef QT4
 		toolTip::remove( m_osc[1].usrWaveBtn );
 #endif*/
 		toolTip::add( m_osc[1].usrWaveBtn,
-					m_osc[1].m_sampleBuffer.audioFile() );
+					m_osc[1].m_sampleBuffer->audioFile() );
 	}
 }
 
@@ -1105,15 +1124,15 @@ void tripleOscillator::osc03UserDefWaveCh( bool _on )
 
 void tripleOscillator::osc03UserDefWaveDblClick( void )
 {
-	QString af = m_osc[2].m_sampleBuffer.openAudioFile();
+	QString af = m_osc[2].m_sampleBuffer->openAudioFile();
 	if( af != "" )
 	{
-		m_osc[2].m_sampleBuffer.setAudioFile( af );
+		m_osc[2].m_sampleBuffer->setAudioFile( af );
 /*#ifndef QT4
 		toolTip::remove( m_osc[2].usrWaveBtn );
 #endif*/
 		toolTip::add( m_osc[2].usrWaveBtn,
-					m_osc[2].m_sampleBuffer.audioFile() );
+					m_osc[2].m_sampleBuffer->audioFile() );
 	}
 }
 

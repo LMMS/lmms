@@ -1,7 +1,7 @@
 /*
  * plugin_browser.cpp - implementation of the plugin-browser
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,9 +49,10 @@
 
 
 
-pluginBrowser::pluginBrowser( QWidget * _parent ) :
+pluginBrowser::pluginBrowser( QWidget * _parent, engine * _engine ) :
 	sideBarWidget( tr( "Instrument plugins" ),
-				embed::getIconPixmap( "plugins" ), _parent )
+				embed::getIconPixmap( "plugins" ), _parent ),
+	engineObject( _engine )
 {
 	setWindowTitle( tr( "Plugin browser" ) );
 	m_view = new QWidget( contentParent() );
@@ -84,7 +85,8 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
-		pluginDescWidget * p = new pluginDescWidget( *it, m_view );
+		pluginDescWidget * p = new pluginDescWidget( *it, m_view,
+									eng() );
 		p->show();
 		view_layout->addWidget( p );
 	}
@@ -106,8 +108,9 @@ pluginBrowser::~pluginBrowser()
 
 
 pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
-							QWidget * _parent ) :
+					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
+	engineObject( _engine ),
 	m_pluginDescriptor( _pd ),
 	m_logo(),
 	m_mouseOver( FALSE )
@@ -234,7 +237,7 @@ void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton )
 	{
 		new stringPairDrag( "instrument", m_pluginDescriptor.name,
-								m_logo, this );
+							m_logo, this, eng() );
 		m_mouseOver = FALSE;
 		update();
 	}

@@ -4,7 +4,7 @@
  * This file is based on the knob-widget of the Qwt Widget Library by
  * Josef Wilgen
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,6 +44,9 @@
 #endif
 
 
+#include "engine.h"
+
+
 class QPixmap;
 class textFloat;
 
@@ -55,11 +58,12 @@ enum knobTypes
 
 
 
-class knob : public QWidget
+class knob : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	knob( int _knob_num, QWidget * _parent, const QString & _name );
+	knob( int _knob_num, QWidget * _parent, const QString & _name,
+							engine * _engine );
 	virtual ~knob();
 
     

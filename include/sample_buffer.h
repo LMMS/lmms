@@ -57,7 +57,7 @@
 class QPainter;
 
 
-class sampleBuffer : public QObject
+class sampleBuffer : public QObject, public engineObject
 {
 	Q_OBJECT
 public:
@@ -69,16 +69,16 @@ public:
 
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	sampleBuffer( const QString & _audio_file = "",
+	sampleBuffer( engine * _engine, const QString & _audio_file = "",
 						bool _is_base64_data = FALSE );
-	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	sampleBuffer( const f_cnt_t _frames );
+	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
+							engine * _engine );
+	sampleBuffer( const f_cnt_t _frames, engine * _engine );
 	
-	~sampleBuffer();
+	virtual ~sampleBuffer();
 
 	bool FASTCALL play( sampleFrame * _ab, const f_cnt_t _start_frame,
-				const fpab_t _frames =
-					mixer::inst()->framesPerAudioBuffer(),
+				const fpab_t _frames,
 				const float _freq = BASE_FREQ,
 				const bool _looped = FALSE,
 				void * * _resampling_data = NULL );
@@ -131,15 +131,16 @@ public:
 	static sampleBuffer * FASTCALL resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr );
+						const sample_rate_t _dst_sr,
+						engine * _engine );
 
 	static inline sampleBuffer * FASTCALL resample(
-						const sampleBuffer * _buf,
+						sampleBuffer * _buf,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 	{
 		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
-								_dst_sr ) );
+						_dst_sr, _buf->eng() ) );
 	}
 
 

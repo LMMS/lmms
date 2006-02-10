@@ -1,7 +1,7 @@
 /*
  * instrument_play_handle.h - play-handle for playing an instrument
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,8 +33,8 @@
 class instrumentPlayHandle : public playHandle
 {
 public:
-	inline instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( INSTRUMENT_PLAY_HANDLE ),
+	inline instrumentPlayHandle( instrument * _instrument ) FASTCALL :
+		playHandle( INSTRUMENT_PLAY_HANDLE, _instrument->eng() ),
 		m_instrument( _instrument )
 	{
 	}

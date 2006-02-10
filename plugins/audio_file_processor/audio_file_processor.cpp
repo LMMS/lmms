@@ -1,7 +1,7 @@
 /*
  * audio_file_processor.cpp - instrument for using audio-files
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +41,8 @@
 #include <qbitmap.h>
 #include <qdom.h>
 #include <qfileinfo.h>
+#include <qcursor.h>
+#include <qwhatsthis.h>
 
 #endif
 
@@ -88,7 +90,7 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
-	m_sampleBuffer( "" ),
+	m_sampleBuffer( eng(), "" ),
 	m_drawMethod( sampleBuffer::LINE_CONNECT )
 {
 	connect( &m_sampleBuffer, SIGNAL( sampleUpdated() ), this,
@@ -166,7 +168,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new knob( knobDark_28, this, tr( "Amplify" ) );
+	m_ampKnob = new knob( knobDark_28, this, tr( "Amplify" ), eng() );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
 	m_ampKnob->setValue( 100.0f, TRUE );
@@ -184,7 +186,8 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"Otherwise it will be amplified up or down (your "
 			"actual sample-file isn't touched!)" ) );
 
-	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ) );
+	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
+									eng() );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
 	m_startKnob->setValue( 0.0f, TRUE );
@@ -203,7 +206,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"which AudioFileProcessor returns if a note is longer "
 			"than the sample between start- and end-point." ) );
 
-	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ) );
+	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng() );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
 	m_endKnob->setValue( 1.0f, TRUE );
@@ -365,7 +368,7 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 	const float freq_factor = BASE_FREQ /
 				( getChannelTrack()->frequency( _n ) *
 						DEFAULT_SAMPLE_RATE /
-						mixer::inst()->sampleRate() );
+					eng()->getMixer()->sampleRate() );
 
 	return( static_cast<Uint32>( floorf( ( m_sampleBuffer.endFrame() -
 						m_sampleBuffer.startFrame() ) *
@@ -398,12 +401,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file )
 
 void audioFileProcessor::playNote( notePlayHandle * _n )
 {
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	// calculate frequency of note
 	const float note_freq = getChannelTrack()->frequency( _n ) /
-						( mixer::inst()->sampleRate() /
+					( eng()->getMixer()->sampleRate() /
 							DEFAULT_SAMPLE_RATE );
 	if( m_sampleBuffer.play( buf, _n->totalFramesPlayed(),
 					frames, note_freq,
@@ -560,7 +563,7 @@ void audioFileProcessor::sampleUpdated( void )
 void audioFileProcessor::reverseBtnToggled( bool _on )
 {
 	m_sampleBuffer.setReversed( _on );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -568,7 +571,7 @@ void audioFileProcessor::reverseBtnToggled( bool _on )
 
 void audioFileProcessor::lineDrawBtnToggled( bool _on )
 {
-	if( _on )
+	if( _on == TRUE )
 	{
 		m_drawMethod = sampleBuffer::LINE_CONNECT;
 		sampleUpdated();
@@ -580,7 +583,7 @@ void audioFileProcessor::lineDrawBtnToggled( bool _on )
 
 void audioFileProcessor::dotDrawBtnToggled( bool _on )
 {
-	if( _on )
+	if( _on == TRUE )
 	{
 		m_drawMethod = sampleBuffer::DOTS;
 		sampleUpdated();
@@ -592,7 +595,7 @@ void audioFileProcessor::dotDrawBtnToggled( bool _on )
 
 void audioFileProcessor::ampKnobChanged( float _val )
 {
-	m_sampleBuffer.setAmplification( _val/100.0f );
+	m_sampleBuffer.setAmplification( _val / 100.0f );
 }
 
 
@@ -628,7 +631,7 @@ void audioFileProcessor::startKnobChanged( float _new_value )
 	}
 	else
 	{
-		m_startKnob->setValue( m_endKnob->value() - 0.01 );
+		m_startKnob->setValue( m_endKnob->value() - 0.01f );
 	}
 	update();
 }
@@ -653,7 +656,7 @@ void audioFileProcessor::endKnobChanged( float _new_value )
 	}
 	else
 	{
-		m_endKnob->setValue( m_startKnob->value() + 0.01 );
+		m_endKnob->setValue( m_startKnob->value() + 0.01f );
 	}
 	update();
 }
@@ -667,7 +670,7 @@ void audioFileProcessor::openAudioFile( void )
 	if( af != "" )
 	{
 		setAudioFile( af );
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 	}
 }
 

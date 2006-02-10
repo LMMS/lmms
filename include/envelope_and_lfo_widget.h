@@ -3,7 +3,7 @@
  *                             is used by envelope/lfo/filter-tab of
  *                              channel-window
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,10 +37,14 @@
 #ifdef QT4
 
 #include <QWidget>
+#include <QMap>
+#include <QVector>
 
 #else
 
 #include <qwidget.h>
+#include <qmap.h>
+#include <qvaluevector.h>
 
 #endif
 
@@ -63,22 +67,26 @@ class tempoSyncKnob;
 
 
 class envelopeAndLFOWidget : public QWidget, public settings,
-				public specialBgHandlingWidget
+				public specialBgHandlingWidget,
+				public engineObject
 {
 	Q_OBJECT
 public:
-	envelopeAndLFOWidget( float _value_for_zero_amount, QWidget * _parent );
-	~envelopeAndLFOWidget();
+	envelopeAndLFOWidget( float _value_for_zero_amount, QWidget * _parent,
+							engine * _engine );
+	virtual ~envelopeAndLFOWidget();
 
 	static inline float expKnobVal( float val )
 	{
 		return( ( ( val < 0 ) ? -1 : 1 ) * val*val );
 	}
-	static void triggerLFO( void );
-	static void resetLFO( void );
 
-	float FASTCALL level( Uint32 _frame, Uint32 _release_begin,
-						Uint32 _frame_offset ) const;
+	static void triggerLFO( engine * _engine );
+	static void resetLFO( engine * _engine );
+
+	float FASTCALL level( f_cnt_t _frame,
+				const f_cnt_t _release_begin,
+				const f_cnt_t _frame_offset ) const;
 
 	inline bool used( void ) const
 	{
@@ -105,7 +113,8 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 
-	float FASTCALL lfoLevel( Uint32 _frame, Uint32 _frame_offset ) const;
+	float FASTCALL lfoLevel( f_cnt_t _frame,
+					const f_cnt_t _frame_offset ) const;
 
 
 protected slots:
@@ -122,9 +131,10 @@ private:
 	static QPixmap * s_envGraph;
 	static QPixmap * s_lfoGraph;
 
-	static Uint32 s_lfoFrame;
+	static QMap<engine *, vvector<envelopeAndLFOWidget *> > s_EaLWidgets;
 
 	bool   m_used;
+
 
 	// envelope-stuff
 	knob * m_predelayKnob;
@@ -139,10 +149,10 @@ private:
 	float  m_amount;
 	float  m_valueForZeroAmount;
 	float  m_amountAdd;
-	Uint32 m_pahdFrames;
-	Uint32 m_rFrames;
-	float * m_pahdEnv;
-	float * m_rEnv;
+	f_cnt_t m_pahdFrames;
+	f_cnt_t m_rFrames;
+	sample_t * m_pahdEnv;
+	sample_t * m_rEnv;
 
 	// LFO-stuff
 	knob * m_lfoPredelayKnob;
@@ -158,12 +168,13 @@ private:
 	ledCheckBox * m_x100Cb;
 	ledCheckBox * m_controlEnvAmountCb;
 
-	Uint32 m_lfoPredelayFrames;
-	Uint32 m_lfoAttackFrames;
-	Uint32 m_lfoOscillationFrames;
+	f_cnt_t m_lfoPredelayFrames;
+	f_cnt_t m_lfoAttackFrames;
+	f_cnt_t m_lfoOscillationFrames;
+	f_cnt_t m_lfoFrame;
 	float m_lfoAmount;
 	bool m_lfoAmountIsZero;
-	float * m_lfoShapeData;
+	sample_t * m_lfoShapeData;
 	sampleBuffer m_userWave;
 
 	enum lfoShapes

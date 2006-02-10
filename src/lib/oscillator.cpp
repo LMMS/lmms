@@ -29,10 +29,13 @@
 
 oscillator::oscillator( const modulationAlgos _modulation_algo,
 			const float _freq, const Sint16 _phase_offset,
-			const float _volume_factor, oscillator * _sub_osc ) :
+			const float _volume_factor,
+			const sample_rate_t _sample_rate,
+			oscillator * _sub_osc ) :
 	m_freq( _freq ),
 	m_volumeFactor( _volume_factor ),
 	m_phaseOffset( _phase_offset ),
+	m_sampleRate( _sample_rate ),
 	m_subOsc( _sub_osc ),
 	m_userWaveData( &ZERO_FRAME ),
 	m_userWaveFrames( 1 )
@@ -155,9 +158,10 @@ class x : public oscillator						\
 public:									\
 	x( const modulationAlgos modulation_algo, const float _freq,	\
 		const Sint16 _phase_offset, const float _volume_factor,	\
+		const sample_rate_t _sample_rate,			\
 				oscillator * _sub_osc ) FASTCALL :	\
 	oscillator( modulation_algo, _freq, _phase_offset,		\
-					_volume_factor, _sub_osc )	\
+			_volume_factor, _sample_rate, _sub_osc )	\
 	{								\
 	}								\
 	virtual ~x()							\
@@ -201,6 +205,7 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 					const float _freq,
 					const Sint16 _phase_offset,
 					const float _volume_factor,
+					const sample_rate_t _sample_rate,
 							oscillator * _sub_osc )
 {
 	switch( _wave_shape )
@@ -208,39 +213,39 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 		case SIN_WAVE:
 			return( new sinWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case TRIANGLE_WAVE:
 			return( new triangleWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case SAW_WAVE:
 			return( new sawWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case SQUARE_WAVE:
 			return( new squareWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case MOOG_SAW_WAVE:
 			return( new moogSawWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case EXP_WAVE:
 			return( new expWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case WHITE_NOISE_WAVE:
 			return( new noiseWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		case USER_DEF_WAVE:
 			return( new userWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 		default:
 			return( new sinWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
-								_sub_osc ) );
+						_sample_rate, _sub_osc ) );
 	}
 
 }
@@ -251,12 +256,11 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 // should be called every time phase-offset or frequency is changed...
 void oscillator::recalcOscCoeff( const float additional_phase_offset )
 {
-	m_oscCoeff = m_freq / static_cast<float>( mixer::inst()->sampleRate() );
+	m_oscCoeff = m_freq / static_cast<float>( m_sampleRate );
 
 	m_sample = static_cast<f_cnt_t>( ( m_phaseOffset * ( 1.0f / 360.0f ) +
 						additional_phase_offset ) *
-						( mixer::inst()->sampleRate() /
-								m_freq ) );
+						( m_sampleRate / m_freq ) );
 	// because we pre-increment m_sample in update-function, we should
 	// decrement it here... (not possible when 0 because it is
 	// unsigned - overflow!!!)

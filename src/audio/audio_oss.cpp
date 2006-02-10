@@ -91,10 +91,12 @@
 
 
 
-audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful ) :
+audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer ) :
 	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audiooss", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
+					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
+								_mixer ),
 	m_convertEndian( FALSE ),
 	m_quit( FALSE )
 {
@@ -125,7 +127,7 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful ) :
 
 	int frag_spec;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		mixer::inst()->framesPerAudioBuffer() * channels() *
+		getMixer()->framesPerAudioBuffer() * channels() *
 							BYTES_PER_INT_SAMPLE;
 		++frag_spec )
 	{
@@ -316,9 +318,9 @@ void audioOSS::run( void )
 {
 	surroundSampleFrame * temp =
 			bufferAllocator::alloc<surroundSampleFrame>(
-					mixer::inst()->framesPerAudioBuffer() );
+					getMixer()->framesPerAudioBuffer() );
 	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
-					mixer::inst()->framesPerAudioBuffer() *
+					getMixer()->framesPerAudioBuffer() *
 								channels() );
 	m_quit = FALSE;
 
@@ -327,7 +329,7 @@ void audioOSS::run( void )
 		const Uint32 frames = getNextBuffer( temp );
 
 		int bytes = convertToS16( temp, frames,
-				mixer::inst()->masterGain(), outbuf,
+				getMixer()->masterGain(), outbuf,
 							m_convertEndian );
 		write( m_audioFD, outbuf, bytes );
 	}

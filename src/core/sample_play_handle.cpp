@@ -1,7 +1,7 @@
 /*
  * sample_play_handle.cpp - implementation of class samplePlayHandle
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,11 +23,6 @@
  */
 
 
-#include "qt3support.h"
-#ifndef QT4
-#include <qpair.h>
-#endif
-
 #include "sample_play_handle.h"
 #include "sample_buffer.h"
 #include "buffer_allocator.h"
@@ -35,13 +30,14 @@
 
 
 
-samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
-	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
+samplePlayHandle::samplePlayHandle( const QString & _sample_file,
+							engine * _engine ) :
+	playHandle( SAMPLE_PLAY_HANDLE, _engine ),
+	m_sampleBuffer( new sampleBuffer( eng(), _sample_file ) ),
 	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle" ) )
+	m_audioPort( new audioPort( "samplePlayHandle", eng() ) )
 {
 }
 
@@ -49,14 +45,15 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 
 
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
+	playHandle( SAMPLE_PLAY_HANDLE, _sample_buffer->eng() ),
 	m_sampleBuffer( _sample_buffer ),
 	m_ownSampleBuffer( FALSE ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle" ) )
+	m_audioPort( new audioPort( "samplePlayHandle", eng() ) )
 {
 }
+
 
 
 
@@ -79,21 +76,19 @@ void samplePlayHandle::play( void )
 		return;
 	}
 
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
-					mixer::inst()->framesPerAudioBuffer() *
-							DEFAULT_CHANNELS );
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 	volumeVector v = { 1.0f, 1.0f
 #ifndef DISABLE_SURROUND
 					, 1.0f, 1.0f
 #endif
 			} ;
-	m_sampleBuffer->play( buf, m_frame );
-	mixer::inst()->bufferToPort( buf, mixer::inst()->framesPerAudioBuffer(),
-							0, v, m_audioPort );
+	m_sampleBuffer->play( buf, m_frame, frames );
+	eng()->getMixer()->bufferToPort( buf, frames, 0, v, m_audioPort );
 
 	bufferAllocator::free( buf );
 
-	m_frame += mixer::inst()->framesPerAudioBuffer();
+	m_frame += frames;
 }
 
 
@@ -107,7 +102,7 @@ bool samplePlayHandle::done( void ) const
 
 
 
-Uint32 samplePlayHandle::totalFrames( void ) const
+f_cnt_t samplePlayHandle::totalFrames( void ) const
 {
 	return( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() );
 }

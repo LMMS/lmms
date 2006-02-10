@@ -37,11 +37,12 @@
 
 
 audioDevice::audioDevice( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels ) :
+				const ch_cnt_t _channels, mixer * _mixer ) :
 	m_sampleRate( _sample_rate ),
 	m_channels( _channels ),
+	m_mixer( _mixer ),
 	m_buffer( bufferAllocator::alloc<surroundSampleFrame>(
-				mixer::inst()->framesPerAudioBuffer() ) )
+				getMixer()->framesPerAudioBuffer() ) )
 {
 #ifdef HAVE_SAMPLERATE_H
 	int error;
@@ -77,7 +78,7 @@ audioDevice::~audioDevice()
 void audioDevice::processNextBuffer( void )
 {
 	const fpab_t frames = getNextBuffer( m_buffer );
-	writeBuffer( m_buffer, frames, mixer::inst()->masterGain() );
+	writeBuffer( m_buffer, frames, getMixer()->masterGain() );
 }
 
 
@@ -85,18 +86,18 @@ void audioDevice::processNextBuffer( void )
 
 fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 {
-	fpab_t frames = mixer::inst()->framesPerAudioBuffer();
-	const surroundSampleFrame * b = mixer::inst()->renderNextBuffer();
+	fpab_t frames = getMixer()->framesPerAudioBuffer();
+	const surroundSampleFrame * b = getMixer()->renderNextBuffer();
 
 	// make sure, no other thread is accessing device
 	lock();
 
 	// now were safe to access the device
-	if( mixer::inst()->sampleRate() != m_sampleRate )
+	if( getMixer()->sampleRate() != m_sampleRate )
 	{
-		resample( b, frames, _ab, mixer::inst()->sampleRate(),
+		resample( b, frames, _ab, getMixer()->sampleRate(),
 								m_sampleRate );
-		frames = frames * m_sampleRate / mixer::inst()->sampleRate();
+		frames = frames * m_sampleRate / getMixer()->sampleRate();
 	}
 	else
 	{

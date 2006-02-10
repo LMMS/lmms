@@ -56,7 +56,7 @@
 
 sampleTCO::sampleTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_sampleBuffer()
+	m_sampleBuffer( eng() )
 {
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
@@ -66,8 +66,8 @@ sampleTCO::sampleTCO( track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
-	connect( songEditor::inst(), SIGNAL( bpmChanged( int ) ), this,
-						SLOT( updateLength( int ) ) );
+	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ), this,
+						SLOT( updateLength( bpm_t ) ) );
 }
 
 
@@ -89,12 +89,12 @@ void sampleTCO::changeLength( const midiTime & _length )
 
 
 
-void FASTCALL sampleTCO::play( sampleFrame * _ab, Uint32 _start_frame,
-								Uint32 _frames )
+void FASTCALL sampleTCO::play( sampleFrame * _ab, f_cnt_t _start_frame,
+							const fpab_t _frames )
 {
 	_start_frame = static_cast<Uint32>( tMax( 0.0f, _start_frame -
 							startPosition() *
-				songEditor::inst()->framesPerTact() / 64 ) );
+			eng()->getSongEditor()->framesPerTact() / 64 ) );
 	m_sampleBuffer.play( _ab, _start_frame, _frames );
 }
 
@@ -124,7 +124,7 @@ void sampleTCO::setSampleFile( const QString & _sf )
 
 
 
-void sampleTCO::updateLength( int )
+void sampleTCO::updateLength( bpm_t )
 {
 	changeLength( getSampleLength() );
 }
@@ -155,7 +155,7 @@ void sampleTCO::dropEvent( QDropEvent * _de )
 	{
 		m_sampleBuffer.loadFromBase64(
 					stringPairDrag::decodeValue( _de ) );
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		updateLength();
 		update();
 		_de->accept();
@@ -175,7 +175,7 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 	if( af != "" && af != m_sampleBuffer.audioFile() )
 	{
 		setSampleFile( af );
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 	}
 }
 
@@ -240,7 +240,7 @@ void sampleTCO::paintEvent( QPaintEvent * )
 midiTime sampleTCO::getSampleLength( void ) const
 {
 	return( static_cast<Sint32>( m_sampleBuffer.frames() /
-					songEditor::inst()->framesPerTact() *
+					eng()->getSongEditor()->framesPerTact() *
 									64 ) );
 }
 
@@ -346,7 +346,7 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 {
 	m_fileLbl->setText( _f );
 	m_sampleTCO->setSampleFile( _f );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 */
 
@@ -356,12 +356,12 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ) ) )
+	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
-						getTrackSettingsWidget() );
+					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
 	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
@@ -388,13 +388,15 @@ track::trackTypes sampleTrack::type( void ) const
 
 
 
-bool FASTCALL sampleTrack::play( const midiTime & _start, Uint32 _start_frame,
-					Uint32 _frames, Uint32 _frame_base,
+bool FASTCALL sampleTrack::play( const midiTime & _start,
+						const f_cnt_t _start_frame,
+						const fpab_t _frames,
+						const f_cnt_t _frame_base,
 							Sint16 /*_tco_num*/ )
 {
 	vlist<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start+static_cast<Sint32>( _frames * 64 /
-					songEditor::inst()->framesPerTact() ) );
+				eng()->getSongEditor()->framesPerTact() ) );
 
 	if ( tcos.size() == 0 )
 	{
@@ -408,7 +410,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start, Uint32 _start_frame,
 					, 1.0f, 1.0f
 #endif
 			} ;
-	float fpt = songEditor::inst()->framesPerTact();
+	float fpt = eng()->getSongEditor()->framesPerTact();
 
 	for( vlist<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
@@ -420,7 +422,8 @@ bool FASTCALL sampleTrack::play( const midiTime & _start, Uint32 _start_frame,
 					static_cast<Uint32>( _start.getTact() *
 									fpt ),
 					_frames );
-			mixer::inst()->bufferToPort( buf, _frames, _frame_base +
+			eng()->getMixer()->bufferToPort( buf, _frames,
+							_frame_base +
 							static_cast<Uint32>(
 					st->startPosition().getTact64th() *
 							fpt / 64.0f ), v,

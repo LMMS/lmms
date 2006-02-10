@@ -50,8 +50,9 @@ using namespace std;
 
 
 
-graph::graph( const QString & _text, QWidget * _parent) :
-	QWidget( _parent )
+graph::graph( QWidget * _parent, engine * _engine ) :
+	QWidget( _parent ),
+	engineObject( _engine )
 {
 
 //	m_background = 0; TODO
@@ -86,7 +87,7 @@ void graph::setSamplePointer( float * _pointer, int _length )
 	update();
 }
 
-void graph::loadSampleFromFile( const QString filename )
+void graph::loadSampleFromFile( const QString & _filename )
 {
 	// zero sample_shape
 	for (int i = 0; i < sampleLength; i++)
@@ -95,9 +96,8 @@ void graph::loadSampleFromFile( const QString filename )
 	}
 	
 	// load user shape
-	sampleBuffer buffer;
-	buffer.setAudioFile( filename );
-		
+	sampleBuffer buffer( eng(), _filename );
+
 	// copy buffer data
 	sampleLength = min( sampleLength, static_cast<int>(buffer.frames()) );		 
 	for ( int i = 0; i < sampleLength; i++ )

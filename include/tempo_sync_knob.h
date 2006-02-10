@@ -37,6 +37,7 @@
 #endif
 
 #include "knob.h"
+#include "types.h"
 
 
 class QAction;
@@ -59,8 +60,8 @@ public:
 	} ;
 
 
-	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name, 
-			float _scale = 1.0f );
+	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
+			engine * _engine, float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
 
 	tempoSyncMode getSyncMode( void );
@@ -95,7 +96,7 @@ protected:
 
 
 protected slots:
-	void calculateTempoSyncTime( int _bpm );
+	void calculateTempoSyncTime( bpm_t _bpm );
 
 
 private:

@@ -2,7 +2,7 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,8 +58,8 @@ public:
 	virtual ~sampleTCO();
 
 	virtual void FASTCALL changeLength( const midiTime & _length );
-	void FASTCALL play( sampleFrame * _ab, Uint32 _start_frame,
-							Uint32 _frames );
+	void FASTCALL play( sampleFrame * _ab, f_cnt_t _start_frame,
+							const fpab_t _frames );
 	const QString & sampleFile( void ) const;
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -73,7 +73,7 @@ public:
 
 public slots:
 	void setSampleFile( const QString & _sf );
-	void updateLength( int = 0 );
+	void updateLength( bpm_t = 0 );
 
 
 protected:
@@ -127,8 +127,9 @@ public:
 
 	virtual trackTypes type( void ) const;
 	virtual bool FASTCALL play( const midiTime & _start,
-					Uint32 _start_frame, Uint32 _frames,
-					Uint32 _frame_base,
+						const f_cnt_t _start_frame,
+						const fpab_t _frames,
+						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 	virtual trackContentObject * FASTCALL createTCO( const midiTime &
 									_pos );

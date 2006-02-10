@@ -29,12 +29,12 @@
 
 #include "instrument.h"
 #include "oscillator.h"
-#include "sample_buffer.h"
 
 
 class knob;
 class pixmapButton;
 class notePlayHandle;
+class sampleBuffer;
 
 
 const int NUM_OF_OSCILLATORS = 3;
@@ -125,7 +125,7 @@ private:
 		pixmapButton * expWaveBtn;
 		pixmapButton * whiteNoiseWaveBtn;
 		pixmapButton * usrWaveBtn;
-		sampleBuffer m_sampleBuffer;
+		sampleBuffer * m_sampleBuffer;
 	} m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr

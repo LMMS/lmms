@@ -50,8 +50,10 @@
 
 
 
-nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent ) :
+nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent,
+							engine * _engine ) :
 	QLabel( _initial_name, _parent ),
+	engineObject( _engine ),
 	m_pixmap(),
 	m_pixmapFile( "" )
 {
@@ -267,7 +269,8 @@ void nameLabel::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( QColor( 0, 224, 0 ) );
-	bbTrack * bbt = bbTrack::findBBTrack( bbEditor::inst()->currentBB() );
+	bbTrack * bbt = bbTrack::findBBTrack(
+				eng()->getBBEditor()->currentBB(), eng() );
 	if( bbt != NULL && bbt->getTrackSettingsWidget() ==
 			dynamic_cast<trackSettingsWidget *>( parentWidget() ) )
 	{

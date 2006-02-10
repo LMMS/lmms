@@ -82,7 +82,7 @@ public:
 	// (note with unspecified length)
 	// Per default this function returns 0. In this case, channel is using
 	// the length of the longest envelope (if one active).
-	virtual Uint32 FASTCALL beatLen( notePlayHandle * _n ) const;
+	virtual f_cnt_t FASTCALL beatLen( notePlayHandle * _n ) const;
 
 
 	// instrument-play-handles use this for checking whether they can mark
@@ -110,7 +110,7 @@ protected:
 	inline void invalidate( void )
 	{
 		m_valid = FALSE;
-		mixer::inst()->checkValidityOfPlayHandles();
+		eng()->getMixer()->checkValidityOfPlayHandles();
 	}
 
 

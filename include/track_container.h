@@ -47,19 +47,21 @@
 #include "track.h"
 #include "settings.h"
 #include "rubberband.h"
+#include "engine.h"
+
 
 
 const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
-
 const Uint16 DEFAULT_SCROLLBAR_SIZE = 16;
 
 
-class trackContainer : public QMainWindow, public settings
+
+class trackContainer : public QMainWindow, public settings, public engineObject
 {
 	Q_OBJECT
 public:
-	trackContainer( void );
-	~trackContainer();
+	trackContainer( engine * _engine );
+	virtual ~trackContainer();
 
 	inline QWidget * containerWidget( void )
 	{
@@ -100,7 +102,9 @@ public:
 	void FASTCALL removeTrack( track * _track );
 	void FASTCALL moveTrackUp( track * _track );
 	void FASTCALL moveTrackDown( track * _track );
+
 	void FASTCALL realignTracks( bool _complete_update = FALSE );
+	void clearAllTracks( void );
 
 	const trackWidget * trackWidgetAt( const int _y ) const;
 

@@ -26,7 +26,7 @@
 
 
 #include "string_pair_drag.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 
 #ifdef QT4
 
@@ -38,12 +38,14 @@
 
 
 stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
-					const QPixmap & _icon, QWidget * _w ) :
+				const QPixmap & _icon, QWidget * _w,
+							engine * _engine ) :
 #ifdef QT4
-				QDrag( _w )
+				QDrag( _w ),
 #else
-				QStoredDrag( "lmms/stringpair", _w )
+				QStoredDrag( "lmms/stringpair", _w ),
 #endif
+				engineObject( _engine )
 {
 	setPixmap( _icon );
 	QString txt = _key + ":" + _value;
@@ -65,7 +67,7 @@ stringPairDrag::~stringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	lmmsMainWin::inst()->clearKeyModifiers();
+	eng()->getMainWindow()->clearKeyModifiers();
 	// TODO: do we have to delete anything???
 }
 

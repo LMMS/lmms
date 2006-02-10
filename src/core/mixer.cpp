@@ -57,11 +57,9 @@
 sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
 
-mixer * mixer::s_instanceOfMe = NULL;
-
-
-mixer::mixer() :
+mixer::mixer( engine * _engine ) :
 	QObject(),
+	engineObject( _engine ),
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
 	m_curBuf( NULL ),
 	m_nextBuf( NULL ),
@@ -73,9 +71,6 @@ mixer::mixer() :
 	m_mixMutex(),
 	m_mixMutexLockLevel( 0 )
 {
-	// small hack because code calling mixer::inst() is called out of ctor
-	s_instanceOfMe = this;
-
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
@@ -94,16 +89,9 @@ mixer::mixer() :
 	m_nextBuf = bufferAllocator::alloc<surroundSampleFrame>(
 						m_framesPerAudioBuffer );
 
-
-	m_audioDev = tryAudioDevices();
-	m_midiClient = tryMIDIClients();
-
-
 	// now clear our two output-buffers before using them...
 	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
 	clearAudioBuffer( m_nextBuf, m_framesPerAudioBuffer );
-
-	m_audioDev->startProcessing();
 
 }
 
@@ -122,6 +110,23 @@ mixer::~mixer()
 
 
 
+void mixer::initDevices( void )
+{
+	m_audioDev = tryAudioDevices();
+	m_midiClient = tryMIDIClients();
+}
+
+
+
+
+void mixer::startProcessing( void )
+{
+	m_audioDev->startProcessing();
+}
+
+
+
+
 void mixer::stopProcessing( void )
 {
 	m_audioDev->stopProcessing();
@@ -133,7 +138,7 @@ void mixer::stopProcessing( void )
 bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 98 &&
-				songEditor::inst()->realTimeTask() == TRUE ) );
+				eng()->getSongEditor()->realTimeTask() == TRUE ) );
 }
 
 
@@ -145,13 +150,14 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	static songEditor::playPos last_metro_pos = -1;
 
-	songEditor::playPos p = songEditor::inst()->getPlayPos(
+	songEditor::playPos p = eng()->getSongEditor()->getPlayPos(
 						songEditor::PLAY_PATTERN );
-	if( songEditor::inst()->playMode() == songEditor::PLAY_PATTERN &&
-		pianoRoll::inst()->isRecording() == TRUE &&
+	if( eng()->getSongEditor()->playMode() == songEditor::PLAY_PATTERN &&
+		eng()->getPianoRoll()->isRecording() == TRUE &&
 		p != last_metro_pos && p.getTact64th() % 16 == 0 )
 	{
-		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg" ) );
+		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg",
+								eng() ) );
 		last_metro_pos = p;
 	}
 
@@ -208,7 +214,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			}
 		}
 
-		songEditor::inst()->processNextBuffer();
+		eng()->getSongEditor()->processNextBuffer();
 
 		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
@@ -229,7 +235,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 
 	// and trigger LFOs
-	envelopeAndLFOWidget::triggerLFO();
+	envelopeAndLFOWidget::triggerLFO( eng() );
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
 							m_framesPerAudioBuffer;
@@ -427,7 +433,7 @@ audioDevice * mixer::tryAudioDevices( void )
 	if( dev_name == audioALSA::name() || dev_name == "" )
 	{
 		dev = new audioALSA( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-								success_ful );
+							success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioALSA::name();
@@ -442,7 +448,7 @@ audioDevice * mixer::tryAudioDevices( void )
 	if( dev_name == audioOSS::name() || dev_name == "" )
 	{
 		dev = new audioOSS( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-								success_ful );
+							success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioOSS::name();
@@ -457,7 +463,7 @@ audioDevice * mixer::tryAudioDevices( void )
 	if( dev_name == audioJACK::name() || dev_name == "" )
 	{
 		dev = new audioJACK( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-								success_ful );
+							success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioJACK::name();
@@ -472,7 +478,7 @@ audioDevice * mixer::tryAudioDevices( void )
 	if( dev_name == audioSDL::name() || dev_name == "" )
 	{
 		dev = new audioSDL( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-								success_ful );
+							success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioSDL::name();
@@ -483,7 +489,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #endif
 
 	// add more device-classes here...
-	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful );
+	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );
 	//if( sucess_ful )
 	//{
 	//	return( dev );
@@ -496,7 +502,8 @@ audioDevice * mixer::tryAudioDevices( void )
 
 	m_audioDevName = audioDummy::name();
 
-	return( new audioDummy( SAMPLE_RATES[m_qualityLevel], success_ful ) );
+	return( new audioDummy( SAMPLE_RATES[m_qualityLevel], success_ful,
+								this ) );
 }
 
 
@@ -510,7 +517,7 @@ midiClient * mixer::tryMIDIClients( void )
 #ifdef ALSA_SUPPORT
 	if( client_name == midiALSASeq::name() || client_name == "" )
 	{
-		midiALSASeq * malsas = new midiALSASeq();
+		midiALSASeq * malsas = new midiALSASeq( eng() );
 		if( malsas->isRunning() )
 		{
 			m_midiClientName = midiALSASeq::name();
@@ -521,7 +528,7 @@ midiClient * mixer::tryMIDIClients( void )
 
 	if( client_name == midiALSARaw::name() || client_name == "" )
 	{
-		midiALSARaw * malsar = new midiALSARaw();
+		midiALSARaw * malsar = new midiALSARaw( eng() );
 		if( malsar->isRunning() )
 		{
 			m_midiClientName = midiALSARaw::name();
@@ -534,7 +541,7 @@ midiClient * mixer::tryMIDIClients( void )
 #ifdef OSS_SUPPORT
 	if( client_name == midiOSS::name() || client_name == "" )
 	{
-		midiOSS * moss = new midiOSS();
+		midiOSS * moss = new midiOSS( eng() );
 		if( moss->isRunning() )
 		{
 			m_midiClientName = midiOSS::name();
@@ -549,7 +556,7 @@ midiClient * mixer::tryMIDIClients( void )
 
 	m_midiClientName = midiDummy::name();
 
-	return( new midiDummy() );
+	return( new midiDummy( eng() ) );
 }
 
 

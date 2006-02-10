@@ -44,6 +44,7 @@
 #include <qdir.h>
 #include <qpushbutton.h>
 #include <qcursor.h>
+#include <qwhatsthis.h>
 
 #endif
 
@@ -52,13 +53,13 @@
 #include "note_play_handle.h"
 #include "buffer_allocator.h"
 #include "mixer.h"
-#include "song_editor.h"
 #include "instrument_play_handle.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
 #include "spc_bg_hndl_widget.h"
 #include "vestige.h"
 #include "text_float.h"
+#include "song_editor.h"
 #include "lvsl_client.h"
 
 #include "embed.cpp"
@@ -105,8 +106,8 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 	setErasePixmap( *s_artwork );
 #endif
 
-	connect( songEditor::inst(), SIGNAL( bpmChanged( int ) ),
-					 this, SLOT( changeBPM( int ) ) );
+	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+					 this, SLOT( changeTempo( bpm_t ) ) );
 
 	m_openPluginButton = new pixmapButton( this );
 	m_openPluginButton->setCheckable( FALSE );
@@ -155,7 +156,7 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 
 	// now we need a play-handle which cares for calling play()
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
-	mixer::inst()->addPlayHandle( iph );
+	eng()->getMixer()->addPlayHandle( iph );
 }
 
 
@@ -270,7 +271,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
 			0 );
 		m_pluginMutex.lock();
-		m_plugin = new remoteVSTPlugin( m_pluginDLL );
+		m_plugin = new remoteVSTPlugin( m_pluginDLL, eng() );
 		if( m_plugin->failed() )
 		{
 			m_pluginMutex.unlock();
@@ -300,7 +301,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 			return;
 		}*/
 		m_plugin->showEditor();
-		m_plugin->setBPM( songEditor::inst()->getBPM() );
+		m_plugin->setTempo( eng()->getSongEditor()->getTempo() );
 		if( set_ch_name == TRUE )
 		{
 			getChannelTrack()->setName( m_plugin->name() );
@@ -332,7 +333,7 @@ void vestigeInstrument::play( void )
 		return;
 	}
 
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	m_plugin->process( NULL, buf );
@@ -476,12 +477,12 @@ void vestigeInstrument::noteOffAll( void )
 
 
 
-void vestigeInstrument::changeBPM( int _new_val )
+void vestigeInstrument::changeTempo( bpm_t _new_tempo )
 {
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->setBPM( _new_val );
+		m_plugin->setTempo( _new_tempo );
 	}
 	m_pluginMutex.unlock();
 }

@@ -100,8 +100,9 @@ public:
 
 	virtual trackTypes type( void ) const;
 	virtual bool FASTCALL play( const midiTime & _start,
-					Uint32 _start_frame, Uint32 _frames,
-					Uint32 _frame_base,
+					const f_cnt_t _start_frame,
+					const fpab_t _frames,
+					const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 	virtual trackContentObject * FASTCALL createTCO( const midiTime &
 									_pos );
@@ -111,7 +112,7 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
-	static bbTrack * FASTCALL findBBTrack( csize _bb_num );
+	static bbTrack * FASTCALL findBBTrack( csize _bb_num, engine * _engine );
 	static csize FASTCALL numOfBBTrack( track * _track );
 	static void FASTCALL swapBBTracks( track * _track1, track * _track2 );
 

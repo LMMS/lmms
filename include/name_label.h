@@ -41,13 +41,16 @@
 
 #endif
 
+#include "engine.h"
 
-class nameLabel : public QLabel
+
+class nameLabel : public QLabel, public engineObject
 {
 	Q_OBJECT
 public:
-	nameLabel( const QString & _initial_name, QWidget * _parent );
-	~nameLabel();
+	nameLabel( const QString & _initial_name, QWidget * _parent,
+							engine * _engine );
+	virtual ~nameLabel();
 
 	const QPixmap & pixmap( void ) const
 	{

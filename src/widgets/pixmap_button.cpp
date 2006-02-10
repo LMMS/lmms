@@ -2,7 +2,7 @@
  * pixmap_button.cpp - implementation of pixmap-button (often used as "themed"
  *                     checkboxes/radiobuttons etc)
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

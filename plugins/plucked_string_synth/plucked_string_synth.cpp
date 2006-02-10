@@ -72,13 +72,15 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 pluckedStringSynth::pluckedStringSynth( channelTrack * _channel_track ) :
 	instrument( _channel_track, &pluckedstringsynth_plugin_descriptor )
 {
-	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ) );
+	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
+									eng() );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
  	m_pickKnob->setValue( 0.0f, TRUE );
 	m_pickKnob->move( 86, 134 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 
-	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ) );
+	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
+									eng() );
 	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 	m_pickupKnob->setValue( 0.05f, TRUE );
 	m_pickupKnob->move( 138, 134 );
@@ -139,10 +141,11 @@ void pluckedStringSynth::playNote( notePlayHandle * _n )
 	{
 		float freq = getChannelTrack()->frequency( _n );
 		_n->m_pluginData = new pluckSynth( freq, m_pickKnob->value(),
-							m_pickupKnob->value() );
+						m_pickupKnob->value(),
+					eng()->getMixer()->sampleRate() );
 	}
 
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );
@@ -208,11 +211,11 @@ void FASTCALL pluckSynth::freeDelayLine( delayLine * _dl )
 
 
 
-pluckSynth::pluckSynth( float _pitch, float _pick, float _pickup )
+pluckSynth::pluckSynth( const float _pitch, const float _pick,
+			const float _pickup, const sample_rate_t _sample_rate )
 {
 	const float AMP = 1.5f;
-	int rail_length = static_cast<int>( mixer::inst()->sampleRate() / 2 /
-								_pitch ) + 1;
+	int rail_length = static_cast<int>( _sample_rate / 2 / _pitch ) + 1;
 	// Round pick position to nearest spatial sample.
 	// A pick position at x = 0 is not allowed.
 	int pick_sample = static_cast<int>( tMax<float>( rail_length * _pick,

@@ -89,20 +89,15 @@
 #include "cpuload_widget.h"
 #include "text_float.h"
 #include "combobox.h"
+#include "main_window.h"
 
 #include "debug.h"
 
 
 
-extern QString file_to_load;
 
-
-
-songEditor * songEditor::s_instanceOfMe = NULL;
-
-
-songEditor::songEditor() :
-	trackContainer(),
+songEditor::songEditor( engine * _engine ) :
+	trackContainer( _engine ),
 	m_fileName( "" ),
 	m_oldFileName( "" ),
 	m_exporting( FALSE ),
@@ -115,14 +110,9 @@ songEditor::songEditor() :
 	m_loopPattern( FALSE ),
 	m_scrollBack( FALSE )
 {
-	// hack, because code called out of this function uses
-	// songEditor::inst(), which assigns s_instanceOfMe this function
-	// returns...
-	s_instanceOfMe = this;
-
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
-	if( lmmsMainWin::inst()->workspace() != NULL )
+	if( eng()->getMainWindow()->workspace() != NULL )
 	{
 		setGeometry( 10, 10, 680, 300 );
 	}
@@ -146,7 +136,7 @@ songEditor::songEditor() :
 	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
 					pixelsPerTact(), m_playPos[PLAY_SONG],
-					m_currentPosition, cw );
+					m_currentPosition, cw, eng() );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				m_playPos[PLAY_SONG].m_timeLine,
 			SLOT( updatePosition( const midiTime & ) ) );
@@ -155,14 +145,14 @@ songEditor::songEditor() :
 
 
 	// add some essential widgets to global tool-bar 
-	QWidget * tb = lmmsMainWin::inst()->toolBar();
+	QWidget * tb = eng()->getMainWindow()->toolBar();
 
-	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb );
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
-							SLOT( setBPM( int ) ) );
+						SLOT( setTempo( int ) ) );
 	toolTip::add( m_bpmSpinBox, tr( "tempo of song" ) );
 
 #ifdef QT4
@@ -177,20 +167,20 @@ songEditor::songEditor() :
 			"should be played within a minute (or how many tacts "
 			"should be played within four minutes)." ) );
 
-	int col = lmmsMainWin::inst()->addWidgetToToolBar( m_bpmSpinBox, 0 );
+	int col = eng()->getMainWindow()->addWidgetToToolBar( m_bpmSpinBox, 0 );
 
 
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
 	hq_btn->setCheckable( TRUE );
-	connect( hq_btn, SIGNAL( toggled( bool ) ), mixer::inst(),
+	connect( hq_btn, SIGNAL( toggled( bool ) ), eng()->getMixer(),
 					SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	lmmsMainWin::inst()->addWidgetToToolBar( hq_btn, 1, col );
+	eng()->getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 
 
-	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 
 
@@ -224,11 +214,11 @@ songEditor::songEditor() :
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	lmmsMainWin::inst()->addWidgetToToolBar( master_vol_lbl );
-	lmmsMainWin::inst()->addWidgetToToolBar( m_masterVolumeSlider );
+	eng()->getMainWindow()->addWidgetToToolBar( master_vol_lbl );
+	eng()->getMainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
 
 
-	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
@@ -259,10 +249,10 @@ songEditor::songEditor() :
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	lmmsMainWin::inst()->addWidgetToToolBar( master_pitch_lbl );
-	lmmsMainWin::inst()->addWidgetToToolBar( m_masterPitchSlider );
+	eng()->getMainWindow()->addWidgetToToolBar( master_pitch_lbl );
+	eng()->getMainWindow()->addWidgetToToolBar( m_masterPitchSlider );
 
-	lmmsMainWin::inst()->addSpacingToToolBar( 10 );
+	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
@@ -272,12 +262,12 @@ songEditor::songEditor() :
 
 	vcw_layout->addStretch();
 	vcw_layout->addWidget( new visualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w ) ); 
+			embed::getIconPixmap( "output_graph" ), vc_w, eng() ) );
 
-	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
+	vcw_layout->addWidget( new cpuloadWidget( vc_w, eng() ) );
 	vcw_layout->addStretch();
 
-	lmmsMainWin::inst()->addWidgetToToolBar( vc_w );
+	eng()->getMainWindow()->addWidgetToToolBar( vc_w );
 
 
 	// create own toolbar
@@ -423,31 +413,8 @@ songEditor::songEditor() :
 					this, SLOT( scrolled( int ) ) );
 
 
-
 	show();
 
-	m_projectNotes = new projectNotes();
-	m_projectNotes->resize( 300, 200 );
-	if( lmmsMainWin::inst()->workspace() != NULL )
-	{
-		m_projectNotes->move( 700, 10 );
-	}
-	else
-	{
-		m_projectNotes->move( 800, 10 );
-	}
-	m_projectNotes->show();
-
-
-	// we try to load given file
-	if( file_to_load != "" )
-	{
-		loadProject( file_to_load );
-	}
-	else
-	{
-		createNewProject();
-	}
 }
 
 
@@ -517,13 +484,13 @@ void songEditor::resizeEvent( QResizeEvent * _re )
 void songEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		lmmsMainWin::isShiftPressed() == TRUE &&
+		eng()->getMainWindow()->isShiftPressed() == TRUE &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			lmmsMainWin::isShiftPressed() == TRUE &&
+			eng()->getMainWindow()->isShiftPressed() == TRUE &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		removeBar();
@@ -584,7 +551,7 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( lmmsMainWin::isCtrlPressed() == TRUE )
+	if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -606,7 +573,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks( TRUE );
 	} 
-	else if( lmmsMainWin::isShiftPressed() == TRUE )
+	else if( eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -634,7 +601,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	mixer::inst()->setMasterGain( 2.0f - _new_val / 100.0f );
+	eng()->getMixer()->setMasterGain( 2.0f - _new_val / 100.0f );
 	setModified();
 }
 
@@ -755,11 +722,11 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 
 
-void songEditor::setBPM( int _new_bpm )
+void songEditor::setTempo( int _new_bpm )
 {
-	m_bpmSpinBox->setValue( tLimit( _new_bpm, MIN_BPM, MAX_BPM ) );
+	m_bpmSpinBox->setValue( tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
 	setModified();
-	emit bpmChanged( _new_bpm );
+	emit tempoChanged( _new_bpm );
 }
 
 
@@ -821,7 +788,7 @@ void songEditor::doActions( void )
 				updateTimeLinePosition();
 
 				// remove all note-play-handles that are active
-				mixer::inst()->clear();
+				eng()->getMixer()->clear();
 
 				break;
 			}
@@ -909,7 +876,7 @@ void songEditor::processNextBuffer( void )
 			// at song-start we have to reset the LFOs
 			if( m_playPos[PLAY_SONG] == 0 )
 			{
-				envelopeAndLFOWidget::resetLFO();
+				envelopeAndLFOWidget::resetLFO( eng() );
 			}
 			break;
 
@@ -918,10 +885,11 @@ void songEditor::processNextBuffer( void )
 			break;
 
 		case PLAY_BB:
-			if( bbEditor::inst()->numOfBBs() > 0 )
+			if( eng()->getBBEditor()->numOfBBs() > 0 )
 			{
-				tco_num = bbEditor::inst()->currentBB();
-				tv.push_back( bbTrack::findBBTrack( tco_num ) );
+				tco_num = eng()->getBBEditor()->currentBB();
+				tv.push_back( bbTrack::findBBTrack( tco_num,
+								eng() ) );
 			}
 			break;
 
@@ -969,9 +937,9 @@ void songEditor::processNextBuffer( void )
 							frames_per_tact / 64 );
 	}
 
-	while( total_frames_played < mixer::inst()->framesPerAudioBuffer() )
+	while( total_frames_played < eng()->getMixer()->framesPerAudioBuffer() )
 	{
-		Uint32 played_frames = mixer::inst()->framesPerAudioBuffer() -
+		Uint32 played_frames = eng()->getMixer()->framesPerAudioBuffer() -
 							total_frames_played;
 
 		// did we play a whole tact?
@@ -986,7 +954,7 @@ void songEditor::processNextBuffer( void )
 			if( m_playMode == PLAY_BB )
 			{
 				max_tact =
-					bbEditor::inst()->lengthOfCurrentBB();
+					eng()->getBBEditor()->lengthOfCurrentBB();
 			}
 			else if( m_playMode == PLAY_PATTERN &&
 					m_loopPattern == TRUE &&
@@ -1011,7 +979,7 @@ void songEditor::processNextBuffer( void )
 		// or do we have some samples left in this tact but this are 
 		// less then samples we have to play?
 		else if( frames_per_tact - m_playPos[m_playMode].currentFrame()
-				< mixer::inst()->framesPerAudioBuffer() )
+				< eng()->getMixer()->framesPerAudioBuffer() )
 		{
 			// then set played_samples to remaining samples, the 
 			// rest will be played in next loop
@@ -1066,7 +1034,7 @@ void songEditor::play( void )
 		if( m_playMode != PLAY_SONG )
 		{
 			// make sure, bb-editor updates/resets it play-button
-			bbEditor::inst()->stop();
+			eng()->getBBEditor()->stop();
 			//pianoRoll::inst()->stop();
 		}
 		else
@@ -1289,14 +1257,14 @@ float songEditor::framesPerTact( void ) const
 	// when fooling around with tempo while playing, we sometimes get
 	// 0 here which leads to FP-exception, so handle it separately
 	const int bpm = tMax( 1, m_bpmSpinBox->value() );
-	return( mixer::inst()->sampleRate() * 60.0f * BEATS_PER_TACT /
+	return( eng()->getMixer()->sampleRate() * 60.0f * BEATS_PER_TACT /
 								bpm );
 }
 
 
 
 
-int songEditor::getBPM( void )
+bpm_t songEditor::getTempo( void )
 {
 	return( m_bpmSpinBox->value() );
 }
@@ -1317,7 +1285,7 @@ bool songEditor::mayChangeProject( void )
 #else
 		information
 #endif
-				( lmmsMainWin::inst(),
+				( eng()->getMainWindow(),
 						tr( "Project not saved" ),
 						tr( "The current project was "
 							"modified since last "
@@ -1338,12 +1306,12 @@ bool songEditor::mayChangeProject( void )
 				QMessageBox::Yes,
 				QMessageBox::No,
 				QMessageBox::Cancel,
-				lmmsMainWin::inst() );
+				eng()->getMainWindow() );
 	int answer = mb.exec();
 
 	if( answer == QMessageBox::Yes )
 	{
-		return( lmmsMainWin::inst()->saveProject() );
+		return( eng()->getMainWindow()->saveProject() );
 	}
 	else if( answer == QMessageBox::No )
 	{
@@ -1368,8 +1336,8 @@ void songEditor::clearProject( void )
 
 	// make sure all running notes are cleared, otherwise the whole
 	// thing will end up in a SIGSEGV...
-	mixer::inst()->clear( TRUE );
-	while( mixer::inst()->haveNoRunningNotes() == FALSE )
+	eng()->getMixer()->clear( TRUE );
+	while( eng()->getMixer()->haveNoRunningNotes() == FALSE )
 	{
 #ifdef QT4
 		QApplication::processEvents( QEventLoop::AllEvents );
@@ -1378,17 +1346,10 @@ void songEditor::clearProject( void )
 #endif
 	}
 
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
-	{
-		removeTrack( *it );
-	}
-	tv = bbEditor::inst()->tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
-	{
-		bbEditor::inst()->removeTrack( *it );
-	}
-	m_projectNotes->clear();
+	clearAllTracks();
+	eng()->getBBEditor()->clearAllTracks();
+
+	eng()->getProjectNotes()->clear();
 }
 
 
@@ -1405,13 +1366,13 @@ void songEditor::createNewProject( void )
 	dynamic_cast< channelTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	track::create( track::SAMPLE_TRACK, this );
-	t = track::create( track::CHANNEL_TRACK, bbEditor::inst() );
+	t = track::create( track::CHANNEL_TRACK, eng()->getBBEditor() );
 	dynamic_cast< channelTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
 
 	m_loadingProject = TRUE;
-	setBPM( DEFAULT_BPM );
+	setTempo( DEFAULT_BPM );
 	m_masterVolumeSlider->setValue( 100 );
 	m_masterPitchSlider->setValue( 0 );
 	m_loadingProject = FALSE;
@@ -1420,7 +1381,7 @@ void songEditor::createNewProject( void )
 
 	m_modified = FALSE;
 
-	lmmsMainWin::inst()->resetWindowTitle( "" );
+	eng()->getMainWindow()->resetWindowTitle( "" );
 }
 
 
@@ -1441,8 +1402,8 @@ void FASTCALL songEditor::createNewProjectFromTemplate( const QString &
 // load given song
 void FASTCALL songEditor::loadProject( const QString & _file_name )
 {
-
 	clearProject();
+
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
 
@@ -1466,7 +1427,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 			if( node.nodeName() == "bpm" &&
 		node.toElement().attribute( "value" ).toInt() > 0 )
 			{
-				setBPM( node.toElement().attribute( "value"
+				setTempo( node.toElement().attribute( "value"
 								).toInt() );
 			}
 			else if( node.nodeName() == "mastervol" )
@@ -1502,9 +1463,10 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 			{
 				loadSettings( node.toElement() );
 			}
-			else if( node.nodeName() == m_projectNotes->nodeName() )
+			else if( node.nodeName() ==
+					eng()->getProjectNotes()->nodeName() )
 			{
-				m_projectNotes->loadSettings(
+				eng()->getProjectNotes()->loadSettings(
 							node.toElement() );
 			}
 		}
@@ -1516,7 +1478,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 
 	m_loadingProject = FALSE;
 
-	lmmsMainWin::inst()->resetWindowTitle( "" );
+	eng()->getMainWindow()->resetWindowTitle( "" );
 }
 
 
@@ -1541,7 +1503,7 @@ bool songEditor::saveProject( void )
 
 
 	saveSettings( mmp, mmp.content() );
-	m_projectNotes->saveSettings( mmp, mmp.content() );
+	eng()->getProjectNotes()->saveSettings( mmp, mmp.content() );
 
 	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||
 					m_fileName != m_oldFileName ) == TRUE )
@@ -1553,7 +1515,7 @@ bool songEditor::saveProject( void )
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
-		lmmsMainWin::inst()->resetWindowTitle( "" );
+		eng()->getMainWindow()->resetWindowTitle( "" );
 	}
 	else
 	{
@@ -1624,7 +1586,7 @@ void songEditor::exportProject( void )
 	}
  	base_filename += fileEncodeDevices[0].m_extension;
 
-	QFileDialog efd( lmmsMainWin::inst() );
+	QFileDialog efd( eng()->getMainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
 
 	int idx = 0;
@@ -1662,7 +1624,7 @@ void songEditor::exportProject( void )
 		const QString export_file_name = efd.selectedFile();
 #endif
 		if( QFileInfo( export_file_name ).exists() == TRUE &&
-			QMessageBox::warning( lmmsMainWin::inst(),
+			QMessageBox::warning( eng()->getMainWindow(),
 						tr( "File already exists" ),
 						tr( "The file \"%1\" already "
 							"exists. Do you want "
@@ -1678,7 +1640,7 @@ void songEditor::exportProject( void )
 			return;
 		}
 		exportProjectDialog epd( export_file_name,
-							lmmsMainWin::inst() );
+						eng()->getMainWindow(), eng() );
 		epd.exec();
 	}
 }

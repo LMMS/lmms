@@ -49,7 +49,7 @@
 
 #include "export_project_dialog.h"
 #include "song_editor.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "combobox.h"
 #include "led_checkbox.h"
 #include "embed.h"
@@ -127,8 +127,10 @@ Sint16 exportProjectDialog::s_availableBitrates[] =
 // TODO: rewrite that crap using layouts!!
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
-							QWidget * _parent ) :
+						QWidget * _parent,
+						engine * _engine ) :
 	QDialog( _parent ),
+	engineObject( _engine ),
 	m_fileName( _file_name ),
 	m_hourglassLbl( NULL ),
 	m_deleteFile( FALSE )
@@ -156,7 +158,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
 				SLOT( changedType( const QString & ) ) );
 
-	int idx = 0;
+	Uint8 idx = 0;
 	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
 	{
 		m_typeCombo->addItem(
@@ -253,7 +255,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 {
 	if( _ke->key() == Qt::Key_Escape )
 	{
-		if( songEditor::inst()->exporting() == FALSE )
+		if( eng()->getSongEditor()->exporting() == FALSE )
 		{
 			accept();
 		}
@@ -269,7 +271,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( songEditor::inst()->exporting() == TRUE )
+	if( eng()->getSongEditor()->exporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
@@ -326,8 +328,8 @@ void exportProjectDialog::exportBtnClicked( void )
 							m_vbrCb->isChecked(),
 					m_kbpsCombo->currentText().toInt(),
 					m_kbpsCombo->currentText().toInt() - 64,
-					m_kbpsCombo->currentText().toInt() + 64
-				);
+					m_kbpsCombo->currentText().toInt() + 64,
+					eng()->getMixer() );
 	if( success_ful == FALSE )
 	{
 		QMessageBox::information( this,
@@ -373,26 +375,26 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 
-	mixer::inst()->setAudioDevice( dev, m_hqmCb->isChecked() );
-	songEditor::inst()->startExport();
+	eng()->getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
+	eng()->getSongEditor()->startExport();
 
 
-	songEditor::playPos & pp = songEditor::inst()->getPlayPos(
+	songEditor::playPos & pp = eng()->getSongEditor()->getPlayPos(
 							songEditor::PLAY_SONG );
 
-	while( songEditor::inst()->exportDone() == FALSE &&
-				songEditor::inst()->exporting() == TRUE )
+	while( eng()->getSongEditor()->exportDone() == FALSE &&
+				eng()->getSongEditor()->exporting() == TRUE )
 	{
 		dev->processNextBuffer();
 		int pval = pp * 100 /
-			( ( songEditor::inst()->lengthInTacts() + 1 ) * 64 );
+			( ( eng()->getSongEditor()->lengthInTacts() + 1 ) * 64 );
 #ifdef QT4
 		m_exportProgressBar->setValue( pval );
 #else
 		m_exportProgressBar->setProgress( pval );
 #endif
 		// update lmms-main-win-caption
-		lmmsMainWin::inst()->setWindowTitle( tr( "Rendering:" ) + " " +
+		eng()->getMainWindow()->setWindowTitle( tr( "Rendering:" ) + " " +
 						QString::number( pval ) + "%" );
 		// process paint-events etc.
 		qApp->processEvents();
@@ -413,7 +415,7 @@ void exportProjectDialog::exportBtnClicked( void )
 void exportProjectDialog::cancelBtnClicked( void )
 {
 	// is song-export-thread active?
-	if( songEditor::inst()->exporting() == TRUE )
+	if( eng()->getSongEditor()->exporting() == TRUE )
 	{
 		// then dispose abort of export
 		abortProjectExport();
@@ -438,7 +440,7 @@ void exportProjectDialog::abortProjectExport( void )
 
 void exportProjectDialog::finishProjectExport( void )
 {
-	mixer::inst()->restoreAudioDevice();
+	eng()->getMixer()->restoreAudioDevice();
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_deleteFile )
@@ -447,9 +449,9 @@ void exportProjectDialog::finishProjectExport( void )
 	}
 
 	// restore window-title
-	lmmsMainWin::inst()->resetWindowTitle(); 
+	eng()->getMainWindow()->resetWindowTitle(); 
 
-	songEditor::inst()->stopExport();
+	eng()->getSongEditor()->stopExport();
 
 	// if we rendered file from command line, quit after export
 	if( file_to_render != "" )

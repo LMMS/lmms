@@ -49,7 +49,8 @@ public:
 			const bool _use_vbr,
 			const bitrate_t _nom_bitrate,
 			const bitrate_t _min_bitrate,
-			const bitrate_t _max_bitrate );
+			const bitrate_t _max_bitrate,
+			mixer * _mixer );
 	virtual ~audioFileOgg();
 
 	static audioFileDevice * getInst( const sample_rate_t _sample_rate,
@@ -59,11 +60,13 @@ public:
 						const bool _use_vbr,
 						const bitrate_t _nom_bitrate,
 						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate )
+						const bitrate_t _max_bitrate,
+						mixer * _mixer )
 	{
 		return( new audioFileOgg( _sample_rate, _channels, _success_ful,
 						_file, _use_vbr, _nom_bitrate,
-						_min_bitrate, _max_bitrate ) );
+						_min_bitrate, _max_bitrate,
+								_mixer ) );
 	}
 
 

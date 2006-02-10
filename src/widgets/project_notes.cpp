@@ -1,7 +1,7 @@
 /*
  * project_notes.cpp - implementation of project-notes-editor
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -67,20 +67,21 @@
 
 #include "project_notes.h"
 #include "embed.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "song_editor.h"
 
 
 
-projectNotes::projectNotes() :
-	QMainWindow( lmmsMainWin::inst()->workspace()
+projectNotes::projectNotes( engine * _engine) :
+	QMainWindow( _engine->getMainWindow()->workspace()
 #ifndef QT4
 				, 0, Qt::WStyle_Title
 #endif
-		)
+		),
+	engineObject( _engine )
 {
 #ifdef QT4
-	lmmsMainWin::inst()->workspace()->addWindow( this );
+	eng()->getMainWindow()->workspace()->addWindow( this );
 #endif
 
 	m_edit = new QTextEdit( this );
@@ -101,13 +102,33 @@ projectNotes::projectNotes() :
 	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
 			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
-				songEditor::inst(), SLOT( setModified() ) );
+				eng()->getSongEditor(), SLOT( setModified() ) );
 
 	setupActions();
 
 	setCentralWidget( m_edit );
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
+
+	resize( 300, 200 );
+	if( eng()->getMainWindow()->workspace() != NULL )
+	{
+		move( 700, 10 );
+	}
+	else
+	{
+		move( 800, 10 );
+	}
+
+	show();
+
+}
+
+
+
+
+projectNotes::~projectNotes()
+{
 }
 
 
@@ -405,7 +426,7 @@ void projectNotes::setupActions()
 void projectNotes::textBold()
 {
 	m_edit->setFontWeight( m_actionTextBold->isChecked() );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -414,7 +435,7 @@ void projectNotes::textBold()
 void projectNotes::textUnderline()
 {
 	m_edit->setFontUnderline( m_actionTextUnderline->isChecked() );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -423,7 +444,7 @@ void projectNotes::textUnderline()
 void projectNotes::textItalic()
 {
 	m_edit->setFontItalic( m_actionTextItalic->isChecked() );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -433,7 +454,7 @@ void projectNotes::textFamily( const QString & _f )
 {
 	m_edit->setFontFamily( _f );
 	m_edit->viewport()->setFocus();
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -443,7 +464,7 @@ void projectNotes::textSize( const QString & _p )
 {
 	m_edit->setFontPointSize( _p.toInt() );
 	m_edit->viewport()->setFocus();
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -499,7 +520,7 @@ void projectNotes::fontChanged( const QFont & _f )
 	m_actionTextBold->setChecked( _f.bold() );
 	m_actionTextItalic->setChecked( _f.italic() );
 	m_actionTextUnderline->setChecked( _f.underline() );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -514,7 +535,7 @@ void projectNotes::colorChanged( const QColor & _c )
 #else
 	m_actionTextColor->setIconSet( pix );
 #endif
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -542,7 +563,7 @@ void projectNotes::alignmentChanged( int _a )
 	{
 		m_actionAlignJustify->setChecked( TRUE );
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 

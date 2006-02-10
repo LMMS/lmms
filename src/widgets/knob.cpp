@@ -4,7 +4,7 @@
  * This file is based on the knob-widget of the Qwt Widget Library from
  * Josef Wilgen
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,6 +53,8 @@
 #include <qfontmetrics.h>
 #include <qapplication.h>
 #include <qinputdialog.h>
+#include <qcursor.h>
+#include <qwhatsthis.h>
 
 #define addSeparator insertSeparator
 
@@ -74,6 +76,7 @@
 #include "gui_templates.h"
 #include "templates.h"
 #include "string_pair_drag.h"
+#include "main_window.h"
 
 
 
@@ -87,12 +90,14 @@ textFloat * knob::s_textFloat = NULL;
 
 
 
-knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
+knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
+							engine * _engine ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
+	engineObject( _engine ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_angle( 0.0f ),
@@ -140,9 +145,9 @@ knob::~knob()
 {
 /*	// make sure pointer to this knob isn't used anymore in active
 	// midi-device-class
-	if( mixer::inst()->getMIDIClient()->pitchBendKnob() == this )
+	if( eng()->getMixer()->getMIDIClient()->pitchBendKnob() == this )
 	{
-		mixer::inst()->getMIDIClient()->setPitchBendKnob( NULL );
+		eng()->getMixer()->getMIDIClient()->setPitchBendKnob( NULL );
 	}*/
 }
 
@@ -401,7 +406,7 @@ void knob::dropEvent( QDropEvent * _de )
 void knob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-				lmmsMainWin::inst()->isCtrlPressed() == FALSE )
+			eng()->getMainWindow()->isCtrlPressed() == FALSE )
 	{
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -428,10 +433,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-					lmmsMainWin::isCtrlPressed() == TRUE )
+			eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		new stringPairDrag( "float_value", QString::number( value() ),
-							QPixmap(), this );
+						QPixmap(), this, eng() );
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
@@ -454,7 +459,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 		{
 			QCursor::setPos( mapToGlobal( m_origMousePos ) );
 		}
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 	}
 
 	s_textFloat->setText( m_hintTextBeforeValue +
@@ -546,7 +551,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 	_we->accept();
 	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
 	incValue( inc );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 
 	s_textFloat->reparent( this );
@@ -747,7 +752,7 @@ void knob::setStep( float _vstep )
 void knob::reset( void )
 {
 	setValue( m_initValue );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( value() ) +
@@ -771,7 +776,7 @@ void knob::copyValue( void )
 void knob::pasteValue( void )
 {
 	setValue( s_copiedValue );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( value() ) +
@@ -812,7 +817,7 @@ void knob::enterValue( void )
 
 void knob::connectToMidiDevice( void )
 {
-	//mixer::inst()->getMIDIDevice()->setPitchBendKnob( this );
+	//eng()->getMixer()->getMIDIDevice()->setPitchBendKnob( this );
 }
 
 

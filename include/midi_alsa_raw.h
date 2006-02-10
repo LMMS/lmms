@@ -1,7 +1,7 @@
 /*
  * midi_alsa_raw.h - midi-client for RawMIDI via ALSA
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -61,8 +61,8 @@ class QLineEdit;
 class midiALSARaw : public midiClientRaw, public QThread
 {
 public:
-	midiALSARaw( void );
-	~midiALSARaw();
+	midiALSARaw( engine * _engine );
+	virtual ~midiALSARaw();
 
 	static QString probeDevice( void );
 

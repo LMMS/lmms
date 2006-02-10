@@ -47,7 +47,8 @@ class QLineEdit;
 class audioOSS : public audioDevice, public QThread
 {
 public:
-	audioOSS( const sample_rate_t _sample_rate, bool & _success_ful );
+	audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer );
 	virtual ~audioOSS();
 
 	inline static QString name( void )

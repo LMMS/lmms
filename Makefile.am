@@ -63,7 +63,7 @@ lmms_MOC =						\
 		./knob.moc				\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
-		./lmms_main_win.moc			\
+		./main_window.moc			\
 		./mixer.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
@@ -121,12 +121,13 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/arp_and_chords_tab_widget.cpp	\
 		$(srcdir)/src/core/bb_editor.cpp			\
 		$(srcdir)/src/core/config_mgr.cpp			\
+		$(srcdir)/src/core/engine.cpp				\
 		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
 		$(srcdir)/src/core/envelope_tab_widget.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
-		$(srcdir)/src/core/lmms_main_win.cpp			\
+		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/midi_tab_widget.cpp			\
 		$(srcdir)/src/core/mixer.cpp				\
@@ -189,7 +190,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
 		$(srcdir)/include/pch.h					\
 		$(srcdir)/include/debug.h				\
-		$(srcdir)/include/lmms_main_win.h			\
+		$(srcdir)/include/main_window.h				\
 		$(srcdir)/include/audio_alsa.h				\
 		$(srcdir)/include/audio_device.h			\
 		$(srcdir)/include/audio_dummy.h				\

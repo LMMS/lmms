@@ -51,8 +51,9 @@ class QLineEdit;
 class audioALSA : public audioDevice, public QThread
 {
 public:
-	audioALSA( const sample_rate_t _sample_rate, bool & _success_ful );
-	~audioALSA();
+	audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer );
+	virtual ~audioALSA();
 
 	inline static QString name( void )
 	{

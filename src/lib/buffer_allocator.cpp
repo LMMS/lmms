@@ -150,7 +150,8 @@ void bufferAllocator::free( void * _buf )
 
 	// do clean-up if neccessary
 	static const Uint32 CLEANUP_LEVEL = static_cast<Uint32>( 768 / ( logf(
-				mixer::inst()->framesPerAudioBuffer() ) /
+				/*mixer::inst()->framesPerAudioBuffer()*/
+								128 ) /
 								logf( 2 ) ) );
 	static int count = 0;
 	// only cleanup every 10th time, because otherwise there's a lot of

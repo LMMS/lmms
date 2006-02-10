@@ -78,8 +78,8 @@ public:
 		BEAT_PATTERN, MELODY_PATTERN/*, AUTOMATION_PATTERN*/
 	} ;
 
-	pattern( channelTrack * _channel_track ) FASTCALL;
-	pattern( const pattern & _pat_to_copy ) FASTCALL;
+	pattern( channelTrack * _channel_track );
+	pattern( const pattern & _pat_to_copy );
 	virtual ~pattern();
 
 	void init( void );
@@ -139,8 +139,9 @@ public:
 
 	// if channel-track recognizes that this pattern is frozen, it calls
 	// this instead of playing all the notes
-	void FASTCALL playFrozenData( sampleFrame * _ab, Uint32 _start_frame,
-							Uint32 _frames );
+	void FASTCALL playFrozenData( sampleFrame * _ab,
+						const f_cnt_t _start_frame,
+							const fpab_t _frames );
 
 	// settings-management
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -269,7 +270,7 @@ signals:
 
 
 
-class patternFreezeThread : public QThread
+class patternFreezeThread : public QThread, public engineObject
 {
 public:
 	patternFreezeThread( pattern * _pattern );

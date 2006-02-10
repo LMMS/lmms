@@ -1,7 +1,7 @@
 /*
  * audio_sdl.cpp - device-class that performs PCM-output via SDL
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,10 +48,11 @@
 
 
 
-audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful ) :
-	audioDevice( _sample_rate, DEFAULT_CHANNELS ),
+audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer ) :
+	audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
-				mixer::inst()->framesPerAudioBuffer() ) ),
+				getMixer()->framesPerAudioBuffer() ) ),
 	m_convertEndian( FALSE )
 {
 	_success_ful = FALSE;
@@ -81,7 +82,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful ) :
 						// of system, so we don't have
 						// to convert the buffers
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = mixer::inst()->framesPerAudioBuffer();
+	m_audioHandle.samples = getMixer()->framesPerAudioBuffer();
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -145,7 +146,7 @@ void audioSDL::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 	const fpab_t frames = _this->getNextBuffer( _this->m_outBuf );
 
 	_this->convertToS16( _this->m_outBuf, frames,
-						mixer::inst()->masterGain(),
+						_this->getMixer()->masterGain(),
 						(int_sample_t *)( _buf ),
 						_this->m_convertEndian );
 }
@@ -171,7 +172,6 @@ audioSDL::setupWidget::setupWidget( QWidget * _parent ) :
 
 audioSDL::setupWidget::~setupWidget()
 {
-
 }
 
 

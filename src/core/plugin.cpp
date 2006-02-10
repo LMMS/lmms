@@ -61,8 +61,9 @@ static plugin::descriptor dummy_plugin_descriptor =
 
 
 
-plugin::plugin( const descriptor * _descriptor ) :
+plugin::plugin( const descriptor * _descriptor, engine * _engine ) :
 	settings(),
+	engineObject( _engine ),
 	m_descriptor( _descriptor )
 {
 	if( m_descriptor == NULL )

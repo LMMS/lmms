@@ -60,7 +60,7 @@
 #include "tooltip.h"
 #include "string_pair_drag.h"
 #include "mmp.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "text_float.h"
 
 
@@ -85,6 +85,7 @@ trackContentObject::trackContentObject( track * _track ) :
 		, Qt::WDestructiveClose
 #endif
  		),
+	engineObject( _track->eng() ),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
@@ -136,7 +137,7 @@ void trackContentObject::movePosition( const midiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		songEditor::inst()->setModified();
+		getTrack()->eng()->getSongEditor()->setModified();
 	}
 	m_startPosition = _pos;
 	m_track->getTrackWidget()->changePosition();
@@ -152,7 +153,7 @@ void trackContentObject::changeLength( const midiTime & _length )
 {
 	if( m_length != _length )
 	{
-		songEditor::inst()->setModified();
+		getTrack()->eng()->getSongEditor()->setModified();
 	}
 	m_length = _length;
 	setFixedWidth( static_cast<int>( m_length * pixelsPerTact() / 64 ) +
@@ -232,7 +233,8 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 	{
 		if( m_track->getTrackContainer()->rubberBandActive() == FALSE )
 		{
-			if( lmmsMainWin::isCtrlPressed() == TRUE )
+			if(
+		getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE )
 			{
 				setSelected( !isSelected() );
 			}
@@ -248,12 +250,12 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( lmmsMainWin::isShiftPressed() == TRUE )
+	else if( getTrack()->eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
 		selectableObject::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-					lmmsMainWin::isCtrlPressed() == TRUE )
+		getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
 		saveSettings( mmp, mmp.content() );
@@ -270,10 +272,11 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 #endif
 		new stringPairDrag( "tco_" +
 					QString::number( m_track->type() ),
-					mmp.toString(), thumbnail, this );
+					mmp.toString(), thumbnail, this,
+							m_track->eng() );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			/*	lmmsMainWin::isShiftPressed() == FALSE &&*/
+			/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
 		m_initialMouseX = _me->x();
@@ -299,7 +302,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( ( _me->button() == Qt::MidButton/* ||
 			( _me->button() == Qt::LeftButton &&
-		  		lmmsMainWin::isShiftPressed() == TRUE )*/ ) &&
+		  		eng()->getMainWindow()->isShiftPressed() == TRUE )*/ ) &&
 							fixedTCOs() == FALSE )
 	{
 		close();
@@ -544,7 +547,7 @@ trackContentObject * FASTCALL trackContentWidget::addTCO(
 	m_trackContentObjects.push_back( _tco );
 	_tco->move( 0, 1 );
 	m_trackWidget->changePosition();
-	songEditor::inst()->setModified();
+	getTrack()->eng()->getSongEditor()->setModified();
 	return( _tco );		// just for convenience
 }
 
@@ -572,7 +575,7 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 			delete _tco;
 		}
 		m_trackContentObjects.erase( it );
-		songEditor::inst()->setModified();
+		getTrack()->eng()->getSongEditor()->setModified();
 	}
 }
 
@@ -711,7 +714,7 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		QWidget::mousePressEvent( _me );
 	}
-	else if( lmmsMainWin::isShiftPressed() == TRUE )
+	else if( getTrack()->eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
 		QWidget::mousePressEvent( _me );
 	}
@@ -871,7 +874,7 @@ bool trackOperationsWidget::muted( void ) const
 void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			lmmsMainWin::isCtrlPressed() == TRUE &&
+m_trackWidget->getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE &&
 			m_trackWidget->getTrack()->type() != track::BB_TRACK )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
@@ -880,7 +883,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 			QString::number( m_trackWidget->getTrack()->type() ),
 			mmp.toString(), QPixmap::grabWidget(
 				&m_trackWidget->getTrackSettingsWidget() ),
-									this );
+				this, m_trackWidget->getTrack()->eng() );
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
@@ -1099,7 +1102,7 @@ void trackWidget::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		if( lmmsMainWin::isShiftPressed() == TRUE )
+		if( m_track->eng()->getMainWindow()->isShiftPressed() == TRUE )
 		{
 			m_action = RESIZE_TRACK;
 			QCursor::setPos( mapToGlobal( QPoint( _me->x(),
@@ -1240,6 +1243,7 @@ midiTime trackWidget::endPosition( const midiTime & _pos_start )
 
 track::track( trackContainer * _tc ) :
 	settings(),
+	engineObject( _tc->eng() ),
 	m_trackContainer( _tc )
 {
 	m_trackWidget = new trackWidget( this,
@@ -1266,7 +1270,7 @@ track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 {
 	// while adding track, pause mixer for not getting into any trouble
 	// because of track being not created completely so far
-	mixer::inst()->pause();
+	_tc->eng()->getMixer()->pause();
 
 	track * t = NULL;
 
@@ -1283,7 +1287,7 @@ track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 	assert( t != NULL );
 
 	// allow mixer to continue
-	mixer::inst()->play();
+	_tc->eng()->getMixer()->play();
 
 	return( t );
 }

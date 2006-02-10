@@ -56,7 +56,7 @@
 
 #include "piano_roll.h"
 #include "song_editor.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "pattern.h"
 #include "embed.h"
 #include "pixmap_button.h"
@@ -103,9 +103,6 @@ const int NE_LINE_WIDTH = 3;
 const int INITIAL_START_KEY = C + OCTAVE_3 * NOTES_PER_OCTAVE;
 
 
-// init static members of pianoRoll
-pianoRoll * pianoRoll::s_instanceOfMe = NULL;
-
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
 QPixmap * pianoRoll::s_whiteKeyBigPm = NULL;
 QPixmap * pianoRoll::s_blackKeyPm = NULL;
@@ -126,8 +123,9 @@ pianoRoll::pianoRollKeyTypes pianoRoll::prKeyOrder[] =
 const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
-pianoRoll::pianoRoll( void ) :
-	QWidget( lmmsMainWin::inst()->workspace() ),
+pianoRoll::pianoRoll( engine * _engine ) :
+	QWidget( _engine->getMainWindow()->workspace() ),
+	engineObject( _engine ),
 	m_paintPixmap(),
 	m_cursorInside( FALSE ),
 	m_pattern( NULL ),
@@ -185,14 +183,15 @@ pianoRoll::pianoRoll( void ) :
 
 #ifdef QT4
 	// add us to workspace
-	lmmsMainWin::inst()->workspace()->addWindow( this );
+	eng()->getMainWindow()->workspace()->addWindow( this );
 #endif
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
-					songEditor::inst()->getPlayPos(
+					eng()->getSongEditor()->getPlayPos(
 						songEditor::PLAY_PATTERN ),
-						m_currentPosition, this );
+						m_currentPosition, this,
+								eng() );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
@@ -459,12 +458,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 	if( validPattern() == FALSE )
 	{
-		// we must not call resizeEvent with NULL-pointer when
-		// being called of of ctor
-		if( s_instanceOfMe == this )
-		{
-			resizeEvent( NULL );
-		}
+		//resizeEvent( NULL );
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
 
 		update();
@@ -1050,7 +1044,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( songEditor::inst()->playing() )
+			if( eng()->getSongEditor()->playing() )
 			{
 				stop();
 			}
@@ -1236,7 +1230,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					QApplication::setOverrideCursor( c );
 				}
 
-				songEditor::inst()->setModified();
+				eng()->getSongEditor()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -1256,7 +1250,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 						( *it )->setLength( 0 );
 						m_pattern->update();
 					}
-					songEditor::inst()->setModified();
+					eng()->getSongEditor()->setModified();
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
@@ -1295,7 +1289,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_action = MOVE_SELECTION;
 
 				play_note = FALSE;
-				songEditor::inst()->setModified();
+				eng()->getSongEditor()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -1311,7 +1305,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 		// was there an action where should be played the note?
 		if( play_note == TRUE && m_recording == FALSE &&
-					songEditor::inst()->playing() == FALSE )
+				eng()->getSongEditor()->playing() == FALSE )
 		{
 			m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
@@ -1403,7 +1397,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_action != SELECT_NOTES &&
 				m_action != MOVE_SELECTION &&
 				m_recording == FALSE &&
-				songEditor::inst()->playing() == FALSE )
+				eng()->getSongEditor()->playing() == FALSE )
 			{
 				m_pattern->getChannelTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
@@ -1483,7 +1477,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_pattern->update();
 			}
 
-			songEditor::inst()->setModified();
+			eng()->getSongEditor()->setModified();
 
 		}
 		else if(
@@ -1907,7 +1901,6 @@ void pianoRoll::paintEvent( QPaintEvent * )
 // responsible for moving/resizing scrollbars after window-resizing
 void pianoRoll::resizeEvent( QResizeEvent * )
 {
-
 	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH, height() -
 								SCROLLBAR_SIZE,
 					width()-WHITE_KEY_WIDTH,
@@ -1936,9 +1929,10 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 	}
 	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
 
-	songEditor::inst()->getPlayPos( songEditor::PLAY_PATTERN
+	eng()->getSongEditor()->getPlayPos( songEditor::PLAY_PATTERN
 					).m_timeLine->setFixedWidth( width() );
 	m_toolBar->setFixedWidth( width() );
+	update();
 }
 
 
@@ -1947,7 +1941,7 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 void pianoRoll::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( lmmsMainWin::isCtrlPressed() == TRUE )
+	if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -1967,7 +1961,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( lmmsMainWin::isShiftPressed() )
+	else if( eng()->getMainWindow()->isShiftPressed() )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() * 2 / 15 );
@@ -2013,30 +2007,31 @@ void pianoRoll::play( void )
 		return;
 	}
 
-	if( songEditor::inst()->playing() )
+	if( eng()->getSongEditor()->playing() )
 	{
-		if( songEditor::inst()->playMode() != songEditor::PLAY_PATTERN )
+		if( eng()->getSongEditor()->playMode() !=
+						songEditor::PLAY_PATTERN )
 		{
-			songEditor::inst()->stop();
-			songEditor::inst()->playPattern( m_pattern );
+			eng()->getSongEditor()->stop();
+			eng()->getSongEditor()->playPattern( m_pattern );
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
-			songEditor::inst()->pause();
+			eng()->getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
 	}
-	else if( songEditor::inst()->paused() )
+	else if( eng()->getSongEditor()->paused() )
 	{
-		songEditor::inst()->resumeFromPause();
+		eng()->getSongEditor()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		songEditor::inst()->playPattern( m_pattern );
+		eng()->getSongEditor()->playPattern( m_pattern );
 	}
 }
 
@@ -2045,7 +2040,7 @@ void pianoRoll::play( void )
 
 void pianoRoll::record( void )
 {
-	if( songEditor::inst()->playing() )
+	if( eng()->getSongEditor()->playing() )
 	{
 		stop();
 	}
@@ -2055,7 +2050,7 @@ void pianoRoll::record( void )
 	}
 
 	m_recording = TRUE;
-	songEditor::inst()->playPattern( m_pattern, FALSE );
+	eng()->getSongEditor()->playPattern( m_pattern, FALSE );
 }
 
 
@@ -2063,7 +2058,7 @@ void pianoRoll::record( void )
 
 void pianoRoll::stop( void )
 {
-	songEditor::inst()->stop();
+	eng()->getSongEditor()->stop();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 	m_recording = FALSE;
@@ -2078,7 +2073,7 @@ void pianoRoll::recordNote( const note & _n )
 	if( m_recording == TRUE && validPattern() == TRUE )
 	{
 		note n( _n );
-		n.setPos( songEditor::inst()->getPlayPos(
+		n.setPos( eng()->getSongEditor()->getPlayPos(
 				songEditor::PLAY_PATTERN ) - n.length() );
 #ifndef QT4
 		qApp->lock();
@@ -2088,7 +2083,7 @@ void pianoRoll::recordNote( const note & _n )
 #ifndef QT4
 		qApp->unlock();
 #endif
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 	}
 }
 
@@ -2315,7 +2310,7 @@ void pianoRoll::cutSelectedNotes( void )
 
 	if( selected_notes.empty() == FALSE )
 	{
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 
 		midiTime start_pos( selected_notes.front()->pos().getTact(),
 									0 );
@@ -2334,7 +2329,7 @@ void pianoRoll::cutSelectedNotes( void )
 	}
 
 	update();
-	songEditor::inst()->update();
+	eng()->getSongEditor()->update();
 }
 
 
@@ -2359,9 +2354,9 @@ void pianoRoll::pasteNotes( void )
 
 		// we only have to do the following lines if we pasted at
 		// least one note...
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		update();
-		songEditor::inst()->update ();
+		eng()->getSongEditor()->update();
 	}
 }
 
@@ -2386,11 +2381,11 @@ void pianoRoll::deleteSelectedNotes( void )
 		selected_notes.erase( selected_notes.begin() );
 	}
 
-	if( update_after_delete )
+	if( update_after_delete == TRUE )
 	{
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		update();
-		songEditor::inst()->update();
+		eng()->getSongEditor()->update();
 	}
 }
 
@@ -2399,8 +2394,9 @@ void pianoRoll::deleteSelectedNotes( void )
 
 void pianoRoll::updatePosition( const midiTime & _t )
 {
-	if( ( songEditor::inst()->playing() &&
-		songEditor::inst()->playMode() == songEditor::PLAY_PATTERN ) ||
+	if( ( eng()->getSongEditor()->playing() &&
+			eng()->getSongEditor()->playMode() ==
+					songEditor::PLAY_PATTERN ) ||
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - WHITE_KEY_WIDTH;

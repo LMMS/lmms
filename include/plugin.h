@@ -49,6 +49,7 @@
 #include "types.h"
 #include "settings.h"
 #include "embed.h"
+#include "engine.h"
 
 
 #define STRINGIFY_PLUGIN_NAME(s) STR(s)
@@ -58,7 +59,7 @@
 class QPixmap;
 
 
-class plugin : public settings
+class plugin : public settings, public engineObject
 {
 public:
 	enum pluginTypes
@@ -85,7 +86,7 @@ public:
 	} ;
 
 	// contructor of a plugin
-	plugin( const descriptor * _descriptor );
+	plugin( const descriptor * _descriptor, engine * _engine );
 	virtual ~plugin();
 
 	// returns public-name out of descriptor

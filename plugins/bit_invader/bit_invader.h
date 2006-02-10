@@ -53,7 +53,7 @@ class pixmapButton;
 class bSynth
 {
 public:
-	bSynth(float* sample, int length, float _pitch, bool _interpolation, float factor);
+	bSynth(float* sample, int length, float _pitch, bool _interpolation, float factor, const sample_rate_t _sample_rate);
 	virtual ~bSynth();
 	
 	sample_t nextStringSample();	

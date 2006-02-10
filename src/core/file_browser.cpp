@@ -2,7 +2,7 @@
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,12 +32,15 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <Q3Header>
+#include <QCursor>
 
 #else
 
 #include <qpushbutton.h>
 #include <qpopupmenu.h>
 #include <qheader.h>
+#include <qcursor.h>
+#include <qworkspace.h>
 
 #endif
 
@@ -55,19 +58,21 @@
 #include "instrument.h"
 #include "text_float.h"
 #include "string_pair_drag.h"
+#include "main_window.h"
 
 
 
 fileBrowser::fileBrowser( const QString & _path, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-							QWidget * _parent ) :
+					QWidget * _parent, engine * _engine  ) :
 	sideBarWidget( _title, _pm, _parent ),
+	engineObject( _engine ),
 	m_contextMenuItem( NULL ),
 	m_path( _path ),
 	m_filter( _filter )
 {
 	setWindowTitle( tr( "Browser" ) );
-	m_l = new listView( contentParent() );
+	m_l = new listView( contentParent(), eng() );
 	addContentWidget( m_l );
 
 #ifdef QT4
@@ -190,10 +195,11 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 void fileBrowser::sendToActiveChannel( void )
 {
-	if( lmmsMainWin::inst()->workspace() != NULL )
+	if( eng()->getMainWindow()->workspace() != NULL )
 	{
 		// get all windows opened in the workspace
-		QWidgetList pl = lmmsMainWin::inst()->workspace()->windowList(
+		QWidgetList pl =
+			eng()->getMainWindow()->workspace()->windowList(
 #if QT_VERSION >= 0x030200
 						QWorkspace::StackingOrder
 #endif
@@ -290,7 +296,7 @@ void fileBrowser::openInNewChannel( trackContainer * _tc )
 
 void fileBrowser::openInNewChannelSE( void )
 {
-	openInNewChannel( songEditor::inst() );
+	openInNewChannel( eng()->getSongEditor() );
 }
 
 
@@ -298,7 +304,7 @@ void fileBrowser::openInNewChannelSE( void )
 
 void fileBrowser::openInNewChannelBBE( void )
 {
-	openInNewChannel( bbEditor::inst() );
+	openInNewChannel( eng()->getBBEditor() );
 }
 
 
@@ -308,8 +314,9 @@ void fileBrowser::openInNewChannelBBE( void )
 
 
 
-listView::listView( QWidget * _parent ) :
+listView::listView( QWidget * _parent, engine * _engine ) :
 	Q3ListView( _parent ),
+	engineObject( _engine ),
 	m_mousePressed( FALSE ),
 	m_pressPos(),
 	m_previewPlayHandle( NULL )
@@ -344,9 +351,8 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			// samples are per default opened in bb-editor because
 			// they're likely drum-samples etc.
 			channelTrack * ct = dynamic_cast<channelTrack *>(
-						track::create(
-							track::CHANNEL_TRACK,
-							bbEditor::inst() ) );
+				track::create( track::CHANNEL_TRACK,
+						eng()->getBBEditor() ) );
 #ifdef LMMS_DEBUG
 			assert( ct != NULL );
 #endif
@@ -364,7 +370,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			// presets are per default opened in bb-editor
 			multimediaProject mmp( f->fullName() );
 			track * t = track::create( track::CHANNEL_TRACK,
-						bbEditor::inst() );
+						eng()->getBBEditor() );
 			channelTrack * ct = dynamic_cast<channelTrack *>( t );
 			if( ct != NULL )
 			{
@@ -376,9 +382,9 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 		}
 		else if( f->type() == fileItem::PROJECT_FILE )
 		{
-			if( songEditor::inst()->mayChangeProject() == TRUE )
+			if( eng()->getSongEditor()->mayChangeProject() == TRUE )
 			{
-				songEditor::inst()->loadProject(
+				eng()->getSongEditor()->loadProject(
 								f->fullName() );
 			}
 		}
@@ -414,7 +420,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	{
 		if( m_previewPlayHandle != NULL )
 		{
-			mixer::inst()->removePlayHandle( m_previewPlayHandle );
+			eng()->getMixer()->removePlayHandle( m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
 		if( f->type() == fileItem::SAMPLE_FILE )
@@ -431,7 +437,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 			qApp->processEvents();
 #endif
 			samplePlayHandle * s = new samplePlayHandle(
-								f->fullName() );
+							f->fullName(), eng() );
 			s->setDoneMayReturnTrue( FALSE );
 			m_previewPlayHandle = s;
 			delete tf;
@@ -439,11 +445,11 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 		else if( f->type() == fileItem::PRESET_FILE )
 		{
 			m_previewPlayHandle = new presetPreviewPlayHandle(
-								f->fullName() );
+							f->fullName(), eng() );
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			mixer::inst()->addPlayHandle( m_previewPlayHandle );
+			eng()->getMixer()->addPlayHandle( m_previewPlayHandle );
 		}
 	}
 }
@@ -469,7 +475,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"preset_file" ),
-									this );
+								this, eng() );
 					break;
 
 				case fileItem::SAMPLE_FILE:
@@ -477,7 +483,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"sound_file" ),
-									this );
+								this, eng() );
 					break;
 
 				case fileItem::MIDI_FILE:
@@ -485,7 +491,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"midi_file" ),
-									this );
+								this, eng() );
 					break;
 
 				default:
@@ -511,14 +517,14 @@ void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
 		{
 			if( s->totalFrames() - s->framesDone() <=
 				static_cast<Uint32>(
-					mixer::inst()->sampleRate() * 3 ) )
+					eng()->getMixer()->sampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( TRUE );
 				m_previewPlayHandle = NULL;
 				return;
 			}
 		}
-		mixer::inst()->removePlayHandle( m_previewPlayHandle );
+		eng()->getMixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
 }

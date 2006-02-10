@@ -33,8 +33,8 @@
 class dummyPlugin : public plugin
 {
 public:
-	inline dummyPlugin( void ) :
-		plugin( NULL )
+	inline dummyPlugin( engine * _engine = NULL ) :
+		plugin( NULL, _engine )
 	{
 	}
 

@@ -48,18 +48,25 @@
 
 
 
-// invisible track-container which is needed as parents for preview-channels
-class blindTrackContainer : public trackContainer
+// invisible track-container which is needed as parent for preview-channels
+class previewTrackContainer : public trackContainer
 {
 public:
-	static inline blindTrackContainer * inst( void )
+	previewTrackContainer( engine * _engine ) :
+		trackContainer( _engine ),
+		m_previewChannelTrack( dynamic_cast<channelTrack *>(
+					track::create( track::CHANNEL_TRACK,
+								this ) )),
+		m_previewNote( NULL ),
+		m_dataMutex()
 	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new blindTrackContainer();
-		}
-		return( s_instanceOfMe );
+		hide();
 	}
+
+	virtual ~previewTrackContainer()
+	{
+	}
+
 
 	// implement pure-virtual functions...
 	virtual inline bool fixedTCOs( void ) const
@@ -69,83 +76,87 @@ public:
 
 	virtual inline QString nodeName( void ) const
 	{
-		return( "blindtc" );
+		return( "previewtc" );
+	}
+
+	channelTrack * previewChannelTrack( void )
+	{
+		return( m_previewChannelTrack );
+	}
+
+	notePlayHandle * previewNote( void )
+	{
+		return( m_previewNote );
+	}
+
+	void setPreviewNote( notePlayHandle * _note )
+	{
+		m_previewNote = _note;
+	}
+
+	void lockData( void )
+	{
+		m_dataMutex.lock();
+	}
+
+	void unlockData( void )
+	{
+		m_dataMutex.unlock();
 	}
 
 
 private:
-	blindTrackContainer( void ) :
-		trackContainer()
-	{
-		hide();
-	}
-
-	virtual ~blindTrackContainer()
-	{
-	}
-
-
-	static blindTrackContainer * s_instanceOfMe;
-
-	friend void presetPreviewPlayHandle::cleanUp( void );
+	channelTrack * m_previewChannelTrack;
+	notePlayHandle * m_previewNote;
+	QMutex m_dataMutex;
 
 } ;
 
 
+QMap<const engine *, previewTrackContainer *>
+					presetPreviewPlayHandle::s_previewTCs;
 
-blindTrackContainer * blindTrackContainer::s_instanceOfMe = NULL;
-
-channelTrack * presetPreviewPlayHandle::s_globalChannelTrack = NULL;
-notePlayHandle * presetPreviewPlayHandle::s_globalPreviewNote = NULL;
-QMutex presetPreviewPlayHandle::s_globalDataMutex;
 
 
 presetPreviewPlayHandle::presetPreviewPlayHandle(
-						const QString & _preset_file ) :
-	playHandle( PRESET_PREVIEW_PLAY_HANDLE ),
+						const QString & _preset_file,
+						engine * _engine ) :
+	playHandle( PRESET_PREVIEW_PLAY_HANDLE, _engine ),
 	m_previewNote( NULL )
 {
-/*	if( s_globalDataMutex == NULL )
+	if( s_previewTCs.contains( _engine ) == FALSE )
 	{
-		s_globalDataMutex = new QMutex;
+		s_previewTCs[_engine] = new previewTrackContainer( eng() );
 	}
 
-	s_globalDataMutex->lock();*/
-	s_globalDataMutex.lock();
+	previewTC()->lockData();
 
-	if( s_globalPreviewNote != NULL )
+	if( previewTC()->previewNote() != NULL )
 	{
-		s_globalPreviewNote->mute();
+		previewTC()->previewNote()->mute();
 	}
 
 
 	multimediaProject mmp( _preset_file );
-	if( s_globalChannelTrack == NULL )
-	{
-		track * t = track::create( track::CHANNEL_TRACK,
-						blindTrackContainer::inst() );
-		s_globalChannelTrack = dynamic_cast<channelTrack *>( t );
-#ifdef LMMS_DEBUG
-		assert( s_globalChannelTrack != NULL );
-#endif
-	}
-	s_globalChannelTrack->loadTrackSpecificSettings( mmp.content().
-								firstChild().
-								toElement() );
+	previewTC()->previewChannelTrack()->loadTrackSpecificSettings(
+				mmp.content().firstChild().toElement() );
+
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
-	s_globalChannelTrack->m_midiPort->setMode( midiPort::DUMMY );
+	previewTC()->previewChannelTrack()->m_midiPort->setMode(
+							midiPort::DUMMY );
 
 	// create temporary note
 	note n( 0, 0, static_cast<tones>( A ),
 				static_cast<octaves>( DEFAULT_OCTAVE-1 ), 100 );
 	// create note-play-handle for it
-	m_previewNote = new notePlayHandle( s_globalChannelTrack, 0, ~0, &n );
+	m_previewNote = new notePlayHandle( previewTC()->previewChannelTrack(),
+								0, ~0, &n );
 
 
-	s_globalPreviewNote = m_previewNote;
+	previewTC()->setPreviewNote( m_previewNote );
 
-	s_globalDataMutex.unlock();
+	previewTC()->unlockData();
 }
 
 
@@ -153,13 +164,15 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 presetPreviewPlayHandle::~presetPreviewPlayHandle()
 {
-	s_globalDataMutex.lock();
+	previewTC()->lockData();
+	// not muted by other preset-preview-handle?
 	if( m_previewNote->muted() == FALSE )
 	{
-		s_globalPreviewNote = NULL;
+		// then set according state
+		previewTC()->setPreviewNote( NULL );
 	}
 	delete m_previewNote;
-	s_globalDataMutex.unlock();
+	previewTC()->unlockData();
 }
 
 
@@ -181,9 +194,13 @@ bool presetPreviewPlayHandle::done( void ) const
 
 
 
-void presetPreviewPlayHandle::cleanUp( void )
+void presetPreviewPlayHandle::cleanUp( engine * _engine )
 {
-	delete blindTrackContainer::inst();
+	if( s_previewTCs.contains( _engine ) == TRUE )
+	{
+		delete s_previewTCs[_engine];
+		s_previewTCs.remove( _engine );
+	}
 }
 
 
@@ -193,13 +210,17 @@ constNotePlayHandleVector presetPreviewPlayHandle::nphsOfChannelTrack(
 						const channelTrack * _ct )
 {
 	constNotePlayHandleVector cnphv;
-	s_globalDataMutex.lock();
-	if( s_globalPreviewNote != NULL &&
-			s_globalPreviewNote->getChannelTrack() == _ct )
+	if( s_previewTCs.contains( _ct->eng() ) == TRUE )
 	{
-		cnphv.push_back( s_globalPreviewNote );
+		previewTrackContainer * tc = s_previewTCs[_ct->eng()];
+		tc->lockData();
+		if( tc->previewNote() != NULL &&
+			tc->previewNote()->getChannelTrack() == _ct )
+		{
+			cnphv.push_back( tc->previewNote() );
+		}
+		tc->unlockData();
 	}
-	s_globalDataMutex.unlock();
 	return( cnphv );
 }
 

@@ -100,9 +100,10 @@
 
 
 
-sampleBuffer::sampleBuffer( const QString & _audio_file,
+sampleBuffer::sampleBuffer( engine * _engine, const QString & _audio_file,
 							bool _is_base64_data ) :
 	QObject(),
+	engineObject( _engine ),
 	m_audioFile( ( _is_base64_data == TRUE ) ? "" : _audio_file ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -131,8 +132,10 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 
 
 
-sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
+sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
+							engine * _engine ) :
 	QObject(),
+	engineObject( _engine ),
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -160,8 +163,9 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 
 
 
-sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
+sampleBuffer::sampleBuffer( const f_cnt_t _frames, engine * _engine ) :
 	QObject(),
+	engineObject( _engine ),
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -623,7 +627,7 @@ SRC_STATE * sampleBuffer::createResamplingContext( void )
 	int error;
 	SRC_STATE * state;
 	if( ( state = src_new(/*
-		( mixer::inst()->highQuality() == TRUE ) ?
+		( eng()->getMixer()->highQuality() == TRUE ) ?
 					SRC_SINC_FASTEST :*/
 					SRC_LINEAR,
 					DEFAULT_CHANNELS, &error ) ) == NULL )
@@ -652,7 +656,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 					const bool _looped,
 					void * * _resampling_data )
 {
-	mixer::inst()->clearAudioBuffer( _ab, _frames );
+	eng()->getMixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_data == NULL || m_frames == 0 || m_endFrame == 0 || _frames == 0 )
 	{
@@ -741,7 +745,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 #else
 		f_cnt_t src_frame_base = 0;
 		// check whether we're in high-quality-mode
-		if( mixer::inst()->highQuality() == TRUE )
+		if( eng()->getMixer()->highQuality() == TRUE )
 		{
 			// we are, so let's use cubic interpolation...
 			for( f_cnt_t frame = 0; frame < frames_to_process;
@@ -1091,7 +1095,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, TRUE );
 	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, TRUE );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
-						mixer::inst()->sampleRate() );
+					eng()->getMixer()->sampleRate() );
 	QBuffer ba_writer;
 #ifdef QT4
 	ba_writer.open( QBuffer::WriteOnly );
@@ -1152,11 +1156,12 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr )
+						const sample_rate_t _dst_sr,
+						engine * _engine )
 {
 	const f_cnt_t dst_frames = static_cast<f_cnt_t>( _frames /
 					(float) _src_sr * (float) _dst_sr );
-	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
+	sampleBuffer * dst_sb = new sampleBuffer( dst_frames, _engine );
 	sampleFrame * dst_buf = dst_sb->m_origData;
 #ifdef HAVE_SAMPLERATE_H
 	// yeah, libsamplerate, let's rock with sinc-interpolation!

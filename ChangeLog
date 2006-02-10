@@ -1,3 +1,18 @@
+2006-02-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	per default set volume of each osc to 33%
+
+	* allmost all files:
+	use engine-technology
+
+	* include/engine.h:
+	* src/core/engine.cpp:
+	added engine- and engineObject-class providing new "engine-technology"
+	which makes singleton-classes obsoletes and offers a lot of new
+	possibilities like GUI-data-separation and having several projects
+	open at the same time
+
 2006-02-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/mixer.h:
@@ -9,15 +24,14 @@
 
 2006-02-06	Andreas Brandmaier <andy/at/brandmaier.de>
 
-	* plugins/bitinvader/bitinvader.cpp
-	* plugins/bitinvader/bitinvader.h
-	* plugins/bitinvader/graph.cpp
-	* plugins/bitinvader/graph.h
+	* plugins/bitinvader/bitinvader.cpp:
+	* plugins/bitinvader/bitinvader.h:
+	* plugins/bitinvader/graph.cpp:
+	* plugins/bitinvader/graph.h:
 	- code cleanup
 	- added drag&drop support to wavegraph
 	- added new BitInvader presets and improved old ones
-	
-	
+
 2006-02-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* include/basic_filters.h:

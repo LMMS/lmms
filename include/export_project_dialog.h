@@ -44,6 +44,7 @@
 #endif
 
 #include "export.h"
+#include "engine.h"
 
 
 class QLabel;
@@ -55,12 +56,13 @@ class ledCheckBox;
 class pixmapButton;
 
 
-class exportProjectDialog : public QDialog
+class exportProjectDialog : public QDialog, public engineObject
 {
 	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent );
-	~exportProjectDialog();
+	exportProjectDialog( const QString & _file_name, QWidget * _parent,
+							engine * _engine );
+	virtual ~exportProjectDialog();
 
 
 public slots:
@@ -68,8 +70,8 @@ public slots:
 
 
 protected:
-	void keyPressEvent( QKeyEvent * _ke );
-	void closeEvent( QCloseEvent * _ce );
+	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void closeEvent( QCloseEvent * _ce );
 
 
 private slots:
@@ -84,6 +86,7 @@ private:
 	static fileTypes FASTCALL getFileTypeFromExtension( const QString &
 									_ext );
 	static Sint16 s_availableBitrates[];
+
 
 	QString m_fileName;
 	QLabel * m_typeLbl;

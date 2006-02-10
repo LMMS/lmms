@@ -45,6 +45,7 @@
 
 #include "types.h"
 #include "note.h"
+#include "engine.h"
 
 
 class QPainter;
@@ -52,26 +53,16 @@ class QPixmap;
 class QScrollBar;
 
 class comboBox;
-class lmmsMainWin;
 class notePlayHandle;
 class pattern;
 class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget
+class pianoRoll : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	static inline pianoRoll * inst( void )
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new pianoRoll();
-		}
-		return( s_instanceOfMe );
-	}
-
 	void FASTCALL setCurrentPattern( pattern * _new_pattern );
 
 	inline bool isRecording( void ) const
@@ -170,13 +161,10 @@ private:
 	} ;
 
 
-	pianoRoll( void );
+	pianoRoll( engine * _engine );
 	pianoRoll( const pianoRoll & );
-	~pianoRoll();
+	virtual ~pianoRoll();
 
-
-
-	static pianoRoll * s_instanceOfMe;
 
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;
@@ -251,7 +239,7 @@ private:
 
 
 
-	friend class lmmsMainWin;
+	friend class engine;
 
 
 signals:

@@ -1,7 +1,7 @@
 /*
  * visualization_widget.h - widget for visualization of sound-data
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _OUTPUT_GRAPH_H
-#define _OUTPUT_GRAPH_H
+#ifndef _VISUALIZATION_WIDGET
+#define _VISUALIZATION_WIDGET
 
 #include "qt3support.h"
 
@@ -43,10 +43,11 @@
 
 #include "mixer.h"
 
+
 class QTimer;
 
 
-class visualizationWidget : public QWidget
+class visualizationWidget : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
@@ -55,6 +56,7 @@ public:
 		SIMPLE		// add more here
 	} ;
 	visualizationWidget( const QPixmap & _bg, QWidget * _parent,
+					engine * _engine,
 					visualizationTypes _vtype = SIMPLE );
 	virtual ~visualizationWidget();
 

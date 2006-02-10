@@ -1,7 +1,7 @@
 /*
  * instrument.cpp - base-class for all instrument-plugins (synths, samplers etc)
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 instrument::instrument( channelTrack * _channel_track,
 					const descriptor * _descriptor ) :
 	QWidget( _channel_track->tabWidgetParent() ),
-	plugin( _descriptor ),
+	plugin( _descriptor, _channel_track->eng() ),
 	m_channelTrack( _channel_track ),
 	m_valid( TRUE )
 {
@@ -73,7 +73,7 @@ void instrument::deleteNotePluginData( notePlayHandle * )
 
 
 
-Uint32 instrument::beatLen( notePlayHandle * ) const
+f_cnt_t instrument::beatLen( notePlayHandle * ) const
 {
 	return( 0 );
 }

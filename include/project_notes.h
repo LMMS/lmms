@@ -1,7 +1,7 @@
 /*
  * project_notes.h - header for project-notes-editor
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,6 +39,7 @@
 #endif
 
 #include "settings.h"
+#include "engine.h"
 
 
 class QAction;
@@ -46,11 +47,13 @@ class QComboBox;
 class QTextEdit;
 
 
-class projectNotes : public QMainWindow, public settings
+class projectNotes : public QMainWindow, public settings, public engineObject
 {
 	Q_OBJECT
 public:
-	projectNotes();
+	projectNotes( engine * _engine );
+	virtual ~projectNotes();
+
 	void clear( void );
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

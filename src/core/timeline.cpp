@@ -1,7 +1,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,7 +47,7 @@
 #include "embed.h"
 #include "templates.h"
 #include "nstate_button.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "text_float.h"
 
 
@@ -60,8 +60,9 @@ QPixmap * timeLine::s_loopPointDisabledPixmap = NULL;
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			songEditor::playPos & _pos, const midiTime & _begin,
-							QWidget * _parent ) :
+					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
+	engineObject( _engine ),
 	m_autoScroll( AUTOSCROLL_ENABLED ),
 	m_loopPoints( LOOP_POINTS_DISABLED ),
 	m_behaviourAtStop( BACK_TO_ZERO ),
@@ -79,23 +80,23 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_loopPos[0] = 0;
 	m_loopPos[1] = 64;
 
-	if( s_timeLinePixmap == NULL)
+	if( s_timeLinePixmap == NULL )
 	{
 		s_timeLinePixmap = new QPixmap( embed::getIconPixmap(
 								"timeline" ) );
 	}
-	if( s_posMarkerPixmap == NULL)
+	if( s_posMarkerPixmap == NULL )
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
 	}
-	if( s_loopPointPixmap == NULL)
+	if( s_loopPointPixmap == NULL )
 	{
 		s_loopPointPixmap = new QPixmap( embed::getIconPixmap(
 							"loop_point" ) );
 	}
 
-	if( s_loopPointDisabledPixmap == NULL)
+	if( s_loopPointDisabledPixmap == NULL )
 	{
 		s_loopPointDisabledPixmap = new QPixmap( embed::getIconPixmap(
 						"loop_point_disabled" ) );
@@ -307,7 +308,7 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 			qSwap( pmin, pmax );
 			m_action = MOVE_LOOP_END;
 		}
-		if( lmmsMainWin::isShiftPressed() == TRUE )
+		if( eng()->getMainWindow()->isShiftPressed() == TRUE )
 		{
 			m_loopPos[pmax] = t;
 			m_action = ( m_action == MOVE_LOOP_BEGIN ) ?
@@ -360,8 +361,8 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 		case MOVE_LOOP_BEGIN:
 		case MOVE_LOOP_END:
 		{
-			Uint8 i = m_action - MOVE_LOOP_BEGIN;
-			if( lmmsMainWin::isCtrlPressed() == TRUE )
+			const Uint8 i = m_action - MOVE_LOOP_BEGIN;
+			if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;

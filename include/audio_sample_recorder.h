@@ -54,11 +54,12 @@ class audioSampleRecorder : public audioDevice
 {
 public:
 	audioSampleRecorder( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, bool & _success_ful );
+				const ch_cnt_t _channels, bool & _success_ful,
+							mixer * _mixer );
 	virtual ~audioSampleRecorder();
 
 	f_cnt_t framesRecorded( void ) const;
-	void FASTCALL createSampleBuffer( sampleBuffer * * _sample_buf ) const;
+	void FASTCALL createSampleBuffer( sampleBuffer * * _sample_buf );
 
 
 private:

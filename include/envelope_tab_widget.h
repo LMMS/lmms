@@ -57,14 +57,16 @@ class pixmapButton;
 class tabWidget;
 
 
-class envelopeTabWidget : public QWidget, public settings
+class envelopeTabWidget : public QWidget, public settings,
+			  public engineObject
 {
 	Q_OBJECT
 public:
 	envelopeTabWidget( channelTrack * _channel_track );
 	virtual ~envelopeTabWidget();
 
-	void FASTCALL processAudioBuffer( sampleFrame * _ab, Uint32 _frames,
+	void FASTCALL processAudioBuffer( sampleFrame * _ab,
+							const fpab_t _frames,
 							notePlayHandle * _n );
 
 	enum targets
@@ -77,10 +79,10 @@ public:
 		TARGET_COUNT
 	} ;
 
-	Uint32 envFrames( void );
-	Uint32 releaseFrames( void );
+	f_cnt_t envFrames( void );
+	f_cnt_t releaseFrames( void );
 
-	float FASTCALL volumeLevel( notePlayHandle * _n, Uint32 _frame );
+	float FASTCALL volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

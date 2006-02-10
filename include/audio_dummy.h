@@ -1,7 +1,7 @@
 /*
  * audio_dummy.h - dummy-audio-device
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,8 +33,9 @@
 class audioDummy : public audioDevice, public QThread
 {
 public:
-	audioDummy( Uint32 _sample_rate, bool & _success_ful ) :
-		audioDevice( _sample_rate, DEFAULT_CHANNELS ),
+	audioDummy( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer ) :
+		audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
 		m_quit( FALSE )
 	{
 		_success_ful = TRUE;
@@ -94,9 +95,8 @@ private:
 			timer.reset();
 			processNextBuffer();
 			const Sint32 microseconds = static_cast<Sint32>(
-					mixer::inst()->framesPerAudioBuffer() *
-					1000000.0f /
-						mixer::inst()->sampleRate() -
+					getMixer()->framesPerAudioBuffer() *
+					1000000.0f / getMixer()->sampleRate() -
 							timer.elapsed() );
 			if( microseconds > 0 )
 			{

@@ -39,22 +39,23 @@
 #include <qwidget.h>
 #include <qpixmap.h>
 #include <qcursor.h>
+
 #endif
 
 
-//class QPixmap;
+#include "engine.h"
 
 
-class graph : public QWidget
+class graph : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	graph( const QString & _txt, QWidget * _parent );
+	graph( QWidget * _parent, engine * _engine );
 	virtual ~graph();
 
 	void setSamplePointer( float * pointer, int length );
 	void setBackground ( const QPixmap & _pixmap );
-	void graph::loadSampleFromFile( QString filename );
+	void loadSampleFromFile( const QString & _filename );
 
 signals:
 	void sampleSizeChanged( float f );

@@ -52,16 +52,18 @@
 
 
 tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
-					const QString & _name, float _scale ) :
-	knob( _knob_num, _parent, _name ),
+				const QString & _name,
+				engine * _engine,
+				float _scale ) :
+	knob( _knob_num, _parent, _name, _engine ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
 	m_tempoSyncIcon( embed::getIconPixmap( "xclock" ) ),
 	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
 	m_tempoLastSyncMode( NO_SYNC )
 {
-	connect( songEditor::inst(), SIGNAL( bpmChanged( int ) ),
-		 this, SLOT( calculateTempoSyncTime( int ) ) );
+	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+		 this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
 }
 
 
@@ -189,7 +191,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 void tempoSyncKnob::mouseMoveEvent( QMouseEvent * _me )
 {
 	m_tempoSyncMode = NO_SYNC;
-	calculateTempoSyncTime( songEditor::inst()->getBPM() );
+	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
 	knob::mouseMoveEvent( _me );
 }
 
@@ -200,7 +202,7 @@ void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
 {
 	knob::wheelEvent( _we );
 	m_tempoSyncMode = NO_SYNC;
-	calculateTempoSyncTime( songEditor::inst()->getBPM() );
+	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
 }
 
 
@@ -219,17 +221,18 @@ void tempoSyncKnob::setTempoSync( QAction * ) { }
 #endif
 
 
+
 void tempoSyncKnob::setTempoSync( int _note_type )
 {
 	m_tempoSyncMode = ( tempoSyncMode ) _note_type;
-	calculateTempoSyncTime( songEditor::inst()->getBPM() );
-	songEditor::inst()->setModified();
+	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	eng()->getSongEditor()->setModified();
 }
 
 
 
 
-void tempoSyncKnob::calculateTempoSyncTime( int _bpm )
+void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 {
 	float conversionFactor = 1.0;
 	
@@ -324,7 +327,7 @@ tempoSyncKnob::tempoSyncMode tempoSyncKnob::getSyncMode( void )
 void tempoSyncKnob::setSyncMode( tempoSyncMode _new_mode )
 {
 	m_tempoSyncMode = _new_mode;
-	calculateTempoSyncTime( songEditor::inst()->getBPM() );
+	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
 }
 
 
@@ -341,7 +344,7 @@ float tempoSyncKnob::getScale( void )
 void tempoSyncKnob::setScale( float _new_scale )
 {
 	m_scale = _new_scale;
-	calculateTempoSyncTime( songEditor::inst()->getBPM() );
+	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
 	emit scaleChanged( _new_scale );
 }
 

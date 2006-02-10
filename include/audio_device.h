@@ -64,7 +64,7 @@ class audioDevice
 {
 public:
 	audioDevice( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels );
+				const ch_cnt_t _channels, mixer * _mixer );
 	virtual ~audioDevice();
 
 	inline void lock( void )
@@ -163,10 +163,17 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
+	mixer * getMixer( void )
+	{
+		return( m_mixer );
+	}
+
 
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
+	mixer * m_mixer;
+
 	QMutex m_devMutex;
 
 #ifdef HAVE_SAMPLERATE_H

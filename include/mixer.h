@@ -52,12 +52,11 @@
 #include "note.h"
 #include "play_handle.h"
 #include "effect_board.h"
+#include "engine.h"
 
 
 class audioDevice;
 class midiClient;
-class lmmsMainWin;
-class plugin;
 class audioPort;
 
 
@@ -107,46 +106,13 @@ const octaves BASE_OCTAVE = OCTAVE_4;
 
 
 
-class mixer : public QObject
+class mixer : public QObject, public engineObject
 {
 	Q_OBJECT
 public:
-	static inline mixer * inst( void )
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new mixer();
-		}
-		return( s_instanceOfMe );
-	}
+	void initDevices( void );
+	void FASTCALL clear( const bool _everything = FALSE );
 
-
-	void FASTCALL bufferToPort( const sampleFrame * _buf,
-					const fpab_t _frames,
-					const fpab_t _framesAhead,
-					const volumeVector & _volumeVector,
-							audioPort * _port );
-
-	inline fpab_t framesPerAudioBuffer( void ) const
-	{
-		return( m_framesPerAudioBuffer );
-	}
-
-	inline Uint8 cpuLoad( void ) const
-	{
-		return( m_cpuLoad );
-	}
-
-	inline bool highQuality( void ) const
-	{
-		return( m_qualityLevel > DEFAULT_QUALITY_LEVEL );
-	}
-
-
-	inline const surroundSampleFrame * currentAudioBuffer( void ) const
-	{
-		return( m_curBuf );
-	}
 
 	// audio-device-stuff
 	inline const QString & audioDevName( void ) const
@@ -181,6 +147,7 @@ public:
 		}
 	}
 
+
 	// MIDI-client-stuff
 	inline const QString & midiClientName( void ) const
 	{
@@ -193,6 +160,7 @@ public:
 	}
 
 
+	// play-handle stuff
 	inline void addPlayHandle( playHandle * _ph )
 	{
 		if( criticalXRuns() == FALSE )
@@ -217,9 +185,36 @@ public:
 
 	void checkValidityOfPlayHandles( void );
 
+	inline bool haveNoRunningNotes( void ) const
+	{
+		return( m_playHandles.size() == 0 );
+	}
 
 
-	inline sample_rate_t sampleRate( void )
+	// methods providing information for other classes
+	inline fpab_t framesPerAudioBuffer( void ) const
+	{
+		return( m_framesPerAudioBuffer );
+	}
+
+	inline const surroundSampleFrame * currentAudioBuffer( void ) const
+	{
+		return( m_curBuf );
+	}
+
+
+	inline Uint8 cpuLoad( void ) const
+	{
+		return( m_cpuLoad );
+	}
+
+	inline bool highQuality( void ) const
+	{
+		return( m_qualityLevel > DEFAULT_QUALITY_LEVEL );
+	}
+
+
+	inline sample_rate_t sampleRate( void ) const
 	{
 		return( SAMPLE_RATES[m_qualityLevel] );
 	}
@@ -250,6 +245,7 @@ public:
 	}
 
 
+	// methods for controlling mixer-state
 	void pause( void )
 	{
 		if( m_mixMutexLockLevel == 0 )
@@ -269,8 +265,12 @@ public:
 	}
 
 
-	void FASTCALL clear( const bool _everything = FALSE );
-
+	// audio-buffer-mgm
+	void FASTCALL bufferToPort( const sampleFrame * _buf,
+					const fpab_t _frames,
+					const fpab_t _framesAhead,
+					const volumeVector & _volumeVector,
+							audioPort * _port );
 
 	void FASTCALL clearAudioBuffer( sampleFrame * _ab,
 							const f_cnt_t _frames );
@@ -278,11 +278,6 @@ public:
 	void FASTCALL clearAudioBuffer( surroundSampleFrame * _ab,
 							const f_cnt_t _frames );
 #endif
-
-	inline bool haveNoRunningNotes( void ) const
-	{
-		return( m_playHandles.size() == 0 );
-	}
 
 	bool criticalXRuns( void ) const;
 
@@ -300,17 +295,16 @@ signals:
 
 
 private:
-
-	static mixer * s_instanceOfMe;
-
-	mixer();
+	mixer( engine * _engine );
 	~mixer();
 
+	void startProcessing( void );
 	void stopProcessing( void );
 
 
 	// we don't allow to create mixer by using copy-ctor
-	mixer( const mixer & )
+	mixer( const mixer & ) :
+		engineObject( NULL )
 	{
 	}
 
@@ -353,7 +347,7 @@ private:
 	Uint8 m_mixMutexLockLevel;
 
 
-	friend class lmmsMainWin;
+	friend class engine;
 
 } ;
 

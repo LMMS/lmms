@@ -38,10 +38,10 @@
 
 namespace bufferAllocator
 {
-	void * FASTCALL allocBytes( Uint32 _bytes );
+	void * FASTCALL allocBytes( const Uint32 _bytes );
 
 	template<class T>
-	inline T * FASTCALL alloc( Uint32 _n )
+	inline T * FASTCALL alloc( const Uint32 _n )
 	{
 		return( (T *) allocBytes( sizeof( T ) * _n ) );
 	}
@@ -50,10 +50,10 @@ namespace bufferAllocator
 	void FASTCALL free( void * _buf );
 
 	// try to cleanup _level unused buffers
-	void FASTCALL cleanUp( Uint16 _level );
+	void FASTCALL cleanUp( const Uint16 _level );
 
 	// disable autocleanup-mechanisms
-	void FASTCALL disableAutoCleanup( bool _disabled );
+	void FASTCALL disableAutoCleanup( const bool _disabled );
 
 
 	// simple class for automatically freeing buffer in complex functions

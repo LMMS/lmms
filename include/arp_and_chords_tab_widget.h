@@ -45,6 +45,7 @@
 
 #include "settings.h"
 #include "types.h"
+#include "engine.h"
 
 
 class QPixmap;
@@ -62,7 +63,8 @@ class tempoSyncKnob;
 const int MAX_CHORD_POLYPHONY = 10;
 
 
-class arpAndChordsTabWidget : public QWidget, public settings
+class arpAndChordsTabWidget : public QWidget, public settings,
+			      public engineObject
 {
 	Q_OBJECT
 public:

@@ -44,6 +44,7 @@
 #endif
 
 #include "settings.h"
+#include "engine.h"
 
 
 class QMenu;
@@ -57,12 +58,12 @@ class lcdSpinBox;
 class midiPort;
 
 
-class midiTabWidget : public QWidget, public settings
+class midiTabWidget : public QWidget, public settings, public engineObject
 {
 	Q_OBJECT
 public:
 	midiTabWidget( channelTrack * _channel_track, midiPort * _port );
-	~midiTabWidget();
+	virtual ~midiTabWidget();
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

@@ -1,7 +1,7 @@
 /*
  * visualization_widget.cpp - widget for visualization of sound-data
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,8 +53,10 @@ const int UPDATE_TIME = 1000 / 20;	// 20 fps
 
 
 visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
+						engine * _engine,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
+	engineObject( _engine ),
 	s_background( _bg ),
 	m_enabled( TRUE )
 {
@@ -64,10 +66,10 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	setFixedSize( s_background.width(), s_background.height() );
 
 
-	const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
 
-	mixer::inst()->clearAudioBuffer( m_buffer, frames );
+	eng()->getMixer()->clearAudioBuffer( m_buffer, frames );
 
 
 	m_updateTimer = new QTimer( this );
@@ -77,7 +79,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 		m_updateTimer->start( UPDATE_TIME );
 	}
 
-	connect( mixer::inst(), SIGNAL( nextAudioBuffer(
+	connect( eng()->getMixer(), SIGNAL( nextAudioBuffer(
 				const surroundSampleFrame *, const fpab_t ) ),
 		this, SLOT( setAudioBuffer(
 				const surroundSampleFrame *, const fpab_t ) ) );
@@ -121,7 +123,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	if( m_enabled == TRUE )
 	{
-		float master_output = mixer::inst()->masterGain();
+		float master_output = eng()->getMixer()->masterGain();
 		Uint16 w = width()-4;
 		float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		Uint16 x_base = 2;
@@ -136,12 +138,13 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 		float max_level = 0.0;
 
-		const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
+		const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 
 		// analyse wave-stream for max-level
 		for( fpab_t frame = 0; frame < frames; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
+									++chnl )
 			{
 				if( tAbs<float>( m_buffer[frame][chnl] ) >
 								max_level )
@@ -211,5 +214,5 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-#include <visualization_widget.moc>
+#include "visualization_widget.moc"
 

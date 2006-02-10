@@ -200,6 +200,7 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	QWidget( _channel_track->tabWidgetParent() ),
 	settings(),
+	engineObject( _channel_track->eng() ),
 	m_arpDirection( UP )
 {
 	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this );
@@ -221,7 +222,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	}
 
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
-							tr( "Chord range" ) );
+						tr( "Chord range" ), eng() );
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setRange( 1.0, 9.0, 1.0 );
 	m_chordRangeKnob->setValue( 1.0, TRUE );
@@ -273,7 +274,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 
 
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio range" ) );
+						tr( "Arpeggio range" ), eng() );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setRange( 1.0, 9.0, 1.0 );
 	m_arpRangeKnob->setValue( 1.0, TRUE );
@@ -290,7 +291,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"amount of octaves." ) );
 
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
-							tr( "Arpeggio time" ) );
+						tr( "Arpeggio time" ), eng() );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setRange( 10.0, 1000.0, 1.0 );
 	m_arpTimeKnob->setValue( 100.0, TRUE );
@@ -307,7 +308,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"each arpeggio-tone should be played." ) );
 
 	m_arpGateKnob = new knob( knobBright_26, m_arpGroupBox,
-							tr( "Arpeggio gate" ) );
+						tr( "Arpeggio gate" ), eng() );
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setRange( 1.0, 200.0, 1.0 );
 	m_arpGateKnob->setValue( 100.0, TRUE );
@@ -511,9 +512,9 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
-	const Uint32 arp_frames = (Uint32)( m_arpTimeKnob->value() / 1000.0f *
-						mixer::inst()->sampleRate() );
-	const Uint32 gated_frames = (Uint32)( m_arpGateKnob->value() *
+	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeKnob->value() / 1000.0f *
+					eng()->getMixer()->sampleRate() );
+	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateKnob->value() *
 							arp_frames / 100.0f );
 
 	// used for calculating remaining frames for arp-note, we have to add
@@ -524,15 +525,15 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 				_n->totalFramesPlayed() )
 							+ arp_frames - 1;
 	// used for loop
-	Uint32 frames_processed = 0;
+	fpab_t frames_processed = 0;
 
-	while( frames_processed < mixer::inst()->framesPerAudioBuffer() )
+	while( frames_processed < eng()->getMixer()->framesPerAudioBuffer() )
 	{
-		const Uint32 remaining_frames_for_cur_arp = arp_frames -
+		const f_cnt_t remaining_frames_for_cur_arp = arp_frames -
 						( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
 		if( remaining_frames_for_cur_arp >
-					mixer::inst()->framesPerAudioBuffer() )
+				eng()->getMixer()->framesPerAudioBuffer() )
 		{
 			// then we don't have to do something!
 			break;
@@ -721,7 +722,7 @@ void arpAndChordsTabWidget::arpUpToggled( bool _on )
 	{
 		m_arpDirection = UP;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -733,7 +734,7 @@ void arpAndChordsTabWidget::arpDownToggled( bool _on )
 	{
 		m_arpDirection = DOWN;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -745,7 +746,7 @@ void arpAndChordsTabWidget::arpUpAndDownToggled( bool _on )
 	{
 		m_arpDirection = UP_AND_DOWN;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -757,7 +758,7 @@ void arpAndChordsTabWidget::arpRandomToggled( bool _on )
 	{
 		m_arpDirection = RANDOM;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 

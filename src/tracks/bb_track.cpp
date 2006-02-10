@@ -66,7 +66,7 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
-	tact t = bbEditor::inst()->lengthOfBB(
+	tact t = eng()->getBBEditor()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
@@ -158,7 +158,7 @@ void bbTCO::paintEvent( QPaintEvent * )
 	}
 #endif
 
-	tact t = bbEditor::inst()->lengthOfBB( bbTrack::numOfBBTrack(
+	tact t = eng()->getBBEditor()->lengthOfBB( bbTrack::numOfBBTrack(
 								getTrack() ) );
 	if( length() > 64 && t > 0 )
 	{
@@ -227,9 +227,10 @@ void bbTCO::loadSettings( const QDomElement & _this )
 
 void bbTCO::openInBBEditor( bool )
 {
-	bbEditor::inst()->setCurrentBB( bbTrack::numOfBBTrack( getTrack() ) );
-	bbEditor::inst()->show();
-	bbEditor::inst()->setFocus();
+	eng()->getBBEditor()->setCurrentBB( bbTrack::numOfBBTrack(
+								getTrack() ) );
+	eng()->getBBEditor()->show();
+	eng()->getBBEditor()->setFocus();
 }
 
 
@@ -270,7 +271,7 @@ void bbTCO::changeColor( void )
 	if( _new_color.isValid() && _new_color != m_color )
 	{
 		m_color = _new_color;
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 		update();
 	}
 }
@@ -291,7 +292,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	s_infoMap[this] = bbNum;
 
 	m_trackLabel = new nameLabel( tr( "Beat/Bassline %1" ).arg( bbNum ),
-						getTrackSettingsWidget() );
+					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
 	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
 									29 );
@@ -299,13 +300,13 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	connect( m_trackLabel, SIGNAL( clicked() ),
 			this, SLOT( clickedTrackLabel() ) );
 	connect( m_trackLabel, SIGNAL( nameChanged() ),
-			bbEditor::inst(), SLOT( updateComboBox() ) );
+			eng()->getBBEditor(), SLOT( updateComboBox() ) );
 	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
-			bbEditor::inst(), SLOT( updateComboBox() ) );
+			eng()->getBBEditor(), SLOT( updateComboBox() ) );
 
 
-	bbEditor::inst()->setCurrentBB( bbNum );
-	bbEditor::inst()->updateComboBox();
+	eng()->getBBEditor()->setCurrentBB( bbNum );
+	eng()->getBBEditor()->updateComboBox();
 
 	_tc->updateAfterTrackAdd();
 }
@@ -316,7 +317,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 bbTrack::~bbTrack()
 {
 	csize bb = s_infoMap[this];
-	bbEditor::inst()->removeBB( bb );
+	eng()->getBBEditor()->removeBB( bb );
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
@@ -346,20 +347,22 @@ track::trackTypes bbTrack::type( void ) const
 
 
 // play _frames frames of given TCO within starting with _start/_start_frame
-bool FASTCALL bbTrack::play( const midiTime & _start, Uint32 _start_frame,
-					Uint32 _frames, Uint32 _frame_base,
+bool FASTCALL bbTrack::play( const midiTime & _start,
+						const f_cnt_t _start_frame,
+						const fpab_t _frames,
+						const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
 	if( _tco_num >= 0 )
 	{
-		return( bbEditor::inst()->play( _start, _start_frame, _frames,
+		return( eng()->getBBEditor()->play( _start, _start_frame, _frames,
 							_frame_base,
 							s_infoMap[this] ) );
 	}
 
 	vlist<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start +static_cast<Sint32>( _frames *
-				64 / songEditor::inst()->framesPerTact() ) );
+			64 / eng()->getSongEditor()->framesPerTact() ) );
 	
 	if ( tcos.size() == 0 )
 	{
@@ -379,7 +382,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start, Uint32 _start_frame,
 	}
 	if( _start - lastPosition < lastLen )
 	{
-		return( bbEditor::inst()->play( _start - lastPosition,
+		return( eng()->getBBEditor()->play( _start - lastPosition,
 							_start_frame, _frames,
 							_frame_base,
 							s_infoMap[this] ) );
@@ -418,12 +421,12 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	bbt_de.setAttribute( "name", m_trackLabel->text() );
 	bbt_de.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	bbt_de.setAttribute( "current", s_infoMap[this] ==
-					bbEditor::inst()->currentBB() );*/
+					eng()->getBBEditor()->currentBB() );*/
 	_parent.appendChild( bbt_de );
 	if( s_infoMap[this] == 0 &&
 				_parent.parentNode().nodeName() != "clone" )
 	{
-		bbEditor::inst()->saveSettings( _doc, bbt_de );
+		eng()->getBBEditor()->saveSettings( _doc, bbt_de );
 	}
 }
 
@@ -439,7 +442,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	if( _this.firstChild().isElement() )
 	{
-		bbEditor::inst()->loadSettings(
+		eng()->getBBEditor()->loadSettings(
 					_this.firstChild().toElement() );
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if
@@ -447,7 +450,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	help at all....
 	if( _this.attribute( "current" ).toInt() )
 	{
-		bbEditor::inst()->setCurrentBB( s_infoMap[this] );
+		eng()->getBBEditor()->setCurrentBB( s_infoMap[this] );
 	}*/
 }
 
@@ -455,15 +458,15 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 // return pointer to bbTrack specified by _bb_num
-bbTrack * bbTrack::findBBTrack( csize _bb_num )
+bbTrack * bbTrack::findBBTrack( csize _bb_num, engine * _engine )
 {
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
 #ifdef QT4
-		if( it.value() == _bb_num )
+		if( it.value() == _bb_num && it.key()->eng() == _engine )
 #else
-		if( it.data() == _bb_num )
+		if( it.data() == _bb_num && it.key()->eng() == _engine )
 #endif
 		{
 			return( it.key() );
@@ -494,8 +497,9 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 	if( t1 != NULL && t2 != NULL )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		bbEditor::inst()->swapBB( s_infoMap[t1], s_infoMap[t2] );
-		bbEditor::inst()->setCurrentBB( s_infoMap[t2] );
+		_track1->eng()->getBBEditor()->swapBB( s_infoMap[t1],
+								s_infoMap[t2] );
+		_track1->eng()->getBBEditor()->setCurrentBB( s_infoMap[t2] );
 	}
 }
 
@@ -504,8 +508,8 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 
 void bbTrack::clickedTrackLabel( void )
 {
-	bbEditor::inst()->setCurrentBB( s_infoMap[this] );
-	bbEditor::inst()->show();
+	eng()->getBBEditor()->setCurrentBB( s_infoMap[this] );
+	eng()->getBBEditor()->show();
 }
 
 

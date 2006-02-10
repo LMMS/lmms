@@ -91,7 +91,7 @@ plugin::descriptor bitinvader_plugin_descriptor =
 QPixmap * bitInvader::s_artwork = NULL;
 
 
-bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, float factor)
+bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, float factor, const sample_rate_t _sample_rate )
 {
 
 	interpolation = _interpolation;
@@ -110,8 +110,8 @@ bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, floa
 	sample_realindex = 0;
 	
 
-	sample_step = static_cast<float>( sample_length / 
-			((float)mixer::inst()->sampleRate() / _pitch) );
+	sample_step = static_cast<float>( sample_length / ( _sample_rate /
+		 						_pitch ) );
 	
 
 }
@@ -190,7 +190,8 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	}
 
 
-	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ) );
+	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ),
+									eng() );
 	m_sampleLengthKnob->setRange( 8, 128, 1 );
  	m_sampleLengthKnob->setValue( 128, TRUE );
 	m_sampleLengthKnob->move( 10, 120 );
@@ -213,7 +214,7 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 			this, SLOT ( normalizeToggle( bool ) ) );
 
 
-	m_graph = new graph( "", this );
+	m_graph = new graph( this, eng() );
 	m_graph->move(53,118);	// 55,120 - 2px border
 	m_graph->setCursor( QCursor( Qt::CrossCursor ) );
 
@@ -436,7 +437,7 @@ void bitInvader::usrWaveClicked( void )
 	}
 
 	// load user shape
-	sampleBuffer buffer;
+	sampleBuffer buffer( eng() );
 	QString af = buffer.openAudioFile();
 	if ( af != "" )
 	{
@@ -634,15 +635,14 @@ void bitInvader::interpolationToggle( bool value )
 {
       	interpolation = value;
 
-      	songEditor::inst()->setModified();
-      	
+	eng()->getSongEditor()->setModified();
 }
         
 void bitInvader::normalizeToggle( bool value )
 {
        	normalize = value;
 
-      	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 }
 
@@ -674,8 +674,7 @@ void bitInvader::smoothClicked( void )
 	update();
 	m_graph->update();
 
-      	songEditor::inst()->setModified();
-
+	eng()->getSongEditor()->setModified();
 
 }
 
@@ -697,14 +696,15 @@ void bitInvader::playNote( notePlayHandle * _n )
 		}
 		
 		_n->m_pluginData = new bSynth( sample_shape, sample_length,freq
-					, interpolation, factor	);
+					, interpolation, factor,
+					eng()->getMixer()->sampleRate() );
 	}
 
-	const Uint32 frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
-	for( Uint32 frame = 0; frame < frames; ++frame )
+	for( fpab_t frame = 0; frame < frames; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -772,7 +772,7 @@ void bitInvader::sampleSizeChanged( float _new_sample_length )
        	m_graph->setSamplePointer( sample_shape, sample_length );
 
 	// set Song modified
-       	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 }                                                
                                                
@@ -793,7 +793,7 @@ void bitInvader::sampleChanged()
              m_graph->update();
 	}
 
-       	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
                                 
 }
 

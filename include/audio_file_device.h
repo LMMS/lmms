@@ -52,7 +52,8 @@ public:
 				const bool _use_vbr,
 				const bitrate_t _nom_bitrate,
 				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate );
+				const bitrate_t _max_bitrate,
+				mixer * _mixer );
 	virtual ~audioFileDevice();
 
 

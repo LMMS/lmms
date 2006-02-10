@@ -44,13 +44,14 @@
 #include "mixer.h"
 #include "communication.h"
 #include "midi.h"
+#include "engine.h"
 
 
 
-class remoteVSTPlugin
+class remoteVSTPlugin : public engineObject
 {
 public:
-	remoteVSTPlugin( const QString & _plugin );
+	remoteVSTPlugin( const QString & _plugin, engine * _engine );
 	~remoteVSTPlugin();
 
 	void showEditor( void );
@@ -80,7 +81,7 @@ public:
 						sampleFrame * _out_buf );
 	void FASTCALL enqueueMidiEvent( const midiEvent & _event,
 						const Uint32 _frames_ahead );
-	void FASTCALL setBPM( const Uint16 _bpm );
+	void FASTCALL setTempo( const bpm_t _bpm );
 
 	const QMap<QString, QString> & parameterDump( void );
 	void setParameterDump( const QMap<QString, QString> & _pdump );

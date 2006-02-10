@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> neccessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,6 +56,7 @@
 #include "midi_time.h"
 #include "settings.h"
 #include "rubberband.h"
+#include "engine.h"
 
 
 class QMenu;
@@ -77,7 +78,8 @@ const Uint16 TRACK_OP_WIDTH = 70;
 const Uint16 TCO_BORDER_WIDTH = 1;
 
 
-class trackContentObject : public selectableObject, public settings
+class trackContentObject : public selectableObject, public settings,
+			   public engineObject
 {
 	Q_OBJECT
 public:
@@ -345,7 +347,7 @@ private:
 
 
 // base-class for all tracks
-class track : public settings
+class track : public settings, public engineObject
 {
 public:
 	enum trackTypes
@@ -361,6 +363,7 @@ public:
 
 	track( trackContainer * _tc );
 	virtual ~track();
+
 	static track * FASTCALL create( trackTypes _tt, trackContainer * _tc );
 	static track * FASTCALL create( const QDomElement & _this,
 							trackContainer * _tc );
@@ -383,9 +386,9 @@ public:
 	virtual trackTypes type( void ) const = 0;
 
 	virtual bool FASTCALL play( const midiTime & _start,
-						Uint32 _start_frame,
-						Uint32 _frames,
-						Uint32 _frame_base,
+						const f_cnt_t _start_frame,
+						const fpab_t _frames,
+						const f_cnt_t _frame_base,
 						Sint16 _tco_num = -1 ) = 0;
 
 

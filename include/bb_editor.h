@@ -27,16 +27,12 @@
 #define _BB_EDITOR_H
 
 #include "qt3support.h"
-
-
 #include "track_container.h"
-#include "lmms_main_win.h"
 
 
 class QPixmap;
 
 class comboBox;
-class songEditor;
 class toolButton;
 
 
@@ -44,17 +40,9 @@ class bbEditor : public trackContainer
 {
 	Q_OBJECT
 public:
-	static inline bbEditor * inst( void )
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new bbEditor();
-		}
-		return( s_instanceOfMe );
-	}
-
-	virtual bool FASTCALL play( midiTime _start, Uint32 _start_frame,
-					Uint32 _frames, Uint32 _frame_base,
+	virtual bool FASTCALL play( midiTime _start, const f_cnt_t _start_frame,
+						const f_cnt_t _frames,
+						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -73,20 +61,22 @@ public:
 	}
 
 	csize currentBB( void ) const;
-	tact FASTCALL lengthOfBB( csize _bb );
+	tact FASTCALL lengthOfBB( const csize _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
 		return( lengthOfBB( currentBB() ) );
 	}
-	void FASTCALL removeBB( csize _bb );
+	void FASTCALL removeBB( const csize _bb );
 	csize numOfBBs( void ) const;
 
-	void FASTCALL swapBB( csize _bb1, csize _bb2 );
+	void FASTCALL swapBB( const csize _bb1, const csize _bb2 );
 
 	void updateBBTrack( trackContentObject * _tco );
 
 
 public slots:
+	void play( void );
+	void stop( void );
 	void updateComboBox( void );
 	void setCurrentBB( int _bb );
 
@@ -99,20 +89,13 @@ protected:
 	virtual QRect scrollAreaRect( void ) const;
 
 
-protected slots:
-	void play( void );
-	void stop( void );
-
-
 private:
-	bbEditor();
+	bbEditor( engine * _engine );
 	//bbEditor( const bbEditor & );
-	~bbEditor();
+	virtual ~bbEditor();
 
-	void FASTCALL createTCOsForBB( csize _bb );
+	void FASTCALL createTCOsForBB( const csize _bb );
 
-
-	static bbEditor * s_instanceOfMe;
 
 	QWidget * m_toolBar;
 
@@ -122,8 +105,7 @@ private:
 	comboBox * m_bbComboBox;
 
 
-	friend class songEditor;
-	friend lmmsMainWin::~lmmsMainWin();
+	friend class engine;
 
 } ;
 

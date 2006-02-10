@@ -77,13 +77,14 @@
 
 #include "templates.h"
 #include "config_mgr.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "lvsl_client.h"
 
 
 
 
-remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
+remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
+	engineObject( _engine ),
 	m_failed( TRUE ),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
@@ -241,7 +242,7 @@ void remoteVSTPlugin::showEditor( void )
 		return;
 	}
 
-	m_pluginWidget = new QWidget( lmmsMainWin::inst()->workspace() );
+	m_pluginWidget = new QWidget( eng()->getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
 	m_pluginWidget->show();
@@ -274,7 +275,7 @@ void remoteVSTPlugin::hideEditor( void )
 void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 							sampleFrame * _out_buf )
 {
-	const fpab_t frames = mixer::inst()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 
 	if( m_shm == NULL )
 	{
@@ -286,7 +287,7 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 		{
 			(void) processNextMessage();
 		}
-		mixer::inst()->clearAudioBuffer( _out_buf, frames );
+		eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
 		return;
 	}
 
@@ -323,7 +324,7 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 		if( outputs != DEFAULT_CHANNELS )
 		{
 			// clear buffer, if plugin didn't fill up both channels
-			mixer::inst()->clearAudioBuffer( _out_buf, frames );
+			eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
 		}
 
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
@@ -341,23 +342,23 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 
 
 void remoteVSTPlugin::enqueueMidiEvent( const midiEvent & _event,
-						const Uint32 _frames_ahead )
+						const f_cnt_t _frames_ahead )
 {
 	lock();
 	writeValueS<Sint16>( VST_ENQUEUE_MIDI_EVENT );
 	writeValueS<midiEvent>( _event );
-	writeValueS<Uint32>( _frames_ahead );
+	writeValueS<f_cnt_t>( _frames_ahead );
 	unlock();
 }
 
 
 
 
-void remoteVSTPlugin::setBPM( Uint16 _bpm )
+void remoteVSTPlugin::setTempo( const bpm_t _bpm )
 {
 	lock();
 	writeValueS<Sint16>( VST_BPM );
-	writeValueS<Uint16>( _bpm );
+	writeValueS<bpm_t>( _bpm );
 	unlock();
 }
 
@@ -465,14 +466,14 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 			writeValueS<Sint16>( VST_SAMPLE_RATE );
 			// handle is the same
 			writeValueS<sample_rate_t>(
-						mixer::inst()->sampleRate() );
+					eng()->getMixer()->sampleRate() );
 			break;
 
 		case VST_GET_BUFFER_SIZE:
 			writeValueS<Sint16>( VST_BUFFER_SIZE );
 			// handle is the same
 			writeValueS<fpab_t>(
-					mixer::inst()->framesPerAudioBuffer() );
+				eng()->getMixer()->framesPerAudioBuffer() );
 			break;
 
 		case VST_SHM_KEY_AND_SIZE:

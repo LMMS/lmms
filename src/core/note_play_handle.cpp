@@ -24,8 +24,6 @@
  */
 
 
-#include <qmap.h>
-
 #include "note_play_handle.h"
 #include "channel_track.h"
 #include "envelope_tab_widget.h"
@@ -38,11 +36,11 @@
 
 
 notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
-						const Uint32 _frames_ahead,
-						const Uint32 _frames,
+						const f_cnt_t _frames_ahead,
+						const f_cnt_t _frames,
 						note * _n,
 						const bool _arp_note ) :
-	playHandle( NOTE_PLAY_HANDLE ),
+	playHandle( NOTE_PLAY_HANDLE, _chnl_trk->eng() ),
 	note( *_n ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
@@ -72,8 +70,8 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
 				(Uint16) ( ( getVolume() / 100.0f ) *
 				( m_channelTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
-				midiTime::fromFrames( m_framesAhead,
-					songEditor::inst()->framesPerTact() ) );
+			midiTime::fromFrames( m_framesAhead,
+				eng()->getSongEditor()->framesPerTact() ) );
 }
 
 
@@ -112,8 +110,8 @@ void notePlayHandle::play( void )
 	}
 
 	if( m_released == FALSE &&
-		m_totalFramesPlayed + mixer::inst()->framesPerAudioBuffer() >=
-								m_frames )
+		m_totalFramesPlayed +
+			eng()->getMixer()->framesPerAudioBuffer() >= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
 	} 
@@ -123,7 +121,7 @@ void notePlayHandle::play( void )
 
 	if( m_released == TRUE )
 	{
-		Uint32 todo = mixer::inst()->framesPerAudioBuffer();
+		f_cnt_t todo = eng()->getMixer()->framesPerAudioBuffer();
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow notePlayHandle::done() to be true
@@ -132,7 +130,7 @@ void notePlayHandle::play( void )
 		if( arpBaseNote() == TRUE )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 *
-					mixer::inst()->framesPerAudioBuffer();
+				eng()->getMixer()->framesPerAudioBuffer();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -140,7 +138,7 @@ void notePlayHandle::play( void )
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
 			if( m_framesBeforeRelease <=
-					mixer::inst()->framesPerAudioBuffer() )
+				eng()->getMixer()->framesPerAudioBuffer() )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -153,7 +151,7 @@ void notePlayHandle::play( void )
 				// release-phase yet)
 				todo = 0;
 				m_framesBeforeRelease -=
-					mixer::inst()->framesPerAudioBuffer();
+			eng()->getMixer()->framesPerAudioBuffer();
 			}
 		}
 		// look whether we're in release-phase
@@ -201,7 +199,7 @@ void notePlayHandle::play( void )
 	}
 
 	// update internal data
-	m_totalFramesPlayed += mixer::inst()->framesPerAudioBuffer();
+	m_totalFramesPlayed += eng()->getMixer()->framesPerAudioBuffer();
 }
 
 
@@ -233,7 +231,7 @@ void notePlayHandle::checkValidity( void )
 
 
 
-void notePlayHandle::noteOff( Uint32 _s )
+void notePlayHandle::noteOff( const f_cnt_t _s )
 {
 	// first note-off all sub-notes
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
@@ -260,7 +258,7 @@ void notePlayHandle::noteOff( Uint32 _s )
 								key(), 0 ),
 						midiTime::fromFrames(
 							m_framesBeforeRelease,
-					songEditor::inst()->framesPerTact() ) );
+				eng()->getSongEditor()->framesPerTact() ) );
 	}
 	else
 	{
@@ -273,7 +271,7 @@ void notePlayHandle::noteOff( Uint32 _s )
 
 
 
-Uint32 notePlayHandle::actualReleaseFramesToDo( void ) const
+f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
 	return( ( m_channelTrack != NULL ) ?
 			m_channelTrack->m_envWidget->releaseFrames() : 0 );
@@ -282,7 +280,7 @@ Uint32 notePlayHandle::actualReleaseFramesToDo( void ) const
 
 
 
-void notePlayHandle::setFrames( Uint32 _frames )
+void notePlayHandle::setFrames( const f_cnt_t _frames )
 {
 	m_frames = _frames;
 	if( m_frames == 0 && m_channelTrack != NULL )
@@ -294,7 +292,7 @@ void notePlayHandle::setFrames( Uint32 _frames )
 
 
 
-float notePlayHandle::volumeLevel( Uint32 _frame )
+float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
 	return( ( m_channelTrack != NULL ) ?
 		m_channelTrack->m_envWidget->volumeLevel( this, _frame ) : 0 );
@@ -319,7 +317,7 @@ void notePlayHandle::mute( void )
 
 int notePlayHandle::index( void ) const
 {
-	const playHandleVector & phv = mixer::inst()->playHandles();
+	const playHandleVector & phv = eng()->getMixer()->playHandles();
 	int idx = 0;
 	for( constPlayHandleVector::const_iterator it = phv.begin();
 							it != phv.end(); ++it )
@@ -346,7 +344,7 @@ int notePlayHandle::index( void ) const
 constNotePlayHandleVector notePlayHandle::nphsOfChannelTrack(
 						const channelTrack * _ct )
 {
-	const playHandleVector & phv = mixer::inst()->playHandles();
+	const playHandleVector & phv = _ct->eng()->getMixer()->playHandles();
 	constNotePlayHandleVector cnphv;
 
 	for( constPlayHandleVector::const_iterator it = phv.begin();

@@ -51,15 +51,14 @@
 #endif
 
 
-#include "lmms_main_win.h"
-
-
 class QLineEdit;
 class QLabel;
 class QRadioButton;
 class QHBoxLayout;
 class QVBoxLayout;
 class QFrame;
+
+class engine;
 
 
 const QString PROJECTS_PATH = "projects/";
@@ -207,8 +206,7 @@ private:
 	QVBoxLayout * m_contentLayout;
 
 
-	// lmmsMainWin-dtor is allowed to destroy us...
-	friend lmmsMainWin::~lmmsMainWin();
+	friend class engine;
 
 } ;
 

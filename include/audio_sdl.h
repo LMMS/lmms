@@ -51,7 +51,8 @@ class QLineEdit;
 class audioSDL : public audioDevice
 {
 public:
-	audioSDL( const sample_rate_t _sample_rate, bool & _success_ful );
+	audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer );
 	virtual ~audioSDL();
 
 	inline static QString name( void )

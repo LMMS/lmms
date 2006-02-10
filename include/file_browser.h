@@ -1,7 +1,7 @@
 /*
  * file_browser.h - include file for fileBrowser
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,7 +46,7 @@
 
 
 #include "side_bar_widget.h"
-
+#include "engine.h"
 
 
 class fileItem;
@@ -57,13 +57,13 @@ class trackContainer;
 
 
 
-class fileBrowser : public sideBarWidget
+class fileBrowser : public sideBarWidget, public engineObject
 {
 	Q_OBJECT
 public:
 	fileBrowser( const QString & _path, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-							QWidget * _parent );
+					QWidget * _parent, engine * _engine );
 	virtual ~fileBrowser();
 
 
@@ -100,12 +100,12 @@ private:
 
 
 
-class listView : public Q3ListView
+class listView : public Q3ListView, public engineObject
 {
 	Q_OBJECT
 public:
-	listView( QWidget * _parent );
-	~listView();
+	listView( QWidget * _parent, engine * _engine );
+	virtual ~listView();
 
 
 protected:

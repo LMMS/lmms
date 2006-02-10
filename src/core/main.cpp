@@ -46,7 +46,7 @@
 #endif
 
 
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "embed.h"
 #include "config_mgr.h"
 #include "export_project_dialog.h"
@@ -54,12 +54,12 @@
 #include "gui_templates.h"
 
 
+QString file_to_render;
+
+
 #if QT_VERSION >= 0x030100
 int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
 #endif
-
-QString file_to_load;
-QString file_to_render;
 
 
 int main( int argc, char * * argv )
@@ -67,6 +67,7 @@ int main( int argc, char * * argv )
 	QApplication app( argc, argv );
 
 	QString extension = "wav";
+	QString file_to_load;
 
 	for( int i = 1; i < app.argc(); ++i )
 	{
@@ -187,10 +188,10 @@ int main( int argc, char * * argv )
 #if QT_VERSION >= 0x030200
 	// init splash screen
 	QPixmap splash = embed::getIconPixmap( "splash" );
-	lmmsMainWin::s_splashScreen = new QSplashScreen( splash );
-	lmmsMainWin::s_splashScreen->show();
+	mainWindow::s_splashScreen = new QSplashScreen( splash );
+	mainWindow::s_splashScreen->show();
 
-	lmmsMainWin::s_splashScreen->showMessage( lmmsMainWin::tr(
+	mainWindow::s_splashScreen->showMessage( mainWindow::tr(
 							"Setting up main-"
 							"window and "
 							"workspace..." ),
@@ -198,33 +199,45 @@ int main( int argc, char * * argv )
 							Qt::white );
 #endif
 
+	engine * main_engine = new engine();
+
+	// we try to load given file
+	if( file_to_load != "" )
+	{
+		main_engine->getSongEditor()->loadProject( file_to_load );
+	}
+	else
+	{
+		main_engine->getSongEditor()->createNewProject();
+	}
 #ifndef QT4
-	app.setMainWidget( lmmsMainWin::inst() );
+	app.setMainWidget( main_engine->getMainWindow() );
 #endif
 	// MDI-mode?
-	if( lmmsMainWin::inst()->workspace() != NULL )
+	if( main_engine->getMainWindow()->workspace() != NULL )
 	{
 		// then maximize
-		lmmsMainWin::inst()->showMaximized();
+		main_engine->getMainWindow()->showMaximized();
 	}
 	else
 	{
 		// otherwise arrange at top-left edge of screen
-		lmmsMainWin::inst()->show();
-		lmmsMainWin::inst()->move( 0, 0 );
-		lmmsMainWin::inst()->resize( 200, 500 );
+		main_engine->getMainWindow()->show();
+		main_engine->getMainWindow()->move( 0, 0 );
+		main_engine->getMainWindow()->resize( 200, 500 );
 	}
 
 
 #if QT_VERSION >= 0x030200
-	delete lmmsMainWin::s_splashScreen;
-	lmmsMainWin::s_splashScreen = NULL;
+	delete mainWindow::s_splashScreen;
+	mainWindow::s_splashScreen = NULL;
 #endif
 	if( file_to_render != "" )
 	{
 		exportProjectDialog * e = new exportProjectDialog(
-							file_to_render,
-							lmmsMainWin::inst() );
+						file_to_render,
+						main_engine->getMainWindow(),
+						main_engine );
 		e->show();
 		e->exportBtnClicked();
 	}

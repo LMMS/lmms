@@ -1,7 +1,7 @@
 /*
  * midi_alsa_seq.h - ALSA-sequencer-client
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -71,8 +71,8 @@ class midiALSASeq :
 {
 	Q_OBJECT
 public:
-	midiALSASeq( void );
-	~midiALSASeq();
+	midiALSASeq( engine * _engine );
+	virtual ~midiALSASeq();
 
 	static QString probeDevice( void );
 
@@ -143,7 +143,7 @@ public:
 
 
 private slots:
-	void changeQueueTempo( int _bpm );
+	void changeQueueTempo( bpm_t _bpm );
 	void updatePortList( void );
 
 

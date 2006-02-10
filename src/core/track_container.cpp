@@ -2,7 +2,7 @@
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,7 +49,7 @@
 #include "track.h"
 #include "templates.h"
 #include "bb_track.h"
-#include "lmms_main_win.h"
+#include "main_window.h"
 #include "mixer.h"
 #include "song_editor.h"
 #include "string_pair_drag.h"
@@ -62,13 +62,14 @@
 
 
 
-trackContainer::trackContainer() :
-	QMainWindow( lmmsMainWin::inst()->workspace()
+trackContainer::trackContainer( engine * _engine ) :
+	QMainWindow( _engine->getMainWindow()->workspace()
 #ifdef QT3
 				, 0, Qt::WStyle_Title
 #endif
 			 ),
 	settings(),
+	engineObject( _engine ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
@@ -76,9 +77,9 @@ trackContainer::trackContainer() :
 	m_origin()
 {
 #ifdef QT4
-	if( lmmsMainWin::inst()->workspace() != NULL )
+	if( eng()->getMainWindow()->workspace() != NULL )
 	{
-		lmmsMainWin::inst()->workspace()->addWindow( this );
+		eng()->getMainWindow()->workspace()->addWindow( this );
 	}
 #endif
 
@@ -214,7 +215,7 @@ void trackContainer::removeTrack( track * _track )
 			m_trackWidgets.end(), _track->getTrackWidget() );
 	if( it != m_trackWidgets.end() )
 	{
-		mixer::inst()->pause();
+		eng()->getMixer()->pause();
 #ifndef QT4
 		m_scrollArea->removeChild( _track->getTrackWidget() );
 #endif
@@ -222,10 +223,10 @@ void trackContainer::removeTrack( track * _track )
 
 		delete _track;
 
-		mixer::inst()->play();
+		eng()->getMixer()->play();
 
 		realignTracks();
-		songEditor::inst()->setModified();
+		eng()->getSongEditor()->setModified();
 	}
 }
 
@@ -301,6 +302,17 @@ void trackContainer::realignTracks( bool _complete_update )
 	m_scrollArea->resizeContents( width() - DEFAULT_SCROLLBAR_SIZE, y );
 #endif
 	updateScrollArea();
+}
+
+
+
+
+void trackContainer::clearAllTracks( void )
+{
+	while( m_trackWidgets.size() )
+	{
+		removeTrack( m_trackWidgets.front()->getTrack() );
+	}
 }
 
 

@@ -62,6 +62,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 							midiPort * _port ) :
 	QWidget( _channel_track->tabWidgetParent() ),
 	settings(),
+	engineObject( _channel_track->eng() ),
 	m_channelTrack( _channel_track ),
 	m_midiPort( _port ),
 	m_readablePorts( NULL ),
@@ -119,7 +120,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	midiClient * mc = mixer::inst()->getMIDIClient();
+	midiClient * mc = eng()->getMixer()->getMIDIClient();
 	if( mc->isRaw() == FALSE )
 	{
 		m_readablePorts = new QMenu( m_setupTabWidget );
@@ -345,7 +346,7 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 void midiTabWidget::inputChannelChanged( int _new_chnl )
 {
 	m_midiPort->setInputChannel( _new_chnl - 1 );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -354,7 +355,7 @@ void midiTabWidget::inputChannelChanged( int _new_chnl )
 void midiTabWidget::outputChannelChanged( int _new_chnl )
 {
 	m_midiPort->setOutputChannel( _new_chnl - 1 );
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -418,7 +419,7 @@ void midiTabWidget::midiPortModeToggled( bool )
 		}
 #endif
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 }
 
 
@@ -450,7 +451,7 @@ void midiTabWidget::readablePortsChanged( void )
 #endif
 
 	m_readablePorts->clear();
-	const QStringList & rp = mixer::inst()->getMIDIClient()->
+	const QStringList & rp = eng()->getMixer()->getMIDIClient()->
 								readablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = rp.begin(); it != rp.end(); ++it )
@@ -501,7 +502,7 @@ void midiTabWidget::writeablePortsChanged( void )
 #endif
 
 	m_writeablePorts->clear();
-	const QStringList & wp = mixer::inst()->getMIDIClient()->
+	const QStringList & wp = eng()->getMixer()->getMIDIClient()->
 							writeablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
@@ -536,7 +537,7 @@ void midiTabWidget::activatedReadablePort( QAction * _item )
 		m_receiveCheckBox->setChecked( TRUE );
 	}
 	_item->setChecked( !_item->isChecked() );
-	mixer::inst()->getMIDIClient()->subscribeReadablePort( m_midiPort,
+	eng()->getMixer()->getMIDIClient()->subscribeReadablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }
 
@@ -553,7 +554,7 @@ void midiTabWidget::activatedWriteablePort( QAction * _item )
 		m_sendCheckBox->setChecked( TRUE );
 	}
 	_item->setChecked( !_item->isChecked() );
-	mixer::inst()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
+	eng()->getMixer()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }
 
@@ -575,7 +576,7 @@ void midiTabWidget::activatedReadablePort( int _id )
 	}
 	m_readablePorts->setItemChecked( _id,
 				!m_readablePorts->isItemChecked( _id ) );
-	mixer::inst()->getMIDIClient()->subscribeReadablePort(
+	eng()->getMixer()->getMIDIClient()->subscribeReadablePort(
 				m_midiPort, m_readablePorts->text( _id ),
 				!m_readablePorts->isItemChecked( _id ) );
 }
@@ -594,7 +595,7 @@ void midiTabWidget::activatedWriteablePort( int _id )
 	}
 	m_writeablePorts->setItemChecked( _id,
 				!m_writeablePorts->isItemChecked( _id ) );
-	mixer::inst()->getMIDIClient()->subscribeWriteablePort(
+	eng()->getMixer()->getMIDIClient()->subscribeWriteablePort(
 				m_midiPort, m_writeablePorts->text( _id ),
 				!m_writeablePorts->isItemChecked( _id ) );
 }

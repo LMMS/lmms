@@ -1,7 +1,7 @@
 /*
  * text_float.cpp - class textFloat, a floating text-label
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,7 +43,6 @@
 
 #include "text_float.h"
 #include "gui_templates.h"
-#include "lmms_main_win.h"
 
 
 
@@ -152,10 +151,6 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 {
 #ifdef QT4
 	QWidget * mw = QApplication::activeWindow();
-	if( mw == NULL )
-	{
-		mw = lmmsMainWin::inst();
-	}
 #else
 	QWidget * mw = qApp->mainWidget();
 	if( mw == NULL )

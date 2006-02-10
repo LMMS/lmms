@@ -36,6 +36,7 @@
 
 #include <qpainter.h>
 #include <qlayout.h>
+#include <qwhatsthis.h>
 
 #endif
 
@@ -51,19 +52,16 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "combobox.h"
-
+#include "main_window.h"
 
 
 const int BBE_PPT = 192;
 
 
 
-bbEditor * bbEditor::s_instanceOfMe = NULL;
 
-
-
-bbEditor::bbEditor() :
-	trackContainer()
+bbEditor::bbEditor( engine * _engine ) :
+	trackContainer( _engine )
 {
 	// create toolbar
 	m_toolBar = new QWidget( this );
@@ -88,7 +86,7 @@ bbEditor::bbEditor() :
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
 				BBE_PPT + 2 * TCO_BORDER_WIDTH +
 				DEFAULT_SCROLLBAR_SIZE );
-	if( lmmsMainWin::inst()->workspace() != NULL )
+	if( eng()->getMainWindow()->workspace() != NULL )
 	{
 		setGeometry( 10, 340, minimumWidth(), 300 );
 	}
@@ -178,9 +176,9 @@ void bbEditor::setCurrentBB( int _bb )
 
 	// now update all track-labels (the current one has to become white,
 	// the others green)
-	for( csize i = 0; i < bbEditor::inst()->numOfBBs(); ++i )
+	for( csize i = 0; i < numOfBBs(); ++i )
 	{
-		bbTrack::findBBTrack( i )->trackLabel()->update();
+		bbTrack::findBBTrack( i, eng() )->trackLabel()->update();
 	}
 
 	emit positionChanged( m_currentPosition = midiTime(
@@ -244,7 +242,7 @@ bool FASTCALL bbEditor::play( midiTime _start, Uint32 _start_frame,
 
 csize bbEditor::numOfBBs( void ) const
 {
-	return( songEditor::inst()->countTracks( track::BB_TRACK ) );
+	return( eng()->getSongEditor()->countTracks( track::BB_TRACK ) );
 }
 
 
@@ -275,7 +273,7 @@ void bbEditor::removeBB( csize _bb )
 
 void bbEditor::updateBBTrack( trackContentObject * _tco )
 {
-	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
+	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64, eng() );
 	if( t != NULL )
 	{
 		t->getTrackContentWidget()->updateTCOs();
@@ -291,7 +289,7 @@ void bbEditor::updateComboBox( void )
 
 	for( csize i = 0; i < numOfBBs(); ++i )
 	{
-		bbTrack * bbt = bbTrack::findBBTrack( i );
+		bbTrack * bbt = bbTrack::findBBTrack( i, eng() );
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
 					bbt->trackLabel()->pixmap() );
 	}
@@ -316,7 +314,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
-		if( songEditor::inst()->playing() )
+		if( eng()->getSongEditor()->playing() )
 		{
 			stop();
 		}
@@ -374,31 +372,31 @@ QRect bbEditor::scrollAreaRect( void ) const
 
 void bbEditor::play( void )
 {
-	if( songEditor::inst()->playing() )
+	if( eng()->getSongEditor()->playing() )
 	{
-		if( songEditor::inst()->playMode() != songEditor::PLAY_BB )
+		if( eng()->getSongEditor()->playMode() != songEditor::PLAY_BB )
 		{
-			songEditor::inst()->stop();
-			songEditor::inst()->playBB();
+			eng()->getSongEditor()->stop();
+			eng()->getSongEditor()->playBB();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
-			songEditor::inst()->pause();
+			eng()->getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"play" ) );
 		}
 	}
-	else if( songEditor::inst()->paused() )
+	else if( eng()->getSongEditor()->paused() )
 	{
-		songEditor::inst()->resumeFromPause();
+		eng()->getSongEditor()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		songEditor::inst()->playBB();
+		eng()->getSongEditor()->playBB();
 	}
 
 }
@@ -408,7 +406,7 @@ void bbEditor::play( void )
 
 void bbEditor::stop( void )
 {
-	songEditor::inst()->stop();
+	eng()->getSongEditor()->stop();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 }

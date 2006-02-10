@@ -1,7 +1,7 @@
 /*
  * sample_play_handle.h - play-handle for playing a sample
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,15 +37,16 @@ class audioPort;
 class samplePlayHandle : public playHandle
 {
 public:
-	samplePlayHandle( const QString & _sample_file );
-	samplePlayHandle( sampleBuffer  * _sample_buffer );
+	samplePlayHandle( const QString & _sample_file, engine * _engine )
+								FASTCALL;
+	samplePlayHandle( sampleBuffer * _sample_buffer ) FASTCALL;
 	virtual ~samplePlayHandle();
 
 	virtual void play( void );
 	virtual bool done( void ) const;
 
-	Uint32 totalFrames( void ) const;
-	inline Uint32 framesDone( void ) const
+	f_cnt_t totalFrames( void ) const;
+	inline f_cnt_t framesDone( void ) const
 	{
 		return( m_frame );
 	}
@@ -60,7 +61,7 @@ private:
 	const bool m_ownSampleBuffer;
 	bool m_doneMayReturnTrue;
 
-	Uint32 m_frame;
+	f_cnt_t m_frame;
 
 	audioPort * m_audioPort;
 

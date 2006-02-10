@@ -1,7 +1,7 @@
 /*
  * midi_client.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -38,7 +38,8 @@
 
 
 
-midiClient::midiClient( void )
+midiClient::midiClient( engine * _engine ) :
+	engineObject( _engine )
 {
 }
 
@@ -63,6 +64,7 @@ void midiClient::applyPortMode( midiPort * )
 void midiClient::applyPortName( midiPort * )
 {
 }
+
 
 
 
@@ -126,8 +128,8 @@ void midiClient::subscribeWriteablePort( midiPort * , const QString & , bool)
 
 
 
-midiClientRaw::midiClientRaw() :
-	midiClient()
+midiClientRaw::midiClientRaw( engine * _engine ) :
+	midiClient( _engine )
 {
 }
 

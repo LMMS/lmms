@@ -2,7 +2,7 @@
  * cpuload_widget.cpp - widget for displaying CPU-load (partly based on
  *                      Hydrogen's CPU-load-widget)
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,8 +42,9 @@
 #include "mixer.h"
 
 
-cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
+cpuloadWidget::cpuloadWidget( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
+	engineObject( _engine ),
 	m_currentLoad( 0 ),
 	m_temp(),
 	m_background( embed::getIconPixmap( "cpuload_bg" ) ),
@@ -103,7 +104,7 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 void cpuloadWidget::updateCpuLoad()
 {
 	// smooth load-values a bit
-	Uint8 new_load = ( m_currentLoad + mixer::inst()->cpuLoad() ) / 2;
+	Uint8 new_load = ( m_currentLoad + eng()->getMixer()->cpuLoad() ) / 2;
 	if( new_load != m_currentLoad )
 	{
 		m_currentLoad = new_load;

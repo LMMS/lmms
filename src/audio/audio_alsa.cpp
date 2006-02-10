@@ -54,10 +54,12 @@
 
 
 
-audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful ) :
+audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
+							mixer * _mixer ) :
 	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audioalsa", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ) ),
+					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
+								_mixer ),
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
@@ -213,9 +215,9 @@ void audioALSA::run( void )
 {
 	surroundSampleFrame * temp =
 			bufferAllocator::alloc<surroundSampleFrame>(
-					mixer::inst()->framesPerAudioBuffer() );
+					getMixer()->framesPerAudioBuffer() );
 	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
-					mixer::inst()->framesPerAudioBuffer() *
+					getMixer()->framesPerAudioBuffer() *
 								channels() );
 	m_quit = FALSE;
 
@@ -223,7 +225,7 @@ void audioALSA::run( void )
 	{
 		const f_cnt_t frames = getNextBuffer( temp );
 
-		convertToS16( temp, frames, mixer::inst()->masterGain(), outbuf,
+		convertToS16( temp, frames, getMixer()->masterGain(), outbuf,
 					m_littleEndian != isLittleEndian() );
 
 		f_cnt_t frame = 0;
@@ -336,7 +338,7 @@ int audioALSA::setHWParams( const sample_rate_t _sample_rate,
 		}
 	}
 
-	m_periodSize = mixer::inst()->framesPerAudioBuffer();
+	m_periodSize = getMixer()->framesPerAudioBuffer();
 	m_bufferSize = m_periodSize * 8;
 	dir = 0;
 	err = snd_pcm_hw_params_set_period_size_near( m_handle, m_hwParams,

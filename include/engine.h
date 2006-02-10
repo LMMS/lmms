@@ -26,17 +26,21 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-class mixer;
-class lmmsMainWin;
-class songEditor;
+#include "qt3support.h"
+
+
 class bbEditor;
+class mainWindow;
+class mixer;
 class pianoRoll;
+class projectNotes;
+class songEditor;
 
 
 class engine
 {
 public:
-	engine( bool _has_gui = TRUE );
+	engine( const bool _has_gui = TRUE );
 	engine( const engine & _engine );
 	~engine();
 
@@ -55,12 +59,22 @@ public:
 		return( m_mixer );
 	}
 
-	inline lmmsMainWin * getMainWindow( void )
+	inline const mixer * getMixer( void ) const
+	{
+		return( m_mixer );
+	}
+
+	inline mainWindow * getMainWindow( void )
 	{
 		return( m_mainWindow );
 	}
 
 	inline songEditor * getSongEditor( void )
+	{
+		return( m_songEditor );
+	}
+
+	inline const songEditor * getSongEditor( void ) const
 	{
 		return( m_songEditor );
 	}
@@ -75,15 +89,21 @@ public:
 		return( m_pianoRoll );
 	}
 
+	inline projectNotes * getProjectNotes( void )
+	{
+		return( m_projectNotes );
+	}
+
 
 private:
 	bool m_hasGUI;
 
 	mixer * m_mixer;
-	lmmsMainWin * m_mainWindow;
+	mainWindow * m_mainWindow;
 	songEditor * m_songEditor;
 	bbEditor * m_bbEditor;
 	pianoRoll * m_pianoRoll;
+	projectNotes * m_projectNotes;
 
 } ;
 
@@ -96,6 +116,11 @@ public:
 	~engineObject();
 
 	inline engine * eng( void )
+	{
+		return( m_engine );
+	}
+
+	inline const engine * eng( void ) const
 	{
 		return( m_engine );
 	}

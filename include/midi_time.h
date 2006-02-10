@@ -2,7 +2,7 @@
  * midi_time.h - declaration of class midiTime which provides data-type for
  *               position- and length-variables
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -98,11 +98,11 @@ public:
 	}
 
 	// calculate number of frame that are needed this time
-	inline Uint32 frames( const float _frames_per_tact ) const
+	inline f_cnt_t frames( const float _frames_per_tact ) const
 	{
 		if( m_tact >= 0 )
 		{
-			return( static_cast<Uint32>( m_tact *
+			return( static_cast<f_cnt_t>( m_tact *
 							_frames_per_tact +
 							m_tact64th *
 							_frames_per_tact /
@@ -111,7 +111,7 @@ public:
 		return( 0 );
 	}
 
-	static inline midiTime fromFrames( Uint32 _frames,
+	static inline midiTime fromFrames( const f_cnt_t _frames,
 						const float _frames_per_tact )
 	{
 		return( midiTime( static_cast<Sint32>( _frames * 64.0f /

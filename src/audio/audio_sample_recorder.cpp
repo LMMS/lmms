@@ -35,8 +35,9 @@
 
 audioSampleRecorder::audioSampleRecorder( const sample_rate_t _sample_rate,
 						const ch_cnt_t _channels,
-							bool & _success_ful ) :
-	audioDevice( _sample_rate, _channels ),
+							bool & _success_ful,
+							mixer * _mixer ) :
+	audioDevice( _sample_rate, _channels, _mixer ),
 	m_buffers()
 {
 	_success_ful = TRUE;
@@ -57,9 +58,9 @@ audioSampleRecorder::~audioSampleRecorder()
 
 
 
-Uint32 audioSampleRecorder::framesRecorded( void ) const
+f_cnt_t audioSampleRecorder::framesRecorded( void ) const
 {
-	Uint32 frames = 0;
+	f_cnt_t frames = 0;
 	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
 	{
@@ -72,9 +73,8 @@ Uint32 audioSampleRecorder::framesRecorded( void ) const
 
 
 void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
-									const
 {
-	f_cnt_t frames = framesRecorded();
+	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
 	sampleFrame * data = bufferAllocator::alloc<sampleFrame>( frames );
 	// make sure buffer is cleaned up properly at the end...
@@ -92,7 +92,7 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 		data += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*_sample_buf = new sampleBuffer( ac.ptr(), frames );
+	*_sample_buf = new sampleBuffer( ac.ptr(), frames, getMixer()->eng() );
 }
 
 

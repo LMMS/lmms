@@ -1,7 +1,7 @@
 /*
  * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,8 +47,8 @@
 #ifdef ALSA_SUPPORT
 
 
-midiALSARaw::midiALSARaw( void ) :
-	midiClientRaw(),
+midiALSARaw::midiALSARaw( engine * _engine ) :
+	midiClientRaw( _engine ),
 	QThread(),
 	m_inputp( &m_input ),
 	m_outputp( &m_output ),

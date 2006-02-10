@@ -1,8 +1,8 @@
 /*
- * envelope_widget.cpp - widget which is m_used by envelope/lfo/filter-tab of
- *                       channel-window
+ * envelope_and_lfo_widget.cpp - widget which is m_used by envelope/lfo/filter-
+ *                               tab of channel-window
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -100,12 +100,15 @@ const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
 QPixmap * envelopeAndLFOWidget::s_envGraph = NULL;
 QPixmap * envelopeAndLFOWidget::s_lfoGraph = NULL;
-Uint32 envelopeAndLFOWidget::s_lfoFrame = 0;
+
+QMap<engine *, vvector<envelopeAndLFOWidget *> >
+					envelopeAndLFOWidget::s_EaLWidgets;
 
 
 
 envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
-							QWidget * _parent ) :
+						QWidget * _parent,
+						engine * _engine ) :
 	QWidget( _parent ),
 	settings(),
 #ifdef QT4
@@ -113,12 +116,15 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 #else
 	specialBgHandlingWidget( paletteBackgroundColor() ),
 #endif
+	engineObject( _engine ),
 	m_used( FALSE ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdEnv( NULL ),
 	m_rEnv( NULL ),
+	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( FALSE ),
 	m_lfoShapeData( NULL ),
+	m_userWave( eng() ),
 	m_lfoShape( SIN ),
 	m_busy( FALSE )
 {
@@ -132,7 +138,11 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
 
-	m_predelayKnob = new knob( knobBright_26, this, tr( "Predelay-time" ) );
+	s_EaLWidgets[eng()].push_back( this );
+
+
+	m_predelayKnob = new knob( knobBright_26, this, tr( "Predelay-time" ),
+									eng() );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_predelayKnob->setValue( 0.0, TRUE );
@@ -149,7 +159,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_predelayKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_attackKnob = new knob( knobBright_26, this, tr( "Attack-time" ) );
+	m_attackKnob = new knob( knobBright_26, this, tr( "Attack-time" ),
+									eng() );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_attackKnob->setValue( 0.0, TRUE );
@@ -168,7 +179,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_attackKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ) );
+	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ), eng() );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->setRange( 0.0, 1.0, 0.001 );
 	m_holdKnob->setValue( 0.5, TRUE );
@@ -186,7 +197,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_holdKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_decayKnob = new knob( knobBright_26, this, tr( "Decay-time" ) );
+	m_decayKnob = new knob( knobBright_26, this, tr( "Decay-time" ),
+									eng() );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_decayKnob->setValue( 0.5, TRUE );
@@ -205,7 +217,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_decayKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_sustainKnob = new knob( knobBright_26, this, tr( "Sustain-level" ) );
+	m_sustainKnob = new knob( knobBright_26, this, tr( "Sustain-level" ),
+									eng() );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->setRange( 0.0, 1.0, 0.001 );
 	m_sustainKnob->setValue( 0.5, TRUE );
@@ -223,7 +236,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_sustainKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_releaseKnob = new knob( knobBright_26, this, tr( "Release-time" ) );
+	m_releaseKnob = new knob( knobBright_26, this, tr( "Release-time" ),
+									eng() );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->setRange( 0.0, 1.0, 0.001 );
 	m_releaseKnob->setValue( 0.1, TRUE );
@@ -243,7 +257,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_amountKnob = new knob( knobBright_26, this,
-						tr( "Modulation amount" ) );
+					tr( "Modulation amount" ), eng() );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_amountKnob->setValue( 0.0, TRUE );
@@ -264,7 +278,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_lfoPredelayKnob = new knob( knobBright_26, this,
-						tr( "LFO-predelay-time" ) );
+					tr( "LFO-predelay-time" ), eng() );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoPredelayKnob->setValue( 0.0, TRUE );
@@ -282,7 +296,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoAttackKnob = new knob( knobBright_26, this,
-						tr( "LFO-attack-time" ) );
+					tr( "LFO-attack-time" ), eng() );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoAttackKnob->setValue( 0.0, TRUE );
@@ -300,7 +314,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
-						tr( "LFO-speed" ), 20000.0 );
+					tr( "LFO-speed" ), eng(), 20000.0 );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
 	m_lfoSpeedKnob->setValue( 0.1, TRUE );
@@ -318,7 +332,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoAmountKnob = new knob( knobBright_26, this,
-						tr( "LFO-modulation-amount" ) );
+					tr( "LFO-modulation-amount" ), eng() );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_lfoAmountKnob->setValue( 0.0, TRUE );
@@ -468,7 +482,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 #endif
 	setAcceptDrops( TRUE );
 
-	connect( mixer::inst(), SIGNAL( sampleRateChanged() ), this,
+	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateSampleVars() ) );
 
 	updateSampleVars();
@@ -482,29 +496,46 @@ envelopeAndLFOWidget::~envelopeAndLFOWidget()
 	delete[] m_pahdEnv;
 	delete[] m_rEnv;
 	delete[] m_lfoShapeData;
+
+	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets[eng()];
+	if( qFind( v.begin(), v.end(), this ) != v.end() )
+	{
+		v.erase( qFind( v.begin(), v.end(), this ) );
+	}
 }
 
 
 
 
-void envelopeAndLFOWidget::triggerLFO( void )
+void envelopeAndLFOWidget::triggerLFO( engine * _engine )
 {
-	s_lfoFrame += mixer::inst()->framesPerAudioBuffer();
+	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets[_engine];
+	for( vvector<envelopeAndLFOWidget *>::iterator it = v.begin();
+							it != v.end(); ++it )
+	{
+		( *it )->m_lfoFrame +=
+				_engine->getMixer()->framesPerAudioBuffer();
+	}
 }
 
 
 
 
-void envelopeAndLFOWidget::resetLFO( void )
+void envelopeAndLFOWidget::resetLFO( engine * _engine )
 {
-	s_lfoFrame = 0;
+	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets[_engine];
+	for( vvector<envelopeAndLFOWidget *>::iterator it = v.begin();
+							it != v.end(); ++it )
+	{
+		( *it )->m_lfoFrame = 0;
+	}
 }
 
 
 
 
-inline float FASTCALL envelopeAndLFOWidget::lfoLevel( Uint32 _frame,
-						Uint32 _frame_offset ) const
+inline float FASTCALL envelopeAndLFOWidget::lfoLevel( f_cnt_t _frame,
+					const f_cnt_t _frame_offset ) const
 {
 	if( m_lfoAmountIsZero == FALSE && _frame > m_lfoPredelayFrames )
 	{
@@ -514,10 +545,10 @@ inline float FASTCALL envelopeAndLFOWidget::lfoLevel( Uint32 _frame,
 		_frame -= m_lfoPredelayFrames;
 		if( _frame > m_lfoAttackFrames )
 		{
-			return( m_lfoShapeData[( s_lfoFrame + _frame_offset ) %
+			return( m_lfoShapeData[( m_lfoFrame + _frame_offset ) %
 						m_lfoOscillationFrames] );
 		}
-		return( m_lfoShapeData[( s_lfoFrame + _frame_offset ) %
+		return( m_lfoShapeData[( m_lfoFrame + _frame_offset ) %
 						m_lfoOscillationFrames] *
 						_frame / m_lfoAttackFrames );
 	}
@@ -527,9 +558,9 @@ inline float FASTCALL envelopeAndLFOWidget::lfoLevel( Uint32 _frame,
 
 
 
-float FASTCALL envelopeAndLFOWidget::level( Uint32 _frame,
-						Uint32 _release_begin,
-						Uint32 _frame_offset ) const
+float FASTCALL envelopeAndLFOWidget::level( f_cnt_t _frame,
+					const f_cnt_t _release_begin,
+					const f_cnt_t _frame_offset ) const
 {
 	if( m_busy )
 	{
@@ -825,7 +856,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
-					mixer::inst()->sampleRate() / 10;
+					eng()->getMixer()->sampleRate() / 10;
 
 	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value() );
 	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),
@@ -851,7 +882,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	{
 		float val = 0.0;
 		float cur_sample = x * frames_for_graph / LFO_GRAPH_W;
-		if( static_cast<Uint32>( cur_sample ) > m_lfoPredelayFrames )
+		if( static_cast<f_cnt_t>( cur_sample ) > m_lfoPredelayFrames )
 		{
 			float phase = ( cur_sample -= m_lfoPredelayFrames ) /
 								osc_frames;
@@ -875,7 +906,8 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 							m_userWave.data(),
 							m_userWave.frames() );
 			}
-			if( (Uint32) cur_sample <= m_lfoAttackFrames )
+			if( static_cast<f_cnt_t>( cur_sample ) <=
+							m_lfoAttackFrames )
 			{
 				val *= cur_sample / m_lfoAttackFrames;
 			}
@@ -918,18 +950,21 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 		m_busy = TRUE;
 
 		const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-						mixer::inst()->sampleRate();
-		Uint32 predelay_frames = static_cast<Uint32>(
+						eng()->getMixer()->sampleRate();
+		const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
 					expKnobVal( m_predelayKnob->value() ) );
 
-		Uint32 attack_frames = static_cast<Uint32>( frames_per_env_seg *
+		const f_cnt_t attack_frames = static_cast<f_cnt_t>(
+							frames_per_env_seg *
 					expKnobVal( m_attackKnob->value() ) );
 
-		Uint32 hold_frames = static_cast<Uint32>( frames_per_env_seg *
+		const f_cnt_t hold_frames = static_cast<f_cnt_t>(
+							frames_per_env_seg *
 					expKnobVal( m_holdKnob->value() ) );
 
-		Uint32 decay_frames = static_cast<Uint32>( frames_per_env_seg *
+		const f_cnt_t decay_frames = static_cast<f_cnt_t>(
+							frames_per_env_seg *
 					expKnobVal( m_decayKnob->value() *
 						m_sustainKnob->value() ) );
 
@@ -947,7 +982,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 		m_pahdFrames = predelay_frames + attack_frames + hold_frames +
 								decay_frames;
-		m_rFrames = static_cast<Uint32>( frames_per_env_seg *
+		m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseKnob->value() ) );
 
 		if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
@@ -956,30 +991,30 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 			m_rFrames = 0;
 		}
 
-		float * new_pahd_env = new float[m_pahdFrames];
-		float * new_r_env = new float[m_rFrames];
+		sample_t * new_pahd_env = new sample_t[m_pahdFrames];
+		sample_t * new_r_env = new sample_t[m_rFrames];
 
-		for( Uint32 i = 0; i < predelay_frames; ++i )
+		for( f_cnt_t i = 0; i < predelay_frames; ++i )
 		{
 			new_pahd_env[i] = m_amountAdd;
 		}
 
-		Uint32 add = predelay_frames;
+		f_cnt_t add = predelay_frames;
 
-		for( Uint32 i = 0; i < attack_frames; ++i )
+		for( f_cnt_t i = 0; i < attack_frames; ++i )
 		{
 			new_pahd_env[add+i] = ( (float)i / attack_frames ) *
 							m_amount + m_amountAdd;
 		}
 
 		add += attack_frames;
-		for( Uint32 i = 0; i < hold_frames; ++i )
+		for( f_cnt_t i = 0; i < hold_frames; ++i )
 		{
 			new_pahd_env[add+i] = m_amount + m_amountAdd;
 		}
 
 		add += hold_frames;
-		for( Uint32 i = 0; i < decay_frames; ++i )
+		for( f_cnt_t i = 0; i < decay_frames; ++i )
 		{
 			new_pahd_env[add+i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
@@ -993,7 +1028,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 		m_pahdEnv = new_pahd_env;
 		m_rEnv = new_r_env;
 
-		for( Uint32 i = 0; i < m_rFrames; ++i )
+		for( f_cnt_t i = 0; i < m_rFrames; ++i )
 		{
 			new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames *
 						m_sustainLevel ) * m_amount;
@@ -1005,14 +1040,14 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 		const float frames_per_lfo_oscillation =
 						SECS_PER_LFO_OSCILLATION *
-						mixer::inst()->sampleRate();
-		m_lfoPredelayFrames = static_cast<Uint32>(
+						eng()->getMixer()->sampleRate();
+		m_lfoPredelayFrames = static_cast<f_cnt_t>(
 						frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayKnob->value() ) );
-		m_lfoAttackFrames = static_cast<Uint32>(
+		m_lfoAttackFrames = static_cast<f_cnt_t>(
 						frames_per_lfo_oscillation *
 				expKnobVal( m_lfoAttackKnob->value() ) );
-		m_lfoOscillationFrames = static_cast<Uint32>(
+		m_lfoOscillationFrames = static_cast<f_cnt_t>(
 						frames_per_lfo_oscillation *
 						m_lfoSpeedKnob->value() );
 		if( m_x100Cb->isChecked() )
@@ -1039,8 +1074,8 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 		if( m_lfoAmountIsZero == FALSE )
 		{
 			delete[] m_lfoShapeData;
-			m_lfoShapeData = new float[m_lfoOscillationFrames];
-			for( Uint32 frame = 0; frame < m_lfoOscillationFrames;
+			m_lfoShapeData = new sample_t[m_lfoOscillationFrames];
+			for( f_cnt_t frame = 0; frame < m_lfoOscillationFrames;
 								++frame )
 			{
 				const float phase = frame / static_cast<float>(
@@ -1088,7 +1123,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 void envelopeAndLFOWidget::x100Toggled( bool )
 {
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 	updateSampleVars();
 }
 
@@ -1109,7 +1144,7 @@ void envelopeAndLFOWidget::lfoSinWaveCh( bool _on )
 	{
 		m_lfoShape = SIN;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 	update();
 }
@@ -1123,7 +1158,7 @@ void envelopeAndLFOWidget::lfoTriangleWaveCh( bool _on )
 	{
 		m_lfoShape = TRIANGLE;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 	update();
 }
@@ -1137,7 +1172,7 @@ void envelopeAndLFOWidget::lfoSawWaveCh( bool _on )
 	{
 		m_lfoShape = SAW;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 	update();
 }
@@ -1151,7 +1186,7 @@ void envelopeAndLFOWidget::lfoSquareWaveCh( bool _on )
 	{
 		m_lfoShape = SQUARE;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 	update();
 }
@@ -1172,7 +1207,7 @@ void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
 		}
 		m_lfoShape = USER;
 	}
-	songEditor::inst()->setModified();
+	eng()->getSongEditor()->setModified();
 
 	update();
 }

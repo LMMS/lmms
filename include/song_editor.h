@@ -38,16 +38,14 @@ class QSlider;
 
 class comboBox;
 class lcdSpinBox;
-class lmmsMainWin;
 class pattern;
-class projectNotes;
 class textFloat;
 class timeLine;
 
 
-const int MIN_BPM = 10;
-const int DEFAULT_BPM = 140;
-const int MAX_BPM = 999;
+const bpm_t MIN_BPM = 10;
+const bpm_t DEFAULT_BPM = 140;
+const bpm_t MAX_BPM = 999;
 const Uint16 MAX_SONG_LENGTH = 9999;
 
 
@@ -75,11 +73,11 @@ public:
 			m_currentFrame( 0 )
 		{
 		}
-		inline void setCurrentFrame( Uint32 _f )
+		inline void setCurrentFrame( const f_cnt_t _f )
 		{
 			m_currentFrame = _f;
 		}
-		inline Uint32 currentFrame( void ) const
+		inline f_cnt_t currentFrame( void ) const
 		{
 			return( m_currentFrame );
 		}
@@ -87,19 +85,10 @@ public:
 		bool m_timeLineUpdate;
 
 	private:
-		Uint32 m_currentFrame;
+		f_cnt_t m_currentFrame;
 	} ;
 
 
-
-	static inline songEditor * inst( void )
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new songEditor();
-		}
-		return( s_instanceOfMe );
-	}
 
 	void processNextBuffer( void );
 
@@ -140,7 +129,8 @@ public:
 	tact lengthInTacts( void ) const;
 
 
-	int getBPM( void );
+	bpm_t getTempo( void );
+
 
 	// every function that replaces current file (e.g. creates new file,
 	// opens another file...) has to call this before and may only process
@@ -175,11 +165,6 @@ public:
 
 	int masterPitch( void ) const;
 
-	projectNotes * getProjectNotesWindow( void )
-	{
-		return( m_projectNotes );
-	}
-
 
 public slots:
 	void play( void );
@@ -195,8 +180,9 @@ public slots:
 
 	void startExport( void );
 	void stopExport( void );
-	// set BPM (beats per minute)
-	void setBPM( int _new_bpm = DEFAULT_BPM );
+
+	// set tempo in BPM (beats per minute)
+	void setTempo( int _new_bpm = DEFAULT_BPM );
 
 	inline void setModified( void )
 	{
@@ -244,7 +230,7 @@ protected slots:
 
 
 private:
-	songEditor();
+	songEditor( engine * _engine );
 	songEditor( const songEditor & );
 	virtual ~songEditor();
 
@@ -265,8 +251,6 @@ private:
 								_play_mode );
 
 
-
-	static songEditor * s_instanceOfMe;
 
 	QScrollBar * m_leftRightScroll;
 
@@ -310,9 +294,6 @@ private:
 	bool m_scrollBack;
 
 
-	projectNotes * m_projectNotes;
-
-
 
 	enum ACTIONS
 	{
@@ -322,12 +303,11 @@ private:
 	vvector<ACTIONS> m_actions;
 
 
-	friend class lmmsMainWin;
-
+	friend class engine;
 
 
 signals:
-	void bpmChanged( int _new_bpm );
+	void tempoChanged( bpm_t _new_bpm );
 
 } ;
 

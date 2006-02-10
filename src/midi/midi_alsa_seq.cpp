@@ -50,11 +50,11 @@
 #ifdef ALSA_SUPPORT
 
 
-midiALSASeq::midiALSASeq( void ) :
+midiALSASeq::midiALSASeq( engine * _engine ) :
 #ifndef QT4
 	QObject(),
 #endif
-	midiClient(),
+	midiClient( _engine ),
 	QThread(),
 	m_seqHandle( NULL ),
 	m_queueID( -1 ),
@@ -82,14 +82,14 @@ midiALSASeq::midiALSASeq( void ) :
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_alloca( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
-						songEditor::inst()->getBPM() );
+					eng()->getSongEditor()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
-	changeQueueTempo( songEditor::inst()->getBPM() );
-	connect( songEditor::inst(), SIGNAL( bpmChanged( int ) ),
-			this, SLOT( changeQueueTempo( int ) ) );
+	changeQueueTempo( eng()->getSongEditor()->getTempo() );
+	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+			this, SLOT( changeQueueTempo( bpm_t ) ) );
 
 	// initial list-update
 	updatePortList();
@@ -503,10 +503,10 @@ void midiALSASeq::run( void )
 
 
 
-void midiALSASeq::changeQueueTempo( int _bpm )
+void midiALSASeq::changeQueueTempo( bpm_t _bpm )
 {
-	snd_seq_change_queue_tempo( m_seqHandle, m_queueID, 60000000 / _bpm,
-									NULL );
+	snd_seq_change_queue_tempo( m_seqHandle, m_queueID,
+					60000000 / (int) _bpm, NULL );
 	snd_seq_drain_output( m_seqHandle );
 }
 

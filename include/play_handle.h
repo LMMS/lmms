@@ -44,7 +44,10 @@
 #endif
 
 
-class playHandle
+#include "engine.h"
+
+
+class playHandle : public engineObject
 {
 public:
 	enum types
@@ -53,7 +56,8 @@ public:
 		PRESET_PREVIEW_PLAY_HANDLE
 	} ;
 
-	inline playHandle( types _type ) :
+	inline playHandle( const types _type, engine * _engine ) FASTCALL :
+		engineObject( _engine ),
 		m_type( _type )
 	{
 	}

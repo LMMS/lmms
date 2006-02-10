@@ -38,7 +38,8 @@ class notePlayHandle;
 class pluckSynth
 {
 public:
-	pluckSynth( float _pitch, float _pick, float _pickup );
+	pluckSynth( const float _pitch, const float _pick, const float _pickup,
+					const sample_rate_t _sample_rate );
 
 	inline ~pluckSynth( void )
 	{

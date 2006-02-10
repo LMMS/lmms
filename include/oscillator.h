@@ -71,7 +71,8 @@ public:
 
 	oscillator( const modulationAlgos _modulation_algo, const float _freq,
 			const Sint16 _phase_offset, const float _volume_factor,
-					oscillator * _m_subOsc ) FASTCALL;
+			const sample_rate_t _sample_rate,
+			oscillator * _m_subOsc ) FASTCALL;
 	virtual ~oscillator()
 	{
 		delete m_subOsc;
@@ -112,6 +113,7 @@ public:
 					const float _freq,
 					const Sint16 _phase_offset,
 					const float _volume_factor,
+					const sample_rate_t _sample_rate,
 						oscillator * _m_subOsc = NULL ); 
 	inline bool syncOk( void )
 	{
@@ -212,6 +214,7 @@ protected:
 	float m_freq;
 	float m_volumeFactor;
 	Sint16 m_phaseOffset;
+	const sample_rate_t m_sampleRate;
 	oscillator * m_subOsc;
 	f_cnt_t m_sample;
 	float m_oscCoeff;

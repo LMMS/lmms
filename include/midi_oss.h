@@ -1,7 +1,7 @@
 /*
  * midi_oss.h - OSS-raw-midi-client
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,8 +43,8 @@ class QLineEdit;
 class midiOSS : public midiClientRaw, public QThread
 {
 public:
-	midiOSS( void );
-	~midiOSS();
+	midiOSS( engine * _engine );
+	virtual ~midiOSS();
 
 	static QString probeDevice( void );
 
