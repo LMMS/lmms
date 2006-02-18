@@ -53,7 +53,7 @@ class textFloat;
 
 enum knobTypes
 {
-	knobDark_28, knobBright_26, knobSmall_17
+	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17
 } ;
 
 
