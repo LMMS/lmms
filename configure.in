@@ -423,12 +423,14 @@ AC_CONFIG_FILES([Makefile
 		 plugins/Makefile
 		 plugins/audio_file_processor/Makefile
 		 plugins/bit_invader/Makefile
+		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
 		 presets/Makefile
 		 presets/AudioFileProcessor/Makefile
 		 presets/BitInvader/Makefile
+		 presets/Organic/Makefile
 		 presets/PluckedStringSynth/Makefile
 		 presets/TripleOscillator/Makefile
 		 presets/VeSTige/Makefile
