@@ -1,3 +1,10 @@
+1006-02-18	Andreas Brandmaier <andreas/at/brandmaier.de>
+
+	* plugins/organic/organic.cpp
+	* plugins/organic/organic.h
+	* presets/Organic
+	added new plugin synthesizer plugin organic and some presets
+
 2006-02-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* plugins/triple_oscillator/triple_oscillator.cpp:
