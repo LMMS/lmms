@@ -238,6 +238,14 @@ void knob::drawKnob( QPainter * _p )
 					(int)( ym - ca*re ) + 1 );
 			break;
 		}
+		case knobGreen_17:
+		{
+			_p->setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
+			_p->drawLine( (int)( xm-sa ), (int)( ym-ca ),
+					(int)( xm - sa*radius ),
+					(int)( ym - ca*radius ) );
+			break;
+		}
 	}
 }
 
