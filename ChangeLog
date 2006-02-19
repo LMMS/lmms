@@ -1,4 +1,14 @@
-1006-02-18	Andreas Brandmaier <andreas/at/brandmaier.de>
+2006-02-19	Andreas Brandmaier <andreas/at/brandmaier.de>
+
+	* plugins/organic/organic.cpp
+	* plugins/organic/organic.h
+	* presets/Organic
+	* presets/Bitinvader
+	added waveshape knob
+	changed distortion method from clipping to foldback
+	renamed and added presets for Organic and BitInvader
+	
+2006-02-18	Andreas Brandmaier <andreas/at/brandmaier.de>
 
 	* plugins/organic/organic.cpp
 	* plugins/organic/organic.h
