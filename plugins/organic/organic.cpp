@@ -114,11 +114,24 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 	for (int i=0; i < m_num_oscillators; i++)
 	{
 		m_osc[i].waveShape = oscillator::SIN_WAVE;
-			
+
+		// setup volume-knob
+		m_osc[i].oscKnob = new knob( knobGreen_17, this, tr(
+					"Osc %1 waveform" ).arg( i+1 ), eng() );
+		m_osc[i].oscKnob->move( 25+i*20, 90 );
+		m_osc[i].oscKnob->setRange( 0.0f, 5.0f, 0.25f );
+		m_osc[i].oscKnob->setValue( 0.0f, TRUE );
+		m_osc[i].oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
+							i+1 ) + " ", "%" );
+										
+		connect( m_osc[i].oscKnob, SIGNAL( valueChanged( float ) ),
+			this, SLOT (oscButtonChanged( void ) ) 
+		);
+										
 		// setup volume-knob
 		m_osc[i].volKnob = new knob( knobGreen_17, this, tr(
 					"Osc %1 volume" ).arg( i+1 ), eng() );
-		m_osc[i].volKnob->move( 25+i*20, 90 );
+		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
 		m_osc[i].volKnob->setValue( 100, TRUE );
 		m_osc[i].volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
@@ -127,7 +140,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
-		m_osc[i].panKnob->move( 25+i*20, 110 );
+		m_osc[i].panKnob->move( 25+i*20, 130 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setValue( DEFAULT_PANNING, TRUE );
 		m_osc[i].panKnob->setHintText( tr("Osc %1 panning:").arg( i+1 )
@@ -137,7 +150,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 		m_osc[i].detuneKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
 									eng() );
-		m_osc[i].detuneKnob->move( 25+i*20, 130 );
+		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].detuneKnob->setValue( 0.0f, TRUE );
 		m_osc[i].detuneKnob->setHintText( tr( "Osc %1 fine detuning "
@@ -153,14 +166,14 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 		fx1Knob = new knob( knobGreen_17, this,
 				tr( "FX1" ),
 									eng() );
-		fx1Knob->move( 20, 160 );
+		fx1Knob->move( 20, 200 );
 		fx1Knob->setRange( 0.0f, 0.99f, 0.01f );
 		fx1Knob->setValue( 0.0f, TRUE );
 		
 		// setup volume-knob
 		volKnob = new knob( knobGreen_17, this, tr(
 					"Osc %1 volume" ).arg( 1 ), eng() );
-		volKnob->move( 50, 160 );
+		volKnob->move( 50, 200 );
 		volKnob->setRange( 0, 200, 1.0f );
 		volKnob->setValue( 100, TRUE );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
@@ -253,13 +266,16 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 								toFloat() );
 		m_osc[i].panKnob->setValue( _this.attribute( "pan" + is ).
 								toFloat() );
-	//	m_osc[i].waveShape = _this.attribute( "wavetype"+is ).toInt();								
+		m_osc[i].oscKnob->setValue( _this.attribute( "wavetype"+is ).
+								toInt() );								
 	}
 	
 	volKnob->setValue( _this.attribute( "vol" ).
 								toFloat() );
 	fx1Knob->setValue( _this.attribute( "foldback" ).
-								toFloat() );	
+								toFloat() );
+								
+	oscButtonChanged();	
 }
 
 
@@ -376,12 +392,12 @@ void organicInstrument::playNote( notePlayHandle * _n )
 	// -- fx section --
 	
 	// fxKnob is [0;1]
-	float t =  fx1Knob->value() * 5.0f;t++;
+	float t =  fx1Knob->value();
 	
 	for (int i=0 ; i < frames ; i++)
 	{
-		buf[i][0] = distort( buf[i][0], t ) * volKnob->value() / 100.0;	
-		buf[i][1] = distort( buf[i][1], t ) * volKnob->value() / 100.0;	
+		buf[i][0] = waveshape( buf[i][0], t ) * volKnob->value() / 100.0;	
+		buf[i][1] = waveshape( buf[i][1], t ) * volKnob->value() / 100.0;	
 	}
 	
 	// -- --
@@ -440,6 +456,50 @@ float organicInstrument::saturate(float x, float t)
 	}
 }
 
+float organicInstrument::waveshape(float in, float amount)
+{
+	float k = 2.0f*amount/(1.0f-amount);
+
+	return (1.0f + k) *
+		in / (1.0f + k * fabs( in ));	
+}
+
+void organicInstrument::oscButtonChanged( )
+{
+	
+	for (int i = 0; i < m_num_oscillators; i++)
+	{
+		float value = m_osc[i].oscKnob->value();
+		
+		if ( value <= 0.5 ) {
+				m_osc[i].waveShape = oscillator::SIN_WAVE;
+				continue;
+		}
+		
+		if ( value <= 1.5 ) {
+				m_osc[i].waveShape = oscillator::SAW_WAVE;
+				continue;
+		}
+
+		if ( value <= 2.5 ) {
+				m_osc[i].waveShape = oscillator::SQUARE_WAVE;
+				continue;
+		}
+		
+		if ( value <= 3.5 ) {
+				m_osc[i].waveShape = oscillator::TRIANGLE_WAVE;
+				continue;
+		}
+		
+		if ( value <= 4.5 ) {
+				m_osc[i].waveShape = oscillator::MOOG_SAW_WAVE;
+				continue;
+		}
+		
+		m_osc[i].waveShape = oscillator::EXP_WAVE;
+		
+	}
+}
 
 
 extern "C"
@@ -454,4 +514,12 @@ plugin * lmms_plugin_main( void * _data )
 
 }
 
+/*
+ * some notes & ideas for the future of this plugin:
+ * 
+ * - 32.692 Hz in the bass to 5919.85 Hz of treble in  a Hammond organ
+ * => implement harmonic foldback
+ * 
+ * - randomize preset
+ */
 

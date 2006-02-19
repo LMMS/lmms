@@ -67,11 +67,22 @@ public:
 
 	virtual QString nodeName( void ) const;
 
+public slots:
+
+	void oscButtonChanged( void );
+
 private:
 
 	float foldback(float in, float threshold);
 	float saturate(float x, float t);
 	float distort(float in, float dist);
+	float waveshape(float in, float amount);
+	
+	// fast atan, fast rather than accurate
+	inline float fastatan( float x )
+	{
+    	return (x / (1.0 + 0.28 * (x * x)));
+	}
 	
 	static QPixmap * s_artwork;
 	
@@ -80,6 +91,7 @@ private:
 	struct oscillatorData
 	{
 		oscillator::waveShapes waveShape;
+		knob * oscKnob;
 		knob * volKnob;
 		knob * panKnob;
 		knob * detuneKnob;
