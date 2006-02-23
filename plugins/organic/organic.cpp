@@ -424,7 +424,7 @@ void organicInstrument::deleteNotePluginData( notePlayHandle * _n )
 	delete static_cast<oscPtr *>( _n->m_pluginData );
 }
 
-float organicInstrument::foldback(float in, float threshold)
+/*float inline organicInstrument::foldback(float in, float threshold)
 {
   if (in>threshold || in<-threshold)
   {
@@ -432,32 +432,9 @@ float organicInstrument::foldback(float in, float threshold)
   }
   return in;
 }
+*/
 
-float organicInstrument::distort(float in, float dist)
-{
-		in *= dist;
-		if (in >= 1.0f) {
-			return 1.0f;
-		} else {
-			return in;
-		}
-	
-}
-
-float organicInstrument::saturate(float x, float t)
-{
-    if(fabs(x)<t)
-        return x;
-    else
-    {
-        if(x > 0.f)
-            return t + (1.f-t)*tanh((x-t)/(1-t));
-        else
-            return -(t + (1.f-t)*tanh((-x-t)/(1-t)));
-	}
-}
-
-float organicInstrument::waveshape(float in, float amount)
+float inline organicInstrument::waveshape(float in, float amount)
 {
 	float k = 2.0f*amount/(1.0f-amount);
 
