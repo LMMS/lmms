@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * config_mgr.cpp - implementation of class configManager
  *
@@ -932,3 +934,5 @@ void configManager::processFilesRecursively( const QString & _src_dir,
 
 #include "config_mgr.moc"
 
+
+#endif

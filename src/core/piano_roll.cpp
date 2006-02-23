@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
@@ -391,7 +393,6 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	// setup zooming-stuff
 	m_zoomingComboBox = new comboBox( m_toolBar );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
-	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 6; ++i )
 	{
 		m_zoomingComboBox->addItem( QString::number( 25 *
@@ -403,6 +404,38 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
 
+
+	// setup quantize-stuff
+	QLabel * quantize_lbl = new QLabel( m_toolBar );
+	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
+
+	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox->setFixedSize( 60, 22 );
+	for( int i = 0; i < 7; ++i )
+	{
+		m_quantizeComboBox->addItem( "1/" + QString::number( 
+					static_cast<int>( powf( 2.0f, i ) ) ) );
+	}
+	m_quantizeComboBox->setCurrentIndex( m_quantizeComboBox->findText(
+								"1/16" ) );
+
+	// setup note-len-stuff
+	QLabel * note_len_lbl = new QLabel( m_toolBar );
+	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
+
+	m_noteLenComboBox = new comboBox( m_toolBar );
+	m_noteLenComboBox->setFixedSize( 120, 22 );
+	m_noteLenComboBox->addItem( tr( "Last note" ),
+					embed::getIconPixmap( "edit_draw" ) );
+	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
+						"sixteenth", "thirtysecond" } ;
+	for( int i = 0; i < 6; ++i )
+	{
+		m_noteLenComboBox->addItem( "1/" + QString::number( 
+					static_cast<int>( powf( 2.0f, i ) ) ),
+				embed::getIconPixmap( "note_" + pixmaps[i] ) );
+	}
+	m_noteLenComboBox->setCurrentIndex( 0 );
 
 
 	tb_layout->addSpacing( 5 );
@@ -422,8 +455,16 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	m_timeLine->addToolButtons( m_toolBar );
 	tb_layout->addSpacing( 15 );
 	tb_layout->addWidget( zoom_lbl );
-	tb_layout->addSpacing( 5 );
+	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_zoomingComboBox );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( quantize_lbl );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_quantizeComboBox );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( note_len_lbl );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_noteLenComboBox );
 	tb_layout->addStretch();
 
 	// setup our actual window
@@ -1178,7 +1219,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 					// then set new note
 					midiTime note_pos( pos_tact_64th );
-					midiTime note_len( m_lenOfNewNotes );
+					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos,
 							(tones)( key_num %
@@ -1472,8 +1513,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				{
 					tact_64th_diff = 1;
 				}
-				m_lenOfNewNotes = midiTime( tact_64th_diff );
-				m_currentNote->setLength( m_lenOfNewNotes );
+				m_currentNote->setLength( midiTime(
+							tact_64th_diff ) );
+				m_currentNote->quantizeLength( quantization() );
+				m_lenOfNewNotes = m_currentNote->length();
 				m_pattern->update();
 			}
 
@@ -2075,6 +2118,7 @@ void pianoRoll::recordNote( const note & _n )
 		note n( _n );
 		n.setPos( eng()->getSongEditor()->getPlayPos(
 				songEditor::PLAY_PATTERN ) - n.length() );
+		n.quantizeLength( quantization() );
 #ifndef QT4
 		qApp->lock();
 #endif
@@ -2430,5 +2474,30 @@ void pianoRoll::zoomingChanged( const QString & _zfac )
 
 
 
+int pianoRoll::quantization( void ) const
+{
+	return( 64 / m_quantizeComboBox->currentText().right(
+				m_quantizeComboBox->currentText().length() -
+								2 ).toInt() );
+}
+
+
+
+
+midiTime pianoRoll::newNoteLen( void ) const
+{
+	if( m_noteLenComboBox->currentIndex() == 0 )
+	{
+		return( m_lenOfNewNotes );
+	}
+	return( 64 / m_noteLenComboBox->currentText().right(
+				m_noteLenComboBox->currentText().length() -
+								2 ).toInt() );
+}
+
+
+
 #include "piano_roll.moc"
 
+
+#endif

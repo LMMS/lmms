@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * ladspa_manager.cpp - a class to manage loading and instantiation
  *                      of ladspa plugins
@@ -917,3 +919,5 @@ void FASTCALL ladspaManager::cleanup( const ladspaKey & _plugin,
 
 #endif
 
+
+#endif

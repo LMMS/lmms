@@ -161,16 +161,18 @@ public:
 
 
 	// play-handle stuff
-	inline void addPlayHandle( playHandle * _ph )
+	inline bool addPlayHandle( playHandle * _ph )
 	{
 		if( criticalXRuns() == FALSE )
 		{
 			m_playHandles.push_back( _ph );
+			return( TRUE );
 		}
 		else
 		{
 			delete _ph;
 		}
+		return( FALSE );
 	}
 
 	inline void removePlayHandle( playHandle * _ph )

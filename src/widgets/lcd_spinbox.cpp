@@ -1,7 +1,9 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,9 +51,7 @@
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_minValue( _min ),
-	m_maxValue( _max ),
-	m_step( 1 ),
+	automatableObject<int>( 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {
@@ -77,22 +77,22 @@ lcdSpinBox::~lcdSpinBox()
 
 
 
-void lcdSpinBox::setStep( int _step )
+
+void lcdSpinBox::setStep( const int _step )
 {
-	m_step = tMax( _step, 1 );
+	automatableObject<int>::setStep( tMax( _step, 1 ) );
 }
 
 
 
 
-void lcdSpinBox::setValue( int _value )
+void lcdSpinBox::setValue( const int _value )
 {
-	_value = ( ( tLimit( _value, m_minValue, m_maxValue ) - m_minValue ) /
-						m_step ) * m_step + m_minValue;
-	QString s = m_textForValue[_value];
+	automatableObject<int>::setValue( _value );
+	QString s = m_textForValue[value()];
 	if( s == "" )
 	{
-		s = QString::number( _value );
+		s = QString::number( value() );
 		while( (int) s.length() < m_number->numDigits() )
 		{
 			s = "0" + s;
@@ -169,7 +169,7 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
 		{
-			setValue( value() - dy / 2 * m_step );
+			setValue( value() - dy / 2 * step() );
 			emit valueChanged( value() );
 			QCursor::setPos( m_origMousePos );
 		}
@@ -191,7 +191,7 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	setValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * m_step );
+	setValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * step() );
 	emit valueChanged( value() );
 }
 
@@ -200,3 +200,5 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 
 #include "lcd_spinbox.moc"
 
+
+#endif

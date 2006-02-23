@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
@@ -583,3 +585,5 @@ void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
 
 #undef setValue
 #undef maximum
+
+#endif

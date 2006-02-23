@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_client.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
@@ -375,3 +377,5 @@ Uint8 midiClientRaw::eventLength( const Uint8 _event )
 }
 
 
+
+#endif

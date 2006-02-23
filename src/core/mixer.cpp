@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
@@ -137,7 +139,7 @@ void mixer::stopProcessing( void )
 
 bool mixer::criticalXRuns( void ) const
 {
-	return( ( m_cpuLoad >= 98 &&
+	return( ( m_cpuLoad >= 99 &&
 				eng()->getSongEditor()->realTimeTask() == TRUE ) );
 }
 
@@ -239,7 +241,8 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
 							m_framesPerAudioBuffer;
-	m_cpuLoad = tLimit( (int) ( new_cpu_load + m_cpuLoad ) / 2, 0, 100 );
+	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
+									100 );
 
 	return( m_curBuf );
 }
@@ -578,3 +581,5 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 
 #include "mixer.moc"
 
+
+#endif

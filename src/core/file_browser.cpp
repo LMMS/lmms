@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
@@ -830,3 +832,5 @@ void fileItem::determineFileType( void )
 
 #include "file_browser.moc"
 
+
+#endif

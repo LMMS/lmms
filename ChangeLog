@@ -1,18 +1,93 @@
+2006-02-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* configure.in:
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	added support for compiling LMMS from one source file which often
+	results in a better/more optimized executable
+
+	* include/note.h:
+	* include/piano_roll.h:
+	* src/core/note.cpp:
+	* src/core/piano_roll.cpp:
+	- simple quantization-support
+	- fixed lengths for drawing notes can be selected in piano-roll
+
+	* resources/black_key.png:
+	* resources/black_key_pressed.png:
+	* resources/pr_black_key.png:
+	* resources/pr_white_key_big.png:
+	* resources/pr_white_key_small.png:
+	* resources/white_key.png:
+	* resources/white_key_pressed.png:
+	replaced by new graphics
+
+	* src/core/engine.cpp:
+	delete piano-roll after song-editor and bb-editor as patterns being
+	destroyed still depend on it
+
+2006-02-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/tracks/channel_track.cpp:
+	do not lock mutex in processOutEvent() as it causes a deadlock when
+	having channel-activity-indicators enabled
+
+	* include/midi_mapper.h
+	* include/project_notes.h:
+	* src/lib/sample_buffer.cpp:
+	* src/midi/midi_file.cpp:
+	* src/midi/midi_mapper.cpp:
+	* src/widgets/project_notes.cpp:
+	misc fixes for being able to compile LMMS from one source-file
+
+	* include/automatable_object.h:
+	* include/knob.h:
+	* include/lcd_spinbox.h:
+	* include/led_checkbox.h:
+	* src/widgets/knob.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	introduced template-class automatableObject for central value-
+	manipulation, range-checking etc. and made some classes (e.g. knob,
+	ledCheckBox, lcdCheckBox) derive from it - preparations for full
+	automation-support in LMMS
+
+	* Makefile.am:
+	do not strip executable when installing as it makes even basic debugging
+	impossible
+
+2006-02-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/led_checkbox.cpp:
+	draw shadowed text
+
+	* include/mixer.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/mixer.cpp:
+	better xrun-detection and -handling (still not perfect)
+
+	* include/mixer.h:
+	* src/tracks/channel_track.cpp:
+	fixed critical bug which made LMMS crash if xruns were detected and
+	notes were discarded by mixer and therefore deleted twice
+
 2006-02-19	Andreas Brandmaier <andreas/at/brandmaier.de>
 
-	* plugins/organic/organic.cpp
-	* plugins/organic/organic.h
-	* presets/Organic
-	* presets/Bitinvader
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* presets/Organic:
+	* presets/Bitinvader:
 	added waveshape knob
 	changed distortion method from clipping to foldback
 	renamed and added presets for Organic and BitInvader
 	
 2006-02-18	Andreas Brandmaier <andreas/at/brandmaier.de>
 
-	* plugins/organic/organic.cpp
-	* plugins/organic/organic.h
-	* presets/Organic
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* presets/Organic:
 	added new plugin synthesizer plugin organic and some presets
 
 2006-02-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>

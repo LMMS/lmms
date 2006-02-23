@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_port.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                 sequencing system
@@ -92,3 +94,5 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 }
 
 
+
+#endif

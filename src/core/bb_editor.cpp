@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * bb_editor.cpp - basic main-window for editing of beats and basslines
  *
@@ -82,7 +84,7 @@ bbEditor::bbEditor( engine * _engine ) :
 
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setWindowTitle( tr( "Beat+Baseline Editor" ) );
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
 				BBE_PPT + 2 * TCO_BORDER_WIDTH +
 				DEFAULT_SCROLLBAR_SIZE );
@@ -477,3 +479,5 @@ void bbEditor::swapBB( csize _bb1, csize _bb2 )
 
 #include "bb_editor.moc"
 
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * tool_button.cpp - implementation of LMMS-tool-button for common (cool) look
  *
@@ -102,3 +104,5 @@ void toolButton::toggledBool( bool _on )
 
 #include "tool_button.moc"
 
+
+#endif

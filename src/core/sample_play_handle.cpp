@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * sample_play_handle.cpp - implementation of class samplePlayHandle
  *
@@ -107,3 +109,5 @@ f_cnt_t samplePlayHandle::totalFrames( void ) const
 	return( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() );
 }
 
+
+#endif

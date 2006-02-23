@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_mapper.cpp - MIDI-mapper for any midiDevice
  *
@@ -52,7 +54,7 @@ midiMapper::midiMapper( const QString & _map ) :
 	{
 		m_drumsetKeyMap[i].first = i;
 	}
-	for( Uint8 i = 0; i < MIDI_CHANNELS; ++i )
+	for( Uint8 i = 0; i < MIDI_CHANNEL_COUNT; ++i )
 	{
 		m_channelMap[i] = i;
 	}
@@ -233,7 +235,7 @@ void midiMapper::readChannelMap( QFile & _f )
 		Uint8 mch = line.section( '=', 1, 1 ).mid( 1 ).
 					section( ' ', 0, 0 ).
 					toInt();
-		if( ch < MIDI_CHANNELS && mch < MIDI_CHANNELS )
+		if( ch < MIDI_CHANNEL_COUNT && mch < MIDI_CHANNEL_COUNT )
 		{
 			m_channelMap[ch] = mch;
 			if( line.contains( QRegExp( "Keymap *\"Drumset\"" ) ) )
@@ -255,3 +257,5 @@ void midiMapper::readChannelMap( QFile & _f )
 
 #undef indexOf
 
+
+#endif

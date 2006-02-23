@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * plugin_browser.cpp - implementation of the plugin-browser
  *
@@ -67,7 +69,7 @@ pluginBrowser::pluginBrowser( QWidget * _parent, engine * _engine ) :
 
 	QLabel * hint = new QLabel( tr( "You can drag an instrument-plugin "
 					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or just into a "
+					"Beat+Baseline Editor or just into a "
 					"channel-window or on the "
 					"corresponding channel-button." ),
 								m_view );
@@ -268,3 +270,5 @@ void pluginDescWidget::mouseReleaseEvent( QMouseEvent * _me )
 
 #include "plugin_browser.moc"
 
+
+#endif

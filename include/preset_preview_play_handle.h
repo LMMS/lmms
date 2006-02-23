@@ -53,7 +53,7 @@ class presetPreviewPlayHandle : public playHandle
 {
 public:
 	presetPreviewPlayHandle( const QString & _preset_file,
-						engine * _engine ) FASTCALL;
+						engine * _engine );
 	virtual ~presetPreviewPlayHandle();
 
 	virtual void play( void );

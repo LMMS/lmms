@@ -67,8 +67,10 @@ using namespace std;
 #include "song_editor.h"
 #include "oscillator.h"
 #include "sample_buffer.h"
-#include "embed.cpp"
 #include "base64.h"
+
+#undef SINGLE_SOURCE_COMPILE
+#include "embed.cpp"
 
 
 extern "C"
@@ -120,7 +122,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 					"Osc %1 waveform" ).arg( i+1 ), eng() );
 		m_osc[i].oscKnob->move( 25+i*20, 90 );
 		m_osc[i].oscKnob->setRange( 0.0f, 5.0f, 0.25f );
-		m_osc[i].oscKnob->setValue( 0.0f, TRUE );
+		m_osc[i].oscKnob->setInitValue( 0.0f );
 		m_osc[i].oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
 							i+1 ) + " ", "%" );
 										
@@ -133,7 +135,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 					"Osc %1 volume" ).arg( i+1 ), eng() );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
-		m_osc[i].volKnob->setValue( 100, TRUE );
+		m_osc[i].volKnob->setInitValue( 100 );
 		m_osc[i].volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 							
@@ -142,7 +144,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
 		m_osc[i].panKnob->move( 25+i*20, 130 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
-		m_osc[i].panKnob->setValue( DEFAULT_PANNING, TRUE );
+		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
 		m_osc[i].panKnob->setHintText( tr("Osc %1 panning:").arg( i+1 )
 						+ " ", "" );
 							
@@ -152,7 +154,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 									eng() );
 		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
-		m_osc[i].detuneKnob->setValue( 0.0f, TRUE );
+		m_osc[i].detuneKnob->setInitValue( 0.0f );
 		m_osc[i].detuneKnob->setHintText( tr( "Osc %1 fine detuning "
 							"left:" ).arg( i + 1 )
 							+ " ", " " +
@@ -164,18 +166,17 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 
 		// setup knob for FX1
 		fx1Knob = new knob( knobGreen_17, this,
-				tr( "FX1" ),
-									eng() );
+				tr( "FX1" ), eng() );
 		fx1Knob->move( 20, 200 );
 		fx1Knob->setRange( 0.0f, 0.99f, 0.01f );
-		fx1Knob->setValue( 0.0f, TRUE );
+		fx1Knob->setInitValue( 0.0f);
 		
 		// setup volume-knob
 		volKnob = new knob( knobGreen_17, this, tr(
 					"Osc %1 volume" ).arg( 1 ), eng() );
 		volKnob->move( 50, 200 );
 		volKnob->setRange( 0, 200, 1.0f );
-		volKnob->setValue( 100, TRUE );
+		volKnob->setInitValue( 100 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							1 ) + " ", "%" );
 

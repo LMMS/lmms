@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * envelope_and_lfo_widget.cpp - widget which is m_used by envelope/lfo/filter-
  *                               tab of channel-window
@@ -145,7 +147,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 									eng() );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_predelayKnob->setValue( 0.0, TRUE );
+	m_predelayKnob->setInitValue( 0.0 );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
 #ifdef QT4
@@ -163,7 +165,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 									eng() );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->setRange( 0.0, 1.0, 0.001 );
-	m_attackKnob->setValue( 0.0, TRUE );
+	m_attackKnob->setInitValue( 0.0 );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
 #ifdef QT4
@@ -182,7 +184,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ), eng() );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->setRange( 0.0, 1.0, 0.001 );
-	m_holdKnob->setValue( 0.5, TRUE );
+	m_holdKnob->setInitValue( 0.5 );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
 #ifdef QT4
@@ -201,7 +203,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 									eng() );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_decayKnob->setValue( 0.5, TRUE );
+	m_decayKnob->setInitValue( 0.5 );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
 #ifdef QT4
@@ -221,7 +223,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 									eng() );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->setRange( 0.0, 1.0, 0.001 );
-	m_sustainKnob->setValue( 0.5, TRUE );
+	m_sustainKnob->setInitValue( 0.5 );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
 #ifdef QT4
@@ -240,7 +242,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 									eng() );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->setRange( 0.0, 1.0, 0.001 );
-	m_releaseKnob->setValue( 0.1, TRUE );
+	m_releaseKnob->setInitValue( 0.1 );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
 	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
 #ifdef QT4
@@ -260,7 +262,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					tr( "Modulation amount" ), eng() );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->setRange( -1.0, 1.0, 0.005 );
-	m_amountKnob->setValue( 0.0, TRUE );
+	m_amountKnob->setInitValue( 0.0 );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 #ifdef QT4
@@ -281,7 +283,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					tr( "LFO-predelay-time" ), eng() );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_lfoPredelayKnob->setValue( 0.0, TRUE );
+	m_lfoPredelayKnob->setInitValue( 0.0 );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "LFO-predelay:" ) + " ", "" );
 #ifdef QT4
@@ -299,7 +301,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					tr( "LFO-attack-time" ), eng() );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->setRange( 0.0, 1.0, 0.001 );
-	m_lfoAttackKnob->setValue( 0.0, TRUE );
+	m_lfoAttackKnob->setInitValue( 0.0 );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
 #ifdef QT4
@@ -317,7 +319,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					tr( "LFO-speed" ), eng(), 20000.0 );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
-	m_lfoSpeedKnob->setValue( 0.1, TRUE );
+	m_lfoSpeedKnob->setInitValue( 0.1 );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
 #ifdef QT4
@@ -335,7 +337,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 					tr( "LFO-modulation-amount" ), eng() );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->setRange( -1.0, 1.0, 0.005 );
-	m_lfoAmountKnob->setValue( 0.0, TRUE );
+	m_lfoAmountKnob->setInitValue( 0.0 );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 #ifdef QT4
@@ -1217,3 +1219,5 @@ void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
 
 #include "envelope_and_lfo_widget.moc"
 
+
+#endif

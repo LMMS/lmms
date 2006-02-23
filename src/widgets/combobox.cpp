@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * combobox.cpp - implementation of LMMS-combobox
  *
@@ -230,7 +232,6 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 
 	if( m_items.size() > 0 )
 	{
-		p.setPen( QColor( 224, 224, 224 ) );
 		p.setFont( font() );
 		p.setClipRect( QRect( 5, 2, width() - CB_ARROW_BTN_WIDTH - 8,
 							height() - 2 ) );
@@ -241,6 +242,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			p.drawPixmap( tx, 3, item_pm );
 			tx += item_pm.width() + 2;
 		}
+		p.setPen( QColor( 64, 64, 64 ) );
+		p.drawText( tx+1, p.fontMetrics().height()+1,
+						m_items[currentIndex()].first );
+		p.setPen( QColor( 224, 224, 224 ) );
 		p.drawText( tx, p.fontMetrics().height(),
 						m_items[currentIndex()].first );
 	}
@@ -293,3 +298,5 @@ void comboBox::setItem( int _item )
 
 #include "combobox.moc"
 
+
+#endif

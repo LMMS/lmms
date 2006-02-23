@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * note.cpp - implementation of class note
  *
@@ -35,6 +37,7 @@
 
 #endif
 
+#include <math.h>
 
 #include "debug.h"
 #include "note.h"
@@ -83,7 +86,7 @@ void note::setPos( const midiTime & _pos )
 
 
 
-void note::setTone( tones _tone )
+void note::setTone( const tones _tone )
 {
 	if( _tone >= C && _tone <= H )
 	{
@@ -101,7 +104,7 @@ void note::setTone( tones _tone )
 
 
 
-void note::setOctave( octaves _octave )
+void note::setOctave( const octaves _octave )
 {
 	if( _octave >= MIN_OCTAVE && _octave <= MAX_OCTAVE )
 	{
@@ -119,7 +122,7 @@ void note::setOctave( octaves _octave )
 
 
 
-void note::setKey( int _key )
+void note::setKey( const int _key )
 {
 	setTone( static_cast<tones>( _key % NOTES_PER_OCTAVE ) );
 	setOctave( static_cast<octaves>( _key / NOTES_PER_OCTAVE ) );
@@ -128,7 +131,7 @@ void note::setKey( int _key )
 
 
 
-void note::setVolume( volume _volume )
+void note::setVolume( const volume _volume )
 {
 	if( _volume <= MAX_VOLUME )
 	{
@@ -146,7 +149,7 @@ void note::setVolume( volume _volume )
 
 
 
-void note::setPanning( panning _panning )
+void note::setPanning( const panning _panning )
 {
 	if( _panning >= PANNING_LEFT && _panning <= PANNING_RIGHT )
 	{
@@ -155,9 +158,42 @@ void note::setPanning( panning _panning )
 #ifdef LMMS_DEBUG
 	else
 	{
-		printf ("Paning out of range (note::set_panning)\n");
+		printf( "Paning out of range (note::setPanning)\n" );
 	}
 #endif
+}
+
+
+
+
+inline midiTime note::quantized( const midiTime & _m, const int _q_grid )
+{
+	float p = ( (float) _m / _q_grid );
+	if( p - floorf( p ) < 0.5f )
+	{
+		return( static_cast<int>( p ) * _q_grid );
+	}
+	return( static_cast<int>( p + 1 ) * _q_grid );
+}
+
+
+
+
+void note::quantizeLength( const int _q_grid )
+{
+	setLength( quantized( length(), _q_grid ) );
+	if( length() == 0 )
+	{
+		setLength( _q_grid );
+	}
+}
+
+
+
+
+void note::quantizePos( const int _q_grid )
+{
+	setPos( quantized( pos(), _q_grid ) );
 }
 
 
@@ -188,3 +224,8 @@ void note::loadSettings( const QDomElement & _this )
 	m_pos = _this.attribute( "pos" ).toInt();
 }
 
+
+
+
+
+#endif

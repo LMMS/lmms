@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * track.cpp - implementation of classes concerning tracks -> neccessary for
  *             all track-like objects (beat/bassline, sample-track...)
@@ -1284,7 +1286,9 @@ track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 		default: break;
 	}
 
+#ifdef DEBUG_LMMS
 	assert( t != NULL );
+#endif
 
 	// allow mixer to continue
 	_tc->eng()->getMixer()->play();
@@ -1494,3 +1498,5 @@ void FASTCALL track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
 
 #include "track.moc"
 
+
+#endif

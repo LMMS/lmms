@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
@@ -869,3 +871,5 @@ void setupDialog::displayMIDIHelp( void )
 
 #include "setup_dialog.moc"
 
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
@@ -474,3 +476,5 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 #include "sample_track.moc"
 
+
+#endif

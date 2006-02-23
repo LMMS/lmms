@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
@@ -93,7 +95,6 @@
 
 #define write writeBlock
 #define read readBlock
-#define seek at 
 #define pos at
 
 #endif
@@ -1463,9 +1464,10 @@ void sampleBuffer::deleteResamplingData( void * * _ptr )
 
 #undef write
 #undef read
-#undef seek
 #undef pos
 
 
 #include "sample_buffer.moc"
 
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
@@ -469,3 +471,5 @@ void exportProjectDialog::finishProjectExport( void )
 
 #include "export_project_dialog.moc"
 
+
+#endif

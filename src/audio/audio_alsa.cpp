@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
@@ -488,3 +490,5 @@ void audioALSA::setupWidget::saveSettings( void )
 
 #endif
 
+
+#endif

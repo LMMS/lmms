@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * visualization_widget.cpp - widget for visualization of sound-data
  *
@@ -216,3 +218,5 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 
 #include "visualization_widget.moc"
 
+
+#endif

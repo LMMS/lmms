@@ -56,7 +56,7 @@ public:
 		PRESET_PREVIEW_PLAY_HANDLE
 	} ;
 
-	inline playHandle( const types _type, engine * _engine ) FASTCALL :
+	playHandle( const types _type, engine * _engine ) :
 		engineObject( _engine ),
 		m_type( _type )
 	{

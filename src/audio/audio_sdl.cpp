@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_sdl.cpp - device-class that performs PCM-output via SDL
  *
@@ -183,5 +185,7 @@ void audioSDL::setupWidget::saveSettings( void )
 							m_device->text() );
 }
 
+
+#endif
 
 #endif

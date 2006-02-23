@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * envelope_tab_widget.cpp - widget for use in envelope/lfo/filter-tab of
  *                           channel-window
@@ -178,7 +180,7 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
 	m_filterCutKnob->setRange( 0.0, 16000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setValue( 16000.0, TRUE );
+	m_filterCutKnob->setInitValue( 16000.0 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
 								tr( "Hz" ) );
 #ifdef QT4
@@ -198,7 +200,7 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->setRange( 0.01, 10.0, 0.01 );
 	m_filterResKnob->move( 190, 18 );
-	m_filterResKnob->setValue( 0.5, TRUE );
+	m_filterResKnob->setInitValue( 0.5 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
 #ifdef QT4
 	m_filterResKnob->setWhatsThis(
@@ -617,3 +619,5 @@ return res;
 }
 
 */
+
+#endif

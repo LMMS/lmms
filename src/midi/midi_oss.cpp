@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_oss.cpp - OSS-raw-midi-client
  *
@@ -173,3 +175,5 @@ void midiOSS::setupWidget::saveSettings( void )
 
 #endif
 
+
+#endif

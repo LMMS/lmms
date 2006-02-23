@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
@@ -315,7 +317,7 @@ void mainWindow::finalize( void )
 	// window-toolbar
 	toolButton * bb_editor_window = new toolButton(
 					embed::getIconPixmap( "bb_track" ),
-					tr( "Show/hide Beat+Bassline Editor" ) +
+					tr( "Show/hide Beat+Baseline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
@@ -326,10 +328,10 @@ void mainWindow::finalize( void )
 	QWhatsThis::add( bb_editor_window, 
 #endif
 		tr( "By pressing this button, you can show or hide the "
-			"Beat+Bassline Editor. The Beat+Bassline Editor is "
+			"Beat+Baseline Editor. The Beat+Baesline Editor is "
 			"needed for setting beats, opening, adding and "
 			"removing channels, cutting, copying and pasting "
-			"beat- and bassline-patterns and other things like "
+			"beat- and baseline-patterns and other things like "
 			"that." ) );
 
 
@@ -503,7 +505,8 @@ void mainWindow::finalize( void )
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
 	{
 		// no, so show it that user can setup everything
-		setupDialog( eng() ).exec();
+		setupDialog sd( eng() );
+		sd.exec();
 		configManager::inst()->setValue( "app", "configured", "1" );
 	}
 	// look whether mixer could use a audio-interface beside audioDummy
@@ -704,7 +707,8 @@ bool mainWindow::saveProjectAs( void )
 
 void mainWindow::showSettingsDialog( void )
 {
-	setupDialog( eng() ).exec();
+	setupDialog sd( eng() );
+	sd.exec();
 }
 
 
@@ -862,3 +866,5 @@ void mainWindow::keyReleaseEvent( QKeyEvent * _ke )
 
 #include "main_window.moc"
 
+
+#endif

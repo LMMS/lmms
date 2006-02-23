@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * song_editor.cpp - basic window for editing song
  *
@@ -240,7 +242,7 @@ songEditor::songEditor( engine * _engine ) :
 			SLOT( masterPitchChanged( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
 			SLOT( masterPitchPressed() ) );
-	connect( m_masterPitchSlider, SIGNAL (sliderMoved( int) ), this,
+	connect( m_masterPitchSlider, SIGNAL( sliderMoved( int ) ), this,
 			SLOT( masterPitchMoved( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
@@ -1665,3 +1667,5 @@ void songEditor::loadSettings( const QDomElement & _this )
 
 #include "song_editor.moc"
 
+
+#endif

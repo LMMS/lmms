@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * name_label.cpp - implementation of class nameLabel, a label which
  *                  is renamable by double-clicking it
@@ -268,6 +270,10 @@ void nameLabel::paintEvent( QPaintEvent * )
 		x += 4 + pm.width();
 	}
 
+	p.setPen( QColor( 16, 16, 16 ) );
+	p.drawText( x+1, height() / 2 + p.fontMetrics().height() / 2 - 3,
+								text() );
+
 	p.setPen( QColor( 0, 224, 0 ) );
 	bbTrack * bbt = bbTrack::findBBTrack(
 				eng()->getBBEditor()->currentBB(), eng() );
@@ -290,3 +296,5 @@ void nameLabel::paintEvent( QPaintEvent * )
 
 #include "name_label.moc"
 
+
+#endif

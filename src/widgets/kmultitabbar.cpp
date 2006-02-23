@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 #include "templates.h"
 #include "tooltip.h"
 
@@ -1689,3 +1691,5 @@ buttonList * KMultiTabBar::buttons() {return &m_buttons;}
 
 
 
+
+#endif

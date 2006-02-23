@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * arp_and_chords_tab_widget.cpp - widget for use in arp/chord-tab of 
  *                                 channel-window
@@ -224,8 +226,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
 						tr( "Chord range" ), eng() );
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
-	m_chordRangeKnob->setRange( 1.0, 9.0, 1.0 );
-	m_chordRangeKnob->setValue( 1.0, TRUE );
+	m_chordRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
+	m_chordRangeKnob->setInitValue( 1.0f );
 	m_chordRangeKnob->move( 164, 24 );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " +
 							tr( "octave(s)" ) );
@@ -276,8 +278,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
 						tr( "Arpeggio range" ), eng() );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
-	m_arpRangeKnob->setRange( 1.0, 9.0, 1.0 );
-	m_arpRangeKnob->setValue( 1.0, TRUE );
+	m_arpRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
+	m_arpRangeKnob->setInitValue( 1.0f );
 	m_arpRangeKnob->move( 164, 24 );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " +
 							tr( "octave(s)" ) );
@@ -293,8 +295,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
 						tr( "Arpeggio time" ), eng() );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-	m_arpTimeKnob->setRange( 10.0, 1000.0, 1.0 );
-	m_arpTimeKnob->setValue( 100.0, TRUE );
+	m_arpTimeKnob->setRange( 10.0f, 1000.0f, 1.0f );
+	m_arpTimeKnob->setInitValue( 100.0f );
 	m_arpTimeKnob->move( 164, 70 );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +
 								tr( "ms" ) );
@@ -310,8 +312,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpGateKnob = new knob( knobBright_26, m_arpGroupBox,
 						tr( "Arpeggio gate" ), eng() );
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
-	m_arpGateKnob->setRange( 1.0, 200.0, 1.0 );
-	m_arpGateKnob->setValue( 100.0, TRUE );
+	m_arpGateKnob->setRange( 1.0f, 200.0f, 1.0f );
+	m_arpGateKnob->setInitValue( 100.0f );
 	m_arpGateKnob->move( 204, 70 );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
 #ifdef QT4
@@ -595,7 +597,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 		// range-checking
 		if( sub_note_key >= NOTES_PER_OCTAVE * OCTAVES ||
-							sub_note_key < 0 )
+			sub_note_key < 0 || eng()->getMixer()->criticalXRuns() )
 		{
 			continue;
 		}
@@ -766,3 +768,5 @@ void arpAndChordsTabWidget::arpRandomToggled( bool _on )
 
 #include "arp_and_chords_tab_widget.moc"
 
+
+#endif

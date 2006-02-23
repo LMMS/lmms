@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * project_notes.cpp - implementation of project-notes-editor
  *
@@ -58,7 +60,6 @@
 #define setFontFamily setFamily
 #define setFontPointSize setPointSize
 #define setTextColor setColor
-#define textColor color
 #define setHtml setText
 #define toHtml text
 
@@ -597,8 +598,9 @@ void projectNotes::loadSettings( const QDomElement & _this )
 #undef setFontItalic
 #undef setFontFamily
 #undef setFontPointSize
-#undef textColor
 #undef setTextColor
 #undef setHtml
 #undef toHtml
 
+
+#endif

@@ -56,6 +56,7 @@
 #include "tooltip.h"
 #include "sample_buffer.h"
 
+#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 
@@ -268,7 +269,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 					"Osc %1 volume" ).arg( i+1 ), eng() );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-		m_osc[i].volKnob->setValue( DEFAULT_VOLUME / 3, TRUE );
+		m_osc[i].volKnob->setInitValue( DEFAULT_VOLUME / 3 );
 		m_osc[i].volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 #ifdef QT4
@@ -287,7 +288,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
-		m_osc[i].panKnob->setValue( DEFAULT_PANNING, TRUE );
+		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
 		m_osc[i].panKnob->setHintText( tr("Osc %1 panning:").arg( i+1 )
 						+ " ", "" );
 #ifdef QT4
@@ -307,7 +308,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
 						2 * NOTES_PER_OCTAVE, 1.0f );
-		m_osc[i].coarseKnob->setValue( 0.0f, TRUE );
+		m_osc[i].coarseKnob->setInitValue( 0.0f );
 		m_osc[i].coarseKnob->setHintText( tr( "Osc %1 coarse detuning:"
 							).arg( i + 1 ) + " ",
 						" " + tr( "semitones" ) );
@@ -328,7 +329,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 									eng() );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
-		m_osc[i].fineLKnob->setValue( 0.0f, TRUE );
+		m_osc[i].fineLKnob->setInitValue( 0.0f );
 		m_osc[i].fineLKnob->setHintText( tr( "Osc %1 fine detuning "
 							"left:" ).arg( i + 1 )
 							+ " ", " " +
@@ -350,7 +351,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 							).arg( i + 1 ), eng() );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
-		m_osc[i].fineRKnob->setValue( 0.0f, TRUE );
+		m_osc[i].fineRKnob->setInitValue( 0.0f );
 		m_osc[i].fineRKnob->setHintText( tr( "Osc %1 fine detuning "
 							"right:").arg( i + 1 ) +
 						" ", " " + tr( "cents" ) );
@@ -372,7 +373,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 									eng() );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
 		m_osc[i].phaseOffsetKnob->setRange( 0.0f, 360.0f, 1.0f );
-		m_osc[i].phaseOffsetKnob->setValue( 0.0f, TRUE );
+		m_osc[i].phaseOffsetKnob->setInitValue( 0.0f );
 		m_osc[i].phaseOffsetKnob->setHintText( tr( "Osc %1 phase-"
 								"offset:" ).
 								arg( i + 1 ) +
@@ -399,7 +400,7 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
 		m_osc[i].stereoPhaseDetuningKnob->setRange( 0.0f, 360.0f,
 									1.0f );
-		m_osc[i].stereoPhaseDetuningKnob->setValue( 0.0f, TRUE );
+		m_osc[i].stereoPhaseDetuningKnob->setInitValue( 0.0f );
 		m_osc[i].stereoPhaseDetuningKnob->setHintText( tr("Osc %1 "
 								"stereo phase-"
 								"detuning:" ).

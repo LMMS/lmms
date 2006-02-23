@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
@@ -401,3 +403,5 @@ void timeLine::mouseReleaseEvent( QMouseEvent * _me )
 
 #include "timeline.moc"
 
+
+#endif

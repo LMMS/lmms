@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /****************************************************************************
     Implementation of QXEmbed class
 
@@ -1362,3 +1364,5 @@ void QXEmbed::reparent( QWidget * parent, WFlags f, const QPoint & p, bool showI
 #include "qxembed.moc"
 #endif
 #endif // Q_WS_X11
+
+#endif

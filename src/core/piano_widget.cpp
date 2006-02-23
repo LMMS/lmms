@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * piano_widget.cpp - implementation of piano-widget used in channel-window
  *                    for testing channel
@@ -68,10 +70,10 @@ QPixmap * pianoWidget::s_blackKeyPressedPm = NULL;
 
 
 const int PIANO_BASE = 11;
-const int WHITE_KEY_WIDTH = 10;
-const int BLACK_KEY_WIDTH = 8;
-const int WHITE_KEY_HEIGHT = 57;
-const int BLACK_KEY_HEIGHT = 38;
+const int PW_WHITE_KEY_WIDTH = 10;
+const int PW_BLACK_KEY_WIDTH = 8;
+const int PW_WHITE_KEY_HEIGHT = 57;
+const int PW_BLACK_KEY_HEIGHT = 38;
 const int LABEL_TEXT_SIZE = 7;
 
 
@@ -127,7 +129,8 @@ pianoWidget::pianoWidget (channelTrack * _parent ) :
 					OCTAVE_3 * WHITE_KEYS_PER_OCTAVE,
 							Qt::Horizontal, this );
 #endif
-	m_pianoScroll->setGeometry( 0, PIANO_BASE+WHITE_KEY_HEIGHT, 250, 16 );
+	m_pianoScroll->setGeometry( 0, PIANO_BASE + PW_WHITE_KEY_HEIGHT, 250,
+									16 );
 	// ...and connect it to this widget...
 	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( pianoScrolled( int ) ) );
@@ -152,7 +155,7 @@ pianoWidget::~pianoWidget()
 int pianoWidget::getKeyFromMouse( const QPoint & _p )
 {
 
-	int key_num = (int)( (float) _p.x() / (float) WHITE_KEY_WIDTH );
+	int key_num = (int)( (float) _p.x() / (float) PW_WHITE_KEY_WIDTH );
 
 	for( int i = 0; i <= key_num; ++i )
 	{
@@ -167,23 +170,25 @@ int pianoWidget::getKeyFromMouse( const QPoint & _p )
 	key_num += m_startOctave * NOTES_PER_OCTAVE + m_startTone;
 
 	// is it a black key?
-	if( _p.y() < PIANO_BASE + BLACK_KEY_HEIGHT )
+	if( _p.y() < PIANO_BASE + PW_BLACK_KEY_HEIGHT )
 	{
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
 		if( key_num > 0 &&
 			KEY_ORDER[( key_num - 1 ) % NOTES_PER_OCTAVE] ==
 								BLACK_KEY &&
-			_p.x() % WHITE_KEY_WIDTH <= ( WHITE_KEY_WIDTH / 2 ) -
-						( BLACK_KEY_WIDTH / 2 ) )
+			_p.x() % PW_WHITE_KEY_WIDTH <=
+					( PW_WHITE_KEY_WIDTH / 2 ) -
+						( PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			--key_num;
 		}
 		if( key_num < NOTES_PER_OCTAVE * OCTAVES - 1 &&
 			KEY_ORDER[( key_num + 1 ) % NOTES_PER_OCTAVE] ==
 								BLACK_KEY &&
-			_p.x() % WHITE_KEY_WIDTH >=
-				( WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2 ) )
+			_p.x() % PW_WHITE_KEY_WIDTH >=
+				( PW_WHITE_KEY_WIDTH -
+				  		PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			++key_num;
 		}
@@ -223,7 +228,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 			volume vol = (volume)( ( float ) y_diff /
 				( ( KEY_ORDER[key_num % NOTES_PER_OCTAVE] ==
 								WHITE_KEY ) ?
-					WHITE_KEY_HEIGHT : BLACK_KEY_HEIGHT ) *
+				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
 				(float) DEFAULT_VOLUME);
 			if( y_diff < 0 )
 			{
@@ -232,7 +237,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 			else if( y_diff > ( ( KEY_ORDER[key_num %
 							NOTES_PER_OCTAVE] ==
 								WHITE_KEY ) ?
-					WHITE_KEY_HEIGHT : BLACK_KEY_HEIGHT ) )
+				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
 				vol = DEFAULT_VOLUME;
 			}
@@ -284,7 +289,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 	int y_diff = _me->pos().y() - PIANO_BASE;
 	volume vol = (volume)( (float) y_diff /
 		( ( KEY_ORDER[key_num % NOTES_PER_OCTAVE] == WHITE_KEY ) ?
-			WHITE_KEY_HEIGHT : BLACK_KEY_HEIGHT ) *
+			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
 						(float)DEFAULT_VOLUME );
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
@@ -295,7 +300,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( y_diff >
 		( ( KEY_ORDER[key_num % NOTES_PER_OCTAVE] == WHITE_KEY ) ?
-				WHITE_KEY_HEIGHT : BLACK_KEY_HEIGHT ) )
+				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 	{
 		vol = DEFAULT_VOLUME;
 	}
@@ -454,7 +459,7 @@ int pianoWidget::getKeyX( int _key_num )
 	int k = m_startOctave*NOTES_PER_OCTAVE + m_startTone;
 	if( _key_num < k )
 	{
-		return( ( _key_num - k ) * WHITE_KEY_WIDTH / 2 );
+		return( ( _key_num - k ) * PW_WHITE_KEY_WIDTH / 2 );
 	}
 
 	int x = 0;
@@ -467,22 +472,22 @@ int pianoWidget::getKeyX( int _key_num )
 			++white_cnt;
 			if( white_cnt > 1 )
 			{
-				x += WHITE_KEY_WIDTH;
+				x += PW_WHITE_KEY_WIDTH;
 			}
 			else
 			{
-				x += WHITE_KEY_WIDTH/2;
+				x += PW_WHITE_KEY_WIDTH/2;
 			}
 		}
 		else
 		{
 			white_cnt = 0;
-			x += WHITE_KEY_WIDTH/2;
+			x += PW_WHITE_KEY_WIDTH/2;
 		}
 		++k;
 	}
 
-	x -= WHITE_KEY_WIDTH / 2;
+	x -= PW_WHITE_KEY_WIDTH / 2;
 
 	return( x );
 
@@ -497,7 +502,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 	QPainter p( this );
 #else
 	// create pixmap for whole widget
-	QPixmap pm( rect().size() );//width(), PIANO_BASE+WHITE_KEY_HEIGHT);
+	QPixmap pm( rect().size() );//width(), PIANO_BASE+PW_WHITE_KEY_HEIGHT);
 	// and a painter for it
 	QPainter p( &pm, this );
 #endif
@@ -522,14 +527,14 @@ void pianoWidget::paintEvent( QPaintEvent * )
 				m_channelTrack->baseOctave() * NOTES_PER_OCTAVE;
 	if( KEY_ORDER[base_key % NOTES_PER_OCTAVE] == WHITE_KEY )
 	{
-		p.fillRect( QRect( getKeyX( base_key ), 1, WHITE_KEY_WIDTH-1,
+		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
 								PIANO_BASE-2 ),
 				QColor( 0xFF, 0xBB, 0x00 ) );
 	}
 	else
 	{
 		p.fillRect( QRect( getKeyX( base_key ) + 1, 1,
-					BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ),
+				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ),
 				QColor( 0xFF, 0xBB, 0x00 ) );
 	}
 
@@ -555,13 +560,13 @@ void pianoWidget::paintEvent( QPaintEvent * )
 			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPm );
 		}
 
-		x += WHITE_KEY_WIDTH;
+		x += PW_WHITE_KEY_WIDTH;
 
 		if( (tones) (cur_key%NOTES_PER_OCTAVE) == C )
 		{
 			// label key of note C with "C" and number of current
 			// octave
-			p.drawText( x - WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
+			p.drawText( x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
 					QString( "C" ) + QString::number(
 					cur_key / NOTES_PER_OCTAVE, 10 ) );
 		}
@@ -579,12 +584,12 @@ void pianoWidget::paintEvent( QPaintEvent * )
 	{
 		if( m_pressedKeys[s_key] == TRUE )
 		{
-			p.drawPixmap( 0 - WHITE_KEY_WIDTH / 2, PIANO_BASE,
+			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE,
 							*s_blackKeyPressedPm );
 		}
 		else
 		{
-			p.drawPixmap( 0 - WHITE_KEY_WIDTH / 2, PIANO_BASE,
+			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE,
 								*s_blackKeyPm );
 		}
 	}
@@ -598,16 +603,16 @@ void pianoWidget::paintEvent( QPaintEvent * )
 			// state of current key
 			if( m_pressedKeys[cur_key] == TRUE )
 			{
-				p.drawPixmap( x + WHITE_KEY_WIDTH / 2,
+				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2,
 								PIANO_BASE,
 							*s_blackKeyPressedPm );
 			}
 			else
 			{
-				p.drawPixmap( x + WHITE_KEY_WIDTH / 2,
+				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2,
 						PIANO_BASE, *s_blackKeyPm );
 			}
-			x += WHITE_KEY_WIDTH;
+			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;
 		}
 		else
@@ -617,7 +622,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 			++white_cnt;
 			if( white_cnt > 1 )
 			{
-				x += WHITE_KEY_WIDTH;
+				x += PW_WHITE_KEY_WIDTH;
 			}
 		}
 		++cur_key;
@@ -632,3 +637,5 @@ void pianoWidget::paintEvent( QPaintEvent * )
 
 #include "piano_widget.moc"
 
+
+#endif

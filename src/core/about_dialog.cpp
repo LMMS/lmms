@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * about_dialog.cpp - implementation of about-dialog
  *
@@ -149,3 +151,5 @@ void aboutDialog::resizeEvent( QResizeEvent * _re )
 
 #include "about_dialog.moc"
 
+
+#endif

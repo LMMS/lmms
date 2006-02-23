@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
@@ -55,7 +57,7 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 							ledColors _color ) :
 	QWidget( _parent ),
-	m_checked( FALSE ),
+	automatableObject<bool>( FALSE, TRUE, FALSE ),
 	m_text( _text )
 {
 	if( _color >= TOTAL_COLORS || _color < YELLOW )
@@ -104,9 +106,9 @@ void ledCheckBox::mousePressEvent( QMouseEvent * _me )
 	
 void ledCheckBox::toggle( void )
 {
-	m_checked = !m_checked;
+	setValue( !value() );
 	update();
-	emit( toggled( m_checked ) );
+	emit( toggled( value() ) );
 }
 
 
@@ -120,7 +122,7 @@ void ledCheckBox::setChecked( bool _on )
 	}
 	else
 	{
-		emit( toggled( m_checked ) );
+		emit( toggled( value() ) );
 	}
 }
 
@@ -148,6 +150,9 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 		p.drawPixmap( 0, 0, *m_ledOffPixmap );
 	}
 
+	p.setPen( QColor( 64, 64, 64 ) );
+	p.drawText( m_ledOffPixmap->width() + 3, 9, text() );
+	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( m_ledOffPixmap->width() + 2, 8, text() );
 
 #ifndef QT4
@@ -159,3 +164,5 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 
 
 #include "led_checkbox.moc"
+
+#endif

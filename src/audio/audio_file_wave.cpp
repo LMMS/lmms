@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
@@ -120,3 +122,5 @@ void audioFileWave::finishEncoding( void )
 	writeData( &m_waveFileHeader, sizeof( m_waveFileHeader ) );
 }
 
+
+#endif

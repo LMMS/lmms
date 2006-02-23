@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
@@ -241,3 +243,5 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 
 #include "surround_area.moc"
 
+
+#endif

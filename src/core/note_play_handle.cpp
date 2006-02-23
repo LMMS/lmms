@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        play-engine
@@ -381,3 +383,5 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 }
 
 
+
+#endif

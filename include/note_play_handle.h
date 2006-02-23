@@ -47,7 +47,7 @@ public:
 
 	notePlayHandle( channelTrack * _chnl_trk, const f_cnt_t _frames_ahead,
 					const f_cnt_t _frames, note * _n,
-					const bool _arp_note = FALSE ) FASTCALL;
+					const bool _arp_note = FALSE );
 	virtual ~notePlayHandle();
 
 

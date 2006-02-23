@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_file_device.cpp - base-class for audio-device-classes which write
  *                         their output into a file
@@ -105,3 +107,5 @@ void audioFileDevice::seekToBegin( void )
 	m_outputFile.seek( 0 );
 }
 
+
+#endif

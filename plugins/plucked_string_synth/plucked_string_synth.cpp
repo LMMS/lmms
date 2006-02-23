@@ -45,6 +45,7 @@
 #include "buffer_allocator.h"
 #include "knob.h"
 
+#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 
@@ -75,14 +76,14 @@ pluckedStringSynth::pluckedStringSynth( channelTrack * _channel_track ) :
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
 									eng() );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
- 	m_pickKnob->setValue( 0.0f, TRUE );
+ 	m_pickKnob->setInitValue( 0.0f );
 	m_pickKnob->move( 86, 134 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 
 	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
 									eng() );
 	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
-	m_pickupKnob->setValue( 0.05f, TRUE );
+	m_pickupKnob->setInitValue( 0.05f );
 	m_pickupKnob->move( 138, 134 );
 	m_pickupKnob->setHintText( tr( "Pickup position:" ) + " ", "" );
 #ifdef QT4

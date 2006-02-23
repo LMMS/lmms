@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * clipboard.cpp - the clipboard for patterns, notes etc.
  *
@@ -57,3 +59,5 @@ namespace clipboard
 } ;
 
 
+
+#endif

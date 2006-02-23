@@ -1,7 +1,7 @@
 /*
  * led_checkbox.h - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,10 +39,13 @@
 #endif
 
 
+#include "automatable_object.h"
+
+
 class QPixmap;
 
 
-class ledCheckBox : public QWidget
+class ledCheckBox : public QWidget, public automatableObject<bool>
 {
 	Q_OBJECT
 public:
@@ -58,7 +61,7 @@ public:
 
 	inline bool isChecked( void ) const
 	{
-		return( m_checked );
+		return( value() );
 	}
 
 	inline const QString & text( void )
@@ -81,7 +84,6 @@ private:
 	QPixmap * m_ledOnPixmap;
 	QPixmap * m_ledOffPixmap;
 	
-	bool m_checked;
 	QString m_text;
 	
 signals:

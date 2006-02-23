@@ -1,8 +1,10 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * knob.cpp - powerful knob-widget
  *
- * This file is based on the knob-widget of the Qwt Widget Library from
- * Josef Wilgen
+ * This file is partly based on the knob-widget of the Qwt Widget Library by
+ * Josef Wilgen.
  *
  * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -80,10 +82,6 @@
 
 
 
-static double MinRelStep = 1.0e-10;
-static double DefaultRelStep = 1.0e-2;
-static double MinEps = 1.0e-10;
-
 
 float knob::s_copiedValue = 0.0f;
 textFloat * knob::s_textFloat = NULL;
@@ -98,6 +96,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 #endif
 		),
 	engineObject( _engine ),
+	automatableObject<float>(),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_angle( 0.0f ),
@@ -105,12 +104,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
 	m_label( "" ),
-	m_minValue( 0.0f ),
-	m_maxValue( 100.0f ),
-	m_value( 0.0f ),
-	m_exactValue( 0.0f ),
-	m_exactPrevValue( 0.0f ),
-	m_prevValue( 0.0f ),
 	m_initValue( 0.0f )
 {
 	if( s_textFloat == NULL )
@@ -274,11 +267,11 @@ float knob::getValue( const QPoint & _p )
 
 		const float arc = atan2( -dx, dy ) * 180.0 / M_PI;
 
-		float new_value = 0.5 * ( m_minValue + m_maxValue ) +
-					arc * ( m_maxValue - m_minValue ) /
+		float new_value = 0.5 * ( minValue() + maxValue() ) +
+					arc * ( maxValue() - minValue() ) /
 								m_totalAngle;
 
-		const float oneTurn = tAbs<float>( m_maxValue - m_minValue ) *
+		const float oneTurn = tAbs<float>( maxValue() - minValue() ) *
 							360.0 / m_totalAngle;
 		const float eqValue = value() + m_mouseOffset;
 
@@ -329,14 +322,14 @@ void knob::recalcAngle( void )
 	//
 	// calculate the angle corresponding to the value
 	//
-	if( m_maxValue == m_minValue )
+	if( maxValue() == minValue() )
 	{
 		m_angle = 0;
 	}
 	else
 	{
-		m_angle = ( value() - 0.5 * ( m_minValue + m_maxValue ) ) /
-				( m_maxValue - m_minValue ) * m_totalAngle;
+		m_angle = ( value() - 0.5 * ( minValue() + maxValue() ) ) /
+				( maxValue() - minValue() ) * m_totalAngle;
 		m_angle = static_cast<int>( m_angle ) % 360;
 	}
 }
@@ -529,9 +522,13 @@ void knob::paintEvent( QPaintEvent * _me )
 		if( m_label != "" )
 		{
 			p.setFont( pointSize<6>( p.font() ) );
+			p.setPen( QColor( 64, 64, 64 ) );
+			p.drawText( width() / 2 -
+				p.fontMetrics().width( m_label ) / 2 + 1,
+					height() - 1, m_label );
 			p.setPen( QColor( 255, 255, 255 ) );
 			p.drawText( width() / 2 -
-				QFontMetrics( p.font() ).width( m_label ) / 2,
+					p.fontMetrics().width( m_label ) / 2,
 					height() - 2, m_label );
 		}
 #ifndef QT4
@@ -570,22 +567,15 @@ void knob::wheelEvent( QWheelEvent * _we )
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
-	if( value() != m_prevValue )
-	{
-		emit sliderMoved( value() );
-	}
+	emit sliderMoved( value() );
 }
 
 
 
 
-//! Emits a valueChanged() signal if necessary
 void knob::buttonReleased( void )
 {
-	if( value() != m_prevValue )
-	{
-		emit valueChanged( value() );
-	}
+	emit valueChanged( value() );
 }
 
 
@@ -600,26 +590,25 @@ void knob::setPosition( const QPoint & _p )
 	}
 	else
 	{
-		setValue( m_value - getValue( _p ) );
+		setValue( value() - getValue( _p ) );
 	}
 }
 
 
 
 
-void knob::setValue( float _val, bool _is_init_value )
+void knob::setValue( const float _x )
 {
-	if( _is_init_value )
+	const float prev_value = value();
+	automatableObject<float>::setValue( _x );
+	if( prev_value != value() )
 	{
-		m_initValue = _val;
+		valueChange();
 	}
-
-	setNewValue( _val, TRUE );
 }
 
 
-
-
+/*
 void knob::fitValue( float _val )
 {
 	setValue( _val );
@@ -632,49 +621,26 @@ void knob::incValue( int _steps )
 {
 	setValue( m_value + float( _steps ) * m_step );
 }
+*/
 
 
 
-
-void knob::setRange( float _vmin, float _vmax, float _vstep, int _page_size )
+void knob::setRange( const float _min, const float _max, const float _step )
 {
-	int rchg = ( ( m_maxValue != _vmax ) || ( m_minValue != _vmin ) );
+	bool rchg = ( ( maxValue() != _max ) || ( minValue() != _min ) );
+	automatableObject<float>::setRange( _min, _max, _step );
 
-	if( rchg )
-	{
-		m_minValue = _vmin;
-		m_maxValue = _vmax;
-	}
+	m_pageSize = tMax<float>( ( maxValue() - minValue() ) / 100.0f,
+								step() );
 
-	//
-	// look if the step width has an acceptable 
-	// value or otherwise change it.
-	//
-	setStep( _vstep );
-
-	//
-	// limit page size
-	//
-/*	m_pageSize = tLimit( pageSize, 0, int( tAbs<float>( ( m_maxValue -
-						m_minValue ) / m_step ) ) ); */
-	m_pageSize = tMax<float>( ( m_maxValue - m_minValue ) / 100.0f,
-								m_step );
-
-	// 
-	// If the value lies out of the range, it 
-	// will be changed. Note that it will not be adjusted to 
-	// the new step width.
-	setNewValue( m_value, FALSE );
-
-	// call notifier after the step width has been 
-	// adjusted.
+	// call notifier after the step width has been adjusted.
 	if( rchg )
 	{
 		rangeChange();
 	}
 }
 
-
+/*
 
 
 void knob::setNewValue( float _x, bool _align )
@@ -753,7 +719,7 @@ void knob::setStep( float _vstep )
 		m_step = newStep;
 	}
 }
-
+*/
 
 
 
@@ -850,4 +816,6 @@ void knob::displayHelp( void )
 
 #ifndef QT4
 #undef addSeparator
+#endif
+
 #endif

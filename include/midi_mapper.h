@@ -1,7 +1,7 @@
 /*
  * midi_mapper.h - MIDI-mapper for any midiDevice
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,11 +43,11 @@
 
 
 #include "types.h"
-
+#include "midi.h"
 
 const Uint8 MIDI_PROGRAMS = 128;
 const Uint8 MIDI_KEYS     = 128;
-const Uint8 MIDI_CHANNELS = 16;
+
 
 class midiMapper
 {
@@ -104,7 +104,7 @@ private:
 
 	QPair<Uint8, QString> m_patchMap[MIDI_PROGRAMS];
 	QPair<Uint8, QString> m_drumsetKeyMap[MIDI_KEYS];
-	Uint8 m_channelMap[MIDI_CHANNELS];
+	Uint8 m_channelMap[MIDI_CHANNEL_COUNT];
 	Uint8 m_drumsetChannel;
 	Uint8 m_drumsetPatch;
 

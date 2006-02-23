@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * side_bar_widget.cpp - implementation of base-widget for side-bar
  *
@@ -123,3 +125,5 @@ void sideBarWidget::resizeEvent( QResizeEvent * )
 #include "side_bar.moc"
 #include "side_bar_widget.moc"
 
+
+#endif

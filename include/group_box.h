@@ -1,7 +1,7 @@
 /*
  * group_box.h - LMMS-groupbox
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@ class groupBox : public QWidget
 	Q_OBJECT
 public:
 	groupBox( const QString & _caption, QWidget * _parent );
-	~groupBox();
+	virtual ~groupBox();
 
 	bool isActive( void ) const
 	{

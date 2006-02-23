@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
@@ -61,9 +63,9 @@ engine::~engine()
 {
 	m_mixer->stopProcessing();
 	delete m_projectNotes;
-	delete m_pianoRoll;
 	delete m_songEditor;
 	delete m_bbEditor;
+	delete m_pianoRoll;
 
 	presetPreviewPlayHandle::cleanUp( this );
 
@@ -92,3 +94,5 @@ engineObject::~engineObject()
 {
 }
 
+
+#endif

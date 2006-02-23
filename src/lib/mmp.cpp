@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
@@ -301,3 +303,5 @@ QString multimediaProject::typeName( projectTypes _project_type )
 	return( s_types[UNKNOWN].m_name );
 }
 
+
+#endif

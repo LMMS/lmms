@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_jack.cpp - support for JACK-transport
  *
@@ -475,5 +477,7 @@ void audioJACK::setupWidget::saveSettings( void )
 				QString::number( m_channels->value() ) );
 }
 
+
+#endif
 
 #endif

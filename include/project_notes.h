@@ -35,6 +35,7 @@
 #else
 
 #include <qmainwindow.h>
+#define textColor color
 
 #endif
 

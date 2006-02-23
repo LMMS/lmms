@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * embed.cpp - misc stuff for using embedded resources (linked into binary)
  *
@@ -134,3 +136,5 @@ void loadTranslation( const QString & _tname )
 
 }
 
+
+#endif

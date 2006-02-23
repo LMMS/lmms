@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * buffer_allocator.cpp - namespace bufferAllocator providing routines for own
  *                        optimized memory-management for audio-buffers
@@ -224,3 +226,5 @@ void bufferAllocator::disableAutoCleanup( bool _disabled )
 	s_autoCleanupDisabled = _disabled;
 }
 
+
+#endif

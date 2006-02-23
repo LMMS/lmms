@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * instrument.cpp - base-class for all instrument-plugins (synths, samplers etc)
  *
@@ -97,3 +99,5 @@ instrument * instrument::instantiate( const QString & _plugin_name,
 	return( new dummyInstrument( _channel_track ) );
 }
 
+
+#endif

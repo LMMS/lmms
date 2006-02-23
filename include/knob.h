@@ -45,6 +45,7 @@
 
 
 #include "engine.h"
+#include "automatable_object.h"
 
 
 class QPixmap;
@@ -58,7 +59,8 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public engineObject
+class knob : public QWidget, public engineObject,
+	     					public automatableObject<float>
 {
 	Q_OBJECT
 public:
@@ -73,10 +75,18 @@ public:
 
 	void setTotalAngle( float _angle );
 
-	void setRange( float _vmin, float _vmax, float _vstep = 0.0,
-							int _pagesize = 1 );
+	inline void setInitValue( const float _val )
+	{
+		m_initValue = _val;
+		setValue( _val );
+	}
 
-	inline float value( void ) const
+	virtual void setValue( const float _x );
+
+	virtual void setRange( const float _min, const float _max,
+						const float _step = 0.0 );
+
+/*	inline float value( void ) const
 	{
 		return( m_value );
 	}
@@ -90,19 +100,19 @@ public:
 	inline float minValue( void ) const
 	{
 		return( m_minValue );
-	}
+	}*/
 
-	inline void incPages( int _n_pages )
+/*	inline void incPages( int _n_pages )
 	{
-		setNewValue( m_value + float( _n_pages ) * m_pageSize, 1 );
-	}
+		setNewValue( value() + float( _n_pages ) * m_pageSize, 1 );
+	}*/
 
 
 
 public slots:
-	void setValue( float _val, bool _is_init_value = FALSE );
+/*	void setValue( float _val, bool _is_init_value = FALSE );
 	void fitValue( float _val );
-	void incValue( int _steps );
+	void incValue( int _steps );*/
 	void reset( void );
 	void copyValue( void );
 	void pasteValue( void );
@@ -148,7 +158,6 @@ protected:
 
 	void buttonReleased( void );
 
-	void setNewValue( float _x, bool _align = FALSE );
 
 
 	static float s_copiedValue;
@@ -160,6 +169,7 @@ protected:
 	bool m_buttonPressed;
 
 
+	float m_pageSize;
 	float m_angle;
 	float m_totalAngle;
 
@@ -170,14 +180,6 @@ protected:
 	QString m_label;
 
 
-	float m_minValue;
-	float m_maxValue;
-	float m_step;
-	float m_pageSize;
-	float m_value;
-	float m_exactValue;
-	float m_exactPrevValue;
-	float m_prevValue;
 	float m_initValue;
 
 } ;

@@ -33,7 +33,7 @@
 class instrumentPlayHandle : public playHandle
 {
 public:
-	inline instrumentPlayHandle( instrument * _instrument ) FASTCALL :
+	inline instrumentPlayHandle( instrument * _instrument ) :
 		playHandle( INSTRUMENT_PLAY_HANDLE, _instrument->eng() ),
 		m_instrument( _instrument )
 	{

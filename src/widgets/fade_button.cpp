@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * fade_button.cpp - implementation of fade-button
  *
@@ -139,3 +141,5 @@ void fadeButton::nextState( void )
 
 #include "fade_button.moc"
 
+
+#endif

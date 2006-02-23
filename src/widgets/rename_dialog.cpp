@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * rename_dialog.cpp - implementation of dialog for renaming something
  *
@@ -88,3 +90,5 @@ void renameDialog::textChanged( const QString & _new_string )
 
 #include "rename_dialog.moc"
 
+
+#endif

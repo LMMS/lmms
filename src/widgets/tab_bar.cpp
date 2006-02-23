@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * tab_bar.cpp - implementation of tab-bar
  *
@@ -260,3 +262,5 @@ bool tabBar::allHidden( void )
 #include "tab_bar.moc"
 #include "tab_button.moc"
 
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_oss.cpp - device-class that implements OSS-PCM-output
  *
@@ -383,3 +385,5 @@ void audioOSS::setupWidget::saveSettings( void )
 
 #endif
 
+
+#endif

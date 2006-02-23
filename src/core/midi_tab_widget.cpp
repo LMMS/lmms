@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                       MIDI-related stuff
@@ -613,3 +615,5 @@ void midiTabWidget::activatedWriteablePort( QAction * ) { }
 
 #include "midi_tab_widget.moc"
 
+
+#endif

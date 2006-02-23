@@ -101,11 +101,13 @@ public:
 
 	void FASTCALL setLength( const midiTime & _length );
 	void FASTCALL setPos( const midiTime & _pos );
-	void FASTCALL setTone( tones _tone = C );
-	void FASTCALL setOctave( octaves _octave = DEFAULT_OCTAVE );
-	void FASTCALL setKey( int _key );
-	void FASTCALL setVolume( volume _volume = DEFAULT_VOLUME );
-	void FASTCALL setPanning( panning _panning = DEFAULT_PANNING );
+	void FASTCALL setTone( const tones _tone = C );
+	void FASTCALL setOctave( const octaves _octave = DEFAULT_OCTAVE );
+	void FASTCALL setKey( const int _key );
+	void FASTCALL setVolume( const volume _volume = DEFAULT_VOLUME );
+	void FASTCALL setPanning( const panning _panning = DEFAULT_PANNING );
+	void FASTCALL quantizeLength( const int _q_grid );
+	void FASTCALL quantizePos( const int _q_grid );
 
 	inline midiTime endPos( void ) const
 	{
@@ -162,6 +164,8 @@ public:
 
 
 private:
+	midiTime FASTCALL quantized( const midiTime & _m, const int _q_grid );
+
 	tones m_tone;
 	octaves m_octave;
 	volume m_volume;

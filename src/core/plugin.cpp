@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * plugin.cpp - implementation of plugin-class including plugin-loader
  *
@@ -244,3 +246,5 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 
 
 
+
+#endif

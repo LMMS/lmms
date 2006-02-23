@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_sample_recorder.cpp - device-class that implements recording
  *                             surround-audio-buffers into RAM, maybe later
@@ -113,3 +115,5 @@ void audioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
+
+#endif

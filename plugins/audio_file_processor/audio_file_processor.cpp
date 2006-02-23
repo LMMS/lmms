@@ -60,6 +60,7 @@
 #include "string_pair_drag.h"
 #include "mmp.h"
 
+#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 
@@ -171,7 +172,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 	m_ampKnob = new knob( knobDark_28, this, tr( "Amplify" ), eng() );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
-	m_ampKnob->setValue( 100.0f, TRUE );
+	m_ampKnob->setInitValue( 100.0f );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
 	m_ampKnob->setLabel( tr( "AMP" ) );
 	connect( m_ampKnob, SIGNAL( valueChanged( float ) ), this,
@@ -190,7 +191,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 									eng() );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
-	m_startKnob->setValue( 0.0f, TRUE );
+	m_startKnob->setInitValue( 0.0f );
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setLabel( tr( "START" ) );
 	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
@@ -209,7 +210,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng() );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
-	m_endKnob->setValue( 1.0f, TRUE );
+	m_endKnob->setInitValue( 1.0f );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setLabel( tr( "END" ) );
 	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,

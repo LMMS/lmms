@@ -4,9 +4,9 @@ dist-hook:
 	rm -rf `find $(distdir) -name \*.moc`
 
 
-install-exec-hook:
-	cd $(DESTDIR)$(bindir) ; \
-	strip lmms
+#install-exec-hook:
+#	cd $(DESTDIR)$(bindir) ; \
+#	strip lmms
 
 
 if HAVE_RPM
@@ -188,6 +188,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/tool_button.cpp			\
 		$(srcdir)/src/widgets/tooltip.cpp			\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
+		$(srcdir)/src/lmms_single_source.cpp			\
 		$(srcdir)/include/pch.h					\
 		$(srcdir)/include/debug.h				\
 		$(srcdir)/include/main_window.h				\
@@ -294,6 +295,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/combobox.h				\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
+		$(srcdir)/include/automatable_object.h			\
 		$(srcdir)/include/qxembed.h
 
 

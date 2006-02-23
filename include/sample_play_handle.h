@@ -37,9 +37,8 @@ class audioPort;
 class samplePlayHandle : public playHandle
 {
 public:
-	samplePlayHandle( const QString & _sample_file, engine * _engine )
-								FASTCALL;
-	samplePlayHandle( sampleBuffer * _sample_buffer ) FASTCALL;
+	samplePlayHandle( const QString & _sample_file, engine * _engine );
+	samplePlayHandle( sampleBuffer * _sample_buffer );
 	virtual ~samplePlayHandle();
 
 	virtual void play( void );

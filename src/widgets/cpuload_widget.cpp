@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * cpuload_widget.cpp - widget for displaying CPU-load (partly based on
  *                      Hydrogen's CPU-load-widget)
@@ -117,3 +119,5 @@ void cpuloadWidget::updateCpuLoad()
 
 #include "cpuload_widget.moc"
 
+
+#endif

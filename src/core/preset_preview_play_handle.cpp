@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
@@ -227,3 +229,5 @@ constNotePlayHandleVector presetPreviewPlayHandle::nphsOfChannelTrack(
 
 
 
+
+#endif

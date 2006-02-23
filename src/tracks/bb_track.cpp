@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
@@ -88,14 +90,14 @@ void bbTCO::constructContextMenu( QMenu * _cm )
 {
 #ifdef QT4
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Bassline-Editor" ),
+					tr( "Open in Beat+Baseline-Editor" ),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ), this,
 					SLOT( openInBBEditor( bool ) ) );
 #else
 	_cm->insertItem( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Bassline-Editor" ),
+					tr( "Open in Beat+Baseline-Editor" ),
 					this, SLOT( openInBBEditor() ),
 								0, -1, 0 );
 #endif
@@ -291,7 +293,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	csize bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
-	m_trackLabel = new nameLabel( tr( "Beat/Bassline %1" ).arg( bbNum ),
+	m_trackLabel = new nameLabel( tr( "Beat/Baseline %1" ).arg( bbNum ),
 					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
 	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
@@ -517,3 +519,5 @@ void bbTrack::clickedTrackLabel( void )
 
 #include "bb_track.moc"
 
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
@@ -230,3 +232,5 @@ void midiALSARaw::setupWidget::saveSettings( void )
 
 #endif
 
+
+#endif

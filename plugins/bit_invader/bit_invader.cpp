@@ -67,9 +67,10 @@ using namespace std;
 #include "song_editor.h"
 #include "oscillator.h"
 #include "sample_buffer.h"
-#include "embed.cpp"
 #include "base64.h"
 
+#undef SINGLE_SOURCE_COMPILE
+#include "embed.cpp"
 
 extern "C"
 {
@@ -193,7 +194,7 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ),
 									eng() );
 	m_sampleLengthKnob->setRange( 8, 128, 1 );
- 	m_sampleLengthKnob->setValue( 128, TRUE );
+ 	m_sampleLengthKnob->setInitValue( 128 );
 	m_sampleLengthKnob->move( 10, 120 );
 	m_sampleLengthKnob->setHintText( tr( "Sample Length" ) + " ", "" );
 

@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
@@ -333,3 +335,5 @@ void FASTCALL audioDevice::clearS16Buffer( int_sample_t * _outbuf,
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
+
+#endif

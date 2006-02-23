@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * group_box.cpp - groupbox for LMMS
  *
@@ -68,6 +70,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 		s_ledBg = new QPixmap( embed::getIconPixmap(
 							"groupbox_led_bg" ) );
 	}
+
 	updatePixmap();
 
 	m_led = new pixmapButton( this );
@@ -239,3 +242,5 @@ void groupBox::updatePixmap( void )
 
 #include "group_box.moc"
 
+
+#endif

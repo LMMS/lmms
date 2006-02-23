@@ -62,6 +62,7 @@
 #include "song_editor.h"
 #include "lvsl_client.h"
 
+#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

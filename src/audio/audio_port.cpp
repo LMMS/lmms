@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * audio_port.cpp - base-class for objects providing sound at a port
  *
@@ -102,3 +104,5 @@ void audioPort::setName( const QString & _name )
 	eng()->getMixer()->audioDev()->renamePort( this );
 }
 
+
+#endif

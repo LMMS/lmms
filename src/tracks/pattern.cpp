@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
@@ -229,6 +231,7 @@ midiTime pattern::length( void ) const
 note * pattern::addNote( const note & _new_note )
 {
 	note * new_note = new note( _new_note );
+	new_note->quantizePos( eng()->getPianoRoll()->quantization() );
 
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
@@ -1342,3 +1345,5 @@ void patternFreezeThread::run( void )
 
 #include "pattern.moc"
 
+
+#endif

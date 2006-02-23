@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * tempo_sync_knob.cpp - adds bpm to ms conversion for knob class
  *
@@ -294,8 +296,7 @@ void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 						": invalid tempoSyncMode" );
 				break;
 		}
-		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ),
-				 FALSE );
+		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
 	}
 	else
 	{
@@ -391,3 +392,5 @@ void tempoSyncKnob::setSyncIcon( const QPixmap & _new_icon )
 
 #include "tempo_sync_knob.moc"
 
+
+#endif

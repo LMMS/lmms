@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * oscillator.cpp - implementation of powerful oscillator-class
  *
@@ -156,10 +158,11 @@ void x::updateSync( sampleFrame * _ab, const fpab_t _frames,		\
 class x : public oscillator						\
 {									\
 public:									\
-	x( const modulationAlgos modulation_algo, const float _freq,	\
+	inline x( const modulationAlgos modulation_algo,		\
+						const float _freq,	\
 		const Sint16 _phase_offset, const float _volume_factor,	\
 		const sample_rate_t _sample_rate,			\
-				oscillator * _sub_osc ) FASTCALL :	\
+				oscillator * _sub_osc ) :		\
 	oscillator( modulation_algo, _freq, _phase_offset,		\
 			_volume_factor, _sample_rate, _sub_osc )	\
 	{								\
@@ -269,3 +272,5 @@ void oscillator::recalcOscCoeff( const float additional_phase_offset )
 		--m_sample;
 	}
 }
+
+#endif

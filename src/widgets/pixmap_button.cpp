@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * pixmap_button.cpp - implementation of pixmap-button (often used as "themed"
  *                     checkboxes/radiobuttons etc)
@@ -171,3 +173,5 @@ void pixmapButton::setBgGraphic( const QPixmap & _pm )
 
 #include "pixmap_button.moc"
 
+
+#endif

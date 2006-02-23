@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * base64.cpp - namespace base64 with methods for encoding/decoding binary data
  *              to/from base64
@@ -165,3 +167,5 @@ void decode( const QString & _b64, char * * _data, int * _size )
 
 #endif
 
+
+#endif

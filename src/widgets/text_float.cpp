@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * text_float.cpp - class textFloat, a floating text-label
  *
@@ -280,3 +282,5 @@ void textFloat::updateSize( void )
 
 #undef setParent
 
+
+#endif

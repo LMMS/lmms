@@ -1,5 +1,6 @@
 to be done as soon as possible:
 
+- KNOB-setValue!!!
 - separate GUI and data/sound-processing-code
 - fix qtimer-problem /channel-activity-LEDs
 - make color-scheme switchable: LMMS / user

@@ -80,6 +80,8 @@ public:
 		return( m_pattern != NULL );
 	}
 
+	int quantization( void ) const;
+
 
 public slots:
 	virtual void update( void );
@@ -165,6 +167,8 @@ private:
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
 
+	midiTime newNoteLen( void ) const;
+
 
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;
@@ -193,6 +197,8 @@ private:
 	toolButton * m_pasteButton;
 
 	comboBox * m_zoomingComboBox;
+	comboBox * m_quantizeComboBox;
+	comboBox * m_noteLenComboBox;
 
 	QPixmap m_paintPixmap;
 	bool m_cursorInside;

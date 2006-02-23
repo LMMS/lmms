@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * rubberband.cpp - rubberband - either own implementation for Qt3 or wrapper
  *                               for Qt4
@@ -161,3 +163,5 @@ vvector<selectableObject *> rubberBand::selectableObjects( void ) const
 
 #include "rubberband.moc"
 
+
+#endif
