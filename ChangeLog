@@ -1,3 +1,9 @@
+2006-02-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/tracks/channel_track.cpp:
+	apply a very basic envelope at the beginning and the end of a note for
+	avoiding these "typical" clicks which were there before
+
 2006-02-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* configure.in:

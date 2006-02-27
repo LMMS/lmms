@@ -56,7 +56,7 @@ public:
 	virtual inline bool done( void ) const
 	{
 		return( ( m_released && m_framesBeforeRelease == 0 &&
-			m_releaseFramesDone >= m_releaseFramesToDo  ) ||
+			m_releaseFramesDone >= m_releaseFramesToDo ) ||
 						m_channelTrack == NULL );
 	}
 

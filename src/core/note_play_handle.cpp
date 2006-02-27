@@ -51,7 +51,7 @@ notePlayHandle::notePlayHandle( channelTrack * _chnl_trk,
 	m_framesAhead( _frames_ahead ),
 	m_totalFramesPlayed( 0 ), 
 	m_framesBeforeRelease( 0 ),
-	m_releaseFramesToDo( 0 ),  
+	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
 	m_released( FALSE ),
 	m_baseNote( TRUE  ),
@@ -246,8 +246,8 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	if( m_channelTrack != NULL )
 	{
-		m_releaseFramesToDo =
-				m_channelTrack->m_envWidget->releaseFrames();
+		m_releaseFramesToDo = tMax<f_cnt_t>( 10,
+				m_channelTrack->m_envWidget->releaseFrames() );
 		if( !configManager::inst()->value( "ui",
 						"manualchannelpiano" ).toInt() )
 		{
@@ -264,7 +264,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	}
 	else
 	{
-		m_releaseFramesToDo = 0;
+		m_releaseFramesToDo = 10;
 	}
 
 	m_released = TRUE;
