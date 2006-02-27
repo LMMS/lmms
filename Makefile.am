@@ -296,6 +296,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/automatable_object.h			\
+		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/qxembed.h
 
 
