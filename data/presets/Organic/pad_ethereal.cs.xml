@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4-cvs20060209" type="channelsettings" version="1.0" >
+  <head/>
+  <channelsettings>
+    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="100" name="Default" basetone="0" tab="1" >
+      <organic harmonic4="3" wavetype1="3" harmonic5="4" wavetype2="3" vol0="79" harmonic6="5" wavetype3="3" vol1="72" num_osc="8" harmonic7="6" wavetype4="0" vol2="31" wavetype5="0" vol3="77" detune0="6" wavetype6="4" vol4="0" detune1="0" wavetype7="0" vol5="13" detune2="14" vol6="20" detune3="6" vol7="69" detune4="0" pan0="0" detune5="0" pan1="0" detune6="-60" pan2="0" detune7="52" pan3="0" pan4="0" pan5="0" harmonic0="0.5" vol="100" pan6="0" harmonic1="0.75" foldback="0" pan7="0" harmonic2="1" harmonic3="2" wavetype0="3" />
+      <eldata fres="0.89" ftype="0" fcut="5600" fwet="1" >
+        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.404" ctlenvamt="0" latt="0" sus="0.329" lspd="0.1" att="0.247" pdel="0" lamt="0" dec="0.702" userwavefile="" x100="0" lshp="0" hold="0.329" />
+        <elcut lfosyncmode="0" lpdel="0" amt="0.595" rel="0.1" ctlenvamt="1" latt="0" sus="0.499" lspd="0.0496" att="0.346" pdel="0" lamt="1" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+      </eldata>
+      <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+      <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+    </channeltrack>
+  </channelsettings>
+</multimediaproject>

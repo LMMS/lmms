@@ -20,10 +20,11 @@ endif
 
 
 
-SUBDIRS = artwork buildtools locale midi-maps plugins presets projects samples
+SUBDIRS = buildtools data plugins
 
 
-INCLUDES = -I$(srcdir)/include -I. -I/usr/include/wine -I/usr/include/wine/windows
+INCLUDES = -I$(srcdir)/include -I.
+#-I/usr/include/wine -I/usr/include/wine/windows
 bin_PROGRAMS = lmms
 
 
@@ -34,7 +35,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 	$(MOC) -o $@ $<
 
 %.ts: 
-	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name *.cpp` -ts locale/$@
+	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name *.cpp` -ts data/locale/$@
 
 %.qm: %.ts
 	$(LRELEASE) $<
@@ -98,7 +99,7 @@ lmms_MOC =						\
 
 BUILT_SOURCES = $(lmms_MOC)
 
-lmms_EMBEDDED_RESOURCES = $(wildcard $(srcdir)/resources/*png AUTHORS COPYING)
+lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 
 ./embedded_resources.h: $(lmms_EMBEDDED_RESOURCES)
 	$(top_builddir)/buildtools/bin2res $(lmms_EMBEDDED_RESOURCES) > $@

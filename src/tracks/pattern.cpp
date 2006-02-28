@@ -129,7 +129,16 @@ pattern::~pattern()
 	if( eng()->getPianoRoll()->currentPattern() == this )
 	{
 		eng()->getPianoRoll()->setCurrentPattern( NULL );
+		// we have to have the song-editor to stop playing if it played
+		// us before
+		if( eng()->getSongEditor()->playing() &&
+			eng()->getSongEditor()->playMode() ==
+							songEditor::PLAY_PATTERN )
+		{
+			eng()->getSongEditor()->playPattern( NULL );
+		}
 	}
+
 	for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{

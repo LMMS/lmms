@@ -166,8 +166,9 @@ configManager::configManager( void ) :
 	// hardcode since qt < 3.2 doesn't know something like
 	// applicationDirPath and implementing own function would be senseless
 	// since real support for qt < 3.2 is senseless too ;-)
-	m_dataDir( "/usr/share/lmms" ),
+	m_dataDir( "/usr/share/lmms/" ),
 #endif
+	m_artworkDir( m_dataDir + DEFAULT_THEME_PATH ),
 #if QT_VERSION >= 0x030200
 	m_pluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/lib/lmms/" ),
@@ -547,6 +548,14 @@ void configManager::setVSTDir( const QString & _vd )
 
 
 
+void configManager::setArtworkDir( const QString & _ad )
+{
+	m_artworkDir = _ad;
+}
+
+
+
+
 void configManager::accept( void )
 {
 	if( m_workingDir.right( 1 ) != "/" )
@@ -797,6 +806,10 @@ bool configManager::loadConfigFile( void )
 		node = node.nextSibling();
 	}
 
+	if( value( "paths", "artwork" ) != "" )
+	{
+		m_artworkDir = value( "paths", "artwork" );
+	}
 	m_workingDir = value( "paths", "workingdir" );
 	m_vstDir = value( "paths", "vstdir" );
 
@@ -847,6 +860,7 @@ bool configManager::loadConfigFile( void )
 
 void configManager::saveConfigFile( void )
 {
+	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 

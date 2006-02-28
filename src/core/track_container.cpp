@@ -190,7 +190,9 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 void trackContainer::cloneTrack( track * _track )
 {
+	eng()->getMixer()->pause();
 	track::clone( _track );
+	eng()->getMixer()->play();
 }
 
 

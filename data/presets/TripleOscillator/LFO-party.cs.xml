@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.0.9" type="channelsettings" version="1.0" >
+  <head/>
+  <channelsettings>
+    <channeltrack surpos="134219776" muted="0" fxch="0" tbidx="1" baseoct="4" vol="100" name="LFO-party" basetone="9" >
+      <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="2" coarse1="12" userwavefile2="samples/empty.wav" wavetype2="2" coarse2="-12" vol0="85" vol1="51" finel0="0" vol2="48" finel1="-10" finel2="0" modalgo1="2" stphdetun0="0" pan0="0" modalgo2="2" stphdetun1="0" pan1="12" stphdetun2="296" pan2="-37" phoffset0="0" phoffset1="0" phoffset2="89" finer0="0" finer1="10" finer2="0" userwavefile0="samples/empty.wav" wavetype0="2" coarse0="0" />
+      <eldata fres="0.21" ftype="6" fcut="1834" fwet="1" >
+        <elvol lpdel="0" amt="1" rel="0.242" latt="0" sus="0.238" lspd="0.3624" att="0" pdel="0" lamt="-0.16" dec="0.444" x100="0" lshp="0" hold="0" />
+        <elpan lpdel="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
+        <elpitch lpdel="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
+        <elcut lpdel="0" amt="0" rel="0" latt="0" sus="0.999" lspd="0.6011" att="0" pdel="0" lamt="0.64" dec="0.999" x100="0" lshp="1" hold="0" />
+        <elres lpdel="0" amt="0" rel="0" latt="0" sus="0.999" lspd="0.4752" att="0" pdel="0" lamt="0.395" dec="0.5" x100="0" lshp="1" hold="0" />
+      </eldata>
+      <arpandchords chordrange="1" arprange="3" chord="0" arpgate="100" arp="8" arptime="100" arpdir="4" />
+    </channeltrack>
+  </channelsettings>
+</multimediaproject>

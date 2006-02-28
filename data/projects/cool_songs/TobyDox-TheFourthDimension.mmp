@@ -1,0 +1,435 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060115" type="song" version="1.0" >
+  <head>
+    <bpm value="140" />
+    <mastervol value="28" />
+    <masterpitch value="0" />
+  </head>
+  <song>
+    <trackcontainer type="songeditor" >
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 1" >
+          <trackcontainer type="bbeditor" >
+            <track muted="0" type="0" >
+              <channeltrack surpos="106432488" fxch="0" baseoct="4" vol="50" name="Analog Dreamz" basetone="9" tab="1" >
+                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="-12" userwavefile2="" wavetype2="2" coarse2="-24" vol0="100" vol1="100" finel0="-18" vol2="100" finel1="14" finel2="0" modalgo1="2" stphdetun0="0" pan0="0" modalgo2="2" stphdetun1="0" pan1="0" stphdetun2="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" finer0="15" finer1="-5" finer2="0" userwavefile0="" wavetype0="2" coarse0="-12" />
+                <eldata fres="4.73" ftype="1" fcut="95" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.423" ctlenvamt="0" latt="0" sus="0.523" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.464" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0.425" rel="0.182" ctlenvamt="0" latt="0" sus="0.717" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.629" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="2" arprange="1" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="Analog Dreamz" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Analog Dreamz" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Analog Dreamz" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="Analog Dreamz" pos="192" frozen="0" len="128" >
+                <note tone="2" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="10" pan="0" oct="5" vol="100" pos="56" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="0" pan="0" oct="6" vol="100" pos="72" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="2" pan="0" oct="6" vol="100" pos="88" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="4" pan="0" oct="6" vol="100" pos="104" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="1" name="Analog Dreamz" pos="256" frozen="0" len="128" >
+                <note tone="9" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="7" pan="0" oct="6" vol="100" pos="8" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="4" pan="0" oct="6" vol="100" pos="24" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="7" pan="0" oct="6" vol="100" pos="40" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="4" pan="0" oct="6" vol="100" pos="56" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="72" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="2" pan="0" oct="6" vol="100" pos="88" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="104" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="2" pan="0" oct="6" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="1" name="Analog Dreamz" pos="320" frozen="0" len="128" >
+                <note tone="9" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="2" pan="0" oct="6" vol="100" pos="8" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="4" pan="0" oct="6" vol="100" pos="24" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="40" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="2" pan="0" oct="6" vol="100" pos="56" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="72" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="5" pan="0" oct="6" vol="100" pos="88" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="7" pan="0" oct="6" vol="100" pos="104" len="8" />
+                <note tone="9" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="9" pan="0" oct="6" vol="100" pos="120" len="8" />
+              </pattern>
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="3" vol="22" name="Soft Strings" basetone="9" tab="1" >
+                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="samples/shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="42" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+                <eldata fres="1.06" ftype="0" fcut="1437" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.418" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.597" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.356" ctlenvamt="0" latt="0" sus="0" lspd="0.486" att="0.416" pdel="0" lamt="0.35" dec="0.136" userwavefile="" x100="1" lshp="0" hold="0" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.6717" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="158" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="1" name="Soft Strings" pos="0" frozen="0" len="640" >
+                <note tone="2" pan="0" oct="3" vol="100" pos="0" len="640" />
+                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="64" />
+                <note tone="2" pan="0" oct="4" vol="100" pos="64" len="64" />
+                <note tone="5" pan="0" oct="4" vol="100" pos="128" len="64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="192" len="64" />
+                <note tone="9" pan="0" oct="3" vol="100" pos="192" len="65" />
+                <note tone="7" pan="0" oct="4" vol="100" pos="256" len="64" />
+                <note tone="0" pan="0" oct="4" vol="100" pos="256" len="64" />
+                <note tone="9" pan="0" oct="3" vol="100" pos="320" len="64" />
+                <note tone="5" pan="0" oct="4" vol="100" pos="320" len="64" />
+                <note tone="4" pan="0" oct="4" vol="100" pos="384" len="64" />
+                <note tone="10" pan="0" oct="3" vol="100" pos="384" len="64" />
+                <note tone="2" pan="0" oct="4" vol="100" pos="448" len="64" />
+                <note tone="7" pan="0" oct="3" vol="100" pos="448" len="64" />
+                <note tone="9" pan="0" oct="3" vol="100" pos="512" len="64" />
+                <note tone="1" pan="0" oct="4" vol="100" pos="512" len="64" />
+                <note tone="9" pan="0" oct="3" vol="100" pos="576" len="64" />
+                <note tone="2" pan="0" oct="4" vol="100" pos="576" len="64" />
+              </pattern>
+              <pattern steps="16" type="0" name="Soft Strings" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Soft Strings" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Soft Strings" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Soft Strings" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Soft Strings" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="75" name="Short3" basetone="9" tab="0" >
+                <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="4" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="4" coarse2="0" vol0="50" vol1="50" finel0="0" vol2="100" finel1="0" finel2="0" modalgo1="2" stphdetun0="162" pan0="0" modalgo2="2" stphdetun1="70" pan1="0" stphdetun2="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" finer0="0" finer1="0" finer2="0" userwavefile0="samples/empty.wav" wavetype0="2" coarse0="0" />
+                <eldata fres="1.96" ftype="0" fcut="33" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.365" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.143" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.404" ctlenvamt="0" latt="0" sus="0.643" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.324" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="Short3" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="Short3" pos="64" frozen="0" len="640" >
+                <note tone="2" pan="0" oct="3" vol="100" pos="0" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="4" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="8" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="16" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="20" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="24" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="32" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="36" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="40" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="48" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="52" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="56" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="64" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="68" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="72" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="80" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="84" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="88" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="96" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="100" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="104" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="112" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="116" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="120" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="128" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="132" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="136" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="144" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="148" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="152" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="160" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="164" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="168" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="176" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="180" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="184" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="192" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="196" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="200" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="208" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="212" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="216" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="224" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="228" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="232" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="240" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="244" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="248" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="256" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="260" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="264" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="272" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="276" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="280" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="288" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="292" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="296" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="304" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="308" len="3" />
+                <note tone="7" pan="0" oct="2" vol="100" pos="312" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="320" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="324" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="328" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="336" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="340" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="344" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="352" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="356" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="360" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="368" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="372" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="376" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="384" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="388" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="392" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="400" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="404" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="408" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="416" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="420" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="424" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="432" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="436" len="3" />
+                <note tone="10" pan="0" oct="2" vol="100" pos="440" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="448" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="452" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="456" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="464" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="468" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="472" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="480" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="484" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="488" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="496" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="500" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="504" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="512" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="516" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="520" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="528" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="532" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="536" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="544" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="548" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="552" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="560" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="564" len="3" />
+                <note tone="9" pan="0" oct="2" vol="100" pos="568" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="576" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="580" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="584" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="592" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="596" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="600" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="608" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="612" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="616" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="624" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="628" len="3" />
+                <note tone="2" pan="0" oct="3" vol="100" pos="632" len="3" />
+              </pattern>
+              <pattern steps="16" type="0" name="Short3" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Short3" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Short3" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Short3" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="132646936" fxch="0" baseoct="4" vol="100" name="bassdrum04.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999611" sframe="0" amp="381" src="drums/bassdrum04.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="bassdrum04.ogg" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="shaker02.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999196" sframe="0" amp="100" src="drums/shaker02.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker02.ogg" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="shaker03.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998949" sframe="0" amp="100" src="drums/shaker03.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="shaker03.ogg" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_closed04.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998915" sframe="0" amp="100" src="drums/hihat_closed04.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="4" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="28" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="44" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="52" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed04.ogg" pos="320" frozen="0" len="64" />
+            </track>
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_opened02.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999834" sframe="0" amp="100" src="drums/hihat_opened02.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="320" frozen="0" len="64" />
+            </track>
+          </trackcontainer>
+        </bbtrack>
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="0" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="640" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="1280" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="1920" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="2560" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="3200" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="3840" len="640" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="4480" len="256" />
+        <bbtco name="Beat/Baseline 1" color="4282417407" pos="5632" len="1280" />
+      </track>
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 2" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="640" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="1920" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="2560" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="3200" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="3840" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="4608" len="128" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="4736" len="384" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="4480" len="128" />
+        <bbtco name="Beat/Baseline 2" color="4294947840" pos="5632" len="640" />
+      </track>
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 2" />
+        <bbtco name="Beat/Baseline 2" color="4290707456" pos="1280" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4290707456" pos="1920" len="640" />
+        <bbtco name="Beat/Baseline 2" color="4290707456" pos="3200" len="2176" />
+      </track>
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 6" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="2560" len="256" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="2944" len="128" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="3200" len="256" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="3840" len="256" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="4480" len="512" />
+        <bbtco name="Beat/Baseline 6" color="4278233600" pos="4224" len="128" />
+      </track>
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 8" />
+        <bbtco name="Beat/Baseline 8" color="4278233600" pos="2816" len="128" />
+        <bbtco name="Beat/Baseline 8" color="4278233600" pos="3456" len="384" />
+        <bbtco name="Beat/Baseline 8" color="4278233600" pos="4096" len="128" />
+        <bbtco name="Beat/Baseline 8" color="4278233600" pos="4992" len="640" />
+      </track>
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 7" />
+        <bbtco name="Beat/Baseline 7" color="4278233600" pos="3072" len="128" />
+        <bbtco name="Beat/Baseline 7" color="4278233600" pos="4352" len="128" />
+      </track>
+    </trackcontainer>
+    <projectnotes><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:11pt;font-family:Bitstream Vera Sans">
+<p><span style="font-style:italic;font-size:16pt;font-weight:600;color:#00ff00">TobyDox - &quot;The Fourth Dimension&quot;</span></p>
+<p><span style="font-weight:600;color:#ffc000">There's not much to say, just listen...</span></p>
+</body></html>
+]]></projectnotes>
+  </song>
+</multimediaproject>

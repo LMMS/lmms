@@ -1,3 +1,31 @@
+2006-02-27	Zolo <the-zolo/at/gmx/dot/de>
+
+	* data/themes/dark_expert/:
+	added new theme for LMMS
+
+2006-02-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/song_editor.cpp:
+	* src/tracks/pattern.cpp:
+	do not crash when playing a pattern which is deleted
+
+	* src/core/track_container.cpp:
+	pause mixer when cloning tracks for avoiding side-effects, probably
+	fixes some crash-bugs
+
+	* include/config_mgr.h:
+	* include/setup_dialog.h:
+	* src/core/config_mgr.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/lib/embed.cpp:
+	first simple support for theming
+
+	* Makefile.am:
+	* configure.in:
+	re-organized all data-directories (samples, presets, localizations,
+	artwork etc.) and put them into data/ dir to be all installed into
+	$prefix/share/lmms
+
 2006-02-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/tracks/channel_track.cpp:

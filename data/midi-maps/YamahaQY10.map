@@ -1,0 +1,305 @@
+# Midi map file for the Yamaha QY10 "walkstation", a basic sequencer / tone
+# module. 
+
+# Provided by Malcolm Tyrrell. If there is a problem with this file, please
+# e-mail tyrrelmr@cs.tcd.ie
+
+# If you make a new map, please send it to Antonio, so future releases
+# will include them.
+#       Antonio Larrosa Jimenez,   larrosa@kde.org
+
+# Yamaha QY10 Map File
+
+DEFINE PATCHMAP
+AcusticPiano  =0
+BrightPiano   =0
+SynthPiano    =1
+HonkyTonky    =0
+ElectricPiano1=1
+ElectricPiano2=2
+Harpsichord   =3
+Clavinet      =3
+Celeste       =18
+Glockenspiel  =18
+Musicbox      =20
+Vibes         =19
+Marimba       =18
+Xylophon      =20
+TubeBell      =19
+Santur        =12
+HomeOrg       =4
+PercussionOrg =4
+RockOrg       =4
+ChurchOrg     =5
+ReedOrg       =5
+Accordion     =5
+Harmonica     =23
+Concrtna      =23
+NylonGuitar   =12
+AcusticGuitar =12
+JazzGuitar    =9
+CleanGuitar   =9
+MuteGuitar    =11
+OdGuitar      =9
+DistortionGuit=10
+GtrHarm       =25
+AcusticBass   =13
+FingerBass    =14
+PickBass      =14
+FretlessBass  =13
+SlapBass1     =15
+SlapBass2     =15
+SynthBass1    =16
+SynthBass2    =16
+Violin        =23
+Viola         =23
+Cello         =23
+Contrabajo    =23
+Marcato       =6
+Pizzicato     =16
+Harp          =12
+Timpani       =20
+Marcato       =6
+SlowStrings   =6
+SynthStrings1 =22
+SynthStrings2 =22
+Choir         =27
+Doo           =21
+Voices        =21
+OrchestraHit  =8
+Trumpet       =26
+Trombone      =26
+Tuba          =21
+MuteTrumpet   =8
+FrenchHorn    =26
+HitBrass      =8
+SynthBrass1   =21
+SynthBrass2   =21
+SopranoSax    =26
+AltoSax       =26
+TenorSax      =26
+BaritoneSax   =26
+Oboe          =27
+EnglishHorn   =26
+Bassoon       =27
+Clarinet      =27
+Piccolo       =27
+Flute         =27
+Recorder      =27
+WoodFlute     =27
+Bottle        =27
+Shakazul      =27
+Whistle       =27
+Ocarina       =27
+SquareWave    =28
+SawWave       =28
+Calliope      =29
+Chiflead      =29
+Charang       =24
+VoxLead       =21
+Lead5th       =21
+BassLead      =21
+Fantasia      =24
+WarmPad       =21
+Polysyn       =22
+Ghostie       =27
+BowGlass      =26
+MetalPad      =21
+HaloPad       =27
+Sweeper       =24
+Aurora        =31
+SoundTrack    =21
+Crystal       =19
+Atmosphear    =24
+FreshAir      =21
+Unicorn       =24
+Sweeper       =24
+StarTrak      =21
+Sitar         =9
+Banjo         =9
+Shamisen      =12
+Koto          =12
+Kalimba       =18
+BagPipes      =28
+Fiddle        =28
+Shannai       =23
+Carillon      =19
+Agogo         =20
+SteelDrm      =18
+WoodBlk       =20
+Taiko         =20
+Toms          =18
+Syntom        =18
+RevCymbal     =31
+Fx-Fret       =31
+Fx-Blow       =31
+Seashore      =31
+Jungle        =31
+Telephon      =5
+Helicopter    =31
+Applause      =31
+Gunshot       =31
+END
+
+DEFINE KEYMAP "Drumset"
+C 0 =0
+C#0 =1
+D 0 =2
+D#0 =3
+E 0 =4
+F 0 =5
+F#0 =6
+G 0 =7
+G#0 =8
+A 0 =9
+A#0 =10
+B 0 =11
+C 1 =12
+C#1 =13
+D 1 =14
+D#1 =15
+E 1 =16
+F 1 =17
+F#1 =18
+G 1 =19
+G#1 =20
+A 1 =21
+A#1 =22
+B 1 =23
+C 2 =24
+C#2 =25
+D 2 =26
+# What is a high q?
+D#2 27 Highq    =40
+E 2 28 Slap     =37
+F 2 29 Scratch1 =23
+F#2 30 Scratch2 =48
+G 2 31 Sticks   =21
+G#2 32 SqrClick =42
+A 2 33 MetaClick=42
+A#2 34 MetBell  =43
+B 2 35 Kick1    =36
+C 3 36 Kick2    =12
+C#3 37 StickRim =21
+D 3 38 Snare1   =15
+D#3 39 Claps    =19
+E 3 40 snare2   =14
+F 3 41 tomlo2   =16
+F#3 42 Hihatclos=23
+G 3 43 Tomlo1   =16
+G#3 44 HihatPd  =23
+A 3 45 Tommid2  =17
+A#3 46 Hihatop  =24
+B 3 47 Tommid1  =17
+C 4 48 Tomhi2   =18
+C#4 49 Cymbalcrsh1 =20
+D 4 50 Tomhi1      =18
+D#4 51 Cymbalride1 =22
+E 4 52 Cymbalchina =22
+F 4 53 Cymbell     =22
+F#4 54 Tamborin    =21
+G 4 55 CymbalSplash=20
+G#4 56 Cowbell     =37
+A 4 57 Cymbalcrash2=20
+A#4 58 Vibslap     =0
+B 4 59 Cymbalride2 =22
+C 5 60 Bongohi  =41
+C#5 61 Bongolo  =40
+D 5 62 Congahi1 =41
+D#5 63 congahi2 =41
+E 5 64 Congalo  =40
+F 5 65 Timbalehi=46
+F#5 66 Timbalelo=45
+G 5 67 Agogohi  =44
+G#5 68 Agogolo  =43
+A 5 69 Cabasa   =48
+A#5 70 Maracas  =48
+B 5 71 whistle1 =0
+C 6 72 whistle2 =0
+C#6 73 Guiro1   =0
+D 6 74 Guiro2   =0
+D#6 75 Clave    =44
+E 6 76 Woodblock1=40
+F 6 77 Woodblock2=41
+# Don't know about the following two
+F#6 78 Cuica1   =0
+G 6 79 Cuica2   =0
+G#6 80 Triangle1=44
+A 6 81 Triangle2=44
+A#6 82 Shaker   =48
+B 6 83 Jingles  =23
+C 7 84 Belltree =0
+C#7 85 Canstinet=21
+D 7 86 Surdo1   =16
+D#7 87 Surdo2   =17
+E 7 =88
+F 7 =89
+F#7 =90
+G 7 =91
+G#7 =92
+A 7 =93
+A#7 =94
+B 7 =95
+C 8 =96
+C#8 =97
+D 8 =98
+D#8 =99
+E 8 =100
+F 8 =101
+F#8 =102
+G 8 =103
+G#8 =104
+A 8 =105
+A#8 =106
+B 8 =107
+C 9 =108
+C#9 =109
+D 9 =110
+D#9 =111
+E 9 =112
+F 9 =113
+F#9 =114
+G 9 =115
+G#9 =116
+A 9 =117
+A#9 =118
+B 9 =119
+C 10=120
+C#10=121
+D 10=122
+D#10=123
+E 10=124
+F 10=125
+F#10=126
+G 10=127
+END
+
+
+DEFINE CHANNELMAP
+# The information on channels 7-8 and 11-15 is ignored since the QY10 is only
+# 8 part multi-timbral. The polyphony should be okay.
+0 = 0
+1 = 1
+2 = 2
+3 = 3
+4 = 4
+5 = 5
+6 = 6
+# The next two channels are ignored
+7 = 9
+8 = 8
+# Play GM channel 9 (drums) on QY10 track 7 (rhythm track)
+9 = 7 Keymap "Drumset" ForcePatch 30
+# All the following channels are ignored.
+10 = 10
+11 = 11
+12 = 12
+13 = 13
+14 = 14
+15 = 15
+END
+
+# I don't think the QY10 responds to Expression Events, so...
+OPTIONS
+MapExpressionToVolumeEvents
+END

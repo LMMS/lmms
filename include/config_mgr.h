@@ -64,8 +64,8 @@ class engine;
 const QString PROJECTS_PATH = "projects/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
-const QString ARTWORK_PATH = "artwork/";
-const QString TRACK_ICON_PATH = "artwork/track_icons/";
+const QString DEFAULT_THEME_PATH = "themes/default/";
+const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
@@ -104,7 +104,7 @@ public:
 
 	QString artworkDir( void ) const
 	{
-		return( m_dataDir + ARTWORK_PATH );
+		return( m_artworkDir );
 	}
 
 	QString trackIconsDir( void ) const
@@ -138,7 +138,8 @@ public:
 
 public slots:
 	void setWorkingDir( const QString & _wd );
-	void setVSTDir( const QString & _wd );
+	void setVSTDir( const QString & _vd );
+	void setArtworkDir( const QString & _ad );
 
 
 protected slots:
@@ -173,6 +174,7 @@ private:
 	const QString m_lmmsRcFile;
 	QString m_workingDir;
 	QString m_dataDir;
+	QString m_artworkDir;
 	QString m_pluginDir;
 	QString m_vstDir;
 

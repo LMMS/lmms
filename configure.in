@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.4-cvs20060225, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060225)
+AC_INIT(lmms, 0.1.4-cvs20060227, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060227)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -430,11 +430,38 @@ fi
 
 
 AC_CONFIG_FILES([Makefile
-		 artwork/Makefile
-		 artwork/track_icons/Makefile
 		 buildtools/Makefile
-		 locale/Makefile
-		 midi-maps/Makefile
+		 data/Makefile
+		 data/locale/Makefile
+		 data/midi-maps/Makefile
+		 data/presets/Makefile
+		 data/presets/AudioFileProcessor/Makefile
+		 data/presets/BitInvader/Makefile
+		 data/presets/Organic/Makefile
+		 data/presets/PluckedStringSynth/Makefile
+		 data/presets/TripleOscillator/Makefile
+		 data/presets/VeSTige/Makefile
+		 data/projects/Makefile
+		 data/projects/cool_songs/Makefile
+		 data/projects/covers/Makefile
+		 data/projects/demos/Makefile
+		 data/projects/misc/Makefile
+		 data/projects/recorded_loops/Makefile
+		 data/projects/templates/Makefile
+		 data/projects/tutorials/Makefile
+		 data/samples/Makefile
+		 data/samples/basses/Makefile
+		 data/samples/bassloopes/Makefile
+		 data/samples/beats/Makefile
+		 data/samples/drums/Makefile
+		 data/samples/effects/Makefile
+		 data/samples/instruments/Makefile
+		 data/samples/latin/Makefile
+		 data/samples/misc/Makefile
+		 data/samples/shapes/Makefile
+		 data/samples/stringsnpads/Makefile
+		 data/themes/Makefile
+		 data/track_icons/Makefile
 		 plugins/Makefile
 		 plugins/audio_file_processor/Makefile
 		 plugins/bit_invader/Makefile
@@ -442,32 +469,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/plucked_string_synth/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
-		 presets/Makefile
-		 presets/AudioFileProcessor/Makefile
-		 presets/BitInvader/Makefile
-		 presets/Organic/Makefile
-		 presets/PluckedStringSynth/Makefile
-		 presets/TripleOscillator/Makefile
-		 presets/VeSTige/Makefile
-		 projects/Makefile
-		 projects/cool_songs/Makefile
-		 projects/covers/Makefile
-		 projects/demos/Makefile
-		 projects/misc/Makefile
-		 projects/recorded_loops/Makefile
-		 projects/templates/Makefile
-		 projects/tutorials/Makefile
-		 samples/Makefile
-		 samples/basses/Makefile
-		 samples/bassloopes/Makefile
-		 samples/beats/Makefile
-		 samples/drums/Makefile
-		 samples/effects/Makefile
-		 samples/instruments/Makefile
-		 samples/latin/Makefile
-		 samples/misc/Makefile
-		 samples/shapes/Makefile
-		 samples/stringsnpads/Makefile
 		 lmms.spec])
 AC_OUTPUT
 

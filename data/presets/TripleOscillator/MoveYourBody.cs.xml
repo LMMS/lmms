@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20051228" type="channelsettings" version="1.0" >
+  <head/>
+  <channelsettings>
+    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="160" name="Move your body" basetone="9" tab="1" >
+      <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="" wavetype2="2" coarse2="-12" vol0="33" vol1="33" finel0="0" vol2="33" finel1="-28" finel2="12" modalgo1="2" stphdetun0="130" pan0="0" modalgo2="2" stphdetun1="261" pan1="33" stphdetun2="94" pan2="-33" phoffset0="0" phoffset1="244" phoffset2="87" finer0="0" finer1="32" finer2="-16" userwavefile0="" wavetype0="2" coarse0="0" />
+      <eldata fres="1.64" ftype="0" fcut="8003" fwet="1" >
+        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.117" ctlenvamt="0" latt="0" sus="0.77" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.23" userwavefile="" x100="0" lshp="0" hold="0.058" />
+        <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0.499" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0.499" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+      </eldata>
+      <arpandchords chordrange="2" arprange="3" arpdisabled="0" chord="0" chorddisabled="0" arpgate="1" arp="0" arpsyncmode="6" arptime="107" arpdir="1" />
+      <midi inputchannel="0" outputchannel="0" receive="1" send="0" inports="80:0 CS46XX:CS46XX" />
+    </channeltrack>
+  </channelsettings>
+</multimediaproject>

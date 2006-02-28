@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060115" type="song" version="1.0" >
+  <head>
+    <bpm value="140" />
+    <mastervol value="100" />
+    <masterpitch value="0" />
+  </head>
+  <song>
+    <trackcontainer type="songeditor" >
+      <track muted="0" type="1" >
+        <bbtrack name="Beat/Baseline 0" >
+          <trackcontainer type="bbeditor" >
+            <track muted="0" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="50" name="Jupiter" basetone="9" tab="2" >
+                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="samples/shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="63" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+                <eldata fres="1.2" ftype="7" fcut="1754" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.328" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.597" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0.82" rel="0.016" ctlenvamt="1" latt="0" sus="0.998" lspd="0.2918" att="0" pdel="0" lamt="0.63" dec="0.136" userwavefile="" x100="0" lshp="1" hold="0" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="8" arpsyncmode="0" arptime="158" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="1" name="Jupiter" pos="0" frozen="0" len="64" >
+                <note tone="0" pan="0" oct="6" vol="100" pos="0" len="4" />
+                <note tone="5" pan="0" oct="5" vol="84" pos="4" len="4" />
+                <note tone="8" pan="0" oct="4" vol="64" pos="6" len="4" />
+                <note tone="8" pan="0" oct="5" vol="46" pos="8" len="4" />
+                <note tone="0" pan="0" oct="6" vol="54" pos="8" len="4" />
+                <note tone="1" pan="0" oct="5" vol="64" pos="12" len="4" />
+                <note tone="5" pan="0" oct="4" vol="34" pos="14" len="4" />
+                <note tone="8" pan="0" oct="5" vol="16" pos="16" len="4" />
+                <note tone="0" pan="0" oct="5" vol="42" pos="20" len="4" />
+                <note tone="0" pan="0" oct="6" vol="6" pos="24" len="4" />
+                <note tone="5" pan="0" oct="4" vol="34" pos="28" len="4" />
+                <note tone="0" pan="0" oct="6" vol="100" pos="32" len="4" />
+                <note tone="5" pan="0" oct="5" vol="88" pos="36" len="4" />
+                <note tone="8" pan="0" oct="5" vol="58" pos="40" len="4" />
+                <note tone="0" pan="0" oct="6" vol="52" pos="40" len="4" />
+                <note tone="1" pan="0" oct="5" vol="66" pos="44" len="4" />
+                <note tone="8" pan="0" oct="5" vol="16" pos="48" len="4" />
+                <note tone="0" pan="0" oct="5" vol="56" pos="52" len="4" />
+                <note tone="0" pan="0" oct="6" vol="6" pos="56" len="4" />
+                <note tone="5" pan="0" oct="4" vol="50" pos="60" len="4" />
+              </pattern>
+            </track>
+          </trackcontainer>
+        </bbtrack>
+        <bbtco name="Beat/Baseline 0" color="4282417407" pos="0" len="512" />
+      </track>
+    </trackcontainer>
+    <projectnotes><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:11pt;font-family:Bitstream Vera Sans">
+<p><span style="font-style:italic;font-size:12pt;font-weight:600;color:#ffcc00">How to edit dynamic note-volumes:</span></p>
+<p><span style="font-weight:600;color:#00ffff">1.</span><span style="color:#cbcbcb"> Open the piano-roll by double-clicking the the pattern in Beat+Baseline-Editor.</span></p>
+<p><span style="font-weight:600;color:#00ffff">2.</span><span style="color:#cbcbcb"> Now in the middle you can see several notes and at the bottom there's a line for each note whose length indicates the volume of the according note.</span></p>
+<p><span style="font-weight:600;color:#00ffff">3.</span><span style="color:#cbcbcb"> Try to change the volume of some notes by changing the length of these lines with the mouse.</span></p>
+<p><span style="font-weight:600;color:#00ffff">4.</span><span style="color:#cbcbcb"> Listen to the result by clicking on the &quot;play&quot;-button!</span></p>
+<p><span style="color:#cbcbcb">(</span><span style="font-weight:600;color:#00ffff">5.</span><span style="color:#cbcbcb"> Create your own tracks with dynamic note-volumes!!)</span></p>
+</body></html>
+]]></projectnotes>
+  </song>
+</multimediaproject>

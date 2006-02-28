@@ -896,9 +896,12 @@ void songEditor::processNextBuffer( void )
 			break;
 
 		case PLAY_PATTERN:
-			tco_num = m_patternToPlay->getTrack()->getTCONum(
+			if( m_patternToPlay != NULL )
+			{
+				tco_num = m_patternToPlay->getTrack()->getTCONum(
 							m_patternToPlay );
-			tv.push_back( m_patternToPlay->getTrack() );
+				tv.push_back( m_patternToPlay->getTrack() );
+			}
 			break;
 
 		default:
@@ -1023,7 +1026,8 @@ void songEditor::processNextBuffer( void )
 bool songEditor::realTimeTask( void ) const
 {
 	return( !( m_exporting == TRUE || ( m_playMode == PLAY_PATTERN &&
-		  		m_patternToPlay->freezing() == TRUE ) ) );
+		  	m_patternToPlay != NULL &&
+			m_patternToPlay->freezing() == TRUE ) ) );
 }
 
 
@@ -1090,7 +1094,10 @@ void songEditor::playPattern( pattern * _patternToPlay, bool _loop )
 	}
 	m_patternToPlay = _patternToPlay;
 	m_loopPattern = _loop;
-	m_actions.push_back( ACT_PLAY_PATTERN );
+	if( m_patternToPlay != NULL )
+	{
+		m_actions.push_back( ACT_PLAY_PATTERN );
+	}
 }
 
 

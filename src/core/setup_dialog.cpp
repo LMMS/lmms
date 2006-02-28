@@ -113,6 +113,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 						"nomsgaftersetup" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
+	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -288,10 +289,35 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openVSTDir() ) );
 
+
+	// artwork-dir
+	tabWidget * artwork_tw = new tabWidget( tr(
+					"Artwork directory" ).toUpper(),
+								directories );
+	artwork_tw->setFixedHeight( 56 );
+
+	m_adLineEdit = new QLineEdit( m_artworkDir, artwork_tw );
+	m_adLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_adLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+				SLOT( setArtworkDir( const QString & ) ) );
+
+	QPushButton * artworkdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+							"", artwork_tw );
+	artworkdir_select_btn->setFixedSize( 24, 24 );
+	artworkdir_select_btn->move( 320, 20 );
+	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openArtworkDir() ) );
+
+
 	dir_layout->addWidget( lmms_wd_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( vst_tw );
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( artwork_tw );
 	dir_layout->addStretch();
+
+
 
 
 
@@ -596,6 +622,7 @@ void setupDialog::accept( void )
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
+	configManager::inst()->setArtworkDir( m_artworkDir );
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -771,8 +798,7 @@ void setupDialog::openVSTDir( void )
 				tr( "Choose your VST-plugin directory" ),
 							m_vstDir );
 #else
-	QString new_dir = QFileDialog::getExistingDirectory( m_vstDir,
-									0, 0,
+	QString new_dir = QFileDialog::getExistingDirectory( m_vstDir, 0, 0,
 				tr( "Choose your VST-plugin directory" ),
 									TRUE );
 #endif
@@ -788,6 +814,34 @@ void setupDialog::openVSTDir( void )
 void setupDialog::setVSTDir( const QString & _vd )
 {
 	m_vstDir = _vd;
+}
+
+
+
+
+void setupDialog::openArtworkDir( void )
+{
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+				tr( "Choose artwork-theme directory" ),
+							m_artworkDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_artworkDir,
+									0, 0,
+				tr( "Choose artwork-theme directory" ), TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		m_adLineEdit->setText( new_dir );
+	}
+}
+
+
+
+
+void setupDialog::setArtworkDir( const QString & _ad )
+{
+	m_artworkDir = _ad;
 }
 
 
