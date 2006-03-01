@@ -671,7 +671,11 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Beat+Bassline Editor</translation>
+        <translation type="obsolete">Beat+Bassline Editor</translation>
+    </message>
+    <message>
+        <source>Beat+Baseline Editor</source>
+        <translation>Beat+Baseline Editor</translation>
     </message>
 </context>
 <context>
@@ -690,14 +694,22 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation>Im Beat+Bassline-Editor öffnen</translation>
+        <translation type="obsolete">Im Beat+Bassline-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Open in Beat+Baseline-Editor</source>
+        <translation>Im Beat+Baseline-Editor öffnen</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation>Beat/Bassline %1</translation>
+        <translation type="obsolete">Beat/Bassline %1</translation>
+    </message>
+    <message>
+        <source>Beat/Baseline %1</source>
+        <translation>Beat/Baseline %1</translation>
     </message>
 </context>
 <context>
@@ -740,7 +752,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen</translation>
     </message>
 </context>
 <context>
@@ -1649,11 +1661,11 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
-        <translation>Zeige/verstecke Beat+Bassline Editor</translation>
+        <translation type="obsolete">Zeige/verstecke Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation>Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -1773,6 +1785,18 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <source>Setting up main-window and workspace...</source>
         <translation>Initialisiere Hauptfenster und Arbeitsbereich...</translation>
     </message>
+    <message>
+        <source>Show/hide Beat+Baseline Editor</source>
+        <translation>Zeige/verstecke Beat+Baseline Editor</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baesline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <translation>Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Baseline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Baseline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
+    </message>
 </context>
 <context>
     <name>midiClient</name>
@@ -1851,6 +1875,49 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>All images (*.png *.jpg *.jpeg *.gif *.bmp)</source>
         <translation>Alle Bilder (*.png *.jpg *.jpeg *.gif *.bmp)</translation>
+    </message>
+</context>
+<context>
+    <name>organicInstrument</name>
+    <message>
+        <source>Osc %1 waveform</source>
+        <translation>Oszillator %1 Wellenform</translation>
+    </message>
+    <message>
+        <source>Osc %1 waveform:</source>
+        <translation>Oszillator %1 Wellenform:</translation>
+    </message>
+    <message>
+        <source>Osc %1 volume</source>
+        <translation>Oszillator %1 Lautstärke</translation>
+    </message>
+    <message>
+        <source>Osc %1 volume:</source>
+        <translation>Oszillator %1 Lautstärke:</translation>
+    </message>
+    <message>
+        <source>Osc %1 panning</source>
+        <translation>Oszillator %1 Balance</translation>
+    </message>
+    <message>
+        <source>Osc %1 panning:</source>
+        <translation>Oszillator %1 Balance:</translation>
+    </message>
+    <message>
+        <source>Osc %1 fine detuning left</source>
+        <translation>Oszillator %1 Fein-Verstimmung links</translation>
+    </message>
+    <message>
+        <source>Osc %1 fine detuning left:</source>
+        <translation>Oszillator %1 Fein-Verstimmung links:</translation>
+    </message>
+    <message>
+        <source>cents</source>
+        <translation>Cent</translation>
+    </message>
+    <message>
+        <source>FX1</source>
+        <translation>FX1</translation>
     </message>
 </context>
 <context>
@@ -2039,6 +2106,10 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <source>All selected notes were copied to the clipboard.</source>
         <translation>Alle gewählten Noten wurden in die Zwischenablage kopiert.</translation>
     </message>
+    <message>
+        <source>Last note</source>
+        <translation>Letzte Note</translation>
+    </message>
 </context>
 <context>
     <name>pluckedStringSynth</name>
@@ -2071,7 +2142,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation>Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Bassline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
+        <translation type="obsolete">Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Bassline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
     </message>
     <message>
         <source>cheap synthesis of guitar/harp-like sounds</source>
@@ -2100,6 +2171,14 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Rough &amp; Dirty Wavetable Synthesizer.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <translation>Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Baseline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
+    </message>
+    <message>
+        <source>Additive Synthesizer for organ-like sounds</source>
+        <translation>Additiver Synthesizer für orgelähnliche Klänge</translation>
     </message>
 </context>
 <context>
@@ -2418,6 +2497,14 @@ LATENZ: %2 ms</translation>
 Latency: %2 ms</source>
         <translation>Frames: %1
 Latenz: %2 ms</translation>
+    </message>
+    <message>
+        <source>Artwork directory</source>
+        <translation>Artwork-Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Choose artwork-theme directory</source>
+        <translation>Artwork-Verzeichnis wählen</translation>
     </message>
 </context>
 <context>
@@ -2844,6 +2931,18 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 bis %5:%6)</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation>Tipp</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free positioning.</source>
+        <translation>Drücken Sie &lt;Strg&gt; für freie Positionierung.</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <translation>Drücken Sie &lt;Strg&gt; für freie Größenänderung.</translation>
     </message>
 </context>
 <context>

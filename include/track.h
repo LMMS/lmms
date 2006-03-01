@@ -151,6 +151,8 @@ private:
 	bool m_autoResize;
 	Sint16 m_initialMouseX;
 
+	textFloat * m_hint;
+
 } ;
 
 

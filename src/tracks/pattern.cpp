@@ -237,10 +237,13 @@ midiTime pattern::length( void ) const
 
 
 
-note * pattern::addNote( const note & _new_note )
+note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
 	note * new_note = new note( _new_note );
-	new_note->quantizePos( eng()->getPianoRoll()->quantization() );
+	if( _quant_pos )
+	{
+		new_note->quantizePos( eng()->getPianoRoll()->quantization() );
+	}
 
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
@@ -301,14 +304,15 @@ void pattern::removeNote( const note * _note_to_del )
 
 
 
-note * pattern::rearrangeNote( const note * _note_to_proc )
+note * pattern::rearrangeNote( const note * _note_to_proc,
+							const bool _quant_pos )
 {
 	// just rearrange the position of the note by removing it and adding 
 	// a copy of it -> addNote inserts it at the correct position
 	note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
 
-	return( addNote( copy_of_note ) );
+	return( addNote( copy_of_note, _quant_pos ) );
 }
 
 

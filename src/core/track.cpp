@@ -93,7 +93,8 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_length(),
 	m_action( NONE ),
 	m_autoResize( FALSE ),
-	m_initialMouseX( 0 )
+	m_initialMouseX( 0 ),
+	m_hint( NULL )
 {
 	if( s_textFloat == NULL )
 	{
@@ -122,6 +123,7 @@ trackContentObject::trackContentObject( track * _track ) :
 
 trackContentObject::~trackContentObject()
 {
+	delete m_hint;
 }
 
 
@@ -278,7 +280,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 							m_track->eng() );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
+		/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
 		m_initialMouseX = _me->x();
@@ -289,6 +291,11 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 			QCursor c( Qt::SizeAllCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current position" ) );
+			delete m_hint;
+			m_hint = textFloat::displayMessage( tr( "Hint" ),
+					tr( "Press <Ctrl> for free "
+							"positioning." ),
+					embed::getIconPixmap( "hint" ), 0 );
 		}
 		else if( m_autoResize == FALSE )
 		{
@@ -296,15 +303,21 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current length" ) );
+			delete m_hint;
+			m_hint = textFloat::displayMessage( tr( "Hint" ),
+					tr( "Press <Ctrl> for free "
+							"resizing." ),
+					embed::getIconPixmap( "hint" ), 0 );
 		}
 		s_textFloat->reparent( this );
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( _me );
 		s_textFloat->show();
+
 	}
 	else if( ( _me->button() == Qt::MidButton/* ||
 			( _me->button() == Qt::LeftButton &&
-		  		eng()->getMainWindow()->isShiftPressed() == TRUE )*/ ) &&
+	  	eng()->getMainWindow()->isShiftPressed() == TRUE )*/ ) &&
 							fixedTCOs() == FALSE )
 	{
 		close();
@@ -316,13 +329,25 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 
 void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 {
+	if( getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE )
+	{
+		delete m_hint;
+		m_hint = NULL;
+	}
+
 	const float ppt = m_track->getTrackContainer()->pixelsPerTact();
 	if( m_action == MOVE )
 	{
 		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
-		movePosition( tMax( 0, (Sint32) m_track->getTrackContainer()->
+		midiTime t = tMax( 0, (Sint32) m_track->getTrackContainer()->
 							currentPosition() +
-					static_cast<int>( x * 64 / ppt ) ) );
+					static_cast<int>( x * 64 / ppt ) );
+		if( getTrack()->eng()->getMainWindow()->isCtrlPressed() ==
+					FALSE && _me->button() == Qt::NoButton )
+		{
+			t = t.toNearestTact();
+		}
+		movePosition( t );
 		m_track->getTrackWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 					arg( m_startPosition.getTact() + 1 ).
@@ -363,8 +388,14 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == RESIZE )
 	{
-		changeLength( tMax( 64,
-				static_cast<int>( _me->x() * 64 / ppt ) ) );
+		midiTime t = tMax( 64,
+				static_cast<int>( _me->x() * 64 / ppt ) );
+		if( getTrack()->eng()->getMainWindow()->isCtrlPressed() ==
+					FALSE && _me->button() == Qt::NoButton )
+		{
+			t = t.toNearestTact();
+		}
+		changeLength( t );
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 					arg( length().getTact() ).
 					arg( length().getTact64th() ).
@@ -404,6 +435,8 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_action = NONE;
+	delete m_hint;
+	m_hint = NULL;
 	s_textFloat->hide();
 	leaveEvent( NULL );
 	selectableObject::mouseReleaseEvent( _me );
@@ -691,16 +724,17 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 	if( type == ( "tco_" + QString::number( getTrack()->type() ) ) &&
 			getTrack()->getTrackContainer()->fixedTCOs() == FALSE )
 	{
-		const midiTime position = getPosition( _de->pos().x() );
+		const midiTime pos = getPosition( _de->pos().x()
+							).toNearestTact();
 		trackContentObject * tco = addTCO( getTrack()->createTCO(
-								position ) );
+								pos ) );
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
 		multimediaProject mmp( value, FALSE );
 		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
 		tco->loadSettings( mmp.content().firstChild().toElement() );
-		tco->movePosition( position );
+		tco->movePosition( pos );
 		_de->accept();
 	}
 }
@@ -723,10 +757,10 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			getTrack()->getTrackContainer()->fixedTCOs() == FALSE )
 	{
-		const midiTime position = getPosition( _me->x() );
+		const midiTime pos = getPosition( _me->x() ).toNearestTact();
 		trackContentObject * tco = addTCO( getTrack()->createTCO(
-								position ) );
-		tco->movePosition( position );
+									pos ) );
+		tco->movePosition( pos );
 	}
 }
 

@@ -224,6 +224,7 @@ songEditor::songEditor( engine * _engine ) :
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
+	master_pitch_lbl->setFixedHeight( 64 );
 
 #ifdef QT4
 	m_masterPitchSlider = new QSlider( Qt::Vertical, tb );
@@ -262,7 +263,7 @@ songEditor::songEditor( engine * _engine ) :
 	vcw_layout->setMargin( 0 );
 	vcw_layout->setSpacing( 0 );
 
-	vcw_layout->addStretch();
+	//vcw_layout->addStretch();
 	vcw_layout->addWidget( new visualizationWidget(
 			embed::getIconPixmap( "output_graph" ), vc_w, eng() ) );
 

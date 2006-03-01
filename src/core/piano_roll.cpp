@@ -1779,7 +1779,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							note_tact_64th );
 				( *it )->setPos( new_note_pos );
 				( *it )->setKey( ( *it )->key() + key_diff );
-				*it = m_pattern->rearrangeNote( *it );
+				*it = m_pattern->rearrangeNote( *it, FALSE );
 			}
 
 			m_moveStartTact64th = pos_tact_64th;

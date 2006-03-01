@@ -1,3 +1,28 @@
+2006-02-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* data/locale/de.ts:
+	updated German translation
+
+	* src/core/timeline.cpp:
+	use note::toNearestTact() in timeLine::mouseMoveEvent() instead of own
+	calculations
+
+	* src/core/track.cpp:
+	per default make TCO-ops (create, move, resize) aligned on tact-
+	boundaries, free positioning/resizing can be achieved by pressing
+	<Ctrl> after pressing mouse-button
+
+	* include/midi_time.h:
+	added note::toNearestTact()-method
+
+	* include/pattern.h:
+	* src/core/piano_roll.cpp:
+	* src/track/pattern.cpp:
+	do not quantize note-position while moving selection of notes
+
+	* src/core/song_editor.cpp:
+	some layout-fixes for looking good with "Blue Scene" as well
+
 2006-02-27	Zolo <the-zolo/at/gmx/dot/de>
 
 	* data/themes/blue_scene/:

@@ -50,6 +50,15 @@ public:
 		*this = _t;
 	}
 
+	inline midiTime toNearestTact( void ) const
+	{
+		if( m_tact64th >= 32 )
+		{
+			return( m_tact * 64 + 64 );
+		}
+		return( m_tact * 64 );
+	}
+
 	inline midiTime & operator=( const midiTime & _t )
 	{
 		m_tact = _t.m_tact;

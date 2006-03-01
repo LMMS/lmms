@@ -87,11 +87,13 @@ public:
 
 	virtual midiTime length( void ) const;
 
-	note * FASTCALL addNote( const note & _new_note );
+	note * FASTCALL addNote( const note & _new_note,
+					const bool _quant_pos = TRUE );
 
 	void FASTCALL removeNote( const note * _note_to_del );
 
-	note * FASTCALL rearrangeNote( const note * _note_to_proc );
+	note * FASTCALL rearrangeNote( const note * _note_to_proc,
+					const bool _quant_pos = TRUE );
 
 	void clearNotes( void );
 	

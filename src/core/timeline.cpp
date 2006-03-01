@@ -373,11 +373,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else
 			{
-				m_loopPos[i] = t.getTact() * 64;
-				if( t.getTact64th() >= 32 )
-				{
-					m_loopPos[i] += 64;
-				}
+				m_loopPos[i] = t.toNearestTact();
 			}
 			update();
 			break;

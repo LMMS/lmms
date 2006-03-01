@@ -328,8 +328,8 @@ void mainWindow::finalize( void )
 	QWhatsThis::add( bb_editor_window, 
 #endif
 		tr( "By pressing this button, you can show or hide the "
-			"Beat+Baseline Editor. The Beat+Baesline Editor is "
-			"needed for setting beats, opening, adding and "
+			"Beat+Baseline Editor. The Beat+Baseline Editor is "
+			"needed for creating beats, opening, adding and "
 			"removing channels, cutting, copying and pasting "
 			"beat- and baseline-patterns and other things like "
 			"that." ) );
