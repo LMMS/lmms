@@ -1,5 +1,11 @@
 2006-03-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
+	* src/core/main_window.cpp:
+	always set to configured-state before showing setup-dialog on first
+	startup
+
+2006-03-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
 	* src/core/engine.cpp:
 	finalize main-window after having mixer to start its audio-devices -
 	fixes crash on first time LMMS is started

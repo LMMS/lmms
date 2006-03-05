@@ -504,10 +504,10 @@ void mainWindow::finalize( void )
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
 	{
+		configManager::inst()->setValue( "app", "configured", "1" );
 		// no, so show it that user can setup everything
 		setupDialog sd( eng() );
 		sd.exec();
-		configManager::inst()->setValue( "app", "configured", "1" );
 	}
 	// look whether mixer could use a audio-interface beside audioDummy
 	else if( eng()->getMixer()->audioDevName() == audioDummy::name() )
