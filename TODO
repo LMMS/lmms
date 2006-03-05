@@ -1,5 +1,10 @@
 to be done as soon as possible:
 
+- recording-functionality
+- show loading-vst-hint when cloning vestige-track
+- do not hang when saving while loading VST-plugin
+- tempo-recogn. and sync of beat-sample
+- do not quantize when importing from MIDI-file
 - KNOB-setValue!!!
 - separate GUI and data/sound-processing-code
 - fix qtimer-problem /channel-activity-LEDs

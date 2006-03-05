@@ -50,9 +50,10 @@ engine::engine( const bool _has_gui ) :
 	m_bbEditor = new bbEditor( this );
 	m_pianoRoll = new pianoRoll( this );
 
+	m_mixer->initDevices();
+
 	m_mainWindow->finalize();
 
-	m_mixer->initDevices();
 	m_mixer->startProcessing();
 }
 

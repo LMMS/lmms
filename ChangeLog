@@ -1,3 +1,9 @@
+2006-03-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/engine.cpp:
+	finalize main-window after having mixer to start its audio-devices -
+	fixes crash on first time LMMS is started
+
 2006-02-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* data/locale/de.ts:
