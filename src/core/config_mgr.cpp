@@ -809,6 +809,14 @@ bool configManager::loadConfigFile( void )
 	if( value( "paths", "artwork" ) != "" )
 	{
 		m_artworkDir = value( "paths", "artwork" );
+		if( QDir( m_artworkDir ).exists() == FALSE )
+		{
+			m_artworkDir = m_dataDir + DEFAULT_THEME_PATH;
+		}
+		if( m_artworkDir.right( 1 ) != QDir::separator() )
+		{
+			m_artworkDir += QDir::separator();
+		}
 	}
 	m_workingDir = value( "paths", "workingdir" );
 	m_vstDir = value( "paths", "vstdir" );

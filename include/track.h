@@ -239,6 +239,7 @@ protected:
 private slots:
 	void cloneTrack( void );
 	void removeTrack( void );
+	void removeTrackTimer( void );
 	void muteBtnRightClicked( void );
 
 

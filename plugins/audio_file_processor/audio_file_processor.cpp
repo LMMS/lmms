@@ -552,7 +552,7 @@ void audioFileProcessor::sampleUpdated( void )
 	QPainter p( &m_graph );
 #endif
 	p.setPen( QColor( 64, 255, 160 ) );
-	m_sampleBuffer.drawWaves( p, QRect( 2, 2, m_graph.width() - 4,
+	m_sampleBuffer.visualize( p, QRect( 2, 2, m_graph.width() - 4,
 							m_graph.height() - 4 ),
 								m_drawMethod );
 	update();

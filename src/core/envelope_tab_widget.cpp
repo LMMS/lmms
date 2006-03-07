@@ -178,7 +178,7 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox, tr(
 						"cutoff-frequency" ), eng() );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
-	m_filterCutKnob->setRange( 0.0, 16000.0, 1.0 );
+	m_filterCutKnob->setRange( 0.0, 10000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setInitValue( 16000.0 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +

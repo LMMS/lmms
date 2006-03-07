@@ -862,9 +862,10 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 
 
 
-void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
+void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
+					const QRect & _clip, drawMethods _dm )
 {
-//	_p.setClipRect( _dr );
+//	_p.setClipRect( _clip );
 //	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
 	//_p.setPen( QColor( 64, 224, 160 ) );
 #ifdef QT4
@@ -877,9 +878,11 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 	const Uint16 y_base = h / 2 + _dr.y();
 	const float y_space = h / 2;
 
+	const QRect isect = _dr.intersect( _clip );
+
 	if( m_data == NULL || m_frames == 0 )
 	{
-		_p.drawLine( _dr.x(), y_base, _dr.x() + w, y_base );
+		_p.drawLine( isect.x(), y_base, isect.right(), y_base );
 		return;
 	}
 	else if( _dm == LINE_CONNECT )
@@ -890,8 +893,8 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 	
 		const float fpp = tMax<float>( tMin<float>( m_frames / (float)w,
 								20.0f ), 1.0f );
-		
-		for( float frame = 0; frame < m_frames; frame += fpp )
+		const float fmax = tMin<float>( m_frames, isect.right() * fpp );
+		for( float frame = fpp * _clip.x(); frame < fmax; frame += fpp )
 		{
 			const float x = frame*w / m_frames + _dr.x();
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
@@ -906,21 +909,25 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 			old_x = x;
 		}
 #else
-		int old_x = _dr.x();
 		int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 	
 		const f_cnt_t fpp = tMax<f_cnt_t>( tMin<f_cnt_t>( m_frames / w,
 								20 ), 1 );
-
+		const f_cnt_t fbase = m_frames * _clip.x() / _clip.width();
+		const f_cnt_t fmax = tMin<f_cnt_t>( m_frames,
+							_clip.width() * fpp );
+		int old_x = _clip.x();
+		//printf("%d\n", fmax );
 		for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
 		{
-			const int x = static_cast<int>( frame /
-							(float) m_frames * w ) +
-								_dr.x();
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			const int x = _dr.x() + static_cast<int>( frame /
+						(float) m_frames * _dr.width() );
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
+									++chnl )
 			{
 				const Uint16 y = y_base +
-			static_cast<Uint16>( m_data[frame][chnl] * y_space );
+			static_cast<Uint16>( m_data[frame][chnl] *
+								y_space );
 				_p.drawLine( old_x, old_y[chnl], x, y );
 				old_y[chnl] = y;
 			}
@@ -934,7 +941,8 @@ void sampleBuffer::drawWaves( QPainter & _p, QRect _dr, drawMethods _dm )
 		for( f_cnt_t frame = 0; frame < m_frames; ++frame )
 		{
 			const int x = frame * w / m_frames + _dr.x();
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
+									++chnl )
 			{
 				_p.drawPoint( x, y_base +
 			static_cast<Uint16>( m_data[frame][chnl] * y_space ) );

@@ -288,6 +288,10 @@ float knob::getValue( const QPoint & _p )
 		}
 		return( new_value );
 	}
+	if( eng()->getMainWindow()->isShiftPressed() )
+	{
+		return( ( _p.y() - m_origMousePos.y() ) * step() );
+	}
 	return( ( _p.y() - m_origMousePos.y() ) * m_pageSize );
 }
 

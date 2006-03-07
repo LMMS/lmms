@@ -1,3 +1,26 @@
+2006-03-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/widgets/knob.cpp:
+	when moving mouse while having shift pressed, increase/decrease by
+	single steps
+
+	* src/core/envelope_tab_widget.cpp:
+	use 10 KHz as filter-maximum instead of 16 KHz
+
+	* include/track.h:
+	* src/core/track.cpp:
+	added HACK to avoid crash because of bug in Qt (< 3.3.5) when removing
+	track
+
+	* src/core/config_mgr.cpp:
+	- use default-theme-path if theme-path from config-file doesn't exist
+	- add "/" to theme-path if missing
+
+2006-03-06	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
+
+	* locale/ru.ts:
+	updated Russian translation
+
 2006-03-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/main_window.cpp:

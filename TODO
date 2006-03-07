@@ -1,9 +1,11 @@
-to be done as soon as possible:
-
+- add support for panes-interface (like blender) (instead of MDI etc.)
+- message when importing unsupported MIDI-file (track-count = 0)
+- volume-knobs for each sample-track
+- AMS-bindings
 - recording-functionality
 - show loading-vst-hint when cloning vestige-track
 - do not hang when saving while loading VST-plugin
-- tempo-recogn. and sync of beat-sample
+- tempo-recogn. and sync of beat-samples
 - do not quantize when importing from MIDI-file
 - KNOB-setValue!!!
 - separate GUI and data/sound-processing-code
@@ -37,8 +39,6 @@ to be done as soon as possible:
 	- ...
 
 
-
-to be done somewhen in the future:
 - effect-board -> live-fx from input
 - event/automation-system
 - chord-editor?

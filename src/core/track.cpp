@@ -44,6 +44,7 @@
 #include <qlayout.h>
 #include <qcursor.h>
 #include <qwhatsthis.h>
+#include <qtimer.h>
 
 #endif
 
@@ -976,6 +977,19 @@ void trackOperationsWidget::cloneTrack( void )
 
 
 void trackOperationsWidget::removeTrack( void )
+{
+#ifdef QT3
+	QTimer::singleShot( 10, this, SLOT( removeTrackTimer() ) );
+#else
+#warning fixme
+	removeTrackTimer();
+#endif
+}
+
+
+
+
+void trackOperationsWidget::removeTrackTimer( void )
 {
 	m_trackWidget->getTrack()->getTrackContainer()->removeTrack(
 						m_trackWidget->getTrack() );

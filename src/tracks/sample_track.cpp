@@ -184,17 +184,18 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void sampleTCO::paintEvent( QPaintEvent * )
+void sampleTCO::paintEvent( QPaintEvent * _pe )
 {
 #ifdef QT4
 	QPainter p( this );
 	// TODO: set according brush/pen for gradient!
-	p.fillRect( rect(), QColor( 64, 64, 64 ) );
+	p.fillRect( _pe->rect(), QColor( 64, 64, 64 ) );
 #else
-	// create pixmap for whole widget
-	QPixmap pm( size() );
+	// create pixmap for our widget
+	QPixmap pm( _pe->rect().size() );
 	// and a painter for it
 	QPainter p( &pm );
+	p.translate( -_pe->rect().x(), -_pe->rect().y() );
 
 	for( int y = 1; y < height() - 1; ++y )
 	{
@@ -225,14 +226,14 @@ void sampleTCO::paintEvent( QPaintEvent * )
 			tMax( static_cast<int>( getSampleLength() *
 				pixelsPerTact() / 64 ), 1 ), height() - 4 );
 	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
-	m_sampleBuffer.drawWaves( p, r );
+	m_sampleBuffer.visualize( p, r, _pe->rect() );
 	if( r.width() < width() - 1 )
 	{
 		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
 				width() - 2, r.y() + r.height() / 2 );
 	}
 #ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
+	bitBlt( this, _pe->rect().topLeft(), &pm );
 #endif
 }
 

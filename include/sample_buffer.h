@@ -83,8 +83,14 @@ public:
 				const bool _looped = FALSE,
 				void * * _resampling_data = NULL );
 
-	void FASTCALL drawWaves( QPainter & _p, QRect _dr,
+	void FASTCALL visualize( QPainter & _p, const QRect & _dr,
+					const QRect & _clip,
 					drawMethods _dm = LINE_CONNECT );
+	inline void visualize( QPainter & _p, const QRect & _dr,
+					drawMethods _dm = LINE_CONNECT )
+	{
+		visualize( _p, _dr, _dr, _dm );
+	}
 
 	inline const QString & audioFile( void ) const
 	{
