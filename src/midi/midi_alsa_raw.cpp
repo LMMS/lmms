@@ -77,7 +77,7 @@ midiALSARaw::midiALSARaw( engine * _engine ) :
 	snd_rawmidi_poll_descriptors( m_input, m_pfds, m_npfds );
 
 	start( 
-#if QT_VERSION >= 0x030200	
+#if QT_VERSION >= 0x030505
 	    	QThread::LowPriority 
 #endif
 					);

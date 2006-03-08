@@ -102,7 +102,7 @@ midiALSASeq::midiALSASeq( engine * _engine ) :
 	m_portListUpdateTimer.start( 1000 );
 
 	start( 
-#if QT_VERSION >= 0x030200	
+#if QT_VERSION >= 0x030505
 	    	QThread::IdlePriority 
 #endif
 					);

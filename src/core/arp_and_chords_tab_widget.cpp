@@ -295,7 +295,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
 						tr( "Arpeggio time" ), eng() );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-	m_arpTimeKnob->setRange( 10.0f, 1000.0f, 1.0f );
+	m_arpTimeKnob->setRange( 25.0f, 2000.0f, 1.0f );
 	m_arpTimeKnob->setInitValue( 100.0f );
 	m_arpTimeKnob->move( 164, 70 );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +

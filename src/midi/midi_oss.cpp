@@ -71,7 +71,7 @@ midiOSS::midiOSS( engine * _engine ) :
 #endif
 	{
 		start(
-#if QT_VERSION >= 0x030200
+#if QT_VERSION >= 0x030505
 				QThread::LowPriority
 #endif
 							);

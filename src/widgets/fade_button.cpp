@@ -75,6 +75,7 @@ void fadeButton::activate( void )
 		m_state = 1.1f;
 		nextState();
 	}
+	update();
 }
 
 
@@ -119,6 +120,12 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );
 #endif
+	if( m_state > 0.0f )
+	{
+		// we might be called out of another thread than the GUI-/
+		// event-loop-thread, so let the timer update ourself
+		QTimer::singleShot( 20, this, SLOT( update( void ) ) );
+	}
 }
 
 
@@ -130,9 +137,6 @@ void fadeButton::nextState( void )
 	{
 		m_state -= 0.1f;
 		QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
-		// we might be called out of another thread than the GUI-/
-		// event-loop-thread, so let the timer update ourself
-		QTimer::singleShot( 0, this, SLOT( update( void ) ) );
 	}
 }
 

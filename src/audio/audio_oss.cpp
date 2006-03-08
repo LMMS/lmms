@@ -292,7 +292,7 @@ void audioOSS::startProcessing( void )
 #ifdef QT4
 			QThread::HighPriority
 #else
-#if QT_VERSION >= 0x030200
+#if QT_VERSION >= 0x030505
 			QThread::HighestPriority
 #endif
 #endif

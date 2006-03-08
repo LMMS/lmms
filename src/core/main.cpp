@@ -66,6 +66,16 @@ int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
 
 int main( int argc, char * * argv )
 {
+#ifdef HAVE_SCHED_H
+	struct sched_param sparam;
+	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
+				sched_get_priority_min( SCHED_FIFO ) ) / 2;
+	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
+	{
+		printf( "could not set realtime priority.\n" );
+	}
+#endif
+
 	QApplication app( argc, argv );
 
 	QString extension = "wav";
@@ -243,17 +253,6 @@ int main( int argc, char * * argv )
 		e->show();
 		e->exportBtnClicked();
 	}
-
-#ifdef HAVE_SCHED_H
-	struct sched_param sparam;
-	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
-				sched_get_priority_min( SCHED_FIFO ) ) / 2;
-	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
-	{
-		printf( "could not set realtime priority.\n" );
-	}
-#endif
-
 
 	return( app.exec() );
 }
