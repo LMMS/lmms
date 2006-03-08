@@ -813,9 +813,9 @@ bool configManager::loadConfigFile( void )
 		{
 			m_artworkDir = m_dataDir + DEFAULT_THEME_PATH;
 		}
-		if( m_artworkDir.right( 1 ) != QDir::separator() )
+		if( m_artworkDir.right( 1 ) != "/" )
 		{
-			m_artworkDir += QDir::separator();
+			m_artworkDir += "/";
 		}
 	}
 	m_workingDir = value( "paths", "workingdir" );
