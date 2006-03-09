@@ -82,7 +82,7 @@ public:
 		const char * author;
 		int version;
 		pluginTypes type;
-		embed::descriptor logo;
+		const QPixmap * logo;
 	} ;
 
 	// contructor of a plugin

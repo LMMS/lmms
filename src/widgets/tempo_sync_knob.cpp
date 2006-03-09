@@ -60,7 +60,7 @@ tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 	knob( _knob_num, _parent, _name, _engine ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
-	m_tempoSyncIcon( embed::getIconPixmap( "xclock" ) ),
+	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
 	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
 	m_tempoLastSyncMode( NO_SYNC )
 {
@@ -301,7 +301,7 @@ void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 	else
 	{
 		m_tempoSyncDescription = tr( "Tempo Sync" );
-		m_tempoSyncIcon = embed::getIconPixmap( "xclock" );
+		m_tempoSyncIcon = embed::getIconPixmap( "tempo_sync" );
 	}
 	
 	if( m_tempoSyncMode != m_tempoLastSyncMode )

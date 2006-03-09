@@ -3,7 +3,7 @@
 /*
  * embed.cpp - misc stuff for using embedded resources (linked into binary)
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,14 +29,10 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QTranslator>
 #include <QImage>
 
 #else
 
-#include <qapplication.h>
-#include <qtranslator.h>
 #include <qimage.h>
 
 #endif
@@ -63,25 +59,44 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 	if( _w == -1 || _h == -1 )
 	{
 		QString name = QString( _name ) + ".png";
+
+#ifdef PLUGIN_NAME
+		QPixmap p( configManager::inst()->artworkDir() + "plugins/" +
+			STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ) + "_" + name );
+		if( p.isNull() )
+		{
+			p = QPixmap( configManager::inst()->artworkDir() +
+									name );
+		}
+#else
+		// look whether icon is in artwork-dir
+		QPixmap p( configManager::inst()->artworkDir() + name );
+#endif
+		if( p.isNull() )
+		{
+			// nothing found, so look in default-artwork-dir
+			p =
+		QPixmap( configManager::inst()->defaultArtworkDir() + name );
+		}
+		if( p.isNull() )
+		{
 #ifdef QT4
-		const embed::descriptor & e = findEmbeddedData(
+			const embed::descriptor & e = findEmbeddedData(
 						name.toAscii().constData() );
 #else
-		const embed::descriptor & e = findEmbeddedData( name.ascii() );
+			const embed::descriptor & e = findEmbeddedData(
+								name.ascii() );
 #endif
-		// not found?
-		if( QString( e.name ) != name )
-		{
-			// then look whether icon is in data-dir
-			QPixmap p( configManager::inst()->artworkDir() + name );
-			if( p.isNull() )
+			// found?
+			if( QString( e.name ) == name )
+			{
+				p.loadFromData( e.data, e.size );
+			}
+			else
 			{
 				p = QPixmap( 1, 1 );
 			}
-			return( p );
 		}
-		QPixmap p;
-		p.loadFromData( e.data, e.size );
 		return( p );
 	}
 #ifdef QT4
@@ -99,38 +114,6 @@ QString getText( const char * _name )
 {
 	const embed::descriptor & e = findEmbeddedData( _name );
 	return( QString::fromLatin1( (const char *) e.data, e.size ) );
-}
-
-
-
-void loadTranslation( const QString & _tname )
-{
-	QTranslator * t = new QTranslator( 0 );
-	QString name = _tname + ".qm";
-
-#if QT_VERSION >= 0x030100
-
-#ifdef QT4
-	const embed::descriptor & e = findEmbeddedData(
-						name.toAscii().constData() );
-#else
-	const embed::descriptor & e = findEmbeddedData( name.ascii() );
-#endif
-	// not found?
-	if( QString( e.name ) != name )
-	{
-#endif
-		// then look whether translation is in data-dir
-		t->load( name, configManager::inst()->localeDir() );
-#if QT_VERSION >= 0x030100
-	}
-	else
-	{
-		t->load( e.data, (int) e.size );
-	}
-#endif
-
-	qApp->installTranslator( t );
 }
 
 

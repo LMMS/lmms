@@ -114,10 +114,9 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 	QWidget( _parent ),
 	engineObject( _engine ),
 	m_pluginDescriptor( _pd ),
-	m_logo(),
+	m_logo( *_pd.logo ),
 	m_mouseOver( FALSE )
 {
-	m_logo.loadFromData( _pd.logo.data, _pd.logo.size );
 	setFixedHeight( 60 );
 	setMouseTracking( TRUE );
 #ifndef QT4

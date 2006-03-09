@@ -68,9 +68,6 @@
 
 arpAndChordsTabWidget::chord arpAndChordsTabWidget::s_chords[] =
 {
-	// thanks to the FL-team for this chords *lol* ;-) took me at least 3
-	// hours to get them all out of FL-arpeggiator...
-
 	{ arpAndChordsTabWidget::tr( "octave" ), { 0, -1 } },
 	{ arpAndChordsTabWidget::tr( "Major" ), { 0, 4, 7, -1 } },
 	{ arpAndChordsTabWidget::tr( "Majb5" ), { 0, 4, 6, -1 } },

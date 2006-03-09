@@ -3,6 +3,44 @@
 	* data/themes/blue_scene/:
 	updated some pixmaps
 
+	* data/themes/blue_scene/plugins/:
+	added pixmaps for plugins
+
+2006-03-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+
+	* src/core/timeline.cpp:
+	more logical loop-point-handling:
+		middle mouse button -> left loop-point
+		right mouse button -> right loop-point
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vestige/vestige.cpp:
+	* include/plugin.h:
+	* src/core/instrument.cpp:
+	* src/core/plugin.cpp:
+	* src/lib/embed.cpp:
+	added support for plugin-theming
+
+	* src/lib/embed.cpp:
+	- first search in artwork-directories before searching for embedded data
+	  as most artwork is not linked into binary (except plugins)
+	- if pixmap not found, try to load according pixmap from
+	  default-artwork-dir
+
+	* include/embed.h:
+	* src/core/main.cpp:
+	* src/lib/embed.cpp:
+	as localizations are no longer embedded into binary, loadTranslation()
+	was moved to main.cpp and contains only some basic code for loading
+	appropriate translation from file
+
+	* src/core/config_mgr.cpp:
+	several fixes concerning artwork-path
+
 2006-03-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
 
 	* src/core/arp_and_chords_tab_widget.cpp:

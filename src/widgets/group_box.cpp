@@ -221,7 +221,7 @@ void groupBox::updatePixmap( void )
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
-	p.setPen( colorGroup().highlight() );
+	p.setPen( colorGroup().buttonText() );
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 

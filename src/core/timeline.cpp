@@ -279,49 +279,7 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	{
 		return;
 	}
-	if( _me->button() == Qt::RightButton )
-	{
-		if( _me->x() >= markerX( loopBegin() ) &&
-				_me->x() <= markerX( loopBegin() ) +
-						s_loopPointPixmap->width() )
-		{
-			m_action = MOVE_LOOP_BEGIN;
-		}
-		else if( _me->x() >= markerX( loopEnd() ) &&
-				_me->x() <= markerX( loopEnd() ) +
-						s_loopPointPixmap->width() )
-		{
-			m_action = MOVE_LOOP_END;
-		}
-		if( m_action != NONE )
-		{
-			m_moveXOff = s_loopPointPixmap->width() / 2;
-		}
-	}
-	else if( _me->button() == Qt::MidButton )
-	{
-		const midiTime t = m_begin +
-				static_cast<Sint32>( _me->x() * 64 / m_ppt );
-		Uint8 pmin = 0;
-		Uint8 pmax = 1;
-		m_action = MOVE_LOOP_BEGIN;
-		if( m_loopPos[pmin] > m_loopPos[pmax] )
-		{
-			qSwap( pmin, pmax );
-			m_action = MOVE_LOOP_END;
-		}
-		if( eng()->getMainWindow()->isShiftPressed() == TRUE )
-		{
-			m_loopPos[pmax] = t;
-			m_action = ( m_action == MOVE_LOOP_BEGIN ) ?
-						MOVE_LOOP_END : MOVE_LOOP_BEGIN;
-		}
-		else
-		{
-			m_loopPos[pmin] = t;
-		}
-	}
-	else
+	if( _me->button() == Qt::LeftButton )
 	{
 		m_action = MOVE_POS_MARKER;
 		if( _me->x() - m_xOffset < s_posMarkerPixmap->width() )
@@ -332,6 +290,23 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 		{
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
+	}
+	else
+	{
+		const midiTime t = m_begin +
+				static_cast<Sint32>( _me->x() * 64 / m_ppt );
+		Uint8 pmin = 0;
+		Uint8 pmax = 1;
+		m_action = MOVE_LOOP_BEGIN;
+		if( m_loopPos[0] > m_loopPos[1]  )
+		{
+			qSwap( m_loopPos[0], m_loopPos[1] );
+		}
+		if( _me->button() == Qt::RightButton )
+		{
+			m_action = MOVE_LOOP_END;
+		}
+		m_loopPos[( m_action == MOVE_LOOP_BEGIN ) ? 0 : 1] = t;
 	}
 	if( m_action == MOVE_LOOP_BEGIN || m_action == MOVE_LOOP_END )
 	{

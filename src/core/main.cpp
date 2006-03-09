@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QSplashScreen>
+#include <QTranslator>
 
 #else
 
@@ -40,6 +41,7 @@
 #if QT_VERSION >= 0x030200
 #include <qsplashscreen.h>
 #endif
+#include <qtranslator.h>
 
 #endif
 
@@ -62,6 +64,17 @@ QString file_to_render;
 #if QT_VERSION >= 0x030100
 int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
 #endif
+
+inline void loadTranslation( const QString & _tname )
+{
+	QTranslator * t = new QTranslator( 0 );
+	QString name = _tname + ".qm";
+
+	t->load( name, configManager::inst()->localeDir() );
+
+	qApp->installTranslator( t );
+}
+
 
 
 int main( int argc, char * * argv )
@@ -160,9 +173,9 @@ int main( int argc, char * * argv )
 			QString( QTextCodec::locale() ).section( '_', 0, 0 );
 #endif
 	// load translation for Qt-widgets/-dialogs
-	embed::loadTranslation( QString( "qt_" ) + pos );
+	loadTranslation( QString( "qt_" ) + pos );
 	// load actual translation for LMMS
-	embed::loadTranslation( pos );
+	loadTranslation( pos );
 
 #ifdef QT4
 	app.setFont( pointSize<10>( app.font() ) );

@@ -100,8 +100,7 @@ trackContentObject::trackContentObject( track * _track ) :
 	if( s_textFloat == NULL )
 	{
 		s_textFloat = new textFloat( this );
-		s_textFloat->setPixmap( embed::getIconPixmap(
-						"xclock", 24, 24 ) );
+		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
 #ifdef QT4

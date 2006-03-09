@@ -54,13 +54,22 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	m_caption( _caption )
 {
 	setFont( pointSize<7>( font() ) );
-#ifdef QT4
+/*#ifdef QT4
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );
 	setPalette( pal );
 #else
 	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
 	setBackgroundMode( Qt::NoBackground );
+#endif*/
+	QColor bg_color = QApplication::palette().active().background().dark(
+									132 );
+#ifdef QT4
+	QPalette pal = palette();
+	pal.setColor( QPalette::Background, bg_color );
+	setPalette( pal );
+#else
+	setPaletteBackgroundColor( bg_color );
 #endif
 }
 

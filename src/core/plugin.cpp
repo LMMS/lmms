@@ -48,7 +48,7 @@
 #include "dummy_plugin.h"
 
 
-static embed::descriptor dummy_embed = { 0, NULL, "" } ;
+//static embed::descriptor dummy_embed = { 0, NULL, "" } ;
 
 static plugin::descriptor dummy_plugin_descriptor =
 {
@@ -58,7 +58,7 @@ static plugin::descriptor dummy_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::UNDEFINED,
-	dummy_embed
+	NULL
 } ;
 
 
@@ -68,6 +68,11 @@ plugin::plugin( const descriptor * _descriptor, engine * _engine ) :
 	engineObject( _engine ),
 	m_descriptor( _descriptor )
 {
+	if( dummy_plugin_descriptor.logo == NULL )
+	{
+		dummy_plugin_descriptor.logo = new QPixmap();
+	}
+
 	if( m_descriptor == NULL )
 	{
 		m_descriptor = &dummy_plugin_descriptor;

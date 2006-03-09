@@ -53,7 +53,6 @@ struct descriptor
 
 QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
 QString getText( const char * _name );
-void loadTranslation( const QString & _tname );
 
 }
 
@@ -63,8 +62,7 @@ namespace PLUGIN_NAME
 {
 
 QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
-QString getText( const char * _name );
-void loadTranslation( const QString & _tname );
+//QString getText( const char * _name );
 
 }
 #endif

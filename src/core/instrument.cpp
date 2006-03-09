@@ -38,10 +38,7 @@ instrument::instrument( channelTrack * _channel_track,
 	m_valid( TRUE )
 {
 	setFixedSize( 250, 250 );
-	QPixmap logo;
-	logo.loadFromData( getDescriptor()->logo.data,
-						getDescriptor()->logo.size );
-	m_channelTrack->setWindowIcon( logo );
+	m_channelTrack->setWindowIcon( *getDescriptor()->logo );
 }
 
 

@@ -73,7 +73,7 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::INSTRUMENT,
-	PLUGIN_NAME::findEmbeddedData( "logo.png" )
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
 } ;
 
 }

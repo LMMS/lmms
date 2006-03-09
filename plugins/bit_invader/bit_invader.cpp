@@ -84,7 +84,7 @@ plugin::descriptor bitinvader_plugin_descriptor =
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
 	plugin::INSTRUMENT,
-	PLUGIN_NAME::findEmbeddedData( "logo.png" )
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
 } ;
 
 }

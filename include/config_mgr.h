@@ -102,6 +102,11 @@ public:
 		return( m_workingDir + SAMPLES_PATH );
 	}
 
+	QString defaultArtworkDir( void ) const
+	{
+		return( m_dataDir + DEFAULT_THEME_PATH );
+	}
+
 	QString artworkDir( void ) const
 	{
 		return( m_artworkDir );

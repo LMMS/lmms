@@ -168,7 +168,7 @@ configManager::configManager( void ) :
 	// since real support for qt < 3.2 is senseless too ;-)
 	m_dataDir( "/usr/share/lmms/" ),
 #endif
-	m_artworkDir( m_dataDir + DEFAULT_THEME_PATH ),
+	m_artworkDir( defaultArtworkDir() ),
 #if QT_VERSION >= 0x030200
 	m_pluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/lib/lmms/" ),
@@ -811,7 +811,7 @@ bool configManager::loadConfigFile( void )
 		m_artworkDir = value( "paths", "artwork" );
 		if( QDir( m_artworkDir ).exists() == FALSE )
 		{
-			m_artworkDir = m_dataDir + DEFAULT_THEME_PATH;
+			m_artworkDir = defaultArtworkDir();
 		}
 		if( m_artworkDir.right( 1 ) != "/" )
 		{
