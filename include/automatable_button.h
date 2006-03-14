@@ -45,7 +45,8 @@
 class automatableButtonGroup;
 
 
-class automatableButton : public QWidget, public automatableObject<bool>
+class automatableButton : public QWidget, public automatableObject<bool,
+			  					signed char>
 {
 	Q_OBJECT
 public:
@@ -58,6 +59,8 @@ public:
 		return( value() );
 	}
 
+	virtual void setValue( const bool _on );
+
 	inline void setToggleButton( bool _on )
 	{
 		m_toggleButton = _on;
@@ -67,7 +70,10 @@ public:
 
 public slots:
 	virtual void toggle( void );
-	virtual void setChecked( bool _on );
+	virtual void setChecked( bool _on )
+	{
+		setValue( _on );
+	}
 
 
 protected:

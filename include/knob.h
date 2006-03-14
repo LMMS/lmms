@@ -77,7 +77,7 @@ public:
 	inline virtual void setInitValue( const float _val )
 	{
 		m_initValue = _val;
-		automatableObject<float>::setInitValue( _val );
+		autoObj::setInitValue( _val );
 	}
 
 	virtual void setValue( const float _x );

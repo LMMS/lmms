@@ -31,7 +31,7 @@
 
 automatableButton::automatableButton( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	automatableObject<bool>( _engine, FALSE, TRUE, FALSE ),
+	autoObj( _engine, FALSE, TRUE, FALSE ),
 	m_group( NULL ),
 	m_toggleButton( FALSE )
 {
@@ -106,11 +106,11 @@ void automatableButton::toggle( void )
 
 
 
-void automatableButton::setChecked( bool _on )
+void automatableButton::setValue( const bool _on )
 {
-	if( _on != isChecked() )
+	if( _on != value() )
 	{
-		setValue( _on );
+		autoObj::setValue( _on );
 		update();
 		emit( toggled( value() ) );
 	}

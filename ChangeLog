@@ -1,3 +1,18 @@
+2006-03-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/automatable_object.h:
+	* include/automatable_button.h:
+	* include/knob.h:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/knob.cpp:
+	added second template-parameter to automatableObject which specifies
+	the type to be used for internal calculations (neccessary for working
+	undo/redo-implementation for bool-objects like buttons)
+
+	* include/led_checkbox.h:
+	* src/widgets/led_checkbox.cpp:
+	fixed some bugs
+
 2006-03-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/main_window.h:

@@ -51,7 +51,7 @@
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	automatableObject<int>( _engine, 0, _min, _max ),
+	autoObj( _engine, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {
@@ -80,7 +80,7 @@ lcdSpinBox::~lcdSpinBox()
 
 void lcdSpinBox::setStep( const int _step )
 {
-	automatableObject<int>::setStep( tMax( _step, 1 ) );
+	autoObj::setStep( tMax( _step, 1 ) );
 }
 
 
@@ -88,7 +88,7 @@ void lcdSpinBox::setStep( const int _step )
 
 void lcdSpinBox::setValue( const int _value )
 {
-	automatableObject<int>::setValue( _value );
+	autoObj::setValue( _value );
 	QString s = m_textForValue[value()];
 	if( s == "" )
 	{

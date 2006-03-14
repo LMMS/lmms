@@ -94,7 +94,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 			, _name.ascii()
 #endif
 		),
-	automatableObject<float>( _engine ),
+	autoObj( _engine ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_angle( 0.0f ),
@@ -606,7 +606,7 @@ void knob::setPosition( const QPoint & _p )
 void knob::setValue( const float _x )
 {
 	const float prev_value = value();
-	automatableObject<float>::setValue( _x );
+	autoObj::setValue( _x );
 	if( prev_value != value() )
 	{
 		valueChange();
@@ -614,27 +614,12 @@ void knob::setValue( const float _x )
 }
 
 
-/*
-void knob::fitValue( float _val )
-{
-	setValue( _val );
-}
-
-
-
-
-void knob::incValue( int _steps )
-{
-	setValue( m_value + float( _steps ) * m_step );
-}
-*/
-
 
 
 void knob::setRange( const float _min, const float _max, const float _step )
 {
 	bool rchg = ( ( maxValue() != _max ) || ( minValue() != _min ) );
-	automatableObject<float>::setRange( _min, _max, _step );
+	autoObj::setRange( _min, _max, _step );
 
 	m_pageSize = tMax<float>( ( maxValue() - minValue() ) / 100.0f,
 								step() );
@@ -646,86 +631,6 @@ void knob::setRange( const float _min, const float _max, const float _step )
 	}
 }
 
-/*
-
-
-void knob::setNewValue( float _x, bool _align )
-{
-	m_prevValue = m_value;
-
-	m_value = tLimit( _x, m_minValue, m_maxValue );
-
-	m_exactPrevValue = m_exactValue;
-	m_exactValue = m_value;
-
-	// align to grid
-	if( _align )
-	{
-		if( m_step != 0.0 )
-		{
-			m_value = floorf( m_value / m_step ) * m_step;
-		}
-		else
-		{
-			m_value = m_minValue;
-		}
-
-		// correct rounding error at the border
-		if( tAbs<float>( m_value - m_maxValue ) < MinEps *
-							tAbs<float>( m_step ) )
-		{
-			m_value = m_maxValue;
-		}
-
-		// correct rounding error if value = 0
-		if( tAbs<float>( m_value ) < MinEps * tAbs<float>( m_step ) )
-		{
-			m_value = 0.0;
-		}
-	}
-
-	if( m_prevValue != m_value )
-	{
-		valueChange();
-	}
-}
-
-
-
-
-void knob::setStep( float _vstep )
-{
-	float intv = m_maxValue - m_minValue;
-
-	float newStep;
-
-	if( _vstep == 0.0 )
-	{
-		newStep = intv * DefaultRelStep;
-	}
-	else
-	{
-		if( ( intv > 0 ) && ( _vstep < 0 ) || ( intv < 0 ) &&
-								( _vstep > 0 ) )
-		{
-			newStep = -_vstep;
-		}
-		else
-		{
-			newStep = _vstep;
-		}
-		if( tAbs<float>( newStep ) <
-					tAbs<float>( MinRelStep * intv ) )
-		{
-			newStep = MinRelStep * intv;
-		}
-	}
-	if( newStep != m_step )
-	{
-		m_step = newStep;
-	}
-}
-*/
 
 
 

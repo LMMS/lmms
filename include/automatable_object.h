@@ -32,10 +32,12 @@
 #include "templates.h"
 
 
-template<typename T>
+template<typename T, typename EDIT_STEP_TYPE = T>
 class automatableObject : public editableObject
 {
 public:
+	typedef automatableObject<T, EDIT_STEP_TYPE> autoObj;
+
 	automatableObject( engine * _engine, const T _val = 0, const T _min = 0,
 				const T _max = 0,
 				const T _step = defaultRelStep() ) :
@@ -139,21 +141,27 @@ public:
 		if( old_val != m_value )
 		{
 			// add changes to history so user can undo it
-			addStep( editStep( 0, m_value - old_val ) );
+			addStep( editStep( 0, static_cast<EDIT_STEP_TYPE>(
+							m_value ) -
+						static_cast<EDIT_STEP_TYPE>(
+							old_val ) ) );
 
 			// notify linked objects
 
 			// doesn't work because of implicit typename T
-			// for( autoObjVector::iterator it = m_linkedObjects.begin();
-			//			it != m_linkedObjects.end(); ++it )
+			// for( autoObjVector::iterator it =
+			// 			m_linkedObjects.begin();
+			//		it != m_linkedObjects.end(); ++it )
 			for( csize i = 0; i < m_linkedObjects.size(); ++i )
 			{
-				automatableObject<T> * it = m_linkedObjects[i];
+				autoObj * it = m_linkedObjects[i];
 				if( value() != it->value() &&
-					it->fittedValue( value() ) != it->value() )
+					it->fittedValue( value() ) !=
+								it->value() )
 				{
 					const bool sr = it->isRecordingSteps();
-					it->setStepRecording( isRecordingSteps() );
+					it->setStepRecording(
+							isRecordingSteps() );
 					it->setValue( value() );
 					it->setStepRecording( sr );
 				}
@@ -177,7 +185,7 @@ public:
 			qSwap<T>( m_minValue, m_maxValue );
 		}
 		// re-adjust value
-		automatableObject<T>::setInitValue( value() );
+		autoObj::setInitValue( value() );
 	}
 
 	inline virtual void setStep( const T _step )
@@ -209,7 +217,7 @@ public:
 		m_step = _step;
 	}
 
-	inline void linkObject( automatableObject<T> * _object )
+	inline void linkObject( autoObj * _object )
 	{
 		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
 					_object ) == m_linkedObjects.end() )
@@ -218,15 +226,15 @@ public:
 		}
 	}
 
-	inline void unlinkObject( automatableObject<T> * _object )
+	inline void unlinkObject( autoObj * _object )
 	{
 		m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
 						m_linkedObjects.end(),
 						_object ) );
 	}
 
-	static inline void linkObjects( automatableObject<T> * _object1,
-					automatableObject<T> * _object2 )
+	static inline void linkObjects( autoObj * _object1,
+					autoObj * _object2 )
 	{
 		_object1->linkObject( _object2 );
 		_object2->linkObject( _object1 );
@@ -239,10 +247,11 @@ protected:
 		const bool sr = isRecordingSteps();
 		setStepRecording( FALSE );
 #ifndef QT3
-		setValue( value() + _edit_step.data().value<T>() );
+		setValue( static_cast<T>( value() +
+				_edit_step.data().value<EDIT_STEP_TYPE>() ) );
 #else
-		setValue( value() + static_cast<T>(
-					_edit_step.data().toDouble() ) );
+		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
+					_edit_step.data().toDouble() ) ) );
 #endif
 		setStepRecording( sr );
 	}
@@ -251,10 +260,11 @@ protected:
 	{
 #ifndef QT3
 		redoStep( editStep( _edit_step.actionID(),
-					-_edit_step.data().value<T>() ) );
+				-_edit_step.data().value<EDIT_STEP_TYPE>() ) );
 #else
 		redoStep( editStep( _edit_step.actionID(),
-			static_cast<T>( -_edit_step.data().toDouble() ) ) );
+				static_cast<EDIT_STEP_TYPE>(
+					-_edit_step.data().toDouble() ) ) );
 #endif
 	}
 
@@ -273,7 +283,7 @@ private:
 	T m_maxValue;
 	T m_step;
 
-	typedef vvector<automatableObject<T> *> autoObjVector;
+	typedef vvector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;
 
 } ;
