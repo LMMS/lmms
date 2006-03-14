@@ -39,8 +39,6 @@
 #include <qtimer.h>
 #include <qobjectlist.h>
 
-#define setChecked setOn
-
 #endif
 
 #ifndef __USE_XOPEN
@@ -59,8 +57,10 @@
 QPixmap * groupBox::s_ledBg = NULL;
 
 
-groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
+groupBox::groupBox( const QString & _caption, QWidget * _parent,
+							engine * _engine ) :
 	QWidget( _parent ),
+	engineObject( _engine ),
 	m_caption( _caption ),
 	m_origHeight( height() ),
 	m_animating( FALSE )
@@ -73,7 +73,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 
 	updatePixmap();
 
-	m_led = new pixmapButton( this );
+	m_led = new pixmapButton( this, eng() );
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
@@ -237,8 +237,6 @@ void groupBox::updatePixmap( void )
 }
 
 
-
-#undef setChecked
 
 #include "group_box.moc"
 

@@ -31,12 +31,10 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QButtonGroup>
 #include <QLabel>
 
 #else
 
-#include <qbuttongroup.h>
 #include <qdom.h>
 #include <qlabel.h>
 #include <qwhatsthis.h>
@@ -199,15 +197,14 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 	QWidget( _channel_track->tabWidgetParent() ),
 	settings(),
-	engineObject( _channel_track->eng() ),
-	m_arpDirection( UP )
+	engineObject( _channel_track->eng() )
 {
-	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this );
+	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this, eng() );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
 
-	m_chordsComboBox = new comboBox( m_chordsGroupBox );
+	m_chordsComboBox = new comboBox( m_chordsGroupBox, eng() );
 	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -240,7 +237,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 
 
 
-	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this );
+	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this, eng() );
 	m_arpGroupBox->setGeometry( ARP_GROUPBOX_X, ARP_GROUPBOX_Y,
 					ARP_GROUPBOX_WIDTH,
 					ARP_GROUPBOX_HEIGHT );
@@ -258,7 +255,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 			"not played at the same time. Typical arpeggios are "
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
-	m_arpComboBox = new comboBox( m_arpGroupBox );
+	m_arpComboBox = new comboBox( m_arpGroupBox, eng() );
 	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -329,72 +326,67 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 
 
 
-	m_arpUpBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpBtn->move( 10, 74 );
-	m_arpUpBtn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
-	m_arpUpBtn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
-	m_arpUpBtn->setChecked( TRUE );
+	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, eng() );
+	arp_up_btn->move( 10, 74 );
+	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
+	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
 #ifdef QT3
-	m_arpUpBtn->setBackgroundMode( Qt::PaletteBackground );
+	arp_up_btn->setBackgroundMode( Qt::PaletteBackground );
 #endif
-	toolTip::add( m_arpUpBtn, tr( "arpeggio direction = up" ) );
-	connect( m_arpUpBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( arpUpToggled( bool ) ) );
+	toolTip::add( arp_up_btn, tr( "arpeggio direction = up" ) );
 
-	m_arpDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpDownBtn->move( 30, 74 );
-	m_arpDownBtn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
-	m_arpDownBtn->setInactiveGraphic( embed::getIconPixmap(
+
+	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, eng() );
+	arp_down_btn->move( 30, 74 );
+	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
+	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_down_off" ) );
 #ifdef QT3
-	m_arpDownBtn->setBackgroundMode( Qt::PaletteBackground );
+	arp_down_btn->setBackgroundMode( Qt::PaletteBackground );
 #endif
-	toolTip::add( m_arpDownBtn, tr( "arpeggio direction = down" ) );
-	connect( m_arpDownBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( arpDownToggled( bool ) ) );
+	toolTip::add( arp_down_btn, tr( "arpeggio direction = down" ) );
 
-	m_arpUpAndDownBtn = new pixmapButton( m_arpGroupBox );
-	m_arpUpAndDownBtn->move( 50, 74 );
-	m_arpUpAndDownBtn->setActiveGraphic( embed::getIconPixmap(
+
+	pixmapButton * arp_up_and_down_btn = new pixmapButton( m_arpGroupBox,
+									eng() );
+	arp_up_and_down_btn->move( 50, 74 );
+	arp_up_and_down_btn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
-	m_arpUpAndDownBtn->setInactiveGraphic( embed::getIconPixmap(
+	arp_up_and_down_btn->setInactiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_off" ) );
 #ifdef QT3
-	m_arpUpAndDownBtn->setBackgroundMode( Qt::PaletteBackground );
+	arp_up_and_down_btn->setBackgroundMode( Qt::PaletteBackground );
 #endif
-	toolTip::add( m_arpUpAndDownBtn,
+	toolTip::add( arp_up_and_down_btn,
 				tr( "arpeggio direction = up and down" ) );
-	connect( m_arpUpAndDownBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( arpUpAndDownToggled( bool ) ) );
 
-	m_arpRandomBtn = new pixmapButton( m_arpGroupBox );
-	m_arpRandomBtn->move( 70, 74 );
-	m_arpRandomBtn->setActiveGraphic( embed::getIconPixmap(
+
+	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox,
+									eng() );
+	arp_random_btn->move( 70, 74 );
+	arp_random_btn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
-	m_arpRandomBtn->setInactiveGraphic( embed::getIconPixmap(
+	arp_random_btn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_random_off" ) );
 #ifdef QT3
-	m_arpRandomBtn->setBackgroundMode( Qt::PaletteBackground );
+	arp_random_btn->setBackgroundMode( Qt::PaletteBackground );
 #endif
-	toolTip::add( m_arpRandomBtn, tr( "arpeggio direction = random" ) );
-	connect( m_arpRandomBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( arpRandomToggled( bool ) ) );
+	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
 
-	QButtonGroup * m_arpDirections_group = new QButtonGroup( this );
-	m_arpDirections_group->addButton( m_arpUpBtn );
-	m_arpDirections_group->addButton( m_arpDownBtn );
-	m_arpDirections_group->addButton( m_arpUpAndDownBtn );
-	m_arpDirections_group->addButton( m_arpRandomBtn );
-	m_arpDirections_group->setExclusive( TRUE );
-#ifdef QT3
-	m_arpDirections_group->hide();
-#endif
+	m_arpDirectionBtnGrp = new automatableButtonGroup( this, eng() );
+	m_arpDirectionBtnGrp->addButton( arp_up_btn );
+	m_arpDirectionBtnGrp->addButton( arp_down_btn );
+	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
+	m_arpDirectionBtnGrp->addButton( arp_random_btn );
+
+	m_arpDirectionBtnGrp->setInitValue( UP - 1 );
+
 
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
 	mode_lbl->setGeometry( 10, 104, 64, 10 );
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
-	m_arpModeComboBox = new comboBox( m_arpGroupBox );
+	m_arpModeComboBox = new comboBox( m_arpGroupBox, eng() );
 	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
 	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
@@ -404,7 +396,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
 					embed::getIconPixmap( "arp_sort" ) );
 	m_arpModeComboBox->addItem( tr( "Sync" ),
 					embed::getIconPixmap( "arp_sync" ) );
-	m_arpModeComboBox->setCurrentIndex( 0 );
+	//m_arpModeComboBox->setValue( 0 );
 }
 
 
@@ -431,7 +423,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 					m_chordsGroupBox->isActive() == TRUE )
 	{
 		// then insert sub-notes for chord
-		const int selected_chord = m_chordsComboBox->currentIndex();
+		const int selected_chord = m_chordsComboBox->value();
 
 		for( int octave_cnt = 0;
 			octave_cnt < m_chordRangeKnob->value(); ++octave_cnt )
@@ -480,7 +472,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	// now follows code for arpeggio
 
-	if( _n->baseNote() == FALSE || m_arpDirection == OFF ||
+	if( _n->baseNote() == FALSE || m_arpDirectionBtnGrp->value() == OFF ||
 		!m_arpGroupBox->isActive() ||
 		( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )
@@ -489,11 +481,11 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	}
 
 
-	const int selected_arp = m_arpComboBox->currentIndex();
+	const int selected_arp = m_arpComboBox->value();
 
 	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfChannelTrack(
 							_n->getChannelTrack() );
-	if( m_arpModeComboBox->currentIndex() != FREE && cnphv.size() == 0 )
+	if( m_arpModeComboBox->value() != FREE && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
 		cnphv = presetPreviewPlayHandle::nphsOfChannelTrack(
@@ -519,7 +511,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame = ( ( m_arpModeComboBox->currentIndex() != FREE ) ?
+	int cur_frame = ( ( m_arpModeComboBox->value() != FREE ) ?
 				cnphv.first()->totalFramesPlayed() :
 				_n->totalFramesPlayed() )
 							+ arp_frames - 1;
@@ -543,7 +535,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// init with zero
 		int cur_arp_idx = 0;
 
-		if( m_arpModeComboBox->currentIndex() == SORT &&
+		if( m_arpModeComboBox->value() == SORT &&
 				( ( cur_frame / arp_frames ) % total_range ) /
 					range != (Uint32) _n->index() )
 		{
@@ -553,17 +545,19 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 			continue;
 		}
 
+		arpDirections dir = static_cast<arpDirections>(
+					m_arpDirectionBtnGrp->value() + 1 );
 		// process according to arpeggio-direction...
-		if( m_arpDirection == UP )
+		if( dir == UP )
 		{
 			cur_arp_idx = ( cur_frame / arp_frames ) % range;
 		}
-		else if( m_arpDirection == DOWN )
+		else if( dir == DOWN )
 		{
 			cur_arp_idx = range - ( cur_frame / arp_frames ) %
 								range - 1;
 		}
-		else if( m_arpDirection == UP_AND_DOWN && range > 1 )
+		else if( dir == UP_AND_DOWN && range > 1 )
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
@@ -579,7 +573,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 							( range - 1 ) - 1;
 			}
 		}
-		else if( m_arpDirection == RANDOM )
+		else if( dir == RANDOM )
 		{
 			// just pick a random chord-index
 			cur_arp_idx = (int)( range * ( (float) rand() /
@@ -619,7 +613,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// and is_arp_note=TRUE
 		notePlayHandle * note_play_handle = new notePlayHandle(
 						_n->getChannelTrack(),
-					( ( m_arpModeComboBox->currentIndex() !=
+					( ( m_arpModeComboBox->value() !=
 					    				FREE ) ?
 						cnphv.first()->framesAhead() :
 						_n->framesAhead() ) +
@@ -639,7 +633,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	// make sure, note is handled as arp-base-note, even if we didn't add a
 	// sub-note so far
-	if( m_arpModeComboBox->currentIndex() != FREE )
+	if( m_arpModeComboBox->value() != FREE )
 	{
 		_n->setArpNote( TRUE );
 	}
@@ -653,19 +647,19 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 {
 	QDomElement act_de = _doc.createElement( nodeName() );
 	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
-	act_de.setAttribute( "chord", m_chordsComboBox->currentIndex() );
+	act_de.setAttribute( "chord", m_chordsComboBox->value() );
 	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
 
 	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
-	act_de.setAttribute( "arp", m_arpComboBox->currentIndex() );
+	act_de.setAttribute( "arp", m_arpComboBox->value() );
 	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
 	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
 	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
-	act_de.setAttribute( "arpdir", m_arpDirection );
+	act_de.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() );
 	act_de.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
-	act_de.setAttribute( "arpmode", m_arpModeComboBox->currentIndex() );
+	act_de.setAttribute( "arpmode", m_arpModeComboBox->value() );
 	_parent.appendChild( act_de );
 }
 
@@ -676,89 +670,25 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 {
 	m_chordsGroupBox->setState( !_this.attribute
 						( "chorddisabled" ).toInt() );
-	m_chordsComboBox->setCurrentIndex( _this.attribute( "chord" ).toInt() );
+	m_chordsComboBox->setValue( _this.attribute( "chord" ).toInt() );
 	m_chordRangeKnob->setValue( _this.attribute( "chordrange" ).toFloat() );
-	m_arpComboBox->setCurrentIndex( _this.attribute( "arp" ).toInt() );
+	m_arpComboBox->setValue( _this.attribute( "arp" ).toInt() );
 	m_arpRangeKnob->setValue( _this.attribute( "arprange" ).toFloat() );
 	m_arpTimeKnob->setValue( _this.attribute( "arptime" ).toFloat() );
 	m_arpGateKnob->setValue( _this.attribute( "arpgate" ).toFloat() );
-	m_arpDirection = static_cast<arpDirections>(
+	m_arpDirectionBtnGrp->setInitValue(
 					_this.attribute( "arpdir" ).toInt() );
 	m_arpTimeKnob->setSyncMode( 
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
 
-	m_arpModeComboBox->setCurrentIndex( _this.attribute( "arpmode"
-								).toInt() );
+	m_arpModeComboBox->setValue( _this.attribute( "arpmode" ).toInt() );
 
-	m_arpGroupBox->setState( m_arpDirection != OFF &&
+	m_arpGroupBox->setState( m_arpDirectionBtnGrp->value() != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );
-	switch( m_arpDirection )
-	{
-		case DOWN:
-			m_arpDownBtn->setChecked( TRUE );
-			break;
-		case UP_AND_DOWN:
-			m_arpUpAndDownBtn->setChecked( TRUE );
-			break;
-		case RANDOM:
-			m_arpRandomBtn->setChecked( TRUE );
-			break;
-		case UP:
-		default:
-			m_arpUpBtn->setChecked( TRUE );
-			m_arpDirection = UP;
-			break;
-	}
 }
 
 
-
-
-void arpAndChordsTabWidget::arpUpToggled( bool _on )
-{
-	if( _on )
-	{
-		m_arpDirection = UP;
-	}
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void arpAndChordsTabWidget::arpDownToggled( bool _on )
-{
-	if( _on )
-	{
-		m_arpDirection = DOWN;
-	}
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void arpAndChordsTabWidget::arpUpAndDownToggled( bool _on )
-{
-	if( _on )
-	{
-		m_arpDirection = UP_AND_DOWN;
-	}
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void arpAndChordsTabWidget::arpRandomToggled( bool _on )
-{
-	if( _on )
-	{
-		m_arpDirection = RANDOM;
-	}
-	eng()->getSongEditor()->setModified();
-}
 
 
 

@@ -28,7 +28,6 @@
 #ifdef QT4
 
 #include <QPainter>
-#include <QButtonGroup>
 #include <QBitmap>
 #include <Qt/QtXml>
 #include <QFileInfo>
@@ -37,7 +36,6 @@
 #else
 
 #include <qpainter.h>
-#include <qbuttongroup.h>
 #include <qbitmap.h>
 #include <qdom.h>
 #include <qfileinfo.h>
@@ -104,7 +102,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 	}
 
 
-	m_openAudioFileButton = new pixmapButton( this );
+	m_openAudioFileButton = new pixmapButton( this, eng() );
 	m_openAudioFileButton->setCheckable( FALSE );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 200, 90 );
@@ -130,7 +128,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
 	
-	m_reverseButton = new pixmapButton( this );
+	m_reverseButton = new pixmapButton( this, eng() );
 	m_reverseButton->move( 160, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
@@ -149,7 +147,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this );
+	m_loopButton = new pixmapButton( this, eng() );
 	m_loopButton->move( 180, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
@@ -226,16 +224,12 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between start- and end-point." ) );
 
-	m_viewLinesPB = new pixmapButton( this );
+	m_viewLinesPB = new pixmapButton( this, eng() );
 	m_viewLinesPB->move( 154, 158 );
 	m_viewLinesPB->setBgGraphic( getBackground( m_viewLinesPB ) );
 	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
 	{
-#ifdef QT4
 		m_viewLinesPB->setChecked( TRUE );
-#else
-		m_viewLinesPB->setOn( TRUE );
-#endif
 	}
 	connect( m_viewLinesPB, SIGNAL( toggled( bool ) ), this,
 					SLOT( lineDrawBtnToggled( bool ) ) );
@@ -249,16 +243,12 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"sound itself. It just gives you another view to your "
 			"sample." ) );
 
-	m_viewDotsPB = new pixmapButton( this );
+	m_viewDotsPB = new pixmapButton( this, eng() );
 	m_viewDotsPB->move( 204, 158 );
 	m_viewDotsPB->setBgGraphic( getBackground( m_viewDotsPB ) );
 	if( m_drawMethod == sampleBuffer::DOTS )
 	{
-#ifdef QT4
 		m_viewDotsPB->setChecked( TRUE );
-#else
-		m_viewDotsPB->setOn( TRUE );
-#endif
 	}
 	connect( m_viewDotsPB, SIGNAL( toggled( bool ) ), this,
 					SLOT( dotDrawBtnToggled( bool ) ) );
@@ -271,13 +261,12 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"with dots. This doesn't change the sound itself. "
 			"It just gives you another view to your sample." ) );
 	
-	QButtonGroup * view_group = new QButtonGroup( this );
+	automatableButtonGroup * view_group = new automatableButtonGroup( this,
+									eng() );
 	view_group->addButton( m_viewLinesPB );
 	view_group->addButton( m_viewDotsPB );
-	view_group->setExclusive( TRUE );
-#ifndef QT4
-	view_group->hide();
 
+#ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
 #endif
 	setAcceptDrops( TRUE );

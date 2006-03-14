@@ -59,8 +59,7 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public engineObject,
-	     					public automatableObject<float>
+class knob : public QWidget, public automatableObject<float>
 {
 	Q_OBJECT
 public:
@@ -75,10 +74,10 @@ public:
 
 	void setTotalAngle( float _angle );
 
-	inline void setInitValue( const float _val )
+	inline virtual void setInitValue( const float _val )
 	{
 		m_initValue = _val;
-		setValue( _val );
+		automatableObject<float>::setInitValue( _val );
 	}
 
 	virtual void setValue( const float _x );
@@ -86,33 +85,8 @@ public:
 	virtual void setRange( const float _min, const float _max,
 						const float _step = 0.0 );
 
-/*	inline float value( void ) const
-	{
-		return( m_value );
-	}
-
-	void setStep( float );
-
-	inline float maxValue( void ) const
-	{
-		return( m_maxValue );
-	}
-	inline float minValue( void ) const
-	{
-		return( m_minValue );
-	}*/
-
-/*	inline void incPages( int _n_pages )
-	{
-		setNewValue( value() + float( _n_pages ) * m_pageSize, 1 );
-	}*/
-
-
 
 public slots:
-/*	void setValue( float _val, bool _is_init_value = FALSE );
-	void fitValue( float _val );
-	void incValue( int _steps );*/
 	void reset( void );
 	void copyValue( void );
 	void pasteValue( void );
@@ -172,6 +146,7 @@ protected:
 	float m_pageSize;
 	float m_angle;
 	float m_totalAngle;
+
 
 	QPixmap * m_knobPixmap;
 	int m_knobNum;

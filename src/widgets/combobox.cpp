@@ -54,10 +54,10 @@ QPixmap * comboBox::s_arrow = NULL;
 const int CB_ARROW_BTN_WIDTH = 20;
 
 
-comboBox::comboBox( QWidget * _parent ) :
+comboBox::comboBox( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
+	automatableObject<int>( _engine ),
 	m_menu( this ),
-	m_currentIndex( 0 ),
 	m_pressed( FALSE )
 {
 	if( s_background == NULL )
@@ -124,6 +124,7 @@ void comboBox::addItem( const QString & _item, const QPixmap & _pixmap )
 #endif
 				);
 	}
+	setRange( 0, m_items.size() - 1 );
 }
 
 
@@ -145,13 +146,14 @@ int comboBox::findText( const QString & _txt ) const
 
 
 
-void comboBox::setCurrentIndex( int _idx )
+void comboBox::setValue( const int _idx )
 {
-	m_currentIndex = tLimit<int>( _idx, 0, ( m_items.size() > 0 ) ?
-						m_items.size() - 1 : 0 );
-	emit( currentIndexChanged( m_currentIndex ) );
+	automatableObject<int>::setValue( _idx );
+/*	m_value = tLimit<int>( _idx, 0, ( m_items.size() > 0 ) ?
+						m_items.size() - 1 : 0 );*/
+	emit( valueChanged( value() ) );
 	emit( activated( ( m_items.size() > 0 ) ?
-					m_items[m_currentIndex].first : "" ) );
+					m_items[value()].first : "" ) );
 	update();
 }
 
@@ -180,11 +182,11 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		setCurrentIndex( currentIndex() + 1 );
+		setValue( value() + 1 );
 	}
 	else if( _me->button() == Qt::RightButton )
 	{
-		setCurrentIndex( currentIndex() - 1 );
+		setValue( value() - 1 );
 	}
 }
 
@@ -235,7 +237,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 		p.setFont( font() );
 		p.setClipRect( QRect( 5, 2, width() - CB_ARROW_BTN_WIDTH - 8,
 							height() - 2 ) );
-		const QPixmap & item_pm = m_items[currentIndex()].second;
+		const QPixmap & item_pm = m_items[value()].second;
 		int tx = 4;
 		if( item_pm.isNull() == FALSE )
 		{
@@ -244,10 +246,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 		}
 		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( tx+1, p.fontMetrics().height()+1,
-						m_items[currentIndex()].first );
+						m_items[value()].first );
 		p.setPen( QColor( 224, 224, 224 ) );
 		p.drawText( tx, p.fontMetrics().height(),
-						m_items[currentIndex()].first );
+						m_items[value()].first );
 	}
 
 #ifdef QT3
@@ -261,7 +263,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 
 void comboBox::wheelEvent( QWheelEvent * _we )
 {
-	setCurrentIndex( currentIndex() + ( ( _we->delta() < 0 ) ? 1 : -1 ) );
+	setValue( value() + ( ( _we->delta() < 0 ) ? 1 : -1 ) );
 	_we->accept();
 }
 
@@ -271,7 +273,7 @@ void comboBox::wheelEvent( QWheelEvent * _we )
 
 void comboBox::setItem( QAction * _item )
 {
-	setCurrentIndex( findText( _item->text() ) );
+	setValue( findText( _item->text() ) );
 }
 
 
@@ -288,7 +290,7 @@ void comboBox::setItem( QAction * )
 
 void comboBox::setItem( int _item )
 {
-	setCurrentIndex( _item );
+	setValue( _item );
 }
 
 

@@ -87,10 +87,13 @@ pluginBrowser::pluginBrowser( QWidget * _parent, engine * _engine ) :
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
-		pluginDescWidget * p = new pluginDescWidget( *it, m_view,
-									eng() );
-		p->show();
-		view_layout->addWidget( p );
+		if( it->type == plugin::INSTRUMENT )
+		{
+			pluginDescWidget * p = new pluginDescWidget( *it,
+								m_view, eng() );
+			p->show();
+			view_layout->addWidget( p );
+		}
 	}
 	view_layout->addStretch();
 	show();

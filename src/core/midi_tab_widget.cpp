@@ -76,7 +76,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
-							m_setupTabWidget );
+						m_setupTabWidget, eng() );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setValue( m_midiPort->inputChannel() + 1 );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -86,7 +86,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 	inputChannelChanged( m_inputChannelSpinBox->value() );
 
 	m_outputChannelSpinBox = new lcdSpinBox( 1, MIDI_CHANNEL_COUNT, 3,
-							m_setupTabWidget );
+						m_setupTabWidget, eng() );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -97,7 +97,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 
 
 	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
-							m_setupTabWidget );
+						m_setupTabWidget, eng() );
 	m_receiveCheckBox->move( 10, 34 );
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
@@ -106,7 +106,7 @@ midiTabWidget::midiTabWidget( channelTrack * _channel_track,
 
 
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
-							m_setupTabWidget );
+						m_setupTabWidget, eng() );
 	m_sendCheckBox->move( 10, 94 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );

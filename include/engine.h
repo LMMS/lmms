@@ -26,10 +26,8 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-#include "qt3support.h"
-
-
 class bbEditor;
+class editHistory;
 class mainWindow;
 class mixer;
 class pianoRoll;
@@ -40,7 +38,7 @@ class songEditor;
 class engine
 {
 public:
-	engine( const bool _has_gui = TRUE );
+	engine( const bool _has_gui = true );
 	engine( const engine & _engine );
 	~engine();
 
@@ -94,6 +92,11 @@ public:
 		return( m_projectNotes );
 	}
 
+	inline editHistory * getEditHistory( void )
+	{
+		return( m_editHistory );
+	}
+
 
 private:
 	bool m_hasGUI;
@@ -104,6 +107,7 @@ private:
 	bbEditor * m_bbEditor;
 	pianoRoll * m_pianoRoll;
 	projectNotes * m_projectNotes;
+	editHistory * m_editHistory;
 
 } ;
 

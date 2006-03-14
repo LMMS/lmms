@@ -68,7 +68,6 @@
 #include <math.h>
 
 #include "knob.h"
-#include "song_editor.h"
 /*#include "midi_client.h"*/
 #include "embed.h"
 #include "spc_bg_hndl_widget.h"
@@ -95,8 +94,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 			, _name.ascii()
 #endif
 		),
-	engineObject( _engine ),
-	automatableObject<float>(),
+	automatableObject<float>( _engine ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_angle( 0.0f ),
@@ -413,6 +411,9 @@ void knob::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			eng()->getMainWindow()->isCtrlPressed() == FALSE )
 	{
+		setStepRecording( FALSE );
+		m_oldValue = value();
+
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
 
@@ -464,7 +465,6 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 		{
 			QCursor::setPos( mapToGlobal( m_origMousePos ) );
 		}
-		eng()->getSongEditor()->setModified();
 	}
 
 	s_textFloat->setText( m_hintTextBeforeValue +
@@ -478,6 +478,9 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 //! Mouse Release Event handler
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
+	setStepRecording( TRUE );
+	addStepFromOldToCurVal();
+
 	if( m_buttonPressed )
 	{
 		m_buttonPressed = TRUE;
@@ -560,7 +563,6 @@ void knob::wheelEvent( QWheelEvent * _we )
 	_we->accept();
 	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
 	incValue( inc );
-	eng()->getSongEditor()->setModified();
 
 
 	s_textFloat->reparent( this );
@@ -730,7 +732,6 @@ void knob::setStep( float _vstep )
 void knob::reset( void )
 {
 	setValue( m_initValue );
-	eng()->getSongEditor()->setModified();
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( value() ) +
@@ -754,7 +755,6 @@ void knob::copyValue( void )
 void knob::pasteValue( void )
 {
 	setValue( s_copiedValue );
-	eng()->getSongEditor()->setModified();
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( value() ) +

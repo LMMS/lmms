@@ -573,8 +573,11 @@ void projectNotes::alignmentChanged( int _a )
 void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	QDomElement pn_de = _doc.createElement( nodeName() );
+	mainWindow::saveWidgetState( this, pn_de );
+
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	pn_de.appendChild( ds );
+
 	_parent.appendChild( pn_de );
 }
 
@@ -583,6 +586,7 @@ void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 
 void projectNotes::loadSettings( const QDomElement & _this )
 {
+	mainWindow::restoreWidgetState( this, _this );
 	m_edit->setHtml( _this.text() );
 }
 

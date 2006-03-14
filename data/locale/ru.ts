@@ -44,19 +44,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>LMMS - A powerful synthesizer-studio
 
-Copyright (c) 2004-2005 LMMS-Developers
-
-http://lmms.sourceforge.net</source>
-        <translation type="obsolete">LMMS - программа-синтезатор для компьютера
-
-Права на программу LMMS (c) 2004-2005 принадлежат её разработчикам
-
-Наша страница в интернете:
-http://lmms.sourceforge.net</translation>
-    </message>
-    <message>
-        <source>LMMS - A powerful synthesizer-studio
-
 Copyright (c) 2004-2006 LMMS-Developers
 
 http://lmms.sourceforge.net</source>
@@ -339,10 +326,6 @@ http://lmms.sourceforge.net</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Chords</source>
-        <translation type="obsolete">Аккорды</translation>
-    </message>
-    <message>
         <source>Chord range:</source>
         <translation>Диапазон аккорда:</translation>
     </message>
@@ -353,14 +336,6 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
         <translation>Этот регулятор изменяет частотный диапазон акорда: аккорд будет содержать указанное число октав.</translation>
-    </message>
-    <message>
-        <source>Range</source>
-        <translation type="obsolete">Диапазон</translation>
-    </message>
-    <message>
-        <source>Arpeggio</source>
-        <translation type="obsolete">Арпеджио</translation>
     </message>
     <message>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
@@ -401,20 +376,8 @@ http://lmms.sourceforge.net</translation>
         <translation>Регулировка заполнения для арпеджио. Коэффициент заполнения показывает, какая часть каждого тона будет проиграна. Простой способ создавать стаккато-орпеджио.</translation>
     </message>
     <message>
-        <source>Time</source>
-        <translation type="obsolete">Период</translation>
-    </message>
-    <message>
-        <source>Gate</source>
-        <translation type="obsolete">Заполнение</translation>
-    </message>
-    <message>
         <source>Direction:</source>
         <translation>Направление:</translation>
-    </message>
-    <message>
-        <source>arpeggio direction = none = no arpeggio</source>
-        <translation type="obsolete">Отключить арпеджио</translation>
     </message>
     <message>
         <source>arpeggio direction = up</source>
@@ -553,14 +516,6 @@ http://lmms.sourceforge.net</translation>
         <translation>ЗАПОЛНЕНИЕ</translation>
     </message>
     <message>
-        <source>DIRECTION:</source>
-        <translation type="obsolete">НАПРАВЛЕНИЕ:</translation>
-    </message>
-    <message>
-        <source>SORT-MODE</source>
-        <translation type="obsolete">СОРТИРОВАТЬ</translation>
-    </message>
-    <message>
         <source>Mode:</source>
         <translation>Режим:</translation>
     </message>
@@ -694,10 +649,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Нажмите чтобы остановить воспроизведение.</translation>
     </message>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation type="obsolete">Редактор ритма/басов</translation>
-    </message>
-    <message>
         <source>Beat+Baseline Editor</source>
         <translation>Редактор ритма/лейтмотива</translation>
     </message>
@@ -717,20 +668,12 @@ http://lmms.sourceforge.net</translation>
         <translation>Изменить цвет</translation>
     </message>
     <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation type="obsolete">Открыть в редакторе ритма/басов</translation>
-    </message>
-    <message>
         <source>Open in Beat+Baseline-Editor</source>
         <translation>Открыть в редакторе ритма/лейтмотива</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
-    <message>
-        <source>Beat/Bassline %1</source>
-        <translation type="obsolete">Ритм/басы %1</translation>
-    </message>
     <message>
         <source>Beat/Baseline %1</source>
         <translation>Лейтмотив %1</translation>
@@ -777,33 +720,6 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
         <translation>Здесь вы можете рисовать собственный сигнал</translation>
-    </message>
-</context>
-<context>
-    <name>browser</name>
-    <message>
-        <source>Files</source>
-        <translation type="obsolete">Файлы</translation>
-    </message>
-    <message>
-        <source>Browser</source>
-        <translation type="obsolete">Просмотрщик</translation>
-    </message>
-    <message>
-        <source>Reload (F5)</source>
-        <translation type="obsolete">Обновить (F5)</translation>
-    </message>
-    <message>
-        <source>Send to active channel</source>
-        <translation type="obsolete">В активный канал</translation>
-    </message>
-    <message>
-        <source>Open in new channel/B+B Editor</source>
-        <translation type="obsolete">В новый канал и открыть в редакторе ритма/басов</translation>
-    </message>
-    <message>
-        <source>Open in new channel/Song-Editor</source>
-        <translation type="obsolete">В новый канал и открыть в редакторе</translation>
     </message>
 </context>
 <context>
@@ -900,25 +816,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Настройка LMMS</translation>
     </message>
     <message>
-        <source>LMMS needs to be setup in order to run properly. This wizard will help you to setup your personal LMMS-installation.
-If you&apos;re unsure what to do at a step, just click on &apos;Next&apos;. LMMS will automatically select the best options for you.
-
-Now click on &apos;Next&apos; to get to the next page.</source>
-        <translation type="obsolete">Перед началом работы нужно настроить LMMS. Этот мастер поможет вам создать собственные настройки.
-Если вы не знаете точно, что следует делать, просто нажимайте &quot;Дальше&quot;. Как правило, настройки по умолчанию являются лучшим выбором.
-
-А теперь - самое время нажать &quot;Дальше&quot;.</translation>
-    </message>
-    <message>
-        <source>When working with LMMS there needs to be a working-directory.
-This directory is used for storing your projects, presets, samples etc.
-
-Please select a directory:</source>
-        <translation type="obsolete">При работе с LMMS вам потребуется рабочий каталог, где вы сможете хранить проекты, настройки, образцы звуков и т. д.
-
-Выберите каталог:</translation>
-    </message>
-    <message>
         <source>For using the ready presets and samples of LMMS and enjoying the demo-songs the according files have to be copied or linked into your LMMS-working-directory.
 When copying files, you can modify them, but they need additional space in your working-directory. If you link files, you cannot modify them, but they need no extra space. So it&apos;s recommended to copy presets and demo-projects and link samples, which are bigger in size.
 </source>
@@ -959,10 +856,6 @@ When copying files, you can modify them, but they need additional space in your 
         <translation>Копировать файлы или создавать ссылки</translation>
     </message>
     <message>
-        <source>Choose LMMS-working-directory</source>
-        <translation type="obsolete">Выбор рабочего каталога LMMS</translation>
-    </message>
-    <message>
         <source>Directory not existing</source>
         <translation>Каталог не существует</translation>
     </message>
@@ -981,16 +874,8 @@ The setup-wizard will be shown for reconfiguring LMMS.</source>
         <translation>Указанный каталог не существует. Создать его?</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отменить</translation>
-    </message>
-    <message>
         <source>&lt; &amp;Back</source>
         <translation>&lt; &amp;Назад</translation>
-    </message>
-    <message>
-        <source>Next &gt;</source>
-        <translation type="obsolete">Дальше &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
@@ -1222,36 +1107,8 @@ LMMS-working-directory. Run the setup-wizard now?</source>
         <translation>Разрешить этому LFO задавать глубину модуляции обложки</translation>
     </message>
     <message>
-        <source>DELAY</source>
-        <translation type="obsolete">DELAY</translation>
-    </message>
-    <message>
-        <source>ATTACK</source>
-        <translation type="obsolete">ATTACK</translation>
-    </message>
-    <message>
         <source>HOLD</source>
         <translation>HOLD</translation>
-    </message>
-    <message>
-        <source>DECAY</source>
-        <translation type="obsolete">DECAY</translation>
-    </message>
-    <message>
-        <source>SUSTAIN</source>
-        <translation type="obsolete">SUSTAIN</translation>
-    </message>
-    <message>
-        <source>RELEASE</source>
-        <translation type="obsolete">RELEASE</translation>
-    </message>
-    <message>
-        <source>AMOUNT</source>
-        <translation type="obsolete">AMOUNT</translation>
-    </message>
-    <message>
-        <source>SPEED</source>
-        <translation type="obsolete">SPEED</translation>
     </message>
     <message>
         <source>DEL</source>
@@ -1308,14 +1165,6 @@ LMMS-working-directory. Run the setup-wizard now?</source>
 </context>
 <context>
     <name>envelopeTabWidget</name>
-    <message>
-        <source>Cut</source>
-        <translation type="obsolete">Срез</translation>
-    </message>
-    <message>
-        <source>Filter</source>
-        <translation type="obsolete">Фильтр</translation>
-    </message>
     <message>
         <source>LowPass</source>
         <translation>ФНЧ</translation>
@@ -1480,10 +1329,6 @@ Make sure, you have write access to the selected file/device!</source>
         <translation>Просмотрщик</translation>
     </message>
     <message>
-        <source>Files</source>
-        <translation type="obsolete">Файлы</translation>
-    </message>
-    <message>
         <source>Reload (F5)</source>
         <translation>Обновить (F5)</translation>
     </message>
@@ -1543,239 +1388,6 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
 </context>
 <context>
-    <name>lmmsMainWin</name>
-    <message>
-        <source>Windows</source>
-        <translation type="obsolete">Окна</translation>
-    </message>
-    <message>
-        <source>Setting up main-window and workspace...</source>
-        <translation type="obsolete">Создаю рабочее пространство...</translation>
-    </message>
-    <message>
-        <source>Creating new song...</source>
-        <translation type="obsolete">Создаю композицию...</translation>
-    </message>
-    <message>
-        <source>Creating GUI...</source>
-        <translation type="obsolete">Создаю GUI...</translation>
-    </message>
-    <message>
-        <source>Show/Hide EffectBoard</source>
-        <translation type="obsolete">Показать/скрыть панель эффектов</translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation type="obsolete">&amp;Новый</translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation type="obsolete">&amp;Открыть...</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Сохранить</translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation type="obsolete">Сохранить &amp;как...</translation>
-    </message>
-    <message>
-        <source>E&amp;xport</source>
-        <translation type="obsolete">&amp;Экспорт</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation type="obsolete">&amp;Выйти</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation type="obsolete">Справка</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation type="obsolete">О программе</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="obsolete">&amp;О программе</translation>
-    </message>
-    <message>
-        <source>Show/Hide Piano-Roll</source>
-        <translation type="obsolete">Показать/скрыть синтезатор</translation>
-    </message>
-    <message>
-        <source>What&apos;s this?</source>
-        <translation type="obsolete">Что это?</translation>
-    </message>
-    <message>
-        <source>Show/Hide Beat+Bassline Editor</source>
-        <translation type="obsolete">Показать/скрыть редактор ритма/басов</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation type="obsolete">По нажатию этой кнопки запускается редактор ритма/басов. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов ритма и басов и т. п.</translation>
-    </message>
-    <message>
-        <source>Show/Hide Song-Editor</source>
-        <translation type="obsolete">Показать/скрыть редактор мелодии</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Song-Editor. With the Song-Editor you can edit the song and set when and which track should be played. You can also insert and move samples (e.g. rap-samples) directly in the playlist.</source>
-        <translation type="obsolete">По нажатию этой кнопки запускается редактор мелодии. С его помощью вы можеет редактировать композицию, устанавливать время воспроизведения для всех дорожек. Также вы можете вставлять и передвигать образцы непосредственно в списке воспроизведения.</translation>
-    </message>
-    <message>
-        <source>My samples</source>
-        <translation type="obsolete">Мои образцы</translation>
-    </message>
-    <message>
-        <source>My presets</source>
-        <translation type="obsolete">Мои предустановки</translation>
-    </message>
-    <message>
-        <source>My projects</source>
-        <translation type="obsolete">Мои проекты</translation>
-    </message>
-    <message>
-        <source>Loading song...</source>
-        <translation type="obsolete">Загружаю композицию...</translation>
-    </message>
-    <message>
-        <source>&amp;Settings</source>
-        <translation type="obsolete">&amp;Настройка</translation>
-    </message>
-    <message>
-        <source>Show setup wizard</source>
-        <translation type="obsolete">Запустить мастер настройки</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.xml)</source>
-        <translation type="obsolete">Мультимедийный проект  (*.xml)</translation>
-    </message>
-    <message>
-        <source>Show/Hide Project notes</source>
-        <translation type="obsolete">Показать/скрыть комментарий</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation type="obsolete">Эта кнопка показывает/прячет окно с заметками. В этом окне вы можете помещать любые комментарии к своей композиции.</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the EffectBoard. The EffectBoard is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation type="obsolete">Эта кнопка показывает/прячет панель эффектов. Эта панель является мощным инструментом управления эффектами, которые Вы можете вставлять в особый канал (канал эффектов).</translation>
-    </message>
-    <message>
-        <source>Create new project</source>
-        <translation type="obsolete">Создать новый проект</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation type="obsolete">Ctrl+N</translation>
-    </message>
-    <message>
-        <source>Open existing project</source>
-        <translation type="obsolete">Открыть существующий проект</translation>
-    </message>
-    <message>
-        <source>Ctrl+O</source>
-        <translation type="obsolete">Ctrl+O</translation>
-    </message>
-    <message>
-        <source>Save current project</source>
-        <translation type="obsolete">Сохранить текущий проект</translation>
-    </message>
-    <message>
-        <source>Export current project</source>
-        <translation type="obsolete">Экспортировать проект в звуковой файл</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
-        <translation type="obsolete">По нажатию этой кнопки запускается синтезатор LMMS. С его помощью вы можете легко редактировать шблоны мелодии.</translation>
-    </message>
-    <message>
-        <source>&amp;Project</source>
-        <translation type="obsolete">&amp;Проект</translation>
-    </message>
-    <message>
-        <source>Open project</source>
-        <translation type="obsolete">Открыть проект</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation type="obsolete">Сохранить проект</translation>
-    </message>
-    <message>
-        <source>Song management</source>
-        <translation type="obsolete">Управление композициями</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation type="obsolete">Импорт файла</translation>
-    </message>
-    <message>
-        <source>My home</source>
-        <translation type="obsolete">Домашний каталог</translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation type="obsolete">Корневой каталог</translation>
-    </message>
-    <message>
-        <source>Show settings dialog</source>
-        <translation type="obsolete">Показать окно настройки</translation>
-    </message>
-    <message>
-        <source>Help not available</source>
-        <translation type="obsolete">Справка недоступна</translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://lmms.sourceforge.net and click on &quot;Documentation&quot;.
-There hopefully you&apos;ll find the stuff you want to know...</source>
-        <translation type="obsolete">Пока что справка для LMMS не написана.
-Зайдите на сайт http://lmms.sourceforge.net и пройдите по ссылке &quot;Documentation&quot;.
-Надеемся, Вы найдёте там нужные материалы...</translation>
-    </message>
-    <message>
-        <source>Show/hide Beat+Bassline Editor</source>
-        <translation type="obsolete">Показать/скрыть редактор ритма/басов</translation>
-    </message>
-    <message>
-        <source>Show/hide Piano-Roll</source>
-        <translation type="obsolete">Показать/скрыть синтезатор</translation>
-    </message>
-    <message>
-        <source>Show/hide Song-Editor</source>
-        <translation type="obsolete">Показать/скрыть редактор мелодии</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
-        <translation type="obsolete">По нажатию этой кнопки запускается редактор мелодии. С его помощью вы можеет редактировать композицию, устанавливать время воспроизведения для всех дорожек. Также вы можете вставлять и передвигать образцы непосредственно в списке воспроизведения.</translation>
-    </message>
-    <message>
-        <source>Show/hide EffectBoard</source>
-        <translation type="obsolete">Показать/скрыть панель эффектов</translation>
-    </message>
-    <message>
-        <source>Show/hide project notes</source>
-        <translation type="obsolete">Показать/скрыть заметки к проекту</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation type="obsolete">Мультимедийный проект (*.mmp *.xml)</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation type="obsolete">Мультимедийный проект (*.mmp);;Шаблон мультимедийного проекта (*.mpt)</translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
-        <translation type="obsolete">Пока что справка для LMMS не написана.
-Вероятно, Вы сможете найти нужные материалы на http://wiki.mindrules.net.</translation>
-    </message>
-</context>
-<context>
     <name>mainWindow</name>
     <message>
         <source>My projects</source>
@@ -1824,14 +1436,6 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>Export current project</source>
         <translation>Экспортировать проект в звуковой файл</translation>
-    </message>
-    <message>
-        <source>Show/hide Beat+Bassline Editor</source>
-        <translation type="obsolete">Показать/скрыть редактор ритма/басов</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation type="obsolete">По нажатию этой кнопки запускается редактор ритма/басов. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов ритма и басов и т. п.</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -1975,20 +1579,6 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>midiDevice</name>
-    <message>
-        <source>DEVICE</source>
-        <translation type="obsolete">УСТРОЙСТВО</translation>
-    </message>
-</context>
-<context>
-    <name>midiRawClient</name>
-    <message>
-        <source>DEVICE</source>
-        <translation type="obsolete">УСТРОЙСТВО</translation>
-    </message>
-</context>
-<context>
     <name>midiTabWidget</name>
     <message>
         <source>MIDI-SETUP FOR THIS CHANNEL</source>
@@ -1997,18 +1587,6 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>CHANNEL</source>
         <translation>КАНАЛ</translation>
-    </message>
-    <message>
-        <source>RECEIVE MIDI-EVENTS</source>
-        <translation type="obsolete">ПРИНИМАТЬ СОБЫТИЯ MIDI</translation>
-    </message>
-    <message>
-        <source>SEND MIDI-EVENTS</source>
-        <translation type="obsolete">ОТПРАВЛЯТЬ СОБЫТИЯ MIDI</translation>
-    </message>
-    <message>
-        <source>SEND RECEIVED MIDI-EVENTS</source>
-        <translation type="obsolete">ОТПРАВЛЯТЬ ПОЛУЧЕНЫЕ СОБЫТИЯ MIDI</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
@@ -2131,10 +1709,6 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
         <translation>Шаблон не может быть заморожен, так как он проигрывается в данный момент. Остановите воспроизведение и попробуйте снова!</translation>
     </message>
     <message>
-        <source>double-click to open this pattern in piano-roll</source>
-        <translation type="obsolete">Чтобы открыть шаблон в синтезаторе, дважды щёлкните мышью</translation>
-    </message>
-    <message>
         <source>Open in piano-roll</source>
         <translation>Открыть в синтезаторе</translation>
     </message>
@@ -2145,10 +1719,6 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>Channel muted</source>
         <translation>Канал заглушён</translation>
-    </message>
-    <message>
-        <source>The channel this pattern belongs to is currently muted, so freezing makes no sense! Do you still want to continue?</source>
-        <translation type="obsolete">Канал, к которому относится этот шаблон, заглушён, так что заморозка не имеет смысла! Тем не менее, заморозить?</translation>
     </message>
     <message>
         <source>1 step</source>
@@ -2190,22 +1760,6 @@ use mouse wheel to set volume of a step</source>
 </context>
 <context>
     <name>pianoRoll</name>
-    <message>
-        <source>Click if you want to draw, resize or move single notes (= key &apos;D&apos;)</source>
-        <translation type="obsolete">Инструмент рисования, изменения размера и перемещения одиночных нот (клавиша &apos;D&apos;)</translation>
-    </message>
-    <message>
-        <source>Click if you want to erase single notes (= key &apos;E&apos;)</source>
-        <translation type="obsolete">Инструмент стирания одиночных нот (клавиша &apos;E&apos;)</translation>
-    </message>
-    <message>
-        <source>Click if you want to select notes (= key &apos;S&apos;)</source>
-        <translation type="obsolete">Инструмент выделения нот (клавиша &apos;S&apos;)</translation>
-    </message>
-    <message>
-        <source>Click if you want to move selected notes (= key &apos;M&apos;)</source>
-        <translation type="obsolete">Инструмент перемещения выбранных нот (клавиша &apos;M&apos;)</translation>
-    </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
         <translation>Эта кнопка включает режим стирания нот по одной. Режим активируется также клавишей &apos;E&apos;.</translation>
@@ -2261,14 +1815,6 @@ use mouse wheel to set volume of a step</source>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
         <translation>Эта кнопка включает режим рисования. При этом вы можете добавлять, перемещать и изменять размер одиночных нот. Этот режим используется чаще всего, и он является режимом по умолчанию.. Режим активируется также клавишей &apos;D&apos;.</translation>
-    </message>
-    <message>
-        <source>Record notes from MIDI-device to current pattern</source>
-        <translation type="obsolete">Записать ноты с цифрового музыкального инструмента (MIDI)</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can edit, play etc. them afterwards.</source>
-        <translation type="obsolete">Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального пианино соответствующего канала. Позже вы сможете отредактировать записанный шаблон.</translation>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
@@ -2349,24 +1895,12 @@ use mouse wheel to set volume of a step</source>
         <translation>Просмотр модулей</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation type="obsolete">Вы можете переносить нужные вам инструменты из этой панели в редактор мелодии или в редактор ритма/басов. Отпускайте кнопку мыши прямо в окне, чтобы создать новый канал, или на кнопке нужного канала для замены типа канала на выбранный инструмент.</translation>
-    </message>
-    <message>
         <source>cheap synthesis of guitar/harp-like sounds</source>
         <translation>Простая эмуляция струнных вроде гитары или арфы</translation>
     </message>
     <message>
-        <source>send all note-events to an external MIDI-device, e.g. a keyboard</source>
-        <translation type="obsolete">Отсылать все ноты на внешний цифровой музыкальный инструмент (MIDI), например, клавиатуру</translation>
-    </message>
-    <message>
         <source>three powerful oscillators you can modulate in several ways</source>
         <translation>Три генератора, которые Вы можете настраивать по вкусу</translation>
-    </message>
-    <message>
-        <source>experimental VST-hoster for using VST-plugins within LMMS</source>
-        <translation type="obsolete">Экспериментальная поддержка модулей VST</translation>
     </message>
     <message>
         <source>simple sampler with various settings for using samples (e.g. drums) in a channel</source>
@@ -2522,10 +2056,6 @@ use mouse wheel to set volume of a step</source>
 <context>
     <name>sampleBuffer</name>
     <message>
-        <source>All Audio-Files (*.wav *.ogg *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation type="obsolete">Все звуковые файлы (*.wav *.ogg *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
-    <message>
         <source>Wave-Files (*.wav)</source>
         <translation>Файлы Wave (*.wav)</translation>
     </message>
@@ -2639,12 +2169,6 @@ use mouse wheel to set volume of a step</source>
         <translation>Учтите, что большинство настроек не вступят в силу до перезапуска программы!</translation>
     </message>
     <message>
-        <source>FRAMES: %1
-LATENCY: %2 ms</source>
-        <translation type="obsolete">ФРАГМЕНТОВ: %1
-ОТКЛИК: %2 мс</translation>
-    </message>
-    <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
         <translation>Здесь вы можете настроить размер внутреннего звукового буфера LMMS. Меньшие значения дают меньшее время отклика программы, но повышают потребление ресурсов - это особенно заметно на старых машинах и системах, ядро которых не поддерживает приоритета реального времени. Если наблюдается прерывистый звук, попробуйте увеличить размер буфера.</translation>
     </message>
@@ -2746,10 +2270,6 @@ Latency: %2 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>JACK (Jack Audio Connection Kit)</source>
-        <translation type="obsolete">JACK (Звуковой инстументарий Jack)</translation>
-    </message>
-    <message>
         <source>SDL (Simple DirectMedia Layer)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2765,28 +2285,8 @@ Latency: %2 ms</source>
 <context>
     <name>songEditor</name>
     <message>
-        <source>Play/pause song (Space)</source>
-        <translation type="obsolete">Воспроизведение/пауза (Пробел)</translation>
-    </message>
-    <message>
-        <source>Stop playing song (Space)</source>
-        <translation type="obsolete">Остановить воспроизведение (Пробел)</translation>
-    </message>
-    <message>
-        <source>Insert bar at current tact (Shift+Insert)</source>
-        <translation type="obsolete">Вставить такт под курсор (Shift+Insert)</translation>
-    </message>
-    <message>
-        <source>Remove bar at current tact (Shift+Delete)</source>
-        <translation type="obsolete">Удалить такт из-под курсора (Shift+Delete)</translation>
-    </message>
-    <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Нажмите сюда, если вы хотите остановить воспроизведение мелодии. Курсор при этом будет установлен на начало композиции.</translation>
-    </message>
-    <message>
-        <source>The current song was modified since last saving. Do you want to save it now?</source>
-        <translation type="obsolete">Der aktuelle Song wurde seit dem letzten Speichern geändert. Wollen Sie ihn jetzt speichern?</translation>
     </message>
     <message>
         <source>untitled</source>
@@ -2801,10 +2301,6 @@ Latency: %2 ms</source>
         <translation>Не могу открыть файл</translation>
     </message>
     <message>
-        <source>Could not open file %1. You probably have no rights to read this file. Please make sure you have at least read-access to the file and try again.</source>
-        <translation type="obsolete">Не огу открыть файл %1; вероятно, у вас нет прав на его чтение. Пожалуйста, проверьте это.</translation>
-    </message>
-    <message>
         <source>Error in multimedia-project</source>
         <translation>Ошибка в мультимедийном проекте</translation>
     </message>
@@ -2817,21 +2313,12 @@ Latency: %2 ms</source>
         <translation>Не могу записать файл</translation>
     </message>
     <message>
-        <source>Could not write file %1. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
-        <translation type="obsolete">Не могу записать файл %1. Вероятно, у вас нет прав на его запись.
-Проверьте, обладаете ли вы правами на запись выбранного файла и попробуйте снова.</translation>
-    </message>
-    <message>
         <source>Song-Editor</source>
         <translation>Редактор мелодии</translation>
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
         <translation>Нажмите, чтобы прослушать созданную мелодию. Воспроизведение начнётся с позиции курсора (зелёный треугольник); вы можете двигать его во время проигрывания.</translation>
-    </message>
-    <message>
-        <source>Song control</source>
-        <translation type="obsolete">Управление мелодией</translation>
     </message>
     <message>
         <source>Play song (Space)</source>
@@ -2846,44 +2333,12 @@ Latency: %2 ms</source>
         <translation>Это значение задаёт темп мелодии в ударах в минуту (англ. аббр. BPM). На каждый такт приходится четыре удара, так что темп в ударах в минуту фактически указывает, сколько четвертей такта проигрывается за минуту (или, что то же, количество тактов, проигрываемых за четыре минуты).</translation>
     </message>
     <message>
-        <source>master output volume</source>
-        <translation type="obsolete">Общая громкость</translation>
-    </message>
-    <message>
         <source>master pitch</source>
         <translation>Общая высота тона</translation>
     </message>
     <message>
-        <source>Edit</source>
-        <translation type="obsolete">Правка</translation>
-    </message>
-    <message>
-        <source>If you click here, a tact will be inserted at the current tact.</source>
-        <translation type="obsolete">Если вы нажмёте эту кнопку, под курсором вставится один такт.</translation>
-    </message>
-    <message>
-        <source>If you click here, the tact at the current tact will be removed.</source>
-        <translation type="obsolete">Если вы нажмёте эту кнопку, такт под курсором будет удалён.</translation>
-    </message>
-    <message>
-        <source>Insert tact at current tact (Shift+Insert)</source>
-        <translation type="obsolete">Вставить такт в текущей позиции (Shift+Insert)</translation>
-    </message>
-    <message>
-        <source>Remove tact at current tact (Shift+Delete)</source>
-        <translation type="obsolete">Удалить такт в текущей позиции (Shift+Delete)</translation>
-    </message>
-    <message>
-        <source>semitones</source>
-        <translation type="obsolete">полутон[а,ов]</translation>
-    </message>
-    <message>
         <source>tempo of song</source>
         <translation>Темп мелодии</translation>
-    </message>
-    <message>
-        <source>Add channel-track</source>
-        <translation type="obsolete">Добавить канал инструмента</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -2892,10 +2347,6 @@ Latency: %2 ms</source>
     <message>
         <source>Add sample-track</source>
         <translation>Добавить файл</translation>
-    </message>
-    <message>
-        <source>%1 saved.</source>
-        <translation type="obsolete">%1 сохранён.</translation>
     </message>
     <message>
         <source>Project NOT saved.</source>
@@ -2929,14 +2380,6 @@ Please make sure you have at least read-access to the file and try again.</sourc
 Проверьте, обладаете ли вы правами на чтение выбранного файла и попробуйте снова.</translation>
     </message>
     <message>
-        <source>Master output volume:</source>
-        <translation type="obsolete">Выходная громкость:</translation>
-    </message>
-    <message>
-        <source>Master output pitch:</source>
-        <translation type="obsolete">Выходная высота тона:</translation>
-    </message>
-    <message>
         <source>Import file</source>
         <translation>Импорт файла</translation>
     </message>
@@ -2952,22 +2395,6 @@ Please make sure you have at least read-access to the file and try again.</sourc
     <message>
         <source>High quality mode</source>
         <translation>Высокое качество</translation>
-    </message>
-    <message>
-        <source>Insert bar (Shift+Insert)</source>
-        <translation type="obsolete">Вставить такт (Shift + Insert)</translation>
-    </message>
-    <message>
-        <source>Remove bar (Shift+Delete)</source>
-        <translation type="obsolete">Удалить такт (Shift + Delete)</translation>
-    </message>
-    <message>
-        <source>If you click here, a bar will be inserted at the current bar.</source>
-        <translation type="obsolete">При нажатии на эту кнопку, в начало композиции вставится один такт.</translation>
-    </message>
-    <message>
-        <source>If you click here, the current bar will be removed.</source>
-        <translation type="obsolete">При нажатии на эту кнопку, из начала композиции удалится один такт.</translation>
     </message>
     <message>
         <source>master volume</source>
@@ -2998,10 +2425,6 @@ Please make sure you have at least read-access to the file and try again.</sourc
         <translation>Проект %1 сохранён.</translation>
     </message>
     <message>
-        <source>The project %1 could not be saved!</source>
-        <translation type="obsolete">Не смог сохранить проект %1!</translation>
-    </message>
-    <message>
         <source>Could not write file %1. You probably are not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation>Не смог записать файл %1. Возможно, у вас нет необходимых для этого прав.
@@ -3018,31 +2441,6 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>Edit mode (select and move)</source>
         <translation>Правка (выделение/перемещение)</translation>
-    </message>
-</context>
-<context>
-    <name>soundGenerator</name>
-    <message>
-        <source>Error while loading plugin</source>
-        <translation type="obsolete">Ошибка загрузки модуля</translation>
-    </message>
-    <message>
-        <source>The %1-plugin wasn&apos;t found! Using AudioFileProcessor with default settings instead.
-</source>
-        <translation type="obsolete">Модуль %1 не найден! Вместо него будет использован AudioFileProcessor с настройками по умолчанию.
-</translation>
-    </message>
-    <message>
-        <source>Plugin not found</source>
-        <translation type="obsolete">Модуль не найден</translation>
-    </message>
-    <message>
-        <source>The %1-plugin wasn&apos;t found!</source>
-        <translation type="obsolete">Модуль %1 не найден!</translation>
-    </message>
-    <message>
-        <source>Failed loading plugin &quot;%1&quot;!</source>
-        <translation type="obsolete">Ошибка загрузки модуля &quot;%1&quot;!</translation>
     </message>
 </context>
 <context>
@@ -3215,10 +2613,6 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>trackContentObject</name>
     <message>
-        <source>Delete</source>
-        <translation type="obsolete">Удалить</translation>
-    </message>
-    <message>
         <source>Cut</source>
         <translation>Вырезать</translation>
     </message>
@@ -3262,20 +2656,12 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action</source>
-        <translation type="obsolete">Для перетаскивания в другое окно нажмите &lt;Ctrl&gt; при нажатии на эту полоску</translation>
-    </message>
-    <message>
         <source>Clone this track</source>
         <translation>Копировать дорожку</translation>
     </message>
     <message>
         <source>Remove this track</source>
         <translation>Удалить дорожку</translation>
-    </message>
-    <message>
-        <source>Operations for this track</source>
-        <translation type="obsolete">Действия для этой дорожки</translation>
     </message>
     <message>
         <source>With this switch you can either mute this track or mute all other tracks.
@@ -3298,43 +2684,6 @@ right click = mute all other tracks (solo)</source>
     <message>
         <source>Actions for this track</source>
         <translation>Действия для этой дорожки</translation>
-    </message>
-</context>
-<context>
-    <name>trackWidget</name>
-    <message>
-        <source>Clone this track</source>
-        <translation type="obsolete">Копировать дорожку</translation>
-    </message>
-    <message>
-        <source>Delete this track</source>
-        <translation type="obsolete">Удалить дорожку</translation>
-    </message>
-    <message>
-        <source>Move this track up</source>
-        <translation type="obsolete">Сдвинуть дорожку вверх</translation>
-    </message>
-    <message>
-        <source>Move this track down</source>
-        <translation type="obsolete">Сдвинуть дорожку вниз</translation>
-    </message>
-    <message>
-        <source>With this switch you can either mute this track or mute all other tracks.
-By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
-When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
-        <translation type="obsolete">Вы можете заглушать эту дорожку или все дорожки кроме этой.
-Если вы нажмёте на выключателе левой кнопкой мыши, то дорожка не будет воспроизводиться. Это может пригодиться, если вам нужно прослушать другие дорожки без удаления текущей, т. е. без потери информации.
-Правая кнопка мыши, наоборот, оставляет звучать только текущую дорожку.</translation>
-    </message>
-    <message>
-        <source>left click = mute this track
-right click = mute all other tracks (solo)</source>
-        <translation type="obsolete">Левая кнопка мыши отключает эту дорожку;
-Правая отключает все дорожки, кроме этой</translation>
-    </message>
-    <message>
-        <source>Remove this track</source>
-        <translation type="obsolete">Удалить дорожку</translation>
     </message>
 </context>
 <context>

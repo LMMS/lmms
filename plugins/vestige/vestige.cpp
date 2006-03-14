@@ -110,7 +110,7 @@ vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
 	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
 					 this, SLOT( changeTempo( bpm_t ) ) );
 
-	m_openPluginButton = new pixmapButton( this );
+	m_openPluginButton = new pixmapButton( this, eng() );
 	m_openPluginButton->setCheckable( FALSE );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 200, 70 );

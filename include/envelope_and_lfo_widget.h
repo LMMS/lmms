@@ -58,6 +58,7 @@
 class QPaintEvent;
 class QPixmap;
 
+class automatableButtonGroup;
 class envelopeTabWidget;
 class knob;
 class ledCheckBox;
@@ -119,10 +120,7 @@ protected:
 
 protected slots:
 	void updateAfterKnobChange( float );
-	void lfoSinWaveCh( bool );
-	void lfoTriangleWaveCh( bool );
-	void lfoSawWaveCh( bool );
-	void lfoSquareWaveCh( bool );
+	void lfoWaveCh( int );
 	void lfoUserWaveCh( bool );
 	void x100Toggled( bool );
 
@@ -159,11 +157,8 @@ private:
 	knob * m_lfoAttackKnob;
 	tempoSyncKnob * m_lfoSpeedKnob;
 	knob * m_lfoAmountKnob;
-	pixmapButton * m_sinLfoBtn;
-	pixmapButton * m_triangleLfoBtn;
-	pixmapButton * m_sawLfoBtn;
-	pixmapButton * m_sqrLfoBtn;
-	pixmapButton * m_usrLfoBtn;
+	pixmapButton * m_userLfoBtn;
+	automatableButtonGroup * m_lfoWaveBtnGrp;
 
 	ledCheckBox * m_x100Cb;
 	ledCheckBox * m_controlEnvAmountCb;

@@ -202,13 +202,13 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 		this, SLOT ( sampleSizeChanged( float ) ) 
 		);
 
-	m_interpolationToggle = new ledCheckBox( "Interpolation", this );
+	m_interpolationToggle = new ledCheckBox( "Interpolation", this, eng() );
 	m_interpolationToggle->move( 55,80 );
 	
 	 connect( m_interpolationToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( interpolationToggle( bool ) ) );
 
-	m_normalizeToggle = new ledCheckBox( "Normalize", this );
+	m_normalizeToggle = new ledCheckBox( "Normalize", this, eng() );
 	m_normalizeToggle->move( 55, 100 );
 	
 	connect( m_normalizeToggle, SIGNAL( toggled( bool ) ),
@@ -233,58 +233,57 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 	connect( m_graph, SIGNAL ( sampleChanged( void ) ),
 		this, SLOT ( sampleChanged( void ) ) );
 	
-		sinWaveBtn = new pixmapButton( this );
+		sinWaveBtn = new pixmapButton( this, eng() );
 		sinWaveBtn->move( 188, 120 );
 		sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
-							"sin_wave_inactive" ) );
+							"sin_wave_active" ) );
 		sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-		sinWaveBtn->setChecked( TRUE );
 		toolTip::add( sinWaveBtn,
 				tr( "Click here if you want a sine-wave for "
 						"current oscillator." ) );
 
-		triangleWaveBtn = new pixmapButton( this );
+		triangleWaveBtn = new pixmapButton( this, eng() );
 		triangleWaveBtn->move( 188, 136 );
 		triangleWaveBtn->setActiveGraphic(
-			embed::getIconPixmap( "triangle_wave_inactive" ) );
+			embed::getIconPixmap( "triangle_wave_active" ) );
 		triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "triangle_wave_inactive" ) );
 		toolTip::add( triangleWaveBtn,
 				tr( "Click here if you want a triangle-wave "
 						"for current oscillator." ) );
 
-		sawWaveBtn = new pixmapButton( this );
+		sawWaveBtn = new pixmapButton( this, eng() );
 		sawWaveBtn->move( 188, 152 );
 		sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
-							"saw_wave_inactive" ) );
+							"saw_wave_active" ) );
 		sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
 		toolTip::add( sawWaveBtn,
 				tr( "Click here if you want a saw-wave for "
 						"current oscillator." ) );
 
-		sqrWaveBtn = new pixmapButton( this );
+		sqrWaveBtn = new pixmapButton( this, eng() );
 		sqrWaveBtn->move( 188, 168 );
 		sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"square_wave_inactive" ) );
+						"square_wave_active" ) );
 		sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
 		toolTip::add( sqrWaveBtn,
 				tr( "Click here if you want a square-wave for "
 						"current oscillator." ) );
 
-		whiteNoiseWaveBtn = new pixmapButton( this );
+		whiteNoiseWaveBtn = new pixmapButton( this, eng() );
 		whiteNoiseWaveBtn->move( 188, 184 );
 		whiteNoiseWaveBtn->setActiveGraphic(
-			embed::getIconPixmap( "white_noise_wave_inactive" ) );
+			embed::getIconPixmap( "white_noise_wave_active" ) );
 		whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_inactive" ) );
 		toolTip::add( whiteNoiseWaveBtn,
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
-		usrWaveBtn = new pixmapButton( this );
+		usrWaveBtn = new pixmapButton( this, eng() );
 		usrWaveBtn->move( 188, 200 );
 		usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -310,7 +309,7 @@ bitInvader::bitInvader( channelTrack * _channel_track ) :
 		
 
 
-		smoothBtn = new pixmapButton( this );
+		smoothBtn = new pixmapButton( this, eng() );
 		smoothBtn->move( 55, 225 );
 		smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"smooth" ) );

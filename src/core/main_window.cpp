@@ -36,6 +36,7 @@
 #include <QSplashScreen>
 #include <QMessageBox>
 #include <QMenuBar>
+#include <Qt/QtXml>
 
 #else
 
@@ -46,6 +47,7 @@
 #include <qpopupmenu.h>
 #include <qmessagebox.h>
 #include <qmenubar.h>
+#include <qdom.h>
 
 #if QT_VERSION >= 0x030200
 #include <qsplashscreen.h>
@@ -74,6 +76,7 @@
 #include "setup_dialog.h"
 #include "audio_dummy.h"
 #include "tool_button.h"
+#include "edit_history.h"
 
 
 #if QT_VERSION >= 0x030100
@@ -464,9 +467,25 @@ void mainWindow::finalize( void )
 #endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
-					Qt::CTRL+Qt::Key_Q );
+					Qt::CTRL + Qt::Key_Q );
 
 
+	QMenu * edit_menu = new QMenu( this );
+#ifdef QT4
+	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
+#else
+	menuBar()->insertItem( tr( "&Edit" ), edit_menu );
+#endif
+	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+					tr( "Undo" ),
+					this, SLOT( undo() ),
+					Qt::CTRL + Qt::Key_Z );
+	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
+					tr( "Redo" ),
+					this, SLOT( redo() ),
+					Qt::CTRL + Qt::Key_R );
+
+	
 	QMenu * settings_menu = new QMenu( this );
 #ifdef QT4
 	menuBar()->addMenu( settings_menu )->setText( tr( "&Settings" ) );
@@ -578,6 +597,34 @@ void mainWindow::clearKeyModifiers( void )
 	m_keyMods.m_ctrl = FALSE;
 	m_keyMods.m_shift = FALSE;
 	m_keyMods.m_alt = FALSE;
+}
+
+
+
+
+void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+{
+	_de.setAttribute( "x", _w->parentWidget()->x() );
+	_de.setAttribute( "y", _w->parentWidget()->y() );
+	_de.setAttribute( "width", _w->width() );
+	_de.setAttribute( "height", _w->height() );
+	_de.setAttribute( "visible", _w->isVisible() );
+}
+
+
+
+
+void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
+{
+	QRect r( _de.attribute( "x" ).toInt(), _de.attribute( "y" ).toInt(),
+			_de.attribute( "width" ).toInt(),
+			_de.attribute( "height" ).toInt() );
+	if( !r.isNull() )
+	{
+		_w->setShown( _de.attribute( "visible" ).toInt() );
+		_w->parentWidget()->move( r.topLeft() );
+		_w->resize( r.size() );
+	}
 }
 
 
@@ -803,6 +850,22 @@ void mainWindow::togglePianoRollWin( void )
 	{
 		eng()->getPianoRoll()->hide();
 	}
+}
+
+
+
+
+void mainWindow::undo( void )
+{
+	eng()->getEditHistory()->undo();
+}
+
+
+
+
+void mainWindow::redo( void )
+{
+	eng()->getEditHistory()->redo();
 }
 
 

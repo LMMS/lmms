@@ -26,6 +26,7 @@
 
 
 #include "bb_editor.h"
+#include "edit_history.h"
 #include "engine.h"
 #include "main_window.h"
 #include "mixer.h"
@@ -41,8 +42,10 @@ engine::engine( const bool _has_gui ) :
 	m_mainWindow( NULL ),
 	m_songEditor( NULL ),
 	m_bbEditor( NULL ),
-	m_pianoRoll( NULL )
+	m_pianoRoll( NULL ),
+	m_editHistory( NULL )
 {
+	m_editHistory = new editHistory( this );
 	m_mainWindow = new mainWindow( this );
 	m_mixer = new mixer( this );
 	m_songEditor = new songEditor( this );
@@ -63,6 +66,7 @@ engine::engine( const bool _has_gui ) :
 engine::~engine()
 {
 	m_mixer->stopProcessing();
+
 	delete m_projectNotes;
 	delete m_songEditor;
 	delete m_bbEditor;

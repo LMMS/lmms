@@ -129,9 +129,9 @@ bbEditor::bbEditor( engine * _engine ) :
 	QLabel * l = new QLabel( m_toolBar );
 	l->setPixmap( embed::getIconPixmap( "drum" ) );
 
-	m_bbComboBox = new comboBox( m_toolBar );
+	m_bbComboBox = new comboBox( m_toolBar, eng() );
 	m_bbComboBox->setFixedSize( 200, 22 );
-	connect( m_bbComboBox, SIGNAL( currentIndexChanged( int ) ),
+	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( setCurrentBB( int ) ) );
 
 	tb_layout->addSpacing( 5 );
@@ -166,9 +166,9 @@ csize bbEditor::currentBB( void ) const
 
 void bbEditor::setCurrentBB( int _bb )
 {
-	if( m_bbComboBox->currentIndex() != _bb )
+	if( m_bbComboBox->value() != _bb )
 	{
-		m_bbComboBox->setCurrentIndex( _bb );
+		m_bbComboBox->setValue( _bb );
 	}
 
 	// first make sure, all channels have a TCO at current BB
@@ -295,7 +295,7 @@ void bbEditor::updateComboBox( void )
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
 					bbt->trackLabel()->pixmap() );
 	}
-	m_bbComboBox->setCurrentIndex( currentBB() );
+	m_bbComboBox->setValue( currentBB() );
 }
 
 

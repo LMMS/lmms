@@ -46,6 +46,7 @@
 #include "types.h"
 #include "note.h"
 #include "engine.h"
+#include "settings.h"
 
 
 class QPainter;
@@ -59,7 +60,7 @@ class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget, public engineObject
+class pianoRoll : public QWidget, public engineObject, public settings
 {
 	Q_OBJECT
 public:
@@ -81,6 +82,15 @@ public:
 	}
 
 	int quantization( void ) const;
+
+
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+							QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "pianoroll" );
+	}
 
 
 public slots:

@@ -153,7 +153,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new comboBox( this );
+	m_typeCombo = new comboBox( this, eng() );
 	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
 					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
 								TYPE_HEIGHT );
@@ -167,7 +167,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 				tr( fileEncodeDevices[idx].m_description ) );
 		++idx;
 	}
-	m_typeCombo->setCurrentIndex( m_typeCombo->findText( tr(
+	m_typeCombo->setValue( m_typeCombo->findText( tr(
 			fileEncodeDevices[m_fileType].m_description ) ) );
 
 
@@ -176,7 +176,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new comboBox( this );
+	m_kbpsCombo = new comboBox( this, eng() );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
@@ -188,18 +188,18 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 						s_availableBitrates[idx] ) );
 		++idx;
 	}
-	m_typeCombo->setCurrentIndex( m_typeCombo->findText(
+	m_typeCombo->setValue( m_typeCombo->findText(
 						QString::number( 128 ) ) );
 
 
-	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, eng() );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
 	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
-									this );
+								this, eng() );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
 	m_hqmCb->setChecked( TRUE );

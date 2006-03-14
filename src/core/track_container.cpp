@@ -58,7 +58,7 @@
 #include "channel_track.h"
 #include "mmp.h"
 #include "config_mgr.h"
-#include "midi_file.h"
+#include "import_filter.h"
 #include "instrument.h"
 #include "rubberband.h"
 
@@ -109,6 +109,7 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	QDomElement tc_de = _doc.createElement( "trackcontainer" );
 	tc_de.setAttribute( "type", nodeName() );
+	mainWindow::saveWidgetState( this, tc_de );
 	_parent.appendChild( tc_de );
 
 	// save settings of each track
@@ -175,6 +176,8 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
+
+	mainWindow::restoreWidgetState( this, _this );
 
 	pd->setValue( start_val + _this.childNodes().count() );
 
@@ -463,8 +466,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "midifile" )
 	{
-		midiFile mf( value );
-		mf.importToTrackContainer( this );
+		importFilter::import( value, this );
 		_de->accept();
 	}
 	else if( type.left( 6 ) == "track_" )

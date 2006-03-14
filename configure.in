@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.4-cvs20060308, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060308)
+AC_INIT(lmms, 0.1.4-cvs20060313, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060313)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -465,6 +465,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/Makefile
 		 plugins/audio_file_processor/Makefile
 		 plugins/bit_invader/Makefile
+		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile
 		 plugins/triple_oscillator/Makefile
@@ -679,7 +680,7 @@ else
 		with_warnings="true"
 	else
 		if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
-			PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* it's own VST-server for hosting VST-plugins"
+			PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LMMS VST Support Layer (LVSL) for integrated VST-plugin usage"
 		else
 			echo " ========================"
 			echo " ===  LMMS - WARNING  ======================================================="

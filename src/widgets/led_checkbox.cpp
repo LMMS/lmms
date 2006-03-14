@@ -55,11 +55,12 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
-							ledColors _color ) :
-	QWidget( _parent ),
-	automatableObject<bool>( FALSE, TRUE, FALSE ),
+				engine * _engine, ledColors _color ) :
+	automatableButton( _parent, _engine ),
 	m_text( _text )
 {
+	setToggleButton( TRUE );
+
 	if( _color >= TOTAL_COLORS || _color < YELLOW )
 	{
 		_color = YELLOW;
@@ -88,42 +89,6 @@ ledCheckBox::~ledCheckBox()
 {
 	delete m_ledOnPixmap;
 	delete m_ledOffPixmap;
-}
-
-
-
-
-void ledCheckBox::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::LeftButton )
-	{
-		toggle();
-	}
-}
-	
-	
-	
-	
-void ledCheckBox::toggle( void )
-{
-	setValue( !value() );
-	update();
-	emit( toggled( value() ) );
-}
-
-
-
-
-void ledCheckBox::setChecked( bool _on )
-{
-	if( _on != isChecked() )
-	{
-		toggle();
-	}
-	else
-	{
-		emit( toggled( value() ) );
-	}
 }
 
 

@@ -52,12 +52,12 @@
 #include "engine.h"
 
 
+class QDomElement;
 class QGridLayout;
 class QSplashScreen;
 
 class configManager;
 class toolButton;
-
 
 
 class mainWindow : public QMainWindow, public engineObject
@@ -98,6 +98,9 @@ public:
 
 	static QSplashScreen * s_splashScreen;
 
+	static void saveWidgetState( QWidget * _w, QDomElement & _de );
+	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
+
 
 public slots:
 	inline void emptySlot( void )
@@ -119,6 +122,9 @@ public slots:
 	void toggleSongEditorWin( void );
 	void toggleProjectNotesWin( void );
 	void togglePianoRollWin( void );
+
+	void undo( void );
+	void redo( void );
 
 
 protected:

@@ -34,18 +34,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 Wenn Sie an der Übersetzung von LMMS in eine andere Sprache interessiert sind oder existierende Übersetzungen verbessern wollen, sind Sie herzlich willkommen, uns zu helfen! Kontaktieren Sie einfach den Maintainer!</translation>
     </message>
     <message>
-        <source>LMMS - A powerful synthesizer-studio
-
-Copyright (c) 2004-2005 LMMS-Developers
-
-http://lmms.sourceforge.net</source>
-        <translation type="obsolete">LMMS - Ein leistungsfähiges Synthesizer-Studio
-
-Copyright (c) 2004-2005 LMMS-Entwickler
-
-http://lmms.sourceforge.net</translation>
-    </message>
-    <message>
         <source>Linux MultiMedia Studio %1</source>
         <translation>Linux MultiMedia Studio %1</translation>
     </message>
@@ -517,20 +505,8 @@ http://lmms.sourceforge.net</translation>
         <translation>GATE</translation>
     </message>
     <message>
-        <source>DIRECTION:</source>
-        <translation type="obsolete">RICHTUNG:</translation>
-    </message>
-    <message>
-        <source>SORT-MODE</source>
-        <translation type="obsolete">SORT-MODUS</translation>
-    </message>
-    <message>
         <source>Direction:</source>
         <translation>Richtung:</translation>
-    </message>
-    <message>
-        <source>Sort-mode</source>
-        <translation type="obsolete">Sort-Modus</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -670,10 +646,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Beats/Bassline stoppen wollen.</translation>
     </message>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation type="obsolete">Beat+Bassline Editor</translation>
-    </message>
-    <message>
         <source>Beat+Baseline Editor</source>
         <translation>Beat+Baseline Editor</translation>
     </message>
@@ -693,10 +665,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Farbe ändern</translation>
     </message>
     <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation type="obsolete">Im Beat+Bassline-Editor öffnen</translation>
-    </message>
-    <message>
         <source>Open in Beat+Baseline-Editor</source>
         <translation>Im Beat+Baseline-Editor öffnen</translation>
     </message>
@@ -704,9 +672,6 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>bbTrack</name>
     <message>
-        <source>Beat/Bassline %1</source>
-        <translation type="obsolete">Beat/Bassline %1</translation>
-    </message>
     <message>
         <source>Beat/Baseline %1</source>
         <translation>Beat/Baseline %1</translation>
@@ -912,10 +877,6 @@ Kopierte Dateien können Sie ändern, aber gleichzeitig belegen diese auch zusä
     <message>
         <source>Copy or link files</source>
         <translation>Dateien kopieren oder verknüpfen</translation>
-    </message>
-    <message>
-        <source>Choose LMMS-working-directory</source>
-        <translation type="obsolete">LMMS-Arbeitsverzeichnis wählen</translation>
     </message>
     <message>
         <source>Directory not existing</source>
@@ -1425,191 +1386,6 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
 </context>
 <context>
-    <name>lmmsMainWin</name>
-    <message>
-        <source>Setting up main-window and workspace...</source>
-        <translation type="obsolete">Initialisiere Hauptfenster und Arbeitsbereich...</translation>
-    </message>
-    <message>
-        <source>Creating new song...</source>
-        <translation type="obsolete">Erstelle neuen Song...</translation>
-    </message>
-    <message>
-        <source>Creating GUI...</source>
-        <translation type="obsolete">Erstelle Oberfläche...</translation>
-    </message>
-    <message>
-        <source>&amp;New</source>
-        <translation type="obsolete">&amp;Neu</translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation type="obsolete">Ö&amp;ffnen...</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="obsolete">&amp;Speichern</translation>
-    </message>
-    <message>
-        <source>Save &amp;As...</source>
-        <translation type="obsolete">Speichern &amp;als...</translation>
-    </message>
-    <message>
-        <source>E&amp;xport</source>
-        <translation type="obsolete">E&amp;xportieren</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation type="obsolete">&amp;Beenden</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation type="obsolete">Hilfe</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation type="obsolete">Über</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="obsolete">&amp;Hilfe</translation>
-    </message>
-    <message>
-        <source>What&apos;s this?</source>
-        <translation type="obsolete">Was ist das?</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
-    </message>
-    <message>
-        <source>My samples</source>
-        <translation type="obsolete">Meine Samples</translation>
-    </message>
-    <message>
-        <source>My presets</source>
-        <translation type="obsolete">Meine Presets</translation>
-    </message>
-    <message>
-        <source>My projects</source>
-        <translation type="obsolete">Meine Projekte</translation>
-    </message>
-    <message>
-        <source>Loading song...</source>
-        <translation type="obsolete">Lade Song...</translation>
-    </message>
-    <message>
-        <source>&amp;Settings</source>
-        <translation type="obsolete">Ein&amp;stellungen</translation>
-    </message>
-    <message>
-        <source>Show setup wizard</source>
-        <translation type="obsolete">Einrichtungsassistent zeigen</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie das Projektnotizen-Fenster ein- oder ausblenden. In diesem Fenster können Sie Ihre Projektnotizen aufschreiben.</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the EffectBoard. The EffectBoard is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes wird das EffectBoard ein- oder ausgeblendet. Das EffectBoard ist ein äußerst leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können Effekte in unterschiedliche Effekt-Kanäle einfügen.</translation>
-    </message>
-    <message>
-        <source>LMMS %1</source>
-        <translation type="obsolete">LMMS %1</translation>
-    </message>
-    <message>
-        <source>Create new project</source>
-        <translation type="obsolete">Neues Projekt erstellen</translation>
-    </message>
-    <message>
-        <source>Open existing project</source>
-        <translation type="obsolete">Existierendes Projekt öffnen</translation>
-    </message>
-    <message>
-        <source>Save current project</source>
-        <translation type="obsolete">Aktuelles Projekt speichern</translation>
-    </message>
-    <message>
-        <source>Export current project</source>
-        <translation type="obsolete">Aktuelles Projekt exportieren</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie das Piano-Roll ein- oder ausblenden. Mit Hilfe des Piano-Rolls können Sie Melodie-Patterns auf eine bequeme Art bearbeiten.</translation>
-    </message>
-    <message>
-        <source>&amp;Project</source>
-        <translation type="obsolete">&amp;Projekt</translation>
-    </message>
-    <message>
-        <source>Open project</source>
-        <translation type="obsolete">Projekt öffnen</translation>
-    </message>
-    <message>
-        <source>Save project</source>
-        <translation type="obsolete">Projekt speichern</translation>
-    </message>
-    <message>
-        <source>Import file</source>
-        <translation type="obsolete">Datei importieren</translation>
-    </message>
-    <message>
-        <source>My home</source>
-        <translation type="obsolete">Persönlicher Ordner</translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation type="obsolete">Wurzelverzeichnis</translation>
-    </message>
-    <message>
-        <source>Show settings dialog</source>
-        <translation type="obsolete">Einstellungsdialog anzeigen</translation>
-    </message>
-    <message>
-        <source>Help not available</source>
-        <translation type="obsolete">Hilfe nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>Show/hide Beat+Bassline Editor</source>
-        <translation type="obsolete">Zeige/verstecke Beat+Bassline Editor</translation>
-    </message>
-    <message>
-        <source>Show/hide Piano-Roll</source>
-        <translation type="obsolete">Zeige/verstecke Piano-Roll</translation>
-    </message>
-    <message>
-        <source>Show/hide Song-Editor</source>
-        <translation type="obsolete">Zeige/verstecke Song-Editor</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie den Song-Editor ein- oder ausblenden. Mit Hilfe des Song-Editors können Sie den Song bearbeiten und einstellen, wann welche Spur gespielt werden soll. Sie können auch Samples (z.B. Rap-Samples) direkt in die Playliste einfügen und verschieben.</translation>
-    </message>
-    <message>
-        <source>Show/hide EffectBoard</source>
-        <translation type="obsolete">Zeige/verstecke EffectBoard</translation>
-    </message>
-    <message>
-        <source>Show/hide project notes</source>
-        <translation type="obsolete">Zeige/verstecke Projekt-Notizen</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation type="obsolete">MultiMedia-Projekt (*.mmp *.xml)</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation type="obsolete">MultiMedia-Projekt (*.mmp);;MultiMedia-Projekt-Vorlage (*.mpt)</translation>
-    </message>
-    <message>
-        <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
-        <translation type="obsolete">Derzeit ist in LMMS keine Hilfe verfügbar.
-Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</translation>
-    </message>
-</context>
-<context>
     <name>mainWindow</name>
     <message>
         <source>My projects</source>
@@ -1658,14 +1434,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>Export current project</source>
         <translation>Aktuelles Projekt exportieren</translation>
-    </message>
-    <message>
-        <source>Show/hide Beat+Bassline Editor</source>
-        <translation type="obsolete">Zeige/verstecke Beat+Bassline Editor</translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -1790,10 +1558,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <translation>Zeige/verstecke Beat+Baseline Editor</translation>
     </message>
     <message>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baesline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
-        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu setzen, um Kanale zu öffnen, hinzuzufügen und zu entfernen, um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
-    </message>
-    <message>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Baseline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Baseline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
@@ -1821,14 +1585,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>CHANNEL</source>
         <translation>KANAL</translation>
-    </message>
-    <message>
-        <source>RECEIVE MIDI-EVENTS</source>
-        <translation type="obsolete">MIDI-EREIGNISSE EMPFANGEN</translation>
-    </message>
-    <message>
-        <source>SEND MIDI-EVENTS</source>
-        <translation type="obsolete">MIDI-EREIGNISSE SENDEN</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
@@ -1949,10 +1705,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>The pattern currently cannot be freezed because you&apos;re in play-mode. Please stop and try again!</source>
         <translation>Der Pattern kann derzeit nicht eingefroren werden, da Sie sich im Abspiel-Modus befinden. Bitte stoppen Sie und versuchen es erneut!</translation>
-    </message>
-    <message>
-        <source>double-click to open this pattern in piano-roll</source>
-        <translation type="obsolete">Doppelklick, um diesen Pattern im Piano-Roll zu öffnen</translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -2141,20 +1893,12 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <translation>Plugin-Browser</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation type="obsolete">Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Bassline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
-    </message>
-    <message>
         <source>cheap synthesis of guitar/harp-like sounds</source>
         <translation>Einfache Synthese gitarren-/harfenähnlicher Klänge</translation>
     </message>
     <message>
         <source>three powerful oscillators you can modulate in several ways</source>
         <translation>Drei leistungsfähige Oszillatoren, die Sie auf verschiedene Art und Weise modulieren können</translation>
-    </message>
-    <message>
-        <source>experimental VST-hoster for using VST-plugins within LMMS</source>
-        <translation type="obsolete">Experimenteller VST-Hoster zum Benutzen von VST-Plugins innerhalb von LMMS</translation>
     </message>
     <message>
         <source>simple sampler with various settings for using samples (e.g. drums) in a channel</source>
@@ -2310,10 +2054,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
 <context>
     <name>sampleBuffer</name>
     <message>
-        <source>All Audio-Files (*.wav *.ogg *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation type="obsolete">Alle Audio-Dateien (*.wav *.ogg *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
-    <message>
         <source>Wave-Files (*.wav)</source>
         <translation>Wave-Dateien (*.wav)</translation>
     </message>
@@ -2415,12 +2155,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <source>FRAMES: %1
-LATENCY: %2 ms</source>
-        <translation type="obsolete">FRAMES: %1
-LATENZ: %2 ms</translation>
-    </message>
-    <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
         <translation>Hier können Sie die interne Puffergröße einstellen, die von LMMS genutzt wird. Kleinere Werte machen sich in einer geringeren Latenz bemerkbar, können aber auch zu unbrauchbarem Sound oder schlechter Performance führen, vor allem auf älteren Computern oder Systemen mit einem Nicht-Echtzeit-Kernel.</translation>
     </message>
@@ -2518,10 +2252,6 @@ Latenz: %2 ms</translation>
         <translation>Dummy (keine Sound-Ausgabe)</translation>
     </message>
     <message>
-        <source>JACK (Jack Audio Connection Kit)</source>
-        <translation type="obsolete">JACK (Jack Audio Connection Kit)</translation>
-    </message>
-    <message>
         <source>OSS (Open Sound System)</source>
         <translation>OSS (Open Sound System)</translation>
     </message>
@@ -2590,7 +2320,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation>Klicken Sie hier, wenn Sie Ihren ganzen Song abspielen wollen. Das Abspielen wird am Song-Positions-Marker (grün) gestartet. Sie können diesen auch während des Bewegens verschieben.</translation>
+        <translation>Klicken Sie hier, wenn Sie Ihren ganzen Song abspielen wollen. Das Abspielen wird am Song-Positions-Marker (grün) gestartet. Sie können diesen auch während des Abspielens verschieben.</translation>
     </message>
     <message>
         <source>Play song (Space)</source>
@@ -2665,32 +2395,12 @@ Bitte stellen Sie sicher, dass Sie wenigstens Leserechte auf die Datei besitzen 
         <translation>High-Quality-Modus</translation>
     </message>
     <message>
-        <source>Insert bar (Shift+Insert)</source>
-        <translation type="obsolete">Spalte einfügen (Umschalt+Einfügen)</translation>
-    </message>
-    <message>
-        <source>Remove bar (Shift+Delete)</source>
-        <translation type="obsolete">Spalte löschen (Umschalt+Entfernen)</translation>
-    </message>
-    <message>
-        <source>If you click here, a bar will be inserted at the current bar.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird eine Spalte an der aktuellen Spalte eingefügt.</translation>
-    </message>
-    <message>
-        <source>If you click here, the current bar will be removed.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird die aktuelle Spalte gelöscht.</translation>
-    </message>
-    <message>
         <source>Project saved</source>
         <translation>Projekt gespeichert</translation>
     </message>
     <message>
         <source>The project %1 is now saved.</source>
         <translation>Das Projekt %1 ist nun gespeichert.</translation>
-    </message>
-    <message>
-        <source>The project %1 could not be saved!</source>
-        <translation type="obsolete">Das Projekt %1 konnte nicht gespeichert werden!</translation>
     </message>
     <message>
         <source>Could not write file %1. You probably are not permitted to write to this file.
@@ -2717,10 +2427,6 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Master pitch</source>
         <translation>Master-Tonhöhe</translation>
-    </message>
-    <message>
-        <source>The project %1 is not saved!</source>
-        <translation type="obsolete">Das Projekt %1 ist nicht gespeichert!</translation>
     </message>
     <message>
         <source>The project %1 was not saved!</source>
@@ -2948,20 +2654,12 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action</source>
-        <translation type="obsolete">Drücken Sie &lt;Strg&gt; während des Klicks auf den Verschiebe-Griff, um eine neue Drag&apos;n&apos;Drop-Aktion zu beginnen</translation>
-    </message>
-    <message>
         <source>Clone this track</source>
         <translation>Diese Spur klonen</translation>
     </message>
     <message>
         <source>Remove this track</source>
         <translation>Diese Spur entfernen</translation>
-    </message>
-    <message>
-        <source>Operations for this track</source>
-        <translation type="obsolete">Aktionen für diese Spur</translation>
     </message>
     <message>
         <source>With this switch you can either mute this track or mute all other tracks.
@@ -2984,39 +2682,6 @@ Klick rechts = alle anderen Spuren stummschalten (Solo)</translation>
     <message>
         <source>Actions for this track</source>
         <translation>Aktionen für dise Spur</translation>
-    </message>
-</context>
-<context>
-    <name>trackWidget</name>
-    <message>
-        <source>Clone this track</source>
-        <translation type="obsolete">Diese Spur klonen</translation>
-    </message>
-    <message>
-        <source>Move this track up</source>
-        <translation type="obsolete">Diese Spur nach oben verschieben</translation>
-    </message>
-    <message>
-        <source>Move this track down</source>
-        <translation type="obsolete">Diese Spur nach unten verschieben</translation>
-    </message>
-    <message>
-        <source>With this switch you can either mute this track or mute all other tracks.
-By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
-When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
-        <translation type="obsolete">Mit diesem Schalter können SIe entweder diese Spur stummschalten oder alle andern Spuren stummschalten.
-Wenn Sie links klicken, wird diese Spur stummgeschaltet. Das ist nützlich, wenn Sie nur die anderen Spuren hören wollen, ohne diese Spur zu ändern und Informationen zu verlieren.
-Wenn Sie rechts klicken, werden alle anderen Spuren stumm geschaltet. Das ist nützlich, wenn Sie nur diese Spur hören wollen.</translation>
-    </message>
-    <message>
-        <source>left click = mute this track
-right click = mute all other tracks (solo)</source>
-        <translation type="obsolete">Klick links = diese Spur stummschalten
-Klick rechts = alle anderen Spuren stummschalten (Solo)</translation>
-    </message>
-    <message>
-        <source>Remove this track</source>
-        <translation type="obsolete">Diese Spur entfernen</translation>
     </message>
 </context>
 <context>

@@ -26,48 +26,32 @@
 #ifndef _PIXMAP_BUTTON_H
 #define _PIXMAP_BUTTON_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "qt3support.h"
 
 #ifdef QT4
 
-#include <QPushButton>
 #include <QPixmap>
 
 #else
 
-#include <qpushbutton.h>
 #include <qpixmap.h>
 
 #endif
 
 
+#include "automatable_button.h"
 
-class pixmapButton : public QPushButton
+
+class pixmapButton : public automatableButton
 {
 	Q_OBJECT
 public:
-	pixmapButton( QWidget * _parent );
+	pixmapButton( QWidget * _parent, engine * _engine );
 	virtual ~pixmapButton();
-	void FASTCALL setActiveGraphic( const QPixmap & _pm );
-	void FASTCALL setInactiveGraphic( const QPixmap & _pm,
-							bool _update = TRUE );
-	void FASTCALL setBgGraphic( const QPixmap & _pm );
 
-#ifdef QT3
-	inline void setChecked( bool _on )
-	{
-		setOn( _on );
-	}
-
-	inline bool isChecked( void ) const
-	{
-		return( isOn() );
-	}
-#endif
+	void setActiveGraphic( const QPixmap & _pm );
+	void setInactiveGraphic( const QPixmap & _pm, bool _update = TRUE );
+	void setBgGraphic( const QPixmap & _pm );
 
 
 signals:
@@ -82,9 +66,9 @@ protected:
 
 
 private:
-	QPixmap * m_activePixmap;
-	QPixmap * m_inactivePixmap;
-	QPixmap * m_bgPixmap;
+	QPixmap m_activePixmap;
+	QPixmap m_inactivePixmap;
+	QPixmap m_bgPixmap;
 
 } ;
 

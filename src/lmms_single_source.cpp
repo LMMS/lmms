@@ -2,6 +2,7 @@
 #undef SINGLE_SOURCE_COMPILE
 #include "src/lib/string_pair_drag.cpp"
 #include "src/lib/buffer_allocator.cpp"
+#include "src/lib/edit_history.cpp"
 #include "src/lib/embed.cpp"
 #include "src/lib/base64.cpp"
 #include "src/lib/mmp.cpp"
@@ -9,6 +10,7 @@
 #include "src/lib/oscillator.cpp"
 #include "src/lib/clipboard.cpp"
 #include "src/lib/sample_buffer.cpp"
+#include "src/core/import_filter.cpp"
 #include "src/core/config_mgr.cpp"
 #include "src/core/envelope_and_lfo_widget.cpp"
 #include "src/core/song_editor.cpp"
@@ -40,7 +42,6 @@
 #include "src/core/midi_tab_widget.cpp"
 #include "src/midi/midi_alsa_seq.cpp"
 #include "src/midi/midi_oss.cpp"
-#include "src/midi/midi_file.cpp"
 #include "src/midi/midi_port.cpp"
 #include "src/midi/midi_client.cpp"
 #include "src/midi/midi_mapper.cpp"
@@ -82,4 +83,5 @@
 #include "src/widgets/tooltip.cpp"
 #include "src/widgets/nstate_button.cpp"
 #include "src/widgets/lcd_spinbox.cpp"
+#include "src/widgets/automatable_button.cpp"
 #endif

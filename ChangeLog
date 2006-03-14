@@ -1,3 +1,83 @@
+2006-03-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	added edit-menu with undo/redo-items
+
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/channel_track.cpp:
+	* src/widgets/project_notes.cpp:
+	use mainWindow::saveWidgetState() and mainWindow::restoreWidgetState()
+	for saving widget-state in project-file
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	made piano-roll a settings-object
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	added static methods for saving and restoring state of a widget
+	(position, size, visibility etc.) to/from QDomElement
+
+	* include/timeline.h:
+	* src/core/song_editor.cpp:
+	* src/core/timeline.cpp:
+	save loop-point-positions and loop-point-state in project
+
+	* plugins/bit_invader/bit_invader.cpp:
+	added visual feedback when pressing wave-shape-buttons
+
+	* include/combobox.h:
+	* include/led_checkbox.h:
+	* include/pixmap_button.h:
+	* src/widgets/combobox.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/pixmap_button.cpp:
+	use automatableButton as new base-class
+	
+	* include/automatable_button.h:
+	* src/widgets/automatable_button.cpp:
+	- added class automatableButton to be the base-class for pixmapButton,
+	  ledCheckBox etc.
+	- added automatableButtonGroup, a more powerful button-group, designed
+	  to be used in conjunction with automatableButton-derived buttons
+
+2006-03-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/automatable_object.h:
+	- added setInitValue() to be used by ALL creators of automatable
+	  objects for initializing object-value - otherwise edit-step-history
+	  gets filled with steps to set object's value to init-value
+	- derive from editableObject and re-implement some methods for
+	  transparent edit-history for all automatable objects (knobs etc.)
+
+	* include/editable_object.h:
+	* include/edit_history.h:
+	* src/lib/edit_history.cpp:
+	added support for recording edit-steps, the base for a generic
+	undo/redo-system
+
+2006-03-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/settings.h:
+	* src/core/plugin_browser.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track_container.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* plugins/midi_import/midi_import.h:
+	made MIDI-file-code an import-filter
+
+	* include/import_filter.h:
+	* src/core/import_filter.cpp:
+	support for import-filter-plugins - simply call
+
+	importFilter::import( FILE_NAME, TRACK_CONTAINER )
+
+	for any file and the rest will be done fully automatically according
+	to installed import-filter-plugins
+
 2006-03-08	Zolo <the-zolo/at/gmx/dot/de>
 
 	* data/themes/blue_scene/:
@@ -6,7 +86,7 @@
 	* data/themes/blue_scene/plugins/:
 	added pixmaps for plugins
 
-2006-03-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/timeline.cpp:
 	more logical loop-point-handling:
@@ -41,7 +121,7 @@
 	* src/core/config_mgr.cpp:
 	several fixes concerning artwork-path
 
-2006-03-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-03-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/arp_and_chords_tab_widget.cpp:
 	more senseful range for arpeggio time: 25-2000 ms (instead of 10-1000ms)
@@ -71,24 +151,24 @@
 	- use default-theme-path if theme-path from config-file doesn't exist
 	- add "/" to theme-path if missing
 
-2006-03-06	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
+2006-03-06	Alexey Kouznetsov <alexey/dot/kouznetsov/at/gmail/dot/com>
 
 	* locale/ru.ts:
 	updated Russian translation
 
-2006-03-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-03-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/main_window.cpp:
 	always set to configured-state before showing setup-dialog on first
 	startup
 
-2006-03-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-03-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/engine.cpp:
 	finalize main-window after having mixer to start its audio-devices -
 	fixes crash on first time LMMS is started
 
-2006-02-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/de.ts:
 	updated German translation
@@ -118,7 +198,7 @@
 	* data/themes/blue_scene/:
 	added new theme for LMMS
 
-2006-02-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/song_editor.cpp:
 	* src/tracks/pattern.cpp:
@@ -141,13 +221,13 @@
 	artwork etc.) and put them into data/ dir to be all installed into
 	$prefix/share/lmms
 
-2006-02-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/channel_track.cpp:
 	apply a very basic envelope at the beginning and the end of a note for
 	avoiding these "typical" clicks which were there before
 
-2006-02-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	* Makefile.am:
@@ -175,7 +255,7 @@
 	delete piano-roll after song-editor and bb-editor as patterns being
 	destroyed still depend on it
 
-2006-02-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/channel_track.cpp:
 	do not lock mutex in processOutEvent() as it causes a deadlock when
@@ -205,7 +285,7 @@
 	do not strip executable when installing as it makes even basic debugging
 	impossible
 
-2006-02-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/combobox.cpp:
 	* src/widgets/knob.cpp:
@@ -222,7 +302,7 @@
 	fixed critical bug which made LMMS crash if xruns were detected and
 	notes were discarded by mixer and therefore deleted twice
 
-2006-02-19	Andreas Brandmaier <andreas/at/brandmaier.de>
+2006-02-19	Andreas Brandmaier <andreas/at/brandmaier/dot/de>
 
 	* plugins/organic/organic.cpp:
 	* plugins/organic/organic.h:
@@ -232,14 +312,14 @@
 	changed distortion method from clipping to foldback
 	renamed and added presets for Organic and BitInvader
 	
-2006-02-18	Andreas Brandmaier <andreas/at/brandmaier.de>
+2006-02-18	Andreas Brandmaier <andreas/at/brandmaier/dot/de>
 
 	* plugins/organic/organic.cpp:
 	* plugins/organic/organic.h:
 	* presets/Organic:
 	added new plugin synthesizer plugin organic and some presets
 
-2006-02-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/triple_oscillator/triple_oscillator.cpp:
 	per default set volume of each osc to 33%
@@ -254,7 +334,7 @@
 	possibilities like GUI-data-separation and having several projects
 	open at the same time
 
-2006-02-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/mixer.h:
 	* include/song_editor.h:
@@ -263,7 +343,7 @@
 	simple xrun-detection - do not accept new note-play-handles if xruns
 	are detected
 
-2006-02-06	Andreas Brandmaier <andy/at/brandmaier.de>
+2006-02-06	Andreas Brandmaier <andy/at/brandmaier/dot/de>
 
 	* plugins/bitinvader/bitinvader.cpp:
 	* plugins/bitinvader/bitinvader.h:
@@ -273,7 +353,7 @@
 	- added drag&drop support to wavegraph
 	- added new BitInvader presets and improved old ones
 
-2006-02-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/basic_filters.h:
 	small optimizations: do not divide by 2.0, instead multiply with 0.5
@@ -295,7 +375,7 @@
 	when checking for VST-SDK-headers, use C++ compiler instead of
 	C-compilers as headers fail to compile with it
 
-2006-02-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/types.h:
 	* most files:
@@ -313,7 +393,7 @@
 	calls without ending in deadlock or crash because of mutex being
 	unlocked to early
 
-2006-02-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	made 0.1.4 release
@@ -324,7 +404,7 @@
 	* include/track_container.h:
 	fixed bug which caused LMMS not being compilable using GCC 3
 
-2006-02-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-02-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	made 0.1.3 release
@@ -346,7 +426,7 @@
 	* src/core/main.cpp:
 	updated copyright-notice in help-text
 
-2006-01-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/fstclient.h:
 	* plugins/vestige/fstclient.cpp:
@@ -361,7 +441,7 @@
 	  Support Layer)
 	- VST SDK 2.4 compatibility (no need to fix headers with 2.4!)
 
-2006-01-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bit_invader/bit_invader.cpp:
 	- call graph::setSamplePointer() after loading settings
@@ -384,7 +464,7 @@
 	- cleanup only every 10th free()-call for decreasing overhead
 	- only start searching for free bufs if there're enough remaining
 
-2006-01-24	Andreas Brandmaier <andy/at/brandmaier.de>
+2006-01-24	Andreas Brandmaier <andy/at/brandmaier/dot/de>
 
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/bit_invader/bit_invader.h:
@@ -392,7 +472,7 @@
 	- changed sample buffer encoding in presets to base64
 	- added BitInvader various presets
 
-2006-01-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/sample_buffer.h:
 	* src/lib/sample_buffer.cpp:
@@ -404,7 +484,7 @@
 	added methods for encoding/decoding binary data to/from base64-encoded
 	data (wrapper-implementation for Qt4)
 
-2006-01-23	Andreas Brandmaier <andy/at/brandmaier.de>
+2006-01-23	Andreas Brandmaier <andy/at/brandmaier/dot/de>
 
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/bit_invader/bit_invader.h:
@@ -416,7 +496,7 @@
 	- added user-loadable waveform
 	- code cleanup
 
-2006-01-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/timeline.h:
 	* src/core/song_editor.cpp:
@@ -456,7 +536,7 @@
 	- scale pixmap to fit into combobox
 	- place menu below combobox if possible
 
-2006-01-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/track.h:
 	* src/core/track.cpp:
@@ -496,13 +576,13 @@
 	fixed all that stuff with annoying scrollbars which partly hid important
 	widgets
 
-2006-01-21	Andreas Brandmaier <andy/at/brandmaier.de>
+2006-01-21	Andreas Brandmaier <andy/at/brandmaier/dot/de>
 
-	* plugins/bit_invader/bit_invader.cpp
-	* plugins/bit_invader/bit_invader.h
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
 	added smooth button
 
-2006-01-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/pattern.cpp:
 	also update after clearing all notes
@@ -536,7 +616,7 @@
 	added own cool-looking combobox with menu-extension which basically
 	has the same API as QComboBox
 
-2006-01-19	Andreas M. Brandmaier <andy/at/brandmaier.de>
+2006-01-19	Andreas M. Brandmaier <andy/at/brandmaier/dot/de>
 
 	* plugins/bit_invader/bit_invader.h:
 	* plugins/bit_invader/bit_invader.cpp:
@@ -544,7 +624,7 @@
 	* plugins/bit_invader/graph.cpp:
 	added "BitInvader"-plugin, an usereditable wavetable-synthesizer
 
-2006-01-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/mmp.cpp:
 	do not add "mmp"-extensions if there's already "mpt" (multimedia-
@@ -555,7 +635,7 @@
 	- added new sync-mode to arpeggiator
 	- arpeggiator-modes are now selectable from combobox
 
-2006-01-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/file_browser.cpp:
 	use 7.5 instead of 8 as font-size
@@ -582,7 +662,7 @@
 	QMutex - fixes crashes with sort-arpeggio if no preset was previewed
 	before
 
-2006-01-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/kmultitabbar.cpp:
 	made KMultiTabBar working with Qt4
@@ -613,17 +693,17 @@
 	  crashing when applying another preset while key is pressed and
 	  released afterwards
 
-2006-01-10	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
+2006-01-10	Alexey Kouznetsov <alexey/dot/kouznetsov/at/gmail/dot/com>
 
 	* locale/ru.ts:
 	updated Russian translation
 
-2006-01-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano_roll.cpp:
 	update pattern after changing volume of step-note
 
-2006-01-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/setup_dialog.h:
 	* src/core/config_mgr.cpp:
@@ -631,7 +711,7 @@
 	made appearence of two dialogs switchable (question whether to re-run
 	wizard after up-/downgrade and message after accepting setup-dialog)
 
-2006-01-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:
@@ -673,12 +753,12 @@
 	removed inclusion of paths.h which isn't part of LMMS for quite a long
 	while... - there were no problems because Linux has paths.h too
 
-2006-01-06	dieEasy <dieeasy/at/cheapnet.it>
+2006-01-06	dieEasy <dieeasy/at/cheapnet/dot/it>
 
 	* locale/it.ts:
 	added Italian translation
 
-2006-01-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.cpp:
 	set vestige-logo as window-icon of plugin-GUI-window
@@ -721,7 +801,7 @@
 	when invalidating note-play-handle, do some stuff which actually would
 	be done by dtor if m_channelTrack wouldn't be NULL
 
-2006-01-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2006-01-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track.cpp:
 	added tooltip to track-op-widget telling the user something about
@@ -739,14 +819,14 @@
 	* src/core/about_dialog.cpp:
 	extended copyright from 2005 to 2006 - Happy New Year!
 
-2005-12-31	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-31	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* src/tracks/channel_track.cpp:
 	removed surround-area in track-settings-widget and added button with
 	MIDI-connection-menu instead
 
-2005-12-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/track.h:
 	* include/track_container.h:
@@ -764,13 +844,13 @@
 	* src/core/midi_tab_widget.cpp:
 	use smaller font for connection-selection-menu
 
-2005-12-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/fade_button.cpp:
 	do not update() directly in nextState(), use QTimer instead for avoiding
 	xlib-threading-errors
 
-2005-12-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/communication.h:
 	* plugins/vestige/fstclient.cpp:
@@ -798,7 +878,7 @@
 	* src/tracks/channel_track.cpp:
 	corrected calculation in channelTrack::masterKey()
 
-2005-12-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:
@@ -845,7 +925,7 @@
 	  current buffer, so if rendering of current buffer went faster than
 	  in realtime, the song doesn't play at a higher speed
 
-2005-12-26	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.cpp:
 	determine real key of note using channelTrack::masterKey
@@ -881,7 +961,7 @@
 	do not align position and length of bb-track-objects on tact-boundaries
 	as it offers an interesting new feature (incomplete/start beats etc.!)
 
-2005-12-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/visualization_widget.cpp:
 	enable visualization-widget per default
@@ -893,7 +973,7 @@
 	- added note-off-button for being able to note off hanging notes
 	  (which sometimes occurs in combination with arpeggios)
 
-2005-12-24	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.cpp:
 	use new parameter-saving/loading-feature when saving/loading settings
@@ -913,7 +993,7 @@
 	pass unused wheel-events to trackContentObect for being able to scroll
 	within song-editor
 
-2005-12-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/fstcore.c:
 	a lot of clean-ups and other bug-fixes making VeSTige almost usable
@@ -950,12 +1030,12 @@
 	added type-information, so every derived class has to pass a
 	type-constant to playHandle-constructor
 
-2005-12-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	made 0.1.2 release
 
-2005-12-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/sample_buffer.cpp:
 	- first try to use libsndfile instead of SDL_sound for decoding sample
@@ -973,7 +1053,7 @@
 	hide all other tabs when changing active tab - neccessary for working
 	with Qt 4.1
 
-2005-12-20	Danny McRae	<khjklujn/at/yahoo.com>
+2005-12-20	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* resources/step_btn_on_100.png:
 	* resources/step_btn_yellow.png:
@@ -982,7 +1062,7 @@
 	make it possible to change volume of steps in bb-editor using mouse
 	wheel and which changes color of step-button accordingly
 
-2005-12-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/sample_buffer.cpp:
 	first implementation of FLAC-encoding/decoding for compressing buffers
@@ -993,7 +1073,7 @@
 	in cleanup-method use list instead of vector for pool of buffers to be
 	removed - fixes crash with Qt4
 
-2005-12-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/knob.cpp:
 	made knob ready for drag'n'drop of values
@@ -1002,7 +1082,7 @@
 	load and save/load sample-data which doesn't come from sample in/from
 	XML-node (base64-encoded)
 
-2005-12-18	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/pattern.cpp:
 	use Sint32 instead of Sint16 for determining central key, otherwise we
@@ -1048,7 +1128,7 @@
 	made up all that drag'n'drop-stuff, you're now able to drag samples
 	and presets directly to according channel, sample etc.
 
-2005-12-17	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/bb_editor.h:
 	* include/pattern.h:
@@ -1088,7 +1168,7 @@
 	everytime it changes - other widgets can use this for querying whether
 	one of these modifier-keys is pressed
 
-2005-12-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	added better LADSPA-check and fixed some other small things
@@ -1102,12 +1182,12 @@
 	* src/lib/ladspa_manager.cpp:
 	load plugins using QLibrary instead of platform-dependent dl-functions
 
-2005-12-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/audio_alsa.h:
 	do not include alsa-headers if they do not exist...
 
-2005-12-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/file_browser.cpp:
 	display text-float while loading sample for preview
@@ -1142,13 +1222,13 @@
 	* most files:
 	continued improving Qt4-support
 
-2005-12-13	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* most files:
 	made LMMS compatible with Qt4 again after heavy development under Qt3
 	led to incompatibility with Qt4
 
-2005-12-11	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/lmms_main_win.cpp:
 	* src/lib/mmp.cpp:
@@ -1189,7 +1269,7 @@
 	* plugins/audio_file_processor/audio_file_processor.cpp:
 	update start- and end-frames of sample-buffer when loading settings
 
-2005-12-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/lmms_main_win.h:
 	* include/song_editor.h:
@@ -1209,7 +1289,7 @@
 	- added highlighting during mouse-over
 	- do not connect clicked()-signal if receiver and/or slot are NULL
 
-2005-12-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* src/core/midi_tab_widget.cpp:
@@ -1227,7 +1307,7 @@
 	* src/midi/midi_port.cpp:
 	do not process MIDI-out-event if channel = -1
 
-2005-12-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/midi_tab_widget.cpp:
 	- always un-check items in port-menus when disabling receceiving or
@@ -1238,7 +1318,7 @@
 	* resources/midi_out.png:
 	added icons for MIDI-input- and MIDI-output-port-selection
 
-2005-12-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/midi_alsa_seq.h:
 	* include/midi_client.h:
@@ -1250,7 +1330,7 @@
 	selecting according source-/destination-port from a menu in
 	MIDI-setup-tab in each channel-window
 
-2005-12-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/note_play_handle.cpp:
 	* src/core/piano_roll.cpp:
@@ -1263,7 +1343,7 @@
 	of a small bug) - will drop MIDI-out-plugin very soon as it isn't
 	needed anymore
 
-2005-12-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:
@@ -1276,7 +1356,7 @@
 	* src/core/piano_roll.cpp:
 	added small zoom-icon to zoom-combobox
 
-2005-12-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/midi_alsa_raw.h:
 	* include/midi_client.h:
@@ -1319,7 +1399,7 @@
 	* src/widgets/tab_widget.cpp:
 	reversed scroll-wheel-direction for changing tab
 
-2005-12-03	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/main.cpp:
 	- better handling of command-line options
@@ -1360,7 +1440,7 @@
 	easier and also results in a better performance (especially when using
 	JACK) - additionally LMMS doesn't take 100% CPU anymore
 
-2005-12-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-12-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/config_mgr.cpp:
 	do not try to re-run wizard in case of version mismatches
@@ -1371,7 +1451,7 @@
 	dropped ladspa_sine_1063-plugin as it is only for experimental
 	purposes
 
-2005-11-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-11-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.h:
 	* plugins/vestige/vestige.cpp:
@@ -1389,13 +1469,13 @@
 	* src/widgets/qxembed.cpp:
 	added QXEmbed-widget which is neccessary for embedding VST-plugin
 
-2005-11-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-11-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:
 	added usleep()-call for realizing usable threading and solve problems
 	with 100%-CPU-usage
 
-2005-11-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-11-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* include/sample_play_handle.h:
@@ -1434,19 +1514,19 @@
 	use memset() for clearing buffers - obsoletes usage of silence-buffers
 	in mixer
 
-2005-11-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-11-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/midi/midi_alsa_seq.cpp:
 	use relative instead of absolute scheduling for events which makes
 	MIDI-out working
 
-2005-10-31	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-31	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/midi_alsa_seq.h:
 	* src/midi/midi_alsa_seq.cpp:
 	several bug-fixes
 
-2005-10-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/midi_alsa_seq.h:
 	* src/midi/midi_alsa_seq.cpp:
@@ -1470,7 +1550,7 @@
 	when reading/saving device-name via config-mgr, use "midialsaraw"
 	instead of "midialsa" as context-name
 
-2005-10-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/project_notes.cpp:
 	set initial text to bright gray, since black text on a very dark back-
@@ -1490,7 +1570,7 @@
 	reorder some code in constructor for not crashing if window is
 	shown while constructor is still running
 
-2005-10-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/led_checkbox.cpp:
 	also emit toggled()-signal if state actually wasn't changed
@@ -1527,7 +1607,7 @@
 	* src/midi/midi_device.cpp:
 	removed
 
-2005-10-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/tempo_sync_knob.cpp:
 	do not implement the same code as knob does in mouseMoveEvent() - call
@@ -1537,7 +1617,7 @@
 	* src/widgets/knob.cpp:
 	cleaned up a lot and fixed some bugs
 
-2005-10-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/song_editor.h:
 	decreased MAX_BPM to 999 since BPM-LCD-spinbox is intended to have
@@ -1552,7 +1632,7 @@
 	* configure.in:
 	check for libfst and present VST-SDK header-files
 
-2005-10-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.h:
 	* plugins/vestige/vestige.cpp:
@@ -1592,7 +1672,7 @@
 	* resources/:
 	improved icons such as project_*.png and sample-track-related icons
 
-2005-10-18	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* src/tracks/channel_track.cpp:
@@ -1627,7 +1707,7 @@
 	added setParameter() and getParameter()-methods for making LMMS able to
 	set parameters of a specific plugin without knowing anything about it
 
-2005-10-17	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* buildtools/bin2res.cpp:
 	* include/embed.h:
@@ -1647,7 +1727,7 @@
 	removed Moog-2-filter as it is only very CPU-intensive without any
 	significant difference to sound of normal Moog-filter
 
-2005-10-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/ladspa_manager.cpp:
 	skip not existing/unreadable directories when searching for plugins
@@ -1686,14 +1766,14 @@
 	* src/core/instrument.cpp:
 	renamed files soundgenerator.* to instrument.* as well as class-name
 
-2005-10-15	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/vestige.h:
 	* src/soundgenerators/vestige.cpp:
 	new plugin "VeSTige" for handling VST-plugins - VERY experimental,
 	but at least, we get some sound out of these strange dll-files ;-)
 
-2005-10-13	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/audio/audio_jack.cpp:
 	do not fill up buffers if JACK-transport is not rolling but at the same
@@ -1712,7 +1792,7 @@
 	* src/soundgenerators/*.cpp:
 	removed obsolete defaultSettings()-method from each soundgenerator
 
-2005-10-13	Danny McRae	<khjklujn/at/yahoo.com>
+2005-10-13	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* include/ladspa_manager.h
 	* include/ladspa_sine_1063.h
@@ -1720,7 +1800,7 @@
 	* src/soundgenerators/ladspa_sine_1063.cpp:
 	added LADSPA-support and a simple soundgenerator for testing-purposes
 
-2005-10-12	Danny McRae	<khjklujn/at/yahoo.com>
+2005-10-12	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* Makefile.am:
 	* include/led_checkbox.h:
@@ -1729,7 +1809,7 @@
 	inherit ledCheckBox from QWidget instead of QCheckBox since it sometimes
 	caused graphic-errors when running on KDE with Baghira-style...
 
-2005-10-05	Danny McRae	<khjklujn/at/yahoo.com>
+2005-10-05	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* resources/note_double_whole.png:
 	* resources/note_eighth.png:
@@ -1761,20 +1841,20 @@
 	added tempo-sync-knob which automatically converts fixed note-length's
 	to a fixed time in ms everytime BPM is changed
 
-2005-10-03	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/basic_filters.h:
 	- added another moog-filter which sounds a bit better but needs MUCH
 	  more CPU-time...
 	- cleaned up different filter-code-branches
 
-2005-10-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/oscillator.h:
 	cast to int instead of floor()ing value in oscillator::phase() which
 	makes the whole thing faster again...
 
-2005-09-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/tab_widget.cpp:
 	fixed bugs when adding widget with already existing index
@@ -1813,7 +1893,7 @@
 	* inlude/empty_sg_plugin.h:
 	added empty sound-generator plugin
 
-2005-09-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/song_editor.h:
 	* src/core/song_editor.cpp:
@@ -1846,7 +1926,7 @@
 	- different painting if no caption was defined
 	- switch tabs if wheel-events occurs
 
-2005-09-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/channel_track.cpp:
 	began improving GUI of channel-track-window
@@ -1861,12 +1941,12 @@
 	define macro ALSA_PCM_NEW_HW_PARAMS_API for working with older ALSA-
 	versions which offer old and new HW-param-API - we're using the new one
 
-2005-09-26	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* many files:
 	make LMMS compile with Qt 3.0 and GCC 2.95
 
-2005-09-25	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/audio/audio_jack.cpp:
 	- decreased wait-time from 0.5 ms to 0.2 ms in writeBufferToDev(...)
@@ -1888,7 +1968,7 @@
 	do not save play-pos from previous play-mode when beginning to play
 	in different play-mode - fixes bug in timeline behaviour "back to start"
 
-2005-09-24	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	* include/audio_oss.h:
@@ -1917,12 +1997,12 @@
 	* src/core/track_container.cpp:
 	set modified-state for song when removing track
 
-2005-09-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	made 0.1.1 release
 
-2005-09-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/about_dialog.h:
 	* src/core/about_dialog.cpp:
@@ -1957,12 +2037,12 @@
 	up everything - fixes bug with empty browsers after fresh personal
 	installation of LMMS
 
-2005-09-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	made 0.1.0 release
 
-2005-09-18	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/bb_track.cpp:
 	revised paintEvent()-method -> bb-TCO's are now painted with a gradient!
@@ -2017,7 +2097,7 @@
 	  for determining path to localization files - this call created all
 	  wizard-widgets before actual localization was loaded...
 
-2005-09-17	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/setup_dialog.cpp:
 	added switches for disabling tooltips and turning on classical knob-
@@ -2027,7 +2107,7 @@
 	* src/widget/led_checkbox.cpp:
 	added LED-check-box
 
-2005-09-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:
 	clear output-buffers in ctor before using them -> avoids awful noises
@@ -2064,7 +2144,7 @@
 	usage of tooltips, so there's no difference to code using tooltips
 	whether it is compiled with Qt 3 or Qt 4
 
-2005-09-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/mixer.h:
 	* include/note_play_handle.h:
@@ -2113,7 +2193,7 @@
 	* locale/fr.ts:
 	added French translation
 
-2005-09-13	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/lmms_main_win.cpp:
 	- show setup-dialog if LMMS is started first time or mixer uses dummy-
@@ -2148,7 +2228,7 @@
 	added probeDevice()-method which eases determining device-name in
 	either actual audio-class as well as in it's setup-widget
 
-2005-09-11	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:
 	use new audio-settings-technology for opening audio-device
@@ -2193,7 +2273,7 @@
 	* src/lib/embed.cpp:
 	do not return null-pixmap if pixmap not found
 
-2005-09-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* resources/setup_audio.png:
 	* resources/setup_general.png:
@@ -2226,12 +2306,12 @@
 	- use macro AS_HELP_STRING for formatting help-strings
 	- removed --with-latency option as it is not needed anymore
 
-2005-09-06	Alireza	<dr.alireza/at/gmail.com>
+2005-09-06	Alireza	<dr/dot/alireza/at/gmail/dot/com>
 
 	* resources/ir.ts:
 	added Persian translation
 
-2005-09-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/audio/audio_oss.cpp:
 	- read device-name from config-file before evaluating environment-
@@ -2274,13 +2354,13 @@
 	added value() and setValue()-method which offers all components of LMMS
 	an easy way for loading/saving their settings at startup/exit
 
-2005-09-02	Mario Izquierdo <mariodebian/at/gmail.com>
-2005-09-02	Johnny Saenz <saenzac/at/hotmail.com>
+2005-09-02	Mario Izquierdo <mariodebian/at/gmail/dot/com>
+2005-09-02	Johnny Saenz <saenzac/at/hotmail/dot/com>
 
 	* resources/es.ts:
 	added Spanish translation
 
-2005-09-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-09-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* most files:
 	finished changes began on 2005-08-29
@@ -2293,7 +2373,7 @@
 	* resources/de.ts:
 	completed German translation
 
-2005-08-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* most files:
 	begin to use new bufferAllocator instead of old buffer-types and
@@ -2305,7 +2385,7 @@
 	as the constant FRAMES_PER_AUDIO_BUFFER - use
 	mixer::inst()->framesPerAudioBuffer() instead
 
-2005-08-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/song_editor.h:
 	* src/core/song_editor.cpp:
@@ -2338,7 +2418,7 @@
 	* src/core/arp_and_chords_tab_widget.cpp:
 	set m_arpDirection correct when loading older settings
 
-2005-08-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* src/tracks/channel_track.cpp:
@@ -2359,7 +2439,7 @@
 	  of LMMS and JACK are different
 	- also free buffers in destructor and not just throw them out of list
 
-2005-08-26	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/audio_jack.h:
 	* src/audio/audio_jack.cpp:
@@ -2372,7 +2452,7 @@
 	* src/lib/buffer_allocator.cpp:
 	added bufferAllocator which is an optimized internal memory-manager
 
-2005-08-24	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/audio_jack.h:
 	* src/audio/audio_jack.cpp:
@@ -2385,7 +2465,7 @@
 	completed usage of switchable groupboxes by saving groupbox-states
 	and evaluating them in processNote()
 
-2005-08-22	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* resources/afp_artwork.png:
 	small improvements for better usability and internationalization
@@ -2449,7 +2529,7 @@
 	text
 
 
-2005-08-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/side_bar_widget.cpp:
 	* src/tracks/channel_track.cpp:
@@ -2497,14 +2577,14 @@
 	* src/core/main.cpp:
 	added --version command-line-switch
 
-2005-08-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/lmms_main_win.cpp:
 	- extended filter for sample-browser
 	- added home- and root-browser for being able to load songs, presets,
 	  samples etc. from somewhere else than within lmms-working-directory
 
-2005-07-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/lmms_main_win.cpp:
 	* src/core/track_container.cpp:
@@ -2526,7 +2606,7 @@
 	* src/core/track.cpp:
 	removed unsused method setTrackWidgetHeight( int )
 
-2005-07-26	Pedro Lopez-Cabanillas <pedro.lopez.cabanillas/at/gmail.com>
+2005-07-26	Pedro Lopez-Cabanillas <pedro/dot/lopez/dot/cabanillas/at/gmail/dot/com>
 
 	* src/core/browser.cpp:
 	* src/core/config_mgr.cpp:
@@ -2543,7 +2623,7 @@
 	added MIDIDEV-environment variable for being able to choose a MIDI
 	device different from the default one
 
-2005-07-24	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/midi_mapper.h:
 	* src/midi/midi_mapper.cpp:
@@ -2568,13 +2648,13 @@
 	- fixed bug which caused horizontal scrollbar to have an undefined
 	  max-value after starting up LMMS
 	- go to start of pattern when pressing home-key
- 
-2005-07-23	Alexey Kouznetsov <alexey.kouznetsov/at/gmail.com>
+
+2005-07-23	Alexey Kouznetsov <alexey/dot/kouznetsov/at/gmail/dot/com>
 
 	* resources/ru.ts:
 	added Russian translation
 
-2005-07-23	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano_roll.cpp:
 	scroll back when stopping and play-position changes to invisible area
@@ -2588,7 +2668,7 @@
 	* src/midi/midi_device.cpp:
 	limit volume between 0 and 127 when sending out note-on-event
 
-2005-07-21	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/nstate_button.h:
 	* src/widgets/nstate_button.cpp:
@@ -2607,7 +2687,7 @@
 	* lmms-0.1.0rc1.tar.bz2:
 	release of Release Candidate 1 of LMMS 0.1.0
 
-2005-07-20	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/midi/midi_file.cpp:
 	- proper handling of note-on-events which velocity 0 -> treat like
@@ -2628,14 +2708,14 @@
 	* src/widgets/knob.cpp:
 	fixed bugs caused by changes made before for scroll-wheel-support
 
-2005-07-19	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/knob.h:
 	* src/widgets/knob.cpp:
 	added better scroll-wheel support which increases/decreases knob-value
 	by 20th of range (e.g 0.05 if knob is ranged between 0 and 1)
 
-2005-07-17	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* projects/:
 	added "covers"-dir and added "Preludium and Fuge A-Minor" by J.S.Bach
@@ -2656,7 +2736,7 @@
 	new plugin midiOut which sends all notes on this channel out to
 	external midi-device this is especially cool for playing arpeggio for
 	key pressed on external midi-device!!
- 
+
 	* src/soundgenerators/plucked_string_synth.cpp:
 	removed unneccesary inclusion of qpainter-header
 
@@ -2674,12 +2754,12 @@
 	added missing arg()-call to QMessageBox::critical()-call in
 	audioFileDevice-ctor
 
-2005-07-16	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/config_mgr.cpp:
 	added shortcuts to navigation-buttons
 	
-2005-07-14	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano_roll.cpp:
 	only play notes while editing if we're not in play-mode
@@ -2689,7 +2769,7 @@
 	when exporting always render one additional tact at the end so that
 	we don't cut off notes with delay etc.
 
-2005-07-12	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	- successful compilation with GCC 4.0.1 ;-)
 
@@ -2697,7 +2777,7 @@
 	fixed bug responsible for playing base-notes of chords all time
 	if any arpeggio selected was selected
 
-2005-07-11	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* resources/source/wizard_files.xcf:
 	* resources/wizard_files.png:
@@ -2716,7 +2796,7 @@
 	* lmms-0.1.0beta.tar.bz2:
 	made beta-release of 0.1.0 and announced it on kde-apps.org
 
-2005-07-10	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* presets/TripleOscillator/:
 	added cool Church Organ preset and improved Xylophon preset
@@ -2751,7 +2831,7 @@
 	* src/core/export_project_dialog.cpp:
 	renamed from export_song_dialog.ext to export_project_dialog.ext
 
-2005-07-09	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* all files:
 	now all source-code-files but some single exceptions do not have more
@@ -2802,7 +2882,7 @@
 	which makes it all a bit smaller and faster since we do not always have
 	to access the current element using the []-operator
 
-2005-07-08	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/envelope_tab_widget.cpp:
 	* src/lib/sample_buffer.cpp:
@@ -2813,7 +2893,7 @@
 	* projects/:
 	added directories "tutorials" and "recorded_loops"
 
-2005-07-07	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/bb_track.h:
 	added FASTCALL to moveLocation(...) and changeLength(...) which fixes
@@ -2825,7 +2905,7 @@
 	* samples/:
 	added a lot of new samples from wikisource and others
 
-2005-07-06	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/project_notes.h:
 	* src/core/song_editor.cpp:
@@ -2857,7 +2937,7 @@
 	added setKey()- and key()-member which setting/getting absolute key
 	of note
 
-2005-07-05	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	* projects/:
@@ -2887,7 +2967,7 @@
 	check whether compiler knows floorf and powf and if not, define them
 	to floor/pow
 
-2005-07-04	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* most files:
 	made LMMS compiling (and working) with Qt 3.0, GCC 2.95 and other old
@@ -2902,7 +2982,7 @@
 	added support for versions of libsndfile < 1.0.11 since API has changed
 	in libsndfile 1.0.11
 
-2005-07-03	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* resources/control_env_amount_active.png:
 	* resources/control_env_amount_inactive.png:
@@ -2940,7 +3020,7 @@
 	* src/audio/audio_alsa.cpp:
 	added support for 48 KHz soundcards
 
-2005-07-02	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	* src/lib/sample_buffer.cpp:
@@ -2966,7 +3046,7 @@
 	led to crash when having piano-roll open while deleting pattern (e.g.
 	creating new file, opening file etc.)
 
-2005-07-01	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-07-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* all files:
 	replaced "location" in names of functions/variables by "position"
@@ -2979,7 +3059,7 @@
 	added support for autoscroll in piano-roll when playing/recording
 	pattern
 
-2005-06-30	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
 	* include/midi_device.h
@@ -3018,7 +3098,7 @@
 	added missing #include "debug.h" for solving problems with undeclared
 	assert() because of not included assert.h
 
-2005-06-29	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-06-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
 	* include/audio_sdl.h:
@@ -3029,15 +3109,14 @@
 	* README:
 	updated everything a bit...
 
-2005-06-28	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/envelope_tab_widget.h:
 	* src/core/envelope_tab_widget.cpp:
 	use button instead of knob for turning filter on/off
 
-2005-06-27	Tobias Doerffel	<tobydox/at/users.sourceforge.net>
+2005-06-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* samples/effects/Makefile.am:
 	don't install effect-samples into directory of basses-samples
 
- 

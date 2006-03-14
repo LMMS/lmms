@@ -40,23 +40,21 @@
 
 #include "pixmap_button.h"
 
+
 class QPixmap;
 
 
-class groupBox : public QWidget
+class groupBox : public QWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	groupBox( const QString & _caption, QWidget * _parent );
+	groupBox( const QString & _caption, QWidget * _parent,
+							engine * _engine );
 	virtual ~groupBox();
 
 	bool isActive( void ) const
 	{
-#ifdef QT4
 		return( m_led->isChecked() );
-#else
-		return( m_led->isOn() );
-#endif
 	}
 
 

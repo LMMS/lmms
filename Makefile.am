@@ -47,6 +47,7 @@ man1_MANS = lmms.1
 lmms_MOC =						\
 		./about_dialog.moc			\
 		./arp_and_chords_tab_widget.moc		\
+		./automatable_button.moc		\
 		./bb_editor.moc				\
 		./bb_track.moc				\
 		./channel_track.moc			\
@@ -127,6 +128,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/envelope_tab_widget.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
 		$(srcdir)/src/core/file_browser.cpp			\
+		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
@@ -150,6 +152,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
 		$(srcdir)/src/lib/clipboard.cpp				\
+		$(srcdir)/src/lib/edit_history.cpp			\
 		$(srcdir)/src/lib/embed.cpp				\
 		$(srcdir)/src/lib/ladspa_manager.cpp			\
 		$(srcdir)/src/lib/mmp.cpp				\
@@ -159,7 +162,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_alsa_raw.cpp			\
 		$(srcdir)/src/midi/midi_alsa_seq.cpp			\
 		$(srcdir)/src/midi/midi_client.cpp			\
-		$(srcdir)/src/midi/midi_file.cpp			\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
 		$(srcdir)/src/midi/midi_oss.cpp				\
 		$(srcdir)/src/midi/midi_port.cpp			\
@@ -167,6 +169,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/channel_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
+		$(srcdir)/src/widgets/automatable_button.cpp		\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/fade_button.cpp			\
@@ -253,7 +256,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/midi_alsa_raw.h			\
 		$(srcdir)/include/midi_client.h				\
 		$(srcdir)/include/midi_event_processor.h		\
-		$(srcdir)/include/midi_file.h				\
 		$(srcdir)/include/midi_oss.h				\
 		$(srcdir)/include/midi_port.h				\
 		$(srcdir)/include/midi_time.h				\
@@ -277,6 +279,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/buffer_allocator.h			\
 		$(srcdir)/include/lcd_spinbox.h				\
 		$(srcdir)/include/tooltip.h				\
+		$(srcdir)/include/automatable_button.h			\
 		$(srcdir)/include/led_checkbox.h			\
 		$(srcdir)/include/text_float.h				\
 		$(srcdir)/include/tempo_sync_knob.h			\
@@ -297,6 +300,9 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/automatable_object.h			\
+		$(srcdir)/include/editable_object.h			\
+		$(srcdir)/include/edit_history.h			\
+		$(srcdir)/include/import_filter.h			\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/qxembed.h
 

@@ -45,11 +45,11 @@
 
 
 
-pixmapButton::pixmapButton( QWidget * _parent ) :
-	QPushButton( _parent ),
-	m_activePixmap( NULL ),
-	m_inactivePixmap( NULL ),
-	m_bgPixmap( NULL )
+pixmapButton::pixmapButton( QWidget * _parent, engine * _engine ) :
+	automatableButton( _parent, _engine ),
+	m_activePixmap(),
+	m_inactivePixmap(),
+	m_bgPixmap()
 {
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
 	setInactiveGraphic( embed::getIconPixmap( "led_off" ), FALSE );
@@ -58,7 +58,7 @@ pixmapButton::pixmapButton( QWidget * _parent ) :
 	setBackgroundMode( Qt::NoBackground );
 #endif
 
-	setCheckable( TRUE );
+	//setCheckable( TRUE );
 }
 
 
@@ -66,9 +66,6 @@ pixmapButton::pixmapButton( QWidget * _parent ) :
 
 pixmapButton::~pixmapButton()
 {
-	delete m_activePixmap;
-	delete m_inactivePixmap;
-	delete m_bgPixmap;
 }
 
 
@@ -85,25 +82,23 @@ void pixmapButton::paintEvent( QPaintEvent * )
 	QPainter p( &draw_pm, this );
 #endif
 
-	if( m_bgPixmap != NULL )
+	if( !m_bgPixmap.isNull() )
 	{
-		p.drawPixmap( 0, 0, *m_bgPixmap );
+		p.drawPixmap( 0, 0, m_bgPixmap );
 	}
 
-	if( isChecked() || isDown() )
+	if( isChecked() )
 	{
-		if( m_activePixmap != NULL )
+		if( !m_activePixmap.isNull() )
 		{
-			p.drawPixmap( 0, 0, *m_activePixmap );
+			p.drawPixmap( 0, 0, m_activePixmap );
 		}
 	}
-	else
+	else if( !m_inactivePixmap.isNull() )
 	{
-		if( m_inactivePixmap != NULL )
-		{
-			p.drawPixmap( 0, 0, *m_inactivePixmap );
-		}
+		p.drawPixmap( 0, 0, m_inactivePixmap );
 	}
+
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );
@@ -114,24 +109,26 @@ void pixmapButton::paintEvent( QPaintEvent * )
 
 
 
-void pixmapButton::mousePressEvent( QMouseEvent * _me)
+void pixmapButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::RightButton )
 	{
 		emit( clickedRight() );
+		_me->accept();
 	}
 	else
 	{
-		QPushButton::mousePressEvent( _me );
+		automatableButton::mousePressEvent( _me );
 	}
 }
 
 
 
 
-void pixmapButton::mouseDoubleClickEvent( QMouseEvent * )
+void pixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	emit doubleClicked();
+	_me->accept();
 }
 
 
@@ -139,10 +136,8 @@ void pixmapButton::mouseDoubleClickEvent( QMouseEvent * )
 
 void pixmapButton::setActiveGraphic( const QPixmap & _pm )
 {
-	delete m_activePixmap;
-
-	m_activePixmap = new QPixmap( _pm );
-	resize( m_activePixmap->width(), m_activePixmap->height() );
+	m_activePixmap = _pm;
+	resize( m_activePixmap.width(), m_activePixmap.height() );
 }
 
 
@@ -150,9 +145,7 @@ void pixmapButton::setActiveGraphic( const QPixmap & _pm )
 
 void pixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 {
-	delete m_inactivePixmap;
-
-	m_inactivePixmap = new QPixmap( _pm );
+	m_inactivePixmap = _pm;
 	if( _update )
 	{
 		update();
@@ -164,9 +157,7 @@ void pixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 void pixmapButton::setBgGraphic( const QPixmap & _pm )
 {
-	delete m_bgPixmap;
-
-	m_bgPixmap = new QPixmap( _pm );
+	m_bgPixmap = _pm;
 }
 
 

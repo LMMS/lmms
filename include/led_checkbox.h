@@ -26,26 +26,13 @@
 #ifndef _LED_CHECKBOX_H
 #define _LED_CHECKBOX_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
-
-#include "automatable_object.h"
+#include "automatable_button.h"
 
 
 class QPixmap;
 
 
-class ledCheckBox : public QWidget, public automatableObject<bool>
+class ledCheckBox : public automatableButton
 {
 	Q_OBJECT
 public:
@@ -54,15 +41,10 @@ public:
 		YELLOW, GREEN, TOTAL_COLORS
 	} ;
 
-	ledCheckBox( const QString & _txt, QWidget * _parent,
+	ledCheckBox( const QString & _txt, QWidget * _parent, engine * _engine,
 						ledColors _color = YELLOW );
 	virtual ~ledCheckBox();
 
-
-	inline bool isChecked( void ) const
-	{
-		return( value() );
-	}
 
 	inline const QString & text( void )
 	{
@@ -70,14 +52,8 @@ public:
 	}
 
 
-public slots:
-	void toggle( void );
-	void setChecked( bool _on );
-
-
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
 
 
 private:
@@ -85,9 +61,6 @@ private:
 	QPixmap * m_ledOffPixmap;
 	
 	QString m_text;
-	
-signals:
-	void toggled( bool );
 
 } ;
 

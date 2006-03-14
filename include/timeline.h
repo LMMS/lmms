@@ -47,7 +47,7 @@ class nStateButton;
 class textFloat;
 
 
-class timeLine : public QWidget, public engineObject
+class timeLine : public QWidget, public engineObject, public settings
 {
 	Q_OBJECT
 public:
@@ -114,6 +114,15 @@ public:
 	}
 
 	void addToolButtons( QWidget * _tool_bar );
+
+
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+							QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "timeline" );
+	}
 
 
 public slots:

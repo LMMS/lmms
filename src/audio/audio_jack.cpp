@@ -450,7 +450,7 @@ audioJACK::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
 	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-									this );
+								this, NULL );
 	m_channels->setStep( 2 );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->setValue( configManager::inst()->value( "audiojack",

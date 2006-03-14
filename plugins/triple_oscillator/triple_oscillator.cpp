@@ -28,13 +28,11 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QButtonGroup>
 #include <QBitmap>
 #include <QPainter>
 
 #else
 
-#include <qbuttongroup.h>
 #include <qbitmap.h>
 #include <qpainter.h>
 #include <qdom.h>
@@ -50,11 +48,13 @@
 #include "channel_track.h"
 #include "note_play_handle.h"
 #include "knob.h"
-#include "pixmap_button.h"
 #include "buffer_allocator.h"
 #include "debug.h"
 #include "tooltip.h"
 #include "sample_buffer.h"
+#include "automatable_button.h"
+#include "pixmap_button.h"
+
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -98,165 +98,116 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
 
-	m_fm1OscBtn = new pixmapButton( this );
-	m_fm1OscBtn->move( 80, 50 );
-	m_fm1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * fm_osc1_btn = new pixmapButton( this, eng() );
+	fm_osc1_btn->move( 80, 50 );
+	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
-	m_fm1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
-	m_fm1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	fm_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	connect( m_fm1OscBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( fm1BtnToggled( bool ) ) );
-	toolTip::add( m_fm1OscBtn, tr( "use frequency modulation for "
+	toolTip::add( fm_osc1_btn, tr( "use frequency modulation for "
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	m_am1OscBtn = new pixmapButton( this );
-	m_am1OscBtn->move( 120, 50 );
-	m_am1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * am_osc1_btn = new pixmapButton( this, eng() );
+	am_osc1_btn->move( 120, 50 );
+	am_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
-	m_am1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	am_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
-	m_am1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	am_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	connect( m_am1OscBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( am1BtnToggled( bool ) ) );
-	toolTip::add( m_am1OscBtn, tr( "use amplitude modulation for "
+	toolTip::add( am_osc1_btn, tr( "use amplitude modulation for "
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	m_mix1OscBtn = new pixmapButton( this );
-	m_mix1OscBtn->move( 160, 50 );
-	m_mix1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * mix_osc1_btn = new pixmapButton( this, eng() );
+	mix_osc1_btn->move( 160, 50 );
+	mix_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
-	m_mix1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	mix_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	m_mix1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+	mix_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
 					"btn_mask" ).createHeuristicMask() ) );
-	connect( m_mix1OscBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( mix1BtnToggled( bool ) ) );
-	toolTip::add( m_mix1OscBtn, tr( "mix output of oscillator 1 & 2" ) );
+	toolTip::add( mix_osc1_btn, tr( "mix output of oscillator 1 & 2" ) );
 
-	m_sync1OscBtn = new pixmapButton( this );
-	m_sync1OscBtn->move( 200, 50 );
-	m_sync1OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * sync_osc1_btn = new pixmapButton( this, eng() );
+	sync_osc1_btn->move( 200, 50 );
+	sync_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
-	m_sync1OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	sync_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	m_sync1OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+	sync_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
 					"btn_mask" ).createHeuristicMask() ) );
-	connect( m_sync1OscBtn, SIGNAL( toggled( bool ) ), this, SLOT(
-						sync1BtnToggled( bool ) ) );
-	toolTip::add( m_sync1OscBtn, tr( "synchronize oscillator 1 with "
+	toolTip::add( sync_osc1_btn, tr( "synchronize oscillator 1 with "
 							"oscillator 2" ) );
 
-	if( m_modulationAlgo1 == oscillator::FREQ_MODULATION )
-	{
-		m_fm1OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo1 == oscillator::AMP_MODULATION )
-	{
-		m_am1OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo1 == oscillator::MIX )
-	{
-		m_mix1OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo1 == oscillator::SYNC )
-	{
-		m_sync1OscBtn->setChecked( TRUE );
-	}
+	m_mod1BtnGrp = new automatableButtonGroup( this, eng() );
+	m_mod1BtnGrp->addButton( fm_osc1_btn );
+	m_mod1BtnGrp->addButton( am_osc1_btn );
+	m_mod1BtnGrp->addButton( mix_osc1_btn );
+	m_mod1BtnGrp->addButton( sync_osc1_btn );
+	m_mod1BtnGrp->setInitValue( m_modulationAlgo1 );
 
-	QButtonGroup * modulation_algo_group1 = new QButtonGroup( this );
-	modulation_algo_group1->addButton( m_fm1OscBtn );
-	modulation_algo_group1->addButton( m_am1OscBtn );
-	modulation_algo_group1->addButton( m_mix1OscBtn );
-	modulation_algo_group1->addButton( m_sync1OscBtn );
-	modulation_algo_group1->setExclusive( TRUE );
-#ifndef QT4
-	modulation_algo_group1->hide();
-#endif
+	connect( m_mod1BtnGrp, SIGNAL( valueChanged( int ) ),
+						this, SLOT( mod1Ch( int ) ) );
 
-	m_fm2OscBtn = new pixmapButton( this );
-	m_fm2OscBtn->move( 80, 70 );
-	m_fm2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+
+	pixmapButton * fm_osc2_btn = new pixmapButton( this, eng() );
+	fm_osc2_btn->move( 80, 70 );
+	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
-	m_fm2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
-	m_fm2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	fm_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	connect( m_fm2OscBtn, SIGNAL( toggled( bool ) ), this, SLOT(
-						fm2BtnToggled( bool ) ) );
-	toolTip::add( m_fm2OscBtn, tr( "use frequency modulation for "
+	toolTip::add( fm_osc2_btn, tr( "use frequency modulation for "
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	m_am2OscBtn = new pixmapButton( this );
-	m_am2OscBtn->move( 120, 70 );
-	m_am2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * am_osc2_btn = new pixmapButton( this, eng() );
+	am_osc2_btn->move( 120, 70 );
+	am_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
-	m_am2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	am_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
-	m_am2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	am_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	connect( m_am2OscBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( am2BtnToggled( bool ) ) );
-	toolTip::add( m_am2OscBtn, tr( "use amplitude modulation for "
+	toolTip::add( am_osc2_btn, tr( "use amplitude modulation for "
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	m_mix2OscBtn = new pixmapButton( this );
-	m_mix2OscBtn->move( 160, 70 );
-	m_mix2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * mix_osc2_btn = new pixmapButton( this, eng() );
+	mix_osc2_btn->move( 160, 70 );
+	mix_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
-	m_mix2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	mix_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	m_mix2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+	mix_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
 					"btn_mask" ).createHeuristicMask() ) );
-	connect( m_mix2OscBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( mix2BtnToggled( bool ) ) );
-	toolTip::add( m_mix2OscBtn, tr("mix output of oscillator 2 & 3" ) );
+	toolTip::add( mix_osc2_btn, tr("mix output of oscillator 2 & 3" ) );
 
-	m_sync2OscBtn = new pixmapButton( this );
-	m_sync2OscBtn->move( 200, 70 );
-	m_sync2OscBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	pixmapButton * sync_osc2_btn = new pixmapButton( this, eng() );
+	sync_osc2_btn->move( 200, 70 );
+	sync_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
-	m_sync2OscBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	sync_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	m_sync2OscBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
+	sync_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap(
 					"btn_mask" ).createHeuristicMask() ) );
-	connect( m_sync2OscBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( sync2BtnToggled( bool ) ) );
-	toolTip::add( m_sync2OscBtn, tr( "synchronize oscillator 2 with "
+	toolTip::add( sync_osc2_btn, tr( "synchronize oscillator 2 with "
 							"oscillator 3" ) );
 
-	if( m_modulationAlgo2 == oscillator::FREQ_MODULATION )
-	{
-		m_fm2OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo2 == oscillator::AMP_MODULATION )
-	{
-		m_am2OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo2 == oscillator::MIX )
-	{
-		m_mix2OscBtn->setChecked( TRUE );
-	}
-	else if( m_modulationAlgo2 == oscillator::SYNC )
-	{
-		m_sync2OscBtn->setChecked( TRUE );
-	}
+	m_mod2BtnGrp = new automatableButtonGroup( this, eng() );
+	m_mod2BtnGrp->addButton( fm_osc2_btn );
+	m_mod2BtnGrp->addButton( am_osc2_btn );
+	m_mod2BtnGrp->addButton( mix_osc2_btn );
+	m_mod2BtnGrp->addButton( sync_osc2_btn );
+	m_mod2BtnGrp->setInitValue( m_modulationAlgo2 );
 
-	QButtonGroup * modulation_algo_group2 = new QButtonGroup( this );
-	modulation_algo_group2->addButton( m_fm2OscBtn );
-	modulation_algo_group2->addButton( m_am2OscBtn );
-	modulation_algo_group2->addButton( m_mix2OscBtn );
-	modulation_algo_group2->addButton( m_sync2OscBtn );
-	modulation_algo_group2->setExclusive( TRUE );
-#ifndef QT4
-	modulation_algo_group2->hide();
-#endif
+	connect( m_mod2BtnGrp, SIGNAL( valueChanged( int ) ),
+						this, SLOT( mod2Ch( int ) ) );
 
 
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
@@ -419,78 +370,78 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 				"channel. This is very good for creating wide "
 				"stereo-sounds." ).arg( i+1 ) );
 
-		m_osc[i].sinWaveBtn = new pixmapButton( this );
-		m_osc[i].sinWaveBtn->move( 188, 105 + i * 50 );
-		m_osc[i].sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
+		pixmapButton * sin_wave_btn = new pixmapButton( this, eng() );
+		sin_wave_btn->move( 188, 105 + i * 50 );
+		sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
-		m_osc[i].sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+		sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-		m_osc[i].sinWaveBtn->setChecked( TRUE );
-		toolTip::add( m_osc[i].sinWaveBtn,
+		sin_wave_btn->setChecked( TRUE );
+		toolTip::add( sin_wave_btn,
 				tr( "Click here if you want a sine-wave for "
 						"current oscillator." ) );
 
-		m_osc[i].triangleWaveBtn = new pixmapButton( this );
-		m_osc[i].triangleWaveBtn->move( 203, 105 + i * 50 );
-		m_osc[i].triangleWaveBtn->setActiveGraphic(
+		pixmapButton * triangle_wave_btn = new pixmapButton( this, eng() );
+		triangle_wave_btn->move( 203, 105 + i * 50 );
+		triangle_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
-		m_osc[i].triangleWaveBtn->setInactiveGraphic(
+		triangle_wave_btn->setInactiveGraphic(
 			embed::getIconPixmap( "triangle_wave_inactive" ) );
-		toolTip::add( m_osc[i].triangleWaveBtn,
+		toolTip::add( triangle_wave_btn,
 				tr( "Click here if you want a triangle-wave "
 						"for current oscillator." ) );
 
-		m_osc[i].sawWaveBtn = new pixmapButton( this );
-		m_osc[i].sawWaveBtn->move( 218, 105 + i * 50 );
-		m_osc[i].sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
+		pixmapButton * saw_wave_btn = new pixmapButton( this, eng() );
+		saw_wave_btn->move( 218, 105 + i * 50 );
+		saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
-		m_osc[i].sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+		saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
-		toolTip::add( m_osc[i].sawWaveBtn,
+		toolTip::add( saw_wave_btn,
 				tr( "Click here if you want a saw-wave for "
 						"current oscillator." ) );
 
-		m_osc[i].sqrWaveBtn = new pixmapButton( this );
-		m_osc[i].sqrWaveBtn->move( 233, 105 + i * 50 );
-		m_osc[i].sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+		pixmapButton * sqr_wave_btn = new pixmapButton( this, eng() );
+		sqr_wave_btn->move( 233, 105 + i * 50 );
+		sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
-		m_osc[i].sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+		sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
-		toolTip::add( m_osc[i].sqrWaveBtn,
+		toolTip::add( sqr_wave_btn,
 				tr( "Click here if you want a square-wave for "
 						"current oscillator." ) );
 
-		m_osc[i].moogSawWaveBtn = new pixmapButton( this );
-		m_osc[i].moogSawWaveBtn->move( 188, 120+i*50 );
-		m_osc[i].moogSawWaveBtn->setActiveGraphic(
+		pixmapButton * moog_saw_wave_btn = new pixmapButton( this, eng() );
+		moog_saw_wave_btn->move( 188, 120+i*50 );
+		moog_saw_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "moog_saw_wave_active" ) );
-		m_osc[i].moogSawWaveBtn->setInactiveGraphic(
+		moog_saw_wave_btn->setInactiveGraphic(
 			embed::getIconPixmap( "moog_saw_wave_inactive" ) );
-		toolTip::add( m_osc[i].moogSawWaveBtn,
+		toolTip::add( moog_saw_wave_btn,
 				tr( "Click here if you want a moog-saw-wave "
 						"for current oscillator." ) );
 
-		m_osc[i].expWaveBtn = new pixmapButton( this );
-		m_osc[i].expWaveBtn->move( 203, 120+i*50 );
-		m_osc[i].expWaveBtn->setActiveGraphic( embed::getIconPixmap(
+		pixmapButton * exp_wave_btn = new pixmapButton( this, eng() );
+		exp_wave_btn->move( 203, 120+i*50 );
+		exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"exp_wave_active" ) );
-		m_osc[i].expWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+		exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 							"exp_wave_inactive" ) );
-		toolTip::add( m_osc[i].expWaveBtn,
+		toolTip::add( exp_wave_btn,
 				tr( "Click here if you want an exponential "
 					"wave for current oscillator." ) );
 
-		m_osc[i].whiteNoiseWaveBtn = new pixmapButton( this );
-		m_osc[i].whiteNoiseWaveBtn->move( 218, 120+i*50 );
-		m_osc[i].whiteNoiseWaveBtn->setActiveGraphic(
+		pixmapButton * white_noise_btn = new pixmapButton( this, eng() );
+		white_noise_btn->move( 218, 120+i*50 );
+		white_noise_btn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
-		m_osc[i].whiteNoiseWaveBtn->setInactiveGraphic(
+		white_noise_btn->setInactiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_inactive" ) );
-		toolTip::add( m_osc[i].whiteNoiseWaveBtn,
+		toolTip::add( white_noise_btn,
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
-		m_osc[i].usrWaveBtn = new pixmapButton( this );
+		m_osc[i].usrWaveBtn = new pixmapButton( this, eng() );
 		m_osc[i].usrWaveBtn->move( 233, 120+i*50 );
 		m_osc[i].usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -500,109 +451,42 @@ tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
 				tr( "Click here if you want a user-defined "
 				"wave-shape for current oscillator." ) );
 
-		QButtonGroup * wave_btn_group = new QButtonGroup( this );
-		wave_btn_group->addButton( m_osc[i].sinWaveBtn );
-		wave_btn_group->addButton( m_osc[i].triangleWaveBtn );
-		wave_btn_group->addButton( m_osc[i].sawWaveBtn );
-		wave_btn_group->addButton( m_osc[i].sqrWaveBtn );
-		wave_btn_group->addButton( m_osc[i].moogSawWaveBtn );
-		wave_btn_group->addButton( m_osc[i].expWaveBtn );
-		wave_btn_group->addButton( m_osc[i].whiteNoiseWaveBtn );
-		wave_btn_group->addButton( m_osc[i].usrWaveBtn );
-		wave_btn_group->setExclusive( TRUE );
-#ifndef QT4
-		wave_btn_group->hide();
-#endif
+		m_osc[i].waveBtnGrp = new automatableButtonGroup( this, eng() );
+		m_osc[i].waveBtnGrp->addButton( sin_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( triangle_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( saw_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( sqr_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( moog_saw_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( exp_wave_btn );
+		m_osc[i].waveBtnGrp->addButton( white_noise_btn );
+		m_osc[i].waveBtnGrp->addButton( m_osc[i].usrWaveBtn );
 
 		if( i == 0 )
-		{		// Osc 1
-			connect( m_osc[i].sinWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01SinWaveCh( bool ) ) );
-			connect( m_osc[i].triangleWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01TriangleWaveCh( bool ) ) );
-			connect( m_osc[i].sawWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01SawWaveCh( bool ) ) );
-			connect( m_osc[i].sqrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01SquareWaveCh( bool ) ) );
-			connect( m_osc[i].moogSawWaveBtn,
-					SIGNAL(toggled( bool ) ), this,
-					SLOT( osc01MoogSawWaveCh( bool ) ) );
-			connect( m_osc[i].expWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01ExpWaveCh( bool ) ) );
-			connect( m_osc[i].whiteNoiseWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01WhiteNoiseCh( bool ) ) );
-			connect( m_osc[i].usrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc01UserDefWaveCh( bool ) ) );
+		{
+			connect( m_osc[i].waveBtnGrp,
+						SIGNAL( valueChanged( int ) ),
+				this, SLOT( osc0WaveCh( int ) ) );
 			connect( m_osc[i].usrWaveBtn,
 					SIGNAL( doubleClicked() ), this,
-					SLOT( osc01UserDefWaveDblClick() ) );
+					SLOT( osc0UserDefWaveDblClick() ) );
 		}
 		else if( i == 1 )
-		{	// Osc 2
-			connect( m_osc[i].sinWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02SinWaveCh( bool ) ) );
-			connect( m_osc[i].triangleWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02TriangleWaveCh( bool ) ) );
-			connect( m_osc[i].sawWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02SawWaveCh( bool ) ) );
-			connect( m_osc[i].sqrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02SquareWaveCh( bool ) ) );
-			connect( m_osc[i].moogSawWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02MoogSawWaveCh( bool ) ) );
-			connect( m_osc[i].expWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02ExpWaveCh( bool ) ) );
-			connect( m_osc[i].whiteNoiseWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02WhiteNoiseCh( bool ) ) );
-			connect( m_osc[i].usrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc02UserDefWaveCh( bool ) ) );
+		{
+			connect( m_osc[i].waveBtnGrp,
+						SIGNAL( valueChanged( int ) ),
+				this, SLOT( osc1WaveCh( int ) ) );
 			connect( m_osc[i].usrWaveBtn,
 					SIGNAL( doubleClicked() ), this,
-					SLOT( osc02UserDefWaveDblClick() ) );
+					SLOT( osc1UserDefWaveDblClick() ) );
 		}
 		else if( i == 2 )
-		{	// Osc 3
-			connect( m_osc[i].sinWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03SinWaveCh( bool ) ) );
-			connect( m_osc[i].triangleWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03TriangleWaveCh( bool ) ) );
-			connect( m_osc[i].sawWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03SawWaveCh( bool ) ) );
-			connect( m_osc[i].sqrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03SquareWaveCh( bool ) ) );
-			connect( m_osc[i].moogSawWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03MoogSawWaveCh( bool ) ) );
-			connect( m_osc[i].expWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03ExpWaveCh( bool ) ) );
-			connect( m_osc[i].whiteNoiseWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03WhiteNoiseCh( bool ) ) );
-			connect( m_osc[i].usrWaveBtn,
-					SIGNAL( toggled( bool ) ), this,
-					SLOT( osc03UserDefWaveCh( bool ) ) );
+		{
+			connect( m_osc[i].waveBtnGrp,
+						SIGNAL( valueChanged( int ) ),
+				this, SLOT( osc2WaveCh( int ) ) );
 			connect( m_osc[i].usrWaveBtn,
 					SIGNAL( doubleClicked() ), this,
-					SLOT( osc03UserDefWaveDblClick() ) );
+					SLOT( osc2UserDefWaveDblClick() ) );
 		}
 	}
 }
@@ -664,8 +548,8 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 	m_modulationAlgo2 = static_cast<oscillator::modulationAlgos>(
 					_this.attribute( "modalgo2" ).toInt() );
 
-	getModulationButton( m_modulationAlgo1, 1 )->setChecked( TRUE );
-	getModulationButton( m_modulationAlgo2, 2 )->setChecked( TRUE );
+	m_mod1BtnGrp->setInitValue( m_modulationAlgo1 );
+	m_mod2BtnGrp->setInitValue( m_modulationAlgo2 );
 
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
@@ -686,36 +570,8 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 						"stphdetun" + is ).toFloat() );
 		m_osc[i].m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
-		switch( _this.attribute( "wavetype" + is ).toInt() )
-		{
-			case oscillator::TRIANGLE_WAVE:
-				m_osc[i].triangleWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::SAW_WAVE:
-				m_osc[i].sawWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::SQUARE_WAVE:
-				m_osc[i].sqrWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::MOOG_SAW_WAVE:
-				m_osc[i].moogSawWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::EXP_WAVE:
-				m_osc[i].expWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::WHITE_NOISE_WAVE:
-				m_osc[i].whiteNoiseWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::USER_DEF_WAVE:
-				toolTip::add( m_osc[i].usrWaveBtn,
-					m_osc[i].m_sampleBuffer->audioFile() );
-				m_osc[i].usrWaveBtn->setChecked( TRUE );
-				break;
-			case oscillator::SIN_WAVE:
-			default:
-				m_osc[i].sinWaveBtn->setChecked( TRUE );
-				break;
-		}
+		m_osc[i].waveBtnGrp->setValue( _this.attribute( "wavetype" +
+							is ).toInt() );
 	}
 }
 
@@ -863,23 +719,82 @@ void tripleOscillator::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-// now follows all the stupid UI-Code...
-
-void tripleOscillator::setModulationAlgo(
-		oscillator::modulationAlgos _new_modulation_algo, int _n )
+void tripleOscillator::osc0WaveCh( int _n )
 {
-	if( _n == 1 )
-	{
-		m_modulationAlgo1 = _new_modulation_algo;
-	}
-	else
-	{
-		m_modulationAlgo2 = _new_modulation_algo;
-	}
-
-	eng()->getSongEditor()->setModified();
+	m_osc[0].waveShape = static_cast<oscillator::waveShapes>( _n );
 }
 
+
+
+
+void tripleOscillator::osc1WaveCh( int _n )
+{
+	m_osc[1].waveShape = static_cast<oscillator::waveShapes>( _n );
+}
+
+
+
+
+void tripleOscillator::osc2WaveCh( int _n )
+{
+	m_osc[2].waveShape = static_cast<oscillator::waveShapes>( _n );
+}
+
+
+
+
+void tripleOscillator::mod1Ch( int _n )
+{
+	m_modulationAlgo1 = static_cast<oscillator::modulationAlgos>( _n );
+}
+
+
+
+
+void tripleOscillator::mod2Ch( int _n )
+{
+	m_modulationAlgo2 = static_cast<oscillator::modulationAlgos>( _n );
+}
+
+
+
+
+void tripleOscillator::osc0UserDefWaveDblClick( void )
+{
+	QString af = m_osc[0].m_sampleBuffer->openAudioFile();
+	if( af != "" )
+	{
+		m_osc[0].m_sampleBuffer->setAudioFile( af );
+		toolTip::add( m_osc[0].usrWaveBtn,
+					m_osc[0].m_sampleBuffer->audioFile() );
+	}
+}
+
+
+
+void tripleOscillator::osc1UserDefWaveDblClick( void )
+{
+	QString af = m_osc[1].m_sampleBuffer->openAudioFile();
+	if( af != "" )
+	{
+		m_osc[1].m_sampleBuffer->setAudioFile( af );
+		toolTip::add( m_osc[1].usrWaveBtn,
+					m_osc[1].m_sampleBuffer->audioFile() );
+	}
+}
+
+
+
+void tripleOscillator::osc2UserDefWaveDblClick( void )
+{
+	QString af = m_osc[2].m_sampleBuffer->openAudioFile();
+	if( af != "" )
+	{
+		m_osc[2].m_sampleBuffer->setAudioFile( af );
+		toolTip::add( m_osc[2].usrWaveBtn,
+					m_osc[2].m_sampleBuffer->audioFile() );
+	}
+}
 
 
 
@@ -895,337 +810,6 @@ oscillator::modulationAlgos tripleOscillator::getModulationAlgo( int _n )
 	}
 }
 
-
-
-
-void tripleOscillator::doSinWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::SIN_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doTriangleWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::TRIANGLE_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doSawWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::SAW_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doSqrWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::SQUARE_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doMoogSawWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::MOOG_SAW_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doExpWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::EXP_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doWhiteNoiseWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::WHITE_NOISE_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-
-void tripleOscillator::doUsrWaveBtn( oscillatorData * _osc )
-{
-	_osc->waveShape = oscillator::USER_DEF_WAVE;
-	eng()->getSongEditor()->setModified();
-}
-
-
-
-// Slots for Osc 1
-void tripleOscillator::osc01SinWaveCh( bool _on )
-{
-	if( _on ) doSinWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01TriangleWaveCh( bool _on )
-{
-	if( _on ) doTriangleWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01SawWaveCh( bool _on )
-{
-	if( _on ) doSawWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01SquareWaveCh( bool _on )
-{
-	if( _on ) doSqrWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01MoogSawWaveCh( bool _on )
-{
-	if( _on ) doMoogSawWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01ExpWaveCh( bool _on )
-{
-	if( _on ) doExpWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01WhiteNoiseCh( bool _on )
-{
-	if( _on ) doWhiteNoiseWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01UserDefWaveCh( bool _on )
-{
-	if( _on ) doUsrWaveBtn( &m_osc[0] );
-}
-
-void tripleOscillator::osc01UserDefWaveDblClick( void )
-{
-	QString af = m_osc[0].m_sampleBuffer->openAudioFile();
-	if( af != "" )
-	{
-		m_osc[0].m_sampleBuffer->setAudioFile( af );
-/*#ifndef QT4
-		toolTip::remove( m_osc[0].usrWaveBtn );
-#endif*/
-		toolTip::add( m_osc[0].usrWaveBtn,
-					m_osc[0].m_sampleBuffer->audioFile() );
-	}
-}
-
-
-
-// Slots for Osc 2
-void tripleOscillator::osc02SinWaveCh( bool _on )
-{
-	if( _on ) doSinWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02TriangleWaveCh( bool _on )
-{
-	if( _on ) doTriangleWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02SawWaveCh( bool _on )
-{
-	if( _on ) doSawWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02SquareWaveCh( bool _on )
-{
-	if( _on ) doSqrWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02MoogSawWaveCh( bool _on )
-{
-	if( _on ) doMoogSawWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02ExpWaveCh( bool _on )
-{
-	if( _on ) doExpWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02WhiteNoiseCh( bool _on )
-{
-	if( _on ) doWhiteNoiseWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02UserDefWaveCh( bool _on )
-{
-	if( _on ) doUsrWaveBtn( &m_osc[1] );
-}
-
-void tripleOscillator::osc02UserDefWaveDblClick( void )
-{
-	QString af = m_osc[1].m_sampleBuffer->openAudioFile();
-	if( af != "" )
-	{
-		m_osc[1].m_sampleBuffer->setAudioFile( af );
-/*#ifndef QT4
-		toolTip::remove( m_osc[1].usrWaveBtn );
-#endif*/
-		toolTip::add( m_osc[1].usrWaveBtn,
-					m_osc[1].m_sampleBuffer->audioFile() );
-	}
-}
-
-
-// Slots for Osc 3
-void tripleOscillator::osc03SinWaveCh( bool _on )
-{
-	if( _on ) doSinWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03TriangleWaveCh( bool _on )
-{
-	if( _on ) doTriangleWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03SawWaveCh( bool _on )
-{
-	if( _on ) doSawWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03SquareWaveCh( bool _on )
-{
-	if( _on ) doSqrWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03MoogSawWaveCh( bool _on )
-{
-	if( _on ) doMoogSawWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03ExpWaveCh( bool _on )
-{
-	if( _on ) doExpWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03WhiteNoiseCh( bool _on )
-{
-	if( _on ) doWhiteNoiseWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03UserDefWaveCh( bool _on )
-{
-	if( _on ) doUsrWaveBtn( &m_osc[2] );
-}
-
-void tripleOscillator::osc03UserDefWaveDblClick( void )
-{
-	QString af = m_osc[2].m_sampleBuffer->openAudioFile();
-	if( af != "" )
-	{
-		m_osc[2].m_sampleBuffer->setAudioFile( af );
-/*#ifndef QT4
-		toolTip::remove( m_osc[2].usrWaveBtn );
-#endif*/
-		toolTip::add( m_osc[2].usrWaveBtn,
-					m_osc[2].m_sampleBuffer->audioFile() );
-	}
-}
-
-
-
-
-void tripleOscillator::fm1BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::FREQ_MODULATION, 1 );
-}
-
-
-
-void tripleOscillator::am1BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::AMP_MODULATION, 1 );
-}
-
-
-
-void tripleOscillator::mix1BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::MIX, 1 );
-}
-
-
-
-void tripleOscillator::sync1BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::SYNC, 1 );
-}
-
-
-
-void tripleOscillator::fm2BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::FREQ_MODULATION, 2 );
-}
-
-
-
-void tripleOscillator::am2BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::AMP_MODULATION, 2 );
-}
-
-
-
-void tripleOscillator::mix2BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::MIX, 2 );
-}
-
-
-
-void tripleOscillator::sync2BtnToggled( bool _on )
-{
-	if( _on ) setModulationAlgo( oscillator::SYNC, 2 );
-}
-
-
-
-
-pixmapButton * tripleOscillator::getModulationButton(
-			oscillator::modulationAlgos _modulation_algo, int _n )
-{
-	if( _n == 1 )
-	{
-		switch( _modulation_algo )
-		{
-			case oscillator::FREQ_MODULATION: return( m_fm1OscBtn );
-			case oscillator::AMP_MODULATION: return( m_am1OscBtn );
-			case oscillator::MIX: return( m_mix1OscBtn );
-			case oscillator::SYNC: return( m_sync1OscBtn );
-		}
-	}
-	else
-	{
-		switch( _modulation_algo )
-		{
-			case oscillator::FREQ_MODULATION: return( m_fm2OscBtn );
-			case oscillator::AMP_MODULATION: return( m_am2OscBtn );
-			case oscillator::MIX: return( m_mix2OscBtn );
-			case oscillator::SYNC: return( m_sync2OscBtn );
-		}
-	}
-#ifdef LMMS_DEBUG
-	// there's something really not ok, if this case occurs, so let's exit
-	assert( 1 != 1 );
-#endif
-	return( NULL );
-}
 
 
 

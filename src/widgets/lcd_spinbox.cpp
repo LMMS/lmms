@@ -49,9 +49,9 @@
 
 
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
-							QWidget * _parent ) :
+					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	automatableObject<int>( 0, _min, _max ),
+	automatableObject<int>( _engine, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {
@@ -62,7 +62,7 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 	setEnabled( TRUE );
 
 	// value is automatically limited to given range
-	setValue( 0 );
+	setInitValue( 0 );
 
 	m_number->setFixedSize( m_number->sizeHint() * 0.9 );
 	setFixedSize( m_number->size() );
@@ -152,6 +152,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 	{
 		m_origMousePos = _me->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
+		m_oldValue = value();
 	}
 }
 
@@ -169,8 +170,10 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
 		{
-			setValue( value() - dy / 2 * step() );
+			setStepRecording( FALSE );// why is this neccessary?!
+			setInitValue( value() - dy / 2 * step() );
 			emit valueChanged( value() );
+			setStepRecording( TRUE );
 			QCursor::setPos( m_origMousePos );
 		}
 	}
@@ -181,6 +184,8 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 
 void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 {
+	addStepFromOldToCurVal();
+
 	QCursor::setPos( m_origMousePos );
 	QApplication::restoreOverrideCursor();
 }

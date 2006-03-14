@@ -34,6 +34,7 @@
 #include <QMouseEvent>
 #include <QLayout>
 #include <QTimer>
+#include <Qt/QtXml>
 
 #else
 
@@ -41,6 +42,7 @@
 #include <qapplication.h>
 #include <qlayout.h>
 #include <qtimer.h>
+#include <qdom.h>
 
 #endif
 
@@ -174,6 +176,30 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 
 
 
+void timeLine::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+{
+	QDomElement tl_de = _doc.createElement( nodeName() );
+	tl_de.setAttribute( "lp0pos", (int) loopBegin() );
+	tl_de.setAttribute( "lp1pos", (int) loopEnd() );
+	tl_de.setAttribute( "lpstate", m_loopPoints );
+	_parent.appendChild( tl_de );
+}
+
+
+
+
+void timeLine::loadSettings( const QDomElement & _this )
+{
+	m_loopPos[0] = _this.attribute( "lp0pos" ).toInt();
+	m_loopPos[1] = _this.attribute( "lp1pos" ).toInt();
+	m_loopPoints = static_cast<loopPointStates>(
+					_this.attribute( "lpstate" ).toInt() );
+	update();
+}
+
+
+
+
 void timeLine::updatePosition( const midiTime & )
 {
 	const int new_x = markerX( m_pos );
@@ -295,8 +321,6 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	{
 		const midiTime t = m_begin +
 				static_cast<Sint32>( _me->x() * 64 / m_ppt );
-		Uint8 pmin = 0;
-		Uint8 pmax = 1;
 		m_action = MOVE_LOOP_BEGIN;
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{

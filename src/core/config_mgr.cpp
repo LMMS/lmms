@@ -62,6 +62,7 @@
 #include <qapplication.h>
 
 #define absolutePath absPath
+#define addButton insert
 
 #ifndef __USE_XOPEN_EXTENDED
 #define __USE_XOPEN_EXTENDED
@@ -955,6 +956,7 @@ void configManager::processFilesRecursively( const QString & _src_dir,
 
 
 #include "config_mgr.moc"
-
+#undef absolutePath
+#undef addButton
 
 #endif

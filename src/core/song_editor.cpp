@@ -64,6 +64,8 @@
 #include <qlayout.h>
 #include <qbuttongroup.h>
 
+#define addButton insert
+
 #endif
 
 
@@ -84,7 +86,6 @@
 #include "visualization_widget.h"
 #include "project_notes.h"
 #include "config_mgr.h"
-#include "midi_file.h"
 #include "lcd_spinbox.h"
 #include "tooltip.h"
 #include "tool_button.h"
@@ -92,6 +93,8 @@
 #include "text_float.h"
 #include "combobox.h"
 #include "main_window.h"
+#include "import_filter.h"
+#include "edit_history.h"
 
 #include "debug.h"
 
@@ -151,7 +154,7 @@ songEditor::songEditor( engine * _engine ) :
 
 	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
-	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb );
+	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb, eng() );
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setTempo( int ) ) );
@@ -370,7 +373,7 @@ songEditor::songEditor( engine * _engine ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox = new comboBox( m_toolBar, eng() );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
@@ -379,7 +382,7 @@ songEditor::songEditor( engine * _engine ) :
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
-	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
+	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
 								"100%" ) );
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
@@ -566,7 +569,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->setCurrentIndex(
+		m_zoomingComboBox->setValue(
 				m_zoomingComboBox->findText( QString::number(
 					static_cast<int>( pixelsPerTact() *
 				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" ) );
@@ -1336,6 +1339,8 @@ bool songEditor::mayChangeProject( void )
 
 void songEditor::clearProject( void )
 {
+	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
+
 	if( m_playing )
 	{
 		// stop play, because it's dangerous that play-routines try to
@@ -1360,6 +1365,8 @@ void songEditor::clearProject( void )
 	eng()->getBBEditor()->clearAllTracks();
 
 	eng()->getProjectNotes()->clear();
+
+	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
 }
 
 
@@ -1370,6 +1377,8 @@ void songEditor::clearProject( void )
 void songEditor::createNewProject( void )
 {
 	clearProject();
+
+	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
 
 	track * t;
 	t = track::create( track::CHANNEL_TRACK, this );
@@ -1392,6 +1401,9 @@ void songEditor::createNewProject( void )
 	m_modified = FALSE;
 
 	eng()->getMainWindow()->resetWindowTitle( "" );
+
+	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
+
 }
 
 
@@ -1413,6 +1425,8 @@ void FASTCALL songEditor::createNewProjectFromTemplate( const QString &
 void FASTCALL songEditor::loadProject( const QString & _file_name )
 {
 	clearProject();
+
+	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -1474,9 +1488,21 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 				loadSettings( node.toElement() );
 			}
 			else if( node.nodeName() ==
+					eng()->getPianoRoll()->nodeName() )
+			{
+				eng()->getPianoRoll()->loadSettings(
+							node.toElement() );
+			}
+			else if( node.nodeName() ==
 					eng()->getProjectNotes()->nodeName() )
 			{
 				eng()->getProjectNotes()->loadSettings(
+							node.toElement() );
+			}
+			else if( node.nodeName() ==
+				m_playPos[PLAY_SONG].m_timeLine->nodeName() )
+			{
+				m_playPos[PLAY_SONG].m_timeLine->loadSettings(
 							node.toElement() );
 			}
 		}
@@ -1489,6 +1515,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 	m_loadingProject = FALSE;
 
 	eng()->getMainWindow()->resetWindowTitle( "" );
+
+	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
 }
 
 
@@ -1513,7 +1541,10 @@ bool songEditor::saveProject( void )
 
 
 	saveSettings( mmp, mmp.content() );
+
+	eng()->getPianoRoll()->saveSettings( mmp, mmp.content() );
 	eng()->getProjectNotes()->saveSettings( mmp, mmp.content() );
+	m_playPos[PLAY_SONG].m_timeLine->saveSettings( mmp, mmp.content() );
 
 	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||
 					m_fileName != m_oldFileName ) == TRUE )
@@ -1574,8 +1605,7 @@ void songEditor::importProject( void )
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
-		midiFile mf( ofd.selectedFiles()[0] );
-		mf.importToTrackContainer( this );
+		importFilter::import( ofd.selectedFiles()[0], this );
 	}
 }
 
@@ -1674,6 +1704,11 @@ void songEditor::loadSettings( const QDomElement & _this )
 
 
 #include "song_editor.moc"
+
+
+#ifdef QT3
+#undef addButton
+#endif
 
 
 #endif

@@ -32,14 +32,12 @@
 
 #include <QPainter>
 #include <QPaintEvent>
-#include <QButtonGroup>
 #include <QWhatsThis>
 #include <Qt/QtXml>
 #include <QLabel>
 
 #else
 
-#include <qbuttongroup.h>
 #include <qwhatsthis.h>
 #include <qpainter.h>
 #include <qpen.h>
@@ -353,101 +351,90 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 
-	m_sinLfoBtn = new pixmapButton( this );
-	m_sinLfoBtn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
-	m_sinLfoBtn->setActiveGraphic( embed::getIconPixmap(
+	pixmapButton * sin_lfo_btn = new pixmapButton( this, eng() );
+	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
+	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
-	m_sinLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-	m_sinLfoBtn->setChecked( TRUE );
 #ifdef QT4
-	m_sinLfoBtn->setWhatsThis(
+	sin_lfo_btn->setWhatsThis(
 #else
-	QWhatsThis::add( m_sinLfoBtn,
+	QWhatsThis::add( sin_lfo_btn,
 #endif
 		tr( "Click here if you want a sine-wave for current "
 							"oscillator." ) );
 
-	m_triangleLfoBtn = new pixmapButton( this );
-	m_triangleLfoBtn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
-	m_triangleLfoBtn->setActiveGraphic( embed::getIconPixmap(
+	pixmapButton * triangle_lfo_btn = new pixmapButton( this, eng() );
+	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
+	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
-	m_triangleLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"triangle_wave_inactive" ) );
 #ifdef QT4
-	m_triangleLfoBtn->setWhatsThis(
+	triangle_lfo_btn->setWhatsThis(
 #else
-	QWhatsThis::add( m_triangleLfoBtn,
+	QWhatsThis::add( triangle_lfo_btn,
 #endif
 		tr( "Click here if you want a triangle-wave for current "
 							"oscillator." ) );
 
-	m_sawLfoBtn = new pixmapButton( this );
-	m_sawLfoBtn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
-	m_sawLfoBtn->setActiveGraphic( embed::getIconPixmap(
+	pixmapButton * saw_lfo_btn = new pixmapButton( this, eng() );
+	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
+	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
-	m_sawLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
 #ifdef QT4
-	m_sawLfoBtn->setWhatsThis(
+	saw_lfo_btn->setWhatsThis(
 #else
-	QWhatsThis::add( m_sawLfoBtn,
+	QWhatsThis::add( saw_lfo_btn,
 #endif
 		tr( "Click here if you want a saw-wave for current "
 							"oscillator." ) );
 
-	m_sqrLfoBtn = new pixmapButton( this );
-	m_sqrLfoBtn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
-	m_sqrLfoBtn->setActiveGraphic( embed::getIconPixmap(
+	pixmapButton * sqr_lfo_btn = new pixmapButton( this, eng() );
+	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
+	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
-	m_sqrLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
 #ifdef QT4
-	m_sqrLfoBtn->setWhatsThis(
+	sqr_lfo_btn->setWhatsThis(
 #else
-	QWhatsThis::add( m_sqrLfoBtn,
+	QWhatsThis::add( sqr_lfo_btn,
 #endif
 		tr( "Click here if you want a square-wave for current "
 							"oscillator." ) );
 
-	m_usrLfoBtn = new pixmapButton( this );
-	m_usrLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
-	m_usrLfoBtn->setActiveGraphic( embed::getIconPixmap(
+	m_userLfoBtn = new pixmapButton( this, eng() );
+	m_userLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
+	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
-	m_usrLfoBtn->setInactiveGraphic( embed::getIconPixmap(
+	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"usr_wave_inactive" ) );
 #ifdef QT4
-	m_usrLfoBtn->setWhatsThis(
+	m_userLfoBtn->setWhatsThis(
 #else
-	QWhatsThis::add( m_usrLfoBtn,
+	QWhatsThis::add( m_userLfoBtn,
 #endif
 		tr( "Click here if you want a user-defined wave for current "
 			"oscillator. Afterwards drag an according sample-"
 			"file into LFO-graph." ) );
 
-	connect( m_sinLfoBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( lfoSinWaveCh( bool ) ) );
-	connect( m_triangleLfoBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( lfoTriangleWaveCh( bool ) ) );
-	connect( m_sawLfoBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( lfoSawWaveCh( bool ) ) );
-	connect( m_sqrLfoBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( lfoSquareWaveCh( bool ) ) );
-	connect( m_usrLfoBtn, SIGNAL( toggled( bool ) ), this,
+	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( lfoUserWaveCh( bool ) ) );
 
-	QButtonGroup * lfo_shapes_algo_group = new QButtonGroup( this );
-	lfo_shapes_algo_group->addButton( m_sinLfoBtn );
-	lfo_shapes_algo_group->addButton( m_triangleLfoBtn );
-	lfo_shapes_algo_group->addButton( m_sawLfoBtn );
-	lfo_shapes_algo_group->addButton( m_sqrLfoBtn );
-	lfo_shapes_algo_group->addButton( m_usrLfoBtn );
-	lfo_shapes_algo_group->setExclusive( TRUE );
-#ifndef QT4
-	lfo_shapes_algo_group->hide();
-#endif
+	m_lfoWaveBtnGrp = new automatableButtonGroup( this, eng() );
+	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
+	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
+	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
+	m_lfoWaveBtnGrp->addButton( sqr_lfo_btn );
+	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
+	m_lfoWaveBtnGrp->setInitValue( SIN );
 
-	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
+
+	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this, eng() );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 #ifdef QT4
@@ -463,7 +450,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
-									this );
+								this, eng() );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSize<6>(
 					m_controlEnvAmountCb->font() ) );
@@ -649,8 +636,11 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_sustainKnob->setValue( _this.attribute( "sus" ).toFloat() );
 	m_releaseKnob->setValue( _this.attribute( "rel" ).toFloat() );
 	m_amountKnob->setValue( _this.attribute( "amt" ).toFloat() );
+
 	m_lfoShape = static_cast<lfoShapes>( _this.attribute(
 							"lshp" ).toInt() );
+	m_lfoWaveBtnGrp->setValue( m_lfoShape );
+
 	m_lfoPredelayKnob->setValue( _this.attribute( "lpdel" ).toFloat() );
 	m_lfoAttackKnob->setValue( _this.attribute( "latt" ).toFloat() );
 	m_lfoSpeedKnob->setValue( _this.attribute( "lspd" ).toFloat() );
@@ -662,29 +652,6 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						"lfosyncmode" ).toInt() );
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
-
-	switch( m_lfoShape )
-	{
-		case SIN:
-			m_sinLfoBtn->setChecked( TRUE );
-			break;
-
-		case TRIANGLE:
-			m_triangleLfoBtn->setChecked( TRUE );
-			break;
-
-		case SAW:
-			m_sawLfoBtn->setChecked( TRUE );
-			break;
-
-		case SQUARE:
-			m_sqrLfoBtn->setChecked( TRUE );
-			break;
-
-		case USER:
-			m_usrLfoBtn->setChecked( TRUE );
-			break;
-	}
 
 	m_busy = FALSE;
 
@@ -750,7 +717,7 @@ void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
 	if( type == "samplefile" )
 	{
 		m_userWave.setAudioFile( stringPairDrag::decodeValue( _de ) );
-		m_usrLfoBtn->setChecked( TRUE );
+		m_userLfoBtn->setChecked( TRUE );
 		lfoUserWaveCh( TRUE );
 		_de->accept();
 	}
@@ -759,7 +726,7 @@ void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
 		multimediaProject mmp( value, FALSE );
 		m_userWave.setAudioFile( mmp.content().firstChild().toElement().
 							attribute( "src" ) );
-		m_usrLfoBtn->setChecked( TRUE );
+		m_userLfoBtn->setChecked( TRUE );
 		lfoUserWaveCh( TRUE );
 		_de->accept();
 	}
@@ -1140,56 +1107,9 @@ void envelopeAndLFOWidget::updateAfterKnobChange( float )
 
 
 
-void envelopeAndLFOWidget::lfoSinWaveCh( bool _on )
+void envelopeAndLFOWidget::lfoWaveCh( int _val )
 {
-	if( _on )
-	{
-		m_lfoShape = SIN;
-	}
-	eng()->getSongEditor()->setModified();
-
-	update();
-}
-
-
-
-
-void envelopeAndLFOWidget::lfoTriangleWaveCh( bool _on )
-{
-	if( _on )
-	{
-		m_lfoShape = TRIANGLE;
-	}
-	eng()->getSongEditor()->setModified();
-
-	update();
-}
-
-
-
-
-void envelopeAndLFOWidget::lfoSawWaveCh( bool _on )
-{
-	if( _on )
-	{
-		m_lfoShape = SAW;
-	}
-	eng()->getSongEditor()->setModified();
-
-	update();
-}
-
-
-
-
-void envelopeAndLFOWidget::lfoSquareWaveCh( bool _on )
-{
-	if( _on )
-	{
-		m_lfoShape = SQUARE;
-	}
-	eng()->getSongEditor()->setModified();
-
+	m_lfoShape = static_cast<lfoShapes>( _val );
 	update();
 }
 

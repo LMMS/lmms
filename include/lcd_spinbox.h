@@ -51,15 +51,11 @@ class lcdSpinBox : public QWidget, public automatableObject<int>
 {
 	Q_OBJECT
 public:
-	lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent );
+	lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
+							engine * _engine );
 	virtual ~lcdSpinBox();
 
 	virtual void setStep( const int _step );
-
-/*	inline int value( void ) const
-	{
-		return( m_number->intValue() );
-	}*/
 
 	void setLabel( const QString & _txt );
 
@@ -83,11 +79,6 @@ protected:
 
 private:
 	QMap<int, QString> m_textForValue;
-
-/*	int m_value;
-	int m_minValue;
-	int m_maxValue;
-	int m_step;*/
 
 	QLCDNumber * m_number;
 	QLabel * m_label;

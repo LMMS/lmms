@@ -37,6 +37,7 @@
 #include <QWheelEvent>
 #include <QLayout>
 #include <QLabel>
+#include <Qt/QtXml>
 
 #else
 
@@ -45,6 +46,9 @@
 #include <qpainter.h>
 #include <qlayout.h>
 #include <qlabel.h>
+#include <qdom.h>
+
+#define addButton insert
 
 #endif
 
@@ -391,7 +395,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox = new comboBox( m_toolBar, eng() );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
@@ -399,7 +403,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
-	m_zoomingComboBox->setCurrentIndex( m_zoomingComboBox->findText(
+	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
 								"100%" ) );
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
@@ -409,21 +413,21 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox = new comboBox( m_toolBar, eng() );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
 		m_quantizeComboBox->addItem( "1/" + QString::number( 
 					static_cast<int>( powf( 2.0f, i ) ) ) );
 	}
-	m_quantizeComboBox->setCurrentIndex( m_quantizeComboBox->findText(
+	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
 								"1/16" ) );
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenComboBox = new comboBox( m_toolBar );
+	m_noteLenComboBox = new comboBox( m_toolBar, eng() );
 	m_noteLenComboBox->setFixedSize( 120, 22 );
 	m_noteLenComboBox->addItem( tr( "Last note" ),
 					embed::getIconPixmap( "edit_draw" ) );
@@ -435,7 +439,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 					static_cast<int>( powf( 2.0f, i ) ) ),
 				embed::getIconPixmap( "note_" + pixmaps[i] ) );
 	}
-	m_noteLenComboBox->setCurrentIndex( 0 );
+	m_noteLenComboBox->setValue( 0 );
 
 
 	tb_layout->addSpacing( 5 );
@@ -548,6 +552,24 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
 
 	update();
+}
+
+
+
+
+void pianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+{
+	QDomElement pr_de = _doc.createElement( nodeName() );
+	mainWindow::saveWidgetState( this, pr_de );
+	_parent.appendChild( pr_de );
+}
+
+
+
+
+void pianoRoll::loadSettings( const QDomElement & _this )
+{
+	mainWindow::restoreWidgetState( this, _this );
 }
 
 
@@ -1996,7 +2018,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->setCurrentIndex(
+		m_zoomingComboBox->setValue(
 				m_zoomingComboBox->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" ) );
@@ -2486,7 +2508,7 @@ int pianoRoll::quantization( void ) const
 
 midiTime pianoRoll::newNoteLen( void ) const
 {
-	if( m_noteLenComboBox->currentIndex() == 0 )
+	if( m_noteLenComboBox->value() == 0 )
 	{
 		return( m_lenOfNewNotes );
 	}
@@ -2498,6 +2520,11 @@ midiTime pianoRoll::newNoteLen( void ) const
 
 
 #include "piano_roll.moc"
+
+
+#ifdef QT3
+#undef addButton
+#endif
 
 
 #endif

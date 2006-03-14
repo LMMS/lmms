@@ -138,12 +138,12 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 	}
 	
 	
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this );
+	m_filterGroupBox = new groupBox( tr( "FILTER" ), this, eng() );
 	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
-	m_filterComboBox = new comboBox( m_filterGroupBox );
+	m_filterComboBox = new comboBox( m_filterGroupBox, eng() );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
@@ -281,7 +281,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 		basicFilters<>::filterTypes filter =
 				basicFilters<>::getFilterType(
-					m_filterComboBox->currentIndex() );
+					m_filterComboBox->value() );
 
 		if( m_envLFOWidgets[VOLUME]->used() &&
 			m_envLFOWidgets[CUT]->used() &&
@@ -498,7 +498,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement etw_de = _doc.createElement( nodeName() );
-	etw_de.setAttribute( "ftype", m_filterComboBox->currentIndex() );
+	etw_de.setAttribute( "ftype", m_filterComboBox->value() );
 	etw_de.setAttribute( "fcut", m_filterCutKnob->value() );
 	etw_de.setAttribute( "fres", m_filterResKnob->value() );
 	etw_de.setAttribute( "fwet", m_filterGroupBox->isActive() );
@@ -520,7 +520,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc,
 
 void envelopeTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_filterComboBox->setCurrentIndex( _this.attribute( "ftype" ).toInt() );
+	m_filterComboBox->setValue( _this.attribute( "ftype" ).toInt() );
 	m_filterCutKnob->setValue( _this.attribute( "fcut" ).toFloat() );
 	m_filterResKnob->setValue( _this.attribute( "fres" ).toFloat() );
 /*	m_filterState->setChecked( _this.attribute( "fwet" ).toInt() );*/

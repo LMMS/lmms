@@ -50,13 +50,12 @@
 
 class QPixmap;
 
+class automatableButtonGroup;
 class channelTrack;
 class comboBox;
 class groupBox;
 class knob;
-class ledCheckBox;
 class notePlayHandle;
-class pixmapButton;
 class tempoSyncKnob;
 
 
@@ -98,14 +97,6 @@ public:
 	}
 
 
-
-protected slots:
-	void arpUpToggled( bool );
-	void arpDownToggled( bool );
-	void arpUpAndDownToggled( bool );
-	void arpRandomToggled( bool );
-
-
 private:
 
 	enum arpDirections
@@ -115,7 +106,7 @@ private:
 		DOWN,
 		UP_AND_DOWN,
 		RANDOM
-	} m_arpDirection;
+	} ;
 
 	enum arpModes
 	{
@@ -137,10 +128,7 @@ private:
 	knob * m_arpGateKnob;
 	QLabel * m_arpDirectionLbl;
 
-	pixmapButton * m_arpUpBtn;
-	pixmapButton * m_arpDownBtn;
-	pixmapButton * m_arpUpAndDownBtn;
-	pixmapButton * m_arpRandomBtn;
+	automatableButtonGroup * m_arpDirectionBtnGrp;
 
 	comboBox * m_arpModeComboBox;
 

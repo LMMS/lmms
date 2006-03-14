@@ -46,14 +46,17 @@
 
 #endif
 
+#include "automatable_object.h"
+
+
 class QAction;
 
 
-class comboBox : public QWidget
+class comboBox : public QWidget, public automatableObject<int>
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent );
+	comboBox( QWidget * _parent, engine * _engine );
 	virtual ~comboBox();
 
 	void addItem( const QString & _item, const QPixmap & _pixmap =
@@ -61,26 +64,19 @@ public:
 
 	inline void clear( void )
 	{
-		m_currentIndex = 0;
+		setRange( 0, 0 );
 		m_items.clear();
 		update();
 	}
 
 	int findText( const QString & _txt ) const;
 
-	int currentIndex( void ) const
-	{
-		return( m_currentIndex );
-	}
-
 	QString currentText( void ) const
 	{
-		return( m_items[m_currentIndex].first );
+		return( m_items[value()].first );
 	}
 
-
-public slots:
-	void setCurrentIndex( int _idx );
+	void setValue( const int _idx );
 
 
 protected:
@@ -98,7 +94,6 @@ private:
 	typedef QPair<QString, QPixmap> item;
 
 	vvector<item> m_items;
-	int m_currentIndex;
 
 	bool m_pressed;
 
@@ -110,7 +105,7 @@ private slots:
 
 signals:
 	void activated( const QString & );
-	void currentIndexChanged( int );
+	void valueChanged( int );
 
 } ;
 

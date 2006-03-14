@@ -135,10 +135,6 @@ inline QString baseName( const QString & _file )
 #define modifiers state
 
 
-// QButtonGroup
-#define addButton insert
-
-
 // QProgressBar
 #define setTextVisible setPercentageVisible
 
