@@ -186,9 +186,12 @@ void pattern::init( void )
 		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
 	}
 
+	saveStepRecordingState( FALSE );
+
 	ensureBeatNotes();
 
 	changeLength( length() );
+	restoreStepRecordingState();
 
 #ifndef QT4
 	// set background-mode for flicker-free redraw

@@ -1,3 +1,5 @@
+- implement editableSettingsObject
+- unique id's for all editable objects
 - add edit-history to project for making it possible to undo things even if you did them in a previous session
 - make edit-history qobject and undo/redo slots -> direct connection to GUI
 - restore stacking-order of windows when loading project

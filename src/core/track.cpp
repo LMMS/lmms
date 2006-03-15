@@ -88,7 +88,8 @@ trackContentObject::trackContentObject( track * _track ) :
 		, Qt::WDestructiveClose
 #endif
  		),
-	engineObject( _track->eng() ),
+	settings(),
+	editableObject( _track->eng() ),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
@@ -110,8 +111,11 @@ trackContentObject::trackContentObject( track * _track ) :
 	setFocusPolicy( StrongFocus );
 #endif
 	show();
+
+	setStepRecording( FALSE );
 	movePosition( 0 );
 	changeLength( 0 );
+	setStepRecording( TRUE );
 
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAcceptDrops( TRUE );
@@ -141,9 +145,10 @@ void trackContentObject::movePosition( const midiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		getTrack()->eng()->getSongEditor()->setModified();
+		//getTrack()->eng()->getSongEditor()->setModified();
+		addStep( editStep( MOVE, m_startPosition - _pos ) );
+		m_startPosition = _pos;
 	}
-	m_startPosition = _pos;
 	m_track->getTrackWidget()->changePosition();
 	// moving a TCO can result in change of song-length etc.,
 	// therefore we update the track-container
@@ -157,29 +162,15 @@ void trackContentObject::changeLength( const midiTime & _length )
 {
 	if( m_length != _length )
 	{
-		getTrack()->eng()->getSongEditor()->setModified();
+		//getTrack()->eng()->getSongEditor()->setModified();
+		addStep( editStep( RESIZE, m_length - _length ) );
+		m_length = _length;
 	}
-	m_length = _length;
-	setFixedWidth( static_cast<int>( m_length * pixelsPerTact() / 64 ) +
-							TCO_BORDER_WIDTH * 2 );
+	setFixedWidth( static_cast<int>( m_length * pixelsPerTact() /
+					64 ) + TCO_BORDER_WIDTH * 2 );
 	// changing length of TCO can result in change of song-length etc.,
-	// therefore we update the trackcontainer
+	// therefore we update the track-container
 	m_track->getTrackContainer()->update();
-}
-
-
-
-
-float trackContentObject::pixelsPerTact( void )
-{
-	if( fixedTCOs() )
-	{
-		return( ( getTrack()->getTrackContentWidget()->width() -
-				2 * TCO_BORDER_WIDTH -
-						DEFAULT_SCROLLBAR_SIZE ) /
-				tMax<float>( length().getTact(), 1.0f ) );
-	}
-	return( getTrack()->getTrackContainer()->pixelsPerTact() );
 }
 
 
@@ -283,11 +274,14 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
+		setStepRecording( FALSE );
+
 		m_initialMouseX = _me->x();
-		
+
 		if( _me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
 			m_action = MOVE;
+			m_oldTime = m_startPosition;
 			QCursor c( Qt::SizeAllCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current position" ) );
@@ -300,6 +294,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		else if( m_autoResize == FALSE )
 		{
 			m_action = RESIZE;
+			m_oldTime = m_length;
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
 			s_textFloat->setTitle( tr( "Current length" ) );
@@ -434,6 +429,13 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 
 void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 {
+	if( m_action == MOVE || m_action == RESIZE )
+	{
+		setStepRecording( TRUE );
+		addStep( editStep( m_action, m_oldTime -
+				( ( m_action == MOVE ) ?
+					m_startPosition : m_length ) ) );
+	}
 	m_action = NONE;
 	delete m_hint;
 	m_hint = NULL;
@@ -471,6 +473,49 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
+float trackContentObject::pixelsPerTact( void )
+{
+	if( fixedTCOs() )
+	{
+		return( ( getTrack()->getTrackContentWidget()->width() -
+				2 * TCO_BORDER_WIDTH -
+						DEFAULT_SCROLLBAR_SIZE ) /
+				tMax<float>( length().getTact(), 1.0f ) );
+	}
+	return( getTrack()->getTrackContainer()->pixelsPerTact() );
+}
+
+
+
+
+void trackContentObject::undoStep( const editStep & _edit_step )
+{
+	saveStepRecordingState( FALSE );
+	switch( _edit_step.actionID() )
+	{
+		case MOVE:
+			movePosition( startPosition() +
+						_edit_step.data().toInt() );
+			break;
+		case RESIZE:
+			changeLength( length() + _edit_step.data().toInt() );
+			break;
+	}
+	restoreStepRecordingState();
+}
+
+
+
+
+void trackContentObject::redoStep( const editStep & _edit_step )
+{
+	undoStep( editStep( _edit_step.actionID(),
+						-_edit_step.data().toInt() ) );
 }
 
 
@@ -531,6 +576,7 @@ void trackContentObject::setAutoResizeEnabled( bool _e )
 // ===========================================================================
 trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 	QWidget( _parent ),
+	editableObject( _parent->getTrack()->eng() ),
 	m_trackWidget( _parent )
 {
 #ifdef QT4
@@ -579,9 +625,14 @@ csize trackContentWidget::numOfTCOs( void )
 trackContentObject * FASTCALL trackContentWidget::addTCO(
 						trackContentObject * _tco )
 {
+	//addStep( editStep( ADD_TCO, 0 ) );
 	m_trackContentObjects.push_back( _tco );
 	_tco->move( 0, 1 );
+
+	_tco->saveStepRecordingState( FALSE );
 	m_trackWidget->changePosition();
+	_tco->restoreStepRecordingState();
+
 	getTrack()->eng()->getSongEditor()->setModified();
 	return( _tco );		// just for convenience
 }
@@ -605,6 +656,7 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 					_tco );
 	if( it != m_trackContentObjects.end() )
 	{
+		//addStep( editStep( REMOVE_TCO, 0 ) );
 		if( _also_delete )
 		{
 			delete _tco;
@@ -757,10 +809,12 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			getTrack()->getTrackContainer()->fixedTCOs() == FALSE )
 	{
-		const midiTime pos = getPosition( _me->x() ).toNearestTact();
+		const midiTime pos = getPosition( _me->x() ).getTact() * 64;
 		trackContentObject * tco = addTCO( getTrack()->createTCO(
 									pos ) );
+		tco->saveStepRecordingState( FALSE );
 		tco->movePosition( pos );
+		tco->restoreStepRecordingState();
 	}
 }
 
@@ -802,6 +856,31 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 void trackContentWidget::resizeEvent( QResizeEvent * _re )
 {
 	updateTCOs();
+}
+
+
+
+
+void trackContentWidget::undoStep( const editStep & _edit_step )
+{
+	saveStepRecordingState( FALSE );
+	switch( _edit_step.actionID() )
+	{
+		case ADD_TCO:
+			break;
+		case REMOVE_TCO:
+			break;
+	}
+	restoreStepRecordingState();
+}
+
+
+
+
+void trackContentWidget::redoStep( const editStep & _edit_step )
+{
+/*	undoStep( editStep( _edit_step.actionID(),
+						-_edit_step.data().toInt() ) );*/
 }
 
 

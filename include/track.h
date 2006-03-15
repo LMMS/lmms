@@ -57,6 +57,7 @@
 #include "settings.h"
 #include "rubberband.h"
 #include "engine.h"
+#include "editable_object.h"
 
 
 class QMenu;
@@ -79,7 +80,7 @@ const Uint16 TCO_BORDER_WIDTH = 1;
 
 
 class trackContentObject : public selectableObject, public settings,
-			   public engineObject
+			   public editableObject
 {
 	Q_OBJECT
 public:
@@ -129,6 +130,9 @@ protected:
 	void setAutoResizeEnabled( bool _e = FALSE );
 	float pixelsPerTact( void );
 
+	virtual void undoStep( const editStep & _edit_step );
+	virtual void redoStep( const editStep & _edit_step );
+
 
 protected slots:
 	void cut( void );
@@ -153,12 +157,14 @@ private:
 
 	textFloat * m_hint;
 
+	midiTime m_oldTime;// used for undo/redo while mouse-button is pressed
+
 } ;
 
 
 
 
-class trackContentWidget : public QWidget
+class trackContentWidget : public QWidget, public editableObject
 {
 	Q_OBJECT
 public:
@@ -200,8 +206,16 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
+	virtual void undoStep( const editStep & _edit_step );
+	virtual void redoStep( const editStep & _edit_step );
+
 
 private:
+	enum actions
+	{
+		ADD_TCO, REMOVE_TCO
+	} ;
+
 	track * getTrack( void );
 	midiTime getPosition( int _mouse_x );
 

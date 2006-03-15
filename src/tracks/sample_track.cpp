@@ -64,7 +64,9 @@ sampleTCO::sampleTCO( track * _track ) :
 	setBackgroundMode( Qt::NoBackground );
 #endif
 
+	saveStepRecordingState( FALSE );
 	setSampleFile( "" );
+	restoreStepRecordingState();
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO

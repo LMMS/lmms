@@ -57,8 +57,10 @@ class QColorGroup;
 
 typedef int csize;
 #define QListViewItem Q3ListViewItem
-#define vvector QVector
+
 #define vlist QList 
+#define vstack QStack
+#define vvector QVector
 
 #include <QFileInfo>
 
@@ -72,8 +74,10 @@ inline QString baseName( const QString & _file )
 #else /* QT3 */
 
 
-#define vvector QValueVector
 #define vlist QValueList 
+#define vstack QValueStack
+#define vvector QValueVector
+
 
 #define QMenu QPopupMenu
 #define QAbstractButton QButton

@@ -127,10 +127,9 @@ public:
 
 	inline virtual void setInitValue( const T _value )
 	{
-		const bool sr = isRecordingSteps();
-		setStepRecording( FALSE );
+		saveStepRecordingState( FALSE );
 		setValue( _value );
-		setStepRecording( sr );
+		restoreStepRecordingState();
 	}
 
 	inline virtual void setValue( const T _value )
@@ -159,11 +158,10 @@ public:
 					it->fittedValue( value() ) !=
 								it->value() )
 				{
-					const bool sr = it->isRecordingSteps();
-					it->setStepRecording(
+					it->saveStepRecordingState(
 							isRecordingSteps() );
 					it->setValue( value() );
-					it->setStepRecording( sr );
+					it->restoreStepRecordingState();
 				}
 			}
 		}
@@ -244,8 +242,7 @@ public:
 protected:
 	virtual void redoStep( const editStep & _edit_step )
 	{
-		const bool sr = isRecordingSteps();
-		setStepRecording( FALSE );
+		saveStepRecordingState( FALSE );
 #ifndef QT3
 		setValue( static_cast<T>( value() +
 				_edit_step.data().value<EDIT_STEP_TYPE>() ) );
@@ -253,7 +250,7 @@ protected:
 		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
 					_edit_step.data().toDouble() ) ) );
 #endif
-		setStepRecording( sr );
+		restoreStepRecordingState();
 	}
 
 	virtual void undoStep( const editStep & _edit_step )

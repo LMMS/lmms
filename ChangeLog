@@ -1,5 +1,19 @@
 2006-03-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/types.h:
+	added type for editable-object-ID
+
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	undo/redo-support for position- and size-changes of TCO
+
+	* include/automatable_object.h:
+	added methods for saving step-recording-state on stack and restoring
+	it
+
 	* include/automatable_object.h:
 	* include/automatable_button.h:
 	* include/knob.h:

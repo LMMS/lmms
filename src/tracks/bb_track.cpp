@@ -72,7 +72,9 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
+		saveStepRecordingState( FALSE );
 		changeLength( midiTime( t, 0 ) );
+		restoreStepRecordingState();
 	}
 }
 
