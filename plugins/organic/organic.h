@@ -66,17 +66,19 @@ public:
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
+	
+	int intRand( int min, int max );
+
 
 public slots:
 
 	void oscButtonChanged( void );
+	void randomiseSettings();
 
 private:
 
-	float foldback(float in, float threshold);
-	float saturate(float x, float t);
-	float distort(float in, float dist);
-	float waveshape(float in, float amount);
+	float inline waveshape(float in, float amount);
+
 	
 	// fast atan, fast rather than accurate
 	inline float fastatan( float x )
@@ -108,6 +110,7 @@ private:
 
 		knob * fx1Knob;
 		knob * volKnob;
+		pixmapButton * m_randBtn;
 
 } ;
 

@@ -179,7 +179,21 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 		volKnob->setInitValue( 100 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							1 ) + " ", "%" );
+							
+		// randomise
+		m_randBtn = new pixmapButton( this );
+		m_randBtn->move( 100, 200 );
+		m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"randomise" ) );
+		m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"randomise" ) );
+		//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+		//				createHeuristicMask() ) );
 
+		connect( m_randBtn, SIGNAL ( toggled(bool) ),
+			this, SLOT( randomiseSettings() ) );
+
+	// set harmonics
 
 	m_osc[0].harmonic = 0.5f;	//	one octave below
 	m_osc[1].harmonic = 0.75f;	//	a fifth below
@@ -478,6 +492,41 @@ void organicInstrument::oscButtonChanged( )
 		
 	}
 }
+
+void organicInstrument::randomiseSettings()
+{
+	
+	for (int i=0; i < m_num_oscillators; i++)
+	{
+		m_osc[i].volKnob->setValue( 
+			intRand(0,100)
+		 );
+	
+		m_osc[i].detuneKnob->setValue( 
+			intRand(-5, 5)
+		 );
+	
+		m_osc[i].panKnob->setValue( 
+			//(int)gaussRand(PANNING_LEFT, PANNING_RIGHT,1,0)
+			0
+		  );
+		  
+		m_osc[i].oscKnob->setValue(  
+			intRand(0, 5)
+		);	
+	}
+	
+}
+
+int organicInstrument::intRand( int min, int max )
+{
+//	int randn = min+int((max-min)*rand()/(RAND_MAX + 1.0));	
+//	cout << randn << endl;
+	int randn = ( rand() % (max-min) ) + min ;
+	return randn;
+}
+
+
 
 
 extern "C"
