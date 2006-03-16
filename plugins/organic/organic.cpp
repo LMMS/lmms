@@ -181,7 +181,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 							1 ) + " ", "%" );
 							
 		// randomise
-		m_randBtn = new pixmapButton( this );
+		m_randBtn = new pixmapButton( this, eng() );
 		m_randBtn->move( 100, 200 );
 		m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
