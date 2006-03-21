@@ -57,7 +57,7 @@ using namespace std;
 
 
 #include "bit_invader.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
 #include "buffer_allocator.h"
@@ -173,7 +173,7 @@ sample_t bSynth::nextStringSample( void )
 ***********************************************************************/
 
 
-bitInvader::bitInvader( channelTrack * _channel_track ) :
+bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	instrument( _channel_track,
 			&bitinvader_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
@@ -565,34 +565,28 @@ bitInvader::~bitInvader()
 
 
 
-void bitInvader::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 
-	QDomElement to_de = _doc.createElement( nodeName() );
-
 	// Save plugin version
-	to_de.setAttribute( "version", "0.1" );
+	_this.setAttribute( "version", "0.1" );
 
 	// Save sample length
-	to_de.setAttribute( "sampleLength", QString::number( sample_length ) );
+	_this.setAttribute( "sampleLength", QString::number( sample_length ) );
 
 	// Save sample shape base64-encoded
 	QString sampleString;
 	base64::encode( (const char *)sample_shape, 
 		sample_length * sizeof(float), sampleString );
-	to_de.setAttribute( "sampleShape", sampleString );
+	_this.setAttribute( "sampleShape", sampleString );
 	
 
 	// save LED normalize 
-	to_de.setAttribute( "interpolation",
+	_this.setAttribute( "interpolation",
 					m_interpolationToggle->isChecked() );
 	
 	// save LED 
-	to_de.setAttribute( "normalize", m_normalizeToggle->isChecked() );
-	
-	_parent.appendChild( to_de );
-
+	_this.setAttribute( "normalize", m_normalizeToggle->isChecked() );
 
 }
 
@@ -686,7 +680,7 @@ void bitInvader::playNote( notePlayHandle * _n )
 	if ( _n->totalFramesPlayed() == 0 )
 	{
 	
-		float freq = getChannelTrack()->frequency( _n );
+		float freq = getInstrumentTrack()->frequency( _n );
 		
 		float factor;
 		if (!normalize) {
@@ -713,7 +707,7 @@ void bitInvader::playNote( notePlayHandle * _n )
 		}
 	}
 
-	getChannelTrack()->processAudioBuffer( buf, frames, _n );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	bufferAllocator::free( buf );
 }
@@ -805,7 +799,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
-	return( new bitInvader( static_cast<channelTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

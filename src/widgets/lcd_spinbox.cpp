@@ -170,10 +170,10 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
 		{
-			setStepRecording( FALSE );// why is this neccessary?!
+			setJournalling( FALSE );// why is this neccessary?!
 			setInitValue( value() - dy / 2 * step() );
 			emit valueChanged( value() );
-			setStepRecording( TRUE );
+			setJournalling( TRUE );
 			QCursor::setPos( m_origMousePos );
 		}
 	}
@@ -184,7 +184,7 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 
 void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 {
-	addStepFromOldToCurVal();
+	addJournalEntryFromOldToCurVal();
 
 	QCursor::setPos( m_origMousePos );
 	QApplication::restoreOverrideCursor();

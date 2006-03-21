@@ -32,7 +32,7 @@
 #include "note.h"
 
 
-class channelTrack;
+class instrumentTrack;
 class notePlayHandle;
 
 typedef vvector<notePlayHandle *> notePlayHandleVector;
@@ -45,8 +45,8 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	notePlayHandle( channelTrack * _chnl_trk, const f_cnt_t _frames_ahead,
-					const f_cnt_t _frames, note * _n,
+	notePlayHandle( instrumentTrack * _chnl_trk, const f_cnt_t _frames_ahead,
+					const f_cnt_t _frames, const note & _n,
 					const bool _arp_note = FALSE );
 	virtual ~notePlayHandle();
 
@@ -57,7 +57,7 @@ public:
 	{
 		return( ( m_released && m_framesBeforeRelease == 0 &&
 			m_releaseFramesDone >= m_releaseFramesToDo ) ||
-						m_channelTrack == NULL );
+						m_instrumentTrack == NULL );
 	}
 
 	virtual void checkValidity( void );
@@ -118,10 +118,10 @@ public:
 		m_arpNote = _n->arpNote() && baseNote();
 	}
 
-	// returns channel-track this note-play-handle plays
-	inline channelTrack * getChannelTrack( void )
+	// returns instrument-track this note-play-handle plays
+	inline instrumentTrack * getInstrumentTrack( void )
 	{
-		return( m_channelTrack );
+		return( m_instrumentTrack );
 	}
 
 	// returns whether note is a base-note, e.g. is not part of an arpeggio
@@ -161,15 +161,15 @@ public:
 
 	// note-play-handles belonging to given channel
 	static constNotePlayHandleVector nphsOfChannelTrack(
-						const channelTrack * _ct );
+						const instrumentTrack * _ct );
 
 	// return whether given note-play-handle is equal to *this
 	bool operator==( const notePlayHandle & _nph ) const;
 
 
 private:
-	channelTrack * m_channelTrack;	// needed for calling
-					// channelTrack::playNote
+	instrumentTrack * m_instrumentTrack;	// needed for calling
+					// instrumentTrack::playNote
 	f_cnt_t m_frames;		// total frames to play
 	f_cnt_t m_framesAhead;		// numbers of frames ahead in buffer
 					// to mix in

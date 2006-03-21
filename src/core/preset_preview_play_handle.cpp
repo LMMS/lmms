@@ -42,7 +42,7 @@
 
 #include "preset_preview_play_handle.h"
 #include "note_play_handle.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "track_container.h"
 #include "mmp.h"
 #include "debug.h"
@@ -56,7 +56,7 @@ class previewTrackContainer : public trackContainer
 public:
 	previewTrackContainer( engine * _engine ) :
 		trackContainer( _engine ),
-		m_previewChannelTrack( dynamic_cast<channelTrack *>(
+		m_previewChannelTrack( dynamic_cast<instrumentTrack *>(
 					track::create( track::CHANNEL_TRACK,
 								this ) )),
 		m_previewNote( NULL ),
@@ -81,7 +81,7 @@ public:
 		return( "previewtc" );
 	}
 
-	channelTrack * previewChannelTrack( void )
+	instrumentTrack * previewChannelTrack( void )
 	{
 		return( m_previewChannelTrack );
 	}
@@ -108,7 +108,7 @@ public:
 
 
 private:
-	channelTrack * m_previewChannelTrack;
+	instrumentTrack * m_previewChannelTrack;
 	notePlayHandle * m_previewNote;
 	QMutex m_dataMutex;
 
@@ -123,7 +123,8 @@ QMap<const engine *, previewTrackContainer *>
 presetPreviewPlayHandle::presetPreviewPlayHandle(
 						const QString & _preset_file,
 						engine * _engine ) :
-	playHandle( PRESET_PREVIEW_PLAY_HANDLE, _engine ),
+	playHandle( PRESET_PREVIEW_PLAY_HANDLE ),
+	engineObject( _engine ),
 	m_previewNote( NULL )
 {
 	if( s_previewTCs.contains( _engine ) == FALSE )
@@ -149,11 +150,12 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 							midiPort::DUMMY );
 
 	// create temporary note
-	note n( 0, 0, static_cast<tones>( A ),
-				static_cast<octaves>( DEFAULT_OCTAVE-1 ), 100 );
+	note n();
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle( previewTC()->previewChannelTrack(),
-								0, ~0, &n );
+						0, ~0,
+		note( NULL, 0, 0, static_cast<tones>( A ),
+			static_cast<octaves>( DEFAULT_OCTAVE-1 ), 100 ) );
 
 
 	previewTC()->setPreviewNote( m_previewNote );
@@ -209,15 +211,15 @@ void presetPreviewPlayHandle::cleanUp( engine * _engine )
 
 
 constNotePlayHandleVector presetPreviewPlayHandle::nphsOfChannelTrack(
-						const channelTrack * _ct )
+						const instrumentTrack * _it )
 {
 	constNotePlayHandleVector cnphv;
-	if( s_previewTCs.contains( _ct->eng() ) == TRUE )
+	if( s_previewTCs.contains( _it->eng() ) == TRUE )
 	{
-		previewTrackContainer * tc = s_previewTCs[_ct->eng()];
+		previewTrackContainer * tc = s_previewTCs[_it->eng()];
 		tc->lockData();
 		if( tc->previewNote() != NULL &&
-			tc->previewNote()->getChannelTrack() == _ct )
+			tc->previewNote()->getInstrumentTrack() == _it )
 		{
 			cnphv.push_back( tc->previewNote() );
 		}

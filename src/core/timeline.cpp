@@ -66,7 +66,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			songEditor::playPos & _pos, const midiTime & _begin,
 					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	engineObject( _engine ),
+	journallingObject( _engine ),
 	m_autoScroll( AUTOSCROLL_ENABLED ),
 	m_loopPoints( LOOP_POINTS_DISABLED ),
 	m_behaviourAtStop( BACK_TO_ZERO ),
@@ -176,13 +176,11 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 
 
 
-void timeLine::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void timeLine::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement tl_de = _doc.createElement( nodeName() );
-	tl_de.setAttribute( "lp0pos", (int) loopBegin() );
-	tl_de.setAttribute( "lp1pos", (int) loopEnd() );
-	tl_de.setAttribute( "lpstate", m_loopPoints );
-	_parent.appendChild( tl_de );
+	_this.setAttribute( "lp0pos", (int) loopBegin() );
+	_this.setAttribute( "lp1pos", (int) loopEnd() );
+	_this.setAttribute( "lpstate", m_loopPoints );
 }
 
 

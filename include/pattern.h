@@ -59,7 +59,7 @@ class QAction;
 class QProgressBar;
 class QPushButton;
 
-class channelTrack;
+class instrumentTrack;
 class patternFreezeThread;
 class sampleBuffer;
 
@@ -78,7 +78,7 @@ public:
 		BEAT_PATTERN, MELODY_PATTERN/*, AUTOMATION_PATTERN*/
 	} ;
 
-	pattern( channelTrack * _channel_track );
+	pattern( instrumentTrack * _channel_track );
 	pattern( const pattern & _pat_to_copy );
 	virtual ~pattern();
 
@@ -154,9 +154,9 @@ public:
 		return( "pattern" );
 	}
 
-	inline channelTrack * getChannelTrack( void )
+	inline instrumentTrack * getInstrumentTrack( void )
 	{
-		return( m_channelTrack );
+		return( m_instrumentTrack );
 	}
 
 
@@ -208,7 +208,7 @@ private:
 	bool m_needsUpdate;
 
 	// general stuff
-	channelTrack * m_channelTrack;
+	instrumentTrack * m_instrumentTrack;
 
 	patternTypes m_patternType;
 	QString m_name;

@@ -36,6 +36,9 @@
 #endif
 
 
+class QVariant;
+
+
 namespace base64
 {
 #ifndef QT3
@@ -55,6 +58,9 @@ namespace base64
 	void encode( const char * _data, const int _size, QString & _dst );
 	void decode( const QString & _b64, char * * _data, int * _size );
 #endif
+	QString encode( const QVariant & _data );
+	QVariant decode( const QString & _b64 );
+
 } ;
 
 #endif

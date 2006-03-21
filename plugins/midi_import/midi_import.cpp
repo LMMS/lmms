@@ -26,7 +26,7 @@
 
 #include "midi_import.h"
 #include "track_container.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "pattern.h"
 
 
@@ -217,7 +217,7 @@ invalid_format:
 		}
 
 		// now create new channel-track for reading track
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 						track::create(
 							track::CHANNEL_TRACK,
 							_tc ) );
@@ -226,7 +226,7 @@ invalid_format:
 #endif
 		// TODO: setup program, channel etc.
 		ct->loadInstrument( "tripleoscillator" );
-		ct->toggledChannelButton( FALSE );
+		ct->toggledInstrumentTrackButton( FALSE );
 
 		// now create pattern to store notes in
 		pattern * p = dynamic_cast<pattern *>( ct->createTCO( 0 ) );
@@ -269,7 +269,8 @@ invalid_format:
 						NOTES_PER_OCTAVE * OCTAVES &&
 							keys[ev.key()][0] >= 0 )
 					{
-			note n( midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
+			note n( eng(),
+				midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
 				midiTime( keys[ev.key()][0] / 10 ),
 				(tones)( ev.key() % NOTES_PER_OCTAVE ),
 				(octaves)( ev.key() / NOTES_PER_OCTAVE ),

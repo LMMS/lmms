@@ -1,7 +1,9 @@
-- implement editableSettingsObject
-- unique id's for all editable objects
-- add edit-history to project for making it possible to undo things even if you did them in a previous session
-- make edit-history qobject and undo/redo slots -> direct connection to GUI
+- font-size-scaling-coefficient in setup-dialog
+- make note able of journalling
+- before calling undoStep/redoStep from journallingObject, save journalling-state-context and disabled journalling, restore afterwards
+- intelligent journal-entry-merging
+- undo/redo-support in note/track etc.
+- save tco-settings in trackContentWidget::saveSettings() etc. instead of track::...
 - restore stacking-order of windows when loading project
 - fix MIDI-import-filter
 - bristol-bindings

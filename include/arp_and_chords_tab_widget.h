@@ -43,7 +43,7 @@
 #include <config.h>
 #endif
 
-#include "settings.h"
+#include "journalling_object.h"
 #include "types.h"
 #include "engine.h"
 
@@ -51,7 +51,7 @@
 class QPixmap;
 
 class automatableButtonGroup;
-class channelTrack;
+class instrumentTrack;
 class comboBox;
 class groupBox;
 class knob;
@@ -62,12 +62,11 @@ class tempoSyncKnob;
 const int MAX_CHORD_POLYPHONY = 10;
 
 
-class arpAndChordsTabWidget : public QWidget, public settings,
-			      public engineObject
+class arpAndChordsTabWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	arpAndChordsTabWidget( channelTrack * _channel_track );
+	arpAndChordsTabWidget( instrumentTrack * _channel_track );
 	virtual ~arpAndChordsTabWidget();
 
 	static struct chord

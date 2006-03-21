@@ -47,9 +47,8 @@
 
 
 #include "types.h"
-#include "settings.h"
+#include "journalling_object.h"
 #include "embed.h"
-#include "engine.h"
 
 
 #define STRINGIFY_PLUGIN_NAME(s) STR(s)
@@ -59,7 +58,7 @@
 class QPixmap;
 
 
-class plugin : public settings, public engineObject
+class plugin : public journallingObject
 {
 public:
 	enum pluginTypes

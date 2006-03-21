@@ -48,7 +48,7 @@
 
 
 #include "midi_tab_widget.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "midi_port.h"
 #include "tab_widget.h"
 #include "led_checkbox.h"
@@ -60,12 +60,11 @@
 
 
 
-midiTabWidget::midiTabWidget( channelTrack * _channel_track,
+midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 							midiPort * _port ) :
-	QWidget( _channel_track->tabWidgetParent() ),
-	settings(),
-	engineObject( _channel_track->eng() ),
-	m_channelTrack( _channel_track ),
+	QWidget( _instrument_track->tabWidgetParent() ),
+	journallingObject( _instrument_track->eng() ),
+	m_instrumentTrack( _instrument_track ),
 	m_midiPort( _port ),
 	m_readablePorts( NULL ),
 	m_writeablePorts( NULL )
@@ -194,13 +193,12 @@ midiTabWidget::~midiTabWidget()
 
 
 
-void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement mw_de = _doc.createElement( nodeName() );
-	mw_de.setAttribute( "inputchannel", m_inputChannelSpinBox->value() );
-	mw_de.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
-	mw_de.setAttribute( "receive", m_receiveCheckBox->isChecked() );
-	mw_de.setAttribute( "send", m_sendCheckBox->isChecked() );
+	_this.setAttribute( "inputchannel", m_inputChannelSpinBox->value() );
+	_this.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
+	_this.setAttribute( "receive", m_receiveCheckBox->isChecked() );
+	_this.setAttribute( "send", m_sendCheckBox->isChecked() );
 
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
@@ -230,7 +228,7 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 		{
 			rp.truncate( rp.length() - 1 );
 		}
-		mw_de.setAttribute( "inports", rp );
+		_this.setAttribute( "inports", rp );
 	}
 
 	if( m_writeablePorts != NULL && m_sendCheckBox->isChecked() == TRUE )
@@ -261,10 +259,8 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 		{
 			wp.truncate( wp.length() - 1 );
 		}
-		mw_de.setAttribute( "outports", wp );
+		_this.setAttribute( "outports", wp );
 	}
-
-	_parent.appendChild( mw_de );
 }
 
 

@@ -49,7 +49,7 @@
 #endif
 
 
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "buffer_allocator.h"
 #include "mixer.h"
@@ -87,7 +87,7 @@ plugin::descriptor vestige_plugin_descriptor =
 QPixmap * vestigeInstrument::s_artwork = NULL;
 
 
-vestigeInstrument::vestigeInstrument( channelTrack * _channel_track ) :
+vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &vestige_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_plugin( NULL ),
@@ -211,33 +211,30 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void vestigeInstrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement vst_de = _doc.createElement( nodeName() );
-	vst_de.setAttribute( "plugin", m_pluginDLL );
+	_this.setAttribute( "plugin", m_pluginDLL );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
 		if( m_plugin->pluginWidget() != NULL )
 		{
-			vst_de.setAttribute( "guivisible",
+			_this.setAttribute( "guivisible",
 					m_plugin->pluginWidget()->isVisible() );
 		}
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
-		vst_de.setAttribute( "numparams", dump.size() );
+		_this.setAttribute( "numparams", dump.size() );
 		for( QMap<QString, QString>::const_iterator it = dump.begin();
 							it != dump.end(); ++it )
 		{
 #ifdef QT4
-			vst_de.setAttribute( it.key(), it.value() );
+			_this.setAttribute( it.key(), it.value() );
 #else
-			vst_de.setAttribute( it.key(), it.data() );
+			_this.setAttribute( it.key(), it.data() );
 #endif
 		}
 	}
 	m_pluginMutex.unlock();
-	_parent.appendChild( vst_de );
 }
 
 
@@ -258,9 +255,9 @@ void vestigeInstrument::setParameter( const QString & _param,
 	{
 		m_pluginMutex.lock();
 		bool set_ch_name = ( m_plugin != NULL &&
-			getChannelTrack()->name() == m_plugin->name() ) ||
-				getChannelTrack()->name() ==
-						channelTrack::tr( "Default" );
+			getInstrumentTrack()->name() == m_plugin->name() ) ||
+				getInstrumentTrack()->name() ==
+						instrumentTrack::tr( "Default" );
 		m_pluginMutex.unlock();
 
 		closePlugin();
@@ -305,16 +302,16 @@ void vestigeInstrument::setParameter( const QString & _param,
 		m_plugin->setTempo( eng()->getSongEditor()->getTempo() );
 		if( set_ch_name == TRUE )
 		{
-			getChannelTrack()->setName( m_plugin->name() );
+			getInstrumentTrack()->setName( m_plugin->name() );
 		}
 		if( m_plugin->pluginWidget() != NULL )
 		{
 #ifdef QT4
 			m_plugin->pluginWidget()->setWindowIcon(
-					getChannelTrack()->windowIcon() );
+					getInstrumentTrack()->windowIcon() );
 #else
 			m_plugin->pluginWidget()->setWindowIcon(
-					*( getChannelTrack()->windowIcon() ) );
+					*( getInstrumentTrack()->windowIcon() ) );
 #endif
 		}
 		m_pluginMutex.unlock();
@@ -339,7 +336,7 @@ void vestigeInstrument::play( void )
 
 	m_plugin->process( NULL, buf );
 	
-	getChannelTrack()->processAudioBuffer( buf, frames, NULL );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
 
 	bufferAllocator::free( buf );
 }
@@ -355,7 +352,7 @@ void vestigeInstrument::playNote( notePlayHandle * _n )
 	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )
 	{
 		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0,
-					getChannelTrack()->masterKey( _n ),
+					getInstrumentTrack()->masterKey( _n ),
 					_n->getVolume() ), _n->framesAhead() );
 	}
 	m_pluginMutex.unlock();
@@ -370,7 +367,7 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 	if( m_plugin != NULL )
 	{
 		m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
-					getChannelTrack()->masterKey( _n ),
+					getInstrumentTrack()->masterKey( _n ),
 								0 ), 0 );
 	}
 	m_pluginMutex.unlock();
@@ -551,7 +548,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
-	return( new vestigeInstrument( static_cast<channelTrack *>( _data ) ) );
+	return( new vestigeInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

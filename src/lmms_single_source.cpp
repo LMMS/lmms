@@ -1,8 +1,11 @@
 #ifdef SINGLE_SOURCE_COMPILE
 #undef SINGLE_SOURCE_COMPILE
+#include "src/tracks/instrument_track.cpp"
+#include "src/core/midi_tab_widget.cpp"
 #include "src/lib/string_pair_drag.cpp"
 #include "src/lib/buffer_allocator.cpp"
-#include "src/lib/edit_history.cpp"
+#include "src/lib/journalling_object.cpp"
+#include "src/lib/project_journal.cpp"
 #include "src/lib/embed.cpp"
 #include "src/lib/base64.cpp"
 #include "src/lib/mmp.cpp"
@@ -39,7 +42,6 @@
 #include "src/core/track.cpp"
 #include "src/core/file_browser.cpp"
 #include "src/core/surround_area.cpp"
-#include "src/core/midi_tab_widget.cpp"
 #include "src/midi/midi_alsa_seq.cpp"
 #include "src/midi/midi_oss.cpp"
 #include "src/midi/midi_port.cpp"
@@ -59,7 +61,6 @@
 #include "src/lmms_single_source.cpp"
 #include "src/tracks/pattern.cpp"
 #include "src/tracks/bb_track.cpp"
-#include "src/tracks/channel_track.cpp"
 #include "src/tracks/sample_track.cpp"
 #include "src/widgets/project_notes.cpp"
 #include "src/widgets/led_checkbox.cpp"

@@ -50,7 +50,7 @@ lmms_MOC =						\
 		./automatable_button.moc		\
 		./bb_editor.moc				\
 		./bb_track.moc				\
-		./channel_track.moc			\
+		./instrument_track.moc			\
 		./combobox.moc				\
 		./config_mgr.moc			\
 		./cpuload_widget.moc			\
@@ -152,7 +152,8 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
 		$(srcdir)/src/lib/clipboard.cpp				\
-		$(srcdir)/src/lib/edit_history.cpp			\
+		$(srcdir)/src/lib/journalling_object.cpp		\
+		$(srcdir)/src/lib/project_journal.cpp			\
 		$(srcdir)/src/lib/embed.cpp				\
 		$(srcdir)/src/lib/ladspa_manager.cpp			\
 		$(srcdir)/src/lib/mmp.cpp				\
@@ -166,7 +167,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_oss.cpp				\
 		$(srcdir)/src/midi/midi_port.cpp			\
 		$(srcdir)/src/tracks/bb_track.cpp			\
-		$(srcdir)/src/tracks/channel_track.cpp			\
+		$(srcdir)/src/tracks/instrument_track.cpp		\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
@@ -209,7 +210,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/interpolation.h			\
 		$(srcdir)/include/mixer.h				\
 		$(srcdir)/include/pattern.h				\
-		$(srcdir)/include/channel_track.h			\
+		$(srcdir)/include/instrument_track.h			\
 		$(srcdir)/include/note.h				\
 		$(srcdir)/include/volume.h				\
 		$(srcdir)/include/panning.h				\
@@ -220,7 +221,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/piano_widget.h			\
 		$(srcdir)/include/effect_board.h			\
 		$(srcdir)/include/pixmap_button.h			\
-		$(srcdir)/include/settings.h				\
 		$(srcdir)/include/rename_dialog.h			\
 		$(srcdir)/include/export_project_dialog.h		\
 		$(srcdir)/include/note_play_handle.h			\
@@ -300,8 +300,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/automatable_object.h			\
-		$(srcdir)/include/editable_object.h			\
-		$(srcdir)/include/edit_history.h			\
+		$(srcdir)/include/journalling_object.h			\
+		$(srcdir)/include/project_journal.h			\
 		$(srcdir)/include/import_filter.h			\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/qxembed.h

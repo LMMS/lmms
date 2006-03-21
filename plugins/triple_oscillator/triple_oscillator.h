@@ -45,7 +45,7 @@ class tripleOscillator : public instrument
 {
 	Q_OBJECT
 public:
-	tripleOscillator( channelTrack * _channel );
+	tripleOscillator( instrumentTrack * _channel );
 	virtual ~tripleOscillator();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n );
@@ -72,7 +72,7 @@ protected slots:
 
 
 private:
-	channelTrack * m_channelTrack;
+	instrumentTrack * m_instrumentTrack;
 
 	struct oscillatorData
 	{

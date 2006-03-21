@@ -26,7 +26,7 @@
 
 
 #include "clipboard.h"
-#include "settings.h"
+#include "journalling_object.h"
 
 
 namespace clipboard
@@ -35,13 +35,12 @@ namespace clipboard
 	map content;
 
 
-	void copy( settings * _settings_object )
+	void copy( journallingObject * _obj )
 	{
 		QDomDocument doc;
 		QDomElement parent = doc.createElement( "clipboard" );
-		_settings_object->saveSettings( doc, parent );
-		content[_settings_object->nodeName()] =
-						parent.firstChild().toElement();
+		_obj->saveState( doc, parent );
+		content[_obj->nodeName()] = parent.firstChild().toElement();
 	}
 
 

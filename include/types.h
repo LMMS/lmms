@@ -54,6 +54,6 @@ typedef Uint16 bpm_t;			// tempo (MIN_BPM to MAX_BPM)
 typedef Uint16 bitrate_t;		// bitrate in kbps
 typedef Sint8 fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
-typedef Uint32 eo_id_t;			// (unique) ID of an editable object
+typedef Uint32 jo_id_t;			// (unique) ID of an journalling object
 
 #endif

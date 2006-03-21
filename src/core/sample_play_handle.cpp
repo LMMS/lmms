@@ -34,7 +34,8 @@
 
 samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 							engine * _engine ) :
-	playHandle( SAMPLE_PLAY_HANDLE, _engine ),
+	playHandle( SAMPLE_PLAY_HANDLE ),
+	engineObject( _engine ),
 	m_sampleBuffer( new sampleBuffer( eng(), _sample_file ) ),
 	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
@@ -47,7 +48,8 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 
 
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
-	playHandle( SAMPLE_PLAY_HANDLE, _sample_buffer->eng() ),
+	playHandle( SAMPLE_PLAY_HANDLE ),
+	engineObject( _sample_buffer->eng() ),
 	m_sampleBuffer( _sample_buffer ),
 	m_ownSampleBuffer( FALSE ),
 	m_doneMayReturnTrue( TRUE ),

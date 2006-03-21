@@ -39,7 +39,7 @@
 
 
 #include "plucked_string_synth.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
 #include "buffer_allocator.h"
@@ -70,7 +70,7 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 // TODO: make this synth stereo for better better spacial (room) feeling and
 // add distortion
 
-pluckedStringSynth::pluckedStringSynth( channelTrack * _channel_track ) :
+pluckedStringSynth::pluckedStringSynth( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &pluckedstringsynth_plugin_descriptor )
 {
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
@@ -107,13 +107,11 @@ pluckedStringSynth::~pluckedStringSynth()
 
 
 void pluckedStringSynth::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement pss_de = _doc.createElement( nodeName() );
-	pss_de.setAttribute( "pick", QString::number( m_pickKnob->value() ) );
-	pss_de.setAttribute( "pickup", QString::number(
+	_this.setAttribute( "pick", QString::number( m_pickKnob->value() ) );
+	_this.setAttribute( "pickup", QString::number(
 						m_pickupKnob->value() ) );
-	_parent.appendChild( pss_de );
 }
 
 
@@ -140,7 +138,7 @@ void pluckedStringSynth::playNote( notePlayHandle * _n )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getChannelTrack()->frequency( _n );
+		float freq = getInstrumentTrack()->frequency( _n );
 		_n->m_pluginData = new pluckSynth( freq, m_pickKnob->value(),
 						m_pickupKnob->value(),
 					eng()->getMixer()->sampleRate() );
@@ -159,7 +157,7 @@ void pluckedStringSynth::playNote( notePlayHandle * _n )
 		}
 	}
 
-	getChannelTrack()->processAudioBuffer( buf, frames, _n );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	bufferAllocator::free( buf );
 }
@@ -269,7 +267,7 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new pluckedStringSynth(
-				static_cast<channelTrack *>( _data ) ) );
+				static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

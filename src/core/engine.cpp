@@ -26,7 +26,7 @@
 
 
 #include "bb_editor.h"
-#include "edit_history.h"
+#include "project_journal.h"
 #include "engine.h"
 #include "main_window.h"
 #include "mixer.h"
@@ -43,9 +43,9 @@ engine::engine( const bool _has_gui ) :
 	m_songEditor( NULL ),
 	m_bbEditor( NULL ),
 	m_pianoRoll( NULL ),
-	m_editHistory( NULL )
+	m_projectJournal( NULL )
 {
-	m_editHistory = new editHistory( this );
+	m_projectJournal = new projectJournal( this );
 	m_mainWindow = new mainWindow( this );
 	m_mixer = new mixer( this );
 	m_songEditor = new songEditor( this );

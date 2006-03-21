@@ -79,14 +79,14 @@ protected slots:
 	void contextMenuRequest( QListViewItem * _i, const QPoint & _pos,
 								int _col );
 #endif
-	void sendToActiveChannel( void );
-	void openInNewChannelSE( void );
-	void openInNewChannelBBE( void );
+	void sendToActiveInstrumentTrack( void );
+	void openInNewInstrumentTrackSE( void );
+	void openInNewInstrumentTrackBBE( void );
 
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
-	void openInNewChannel( trackContainer * _tc );
+	void openInNewInstrumentTrack( trackContainer * _tc );
 
 	listView * m_l;
 	fileItem * m_contextMenuItem;

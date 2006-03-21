@@ -45,7 +45,7 @@
 
 
 #include "track.h"
-#include "settings.h"
+#include "journalling_object.h"
 #include "rubberband.h"
 #include "engine.h"
 
@@ -56,7 +56,7 @@ const Uint16 DEFAULT_SCROLLBAR_SIZE = 16;
 
 
 
-class trackContainer : public QMainWindow, public settings, public engineObject
+class trackContainer : public QMainWindow, public journallingObject
 {
 	Q_OBJECT
 public:

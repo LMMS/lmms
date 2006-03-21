@@ -1,5 +1,5 @@
 /*
- * bit_invader.cpp - instrument which uses a usereditable wavetable
+ * organic.cpp - additive synthesizer for organ-like sounds
  *
  * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
@@ -57,7 +57,7 @@ using namespace std;
 
 
 #include "organic.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
 #include "buffer_allocator.h"
@@ -102,7 +102,7 @@ QPixmap * organicInstrument::s_artwork = NULL;
 ***********************************************************************/
 
 
-organicInstrument::organicInstrument( channelTrack * _channel_track ) :
+organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track,
 			&organic_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
@@ -190,7 +190,7 @@ organicInstrument::organicInstrument( channelTrack * _channel_track ) :
 		//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 		//				createHeuristicMask() ) );
 
-		connect( m_randBtn, SIGNAL ( toggled(bool) ),
+		connect( m_randBtn, SIGNAL ( clicked() ),
 			this, SLOT( randomiseSettings() ) );
 
 	// set harmonics
@@ -232,36 +232,26 @@ organicInstrument::~organicInstrument()
 
 
 
-void organicInstrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-
-	QDomElement to_de = _doc.createElement( nodeName() );
-
-	to_de.setAttribute( "num_osc", QString::number( m_num_oscillators ) );
-	to_de.setAttribute( "foldback", QString::number( fx1Knob->value() ) );
-	to_de.setAttribute( "vol", QString::number( volKnob->value() ) );
+	_this.setAttribute( "num_osc", QString::number( m_num_oscillators ) );
+	_this.setAttribute( "foldback", QString::number( fx1Knob->value() ) );
+	_this.setAttribute( "vol", QString::number( volKnob->value() ) );
 
 	for( int i = 0; i < m_num_oscillators; ++i )
 	{
 		QString is = QString::number( i );
-		to_de.setAttribute( "vol" + is, QString::number(
+		_this.setAttribute( "vol" + is, QString::number(
 						m_osc[i].volKnob->value() ) );
-		to_de.setAttribute( "pan" + is, QString::number(
+		_this.setAttribute( "pan" + is, QString::number(
 						m_osc[i].panKnob->value() ) );
-		to_de.setAttribute( "harmonic" + is, QString::number(
+		_this.setAttribute( "harmonic" + is, QString::number(
 						m_osc[i].harmonic ) );
-		to_de.setAttribute( "detune" + is, QString::number(
+		_this.setAttribute( "detune" + is, QString::number(
 						m_osc[i].detuneKnob->value() ) );
-		to_de.setAttribute( "wavetype" + is, QString::number(
+		_this.setAttribute( "wavetype" + is, QString::number(
 							m_osc[i].waveShape ) );
 	}
-	
-	
-
-	_parent.appendChild( to_de );
-
-
 }
 
 
@@ -306,7 +296,7 @@ void organicInstrument::playNote( notePlayHandle * _n )
 {
 	if( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getChannelTrack()->frequency( _n );
+		float freq = getInstrumentTrack()->frequency( _n );
 
 		oscillator * oscs_l[m_num_oscillators];
 		oscillator * oscs_r[m_num_oscillators];
@@ -417,7 +407,7 @@ void organicInstrument::playNote( notePlayHandle * _n )
 	
 	// -- --
 
-	getChannelTrack()->processAudioBuffer( buf, frames, _n );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	bufferAllocator::free( buf );
 }
@@ -535,7 +525,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
-	return( new organicInstrument( static_cast<channelTrack *>( _data ) ) );
+	return( new organicInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

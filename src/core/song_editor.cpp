@@ -65,6 +65,7 @@
 #include <qbuttongroup.h>
 
 #define addButton insert
+#define setCheckable setToggleButton
 
 #endif
 
@@ -76,7 +77,7 @@
 #include "templates.h"
 #include "export_project_dialog.h"
 #include "bb_track.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "mmp.h"
 #include "midi_client.h"
 #include "timeline.h"
@@ -94,7 +95,7 @@
 #include "combobox.h"
 #include "main_window.h"
 #include "import_filter.h"
-#include "edit_history.h"
+#include "project_journal.h"
 
 #include "debug.h"
 
@@ -382,7 +383,7 @@ songEditor::songEditor( engine * _engine ) :
 					static_cast<int>( powf( 2.0f, i ) ) ) +
 									"%" );
 	}
-	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
+	m_zoomingComboBox->setInitValue( m_zoomingComboBox->findText(
 								"100%" ) );
 	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingChanged( const QString & ) ) );
@@ -1339,7 +1340,7 @@ bool songEditor::mayChangeProject( void )
 
 void songEditor::clearProject( void )
 {
-	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
+	eng()->getProjectJournal()->setJournalling( FALSE );
 
 	if( m_playing )
 	{
@@ -1362,11 +1363,14 @@ void songEditor::clearProject( void )
 	}
 
 	clearAllTracks();
+
 	eng()->getBBEditor()->clearAllTracks();
 
 	eng()->getProjectNotes()->clear();
 
-	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
+	eng()->getProjectJournal()->clear();
+
+	eng()->getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -1378,15 +1382,15 @@ void songEditor::createNewProject( void )
 {
 	clearProject();
 
-	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
+	eng()->getProjectJournal()->setJournalling( FALSE );
 
 	track * t;
 	t = track::create( track::CHANNEL_TRACK, this );
-	dynamic_cast< channelTrack * >( t )->loadInstrument(
+	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	track::create( track::SAMPLE_TRACK, this );
 	t = track::create( track::CHANNEL_TRACK, eng()->getBBEditor() );
-	dynamic_cast< channelTrack * >( t )->loadInstrument(
+	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
 
@@ -1402,7 +1406,7 @@ void songEditor::createNewProject( void )
 
 	eng()->getMainWindow()->resetWindowTitle( "" );
 
-	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
+	eng()->getProjectJournal()->setJournalling( TRUE );
 
 }
 
@@ -1426,7 +1430,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 {
 	clearProject();
 
-	eng()->getEditHistory()->setGlobalStepRecording( FALSE );
+	eng()->getProjectJournal()->setJournalling( FALSE );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -1485,24 +1489,24 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 		{
 			if( node.nodeName() == "trackcontainer" )
 			{
-				loadSettings( node.toElement() );
+				restoreState( node.toElement() );
 			}
 			else if( node.nodeName() ==
 					eng()->getPianoRoll()->nodeName() )
 			{
-				eng()->getPianoRoll()->loadSettings(
+				eng()->getPianoRoll()->restoreState(
 							node.toElement() );
 			}
 			else if( node.nodeName() ==
 					eng()->getProjectNotes()->nodeName() )
 			{
-				eng()->getProjectNotes()->loadSettings(
+				eng()->getProjectNotes()->restoreState(
 							node.toElement() );
 			}
 			else if( node.nodeName() ==
 				m_playPos[PLAY_SONG].m_timeLine->nodeName() )
 			{
-				m_playPos[PLAY_SONG].m_timeLine->loadSettings(
+				m_playPos[PLAY_SONG].m_timeLine->restoreState(
 							node.toElement() );
 			}
 		}
@@ -1516,7 +1520,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 
 	eng()->getMainWindow()->resetWindowTitle( "" );
 
-	eng()->getEditHistory()->setGlobalStepRecording( TRUE );
+	eng()->getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -1540,11 +1544,11 @@ bool songEditor::saveProject( void )
 	mmp.head().appendChild( mp );
 
 
-	saveSettings( mmp, mmp.content() );
+	saveState( mmp, mmp.content() );
 
-	eng()->getPianoRoll()->saveSettings( mmp, mmp.content() );
-	eng()->getProjectNotes()->saveSettings( mmp, mmp.content() );
-	m_playPos[PLAY_SONG].m_timeLine->saveSettings( mmp, mmp.content() );
+	eng()->getPianoRoll()->saveState( mmp, mmp.content() );
+	eng()->getProjectNotes()->saveState( mmp, mmp.content() );
+	m_playPos[PLAY_SONG].m_timeLine->saveState( mmp, mmp.content() );
 
 	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||
 					m_fileName != m_oldFileName ) == TRUE )
@@ -1687,27 +1691,12 @@ void songEditor::exportProject( void )
 
 
 
-
-void songEditor::saveSettings( QDomDocument & _doc, QDomElement & _parent )
-{
-	trackContainer::saveSettings( _doc, _parent );
-}
-
-
-
-
-void songEditor::loadSettings( const QDomElement & _this )
-{
-	trackContainer::loadSettings( _this );
-}
-
-
-
 #include "song_editor.moc"
 
 
 #ifdef QT3
 #undef addButton
+#undef setCheckable
 #endif
 
 

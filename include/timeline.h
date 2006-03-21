@@ -47,7 +47,7 @@ class nStateButton;
 class textFloat;
 
 
-class timeLine : public QWidget, public engineObject, public settings
+class timeLine : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:

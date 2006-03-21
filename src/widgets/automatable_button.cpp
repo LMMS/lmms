@@ -33,7 +33,7 @@ automatableButton::automatableButton( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
 	autoObj( _engine, FALSE, TRUE, FALSE ),
 	m_group( NULL ),
-	m_toggleButton( FALSE )
+	m_checkable( FALSE )
 {
 }
 
@@ -55,7 +55,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		if( m_toggleButton == FALSE )
+		if( m_checkable == FALSE )
 		{
 			setChecked( TRUE );
 		}
@@ -76,7 +76,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 
 void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
-	if( m_toggleButton == FALSE )
+	if( m_checkable == FALSE )
 	{
 		setChecked( FALSE );
 	}
@@ -88,7 +88,7 @@ void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 
 void automatableButton::toggle( void )
 {
-	if( m_toggleButton == TRUE && m_group != NULL )
+	if( m_checkable == TRUE && m_group != NULL )
 	{
 		if( value() == FALSE )
 		{
@@ -147,11 +147,11 @@ automatableButtonGroup::~automatableButtonGroup()
 void automatableButtonGroup::addButton( automatableButton * _btn )
 {
 	_btn->m_group = this;
-	_btn->setToggleButton( TRUE );
+	_btn->setCheckable( TRUE );
 	_btn->setChecked( FALSE );
 	// disable step-recording as we're recording changes of states of 
 	// button-group members on our own
-	_btn->setStepRecording( FALSE );
+	_btn->setJournalling( FALSE );
 
 	m_buttons.push_back( _btn );
 	setRange( 0, m_buttons.size() - 1 );

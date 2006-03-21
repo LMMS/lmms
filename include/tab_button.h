@@ -48,7 +48,11 @@ public:
 		QPushButton( _text, _parent ),
 		m_id( _id )
 	{
+#ifndef QT3
 		setCheckable( TRUE );
+#else
+		setToggleButton( TRUE );
+#endif
 		connect( this, SIGNAL( clicked() ), this,
 						SLOT( slotClicked() ) );
 	}

@@ -28,12 +28,22 @@
 
 #include <math.h>
 
-#include "editable_object.h"
+#include "journalling_object.h"
 #include "templates.h"
+
+#ifndef QT3
+
+#include <Qt/QtXml>
+
+#else
+
+#include <qdom.h>
+
+#endif
 
 
 template<typename T, typename EDIT_STEP_TYPE = T>
-class automatableObject : public editableObject
+class automatableObject : public journallingObject
 {
 public:
 	typedef automatableObject<T, EDIT_STEP_TYPE> autoObj;
@@ -41,7 +51,7 @@ public:
 	automatableObject( engine * _engine, const T _val = 0, const T _min = 0,
 				const T _max = 0,
 				const T _step = defaultRelStep() ) :
-		editableObject( _engine ),
+		journallingObject( _engine ),
 		m_oldValue( _val ),
 		m_value( _val ),
 		m_minValue( _min ),
@@ -127,9 +137,9 @@ public:
 
 	inline virtual void setInitValue( const T _value )
 	{
-		saveStepRecordingState( FALSE );
+		saveJournallingState( FALSE );
 		setValue( _value );
-		restoreStepRecordingState();
+		restoreJournallingState();
 	}
 
 	inline virtual void setValue( const T _value )
@@ -140,10 +150,9 @@ public:
 		if( old_val != m_value )
 		{
 			// add changes to history so user can undo it
-			addStep( editStep( 0, static_cast<EDIT_STEP_TYPE>(
-							m_value ) -
-						static_cast<EDIT_STEP_TYPE>(
-							old_val ) ) );
+			addJournalEntry( journalEntry( 0,
+				static_cast<EDIT_STEP_TYPE>( m_value ) -
+				static_cast<EDIT_STEP_TYPE>( old_val ) ) );
 
 			// notify linked objects
 
@@ -158,10 +167,10 @@ public:
 					it->fittedValue( value() ) !=
 								it->value() )
 				{
-					it->saveStepRecordingState(
-							isRecordingSteps() );
+					it->saveJournallingState(
+							isJournalling() );
 					it->setValue( value() );
-					it->restoreStepRecordingState();
+					it->restoreJournallingState();
 				}
 			}
 		}
@@ -238,39 +247,57 @@ public:
 		_object2->linkObject( _object1 );
 	}
 
+	virtual QString nodeName( void ) const
+	{
+		return( "automatableobject" );
+	}
+
 
 protected:
-	virtual void redoStep( const editStep & _edit_step )
+	virtual void redoStep( journalEntry & _je )
 	{
-		saveStepRecordingState( FALSE );
+		saveJournallingState( FALSE );
 #ifndef QT3
 		setValue( static_cast<T>( value() +
-				_edit_step.data().value<EDIT_STEP_TYPE>() ) );
+					_je.data().value<EDIT_STEP_TYPE>() ) );
 #else
 		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
-					_edit_step.data().toDouble() ) ) );
+						_je.data().toDouble() ) ) );
 #endif
-		restoreStepRecordingState();
+		restoreJournallingState();
 	}
 
-	virtual void undoStep( const editStep & _edit_step )
+	virtual void undoStep( journalEntry & _je )
 	{
+		journalEntry je( _je.actionID(),
 #ifndef QT3
-		redoStep( editStep( _edit_step.actionID(),
-				-_edit_step.data().value<EDIT_STEP_TYPE>() ) );
+					-_je.data().value<EDIT_STEP_TYPE>();
 #else
-		redoStep( editStep( _edit_step.actionID(),
-				static_cast<EDIT_STEP_TYPE>(
-					-_edit_step.data().toDouble() ) ) );
+			static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() )
 #endif
+				);
+		redoStep( je );
 	}
+
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+							QDomElement & _this )
+	{
+		_this.setAttribute( "value", value() );
+	}
+
+	virtual void FASTCALL loadSettings( const QDomElement & _this )
+	{
+		setValue( static_cast<T>(
+				_this.attribute( "value" ).toDouble() ) );
+	}
+
 
 	// most objects will need this temporarily
 	T m_oldValue;
 
-	inline void addStepFromOldToCurVal( void )
+	inline void addJournalEntryFromOldToCurVal( void )
 	{
-		addStep( editStep( 0, value() - m_oldValue ) );
+		addJournalEntry( journalEntry( 0, value() - m_oldValue ) );
 	}
 
 

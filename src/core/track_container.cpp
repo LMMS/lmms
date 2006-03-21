@@ -55,7 +55,7 @@
 #include "mixer.h"
 #include "song_editor.h"
 #include "string_pair_drag.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "mmp.h"
 #include "config_mgr.h"
 #include "import_filter.h"
@@ -70,8 +70,7 @@ trackContainer::trackContainer( engine * _engine ) :
 				, 0, Qt::WStyle_Title
 #endif
 			 ),
-	settings(),
-	engineObject( _engine ),
+	journallingObject( _engine ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
@@ -105,18 +104,17 @@ trackContainer::~trackContainer()
 
 
 
-void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement tc_de = _doc.createElement( "trackcontainer" );
-	tc_de.setAttribute( "type", nodeName() );
-	mainWindow::saveWidgetState( this, tc_de );
-	_parent.appendChild( tc_de );
+	_this.setTagName( "trackcontainer" );
+	_this.setAttribute( "type", nodeName() );
+	mainWindow::saveWidgetState( this, _this );
 
 	// save settings of each track
 	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{
-		( *it )->getTrack()->saveSettings( _doc, tc_de );
+		( *it )->getTrack()->saveState( _doc, _this );
 	}
 }
 
@@ -170,7 +168,8 @@ void trackContainer::loadSettings( const QDomElement & _this )
 			break;
 		}
 
-		if( node.isElement() )
+		if( node.isElement() &&
+			!node.toElement().attribute( "metadata" ).toInt() )
 		{
 			track::create( node.toElement(), this );
 		}
@@ -436,32 +435,32 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	QString value = stringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::CHANNEL_TRACK,
 								this ) );
-		ct->loadInstrument( value );
-		ct->toggledChannelButton( TRUE );
+		it->loadInstrument( value );
+		it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "sampledata" || type == "samplefile" )
 	{
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::CHANNEL_TRACK,
 								this ) );
-		instrument * i = ct->loadInstrument( "audiofileprocessor" );
+		instrument * i = it->loadInstrument( "audiofileprocessor" );
 		i->setParameter( type, value );
-		ct->toggledChannelButton( TRUE );
+		it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "presetfile" )
 	{
 		multimediaProject mmp( value );
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::CHANNEL_TRACK,
 								this ) );
-		ct->loadTrackSpecificSettings( mmp.content().firstChild().
+		it->loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );
-		ct->toggledChannelButton( TRUE );
+		it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "midifile" )

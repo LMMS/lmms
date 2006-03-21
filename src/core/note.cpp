@@ -45,8 +45,10 @@
 
 
 
-note::note( const midiTime & _length, const midiTime & _pos, tones _tone,
-			octaves _octave, volume _volume, panning _panning ) :
+note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
+		tones _tone, octaves _octave, volume _volume,
+							panning _panning ) :
+	journallingObject( _engine ),
 	m_tone( C ),
 	m_octave( DEFAULT_OCTAVE ),
 	m_volume( DEFAULT_VOLUME ),
@@ -54,10 +56,15 @@ note::note( const midiTime & _length, const midiTime & _pos, tones _tone,
 	m_length( _length ),
 	m_pos( _pos )
 {
+	//saveJournallingState( FALSE );
+	setJournalling( FALSE );
+
 	setTone( _tone );
 	setOctave( _octave );
 	setVolume( _volume );
 	setPanning( _panning );
+
+	//restoreJournallingState();
 }
 
 
@@ -72,6 +79,7 @@ note::~note()
 
 void note::setLength( const midiTime & _length )
 {
+	addJournalEntry( journalEntry( CHANGE_LENGTH, m_length - _length ) );
 	m_length = _length;
 }
 
@@ -80,6 +88,7 @@ void note::setLength( const midiTime & _length )
 
 void note::setPos( const midiTime & _pos )
 {
+	addJournalEntry( journalEntry( CHANGE_POSITION, m_pos - _pos ) );
 	m_pos = _pos;
 }
 
@@ -88,17 +97,9 @@ void note::setPos( const midiTime & _pos )
 
 void note::setTone( const tones _tone )
 {
-	if( _tone >= C && _tone <= H )
-	{
-		m_tone = _tone;
-	}
-	else
-	{
-		m_tone = tLimit( _tone, C, H );
-#ifdef LMMS_DEBUG
-		printf ( "Tone out of range (note::setTone)\n" );
-#endif
-	}
+	const tones t = tLimit( _tone, C, H );
+	addJournalEntry( journalEntry( CHANGE_KEY, (int) m_tone - t ) );
+	m_tone = t;
 }
 
 
@@ -106,17 +107,10 @@ void note::setTone( const tones _tone )
 
 void note::setOctave( const octaves _octave )
 {
-	if( _octave >= MIN_OCTAVE && _octave <= MAX_OCTAVE )
-	{
-		m_octave = _octave;
-	}
-	else
-	{
-		m_octave = tLimit( _octave, MIN_OCTAVE, MAX_OCTAVE );
-#ifdef LMMS_DEBUG
-		printf( "Octave out of range (note::setOctave)\n" );
-#endif
-	}
+	const octaves o = tLimit( _octave, MIN_OCTAVE, MAX_OCTAVE );
+	addJournalEntry( journalEntry( CHANGE_KEY, NOTES_PER_OCTAVE *
+						( (int) m_octave - o ) ) );
+	m_octave = o;
 }
 
 
@@ -124,8 +118,12 @@ void note::setOctave( const octaves _octave )
 
 void note::setKey( const int _key )
 {
+	const int k = key();
+	saveJournallingState( FALSE );
 	setTone( static_cast<tones>( _key % NOTES_PER_OCTAVE ) );
 	setOctave( static_cast<octaves>( _key / NOTES_PER_OCTAVE ) );
+	restoreJournallingState();
+	addJournalEntry( journalEntry( CHANGE_KEY, k - key() ) );
 }
 
 
@@ -133,17 +131,9 @@ void note::setKey( const int _key )
 
 void note::setVolume( const volume _volume )
 {
-	if( _volume <= MAX_VOLUME )
-	{
-		m_volume = _volume;
-	}
-	else
-	{
-		m_volume = tMin( _volume, MAX_VOLUME );
-#ifdef LMMS_DEBUG
-		printf( "Volume out of range (note::setVolume)\n" );
-#endif
-	}
+	const volume v = tMin( _volume, MAX_VOLUME );
+	addJournalEntry( journalEntry( CHANGE_VOLUME, (int) m_volume - v ) );
+	m_volume = v;
 }
 
 
@@ -151,16 +141,9 @@ void note::setVolume( const volume _volume )
 
 void note::setPanning( const panning _panning )
 {
-	if( _panning >= PANNING_LEFT && _panning <= PANNING_RIGHT )
-	{
-		m_panning = _panning;
-	}
-#ifdef LMMS_DEBUG
-	else
-	{
-		printf( "Paning out of range (note::setPanning)\n" );
-	}
-#endif
+	const panning p = tLimit( _panning, PANNING_LEFT, PANNING_RIGHT );
+	addJournalEntry( journalEntry( CHANGE_PANNING, (int) m_panning - p ) );
+	m_panning = p;
 }
 
 
@@ -199,16 +182,14 @@ void note::quantizePos( const int _q_grid )
 
 
 
-void note::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement note_de = _doc.createElement( "note" );
-	note_de.setAttribute( "tone", m_tone );
-	note_de.setAttribute( "oct", m_octave );
-	note_de.setAttribute( "vol", m_volume );
-	note_de.setAttribute( "pan", m_panning );
-	note_de.setAttribute( "len", m_length );
-	note_de.setAttribute( "pos", m_pos );
-	_parent.appendChild( note_de );
+	_this.setAttribute( "tone", m_tone );
+	_this.setAttribute( "oct", m_octave );
+	_this.setAttribute( "vol", m_volume );
+	_this.setAttribute( "pan", m_panning );
+	_this.setAttribute( "len", m_length );
+	_this.setAttribute( "pos", m_pos );
 }
 
 
@@ -225,6 +206,44 @@ void note::loadSettings( const QDomElement & _this )
 }
 
 
+
+
+void note::undoStep( journalEntry & _je )
+{
+	saveJournallingState( FALSE );
+	switch( static_cast<actions>( _je.actionID() ) )
+	{
+		case CHANGE_KEY:
+			setKey( key() - _je.data().toInt() );
+			break;
+
+		case CHANGE_VOLUME:
+			setVolume( getVolume() - _je.data().toInt() );
+			break;
+
+		case CHANGE_PANNING:
+			setVolume( getPanning() - _je.data().toInt() );
+			break;
+
+		case CHANGE_LENGTH:
+			setLength( length() - _je.data().toInt() );
+			break;
+
+		case CHANGE_POSITION:
+			setPos( pos() - _je.data().toInt() );
+			break;
+	}
+	restoreJournallingState();
+}
+
+
+
+
+void note::redoStep( journalEntry & _je )
+{
+	journalEntry je( _je.actionID(), -_je.data().toInt() );
+	undoStep( je );
+}
 
 
 

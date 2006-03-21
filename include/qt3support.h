@@ -130,8 +130,6 @@ inline QString baseName( const QString & _file )
 
 
 // QAbstractButton/QButton
-#define setCheckable setToggleButton
-#define isCheckable isToggleButton
 #define setShortcut setAccel
 
 

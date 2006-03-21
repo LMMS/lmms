@@ -56,7 +56,7 @@
 
 
 #include "pattern.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
@@ -81,13 +81,13 @@ QPixmap * pattern::s_frozen = NULL;
 
 
 
-pattern::pattern ( channelTrack * _channel_track ) :
-	trackContentObject( _channel_track ),
+pattern::pattern ( instrumentTrack * _instrument_track ) :
+	trackContentObject( _instrument_track ),
 	m_paintPixmap(),
 	m_needsUpdate( TRUE ),
-	m_channelTrack( _channel_track ),
+	m_instrumentTrack( _instrument_track ),
 	m_patternType( BEAT_PATTERN ),
-	m_name( _channel_track->name() ),
+	m_name( _instrument_track->name() ),
 	m_steps( DEFAULT_STEPS_PER_TACT ),
 	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
@@ -101,10 +101,10 @@ pattern::pattern ( channelTrack * _channel_track ) :
 
 
 pattern::pattern( const pattern & _pat_to_copy ) :
-	trackContentObject( _pat_to_copy.m_channelTrack ),
+	trackContentObject( _pat_to_copy.m_instrumentTrack ),
 	m_paintPixmap(),
 	m_needsUpdate( TRUE ),
-	m_channelTrack( _pat_to_copy.m_channelTrack ),
+	m_instrumentTrack( _pat_to_copy.m_instrumentTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
 	m_steps( _pat_to_copy.m_steps ),
@@ -186,12 +186,12 @@ void pattern::init( void )
 		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
 	}
 
-	saveStepRecordingState( FALSE );
+	saveJournallingState( FALSE );
 
 	ensureBeatNotes();
 
 	changeLength( length() );
-	restoreStepRecordingState();
+	restoreJournallingState();
 
 #ifndef QT4
 	// set background-mode for flicker-free redraw
@@ -411,27 +411,25 @@ void pattern::playFrozenData( sampleFrame * _ab, const f_cnt_t _start_frame,
 
 
 
-void pattern::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement pattern_de = _doc.createElement( nodeName() );
-	pattern_de.setAttribute( "type", m_patternType );
-	pattern_de.setAttribute( "name", m_name );
+	_this.setAttribute( "type", m_patternType );
+	_this.setAttribute( "name", m_name );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
-	if( _parent.nodeName() == "clipboard" ||
-					_parent.nodeName() == "dnddata" )
+	if( _this.parentNode().nodeName() == "clipboard" ||
+				_this.parentNode().nodeName() == "dnddata" )
 	{
-		pattern_de.setAttribute( "pos", -1 );
+		_this.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		pattern_de.setAttribute( "pos", startPosition() );
+		_this.setAttribute( "pos", startPosition() );
 	}
-	pattern_de.setAttribute( "len", length() );
-	pattern_de.setAttribute( "steps", m_steps );
-	pattern_de.setAttribute( "frozen", m_frozenPattern != NULL );
-	_parent.appendChild( pattern_de );
+	_this.setAttribute( "len", length() );
+	_this.setAttribute( "steps", m_steps );
+	_this.setAttribute( "frozen", m_frozenPattern != NULL );
 
 	// now save settings of all notes
 	for( noteVector::iterator it = m_notes.begin();
@@ -439,7 +437,7 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 	{
 		if( ( *it )->length() )
 		{
-			( *it )->saveSettings( _doc, pattern_de );
+			( *it )->saveState( _doc, _this );
 		}
 	}
 }
@@ -465,10 +463,11 @@ void pattern::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( node.isElement() )
+		if( node.isElement() &&
+			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			note * n = new note();
-			n->loadSettings( node.toElement() );
+			note * n = new note( eng() );
+			n->restoreState( node.toElement() );
 			m_notes.push_back( n );
 		}
 		node = node.nextSibling();
@@ -530,7 +529,7 @@ void pattern::clear( void )
 
 void pattern::resetName( void )
 {
-	m_name = m_channelTrack->name();
+	m_name = m_instrumentTrack->name();
 }
 
 
@@ -558,7 +557,7 @@ void pattern::freeze( void )
 						QMessageBox::Ok );
 		return;
 	}
-	if( m_channelTrack->muted() )
+	if( m_instrumentTrack->muted() )
 	{
 		if( QMessageBox::
 #if QT_VERSION >= 0x030200		
@@ -1143,7 +1142,7 @@ void pattern::ensureBeatNotes( void )
 		}
 		if( found == FALSE )
 		{
-			addNote( note( midiTime( 0 ), midiTime( i *
+			addNote( note( eng(), midiTime( 0 ), midiTime( i *
 							BEATS_PER_TACT ) ) );
 		}
 	}

@@ -42,7 +42,7 @@
 
 
 #include "piano_widget.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "midi.h"
 #include "templates.h"
 #include "embed.h"
@@ -77,9 +77,9 @@ const int PW_BLACK_KEY_HEIGHT = 38;
 const int LABEL_TEXT_SIZE = 7;
 
 
-pianoWidget::pianoWidget (channelTrack * _parent ) :
+pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	QWidget( _parent ),
-	m_channelTrack( _parent ),
+	m_instrumentTrack( _parent ),
 	m_startTone( C ),
 	m_startOctave( OCTAVE_3 )
 {
@@ -242,7 +242,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 				vol = DEFAULT_VOLUME;
 			}
 			// set note on
-			m_channelTrack->processInEvent(
+			m_instrumentTrack->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
 							vol * 127 / 100 ),
 								midiTime() );
@@ -250,9 +250,9 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			m_channelTrack->setBaseTone( static_cast<tones>(
+			m_instrumentTrack->setBaseTone( static_cast<tones>(
 						key_num % NOTES_PER_OCTAVE ) );
-			m_channelTrack->setBaseOctave( static_cast<octaves>(
+			m_instrumentTrack->setBaseOctave( static_cast<octaves>(
 						key_num / NOTES_PER_OCTAVE ) );
 		}
 
@@ -269,7 +269,7 @@ void pianoWidget::mouseReleaseEvent( QMouseEvent * _me )
 {
 	int released_key = getKeyFromMouse( _me->pos() );
 
-	m_channelTrack->processInEvent(
+	m_instrumentTrack->processInEvent(
 			midiEvent( NOTE_OFF, 0, released_key, 0 ), midiTime() );
 	m_pressedKeys[released_key] = FALSE;
 
@@ -309,7 +309,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 	// user just moved the cursor one pixel left but on the same key)
 	if( key_num != released_key )
 	{
-		m_channelTrack->processInEvent(
+		m_instrumentTrack->processInEvent(
 				midiEvent( NOTE_OFF, 0, released_key, 0 ),
 								midiTime() );
 		m_pressedKeys[released_key] = FALSE;
@@ -321,16 +321,16 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
-				m_channelTrack->processInEvent(
+				m_instrumentTrack->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num, vol ),
 								midiTime() );
 				m_pressedKeys[key_num] = TRUE;
 			}
 			else
 			{
-				m_channelTrack->setBaseTone( (tones)
+				m_instrumentTrack->setBaseTone( (tones)
 					( key_num % NOTES_PER_OCTAVE ) );
-				m_channelTrack->setBaseOctave( (octaves)
+				m_instrumentTrack->setBaseOctave( (octaves)
 					( key_num / NOTES_PER_OCTAVE ) );
 			}
 		}
@@ -339,7 +339,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_pressedKeys[key_num] == TRUE )
 	{
-		m_channelTrack->processInEvent(
+		m_instrumentTrack->processInEvent(
 				midiEvent( KEY_PRESSURE, 0, key_num, vol ),
 								midiTime() );
 	}
@@ -397,7 +397,7 @@ void pianoWidget::keyPressEvent( QKeyEvent * _ke )
 
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
-		m_channelTrack->processInEvent(
+		m_instrumentTrack->processInEvent(
 			midiEvent( NOTE_ON, 0, key_num, DEFAULT_VOLUME ),
 								midiTime() );
 		m_pressedKeys[key_num] = TRUE;
@@ -418,7 +418,7 @@ void pianoWidget::keyReleaseEvent( QKeyEvent * _ke )
 				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
-		m_channelTrack->processInEvent(
+		m_instrumentTrack->processInEvent(
 					midiEvent( NOTE_OFF, 0, key_num, 0 ),
 								midiTime() );
 		m_pressedKeys[key_num] = FALSE;
@@ -442,7 +442,7 @@ void pianoWidget::focusOutEvent( QFocusEvent * )
 	{
 		if( m_pressedKeys[i] == TRUE )
 		{
-			m_channelTrack->processInEvent(
+			m_instrumentTrack->processInEvent(
 						midiEvent( NOTE_OFF, 0, i, 0 ),
 								midiTime() );
 			m_pressedKeys[i] = FALSE;
@@ -523,8 +523,8 @@ void pianoWidget::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor ( 0xFF, 0xFF, 0xFF ) );
 
-	int base_key = m_channelTrack->baseTone() +
-				m_channelTrack->baseOctave() * NOTES_PER_OCTAVE;
+	int base_key = m_instrumentTrack->baseTone() +
+			m_instrumentTrack->baseOctave() * NOTES_PER_OCTAVE;
 	if( KEY_ORDER[base_key % NOTES_PER_OCTAVE] == WHITE_KEY )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,

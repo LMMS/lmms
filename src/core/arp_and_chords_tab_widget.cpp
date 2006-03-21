@@ -2,7 +2,7 @@
 
 /*
  * arp_and_chords_tab_widget.cpp - widget for use in arp/chord-tab of 
- *                                 channel-window
+ *                                 instrument-track-window
  *
  * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -57,7 +57,7 @@
 #include "tooltip.h"
 #include "gui_templates.h"
 #include "tempo_sync_knob.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "led_checkbox.h"
 #include "preset_preview_play_handle.h"
 #include "combobox.h"
@@ -194,10 +194,9 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 
 
-arpAndChordsTabWidget::arpAndChordsTabWidget( channelTrack * _channel_track ) :
-	QWidget( _channel_track->tabWidgetParent() ),
-	settings(),
-	engineObject( _channel_track->eng() )
+arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_track ) :
+	QWidget( _instrument_track->tabWidgetParent() ),
+	journallingObject( _instrument_track->eng() )
 {
 	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this, eng() );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
@@ -449,7 +448,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 					break;
 				}
 				// create copy of base-note
-				note note_copy( 0, 0, (tones)( sub_note_key %
+				note note_copy( NULL, 0, 0,
+						(tones)( sub_note_key %
 							NOTES_PER_OCTAVE ),
 						(octaves)( sub_note_key /
 							NOTES_PER_OCTAVE ),
@@ -459,9 +459,9 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 				// different
 				notePlayHandle * note_play_handle =
 					new notePlayHandle(
-						_n->getChannelTrack(),
+						_n->getInstrumentTrack(),
 						_n->framesAhead(),
-						_n->frames(), &note_copy );
+						_n->frames(), note_copy );
 				// add sub-note to base-note, now all stuff is
 				// done by notePlayHandle::play_note()
 				_n->addSubNote( note_play_handle );
@@ -484,12 +484,12 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	const int selected_arp = m_arpComboBox->value();
 
 	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfChannelTrack(
-							_n->getChannelTrack() );
+							_n->getInstrumentTrack() );
 	if( m_arpModeComboBox->value() != FREE && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
 		cnphv = presetPreviewPlayHandle::nphsOfChannelTrack(
-							_n->getChannelTrack() );
+							_n->getInstrumentTrack() );
 		if( cnphv.size() == 0 )
 		{
 			// still nothing found here, so lets return
@@ -600,7 +600,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		}
 
 		// create new arp-note
-		note new_note( midiTime( 0 ), midiTime( 0 ),
+		note new_note( NULL, midiTime( 0 ), midiTime( 0 ),
 				static_cast<tones>( sub_note_key %
 							NOTES_PER_OCTAVE ),
 				static_cast<octaves>( sub_note_key /
@@ -612,14 +612,14 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// duplicate note-play-handle, only ptr to note is different
 		// and is_arp_note=TRUE
 		notePlayHandle * note_play_handle = new notePlayHandle(
-						_n->getChannelTrack(),
+						_n->getInstrumentTrack(),
 					( ( m_arpModeComboBox->value() !=
 					    				FREE ) ?
 						cnphv.first()->framesAhead() :
 						_n->framesAhead() ) +
 							frames_processed,
 						gated_frames,
-						&new_note,
+						new_note,
 						TRUE );
 
 		// add sub-note to base-note - now all stuff is done by
@@ -643,24 +643,22 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 
 void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement act_de = _doc.createElement( nodeName() );
-	act_de.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
-	act_de.setAttribute( "chord", m_chordsComboBox->value() );
-	act_de.setAttribute( "chordrange", m_chordRangeKnob->value() );
+	_this.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
+	_this.setAttribute( "chord", m_chordsComboBox->value() );
+	_this.setAttribute( "chordrange", m_chordRangeKnob->value() );
 
-	act_de.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
-	act_de.setAttribute( "arp", m_arpComboBox->value() );
-	act_de.setAttribute( "arprange", m_arpRangeKnob->value() );
-	act_de.setAttribute( "arptime", m_arpTimeKnob->value() );
-	act_de.setAttribute( "arpgate", m_arpGateKnob->value() );
-	act_de.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() );
-	act_de.setAttribute( "arpsyncmode",
+	_this.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
+	_this.setAttribute( "arp", m_arpComboBox->value() );
+	_this.setAttribute( "arprange", m_arpRangeKnob->value() );
+	_this.setAttribute( "arptime", m_arpTimeKnob->value() );
+	_this.setAttribute( "arpgate", m_arpGateKnob->value() );
+	_this.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() );
+	_this.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
-	act_de.setAttribute( "arpmode", m_arpModeComboBox->value() );
-	_parent.appendChild( act_de );
+	_this.setAttribute( "arpmode", m_arpModeComboBox->value() );
 }
 
 

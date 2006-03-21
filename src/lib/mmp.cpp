@@ -55,11 +55,14 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::UNKNOWN, "unknown" },
 	{ multimediaProject::SONG_PROJECT, "song" },
 	{ multimediaProject::SONG_PROJECT_TEMPLATE, "songtemplate" },
-	{ multimediaProject::CHANNEL_SETTINGS, "channelsettings" },
+#warning compat-code, remove in 0.3.0
+	{ multimediaProject::INSTRUMENT_TRACK_SETTINGS,
+				"instrumenttracksettings,channelsettings" },
 	{ multimediaProject::DRAG_N_DROP_DATA, "dnddata" },
+	{ multimediaProject::JOURNAL_DATA, "journaldata" },
 	{ multimediaProject::EFFECT_SETTINGS, "effectsettings" },
-	{ multimediaProject::VIDEO_PROJECT, "video" },
-	{ multimediaProject::BURN_PROJECT, "burn" },
+	{ multimediaProject::VIDEO_PROJECT, "videoproject" },
+	{ multimediaProject::BURN_PROJECT, "burnproject" },
 	{ multimediaProject::PLAYLIST, "playlist" }
 } ;
 
@@ -162,7 +165,9 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 			{
 				m_head = node.toElement();
 			}
-			else if( node.nodeName() == typeName( m_type ) )
+			else if( node.nodeName() == typeName( m_type ) ||
+#warning compat-code, remove in 0.3.0
+					node.nodeName() == "channelsettings" )
 			{
 				m_content = node.toElement();
 			}
@@ -189,7 +194,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 #endif
 									);
 	QString fn = _fn;
-	if( type() == CHANNEL_SETTINGS )
+	if( type() == INSTRUMENT_TRACK_SETTINGS )
 	{
 		if( fn.section( '.', -2, -1 ) != "cs.xml" )
 		{
@@ -282,7 +287,12 @@ multimediaProject::projectTypes multimediaProject::type(
 {
 	for( int i = 0; i < PROJ_TYPE_COUNT; ++i )
 	{
-		if( s_types[i].m_name == _type_name )
+		if( s_types[i].m_name == _type_name || (
+			s_types[i].m_name.contains( "," ) && (
+			s_types[i].m_name.section( ',', 0, 0 ) == _type_name ||
+			s_types[i].m_name.section( ',', 1, 1 ) == _type_name ) )
+							)
+
 		{
 			return( static_cast<multimediaProject::projectTypes>(
 									i ) );

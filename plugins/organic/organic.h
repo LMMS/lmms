@@ -1,6 +1,5 @@
 /*
- * bit_invader.h - declaration of class bitInvader and bSynth which
- *                         are a wavetable synthesizer
+ * organic.h - additive synthesizer for organ-like sounds
  *
  * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
@@ -54,7 +53,7 @@ class organicInstrument : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:
-	organicInstrument(channelTrack * _channel_track );
+	organicInstrument( instrumentTrack * _channel_track );
 	virtual ~organicInstrument();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n );

@@ -64,9 +64,9 @@ sampleTCO::sampleTCO( track * _track ) :
 	setBackgroundMode( Qt::NoBackground );
 #endif
 
-	saveStepRecordingState( FALSE );
+	saveJournallingState( FALSE );
 	setSampleFile( "" );
-	restoreStepRecordingState();
+	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
@@ -253,26 +253,24 @@ midiTime sampleTCO::getSampleLength( void ) const
 
 
 void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement sampletco_de = _doc.createElement( nodeName() );
-	if( _parent.nodeName() == "clipboard" )
+	if( _this.parentNode().nodeName() == "clipboard" )
 	{
-		sampletco_de.setAttribute( "pos", -1 );
+		_this.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		sampletco_de.setAttribute( "pos", startPosition() );
+		_this.setAttribute( "pos", startPosition() );
 	}
-	sampletco_de.setAttribute( "len", length() );
-	sampletco_de.setAttribute( "src", sampleFile() );
+	_this.setAttribute( "len", length() );
+	_this.setAttribute( "src", sampleFile() );
 	if( sampleFile() == "" )
 	{
 		QString s;
-		sampletco_de.setAttribute( "data", m_sampleBuffer.toBase64( s ) );
+		_this.setAttribute( "data", m_sampleBuffer.toBase64( s ) );
 	}
 	// TODO: start- and end-frame
-	_parent.appendChild( sampletco_de );
 }
 
 
@@ -454,12 +452,10 @@ trackContentObject * sampleTrack::createTCO( const midiTime & )
 
 
 void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement st_de = _doc.createElement( nodeName() );
-	st_de.setAttribute( "name", m_trackLabel->text() );
-	st_de.setAttribute( "icon", m_trackLabel->pixmapFile() );
-	_parent.appendChild( st_de );
+	_this.setAttribute( "name", m_trackLabel->text() );
+	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 }
 
 

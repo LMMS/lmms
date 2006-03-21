@@ -46,7 +46,7 @@
 #include "types.h"
 #include "note.h"
 #include "engine.h"
-#include "settings.h"
+#include "journalling_object.h"
 
 
 class QPainter;
@@ -60,7 +60,7 @@ class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget, public engineObject, public settings
+class pianoRoll : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:

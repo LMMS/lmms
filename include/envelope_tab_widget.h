@@ -41,14 +41,13 @@
 #endif
 
 
-#include "settings.h"
 #include "basic_filters.h"
 #include "envelope_and_lfo_widget.h"
 
 
 class QLabel;
 
-class channelTrack;
+class instrumentTrack;
 class comboBox;
 class groupBox;
 class knob;
@@ -57,12 +56,11 @@ class pixmapButton;
 class tabWidget;
 
 
-class envelopeTabWidget : public QWidget, public settings,
-			  public engineObject
+class envelopeTabWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	envelopeTabWidget( channelTrack * _channel_track );
+	envelopeTabWidget( instrumentTrack * _channel_track );
 	virtual ~envelopeTabWidget();
 
 	void FASTCALL processAudioBuffer( sampleFrame * _ab,

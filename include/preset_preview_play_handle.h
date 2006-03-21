@@ -31,25 +31,25 @@
 
 #ifdef QT4
 
-#include <QMutex>
 #include <QMap>
 
 #else
 
-#include <qmutex.h>
 #include <qmap.h>
 
 #endif
 
 
 #include "note_play_handle.h"
+#include "engine.h"
 
 
+class instrumentTrack;
+class notePlayHandle;
 class previewTrackContainer;
-class channelTrack;
 
 
-class presetPreviewPlayHandle : public playHandle
+class presetPreviewPlayHandle : public playHandle, public engineObject
 {
 public:
 	presetPreviewPlayHandle( const QString & _preset_file,
@@ -61,7 +61,7 @@ public:
 
 	static void cleanUp( engine * _engine );
 	static constNotePlayHandleVector nphsOfChannelTrack(
-						const channelTrack * _ct );
+						const instrumentTrack * _ct );
 
 private:
 	inline previewTrackContainer * previewTC( void )

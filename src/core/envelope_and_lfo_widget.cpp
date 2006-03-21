@@ -110,13 +110,12 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 						QWidget * _parent,
 						engine * _engine ) :
 	QWidget( _parent ),
-	settings(),
+	journallingObject( _engine ),
 #ifdef QT4
 	specialBgHandlingWidget( palette().color( backgroundRole() ) ),
 #else
 	specialBgHandlingWidget( paletteBackgroundColor() ),
 #endif
-	engineObject( _engine ),
 	m_used( FALSE ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdEnv( NULL ),

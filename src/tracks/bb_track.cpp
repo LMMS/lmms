@@ -72,9 +72,9 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
-		saveStepRecordingState( FALSE );
+		saveJournallingState( FALSE );
 		changeLength( midiTime( t, 0 ) );
-		restoreStepRecordingState();
+		restoreJournallingState();
 	}
 }
 
@@ -192,21 +192,19 @@ void bbTCO::paintEvent( QPaintEvent * )
 
 
 
-void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement bbtco_de = _doc.createElement( nodeName() );
-	bbtco_de.setAttribute( "name", m_name );
-	if( _parent.nodeName() == "clipboard" )
+	_this.setAttribute( "name", m_name );
+	if( _this.parentNode().nodeName() == "clipboard" )
 	{
-		bbtco_de.setAttribute( "pos", -1 );
+		_this.setAttribute( "pos", -1 );
 	}
 	else
 	{
-		bbtco_de.setAttribute( "pos", startPosition() );
+		_this.setAttribute( "pos", startPosition() );
 	}
-	bbtco_de.setAttribute( "len", length() );
-	bbtco_de.setAttribute( "color", m_color.rgb() );
-	_parent.appendChild( bbtco_de );
+	_this.setAttribute( "len", length() );
+	_this.setAttribute( "color", m_color.rgb() );
 }
 
 
@@ -419,18 +417,16 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 
 
 void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement bbt_de = _doc.createElement( nodeName() );
-	bbt_de.setAttribute( "name", m_trackLabel->text() );
-	bbt_de.setAttribute( "icon", m_trackLabel->pixmapFile() );
-/*	bbt_de.setAttribute( "current", s_infoMap[this] ==
+	_this.setAttribute( "name", m_trackLabel->text() );
+	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
+/*	_this.setAttribute( "current", s_infoMap[this] ==
 					eng()->getBBEditor()->currentBB() );*/
-	_parent.appendChild( bbt_de );
 	if( s_infoMap[this] == 0 &&
-				_parent.parentNode().nodeName() != "clone" )
+			_this.parentNode().nodeName() != "clone" )
 	{
-		eng()->getBBEditor()->saveSettings( _doc, bbt_de );
+		eng()->getBBEditor()->saveState( _doc, _this );
 	}
 }
 
@@ -446,7 +442,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	if( _this.firstChild().isElement() )
 	{
-		eng()->getBBEditor()->loadSettings(
+		eng()->getBBEditor()->restoreState(
 					_this.firstChild().toElement() );
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if

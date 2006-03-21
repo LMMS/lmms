@@ -59,7 +59,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	automatableButton( _parent, _engine ),
 	m_text( _text )
 {
-	setToggleButton( TRUE );
+	setCheckable( TRUE );
 
 	if( _color >= TOTAL_COLORS || _color < YELLOW )
 	{

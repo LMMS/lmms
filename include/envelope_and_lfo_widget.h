@@ -49,7 +49,7 @@
 #endif
 
 
-#include "settings.h"
+#include "journalling_object.h"
 #include "types.h"
 #include "spc_bg_hndl_widget.h"
 #include "sample_buffer.h"
@@ -67,9 +67,8 @@ class tempoSyncKnob;
 
 
 
-class envelopeAndLFOWidget : public QWidget, public settings,
-				public specialBgHandlingWidget,
-				public engineObject
+class envelopeAndLFOWidget : public QWidget, public journallingObject,
+				public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:

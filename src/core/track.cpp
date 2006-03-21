@@ -51,7 +51,7 @@
 
 #include "track.h"
 #include "track_container.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "bb_track.h"
 #include "sample_track.h"
 #include "song_editor.h"
@@ -65,7 +65,7 @@
 #include "mmp.h"
 #include "main_window.h"
 #include "text_float.h"
-
+#include "project_journal.h"
 
 
 const Sint16 RESIZE_GRIP_WIDTH = 4;
@@ -88,8 +88,7 @@ trackContentObject::trackContentObject( track * _track ) :
 		, Qt::WDestructiveClose
 #endif
  		),
-	settings(),
-	editableObject( _track->eng() ),
+	journallingObject( _track->eng() ),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
@@ -112,10 +111,10 @@ trackContentObject::trackContentObject( track * _track ) :
 #endif
 	show();
 
-	setStepRecording( FALSE );
+	setJournalling( FALSE );
 	movePosition( 0 );
 	changeLength( 0 );
-	setStepRecording( TRUE );
+	setJournalling( TRUE );
 
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAcceptDrops( TRUE );
@@ -146,7 +145,7 @@ void trackContentObject::movePosition( const midiTime & _pos )
 	if( m_startPosition != _pos )
 	{
 		//getTrack()->eng()->getSongEditor()->setModified();
-		addStep( editStep( MOVE, m_startPosition - _pos ) );
+		addJournalEntry( journalEntry( MOVE, m_startPosition - _pos ) );
 		m_startPosition = _pos;
 	}
 	m_track->getTrackWidget()->changePosition();
@@ -163,7 +162,7 @@ void trackContentObject::changeLength( const midiTime & _length )
 	if( m_length != _length )
 	{
 		//getTrack()->eng()->getSongEditor()->setModified();
-		addStep( editStep( RESIZE, m_length - _length ) );
+		addJournalEntry( journalEntry( RESIZE, m_length - _length ) );
 		m_length = _length;
 	}
 	setFixedWidth( static_cast<int>( m_length * pixelsPerTact() /
@@ -197,7 +196,7 @@ void trackContentObject::dropEvent( QDropEvent * _de )
 		// at least save position before getting to moved to somewhere
 		// the user doesn't expect...
 		midiTime pos = startPosition();
-		loadSettings( mmp.content().firstChild().toElement() );
+		restoreState( mmp.content().firstChild().toElement() );
 		movePosition( pos );
 		_de->accept();
 	}
@@ -253,7 +252,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
-		saveSettings( mmp, mmp.content() );
+		saveState( mmp, mmp.content() );
 #ifdef QT4
 		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
 						128, 128,
@@ -265,8 +264,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		QPixmap thumbnail = QPixmap::grabWidget( this ).
 					convertToImage().smoothScale( s );
 #endif
-		new stringPairDrag( "tco_" +
-					QString::number( m_track->type() ),
+		new stringPairDrag( QString( "tco_%1" ).arg( m_track->type() ),
 					mmp.toString(), thumbnail, this,
 							m_track->eng() );
 	}
@@ -274,7 +272,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
-		setStepRecording( FALSE );
+		setJournalling( FALSE );
 
 		m_initialMouseX = _me->x();
 
@@ -308,7 +306,6 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( _me );
 		s_textFloat->show();
-
 	}
 	else if( ( _me->button() == Qt::MidButton/* ||
 			( _me->button() == Qt::LeftButton &&
@@ -431,8 +428,8 @@ void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( m_action == MOVE || m_action == RESIZE )
 	{
-		setStepRecording( TRUE );
-		addStep( editStep( m_action, m_oldTime -
+		setJournalling( TRUE );
+		addJournalEntry( journalEntry( m_action, m_oldTime -
 				( ( m_action == MOVE ) ?
 					m_startPosition : m_length ) ) );
 	}
@@ -493,29 +490,28 @@ float trackContentObject::pixelsPerTact( void )
 
 
 
-void trackContentObject::undoStep( const editStep & _edit_step )
+void trackContentObject::undoStep( journalEntry & _je )
 {
-	saveStepRecordingState( FALSE );
-	switch( _edit_step.actionID() )
+	saveJournallingState( FALSE );
+	switch( _je.actionID() )
 	{
 		case MOVE:
-			movePosition( startPosition() +
-						_edit_step.data().toInt() );
+			movePosition( startPosition() + _je.data().toInt() );
 			break;
 		case RESIZE:
-			changeLength( length() + _edit_step.data().toInt() );
+			changeLength( length() + _je.data().toInt() );
 			break;
 	}
-	restoreStepRecordingState();
+	restoreJournallingState();
 }
 
 
 
 
-void trackContentObject::redoStep( const editStep & _edit_step )
+void trackContentObject::redoStep( journalEntry & _je )
 {
-	undoStep( editStep( _edit_step.actionID(),
-						-_edit_step.data().toInt() ) );
+	journalEntry je( _je.actionID(), -_je.data().toInt() );
+	undoStep( je );
 }
 
 
@@ -556,7 +552,7 @@ void trackContentObject::paste( void )
 {
 	if( clipboard::getContent( nodeName() ) != NULL )
 	{
-		loadSettings( *( clipboard::getContent( nodeName() ) ) );
+		restoreState( *( clipboard::getContent( nodeName() ) ) );
 	}
 }
 
@@ -576,7 +572,7 @@ void trackContentObject::setAutoResizeEnabled( bool _e )
 // ===========================================================================
 trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 	QWidget( _parent ),
-	editableObject( _parent->getTrack()->eng() ),
+	journallingObject( _parent->getTrack()->eng() ),
 	m_trackWidget( _parent )
 {
 #ifdef QT4
@@ -625,15 +621,18 @@ csize trackContentWidget::numOfTCOs( void )
 trackContentObject * FASTCALL trackContentWidget::addTCO(
 						trackContentObject * _tco )
 {
-	//addStep( editStep( ADD_TCO, 0 ) );
+	QMap<QString, QVariant> map;
+	map["id"] = _tco->id();
+	addJournalEntry( journalEntry( ADD_TCO, map ) );
+
 	m_trackContentObjects.push_back( _tco );
 	_tco->move( 0, 1 );
 
-	_tco->saveStepRecordingState( FALSE );
+	_tco->saveJournallingState( FALSE );
 	m_trackWidget->changePosition();
-	_tco->restoreStepRecordingState();
+	_tco->restoreJournallingState();
 
-	getTrack()->eng()->getSongEditor()->setModified();
+	//getTrack()->eng()->getSongEditor()->setModified();
 	return( _tco );		// just for convenience
 }
 
@@ -656,7 +655,12 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 					_tco );
 	if( it != m_trackContentObjects.end() )
 	{
-		//addStep( editStep( REMOVE_TCO, 0 ) );
+		QMap<QString, QVariant> map;
+		multimediaProject mmp( multimediaProject::JOURNAL_DATA );
+		_tco->saveState( mmp, mmp.content() );
+		map["id"] = _tco->id();
+		map["state"] = mmp.toString();
+		addJournalEntry( journalEntry( REMOVE_TCO, map ) );
 		if( _also_delete )
 		{
 			delete _tco;
@@ -785,7 +789,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		multimediaProject mmp( value, FALSE );
 		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
-		tco->loadSettings( mmp.content().firstChild().toElement() );
+		tco->restoreState( mmp.content().firstChild().toElement() );
 		tco->movePosition( pos );
 		_de->accept();
 	}
@@ -812,9 +816,9 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 		const midiTime pos = getPosition( _me->x() ).getTact() * 64;
 		trackContentObject * tco = addTCO( getTrack()->createTCO(
 									pos ) );
-		tco->saveStepRecordingState( FALSE );
+		tco->saveJournallingState( FALSE );
 		tco->movePosition( pos );
-		tco->restoreStepRecordingState();
+		tco->restoreJournallingState();
 	}
 }
 
@@ -861,26 +865,57 @@ void trackContentWidget::resizeEvent( QResizeEvent * _re )
 
 
 
-void trackContentWidget::undoStep( const editStep & _edit_step )
+void trackContentWidget::undoStep( journalEntry & _je )
 {
-	saveStepRecordingState( FALSE );
-	switch( _edit_step.actionID() )
+	saveJournallingState( FALSE );
+	switch( _je.actionID() )
 	{
 		case ADD_TCO:
+		{
+			QMap<QString, QVariant> map = _je.data().toMap();
+			journallingObject * jo =
+	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() );
+			assert( jo != NULL );
+			multimediaProject mmp(
+					multimediaProject::JOURNAL_DATA );
+			jo->saveState( mmp, mmp.content() );
+			map["state"] = mmp.toString();
+			_je.data() = map;
+			delete jo;
 			break;
+		}
+
 		case REMOVE_TCO:
+		{
+			trackContentObject * tco = addTCO(
+						getTrack()->createTCO(
+							midiTime( 0 ) ) );
+			multimediaProject mmp(
+				_je.data().toMap()["state"].toString(), FALSE );
+			tco->restoreState(
+				mmp.content().firstChild().toElement() );
 			break;
+		}
 	}
-	restoreStepRecordingState();
+	restoreJournallingState();
 }
 
 
 
 
-void trackContentWidget::redoStep( const editStep & _edit_step )
+void trackContentWidget::redoStep( journalEntry & _je )
 {
-/*	undoStep( editStep( _edit_step.actionID(),
-						-_edit_step.data().toInt() ) );*/
+	switch( _je.actionID() )
+	{
+		case ADD_TCO:
+		case REMOVE_TCO:
+			_je.actionID() = ( _je.actionID() == ADD_TCO ) ?
+							REMOVE_TCO : ADD_TCO;
+			undoStep( _je );
+			_je.actionID() = ( _je.actionID() == ADD_TCO ) ?
+							REMOVE_TCO : ADD_TCO;
+			break;
+	}
 }
 
 
@@ -945,6 +980,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	m_muteBtn = new pixmapButton( this, m_trackWidget->getTrack()->eng() );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "mute_on" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "mute_off" ) );
+	m_muteBtn->setCheckable( TRUE );
 	m_muteBtn->move( 44, 4 );
 	m_muteBtn->show();
 	connect( m_muteBtn, SIGNAL( toggled( bool ) ), this,
@@ -993,9 +1029,9 @@ m_trackWidget->getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE &&
 			m_trackWidget->getTrack()->type() != track::BB_TRACK )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
-		m_trackWidget->getTrack()->saveSettings( mmp, mmp.content() );
-		new stringPairDrag( "track_" +
-			QString::number( m_trackWidget->getTrack()->type() ),
+		m_trackWidget->getTrack()->saveState( mmp, mmp.content() );
+		new stringPairDrag( QString( "track_%1" ).arg(
+					m_trackWidget->getTrack()->type() ),
 			mmp.toString(), QPixmap::grabWidget(
 				&m_trackWidget->getTrackSettingsWidget() ),
 				this, m_trackWidget->getTrack()->eng() );
@@ -1214,7 +1250,7 @@ void trackWidget::dropEvent( QDropEvent * _de )
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
 		multimediaProject mmp( value, FALSE );
-		m_track->loadSettings( mmp.content().firstChild().toElement() );
+		m_track->restoreState( mmp.content().firstChild().toElement() );
 		_de->accept();
 	}
 }
@@ -1370,8 +1406,7 @@ midiTime trackWidget::endPosition( const midiTime & _pos_start )
 // ===========================================================================
 
 track::track( trackContainer * _tc ) :
-	settings(),
-	engineObject( _tc->eng() ),
+	journallingObject( _tc->eng() ),
 	m_trackContainer( _tc )
 {
 	m_trackWidget = new trackWidget( this,
@@ -1404,7 +1439,7 @@ track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 
 	switch( _tt )
 	{
-		case CHANNEL_TRACK: t = new channelTrack( _tc ); break;
+		case CHANNEL_TRACK: t = new instrumentTrack( _tc ); break;
 		case BB_TRACK: t = new bbTrack( _tc ); break;
 		case SAMPLE_TRACK: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
@@ -1430,7 +1465,7 @@ track * FASTCALL track::create( const QDomElement & _this,
 {
 	track * t = create( static_cast<trackTypes>( _this.attribute(
 						"type" ).toInt() ), _tc );
-	t->loadSettings( _this );
+	t->restoreState( _this );
 	return( t );
 }
 
@@ -1441,7 +1476,7 @@ track * FASTCALL track::clone( track * _track )
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
-	_track->saveSettings( doc, parent );
+	_track->saveState( doc, parent );
 	QDomElement e = parent.firstChild().toElement();
 	return( create( e, _track->getTrackContainer() ) );
 }
@@ -1457,25 +1492,26 @@ tact track::length( void ) const
 
 
 
-void FASTCALL track::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void FASTCALL track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	csize num_of_tcos = getTrackContentWidget()->numOfTCOs();
 
-	QDomElement track_de = _doc.createElement( "track" );
-	track_de.setAttribute( "type", type() );
-	track_de.setAttribute( "muted", muted() );
-	track_de.setAttribute( "height", m_trackWidget->height() );
-	_parent.appendChild( track_de );
+	_this.setTagName( "track" );
+	_this.setAttribute( "type", type() );
+	_this.setAttribute( "muted", muted() );
+	_this.setAttribute( "height", m_trackWidget->height() );
 
-	// let actual track (channelTrack, bbTrack, sampleTrack etc.) save
+	QDomElement ts_de = _doc.createElement( nodeName() );
+	// let actual track (instrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
-	saveTrackSpecificSettings( _doc, track_de );
+	saveTrackSpecificSettings( _doc, ts_de );
+	_this.appendChild( ts_de );
 
 	// now save settings of all TCO's
 	for( csize i = 0; i < num_of_tcos; ++i )
 	{
 		trackContentObject * tco = getTCO( i );
-		tco->saveSettings( _doc, track_de );
+		tco->saveState( _doc, _this );
 	}
 }
 
@@ -1500,15 +1536,20 @@ void FASTCALL track::loadSettings( const QDomElement & _this )
 	{
 		if( node.isElement() )
 		{
-			if( nodeName() == node.nodeName() )
+			if( node.nodeName() == nodeName() ||
+#warning compat-code, remove in 0.3.0
+				( node.nodeName() == "channeltrack" &&
+				  nodeName() == "instrumenttrack" )
+				)
 			{
 				loadTrackSpecificSettings( node.toElement() );
 			}
-			else
+			else if(
+			!node.toElement().attribute( "metadata" ).toInt() )
 			{
 				trackContentObject * tco = createTCO(
 								midiTime( 0 ) );
-				tco->loadSettings( node.toElement() );
+				tco->restoreState( node.toElement() );
 				addTCO( tco );
 			}
 		}

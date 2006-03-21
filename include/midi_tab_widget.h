@@ -43,7 +43,7 @@
 #include <config.h>
 #endif
 
-#include "settings.h"
+#include "journalling_object.h"
 #include "engine.h"
 
 
@@ -51,18 +51,18 @@ class QMenu;
 class QPixmap;
 class QAction;
 
-class channelTrack;
+class instrumentTrack;
 class tabWidget;
 class ledCheckBox;
 class lcdSpinBox;
 class midiPort;
 
 
-class midiTabWidget : public QWidget, public settings, public engineObject
+class midiTabWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	midiTabWidget( channelTrack * _channel_track, midiPort * _port );
+	midiTabWidget( instrumentTrack * _channel_track, midiPort * _port );
 	virtual ~midiTabWidget();
 
 
@@ -91,7 +91,7 @@ protected slots:
 	void activatedWriteablePort( int _id );
 
 private:
-	channelTrack * m_channelTrack;
+	instrumentTrack * m_instrumentTrack;
 	midiPort * m_midiPort;
 
 	tabWidget * m_setupTabWidget;
@@ -103,7 +103,7 @@ private:
 	QMenu * m_readablePorts;
 	QMenu * m_writeablePorts;
 
-	friend class channelTrack;
+	friend class instrumentTrack;
 
 } ;
 

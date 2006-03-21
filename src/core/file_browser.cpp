@@ -51,7 +51,7 @@
 #include "song_editor.h"
 #include "bb_editor.h"
 #include "embed.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "mmp.h"
 #include "preset_preview_play_handle.h"
 #include "sample_play_handle.h"
@@ -177,14 +177,17 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 	{
 		m_contextMenuItem = f;
 		QMenu * contextMenu = new QMenu( this );
-		contextMenu->addAction( tr( "Send to active channel" ), this,
-						SLOT( sendToActiveChannel() ) );
-		contextMenu->addAction( tr( "Open in new channel/Song-Editor" ),
+		contextMenu->addAction( tr( "Send to active instrument-track" ),
 						this,
-						SLOT( openInNewChannelSE() ) );
-		contextMenu->addAction( tr( "Open in new channel/B+B Editor" ),
+					SLOT( sendToActiveInstrumentTrack() ) );
+		contextMenu->addAction( tr( "Open in new instrument-track/"
+								"Song-Editor" ),
 						this,
-						SLOT( openInNewChannelBBE() ) );
+					SLOT( openInNewInstrumentTrackSE() ) );
+		contextMenu->addAction( tr( "Open in new instrument-track/"
+								"B+B Editor" ),
+						this,
+					SLOT( openInNewInstrumentTrackBBE() ) );
 		contextMenu->exec( QCursor::pos() );
 		m_contextMenuItem = NULL;
 		delete contextMenu;
@@ -195,7 +198,7 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 
 
-void fileBrowser::sendToActiveChannel( void )
+void fileBrowser::sendToActiveInstrumentTrack( void )
 {
 	if( eng()->getMainWindow()->workspace() != NULL )
 	{
@@ -209,24 +212,24 @@ void fileBrowser::sendToActiveChannel( void )
 #ifdef QT4
 		QListIterator<QWidget *> w( pl );
 		w.toBack();
-		// now we travel through the window-list until we find a
-		// channel-track
+		// now we travel through the window-list until we find an
+		// instrument-track
 		while( w.hasPrevious() )
 		{
-			channelTrack * ct = dynamic_cast<channelTrack *>(
+			instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 								w.previous() );
 #else
 		QWidget * w = pl.last();
-		// now we travel through the window-list until we find a
-		// channel-track
+		// now we travel through the window-list until we find an
+		// instrument-track
 		while( w != NULL )
 		{
-			channelTrack * ct = dynamic_cast<channelTrack *>( w );
+			instrumentTrack * ct = dynamic_cast<instrumentTrack *>( w );
 #endif
 			if( ct != NULL && ct->isHidden() == FALSE )
 			{
-				// ok, it's a channel-track, so we can apply the
-				// sample or the preset
+				// ok, it's an instrument-track, so we can apply
+				// the sample or the preset
 				if( m_contextMenuItem->type() ==
 							fileItem::SAMPLE_FILE )
 				{
@@ -248,7 +251,7 @@ void fileBrowser::sendToActiveChannel( void )
 								firstChild().
 								toElement() );
 				}
-				ct->toggledChannelButton( TRUE );
+				ct->toggledInstrumentTrackButton( TRUE );
 				break;
 			}
 #ifndef QT4
@@ -261,11 +264,11 @@ void fileBrowser::sendToActiveChannel( void )
 
 
 
-void fileBrowser::openInNewChannel( trackContainer * _tc )
+void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 {
 	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
 	{
-		channelTrack * ct = dynamic_cast<channelTrack *>(
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 			track::create( track::CHANNEL_TRACK, _tc ) );
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
@@ -276,19 +279,19 @@ void fileBrowser::openInNewChannel( trackContainer * _tc )
 			afp->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
 		}
-		ct->toggledChannelButton( TRUE );
+		ct->toggledInstrumentTrackButton( TRUE );
 	}
 	else if( m_contextMenuItem->type() == fileItem::PRESET_FILE )
 	{
 		multimediaProject mmp( m_contextMenuItem->fullName() );
 		track * t = track::create( track::CHANNEL_TRACK, _tc );
-		channelTrack * ct = dynamic_cast<channelTrack *>( t );
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
 		if( ct != NULL )
 		{
 			ct->loadTrackSpecificSettings( mmp.content().
 							firstChild().
 							toElement() );
-			ct->toggledChannelButton( TRUE );
+			ct->toggledInstrumentTrackButton( TRUE );
 		}
 	}
 }
@@ -296,17 +299,17 @@ void fileBrowser::openInNewChannel( trackContainer * _tc )
 
 
 
-void fileBrowser::openInNewChannelSE( void )
+void fileBrowser::openInNewInstrumentTrackSE( void )
 {
-	openInNewChannel( eng()->getSongEditor() );
+	openInNewInstrumentTrack( eng()->getSongEditor() );
 }
 
 
 
 
-void fileBrowser::openInNewChannelBBE( void )
+void fileBrowser::openInNewInstrumentTrackBBE( void )
 {
-	openInNewChannel( eng()->getBBEditor() );
+	openInNewInstrumentTrack( eng()->getBBEditor() );
 }
 
 
@@ -352,7 +355,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 		{
 			// samples are per default opened in bb-editor because
 			// they're likely drum-samples etc.
-			channelTrack * ct = dynamic_cast<channelTrack *>(
+			instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 				track::create( track::CHANNEL_TRACK,
 						eng()->getBBEditor() ) );
 #ifdef LMMS_DEBUG
@@ -365,7 +368,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 				afp->setParameter( "samplefile",
 								f->fullName() );
 			}
-			ct->toggledChannelButton( TRUE );
+			ct->toggledInstrumentTrackButton( TRUE );
 		}
 		else if( f->type() == fileItem::PRESET_FILE )
 		{
@@ -373,13 +376,13 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			multimediaProject mmp( f->fullName() );
 			track * t = track::create( track::CHANNEL_TRACK,
 						eng()->getBBEditor() );
-			channelTrack * ct = dynamic_cast<channelTrack *>( t );
+			instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
 			if( ct != NULL )
 			{
 				ct->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
-				ct->toggledChannelButton( TRUE );
+				ct->toggledInstrumentTrackButton( TRUE );
 			}
 		}
 		else if( f->type() == fileItem::PROJECT_FILE )
@@ -797,7 +800,7 @@ void fileItem::determineFileType( void )
 		{
 			m_type = PROJECT_FILE;
 		}
-		else if( t == multimediaProject::CHANNEL_SETTINGS )
+		else if( t == multimediaProject::INSTRUMENT_TRACK_SETTINGS )
 		{
 			m_type = PRESET_FILE;
 		}

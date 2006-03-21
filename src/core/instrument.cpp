@@ -26,19 +26,19 @@
 
 
 #include "instrument.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "dummy_instrument.h"
 
 
-instrument::instrument( channelTrack * _channel_track,
+instrument::instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor ) :
-	QWidget( _channel_track->tabWidgetParent() ),
-	plugin( _descriptor, _channel_track->eng() ),
-	m_channelTrack( _channel_track ),
+	QWidget( _instrument_track->tabWidgetParent() ),
+	plugin( _descriptor, _instrument_track->eng() ),
+	m_instrumentTrack( _instrument_track ),
 	m_valid( TRUE )
 {
 	setFixedSize( 250, 250 );
-	m_channelTrack->setWindowIcon( *getDescriptor()->logo );
+	m_instrumentTrack->setWindowIcon( *getDescriptor()->logo );
 }
 
 
@@ -81,9 +81,9 @@ f_cnt_t instrument::beatLen( notePlayHandle * ) const
 
 
 instrument * instrument::instantiate( const QString & _plugin_name,
-						channelTrack * _channel_track )
+					instrumentTrack * _instrument_track )
 {
-	plugin * p = plugin::instantiate( _plugin_name, _channel_track );
+	plugin * p = plugin::instantiate( _plugin_name, _instrument_track );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<instrument *>( p ) != NULL )
 	{
@@ -93,7 +93,7 @@ instrument * instrument::instantiate( const QString & _plugin_name,
 
 	// not quite... so delete plugin and return dummy instrument
 	delete p;
-	return( new dummyInstrument( _channel_track ) );
+	return( new dummyInstrument( _instrument_track ) );
 }
 
 

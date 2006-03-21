@@ -33,7 +33,7 @@
 class dummyInstrument : public instrument
 {
 public:
-	inline dummyInstrument( channelTrack * _channel_track ) :
+	inline dummyInstrument( instrumentTrack * _channel_track ) :
 		instrument( _channel_track, NULL )
 	{
 	}

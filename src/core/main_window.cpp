@@ -76,7 +76,7 @@
 #include "setup_dialog.h"
 #include "audio_dummy.h"
 #include "tool_button.h"
-#include "edit_history.h"
+#include "project_journal.h"
 
 
 #if QT_VERSION >= 0x030100
@@ -621,8 +621,9 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			_de.attribute( "height" ).toInt() );
 	if( !r.isNull() )
 	{
-		_w->setShown( _de.attribute( "visible" ).toInt() );
+		_w->show();
 		_w->parentWidget()->move( r.topLeft() );
+		_w->setShown( _de.attribute( "visible" ).toInt() );
 		_w->resize( r.size() );
 	}
 }
@@ -857,7 +858,7 @@ void mainWindow::togglePianoRollWin( void )
 
 void mainWindow::undo( void )
 {
-	eng()->getEditHistory()->undo();
+	eng()->getProjectJournal()->undo();
 }
 
 
@@ -865,7 +866,7 @@ void mainWindow::undo( void )
 
 void mainWindow::redo( void )
 {
-	eng()->getEditHistory()->redo();
+	eng()->getProjectJournal()->redo();
 }
 
 

@@ -64,8 +64,7 @@ static plugin::descriptor dummy_plugin_descriptor =
 
 
 plugin::plugin( const descriptor * _descriptor, engine * _engine ) :
-	settings(),
-	engineObject( _engine ),
+	journallingObject( _engine ),
 	m_descriptor( _descriptor )
 {
 	if( dummy_plugin_descriptor.logo == NULL )

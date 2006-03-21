@@ -411,7 +411,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			eng()->getMainWindow()->isCtrlPressed() == FALSE )
 	{
-		setStepRecording( FALSE );
+		setJournalling( FALSE );
 		m_oldValue = value();
 
 		const QPoint & p = _me->pos();
@@ -478,8 +478,8 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 //! Mouse Release Event handler
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	setStepRecording( TRUE );
-	addStepFromOldToCurVal();
+	setJournalling( TRUE );
+	addJournalEntryFromOldToCurVal();
 
 	if( m_buttonPressed )
 	{

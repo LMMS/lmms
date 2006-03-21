@@ -27,7 +27,7 @@
 #define _ENGINE_H
 
 class bbEditor;
-class editHistory;
+class projectJournal;
 class mainWindow;
 class mixer;
 class pianoRoll;
@@ -92,9 +92,9 @@ public:
 		return( m_projectNotes );
 	}
 
-	inline editHistory * getEditHistory( void )
+	inline projectJournal * getProjectJournal( void )
 	{
-		return( m_editHistory );
+		return( m_projectJournal );
 	}
 
 
@@ -107,7 +107,7 @@ private:
 	bbEditor * m_bbEditor;
 	pianoRoll * m_pianoRoll;
 	projectNotes * m_projectNotes;
-	editHistory * m_editHistory;
+	projectJournal * m_projectJournal;
 
 } ;
 

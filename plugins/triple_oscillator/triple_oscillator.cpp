@@ -45,7 +45,7 @@
 
 #include "triple_oscillator.h"
 #include "song_editor.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "knob.h"
 #include "buffer_allocator.h"
@@ -79,7 +79,7 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 }
 
  
-tripleOscillator::tripleOscillator( channelTrack * _channel_track ) :
+tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &tripleoscillator_plugin_descriptor ),
 	m_modulationAlgo1( oscillator::MIX ),
 	m_modulationAlgo2( oscillator::MIX )
@@ -505,37 +505,33 @@ tripleOscillator::~tripleOscillator()
 
 
 
-void tripleOscillator::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement to_de = _doc.createElement( nodeName() );
-	to_de.setAttribute( "modalgo1", QString::number( m_modulationAlgo1 ) );
-	to_de.setAttribute( "modalgo2", QString::number( m_modulationAlgo2 ) );
+	_this.setAttribute( "modalgo1", QString::number( m_modulationAlgo1 ) );
+	_this.setAttribute( "modalgo2", QString::number( m_modulationAlgo2 ) );
 
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
 		QString is = QString::number( i );
-		to_de.setAttribute( "vol" + is, QString::number(
+		_this.setAttribute( "vol" + is, QString::number(
 						m_osc[i].volKnob->value() ) );
-		to_de.setAttribute( "pan" + is, QString::number(
+		_this.setAttribute( "pan" + is, QString::number(
 						m_osc[i].panKnob->value() ) );
-		to_de.setAttribute( "coarse" + is, QString::number(
+		_this.setAttribute( "coarse" + is, QString::number(
 					m_osc[i].coarseKnob->value() ) );
-		to_de.setAttribute( "finel" + is, QString::number(
+		_this.setAttribute( "finel" + is, QString::number(
 						m_osc[i].fineLKnob->value() ) );
-		to_de.setAttribute( "finer" + is, QString::number(
+		_this.setAttribute( "finer" + is, QString::number(
 						m_osc[i].fineRKnob->value() ) );
-		to_de.setAttribute( "phoffset" + is, QString::number(
+		_this.setAttribute( "phoffset" + is, QString::number(
 					m_osc[i].phaseOffsetKnob->value() ) );
-		to_de.setAttribute( "stphdetun" + is, QString::number(
+		_this.setAttribute( "stphdetun" + is, QString::number(
 				m_osc[i].stereoPhaseDetuningKnob->value() ) );
-		to_de.setAttribute( "wavetype" + is, QString::number(
+		_this.setAttribute( "wavetype" + is, QString::number(
 							m_osc[i].waveShape ) );
-		to_de.setAttribute( "userwavefile" + is,
+		_this.setAttribute( "userwavefile" + is,
 					m_osc[i].m_sampleBuffer->audioFile() );
 	}
-
-	_parent.appendChild( to_de );
 }
 
 
@@ -590,7 +586,7 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 {
 	if( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getChannelTrack()->frequency( _n );
+		float freq = getInstrumentTrack()->frequency( _n );
 
 		oscillator * oscs_l[NUM_OF_OSCILLATORS];
 		oscillator * oscs_r[NUM_OF_OSCILLATORS];
@@ -695,7 +691,7 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 	osc_l->update( buf, frames, 0 );
 	osc_r->update( buf, frames, 1 );
 
-	getChannelTrack()->processAudioBuffer( buf, frames, _n );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	bufferAllocator::free( buf );
 }
@@ -821,7 +817,7 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new tripleOscillator(
-				static_cast<channelTrack *>( _data ) ) );
+				static_cast<instrumentTrack *>( _data ) ) );
 }
 
 }

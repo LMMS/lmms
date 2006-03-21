@@ -30,8 +30,16 @@
 #include "base64.h"
 #include "types.h"
 
+#ifndef QT3
 
-#ifdef QT3
+#include <QVariant>
+#include <QBuffer>
+
+#else
+
+#include <qvariant.h>
+#include <qbuffer.h>
+
 
 namespace base64
 {
@@ -167,5 +175,56 @@ void decode( const QString & _b64, char * * _data, int * _size )
 
 #endif
 
+
+namespace base64
+{
+
+	
+QString encode( const QVariant & _data )
+{
+	QBuffer buf;
+#ifndef QT3
+	buf.open( QBuffer::WriteOnly );
+#else
+	buf.open( IO_WriteOnly );
+#endif
+	QDataStream out( &buf );
+	out << _data;
+	QByteArray data = buf.buffer();
+	QString dst;
+#ifndef QT3
+	encode( data.constData(), data.size(), dst );
+#else
+	encode( data.data(), data.size(), dst );
+#endif
+	return( dst );
+}
+
+
+
+
+QVariant decode( const QString & _b64 )
+{
+	char * dst = NULL;
+	int dsize = 0;
+	base64::decode( _b64, &dst, &dsize );
+#ifndef QT3
+	QByteArray ba( dst, dsize );
+	QBuffer buf( &ba );
+	buf.open( QBuffer::ReadOnly );
+#else
+	QByteArray ba;
+	ba.setRawData( dst, dsize );
+	QBuffer buf( ba );
+	buf.open( IO_ReadOnly );
+#endif
+	QDataStream in( &buf );
+	QVariant ret;
+	in >> ret;
+	return( ret );
+}
+
+
+} ;
 
 #endif

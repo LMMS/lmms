@@ -1,7 +1,7 @@
 /*
  * clipboard.h - the clipboard for patterns, notes etc.
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,14 +46,14 @@
 #endif
 
 
-class settings;
+class journallingObject;
 
 namespace clipboard
 {
 	typedef QMap<QString, QDomElement> map;
 	extern map content;
 
-	void FASTCALL copy( settings * _settings_object );
+	void FASTCALL copy( journallingObject * _object );
 	const QDomElement * FASTCALL getContent( const QString & _node_name );
 } ;
 

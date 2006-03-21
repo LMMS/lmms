@@ -48,7 +48,7 @@
 #include "templates.h"
 
 
-class channelTrack;
+class instrumentTrack;
 class notePlayHandle;
 
 
@@ -63,7 +63,7 @@ class pianoWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	pianoWidget( channelTrack * _channel_track );
+	pianoWidget( instrumentTrack * _channel_track );
 	virtual ~pianoWidget();
 
 	inline void setKeyState( int _key, bool _on = FALSE )
@@ -97,7 +97,7 @@ private:
 	bool m_pressedKeys[NOTES_PER_OCTAVE * OCTAVES];
 
 	QScrollBar * m_pianoScroll;
-	channelTrack * m_channelTrack;
+	instrumentTrack * m_instrumentTrack;
 	tones m_startTone;			// first key when drawing
 	octaves m_startOctave;
 

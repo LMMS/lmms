@@ -75,7 +75,7 @@ class bitInvader : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:
-	bitInvader(channelTrack * _channel_track );
+	bitInvader(instrumentTrack * _channel_track );
 	virtual ~bitInvader();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n );

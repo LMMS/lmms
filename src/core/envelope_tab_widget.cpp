@@ -2,7 +2,7 @@
 
 /*
  * envelope_tab_widget.cpp - widget for use in envelope/lfo/filter-tab of
- *                           channel-window
+ *                           instrument-track-window
  *
  * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -50,7 +50,7 @@
 #include "tab_widget.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "combobox.h"
 
 
@@ -83,10 +83,9 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
  
 
 
-envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
-	QWidget( _channel_track->tabWidgetParent() ),
-	settings(),
-	engineObject( _channel_track->eng() )
+envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
+	QWidget( _instrument_track->tabWidgetParent() ),
+	journallingObject( _instrument_track->eng() )
 {
 
 	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );
@@ -171,14 +170,14 @@ envelopeTabWidget::envelopeTabWidget( channelTrack * _channel_track ) :
 	QWhatsThis::add( m_filterComboBox,
 #endif
 		tr( "Here you can select the built-in filter you want to use "
-			"in this channel. Filters are very important for "
-			"changing the characteristics of a sound." ) );
+			"for this instrument-track. Filters are very important "
+			"for changing the characteristics of a sound." ) );
 
 
 	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox, tr(
 						"cutoff-frequency" ), eng() );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
-	m_filterCutKnob->setRange( 0.0, 10000.0, 1.0 );
+	m_filterCutKnob->setRange( 0.0, 14000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setInitValue( 16000.0 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
@@ -494,24 +493,18 @@ f_cnt_t envelopeTabWidget::releaseFrames( void )
 
 
 
-void envelopeTabWidget::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement etw_de = _doc.createElement( nodeName() );
-	etw_de.setAttribute( "ftype", m_filterComboBox->value() );
-	etw_de.setAttribute( "fcut", m_filterCutKnob->value() );
-	etw_de.setAttribute( "fres", m_filterResKnob->value() );
-	etw_de.setAttribute( "fwet", m_filterGroupBox->isActive() );
-	_parent.appendChild( etw_de );
+	_this.setAttribute( "ftype", m_filterComboBox->value() );
+	_this.setAttribute( "fcut", m_filterCutKnob->value() );
+	_this.setAttribute( "fres", m_filterResKnob->value() );
+	_this.setAttribute( "fwet", m_filterGroupBox->isActive() );
 
 	for( int i = 0; i < TARGET_COUNT; ++i )
 	{
-		QDomElement target_de = _doc.createElement(
-						m_envLFOWidgets[i]->nodeName() +
-					QString(
-						targetNames[i][1] ).toLower() );
-		m_envLFOWidgets[i]->saveSettings( _doc, target_de );
-		etw_de.appendChild( target_de );
+		m_envLFOWidgets[i]->saveState( _doc, _this ).setTagName(
+			m_envLFOWidgets[i]->nodeName() +
+				QString( targetNames[i][1] ).toLower() );
 	}
 }
 
@@ -537,7 +530,7 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 						m_envLFOWidgets[i]->nodeName() +
 					QString( targetNames[i][1] ).toLower() )
 				{
-					m_envLFOWidgets[i]->loadSettings(
+					m_envLFOWidgets[i]->restoreState(
 							node.toElement() );
 				}
 			}

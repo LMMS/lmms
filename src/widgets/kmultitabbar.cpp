@@ -5,7 +5,7 @@
 
 #include "qt3support.h"
 
-#ifdef QT4
+#ifndef QT3
 
 #include "kmultitabbar.h"
 
@@ -1220,7 +1220,7 @@ KMultiTabBarTab::KMultiTabBarTab(const QPixmap& pic, const QString& text,
 	d=new KMultiTabBarTabPrivate();
 	setIcon(pic);
 	m_expandedSize=24;
-	setCheckable(true);
+	setToggleButton(true);
 }
 
 KMultiTabBarTab::~KMultiTabBarTab() {

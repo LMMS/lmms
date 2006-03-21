@@ -194,7 +194,7 @@ private:
 class pluckedStringSynth : public instrument
 {
 public:
-	pluckedStringSynth(channelTrack * _channel_track );
+	pluckedStringSynth( instrumentTrack * _channel_track );
 	virtual ~pluckedStringSynth();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n );

@@ -54,10 +54,9 @@
 
 #include "types.h"
 #include "midi_time.h"
-#include "settings.h"
 #include "rubberband.h"
 #include "engine.h"
-#include "editable_object.h"
+#include "journalling_object.h"
 
 
 class QMenu;
@@ -79,8 +78,8 @@ const Uint16 TRACK_OP_WIDTH = 70;
 const Uint16 TCO_BORDER_WIDTH = 1;
 
 
-class trackContentObject : public selectableObject, public settings,
-			   public editableObject
+class trackContentObject : public selectableObject,
+			   public journallingObject
 {
 	Q_OBJECT
 public:
@@ -130,8 +129,8 @@ protected:
 	void setAutoResizeEnabled( bool _e = FALSE );
 	float pixelsPerTact( void );
 
-	virtual void undoStep( const editStep & _edit_step );
-	virtual void redoStep( const editStep & _edit_step );
+	virtual void undoStep( journalEntry & _edit_step );
+	virtual void redoStep( journalEntry & _edit_step );
 
 
 protected slots:
@@ -164,7 +163,7 @@ private:
 
 
 
-class trackContentWidget : public QWidget, public editableObject
+class trackContentWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -206,8 +205,13 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
-	virtual void undoStep( const editStep & _edit_step );
-	virtual void redoStep( const editStep & _edit_step );
+	virtual QString nodeName( void ) const
+	{
+		return( "trackcontentwidget" );
+	}
+
+	virtual void undoStep( journalEntry & _edit_step );
+	virtual void redoStep( journalEntry & _edit_step );
 
 
 private:
@@ -364,7 +368,7 @@ private:
 
 
 // base-class for all tracks
-class track : public settings, public engineObject
+class track : public journallingObject
 {
 public:
 	enum trackTypes
@@ -419,7 +423,7 @@ public:
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
+							QDomElement & _this );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 

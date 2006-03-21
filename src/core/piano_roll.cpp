@@ -49,6 +49,7 @@
 #include <qdom.h>
 
 #define addButton insert
+#define setCheckable setToggleButton
 
 #endif
 
@@ -69,7 +70,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "timeline.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "tooltip.h"
 #include "midi.h"
 #include "tool_button.h"
@@ -131,7 +132,7 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 pianoRoll::pianoRoll( engine * _engine ) :
 	QWidget( _engine->getMainWindow()->workspace() ),
-	engineObject( _engine ),
+	journallingObject( _engine ),
 	m_paintPixmap(),
 	m_cursorInside( FALSE ),
 	m_pattern( NULL ),
@@ -545,7 +546,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 	// and now connect to noteDone()-signal of channel so that
 	// we receive note-off-events from it's midi-port for recording it
-	connect( m_pattern->getChannelTrack(),
+	connect( m_pattern->getInstrumentTrack(),
 			SIGNAL( noteDone( const note & ) ),
 			this, SLOT( recordNote( const note & ) ) );
 
@@ -557,11 +558,9 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 
 
-void pianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void pianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement pr_de = _doc.createElement( nodeName() );
-	mainWindow::saveWidgetState( this, pr_de );
-	_parent.appendChild( pr_de );
+	mainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -1243,7 +1242,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					midiTime note_pos( pos_tact_64th );
 					midiTime note_len( newNoteLen() );
 		
-					note new_note( note_len, note_pos,
+					note new_note( eng(),
+							note_len, note_pos,
 							(tones)( key_num %
 							NOTES_PER_OCTAVE ),
 							(octaves)( key_num /
@@ -1370,7 +1370,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		if( play_note == TRUE && m_recording == FALSE &&
 				eng()->getSongEditor()->playing() == FALSE )
 		{
-			m_pattern->getChannelTrack()->processInEvent(
+			m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
 							vol * 127 / 100 ),
 								midiTime() );
@@ -1387,13 +1387,13 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		if( m_action == CHANGE_NOTE_VOLUME && m_currentNote != NULL )
 		{
-			m_pattern->getChannelTrack()->processInEvent(
+			m_pattern->getInstrumentTrack()->processInEvent(
 				midiEvent( NOTE_OFF, 0,
 					m_currentNote->key(), 0 ), midiTime() );
 		}
 		else
 		{
-			m_pattern->getChannelTrack()->processInEvent(
+			m_pattern->getInstrumentTrack()->processInEvent(
 				midiEvent( NOTE_OFF, 0, getKey( _me->y() ), 0 ),
 								midiTime() );
 		}
@@ -1446,7 +1446,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 #endif
 					Qt::LeftButton )
 		{
-			m_pattern->getChannelTrack()->processInEvent(
+			m_pattern->getInstrumentTrack()->processInEvent(
 				midiEvent( NOTE_OFF, 0, released_key, 0 ),
 								midiTime() );
 			if(
@@ -1462,7 +1462,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_recording == FALSE &&
 				eng()->getSongEditor()->playing() == FALSE )
 			{
-				m_pattern->getChannelTrack()->processInEvent(
+				m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
 						DEFAULT_VOLUME * 127 / 100 ),
 								midiTime() );
@@ -1487,7 +1487,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								MAX_VOLUME );
 				m_currentNote->setVolume( vol );
 				m_pattern->update();
-				m_pattern->getChannelTrack()->processInEvent(
+				m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( KEY_PRESSURE, 0, key_num,
 							vol * 127 / 100 ),
 								midiTime() );
@@ -2524,6 +2524,7 @@ midiTime pianoRoll::newNoteLen( void ) const
 
 #ifdef QT3
 #undef addButton
+#undef setCheckable
 #endif
 
 

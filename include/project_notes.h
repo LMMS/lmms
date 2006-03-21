@@ -39,7 +39,7 @@
 
 #endif
 
-#include "settings.h"
+#include "journalling_object.h"
 #include "engine.h"
 
 
@@ -48,7 +48,7 @@ class QComboBox;
 class QTextEdit;
 
 
-class projectNotes : public QMainWindow, public settings, public engineObject
+class projectNotes : public QMainWindow, public journallingObject
 {
 	Q_OBJECT
 public:

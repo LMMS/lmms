@@ -61,10 +61,15 @@ public:
 
 	virtual void setValue( const bool _on );
 
-	inline void setToggleButton( bool _on )
+	inline void setCheckable( bool _on )
 	{
-		m_toggleButton = _on;
-		setStepRecording( m_toggleButton );
+		m_checkable = _on;
+		setJournalling( m_checkable );
+	}
+
+	inline bool isCheckable( void ) const
+	{
+		return( m_checkable );
 	}
 
 
@@ -83,7 +88,7 @@ protected:
 
 private:
 	automatableButtonGroup * m_group;
-	bool m_toggleButton;
+	bool m_checkable;
 
 
 	friend class automatableButtonGroup;

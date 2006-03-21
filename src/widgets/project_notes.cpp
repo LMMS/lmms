@@ -79,7 +79,7 @@ projectNotes::projectNotes( engine * _engine) :
 				, 0, Qt::WStyle_Title
 #endif
 		),
-	engineObject( _engine )
+	journallingObject( _engine )
 {
 #ifdef QT4
 	eng()->getMainWindow()->workspace()->addWindow( this );
@@ -570,15 +570,12 @@ void projectNotes::alignmentChanged( int _a )
 
 
 
-void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QDomElement pn_de = _doc.createElement( nodeName() );
-	mainWindow::saveWidgetState( this, pn_de );
+	mainWindow::saveWidgetState( this, _this );
 
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
-	pn_de.appendChild( ds );
-
-	_parent.appendChild( pn_de );
+	_this.appendChild( ds );
 }
 
 

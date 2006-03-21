@@ -47,7 +47,7 @@
 
 #include "audio_file_processor.h"
 #include "song_editor.h"
-#include "channel_track.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "paths.h"
 #include "interpolation.h"
@@ -72,7 +72,8 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 	"AudioFileProcessor",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"simple sampler with various settings for "
-				"using samples (e.g. drums) in a channel" ),
+				"using samples (e.g. drums) in an "
+				"instrument-track" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::INSTRUMENT,
@@ -86,7 +87,7 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 
 
 
-audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
+audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_sampleBuffer( eng(), "" ),
@@ -103,7 +104,6 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 
 
 	m_openAudioFileButton = new pixmapButton( this, eng() );
-	m_openAudioFileButton->setCheckable( FALSE );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 200, 90 );
 	m_openAudioFileButton->setActiveGraphic( embed::getIconPixmap(
@@ -129,6 +129,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"doesn't sound like the original one..." ) );
 	
 	m_reverseButton = new pixmapButton( this, eng() );
+	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 160, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_on" ) );
@@ -148,6 +149,7 @@ audioFileProcessor::audioFileProcessor( channelTrack * _channel_track ) :
 			"crash." ) );
 
 	m_loopButton = new pixmapButton( this, eng() );
+	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 180, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
@@ -283,27 +285,25 @@ audioFileProcessor::~audioFileProcessor()
 
 
 void audioFileProcessor::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+							QDomElement & _this )
 {
-	QDomElement afp_de = _doc.createElement( nodeName() );
-	afp_de.setAttribute( "src", m_sampleBuffer.audioFile() );
+	_this.setAttribute( "src", m_sampleBuffer.audioFile() );
 	if( m_sampleBuffer.audioFile() == "" )
 	{
 		QString s;
-		afp_de.setAttribute( "sampledata", m_sampleBuffer.toBase64( s ) );
+		_this.setAttribute( "sampledata", m_sampleBuffer.toBase64( s ) );
 	}
-	afp_de.setAttribute( "sframe", QString::number(
+	_this.setAttribute( "sframe", QString::number(
 						m_sampleBuffer.startFrame() /
 					(float)m_sampleBuffer.frames() ) );
-	afp_de.setAttribute( "eframe", QString::number(
+	_this.setAttribute( "eframe", QString::number(
 						m_sampleBuffer.endFrame() /
 					(float)m_sampleBuffer.frames() ) );
-	afp_de.setAttribute( "reversed", QString::number(
+	_this.setAttribute( "reversed", QString::number(
 					m_reverseButton->isChecked() ) );
-	afp_de.setAttribute( "looped", QString::number(
+	_this.setAttribute( "looped", QString::number(
 					m_loopButton->isChecked() ) );
-	afp_de.setAttribute( "amp", QString::number( m_ampKnob->value() ) );
-	_parent.appendChild( afp_de );
+	_this.setAttribute( "amp", QString::number( m_ampKnob->value() ) );
 }
 
 
@@ -356,7 +356,7 @@ void audioFileProcessor::setParameter( const QString & _param,
 Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 {
 	const float freq_factor = BASE_FREQ /
-				( getChannelTrack()->frequency( _n ) *
+				( getInstrumentTrack()->frequency( _n ) *
 						DEFAULT_SAMPLE_RATE /
 					eng()->getMixer()->sampleRate() );
 
@@ -371,12 +371,12 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 void audioFileProcessor::setAudioFile( const QString & _audio_file )
 {
 	// is current channel-name equal to previous-filename??
-	if( getChannelTrack()->name() ==
+	if( getInstrumentTrack()->name() ==
 			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
 		m_sampleBuffer.audioFile() == "" )
 	{
 		// then set it to new one
-		getChannelTrack()->setName( QFileInfo( _audio_file
+		getInstrumentTrack()->setName( QFileInfo( _audio_file
 								).fileName() );
 	}
 	// else we don't touch the channel-name, because the user named it self
@@ -395,7 +395,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n )
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	// calculate frequency of note
-	const float note_freq = getChannelTrack()->frequency( _n ) /
+	const float note_freq = getInstrumentTrack()->frequency( _n ) /
 					( eng()->getMixer()->sampleRate() /
 							DEFAULT_SAMPLE_RATE );
 	if( m_sampleBuffer.play( buf, _n->totalFramesPlayed(),
@@ -403,7 +403,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n )
 					m_loopButton->isChecked(),
 					&_n->m_pluginData ) == TRUE )
 	{
-		getChannelTrack()->processAudioBuffer( buf, frames, _n );
+		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
 	bufferAllocator::free( buf );
 }
@@ -674,7 +674,7 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new audioFileProcessor(
-				static_cast<channelTrack *>( _data ) ) );
+				static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

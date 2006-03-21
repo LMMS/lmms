@@ -34,7 +34,7 @@ class instrumentPlayHandle : public playHandle
 {
 public:
 	inline instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( INSTRUMENT_PLAY_HANDLE, _instrument->eng() ),
+		playHandle( INSTRUMENT_PLAY_HANDLE ),
 		m_instrument( _instrument )
 	{
 	}

@@ -52,7 +52,7 @@ class audioFileProcessor : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:
-	audioFileProcessor( channelTrack * _channel_track );
+	audioFileProcessor( instrumentTrack * _channel_track );
 	virtual ~audioFileProcessor();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n );

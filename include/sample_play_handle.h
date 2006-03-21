@@ -28,13 +28,13 @@
 
 #include "play_handle.h"
 #include "types.h"
-
+#include "engine.h"
 
 class sampleBuffer;
 class audioPort;
 
 
-class samplePlayHandle : public playHandle
+class samplePlayHandle : public playHandle, public engineObject
 {
 public:
 	samplePlayHandle( const QString & _sample_file, engine * _engine );

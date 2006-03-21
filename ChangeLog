@@ -1,8 +1,84 @@
+2006-03-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/pattern.cpp:
+	in loadSettings(): do not get confused by meta-data (journal etc.)
+
+	* src/lib/journalling_object.cpp:
+	- lot of bugfixes
+	- save/load data of journal-entry (QVariant) by encoding/decoding it
+	  with base64
+
+	* include/base64.h:
+	* src/lib/base64.cpp:
+	support for encoding and decoding whole QVariant, independent of its 
+	type (the result is one string, representing data of any type (int,
+	QMap, QVector QString...) - this is just awesome!!)
+
+	* src/tracks/instrument_track.cpp:
+	do not crash in several situations if instrument is not loaded for
+	some reason (e.g. invalid preset)
+
+	* src/core/track.cpp:
+	full support for undo/redo adding/removing a TCO (track-type
+	independent)
+
+2006-03-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/main_window.cpp:
+	avoid layouting-errors when restore widget-state by showing widget
+	while moving it
+
+	* include/note.h:
+	* src/core/note.cpp:
+	undo/redo-support for note-properties
+
+	* most files:
+	- derive from journallingObject instead of settings and/or engineObject
+	- in saveSettings() do not create own node, instead directly set
+	  attributes of passed dom-element
+
+	* include/journalling_object.h:
+	* src/lib/journalling_object.cpp:
+	- added saveSettings() and loadSettings()-method from former
+	  settings-class
+	- new wrapper-functions around saveSettings() and loadSettings():
+	  saveState()
+	  restoreState()
+	  -> objects do not have to create a new node on their own,
+	     saveState() does it for them using nodeName() as node-name
+	  -> journal of object is saved/restored automatically
+
+	* include/settings.h:
+	removed
+
+2006-03-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/journalling_object.h:
+	- renamed from editable_object.h
+	- renamed editStep to journalEntry
+	- renamed editableObject to journallingObject
+	- renamed other method-names
+
+	* include/project_journal.h:
+	* src/lib/project_journal.cpp:
+	renamed editHistory to projectJournal and changed file-names
+	accordingly
+
+	* most files:
+	renamed class channelTrack to instrumentTrack and changed other
+	method-names to match new naming-convention
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	renamed channel_track.* to instrument_track.*
+
 2006-03-16	Andreas Brandmaier <andreas/at/brandmaier/dot/de>
 
-	* plugins/organic/organic.cpp
-	* plugins/organic/organic.h
-	* plugins/organic/randomise.png
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/organic/randomise.png:
 	added "randomise preset" button to organic plugin
 
 2006-03-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>

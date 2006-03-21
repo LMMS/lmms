@@ -46,7 +46,7 @@
 #include "volume.h"
 #include "panning.h"
 #include "midi_time.h"
-#include "settings.h"
+#include "journalling_object.h"
 
 enum tones
 {
@@ -89,15 +89,18 @@ const int OCTAVES = 9;
 
 
 
-class note : public settings
+class note : public journallingObject
 {
 public:
-	note( const midiTime & _length = 0, const midiTime & _pos = 0,
-		tones _tone = A, octaves _octave = DEFAULT_OCTAVE,
+	note( engine * _engine = NULL,
+		const midiTime & _length = 0,
+		const midiTime & _pos = 0,
+		tones _tone = A,
+		octaves _octave = DEFAULT_OCTAVE,
 		volume _volume = DEFAULT_VOLUME,
 		panning _panning = DEFAULT_PANNING ) FASTCALL;
 
-	~note();
+	virtual ~note();
 
 	void FASTCALL setLength( const midiTime & _length );
 	void FASTCALL setPos( const midiTime & _pos );
@@ -154,17 +157,30 @@ public:
 		return( m_panning );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "note" );
 	}
 
 
+protected:
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+							QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
+
+
 private:
 	midiTime FASTCALL quantized( const midiTime & _m, const int _q_grid );
+
+	enum actions
+	{
+		CHANGE_KEY, CHANGE_VOLUME, CHANGE_PANNING,
+		CHANGE_LENGTH, CHANGE_POSITION
+	} ;
+
 
 	tones m_tone;
 	octaves m_octave;

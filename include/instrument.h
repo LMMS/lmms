@@ -53,14 +53,14 @@
 
 
 // forward-declarations
-class channelTrack;
+class instrumentTrack;
 class notePlayHandle;
 
 
 class instrument : public QWidget, public plugin
 {
 public:
-	instrument( channelTrack * _channel_track,
+	instrument( instrumentTrack * _channel_track,
 					const descriptor * _descriptor );
 	virtual ~instrument();
 
@@ -96,12 +96,12 @@ public:
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
 	static instrument * FASTCALL instantiate( const QString & _plugin_name,
-						channelTrack * _channel_track );
+						instrumentTrack * _channel_track );
 
 protected:
-	inline channelTrack * getChannelTrack( void ) const
+	inline instrumentTrack * getInstrumentTrack( void ) const
 	{
-		return( m_channelTrack );
+		return( m_instrumentTrack );
 	}
 
 	// instruments can use this for invalidating themselves, which is for
@@ -115,7 +115,7 @@ protected:
 
 
 private:
-	channelTrack * m_channelTrack;
+	instrumentTrack * m_instrumentTrack;
 	bool m_valid;
 
 } ;

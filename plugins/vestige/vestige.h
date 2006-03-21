@@ -53,7 +53,7 @@ class vestigeInstrument : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:
-	vestigeInstrument( channelTrack * _channel_track );
+	vestigeInstrument( instrumentTrack * _channel_track );
 	virtual ~vestigeInstrument();
 
 	virtual void play( void );
