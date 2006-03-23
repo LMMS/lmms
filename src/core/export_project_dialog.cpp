@@ -355,7 +355,6 @@ void exportProjectDialog::exportBtnClicked( void )
 	delete m_kbpsLbl;
 	delete m_kbpsCombo;
 	delete m_vbrCb;
-	delete m_hqmCb;
 	delete m_exportBtn;
 
 	m_exportProgressBar = new QProgressBar( this );
@@ -380,6 +379,7 @@ void exportProjectDialog::exportBtnClicked( void )
 	eng()->getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
 	eng()->getSongEditor()->startExport();
 
+	delete m_hqmCb;
 
 	songEditor::playPos & pp = eng()->getSongEditor()->getPlayPos(
 							songEditor::PLAY_SONG );

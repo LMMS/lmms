@@ -1,3 +1,8 @@
+2006-03-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/export_project_dialog.cpp:
+	fixed bug causing LMMS to crash when trying to export a project
+
 2006-03-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track.cpp:
