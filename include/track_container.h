@@ -129,6 +129,9 @@ public:
 
 
 protected:
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
+
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -152,6 +155,10 @@ protected slots:
 
 
 private:
+	enum actions
+	{
+		ADD_TRACK, REMOVE_TRACK
+	} ;
 
 	class scrollArea : public QScrollArea
 	{

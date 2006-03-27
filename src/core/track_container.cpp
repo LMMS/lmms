@@ -61,6 +61,7 @@
 #include "import_filter.h"
 #include "instrument.h"
 #include "rubberband.h"
+#include "project_journal.h"
 
 
 
@@ -202,6 +203,10 @@ void trackContainer::cloneTrack( track * _track )
 
 void trackContainer::addTrack( track * _track )
 {
+	QMap<QString, QVariant> map;
+	map["id"] = _track->id();
+	addJournalEntry( journalEntry( ADD_TRACK, map ) );
+
 	m_trackWidgets.push_back( _track->getTrackWidget() );
 #ifndef QT4
 	m_scrollArea->addChild( _track->getTrackWidget() );
@@ -221,6 +226,13 @@ void trackContainer::removeTrack( track * _track )
 			m_trackWidgets.end(), _track->getTrackWidget() );
 	if( it != m_trackWidgets.end() )
 	{
+		QMap<QString, QVariant> map;
+		multimediaProject mmp( multimediaProject::JOURNAL_DATA );
+		_track->saveState( mmp, mmp.content() );
+		map["id"] = _track->id();
+		map["state"] = mmp.toString();
+		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
+
 		eng()->getMixer()->pause();
 #ifndef QT4
 		m_scrollArea->removeChild( _track->getTrackWidget() );
@@ -412,6 +424,60 @@ trackVector trackContainer::tracks( void )
 void trackContainer::setPixelsPerTact( Uint16 _ppt )
 {
 	m_ppt = _ppt;
+}
+
+
+
+
+void trackContainer::undoStep( journalEntry & _je )
+{
+	saveJournallingState( FALSE );
+	switch( _je.actionID() )
+	{
+		case ADD_TRACK:
+		{
+			QMap<QString, QVariant> map = _je.data().toMap();
+			track * tr =
+dynamic_cast<track *>(
+	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() ) );
+			assert( tr != NULL );
+			multimediaProject mmp(
+					multimediaProject::JOURNAL_DATA );
+			tr->saveState( mmp, mmp.content() );
+			map["state"] = mmp.toString();
+			_je.data() = map;
+			removeTrack( tr );
+			break;
+		}
+
+		case REMOVE_TRACK:
+		{
+			multimediaProject mmp(
+				_je.data().toMap()["state"].toString(), FALSE );
+			track::create( mmp.content().firstChild().toElement(),
+									this );
+			break;
+		}
+	}
+	restoreJournallingState();
+}
+
+
+
+
+void trackContainer::redoStep( journalEntry & _je )
+{
+	switch( _je.actionID() )
+	{
+		case ADD_TRACK:
+		case REMOVE_TRACK:
+			_je.actionID() = ( _je.actionID() == ADD_TRACK ) ?
+						REMOVE_TRACK : ADD_TRACK;
+			undoStep( _je );
+			_je.actionID() = ( _je.actionID() == ADD_TRACK ) ?
+						REMOVE_TRACK : ADD_TRACK;
+			break;
+	}
 }
 
 

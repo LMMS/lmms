@@ -184,7 +184,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		m_randBtn = new pixmapButton( this, eng() );
 		m_randBtn->move( 100, 200 );
 		m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"randomise" ) );
+							"randomise_pressed" ) );
 		m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise" ) );
 		//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).

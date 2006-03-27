@@ -1,4 +1,52 @@
+2005-03-26	Danny McRae	<khjklujn/at/yahoo/dot/com>
+
+	* plugins/vibed/:
+	added "Vibed"-plugin, a powerful combination of PluckedStringSynth and
+	BitInvader that's capable of producing a surprisingly wide range of
+	sounds
+
+2006-03-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/lib/journalling_object.cpp:
+	in journallingObject::saveState(): append new dom-element to parent
+	before calling saveSettings() as some implementations of it depend on
+	knowing something about it's parent (e.g. whether it's the clipboard
+	etc.) - fixes several bugs related to clipboard-usage and drag'n'drop
+
+2006-03-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/instrument_track.h:
+	* src/core/preset_preview_play_handle.cpp:
+	disable journalling for all objects involved in preset-preview
+
+	* src/tracks/instrument_track.cpp:
+	when saving preset, create new node below content-node of project, as
+	the behaviour of saveTrackSpecificSettings() was changed some days
+	before
+
+	* src/lib/mmp.cpp:
+	bugfixes concerning project type-naming
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	bugfixes concerning loading/saving settings
+
+2006-03-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/track.cpp:
+	in trackContentWidget::undoStep(): cast journalling object to
+	track-content-object and close it instead of deleting it - fixes crash
+	after undo of TCO-add
+
 2006-03-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/randomise_pressed.png:
+	added pixmap for visual feedback when pressing randomise-button
+
+	* plugins/midi_import/midi_import.cpp:
+	removed attribute FASTCALL from midiImport::tryImport() for not
+	crashing LMMS, as tryImport() is not defined as FASTCALL in
+	importFilter-API
 
 	* src/core/export_project_dialog.cpp:
 	fixed bug causing LMMS to crash when trying to export a project

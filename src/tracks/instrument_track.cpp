@@ -415,7 +415,9 @@ void instrumentTrack::saveSettingsBtnClicked( void )
 	{
 		multimediaProject mmp(
 				multimediaProject::INSTRUMENT_TRACK_SETTINGS );
-		saveTrackSpecificSettings( mmp, mmp.content() );
+		QDomElement _this = mmp.createElement( nodeName() );
+		saveTrackSpecificSettings( mmp, _this );
+		mmp.content().appendChild( _this );
 #ifdef QT4
 		mmp.writeFile( sfd.selectedFiles()[0] );
 #else

@@ -85,7 +85,7 @@ midiImport::~midiImport()
 
 
 
-bool FASTCALL midiImport::tryImport( trackContainer * _tc )
+bool midiImport::tryImport( trackContainer * _tc )
 {
 	if( openFile() == FALSE )
 	{

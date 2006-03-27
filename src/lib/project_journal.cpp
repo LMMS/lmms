@@ -80,6 +80,7 @@ void projectJournal::redo( void )
 
 	journallingObject * jo;
 
+	printf("%d\n", m_joIDs[*(m_currentJournalEntry+1)] );
 	if( m_currentJournalEntry < m_journalEntries.end() &&
 		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
 	{
@@ -97,7 +98,7 @@ void projectJournal::journalEntryAdded( const jo_id_t _id )
 	m_journalEntries.push_back( _id );
 	m_currentJournalEntry = m_journalEntries.end();
 	eng()->getSongEditor()->setModified();
-	printf("history size:%d\n", m_journalEntries.size());
+	printf("history size: %d\n", m_journalEntries.size() );
 }
 
 
@@ -122,7 +123,7 @@ jo_id_t projectJournal::allocID( journallingObject * _obj )
 
 void projectJournal::reallocID( const jo_id_t _id, journallingObject * _obj )
 {
-	//printf("realloc %d %d\n", _id, _obj);
+	//printf("realloc %d %d\n", _id, _obj );
 	if( m_joIDs.contains( _id ) )
 	{
 		m_joIDs[_id] = _obj;
@@ -134,6 +135,7 @@ void projectJournal::reallocID( const jo_id_t _id, journallingObject * _obj )
 
 void projectJournal::forgetAboutID( const jo_id_t _id )
 {
+	printf("forget about %d\n", _id );
 	journalEntryVector::iterator it;
 	while( ( it = qFind( m_journalEntries.begin(), m_journalEntries.end(),
 					_id ) ) != m_journalEntries.end() )
@@ -150,12 +152,22 @@ void projectJournal::forgetAboutID( const jo_id_t _id )
 
 
 
-void projectJournal::clear( void )
+void projectJournal::clearInvalidJournallingObjects( void )
 {
-	while( m_joIDs.size() )
+	vlist<journallingObject *>::const_iterator it;
+	for( joIDMap::iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		forgetAboutID( m_joIDs.keys().front() );
+		if( it.data() == NULL )
+		{
+			forgetAboutID( it.key() );
+			it = m_joIDs.begin();
+		}
+		else
+		{
+			++it;
+		}
 	}
+	//clearJournal();
 }
 
 

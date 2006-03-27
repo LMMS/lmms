@@ -1368,7 +1368,8 @@ void songEditor::clearProject( void )
 
 	eng()->getProjectNotes()->clear();
 
-	eng()->getProjectJournal()->clear();
+	eng()->getProjectJournal()->clearInvalidJournallingObjects();
+	eng()->getProjectJournal()->clearJournal();
 
 	eng()->getProjectJournal()->setJournalling( TRUE );
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4-cvs20060323" type="instrumenttracksettings" version="1.0" >
+  <head/>
+  <instrumenttracksettings>
+    <instrumenttrack width="250" x="12" y="227" surpos="134219776" fxch="0" height="436" baseoct="4" vol="100" name="AnalogTimes 2" basetone="9" tab="1" visible="1" >
+      <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="2" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="0" coarse2="-12" vol0="49" vol1="54" finel0="0" vol2="14" finel1="0" finel2="-14" modalgo1="2" stphdetun0="247" pan0="0" modalgo2="3" stphdetun1="109" pan1="0" stphdetun2="50" pan2="0" phoffset0="0" phoffset1="271" phoffset2="0" finer0="0" finer1="0" finer2="13" userwavefile0="samples/empty.wav" wavetype0="3" coarse0="0" >
+        <journal entries="0" metadata="1" id="391701" curentry="0" />
+      </tripleoscillator>
+      <eldata fres="0.66" ftype="0" fcut="0" fwet="1" >
+        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.473" ctlenvamt="0" latt="0" sus="0.433" lspd="0.0917" att="0" pdel="0" lamt="0" dec="0.324" userwavefile="" x100="0" lshp="0" hold="0" >
+          <journal entries="0" metadata="1" id="579409" curentry="0" />
+        </elvol>
+        <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.43" ctlenvamt="0" latt="0" sus="0.64" lspd="0.767" att="0" pdel="0" lamt="0" dec="0.241" userwavefile="" x100="0" lshp="1" hold="0" >
+          <journal entries="0" metadata="1" id="907107" curentry="0" />
+        </elcut>
+        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.01" att="0" pdel="0" lamt="-0.01" dec="0.499" userwavefile="" x100="0" lshp="1" hold="0" >
+          <journal entries="0" metadata="1" id="403343" curentry="0" />
+        </elres>
+        <journal entries="0" metadata="1" id="518423" curentry="0" />
+      </eldata>
+      <arpandchords arpmode="0" chordrange="1" arprange="3" arpdisabled="1" chord="0" chorddisabled="0" arpgate="142" arp="0" arpsyncmode="0" arptime="102" arpdir="1" >
+        <journal entries="0" metadata="1" id="485335" curentry="0" />
+      </arpandchords>
+      <midi inputchannel="0" outputchannel="1" receive="1" send="0" inports="24:0 CS46XX:CS46XX" >
+        <journal entries="0" metadata="1" id="192691" curentry="0" />
+      </midi>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</multimediaproject>

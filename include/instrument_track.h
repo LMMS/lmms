@@ -155,6 +155,9 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
+	using track::setJournalling;
+
+
 	// load instrument whose name matches given one
 	instrument * FASTCALL loadInstrument( const QString &
 							_instrument_name );

@@ -160,7 +160,7 @@ public:
 	int index( void ) const;
 
 	// note-play-handles belonging to given channel
-	static constNotePlayHandleVector nphsOfChannelTrack(
+	static constNotePlayHandleVector nphsOfInstrumentTrack(
 						const instrumentTrack * _ct );
 
 	// return whether given note-play-handle is equal to *this

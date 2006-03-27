@@ -90,7 +90,13 @@ public:
 	// journalling information about the ID get's lost
 	void forgetAboutID( const jo_id_t _id );
 
-	void clear( void );
+	void clearJournal( void )
+	{
+		m_journalEntries.clear();
+		m_currentJournalEntry = m_journalEntries.end();
+	}
+
+	void clearInvalidJournallingObjects( void );
 
 	journallingObject * getJournallingObject( const jo_id_t _id )
 	{

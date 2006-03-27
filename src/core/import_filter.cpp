@@ -27,6 +27,7 @@
 
 #include "import_filter.h"
 #include "track_container.h"
+#include "project_journal.h"
 
 #ifdef QT4
 
@@ -75,6 +76,10 @@ void importFilter::import( const QString & _file_to_import,
 #endif
 						);
 
+	// do not record changes while importing files
+	const bool j = _tc->eng()->getProjectJournal()->isJournalling();
+	_tc->eng()->getProjectJournal()->setJournalling( FALSE );
+
 	for( vvector<plugin::descriptor>::iterator it = d.begin();
 							it != d.end(); ++it )
 	{
@@ -92,6 +97,8 @@ void importFilter::import( const QString & _file_to_import,
 			delete p;
 		}
 	}
+
+	_tc->eng()->getProjectJournal()->setJournalling( j );
 
 	delete[] s;
 

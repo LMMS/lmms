@@ -69,6 +69,7 @@ journallingObject::~journallingObject()
 
 void journallingObject::undo( void )
 {
+	printf("undo: %d\n", id() );
 	if( m_journalEntries.empty() == TRUE )
 	{
 		return;
@@ -85,6 +86,7 @@ void journallingObject::undo( void )
 
 void journallingObject::redo( void )
 {
+	printf("undo: %d\n", id() );
 	if( m_journalEntries.empty() == TRUE )
 	{
 		return;
@@ -103,9 +105,9 @@ QDomElement journallingObject::saveState( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	QDomElement _this = _doc.createElement( nodeName() );
+	_parent.appendChild( _this );
 	saveSettings( _doc, _this );
 	saveJournal( _doc, _this );
-	_parent.appendChild( _this );
 	return( _this );
 }
 
@@ -115,7 +117,11 @@ QDomElement journallingObject::saveState( QDomDocument & _doc,
 void journallingObject::restoreState( const QDomElement & _this )
 {
 	saveJournallingState( FALSE );
+
+	// load actual settings
 	loadSettings( _this );
+
+	// search for journal-node
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
@@ -125,13 +131,14 @@ void journallingObject::restoreState( const QDomElement & _this )
 		}
 		node = node.nextSibling();
         }
+
 	restoreJournallingState();
 }
 
 
 
 
-void journallingObject::addJournalEntry( const journalEntry & _edit_step )
+void journallingObject::addJournalEntry( const journalEntry & _je )
 {
 	if( !( eng() == NULL ||
 		eng()->getProjectJournal()->isJournalling() == FALSE ||
@@ -139,7 +146,7 @@ void journallingObject::addJournalEntry( const journalEntry & _edit_step )
 	{
 		m_journalEntries.erase( m_currentJournalEntry,
 						m_journalEntries.end() );
-		m_journalEntries.push_back( _edit_step );
+		m_journalEntries.push_back( _je );
 		m_currentJournalEntry = m_journalEntries.end();
 		eng()->getProjectJournal()->journalEntryAdded( id() );
 	}

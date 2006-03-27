@@ -60,7 +60,7 @@ public:
 	virtual bool done( void ) const;
 
 	static void cleanUp( engine * _engine );
-	static constNotePlayHandleVector nphsOfChannelTrack(
+	static constNotePlayHandleVector nphsOfInstrumentTrack(
 						const instrumentTrack * _ct );
 
 private:

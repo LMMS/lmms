@@ -348,7 +348,7 @@ int notePlayHandle::index( void ) const
 
 
 
-constNotePlayHandleVector notePlayHandle::nphsOfChannelTrack(
+constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
 						const instrumentTrack * _it )
 {
 	const playHandleVector & phv = _it->eng()->getMixer()->playHandles();

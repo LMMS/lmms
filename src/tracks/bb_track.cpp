@@ -357,7 +357,8 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 {
 	if( _tco_num >= 0 )
 	{
-		return( eng()->getBBEditor()->play( _start, _start_frame, _frames,
+		return( eng()->getBBEditor()->play( _start, _start_frame,
+							_frames,
 							_frame_base,
 							s_infoMap[this] ) );
 	}
@@ -424,7 +425,8 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					eng()->getBBEditor()->currentBB() );*/
 	if( s_infoMap[this] == 0 &&
-			_this.parentNode().nodeName() != "clone" )
+			_this.parentNode().nodeName() != "clone" &&
+			_this.parentNode().nodeName() != "journaldata" )
 	{
 		eng()->getBBEditor()->saveState( _doc, _this );
 	}

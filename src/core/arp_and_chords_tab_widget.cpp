@@ -472,9 +472,10 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	// now follows code for arpeggio
 
-	if( _n->baseNote() == FALSE || m_arpDirectionBtnGrp->value() == OFF ||
-		!m_arpGroupBox->isActive() ||
-		( _n->released() && _n->releaseFramesDone() >=
+	if( _n->baseNote() == FALSE ||
+		( m_arpDirectionBtnGrp->value() + 1) == OFF ||
+			!m_arpGroupBox->isActive() ||
+			( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )
 	{
 		return;
@@ -483,13 +484,13 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	const int selected_arp = m_arpComboBox->value();
 
-	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfChannelTrack(
-							_n->getInstrumentTrack() );
+	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfInstrumentTrack(
+						_n->getInstrumentTrack() );
 	if( m_arpModeComboBox->value() != FREE && cnphv.size() == 0 )
 	{
 		// maybe we're playing only a preset-preview-note?
-		cnphv = presetPreviewPlayHandle::nphsOfChannelTrack(
-							_n->getInstrumentTrack() );
+		cnphv = presetPreviewPlayHandle::nphsOfInstrumentTrack(
+						_n->getInstrumentTrack() );
 		if( cnphv.size() == 0 )
 		{
 			// still nothing found here, so lets return
@@ -654,7 +655,7 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "arprange", m_arpRangeKnob->value() );
 	_this.setAttribute( "arptime", m_arpTimeKnob->value() );
 	_this.setAttribute( "arpgate", m_arpGateKnob->value() );
-	_this.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() );
+	_this.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() + 1 );
 	_this.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
@@ -675,14 +676,14 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpTimeKnob->setValue( _this.attribute( "arptime" ).toFloat() );
 	m_arpGateKnob->setValue( _this.attribute( "arpgate" ).toFloat() );
 	m_arpDirectionBtnGrp->setInitValue(
-					_this.attribute( "arpdir" ).toInt() );
+				_this.attribute( "arpdir" ).toInt() - 1 );
 	m_arpTimeKnob->setSyncMode( 
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
 
 	m_arpModeComboBox->setValue( _this.attribute( "arpmode" ).toInt() );
 
-	m_arpGroupBox->setState( m_arpDirectionBtnGrp->value() != OFF &&
+	m_arpGroupBox->setState( _this.attribute( "arpdir" ).toInt() != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );
 }
 

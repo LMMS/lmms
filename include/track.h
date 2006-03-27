@@ -129,8 +129,8 @@ protected:
 	void setAutoResizeEnabled( bool _e = FALSE );
 	float pixelsPerTact( void );
 
-	virtual void undoStep( journalEntry & _edit_step );
-	virtual void redoStep( journalEntry & _edit_step );
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
 
 
 protected slots:
@@ -210,8 +210,8 @@ protected:
 		return( "trackcontentwidget" );
 	}
 
-	virtual void undoStep( journalEntry & _edit_step );
-	virtual void redoStep( journalEntry & _edit_step );
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
 
 
 private:
@@ -277,7 +277,7 @@ private:
 
 
 // actual widget shown in trackContainer
-class trackWidget : public QWidget
+class trackWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -338,6 +338,15 @@ public slots:
 
 
 protected:
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
+
+	virtual QString nodeName( void ) const
+	{
+		return( "trackwidget" );
+	}
+
+
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );

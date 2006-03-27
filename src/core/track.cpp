@@ -595,7 +595,7 @@ trackContentWidget::~trackContentWidget()
 
 
 
-trackContentObject * FASTCALL trackContentWidget::getTCO( csize _tco_num )
+trackContentObject * trackContentWidget::getTCO( csize _tco_num )
 {
 	if( _tco_num < m_trackContentObjects.size() )
 	{
@@ -618,8 +618,7 @@ csize trackContentWidget::numOfTCOs( void )
 
 
 
-trackContentObject * FASTCALL trackContentWidget::addTCO(
-						trackContentObject * _tco )
+trackContentObject * trackContentWidget::addTCO( trackContentObject * _tco )
 {
 	QMap<QString, QVariant> map;
 	map["id"] = _tco->id();
@@ -639,7 +638,7 @@ trackContentObject * FASTCALL trackContentWidget::addTCO(
 
 
 
-void FASTCALL trackContentWidget::removeTCO( csize _tco_num, bool _also_delete )
+void trackContentWidget::removeTCO( csize _tco_num, bool _also_delete )
 {
 	removeTCO( getTCO( _tco_num ), _also_delete );
 }
@@ -661,10 +660,12 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 		map["id"] = _tco->id();
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TCO, map ) );
+
 		if( _also_delete )
 		{
 			delete _tco;
 		}
+
 		m_trackContentObjects.erase( it );
 		getTrack()->eng()->getSongEditor()->setModified();
 	}
@@ -873,15 +874,16 @@ void trackContentWidget::undoStep( journalEntry & _je )
 		case ADD_TCO:
 		{
 			QMap<QString, QVariant> map = _je.data().toMap();
-			journallingObject * jo =
-	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() );
-			assert( jo != NULL );
+			trackContentObject * tco =
+dynamic_cast<trackContentObject *>(
+	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() ) );
+			assert( tco != NULL );
 			multimediaProject mmp(
 					multimediaProject::JOURNAL_DATA );
-			jo->saveState( mmp, mmp.content() );
+			tco->saveState( mmp, mmp.content() );
 			map["state"] = mmp.toString();
 			_je.data() = map;
-			delete jo;
+			tco->close();
 			break;
 		}
 
@@ -1141,6 +1143,7 @@ void trackOperationsWidget::muteBtnRightClicked( void )
 
 trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	QWidget( _parent ),
+	journallingObject( _track->eng() ),
 	m_track( _track ),
 	m_trackOperationsWidget( this ),
 	m_trackSettingsWidget( this ),
@@ -1227,6 +1230,46 @@ void trackWidget::changePosition( const midiTime & _new_pos )
 			tco->hide();
 		}
 	}
+}
+
+
+
+
+void trackWidget::undoStep( journalEntry & _je )
+{
+	saveJournallingState( FALSE );
+	switch( _je.actionID() )
+	{
+		case MOVE_TRACK:
+		{
+			trackContainer * tc = m_track->getTrackContainer();
+			if( _je.data().toInt() > 0 )
+			{
+				tc->moveTrackUp( m_track );
+			}
+			else
+			{
+				tc->moveTrackDown( m_track );
+			}
+			break;
+		}
+		case RESIZE_TRACK:
+			setFixedHeight( tMax<int>( height() +
+						_je.data().toInt(),
+						MINIMAL_TRACK_HEIGHT ) );
+			m_track->getTrackContainer()->realignTracks();
+			break;
+	}
+	restoreJournallingState();
+}
+
+
+
+
+void trackWidget::redoStep( journalEntry & _je )
+{
+	journalEntry je( _je.actionID(), -_je.data().toInt() );
+	undoStep( je );
 }
 
 
@@ -1320,6 +1363,7 @@ void trackWidget::mouseMoveEvent( QMouseEvent * _me )
 			{
 				tc->moveTrackDown( m_track );
 			}
+			addJournalEntry( journalEntry( MOVE_TRACK, _me->y() ) );
 		}
 	}
 	else if( m_action == RESIZE_TRACK )
@@ -1429,7 +1473,7 @@ track::~track()
 
 
 
-track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
+track * track::create( trackTypes _tt, trackContainer * _tc )
 {
 	// while adding track, pause mixer for not getting into any trouble
 	// because of track being not created completely so far
@@ -1460,8 +1504,7 @@ track * FASTCALL track::create( trackTypes _tt, trackContainer * _tc )
 
 
 
-track * FASTCALL track::create( const QDomElement & _this,
-							trackContainer * _tc )
+track * track::create( const QDomElement & _this, trackContainer * _tc )
 {
 	track * t = create( static_cast<trackTypes>( _this.attribute(
 						"type" ).toInt() ), _tc );
@@ -1472,7 +1515,7 @@ track * FASTCALL track::create( const QDomElement & _this,
 
 
 
-track * FASTCALL track::clone( track * _track )
+track * track::clone( track * _track )
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
@@ -1492,7 +1535,7 @@ tact track::length( void ) const
 
 
 
-void FASTCALL track::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	csize num_of_tcos = getTrackContentWidget()->numOfTCOs();
 
@@ -1518,7 +1561,7 @@ void FASTCALL track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void FASTCALL track::loadSettings( const QDomElement & _this )
+void track::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "type" ).toInt() != type() )
 	{
@@ -1550,7 +1593,11 @@ void FASTCALL track::loadSettings( const QDomElement & _this )
 				trackContentObject * tco = createTCO(
 								midiTime( 0 ) );
 				tco->restoreState( node.toElement() );
+				getTrackContentWidget()->saveJournallingState(
+									FALSE );
 				addTCO( tco );
+				getTrackContentWidget()->
+						restoreJournallingState();
 			}
 		}
 		node = node.nextSibling();
@@ -1566,7 +1613,7 @@ void FASTCALL track::loadSettings( const QDomElement & _this )
 
 
 
-trackContentObject * FASTCALL track::addTCO( trackContentObject * _tco )
+trackContentObject * track::addTCO( trackContentObject * _tco )
 {
 	return( getTrackContentWidget()->addTCO( _tco ) );
 }
@@ -1574,7 +1621,7 @@ trackContentObject * FASTCALL track::addTCO( trackContentObject * _tco )
 
 
 
-void FASTCALL track::removeTCO( csize _tco_num )
+void track::removeTCO( csize _tco_num )
 {
 	getTrackContentWidget()->removeTCO( _tco_num );
 }
@@ -1590,7 +1637,7 @@ csize track::numOfTCOs( void )
 
 
 
-trackContentObject * FASTCALL track::getTCO( csize _tco_num )
+trackContentObject * track::getTCO( csize _tco_num )
 {
 	return( getTrackContentWidget()->getTCO( _tco_num ) );
 	
@@ -1599,7 +1646,7 @@ trackContentObject * FASTCALL track::getTCO( csize _tco_num )
 
 
 
-csize FASTCALL track::getTCONum( trackContentObject * _tco )
+csize track::getTCONum( trackContentObject * _tco )
 {
 	for( csize i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	{
@@ -1608,16 +1655,14 @@ csize FASTCALL track::getTCONum( trackContentObject * _tco )
 			return( i );
 		}
 	}
-#ifdef LMMS_DEBUG
-	qFatal( "track::getTCONum(...) -> _tco not found!\n" );
-#endif
+	qWarning( "track::getTCONum(...) -> _tco not found!\n" );
 	return( 0 );
 }
 
 
 
 
-void FASTCALL track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
+void track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
 							const midiTime & _start,
 							const midiTime & _end )
 {
@@ -1655,7 +1700,7 @@ void FASTCALL track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
 
 
 
-void FASTCALL track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
+void track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
 {
 	getTrackContentWidget()->swapPositionOfTCOs( _tco_num1, _tco_num2 );
 }

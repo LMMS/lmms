@@ -152,10 +152,8 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 		}
 	}
 
-
 	QDomElement root = documentElement();
 	m_type = type( root.attribute( "type" ) );
-
 	QDomNode node = root.firstChild();
 	while( !node.isNull() )
 	{
@@ -308,7 +306,10 @@ QString multimediaProject::typeName( projectTypes _project_type )
 {
 	if( _project_type >= UNKNOWN && _project_type < PROJ_TYPE_COUNT )
 	{
-		return( s_types[_project_type].m_name );
+		return( s_types[_project_type].m_name
+#warning compat-code, remove in 0.3.0
+				.section( ',', 0, 0 )
+				);
 	}
 	return( s_types[UNKNOWN].m_name );
 }

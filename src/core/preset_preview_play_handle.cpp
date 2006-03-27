@@ -56,12 +56,15 @@ class previewTrackContainer : public trackContainer
 public:
 	previewTrackContainer( engine * _engine ) :
 		trackContainer( _engine ),
-		m_previewChannelTrack( dynamic_cast<instrumentTrack *>(
-					track::create( track::CHANNEL_TRACK,
-								this ) )),
+		m_previewInstrumentTrack( NULL ),
 		m_previewNote( NULL ),
 		m_dataMutex()
 	{
+		setJournalling( FALSE );
+		m_previewInstrumentTrack =  dynamic_cast<instrumentTrack *>(
+					track::create( track::CHANNEL_TRACK,
+								this ) );
+		m_previewInstrumentTrack->setJournalling( FALSE );
 		hide();
 	}
 
@@ -81,9 +84,9 @@ public:
 		return( "previewtc" );
 	}
 
-	instrumentTrack * previewChannelTrack( void )
+	instrumentTrack * previewInstrumentTrack( void )
 	{
-		return( m_previewChannelTrack );
+		return( m_previewInstrumentTrack );
 	}
 
 	notePlayHandle * previewNote( void )
@@ -108,7 +111,7 @@ public:
 
 
 private:
-	instrumentTrack * m_previewChannelTrack;
+	instrumentTrack * m_previewInstrumentTrack;
 	notePlayHandle * m_previewNote;
 	QMutex m_dataMutex;
 
@@ -141,21 +144,21 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 
 	multimediaProject mmp( _preset_file );
-	previewTC()->previewChannelTrack()->loadTrackSpecificSettings(
+	printf("load track sp\n");
+	previewTC()->previewInstrumentTrack()->loadTrackSpecificSettings(
 				mmp.content().firstChild().toElement() );
+	printf("here\n");
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
-	previewTC()->previewChannelTrack()->m_midiPort->setMode(
+	previewTC()->previewInstrumentTrack()->m_midiPort->setMode(
 							midiPort::DUMMY );
 
-	// create temporary note
-	note n();
 	// create note-play-handle for it
-	m_previewNote = new notePlayHandle( previewTC()->previewChannelTrack(),
-						0, ~0,
+	m_previewNote = new notePlayHandle(
+			previewTC()->previewInstrumentTrack(), 0, ~0,
 		note( NULL, 0, 0, static_cast<tones>( A ),
-			static_cast<octaves>( DEFAULT_OCTAVE-1 ), 100 ) );
+			static_cast<octaves>( DEFAULT_OCTAVE - 1 ), 100 ) );
 
 
 	previewTC()->setPreviewNote( m_previewNote );
@@ -210,7 +213,7 @@ void presetPreviewPlayHandle::cleanUp( engine * _engine )
 
 
 
-constNotePlayHandleVector presetPreviewPlayHandle::nphsOfChannelTrack(
+constNotePlayHandleVector presetPreviewPlayHandle::nphsOfInstrumentTrack(
 						const instrumentTrack * _it )
 {
 	constNotePlayHandleVector cnphv;

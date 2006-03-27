@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.4-cvs20060323, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060323)
+AC_INIT(lmms, 0.1.4-cvs20060326, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060326)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -470,6 +470,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/plucked_string_synth/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
+		 plugins/vibed/Makefile
 		 lmms.spec])
 AC_OUTPUT
 
