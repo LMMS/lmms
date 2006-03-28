@@ -1,3 +1,7 @@
+2005-03-28	Danny McRae	<khjklujn/at/yahoo/dot/com>
+	* lib/sample_buffer.cpp:
+	corrected miscalculation of buffer size in resample
+	
 2005-03-26	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* plugins/vibed/:

@@ -1207,7 +1207,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 					static_cast<f_cnt_t>( src_frame_float );
 		const f_cnt_t src_frame = tLimit<f_cnt_t>(
 					static_cast<f_cnt_t>( src_frame_float ),
-							1, _frames - 2 );
+							1, _frames - 3 );
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			dst_buf[frame][ch] = cubicInterpolate(
