@@ -2,7 +2,6 @@
  * flp_import.cpp - support for importing FLP-files
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -162,6 +161,18 @@ plugin::descriptor flpimport_plugin_descriptor =
 }
 
 
+void dump_mem( const void * buffer, uint n_bytes )
+{
+	uchar * cp = (uchar *) buffer;
+	for( uint k = 0; k < n_bytes; ++k )
+	{
+		printf( "%02x ", ( cp[k] > 31 || cp[k] < 7 ) ? cp[k] : '.' );
+	}
+	printf( "\n" );
+}
+
+
+
 flpImport::flpImport( const QString & _file ) :
 	importFilter( _file, &flpimport_plugin_descriptor, NULL )
 {
@@ -190,16 +201,14 @@ bool flpImport::tryImport( trackContainer * _tc )
 		return( FALSE );
 	}
 
-	const int header_len = readInt( 4 );
-	printf("%d\n", header_len );
+	const int header_len = read32LE();
 	if( header_len != 6 )
 	{
-invalid_format:
 		printf( "flpImport::tryImport(): invalid file format\n" );
 		return( FALSE );
 	}
 
-	const int type = readInt( 2 );
+	const int type = read16LE();
 	if( type != 0 )
 	{
 		printf( "flpImport::tryImport(): type %d format is not "
@@ -207,7 +216,7 @@ invalid_format:
 		return( FALSE );
 	}
 
-	const int num_channels = readInt( 2 );
+	const int num_channels = read16LE();
 	if( num_channels < 1 || num_channels > 1000 )
 	{
 		printf( "flpImport::tryImport(): invalid number of channels "
@@ -217,10 +226,11 @@ invalid_format:
 
 	printf( "channels: %d\n", num_channels );
 
-	const int ppq = readInt( 2 );
+	const int ppq = read16LE();
 	if( ppq < 0 )
 	{
-		goto invalid_format;
+		printf( "flpImport::tryImport(): invalid ppq\n" );
+		return( FALSE );
 	}
 
 #ifdef QT4
@@ -240,7 +250,7 @@ invalid_format:
 	while( 1 )
 	{
 		Sint32 id = readID();
-		const int len = readInt( 4 );
+		const int len = read32LE();
 		if( file().atEnd() )
 		{
 			printf( "flpImport::tryImport(): unexpected "
@@ -268,11 +278,13 @@ invalid_format:
 
 	instrumentTrack * it = NULL;
 	pattern * p = NULL;
+	char * text = NULL;
+	int text_len = 0;
 	int pat_cnt = 0;
 
 
         // read channels
-	for( int i = 0; i < num_channels; ++i )
+/*	for( int i = 0; i < num_channels; ++i )
 	{
 		pd.setValue( i );
 #ifdef QT4
@@ -284,20 +296,22 @@ invalid_format:
 		if( pd.wasCanceled() )
 		{
 			return( FALSE );
-		}
-
+		}*/
+	while( file().atEnd() == FALSE )
+	{
 		flpEvents ev = static_cast<flpEvents>( readByte() );
 		Uint32 data = readByte();
 
+		//printf("ev: %d\n", (int) ev );
 		if( ev >= FLP_Word && ev < FLP_Text )
 		{
-			data = ( data << 8 ) + readByte();
+			data = data | ( readByte() << 8 );
 		}
 
 		if( ev >= FLP_Int && ev < FLP_Text )
 		{
-			data = ( data << 8 ) + readByte();
-			data = ( data << 8 ) + readByte();
+			data = data | ( readByte() << 16 );
+			data = data | ( readByte() << 24 );
 		}
 
 /*For TEXT (variable-length) events, you still have to read the size of the event, which is coded in the next byte(s) a bit like in MIDI files (but not stupidly inverted). After the size is the actual data, which you can process or skip.
@@ -313,25 +327,63 @@ To resume, if Size < 128 then it will occupy only 1 byte, else if Size < 16384 i
 
 		if( ev >= FLP_Text )
 		{
-			int read_so_far = 2;
-			Uint32 len = data & 0x7F;
+			text_len = data & 0x7F;
 			while( data & 0x80 )
 			{
 				data = readByte();
-				len = ( len << 7 ) | ( data & 0x7F );
-				++read_so_far;
+				text_len = ( text_len << 7 ) | ( data & 0x7F );
 			}
-			skip( len - read_so_far );
-			continue;
+			delete[] text;
+			text = new char[text_len+1];
+			if( readBlock( text, text_len ) <= 0 )
+			{
+				printf( "could not read string\n" );
+			}
+			text[text_len] = 0;
 		}
 
 		switch( ev )
 		{
+			// BYTE EVENTS
 			case FLP_NoteOn:
 				// data = pos   how to handle?
 				break;
 
+			case FLP_LoopActive:
+				printf( "active loop: %d\n", data );
+				break;
+
+			case FLP_ShowInfo:
+				printf( "show info: %d\n", data );
+				break;
+
+			case FLP_Shuffle:
+				printf( "shuffle: %d\n", data );
+				break;
+
+			case FLP_MainVol:
+				printf( "main-volume: %d\n", data );
+				break;
+
+			case FLP_MainPitch:
+				printf( "main-pitch: %d\n", data );
+				break;
+
+			case FLP_PatLength:
+				printf( "pattern-length: %d\n", data );
+				break;
+
+			case FLP_BlockLength:
+				printf( "block length: %d\n", data );
+				break;
+
+			case FLP_ChanType:
+				printf( "channel type: %d\n", data );
+				break;
+
+			// WORD EVENTS
 			case FLP_NewChan:
+				printf( "new channel\n" );
 				m_events.clear();
 				pat_cnt = 0;
 
@@ -341,7 +393,7 @@ To resume, if Size < 128 then it will occupy only 1 byte, else if Size < 16384 i
 				it->loadInstrument( "tripleoscillator" );
 				it->toggledInstrumentTrackButton( FALSE );
 
-				continue;
+				break;
 
 			case FLP_NewPat:
 				p = dynamic_cast<pattern *>( it->createTCO(
@@ -350,9 +402,83 @@ To resume, if Size < 128 then it will occupy only 1 byte, else if Size < 16384 i
 				it->addTCO( p );
 				break;
 
+			case FLP_Tempo:
+				printf( "tempo: %d\n", data );
+				break;
+
+			case FLP_CurrentPatNum:
+				printf( "current pattern: %d\n", data );
+				break;
+
+			case FLP_FX:
+				printf( "FX-channel for cur channel: %d\n", data );
+				break;
+
+			case FLP_CutOff:
+				printf( "cutoff (for cur channel?): %d\n", data );
+				break;
+
+			case FLP_Resonance:
+				printf( "reso (for cur channel?): %d\n", data );
+				break;
+
+			case FLP_FX3:
+				printf( "FX 3: %d\n", data );
+				break;
+
+			case FLP_ShiftDelay:
+				printf( "shift delay: %d\n", data );
+				break;
+
+			// DWORD EVENTS
+			case FLP_DelayReso:
+				printf( "delay resonance: %d\n", data );
+				break;
+
+			case FLP_Reverb:
+				printf( "reverb: %d\n", data );
+				break;
+
+			case FLP_Version:
+				printf( "FL Version: %s\n", text );
+				break;
+
+			case FLP_Text_PluginName:
+				if( QString( text ) == "3x Osc" )
+				{
+					it->loadInstrument( "tripleoscillator" );
+				}
+				else
+				{
+					printf( "unsupported plugin: %s\n", text );
+				}
+				break;
+
+			case FLP_Delay:
+				printf( "delay-data:\n" );
+				dump_mem( text, text_len );
+				break;
+
+			case FLP_NewPlugin:
+				printf( "new plugin: %s\n", text );
+				break;
+
+			case FLP_PluginParams:
+				printf( "plugin params:\n" );
+				dump_mem( text, text_len );
+				break;
+
 			default:
-				printf( "handling of FLP-event %d not "
-						"implemented yet.", ev );
+				if( ev >= FLP_Text )
+				{
+					printf( "unhandled text (%d): %s\n", ev,
+						text );
+				}
+				else
+				{
+					printf( "!! handling of FLP-event %d not "
+						"implemented yet.\n", ev );
+				}
 				break;
 		}
 /*

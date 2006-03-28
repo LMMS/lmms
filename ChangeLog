@@ -1,3 +1,9 @@
+2006-03-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	improvements for having a working flp-filter as soon as possible
+
 2005-03-28	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* src/lib/sample_buffer.cpp:

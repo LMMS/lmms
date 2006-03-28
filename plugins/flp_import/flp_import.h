@@ -197,6 +197,12 @@ private:
 		value |= readByte() << 24;
 		return( value );
 	}
+	inline Sint32 read16LE( void )
+	{
+		int value = readByte();
+		value |= readByte() << 8;
+		return( value );
+	}
 /*	inline int readVar( void )
 	{
 		int c = readByte();

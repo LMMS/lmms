@@ -94,6 +94,11 @@ protected:
 #endif
 	}
 
+	inline int readBlock( char * _data, int _len )
+	{
+		return( m_file.readBlock( _data, _len ) );
+	}
+
 	inline void ungetChar( int _ch )
 	{
 #ifndef QT3
