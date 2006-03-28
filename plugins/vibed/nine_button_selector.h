@@ -24,12 +24,11 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include <qptrlist.h>
-
 #include "qt3support.h"
 #include "config.h"
 #include "types.h"
 #include "pixmap_button.h"
+
 
 class nineButtonSelector: public QWidget, public engineObject
 {
@@ -79,7 +78,7 @@ signals:
 	void nineButtonSelection( Uint8 );
 	
 private:
-	QPtrList<pixmapButton> m_buttons;
+	vlist<pixmapButton*> m_buttons;
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
 	QPixmap m_base;

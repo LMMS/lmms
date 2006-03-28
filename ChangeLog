@@ -2,6 +2,15 @@
 
 	* src/lib/sample_buffer.cpp:
 	corrected miscalculation of buffer size in resample
+
+	* nine_button_selector.cpp:
+	* nine_button_selector.h:
+	* string_container.cpp:
+	* string_container.h:
+	* vibed.cpp:
+	* vibed.h:
+	changed QPtrList variables to vlist type to make things more
+	Qt4 friendly
 	
 2006-03-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

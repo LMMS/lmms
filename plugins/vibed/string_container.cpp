@@ -25,9 +25,9 @@
 #include "string_container.h"
 
 
-stringContainer::stringContainer(	const float _pitch, 
-					const sample_rate_t _sample_rate,
-					const Uint32 _buffer_length ) :
+stringContainer::stringContainer(const float _pitch, 
+				const sample_rate_t _sample_rate,
+				const Uint32 _buffer_length ) :
 	m_pitch( _pitch ),
 	m_sampleRate( _sample_rate ),
 	m_bufferLength( _buffer_length )

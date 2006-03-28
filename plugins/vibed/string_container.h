@@ -24,16 +24,9 @@
 #define _TWO_STRINGS_H
 
 
-#ifdef QT4
+#include "qt3support.h"
 
-#include <Qt3Support>
-
-#else
-
-#include "qptrlist.h"
-
-#endif
-
+#include <qvaluevector.h>
 
 #include "config.h"
 #include "types.h"
@@ -44,7 +37,7 @@
 class stringContainer
 {
 public:
-	stringContainer(	const float _pitch, 
+	stringContainer(const float _pitch, 
 			const sample_rate_t _sample_rate,
 			const Uint32 _buffer_length );
 	
@@ -56,25 +49,24 @@ public:
 			const float _string_loss,
 			const float _detune,
 			const Uint8 _oversample,
-			const bool _state  );
+			const bool _state );
 	
 	inline ~stringContainer()
 	{
-		m_strings.setAutoDelete( TRUE );
 		Uint32 strings = m_strings.count();
 		for( Uint32 i = 0; i < strings; i++ )
 		{
-			m_strings.removeFirst();
+			delete m_strings[i];
 		}
 	}
 	
 	inline float getStringSample( Uint8 _string )
 	{
-		return( m_strings.at( _string )->nextSample() );
+		return( m_strings[_string]->nextSample() );
 	}
 	
 private:
-	QPtrList<vibratingString> m_strings;
+	vvector<vibratingString *> m_strings;
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
 	const Uint32 m_bufferLength;

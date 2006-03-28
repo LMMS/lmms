@@ -152,13 +152,17 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button8Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_lastBtn = m_buttons.at( _default );
+	m_lastBtn = m_buttons[_default];
 	m_lastBtn->setChecked( TRUE );
 }
 
 
 nineButtonSelector::~ nineButtonSelector()
 {
+	for( Uint8 i = 0; i < 9; i++ )
+	{
+		delete m_buttons[i];
+	}
 }
 
 
@@ -167,7 +171,7 @@ nineButtonSelector::~ nineButtonSelector()
 void nineButtonSelector::button0Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 0 );
+	m_lastBtn = m_buttons[0];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 0;
@@ -180,7 +184,7 @@ void nineButtonSelector::button0Clicked( void )
 void nineButtonSelector::button1Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 1 );
+	m_lastBtn = m_buttons[1];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 1;
@@ -193,7 +197,7 @@ void nineButtonSelector::button1Clicked( void )
 void nineButtonSelector::button2Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 2 );
+	m_lastBtn = m_buttons[2];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 2;
@@ -206,7 +210,7 @@ void nineButtonSelector::button2Clicked( void )
 void nineButtonSelector::button3Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 3 );
+	m_lastBtn = m_buttons[3];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 3;
@@ -219,7 +223,7 @@ void nineButtonSelector::button3Clicked( void )
 void nineButtonSelector::button4Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 4 );
+	m_lastBtn = m_buttons[4];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 4;
@@ -232,7 +236,7 @@ void nineButtonSelector::button4Clicked( void )
 void nineButtonSelector::button5Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 5 );
+	m_lastBtn = m_buttons[5];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 5;
@@ -245,7 +249,7 @@ void nineButtonSelector::button5Clicked( void )
 void nineButtonSelector::button6Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 6 );
+	m_lastBtn = m_buttons[6];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 6;
@@ -258,7 +262,7 @@ void nineButtonSelector::button6Clicked( void )
 void nineButtonSelector::button7Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 7 );
+	m_lastBtn = m_buttons[7];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 7;
@@ -271,7 +275,7 @@ void nineButtonSelector::button7Clicked( void )
 void nineButtonSelector::button8Clicked( void )
 {
 	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons.at( 8 );
+	m_lastBtn = m_buttons[8];
 	m_lastBtn->setChecked( TRUE );
 	
 	m_selected = 8;

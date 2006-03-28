@@ -33,6 +33,7 @@
 
 class vibratingString
 {
+
 public:
 	vibratingString(	float _pitch, 
 				float _pick, 

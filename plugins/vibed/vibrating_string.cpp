@@ -38,7 +38,7 @@ vibratingString::vibratingString(	float _pitch,
 					float _randomize,
 					float _string_loss,
 					float _detune,
-					bool _state ):
+					bool _state ) :
 	m_oversample( _oversample ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
@@ -156,3 +156,4 @@ void FASTCALL vibratingString::resample( float *_src,
 						frac_pos );
 	}
 }
+

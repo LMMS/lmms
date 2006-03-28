@@ -358,17 +358,17 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "vibrating strings.  The LED in the lower right corner of the "
 "waveform editor indicates whether the selected string is active." ) );
 
-	m_pickKnob = m_pickKnobs.at( 0 );
-	m_pickupKnob = m_pickupKnobs.at( 0 );
-	m_stiffnessKnob = m_stiffnessKnobs.at( 0 );
-	m_volumeKnob = m_volumeKnobs.at( 0 );
-	m_panKnob = m_panKnobs.at( 0 );
-	m_detuneKnob = m_detuneKnobs.at( 0 );
-	m_randomKnob = m_randomKnobs.at( 0 );
-	m_lengthKnob = m_lengthKnobs.at( 0 );
-	m_editor = m_editors.at( 0 );
-	m_impulse = m_impulses.at( 0 );
-	m_harmonic = m_harmonics.at( 0 );
+	m_pickKnob = m_pickKnobs[0];
+	m_pickupKnob = m_pickupKnobs[0];
+	m_stiffnessKnob = m_stiffnessKnobs[0];
+	m_volumeKnob = m_volumeKnobs[0];
+	m_panKnob = m_panKnobs[0];
+	m_detuneKnob = m_detuneKnobs[0];
+	m_randomKnob = m_randomKnobs[0];
+	m_lengthKnob = m_lengthKnobs[0];
+	m_editor = m_editors[0];
+	m_impulse = m_impulses[0];
+	m_harmonic = m_harmonics[0];
 	
 	m_editor->setOn( TRUE );
 	showString( 0 );
@@ -407,30 +407,20 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 vibed::~vibed()
 {
 	delete m_sampleBuffer;
-	m_pickKnobs.setAutoDelete( TRUE );
-	m_pickupKnobs.setAutoDelete( TRUE );
-	m_stiffnessKnobs.setAutoDelete( TRUE );
-	m_volumeKnobs.setAutoDelete( TRUE );
-	m_panKnobs.setAutoDelete( TRUE );
-	m_detuneKnobs.setAutoDelete( TRUE );
-	m_randomKnobs.setAutoDelete( TRUE );
-	m_lengthKnobs.setAutoDelete( TRUE );
-	m_editors.setAutoDelete( TRUE );
-	m_impulses.setAutoDelete( TRUE );
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		m_pickKnobs.removeFirst();
-		m_pickupKnobs.removeFirst();
-		m_stiffnessKnobs.removeFirst();
-		m_volumeKnobs.removeFirst();
-		m_panKnobs.removeFirst();
-		m_detuneKnobs.removeFirst();
-		m_randomKnobs.removeFirst();
-		m_lengthKnobs.removeFirst();
-		m_editors.removeFirst();
-		m_impulses.removeFirst();
-		m_harmonics.removeFirst();
-	}		
+		delete m_pickKnobs[harm];
+		delete m_pickupKnobs[harm];
+		delete m_stiffnessKnobs[harm];
+		delete m_volumeKnobs[harm];
+		delete m_panKnobs[harm];
+		delete m_detuneKnobs[harm];
+		delete m_randomKnobs[harm];
+		delete m_lengthKnobs[harm];
+		delete m_editors[harm];
+		delete m_impulses[harm];
+		delete m_harmonics[harm];
+	}
 }
 
 
@@ -448,48 +438,48 @@ void vibed::saveSettings( QDomDocument & _doc,
 	{
 		name = "active" + QString::number( i );
 		_this.setAttribute( name, QString::number( 
-					m_editors.at( i )->isOn() ) );
-		if( m_editors.at( i )->isOn() )
+					m_editors[i]->isOn() ) );
+		if( m_editors[i]->isOn() )
 		{
 			name = "volume" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_volumeKnobs.at( i )->value() ) );
+					m_volumeKnobs[i]->value() ) );
 	
 			name = "stiffness" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_stiffnessKnobs.at( i )->value() ) );
+					m_stiffnessKnobs[i]->value() ) );
 
 			name = "pick" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_pickKnobs.at( i )->value() ) );
+					m_pickKnobs[i]->value() ) );
 
 			name = "pickup" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_pickupKnobs.at( i )->value() ) );
+					m_pickupKnobs[i]->value() ) );
 
 			name = "length" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_lengthKnobs.at( i )->value() ) );
+					m_lengthKnobs[i]->value() ) );
 
 			name = "pan" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_panKnobs.at( i )->value() ) );
+					m_panKnobs[i]->value() ) );
 
 			name = "detune" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_detuneKnobs.at( i )->value() ) );
+					m_detuneKnobs[i]->value() ) );
 
 			name = "slap" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_randomKnobs.at( i )->value() ) );
+					m_randomKnobs[i]->value() ) );
 
 			name = "impulse" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
-					m_impulses.at( i )->isChecked() ) );
+					m_impulses[i]->isChecked() ) );
 		
 			QString sampleString;
 			base64::encode( 
-				(const char *)m_editors.at( i )->getValues(), 
+				(const char *)m_editors[i]->getValues(), 
 				 128 * sizeof(float), sampleString );
 			name = "graph" + QString::number( i );
 			_this.setAttribute( name, sampleString );
@@ -508,44 +498,44 @@ void vibed::loadSettings( const QDomElement & _this )
 	for( Uint8 i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
-		m_editors.at( i )->setOn( _this.attribute( name ).toInt() );
+		m_editors[i]->setOn( _this.attribute( name ).toInt() );
 		
-		if( m_editors.at( i )->isOn() )
+		if( m_editors[i]->isOn() )
 		{
 			name = "volume" + QString::number( i );
-			m_volumeKnobs.at( i )->setValue( 
+			m_volumeKnobs[i]->setValue( 
 				_this.attribute( name ).toFloat() );
 		
 			name = "stiffness" + QString::number( i );
-			m_stiffnessKnobs.at( i )->setValue( 
+			m_stiffnessKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "pick" + QString::number( i );
-			m_pickKnobs.at( i )->setValue( 
+			m_pickKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "pickup" + QString::number( i );
-			m_pickupKnobs.at( i )->setValue( 
+			m_pickupKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "length" + QString::number( i );
-			m_lengthKnobs.at( i )->setValue( 
+			m_lengthKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "pan" + QString::number( i );
-			m_panKnobs.at( i )->setValue( 
+			m_panKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "detune" + QString::number( i );
-			m_detuneKnobs.at( i )->setValue( 
+			m_detuneKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "slap" + QString::number( i );
-			m_randomKnobs.at( i )->setValue( 
+			m_randomKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
 			name = "impulse" + QString::number( i );
-			m_impulses.at( i )->setChecked(
+			m_impulses[i]->setChecked(
 					_this.attribute( name ).toInt() );
 
 			name = "graph" + QString::number( i );
@@ -555,7 +545,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			char * dst = 0;
 			base64::decode( sampleString, &dst, &size );
 			memcpy( shape, dst, size );
-			m_editors.at( i )->setValues( shape );
+			m_editors[i]->setValues( shape );
 		}
 	}
 	
@@ -586,20 +576,20 @@ void vibed::playNote( notePlayHandle * _n )
 		
 		for( Uint8 i = 0; i < 9; i++ )
 		{
-			if( m_editors.at( i )->isOn() )
+			if( m_editors[i]->isOn() )
 			{
 				static_cast<stringContainer*>(
 					_n->m_pluginData )->addString(
-				m_harmonics.at( i )->getSelected(),
-				m_pickKnobs.at( i )->value(),
-				m_pickupKnobs.at( i )->value(),
-				m_editors.at( i )->getValues(),
-				m_randomKnobs.at( i )->value(),
-				m_stiffnessKnobs.at( i )->value(),
-				m_detuneKnobs.at( i )->value(),
+				m_harmonics[i]->getSelected(),
+				m_pickKnobs[i]->value(),
+				m_pickupKnobs[i]->value(),
+				m_editors[i]->getValues(),
+				m_randomKnobs[i]->value(),
+				m_stiffnessKnobs[i]->value(),
+				m_detuneKnobs[i]->value(),
 				static_cast<int>(
-					m_lengthKnobs.at( i )->value() ),
-				m_impulses.at( i )->isChecked() );
+					m_lengthKnobs[i]->value() ),
+				m_impulses[i]->isChecked() );
 			}
 		}
 	}
@@ -622,12 +612,11 @@ void vibed::playNote( notePlayHandle * _n )
 		s = 0;
 		for( Uint8 string = 0; string < 9; string ++ )
 		{
-			if( m_editors.at( string )->isOn() )
+			if( m_editors[string]->isOn() )
 			{
-				vol = m_volumeKnobs.at( 
-							string )->value();
+				vol = m_volumeKnobs[string]->value();
 				pan = ( 
-				m_panKnobs.at( string )->value() + 1 ) / 2.0;
+				m_panKnobs[string]->value() + 1 ) / 2.0;
 				sample = ps->getStringSample( s );
 
 				buf[i][0] += pan * vol * sample;
@@ -667,30 +656,30 @@ void vibed::showString( Uint8 _string )
 	m_impulse->hide();
 	m_harmonic->hide();
 	
-	m_editors.at( _string )->show();
-	m_volumeKnobs.at( _string )->show();
-	m_stiffnessKnobs.at( _string )->show();
-	m_pickKnobs.at( _string )->show();
-	m_pickupKnobs.at( _string )->show();
-	m_panKnobs.at( _string )->show();
-	m_detuneKnobs.at( _string )->show();
-	m_randomKnobs.at( _string )->show();
-	m_lengthKnobs.at( _string )->show();
-	m_impulses.at( _string )->show();
-	m_impulses.at( _string )->update();
-	m_harmonics.at( _string )->show();
+	m_editors[_string]->show();
+	m_volumeKnobs[_string]->show();
+	m_stiffnessKnobs[_string]->show();
+	m_pickKnobs[_string]->show();
+	m_pickupKnobs[_string]->show();
+	m_panKnobs[_string]->show();
+	m_detuneKnobs[_string]->show();
+	m_randomKnobs[_string]->show();
+	m_lengthKnobs[_string]->show();
+	m_impulses[_string]->show();
+	m_impulses[_string]->update();
+	m_harmonics[_string]->show();
 	
-	m_pickKnob = m_pickKnobs.at( _string );
-	m_pickupKnob = m_pickupKnobs.at( _string );
-	m_stiffnessKnob = m_stiffnessKnobs.at( _string );
-	m_volumeKnob = m_volumeKnobs.at( _string );
-	m_panKnob = m_panKnobs.at( _string );
-	m_detuneKnob = m_detuneKnobs.at( _string );
-	m_randomKnob = m_randomKnobs.at( _string );
-	m_lengthKnob = m_lengthKnobs.at( _string );
-	m_editor = m_editors.at( _string );
-	m_impulse = m_impulses.at( _string );
-	m_harmonic = m_harmonics.at( _string );
+	m_pickKnob = m_pickKnobs[_string];
+	m_pickupKnob = m_pickupKnobs[_string];
+	m_stiffnessKnob = m_stiffnessKnobs[_string];
+	m_volumeKnob = m_volumeKnobs[_string];
+	m_panKnob = m_panKnobs[_string];
+	m_detuneKnob = m_detuneKnobs[_string];
+	m_randomKnob = m_randomKnobs[_string];
+	m_lengthKnob = m_lengthKnobs[_string];
+	m_editor = m_editors[_string];
+	m_impulse = m_impulses[_string];
+	m_harmonic = m_harmonics[_string];
 }
 
 
