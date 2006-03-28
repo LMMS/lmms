@@ -71,7 +71,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
-	m_setupTabWidget->setGeometry( 4, 5, 238, 160 );
+	m_setupTabWidget->setGeometry( 4, 5, 238, 200 );
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
@@ -89,7 +89,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->move( 28, 112 );
+	m_outputChannelSpinBox->move( 28, 132 );
 	connect( m_outputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( outputChannelChanged( int ) ) );
 	outputChannelChanged( m_outputChannelSpinBox->value() );
@@ -103,14 +103,28 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
 			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
+	m_defaultVelocityInCheckBox = new ledCheckBox( tr( "Default velocity "
+						"for all input-events" ),
+						m_setupTabWidget, eng() );
+	m_defaultVelocityInCheckBox->move( 28, 84 );
+	connect( m_defaultVelocityInCheckBox, SIGNAL( toggled( bool ) ),
+				this, SLOT( defaultVelInChanged( bool ) ) );
+
 
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
 						m_setupTabWidget, eng() );
-	m_sendCheckBox->move( 10, 94 );
+	m_sendCheckBox->move( 10, 114 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
+
+	m_defaultVelocityOutCheckBox = new ledCheckBox( tr( "Default velocity "
+						"for all output-events" ),
+						m_setupTabWidget, eng() );
+	m_defaultVelocityOutCheckBox->move( 28, 164 );
+	connect( m_defaultVelocityOutCheckBox, SIGNAL( toggled( bool ) ),
+				this, SLOT( defaultVelOutChanged( bool ) ) );
 
 
 	const midiPort::modes m = m_midiPort->mode();
@@ -168,7 +182,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 		wp_btn->setText( tr( "MIDI-devices to send MIDI-events "
 								"to" ) );
 		wp_btn->setIcon( embed::getIconPixmap( "midi_out" ) );
-		wp_btn->setGeometry( 186, 94, 40, 40 );
+		wp_btn->setGeometry( 186, 114, 40, 40 );
 		wp_btn->setMenu( m_writeablePorts );
 #ifdef QT4
 		wp_btn->setPopupMode( QToolButton::InstantPopup );
@@ -199,6 +213,10 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
 	_this.setAttribute( "receive", m_receiveCheckBox->isChecked() );
 	_this.setAttribute( "send", m_sendCheckBox->isChecked() );
+	_this.setAttribute( "defvelin",
+				m_defaultVelocityInCheckBox->isChecked() );
+	_this.setAttribute( "defvelout",
+				m_defaultVelocityOutCheckBox->isChecked() );
 
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
@@ -274,6 +292,10 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 								).toInt() );
 	m_receiveCheckBox->setChecked( _this.attribute( "receive" ).toInt() );
 	m_sendCheckBox->setChecked( _this.attribute( "send" ).toInt() );
+	m_defaultVelocityInCheckBox->setChecked(
+					_this.attribute( "defvelin" ).toInt() );
+	m_defaultVelocityOutCheckBox->setChecked(
+				_this.attribute( "defvelout" ).toInt() );
 
 	// restore connections
 
@@ -354,6 +376,22 @@ void midiTabWidget::outputChannelChanged( int _new_chnl )
 {
 	m_midiPort->setOutputChannel( _new_chnl - 1 );
 	eng()->getSongEditor()->setModified();
+}
+
+
+
+
+void midiTabWidget::defaultVelInChanged( bool _on )
+{
+	m_midiPort->enableDefaultVelocityForInEvents( _on );
+}
+
+
+
+
+void midiTabWidget::defaultVelOutChanged( bool _on )
+{
+	m_midiPort->enableDefaultVelocityForOutEvents( _on );
 }
 
 

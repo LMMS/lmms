@@ -672,7 +672,6 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>bbTrack</name>
     <message>
-    <message>
         <source>Beat/Baseline %1</source>
         <translation>Beat/Baseline %1</translation>
     </message>
@@ -724,87 +723,87 @@ http://lmms.sourceforge.net</translation>
     <name>channelTrack</name>
     <message>
         <source>With this knob you can set the volume of the opened channel.</source>
-        <translation>Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
     </message>
     <message>
         <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
-        <translation>Innerhalb dieses Rechtecks können Sie die Position setzen, an der dieser Kanal zu hören sein soll. Um dieses Feature sinnvoll zu nutzen, sollten Sie eine Soundkarte haben, die mindestens Surround 4.0 unterstützt.</translation>
+        <translation type="obsolete">Innerhalb dieses Rechtecks können Sie die Position setzen, an der dieser Kanal zu hören sein soll. Um dieses Feature sinnvoll zu nutzen, sollten Sie eine Soundkarte haben, die mindestens Surround 4.0 unterstützt.</translation>
     </message>
     <message>
         <source>Save current channel settings in a preset-file</source>
-        <translation>Aktuelle Kanal-Einstellungen in einer Preset-Datei speichern</translation>
+        <translation type="obsolete">Aktuelle Kanal-Einstellungen in einer Preset-Datei speichern</translation>
     </message>
     <message>
         <source>Channel volume</source>
-        <translation>Kanal Lautstärke</translation>
+        <translation type="obsolete">Kanal Lautstärke</translation>
     </message>
     <message>
         <source>Channel volume:</source>
-        <translation>Kanal Lautstärke:</translation>
+        <translation type="obsolete">Kanal Lautstärke:</translation>
     </message>
     <message>
         <source>Channel-Settings-File (*.cs.xml)</source>
-        <translation>Channel-Settings-Datei (*.cs.xml)</translation>
+        <translation type="obsolete">Channel-Settings-Datei (*.cs.xml)</translation>
     </message>
     <message>
         <source>Save channel-settings in file</source>
-        <translation>Kanal-Einstellungen in Datei speichern</translation>
+        <translation type="obsolete">Kanal-Einstellungen in Datei speichern</translation>
     </message>
     <message>
         <source>VOLUME</source>
-        <translation>LAUTSTÄRKE</translation>
+        <translation type="obsolete">LAUTSTÄRKE</translation>
     </message>
     <message>
         <source>FX CHNL</source>
-        <translation>FX KANAL</translation>
+        <translation type="obsolete">FX KANAL</translation>
     </message>
     <message>
         <source>ENV/LFO/FILTER</source>
-        <translation>HÜLLK./LFO/FILTER</translation>
+        <translation type="obsolete">HÜLLK./LFO/FILTER</translation>
     </message>
     <message>
         <source>ARP/CHORD</source>
-        <translation>ARP/AKK.</translation>
+        <translation type="obsolete">ARP/AKK.</translation>
     </message>
     <message>
         <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation>Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation>LAUT</translation>
+        <translation type="obsolete">LAUT</translation>
     </message>
     <message>
         <source>GENERAL SETTINGS</source>
-        <translation>GRUNDLEGENDE EINSTELLUNGEN</translation>
+        <translation type="obsolete">GRUNDLEGENDE EINSTELLUNGEN</translation>
     </message>
     <message>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="obsolete">MIDI</translation>
     </message>
     <message>
         <source>PLUGIN</source>
-        <translation>PLUGIN</translation>
+        <translation type="obsolete">PLUGIN</translation>
     </message>
     <message>
         <source>unnamed_channel</source>
-        <translation>Unbenannter_Kanal</translation>
+        <translation type="obsolete">Unbenannter_Kanal</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation>Default</translation>
+        <translation type="obsolete">Default</translation>
     </message>
     <message>
         <source>MIDI input/output</source>
-        <translation>MIDI-Eingabe/Ausgabe</translation>
+        <translation type="obsolete">MIDI-Eingabe/Ausgabe</translation>
     </message>
     <message>
         <source>MIDI input</source>
-        <translation>MIDI-Eingabe</translation>
+        <translation type="obsolete">MIDI-Eingabe</translation>
     </message>
     <message>
         <source>MIDI output</source>
-        <translation>MIDI-Ausgabe</translation>
+        <translation type="obsolete">MIDI-Ausgabe</translation>
     </message>
 </context>
 <context>
@@ -1194,7 +1193,7 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     </message>
     <message>
         <source>Here you can select the built-in filter you want to use in this channel. Filters are very important for changing the characteristics of a sound.</source>
-        <translation>Hier können Sie den eingebauten Filter wählen, den Sie in diesem Kanal verwenden wollen. Filter sind sehr wichtig, um den Charakter eines Klangs zu ändern.</translation>
+        <translation type="obsolete">Hier können Sie den eingebauten Filter wählen, den Sie in diesem Kanal verwenden wollen. Filter sind sehr wichtig, um den Charakter eines Klangs zu ändern.</translation>
     </message>
     <message>
         <source>Hz</source>
@@ -1251,6 +1250,10 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     <message>
         <source>TARGET</source>
         <translation>ZIEL</translation>
+    </message>
+    <message>
+        <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
+        <translation>Hier können Sie den eingebauten Filter wählen, den Sie in dieser Instrument-Spur nutzen wollen. Filter sind sehr wichtig, um die Charakteristik eines Klangs zu verändern.</translation>
     </message>
 </context>
 <context>
@@ -1332,15 +1335,161 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
     <message>
         <source>Send to active channel</source>
-        <translation>An aktiven Kanal senden</translation>
+        <translation type="obsolete">An aktiven Kanal senden</translation>
     </message>
     <message>
         <source>Open in new channel/Song-Editor</source>
-        <translation>In neuem Kanal im Song-Editor öffnen</translation>
+        <translation type="obsolete">In neuem Kanal im Song-Editor öffnen</translation>
     </message>
     <message>
         <source>Open in new channel/B+B Editor</source>
-        <translation>In neuem Kanal im B+B Editor öffnen</translation>
+        <translation type="obsolete">In neuem Kanal im B+B Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Send to active instrument-track</source>
+        <translation>An aktive Instrument-Spur senden</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation>In neuer Instrument-Spur im Song-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation>In neuer Instrument-Spur im B+B Editor öffnen</translation>
+    </message>
+</context>
+<context>
+    <name>impulseEditor</name>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse onto this graph</source>
+        <translation>Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen</translation>
+    </message>
+    <message>
+        <source>Click here if you want a sine-wave for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here if you want a triangle-wave for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here if you want a saw-wave for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here if you want a square-wave for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here if you want a white-noise for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
+        <translation>Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Click here to smooth waveform.</source>
+        <translation>Klicken Sie hier, um die Wellenform zu glätten.</translation>
+    </message>
+    <message>
+        <source>Click here to normalize waveform.</source>
+        <translation>Hier klicken, um die Wellenform zu normalisieren.</translation>
+    </message>
+    <message>
+        <source>Click here to enable/disable waveform.</source>
+        <translation>Hier klicken, um die Wellenform zu aktivieren/deaktiveren.</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
+    </message>
+</context>
+<context>
+    <name>instrumentTrack</name>
+    <message>
+        <source>With this knob you can set the volume of the opened channel.</source>
+        <translation>Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
+    </message>
+    <message>
+        <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
+        <translation>Innerhalb dieses Rechtecks können Sie die Position setzen, an der dieser Kanal zu hören sein soll. Um dieses Feature sinnvoll zu nutzen, sollten Sie eine Soundkarte haben, die mindestens Surround 4.0 unterstützt.</translation>
+    </message>
+    <message>
+        <source>unnamed_channel</source>
+        <translation>Unbenannter_Kanal</translation>
+    </message>
+    <message>
+        <source>Channel volume</source>
+        <translation>Kanal Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel volume:</source>
+        <translation>Kanal Lautstärke:</translation>
+    </message>
+    <message>
+        <source>VOL</source>
+        <translation>LAUT</translation>
+    </message>
+    <message>
+        <source>MIDI input/output</source>
+        <translation>MIDI-Eingabe/Ausgabe</translation>
+    </message>
+    <message>
+        <source>GENERAL SETTINGS</source>
+        <translation>GRUNDLEGENDE EINSTELLUNGEN</translation>
+    </message>
+    <message>
+        <source>VOLUME</source>
+        <translation>LAUTSTÄRKE</translation>
+    </message>
+    <message>
+        <source>FX CHNL</source>
+        <translation>FX KANAL</translation>
+    </message>
+    <message>
+        <source>Save current channel settings in a preset-file</source>
+        <translation>Aktuelle Kanal-Einstellungen in einer Preset-Datei speichern</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation>Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>ENV/LFO/FILTER</source>
+        <translation>HÜLLK./LFO/FILTER</translation>
+    </message>
+    <message>
+        <source>ARP/CHORD</source>
+        <translation>ARP/AKKORD</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>MIDI input</source>
+        <translation>MIDI-Eingabe</translation>
+    </message>
+    <message>
+        <source>MIDI output</source>
+        <translation>MIDI-Ausgabe</translation>
+    </message>
+    <message>
+        <source>Save channel-settings in file</source>
+        <translation>Kanal-Einstellungen in Datei speichern</translation>
+    </message>
+    <message>
+        <source>Channel-Settings-File (*.cs.xml)</source>
+        <translation>Channel-Settings-Datei (*.cs.xml)</translation>
+    </message>
+    <message>
+        <source>PLUGIN</source>
+        <translation>PLUGIN</translation>
     </message>
 </context>
 <context>
@@ -1561,6 +1710,18 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Baseline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Baseline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>Wiederherstellen</translation>
+    </message>
 </context>
 <context>
     <name>midiClient</name>
@@ -1631,6 +1792,13 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>All images (*.png *.jpg *.jpeg *.gif *.bmp)</source>
         <translation>Alle Bilder (*.png *.jpg *.jpeg *.gif *.bmp)</translation>
+    </message>
+</context>
+<context>
+    <name>nineButtonSelector</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
     </message>
 </context>
 <context>
@@ -1902,7 +2070,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>simple sampler with various settings for using samples (e.g. drums) in a channel</source>
-        <translation>Einfacher Sampler mit verschiedenen Einstellungen zum Benutzen von Samples (z.B. Drums) in einem Kanal</translation>
+        <translation type="obsolete">Einfacher Sampler mit verschiedenen Einstellungen zum Benutzen von Samples (z.B. Drums) in einem Kanal</translation>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
@@ -1923,6 +2091,18 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
         <translation>Additiver Synthesizer für orgelähnliche Klänge</translation>
+    </message>
+    <message>
+        <source>Vibrating string modeler</source>
+        <translation>Modellierung einer schwingenden Saite</translation>
+    </message>
+    <message>
+        <source>Filter for importing MIDI-files into LMMS</source>
+        <translation>Filter, um MIDI-Dateien in LMMS zu importieren</translation>
+    </message>
+    <message>
+        <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
+        <translation>Einfacher Sampler mit verschiedenen Einstellungen zur Nutzung von Samples (z.B. Drums) in einer Instrument-Spur</translation>
     </message>
 </context>
 <context>
@@ -2589,23 +2769,43 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     </message>
     <message>
         <source>Could not open file</source>
-        <translation>Konnte Datei nicht öffnen</translation>
+        <translation type="obsolete">Konnte Datei nicht öffnen</translation>
     </message>
     <message>
         <source>Could not open file %1 for reading.
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation>Die Datei %1 konnte nicht zum Lesen geöffnet werden.
+        <translation type="obsolete">Die Datei %1 konnte nicht zum Lesen geöffnet werden.
 Bitte stellen Sie sicher, dass Sie Leserechte auf die Datei und auf das Verzeichnis, das diese Datei beinhaltet, haben und versuchen es erneut!</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Die Datei %1 konnte nicht zum Schreiben geöffnet werden.
+        <translation type="obsolete">Die Datei %1 konnte nicht zum Schreiben geöffnet werden.
 Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeichnis, das diese Datei enthält, besitzen und versuchen es erneut!</translation>
     </message>
     <message>
         <source>Importing MIDI-file...</source>
         <translation>Importiere MIDI-Datei...</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t import file</source>
+        <translation>Konnte Datei nicht importieren</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find a filter for importing file %1.
+You should convert this file into a format supported by LMMS using another software. </source>
+        <translation>Konnte keinen Filter finden, um die Datei %1 zu importieren.
+Sie sollten diese Datei mit Hilfe einer anderen Software in ein Format konvertieren, das von LMMS unterstützt wird.</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file</source>
+        <translation>Konnte Datei nicht öffnen</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file %1 for reading.
+Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
+        <translation>Konnte Datei %1 nicht zum Lesen öffnen.
+Bitte stellen Sie sicher, dass Sie Lese-Rechte auf diese Datei sowie das Verzeichnis besitzen und probieren es erneut!</translation>
     </message>
 </context>
 <context>
@@ -2906,6 +3106,165 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     <message>
         <source>Turn off all notes</source>
         <translation>Alle Noten ausschalten</translation>
+    </message>
+</context>
+<context>
+    <name>vibed</name>
+    <message>
+        <source>The waveform editor provides control over the initial state or impulse that is used to start the string vibrating.  The buttons to the right of the graph will initialize the waveform to the selected type.  The &apos;?&apos; button will load a waveform from a file--only the first 128 samples will be loaded.
+
+The waveform can also be drawn in the graph.
+
+The &apos;S&apos; button will smooth the waveform.
+
+The &apos;N&apos; button will normalize the waveform.</source>
+        <translation>Der Wellenform-Editor ermöglicht die Kontrolle über die Grundstellung oder den Impuls, der genutzt wird, um die Saite zum Schwingen zu bringen.  Die Buttons rechts des Graphes initialisieren die Wellenform mit dem gewünschten Typ.  Der &apos;?&apos;-Button lässt Sie eine Wellenform aus einer Datei laden - allerdings werden nur die ersten 128 Samples geladen.
+
+Die Wellenform kann ebenfalls in dem Graph gezeichnet werden.
+
+Der &apos;S&apos;-Button glättet die Wellenform.
+
+Der &apos;N&apos;-Button normalisiert die Wellenform.</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Lautstärke</translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation>Lautstärke:</translation>
+    </message>
+    <message>
+        <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
+        <translation>Der &apos;V&apos;-Knopf setzt die Lautstärke der gewählten Saite.</translation>
+    </message>
+    <message>
+        <source>String stiffness</source>
+        <translation>Härte der Saite</translation>
+    </message>
+    <message>
+        <source>String stiffness:</source>
+        <translation>Härte der Saite:</translation>
+    </message>
+    <message>
+        <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
+        <translation>Der &apos;S&apos;-Knopf setzt die Härte der gewählten Saite.  Die Härte der Saite beeinflusst deren Ausklang-Dauer.  Je kleiner die Einstellung, desto länger klingt die Saite aus.</translation>
+    </message>
+    <message>
+        <source>Pick position</source>
+        <translation>Zupf-Position</translation>
+    </message>
+    <message>
+        <source>Pick position:</source>
+        <translation>Zupf-Position:</translation>
+    </message>
+    <message>
+        <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
+        <translation>Der &apos;P&apos;-Knopf bestimmt die Position, an der die Saite angezupft wird.  Je kleiner die Einstellung, desto näher wird am Steg gezupft.</translation>
+    </message>
+    <message>
+        <source>Pickup position</source>
+        <translation>Abnehmer-Position</translation>
+    </message>
+    <message>
+        <source>Pickup position:</source>
+        <translation>Abnehmer-Position:</translation>
+    </message>
+    <message>
+        <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
+        <translation>Der &apos;PU&apos;-Knopf bestimmt die Position, an der die Schwingungen an der gewählten Saite abgenommen werden.  Je kleiner die Einstellung, desto näher ist der Abnehmer am Steg.</translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation>Balance</translation>
+    </message>
+    <message>
+        <source>Pan:</source>
+        <translation>Balance:</translation>
+    </message>
+    <message>
+        <source>The Pan knob determines the location of the selected string in the stereo field.</source>
+        <translation>Der Balance-Knopf bestimmt den Ort der gewählten Saite im Stereo-Raum.</translation>
+    </message>
+    <message>
+        <source>Detune</source>
+        <translation>Verstimmung</translation>
+    </message>
+    <message>
+        <source>Detune:</source>
+        <translation>Verstimmung:</translation>
+    </message>
+    <message>
+        <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
+        <translation>Der Verstimmungs-Knopf verändert die Tonhöhe der gewählten Saite.  Einstellungen kleiner als 0 lassen die Saite flacher klingen, während Werte über 0 zu einem eher scharfen Klang führen.</translation>
+    </message>
+    <message>
+        <source>Fuzziness</source>
+        <translation>Unschärfe</translation>
+    </message>
+    <message>
+        <source>Fuzziness:</source>
+        <translation>Unschärfe:</translation>
+    </message>
+    <message>
+        <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
+        <translation>Der Unschärfe-Knopf fügt dem Klang der Saite etwas &apos;Fuzz&apos; hinzu, welcher hauptsächlich während des Anschlages zum Tragen kommt, wenngleich er auch genutzt werden kann, um den Klang etwas metallischer zu gestalten.</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Länge</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Länge:</translation>
+    </message>
+    <message>
+        <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
+        <translation>Der Länge-Knopf bestimmt die Länge der gewählten Saite.  Längere Saiten klingen länger und klingen heller, wobei sie gleichzeitig auch mehr CPU-Leistung fressen.</translation>
+    </message>
+    <message>
+        <source>Impulse or initial state</source>
+        <translation>Impuls oder Grundstellung</translation>
+    </message>
+    <message>
+        <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
+        <translation>Mit dem &apos;Imp&apos;-Knopf legen Sie fest, ob die Wellenform in diesem Graph als Impuls zum Anzupfen der Saite oder als Grundstellung für die Saite genutzt werden soll.</translation>
+    </message>
+    <message>
+        <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
+        <translation>Mit dem Oktaven-Wähler kann der Oktavenversatz gegenüber der Note verändert werden.  So meint beispielsweise eine Einstellung von &apos;-2&apos;, dass die Saite zwei Oktaven unterhalb des Grundtons (&apos;F&apos;) schwingen wird und &apos;6&apos; dementsprechend 6 Oktaven über dem Grundton.</translation>
+    </message>
+    <message>
+        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <translation>Der Saiten-Wähler bestimmt die derzeit bearbeitete Saite.  Ein Vibed-Instrument kann aus bis zu neun voneinander unabhängig schwingenden Saiten bestehen.  Die LED in der Ecke rechts unterhalb der Wellenform gibt an, ob die gewählte Saite aktiv ist.</translation>
+    </message>
+    <message>
+        <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
+
+The graph allows you to control the initial state or impulse used to set the string in motion.
+
+The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the string&apos;s stiffness.  The &apos;P&apos; knob controls the pick position.  The &apos;PU&apos; knob controls the pickup position.
+
+&apos;Pan&apos; and &apos;Detune&apos; hopefully don&apos;t need explanation.  The &apos;Slap&apos; knob adds a bit of fuzz to the sound of the string.
+
+The &apos;Length&apos; knob controls the length of the string.
+
+The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
+        <translation>Vibed modelliert bis zu 9 unabhängige schwingende Saiten.  Der Saiten-Wähler ermöglicht die Wahl der gerade aktiven Saite.  Der &apos;Imp&apos;-Knopf bestimmt, ob der Graph einen Impuls oder die Grundstellung der Saite repräsentiert.  Der Oktaven-Wähler gibt den Oktavenversatz der Saite gegenüber dem Grundton an.
+
+Der Graph ermöglicht die Kontrolle über die Grundstellung der Saite oder den Impuls, der zum Anzupfen der Saite genutzt wird.
+
+Der &apos;V&apos;-Knopf bestimmt die Lautstärke.  Mit dem &apos;S&apos;-Knopf wird die Härte der Saite eingestellt. Der &apos;P&apos;-Knopf beeinflusst den Ort, an dem die Saite angezupft wird, während der &apos;PU&apos;-Knopf die Position des Abnehmers bestimmt.
+
+&apos;Balance&apos; und &apos;Verstimmung&apos; bedürfen hoffentlich keiner Erklärung.  Der Unschärfe-Knopf fügt dem Klang der Saite etwas &apos;Fuzz&apos; hinzu.
+
+Der Länge-Knopf bestimmt die Länge der Saite.
+
+Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
     </message>
 </context>
 <context>

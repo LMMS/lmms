@@ -1,7 +1,21 @@
 2005-03-28	Danny McRae	<khjklujn/at/yahoo/dot/com>
-	* lib/sample_buffer.cpp:
+
+	* src/lib/sample_buffer.cpp:
 	corrected miscalculation of buffer size in resample
 	
+2006-03-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/:
+	skeleton for FLP-import-filter and some first code (doesn't work yet)
+
+	* include/midi.h:
+	* include/midi_port.h:
+	* include/midi_tab_widget.h:
+	* src/core/midi_tab_widget.cpp:
+	* src/midi/midi_port.cpp:
+	support for default-velocity for MIDI-in and/or -out-events - useful
+	when recording with constant velocity
+
 2005-03-26	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* plugins/vibed/:

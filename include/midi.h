@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -86,11 +86,23 @@ struct midiEvent
 	{
 		m_data.m_sysExDataLen = _data_len;
 	}
+
 	inline Uint16 key( void ) const
 	{
 		return( m_data.m_param[0] );
 	}
-	inline Uint32 velocity( void ) const
+
+	inline Uint16 & key( void )
+	{
+		return( m_data.m_param[0] );
+	}
+
+	inline Uint16 velocity( void ) const
+	{
+		return( m_data.m_param[1] );
+	}
+
+	inline Uint16 & velocity( void )
 	{
 		return( m_data.m_param[1] );
 	}

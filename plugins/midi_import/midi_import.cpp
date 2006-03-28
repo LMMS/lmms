@@ -101,8 +101,8 @@ bool midiImport::tryImport( trackContainer * _tc )
 			return( readRIFF( _tc ) );
 
 		default:
-			printf( "midiImport::importToTrackContainer(): not a "
-						"Standard MIDI file\n" );
+			printf( "midiImport::tryImport(): not a Standard MIDI "
+								"file\n" );
 			return( FALSE );
 	}
 }

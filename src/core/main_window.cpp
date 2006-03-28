@@ -127,7 +127,7 @@ mainWindow::mainWindow( engine * _engine ) :
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter, eng() ), ++id );
 	side_bar->appendTab( new fileBrowser( wdir+"projects",
-							"*.mmp *.xml *.mid",
+						"*.mmp *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
 							splitter, eng() ),

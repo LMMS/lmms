@@ -110,7 +110,7 @@ void importFilter::import( const QString & _file_to_import,
 						"importing file %1.\n"
 						"You should convert this file "
 						"into a format supported by "
-						"LMMS using another software. "
+						"LMMS using another software."
 						).arg( _file_to_import ),
 					QMessageBox::Ok,
 					QMessageBox::NoButton );

@@ -190,7 +190,8 @@ public:
 
 	enum fileTypes
 	{
-		PROJECT_FILE, PRESET_FILE, SAMPLE_FILE, MIDI_FILE, UNKNOWN
+		PROJECT_FILE, PRESET_FILE, SAMPLE_FILE, MIDI_FILE, FLP_FILE,
+		UNKNOWN
 	} ;
 	
 	inline fileTypes type( void )
@@ -207,6 +208,7 @@ private:
 	static QPixmap * s_presetFilePixmap;
 	static QPixmap * s_sampleFilePixmap;
 	static QPixmap * s_midiFilePixmap;
+	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 	
 	QPixmap * m_pix;

@@ -82,6 +82,8 @@ public slots:
 protected slots:
 	void inputChannelChanged( int );
 	void outputChannelChanged( int );
+	void defaultVelInChanged( bool );
+	void defaultVelOutChanged( bool );
 	void readablePortsChanged( void );
 	void writeablePortsChanged( void );
 	void activatedReadablePort( QAction * _item );
@@ -99,6 +101,8 @@ private:
 	lcdSpinBox * m_outputChannelSpinBox;
 	ledCheckBox * m_receiveCheckBox;
 	ledCheckBox * m_sendCheckBox;
+	ledCheckBox * m_defaultVelocityInCheckBox;
+	ledCheckBox * m_defaultVelocityOutCheckBox;
 
 	QMenu * m_readablePorts;
 	QMenu * m_writeablePorts;

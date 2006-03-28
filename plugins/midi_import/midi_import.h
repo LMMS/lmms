@@ -1,5 +1,5 @@
 /*
- * midi_import_filter.h - support for importing MIDI-files
+ * midi_import.h - support for importing MIDI-files
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

@@ -4,7 +4,7 @@
  * midi_port.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                 sequencing system
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 
 #include "midi_port.h"
 #include "midi_client.h"
+#include "volume.h"
 
 
 
@@ -38,7 +39,9 @@ midiPort::midiPort( midiClient * _mc, midiEventProcessor * _mep,
 	m_name( _name ),
 	m_mode( _mode ),
 	m_inputChannel( -1 ),
-	m_outputChannel( -1 )
+	m_outputChannel( -1 ),
+	m_defaultVelocityForInEventsEnabled( FALSE ),
+	m_defaultVelocityForOutEventsEnabled( FALSE )
 {
 }
 
@@ -76,7 +79,13 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 	if( ( mode() == INPUT || mode() == DUPLEX ) &&
 		( inputChannel() == _me.m_channel || inputChannel() == -1 ) )
 	{
-		m_midiEventProcessor->processInEvent( _me, _time );
+		midiEvent ev = _me;
+		if( m_defaultVelocityForInEventsEnabled == TRUE &&
+							_me.velocity() > 0 )
+		{
+			ev.velocity() = DEFAULT_VOLUME;
+		}
+		m_midiEventProcessor->processInEvent( ev, _time );
 	}
 }
 
@@ -89,7 +98,13 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 	if( ( mode() == OUTPUT || mode() == DUPLEX ) &&
 		( outputChannel() == _me.m_channel && outputChannel() != -1 ) )
 	{
-		m_midiClient->processOutEvent( _me, _time, this );
+		midiEvent ev = _me;
+		if( m_defaultVelocityForOutEventsEnabled == TRUE &&
+							_me.velocity() > 0 )
+		{
+			ev.velocity() = DEFAULT_VOLUME;
+		}
+		m_midiClient->processOutEvent( ev, _time, this );
 	}
 }
 

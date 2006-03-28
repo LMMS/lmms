@@ -1599,10 +1599,10 @@ bool FASTCALL songEditor::saveProjectAs( const QString & _file_name )
 void songEditor::importProject( void )
 {
 #ifdef QT4
-	QFileDialog ofd( this, tr( "Import file" ), "",
-					tr( "MIDI-files (*.mid)" ) );
+	QFileDialog ofd( this, tr( "Import file" ), ""/*,
+					tr( "MIDI-files (*.mid)" )*/ );
 #else
-	QFileDialog ofd( QString::null, tr( "MIDI-files (*.mid)" ),
+	QFileDialog ofd( QString::null,/* tr( "MIDI-files (*.mid)" )*/ QString::null,
 							this, "", TRUE );
 	ofd.setWindowTitle( tr( "Import file" ) );
 #endif

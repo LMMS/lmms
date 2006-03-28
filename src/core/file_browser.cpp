@@ -376,13 +376,14 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			multimediaProject mmp( f->fullName() );
 			track * t = track::create( track::CHANNEL_TRACK,
 						eng()->getBBEditor() );
-			instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
-			if( ct != NULL )
+			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+									t );
+			if( it != NULL )
 			{
-				ct->loadTrackSpecificSettings( mmp.content().
+				it->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
-				ct->toggledInstrumentTrackButton( TRUE );
+				it->toggledInstrumentTrackButton( TRUE );
 			}
 		}
 		else if( f->type() == fileItem::PROJECT_FILE )
@@ -425,7 +426,8 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	{
 		if( m_previewPlayHandle != NULL )
 		{
-			eng()->getMixer()->removePlayHandle( m_previewPlayHandle );
+			eng()->getMixer()->removePlayHandle(
+							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
 		if( f->type() == fileItem::SAMPLE_FILE )
@@ -704,6 +706,7 @@ QPixmap * fileItem::s_projectFilePixmap = NULL;
 QPixmap * fileItem::s_presetFilePixmap = NULL;
 QPixmap * fileItem::s_sampleFilePixmap = NULL;
 QPixmap * fileItem::s_midiFilePixmap = NULL;
+QPixmap * fileItem::s_flpFilePixmap = NULL;
 QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 
@@ -759,6 +762,12 @@ void fileItem::initPixmapStuff( void )
 							"midi_file", 16, 16 ) );
 	}
 
+	if( s_flpFilePixmap == NULL )
+	{
+		s_flpFilePixmap = new QPixmap( embed::getIconPixmap(
+							"midi_file", 16, 16 ) );
+	}
+
 	if( s_unknownFilePixmap == NULL )
 	{
 		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
@@ -771,6 +780,7 @@ void fileItem::initPixmapStuff( void )
 		case PRESET_FILE: m_pix = s_presetFilePixmap; break;
 		case SAMPLE_FILE: m_pix = s_sampleFilePixmap; break;
 		case MIDI_FILE: m_pix = s_midiFilePixmap; break;
+		case FLP_FILE: m_pix = s_flpFilePixmap; break;
 		case UNKNOWN:
 		default:
 			m_pix = s_unknownFilePixmap;
@@ -822,6 +832,10 @@ void fileItem::determineFileType( void )
 	else if( ext == "mid" )
 	{
 		m_type = MIDI_FILE;
+	}
+	else if( ext == "flp" )
+	{
+		m_type = FLP_FILE;
 	}
 	else
 	{

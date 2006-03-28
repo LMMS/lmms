@@ -93,6 +93,11 @@ public:
 		m_inputChannel = _chnl;
 	}
 
+	inline void enableDefaultVelocityForInEvents( const bool _on )
+	{
+		m_defaultVelocityForInEventsEnabled = _on;
+	}
+
 	inline Sint8 outputChannel( void ) const
 	{
 		return( m_outputChannel );
@@ -102,6 +107,12 @@ public:
 	{
 		m_outputChannel = _chnl;
 	}
+
+	inline void enableDefaultVelocityForOutEvents( const bool _on )
+	{
+		m_defaultVelocityForOutEventsEnabled = _on;
+	}
+
 
 
 	void FASTCALL processInEvent( const midiEvent & _me,
@@ -117,6 +128,8 @@ private:
 	modes m_mode;
 	Sint8 m_inputChannel;
 	Sint8 m_outputChannel;
+	bool m_defaultVelocityForInEventsEnabled;
+	bool m_defaultVelocityForOutEventsEnabled;
 
 } ;
 
