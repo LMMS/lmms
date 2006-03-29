@@ -1,4 +1,4 @@
-- when recording MIDI-events, add switch to disable recording of velocity
+- in flp-import-filter: merge play-list-items if possible
 - integrated sample-browser in context-menu of sample-track/-tco
 - font-size-scaling-coefficient in setup-dialog
 - make note able of journalling

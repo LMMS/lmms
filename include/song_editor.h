@@ -187,6 +187,8 @@ public slots:
 		m_modified = TRUE;
 	}
 
+	void clearProject( void );
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -231,8 +233,6 @@ private:
 	songEditor( engine * _engine );
 	songEditor( const songEditor & );
 	virtual ~songEditor();
-
-	void clearProject( void );
 
 
 	inline tact currentTact( void ) const

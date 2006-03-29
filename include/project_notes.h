@@ -56,6 +56,7 @@ public:
 	virtual ~projectNotes();
 
 	void clear( void );
+	void setText( const QString & _text );
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );

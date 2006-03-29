@@ -152,6 +152,14 @@ void projectNotes::clear( void )
 
 
 
+void projectNotes::setText( const QString & _text )
+{
+	m_edit->setHtml( _text );
+}
+
+
+
+
 void projectNotes::setupActions()
 {
 	QToolBar * tb = new QToolBar( tr( "Edit Actions" ), this );
