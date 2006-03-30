@@ -739,6 +739,22 @@ void songEditor::setTempo( int _new_bpm )
 
 
 
+void songEditor::setMasterVolume( volume _vol )
+{
+	m_masterVolumeSlider->setValue( _vol );
+}
+
+
+
+
+void songEditor::setMasterPitch( int _master_pitch )
+{
+	m_masterPitchSlider->setValue( _master_pitch );
+}
+
+
+
+
 int songEditor::masterPitch( void ) const
 {
 	return( -m_masterPitchSlider->value() );

@@ -181,6 +181,8 @@ public slots:
 
 	// set tempo in BPM (beats per minute)
 	void setTempo( int _new_bpm = DEFAULT_BPM );
+	void setMasterVolume( volume _vol );
+	void setMasterPitch( int _master_pitch );
 
 	inline void setModified( void )
 	{

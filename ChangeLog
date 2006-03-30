@@ -1,3 +1,14 @@
+2006-03-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	- read text-len correctly
+	- do not crash when creating new pattern before actual channels are
+	  created
+	- stated event 224 to be FLP_PatternData
+	- extract information for creating notes out of pattern-data
+	- add playlist-items after all is done for resizing them correctly
+
 2006-03-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/flp_import/flp_import.h:

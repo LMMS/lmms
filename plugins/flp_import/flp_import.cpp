@@ -31,6 +31,7 @@
 #include "track_container.h"
 #include "instrument_track.h"
 #include "pattern.h"
+#include "project_journal.h"
 
 
 #ifdef QT4
@@ -135,8 +136,6 @@ bool flpImport::tryImport( trackContainer * _tc )
 		return( FALSE );
 	}
 
-	printf( "channels: %d\n", num_channels );
-
 	const int ppq = read16LE();
 	if( ppq < 0 )
 	{
@@ -187,15 +186,20 @@ bool flpImport::tryImport( trackContainer * _tc )
 		return( FALSE );
 	}
 
+	printf( "channels: %d\n", num_channels );
+
 	instrumentTrack * it = NULL;
-	pattern * p = NULL;
+	int current_pattern = 0;
 	char * text = NULL;
 	int text_len = 0;
-	int it_cnt = 0;
+	vlist<instrumentTrack *> i_tracks;
 
 	int ev_cnt = 0;
 
 	_tc->eng()->getSongEditor()->clearProject();
+	const bool is_journ = _tc->eng()->getProjectJournal()->isJournalling();
+	_tc->eng()->getProjectJournal()->setJournalling( FALSE );
+
 
 	while( file().atEnd() == FALSE )
 	{
@@ -207,7 +211,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 #else
 			qApp->processEvents( 100 );
 #endif
-			pd.setValue( it_cnt );
+			pd.setValue( i_tracks.size() );
 
 			if( pd.wasCanceled() )
 			{
@@ -233,16 +237,19 @@ bool flpImport::tryImport( trackContainer * _tc )
 		if( ev >= FLP_Text )
 		{
 			text_len = data & 0x7F;
+			int shift = 0;
 			while( data & 0x80 )
 			{
 				data = readByte();
-				text_len = ( text_len << 7 ) | ( data & 0x7F );
+				//text_len = ( text_len << 7 ) | ( data & 0x7F );
+				text_len = text_len | ( ( data & 0x7F ) << ( shift += 7 ) );
 			}
 			delete[] text;
 			text = new char[text_len+1];
 			if( readBlock( text, text_len ) <= 0 )
 			{
-				printf( "could not read string\n" );
+				printf( "could not read string (len: %d)\n",
+						text_len );
 			}
 			text[text_len] = 0;
 		}
@@ -273,6 +280,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MainVol:
 				printf( "main-volume: %d\n", data );
+				_tc->eng()->getSongEditor()->setMasterVolume(
+						static_cast<volume>( data ) );
 				break;
 
 			case FLP_PatLength:
@@ -294,7 +303,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 			case FLP_MixSliceNum:
 				printf( "mix slice num: %d\n", data );
 				break;
-
+/*
 			case 31:
 			case 32:
 			case 33:
@@ -302,35 +311,28 @@ bool flpImport::tryImport( trackContainer * _tc )
 			case 35:
 			case 36:
 				printf( "ev: %d data: %d\n", ev, data );
-				break;
+				break;*/
 
 			// WORD EVENTS
 			case FLP_NewChan:
 				printf( "new channel\n" );
-				++it_cnt;
-				m_events.clear();
 
 				it = dynamic_cast<instrumentTrack *>(
 	track::create( track::CHANNEL_TRACK, _tc->eng()->getBBEditor() ) );
 				assert( it != NULL );
+				i_tracks.push_back( it );
 				it->loadInstrument( "tripleoscillator" );
 				it->toggledInstrumentTrackButton( FALSE );
 
 				break;
 
 			case FLP_NewPat:
-				while( _tc->eng()->getBBEditor()->numOfBBs() <=
-								data )
-				{
-					track::create( track::BB_TRACK,
-						_tc->eng()->getSongEditor() );
-				}
-				p = dynamic_cast<pattern *>(
-						it->getTCO( data - 1 ) );
+				current_pattern = data - 1;
 				break;
 
 			case FLP_Tempo:
 				printf( "tempo: %d\n", data );
+				_tc->eng()->getSongEditor()->setTempo( data );
 				break;
 
 			case FLP_CurrentPatNum:
@@ -368,10 +370,16 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MainPitch:
 				printf( "main-pitch: %d\n", data );
+				_tc->eng()->getSongEditor()->setMasterPitch(
+									data );
 				break;
 
 			case FLP_Resonance:
 				printf( "reso (for cur channel?): %d\n", data );
+				break;
+
+			case FLP_LoopBar:
+				printf( "loop bar: %d\n", data );
 				break;
 
 			case FLP_StDel:
@@ -396,20 +404,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_PlayListItem:
 			{
-				unsigned int pat_num = ( data >> 16 ) - 1;
-				while( _tc->eng()->getBBEditor()->numOfBBs() <=
-								pat_num )
-				{
-					track::create( track::BB_TRACK,
-						_tc->eng()->getSongEditor() );
-				}
-				
-				bbTrack * bbt = bbTrack::findBBTrack( pat_num,
-								_tc->eng() );
-				trackContentObject * tco = bbt->addTCO(
-							bbt->createTCO( 0 ) );
-				tco->movePosition( midiTime( ( data & 0xffff ) *
-									64 ) );
+				m_plItems.push_back( data );
 				break;
 			}
 
@@ -435,6 +430,13 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			// TEXT EVENTS
 			case FLP_Text_ChanName:
+				if( it == NULL )
+				{
+					printf( "!! tried to set channel name "
+						"but no channel was created so "
+						"far\n" );
+					break;
+				}
 				it->setName( text );
 				break;
 
@@ -489,6 +491,33 @@ bool flpImport::tryImport( trackContainer * _tc )
 				dump_mem( text, text_len );
 				break;
 
+			case FLP_PatternData:
+			{
+				printf( "pattern data:\n" );
+				//dump_mem( text, text_len );
+				const int bpn = 20;
+				for( int i = 0; i*bpn < text_len; ++i )
+				{
+					int ch = *( text + i*bpn + 6 );
+					int pos = *( (int *)( text + i*bpn ) );
+					int key = *( text + i*bpn + 12 );
+					int len = *( (int*)( text + i*bpn +
+									8 ) );
+					pos /= 6;
+					len /= 6;
+					note n( NULL, len, pos );
+					n.setKey( key );
+					m_notes.push_back( qMakePair(
+				num_channels * current_pattern + ch, n ) );
+				
+					//printf( "note on channel %d at pos %d with key %d and length %d   ", (int)*((text+i*bpn+6)), *((int*)(text+i*bpc)), (int) *(text+i*bpc+12), (int) *((int*)(text+i*bpc+8)));
+					//printf( "note on channel %d at pos %d with key %d and length %d\n", ch, pos, key, len );
+					
+					//dump_mem( text+i*bpn+4, bpc-4 );
+				}
+				break;
+			}
+
 			default:
 				if( ev >= FLP_Text )
 				{
@@ -504,240 +533,49 @@ bool flpImport::tryImport( trackContainer * _tc )
 				}
 				break;
 		}
-/*
-		// now process every event
-		for( eventVector::const_iterator it = m_events.begin();
-						it != m_events.end(); ++it )
-		{
-			const int tick = it->first;
-			const midiEvent & ev = it->second;
-			switch( ev.m_type )
-			{
-				case NOTE_ON:
-					if( ev.key() >=
-						NOTES_PER_OCTAVE * OCTAVES )
-					{
-						continue;
-					}
-					if( ev.velocity() > 0 )
-					{
-						keys[ev.key()][0] = tick;
-						keys[ev.key()][1] =
-								ev.velocity();
-						break;
-					}
-
-				case NOTE_OFF:
-					if( ev.key() <
-						NOTES_PER_OCTAVE * OCTAVES &&
-							keys[ev.key()][0] >= 0 )
-					{
-			note n( eng(),
-				midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
-				midiTime( keys[ev.key()][0] / 10 ),
-				(tones)( ev.key() % NOTES_PER_OCTAVE ),
-				(octaves)( ev.key() / NOTES_PER_OCTAVE ),
-				keys[ev.key()][1] * 100 / 128 );
-						p->addNote( n );
-						keys[ev.key()][0] = -1;
-					}
-					break;
-
-				default:
-//					printf( "Unhandled event: %#x\n",
-//								ev.m_type );
-					break;
-			}
-		}*/
         }
+
+	// now process all notes
+	for( patternNoteVector::const_iterator it = m_notes.begin();
+						it != m_notes.end(); ++it )
+	{
+		const int where = ( *it ).first;
+		const int ch = where % num_channels;
+		const csize pat = where / num_channels;
+		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat )
+		{
+			track::create( track::BB_TRACK,
+						_tc->eng()->getSongEditor() );
+		}
+		pattern * p = dynamic_cast<pattern *>(
+						i_tracks[ch]->getTCO( pat ) );
+		if( p != NULL )
+		{
+			p->addNote( ( *it ).second, FALSE );
+		}
+	}
+
+	// process all playlist-items
+	for( playListItems::const_iterator it = m_plItems.begin();
+						it != m_plItems.end(); ++it )
+	{
+		unsigned int pat_num = ( ( *it ) >> 16 ) - 1;
+		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat_num )
+		{
+			track::create( track::BB_TRACK,
+						_tc->eng()->getSongEditor() );
+		}
+		
+		bbTrack * bbt = bbTrack::findBBTrack( pat_num, _tc->eng() );
+		trackContentObject * tco = bbt->addTCO( bbt->createTCO( 0 ) );
+		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
+	}
+
+	_tc->eng()->getProjectJournal()->setJournalling( is_journ );
         return( TRUE );
 }
 
 
-
-#if 0
-bool FASTCALL flpImport::readTrack( int _track_end )
-{
-        int tick = 0;
-        unsigned char last_cmd = 0;
-//        unsigned char port = 0;
-
-	m_events.clear();
-        // the current file position is after the track ID and length
-        while( (int) file().pos() < _track_end )
-	{
-		unsigned char cmd;
-		int len;
-
-		int delta_ticks = readVar();
-		if( delta_ticks < 0 )
-		{
-			break;
-		}
-		tick += delta_ticks;
-
-		int c = readByte();
-		if( c < 0 )
-		{
-			break;
-		}
-		if( c & 0x80 )
-		{
-			// have command
-			cmd = c;
-			if( cmd < 0xf0 )
-			{
-				last_cmd = cmd;
-			}
-		}
-		else
-		{
-			// running status
-			ungetChar( c );
-			cmd = last_cmd;
-			if( !cmd )
-			{
-				error();
-				return( FALSE );
-			}
-		}
-                switch( cmd & 0xF0 )
-		{
-			// channel msg with 2 parameter bytes
-			case NOTE_OFF:
-			case NOTE_ON:
-			case KEY_PRESSURE:
-			case CONTROL_CHANGE:
-			case PITCH_BEND:
-			{
-				int data1 = readByte() & 0x7F;
-				int data2 = readByte() & 0x7F;
-				m_events.push_back( qMakePair( tick,
-					midiEvent( static_cast<midiEventTypes>(
-								cmd & 0xF0 ),
-							cmd & 0x0F,
-							data1,
-							data2 ) ) );
-				break;
-			}
-			// channel msg with 1 parameter byte
-			case PROGRAM_CHANGE:
-			case CHANNEL_PRESSURE:
-				m_events.push_back( qMakePair( tick,
-					midiEvent( static_cast<midiEventTypes>(
-								cmd & 0xF0 ),
-							cmd & 0x0F,
-							readByte() & 0x7F ) ) );
-				break;
-
-			case MIDI_SYSEX:
-				switch( cmd )
-				{
-					case MIDI_SYSEX:
-					case MIDI_EOX:
-					{
-						len = readVar();
-						if( len < 0 )
-						{
-							error();
-							return( FALSE );
-						}
-						if( cmd == MIDI_SYSEX )
-						{
-							++len;
-						}
-						char * data = new char[len];
-						if( cmd == MIDI_SYSEX )
-						{
-							data[0] = MIDI_SYSEX;
-						}
-						for( ; c < len; ++c )
-						{
-							data[c] = readByte();
-						}
-						m_events.push_back(
-							qMakePair( tick,
-				midiEvent( MIDI_SYSEX, data, len ) ) );
-						break;
-					}
-
-					case MIDI_META_EVENT:
-						c = readByte();
-						len = readVar();
-/*						if( len < 0 )
-						{
-							error();
-							return( FALSE );
-						}*/
-						switch( c )
-						{
-						case 0x21: // port number
-							if( len < 1 )
-							{
-								error();
-								return( FALSE );
-							}
-/*							port = readByte() %
-								port_count;
-							skip( len - 1 );*/
-							skip( len );
-							break;
-
-						case 0x2F: // end of track
-						//track->end_tick = tick;
-							skip( _track_end -
-								file().pos() );
-							return( TRUE );
-
-						case 0x51: // tempo
-							if( len < 3 )
-							{
-								error();
-								return( FALSE );
-							}
-							if( m_smpteTiming )
-							{
-								// SMPTE timing
-								// doesnt change
-								skip( len );
-							}
-							else
-							{
-/*			event = new_event(track, 0);
-			event->type = SND_SEQ_EVENT_TEMPO;
-			event->port = port;
-			event->tick = tick;
-			event->data.tempo = read_byte() << 16;
-			event->data.tempo |= read_byte() << 8;
-			event->data.tempo |= read_byte();
-			skip( len -3 );*/
-								skip( len );
-							}
-							break;
-
-						default:// ignore all other
-							// meta events
-							skip( len );
-							break;
-						}
-						break;
-
-					default: // invalid Fx command
-						error();
-						return( FALSE );
-				}
-				break;
-
-			default: // cannot happen
-                	        error();
-				return( FALSE );
-                }
-        }
-	error();
-	return( FALSE );
-}
-
-#endif
 
 
 

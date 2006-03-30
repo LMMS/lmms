@@ -48,8 +48,8 @@
 #endif
 
 
-#include "midi.h"
 #include "import_filter.h"
+#include "note.h"
 
 
 enum flpEvents
@@ -155,6 +155,7 @@ enum flpEvents
 	FLP_PluginParams   	= FLP_Text + 21,
 	FLP_ChanParams    	= FLP_Text + 23,// block of various channel
 						// params (can grow)
+	FLP_PatternData		= FLP_Text + 32,
 
 	FLP_CmdCount
 
@@ -244,8 +245,11 @@ private:
 	}
 
 
-	typedef vvector<QPair<int, midiEvent> > eventVector;
-	eventVector m_events;
+	typedef vlist<QPair<int, note> > patternNoteVector;
+	patternNoteVector m_notes;
+
+	typedef vlist<Uint32> playListItems;
+	playListItems m_plItems;
 
 } ;
 
