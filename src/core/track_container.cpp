@@ -96,10 +96,14 @@ trackContainer::trackContainer( engine * _engine ) :
 
 trackContainer::~trackContainer()
 {
+	eng()->getProjectJournal()->setJournalling( FALSE );
+
 	while( m_trackWidgets.size() )
 	{
 		removeTrack( m_trackWidgets.front()->getTrack() );
 	}
+
+	eng()->getProjectJournal()->setJournalling( TRUE );
 }
 
 

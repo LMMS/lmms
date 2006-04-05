@@ -55,6 +55,8 @@ class notePlayHandle;
 class pixmapButton;
 class tabWidget;
 
+class flpImport;
+
 
 class envelopeTabWidget : public QWidget, public journallingObject
 {
@@ -77,8 +79,8 @@ public:
 		TARGET_COUNT
 	} ;
 
-	f_cnt_t envFrames( void );
-	f_cnt_t releaseFrames( void );
+	f_cnt_t envFrames( const bool _only_vol = FALSE );
+	f_cnt_t releaseFrames( const bool _only_vol = FALSE );
 
 	float FASTCALL volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
 
@@ -101,6 +103,8 @@ private:
 	comboBox * m_filterComboBox;
 	knob * m_filterCutKnob;
 	knob * m_filterResKnob;
+
+	friend class flpImport;
 
 } ;
 

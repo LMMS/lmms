@@ -1,3 +1,7 @@
+- do REAL release in envelopes (can't be precalculated as it depends on key-press-duration/rest of envelope)
+- correctly load steps/dots from FLP-files
+- vibed-plugin: do not crash at destruction
+- convert FL-Plucked!-parameters to Vibed-parameters
 - in flp-import-filter: merge play-list-items if possible
 - integrated sample-browser in context-menu of sample-track/-tco
 - font-size-scaling-coefficient in setup-dialog

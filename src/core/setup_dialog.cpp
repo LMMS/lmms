@@ -114,6 +114,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
+	m_flDir( configManager::inst()->flDir() ),
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -137,7 +138,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-	ws->setFixedSize( 360, 240 );
+	ws->setFixedSize( 360, 300 );
 
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 240 );
@@ -245,7 +246,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 	QWidget * directories = new QWidget( ws );
-	directories->setFixedSize( 360, 200 );
+	directories->setFixedSize( 360, 260 );
 	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
@@ -289,7 +290,6 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openVSTDir() ) );
 
-
 	// artwork-dir
 	tabWidget * artwork_tw = new tabWidget( tr(
 					"Artwork directory" ).toUpper(),
@@ -309,12 +309,33 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openArtworkDir() ) );
 
+	// FL Studio-dir
+	tabWidget * fl_tw = new tabWidget( tr(
+				"FL Studio installation directory" ).toUpper(),
+								directories );
+	fl_tw->setFixedHeight( 56 );
+
+	m_fdLineEdit = new QLineEdit( m_flDir, fl_tw );
+	m_fdLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_fdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setFLDir( const QString & ) ) );
+
+	QPushButton * fldir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", fl_tw );
+	fldir_select_btn->setFixedSize( 24, 24 );
+	fldir_select_btn->move( 320, 20 );
+	connect( fldir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openFLDir() ) );
+
 
 	dir_layout->addWidget( lmms_wd_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( vst_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( artwork_tw );
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( fl_tw );
 	dir_layout->addStretch();
 
 
@@ -623,6 +644,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
 	configManager::inst()->setArtworkDir( m_artworkDir );
+	configManager::inst()->setFLDir( m_flDir );
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -842,6 +864,33 @@ void setupDialog::openArtworkDir( void )
 void setupDialog::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = _ad;
+}
+
+
+
+
+void setupDialog::openFLDir( void )
+{
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+				tr( "Choose FL Studio installation directory" ),
+							m_flDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_flDir, 0, 0,
+			tr( "Choose FL Studio installation directory" ), TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		m_fdLineEdit->setText( new_dir );
+	}
+}
+
+
+
+
+void setupDialog::setFLDir( const QString & _fd )
+{
+	m_flDir = _fd;
 }
 
 

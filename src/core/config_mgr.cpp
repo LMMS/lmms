@@ -180,6 +180,7 @@ configManager::configManager( void ) :
 	m_pluginDir( "/usr/lib/lmms" ),
 #endif
 	m_vstDir( QDir::home().absolutePath() ),
+	m_flDir( QDir::home().absolutePath() ),
 	m_currentPage( 0 )
 {
 }
@@ -557,6 +558,14 @@ void configManager::setArtworkDir( const QString & _ad )
 
 
 
+void configManager::setFLDir( const QString & _fd )
+{
+	m_flDir = _fd;
+}
+
+
+
+
 void configManager::accept( void )
 {
 	if( m_workingDir.right( 1 ) != "/" )
@@ -821,10 +830,16 @@ bool configManager::loadConfigFile( void )
 	}
 	m_workingDir = value( "paths", "workingdir" );
 	m_vstDir = value( "paths", "vstdir" );
+	m_flDir = value( "paths", "fldir" );
 
 	if( m_vstDir == "" )
 	{
 		m_vstDir = QDir::home().absolutePath();
+	}
+
+	if( m_flDir == "" )
+	{
+		m_flDir = QDir::home().absolutePath();
 	}
 
 	if( root.isElement() )
@@ -872,6 +887,7 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
+	setValue( "paths", "fldir", m_flDir );
 
 	QDomDocument doc( "lmms-config-file" );
 

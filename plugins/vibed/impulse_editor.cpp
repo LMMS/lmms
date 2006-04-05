@@ -188,7 +188,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	m_graph->setSamplePointer( m_sampleShape, m_sampleLength );
 	
 	m_lastBtn = m_sinWaveBtn;
-	emit( sinWaveClicked() );
+	emit( sawWaveClicked() );
 	
 	move( _x, _y );
 

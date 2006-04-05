@@ -82,6 +82,7 @@ private slots:
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
+	void setFLDir( const QString & _fd );
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -102,6 +103,7 @@ private slots:
 	void openWorkingDir( void );
 	void openVSTDir( void );
 	void openArtworkDir( void );
+	void openFLDir( void );
 
 
 	void toggleDisableChActInd( bool _disabled );
@@ -125,10 +127,12 @@ private:
 	QLineEdit * m_wdLineEdit;
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
+	QLineEdit * m_fdLineEdit;
 
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_artworkDir;
+	QString m_flDir;
 
 
 	bool m_disableChActInd;

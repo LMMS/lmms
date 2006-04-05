@@ -132,6 +132,11 @@ public:
 		return( m_vstDir );
 	}
 
+	const QString & flDir( void ) const
+	{
+		return( m_flDir );
+	}
+
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
 	void setValue( const QString & _class, const QString & _attribute,
@@ -145,6 +150,7 @@ public slots:
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
+	void setFLDir( const QString & _fd );
 
 
 protected slots:
@@ -182,6 +188,7 @@ private:
 	QString m_artworkDir;
 	QString m_pluginDir;
 	QString m_vstDir;
+	QString m_flDir;
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

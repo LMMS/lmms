@@ -1,4 +1,78 @@
+2006-04-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/unrtf/*:
+	* plugins/flp_import/flp_import.cpp:
+	use integrated unrtf-source into FLP-import-filter for converting
+	RTF-comments to plain HTML which is usable with QTextEdit
+
+2006-04-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/song_editor.cpp:
+	set master-volume-slider correctly in songEditor::setMasterVolume()
+
+	* include/envelope_tab_widget.h:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/note_play_handle.cpp:
+	- in envelopeTabWidget::releaseFrames():
+		if the volume-envelope is used, do not check
+		release-frames of other envelope-targets, as it is not
+		interesting if they're beyond the end of the volume-envelope
+		(silent so or so) - may result in less CPU-usage in some
+		situations if the user set a bigger release to an envelope
+		other than the volume-env
+	- for arpeggio-base-notes only use number of release-frames of
+	  volume-envelope for m_releaseFramesToDo (for not creating silent notes
+	  in release-phase of arp-base-note)
+
+	* plugins/vibed/impulse_editor.cpp:
+	use saw-wave as default shape for strings as it sounds much more like
+	a typical guitar-string than a sine-wave
+
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	re-implement setParameter()-method for setting user-defined wave-shape
+	(used by FLP-import-filter)
+
+	* plugins/flp_import/flp_import.cpp:
+	- convert 3x Osc params to TripleOscillator-settings and load them
+	- load Vibed-Plugin for Plucked!-instrument
+	- load arpeggio-settings of channel
+	- load filter-settings of channel
+	- handle base-note of each channel
+	- correct master-volume-calculation
+
+2006-04-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.cpp:
+	- hack for converting RTF-comment to HTML using unrtf (if installed)
+
+2006-03-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	- try to load samples correctly using FL Studio installation
+	- recognize steps (not working properly yet)
+	- set current pattern of project
+	- separate handling of plugin-parameters (will allow support of FL
+	  presets later!)
+	- added FLP_StepData (225) (not handled as format not known yet)
+	- added FLP_EnvLfoParams (218) (not handled as format not known yet)
+	- load envelope-settings of instrument-tracks
+
+	* src/core/track_container.cpp:
+	disable journalling in destructor of trackContainer
+
+	* include/config_mgr.h:
+	* include/setup_dialog.h:
+	* src/core/config_mgr.cpp:
+	* src/core/setup_dialog.cpp:
+	support for setting path to installation directory of FL Studio
+
 2006-03-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	added setMasterVolume() and setMasterPitch()
 
 	* plugins/flp_import/flp_import.h:
 	* plugins/flp_import/flp_import.cpp:

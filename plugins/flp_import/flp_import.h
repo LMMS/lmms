@@ -155,14 +155,30 @@ enum flpEvents
 	FLP_PluginParams   	= FLP_Text + 21,
 	FLP_ChanParams    	= FLP_Text + 23,// block of various channel
 						// params (can grow)
-	FLP_PatternData		= FLP_Text + 32,
+	FLP_EnvLfoParams	= FLP_Text + 26,
+	FLP_FilterParams	= FLP_Text + 27,
+	FLP_PatternNotes	= FLP_Text + 32,
+	FLP_StepData		= FLP_Text + 33,
 
 	FLP_CmdCount
 
 } ;
 
 
+enum flPlugins
+{
+	FL_Plugin_3x_Osc,
+	FL_Plugin_Sampler,
+	FL_Plugin_Plucked,
+	FL_Plugin_SimSynth,
+	FL_Plugin_DX10,
+	FL_Plugin_Sytrus,
+	FL_Plugin_WASP,
+	FL_Plugin_Undef
+} ;
 
+
+class instrument;
 
 
 class flpImport : public importFilter
@@ -174,6 +190,9 @@ public:
 
 private:
 	virtual bool tryImport( trackContainer * _tc );
+
+	bool processPluginParams( const flPlugins _plugin, const char * _data,
+					const int _data_len, instrument * _i );
 
 	inline int readInt( int _bytes )
 	{
@@ -204,31 +223,6 @@ private:
 		value |= readByte() << 8;
 		return( value );
 	}
-/*	inline int readVar( void )
-	{
-		int c = readByte();
-		int value = c & 0x7f;
-		if( c & 0x80 )
-		{
-			c = readByte();
-			value = ( value << 7 ) | ( c & 0x7f );
-			if( c & 0x80 )
-			{
-				c = readByte();
-				value = ( value << 7 ) | ( c & 0x7f );
-				if( c & 0x80 )
-				{
-					c = readByte();
-					value = ( value << 7 ) | c;
-					if( c & 0x80 )
-					{
-						return -1;
-					}
-				}
-			}
-	        }
-        	return( !file().atEnd() ? value : -1 );
-	}*/
 
 	inline Sint32 readID( void )
 	{
@@ -247,6 +241,9 @@ private:
 
 	typedef vlist<QPair<int, note> > patternNoteVector;
 	patternNoteVector m_notes;
+
+	typedef vlist<int> stepVector;
+	stepVector m_steps;
 
 	typedef vlist<Uint32> playListItems;
 	playListItems m_plItems;

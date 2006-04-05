@@ -329,14 +329,6 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 
 
 
-QString audioFileProcessor::nodeName( void ) const
-{
-	return( audiofileprocessor_plugin_descriptor.name );
-}
-
-
-
-
 void audioFileProcessor::setParameter( const QString & _param,
 							const QString & _value )
 {
@@ -348,6 +340,14 @@ void audioFileProcessor::setParameter( const QString & _param,
 	{
 		m_sampleBuffer.loadFromBase64( _value );
 	}
+}
+
+
+
+
+QString audioFileProcessor::nodeName( void ) const
+{
+	return( audiofileprocessor_plugin_descriptor.name );
 }
 
 

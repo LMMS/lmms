@@ -66,6 +66,8 @@ class pixmapButton;
 class tempoSyncKnob;
 
 
+class flpImport;
+
 
 class envelopeAndLFOWidget : public QWidget, public journallingObject,
 				public specialBgHandlingWidget
@@ -185,6 +187,7 @@ private:
 
 
 	friend class envelopeTabWidget;
+	friend class flpImport;
 
 } ;
 

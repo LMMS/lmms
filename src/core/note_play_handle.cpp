@@ -251,7 +251,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	if( m_instrumentTrack != NULL )
 	{
 		m_releaseFramesToDo = tMax<f_cnt_t>( 10,
-				m_instrumentTrack->m_envWidget->releaseFrames() );
+			m_instrumentTrack->m_envWidget->releaseFrames() );
 		if( !configManager::inst()->value( "ui",
 						"manualchannelpiano" ).toInt() )
 		{
@@ -280,7 +280,8 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
 	return( ( m_instrumentTrack != NULL ) ?
-			m_instrumentTrack->m_envWidget->releaseFrames() : 0 );
+			m_instrumentTrack->m_envWidget->releaseFrames(
+							arpBaseNote() ) : 0 );
 }
 
 

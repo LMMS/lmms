@@ -51,6 +51,7 @@
 class QPixmap;
 
 class automatableButtonGroup;
+class flpImport;
 class instrumentTrack;
 class comboBox;
 class groupBox;
@@ -130,6 +131,8 @@ private:
 	automatableButtonGroup * m_arpDirectionBtnGrp;
 
 	comboBox * m_arpModeComboBox;
+
+	friend class flpImport;
 
 } ;
 

@@ -69,6 +69,8 @@ class pianoWidget;
 class presetPreviewPlayHandle;
 class surroundArea;
 
+class flpImport;
+
 
 
 class instrumentTrack : public QWidget, public track, public midiEventProcessor
@@ -255,6 +257,7 @@ private:
 	friend class instrumentTrackButton;
 	friend class notePlayHandle;
 	friend class presetPreviewPlayHandle;
+	friend class flpImport;
 
 
 signals:

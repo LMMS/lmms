@@ -514,8 +514,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// correctly... -> arp_frames frames silence at the start of every note!
 	int cur_frame = ( ( m_arpModeComboBox->value() != FREE ) ?
 				cnphv.first()->totalFramesPlayed() :
-				_n->totalFramesPlayed() )
-							+ arp_frames - 1;
+				_n->totalFramesPlayed() ) + arp_frames - 1;
 	// used for loop
 	fpab_t frames_processed = 0;
 
@@ -536,6 +535,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// init with zero
 		int cur_arp_idx = 0;
 
+		// in sorted mode: is it our turn or do we have to be quiet for
+		// now?
 		if( m_arpModeComboBox->value() == SORT &&
 				( ( cur_frame / arp_frames ) % total_range ) /
 					range != (Uint32) _n->index() )

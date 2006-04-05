@@ -458,16 +458,19 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 
 
-f_cnt_t envelopeTabWidget::envFrames( void )
+f_cnt_t envelopeTabWidget::envFrames( const bool _only_vol )
 {
 	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->m_pahdFrames;
 
-	for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
+	if( _only_vol == FALSE )
 	{
-		if( m_envLFOWidgets[i]->used() &&
-				m_envLFOWidgets[i]->m_pahdFrames > ret_val )
+		for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
 		{
-			ret_val = m_envLFOWidgets[i]->m_pahdFrames;
+			if( m_envLFOWidgets[i]->used() &&
+				m_envLFOWidgets[i]->m_pahdFrames > ret_val )
+			{
+				ret_val = m_envLFOWidgets[i]->m_pahdFrames;
+			}
 		}
 	}
 	return( ret_val );
@@ -476,15 +479,19 @@ f_cnt_t envelopeTabWidget::envFrames( void )
 
 
 
-f_cnt_t envelopeTabWidget::releaseFrames( void )
+f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 {
-	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->m_rFrames;
-	for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
+	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->used() ?
+					m_envLFOWidgets[VOLUME]->m_rFrames : 0;
+	if( m_envLFOWidgets[VOLUME]->used() == FALSE )
 	{
-		if( m_envLFOWidgets[i]->used() &&
-				m_envLFOWidgets[i]->m_rFrames > ret_val )
+		for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
 		{
-			ret_val = m_envLFOWidgets[i]->m_rFrames;
+			if( m_envLFOWidgets[i]->used() &&
+				m_envLFOWidgets[i]->m_rFrames > ret_val )
+			{
+				ret_val = m_envLFOWidgets[i]->m_rFrames;
+			}
 		}
 	}
 	return( ret_val );

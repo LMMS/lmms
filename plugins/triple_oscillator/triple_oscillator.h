@@ -56,6 +56,9 @@ public:
 							QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
+	virtual void FASTCALL setParameter( const QString & _param,
+						const QString & _value );
+
 	virtual QString nodeName( void ) const;
 
 
