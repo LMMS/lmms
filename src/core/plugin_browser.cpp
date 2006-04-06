@@ -46,6 +46,7 @@
 #include "plugin_browser.h"
 #include "embed.h"
 #include "debug.h"
+#include "templates.h"
 #include "gui_templates.h"
 #include "string_pair_drag.h"
 
@@ -116,13 +117,16 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
 	engineObject( _engine ),
+	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
 	m_logo( *_pd.logo ),
-	m_mouseOver( FALSE )
+	m_mouseOver( FALSE ),
+	m_targetHeight( 24 )
 {
-	setFixedHeight( 60 );
+	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
+	setFixedHeight( m_targetHeight );
 	setMouseTracking( TRUE );
-#ifndef QT4
+#ifdef QT3
 	setBackgroundMode( Qt::NoBackground );
 #endif
 	setCursor( Qt::PointingHandCursor );
@@ -140,11 +144,8 @@ pluginDescWidget::~pluginDescWidget()
 
 void pluginDescWidget::paintEvent( QPaintEvent * )
 {
-	QColor fill_color( 192, 192, 192 );
-	if( m_mouseOver )
-	{
-		fill_color = QColor( 224, 224, 224 );
-	}
+	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
+						QColor( 192, 192, 192 );
 
 #ifdef QT4
 	QPainter p( this );
@@ -157,80 +158,69 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	// and a painter for it
 	QPainter p( &pm );
 #endif
+
+	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
+								( 60 - 24 );
+	const QSize logo_size( s, s );
+#ifndef QT3
+	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
+						Qt::SmoothTransformation );
+#else
+	QPixmap logo;
+	logo.convertFromImage( m_logo.convertToImage().smoothScale( logo_size,
+							QImage::ScaleMin ) );
+#endif
 	p.setPen( QColor( 64, 64, 64 ) );
 	p.drawRect( rect() );
-	p.drawPixmap( 4, 4, m_logo );
+	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
 	f.setBold( TRUE );
 	p.setFont( f );
-	p.drawText( 58, 14, m_pluginDescriptor.public_name );
+	p.drawText( 10 + logo_size.width(), 15,
+					m_pluginDescriptor.public_name );
 
-	f.setBold( FALSE );
-	p.setFont( pointSize<7>( f ) );
-#ifdef QT4
-	QStringList words = pluginBrowser::tr(
-				m_pluginDescriptor.description ).split( ' ' );
-#else
-	QStringList words = QStringList::split( ' ',
-			pluginBrowser::tr( m_pluginDescriptor.description ) );
-#endif
-	for( QStringList::iterator it = words.begin(); it != words.end(); ++it )
+	if( height() > 24 || m_mouseOver )
 	{
-		if( ( *it ).contains( '-' ) )
+		f.setBold( FALSE );
+		p.setFont( pointSize<7>( f ) );
+		QRect br;
+		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
+								Qt::WordBreak,
+			pluginBrowser::tr( m_pluginDescriptor.description ),
+								-1, &br );
+		if( m_mouseOver )
 		{
-#ifdef QT4
-			QStringList splitted_word = it->split( '-' );
-#else
-			QStringList splitted_word = QStringList::split( '-',
-									*it );
-#endif
-			QStringList::iterator orig_it = it;
-			for( QStringList::iterator it2 = splitted_word.begin();
-					it2 != splitted_word.end(); ++it2 )
-			{
-#ifdef QT4
-				if( it2 == --splitted_word.end() )
-#else
-				if( it2 == splitted_word.fromLast() )
-#endif
-				{
-					words.insert( it, *it2 );
-				}
-				else
-				{
-					words.insert( it, *it2 + "-" );
-					++it;
-				}
-			}
-			words.erase( orig_it );
-			--it;
+			m_targetHeight = tMax( 60, 25 + br.height() );
 		}
 	}
-
-	int y = 26;
-	int avail_width = width() - 58 - 5;
-	QString s;
-	for( QStringList::iterator it = words.begin(); it != words.end(); ++it )
-	{
-		if( p.fontMetrics().width( s + *it + " " ) >= avail_width )
-		{
-			p.drawText( 58, y, s );
-			y += 10;
-			s = "";
-		}
-		s += *it;
-		if( ( *it ).right( 1 ) != "-" )
-		{
-			s += " ";
-		}
-	}
-	p.drawText( 58, y, s );
 
 #ifndef QT4
 	// blit drawn pixmap to actual widget
 	bitBlt( this, rect().topLeft(), &pm );
 #endif
+}
+
+
+
+
+void pluginDescWidget::enterEvent( QEvent * _e )
+{
+	m_mouseOver = TRUE;
+	m_targetHeight = height() + 1;
+	updateHeight();
+	QWidget::enterEvent( _e );
+}
+
+
+
+
+void pluginDescWidget::leaveEvent( QEvent * _e )
+{
+	m_mouseOver = FALSE;
+	m_targetHeight = 24;
+	updateHeight();
+	QWidget::leaveEvent( _e );
 }
 
 
@@ -242,31 +232,34 @@ void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		new stringPairDrag( "instrument", m_pluginDescriptor.name,
 							m_logo, this, eng() );
-		m_mouseOver = FALSE;
-		update();
+		leaveEvent( _me );
 	}
 }
 
 
 
 
-void pluginDescWidget::mouseMoveEvent( QMouseEvent * _me )
+void pluginDescWidget::updateHeight( void )
 {
-	bool new_mouse_over = rect().contains( _me->pos() );
-	if( new_mouse_over != m_mouseOver )
+	if( m_targetHeight > height() )
 	{
-		m_mouseOver = new_mouse_over;
-		update();
+		setFixedHeight( height() + 1 );
+	}
+	else if( m_targetHeight < height() )
+	{
+		setFixedHeight( height() - 1 );
+	}
+	else
+	{
+		m_updateTimer.stop();
+		return;
+	}
+	if( !m_updateTimer.isActive() )
+	{
+		m_updateTimer.start( 15 );
 	}
 }
 
-
-
-
-void pluginDescWidget::mouseReleaseEvent( QMouseEvent * _me )
-{
-	mouseMoveEvent( _me );
-}
 
 
 

@@ -14,13 +14,13 @@
 - bristol-bindings
 - resample sample-track-tcos when using hq-mode
 - add support for panes-interface (like blender) (instead of MDI etc.)
-- message when importing unsupported MIDI-file (track-count = 0)
+- message to user when importing unsupported MIDI-file (track-count = 0)
 - volume-knobs for each sample-track
 - AMS/OMS-bindings
 - remove binary-embed-system
 - recording-functionality
 - show loading-vst-hint when cloning vestige-track
-- do not hang when saving while loading VST-plugin
+- do not hang when saving while loading VST-plugin (because then we call dispatcher while the load-process is still going on)
 - tempo-recogn. and sync of beat-samples
 - do not quantize when importing from MIDI-file
 - separate GUI and data/sound-processing-code
@@ -31,7 +31,6 @@
 - do not skip samples because of rounding-errors when resampling in src/lib/sample_buffer.cpp
 - MIDI-program/MIDI-mapping/process program-/channel-change-events from MIDI-files
 - DSSI-support
-- somehow avoid hidden plugin-descriptor-widgets plugin-browser if height of window is too small -> add scrollbar
 - use drawLineF() for drawing notes in pattern::paintEvent() in qt4-version
 - only redraw region given by paint-event in pattern, bbTCO, sampleTCO etc.
 - pre-listen when opening sample with QFileDialog

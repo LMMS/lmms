@@ -37,11 +37,13 @@
 
 #include <QVector>
 #include <QPixmap>
+#include <QTimer>
 
 #else
 
 #include <qvaluevector.h>
 #include <qpixmap.h>
+#include <qtimer.h>
 
 #endif
 
@@ -73,6 +75,7 @@ private:
 
 class pluginDescWidget : public QWidget, public engineObject
 {
+	Q_OBJECT
 public:
 	pluginDescWidget( const plugin::descriptor & _pd, QWidget * _parent,
 							engine * _engine );
@@ -80,17 +83,24 @@ public:
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void enterEvent( QEvent * _e );
+	virtual void leaveEvent( QEvent * _e );
 	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
+
+
+private slots:
+	void updateHeight( void );
 
 
 private:
+	QTimer m_updateTimer;
+
 	const plugin::descriptor & m_pluginDescriptor;
 	QPixmap m_logo;
 
 	bool m_mouseOver;
+	int m_targetHeight;
 
 } ;
 

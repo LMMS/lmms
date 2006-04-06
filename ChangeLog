@@ -1,3 +1,14 @@
+2006-04-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/plugin_browser.h:
+	* src/core/plugin_browser.cpp:
+	- per default show small items for plugins in plugin-browser and show
+	  details on mouse-over (nice animations!! ;-) - avoids problems with
+	  hidden plugin-items because of too low screen-resolution and missing
+	  scrollbars
+	- draw plugin-details-text using QPainter::drawText (not with old own
+	  (buggy) algorithm for text-drawing with word-break-support)
+
 2006-04-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/flp_import/unrtf/*:
