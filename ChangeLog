@@ -1,5 +1,11 @@
 2006-04-05	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 
+	* include/sample_track.h:
+	* src/tracks/sample_track.cpp:
+	- add volume knob to sample tracks
+
+2006-04-05	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* plugins/vibed/impulse_editor.cpp:
 	- corrected mismatch sin/saw mismatch in initialization
 

@@ -47,6 +47,7 @@
 class nameLabel;
 class audioPort;
 class QLabel;
+class knob;
 //class sampleTCOSettingsDialog;
 
 
@@ -74,7 +75,6 @@ public:
 public slots:
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
-
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
@@ -140,17 +140,20 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
-
 public slots:
 	virtual QString nodeName( void ) const
 	{
 		return( "sampletrack" );
 	}
+	void setVolume( float _new_volume );
 
 
 private:
 	nameLabel * m_trackLabel;
 	audioPort * m_audioPort;
+	
+	knob * m_volumeKnob;
+	float m_volume;
 
 } ;
 

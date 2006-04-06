@@ -53,7 +53,8 @@
 #include "tooltip.h"
 #include "audio_port.h"
 #include "string_pair_drag.h"
-
+#include "knob.h"
+#include "volume.h"
 
 
 sampleTCO::sampleTCO( track * _track ) :
@@ -359,16 +360,36 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) )
+	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) ),
+	m_volume( 1.0f )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
 					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
-	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
+	m_trackLabel->setGeometry( 26, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
 
+	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+				    tr( "Channel volume" ), eng() );
+	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
+	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
+	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
+	m_volumeKnob->move( 4, 4 );
+	m_volumeKnob->setLabel( tr( "VOL" ) );
+	m_volumeKnob->show();
+	connect( m_volumeKnob, SIGNAL( valueChanged( float ) ), 
+		 this, SLOT( setVolume( float ) ) );
+#ifdef QT4
+	m_volumeKnob->setWhatsThis(
+#else
+	QWhatsThis::add( m_volumeKnob,
+#endif
+		tr( "With this knob you can set "
+			"the volume of the opened "
+			"channel." ) ); 
+	
 	_tc->updateAfterTrackAdd();
 }
 
@@ -378,6 +399,16 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 sampleTrack::~sampleTrack()
 {
 	delete m_audioPort;
+}
+
+
+
+void sampleTrack::setVolume( float _new_volume )
+{
+	if( _new_volume <= MAX_VOLUME )
+	{
+		m_volume = _new_volume / 100.0f;
+	}
 }
 
 
@@ -408,9 +439,9 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );
 
-	volumeVector v = { 1.0f, 1.0f
+	volumeVector v = { m_volume, m_volume
 #ifndef DISABLE_SURROUND
-					, 1.0f, 1.0f
+					, m_volume, m_volume
 #endif
 			} ;
 	float fpt = eng()->getSongEditor()->framesPerTact();
@@ -456,6 +487,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
+	_this.setAttribute( "vol",  m_volume );
 }
 
 
@@ -467,6 +499,16 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
+	}
+	if( _this.attribute( "vol" ) != "" )
+	{
+		m_volume = _this.attribute( "vol" ).toFloat();
+		m_volumeKnob->setValue( m_volume * 100.0f );
+	}
+	else
+	{
+		m_volumeKnob->setValue( 100.0f );
+		m_volume = 1.0;
 	}
 }
 
