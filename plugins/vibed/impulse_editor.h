@@ -57,6 +57,7 @@ public:
 	
 	inline float * getValues() { return( m_sampleShape ); };
 	inline bool isOn() { return( m_state->isChecked() ); };
+	
 	void FASTCALL setValues( float * _shape );
 	
 public slots:

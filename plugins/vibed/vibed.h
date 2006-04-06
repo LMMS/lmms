@@ -93,7 +93,6 @@ private:
 	sampleBuffer * m_sampleBuffer;
 	
 	int m_sampleLength;
-
 } ;
 
 

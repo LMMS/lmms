@@ -589,7 +589,8 @@ void vibed::playNote( notePlayHandle * _n )
 				m_detuneKnobs[i]->value(),
 				static_cast<int>(
 					m_lengthKnobs[i]->value() ),
-				m_impulses[i]->isChecked() );
+				m_impulses[i]->isChecked(),
+				i );
 			}
 		}
 	}
@@ -612,7 +613,7 @@ void vibed::playNote( notePlayHandle * _n )
 		s = 0;
 		for( Uint8 string = 0; string < 9; string ++ )
 		{
-			if( m_editors[string]->isOn() )
+			if( ps->exists( string ) )
 			{
 				vol = m_volumeKnobs[string]->value();
 				pan = ( 

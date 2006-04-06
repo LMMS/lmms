@@ -27,11 +27,16 @@
 
 stringContainer::stringContainer(const float _pitch, 
 				const sample_rate_t _sample_rate,
-				const Uint32 _buffer_length ) :
+				const Uint32 _buffer_length,
+				const Uint8 _strings ) :
 	m_pitch( _pitch ),
 	m_sampleRate( _sample_rate ),
 	m_bufferLength( _buffer_length )
 {
+	for( Uint8 i = 0; i < _strings; i++ )
+	{
+		m_exists.append( FALSE );
+	}
 }
 
 
@@ -45,7 +50,8 @@ void stringContainer::addString(Uint8 _harm,
 				const float _string_loss,
 				const float _detune,
 				const Uint8 _oversample,
-				const bool _state )
+				const bool _state,
+				const Uint8 _id )
 {
 	float harm;
 	switch( _harm )
@@ -92,4 +98,5 @@ void stringContainer::addString(Uint8 _harm,
 						_string_loss,
 						_detune,
 						_state ) );
+	m_exists[_id] = TRUE;
 }

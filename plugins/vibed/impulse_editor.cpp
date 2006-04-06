@@ -188,7 +188,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	m_graph->setSamplePointer( m_sampleShape, m_sampleLength );
 	
 	m_lastBtn = m_sinWaveBtn;
-	emit( sawWaveClicked() );
+	emit( sinWaveClicked() );
 	
 	move( _x, _y );
 
@@ -298,7 +298,7 @@ void impulseEditor::noiseWaveClicked( void )
 
 void impulseEditor::usrWaveClicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
+	m_lastBtn->setChecked( FALSE );
 	m_lastBtn = m_usrWaveBtn;
 	m_lastBtn->setChecked( TRUE );
 	// zero sample_shape

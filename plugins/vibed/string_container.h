@@ -39,7 +39,8 @@ class stringContainer
 public:
 	stringContainer(const float _pitch, 
 			const sample_rate_t _sample_rate,
-			const Uint32 _buffer_length );
+			const Uint32 _buffer_length,
+			const Uint8 _strings = 9 );
 	
 	void addString(	Uint8 _harm,
 			const float _pick,
@@ -49,7 +50,13 @@ public:
 			const float _string_loss,
 			const float _detune,
 			const Uint8 _oversample,
-			const bool _state );
+			const bool _state,
+			const Uint8 _id );
+	
+	inline bool exists( Uint8 _id )
+	{
+		return( m_exists[_id] );
+	}
 	
 	inline ~stringContainer()
 	{
@@ -70,6 +77,7 @@ private:
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
 	const Uint32 m_bufferLength;
+	vvector<bool> m_exists;
 } ;
 
 #endif

@@ -1,3 +1,14 @@
+2006-04-05	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vibed/impulse_editor.cpp:
+	- corrected mismatch sin/saw mismatch in initialization
+
+	* plugins/vibed/string_container.h:
+	* plugins/vibed/string_container.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	- added string id tracking to allow adding strings while playing
+
 2006-04-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/plugin_browser.h:
