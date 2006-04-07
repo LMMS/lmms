@@ -40,6 +40,7 @@
 #include <qpushbutton.h>
 #include <qpainter.h>
 #include <qdom.h>
+#include <qwhatsthis.h>
 
 #endif
 
