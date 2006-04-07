@@ -61,7 +61,7 @@ class fileBrowser : public sideBarWidget, public engineObject
 {
 	Q_OBJECT
 public:
-	fileBrowser( const QString & _path, const QString & _filter,
+	fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
 					QWidget * _parent, engine * _engine );
 	virtual ~fileBrowser();
@@ -86,12 +86,14 @@ protected slots:
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
+
+	void addItems( const QString & _path );
 	void openInNewInstrumentTrack( trackContainer * _tc );
 
 	listView * m_l;
 	fileItem * m_contextMenuItem;
 
-	QString m_path;
+	QString m_directories;
 	QString m_filter;
 
 
@@ -137,12 +139,16 @@ public:
 	void setOpen( bool );
 	void setup( void );
 
-	inline QString fullName( void )
+	inline QString fullName( QString _path = QString::null )
 	{
+		if( _path == QString::null )
+		{
+			_path = m_directories[0];
+		}
 #ifdef QT4
-		return( QDir::cleanPath( m_path + "/" + text( 0 ) + "/" ) );
+		return( QDir::cleanPath( _path + "/" + text( 0 ) + "/" ) );
 #else
-		return( QDir::cleanDirPath( m_path + "/" + text( 0 ) + "/" ) );
+		return( QDir::cleanDirPath( _path + "/" + text( 0 ) + "/" ) );
 #endif
 	}
 
@@ -151,19 +157,26 @@ public:
 		return( m_pix );
 	}
 
+	inline void addDirectory( const QString & _dir )
+	{
+		m_directories.push_back( _dir );
+	}
+
 
 private:
 	void initPixmapStuff( void );
-	//using Q3ListViewItem::setPixmap;
-	void FASTCALL setPixmap( QPixmap * _px );
+	void FASTCALL setPixmap( const QPixmap * _px );
+
+	bool addItems( const QString & _path );
+
 
 	static QPixmap * s_folderPixmap;
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
 	directory * m_p;
-	QPixmap * m_pix;
-	QString m_path;
+	const QPixmap * m_pix;
+	QStringList m_directories;
 	QString m_filter;
 
 } ;
@@ -175,9 +188,9 @@ class fileItem : public Q3ListViewItem
 {
 public:
 	fileItem( Q3ListView * _parent, const QString & _name,
-							const QString & _path );
+						const QString & _path );
 	fileItem( Q3ListViewItem * _parent, const QString & _name,
-							const QString & _path );
+						const QString & _path );
 
 	inline QString fullName( void ) const
 	{

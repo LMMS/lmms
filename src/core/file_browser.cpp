@@ -61,16 +61,17 @@
 #include "text_float.h"
 #include "string_pair_drag.h"
 #include "main_window.h"
+#include "config_mgr.h"
 
 
 
-fileBrowser::fileBrowser( const QString & _path, const QString & _filter,
+fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
 					QWidget * _parent, engine * _engine  ) :
 	sideBarWidget( _title, _pm, _parent ),
 	engineObject( _engine ),
 	m_contextMenuItem( NULL ),
-	m_path( _path ),
+	m_directories( _directories ),
 	m_filter( _filter )
 {
 	setWindowTitle( tr( "Browser" ) );
@@ -112,7 +113,49 @@ fileBrowser::~fileBrowser()
 void fileBrowser::reloadTree( void )
 {
 	m_l->clear();
-	QDir cdir( m_path );
+	QStringList paths = QStringList::split( '*', m_directories );
+	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
+	{
+		addItems( *it );
+	}
+
+	Q3ListViewItem * item = m_l->firstChild();
+	bool resort = FALSE;
+
+	// sort merged directories
+	while( item != NULL )
+	{
+		directory * d = dynamic_cast<directory *>( item );
+		if( d == NULL )
+		{
+			resort = TRUE;
+		}
+		else if( resort == TRUE )
+		{
+			Q3ListViewItem * i2 = m_l->firstChild();
+			d->moveItem( i2 );
+			i2->moveItem( d );
+			directory * d2 = NULL;
+			while( ( d2 = dynamic_cast<directory *>( i2 ) ) !=
+									NULL )
+			{
+				if( d->text( 0 ) > d2->text( 0 ) )
+				{
+					d->moveItem( d2 );
+				}
+				i2 = i2->nextSibling();
+			}
+		}
+		item = item->nextSibling();
+	}
+}
+
+
+
+
+void fileBrowser::addItems( const QString & _path )
+{
+	QDir cdir( _path );
 	QStringList files = cdir.entryList( QDir::NoFilter, QDir::Name );
 
 	// TODO: after dropping qt3-support we can use QStringList's iterator
@@ -123,7 +166,7 @@ void fileBrowser::reloadTree( void )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
-				!QFileInfo( m_path + "/" + cur_file ).isDir()
+				!QFileInfo( _path + "/" + cur_file ).isDir()
 #ifdef QT4
 // TBD
 #else
@@ -131,7 +174,9 @@ void fileBrowser::reloadTree( void )
 #endif
 	)
 		{
-			(void) new fileItem( m_l, cur_file, m_path );
+			// remove existing file-items
+			delete m_l->findItem( cur_file, 0 );
+			(void) new fileItem( m_l, cur_file, _path );
 		}
 	}
 
@@ -139,9 +184,19 @@ void fileBrowser::reloadTree( void )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
-			QFileInfo( m_path + "/" + cur_file ).isDir() )
+			QFileInfo( _path + "/" + cur_file ).isDir() )
 		{
-			(void) new directory( m_l, cur_file, m_path, m_filter );
+			QListViewItem * item = m_l->findItem( cur_file, 0 );
+			if( item == NULL )
+			{
+				(void) new directory( m_l, cur_file, _path,
+							      	m_filter );
+			}
+			else if( dynamic_cast<directory *>( item ) != NULL )
+			{
+				dynamic_cast<directory *>( item )->
+							addDirectory( _path );
+			}
 		}
 	}
 }
@@ -224,7 +279,8 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 		// instrument-track
 		while( w != NULL )
 		{
-			instrumentTrack * ct = dynamic_cast<instrumentTrack *>( w );
+			instrumentTrack * ct =
+					dynamic_cast<instrumentTrack *>( w );
 #endif
 			if( ct != NULL && ct->isHidden() == FALSE )
 			{
@@ -355,20 +411,20 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 		{
 			// samples are per default opened in bb-editor because
 			// they're likely drum-samples etc.
-			instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::CHANNEL_TRACK,
 						eng()->getBBEditor() ) );
 #ifdef LMMS_DEBUG
-			assert( ct != NULL );
+			assert( it != NULL );
 #endif
-			instrument * afp = ct->loadInstrument(
+			instrument * afp = it->loadInstrument(
 							"audiofileprocessor" );
 			if( afp != NULL )
 			{
 				afp->setParameter( "samplefile",
 								f->fullName() );
 			}
-			ct->toggledInstrumentTrackButton( TRUE );
+			it->toggledInstrumentTrackButton( TRUE );
 		}
 		else if( f->type() == fileItem::PRESET_FILE )
 		{
@@ -407,6 +463,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	{
 		return;
 	}
+
 	QPoint p( contentsToViewport( _me->pos() ) );
 	Q3ListViewItem * i = itemAt( p );
         if ( i )
@@ -421,6 +478,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 			m_mousePressed = TRUE;
 		}
 	}
+
 	fileItem * f = dynamic_cast<fileItem *>( i );
 	if( f != NULL )
 	{
@@ -552,7 +610,7 @@ directory::directory( directory * _parent, const QString & _name,
 	Q3ListViewItem( _parent, _name ),
 	m_p( _parent ),
 	m_pix( NULL ),
-	m_path( _path ),
+	m_directories( _path ),
 	m_filter( _filter )
 {
 	initPixmapStuff();
@@ -566,7 +624,7 @@ directory::directory( Q3ListView * _parent, const QString & _name,
 	Q3ListViewItem( _parent, _name ),
 	m_p( NULL ),
 	m_pix( NULL ),
-	m_path( _path ),
+	m_directories( _path ),
 	m_filter( _filter )
 {
 	initPixmapStuff();
@@ -583,11 +641,13 @@ void directory::initPixmapStuff( void )
 		s_folderPixmap = new QPixmap(
 					embed::getIconPixmap( "folder" ) );
 	}
+
 	if( s_folderOpenedPixmap == NULL )
 	{
 		s_folderOpenedPixmap = new QPixmap(
 				embed::getIconPixmap( "folder_opened" ) );
 	}
+
 	if( s_folderLockedPixmap == NULL )
 	{
 		s_folderLockedPixmap = new QPixmap(
@@ -607,7 +667,7 @@ void directory::initPixmapStuff( void )
 
 
 
-void directory::setPixmap( QPixmap * _px )
+void directory::setPixmap( const QPixmap * _px )
 {
 	m_pix = _px;
 	setup();
@@ -632,57 +692,18 @@ void directory::setOpen( bool _o )
 
 	if( _o && !childCount() )
 	{
-		QString s( fullName() );
-		QDir thisDir( s );
-		if( !thisDir.isReadable() )
+		for( QStringList::iterator it = m_directories.begin();
+					it != m_directories.end(); ++it )
 		{
-			//readable = FALSE;
-			setExpandable( FALSE );
-			return;
-		}
-
-		listView()->setUpdatesEnabled( FALSE );
-
-		QStringList files = thisDir.entryList( QDir::NoFilter,
-								QDir::Name );
-		for( csize i = 0; i < files.size(); ++i )
-		{
-			QString cur_file = files[files.size()-i-1];
-#ifdef QT4
-			if( cur_file[0] != '.' && !QFileInfo(
-						thisDir.absolutePath() + "/" +
-							cur_file ).isDir() &&
-				thisDir.match( m_filter, cur_file.toLower() )
-				/*QDir::match( FILE_FILTER, cur_file )*/ )
-#else
-			if( cur_file[0] != '.' && !QFileInfo(
-						thisDir.absPath() + "/" +
-							cur_file ).isDir() &&
-				thisDir.match( m_filter, cur_file.lower() )
-				/*QDir::match( FILE_FILTER, cur_file )*/ )
-#endif
+			if( addItems( fullName( *it ) ) &&
+				( *it ).contains(
+					configManager::inst()->dataDir() ) )
 			{
-				(void) new fileItem( this, cur_file, s );
+				( new QListViewItem( this,
+		listView::tr( "--- Factory files ---" ) ) )->setPixmap( 0,
+				embed::getIconPixmap( "factory_files" ) );
 			}
 		}
-		for( csize i = 0; i < files.size(); ++i )
-		{
-			QString cur_file = files[files.size()-i-1];
-#ifdef QT4
-			if( cur_file[0] != '.' && QFileInfo(
-						thisDir.absolutePath() + "/" +
-							cur_file ).isDir() )
-#else
-			if( cur_file[0] != '.' && QFileInfo(
-						thisDir.absPath() + "/" +
-							cur_file ).isDir() )
-#endif
-			{
-				(void) new directory( this, cur_file, s,
-								m_filter );
-			}
-		}
-		listView()->setUpdatesEnabled( TRUE );
 	}
 	Q3ListViewItem::setOpen( _o );
 }
@@ -698,6 +719,90 @@ void directory::setup( void )
 
 
 
+
+bool directory::addItems( const QString & _path )
+{
+	QDir thisDir( _path );
+	if( !thisDir.isReadable() )
+	{
+		//readable = FALSE;
+		setExpandable( FALSE );
+		return( FALSE );
+	}
+
+	listView()->setUpdatesEnabled( FALSE );
+
+	bool added_something = FALSE;
+
+	QStringList files = thisDir.entryList( QDir::NoFilter, QDir::Name );
+	for( csize i = 0; i < files.size(); ++i )
+	{
+		QString cur_file = files[files.size() - i - 1];
+#ifdef QT4
+		if( cur_file[0] != '.' && !QFileInfo(
+					thisDir.absolutePath() + "/" +
+						cur_file ).isDir() &&
+			thisDir.match( m_filter, cur_file.toLower() )
+			/*QDir::match( FILE_FILTER, cur_file )*/ )
+#else
+		if( cur_file[0] != '.' && !QFileInfo(
+					thisDir.absPath() + "/" +
+						cur_file ).isDir() &&
+			thisDir.match( m_filter, cur_file.lower() )
+			/*QDir::match( FILE_FILTER, cur_file )*/ )
+#endif
+		{
+			(void) new fileItem( this, cur_file, _path );
+			added_something = TRUE;
+		}
+	}
+
+	for( csize i = 0; i < files.size(); ++i )
+	{
+		QString cur_file = files[files.size() - i - 1];
+#ifdef QT4
+		if( cur_file[0] != '.' && QFileInfo(
+					thisDir.absolutePath() + "/" +
+						cur_file ).isDir() )
+#else
+		if( cur_file[0] != '.' && QFileInfo(
+					thisDir.absPath() + "/" +
+						cur_file ).isDir() )
+#endif
+		{
+			new directory( this, cur_file, _path, m_filter );
+			added_something = TRUE;
+#if 0
+			if( firstChild() == NULL )
+			{
+				continue;
+			}
+			bool moved = FALSE;
+			QListViewItem * item = firstChild();
+			while( item != NULL )
+			{
+				directory * cd =
+					dynamic_cast<directory *>( item );
+				if( cd != NULL )
+				{
+/*					if( moved == FALSE ||
+						cd->text( 0 ) < cur_file )
+					{*/
+						printf( "move item %s after %s\n", d->text(0).ascii(), cd->text(0).ascii());
+						d->moveItem( cd );
+						moved = TRUE;
+					//}
+				}
+				item = item->nextSibling();
+			}
+#endif
+		}
+	}
+
+	listView()->setUpdatesEnabled( TRUE );
+
+	return( added_something );
+}
 
 
 

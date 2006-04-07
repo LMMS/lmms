@@ -126,20 +126,27 @@ mainWindow::mainWindow( engine * _engine ) :
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter, eng() ), ++id );
-	side_bar->appendTab( new fileBrowser( wdir+"projects",
+	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
+							PROJECTS_PATH + "*" +
+						wdir+PROJECTS_PATH,
 						"*.mmp *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
 							splitter, eng() ),
 									++id );
-	side_bar->appendTab( new fileBrowser( wdir+"samples", "*.wav *.ogg *.au"
+	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
+							SAMPLES_PATH + "*" +
+						wdir+SAMPLES_PATH,
+					"*.wav *.ogg *.au"
 					"*.voc *.aif *.aiff *.flac *.raw",
 							tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),
 							splitter, eng() ),
 									++id );
-	side_bar->appendTab( new fileBrowser( wdir+"presets", "*.cs.xml",
-							tr( "My presets" ),
+	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
+							PRESETS_PATH + "*" +
+						wdir+PRESETS_PATH,
+						"*.cs.xml", tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
 							splitter, eng() ),
 									++id );

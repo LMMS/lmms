@@ -1,3 +1,4 @@
+- replace rest of wizard by simple directory-selection-dialog for working-dir when running the first time
 - do REAL release in envelopes (can't be precalculated as it depends on key-press-duration/rest of envelope)
 - correctly load steps/dots from FLP-files
 - vibed-plugin: do not crash at destruction

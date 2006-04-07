@@ -135,7 +135,7 @@ void projectJournal::reallocID( const jo_id_t _id, journallingObject * _obj )
 
 void projectJournal::forgetAboutID( const jo_id_t _id )
 {
-	printf("forget about %d\n", _id );
+	//printf("forget about %d\n", _id );
 	journalEntryVector::iterator it;
 	while( ( it = qFind( m_journalEntries.begin(), m_journalEntries.end(),
 					_id ) ) != m_journalEntries.end() )

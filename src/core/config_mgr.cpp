@@ -359,7 +359,7 @@ void configManager::createWidgets( void )
 	workingdir_layout->addWidget( workingdir_content );
 
 
-
+/*
 	// page for files-management
 	m_pageFiles = new QWidget( m_contentWidget );
 	QHBoxLayout * files_layout = new QHBoxLayout( m_pageFiles );
@@ -502,12 +502,12 @@ void configManager::createWidgets( void )
 
 	files_layout->addWidget( files_logo_lbl );
 	files_layout->addWidget( files_content );
-
+*/
 
 
 	addPage( m_pageIntro, tr( "Welcome to LMMS" ) );
 	addPage( m_pageWorkingDir, tr( "Select working directory" ) );
-	addPage( m_pageFiles, tr( "Copy or link files" ) );
+	//addPage( m_pageFiles, tr( "Copy or link files" ) );
 	switchPage( static_cast<csize>( 0 ) );
 }
 
@@ -595,7 +595,11 @@ void configManager::accept( void )
 			return;
 		}
 	}
-	processFilesRecursively( m_dataDir + "samples/", m_workingDir +
+
+	mkPath( projectsDir() );
+	mkPath( samplesDir() );
+	mkPath( presetsDir() );
+/*	processFilesRecursively( m_dataDir + "samples/", m_workingDir +
 								"samples/",
 					m_samplesCopyRB->isChecked() ?
 								&copyFile :
@@ -609,7 +613,7 @@ void configManager::accept( void )
 								"projects/",
 					m_projectsCopyRB->isChecked() ?
 								&copyFile :
-								&linkFile );
+								&linkFile );*/
 	saveConfigFile();
 
 	QDialog::accept();
@@ -942,7 +946,7 @@ void configManager::saveConfigFile( void )
 
 
 
-
+/*
 void configManager::processFilesRecursively( const QString & _src_dir,
 						const QString & _dst_dir,
 	void( * _proc_func )( const QString & _src, const QString & _dst ) )
@@ -967,7 +971,7 @@ void configManager::processFilesRecursively( const QString & _src_dir,
 		}
 	}
 }
-
+*/
 
 
 

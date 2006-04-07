@@ -1,3 +1,21 @@
+2006-04-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	use setup-wizard only for setting working-directory
+
+	* src/core/main_window.cpp:
+	when creating file-browsers, pass 2 directories:
+		- factory-files
+		- user-files
+	this concerns projects, presets and samples - obsoletes
+	copying/linking files the first time, LMMS is run (new factory files in
+	new versions do not cause any trouble anymore)
+
+	* include/file_browser.h:
+	* src/core/file_browser.cpp:
+	added support for merging several directory-trees into one view
+
 2006-04-05	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 
 	* include/sample_track.h:

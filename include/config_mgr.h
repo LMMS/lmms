@@ -82,6 +82,11 @@ public:
 		return( s_instanceOfMe );
 	}
 
+	const QString & dataDir( void ) const
+	{
+		return( m_dataDir );
+	}
+
 	const QString & workingDir( void ) const
 	{
 		return( m_workingDir );
@@ -176,10 +181,10 @@ private:
 
 	void FASTCALL addPage( QWidget * _w, const QString & _title );
 
-	static void processFilesRecursively( const QString & _src_dir,
+/*	static void processFilesRecursively( const QString & _src_dir,
 						const QString & _dst_dir,
 		void( * _proc_func )( const QString & _src, const QString &
-								_dst ) );
+								_dst ) );*/
 
 
 	const QString m_lmmsRcFile;
