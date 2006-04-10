@@ -28,9 +28,9 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QPixmap>
-#include <QCursor>
+#include <QtGui/QWidget>
+#include <QtGui/QPixmap>
+#include <QtGui/QCursor>
 
 #else
 

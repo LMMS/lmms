@@ -35,8 +35,8 @@
 
 #ifdef QT4
 
-#include <QString>
-#include <QVector>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
 #else
 

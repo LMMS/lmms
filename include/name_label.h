@@ -32,7 +32,7 @@
 #ifdef QT4
 
 #include <QLabel>
-#include <QPixmap>
+#include <QtGui/QPixmap>
 
 #else
 

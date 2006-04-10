@@ -26,7 +26,16 @@
 
 #include "qt3support.h"
 
+#ifndef QT3
+
+#include <QtCore/QVector>
+
+#else
+
 #include <qvaluevector.h>
+
+#endif
+
 
 #include "config.h"
 #include "types.h"

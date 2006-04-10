@@ -35,8 +35,8 @@
 
 #ifdef QT4
 
-#include <QVector>
-#include <QPixmap>
+#include <QtCore/QVector>
+#include <QtGui/QPixmap>
 #include <QTimer>
 
 #else

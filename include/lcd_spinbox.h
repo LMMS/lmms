@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QLCDNumber>
-#include <QMap>
+#include <QtCore/QMap>
+#include <QtGui/QLCDNumber>
 
 #else
 

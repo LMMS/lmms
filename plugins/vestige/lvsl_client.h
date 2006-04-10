@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QString>
-#include <QMutex>
+#include <QtCore/QString>
+#include <QtCore/QMutex>
 
 #else
 
@@ -80,7 +80,7 @@ public:
 	void FASTCALL process( const sampleFrame * _in_buf,
 						sampleFrame * _out_buf );
 	void FASTCALL enqueueMidiEvent( const midiEvent & _event,
-						const Uint32 _frames_ahead );
+						const f_cnt_t _frames_ahead );
 	void FASTCALL setTempo( const bpm_t _bpm );
 
 	const QMap<QString, QString> & parameterDump( void );

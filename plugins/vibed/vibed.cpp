@@ -27,9 +27,10 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QMap>
-#include <QLabel>
-#include <QMenu>
+#include <QtCore/QMap>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QWhatsThis>
 
 #else
 

@@ -328,7 +328,7 @@ void audioOSS::run( void )
 
 	while( m_quit == FALSE )
 	{
-		const Uint32 frames = getNextBuffer( temp );
+		const fpab_t frames = getNextBuffer( temp );
 
 		int bytes = convertToS16( temp, frames,
 				getMixer()->masterGain(), outbuf,

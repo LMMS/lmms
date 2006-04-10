@@ -621,7 +621,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					notePlayHandle * nph = new
 						notePlayHandle( this,
 			_time.frames( eng()->getSongEditor()->framesPerTact() ),
-								~0, n );
+						valueRanges<f_cnt_t>::max, n );
 					if( eng()->getMixer()->addPlayHandle(
 									nph ) )
 					{

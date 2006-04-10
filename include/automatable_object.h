@@ -271,7 +271,7 @@ protected:
 	{
 		journalEntry je( _je.actionID(),
 #ifndef QT3
-					-_je.data().value<EDIT_STEP_TYPE>();
+					-_je.data().value<EDIT_STEP_TYPE>()
 #else
 			static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() )
 #endif

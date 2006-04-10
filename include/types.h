@@ -47,13 +47,27 @@ typedef Sint16 int_sample_t;		// 16-bit-int-sample
 
 
 typedef Uint32 sample_rate_t;		// sample-rate
-typedef Uint16 fpab_t;			// frames per audio-buffer (0-16384)
-typedef Uint32 f_cnt_t;			// standard frame-count
+typedef Sint16 fpab_t;			// frames per audio-buffer (0-16384)
+typedef Sint32 f_cnt_t;			// standard frame-count
 typedef Uint8 ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
 typedef Uint16 bpm_t;			// tempo (MIN_BPM to MAX_BPM)
 typedef Uint16 bitrate_t;		// bitrate in kbps
 typedef Sint8 fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
-typedef Uint32 jo_id_t;			// (unique) ID of an journalling object
+typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
+
+
+template<typename T>
+struct valueRanges
+{
+	enum
+	{
+		max = static_cast<T>( static_cast<T>( ~0 ) > 0 ?
+			~0 : ( ( ( T ) 1 << ( sizeof( T ) * 8 - 1 ) ) - 1 ) ),
+		min = static_cast<T>( static_cast<T>( ~0 ) > 0 ?
+							0 : ( -max - 1 ) )
+	} ;
+} ;
+
 
 #endif

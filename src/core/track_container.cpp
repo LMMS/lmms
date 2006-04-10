@@ -367,9 +367,9 @@ bool trackContainer::allowRubberband( void ) const
 
 
 
-unsigned int trackContainer::countTracks( track::trackTypes _tt ) const
+Uint16 trackContainer::countTracks( track::trackTypes _tt ) const
 {
-	unsigned int cnt = 0;
+	Uint16 cnt = 0;
 	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{

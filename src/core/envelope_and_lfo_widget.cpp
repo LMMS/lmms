@@ -432,6 +432,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
 	m_lfoWaveBtnGrp->setInitValue( SIN );
 
+	connect( m_lfoWaveBtnGrp, SIGNAL( valueChanged( int ) ),
+						SLOT( lfoWaveCh( int ) ) );
 
 	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this, eng() );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
@@ -554,46 +556,33 @@ float FASTCALL envelopeAndLFOWidget::level( f_cnt_t _frame,
 	{
 		return( 0.0f );
 	}
-	if( _frame < m_pahdFrames )
+	const float lfo_level = lfoLevel( _frame, _frame_offset );
+	float env_level;
+	if( _frame < _release_begin && _frame < m_pahdFrames )
 	{
-		if( m_controlEnvAmountCb->isChecked() )
+		env_level = m_pahdEnv[_frame];
+	}
+	else if( _frame >= _release_begin )
+	{
+		if( ( _frame -= _release_begin ) < m_rFrames )
 		{
-			return( m_pahdEnv[_frame] * ( 0.5f +
-					lfoLevel( _frame, _frame_offset ) ) );
+			env_level = m_rEnv[_frame] *
+				( ( _release_begin < m_pahdFrames ) ?
+				m_pahdEnv[_release_begin] : m_sustainLevel );
 		}
 		else
 		{
-			return( m_pahdEnv[_frame] +
-					lfoLevel( _frame, _frame_offset ) );
+			env_level = 0.0f;
 		}
 	}
-	else if( _frame > _release_begin )
+	else
 	{
-		_frame -= _release_begin;
-		if( _frame < m_rFrames )
-		{
-			if( m_controlEnvAmountCb->isChecked() )
-			{
-				return( m_rEnv[_frame] * ( 0.5f +
-					lfoLevel( _frame, _frame_offset ) ) );
-			}
-			else
-			{
-				return( m_rEnv[_frame] +
-					lfoLevel( _frame, _frame_offset ) );
-			}
-		}
-		else
-		{
-			return( 0.0f );
-		}
+		env_level = m_sustainLevel;
 	}
-	if( m_controlEnvAmountCb->isChecked() )
-	{
-		return( m_sustainLevel * ( 0.5f +
-					lfoLevel( _frame, _frame_offset ) ) );
-	}
-	return( m_sustainLevel + lfoLevel( _frame, _frame_offset ) );
+	return( m_controlEnvAmountCb->isChecked() ?
+			env_level * ( 0.5f + lfo_level )
+		:
+			env_level + lfo_level );
 }
 
 
@@ -998,8 +987,9 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 		for( f_cnt_t i = 0; i < m_rFrames; ++i )
 		{
-			new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames *
-						m_sustainLevel ) * m_amount;
+			new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames
+					// * m_sustainLevel
+					 		) * m_amount;
 		}
 
 		// save this calculation in real-time-part
@@ -1117,7 +1107,7 @@ void envelopeAndLFOWidget::lfoWaveCh( int _val )
 
 void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
 {
-	if( _on )
+	if( _on && m_lfoShape != USER )
 	{
 		if( m_userWave.frames() <= 1 )
 		{

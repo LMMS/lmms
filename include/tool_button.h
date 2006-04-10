@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QToolButton>
-#include <QColor>
+#include <QtGui/QToolButton>
+#include <QtGui/QColor>
 
 #else
 

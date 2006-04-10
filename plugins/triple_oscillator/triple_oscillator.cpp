@@ -28,8 +28,8 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QBitmap>
-#include <QPainter>
+#include <QtGui/QBitmap>
+#include <QtGui/QPainter>
 
 #else
 

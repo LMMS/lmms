@@ -332,7 +332,8 @@ int notePlayHandle::index( void ) const
 	{
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
-		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack ||
+		if( nph == NULL ||
+			nph->m_instrumentTrack != m_instrumentTrack ||
 						nph->released() == TRUE )
 		{
 			continue;

@@ -36,10 +36,10 @@
 
 #ifdef QT4
 
-#include <QDialog>
-#include <QMap>
-#include <QVector>
-#include <QPair>
+#include <QtGui/QDialog>
+#include <QtCore/QMap>
+#include <QtCore/QVector>
+#include <QtCore/QPair>
 
 #else
 

@@ -36,9 +36,9 @@
 
 #ifndef QT3
 
-#include <QVariant>
-#include <QVector>
-#include <QStack>
+#include <QtCore/QVariant>
+#include <QtCore/QVector>
+#include <QtCore/QStack>
 
 #else
 

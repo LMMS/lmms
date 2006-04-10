@@ -31,9 +31,9 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QVector>
-#include <QPixmap>
+#include <QtGui/QWidget>
+#include <QtCore/QVector>
+#include <QtGui/QPixmap>
 
 #else
 

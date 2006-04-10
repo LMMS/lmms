@@ -34,8 +34,8 @@
 
 #ifdef QT4
 
-#include <QMutex>
-#include <QVector>
+#include <QtCore/QMutex>
+#include <QtCore/QVector>
 
 #else
 
@@ -168,10 +168,7 @@ public:
 			m_playHandles.push_back( _ph );
 			return( TRUE );
 		}
-		else
-		{
-			delete _ph;
-		}
+		delete _ph;
 		return( FALSE );
 	}
 

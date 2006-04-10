@@ -31,7 +31,7 @@
 
 #ifdef QT4
 
-#include <QFile>
+#include <QtCore/QFile>
 
 #else
 

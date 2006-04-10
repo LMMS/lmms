@@ -22,10 +22,13 @@
  *
  */
 
+#include "qt3support.h"
+
 #ifdef QT4
 
-#include <QLabel>
-#include <QMenu>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QWhatsThis>
 
 #else
 
@@ -62,7 +65,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					Uint32 _x, Uint32 _y,
 					QWidget * _parent,
 					engine * _engine ):
-	QWidget( _parent, "nineButtonSelector" ),
+	QWidget( _parent/*, "nineButtonSelector"*/ ),
 	engineObject( _engine ),
 	m_selected( _default )
 {

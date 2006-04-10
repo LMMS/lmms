@@ -28,9 +28,9 @@
 #ifndef QT3
 
 #include <QLayout>
-#include <QString>
-#include <QList>
-#include <QPushButton>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtGui/QPushButton>
 
 class QPixmap;
 class QPainter;

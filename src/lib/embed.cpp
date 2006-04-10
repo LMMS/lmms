@@ -29,7 +29,7 @@
 
 #ifdef QT4
 
-#include <QImage>
+#include <QtGui/QImage>
 
 #else
 

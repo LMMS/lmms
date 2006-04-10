@@ -32,9 +32,9 @@
 
 #ifndef QT3
 
-#include <QVariant>
-#include <QVector>
-#include <QMap>
+#include <QtCore/QVariant>
+#include <QtCore/QVector>
+#include <QtCore/QMap>
 
 #else
 

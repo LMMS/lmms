@@ -26,11 +26,12 @@
 
 #ifdef QT4
 
-#include <QPoint>
+#include <QtCore/QPoint>
 #include <Qt/QtXml>
-#include <QMap>
-#include <QLabel>
-#include <QMenu>
+#include <QtCore/QMap>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QWhatsThis>
 
 #else
 
@@ -53,7 +54,7 @@
 
 impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, 
 					engine * _engine, Uint32 _len ) :
-	QWidget( _parent, "impulseEditor" ),
+	QWidget( _parent/*, "impulseEditor"*/ ),
 	engineObject( _engine ),
 	m_sampleLength( _len ),
 	m_normalizeFactor( 1.0f ),
@@ -61,7 +62,13 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 {
 	setFixedSize( 153, 124 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
+#ifndef QT3
+	QPalette pal = palette();
+	pal.setBrush( backgroundRole(), QBrush( m_base ) );
+	setPalette( pal );
+#else
 	setPaletteBackgroundPixmap( m_base );
+#endif
 	
 	m_graph = new graph( this, eng() );
 	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );

@@ -33,8 +33,8 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QPoint>
+#include <QtGui/QWidget>
+#include <QtCore/QPoint>
 
 #else
 

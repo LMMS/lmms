@@ -28,23 +28,13 @@
 #define _BIT_INVADER_H
 
 
-#ifdef QT4
-
-#include <QPixmap>
-
-#else
-
-#include <qpixmap.h>
-#include <qwidget.h>
-
-#endif
-
-
 #include "instrument.h"
 #include "spc_bg_hndl_widget.h"
 #include "graph.h"
 #include "led_checkbox.h"
 #include "oscillator.h"
+
+class QPixmap;
 
 class knob;
 class notePlayHandle;

@@ -539,7 +539,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// now?
 		if( m_arpModeComboBox->value() == SORT &&
 				( ( cur_frame / arp_frames ) % total_range ) /
-					range != (Uint32) _n->index() )
+						range != (f_cnt_t) _n->index() )
 		{
 			// update counters
 			frames_processed += arp_frames;

@@ -31,9 +31,9 @@
 
 #ifdef QT4
 
-#include <QScrollArea>
-#include <QVector>
-#include <QMainWindow>
+#include <QtGui/QScrollArea>
+#include <QtCore/QVector>
+#include <QtGui/QMainWindow>
 
 #else
 
@@ -89,7 +89,7 @@ public:
 		return( FALSE );
 	}
 
-	unsigned int FASTCALL countTracks( track::trackTypes _tt =
+	Uint16 FASTCALL countTracks( track::trackTypes _tt =
 					track::TOTAL_TRACK_TYPES ) const;
 
 	void FASTCALL setMutedOfAllTracks( bool _muted );

@@ -30,9 +30,9 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QFont>
-#include <QDesktopWidget>
+#include <QtGui/QApplication>
+#include <QtGui/QFont>
+#include <QtGui/QDesktopWidget>
 
 #else
 

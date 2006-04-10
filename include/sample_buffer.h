@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QObject>
-#include <QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #else
 

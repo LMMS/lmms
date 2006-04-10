@@ -30,9 +30,9 @@
 
 #ifdef QT4
 
-#include <QPair>
-#include <QMutex>
-#include <QThread>
+#include <QtCore/QPair>
+#include <QtCore/QMutex>
+#include <QtCore/QThread>
 
 #else
 

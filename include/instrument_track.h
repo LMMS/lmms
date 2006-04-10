@@ -31,10 +31,10 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QPushButton>
-#include <QPainter>
-#include <QMutex>
+#include <QtGui/QApplication>
+#include <QtGui/QPushButton>
+#include <QtGui/QPainter>
+#include <QtCore/QMutex>
 
 #else
 

@@ -1,3 +1,49 @@
+2006-04-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	do not show hint when loading settings in which lfo-shape is set to USER
+
+	* src/core/preset_preview_play_handle.cpp:
+	disable project-journalling while loading preset
+
+	* src/core/preset_preview_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	for generating infinite notes, pass valueRanges<f_cnt_t>::max instead
+	of ~0 to note-play-handle-constructor as ~0 = 1 for signed ints
+
+	* include/types.h:
+	- changed types of fpab_t and f_cnt_t to be signed - compiler
+	  generates more optimized code this way
+	- added template-struct "valueRanges", containing members "min" and
+	  "max" which hold the minimum and maximum value of the type the
+	  template is instantiated with
+
+	* plugins/bit_invader/bit_invader.cpp:
+	- fixed buffer-overflow when loading sample-data from base64 and more
+	  bytes were decoded than allocated in wave-buffer
+	- delete decoded base64-data after copying it into wave-buffer
+
+2006-04-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	- connect valueChanged()-event of lfo-shape-buttongroup with
+	  lfoWaveCh()-slot - fixes bug that clicks at the lfo-wave-buttons
+	  were not recognized
+	- completely revised level()-method which doesn't have the bug
+	  anymore, that in release-phase the envelope-level simply went down
+	  from sustain-level to zero, now it goes down from the level at which
+	  the note was released, new method is also much cleaner and more
+	  optimized (and optmizable by compiler)
+
+	* src/core/preset_preview_play_handle.cpp:
+	hide preview-instrument-track-window after loading settings
+
+2006-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vibed/vibrating_string.h:
+	corrected type-names for resample()-method-parameters (f_cnt_t instead
+	of samplerate_t)
+
 2006-04-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/config_mgr.h:

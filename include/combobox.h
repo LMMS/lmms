@@ -30,11 +30,11 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QVector>
-#include <QMenu>
-#include <QPixmap>
-#include <QPair>
+#include <QtGui/QWidget>
+#include <QtCore/QVector>
+#include <QtGui/QMenu>
+#include <QtGui/QPixmap>
+#include <QtCore/QPair>
 
 #else
 

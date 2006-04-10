@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QPushButton>
+#include <QtGui/QPushButton>
 
 #else
 

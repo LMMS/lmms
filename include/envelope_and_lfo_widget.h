@@ -36,9 +36,9 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QMap>
-#include <QVector>
+#include <QtGui/QWidget>
+#include <QtCore/QMap>
+#include <QtCore/QVector>
 
 #else
 

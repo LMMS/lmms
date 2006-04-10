@@ -27,11 +27,11 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QBitmap>
+#include <QtGui/QPainter>
+#include <QtGui/QBitmap>
 #include <Qt/QtXml>
-#include <QFileInfo>
-#include <QDropEvent>
+#include <QtCore/QFileInfo>
+#include <QtGui/QDropEvent>
 
 #else
 
@@ -507,8 +507,8 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 	const QRect graph_rect( 4, 174, 241, 70 );
-	const Uint32 frames = tMax( m_sampleBuffer.frames(),
-						static_cast<Uint32>( 1 ) );
+	const f_cnt_t frames = tMax( m_sampleBuffer.frames(),
+						static_cast<f_cnt_t>( 1 ) );
 	const Uint16 start_frame_x = m_sampleBuffer.startFrame() *
 						graph_rect.width() / frames;
 	const Uint16 end_frame_x = m_sampleBuffer.endFrame() *

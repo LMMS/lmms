@@ -31,12 +31,12 @@
 
 #ifdef QT4
 
-#include <QVector>
-#include <QWidget>
-#include <QMutex>
-#include <QDialog>
-#include <QThread>
-#include <QPixmap>
+#include <QtCore/QVector>
+#include <QtGui/QWidget>
+#include <QtCore/QMutex>
+#include <QtGui/QDialog>
+#include <QtCore/QThread>
+#include <QtGui/QPixmap>
 
 #else
 

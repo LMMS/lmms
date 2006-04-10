@@ -512,7 +512,7 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 
 
 
-void VSTPlugin::setBlockSize( const Uint16 _bsize )
+void VSTPlugin::setBlockSize( const fpab_t _bsize )
 {
 	if( _bsize == m_blockSize )
 	{

@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QString>
+#include <QtCore/QString>
 
 #else
 

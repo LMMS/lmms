@@ -27,20 +27,14 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QButtonGroup>
-#include <QBitmap>
+#include <QtGui/QPainter>
 #include <Qt/QtXml>
-#include <QFileInfo>
-#include <QDropEvent>
+#include <QtGui/QDropEvent>
 
 #else
 
 #include <qpainter.h>
-#include <qbuttongroup.h>
-#include <qbitmap.h>
 #include <qdom.h>
-#include <qfileinfo.h>
 #include <qdom.h>
 #include <qmap.h>
 #include <qcanvas.h>

@@ -32,8 +32,8 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QApplication>
-#include <QProgressDialog>
+#include <QtGui/QApplication>
+#include <QtGui/QProgressDialog>
 
 #else
 

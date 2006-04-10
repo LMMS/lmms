@@ -41,10 +41,10 @@
 
 #ifdef QT4
 
-#include <QMutex>
-#include <QVector>
-#include <QList>
-#include <QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QVector>
+#include <QtCore/QList>
+#include <QtCore/QMap>
 
 #else
 

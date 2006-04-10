@@ -42,7 +42,7 @@
 
 #ifdef QT4
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #else
 

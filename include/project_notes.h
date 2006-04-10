@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QMainWindow>
+#include <QtGui/QMainWindow>
 
 #else
 

@@ -37,8 +37,8 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QVector>
+#include <QtGui/QWidget>
+#include <QtCore/QVector>
 
 #else
 

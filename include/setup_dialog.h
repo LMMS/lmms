@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QDialog>
-#include <QMap>
+#include <QtGui/QDialog>
+#include <QtCore/QMap>
 
 #else
 

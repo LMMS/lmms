@@ -31,7 +31,7 @@
 #ifdef QT4
 
 #include <QAbstractButton>
-#include <QColor>
+#include <QtGui/QColor>
 
 #else
 

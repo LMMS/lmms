@@ -27,9 +27,9 @@
 
 #ifdef QT4
 
-#include <QPaintEvent>
-#include <QFontMetrics>
-#include <QPainter>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QPainter>
 
 #else
 

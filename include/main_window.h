@@ -30,9 +30,9 @@
 
 #ifdef QT4
 
-#include <QMainWindow>
-#include <QWorkspace>
-#include <QWhatsThis>
+#include <QtGui/QMainWindow>
+#include <QtGui/QWorkspace>
+#include <QtGui/QWhatsThis>
 
 #else
 

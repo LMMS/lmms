@@ -33,8 +33,8 @@
 
 #ifdef QT4
 
-#include <QList>
-#include <QPair>
+#include <QtCore/QList>
+#include <QtCore/QPair>
 
 #else
 

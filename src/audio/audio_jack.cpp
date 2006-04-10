@@ -382,7 +382,8 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		{
 			for( Uint8 chnl = 0; chnl < _this->channels(); ++chnl )
 			{
-				for( Uint32 frame = 0; frame < todo; ++frame )
+				for( jack_nframes_t frame = 0; frame < todo;
+								++frame )
 				{
 					outbufs[chnl][done+frame] = 
 		_this->m_outBuf[_this->m_framesDoneInCurBuf+frame][chnl] *

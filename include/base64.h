@@ -31,7 +31,7 @@
 
 #ifndef QT3
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
 #endif
 

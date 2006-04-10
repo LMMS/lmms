@@ -140,7 +140,7 @@ void mixer::stopProcessing( void )
 bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
-				eng()->getSongEditor()->realTimeTask() == TRUE ) );
+			eng()->getSongEditor()->realTimeTask() == TRUE ) );
 }
 
 

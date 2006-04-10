@@ -27,10 +27,11 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QX11EmbedWidget>
-#include <QX11Info>
-#include <QTime>
+#include <QtCore/QLocale>
+#include <QtCore/QTime>
+#include <QtGui/QApplication>
+#include <QtGui/QX11EmbedWidget>
+#include <QtGui/QX11Info>
 
 #else
 

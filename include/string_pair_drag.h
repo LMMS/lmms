@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QDrag>
+#include <QtGui/QDrag>
 
 #else
 

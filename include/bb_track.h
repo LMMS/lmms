@@ -31,8 +31,8 @@
 
 #ifdef QT4
 
-#include <QObject>
-#include <QMap>
+#include <QtCore/QObject>
+#include <QtCore/QMap>
 
 #else
 

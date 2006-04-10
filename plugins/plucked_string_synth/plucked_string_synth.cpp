@@ -28,12 +28,10 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QMap>
 
 #else
 
 #include <qdom.h>
-#include <qmap.h>
 
 #endif
 

@@ -156,7 +156,11 @@ static int my_getchar (QBuffer* f)
 						error_handler("Cannot allocate read buffer");
 				}
 			}
+#ifndef QT3
+			read_buf_end = f->read(read_buf, buffer_size);
+#else
 			read_buf_end = f->readBlock(read_buf, buffer_size);
+#endif
 			read_buf_index = 0;
 			if (!read_buf_end)
 				return EOF;

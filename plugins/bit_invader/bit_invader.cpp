@@ -27,17 +27,13 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QButtonGroup>
-#include <QBitmap>
+#include <QtGui/QPainter>
 #include <Qt/QtXml>
-#include <QFileInfo>
-#include <QDropEvent>
+#include <QtGui/QDropEvent>
 
 #else
 
 #include <qpainter.h>
-#include <qbuttongroup.h>
 #include <qbitmap.h>
 #include <qdom.h>
 #include <qfileinfo.h>
@@ -595,8 +591,6 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void bitInvader::loadSettings( const QDomElement & _this )
 {
-
-
 	// Load sample length
 	sample_length = _this.attribute( "sampleLength" ).toInt() ;
 
@@ -606,13 +600,14 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	// Load sample shape
 	delete[] sample_shape;
 	sample_shape = new float[sample_length];
-	QString sampleString = _this.attribute( "sampleShape");
 	int size = 0;
 	char * dst = 0;
-	base64::decode( sampleString, &dst, &size );
-	memcpy( sample_shape, dst, size  );
+	base64::decode( _this.attribute( "sampleShape"), &dst, &size );
+	memcpy( sample_shape, dst, tMin<int>( size, sample_length *
+							sizeof( float ) ) );
 
-       	m_graph->setSamplePointer( sample_shape, sample_length );
+	delete[] dst;
+    	m_graph->setSamplePointer( sample_shape, sample_length );
 
 	// Load LED normalize 
 	m_interpolationToggle->setChecked( _this.attribute(

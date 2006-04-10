@@ -581,7 +581,7 @@ void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
 		if( s != NULL )
 		{
 			if( s->totalFrames() - s->framesDone() <=
-				static_cast<Uint32>(
+				static_cast<f_cnt_t>(
 					eng()->getMixer()->sampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( TRUE );

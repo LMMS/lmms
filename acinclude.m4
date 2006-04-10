@@ -9,7 +9,7 @@ AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [defau
 # Check that QTDIR is defined or that --with-qtdir given
 if test x"$QTDIR" = x ; then
 	# some usual Qt-locations
-	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 usr/local/qt /usr/local/qt3 /usr/local/qt31/ /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0"
+	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 usr/local/qt /usr/local/qt3 /usr/local/qt31/ /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
 else
 	QT_SEARCH=$QTDIR
 	QTDIR=""
@@ -75,12 +75,6 @@ if test x$UIC = x ; then
         AC_MSG_WARN([*** not found! It's currently not needed but should be part of a proper Qt-devel-tools-installation!])
 fi
 
-# qembed is the Qt data embedding utility.
-#AC_CHECK_PROG(QEMBED, qembed, $QTDIR/bin/qembed,,$QTDIR/bin/)
-#if test x$QEMBED = x ; then
-#        AC_MSG_ERROR([*** not found! Make sure you have Qt-devel-tools/Qt-extensions installed! On some distributions (e.g. SuSE) the package, containing qembed is also called qt3-extensions.])
-#fi
-
 # lupdate is the Qt translation-update utility.
 AC_CHECK_PROG(LUPDATE, lupdate, $QTDIR/bin/lupdate,,$QTDIR/bin/)
 if test x$LUPDATE = x ; then
@@ -134,7 +128,10 @@ case "${host}" in
         if test x$QT_IS_STATIC = xno ; then
             QT_IS_DYNAMIC=`ls $QTDIR/lib/*.so 2> /dev/null` 
             if test "x$QT_IS_DYNAMIC" = x;  then
-                AC_MSG_ERROR([*** Couldn't find any Qt libraries])
+                QT_IS_DYNAMIC=`ls /usr/lib/libQt*so.4 2> /dev/null` 
+                if test "x$QT_IS_DYNAMIC" = x;  then
+                    AC_MSG_ERROR([*** Couldn't find any Qt libraries])
+		fi
             fi
         fi
 	if test "$QT_MAJOR" = "4" ; then

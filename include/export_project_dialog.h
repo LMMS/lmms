@@ -35,7 +35,7 @@
 
 #ifdef QT4
 
-#include <QDialog>
+#include <QtGui/QDialog>
 
 #else
 

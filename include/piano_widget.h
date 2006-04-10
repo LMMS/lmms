@@ -31,9 +31,9 @@
 
 #ifdef QT4
 
-#include <QWidget>
-#include <QPixmap>
-#include <QScrollBar>
+#include <QtGui/QWidget>
+#include <QtGui/QPixmap>
+#include <QtGui/QScrollBar>
 
 #else
 

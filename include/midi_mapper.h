@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QPair>
-#include <QFile>
+#include <QtCore/QPair>
+#include <QtCore/QFile>
 
 #else
 

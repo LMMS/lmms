@@ -953,8 +953,8 @@ void songEditor::processNextBuffer( void )
 		}
 	}
 
-	Uint32 total_frames_played = 0;
-	Uint32 frames_per_tact = static_cast<Uint32>( framesPerTact() );
+	f_cnt_t total_frames_played = 0;
+	f_cnt_t frames_per_tact = static_cast<f_cnt_t>( framesPerTact() );
 	if( m_playPos[m_playMode].currentFrame() == 0 &&
 		m_playPos[m_playMode].getTact64th() > 0 )
 	{
@@ -965,7 +965,7 @@ void songEditor::processNextBuffer( void )
 
 	while( total_frames_played < eng()->getMixer()->framesPerAudioBuffer() )
 	{
-		Uint32 played_frames = eng()->getMixer()->framesPerAudioBuffer() -
+		f_cnt_t played_frames = eng()->getMixer()->framesPerAudioBuffer() -
 							total_frames_played;
 
 		// did we play a whole tact?
@@ -1144,7 +1144,7 @@ void songEditor::setPlayPos( tact _tact_num, tact64th _t_64th, playModes
 {
 	m_playPos[_play_mode].setTact( _tact_num );
 	m_playPos[_play_mode].setTact64th( _t_64th );
-	m_playPos[_play_mode].setCurrentFrame( static_cast<Uint32>(
+	m_playPos[_play_mode].setCurrentFrame( static_cast<f_cnt_t>(
 					_t_64th * framesPerTact() / 64.0f ) );
 	if( _play_mode == m_playMode )
 	{

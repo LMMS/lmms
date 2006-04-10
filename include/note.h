@@ -35,7 +35,7 @@
 
 #ifdef QT4
 
-#include <QVector>
+#include <QtCore/QVector>
 
 #else
 

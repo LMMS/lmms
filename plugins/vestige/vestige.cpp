@@ -28,12 +28,12 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QDir>
-#include <QPushButton>
-#include <QCursor>
+#include <QtGui/QMessageBox>
+#include <QtGui/QFileDialog>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtGui/QPushButton>
+#include <QtGui/QCursor>
 
 #else
 

@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QPixmap>
+#include <QtGui/QPixmap>
 
 #else
 

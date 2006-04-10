@@ -214,8 +214,8 @@ tact bbEditor::lengthOfBB( csize _bb )
 
 
 
-bool FASTCALL bbEditor::play( midiTime _start, Uint32 _start_frame,
-				Uint32 _frames, Uint32 _frame_base,
+bool FASTCALL bbEditor::play( midiTime _start, f_cnt_t _start_frame,
+				f_cnt_t _frames, f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
 	bool played_a_note = FALSE;

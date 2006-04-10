@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QMap>
+#include <QtCore/QMap>
 
 #else
 

@@ -31,8 +31,8 @@
 
 #ifndef QT3
 
-#include <QRubberBand>
-#include <QVector>
+#include <QtGui/QRubberBand>
+#include <QtCore/QVector>
 
 #else
 

@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QWidget>
+#include <QtGui/QWidget>
 
 #else
 

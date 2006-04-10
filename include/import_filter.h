@@ -36,7 +36,7 @@
 
 #ifdef QT4
 
-#include <QFile>
+#include <QtCore/QFile>
 
 #else
 
@@ -96,7 +96,11 @@ protected:
 
 	inline int readBlock( char * _data, int _len )
 	{
+#ifndef QT3
+		return( m_file.read( _data, _len ) );
+#else
 		return( m_file.readBlock( _data, _len ) );
+#endif
 	}
 
 	inline void ungetChar( int _ch )

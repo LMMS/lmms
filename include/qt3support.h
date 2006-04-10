@@ -62,7 +62,7 @@ typedef int csize;
 #define vstack QStack
 #define vvector QVector
 
-#include <QFileInfo>
+#include <QtCore/QFileInfo>
 
 inline QString baseName( const QString & _file )
 {

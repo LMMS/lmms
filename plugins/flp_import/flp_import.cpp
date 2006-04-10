@@ -49,10 +49,10 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QApplication>
-#include <QProgressDialog>
-#include <QDir>
-#include <QBuffer>
+#include <QtGui/QApplication>
+#include <QtGui/QProgressDialog>
+#include <QtCore/QDir>
+#include <QtCore/QBuffer>
 
 #else
 
@@ -506,12 +506,14 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_Text_CommentRTF:
 			{
+#ifndef QT3
+				QByteArray ba( text, text_len );
+				QBuffer buf( &ba );
+				buf.open( QBuffer::ReadOnly );
+#else
 				QByteArray ba;
 				ba.setRawData( text, text_len );
 				QBuffer buf( ba );
-#ifndef QT3
-				buf.open( QBuffer::ReadOnly );
-#else
 				buf.open( IO_ReadOnly );
 #endif
 				op = html_init();
@@ -521,7 +523,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 				word_print( word, out );
 				word_free( word );
 				op_free( op );
+#ifdef QT3
 				ba.resetRawData( text, text_len );
+#endif
 
 				_tc->eng()->getProjectNotes()->setText( out );
 				outstring = "";
@@ -856,7 +860,7 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 	for( playListItems::const_iterator it = m_plItems.begin();
 						it != m_plItems.end(); ++it )
 	{
-		unsigned int pat_num = ( ( *it ) >> 16 ) - 1;
+		csize pat_num = ( ( *it ) >> 16 ) - 1;
 		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat_num )
 		{
 			track::create( track::BB_TRACK,
