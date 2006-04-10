@@ -4,7 +4,6 @@
 	* include/basic_filters.h:
 	* include/oscillator.h:
 	* include/interpolation.h:
-	* src/widgets/knob.cpp:
 	converted calculations using PI to single precision
 	
 	* src/audio/audio_device.cpp:
