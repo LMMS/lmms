@@ -208,6 +208,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/audio_sample_recorder.h		\
 		$(srcdir)/include/audio_sdl.h				\
 		$(srcdir)/include/interpolation.h			\
+		$(srcdir)/include/lmms_constants.h			\
 		$(srcdir)/include/mixer.h				\
 		$(srcdir)/include/pattern.h				\
 		$(srcdir)/include/instrument_track.h			\

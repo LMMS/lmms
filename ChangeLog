@@ -1,3 +1,60 @@
+2006-04-10	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+	* Makefile.am:
+	* include/lmms_constants.h:
+	* include/basic_filters.h:
+	* include/oscillator.h:
+	* include/interpolation.h:
+	* src/widgets/knob.cpp:
+	converted calculations using PI to single precision
+	
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_file_wave.cpp:
+	corrected handling of big endian data
+	
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	-added octave to save and restore settings
+	-removed mysterious m_sampleBuffer that was causing seg faults in the
+	 deconstructor
+
+	* src/core/main_window.cpp:
+	added checks to handle "gimp like windows" for save and restore widget 
+	states to prevent seg fault
+
+	* data/projects/cool_songs/Djeezus-BeatRolls.mmp:
+	* data/projects/cool_songs/Djeezus-Oscilisous.mmp:
+	* data/projects/cool_songs/Marfil-MarfilDrum01.mpp:
+	* data/projects/cool_songs/Mart-Concave_flow.mpp:
+	* data/projects/cool_songs/Mart-Dirt_Track.mpp:
+	* data/projects/cool_songs/MaxFellner-Ease.mpp:
+	* data/projects/cool_songs/SharkyX-DeadManDancing.mpp:
+	* data/projects/cool_songs/SharkyX-Experiments.mpp:
+	* data/projects/cool_songs/Siegel-DreamWave.mpp:
+	* data/projects/cool_songs/TobyDox-Confused.mpp:
+	* data/projects/cool_songs/TobyDox-Psycho.mpp:
+	* data/projects/cool_songs/TobyDox-TheFourthDimension.mpp:
+	* data/projects/covers/J.S.Bach-Preludium_and_Fuge_A-Minor.mmp:
+	* data/projects/demos/basses-demo.mpp:
+	* data/projects/demos/beat-collection.mpp:
+	* data/projects/demos/demo1.mpp:
+	* data/projects/demos/demo3.mpp:
+	* data/projects/demos/demo5.mpp:
+	* data/projects/demos/demo6.mpp:
+	* data/projects/demos/loop_collection.mpp:
+	* data/projects/demos/some_basslines.mpp:
+	* data/projects/misc/1st.mpp:
+	* data/projects/misc/time_machine.mpp:
+	* data/projects/templates/AccousticDrums.mpt:
+	* data/projects/templates/ClubMix.mpt:
+	* data/presets/AudioFileProcessor/Bass-Mainia.cs.xml:
+	* data/presets/AudioFileProcessor/Fat-Reversed-Kick.cs.xml:
+	* data/presets/AudioFileProcessor/Kick-4-your-Subwoofer.cs.xml:
+	updated audiofileprocessors to point to factory presets files in /usr/local/share/lmms
+
+
 2006-04-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/envelope_and_lfo_widget.cpp:

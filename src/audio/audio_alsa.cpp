@@ -228,7 +228,7 @@ void audioALSA::run( void )
 		const f_cnt_t frames = getNextBuffer( temp );
 
 		convertToS16( temp, frames, getMixer()->masterGain(), outbuf,
-					m_littleEndian != isLittleEndian() );
+					m_littleEndian );
 
 		f_cnt_t frame = 0;
 		int_sample_t * ptr = outbuf;

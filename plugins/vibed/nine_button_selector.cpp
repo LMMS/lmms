@@ -173,12 +173,7 @@ nineButtonSelector::~ nineButtonSelector()
 
 void nineButtonSelector::button0Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[0];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 0;
-	emit nineButtonSelection( m_selected );
+	setSelected( 0 );
 }
 
 
@@ -186,12 +181,7 @@ void nineButtonSelector::button0Clicked( void )
 
 void nineButtonSelector::button1Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[1];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 1;
-	emit nineButtonSelection( m_selected );
+	setSelected( 1 );
 }
 
 
@@ -199,12 +189,7 @@ void nineButtonSelector::button1Clicked( void )
 
 void nineButtonSelector::button2Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[2];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 2;
-	emit nineButtonSelection( m_selected );
+	setSelected( 2 );
 }
 
 
@@ -212,12 +197,7 @@ void nineButtonSelector::button2Clicked( void )
 
 void nineButtonSelector::button3Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[3];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 3;
-	emit nineButtonSelection( m_selected );
+	setSelected( 3 );
 }
 
 
@@ -225,12 +205,7 @@ void nineButtonSelector::button3Clicked( void )
 
 void nineButtonSelector::button4Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[4];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 4;
-	emit nineButtonSelection( m_selected );
+	setSelected( 4 );
 }
 
 
@@ -238,12 +213,7 @@ void nineButtonSelector::button4Clicked( void )
 
 void nineButtonSelector::button5Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[5];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 5;
-	emit nineButtonSelection( m_selected );
+	setSelected( 5 );
 }
 
 
@@ -251,12 +221,7 @@ void nineButtonSelector::button5Clicked( void )
 
 void nineButtonSelector::button6Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[6];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 6;
-	emit nineButtonSelection( m_selected );
+	setSelected( 6 );
 }
 
 
@@ -264,12 +229,7 @@ void nineButtonSelector::button6Clicked( void )
 
 void nineButtonSelector::button7Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[7];
-	m_lastBtn->setChecked( TRUE );
-	
-	m_selected = 7;
-	emit nineButtonSelection( m_selected );
+	setSelected( 7 );
 }
 
 
@@ -277,11 +237,20 @@ void nineButtonSelector::button7Clicked( void )
 
 void nineButtonSelector::button8Clicked( void )
 {
-	m_lastBtn->setChecked( FALSE);
-	m_lastBtn = m_buttons[8];
+	setSelected( 8 );
+}
+
+
+
+
+void FASTCALL nineButtonSelector::setSelected( Uint8 _new_button )
+{
+	m_selected = _new_button;
+	
+	m_lastBtn->setChecked( FALSE );
+	m_lastBtn = m_buttons[m_selected];
 	m_lastBtn->setChecked( TRUE );
 	
-	m_selected = 8;
 	emit nineButtonSelection( m_selected );
 }
 

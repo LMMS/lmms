@@ -90,8 +90,6 @@ private:
 	
 	ledCheckBox * m_impulse;
 	
-	sampleBuffer * m_sampleBuffer;
-	
 	int m_sampleLength;
 } ;
 

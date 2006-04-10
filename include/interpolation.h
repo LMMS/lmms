@@ -31,7 +31,7 @@
 #endif
 
 #include <math.h>
-
+#include "lmms_constants.h"
 
 inline float hermiteInterpolate( float x0, float x1, float x2, float x3,
 								float frac_pos )
@@ -79,7 +79,7 @@ inline float cubicInterpolate( float v0, float v1, float v2, float v3, float x )
 
 inline float cosinusInterpolate( float v0, float v1, float x )
 {
-	float f = cosf( x * ( M_PI*0.5f ) );
+	float f = cosf( x * ( F_PI_2 ) );
 	return( v0*f + v1*( 1.0f-f ) );
 }
 

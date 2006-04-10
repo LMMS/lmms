@@ -36,6 +36,7 @@
 
 #include "mixer.h"
 #include "interpolation.h"
+#include "lmms_constants.h"
 
 
 // fwd-decl because we need it for the typedef below...
@@ -138,7 +139,7 @@ public:
 
 	static inline sample_t sinSample( const float _sample )
 	{
-		return( sinf( _sample * 2.0f * M_PI ) );
+		return( sinf( _sample * F_2PI ) );
 	}
 
 	static inline sample_t triangleSample( const float _sample )

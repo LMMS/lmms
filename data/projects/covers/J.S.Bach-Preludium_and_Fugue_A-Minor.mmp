@@ -10,7 +10,7 @@
     <trackcontainer type="songeditor" >
       <track muted="0" type="0" >
         <channeltrack surpos="126092838" fxch="0" baseoct="6" vol="100" name="church_organ02.ogg" basetone="9" tab="2" >
-          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="100" src="instruments/church_organ02.ogg" />
+          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="100" src="/usr/local/share/lmms/samples/instruments/church_organ02.ogg" />
           <eldata fres="1" ftype="0" fcut="6028" fwet="0" >
             <elvol lpdel="0" amt="1" rel="0.215" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.019" pdel="0" lamt="0" dec="0.374" x100="0" lshp="0" hold="0" />
             <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -810,7 +810,7 @@
       </track>
       <track muted="0" type="0" >
         <channeltrack surpos="134219776" fxch="0" baseoct="3" vol="60" name="church_organ04.ogg" basetone="9" tab="2" >
-          <audiofileprocessor reversed="0" looped="0" eframe="0.999997" sframe="0" amp="100" src="instruments/church_organ04.ogg" />
+          <audiofileprocessor reversed="0" looped="0" eframe="0.999997" sframe="0" amp="100" src="/usr/local/share/lmms/samples/instruments/church_organ04.ogg" />
           <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
             <elvol lpdel="0" amt="1" rel="0.178" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.394" x100="0" lshp="0" hold="0" />
             <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -1242,7 +1242,7 @@
       </track>
       <track muted="0" type="0" >
         <channeltrack surpos="122816836" fxch="0" baseoct="5" vol="130" name="church_organ01.ogg" basetone="9" tab="2" >
-          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="100" src="instruments/church_organ01.ogg" />
+          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="100" src="/usr/local/share/lmms/samples/instruments/church_organ01.ogg" />
           <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
             <elvol lpdel="0" amt="1" rel="0.261" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.394" x100="0" lshp="0" hold="0" />
             <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -4153,7 +4153,7 @@
       </track>
       <track muted="0" type="0" >
         <channeltrack surpos="119539936" fxch="0" baseoct="5" vol="100" name="church_organ01.ogg" basetone="9" tab="2" >
-          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="183" src="instruments/church_organ01.ogg" />
+          <audiofileprocessor reversed="0" looped="0" eframe="0.999998" sframe="0" amp="183" src="/usr/local/share/lmms/samples/instruments/church_organ01.ogg" />
           <eldata fres="1" ftype="7" fcut="2524" fwet="1" >
             <elvol lpdel="0" amt="1" rel="0.254" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.598" x100="0" lshp="0" hold="0" />
             <elcut lpdel="0" amt="1" rel="0.016" ctlenvamt="0" latt="0" sus="0.999" lspd="0.6268" att="0" pdel="0" lamt="0" dec="0.137" x100="0" lshp="1" hold="0" />

@@ -38,6 +38,7 @@
 #include "types.h"
 #include "mixer.h"
 #include "templates.h"
+#include "lmms_constants.h"
 
 //const int MOOG_VOLTAGE = 40000;
 
@@ -273,7 +274,7 @@ public:
 							0.6490 * kfc + 0.9988;
 				const float kacr = -3.9364 * ( kfc*kfc ) +
 							1.8409 * kfc + 0.9968;
-				m_p = MOOG_VOLTAGE * ( 1 - expf( -2.0 * M_PI *
+				m_p = MOOG_VOLTAGE * ( 1 - expf( F_2PI *
 								kfcr * kf ) );
 				m_r = 4 * _q * kacr;
 				break;
@@ -282,7 +283,7 @@ public:
 			default:
 			{
 				// other filters
-				const float omega	= 2.0f * M_PI * _freq *
+				const float omega	= F_2PI * _freq *
 								m_sampleRate;
 				const float tsin	= sinf( omega );
 				const float tcos	= cosf( omega );

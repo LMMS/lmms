@@ -611,8 +611,16 @@ void mainWindow::clearKeyModifiers( void )
 
 void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	_de.setAttribute( "x", _w->parentWidget()->x() );
-	_de.setAttribute( "y", _w->parentWidget()->y() );
+	if( _w->parentWidget() != NULL )
+	{
+		_de.setAttribute( "x", _w->parentWidget()->x() );
+		_de.setAttribute( "y", _w->parentWidget()->y() );
+	}
+	else
+	{
+		_de.setAttribute( "x", 0 );
+		_de.setAttribute( "y", 0 );
+	}
 	_de.setAttribute( "width", _w->width() );
 	_de.setAttribute( "height", _w->height() );
 	_de.setAttribute( "visible", _w->isVisible() );
@@ -629,7 +637,10 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 	if( !r.isNull() )
 	{
 		_w->show();
-		_w->parentWidget()->move( r.topLeft() );
+		if( _w->parentWidget() != NULL )
+		{
+			_w->parentWidget()->move( r.topLeft() );
+		}
 		_w->setShown( _de.attribute( "visible" ).toInt() );
 		_w->resize( r.size() );
 	}

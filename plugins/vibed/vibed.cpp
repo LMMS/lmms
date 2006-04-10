@@ -407,7 +407,6 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 vibed::~vibed()
 {
-	delete m_sampleBuffer;
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
 		delete m_pickKnobs[harm];
@@ -457,6 +456,10 @@ void vibed::saveSettings( QDomDocument & _doc,
 			name = "pickup" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
 					m_pickupKnobs[i]->value() ) );
+
+			name = "octave" + QString::number( i );
+			_this.setAttribute( name, QString::number( 
+					m_harmonics[i]->getSelected() ) );
 
 			name = "length" + QString::number( i );
 			_this.setAttribute( name, QString::number( 
@@ -519,6 +522,10 @@ void vibed::loadSettings( const QDomElement & _this )
 			m_pickupKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );
 		
+			name = "octave" + QString::number( i );
+			m_harmonics[i]->setSelected( 
+					_this.attribute( name ).toInt() );
+			
 			name = "length" + QString::number( i );
 			m_lengthKnobs[i]->setValue( 
 					_this.attribute( name ).toFloat() );

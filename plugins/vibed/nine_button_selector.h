@@ -60,6 +60,7 @@ public:
 	~nineButtonSelector();
 	
 	inline Uint8 getSelected() { return( m_selected ); };
+	void FASTCALL setSelected( Uint8 _new_button );
 	
 public slots:
 	void button0Clicked( void );

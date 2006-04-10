@@ -4,7 +4,7 @@
   <head/>
   <channelsettings>
     <channeltrack surpos="134219776" muted="0" fxch="0" tbidx="0" baseoct="4" vol="100" name="Fat Reversed Kick" basetone="9" >
-      <audiofileprocessor reversed="1" looped="1" eframe="19723" sframe="0" amp="100" src="drums/bassdrum01.ogg" />
+      <audiofileprocessor reversed="1" looped="1" eframe="19723" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/bassdrum01.ogg" />
       <eldata fres="3" ftype="0" fcut="193" fwet="1" >
         <elvol lpdel="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
         <elpan lpdel="0" amt="0" rel="0.1" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
