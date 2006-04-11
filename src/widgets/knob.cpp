@@ -32,17 +32,15 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QPalette>
-#include <QBitmap>
-#include <QLabel>
-#include <QStatusBar>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QStatusBar>
-#include <QFontMetrics>
-#include <QApplication>
-#include <QInputDialog>
+#include <QtGui/QApplication>
+#include <QtGui/QBitmap>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPalette>
 
 #else
 

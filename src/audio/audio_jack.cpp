@@ -32,9 +32,9 @@
 
 #ifdef QT4
 
-#include <QLineEdit>
-#include <QLabel>
-#include <QMessageBox>
+#include <QtGui/QLineEdit>
+#include <QtGui/QLabel>
+#include <QtGui/QMessageBox>
 
 #else
 

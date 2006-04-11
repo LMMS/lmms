@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QMouseEvent>
-#include <QCursor>
-#include <QLabel>
+#include <QtGui/QApplication>
+#include <QtGui/QCursor>
+#include <QtGui/QLabel>
+#include <QtGui/QMouseEvent>
 
 #else
 

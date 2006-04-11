@@ -1,7 +1,7 @@
 /*
  * tab_bar.h - class tabBar
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,9 +34,9 @@
 
 #ifdef QT4
 
-#include <QtGui/QWidget>
 #include <QtCore/QMap>
-#include <QLayout>
+#include <QtGui/QLayout>
+#include <QtGui/QWidget>
 
 #else
 

@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QMouseEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 #else
 

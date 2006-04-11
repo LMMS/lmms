@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
-#include <QList>
-#include <QMutex>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
 
 #else
 
@@ -151,7 +151,7 @@ void bufferAllocator::free( void * _buf )
 	}
 
 	// do clean-up if neccessary
-	static const Uint32 CLEANUP_LEVEL = static_cast<Uint32>( 768 / ( logf(
+	static const csize CLEANUP_LEVEL = static_cast<csize>( 768 / ( logf(
 				/*mixer::inst()->framesPerAudioBuffer()*/
 								128 ) /
 								logf( 2 ) ) );

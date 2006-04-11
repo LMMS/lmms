@@ -29,11 +29,11 @@
 
 #ifdef QT4
 
-#include <QTextEdit>
-#include <QTabWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QResizeEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QResizeEvent>
+#include <QtGui/QTabWidget>
+#include <QtGui/QTextEdit>
 
 #else
 

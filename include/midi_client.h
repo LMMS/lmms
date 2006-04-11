@@ -30,8 +30,8 @@
 
 #ifdef QT4
 
+#include <QtCore/QStringList>
 #include <QtCore/QVector>
-#include <QStringList>
 
 #else
 

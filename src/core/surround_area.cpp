@@ -4,7 +4,7 @@
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,18 +30,16 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QPainter>
-#include <QCursor>
-#include <QMouseEvent>
-#include <QImage>
+#include <QtGui/QApplication>
+#include <QtGui/QCursor>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 #else
 
 #include <qapplication.h>
 #include <qpainter.h>
 #include <qcursor.h>
-#include <qimage.h>
 
 #endif
 

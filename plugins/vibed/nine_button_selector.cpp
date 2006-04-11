@@ -72,8 +72,14 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 	setFixedSize( 50, 50 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
 	move( _x, _y );
+#ifndef QT3
+	QPalette pal = palette();
+	pal.setBrush( backgroundRole(), QBrush( m_base ) );
+	setPalette( pal );
+#else
 	setPaletteBackgroundPixmap( m_base );
-	
+#endif
+
 	m_button = new pixmapButton( this, eng() );
 	m_button->move( 1, 1 );
 	m_button->setActiveGraphic( _button0_on );

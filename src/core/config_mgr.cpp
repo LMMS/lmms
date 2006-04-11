@@ -33,18 +33,18 @@
 
 #ifdef QT4
 
-#include <QDir>
 #include <Qt/QtXml>
-#include <QFile>
-#include <QMessageBox>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QFileDialog>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QApplication>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtGui/QMessageBox>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
+#include <QtGui/QFileDialog>
+#include <QtGui/QRadioButton>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QApplication>
 
 #else
 

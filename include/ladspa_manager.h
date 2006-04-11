@@ -42,10 +42,10 @@
 
 #ifdef QT4
 
-#include <QtCore/QString>
-#include <QStringList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #else
 

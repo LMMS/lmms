@@ -30,11 +30,11 @@
 
 #ifdef QT4
 
-#include <QApplication>
 #include <Qt/QtXml>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QLayout>
+#include <QtGui/QApplication>
+#include <QtGui/QLayout>
+#include <QtGui/QMenu>
+#include <QtGui/QMouseEvent>
 
 #else
 
@@ -1097,7 +1097,7 @@ void trackOperationsWidget::removeTrack( void )
 #ifdef QT3
 	QTimer::singleShot( 10, this, SLOT( removeTrackTimer() ) );
 #else
-#warning fixme
+//#warning fixme
 	removeTrackTimer();
 #endif
 }

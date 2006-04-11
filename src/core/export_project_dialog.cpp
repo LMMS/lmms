@@ -29,13 +29,13 @@
 
 #ifdef QT4
 
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QLabel>
-#include <QPushButton>
-#include <QCloseEvent>
-#include <QApplication>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QProgressBar>
+#include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QApplication>
 
 #else
 

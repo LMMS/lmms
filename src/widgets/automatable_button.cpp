@@ -28,6 +28,17 @@
 
 #include "automatable_button.h"
 
+#ifndef QT3
+
+#include <QtGui/QMouseEvent>
+
+#else
+
+#define indexOf findIndex
+
+#endif
+
+
 
 automatableButton::automatableButton( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
@@ -173,9 +184,9 @@ void automatableButtonGroup::removeButton( automatableButton * _btn )
 
 void automatableButtonGroup::activateButton( automatableButton * _btn )
 {
-	if( _btn != m_buttons[value()] && m_buttons.findIndex( _btn ) != -1 )
+	if( _btn != m_buttons[value()] && m_buttons.indexOf( _btn ) != -1 )
 	{
-		setValue( m_buttons.findIndex( _btn ) );
+		setValue( m_buttons.indexOf( _btn ) );
 	}
 }
 
@@ -198,6 +209,10 @@ void automatableButtonGroup::setValue( const int _value )
 	emit valueChanged( value() );
 }
 
+
+#ifdef QT3
+#undef findIndex
+#endif
 
 
 #include "automatable_button.moc"

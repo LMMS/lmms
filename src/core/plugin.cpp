@@ -29,9 +29,9 @@
 
 #ifdef QT4
 
-#include <QMessageBox>
-#include <QDir>
-#include <QLibrary>
+#include <QtCore/QDir>
+#include <QtCore/QLibrary>
+#include <QtGui/QMessageBox>
 
 #else
 

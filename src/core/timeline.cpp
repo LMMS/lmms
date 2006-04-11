@@ -29,12 +29,12 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QApplication>
-#include <QMouseEvent>
-#include <QLayout>
-#include <QTimer>
 #include <Qt/QtXml>
+#include <QtCore/QTimer>
+#include <QtGui/QApplication>
+#include <QtGui/QLayout>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 #else
 

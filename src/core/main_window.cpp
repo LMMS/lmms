@@ -29,13 +29,13 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QFileDialog>
-#include <QCloseEvent>
-#include <QSplitter>
-#include <QSplashScreen>
-#include <QMessageBox>
-#include <QMenuBar>
+#include <QtGui/QApplication>
+#include <QtGui/QFileDialog>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QSplitter>
+#include <QtGui/QSplashScreen>
+#include <QtGui/QMessageBox>
+#include <QtGui/QMenuBar>
 #include <Qt/QtXml>
 
 #else
@@ -246,7 +246,6 @@ void mainWindow::finalize( void )
 								Qt::white );
 	}
 #endif
-	eng()->getSongEditor();
 
 
 #if QT_VERSION >= 0x030200
@@ -634,7 +633,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 	QRect r( _de.attribute( "x" ).toInt(), _de.attribute( "y" ).toInt(),
 			_de.attribute( "width" ).toInt(),
 			_de.attribute( "height" ).toInt() );
-	if( !r.isNull() )
+	if( !r.isNull() && _w->parentWidget() != NULL )
 	{
 		_w->show();
 		if( _w->parentWidget() != NULL )
@@ -666,7 +665,7 @@ void mainWindow::createNewProjectFromTemplate( int _idx )
 	// TODO!!!
 #else
 	if( m_templatesMenu != NULL &&
-				eng()->getSongEditor()->mayChangeProject() == TRUE )
+			eng()->getSongEditor()->mayChangeProject() == TRUE )
 	{
 		eng()->getSongEditor()->createNewProjectFromTemplate(
 			configManager::inst()->projectsDir() + "templates/" +

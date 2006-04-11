@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QLocale>
-#include <QSplashScreen>
-#include <QTranslator>
+#include <QtCore/QLocale>
+#include <QtCore/QTranslator>
+#include <QtGui/QApplication>
+#include <QtGui/QSplashScreen>
 
 #else
 

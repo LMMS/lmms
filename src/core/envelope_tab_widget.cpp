@@ -31,7 +31,6 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QWhatsThis>
 
 #else
 

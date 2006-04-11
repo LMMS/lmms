@@ -30,11 +30,11 @@
 
 #ifdef QT4
 
-#include <QPushButton>
-#include <QKeyEvent>
-#include <QMenu>
-#include <Q3Header>
-#include <QCursor>
+#include <QtGui/QPushButton>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QMenu>
+#include <QtGui/QCursor>
+#include <Qt3Support/Q3Header>
 
 #else
 
@@ -113,7 +113,11 @@ fileBrowser::~fileBrowser()
 void fileBrowser::reloadTree( void )
 {
 	m_l->clear();
+#ifndef QT3
+	QStringList paths = m_directories.split( '*' );
+#else
 	QStringList paths = QStringList::split( '*', m_directories );
+#endif
 	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
 	{
 		addItems( *it );

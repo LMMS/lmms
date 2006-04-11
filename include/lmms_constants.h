@@ -21,10 +21,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef _LMMS_CONSTANTS_H
 #define _LMMS_CONSTANTS_H
 
 const float F_PI = 3.141593f;
 const float F_2PI = 6.283185f;
 const float F_PI_2 = 1.570796f;
+
 #endif
+

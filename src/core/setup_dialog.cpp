@@ -29,14 +29,14 @@
 
 #ifdef QT4
 
-#include <QLayout>
-#include <QLabel>
-#include <QSlider>
-#include <QWhatsThis>
-#include <QComboBox>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QFileDialog>
+#include <QtGui/QComboBox>
+#include <QtGui/QFileDialog>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QMessageBox>
+#include <QtGui/QSlider>
+#include <QtGui/QWhatsThis>
 
 #else
 

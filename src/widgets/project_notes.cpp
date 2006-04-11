@@ -30,15 +30,15 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QApplication>
-#include <QTextEdit>
-#include <QLineEdit>
-#include <QAction>
-#include <QToolBar>
-#include <QFontDatabase>
-#include <QComboBox>
-#include <QColorDialog>
-#include <QTextCursor>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QColorDialog>
+#include <QtGui/QComboBox>
+#include <QtGui/QFontDatabase>
+#include <QtGui/QLineEdit>
+#include <QtGui/QTextCursor>
+#include <QtGui/QTextEdit>
+#include <QtGui/QToolBar>
 
 #else
 
@@ -112,16 +112,18 @@ projectNotes::projectNotes( engine * _engine) :
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
 	resize( 300, 200 );
+
+	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
 	if( eng()->getMainWindow()->workspace() != NULL )
 	{
-		move( 700, 10 );
+		w->move( 700, 10 );
 	}
 	else
 	{
-		move( 800, 10 );
+		w->move( 800, 10 );
 	}
 
-	show();
+	//show();
 
 }
 

@@ -3,7 +3,7 @@
 /*
  * tooltip.cpp - namespace toolTip, a tooltip-wrapper for LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,7 +29,7 @@
 
 #ifdef QT4
 
-#include <QToolTip>
+#include <QtGui/QToolTip>
 
 #else
 

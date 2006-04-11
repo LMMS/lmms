@@ -31,8 +31,8 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QMenu>
-#include <QToolButton>
+#include <QtGui/QMenu>
+#include <QtGui/QToolButton>
 
 #else
 

@@ -37,18 +37,18 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QApplication>
-#include <QFile>
-#include <QMessageBox>
-#include <QFileInfo>
-#include <QFileDialog>
-#include <QSlider>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QStatusBar>
-#include <QAction>
-#include <QLayout>
-#include <QButtonGroup>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QFileDialog>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QMessageBox>
+#include <QtGui/QSlider>
+#include <QtGui/QStatusBar>
 
 #else
 
@@ -118,13 +118,17 @@ songEditor::songEditor( engine * _engine ) :
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
+
+	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
 	if( eng()->getMainWindow()->workspace() != NULL )
 	{
-		setGeometry( 10, 10, 680, 300 );
+		resize( 680, 300 );
+		w->move( 10, 10 );
 	}
 	else
 	{
-		setGeometry( 210, 10, 580, 300 );
+		resize( 580, 300 );
+		w->move( 210, 10 );
 	}
 
 #ifdef QT4
@@ -1506,7 +1510,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 		{
 			if( node.nodeName() == "trackcontainer" )
 			{
-				restoreState( node.toElement() );
+				( (journallingObject *)( this ) )->
+					restoreState( node.toElement() );
 			}
 			else if( node.nodeName() ==
 					eng()->getPianoRoll()->nodeName() )
@@ -1517,8 +1522,9 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 			else if( node.nodeName() ==
 					eng()->getProjectNotes()->nodeName() )
 			{
-				eng()->getProjectNotes()->restoreState(
-							node.toElement() );
+				( (journallingObject *)( eng()->
+							getProjectNotes() ) )->
+					restoreState( node.toElement() );
 			}
 			else if( node.nodeName() ==
 				m_playPos[PLAY_SONG].m_timeLine->nodeName() )
@@ -1561,10 +1567,11 @@ bool songEditor::saveProject( void )
 	mmp.head().appendChild( mp );
 
 
-	saveState( mmp, mmp.content() );
+	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );
 
 	eng()->getPianoRoll()->saveState( mmp, mmp.content() );
-	eng()->getProjectNotes()->saveState( mmp, mmp.content() );
+	( (journallingObject *)( eng()->getProjectNotes() ) )->saveState( mmp,
+								mmp.content() );
 	m_playPos[PLAY_SONG].m_timeLine->saveState( mmp, mmp.content() );
 
 	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||

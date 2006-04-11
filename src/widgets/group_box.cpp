@@ -29,9 +29,9 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QTimer>
-#include <QMouseEvent>
+#include <QtCore/QTimer>
+#include <QtGui/QPainter>
+#include <QtGui/QMouseEvent>
 
 #else
 
@@ -192,7 +192,12 @@ void groupBox::animate( void )
 
 void groupBox::updatePixmap( void )
 {
+#ifndef QT3
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background );
+#else
 	QColor bg_color = QApplication::palette().active().background();
+#endif
 	QPixmap pm( size() );
 	pm.fill( bg_color.dark( 132 ) );
 
@@ -222,7 +227,11 @@ void groupBox::updatePixmap( void )
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
+#ifndef QT3
+	p.setPen( palette().color( QPalette::Active, QPalette::ButtonText ) );
+#else
 	p.setPen( colorGroup().buttonText() );
+#endif
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 

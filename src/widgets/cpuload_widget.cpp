@@ -30,7 +30,7 @@
 
 #ifdef QT4
 
-#include <QPainter>
+#include <QtGui/QPainter>
 
 #else
 

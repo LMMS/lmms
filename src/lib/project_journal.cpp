@@ -31,6 +31,10 @@
 #include "journalling_object.h"
 #include "song_editor.h"
 
+#ifdef QT3
+#define value data
+#endif
+
 
 
 projectJournal::projectJournal( engine * _engine ) :
@@ -80,7 +84,7 @@ void projectJournal::redo( void )
 
 	journallingObject * jo;
 
-	printf("%d\n", m_joIDs[*(m_currentJournalEntry+1)] );
+	//printf("%d\n", m_joIDs[*(m_currentJournalEntry+1)] );
 	if( m_currentJournalEntry < m_journalEntries.end() &&
 		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
 	{
@@ -146,7 +150,7 @@ void projectJournal::forgetAboutID( const jo_id_t _id )
 		}
 		m_journalEntries.erase( it );
 	}
-	m_joIDs.erase( _id );
+	m_joIDs.remove( _id );
 }
 
 
@@ -154,10 +158,9 @@ void projectJournal::forgetAboutID( const jo_id_t _id )
 
 void projectJournal::clearInvalidJournallingObjects( void )
 {
-	vlist<journallingObject *>::const_iterator it;
 	for( joIDMap::iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		if( it.data() == NULL )
+		if( it.value() == NULL )
 		{
 			forgetAboutID( it.key() );
 			it = m_joIDs.begin();
@@ -169,6 +172,12 @@ void projectJournal::clearInvalidJournallingObjects( void )
 	}
 	//clearJournal();
 }
+
+
+
+#ifdef QT3
+#undef value
+#endif
 
 
 #endif

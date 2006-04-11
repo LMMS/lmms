@@ -33,9 +33,9 @@
 
 #ifdef QT4
 
-#include <QDir>
-#include <QFileInfo>
-#include <QLibrary>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QLibrary>
 
 #else
 

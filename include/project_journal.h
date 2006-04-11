@@ -32,9 +32,9 @@
 
 #ifndef QT3
 
+#include <QtCore/QHash>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
-#include <QtCore/QMap>
 
 #else
 
@@ -109,7 +109,11 @@ public:
 
 
 private:
+#ifndef QT3
+	typedef QHash<jo_id_t, journallingObject *> joIDMap;
+#else
 	typedef QMap<jo_id_t, journallingObject *> joIDMap;
+#endif
 	typedef vvector<jo_id_t> journalEntryVector;
 
 	joIDMap m_joIDs;

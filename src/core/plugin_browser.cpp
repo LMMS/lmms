@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QLabel>
-#include <QPainter>
-#include <QCursor>
-#include <QMouseEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QPainter>
+#include <QtGui/QCursor>
+#include <QtGui/QMouseEvent>
 
 #else
 
@@ -171,7 +171,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 							QImage::ScaleMin ) );
 #endif
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( rect() );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
@@ -186,9 +186,16 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<7>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-								Qt::WordBreak,
+#ifndef QT3
+							Qt::TextWordWrap,
+#else
+							Qt::WordBreak,
+#endif
 			pluginBrowser::tr( m_pluginDescriptor.description ),
-								-1, &br );
+#ifdef QT3
+								-1,
+#endif
+								&br );
 		if( m_mouseOver )
 		{
 			m_targetHeight = tMax( 60, 25 + br.height() );

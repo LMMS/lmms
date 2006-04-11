@@ -30,9 +30,9 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QPainter>
-#include <QColorDialog>
-#include <QMenu>
+#include <QtGui/QColorDialog>
+#include <QtGui/QMenu>
+#include <QtGui/QPainter>
 
 #else
 
@@ -146,8 +146,11 @@ void bbTCO::paintEvent( QPaintEvent * )
 	}
 #ifdef QT4
 	QPainter p( this );
-	// TODO: set according brush/pen for gradient!
-	p.fillRect( rect(), col );
+
+	QLinearGradient lingrad( 0, 0, 0, height() );
+	lingrad.setColorAt( 0, col.light( 130 ) );
+	lingrad.setColorAt( 1, col.light( 70 ) );
+	p.fillRect( rect(), lingrad );
 #else
 	// create pixmap for whole widget
 	QPixmap pm( rect().size() );
@@ -167,7 +170,7 @@ void bbTCO::paintEvent( QPaintEvent * )
 	if( length() > 64 && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
-								x < width();
+								x < width()-2;
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
 			p.setPen( col.light( 80 ) );
@@ -178,7 +181,7 @@ void bbTCO::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( col.dark() );
-	p.drawRect( 0, 0, width(), height() );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	p.setFont( pointSize<7>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );
@@ -428,7 +431,8 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 			_this.parentNode().nodeName() != "clone" &&
 			_this.parentNode().nodeName() != "journaldata" )
 	{
-		eng()->getBBEditor()->saveState( _doc, _this );
+		( (journallingObject *)( eng()->getBBEditor() ) )->saveState(
+								_doc, _this );
 	}
 }
 
@@ -444,7 +448,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	if( _this.firstChild().isElement() )
 	{
-		eng()->getBBEditor()->restoreState(
+		( (journallingObject *)( eng()->getBBEditor() ) )->restoreState(
 					_this.firstChild().toElement() );
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if

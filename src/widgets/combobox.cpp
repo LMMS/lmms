@@ -32,11 +32,11 @@
 
 #ifndef QT3
 
-#include <QPainter>
-#include <QPixmap>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QMouseEvent>
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
 
 #else
 

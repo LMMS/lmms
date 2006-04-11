@@ -30,9 +30,9 @@
 
 #ifdef QT4
 
-#include <QLabel>
-#include <QMouseEvent>
-#include <QMenu>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QMouseEvent>
 
 #else
 

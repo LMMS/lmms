@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QPixmap>
-#include <QTimer>
-#include <QMouseEvent>
+#include <QtCore/QTimer>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
 
 #else
 

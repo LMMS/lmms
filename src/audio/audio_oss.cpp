@@ -34,9 +34,9 @@
 
 #ifdef QT4
 
-#include <QFileInfo>
-#include <QLineEdit>
-#include <QLabel>
+#include <QtCore/QFileInfo>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
 
 #else
 

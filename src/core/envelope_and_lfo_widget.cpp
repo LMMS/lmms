@@ -30,11 +30,10 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QPaintEvent>
-#include <QWhatsThis>
+#include <QtGui/QPainter>
+#include <QtGui/QPaintEvent>
 #include <Qt/QtXml>
-#include <QLabel>
+#include <QtGui/QLabel>
 
 #else
 

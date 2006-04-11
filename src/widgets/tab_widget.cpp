@@ -1,9 +1,9 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * tabwidget.cpp - tabwidget for LMMS
+ * tab_widget.cpp - tabwidget for LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QPixmap>
-#include <QMouseEvent>
-#include <QWheelEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
+#include <QtGui/QWheelEvent>
 
 #else
 
@@ -62,13 +62,16 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
 	setBackgroundMode( Qt::NoBackground );
 #endif*/
-	QColor bg_color = QApplication::palette().active().background().dark(
-									132 );
-#ifdef QT4
+#ifndef QT3
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background ).
+								dark( 132 );
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
 #else
+	QColor bg_color = QApplication::palette().active().background().dark(
+									132 );
 	setPaletteBackgroundColor( bg_color );
 #endif
 }

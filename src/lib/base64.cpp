@@ -32,8 +32,8 @@
 
 #ifndef QT3
 
-#include <QVariant>
-#include <QBuffer>
+#include <QtCore/QBuffer>
+#include <QtCore/QVariant>
 
 #else
 

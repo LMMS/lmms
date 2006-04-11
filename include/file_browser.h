@@ -35,7 +35,7 @@
 
 #ifdef QT4
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #else
 

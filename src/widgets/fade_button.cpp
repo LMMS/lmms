@@ -29,9 +29,9 @@
 
 #ifdef QT4
 
-#include <QTimer>
-#include <QPainter>
-#include <QPixmap>
+#include <QtCore/QTimer>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
 
 #else
 
@@ -108,6 +108,7 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 	}
 #ifdef QT4
 	QPainter p( this );
+	p.fillRect( rect(), col );
 #else
 	QPixmap draw_pm( rect().size() );
 	draw_pm.fill( col );
@@ -115,7 +116,7 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 	QPainter p( &draw_pm, this );
 #endif
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 0, 0, width(), height() );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );

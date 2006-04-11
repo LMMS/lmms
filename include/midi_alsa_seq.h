@@ -45,7 +45,7 @@
 #ifdef QT4
 
 #include <QtCore/QThread>
-#include <QTimer>
+#include <QtCore/QTimer>
 
 #else
 

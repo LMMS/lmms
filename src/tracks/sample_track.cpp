@@ -30,10 +30,10 @@
 
 #ifdef QT4
 
-#include <QPushButton>
-#include <QPainter>
 #include <Qt/QtXml>
-#include <QDropEvent>
+#include <QtGui/QDropEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPushButton>
 
 #else
 

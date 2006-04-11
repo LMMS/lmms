@@ -32,9 +32,9 @@
 
 #ifdef QT4
 
-#include <QMimeData>
-#include <QDragEnterEvent>
-#include <QDropEvent>
+#include <QtCore/QMimeData>
+#include <QtGui/QDragEnterEvent>
+#include <QtGui/QDropEvent>
 
 #endif
 

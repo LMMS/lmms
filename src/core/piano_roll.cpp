@@ -30,14 +30,14 @@
 
 #ifdef QT4
 
-#include <QApplication>
-#include <QButtonGroup>
-#include <QPainter>
-#include <QKeyEvent>
-#include <QWheelEvent>
-#include <QLayout>
-#include <QLabel>
 #include <Qt/QtXml>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QLayout>
+#include <QtGui/QLabel>
 
 #else
 
@@ -438,7 +438,14 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	{
 		m_noteLenComboBox->addItem( "1/" + QString::number( 
 					static_cast<int>( powf( 2.0f, i ) ) ),
-				embed::getIconPixmap( "note_" + pixmaps[i] ) );
+				embed::getIconPixmap(
+					QString( "note_" + pixmaps[i] ).
+#ifndef QT3
+					toAscii().constData()
+#else
+					ascii()
+#endif
+					) );
 	}
 	m_noteLenComboBox->setValue( 0 );
 

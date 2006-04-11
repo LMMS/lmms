@@ -29,10 +29,10 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QKeyEvent>
-#include <QCloseEvent>
-#include <QLayout>
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QLayout>
 
 #else
 
@@ -71,7 +71,7 @@ bbEditor::bbEditor( engine * _engine ) :
 	m_toolBar->move( 0, 0 );
 #ifdef QT4
 	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
+	pal.setBrush( QPalette::Background, QBrush(
 				embed::getIconPixmap( "toolbar_bg" ) ) );
 	m_toolBar->setPalette( pal );
 #else
@@ -88,13 +88,17 @@ bbEditor::bbEditor( engine * _engine ) :
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
 				BBE_PPT + 2 * TCO_BORDER_WIDTH +
 				DEFAULT_SCROLLBAR_SIZE );
+
+	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
 	if( eng()->getMainWindow()->workspace() != NULL )
 	{
-		setGeometry( 10, 340, minimumWidth(), 300 );
+		resize( minimumWidth(), 300 );
+		w->move( 10, 340 );
 	}
 	else
 	{
-		setGeometry( 210, 340, minimumWidth(), 300 );
+		resize( minimumWidth(), 300 );
+		w->move( 210, 340 );
 	}
 
 	containerWidget()->move( 0, 32 );

@@ -9,14 +9,14 @@
 
 #include "kmultitabbar.h"
 
-#include <QEvent>
-#include <QLayout>
-#include <QPainter>
-#include <QFontMetrics>
-#include <QStyle>
-#include <QStyleOptionButton>
-#include <QApplication>
-#include <QFrame>
+#include <QtCore/QEvent>
+#include <QtGui/QApplication>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QFrame>
+#include <QtGui/QLayout>
+#include <QtGui/QPainter>
+#include <QtGui/QStyle>
+#include <QtGui/QStyleOptionButton>
 
 #include <math.h>
 

@@ -29,8 +29,8 @@
 
 #ifdef QT4
 
-#include <QMutex>
-#include <QMutexLocker>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #else
 

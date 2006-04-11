@@ -30,16 +30,16 @@
 
 #ifdef QT4
 
-#include <QFileDialog>
-#include <QDir>
-#include <QFile>
-#include <QApplication>
 #include <Qt/QtXml>
-#include <QLineEdit>
-#include <QCloseEvent>
-#include <QLayout>
-#include <QLabel>
-#include <QMenu>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtGui/QApplication>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QFileDialog>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QMenu>
 
 #else
 

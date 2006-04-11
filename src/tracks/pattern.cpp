@@ -31,13 +31,12 @@
 #ifdef QT4
 
 #include <Qt/QtXml>
-#include <QMenu>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QImage>
-#include <QMouseEvent>
-#include <QTimer>
+#include <QtCore/QTimer>
+#include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QProgressBar>
+#include <QtGui/QPushButton>
 
 #else
 
@@ -193,7 +192,7 @@ void pattern::init( void )
 	changeLength( length() );
 	restoreJournallingState();
 
-#ifndef QT4
+#ifdef QT3
 	// set background-mode for flicker-free redraw
 	setBackgroundMode( Qt::NoBackground );
 #endif
@@ -914,7 +913,13 @@ void pattern::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 #ifdef QT4
-	// TODO: gradient!
+	QLinearGradient lingrad( 0, 0, 0, height() );
+	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
+							QColor( 96, 96, 96 );
+	lingrad.setColorAt( 0, c );
+	lingrad.setColorAt( 0.5, Qt::black );
+	lingrad.setColorAt( 1, c );
+	p.fillRect( QRect( 1, 1, width() - 2, height() - 2 ), lingrad );
 #else
 	for( int y = 1; y < height() / 2; ++y )
 	{

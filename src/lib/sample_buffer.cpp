@@ -33,13 +33,13 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QMutex>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QFile>
-#include <QBuffer>
+#include <QtCore/QBuffer>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QMutex>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QPainter>
 
 #else
 

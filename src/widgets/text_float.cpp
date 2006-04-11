@@ -29,8 +29,8 @@
 
 #ifdef QT4
 
-#include <QPainter>
-#include <QTimer>
+#include <QtCore/QTimer>
+#include <QtGui/QPainter>
 
 #else
 

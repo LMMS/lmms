@@ -1,4 +1,13 @@
+2006-04-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* most files:
+	Qt4-fixes:
+	- when including headers, specify qt-module too (QtCore, QtGui etc.)
+	- draw gradients using QLinearGradient etc.
+	- other opmizations (use QHash instead of QMap etc.)
+
 2006-04-10	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* Makefile.am:
 	* include/lmms_constants.h:
 	* include/basic_filters.h:
@@ -10,14 +19,14 @@
 	* src/audio/audio_alsa.cpp:
 	* src/audio/audio_file_wave.cpp:
 	corrected handling of big endian data
-	
+
 	* plugins/vibed/vibed.h:
 	* plugins/vibed/vibed.cpp:
 	* plugins/vibed/nine_button_selector.h:
 	* plugins/vibed/nine_button_selector.cpp:
-	-added octave to save and restore settings
-	-removed mysterious m_sampleBuffer that was causing seg faults in the
-	 deconstructor
+	- added octave to save and restore settings
+	- removed mysterious m_sampleBuffer that was causing seg faults in the
+	  deconstructor
 
 	* src/core/main_window.cpp:
 	added checks to handle "gimp like windows" for save and restore widget 
@@ -51,8 +60,8 @@
 	* data/presets/AudioFileProcessor/Bass-Mainia.cs.xml:
 	* data/presets/AudioFileProcessor/Fat-Reversed-Kick.cs.xml:
 	* data/presets/AudioFileProcessor/Kick-4-your-Subwoofer.cs.xml:
-	updated audiofileprocessors to point to factory presets files in /usr/local/share/lmms
-
+	updated audiofileprocessors to point to factory presets files in
+	/usr/local/share/lmms
 
 2006-04-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

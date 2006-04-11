@@ -31,7 +31,7 @@
 
 #ifdef QT4
 
-#include <QLabel>
+#include <QtGui/QLabel>
 #include <QtGui/QPixmap>
 
 #else

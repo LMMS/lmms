@@ -257,24 +257,24 @@ protected:
 	virtual void redoStep( journalEntry & _je )
 	{
 		saveJournallingState( FALSE );
-#ifndef QT3
+/*#ifndef QT3
 		setValue( static_cast<T>( value() +
 					_je.data().value<EDIT_STEP_TYPE>() ) );
-#else
+#else*/
 		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
 						_je.data().toDouble() ) ) );
-#endif
+//#endif
 		restoreJournallingState();
 	}
 
 	virtual void undoStep( journalEntry & _je )
 	{
 		journalEntry je( _je.actionID(),
-#ifndef QT3
+/*#ifndef QT3
 					-_je.data().value<EDIT_STEP_TYPE>()
-#else
+#else*/
 			static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() )
-#endif
+//#endif
 				);
 		redoStep( je );
 	}
