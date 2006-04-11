@@ -181,7 +181,11 @@ void bbTCO::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( col.dark() );
+#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+#else
+	p.drawRect( rect() );
+#endif
 
 	p.setFont( pointSize<7>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );

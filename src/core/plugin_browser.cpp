@@ -171,7 +171,11 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 							QImage::ScaleMin ) );
 #endif
 	p.setPen( QColor( 64, 64, 64 ) );
+#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+#else
+	p.drawRect( rect() );
+#endif
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
