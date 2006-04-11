@@ -40,6 +40,7 @@
 #include <qapplication.h>
 #include <qpainter.h>
 #include <qcursor.h>
+#include <qimage.h>
 
 #endif
 
