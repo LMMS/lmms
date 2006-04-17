@@ -85,4 +85,5 @@
 #include "src/widgets/nstate_button.cpp"
 #include "src/widgets/lcd_spinbox.cpp"
 #include "src/widgets/automatable_button.cpp"
+#include "src/widgets/volume_knob.cpp"
 #endif

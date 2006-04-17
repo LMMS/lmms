@@ -65,6 +65,10 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 	m_origHeight( height() ),
 	m_animating( FALSE )
 {
+#ifndef QT3
+	setAutoFillBackground( TRUE );
+#endif
+
 	if( s_ledBg == NULL )
 	{
 		s_ledBg = new QPixmap( embed::getIconPixmap(
@@ -193,9 +197,11 @@ void groupBox::animate( void )
 void groupBox::updatePixmap( void )
 {
 #ifndef QT3
+	const int c = 0;
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
 #else
+	const int c = 1;
 	QColor bg_color = QApplication::palette().active().background();
 #endif
 	QPixmap pm( size() );
@@ -205,7 +211,7 @@ void groupBox::updatePixmap( void )
 
 	// outer rect
 	p.setPen( bg_color.dark( 200 ) );
-	p.drawRect( 0, 0, width(), height() );
+	p.drawRect( 0, 0, width() - 1 + c, height() - 1 + c );
 
 	// brighter line at bottom/right
 	p.setPen( bg_color.light( 125 ) );
@@ -223,7 +229,7 @@ void groupBox::updatePixmap( void )
 	p.drawLine( 2 + s_ledBg->width(), 11, width() - 3, 11 );
 
 	// black inner rect
-	p.drawRect( 1, 1, width() - 2, height() - 2 );
+	p.drawRect( 1, 1, width() - 3 + c, height() - 3 + c );
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
@@ -238,7 +244,6 @@ void groupBox::updatePixmap( void )
 #ifdef QT4
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );
-/*	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );*/
 	setPalette( pal );
 #else
 	setPaletteBackgroundColor( bg_color.dark( 132 ) );

@@ -126,26 +126,26 @@ mainWindow::mainWindow( engine * _engine ) :
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter, eng() ), ++id );
-	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
-							PROJECTS_PATH + "*" +
-						wdir+PROJECTS_PATH,
+	side_bar->appendTab( new fileBrowser(
+			configManager::inst()->factoryProjectsDir() + "*" +
+				configManager::inst()->userProjectsDir(),
 						"*.mmp *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
 							splitter, eng() ),
 									++id );
-	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
-							SAMPLES_PATH + "*" +
-						wdir+SAMPLES_PATH,
+	side_bar->appendTab( new fileBrowser(
+			configManager::inst()->factorySamplesDir() + "*" +
+					configManager::inst()->userSamplesDir(),
 					"*.wav *.ogg *.au"
 					"*.voc *.aif *.aiff *.flac *.raw",
 							tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),
 							splitter, eng() ),
 									++id );
-	side_bar->appendTab( new fileBrowser( configManager::inst()->dataDir()+
-							PRESETS_PATH + "*" +
-						wdir+PRESETS_PATH,
+	side_bar->appendTab( new fileBrowser(
+			configManager::inst()->factoryPresetsDir() + "*" +
+					configManager::inst()->userPresetsDir(),
 						"*.cs.xml", tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
 							splitter, eng() ),
@@ -184,9 +184,10 @@ mainWindow::mainWindow( engine * _engine ) :
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
 #ifdef QT4
+	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
-				embed::getIconPixmap( "main_toolbar_bg" ) ) );
+	pal.setBrush( m_toolBar->backgroundRole(),
+				embed::getIconPixmap( "main_toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 #else
 	m_toolBar->setPaletteBackgroundPixmap(
@@ -264,7 +265,7 @@ void mainWindow::finalize( void )
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
-	QDir d( configManager::inst()->projectsDir() + "templates" );
+	QDir d( configManager::inst()->factoryProjectsDir() + "templates" );
 	QStringList templates = d.entryList(
 #ifdef QT4
 						QStringList( "*.mpt" ),
@@ -668,7 +669,8 @@ void mainWindow::createNewProjectFromTemplate( int _idx )
 			eng()->getSongEditor()->mayChangeProject() == TRUE )
 	{
 		eng()->getSongEditor()->createNewProjectFromTemplate(
-			configManager::inst()->projectsDir() + "templates/" +
+			configManager::inst()->factoryProjectsDir() +
+				"templates/" +
 				m_templatesMenu->text( _idx ) + ".mpt" );
 	}
 #endif
@@ -690,7 +692,7 @@ void mainWindow::openProject( void )
 							this, "", TRUE );
 		ofd.setWindowTitle( tr( "Open project" ) );
 #endif
-		ofd.setDirectory( configManager::inst()->projectsDir() );
+		ofd.setDirectory( configManager::inst()->userProjectsDir() );
 		ofd.setFileMode( QFileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
@@ -746,7 +748,7 @@ bool mainWindow::saveProjectAs( void )
 	}
 	else
 	{
-		sfd.setDirectory( configManager::inst()->projectsDir() );
+		sfd.setDirectory( configManager::inst()->userProjectsDir() );
 	}
 
 	if( sfd.exec () == QFileDialog::Accepted &&

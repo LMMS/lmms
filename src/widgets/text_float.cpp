@@ -45,6 +45,7 @@
 
 #include "text_float.h"
 #include "gui_templates.h"
+#include "main_window.h"
 
 
 
@@ -153,6 +154,16 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 {
 #ifdef QT4
 	QWidget * mw = QApplication::activeWindow();
+	if( mw == NULL )
+	{
+		foreach( QWidget * w, QApplication::topLevelWidgets() )
+		{
+			if( mw == NULL || dynamic_cast<mainWindow *>( w ) )
+			{
+				mw = w;
+			}
+		}
+	}
 #else
 	QWidget * mw = qApp->mainWidget();
 	if( mw == NULL )
@@ -215,7 +226,11 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 
 	p.setFont( pointSize<8>( p.font() ) );
 
+#ifndef QT3
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+#else
 	p.drawRect( rect() );
+#endif
 
 //	p.setPen( Qt::black );
 	// small message?

@@ -116,7 +116,11 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 	QPainter p( &draw_pm, this );
 #endif
 	p.setPen( QColor( 0, 0, 0 ) );
+#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+#else
+	p.drawRect( rect() );
+#endif
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );

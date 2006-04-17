@@ -73,7 +73,6 @@
 #include "note_play_handle.h"
 #include "embed.h"
 #include "fade_button.h"
-#include "knob.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "piano_widget.h"
@@ -85,6 +84,7 @@
 #include "debug.h"
 #include "mmp.h"
 #include "string_pair_drag.h"
+#include "volume_knob.h"
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "instrumentTrack",
@@ -148,7 +148,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	// creation of widgets for track-settings-widget
-	m_tswVolumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_tswVolumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
 					tr( "Channel volume" ), eng() );
 	m_tswVolumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_tswVolumeKnob->setInitValue( DEFAULT_VOLUME );
@@ -219,7 +219,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	// setup volume-knob
-	m_volumeKnob = new knob( knobBright_26, m_generalSettingsWidget,
+	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
 					tr( "Channel volume" ), eng() );
 	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
@@ -235,7 +235,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 		tr( volume_help ) );
 /*	connect( m_volumeKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( volValueChanged( float ) ) );*/
-	knob::linkObjects( m_tswVolumeKnob, m_volumeKnob );
+	volumeKnob::linkObjects( m_tswVolumeKnob, m_volumeKnob );
 
 
 	// setup surround-area
@@ -362,6 +362,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	_tc->updateAfterTrackAdd();
+#ifndef QT3
+	setFixedWidth( CHANNEL_WIDTH );
+	resize( sizeHint() );
+#endif
 }
 
 
@@ -393,7 +397,7 @@ void instrumentTrack::saveSettingsBtnClicked( void )
 	sfd.setFilter( tr( "Channel-Settings-File (*.cs.xml)" ) );
 #endif
 
-	QString preset_root = configManager::inst()->presetsDir();
+	QString preset_root = configManager::inst()->userPresetsDir();
 	if( !QDir( preset_root ).exists() )
 	{
 		QDir().mkdir( preset_root );

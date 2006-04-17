@@ -58,6 +58,7 @@
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
+#include "volume_knob.h"
 
 
 extern "C"
@@ -90,6 +91,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	}
 
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
@@ -216,7 +218,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].waveShape = oscillator::SIN_WAVE;
 		
 		// setup volume-knob
-		m_osc[i].volKnob = new knob( knobSmall_17, this, tr(
+		m_osc[i].volKnob = new volumeKnob( knobSmall_17, this, tr(
 					"Osc %1 volume" ).arg( i+1 ), eng() );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );

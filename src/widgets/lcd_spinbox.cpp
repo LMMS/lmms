@@ -59,6 +59,15 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 	m_number->setFrameShape( QFrame::Panel );
 	m_number->setFrameShadow( QFrame::Sunken );
 	m_number->setSegmentStyle( QLCDNumber::Flat );
+#ifndef QT3
+	QPalette pal;
+	pal.setColor( QPalette::Light, Qt::gray );
+	pal.setColor( QPalette::Mid, Qt::darkGray );
+	pal.setColor( QPalette::Dark, Qt::black );
+	pal.setColor( m_number->backgroundRole(), Qt::black );
+	m_number->setPalette( pal );
+	m_number->setAutoFillBackground( TRUE );
+#endif
 	setEnabled( TRUE );
 
 	// value is automatically limited to given range

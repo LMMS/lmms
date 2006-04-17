@@ -1,3 +1,128 @@
+2006-04-16	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	* include/knob.h:
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	*+src/include/volume_knob.h:
+	*+src/widgets/volume_knob.cpp:
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	* include/sample_track.h:
+	* src/tracks/sample_track.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/organic/organic.h:
+	* plugins/organic/organic.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	Added a volume knob widget that will display the volume level as
+	either a percentage or in dbV, which can be selected from the
+	general settings in the setup dialog.  Changed vibed to use a 
+	volume range from 0 to 200 to bring it in line with every other
+	volume knob in lmms.  Unfortunately, this will break any existing
+	presets, but better to do it now before many of them actually
+	exist.
+
+	* src/core/mixer.cpp:
+	Changed the number of channels processed from the fixed value of
+	SURROUND_CHANNELS to m_audioDev->channels() so that only the
+	number of channels that will be output get processed instead of
+	the maximum number of channels that could be defined.
+	
+2006-04-15	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	* src/core/song_editor.cpp:
+	*+data/themes/default/auto_limit.png:
+	*+data/themes/blue_scene/auto_limit.png:
+	Added auto limiter option.  Main window now has a button next to
+	the high-quality button to toggle the auto limiter on and off
+	The limiter scales the whole section between zero crossings where
+	a clip occurs.  This required adding another processing buffer
+	in the mixer, which will double the latency when the auto limiter
+	is being used, but when it's not being used, there is no change
+	to the latency.  Because it's based on detecting the zero
+	crossings, the lowest frequency for which it is effective is
+	sample_rate/(4*buffer_len).
+
+2006-04-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/lib/mmp.cpp:
+	clean metadata-nodes when saving projects, project-templates or presets
+
+	* plugins/vibed/vibed.cpp:
+	- in vibed::loadSettings():
+	  - simplified loading of wave-shape
+	  - delete base64-decoded data at the end
+	- commented out code in destructor as it is not neccessary - to be
+	  removed someday
+
+	* include/base64.h:
+	fixed fatal bug in Qt4-version of base64::decode(): memcpy()ed data to
+	_data instead of *_data
+
+	* src/widgets/group_box.cpp:
+	* src/widgets/tab_widget.cpp:
+	some fine-tuning of Qt4-version of painting-code
+
+	* src/widgets/lcd_spinbox.cpp:
+	explicitely set black background-color in Qt4-version
+
+	* src/core/midi_tab_widget.cpp:
+	Qt4-version of MIDI-connection-code is now working
+
+	* src/core/main_window.cpp:
+	* plugins/vibed/impulse_editor.cpp:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/organic/organic.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/main_window.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/track.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/tab_widget.cpp:
+	* src/widgets/tool_button.cpp:
+	added missing setAutoFillBackground( TRUE )-call for making QWidget
+	paint specified background-color/pixmap - makes Qt4-version of LMMS
+	almost usable
+
+	* src/widgets/tab_widget.cpp:
+	per default hide newly added tabs
+
+	* include/spc_bg_hndl_widget.h:
+	added missing code for painting pixmap-backgrounds in Qt4-version
+
+	* plugins/vestige/lvsl_client.cpp:
+	use QX11EmbedContainer instead of QX11EmbedWidget in Qt4-version ->
+	working VST-support in Qt4-version of LMMS
+
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	- when loading sample, first look for it in user's working-directory,
+	  then in LMMS' factory-samples-directory
+	- simplified making the path of a sample-file relative
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	* src/core/main_window.cpp:
+	* src/tracks/instrument_track.cpp:
+	replaced methods projectsDir(), presetsDir() and samplesDir() with
+	userProjectsDir(), factoryProjectsDir(), userPresetsDir(),
+	factoryPresetsDir() etc.
+
+	* include/file_browser.h:
+	* src/core/file_browser.cpp:
+	try to avoid duplicate "/" in paths - fixes some problems
+
 2006-04-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* most files:

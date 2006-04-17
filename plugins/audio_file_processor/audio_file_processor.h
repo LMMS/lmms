@@ -46,6 +46,7 @@
 
 class knob;
 class pixmapButton;
+class volumeKnob;
 
 
 class audioFileProcessor : public instrument, public specialBgHandlingWidget
@@ -100,7 +101,7 @@ private:
 	sampleBuffer::drawMethods m_drawMethod;
 
 	QPixmap m_graph;
-	knob * m_ampKnob;
+	volumeKnob * m_ampKnob;
 	knob * m_startKnob;
 	knob * m_endKnob;
 	pixmapButton * m_openAudioFileButton;

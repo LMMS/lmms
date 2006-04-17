@@ -190,6 +190,16 @@ songEditor::songEditor( engine * _engine ) :
 	eng()->getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 
 
+	toolButton * cp_btn = new toolButton( embed::getIconPixmap( "auto_limit" ),
+					      tr( "Auto limiter" ),
+					      NULL, NULL, tb );
+	cp_btn->setCheckable( TRUE );
+	connect( cp_btn, SIGNAL( toggled( bool ) ), eng()->getMixer(),
+		 SLOT( setClipScaling( bool ) ) );
+	cp_btn->setFixedWidth( 30 );
+	eng()->getMainWindow()->addWidgetToToolBar( cp_btn, 1, col + 1 );
+
+
 	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 
@@ -286,9 +296,10 @@ songEditor::songEditor( engine * _engine ) :
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
 #ifdef QT4
+	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), QBrush(
-				embed::getIconPixmap( "toolbar_bg" ) ) );
+	pal.setBrush( m_toolBar->backgroundRole(), 
+				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 #else
 	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
@@ -1629,7 +1640,7 @@ void songEditor::importProject( void )
 							this, "", TRUE );
 	ofd.setWindowTitle( tr( "Import file" ) );
 #endif
-	ofd.setDirectory( configManager::inst()->projectsDir() );
+	ofd.setDirectory( configManager::inst()->userProjectsDir() );
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{

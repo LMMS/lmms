@@ -100,9 +100,9 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
 	}
 
 #ifdef QT4
-	QPalette pal;
+/*	QPalette pal;
 	pal.setBrush( backgroundRole(), *s_artwork);
-	setPalette( pal );
+	setPalette( pal );*/
 #else
 	setErasePixmap( *s_artwork );
 #endif
@@ -254,7 +254,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 	if( _param == "plugin" && _value != "" )
 	{
 		m_pluginMutex.lock();
-		bool set_ch_name = ( m_plugin != NULL &&
+		const bool set_ch_name = ( m_plugin != NULL &&
 			getInstrumentTrack()->name() == m_plugin->name() ) ||
 				getInstrumentTrack()->name() ==
 						instrumentTrack::tr( "Default" );
@@ -267,7 +267,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 				tr( "Loading plugin" ),
 				tr( "Please wait while loading VST-plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
-			0 );
+									0 );
 		m_pluginMutex.lock();
 		m_plugin = new remoteVSTPlugin( m_pluginDLL, eng() );
 		if( m_plugin->failed() )

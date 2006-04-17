@@ -79,7 +79,7 @@ signals:
 	void nineButtonSelection( Uint8 );
 	
 private:
-	vlist<pixmapButton*> m_buttons;
+	vlist<pixmapButton *> m_buttons;
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
 	QPixmap m_base;

@@ -198,7 +198,7 @@ public:
 
 	inline const surroundSampleFrame * currentAudioBuffer( void ) const
 	{
-		return( m_curBuf );
+		return( m_writeBuf );
 	}
 
 
@@ -285,7 +285,7 @@ public:
 
 public slots:
 	void setHighQuality( bool _hq_on = FALSE );
-
+	void setClipScaling( bool _state );
 
 signals:
 	void sampleRateChanged( void );
@@ -315,15 +315,29 @@ private:
 	void processBuffer( const surroundSampleFrame * _buf,
 						const fx_ch_t _fx_chnl );
 
-
+	void FASTCALL scaleClip( fpab_t _frame, ch_cnt_t _chnl );
 
 	vvector<audioPort *> m_audioPorts;
 
 	fpab_t m_framesPerAudioBuffer;
 
-	surroundSampleFrame * m_curBuf;
-	surroundSampleFrame * m_nextBuf;
-
+	surroundSampleFrame * m_readBuf;
+	surroundSampleFrame * m_writeBuf;
+	
+	vvector<surroundSampleFrame *> m_bufferPool;
+	Uint8 m_readBuffer;
+	Uint8 m_writeBuffer;
+	Uint8 m_analBuffer;
+	Uint8 m_poolDepth;
+	
+	bool m_scaleClip;
+	surroundSampleFrame m_maxClip;
+	surroundSampleFrame m_previousSample;
+	fpab_t m_halfStart[SURROUND_CHANNELS];
+	bool m_clipped[SURROUND_CHANNELS];
+	bool m_oldBuffer[SURROUND_CHANNELS];
+	bool m_newBuffer[SURROUND_CHANNELS];
+	
 	Uint8 m_cpuLoad;
 
 	playHandleVector m_playHandles;

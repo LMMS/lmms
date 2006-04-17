@@ -60,7 +60,7 @@
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-
+#include "volume_knob.h"
 
 
 extern "C"
@@ -169,7 +169,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new knob( knobDark_28, this, tr( "Amplify" ), eng() );
+	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), eng() );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
 	m_ampKnob->setInitValue( 100.0f );

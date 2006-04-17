@@ -98,7 +98,7 @@ private slots:
 	void toggleGIMPLikeWindows( bool _enabled );
 	void toggleNoWizard( bool _enabled );
 	void toggleNoMsgAfterSetup( bool _enabled );
-
+	void toggleDisplaydBV( bool _enabled );
 
 	void openWorkingDir( void );
 	void openVSTDir( void );
@@ -122,6 +122,7 @@ private:
 	bool m_gimpLikeWindows;
 	bool m_noWizard;
 	bool m_noMsgAfterSetup;
+	bool m_displaydBV;
 
 
 	QLineEdit * m_wdLineEdit;

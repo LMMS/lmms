@@ -42,6 +42,8 @@
 #include <qlistview.h>
 #include <qdir.h>
 
+#define cleanPath cleanDirPath
+
 #endif
 
 
@@ -145,11 +147,9 @@ public:
 		{
 			_path = m_directories[0];
 		}
-#ifdef QT4
-		return( QDir::cleanPath( _path + "/" + text( 0 ) + "/" ) );
-#else
-		return( QDir::cleanDirPath( _path + "/" + text( 0 ) + "/" ) );
-#endif
+		return( QDir::cleanPath( _path + QDir::separator() +
+								text( 0 ) ) +
+							QDir::separator() );
 	}
 
 	inline const QPixmap * pixmap( int ) const
@@ -194,7 +194,8 @@ public:
 
 	inline QString fullName( void ) const
 	{
-		return( m_path + "/" + text( 0 ) );
+		return( QDir::cleanPath( m_path ) + QDir::separator() +
+								text( 0 ) );
 	}
 	inline const QPixmap * pixmap( int ) const
 	{
@@ -229,6 +230,10 @@ private:
 	fileTypes m_type;
 } ;
 
+
+#ifdef QT3
+#undef cleanPath
+#endif
 
 
 #endif

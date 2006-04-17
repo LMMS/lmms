@@ -1,7 +1,7 @@
 /*
  * spc_bg_hndl_widget.h - class specialBgHandlingWidget
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -100,11 +100,18 @@ public:
 		{
 #ifdef QT4
 			QPainter p( &pm );
-			// TODO: fix that for background-pixmaps, because
-			// drawing is started at the top left edge even
-			// if this widget isn't posated there
-			p.fillRect( _w->rect(), pw->palette().brush(
-						pw->backgroundRole() ) );
+			const QBrush & br = pw->palette().brush(
+							pw->backgroundRole() );
+			if( br.style() == Qt::TexturePattern )
+			{
+				p.drawPixmap( 0, 0, br.texture(),
+						_w->x(), _w->y(),
+						_w->width(), _w->height() );
+			}
+			else
+			{
+				pm.fill( br.color() );
+			}
 #else
 			const QPixmap * pbp = pw->paletteBackgroundPixmap();
 			if( pbp == NULL )

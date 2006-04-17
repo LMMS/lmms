@@ -63,8 +63,8 @@ mixer::mixer( engine * _engine ) :
 	QObject(),
 	engineObject( _engine ),
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
-	m_curBuf( NULL ),
-	m_nextBuf( NULL ),
+	m_readBuf( NULL ),
+	m_writeBuf( NULL ),
 	m_cpuLoad( 0 ),
 	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
 	m_masterGain( 1.0f ),
@@ -86,15 +86,16 @@ mixer::mixer( engine * _engine ) :
 				QString::number( m_framesPerAudioBuffer ) );
 	}
 
-	m_curBuf = bufferAllocator::alloc<surroundSampleFrame>(
-						m_framesPerAudioBuffer );
-	m_nextBuf = bufferAllocator::alloc<surroundSampleFrame>(
-						m_framesPerAudioBuffer );
-
-	// now clear our two output-buffers before using them...
-	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
-	clearAudioBuffer( m_nextBuf, m_framesPerAudioBuffer );
-
+	for( Uint8 i = 0; i < 3; i++ )
+	{
+		m_readBuf = bufferAllocator::alloc<surroundSampleFrame>(
+				m_framesPerAudioBuffer );
+		
+		clearAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
+		m_bufferPool.push_back( m_readBuf );
+	}
+	
+	setClipScaling( FALSE );
 }
 
 
@@ -105,8 +106,10 @@ mixer::~mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
-	bufferAllocator::free( m_curBuf );
-	bufferAllocator::free( m_nextBuf );
+	for( Uint8 i = 0; i < 3; i++ )
+	{
+		bufferAllocator::free( m_bufferPool[i] );
+	}
 }
 
 
@@ -141,6 +144,47 @@ bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
 			eng()->getSongEditor()->realTimeTask() == TRUE ) );
+}
+
+
+
+
+void mixer::setClipScaling( bool _state )
+{
+	m_mixMutex.lock();
+	
+	m_scaleClip = _state;
+	
+	if( _state )
+	{
+		m_poolDepth = 3;
+		m_readBuffer = 0;
+		m_analBuffer = m_readBuffer + 1;
+		m_writeBuffer = m_poolDepth - 1;
+	
+		for( ch_cnt_t chnl=0; chnl < m_audioDev->channels(); ++chnl )
+		{
+			m_clipped[chnl] = FALSE;
+			m_halfStart[chnl] = m_framesPerAudioBuffer;
+			m_maxClip[chnl] = 1.0f;
+			m_previousSample[chnl] = 0.0;
+			m_newBuffer[chnl] = FALSE;
+		}
+		for( Uint8 i = 0; i < 3; i++ )
+		{
+			m_readBuf = m_bufferPool[i];
+			clearAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
+		}
+	}
+	else
+	{
+		m_poolDepth = 2;
+		m_readBuffer = 0;
+		m_writeBuffer = 1;
+		m_analBuffer = 1;
+	}
+	
+	m_mixMutex.unlock();
 }
 
 
@@ -190,10 +234,21 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	// now swap the buffers... current buffer becomes next (last)
 	// buffer and the next buffer becomes current (first) buffer
-	qSwap( m_curBuf, m_nextBuf );
-
+//	qSwap( m_curBuf, m_nextBuf );
+	m_writeBuffer++;
+	m_writeBuffer %= m_poolDepth;
+	
+	m_readBuffer++;
+	m_readBuffer %= m_poolDepth;
+	
+	m_analBuffer++;
+	m_analBuffer %= m_poolDepth;
+	
+	m_writeBuf = m_bufferPool[m_writeBuffer];
+	m_readBuf = m_bufferPool[m_readBuffer];
+	
 	// clear last audio-buffer
-	clearAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
+	clearAudioBuffer( m_writeBuf, m_framesPerAudioBuffer );
 
 //	if( criticalXRuns() == FALSE )
 	{
@@ -223,18 +278,18 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		{
 			if( ( *it )->m_bufferUsage != audioPort::NONE )
 			{
-				processBuffer( ( *it )->firstBuffer(),
-						( *it )->nextFxChannel() );
+				processBuffer( 
+					( *it )->firstBuffer(),
+					( *it )->nextFxChannel() );
 				( *it )->nextPeriod();
 			}
 		}
 	}
 
 
-	emit nextAudioBuffer( m_curBuf, m_framesPerAudioBuffer );
+	emit nextAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
 
 	m_mixMutex.unlock();
-
 
 	// and trigger LFOs
 	envelopeAndLFOWidget::triggerLFO( eng() );
@@ -244,7 +299,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
 									100 );
 
-	return( m_curBuf );
+	return( m_readBuf );
 }
 
 
@@ -303,7 +358,7 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 
 	for( fpab_t frame = start_frame; frame < loop1_frame; ++frame )
 	{
-		for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
 		{
 			_port->firstBuffer()[frame][chnl] +=
 					_buf[frame - start_frame][chnl %
@@ -319,7 +374,7 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 						m_framesPerAudioBuffer );
 		for( fpab_t frame = 0; frame < end_frame; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
+			for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels();
 									++chnl )
 			{
 				_port->secondBuffer()[frame][chnl] +=
@@ -569,13 +624,93 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 						fx_ch_t/* _fx_chnl */ )
 {
 	// TODO: effect-implementation
-	for( fpab_t frame = 0; frame < m_framesPerAudioBuffer; ++frame )
+	
+	if( m_scaleClip )
 	{
-		for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+		for( ch_cnt_t chnl=0; 
+			chnl < m_audioDev->channels(); 
+			++chnl )
 		{
-			m_curBuf[frame][chnl] += _buf[frame][chnl];
+			m_newBuffer[chnl] = TRUE;
 		}
 	}
+	
+	for( fpab_t frame = 0; frame < m_framesPerAudioBuffer; ++frame )
+	{
+		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
+		{
+			m_writeBuf[frame][chnl] += _buf[frame][chnl];
+			
+			if( m_scaleClip )
+			{
+				scaleClip( frame, chnl );
+			}
+		}
+	}
+}
+
+
+
+
+void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
+{
+	// Check for zero crossing
+	if( ( m_writeBuf[_frame][_chnl] >=0 &&
+		     m_previousSample[_chnl] < 0 ) ||
+		     ( m_writeBuf[_frame][_chnl] <=0 &&
+		     m_previousSample[_chnl] > 0 ) )
+	{
+		// if a clip occurred between the zero
+		// crossings, scale the half-wave
+		if( m_clipped[_chnl] )
+		{
+			if( m_newBuffer[_chnl] )
+			{
+				for( fpab_t i = m_halfStart[_chnl];
+					i < m_framesPerAudioBuffer;
+					i++ )
+				{
+					m_bufferPool[m_analBuffer][i][_chnl] /=
+							m_maxClip[_chnl];
+				}
+					
+				for( fpab_t i = 0;
+					i < _frame;
+					i++ )
+				{
+					m_writeBuf[i][_chnl] /= 
+							m_maxClip[_chnl];
+				}
+			}
+			else
+			{
+				for( fpab_t i = m_halfStart[_chnl];
+					 i < _frame;
+					 i++ )
+				{
+					m_writeBuf[i][_chnl] /= m_maxClip[_chnl];
+				}
+			}
+		}
+		m_halfStart[_chnl] = _frame;
+		m_clipped[_chnl] = FALSE;
+		m_newBuffer[_chnl] = FALSE;
+		m_maxClip[_chnl] = 1.0;
+	}
+			
+	// check for clip
+	if( fabs( m_writeBuf[_frame][_chnl] ) > 1.0f )
+	{
+		m_clipped[_chnl] = TRUE;
+		if( fabs( m_writeBuf[_frame][_chnl] ) >
+				  m_maxClip[_chnl] )
+		{
+			m_maxClip[_chnl] = fabs( 
+					m_writeBuf[_frame][_chnl] );
+		}
+	}
+			
+	m_previousSample[_chnl] = m_writeBuf[_frame][_chnl];
 }
 
 

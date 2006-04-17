@@ -63,8 +63,9 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	setFixedSize( 153, 124 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
 #ifndef QT3
+	setAutoFillBackground( TRUE );
 	QPalette pal = palette();
-	pal.setBrush( backgroundRole(), QBrush( m_base ) );
+	pal.setBrush( backgroundRole(), m_base );
 	setPalette( pal );
 #else
 	setPaletteBackgroundPixmap( m_base );

@@ -36,7 +36,7 @@ class knob;
 class notePlayHandle;
 class pixmapButton;
 class sampleBuffer;
-
+class volumeKnob;
 
 const int NUM_OF_OSCILLATORS = 3;
 
@@ -80,7 +80,7 @@ private:
 	struct oscillatorData
 	{
 		oscillator::waveShapes waveShape;
-		knob * volKnob;
+		volumeKnob * volKnob;
 		knob * panKnob;
 		knob * coarseKnob;
 		knob * fineLKnob;

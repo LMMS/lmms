@@ -111,6 +111,8 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_noWizard( configManager::inst()->value( "app", "nowizard" ).toInt() ),
 	m_noMsgAfterSetup( configManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
+	m_displaydBV( configManager::inst()->value( "app", 
+		      				"displaydbv" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
@@ -187,7 +189,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 110 );
+	misc_tw->setFixedHeight( 128 );
 
 	ledCheckBox * disable_tooltips = new ledCheckBox(
 					tr( "Disable tooltips (no spurious "
@@ -237,6 +239,14 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	connect( no_msg, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleNoMsgAfterSetup( bool ) ) );
 
+
+	ledCheckBox * dbv = new ledCheckBox(
+					tr( "Display volume as dbV " ),
+							misc_tw, eng() );
+	dbv->move( 10, 108 );
+	dbv->setChecked( m_displaydBV );
+	connect( dbv, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisplaydBV( bool ) ) );
 
 	gen_layout->addWidget( bufsize_tw );
 	gen_layout->addSpacing( 10 );
@@ -635,6 +645,8 @@ void setupDialog::accept( void )
 				QString::number( m_noWizard ) );
 	configManager::inst()->setValue( "app", "nomsgaftersetup",
 				QString::number( m_noMsgAfterSetup ) );
+	configManager::inst()->setValue( "app", "displaydbv",
+				QString::number( m_displaydBV ) );
 	configManager::inst()->setValue( "ui",
 					"disablechannelactivityindicators",
 					QString::number( m_disableChActInd ) );
@@ -763,6 +775,14 @@ void setupDialog::toggleNoWizard( bool _enabled )
 void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
 {
 	m_noMsgAfterSetup = _enabled;
+}
+
+
+
+
+void setupDialog::toggleDisplaydBV( bool _enabled )
+{
+	m_displaydBV = _enabled;
 }
 
 

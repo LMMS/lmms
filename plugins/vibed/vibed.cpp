@@ -52,12 +52,13 @@
 #include "knob.h"
 #include "tooltip.h"
 #include "oscillator.h"
-#include "song_editor.h"
 #include "string_container.h"
 #include "base64.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
+#include "volume_knob.h"
+#include "volume.h"
 
 
 extern "C"
@@ -83,6 +84,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 	m_sampleLength( 128 )
 {
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 			"artwork" ) );
@@ -115,11 +117,11 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 "The 'N' button will normalize the waveform.") );
 
-		m_volumeKnob = new knob( knobBright_26, this, 
+		m_volumeKnob = new volumeKnob( knobBright_26, this, 
 					tr( "Volume" ),
 					eng() );
-		m_volumeKnob->setRange( 0.0f, 2.0f, 0.01f );
-		m_volumeKnob->setInitValue( 1.0f );
+		m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
+		m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 		m_volumeKnob->move( 103, 142 );
 		m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
 		m_volumeKnob->hide();
@@ -407,6 +409,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 vibed::~vibed()
 {
+/*
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
 		delete m_pickKnobs[harm];
@@ -420,7 +423,7 @@ vibed::~vibed()
 		delete m_editors[harm];
 		delete m_impulses[harm];
 		delete m_harmonics[harm];
-	}
+	}*/
 }
 
 
@@ -546,14 +549,22 @@ void vibed::loadSettings( const QDomElement & _this )
 			m_impulses[i]->setChecked(
 					_this.attribute( name ).toInt() );
 
-			name = "graph" + QString::number( i );
-			float shape[128];
 			int size = 0;
-			QString sampleString = _this.attribute( name );	
-			char * dst = 0;
-			base64::decode( sampleString, &dst, &size );
-			memcpy( shape, dst, size );
-			m_editors[i]->setValues( shape );
+			float * shp = 0;
+			base64::decode( _this.attribute( "graph" +
+						QString::number( i ) ),
+						(char * *) &shp, &size );
+			// TODO: check whether size == 128 * sizeof( float ),
+			// otherwise me might and up in a segfault
+			m_editors[i]->setValues( shp );
+			delete[] shp;
+
+			// TODO: do one of the following to avoid
+			// "uninitialized" wave-shape-buttongroup
+			// - activate random-wave-shape-button here
+			// - make wave-shape-buttons simple toggle-buttons
+			//   instead of checkable buttons
+			// - save and restore selected wave-shape-button
 		}
 	}
 	
@@ -623,7 +634,8 @@ void vibed::playNote( notePlayHandle * _n )
 		{
 			if( ps->exists( string ) )
 			{
-				vol = m_volumeKnobs[string]->value();
+				vol = ( m_volumeKnobs[string]->value() ) / 
+						100.0f;
 				pan = ( 
 				m_panKnobs[string]->value() + 1 ) / 2.0;
 				sample = ps->getStringSample( s );

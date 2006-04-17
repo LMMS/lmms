@@ -576,6 +576,7 @@ trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 	m_trackWidget( _parent )
 {
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( backgroundRole(), QColor( 96, 96, 96 ) );
 	setPalette( pal );
@@ -1151,6 +1152,7 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	m_action( NONE )
 {
 #ifdef QT4
+	m_trackOperationsWidget.setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( m_trackOperationsWidget.backgroundRole(),
 						QColor( 128, 128, 128 ) );
@@ -1163,6 +1165,7 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 
 
 #ifdef QT4
+	m_trackSettingsWidget.setAutoFillBackground( TRUE );
 	pal.setColor( m_trackSettingsWidget.backgroundRole(),
 							QColor( 64, 64, 64 ) );
 	m_trackSettingsWidget.setPalette( pal );

@@ -37,6 +37,7 @@ class QPixmap;
 class knob;
 class notePlayHandle;
 class pixmapButton;
+class volumeKnob;
 
 
 class organicInstrument : public instrument, public specialBgHandlingWidget
@@ -83,7 +84,7 @@ private:
 	{
 		oscillator::waveShapes waveShape;
 		knob * oscKnob;
-		knob * volKnob;
+		volumeKnob * volKnob;
 		knob * panKnob;
 		knob * detuneKnob;
 		float harmonic;

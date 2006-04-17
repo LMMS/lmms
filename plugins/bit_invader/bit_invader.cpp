@@ -321,6 +321,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );

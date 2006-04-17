@@ -63,6 +63,7 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	setBackgroundMode( Qt::NoBackground );
 #endif*/
 #ifndef QT3
+	setAutoFillBackground( TRUE );
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background ).
 								dark( 132 );
@@ -98,7 +99,7 @@ void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 	m_widgets[_idx] = d;
 	_w->setFixedSize( width() - 4, height() - 14 );
 	_w->move( 2, 12 );
-	_w->show();
+	_w->hide();
 
 	if( m_widgets.contains( m_activeTab ) )
 	{
@@ -171,24 +172,27 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 {
 #ifdef QT4
 	QPainter p( this );
+	p.fillRect( 0, 0, width() - 1, height() - 1, QColor( 96, 96, 96 ) );
+	const int c = 0;
 #else
 	QPixmap pm( size() );
 	pm.fill( QColor( 96, 96, 96 ) );
 
 	QPainter p( &pm );
+	const int c = 1;
 #endif
 	bool big_tab_captions = ( m_caption == "" );
 	int add = big_tab_captions ? 1 : 0;
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( 0, 0, width(), height() );
+	p.drawRect( 0, 0, width() - 1 + c, height() - 1 + c );
 
 	p.setPen( QColor( 160, 160, 160 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 1, 1, width() - 2, height() - 2 );
+	p.drawRect( 1, 1, width() - 3 + c, height() - 3 + c );
 
 	p.fillRect( 2, 2, width() - 4, 9 + add, QColor( 30, 45, 60 ) );
 	p.drawLine( 2, 11 + add, width() - 3, 11 + add );

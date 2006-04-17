@@ -250,7 +250,12 @@ void sampleBuffer::update( bool _keep_settings )
 		// name
 		if( file[0] != '/' )
 		{
-			file = configManager::inst()->samplesDir() + file;
+			file = configManager::inst()->userSamplesDir() + file;
+			if( QFileInfo( file ).exists() == FALSE )
+			{
+				file =
+		configManager::inst()->factorySamplesDir() + m_audioFile;
+			}
 		}
 		const char * f =
 #ifdef QT4
@@ -970,7 +975,12 @@ QString sampleBuffer::openAudioFile( void ) const
 		QString f = m_audioFile;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = configManager::inst()->samplesDir() + f;
+			f = configManager::inst()->userSamplesDir() + f;
+			if( QFileInfo( f ).exists() == FALSE )
+			{
+				f = configManager::inst()->factorySamplesDir() +
+								m_audioFile;
+			}
 		}
 #ifdef QT4
 		dir = QFileInfo( f ).absolutePath();
@@ -980,7 +990,7 @@ QString sampleBuffer::openAudioFile( void ) const
 	}
 	else
 	{
-		dir = configManager::inst()->samplesDir();
+		dir = configManager::inst()->userSamplesDir();
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
@@ -1031,19 +1041,7 @@ QString sampleBuffer::openAudioFile( void ) const
 		{
 			return( "" );
 		}
-		QString sf = ofd.selectedFiles()[0];
-		if( !QFileInfo( sf ).isRelative() )
-		{
-#if QT_VERSION >= 0x030100
-			sf = sf.replace( configManager::inst()->samplesDir(),
-									"" );
-#else
-			sf = sf.replace( QRegExp(
-					configManager::inst()->samplesDir() ),
-									"" );
-#endif
-		}
-		return( sf );
+		return( tryToMakeRelative( ofd.selectedFiles()[0] ) );
 	}
 
 	return( "" );
@@ -1228,20 +1226,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 
 void sampleBuffer::setAudioFile( const QString & _audio_file )
 {
-	m_audioFile = _audio_file;
-	// try to make path of audio-file relative if it's posated
-	// within LMMS-working-dir
-	if( !QFileInfo( m_audioFile ).isRelative() )
-	{
-#if QT_VERSION >= 0x030100
-		m_audioFile = m_audioFile.replace(
-				configManager::inst()->samplesDir(), "" );
-#else
-		m_audioFile = m_audioFile.replace(
-				QRegExp( configManager::inst()->samplesDir() ),
-									"" );
-#endif
-	}
+	m_audioFile = tryToMakeRelative( _audio_file );
 	update();
 }
 
@@ -1468,6 +1453,28 @@ void sampleBuffer::deleteResamplingData( void * * _ptr )
 #endif
 	*_ptr = NULL;
 }
+
+
+
+
+QString sampleBuffer::tryToMakeRelative( const QString & _file )
+{
+	if( QFileInfo( _file ).isRelative() == FALSE )
+	{
+		QString fsd = configManager::inst()->factorySamplesDir();
+		QString usd = configManager::inst()->userSamplesDir();
+		if( _file.contains( fsd ) )
+		{
+			return( QString( _file ).replace( fsd, "" ) );
+		}
+		else if( _file.contains( usd ) )
+		{
+			return( QString( _file ).replace( usd, "" ) );
+		}
+	}
+	return( _file );
+}
+
 
 
 #undef write

@@ -30,7 +30,7 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
 #include <QtGui/QApplication>
-#include <QtGui/QX11EmbedWidget>
+#include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 
 #else
@@ -40,8 +40,8 @@
 
 #include "qxembed.h"
 
-#define QX11EmbedWidget QXEmbed
-#define embedInto embed
+#define QX11EmbedContainer QXEmbed
+#define embedClient embed
 
 #endif
 
@@ -246,10 +246,13 @@ void remoteVSTPlugin::showEditor( void )
 	m_pluginWidget = new QWidget( eng()->getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
+#ifndef QT3
+	eng()->getMainWindow()->workspace()->addWindow( m_pluginWidget );
+#endif
 	m_pluginWidget->show();
 
-	QX11EmbedWidget * xe = new QX11EmbedWidget( m_pluginWidget );
-	xe->embedInto( m_pluginXID );
+	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
+	xe->embedClient( m_pluginXID );
 	xe->setFixedSize( m_pluginGeometry );
 	//xe->setAutoDelete( FALSE );
 	xe->show();

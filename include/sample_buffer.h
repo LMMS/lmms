@@ -162,6 +162,9 @@ public slots:
 private:
 	void FASTCALL update( bool _keep_settings = FALSE );
 
+	static QString tryToMakeRelative( const QString & _file );
+
+
 #ifdef SDL_SDL_SOUND_H
 	f_cnt_t FASTCALL decodeSampleSDL( const char * _f,
 						int_sample_t * & _buf,

@@ -37,6 +37,7 @@
 
 class knob;
 class notePlayHandle;
+class volumeKnob;
 
 
 class vibed : public instrument
@@ -66,7 +67,7 @@ private:
 	vlist<knob*> m_pickKnobs;
 	vlist<knob*> m_pickupKnobs;
 	vlist<knob*> m_stiffnessKnobs;
-	vlist<knob*> m_volumeKnobs;
+	vlist<volumeKnob*> m_volumeKnobs;
 	vlist<knob*> m_panKnobs;
 	vlist<knob*> m_detuneKnobs;
 	vlist<knob*> m_randomKnobs;
@@ -78,7 +79,7 @@ private:
 	knob * m_pickKnob;
 	knob * m_pickupKnob;
 	knob * m_stiffnessKnob;
-	knob * m_volumeKnob;
+	volumeKnob * m_volumeKnob;
 	knob * m_panKnob;
 	knob * m_detuneKnob;
 	knob * m_randomKnob;

@@ -170,7 +170,8 @@ void fileBrowser::addItems( const QString & _path )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
-				!QFileInfo( _path + "/" + cur_file ).isDir()
+			QFileInfo( _path + QDir::separator() +
+						cur_file ).isDir() == FALSE
 #ifdef QT4
 // TBD
 #else
@@ -188,7 +189,8 @@ void fileBrowser::addItems( const QString & _path )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
-			QFileInfo( _path + "/" + cur_file ).isDir() )
+			QFileInfo( _path + QDir::separator() +
+							cur_file ).isDir() )
 		{
 			QListViewItem * item = m_l->findItem( cur_file, 0 );
 			if( item == NULL )
@@ -744,13 +746,13 @@ bool directory::addItems( const QString & _path )
 		QString cur_file = files[files.size() - i - 1];
 #ifdef QT4
 		if( cur_file[0] != '.' && !QFileInfo(
-					thisDir.absolutePath() + "/" +
+				thisDir.absolutePath() + QDir::separator() +
 						cur_file ).isDir() &&
 			thisDir.match( m_filter, cur_file.toLower() )
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
 #else
 		if( cur_file[0] != '.' && !QFileInfo(
-					thisDir.absPath() + "/" +
+					thisDir.absPath() + QDir::separator() +
 						cur_file ).isDir() &&
 			thisDir.match( m_filter, cur_file.lower() )
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
@@ -766,11 +768,11 @@ bool directory::addItems( const QString & _path )
 		QString cur_file = files[files.size() - i - 1];
 #ifdef QT4
 		if( cur_file[0] != '.' && QFileInfo(
-					thisDir.absolutePath() + "/" +
+				thisDir.absolutePath() + QDir::separator() +
 						cur_file ).isDir() )
 #else
 		if( cur_file[0] != '.' && QFileInfo(
-					thisDir.absPath() + "/" +
+					thisDir.absPath() + QDir::separator() +
 						cur_file ).isDir() )
 #endif
 		{

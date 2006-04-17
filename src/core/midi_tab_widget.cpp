@@ -310,6 +310,7 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 			if( ( *it )->isChecked() !=
 				( rp.indexOf( ( *it )->text() ) != -1 ) )
 			{
+				( *it )->setChecked( TRUE );
 				activatedReadablePort( *it );
 			}
 		}
@@ -340,6 +341,7 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 			if( ( *it )->isChecked() !=
 				( wp.indexOf( ( *it )->text() ) != -1 ) )
 			{
+				( *it )->setChecked( TRUE );
 				activatedWriteablePort( *it );
 			}
 		}
@@ -418,6 +420,7 @@ void midiTabWidget::midiPortModeToggled( bool )
 		{
 			if( ( *it )->isChecked() == TRUE )
 			{
+				( *it )->setChecked( FALSE );
 				activatedReadablePort( *it );
 			}
 		}
@@ -441,6 +444,7 @@ void midiTabWidget::midiPortModeToggled( bool )
 		{
 			if( ( *it )->isChecked() == TRUE )
 			{
+				( *it )->setChecked( FALSE );
 				activatedWriteablePort( *it );
 			}
 		}
@@ -494,6 +498,7 @@ void midiTabWidget::readablePortsChanged( void )
 	{
 #ifdef QT4
 		QAction * item = m_readablePorts->addAction( *it );
+		item->setCheckable( TRUE );
 		if( selected_ports.indexOf( *it ) != -1 )
 		{
 			item->setChecked( TRUE );
@@ -545,6 +550,7 @@ void midiTabWidget::writeablePortsChanged( void )
 	{
 #ifdef QT4
 		QAction * item = m_writeablePorts->addAction( *it );
+		item->setCheckable( TRUE );
 		if( selected_ports.indexOf( *it ) != -1 )
 		{
 			item->setChecked( TRUE );
@@ -566,13 +572,12 @@ void midiTabWidget::writeablePortsChanged( void )
 void midiTabWidget::activatedReadablePort( QAction * _item )
 {
 	// make sure, MIDI-port is configured for input
-	if( _item->isChecked() == FALSE &&
+	if( _item->isChecked() == TRUE &&
 		m_midiPort->mode() != midiPort::INPUT &&
 		m_midiPort->mode() != midiPort::DUPLEX )
 	{
 		m_receiveCheckBox->setChecked( TRUE );
 	}
-	_item->setChecked( !_item->isChecked() );
 	eng()->getMixer()->getMIDIClient()->subscribeReadablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }
@@ -583,13 +588,12 @@ void midiTabWidget::activatedReadablePort( QAction * _item )
 void midiTabWidget::activatedWriteablePort( QAction * _item )
 {
 	// make sure, MIDI-port is configured for output
-	if( _item->isChecked() == FALSE &&
+	if( _item->isChecked() == TRUE &&
 		m_midiPort->mode() != midiPort::OUTPUT &&
 		m_midiPort->mode() != midiPort::DUPLEX )
 	{
 		m_sendCheckBox->setChecked( TRUE );
 	}
-	_item->setChecked( !_item->isChecked() );
 	eng()->getMixer()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }

@@ -87,6 +87,7 @@ projectNotes::projectNotes( engine * _engine) :
 
 	m_edit = new QTextEdit( this );
 #ifdef QT4
+	m_edit->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_edit->setPalette( pal );

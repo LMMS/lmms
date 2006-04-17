@@ -1,7 +1,7 @@
 /*
  * mmp.h - class for reading and writing multimedia-project-files
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -89,6 +89,9 @@ public:
 private:
 	static projectTypes FASTCALL type( const QString & _type_name );
 	static QString FASTCALL typeName( projectTypes _project_type );
+
+	void cleanMetaNodes( QDomElement _de );
+
 
 	struct typeDescStruct
 	{

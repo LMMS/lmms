@@ -186,11 +186,7 @@ multimediaProject::~multimediaProject()
 
 bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 {
-	QString xml = "<?xml version=\"1.0\"?>\n" + toString(
-#if QT_VERSION >= 0x030100
-								2
-#endif
-									);
+	bool clean_meta_nodes = FALSE;
 	QString fn = _fn;
 	if( type() == INSTRUMENT_TRACK_SETTINGS )
 	{
@@ -198,6 +194,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 		{
 			fn += ".cs.xml";
 		}
+		clean_meta_nodes = TRUE;
 	}
 	else if( type() == SONG_PROJECT )
 	{
@@ -206,6 +203,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 		{
 			fn += ".mmp";
 		}
+		clean_meta_nodes = TRUE;
 	}
 	else if( type() == SONG_PROJECT_TEMPLATE )
 	{
@@ -213,6 +211,12 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 		{
 			fn += ".mpt";
 		}
+		clean_meta_nodes = TRUE;
+	}
+
+	if( clean_meta_nodes == TRUE )
+	{
+		cleanMetaNodes( documentElement() );
 	}
 
 
@@ -257,6 +261,11 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 						).arg( fn ) );
 		return( FALSE );
 	}
+	QString xml = "<?xml version=\"1.0\"?>\n" + toString(
+#if QT_VERSION >= 0x030100
+								2
+#endif
+									);
 #ifdef QT4
 	outfile.write( xml.toAscii().constData(), xml.length() );
 #else
@@ -313,6 +322,33 @@ QString multimediaProject::typeName( projectTypes _project_type )
 	}
 	return( s_types[UNKNOWN].m_name );
 }
+
+
+
+
+void multimediaProject::cleanMetaNodes( QDomElement _de )
+{
+	QDomNode node = _de.firstChild();
+	while( !node.isNull() )
+	{
+		if( node.isElement() )
+		{
+			if( node.toElement().attribute( "metadata" ).toInt() )
+			{
+				QDomNode ns = node.nextSibling();
+				_de.removeChild( node );
+				node = ns;
+				continue;
+			}
+			if( node.hasChildNodes() )
+			{
+				cleanMetaNodes( node.toElement() );
+			}
+		}
+		node = node.nextSibling();
+	}
+}
+
 
 
 #endif

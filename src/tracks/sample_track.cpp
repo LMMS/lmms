@@ -372,7 +372,7 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_trackLabel->setGeometry( 26, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
 
-	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
 				    tr( "Channel volume" ), eng() );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_volumeKnob->setInitValue( DEFAULT_VOLUME );

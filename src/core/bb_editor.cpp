@@ -70,9 +70,10 @@ bbEditor::bbEditor( engine * _engine ) :
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
 #ifdef QT4
+	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
-	pal.setBrush( QPalette::Background, QBrush(
-				embed::getIconPixmap( "toolbar_bg" ) ) );
+	pal.setBrush( m_toolBar->backgroundRole(),
+					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 #else
 	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(

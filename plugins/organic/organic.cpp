@@ -58,13 +58,11 @@ using namespace std;
 #include "knob.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
-#include "song_editor.h"
 #include "oscillator.h"
-#include "sample_buffer.h"
-#include "base64.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
+#include "volume_knob.h"
 
 
 extern "C"
@@ -125,7 +123,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		);
 										
 		// setup volume-knob
-		m_osc[i].volKnob = new knob( knobGreen_17, this, tr(
+		m_osc[i].volKnob = new volumeKnob( knobGreen_17, this, tr(
 					"Osc %1 volume" ).arg( i+1 ), eng() );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
@@ -208,6 +206,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );

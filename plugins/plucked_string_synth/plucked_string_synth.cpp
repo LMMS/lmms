@@ -85,6 +85,7 @@ pluckedStringSynth::pluckedStringSynth( instrumentTrack * _channel_track ) :
 	m_pickupKnob->move( 138, 134 );
 	m_pickupKnob->setHintText( tr( "Pickup position:" ) + " ", "" );
 #ifdef QT4
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );

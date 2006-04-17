@@ -92,19 +92,34 @@ public:
 		return( m_workingDir );
 	}
 
-	QString projectsDir( void ) const
+	QString userProjectsDir( void ) const
 	{
-		return( m_workingDir + PROJECTS_PATH );
+		return( workingDir() + PROJECTS_PATH );
 	}
 
-	QString presetsDir( void ) const
+	QString userPresetsDir( void ) const
 	{
-		return( m_workingDir + PRESETS_PATH );
+		return( workingDir() + PRESETS_PATH );
 	}
 
-	QString samplesDir( void ) const
+	QString userSamplesDir( void ) const
 	{
-		return( m_workingDir + SAMPLES_PATH );
+		return( workingDir() + SAMPLES_PATH );
+	}
+
+	QString factoryProjectsDir( void ) const
+	{
+		return( dataDir() + PROJECTS_PATH );
+	}
+
+	QString factoryPresetsDir( void ) const
+	{
+		return( dataDir() + PRESETS_PATH );
+	}
+
+	QString factorySamplesDir( void ) const
+	{
+		return( dataDir() + SAMPLES_PATH );
 	}
 
 	QString defaultArtworkDir( void ) const

@@ -42,6 +42,9 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	m_colorStandard( s_stdColor ),
 	m_colorHighlighted( s_hlColor )
 {
+#ifndef QT3
+	setAutoFillBackground( TRUE );
+#endif
 	if( _receiver != NULL && _slot != NULL )
 	{
 		connect( this, SIGNAL( clicked() ), _receiver, _slot );

@@ -95,7 +95,8 @@ lmms_MOC =						\
 		./tool_button.moc			\
 		./track_container.moc			\
 		./track.moc				\
-		./visualization_widget.moc
+		./visualization_widget.moc		\
+		./volume_knob.moc
 
 
 BUILT_SOURCES = $(lmms_MOC)
@@ -193,6 +194,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/tool_button.cpp			\
 		$(srcdir)/src/widgets/tooltip.cpp			\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
+		$(srcdir)/src/widgets/volume_knob.cpp			\
 		$(srcdir)/src/lmms_single_source.cpp			\
 		$(srcdir)/include/pch.h					\
 		$(srcdir)/include/debug.h				\
@@ -284,6 +286,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/led_checkbox.h			\
 		$(srcdir)/include/text_float.h				\
 		$(srcdir)/include/tempo_sync_knob.h			\
+		$(srcdir)/include/volume_knob.h				\
 		$(srcdir)/include/setup_dialog.h			\
 		$(srcdir)/include/dummy_plugin.h			\
 		$(srcdir)/include/dummy_instrument.h			\

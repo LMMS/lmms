@@ -108,7 +108,7 @@ void mkPath( const QString & _path )
 
 
 
-
+/*
 void linkFile( const QString & _src, const QString & _dst )
 {
 #ifdef QT4
@@ -149,7 +149,7 @@ void copyFile( const QString & _src, const QString & _dst )
 	}
 #endif
 }
-
+*/
 
 
 
@@ -596,9 +596,9 @@ void configManager::accept( void )
 		}
 	}
 
-	mkPath( projectsDir() );
-	mkPath( samplesDir() );
-	mkPath( presetsDir() );
+	mkPath( userProjectsDir() );
+	mkPath( userSamplesDir() );
+	mkPath( userPresetsDir() );
 /*	processFilesRecursively( m_dataDir + "samples/", m_workingDir +
 								"samples/",
 					m_samplesCopyRB->isChecked() ?

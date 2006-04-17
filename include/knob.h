@@ -90,7 +90,7 @@ public slots:
 	void reset( void );
 	void copyValue( void );
 	void pasteValue( void );
-	void enterValue( void );
+	virtual void enterValue( void );
 	void connectToMidiDevice( void );
 	void displayHelp( void );
 

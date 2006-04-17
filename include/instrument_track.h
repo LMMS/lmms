@@ -51,7 +51,7 @@
 #include "gui_templates.h"
 #include "tab_widget.h"
 #include "engine.h"
-
+#include "volume_knob.h"
 
 class QLineEdit;
 class arpAndChordsTabWidget;
@@ -60,7 +60,6 @@ class instrumentTrackButton;
 class envelopeTabWidget;
 class fadeButton;
 class instrument;
-class knob;
 class lcdSpinBox;
 class midiPort;
 class midiTabWidget;
@@ -223,7 +222,7 @@ private:
 	// widgets on the top of a instrument-track-window
 	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_instrumentNameLE;
-	knob * m_volumeKnob;
+	volumeKnob * m_volumeKnob;
 	surroundArea * m_surroundArea;
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
@@ -242,7 +241,7 @@ private:
 
 
 	// widgets in track-settings-widget
-	knob * m_tswVolumeKnob;
+	volumeKnob * m_tswVolumeKnob;
 	fadeButton * m_tswActivityIndicator;
 	instrumentTrackButton * m_tswInstrumentTrackButton;
 	QMenu * m_tswMidiMenu;
