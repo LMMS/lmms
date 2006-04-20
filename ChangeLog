@@ -1,3 +1,24 @@
+2006-04-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/unrtf/output.c:
+	generally use bigger font-sizes
+
+	* plugins/flp_import/unrtf/attr.c:
+	* plugins/flp_import/unrtf/attr.h:
+	* plugins/flp_import/flp_import.cpp:
+	do not crash when importing FLP-projects more than one time per
+	session (some vars need to be reset before unrtf works again)
+
+	* plugins/flp_import/flp_import.cpp:
+	- limit number of bb-tracks for avoiding hangups
+	- set length of step-notes to -64 instead of -1
+	- scale filter-resonance to smaller values
+
+2006-04-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vibed/vibed.cpp:
+	some small optimizations in vibed::playNote( ... )
+
 2006-04-16	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
 	* Makefile.am:
 	* src/lmms_single_source.cpp:

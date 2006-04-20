@@ -28,6 +28,23 @@
 #include <math.h>
 
 #include "volume_knob.h"
+#include "main_window.h"
+#include "config_mgr.h"
+#include "text_float.h"
+#include "string_pair_drag.h"
+
+#ifndef QT3
+
+#include <QtGui/QApplication>
+#include <QtGui/QInputDialog>
+
+#else
+
+#include <qapplication.h>
+#include <qinputdialog.h>
+
+#endif
+
 
 
 volumeKnob::volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,

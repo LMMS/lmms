@@ -409,21 +409,6 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 vibed::~vibed()
 {
-/*
-	for( Uint8 harm = 0; harm < 9; harm++ )
-	{
-		delete m_pickKnobs[harm];
-		delete m_pickupKnobs[harm];
-		delete m_stiffnessKnobs[harm];
-		delete m_volumeKnobs[harm];
-		delete m_panKnobs[harm];
-		delete m_detuneKnobs[harm];
-		delete m_randomKnobs[harm];
-		delete m_lengthKnobs[harm];
-		delete m_editors[harm];
-		delete m_impulses[harm];
-		delete m_harmonics[harm];
-	}*/
 }
 
 
@@ -593,7 +578,7 @@ void vibed::playNote( notePlayHandle * _n )
 				eng()->getMixer()->sampleRate(),
 				m_sampleLength );
 		
-		for( Uint8 i = 0; i < 9; i++ )
+		for( Uint8 i = 0; i < 9; ++i )
 		{
 			if( m_editors[i]->isOn() )
 			{
@@ -614,34 +599,29 @@ void vibed::playNote( notePlayHandle * _n )
 		}
 	}
 
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	stringContainer * ps = static_cast<stringContainer *>(
 			 				_n->m_pluginData );
 	
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
-	float vol;
-	float pan;
-	float sample;
-	Uint8 s;
-	
-	for( Uint32 i = 0; i < frames; i++ )
+	for( fpab_t i = 0; i < frames; ++i )
 	{
 		buf[i][0] = 0.0f;
 		buf[i][1] = 0.0f;
-		s = 0;
-		for( Uint8 string = 0; string < 9; string ++ )
+		Uint8 s = 0;
+		for( Uint8 string = 0; string < 9; ++string )
 		{
 			if( ps->exists( string ) )
 			{
-				vol = ( m_volumeKnobs[string]->value() ) / 
-						100.0f;
-				pan = ( 
-				m_panKnobs[string]->value() + 1 ) / 2.0;
-				sample = ps->getStringSample( s );
-
-				buf[i][0] += pan * vol * sample;
-				buf[i][1] += ( 1.0 - pan ) * vol * sample;
+				const float pan = ( 
+					m_panKnobs[string]->value() + 1 ) /
+									2.0f;
+				const sample_t sample = ps->getStringSample(
+									s ) *
+					m_volumeKnobs[string]->value() / 100.0f;
+				buf[i][0] += pan * sample;
+				buf[i][1] += ( 1.0f - pan ) * sample;
 				s++;
 			}
 		}
@@ -677,6 +657,11 @@ void vibed::showString( Uint8 _string )
 	m_impulse->hide();
 	m_harmonic->hide();
 	
+	// TODO: first assign, then show - avoids that we have to index vector
+	// (or list or whatever) twice
+	// something like
+	// ( m_editor = m_editors[_string] )->show()
+	// would be even better ;-)
 	m_editors[_string]->show();
 	m_volumeKnobs[_string]->show();
 	m_stiffnessKnobs[_string]->show();

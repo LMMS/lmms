@@ -86,6 +86,11 @@ static AttrStack *stack_of_stacks = NULL;
 static AttrStack *stack_of_stacks_top = NULL;
 
 
+void attr_clear_all( void )
+{
+    stack_of_stacks = NULL;
+    stack_of_stacks_top = NULL;
+}
 
 
 /*========================================================================

@@ -92,6 +92,7 @@ plugin::descriptor flpimport_plugin_descriptor =
 #include "word.h"
 #include "hash.h"
 #include "convert.h"
+#include "attr.h"
 
 
 OutputPersonality * op = NULL;
@@ -516,6 +517,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 				QBuffer buf( ba );
 				buf.open( IO_ReadOnly );
 #endif
+				lineno = 0;
+				attr_clear_all();
 				op = html_init();
 				hash_init();
 				Word * word = word_read( &buf );
@@ -730,11 +733,11 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 				printf( "\n" );*/
 				etw->m_filterComboBox->setValue(
 							mappedFilter[p[5]] );
-				etw->m_filterCutKnob->setValue( p[3] / 255.0 *
+				etw->m_filterCutKnob->setValue( p[3] / 255.0f *
 					( etw->m_filterCutKnob->maxValue() -
 					etw->m_filterCutKnob->minValue() ) +
 					etw->m_filterCutKnob->minValue() );
-				etw->m_filterResKnob->setValue( p[4] / 512.0 *
+				etw->m_filterResKnob->setValue( p[4] / 1024.0f *
 					( etw->m_filterResKnob->maxValue() -
 					etw->m_filterResKnob->minValue() ) +
 					etw->m_filterResKnob->minValue() );
@@ -833,7 +836,7 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 		{
 			continue;
 		}
-		p->setNoteAt( pos / 4, note( NULL, -1, pos ) );
+		p->setNoteAt( pos / 4, note( NULL, -64, pos ) );
 	}
 
 	// now process all notes
@@ -843,10 +846,19 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 		const int where = ( *it ).first;
 		const int ch = where % num_channels;
 		const csize pat = where / num_channels;
+		if( pat > 100 )
+		{
+			continue;
+		}
 		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat )
 		{
 			track::create( track::BB_TRACK,
 						_tc->eng()->getSongEditor() );
+#ifdef QT4
+			qApp->processEvents( QEventLoop::AllEvents, 100 );
+#else
+			qApp->processEvents( 100 );
+#endif
 		}
 		pattern * p = dynamic_cast<pattern *>(
 						i_tracks[ch]->getTCO( pat ) );
@@ -861,10 +873,19 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 						it != m_plItems.end(); ++it )
 	{
 		csize pat_num = ( ( *it ) >> 16 ) - 1;
+		if( pat_num > 100 )
+		{
+			continue;
+		}
 		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat_num )
 		{
 			track::create( track::BB_TRACK,
 						_tc->eng()->getSongEditor() );
+#ifdef QT4
+			qApp->processEvents( QEventLoop::AllEvents, 100 );
+#else
+			qApp->processEvents( 100 );
+#endif
 		}
 		
 		bbTrack * bbt = bbTrack::findBBTrack( pat_num, _tc->eng() );
@@ -872,7 +893,10 @@ QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_
 		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
 	}
 
-	_tc->eng()->getBBEditor()->setCurrentBB( project_cur_pat );
+	if( (csize) project_cur_pat < _tc->eng()->getBBEditor()->numOfBBs() )
+	{
+		_tc->eng()->getBBEditor()->setCurrentBB( project_cur_pat );
+	}
 
 	_tc->eng()->getProjectJournal()->setJournalling( is_journ );
         return( TRUE );

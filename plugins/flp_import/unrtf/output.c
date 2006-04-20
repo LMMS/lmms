@@ -187,6 +187,7 @@ op_translate_char (OutputPersonality *op, int charset, int ch)
 void
 op_begin_std_fontsize (OutputPersonality *op, int size)
 {
+	size = ( size * 3 ) / 2;
 	int found_std_expr = FALSE;
 
 	CHECK_PARAM_NOT_NULL(op);

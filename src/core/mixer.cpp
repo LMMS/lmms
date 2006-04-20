@@ -25,6 +25,8 @@
  */
 
 
+#include <math.h>
+
 #include "mixer.h"
 #include "play_handle.h"
 #include "song_editor.h"
@@ -699,7 +701,7 @@ void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
 	}
 			
 	// check for clip
-	if( fabs( m_writeBuf[_frame][_chnl] ) > 1.0f )
+	if( fabsf( m_writeBuf[_frame][_chnl] ) > 1.0f )
 	{
 		m_clipped[_chnl] = TRUE;
 		if( fabs( m_writeBuf[_frame][_chnl] ) >
