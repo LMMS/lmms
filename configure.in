@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.1.4-cvs20060419, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060419)
+AC_INIT(lmms, 0.1.4-cvs20060519, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.1.4-cvs20060519)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -423,7 +423,8 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-# CXXFLAGS="$CXXFLAGS -g0"
+#CFLAGS="$CXXFLAGS -g -O2"
+#CXXFLAGS="$CXXFLAGS -g -O2"
 if test $CXX == "g++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall -fno-exceptions"
 fi

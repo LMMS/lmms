@@ -44,6 +44,7 @@
 #include "arp_and_chords_tab_widget.h"
 #include "tempo_sync_knob.h"
 #include "piano_widget.h"
+#include "debug.h"
 
 
 #ifdef QT4

@@ -62,7 +62,7 @@
 #include "instrument.h"
 #include "rubberband.h"
 #include "project_journal.h"
-
+#include "debug.h"
 
 
 trackContainer::trackContainer( engine * _engine ) :
