@@ -72,7 +72,7 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file );
+	void setAudioFile( const QString & _audio_file, bool _rename = TRUE );
 
 
 protected slots:

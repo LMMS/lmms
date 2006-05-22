@@ -313,7 +313,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "src" ) != "" )
 	{
-		setAudioFile( _this.attribute( "src" ) );
+		setAudioFile( _this.attribute( "src" ), FALSE );
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
@@ -368,12 +368,13 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 
 
 
-void audioFileProcessor::setAudioFile( const QString & _audio_file )
+void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename )
 {
 	// is current channel-name equal to previous-filename??
-	if( getInstrumentTrack()->name() ==
+	if( _rename && 
+		( getInstrumentTrack()->name() ==
 			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
-		m_sampleBuffer.audioFile() == "" )
+		   	m_sampleBuffer.audioFile() == "" ) )
 	{
 		// then set it to new one
 		getInstrumentTrack()->setName( QFileInfo( _audio_file
