@@ -1,3 +1,21 @@
+2006-05-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/locale/de.ts:
+	updated German translation
+
+	* src/core/bb_editor.cpp:
+	added button in bb-editor for adding new beat/bassline
+
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	added "muted"-property to track-content-objects for being able to mute
+	single patterns, samples etc. either via context-menu or using <Ctrl>
+	and middle mousebutton
+
 2006-05-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track_container.cpp:
@@ -1901,7 +1919,7 @@
 2005-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/midi_tab_widget.cpp:
-	- always un-check items in port-menus when disabling receceiving or
+	- always un-check items in port-menus when disabling receiving or
 	  sending MIDI-events
 	- small GUI improvements
 
@@ -2087,8 +2105,8 @@
 	added so called audio-ports which are important for transporting sound
 	from it's origin through the mixer and the effect-board (the latter
 	one isn't existing yet but coming quite soon) - another important
-	point is ability of having output-ports for each channel/sample-track
-	with JACK
+	point is the ability of having output-ports for each channel/sample-
+	track with JACK
 
 	* src/tracks/channel_track.cpp:
 	translate default-channel-name "Default"

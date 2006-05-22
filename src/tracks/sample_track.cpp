@@ -192,7 +192,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 {
 #ifdef QT4
 	QPainter p( this );
-	// TODO: set according brush/pen for gradient!
+#warning TODO: set according brush for gradient!
 	p.fillRect( _pe->rect(), QColor( 64, 64, 64 ) );
 #else
 	// create pixmap for our widget
@@ -218,7 +218,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 0, 0, width(), height() );
-	if( getTrack()->muted() )
+	if( getTrack()->muted() || muted() )
 	{
 		p.setPen( QColor( 128, 128, 128 ) );
 	}
@@ -236,6 +236,13 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
 				width() - 2, r.y() + r.height() / 2 );
 	}
+
+	p.translate( 0, 0 );
+	if( muted() )
+	{
+		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
+	}
+
 #ifndef QT4
 	bitBlt( this, _pe->rect().topLeft(), &pm );
 #endif
@@ -266,6 +273,7 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
+	_this.setAttribute( "muted", muted() );
 	_this.setAttribute( "src", sampleFile() );
 	if( sampleFile() == "" )
 	{
@@ -290,6 +298,10 @@ void FASTCALL sampleTCO::loadSettings( const QDomElement & _this )
 		m_sampleBuffer.loadFromBase64( _this.attribute( "data" ) );
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
+	if( _this.attribute( "muted" ).toInt() != muted() )
+	{
+		toggleMute();
+	}
 }
 
 
@@ -451,7 +463,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 							it != tcos.end(); ++it )
 	{
 		sampleTCO * st = dynamic_cast<sampleTCO *>( *it );
-		if( st != NULL )
+		if( st != NULL && !st->muted() )
 		{
 			st->play( buf, _start_frame +
 					static_cast<Uint32>( _start.getTact() *

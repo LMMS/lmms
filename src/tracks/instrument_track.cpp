@@ -891,7 +891,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 							it != tcos.end(); ++it )
 	{
 		pattern * p = dynamic_cast<pattern *>( *it );
-		if( p == NULL )
+		// everything which is not a pattern or muted won't be played
+		if( p == NULL || ( *it )->muted() )
 		{
 			continue;
 		}

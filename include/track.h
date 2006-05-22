@@ -103,6 +103,11 @@ public:
 		return( m_length );
 	}
 
+	bool muted( void ) const
+	{
+		return( m_muted );
+	}
+
 	bool fixedTCOs( void );
 
 	virtual void FASTCALL movePosition( const midiTime & _pos );
@@ -137,6 +142,7 @@ protected slots:
 	void cut( void );
 	void copy( void );
 	void paste( void );
+	void toggleMute( void );
 
 
 private:
@@ -153,6 +159,8 @@ private:
 	actions m_action;
 	bool m_autoResize;
 	Sint16 m_initialMouseX;
+
+	bool m_muted;
 
 	textFloat * m_hint;
 

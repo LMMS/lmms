@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4-cvs20060414" type="instrumenttracksettings" version="1.0" >
+  <head/>
+  <instrumenttracksettings>
+    <instrumenttrack width="250" x="611" y="0" surpos="135792566" fxch="0" height="436" baseoct="4" vol="100" name="Saw Reso" basetone="9" tab="1" visible="1" >
+      <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="" wavetype2="2" coarse2="-12" vol0="100" vol1="53" finel0="8" vol2="37" finel1="-9" finel2="0" modalgo1="2" stphdetun0="0" pan0="0" modalgo2="2" stphdetun1="0" pan1="0" stphdetun2="0" pan2="0" phoffset0="0" phoffset1="0" phoffset2="0" finer0="8" finer1="-9" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+      <eldata fres="2.62" ftype="7" fcut="5490" fwet="1" >
+        <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.469" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.118" pdel="0.001" lamt="0" dec="0.534" userwavefile="" x100="0" lshp="0" hold="0.287" />
+        <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.375" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.444" pdel="0.001" lamt="0" dec="0.416" userwavefile="" x100="0" lshp="0" hold="0.244" />
+        <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.244" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.244" pdel="0.001" lamt="0" dec="0.366" userwavefile="" x100="0" lshp="0" hold="0.244" />
+      </eldata>
+      <arpandchords arpmode="0" chordrange="1" arprange="3" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="128" arpdir="1" />
+      <midi defvelout="0" inputchannel="0" outputchannel="1" receive="0" send="0" defvelin="0" />
+    </instrumenttrack>
+  </instrumenttracksettings>
+</multimediaproject>

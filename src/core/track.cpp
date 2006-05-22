@@ -95,6 +95,7 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_action( NONE ),
 	m_autoResize( FALSE ),
 	m_initialMouseX( 0 ),
+	m_muted( FALSE ),
 	m_hint( NULL )
 {
 	if( s_textFloat == NULL )
@@ -225,6 +226,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 	if( m_track->getTrackContainer()->allowRubberband() == TRUE &&
 					_me->button() == Qt::LeftButton )
 	{
+		// if rubberband is active, we can be selected
 		if( m_track->getTrackContainer()->rubberBandActive() == FALSE )
 		{
 			if(
@@ -246,11 +248,13 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( getTrack()->eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
+		// add/remove object to/from selection
 		selectableObject::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton &&
 		getTrack()->eng()->getMainWindow()->isCtrlPressed() == TRUE )
 	{
+		// start drag-action
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
 		saveState( mmp, mmp.content() );
 #ifdef QT4
@@ -272,6 +276,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
+		// move or resize
 		setJournalling( FALSE );
 
 		m_initialMouseX = _me->x();
@@ -307,12 +312,17 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		mouseMoveEvent( _me );
 		s_textFloat->show();
 	}
-	else if( ( _me->button() == Qt::MidButton/* ||
-			( _me->button() == Qt::LeftButton &&
-	  	eng()->getMainWindow()->isShiftPressed() == TRUE )*/ ) &&
-							fixedTCOs() == FALSE )
+	else if( _me->button() == Qt::MidButton )
 	{
-		close();
+		if( getTrack()->eng()->getMainWindow()->isCtrlPressed() )
+		{
+			toggleMute();
+		}
+		else if( fixedTCOs() == FALSE )
+		{
+			// delete ourself
+			close();
+		}
 	}
 }
 
@@ -464,9 +474,10 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Copy" ), this, SLOT( copy() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), this, SLOT( paste() ) );
-	//contextMenu.insertSeparator();
-	//contextMenu.insertItem( tr( "&Help" ), this, SLOT( displayHelp() ) );
-
+	contextMenu.insertSeparator();
+	contextMenu.addAction( embed::getIconPixmap( "muted" ),
+				tr( "Mute/unmute (<Ctrl> + middle click)" ),
+						this, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -554,6 +565,15 @@ void trackContentObject::paste( void )
 	{
 		restoreState( *( clipboard::getContent( nodeName() ) ) );
 	}
+}
+
+
+
+
+void trackContentObject::toggleMute( void )
+{
+	m_muted = !m_muted;
+	update();
 }
 
 
@@ -1215,8 +1235,7 @@ void trackWidget::changePosition( const midiTime & _new_pos )
 
 	for( csize i = 0; i < tcos; ++i )
 	{
-		trackContentObject * tco =
-					m_trackContentWidget.getTCO( i );
+		trackContentObject * tco = m_trackContentWidget.getTCO( i );
 		tco->changeLength( tco->length() );
 		Sint32 ts = tco->startPosition();
 		Sint32 te = tco->endPosition();

@@ -649,6 +649,10 @@ http://lmms.sourceforge.net</translation>
         <source>Beat+Baseline Editor</source>
         <translation>Beat+Baseline Editor</translation>
     </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation>Beat/Bassline hinzufügen</translation>
+    </message>
 </context>
 <context>
     <name>bbTCO</name>
@@ -842,28 +846,28 @@ Bitte wählen Sie ein Verzeichnis:</translation>
         <source>For using the ready presets and samples of LMMS and enjoying the demo-songs the according files have to be copied or linked into your LMMS-working-directory.
 When copying files, you can modify them, but they need additional space in your working-directory. If you link files, you cannot modify them, but they need no extra space. So it&apos;s recommended to copy presets and demo-projects and link samples, which are bigger in size.
 </source>
-        <translation>Damit Sie die fertigen Presets und Samples von LMMS nutzen können und mit den Demo-Songs herumspielen können, müssen die entsprechenden Dateien in Ihr LMMS-Arbeitsverzeichnis kopiert oder verknüpft werden.
+        <translation type="obsolete">Damit Sie die fertigen Presets und Samples von LMMS nutzen können und mit den Demo-Songs herumspielen können, müssen die entsprechenden Dateien in Ihr LMMS-Arbeitsverzeichnis kopiert oder verknüpft werden.
 Kopierte Dateien können Sie ändern, aber gleichzeitig belegen diese auch zusätzlichen Speicherplatz in Ihrem Arbeitsverzeichnis. Wenn Sie Dateien verknüpfen, können Sie diese nicht verändern, brauchen dafür aber auch keinen extra Speicherplatz. Deshalb wird empfohlen, Presets und Demo-Projekte zu kopieren und die Samples zu verknüpfen, da letztere doch eine gewisse Größe haben.</translation>
     </message>
     <message>
         <source>samples:</source>
-        <translation>Samples:</translation>
+        <translation type="obsolete">Samples:</translation>
     </message>
     <message>
         <source>copy</source>
-        <translation>Kopieren</translation>
+        <translation type="obsolete">Kopieren</translation>
     </message>
     <message>
         <source>link</source>
-        <translation>Verknüpfen</translation>
+        <translation type="obsolete">Verknüpfen</translation>
     </message>
     <message>
         <source>presets:</source>
-        <translation>Presets:</translation>
+        <translation type="obsolete">Presets:</translation>
     </message>
     <message>
         <source>demo projects:</source>
-        <translation>Demo Projekte:</translation>
+        <translation type="obsolete">Demo Projekte:</translation>
     </message>
     <message>
         <source>Welcome to LMMS</source>
@@ -875,7 +879,7 @@ Kopierte Dateien können Sie ändern, aber gleichzeitig belegen diese auch zusä
     </message>
     <message>
         <source>Copy or link files</source>
-        <translation>Dateien kopieren oder verknüpfen</translation>
+        <translation type="obsolete">Dateien kopieren oder verknüpfen</translation>
     </message>
     <message>
         <source>Directory not existing</source>
@@ -1533,6 +1537,10 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
         <source>Please wait, loading sample for preview...</source>
         <translation>Bitte warten, Sample wird für Vorschau geladen....</translation>
     </message>
+    <message>
+        <source>--- Factory files ---</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>mainWindow</name>
@@ -1763,6 +1771,14 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <source>Send MIDI-events</source>
         <translation>MIDI-Ereignisse senden</translation>
     </message>
+    <message>
+        <source>Default velocity for all input-events</source>
+        <translation>Standardlautstärke für alle einkommenden Ereignisse</translation>
+    </message>
+    <message>
+        <source>Default velocity for all output-events</source>
+        <translation>Standardlautstärke für alle ausgehende Ereignisse</translation>
+    </message>
 </context>
 <context>
     <name>mixer</name>
@@ -1884,11 +1900,11 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     </message>
     <message>
         <source>Channel muted</source>
-        <translation>Kanal stumm geschalten</translation>
+        <translation type="obsolete">Kanal stumm geschalten</translation>
     </message>
     <message>
         <source>The channel this pattern belongs to is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation>Der Kanal, zu dem dieser Pattern gehört, ist derzeit stumm geschaltet, weshalb das Einfrieren keinen Sinn ergibt! Wollen Sie trotzdem fortfahren?</translation>
+        <translation type="obsolete">Der Kanal, zu dem dieser Pattern gehört, ist derzeit stumm geschaltet, weshalb das Einfrieren keinen Sinn ergibt! Wollen Sie trotzdem fortfahren?</translation>
     </message>
     <message>
         <source>Add steps</source>
@@ -1911,6 +1927,14 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
 use mouse wheel to set volume of a step</source>
         <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
 Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
+    </message>
+    <message>
+        <source>Pattern muted</source>
+        <translation>Pattern stummgeschaltet</translation>
+    </message>
+    <message>
+        <source>The track this pattern belongs to or the pattern itself is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
+        <translation>Die Spur, zu der dieser Pattern gehört oder dieser Pattern selbst sind derzeit stummgeschaltet, weshalb das Einfrieren keinen Sinn ergibt. Wollen Sie trotzdem fortfahren?</translation>
     </message>
 </context>
 <context>
@@ -2104,6 +2128,10 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
         <translation>Einfacher Sampler mit verschiedenen Einstellungen zur Nutzung von Samples (z.B. Drums) in einer Instrument-Spur</translation>
     </message>
+    <message>
+        <source>Filter for importing FL Studio projects into LMMS</source>
+        <translation>Filter für Import von FL Studio Projekten in LMMS</translation>
+    </message>
 </context>
 <context>
     <name>projectNotes</name>
@@ -2283,6 +2311,22 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <source>Sample track</source>
         <translation>Sample-Spur</translation>
     </message>
+    <message>
+        <source>Channel volume</source>
+        <translation>Kanal Lautstärke</translation>
+    </message>
+    <message>
+        <source>Channel volume:</source>
+        <translation>Kanal Lautstärke:</translation>
+    </message>
+    <message>
+        <source>VOL</source>
+        <translation>LAUT</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the volume of the opened channel.</source>
+        <translation>Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
+    </message>
 </context>
 <context>
     <name>setupDialog</name>
@@ -2419,6 +2463,18 @@ Latenz: %2 ms</translation>
     <message>
         <source>Choose artwork-theme directory</source>
         <translation>Artwork-Verzeichnis wählen</translation>
+    </message>
+    <message>
+        <source>Display volume as dbV </source>
+        <translation>Lautstärke als in dbV anzeigen </translation>
+    </message>
+    <message>
+        <source>FL Studio installation directory</source>
+        <translation>FL Studio Installationsverzeichnis</translation>
+    </message>
+    <message>
+        <source>Choose FL Studio installation directory</source>
+        <translation>FL Studio Installationsverzeichnis wählen</translation>
     </message>
 </context>
 <context>
@@ -2558,7 +2614,7 @@ Wollen Sie diese überschreiben?</translation>
     </message>
     <message>
         <source>MIDI-files (*.mid)</source>
-        <translation>MIDI-Dateien (*.mid)</translation>
+        <translation type="obsolete">MIDI-Dateien (*.mid)</translation>
     </message>
     <message>
         <source>TEMPO/BPM</source>
@@ -2619,6 +2675,10 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Edit mode (select and move)</source>
         <translation>Editier-Modus (auswählen und verschieben)</translation>
+    </message>
+    <message>
+        <source>Auto limiter</source>
+        <translation>Autolimiter</translation>
     </message>
 </context>
 <context>
@@ -2794,7 +2854,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     <message>
         <source>Couldn&apos;t find a filter for importing file %1.
 You should convert this file into a format supported by LMMS using another software. </source>
-        <translation>Konnte keinen Filter finden, um die Datei %1 zu importieren.
+        <translation type="obsolete">Konnte keinen Filter finden, um die Datei %1 zu importieren.
 Sie sollten diese Datei mit Hilfe einer anderen Software in ein Format konvertieren, das von LMMS unterstützt wird.</translation>
     </message>
     <message>
@@ -2806,6 +2866,16 @@ Sie sollten diese Datei mit Hilfe einer anderen Software in ein Format konvertie
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
         <translation>Konnte Datei %1 nicht zum Lesen öffnen.
 Bitte stellen Sie sicher, dass Sie Lese-Rechte auf diese Datei sowie das Verzeichnis besitzen und probieren es erneut!</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find a filter for importing file %1.
+You should convert this file into a format supported by LMMS using another software.</source>
+        <translation>Es konnte kein Filter gefunden werden, um die Datei %1 zu importieren.
+Sie sollten diese Datei mit Hilfe anderer Software in ein von LMMS unterstützes Format umwandeln.</translation>
+    </message>
+    <message>
+        <source>Importing FLP-file...</source>
+        <translation>Importiere FLP-Datei...</translation>
     </message>
 </context>
 <context>
@@ -2849,6 +2919,10 @@ Bitte stellen Sie sicher, dass Sie Lese-Rechte auf diese Datei sowie das Verzeic
     <message>
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
         <translation>Drücken Sie &lt;Strg&gt; für freie Größenänderung.</translation>
+    </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation>Stumm/Laut schalten (&lt;Strg&gt; + Mittelklick)</translation>
     </message>
 </context>
 <context>
@@ -3272,6 +3346,17 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>click to enable/disable visualization of master-output</source>
         <translation>klicken, um Visualisierung des Masterausgangs an-/auszuschalten</translation>
+    </message>
+</context>
+<context>
+    <name>volumeKnob</name>
+    <message>
+        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
+        <translation>Bitte geben Sie einen Wert zwischen -96.0 dbV und 6.0 dbV ein:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
     </message>
 </context>
 </TS>

@@ -154,16 +154,16 @@ bool mixer::criticalXRuns( void ) const
 void mixer::setClipScaling( bool _state )
 {
 	m_mixMutex.lock();
-	
+
 	m_scaleClip = _state;
-	
+
 	if( _state )
 	{
 		m_poolDepth = 3;
 		m_readBuffer = 0;
 		m_analBuffer = m_readBuffer + 1;
 		m_writeBuffer = m_poolDepth - 1;
-	
+
 		for( ch_cnt_t chnl=0; chnl < m_audioDev->channels(); ++chnl )
 		{
 			m_clipped[chnl] = FALSE;
@@ -172,6 +172,9 @@ void mixer::setClipScaling( bool _state )
 			m_previousSample[chnl] = 0.0;
 			m_newBuffer[chnl] = FALSE;
 		}
+		// FIXME: why assign buffer-ptr to m_readBuf just for calling
+		//        another method?
+		//        clearAudioBuffer(m_bufferPool[i],...) would do as well
 		for( Uint8 i = 0; i < 3; i++ )
 		{
 			m_readBuf = m_bufferPool[i];
@@ -185,7 +188,7 @@ void mixer::setClipScaling( bool _state )
 		m_writeBuffer = 1;
 		m_analBuffer = 1;
 	}
-	
+
 	m_mixMutex.unlock();
 }
 
@@ -239,16 +242,16 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 //	qSwap( m_curBuf, m_nextBuf );
 	m_writeBuffer++;
 	m_writeBuffer %= m_poolDepth;
-	
+
 	m_readBuffer++;
 	m_readBuffer %= m_poolDepth;
-	
+
 	m_analBuffer++;
 	m_analBuffer %= m_poolDepth;
-	
+
 	m_writeBuf = m_bufferPool[m_writeBuffer];
 	m_readBuf = m_bufferPool[m_readBuffer];
-	
+
 	// clear last audio-buffer
 	clearAudioBuffer( m_writeBuf, m_framesPerAudioBuffer );
 
@@ -280,9 +283,8 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		{
 			if( ( *it )->m_bufferUsage != audioPort::NONE )
 			{
-				processBuffer( 
-					( *it )->firstBuffer(),
-					( *it )->nextFxChannel() );
+				processBuffer( ( *it )->firstBuffer(),
+						( *it )->nextFxChannel() );
 				( *it )->nextPeriod();
 			}
 		}

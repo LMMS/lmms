@@ -132,7 +132,7 @@ pattern::~pattern()
 		// us before
 		if( eng()->getSongEditor()->playing() &&
 			eng()->getSongEditor()->playMode() ==
-							songEditor::PLAY_PATTERN )
+						songEditor::PLAY_PATTERN )
 		{
 			eng()->getSongEditor()->playPattern( NULL );
 		}
@@ -427,6 +427,7 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
+	_this.setAttribute( "muted", muted() );
 	_this.setAttribute( "steps", m_steps );
 	_this.setAttribute( "frozen", m_frozenPattern != NULL );
 
@@ -456,6 +457,10 @@ void pattern::loadSettings( const QDomElement & _this )
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
 	changeLength( midiTime( _this.attribute( "len" ).toInt() ) );
+	if( _this.attribute( "muted" ).toInt() != muted() )
+	{
+		toggleMute();
+	}
 
 	clearNotes();
 
@@ -556,7 +561,7 @@ void pattern::freeze( void )
 						QMessageBox::Ok );
 		return;
 	}
-	if( m_instrumentTrack->muted() )
+	if( m_instrumentTrack->muted() || muted() )
 	{
 		if( QMessageBox::
 #if QT_VERSION >= 0x030200		
@@ -565,9 +570,10 @@ void pattern::freeze( void )
 				 information
 #endif				 
 		
-					    ( 0, tr( "Channel muted" ),
-						tr( "The channel this pattern "
-							"belongs to is "
+					    ( 0, tr( "Pattern muted" ),
+						tr( "The track this pattern "
+							"belongs to or the "
+							"pattern itself is "
 							"currently muted "
 							"therefore "
 							"freezing makes no "
@@ -786,11 +792,6 @@ void pattern::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void pattern::mousePressEvent( QMouseEvent * _me )
 {
-/*	if( _me->button() != Qt::LeftButton )
-	{
-	return;
-}*/
-
 	if( _me->button() == Qt::LeftButton &&
 		   m_patternType == pattern::BEAT_PATTERN &&
 		   ( pixelsPerTact() >= 192 ||
@@ -1001,7 +1002,7 @@ void pattern::paintEvent( QPaintEvent * )
 						height() - 2 *
 							TCO_BORDER_WIDTH );
 				}
-				if( getTrack()->muted() )
+				if( getTrack()->muted() || muted() )
 				{
 					p.setPen( QColor( 160, 160, 160 ) );
 				}
@@ -1110,9 +1111,21 @@ void pattern::paintEvent( QPaintEvent * )
 	}
 
 	p.setFont( pointSize<7>( p.font() ) );
-	p.setPen( QColor( 32, 240, 32 ) );
-	p.drawText( 2, 9, m_name );
-	if( m_frozenPattern != NULL )
+	if( muted() || getTrack()->muted() )
+	{
+		p.setPen( QColor( 192, 192, 192 ) );
+	}
+	else
+	{
+		p.setPen( QColor( 32, 240, 32 ) );
+	}
+	p.drawText( 2, p.fontMetrics().height() - 1, m_name );
+	if( muted() )
+	{
+		p.drawPixmap( 3, p.fontMetrics().height() + 1,
+				embed::getIconPixmap( "muted", 16, 16 ) );
+	}
+	else if( m_frozenPattern != NULL )
 	{
 		p.setPen( QColor( 0, 224, 255 ) );
 		p.drawRect( 0, 0, width(), height() - 1 );

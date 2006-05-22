@@ -114,6 +114,12 @@ bbEditor::bbEditor( engine * _engine ) :
 			tr( "Stop playing of current beat/bassline (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
+	toolButton * add_bb_track = new toolButton(
+					embed::getIconPixmap( "add_bb_track" ),
+						tr( "Add beat/bassline" ),
+				eng()->getSongEditor(), SLOT( addBBTrack() ),
+								m_toolBar );
+
 
 #ifdef QT4
 	m_playButton->setWhatsThis(
@@ -144,6 +150,8 @@ bbEditor::bbEditor( engine * _engine ) :
 	tb_layout->addWidget( m_stopButton );
 	tb_layout->addSpacing( 20 );
 	tb_layout->addWidget( m_bbComboBox );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( add_bb_track );
 	tb_layout->addStretch();
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
@@ -198,7 +206,7 @@ void bbEditor::setCurrentBB( int _bb )
 tact bbEditor::lengthOfBB( csize _bb )
 {
 	midiTime max_length;
-	
+
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
 	{
