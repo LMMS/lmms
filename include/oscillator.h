@@ -196,7 +196,7 @@ public:
 					const sampleFrame * _user_wave,
 					const f_cnt_t _user_wave_frames )
 	{
-		const float frame = fraction( _sample ) * _user_wave_frames;
+		const float frame = fraction( fabs( _sample ) ) * _user_wave_frames;
 		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
 		const f_cnt_t f2 = ( f1 + 1 ) % _user_wave_frames;
 		return( linearInterpolate( _user_wave[f1][0],

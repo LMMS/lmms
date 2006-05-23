@@ -1,3 +1,11 @@
+2006-5-23	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/oscillator.h:
+	FM mixing sometimes calculates a negative "time" for the sampling
+	which causes bad things to happen when pulling the data out of
+	a user defined wave.  Changed userWaveSample to use the absolute
+	value of the sample, which fixes the segfaulting problem.  Not
+	sure whether I should care about the negative times elsewhere.
+
 2006-05-22	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
 
 	* plugins/audio_file_processor/audio_file_processor.h:
