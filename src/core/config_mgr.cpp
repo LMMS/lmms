@@ -937,9 +937,10 @@ void configManager::saveConfigFile( void )
 	}
 
 #ifdef QT4
-	outfile.write( xml.toAscii().constData(), xml.length() );
+	outfile.write( xml.toUtf8().constData(), xml.length() );
 #else
-	outfile.writeBlock( xml.ascii(), xml.length() );
+	QCString xml_utf8 = xml.utf8();
+	outfile.writeBlock( xml_utf8.data(), xml_utf8.length() );
 #endif
 	outfile.close();
 }

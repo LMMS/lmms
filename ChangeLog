@@ -1,3 +1,12 @@
+2006-5-26	Javier Serrano Polo <jasp00/dot/terra/dot/es>
+	* src/lib/sample_buffer.cpp:
+	corrected the calculation of f1 in play to prevent it from shifting
+	the start_frame out of bounds when resampling.
+
+	* src/core/config_mgr.cpp:
+	* src/lib/mmp.cpp:
+	changed the xml output to use UTF8 encoding instead of ascii.
+
 2006-5-23	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
 	* include/oscillator.h:
 	FM mixing sometimes calculates a negative "time" for the sampling

@@ -706,7 +706,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 	{
 		frames_to_process = frames_for_loop;
 	}
-	const f_cnt_t f1 = static_cast<f_cnt_t>( play_frame * freq_factor );
+	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startFrame + ( play_frame - m_startFrame ) * freq_factor );
 /*	Uint32 f2 = 0;
 	while( f2 < f1 )
 	{
