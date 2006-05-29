@@ -298,7 +298,7 @@ void organicInstrument::playNote( notePlayHandle * _n )
 		{
 			
 			// volume
-			float volume = m_osc[i].volKnob->value() / 100.0 / m_num_oscillators ;
+			float volume = 1.0 / m_num_oscillators ;
 			float volume_l = volume * ( m_osc[i].panKnob->value() +
 						PANNING_RIGHT ) / 100.0f;
 			float volume_r = volume * ( PANNING_RIGHT -
@@ -334,7 +334,8 @@ void organicInstrument::playNote( notePlayHandle * _n )
 						oscillator::MIX,
 						freq_l,
 						phase_l,
-								volume_l,
+						volume_l,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate() );
 				// create right oscillator
 				oscs_r[i] = oscillator::createOsc(
@@ -342,7 +343,8 @@ void organicInstrument::playNote( notePlayHandle * _n )
 						oscillator::MIX,
 						freq_r,
 						phase_r,
-								volume_r,
+						volume_r,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate() );	
 					
 			} else {
@@ -352,7 +354,8 @@ void organicInstrument::playNote( notePlayHandle * _n )
 						oscillator::MIX,
 						freq_l,
 						phase_l,
-								volume_l,
+						volume_l,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate(),
 					oscs_l[i + 1] );
 				// create right oscillator
@@ -361,7 +364,8 @@ void organicInstrument::playNote( notePlayHandle * _n )
 						oscillator::MIX,
 						freq_r,
 						phase_r,
-								volume_r,
+						volume_r,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate(),
 					oscs_r[i + 1] );					
 				

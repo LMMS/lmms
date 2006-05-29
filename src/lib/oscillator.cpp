@@ -31,16 +31,16 @@
 
 oscillator::oscillator( const modulationAlgos _modulation_algo,
 			const float _freq, const Sint16 _phase_offset,
-			const float _volume_factor,
+			const float _volume_factor, const volumeKnob * _volume_knob,
 			const sample_rate_t _sample_rate,
 			oscillator * _sub_osc ) :
 	m_freq( _freq ),
 	m_volumeFactor( _volume_factor ),
+	m_volumeKnob( _volume_knob ),
 	m_phaseOffset( _phase_offset ),
 	m_sampleRate( _sample_rate ),
 	m_subOsc( _sub_osc ),
-	m_userWaveData( &ZERO_FRAME ),
-	m_userWaveFrames( 1 )
+	m_userWave( NULL )
 {
 	if( m_subOsc != NULL )
 	{
@@ -72,6 +72,13 @@ oscillator::oscillator( const modulationAlgos _modulation_algo,
 
 
 
+float oscillator::volumeFactor( void )
+{
+	return( m_volumeFactor * m_volumeKnob->value() / 100.0f );
+}
+
+
+
 // if we have no sub-osc, we can't do any modulation... just get our samples
 #define defineNoSubUpdateFor(x,getSampleFunction) 			\
 void x::updateNoSub( sampleFrame * _ab, const fpab_t _frames,		\
@@ -80,7 +87,7 @@ void x::updateNoSub( sampleFrame * _ab, const fpab_t _frames,		\
 	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * m_volumeFactor;	\
+					m_oscCoeff ) * volumeFactor();	\
 	}								\
 }
 
@@ -96,13 +103,13 @@ void x::updateFM( sampleFrame * _ab, const fpab_t _frames,		\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
 							m_oscCoeff +	\
 						_ab[frame][_chnl] ) *	\
-							m_volumeFactor;	\
+							volumeFactor();	\
 		/* following line is REAL FM */				\
 /*		float new_freq = powf( 2.0, _ab[frame][_chnl] );	\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample*((m_freq * \
-		new_freq )/mixer::inst()->sampleRate() )) * m_volumeFactor;  \
+		new_freq )/mixer::inst()->sampleRate() )) * volumeFactor();  \
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample*(m_oscCoeff *\
-			_ab[frame][_chnl] )) * m_volumeFactor;*/	\
+			_ab[frame][_chnl] )) * volumeFactor();*/	\
 	}								\
 }
 
@@ -116,7 +123,7 @@ void x::updateAM( sampleFrame * _ab, const fpab_t _frames,		\
 	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] *= getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * m_volumeFactor;	\
+					m_oscCoeff ) * volumeFactor();	\
 	}								\
 }
 
@@ -130,7 +137,7 @@ void x::updateMix( sampleFrame * _ab, const fpab_t _frames,		\
 	for( fpab_t frame = 0; frame < _frames; ++frame )		\
 	{								\
 		_ab[frame][_chnl] += getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * m_volumeFactor;	\
+					m_oscCoeff ) * volumeFactor();	\
 	}								\
 }
 
@@ -148,7 +155,7 @@ void x::updateSync( sampleFrame * _ab, const fpab_t _frames,		\
 			sync();						\
 		}							\
 		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * m_volumeFactor;	\
+					m_oscCoeff ) * volumeFactor();	\
 	}								\
 }
 
@@ -161,10 +168,12 @@ public:									\
 	inline x( const modulationAlgos modulation_algo,		\
 						const float _freq,	\
 		const Sint16 _phase_offset, const float _volume_factor,	\
+		const volumeKnob * _volume_knob,			\
 		const sample_rate_t _sample_rate,			\
 				oscillator * _sub_osc ) :		\
 	oscillator( modulation_algo, _freq, _phase_offset,		\
-			_volume_factor, _sample_rate, _sub_osc )	\
+			_volume_factor, _volume_knob,			\
+			_sample_rate, _sub_osc )			\
 	{								\
 	}								\
 	virtual ~x()							\
@@ -208,6 +217,7 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 					const float _freq,
 					const Sint16 _phase_offset,
 					const float _volume_factor,
+					const volumeKnob * _volume_knob,
 					const sample_rate_t _sample_rate,
 							oscillator * _sub_osc )
 {
@@ -216,38 +226,47 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 		case SIN_WAVE:
 			return( new sinWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case TRIANGLE_WAVE:
 			return( new triangleWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case SAW_WAVE:
 			return( new sawWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case SQUARE_WAVE:
 			return( new squareWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case MOOG_SAW_WAVE:
 			return( new moogSawWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case EXP_WAVE:
 			return( new expWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case WHITE_NOISE_WAVE:
 			return( new noiseWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		case USER_DEF_WAVE:
 			return( new userWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 		default:
 			return( new sinWaveOsc( _modulation_algo, _freq,
 						_phase_offset, _volume_factor,
+						_volume_knob,
 						_sample_rate, _sub_osc ) );
 	}
 

@@ -516,7 +516,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 				cnphv.first()->totalFramesPlayed() :
 				_n->totalFramesPlayed() ) + arp_frames - 1;
 	// used for loop
-	fpab_t frames_processed = 0;
+	f_cnt_t frames_processed = 0;
 
 	while( frames_processed < eng()->getMixer()->framesPerAudioBuffer() )
 	{

@@ -858,9 +858,8 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 					val = oscillator::squareSample( phase );
 					break;
 				case USER:
-					val = oscillator::userWaveSample( phase,
-							m_userWave.data(),
-							m_userWave.frames() );
+					val = m_userWave.userWaveSample(
+								phase );
 			}
 			if( static_cast<f_cnt_t>( cur_sample ) <=
 							m_lfoAttackFrames )
@@ -1058,9 +1057,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 						break;
 					case USER:
 						m_lfoShapeData[frame] =
-				oscillator::userWaveSample( phase,
-							m_userWave.data(),
-							m_userWave.frames() );
+				m_userWave.userWaveSample( phase );
 						break;
 					case SIN:
 					default:

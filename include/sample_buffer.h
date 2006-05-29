@@ -51,6 +51,7 @@
 
 
 #include "mixer.h"
+#include "interpolation.h"
 #include "types.h"
 
 
@@ -147,6 +148,24 @@ public:
 	{
 		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
 						_dst_sr, _buf->eng() ) );
+	}
+
+	static inline float fraction( const float _sample )
+	{
+		return( _sample - static_cast<int>( _sample ) );
+	}
+
+	inline sample_t userWaveSample( const float _sample )
+	{
+		m_dataMutex.lock();
+		const float frame = fraction( fabs( _sample ) ) * m_frames;
+		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
+		const f_cnt_t f2 = ( f1 + 1 ) % m_frames;
+		sample_t waveSample = linearInterpolate( m_data[f1][0],
+						m_data[f2][0],
+						fraction( frame ) );
+		m_dataMutex.unlock();
+		return( waveSample );
 	}
 
 

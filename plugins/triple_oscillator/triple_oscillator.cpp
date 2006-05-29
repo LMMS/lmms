@@ -633,9 +633,6 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 				vol_fac_r = 1.0f;
 			}
 
-			vol_fac_l *= m_osc[i].volKnob->value() / 100.0f;
-			vol_fac_r *= m_osc[i].volKnob->value() / 100.0f;
-
 			// the third oscs needs no sub-oscs...
 			if( i == 2 )
 			{
@@ -646,7 +643,8 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() +
 				m_osc[i].stereoPhaseDetuningKnob->value() ),
-								vol_fac_l,
+						vol_fac_l,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate() );
 				oscs_r[i] = oscillator::createOsc(
 						m_osc[i].waveShape,
@@ -654,7 +652,8 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						freq*osc_detuning_r,
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() ),
-								vol_fac_r,
+						vol_fac_r,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate() );
 			}
 			else
@@ -666,7 +665,8 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() +
 				m_osc[i].stereoPhaseDetuningKnob->value() ),
-								vol_fac_l,
+						vol_fac_l,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate(),
 							oscs_l[i + 1] );
 				oscs_r[i] = oscillator::createOsc(
@@ -675,7 +675,8 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 						freq*osc_detuning_r,
 						static_cast<int>(
 					m_osc[i].phaseOffsetKnob->value() ),
-								vol_fac_r,
+						vol_fac_r,
+						m_osc[i].volKnob,
 					eng()->getMixer()->sampleRate(),
 								oscs_r[i + 1] );
 			}
@@ -683,11 +684,9 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 			if( m_osc[i].waveShape == oscillator::USER_DEF_WAVE )
 			{
 				oscs_l[i]->setUserWave(
-					m_osc[i].m_sampleBuffer->data(),
-					m_osc[i].m_sampleBuffer->frames() );
+						m_osc[i].m_sampleBuffer );
 				oscs_r[i]->setUserWave(
-					m_osc[i].m_sampleBuffer->data(),
-					m_osc[i].m_sampleBuffer->frames() );
+						m_osc[i].m_sampleBuffer );
 			}
 
 		}

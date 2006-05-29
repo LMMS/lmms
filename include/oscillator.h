@@ -35,8 +35,9 @@
 #endif
 
 #include "mixer.h"
-#include "interpolation.h"
+#include "sample_buffer.h"
 #include "lmms_constants.h"
+#include "volume_knob.h"
 
 
 // fwd-decl because we need it for the typedef below...
@@ -45,9 +46,6 @@ class oscillator;
 typedef void ( oscillator:: * oscFuncPtr )
 		( sampleFrame * _ab, const fpab_t _frames,
 		  				const ch_cnt_t _chnl );
-
-
-const sampleFrame ZERO_FRAME = { 0.0f, 0.0f } ;
 
 
 class oscillator
@@ -72,6 +70,7 @@ public:
 
 	oscillator( const modulationAlgos _modulation_algo, const float _freq,
 			const Sint16 _phase_offset, const float _volume_factor,
+			const volumeKnob * _volume_knob,
 			const sample_rate_t _sample_rate,
 			oscillator * _m_subOsc ) FASTCALL;
 	virtual ~oscillator()
@@ -79,19 +78,9 @@ public:
 		delete m_subOsc;
 	}
 
-	inline void setUserWave( const sampleFrame * _data,
-							const f_cnt_t _frames )
+	inline void setUserWave( sampleBuffer * _wave )
 	{
-		if( m_userWaveFrames > 0 )
-		{
-			m_userWaveData = _data;
-			m_userWaveFrames = _frames;
-		}
-		else
-		{
-			m_userWaveData = &ZERO_FRAME;
-			m_userWaveFrames = 1;
-		}
+		m_userWave = _wave;
 	}
 
 	inline void update( sampleFrame * _ab, const fpab_t _frames,
@@ -114,6 +103,7 @@ public:
 					const float _freq,
 					const Sint16 _phase_offset,
 					const float _volume_factor,
+					const volumeKnob * _volume_knob,
 					const sample_rate_t _sample_rate,
 						oscillator * _m_subOsc = NULL ); 
 	inline bool syncOk( void )
@@ -192,37 +182,33 @@ public:
 								RAND_MAX ) ) );
 	}
 
-	static inline sample_t userWaveSample( const float _sample,
-					const sampleFrame * _user_wave,
-					const f_cnt_t _user_wave_frames )
-	{
-		const float frame = fraction( fabs( _sample ) ) * _user_wave_frames;
-		const f_cnt_t f1 = static_cast<f_cnt_t>( frame );
-		const f_cnt_t f2 = ( f1 + 1 ) % _user_wave_frames;
-		return( linearInterpolate( _user_wave[f1][0],
-						_user_wave[f2][0],
-						fraction( frame ) ) );
-	}
-
 	inline sample_t userWaveSample( const float _sample )
 	{
-		return( userWaveSample( _sample, m_userWaveData,
-							m_userWaveFrames ) );
+		if( m_userWave->frames() > 0 )
+		{
+			return( m_userWave->userWaveSample( _sample ) );
+		}
+		else
+		{
+			return( 0.0f );
+		}
 	}
 
 
 protected:
 	float m_freq;
 	float m_volumeFactor;
+	const volumeKnob * m_volumeKnob;
 	Sint16 m_phaseOffset;
 	const sample_rate_t m_sampleRate;
 	oscillator * m_subOsc;
 	f_cnt_t m_sample;
 	float m_oscCoeff;
-	sampleFrame const * m_userWaveData;
-	f_cnt_t m_userWaveFrames;
+	sampleBuffer * m_userWave;
 	oscFuncPtr m_callUpdate;
 
+
+	float volumeFactor( void );
 
 	virtual void FASTCALL updateNoSub( sampleFrame * _ab,
 						const fpab_t _frames,
