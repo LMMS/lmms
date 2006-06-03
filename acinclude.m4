@@ -9,7 +9,7 @@ AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [defau
 # Check that QTDIR is defined or that --with-qtdir given
 if test x"$QTDIR" = x ; then
 	# some usual Qt-locations
-	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 usr/local/qt /usr/local/qt3 /usr/local/qt31/ /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
+	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 /usr/local/qt /usr/local/qt3 /usr/local/qt31 /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
 else
 	QT_SEARCH=$QTDIR
 	QTDIR=""
@@ -59,6 +59,26 @@ case "${QT_VER}" in
     ;;
 esac
 AC_MSG_RESULT([$QT_VER ($QT_MAJOR)])
+
+# Search for available Qt translations
+AC_MSG_CHECKING([Qt translations])
+case "${QT_VER}" in
+    3*)
+        QT_TRANSLATIONS_SEARCH="/usr/share/qt3 /usr/local/qt3 /usr/local/qt31 /usr/local/qt32 /usr/local/qt33 /usr/local/qt"
+    ;;
+    4*)
+        QT_TRANSLATIONS_SEARCH="/usr/share/qt4 /usr/local/qt /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
+    ;;
+esac
+for i in $QT_TRANSLATIONS_SEARCH ; do
+    if test -d $i/translations -a x$QT_TRANSLATIONS = x ; then
+        QT_TRANSLATIONS=$i/translations
+    fi
+done
+if test x"$QT_TRANSLATIONS" = x ; then
+    AC_MSG_WARN([*** not found! You may want to install a Qt i18n package])
+fi
+AC_MSG_RESULT([$QT_TRANSLATIONS])
 
 # Check that moc is in path
 AC_CHECK_PROG(MOC, moc, $QTDIR/bin/moc,,$QTDIR/bin/)
@@ -240,6 +260,10 @@ fi
 if test x"$QT_IS_MT" = "xyes" ; then
         QT_CXXFLAGS="$QT_CXXFLAGS -D_REENTRANT -DQT_THREAD_SUPPORT"
 	QT_LIBS="$QT_LIBS -lpthread"
+fi
+
+if test x"$QT_TRANSLATIONS" != x ; then
+    QT_CXXFLAGS="$QT_CXXFLAGS -DQT_TRANSLATIONS_DIR='\"$QT_TRANSLATIONS\"'"
 fi
 
 QT_LDADD="-L$QTDIR/lib $QT_LIBS"
