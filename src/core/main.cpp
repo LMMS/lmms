@@ -65,12 +65,13 @@ QString file_to_render;
 int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
 #endif
 
-inline void loadTranslation( const QString & _tname )
+inline void loadTranslation( const QString & _tname,
+	const QString & _dir = configManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( 0 );
 	QString name = _tname + ".qm";
 
-	t->load( name, configManager::inst()->localeDir() );
+	t->load( name, _dir );
 
 	qApp->installTranslator( t );
 }
@@ -173,7 +174,12 @@ int main( int argc, char * * argv )
 			QString( QTextCodec::locale() ).section( '_', 0, 0 );
 #endif
 	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	loadTranslation( QString( "qt_" ) + pos,
+					QString( QT_TRANSLATIONS_DIR ) );
+#else
 	loadTranslation( QString( "qt_" ) + pos );
+#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
 

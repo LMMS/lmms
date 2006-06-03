@@ -1,3 +1,9 @@
+2006-06-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* acinclude.m4:
+	* src/core/main.cpp:
+	detect and load standard Qt translations
+
 2006-05-29	Javier Serrano Polo <jasp00/dot/terra/dot/es>
 
 	* src/core/arp_and_chords_tab_widget.cpp:
