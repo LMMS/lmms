@@ -13,7 +13,7 @@
           <trackcontainer type="bbeditor" >
             <track muted="0" type="0" >
               <channeltrack surpos="80218386" fxch="0" baseoct="4" vol="100" name="hihat_opened02.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99989" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_opened02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.99989" sframe="0" amp="100" src="drums/hihat_opened02.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -48,7 +48,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="99878638" fxch="0" baseoct="4" vol="100" name="hihat_opened01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99983" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_opened01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.99983" sframe="0" amp="100" src="drums/hihat_opened01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -79,7 +79,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_closed04.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999457" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_closed04.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999457" sframe="0" amp="100" src="drums/hihat_closed04.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -108,7 +108,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="103155786" fxch="0" baseoct="4" vol="133" name="bassdrum01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999848" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/bassdrum01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999848" sframe="0" amp="100" src="drums/bassdrum01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -138,7 +138,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="99878438" fxch="0" baseoct="4" vol="100" name="horror_bass01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999796" sframe="0" amp="100" src="/usr/local/share/lmms/samples/basses/horror_bass01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999796" sframe="0" amp="100" src="basses/horror_bass01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.33" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0" userwavefile="" x100="0" lshp="0" hold="0" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />

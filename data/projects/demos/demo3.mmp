@@ -42,7 +42,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="122816288" fxch="0" baseoct="4" vol="100" name="kick_hardcore01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999877" sframe="0" amp="147" src="/usr/local/share/lmms/samples/drums/kick_hardcore01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999877" sframe="0" amp="147" src="drums/kick_hardcore01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -65,7 +65,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="rave_bass02.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999868" sframe="0" amp="335" src="/usr/local/share/lmms/samples/basses/rave_bass02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999868" sframe="0" amp="335" src="basses/rave_bass02.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.291" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.448" userwavefile="" x100="0" lshp="0" hold="0" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -99,7 +99,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="bass_acid01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999831" sframe="0" amp="144" src="/usr/local/share/lmms/samples/basses/bass_acid01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999831" sframe="0" amp="144" src="basses/bass_acid01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -120,7 +120,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="techno_synth01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999849" sframe="0" amp="100" src="/usr/local/share/lmms/samples/basses/techno_synth01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999849" sframe="0" amp="100" src="basses/techno_synth01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.37" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.195" userwavefile="" x100="0" lshp="0" hold="0.165" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -380,8 +380,8 @@
       </track>
       <track muted="0" type="2" >
         <sampletrack name="Sample track" />
-        <sampletco pos="1024" src="/usr/local/share/lmms/samples/bassloopes/rave_bass02.ogg" len="127" />
-        <sampletco pos="1152" src="/usr/local/share/lmms/samples/bassloopes/rave_bass02.ogg" len="127" />
+        <sampletco pos="1024" src="bassloopes/rave_bass02.ogg" len="127" />
+        <sampletco pos="1152" src="bassloopes/rave_bass02.ogg" len="127" />
       </track>
       <track muted="0" type="1" >
         <bbtrack name="Hardcore Baseline" />

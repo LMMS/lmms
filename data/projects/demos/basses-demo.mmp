@@ -441,7 +441,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="kick_distorted01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999957" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/kick_distorted01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999957" sframe="0" amp="100" src="drums/kick_distorted01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
                   <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -461,7 +461,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="clap01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999935" sframe="0" amp="325" src="/usr/local/share/lmms/samples/drums/clap01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999935" sframe="0" amp="325" src="drums/clap01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
                   <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -476,7 +476,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_closed02.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99974" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_closed02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.99974" sframe="0" amp="100" src="drums/hihat_closed02.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
                   <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
@@ -496,7 +496,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_opened01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999943" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_opened01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999943" sframe="0" amp="100" src="drums/hihat_opened01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />
                   <elcut lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.5" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.5" x100="0" lshp="0" hold="0.5" />

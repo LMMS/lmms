@@ -13,7 +13,7 @@
           <trackcontainer type="bbeditor" >
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="42" name="bassdrum02.ogg" basetone="9" tab="1" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.659134" sframe="0" amp="135" src="/usr/local/share/lmms/samples/drums/bassdrum02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.659134" sframe="0" amp="135" src="drums/bassdrum02.ogg" />
                 <eldata fres="0.01" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.661" ctlenvamt="0" latt="0" sus="0.698" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.037" userwavefile="" x100="0" lshp="0" hold="0.287" />
                   <elcut lfosyncmode="0" lpdel="0" amt="-0.62" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -48,7 +48,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="158" name="bassdrum03.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.998879" sframe="0" amp="115" src="/usr/local/share/lmms/samples/drums/bassdrum03.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998879" sframe="0" amp="115" src="drums/bassdrum03.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -79,7 +79,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="158" name="kick_hard01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999617" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/kick_hard01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999617" sframe="0" amp="100" src="drums/kick_hard01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -100,7 +100,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="144" name="scratch01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99941" sframe="0" amp="100" src="/usr/local/share/lmms/samples/effects/scratch01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.99941" sframe="0" amp="100" src="effects/scratch01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -123,7 +123,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="64" name="warp01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999755" sframe="0" amp="100" src="/usr/local/share/lmms/samples/effects/warp01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999755" sframe="0" amp="100" src="effects/warp01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -146,7 +146,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="60" name="bell_choir02.ogg" basetone="9" tab="2" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999966" sframe="0" amp="230" src="/usr/local/share/lmms/samples/stringsnpads/bell_choir02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999966" sframe="0" amp="230" src="stringsnpads/bell_choir02.ogg" />
                 <eldata fres="8.22" ftype="0" fcut="13120" fwet="1" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.326" userwavefile="" x100="0" lshp="0" hold="0.363" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -172,7 +172,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="96" name="clap03.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.998224" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/clap03.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998224" sframe="0" amp="100" src="drums/clap03.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -198,7 +198,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="114" name="hihat_closed01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.998337" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_closed01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998337" sframe="0" amp="100" src="drums/hihat_closed01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -228,7 +228,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="106" name="hihat_foot_pedal01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999621" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_foot_pedal01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999621" sframe="0" amp="100" src="drums/hihat_foot_pedal01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -254,7 +254,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="120" name="hihat_opened02.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999614" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/hihat_opened02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999614" sframe="0" amp="100" src="drums/hihat_opened02.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -280,7 +280,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="98" name="snare01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999163" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/snare01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999163" sframe="0" amp="100" src="drums/snare01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -306,7 +306,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="74" name="tom_low01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999413" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/tom_low01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999413" sframe="0" amp="100" src="drums/tom_low01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -333,7 +333,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="tom_mid01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99947" sframe="0" amp="100" src="/usr/local/share/lmms/samples/drums/tom_mid01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.99947" sframe="0" amp="100" src="drums/tom_mid01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -354,7 +354,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="62" name="synth_acid02.ogg" basetone="9" tab="1" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999501" sframe="0" amp="100" src="/usr/local/share/lmms/samples/basses/synth_acid02.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999501" sframe="0" amp="100" src="basses/synth_acid02.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.039" userwavefile="" x100="0" lshp="0" hold="0.414" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -380,7 +380,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="2" baseoct="4" vol="140" name="latin_brass01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999917" sframe="0.0399543" amp="95" src="/usr/local/share/lmms/samples/latin/latin_brass01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999917" sframe="0.0399543" amp="95" src="latin/latin_brass01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0" userwavefile="" x100="0" lshp="0" hold="0.324" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
@@ -403,7 +403,7 @@
             </track>
             <track muted="0" type="0" >
               <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="undefined01.ogg" basetone="9" tab="1" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999608" sframe="0" amp="100" src="/usr/local/share/lmms/samples/misc/undefined01.ogg" />
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999608" sframe="0" amp="100" src="misc/undefined01.ogg" />
                 <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
                   <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.048" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0" userwavefile="" x100="0" lshp="0" hold="0.163" />
                   <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
