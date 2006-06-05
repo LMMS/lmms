@@ -83,7 +83,8 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &tripleoscillator_plugin_descriptor ),
 	m_modulationAlgo1( oscillator::MIX ),
-	m_modulationAlgo2( oscillator::MIX )
+	m_modulationAlgo2( oscillator::MIX ),
+	m_modulationAlgo3( oscillator::MIX )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
@@ -219,10 +220,11 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobSmall_17, this, tr(
-					"Osc %1 volume" ).arg( i+1 ), eng() );
+				"Osc %1 volume" ).arg( i+1 ), eng(), i );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-		m_osc[i].volKnob->setInitValue( DEFAULT_VOLUME / 3 );
+		m_osc[i].volKnob->setInitValue( DEFAULT_VOLUME
+							/ NUM_OF_OSCILLATORS );
 		m_osc[i].volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 #ifdef QT4
@@ -238,7 +240,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobSmall_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng(), i );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
@@ -257,7 +259,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup coarse-knob
 		m_osc[i].coarseKnob = new knob( knobSmall_17, this,
 				tr("Osc %1 coarse detuning").arg( i + 1 ),
-								eng() );
+								eng(), i );
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
 						2 * NOTES_PER_OCTAVE, 1.0f );
@@ -279,7 +281,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].fineLKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-									eng() );
+								eng(), i );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineLKnob->setInitValue( 0.0f );
@@ -301,7 +303,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup knob for right fine-detuning
 		m_osc[i].fineRKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 fine detuning right"
-							).arg( i + 1 ), eng() );
+							).arg( i + 1 ),
+								eng(), i );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineRKnob->setInitValue( 0.0f );
@@ -323,7 +326,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].phaseOffsetKnob = new knob( knobSmall_17, this,
 							tr( "Osc %1 phase-"
 							"offset" ).arg( i+1 ),
-									eng() );
+								eng(), i );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
 		m_osc[i].phaseOffsetKnob->setRange( 0.0f, 360.0f, 1.0f );
 		m_osc[i].phaseOffsetKnob->setInitValue( 0.0f );
@@ -349,7 +352,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].stereoPhaseDetuningKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 stereo phase-"
 							"detuning" ).arg( i+1 ),
-									eng() );
+								eng(), i );
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
 		m_osc[i].stereoPhaseDetuningKnob->setRange( 0.0f, 360.0f,
 									1.0f );
@@ -371,6 +374,36 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				"between the phase-offset of left and right "
 				"channel. This is very good for creating wide "
 				"stereo-sounds." ).arg( i+1 ) );
+
+		// Connect knobs with oscillators' inputs
+		connect( m_osc[i].volKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateVolume( int ) ) );
+		connect( m_osc[i].panKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateVolume( int ) ) );
+		updateVolume( i );
+
+		connect( m_osc[i].coarseKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateDetuningLeft( int ) ) );
+		connect( m_osc[i].coarseKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateDetuningRight( int ) ) );
+		connect( m_osc[i].fineLKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateDetuningLeft( int ) ) );
+		connect( m_osc[i].fineRKnob, SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updateDetuningRight( int ) ) );
+		updateDetuningLeft( i );
+		updateDetuningRight( i );
+
+		connect( m_osc[i].phaseOffsetKnob,
+				SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updatePhaseOffsetLeft( int ) ) );
+		connect( m_osc[i].phaseOffsetKnob,
+				SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updatePhaseOffsetRight( int ) ) );
+		connect( m_osc[i].stereoPhaseDetuningKnob,
+				SIGNAL( idKnobChanged( int ) ),
+				this, SLOT( updatePhaseOffsetLeft( int ) ) );
+		updatePhaseOffsetLeft( i );
+		updatePhaseOffsetRight( i );
 
 		pixmapButton * sin_wave_btn = new pixmapButton( this, eng() );
 		sin_wave_btn->move( 188, 105 + i * 50 );
@@ -491,6 +524,9 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					SLOT( osc2UserDefWaveDblClick() ) );
 		}
 	}
+
+	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ),
+			this, SLOT( updateAllDetuning() ) );
 }
 
 
@@ -603,91 +639,52 @@ void tripleOscillator::playNote( notePlayHandle * _n )
 {
 	if( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getInstrumentTrack()->frequency( _n );
-
 		oscillator * oscs_l[NUM_OF_OSCILLATORS];
 		oscillator * oscs_r[NUM_OF_OSCILLATORS];
 
 		for( Sint8 i = NUM_OF_OSCILLATORS-1; i >= 0; --i )
 		{
 
-			float osc_detuning_l = pow( 2.0, (
-				(float)m_osc[i].coarseKnob->value() * 100.0f +
-				(float)m_osc[i].fineLKnob->value() ) / 1200.0f);
-			float osc_detuning_r = pow( 2.0, (
-				(float)m_osc[i].coarseKnob->value() * 100.0f +
-				(float)m_osc[i].fineRKnob->value() ) / 1200.0f);
-
-			float vol_fac_l = ( m_osc[i].panKnob->value() +
-						PANNING_RIGHT ) / 100.0f;
-			float vol_fac_r = ( PANNING_RIGHT -
-						m_osc[i].panKnob->value() ) /
-									100.0f;
-
-			if( vol_fac_l > 1.0f )
-			{
-				vol_fac_l = 1.0f;
-			}
-			if( vol_fac_r > 1.0f )
-			{
-				vol_fac_r = 1.0f;
-			}
-
 			// the third oscs needs no sub-oscs...
 			if( i == 2 )
 			{
-				oscs_l[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq*osc_detuning_l,
-						static_cast<int>(
-					m_osc[i].phaseOffsetKnob->value() +
-				m_osc[i].stereoPhaseDetuningKnob->value() ),
-						vol_fac_l,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate() );
-				oscs_r[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq*osc_detuning_r,
-						static_cast<int>(
-					m_osc[i].phaseOffsetKnob->value() ),
-						vol_fac_r,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate() );
+				oscs_l[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo3,
+						&_n->m_frequency,
+						&m_osc[i].detuningLeft,
+						&m_osc[i].phaseOffsetLeft,
+						&m_osc[i].volumeLeft );
+				oscs_r[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo3,
+						&_n->m_frequency,
+						&m_osc[i].detuningRight,
+						&m_osc[i].phaseOffsetRight,
+						&m_osc[i].volumeRight );
 			}
 			else
 			{
-				oscs_l[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
+				oscs_l[i] = new oscillator(
+						&m_osc[i].waveShape,
 						getModulationAlgo( i + 1 ),
-						freq*osc_detuning_l,
-						static_cast<int>(
-					m_osc[i].phaseOffsetKnob->value() +
-				m_osc[i].stereoPhaseDetuningKnob->value() ),
-						vol_fac_l,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate(),
+						&_n->m_frequency,
+						&m_osc[i].detuningLeft,
+						&m_osc[i].phaseOffsetLeft,
+						&m_osc[i].volumeLeft,
 							oscs_l[i + 1] );
-				oscs_r[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
+				oscs_r[i] = new oscillator(
+						&m_osc[i].waveShape,
 						getModulationAlgo( i + 1 ),
-						freq*osc_detuning_r,
-						static_cast<int>(
-					m_osc[i].phaseOffsetKnob->value() ),
-						vol_fac_r,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate(),
+						&_n->m_frequency,
+						&m_osc[i].detuningRight,
+						&m_osc[i].phaseOffsetRight,
+						&m_osc[i].volumeRight,
 								oscs_r[i + 1] );
 			}
 
-			if( m_osc[i].waveShape == oscillator::USER_DEF_WAVE )
-			{
-				oscs_l[i]->setUserWave(
-						m_osc[i].m_sampleBuffer );
-				oscs_r[i]->setUserWave(
-						m_osc[i].m_sampleBuffer );
-			}
+			oscs_l[i]->setUserWave( m_osc[i].m_sampleBuffer );
+			oscs_r[i]->setUserWave( m_osc[i].m_sampleBuffer );
 
 		}
 
@@ -810,15 +807,95 @@ void tripleOscillator::osc2UserDefWaveDblClick( void )
 
 
 
-oscillator::modulationAlgos tripleOscillator::getModulationAlgo( int _n )
+
+void tripleOscillator::updateVolume( int _i )
 {
-	if( _n == 1 )
+	float panningFactorLeft;
+	float panningFactorRight;
+
+	if( m_osc[_i].panKnob->value() >= 0.0f )
 	{
-		return( m_modulationAlgo1 );
+		panningFactorLeft = 1.0f - m_osc[_i].panKnob->value()
+						/ (float)PANNING_RIGHT;
+		panningFactorRight = 1.0f;
 	}
 	else
 	{
-		return( m_modulationAlgo2 );
+		panningFactorLeft = 1.0f;
+		panningFactorRight = 1.0f + m_osc[_i].panKnob->value()
+						/ (float)PANNING_RIGHT;
+	}
+
+	m_osc[_i].volumeLeft = panningFactorLeft * m_osc[_i].volKnob->value()
+								/ 100.0f;
+	m_osc[_i].volumeRight = panningFactorRight * m_osc[_i].volKnob->value()
+								/ 100.0f;
+}
+
+
+
+
+void tripleOscillator::updateDetuningLeft( int _i )
+{
+	m_osc[_i].detuningLeft = powf( 2.0f, (
+			(float)m_osc[_i].coarseKnob->value() * 100.0f +
+			(float)m_osc[_i].fineLKnob->value() ) / 1200.0f )
+			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+}
+
+
+
+
+void tripleOscillator::updateDetuningRight( int _i )
+{
+	m_osc[_i].detuningRight = powf( 2.0f, (
+			(float)m_osc[_i].coarseKnob->value() * 100.0f +
+			(float)m_osc[_i].fineRKnob->value() ) / 1200.0f )
+			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+}
+
+
+
+
+void tripleOscillator::updateAllDetuning( void )
+{
+	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
+	{
+		updateDetuningLeft( i );
+		updateDetuningRight( i );
+	}
+}
+
+
+
+
+void tripleOscillator::updatePhaseOffsetLeft( int _i )
+{
+	m_osc[_i].phaseOffsetLeft = ( m_osc[_i].phaseOffsetKnob->value() +
+			m_osc[_i].stereoPhaseDetuningKnob->value() ) / 360.0f;
+}
+
+
+
+
+void tripleOscillator::updatePhaseOffsetRight( int _i )
+{
+	m_osc[_i].phaseOffsetRight = m_osc[_i].phaseOffsetKnob->value()
+								/ 360.0f;
+}
+
+
+
+
+oscillator::modulationAlgos * tripleOscillator::getModulationAlgo( int _n )
+{
+	if( _n == 1 )
+	{
+		return( &m_modulationAlgo1 );
+	}
+	else
+	{
+		return( &m_modulationAlgo2 );
 	}
 }
 

@@ -29,245 +29,171 @@
 
 
 
-oscillator::oscillator( const modulationAlgos _modulation_algo,
-			const float _freq, const Sint16 _phase_offset,
-			const float _volume_factor, const volumeKnob * _volume_knob,
-			const sample_rate_t _sample_rate,
+oscillator::oscillator( const waveShapes * _wave_shape,
+			const modulationAlgos * _modulation_algo,
+			const float * _freq,
+			const float * _detuning,
+			const float * _phase_offset,
+			const float * _volume,
 			oscillator * _sub_osc ) :
+	m_waveShape( _wave_shape ),
+	m_modulationAlgo( _modulation_algo ),
 	m_freq( _freq ),
-	m_volumeFactor( _volume_factor ),
-	m_volumeKnob( _volume_knob ),
-	m_phaseOffset( _phase_offset ),
-	m_sampleRate( _sample_rate ),
+	m_detuning( _detuning ),
+	m_volume( _volume ),
+	m_ext_phaseOffset( _phase_offset ),
 	m_subOsc( _sub_osc ),
 	m_userWave( NULL )
 {
+	m_phaseOffset = *m_ext_phaseOffset;
+	m_phase = m_phaseOffset;
+}
+
+
+
+
+void oscillator::update( sampleFrame * _ab, const fpab_t _frames, const ch_cnt_t _chnl )
+{
 	if( m_subOsc != NULL )
 	{
-		switch( _modulation_algo )
+		switch( *m_modulationAlgo )
 		{
 			case FREQ_MODULATION:
-				m_callUpdate = &oscillator::updateFM;
+				updateFM( _ab, _frames, _chnl );
 				break;
-
 			case AMP_MODULATION:
-				m_callUpdate = &oscillator::updateAM;
+				updateAM( _ab, _frames, _chnl );
 				break;
-
 			case MIX:
-				m_callUpdate = &oscillator::updateMix;
+				updateMix( _ab, _frames, _chnl );
 				break;
 			case SYNC:
-				m_callUpdate = &oscillator::updateSync;
+				updateSync( _ab, _frames, _chnl );
 				break;
 		}
 	}
 	else
 	{
-		m_callUpdate = &oscillator::updateNoSub;
+		updateNoSub( _ab, _frames, _chnl );
 	}
-
-	recalcOscCoeff();
 }
 
-
-
-float oscillator::volumeFactor( void )
-{
-	return( m_volumeFactor * m_volumeKnob->value() / 100.0f );
-}
 
 
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
-#define defineNoSubUpdateFor(x,getSampleFunction) 			\
-void x::updateNoSub( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl )	\
-{									\
-	for( fpab_t frame = 0; frame < _frames; ++frame )		\
-	{								\
-		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * volumeFactor();	\
-	}								\
+void oscillator::updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
 }
 
 
 // do fm by using sub-osc as modulator
-#define defineFMUpdateFor(x,getSampleFunction)				\
-void x::updateFM( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl )	\
-{									\
-	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( fpab_t frame = 0; frame < _frames; ++frame )		\
-	{								\
-		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
-							m_oscCoeff +	\
-						_ab[frame][_chnl] ) *	\
-							volumeFactor();	\
-		/* following line is REAL FM */				\
-/*		float new_freq = powf( 2.0, _ab[frame][_chnl] );	\
-		_ab[frame][_chnl] = getSampleFunction( ++m_sample*((m_freq * \
-		new_freq )/mixer::inst()->sampleRate() )) * volumeFactor();  \
-		_ab[frame][_chnl] = getSampleFunction( ++m_sample*(m_oscCoeff *\
-			_ab[frame][_chnl] )) * volumeFactor();*/	\
-	}								\
+void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		m_phase += _ab[frame][_chnl];
+		if ( m_phase < 0.0f )
+		{
+			m_phase -= floorf(m_phase);
+		}
+		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
 }
 
 
 // do am by using sub-osc as modulator
-#define defineAMUpdateFor(x,getSampleFunction)				\
-void x::updateAM( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl )	\
-{									\
-	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( fpab_t frame = 0; frame < _frames; ++frame )		\
-	{								\
-		_ab[frame][_chnl] *= getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * volumeFactor();	\
-	}								\
+void oscillator::updateAM( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] *= getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
 }
 
 
 // do mix by using sub-osc as mix-sample
-#define defineMixUpdateFor(x,getSampleFunction)				\
-void x::updateMix( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl )	\
-{									\
-	m_subOsc->update( _ab, _frames, _chnl );			\
-	for( fpab_t frame = 0; frame < _frames; ++frame )		\
-	{								\
-		_ab[frame][_chnl] += getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * volumeFactor();	\
-	}								\
+void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] += getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
 }
 
 
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
-#define defineSyncUpdateFor(x,getSampleFunction)			\
-void x::updateSync( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl )	\
-{									\
-	for( fpab_t frame = 0; frame < _frames ; ++frame )		\
-	{								\
-		if( m_subOsc->syncOk() )				\
-		{							\
-			sync();						\
-		}							\
-		_ab[frame][_chnl] = getSampleFunction( ++m_sample *	\
-					m_oscCoeff ) * volumeFactor();	\
-	}								\
+void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames ; ++frame )
+	{
+		if( m_subOsc->syncOk( sub_osc_coeff ) )
+		{
+			m_phase = m_phaseOffset;
+		}
+		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
 }
 
 
 
-#define generateOscillatorCodeFor(x,getSampleFunction);			\
-class x : public oscillator						\
-{									\
-public:									\
-	inline x( const modulationAlgos modulation_algo,		\
-						const float _freq,	\
-		const Sint16 _phase_offset, const float _volume_factor,	\
-		const volumeKnob * _volume_knob,			\
-		const sample_rate_t _sample_rate,			\
-				oscillator * _sub_osc ) :		\
-	oscillator( modulation_algo, _freq, _phase_offset,		\
-			_volume_factor, _volume_knob,			\
-			_sample_rate, _sub_osc )			\
-	{								\
-	}								\
-	virtual ~x()							\
-	{								\
-	}								\
-									\
-protected:								\
-	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,	\
-						const ch_cnt_t _chnl );	\
-	void updateFM( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl );	\
-	void updateAM( sampleFrame * _ab, const fpab_t _frames,		\
-						const ch_cnt_t _chnl );	\
-	void updateMix( sampleFrame * _ab, const fpab_t _frames,	\
-						const ch_cnt_t _chnl );	\
-	void updateSync( sampleFrame * _ab, const fpab_t _frames,	\
-						const ch_cnt_t _chnl );	\
-									\
-} ;									\
-									\
-defineNoSubUpdateFor( x, getSampleFunction )				\
-defineFMUpdateFor( x, getSampleFunction )				\
-defineAMUpdateFor( x, getSampleFunction )				\
-defineMixUpdateFor( x, getSampleFunction )				\
-defineSyncUpdateFor( x, getSampleFunction )
 
-
-generateOscillatorCodeFor( sinWaveOsc, sinSample );
-generateOscillatorCodeFor( triangleWaveOsc, triangleSample );
-generateOscillatorCodeFor( sawWaveOsc, sawSample );
-generateOscillatorCodeFor( squareWaveOsc, squareSample );
-generateOscillatorCodeFor( moogSawWaveOsc, moogSawSample );
-generateOscillatorCodeFor( expWaveOsc, expSample );
-generateOscillatorCodeFor( noiseWaveOsc, noiseSample );
-generateOscillatorCodeFor( userWaveOsc, userWaveSample );
-
-
-
-oscillator * oscillator::createOsc( const waveShapes _wave_shape,
-					const modulationAlgos _modulation_algo,
-					const float _freq,
-					const Sint16 _phase_offset,
-					const float _volume_factor,
-					const volumeKnob * _volume_knob,
-					const sample_rate_t _sample_rate,
-							oscillator * _sub_osc )
+inline sample_t oscillator::getSample( const float _sample )
 {
-	switch( _wave_shape )
+	switch( *m_waveShape )
 	{
 		case SIN_WAVE:
-			return( new sinWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( sinSample( _sample ) );
 		case TRIANGLE_WAVE:
-			return( new triangleWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( triangleSample( _sample ) );
 		case SAW_WAVE:
-			return( new sawWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( sawSample( _sample ) );
 		case SQUARE_WAVE:
-			return( new squareWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( squareSample( _sample ) );
 		case MOOG_SAW_WAVE:
-			return( new moogSawWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( moogSawSample( _sample ) );
 		case EXP_WAVE:
-			return( new expWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( expSample( _sample ) );
 		case WHITE_NOISE_WAVE:
-			return( new noiseWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( noiseSample( _sample ) );
 		case USER_DEF_WAVE:
-			return( new userWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( userWaveSample( _sample ) );
 		default:
-			return( new sinWaveOsc( _modulation_algo, _freq,
-						_phase_offset, _volume_factor,
-						_volume_knob,
-						_sample_rate, _sub_osc ) );
+			return( sinSample( _sample ) );
 	}
 
 }
@@ -275,21 +201,41 @@ oscillator * oscillator::createOsc( const waveShapes _wave_shape,
 
 
 
-// should be called every time phase-offset or frequency is changed...
-void oscillator::recalcOscCoeff( const float additional_phase_offset )
+// should be called every time phase-offset is changed...
+inline void oscillator::recalcPhase( void )
 {
-	m_oscCoeff = m_freq / static_cast<float>( m_sampleRate );
-
-	m_sample = static_cast<f_cnt_t>( ( m_phaseOffset * ( 1.0f / 360.0f ) +
-						additional_phase_offset ) *
-						( m_sampleRate / m_freq ) );
-	// because we pre-increment m_sample in update-function, we should
-	// decrement it here... (not possible when 0 because it is
-	// unsigned - overflow!!!)
-	if( m_sample > 0 )
+	if( m_phaseOffset != *m_ext_phaseOffset )
 	{
-		--m_sample;
+		m_phase += 1.0f - m_phaseOffset;
+		m_phaseOffset = *m_ext_phaseOffset;
+		m_phase += m_phaseOffset;
 	}
+	m_phase = fraction( m_phase );
+}
+
+
+
+
+inline bool oscillator::syncOk( float _osc_coeff )
+{
+	const float v1 = m_phase;
+	m_phase += _osc_coeff;
+	// check whether m_phase is in next period
+	return( floorf( m_phase ) > floorf( v1 ) );
+}
+
+
+
+
+float oscillator::syncInit( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	if( m_subOsc != NULL )
+	{
+		m_subOsc->update( _ab, _frames, _chnl );
+	}
+	recalcPhase();
+	return( *m_freq * *m_detuning );
 }
 
 #endif

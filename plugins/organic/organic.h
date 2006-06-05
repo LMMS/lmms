@@ -88,6 +88,14 @@ private:
 		knob * panKnob;
 		knob * detuneKnob;
 		float harmonic;
+		float volumeLeft;
+		float volumeRight;
+		// normalized detuning -> x/sampleRate
+		float detuningLeft;
+		float detuningRight;
+		// normalized offset -> x/360
+		float phaseOffsetLeft;
+		float phaseOffsetRight;
 	};
 	
 	oscillatorData* m_osc;
@@ -98,9 +106,17 @@ private:
 		oscillator * oscRight;
 	} ;
 
+	const oscillator::modulationAlgos m_modulationAlgo;
+
 		knob * fx1Knob;
 		knob * volKnob;
 		pixmapButton * m_randBtn;
+
+private slots:
+
+	void updateVolume( int _i );
+	void updateDetuning( int _i );
+	void updateAllDetuning( void );
 
 } ;
 

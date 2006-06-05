@@ -28,8 +28,8 @@
 
 #include "types.h"
 
-const panning PANNING_LEFT = ( 0 - 100);
 const panning PANNING_RIGHT = ( 0 + 100);
+const panning PANNING_LEFT = - PANNING_RIGHT;
 const panning PANNING_CENTER = 0;
 const panning DEFAULT_PANNING = PANNING_CENTER;
 

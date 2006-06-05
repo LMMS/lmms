@@ -37,15 +37,6 @@
 #include "mixer.h"
 #include "sample_buffer.h"
 #include "lmms_constants.h"
-#include "volume_knob.h"
-
-
-// fwd-decl because we need it for the typedef below...
-class oscillator;
-
-typedef void ( oscillator:: * oscFuncPtr )
-		( sampleFrame * _ab, const fpab_t _frames,
-		  				const ch_cnt_t _chnl );
 
 
 class oscillator
@@ -68,11 +59,13 @@ public:
 		FREQ_MODULATION, AMP_MODULATION, MIX, SYNC
 	} ;
 
-	oscillator( const modulationAlgos _modulation_algo, const float _freq,
-			const Sint16 _phase_offset, const float _volume_factor,
-			const volumeKnob * _volume_knob,
-			const sample_rate_t _sample_rate,
-			oscillator * _m_subOsc ) FASTCALL;
+	oscillator( const waveShapes * _wave_shape,
+			const modulationAlgos * _modulation_algo,
+			const float * _freq,
+			const float * _detuning,
+			const float * _phase_offset,
+			const float * _volume,
+			oscillator * _m_subOsc = NULL ) FASTCALL;
 	virtual ~oscillator()
 	{
 		delete m_subOsc;
@@ -83,36 +76,9 @@ public:
 		m_userWave = _wave;
 	}
 
-	inline void update( sampleFrame * _ab, const fpab_t _frames,
-							const ch_cnt_t _chnl )
-	{
-		( this->*m_callUpdate )( _ab, _frames, _chnl );
-	}
+	void update( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
 
-	inline void setNewFreq( const float _new_freq )
-	{
-		// save current state - we need it later for restoring same
-		// phase (otherwise we'll get clicks in the audio-stream)
-		const float v = m_sample * m_oscCoeff;
-		m_freq = _new_freq;
-		recalcOscCoeff( fraction( v ) );
-	}
-
-	static oscillator * FASTCALL createOsc( const waveShapes _wave_shape,
-					const modulationAlgos _modulation_algo,
-					const float _freq,
-					const Sint16 _phase_offset,
-					const float _volume_factor,
-					const volumeKnob * _volume_knob,
-					const sample_rate_t _sample_rate,
-						oscillator * _m_subOsc = NULL ); 
-	inline bool syncOk( void )
-	{
-		const float v1 = m_sample * m_oscCoeff;
-		const float v2 = ++m_sample * m_oscCoeff;
-		// check whether v2 is in next period
-		return( floorf( v2 ) > floorf( v1 ) );
-	}
 /*#define	FLOAT_TO_INT(in,out)		\
 	register const float round_const = -0.5f;			\
 	__asm__ __volatile__ ("fadd %%st,%%st(0)\n"		\
@@ -195,44 +161,36 @@ public:
 	}
 
 
-protected:
-	float m_freq;
-	float m_volumeFactor;
-	const volumeKnob * m_volumeKnob;
-	Sint16 m_phaseOffset;
-	const sample_rate_t m_sampleRate;
+private:
+	const waveShapes * m_waveShape;
+	const modulationAlgos * m_modulationAlgo;
+	const float * m_freq;
+	const float * m_detuning;
+	const float * m_volume;
+	const float * m_ext_phaseOffset;
 	oscillator * m_subOsc;
-	f_cnt_t m_sample;
-	float m_oscCoeff;
+	float m_phaseOffset;
+	float m_phase;
 	sampleBuffer * m_userWave;
-	oscFuncPtr m_callUpdate;
 
 
-	float volumeFactor( void );
+	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	void updateFM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	void updateAM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	void updateMix( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	void updateSync( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
 
-	virtual void FASTCALL updateNoSub( sampleFrame * _ab,
-						const fpab_t _frames,
-						const ch_cnt_t _chnl ) = 0;
-	virtual void FASTCALL updateFM( sampleFrame * _ab,
-						const fpab_t _frames,
-						const ch_cnt_t _chnl ) = 0;
-	virtual void FASTCALL updateAM( sampleFrame * _ab,
-						const fpab_t _frames,
-						const ch_cnt_t _chnl ) = 0;
-	virtual void FASTCALL updateMix( sampleFrame * _ab,
-						const fpab_t _frames,
-						const ch_cnt_t _chnl ) = 0;
-	virtual void FASTCALL updateSync( sampleFrame * _ab,
-						const fpab_t _frames,
-						const ch_cnt_t _chnl ) = 0;
+	float syncInit( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	bool syncOk( float _osc_coeff );
 
-	inline void sync( void )
-	{
-		m_sample = 0;
-	}
-
-	void FASTCALL recalcOscCoeff( const float _additional_phase_offset =
-									0.0 );
+	sample_t getSample( const float _sample );
+	void FASTCALL recalcPhase( void );
 
 } ;
 

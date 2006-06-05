@@ -97,14 +97,24 @@ QPixmap * organicInstrument::s_artwork = NULL;
 organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track,
 			&organic_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
+	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
+	m_modulationAlgo( oscillator::MIX )
 {
 
 
 	m_num_oscillators = 8;
-	
+
 	m_osc = new oscillatorData[m_num_oscillators];
 	
+	m_osc[0].harmonic = log2f( 0.5f );	//	one octave below
+	m_osc[1].harmonic = log2f( 0.75f );	//	a fifth below
+	m_osc[2].harmonic = log2f( 1.0f );	// base freq
+	m_osc[3].harmonic = log2f( 2.0f );	// first overtone
+	m_osc[4].harmonic = log2f( 3.0f );	// second overtone
+	m_osc[5].harmonic = log2f( 4.0f );	// .
+	m_osc[6].harmonic = log2f( 5.0f );	// .
+	m_osc[7].harmonic = log2f( 6.0f );	// .
+
 	for (int i=0; i < m_num_oscillators; i++)
 	{
 		m_osc[i].waveShape = oscillator::SIN_WAVE;
@@ -124,7 +134,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 										
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobGreen_17, this, tr(
-					"Osc %1 volume" ).arg( i+1 ), eng() );
+				"Osc %1 volume" ).arg( i+1 ), eng(), i );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
 		m_osc[i].volKnob->setInitValue( 100 );
@@ -133,7 +143,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobGreen_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng(), i );
 		m_osc[i].panKnob->move( 25+i*20, 130 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
@@ -143,7 +153,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].detuneKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-									eng() );
+								eng(), i );
 		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].detuneKnob->setInitValue( 0.0f );
@@ -151,10 +161,21 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							"left:" ).arg( i + 1 )
 							+ " ", " " +
 							tr( "cents" ) );
-							
-						
-							
+
+		connect( m_osc[i].volKnob, SIGNAL( idKnobChanged( int ) ),
+					this, SLOT( updateVolume( int ) ) );
+		connect( m_osc[i].panKnob, SIGNAL( idKnobChanged( int ) ),
+					this, SLOT( updateVolume( int ) ) );
+		updateVolume( i );
+
+		connect( m_osc[i].detuneKnob, SIGNAL ( idKnobChanged( int ) ),
+					this, SLOT( updateDetuning( int ) ) );
+		updateDetuning( i );
+
 	}
+
+	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ),
+			this, SLOT( updateAllDetuning() ) );
 
 		// setup knob for FX1
 		fx1Knob = new knob( knobGreen_17, this,
@@ -185,18 +206,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		connect( m_randBtn, SIGNAL ( clicked() ),
 			this, SLOT( randomiseSettings() ) );
 
-	// set harmonics
 
-	m_osc[0].harmonic = 0.5f;	//	one octave below
-	m_osc[1].harmonic = 0.75f;	//	a fifth below
-	m_osc[2].harmonic = 1.0f;	// base freq
-	m_osc[3].harmonic = 2.0f;	// first overtone
-	m_osc[4].harmonic = 3.0f;	// second overtone
-	m_osc[5].harmonic = 4.0f;	// .
-	m_osc[6].harmonic = 5.0f;	// .
-	m_osc[7].harmonic = 6.0f;	// .
-
-			
 	if( s_artwork == NULL )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
@@ -289,84 +299,58 @@ void organicInstrument::playNote( notePlayHandle * _n )
 {
 	if( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getInstrumentTrack()->frequency( _n );
-
 		oscillator * oscs_l[m_num_oscillators];
 		oscillator * oscs_r[m_num_oscillators];
 
 		for( Sint8 i = m_num_oscillators-1; i >= 0; --i )
 		{
 			
-			// volume
-			float volume = 1.0 / m_num_oscillators ;
-			float volume_l = volume * ( m_osc[i].panKnob->value() +
-						PANNING_RIGHT ) / 100.0f;
-			float volume_r = volume * ( PANNING_RIGHT -
-						m_osc[i].panKnob->value() ) /
-									100.0f;
-
-			// detuning
-			float osc_detuning_l = +m_osc[i].detuneKnob->value() / 10.0f;
-			float osc_detuning_r = -m_osc[i].detuneKnob->value() / 10.0f;
-			
-			// frequency
-			float freq_l = freq * m_osc[i].harmonic + osc_detuning_l;
-			float freq_r = freq * m_osc[i].harmonic + osc_detuning_r;
-			
-			// randomize the phaseOffset [0,360]
-			int phase_l = (int) (rand() * 360.0);
-			int phase_r = (int) (rand() * 360.0);
+			// randomize the phaseOffset [0,1)
+			m_osc[i].phaseOffsetLeft = rand()
+							/ ( RAND_MAX + 1.0f );
+			m_osc[i].phaseOffsetRight = rand()
+							/ ( RAND_MAX + 1.0f );
 			
 
-			
-			// Nyquist boundary check
-			if (freq > (eng()->getMixer()->sampleRate() >> 2))
-			{
-				volume = 0;
-			}
 			
 			// initialise ocillators
 			
 			if (i == (m_num_oscillators-1)) {
 				// create left oscillator
-				oscs_l[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq_l,
-						phase_l,
-						volume_l,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate() );
+				oscs_l[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo,
+						&_n->m_frequency,
+						&m_osc[i].detuningLeft,
+						&m_osc[i].phaseOffsetLeft,
+						&m_osc[i].volumeLeft );
 				// create right oscillator
-				oscs_r[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq_r,
-						phase_r,
-						volume_r,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate() );	
+				oscs_r[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo,
+						&_n->m_frequency,
+						&m_osc[i].detuningRight,
+						&m_osc[i].phaseOffsetRight,
+						&m_osc[i].volumeRight );	
 					
 			} else {
 				// create left oscillator
-				oscs_l[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq_l,
-						phase_l,
-						volume_l,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate(),
+				oscs_l[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo,
+						&_n->m_frequency,
+						&m_osc[i].detuningLeft,
+						&m_osc[i].phaseOffsetLeft,
+						&m_osc[i].volumeLeft,
 					oscs_l[i + 1] );
 				// create right oscillator
-				oscs_r[i] = oscillator::createOsc(
-						m_osc[i].waveShape,
-						oscillator::MIX,
-						freq_r,
-						phase_r,
-						volume_r,
-						m_osc[i].volKnob,
-					eng()->getMixer()->sampleRate(),
+				oscs_r[i] = new oscillator(
+						&m_osc[i].waveShape,
+						&m_modulationAlgo,
+						&_n->m_frequency,
+						&m_osc[i].detuningRight,
+						&m_osc[i].phaseOffsetRight,
+						&m_osc[i].volumeRight,
 					oscs_r[i + 1] );					
 				
 			}
@@ -398,8 +382,10 @@ void organicInstrument::playNote( notePlayHandle * _n )
 	
 	for (int i=0 ; i < frames ; i++)
 	{
-		buf[i][0] = waveshape( buf[i][0], t ) * volKnob->value() / 100.0;	
-		buf[i][1] = waveshape( buf[i][1], t ) * volKnob->value() / 100.0;	
+		buf[i][0] = waveshape( buf[i][0], t ) * volKnob->value()
+								/ 100.0f;
+		buf[i][1] = waveshape( buf[i][1], t ) * volKnob->value()
+								/ 100.0f;
 	}
 	
 	// -- --
@@ -504,6 +490,46 @@ void organicInstrument::randomiseSettings()
 	}
 	
 }
+
+
+
+
+void organicInstrument::updateVolume( int _i )
+{
+	m_osc[_i].volumeLeft =
+		( 1.0f - m_osc[_i].panKnob->value() / (float)PANNING_RIGHT )
+		* m_osc[_i].volKnob->value() / m_num_oscillators / 100.0f;
+	m_osc[_i].volumeRight =
+		( 1.0f + m_osc[_i].panKnob->value() / (float)PANNING_RIGHT )
+		* m_osc[_i].volKnob->value() / m_num_oscillators / 100.0f;
+}
+
+
+
+
+void organicInstrument::updateDetuning( int _i )
+{
+	m_osc[_i].detuningLeft = powf( 2.0f, m_osc[_i].harmonic
+			+ (float)m_osc[_i].detuneKnob->value() / 100.0f )
+			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+	m_osc[_i].detuningRight = powf( 2.0f, m_osc[_i].harmonic
+			- (float)m_osc[_i].detuneKnob->value() / 100.0f )
+			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+}
+
+
+
+
+void organicInstrument::updateAllDetuning( void )
+{
+	for( int i = 0; i < m_num_oscillators; ++i )
+	{
+		updateDetuning( i );
+	}
+}
+
+
+
 
 int organicInstrument::intRand( int min, int max )
 {

@@ -73,6 +73,13 @@ protected slots:
 	void mod1Ch( int _n );
 	void mod2Ch( int _n );
 
+	void updateVolume( int _i );
+	void updateDetuningLeft( int _i );
+	void updateDetuningRight( int _i );
+	void updateAllDetuning( void );
+	void updatePhaseOffsetLeft( int _i );
+	void updatePhaseOffsetRight( int _i );
+
 
 private:
 	instrumentTrack * m_instrumentTrack;
@@ -90,6 +97,14 @@ private:
 		automatableButtonGroup * waveBtnGrp;
 		pixmapButton * usrWaveBtn;
 		sampleBuffer * m_sampleBuffer;
+		float volumeLeft;
+		float volumeRight;
+		// normalized detuning -> x/sampleRate
+		float detuningLeft;
+		float detuningRight;
+		// normalized offset -> x/360
+		float phaseOffsetLeft;
+		float phaseOffsetRight;
 	} m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
@@ -103,10 +118,11 @@ private:
 			oscillator::modulationAlgos _modulation_algo, int _n );*/
 /*	void FASTCALL setModulationAlgo(
 		oscillator::modulationAlgos _new_modulation_algo, int _n );*/
-	oscillator::modulationAlgos FASTCALL getModulationAlgo( int _n );
+	oscillator::modulationAlgos * FASTCALL getModulationAlgo( int _n );
 
 	oscillator::modulationAlgos m_modulationAlgo1;
 	oscillator::modulationAlgos m_modulationAlgo2;
+	const oscillator::modulationAlgos m_modulationAlgo3;
 
 	automatableButtonGroup * m_mod1BtnGrp;
 	automatableButtonGroup * m_mod2BtnGrp;
