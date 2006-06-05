@@ -59,6 +59,10 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_arpNote( _arp_note ),
 	m_muted( FALSE )
 {
+	connect( m_instrumentTrack, SIGNAL( baseNoteChanged() ),
+					this, SLOT( updateFrequency() ) );
+	updateFrequency();
+
 	setFrames( _frames );
 	if( !configManager::inst()->value( "ui",
 						"manualchannelpiano" ).toInt() )
@@ -389,6 +393,17 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			m_muted == _nph.m_muted );
 }
 
+
+
+
+void notePlayHandle::updateFrequency( void )
+{
+	m_frequency = m_instrumentTrack->frequency( this );
+}
+
+
+
+#include "note_play_handle.moc"
 
 
 #endif

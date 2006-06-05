@@ -27,6 +27,8 @@
 #ifndef _NOTE_PLAY_HANDLE_H
 #define _NOTE_PLAY_HANDLE_H
 
+#include <qobject.h>
+
 #include "play_handle.h"
 #include "basic_filters.h"
 #include "note.h"
@@ -39,11 +41,14 @@ typedef vvector<notePlayHandle *> notePlayHandleVector;
 typedef vvector<const notePlayHandle *> constNotePlayHandleVector;
 
 
-class notePlayHandle : public playHandle, public note
+class notePlayHandle : public QObject, public playHandle, public note
 {
+	Q_OBJECT
 public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
+
+	float m_frequency;
 
 	notePlayHandle( instrumentTrack * _chnl_trk, const f_cnt_t _frames_ahead,
 					const f_cnt_t _frames, const note & _n,
@@ -190,6 +195,10 @@ private:
 					// an arpeggio (either base-note or
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
+
+
+private slots:
+	void updateFrequency( void );
 
 } ;
 
