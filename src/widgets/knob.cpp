@@ -86,7 +86,8 @@ textFloat * knob::s_textFloat = NULL;
 
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
-							engine * _engine ) :
+							engine * _engine,
+							const int _knob_id ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
@@ -100,7 +101,8 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
 	m_label( "" ),
-	m_initValue( 0.0f )
+	m_initValue( 0.0f ),
+	m_knobId( _knob_id )
 {
 	if( s_textFloat == NULL )
 	{
@@ -246,6 +248,7 @@ void knob::valueChange( void )
 	recalcAngle();
 	update();
 	emit valueChanged( value() );
+	emit idKnobChanged( m_knobId );
 }
 
 
@@ -458,6 +461,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( value() );
+		emit idKnobChanged( m_knobId );
 		if( !configManager::inst()->value( "knobs",
 						"classicalusability").toInt() )
 		{
@@ -572,6 +576,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( value() );
+	emit idKnobChanged( m_knobId );
 }
 
 
@@ -580,6 +585,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 void knob::buttonReleased( void )
 {
 	emit valueChanged( value() );
+	emit idKnobChanged( m_knobId );
 }
 
 

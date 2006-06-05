@@ -44,7 +44,7 @@ class volumeKnob: public knob
 	Q_OBJECT
 public:
 	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-		    engine * _engine );
+		    engine * _engine, const int _knob_id = 0 );
 	~volumeKnob();
 
 public slots:

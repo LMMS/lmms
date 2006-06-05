@@ -64,7 +64,8 @@ class knob : public QWidget, public automatableObject<float>
 	Q_OBJECT
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name,
-							engine * _engine );
+						engine * _engine,
+						const int _knob_id = 0 );
 	virtual ~knob();
 
     
@@ -97,10 +98,11 @@ public slots:
 
 signals:
 	void valueChanged( float value );
+	void idKnobChanged( int id );
 	void sliderPressed( void );
 	void sliderReleased( void );
 	void sliderMoved( float value );
-    
+
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
@@ -156,6 +158,7 @@ protected:
 
 
 	float m_initValue;
+	const int m_knobId;
 
 } ;
 
