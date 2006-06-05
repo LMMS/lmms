@@ -121,10 +121,8 @@ public:
 	volume getVolume( void ) const;
 	void FASTCALL setSurroundAreaPos( const QPoint & _p );
 	const QPoint & surroundAreaPos( void ) const;
-	
-	// base-tone stuff
-	void FASTCALL setBaseTone( tones _new_tone );
-	void FASTCALL setBaseOctave( octaves _new_octave );
+
+	void FASTCALL setBaseNote( Uint32 _new_note );
 
 	inline tones baseTone( void ) const
 	{
@@ -174,6 +172,10 @@ public slots:
 	void surroundAreaPosChanged( const QPoint & _new_p );
 	void textChanged( const QString & _new_name );
 	void toggledInstrumentTrackButton( bool _on );
+
+
+signals:
+	void baseNoteChanged( void );
 
 
 protected:
@@ -257,6 +259,10 @@ private:
 	friend class notePlayHandle;
 	friend class presetPreviewPlayHandle;
 	friend class flpImport;
+
+	// base-tone stuff
+	void FASTCALL setBaseTone( tones _new_tone );
+	void FASTCALL setBaseOctave( octaves _new_octave );
 
 
 signals:

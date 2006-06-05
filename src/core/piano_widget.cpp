@@ -221,7 +221,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton )
 	{
 		// get pressed key
-		int key_num = getKeyFromMouse( _me->pos() );
+		Uint32 key_num = getKeyFromMouse( _me->pos() );
 		if( _me->pos().y() > PIANO_BASE )
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
@@ -250,10 +250,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			m_instrumentTrack->setBaseTone( static_cast<tones>(
-						key_num % NOTES_PER_OCTAVE ) );
-			m_instrumentTrack->setBaseOctave( static_cast<octaves>(
-						key_num / NOTES_PER_OCTAVE ) );
+			m_instrumentTrack->setBaseNote( key_num );
 		}
 
 		// and let the user see that he pressed a key... :)
@@ -328,10 +325,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else
 			{
-				m_instrumentTrack->setBaseTone( (tones)
-					( key_num % NOTES_PER_OCTAVE ) );
-				m_instrumentTrack->setBaseOctave( (octaves)
-					( key_num / NOTES_PER_OCTAVE ) );
+				m_instrumentTrack->setBaseNote( key_num );
 			}
 		}
 		// and let the user see that he pressed a key... :)

@@ -821,13 +821,23 @@ const QPoint & instrumentTrack::surroundAreaPos( void ) const
 
 
 
+void instrumentTrack::setBaseNote( Uint32 _new_note )
+{
+	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
+	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
+	eng()->getSongEditor()->setModified();
+	emit baseNoteChanged();
+}
+
+
+
+
 void instrumentTrack::setBaseTone( tones _new_tone )
 {
 	if( _new_tone >= C && _new_tone <= H )
 	{
 		m_baseTone = _new_tone;
 	}
-	eng()->getSongEditor()->setModified();
 }
 
 
@@ -839,7 +849,6 @@ void instrumentTrack::setBaseOctave( octaves _new_octave )
 	{
 		m_baseOctave = _new_octave;
 	}
-	eng()->getSongEditor()->setModified();
 }
 
 

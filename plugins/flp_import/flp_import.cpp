@@ -475,10 +475,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MiddleNote:
 				data += 8;
-				it->setBaseTone( static_cast<tones>( data %
-							NOTES_PER_OCTAVE ) );
-				it->setBaseOctave( static_cast<octaves>( data /
-							NOTES_PER_OCTAVE ) );
+				it->setBaseNote( data );
 				it->m_pianoWidget->update();
 				break;
 
