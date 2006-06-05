@@ -71,6 +71,7 @@ lmms_MOC =						\
 		./nstate_button.moc			\
 		./midi_alsa_seq.moc			\
 		./midi_tab_widget.moc			\
+		./note_play_handle.moc			\
 		./pattern.moc				\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
