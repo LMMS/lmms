@@ -1,3 +1,65 @@
+2006-06-05	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/oscillator.h:
+	* include/panning.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* src/lib/oscillator.cpp:
+	oscillator rewrite, now many parameters may be changed between audio
+	buffer updates
+
+	* Makefile.am:
+	note_play_handle is now a QObject
+
+	* data/projects/cool_songs/Djeezus-BeatRolls.mmp:
+	* data/projects/cool_songs/Djeezus-Oscilisous.mmp:
+	* data/projects/cool_songs/Marfil-MarfilDrum01.mmp:
+	* data/projects/cool_songs/Mart-Concave_flow.mmp:
+	* data/projects/cool_songs/Mart-Dirt_Track.mmp:
+	* data/projects/cool_songs/MaxFellner-Ease.mmp:
+	* data/projects/cool_songs/SharkyX-DeadManDancing.mmp:
+	* data/projects/cool_songs/SharkyX-Experiments.mmp:
+	* data/projects/cool_songs/Siegel-DreamWave.mmp:
+	* data/projects/cool_songs/TobyDox-Confused.mmp:
+	* data/projects/cool_songs/TobyDox-Psycho.mmp:
+	* data/projects/cool_songs/TobyDox-TheFourthDimension.mmp:
+	* data/projects/covers/J.S.Bach-Preludium_and_Fugue_A-Minor.mmp:
+	* data/projects/demos/basses-demo.mmp:
+	* data/projects/demos/beat-collection.mmp:
+	* data/projects/demos/demo1.mmp:
+	* data/projects/demos/demo3.mmp:
+	* data/projects/demos/demo5.mmp:
+	* data/projects/demos/demo6.mmp:
+	* data/projects/demos/loop_collection.mmp:
+	* data/projects/demos/some_basslines.mmp:
+	* data/projects/misc/1st.mmp:
+	* data/projects/misc/time_machine.mmp:
+	* data/projects/templates/AcousticDrumset.mpt:
+	* data/projects/templates/ClubMix.mpt:
+	* data/presets/AudioFileProcessor/Bass-Mania.cs.xml:
+	* data/presets/AudioFileProcessor/Fat-Reversed-Kick.cs.xml:
+	* data/presets/AudioFileProcessor/Kick-4-your-Subwoofer.cs.xml:
+	reverted audiofileprocessors to not point to /usr/local/share/lmms, they
+	should continue working
+
+	* include/knob.h:
+	* include/volume_knob.h:
+	* src/widgets/knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	added knob id
+
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	update note frequency when changing base note in instrument track
+
+	* include/instrument_track.h:
+	* plugins/flp_import/flp_import.cpp:
+	* src/core/piano_widget.cpp:
+	* src/tracks/instrument_track.cpp:
+	unify method to set a base note
+
 2006-06-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* acinclude.m4:
