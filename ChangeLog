@@ -1,3 +1,25 @@
+2006-06-09	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/lmms_math.h:
+	* include/oscillator.h:
+	* include/sample_buffer.h:
+	* src/lib/oscillator.cpp:
+	- reverted to PM and added FM as a new modulation method
+	- improved performance, specially PM/FM
+	- moved fraction() to global scope
+	- removed absolute value from userWaveSample, it's handled by fraction()
+
+	* plugins/triple_oscillator/pm_active.png:
+	* plugins/triple_oscillator/pm_inactive.png:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	added PM buttons, hid FM ones
+
+	* Makefile.am:
+	added lmms_math.h
+
+	* data/locale/ca.ts:
+	updated translation
+
 2006-06-05	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/oscillator.h:
