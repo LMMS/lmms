@@ -101,15 +101,15 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
 
-	pixmapButton * fm_osc1_btn = new pixmapButton( this, eng() );
-	fm_osc1_btn->move( 80, 50 );
-	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"fm_active" ) );
-	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"fm_inactive" ) );
-	fm_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	pixmapButton * pm_osc1_btn = new pixmapButton( this, eng() );
+	pm_osc1_btn->move( 80, 50 );
+	pm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"pm_active" ) );
+	pm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"pm_inactive" ) );
+	pm_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	toolTip::add( fm_osc1_btn, tr( "use frequency modulation for "
+	toolTip::add( pm_osc1_btn, tr( "use phase modulation for "
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
@@ -146,26 +146,39 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc1_btn, tr( "synchronize oscillator 1 with "
 							"oscillator 2" ) );
 
+	pixmapButton * fm_osc1_btn = new pixmapButton( this, eng() );
+	fm_osc1_btn->move( 330, 50 );
+	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"fm_active" ) );
+	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"fm_inactive" ) );
+	fm_osc1_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+						createHeuristicMask() ) );
+	toolTip::add( fm_osc1_btn, tr( "use frequency modulation for "
+					"modulating oscillator 2 with "
+					"oscillator 1" ) );
+
 	m_mod1BtnGrp = new automatableButtonGroup( this, eng() );
-	m_mod1BtnGrp->addButton( fm_osc1_btn );
+	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
 	m_mod1BtnGrp->addButton( sync_osc1_btn );
+	m_mod1BtnGrp->addButton( fm_osc1_btn );
 	m_mod1BtnGrp->setInitValue( m_modulationAlgo1 );
 
 	connect( m_mod1BtnGrp, SIGNAL( valueChanged( int ) ),
 						this, SLOT( mod1Ch( int ) ) );
 
 
-	pixmapButton * fm_osc2_btn = new pixmapButton( this, eng() );
-	fm_osc2_btn->move( 80, 70 );
-	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"fm_active" ) );
-	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"fm_inactive" ) );
-	fm_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	pixmapButton * pm_osc2_btn = new pixmapButton( this, eng() );
+	pm_osc2_btn->move( 80, 70 );
+	pm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"pm_active" ) );
+	pm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"pm_inactive" ) );
+	pm_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
 						createHeuristicMask() ) );
-	toolTip::add( fm_osc2_btn, tr( "use frequency modulation for "
+	toolTip::add( pm_osc2_btn, tr( "use phase modulation for "
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
@@ -202,11 +215,24 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc2_btn, tr( "synchronize oscillator 2 with "
 							"oscillator 3" ) );
 
+	pixmapButton * fm_osc2_btn = new pixmapButton( this, eng() );
+	fm_osc2_btn->move( 330, 70 );
+	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"fm_active" ) );
+	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"fm_inactive" ) );
+	fm_osc2_btn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+						createHeuristicMask() ) );
+	toolTip::add( fm_osc2_btn, tr( "use frequency modulation for "
+					"modulating oscillator 3 with "
+					"oscillator 2" ) );
+
 	m_mod2BtnGrp = new automatableButtonGroup( this, eng() );
-	m_mod2BtnGrp->addButton( fm_osc2_btn );
+	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
 	m_mod2BtnGrp->addButton( mix_osc2_btn );
 	m_mod2BtnGrp->addButton( sync_osc2_btn );
+	m_mod2BtnGrp->addButton( fm_osc2_btn );
 	m_mod2BtnGrp->setInitValue( m_modulationAlgo2 );
 
 	connect( m_mod2BtnGrp, SIGNAL( valueChanged( int ) ),
