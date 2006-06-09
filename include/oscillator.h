@@ -37,6 +37,7 @@
 #include "mixer.h"
 #include "sample_buffer.h"
 #include "lmms_constants.h"
+#include "lmms_math.h"
 
 
 class oscillator
@@ -56,7 +57,7 @@ public:
 
 	enum modulationAlgos
 	{
-		FREQ_MODULATION, AMP_MODULATION, MIX, SYNC
+		PHASE_MODULATION, AMP_MODULATION, MIX, SYNC, FREQ_MODULATION
 	} ;
 
 	oscillator( const waveShapes * _wave_shape,
@@ -85,11 +86,6 @@ public:
 				"fadd	%2\n"			\
 				"fistpl	%0\n"			\
 				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;*/
-
-	static inline float fraction( const float _sample )
-	{
-		return( _sample - static_cast<int>( _sample ) );
-	}
 
 	// now follow the wave-shape-routines...
 
@@ -176,13 +172,15 @@ private:
 
 	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
-	void updateFM( sampleFrame * _ab, const fpab_t _frames,
+	void updatePM( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
 	void updateAM( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
 	void updateMix( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
 	void updateSync( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	void updateFM( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
 
 	float syncInit( sampleFrame * _ab, const fpab_t _frames,

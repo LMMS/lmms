@@ -58,8 +58,8 @@ void oscillator::update( sampleFrame * _ab, const fpab_t _frames, const ch_cnt_t
 	{
 		switch( *m_modulationAlgo )
 		{
-			case FREQ_MODULATION:
-				updateFM( _ab, _frames, _chnl );
+			case PHASE_MODULATION:
+				updatePM( _ab, _frames, _chnl );
 				break;
 			case AMP_MODULATION:
 				updateAM( _ab, _frames, _chnl );
@@ -70,6 +70,8 @@ void oscillator::update( sampleFrame * _ab, const fpab_t _frames, const ch_cnt_t
 			case SYNC:
 				updateSync( _ab, _frames, _chnl );
 				break;
+			case FREQ_MODULATION:
+				updateFM( _ab, _frames, _chnl );
 		}
 	}
 	else
@@ -96,8 +98,8 @@ void oscillator::updateNoSub( sampleFrame * _ab, const fpab_t _frames,
 }
 
 
-// do fm by using sub-osc as modulator
-void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
+// do pm by using sub-osc as modulator
+void oscillator::updatePM( sampleFrame * _ab, const fpab_t _frames,
 						const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl );
@@ -106,12 +108,8 @@ void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
 
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
-		m_phase += _ab[frame][_chnl];
-		if ( m_phase < 0.0f )
-		{
-			m_phase -= floorf(m_phase);
-		}
-		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
+		_ab[frame][_chnl] = getSample( m_phase + _ab[frame][_chnl] )
+								* *m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -172,6 +170,25 @@ void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
 
 
 
+// do fm by using sub-osc as modulator
+void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
+						const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		m_phase += _ab[frame][_chnl];
+		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
 inline sample_t oscillator::getSample( const float _sample )
 {
 	switch( *m_waveShape )
@@ -206,7 +223,7 @@ inline void oscillator::recalcPhase( void )
 {
 	if( m_phaseOffset != *m_ext_phaseOffset )
 	{
-		m_phase += 1.0f - m_phaseOffset;
+		m_phase -= m_phaseOffset;
 		m_phaseOffset = *m_ext_phaseOffset;
 		m_phase += m_phaseOffset;
 	}
