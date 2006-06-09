@@ -567,7 +567,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. After clicking on this button, a file-open-dialog appears and you can select your file. Settings like Looping-Mode, start- and end-point, amplify-value and so on are not reset, so please don&apos;t wonder if your sample doesn&apos;t sound like the original one...</source>
-        <translation>Pica aquí si vols obrir un altre fitxer d&apos;àudio. Després de picar en aquest botó, apareix un diàleg on pots seleccionar i obrir el teu fitxer. Els ajustaments com Mode Bucle, punts inicial i final, valor d&apos;amplificació i la resta no són reiniciats, per tant no t&apos;estranyis si la mostra no sona com l&apos;original...</translation>
+        <translation>Pica aquí si vols obrir un altre fitxer d&apos;àudio. Després de picar en aquest botó, apareix un diàleg on pots seleccionar i obrir el teu fitxer. Els ajusts com Mode Bucle, punts inicial i final, valor d&apos;amplificació i la resta no són reiniciats, per tant no t&apos;estranyis si la mostra no sona com l&apos;original...</translation>
     </message>
     <message>
         <source>Here you can set, whether Looping-Mode is enabled. If enabled, AudioFileProcessor loops between start- and end-point of a sample until the whole note is played. This is useful for things like string- and choir-samples.</source>
@@ -2942,6 +2942,14 @@ clic dret = apaga totes les altres pistes (solo)</translation>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo-sounds.</source>
         <translation>Amb aquesta roda pots ajustar el desfasament estèreo de l&apos;oscil·lador %1. El desfasament estèreo especifica el tamany de la diferència entre el desfasament del canal esquerre i el dret. Això és molt bo per a crear sons estèreo amples.</translation>
     </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>usa modulació de fase per a modular l&apos;oscil·lador 2 amb l&apos;oscil·lador 1</translation>
+    </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>usa modulació de fase per a modular l&apos;oscil·lador 3 amb l&apos;oscil·lador 2</translation>
+    </message>
 </context>
 <context>
     <name>vestigeInstrument</name>
@@ -3080,7 +3088,7 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
-        <translation>La roda Panorama determina la localització de la corda seleccionada al camp estèreo.</translation>
+        <translation>La roda Pan determina la localització de la corda seleccionada al camp estèreo.</translation>
     </message>
     <message>
         <source>Detune</source>
@@ -3092,7 +3100,7 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
-        <translation>La roda Desafinament modifica el to de la corda seleccionada. Valors menors que zero faran que la corda soni amb bemoll. Valors majors que zero faran que la corda soni amb sostingut.</translation>
+        <translation>La roda Detune modifica el to de la corda seleccionada. Valors menors que zero faran que la corda soni amb bemoll. Valors majors que zero faran que la corda soni amb sostingut.</translation>
     </message>
     <message>
         <source>Fuzziness</source>
@@ -3104,7 +3112,7 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation>La roda Palmada afegeix una mica d&apos;arrissada a la corda seleccionada que és més notable durant l&apos;atac, encara que també pot usar-se per a que la corda soni més &apos;metàl·lica&apos;.</translation>
+        <translation>La roda Slap afegeix una mica d&apos;arrissada a la corda seleccionada que és més notable durant l&apos;atac, encara que també pot usar-se per a que la corda soni més &apos;metàl·lica&apos;.</translation>
     </message>
     <message>
         <source>Length</source>
@@ -3116,7 +3124,7 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
-        <translation>La roda Longitud ajusta la longitud de la corda seleccionada. Les cordes més llargues sonaran a la vegada més temps i més brillants, emperò també es menjaran més cicles de CPU.</translation>
+        <translation>La roda Length ajusta la longitud de la corda seleccionada. Les cordes més llargues sonaran a la vegada més temps i més brillants, emperò també es menjaran més cicles de CPU.</translation>
     </message>
     <message>
         <source>Impulse or initial state</source>
@@ -3128,11 +3136,11 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation>El selector Octava s&apos;usa per a escollir a quin harmònic de la nota la corda sonarà. Per exemple, &apos;-2&apos; significa que la corda sonarà dues octaves per sota de la fonamental, &apos;F&apos; significa que la corda sonarà a la fonamental, i &apos;6&apos; significa que la corda sonarà sis octaves per sobre de la fonamental.</translation>
+        <translation>El selector Octave s&apos;usa per a escollir a quin harmònic de la nota la corda sonarà. Per exemple, &apos;-2&apos; significa que la corda sonarà dues octaves per sota de la fonamental, &apos;F&apos; significa que la corda sonarà a la fonamental, i &apos;6&apos; significa que la corda sonarà sis octaves per sobre de la fonamental.</translation>
     </message>
     <message>
         <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
-        <translation>El selector Corda s&apos;usa per a escollir quina corda estan editant els controls. Un instrument Vibed pot tenir fins a nou cordes vibrants independents. El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona indica si la corda seleccionada està activa.</translation>
+        <translation>El selector String s&apos;usa per a escollir quina corda estan editant els controls. Un instrument Vibed pot tenir fins a nou cordes vibrants independents. El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona indica si la corda seleccionada està activa.</translation>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
@@ -3146,15 +3154,15 @@ The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the
 The &apos;Length&apos; knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation>Vibed modela fins a nou cordes vibrants independents. El selector &apos;Corda&apos; et permet escollir quina corda s&apos;està editant. El selector &apos;Imp&apos; escull si el gràfic representa un impuls o l&apos;estat inicial de la corda. El selector &apos;Octava&apos; escull a quin harmònic la corda ha de vibrar.
+        <translation>Vibed modela fins a nou cordes vibrants independents. El selector &apos;String&apos; et permet escollir quina corda s&apos;està editant. El selector &apos;Imp&apos; escull si el gràfic representa un impuls o l&apos;estat inicial de la corda. El selector &apos;Octave&apos; escull a quin harmònic la corda ha de vibrar.
 
 El gràfic et permet controlar l&apos;estat inicial o impuls usat per a posar la corda en marxa.
 
 La roda &apos;V&apos; controla el volum. La roda &apos;S&apos; controla la rigidesa de la corda. La roda &apos;P&apos; controla la posició per a tocar. La roda &apos;PU&apos; controla la posició per a recollir.
 
-Probablement no cal explicar &apos;Panorama&apos; i &apos;Desafinament&apos;. La roda &apos;Palmada&apos; afegeix una mica d&apos;arrissada al so de la corda.
+Probablement no cal explicar &apos;Pan&apos; i &apos;Detune&apos;. La roda &apos;Slap&apos; afegeix una mica d&apos;arrissada al so de la corda.
 
-La roda &apos;Longitud&apos; controla la longitud de la corda.
+La roda &apos;Length&apos; controla la longitud de la corda.
 
 El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona determina si la corda està activa a l&apos;instrument actual.</translation>
     </message>
