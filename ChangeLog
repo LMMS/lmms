@@ -1,3 +1,14 @@
+2006-06-10	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/lib/sample_buffer.cpp:
+	- fixed bug when sample processor generates less frames than the audio
+	  buffer size
+	- load full wav samples
+
+	* data/presets/AudioFileProcessor/Fat-Reversed-Kick.cs.xml:
+	* data/presets/AudioFileProcessor/Kick-4-your-Subwoofer.cs.xml:
+	upgraded to newer version, end frame value caused segfault
+
 2006-06-09	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/lmms_math.h:
