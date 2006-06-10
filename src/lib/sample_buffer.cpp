@@ -444,7 +444,14 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 		frames = sf_info.frames;
 #endif
 		_buf = new int_sample_t[sf_info.channels * frames];
-		frames = sf_read_short( snd_file, _buf, frames );
+		if( sf_read_short( snd_file, _buf, sf_info.channels * frames )
+						< sf_info.channels * frames )
+		{
+#ifdef DEBUG_LMMS
+			printf( "sampleBuffer::decodeSampleSF(): could not read"
+				" sample %s: %s\n", _f, sf_strerror( NULL ) );
+#endif
+		}
 		_channels = sf_info.channels;
 		_samplerate = sf_info.samplerate;
 
@@ -706,7 +713,8 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 	{
 		frames_to_process = frames_for_loop;
 	}
-	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startFrame + ( play_frame - m_startFrame ) * freq_factor );
+	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startFrame +
+				( play_frame - m_startFrame ) * freq_factor );
 /*	Uint32 f2 = 0;
 	while( f2 < f1 )
 	{
@@ -721,7 +729,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 	sampleFrame * start_frame = (sampleFrame *) m_data + f1;
 	//printf("diff:%d %f  %d f2: %d  input: %d\n", f2 -foo, play_frame * freq_factor, static_cast<Uint32>( play_frame * freq_factor ), f2, (Uint32)( frames_for_loop * freq_factor ) );
 //	foo = f2;
-	sampleFrame * loop_start = start_frame;
+	sampleFrame * loop_start = (sampleFrame *) m_data + m_startFrame;
 
 	// check whether we have to change pitch...
 	if( freq_diff != 0 )
@@ -736,17 +744,58 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 			}
 			state = static_cast<SRC_STATE *>( *_resampling_data );
 		}
-		m_srcData.data_in = start_frame[0];
-		m_srcData.data_out = _ab[0];
-		m_srcData.input_frames = static_cast<f_cnt_t>( frames_for_loop *
-								freq_factor );
-		m_srcData.output_frames = frames_to_process;
-		m_srcData.src_ratio = 1.0 / freq_factor;
-		int error;
-		if( ( error = src_process( state, &m_srcData ) ) )
+
+		// Check loop
+		if( _looped && frames_for_loop < frames_to_process )
 		{
-			printf( "sampleBuffer: error while resampling: %s\n",
-						src_strerror( error ) );
+			f_cnt_t total_frames_copied = 0;
+			while( total_frames_copied < frames_to_process )
+			{
+				// Generate output
+				m_srcData.data_in = start_frame[0];
+				m_srcData.data_out = _ab[total_frames_copied];
+				m_srcData.input_frames = static_cast<f_cnt_t>(
+						frames_for_loop * freq_factor );
+				m_srcData.output_frames = frames_for_loop;
+				m_srcData.src_ratio = 1.0 / freq_factor;
+				int error = src_process( state, &m_srcData );
+				if( error )
+				{
+					printf( "sampleBuffer: error while "
+							"resampling: %s\n",
+							src_strerror( error ) );
+				}
+				// Advance
+				total_frames_copied += frames_for_loop;
+
+				// reset start_frame to start
+				start_frame = loop_start;
+				// and calculate frames for next loop
+				frames_for_loop = frames_to_process
+							- total_frames_copied;
+				if( frames_for_loop
+					> total_frames_for_current_pitch )
+				{
+					frames_for_loop =
+						total_frames_for_current_pitch;
+				}
+			}
+		}
+		else
+		{
+			// Generate output
+			m_srcData.data_in = start_frame[0];
+			m_srcData.data_out = _ab[0];
+			m_srcData.input_frames = static_cast<f_cnt_t>(
+						frames_for_loop * freq_factor );
+			m_srcData.output_frames = frames_to_process;
+			m_srcData.src_ratio = 1.0 / freq_factor;
+			int error = src_process( state, &m_srcData );
+			if( error )
+			{
+				printf( "sampleBuffer: error while resampling: "
+						"%s\n", src_strerror( error ) );
+			}
 		}
 #else
 		f_cnt_t src_frame_base = 0;
@@ -829,30 +878,35 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 	{
 		// we don't have to pitch, so we just copy the sample-data
 		// as is into pitched-copy-buffer
+
+		// Check loop
 		if( _looped && frames_for_loop < frames_to_process )
 		{
 			f_cnt_t total_frames_copied = 0;
 			while( total_frames_copied < frames_to_process )
 			{
+				// Generate output
 				memcpy( _ab[total_frames_copied], start_frame,
 					frames_for_loop * BYTES_PER_FRAME );
+				// Advance
 				total_frames_copied += frames_for_loop;
 
 				// reset start_frame to start
 				start_frame = loop_start;
 				// and calculate frames for next loop
-				frames_for_loop = frames_to_process %
-						total_frames_for_current_pitch;
-				if( frames_for_loop >
-					frames_to_process-total_frames_copied )
+				frames_for_loop = frames_to_process
+							- total_frames_copied;
+				if( frames_for_loop
+					> total_frames_for_current_pitch )
 				{
-					frames_for_loop = frames_to_process -
-							total_frames_copied;
+					frames_for_loop =
+						total_frames_for_current_pitch;
 				}
 			}
 		}
 		else
 		{
+			// Generate output
 			memcpy( _ab, start_frame,
 					frames_to_process * BYTES_PER_FRAME );
 		}
