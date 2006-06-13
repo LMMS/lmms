@@ -34,10 +34,12 @@
 #ifndef QT3
 
 #include <Qt/QtXml>
+#include <QtCore/QVariant>
 
 #else
 
 #include <qdom.h>
+#include <qvariant.h>
 
 #endif
 
@@ -252,6 +254,16 @@ public:
 		return( "automatableobject" );
 	}
 
+	inline const QVariant & data( void ) const
+	{
+		return( m_data );
+	}
+
+	void setData( const QVariant & _data )
+	{
+		m_data = _data;
+	}
+
 
 protected:
 	virtual void redoStep( journalEntry & _je )
@@ -306,6 +318,8 @@ private:
 	T m_minValue;
 	T m_maxValue;
 	T m_step;
+
+	QVariant m_data;
 
 	typedef vvector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;

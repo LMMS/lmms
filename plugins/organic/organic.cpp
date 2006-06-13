@@ -134,7 +134,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 										
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobGreen_17, this, tr(
-				"Osc %1 volume" ).arg( i+1 ), eng(), i );
+					"Osc %1 volume" ).arg( i+1 ), eng() );
+		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
 		m_osc[i].volKnob->setInitValue( 100 );
@@ -143,7 +144,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobGreen_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng(), i );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 25+i*20, 130 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
@@ -153,7 +155,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].detuneKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-								eng(), i );
+								eng() );
+		m_osc[i].detuneKnob->setData( i );
 		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].detuneKnob->setInitValue( 0.0f );
@@ -162,14 +165,17 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							+ " ", " " +
 							tr( "cents" ) );
 
-		connect( m_osc[i].volKnob, SIGNAL( idKnobChanged( int ) ),
-					this, SLOT( updateVolume( int ) ) );
-		connect( m_osc[i].panKnob, SIGNAL( idKnobChanged( int ) ),
-					this, SLOT( updateVolume( int ) ) );
+		connect( m_osc[i].volKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateVolume( const QVariant & ) ) );
+		connect( m_osc[i].panKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateVolume( const QVariant & ) ) );
 		updateVolume( i );
 
-		connect( m_osc[i].detuneKnob, SIGNAL ( idKnobChanged( int ) ),
-					this, SLOT( updateDetuning( int ) ) );
+		connect( m_osc[i].detuneKnob,
+				SIGNAL ( valueChanged( const QVariant & ) ),
+			this, SLOT( updateDetuning( const QVariant & ) ) );
 		updateDetuning( i );
 
 	}
@@ -494,8 +500,9 @@ void organicInstrument::randomiseSettings()
 
 
 
-void organicInstrument::updateVolume( int _i )
+void organicInstrument::updateVolume( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].volumeLeft =
 		( 1.0f - m_osc[_i].panKnob->value() / (float)PANNING_RIGHT )
 		* m_osc[_i].volKnob->value() / m_num_oscillators / 100.0f;
@@ -507,8 +514,9 @@ void organicInstrument::updateVolume( int _i )
 
 
 
-void organicInstrument::updateDetuning( int _i )
+void organicInstrument::updateDetuning( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].detuningLeft = powf( 2.0f, m_osc[_i].harmonic
 			+ (float)m_osc[_i].detuneKnob->value() / 100.0f )
 			/ static_cast<float>( eng()->getMixer()->sampleRate() );

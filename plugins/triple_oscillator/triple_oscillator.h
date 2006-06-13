@@ -73,12 +73,12 @@ protected slots:
 	void mod1Ch( int _n );
 	void mod2Ch( int _n );
 
-	void updateVolume( int _i );
-	void updateDetuningLeft( int _i );
-	void updateDetuningRight( int _i );
+	void updateVolume( const QVariant & _i );
+	void updateDetuningLeft( const QVariant & _i );
+	void updateDetuningRight( const QVariant & _i );
 	void updateAllDetuning( void );
-	void updatePhaseOffsetLeft( int _i );
-	void updatePhaseOffsetRight( int _i );
+	void updatePhaseOffsetLeft( const QVariant & _i );
+	void updatePhaseOffsetRight( const QVariant & _i );
 
 
 private:
@@ -114,10 +114,6 @@ private:
 	} ;
 
 
-/*	pixmapButton * FASTCALL getModulationButton(
-			oscillator::modulationAlgos _modulation_algo, int _n );*/
-/*	void FASTCALL setModulationAlgo(
-		oscillator::modulationAlgos _new_modulation_algo, int _n );*/
 	oscillator::modulationAlgos * FASTCALL getModulationAlgo( int _n );
 
 	oscillator::modulationAlgos m_modulationAlgo1;

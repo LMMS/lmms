@@ -246,7 +246,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobSmall_17, this, tr(
-				"Osc %1 volume" ).arg( i+1 ), eng(), i );
+				"Osc %1 volume" ).arg( i+1 ), eng() );
+		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 		m_osc[i].volKnob->setInitValue( DEFAULT_VOLUME
@@ -266,7 +267,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobSmall_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng(), i );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
 		m_osc[i].panKnob->setInitValue( DEFAULT_PANNING );
@@ -284,8 +286,9 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		// setup coarse-knob
 		m_osc[i].coarseKnob = new knob( knobSmall_17, this,
-				tr("Osc %1 coarse detuning").arg( i + 1 ),
-								eng(), i );
+				tr( "Osc %1 coarse detuning" ).arg( i + 1 ),
+									eng() );
+		m_osc[i].coarseKnob->setData( i );
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
 						2 * NOTES_PER_OCTAVE, 1.0f );
@@ -307,7 +310,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].fineLKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-								eng(), i );
+									eng() );
+		m_osc[i].fineLKnob->setData( i );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineLKnob->setInitValue( 0.0f );
@@ -330,7 +334,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].fineRKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 fine detuning right"
 							).arg( i + 1 ),
-								eng(), i );
+									eng() );
+		m_osc[i].fineRKnob->setData( i );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
 		m_osc[i].fineRKnob->setInitValue( 0.0f );
@@ -352,7 +357,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].phaseOffsetKnob = new knob( knobSmall_17, this,
 							tr( "Osc %1 phase-"
 							"offset" ).arg( i+1 ),
-								eng(), i );
+								eng() );
+		m_osc[i].phaseOffsetKnob->setData( i );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
 		m_osc[i].phaseOffsetKnob->setRange( 0.0f, 360.0f, 1.0f );
 		m_osc[i].phaseOffsetKnob->setInitValue( 0.0f );
@@ -378,7 +384,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].stereoPhaseDetuningKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 stereo phase-"
 							"detuning" ).arg( i+1 ),
-								eng(), i );
+									eng() );
+		m_osc[i].stereoPhaseDetuningKnob->setData( i );
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
 		m_osc[i].stereoPhaseDetuningKnob->setRange( 0.0f, 360.0f,
 									1.0f );
@@ -402,32 +409,41 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				"stereo-sounds." ).arg( i+1 ) );
 
 		// Connect knobs with oscillators' inputs
-		connect( m_osc[i].volKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateVolume( int ) ) );
-		connect( m_osc[i].panKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateVolume( int ) ) );
+		connect( m_osc[i].volKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateVolume( const QVariant & ) ) );
+		connect( m_osc[i].panKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateVolume( const QVariant & ) ) );
 		updateVolume( i );
 
-		connect( m_osc[i].coarseKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateDetuningLeft( int ) ) );
-		connect( m_osc[i].coarseKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateDetuningRight( int ) ) );
-		connect( m_osc[i].fineLKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateDetuningLeft( int ) ) );
-		connect( m_osc[i].fineRKnob, SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updateDetuningRight( int ) ) );
+		connect( m_osc[i].coarseKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateDetuningLeft( const QVariant & ) ) );
+		connect( m_osc[i].coarseKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateDetuningRight( const QVariant & ) ) );
+		connect( m_osc[i].fineLKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateDetuningLeft( const QVariant & ) ) );
+		connect( m_osc[i].fineRKnob,
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this, SLOT( updateDetuningRight( const QVariant & ) ) );
 		updateDetuningLeft( i );
 		updateDetuningRight( i );
 
 		connect( m_osc[i].phaseOffsetKnob,
-				SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updatePhaseOffsetLeft( int ) ) );
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this,
+			SLOT( updatePhaseOffsetLeft( const QVariant & ) ) );
 		connect( m_osc[i].phaseOffsetKnob,
-				SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updatePhaseOffsetRight( int ) ) );
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this,
+			SLOT( updatePhaseOffsetRight( const QVariant & ) ) );
 		connect( m_osc[i].stereoPhaseDetuningKnob,
-				SIGNAL( idKnobChanged( int ) ),
-				this, SLOT( updatePhaseOffsetLeft( int ) ) );
+				SIGNAL( valueChanged( const QVariant & ) ),
+			this,
+			SLOT( updatePhaseOffsetLeft( const QVariant & ) ) );
 		updatePhaseOffsetLeft( i );
 		updatePhaseOffsetRight( i );
 
@@ -834,8 +850,9 @@ void tripleOscillator::osc2UserDefWaveDblClick( void )
 
 
 
-void tripleOscillator::updateVolume( int _i )
+void tripleOscillator::updateVolume( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	float panningFactorLeft;
 	float panningFactorRight;
 
@@ -861,8 +878,9 @@ void tripleOscillator::updateVolume( int _i )
 
 
 
-void tripleOscillator::updateDetuningLeft( int _i )
+void tripleOscillator::updateDetuningLeft( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].detuningLeft = powf( 2.0f, (
 			(float)m_osc[_i].coarseKnob->value() * 100.0f +
 			(float)m_osc[_i].fineLKnob->value() ) / 1200.0f )
@@ -872,8 +890,9 @@ void tripleOscillator::updateDetuningLeft( int _i )
 
 
 
-void tripleOscillator::updateDetuningRight( int _i )
+void tripleOscillator::updateDetuningRight( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].detuningRight = powf( 2.0f, (
 			(float)m_osc[_i].coarseKnob->value() * 100.0f +
 			(float)m_osc[_i].fineRKnob->value() ) / 1200.0f )
@@ -895,8 +914,9 @@ void tripleOscillator::updateAllDetuning( void )
 
 
 
-void tripleOscillator::updatePhaseOffsetLeft( int _i )
+void tripleOscillator::updatePhaseOffsetLeft( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].phaseOffsetLeft = ( m_osc[_i].phaseOffsetKnob->value() +
 			m_osc[_i].stereoPhaseDetuningKnob->value() ) / 360.0f;
 }
@@ -904,8 +924,9 @@ void tripleOscillator::updatePhaseOffsetLeft( int _i )
 
 
 
-void tripleOscillator::updatePhaseOffsetRight( int _i )
+void tripleOscillator::updatePhaseOffsetRight( const QVariant & _data )
 {
+	const int _i = _data.toInt();
 	m_osc[_i].phaseOffsetRight = m_osc[_i].phaseOffsetKnob->value()
 								/ 360.0f;
 }

@@ -114,8 +114,8 @@ private:
 
 private slots:
 
-	void updateVolume( int _i );
-	void updateDetuning( int _i );
+	void updateVolume( const QVariant & _i );
+	void updateDetuning( const QVariant & _i );
 	void updateAllDetuning( void );
 
 } ;

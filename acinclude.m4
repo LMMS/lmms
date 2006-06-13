@@ -190,6 +190,7 @@ AC_MSG_RESULT([$QT_IS_EMBEDDED])
 QT_GUILINK=""
 QASSISTANTCLIENT_LDADD="-lqassistantclient"
 QT_LIBS="$QT_LIB"
+x_libraries="$x_libraries -L/usr/X11R6/lib"
 
 case "${host}" in
     *irix*)

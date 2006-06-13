@@ -52,7 +52,8 @@ oscillator::oscillator( const waveShapes * _wave_shape,
 
 
 
-void oscillator::update( sampleFrame * _ab, const fpab_t _frames, const ch_cnt_t _chnl )
+void oscillator::update( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
 {
 	if( m_subOsc != NULL )
 	{

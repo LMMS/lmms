@@ -48,8 +48,8 @@
 
 
 volumeKnob::volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-					engine * _engine, const int _knob_id ):
-	knob( _knob_num, _parent, _name, _engine, _knob_id )
+							engine * _engine ) :
+	knob( _knob_num, _parent, _name, _engine )
 {
 }
 
@@ -129,7 +129,7 @@ void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( value() );
-		emit idKnobChanged( m_knobId );
+		emit valueChanged( data() );
 		if( !configManager::inst()->value( "knobs",
 		     "classicalusability").toInt() )
 		{
@@ -181,7 +181,7 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( value() );
-	emit idKnobChanged( m_knobId );
+	emit valueChanged( data() );
 }
 
 

@@ -22,6 +22,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef _VOLUME_KNOB_H
 #define _VOLUME_KNOB_H
 
@@ -44,16 +45,18 @@ class volumeKnob: public knob
 	Q_OBJECT
 public:
 	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-		    engine * _engine, const int _knob_id = 0 );
-	~volumeKnob();
+							    engine * _engine );
+	virtual ~volumeKnob();
+
 
 public slots:
-	void enterValue( void );
+	virtual void enterValue( void );
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
-};
+} ;
 
 #endif
