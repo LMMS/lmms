@@ -385,7 +385,7 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_trackLabel->show();
 
 	m_volumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-				    tr( "Channel volume" ), eng() );
+				    tr( "Channel volume" ), eng(), this );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
@@ -441,6 +441,8 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 						const f_cnt_t _frame_base,
 							Sint16 /*_tco_num*/ )
 {
+	sendMidiTime( _start );
+
 	vlist<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start+static_cast<Sint32>( _frames * 64 /
 				eng()->getSongEditor()->framesPerTact() ) );
@@ -500,7 +502,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
-	_this.setAttribute( "vol",  m_volume );
+	m_volumeKnob->saveSettings( _doc, _this, "vol" );
 }
 
 
@@ -516,12 +518,21 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	if( _this.attribute( "vol" ) != "" )
 	{
 		m_volume = _this.attribute( "vol" ).toFloat();
-		m_volumeKnob->setValue( m_volume * 100.0f );
+		m_volumeKnob->setInitValue( m_volume * 100.0f );
 	}
 	else
 	{
-		m_volumeKnob->setValue( 100.0f );
-		m_volume = 1.0;
+		QDomNode node = _this.namedItem( timePattern::classNodeName() );
+		if( node.isElement() && node.namedItem( "vol" ).isElement() )
+		{
+			m_volumeKnob->loadSettings( _this, "vol" );
+			m_volume = m_volumeKnob->value() / 100.0f;
+		}
+		else
+		{
+			m_volume = 1.0;
+			m_volumeKnob->setInitValue( 100.0f );
+		}
 	}
 }
 
