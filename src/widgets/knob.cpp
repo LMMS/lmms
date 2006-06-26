@@ -86,13 +86,13 @@ textFloat * knob::s_textFloat = NULL;
 
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
-							engine * _engine ) :
+					engine * _engine, track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	autoObj( _engine ),
+	autoObj( _engine, _track ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_angle( 0.0f ),
@@ -118,12 +118,13 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( "knob0" +
 					QString::number( m_knobNum + 1 ) ) );
 #endif
+	getTimePattern();
+
 	setRange( 0.0f, 100.0f, 1.0f );
 
 	setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	setTotalAngle( 270.0f );
 	recalcAngle();
-
 }
 
 
@@ -371,6 +372,12 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 							m_hintTextAfterValue ),
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+						tr( "&Open in time-roll" ),
+						getTimePattern(),
+						SLOT( openInTimeRoll() ) );
+	contextMenu.addSeparator();
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
 						SLOT( connectToMidiDevice() ) );
 	contextMenu.addSeparator();
@@ -609,6 +616,7 @@ void knob::setValue( const float _x )
 {
 	const float prev_value = value();
 	autoObj::setValue( _x );
+	setFirstValue();
 	if( prev_value != value() )
 	{
 		valueChange();

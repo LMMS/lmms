@@ -64,7 +64,7 @@ class knob : public QWidget, public automatableObject<float>
 	Q_OBJECT
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name,
-						engine * _engine );
+					engine * _engine, track * _track );
 	virtual ~knob();
 
     
