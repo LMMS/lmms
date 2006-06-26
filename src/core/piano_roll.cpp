@@ -401,9 +401,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingComboBox->addItem( QString::number( 25 *
-					static_cast<int>( powf( 2.0f, i ) ) ) +
-									"%" );
+		m_zoomingComboBox->addItem( QString::number( 25 << i ) + "%" );
 	}
 	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
 								"100%" ) );
@@ -419,8 +417,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeComboBox->addItem( "1/" + QString::number( 
-					static_cast<int>( powf( 2.0f, i ) ) ) );
+		m_quantizeComboBox->addItem( "1/" + QString::number( 1 << i ) );
 	}
 	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
 								"1/16" ) );
@@ -437,8 +434,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 						"sixteenth", "thirtysecond" } ;
 	for( int i = 0; i < 6; ++i )
 	{
-		m_noteLenComboBox->addItem( "1/" + QString::number( 
-					static_cast<int>( powf( 2.0f, i ) ) ),
+		m_noteLenComboBox->addItem( "1/" + QString::number( 1 << i ),
 				embed::getIconPixmap(
 					QString( "note_" + pixmaps[i] ).
 #ifndef QT3
