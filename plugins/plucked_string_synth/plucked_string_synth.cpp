@@ -72,14 +72,14 @@ pluckedStringSynth::pluckedStringSynth( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &pluckedstringsynth_plugin_descriptor )
 {
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
-									eng() );
+							eng(), _channel_track );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
  	m_pickKnob->setInitValue( 0.0f );
 	m_pickKnob->move( 86, 134 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 
 	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
-									eng() );
+							eng(), _channel_track );
 	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 	m_pickupKnob->setInitValue( 0.05f );
 	m_pickupKnob->move( 138, 134 );
@@ -108,9 +108,8 @@ pluckedStringSynth::~pluckedStringSynth()
 void pluckedStringSynth::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "pick", QString::number( m_pickKnob->value() ) );
-	_this.setAttribute( "pickup", QString::number(
-						m_pickupKnob->value() ) );
+	m_pickKnob->saveSettings( _doc, _this, "pick" );
+	m_pickupKnob->saveSettings( _doc, _this, "pickup" );
 }
 
 
@@ -118,8 +117,8 @@ void pluckedStringSynth::saveSettings( QDomDocument & _doc,
 
 void pluckedStringSynth::loadSettings( const QDomElement & _this )
 {
-	m_pickKnob->setValue( _this.attribute( "pick" ).toFloat() );
-	m_pickupKnob->setValue( _this.attribute( "pickup" ).toFloat() );
+	m_pickKnob->loadSettings( _this, "pick" );
+	m_pickupKnob->loadSettings( _this, "pickup" );
 }
 
 

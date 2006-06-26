@@ -169,7 +169,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), eng() );
+	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), eng(),
+							_channel_track );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
 	m_ampKnob->setInitValue( 100.0f );
@@ -188,7 +189,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
-									eng() );
+							eng(), _channel_track );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
 	m_startKnob->setInitValue( 0.0f );
@@ -207,7 +208,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"which AudioFileProcessor returns if a note is longer "
 			"than the sample between start- and end-point." ) );
 
-	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng() );
+	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng(),
+							_channel_track );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
 	m_endKnob->setInitValue( 1.0f );
@@ -303,7 +305,7 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 					m_reverseButton->isChecked() ) );
 	_this.setAttribute( "looped", QString::number(
 					m_loopButton->isChecked() ) );
-	_this.setAttribute( "amp", QString::number( m_ampKnob->value() ) );
+	m_ampKnob->saveSettings( _doc, _this, "amp" );
 }
 
 
@@ -323,7 +325,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 				_this.attribute( "eframe" ).toFloat() );  
 	m_reverseButton->setChecked( _this.attribute( "reversed" ).toInt() );
 	m_loopButton->setChecked( _this.attribute( "looped" ).toInt() );
-	m_ampKnob->setValue( _this.attribute( "amp" ).toFloat() );
+	m_ampKnob->loadSettings( _this, "amp" );
 }
 
 

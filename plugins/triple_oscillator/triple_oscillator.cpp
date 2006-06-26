@@ -246,7 +246,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobSmall_17, this, tr(
-				"Osc %1 volume" ).arg( i+1 ), eng() );
+				"Osc %1 volume" ).arg( i+1 ), eng(),
+							_channel_track );
 		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
@@ -267,7 +268,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobSmall_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng(),
+							_channel_track );
 		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
@@ -287,7 +289,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup coarse-knob
 		m_osc[i].coarseKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 coarse detuning" ).arg( i + 1 ),
-									eng() );
+							eng(), _channel_track );
 		m_osc[i].coarseKnob->setData( i );
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
@@ -310,7 +312,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].fineLKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-									eng() );
+							eng(), _channel_track );
 		m_osc[i].fineLKnob->setData( i );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -334,7 +336,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].fineRKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 fine detuning right"
 							).arg( i + 1 ),
-									eng() );
+							eng(), _channel_track );
 		m_osc[i].fineRKnob->setData( i );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -357,7 +359,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].phaseOffsetKnob = new knob( knobSmall_17, this,
 							tr( "Osc %1 phase-"
 							"offset" ).arg( i+1 ),
-								eng() );
+							eng(),
+							_channel_track );
 		m_osc[i].phaseOffsetKnob->setData( i );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
 		m_osc[i].phaseOffsetKnob->setRange( 0.0f, 360.0f, 1.0f );
@@ -384,7 +387,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].stereoPhaseDetuningKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 stereo phase-"
 							"detuning" ).arg( i+1 ),
-									eng() );
+							eng(),
+							_channel_track );
 		m_osc[i].stereoPhaseDetuningKnob->setData( i );
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
 		m_osc[i].stereoPhaseDetuningKnob->setRange( 0.0f, 360.0f,
@@ -593,20 +597,15 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
 		QString is = QString::number( i );
-		_this.setAttribute( "vol" + is, QString::number(
-						m_osc[i].volKnob->value() ) );
-		_this.setAttribute( "pan" + is, QString::number(
-						m_osc[i].panKnob->value() ) );
-		_this.setAttribute( "coarse" + is, QString::number(
-					m_osc[i].coarseKnob->value() ) );
-		_this.setAttribute( "finel" + is, QString::number(
-						m_osc[i].fineLKnob->value() ) );
-		_this.setAttribute( "finer" + is, QString::number(
-						m_osc[i].fineRKnob->value() ) );
-		_this.setAttribute( "phoffset" + is, QString::number(
-					m_osc[i].phaseOffsetKnob->value() ) );
-		_this.setAttribute( "stphdetun" + is, QString::number(
-				m_osc[i].stereoPhaseDetuningKnob->value() ) );
+		m_osc[i].volKnob->saveSettings( _doc, _this, "vol" + is );
+		m_osc[i].panKnob->saveSettings( _doc, _this, "pan" + is );
+		m_osc[i].coarseKnob->saveSettings( _doc, _this, "coarse" + is );
+		m_osc[i].fineLKnob->saveSettings( _doc, _this, "finel" + is );
+		m_osc[i].fineRKnob->saveSettings( _doc, _this, "finer" + is );
+		m_osc[i].phaseOffsetKnob->saveSettings( _doc, _this,
+							"phoffset" + is );
+		m_osc[i].stereoPhaseDetuningKnob->saveSettings( _doc, _this,
+							"stphdetun" + is );
 		_this.setAttribute( "wavetype" + is, QString::number(
 							m_osc[i].waveShape ) );
 		_this.setAttribute( "userwavefile" + is,
@@ -630,20 +629,15 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
 		QString is = QString::number( i );
-		m_osc[i].volKnob->setValue( _this.attribute( "vol" + is ).
-								toFloat() );
-		m_osc[i].panKnob->setValue( _this.attribute( "pan" + is ).
-								toFloat() );
-		m_osc[i].coarseKnob->setValue( _this.attribute( "coarse" + is ).
-								toFloat() );
-		m_osc[i].fineLKnob->setValue( _this.attribute( "finel" + is ).
-								toFloat() );
-		m_osc[i].fineRKnob->setValue( _this.attribute( "finer" + is ).
-								toFloat() );
-		m_osc[i].phaseOffsetKnob->setValue( _this.attribute(
-						"phoffset" + is ).toFloat() );
-		m_osc[i].stereoPhaseDetuningKnob->setValue( _this.attribute(
-						"stphdetun" + is ).toFloat() );
+		m_osc[i].volKnob->loadSettings( _this, "vol" + is );
+		m_osc[i].panKnob->loadSettings( _this, "pan" + is );
+		m_osc[i].coarseKnob->loadSettings( _this, "coarse" + is );
+		m_osc[i].fineLKnob->loadSettings( _this, "finel" + is );
+		m_osc[i].fineRKnob->loadSettings( _this, "finer" + is );
+		m_osc[i].phaseOffsetKnob->loadSettings( _this,
+							"phoffset" + is );
+		m_osc[i].stereoPhaseDetuningKnob->loadSettings( _this,
+							"stphdetun" + is );
 		m_osc[i].m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
 		m_osc[i].waveBtnGrp->setValue( _this.attribute( "wavetype" +

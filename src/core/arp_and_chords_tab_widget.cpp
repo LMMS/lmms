@@ -217,7 +217,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	}
 
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
-						tr( "Chord range" ), eng() );
+						tr( "Chord range" ),
+						eng(), _instrument_track );
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
 	m_chordRangeKnob->setInitValue( 1.0f );
@@ -269,7 +270,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio range" ), eng() );
+						tr( "Arpeggio range" ),
+						eng(), _instrument_track );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
 	m_arpRangeKnob->setInitValue( 1.0f );
@@ -286,7 +288,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"amount of octaves." ) );
 
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio time" ), eng() );
+						tr( "Arpeggio time" ),
+						eng(), _instrument_track );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setRange( 25.0f, 2000.0f, 1.0f );
 	m_arpTimeKnob->setInitValue( 100.0f );
@@ -303,7 +306,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"each arpeggio-tone should be played." ) );
 
 	m_arpGateKnob = new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio gate" ), eng() );
+						tr( "Arpeggio gate" ),
+						eng(), _instrument_track );
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setRange( 1.0f, 200.0f, 1.0f );
 	m_arpGateKnob->setInitValue( 100.0f );
@@ -649,13 +653,13 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 {
 	_this.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
 	_this.setAttribute( "chord", m_chordsComboBox->value() );
-	_this.setAttribute( "chordrange", m_chordRangeKnob->value() );
+	m_chordRangeKnob->saveSettings( _doc, _this, "chordrange" );
 
 	_this.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
 	_this.setAttribute( "arp", m_arpComboBox->value() );
-	_this.setAttribute( "arprange", m_arpRangeKnob->value() );
-	_this.setAttribute( "arptime", m_arpTimeKnob->value() );
-	_this.setAttribute( "arpgate", m_arpGateKnob->value() );
+	m_arpRangeKnob->saveSettings( _doc, _this, "arprange" );
+	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
+	m_arpGateKnob->saveSettings( _doc, _this, "arpgate" );
 	_this.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() + 1 );
 	_this.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
@@ -671,11 +675,11 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_chordsGroupBox->setState( !_this.attribute
 						( "chorddisabled" ).toInt() );
 	m_chordsComboBox->setValue( _this.attribute( "chord" ).toInt() );
-	m_chordRangeKnob->setValue( _this.attribute( "chordrange" ).toFloat() );
+	m_chordRangeKnob->loadSettings( _this, "chordrange" );
 	m_arpComboBox->setValue( _this.attribute( "arp" ).toInt() );
-	m_arpRangeKnob->setValue( _this.attribute( "arprange" ).toFloat() );
-	m_arpTimeKnob->setValue( _this.attribute( "arptime" ).toFloat() );
-	m_arpGateKnob->setValue( _this.attribute( "arpgate" ).toFloat() );
+	m_arpRangeKnob->loadSettings( _this, "arprange" );
+	m_arpTimeKnob->loadSettings( _this, "arptime" );
+	m_arpGateKnob->loadSettings( _this, "arpgate" );
 	m_arpDirectionBtnGrp->setInitValue(
 				_this.attribute( "arpdir" ).toInt() - 1 );
 	m_arpTimeKnob->setSyncMode( 

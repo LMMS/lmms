@@ -121,7 +121,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 		// setup volume-knob
 		m_osc[i].oscKnob = new knob( knobGreen_17, this, tr(
-					"Osc %1 waveform" ).arg( i+1 ), eng() );
+					"Osc %1 waveform" ).arg( i+1 ), eng(),
+							_channel_track );
 		m_osc[i].oscKnob->move( 25+i*20, 90 );
 		m_osc[i].oscKnob->setRange( 0.0f, 5.0f, 0.25f );
 		m_osc[i].oscKnob->setInitValue( 0.0f );
@@ -134,7 +135,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 										
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobGreen_17, this, tr(
-					"Osc %1 volume" ).arg( i+1 ), eng() );
+					"Osc %1 volume" ).arg( i+1 ), eng(),
+							_channel_track );
 		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
 		m_osc[i].volKnob->setRange( 0, 100, 1.0f );
@@ -144,7 +146,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobGreen_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng() );
+				tr( "Osc %1 panning" ).arg( i + 1 ), eng(),
+							_channel_track );
 		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 25+i*20, 130 );
 		m_osc[i].panKnob->setRange( PANNING_LEFT, PANNING_RIGHT, 1.0f );
@@ -155,7 +158,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].detuneKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-								eng() );
+							eng(), _channel_track );
 		m_osc[i].detuneKnob->setData( i );
 		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -185,14 +188,15 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 		// setup knob for FX1
 		fx1Knob = new knob( knobGreen_17, this,
-				tr( "FX1" ), eng() );
+				tr( "FX1" ), eng(), _channel_track );
 		fx1Knob->move( 20, 200 );
 		fx1Knob->setRange( 0.0f, 0.99f, 0.01f );
 		fx1Knob->setInitValue( 0.0f);
 		
 		// setup volume-knob
 		volKnob = new knob( knobGreen_17, this, tr(
-					"Osc %1 volume" ).arg( 1 ), eng() );
+					"Osc %1 volume" ).arg( 1 ), eng(),
+							_channel_track );
 		volKnob->move( 50, 200 );
 		volKnob->setRange( 0, 200, 1.0f );
 		volKnob->setInitValue( 100 );
@@ -244,20 +248,17 @@ organicInstrument::~organicInstrument()
 void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "num_osc", QString::number( m_num_oscillators ) );
-	_this.setAttribute( "foldback", QString::number( fx1Knob->value() ) );
-	_this.setAttribute( "vol", QString::number( volKnob->value() ) );
+	fx1Knob->saveSettings( _doc, _this, "foldback" );
+	volKnob->saveSettings( _doc, _this, "vol" );
 
 	for( int i = 0; i < m_num_oscillators; ++i )
 	{
 		QString is = QString::number( i );
-		_this.setAttribute( "vol" + is, QString::number(
-						m_osc[i].volKnob->value() ) );
-		_this.setAttribute( "pan" + is, QString::number(
-						m_osc[i].panKnob->value() ) );
+		m_osc[i].volKnob->saveSettings( _doc, _this, "vol" + is );
+		m_osc[i].panKnob->saveSettings( _doc, _this, "pan" + is );
 		_this.setAttribute( "harmonic" + is, QString::number(
 						m_osc[i].harmonic ) );
-		_this.setAttribute( "detune" + is, QString::number(
-						m_osc[i].detuneKnob->value() ) );
+		m_osc[i].detuneKnob->saveSettings( _doc, _this, "detune" + is );
 		_this.setAttribute( "wavetype" + is, QString::number(
 							m_osc[i].waveShape ) );
 	}
@@ -274,20 +275,15 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 	for( int i = 0; i < m_num_oscillators; ++i )
 	{
 		QString is = QString::number( i );
-		m_osc[i].volKnob->setValue( _this.attribute( "vol" + is ).
-								toFloat() );
-		m_osc[i].detuneKnob->setValue( _this.attribute( "detune" + is ).
-								toFloat() );
-		m_osc[i].panKnob->setValue( _this.attribute( "pan" + is ).
-								toFloat() );
+		m_osc[i].volKnob->loadSettings( _this, "vol" + is );
+		m_osc[i].detuneKnob->loadSettings( _this, "detune" + is );
+		m_osc[i].panKnob->loadSettings( _this, "pan" + is );
 		m_osc[i].oscKnob->setValue( _this.attribute( "wavetype"+is ).
 								toInt() );								
 	}
 	
-	volKnob->setValue( _this.attribute( "vol" ).
-								toFloat() );
-	fx1Knob->setValue( _this.attribute( "foldback" ).
-								toFloat() );
+	volKnob->loadSettings( _this, "vol" );
+	fx1Knob->loadSettings( _this, "foldback" );
 								
 	oscButtonChanged();	
 }

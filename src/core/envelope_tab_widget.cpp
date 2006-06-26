@@ -121,7 +121,8 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 		m_envLFOWidgets[i] = new envelopeAndLFOWidget(
 							value_for_zero_amount,
 							m_targetsTabWidget,
-							eng() );
+							eng(),
+							_instrument_track );
 		m_targetsTabWidget->addTab( m_envLFOWidgets[i],
 						tr( targetNames[i][0]
 #ifdef QT4
@@ -173,8 +174,9 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 			"for changing the characteristics of a sound." ) );
 
 
-	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox, tr(
-						"cutoff-frequency" ), eng() );
+	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox,
+						tr( "cutoff-frequency" ),
+						eng(), _instrument_track );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
 	m_filterCutKnob->setRange( 0.0, 14000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
@@ -193,8 +195,9 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 			"the cutoff-frequency. A highpass-filter cuts all "
 			"frequencies below cutoff-frequency and so on..." ) );
 
-	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox, tr(
-						"Q/Resonance" ), eng() );
+	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox,
+						tr( "Q/Resonance" ),
+						eng(), _instrument_track );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->setRange( 0.01, 10.0, 0.01 );
 	m_filterResKnob->move( 190, 18 );
@@ -502,8 +505,8 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "ftype", m_filterComboBox->value() );
-	_this.setAttribute( "fcut", m_filterCutKnob->value() );
-	_this.setAttribute( "fres", m_filterResKnob->value() );
+	m_filterCutKnob->saveSettings( _doc, _this, "fcut" );
+	m_filterResKnob->saveSettings( _doc, _this, "fres" );
 	_this.setAttribute( "fwet", m_filterGroupBox->isActive() );
 
 	for( int i = 0; i < TARGET_COUNT; ++i )
@@ -520,8 +523,8 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void envelopeTabWidget::loadSettings( const QDomElement & _this )
 {
 	m_filterComboBox->setValue( _this.attribute( "ftype" ).toInt() );
-	m_filterCutKnob->setValue( _this.attribute( "fcut" ).toFloat() );
-	m_filterResKnob->setValue( _this.attribute( "fres" ).toFloat() );
+	m_filterCutKnob->loadSettings( _this, "fcut" );
+	m_filterResKnob->loadSettings( _this, "fres" );
 /*	m_filterState->setChecked( _this.attribute( "fwet" ).toInt() );*/
 	m_filterGroupBox->setState( _this.attribute( "fwet" ).toInt() );
 

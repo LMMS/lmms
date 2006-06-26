@@ -188,7 +188,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 
 	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ),
-									eng() );
+							eng(), _channel_track );
 	m_sampleLengthKnob->setRange( 8, 128, 1 );
  	m_sampleLengthKnob->setInitValue( 128 );
 	m_sampleLengthKnob->move( 10, 120 );
