@@ -64,6 +64,7 @@ class QPushButton;
 
 class pixmapButton;
 class textFloat;
+class timePattern;
 class track;
 class trackContainer;
 class trackContentWidget;
@@ -484,10 +485,29 @@ public:
 		return( &m_trackWidget->getTrackContentWidget() );
 	}
 
+	void addTimePattern( timePattern * _pattern );
+	void removeTimePattern( timePattern * _pattern );
+
+	// name-stuff
+	inline virtual const QString & name( void ) const
+	{
+		return( m_name );
+	}
+	inline virtual void setName( const QString & _new_name )
+	{
+		m_name = _new_name;
+	}
+
+
+protected:
+	void sendMidiTime( const midiTime & _time );
+	QString m_name;
+
 
 private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
+	QPtrList<timePattern> m_time_patterns;
 
 } ;
 

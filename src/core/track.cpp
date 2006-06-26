@@ -1730,6 +1730,36 @@ void track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
 
 
 
+void track::addTimePattern( timePattern * _pattern )
+{
+	m_time_patterns.append( _pattern );
+}
+
+
+
+
+void track::removeTimePattern( timePattern * _pattern )
+{
+	m_time_patterns.remove( _pattern );
+}
+
+
+
+
+void track::sendMidiTime( const midiTime & _time )
+{
+	QPtrListIterator<timePattern> it( m_time_patterns );
+	timePattern * pattern ;
+	while( ( pattern = it.current() ) )
+	{
+		++it;
+		pattern->processMidiTime( _time );
+	}
+}
+
+
+
+
 #include "track.moc"
 
 
