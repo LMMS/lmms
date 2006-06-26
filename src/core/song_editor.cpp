@@ -394,9 +394,7 @@ songEditor::songEditor( engine * _engine ) :
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_zoomingComboBox->addItem( QString::number( 25 *
-					static_cast<int>( powf( 2.0f, i ) ) ) +
-									"%" );
+		m_zoomingComboBox->addItem( QString::number( 25 << i ) + "%" );
 	}
 	m_zoomingComboBox->setInitValue( m_zoomingComboBox->findText(
 								"100%" ) );
