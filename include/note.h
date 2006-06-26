@@ -162,6 +162,9 @@ public:
 		return( "note" );
 	}
 
+	static midiTime FASTCALL quantized( const midiTime & _m,
+							const int _q_grid );
+
 
 protected:
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -173,8 +176,6 @@ protected:
 
 
 private:
-	midiTime FASTCALL quantized( const midiTime & _m, const int _q_grid );
-
 	enum actions
 	{
 		CHANGE_KEY, CHANGE_VOLUME, CHANGE_PANNING,
