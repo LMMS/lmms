@@ -122,6 +122,7 @@ public slots:
 	void toggleSongEditorWin( void );
 	void toggleProjectNotesWin( void );
 	void togglePianoRollWin( void );
+	void toggleTimeRollWin( void );
 
 	void undo( void );
 	void redo( void );

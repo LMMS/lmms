@@ -77,6 +77,7 @@
 #include "audio_dummy.h"
 #include "tool_button.h"
 #include "project_journal.h"
+#include "time_roll.h"
 
 
 #if QT_VERSION >= 0x030100
@@ -381,6 +382,25 @@ void mainWindow::finalize( void )
 			"rap-samples) directly into the playlist." ) );
 
 
+//TODO: Change icon
+	toolButton * time_roll_window = new toolButton(
+						embed::getIconPixmap( "piano" ),
+						tr( "Show/hide Time-Roll" ) +
+									" (F9)",
+					this, SLOT( toggleTimeRollWin() ),
+								m_toolBar );
+	time_roll_window->setShortcut( Qt::Key_F9 );
+#ifdef QT4
+	time_roll_window->setWhatsThis(
+#else
+	QWhatsThis::add( time_roll_window,
+#endif
+			tr( "By pressing this button, you can show or hide the "
+				"Time-Roll. With the help of the Time-Roll "
+				"you can edit dynamic values in an easy way."
+				) );
+
+//TODO: Relocate effect board button
 /*	toolButton * effect_board_window = new toolButton(
 					embed::getIconPixmap( "effect_board" ),
 					tr( "Show/hide EffectBoard" ) + " (F9)",
@@ -415,6 +435,8 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 2 );
 	m_toolBarLayout->addWidget( song_editor_window, 1, 3 );
+	m_toolBarLayout->addWidget( time_roll_window, 1, 4 );
+//TODO: Relocate effect board
 	//m_toolBarLayout->addWidget( effect_board_window, 1, 4 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 5 );
 
@@ -869,6 +891,24 @@ void mainWindow::togglePianoRollWin( void )
 	else
 	{
 		eng()->getPianoRoll()->hide();
+	}
+}
+
+
+
+
+void mainWindow::toggleTimeRollWin( void )
+{
+	if( eng()->getTimeRoll()->isHidden() == TRUE ||
+		( m_workspace != NULL &&
+			m_workspace->activeWindow() != eng()->getTimeRoll() ) )
+	{
+		eng()->getTimeRoll()->show();
+		eng()->getTimeRoll()->setFocus();
+	}
+	else
+	{
+		eng()->getTimeRoll()->hide();
 	}
 }
 
