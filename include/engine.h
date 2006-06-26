@@ -33,6 +33,7 @@ class mixer;
 class pianoRoll;
 class projectNotes;
 class songEditor;
+class timeRoll;
 
 
 class engine
@@ -97,6 +98,11 @@ public:
 		return( m_projectJournal );
 	}
 
+	inline timeRoll * getTimeRoll( void )
+	{
+		return( m_timeRoll );
+	}
+
 
 private:
 	bool m_hasGUI;
@@ -108,6 +114,7 @@ private:
 	pianoRoll * m_pianoRoll;
 	projectNotes * m_projectNotes;
 	projectJournal * m_projectJournal;
+	timeRoll * m_timeRoll;
 
 } ;
 
