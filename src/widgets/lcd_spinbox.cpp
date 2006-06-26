@@ -51,7 +51,7 @@
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 					QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	autoObj( _engine, 0, _min, _max ),
+	autoObj( _engine, NULL, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {

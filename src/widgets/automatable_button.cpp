@@ -42,7 +42,7 @@
 
 automatableButton::automatableButton( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	autoObj( _engine, FALSE, TRUE, FALSE ),
+	autoObj( _engine, NULL, FALSE, TRUE, FALSE ),
 	m_group( NULL ),
 	m_checkable( FALSE )
 {

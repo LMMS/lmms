@@ -54,10 +54,10 @@
 
 
 tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
-				const QString & _name,
-				engine * _engine,
-				float _scale ) :
-	knob( _knob_num, _parent, _name, _engine ),
+					const QString & _name,
+					engine * _engine, track * _track,
+					float _scale ) :
+	knob( _knob_num, _parent, _name, _engine, _track ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),

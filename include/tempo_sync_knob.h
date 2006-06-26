@@ -61,7 +61,8 @@ public:
 
 
 	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
-			engine * _engine, float _scale = 1.0f );
+					engine * _engine, track * _track,
+					float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
 
 	tempoSyncMode getSyncMode( void );

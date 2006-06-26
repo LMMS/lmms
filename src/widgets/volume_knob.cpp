@@ -48,8 +48,8 @@
 
 
 volumeKnob::volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-							engine * _engine ) :
-	knob( _knob_num, _parent, _name, _engine )
+					engine * _engine, track * _track ) :
+	knob( _knob_num, _parent, _name, _engine, _track )
 {
 }
 
