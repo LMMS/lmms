@@ -59,6 +59,7 @@ public:
 		PLAY_TRACK,
 		PLAY_BB,
 		PLAY_PATTERN,
+		PLAY_TIME_PATTERN,
 		PLAY_MODE_CNT
 	} ;
 
