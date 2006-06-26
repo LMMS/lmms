@@ -106,8 +106,9 @@ QMap<engine *, vvector<envelopeAndLFOWidget *> >
 
 
 envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
-						QWidget * _parent,
-						engine * _engine ) :
+							QWidget * _parent,
+							engine * _engine,
+							track * _track ) :
 	QWidget( _parent ),
 	journallingObject( _engine ),
 #ifdef QT4
@@ -140,7 +141,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_predelayKnob = new knob( knobBright_26, this, tr( "Predelay-time" ),
-									eng() );
+								eng(), _track );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_predelayKnob->setInitValue( 0.0 );
@@ -158,7 +159,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_attackKnob = new knob( knobBright_26, this, tr( "Attack-time" ),
-									eng() );
+								eng(), _track );
 	m_attackKnob->setLabel( tr( "ATT" ) );
 	m_attackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_attackKnob->setInitValue( 0.0 );
@@ -177,7 +178,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_attackKnob, SIGNAL( valueChanged( float ) ), this,
 				SLOT( updateAfterKnobChange( float ) ) );
 
-	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ), eng() );
+	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ),
+								eng(), _track );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
 	m_holdKnob->setRange( 0.0, 1.0, 0.001 );
 	m_holdKnob->setInitValue( 0.5 );
@@ -196,7 +198,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_decayKnob = new knob( knobBright_26, this, tr( "Decay-time" ),
-									eng() );
+								eng(), _track );
 	m_decayKnob->setLabel( tr( "DEC" ) );
 	m_decayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_decayKnob->setInitValue( 0.5 );
@@ -216,7 +218,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_sustainKnob = new knob( knobBright_26, this, tr( "Sustain-level" ),
-									eng() );
+								eng(), _track );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
 	m_sustainKnob->setRange( 0.0, 1.0, 0.001 );
 	m_sustainKnob->setInitValue( 0.5 );
@@ -235,7 +237,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_releaseKnob = new knob( knobBright_26, this, tr( "Release-time" ),
-									eng() );
+								eng(), _track );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->setRange( 0.0, 1.0, 0.001 );
 	m_releaseKnob->setInitValue( 0.1 );
@@ -255,7 +257,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_amountKnob = new knob( knobBright_26, this,
-					tr( "Modulation amount" ), eng() );
+						tr( "Modulation amount" ),
+						eng(), _track );
 	m_amountKnob->setLabel( tr( "AMT" ) );
 	m_amountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_amountKnob->setInitValue( 0.0 );
@@ -276,7 +279,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_lfoPredelayKnob = new knob( knobBright_26, this,
-					tr( "LFO-predelay-time" ), eng() );
+						tr( "LFO-predelay-time" ),
+						eng(), _track );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoPredelayKnob->setInitValue( 0.0 );
@@ -294,7 +298,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoAttackKnob = new knob( knobBright_26, this,
-					tr( "LFO-attack-time" ), eng() );
+						tr( "LFO-attack-time" ),
+						eng(), _track );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->setRange( 0.0, 1.0, 0.001 );
 	m_lfoAttackKnob->setInitValue( 0.0 );
@@ -312,7 +317,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
-					tr( "LFO-speed" ), eng(), 20000.0 );
+						tr( "LFO-speed" ),
+						eng(), _track, 20000.0 );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
 	m_lfoSpeedKnob->setInitValue( 0.1 );
@@ -330,7 +336,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 	m_lfoAmountKnob = new knob( knobBright_26, this,
-					tr( "LFO-modulation-amount" ), eng() );
+						tr( "LFO-modulation-amount" ),
+						eng(), _track );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->setRange( -1.0, 1.0, 0.005 );
 	m_lfoAmountKnob->setInitValue( 0.0 );
@@ -587,21 +594,21 @@ float FASTCALL envelopeAndLFOWidget::level( f_cnt_t _frame,
 
 
 
-void envelopeAndLFOWidget::saveSettings( QDomDocument & ,
+void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	_parent.setAttribute( "pdel", m_predelayKnob->value() );
-	_parent.setAttribute( "att", m_attackKnob->value() );
-	_parent.setAttribute( "hold", m_holdKnob->value() );
-	_parent.setAttribute( "dec", m_decayKnob->value() );
-	_parent.setAttribute( "sus", m_sustainKnob->value() );
-	_parent.setAttribute( "rel", m_releaseKnob->value() );
-	_parent.setAttribute( "amt", m_amountKnob->value() );
+	m_predelayKnob->saveSettings( _doc, _parent, "pdel" );
+	m_attackKnob->saveSettings( _doc, _parent, "att" );
+	m_holdKnob->saveSettings( _doc, _parent, "hold" );
+	m_decayKnob->saveSettings( _doc, _parent, "dec" );
+	m_sustainKnob->saveSettings( _doc, _parent, "sus" );
+	m_releaseKnob->saveSettings( _doc, _parent, "rel" );
+	m_amountKnob->saveSettings( _doc, _parent, "amt" );
 	_parent.setAttribute( "lshp", m_lfoShape );
-	_parent.setAttribute( "lpdel", m_lfoPredelayKnob->value() );
-	_parent.setAttribute( "latt", m_lfoAttackKnob->value() );
-	_parent.setAttribute( "lspd", m_lfoSpeedKnob->value() );
-	_parent.setAttribute( "lamt", m_lfoAmountKnob->value() );
+	m_lfoPredelayKnob->saveSettings( _doc, _parent, "lpdel" );
+	m_lfoAttackKnob->saveSettings( _doc, _parent, "latt" );
+	m_lfoSpeedKnob->saveSettings( _doc, _parent, "lspd" );
+	m_lfoAmountKnob->saveSettings( _doc, _parent, "lamt" );
 	_parent.setAttribute( "x100", m_x100Cb->isChecked() );
 	_parent.setAttribute( "ctlenvamt", m_controlEnvAmountCb->isChecked() );
 	_parent.setAttribute( "lfosyncmode",
@@ -616,22 +623,22 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 {
 	m_busy = TRUE;
 
-	m_predelayKnob->setValue( _this.attribute( "pdel" ).toFloat() );
-	m_attackKnob->setValue( _this.attribute( "att" ).toFloat() );
-	m_holdKnob->setValue( _this.attribute( "hold" ).toFloat() );
-	m_decayKnob->setValue( _this.attribute( "dec" ).toFloat() );
-	m_sustainKnob->setValue( _this.attribute( "sus" ).toFloat() );
-	m_releaseKnob->setValue( _this.attribute( "rel" ).toFloat() );
-	m_amountKnob->setValue( _this.attribute( "amt" ).toFloat() );
+	m_predelayKnob->loadSettings( _this, "pdel" );
+	m_attackKnob->loadSettings( _this, "att" );
+	m_holdKnob->loadSettings( _this, "hold" );
+	m_decayKnob->loadSettings( _this, "dec" );
+	m_sustainKnob->loadSettings( _this, "sus" );
+	m_releaseKnob->loadSettings( _this, "rel" );
+	m_amountKnob->loadSettings( _this, "amt" );
 
 	m_lfoShape = static_cast<lfoShapes>( _this.attribute(
 							"lshp" ).toInt() );
 	m_lfoWaveBtnGrp->setValue( m_lfoShape );
 
-	m_lfoPredelayKnob->setValue( _this.attribute( "lpdel" ).toFloat() );
-	m_lfoAttackKnob->setValue( _this.attribute( "latt" ).toFloat() );
-	m_lfoSpeedKnob->setValue( _this.attribute( "lspd" ).toFloat() );
-	m_lfoAmountKnob->setValue( _this.attribute( "lamt" ).toFloat() );
+	m_lfoPredelayKnob->loadSettings( _this, "lpdel" );
+	m_lfoAttackKnob->loadSettings( _this, "latt" );
+	m_lfoSpeedKnob->loadSettings( _this, "lspd" );
+	m_lfoAmountKnob->loadSettings( _this, "lamt" );
 	m_x100Cb->setChecked( _this.attribute( "x100" ).toInt() );
 	m_controlEnvAmountCb->setChecked( _this.attribute(
 							"ctlenvamt" ).toInt() );

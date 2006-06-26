@@ -64,6 +64,7 @@ class knob;
 class ledCheckBox;
 class pixmapButton;
 class tempoSyncKnob;
+class track;
 
 
 class flpImport;
@@ -75,7 +76,7 @@ class envelopeAndLFOWidget : public QWidget, public journallingObject,
 	Q_OBJECT
 public:
 	envelopeAndLFOWidget( float _value_for_zero_amount, QWidget * _parent,
-							engine * _engine );
+					engine * _engine, track * _track );
 	virtual ~envelopeAndLFOWidget();
 
 	static inline float expKnobVal( float val )
