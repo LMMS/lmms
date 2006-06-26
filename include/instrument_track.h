@@ -218,8 +218,6 @@ private:
 	tones m_baseTone;
 	octaves m_baseOctave;
 
-	QString m_name;
-
 
 	// widgets on the top of a instrument-track-window
 	tabWidget * m_generalSettingsWidget;

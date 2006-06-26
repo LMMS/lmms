@@ -149,7 +149,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// creation of widgets for track-settings-widget
 	m_tswVolumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-					tr( "Channel volume" ), eng() );
+					tr( "Channel volume" ), eng(), this );
 	m_tswVolumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_tswVolumeKnob->setInitValue( DEFAULT_VOLUME );
 	m_tswVolumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
@@ -220,7 +220,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// setup volume-knob
 	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
-					tr( "Channel volume" ), eng() );
+					tr( "Channel volume" ), eng(), this );
 	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
@@ -870,6 +870,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
+	sendMidiTime( _start );
+
 	// calculate samples per tact; need that later when calculating
 	// sample-pos of a note
 	float frames_per_tact = eng()->getSongEditor()->framesPerTact();
@@ -1040,7 +1042,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", name() );
-	_this.setAttribute( "vol", getVolume() );
+	m_volumeKnob->saveSettings( _doc, _this, "vol" );
 
 	// make all coordinates positive
 	unsigned int x = surroundAreaPos().x() + 2 * SURROUND_AREA_SIZE;
@@ -1072,7 +1074,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	invalidateAllMyNPH();
 
 	setName( _this.attribute( "name" ) );
-	setVolume( _this.attribute( "vol" ).toInt() );
+	m_volumeKnob->loadSettings( _this, "vol" );
 
 	int i = _this.attribute( "surpos" ).toInt();
 	setSurroundAreaPos( QPoint( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE,
@@ -1104,7 +1106,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_midiWidget->restoreState( node.toElement() );
 			}
-			else
+			else if( timePattern::classNodeName()
+							!= node.nodeName() )
 			{
 				// if node-name doesn't match any known one,
 				// we assume that it is an instrument-plugin
