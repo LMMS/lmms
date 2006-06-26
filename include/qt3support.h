@@ -188,6 +188,10 @@ inline QString baseName( const QString & _file )
 #define setColumnMinimumWidth setColSpacing
 
 
+// QPointer
+#define QPointer QGuardedPtr
+
+
 // QRect
 #define normalized normalize
 
