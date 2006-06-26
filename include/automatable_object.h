@@ -28,42 +28,60 @@
 
 #include <math.h>
 
+#include "qt3support.h"
 #include "journalling_object.h"
 #include "templates.h"
+#include "midi_time.h"
+#include "level_object.h"
+#include "time_pattern.h"
+#include "time_roll.h"
 
 #ifndef QT3
 
 #include <Qt/QtXml>
 #include <QtCore/QVariant>
+#include <QtCore/QPointer>
 
 #else
 
 #include <qdom.h>
 #include <qvariant.h>
+#include <qguardedptr.h>
 
 #endif
 
 
 template<typename T, typename EDIT_STEP_TYPE = T>
-class automatableObject : public journallingObject
+class automatableObject : public journallingObject, public levelObject
 {
 public:
 	typedef automatableObject<T, EDIT_STEP_TYPE> autoObj;
 
-	automatableObject( engine * _engine, const T _val = 0, const T _min = 0,
-				const T _max = 0,
-				const T _step = defaultRelStep() ) :
+	automatableObject( engine * _engine, track * _track = NULL,
+					const T _val = 0, const T _min = 0,
+					const T _max = 0,
+					const T _step = defaultRelStep() ) :
 		journallingObject( _engine ),
 		m_oldValue( _val ),
 		m_value( _val ),
 		m_minValue( _min ),
 		m_maxValue( _max ),
-		m_step( _step )
+		m_step( _step ),
+		m_curLevel( (int)( _val / _step ) ),
+		m_time_pattern( NULL ),
+		m_track( _track ),
+		m_update_first( TRUE )
 	{
+		m_minLevel = level( _min );
+		m_maxLevel = level( _max );
 	}
 
 	virtual ~automatableObject()
 	{
+		if( m_time_pattern )
+		{
+			delete m_time_pattern;
+		}
 		while( m_linkedObjects.empty() == FALSE )
 		{
 			m_linkedObjects.last()->unlinkObject( this );
@@ -107,6 +125,11 @@ public:
 		return( m_step );
 	}
 
+	inline int curLevel( void ) const
+	{
+		return( m_curLevel );
+	}
+
 	inline T fittedValue( T _value )
 	{
 		_value = tLimit<T>( _value, minValue(), maxValue() );
@@ -141,6 +164,10 @@ public:
 	{
 		saveJournallingState( FALSE );
 		setValue( _value );
+		if( m_time_pattern )
+		{
+			setFirstValue();
+		}
 		restoreJournallingState();
 	}
 
@@ -151,6 +178,8 @@ public:
 		m_value = fittedValue( _value );
 		if( old_val != m_value )
 		{
+			m_curLevel = level( m_value );
+
 			// add changes to history so user can undo it
 			addJournalEntry( journalEntry( 0,
 				static_cast<EDIT_STEP_TYPE>( m_value ) -
@@ -188,11 +217,11 @@ public:
 	{
 		m_minValue = _min;
 		m_maxValue = _max;
-		setStep( _step );
 		if( m_minValue > m_maxValue )
 		{
 			qSwap<T>( m_minValue, m_maxValue );
 		}
+		setStep( _step );
 		// re-adjust value
 		autoObj::setInitValue( value() );
 	}
@@ -224,22 +253,9 @@ public:
 			}
 		}*/
 		m_step = _step;
-	}
-
-	inline void linkObject( autoObj * _object )
-	{
-		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
-					_object ) == m_linkedObjects.end() )
-		{
-			m_linkedObjects.push_back( _object );
-		}
-	}
-
-	inline void unlinkObject( autoObj * _object )
-	{
-		m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
-						m_linkedObjects.end(),
-						_object ) );
+		m_curLevel = level( m_value );
+		m_minLevel = level( m_minValue );
+		m_maxLevel = level( m_maxValue );
 	}
 
 	static inline void linkObjects( autoObj * _object1,
@@ -247,6 +263,64 @@ public:
 	{
 		_object1->linkObject( _object2 );
 		_object2->linkObject( _object1 );
+
+		if( _object1->m_time_pattern != _object2->m_time_pattern )
+		{
+			if( _object2->m_time_pattern )
+			{
+				delete _object2->m_time_pattern;
+			}
+			_object2->m_time_pattern = _object1->m_time_pattern;
+		}
+	}
+
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+					QDomElement & _this,
+					const QString & _name = "value" )
+	{
+		if( m_time_pattern )
+		{
+			QDomElement pattern_element;
+			QDomNode node = _this.namedItem(
+						timePattern::classNodeName() );
+			if( node.isElement() )
+			{
+				pattern_element = node.toElement();
+			}
+			else
+			{
+				pattern_element = _doc.createElement(
+						timePattern::classNodeName() );
+				_this.appendChild( pattern_element );
+			}
+			QDomElement element = _doc.createElement( _name );
+			m_time_pattern->saveSettings( _doc, element );
+			pattern_element.appendChild( element );
+		}
+		else
+		{
+			_this.setAttribute( _name, value() );
+		}
+	}
+
+	virtual void FASTCALL loadSettings( const QDomElement & _this,
+					const QString & _name = "value" )
+	{
+		QDomNode node = _this.namedItem( timePattern::classNodeName() );
+		if( node.isElement() )
+		{
+			node = node.namedItem( _name );
+			if( node.isElement() )
+			{
+				m_time_pattern->loadSettings(
+							node.toElement() );
+				setLevel( m_time_pattern->valueAt(
+							midiTime( 0 ) ) );
+				return;
+			}
+		}
+
+		setInitValue( attributeValue( _this.attribute( _name ) ) );
 	}
 
 	virtual QString nodeName( void ) const
@@ -291,18 +365,6 @@ protected:
 		redoStep( je );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
-	{
-		_this.setAttribute( "value", value() );
-	}
-
-	virtual void FASTCALL loadSettings( const QDomElement & _this )
-	{
-		setValue( static_cast<T>(
-				_this.attribute( "value" ).toDouble() ) );
-	}
-
 
 	// most objects will need this temporarily
 	T m_oldValue;
@@ -312,17 +374,89 @@ protected:
 		addJournalEntry( journalEntry( 0, value() - m_oldValue ) );
 	}
 
+	inline timePattern * getTimePattern( void )
+	{
+		if( !m_time_pattern )
+		{
+			m_time_pattern = new timePattern( m_track, this );
+			syncTimePattern();
+		}
+		return( m_time_pattern );
+	}
+
+	inline void setFirstValue( void )
+	{
+		if( m_update_first )
+		{
+			m_time_pattern->putValue( midiTime( 0 ), m_curLevel,
+									FALSE );
+			if( eng()->getTimeRoll()->currentPattern()
+							== m_time_pattern )
+			{
+				eng()->getTimeRoll()->update();
+			}
+		}
+	}
+
 
 private:
 	T m_value;
 	T m_minValue;
 	T m_maxValue;
 	T m_step;
+	int m_curLevel;
+	QPointer<timePattern> m_time_pattern;
+	track * m_track;
+	bool m_update_first;
 
 	QVariant m_data;
 
 	typedef vvector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;
+
+	inline void linkObject( autoObj * _object )
+	{
+		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
+					_object ) == m_linkedObjects.end() )
+		{
+			m_linkedObjects.push_back( _object );
+		}
+	}
+
+	inline void unlinkObject( autoObj * _object )
+	{
+		m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
+						m_linkedObjects.end(),
+						_object ) );
+	}
+
+	static T attributeValue( QString _value );
+
+	inline void syncTimePattern( void )
+	{
+		for( csize i = 0; i < m_linkedObjects.size(); ++i )
+		{
+			autoObj * it = m_linkedObjects[i];
+			if( m_time_pattern != it->m_time_pattern )
+			{
+				it->m_time_pattern = m_time_pattern;
+			}
+		}
+	}
+
+	void setLevel( int _level )
+	{
+		saveJournallingState( FALSE );
+		m_update_first = FALSE;
+		setValue( _level * m_step );
+		m_update_first = TRUE;
+		restoreJournallingState();
+	}
+
+	inline int level( T _value ) const
+	{
+		return( (int)( _value / m_step ) );
+	}
 
 } ;
 
@@ -347,6 +481,31 @@ template<>
 inline float automatableObject<float>::minEps( void )
 {
 	return( 1.0e-10 );
+}
+
+
+
+template<>
+inline float automatableObject<float>::attributeValue( QString _value )
+{
+	return( _value.toFloat() );
+}
+
+
+
+template<>
+inline int automatableObject<int>::attributeValue( QString _value )
+{
+	return( _value.toInt() );
+}
+
+
+
+template<>
+inline bool automatableObject<bool, signed char>::attributeValue(
+								QString _value )
+{
+	return( static_cast<bool>( _value.toInt() ) );
 }
 
 
