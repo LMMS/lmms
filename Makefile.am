@@ -92,6 +92,8 @@ lmms_MOC =						\
 		./tab_button.moc			\
 		./tab_widget.moc			\
 		./tempo_sync_knob.moc			\
+		./time_pattern.moc			\
+		./time_roll.moc				\
 		./timeline.moc				\
 		./tool_button.moc			\
 		./track_container.moc			\
@@ -150,6 +152,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/track.cpp				\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
+		$(srcdir)/src/core/time_roll.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
 		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
@@ -172,6 +175,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/instrument_track.cpp		\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
+		$(srcdir)/src/tracks/time_pattern.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
@@ -268,6 +272,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/types.h				\
 		$(srcdir)/include/qt3support.h				\
 		$(srcdir)/include/embed.h				\
+		$(srcdir)/include/time_pattern.h			\
+		$(srcdir)/include/time_roll.h				\
 		$(srcdir)/include/timeline.h				\
 		$(srcdir)/include/config_mgr.h				\
 		$(srcdir)/include/spc_bg_hndl_widget.h			\
@@ -307,6 +313,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/automatable_object.h			\
 		$(srcdir)/include/journalling_object.h			\
+		$(srcdir)/include/level_object.h			\
 		$(srcdir)/include/project_journal.h			\
 		$(srcdir)/include/import_filter.h			\
 		$(srcdir)/include/engine.h				\
