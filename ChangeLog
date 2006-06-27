@@ -1,3 +1,91 @@
+2006-06-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/time_pattern.h:
+	* src/tracks/time_pattern.cpp:
+	initial release, pattern for dynamic values
+
+	* include/time_roll.h:
+	* src/core/time_roll.cpp:
+	initial release, time pattern editor
+
+	* include/level_object.h:
+	initial release, mainly used by the time-roll
+
+	* include/automatable_object.h:
+	- added levelObject inheritance and related functions
+	- added time pattern
+	- moved linkObject methods to private for safety
+	- save/load settings can use generic names and types other than double
+
+	* include/engine.h:
+	* include/main_window.h:
+	* src/core/engine.cpp:
+	* src/core/main_window.cpp:
+	added time-roll
+
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	- use automation capabilities
+	- added time-roll option in context menu
+
+	* include/tempo_sync_knob.h:
+	* include/volume_knob.h:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	added automation
+
+	* include/envelope_and_lfo_widget.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vibed/vibed.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	added automation to many knobs
+
+	* include/track.h:
+	* src/core/track.cpp:
+	- added time pattern
+	- added name methods
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	- moved name scope to track
+	- added automation to knobs
+	- don't try to load a time pattern plugin
+
+	* src/tracks/sample_track.cpp:
+	added automation to knob
+
+	* include/note.h:
+	* src/core/note.cpp:
+	moved quantized() to public
+
+	* include/qt3support.h:
+	added QPointer
+
+	* include/song_editor.h:
+	added time pattern
+
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	simplified combobox numbers generation
+
+	* data/themes/default/zoom_x.png:
+	* data/themes/default/zoom_y.png:
+	* resources/zoom_x.png:
+	* resources/zoom_y.png:
+	icons for the time-roll
+
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	added new files
+
 2006-06-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/organic/organic.cpp:
