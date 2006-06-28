@@ -1,3 +1,13 @@
+2006-06-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/level_object.h:
+	* src/tracks/time_pattern.cpp:
+	added level<->label methods
+
+	* include/automatable_object.h:
+	- added level<->label methods
+	- minimized rounding errors
+
 2006-06-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/time_pattern.h:
