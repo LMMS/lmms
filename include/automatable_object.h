@@ -136,7 +136,7 @@ public:
 
 		if( m_step != 0 )
 		{
-			_value = static_cast<T>( floorf( _value / step() ) *
+			_value = static_cast<T>( roundf( _value / step() ) *
 								step() );
 		}
 		else
@@ -455,7 +455,17 @@ private:
 
 	inline int level( T _value ) const
 	{
-		return( (int)( _value / m_step ) );
+		return( (int)roundf( _value / m_step ) );
+	}
+
+	QString levelToLabel( int _level )
+	{
+		return( QString::number( _level * m_step ) );
+	}
+
+	int labelToLevel( QString _label )
+	{
+		return( level( attributeValue( _label ) ) );
 	}
 
 } ;
