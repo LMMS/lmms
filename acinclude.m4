@@ -203,7 +203,7 @@ case "${host}" in
     *linux*)
         QT_LIBS="$QT_LIB"
         if test $QT_IS_STATIC = yes && test $QT_IS_EMBEDDED = no; then
-            QT_LIBS="$QT_LIBS -L$x_libraries -lXext -lX11 -lm -lSM -lICE -ldl -ljpeg"
+            QT_LIBS="$QT_LIBS -L$x_libraries -lXext -lX11 -lm -lSM -lICE -ljpeg"
         fi
         ;;
 

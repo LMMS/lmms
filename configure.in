@@ -429,6 +429,8 @@ if test $CXX == "g++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall -fno-exceptions"
 fi
 
+LDFLAGS="$LDFLAGS -L/usr/local/lib"
+CXXFLAGS="$CXXFLAGS -I/usr/local/include"
 
 AC_CONFIG_FILES([Makefile
 		 buildtools/Makefile
@@ -670,11 +672,10 @@ else
 		echo " = in /usr/include/ or ./include. We cannot distribute them as they're licensed under"
 		echo " = a GPL-incompatible license, so you'll have to download them at"
 		echo " ="
-		echo " = http://www.steinberg.de/Steinberg/ygrabit/vstsdk/OnlineDoc/source/common/AEffect.h"
-		echo " = http://www.steinberg.de/Steinberg/ygrabit/vstsdk/OnlineDoc/source/common/aeffectx.h"
+		echo " = http://audacity.cvs.sourceforge.net/*checkout*/audacity/audacity-old/effects/aeffectx.h"
+		echo " = http://audacity.cvs.sourceforge.net/*checkout*/audacity/audacity-old/effects/AEffect.h"
 		echo " ="
-		echo " = and put the mentioned files into /usr/include/ or ./include. Make sure,"
-		echo "= they're patched with file vst_sdk23_headers.diff!"
+		echo " = and put the mentioned files into /usr/include/ or ./include."
 		echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
 		echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
 		echo " = ignore this warning."

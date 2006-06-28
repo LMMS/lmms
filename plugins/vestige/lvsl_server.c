@@ -5,7 +5,7 @@
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
- * Code partly taken from XFST:
+ * Code partly taken from (X)FST:
  * 		Copyright (c) 2004 Paul Davis
  * 		Copyright (c) 2004 Torben Hohn
  *	 	Copyright (c) 2002 Kjetil S. Matheussen
@@ -611,14 +611,18 @@ void VSTPlugin::getParameterProperties( const Sint32 _idx )
 	memcpy( props.label, vst_props.label, sizeof( props.label ) );
 	memcpy( props.shortLabel, vst_props.shortLabel,
 						sizeof( props.shortLabel) );
+#if kVstVersion > 2
 	memcpy( props.categoryLabel, vst_props.categoryLabel,
 						sizeof( props.categoryLabel ) );
+#endif
 	props.minValue = vst_props.minInteger;
 	props.maxValue = vst_props.maxInteger;
 	props.step = ( vst_props.flags & kVstParameterUsesFloatStep ) ?
 							vst_props.stepFloat :
 							vst_props.stepInteger;
+#if kVstVersion > 2
 	props.category = vst_props.category;
+#endif
 	writeValue<Sint16>( VST_PARAMETER_PROPERTIES );
 	writeValue<vstParamProperties>( props );
 }
@@ -966,6 +970,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 									0.0f );
 			return( 0 );
 
+#if kVstVersion > 2
 		case audioMasterBeginEdit:
 			SHOW_CALLBACK( "amc: audioMasterBeginEdit\n" );
 			// begin of automation session (when mouse down),	
@@ -983,7 +988,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			// open a fileselector window with VstFileSelect*
 			// in <ptr>
 			return( 0 );
-
+#endif
 		default:
 			SHOW_CALLBACK( "VST master dispatcher: undefined: "
 						"%d\n", (int) _opcode );
