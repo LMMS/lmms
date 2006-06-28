@@ -50,6 +50,9 @@ public:
 
 	virtual void setLevel( int _level ) = 0;
 
+	virtual QString levelToLabel( int _level ) = 0;
+	virtual int labelToLevel( QString _label ) = 0;
+
 
 protected:
 	int m_minLevel;
