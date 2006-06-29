@@ -29,12 +29,12 @@
 #include <math.h>
 
 #include "qt3support.h"
+#include "automation_editor.h"
+#include "automation_pattern.h"
 #include "journalling_object.h"
 #include "templates.h"
 #include "midi_time.h"
 #include "level_object.h"
-#include "time_pattern.h"
-#include "time_roll.h"
 
 #ifndef QT3
 
@@ -68,7 +68,7 @@ public:
 		m_maxValue( _max ),
 		m_step( _step ),
 		m_curLevel( (int)( _val / _step ) ),
-		m_time_pattern( NULL ),
+		m_automation_pattern( NULL ),
 		m_track( _track ),
 		m_update_first( TRUE )
 	{
@@ -78,9 +78,9 @@ public:
 
 	virtual ~automatableObject()
 	{
-		if( m_time_pattern )
+		if( m_automation_pattern )
 		{
-			delete m_time_pattern;
+			delete m_automation_pattern;
 		}
 		while( m_linkedObjects.empty() == FALSE )
 		{
@@ -136,8 +136,8 @@ public:
 
 		if( m_step != 0 )
 		{
-			_value = static_cast<T>( roundf( _value / step() ) *
-								step() );
+			_value = static_cast<T>( roundf( _value
+						/ (float)step() ) * step() );
 		}
 		else
 		{
@@ -164,7 +164,7 @@ public:
 	{
 		saveJournallingState( FALSE );
 		setValue( _value );
-		if( m_time_pattern )
+		if( m_automation_pattern )
 		{
 			setFirstValue();
 		}
@@ -264,13 +264,15 @@ public:
 		_object1->linkObject( _object2 );
 		_object2->linkObject( _object1 );
 
-		if( _object1->m_time_pattern != _object2->m_time_pattern )
+		if( _object1->m_automation_pattern
+					!= _object2->m_automation_pattern )
 		{
-			if( _object2->m_time_pattern )
+			if( _object2->m_automation_pattern )
 			{
-				delete _object2->m_time_pattern;
+				delete _object2->m_automation_pattern;
 			}
-			_object2->m_time_pattern = _object1->m_time_pattern;
+			_object2->m_automation_pattern
+					= _object1->m_automation_pattern;
 		}
 	}
 
@@ -278,11 +280,11 @@ public:
 					QDomElement & _this,
 					const QString & _name = "value" )
 	{
-		if( m_time_pattern )
+		if( m_automation_pattern )
 		{
 			QDomElement pattern_element;
 			QDomNode node = _this.namedItem(
-						timePattern::classNodeName() );
+					automationPattern::classNodeName() );
 			if( node.isElement() )
 			{
 				pattern_element = node.toElement();
@@ -290,11 +292,11 @@ public:
 			else
 			{
 				pattern_element = _doc.createElement(
-						timePattern::classNodeName() );
+					automationPattern::classNodeName() );
 				_this.appendChild( pattern_element );
 			}
 			QDomElement element = _doc.createElement( _name );
-			m_time_pattern->saveSettings( _doc, element );
+			m_automation_pattern->saveSettings( _doc, element );
 			pattern_element.appendChild( element );
 		}
 		else
@@ -306,15 +308,16 @@ public:
 	virtual void FASTCALL loadSettings( const QDomElement & _this,
 					const QString & _name = "value" )
 	{
-		QDomNode node = _this.namedItem( timePattern::classNodeName() );
+		QDomNode node = _this.namedItem(
+					automationPattern::classNodeName() );
 		if( node.isElement() )
 		{
 			node = node.namedItem( _name );
 			if( node.isElement() )
 			{
-				m_time_pattern->loadSettings(
+				m_automation_pattern->loadSettings(
 							node.toElement() );
-				setLevel( m_time_pattern->valueAt(
+				setLevel( m_automation_pattern->valueAt(
 							midiTime( 0 ) ) );
 				return;
 			}
@@ -374,26 +377,27 @@ protected:
 		addJournalEntry( journalEntry( 0, value() - m_oldValue ) );
 	}
 
-	inline timePattern * getTimePattern( void )
+	inline automationPattern * getAutomationPattern( void )
 	{
-		if( !m_time_pattern )
+		if( !m_automation_pattern )
 		{
-			m_time_pattern = new timePattern( m_track, this );
-			syncTimePattern();
+			m_automation_pattern = new automationPattern( m_track,
+									this );
+			syncAutomationPattern();
 		}
-		return( m_time_pattern );
+		return( m_automation_pattern );
 	}
 
 	inline void setFirstValue( void )
 	{
 		if( m_update_first )
 		{
-			m_time_pattern->putValue( midiTime( 0 ), m_curLevel,
-									FALSE );
-			if( eng()->getTimeRoll()->currentPattern()
-							== m_time_pattern )
+			m_automation_pattern->putValue( midiTime( 0 ),
+							m_curLevel, FALSE );
+			if( eng()->getAutomationEditor()->currentPattern()
+						== m_automation_pattern )
 			{
-				eng()->getTimeRoll()->update();
+				eng()->getAutomationEditor()->update();
 			}
 		}
 	}
@@ -405,7 +409,7 @@ private:
 	T m_maxValue;
 	T m_step;
 	int m_curLevel;
-	QPointer<timePattern> m_time_pattern;
+	QPointer<automationPattern> m_automation_pattern;
 	track * m_track;
 	bool m_update_first;
 
@@ -432,14 +436,14 @@ private:
 
 	static T attributeValue( QString _value );
 
-	inline void syncTimePattern( void )
+	inline void syncAutomationPattern( void )
 	{
 		for( csize i = 0; i < m_linkedObjects.size(); ++i )
 		{
 			autoObj * it = m_linkedObjects[i];
-			if( m_time_pattern != it->m_time_pattern )
+			if( m_automation_pattern != it->m_automation_pattern )
 			{
-				it->m_time_pattern = m_time_pattern;
+				it->m_automation_pattern = m_automation_pattern;
 			}
 		}
 	}
@@ -455,7 +459,7 @@ private:
 
 	inline int level( T _value ) const
 	{
-		return( (int)roundf( _value / m_step ) );
+		return( (int)roundf( _value / (float)m_step ) );
 	}
 
 	QString levelToLabel( int _level )
