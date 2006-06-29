@@ -25,6 +25,7 @@
  */
 
 
+#include "automation_editor.h"
 #include "bb_editor.h"
 #include "project_journal.h"
 #include "engine.h"
@@ -34,7 +35,6 @@
 #include "preset_preview_play_handle.h"
 #include "project_notes.h"
 #include "song_editor.h"
-#include "time_roll.h"
 
 
 engine::engine( const bool _has_gui ) :
@@ -42,10 +42,10 @@ engine::engine( const bool _has_gui ) :
 	m_mixer( NULL ),
 	m_mainWindow( NULL ),
 	m_songEditor( NULL ),
+	m_automationEditor( NULL ),
 	m_bbEditor( NULL ),
 	m_pianoRoll( NULL ),
-	m_projectJournal( NULL ),
-	m_timeRoll( NULL )
+	m_projectJournal( NULL )
 {
 	m_projectJournal = new projectJournal( this );
 	m_mainWindow = new mainWindow( this );
@@ -54,7 +54,7 @@ engine::engine( const bool _has_gui ) :
 	m_projectNotes = new projectNotes( this );
 	m_bbEditor = new bbEditor( this );
 	m_pianoRoll = new pianoRoll( this );
-	m_timeRoll = new timeRoll( this );
+	m_automationEditor = new automationEditor( this );
 
 	m_mixer->initDevices();
 
@@ -74,7 +74,7 @@ engine::~engine()
 	delete m_songEditor;
 	delete m_bbEditor;
 	delete m_pianoRoll;
-	delete m_timeRoll;
+	delete m_automationEditor;
 
 	presetPreviewPlayHandle::cleanUp( this );
 

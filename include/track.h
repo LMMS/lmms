@@ -62,9 +62,9 @@
 class QMenu;
 class QPushButton;
 
+class automationPattern;
 class pixmapButton;
 class textFloat;
-class timePattern;
 class track;
 class trackContainer;
 class trackContentWidget;
@@ -485,8 +485,8 @@ public:
 		return( &m_trackWidget->getTrackContentWidget() );
 	}
 
-	void addTimePattern( timePattern * _pattern );
-	void removeTimePattern( timePattern * _pattern );
+	void addAutomationPattern( automationPattern * _pattern );
+	void removeAutomationPattern( automationPattern * _pattern );
 
 	// name-stuff
 	inline virtual const QString & name( void ) const
@@ -507,7 +507,7 @@ protected:
 private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
-	QPtrList<timePattern> m_time_patterns;
+	QPtrList<automationPattern> m_automation_patterns;
 
 } ;
 

@@ -1106,7 +1106,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_midiWidget->restoreState( node.toElement() );
 			}
-			else if( timePattern::classNodeName()
+			else if( automationPattern::classNodeName()
 							!= node.nodeName() )
 			{
 				// if node-name doesn't match any known one,

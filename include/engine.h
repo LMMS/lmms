@@ -26,6 +26,7 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
+class automationEditor;
 class bbEditor;
 class projectJournal;
 class mainWindow;
@@ -33,7 +34,6 @@ class mixer;
 class pianoRoll;
 class projectNotes;
 class songEditor;
-class timeRoll;
 
 
 class engine
@@ -98,9 +98,9 @@ public:
 		return( m_projectJournal );
 	}
 
-	inline timeRoll * getTimeRoll( void )
+	inline automationEditor * getAutomationEditor( void )
 	{
-		return( m_timeRoll );
+		return( m_automationEditor );
 	}
 
 
@@ -110,11 +110,11 @@ private:
 	mixer * m_mixer;
 	mainWindow * m_mainWindow;
 	songEditor * m_songEditor;
+	automationEditor * m_automationEditor;
 	bbEditor * m_bbEditor;
 	pianoRoll * m_pianoRoll;
 	projectNotes * m_projectNotes;
 	projectJournal * m_projectJournal;
-	timeRoll * m_timeRoll;
 
 } ;
 

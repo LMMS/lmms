@@ -48,6 +48,8 @@ lmms_MOC =						\
 		./about_dialog.moc			\
 		./arp_and_chords_tab_widget.moc		\
 		./automatable_button.moc		\
+		./automation_editor.moc			\
+		./automation_pattern.moc		\
 		./bb_editor.moc				\
 		./bb_track.moc				\
 		./instrument_track.moc			\
@@ -92,8 +94,6 @@ lmms_MOC =						\
 		./tab_button.moc			\
 		./tab_widget.moc			\
 		./tempo_sync_knob.moc			\
-		./time_pattern.moc			\
-		./time_roll.moc				\
 		./timeline.moc				\
 		./tool_button.moc			\
 		./track_container.moc			\
@@ -125,6 +125,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/audio/audio_sdl.cpp			\
 		$(srcdir)/src/core/about_dialog.cpp			\
 		$(srcdir)/src/core/arp_and_chords_tab_widget.cpp	\
+		$(srcdir)/src/core/automation_editor.cpp		\
 		$(srcdir)/src/core/bb_editor.cpp			\
 		$(srcdir)/src/core/config_mgr.cpp			\
 		$(srcdir)/src/core/engine.cpp				\
@@ -152,7 +153,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/track.cpp				\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
-		$(srcdir)/src/core/time_roll.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
 		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/buffer_allocator.cpp			\
@@ -171,11 +171,11 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
 		$(srcdir)/src/midi/midi_oss.cpp				\
 		$(srcdir)/src/midi/midi_port.cpp			\
+		$(srcdir)/src/tracks/automation_pattern.cpp		\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/instrument_track.cpp		\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
-		$(srcdir)/src/tracks/time_pattern.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
@@ -214,6 +214,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/audio_oss.h				\
 		$(srcdir)/include/audio_sample_recorder.h		\
 		$(srcdir)/include/audio_sdl.h				\
+		$(srcdir)/include/automation_editor.h			\
+		$(srcdir)/include/automation_pattern.h			\
 		$(srcdir)/include/interpolation.h			\
 		$(srcdir)/include/lmms_constants.h			\
 		$(srcdir)/include/lmms_math.h				\
@@ -272,8 +274,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/types.h				\
 		$(srcdir)/include/qt3support.h				\
 		$(srcdir)/include/embed.h				\
-		$(srcdir)/include/time_pattern.h			\
-		$(srcdir)/include/time_roll.h				\
 		$(srcdir)/include/timeline.h				\
 		$(srcdir)/include/config_mgr.h				\
 		$(srcdir)/include/spc_bg_hndl_widget.h			\

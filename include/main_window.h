@@ -118,11 +118,11 @@ public slots:
 	void showSettingsDialog( void );
 	void aboutLMMS( void );
 	void help( void );
+	void toggleAutomationEditorWin( void );
 	void toggleBBEditorWin( void );
 	void toggleSongEditorWin( void );
 	void toggleProjectNotesWin( void );
 	void togglePianoRollWin( void );
-	void toggleTimeRollWin( void );
 
 	void undo( void );
 	void redo( void );

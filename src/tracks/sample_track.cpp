@@ -522,7 +522,8 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	else
 	{
-		QDomNode node = _this.namedItem( timePattern::classNodeName() );
+		QDomNode node = _this.namedItem(
+					automationPattern::classNodeName() );
 		if( node.isElement() && node.namedItem( "vol" ).isElement() )
 		{
 			m_volumeKnob->loadSettings( _this, "vol" );

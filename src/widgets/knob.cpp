@@ -118,7 +118,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( "knob0" +
 					QString::number( m_knobNum + 1 ) ) );
 #endif
-	getTimePattern();
+	getAutomationPattern();
 
 	setRange( 0.0f, 100.0f, 1.0f );
 
@@ -374,9 +374,9 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	contextMenu.addSeparator();
 //TODO: Change icon
 	contextMenu.addAction( embed::getIconPixmap( "piano" ),
-						tr( "&Open in time-roll" ),
-						getTimePattern(),
-						SLOT( openInTimeRoll() ) );
+					tr( "&Open in automation editor" ),
+					getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
 						SLOT( connectToMidiDevice() ) );
