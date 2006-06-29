@@ -1,3 +1,42 @@
+2006-06-29	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* Makefile.am:
+	* include/automation_editor.h:
+	* include/automation_pattern.h:
+	* include/engine.h:
+	* include/main_window.h:
+	* include/song_editor.h:
+	* include/time_pattern.h:
+	* include/time_roll.h:
+	* include/track.h:
+	* src/lmms_single_source.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/engine.cpp:
+	* src/core/main_window.cpp:
+	* src/core/time_roll.cpp:
+	* src/core/track.cpp:
+	* src/tracks/automation_pattern.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/time_pattern.cpp:
+	* src/widgets/knob.cpp:
+	renamed time* classes to automation* ones
+
+	* include/automatable_object.h:
+	- renamed time* classes to automation* ones
+	- fixed int classes rounding
+
+	* plugins/organic/organic.cpp:
+	save harmonic settings like before
+
+	* data/presets/Organic/organ_risingsun.cs.xml:
+	* data/presets/Organic/organ_swish.cs.xml:
+	* data/presets/Organic/pad_ethereal.cs.xml:
+	* data/presets/Organic/pad_rich.cs.xml:
+	* data/presets/Organic/pad_sweep.cs.xml:
+	* data/presets/Organic/sequencer_64.cs.xml:
+	upgraded to new detuning algorithm
+
 2006-06-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/level_object.h:
