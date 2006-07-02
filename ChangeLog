@@ -1,3 +1,66 @@
+2006-07-02	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/surround_area.h:
+	* src/core/surround_area.cpp:
+	- use automation capabilities using helper knobs
+	- added context menu
+	- added save/load methods
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	use upgraded surround area
+
+	* include/automatable_button.h:
+	* src/widgets/automatable_button.cpp:
+	- use automation capabilities in button and button group
+	- added button context menu
+
+	* include/group_box.h:
+	* include/led_checkbox.h:
+	* include/pixmap_button.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vibed/impulse_editor.cpp:
+	* plugins/vibed/impulse_editor.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/vibed.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/track.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/pixmap_button.cpp:
+	upgraded buttons
+
+	* plugins/bit_invader/bit_invader.cpp:
+	- upgraded buttons
+	- use sample length knob automation
+
+	* plugins/organic/organic.cpp:
+	- upgraded button
+	- use waveshape knob automation
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	upgraded buttons and button groups
+
+	* include/automatable_object.h:
+	- moved getAutomationPattern to public
+	- added some checks and minor fixes
+
+	* src/core/automation_editor.cpp:
+	improved levels display
+
+	* src/core/song_editor.cpp:
+	save/load automation editor state
+
+	* src/widgets/tempo_sync_knob.cpp:
+	added automation editor option in context menu
+
 2006-06-29	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* Makefile.am:
