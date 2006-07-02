@@ -204,7 +204,8 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							1 ) + " ", "%" );
 							
 		// randomise
-		m_randBtn = new pixmapButton( this, eng() );
+		m_randBtn = new pixmapButton( this, tr( "Randomise" ), eng(),
+							_channel_track );
 		m_randBtn->move( 100, 200 );
 		m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise_pressed" ) );
@@ -259,8 +260,7 @@ void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "harmonic" + is, QString::number(
 					powf( 2.0f, m_osc[i].harmonic ) ) );
 		m_osc[i].detuneKnob->saveSettings( _doc, _this, "detune" + is );
-		_this.setAttribute( "wavetype" + is, QString::number(
-							m_osc[i].waveShape ) );
+		m_osc[i].oscKnob->saveSettings( _doc, _this, "wavetype" + is );
 	}
 }
 
@@ -278,8 +278,7 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 		m_osc[i].volKnob->loadSettings( _this, "vol" + is );
 		m_osc[i].detuneKnob->loadSettings( _this, "detune" + is );
 		m_osc[i].panKnob->loadSettings( _this, "pan" + is );
-		m_osc[i].oscKnob->setValue( _this.attribute( "wavetype"+is ).
-								toInt() );								
+		m_osc[i].oscKnob->loadSettings( _this, "wavetype" + is );
 	}
 	
 	volKnob->loadSettings( _this, "vol" );
