@@ -1529,6 +1529,12 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 							node.toElement() );
 			}
 			else if( node.nodeName() ==
+				eng()->getAutomationEditor()->nodeName() )
+			{
+				eng()->getAutomationEditor()->restoreState(
+							node.toElement() );
+			}
+			else if( node.nodeName() ==
 					eng()->getProjectNotes()->nodeName() )
 			{
 				( (journallingObject *)( eng()->
@@ -1579,6 +1585,7 @@ bool songEditor::saveProject( void )
 	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );
 
 	eng()->getPianoRoll()->saveState( mmp, mmp.content() );
+	eng()->getAutomationEditor()->saveState( mmp, mmp.content() );
 	( (journallingObject *)( eng()->getProjectNotes() ) )->saveState( mmp,
 								mmp.content() );
 	m_playPos[PLAY_SONG].m_timeLine->saveState( mmp, mmp.content() );
