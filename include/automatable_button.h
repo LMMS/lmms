@@ -50,7 +50,8 @@ class automatableButton : public QWidget, public automatableObject<bool,
 {
 	Q_OBJECT
 public:
-	automatableButton( QWidget * _parent, engine * _engine );
+	automatableButton( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track );
 	virtual ~automatableButton();
 
 
@@ -82,6 +83,7 @@ public slots:
 
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
@@ -102,11 +104,12 @@ signals:
 
 
 
-class automatableButtonGroup : public QObject, public automatableObject<int>
+class automatableButtonGroup : public QWidget, public automatableObject<int>
 {
 	Q_OBJECT
 public:
-	automatableButtonGroup( QObject * _parent, engine * _engine );
+	automatableButtonGroup( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track );
 	virtual ~automatableButtonGroup();
 
 	void addButton( automatableButton * _btn );

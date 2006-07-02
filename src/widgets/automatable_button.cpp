@@ -30,22 +30,44 @@
 
 #ifndef QT3
 
+#include <QtGui/QCursor>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
 #else
+
+#include <qcursor.h>
+#include <qlabel.h>
+#include <qpopupmenu.h>
 
 #define indexOf findIndex
 
 #endif
 
+#include "embed.h"
 
 
-automatableButton::automatableButton( QWidget * _parent, engine * _engine ) :
-	QWidget( _parent ),
-	autoObj( _engine, NULL, FALSE, TRUE, FALSE ),
+
+automatableButton::automatableButton( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track ) :
+	QWidget( _parent
+#ifndef QT4
+			, _name.ascii()
+#endif
+		),
+	autoObj( _engine, _track, FALSE, FALSE, TRUE ),
 	m_group( NULL ),
 	m_checkable( FALSE )
 {
+	if( _track != NULL )
+	{
+		getAutomationPattern();
+	}
+	setInitValue( FALSE );
+#ifdef QT4
+	setAccessibleName( _name );
+#endif
 }
 
 
@@ -57,6 +79,55 @@ automatableButton::~automatableButton()
 	{
 		m_group->removeButton( this );
 	}
+}
+
+
+
+
+void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
+{
+	if( nullTrack() && m_group == NULL )
+	{
+		QWidget::contextMenuEvent( _me );
+		return;
+	}
+
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
+	QWidget * target;
+	automationPattern * pattern;
+	if ( m_group != NULL )
+	{
+		target = m_group;
+		pattern = m_group->getAutomationPattern();
+	}
+	else
+	{
+		target = this;
+		pattern = getAutomationPattern();
+	}
+
+	QMenu contextMenu( target );
+#ifdef QT4
+	contextMenu.setTitle( target->accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( target->accessibleName() ) + "</b></font>",
+									this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "&Open in automation editor" ),
+					pattern,
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.exec( QCursor::pos() );
 }
 
 
@@ -122,6 +193,7 @@ void automatableButton::setValue( const bool _on )
 	if( _on != value() )
 	{
 		autoObj::setValue( _on );
+		setFirstValue();
 		update();
 		emit( toggled( value() ) );
 	}
@@ -134,11 +206,22 @@ void automatableButton::setValue( const bool _on )
 
 
 
-automatableButtonGroup::automatableButtonGroup( QObject * _parent,
-							engine * _engine ) :
-	QObject( _parent ),
-	automatableObject<int>( _engine )
+automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
+					const QString & _name,
+					engine * _engine, track * _track ) :
+	QWidget( _parent
+#ifndef QT4
+			, _name.ascii()
+#endif
+		),
+	automatableObject<int>( _engine, _track )
 {
+	hide();
+	getAutomationPattern();
+	setInitValue( 0 );
+#ifdef QT4
+	setAccessibleName( _name );
+#endif
 }
 
 
@@ -203,6 +286,7 @@ void automatableButtonGroup::setValue( const int _value )
 			m_buttons[value()]->setChecked( FALSE );
 		}
 		automatableObject<int>::setValue( _value );
+		setFirstValue();
 		m_buttons[value()]->setChecked( TRUE );
 	}
 
