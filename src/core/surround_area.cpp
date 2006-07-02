@@ -32,13 +32,17 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
 #else
 
 #include <qapplication.h>
+#include <qlabel.h>
 #include <qpainter.h>
+#include <qpopupmenu.h>
 #include <qcursor.h>
 #include <qimage.h>
 
@@ -70,10 +74,30 @@ QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
 
 
-surroundArea::surroundArea( QWidget * _parent ) :
-	QWidget( _parent ),
+surroundArea::surroundArea( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track ) :
+	QWidget( _parent
+#ifndef QT4
+			, _name.ascii()
+#endif
+		),
 	m_sndSrcPos( QPoint() )
 {
+	m_position_x = new knob( knobDark_28, NULL, tr ( "Surround area X" ),
+							_engine, _track );
+	m_position_x->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
+	m_position_x->setInitValue( 0.0f );
+
+	m_position_y = new knob( knobDark_28, NULL, tr ( "Surround area Y" ),
+							_engine, _track );
+	m_position_y->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
+	m_position_y->setInitValue( 0.0f );
+
+	connect( m_position_x, SIGNAL( valueChanged( float ) ), this,
+					SLOT( updatePositionX( void ) ) );
+	connect( m_position_y, SIGNAL( valueChanged( float ) ), this,
+					SLOT( updatePositionY( void ) ) );
+
 	if( s_backgroundArtwork == NULL )
 	{
 		s_backgroundArtwork = new QPixmap( embed::getIconPixmap(
@@ -82,7 +106,9 @@ surroundArea::surroundArea( QWidget * _parent ) :
 
 	setFixedSize( s_backgroundArtwork->width(),
 						s_backgroundArtwork->height() );
-#ifndef QT4
+#ifdef QT4
+	setAccessibleName( _name );
+#else
 	setBackgroundMode( Qt::NoBackground );
 #endif
 	toolTip::add( this,
@@ -94,6 +120,8 @@ surroundArea::surroundArea( QWidget * _parent ) :
 
 surroundArea::~surroundArea()
 {
+	delete m_position_x;
+	delete m_position_y;
 }
 
 
@@ -141,6 +169,39 @@ FASTCALL float surroundArea::getVolume( const QPoint & _speaker_pos,
 						( 1.0f / SURROUND_AREA_SIZE );
 
 	return( tLimit( new_vol, 0.0f, 1.0f ) * _v_scale );
+}
+
+
+
+
+void surroundArea::contextMenuEvent( QContextMenuEvent * )
+{
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
+	QMenu contextMenu( this );
+#ifdef QT4
+	contextMenu.setTitle( accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( accessibleName() ) + "</b></font>", this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "Open &X in automation editor" ),
+					m_position_x->getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "Open &Y in automation editor" ),
+					m_position_y->getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.exec( QCursor::pos() );
 }
 
 
@@ -197,6 +258,11 @@ void surroundArea::paintEvent( QPaintEvent * )
 
 void surroundArea::mousePressEvent( QMouseEvent * _me )
 {
+	if( _me->button() == Qt::RightButton )
+	{
+		return;
+	}
+
 	const int w = width();//s_backgroundArtwork->width();
 	const int h = height();//s_backgroundArtwork->height();
 	if( _me->x() > 1 && _me->x() < w-1 && _me->y() > 1 && _me->y() < h-1 )
@@ -218,6 +284,9 @@ void surroundArea::mousePressEvent( QMouseEvent * _me )
 		QCursor::setPos( mapToGlobal( QPoint( x, y ) ) );
 	}
 
+	m_position_x->setValue( m_sndSrcPos.x() );
+	m_position_y->setValue( m_sndSrcPos.y() );
+
 	emit valueChanged( m_sndSrcPos );
 }
 
@@ -235,6 +304,56 @@ void surroundArea::mouseMoveEvent( QMouseEvent * _me )
 void surroundArea::mouseReleaseEvent( QMouseEvent * )
 {
 	QApplication::restoreOverrideCursor();
+}
+
+
+
+
+void surroundArea::updatePositionX( void )
+{
+	m_sndSrcPos.setX( (int)m_position_x->value() );
+	update();
+}
+
+
+
+
+void surroundArea::updatePositionY( void )
+{
+	m_sndSrcPos.setY( (int)m_position_y->value() );
+	update();
+}
+
+
+
+
+void FASTCALL surroundArea::saveSettings( QDomDocument & _doc,
+							QDomElement & _this,
+							const QString & _name )
+{
+	m_position_x->saveSettings( _doc, _this, _name + "-x" );
+	m_position_y->saveSettings( _doc, _this, _name + "-y" );
+}
+
+
+
+
+void FASTCALL surroundArea::loadSettings( const QDomElement & _this,
+							const QString & _name )
+{
+	if( _this.hasAttribute( _name ) )
+	{
+		int i = _this.attribute( _name ).toInt();
+		setValue( QPoint( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE,
+					( i >> 16 ) - 2 * SURROUND_AREA_SIZE) );
+		m_position_x->setValue( m_sndSrcPos.x() );
+		m_position_y->setValue( m_sndSrcPos.y() );
+	}
+	else
+	{
+		m_position_x->loadSettings( _this, _name + "-x" );
+		m_position_y->loadSettings( _this, _name + "-y" );
+	}
 }
 
 

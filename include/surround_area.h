@@ -41,6 +41,7 @@
 #endif
 
 
+#include "knob.h"
 #include "types.h"
 #include "mixer.h"
 #include "templates.h"
@@ -55,7 +56,8 @@ class surroundArea : public QWidget
 {
 	Q_OBJECT
 public:
-	surroundArea( QWidget * _parent = NULL );
+	surroundArea( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track );
 	virtual ~surroundArea();
 	volumeVector getVolumeVector( float _v_scale = 0.0f ) const;
 	inline const QPoint & value( void ) const
@@ -64,8 +66,14 @@ public:
 	}
 	void FASTCALL setValue( const QPoint & _p );
 
+	void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _this,
+					const QString & _name = "surpos" );
+	void FASTCALL loadSettings( const QDomElement & _this,
+					const QString & _name = "surpos" );
+
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
@@ -84,6 +92,14 @@ private:
 
 	static const QPoint s_defaultSpeakerPositions[SURROUND_CHANNELS];
 	static QPixmap * s_backgroundArtwork;
+
+	knob * m_position_x;
+	knob * m_position_y;
+
+
+private slots:
+	void updatePositionX( void );
+	void updatePositionY( void );
 
 } ;
 
