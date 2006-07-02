@@ -239,7 +239,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	// setup surround-area
-	m_surroundArea = new surroundArea( m_generalSettingsWidget );
+	m_surroundArea = new surroundArea( m_generalSettingsWidget,
+					tr( "Surround area" ), eng(), this );
 	m_surroundArea->move( 20 + m_volumeKnob->width(), 38 );
 	m_surroundArea->show();
 #ifdef QT4
@@ -813,14 +814,6 @@ void instrumentTrack::setSurroundAreaPos( const QPoint & _p )
 
 
 
-const QPoint & instrumentTrack::surroundAreaPos( void ) const
-{
-	return( m_surroundArea->value() );
-}
-
-
-
-
 void instrumentTrack::setBaseNote( Uint32 _new_note )
 {
 	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
@@ -1044,11 +1037,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	_this.setAttribute( "name", name() );
 	m_volumeKnob->saveSettings( _doc, _this, "vol" );
 
-	// make all coordinates positive
-	unsigned int x = surroundAreaPos().x() + 2 * SURROUND_AREA_SIZE;
-	unsigned int y = surroundAreaPos().y() + 2 * SURROUND_AREA_SIZE;
-	_this.setAttribute( "surpos", static_cast<unsigned int>( x & 0xFFFF ) +
-							( y * 256 * 256 ) );
+	m_surroundArea->saveSettings( _doc, _this, "surpos" );
 
 	_this.setAttribute( "fxch", m_effectChannelNumber->value() );
 	_this.setAttribute( "basetone", m_baseTone );
@@ -1076,9 +1065,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	setName( _this.attribute( "name" ) );
 	m_volumeKnob->loadSettings( _this, "vol" );
 
-	int i = _this.attribute( "surpos" ).toInt();
-	setSurroundAreaPos( QPoint( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE,
-			( i / ( 256 * 256 ) ) - 2 * SURROUND_AREA_SIZE) );
+	m_surroundArea->loadSettings( _this, "surpos" );
 
 	m_effectChannelNumber->setInitValue(
 					_this.attribute( "fxch" ).toInt() );

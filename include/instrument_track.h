@@ -120,7 +120,6 @@ public:
 	void FASTCALL setVolume( volume _new_volume );
 	volume getVolume( void ) const;
 	void FASTCALL setSurroundAreaPos( const QPoint & _p );
-	const QPoint & surroundAreaPos( void ) const;
 
 	void FASTCALL setBaseNote( Uint32 _new_note );
 
