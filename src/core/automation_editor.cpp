@@ -520,21 +520,25 @@ void automationEditor::update( void )
 	AlignmentFlags text_flags =
 				(AlignmentFlags)( AlignRight | AlignVCenter );
 
-	for( int y = grid_bottom, level = m_bottom_level;
+	if ( m_pattern )
+	{
+		for( int y = grid_bottom, level = m_bottom_level;
 					y >= TOP_MARGIN && level <= m_top_level;
 					y -= m_y_delta, ++level )
-	{
-		if( level % 5 == 0 )
 		{
-			p.setPen( QColor( 240, 240, 240 ) );
-			p.drawText( 1, y - font_height + 1,
+			if( level % 5 == 0 )
+			{
+				const QString & label = m_pattern->object()
+							->levelToLabel( level );
+				p.setPen( QColor( 240, 240, 240 ) );
+				p.drawText( 1, y - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, QString::number( level ) );
-
-			p.setPen( QColor( 0, 0, 0 ) );
-			p.drawText( 0, y - font_height,
+					text_flags, label );
+				p.setPen( QColor( 0, 0, 0 ) );
+				p.drawText( 0, y - font_height,
 					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, QString::number( level ) );
+					text_flags, label );
+			}
 		}
 	}
 
