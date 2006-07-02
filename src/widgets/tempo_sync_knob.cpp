@@ -177,6 +177,12 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	contextMenu.addSeparator();
 	
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "&Open in automation editor" ),
+					getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.addSeparator();
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
 						SLOT( connectToMidiDevice() ) );
 	contextMenu.addSeparator();
