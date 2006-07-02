@@ -198,13 +198,17 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 		this, SLOT ( sampleSizeChanged( float ) ) 
 		);
 
-	m_interpolationToggle = new ledCheckBox( "Interpolation", this, eng() );
+	m_interpolationToggle = new ledCheckBox( "Interpolation", this,
+							tr( "Interpolation" ),
+							eng(), _channel_track );
 	m_interpolationToggle->move( 55,80 );
 	
 	 connect( m_interpolationToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( interpolationToggle( bool ) ) );
 
-	m_normalizeToggle = new ledCheckBox( "Normalize", this, eng() );
+	m_normalizeToggle = new ledCheckBox( "Normalize", this,
+							tr( "Normalize" ),
+							eng(), _channel_track );
 	m_normalizeToggle->move( 55, 100 );
 	
 	connect( m_normalizeToggle, SIGNAL( toggled( bool ) ),
@@ -229,7 +233,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	connect( m_graph, SIGNAL ( sampleChanged( void ) ),
 		this, SLOT ( sampleChanged( void ) ) );
 	
-		sinWaveBtn = new pixmapButton( this, eng() );
+		sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ), eng(),
+							_channel_track );
 		sinWaveBtn->move( 188, 120 );
 		sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -239,7 +244,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a sine-wave for "
 						"current oscillator." ) );
 
-		triangleWaveBtn = new pixmapButton( this, eng() );
+		triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ),
+							eng(), _channel_track );
 		triangleWaveBtn->move( 188, 136 );
 		triangleWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -249,7 +255,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a triangle-wave "
 						"for current oscillator." ) );
 
-		sawWaveBtn = new pixmapButton( this, eng() );
+		sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ), eng(),
+							_channel_track );
 		sawWaveBtn->move( 188, 152 );
 		sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -259,7 +266,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a saw-wave for "
 						"current oscillator." ) );
 
-		sqrWaveBtn = new pixmapButton( this, eng() );
+		sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ), eng(),
+							_channel_track );
 		sqrWaveBtn->move( 188, 168 );
 		sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -269,7 +277,9 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a square-wave for "
 						"current oscillator." ) );
 
-		whiteNoiseWaveBtn = new pixmapButton( this, eng() );
+		whiteNoiseWaveBtn = new pixmapButton( this,
+						tr( "White noise wave" ),
+						eng(), _channel_track );
 		whiteNoiseWaveBtn->move( 188, 184 );
 		whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -279,7 +289,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
-		usrWaveBtn = new pixmapButton( this, eng() );
+		usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ),
+							eng(), _channel_track );
 		usrWaveBtn->move( 188, 200 );
 		usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -305,7 +316,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 		
 
 
-		smoothBtn = new pixmapButton( this, eng() );
+		smoothBtn = new pixmapButton( this, tr( "Smooth" ), eng(),
+							_channel_track );
 		smoothBtn->move( 55, 225 );
 		smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"smooth" ) );
@@ -569,7 +581,7 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "version", "0.1" );
 
 	// Save sample length
-	_this.setAttribute( "sampleLength", QString::number( sample_length ) );
+	m_sampleLengthKnob->saveSettings( _doc, _this, "sampleLength" );
 
 	// Save sample shape base64-encoded
 	QString sampleString;
@@ -579,11 +591,10 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 
 	// save LED normalize 
-	_this.setAttribute( "interpolation",
-					m_interpolationToggle->isChecked() );
+	m_interpolationToggle->saveSettings( _doc, _this, "interpolation" );
 	
 	// save LED 
-	_this.setAttribute( "normalize", m_normalizeToggle->isChecked() );
+	m_normalizeToggle->saveSettings( _doc, _this, "normalize" );
 
 }
 
@@ -593,10 +604,9 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void bitInvader::loadSettings( const QDomElement & _this )
 {
 	// Load sample length
-	sample_length = _this.attribute( "sampleLength" ).toInt() ;
+	m_sampleLengthKnob->loadSettings( _this, "sampleLength" );
 
-	// Load knobs  (fires change SIGNAL?)
-	m_sampleLengthKnob->setValue( static_cast<float>(sample_length) );
+	sample_length = (int)m_sampleLengthKnob->value();
 
 	// Load sample shape
 	delete[] sample_shape;
@@ -611,10 +621,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
     	m_graph->setSamplePointer( sample_shape, sample_length );
 
 	// Load LED normalize 
-	m_interpolationToggle->setChecked( _this.attribute(
-						"interpolation" ).toInt() );
+	m_interpolationToggle->loadSettings( _this, "interpolation" );
 	// Load LED 
-	m_normalizeToggle->setChecked( _this.attribute( "normalize" ).toInt() );
+	m_normalizeToggle->loadSettings( _this, "normalize" );
 	update();
 
 //	songEditor::inst()->setModified();
