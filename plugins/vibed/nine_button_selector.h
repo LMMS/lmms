@@ -56,7 +56,8 @@ public:
 				Uint8 _default,
 				Uint32 _x, Uint32 _y,
 				QWidget * _parent,
-				engine * _engine );
+				engine * _engine,
+				track * _track );
 	~nineButtonSelector();
 	
 	inline Uint8 getSelected() { return( m_selected ); };

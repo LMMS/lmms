@@ -95,7 +95,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		m_editor = new impulseEditor( this, 76, 21, eng() );
+		m_editor = new impulseEditor( this, 76, 21, eng(),
+							_channel_track );
 		m_editor->setOn( FALSE );
 		m_editor->hide();
 		m_editors.append( m_editor );
@@ -267,7 +268,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "will both ring longer and sound brighter, however, they will also eat up "
 "more CPU cycles." ) );
 
-		m_impulse = new ledCheckBox( "", this, eng() );
+		m_impulse = new ledCheckBox( "", this, tr( "Impulse" ), eng(),
+							_channel_track );
 		m_impulse->move( 23, 94 );
 		m_impulse->setChecked( FALSE );
 		toolTip::add( m_impulse,
@@ -306,7 +308,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			2,
 			21, 127,
 			this,
-			eng() );
+			eng(),
+			NULL );
 		m_harmonic->hide();
 		m_harmonics.append( m_harmonic );
 #ifdef QT4
@@ -344,7 +347,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			0,
 			21, 39,
 			this,
-			eng() );
+			eng(),
+			NULL );
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
 			this, SLOT( showString( Uint8 ) ) );
 #ifdef QT4
@@ -455,8 +459,7 @@ void vibed::saveSettings( QDomDocument & _doc,
 			m_randomKnobs[i]->saveSettings( _doc, _this, name );
 
 			name = "impulse" + QString::number( i );
-			_this.setAttribute( name, QString::number( 
-					m_impulses[i]->isChecked() ) );
+			m_impulses[i]->saveSettings( _doc, _this, name );
 		
 			QString sampleString;
 			base64::encode( 
@@ -512,8 +515,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			m_randomKnobs[i]->loadSettings( _this, name );
 		
 			name = "impulse" + QString::number( i );
-			m_impulses[i]->setChecked(
-					_this.attribute( name ).toInt() );
+			m_impulses[i]->loadSettings( _this, name );
 
 			int size = 0;
 			float * shp = 0;

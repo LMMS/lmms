@@ -1000,7 +1000,9 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
 
-	m_muteBtn = new pixmapButton( this, m_trackWidget->getTrack()->eng() );
+	m_muteBtn = new pixmapButton( this, tr( "Mute" ),
+					m_trackWidget->getTrack()->eng(),
+					m_trackWidget->getTrack() );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "mute_on" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "mute_off" ) );
 	m_muteBtn->setCheckable( TRUE );

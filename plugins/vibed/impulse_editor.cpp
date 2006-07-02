@@ -53,7 +53,8 @@
 
 
 impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, 
-					engine * _engine, Uint32 _len ) :
+					engine * _engine, track * _track,
+					Uint32 _len ) :
 	QWidget( _parent/*, "impulseEditor"*/ ),
 	engineObject( _engine ),
 	m_sampleLength( _len ),
@@ -81,7 +82,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	connect( m_graph, SIGNAL ( sampleChanged( void ) ),
 			this, SLOT ( sampleChanged( void ) ) );
 	
-	m_sinWaveBtn = new pixmapButton( this, eng() );
+	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ), eng(),
+								_track );
 	m_sinWaveBtn->move( 136, 3 );
 	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"sin_wave_active" ) );
@@ -95,7 +97,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( sinWaveClicked( void ) ) );
 
 	
-	m_triangleWaveBtn = new pixmapButton( this, eng() );
+	m_triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ),
+								eng(), _track );
 	m_triangleWaveBtn->move( 136, 20 );
 	m_triangleWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -108,7 +111,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( triangleWaveClicked( void ) ) );
 
 	
-	m_sawWaveBtn = new pixmapButton( this, eng() );
+	m_sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ), eng(),
+								_track );
 	m_sawWaveBtn->move( 136, 37 );
 	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"saw_wave_active" ) );
@@ -121,7 +125,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( sawWaveClicked( void ) ) );
 
 	
-	m_sqrWaveBtn = new pixmapButton( this, eng() );
+	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ), eng(),
+								_track );
 	m_sqrWaveBtn->move( 136, 54 );
 	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"square_wave_active" ) );
@@ -134,7 +139,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( sqrWaveClicked( void ) ) );
 
 	
-	m_whiteNoiseWaveBtn = new pixmapButton( this, eng() );
+	m_whiteNoiseWaveBtn = new pixmapButton( this, tr( "White noise wave" ),
+								eng(), _track );
 	m_whiteNoiseWaveBtn->move( 136, 71 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -147,7 +153,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( noiseWaveClicked( void ) ) );
 
 	
-	m_usrWaveBtn = new pixmapButton( this, eng() );
+	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ), eng(),
+								_track );
 	m_usrWaveBtn->move( 136, 88 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"usr_wave_active" ) );
@@ -160,7 +167,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( usrWaveClicked( void ) ) );
 
 	
-	m_smoothBtn = new pixmapButton( this, eng() );
+	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ), eng(), _track );
 	m_smoothBtn->move( 3, 108 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"smooth_active" ) );
@@ -173,7 +180,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( smoothClicked( void ) ) );
 
 	
-	m_normalizeBtn = new pixmapButton( this, eng() );
+	m_normalizeBtn = new pixmapButton( this, tr( "Normalize" ), eng(),
+								_track );
 	m_normalizeBtn->move( 20, 108 );
 	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"normalize_active" ) );
@@ -186,7 +194,8 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	connect( m_normalizeBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( normalizeClicked( void ) ) );
 
- 	m_state = new ledCheckBox( "", this, eng() );
+ 	m_state = new ledCheckBox( "", this, tr( "Enable waveform" ), eng(),
+								_track );
  	m_state->move( 136, 109 );
  	m_state->setChecked( TRUE );
 	toolTip::add( m_state,

@@ -41,8 +41,9 @@ public:
 		YELLOW, GREEN, TOTAL_COLORS
 	} ;
 
-	ledCheckBox( const QString & _txt, QWidget * _parent, engine * _engine,
-						ledColors _color = YELLOW );
+	ledCheckBox( const QString & _txt, QWidget * _parent,
+				const QString & _name, engine * _engine,
+				track * _track, ledColors _color = YELLOW );
 	virtual ~ledCheckBox();
 
 

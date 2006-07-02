@@ -137,7 +137,8 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	}
 	
 	
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this, eng() );
+	m_filterGroupBox = new groupBox( tr( "FILTER" ), this, eng(),
+							_instrument_track );
 	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );

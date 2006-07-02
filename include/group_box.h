@@ -49,7 +49,7 @@ class groupBox : public QWidget, public engineObject
 	Q_OBJECT
 public:
 	groupBox( const QString & _caption, QWidget * _parent,
-							engine * _engine );
+					engine * _engine, track * _track );
 	virtual ~groupBox();
 
 	bool isActive( void ) const

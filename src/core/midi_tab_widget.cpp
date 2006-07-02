@@ -96,7 +96,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 
 	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Receive MIDI-events" ),
+						eng(), _instrument_track );
 	m_receiveCheckBox->move( 10, 34 );
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
@@ -105,14 +107,18 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 	m_defaultVelocityInCheckBox = new ledCheckBox( tr( "Default velocity "
 						"for all input-events" ),
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Default input velocity" ),
+						eng(), _instrument_track );
 	m_defaultVelocityInCheckBox->move( 28, 84 );
 	connect( m_defaultVelocityInCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( defaultVelInChanged( bool ) ) );
 
 
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Send MIDI-events" ),
+						eng(), _instrument_track );
 	m_sendCheckBox->move( 10, 114 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
@@ -121,7 +127,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 	m_defaultVelocityOutCheckBox = new ledCheckBox( tr( "Default velocity "
 						"for all output-events" ),
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Default output velocity" ),
+						eng(), _instrument_track );
 	m_defaultVelocityOutCheckBox->move( 28, 164 );
 	connect( m_defaultVelocityOutCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( defaultVelOutChanged( bool ) ) );
@@ -211,12 +219,10 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "inputchannel", m_inputChannelSpinBox->value() );
 	_this.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
-	_this.setAttribute( "receive", m_receiveCheckBox->isChecked() );
-	_this.setAttribute( "send", m_sendCheckBox->isChecked() );
-	_this.setAttribute( "defvelin",
-				m_defaultVelocityInCheckBox->isChecked() );
-	_this.setAttribute( "defvelout",
-				m_defaultVelocityOutCheckBox->isChecked() );
+	m_receiveCheckBox->saveSettings( _doc, _this, "receive" );
+	m_sendCheckBox->saveSettings( _doc, _this, "send" );
+	m_defaultVelocityInCheckBox->saveSettings( _doc, _this, "defvelin" );
+	m_defaultVelocityOutCheckBox->saveSettings( _doc, _this, "defvelout" );
 
 	if( m_readablePorts != NULL && m_receiveCheckBox->isChecked() == TRUE )
 	{
@@ -290,12 +296,10 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 								).toInt() );
 	m_outputChannelSpinBox->setValue( _this.attribute( "outputchannel"
 								).toInt() );
-	m_receiveCheckBox->setChecked( _this.attribute( "receive" ).toInt() );
-	m_sendCheckBox->setChecked( _this.attribute( "send" ).toInt() );
-	m_defaultVelocityInCheckBox->setChecked(
-					_this.attribute( "defvelin" ).toInt() );
-	m_defaultVelocityOutCheckBox->setChecked(
-				_this.attribute( "defvelout" ).toInt() );
+	m_receiveCheckBox->loadSettings( _this, "receive" );
+	m_sendCheckBox->loadSettings( _this, "send" );
+	m_defaultVelocityInCheckBox->loadSettings( _this, "defvelin" );
+	m_defaultVelocityOutCheckBox->loadSettings( _this, "defvelout" );
 
 	// restore connections
 

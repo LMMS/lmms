@@ -103,7 +103,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	}
 
 
-	m_openAudioFileButton = new pixmapButton( this, eng() );
+	m_openAudioFileButton = new pixmapButton( this, NULL, eng(), NULL );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 200, 90 );
 	m_openAudioFileButton->setActiveGraphic( embed::getIconPixmap(
@@ -128,7 +128,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
 	
-	m_reverseButton = new pixmapButton( this, eng() );
+	m_reverseButton = new pixmapButton( this, tr( "Reverse" ), eng(),
+							_channel_track );
 	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 160, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -148,7 +149,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this, eng() );
+	m_loopButton = new pixmapButton( this, tr( "Loop" ), eng(),
+							_channel_track );
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 180, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -228,7 +230,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between start- and end-point." ) );
 
-	m_viewLinesPB = new pixmapButton( this, eng() );
+	m_viewLinesPB = new pixmapButton( this, NULL, eng(), _channel_track );
 	m_viewLinesPB->move( 154, 158 );
 	m_viewLinesPB->setBgGraphic( getBackground( m_viewLinesPB ) );
 	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
@@ -247,7 +249,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"sound itself. It just gives you another view to your "
 			"sample." ) );
 
-	m_viewDotsPB = new pixmapButton( this, eng() );
+	m_viewDotsPB = new pixmapButton( this, NULL, eng(), _channel_track );
 	m_viewDotsPB->move( 204, 158 );
 	m_viewDotsPB->setBgGraphic( getBackground( m_viewDotsPB ) );
 	if( m_drawMethod == sampleBuffer::DOTS )
@@ -266,7 +268,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"It just gives you another view to your sample." ) );
 	
 	automatableButtonGroup * view_group = new automatableButtonGroup( this,
-									eng() );
+						tr( "Sample draw mode" ),
+						eng(), _channel_track );
 	view_group->addButton( m_viewLinesPB );
 	view_group->addButton( m_viewDotsPB );
 
@@ -301,10 +304,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "eframe", QString::number(
 						m_sampleBuffer.endFrame() /
 					(float)m_sampleBuffer.frames() ) );
-	_this.setAttribute( "reversed", QString::number(
-					m_reverseButton->isChecked() ) );
-	_this.setAttribute( "looped", QString::number(
-					m_loopButton->isChecked() ) );
+	m_reverseButton->saveSettings( _doc, _this, "reversed" );
+	m_loopButton->saveSettings( _doc, _this, "looped" );
 	m_ampKnob->saveSettings( _doc, _this, "amp" );
 }
 
@@ -323,8 +324,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	setStartAndEndKnob( _this.attribute( "sframe" ).toFloat(),
 				_this.attribute( "eframe" ).toFloat() );  
-	m_reverseButton->setChecked( _this.attribute( "reversed" ).toInt() );
-	m_loopButton->setChecked( _this.attribute( "looped" ).toInt() );
+	m_reverseButton->loadSettings( _this, "reversed" );
+	m_loopButton->loadSettings( _this, "looped" );
 	m_ampKnob->loadSettings( _this, "amp" );
 }
 

@@ -58,7 +58,7 @@ QPixmap * groupBox::s_ledBg = NULL;
 
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent,
-							engine * _engine ) :
+					engine * _engine, track * _track ) :
 	QWidget( _parent ),
 	engineObject( _engine ),
 	m_caption( _caption ),
@@ -77,7 +77,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 
 	updatePixmap();
 
-	m_led = new pixmapButton( this, eng() );
+	m_led = new pixmapButton( this, _caption, eng(), _track );
 	m_led->setCheckable( TRUE );
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );

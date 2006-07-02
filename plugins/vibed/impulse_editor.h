@@ -52,7 +52,8 @@ class impulseEditor: public QWidget, public engineObject
 	Q_OBJECT
 public:
 	impulseEditor( QWidget *parent, int _x, int _y, 
-				engine * _engine, Uint32 _len = 128 );
+					engine * _engine, track * _track,
+					Uint32 _len = 128 );
 	~impulseEditor();
 	
 	inline float * getValues() { return( m_sampleShape ); };

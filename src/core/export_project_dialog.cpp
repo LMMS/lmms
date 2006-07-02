@@ -192,14 +192,15 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 						QString::number( 128 ) ) );
 
 
-	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, eng() );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, NULL, eng(),
+									NULL );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
 	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
-								this, eng() );
+						this, NULL, eng(), NULL );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
 	m_hqmCb->setChecked( TRUE );

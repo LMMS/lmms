@@ -45,8 +45,9 @@
 
 
 
-pixmapButton::pixmapButton( QWidget * _parent, engine * _engine ) :
-	automatableButton( _parent, _engine ),
+pixmapButton::pixmapButton( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track ) :
+	automatableButton( _parent, _name, _engine, _track ),
 	m_activePixmap(),
 	m_inactivePixmap(),
 	m_bgPixmap()

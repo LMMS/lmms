@@ -55,8 +55,10 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
-				engine * _engine, ledColors _color ) :
-	automatableButton( _parent, _engine ),
+					const QString & _name,
+					engine * _engine, track * _track,
+					ledColors _color ) :
+	automatableButton( _parent, _name, _engine, _track ),
 	m_text( _text )
 {
 	setCheckable( TRUE );

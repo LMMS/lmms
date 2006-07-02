@@ -46,7 +46,8 @@ class pixmapButton : public automatableButton
 {
 	Q_OBJECT
 public:
-	pixmapButton( QWidget * _parent, engine * _engine );
+	pixmapButton( QWidget * _parent, const QString & _name,
+					engine * _engine, track * _track );
 	virtual ~pixmapButton();
 
 	void setActiveGraphic( const QPixmap & _pm );
