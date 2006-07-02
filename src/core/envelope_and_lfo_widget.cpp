@@ -356,7 +356,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 				SLOT( updateAfterKnobChange( float ) ) );
 
 
-	pixmapButton * sin_lfo_btn = new pixmapButton( this, eng() );
+	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -370,7 +371,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a sine-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * triangle_lfo_btn = new pixmapButton( this, eng() );
+	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
@@ -384,7 +386,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a triangle-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * saw_lfo_btn = new pixmapButton( this, eng() );
+	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -398,7 +401,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a saw-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * sqr_lfo_btn = new pixmapButton( this, eng() );
+	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -412,7 +416,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a square-wave for current "
 							"oscillator." ) );
 
-	m_userLfoBtn = new pixmapButton( this, eng() );
+	m_userLfoBtn = new pixmapButton( this, NULL, eng(), NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
 	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -430,7 +434,9 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ), this,
 					SLOT( lfoUserWaveCh( bool ) ) );
 
-	m_lfoWaveBtnGrp = new automatableButtonGroup( this, eng() );
+	m_lfoWaveBtnGrp = new automatableButtonGroup( this,
+							tr( "LFO wave shape" ),
+							eng(), _track );
 	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
@@ -441,7 +447,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	connect( m_lfoWaveBtnGrp, SIGNAL( valueChanged( int ) ),
 						SLOT( lfoWaveCh( int ) ) );
 
-	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this, eng() );
+	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this,
+					tr( "Freq x 100" ), eng(), _track );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 #ifdef QT4
@@ -457,7 +464,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
-								this, eng() );
+					this, tr( "Modulate Env-Amount" ),
+					eng(), _track );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSize<6>(
 					m_controlEnvAmountCb->font() ) );
@@ -604,13 +612,13 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 	m_sustainKnob->saveSettings( _doc, _parent, "sus" );
 	m_releaseKnob->saveSettings( _doc, _parent, "rel" );
 	m_amountKnob->saveSettings( _doc, _parent, "amt" );
-	_parent.setAttribute( "lshp", m_lfoShape );
+	m_lfoWaveBtnGrp->saveSettings( _doc, _parent, "lshp" );
 	m_lfoPredelayKnob->saveSettings( _doc, _parent, "lpdel" );
 	m_lfoAttackKnob->saveSettings( _doc, _parent, "latt" );
 	m_lfoSpeedKnob->saveSettings( _doc, _parent, "lspd" );
 	m_lfoAmountKnob->saveSettings( _doc, _parent, "lamt" );
-	_parent.setAttribute( "x100", m_x100Cb->isChecked() );
-	_parent.setAttribute( "ctlenvamt", m_controlEnvAmountCb->isChecked() );
+	m_x100Cb->saveSettings( _doc, _parent, "x100" );
+	m_controlEnvAmountCb->saveSettings( _doc, _parent, "ctlenvamt" );
 	_parent.setAttribute( "lfosyncmode",
 					( int ) m_lfoSpeedKnob->getSyncMode() );
 	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
@@ -630,18 +638,13 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_sustainKnob->loadSettings( _this, "sus" );
 	m_releaseKnob->loadSettings( _this, "rel" );
 	m_amountKnob->loadSettings( _this, "amt" );
-
-	m_lfoShape = static_cast<lfoShapes>( _this.attribute(
-							"lshp" ).toInt() );
-	m_lfoWaveBtnGrp->setValue( m_lfoShape );
-
+	m_lfoWaveBtnGrp->loadSettings( _this, "lshp" );
 	m_lfoPredelayKnob->loadSettings( _this, "lpdel" );
 	m_lfoAttackKnob->loadSettings( _this, "latt" );
 	m_lfoSpeedKnob->loadSettings( _this, "lspd" );
 	m_lfoAmountKnob->loadSettings( _this, "lamt" );
-	m_x100Cb->setChecked( _this.attribute( "x100" ).toInt() );
-	m_controlEnvAmountCb->setChecked( _this.attribute(
-							"ctlenvamt" ).toInt() );
+	m_x100Cb->loadSettings( _this, "x100" );
+	m_controlEnvAmountCb->loadSettings( _this, "ctlenvamt" );
 	m_lfoSpeedKnob->setSyncMode(
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						"lfosyncmode" ).toInt() );

@@ -101,7 +101,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
 
-	pixmapButton * pm_osc1_btn = new pixmapButton( this, eng() );
+	pixmapButton * pm_osc1_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	pm_osc1_btn->move( 80, 50 );
 	pm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
@@ -113,7 +114,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	pixmapButton * am_osc1_btn = new pixmapButton( this, eng() );
+	pixmapButton * am_osc1_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	am_osc1_btn->move( 120, 50 );
 	am_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
@@ -125,7 +127,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	pixmapButton * mix_osc1_btn = new pixmapButton( this, eng() );
+	pixmapButton * mix_osc1_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	mix_osc1_btn->move( 160, 50 );
 	mix_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
@@ -135,7 +138,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"btn_mask" ).createHeuristicMask() ) );
 	toolTip::add( mix_osc1_btn, tr( "mix output of oscillator 1 & 2" ) );
 
-	pixmapButton * sync_osc1_btn = new pixmapButton( this, eng() );
+	pixmapButton * sync_osc1_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	sync_osc1_btn->move( 200, 50 );
 	sync_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
@@ -146,7 +150,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc1_btn, tr( "synchronize oscillator 1 with "
 							"oscillator 2" ) );
 
-	pixmapButton * fm_osc1_btn = new pixmapButton( this, eng() );
+	pixmapButton * fm_osc1_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	fm_osc1_btn->move( 330, 50 );
 	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
@@ -158,7 +163,9 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	m_mod1BtnGrp = new automatableButtonGroup( this, eng() );
+	m_mod1BtnGrp = new automatableButtonGroup( this,
+						tr( "Modulation type 1" ),
+						eng(), _channel_track );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
@@ -170,7 +177,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						this, SLOT( mod1Ch( int ) ) );
 
 
-	pixmapButton * pm_osc2_btn = new pixmapButton( this, eng() );
+	pixmapButton * pm_osc2_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	pm_osc2_btn->move( 80, 70 );
 	pm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
@@ -182,7 +190,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	pixmapButton * am_osc2_btn = new pixmapButton( this, eng() );
+	pixmapButton * am_osc2_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	am_osc2_btn->move( 120, 70 );
 	am_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
@@ -194,7 +203,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	pixmapButton * mix_osc2_btn = new pixmapButton( this, eng() );
+	pixmapButton * mix_osc2_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	mix_osc2_btn->move( 160, 70 );
 	mix_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
@@ -204,7 +214,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"btn_mask" ).createHeuristicMask() ) );
 	toolTip::add( mix_osc2_btn, tr("mix output of oscillator 2 & 3" ) );
 
-	pixmapButton * sync_osc2_btn = new pixmapButton( this, eng() );
+	pixmapButton * sync_osc2_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	sync_osc2_btn->move( 200, 70 );
 	sync_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
@@ -215,7 +226,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc2_btn, tr( "synchronize oscillator 2 with "
 							"oscillator 3" ) );
 
-	pixmapButton * fm_osc2_btn = new pixmapButton( this, eng() );
+	pixmapButton * fm_osc2_btn = new pixmapButton( this, NULL, eng(),
+									NULL );
 	fm_osc2_btn->move( 330, 70 );
 	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
@@ -227,7 +239,9 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	m_mod2BtnGrp = new automatableButtonGroup( this, eng() );
+	m_mod2BtnGrp = new automatableButtonGroup( this,
+						tr( "Modulation type 2" ),
+						eng(), _channel_track );
 	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
 	m_mod2BtnGrp->addButton( mix_osc2_btn );
@@ -451,7 +465,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		updatePhaseOffsetLeft( i );
 		updatePhaseOffsetRight( i );
 
-		pixmapButton * sin_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * sin_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		sin_wave_btn->move( 188, 105 + i * 50 );
 		sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -462,7 +477,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a sine-wave for "
 						"current oscillator." ) );
 
-		pixmapButton * triangle_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * triangle_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		triangle_wave_btn->move( 203, 105 + i * 50 );
 		triangle_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -472,7 +488,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a triangle-wave "
 						"for current oscillator." ) );
 
-		pixmapButton * saw_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * saw_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		saw_wave_btn->move( 218, 105 + i * 50 );
 		saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -482,7 +499,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a saw-wave for "
 						"current oscillator." ) );
 
-		pixmapButton * sqr_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		sqr_wave_btn->move( 233, 105 + i * 50 );
 		sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -492,7 +510,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a square-wave for "
 						"current oscillator." ) );
 
-		pixmapButton * moog_saw_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * moog_saw_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		moog_saw_wave_btn->move( 188, 120+i*50 );
 		moog_saw_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -502,7 +521,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a moog-saw-wave "
 						"for current oscillator." ) );
 
-		pixmapButton * exp_wave_btn = new pixmapButton( this, eng() );
+		pixmapButton * exp_wave_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		exp_wave_btn->move( 203, 120+i*50 );
 		exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"exp_wave_active" ) );
@@ -512,7 +532,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want an exponential "
 					"wave for current oscillator." ) );
 
-		pixmapButton * white_noise_btn = new pixmapButton( this, eng() );
+		pixmapButton * white_noise_btn = new pixmapButton( this, NULL,
+								eng(), NULL );
 		white_noise_btn->move( 218, 120+i*50 );
 		white_noise_btn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -522,7 +543,8 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
-		m_osc[i].usrWaveBtn = new pixmapButton( this, eng() );
+		m_osc[i].usrWaveBtn = new pixmapButton( this, NULL, eng(),
+									NULL );
 		m_osc[i].usrWaveBtn->move( 233, 120+i*50 );
 		m_osc[i].usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -532,7 +554,9 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a user-defined "
 				"wave-shape for current oscillator." ) );
 
-		m_osc[i].waveBtnGrp = new automatableButtonGroup( this, eng() );
+		m_osc[i].waveBtnGrp = new automatableButtonGroup( this,
+					tr( "Osc %1 wave shape" ).arg( i + 1 ),
+					eng(), _channel_track );
 		m_osc[i].waveBtnGrp->addButton( sin_wave_btn );
 		m_osc[i].waveBtnGrp->addButton( triangle_wave_btn );
 		m_osc[i].waveBtnGrp->addButton( saw_wave_btn );
@@ -591,8 +615,8 @@ tripleOscillator::~tripleOscillator()
 
 void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "modalgo1", QString::number( m_modulationAlgo1 ) );
-	_this.setAttribute( "modalgo2", QString::number( m_modulationAlgo2 ) );
+	m_mod1BtnGrp->saveSettings( _doc, _this, "modalgo1" );
+	m_mod2BtnGrp->saveSettings( _doc, _this, "modalgo2" );
 
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
@@ -606,8 +630,8 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							"phoffset" + is );
 		m_osc[i].stereoPhaseDetuningKnob->saveSettings( _doc, _this,
 							"stphdetun" + is );
-		_this.setAttribute( "wavetype" + is, QString::number(
-							m_osc[i].waveShape ) );
+		m_osc[i].waveBtnGrp->saveSettings( _doc, _this,
+							"wavetype" + is );
 		_this.setAttribute( "userwavefile" + is,
 					m_osc[i].m_sampleBuffer->audioFile() );
 	}
@@ -618,13 +642,8 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void tripleOscillator::loadSettings( const QDomElement & _this )
 {
-	m_modulationAlgo1 = static_cast<oscillator::modulationAlgos>(
-					_this.attribute( "modalgo1" ).toInt() );
-	m_modulationAlgo2 = static_cast<oscillator::modulationAlgos>(
-					_this.attribute( "modalgo2" ).toInt() );
-
-	m_mod1BtnGrp->setInitValue( m_modulationAlgo1 );
-	m_mod2BtnGrp->setInitValue( m_modulationAlgo2 );
+	m_mod1BtnGrp->loadSettings( _this, "modalgo1" );
+	m_mod2BtnGrp->loadSettings( _this, "modalgo2" );
 
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
@@ -640,8 +659,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 							"stphdetun" + is );
 		m_osc[i].m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
-		m_osc[i].waveBtnGrp->setValue( _this.attribute( "wavetype" +
-							is ).toInt() );
+		m_osc[i].waveBtnGrp->loadSettings( _this, "wavetype" + is );
 	}
 }
 

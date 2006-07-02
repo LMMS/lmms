@@ -198,7 +198,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	QWidget( _instrument_track->tabWidgetParent() ),
 	journallingObject( _instrument_track->eng() )
 {
-	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this, eng() );
+	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this, eng(),
+							_instrument_track );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
@@ -237,7 +238,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 
-	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this, eng() );
+	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this, eng(),
+							_instrument_track );
 	m_arpGroupBox->setGeometry( ARP_GROUPBOX_X, ARP_GROUPBOX_Y,
 					ARP_GROUPBOX_WIDTH,
 					ARP_GROUPBOX_HEIGHT );
@@ -329,7 +331,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 
-	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, eng() );
+	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, NULL,
+								eng(), NULL );
 	arp_up_btn->move( 10, 74 );
 	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
@@ -339,7 +342,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	toolTip::add( arp_up_btn, tr( "arpeggio direction = up" ) );
 
 
-	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, eng() );
+	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, NULL,
+								eng(), NULL );
 	arp_down_btn->move( 30, 74 );
 	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -351,7 +355,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	pixmapButton * arp_up_and_down_btn = new pixmapButton( m_arpGroupBox,
-									eng() );
+							NULL, eng(), NULL );
 	arp_up_and_down_btn->move( 50, 74 );
 	arp_up_and_down_btn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
@@ -364,8 +368,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 				tr( "arpeggio direction = up and down" ) );
 
 
-	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox,
-									eng() );
+	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox, NULL,
+								eng(), NULL );
 	arp_random_btn->move( 70, 74 );
 	arp_random_btn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
@@ -376,7 +380,9 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 #endif
 	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
 
-	m_arpDirectionBtnGrp = new automatableButtonGroup( this, eng() );
+	m_arpDirectionBtnGrp = new automatableButtonGroup( this,
+						tr( "Arpeggio direction" ),
+						eng(), _instrument_track );
 	m_arpDirectionBtnGrp->addButton( arp_up_btn );
 	m_arpDirectionBtnGrp->addButton( arp_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
@@ -660,7 +666,7 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	m_arpRangeKnob->saveSettings( _doc, _this, "arprange" );
 	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
 	m_arpGateKnob->saveSettings( _doc, _this, "arpgate" );
-	_this.setAttribute( "arpdir", m_arpDirectionBtnGrp->value() + 1 );
+	m_arpDirectionBtnGrp->saveSettings( _doc, _this, "arpdir" );
 	_this.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
@@ -680,8 +686,15 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpRangeKnob->loadSettings( _this, "arprange" );
 	m_arpTimeKnob->loadSettings( _this, "arptime" );
 	m_arpGateKnob->loadSettings( _this, "arpgate" );
-	m_arpDirectionBtnGrp->setInitValue(
+	if( _this.hasAttribute( "arpdir" ) )
+	{
+		m_arpDirectionBtnGrp->setInitValue(
 				_this.attribute( "arpdir" ).toInt() - 1 );
+	}
+	else
+	{
+		m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
+	}
 	m_arpTimeKnob->setSyncMode( 
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
