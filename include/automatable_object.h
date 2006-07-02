@@ -67,11 +67,11 @@ public:
 		m_minValue( _min ),
 		m_maxValue( _max ),
 		m_step( _step ),
-		m_curLevel( (int)( _val / _step ) ),
 		m_automation_pattern( NULL ),
 		m_track( _track ),
 		m_update_first( TRUE )
 	{
+		m_curLevel = level( _val );
 		m_minLevel = level( _min );
 		m_maxLevel = level( _max );
 	}
@@ -341,6 +341,17 @@ public:
 		m_data = _data;
 	}
 
+	inline automationPattern * getAutomationPattern( void )
+	{
+		if( !m_automation_pattern )
+		{
+			m_automation_pattern = new automationPattern( m_track,
+									this );
+			syncAutomationPattern();
+		}
+		return( m_automation_pattern );
+	}
+
 
 protected:
 	virtual void redoStep( journalEntry & _je )
@@ -377,20 +388,9 @@ protected:
 		addJournalEntry( journalEntry( 0, value() - m_oldValue ) );
 	}
 
-	inline automationPattern * getAutomationPattern( void )
-	{
-		if( !m_automation_pattern )
-		{
-			m_automation_pattern = new automationPattern( m_track,
-									this );
-			syncAutomationPattern();
-		}
-		return( m_automation_pattern );
-	}
-
 	inline void setFirstValue( void )
 	{
-		if( m_update_first )
+		if( m_update_first && m_automation_pattern )
 		{
 			m_automation_pattern->putValue( midiTime( 0 ),
 							m_curLevel, FALSE );
@@ -400,6 +400,11 @@ protected:
 				eng()->getAutomationEditor()->update();
 			}
 		}
+	}
+
+	inline bool nullTrack( void )
+	{
+		return( m_track == NULL );
 	}
 
 
