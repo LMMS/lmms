@@ -118,7 +118,10 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( "knob0" +
 					QString::number( m_knobNum + 1 ) ) );
 #endif
-	getAutomationPattern();
+	if( _track != NULL )
+	{
+		getAutomationPattern();
+	}
 
 	setRange( 0.0f, 100.0f, 1.0f );
 
@@ -372,12 +375,15 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 							m_hintTextAfterValue ),
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
+	if( !nullTrack() )
+	{
 //TODO: Change icon
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+		contextMenu.addAction( embed::getIconPixmap( "piano" ),
 					tr( "&Open in automation editor" ),
 					getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
-	contextMenu.addSeparator();
+		contextMenu.addSeparator();
+	}
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
 						SLOT( connectToMidiDevice() ) );
 	contextMenu.addSeparator();
