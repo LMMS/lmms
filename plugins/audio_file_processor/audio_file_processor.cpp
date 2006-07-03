@@ -128,8 +128,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
 	
-	m_reverseButton = new pixmapButton( this, tr( "Reverse" ), eng(),
-							_channel_track );
+	m_reverseButton = new pixmapButton( this, NULL, eng(), NULL );
 	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 160, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -149,8 +148,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this, tr( "Loop" ), eng(),
-							_channel_track );
+	m_loopButton = new pixmapButton( this, NULL, eng(), NULL );
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 180, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -172,7 +170,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"samples." ) );
 
 	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), eng(),
-							_channel_track );
+									NULL );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
 	m_ampKnob->setInitValue( 100.0f );
@@ -191,7 +189,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
-							eng(), _channel_track );
+								eng(), NULL );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
 	m_startKnob->setInitValue( 0.0f );
@@ -211,7 +209,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"than the sample between start- and end-point." ) );
 
 	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng(),
-							_channel_track );
+									NULL );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
 	m_endKnob->setInitValue( 1.0f );
@@ -230,7 +228,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between start- and end-point." ) );
 
-	m_viewLinesPB = new pixmapButton( this, NULL, eng(), _channel_track );
+	m_viewLinesPB = new pixmapButton( this, NULL, eng(), NULL );
 	m_viewLinesPB->move( 154, 158 );
 	m_viewLinesPB->setBgGraphic( getBackground( m_viewLinesPB ) );
 	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
@@ -249,7 +247,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"sound itself. It just gives you another view to your "
 			"sample." ) );
 
-	m_viewDotsPB = new pixmapButton( this, NULL, eng(), _channel_track );
+	m_viewDotsPB = new pixmapButton( this, NULL, eng(), NULL );
 	m_viewDotsPB->move( 204, 158 );
 	m_viewDotsPB->setBgGraphic( getBackground( m_viewDotsPB ) );
 	if( m_drawMethod == sampleBuffer::DOTS )
@@ -268,8 +266,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"It just gives you another view to your sample." ) );
 	
 	automatableButtonGroup * view_group = new automatableButtonGroup( this,
-						tr( "Sample draw mode" ),
-						eng(), _channel_track );
+							NULL, eng(), NULL );
 	view_group->addButton( m_viewLinesPB );
 	view_group->addButton( m_viewDotsPB );
 
