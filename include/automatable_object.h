@@ -68,8 +68,7 @@ public:
 		m_maxValue( _max ),
 		m_step( _step ),
 		m_automation_pattern( NULL ),
-		m_track( _track ),
-		m_update_first( TRUE )
+		m_track( _track )
 	{
 		m_curLevel = level( _val );
 		m_minLevel = level( _min );
@@ -352,6 +351,11 @@ public:
 		return( m_automation_pattern );
 	}
 
+	inline bool nullTrack( void )
+	{
+		return( m_track == NULL );
+	}
+
 
 protected:
 	virtual void redoStep( journalEntry & _je )
@@ -390,7 +394,8 @@ protected:
 
 	inline void setFirstValue( void )
 	{
-		if( m_update_first && m_automation_pattern )
+		if( m_automation_pattern
+					&& m_automation_pattern->updateFirst() )
 		{
 			m_automation_pattern->putValue( midiTime( 0 ),
 							m_curLevel, FALSE );
@@ -402,11 +407,6 @@ protected:
 		}
 	}
 
-	inline bool nullTrack( void )
-	{
-		return( m_track == NULL );
-	}
-
 
 private:
 	T m_value;
@@ -416,7 +416,6 @@ private:
 	int m_curLevel;
 	QPointer<automationPattern> m_automation_pattern;
 	track * m_track;
-	bool m_update_first;
 
 	QVariant m_data;
 
@@ -456,9 +455,9 @@ private:
 	void setLevel( int _level )
 	{
 		saveJournallingState( FALSE );
-		m_update_first = FALSE;
+		m_automation_pattern->setUpdateFirst( FALSE );
 		setValue( _level * m_step );
-		m_update_first = TRUE;
+		m_automation_pattern->setUpdateFirst( TRUE );
 		restoreJournallingState();
 	}
 
