@@ -90,6 +90,16 @@ public:
 
 	void processMidiTime( const midiTime & _time );
 
+	inline bool updateFirst( void )
+	{
+		return( m_update_first );
+	}
+
+	inline void setUpdateFirst( bool _update )
+	{
+		m_update_first = _update;
+	}
+
 
 protected slots:
 	void openInAutomationEditor( void );
@@ -100,6 +110,7 @@ private:
 	track * m_track;
 	levelObject * m_object;
 	timeMap m_time_map;
+	bool m_update_first;
 
 	void init( void );
 

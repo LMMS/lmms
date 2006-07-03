@@ -49,7 +49,8 @@
 automationPattern::automationPattern ( track * _track, levelObject * _object ) :
 	journallingObject( _track->eng() ),
 	m_track( _track ),
-	m_object( _object )
+	m_object( _object ),
+	m_update_first( TRUE )
 {
 	init();
 }
@@ -60,7 +61,8 @@ automationPattern::automationPattern ( track * _track, levelObject * _object ) :
 automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 	journallingObject( _pat_to_copy.m_track->eng() ),
 	m_track( _pat_to_copy.m_track ),
-	m_object( _pat_to_copy.m_object )
+	m_object( _pat_to_copy.m_object ),
+	m_update_first( _pat_to_copy.m_update_first )
 {
 	for( timeMap::const_iterator it = _pat_to_copy.m_time_map.begin();
 				it != _pat_to_copy.m_time_map.end(); ++it )
