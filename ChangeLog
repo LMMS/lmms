@@ -1,3 +1,22 @@
+2006-07-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	removed all automation
+
+	* src/widgets/automatable_button.cpp:
+	button groups may not use automation
+
+	* src/widgets/knob.cpp:
+	knobs may not use automation
+
+	* include/automatable_object.h:
+	- moved update flag to automation pattern
+	- moved nullTrack() to public
+
+	* include/automation_pattern.h:
+	* src/tracks/automation_pattern.cpp:
+	moved update flag from automatable object
+
 2006-07-02	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/surround_area.h:
