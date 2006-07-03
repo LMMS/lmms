@@ -86,7 +86,7 @@ automatableButton::~automatableButton()
 
 void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
-	if( nullTrack() && m_group == NULL )
+	if( nullTrack() && ( m_group == NULL || m_group->nullTrack() ) )
 	{
 		QWidget::contextMenuEvent( _me );
 		return;
@@ -217,7 +217,10 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 	automatableObject<int>( _engine, _track )
 {
 	hide();
-	getAutomationPattern();
+	if( _track != NULL )
+	{
+		getAutomationPattern();
+	}
 	setInitValue( 0 );
 #ifdef QT4
 	setAccessibleName( _name );
