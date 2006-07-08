@@ -1,3 +1,47 @@
+2006-07-08	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automation_track.h:
+	* src/tracks/automation_track.cpp:
+	initial release, to handle automation of objects without a track
+
+	* include/lcd_spinbox.h:
+	* src/widgets/lcd_spinbox.cpp:
+	- use automation capabilities
+	- added context menu
+
+	* include/automatable_slider.h:
+	* src/widgets/automatable_slider.cpp:
+	initial release, slider with automation
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	- use automatable sliders
+	- use automation track
+	- upgraded lcd spin box
+	- joined some slider creation code between QT versions
+	- show slider status on manual change only
+
+	* include/track.h:
+	* src/core/track.cpp:
+	added automation track
+
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/tracks/instrument_track.cpp:
+	upgraded lcd spin boxes
+
+	* include/automatable_object.h:
+	check whether the automation editor has been created
+
+	* src/core/surround_area.cpp:
+	fixed position rounding
+
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	added automatable_slider and automation_track
+
 2006-07-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/audio_file_processor/audio_file_processor.cpp:
