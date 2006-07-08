@@ -32,6 +32,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
 #include <QtGui/QLabel>
+#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
 #else
@@ -39,19 +40,26 @@
 #include <qapplication.h>
 #include <qcursor.h>
 #include <qlabel.h>
+#include <qpopupmenu.h>
 
 #endif
 
 
 #include "lcd_spinbox.h"
+#include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
 
 
-lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
-					QWidget * _parent, engine * _engine ) :
-	QWidget( _parent ),
-	autoObj( _engine, NULL, 0, _min, _max ),
+lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
+					const QString & _name,
+					engine * _engine, track * _track ) :
+	QWidget( _parent
+#ifndef QT4
+			, _name.ascii()
+#endif
+		),
+	autoObj( _engine, _track, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {
@@ -70,8 +78,16 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits,
 #endif
 	setEnabled( TRUE );
 
+	if( _track != NULL )
+	{
+		getAutomationPattern();
+	}
+
 	// value is automatically limited to given range
 	setInitValue( 0 );
+#ifdef QT4
+	setAccessibleName( _name );
+#endif
 
 	m_number->setFixedSize( m_number->sizeHint() * 0.9 );
 	setFixedSize( m_number->size() );
@@ -155,6 +171,43 @@ void lcdSpinBox::setEnabled( bool _on )
 
 
 
+void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
+{
+	m_origMousePos = _me->globalPos();
+
+	if( nullTrack() )
+	{
+		QWidget::contextMenuEvent( _me );
+		return;
+	}
+
+	// for the case, the user clicked right while pressing left mouse-
+	// button, the context-menu appears while mouse-cursor is still hidden
+	// and it isn't shown again until user does something which causes
+	// an QApplication::restoreOverrideCursor()-call...
+	mouseReleaseEvent( NULL );
+
+	QMenu contextMenu( this );
+#ifdef QT4
+	contextMenu.setTitle( accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( accessibleName() ) + "</b></font>", this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "&Open in automation editor" ),
+					getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton && _me->y() < m_number->height()  )
@@ -205,7 +258,7 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	setValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * step() );
+	setInitValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * step() );
 	emit valueChanged( value() );
 }
 

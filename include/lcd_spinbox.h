@@ -52,7 +52,8 @@ class lcdSpinBox : public QWidget, public automatableObject<int>
 	Q_OBJECT
 public:
 	lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
-							engine * _engine );
+					const QString & _name,
+					engine * _engine, track * _track );
 	virtual ~lcdSpinBox();
 
 	virtual void setStep( const int _step );
@@ -71,6 +72,7 @@ public slots:
 
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
