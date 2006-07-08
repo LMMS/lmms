@@ -399,7 +399,8 @@ protected:
 		{
 			m_automation_pattern->putValue( midiTime( 0 ),
 							m_curLevel, FALSE );
-			if( eng()->getAutomationEditor()->currentPattern()
+			if( eng()->getAutomationEditor() &&
+				eng()->getAutomationEditor()->currentPattern()
 						== m_automation_pattern )
 			{
 				eng()->getAutomationEditor()->update();
