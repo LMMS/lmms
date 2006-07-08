@@ -75,7 +75,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Input channel" ),
+						eng(), _instrument_track );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setValue( m_midiPort->inputChannel() + 1 );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -85,7 +87,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	inputChannelChanged( m_inputChannelSpinBox->value() );
 
 	m_outputChannelSpinBox = new lcdSpinBox( 1, MIDI_CHANNEL_COUNT, 3,
-						m_setupTabWidget, eng() );
+						m_setupTabWidget,
+						tr( "Output channel" ),
+						eng(), _instrument_track );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -217,8 +221,8 @@ midiTabWidget::~midiTabWidget()
 
 void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "inputchannel", m_inputChannelSpinBox->value() );
-	_this.setAttribute( "outputchannel", m_outputChannelSpinBox->value() );
+	m_inputChannelSpinBox->saveSettings( _doc, _this, "inputchannel" );
+	m_outputChannelSpinBox->saveSettings( _doc, _this, "outputchannel" );
 	m_receiveCheckBox->saveSettings( _doc, _this, "receive" );
 	m_sendCheckBox->saveSettings( _doc, _this, "send" );
 	m_defaultVelocityInCheckBox->saveSettings( _doc, _this, "defvelin" );
@@ -292,10 +296,8 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void midiTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_inputChannelSpinBox->setValue( _this.attribute( "inputchannel"
-								).toInt() );
-	m_outputChannelSpinBox->setValue( _this.attribute( "outputchannel"
-								).toInt() );
+	m_inputChannelSpinBox->loadSettings( _this, "inputchannel" );
+	m_outputChannelSpinBox->loadSettings( _this, "outputchannel" );
 	m_receiveCheckBox->loadSettings( _this, "receive" );
 	m_sendCheckBox->loadSettings( _this, "send" );
 	m_defaultVelocityInCheckBox->loadSettings( _this, "defvelin" );

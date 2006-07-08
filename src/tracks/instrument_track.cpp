@@ -260,7 +260,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_effectChannelNumber = new lcdSpinBox( MIN_EFFECT_CHANNEL,
 						MAX_EFFECT_CHANNEL, 2,
 						m_generalSettingsWidget,
-						eng() );
+						tr( "FX channel" ),
+						eng(), this );
 	m_effectChannelNumber->setInitValue( DEFAULT_EFFECT_CHANNEL );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
 	m_effectChannelNumber->move( m_surroundArea->x() +
@@ -1039,7 +1040,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 	m_surroundArea->saveSettings( _doc, _this, "surpos" );
 
-	_this.setAttribute( "fxch", m_effectChannelNumber->value() );
+	m_effectChannelNumber->saveSettings( _doc, _this, "fxch" );
 	_this.setAttribute( "basetone", m_baseTone );
 	_this.setAttribute( "baseoct", m_baseOctave );
 	_this.setAttribute( "tab", m_tabWidget->activeTab() );
@@ -1067,8 +1068,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 	m_surroundArea->loadSettings( _this, "surpos" );
 
-	m_effectChannelNumber->setInitValue(
-					_this.attribute( "fxch" ).toInt() );
+	m_effectChannelNumber->loadSettings( _this, "fxch" );
 	m_baseTone = static_cast<tones>( _this.attribute(
 							"basetone" ).toInt() );
 	m_baseOctave = static_cast<octaves>( _this.attribute(
