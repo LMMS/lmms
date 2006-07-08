@@ -48,8 +48,10 @@ lmms_MOC =						\
 		./about_dialog.moc			\
 		./arp_and_chords_tab_widget.moc		\
 		./automatable_button.moc		\
+		./automatable_slider.moc		\
 		./automation_editor.moc			\
 		./automation_pattern.moc		\
+		./automation_track.moc			\
 		./bb_editor.moc				\
 		./bb_track.moc				\
 		./instrument_track.moc			\
@@ -172,11 +174,13 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_oss.cpp				\
 		$(srcdir)/src/midi/midi_port.cpp			\
 		$(srcdir)/src/tracks/automation_pattern.cpp		\
+		$(srcdir)/src/tracks/automation_track.cpp		\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/instrument_track.cpp		\
 		$(srcdir)/src/tracks/pattern.cpp			\
 		$(srcdir)/src/tracks/sample_track.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
+		$(srcdir)/src/widgets/automatable_slider.cpp		\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/fade_button.cpp			\
@@ -216,6 +220,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/audio_sdl.h				\
 		$(srcdir)/include/automation_editor.h			\
 		$(srcdir)/include/automation_pattern.h			\
+		$(srcdir)/include/automation_track.h			\
 		$(srcdir)/include/interpolation.h			\
 		$(srcdir)/include/lmms_constants.h			\
 		$(srcdir)/include/lmms_math.h				\
@@ -291,6 +296,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/lcd_spinbox.h				\
 		$(srcdir)/include/tooltip.h				\
 		$(srcdir)/include/automatable_button.h			\
+		$(srcdir)/include/automatable_slider.h			\
 		$(srcdir)/include/led_checkbox.h			\
 		$(srcdir)/include/text_float.h				\
 		$(srcdir)/include/tempo_sync_knob.h			\

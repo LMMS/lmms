@@ -61,6 +61,7 @@
 #include "src/audio/audio_file_wave.cpp"
 #include "src/lmms_single_source.cpp"
 #include "src/tracks/automation_pattern.cpp"
+#include "src/tracks/automation_track.cpp"
 #include "src/tracks/pattern.cpp"
 #include "src/tracks/bb_track.cpp"
 #include "src/tracks/sample_track.cpp"
@@ -87,5 +88,6 @@
 #include "src/widgets/nstate_button.cpp"
 #include "src/widgets/lcd_spinbox.cpp"
 #include "src/widgets/automatable_button.cpp"
+#include "src/widgets/automatable_slider.cpp"
 #include "src/widgets/volume_knob.cpp"
 #endif
