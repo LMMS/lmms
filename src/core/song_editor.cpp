@@ -47,7 +47,6 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMessageBox>
-#include <QtGui/QSlider>
 #include <QtGui/QStatusBar>
 
 #else
@@ -58,7 +57,6 @@
 #include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qdom.h>
-#include <qslider.h>
 #include <qlabel.h>
 #include <qstatusbar.h>
 #include <qlayout.h>
@@ -71,6 +69,7 @@
 
 
 #include "song_editor.h"
+#include "automatable_slider.h"
 #include "bb_editor.h"
 #include "rename_dialog.h"
 #include "embed.h"
@@ -153,13 +152,15 @@ songEditor::songEditor( engine * _engine ) :
 	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
+	m_automation_track = track::create( track::AUTOMATION_TRACK, this );
 
 	// add some essential widgets to global tool-bar 
 	QWidget * tb = eng()->getMainWindow()->toolBar();
 
 	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
-	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb, eng() );
+	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb, tr( "Tempo" ),
+						eng(), m_automation_track );
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setTempo( int ) ) );
@@ -207,25 +208,26 @@ songEditor::songEditor( engine * _engine ) :
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-#ifdef QT4
-	m_masterVolumeSlider = new QSlider( Qt::Vertical, tb );
+	m_masterVolumeSlider = new automatableSlider( tb, tr( "Master volume" ),
+						eng(), m_automation_track );
+	m_masterVolumeSlider->setOrientation( Vertical );
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 1 );
-	m_masterVolumeSlider->setValue( 100 );
+	m_masterVolumeSlider->setInitValue( 100 );
+#ifdef QT4
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 #else
-	m_masterVolumeSlider = new QSlider( 0, 200, 1, 100, Qt::Vertical, tb );
 	m_masterVolumeSlider->setTickPosition( QSlider::Left );
 #endif
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
 	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
-	connect( m_masterVolumeSlider, SIGNAL( valueChanged( int ) ), this,
+	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterVolumeChanged( int ) ) );
 	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
 			SLOT( masterVolumePressed() ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderMoved( int ) ), this,
+	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
 			SLOT( masterVolumeMoved( int ) ) );
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterVolumeReleased() ) );
@@ -244,24 +246,25 @@ songEditor::songEditor( engine * _engine ) :
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
-#ifdef QT4
-	m_masterPitchSlider = new QSlider( Qt::Vertical, tb );
+	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ),
+						eng(), m_automation_track );
+	m_masterPitchSlider->setOrientation( Vertical );
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
-	m_masterPitchSlider->setValue( 0 );
+	m_masterPitchSlider->setInitValue( 0 );
+#ifdef QT4
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 #else
-	m_masterPitchSlider = new QSlider( -12, 12, 1, 0, Qt::Vertical, tb );
 	m_masterPitchSlider->setTickPosition( QSlider::Left );
 #endif
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
 	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
-	connect( m_masterPitchSlider, SIGNAL( valueChanged( int ) ), this,
+	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterPitchChanged( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
 			SLOT( masterPitchPressed() ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderMoved( int ) ), this,
+	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
 			SLOT( masterPitchMoved( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
@@ -442,6 +445,7 @@ songEditor::songEditor( engine * _engine ) :
 
 songEditor::~songEditor()
 {
+	delete m_automation_track;
 }
 
 
@@ -612,7 +616,8 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 void songEditor::masterVolumeChanged( int _new_val )
 {
 	masterVolumeMoved( _new_val );
-	if( m_mvsStatus->isVisible() == FALSE && m_loadingProject == FALSE )
+	if( m_mvsStatus->isVisible() == FALSE && m_loadingProject == FALSE
+					&& m_masterVolumeSlider->showStatus() )
 	{
 		m_mvsStatus->reparent( m_masterVolumeSlider );
 		m_mvsStatus->move( m_masterVolumeSlider->mapTo(
@@ -621,7 +626,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	eng()->getMixer()->setMasterGain( 2.0f - _new_val / 100.0f );
+	eng()->getMixer()->setMasterGain( _new_val / 100.0f );
 	setModified();
 }
 
@@ -636,7 +641,7 @@ void songEditor::masterVolumePressed( void )
 							QPoint( 0, 0 ) ) +
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 	m_mvsStatus->show();
-	masterVolumeMoved( m_masterVolumeSlider->value() );
+	masterVolumeMoved( m_masterVolumeSlider->logicValue() );
 }
 
 
@@ -644,7 +649,7 @@ void songEditor::masterVolumePressed( void )
 
 void songEditor::masterVolumeMoved( int _new_val )
 {
-	m_mvsStatus->setText( tr( "Value: %1%" ).arg( 200 - _new_val ) );
+	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
 }
 
 
@@ -661,7 +666,8 @@ void songEditor::masterVolumeReleased( void )
 void songEditor::masterPitchChanged( int _new_val )
 {
 	masterPitchMoved( _new_val );
-	if( m_mpsStatus->isVisible() == FALSE && m_loadingProject == FALSE )
+	if( m_mpsStatus->isVisible() == FALSE && m_loadingProject == FALSE
+					&& m_masterPitchSlider->showStatus() )
 	{
 		m_mpsStatus->reparent( m_masterPitchSlider );
 		m_mpsStatus->move( m_masterPitchSlider->mapTo(
@@ -684,7 +690,7 @@ void songEditor::masterPitchPressed( void )
 							QPoint( 0, 0 ) ) +
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
-	masterPitchMoved( m_masterPitchSlider->value() );
+	masterPitchMoved( m_masterPitchSlider->logicValue() );
 }
 
 
@@ -692,7 +698,7 @@ void songEditor::masterPitchPressed( void )
 
 void songEditor::masterPitchMoved( int _new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( -_new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
 
 }
 
@@ -744,7 +750,8 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 void songEditor::setTempo( int _new_bpm )
 {
-	m_bpmSpinBox->setValue( tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
+	m_bpmSpinBox->setInitValue(
+				tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
 	setModified();
 	emit tempoChanged( _new_bpm );
 }
@@ -754,7 +761,7 @@ void songEditor::setTempo( int _new_bpm )
 
 void songEditor::setMasterVolume( volume _vol )
 {
-	m_masterVolumeSlider->setValue( 200 - _vol );
+	m_masterVolumeSlider->setInitValue( _vol );
 }
 
 
@@ -762,7 +769,7 @@ void songEditor::setMasterVolume( volume _vol )
 
 void songEditor::setMasterPitch( int _master_pitch )
 {
-	m_masterPitchSlider->setValue( -_master_pitch );
+	m_masterPitchSlider->setInitValue( _master_pitch );
 }
 
 
@@ -770,7 +777,7 @@ void songEditor::setMasterPitch( int _master_pitch )
 
 int songEditor::masterPitch( void ) const
 {
-	return( -m_masterPitchSlider->value() );
+	return( m_masterPitchSlider->logicValue() );
 }
 
 
@@ -1025,6 +1032,11 @@ void songEditor::processNextBuffer( void )
 			played_frames = frames_per_tact -
 					m_playPos[m_playMode].currentFrame();
 		}
+
+		m_automation_track->play( m_playPos[m_playMode],
+					m_playPos[m_playMode].currentFrame(),
+					played_frames, total_frames_played,
+					tco_num );
 
 		// loop through all tracks and play them if they're not muted
 		for( trackVector::iterator it = tv.begin(); it != tv.end();
@@ -1393,6 +1405,11 @@ void songEditor::clearProject( void )
 
 	clearAllTracks();
 
+	eng()->getAutomationEditor()->setCurrentPattern( NULL );
+	m_bpmSpinBox->getAutomationPattern()->clearValues();
+	m_masterVolumeSlider->clearAutomationValues();
+	m_masterPitchSlider->clearAutomationValues();
+
 	eng()->getBBEditor()->clearAllTracks();
 
 	eng()->getProjectNotes()->clear();
@@ -1426,8 +1443,8 @@ void songEditor::createNewProject( void )
 
 	m_loadingProject = TRUE;
 	setTempo( DEFAULT_BPM );
-	m_masterVolumeSlider->setValue( 100 );
-	m_masterPitchSlider->setValue( 0 );
+	m_masterVolumeSlider->setInitValue( 100 );
+	m_masterPitchSlider->setInitValue( 0 );
 	m_loadingProject = FALSE;
 
 	m_fileName = m_oldFileName = "";
@@ -1493,20 +1510,30 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 				if( node.toElement().attribute( "value"
 								).toInt() > 0 )
 				{
-					m_masterVolumeSlider->setValue( 200 -
-				node.toElement().attribute( "value" ).toInt() );
+					m_masterVolumeSlider->setInitValue(
+						node.toElement().attribute(
+							"value" ).toInt() );
 				}
 				else
 				{
-					m_masterVolumeSlider->setValue(
+					m_masterVolumeSlider->setInitValue(
 							DEFAULT_VOLUME );
 				}
 			}
 			else if( node.nodeName() == "masterpitch" )
 			{
-				m_masterPitchSlider->setValue(
-					node.toElement().attribute( "value"
+				m_masterPitchSlider->setInitValue(
+					-node.toElement().attribute( "value"
 								).toInt() );
+			}
+			else if( node.nodeName()
+					== automationPattern::classNodeName() )
+			{
+				m_bpmSpinBox->loadSettings( mmp.head(), "bpm" );
+				m_masterVolumeSlider->loadSettings( mmp.head(),
+								"mastervol" );
+				m_masterPitchSlider->loadSettings( mmp.head(),
+								"masterpitch" );
 			}
 		}
 		node = node.nextSibling();
@@ -1569,17 +1596,9 @@ bool songEditor::saveProject( void )
 {
 	multimediaProject mmp( multimediaProject::SONG_PROJECT );
 
-	QDomElement bpm = mmp.createElement( "bpm" );
-	bpm.setAttribute( "value", m_bpmSpinBox->value() );
-	mmp.head().appendChild( bpm );
-
-	QDomElement mv = mmp.createElement( "mastervol" );
-	mv.setAttribute( "value", 200 - m_masterVolumeSlider->value() );
-	mmp.head().appendChild( mv );
-
-	QDomElement mp = mmp.createElement( "masterpitch" );
-	mp.setAttribute( "value", m_masterPitchSlider->value() );
-	mmp.head().appendChild( mp );
+	m_bpmSpinBox->saveSettings( mmp, mmp.head(), "bpm" );
+	m_masterVolumeSlider->saveSettings( mmp, mmp.head(), "mastervol" );
+	m_masterPitchSlider->saveSettings( mmp, mmp.head(), "masterpitch" );
 
 
 	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );

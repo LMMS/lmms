@@ -34,8 +34,8 @@
 
 class QLabel;
 class QScrollBar;
-class QSlider;
 
+class automatableSlider;
 class comboBox;
 class lcdSpinBox;
 class pattern;
@@ -261,8 +261,8 @@ private:
 	toolButton * m_stopButton;
 	lcdSpinBox * m_bpmSpinBox;
 
-	QSlider * m_masterVolumeSlider;
-	QSlider * m_masterPitchSlider;
+	automatableSlider * m_masterVolumeSlider;
+	automatableSlider * m_masterPitchSlider;
 	textFloat * m_mvsStatus;
 	textFloat * m_mpsStatus;
 
@@ -293,6 +293,8 @@ private:
 	bool m_loopPattern;
 
 	bool m_scrollBack;
+
+	track * m_automation_track;
 
 
 
