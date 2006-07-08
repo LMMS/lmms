@@ -397,10 +397,11 @@ public:
 		EVENT_TRACK,
 		VIDEO_TRACK,
 		NULL_TRACK,
+		AUTOMATION_TRACK,
 		TOTAL_TRACK_TYPES
 	} ;
 
-	track( trackContainer * _tc );
+	track( trackContainer * _tc, bool _create_widget = TRUE );
 	virtual ~track();
 
 	static track * FASTCALL create( trackTypes _tt, trackContainer * _tc );

@@ -51,6 +51,7 @@
 
 #include "track.h"
 #include "track_container.h"
+#include "automation_track.h"
 #include "instrument_track.h"
 #include "bb_track.h"
 #include "sample_track.h"
@@ -1473,14 +1474,18 @@ midiTime trackWidget::endPosition( const midiTime & _pos_start )
 // track
 // ===========================================================================
 
-track::track( trackContainer * _tc ) :
+track::track( trackContainer * _tc, bool _create_widget ) :
 	journallingObject( _tc->eng() ),
-	m_trackContainer( _tc )
+	m_trackContainer( _tc ),
+	m_trackWidget( NULL )
 {
-	m_trackWidget = new trackWidget( this,
+	if( _create_widget )
+	{
+		m_trackWidget = new trackWidget( this,
 					m_trackContainer->containerWidget() );
 
-	m_trackContainer->addTrack( this );
+		m_trackContainer->addTrack( this );
+	}
 }
 
 
@@ -1488,10 +1493,13 @@ track::track( trackContainer * _tc ) :
 
 track::~track()
 {
-	m_trackContainer->removeTrack( this );
+	if( m_trackWidget != NULL )
+	{
+		m_trackContainer->removeTrack( this );
 
-	delete m_trackWidget;
-	m_trackWidget = NULL;
+		delete m_trackWidget;
+		m_trackWidget = NULL;
+	}
 }
 
 
@@ -1512,6 +1520,7 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 		case SAMPLE_TRACK: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
+		case AUTOMATION_TRACK: t = new automationTrack( _tc ); break;
 		default: break;
 	}
 
