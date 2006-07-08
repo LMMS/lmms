@@ -311,7 +311,7 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 
 void surroundArea::updatePositionX( void )
 {
-	m_sndSrcPos.setX( (int)m_position_x->value() );
+	m_sndSrcPos.setX( (int)roundf( m_position_x->value() ) );
 	update();
 }
 
@@ -320,7 +320,7 @@ void surroundArea::updatePositionX( void )
 
 void surroundArea::updatePositionY( void )
 {
-	m_sndSrcPos.setY( (int)m_position_y->value() );
+	m_sndSrcPos.setY( (int)roundf( m_position_y->value() ) );
 	update();
 }
 
