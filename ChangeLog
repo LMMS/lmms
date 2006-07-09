@@ -1,3 +1,17 @@
+2006-07-09	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/piano_widget.h:
+	* src/core/piano_widget.cpp:
+	- use automation capabilities using a helper knob
+	- added context menu
+	- added save/load methods
+	- use raw keycodes to play the piano
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	- don't set song modified flag when playing automation
+	- use piano widget save/load methods
+
 2006-07-08	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/automation_track.h:
