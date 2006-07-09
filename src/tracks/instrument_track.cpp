@@ -815,11 +815,14 @@ void instrumentTrack::setSurroundAreaPos( const QPoint & _p )
 
 
 
-void instrumentTrack::setBaseNote( Uint32 _new_note )
+void instrumentTrack::setBaseNote( Uint32 _new_note, bool _modified )
 {
 	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
 	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
-	eng()->getSongEditor()->setModified();
+	if( _modified )
+	{
+		eng()->getSongEditor()->setModified();
+	}
 	emit baseNoteChanged();
 }
 
@@ -1041,8 +1044,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_surroundArea->saveSettings( _doc, _this, "surpos" );
 
 	m_effectChannelNumber->saveSettings( _doc, _this, "fxch" );
-	_this.setAttribute( "basetone", m_baseTone );
-	_this.setAttribute( "baseoct", m_baseOctave );
+	m_pianoWidget->saveSettings( _doc, _this, "basenote" );
 	_this.setAttribute( "tab", m_tabWidget->activeTab() );
 
 	mainWindow::saveWidgetState( this, _this );
@@ -1069,11 +1071,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	m_surroundArea->loadSettings( _this, "surpos" );
 
 	m_effectChannelNumber->loadSettings( _this, "fxch" );
-	m_baseTone = static_cast<tones>( _this.attribute(
-							"basetone" ).toInt() );
-	m_baseOctave = static_cast<octaves>( _this.attribute(
-							"baseoct" ).toInt() );
-
+	m_pianoWidget->loadSettings( _this, "basenote" );
 	int tab = _this.attribute( "tab" ).toInt();
 
 	QDomNode node = _this.firstChild();

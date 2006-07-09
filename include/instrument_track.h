@@ -121,7 +121,7 @@ public:
 	volume getVolume( void ) const;
 	void FASTCALL setSurroundAreaPos( const QPoint & _p );
 
-	void FASTCALL setBaseNote( Uint32 _new_note );
+	void FASTCALL setBaseNote( Uint32 _new_note, bool _modified = TRUE );
 
 	inline tones baseTone( void ) const
 	{
