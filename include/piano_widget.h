@@ -44,6 +44,7 @@
 #endif
 
 
+#include "knob.h"
 #include "note.h"
 #include "templates.h"
 
@@ -73,8 +74,14 @@ public:
 		update();
 	}
 
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name );
+	virtual void loadSettings( const QDomElement & _this,
+							const QString & _name );
+
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
@@ -82,6 +89,7 @@ protected:
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
 	virtual void focusOutEvent( QFocusEvent * _fe );
+	virtual bool x11Event( XEvent * _xe );
 
 
 private:
@@ -102,10 +110,14 @@ private:
 	octaves m_startOctave;
 
 	int m_lastKey;
+	unsigned int m_keycode;
+
+	knob * m_noteKnob;
 
 
 private slots:
 	void pianoScrolled( int _new_pos );
+	void updateBaseNote( void );
 
 } ;
 

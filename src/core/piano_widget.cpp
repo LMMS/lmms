@@ -30,13 +30,19 @@
 
 #ifdef QT4
 
+#include <QtGui/QCursor>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
 #else
 
+#include <qcursor.h>
+#include <qlabel.h>
 #include <qpainter.h>
+#include <qpopupmenu.h>
 
 #endif
 
@@ -46,6 +52,12 @@
 #include "midi.h"
 #include "templates.h"
 #include "embed.h"
+
+#ifdef Q_WS_X11
+
+#include <X11/Xlib.h>
+
+#endif
 
 
 const keyTypes KEY_ORDER[] =
@@ -139,6 +151,14 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	// set background-mode for flicker-free redraw
 	setBackgroundMode( Qt::NoBackground );
 #endif
+
+	m_noteKnob = new knob( knobDark_28, NULL, tr ( "Base note" ),
+						_parent->eng(), _parent );
+	m_noteKnob->setRange( 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1.0f );
+	m_noteKnob->setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
+
+	connect( m_noteKnob, SIGNAL( valueChanged( float ) ), this,
+					SLOT( updateBaseNote( void ) ) );
 }
 
 
@@ -146,6 +166,7 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 
 pianoWidget::~pianoWidget()
 {
+	delete m_noteKnob;
 }
 
 
@@ -215,6 +236,36 @@ void pianoWidget::pianoScrolled( int _new_pos )
 
 
 
+void pianoWidget::contextMenuEvent( QContextMenuEvent * _me )
+{
+	if( _me->pos().y() > PIANO_BASE )
+	{
+		QWidget::contextMenuEvent( _me );
+		return;
+	}
+
+	QMenu contextMenu( this );
+#ifdef QT4
+	contextMenu.setTitle( m_noteKnob->accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( m_noteKnob->accessibleName() ) + "</b></font>",
+			this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "&Open in automation editor" ),
+					m_noteKnob->getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
 // handler for mouse-click-event
 void pianoWidget::mousePressEvent( QMouseEvent * _me )
 {
@@ -250,6 +301,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
+			m_noteKnob->setInitValue( key_num );
 			m_instrumentTrack->setBaseNote( key_num );
 		}
 
@@ -325,6 +377,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else
 			{
+				m_noteKnob->setInitValue( key_num );
 				m_instrumentTrack->setBaseNote( key_num );
 			}
 		}
@@ -345,37 +398,37 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 
 int pianoWidget::getKeyFromKeyboard( int _k ) const
 {
-	switch( _k )
+	switch( m_keycode )
 	{
-		case Qt::Key_Y: return( 0 );
-		case Qt::Key_S: return( 1 );
-		case Qt::Key_X: return( 2 );
-		case Qt::Key_D: return( 3 );
-		case Qt::Key_C: return( 4 );
-		case Qt::Key_V: return( 5 );
-		case Qt::Key_G: return( 6 );
-		case Qt::Key_B: return( 7 );
-		case Qt::Key_H: return( 8 );
-		case Qt::Key_N: return( 9 );
-		case Qt::Key_J: return( 10 );
-		case Qt::Key_M: return( 11 );
-		case Qt::Key_Q: return( 12 );
-		case Qt::Key_2: return( 13 );
-		case Qt::Key_W: return( 14 );
-		case Qt::Key_3: return( 15 );
-		case Qt::Key_E: return( 16 );
-		case Qt::Key_R: return( 17 );
-		case Qt::Key_5: return( 18 );
-		case Qt::Key_T: return( 19 );
-		case Qt::Key_6: return( 20 );
-		case Qt::Key_Z: return( 21 );
-		case Qt::Key_7: return( 22 );
-		case Qt::Key_U: return( 23 );
-		case Qt::Key_I: return( 24 );
-		case Qt::Key_9: return( 25 );
-		case Qt::Key_O: return( 26 );
-		case Qt::Key_0: return( 27 );
-		case Qt::Key_P: return( 28 );
+		case 52: return( 0 ); // Y
+		case 39: return( 1 ); // S
+		case 53: return( 2 ); // X
+		case 40: return( 3 ); // D
+		case 54: return( 4 ); // C
+		case 55: return( 5 ); // V
+		case 42: return( 6 ); // G
+		case 56: return( 7 ); // B
+		case 43: return( 8 ); // H
+		case 57: return( 9 ); // N
+		case 44: return( 10 ); // J
+		case 58: return( 11 ); // M
+		case 24: return( 12 ); // Q
+		case 11: return( 13 ); // 2
+		case 25: return( 14 ); // W
+		case 12: return( 15 ); // 3
+		case 26: return( 16 ); // E
+		case 27: return( 17 ); // R
+		case 14: return( 18 ); // 5
+		case 28: return( 19 ); // T
+		case 15: return( 20 ); // 6
+		case 29: return( 21 ); // Z
+		case 16: return( 22 ); // 7
+		case 30: return( 23 ); // U
+		case 31: return( 24 ); // I
+		case 18: return( 25 ); // 9
+		case 32: return( 26 ); // O
+		case 19: return( 27 ); // 0
+		case 33: return( 28 ); // P
 	}
 
 	return( -100 );
@@ -626,6 +679,59 @@ void pianoWidget::paintEvent( QPaintEvent * )
 	bitBlt( this, rect().topLeft(), &pm );
 #endif
 }
+
+
+
+
+void pianoWidget::updateBaseNote( void )
+{
+	m_instrumentTrack->setBaseNote( (int)roundf( m_noteKnob->value() ),
+									FALSE );
+	update();
+}
+
+
+
+
+void pianoWidget::saveSettings( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name )
+{
+	m_noteKnob->saveSettings( _doc, _this, _name );
+}
+
+
+
+
+void pianoWidget::loadSettings( const QDomElement & _this,
+							const QString & _name )
+{
+	if( _this.hasAttribute( "baseoct" ) )
+	{
+		m_noteKnob->setInitValue( _this.attribute( "baseoct" ).toInt()
+				* NOTES_PER_OCTAVE
+				+ _this.attribute( "basetone" ).toInt() );
+	}
+	else
+	{
+		m_noteKnob->loadSettings( _this, _name );
+	}
+	updateBaseNote();
+}
+
+
+
+
+bool pianoWidget::x11Event( XEvent * _xe )
+{
+	switch( _xe->type )
+	{
+		case KeyPress:
+		case KeyRelease:
+			m_keycode = _xe->xkey.keycode;
+	}
+	return( FALSE );
+}
+
 
 
 
