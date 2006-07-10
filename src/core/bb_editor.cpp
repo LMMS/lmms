@@ -140,7 +140,7 @@ bbEditor::bbEditor( engine * _engine ) :
 	QLabel * l = new QLabel( m_toolBar );
 	l->setPixmap( embed::getIconPixmap( "drum" ) );
 
-	m_bbComboBox = new comboBox( m_toolBar, eng() );
+	m_bbComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( setCurrentBB( int ) ) );
@@ -271,17 +271,10 @@ void bbEditor::removeBB( csize _bb )
 		( *it )->removeTCO( _bb );
 		( *it )->getTrackContentWidget()->removeTact( _bb * 64 );
 	}
-/*	if( _bb == currentBB() && numOfBBs() > 0 )
-	{*/
-		if( _bb > 0)
-		{
-			setCurrentBB( _bb - 1 );
-		}
-		else
-		{
-			setCurrentBB( 0 );
-		}
-//	}
+	if( _bb <= currentBB() )
+	{
+		setCurrentBB( tMax( (int)currentBB() - 1, 0 ) );
+	}
 }
 
 
@@ -300,6 +293,11 @@ void bbEditor::updateBBTrack( trackContentObject * _tco )
 
 void bbEditor::updateComboBox( void )
 {
+	disconnect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
+					this, SLOT( setCurrentBB( int ) ) );
+
+	csize current_bb = currentBB();
+
 	m_bbComboBox->clear();
 
 	for( csize i = 0; i < numOfBBs(); ++i )
@@ -308,7 +306,10 @@ void bbEditor::updateComboBox( void )
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
 					bbt->trackLabel()->pixmap() );
 	}
-	m_bbComboBox->setValue( currentBB() );
+	m_bbComboBox->setValue( current_bb );
+
+	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
+					this, SLOT( setCurrentBB( int ) ) );
 }
 
 
