@@ -143,7 +143,8 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
-	m_filterComboBox = new comboBox( m_filterGroupBox, eng() );
+	m_filterComboBox = new comboBox( m_filterGroupBox, tr( "Filter type" ),
+						eng(), _instrument_track );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
@@ -505,7 +506,7 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 
 void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "ftype", m_filterComboBox->value() );
+	m_filterComboBox->saveSettings( _doc, _this, "ftype" );
 	m_filterCutKnob->saveSettings( _doc, _this, "fcut" );
 	m_filterResKnob->saveSettings( _doc, _this, "fres" );
 	_this.setAttribute( "fwet", m_filterGroupBox->isActive() );
@@ -523,7 +524,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void envelopeTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_filterComboBox->setValue( _this.attribute( "ftype" ).toInt() );
+	m_filterComboBox->loadSettings( _this, "ftype" );
 	m_filterCutKnob->loadSettings( _this, "fcut" );
 	m_filterResKnob->loadSettings( _this, "fres" );
 /*	m_filterState->setChecked( _this.attribute( "fwet" ).toInt() );*/

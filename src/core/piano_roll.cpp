@@ -397,7 +397,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, eng() );
+	m_zoomingComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
@@ -413,7 +413,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, eng() );
+	m_quantizeComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
@@ -426,7 +426,7 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenComboBox = new comboBox( m_toolBar, eng() );
+	m_noteLenComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_noteLenComboBox->setFixedSize( 120, 22 );
 	m_noteLenComboBox->addItem( tr( "Last note" ),
 					embed::getIconPixmap( "edit_draw" ) );

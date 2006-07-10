@@ -153,7 +153,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new comboBox( this, eng() );
+	m_typeCombo = new comboBox( this, NULL, eng(), NULL );
 	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
 					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
 								TYPE_HEIGHT );
@@ -176,7 +176,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new comboBox( this, eng() );
+	m_kbpsCombo = new comboBox( this, NULL, eng(), NULL );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );

@@ -319,7 +319,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar, eng() );
+	m_zoomingXComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
@@ -333,7 +333,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar, eng() );
+	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
@@ -348,7 +348,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, eng() );
+	m_quantizeComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{

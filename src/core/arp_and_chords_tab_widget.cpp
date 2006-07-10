@@ -204,7 +204,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
 
-	m_chordsComboBox = new comboBox( m_chordsGroupBox, eng() );
+	m_chordsComboBox = new comboBox( m_chordsGroupBox, tr( "Chord type" ),
+						eng(), _instrument_track );
 	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -257,7 +258,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"not played at the same time. Typical arpeggios are "
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
-	m_arpComboBox = new comboBox( m_arpGroupBox, eng() );
+	m_arpComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio type" ),
+						eng(), _instrument_track );
 	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -395,7 +397,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	mode_lbl->setGeometry( 10, 104, 64, 10 );
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
-	m_arpModeComboBox = new comboBox( m_arpGroupBox, eng() );
+	m_arpModeComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio mode" ),
+						eng(), _instrument_track );
 	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
 	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
@@ -658,11 +661,11 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
-	_this.setAttribute( "chord", m_chordsComboBox->value() );
+	m_chordsComboBox->saveSettings( _doc, _this, "chord" );
 	m_chordRangeKnob->saveSettings( _doc, _this, "chordrange" );
 
 	_this.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
-	_this.setAttribute( "arp", m_arpComboBox->value() );
+	m_arpComboBox->saveSettings( _doc, _this, "arp" );
 	m_arpRangeKnob->saveSettings( _doc, _this, "arprange" );
 	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
 	m_arpGateKnob->saveSettings( _doc, _this, "arpgate" );
@@ -670,7 +673,7 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "arpsyncmode",
 					( int ) m_arpTimeKnob->getSyncMode() );
 
-	_this.setAttribute( "arpmode", m_arpModeComboBox->value() );
+	m_arpModeComboBox->saveSettings( _doc, _this, "arpmode" );
 }
 
 
@@ -680,9 +683,9 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 {
 	m_chordsGroupBox->setState( !_this.attribute
 						( "chorddisabled" ).toInt() );
-	m_chordsComboBox->setValue( _this.attribute( "chord" ).toInt() );
+	m_chordsComboBox->loadSettings( _this, "chord" );
 	m_chordRangeKnob->loadSettings( _this, "chordrange" );
-	m_arpComboBox->setValue( _this.attribute( "arp" ).toInt() );
+	m_arpComboBox->loadSettings( _this, "arp" );
 	m_arpRangeKnob->loadSettings( _this, "arprange" );
 	m_arpTimeKnob->loadSettings( _this, "arptime" );
 	m_arpGateKnob->loadSettings( _this, "arpgate" );
@@ -699,7 +702,7 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						 "arpsyncmode" ).toInt() );
 
-	m_arpModeComboBox->setValue( _this.attribute( "arpmode" ).toInt() );
+	m_arpModeComboBox->loadSettings( _this, "arpmode" );
 
 	m_arpGroupBox->setState( _this.attribute( "arpdir" ).toInt() != OFF &&
 				!_this.attribute( "arpdisabled" ).toInt() );
