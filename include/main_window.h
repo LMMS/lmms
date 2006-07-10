@@ -149,6 +149,7 @@ private:
 	QGridLayout * m_toolBarLayout;
 
 	QMenu * m_templatesMenu;
+	int m_custom_templates_count;
 
 	struct keyModifiers
 	{
@@ -165,6 +166,10 @@ private:
 
 
 	friend class engine;
+
+
+private slots:
+	void fillTemplatesMenu( void );
 
 } ;
 

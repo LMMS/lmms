@@ -53,6 +53,8 @@
 #include <qsplashscreen.h>
 #endif
 
+#define addSeparator insertSeparator
+
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -266,34 +268,17 @@ void mainWindow::finalize( void )
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
-	QDir d( configManager::inst()->factoryProjectsDir() + "templates" );
-	QStringList templates = d.entryList(
-#ifdef QT4
-						QStringList( "*.mpt" ),
-#else
-						"*.mpt",
-#endif
-						QDir::Files | QDir::Readable );
-	if( !templates.isEmpty() )
-	{
-		m_templatesMenu = new QMenu( project_new );
-		for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-		{
-			m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
-		}
-		connect( m_templatesMenu, SIGNAL( activated( int ) ),
+	m_templatesMenu = new QMenu( project_new );
+	connect( m_templatesMenu, SIGNAL( aboutToShow( void ) ),
+				this, SLOT( fillTemplatesMenu( void ) ) );
+	connect( m_templatesMenu, SIGNAL( activated( int ) ),
 			this, SLOT( createNewProjectFromTemplate( int ) ) );
-		project_new->setMenu( m_templatesMenu );
+	project_new->setMenu( m_templatesMenu );
 #ifdef QT4
-		project_new->setPopupMode( toolButton::MenuButtonPopup );
+	project_new->setPopupMode( toolButton::MenuButtonPopup );
 #else
-		project_new->setPopupDelay( 0 );
+	project_new->setPopupDelay( 0 );
 #endif
-	}
-
 
 	toolButton * project_open = new toolButton( 
 					embed::getIconPixmap( "project_open" ),
@@ -692,9 +677,12 @@ void mainWindow::createNewProjectFromTemplate( int _idx )
 	if( m_templatesMenu != NULL &&
 			eng()->getSongEditor()->mayChangeProject() == TRUE )
 	{
+		QString dir_base = m_templatesMenu->indexOf( _idx )
+						>= m_custom_templates_count ?
+				configManager::inst()->factoryProjectsDir() :
+				configManager::inst()->userProjectsDir();
 		eng()->getSongEditor()->createNewProjectFromTemplate(
-			configManager::inst()->factoryProjectsDir() +
-				"templates/" +
+				dir_base + "templates/" +
 				m_templatesMenu->text( _idx ) + ".mpt" );
 	}
 #endif
@@ -987,6 +975,59 @@ void mainWindow::keyReleaseEvent( QKeyEvent * _ke )
 }
 
 
+
+
+void mainWindow::fillTemplatesMenu( void )
+{
+	m_templatesMenu->clear();
+
+	QDir user_d( configManager::inst()->userProjectsDir() + "templates" );
+	QStringList templates = user_d.entryList(
+#ifdef QT4
+						QStringList( "*.mpt" ),
+#else
+						"*.mpt",
+#endif
+						QDir::Files | QDir::Readable );
+
+	m_custom_templates_count = templates.count();
+	for( QStringList::iterator it = templates.begin();
+						it != templates.end(); ++it )
+	{
+		m_templatesMenu->addAction(
+					embed::getIconPixmap( "project_file" ),
+					( *it ).left( ( *it ).length() - 4 ) );
+	}
+
+	QDir d( configManager::inst()->factoryProjectsDir() + "templates" );
+	templates = d.entryList(
+#ifdef QT4
+						QStringList( "*.mpt" ),
+#else
+						"*.mpt",
+#endif
+						QDir::Files | QDir::Readable );
+
+
+	if( m_custom_templates_count > 0 && !templates.isEmpty() )
+	{
+		m_templatesMenu->addSeparator();
+	}
+	for( QStringList::iterator it = templates.begin();
+						it != templates.end(); ++it )
+	{
+		m_templatesMenu->addAction(
+					embed::getIconPixmap( "project_file" ),
+					( *it ).left( ( *it ).length() - 4 ) );
+	}
+}
+
+
+
+
+#ifndef QT4
+#undef addSeparator
+#endif
 
 
 #include "main_window.moc"
