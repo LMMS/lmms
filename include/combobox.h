@@ -56,7 +56,8 @@ class comboBox : public QWidget, public automatableObject<int>
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent, engine * _engine );
+	comboBox( QWidget * _parent, const QString & _name, engine * _engine,
+							track * _track );
 	virtual ~comboBox();
 
 	void addItem( const QString & _item, const QPixmap & _pixmap =
@@ -80,6 +81,7 @@ public:
 
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void wheelEvent( QWheelEvent * _we );

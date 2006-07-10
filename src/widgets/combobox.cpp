@@ -33,13 +33,17 @@
 #ifndef QT3
 
 #include <QtGui/QApplication>
+#include <QtGui/QCursor>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
 #else
 
+#include <qcursor.h>
+#include <qlabel.h>
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qimage.h>
@@ -54,9 +58,14 @@ QPixmap * comboBox::s_arrow = NULL;
 const int CB_ARROW_BTN_WIDTH = 20;
 
 
-comboBox::comboBox( QWidget * _parent, engine * _engine ) :
-	QWidget( _parent ),
-	automatableObject<int>( _engine ),
+comboBox::comboBox( QWidget * _parent, const QString & _name, engine * _engine,
+							track * _track ) :
+	QWidget( _parent
+#ifndef QT4
+			, _name.ascii()
+#endif
+		),
+	automatableObject<int>( _engine, _track ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {
@@ -85,6 +94,15 @@ comboBox::comboBox( QWidget * _parent, engine * _engine ) :
 
 #ifdef QT3
 	setBackgroundMode( NoBackground );
+#endif
+
+	if( _track != NULL )
+	{
+		getAutomationPattern();
+	}
+	setInitValue( 0 );
+#ifdef QT4
+	setAccessibleName( _name );
 #endif
 }
 
@@ -160,10 +178,45 @@ void comboBox::setValue( const int _idx )
 
 
 
+void comboBox::contextMenuEvent( QContextMenuEvent * _me )
+{
+	if( nullTrack() || _me->x() <= width() - CB_ARROW_BTN_WIDTH )
+	{
+		QWidget::contextMenuEvent( _me );
+		return;
+	}
+
+	QMenu contextMenu( this );
+#ifdef QT4
+	contextMenu.setTitle( accessibleName() );
+#else
+	QLabel * caption = new QLabel( "<font color=white><b>" +
+			QString( accessibleName() ) + "</b></font>",
+			this );
+	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
+	caption->setAlignment( Qt::AlignCenter );
+	contextMenu.addAction( caption );
+#endif
+//TODO: Change icon
+	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+					tr( "&Open in automation editor" ),
+					getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
 void comboBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
 	{
+		if( _me->button() == Qt::RightButton )
+		{
+			return;
+		}
+
 		m_pressed = TRUE;
 		update();
 
@@ -182,11 +235,11 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		setValue( value() + 1 );
+		setInitValue( value() + 1 );
 	}
 	else if( _me->button() == Qt::RightButton )
 	{
-		setValue( value() - 1 );
+		setInitValue( value() - 1 );
 	}
 }
 
@@ -263,7 +316,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 
 void comboBox::wheelEvent( QWheelEvent * _we )
 {
-	setValue( value() + ( ( _we->delta() < 0 ) ? 1 : -1 ) );
+	setInitValue( value() + ( ( _we->delta() < 0 ) ? 1 : -1 ) );
 	_we->accept();
 }
 
@@ -273,7 +326,7 @@ void comboBox::wheelEvent( QWheelEvent * _we )
 
 void comboBox::setItem( QAction * _item )
 {
-	setValue( findText( _item->text() ) );
+	setInitValue( findText( _item->text() ) );
 }
 
 
@@ -290,7 +343,7 @@ void comboBox::setItem( QAction * )
 
 void comboBox::setItem( int _item )
 {
-	setValue( _item );
+	setInitValue( _item );
 }
 
 
