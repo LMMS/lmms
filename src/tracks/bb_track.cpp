@@ -355,6 +355,7 @@ bbTrack::~bbTrack()
 #endif
 	}
 	s_infoMap.remove( this );
+	eng()->getBBEditor()->updateComboBox();
 }
 
 
@@ -522,7 +523,7 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
 		_track1->eng()->getBBEditor()->swapBB( s_infoMap[t1],
 								s_infoMap[t2] );
-		_track1->eng()->getBBEditor()->setCurrentBB( s_infoMap[t2] );
+		_track1->eng()->getBBEditor()->setCurrentBB( s_infoMap[t1] );
 	}
 }
 
