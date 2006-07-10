@@ -392,7 +392,7 @@ songEditor::songEditor( engine * _engine ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, eng() );
+	m_zoomingComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
@@ -1427,6 +1427,22 @@ void songEditor::clearProject( void )
 // create new file
 void songEditor::createNewProject( void )
 {
+	QString default_template = configManager::inst()->userProjectsDir()
+						+ "templates/default.mpt";
+	if( QFile::exists( default_template ) )
+	{
+		createNewProjectFromTemplate( default_template );
+		return;
+	}
+
+	default_template = configManager::inst()->factoryProjectsDir()
+						+ "templates/default.mpt";
+	if( QFile::exists( default_template ) )
+	{
+		createNewProjectFromTemplate( default_template );
+		return;
+	}
+
 	clearProject();
 
 	eng()->getProjectJournal()->setJournalling( FALSE );
