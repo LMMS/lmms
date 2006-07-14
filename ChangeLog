@@ -1,3 +1,48 @@
+2006-07-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/note.h:
+	* src/core/note.cpp:
+	- added detuning knob
+	- added explicit constructor from another note
+
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	handle detuning automation
+
+	* include/instrument_track.h:
+	send a signal when handling automation
+
+	* src/tracks/instrument_track.cpp:
+	- send a signal when handling automation
+	- use note detuning to calculate frequency
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	extended detuning to chords and arpeggios
+
+	* include/automation_pattern.h:
+	* src/tracks/automation_pattern.cpp:
+	- automation pattern can be initialized without track
+	- slots moved to public
+
+	* include/automatable_object.h:
+	automation pattern can be initialized without track
+
+	* src/core/song_editor.cpp:
+	* src/widgets/automatable_slider.cpp:
+	updated clear automation method name
+
+	* include/piano_roll.h:
+	added open (note in editor) mode and support methods
+
+	* src/core/piano_roll.cpp:
+	- added open (note in editor) mode and support methods
+	- clone detuning knobs when copying/pasting notes
+
+	* src/core/automation_editor.cpp:
+	- improved display when no pattern
+	- play buttons can be used to play related note patterns
+	- improved play/pause button display
+
 2006-07-10	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/combobox.h:
