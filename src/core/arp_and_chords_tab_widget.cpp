@@ -468,6 +468,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 							NOTES_PER_OCTAVE ),
 							_n->getVolume(),
 							_n->getPanning() );
+				note_copy.setDetuning( _n->detuning() );
 				// duplicate note-play-handle, only note is
 				// different
 				notePlayHandle * note_play_handle =
@@ -623,6 +624,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 				static_cast<volume>( _n->getVolume() *
 								vol_level ),
 				_n->getPanning() );
+		new_note.setDetuning( _n->detuning() );
 
 		// duplicate note-play-handle, only ptr to note is different
 		// and is_arp_note=TRUE
