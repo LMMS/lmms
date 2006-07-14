@@ -88,6 +88,9 @@ const int NOTES_PER_OCTAVE = WHITE_KEYS_PER_OCTAVE + BLACK_KEYS_PER_OCTAVE;
 const int OCTAVES = 9;
 
 
+class knob;
+
+
 
 class note : public journallingObject
 {
@@ -99,7 +102,7 @@ public:
 		octaves _octave = DEFAULT_OCTAVE,
 		volume _volume = DEFAULT_VOLUME,
 		panning _panning = DEFAULT_PANNING ) FASTCALL;
-
+	note( const note & _note );
 	virtual ~note();
 
 	void FASTCALL setLength( const midiTime & _length );
@@ -109,6 +112,7 @@ public:
 	void FASTCALL setKey( const int _key );
 	void FASTCALL setVolume( const volume _volume = DEFAULT_VOLUME );
 	void FASTCALL setPanning( const panning _panning = DEFAULT_PANNING );
+	void FASTCALL setDetuning( knob * _detuning );
 	void FASTCALL quantizeLength( const int _q_grid );
 	void FASTCALL quantizePos( const int _q_grid );
 
@@ -165,6 +169,14 @@ public:
 	static midiTime FASTCALL quantized( const midiTime & _m,
 							const int _q_grid );
 
+	knob * detuning( void ) const
+	{
+		return( m_detuning );
+	}
+
+	void editDetuningPattern( void );
+	void detachCurrentDetuning( void );
+
 
 protected:
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -182,6 +194,8 @@ private:
 		CHANGE_LENGTH, CHANGE_POSITION
 	} ;
 
+	static const float MAX_DETUNING;
+
 
 	tones m_tone;
 	octaves m_octave;
@@ -189,6 +203,9 @@ private:
 	panning m_panning;
 	midiTime m_length;
 	midiTime m_pos;
+	knob * m_detuning;
+
+	void createDetuning( void );
 
 } ;
 

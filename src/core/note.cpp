@@ -41,7 +41,12 @@
 
 #include "debug.h"
 #include "note.h"
+#include "knob.h"
 #include "templates.h"
+
+
+const float note::MAX_DETUNING = 4 * 12.0f;
+
 
 
 
@@ -54,7 +59,8 @@ note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
 	m_volume( DEFAULT_VOLUME ),
 	m_panning( DEFAULT_PANNING ),
 	m_length( _length ),
-	m_pos( _pos )
+	m_pos( _pos ),
+	m_detuning( NULL )
 {
 	//saveJournallingState( FALSE );
 	setJournalling( FALSE );
@@ -64,7 +70,26 @@ note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
 	setVolume( _volume );
 	setPanning( _panning );
 
+	if( _engine )
+	{
+		createDetuning();
+	}
 	//restoreJournallingState();
+}
+
+
+
+
+note::note( const note & _note ) :
+	journallingObject( _note ),
+	m_tone( _note.m_tone ),
+	m_octave( _note.m_octave ),
+	m_volume( _note.m_volume ),
+	m_panning( _note.m_panning ),
+	m_length( _note.m_length ),
+	m_pos( _note.m_pos )
+{
+	setDetuning( _note.m_detuning );
 }
 
 
@@ -72,6 +97,17 @@ note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
 
 note::~note()
 {
+	if( m_detuning )
+	{
+		if( m_detuning->data().toInt() )
+		{
+			m_detuning->setData( m_detuning->data().toInt() - 1 );
+		}
+		else
+		{
+			delete m_detuning;
+		}
+	}
 }
 
 
@@ -190,6 +226,10 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pan", m_panning );
 	_this.setAttribute( "len", m_length );
 	_this.setAttribute( "pos", m_pos );
+	if( m_length > 0 )
+	{
+		m_detuning->saveSettings( _doc, _this, "detuning" );
+	}
 }
 
 
@@ -203,6 +243,7 @@ void note::loadSettings( const QDomElement & _this )
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
+	m_detuning->loadSettings( _this, "detuning" );
 }
 
 
@@ -244,6 +285,57 @@ void note::redoStep( journalEntry & _je )
 	journalEntry je( _je.actionID(), -_je.data().toInt() );
 	undoStep( je );
 }
+
+
+
+
+void note::editDetuningPattern( void )
+{
+	m_detuning->getAutomationPattern()->openInAutomationEditor();
+}
+
+
+
+
+void note::setDetuning( knob * _detuning )
+{
+	m_detuning = _detuning;
+	if( m_detuning )
+	{
+		m_detuning->setData( m_detuning->data().toInt() + 1 );
+	}
+}
+
+
+
+
+void note::createDetuning( void )
+{
+	m_detuning = new knob( knobDark_28, NULL,
+						QObject::tr( "Note detuning" ),
+						eng(), NULL );
+	m_detuning->initAutomationPattern( eng() );
+	m_detuning->setData( 0 );
+	m_detuning->setRange( -MAX_DETUNING, MAX_DETUNING, 0.1f );
+}
+
+
+
+
+void note::detachCurrentDetuning( void )
+{
+	if( m_detuning->data().toInt() )
+	{
+		m_detuning->setData( m_detuning->data().toInt() - 1 );
+
+		QDomDocument doc;
+		QDomElement parent = doc.createElement( "clone" );
+		m_detuning->saveSettings( doc, parent );
+		createDetuning();
+		m_detuning->loadSettings( parent );
+	}
+}
+
 
 
 
