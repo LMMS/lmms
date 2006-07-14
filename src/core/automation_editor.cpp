@@ -75,6 +75,7 @@
 #include "text_float.h"
 #include "combobox.h"
 #include "bb_editor.h"
+#include "piano_roll.h"
 
 
 QPixmap * automationEditor::s_toolDraw = NULL;
@@ -417,10 +418,9 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 	if( validPattern() == FALSE )
 	{
-		//resizeEvent( NULL );
 		setWindowTitle( tr( "Automation Editor - no pattern" ) );
-
-		update();
+		m_min_level = m_max_level = m_scroll_level = 0;
+		resizeEvent( NULL );
 		return;
 	}
 
@@ -706,8 +706,10 @@ void automationEditor::update( void )
 		p.setFont( pointSize<14>( f ) );
 		p.setPen( QColor( 0, 255, 0 ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
-				tr( "Please open a time pattern with the "
-					"context menu of a control!" ) );
+				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
+				grid_height - 40, WordBreak,
+				tr( "Please open an automation pattern with "
+					"the context menu of a control!" ) );
 	}
 
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
@@ -1614,38 +1616,21 @@ void automationEditor::play( void )
 		return;
 	}
 
-	if( inBBEditor() )
+	if( !m_pattern->getTrack() )
 	{
-		eng()->getBBEditor()->play();
-		if( eng()->getSongEditor()->playing() )
+		if( eng()->getSongEditor()->playMode() !=
+						songEditor::PLAY_PATTERN )
 		{
+			eng()->getSongEditor()->stop();
+			eng()->getSongEditor()->playPattern( (pattern *)
+				eng()->getPianoRoll()->currentPattern() );
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		else
+		else if( eng()->getSongEditor()->playing() )
 		{
+			eng()->getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
-	}
-	else
-	{
-		if( eng()->getSongEditor()->playing() )
-		{
-			if( eng()->getSongEditor()->playMode() !=
-					songEditor::PLAY_AUTOMATION_PATTERN )
-			{
-				//TODO: stop/play?
-				eng()->getSongEditor()->stop();
-				eng()->getSongEditor()->play();
-				m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-			}
-			else
-			{
-				eng()->getSongEditor()->pause();
-				m_playButton->setIcon( embed::getIconPixmap(
-								"play" ) );
-			}
 		}
 		else if( eng()->getSongEditor()->paused() )
 		{
@@ -1655,7 +1640,42 @@ void automationEditor::play( void )
 		}
 		else
 		{
-			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+			m_playButton->setIcon( embed::getIconPixmap(
+								"pause" ) );
+			eng()->getSongEditor()->playPattern( (pattern *)
+				eng()->getPianoRoll()->currentPattern() );
+		}
+	}
+	else if( inBBEditor() )
+	{
+		if( eng()->getSongEditor()->playing() )
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap(
+								"pause" ) );
+		}
+		eng()->getBBEditor()->play();
+	}
+	else
+	{
+		if( eng()->getSongEditor()->playing() )
+		{
+			eng()->getSongEditor()->pause();
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+		else if( eng()->getSongEditor()->paused() )
+		{
+			eng()->getSongEditor()->resumeFromPause();
+			m_playButton->setIcon( embed::getIconPixmap(
+								"pause" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap(
+								"pause" ) );
 			eng()->getSongEditor()->play();
 		}
 	}
@@ -1666,7 +1686,7 @@ void automationEditor::play( void )
 
 void automationEditor::stop( void )
 {
-	if( inBBEditor() )
+	if( m_pattern->getTrack() && inBBEditor() )
 	{
 		eng()->getBBEditor()->stop();
 	}
