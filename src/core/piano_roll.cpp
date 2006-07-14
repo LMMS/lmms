@@ -117,6 +117,7 @@ QPixmap * pianoRoll::s_toolDraw = NULL;
 QPixmap * pianoRoll::s_toolErase = NULL;
 QPixmap * pianoRoll::s_toolSelect = NULL;
 QPixmap * pianoRoll::s_toolMove = NULL;
+QPixmap * pianoRoll::s_toolOpen = NULL;
 
 // used for drawing of piano
 pianoRoll::pianoRollKeyTypes pianoRoll::prKeyOrder[] =
@@ -186,6 +187,11 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	{
 		s_toolMove = new QPixmap( embed::getIconPixmap(
 							"edit_move" ) );
+	}
+//TODO: Change pixmap!
+	if( s_toolOpen == NULL )
+	{
+		s_toolOpen = new QPixmap( embed::getIconPixmap( "piano" ) );
 	}
 
 #ifdef QT4
@@ -1126,10 +1132,36 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			m_timeLine->updatePosition();
 			break;
 
+		case Key_Control:
+			if( mouseOverNote() )
+			{
+				m_editMode = OPEN;
+				QApplication::setOverrideCursor(
+						QCursor( ArrowCursor ), TRUE );
+				QWidget::update();
+			}
+
 		default:
 			_ke->ignore();
 			break;
 	}
+}
+
+
+
+
+void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
+{
+	switch( _ke->key() )
+	{
+		case Key_Control:
+			if( m_editMode == OPEN )
+			{
+				m_editMode = DRAW;
+				update();
+			}
+	}
+	_ke->ignore();
 }
 
 
@@ -1153,6 +1185,12 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 {
 	if( validPattern() == FALSE )
 	{
+		return;
+	}
+
+	if( m_editMode == OPEN )
+	{
+		noteUnderMouse()->editDetuningPattern();
 		return;
 	}
 
@@ -1551,11 +1589,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		else if(
 #ifdef QT4
-			_me->buttons() &
+			_me->buttons() == NoButton
 #else
-			_me->state() ==
+			( _me->state() == NoButton
+					|| _me->state() == ControlButton )
 #endif
-					Qt::NoButton && m_editMode == DRAW )
+							&& m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
 
@@ -1589,8 +1628,14 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// no note??
 			if( it != notes.end() )
 			{
+				if( _me->modifiers() & ControlModifier )
+				{
+					m_editMode = OPEN;
+					QApplication::setOverrideCursor(
+						QCursor( ArrowCursor ), TRUE );
+				}
 				// cursor at the "tail" of the note?
-				if( ( *it )->length() > 0 &&
+				else if( ( *it )->length() > 0 &&
 					pos_tact_64th > ( *it )->pos() +
 						( *it )->length() -
 							RESIZE_AREA_WIDTH )
@@ -1811,6 +1856,11 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			m_moveStartTact64th = pos_tact_64th;
 			m_moveStartKey = key_num;
 		}
+		else if( m_editMode == OPEN && !( mouseOverNote()
+				&& _me->modifiers() & ControlModifier ) )
+		{
+			m_editMode = DRAW;
+		}
 	}
 	else
 	{
@@ -1953,6 +2003,7 @@ void pianoRoll::paintEvent( QPaintEvent * )
 			case ERASE: cursor = s_toolErase; break;
 			case SELECT: cursor = s_toolSelect; break;
 			case MOVE: cursor = s_toolMove; break;
+			case OPEN: cursor = s_toolOpen; break;
 		}
 		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
@@ -2349,6 +2400,7 @@ void pianoRoll::copySelectedNotes( void )
 			m_notesToCopy.push_back( new note( **it ) );
 			m_notesToCopy.back()->setPos( m_notesToCopy.back()->pos(
 								start_pos ) );
+			m_notesToCopy.back()->detachCurrentDetuning();
 		}
 		textFloat::displayMessage( tr( "Notes copied" ),
 				tr( "All selected notes were copied to the "
@@ -2419,6 +2471,7 @@ void pianoRoll::pasteNotes( void )
 		{
 			note cur_note( **it );
 			cur_note.setPos( cur_note.pos() + m_currentPosition );
+			cur_note.detachCurrentDetuning();
 			m_pattern->addNote( cur_note );
 		}
 
@@ -2520,6 +2573,64 @@ midiTime pianoRoll::newNoteLen( void ) const
 				m_noteLenComboBox->currentText().length() -
 								2 ).toInt() );
 }
+
+
+
+
+bool pianoRoll::mouseOverNote( void )
+{
+	return( noteIteratorUnderMouse() != m_pattern->notes().end() );
+}
+
+
+
+
+note * pianoRoll::noteUnderMouse( void )
+{
+	return( *noteIteratorUnderMouse() );
+}
+
+
+
+
+noteVector::iterator pianoRoll::noteIteratorUnderMouse( void )
+{
+	QPoint pos = mapFromGlobal( QCursor::pos() );
+
+	// get note-vector of current pattern
+	noteVector & notes = m_pattern->notes();
+
+	if( pos.x() <= WHITE_KEY_WIDTH || pos.x() > width() - SCROLLBAR_SIZE
+		|| pos.y() < PR_TOP_MARGIN
+		|| pos.y() > height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
+	{
+		return( notes.end() );
+	}
+
+	int key_num = getKey( pos.y() );
+	int pos_tact_64th = ( pos.x() - WHITE_KEY_WIDTH ) * 64 / m_ppt
+							+ m_currentPosition;
+
+	// will be our iterator in the following loop
+	noteVector::iterator it = notes.begin();
+
+	// loop through whole note-vector...
+	while( it != notes.end() )
+	{
+		// and check whether the cursor is over an
+		// existing note
+		if( pos_tact_64th >= ( *it )->pos() &&
+	    		pos_tact_64th <= ( *it )->pos() + ( *it )->length() &&
+			( *it )->key() == key_num && ( *it )->length() > 0 )
+		{
+			break;
+		}
+		++it;
+	}
+
+	return( it );
+}
+
 
 
 
