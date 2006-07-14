@@ -356,6 +356,11 @@ public:
 		return( m_track == NULL );
 	}
 
+	void initAutomationPattern( engine * _engine )
+	{
+		m_automation_pattern = new automationPattern( _engine, this );
+	}
+
 
 protected:
 	virtual void redoStep( journalEntry & _je )
