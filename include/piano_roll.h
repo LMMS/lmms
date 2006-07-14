@@ -101,6 +101,7 @@ protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void enterEvent( QEvent * _e );
 	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void keyReleaseEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -151,7 +152,8 @@ private:
 		DRAW,
 		ERASE,
 		SELECT,
-		MOVE
+		MOVE,
+		OPEN
 	} ;
 
 	enum actions
@@ -187,6 +189,7 @@ private:
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
+	static QPixmap * s_toolOpen;
 
 	static pianoRollKeyTypes prKeyOrder[];
 
@@ -252,6 +255,10 @@ private:
 
 	timeLine * m_timeLine;
 	bool m_scrollBack;
+
+	bool mouseOverNote( void );
+	note * noteUnderMouse( void );
+	noteVector::iterator noteIteratorUnderMouse( void );
 
 
 
