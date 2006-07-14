@@ -198,6 +198,7 @@ private:
 
 
 private slots:
+	void processMidiTime( const midiTime & _time );
 	void updateFrequency( void );
 
 } ;

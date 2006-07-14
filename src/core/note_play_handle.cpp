@@ -59,6 +59,17 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_arpNote( _arp_note ),
 	m_muted( FALSE )
 {
+	setDetuning( _n.detuning() );
+	if( detuning() )
+	{
+		connect( m_instrumentTrack,
+				SIGNAL( sentMidiTime( const midiTime & ) ),
+				this,
+				SLOT( processMidiTime( const midiTime & ) ) );
+		processMidiTime( pos() );
+		connect( detuning(), SIGNAL( valueChanged( float ) ),
+					this, SLOT( updateFrequency() ) );
+	}
 	connect( m_instrumentTrack, SIGNAL( baseNoteChanged() ),
 					this, SLOT( updateFrequency() ) );
 	updateFrequency();
@@ -400,6 +411,15 @@ void notePlayHandle::updateFrequency( void )
 {
 	m_frequency = m_instrumentTrack->frequency( this );
 }
+
+
+
+
+void notePlayHandle::processMidiTime( const midiTime & _time )
+{
+	detuning()->getAutomationPattern()->processMidiTime( _time - pos() );
+}
+
 
 
 
