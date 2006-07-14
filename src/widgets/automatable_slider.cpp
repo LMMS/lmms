@@ -220,7 +220,7 @@ int automatableSlider::logicValue( void )
 
 void automatableSlider::clearAutomationValues( void )
 {
-	m_knob->getAutomationPattern()->clearValues();
+	m_knob->getAutomationPattern()->clear();
 }
 
 

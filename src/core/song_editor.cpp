@@ -1406,7 +1406,7 @@ void songEditor::clearProject( void )
 	clearAllTracks();
 
 	eng()->getAutomationEditor()->setCurrentPattern( NULL );
-	m_bpmSpinBox->getAutomationPattern()->clearValues();
+	m_bpmSpinBox->getAutomationPattern()->clear();
 	m_masterVolumeSlider->clearAutomationValues();
 	m_masterPitchSlider->clearAutomationValues();
 
