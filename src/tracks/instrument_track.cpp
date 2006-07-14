@@ -508,9 +508,14 @@ void instrumentTrack::midiConfigChanged( bool )
 
 float instrumentTrack::frequency( notePlayHandle * _n ) const
 {
-	return( BASE_FREQ * powf( 2.0f, (float)( _n->tone() - m_baseTone +
+	float pitch = (float)( _n->tone() - m_baseTone +
 			eng()->getSongEditor()->masterPitch() ) / 12.0f +
-				(float)( _n->octave() - m_baseOctave ) ) );
+					(float)( _n->octave() - m_baseOctave );
+	if( _n->detuning() )
+	{
+		pitch += _n->detuning()->value() / 12.0f;
+	}
+	return( BASE_FREQ * powf( 2.0f, pitch ) );
 }
 
 
@@ -868,6 +873,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 							Sint16 _tco_num )
 {
 	sendMidiTime( _start );
+	emit sentMidiTime( _start );
 
 	// calculate samples per tact; need that later when calculating
 	// sample-pos of a note
