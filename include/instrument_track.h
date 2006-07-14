@@ -175,6 +175,7 @@ public slots:
 
 signals:
 	void baseNoteChanged( void );
+	void sentMidiTime( const midiTime & _time );
 
 
 protected:
