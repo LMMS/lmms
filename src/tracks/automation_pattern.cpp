@@ -46,9 +46,22 @@
 
 
 
-automationPattern::automationPattern ( track * _track, levelObject * _object ) :
+automationPattern::automationPattern( track * _track, levelObject * _object ) :
 	journallingObject( _track->eng() ),
 	m_track( _track ),
+	m_object( _object ),
+	m_update_first( TRUE )
+{
+	init();
+}
+
+
+
+
+automationPattern::automationPattern( engine * _engine,
+						levelObject * _object ) :
+	journallingObject( _engine ),
+	m_track( NULL ),
 	m_object( _object ),
 	m_update_first( TRUE )
 {
@@ -78,7 +91,10 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 automationPattern::~automationPattern()
 {
-	m_track->removeAutomationPattern( this );
+	if( m_track )
+	{
+		m_track->removeAutomationPattern( this );
+	}
 
 	if( eng()->getAutomationEditor()->currentPattern() == this )
 	{
@@ -93,7 +109,10 @@ automationPattern::~automationPattern()
 
 void automationPattern::init( void )
 {
-	m_track->addAutomationPattern( this );
+	if( m_track )
+	{
+		m_track->addAutomationPattern( this );
+	}
 }
 
 
@@ -144,7 +163,7 @@ void automationPattern::removeValue( const midiTime & _time )
 
 
 
-void automationPattern::clearValues( void )
+void automationPattern::clear( void )
 {
 	m_time_map.clear();
 	if( eng()->getAutomationEditor()->currentPattern() == this )
@@ -187,7 +206,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void automationPattern::loadSettings( const QDomElement & _this )
 {
-	clearValues();
+	clear();
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
@@ -216,18 +235,18 @@ void automationPattern::openInAutomationEditor( void )
 
 
 
-void automationPattern::clear( void )
-{
-	clearValues();
-}
-
-
-
-
 const QString automationPattern::name( void )
 {
-	return( m_track->name() + " - " + dynamic_cast<QWidget *>( m_object )
-							->accessibleName() );
+	QString widget_name = dynamic_cast<QWidget *>( m_object )
+							->accessibleName();
+	if( m_track )
+	{
+		return( m_track->name() + " - " + widget_name );
+	}
+	else
+	{
+		return( widget_name );
+	}
 }
 
 

@@ -40,7 +40,8 @@ class automationPattern : public QObject, public journallingObject
 public:
 	typedef QMap<midiTime, int> timeMap;
 
-	automationPattern( track * _channel_track, levelObject * _object );
+	automationPattern( track * _track, levelObject * _object );
+	automationPattern( engine * _engine, levelObject * _object );
 	automationPattern( const automationPattern & _pat_to_copy );
 	virtual ~automationPattern();
 
@@ -52,8 +53,6 @@ public:
 
 	void FASTCALL removeValue( const midiTime & _time );
 
-	void clearValues( void );
-	
 	inline timeMap & getTimeMap( void )
 	{
 		return( m_time_map );
@@ -101,7 +100,7 @@ public:
 	}
 
 
-protected slots:
+public slots:
 	void openInAutomationEditor( void );
 	void clear( void );
 
