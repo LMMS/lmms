@@ -1,5 +1,12 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Note detuning</source>
+        <translation>Desafinament de nota</translation>
+    </message>
+</context>
+<context>
     <name>aboutDialog</name>
     <message>
         <source>About LMMS...</source>
@@ -523,6 +530,22 @@ http://lmms.sourceforge.net</translation>
         <source>Sync</source>
         <translation>Sinc</translation>
     </message>
+    <message>
+        <source>Chord type</source>
+        <translation>Tipus d&apos;acord</translation>
+    </message>
+    <message>
+        <source>Arpeggio type</source>
+        <translation>Tipus d&apos;arpegi</translation>
+    </message>
+    <message>
+        <source>Arpeggio direction</source>
+        <translation>Direcció d&apos;arpegi</translation>
+    </message>
+    <message>
+        <source>Arpeggio mode</source>
+        <translation>Mode d&apos;arpegi</translation>
+    </message>
 </context>
 <context>
     <name>audioDevice</name>
@@ -623,6 +646,115 @@ http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
+    <name>automatableButton</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
+    </message>
+</context>
+<context>
+    <name>automatableSlider</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
+    </message>
+</context>
+<context>
+    <name>automationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>Reprodueix/pausa el patró actual (Espai)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>Atura la reproducció del patró actual (Espai)</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation>Pica aquí si vols reproduir el patró actual. Això és útil mentre s&apos;edita. El patró es repeteix automàticament quan arriba al final.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of current pattern.</source>
+        <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
+    </message>
+    <message>
+        <source>Draw mode (D)</source>
+        <translation>Mode dibuixar (D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (E)</source>
+        <translation>Mode esborrar (E)</translation>
+    </message>
+    <message>
+        <source>Select mode (S)</source>
+        <translation>Mode seleccionar (S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (M)</source>
+        <translation>Mode moure selecció (M)</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;E&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar valors. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure valors. També pots pitjar &apos;S&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;M&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>Talla els valors seleccionats (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>Copia els valors seleccionats (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation>Enganxa valors des del portapapers (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>Si piques aqui, els valors seleccionats seran tallats cap al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>Si piques aquí, els valors seleccionats seran copiats al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
+    </message>
+    <message>
+        <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
+        <translation>Si piques aqui, els valors del portapapers seran enganxats al primer compàs visible.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation>Editor d&apos;Automatització - sense patró</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation>Editor d&apos;Automatització - %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation>Per favor, obre un patró d&apos;automatització amb el menú contextual d&apos;un control!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation>Valors copiats</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation>Tots els valors seleccionats s&apos;han copiat al portapapers.</translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir i moure valors solts. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;D&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+</context>
+<context>
     <name>bbEditor</name>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -716,6 +848,49 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Click here to smooth waveform.</source>
         <translation>Pica aquí per a suavitzar la forma d&apos;ona.</translation>
+    </message>
+    <message>
+        <source>Interpolation</source>
+        <translation>Interpolació</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Normalitza</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Ona sinusoïdal</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Ona triangular</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Ona de serra</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Ona quadrada</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Ona de soroll blanc</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Ona arbitrària</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Suavitza</translation>
+    </message>
+</context>
+<context>
+    <name>comboBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
 </context>
 <context>
@@ -1040,6 +1215,18 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Arrossega una mostra d&apos;on sigui i amolla-la en aquesta finestra.</translation>
     </message>
+    <message>
+        <source>LFO wave shape</source>
+        <translation>Forma d&apos;ona de l&apos;OBF</translation>
+    </message>
+    <message>
+        <source>Freq x 100</source>
+        <translation>Freq x 100</translation>
+    </message>
+    <message>
+        <source>Modulate Env-Amount</source>
+        <translation>Modula Amplitud</translation>
+    </message>
 </context>
 <context>
     <name>envelopeTabWidget</name>
@@ -1130,6 +1317,10 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
     <message>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
         <translation>Aquí pots seleccionar el filtre integrat que vols usar per a aquesta pista d&apos;instrument. Els filtres són molt importants per a canviar les característiques d&apos;un so.</translation>
+    </message>
+    <message>
+        <source>Filter type</source>
+        <translation>Tipus de filtre</translation>
     </message>
 </context>
 <context>
@@ -1268,6 +1459,42 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Ona sinusoïdal</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Ona triangular</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Ona de serra</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Ona quadrada</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Ona de soroll blanc</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Ona arbitrària</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Suavitza</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Normalitza</translation>
+    </message>
+    <message>
+        <source>Enable waveform</source>
+        <translation>Habilita forma d&apos;ona</translation>
+    </message>
 </context>
 <context>
     <name>instrumentTrack</name>
@@ -1355,6 +1582,14 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <source>PLUGIN</source>
         <translation>CONNECTOR</translation>
     </message>
+    <message>
+        <source>Surround area</source>
+        <translation>Àrea envoltant</translation>
+    </message>
+    <message>
+        <source>FX channel</source>
+        <translation>Canal FX</translation>
+    </message>
 </context>
 <context>
     <name>knob</name>
@@ -1381,6 +1616,17 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Per favor, introdueix un nou valor entre %1 i %2:</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
+    </message>
+</context>
+<context>
+    <name>lcdSpinBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
 </context>
 <context>
@@ -1590,6 +1836,14 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
         <translation>Actualment no hi ha ajuda diponible a LMMS.
 Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</translation>
     </message>
+    <message>
+        <source>Show/hide Automation Editor</source>
+        <translation>Mostra/amaga Editor d&apos;Automatització</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
+        <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor d&apos;Automatització. Amb l&apos;ajuda de l&apos;Editor d&apos;Automatització pots editar valors dinàmics fàcilment.</translation>
+    </message>
 </context>
 <context>
     <name>midiClient</name>
@@ -1638,6 +1892,22 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     <message>
         <source>MIDI-devices to send MIDI-events to</source>
         <translation>Dispositius MIDI a on enviar esdeveniments MIDI</translation>
+    </message>
+    <message>
+        <source>Input channel</source>
+        <translation>Canal d&apos;entrada</translation>
+    </message>
+    <message>
+        <source>Output channel</source>
+        <translation>Canal de sortida</translation>
+    </message>
+    <message>
+        <source>Default input velocity</source>
+        <translation>Velocitat per defecte d&apos;entrada</translation>
+    </message>
+    <message>
+        <source>Default output velocity</source>
+        <translation>Velocitat per defecte de sortida</translation>
     </message>
 </context>
 <context>
@@ -1718,6 +1988,10 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     <message>
         <source>FX1</source>
         <translation>FX1</translation>
+    </message>
+    <message>
+        <source>Randomise</source>
+        <translation>Aleatoritza</translation>
     </message>
 </context>
 <context>
@@ -1908,6 +2182,17 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
 </context>
 <context>
+    <name>pianoWidget</name>
+    <message>
+        <source>Base note</source>
+        <translation>Nota base</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
+    </message>
+</context>
+<context>
     <name>pluckedStringSynth</name>
     <message>
         <source>Pick position</source>
@@ -1962,7 +2247,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
-        <translation>hoste VST per a usar connectors VST(i) amb LMMS</translation>
+        <translation>servidor VST per a usar connectors VST(i) amb LMMS</translation>
     </message>
     <message>
         <source>Filter for importing FL Studio projects into LMMS</source>
@@ -2524,12 +2809,32 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>No es pot escriure el fitxer %1. Probablement no tens permís per a escriure aquest fitxer.
 Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxer i torna-ho a provar.</translation>
     </message>
+    <message>
+        <source>Tempo</source>
+        <translation>Tempo</translation>
+    </message>
 </context>
 <context>
     <name>surroundArea</name>
     <message>
         <source>click to where this channel should be audible</source>
         <translation>pica a on aquest canal ha de ser audible</translation>
+    </message>
+    <message>
+        <source>Surround area X</source>
+        <translation>Àrea envoltant X</translation>
+    </message>
+    <message>
+        <source>Surround area Y</source>
+        <translation>Àrea envoltant Y</translation>
+    </message>
+    <message>
+        <source>Open &amp;X in automation editor</source>
+        <translation>Obre &amp;X a l&apos;editor d&apos;automatització</translation>
+    </message>
+    <message>
+        <source>Open &amp;Y in automation editor</source>
+        <translation>Obre &amp;Y a l&apos;editor d&apos;automatització</translation>
     </message>
 </context>
 <context>
@@ -2624,6 +2929,10 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
     <message>
         <source>Synced to 32nd Note</source>
         <translation>Sincronitzat a 32è de Nota</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
 </context>
 <context>
@@ -2778,6 +3087,10 @@ Amb un clic dret a l&apos;interruptor, totes les altres pistes s&apos;apagaran. 
 right click = mute all other tracks (solo)</source>
         <translation>clic esquerre = apaga aquesta pista
 clic dret = apaga totes les altres pistes (solo)</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Apaga</translation>
     </message>
 </context>
 <context>
@@ -2949,6 +3262,18 @@ clic dret = apaga totes les altres pistes (solo)</translation>
     <message>
         <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
         <translation>usa modulació de fase per a modular l&apos;oscil·lador 3 amb l&apos;oscil·lador 2</translation>
+    </message>
+    <message>
+        <source>Modulation type 1</source>
+        <translation>Tipus de modulació 1</translation>
+    </message>
+    <message>
+        <source>Modulation type 2</source>
+        <translation>Tipus de modulació 2</translation>
+    </message>
+    <message>
+        <source>Osc %1 wave shape</source>
+        <translation>Forma d&apos;ona d&apos;osc %1</translation>
     </message>
 </context>
 <context>
@@ -3169,6 +3494,10 @@ El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona determina
     <message>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
+    </message>
+    <message>
+        <source>Impulse</source>
+        <translation>Impuls</translation>
     </message>
 </context>
 <context>
