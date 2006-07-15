@@ -242,7 +242,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QWhatsThis::add( m_drawButton,
 #endif
 		tr( "If you click here, draw-mode will be activated. In this "
-			"mode you can add, resize and move single values. This "
+			"mode you can add and move single values. This "
 			"is the default-mode which is used most of the time. "
 			"You can also press 'D' on your keyboard to activate "
 			"this mode." ) );
