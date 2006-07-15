@@ -1,3 +1,11 @@
+2006-07-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* data/locale/ca.ts:
+	updated translation
+
+	* src/core/automation_editor.cpp:
+	corrected help sentence
+
 2006-07-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/note.h:
