@@ -122,8 +122,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	caption->setAlignment( Qt::AlignCenter );
 	contextMenu.addAction( caption );
 #endif
-//TODO: Change icon
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					pattern,
 					SLOT( openInAutomationEditor() ) );

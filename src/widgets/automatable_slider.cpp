@@ -126,8 +126,7 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 	caption->setAlignment( Qt::AlignCenter );
 	contextMenu.addAction( caption );
 #endif
-//TODO: Change icon
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					m_knob->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );

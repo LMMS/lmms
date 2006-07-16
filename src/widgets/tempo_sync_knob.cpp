@@ -177,8 +177,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	contextMenu.addSeparator();
 	
-//TODO: Change icon
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );

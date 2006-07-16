@@ -367,9 +367,8 @@ void mainWindow::finalize( void )
 			"rap-samples) directly into the playlist." ) );
 
 
-//TODO: Change icon
 	toolButton * automation_editor_window = new toolButton(
-					embed::getIconPixmap( "piano" ),
+					embed::getIconPixmap( "automation" ),
 					tr( "Show/hide Automation Editor" ) +
 									" (F9)",
 					this,

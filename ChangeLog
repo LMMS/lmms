@@ -1,3 +1,20 @@
+2006-07-16	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* data/themes/default/automation.png:
+	* resources/automation.png:
+	* src/core/automation_editor.cpp:
+	* src/core/main_window.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/surround_area.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	added automation icon
+
 2006-07-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* data/locale/ca.ts:

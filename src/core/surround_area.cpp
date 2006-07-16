@@ -192,12 +192,11 @@ void surroundArea::contextMenuEvent( QContextMenuEvent * )
 	caption->setAlignment( Qt::AlignCenter );
 	contextMenu.addAction( caption );
 #endif
-//TODO: Change icon
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &X in automation editor" ),
 					m_position_x->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
-	contextMenu.addAction( embed::getIconPixmap( "piano" ),
+	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &Y in automation editor" ),
 					m_position_y->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );

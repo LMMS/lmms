@@ -188,10 +188,10 @@ pianoRoll::pianoRoll( engine * _engine ) :
 		s_toolMove = new QPixmap( embed::getIconPixmap(
 							"edit_move" ) );
 	}
-//TODO: Change pixmap!
 	if( s_toolOpen == NULL )
 	{
-		s_toolOpen = new QPixmap( embed::getIconPixmap( "piano" ) );
+		s_toolOpen = new QPixmap( embed::getIconPixmap(
+							"automation" ) );
 	}
 
 #ifdef QT4

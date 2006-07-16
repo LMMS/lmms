@@ -387,8 +387,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	tb_layout->addStretch();
 
 	// setup our actual window
-//TODO: change icon
-	setWindowIcon( embed::getIconPixmap( "piano" ) );
+	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 	setCurrentPattern( NULL );
 
