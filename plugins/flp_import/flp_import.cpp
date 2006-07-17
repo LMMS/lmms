@@ -530,19 +530,6 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 				_tc->eng()->getProjectNotes()->setText( out );
 				outstring = "";
-#if 0
-#warning HACK !!! - replace by integrating unrtf-source
-				system(
-QString( "echo \"%1\" > /tmp/flp_rtf_comment.rtf ; unrtf -n --html /tmp/flp_rtf_comment.rtf > /tmp/flp_rtf_comment.html" ).arg( text ).ascii() );
-				QFile f( "/tmp/flp_rtf_comment.html" );
-				f.open( IO_ReadOnly );
-				char * out = new char[f.size()+1];
-				f.readBlock( out, f.size() );
-				_tc->eng()->getProjectNotes()->setText( out );
-				f.remove();
-
-				delete[] out;
-#endif
 				break;
 			}
 

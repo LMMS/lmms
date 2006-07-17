@@ -1,5 +1,12 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Note detuning</source>
+        <translation>Noten-Verstimmung</translation>
+    </message>
+</context>
+<context>
     <name>aboutDialog</name>
     <message>
         <source>About LMMS...</source>
@@ -524,6 +531,22 @@ http://lmms.sourceforge.net</translation>
         <source>Sync</source>
         <translation>Synchron</translation>
     </message>
+    <message>
+        <source>Chord type</source>
+        <translation>Akkordtyp</translation>
+    </message>
+    <message>
+        <source>Arpeggio type</source>
+        <translation>Arpeggiotyp</translation>
+    </message>
+    <message>
+        <source>Arpeggio direction</source>
+        <translation>Arpeggio-Richtung</translation>
+    </message>
+    <message>
+        <source>Arpeggio mode</source>
+        <translation>Arpeggio-Modus</translation>
+    </message>
 </context>
 <context>
     <name>audioDevice</name>
@@ -628,6 +651,115 @@ http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
+    <name>automatableButton</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
+    </message>
+</context>
+<context>
+    <name>automatableSlider</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
+    </message>
+</context>
+<context>
+    <name>automationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>Aktuellen Pattern abspielen/pausieren (Leertaste)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>Abspielen des aktuellen Patterns stoppen (Leertaste)</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of current pattern.</source>
+        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
+    </message>
+    <message>
+        <source>Draw mode (D)</source>
+        <translation>Zeichnen-Modus (D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (E)</source>
+        <translation>Löschen-Modus (E)</translation>
+    </message>
+    <message>
+        <source>Select mode (S)</source>
+        <translation>Auswahl-Modus (S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (M)</source>
+        <translation>Verschieben-Modus (M)</translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
+        <translation>Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
+        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
+        <translation>Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>Ausgewählte Werte ausschneiden (Strg+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>Ausgewählte Werte kopieren (Strg+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation>Werte aus Zwischenablage einfügen (Strg+V)</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage ausgeschnitten. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage kopiert. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
+        <translation>Wenn Sie hier klicken, werden die Werte in der Zwischenablage im ersten sichtbaren Takt eingefügt.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation>Automation-Editor - Kein Pattern</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation>Automation-Editor - %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation>Bitte öffnen Sie einen Automation-Pattern mit Hilfe des Kontextmenüs eines Steuerelements!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation>Werte kopiert</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation>Alle ausgewählten Werte wurden in die Zwischenablage kopiert.</translation>
+    </message>
+</context>
+<context>
     <name>bbEditor</name>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -722,6 +854,42 @@ http://lmms.sourceforge.net</translation>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
         <translation>Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen</translation>
     </message>
+    <message>
+        <source>Interpolation</source>
+        <translation>Interpolation</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Normalisieren</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinus-Welle</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Dreiecks-Welle</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Sägezahn-Welle</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Rechtecks-Welle</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Weißes Rauschen</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Benutzerdefinierte Welle</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Glätten</translation>
+    </message>
 </context>
 <context>
     <name>channelTrack</name>
@@ -808,6 +976,13 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>MIDI output</source>
         <translation type="obsolete">MIDI-Ausgabe</translation>
+    </message>
+</context>
+<context>
+    <name>comboBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
     </message>
 </context>
 <context>
@@ -1164,6 +1339,18 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Ziehen Sie ein Sample von irgendwo und lassen es in diesem Fenster fallen.</translation>
     </message>
+    <message>
+        <source>LFO wave shape</source>
+        <translation>LFO-Wellenform</translation>
+    </message>
+    <message>
+        <source>Freq x 100</source>
+        <translation>Freq x 100</translation>
+    </message>
+    <message>
+        <source>Modulate Env-Amount</source>
+        <translation>HK.Intens. modulieren</translation>
+    </message>
 </context>
 <context>
     <name>envelopeTabWidget</name>
@@ -1258,6 +1445,10 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     <message>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
         <translation>Hier können Sie den eingebauten Filter wählen, den Sie in dieser Instrument-Spur nutzen wollen. Filter sind sehr wichtig, um die Charakteristik eines Klangs zu verändern.</translation>
+    </message>
+    <message>
+        <source>Filter type</source>
+        <translation>Filtertyp</translation>
     </message>
 </context>
 <context>
@@ -1408,6 +1599,42 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinus-Welle</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Dreiecks-Welle</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Sägezahn-Welle</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Rechtecks-Welle</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Weißes Rauschen</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Benutzerdefinierte Welle</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Glätten</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Normalisieren</translation>
+    </message>
+    <message>
+        <source>Enable waveform</source>
+        <translation>Wellenform aktivieren</translation>
+    </message>
 </context>
 <context>
     <name>instrumentTrack</name>
@@ -1495,6 +1722,14 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
         <source>PLUGIN</source>
         <translation>PLUGIN</translation>
     </message>
+    <message>
+        <source>Surround area</source>
+        <translation>Surround-Area</translation>
+    </message>
+    <message>
+        <source>FX channel</source>
+        <translation>FX-Kanal</translation>
+    </message>
 </context>
 <context>
     <name>knob</name>
@@ -1522,6 +1757,17 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
     </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
+    </message>
+</context>
+<context>
+    <name>lcdSpinBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
+    </message>
 </context>
 <context>
     <name>listView</name>
@@ -1539,7 +1785,7 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished"></translation>
+        <translation>--- Distributions-Dateien ---</translation>
     </message>
 </context>
 <context>
@@ -1730,6 +1976,14 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
+    <message>
+        <source>Show/hide Automation Editor</source>
+        <translation>Zeige/Verstecke Automation-Editor</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
+        <translation>Durch das Drücken dieses Knopfes können Sie den Automation-Editor ein- oder ausblenden. Mit Hilfe des Automation-Editors können Sie dynamische Werte auf eine einfache Art und Weise bearbeiten.</translation>
+    </message>
 </context>
 <context>
     <name>midiClient</name>
@@ -1778,6 +2032,22 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>Default velocity for all output-events</source>
         <translation>Standardlautstärke für alle ausgehende Ereignisse</translation>
+    </message>
+    <message>
+        <source>Input channel</source>
+        <translation>Eingangskanal</translation>
+    </message>
+    <message>
+        <source>Output channel</source>
+        <translation>Ausgangskanal</translation>
+    </message>
+    <message>
+        <source>Default input velocity</source>
+        <translation>Standardeingabelautstärke</translation>
+    </message>
+    <message>
+        <source>Default output velocity</source>
+        <translation>Standardausgabelautstärke</translation>
     </message>
 </context>
 <context>
@@ -1858,6 +2128,10 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>FX1</source>
         <translation>FX1</translation>
+    </message>
+    <message>
+        <source>Randomise</source>
+        <translation>Würfeln</translation>
     </message>
 </context>
 <context>
@@ -2053,6 +2327,17 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Last note</source>
         <translation>Letzte Note</translation>
+    </message>
+</context>
+<context>
+    <name>pianoWidget</name>
+    <message>
+        <source>Base note</source>
+        <translation>Grundton</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
     </message>
 </context>
 <context>
@@ -2680,12 +2965,32 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
         <source>Auto limiter</source>
         <translation>Autolimiter</translation>
     </message>
+    <message>
+        <source>Tempo</source>
+        <translation>Tempo</translation>
+    </message>
 </context>
 <context>
     <name>surroundArea</name>
     <message>
         <source>click to where this channel should be audible</source>
         <translation>dorthin klicken, wo dieser Kanal zu hören sein soll</translation>
+    </message>
+    <message>
+        <source>Surround area X</source>
+        <translation>Surround-Area X</translation>
+    </message>
+    <message>
+        <source>Surround area Y</source>
+        <translation>Surround-Area Y</translation>
+    </message>
+    <message>
+        <source>Open &amp;X in automation editor</source>
+        <translation>&amp;X im Automation-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Open &amp;Y in automation editor</source>
+        <translation>&amp;Y im Automation-Editor öffnen</translation>
     </message>
 </context>
 <context>
@@ -2780,6 +3085,10 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Synced to 32nd Note</source>
         <translation>Mit 32tel Note synchronisiert</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>Im Aut&amp;omation-Editor öffnen</translation>
     </message>
 </context>
 <context>
@@ -2957,6 +3266,10 @@ Klick rechts = alle anderen Spuren stummschalten (Solo)</translation>
         <source>Actions for this track</source>
         <translation>Aktionen für dise Spur</translation>
     </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stumm</translation>
+    </message>
 </context>
 <context>
     <name>tripleOscillator</name>
@@ -3119,6 +3432,26 @@ Klick rechts = alle anderen Spuren stummschalten (Solo)</translation>
     <message>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo-sounds.</source>
         <translation>Mit diesem Knopf können Sie die Stereo Phasen-Verschiebung von Oszillator %1 setzen. Die Stereo Phasen-Verschiebung gibt die Größe der Differenz zwischen den Phasen-Verschiebungen zwischen dem linken und rechten Kanal an. Das ist sehr gut, um großräumig-klingende Stereo-Sounds zu erzeugen.</translation>
+    </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>Phasenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Modulation type 1</source>
+        <translation>Modulationsart 1</translation>
+    </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>Phasenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Modulation type 2</source>
+        <translation>Modulationsart 2</translation>
+    </message>
+    <message>
+        <source>Osc %1 wave shape</source>
+        <translation>Oszillator %1 Wellenform</translation>
     </message>
 </context>
 <context>
@@ -3339,6 +3672,10 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
+    </message>
+    <message>
+        <source>Impulse</source>
+        <translation>Impuls</translation>
     </message>
 </context>
 <context>

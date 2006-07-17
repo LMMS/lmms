@@ -163,7 +163,7 @@ private:
 	static const int SCROLLBAR_SIZE = 16;
 	static const int TOP_MARGIN = 48;
 
-	static const int DEFAULT_Y_DELTA = 12;
+	static const int DEFAULT_Y_DELTA = 6;
 	static const int DEFAULT_STEPS_PER_TACT = 16;
 	static const int DEFAULT_PPT = 12 * DEFAULT_STEPS_PER_TACT;
 

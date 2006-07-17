@@ -1,3 +1,15 @@
+2006-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	updated German translation
+
+	* include/automation_editor.h:
+	decreased DEFAULT_Y_DELTA
+
+	* plugins/flp_import/flp_import.cpp:
+	removed some obsolete code
+
 2006-07-16	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* data/themes/default/automation.png:
