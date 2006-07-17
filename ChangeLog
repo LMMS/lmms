@@ -10,6 +10,11 @@
 	* plugins/flp_import/flp_import.cpp:
 	removed some obsolete code
 
+2006-07-17	dieEasy <dieeasy/at/cheapnet/dot/it>
+
+	* locale/it.ts:
+	updated Italian translation
+
 2006-07-16	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* data/themes/default/automation.png:
