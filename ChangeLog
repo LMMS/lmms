@@ -4,6 +4,9 @@
 	- added optimization-flags
 	- made 0.2.0 release
 
+	* vst_sdk23_headers.diff:
+	- removed as not needed anymore
+
 2006-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/de.ts:

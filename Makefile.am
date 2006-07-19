@@ -327,7 +327,7 @@ lmms_SOURCES =								\
 
 
 
-EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) vst_sdk23_headers.diff lmms.1
+EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) lmms.1
 
 
 CLEANFILES = $(lmms_MOC) ./embedded_resources.h
