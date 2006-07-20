@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.0, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.0)
+AC_INIT(lmms, 0.2.0-cvs20060720, tobydox/at/users/dot/sourceforge/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.0-cvs20060720)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -16,9 +16,10 @@ AC_PROG_LIBTOOL
 
 EXTRAFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
 
-if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
-	EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -funsafe-loop-optimizations -Wunsafe-loop-optimizations -ftree-loop-linear"
-fi
+#somehow enable this later
+#if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
+	#EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -funsafe-loop-optimizations -Wunsafe-loop-optimizations -ftree-loop-linear"
+#fi
 CFLAGS="$CFLAGS $EXTRAFLAGS"
 CXXFLAGS="$CXXFLAGS $EXTRAFLAGS"
 

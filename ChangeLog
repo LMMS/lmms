@@ -1,3 +1,10 @@
+2006-07-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/tracks/automation_pattern.cpp:
+	automationPattern::processMidiTime(): do not start search on time-map if
+	empty - find() on maps is horribly slow and makes LMMS unusable (still
+	have to find a better solution without any find()s at all)
+
 2006-07-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

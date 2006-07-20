@@ -254,10 +254,13 @@ const QString automationPattern::name( void )
 
 void automationPattern::processMidiTime( const midiTime & _time )
 {
-	timeMap::iterator it = m_time_map.find( _time );
-	if( it != m_time_map.end() )
+	if( m_time_map.size() > 1 )
 	{
-		m_object->setLevel( it.data() );
+		timeMap::iterator it = m_time_map.find( _time );
+		if( it != m_time_map.end() )
+		{
+			m_object->setLevel( it.data() );
+		}
 	}
 }
 
