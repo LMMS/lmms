@@ -14,11 +14,17 @@ AC_PROG_LN_S
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_LIBTOOL
 
-EXTRAFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
+# -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
+#EXTRAFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
+EXTRAFLAGS="-floop-optimize2 -fgcse-sm  -fgcse-las"
 
-#somehow enable this later
+# Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
 #if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
-	#EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -funsafe-loop-optimizations -Wunsafe-loop-optimizations -ftree-loop-linear"
+#	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" = "x0" ; then
+#		EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -ftree-loop-linear"
+#	else
+#		EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -funsafe-loop-optimizations -Wunsafe-loop-optimizations -ftree-loop-linear"
+#	fi	
 #fi
 CFLAGS="$CFLAGS $EXTRAFLAGS"
 CXXFLAGS="$CXXFLAGS $EXTRAFLAGS"

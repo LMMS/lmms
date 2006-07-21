@@ -1,3 +1,11 @@
+2006-07-21	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	- removed -fomit-frame-pointer flag--causes wine to crash on
+	  Ubuntu
+	- added check for gcc 4.0 for optimization flags--left it
+	  commented out--needs to be tested with 4.1
+
 2006-07-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/automation_pattern.cpp:
