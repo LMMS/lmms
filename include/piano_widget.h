@@ -79,6 +79,10 @@ public:
 	virtual void loadSettings( const QDomElement & _this,
 							const QString & _name );
 
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+	virtual bool x11Event( XEvent * _xe );
+
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
@@ -86,10 +90,7 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
 	virtual void mouseMoveEvent( QMouseEvent * me );
-	virtual void keyPressEvent( QKeyEvent * ke );
-	virtual void keyReleaseEvent( QKeyEvent * ke );
 	virtual void focusOutEvent( QFocusEvent * _fe );
-	virtual bool x11Event( XEvent * _xe );
 
 
 private:
