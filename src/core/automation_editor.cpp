@@ -201,27 +201,27 @@ automationEditor::automationEditor( engine * _engine ) :
 
 	// init edit-buttons at the top
 	m_drawButton = new toolButton( embed::getIconPixmap( "edit_draw" ),
-					tr( "Draw mode (D)" ),
+					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
 	m_drawButton->setCheckable( TRUE );
 	m_drawButton->setChecked( TRUE );
 
 	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
-					tr( "Erase mode (E)" ),
+					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
 	m_eraseButton->setCheckable( TRUE );
 
 	m_selectButton = new toolButton( embed::getIconPixmap(
 							"edit_select" ),
-					tr( "Select mode (S)" ),
+					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
 	m_selectButton->setCheckable( TRUE );
 
 	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
-					tr( "Move selection mode (M)" ),
+					tr( "Move selection mode (Shift+M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
 	m_moveButton->setCheckable( TRUE );
@@ -244,8 +244,8 @@ automationEditor::automationEditor( engine * _engine ) :
 		tr( "If you click here, draw-mode will be activated. In this "
 			"mode you can add and move single values. This "
 			"is the default-mode which is used most of the time. "
-			"You can also press 'D' on your keyboard to activate "
-			"this mode." ) );
+			"You can also press 'Shift+D' on your keyboard to "
+			"activate this mode." ) );
 #ifdef QT4
 	m_eraseButton->setWhatsThis(
 #else
@@ -253,7 +253,7 @@ automationEditor::automationEditor( engine * _engine ) :
 #endif
 		tr( "If you click here, erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
-			"'E' on your keyboard to activate this mode." ) );
+			"'Shift+E' on your keyboard to activate this mode." ) );
 #ifdef QT4
 	m_selectButton->setWhatsThis(
 #else
@@ -262,8 +262,8 @@ automationEditor::automationEditor( engine * _engine ) :
 		tr( "If you click here, select-mode will be activated. In this "
 			"mode you can select values. This is neccessary "
 			"if you want to cut, copy, paste, delete or move "
-			"values. You can also press 'S' on your keyboard to "
-			"activate this mode." ) );
+			"values. You can also press 'Shift+S' on your keyboard "
+			"to activate this mode." ) );
 #ifdef QT4
 	m_moveButton->setWhatsThis(
 #else
@@ -271,8 +271,8 @@ automationEditor::automationEditor( engine * _engine ) :
 #endif
 		tr( "If you click here, move-mode will be activated. In this "
 			"mode you can move the values you selected in select-"
-			"mode. You can also press 'M' on your keyboard to "
-			"activate this mode." ) );
+			"mode. You can also press 'Shift+M' on your keyboard "
+			"to activate this mode." ) );
 
 	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected values (Ctrl+X)" ),
@@ -848,19 +848,47 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_D:
-			m_drawButton->setChecked( TRUE );
+			if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				m_drawButton->setChecked( TRUE );
+			}
+			else
+			{
+				_ke->ignore();
+			}
 			break;
 
 		case Qt::Key_E:
-			m_eraseButton->setChecked( TRUE );
+			if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				m_eraseButton->setChecked( TRUE );
+			}
+			else
+			{
+				_ke->ignore();
+			}
 			break;
 
 		case Qt::Key_S:
-			m_selectButton->setChecked( TRUE );
+			if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				m_selectButton->setChecked( TRUE );
+			}
+			else
+			{
+				_ke->ignore();
+			}
 			break;
 
 		case Qt::Key_M:
-			m_moveButton->setChecked( TRUE );
+			if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				m_moveButton->setChecked( TRUE );
+			}
+			else
+			{
+				_ke->ignore();
+			}
 			break;
 
 		case Qt::Key_Delete:
