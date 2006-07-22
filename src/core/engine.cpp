@@ -68,13 +68,25 @@ engine::engine( const bool _has_gui ) :
 
 engine::~engine()
 {
+}
+
+
+
+
+void engine::close( void )
+{
 	m_mixer->stopProcessing();
 
 	delete m_projectNotes;
+	m_projectNotes = NULL;
 	delete m_songEditor;
+	m_songEditor = NULL;
 	delete m_bbEditor;
+	m_bbEditor = NULL;
 	delete m_pianoRoll;
+	m_pianoRoll = NULL;
 	delete m_automationEditor;
+	m_automationEditor = NULL;
 
 	presetPreviewPlayHandle::cleanUp( this );
 
@@ -83,8 +95,11 @@ engine::~engine()
 
 
 	delete m_mixer;
+	m_mixer = NULL;
 	//delete configManager::inst();
-	
+	delete m_projectJournal;
+	m_projectJournal = NULL;
+	m_mainWindow = NULL;
 }
 
 

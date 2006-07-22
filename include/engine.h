@@ -103,6 +103,8 @@ public:
 		return( m_automationEditor );
 	}
 
+	void close( void );
+
 
 private:
 	bool m_hasGUI;
