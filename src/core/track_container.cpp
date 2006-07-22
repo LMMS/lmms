@@ -248,7 +248,10 @@ void trackContainer::removeTrack( track * _track )
 		eng()->getMixer()->play();
 
 		realignTracks();
-		eng()->getSongEditor()->setModified();
+		if( eng()->getSongEditor() )
+		{
+			eng()->getSongEditor()->setModified();
+		}
 	}
 }
 

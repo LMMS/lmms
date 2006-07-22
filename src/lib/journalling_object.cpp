@@ -58,7 +58,7 @@ journallingObject::journallingObject( engine * _engine ) :
 
 journallingObject::~journallingObject()
 {
-	if( eng() != NULL )
+	if( eng() && eng()->getProjectJournal() )
 	{
 		eng()->getProjectJournal()->freeID( id() );
 	}
