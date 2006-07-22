@@ -1,3 +1,61 @@
+2006-07-22	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automatable_object.h:
+	avoid unnecessary level updates
+
+	* include/track.h:
+	* src/tracks/instrument_track.cpp:
+	trigger automation only when time has changed
+
+	* src/core/track.cpp:
+	- trigger automation only when time has changed
+	- remove references from patterns when closing the application
+
+	* include/automation_pattern.h:
+	added method to avoid segfaults when closing the application
+
+	* src/tracks/automation_pattern.cpp:
+	- added check to avoid segfaults when closing the application
+	- reverted processMidiTime(), that processing is needed
+
+	* src/core/track_container.cpp:
+	* src/lib/journalling_object.cpp:
+	added checks to avoid segfaults when closing the application
+
+	* include/engine.h:
+	* src/core/engine.cpp:
+	- do the clean-up in close()
+	- ensure deleted elements aren't accessed
+
+	* src/core/main_window.cpp:
+	close the engine rather than delete it
+
+	* include/instrument_track.h:
+	allow access to the piano widget
+
+	* include/piano_widget.h:
+	moved key event handlers to public
+
+	* include/piano_roll.h:
+	redirect events to the piano widget
+
+	* src/core/piano_roll.cpp:
+	- changed some accelerators
+	- redirect keyboard events to the piano widget
+	- fixed segfault when pressing Ctrl with no pattern
+
+	* src/core/automation_editor.cpp:
+	changed some accelerators
+
+	* src/core/song_editor.cpp:
+	play the automation track only when playing song
+
+	* include/automation_track.h:
+	removed unused signal section
+
+	* data/locale/ca.ts:
+	updated translation
+
 2006-07-21	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
