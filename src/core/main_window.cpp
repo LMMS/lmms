@@ -229,7 +229,7 @@ mainWindow::~mainWindow()
 
 	// destroy config-manager (which automatically saves config-file)
 */
-	delete eng();
+	eng()->close();
 }
 
 
