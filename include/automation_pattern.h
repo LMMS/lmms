@@ -99,6 +99,11 @@ public:
 		m_update_first = _update;
 	}
 
+	void forgetTrack()
+	{
+		m_track = NULL;
+	}
+
 
 public slots:
 	void openInAutomationEditor( void );
