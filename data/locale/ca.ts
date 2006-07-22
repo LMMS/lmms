@@ -678,34 +678,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <source>Draw mode (D)</source>
-        <translation>Mode dibuixar (D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (E)</source>
-        <translation>Mode esborrar (E)</translation>
-    </message>
-    <message>
-        <source>Select mode (S)</source>
-        <translation>Mode seleccionar (S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (M)</source>
-        <translation>Mode moure selecció (M)</translation>
-    </message>
-    <message>
-        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;E&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
-        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar valors. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure valors. També pots pitjar &apos;S&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;M&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
         <source>Cut selected values (Ctrl+X)</source>
         <translation>Talla els valors seleccionats (Ctrl+X)</translation>
     </message>
@@ -750,8 +722,36 @@ http://lmms.sourceforge.net</translation>
         <translation>Tots els valors seleccionats s&apos;han copiat al portapapers.</translation>
     </message>
     <message>
-        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir i moure valors solts. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;D&apos; al teclat per a activar aquest mode.</translation>
+        <source>Draw mode (Shift+D)</source>
+        <translation>Mode dibuixar (Maj+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>Mode esborrar (Maj+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>Mode seleccionar (Maj+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation>Mode moure selecció (Maj+M)</translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir i moure valors solts. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar valors. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure valors. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
 </context>
 <context>
@@ -2077,10 +2077,6 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>pianoRoll</name>
     <message>
-        <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notas soltes. També pots pitjar &apos;E&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Talla les notes seleccionades (Ctrl+X)</translation>
     </message>
@@ -2121,24 +2117,12 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir, redimensionar i moure notes soltes. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;D&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
         <source>Piano-Roll - no pattern</source>
         <translation>Rotlle de Piano - sense patró</translation>
     </message>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
         <translation>Per favor, obre un patró picant-lo dos cops!</translation>
-    </message>
-    <message>
-        <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar notes. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure notes. També pots pitjar &apos;S&apos; al teclat per a activar aquest mode.</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;M&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
@@ -2153,22 +2137,6 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Pica aquí si vols enregistrar notes des d&apos;un dispositiu MIDI o el piano virtual de prova de la finestra de canal corresponent al patró actual. Mentre s&apos;enregistra, totes les notes que toquis seran escrites en aquest patró i les podràs reproduir i editar després.</translation>
     </message>
     <message>
-        <source>Draw mode (D)</source>
-        <translation>Mode dibuixar (D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (E)</source>
-        <translation>Mode esborrar (E)</translation>
-    </message>
-    <message>
-        <source>Select mode (S)</source>
-        <translation>Mode seleccionar (S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (M)</source>
-        <translation>Mode moure selecció (M)</translation>
-    </message>
-    <message>
         <source>Last note</source>
         <translation>Darrera nota</translation>
     </message>
@@ -2179,6 +2147,38 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     <message>
         <source>All selected notes were copied to the clipboard.</source>
         <translation>Totes les notes seleccionades s&apos;han copiat al portapapers.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>Mode dibuixar (Maj+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>Mode esborrar (Maj+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>Mode seleccionar (Maj+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation>Mode moure selecció (Maj+M)</translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir, redimensionar i moure notes soltes. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notas soltes. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar notes. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure notes. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
 </context>
 <context>
