@@ -501,7 +501,7 @@ public:
 
 
 protected:
-	void sendMidiTime( const midiTime & _time );
+	bool sendMidiTime( const midiTime & _time );
 	QString m_name;
 
 
@@ -509,6 +509,7 @@ private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
 	QPtrList<automationPattern> m_automation_patterns;
+	midiTime m_last_time_sent;
 
 } ;
 

@@ -872,8 +872,10 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
-	sendMidiTime( _start );
-	emit sentMidiTime( _start );
+	if( sendMidiTime( _start ) )
+	{
+		emit sentMidiTime( _start );
+	}
 
 	// calculate samples per tact; need that later when calculating
 	// sample-pos of a note
