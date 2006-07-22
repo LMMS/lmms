@@ -460,6 +460,10 @@ private:
 
 	void setLevel( int _level )
 	{
+		if( m_curLevel == _level )
+		{
+			return;
+		}
 		saveJournallingState( FALSE );
 		m_automation_pattern->setUpdateFirst( FALSE );
 		setValue( _level * m_step );
