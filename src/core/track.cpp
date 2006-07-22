@@ -1500,6 +1500,14 @@ track::~track()
 		delete m_trackWidget;
 		m_trackWidget = NULL;
 	}
+
+	QPtrListIterator<automationPattern> it( m_automation_patterns );
+	automationPattern * pattern ;
+	while( ( pattern = it.current() ) )
+	{
+		++it;
+		pattern->forgetTrack();
+	}
 }
 
 
@@ -1757,8 +1765,14 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 
 
-void track::sendMidiTime( const midiTime & _time )
+bool track::sendMidiTime( const midiTime & _time )
 {
+	if( m_last_time_sent == _time )
+	{
+		return( FALSE );
+	}
+	m_last_time_sent = _time;
+
 	QPtrListIterator<automationPattern> it( m_automation_patterns );
 	automationPattern * pattern ;
 	while( ( pattern = it.current() ) )
@@ -1766,6 +1780,7 @@ void track::sendMidiTime( const midiTime & _time )
 		++it;
 		pattern->processMidiTime( _time );
 	}
+	return( TRUE );
 }
 
 
