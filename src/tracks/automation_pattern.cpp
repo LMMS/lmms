@@ -96,12 +96,11 @@ automationPattern::~automationPattern()
 		m_track->removeAutomationPattern( this );
 	}
 
-	if( eng()->getAutomationEditor()->currentPattern() == this )
+	if( eng()->getAutomationEditor()
+		&& eng()->getAutomationEditor()->currentPattern() == this )
 	{
 		eng()->getAutomationEditor()->setCurrentPattern( NULL );
 	}
-
-	m_time_map.clear();
 }
 
 
@@ -254,13 +253,10 @@ const QString automationPattern::name( void )
 
 void automationPattern::processMidiTime( const midiTime & _time )
 {
-	if( m_time_map.size() > 1 )
+	timeMap::iterator it = m_time_map.find( _time );
+	if( it != m_time_map.end() )
 	{
-		timeMap::iterator it = m_time_map.find( _time );
-		if( it != m_time_map.end() )
-		{
-			m_object->setLevel( it.data() );
-		}
+		m_object->setLevel( it.data() );
 	}
 }
 
