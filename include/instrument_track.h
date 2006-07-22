@@ -166,6 +166,11 @@ public:
 		return( m_tabWidget );
 	}
 
+	pianoWidget * getPianoWidget( void )
+	{
+		return( m_pianoWidget );
+	}
+
 
 public slots:
 	void surroundAreaPosChanged( const QPoint & _new_p );
