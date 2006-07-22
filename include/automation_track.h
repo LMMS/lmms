@@ -38,9 +38,6 @@ public:
 	virtual ~automationTrack();
 
 
-signals:
-
-
 private:
 	inline QString nodeName( void ) const
 	{
