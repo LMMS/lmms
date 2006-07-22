@@ -1033,10 +1033,13 @@ void songEditor::processNextBuffer( void )
 					m_playPos[m_playMode].currentFrame();
 		}
 
-		m_automation_track->play( m_playPos[m_playMode],
+		if( m_playMode == PLAY_SONG )
+		{
+			m_automation_track->play( m_playPos[m_playMode],
 					m_playPos[m_playMode].currentFrame(),
 					played_frames, total_frames_played,
 					tco_num );
+		}
 
 		// loop through all tracks and play them if they're not muted
 		for( trackVector::iterator it = tv.begin(); it != tv.end();
