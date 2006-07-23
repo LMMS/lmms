@@ -1563,8 +1563,12 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 	m_topBottomScroll->setValue( m_scroll_level );
 
-	eng()->getSongEditor()->getPlayPos( songEditor::PLAY_AUTOMATION_PATTERN
+	if( eng()->getSongEditor() )
+	{
+		eng()->getSongEditor()->getPlayPos(
+					songEditor::PLAY_AUTOMATION_PATTERN
 					).m_timeLine->setFixedWidth( width() );
+	}
 	m_toolBar->setFixedWidth( width() );
 
 	updateTopBottomLevels();
