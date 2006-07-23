@@ -93,7 +93,8 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	QWidget( _parent ),
 	m_instrumentTrack( _parent ),
 	m_startTone( C ),
-	m_startOctave( OCTAVE_3 )
+	m_startOctave( OCTAVE_3 ),
+	m_lastKey( -1 )
 {
 #ifdef QT4
 	setFocusPolicy( Qt::StrongFocus );
@@ -360,7 +361,10 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 		m_instrumentTrack->processInEvent(
 				midiEvent( NOTE_OFF, 0, released_key, 0 ),
 								midiTime() );
-		m_pressedKeys[released_key] = FALSE;
+		if( released_key >= 0 )
+		{
+			m_pressedKeys[released_key] = FALSE;
+		}
 #ifdef QT4
 		if( _me->buttons() & Qt::LeftButton )
 #else
