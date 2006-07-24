@@ -113,7 +113,8 @@ songEditor::songEditor( engine * _engine ) :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE ),
-	m_scrollBack( FALSE )
+	m_scrollBack( FALSE ),
+	m_destroyed( FALSE )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
@@ -446,6 +447,7 @@ songEditor::songEditor( engine * _engine ) :
 songEditor::~songEditor()
 {
 	delete m_automation_track;
+	m_destroyed = TRUE;
 }
 
 
@@ -1199,6 +1201,10 @@ void songEditor::updateTimeLinePosition( void )
 
 void songEditor::stop( void )
 {
+	if( m_destroyed )
+	{
+		return;
+	}
 	m_actions.push_back( ACT_STOP_PLAY );
 #ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );

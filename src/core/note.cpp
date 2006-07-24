@@ -226,7 +226,7 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pan", m_panning );
 	_this.setAttribute( "len", m_length );
 	_this.setAttribute( "pos", m_pos );
-	if( m_length > 0 )
+	if( m_length > 0 && m_detuning )
 	{
 		m_detuning->saveSettings( _doc, _this, "detuning" );
 	}
