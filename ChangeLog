@@ -1,3 +1,13 @@
+2006-07-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/tracks/instrument_track.cpp:
+	handle notes deleted when keys still pressed
+
+	* include/song_editor.h:
+	* src/core/note.cpp:
+	* src/core/song_editor.cpp:
+	added checks to avoid segfaults when closing the application
+
 2006-07-23	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/core/piano_widget.cpp:
