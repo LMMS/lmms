@@ -749,6 +749,21 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	{
 		m_instrument->deleteNotePluginData( _n );
 	}
+
+	m_notesMutex.lock();
+	// Notes deleted when keys still pressed
+	if( m_notes[_n->key()] == _n )
+	{
+		note done_note( NULL, midiTime( static_cast<f_cnt_t>(
+					_n->totalFramesPlayed() * 64 /
+				eng()->getSongEditor()->framesPerTact() ) ),
+					0, _n->tone(), _n->octave(),
+					_n->getVolume(), _n->getPanning() );
+		_n->noteOff();
+		m_notes[_n->key()] = NULL;
+		emit noteDone( done_note );
+	}
+	m_notesMutex.unlock();
 }
 
 
