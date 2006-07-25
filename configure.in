@@ -19,13 +19,13 @@ AC_PROG_LIBTOOL
 EXTRAFLAGS="-floop-optimize2 -fgcse-sm  -fgcse-las"
 
 # Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
-#if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
-#	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" = "x0" ; then
-#		EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -ftree-loop-linear"
-#	else
-#		EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -funsafe-loop-optimizations -Wunsafe-loop-optimizations -ftree-loop-linear"
-#	fi	
-#fi
+if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
+	EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -ftree-loop-linear"
+	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" != "x0" ; then
+		EXTRAFLAGS="$EXTRAFLAGS -funsafe-loop-optimizations -Wunsafe-loop-optimizations"
+	fi	
+fi
+
 CFLAGS="$CFLAGS $EXTRAFLAGS"
 CXXFLAGS="$CXXFLAGS $EXTRAFLAGS"
 
@@ -439,7 +439,7 @@ AC_SUBST(lmmsdatadir)
 
 #CFLAGS="$CXXFLAGS -g -O2"
 #CXXFLAGS="$CXXFLAGS -g -O2"
-if test $CXX == "g++" ; then
+if test "x$CXX" == "xg++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall -fno-exceptions"
 fi
 
