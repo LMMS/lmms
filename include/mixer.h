@@ -289,8 +289,7 @@ public slots:
 
 signals:
 	void sampleRateChanged( void );
-	void nextAudioBuffer( const surroundSampleFrame *,
-						const fpab_t _frames );
+	void nextAudioBuffer( const surroundSampleFrame *, int _frames );
 
 
 private:

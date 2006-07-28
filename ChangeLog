@@ -1,3 +1,13 @@
+2006-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	made 0.2.1 release
+
+	* include/mixer.h:
+	* include/visualization_widget.h:
+	* src/widgets/visualization_widget.cpp:
+	fixed a bug in connection between mixer and visualization-widget
+
 2006-07-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/tracks/instrument_track.cpp:

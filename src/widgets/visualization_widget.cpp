@@ -82,9 +82,9 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	}
 
 	connect( eng()->getMixer(), SIGNAL( nextAudioBuffer(
-				const surroundSampleFrame *, const fpab_t ) ),
+					const surroundSampleFrame *, int ) ),
 		this, SLOT( setAudioBuffer(
-				const surroundSampleFrame *, const fpab_t ) ) );
+					const surroundSampleFrame *, int ) ) );
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
 							"master-output" ) );
@@ -101,7 +101,7 @@ visualizationWidget::~visualizationWidget()
 
 
 void visualizationWidget::setAudioBuffer( const surroundSampleFrame * _ab,
-							const fpab_t _frames )
+								int _frames )
 {
 	if( m_enabled == TRUE )
 	{
