@@ -229,6 +229,7 @@ private:
 
 	int m_ppt;
 	int m_y_delta;
+	bool m_y_auto;
 
 	timeMap m_valuesToCopy;
 	timeMap m_selValuesForMove;
