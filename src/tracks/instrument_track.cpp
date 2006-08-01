@@ -631,7 +631,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					// create (timed) note-play-handle
 					notePlayHandle * nph = new
 						notePlayHandle( this,
-			_time.frames( eng()->getSongEditor()->framesPerTact() ),
+					_time.frames( eng()->framesPerTact() ),
 						valueRanges<f_cnt_t>::max, n );
 					if( eng()->getMixer()->addPlayHandle(
 									nph ) )
@@ -653,8 +653,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// recording notes into a pattern
 				note done_note( NULL,
 					midiTime( static_cast<f_cnt_t>(
-					n->totalFramesPlayed() * 64 /
-				eng()->getSongEditor()->framesPerTact() ) ),
+						n->totalFramesPlayed() * 64 /
+						eng()->framesPerTact() ) ),
 					0, n->tone(), n->octave(),
 					n->getVolume(), n->getPanning() );
 				n->noteOff();
@@ -755,8 +755,8 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	if( m_notes[_n->key()] == _n )
 	{
 		note done_note( NULL, midiTime( static_cast<f_cnt_t>(
-					_n->totalFramesPlayed() * 64 /
-				eng()->getSongEditor()->framesPerTact() ) ),
+						_n->totalFramesPlayed() * 64 /
+						eng()->framesPerTact() ) ),
 					0, _n->tone(), _n->octave(),
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
@@ -894,7 +894,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 
 	// calculate samples per tact; need that later when calculating
 	// sample-pos of a note
-	float frames_per_tact = eng()->getSongEditor()->framesPerTact();
+	float frames_per_tact = eng()->framesPerTact();
 
 	vlist<trackContentObject *> tcos;
 	if( _tco_num >= 0 )

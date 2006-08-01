@@ -105,9 +105,16 @@ public:
 
 	void close( void );
 
+	float framesPerTact( void ) const
+	{
+		return( m_frames_per_tact );
+	}
+	void updateFramesPerTact( void );
+
 
 private:
 	bool m_hasGUI;
+	float m_frames_per_tact;
 
 	mixer * m_mixer;
 	mainWindow * m_mainWindow;

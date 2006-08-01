@@ -100,7 +100,7 @@ void FASTCALL sampleTCO::play( sampleFrame * _ab, f_cnt_t _start_frame,
 {
 	_start_frame = static_cast<Uint32>( tMax( 0.0f, _start_frame -
 							startPosition() *
-			eng()->getSongEditor()->framesPerTact() / 64 ) );
+						eng()->framesPerTact() / 64 ) );
 	m_sampleBuffer.play( _ab, _start_frame, _frames );
 }
 
@@ -254,8 +254,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 midiTime sampleTCO::getSampleLength( void ) const
 {
 	return( static_cast<Sint32>( m_sampleBuffer.frames() /
-					eng()->getSongEditor()->framesPerTact() *
-									64 ) );
+						eng()->framesPerTact() * 64 ) );
 }
 
 
@@ -445,7 +444,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 
 	vlist<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start+static_cast<Sint32>( _frames * 64 /
-				eng()->getSongEditor()->framesPerTact() ) );
+						eng()->framesPerTact() ) );
 
 	if ( tcos.size() == 0 )
 	{
@@ -459,7 +458,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 					, m_volume, m_volume
 #endif
 			} ;
-	float fpt = eng()->getSongEditor()->framesPerTact();
+	float fpt = eng()->framesPerTact();
 
 	for( vlist<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )

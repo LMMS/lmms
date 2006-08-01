@@ -89,7 +89,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 				( m_instrumentTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
 			midiTime::fromFrames( m_framesAhead,
-		m_instrumentTrack->eng()->getSongEditor()->framesPerTact() ) );
+				m_instrumentTrack->eng()->framesPerTact() ) );
 }
 
 
@@ -274,17 +274,12 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 									FALSE );
 		}
 		// send MIDI-note-off-event
-		// TODO: move framesPerTact() to engine
-		if( m_instrumentTrack->eng()->getSongEditor() )
-		{
-			m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
+		m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_instrumentTrack->m_midiPort->outputChannel(),
 								key(), 0 ),
 						midiTime::fromFrames(
 							m_framesBeforeRelease,
-			m_instrumentTrack->eng()->getSongEditor()
-							->framesPerTact() ) );
-		}
+				m_instrumentTrack->eng()->framesPerTact() ) );
 	}
 	else
 	{
