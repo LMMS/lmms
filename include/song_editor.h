@@ -139,8 +139,6 @@ public:
 	bool mayChangeProject( void );
 
 
-	float framesPerTact( void ) const;
-
 	// file management
 	void createNewProject( void );
 	void FASTCALL createNewProjectFromTemplate( const QString & _template );
@@ -309,6 +307,10 @@ private:
 
 
 	friend class engine;
+
+
+private slots:
+	void updateFramesPerTact( void );
 
 
 signals:

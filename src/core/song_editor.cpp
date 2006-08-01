@@ -204,6 +204,9 @@ songEditor::songEditor( engine * _engine ) :
 
 	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
+	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ), this,
+						SLOT( updateFramesPerTact() ) );
+
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
@@ -755,6 +758,7 @@ void songEditor::setTempo( int _new_bpm )
 	m_bpmSpinBox->setInitValue(
 				tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
 	setModified();
+	eng()->updateFramesPerTact();
 	emit tempoChanged( _new_bpm );
 }
 
@@ -976,7 +980,8 @@ void songEditor::processNextBuffer( void )
 	}
 
 	f_cnt_t total_frames_played = 0;
-	f_cnt_t frames_per_tact = static_cast<f_cnt_t>( framesPerTact() );
+	f_cnt_t frames_per_tact = static_cast<f_cnt_t>(
+						eng()->framesPerTact() );
 	if( m_playPos[m_playMode].currentFrame() == 0 &&
 		m_playPos[m_playMode].getTact64th() > 0 )
 	{
@@ -1175,7 +1180,7 @@ void songEditor::setPlayPos( tact _tact_num, tact64th _t_64th, playModes
 	m_playPos[_play_mode].setTact( _tact_num );
 	m_playPos[_play_mode].setTact64th( _t_64th );
 	m_playPos[_play_mode].setCurrentFrame( static_cast<f_cnt_t>(
-					_t_64th * framesPerTact() / 64.0f ) );
+				_t_64th * eng()->framesPerTact() / 64.0f ) );
 	if( _play_mode == m_playMode )
 	{
 		updateTimeLinePosition();
@@ -1311,18 +1316,6 @@ void songEditor::addBBTrack( void )
 void songEditor::addSampleTrack( void )
 {
 	(void) track::create( track::SAMPLE_TRACK, this );
-}
-
-
-
-
-float songEditor::framesPerTact( void ) const
-{
-	// when fooling around with tempo while playing, we sometimes get
-	// 0 here which leads to FP-exception, so handle it separately
-	const int bpm = tMax( 1, m_bpmSpinBox->value() );
-	return( eng()->getMixer()->sampleRate() * 60.0f * BEATS_PER_TACT /
-								bpm );
 }
 
 
@@ -1772,6 +1765,15 @@ void songEditor::exportProject( void )
 		epd.exec();
 	}
 }
+
+
+
+
+void songEditor::updateFramesPerTact( void )
+{
+	eng()->updateFramesPerTact();
+}
+
 
 
 

@@ -31,6 +31,7 @@
 #include "engine.h"
 #include "main_window.h"
 #include "mixer.h"
+#include "pattern.h"
 #include "piano_roll.h"
 #include "preset_preview_play_handle.h"
 #include "project_notes.h"
@@ -100,6 +101,15 @@ void engine::close( void )
 	delete m_projectJournal;
 	m_projectJournal = NULL;
 	m_mainWindow = NULL;
+}
+
+
+
+
+void engine::updateFramesPerTact( void )
+{
+	m_frames_per_tact = m_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
+						/ m_songEditor->getTempo();
 }
 
 
