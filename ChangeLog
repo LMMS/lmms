@@ -1,3 +1,26 @@
+2006-08-01	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automation_editor.h:
+	added "Auto" view
+
+	* src/core/automation_editor.cpp:
+	- added "Auto" view
+	- improved labels display
+	- removed duplicate variable y_base
+
+	* include/song_editor.h:
+	* src/core/engine.cpp:
+	* src/core/song_editor.cpp:
+	- moved framesPerTact() from songEditor to engine
+	- update frames per tact only when changes happen
+
+	* include/engine.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	moved framesPerTact() from songEditor to engine
+
 2006-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
