@@ -101,6 +101,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	m_moveStartTact64th( 0 ),
 	m_ppt( DEFAULT_PPT ),
 	m_y_delta( DEFAULT_Y_DELTA ),
+	m_y_auto( TRUE ),
 	m_editMode( DRAW ),
 	m_scrollBack( FALSE )
 {
@@ -336,11 +337,12 @@ automationEditor::automationEditor( engine * _engine ) :
 
 	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->addItem( "Auto" );
 	for( int i = 0; i < 6; ++i )
 	{
 		m_zoomingYComboBox->addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingYComboBox->setValue( m_zoomingYComboBox->findText( "100%" ) );
+	m_zoomingYComboBox->setValue( m_zoomingYComboBox->findText( "Auto" ) );
 	connect( m_zoomingYComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingYChanged( const QString & ) ) );
 
@@ -519,13 +521,42 @@ void automationEditor::update( void )
 	AlignmentFlags text_flags =
 				(AlignmentFlags)( AlignRight | AlignVCenter );
 
-	if ( m_pattern )
+	if( m_pattern )
 	{
-		for( int y = grid_bottom, level = m_bottom_level;
-					y >= TOP_MARGIN && level <= m_top_level;
-					y -= m_y_delta, ++level )
+		if( m_y_auto )
 		{
-			if( level % 5 == 0 )
+			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
+			int level[] = { m_min_level, m_max_level };
+			for( int i = 0; i < 2; ++i )
+			{
+				const QString & label = m_pattern->object()
+						->levelToLabel( level[i] );
+				p.setPen( QColor( 240, 240, 240 ) );
+				p.drawText( 1, y[i] - font_height + 1,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+				p.setPen( QColor( 0, 0, 0 ) );
+				p.drawText( 0, y[i] - font_height,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+			}
+		}
+		else
+		{
+			int y = grid_bottom;
+			int level = m_bottom_level;
+			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
+								/ m_y_delta );
+			int module = level % printable;
+			if( module )
+			{
+				int inv_module = ( printable - module )
+								% printable;
+				y -= inv_module * m_y_delta;
+				level += inv_module;
+			}
+			for( ; y >= TOP_MARGIN && level <= m_top_level;
+				y -= printable * m_y_delta, level += printable )
 			{
 				const QString & label = m_pattern->object()
 							->levelToLabel( level );
@@ -551,50 +582,72 @@ void automationEditor::update( void )
 	const int offset = ( m_currentPosition % 4 ) * m_ppt /
 						DEFAULT_STEPS_PER_TACT / 4;
 
-	int x_line_end = m_top_level < m_max_level ?
-		TOP_MARGIN :
-		grid_bottom - ( m_top_level - m_bottom_level ) * m_y_delta;
+	if( m_pattern )
+	{
+		int x_line_end = m_top_level < m_max_level ?
+			TOP_MARGIN :
+			grid_bottom - ( m_top_level - m_bottom_level )
+								* m_y_delta;
 
-	for( int x = VALUES_WIDTH - offset; x < width();
+		for( int x = VALUES_WIDTH - offset; x < width();
 			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
-	{
-		if( x >= VALUES_WIDTH )
 		{
-			// every tact-start needs to be a bright line
-			if( tact_16th % 16 == 0 )
+			if( x >= VALUES_WIDTH )
 			{
-	 			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+				// every tact-start needs to be a bright line
+				if( tact_16th % 16 == 0 )
+				{
+	 				p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+				}
+				// normal line
+				else if( tact_16th % 4 == 0 )
+				{
+					p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
+				}
+				// weak line
+				else
+				{
+					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+				}
+				p.drawLine( x, grid_bottom, x, x_line_end );
 			}
-			// normal line
-			else if( tact_16th % 4 == 0 )
-			{
-				p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
-			}
-			// weak line
-			else
-			{
-				p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
-			}
-			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
-	}
 
 
-	for( int y = grid_bottom, level = m_bottom_level;
-					y >= TOP_MARGIN && level <= m_top_level;
-					y -= m_y_delta, ++level )
-	{
-		if( level % 5 == 0 )
+		if( m_y_auto )
 		{
-			p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
+			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
+			p.setPen( pen );
+			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
+								grid_bottom );
+			pen.setStyle( DotLine );
+			p.setPen( pen );
+			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
+			for( int i = 1; i < 8; ++i )
+			{
+				int y = (int)( grid_bottom - i * y_delta );
+				p.drawLine( VALUES_WIDTH, y, width(), y );
+			}
 		}
 		else
 		{
-			p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
-		}
+			for( int y = grid_bottom, level = m_bottom_level;
+					y >= TOP_MARGIN && level <= m_top_level;
+					y -= m_y_delta, ++level )
+			{
+				if( level % 5 == 0 )
+				{
+					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
+				}
+				else
+				{
+					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+				}
 
-		// draw key-line
-		p.drawLine( VALUES_WIDTH, y, width(), y );
+				// draw key-line
+				p.drawLine( VALUES_WIDTH, y, width(), y );
+			}
+		}
 	}
 
 
@@ -616,7 +669,6 @@ void automationEditor::update( void )
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	int y_base = height() - SCROLLBAR_SIZE - 1;
 	if( validPattern() == TRUE )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
@@ -655,7 +707,7 @@ void automationEditor::update( void )
 			if( !xVisible( x ) && !xVisible( next_x )
 						&& it_next != time_map.end() )
 			{
-				continue;;
+				continue;
 			}
 
 			// is the value in visible area?
@@ -689,12 +741,30 @@ void automationEditor::update( void )
 
 				// we've done and checked all, lets draw the
 				// value
-				drawValueRect( p, x + VALUES_WIDTH,
-						y_base - ( value
+				int y_start;
+				int rect_height;
+				if( m_y_auto )
+				{
+					y_start = grid_bottom
+						- ( grid_bottom - TOP_MARGIN )
+						* ( value - m_min_level )
+						/ ( m_max_level - m_min_level );
+					int y_end = grid_bottom
+						+ ( grid_bottom - TOP_MARGIN )
+						* m_min_level
+						/ ( m_max_level - m_min_level );
+					rect_height = y_end - y_start;
+				}
+				else
+				{
+					y_start = grid_bottom - ( value
 							- m_bottom_level )
-							* m_y_delta,
-						rect_width, value * m_y_delta,
-						is_selected );
+							* m_y_delta;
+					rect_height = value * m_y_delta;
+				}
+				drawValueRect( p, x + VALUES_WIDTH, y_start,
+							rect_width, rect_height,
+							is_selected );
 			}
 		}
 	}
@@ -718,8 +788,8 @@ void automationEditor::update( void )
 	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) / 64;
 	int w = ( ( ( sel_pos_end - m_currentPosition ) * m_ppt ) /
 								64 ) - x;
-	int y = (int) y_base - sel_key_start * m_y_delta;
-	int h = (int) y_base - sel_key_end * m_y_delta - y;
+	int y = grid_bottom - sel_key_start * m_y_delta;
+	int h = grid_bottom - sel_key_end * m_y_delta - y;
 	p.setPen( QColor( 0, 64, 192 ) );
 	p.drawRect( x + VALUES_WIDTH, y, w, h );
 
@@ -1541,7 +1611,7 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 	int half_grid = grid_height / 2;
 	int total_pixels = ( m_max_level - m_min_level ) * m_y_delta + 1;
-	if( grid_height < total_pixels )
+	if( !m_y_auto && grid_height < total_pixels )
 	{
 		int min_scroll = m_min_level + (int)floorf( half_grid
 							/ (float)m_y_delta );
@@ -1620,16 +1690,17 @@ int automationEditor::getValue( int _y )
 {
 	int key_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed value on time roll
-	int value = m_bottom_level + (int)roundf( ( key_line_y - _y )
-							/ (float)m_y_delta );
+	int value = m_bottom_level + (int)roundf( m_y_auto ?
+			( m_max_level - m_min_level ) * ( key_line_y - _y )
+					/ (float)( key_line_y - TOP_MARGIN ) :
+			( key_line_y - _y ) / (float)m_y_delta );
 
 	// some range-checking-stuff
 	if( value < m_bottom_level )
 	{
 		value = m_bottom_level;
 	}
-
-	if( value > m_top_level )
+	else if( value > m_top_level )
 	{
 		value = m_top_level;
 	}
@@ -2047,8 +2118,12 @@ void automationEditor::zoomingXChanged( const QString & _zfac )
 
 void automationEditor::zoomingYChanged( const QString & _zfac )
 {
-	m_y_delta = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_Y_DELTA
-									/ 100;
+	m_y_auto = _zfac == "Auto";
+	if( !m_y_auto )
+	{
+		m_y_delta = _zfac.left( _zfac.length() - 1 ).toInt()
+							* DEFAULT_Y_DELTA / 100;
+	}
 #ifdef LMMS_DEBUG
 	assert( m_y_delta > 0 );
 #endif
@@ -2070,11 +2145,18 @@ int automationEditor::quantization( void ) const
 
 void automationEditor::updateTopBottomLevels( void )
 {
+	if( m_y_auto )
+	{
+		m_bottom_level = m_min_level;
+		m_top_level = m_max_level;
+		return;
+	}
+
 	int total_pixels = ( m_max_level - m_min_level ) * m_y_delta + 1;
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 	int half_grid = grid_height / 2;
 
-	if ( total_pixels > grid_height )
+	if( total_pixels > grid_height )
 	{
 		int central_level = m_min_level + m_max_level - m_scroll_level;
 
