@@ -106,7 +106,7 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
 
-	int FASTCALL getValue( int _y );
+	int FASTCALL getLevel( int _y );
 	static inline void drawValueRect( QPainter & _p, Uint16 _x, Uint16 _y,
 						Sint16 _width, Sint16 _height,
 						const bool _is_selected );
@@ -220,10 +220,10 @@ private:
 
 	Uint32 m_selectStartTact64th;
 	int m_selectedTact64th;
-	int m_selectStartKey;
-	int m_selectedKeys;
+	int m_selectStartLevel;
+	int m_selectedLevels;
 
-	int m_moveStartKey;
+	int m_moveStartLevel;
 	int m_moveStartTact64th;
 	int m_moveXOffset;
 
