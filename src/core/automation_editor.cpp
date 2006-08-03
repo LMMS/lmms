@@ -97,7 +97,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	m_top_level( 0 ),
 	m_currentPosition(),
 	m_action( NONE ),
-	m_moveStartKey( 0 ),
+	m_moveStartLevel( 0 ),
 	m_moveStartTact64th( 0 ),
 	m_ppt( DEFAULT_PPT ),
 	m_y_delta( DEFAULT_Y_DELTA ),
@@ -430,6 +430,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	m_scroll_level = ( m_min_level + m_max_level ) / 2;
 
 	timeMap & time_map = m_pattern->getTimeMap();
+	//TODO: This is currently unused
 	int central_key = 0;
 	if( !time_map.isEmpty() )
 	{
@@ -584,7 +585,7 @@ void automationEditor::update( void )
 
 	if( m_pattern )
 	{
-		int x_line_end = m_top_level < m_max_level ?
+		int x_line_end = m_y_auto || m_top_level < m_max_level ?
 			TOP_MARGIN :
 			grid_bottom - ( m_top_level - m_bottom_level )
 								* m_y_delta;
@@ -644,7 +645,7 @@ void automationEditor::update( void )
 					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
 				}
 
-				// draw key-line
+				// draw level line
 				p.drawLine( VALUES_WIDTH, y, width(), y );
 			}
 		}
@@ -662,11 +663,11 @@ void automationEditor::update( void )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int sel_key_start = m_selectStartKey;
-	int sel_key_end = sel_key_start + m_selectedKeys;
-	if( sel_key_start > sel_key_end )
+	int sel_level_start = m_selectStartLevel;
+	int sel_level_end = sel_level_start + m_selectedLevels;
+	if( sel_level_start > sel_level_end )
 	{
-		qSwap<int>( sel_key_start, sel_key_end );
+		qSwap<int>( sel_level_start, sel_level_end );
 	}
 
 	if( validPattern() == TRUE )
@@ -678,7 +679,7 @@ void automationEditor::update( void )
 		{
 			Sint32 len_tact_64th = 4;
 
-			const int value = it.data();
+			const int level = it.data();
 
 			Sint32 pos_tact_64th = it.key();
 
@@ -711,9 +712,9 @@ void automationEditor::update( void )
 			}
 
 			// is the value in visible area?
-			if( ( value >= m_bottom_level && value <= m_top_level )
-				|| ( value > m_top_level && m_top_level >= 0 )
-				|| ( value < m_bottom_level
+			if( ( level >= m_bottom_level && level <= m_top_level )
+				|| ( level > m_top_level && m_top_level >= 0 )
+				|| ( level < m_bottom_level
 						&& m_bottom_level <= 0 ) )
 			{
 				bool is_selected = FALSE;
@@ -730,8 +731,8 @@ void automationEditor::update( void )
 						is_selected = TRUE;
 					}
 				}
-				else if( value > sel_key_start &&
-					value <= sel_key_end &&
+				else if( level > sel_level_start &&
+					level <= sel_level_end &&
 					pos_tact_64th >= sel_pos_start &&
 					pos_tact_64th + len_tact_64th <=
 								sel_pos_end )
@@ -747,7 +748,7 @@ void automationEditor::update( void )
 				{
 					y_start = grid_bottom
 						- ( grid_bottom - TOP_MARGIN )
-						* ( value - m_min_level )
+						* ( level - m_min_level )
 						/ ( m_max_level - m_min_level );
 					int y_end = grid_bottom
 						+ ( grid_bottom - TOP_MARGIN )
@@ -757,10 +758,10 @@ void automationEditor::update( void )
 				}
 				else
 				{
-					y_start = grid_bottom - ( value
+					y_start = grid_bottom - ( level
 							- m_bottom_level )
 							* m_y_delta;
-					rect_height = value * m_y_delta;
+					rect_height = level * m_y_delta;
 				}
 				drawValueRect( p, x + VALUES_WIDTH, y_start,
 							rect_width, rect_height,
@@ -785,11 +786,24 @@ void automationEditor::update( void )
 								grid_height );
 
 	// now draw selection-frame
-	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) / 64;
-	int w = ( ( ( sel_pos_end - m_currentPosition ) * m_ppt ) /
-								64 ) - x;
-	int y = grid_bottom - sel_key_start * m_y_delta;
-	int h = grid_bottom - sel_key_end * m_y_delta - y;
+	int x = ( sel_pos_start - m_currentPosition ) * m_ppt / 64;
+	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / 64;
+	int y, h;
+	if( m_y_auto )
+	{
+		y = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( sel_level_start - m_min_level )
+				/ (float)( m_max_level - m_min_level ) );
+		h = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( sel_level_end - m_min_level )
+				/ (float)( m_max_level - m_min_level ) ) - y;
+	}
+	else
+	{
+		y = grid_bottom - ( sel_level_start - m_bottom_level )
+								* m_y_delta;
+		h = ( sel_level_start - sel_level_end ) * m_y_delta;
+	}
 	p.setPen( QColor( 0, 64, 192 ) );
 	p.drawRect( x + VALUES_WIDTH, y, w, h );
 
@@ -814,8 +828,8 @@ void automationEditor::removeSelection( void )
 {
 	m_selectStartTact64th = 0;
 	m_selectedTact64th = 0;
-	m_selectStartKey = 0;
-	m_selectedKeys = 0;
+	m_selectStartLevel = 0;
+	m_selectedLevels = 0;
 }
 
 
@@ -1014,7 +1028,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 	if( _me->y() > TOP_MARGIN )
 	{
-		int value = getValue( _me->y() );
+		int level = getLevel( _me->y() );
 
 		int x = _me->x();
 
@@ -1044,7 +1058,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( pos_tact_64th >= it.key() &&
 					len > 0 &&
 					pos_tact_64th <= it.key() + len &&
-					it.data() == value )
+					it.data() == level )
 				{
 					break;
 				}
@@ -1064,7 +1078,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 		
 					midiTime new_time =
 						m_pattern->putValue( value_pos,
-									value );
+									level );
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -1110,8 +1124,8 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				m_selectStartTact64th = pos_tact_64th;
 				m_selectedTact64th = 0;
-				m_selectStartKey = value;
-				m_selectedKeys = 1;
+				m_selectStartLevel = level;
+				m_selectedLevels = 1;
 				m_action = SELECT_VALUES;
 			}
 			else if( _me->button() == Qt::RightButton &&
@@ -1129,7 +1143,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				// save position where move-process began
 				m_moveStartTact64th = pos_tact_64th;
-				m_moveStartKey = value;
+				m_moveStartLevel = level;
 
 				m_action = MOVE_SELECTION;
 
@@ -1174,7 +1188,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 	if( _me->y() > TOP_MARGIN )
 	{
-		int value = getValue( _me->y() );
+		int level = getLevel( _me->y() );
 		int x = _me->x();
 
 		if( _me->x() <= VALUES_WIDTH )
@@ -1212,7 +1226,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				m_pattern->removeValue(
 						midiTime( pos_tact_64th ) );
 				m_pattern->putValue( midiTime( pos_tact_64th ),
-								value );
+								level );
 			}
 
 			eng()->getSongEditor()->setModified();
@@ -1247,7 +1261,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			    		pos_tact_64th <= it.key() +
 							//TODO: Add constant
 							4 &&
-					it.data() == value )
+					it.data() == level )
 				{
 					break;
 				}
@@ -1337,10 +1351,10 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				m_selectedTact64th = -static_cast<int>(
 							m_selectStartTact64th );
 			}
-			m_selectedKeys = value - m_selectStartKey;
-			if( value <= m_selectStartKey )
+			m_selectedLevels = level - m_selectStartLevel;
+			if( level <= m_selectStartLevel )
 			{
-				--m_selectedKeys;
+				--m_selectedLevels;
 			}
 		}
 		else if(
@@ -1386,40 +1400,41 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 
 			// do vertical move-stuff
-			int key_diff = value - m_moveStartKey;
+			int level_diff = level - m_moveStartLevel;
 
-			if( m_selectedKeys > 0 )
+			if( m_selectedLevels > 0 )
 			{
-				if( m_selectStartKey + key_diff < m_min_level )
+				if( m_selectStartLevel + level_diff
+								< m_min_level )
 				{
-					key_diff = m_min_level -
-							m_selectStartKey;
+					level_diff = m_min_level -
+							m_selectStartLevel;
 				}
-				else if( m_selectStartKey + m_selectedKeys +
-							key_diff > m_max_level )
+				else if( m_selectStartLevel + m_selectedLevels +
+						level_diff > m_max_level )
 				{
-					key_diff = m_max_level -
-							m_selectStartKey -
-							m_selectedKeys;
+					level_diff = m_max_level -
+							m_selectStartLevel -
+							m_selectedLevels;
 				}
 			}
 			else
 			{
-				if( m_selectStartKey + m_selectedKeys +
-							key_diff < m_min_level )
+				if( m_selectStartLevel + m_selectedLevels +
+						level_diff < m_min_level )
 				{
-					key_diff = m_min_level -
-							m_selectStartKey -
-							m_selectedKeys;
+					level_diff = m_min_level -
+							m_selectStartLevel -
+							m_selectedLevels;
 				}
-				else if( m_selectStartKey + key_diff >
+				else if( m_selectStartLevel + level_diff >
 								m_max_level )
 				{
-					key_diff = m_max_level -
-							m_selectStartKey;
+					level_diff = m_max_level -
+							m_selectStartLevel;
 				}
 			}
-			m_selectStartKey += key_diff;
+			m_selectStartLevel += level_diff;
 
 
 			timeMap new_selValuesForMove;
@@ -1444,13 +1459,13 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 							value_tact_64th );
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
-						it.data() + key_diff, FALSE )]
-							= it.data() + key_diff;
+						it.data() + level_diff, FALSE )]
+						= it.data() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
 			m_moveStartTact64th = pos_tact_64th;
-			m_moveStartKey = value;
+			m_moveStartLevel = level;
 		}
 	}
 	else
@@ -1504,30 +1519,30 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 							m_selectStartTact64th );
 			}
 
-			int value = getValue( _me->y() );
+			int level = getLevel( _me->y() );
 
-			if( value <= m_bottom_level )
+			if( level <= m_bottom_level )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							height() -
 							SCROLLBAR_SIZE ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
-				value = m_bottom_level;
+				level = m_bottom_level;
 			}
-			else if( value >= m_top_level )
+			else if( level >= m_top_level )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							TOP_MARGIN ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
-				value = m_top_level;
+				level = m_top_level;
 			}
 
-			m_selectedKeys = value - m_selectStartKey;
-			if( value <= m_selectStartKey )
+			m_selectedLevels = level - m_selectStartLevel;
+			if( level <= m_selectStartLevel )
 			{
-				--m_selectedKeys;
+				--m_selectedLevels;
 			}
 		}
 		QApplication::restoreOverrideCursor();
@@ -1686,26 +1701,26 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 
 
 
-int automationEditor::getValue( int _y )
+int automationEditor::getLevel( int _y )
 {
-	int key_line_y = height() - SCROLLBAR_SIZE - 1;
-	// pressed value on time roll
-	int value = m_bottom_level + (int)roundf( m_y_auto ?
-			( m_max_level - m_min_level ) * ( key_line_y - _y )
-					/ (float)( key_line_y - TOP_MARGIN ) :
-			( key_line_y - _y ) / (float)m_y_delta );
+	int level_line_y = height() - SCROLLBAR_SIZE - 1;
+	// pressed level
+	int level = m_bottom_level + (int)roundf( m_y_auto ?
+			( m_max_level - m_min_level ) * ( level_line_y - _y )
+					/ (float)( level_line_y - TOP_MARGIN ) :
+			( level_line_y - _y ) / (float)m_y_delta );
 
 	// some range-checking-stuff
-	if( value < m_bottom_level )
+	if( level < m_bottom_level )
 	{
-		value = m_bottom_level;
+		level = m_bottom_level;
 	}
-	else if( value > m_top_level )
+	else if( level > m_top_level )
 	{
-		value = m_top_level;
+		level = m_top_level;
 	}
 
-	return( value );
+	return( level );
 }
 
 
@@ -1883,22 +1898,23 @@ void automationEditor::selectAll( void )
 		//TODO: Add constant
 		Uint32 len_tact_64th = 4;
 
-		const int key = it.data();
+		const int level = it.data();
 
 		Uint32 pos_tact_64th = it.key();
-		if( key <= m_selectStartKey || first_time )
+		if( level <= m_selectStartLevel || first_time )
 		{
-			// if we move start-key down, we have to add 
-			// the difference between old and new start-key
-			// to m_selectedKeys, otherwise the selection
+			// if we move start-level down, we have to add 
+			// the difference between old and new start-level
+			// to m_selectedLevels, otherwise the selection
 			// is just moved down...
-			int diff = m_selectStartKey - ( key - 1 );
-			m_selectStartKey = key - 1;
-			m_selectedKeys += diff;
+			int diff = m_selectStartLevel - ( level - 1 );
+			m_selectStartLevel = level - 1;
+			m_selectedLevels += diff;
 		}
-		if( key >= m_selectedKeys+m_selectStartKey || first_time )
+		if( level >= m_selectedLevels + m_selectStartLevel
+								|| first_time )
 		{
-			m_selectedKeys = key - m_selectStartKey;
+			m_selectedLevels = level - m_selectStartLevel;
 		}
 		if( pos_tact_64th < m_selectStartTact64th || first_time )
 		{
@@ -1933,11 +1949,11 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int sel_key_start = m_selectStartKey;
-	int sel_key_end = sel_key_start + m_selectedKeys;
-	if( sel_key_start > sel_key_end )
+	int sel_level_start = m_selectStartLevel;
+	int sel_level_end = sel_level_start + m_selectedLevels;
+	if( sel_level_start > sel_level_end )
 	{
-		qSwap<int>( sel_key_start, sel_key_end );
+		qSwap<int>( sel_level_start, sel_level_end );
 	}
 
 	timeMap & time_map = m_pattern->getTimeMap();
@@ -1948,14 +1964,14 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		//TODO: Add constant
 		Sint32 len_tact_64th = 4;
 
-		int key = it.data();
+		int level = it.data();
 		Sint32 pos_tact_64th = it.key();
 
-		if( key > sel_key_start && key <= sel_key_end &&
+		if( level > sel_level_start && level <= sel_level_end &&
 				pos_tact_64th >= sel_pos_start &&
 				pos_tact_64th+len_tact_64th <= sel_pos_end )
 		{
-			_selected_values[it.key()] = it.data();
+			_selected_values[it.key()] = level;
 		}
 	}
 }
