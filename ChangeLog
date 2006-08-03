@@ -1,3 +1,13 @@
+2006-08-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/core/automation_editor.cpp:
+	- fixed vertical bars in Auto view
+	- fixed selection frame drawing
+	- renamed some members and variables
+
+	* include/automation_editor.h:
+	renamed some members
+
 2006-08-01	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/automation_editor.h:
