@@ -1,3 +1,23 @@
+2006-08-06	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/engine.h:
+	* include/midi_time.h:
+	* src/core/engine.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/sample_track.cpp:
+	frames computation based on 64th of a tact, fixes BB-pattern arbitrary
+	positioning in song editor
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	- frames computation based on 64th of a tact
+	- changed playPos frame counter to float, improves timing precision
+
+	* src/tracks/instrument_track.cpp:
+	- frames computation based on 64th of a tact
+	- simplified note playing
+
 2006-08-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/core/automation_editor.cpp:
