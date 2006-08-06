@@ -28,7 +28,6 @@
 #define _SONG_EDITOR_H
 
 #include "track_container.h"
-#include "types.h"
 #include "tool_button.h"
 
 
@@ -71,14 +70,14 @@ public:
 			midiTime( _abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( TRUE ),
-			m_currentFrame( 0 )
+			m_currentFrame( 0.0f )
 		{
 		}
-		inline void setCurrentFrame( const f_cnt_t _f )
+		inline void setCurrentFrame( const float _f )
 		{
 			m_currentFrame = _f;
 		}
-		inline f_cnt_t currentFrame( void ) const
+		inline float currentFrame( void ) const
 		{
 			return( m_currentFrame );
 		}
@@ -86,7 +85,7 @@ public:
 		bool m_timeLineUpdate;
 
 	private:
-		f_cnt_t m_currentFrame;
+		float m_currentFrame;
 	} ;
 
 
@@ -310,7 +309,7 @@ private:
 
 
 private slots:
-	void updateFramesPerTact( void );
+	void updateFramesPerTact64th( void );
 
 
 signals:

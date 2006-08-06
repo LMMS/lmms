@@ -205,7 +205,7 @@ songEditor::songEditor( engine * _engine ) :
 	eng()->getMainWindow()->addSpacingToToolBar( 10 );
 
 	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ), this,
-						SLOT( updateFramesPerTact() ) );
+					SLOT( updateFramesPerTact64th() ) );
 
 
 
@@ -758,7 +758,7 @@ void songEditor::setTempo( int _new_bpm )
 	m_bpmSpinBox->setInitValue(
 				tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
 	setModified();
-	eng()->updateFramesPerTact();
+	eng()->updateFramesPerTact64th();
 	emit tempoChanged( _new_bpm );
 }
 
@@ -980,72 +980,87 @@ void songEditor::processNextBuffer( void )
 	}
 
 	f_cnt_t total_frames_played = 0;
-	f_cnt_t frames_per_tact = static_cast<f_cnt_t>(
-						eng()->framesPerTact() );
-	if( m_playPos[m_playMode].currentFrame() == 0 &&
-		m_playPos[m_playMode].getTact64th() > 0 )
-	{
-		m_playPos[m_playMode].setCurrentFrame(
-					m_playPos[m_playMode].getTact64th() *
-							frames_per_tact / 64 );
-	}
+	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	while( total_frames_played < eng()->getMixer()->framesPerAudioBuffer() )
 	{
-		f_cnt_t played_frames = eng()->getMixer()->framesPerAudioBuffer() -
-							total_frames_played;
+		f_cnt_t played_frames = eng()->getMixer()
+				->framesPerAudioBuffer() - total_frames_played;
 
-		// did we play a whole tact?
-		if( m_playPos[m_playMode].currentFrame() >= frames_per_tact )
+		float current_frame = m_playPos[m_playMode].currentFrame();
+		// did we play a 64th of a tact?
+		if( current_frame >= frames_per_tact64th )
 		{
-			// per default we just continue playing even if
-			// there's no more stuff to play (song-play-mode)
-			int max_tact = m_playPos[m_playMode].getTact() + 2;
-
-			// then decide whether to go over to next tact or to 
-			// loop back to first tact
-			if( m_playMode == PLAY_BB )
+			int tact64th = m_playPos[m_playMode].getTact64th()
+				+ (int)( current_frame / frames_per_tact64th );
+			// did we play a whole tact?
+			if( tact64th >= 64 )
 			{
-				max_tact =
-					eng()->getBBEditor()->lengthOfCurrentBB();
-			}
-			else if( m_playMode == PLAY_PATTERN &&
+				// per default we just continue playing even if
+				// there's no more stuff to play
+				// (song-play-mode)
+				int max_tact = m_playPos[m_playMode].getTact()
+									+ 2;
+
+				// then decide whether to go over to next tact
+				// or to loop back to first tact
+				if( m_playMode == PLAY_BB )
+				{
+					max_tact = eng()->getBBEditor()
+							->lengthOfCurrentBB();
+				}
+				else if( m_playMode == PLAY_PATTERN &&
 					m_loopPattern == TRUE &&
 					tl != NULL &&
 					tl->loopPointsEnabled() == FALSE )
-			{
-				max_tact = m_patternToPlay->length().getTact();
+				{
+					max_tact = m_patternToPlay->length()
+								.getTact();
+				}
+				if( m_playPos[m_playMode].getTact() + 1
+								< max_tact )
+				{
+					// next tact
+					m_playPos[m_playMode].setTact(
+						m_playPos[m_playMode].getTact()
+									+ 1 );
+				}
+				else
+				{
+					// first tact
+					m_playPos[m_playMode].setTact( 0 );
+				}
 			}
-			if( m_playPos[m_playMode].getTact() + 1 < max_tact )
-			{
-				// next tact
-				m_playPos[m_playMode].setTact(
-					m_playPos[m_playMode].getTact() + 1 );
-			}
-			else
-			{
-				// first tact
-				m_playPos[m_playMode].setTact( 0 );
-			}
-			m_playPos[m_playMode].setCurrentFrame( 0 );
+			m_playPos[m_playMode].setTact64th( tact64th % 64 );
+			current_frame = fmodf( current_frame,
+							frames_per_tact64th );
+			m_playPos[m_playMode].setCurrentFrame( current_frame );
 		}
-		// or do we have some samples left in this tact but this are 
-		// less then samples we have to play?
-		else if( frames_per_tact - m_playPos[m_playMode].currentFrame()
-				< eng()->getMixer()->framesPerAudioBuffer() )
+
+		f_cnt_t last_frames = (f_cnt_t)frames_per_tact64th
+						- (f_cnt_t)current_frame;
+		// skip last frame fraction
+		if( last_frames == 0 )
 		{
-			// then set played_samples to remaining samples, the 
+			++total_frames_played;
+			m_playPos[m_playMode].setCurrentFrame( current_frame
+								+ 1.0f );
+			continue;
+		}
+		// do we have some samples left in this tact64th but this are
+		// less then samples we have to play?
+		if( last_frames < played_frames )
+		{
+			// then set played_samples to remaining samples, the
 			// rest will be played in next loop
-			played_frames = frames_per_tact -
-					m_playPos[m_playMode].currentFrame();
+			played_frames = last_frames;
 		}
 
 		if( m_playMode == PLAY_SONG )
 		{
 			m_automation_track->play( m_playPos[m_playMode],
-					m_playPos[m_playMode].currentFrame(),
-					played_frames, total_frames_played,
-					tco_num );
+					(f_cnt_t)current_frame, played_frames,
+					total_frames_played, tco_num );
 		}
 
 		// loop through all tracks and play them if they're not muted
@@ -1055,19 +1070,15 @@ void songEditor::processNextBuffer( void )
 			if( ( *it )->muted() == FALSE )
 			{
 				( *it )->play( m_playPos[m_playMode],
-					m_playPos[m_playMode].currentFrame(),
-					played_frames, total_frames_played,
-					tco_num );
+					(f_cnt_t)current_frame, played_frames,
+					total_frames_played, tco_num );
 			}
 		}
 
 		// update frame-counters
 		total_frames_played += played_frames;
 		m_playPos[m_playMode].setCurrentFrame( played_frames +
-					m_playPos[m_playMode].currentFrame() );
-		m_playPos[m_playMode].setTact64th(
-					( m_playPos[m_playMode].currentFrame() *
-						64 / frames_per_tact) % 64 );
+								current_frame );
 	}
 
 	if( m_exporting == FALSE )
@@ -1179,8 +1190,7 @@ void songEditor::setPlayPos( tact _tact_num, tact64th _t_64th, playModes
 {
 	m_playPos[_play_mode].setTact( _tact_num );
 	m_playPos[_play_mode].setTact64th( _t_64th );
-	m_playPos[_play_mode].setCurrentFrame( static_cast<f_cnt_t>(
-				_t_64th * eng()->framesPerTact() / 64.0f ) );
+	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 	if( _play_mode == m_playMode )
 	{
 		updateTimeLinePosition();
@@ -1769,9 +1779,9 @@ void songEditor::exportProject( void )
 
 
 
-void songEditor::updateFramesPerTact( void )
+void songEditor::updateFramesPerTact64th( void )
 {
-	eng()->updateFramesPerTact();
+	eng()->updateFramesPerTact64th();
 }
 
 
