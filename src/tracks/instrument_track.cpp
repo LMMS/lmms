@@ -631,7 +631,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					// create (timed) note-play-handle
 					notePlayHandle * nph = new
 						notePlayHandle( this,
-					_time.frames( eng()->framesPerTact() ),
+							_time.frames(
+						eng()->framesPerTact64th() ),
 						valueRanges<f_cnt_t>::max, n );
 					if( eng()->getMixer()->addPlayHandle(
 									nph ) )
@@ -653,8 +654,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// recording notes into a pattern
 				note done_note( NULL,
 					midiTime( static_cast<f_cnt_t>(
-						n->totalFramesPlayed() * 64 /
-						eng()->framesPerTact() ) ),
+						n->totalFramesPlayed() /
+						eng()->framesPerTact64th() ) ),
 					0, n->tone(), n->octave(),
 					n->getVolume(), n->getPanning() );
 				n->noteOff();
@@ -755,8 +756,8 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	if( m_notes[_n->key()] == _n )
 	{
 		note done_note( NULL, midiTime( static_cast<f_cnt_t>(
-						_n->totalFramesPlayed() * 64 /
-						eng()->framesPerTact() ) ),
+						_n->totalFramesPlayed() /
+						eng()->framesPerTact64th() ) ),
 					0, _n->tone(), _n->octave(),
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
@@ -892,9 +893,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		emit sentMidiTime( _start );
 	}
 
-	// calculate samples per tact; need that later when calculating
-	// sample-pos of a note
-	float frames_per_tact = eng()->framesPerTact();
+	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
 	if( _tco_num >= 0 )
@@ -903,9 +902,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	}
 	else
 	{
-		getTCOsInRange( tcos, _start, _start +
-				static_cast<Sint32>( _frames * 64 /
-							frames_per_tact ) );
+		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
+					_frames / frames_per_tact64th ) );
 	}
 	
 	if ( tcos.size() == 0 )
@@ -914,9 +912,6 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	}
 
 	bool played_a_note = FALSE;	// will be return variable
-
-	// calculate the end of the current sample-frame
-	const f_cnt_t end_frame = _start_frame+_frames-1;
 
 	for( vlist<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
@@ -927,10 +922,11 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		{
 			continue;
 		}
-		midiTime cur_start = _start.getTact() * 64 -
-					( ( _tco_num < 0 ) ?
-						p->startPosition() :
-							midiTime( 0 ) );
+		midiTime cur_start = _start;
+		if( _tco_num < 0 )
+		{
+			cur_start -= p->startPosition();
+		}
 		if( p->frozen() &&
 				eng()->getSongEditor()->exporting() == FALSE )
 		{
@@ -944,19 +940,19 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
 								_frames );
 
-			p->playFrozenData( buf, _start_frame +
-						static_cast<f_cnt_t>(
-							cur_start.getTact() *
-							frames_per_tact ),
+			p->playFrozenData( buf, _start_frame + cur_start.frames(
+							frames_per_tact64th ),
 						_frames );
 			eng()->getMixer()->bufferToPort( buf, _frames,
-								_frame_base +
-				static_cast<f_cnt_t>(
-					p->startPosition().getTact64th() *
-							frames_per_tact /
-								64.0f ),
-							v, m_audioPort );
+								_frame_base, v,
+								m_audioPort );
 			bufferAllocator::free( buf );
+			continue;
+		}
+
+		// all notes start at 0
+		if( _start_frame > 0 )
+		{
 			continue;
 		}
 
@@ -978,28 +974,15 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			}
 		}
 
-		// skip notes before sample-frame
-		while( it != notes.end() &&
-			( *it )->pos( cur_start ).frames( frames_per_tact ) <
-								_start_frame )
-		{
-			++it;
-		}
-
 		note * cur_note;
 		while( it != notes.end() &&
-			( ( cur_note = *it )->pos( cur_start ).frames(
-					frames_per_tact ) ) <= end_frame )
+					( cur_note = *it )->pos() == cur_start )
 		{
 			if( cur_note->length() != 0 )
 			{
-				const f_cnt_t frames_ahead = _frame_base -
-								_start_frame +
-			cur_note->pos( cur_start ).frames( frames_per_tact );
-
 				const f_cnt_t note_frames =
 					cur_note->length().frames(
-							frames_per_tact );
+							frames_per_tact64th );
 
 /*				// generate according MIDI-events
 				processOutEvent( midiEvent( NOTE_ON,
@@ -1008,20 +991,21 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 							cur_note->getVolume() *
 								128 / 100 ),
 						midiTime::fromFrames(
-							frames_ahead,
-							frames_per_tact ) );
+							_frame_base,
+							frames_per_tact64th ) );
 
 				processOutEvent( midiEvent( NOTE_OFF,
 						m_midiPort->outputChannel(),
 							cur_note->key(), 0 ),
 						midiTime::fromFrames(
-							frames_ahead +
+							_frame_base +
 								note_frames,
-							frames_per_tact ) );*/
+							frames_per_tact64th ) );
+*/
 
 				notePlayHandle * note_play_handle =
 					new notePlayHandle( this,
-								frames_ahead,
+								_frame_base,
 								note_frames,
 								*cur_note );
 				note_play_handle->play();
