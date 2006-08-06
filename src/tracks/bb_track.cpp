@@ -384,8 +384,8 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 	}
 
 	vlist<trackContentObject *> tcos;
-	getTCOsInRange( tcos, _start, _start +static_cast<Sint32>( _frames *
-						64 / eng()->framesPerTact() ) );
+	getTCOsInRange( tcos, _start, _start + static_cast<Sint32>( _frames /
+						eng()->framesPerTact64th() ) );
 	
 	if ( tcos.size() == 0 )
 	{

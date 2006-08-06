@@ -105,16 +105,16 @@ public:
 
 	void close( void );
 
-	float framesPerTact( void ) const
+	float framesPerTact64th( void ) const
 	{
-		return( m_frames_per_tact );
+		return( m_frames_per_tact64th );
 	}
-	void updateFramesPerTact( void );
+	void updateFramesPerTact64th( void );
 
 
 private:
 	bool m_hasGUI;
-	float m_frames_per_tact;
+	float m_frames_per_tact64th;
 
 	mixer * m_mixer;
 	mainWindow * m_mainWindow;

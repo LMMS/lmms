@@ -106,10 +106,10 @@ void engine::close( void )
 
 
 
-void engine::updateFramesPerTact( void )
+void engine::updateFramesPerTact64th( void )
 {
-	m_frames_per_tact = m_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
-						/ m_songEditor->getTempo();
+	m_frames_per_tact64th = m_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
+					/ 64.0f / m_songEditor->getTempo();
 }
 
 

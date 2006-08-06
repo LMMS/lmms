@@ -107,24 +107,21 @@ public:
 	}
 
 	// calculate number of frame that are needed this time
-	inline f_cnt_t frames( const float _frames_per_tact ) const
+	inline f_cnt_t frames( const float _frames_per_tact64th ) const
 	{
 		if( m_tact >= 0 )
 		{
-			return( static_cast<f_cnt_t>( m_tact *
-							_frames_per_tact +
-							m_tact64th *
-							_frames_per_tact /
-							64.0f ) );
+			return( static_cast<f_cnt_t>( ( m_tact * 64
+				+ m_tact64th ) * _frames_per_tact64th ) );
 		}
 		return( 0 );
 	}
 
 	static inline midiTime fromFrames( const f_cnt_t _frames,
-						const float _frames_per_tact )
+					const float _frames_per_tact64th )
 	{
-		return( midiTime( static_cast<Sint32>( _frames * 64.0f /
-							_frames_per_tact ) ) );
+		return( midiTime( static_cast<Sint32>( _frames /
+						_frames_per_tact64th ) ) );
 	}
 
 

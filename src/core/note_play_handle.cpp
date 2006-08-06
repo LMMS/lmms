@@ -88,8 +88,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 				(Uint16) ( ( getVolume() / 100.0f ) *
 				( m_instrumentTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
-			midiTime::fromFrames( m_framesAhead,
-				m_instrumentTrack->eng()->framesPerTact() ) );
+			midiTime::fromFrames( m_framesAhead, m_instrumentTrack
+					->eng()->framesPerTact64th() ) );
 }
 
 
@@ -277,9 +277,9 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 		m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_instrumentTrack->m_midiPort->outputChannel(),
 								key(), 0 ),
-						midiTime::fromFrames(
-							m_framesBeforeRelease,
-				m_instrumentTrack->eng()->framesPerTact() ) );
+			midiTime::fromFrames( m_framesBeforeRelease,
+					m_instrumentTrack->eng()
+						->framesPerTact64th() ) );
 	}
 	else
 	{
