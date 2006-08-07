@@ -90,6 +90,7 @@ private:
 
 signals:
 	void valueChanged( int );
+	void manualChange( void );
 
 } ;
 
