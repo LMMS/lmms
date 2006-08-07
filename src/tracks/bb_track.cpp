@@ -375,6 +375,8 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
+	sendMidiTime( _start );
+
 	if( _tco_num >= 0 )
 	{
 		return( eng()->getBBEditor()->play( _start, _start_frame,
