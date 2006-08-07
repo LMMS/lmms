@@ -597,14 +597,15 @@ void vibed::playNote( notePlayHandle * _n )
 		{
 			if( ps->exists( string ) )
 			{
+				// pan: 0 -> left, 1 -> right
 				const float pan = ( 
 					m_panKnobs[string]->value() + 1 ) /
 									2.0f;
 				const sample_t sample = ps->getStringSample(
 									s ) *
 					m_volumeKnobs[string]->value() / 100.0f;
-				buf[i][0] += pan * sample;
-				buf[i][1] += ( 1.0f - pan ) * sample;
+				buf[i][0] += ( 1.0f - pan ) * sample;
+				buf[i][1] += pan * sample;
 				s++;
 			}
 		}
