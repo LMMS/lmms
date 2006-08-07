@@ -189,7 +189,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
-								eng(), NULL );
+							eng(), _channel_track );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
 	m_startKnob->setInitValue( 0.0f );
@@ -209,7 +209,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"than the sample between start- and end-point." ) );
 
 	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng(),
-									NULL );
+							_channel_track );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
 	m_endKnob->setInitValue( 1.0f );
