@@ -113,6 +113,7 @@ void lcdSpinBox::setStep( const int _step )
 
 void lcdSpinBox::setValue( const int _value )
 {
+	const int prev_value = value();
 	autoObj::setValue( _value );
 	QString s = m_textForValue[value()];
 	if( s == "" )
@@ -124,6 +125,11 @@ void lcdSpinBox::setValue( const int _value )
 		}
 	}
 	m_number->display( s );
+
+	if( prev_value != value() )
+	{
+		emit valueChanged( value() );
+	}
 }
 
 
@@ -231,10 +237,8 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
 		{
-			setJournalling( FALSE );// why is this neccessary?!
 			setInitValue( value() - dy / 2 * step() );
-			emit valueChanged( value() );
-			setJournalling( TRUE );
+			emit manualChange();
 			QCursor::setPos( m_origMousePos );
 		}
 	}
@@ -258,7 +262,7 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	setInitValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * step() );
-	emit valueChanged( value() );
+	emit manualChange();
 }
 
 
