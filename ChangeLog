@@ -1,3 +1,36 @@
+2006-08-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/lcd_spinbox.h:
+	added manualChange signal
+
+	* src/widgets/lcd_spinbox.cpp:
+	- added manualChange signal
+	- emit valueChanged whenever value is changed
+	- removed redundant journalling operations
+
+	* src/core/song_editor.cpp:
+	- set modified flag if there's a manual BPM change
+	- set tempo if BPM value has changed
+	- allow further processing on muted tracks
+
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	added bbTrack reference to check whether it's muted
+
+	* src/tracks/bb_track.cpp:
+	send automation events
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	fixed overflow when using big audio buffers
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	use automation in start-/end-point knobs
+
+	* plugins/vibed/vibed.cpp:
+	fixed reversed pan
+
 2006-08-06	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/engine.h:
