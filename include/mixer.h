@@ -267,7 +267,7 @@ public:
 	// audio-buffer-mgm
 	void FASTCALL bufferToPort( const sampleFrame * _buf,
 					const fpab_t _frames,
-					const fpab_t _framesAhead,
+					const f_cnt_t _framesAhead,
 					const volumeVector & _volumeVector,
 							audioPort * _port );
 

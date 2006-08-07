@@ -352,7 +352,7 @@ void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 
 void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 					const fpab_t _frames,
-					const fpab_t _frames_ahead,
+					const f_cnt_t _frames_ahead,
 					const volumeVector & _volume_vector,
 						audioPort * _port )
 {
