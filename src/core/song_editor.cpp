@@ -165,6 +165,8 @@ songEditor::songEditor( engine * _engine ) :
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setTempo( int ) ) );
+	connect( m_bpmSpinBox, SIGNAL( manualChange() ), this,
+						SLOT( setModified() ) );
 	toolTip::add( m_bpmSpinBox, tr( "tempo of song" ) );
 
 #ifdef QT4
@@ -755,9 +757,7 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 void songEditor::setTempo( int _new_bpm )
 {
-	m_bpmSpinBox->setInitValue(
-				tLimit<bpm_t>( _new_bpm, MIN_BPM, MAX_BPM ) );
-	setModified();
+	m_bpmSpinBox->setInitValue( _new_bpm );
 	eng()->updateFramesPerTact64th();
 	emit tempoChanged( _new_bpm );
 }
@@ -1063,16 +1063,13 @@ void songEditor::processNextBuffer( void )
 					total_frames_played, tco_num );
 		}
 
-		// loop through all tracks and play them if they're not muted
+		// loop through all tracks and play them
 		for( trackVector::iterator it = tv.begin(); it != tv.end();
 									++it )
 		{
-			if( ( *it )->muted() == FALSE )
-			{
-				( *it )->play( m_playPos[m_playMode],
+			( *it )->play( m_playPos[m_playMode],
 					(f_cnt_t)current_frame, played_frames,
 					total_frames_played, tco_num );
-			}
 		}
 
 		// update frame-counters
@@ -1470,7 +1467,7 @@ void songEditor::createNewProject( void )
 	track::create( track::BB_TRACK, this );
 
 	m_loadingProject = TRUE;
-	setTempo( DEFAULT_BPM );
+	m_bpmSpinBox->setInitValue( DEFAULT_BPM );
 	m_masterVolumeSlider->setInitValue( 100 );
 	m_masterPitchSlider->setInitValue( 0 );
 	m_loadingProject = FALSE;
@@ -1530,8 +1527,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 			if( node.nodeName() == "bpm" &&
 		node.toElement().attribute( "value" ).toInt() > 0 )
 			{
-				setTempo( node.toElement().attribute( "value"
-								).toInt() );
+				m_bpmSpinBox->setInitValue( node.toElement()
+						.attribute( "value" ).toInt() );
 			}
 			else if( node.nodeName() == "mastervol" )
 			{
