@@ -544,7 +544,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 							notePlayHandle * _n )
 {
 	// we must not play the sound if this instrumentTrack is muted...
-	if( muted() )
+	if( muted() || ( _n && _n->bbTrackMuted() ) )
 	{
 		return;
 	}
@@ -896,14 +896,17 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
+	bbTrack * bb_track;
 	if( _tco_num >= 0 )
 	{
 		tcos.push_back( getTCO( _tco_num ) );
+		bb_track = bbTrack::findBBTrack( _tco_num, eng() );
 	}
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
 					_frames / frames_per_tact64th ) );
+		bb_track = NULL;
 	}
 	
 	if ( tcos.size() == 0 )
@@ -930,6 +933,10 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		if( p->frozen() &&
 				eng()->getSongEditor()->exporting() == FALSE )
 		{
+			if( bb_track && bb_track->muted() )
+			{
+				continue;
+			}
 			volumeVector v = m_surroundArea->getVolumeVector(
 									1.0f );
 			// volume-vector was already used when freezing
@@ -1008,6 +1015,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 								_frame_base,
 								note_frames,
 								*cur_note );
+				note_play_handle->setBBTrack( bb_track );
 				note_play_handle->play();
 				// could we play all within current number of
 				// frames per audio-buffer?

@@ -31,6 +31,7 @@
 
 #include "play_handle.h"
 #include "basic_filters.h"
+#include "bb_track.h"
 #include "note.h"
 
 
@@ -171,6 +172,15 @@ public:
 	// return whether given note-play-handle is equal to *this
 	bool operator==( const notePlayHandle & _nph ) const;
 
+	bool bbTrackMuted( void )
+	{
+		return( m_bbTrack && m_bbTrack->muted() );
+	}
+	void setBBTrack( bbTrack * _bb_track )
+	{
+		m_bbTrack = _bb_track;
+	}
+
 
 private:
 	instrumentTrack * m_instrumentTrack;	// needed for calling
@@ -195,6 +205,7 @@ private:
 					// an arpeggio (either base-note or
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
+	bbTrack * m_bbTrack;		// related BB track
 
 
 private slots:

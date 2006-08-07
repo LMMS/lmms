@@ -57,7 +57,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_released( FALSE ),
 	m_baseNote( TRUE  ),
 	m_arpNote( _arp_note ),
-	m_muted( FALSE )
+	m_muted( FALSE ),
+	m_bbTrack( NULL )
 {
 	setDetuning( _n.detuning() );
 	if( detuning() )
