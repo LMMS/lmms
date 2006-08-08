@@ -36,7 +36,6 @@
 #include "journalling_object.h"
 #include "led_checkbox.h"
 #include "instrument_track.h"
-#include "embossed_font_label.h"
 #include "effect.h"
 #include "ladspa_control_dialog.h"
 

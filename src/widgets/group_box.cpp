@@ -129,9 +129,7 @@ void groupBox::setState( bool _on, bool _anim )
 		m_animating = TRUE;
 		animate();
 	}
-#ifdef LADSPA_SUPPORT
 	emit( toggled( _on ) );
-#endif
 }
 
 

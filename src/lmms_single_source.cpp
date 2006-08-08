@@ -77,7 +77,6 @@
 #include "src/widgets/project_notes.cpp"
 #include "src/widgets/led_checkbox.cpp"
 #include "src/widgets/knob.cpp"
-#include "src/widgets/labeled_knob.cpp"
 #include "src/widgets/pixmap_button.cpp"
 #include "src/widgets/qxembed.cpp"
 #include "src/widgets/group_box.cpp"
@@ -102,6 +101,5 @@
 #include "src/widgets/volume_knob.cpp"
 #include "src/widgets/rack_plugin.cpp"
 #include "src/widgets/rack_view.cpp"
-#include "src/widgets/labeled_knob.cpp"
 #include "src/widgets/ladspa_control.cpp"
 #endif

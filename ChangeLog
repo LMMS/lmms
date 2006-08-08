@@ -5,6 +5,7 @@
 	clean up some things that were preventing the getNextSample
 	methods from being inlined
 
+	* configure
 	* configure.in:
 	-made ladspa support default off
 	-must pass --with-ladspa to get it to build

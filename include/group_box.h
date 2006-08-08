@@ -39,7 +39,6 @@
 #endif
 
 #include "pixmap_button.h"
-#include "ladspa_manager.h"
 
 
 class QPixmap;
@@ -63,10 +62,8 @@ public slots:
 	void setState( bool _on, bool _anim = FALSE );
 	void animate( void );
 
-#ifdef LADSPA_SUPPORT
 signals:
 	void toggled( bool _state );
-#endif
 
 protected:
 	virtual void resizeEvent( QResizeEvent * _re );
