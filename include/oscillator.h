@@ -185,10 +185,10 @@ private:
 
 	float syncInit( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl );
-	bool syncOk( float _osc_coeff );
+	inline bool syncOk( float _osc_coeff );
 
-	sample_t getSample( const float _sample );
-	void FASTCALL recalcPhase( void );
+	inline sample_t getSample( const float _sample );
+	inline void FASTCALL recalcPhase( void );
 
 } ;
 

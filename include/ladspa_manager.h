@@ -58,82 +58,107 @@
 
 
 #include "types.h"
+#include "qt3support.h"
 
+class engine;
 
-typedef QPair<QString, QString> ladspaKey;
+const float NOHINT = -99342.2243f;
+
+typedef QPair<QString, QString> ladspa_key_t;
+typedef QPair<QString, ladspa_key_t> sortable_plugin_t;
+typedef vlist<sortable_plugin_t> l_sortable_plugin_t;
+typedef vlist<ladspa_key_t> l_ladspa_key_t;
 
 /* ladspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
 it loads all of the plug-ins found in the LADSPA_PATH environmental variable
 and stores their access descriptors according in a dictionary keyed on
 the filename the plug-in was loaded from and the label of the plug-in.
 
-The can be retrieved by using ladspaKey.  For example, to get the 
+The can be retrieved by using ladspa_key_t.  For example, to get the 
 "Phase Modulated Voice" plug-in from the cmt library, you would perform the
 calls using:
 
-	ladspaKey( "cmt.so", "phasemod" )
+	ladspa_key_t key( "cmt.so", "phasemod" )
 	
 as the plug-in key. */
+
+enum pluginType
+{
+	SOURCE,
+	TRANSFER,
+	VALID,
+	INVALID,
+	SINK,
+	OTHER
+};
+
+typedef struct ladspaManagerStorage
+{
+	LADSPA_Descriptor_Function descriptorFunction;
+	Uint32 index;
+	pluginType type;
+	Uint16 inputChannels;
+	Uint16 outputChannels;
+} ladspaManagerDescription;
+
 
 class ladspaManager
 {
 public:
-	/* Provides access to the single instance of the class. */
-	static inline ladspaManager * inst( void )
-	{
-		if( s_instanceOfMe == NULL )
-		{
-			s_instanceOfMe = new ladspaManager();
-		}
-		return( s_instanceOfMe );
-	}
+	
+	ladspaManager( engine * _engine );
+	~ladspaManager();
 
+	l_sortable_plugin_t getSortedPlugins();
+	ladspaManagerDescription * getDescription( const ladspa_key_t & 
+								_plugin );
+	
 	/* This identifier can be used as a unique, case-sensitive
 	identifier for the plugin type within the plugin file. Plugin
 	types should be identified by file and label rather than by index
 	or plugin name, which may be changed in new plugin
 	versions. Labels must not contain white-space characters. */
-	QString FASTCALL getLabel( const ladspaKey & _plugin );
+	QString FASTCALL getLabel( const ladspa_key_t & _plugin );
 
 	/* Indicates that the plugin has a real-time dependency
 	(e.g. listens to a MIDI device) and so its output must not
 	be cached or subject to significant latency. */
-	bool FASTCALL hasRealTimeDependency( const ladspaKey & _plugin );
+	bool FASTCALL hasRealTimeDependency( const ladspa_key_t & _plugin );
 
 	/* Indicates that the plugin may cease to work correctly if the 
 	host elects to use the same data location for both input and output
 	(see connectPort). */
-	bool FASTCALL isInplaceBroken( const ladspaKey & _plugin );
+	bool FASTCALL isInplaceBroken( const ladspa_key_t & _plugin );
 
 	/* Indicates that the plugin is capable of running not only in a
 	conventional host but also in a 'hard real-time' environment. */
-	bool FASTCALL isRealTimeCapable( const ladspaKey & _plugin );
+	bool FASTCALL isRealTimeCapable( const ladspa_key_t & _plugin );
 
 	/* Returns the name of the plug-in */
-	QString FASTCALL getName( const ladspaKey & _plugin );
+	QString FASTCALL getName( const ladspa_key_t & _plugin );
 
 	/* Returns the the plug-in's author */
-	QString FASTCALL getMaker( const ladspaKey & _plugin );
+	QString FASTCALL getMaker( const ladspa_key_t & _plugin );
 
 	/* Returns the copyright for the plug-in */
-	QString FASTCALL getCopyright( const ladspaKey & _plugin );
+	QString FASTCALL getCopyright( const ladspa_key_t & _plugin );
 
   	/* This indicates the number of ports (input AND output) present on
 	the plugin. */
-	Uint32 FASTCALL getPortCount( const ladspaKey & _plugin );
+	Uint32 FASTCALL getPortCount( const ladspa_key_t & _plugin );
 
 
 	/* Indicates that the port is an input. */
-	bool FASTCALL isPortInput( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isPortInput( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates that the port is an output. */
-	bool FASTCALL isPortOutput( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isPortOutput( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates that the port is an audio. */
-	bool FASTCALL isPortAudio( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isPortAudio( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates that the port is an control. */
-	bool FASTCALL isPortControl( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isPortControl( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates that any bounds specified should be interpreted as 
 	multiples of the sample rate. For instance, a frequency range from 
@@ -141,44 +166,44 @@ public:
 	by this hint in conjunction with LowerBound = 0 and UpperBound = 0.5. 
 	Hosts that support bounds at all must support this hint to retain
 	meaning. */
-	bool FASTCALL areHintsSampleRateDependent( const ladspaKey & _plugin, 
+	bool FASTCALL areHintsSampleRateDependent( const ladspa_key_t & _plugin, 
 								Uint32 _port );
 
   	/* Returns the lower boundary value for the given port. If
 	no lower bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
-	float FASTCALL getLowerBound( const ladspaKey & _plugin, Uint32 _port );
+	float FASTCALL getLowerBound( const ladspa_key_t & _plugin, Uint32 _port );
 
   	/* Returns the upper boundary value for the given port. If
 	no upper bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
-	float FASTCALL getUpperBound( const ladspaKey & _plugin, Uint32 _port );
+	float FASTCALL getUpperBound( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates whether the given port should be considered 0 or 1
 	boolean switch. */
-	bool FASTCALL isPortToggled( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isPortToggled( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Retrieves any default setting hints offered by the plug-in for
 	the given port. */
-	float FASTCALL getDefaultSetting( const ladspaKey & _plugin, 
+	float FASTCALL getDefaultSetting( const ladspa_key_t & _plugin, 
 								Uint32 _port );
 
 	/* Indicates that it is likely that the user will find it more
 	intuitive to view values using a logarithmic scale. This is
 	particularly useful for frequencies and gains. */
-	bool FASTCALL isLogarithmic( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isLogarithmic( const ladspa_key_t & _plugin, Uint32 _port );
 
 	/* Indicates that a user interface would probably wish to provide a 
 	stepped control taking only integer values. Any bounds set should be 
 	slightly wider than the actual integer range required to avoid floating
 	point rounding errors. For instance, the integer set {0,1,2,3} might 
 	be described as [-0.1, 3.1]. */
-	bool FASTCALL isInteger( const ladspaKey & _plugin, Uint32 _port );
+	bool FASTCALL isInteger( const ladspa_key_t & _plugin, Uint32 _port );
 	
 	/* Returns the name of the port. */
-	QString FASTCALL getPortName( const ladspaKey & _plugin, Uint32 _port );
+	QString FASTCALL getPortName( const ladspa_key_t & _plugin, Uint32 _port );
 	
 	
 	/* This may be used by the plugin developer to pass any custom
@@ -187,13 +212,13 @@ public:
 	writers will not use this facility as LADSPA_Handle should be
 	used to hold instance data. */
 	const void * FASTCALL getImplementationData(
-						const ladspaKey & _plugin );
+						const ladspa_key_t & _plugin );
 	
 	
 	/* Returns a pointer to the plug-in's descriptor from which control
 	of the plug-in is accessible */
 	const LADSPA_Descriptor * FASTCALL getDescriptor(
-						const ladspaKey & _plugin );
+						const ladspa_key_t & _plugin );
 	
 	
 	/* The following methods are convenience functions for use during
@@ -203,7 +228,7 @@ public:
 	
 	
 	/* Returns a handle to an instantiation of the given plug-in. */
-	LADSPA_Handle FASTCALL instantiate( const ladspaKey & _plugin, 
+	LADSPA_Handle FASTCALL instantiate( const ladspa_key_t & _plugin, 
 						Uint32 _sample_rate );
 	
   	/* This method calls a function pointer that connects a port on an
@@ -223,7 +248,7 @@ public:
 
 	connectPort() must be called at least once for each port before
 	run() or runAdding() is called. */
-	void FASTCALL connectPort( const ladspaKey & _plugin, 
+	bool FASTCALL connectPort( const ladspa_key_t & _plugin, 
 					LADSPA_Handle _instance, 
 					Uint32 _port,
 					LADSPA_Data * _data_location );
@@ -247,7 +272,7 @@ public:
 	called again unless deactivate() is called first. Note that
 	connectPort() may be called before or after a call to
 	activate(). */
-	void FASTCALL activate( const ladspaKey & _plugin,
+	bool FASTCALL activate( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance );
 
 	/* This method calls a function pointer that runs an instance of a
@@ -260,7 +285,7 @@ public:
 	before run() or run_adding(). If deactivate() is called for a
 	plugin instance then the plugin instance may not be reused until
 	activate() has been called again. */
-	void FASTCALL run( const ladspaKey & _plugin, LADSPA_Handle _instance,
+	bool FASTCALL run( const ladspa_key_t & _plugin, LADSPA_Handle _instance,
 					Uint32 _sample_count );
 
 	/* This method calls a function pointer that runs an instance of a
@@ -276,7 +301,7 @@ public:
 	runAdding() is optional. When it is not provided by a plugin,
 	this function pointer must be set to NULL. When it is provided,
 	the function setRunAddingGain() must be provided also. */
-	void FASTCALL runAdding( const ladspaKey & _plugin,
+	bool FASTCALL runAdding( const ladspa_key_t & _plugin,
 							LADSPA_Handle _instance,
 							Uint32 _sample_count );
 
@@ -289,7 +314,7 @@ public:
 	This function should be provided by the plugin if and only if the
 	runAdding() function is provided. When it is absent this
 	function pointer must be set to NULL. */
-	void FASTCALL setRunAddingGain( const ladspaKey & _plugin,
+	bool FASTCALL setRunAddingGain( const ladspa_key_t & _plugin,
 							LADSPA_Handle _instance,
 							LADSPA_Data _gain );
 
@@ -306,7 +331,7 @@ public:
 
 	Deactivation is not similar to pausing as the plugin instance
 	will be reinitialised when activate() is called to reuse it. */
-	void FASTCALL deactivate( const ladspaKey & _plugin,
+	bool FASTCALL deactivate( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance );
 
 	/* Once an instance of a plugin has been finished with it can be
@@ -316,27 +341,21 @@ public:
 	If activate() was called for a plugin instance then a
 	corresponding call to deactivate() must be made before cleanup()
 	is called. */
-	void FASTCALL cleanup( const ladspaKey & _plugin,
+	bool FASTCALL cleanup( const ladspa_key_t & _plugin,
 						LADSPA_Handle _instance );
 
 private:
 	void FASTCALL addPlugins( LADSPA_Descriptor_Function _descriptor_func,
-							const QString & _file );
+						const QString & _file );
+	Uint16 FASTCALL getPluginInputs( const LADSPA_Descriptor * _descriptor );
+	Uint16 FASTCALL getPluginOutputs( const LADSPA_Descriptor * _descriptor );
 	
-	ladspaManager( void );
-	~ladspaManager();
-
-
-	static ladspaManager * s_instanceOfMe;
-
-	typedef struct ladspaManagerStorage
-	{
-		LADSPA_Descriptor_Function descriptorFunction;
-		Uint32 index;
-	} ladspaManagerDescription;
-
-	typedef QMap<ladspaKey, ladspaManagerDescription *> ladspaManagerMapType;
+	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
+							ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;
+	l_sortable_plugin_t m_sortedPlugins;
+	
+	friend class engine;
 
 } ;
 

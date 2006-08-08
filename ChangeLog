@@ -1,3 +1,67 @@
+2006-08-07	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/oscillator.h:
+	* plugins/vibed/vibrating_string.h:
+	* plugins/vibed/vibrating_string.cpp:
+	clean up some things that were preventing the getNextSample
+	methods from being inlined
+
+	* configure.in:
+	-made ladspa support default off
+	-must pass --with-ladspa to get it to build
+
+	* Makefile.am:
+	* data/themes/default/add.png:
+	* data/themes/default/analysis.png:
+	* data/themes/default/ports.png:
+	* data/themes/default/uhoh.png:
+	* data/themes/default/unavailable_sound.png:
+	* data/themes/blue_scene/add.png:
+	* data/themes/blue_scene/analysis.png:
+	* data/themes/blue_scene/ports.png:
+	* data/themes/blue_scene/uhoh.png:
+	* data/themes/blue_scene/unavailable_sound.png:
+	* include/audio_port.h:
+	* include/effect_chain.h:
+	* include/effect_tab_widget.h:
+	* include/effect.h:
+	* include/engine.h:
+	* include/group_box.h:
+	* include/instrument_track.h:
+	* include/ladspa_2_lmms.h:
+	* include/ladspa_browser.h:
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* include/ladspa_description.h:
+	* include/ladspa_manager.h:
+	* include/ladspa_port_dialog.h:
+	* include/main_window.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* include/select_ladspa_dialog.h:
+	* src/lmms_single_source.cpp:
+	* src/audio/audio_port.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/effect.cpp:
+	* src/core/engine.cpp:
+	* src/core/ladspa_browser.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/ladspa_port_dialog.cpp:
+	* src/core/main_window.cpp:
+	* src/core/mixer.cpp:
+	* src/core/select_ladspa_dialog.cpp:
+	* src/lib/ladspa_2_lmms.cpp:
+	* src/lib/ladspa_manager.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/ladspa_description.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	-added preliminary support for ladspa effects
+	-no load or save
+	-expect segfaults
+
 2006-08-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/lcd_spinbox.h:

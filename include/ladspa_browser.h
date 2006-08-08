@@ -1,7 +1,8 @@
 /*
- * group_box.h - LMMS-groupbox
+ * ladspa_browser.h - dialog to display information about installed LADSPA
+ *                    plugins
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,67 +24,52 @@
  */
 
 
-#ifndef _GROUP_BOX_H
-#define _GROUP_BOX_H
+#ifndef _LADSPA_BROWSER_H
+#define _LADSPA_BROWSER_H
+
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
 
 #include "qt3support.h"
 
 #ifdef QT4
 
-#include <QtGui/QWidget>
+#include <QtGui/QDialog>
 
 #else
 
-#include <qwidget.h>
+#include <qdialog.h>
 
 #endif
 
-#include "pixmap_button.h"
-#include "ladspa_manager.h"
+#include "engine.h"
+
+class QComboBox;
+class QLabel;
+class QLineEdit;
+class QSlider;
+
+class tabBar;
 
 
-class QPixmap;
-
-
-class groupBox : public QWidget, public engineObject
+class ladspaBrowser : public QDialog, public engineObject
 {
 	Q_OBJECT
 public:
-	groupBox( const QString & _caption, QWidget * _parent,
-					engine * _engine, track * _track );
-	virtual ~groupBox();
+	ladspaBrowser( engine * _engine );
+	virtual ~ladspaBrowser();
 
-	bool isActive( void ) const
-	{
-		return( m_led->isChecked() );
-	}
-
+	inline void labelWidget( QWidget * _w, const QString & _txt );
 
 public slots:
-	void setState( bool _on, bool _anim = FALSE );
-	void animate( void );
-
-#ifdef LADSPA_SUPPORT
-signals:
-	void toggled( bool _state );
-#endif
-
-protected:
-	virtual void resizeEvent( QResizeEvent * _re );
-	virtual void mousePressEvent( QMouseEvent * _me );
-
-
+	void showPorts( const ladspa_key_t & _key );
+	void testLADSPA( const ladspa_key_t & _key );
+	
 private:
-	void updatePixmap( void );
-
-	static QPixmap * s_ledBg;
-
-	pixmapButton * m_led;
-	QString m_caption;
-
-	int m_origHeight;
-	bool m_animating;
+	tabBar * m_tabBar;
 
 } ;
+
+#endif
 
 #endif

@@ -37,6 +37,10 @@
 #include "project_notes.h"
 #include "song_editor.h"
 
+#ifdef LADSPA_SUPPORT
+#include "ladspa_2_lmms.h"
+#endif
+
 
 engine::engine( const bool _has_gui ) :
 	m_hasGUI( _has_gui ),
@@ -57,6 +61,10 @@ engine::engine( const bool _has_gui ) :
 	m_pianoRoll = new pianoRoll( this );
 	m_automationEditor = new automationEditor( this );
 
+#ifdef LADSPA_SUPPORT
+	m_ladspaManager = new ladspa2LMMS( this );
+#endif
+	
 	m_mixer->initDevices();
 
 	m_mainWindow->finalize();

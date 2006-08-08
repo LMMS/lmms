@@ -49,6 +49,7 @@ public:
 	
 	inline ~vibratingString( void )
 	{
+		bufferAllocator::free( m_outsamp );
 		bufferAllocator::free( m_impulse );
 		vibratingString::freeDelayLine( m_fromBridge );
 		vibratingString::freeDelayLine( m_toBridge );
@@ -56,15 +57,14 @@ public:
 
 	inline sample_t nextSample( void )
 	{	
-		sample_t outsamp[m_oversample];
 		sample_t ym0;
 		sample_t ypM;
 		for( Uint8 i = 0; i < m_oversample; i++)
 		{
 			// Output at pickup position
-			outsamp[i] = fromBridgeAccess( m_fromBridge, 
+			m_outsamp[i] = fromBridgeAccess( m_fromBridge, 
 								m_pickupLoc );
-			outsamp[i] += toBridgeAccess( m_toBridge, 
+			m_outsamp[i] += toBridgeAccess( m_toBridge, 
 								m_pickupLoc );
 		
 			// Sample traveling into "bridge"
@@ -81,7 +81,7 @@ public:
 			// Update and then increment pointer
 			toBridgeUpdate( m_toBridge, -ypM );
 		}
-		return( outsamp[m_choice] );
+		return( m_outsamp[m_choice] );
 	}
 
 private:
@@ -104,6 +104,8 @@ private:
 	int m_choice;
 	float m_state;
 	
+	sample_t * m_outsamp;
+
 	delayLine * FASTCALL initDelayLine( int _len, int _pick );
 	static void FASTCALL freeDelayLine( delayLine * _dl );
 	void FASTCALL resample( float *_src,

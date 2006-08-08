@@ -44,6 +44,7 @@ vibratingString::vibratingString(	float _pitch,
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )
 {
+	m_outsamp = bufferAllocator::alloc<sample_t>( m_oversample );
 	int string_length;
 	
 	string_length = static_cast<int>( m_oversample *_sample_rate /

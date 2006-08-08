@@ -58,6 +58,7 @@ lmms_MOC =						\
 		./combobox.moc				\
 		./config_mgr.moc			\
 		./cpuload_widget.moc			\
+		./effect_tab_widget.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
@@ -67,6 +68,11 @@ lmms_MOC =						\
 		./kmultitabbar.moc			\
 		./kmultitabbar-qt3.moc			\
 		./knob.moc				\
+		./ladspa_browser.moc			\
+		./ladspa_control.moc			\
+		./ladspa_control_dialog.moc		\
+		./ladspa_description.moc		\
+		./ladspa_port_dialog.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./main_window.moc			\
@@ -82,11 +88,14 @@ lmms_MOC =						\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
+		./rack_plugin.moc			\
+		./rack_view.moc				\
 		./rubberband.moc			\
 		./qxembed.moc				\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
 		./sample_track.moc			\
+		./select_ladspa_dialog.moc		\
 		./setup_dialog.moc			\
 		./side_bar.moc				\
 		./side_bar_widget.moc			\
@@ -130,6 +139,9 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/automation_editor.cpp		\
 		$(srcdir)/src/core/bb_editor.cpp			\
 		$(srcdir)/src/core/config_mgr.cpp			\
+		$(srcdir)/src/core/effect_chain.cpp			\
+		$(srcdir)/src/core/effect_tab_widget.cpp		\
+		$(srcdir)/src/core/effect.cpp				\
 		$(srcdir)/src/core/engine.cpp				\
 		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
 		$(srcdir)/src/core/envelope_tab_widget.cpp		\
@@ -137,6 +149,9 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
+		$(srcdir)/src/core/ladspa_browser.cpp			\
+		$(srcdir)/src/core/ladspa_control_dialog.cpp		\
+		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/midi_tab_widget.cpp			\
@@ -150,6 +165,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/plugin_browser.cpp			\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp	\
 		$(srcdir)/src/core/sample_play_handle.cpp		\
+		$(srcdir)/src/core/select_ladspa_dialog.cpp		\
 		$(srcdir)/src/core/setup_dialog.cpp			\
 		$(srcdir)/src/core/song_editor.cpp			\
 		$(srcdir)/src/core/track.cpp				\
@@ -162,6 +178,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
 		$(srcdir)/src/lib/embed.cpp				\
+		$(srcdir)/src/lib/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/lib/ladspa_manager.cpp			\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
@@ -187,11 +204,15 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
+		$(srcdir)/src/widgets/ladspa_control.cpp		\
+		$(srcdir)/src/widgets/ladspa_description.cpp		\
 		$(srcdir)/src/widgets/lcd_spinbox.cpp			\
 		$(srcdir)/src/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
 		$(srcdir)/src/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/widgets/project_notes.cpp			\
+		$(srcdir)/src/widgets/rack_plugin.cpp			\
+		$(srcdir)/src/widgets/rack_view.cpp			\
 		$(srcdir)/src/widgets/rubberband.cpp			\
 		$(srcdir)/src/widgets/qxembed.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
@@ -323,6 +344,18 @@ lmms_SOURCES =								\
 		$(srcdir)/include/project_journal.h			\
 		$(srcdir)/include/import_filter.h			\
 		$(srcdir)/include/engine.h				\
+		$(srcdir)/include/effect.h				\
+		$(srcdir)/include/effect_chain.h			\
+		$(srcdir)/include/effect_tab_widget.h			\
+		$(srcdir)/include/ladspa_2_lmms.h			\
+		$(srcdir)/include/ladspa_browser.h			\
+		$(srcdir)/include/ladspa_control.h			\
+		$(srcdir)/include/ladspa_control_dialog.h		\
+		$(srcdir)/include/ladspa_description.h			\
+		$(srcdir)/include/ladspa_port_dialog.h			\
+		$(srcdir)/include/rack_plugin.h				\
+		$(srcdir)/include/rack_view.h				\
+		$(srcdir)/include/select_ladspa_dialog.h		\
 		$(srcdir)/include/qxembed.h
 
 

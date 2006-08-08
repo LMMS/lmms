@@ -50,6 +50,7 @@
 
 #include "types.h"
 #include "engine.h"
+#include "ladspa_manager.h"
 
 
 class QDomElement;
@@ -118,6 +119,7 @@ public slots:
 	void showSettingsDialog( void );
 	void aboutLMMS( void );
 	void help( void );
+	void ladspaPluginBrowser( void );
 	void toggleAutomationEditorWin( void );
 	void toggleBBEditorWin( void );
 	void toggleSongEditorWin( void );

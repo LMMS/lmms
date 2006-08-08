@@ -1,0 +1,99 @@
+/*
+ * effect_tab_widget.h - tab-widget in channel-track-window for setting up
+ *                       effects
+ *
+ * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ */
+
+
+#ifndef _EFFECT_TAB_WIDGET_H
+#define _EFFECT_TAB_WIDGET_H
+
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+
+#include "qt3support.h"
+
+#ifdef QT4
+
+#include <QtGui/QWidget>
+
+#else
+
+#include <qwidget.h>
+#include <qpushbutton.h>
+#include <qlayout.h>
+#include <qscrollview.h>
+#include <qvbox.h>
+#include <qptrlist.h>
+
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "journalling_object.h"
+#include "engine.h"
+#include "rack_plugin.h"
+#include "rack_view.h"
+
+
+class instrumentTrack;
+class groupBox;
+
+
+class effectTabWidget : public QWidget, public journallingObject
+{
+	Q_OBJECT
+public:
+	effectTabWidget( instrumentTrack * _channel_track );
+	virtual ~effectTabWidget();
+
+
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+							QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "fx" );
+	}
+
+private slots:
+	void addEffect( void );
+	void setBypass( bool _state );
+
+private:
+	instrumentTrack * m_instrumentTrack;
+	
+	groupBox * m_effectsGroupBox;
+	QPushButton * m_addButton;
+	
+	rackView * m_rack;
+		
+	friend class instrumentTrack;
+
+} ;
+
+
+#endif
+
+#endif

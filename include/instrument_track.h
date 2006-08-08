@@ -27,6 +27,8 @@
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
+#include "ladspa_manager.h"
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -70,6 +72,9 @@ class surroundArea;
 
 class flpImport;
 
+#ifdef LADSPA_SUPPORT
+class effectTabWidget;
+#endif
 
 
 class instrumentTrack : public QWidget, public track, public midiEventProcessor
@@ -170,6 +175,11 @@ public:
 	{
 		return( m_pianoWidget );
 	}
+	
+	inline audioPort * getAudioPort( void )
+	{
+		return( m_audioPort );
+	}
 
 
 public slots:
@@ -239,7 +249,9 @@ private:
 	envelopeTabWidget * m_envWidget;
 	arpAndChordsTabWidget * m_arpWidget;
 	midiTabWidget * m_midiWidget;
-
+#ifdef LADSPA_SUPPORT
+	effectTabWidget * m_effWidget;
+#endif
 
 	// test-piano at the bottom of every instrument-settings-window
 	pianoWidget * m_pianoWidget;

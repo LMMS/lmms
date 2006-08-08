@@ -35,6 +35,10 @@ class pianoRoll;
 class projectNotes;
 class songEditor;
 
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+class ladspa2LMMS;
+#endif
 
 class engine
 {
@@ -103,6 +107,13 @@ public:
 		return( m_automationEditor );
 	}
 
+#ifdef LADSPA_SUPPORT
+	inline ladspa2LMMS * getLADSPAManager( void )
+	{
+		return( m_ladspaManager );
+	}
+#endif
+	
 	void close( void );
 
 	float framesPerTact64th( void ) const
@@ -124,7 +135,11 @@ private:
 	pianoRoll * m_pianoRoll;
 	projectNotes * m_projectNotes;
 	projectJournal * m_projectJournal;
-
+	
+#ifdef LADSPA_SUPPORT
+	ladspa2LMMS * m_ladspaManager;
+#endif
+	
 } ;
 
 

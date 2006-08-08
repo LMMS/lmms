@@ -81,6 +81,10 @@
 #include "project_journal.h"
 #include "automation_editor.h"
 
+#ifdef LADSPA_SUPPORT
+#include "ladspa_browser.h"
+#endif
+
 
 #if QT_VERSION >= 0x030100
 QSplashScreen * mainWindow::s_splashScreen = NULL;
@@ -527,13 +531,26 @@ void mainWindow::finalize( void )
 	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ) );
+
+
+#ifdef LADSPA_SUPPORT
+#ifdef QT4
+	help_menu->addSeparator();
+#else
+	help_menu->insertSeparator();
+#endif
+	help_menu->addAction( embed::getIconPixmap( "help" ), tr( "LADSPA Plugins..." ),
+			      this, SLOT( ladspaPluginBrowser() ) );
+#endif
+
+	
 #ifdef QT4
 	help_menu->addSeparator();
 #else
 	help_menu->insertSeparator();
 #endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
-						this, SLOT( aboutLMMS() ) );
+			      this, SLOT( aboutLMMS() ) );
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
@@ -803,12 +820,25 @@ void mainWindow::aboutLMMS( void )
 void mainWindow::help( void )
 {
 	QMessageBox::information( this, tr( "Help not available" ),
-					tr( "Currently there's no help "
-						"available in LMMS.\n"
-						"Please visit "
-						"http://wiki.mindrules.net "
-						"for documentation on LMMS." ),
-					QMessageBox::Ok );
+				  tr( "Currently there's no help "
+						  "available in LMMS.\n"
+						  "Please visit "
+						  "http://wiki.mindrules.net "
+						  "for documentation on LMMS." ),
+				  QMessageBox::Ok );
+}
+
+
+
+
+void mainWindow::ladspaPluginBrowser( void )
+{
+	// moc for Qt 3.x doesn't recognize preprocessor directives,
+	// so we can't just block the whole thing out.
+#ifdef LADSPA_SUPPORT
+	ladspaBrowser lb( eng() );
+	lb.exec();
+#endif
 }
 
 

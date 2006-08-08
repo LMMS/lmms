@@ -38,6 +38,10 @@
 
 #endif
 
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+#include "effect_chain.h"
+#endif
 
 #include "mixer.h"
 #include "effect_board.h"
@@ -76,6 +80,13 @@ public:
 		return( m_nextFxChannel );
 	}
 
+#ifdef LADSPA_SUPPORT
+	inline effectChain * getEffects( void )
+	{
+		return( m_effects );
+	}
+#endif
+
 	void setNextFxChannel( const fx_ch_t _chnl )
 	{
 		m_nextFxChannel = _chnl;
@@ -94,7 +105,10 @@ public:
 	{
 		NONE, FIRST, BOTH
 	} m_bufferUsage;
-
+	
+#ifdef LADSPA_SUPPORT
+	inline bool processEffects( void ) { return( m_effects->processAudioBuffer( m_firstBuffer, m_frames ) ); };
+#endif
 
 private:
 	surroundSampleFrame * m_firstBuffer;
@@ -103,6 +117,11 @@ private:
 	fx_ch_t m_nextFxChannel;
 
 	QString m_name;
+	
+#ifdef LADSPA_SUPPORT
+	effectChain * m_effects;
+	fpab_t m_frames;
+#endif
 
 } ;
 

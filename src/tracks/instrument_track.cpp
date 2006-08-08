@@ -26,6 +26,13 @@
  */
 
 
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+#include "effect.h"
+#include "effect_chain.h"
+#include "effect_tab_widget.h"
+#endif
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -301,9 +308,17 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_envWidget = new envelopeTabWidget( this );
 	m_arpWidget = new arpAndChordsTabWidget( this );
 	m_midiWidget = new midiTabWidget( this, m_midiPort );
+#ifdef LADSPA_SUPPORT
+	m_effWidget = new effectTabWidget( this );
+#endif
 	m_tabWidget->addTab( m_envWidget, tr( "ENV/LFO/FILTER" ), 1 );
 	m_tabWidget->addTab( m_arpWidget, tr( "ARP/CHORD" ), 2 );
+#ifdef LADSPA_SUPPORT
+	m_tabWidget->addTab( m_effWidget, tr( "FX" ), 3 );
+	m_tabWidget->addTab( m_midiWidget, tr( "MIDI" ), 4 );
+#else
 	m_tabWidget->addTab( m_midiWidget, tr( "MIDI" ), 3 );
+#endif
 
 	// setup piano-widget
 	m_pianoWidget = new pianoWidget( this );
@@ -368,6 +383,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	setFixedWidth( CHANNEL_WIDTH );
 	resize( sizeHint() );
 #endif
+
 }
 
 
@@ -549,6 +565,10 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		return;
 	}
 	float v_scale = (float) getVolume() / DEFAULT_VOLUME;
+	
+#ifdef LADSPA_SUPPORT
+	m_audioPort->getEffects()->setRunning();
+#endif
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for _n, which
