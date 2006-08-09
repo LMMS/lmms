@@ -1,3 +1,28 @@
+2006-08-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_tab_widget.h:
+	* include/ladspa_browser.h:
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/ladspa_browser.cpp:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	-added ability to change the order of effects or delete them
+	-partial save and load support
+	-still getting spurious segfaults when twoddling with knobs,
+	 the textFloat associated with the knob is being reparented to
+	 NULL(?!), but works well enough to at least hear what things
+	 sound like with effects
+
 2006-08-07	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* include/oscillator.h:
 	* plugins/vibed/vibrating_string.h:

@@ -1091,6 +1091,9 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_envWidget->saveState( _doc, _this );
 	m_arpWidget->saveState( _doc, _this );
 	m_midiWidget->saveState( _doc, _this );
+#ifdef LADSPA_SUPPORT
+	m_effWidget->saveState( _doc, _this );
+#endif
 }
 
 
@@ -1126,6 +1129,12 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_midiWidget->restoreState( node.toElement() );
 			}
+#ifdef LADSPA_SUPPORT
+			else if( m_effWidget->nodeName() == node.nodeName() )
+			{
+				m_effWidget->restoreState( node.toElement() );
+			}
+#endif
 			else if( automationPattern::classNodeName()
 							!= node.nodeName() )
 			{

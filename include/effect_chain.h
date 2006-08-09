@@ -28,6 +28,8 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#include <qmutex.h>
+
 #include "qt3support.h"
 
 #include "engine.h"
@@ -42,8 +44,10 @@ public:
 	~effectChain();
 	
 	void FASTCALL appendEffect( effect * _effect );
+	void FASTCALL deleteEffect( effect * _effect );
+	void FASTCALL moveDown( effect * _effect );
+	void FASTCALL moveUp( effect * _effect );
 	bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames );
-	void FASTCALL swapEffects( effect * _eff1, effect * _eff2 );
 	void setRunning( void );
 	bool isRunning( void );
 	
@@ -61,7 +65,7 @@ private:
 	effect_list_t m_effects;
 	
 	bool m_bypassed;
-	
+	QMutex m_processLock;
 };
 
 #endif

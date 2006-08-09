@@ -87,6 +87,7 @@ effectTabWidget::~effectTabWidget()
 void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "fxdisabled", !m_effectsGroupBox->isActive() );
+	m_rack->saveState( _doc, _this );
 
 }
 
@@ -96,6 +97,19 @@ void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void effectTabWidget::loadSettings( const QDomElement & _this )
 {
 	m_effectsGroupBox->setState( !_this.attribute( "fxdisabled" ).toInt() );
+	
+	QDomNode node = _this.firstChild();
+	while( !node.isNull() )
+	{
+		if( node.isElement() )
+		{
+			if( m_rack->nodeName() == node.nodeName() )
+			{
+				m_rack->restoreState( node.toElement() );
+			}
+		}
+		node = node.nextSibling();
+	}
 }
 
 

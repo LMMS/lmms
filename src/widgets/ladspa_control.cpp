@@ -35,7 +35,7 @@
 
 ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, instrumentTrack * _track ) :
 	QWidget( _parent, "ladspaControl" ),
-	engineObject( _engine ),
+	journallingObject( _engine ),
 	m_port( _port ),
 	m_toggle( NULL ),
 	m_knob( NULL )
@@ -109,6 +109,42 @@ LADSPA_Data ladspaControl::getValue( void )
 		default:
 			return( static_cast<LADSPA_Data>( m_knob->value() ) );
 	}
+}
+
+
+
+
+void ladspaControl::setValue( LADSPA_Data _value )
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+			m_toggle->setChecked( static_cast<bool>( _value ) );
+			break;
+		case INTEGER:
+			m_knob->setValue( static_cast<int>( _value ) );
+			break;
+		case FLOAT:
+			m_knob->setValue( static_cast<float>( _value ) );
+			break;
+		default:
+			printf("ladspaControl::setValue BAD BAD BAD\n");
+			break;
+	}
+}
+
+
+
+
+void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+}
+
+
+
+
+void FASTCALL ladspaControl::loadSettings( const QDomElement & _this )
+{
 }
 
 

@@ -33,10 +33,12 @@
 #ifdef QT4
 
 #include <QtGui/QLayout>
+#include <QtGui/QWhatsThis>
 
 #else
 
 #include <qlayout.h>
+#include <qwhatsthis.h>
 
 #endif
 
@@ -194,13 +196,15 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
 
-	QPushButton * cancel_btn = new QPushButton( embed::getIconPixmap(
-								"cancel" ),
-							tr( "Close" ),
-							buttons );
+	QPushButton * help_btn = new QPushButton( embed::getIconPixmap( "help" ), "", buttons );
+	connect( help_btn, SIGNAL( clicked() ), this, SLOT( displayHelp() ) );
+	
+	QPushButton * cancel_btn = new QPushButton( embed::getIconPixmap( "cancel" ), tr( "Close" ), buttons );
 	connect( cancel_btn, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
 	btn_layout->addStretch();
+	btn_layout->addSpacing( 10 );
+	btn_layout->addWidget( help_btn );
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
@@ -213,6 +217,37 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 
 	show();
 
+#ifdef QT4
+	this->setWhatsThis(
+#else
+	QWhatsThis::add( this,
+#endif
+				tr( 
+"This dialog displays information on all of the LADSPA plugins LMMS was "
+"able to locate.  The plugins are divided into five categories based "
+"upon an interpretation of the port types and names.\n\n"
+
+"Available Effects are those that can be used by LMMS.  In order for LMMS "
+"to be able to use an effect, it must, first and foremost, be an effect, "
+"which is to say, it has to have both input channels and output channels.  "
+"LMMS identifies an input channel as an audio rate port containing 'in' in "
+"the name.  Output channels are identified by the letters 'out'.  Furthermore, "
+"the effect must have the same number of inputs and outputs and be real time "
+"capable.\n\n"
+
+"Unavailable Effects are those that were identified as effects, but either "
+"didn't have the same number of input and output channels or weren't real "
+"time capable.\n\n"
+
+"Instruments are plugins for which only output channels were identified.\n\n"
+
+"Analysis Tools are plugins for which only input channels were identified.\n\n"
+
+"Don't Knows are plugins for which no input or output channels were "
+"identified.\n\n"
+
+"Double clicking any of the plugins will bring up information on the "
+"ports." ) );
 
 }
 
@@ -251,6 +286,18 @@ void ladspaBrowser::testLADSPA( const ladspa_key_t & _key )
 		chain.processAudioBuffer( buffer, buf_size );
 	}
 	bufferAllocator::free( buffer );
+}
+
+
+
+
+void ladspaBrowser::displayHelp( void )
+{
+#ifdef QT4
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
+#else
+	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal( rect().bottomRight() ) );
+#endif
 }
 
 

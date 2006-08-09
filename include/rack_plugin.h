@@ -51,17 +51,41 @@ public:
 	rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * _track, engine * _engine );
 	~rackPlugin();
 	
-	QString nodeName( void ) const
+	inline effect * getEffect()
 	{
-		return( "plugin" );
+		return( m_effect );
 	}
 	
+	inline const ladspa_key_t & getKey( void )
+	{
+		return( m_key );
+	}
+	
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "effect" );
+	}
+
 public slots:
 	void editControls( void );
 	void bypassed( bool _state );
 	void setWetDry( float _value );
 	void setAutoQuit( float _value );
 	void setGate( float _value );
+	void moveUp( void );
+	void moveDown( void );
+	void deletePlugin( void );
+	void displayHelp( void );
+	
+signals:
+	void moveUp( rackPlugin * _plugin );
+	void moveDown( rackPlugin * _plugin );
+	void deletePlugin( rackPlugin * _plugin );
+
+protected:
+	void contextMenuEvent( QContextMenuEvent * _me );
 	
 private:
 	ledCheckBox * m_bypass;
@@ -74,6 +98,10 @@ private:
 	QPushButton * m_editButton;
 	effect * m_effect;
 	ladspaControlDialog * m_controlView;
+	instrumentTrack * m_track;
+	QMenu * m_contextMenu;
+	ladspa_key_t m_key;
+	QString m_name;
 };
 
 #endif

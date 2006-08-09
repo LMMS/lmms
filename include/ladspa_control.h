@@ -30,7 +30,7 @@
 
 #include <qwidget.h>
 
-#include "engine.h"
+#include "journalling_object.h"
 #include "instrument_track.h"
 #include "knob.h"
 #include "led_checkbox.h"
@@ -38,7 +38,7 @@
 typedef struct portDescription port_desc_t;
 
 
-class ladspaControl : public QWidget, public engineObject
+class ladspaControl : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -46,11 +46,21 @@ public:
 	~ladspaControl();
 	
 	LADSPA_Data getValue( void );
+	void FASTCALL setValue( LADSPA_Data _value );
+	
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "port" );
+	}
 
 private:
 	port_desc_t * m_port;
 	ledCheckBox * m_toggle;
 	knob * m_knob;
+	
+	QMutex m_processLock;
 };
 
 #endif

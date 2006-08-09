@@ -69,8 +69,7 @@ public:
 	virtual ~effectTabWidget();
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{

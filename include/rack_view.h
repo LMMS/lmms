@@ -34,12 +34,13 @@
 #include <qptrlist.h>
 
 #include "types.h"
-#include "engine.h"
+#include "journalling_object.h"
 #include "rack_plugin.h"
 #include "instrument_track.h"
+#include "ladspa_2_lmms.h"
 
 
-class rackView: public QWidget, public engineObject
+class rackView: public QWidget, public journallingObject
 {
 	Q_OBJECT
 
@@ -48,16 +49,31 @@ public:
 	~rackView();
 
 	void addPlugin( ladspa_key_t _key );
+	
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "rack" );
+	}
 
+public slots:
+	void moveUp( rackPlugin * _plugin );
+	void moveDown( rackPlugin * _plugin );
+	void deletePlugin( rackPlugin * _plugin );
+	
 private:
-	QPtrList<rackPlugin> m_rackInserts;
-	int m_insertIndex;
+	void redraw();
+	
+	vvector<rackPlugin *> m_rackInserts;
 		
 	QVBoxLayout * m_mainLayout;
 	QScrollView * m_scrollView;
-	QVBox * m_rack;
 	
 	instrumentTrack * m_instrumentTrack;
+	Uint32 m_lastY;
+	
+	ladspa2LMMS * m_ladspa;
 };
 
 #endif

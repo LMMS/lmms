@@ -40,11 +40,13 @@ effectChain::effectChain( engine * _engine ):
 
 effectChain::~ effectChain()
 {
+	m_processLock.lock();
 	for( Uint32 eff = 0; eff < m_effects.count(); eff++ )
 	{
 		free( m_effects[eff] );
 	}
 	m_effects.clear();
+	m_processLock.unlock();
 }
 
 
@@ -52,7 +54,84 @@ effectChain::~ effectChain()
 
 void FASTCALL effectChain::appendEffect( effect * _effect )
 {
+	m_processLock.lock();
 	m_effects.append( _effect );
+	m_processLock.unlock();
+}
+
+
+
+void FASTCALL effectChain::deleteEffect( effect * _effect )
+{
+	m_processLock.lock();
+	effect_list_t::iterator which = NULL;
+	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	{
+		if( (*it) == _effect )
+		{
+			which = it;
+			break;
+		}
+	}
+	
+	if( which != NULL )
+	{
+		m_effects.erase( which );
+	}
+	
+	m_processLock.unlock();
+}
+
+
+
+
+void FASTCALL effectChain::moveDown( effect * _effect )
+{
+	m_processLock.lock();
+	
+	if( _effect != m_effects.last() )
+	{
+		int i = 0;
+		for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++, i++ )
+		{
+			if( (*it) == _effect )
+			{
+				break;
+			}
+		}
+		
+		effect * temp = m_effects[i + 1];
+		m_effects[i + 1] = _effect;
+		m_effects[i] = temp;	
+	}
+	
+	m_processLock.unlock();
+}
+
+
+
+
+void FASTCALL effectChain::moveUp( effect * _effect )
+{
+	m_processLock.lock();
+	
+	if( _effect != m_effects.first() )
+	{
+		int i = 0;
+		for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++, i++ )
+		{
+			if( (*it) == _effect )
+			{
+				break;
+			}
+		}
+		
+		effect * temp = m_effects[i - 1];
+		m_effects[i - 1] = _effect;
+		m_effects[i] = temp;	
+	}
+	
+	m_processLock.unlock();
 }
 
 
@@ -60,7 +139,7 @@ void FASTCALL effectChain::appendEffect( effect * _effect )
 
 bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames )
 {
-	if( m_bypassed )
+	if( m_bypassed || ! m_processLock.tryLock() )
 	{
 		return( FALSE );
 	}
@@ -70,6 +149,7 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, const
 	{
 		more_effects |= (*it)->processAudioBuffer( _buf, _frames );
 	}
+	m_processLock.unlock();
 	return( more_effects );
 }
 
@@ -107,35 +187,7 @@ bool effectChain::isRunning( void )
 	}
 	return( running );
 }
-	
 
-
-
-void FASTCALL effectChain::swapEffects( effect * _eff1, effect * _eff2 )
-{
-	Uint32 eff1_loc = m_effects.count();
-	Uint32 eff2_loc = m_effects.count();
-	
-	Uint32 count = 0;
-	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
-	{
-		if( (*it) == _eff1 )
-		{
-			eff1_loc = count;
-		}
-		if( (*it) == _eff2 )
-		{
-			eff2_loc = count;
-		}
-		count++;
-	}
-	
-	if( eff1_loc < m_effects.count() && eff2_loc < m_effects.count() )
-	{
-		m_effects[eff1_loc] = _eff2;
-		m_effects[eff2_loc] = _eff1;
-	}
-}
 
 #endif
 

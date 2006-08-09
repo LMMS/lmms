@@ -66,7 +66,7 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 	m_processors = lmms_chnls / m_effectChannels;
 	
 	// Categorize the ports, and create the buffers.
-	fpab_t buffer_size =  configManager::inst()->value( "mixer", "framesperaudiobuffer" ).toInt();
+	m_bufferSize =  configManager::inst()->value( "mixer", "framesperaudiobuffer" ).toInt();
 	m_portCount = m_ladspa->getPortCount( _key );
 	
 	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )
@@ -87,7 +87,7 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 				// with some prepackaged plugins that were segfaulting
 				// during cleanup.  It was easier to troubleshoot with the
 				// memory management all taking place in one file.
-				p->buffer = new LADSPA_Data[buffer_size];
+				p->buffer = new LADSPA_Data[m_bufferSize];
 				
 				if( p->name.upper().contains( "IN" ) && m_ladspa->isPortInput( _key, port ) )
 				{
@@ -240,6 +240,8 @@ effect::~effect()
 		return;
 	}
 	
+	m_processLock.lock();
+	
 	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )
 	{
 		m_ladspa->deactivate( m_key, m_handles[proc] );
@@ -253,6 +255,8 @@ effect::~effect()
 	}
 	m_ports.clear();
 	m_handles.clear();
+	
+	m_processLock.unlock();
 }
 
 
@@ -260,7 +264,7 @@ effect::~effect()
 
 bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames )
 {
-	if( !m_okay || m_noRun || !m_running || m_bypass )
+	if( !m_okay || m_noRun || !m_running || m_bypass || !m_processLock.tryLock() )
 	{
 		return( FALSE );
 	}
@@ -343,8 +347,9 @@ bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf, const fpab
 		}
 	}
 	
-	// Check whether we need to continue processing input.
-	if( out_sum <= ( m_gate * _frames * channel ) )
+	// Check whether we need to continue processing input.  Restart the
+	// counter if the threshold has been exceeded.
+	if( out_sum <= ( m_gate ) )
 	{
 		m_bufferCount++;
 		if( m_bufferCount > m_silenceTimeout )
@@ -353,7 +358,12 @@ bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf, const fpab
 			m_bufferCount = 0;
 		}
 	}
+	else
+	{
+		m_bufferCount = 0;
+	}
 	
+	m_processLock.unlock();
 	return( m_running );
 }
 
@@ -365,7 +375,9 @@ void FASTCALL effect::setControl( Uint16 _control, LADSPA_Data _value )
 	{
 		return;
 	}
+	m_processLock.lock();
 	m_controls[_control]->value = _value;
+	m_processLock.unlock();
 }
 
 
@@ -373,7 +385,9 @@ void FASTCALL effect::setControl( Uint16 _control, LADSPA_Data _value )
 
 void FASTCALL effect::setGate( float _level )
 {
-	m_gate = _level;
+	m_processLock.lock();
+	m_gate = _level * _level * m_processors * m_bufferSize;
+	m_processLock.unlock();
 }
 
 

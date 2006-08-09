@@ -32,6 +32,8 @@
 #include <config.h>
 #endif
 
+#include<qmutex.h>
+
 #include "qt3support.h"
 
 #include "engine.h"
@@ -136,7 +138,8 @@ private:
 	ch_cnt_t m_processors;
 	Uint16 m_effectChannels;
 	Uint16 m_portCount;
-	
+	fpab_t m_bufferSize;
+				
 	const LADSPA_Descriptor * m_descriptor;
 	vvector<LADSPA_Handle> m_handles;
 	
@@ -155,6 +158,7 @@ private:
 	
 	float m_wetDry;
 	float m_gate;
+	QMutex m_processLock;
 };
 
 #endif
