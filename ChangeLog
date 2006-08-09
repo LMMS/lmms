@@ -1,3 +1,11 @@
+2006-08-09	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	full save and load support for effects in instrument tracks
+
 2006-08-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* include/effect.h:
 	* include/effect_chain.h:
@@ -30,7 +38,7 @@
 	clean up some things that were preventing the getNextSample
 	methods from being inlined
 
-	* configure
+	* configure:
 	* configure.in:
 	-made ladspa support default off
 	-must pass --with-ladspa to get it to build

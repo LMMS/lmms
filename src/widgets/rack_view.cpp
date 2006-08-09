@@ -170,15 +170,17 @@ void rackView::redraw()
 
 void FASTCALL rackView::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	int num = 0;
 	_this.setAttribute( "plugins", m_rackInserts.count() );
 	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++ )
 	{
 		ladspa_key_t key = (*it)->getKey();
-		_this.setAttribute( "label", key.first );
-		_this.setAttribute( "lib", key.second );
-		_this.setAttribute( "name", m_ladspa->getName( key ) );
-		_this.setAttribute( "maker", m_ladspa->getMaker( key ) );
+		_this.setAttribute( "label" + QString::number(num), key.first );
+		_this.setAttribute( "lib" + QString::number(num), key.second );
+		_this.setAttribute( "name" + QString::number(num), m_ladspa->getName( key ) );
+		_this.setAttribute( "maker" + QString::number(num), m_ladspa->getMaker( key ) );
 		(*it)->saveState( _doc, _this );
+		num++;
 	}
 }
 
@@ -188,33 +190,29 @@ void FASTCALL rackView::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void FASTCALL rackView::loadSettings( const QDomElement & _this )
 {
 	int plugin_cnt = _this.attribute( "plugins" ).toInt();
-	QString lib = _this.attribute( "lib" );
-	QString label = _this.attribute( "label" );
+	
+	QDomNode node = _this.firstChild();
 	for( int i = 0; i < plugin_cnt; i++ )
 	{
-		printf( "%s, %s\n", lib.ascii(), label.ascii() );
+		QString lib = _this.attribute( "lib" + QString::number( i ) );
+		QString label = _this.attribute( "label" + QString::number( i ) );
 		ladspa_key_t key( label, lib );
 		if( m_ladspa->getDescriptor( key ) != NULL )
 		{
 			addPlugin( key );
 			
-			QDomNode node = _this.firstChild();
-			while( !node.isNull() )
+			if( node.isElement() )
 			{
-				if( node.isElement() )
+				if( m_rackInserts.last()->nodeName() == node.nodeName() )
 				{
-					if( m_rackInserts.last()->nodeName() == node.nodeName() )
-					{
-						m_rackInserts.last()->restoreState( node.toElement() );
-					}
+					m_rackInserts.last()->restoreState( node.toElement() );
 				}
-				node = node.nextSibling();
 			}
 		}
 		else
 		{
-			QString name = _this.attribute( "name" );
-			QString maker = _this.attribute( "maker" );
+			QString name = _this.attribute( "name" + QString::number( i ) );
+			QString maker = _this.attribute( "maker" + QString::number( i ) );
 			QString message = "Couldn't find " + name + " from:\n\n";
 			message += "Library: " + lib + "\n";
 			message += "Label: " + label + "\n";
@@ -222,6 +220,7 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 			
 			QMessageBox::information( 0, tr( "Uknown plugin" ), message, QMessageBox::Ok );
 		}
+		node = node.nextSibling();
 	}
 	
 }

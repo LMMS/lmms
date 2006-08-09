@@ -48,8 +48,8 @@ public:
 	LADSPA_Data getValue( void );
 	void FASTCALL setValue( LADSPA_Data _value );
 	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent, const QString & _name );
+	virtual void FASTCALL loadSettings( const QDomElement & _this, const QString & _name );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "port" );

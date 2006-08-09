@@ -331,7 +331,19 @@ void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
 	m_wetDry->setValue( _this.attribute( "wet" ).toFloat() );
 	m_autoQuit->setValue( _this.attribute( "autoquit" ).toFloat() );
 	m_gate->setValue( _this.attribute( "gate" ).toFloat() );
-	m_controlView->loadSettings( _this );
+	
+	QDomNode node = _this.firstChild();
+	while( !node.isNull() )
+	{
+		if( node.isElement() )
+		{
+			if( m_controlView->nodeName() == node.nodeName() )
+			{
+				m_controlView->restoreState( node.toElement() );
+			}
+		}
+		node = node.nextSibling();
+	}
 }
 
 

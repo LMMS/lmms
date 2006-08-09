@@ -136,15 +136,40 @@ void ladspaControl::setValue( LADSPA_Data _value )
 
 
 
-void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, QDomElement & _this, const QString & _name )
 {
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+			m_toggle->saveSettings( _doc, _this, _name );
+			break;
+		case INTEGER:
+		case FLOAT:
+			m_knob->saveSettings( _doc, _this, _name );
+			break;
+		default:
+			printf("ladspaControl::saveSettings BAD BAD BAD\n");
+			break;
+	}
 }
 
 
 
-
-void FASTCALL ladspaControl::loadSettings( const QDomElement & _this )
+void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, const QString & _name )
 {
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+			m_toggle->loadSettings( _this, _name );
+			break;
+		case INTEGER:
+		case FLOAT:
+			m_knob->loadSettings( _this, _name );
+			break;
+		default:
+			printf("ladspaControl::loadSettings BAD BAD BAD\n");
+			break;
+	}
 }
 
 
