@@ -63,6 +63,7 @@ class QMenu;
 class QPushButton;
 
 class automationPattern;
+class bbTrack;
 class pixmapButton;
 class textFloat;
 class track;
@@ -265,9 +266,12 @@ protected:
 
 private slots:
 	void cloneTrack( void );
+	void disableTrack( void );
+	void enableTrack( void );
 	void removeTrack( void );
 	void removeTrackTimer( void );
 	void muteBtnRightClicked( void );
+	void updateMenu( void );
 
 
 private:
@@ -277,6 +281,9 @@ private:
 
 	QPushButton * m_trackOps;
 	pixmapButton * m_muteBtn;
+
+	bbTrack * currentBBTrack( void );
+	bool inBBEditor( void );
 
 } ;
 

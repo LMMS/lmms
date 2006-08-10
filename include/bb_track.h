@@ -121,6 +121,19 @@ public:
 		return( m_trackLabel );
 	}
 
+	bool isDisabled( track * _track )
+	{
+		return( m_disabled_tracks.containsRef( _track ) );
+	}
+	void disableTrack( track * _track )
+	{
+		m_disabled_tracks.append( _track );
+	}
+	void enableTrack( track * _track )
+	{
+		m_disabled_tracks.removeRef( _track );
+	}
+
 
 public slots:
 	void clickedTrackLabel( void );
@@ -135,6 +148,7 @@ protected:
 
 private:
 	nameLabel * m_trackLabel;
+	QPtrList<track> m_disabled_tracks;
 
 	typedef QMap<bbTrack *, csize> infoMap;
 	static infoMap s_infoMap;

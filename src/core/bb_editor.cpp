@@ -239,11 +239,12 @@ bool FASTCALL bbEditor::play( midiTime _start, f_cnt_t _start_frame,
 
 	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) * 64 +
 							_start.getTact64th();
+	bbTrack * bb_track = bbTrack::findBBTrack( _tco_num, eng() );
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
 	{
-		if( ( *it )->play( _start, _start_frame, _frames, _frame_base,
-							_tco_num ) == TRUE )
+		if( !bb_track->isDisabled( *it ) && ( *it )->play( _start,
+			_start_frame, _frames, _frame_base, _tco_num ) == TRUE )
 		{
 			played_a_note = TRUE;
 		}
