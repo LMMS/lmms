@@ -33,17 +33,18 @@
 #include "effect.h"
 
 
-ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, instrumentTrack * _track ) :
+ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, track * _track ) :
 	QWidget( _parent, "ladspaControl" ),
 	journallingObject( _engine ),
 	m_port( _port ),
+	m_track( _track ),
 	m_toggle( NULL ),
 	m_knob( NULL )
 {
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle = new ledCheckBox( m_port->name, this, "", eng(), _track );
+			m_toggle = new ledCheckBox( m_port->name, this, "", eng(), m_track );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
@@ -51,7 +52,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 			}	
 			break;
 		case INTEGER:
-			m_knob = new knob( knobBright_26, this, m_port->name, eng(), _track);
+			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->max, m_port->min, 1 + static_cast<int>( m_port->max - m_port->min ) / 500 );
 			m_knob->setInitValue( m_port->def );
@@ -65,7 +66,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 					tr( "Sorry, no help available." ) );
 			break;
 		case FLOAT:
-			m_knob = new knob( knobBright_26, this, m_port->name, eng(), _track);
+			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
 			if( ( m_port->max - m_port->min ) < 500.0f )
 			{

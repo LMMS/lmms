@@ -44,7 +44,7 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 	m_output( NULL ),
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
-	m_running( TRUE ),
+	m_running( FALSE ),
 	m_bypass( FALSE ),
 	m_bufferCount( 0 ),
 	m_silenceTimeout( 10 ),
@@ -66,7 +66,7 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 	m_processors = lmms_chnls / m_effectChannels;
 	
 	// Categorize the ports, and create the buffers.
-	m_bufferSize =  configManager::inst()->value( "mixer", "framesperaudiobuffer" ).toInt();
+	m_bufferSize =  eng()->getMixer()->framesPerAudioBuffer();
 	m_portCount = m_ladspa->getPortCount( _key );
 	
 	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )

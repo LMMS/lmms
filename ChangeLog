@@ -1,10 +1,30 @@
 2006-08-09	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* Makefile.am:
+	* include/effect_label.h:
+	* include/effect_tab_widget.h:
+	* include/instrument_track.h:
 	* include/ladspa_control.h:
 	* include/ladspa_control_dialog.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* src/lmms_single_source.cpp:
+	* src/audio/audio_port.cpp:
+	* src/core/effect.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/core/ladspa_port_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
 	* src/widgets/ladspa_control.cpp:
 	* src/widgets/rack_plugin.cpp:
 	* src/widgets/rack_view.cpp:
-	full save and load support for effects in instrument tracks
+	-full save and load
+	-added effects to sample tracks
+	-fixed the knob twoddling segfaults (hopefully)
+	-somewhere between 0.2.1 and yesterday a crackling has been
+	 introduced in the sample tracks.  My largish checkins
+	 look like an obvious culprit, but it would have to be
+	 something I forgot to #ifdef LADSPA_SUPPORT out.
 
 2006-08-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* include/effect.h:

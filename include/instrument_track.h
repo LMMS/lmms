@@ -176,10 +176,12 @@ public:
 		return( m_pianoWidget );
 	}
 	
+#ifdef LADSPA_SUPPORT
 	inline audioPort * getAudioPort( void )
 	{
 		return( m_audioPort );
 	}
+#endif
 
 
 public slots:

@@ -48,6 +48,7 @@
 
 #include "effect_tab_widget.h"
 #include "instrument_track.h"
+#include "sample_track.h"
 #include "group_box.h"
 #include "tooltip.h"
 #include "embed.h"
@@ -56,22 +57,25 @@
 #include "audio_port.h"
 
 
-effectTabWidget::effectTabWidget( instrumentTrack * _instrument_track ) :
-	QWidget( _instrument_track->tabWidgetParent() ),
-	journallingObject( _instrument_track->eng() ),
-	m_instrumentTrack( _instrument_track )
+effectTabWidget::effectTabWidget( instrumentTrack * _track, audioPort * _port ) :
+	QWidget( _track->tabWidgetParent() ),
+	journallingObject( _track->eng() ),
+	m_track( dynamic_cast<track *>( _track ) ),
+	m_port( _port )
 {
-	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this, eng(), _instrument_track );
-	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), this, SLOT( setBypass( bool ) ) );
-	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
-	
-	m_rack = new rackView( m_effectsGroupBox, eng(), _instrument_track );
-	m_rack->move( 6, 22 );
-		
-	m_addButton = new QPushButton( m_effectsGroupBox, "Add Effect" );
-	m_addButton->setText( tr( "Add" ) );
-	m_addButton->move( 75, 210 );
-	connect( m_addButton, SIGNAL( clicked( void ) ), this, SLOT( addEffect( void ) ) );
+	setupWidget();
+}
+
+
+
+
+effectTabWidget::effectTabWidget( QWidget * _parent, sampleTrack * _track, audioPort * _port ) :
+	QWidget( _parent ),
+	journallingObject( _track->eng() ),
+	m_track( dynamic_cast<track *>( _track ) ),
+	m_port( _port )
+{
+	setupWidget();
 }
 
 
@@ -79,6 +83,24 @@ effectTabWidget::effectTabWidget( instrumentTrack * _instrument_track ) :
 
 effectTabWidget::~effectTabWidget()
 {
+}
+
+
+
+
+void effectTabWidget::setupWidget( void )
+{
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this, eng(), m_track );
+	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), this, SLOT( setBypass( bool ) ) );
+	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
+	
+	m_rack = new rackView( m_effectsGroupBox, eng(), m_track, m_port );
+	m_rack->move( 6, 22 );
+		
+	m_addButton = new QPushButton( m_effectsGroupBox, "Add Effect" );
+	m_addButton->setText( tr( "Add" ) );
+	m_addButton->move( 75, 210 );
+	connect( m_addButton, SIGNAL( clicked( void ) ), this, SLOT( addEffect( void ) ) );
 }
 
 
@@ -134,8 +156,18 @@ void effectTabWidget::addEffect( void )
 
 void effectTabWidget::setBypass( bool _state )
 {
-	m_instrumentTrack->getAudioPort()->getEffects()->setBypass( !_state );
+	m_port->getEffects()->setBypass( !_state );
 }
+
+
+
+
+void effectTabWidget::closeEvent( QCloseEvent * _ce )
+{
+	_ce->ignore();
+	emit( closed() );
+}
+
 
 #include "effect_tab_widget.moc"
 

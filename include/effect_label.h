@@ -1,8 +1,9 @@
 /*
- * right_frame.h - provides the display for the rackInsert instances
+ * effect_label.h - a label which is renamable by double-clicking it and
+ *                  offers access to an effect rack
  *
- * Copyright (c) 2006 Danny McRae <khjklujn@netscape.net>
- *
+ * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,62 +22,69 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _RIGHT_FRAME_H
-#define _RIGHT_FRAME_H
+
+#ifndef _EFFECT_LABEL_H
+#define _EFFECT_LABEL_H
 
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
 #include <qwidget.h>
-#include <qlayout.h>
-#include <qscrollview.h>
-#include <qvbox.h>
-#include <qptrlist.h>
+#include <qpushbutton.h>
+#include <qlabel.h>
 
-#include "types.h"
 #include "journalling_object.h"
-#include "rack_plugin.h"
-#include "track.h"
-#include "ladspa_2_lmms.h"
-#include "audio_port.h"
+#include "tab_widget.h"
+#include "effect_tab_widget.h"
 
 
-class rackView: public QWidget, public journallingObject
+class sampleTrack;
+
+
+class effectLabel: public QWidget, public journallingObject
 {
 	Q_OBJECT
-
 public:
-	rackView( QWidget * _parent, engine * _engine, track * _track, audioPort * _port );
-	~rackView();
+	effectLabel( const QString & _initial_name, QWidget * _parent, engine * _engine, sampleTrack * _track );
+	virtual ~effectLabel();
 
-	void addPlugin( ladspa_key_t _key );
+	inline const QString & text( void )
+	{
+		return( m_text );
+	}
+	void FASTCALL setText( const QString & _text );
 	
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "rack" );
+		return( "sample_track" );
 	}
-
+	
 public slots:
-	void moveUp( rackPlugin * _plugin );
-	void moveDown( rackPlugin * _plugin );
-	void deletePlugin( rackPlugin * _plugin );
+	void showEffects( void );
+	void closeEffects( void );
+	void rename( void );
 	
+signals:
+	void clicked( void );
+	void nameChanged( void );
+	void nameChanged( const QString & _new_name );
+	void pixmapChanged( void );
+
+protected:
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+
 private:
-	void redraw();
+	sampleTrack * m_track;
+	QString m_text;
+	bool m_show;
 	
-	vvector<rackPlugin *> m_rackInserts;
-		
-	QVBoxLayout * m_mainLayout;
-	QScrollView * m_scrollView;
-	
-	track * m_track;
-	audioPort * m_port;
-	
-	Uint32 m_lastY;
-	
-	ladspa2LMMS * m_ladspa;
+	QLabel * m_label;
+	QPushButton * m_effectBtn;
+	tabWidget * m_tabWidget;
+	effectTabWidget * m_effWidget;
 };
 
 #endif

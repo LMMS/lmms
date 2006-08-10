@@ -56,7 +56,6 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key,
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( "Ports" );
 	setModal( TRUE );
-//	setFixedSize( 500, 500 );
 	
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );

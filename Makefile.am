@@ -58,6 +58,7 @@ lmms_MOC =						\
 		./combobox.moc				\
 		./config_mgr.moc			\
 		./cpuload_widget.moc			\
+		./effect_label.moc			\
 		./effect_tab_widget.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
@@ -200,6 +201,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/automatable_slider.cpp		\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
+		$(srcdir)/src/widgets/effect_label.cpp			\
 		$(srcdir)/src/widgets/fade_button.cpp			\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
@@ -346,6 +348,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/effect.h				\
 		$(srcdir)/include/effect_chain.h			\
+		$(srcdir)/include/effect_label.h			\
 		$(srcdir)/include/effect_tab_widget.h			\
 		$(srcdir)/include/ladspa_2_lmms.h			\
 		$(srcdir)/include/ladspa_browser.h			\

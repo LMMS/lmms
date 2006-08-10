@@ -29,9 +29,10 @@
 #ifdef LADSPA_SUPPORT
 
 #include <qwidget.h>
+#include <qmutex.h>
 
 #include "journalling_object.h"
-#include "instrument_track.h"
+#include "track.h"
 #include "knob.h"
 #include "led_checkbox.h"
 
@@ -42,7 +43,7 @@ class ladspaControl : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, instrumentTrack * _track );
+	ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, track * _track );
 	~ladspaControl();
 	
 	LADSPA_Data getValue( void );
@@ -57,6 +58,7 @@ public:
 
 private:
 	port_desc_t * m_port;
+	track * m_track;
 	ledCheckBox * m_toggle;
 	knob * m_knob;
 	

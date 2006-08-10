@@ -47,6 +47,7 @@
 #include <QtGui/QLayout>
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
 
 #else
 
@@ -61,6 +62,7 @@
 #include <qlabel.h>
 #include <qpopupmenu.h>
 #include <qwhatsthis.h>
+#include <qmessagebox.h>
 
 #endif
 
@@ -309,7 +311,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_arpWidget = new arpAndChordsTabWidget( this );
 	m_midiWidget = new midiTabWidget( this, m_midiPort );
 #ifdef LADSPA_SUPPORT
-	m_effWidget = new effectTabWidget( this );
+	m_effWidget = new effectTabWidget( this, m_audioPort );
 #endif
 	m_tabWidget->addTab( m_envWidget, tr( "ENV/LFO/FILTER" ), 1 );
 	m_tabWidget->addTab( m_arpWidget, tr( "ARP/CHORD" ), 2 );
@@ -1133,6 +1135,21 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			else if( m_effWidget->nodeName() == node.nodeName() )
 			{
 				m_effWidget->restoreState( node.toElement() );
+			}
+#else
+			else if( node.nodeName() == "fx" )
+			{
+				// A song saved using ladspa will segfault when
+				// a version of lmms compiled without ladspa tries
+				// to instantiate a plugin from "libfx.so", so
+				// we catch it here.
+				QMessageBox::information( 0, 
+						tr( "No LADSPA Support" ),
+						tr( "This instrument uses "
+						"features that aren't "
+						"available in this "
+						"version of LMMS." ),
+						QMessageBox::Ok );
 			}
 #endif
 			else if( automationPattern::classNodeName()

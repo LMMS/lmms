@@ -30,13 +30,13 @@
 #include <qmessagebox.h>
 
 #include "rack_view.h"
-#include "audio_port.h"
 
 
-rackView::rackView( QWidget * _parent, engine * _engine, instrumentTrack * _track ):
+rackView::rackView( QWidget * _parent, engine * _engine, track * _track, audioPort * _port ):
 	QWidget( _parent, "rackView" ),
 	journallingObject( _engine ),
-	m_instrumentTrack( _track ),
+	m_track( _track ),
+	m_port( _port ),
 	m_ladspa( eng()->getLADSPAManager() )
 {
 	setFixedSize( 230, 180 );
@@ -61,7 +61,7 @@ rackView::~rackView()
 
 void rackView::addPlugin( ladspa_key_t _key )
 {
-	rackPlugin * plugin = new rackPlugin( m_scrollView->viewport(), _key, m_instrumentTrack, eng() );
+	rackPlugin * plugin = new rackPlugin( m_scrollView->viewport(), _key, m_track, eng(), m_port );
 	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), this, SLOT( moveUp( rackPlugin * ) ) );
 	connect( plugin, SIGNAL( moveDown( rackPlugin * ) ), this, SLOT( moveDown( rackPlugin * ) ) );
 	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ), this, SLOT( deletePlugin( rackPlugin * ) ) );
@@ -103,7 +103,7 @@ void rackView::moveUp( rackPlugin * _plugin )
 
 void rackView::moveDown( rackPlugin * _plugin )
 {
-	m_instrumentTrack->getAudioPort()->getEffects()->moveDown( _plugin->getEffect() );
+	m_port->getEffects()->moveDown( _plugin->getEffect() );
 	if( _plugin != m_rackInserts.last() )
 	{
 		int i = 0;
@@ -129,7 +129,7 @@ void rackView::moveDown( rackPlugin * _plugin )
 
 void rackView::deletePlugin( rackPlugin * _plugin )
 {
-	m_instrumentTrack->getAudioPort()->getEffects()->deleteEffect( _plugin->getEffect() );
+	m_port->getEffects()->deleteEffect( _plugin->getEffect() );
 	
 	m_scrollView->removeChild( _plugin );
 	

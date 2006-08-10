@@ -55,9 +55,12 @@
 #include "engine.h"
 #include "rack_plugin.h"
 #include "rack_view.h"
+#include "audio_port.h"
+#include "track.h"
 
 
 class instrumentTrack;
+class sampleTrack;
 class groupBox;
 
 
@@ -65,7 +68,8 @@ class effectTabWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	effectTabWidget( instrumentTrack * _channel_track );
+	effectTabWidget( instrumentTrack * _track, audioPort * _port );
+	effectTabWidget( QWidget * _parent, sampleTrack * _track, audioPort * _port );
 	virtual ~effectTabWidget();
 
 
@@ -75,13 +79,22 @@ public:
 	{
 		return( "fx" );
 	}
+	
+	void setupWidget( void );
+
+signals:
+	void closed( void );
 
 private slots:
 	void addEffect( void );
 	void setBypass( bool _state );
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
+
 private:
-	instrumentTrack * m_instrumentTrack;
+	track * m_track;
+	audioPort * m_port;
 	
 	groupBox * m_effectsGroupBox;
 	QPushButton * m_addButton;

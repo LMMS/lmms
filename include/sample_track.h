@@ -44,8 +44,13 @@
 #include "sample_buffer.h"
 #include "volume_knob.h"
 
-
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+class effectLabel;
+#else
 class nameLabel;
+#endif
+
 class audioPort;
 class QLabel;
 
@@ -141,6 +146,13 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
+#ifdef LADSPA_SUPPORT
+	inline audioPort * getAudioPort( void )
+	{
+		return( m_audioPort );
+	}
+#endif
+
 public slots:
 	virtual QString nodeName( void ) const
 	{
@@ -150,7 +162,11 @@ public slots:
 
 
 private:
+#ifdef LADSPA_SUPPORT
+	effectLabel * m_trackLabel;
+#else
 	nameLabel * m_trackLabel;
+#endif
 	audioPort * m_audioPort;
 	
 	volumeKnob * m_volumeKnob;

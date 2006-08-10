@@ -44,10 +44,15 @@
 
 #endif
 
+#include "ladspa_manager.h"
+#ifdef LADSPA_SUPPORT
+#include "effect_label.h"
+#else
+#include "name_label.h"
+#endif
 
 #include "sample_track.h"
 #include "song_editor.h"
-#include "name_label.h"
 #include "embed.h"
 #include "templates.h"
 #include "buffer_allocator.h"
@@ -377,9 +382,14 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
+#ifdef LADSPA_SUPPORT
+	m_trackLabel = new effectLabel( tr( "Sample track" ),
+				      getTrackSettingsWidget(), eng(), this );				
+#else
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
 					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
+#endif
 	m_trackLabel->setGeometry( 26, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
 
@@ -453,6 +463,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );
 
+
 	volumeVector v = { m_volume, m_volume
 #ifndef DISABLE_SURROUND
 					, m_volume, m_volume
@@ -460,6 +471,9 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 			} ;
 	float fpt64th = eng()->framesPerTact64th();
 
+#ifdef LADSPA_SUPPORT
+	m_audioPort->getEffects()->setRunning();
+#endif
 	for( vlist<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 	{
@@ -496,7 +510,11 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
+#ifdef LADSPA_SUPPORT
+	m_trackLabel->saveState( _doc, _this );
+#else
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
+#endif
 	m_volumeKnob->saveSettings( _doc, _this, "vol" );
 }
 
@@ -506,10 +524,25 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	m_trackLabel->setText( _this.attribute( "name" ) );
+#ifdef LADSPA_SUPPORT
+	QDomNode node = _this.firstChild();
+	while( !node.isNull() )
+	{
+		if( node.isElement() )
+		{
+			if( m_trackLabel->nodeName() == node.nodeName() )
+			{
+				m_trackLabel->restoreState( node.toElement() );
+			}
+		}
+		node = node.nextSibling();
+	}
+#else
 	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
+#endif
 	if( _this.attribute( "vol" ) != "" )
 	{
 		m_volume = _this.attribute( "vol" ).toFloat();

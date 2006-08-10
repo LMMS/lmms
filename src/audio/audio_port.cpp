@@ -53,7 +53,7 @@ audioPort::audioPort( const QString & _name, engine * _engine ) :
 	eng()->getMixer()->addAudioPort( this );
 	setExtOutputEnabled( TRUE );
 #ifdef LADSPA_SUPPORT
-	m_frames = configManager::inst()->value( "mixer", "framesperaudiobuffer" ).toInt();
+	m_frames = eng()->getMixer()->framesPerAudioBuffer();
 	m_effects = new effectChain( eng() );
 #endif
 }

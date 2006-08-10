@@ -53,22 +53,25 @@
 
 #include "rack_plugin.h"
 #include "knob.h"
+#include "tempo_sync_knob.h"
 #include "tooltip.h"
 #include "ladspa_2_lmms.h"
 #include "ladspa_control_dialog.h"
-#include "audio_port.h"
 #include "embed.h"
+#include "gui_templates.h"
 
 
-rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * _track, engine * _engine ) :
+rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, engine * _engine, audioPort * _port ) :
 	QWidget( _parent, "rackPlugin" ),
 	journallingObject( _engine ),
 	m_track( _track ),
+	m_port( _port ),
 	m_contextMenu( NULL ),
-	m_key( _key )
+	m_key( _key ),
+	m_show( TRUE )
 {
 	m_effect = new effect( _key, eng() );
-	_track->getAudioPort()->getEffects()->appendEffect( m_effect );
+	m_port->getEffects()->appendEffect( m_effect );
 	
 	m_name = m_effect->getName();
 	
@@ -78,7 +81,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * 
 	m_grouper = new QGroupBox( 1, Qt::Vertical, "", this );
 	m_grouper->setFixedSize( 210, 58 );
 	
-	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), eng(), _track );
+	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), eng(), m_track );
 	connect( m_bypass, SIGNAL( toggled( bool ) ), this, SLOT( bypassed( bool ) ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 	m_bypass->setChecked( TRUE );
@@ -91,7 +94,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * 
 					tr( 
 "Toggles the effect on or off." ) );
 	
-	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ), eng(), _track );
+	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ), eng(), m_track );
 	connect( m_wetDry, SIGNAL( valueChanged( float ) ), this, SLOT( setWetDry( float ) ) );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->setRange( 0.0f, 1.0f, 0.01f );
@@ -106,13 +109,13 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * 
 					tr( 
 "The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output." ) );
 
-	m_autoQuit = new knob( knobBright_26, this, tr( "Decay" ), eng(), _track );
+	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ), eng(), m_track );
 	connect( m_autoQuit, SIGNAL( valueChanged( float ) ), this, SLOT( setAutoQuit( float ) ) );
 	m_autoQuit->setLabel( tr( "Decay" ) );
-	m_autoQuit->setRange( 1, 100, 1 );
+	m_autoQuit->setRange( 1.0f, 8000.0f, 100.0f );
 	m_autoQuit->setInitValue( 1 );
 	m_autoQuit->move( 60, 3 );
-	m_autoQuit->setHintText( tr( "Buffers:" ) + " ", "" );
+	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
 #ifdef QT4
 		m_autoQuit->setWhatsThis(
 #else
@@ -122,7 +125,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * 
 "The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values "
 "will reduce the CPU overhead but run the risk of clipping the tail on delay effects." ) );
 
-	m_gate = new knob( knobBright_26, this, tr( "Decay" ), eng(), _track );
+	m_gate = new knob( knobBright_26, this, tr( "Gate" ), eng(), m_track );
 	connect( m_wetDry, SIGNAL( valueChanged( float ) ), this, SLOT( setGate( float ) ) );
 	m_gate->setLabel( tr( "Gate" ) );
 	m_gate->setRange( 0.0f, 1.0f, 0.01f );
@@ -140,18 +143,22 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * 
 
 	m_editButton = new QPushButton( this, "Controls" );
 	m_editButton->setText( tr( "Controls" ) );
+	QFont f = m_editButton->font();
+	m_editButton->setFont( pointSize<7>( f ) );
 	m_editButton->setGeometry( 140, 19, 50, 20 );
 	connect( m_editButton, SIGNAL( clicked() ), this, SLOT( editControls() ) );
 		
 	QString name = eng()->getLADSPAManager()->getShortName( _key );
 	m_label = new QLabel( this );
 	m_label->setText( name );
-	QFont f = m_label->font();
+	f = m_label->font();
 	f.setBold( TRUE );
 	m_label->setFont( pointSize<7>( f ) );
 	m_label->setGeometry( 5, 38, 200, 20 );
 	
-	m_controlView = new ladspaControlDialog( this, m_effect, eng(), _track );
+	m_controlView = new ladspaControlDialog( NULL, m_effect, eng(), m_track );
+	connect( m_controlView, SIGNAL( closed() ), this, SLOT( closeEffects() ) );
+	m_controlView->hide();
 	
 #ifdef QT4
 	this->setWhatsThis(
@@ -199,8 +206,17 @@ rackPlugin::~rackPlugin()
 
 void rackPlugin::editControls( void )
 {
-	m_controlView->show();
-	m_controlView->raise();
+	if( m_show)
+	{
+		m_controlView->show();
+		m_controlView->raise();
+		m_show = FALSE;
+	}
+	else
+	{
+		m_controlView->hide();
+		m_show = TRUE;
+	}
 }
 
 
@@ -223,7 +239,9 @@ void rackPlugin::setWetDry( float _value )
 
 void rackPlugin::setAutoQuit( float _value )
 {
-	m_effect->setTimeout( static_cast<Uint32>( _value ) );
+	float samples = eng()->getMixer()->sampleRate() * _value / 1000.0f;
+	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / eng()->getMixer()->framesPerAudioBuffer() );
+	m_effect->setTimeout( buffers );
 }
 
 
@@ -344,6 +362,15 @@ void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
+}
+
+
+
+
+void rackPlugin::closeEffects( void )
+{
+	m_controlView->hide();
+	m_show = TRUE;
 }
 
 

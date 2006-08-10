@@ -102,4 +102,5 @@
 #include "src/widgets/rack_plugin.cpp"
 #include "src/widgets/rack_view.cpp"
 #include "src/widgets/ladspa_control.cpp"
+#include "src/widgets/effect_label.cpp"
 #endif

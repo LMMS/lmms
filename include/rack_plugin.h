@@ -35,12 +35,14 @@
 
 #include "journalling_object.h"
 #include "led_checkbox.h"
-#include "instrument_track.h"
+#include "track.h"
 #include "effect.h"
 #include "ladspa_control_dialog.h"
+#include "audio_port.h"
 
 
 class knob;
+class tempoSyncKnob;
 
 
 class rackPlugin: public QWidget, public journallingObject
@@ -48,7 +50,7 @@ class rackPlugin: public QWidget, public journallingObject
 	Q_OBJECT
 
 public:
-	rackPlugin( QWidget * _parent, ladspa_key_t _key, instrumentTrack * _track, engine * _engine );
+	rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, engine * _engine, audioPort * _port );
 	~rackPlugin();
 	
 	inline effect * getEffect()
@@ -78,6 +80,7 @@ public slots:
 	void moveDown( void );
 	void deletePlugin( void );
 	void displayHelp( void );
+	void closeEffects( void );
 	
 signals:
 	void moveUp( rackPlugin * _plugin );
@@ -90,7 +93,7 @@ protected:
 private:
 	ledCheckBox * m_bypass;
 	knob * m_wetDry;
-	knob * m_autoQuit;
+	tempoSyncKnob * m_autoQuit;
 	knob * m_gate;
 	QGroupBox * m_grouper;
 	QGroupBox * m_controls;
@@ -98,10 +101,12 @@ private:
 	QPushButton * m_editButton;
 	effect * m_effect;
 	ladspaControlDialog * m_controlView;
-	instrumentTrack * m_track;
+	track * m_track;
+	audioPort * m_port;
 	QMenu * m_contextMenu;
 	ladspa_key_t m_key;
 	QString m_name;
+	bool m_show;
 };
 
 #endif
