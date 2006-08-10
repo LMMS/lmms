@@ -448,11 +448,25 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					eng()->getBBEditor()->currentBB() );*/
 	if( s_infoMap[this] == 0 &&
-			_this.parentNode().nodeName() != "clone" &&
+			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().nodeName() != "journaldata" )
 	{
 		( (journallingObject *)( eng()->getBBEditor() ) )->saveState(
 								_doc, _this );
+	}
+
+	int track_num = 0;
+	trackVector tracks = eng()->getBBEditor()->tracks();
+	for( trackVector::iterator it = tracks.begin(); it != tracks.end();
+							++it, ++track_num )
+	{
+		if( isDisabled( *it ) )
+		{
+			QDomElement disabled = _doc.createElement(
+							"disabled-track" );
+			disabled.setAttribute( "num", track_num );
+			_this.appendChild( disabled );
+		}
 	}
 }
 
@@ -466,10 +480,11 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
-	if( _this.firstChild().isElement() )
+	QDomNode node = _this.namedItem( trackContainer::classNodeName() );
+	if( node.isElement() )
 	{
 		( (journallingObject *)( eng()->getBBEditor() ) )->restoreState(
-					_this.firstChild().toElement() );
+							node.toElement() );
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if
 	bb-tracks are created after this function is called, this doesn't
@@ -478,6 +493,18 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		eng()->getBBEditor()->setCurrentBB( s_infoMap[this] );
 	}*/
+
+	trackVector tracks = eng()->getBBEditor()->tracks();
+	node = _this.firstChild();
+	while( !node.isNull() )
+	{
+		if( node.isElement() && node.nodeName() == "disabled-track" )
+		{
+			disableTrack( tracks[node.toElement().attribute( "num" )
+								.toInt()] );
+		}
+		node = node.nextSibling();
+	}
 }
 
 
