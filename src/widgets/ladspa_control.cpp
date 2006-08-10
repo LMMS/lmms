@@ -54,8 +54,8 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 		case INTEGER:
 			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
-			m_knob->setRange( m_port->max, m_port->min, 1 + static_cast<int>( m_port->max - m_port->min ) / 500 );
-			m_knob->setInitValue( m_port->def );
+			m_knob->setRange( static_cast<int>( m_port->max ), static_cast<int>( m_port->min ), 1 + static_cast<int>( m_port->max - m_port->min ) / 200 );
+			m_knob->setInitValue( static_cast<int>( m_port->def ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -68,14 +68,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 		case FLOAT:
 			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
-			if( ( m_port->max - m_port->min ) < 500.0f )
-			{
-				m_knob->setRange( m_port->min, m_port->max, 0.01 );
-			}
-			else
-			{
-				m_knob->setRange( m_port->min, m_port->max, ( m_port->max - m_port->min ) / 500.0f );
-			}
+			m_knob->setRange( m_port->min, m_port->max, ( m_port->max - m_port->min ) / 200.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -103,13 +96,30 @@ ladspaControl::~ladspaControl()
 
 LADSPA_Data ladspaControl::getValue( void )
 {
+	LADSPA_Data value = 0.0f;
+	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			return( static_cast<LADSPA_Data>( m_toggle->isChecked() ) );
+			value = static_cast<LADSPA_Data>( m_toggle->isChecked() );
+			break;
+		case INTEGER:
+			value = static_cast<LADSPA_Data>( m_knob->value() );
+			break;
+		case FLOAT:
+			value = static_cast<LADSPA_Data>( m_knob->value() );
+			break;
 		default:
-			return( static_cast<LADSPA_Data>( m_knob->value() ) );
+			printf( "ladspaControl::getValue BAD BAD BAD\n" );
+			break;
 	}
+	
+	if( m_port->is_scaled )
+	{
+		value /= eng()->getMixer()->sampleRate();
+	}
+	
+	return( value );
 }
 
 

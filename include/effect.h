@@ -68,6 +68,7 @@ typedef struct portDescription
 	Uint16 control_id;
 	buffer_rate_t rate;
 	buffer_data_t data_type;
+	bool is_scaled;
 	LADSPA_Data max;
 	LADSPA_Data min;
 	LADSPA_Data def;

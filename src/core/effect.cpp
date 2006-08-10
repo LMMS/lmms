@@ -134,13 +134,13 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 			}
 			
 			// Get the range and default values.
+			p->is_scaled = m_ladspa->areHintsSampleRateDependent( _key, port );
 			p->max = m_ladspa->getUpperBound( _key, port );
-			
 			if( p->max == NOHINT )
 			{
 				p->max = 999999.0f;
 			}
-			else if( m_ladspa->areHintsSampleRateDependent( _key, port ) )
+			else if( p->is_scaled )
 			{
 				p->max *= eng()->getMixer()->sampleRate();
 			}
@@ -150,7 +150,7 @@ effect::effect( const ladspa_key_t & _key, engine * _engine ) :
 			{
 				p->min = -999999.0f;
 			}
-			else if( m_ladspa->areHintsSampleRateDependent( _key, port ) )
+			else if( p->is_scaled )
 			{
 				p->min *= eng()->getMixer()->sampleRate();
 			}
