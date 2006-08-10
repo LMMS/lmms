@@ -127,6 +127,13 @@ public:
 		return( foo );
 	}
 
+	trackVector tracks( void );
+
+	static const QString classNodeName( void )
+	{
+		return( "trackcontainer" );
+	}
+
 
 protected:
 	virtual void undoStep( journalEntry & _je );
@@ -140,7 +147,6 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	constTrackVector tracks( void ) const;
-	trackVector tracks( void );
 
 	virtual QRect scrollAreaRect( void ) const
 	{
