@@ -1,3 +1,36 @@
+2006-08-10	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/bb_track.h:
+	* include/track.h:
+	* src/core/bb_editor.cpp:
+	added disabled tracks
+
+	* src/tracks/bb_track.cpp:
+	- added disabled tracks
+	- fixed BB-track 0 cloning bug
+
+	* src/core/track.cpp:
+	- added disabled tracks
+	- update track operations menu
+	- simplified engine access
+	- fixed BB-track 0 cloning bug
+	- improved removing automation patterns
+
+	* include/track_container.h:
+	- moved tracks() to public
+	- added node name
+
+	* src/core/track_container.cpp:
+	added node name
+
+	* data/themes/default/mute_on_disabled.png:
+	* data/themes/default/track_op_menu_disabled.png:
+	* data/themes/default/mute_off_disabled.png:
+	* resources/mute_on_disabled.png:
+	* resources/track_op_menu_disabled.png:
+	* resources/mute_off_disabled.png:
+	added disabled track artwork
+
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* include/effect.h:
 	* include/effect_chain.h:
