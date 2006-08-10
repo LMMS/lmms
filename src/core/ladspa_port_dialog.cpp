@@ -32,6 +32,7 @@
 #ifdef QT4
 
 #include <QtGui/QLayout>
+#include <QtGui/QTableWidget>
 
 #else
 

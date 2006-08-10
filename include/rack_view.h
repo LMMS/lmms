@@ -27,11 +27,22 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtGui/QWidget>
+#include <QtGui/QLayout>
+#include <QtGui/QScrollView>
+#include <QtGui/QVBox>
+
+#else
+
 #include <qwidget.h>
 #include <qlayout.h>
 #include <qscrollview.h>
 #include <qvbox.h>
-#include <qptrlist.h>
+
+#endif
+
 
 #include "types.h"
 #include "journalling_object.h"

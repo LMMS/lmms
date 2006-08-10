@@ -32,7 +32,16 @@
 #include <config.h>
 #endif
 
+#ifdef QT4
+
+#include <QtCore/QMutex>
+
+#else
+
 #include<qmutex.h>
+
+#endif
+
 
 #include "qt3support.h"
 

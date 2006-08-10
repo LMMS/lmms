@@ -29,9 +29,19 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtGui/QWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QLabel>
+
+#else
+
 #include <qwidget.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
+
+#endif
 
 #include "journalling_object.h"
 #include "tab_widget.h"

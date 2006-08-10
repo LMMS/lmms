@@ -40,7 +40,6 @@
 
 #include <qdom.h>
 #include <qlistbox.h>
-#include <qpopupmenu.h>
 #include <qtoolbutton.h>
 
 #endif

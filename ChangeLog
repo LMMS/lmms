@@ -1,4 +1,22 @@
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_label.h:
+	* include/effect_tab_widget.h:
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* include/ladspa_description.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* src/core/effect.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/ladspa_port_dialog.cpp:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/widgets/ladspa_description.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	added Qt4 includes
+
 	* include/config_mgr.h:
 	* include/setup_dialog.h:
 	* src/core/config_mgr.cpp:

@@ -28,8 +28,18 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtGui/QWidget>
+#include <QtCore/QMutex>
+
+#else
+
 #include <qwidget.h>
 #include <qmutex.h>
+
+#endif
+
 
 #include "journalling_object.h"
 #include "track.h"

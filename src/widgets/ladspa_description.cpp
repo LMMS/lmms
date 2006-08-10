@@ -26,8 +26,16 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
-#include <qpair.h>
+#ifdef QT4
+
+#include <QTCore/QString>
+
+#else
+
 #include <qstring.h>
+
+#endif
+
 
 #include "ladspa_description.h"
 #include "mixer.h"

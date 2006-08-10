@@ -27,7 +27,16 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtGui/QMessageBox>
+
+#else
+
 #include <qmessagebox.h>
+
+#endif
+
 
 #include "rack_view.h"
 

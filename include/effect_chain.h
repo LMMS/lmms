@@ -28,7 +28,15 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtCore/QMutex>
+
+#else
+
 #include <qmutex.h>
+
+#endif
 
 #include "qt3support.h"
 

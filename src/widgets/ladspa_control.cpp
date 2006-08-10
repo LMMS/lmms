@@ -27,7 +27,16 @@
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 
+#ifdef QT4
+
+#include <QtGui/QWhatsThis>
+
+#else
+
 #include <qwhatsthis.h>
+
+#endif
+
 
 #include "ladspa_control.h"
 #include "effect.h"

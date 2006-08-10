@@ -35,6 +35,10 @@
 #ifdef QT4
 
 #include <QtGui/QWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QLayout>
+#include <QtGui/QScrollView>
+#include <QtGui/QVBox>
 
 #else
 
@@ -43,7 +47,6 @@
 #include <qlayout.h>
 #include <qscrollview.h>
 #include <qvbox.h>
-#include <qptrlist.h>
 
 #endif
 

@@ -35,6 +35,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
+#include <QtGui/QColor>
 
 #else
 
