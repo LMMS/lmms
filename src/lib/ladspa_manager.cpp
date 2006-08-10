@@ -50,6 +50,7 @@
 
 #include <math.h>
 
+#include "config_mgr.h"
 
 
 
@@ -60,14 +61,13 @@ ladspaManager::ladspaManager( engine * _engine )
 #ifdef QT4
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( ':' );
+	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
 #else
 	QStringList ladspaDirectories = QStringList::split( ':',
 		QString( getenv( "LADSPA_PATH" ) ) );
+	ladspaDirectories += QStringList::split( ':', 
+					configManager::inst()->ladspaDir() );
 #endif
-	
-	//*********DELETE THIS*********
-	ladspaDirectories.push_back( "/usr/lib/ladspa" );
-	//*********DELETE THIS*********
 	
 	// set default-directory if nothing is specified...
 	if( ladspaDirectories.isEmpty() )
@@ -99,6 +99,11 @@ ladspaManager::ladspaManager( engine * _engine )
 #else
 			const QFileInfo & f = **file;
 #endif
+			if( !f.isFile() || f.fileName().right(2) != "so" )
+			{
+				continue;
+			}
+			
 			QLibrary plugin_lib( f.absoluteFilePath() );
 			
 			if( plugin_lib.load() == TRUE )

@@ -50,6 +50,8 @@
 
 #endif
 
+#include "ladspa_manager.h"
+
 
 class QLineEdit;
 class QLabel;
@@ -157,6 +159,13 @@ public:
 		return( m_flDir );
 	}
 
+#ifdef LADSPA_SUPPORT
+	const QString & ladspaDir( void ) const
+	{
+		return( m_ladDir );
+	}
+#endif
+
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
 	void setValue( const QString & _class, const QString & _attribute,
@@ -171,6 +180,7 @@ public slots:
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
+	void setLADSPADir( const QString & _fd );
 
 
 protected slots:
@@ -209,6 +219,9 @@ private:
 	QString m_pluginDir;
 	QString m_vstDir;
 	QString m_flDir;
+#ifdef LADSPA_SUPPORT
+	QString m_ladDir;
+#endif
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;

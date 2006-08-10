@@ -1,4 +1,12 @@
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/config_mgr.h:
+	* include/setup_dialog.h:
+	* src/core/config_mgr.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/lib/ladspa_manager.cpp:
+	-added ladspa search path to user configuration
+	-made ladspa loader ignore all files not ending in "so"
+
 	* include/effect.h:
 	* src/core/effect.cpp:
 	* src/widgets/ladspa_control.cpp:

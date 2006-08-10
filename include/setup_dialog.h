@@ -43,6 +43,7 @@
 
 #include "audio_device.h"
 #include "midi_client.h"
+#include "ladspa_manager.h"
 
 
 class QComboBox;
@@ -83,6 +84,7 @@ private slots:
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
+	void setLADSPADir( const QString & _fd );
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -104,6 +106,7 @@ private slots:
 	void openVSTDir( void );
 	void openArtworkDir( void );
 	void openFLDir( void );
+	void openLADSPADir( void );
 
 
 	void toggleDisableChActInd( bool _disabled );
@@ -129,12 +132,17 @@ private:
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
+#ifdef LADSPA_SUPPORT
+	QLineEdit * m_ladLineEdit;
+#endif
 
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_artworkDir;
 	QString m_flDir;
-
+#ifdef LADSPA_SUPPORT
+	QString m_ladDir;
+#endif
 
 	bool m_disableChActInd;
 	bool m_manualChPiano;

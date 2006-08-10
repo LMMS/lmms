@@ -63,6 +63,7 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"
+#include "ladspa_manager.h"
 
 
 // platform-specific audio-interface-classes
@@ -77,7 +78,6 @@
 #include "midi_alsa_seq.h"
 #include "midi_oss.h"
 #include "midi_dummy.h"
-
 
 
 inline void labelWidget( QWidget * _w, const QString & _txt )
@@ -117,6 +117,9 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_flDir( configManager::inst()->flDir() ),
+#ifdef LADSPA_SUPPORT
+	m_ladDir( configManager::inst()->ladspaDir() ),
+#endif
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -140,8 +143,11 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
+#ifdef LADSPA_SUPPORT
+	ws->setFixedSize( 360, 356 );
+#else
 	ws->setFixedSize( 360, 300 );
-
+#endif
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 240 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
@@ -256,7 +262,11 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 	QWidget * directories = new QWidget( ws );
+#ifdef LADSPA_SUPPORT
+	directories->setFixedSize( 360, 316 );
+#else
 	directories->setFixedSize( 360, 260 );
+#endif
 	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
@@ -337,6 +347,26 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	fldir_select_btn->move( 320, 20 );
 	connect( fldir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openFLDir() ) );
+#ifdef LADSPA_SUPPORT
+	// LADSPA-dir
+	tabWidget * lad_tw = new tabWidget( tr(
+			"LADSPA plugin directories" ).toUpper(),
+							directories );
+	lad_tw->setFixedHeight( 56 );
+
+	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
+	m_ladLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_ladLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+		 		SLOT( setLADSPADir( const QString & ) ) );
+
+	QPushButton * laddir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", lad_tw );
+	laddir_select_btn->setFixedSize( 24, 24 );
+	laddir_select_btn->move( 320, 20 );
+	connect( laddir_select_btn, SIGNAL( clicked() ), this,
+				 		SLOT( openLADSPADir() ) );
+#endif
 
 
 	dir_layout->addWidget( lmms_wd_tw );
@@ -346,6 +376,10 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	dir_layout->addWidget( artwork_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( fl_tw );
+#ifdef LADSPA_SUPPORT
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( lad_tw );
+#endif
 	dir_layout->addStretch();
 
 
@@ -657,6 +691,9 @@ void setupDialog::accept( void )
 	configManager::inst()->setVSTDir( m_vstDir );
 	configManager::inst()->setArtworkDir( m_artworkDir );
 	configManager::inst()->setFLDir( m_flDir );
+#ifdef LADSPA_SUPPORT
+	configManager::inst()->setLADSPADir( m_ladDir );
+#endif
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -908,9 +945,48 @@ void setupDialog::openFLDir( void )
 
 
 
+void setupDialog::openLADSPADir( void )
+{
+#ifdef LADSPA_SUPPORT
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+				tr( "Choose LADSPA plugin directory" ),
+							m_ladDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_ladDir, 0, 0,
+			tr( "Choose LADSPA plugin directory" ), TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		if( m_ladLineEdit->text() == "" )
+		{
+			m_ladLineEdit->setText( new_dir );
+		}
+		else
+		{
+			m_ladLineEdit->setText( m_ladLineEdit->text() + ":" +
+								new_dir );
+		}
+	}
+#endif
+}
+
+
+
+
 void setupDialog::setFLDir( const QString & _fd )
 {
 	m_flDir = _fd;
+}
+
+
+
+
+void setupDialog::setLADSPADir( const QString & _fd )
+{
+#ifdef LADSPA_SUPPORT
+	m_ladDir = _fd;
+#endif
 }
 
 
