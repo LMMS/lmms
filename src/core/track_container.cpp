@@ -111,7 +111,7 @@ trackContainer::~trackContainer()
 
 void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setTagName( "trackcontainer" );
+	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
 	mainWindow::saveWidgetState( this, _this );
 
