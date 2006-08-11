@@ -60,6 +60,7 @@
 #include "ladspa_control_dialog.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "main_window.h"
 
 
 rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, engine * _engine, audioPort * _port ) :
@@ -157,7 +158,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 	m_label->setFont( pointSize<7>( f ) );
 	m_label->setGeometry( 5, 38, 200, 20 );
 	
-	m_controlView = new ladspaControlDialog( NULL, m_effect, eng(), m_track );
+	m_controlView = new ladspaControlDialog( eng()->getMainWindow()->workspace(), m_effect, eng(), m_track );
 	connect( m_controlView, SIGNAL( closed() ), this, SLOT( closeEffects() ) );
 	m_controlView->hide();
 	

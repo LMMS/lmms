@@ -33,6 +33,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "rename_dialog.h"
+#include "main_window.h"
 
 
 effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent, engine * _engine, sampleTrack * _track ) :
@@ -51,7 +52,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent, engi
 	m_label->setFont( pointSize<8>( f ) );
 	m_label->setGeometry( 38, 1, 200, 28 );
 	
-	m_effWidget = new effectTabWidget( NULL, m_track, m_track->getAudioPort() );
+	m_effWidget = new effectTabWidget( eng()->getMainWindow()->workspace(), m_track, m_track->getAudioPort() );
 	m_effWidget->setFixedSize( 240, 242 );
 	m_effWidget->hide();
 	connect( m_effWidget, SIGNAL( closed() ), this, SLOT( closeEffects() ) );
