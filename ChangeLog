@@ -1,3 +1,8 @@
+2006-08-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	added check for ctype.h to make LMMS work on Zenwalk-systems
+
 2006-08-10	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/bb_track.h:

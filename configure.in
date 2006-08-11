@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-cvs20060810, tobydox/at/users/dot/sourceforge/dot/net)
+AC_INIT(lmms, 0.2.1-cvs20060811, tobydox/at/users/dot/sourceforge/dot/net)
 AM_INIT_AUTOMAKE(lmms, 0.2.1-cvs20060810)
 
 AM_CONFIG_HEADER(config.h)
@@ -36,7 +36,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h sched.h])
+AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h sched.h ctype.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
