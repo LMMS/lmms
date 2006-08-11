@@ -54,6 +54,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 	{
 		case TOGGLED:
 			m_toggle = new ledCheckBox( m_port->name, this, "", eng(), m_track );
+//			connect( m_toggle, SIGNAL( toggled( bool ) ), this SLOT( ledChange( bool ) ) );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
@@ -62,6 +63,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 			break;
 		case INTEGER:
 			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
+//			connect( m_knob, SIGNAL( valueChanged( float ) ), this SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( static_cast<int>( m_port->max ), static_cast<int>( m_port->min ), 1 + static_cast<int>( m_port->max - m_port->min ) / 200 );
 			m_knob->setInitValue( static_cast<int>( m_port->def ) );
@@ -76,6 +78,7 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 			break;
 		case FLOAT:
 			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
+//			connect( m_knob, SIGNAL( valueChanged( float ) ), this SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->min, m_port->max, ( m_port->max - m_port->min ) / 200.0f );
 			m_knob->setInitValue( m_port->def );
@@ -121,11 +124,6 @@ LADSPA_Data ladspaControl::getValue( void )
 		default:
 			printf( "ladspaControl::getValue BAD BAD BAD\n" );
 			break;
-	}
-	
-	if( m_port->is_scaled )
-	{
-		value /= eng()->getMixer()->sampleRate();
 	}
 	
 	return( value );
@@ -191,6 +189,22 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, const QStr
 			break;
 	}
 }
+
+
+
+
+// void ladspaControl::ledChange( bool _state )
+// {
+// 	printf("state %d\n", _state);
+// }
+// 
+// 
+// 
+// 
+// void ladspaControl::knobChange( float _value )
+// {
+// 	printf("value %f\n", _value);
+// }
 
 
 #include "ladspa_control.moc"

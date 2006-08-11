@@ -1,4 +1,8 @@
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/ladspa_control.cpp:
+	unfixed my misunderstood fix of the setting of sample rate
+	dependent ports
+	
 	* src/core/mixer:
 	got rid of the "more_effect |= ..." nonsense
 	
