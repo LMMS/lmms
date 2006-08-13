@@ -77,6 +77,11 @@ public:
 		return( "sampletco" );
 	}
 
+	sampleBuffer * getSampleBuffer( void )
+	{
+		return( &m_sampleBuffer );
+	}
+
 
 public slots:
 	void setSampleFile( const QString & _sf );
@@ -146,19 +151,15 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
-#ifdef LADSPA_SUPPORT
 	inline audioPort * getAudioPort( void )
 	{
 		return( m_audioPort );
 	}
-#endif
 
-public slots:
 	virtual QString nodeName( void ) const
 	{
 		return( "sampletrack" );
 	}
-	void setVolume( float _new_volume );
 
 
 private:
@@ -170,7 +171,6 @@ private:
 	audioPort * m_audioPort;
 	
 	volumeKnob * m_volumeKnob;
-	float m_volume;
 
 } ;
 
