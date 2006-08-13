@@ -201,7 +201,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 						tr( "Q/Resonance" ),
 						eng(), _instrument_track );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->setRange( 0.01, 10.0, 0.01 );
+	m_filterResKnob->setRange( basicFilters<>::minQ(), 10.0, 0.01 );
 	m_filterResKnob->move( 190, 18 );
 	m_filterResKnob->setInitValue( 0.5 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
