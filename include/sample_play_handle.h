@@ -26,22 +26,29 @@
 #ifndef _SAMPLE_PLAY_HANDLE_H
 #define _SAMPLE_PLAY_HANDLE_H
 
+#include <qobject.h>
+
 #include "play_handle.h"
 #include "types.h"
 #include "engine.h"
 
 class sampleBuffer;
+class sampleTCO;
+class track;
 class audioPort;
 
 
-class samplePlayHandle : public playHandle, public engineObject
+class samplePlayHandle : public QObject, public playHandle, public engineObject
 {
+	Q_OBJECT
 public:
 	samplePlayHandle( const QString & _sample_file, engine * _engine );
 	samplePlayHandle( sampleBuffer * _sample_buffer );
+	samplePlayHandle( sampleTCO * _tco );
 	virtual ~samplePlayHandle();
 
 	virtual void play( void );
+	void play( const fpab_t _frame_base );
 	virtual bool done( void ) const;
 
 	f_cnt_t totalFrames( void ) const;
@@ -55,6 +62,10 @@ public:
 	}
 
 
+public slots:
+	void setVolume( float _new_volume );
+
+
 private:
 	sampleBuffer * m_sampleBuffer;
 	const bool m_ownSampleBuffer;
@@ -63,6 +74,10 @@ private:
 	f_cnt_t m_frame;
 
 	audioPort * m_audioPort;
+	const bool m_ownAudioPort;
+
+	float m_volume;
+	track * m_track;
 
 } ;
 

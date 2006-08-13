@@ -27,6 +27,7 @@
 
 #include "sample_play_handle.h"
 #include "sample_buffer.h"
+#include "sample_track.h"
 #include "buffer_allocator.h"
 #include "audio_port.h"
 
@@ -40,7 +41,10 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle", eng() ) )
+	m_audioPort( new audioPort( "samplePlayHandle", eng() ) ),
+	m_ownAudioPort( TRUE ),
+	m_volume( 1.0f ),
+	m_track( NULL )
 {
 }
 
@@ -54,7 +58,27 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	m_ownSampleBuffer( FALSE ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle", eng() ) )
+	m_audioPort( new audioPort( "samplePlayHandle", eng() ) ),
+	m_ownAudioPort( TRUE ),
+	m_volume( 1.0f ),
+	m_track( NULL )
+{
+}
+
+
+
+
+samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
+	playHandle( SAMPLE_PLAY_HANDLE ),
+	engineObject( _tco->eng() ),
+	m_sampleBuffer( _tco->getSampleBuffer() ),
+	m_ownSampleBuffer( FALSE ),
+	m_doneMayReturnTrue( TRUE ),
+	m_frame( 0 ),
+	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
+	m_ownAudioPort( FALSE ),
+	m_volume( 1.0f ),
+	m_track( _tco->getTrack() )
 {
 }
 
@@ -67,7 +91,10 @@ samplePlayHandle::~samplePlayHandle()
 	{
 		delete m_sampleBuffer;
 	}
-	delete m_audioPort;
+	if( m_ownAudioPort )
+	{
+		delete m_audioPort;
+	}
 }
 
 
@@ -75,22 +102,36 @@ samplePlayHandle::~samplePlayHandle()
 
 void samplePlayHandle::play( void )
 {
+	play( 0 );
+}
+
+
+
+
+void samplePlayHandle::play( const fpab_t _frame_base )
+{
 	if( framesDone() >= totalFrames() )
 	{
 		return;
 	}
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
-	volumeVector v = { 1.0f, 1.0f
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer()
+								- _frame_base;
+	if( !( m_track && m_track->muted() ) )
+	{
+		sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
+								frames );
+		volumeVector v = { { m_volume, m_volume
 #ifndef DISABLE_SURROUND
-					, 1.0f, 1.0f
+						, m_volume, m_volume
 #endif
-			} ;
-	m_sampleBuffer->play( buf, m_frame, frames );
-	eng()->getMixer()->bufferToPort( buf, frames, 0, v, m_audioPort );
+				} } ;
+		m_sampleBuffer->play( buf, m_frame, frames );
+		eng()->getMixer()->bufferToPort( buf, frames, _frame_base, v,
+								m_audioPort );
 
-	bufferAllocator::free( buf );
+		bufferAllocator::free( buf );
+	}
 
 	m_frame += frames;
 }
@@ -110,6 +151,22 @@ f_cnt_t samplePlayHandle::totalFrames( void ) const
 {
 	return( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() );
 }
+
+
+
+
+void samplePlayHandle::setVolume( float _new_volume )
+{
+	if( _new_volume <= MAX_VOLUME )
+	{
+		m_volume = _new_volume / 100.0f;
+	}
+}
+
+
+
+
+#include "sample_play_handle.moc"
 
 
 #endif
