@@ -95,6 +95,7 @@ lmms_MOC =						\
 		./qxembed.moc				\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
+		./sample_play_handle.moc		\
 		./sample_track.moc			\
 		./select_ladspa_dialog.moc		\
 		./setup_dialog.moc			\
