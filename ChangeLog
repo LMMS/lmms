@@ -1,3 +1,48 @@
+2006-08-13	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/tracks/sample_track.cpp:
+	moved playing to samplePlayHandle, removes crackling
+
+	* include/sample_track.h:
+	- allow sample buffer access
+	- getAudioPort() is required
+	- removed slots, moved playing to samplePlayHandle
+
+	* include/sample_play_handle.h.
+	* src/core/sample_play_handle.cpp:
+	- became a QObject
+	- create handle from sampleTCO
+	- fill audio buffer from the requested base frame
+	- made automation-awared
+
+	* Makefile.am:
+	samplePlayHandle is now a QObject
+
+	* include/sample_buffer.h:
+	- use fast sample generation, rely on proper waveforms
+	- removed locks in sample generation
+	- added lock methods for use in higher levels
+
+	* src/lib/oscillator.cpp:
+	lock user waveform once per loop
+
+	* data/samples/shapes/low_sine.wav:
+	low frequency sine for use in the oscillator
+
+	* include/lmms_math.h:
+	added fast pseudo-random integer generator
+
+	* include/oscillator.h:
+	- use fast noise generation
+	- simplified user-wave call, frames must never be 0
+
+	* include/basic_filters.h:
+	- added minQ "constant"
+	- limit Q resonance
+
+	* src/core/envelope_tab_widget.cpp:
+	added minQ "constant"
+
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* src/widgets/ladspa_control.cpp:
 	unfixed my misunderstood fix of the setting of sample rate
