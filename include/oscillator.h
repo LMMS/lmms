@@ -140,20 +140,16 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		return( 1.0f - 2.0f * ( ( float )rand() * ( 1.0f /
-								RAND_MAX ) ) );
+		// Precise implementation
+//		return( 1.0f - rand() * 2.0f / RAND_MAX );
+
+		// Fast implementation
+		return( 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX );
 	}
 
 	inline sample_t userWaveSample( const float _sample )
 	{
-		if( m_userWave->frames() > 0 )
-		{
-			return( m_userWave->userWaveSample( _sample ) );
-		}
-		else
-		{
-			return( 0.0f );
-		}
+		return( m_userWave->userWaveSample( _sample ) );
 	}
 
 
