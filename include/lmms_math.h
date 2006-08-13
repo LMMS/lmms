@@ -27,12 +27,27 @@
 #define _LMMS_MATH_H
 
 
+
+
 // Equivalent to _x - floorf( _x )
 static inline float fraction( const float _x )
 {
 	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
 						static_cast<int>( _x ) - 1 ) );
 }
+
+
+
+
+#define FAST_RAND_MAX 32767
+static inline int fast_rand( void )
+{
+	static unsigned long next = 1;
+	next = next * 1103515245 + 12345;
+	return( (unsigned)( next / 65536 ) % 32768 );
+}
+
+
 
 
 #endif
