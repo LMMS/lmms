@@ -55,9 +55,9 @@
 #include "song_editor.h"
 #include "embed.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "tooltip.h"
 #include "audio_port.h"
+#include "sample_play_handle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
 #include "volume.h"
@@ -377,8 +377,7 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) ),
-	m_volume( 1.0f )
+	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
@@ -401,8 +400,6 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_volumeKnob->move( 4, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-	connect( m_volumeKnob, SIGNAL( valueChanged( float ) ), 
-		 this, SLOT( setVolume( float ) ) );
 #ifdef QT4
 	m_volumeKnob->setWhatsThis(
 #else
@@ -425,16 +422,6 @@ sampleTrack::~sampleTrack()
 
 
 
-void sampleTrack::setVolume( float _new_volume )
-{
-	if( _new_volume <= MAX_VOLUME )
-	{
-		m_volume = _new_volume / 100.0f;
-	}
-}
-
-
-
 
 track::trackTypes sampleTrack::type( void ) const
 {
@@ -450,48 +437,52 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 						const f_cnt_t _frame_base,
 							Sint16 /*_tco_num*/ )
 {
-	sendMidiTime( _start );
-
-	vlist<trackContentObject *> tcos;
-	getTCOsInRange( tcos, _start, _start+static_cast<Sint32>( _frames /
-						eng()->framesPerTact64th() ) );
-
-	if ( tcos.size() == 0 )
+	if ( _start_frame > 0 )
 	{
 		return( FALSE );
 	}
 
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );
-
-
-	volumeVector v = { m_volume, m_volume
-#ifndef DISABLE_SURROUND
-					, m_volume, m_volume
-#endif
-			} ;
-	float fpt64th = eng()->framesPerTact64th();
+	sendMidiTime( _start );
 
 #ifdef LADSPA_SUPPORT
 	m_audioPort->getEffects()->setRunning();
 #endif
-	for( vlist<trackContentObject *>::iterator it = tcos.begin();
-							it != tcos.end(); ++it )
+	bool played_a_note = FALSE;	// will be return variable
+
+	for( csize i = 0; i < numOfTCOs(); ++i )
 	{
-		sampleTCO * st = dynamic_cast<sampleTCO *>( *it );
-		if( st != NULL && !st->muted() )
+		trackContentObject * tco = getTCO( i );
+		if( tco->startPosition() != _start )
 		{
-			st->play( buf, _start_frame +
-					static_cast<Uint32>( _start * fpt64th ),
-					_frames );
-			eng()->getMixer()->bufferToPort( buf, _frames,
-								_frame_base, v,
-								m_audioPort );
+			continue;
+		}
+		sampleTCO * st = dynamic_cast<sampleTCO *>( tco );
+		if( !st->muted() )
+		{
+			samplePlayHandle * handle = new samplePlayHandle( st );
+			connect( m_volumeKnob, SIGNAL( valueChanged( float ) ),
+					handle, SLOT( setVolume( float ) ) );
+			handle->setVolume( m_volumeKnob->value() );
+//TODO: do we need sample tracks in BB editor?
+//			handle->setBBTrack( bb_track );
+			handle->play( _frame_base );
+			// could we play all within current number of frames per
+			// audio-buffer?
+			if( handle->done() )
+			{
+				// throw it away...
+				delete handle;
+			}
+			else
+			{
+				// send it to the mixer
+				eng()->getMixer()->addPlayHandle( handle );
+			}
+			played_a_note = TRUE;
 		}
 	}
 
-	bufferAllocator::free( buf );
-
-	return( TRUE );
+	return( played_a_note );
 }
 
 
@@ -545,8 +536,8 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 #endif
 	if( _this.attribute( "vol" ) != "" )
 	{
-		m_volume = _this.attribute( "vol" ).toFloat();
-		m_volumeKnob->setInitValue( m_volume * 100.0f );
+		m_volumeKnob->setInitValue( _this.attribute( "vol" ).toFloat()
+								* 100.0f );
 	}
 	else
 	{
@@ -555,11 +546,9 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		if( node.isElement() && node.namedItem( "vol" ).isElement() )
 		{
 			m_volumeKnob->loadSettings( _this, "vol" );
-			m_volume = m_volumeKnob->value() / 100.0f;
 		}
 		else
 		{
-			m_volume = 1.0;
 			m_volumeKnob->setInitValue( 100.0f );
 		}
 	}
