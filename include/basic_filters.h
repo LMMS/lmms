@@ -61,6 +61,11 @@ public:
 		DOUBLE_MOOG	= 16+MOOG
 	} ;
 
+	static inline float minQ( void )
+	{
+		return( 0.01f );
+	}
+
 	static inline filterTypes getFilterType( const int _idx )
 	{
 		if( _idx < SIMPLE_FLT_CNT )
@@ -220,13 +225,14 @@ public:
 
    
 	inline void calcFilterCoeffs( const filterTypes _type, float _freq,
-					const float _q
+					float _q
 				/*, const bool _q_is_bandwidth = FALSE*/ )
 	{
 		// temp coef vars
 		m_type = _type;
-		_freq = tMax( _freq, 0.01f );// limit freq for not getting
+		_freq = tMax( _freq, 0.01f );// limit freq and q for not getting
 					      // bad noise out of the filter...
+		_q = tMax( _q, minQ() );
 
 		switch( m_type )
 		{
