@@ -54,7 +54,6 @@
 #include "tooltip.h"
 #include "ladspa_description.h"
 #include "ladspa_port_dialog.h"
-#include "effect.h"
 #include "audio_device.h"
 #include "buffer_allocator.h"
 #include "effect_chain.h"
@@ -265,27 +264,6 @@ void ladspaBrowser::showPorts( const ladspa_key_t & _key )
 {
 	ladspaPortDialog ports( _key, eng() );
 	ports.exec();
-}
-
-
-
-
-void ladspaBrowser::testLADSPA( const ladspa_key_t & _key )
-{
-	effect * eff1 = new effect( _key, eng() );
-	effect * eff2 = new effect( _key, eng() );
-	effectChain chain( eng() );
-
-	chain.appendEffect( eff1 );
-	chain.appendEffect( eff2 );
-	
-	fpab_t buf_size = eng()->getMixer()->audioDev()->channels();
-	surroundSampleFrame * buffer = bufferAllocator::alloc<surroundSampleFrame>( buf_size );
-	for( Uint8 i = 0; i < 100; i++ )
-	{
-		chain.processAudioBuffer( buffer, buf_size );
-	}
-	bufferAllocator::free( buffer );
 }
 
 

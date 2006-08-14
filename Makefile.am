@@ -153,6 +153,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/instrument.cpp			\
 		$(srcdir)/src/core/ladspa_browser.cpp			\
 		$(srcdir)/src/core/ladspa_control_dialog.cpp		\
+		$(srcdir)/src/core/ladspa_effect.cpp			\
 		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
@@ -360,6 +361,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rack_plugin.h				\
 		$(srcdir)/include/rack_view.h				\
 		$(srcdir)/include/select_ladspa_dialog.h		\
+		$(srcdir)/include/ladspa_effect.h			\
 		$(srcdir)/include/qxembed.h
 
 

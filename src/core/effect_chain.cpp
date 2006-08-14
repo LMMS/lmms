@@ -143,7 +143,6 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, const
 	{
 		return( FALSE );
 	}
-	
 	bool more_effects = FALSE;
 	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
 	{
@@ -156,7 +155,7 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, const
 
 
 
-void effectChain::setRunning( void )
+void effectChain::startRunning( void )
 {
 	if( m_bypassed )
 	{
@@ -165,7 +164,7 @@ void effectChain::setRunning( void )
 	
 	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
 	{
-		(*it)->setRunning();
+		(*it)->startRunning();
 	}
 }
 

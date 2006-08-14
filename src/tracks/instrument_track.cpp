@@ -28,7 +28,6 @@
 
 #include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
-#include "effect.h"
 #include "effect_chain.h"
 #include "effect_tab_widget.h"
 #endif
@@ -569,7 +568,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	float v_scale = (float) getVolume() / DEFAULT_VOLUME;
 	
 #ifdef LADSPA_SUPPORT
-	m_audioPort->getEffects()->setRunning();
+	m_audioPort->getEffects()->startRunning();
 #endif
 
 	// instruments using instrument-play-handles will call this method

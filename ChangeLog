@@ -1,3 +1,27 @@
+2006-08-14	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* Makefile.am:
+	* include/ladspa_effect.h:
+	* src/core/ladspa_effect.cpp:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/ladspa_browser:
+	* include/ladspa_control_dialog.h:
+	* include/rack_plugin.h:
+	* select_ladspa_dialog.h:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/ladspa_browser.cpp:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/core/select_ladspa_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/rack_plugin.cpp:
+	- separated ladspa specific stuff into a class derived from
+	  effect
+	- changed the default value range for unhinted ports from
+	  (-99999,99999) to (0,1)
+
 2006-08-13	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/tracks/sample_track.cpp:

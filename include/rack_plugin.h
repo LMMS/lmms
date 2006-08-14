@@ -48,7 +48,7 @@
 #include "journalling_object.h"
 #include "led_checkbox.h"
 #include "track.h"
-#include "effect.h"
+#include "ladspa_effect.h"
 #include "ladspa_control_dialog.h"
 #include "audio_port.h"
 
@@ -111,7 +111,7 @@ private:
 	QGroupBox * m_controls;
 	QLabel * m_label;
 	QPushButton * m_editButton;
-	effect * m_effect;
+	ladspaEffect * m_effect;
 	ladspaControlDialog * m_controlView;
 	track * m_track;
 	audioPort * m_port;

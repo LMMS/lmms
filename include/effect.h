@@ -46,81 +46,67 @@
 #include "qt3support.h"
 
 #include "engine.h"
-#include "ladspa_2_lmms.h"
 #include "mixer.h"
-#include "ladspa_control.h"
 
-
-typedef enum bufferRates
-{
-	CHANNEL_IN,
-	CHANNEL_OUT,
-	AUDIO_RATE_INPUT,
-	AUDIO_RATE_OUTPUT,
-	CONTROL_RATE_INPUT,
-	CONTROL_RATE_OUTPUT
-} buffer_rate_t;
-
-typedef enum bufferData
-{
-	TOGGLED,
-	INTEGER,
-	FLOAT,
-	NONE
-} buffer_data_t;
-
-typedef struct portDescription
-{
-	QString name;
-	ch_cnt_t proc;
-	Uint16 port_id;
-	Uint16 control_id;
-	buffer_rate_t rate;
-	buffer_data_t data_type;
-	bool is_scaled;
-	LADSPA_Data max;
-	LADSPA_Data min;
-	LADSPA_Data def;
-	LADSPA_Data value;
-	LADSPA_Data * buffer;
-	ladspaControl * control;
-} port_desc_t;
-
-typedef vvector<port_desc_t *> multi_proc_t;
 
 class effect: public engineObject
 {
 public:
-	effect( const ladspa_key_t & _key, engine * _engine );
-	~effect();
+	effect( engine * _engine );
+	virtual ~effect();
 	
-	bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames );
-	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );
-	
-	inline const multi_proc_t & getControls( void )
-	{
-		return( m_controls );
-	}
+	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames );
 	
 	inline ch_cnt_t getProcessorCount( void )
 	{
 		return( m_processors );
 	}
 	
-	inline void setRunning( void ) 
+	inline void setProcessorCount( ch_cnt_t _processors )
+	{
+		m_processors = _processors;
+	}
+	
+	inline bool isOkay( void )
+	{
+		return( m_okay );
+	}
+	
+	inline void setOkay( bool _state )
+	{
+		m_okay = _state;
+	}
+	
+	
+	inline bool isRunning( void )
+	{
+		return( m_running );
+	}
+	
+	inline void startRunning( void ) 
 	{ 
 		m_bufferCount = 0;
 		m_running = TRUE; 
-	};
+	}
+	
+	inline void stopRunning( void )
+	{
+		m_running = FALSE;
+	}
+	
+	inline bool isBypassed( void )
+	{
+		return( m_bypass );
+	}
 	
 	inline void setBypass( bool _mode )
 	{
 		m_bypass = _mode;
 	}
 	
-	inline bool isRunning( void )
+	inline Uint32 getTimeout( void )
 	{
-		return( m_running );
+		return( m_silenceTimeout );
 	}
 	
 	inline void setTimeout( Uint32 _time_out )
@@ -128,7 +114,17 @@ public:
 		m_silenceTimeout = _time_out;
 	}
 	
-	inline void setWetDry( float _wet )
+	inline float getWetLevel( void )
+	{
+		return( m_wetDry );
+	}
+	
+	inline float getDryLevel( void )
+	{
+		return( 1.0f - m_wetDry );
+	}
+	
+	inline void setWetLevel( float _wet )
 	{
 		m_wetDry = _wet;
 	}
@@ -138,25 +134,61 @@ public:
 		return( m_name );
 	}
 	
+	inline void setName( QString _name )
+	{
+		m_name = _name;
+	}
+	
+	inline float getGate( void )
+	{
+		return( m_gate );
+	}
+	
 	void FASTCALL setGate( float _level );
 	
+	inline Uint32 getBufferCount( void )
+	{
+		return( m_bufferCount );
+	}
+	
+	inline void resetBufferCount( void )
+	{
+		m_bufferCount = 0;
+	}
+	
+	inline void incrementBufferCount( void )
+	{
+		m_bufferCount++;
+	}
+	
+	inline bool tryLock( void )
+	{
+		return( m_processLock.tryLock() );
+	}
+	
+	inline void lock( void )
+	{
+		m_processLock.lock();
+	}
+	
+	inline void unlock( void )
+	{
+		m_processLock.unlock();
+	}
+	
+	inline bool dontRun( void )
+	{
+		return( m_noRun );
+	}
+	
+	inline void setDontRun( bool _state )
+	{
+		m_noRun = _state;
+	}
+	
 private:
-	ladspa_key_t m_key;
-	ladspa2LMMS * m_ladspa;
 	QString m_name;
-	
 	ch_cnt_t m_processors;
-	Uint16 m_effectChannels;
-	Uint16 m_portCount;
-	fpab_t m_bufferSize;
-				
-	const LADSPA_Descriptor * m_descriptor;
-	vvector<LADSPA_Handle> m_handles;
-	
-	vvector<multi_proc_t> m_ports;
-	multi_proc_t m_controls;
-	
-	effect * m_output;
 	
 	bool m_okay;
 	bool m_noRun;

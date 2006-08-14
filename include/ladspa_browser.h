@@ -63,7 +63,6 @@ public:
 
 public slots:
 	void showPorts( const ladspa_key_t & _key );
-	void testLADSPA( const ladspa_key_t & _key );
 	void displayHelp( void );
 	
 private:

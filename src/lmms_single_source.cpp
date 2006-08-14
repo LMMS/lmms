@@ -17,6 +17,7 @@
 #include "src/lib/oscillator.cpp"
 #include "src/lib/clipboard.cpp"
 #include "src/lib/sample_buffer.cpp"
+#include "src/core/ladspa_effect.cpp"
 #include "src/core/effect_chain.cpp"
 #include "src/core/effect.cpp"
 #include "src/core/ladspa_browser.cpp"

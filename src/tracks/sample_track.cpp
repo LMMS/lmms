@@ -445,7 +445,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 	sendMidiTime( _start );
 
 #ifdef LADSPA_SUPPORT
-	m_audioPort->getEffects()->setRunning();
+	m_audioPort->getEffects()->startRunning();
 #endif
 	bool played_a_note = FALSE;	// will be return variable
 

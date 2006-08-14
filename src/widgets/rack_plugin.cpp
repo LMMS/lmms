@@ -72,7 +72,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 	m_key( _key ),
 	m_show( TRUE )
 {
-	m_effect = new effect( _key, eng() );
+	m_effect = new ladspaEffect( _key, eng() );
 	m_port->getEffects()->appendEffect( m_effect );
 	
 	m_name = m_effect->getName();
@@ -234,7 +234,7 @@ void rackPlugin::bypassed( bool _state )
 
 void rackPlugin::setWetDry( float _value )
 {
-	m_effect->setWetDry( _value );
+	m_effect->setWetLevel( _value );
 }
 
 
