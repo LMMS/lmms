@@ -89,6 +89,25 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 
 
+automationPattern::automationPattern( const automationPattern & _pat_to_copy,
+						levelObject * _object ) :
+	journallingObject( _pat_to_copy.m_track->eng() ),
+	m_track( _pat_to_copy.m_track ),
+	m_object( _object ),
+	m_update_first( _pat_to_copy.m_update_first )
+{
+	for( timeMap::const_iterator it = _pat_to_copy.m_time_map.begin();
+				it != _pat_to_copy.m_time_map.end(); ++it )
+	{
+		m_time_map[it.key()] = it.data();
+	}
+
+	init();
+}
+
+
+
+
 automationPattern::~automationPattern()
 {
 	if( m_track )
@@ -156,7 +175,10 @@ midiTime automationPattern::putValue( const midiTime & _time, const int _value,
 
 void automationPattern::removeValue( const midiTime & _time )
 {
-	m_time_map.remove( _time );
+	if( _time != 0 )
+	{
+		m_time_map.remove( _time );
+	}
 }
 
 
