@@ -9,7 +9,7 @@ all:
 	@echo \ \* Creating config.h.in
 	@autoheader
 	@echo \ \* Creating Makefile templates
-	@automake
+	@automake -ac
 	@echo \ \* Creating configure
 	@autoconf
 	@echo \ \* Cleaning up

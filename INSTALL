@@ -3,7 +3,7 @@ Quick Instructions
 
    Go to the directory containing the package's source code and type:
 
-     autoreconf
+     autoreconf -is
      ./configure
      make install
      lmms
