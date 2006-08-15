@@ -81,39 +81,6 @@ private:
 
 #endif
 
-typedef vvector<effect *> effect_list_t;
-
-class effectChain: public engineObject
-{
-	public:
-		effectChain( engine * _engine );
-		~effectChain();
-	
-		void FASTCALL appendEffect( effect * _effect );
-		void FASTCALL deleteEffect( effect * _effect );
-		void FASTCALL moveDown( effect * _effect );
-		void FASTCALL moveUp( effect * _effect );
-		bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, 
-				const fpab_t _frames );
-		void startRunning( void );
-		bool isRunning( void );
-	
-		inline void setBypass( bool _mode )
-		{
-			m_bypassed = _mode;
-		}
-	
-		inline const effect_list_t & getEffects( void )
-		{
-			return( m_effects );
-		}
-	
-	private:
-		effect_list_t m_effects;
-	
-		bool m_bypassed;
-		QMutex m_processLock;
-};
 
 
 

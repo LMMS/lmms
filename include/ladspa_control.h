@@ -60,6 +60,24 @@ public:
 	LADSPA_Data getValue( void );
 	void FASTCALL setValue( LADSPA_Data _value );
 	
+	void FASTCALL linkControls( ladspaControl * _control );
+	void FASTCALL unlinkControls( ladspaControl * _control );
+
+	inline ledCheckBox * getToggle( void )
+	{
+		return( m_toggle );
+	}
+	
+	inline knob * getKnob( void )
+	{
+		return( m_knob );
+	}
+	
+	inline port_desc_t * getPort( void )
+	{
+		return( m_port );
+	}
+
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
 				QDomElement & _parent, const QString & _name );
 	virtual void FASTCALL loadSettings( const QDomElement & _this, 
@@ -69,6 +87,13 @@ public:
 		return( "port" );
 	}
 
+signals:
+	void changed( Uint16 _port, LADSPA_Data );
+
+protected slots:
+	void ledChange( bool );
+	void knobChange( float );
+	
 private:
 	port_desc_t * m_port;
 	track * m_track;

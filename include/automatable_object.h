@@ -264,7 +264,7 @@ public:
 		_object2->linkObject( _object1 );
 
 		if( _object1->m_automation_pattern
-					!= _object2->m_automation_pattern )
+				  != _object2->m_automation_pattern )
 		{
 			if( _object2->m_automation_pattern )
 			{
@@ -273,6 +273,21 @@ public:
 			_object2->m_automation_pattern
 					= _object1->m_automation_pattern;
 		}
+	}
+
+	static void unlinkObjects( autoObj * _object1,
+					autoObj * _object2 )
+	{
+		_object1->unlinkObject( _object2 );
+		_object2->unlinkObject( _object1 );
+
+		if( !_object1->m_automation_pattern )
+		{
+			_object1->m_automation_pattern = 
+					_object1->getAutomationPattern();
+		}
+		_object2->m_automation_pattern = 
+		new automationPattern( *_object1->m_automation_pattern );
 	}
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -439,9 +454,13 @@ private:
 
 	inline void unlinkObject( autoObj * _object )
 	{
-		m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
+		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
+		    _object ) != m_linkedObjects.end() )
+		{
+			m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
 						m_linkedObjects.end(),
 						_object ) );
+		}
 	}
 
 	static T attributeValue( QString _value );

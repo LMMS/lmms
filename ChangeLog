@@ -3,6 +3,15 @@
 	added deletion of the control view to the dtor to make it clean
 	up after itself
 	
+	* include/automatable_object.h:
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/core/ladspa_control.cpp:
+	- added a link channels option to the ladspa controls
+	- unlinking the channels will currently break automation for all
+	  but the first channel
+	
 	* All of the effects related files:
 	reformatted to respect the 80 characters per line convention
 	

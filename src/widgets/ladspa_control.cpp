@@ -57,7 +57,9 @@ ladspaControl::ladspaControl( QWidget * _parent,
 	{
 		case TOGGLED:
 			m_toggle = new ledCheckBox( m_port->name, this, "", 
-							eng(), m_track );
+					eng(), m_track );
+			connect( m_toggle, SIGNAL( toggled( bool ) ),
+					this, SLOT( ledChange( bool ) ) );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
@@ -67,6 +69,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 		case INTEGER:
 			m_knob = new knob( knobBright_26, this, 
 						m_port->name, eng(), m_track);
+			connect( m_knob, SIGNAL( valueChanged( float ) ),
+					this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( static_cast<int>( m_port->max ), 
 					static_cast<int>( m_port->min ), 
@@ -86,6 +90,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 		case FLOAT:
 			m_knob = new knob( knobBright_26, this, 
 						m_port->name, eng(), m_track);
+			connect( m_knob, SIGNAL( valueChanged( float ) ), 
+					this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->min, m_port->max, 
 						( m_port->max - 
@@ -199,6 +205,60 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 			break;
 		default:
 			printf("ladspaControl::loadSettings BAD BAD BAD\n");
+			break;
+	}
+}
+
+
+
+
+void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+			ledCheckBox::linkObjects( m_toggle, _control->getToggle() );
+			break;
+		case INTEGER:
+		case FLOAT:
+			knob::linkObjects( m_knob, _control->getKnob() );
+			break;
+		default:
+			break;
+	}
+}
+
+
+
+
+void ladspaControl::ledChange( bool _state )
+{
+	emit( changed( m_port->port_id, static_cast<LADSPA_Data>( _state ) ) );
+}
+
+
+
+
+void ladspaControl::knobChange( float _value )
+{
+	emit( changed( m_port->port_id, static_cast<LADSPA_Data>( _value ) ) );
+}
+
+
+
+
+void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
+{
+	switch( m_port->data_type )
+	{
+		case TOGGLED:
+			ledCheckBox::unlinkObjects( m_toggle, _control->getToggle() );
+			break;
+		case INTEGER:
+		case FLOAT:
+			knob::unlinkObjects( m_knob, _control->getKnob() );
+			break;
+		default:
 			break;
 	}
 }
