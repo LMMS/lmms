@@ -281,13 +281,13 @@ public:
 		_object1->unlinkObject( _object2 );
 		_object2->unlinkObject( _object1 );
 
-		if( !_object1->m_automation_pattern )
+		if( _object1->m_automation_pattern
+				&& _object1->m_automation_pattern
+					== _object2->m_automation_pattern )
 		{
-			_object1->m_automation_pattern = 
-					_object1->getAutomationPattern();
+			_object2->m_automation_pattern = new automationPattern(
+				*_object1->m_automation_pattern, _object2 );
 		}
-		_object2->m_automation_pattern = 
-		new automationPattern( *_object1->m_automation_pattern );
 	}
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
