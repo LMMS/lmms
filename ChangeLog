@@ -1,3 +1,21 @@
+2006-08-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automatable_object.h:
+	fixed unlinking objects
+
+	* include/automation_pattern.h:
+	added constructor for unlinking objects
+
+	* src/tracks/automation_pattern.cpp:
+	- added constructor for unlinking objects
+	- don't remove value at position 0
+
+	* INSTALL:
+	* Makefile.cvs:
+	* install-sh:
+	* missing:
+	removed more generated files
+
 2006-08-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/knob.cpp:
