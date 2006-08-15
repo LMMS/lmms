@@ -396,7 +396,8 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 
 void knob::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "float_value" );
+	stringPairDrag::processDragEnterEvent( _dee, "float_value,"
+								"link_object" );
 }
 
 
@@ -405,11 +406,19 @@ void knob::dragEnterEvent( QDragEnterEvent * _dee )
 void knob::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
+	QString val = stringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		setValue( value.toFloat() );
+		printf("set val\n");
+		setValue( val.toFloat() );
 		_de->accept();
+	}
+	else if( type == "link_object" )
+	{
+		printf("link!\n");
+		knob * obj = (knob *)( val.toULong() );
+		linkObjects( this, obj );
+		obj->setValue( value() );
 	}
 }
 
@@ -420,7 +429,8 @@ void knob::dropEvent( QDropEvent * _de )
 void knob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == FALSE )
+			eng()->getMainWindow()->isCtrlPressed() == FALSE &&
+			eng()->getMainWindow()->isShiftPressed() == FALSE )
 	{
 		setJournalling( FALSE );
 		m_oldValue = value();
@@ -450,9 +460,18 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == TRUE )
+			eng()->getMainWindow()->isCtrlPressed() == TRUE/* &&
+			eng()->getMainWindow()->isShiftPressed() == FALSE*/ )
 	{
 		new stringPairDrag( "float_value", QString::number( value() ),
+						QPixmap(), this, eng() );
+	}
+	else if( _me->button() == Qt::LeftButton &&
+/*			eng()->getMainWindow()->isCtrlPressed() == TRUE &&*/
+			eng()->getMainWindow()->isShiftPressed() == TRUE )
+	{
+		new stringPairDrag( "link_object",
+						QString::number( (uint) this ),
 						QPixmap(), this, eng() );
 	}
 	else if( _me->button() == Qt::MidButton )

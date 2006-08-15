@@ -1,3 +1,9 @@
+2006-08-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/knob.cpp:
+	support for linking knobs using <Shift> + drag'n'drop (note that
+	connetions are not saved!)
+
 2006-08-15	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* src/widgets/rack_plugin.cpp:
 	added deletion of the control view to the dtor to make it clean
