@@ -1,3 +1,16 @@
+2006-08-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.cvs:
+	small makefile to be run before configure for creating/copying all
+	neccessary files
+
+	* config.sub:
+	* config.guess:
+	* configure:
+	* config.h.in:
+	* ltmain.sh:
+	removed
+
 2006-08-14	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* Makefile.am:
 	* include/ladspa_effect.h:

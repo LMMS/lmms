@@ -1,0 +1,22 @@
+all:
+	@echo
+	@echo Creating neccessary files for configuring and building LMMS
+	@echo
+	@echo \ \* Creating aclocal.m4
+	@aclocal
+	@echo \ \* Running libtoolize
+	@libtoolize -c -f
+	@echo \ \* Creating config.h.in
+	@autoheader
+	@echo \ \* Creating Makefile templates
+	@automake
+	@echo \ \* Creating configure
+	@autoconf
+	@echo \ \* Cleaning up
+	@rm -rf autom4te.cache/
+	@echo
+	@echo ...done\! If something failed make sure you\'ve installed autoconf,
+	@echo automake and libtool.
+	@echo Otherwise you can run now configure \(if you did not so far\) and then make.
+	@echo
+
