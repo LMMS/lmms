@@ -5,6 +5,9 @@
 	connetions are not saved!)
 
 2006-08-15	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/core/ladspa_control_dialog.cpp:
+	save and restore the channel link state
+	
 	* src/widgets/rack_plugin.cpp:
 	added deletion of the control view to the dtor to make it clean
 	up after itself
