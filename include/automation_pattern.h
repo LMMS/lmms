@@ -43,6 +43,8 @@ public:
 	automationPattern( track * _track, levelObject * _object );
 	automationPattern( engine * _engine, levelObject * _object );
 	automationPattern( const automationPattern & _pat_to_copy );
+	automationPattern( const automationPattern & _pat_to_copy,
+							levelObject * _object );
 	virtual ~automationPattern();
 
 
