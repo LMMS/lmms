@@ -1,3 +1,8 @@
+2006-08-15	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/rack_plugin.cpp:
+	added deletion of the control view to the dtor to make it clean
+	up after itself
+	
 2006-08-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* Makefile.cvs:

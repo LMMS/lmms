@@ -202,6 +202,7 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 rackPlugin::~rackPlugin()
 {
 	delete m_effect;
+	delete m_controlView;
 }
 
 
