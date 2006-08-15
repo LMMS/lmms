@@ -47,7 +47,8 @@ pluginDescription::pluginDescription( QWidget * _parent, engine * _engine ):
 	m_ladspaManager( _engine->getLADSPAManager() )
 {
 	m_boxer = new QVBoxLayout( this );
-	m_grouper = new QGroupBox( 9, Qt::Vertical, tr( "Description" ), this );
+	m_grouper = new QGroupBox( 9, Qt::Vertical, 
+						tr( "Description" ), this );
 
 	m_label = new QLabel( m_grouper );
 	m_label->setText( tr( "Label:" ) );
@@ -131,7 +132,9 @@ void pluginDescription::onHighlighted( const ladspa_key_t & _key )
 
 
 
-ladspaDescription::ladspaDescription( QWidget * _parent, engine * _engine, pluginType _type ):
+ladspaDescription::ladspaDescription( QWidget * _parent, 
+					engine * _engine, 
+					pluginType _type ):
 	QWidget( _parent, "ladspaDescription" )
 {
 	m_ladspaManager = _engine->getLADSPAManager();
@@ -168,7 +171,10 @@ ladspaDescription::ladspaDescription( QWidget * _parent, engine * _engine, plugi
 	for( l_sortable_plugin_t::iterator it = plugins.begin();
 		    it != plugins.end(); it++ )
 	{
-		if( _type != VALID || m_ladspaManager->getDescription( (*it).second )->inputChannels <= _engine->getMixer()->audioDev()->channels() )
+		if( _type != VALID || 
+			m_ladspaManager->getDescription( 
+				(*it).second )->inputChannels <= 
+				  _engine->getMixer()->audioDev()->channels() )
 		{ 
 			m_pluginNames.append( (*it).first );
 			m_pluginKeys.append( (*it).second );
@@ -186,7 +192,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent, engine * _engine, plugi
 	m_pluginDescription = new pluginDescription( this, _engine );
 	connect( this, SIGNAL( highlighted( const ladspa_key_t & ) ),
 			m_pluginDescription, 
-				SLOT( onHighlighted( const ladspa_key_t & ) ) );
+			SLOT( onHighlighted( const ladspa_key_t & ) ) );
 	m_boxer->addWidget( m_pluginDescription );
 	
 	if( m_pluginList->numRows() > 0 )
@@ -222,7 +228,6 @@ void ladspaDescription::onHighlighted( int _pluginIndex )
 
 void ladspaDescription::onDoubleClicked( QListBoxItem * _item )
 {
-//	m_currentSelection = m_pluginKeys[m_pluginList->index( _item )];
 	emit( doubleClicked( m_currentSelection ) );
 }
 

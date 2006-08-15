@@ -42,7 +42,10 @@
 #include "ladspa_effect.h"
 
 
-ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _engine, track * _track ) :
+ladspaControl::ladspaControl( QWidget * _parent, 
+				port_desc_t * _port, 
+				engine * _engine, 
+				track * _track ) :
 	QWidget( _parent, "ladspaControl" ),
 	journallingObject( _engine ),
 	m_port( _port ),
@@ -53,7 +56,8 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle = new ledCheckBox( m_port->name, this, "", eng(), m_track );
+			m_toggle = new ledCheckBox( m_port->name, this, "", 
+							eng(), m_track );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
@@ -61,10 +65,15 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 			}	
 			break;
 		case INTEGER:
-			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
+			m_knob = new knob( knobBright_26, this, 
+						m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
-			m_knob->setRange( static_cast<int>( m_port->max ), static_cast<int>( m_port->min ), 1 + static_cast<int>( m_port->max - m_port->min ) / 200 );
-			m_knob->setInitValue( static_cast<int>( m_port->def ) );
+			m_knob->setRange( static_cast<int>( m_port->max ), 
+					static_cast<int>( m_port->min ), 
+					1 + static_cast<int>( m_port->max - 
+							m_port->min ) / 200 );
+			m_knob->setInitValue( 
+					static_cast<int>( m_port->def ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -75,9 +84,12 @@ ladspaControl::ladspaControl( QWidget * _parent, port_desc_t * _port, engine * _
 					tr( "Sorry, no help available." ) );
 			break;
 		case FLOAT:
-			m_knob = new knob( knobBright_26, this, m_port->name, eng(), m_track);
+			m_knob = new knob( knobBright_26, this, 
+						m_port->name, eng(), m_track);
 			m_knob->setLabel( m_port->name );
-			m_knob->setRange( m_port->min, m_port->max, ( m_port->max - m_port->min ) / 200.0f );
+			m_knob->setRange( m_port->min, m_port->max, 
+						( m_port->max - 
+						m_port->min ) / 200.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -110,7 +122,8 @@ LADSPA_Data ladspaControl::getValue( void )
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			value = static_cast<LADSPA_Data>( m_toggle->isChecked() );
+			value = static_cast<LADSPA_Data>( 
+						m_toggle->isChecked() );
 			break;
 		case INTEGER:
 			value = static_cast<LADSPA_Data>( m_knob->value() );
@@ -151,7 +164,9 @@ void ladspaControl::setValue( LADSPA_Data _value )
 
 
 
-void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, QDomElement & _this, const QString & _name )
+void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, 
+						QDomElement & _this, 
+						const QString & _name )
 {
 	switch( m_port->data_type )
 	{
@@ -170,7 +185,8 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, QDomElement & _t
 
 
 
-void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, const QString & _name )
+void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, 
+						const QString & _name )
 {
 	switch( m_port->data_type )
 	{

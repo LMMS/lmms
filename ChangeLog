@@ -3,6 +3,9 @@
 	added deletion of the control view to the dtor to make it clean
 	up after itself
 	
+	* All of the effects related files:
+	reformatted to respect the 80 characters per line convention
+	
 2006-08-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* Makefile.cvs:

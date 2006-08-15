@@ -106,9 +106,10 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	avl_layout->setMargin( 0 );
 	labelWidget( available, tr( "Available Effects" ) );
 
-	ladspaDescription * available_list = new ladspaDescription(available, _engine, VALID );
+	ladspaDescription * available_list = new ladspaDescription(available,
+			 				_engine, VALID );
 	connect( available_list, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-				SLOT( showPorts( const ladspa_key_t & ) ) );
+			this, SLOT( showPorts( const ladspa_key_t & ) ) );
 	avl_layout->addWidget( available_list );
 
 
@@ -119,9 +120,11 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	unavl_layout->setMargin( 0 );
 	labelWidget( unavailable, tr( "Unavailable Effects" ) );
 
-	ladspaDescription * unavailable_list = new ladspaDescription(unavailable, _engine, INVALID );
-	connect( unavailable_list, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-				 SLOT( showPorts( const ladspa_key_t & ) ) );
+	ladspaDescription * unavailable_list = new ladspaDescription(unavailable,
+							_engine, INVALID );
+	connect( unavailable_list, 
+			SIGNAL( doubleClicked( const ladspa_key_t & ) ),
+			this, SLOT( showPorts( const ladspa_key_t & ) ) );
 	unavl_layout->addWidget( unavailable_list );
 
 
@@ -132,9 +135,11 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	inst_layout->setMargin( 0 );
 	labelWidget( instruments, tr( "Instruments" ) );
 
-	ladspaDescription * instruments_list = new ladspaDescription(instruments, _engine, SOURCE );
-	connect( instruments_list, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-				 SLOT( showPorts( const ladspa_key_t  & ) ) );
+	ladspaDescription * instruments_list = 
+			new ladspaDescription(instruments, _engine, SOURCE );
+	connect( instruments_list, 
+			SIGNAL( doubleClicked( const ladspa_key_t & ) ),
+			this, SLOT( showPorts( const ladspa_key_t  & ) ) );
 	inst_layout->addWidget( instruments_list );
 
 
@@ -145,9 +150,11 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	anal_layout->setMargin( 0 );
 	labelWidget( analysis, tr( "Analysis Tools" ) );
 
-	ladspaDescription * analysis_list = new ladspaDescription(analysis, _engine, SINK );
-	connect( analysis_list, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-					 SLOT( showPorts( const ladspa_key_t & ) ) );
+	ladspaDescription * analysis_list = 
+			new ladspaDescription(analysis, _engine, SINK );
+	connect( analysis_list, 
+			SIGNAL( doubleClicked( const ladspa_key_t & ) ),
+			this, SLOT( showPorts( const ladspa_key_t & ) ) );
 	anal_layout->addWidget( analysis_list );
 
 
@@ -158,26 +165,33 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	other_layout->setMargin( 0 );
 	labelWidget( other, tr( "Don't know" ) );
 
-	ladspaDescription * other_list = new ladspaDescription(other, _engine, OTHER );
-	connect( other_list, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
-		 SLOT( showPorts( const ladspa_key_t & ) ) );
+	ladspaDescription * other_list = 
+			new ladspaDescription(other, _engine, OTHER );
+	connect( other_list, 
+			SIGNAL( doubleClicked( const ladspa_key_t & ) ),
+			this, SLOT( showPorts( const ladspa_key_t & ) ) );
 	other_layout->addWidget( other_list );
 	
 #ifndef QT4
 #define setIcon setPixmap
 #endif
 
-	m_tabBar->addTab( available, tr( "Available Effects" ), 0, FALSE, TRUE 
+	m_tabBar->addTab( available, tr( "Available Effects" ), 
+				0, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 1, FALSE, TRUE 
+	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
+				1, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap(
-							"unavailable_sound" ) );
-	m_tabBar->addTab( instruments, tr( "Instruments" ), 2, FALSE,
-				TRUE )->setIcon( embed::getIconPixmap(
+						"unavailable_sound" ) );
+	m_tabBar->addTab( instruments, tr( "Instruments" ), 
+				2, FALSE, TRUE 
+			)->setIcon( embed::getIconPixmap(
 							"setup_midi" ) );
-	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 3, FALSE, TRUE
+	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
+				3, FALSE, TRUE
 			)->setIcon( embed::getIconPixmap( "analysis" ) );
-	m_tabBar->addTab( other, tr( "Don't know" ), 4, TRUE, TRUE
+	m_tabBar->addTab( other, tr( "Don't know" ), 
+				4, TRUE, TRUE
 			)->setIcon( embed::getIconPixmap( "uhoh" ) );
 
 #undef setIcon
@@ -195,11 +209,15 @@ ladspaBrowser::ladspaBrowser( engine * _engine ) :
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
 
-	QPushButton * help_btn = new QPushButton( embed::getIconPixmap( "help" ), "", buttons );
-	connect( help_btn, SIGNAL( clicked() ), this, SLOT( displayHelp() ) );
+	QPushButton * help_btn = new QPushButton( 
+				embed::getIconPixmap( "help" ), "", buttons );
+	connect( help_btn, SIGNAL( clicked() ), 
+					this, SLOT( displayHelp() ) );
 	
-	QPushButton * cancel_btn = new QPushButton( embed::getIconPixmap( "cancel" ), tr( "Close" ), buttons );
-	connect( cancel_btn, SIGNAL( clicked() ), this, SLOT( reject() ) );
+	QPushButton * cancel_btn = new QPushButton( 
+		embed::getIconPixmap( "cancel" ), tr( "Close" ), buttons );
+	connect( cancel_btn, SIGNAL( clicked() ), 
+					this, SLOT( reject() ) );
 
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
@@ -272,9 +290,11 @@ void ladspaBrowser::showPorts( const ladspa_key_t & _key )
 void ladspaBrowser::displayHelp( void )
 {
 #ifdef QT4
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), 
+								whatsThis() );
 #else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal( rect().bottomRight() ) );
+	QWhatsThis::display( QWhatsThis::textFor( this ), 
+					mapToGlobal( rect().bottomRight() ) );
 #endif
 }
 

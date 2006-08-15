@@ -81,7 +81,8 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key,
 	{
 		port_nums.append( QString::number( row ) );
 		Uint8 col = 0;
-		display->setText( row, col, m_ladspa->getPortName( m_key, row ) );
+		display->setText( row, col, m_ladspa->getPortName( 
+							m_key, row ) );
 		col++;
 		
 		if( m_ladspa->isPortAudio( m_key, row ) )
@@ -141,7 +142,8 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key,
 		}
 		else if( m_ladspa->isInteger( m_key, row ) )
 		{
-			range += QString::number( static_cast<int>( min ) ) + " < ";
+			range += QString::number( static_cast<int>( min ) ) +
+									" < ";
 		}
 		else
 		{
@@ -154,7 +156,8 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key,
 		}
 		else if( m_ladspa->isInteger( m_key, row ) )
 		{
-			range += QString::number( static_cast<int>( def ) ) + " < ";
+			range += QString::number( static_cast<int>( def ) ) + 
+									" < ";
 		}
 		else
 		{

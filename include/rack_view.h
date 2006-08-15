@@ -57,12 +57,14 @@ class rackView: public QWidget, public journallingObject
 	Q_OBJECT
 
 public:
-	rackView( QWidget * _parent, engine * _engine, track * _track, audioPort * _port );
+	rackView( QWidget * _parent, engine * _engine, 
+					track * _track, audioPort * _port );
 	~rackView();
 
 	void addPlugin( ladspa_key_t _key );
 	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
+							QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{

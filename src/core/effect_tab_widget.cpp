@@ -56,7 +56,8 @@
 #include "audio_port.h"
 
 
-effectTabWidget::effectTabWidget( instrumentTrack * _track, audioPort * _port ) :
+effectTabWidget::effectTabWidget( instrumentTrack * _track,
+					audioPort * _port ) :
 	QWidget( _track->tabWidgetParent() ),
 	journallingObject( _track->eng() ),
 	m_track( dynamic_cast<track *>( _track ) ),
@@ -68,7 +69,9 @@ effectTabWidget::effectTabWidget( instrumentTrack * _track, audioPort * _port ) 
 
 
 
-effectTabWidget::effectTabWidget( QWidget * _parent, sampleTrack * _track, audioPort * _port ) :
+effectTabWidget::effectTabWidget( QWidget * _parent, 
+					sampleTrack * _track, 
+					audioPort * _port ) :
 	QWidget( _parent ),
 	journallingObject( _track->eng() ),
 	m_track( dynamic_cast<track *>( _track ) ),
@@ -89,8 +92,10 @@ effectTabWidget::~effectTabWidget()
 
 void effectTabWidget::setupWidget( void )
 {
-	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this, eng(), m_track );
-	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), this, SLOT( setBypass( bool ) ) );
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), 
+							this, eng(), m_track );
+	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), 
+					this, SLOT( setBypass( bool ) ) );
 	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
 	
 	m_rack = new rackView( m_effectsGroupBox, eng(), m_track, m_port );
@@ -99,7 +104,8 @@ void effectTabWidget::setupWidget( void )
 	m_addButton = new QPushButton( m_effectsGroupBox, "Add Effect" );
 	m_addButton->setText( tr( "Add" ) );
 	m_addButton->move( 75, 210 );
-	connect( m_addButton, SIGNAL( clicked( void ) ), this, SLOT( addEffect( void ) ) );
+	connect( m_addButton, SIGNAL( clicked( void ) ), 
+					this, SLOT( addEffect( void ) ) );
 }
 
 
@@ -117,7 +123,8 @@ void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effectTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_effectsGroupBox->setState( !_this.attribute( "fxdisabled" ).toInt() );
+	m_effectsGroupBox->setState( 
+				!_this.attribute( "fxdisabled" ).toInt() );
 	
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )

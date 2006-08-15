@@ -41,7 +41,10 @@
 #include "rack_view.h"
 
 
-rackView::rackView( QWidget * _parent, engine * _engine, track * _track, audioPort * _port ):
+rackView::rackView( QWidget * _parent, 
+			engine * _engine, 
+			track * _track, 
+			audioPort * _port ):
 	QWidget( _parent, "rackView" ),
 	journallingObject( _engine ),
 	m_track( _track ),
@@ -70,10 +73,14 @@ rackView::~rackView()
 
 void rackView::addPlugin( ladspa_key_t _key )
 {
-	rackPlugin * plugin = new rackPlugin( m_scrollView->viewport(), _key, m_track, eng(), m_port );
-	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), this, SLOT( moveUp( rackPlugin * ) ) );
-	connect( plugin, SIGNAL( moveDown( rackPlugin * ) ), this, SLOT( moveDown( rackPlugin * ) ) );
-	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ), this, SLOT( deletePlugin( rackPlugin * ) ) );
+	rackPlugin * plugin = new rackPlugin( m_scrollView->viewport(),
+						_key, m_track, eng(), m_port );
+	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), 
+				this, SLOT( moveUp( rackPlugin * ) ) );
+	connect( plugin, SIGNAL( moveDown( rackPlugin * ) ),
+				this, SLOT( moveDown( rackPlugin * ) ) );
+	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ),
+				this, SLOT( deletePlugin( rackPlugin * ) ) );
 	m_scrollView->addChild( plugin );
 	m_scrollView->moveChild( plugin, 0, m_lastY );
 	plugin->show();
@@ -90,7 +97,9 @@ void rackView::moveUp( rackPlugin * _plugin )
 	if( _plugin != m_rackInserts.first() )
 	{
 		int i = 0;
-		for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++, i++ )
+		for( vvector<rackPlugin *>::iterator it = 
+						m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++, i++ )
 		{
 			if( (*it) == _plugin )
 			{
@@ -116,7 +125,9 @@ void rackView::moveDown( rackPlugin * _plugin )
 	if( _plugin != m_rackInserts.last() )
 	{
 		int i = 0;
-		for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++, i++ )
+		for( vvector<rackPlugin *>::iterator it = 
+						m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++, i++ )
 		{
 			if( (*it) == _plugin )
 			{
@@ -143,7 +154,8 @@ void rackView::deletePlugin( rackPlugin * _plugin )
 	m_scrollView->removeChild( _plugin );
 	
 	vvector<rackPlugin *>::iterator loc = NULL;
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++ )
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++ )
 	{
 		if( (*it) == _plugin )
 		{
@@ -166,7 +178,8 @@ void rackView::deletePlugin( rackPlugin * _plugin )
 void rackView::redraw()
 {
 	m_lastY = 0;
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++ )
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++ )
 	{
 		m_scrollView->moveChild( (*it), 0, m_lastY );
 		m_lastY += (*it)->height();
@@ -177,17 +190,22 @@ void rackView::redraw()
 
 
 
-void FASTCALL rackView::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void FASTCALL rackView::saveSettings( QDomDocument & _doc, 
+							QDomElement & _this )
 {
 	int num = 0;
 	_this.setAttribute( "plugins", m_rackInserts.count() );
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); it != m_rackInserts.end(); it++ )
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++ )
 	{
 		ladspa_key_t key = (*it)->getKey();
-		_this.setAttribute( "label" + QString::number(num), key.first );
+		_this.setAttribute( "label" + QString::number(num), 
+								key.first );
 		_this.setAttribute( "lib" + QString::number(num), key.second );
-		_this.setAttribute( "name" + QString::number(num), m_ladspa->getName( key ) );
-		_this.setAttribute( "maker" + QString::number(num), m_ladspa->getMaker( key ) );
+		_this.setAttribute( "name" + QString::number(num), 
+						m_ladspa->getName( key ) );
+		_this.setAttribute( "maker" + QString::number(num), 
+						m_ladspa->getMaker( key ) );
 		(*it)->saveState( _doc, _this );
 		num++;
 	}
@@ -204,7 +222,8 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 	for( int i = 0; i < plugin_cnt; i++ )
 	{
 		QString lib = _this.attribute( "lib" + QString::number( i ) );
-		QString label = _this.attribute( "label" + QString::number( i ) );
+		QString label = _this.attribute( "label" + 
+							QString::number( i ) );
 		ladspa_key_t key( label, lib );
 		if( m_ladspa->getDescriptor( key ) != NULL )
 		{
@@ -212,22 +231,28 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 			
 			if( node.isElement() )
 			{
-				if( m_rackInserts.last()->nodeName() == node.nodeName() )
+				if( m_rackInserts.last()->nodeName() == 
+							node.nodeName() )
 				{
-					m_rackInserts.last()->restoreState( node.toElement() );
+					m_rackInserts.last()->restoreState( 
+							node.toElement() );
 				}
 			}
 		}
 		else
 		{
-			QString name = _this.attribute( "name" + QString::number( i ) );
-			QString maker = _this.attribute( "maker" + QString::number( i ) );
-			QString message = "Couldn't find " + name + " from:\n\n";
+			QString name = _this.attribute( "name" + 
+						QString::number( i ) );
+			QString maker = _this.attribute( "maker" + 
+						QString::number( i ) );
+			QString message = "Couldn't find " + name + 
+						" from:\n\n";
 			message += "Library: " + lib + "\n";
 			message += "Label: " + label + "\n";
 			message += "Maker: " + maker;
 			
-			QMessageBox::information( 0, tr( "Uknown plugin" ), message, QMessageBox::Ok );
+			QMessageBox::information( 0, tr( "Uknown plugin" ), 
+						message, QMessageBox::Ok );
 		}
 		node = node.nextSibling();
 	}

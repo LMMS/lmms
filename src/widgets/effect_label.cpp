@@ -36,15 +36,20 @@
 #include "main_window.h"
 
 
-effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent, engine * _engine, sampleTrack * _track ) :
+effectLabel::effectLabel( const QString & _initial_name, 
+				QWidget * _parent, 
+				engine * _engine, 
+				sampleTrack * _track ) :
 	QWidget( _parent ),
 	journallingObject( _engine ),
 	m_track( _track ),
 	m_show( TRUE )
 {
-	m_effectBtn = new QPushButton( embed::getIconPixmap( "setup_audio" ), "", this );
+	m_effectBtn = new QPushButton( embed::getIconPixmap( "setup_audio" ),
+								"", this );
 	m_effectBtn->setGeometry( 6, 1, 28, 28 );
-	connect( m_effectBtn, SIGNAL( clicked() ), this, SLOT( showEffects() ) );
+	connect( m_effectBtn, SIGNAL( clicked() ), 
+					this, SLOT( showEffects() ) );
 	
 	m_label = new QLabel( this );
 	m_label->setText( _initial_name );
@@ -52,10 +57,13 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent, engi
 	m_label->setFont( pointSize<8>( f ) );
 	m_label->setGeometry( 38, 1, 200, 28 );
 	
-	m_effWidget = new effectTabWidget( eng()->getMainWindow()->workspace(), m_track, m_track->getAudioPort() );
+	m_effWidget = new effectTabWidget( eng()->getMainWindow()->workspace(),
+						m_track, 
+						m_track->getAudioPort() );
 	m_effWidget->setFixedSize( 240, 242 );
 	m_effWidget->hide();
-	connect( m_effWidget, SIGNAL( closed() ), this, SLOT( closeEffects() ) );
+	connect( m_effWidget, SIGNAL( closed() ), 
+					this, SLOT( closeEffects() ) );
 }
 
 

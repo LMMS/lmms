@@ -55,7 +55,9 @@ class effectLabel: public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	effectLabel( const QString & _initial_name, QWidget * _parent, engine * _engine, sampleTrack * _track );
+	effectLabel( const QString & _initial_name, 
+			QWidget * _parent, engine * _engine, 
+			sampleTrack * _track );
 	virtual ~effectLabel();
 
 	inline const QString & text( void )
@@ -64,7 +66,8 @@ public:
 	}
 	void FASTCALL setText( const QString & _text );
 	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
+						QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{

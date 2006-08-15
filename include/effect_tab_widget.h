@@ -72,11 +72,13 @@ class effectTabWidget : public QWidget, public journallingObject
 	Q_OBJECT
 public:
 	effectTabWidget( instrumentTrack * _track, audioPort * _port );
-	effectTabWidget( QWidget * _parent, sampleTrack * _track, audioPort * _port );
+	effectTabWidget( QWidget * _parent, sampleTrack * _track, 
+							audioPort * _port );
 	virtual ~effectTabWidget();
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
+						QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{

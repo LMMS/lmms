@@ -65,7 +65,8 @@ void FASTCALL effectChain::deleteEffect( effect * _effect )
 {
 	m_processLock.lock();
 	effect_list_t::iterator which = NULL;
-	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	for( effect_list_t::iterator it = m_effects.begin(); 
+						it != m_effects.end(); it++ )
 	{
 		if( (*it) == _effect )
 		{
@@ -92,7 +93,8 @@ void FASTCALL effectChain::moveDown( effect * _effect )
 	if( _effect != m_effects.last() )
 	{
 		int i = 0;
-		for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++, i++ )
+		for( effect_list_t::iterator it = m_effects.begin(); 
+					it != m_effects.end(); it++, i++ )
 		{
 			if( (*it) == _effect )
 			{
@@ -118,7 +120,8 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 	if( _effect != m_effects.first() )
 	{
 		int i = 0;
-		for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++, i++ )
+		for( effect_list_t::iterator it = m_effects.begin(); 
+					it != m_effects.end(); it++, i++ )
 		{
 			if( (*it) == _effect )
 			{
@@ -137,14 +140,16 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 
 
 
-bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, const fpab_t _frames )
+bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, 
+							const fpab_t _frames )
 {
 	if( m_bypassed || ! m_processLock.tryLock() )
 	{
 		return( FALSE );
 	}
 	bool more_effects = FALSE;
-	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	for( effect_list_t::iterator it = m_effects.begin(); 
+						it != m_effects.end(); it++ )
 	{
 		more_effects |= (*it)->processAudioBuffer( _buf, _frames );
 	}
@@ -162,7 +167,8 @@ void effectChain::startRunning( void )
 		return;
 	}
 	
-	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	for( effect_list_t::iterator it = m_effects.begin(); 
+						it != m_effects.end(); it++ )
 	{
 		(*it)->startRunning();
 	}
@@ -180,7 +186,8 @@ bool effectChain::isRunning( void )
 	
 	bool running = FALSE;
 	
-	for( effect_list_t::iterator it = m_effects.begin(); it != m_effects.end() || !running; it++ )
+	for( effect_list_t::iterator it = m_effects.begin(); 
+				it != m_effects.end() || !running; it++ )
 	{
 		running = (*it)->isRunning() && running;
 	}

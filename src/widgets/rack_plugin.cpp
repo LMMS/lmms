@@ -63,7 +63,11 @@
 #include "main_window.h"
 
 
-rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, engine * _engine, audioPort * _port ) :
+rackPlugin::rackPlugin( QWidget * _parent, 
+			ladspa_key_t _key, 
+			track * _track, 
+			engine * _engine, 
+			audioPort * _port ) :
 	QWidget( _parent, "rackPlugin" ),
 	journallingObject( _engine ),
 	m_track( _track ),
@@ -83,8 +87,10 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 	m_grouper = new QGroupBox( 1, Qt::Vertical, "", this );
 	m_grouper->setFixedSize( 210, 58 );
 	
-	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), eng(), m_track );
-	connect( m_bypass, SIGNAL( toggled( bool ) ), this, SLOT( bypassed( bool ) ) );
+	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), 
+							eng(), m_track );
+	connect( m_bypass, SIGNAL( toggled( bool ) ), 
+				this, SLOT( bypassed( bool ) ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 	m_bypass->setChecked( TRUE );
 	m_bypass->move( 3, 3 );
@@ -96,8 +102,10 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 					tr( 
 "Toggles the effect on or off." ) );
 	
-	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ), eng(), m_track );
-	connect( m_wetDry, SIGNAL( valueChanged( float ) ), this, SLOT( setWetDry( float ) ) );
+	m_wetDry = new knob( knobBright_26, this, 
+					tr( "Wet/Dry mix" ), eng(), m_track );
+	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
+				this, SLOT( setWetDry( float ) ) );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->setRange( 0.0f, 1.0f, 0.01f );
 	m_wetDry->setInitValue( 1.0f );
@@ -109,10 +117,13 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 		QWhatsThis::add( m_wetDry,
 #endif
 					tr( 
-"The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output." ) );
+"The Wet/Dry knob sets the ratio between the input signal and the effect that "
+"shows up in the output." ) );
 
-	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ), eng(), m_track );
-	connect( m_autoQuit, SIGNAL( valueChanged( float ) ), this, SLOT( setAutoQuit( float ) ) );
+	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ),
+							eng(), m_track );
+	connect( m_autoQuit, SIGNAL( valueChanged( float ) ), 
+				this, SLOT( setAutoQuit( float ) ) );
 	m_autoQuit->setLabel( tr( "Decay" ) );
 	m_autoQuit->setRange( 1.0f, 8000.0f, 100.0f );
 	m_autoQuit->setInitValue( 1 );
@@ -124,11 +135,13 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 		QWhatsThis::add( m_autoQuit,
 #endif
 					tr( 
-"The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values "
-"will reduce the CPU overhead but run the risk of clipping the tail on delay effects." ) );
+"The Decay knob controls how many buffers of silence must pass before the "
+"plugin stops processing.  Smaller values will reduce the CPU overhead but "
+"run the risk of clipping the tail on delay effects." ) );
 
 	m_gate = new knob( knobBright_26, this, tr( "Gate" ), eng(), m_track );
-	connect( m_wetDry, SIGNAL( valueChanged( float ) ), this, SLOT( setGate( float ) ) );
+	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
+				this, SLOT( setGate( float ) ) );
 	m_gate->setLabel( tr( "Gate" ) );
 	m_gate->setRange( 0.0f, 1.0f, 0.01f );
 	m_gate->setInitValue( 0.0f );
@@ -140,15 +153,16 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 		QWhatsThis::add( m_gate,
 #endif
 					tr( 
-"The Gate knob controls the signal level that is considered to be 'silence' while deciding when to stop processing "
-"signals." ) );
+"The Gate knob controls the signal level that is considered to be 'silence' "
+"while deciding when to stop processing signals." ) );
 
 	m_editButton = new QPushButton( this, "Controls" );
 	m_editButton->setText( tr( "Controls" ) );
 	QFont f = m_editButton->font();
 	m_editButton->setFont( pointSize<7>( f ) );
 	m_editButton->setGeometry( 140, 19, 50, 20 );
-	connect( m_editButton, SIGNAL( clicked() ), this, SLOT( editControls() ) );
+	connect( m_editButton, SIGNAL( clicked() ), 
+				this, SLOT( editControls() ) );
 		
 	QString name = eng()->getLADSPAManager()->getShortName( _key );
 	m_label = new QLabel( this );
@@ -158,8 +172,11 @@ rackPlugin::rackPlugin( QWidget * _parent, ladspa_key_t _key, track * _track, en
 	m_label->setFont( pointSize<7>( f ) );
 	m_label->setGeometry( 5, 38, 200, 20 );
 	
-	m_controlView = new ladspaControlDialog( eng()->getMainWindow()->workspace(), m_effect, eng(), m_track );
-	connect( m_controlView, SIGNAL( closed() ), this, SLOT( closeEffects() ) );
+	m_controlView = new ladspaControlDialog( 
+				eng()->getMainWindow()->workspace(), 
+				m_effect, eng(), m_track );
+	connect( m_controlView, SIGNAL( closed() ),
+				this, SLOT( closeEffects() ) );
 	m_controlView->hide();
 	
 #ifdef QT4
@@ -243,7 +260,8 @@ void rackPlugin::setWetDry( float _value )
 void rackPlugin::setAutoQuit( float _value )
 {
 	float samples = eng()->getMixer()->sampleRate() * _value / 1000.0f;
-	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / eng()->getMixer()->framesPerAudioBuffer() );
+	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / 
+			eng()->getMixer()->framesPerAudioBuffer() );
 	m_effect->setTimeout( buffers );
 }
 
@@ -263,17 +281,27 @@ void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 #ifdef QT4
 	m_contextMenu->setTitle( m_effect->getName() );
 #else
-	QLabel * caption = new QLabel( "<font color=white><b>" + QString( m_effect->getName() ) + "</b></font>", this );
+	QLabel * caption = new QLabel( "<font color=white><b>" + 
+				QString( m_effect->getName() ) + "</b></font>",
+				this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
 	caption->setAlignment( Qt::AlignCenter );
 	m_contextMenu->addAction( caption );
 #endif
-	m_contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ), tr( "Move &up" ), this, SLOT( moveUp() ) );
-	m_contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ), tr( "Move &down" ), this, SLOT( moveDown() ) );
+	m_contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ), 
+						tr( "Move &up" ), 
+						this, SLOT( moveUp() ) );
+	m_contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ), 
+						tr( "Move &down" ),
+						this, SLOT( moveDown() ) );
 	m_contextMenu->addSeparator();
-	m_contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Remove this plugin" ), this, SLOT( deletePlugin() ) );
+	m_contextMenu->addAction( embed::getIconPixmap( "cancel" ), 
+						tr( "&Remove this plugin" ),
+						this, SLOT( deletePlugin() ) );
 	m_contextMenu->addSeparator();
-	m_contextMenu->addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),  this, SLOT( displayHelp() ) );
+	m_contextMenu->addAction( embed::getIconPixmap( "help" ), 
+						tr( "&Help" ),  
+						this, SLOT( displayHelp() ) );
 	m_contextMenu->exec( QCursor::pos() );
 	if( m_contextMenu != NULL )
 	{
@@ -325,16 +353,19 @@ void rackPlugin::deletePlugin()
 void rackPlugin::displayHelp( void )
 {
 #ifdef QT4
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
+								whatsThis() );
 #else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal( rect().bottomRight() ) );
+	QWhatsThis::display( QWhatsThis::textFor( this ),
+					mapToGlobal( rect().bottomRight() ) );
 #endif
 }
 
 
 
 
-void FASTCALL rackPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void FASTCALL rackPlugin::saveSettings( QDomDocument & _doc, 
+							QDomElement & _this )
 {
 	_this.setAttribute( "on", m_bypass->isChecked() );
 	_this.setAttribute( "wet", m_wetDry->value() );
@@ -360,7 +391,8 @@ void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
 		{
 			if( m_controlView->nodeName() == node.nodeName() )
 			{
-				m_controlView->restoreState( node.toElement() );
+				m_controlView->restoreState( 
+							node.toElement() );
 			}
 		}
 		node = node.nextSibling();
