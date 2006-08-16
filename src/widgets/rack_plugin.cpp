@@ -46,6 +46,7 @@
 #include <qpopupmenu.h>
 #include <qcursor.h>
 #include <qcolor.h>
+#include <qimage.h>
 
 #define addSeparator insertSeparator
 #define addMenu insertItem
@@ -81,11 +82,17 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	
 	m_name = m_effect->getName();
 	
-	setFixedSize( 210, 58 );
-	setPaletteBackgroundColor( QColor( 99, 99, 99 ) );
-	
-	m_grouper = new QGroupBox( 1, Qt::Vertical, "", this );
-	m_grouper->setFixedSize( 210, 58 );
+	setFixedSize( 210, 60 );
+
+	QPixmap bg = embed::getIconPixmap( "effect_plugin" );
+#ifdef QT4
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), bg );
+	setPalette( pal );
+#else
+	setErasePixmap( bg );
+#endif
 	
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), 
 							eng(), m_track );
@@ -109,7 +116,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->setRange( 0.0f, 1.0f, 0.01f );
 	m_wetDry->setInitValue( 1.0f );
-	m_wetDry->move( 25, 3 );
+	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
 #ifdef QT4
 		m_wetDry->setWhatsThis(
@@ -127,7 +134,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_autoQuit->setLabel( tr( "Decay" ) );
 	m_autoQuit->setRange( 1.0f, 8000.0f, 100.0f );
 	m_autoQuit->setInitValue( 1 );
-	m_autoQuit->move( 60, 3 );
+	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
 #ifdef QT4
 		m_autoQuit->setWhatsThis(
@@ -145,7 +152,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_gate->setLabel( tr( "Gate" ) );
 	m_gate->setRange( 0.0f, 1.0f, 0.01f );
 	m_gate->setInitValue( 0.0f );
-	m_gate->move( 95, 3 );
+	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
 #ifdef QT4
 		m_gate->setWhatsThis(
@@ -160,7 +167,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_editButton->setText( tr( "Controls" ) );
 	QFont f = m_editButton->font();
 	m_editButton->setFont( pointSize<7>( f ) );
-	m_editButton->setGeometry( 140, 19, 50, 20 );
+	m_editButton->setGeometry( 140, 14, 50, 20 );
 	connect( m_editButton, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 		
@@ -170,7 +177,18 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	f = m_label->font();
 	f.setBold( TRUE );
 	m_label->setFont( pointSize<7>( f ) );
-	m_label->setGeometry( 5, 38, 200, 20 );
+	m_label->setGeometry( 5, 44, 195, 10 );
+	
+	QPixmap back = QPixmap( bg.convertToImage().copy( 5, 44, 
+							195, 10 ) );
+#ifdef QT4
+	m_label->setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), back );
+	m_label->setPalette( pal );
+#else
+	m_label->setErasePixmap( back );
+#endif
 	
 	m_controlView = new ladspaControlDialog( 
 				eng()->getMainWindow()->workspace(), 

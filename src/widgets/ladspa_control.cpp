@@ -75,7 +75,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			m_knob->setRange( static_cast<int>( m_port->max ), 
 					static_cast<int>( m_port->min ), 
 					1 + static_cast<int>( m_port->max - 
-							m_port->min ) / 200 );
+							m_port->min ) / 400 );
 			m_knob->setInitValue( 
 					static_cast<int>( m_port->def ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
@@ -95,7 +95,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->min, m_port->max, 
 						( m_port->max - 
-						m_port->min ) / 200.0f );
+						m_port->min ) / 400.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4

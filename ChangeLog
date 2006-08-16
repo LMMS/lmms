@@ -23,6 +23,17 @@
 	connetions are not saved!)
 
 2006-08-15	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/ladspa_control.cpp:
+	doubled the number of steps in the knobs
+	
+	* src/core/ladspa_control_dialog.cpp:
+	changed linking to default on
+	
+	* data/themes/default/effect_plugin.png:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	added some texture to the plugin widget
+	
 	* src/core/ladspa_control_dialog.cpp:
 	save and restore the channel link state
 	
@@ -36,8 +47,6 @@
 	* src/core/ladspa_control_dialog.cpp:
 	* src/core/ladspa_control.cpp:
 	- added a link channels option to the ladspa controls
-	- unlinking the channels will currently break automation for all
-	  but the first channel
 	
 	* All of the effects related files:
 	reformatted to respect the 80 characters per line convention

@@ -51,11 +51,11 @@ rackView::rackView( QWidget * _parent,
 	m_port( _port ),
 	m_ladspa( eng()->getLADSPAManager() )
 {
-	setFixedSize( 230, 180 );
+	setFixedSize( 230, 184 );
 	
 	m_mainLayout = new QVBoxLayout( this );
 	m_scrollView = new QScrollView( this );
-	m_scrollView->setFixedSize( 230, 180 );
+	m_scrollView->setFixedSize( 230, 184 );
 	m_scrollView->setVScrollBarMode( QScrollView::AlwaysOn );
 	m_mainLayout->addWidget( m_scrollView );
 	
