@@ -3,7 +3,9 @@
 	* include/ladspa_control_dialog.h:
 	* src/core/ladspa_control_dialog.cpp:
 	* src/widgets/ladspa_control.cpp:
-	added channel link selectors for individual ports
+	* src/widgets/rack_plugin.cpp:
+	- added channel link selectors for individual ports
+	- don't show control edit button for plugins with no controls
 	
 2006-08-16	Erwin Goossen <egoossen/at/tomaatnet/dot/nl>
 

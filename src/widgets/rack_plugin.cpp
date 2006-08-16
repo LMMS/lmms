@@ -197,6 +197,11 @@ rackPlugin::rackPlugin( QWidget * _parent,
 				this, SLOT( closeEffects() ) );
 	m_controlView->hide();
 	
+	if( m_controlView->getControlCount() == 0 )
+	{
+		m_editButton->hide();
+	}
+	
 #ifdef QT4
 	this->setWhatsThis(
 #else
