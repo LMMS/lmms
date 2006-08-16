@@ -1,3 +1,8 @@
+2006-08-16	Erwin Goossen <egoossen/at/tomaatnet/dot/nl>
+
+	* data/locale/nl.ts:
+	added Dutch translation
+
 2006-08-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/automatable_object.h:
