@@ -41,6 +41,7 @@
 #include "ladspa_control.h"
 #include "ladspa_effect.h"
 #include "tooltip.h"
+#include "tempo_sync_knob.h"
 
 
 ladspaControl::ladspaControl( QWidget * _parent, 
@@ -125,7 +126,33 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->min, m_port->max, 
 					  ( m_port->max - 
-							  m_port->min ) / 400.0f );
+						m_port->min ) / 400.0f );
+			m_knob->setInitValue( m_port->def );
+			m_knob->setHintText( tr( "Value:" ) + " ", "" );
+#ifdef QT4
+			m_knob->setWhatsThis(
+#else
+			QWhatsThis::add( m_knob,
+#endif
+					tr( "Sorry, no help available." ) );
+			setFixedSize( m_knob->width(), m_knob->height() );
+			if( _link )
+			{
+				m_layout->addWidget( m_knob );
+				setFixedSize( m_link->width() + 
+						m_knob->width(),
+						m_knob->height() );
+			}
+			break;
+		case TIME:
+			m_knob = new tempoSyncKnob( knobBright_26, this, 
+						m_port->name, eng(), m_track);
+			connect( m_knob, SIGNAL( valueChanged( float ) ), 
+					this, SLOT( knobChange( float ) ) );
+			m_knob->setLabel( m_port->name );
+			m_knob->setRange( m_port->min, m_port->max, 
+					  ( m_port->max - 
+						m_port->min ) / 400.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -169,11 +196,10 @@ LADSPA_Data ladspaControl::getValue( void )
 					m_toggle->isChecked() );
 			break;
 		case INTEGER:
-			value = static_cast<LADSPA_Data>( m_knob->value() );
-			break;
 		case FLOAT:
+		case TIME:
 			value = static_cast<LADSPA_Data>( m_knob->value() );
-			break;
+			break;		
 		default:
 			printf( "ladspaControl::getValue BAD BAD BAD\n" );
 			break;
@@ -196,6 +222,7 @@ void ladspaControl::setValue( LADSPA_Data _value )
 			m_knob->setValue( static_cast<int>( _value ) );
 			break;
 		case FLOAT:
+		case TIME:
 			m_knob->setValue( static_cast<float>( _value ) );
 			break;
 		default:
@@ -222,6 +249,7 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 			break;
 		case INTEGER:
 		case FLOAT:
+		case TIME:
 			m_knob->saveSettings( _doc, _this, _name );
 			break;
 		default:
@@ -246,6 +274,7 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 			break;
 		case INTEGER:
 		case FLOAT:
+		case TIME:
 			m_knob->loadSettings( _this, _name );
 			break;
 		default:
@@ -266,6 +295,7 @@ void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 			break;
 		case INTEGER:
 		case FLOAT:
+		case TIME:
 			knob::linkObjects( m_knob, _control->getKnob() );
 			break;
 		default:
@@ -301,6 +331,7 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 			break;
 		case INTEGER:
 		case FLOAT:
+		case TIME:
 			knob::unlinkObjects( m_knob, _control->getKnob() );
 			break;
 		default:

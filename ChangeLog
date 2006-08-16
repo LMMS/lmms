@@ -1,4 +1,17 @@
 2006-08-16	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/tempo_sync_knob.cpp:
+	changed context menu to only display possible note length
+	options based on the knob's max value
+	
+	* include/ladspa_effect.h:
+	* src/core/ladspa_effect.cpp:
+	- added a new port data type TIME for port names containing
+	  "(ms)", "(S)", or "(Seconds)"
+	- converts units to milliseconds for TIME ports
+	
+	* src/widgets/ladspa_control.cpp:
+	use a tempoSyncKnob for TIME ports
+	
 	* src/widgets/automatable_button.cpp:
 	remove toggled signal sent from method toggle--it's also sent
 	from setValue, and the double signal was wreaking havoc with

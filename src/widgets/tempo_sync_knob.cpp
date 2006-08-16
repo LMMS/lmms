@@ -105,66 +105,110 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 							m_hintTextAfterValue ),
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
+	
+	float limit = 60000.0f / ( eng()->getSongEditor()->getTempo() *
+								m_scale );
+	
 #ifdef QT4
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
-						m_tempoSyncDescription );
+#else
+	QMenu * syncMenu = new QMenu( this );
+#endif
+	if( limit / 8.0f <= maxValue() )
+	{
+#ifdef QT4
 	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( setTempoSync( QAction * ) ) );
 	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
 				tr( "No Sync" ) )->setData( (int) NO_SYNC );
-	syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
+	if( limit / 0.125f <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
 				tr( "Eight beats" ) )->setData(
 						(int) DOUBLE_WHOLE_NOTE );
-	syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
+	}
+	if( limit / 0.25f <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
 					tr( "Whole note" ) )->setData(
 						(int) WHOLE_NOTE );
-	syncMenu->addAction( embed::getIconPixmap( "note_half" ),
+	}
+	if( limit / 0.5f <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_half" ),
 					tr( "Half note" ) )->setData(
 						(int) HALF_NOTE );
-	syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
+	}
+	if( limit <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
 					tr( "Quarter note" ) )->setData(
 						(int) QUARTER_NOTE );
-	syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
+	}
+	if( limit / 2.0f <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
 					tr( "8th note" ) )->setData(
 						(int) EIGHTH_NOTE );
-	syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
+	}
+	if( limit / 4.0f <= maxValue() )
+	{
+		syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
 					tr( "16th note" ) )->setData(
 					(int) SIXTEENTH_NOTE );
+	}
 	syncMenu->addAction( embed::getIconPixmap( "note_thirtysecond" ),
 					tr( "32nd note" ) )->setData(
 					(int) THIRTYSECOND_NOTE );
 #else
-	QMenu * syncMenu = new QMenu( this );
 	int menuId;
 	menuId = syncMenu->addAction( embed::getIconPixmap( "note_none" ),
 					tr( "No Sync" ),
 					this, SLOT( setTempoSync( int ) ) );
 	syncMenu->setItemParameter( menuId, ( int ) NO_SYNC );
-	menuId = syncMenu->addAction( embed::getIconPixmap(
+	if( limit / 0.125f <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap(
 							"note_double_whole" ),
 					tr( "Eight beats" ),
 					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) DOUBLE_WHOLE_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
+		syncMenu->setItemParameter( menuId, ( int ) DOUBLE_WHOLE_NOTE );
+	}
+	if( limit / 0.25f <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
 					tr( "Whole note" ),
 					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) WHOLE_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_half" ),
+		syncMenu->setItemParameter( menuId, ( int ) WHOLE_NOTE );
+	}
+	if( limit / 0.5f <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap( "note_half" ),
 					tr( "Half note" ),
 					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) HALF_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
+		syncMenu->setItemParameter( menuId, ( int ) HALF_NOTE );
+	}
+	if( limit <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
 					tr( "Quarter note" ),
 			     		this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) QUARTER_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
+		syncMenu->setItemParameter( menuId, ( int ) QUARTER_NOTE );
+	}
+	if( limit / 2.0f <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
 					tr( "8th note" ),
 					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) EIGHTH_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
+		syncMenu->setItemParameter( menuId, ( int ) EIGHTH_NOTE );
+	}
+	if( limit / 4.0f <= maxValue() )
+	{
+		menuId = syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
 					tr( "16th note" ),
 					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) SIXTEENTH_NOTE );
+		syncMenu->setItemParameter( menuId, ( int ) SIXTEENTH_NOTE );
+	}
 	menuId = syncMenu->addAction( embed::getIconPixmap(
 							"note_thirtysecond" ),
 					tr( "32nd note" ),
@@ -176,6 +220,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 #endif
 
 	contextMenu.addSeparator();
+	}
 	
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
