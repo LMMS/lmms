@@ -180,7 +180,6 @@ void automatableButton::toggle( void )
 	{
 		setValue( !value() );
 		update();
-		emit( toggled( value() ) );
 	}
 }
 

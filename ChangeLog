@@ -1,4 +1,9 @@
 2006-08-16	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/automatable_button.cpp:
+	remove toggled signal sent from method toggle--it's also sent
+	from setValue, and the double signal was wreaking havoc with
+	the channel linkings
+	
 	* include/ladspa_control.h:
 	* include/ladspa_control_dialog.h:
 	* src/core/ladspa_control_dialog.cpp:
