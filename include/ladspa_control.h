@@ -31,12 +31,14 @@
 #ifdef QT4
 
 #include <QtGui/QWidget>
+#include <QtGui/QLayout>
 #include <QtCore/QMutex>
 
 #else
 
 #include <qwidget.h>
 #include <qmutex.h>
+#include <qlayout.h>
 
 #endif
 
@@ -54,11 +56,13 @@ class ladspaControl : public QWidget, public journallingObject
 	Q_OBJECT
 public:
 	ladspaControl( QWidget * _parent, port_desc_t * _port, 
-					engine * _engine, track * _track );
+					engine * _engine, track * _track,
+					bool _link = FALSE );
 	~ladspaControl();
 	
 	LADSPA_Data getValue( void );
 	void FASTCALL setValue( LADSPA_Data _value );
+	void FASTCALL setLink( bool _state );
 	
 	void FASTCALL linkControls( ladspaControl * _control );
 	void FASTCALL unlinkControls( ladspaControl * _control );
@@ -88,15 +92,19 @@ public:
 	}
 
 signals:
-	void changed( Uint16 _port, LADSPA_Data );
+	void changed( Uint16 _port, LADSPA_Data _value );
+	void linkChanged( Uint16 _port, bool _state );
 
 protected slots:
-	void ledChange( bool );
-	void knobChange( float );
+	void ledChange( bool _state );
+	void knobChange( float _value );
+	void portLink( bool _state );
 	
 private:
 	port_desc_t * m_port;
 	track * m_track;
+	QHBoxLayout * m_layout;
+	ledCheckBox * m_link;
 	ledCheckBox * m_toggle;
 	knob * m_knob;
 	

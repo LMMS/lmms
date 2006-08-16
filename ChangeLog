@@ -1,3 +1,10 @@
+2006-08-16	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* include/ladspa_control.h:
+	* include/ladspa_control_dialog.h:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/widgets/ladspa_control.cpp:
+	added channel link selectors for individual ports
+	
 2006-08-16	Erwin Goossen <egoossen/at/tomaatnet/dot/nl>
 
 	* data/locale/nl.ts:

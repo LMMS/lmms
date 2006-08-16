@@ -40,42 +40,65 @@
 
 #include "ladspa_control.h"
 #include "ladspa_effect.h"
+#include "tooltip.h"
 
 
 ladspaControl::ladspaControl( QWidget * _parent, 
 				port_desc_t * _port, 
 				engine * _engine, 
-				track * _track ) :
+				track * _track,
+			    	bool _link) :
 	QWidget( _parent, "ladspaControl" ),
 	journallingObject( _engine ),
 	m_port( _port ),
 	m_track( _track ),
+	m_link( NULL ),
 	m_toggle( NULL ),
 	m_knob( NULL )
 {
+	m_layout = new QHBoxLayout( this, 0, 0, "ladspaControlLayout" );
+	
+	if( _link )
+	{
+		m_link = new ledCheckBox( "", this, "", eng(), m_track );
+		m_link->setChecked( FALSE );
+		connect( m_link, SIGNAL( toggled( bool ) ),
+			 this, SLOT( portLink( bool ) ) );
+		m_layout->addWidget( m_link );
+		toolTip::add( m_link, tr( "Link channels" ) );
+	}
+	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
 			m_toggle = new ledCheckBox( m_port->name, this, "", 
-					eng(), m_track );
+					eng(), m_track,
+					ledCheckBox::GREEN );
 			connect( m_toggle, SIGNAL( toggled( bool ) ),
-					this, SLOT( ledChange( bool ) ) );
+				 this, SLOT( ledChange( bool ) ) );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
 				m_toggle->setChecked( TRUE );
-			}	
+			}
+			if( _link )
+			{
+				m_layout->addWidget( m_toggle );
+				setFixedSize( m_link->width() + 
+						m_toggle->width(),
+						m_toggle->height() );
+			}
 			break;
 		case INTEGER:
 			m_knob = new knob( knobBright_26, this, 
-						m_port->name, eng(), m_track);
+					   m_port->name, eng(), m_track);
 			connect( m_knob, SIGNAL( valueChanged( float ) ),
-					this, SLOT( knobChange( float ) ) );
+				 this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( static_cast<int>( m_port->max ), 
-					static_cast<int>( m_port->min ), 
-					1 + static_cast<int>( m_port->max - 
-							m_port->min ) / 400 );
+					  static_cast<int>( m_port->min ), 
+					  1 + static_cast<int>( m_port->max - 
+							  m_port->min ) / 400 );
 			m_knob->setInitValue( 
 					static_cast<int>( m_port->def ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
@@ -86,16 +109,23 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			QWhatsThis::add( m_knob,
 #endif
 					tr( "Sorry, no help available." ) );
+			if( _link )
+			{
+				m_layout->addWidget( m_knob );
+				setFixedSize( m_link->width() + 
+						m_knob->width(),
+						m_knob->height() );
+			}
 			break;
 		case FLOAT:
 			m_knob = new knob( knobBright_26, this, 
-						m_port->name, eng(), m_track);
+					   m_port->name, eng(), m_track);
 			connect( m_knob, SIGNAL( valueChanged( float ) ), 
-					this, SLOT( knobChange( float ) ) );
+				 this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
 			m_knob->setRange( m_port->min, m_port->max, 
-						( m_port->max - 
-						m_port->min ) / 400.0f );
+					  ( m_port->max - 
+							  m_port->min ) / 400.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4
@@ -105,6 +135,13 @@ ladspaControl::ladspaControl( QWidget * _parent,
 #endif
 					tr( "Sorry, no help available." ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
+			if( _link )
+			{
+				m_layout->addWidget( m_knob );
+				setFixedSize( m_link->width() + 
+						m_knob->width(),
+						m_knob->height() );
+			}
 			break;
 		default:
 			break;
@@ -129,7 +166,7 @@ LADSPA_Data ladspaControl::getValue( void )
 	{
 		case TOGGLED:
 			value = static_cast<LADSPA_Data>( 
-						m_toggle->isChecked() );
+					m_toggle->isChecked() );
 			break;
 		case INTEGER:
 			value = static_cast<LADSPA_Data>( m_knob->value() );
@@ -171,9 +208,13 @@ void ladspaControl::setValue( LADSPA_Data _value )
 
 
 void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, 
-						QDomElement & _this, 
-						const QString & _name )
+					   QDomElement & _this, 
+					   const QString & _name )
 {
+	if( m_link != NULL )
+	{
+		m_link->saveSettings( _doc, _this, _name + "link" );
+	}
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
@@ -192,8 +233,12 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 
 
 void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, 
-						const QString & _name )
+					   const QString & _name )
 {
+	if( m_link != NULL )
+	{
+		m_link->loadSettings( _this, _name + "link" );
+	}
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
@@ -263,6 +308,24 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 	}
 }
 
+
+
+
+void ladspaControl::portLink( bool _state )
+{
+	emit( linkChanged( m_port->control_id, _state ) );
+}
+
+
+
+
+void FASTCALL ladspaControl::setLink( bool _state )
+{
+	if( m_link != NULL )
+	{
+		m_link->setChecked( _state );
+	}
+}
 
 
 
