@@ -1,3 +1,8 @@
+2006-08-17	Erwin Goossen <egoossen/at/tomaatnet/dot/nl>
+
+	* data/locale/nl.ts:
+	updated Dutch translation
+
 2006-08-16	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* src/widgets/tempo_sync_knob.cpp:
 	changed context menu to only display possible note length

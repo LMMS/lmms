@@ -36,7 +36,7 @@
         <source>Current language not translated.
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Just contact the maintainer!</source>
-        <translation>Is jouw taal al vertaald?
+        <translation>Is jouw taal niet vertaald?
 
 Als je geinteresseerd bent in het vertalen van LMMS in een andere taal, of je wilt de huidige vertaling verbeteren, dan ben je uitgenodigd om te helpen! Neem contact op met de maintainer!</translation>
     </message>
@@ -337,7 +337,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
-        <translation>Gebruik deze knop om het akkoorden bereik in oktaven in te stellen. Het geselecteerde akkoord zal binnen de ingestelde oktaafbereik gespeeld worden.</translation>
+        <translation>Gebruik deze knop om het akkoorden-bereik in oktaven in te stellen. Het geselecteerde akkoord zal binnen de ingestelde oktaafbereik gespeeld worden.</translation>
     </message>
     <message>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
@@ -700,7 +700,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Als je hier klikt, word de tekenmodus geactiveerd. In deze modus kun je enkele waarden toevoegen en verplaatsen. Dit is de standaard-modus en word het meest gebruikt. Je kunt ook &apos;D&apos; op het toetsenbord gebruiken om in deze modus te komen.</translation>
+        <translation type="obsolete">Als je hier klikt, word de tekenmodus geaktiveerd. In deze modus kun je enkele waarden toevoegen en verplaatsen. Dit is de standaard-modus en word het meest gebruikt. Je kunt ook &apos;D&apos; op het toetsenbord gebruiken om in deze modus te komen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
@@ -760,35 +760,35 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished"></translation>
+        <translation>Teken modus (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis modus (Shift+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer modus (Shift+S)</translation>
     </message>
     <message>
         <source>Move selection mode (Shift+M)</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats selectie modus (Shift+M)</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de tekenmodus geactiveerd. In deze modus kun je enkele waarden toevoegen en verplaatsen. Dit is de standaard-modus en word het meest gebruikt. Je kunt ook &apos;Shift+D&apos; op het toetsenbord gebruiken om in deze modus te komen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de wis-modus geactiveerd. In deze modus kun je enkele waarden wissen. Je kunt ook &apos;Shift+E&apos; op het toetsenbord gebruiken om deze modus te activeren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de selecteer-modus geactiveerd. In deze modus kun je waarden selecteren.Dit is nodig als je meerdere noten wilt knippen, plakken, verwijderen, enz. Je kunt ook &apos;Shift+S&apos; op het toetsenbord gebruiken om deze modus te activeren. </translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de verplaats-modus geactiveerdt. In deze modus kun je de in de selecteer-modus geselecteerde waarden verplaatsen. Je kunt ook &apos;Shift+M&apos; op het toetsenbord gebruiken om deze modus te activeren.</translation>
     </message>
 </context>
 <context>
@@ -880,7 +880,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation>Klik hier, wanneer je de golfvorm vloeiend wilt maken.</translation>
+        <translation>Klik hier, wanneer je de golfvorm gladder wilt maken.</translation>
     </message>
     <message>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
@@ -920,7 +920,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Vloeien</translation>
+        <translation>Uitstrijker</translation>
     </message>
 </context>
 <context>
@@ -1083,7 +1083,7 @@ Kopierte Dateien können Sie ändern, aber gleichzeitig belegen diese auch zusä
     </message>
     <message>
         <source>Select working directory</source>
-        <translation>Selecteer een werk-map</translation>
+        <translation>Selecteer een werkmap</translation>
     </message>
     <message>
         <source>Copy or link files</source>
@@ -1144,7 +1144,7 @@ in de LMMS-werk-map staan. Setup-dialoog nu starten?</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation>Annu&amp;leren</translation>
+        <translation>A&amp;nnuleren</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
@@ -1152,18 +1152,7 @@ in de LMMS-werk-map staan. Setup-dialoog nu starten?</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
-        <translation>Kies LMMS-werkmap</translation>
-    </message>
-</context>
-<context>
-    <name>effectTabWidget</name>
-    <message>
-        <source>EFFECTS CHAIN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies LMMS-werk-map</translation>
     </message>
 </context>
 <context>
@@ -1670,7 +1659,7 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor het geselecteerde bestand/appar
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Vloeien</translation>
+        <translation>Uitstrijker</translation>
     </message>
     <message>
         <source>Normalize</source>
@@ -1775,18 +1764,6 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor het geselecteerde bestand/appar
         <source>FX channel</source>
         <translation>FX-Kanaal</translation>
     </message>
-    <message>
-        <source>FX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No LADSPA Support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This instrument uses features that aren&apos;t available in this version of LMMS.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>knob</name>
@@ -1817,145 +1794,6 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor het geselecteerde bestand/appar
     <message>
         <source>&amp;Open in automation editor</source>
         <translation>In Aut&amp;omation Editor openen</translation>
-    </message>
-</context>
-<context>
-    <name>ladspaBrowser</name>
-    <message>
-        <source>LADSPA Plugin Browser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Available Effects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unavailable Effects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Instruments</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Analysis Tools</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t know</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Sluiten</translation>
-    </message>
-    <message>
-        <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate.  The plugins are divided into five categories based upon an interpretation of the port types and names.
-
-Available Effects are those that can be used by LMMS.  In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels.  LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name.  Output channels are identified by the letters &apos;out&apos;.  Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
-
-Unavailable Effects are those that were identified as effects, but either didn&apos;t have the same number of input and output channels or weren&apos;t real time capable.
-
-Instruments are plugins for which only output channels were identified.
-
-Analysis Tools are plugins for which only input channels were identified.
-
-Don&apos;t Knows are plugins for which no input or output channels were identified.
-
-Double clicking any of the plugins will bring up information on the ports.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ladspaControl</name>
-    <message>
-        <source>Value:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, no help available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ladspaControlDialog</name>
-    <message>
-        <source>Channel </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Link Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ladspaDescription</name>
-    <message>
-        <source>Plugins</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ladspaPortDialog</name>
-    <message>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Direction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Min &lt; Default &lt; Max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Logarithmic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SR Dependent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Toggled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Integer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Float</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2180,10 +2018,6 @@ Bezoek http://wiki.mindrules.net voor documentatie over LMMS.</translation>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Met deze knop kun je de Automation Editor tonen/verbergen. Met behulp van deze bewerker kun je je song dynamischer maken op een eenvoudige manier.</translation>
     </message>
-    <message>
-        <source>LADSPA Plugins...</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>midiClient</name>
@@ -2227,13 +2061,11 @@ Bezoek http://wiki.mindrules.net voor documentatie over LMMS.</translation>
     </message>
     <message>
         <source>Default velocity for all input-events</source>
-        <translation>Standaard gevoeligheid voor alle 
-invoer-gebeurtenissen</translation>
+        <translation>Standaard gevoeligheid voor alle invoer</translation>
     </message>
     <message>
         <source>Default velocity for all output-events</source>
-        <translation>Standaard gevoeligheid voor alle 
-uitvoer-gebeurtenissen</translation>
+        <translation>Standaard gevoeligheid voor alle uitvoer</translation>
     </message>
     <message>
         <source>Input channel</source>
@@ -2532,35 +2364,35 @@ volume van de steps is met het muiswiel te veranderen</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished"></translation>
+        <translation>Teken modus (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis modus (Shift+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer modus (Shift+S)</translation>
     </message>
     <message>
         <source>Move selection mode (Shift+M)</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats selectie modus (Shift+M)</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de tekenmodus geaktiveerd. In deze modus kun je enkele waarden toevoegen en verplaatsen. Dit is de standaard-modus en word het meest gebruikt. Je kunt ook &apos;Shift+D&apos; op het toetsenbord gebruiken om in deze modus te komen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de wis-modus geactiveerd. In deze modus kun je enkele waarden wissen. Je kunt ook &apos;Shift+E&apos; op het toetsenbord gebruiken om deze modus te activeren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de selecteer-modus geactiveerd. In deze modus kun je waarden selecteren.Dit is nodig als je meerdere noten wilt knippen, plakken, verwijderen, enz. Je kunt ook &apos;Shift+S&apos; op het toetsenbord gebruiken om deze modus te activeren. </translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je hier klikt, word de verplaats-modus geactiveerdt. In deze modus kun je de in de selecteer-modus geselecteerde waarden verplaatsen. Je kunt ook &apos;Shift+M&apos; op het toetsenbord gebruiken om deze modus te activeren.Als je hier klikt, word de verplaats-modus geactiveerdt. In deze modus kun je de in de selecteer-modus geselecteerde waarden verplaatsen. Je kunt ook &apos;Shift+M&apos; op het toetsenbord gebruiken om deze modus te activeren.</translation>
     </message>
 </context>
 <context>
@@ -2645,94 +2477,11 @@ volume van de steps is met het muiswiel te veranderen</translation>
     </message>
     <message>
         <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
-        <translation>Eenvoudige Sampler met verschillende instellingen voor gebruik van samples (bv. drums) in een instrument-spoor</translation>
+        <translation>Eenvoudige Sampler met verschillende instellingen voor gebruik van samples (z.B. Drums) in in een instrument-spoor</translation>
     </message>
     <message>
         <source>Filter for importing FL Studio projects into LMMS</source>
         <translation>Filter voor importeren van FL Studio Projecten in LMMS</translation>
-    </message>
-</context>
-<context>
-    <name>pluginDescription</name>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Label:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maker:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Requires Real Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Real Time Capable:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Inplace Broken:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channels In:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channels Out:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maker: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Requires Real Time: Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Requires Real Time: No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Real Time Capable: Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Real Time Capable: No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Place Broken: Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Place Broken: No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channels In: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channels Out: </source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2855,104 +2604,6 @@ volume van de steps is met het muiswiel te veranderen</translation>
     </message>
 </context>
 <context>
-    <name>rackPlugin</name>
-    <message>
-        <source>Turn the effect off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On/Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Toggles the effect on or off.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wet/Dry mix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>W/D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wet Level:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Gate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Gate:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Controls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
-
-The On/Off switch allows you to bypass a given plugin at any point in time.
-
-The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for one stage is the output from the previous stage, so the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
-
-The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the signal has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
-
-The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
-
-The Controls button opens a dialog for editing the effect&apos;s parameters.
-
-Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move &amp;up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move &amp;down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Remove this plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Help</translation>
-    </message>
-</context>
-<context>
-    <name>rackView</name>
-    <message>
-        <source>Uknown plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>renameDialog</name>
     <message>
         <source>Rename...</source>
@@ -3026,25 +2677,6 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>With this knob you can set the volume of the opened channel.</source>
         <translation>Met deze knop kun je het volume van het geopende kanaal instellen.</translation>
-    </message>
-</context>
-<context>
-    <name>selectLADSPADialog</name>
-    <message>
-        <source>Effects Selector</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ports</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3147,7 +2779,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Choose LMMS working directory</source>
-        <translation>Kies LMMS werkmap </translation>
+        <translation>Kies LMMS-werkmap </translation>
     </message>
     <message>
         <source>Choose your VST-plugin directory</source>
@@ -3194,14 +2826,6 @@ Vertraging: %2 ms</translation>
     <message>
         <source>Choose FL Studio installation directory</source>
         <translation>Kies FL Studio installatie map</translation>
-    </message>
-    <message>
-        <source>LADSPA plugin directories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose LADSPA plugin directory</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3710,14 +3334,6 @@ rechts klik = alle andere tracks dempen (solo)</translation>
         <source>Mute</source>
         <translation>Dempen</translation>
     </message>
-    <message>
-        <source>Enable this track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disable this track</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>tripleOscillator</name>
@@ -3973,13 +3589,13 @@ The waveform can also be drawn in the graph.
 The &apos;S&apos; button will smooth the waveform.
 
 The &apos;N&apos; button will normalize the waveform.</source>
-        <translation>The waveform editor provides control over the initial state or impulse that is used to start the string vibrating. The buttons to the right of the graph will initialize the waveform to the selected type. The &apos;?&apos; button will load a waveform from a file--only the first 128 samples will be loaded. 
+        <translation>De golfvorm bewerker levert controle over de aanvangstoestand of impuls welke word gebruikt om een snaar te laten trillen. De knoppen aan de rechterkant van de grafiek geven aan welke golfvorm geselecteerd is. De &apos;?&apos; knop laadt een golfvorm-bestand-alleen de eerste 128 samples worden geladen.
 
-The waveform can also be drawn in the graph. 
+De golfvorm kan ook in de grafiek getekend worden.
 
-The &apos;S&apos; button will smooth the waveform.
+De &apos;S&apos; knop zal de golfvorm uitstrijken (egaler maken).
 
-The &apos;N&apos; button will normalize the waveform.</translation>
+De &apos;N; knop zal de golfvorm normaliseren.</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -3991,7 +3607,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
-        <translation>The &apos;V&apos; knob sets the volume of the selected string.</translation>
+        <translation>De &apos;V&apos; knop stelt het volume in van de geselecteerde snaar.</translation>
     </message>
     <message>
         <source>String stiffness</source>
@@ -4003,7 +3619,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation>The &apos;S&apos; knob sets the stiffness of the selected string.(sp)(sp)The stiffness of the string affects how long the string will ring out.(sp)(sp)The lower the setting, the longer the string will ring.</translation>
+        <translation>De &apos;S&apos; knop stelt de stijfheid in van de geselecteerde snaar. De stijfheid van de snaar bepaalt hoe lang de snaar uittrilt. Hoe lager de waarde, hoe langer de snaar trilt.</translation>
     </message>
     <message>
         <source>Pick position</source>
@@ -4015,7 +3631,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
-        <translation>Met de &apos;P&apos; knop kun je de aanslagpositie van de snaar aangeven. Hoe lager de waarde hoe dichter er bij de brug word aangeslagen.</translation>
+        <translation>De &apos;P&apos; knop stelt de aanslagpositie in van de snaar aangeven. Hoe lager de waarde hoe dichter er bij de brug word aangeslagen.</translation>
     </message>
     <message>
         <source>Pickup position</source>
@@ -4027,7 +3643,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
-        <translation>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.(sp)(sp)The lower the setting, the closer the pickup is to the bridge.</translation>
+        <translation>De &apos;PU&apos; knop stelt de positie in waar de trilling van de snaar word opgepikt. Hoe lager de waarde, hoe dichter de pickup bij de brug geplaatst is.</translation>
     </message>
     <message>
         <source>Pan</source>
@@ -4064,7 +3680,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</translation>
+        <translation>De Slap knop voegt ruigheid toe aan de geselecteerde snaar en is het meest merkbaar in de attack-fase. Tevens kan dit gebruikt worden om de snaar meer &apos;metallic&apos; te laten klinken.</translation>
     </message>
     <message>
         <source>Length</source>
@@ -4094,7 +3710,7 @@ The &apos;N&apos; button will normalize the waveform.</translation>
     </message>
     <message>
         <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
-        <translation>The String selector is used to choose which string the controls are editting. A Vibed instrument can contain up to nine independently vibrating strings. The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</translation>
+        <translation>De snaar-kiezer word gebruikt voor het kiezen van de snar welke bewerkt word. Een Vibed instrument kan tot 9 individueel trillende snaren bevatten. De LED in de rechter benedenhoek van de golfvorm bewerker geeft aan of de geselecteerde snaar actief is.</translation>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
@@ -4108,17 +3724,17 @@ The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the
 The &apos;Length&apos; knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation>Vibed models up to nine independently vibrating strings. The &apos;String&apos; selector allows you to choose which string is being edited. The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string. The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at. 
- 
-The graph allows you to control the initial state or impulse used to set the string in motion. 
- 
-The &apos;V&apos; knob controls the volume. The &apos;S&apos; knob controls the string&apos;s stiffness. The &apos;P&apos; knob controls the pick position. The &apos;PU&apos; knob controls the pickup position. 
- 
-&apos;Pan&apos; and &apos;Detune&apos; hopefully don&apos;t need explanation. The &apos;Slap&apos; knob adds a bit of fuzz to the sound of the string. 
- 
-The &apos;Length&apos; knob controls the length of the string. 
- 
-The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</translation>
+        <translation>Vibed modeleert tot 9 individuele snaren. De &apos;Snaren&apos; kiezer maakt het mogelijk om de geselecteerde snaar te bewerken. Met &apos;Imp&apos; kiezer geef je aan of de grafiek de impuls of de beginwaarde weergeeft. Met de &apos;Octave&apos; kiezer selecteer je de harmonischen waar de snaar mee trilt.
+
+De grafiek geeft je de mogelijkheid de beginwaarde en de impuls te beheren om de snaar in beweging te zetten. 
+
+De &apos;V&apos; knop stelt het volume in. De &apos;S&apos; knop stelt de stijfheid in. De &apos;P&apos; knop stelt de aanslagpositie in. De &apos;PU&apos; knop stelt de positie van de pichup in.
+
+&apos;Pan&apos; (balans) en &apos;Detune&apos; (ontstemming) behoeven geen uitleg. De &apos;Slap&apos; knop voegt wat ruigheid toe aan het geluid van de snaar.
+
+De lengteknop stelt de lengte van de snaar in.
+
+De LED in de rechter benedenhoek van de golfvorm bewerker geeft aan of de snaar actief is in het huidige instrument.</translation>
     </message>
     <message>
         <source>&amp;Help</source>
