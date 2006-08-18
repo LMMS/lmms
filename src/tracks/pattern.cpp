@@ -1180,6 +1180,22 @@ void pattern::updateBBTrack( void )
 
 
 
+bool pattern::empty( void )
+{
+	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
+									++it )
+	{
+		if( ( *it )->length() != 0 )
+		{
+			return( FALSE );
+		}
+	}
+	return( TRUE );
+}
+
+
+
+
 
 
 

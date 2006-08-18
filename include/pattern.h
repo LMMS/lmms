@@ -159,6 +159,8 @@ public:
 		return( m_instrumentTrack );
 	}
 
+	bool empty( void );
+
 
 public slots:
 	virtual void update( void );
