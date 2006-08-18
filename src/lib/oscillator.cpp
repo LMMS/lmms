@@ -55,7 +55,10 @@ oscillator::oscillator( const waveShapes * _wave_shape,
 void oscillator::update( sampleFrame * _ab, const fpab_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_userWave->lock();
+	if( m_userWave )
+	{
+		m_userWave->lock();
+	}
 
 	if( m_subOsc != NULL )
 	{
@@ -82,7 +85,10 @@ void oscillator::update( sampleFrame * _ab, const fpab_t _frames,
 		updateNoSub( _ab, _frames, _chnl );
 	}
 
-	m_userWave->unlock();
+	if( m_userWave )
+	{
+		m_userWave->unlock();
+	}
 }
 
 
