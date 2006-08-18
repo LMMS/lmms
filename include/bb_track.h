@@ -121,15 +121,15 @@ public:
 		return( m_trackLabel );
 	}
 
-	bool isDisabled( track * _track )
+	bool automationDisabled( track * _track )
 	{
 		return( m_disabled_tracks.containsRef( _track ) );
 	}
-	void disableTrack( track * _track )
+	void disableAutomation( track * _track )
 	{
 		m_disabled_tracks.append( _track );
 	}
-	void enableTrack( track * _track )
+	void enableAutomation( track * _track )
 	{
 		m_disabled_tracks.removeRef( _track );
 	}

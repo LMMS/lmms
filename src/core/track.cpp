@@ -1095,7 +1095,7 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 			const char * trackOps_icon;
 			const char * mute_active_icon;
 			const char * mute_inactive_icon;
-			if( currentBBTrack()->isDisabled(
+			if( currentBBTrack()->automationDisabled(
 						m_trackWidget->getTrack() ) )
 			{
 				trackOps_icon = "track_op_menu_disabled";
@@ -1191,19 +1191,20 @@ void trackOperationsWidget::updateMenu( void )
 	to_menu->clear();
 	if( inBBEditor() )
 	{
-		if( currentBBTrack()->isDisabled( m_trackWidget->getTrack() ) )
+		if( currentBBTrack()->automationDisabled(
+						m_trackWidget->getTrack() ) )
 		{
 			to_menu->addAction( embed::getIconPixmap( "led_off",
 								16, 16 ),
-						tr( "Enable this track" ),
-						this, SLOT( enableTrack() ) );
+					tr( "Enable automation" ),
+					this, SLOT( enableAutomation() ) );
 		}
 		else
 		{
 			to_menu->addAction( embed::getIconPixmap( "led_green",
 								16, 16 ),
-						tr( "Disable this track" ),
-						this, SLOT( disableTrack() ) );
+					tr( "Disable automation" ),
+					this, SLOT( disableAutomation() ) );
 		}
 	}
 	to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
@@ -1217,17 +1218,17 @@ void trackOperationsWidget::updateMenu( void )
 
 
 
-void trackOperationsWidget::enableTrack( void )
+void trackOperationsWidget::enableAutomation( void )
 {
-	currentBBTrack()->enableTrack( m_trackWidget->getTrack() );
+	currentBBTrack()->enableAutomation( m_trackWidget->getTrack() );
 }
 
 
 
 
-void trackOperationsWidget::disableTrack( void )
+void trackOperationsWidget::disableAutomation( void )
 {
-	currentBBTrack()->disableTrack( m_trackWidget->getTrack() );
+	currentBBTrack()->disableAutomation( m_trackWidget->getTrack() );
 }
 
 
@@ -1594,10 +1595,10 @@ track::~track()
 			if( ( *it )->type() == BB_TRACK )
 			{
 				bbTrack * bb_track = (bbTrack *)*it;
-				if( bb_track->isDisabled( this ) )
+				if( bb_track->automationDisabled( this ) )
 				{
 					// Remove reference from bbTrack
-					bb_track->enableTrack( this );
+					bb_track->enableAutomation( this );
 				}
 			}
 		}

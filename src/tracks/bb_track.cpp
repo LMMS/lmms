@@ -460,11 +460,11 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	for( trackVector::iterator it = tracks.begin(); it != tracks.end();
 							++it, ++track_num )
 	{
-		if( isDisabled( *it ) )
+		if( automationDisabled( *it ) )
 		{
 			QDomElement disabled = _doc.createElement(
-							"disabled-track" );
-			disabled.setAttribute( "num", track_num );
+							"automation-disabled" );
+			disabled.setAttribute( "track", track_num );
 			_this.appendChild( disabled );
 		}
 	}
@@ -498,10 +498,11 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( node.isElement() && node.nodeName() == "disabled-track" )
+		if( node.isElement()
+				&& node.nodeName() == "automation-disabled" )
 		{
-			disableTrack( tracks[node.toElement().attribute( "num" )
-								.toInt()] );
+			disableAutomation( tracks[node.toElement().attribute(
+							"track" ).toInt()] );
 		}
 		node = node.nextSibling();
 	}
