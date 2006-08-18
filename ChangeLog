@@ -1,3 +1,27 @@
+2006-08-18	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/core/bb_editor.cpp:
+	removed disabled tracks
+
+	* src/tracks/instrument_track.cpp:
+	added automation disabled
+
+	* include/bb_track.h:
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/tracks/bb_track.cpp:
+	renamed disabled track logic to automation disabled
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	added empty() to check whether there is any relevant note
+
+	* src/lib/oscillator.cpp:
+	check user waveform presence, fixes organic segfault
+
+	* src/core/name_label.cpp:
+	changed icon selection, fixes loss of icon
+
 2006-08-17	Erwin Goossen <egoossen/at/tomaatnet/dot/nl>
 
 	* data/locale/nl.ts:
