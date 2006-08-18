@@ -129,7 +129,7 @@ void nameLabel::selectPixmap( void )
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory( dir );
-	ofd.setFileMode( QFileDialog::ExistingFiles );
+	// use default QFileDialog::ExistingFile
 
 	// set filters
 #ifdef QT4
@@ -149,11 +149,7 @@ void nameLabel::selectPixmap( void )
 
 	if ( ofd.exec () == QDialog::Accepted )
 	{
-		if( ofd.selectedFiles().isEmpty() )
-		{
-			return;
-		}
-		QString pf = ofd.selectedFiles()[0];
+		QString pf = ofd.selectedFile();
 		if( !QFileInfo( pf ).isRelative() )
 		{
 #if QT_VERSION >= 0x030100
