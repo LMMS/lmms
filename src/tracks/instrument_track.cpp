@@ -909,27 +909,35 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
-	if( sendMidiTime( _start ) )
-	{
-		emit sentMidiTime( _start );
-	}
-
 	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
 	bbTrack * bb_track;
 	if( _tco_num >= 0 )
 	{
-		tcos.push_back( getTCO( _tco_num ) );
+		trackContentObject * tco = getTCO( _tco_num );
+		tcos.push_back( tco );
 		bb_track = bbTrack::findBBTrack( _tco_num, eng() );
+		if( !( bb_track->automationDisabled( this )
+				|| dynamic_cast<pattern *>( tco )->empty() ) )
+		{
+			if( sendMidiTime( _start ) )
+			{
+				emit sentMidiTime( _start );
+			}
+		}
 	}
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
 					_frames / frames_per_tact64th ) );
 		bb_track = NULL;
+		if( sendMidiTime( _start ) )
+		{
+			emit sentMidiTime( _start );
+		}
 	}
-	
+
 	if ( tcos.size() == 0 )
 	{
 		return( FALSE );
