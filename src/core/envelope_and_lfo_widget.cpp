@@ -124,8 +124,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAmountIsZero( FALSE ),
 	m_lfoShapeData( NULL ),
 	m_userWave( eng() ),
-	m_lfoShape( SIN ),
-	m_busy( FALSE )
+	m_lfoShape( SIN )
 {
 	if( s_envGraph == NULL )
 	{
@@ -564,12 +563,8 @@ inline float FASTCALL envelopeAndLFOWidget::lfoLevel( f_cnt_t _frame,
 
 float FASTCALL envelopeAndLFOWidget::level( f_cnt_t _frame,
 					const f_cnt_t _release_begin,
-					const f_cnt_t _frame_offset ) const
+					const f_cnt_t _frame_offset )
 {
-	if( m_busy )
-	{
-		return( 0.0f );
-	}
 	const float lfo_level = lfoLevel( _frame, _frame_offset );
 	float env_level;
 	if( _frame < _release_begin && _frame < m_pahdFrames )
@@ -629,7 +624,7 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 
 void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 {
-	m_busy = TRUE;
+	m_busyMutex.lock();
 
 	m_predelayKnob->loadSettings( _this, "pdel" );
 	m_attackKnob->loadSettings( _this, "att" );
@@ -650,7 +645,7 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 						"lfosyncmode" ).toInt() );
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
-	m_busy = FALSE;
+	m_busyMutex.unlock();
 
 	updateSampleVars();
 	update();
@@ -910,176 +905,166 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 
 void envelopeAndLFOWidget::updateSampleVars( void )
 {
-	if( !m_busy )
-	{
-		m_busy = TRUE;
+	m_busyMutex.lock();
 
-		const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
+	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 						eng()->getMixer()->sampleRate();
-		const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
+	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
 					expKnobVal( m_predelayKnob->value() ) );
 
-		const f_cnt_t attack_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
+	const f_cnt_t attack_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_attackKnob->value() ) );
 
-		const f_cnt_t hold_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
+	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_holdKnob->value() ) );
 
-		const f_cnt_t decay_frames = static_cast<f_cnt_t>(
-							frames_per_env_seg *
+	const f_cnt_t decay_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_decayKnob->value() *
 						m_sustainKnob->value() ) );
 
-		m_sustainLevel = 1.0f - m_sustainKnob->value();
-		m_amount = m_amountKnob->value();
-		if( m_amount >= 0 )
-		{
-			m_amountAdd = ( 1.0f - m_amount ) *
-							m_valueForZeroAmount;
-		}
-		else
-		{
-			m_amountAdd = m_valueForZeroAmount;
-		}
+	m_sustainLevel = 1.0f - m_sustainKnob->value();
+	m_amount = m_amountKnob->value();
+	if( m_amount >= 0 )
+	{
+		m_amountAdd = ( 1.0f - m_amount ) * m_valueForZeroAmount;
+	}
+	else
+	{
+		m_amountAdd = m_valueForZeroAmount;
+	}
 
-		m_pahdFrames = predelay_frames + attack_frames + hold_frames +
+	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
 								decay_frames;
-		m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
+	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseKnob->value() ) );
 
-		if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
-		{
-			//m_pahdFrames = 0;
-			m_rFrames = 0;
-		}
+	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
+	{
+		//m_pahdFrames = 0;
+		m_rFrames = 0;
+	}
 
-		sample_t * new_pahd_env = new sample_t[m_pahdFrames];
-		sample_t * new_r_env = new sample_t[m_rFrames];
+	sample_t * new_pahd_env = new sample_t[m_pahdFrames];
+	sample_t * new_r_env = new sample_t[m_rFrames];
 
-		for( f_cnt_t i = 0; i < predelay_frames; ++i )
-		{
-			new_pahd_env[i] = m_amountAdd;
-		}
+	for( f_cnt_t i = 0; i < predelay_frames; ++i )
+	{
+		new_pahd_env[i] = m_amountAdd;
+	}
 
-		f_cnt_t add = predelay_frames;
+	f_cnt_t add = predelay_frames;
 
-		for( f_cnt_t i = 0; i < attack_frames; ++i )
-		{
-			new_pahd_env[add+i] = ( (float)i / attack_frames ) *
+	for( f_cnt_t i = 0; i < attack_frames; ++i )
+	{
+		new_pahd_env[add+i] = ( (float)i / attack_frames ) *
 							m_amount + m_amountAdd;
-		}
+	}
 
-		add += attack_frames;
-		for( f_cnt_t i = 0; i < hold_frames; ++i )
-		{
-			new_pahd_env[add+i] = m_amount + m_amountAdd;
-		}
+	add += attack_frames;
+	for( f_cnt_t i = 0; i < hold_frames; ++i )
+	{
+		new_pahd_env[add+i] = m_amount + m_amountAdd;
+	}
 
-		add += hold_frames;
-		for( f_cnt_t i = 0; i < decay_frames; ++i )
-		{
-			new_pahd_env[add+i] = ( m_sustainLevel + ( 1.0f -
+	add += hold_frames;
+	for( f_cnt_t i = 0; i < decay_frames; ++i )
+	{
+		new_pahd_env[add+i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
 						( 1.0f - m_sustainLevel ) ) *
 							m_amount + m_amountAdd;
-		}
+	}
 
-		delete[] m_pahdEnv;
-		delete[] m_rEnv;
+	delete[] m_pahdEnv;
+	delete[] m_rEnv;
 
-		m_pahdEnv = new_pahd_env;
-		m_rEnv = new_r_env;
+	m_pahdEnv = new_pahd_env;
+	m_rEnv = new_r_env;
 
-		for( f_cnt_t i = 0; i < m_rFrames; ++i )
-		{
-			new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames
+	for( f_cnt_t i = 0; i < m_rFrames; ++i )
+	{
+		new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames
 					// * m_sustainLevel
 					 		) * m_amount;
-		}
+	}
 
-		// save this calculation in real-time-part
-		m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
-		
+	// save this calculation in real-time-part
+	m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
 
-		const float frames_per_lfo_oscillation =
-						SECS_PER_LFO_OSCILLATION *
+
+	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
 						eng()->getMixer()->sampleRate();
-		m_lfoPredelayFrames = static_cast<f_cnt_t>(
-						frames_per_lfo_oscillation *
+	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayKnob->value() ) );
-		m_lfoAttackFrames = static_cast<f_cnt_t>(
-						frames_per_lfo_oscillation *
+	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoAttackKnob->value() ) );
-		m_lfoOscillationFrames = static_cast<f_cnt_t>(
+	m_lfoOscillationFrames = static_cast<f_cnt_t>(
 						frames_per_lfo_oscillation *
 						m_lfoSpeedKnob->value() );
-		if( m_x100Cb->isChecked() )
-		{
-			m_lfoOscillationFrames /= 100;
-		}
-		m_lfoAmount = m_lfoAmountKnob->value() * 0.5f;
-
-		m_used = TRUE;
-		if( static_cast<int>( floorf( m_lfoAmount * 1000.0f ) ) == 0 )
-		{
-			m_lfoAmountIsZero = TRUE;
-			if( static_cast<int>( floorf( m_amount * 1000.0f ) ) ==
-									0 )
-			{
-				m_used = FALSE;
-			}
-		}
-		else
-		{
-			m_lfoAmountIsZero = FALSE;
-		}
-
-		if( m_lfoAmountIsZero == FALSE )
-		{
-			delete[] m_lfoShapeData;
-			m_lfoShapeData = new sample_t[m_lfoOscillationFrames];
-			for( f_cnt_t frame = 0; frame < m_lfoOscillationFrames;
-								++frame )
-			{
-				const float phase = frame / static_cast<float>(
-						m_lfoOscillationFrames );
-				// hope, compiler optimizes well and places
-				// branches out of loop and generates one loop
-				// for each branch...
-				switch( m_lfoShape  )
-				{
-					case TRIANGLE:
-						m_lfoShapeData[frame] =
-				oscillator::triangleSample( phase );
-						break;
-
-					case SQUARE:
-						m_lfoShapeData[frame] =
-				oscillator::squareSample( phase );
-						break;
-
-					case SAW:
-						m_lfoShapeData[frame] =
-				oscillator::sawSample( phase );
-						break;
-					case USER:
-						m_lfoShapeData[frame] =
-				m_userWave.userWaveSample( phase );
-						break;
-					case SIN:
-					default:
-						m_lfoShapeData[frame] =
-				oscillator::sinSample( phase );
-						break;
-				}
-				m_lfoShapeData[frame] *= m_lfoAmount;
-			}
-		}
-		m_busy = FALSE;
+	if( m_x100Cb->isChecked() )
+	{
+		m_lfoOscillationFrames /= 100;
 	}
+	m_lfoAmount = m_lfoAmountKnob->value() * 0.5f;
+
+	m_used = TRUE;
+	if( static_cast<int>( floorf( m_lfoAmount * 1000.0f ) ) == 0 )
+	{
+		m_lfoAmountIsZero = TRUE;
+		if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
+		{
+			m_used = FALSE;
+		}
+	}
+	else
+	{
+		m_lfoAmountIsZero = FALSE;
+	}
+
+	if( m_lfoAmountIsZero == FALSE )
+	{
+		delete[] m_lfoShapeData;
+		m_lfoShapeData = new sample_t[m_lfoOscillationFrames];
+		for( f_cnt_t frame = 0; frame < m_lfoOscillationFrames;
+								++frame )
+		{
+			const float phase = frame / static_cast<float>(
+						m_lfoOscillationFrames );
+			// in gcc, optimization level 3 may place
+			// branches out of loop and generates one loop
+			// for each branch...
+			switch( m_lfoShape  )
+			{
+				case TRIANGLE:
+					m_lfoShapeData[frame] =
+					oscillator::triangleSample( phase );
+					break;
+
+				case SQUARE:
+					m_lfoShapeData[frame] =
+					oscillator::squareSample( phase );
+					break;
+
+				case SAW:
+					m_lfoShapeData[frame] =
+					oscillator::sawSample( phase );
+					break;
+				case USER:
+					m_lfoShapeData[frame] =
+					m_userWave.userWaveSample( phase );
+					break;
+				case SIN:
+				default:
+					m_lfoShapeData[frame] =
+					oscillator::sinSample( phase );
+					break;
+			}
+			m_lfoShapeData[frame] *= m_lfoAmount;
+		}
+	}
+
+	m_busyMutex.unlock();
 }
 
 

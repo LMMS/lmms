@@ -89,7 +89,7 @@ public:
 
 	float FASTCALL level( f_cnt_t _frame,
 				const f_cnt_t _release_begin,
-				const f_cnt_t _frame_offset ) const;
+				const f_cnt_t _frame_offset );
 
 	inline bool used( void ) const
 	{
@@ -103,6 +103,15 @@ public:
 	inline virtual QString nodeName( void ) const
 	{
 		return( "el" );
+	}
+
+	void lock( void )
+	{
+		m_busyMutex.lock();
+	}
+	void unlock( void )
+	{
+		m_busyMutex.unlock();
 	}
 
 
@@ -183,7 +192,7 @@ private:
 		USER
 	} m_lfoShape;
 
-	volatile bool m_busy;
+	QMutex m_busyMutex;
 
 
 

@@ -238,7 +238,12 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 		release_begin += eng()->getMixer()->framesPerAudioBuffer();
 	}
 
-	return( m_envLFOWidgets[VOLUME]->level( _frame, release_begin, 0 ) );
+	m_envLFOWidgets[VOLUME]->lock();
+	float volume_level =
+		m_envLFOWidgets[VOLUME]->level( _frame, release_begin, 0 );
+	m_envLFOWidgets[VOLUME]->unlock();
+
+	return( volume_level );
 }
 
 
@@ -276,6 +281,10 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		_n->m_filter = new basicFilters<>(
 					eng()->getMixer()->sampleRate() );
 	}
+
+	m_envLFOWidgets[VOLUME]->lock();
+	m_envLFOWidgets[CUT]->lock();
+	m_envLFOWidgets[RES]->lock();
 
 	if( m_filterGroupBox->isActive() )
 	{
@@ -457,6 +466,10 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			}
 		}
 	}*/
+
+	m_envLFOWidgets[RES]->unlock();
+	m_envLFOWidgets[CUT]->unlock();
+	m_envLFOWidgets[VOLUME]->unlock();
 }
 
 
