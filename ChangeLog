@@ -1,7 +1,9 @@
 2006-08-22	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* configure.in:
-	changed package-maintainer-email-address to lmms-devel-list
+	- changed package-maintainer-email-address to lmms-devel-list
+	- removed -floop-optimization2-flag as it is deprecated and not
+	  supported by coming GCC 4.2
 
 2006-08-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
