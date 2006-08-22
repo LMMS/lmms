@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-cvs20060820, tobydox/at/users/dot/sourceforge/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-cvs20060820)
+AC_INIT(lmms, 0.2.1-cvs20060822, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-cvs20060822)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -757,7 +757,7 @@ else
 fi
 echo " ="
 echo " = If there're problems while compiling LMMS, please send a mail to "
-echo " = tobydox [at] users.sourceforge.net!"
+echo " = lmms-devel [at] lists.sf.net!"
 echo " ="
 echo
 
