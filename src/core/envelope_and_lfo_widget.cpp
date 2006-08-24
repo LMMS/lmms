@@ -124,7 +124,8 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAmountIsZero( FALSE ),
 	m_lfoShapeData( NULL ),
 	m_userWave( eng() ),
-	m_lfoShape( SIN )
+	m_lfoShape( SIN ),
+	m_busyMutex( TRUE )
 {
 	if( s_envGraph == NULL )
 	{
