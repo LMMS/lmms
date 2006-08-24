@@ -54,12 +54,13 @@
 #include "interpolation.h"
 #include "types.h"
 #include "lmms_math.h"
+#include "shared_object.h"
 
 
 class QPainter;
 
 
-class sampleBuffer : public QObject, public engineObject
+class sampleBuffer : public QObject, public engineObject, public sharedObject
 {
 	Q_OBJECT
 public:
