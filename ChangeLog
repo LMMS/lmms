@@ -1,3 +1,45 @@
+2006-08-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/shared_object.h:
+	initial release, shared object for use among threads
+
+	* include/sample_buffer.h:
+	became a shared object
+
+	* src/tracks/instrument_track.cpp:
+	use sample handles to play frozen patterns, fixes crackling
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	allow access to the frozen pattern
+
+	* include/sample_play_handle.h:
+	* src/core/sample_play_handle.cpp:
+	- react to bb-track mute automation
+	- added constructor to handle frozen patterns
+	- use shared sample buffers
+
+	* include/instrument_track.h:
+	getAudioPort() is required
+
+	* include/sample_track.h:
+	* src/tracks/sample_track.cpp:
+	- removed obsolete play() in sampleTCO
+	- use shared sample buffers
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	fixed load settings deadlock
+
+	* src/audio/audio_device.cpp:
+	graceful shutdown
+
+	* include/midi_alsa_seq.h:
+	* src/midi/midi_alsa_seq.cpp:
+	added pipe to detect shutdown
+
+	* Makefile.am:
+	added shared object
+
 2006-08-22	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* configure.in:
