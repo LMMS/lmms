@@ -32,6 +32,8 @@
 #include "types.h"
 #include "engine.h"
 
+class bbTrack;
+class pattern;
 class sampleBuffer;
 class sampleTCO;
 class track;
@@ -45,6 +47,7 @@ public:
 	samplePlayHandle( const QString & _sample_file, engine * _engine );
 	samplePlayHandle( sampleBuffer * _sample_buffer );
 	samplePlayHandle( sampleTCO * _tco );
+	samplePlayHandle( pattern * _pattern );
 	virtual ~samplePlayHandle();
 
 	virtual void play( void );
@@ -61,6 +64,11 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
+	void setBBTrack( bbTrack * _bb_track )
+	{
+		m_bbTrack = _bb_track;
+	}
+
 
 public slots:
 	void setVolume( float _new_volume );
@@ -68,7 +76,6 @@ public slots:
 
 private:
 	sampleBuffer * m_sampleBuffer;
-	const bool m_ownSampleBuffer;
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;
@@ -78,6 +85,8 @@ private:
 
 	float m_volume;
 	track * m_track;
+
+	bbTrack * m_bbTrack;
 
 } ;
 

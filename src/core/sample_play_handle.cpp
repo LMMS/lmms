@@ -26,6 +26,9 @@
 
 
 #include "sample_play_handle.h"
+#include "bb_track.h"
+#include "instrument_track.h"
+#include "pattern.h"
 #include "sample_buffer.h"
 #include "sample_track.h"
 #include "buffer_allocator.h"
@@ -38,13 +41,13 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 	playHandle( SAMPLE_PLAY_HANDLE ),
 	engineObject( _engine ),
 	m_sampleBuffer( new sampleBuffer( eng(), _sample_file ) ),
-	m_ownSampleBuffer( TRUE ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle", eng() ) ),
 	m_ownAudioPort( TRUE ),
 	m_volume( 1.0f ),
-	m_track( NULL )
+	m_track( NULL ),
+	m_bbTrack( NULL )
 {
 }
 
@@ -54,14 +57,14 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	playHandle( SAMPLE_PLAY_HANDLE ),
 	engineObject( _sample_buffer->eng() ),
-	m_sampleBuffer( _sample_buffer ),
-	m_ownSampleBuffer( FALSE ),
+	m_sampleBuffer( sharedObject::ref( _sample_buffer ) ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle", eng() ) ),
 	m_ownAudioPort( TRUE ),
 	m_volume( 1.0f ),
-	m_track( NULL )
+	m_track( NULL ),
+	m_bbTrack( NULL )
 {
 }
 
@@ -71,14 +74,31 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 	playHandle( SAMPLE_PLAY_HANDLE ),
 	engineObject( _tco->eng() ),
-	m_sampleBuffer( _tco->getSampleBuffer() ),
-	m_ownSampleBuffer( FALSE ),
+	m_sampleBuffer( sharedObject::ref( _tco->getSampleBuffer() ) ),
 	m_doneMayReturnTrue( TRUE ),
 	m_frame( 0 ),
 	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
 	m_ownAudioPort( FALSE ),
 	m_volume( 1.0f ),
-	m_track( _tco->getTrack() )
+	m_track( _tco->getTrack() ),
+	m_bbTrack( NULL )
+{
+}
+
+
+
+
+samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
+	playHandle( SAMPLE_PLAY_HANDLE ),
+	engineObject( _pattern->eng() ),
+	m_sampleBuffer( sharedObject::ref( _pattern->getFrozenPattern() ) ),
+	m_doneMayReturnTrue( TRUE ),
+	m_frame( 0 ),
+	m_audioPort( _pattern->getInstrumentTrack()->getAudioPort() ),
+	m_ownAudioPort( FALSE ),
+	m_volume( 1.0f ),
+	m_track( _pattern->getInstrumentTrack() ),
+	m_bbTrack( NULL )
 {
 }
 
@@ -87,10 +107,7 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 
 samplePlayHandle::~samplePlayHandle()
 {
-	if( m_ownSampleBuffer == TRUE )
-	{
-		delete m_sampleBuffer;
-	}
+	sharedObject::unref( m_sampleBuffer );
 	if( m_ownAudioPort )
 	{
 		delete m_audioPort;
@@ -117,7 +134,8 @@ void samplePlayHandle::play( const fpab_t _frame_base )
 
 	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer()
 								- _frame_base;
-	if( !( m_track && m_track->muted() ) )
+	if( !( m_track && m_track->muted() )
+				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
 		sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
 								frames );
