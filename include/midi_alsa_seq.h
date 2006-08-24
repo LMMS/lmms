@@ -169,6 +169,8 @@ private:
 	QStringList m_readablePorts;
 	QStringList m_writeablePorts;
 
+	int m_pipe[2];
+
 
 signals:
 	void readablePortsChanged( void );

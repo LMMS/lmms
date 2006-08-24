@@ -101,6 +101,12 @@ midiALSASeq::midiALSASeq( engine * _engine ) :
 	// we check for port-changes every second
 	m_portListUpdateTimer.start( 1000 );
 
+	// use a pipe to detect shutdown
+	if( pipe( m_pipe ) == -1 )
+	{
+		perror( __FILE__ ": pipe" );
+	}
+
 	start( 
 #if QT_VERSION >= 0x030505
 	    	QThread::IdlePriority 
@@ -116,8 +122,9 @@ midiALSASeq::~midiALSASeq()
 	if( isRunning() )
 	{
 		m_quit = TRUE;
+		// wake up input queue
+		write( m_pipe[1], "\n", 1 );
 		wait( 1000 );
-		terminate();
 
 		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
 		snd_seq_free_queue( m_seqHandle, m_queueID );
@@ -437,8 +444,32 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 
 void midiALSASeq::run( void )
 {
+	// watch the pipe and sequencer input events
+	int pollfd_count = snd_seq_poll_descriptors_count( m_seqHandle,
+								POLLIN );
+	struct pollfd * pollfd_set = new struct pollfd[pollfd_count + 1];
+	snd_seq_poll_descriptors( m_seqHandle, pollfd_set + 1, pollfd_count,
+								POLLIN );
+	pollfd_set[0].fd = m_pipe[0];
+	pollfd_set[0].events = POLLIN;
+	++pollfd_count;
+
 	while( m_quit == FALSE )
 	{
+		if( poll( pollfd_set, pollfd_count, -1 ) == -1 )
+		{
+			// gdb may interrupt the poll
+			if( errno == EINTR )
+			{
+				continue;
+			}
+			perror( __FILE__ ": poll" );
+		}
+		// shutdown?
+		if( pollfd_set[0].revents )
+		{
+			break;
+		}
 		snd_seq_event_t * ev;
 		snd_seq_event_input( m_seqHandle, &ev );
 
@@ -500,6 +531,7 @@ void midiALSASeq::run( void )
 
 	}
 
+	delete pollfd_set;
 }
 
 
