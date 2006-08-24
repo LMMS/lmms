@@ -65,8 +65,6 @@ public:
 	virtual ~sampleTCO();
 
 	virtual void FASTCALL changeLength( const midiTime & _length );
-	void FASTCALL play( sampleFrame * _ab, f_cnt_t _start_frame,
-							const fpab_t _frames );
 	const QString & sampleFile( void ) const;
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -79,7 +77,7 @@ public:
 
 	sampleBuffer * getSampleBuffer( void )
 	{
-		return( &m_sampleBuffer );
+		return( m_sampleBuffer );
 	}
 
 
@@ -97,7 +95,7 @@ protected:
 
 
 private:
-	sampleBuffer m_sampleBuffer;
+	sampleBuffer * m_sampleBuffer;
 
 
 	//friend class sampleTCOSettingsDialog;

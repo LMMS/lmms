@@ -65,7 +65,7 @@
 
 sampleTCO::sampleTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_sampleBuffer( eng() )
+	m_sampleBuffer( new sampleBuffer( eng() ) )
 {
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
@@ -86,6 +86,7 @@ sampleTCO::sampleTCO( track * _track ) :
 
 sampleTCO::~sampleTCO()
 {
+	sharedObject::unref( m_sampleBuffer );
 }
 
 
@@ -100,21 +101,9 @@ void sampleTCO::changeLength( const midiTime & _length )
 
 
 
-void FASTCALL sampleTCO::play( sampleFrame * _ab, f_cnt_t _start_frame,
-							const fpab_t _frames )
-{
-	_start_frame = static_cast<Uint32>( tMax( 0.0f, _start_frame -
-							startPosition() *
-						eng()->framesPerTact64th() ) );
-	m_sampleBuffer.play( _ab, _start_frame, _frames );
-}
-
-
-
-
 const QString & sampleTCO::sampleFile( void ) const
 {
-	return( m_sampleBuffer.audioFile() );
+	return( m_sampleBuffer->audioFile() );
 }
 
 
@@ -122,13 +111,13 @@ const QString & sampleTCO::sampleFile( void ) const
 
 void sampleTCO::setSampleFile( const QString & _sf )
 {
-	m_sampleBuffer.setAudioFile( _sf );
+	m_sampleBuffer->setAudioFile( _sf );
 	updateLength();
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
-	toolTip::add( this, ( m_sampleBuffer.audioFile() != "" ) ?
-					m_sampleBuffer.audioFile() :
+	toolTip::add( this, ( m_sampleBuffer->audioFile() != "" ) ?
+					m_sampleBuffer->audioFile() :
 					tr( "double-click to select sample" ) );
 }
 
@@ -164,7 +153,7 @@ void sampleTCO::dropEvent( QDropEvent * _de )
 	}
 	else if( stringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_sampleBuffer.loadFromBase64(
+		m_sampleBuffer->loadFromBase64(
 					stringPairDrag::decodeValue( _de ) );
 		eng()->getSongEditor()->setModified();
 		updateLength();
@@ -182,8 +171,8 @@ void sampleTCO::dropEvent( QDropEvent * _de )
 
 void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = m_sampleBuffer.openAudioFile();
-	if( af != "" && af != m_sampleBuffer.audioFile() )
+	QString af = m_sampleBuffer->openAudioFile();
+	if( af != "" && af != m_sampleBuffer->audioFile() )
 	{
 		setSampleFile( af );
 		eng()->getSongEditor()->setModified();
@@ -235,7 +224,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 			tMax( static_cast<int>( getSampleLength() *
 				pixelsPerTact() / 64 ), 1 ), height() - 4 );
 	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
-	m_sampleBuffer.visualize( p, r, _pe->rect() );
+	m_sampleBuffer->visualize( p, r, _pe->rect() );
 	if( r.width() < width() - 1 )
 	{
 		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
@@ -258,7 +247,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 
 midiTime sampleTCO::getSampleLength( void ) const
 {
-	return( static_cast<Sint32>( m_sampleBuffer.frames() /
+	return( static_cast<Sint32>( m_sampleBuffer->frames() /
 						eng()->framesPerTact64th() ) );
 }
 
@@ -282,7 +271,7 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 	if( sampleFile() == "" )
 	{
 		QString s;
-		_this.setAttribute( "data", m_sampleBuffer.toBase64( s ) );
+		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
 	// TODO: start- and end-frame
 }
@@ -299,7 +288,7 @@ void FASTCALL sampleTCO::loadSettings( const QDomElement & _this )
 	setSampleFile( _this.attribute( "src" ) );
 	if( sampleFile() == "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "data" ) );
+		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	if( _this.attribute( "muted" ).toInt() != muted() )
@@ -353,7 +342,7 @@ sampleTCOSettingsDialog::~sampleTCOSettingsDialog()
 
 void sampleTCOSettingsDialog::openSampleFile( void )
 {
-	QString af = m_sampleTCO->m_sampleBuffer.openAudioFile();
+	QString af = m_sampleTCO->m_sampleBuffer->openAudioFile();
 	if( af != "" )
 	{
 		setSampleFile( af );
