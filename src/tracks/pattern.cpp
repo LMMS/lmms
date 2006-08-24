@@ -147,7 +147,10 @@ pattern::~pattern()
 	m_notes.clear();
 
 	m_frozenPatternMutex.lock();
-	delete m_frozenPattern;
+	if( m_frozenPattern )
+	{
+		sharedObject::unref( m_frozenPattern );
+	}
 	m_frozenPatternMutex.unlock();
 }
 
@@ -396,6 +399,7 @@ void pattern::checkType( void )
 
 
 
+//TODO: remove this method, check mutex
 void pattern::playFrozenData( sampleFrame * _ab, const f_cnt_t _start_frame,
 							const fpab_t _frames )
 {
@@ -608,7 +612,7 @@ void pattern::unfreeze( void )
 	if( m_frozenPattern != NULL )
 	{
 		m_frozenPatternMutex.lock();
-		delete m_frozenPattern;
+		sharedObject::unref( m_frozenPattern );
 		m_frozenPattern = NULL;
 		m_frozenPatternMutex.unlock();
 		update();

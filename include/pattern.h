@@ -139,6 +139,11 @@ public:
 		return( m_frozenPattern != NULL );
 	}
 
+	sampleBuffer * getFrozenPattern( void )
+	{
+		return( m_frozenPattern );
+	}
+
 	// if channel-track recognizes that this pattern is frozen, it calls
 	// this instead of playing all the notes
 	void FASTCALL playFrozenData( sampleFrame * _ab,
