@@ -79,6 +79,7 @@
 #include "midi_port.h"
 #include "midi_tab_widget.h"
 #include "note_play_handle.h"
+#include "sample_play_handle.h"
 #include "embed.h"
 #include "fade_button.h"
 #include "lcd_spinbox.h"
@@ -87,7 +88,6 @@
 #include "surround_area.h"
 #include "tooltip.h"
 #include "tab_widget.h"
-#include "buffer_allocator.h"
 #include "config_mgr.h"
 #include "debug.h"
 #include "mmp.h"
@@ -909,6 +909,12 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
+	//TODO: remove _start_frame
+	if( _start_frame > 0 )
+	{
+		return( FALSE );
+	}
+
 	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
@@ -962,33 +968,27 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		if( p->frozen() &&
 				eng()->getSongEditor()->exporting() == FALSE )
 		{
-			if( bb_track && bb_track->muted() )
+			if( cur_start > 0 )
 			{
 				continue;
 			}
-			volumeVector v = m_surroundArea->getVolumeVector(
-									1.0f );
-			// volume-vector was already used when freezing
-			// pattern, but only in stereo-mode, so front speakers
-			// are already setup
-			v.vol[0] = 1.0f;
-			v.vol[1] = 1.0f;
-			sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
-								_frames );
 
-			p->playFrozenData( buf, _start_frame + cur_start.frames(
-							frames_per_tact64th ),
-						_frames );
-			eng()->getMixer()->bufferToPort( buf, _frames,
-								_frame_base, v,
-								m_audioPort );
-			bufferAllocator::free( buf );
-			continue;
-		}
-
-		// all notes start at 0
-		if( _start_frame > 0 )
-		{
+			samplePlayHandle * handle = new samplePlayHandle( p );
+			handle->setBBTrack( bb_track );
+			handle->play( _frame_base );
+			// could we play all within current number of frames per
+			// audio-buffer?
+			if( handle->done() )
+			{
+				// throw it away...
+				delete handle;
+			}
+			else
+			{
+				// send it to the mixer
+				eng()->getMixer()->addPlayHandle( handle );
+			}
+			played_a_note = TRUE;
 			continue;
 		}
 
