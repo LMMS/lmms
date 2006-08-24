@@ -346,6 +346,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/journalling_object.h			\
 		$(srcdir)/include/level_object.h			\
 		$(srcdir)/include/project_journal.h			\
+		$(srcdir)/include/shared_object.h			\
 		$(srcdir)/include/import_filter.h			\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/effect.h				\
