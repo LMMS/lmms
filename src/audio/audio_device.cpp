@@ -71,7 +71,10 @@ audioDevice::~audioDevice()
 	src_delete( m_srcState );
 #endif
 	bufferAllocator::free( m_buffer );
-	unlock();
+	if( m_devMutex.locked() )
+	{
+		unlock();
+	}
 }
 
 
