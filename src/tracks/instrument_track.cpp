@@ -904,17 +904,10 @@ int instrumentTrack::masterKey( notePlayHandle * _n ) const
 
 
 bool FASTCALL instrumentTrack::play( const midiTime & _start,
-					const f_cnt_t _start_frame,
 					const fpab_t _frames,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
-	//TODO: remove _start_frame
-	if( _start_frame > 0 )
-	{
-		return( FALSE );
-	}
-
 	float frames_per_tact64th = eng()->framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
@@ -927,10 +920,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		if( !( bb_track->automationDisabled( this )
 				|| dynamic_cast<pattern *>( tco )->empty() ) )
 		{
-			if( sendMidiTime( _start ) )
-			{
-				emit sentMidiTime( _start );
-			}
+			sendMidiTime( _start );
+			emit sentMidiTime( _start );
 		}
 	}
 	else
@@ -938,10 +929,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
 					_frames / frames_per_tact64th ) );
 		bb_track = NULL;
-		if( sendMidiTime( _start ) )
-		{
-			emit sentMidiTime( _start );
-		}
+		sendMidiTime( _start );
+		emit sentMidiTime( _start );
 	}
 
 	if ( tcos.size() == 0 )
