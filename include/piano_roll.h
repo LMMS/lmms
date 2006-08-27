@@ -93,10 +93,6 @@ public:
 	}
 
 
-public slots:
-	virtual void update( void );
-
-
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void enterEvent( QEvent * _e );
@@ -181,6 +177,8 @@ private:
 	virtual ~pianoRoll();
 
 	midiTime newNoteLen( void ) const;
+
+	void updatePaintPixmap( void );
 
 
 	static QPixmap * s_whiteKeyBigPm;

@@ -88,10 +88,6 @@ public:
 	}
 
 
-public slots:
-	virtual void update( void );
-
-
 protected:
 	typedef automationPattern::timeMap timeMap;
 
@@ -209,6 +205,7 @@ private:
 	int m_bottom_level;
 	int m_top_level;
 
+	void updatePaintPixmap( void );
 	void updateTopBottomLevels( void );
 
 	QScrollBar * m_leftRightScroll;

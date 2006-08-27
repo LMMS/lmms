@@ -497,7 +497,7 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 
 
 
-void automationEditor::update( void )
+void automationEditor::updatePaintPixmap( void )
 {
 	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
 	{
@@ -817,8 +817,6 @@ void automationEditor::update( void )
 #else
 	m_leftRightScroll->setSteps( 1, l );
 #endif
-
-	QWidget::update();
 }
 
 
@@ -1193,7 +1191,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 		if( _me->x() <= VALUES_WIDTH )
 		{
-			QWidget::update();
+			update();
 			return;
 		}
 		x -= VALUES_WIDTH;
@@ -1548,20 +1546,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 		QApplication::restoreOverrideCursor();
 	}
 
-	if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-						Qt::NoButton )
-	{
-		QWidget::update();
-	}
-	else
-	{
-		update();
-	}
+	update();
 }
 
 
@@ -1569,6 +1554,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 void automationEditor::paintEvent( QPaintEvent * )
 {
+	updatePaintPixmap();
 #ifdef QT4
 	QPainter p( this );
 #else

@@ -633,7 +633,7 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 
 
 
-void pianoRoll::update( void )
+void pianoRoll::updatePaintPixmap( void )
 {
 	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
 	{
@@ -982,8 +982,6 @@ void pianoRoll::update( void )
 #else
 	m_leftRightScroll->setSteps( 1, l );
 #endif
-
-	QWidget::update();
 }
 
 
@@ -1172,7 +1170,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				m_editMode = OPEN;
 				QApplication::setOverrideCursor(
 						QCursor( ArrowCursor ), TRUE );
-				QWidget::update();
+				update();
 			}
 
 		default:
@@ -1551,7 +1549,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		if( _me->x() <= WHITE_KEY_WIDTH )
 		{
-			QWidget::update();
+			update();
 			return;
 		}
 		x -= WHITE_KEY_WIDTH;
@@ -1989,20 +1987,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		QApplication::restoreOverrideCursor();
 	}
 
-	if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-						Qt::NoButton )
-	{
-		QWidget::update();
-	}
-	else
-	{
-		update();
-	}
+	update();
 }
 
 
@@ -2010,6 +1995,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 void pianoRoll::paintEvent( QPaintEvent * )
 {
+	updatePaintPixmap();
 #ifdef QT4
 	QPainter p( this );
 #else
