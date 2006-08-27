@@ -290,7 +290,7 @@ void textFloat::updateSize( void )
 	}
 	resize( textBound.width() + 5, textBound.height() + 5 );
 	//move( QPoint( parentWidget()->width() + 5, 5 ) );
-	repaint();
+	update();
 }
 
 

@@ -81,7 +81,7 @@ void KMultiTabBarInternal::setStyle(enum KMultiTabBar::KMultiTabBarStyle style)
         	        mainLayout->addWidget(m_tabs.at(i));
 
 	}
-	repaint();
+	update();
 }
 
 
@@ -282,7 +282,7 @@ void KMultiTabBarInternal::setPosition(enum KMultiTabBar::KMultiTabBarPosition p
 	m_position=pos;
 	for (int i=0;i<m_tabs.count();i++)
 		m_tabs.at(i)->setTabsPosition(m_position);
-	repaint();
+	update();
 }
 
 KMultiTabBarButton::KMultiTabBarButton(const QPixmap& pic,const QString& text, QMenu *popup,
@@ -338,13 +338,13 @@ void KMultiTabBarButton::slotClicked()
 void KMultiTabBarButton::setPosition(KMultiTabBar::KMultiTabBarPosition pos)
 {
 	m_position=pos;
-	repaint();
+	update();
 }
 
 void KMultiTabBarButton::setStyle(KMultiTabBar::KMultiTabBarStyle style)
 {
 	m_style=style;
-	repaint();
+	update();
 }
 
 void KMultiTabBarButton::hideEvent( QHideEvent* he) {
@@ -883,7 +883,7 @@ void KMultiTabBar::fontChange(const QFont& /* oldFont */)
 {
 	for (int i=0;i<tabs()->count();i++)
 		tabs()->at(i)->resize();
-	repaint();
+	update();
 }
 
 QList<KMultiTabBarTab *>* KMultiTabBar::tabs() {return m_internal->tabs();}
@@ -953,7 +953,7 @@ void KMultiTabBarInternal::setStyle(enum KMultiTabBar::KMultiTabBarStyle style)
 		(m_style==KMultiTabBar::KDEV3ICON ) ) {
 		resizeEvent(0);
 	}
-        viewport()->repaint();
+        viewport()->update();
 }
 
 
@@ -1093,7 +1093,7 @@ void KMultiTabBarInternal::setPosition(enum KMultiTabBar::KMultiTabBarPosition p
 	m_position=pos;
 	for (csize i=0;i<m_tabs.count();i++)
 		m_tabs.at(i)->setTabsPosition(m_position);
-	viewport()->repaint();
+	viewport()->update();
 }
 
 
@@ -1150,13 +1150,13 @@ void KMultiTabBarButton::slotClicked()
 void KMultiTabBarButton::setPosition(KMultiTabBar::KMultiTabBarPosition pos)
 {
 	m_position=pos;
-	repaint();
+	update();
 }
 
 void KMultiTabBarButton::setStyle(KMultiTabBar::KMultiTabBarStyle style)
 {
 	m_style=style;
-	repaint();
+	update();
 }
 
 void KMultiTabBarButton::hideEvent( QHideEvent* he) {
@@ -1240,7 +1240,7 @@ void KMultiTabBarTab::setTabsPosition(KMultiTabBar::KMultiTabBarPosition pos)
 	}
 
 	setPosition(pos);
-//	repaint();
+//	update();
 }
 
 void KMultiTabBarTab::setIcon(const QString& icon)
@@ -1678,7 +1678,7 @@ void KMultiTabBar::fontChange(const QFont& /* oldFont */)
 {
 	for (csize i=0;i<tabs()->count();i++)
 		tabs()->at(i)->resize();
-	repaint();
+	update();
 }
 
 tabList * KMultiTabBar::tabs() {return m_internal->tabs();}

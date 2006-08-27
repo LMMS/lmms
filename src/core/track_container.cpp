@@ -312,7 +312,7 @@ void trackContainer::realignTracks( bool _complete_update )
 					it != m_trackWidgets.end(); ++it )
 	{
 		( *it )->show();
-		( *it )->repaint();
+		( *it )->update();
 #ifdef QT4
 		( *it )->move( 0, y );
 #else
