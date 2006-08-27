@@ -368,9 +368,8 @@ track::trackTypes bbTrack::type( void ) const
 
 
 
-// play _frames frames of given TCO within starting with _start/_start_frame
+// play _frames frames of given TCO within starting with _start
 bool FASTCALL bbTrack::play( const midiTime & _start,
-						const f_cnt_t _start_frame,
 						const fpab_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num )
@@ -379,8 +378,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 
 	if( _tco_num >= 0 )
 	{
-		return( eng()->getBBEditor()->play( _start, _start_frame,
-							_frames,
+		return( eng()->getBBEditor()->play( _start, _frames,
 							_frame_base,
 							s_infoMap[this] ) );
 	}
@@ -388,7 +386,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 	vlist<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start + static_cast<Sint32>( _frames /
 						eng()->framesPerTact64th() ) );
-	
+
 	if ( tcos.size() == 0 )
 	{
 		return( FALSE );
@@ -409,7 +407,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 	if( _start - lastPosition < lastLen )
 	{
 		return( eng()->getBBEditor()->play( _start - lastPosition,
-							_start_frame, _frames,
+							_frames,
 							_frame_base,
 							s_infoMap[this] ) );
 	}

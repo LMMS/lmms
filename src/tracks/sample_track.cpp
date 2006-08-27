@@ -421,16 +421,10 @@ track::trackTypes sampleTrack::type( void ) const
 
 
 bool FASTCALL sampleTrack::play( const midiTime & _start,
-						const f_cnt_t _start_frame,
 						const fpab_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 /*_tco_num*/ )
 {
-	if ( _start_frame > 0 )
-	{
-		return( FALSE );
-	}
-
 	sendMidiTime( _start );
 
 #ifdef LADSPA_SUPPORT

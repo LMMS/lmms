@@ -47,7 +47,6 @@ private:
 	virtual trackTypes type( void ) const;
 
 	virtual bool FASTCALL play( const midiTime & _start,
-						const f_cnt_t _start_frame,
 						const fpab_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );

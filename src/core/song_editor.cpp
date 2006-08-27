@@ -1056,20 +1056,23 @@ void songEditor::processNextBuffer( void )
 			played_frames = last_frames;
 		}
 
-		if( m_playMode == PLAY_SONG )
+		if( (f_cnt_t)current_frame == 0 )
 		{
-			m_automation_track->play( m_playPos[m_playMode],
-					(f_cnt_t)current_frame, played_frames,
-					total_frames_played, tco_num );
-		}
+			if( m_playMode == PLAY_SONG )
+			{
+				m_automation_track->play( m_playPos[m_playMode],
+						played_frames,
+						total_frames_played, tco_num );
+			}
 
-		// loop through all tracks and play them
-		for( trackVector::iterator it = tv.begin(); it != tv.end();
-									++it )
-		{
-			( *it )->play( m_playPos[m_playMode],
-					(f_cnt_t)current_frame, played_frames,
-					total_frames_played, tco_num );
+			// loop through all tracks and play them
+			for( trackVector::iterator it = tv.begin();
+							it != tv.end(); ++it )
+			{
+				( *it )->play( m_playPos[m_playMode],
+						played_frames,
+						total_frames_played, tco_num );
+			}
 		}
 
 		// update frame-counters

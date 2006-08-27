@@ -55,7 +55,6 @@ track::trackTypes automationTrack::type( void ) const
 
 
 bool automationTrack::play( const midiTime & _start,
-					const f_cnt_t _start_frame,
 					const fpab_t _frames,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )

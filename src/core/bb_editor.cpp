@@ -227,8 +227,8 @@ tact bbEditor::lengthOfBB( csize _bb )
 
 
 
-bool FASTCALL bbEditor::play( midiTime _start, f_cnt_t _start_frame,
-				f_cnt_t _frames, f_cnt_t _frame_base,
+bool FASTCALL bbEditor::play( midiTime _start, fpab_t _frames,
+							f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
 	bool played_a_note = FALSE;
@@ -242,7 +242,7 @@ bool FASTCALL bbEditor::play( midiTime _start, f_cnt_t _start_frame,
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
 	{
-		if( ( *it )->play( _start, _start_frame, _frames, _frame_base,
+		if( ( *it )->play( _start, _frames, _frame_base,
 							_tco_num ) == TRUE )
 		{
 			played_a_note = TRUE;
