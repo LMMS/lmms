@@ -87,9 +87,9 @@ public:
 	static void triggerLFO( engine * _engine );
 	static void resetLFO( engine * _engine );
 
-	float FASTCALL level( f_cnt_t _frame,
+	void FASTCALL fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
-				const f_cnt_t _frame_offset );
+				const fpab_t _frames );
 
 	inline bool used( void ) const
 	{
@@ -125,8 +125,8 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 
-	float FASTCALL lfoLevel( f_cnt_t _frame,
-					const f_cnt_t _frame_offset ) const;
+	void FASTCALL fillLFOLevel( float * _buf, f_cnt_t _frame,
+							const fpab_t _frames );
 
 
 protected slots:
@@ -181,6 +181,7 @@ private:
 	float m_lfoAmount;
 	bool m_lfoAmountIsZero;
 	sample_t * m_lfoShapeData;
+	bool m_bad_lfoShapeData;
 	sampleBuffer m_userWave;
 
 	enum lfoShapes
@@ -193,6 +194,9 @@ private:
 	} m_lfoShape;
 
 	QMutex m_busyMutex;
+
+	sample_t lfoShapeSample( fpab_t _frame_offset );
+	void updateLFOShapeData( void );
 
 
 

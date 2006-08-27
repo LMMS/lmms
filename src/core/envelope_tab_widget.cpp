@@ -238,9 +238,10 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 		release_begin += eng()->getMixer()->framesPerAudioBuffer();
 	}
 
+	float volume_level;
 	m_envLFOWidgets[VOLUME]->lock();
-	float volume_level =
-		m_envLFOWidgets[VOLUME]->level( _frame, release_begin, 0 );
+	m_envLFOWidgets[VOLUME]->fillLevel( &volume_level, _frame,
+							release_begin, 1 );
 	m_envLFOWidgets[VOLUME]->unlock();
 
 	return( volume_level );
@@ -286,6 +287,29 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 	m_envLFOWidgets[CUT]->lock();
 	m_envLFOWidgets[RES]->lock();
 
+	float * vol_buf = NULL;
+	float * cut_buf = NULL;
+	float * res_buf = NULL;
+
+	if( m_envLFOWidgets[VOLUME]->used() )
+	{
+		vol_buf = new float[_frames];
+		m_envLFOWidgets[VOLUME]->fillLevel( vol_buf, total_frames,
+						release_begin, _frames );
+	}
+	if( m_envLFOWidgets[CUT]->used() )
+	{
+		cut_buf = new float[_frames];
+		m_envLFOWidgets[CUT]->fillLevel( cut_buf, total_frames,
+						release_begin, _frames );
+	}
+	if( m_envLFOWidgets[RES]->used() )
+	{
+		res_buf = new float[_frames];
+		m_envLFOWidgets[RES]->fillLevel( res_buf, total_frames,
+						release_begin, _frames );
+	}
+
 	if( m_filterGroupBox->isActive() )
 	{
 		int old_filter_cut = 0;
@@ -302,12 +326,11 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			for( fpab_t frame = 0; frame < _frames;
 						++frame, ++total_frames )
 			{
-				float new_cut_val = m_envLFOWidgets[CUT]->level( total_frames, release_begin, frame );
-				new_cut_val = envelopeAndLFOWidget::expKnobVal( new_cut_val ) * CUT_FREQ_MULTIPLIER +
+				float new_cut_val = envelopeAndLFOWidget::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
 						m_filterCutKnob->value();
 
 				float new_res_val = m_filterResKnob->value() + RES_MULTIPLIER *
-							m_envLFOWidgets[RES]->level( total_frames, release_begin, frame );
+							res_buf[frame];
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
 					static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
@@ -317,7 +340,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				float vol_level = m_envLFOWidgets[VOLUME]->level( total_frames, release_begin, frame );
+				float vol_level = vol_buf[frame];
 				vol_level = vol_level*vol_level;
 
 				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -330,8 +353,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		{
 			for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 			{
-				float new_cut_val = m_envLFOWidgets[CUT]->level( total_frames, release_begin, frame );
-				new_cut_val = envelopeAndLFOWidget::expKnobVal( new_cut_val ) * CUT_FREQ_MULTIPLIER +
+				float new_cut_val = envelopeAndLFOWidget::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
 						m_filterCutKnob->value();
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
@@ -340,7 +362,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 					old_filter_cut = static_cast<int>( new_cut_val );
 				}
 
-				float vol_level = m_envLFOWidgets[VOLUME]->level( total_frames, release_begin, frame );
+				float vol_level = vol_buf[frame];
 				vol_level = vol_level*vol_level;
 
 				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -355,7 +377,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 			{
 				float new_res_val = m_filterResKnob->value() + RES_MULTIPLIER *
-							m_envLFOWidgets[RES]->level( total_frames, release_begin, frame );
+							res_buf[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
@@ -363,7 +385,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				float vol_level = m_envLFOWidgets[VOLUME]->level( total_frames, release_begin, frame );
+				float vol_level = vol_buf[frame];
 				vol_level = vol_level*vol_level;
 
 				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -377,8 +399,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		{
 			for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 			{
-				float new_cut_val = m_envLFOWidgets[CUT]->level( total_frames, release_begin, frame );
-				new_cut_val = envelopeAndLFOWidget::expKnobVal( new_cut_val ) * CUT_FREQ_MULTIPLIER +
+				float new_cut_val = envelopeAndLFOWidget::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
 						m_filterCutKnob->value();
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
@@ -398,7 +419,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 			{
 				float new_res_val = m_filterResKnob->value() + RES_MULTIPLIER *
-							m_envLFOWidgets[RES]->level( total_frames, release_begin, frame );
+							res_buf[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
@@ -418,7 +439,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 			for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 			{
-				float vol_level = m_envLFOWidgets[VOLUME]->level( total_frames, release_begin, frame );
+				float vol_level = vol_buf[frame];
 				vol_level = vol_level*vol_level;
 
 				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -445,7 +466,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		// only use volume-envelope...
 		for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 		{
-			float vol_level = m_envLFOWidgets[VOLUME]->level( total_frames, release_begin, frame );
+			float vol_level = vol_buf[frame];
 			vol_level = vol_level*vol_level;
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
@@ -458,7 +479,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		// only use panning-envelope...
 		for( fpab_t frame = 0; frame < _frames; ++frame, ++total_frames )
 		{
-			float vol_level = m_envLFOWidgets[PANNING]->level( total_frames, release_begin, frame );
+			float vol_level = pan_buf[frame];
 			vol_level = vol_level*vol_level;
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{
@@ -466,6 +487,10 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			}
 		}
 	}*/
+
+	delete[] vol_buf;
+	delete[] cut_buf;
+	delete[] res_buf;
 
 	m_envLFOWidgets[RES]->unlock();
 	m_envLFOWidgets[CUT]->unlock();
