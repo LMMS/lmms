@@ -67,6 +67,7 @@ public:
 	{
 		setRange( 0, 0 );
 		m_items.clear();
+		m_menu.clear();
 		update();
 	}
 
