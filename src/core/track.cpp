@@ -1095,7 +1095,8 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 			const char * trackOps_icon;
 			const char * mute_active_icon;
 			const char * mute_inactive_icon;
-			if( currentBBTrack()->automationDisabled(
+			bbTrack * bb_track = currentBBTrack();
+			if( !bb_track || bb_track->automationDisabled(
 						m_trackWidget->getTrack() ) )
 			{
 				trackOps_icon = "track_op_menu_disabled";
@@ -1191,20 +1192,24 @@ void trackOperationsWidget::updateMenu( void )
 	to_menu->clear();
 	if( inBBEditor() )
 	{
-		if( currentBBTrack()->automationDisabled(
-						m_trackWidget->getTrack() ) )
+		bbTrack * bb_track = currentBBTrack();
+		if( bb_track )
 		{
-			to_menu->addAction( embed::getIconPixmap( "led_off",
-								16, 16 ),
+			if( bb_track->automationDisabled(
+						m_trackWidget->getTrack() ) )
+			{
+				to_menu->addAction( embed::getIconPixmap(
+							"led_off", 16, 16 ),
 					tr( "Enable automation" ),
 					this, SLOT( enableAutomation() ) );
-		}
-		else
-		{
-			to_menu->addAction( embed::getIconPixmap( "led_green",
-								16, 16 ),
+			}
+			else
+			{
+				to_menu->addAction( embed::getIconPixmap(
+							"led_green", 16, 16 ),
 					tr( "Disable automation" ),
 					this, SLOT( disableAutomation() ) );
+			}
 		}
 	}
 	to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
@@ -1309,6 +1314,15 @@ void trackWidget::repaint( void )
 {
 	m_trackContentWidget.repaint();
 	QWidget::repaint();
+}
+
+
+
+
+void trackWidget::update( void )
+{
+	m_trackContentWidget.update();
+	QWidget::update();
 }
 
 
@@ -1876,14 +1890,8 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 
 
-bool track::sendMidiTime( const midiTime & _time )
+void track::sendMidiTime( const midiTime & _time )
 {
-	if( m_last_time_sent == _time )
-	{
-		return( FALSE );
-	}
-	m_last_time_sent = _time;
-
 	QPtrListIterator<automationPattern> it( m_automation_patterns );
 	automationPattern * pattern;
 	while( ( pattern = it.current() ) )
@@ -1891,7 +1899,6 @@ bool track::sendMidiTime( const midiTime & _time )
 		++it;
 		pattern->processMidiTime( _time );
 	}
-	return( TRUE );
 }
 
 
