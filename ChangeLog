@@ -1,3 +1,56 @@
+2006-08-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automation_track.h:
+	* include/bb_editor.h:
+	* include/bb_track.h:
+	* include/instrument_track.h:
+	* include/sample_track.h:
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/sample_track.cpp:
+	removed start frame from play() methods
+
+	* src/tracks/instrument_track.cpp:
+	- removed start frame from play() methods
+	- removed checks when sending automation events
+
+	* include/track.h:
+	- removed start frame from play() methods
+	- removed checks when sending automation events
+	- use update() instead of repaint()
+
+	* src/core/track.cpp:
+	- fixed no bb-track case
+	- removed checks when sending automation events
+	- use update() instead of repaint()
+
+	* src/core/track_container.cpp:
+	* src/widgets/kmultitabbar.cpp:
+	* src/widgets/text_float.cpp:
+	use update() instead of repaint()
+
+	* include/automation_editor.h:
+	* include/piano_roll.h:
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	moved update() reimplementations to methods called from paintEvent()
+
+	* include/envelope_and_lfo_widget.h:
+	* src/core/envelope_tab_widget.cpp:
+	optimized envelope and LFO computations
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	- optimized envelope and LFO computations
+	- separated sample variables updates from paint events
+
+	* include/combobox.h:
+	clear the menu when the combobox is cleared
+
+	* src/midi/midi_alsa_seq.cpp:
+	clean-up properly
+
 2006-08-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/shared_object.h:
