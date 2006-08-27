@@ -1,3 +1,18 @@
+2006-08-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* COPYING:
+	updated GPL
+
+	* README:
+	* source files:
+	updated FSF address
+
+	* depcomp:
+	removed generated file
+
+	* mkinstalldirs:
+	removed auxiliary automake file
+
 2006-08-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/automation_track.h:
