@@ -347,6 +347,7 @@ public:
 	}
 	
 	virtual void repaint( void );
+	virtual void update( void );
 
 
 public slots:
@@ -433,7 +434,6 @@ public:
 	virtual trackTypes type( void ) const = 0;
 
 	virtual bool FASTCALL play( const midiTime & _start,
-						const f_cnt_t _start_frame,
 						const fpab_t _frames,
 						const f_cnt_t _frame_base,
 						Sint16 _tco_num = -1 ) = 0;
@@ -508,7 +508,7 @@ public:
 
 
 protected:
-	bool sendMidiTime( const midiTime & _time );
+	void sendMidiTime( const midiTime & _time );
 	QString m_name;
 
 
@@ -516,7 +516,6 @@ private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
 	QPtrList<automationPattern> m_automation_patterns;
-	midiTime m_last_time_sent;
 
 } ;
 
