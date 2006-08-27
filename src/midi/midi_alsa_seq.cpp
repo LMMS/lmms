@@ -531,7 +531,7 @@ void midiALSASeq::run( void )
 
 	}
 
-	delete pollfd_set;
+	delete[] pollfd_set;
 }
 
 
