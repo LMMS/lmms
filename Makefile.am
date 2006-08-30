@@ -80,6 +80,7 @@ lmms_MOC =						\
 		./mixer.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
+		./meter_dialog.moc			\
 		./midi_alsa_seq.moc			\
 		./midi_tab_widget.moc			\
 		./note_play_handle.moc			\
@@ -157,6 +158,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
+		$(srcdir)/src/core/meter_dialog.cpp			\
 		$(srcdir)/src/core/midi_tab_widget.cpp			\
 		$(srcdir)/src/core/mixer.cpp				\
 		$(srcdir)/src/core/name_label.cpp			\
@@ -363,6 +365,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rack_view.h				\
 		$(srcdir)/include/select_ladspa_dialog.h		\
 		$(srcdir)/include/ladspa_effect.h			\
+		$(srcdir)/include/meter_dialog.h			\
 		$(srcdir)/include/qxembed.h
 
 

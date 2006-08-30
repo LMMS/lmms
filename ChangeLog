@@ -6,7 +6,23 @@
 	* src/core/ladspa_effect.cpp:
 	corrected the labeling of "(ms)" which were showing up as
 	"(ms))"
-
+	
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	* include/meter_dialog.h:
+	* src/core/meter_dialog.cpp:
+	* include/tempo_sync_knob.h:
+	* src/widgets/tempo_sync_knob:
+	added user definable settings for tempo sync
+	
+	* src/core/arp_and_chords_tab_widget.cpp:
+	- changed arp time knob to save using new tempo sync format
+	- fixed a bug that was preventing the arp groupbox state from
+	  being restored properly
+	
+	* src/core/envelope_and_lfo_widget.cpp:
+	changed lfo time knob to save using new tempo sync format
+	
 2006-08-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* COPYING:

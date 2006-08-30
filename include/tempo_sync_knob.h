@@ -38,6 +38,7 @@
 
 #include "knob.h"
 #include "types.h"
+#include "meter_dialog.h"
 
 
 class QAction;
@@ -56,7 +57,8 @@ public:
 		QUARTER_NOTE,
 		EIGHTH_NOTE,
 		SIXTEENTH_NOTE,
-		THIRTYSECOND_NOTE
+		THIRTYSECOND_NOTE,
+		CUSTOM
 	} ;
 
 
@@ -64,6 +66,11 @@ public:
 					engine * _engine, track * _track,
 					float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
+						const QString & _name );
+	virtual void loadSettings( const QDomElement & _this,
+						const QString & _name );
 
 	tempoSyncMode getSyncMode( void );
 	void setSyncMode( tempoSyncMode _new_mode );
@@ -76,7 +83,6 @@ public:
 
 	const QPixmap & getSyncIcon( void );
 	void setSyncIcon( const QPixmap & _new_pix );
-
 
 signals:
 	void syncModeChanged( tempoSyncMode _new_mode );
@@ -98,7 +104,8 @@ protected:
 
 protected slots:
 	void calculateTempoSyncTime( bpm_t _bpm );
-
+	void updateCustom( int );
+	void showCustom( void );
 
 private:
 	tempoSyncMode m_tempoSyncMode;
@@ -107,7 +114,7 @@ private:
 	QString m_tempoSyncDescription;
 	
 	tempoSyncMode m_tempoLastSyncMode;
-
+	meterDialog * m_custom;
 } ;
 
 

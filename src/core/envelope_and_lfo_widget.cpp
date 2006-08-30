@@ -649,8 +649,6 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 	m_lfoAmountKnob->saveSettings( _doc, _parent, "lamt" );
 	m_x100Cb->saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountCb->saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute( "lfosyncmode",
-					( int ) m_lfoSpeedKnob->getSyncMode() );
 	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
 }
 
@@ -675,9 +673,15 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	m_lfoAmountKnob->loadSettings( _this, "lamt" );
 	m_x100Cb->loadSettings( _this, "x100" );
 	m_controlEnvAmountCb->loadSettings( _this, "ctlenvamt" );
-	m_lfoSpeedKnob->setSyncMode(
+	
+	// Keep compatibility with version 2.1 file format
+	if( _this.hasAttribute( "lfosyncmode" ) )
+	{
+		m_lfoSpeedKnob->setSyncMode(
 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
 						"lfosyncmode" ).toInt() );
+	}
+	
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	m_busyMutex.unlock();

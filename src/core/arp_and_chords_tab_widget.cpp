@@ -672,8 +672,6 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
 	m_arpGateKnob->saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionBtnGrp->saveSettings( _doc, _this, "arpdir" );
-	_this.setAttribute( "arpsyncmode",
-					( int ) m_arpTimeKnob->getSyncMode() );
 
 	m_arpModeComboBox->saveSettings( _doc, _this, "arpmode" );
 }
@@ -695,19 +693,26 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	{
 		m_arpDirectionBtnGrp->setInitValue(
 				_this.attribute( "arpdir" ).toInt() - 1 );
+		m_arpGroupBox->setState( 
+				_this.attribute( "arpdir" ).toInt() != OFF &&
+				!_this.attribute( "arpdisabled" ).toInt() );
 	}
 	else
 	{
 		m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
+		m_arpGroupBox->setState( 
+				!_this.attribute( "arpdisabled" ).toInt() );
 	}
-	m_arpTimeKnob->setSyncMode( 
-		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
-						 "arpsyncmode" ).toInt() );
+	
+	// Keep compatibility with version 2.1 file format
+	if( _this.hasAttribute( "arpsyncmode" ) )
+	{
+	 	m_arpTimeKnob->setSyncMode( 
+ 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
+ 						 "arpsyncmode" ).toInt() );
+	}
 
 	m_arpModeComboBox->loadSettings( _this, "arpmode" );
-
-	m_arpGroupBox->setState( _this.attribute( "arpdir" ).toInt() != OFF &&
-				!_this.attribute( "arpdisabled" ).toInt() );
 }
 
 
