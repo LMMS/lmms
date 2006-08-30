@@ -1,3 +1,12 @@
+2006-08-30	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* src/widgets/ladspa_control.cpp:
+	added a lock to prevent segfaults when changing the values
+	while playing
+	
+	* src/core/ladspa_effect.cpp:
+	corrected the labeling of "(ms)" which were showing up as
+	"(ms))"
+
 2006-08-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* COPYING:

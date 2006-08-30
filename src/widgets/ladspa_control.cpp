@@ -189,20 +189,26 @@ LADSPA_Data ladspaControl::getValue( void )
 {
 	LADSPA_Data value = 0.0f;
 	
-	switch( m_port->data_type )
+	if( m_processLock.tryLock() )
 	{
-		case TOGGLED:
-			value = static_cast<LADSPA_Data>( 
-					m_toggle->isChecked() );
-			break;
-		case INTEGER:
-		case FLOAT:
-		case TIME:
-			value = static_cast<LADSPA_Data>( m_knob->value() );
-			break;		
-		default:
-			printf( "ladspaControl::getValue BAD BAD BAD\n" );
-			break;
+		switch( m_port->data_type )
+		{
+			case TOGGLED:
+				value = static_cast<LADSPA_Data>( 
+						m_toggle->isChecked() );
+				break;
+			case INTEGER:
+			case FLOAT:
+			case TIME:
+				value = static_cast<LADSPA_Data>( 
+							m_knob->value() );
+				break;		
+			default:
+				printf( 
+				"ladspaControl::getValue BAD BAD BAD\n" );
+				break;
+		}
+		m_processLock.unlock();
 	}
 	
 	return( value );
@@ -213,6 +219,8 @@ LADSPA_Data ladspaControl::getValue( void )
 
 void ladspaControl::setValue( LADSPA_Data _value )
 {
+	m_processLock.lock();
+	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
@@ -229,6 +237,8 @@ void ladspaControl::setValue( LADSPA_Data _value )
 			printf("ladspaControl::setValue BAD BAD BAD\n");
 			break;
 	}
+	
+	m_processLock.unlock();
 }
 
 
@@ -238,6 +248,8 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 					   QDomElement & _this, 
 					   const QString & _name )
 {
+	m_processLock.lock();
+	
 	if( m_link != NULL )
 	{
 		m_link->saveSettings( _doc, _this, _name + "link" );
@@ -256,6 +268,8 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 			printf("ladspaControl::saveSettings BAD BAD BAD\n");
 			break;
 	}
+	
+	m_processLock.unlock();
 }
 
 
@@ -263,6 +277,8 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, 
 					   const QString & _name )
 {
+	m_processLock.lock();
+	
 	if( m_link != NULL )
 	{
 		m_link->loadSettings( _this, _name + "link" );
@@ -281,6 +297,8 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 			printf("ladspaControl::loadSettings BAD BAD BAD\n");
 			break;
 	}
+	
+	m_processLock.unlock();
 }
 
 
@@ -288,6 +306,8 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 
 void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 {
+	m_processLock.lock();
+	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
@@ -301,6 +321,8 @@ void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 		default:
 			break;
 	}
+	
+	m_processLock.unlock();
 }
 
 
@@ -324,6 +346,8 @@ void ladspaControl::knobChange( float _value )
 
 void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 {
+	m_processLock.lock();
+	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
@@ -337,6 +361,8 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 		default:
 			break;
 	}
+	
+	m_processLock.unlock();
 }
 
 
