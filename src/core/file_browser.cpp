@@ -824,6 +824,7 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
+	m_pix( NULL ),
 	m_path( _path )
 {
 	determineFileType();
@@ -837,6 +838,7 @@ fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
 						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
+	m_pix( NULL ),
 	m_path( _path )
 {
 	determineFileType();
