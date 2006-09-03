@@ -1,3 +1,56 @@
+2006-09-03	Thomas Girard <thomas/dot/g/dot/girard/at/free/dot/fr>
+
+	* src/core/file_browser.cpp:
+	fixed bad project browsing segfault
+
+2006-09-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/bb_track.h:
+	* src/core/track.cpp:
+	integrated Toby's Qt4 fixes
+
+	* src/widgets/tempo_sync_knob.cpp:
+	- integrated Toby's Qt4 fixes
+	- connect the meter dialog only when custom sync
+	- don't set the modified flag on automated changes
+
+	* src/core/song_editor.cpp:
+	- integrated Toby's Qt4 fixes
+	- rely on objects to set the modified flag
+
+	* src/core/meter_dialog.cpp:
+	added names to display in the automation editor
+
+2006-09-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* acinclude.m4:
+	* include/effect_tab_widget.h:
+	* include/ladspa_description.h:
+	* include/qt3support.h:
+	* include/rack_view.h:
+	* include/track.h:
+	* src/audio/audio_device.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/core/ladspa_effect.cpp:
+	* src/core/ladspa_port_dialog.cpp:
+	* src/core/name_label.cpp:
+	* src/core/note.cpp:
+	* src/core/piano_roll.cpp:
+	* src/lib/ladspa_2_lmms.cpp:
+	* src/lib/ladspa_manager.cpp:
+	* src/tracks/automation_pattern.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/ladspa_description.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	* src/widgets/volume_knob.cpp:
+	Qt4-compat fixes
+
 2006-08-30	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* src/widgets/ladspa_control.cpp:
 	added a lock to prevent segfaults when changing the values
