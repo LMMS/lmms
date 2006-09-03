@@ -28,7 +28,7 @@
 
 #ifdef QT4
 
-#include <QTCore/QString>
+#include <QtCore/QString>
 
 #else
 
@@ -43,12 +43,20 @@
 
 
 pluginDescription::pluginDescription( QWidget * _parent, engine * _engine ):
-	QWidget( _parent, "pluginDescription" ),
+	QWidget( _parent
+#ifdef QT3
+			, "pluginDescription"
+#endif
+						),
 	m_ladspaManager( _engine->getLADSPAManager() )
 {
 	m_boxer = new QVBoxLayout( this );
+#ifndef QT3
+	m_grouper = new QGroupBox( tr( "Description" ), this );
+#else
 	m_grouper = new QGroupBox( 9, Qt::Vertical, 
 						tr( "Description" ), this );
+#endif
 
 	m_label = new QLabel( m_grouper );
 	m_label->setText( tr( "Label:" ) );
@@ -135,13 +143,21 @@ void pluginDescription::onHighlighted( const ladspa_key_t & _key )
 ladspaDescription::ladspaDescription( QWidget * _parent, 
 					engine * _engine, 
 					pluginType _type ):
-	QWidget( _parent, "ladspaDescription" )
+	QWidget( _parent
+#ifdef QT3
+			, "ladspaDescription"
+#endif
+						)
 {
 	m_ladspaManager = _engine->getLADSPAManager();
 	
 	setMinimumWidth( 200 );
 	m_boxer = new QVBoxLayout( this );
+#ifndef QT3
+	m_grouper = new QGroupBox( tr( "Plugins" ), this );
+#else
 	m_grouper = new QGroupBox( 1, Qt::Vertical, tr( "Plugins" ), this );
+#endif
 
 	l_sortable_plugin_t plugins;
 	switch( _type )
@@ -181,7 +197,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 		}
 	}
 	
-	m_pluginList = new QListBox( m_grouper );
+	m_pluginList = new Q3ListBox( m_grouper );
 	m_pluginList->insertStringList( m_pluginNames );
 	connect( m_pluginList, SIGNAL( highlighted( int ) ),
 				SLOT( onHighlighted( int ) ) );	

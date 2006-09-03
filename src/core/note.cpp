@@ -99,9 +99,10 @@ note::~note()
 {
 	if( m_detuning )
 	{
-		if( m_detuning->data().toInt() )
+		knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
+		if( o->data().toInt() )
 		{
-			m_detuning->setData( m_detuning->data().toInt() - 1 );
+			o->setData( o->data().toInt() - 1 );
 		}
 		else
 		{
@@ -302,7 +303,8 @@ void note::setDetuning( knob * _detuning )
 	m_detuning = _detuning;
 	if( m_detuning )
 	{
-		m_detuning->setData( m_detuning->data().toInt() + 1 );
+		knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
+		o->setData( o->data().toInt() + 1 );
 	}
 }
 
@@ -324,9 +326,10 @@ void note::createDetuning( void )
 
 void note::detachCurrentDetuning( void )
 {
-	if( m_detuning->data().toInt() )
+	knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
+	if( o->data().toInt() )
 	{
-		m_detuning->setData( m_detuning->data().toInt() - 1 );
+		o->setData( o->data().toInt() - 1 );
 
 		QDomDocument doc;
 		QDomElement parent = doc.createElement( "clone" );

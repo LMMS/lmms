@@ -77,6 +77,10 @@
 #include "bb_editor.h"
 #include "piano_roll.h"
 
+#ifdef QT3
+#define value data
+#endif
+
 
 QPixmap * automationEditor::s_toolDraw = NULL;
 QPixmap * automationEditor::s_toolErase = NULL;
@@ -439,7 +443,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 		for( timeMap::iterator it = time_map.begin();
 						it != time_map.end(); ++it )
 		{
-			central_key += it.data();
+			central_key += it.value();
 			++total_values;
 		}
 
@@ -519,8 +523,8 @@ void automationEditor::updatePaintPixmap( void )
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
-	AlignmentFlags text_flags =
-				(AlignmentFlags)( AlignRight | AlignVCenter );
+	Qt::Alignment text_flags =
+		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
 
 	if( m_pattern )
 	{
@@ -621,7 +625,7 @@ void automationEditor::updatePaintPixmap( void )
 			p.setPen( pen );
 			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
 								grid_bottom );
-			pen.setStyle( DotLine );
+			pen.setStyle( Qt::DotLine );
 			p.setPen( pen );
 			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
 			for( int i = 1; i < 8; ++i )
@@ -679,7 +683,7 @@ void automationEditor::updatePaintPixmap( void )
 		{
 			Sint32 len_tact_64th = 4;
 
-			const int level = it.data();
+			const int level = it.value();
 
 			Sint32 pos_tact_64th = it.key();
 
@@ -777,7 +781,7 @@ void automationEditor::updatePaintPixmap( void )
 		p.setPen( QColor( 0, 255, 0 ) );
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
-				grid_height - 40, WordBreak,
+				grid_height - 40, Qt::TextWordWrap,
 				tr( "Please open an automation pattern with "
 					"the context menu of a control!" ) );
 	}
@@ -851,6 +855,9 @@ void automationEditor::enterEvent( QEvent * _e )
 
 
 
+#ifdef QT3
+#undef value
+#endif
 
 void automationEditor::keyPressEvent( QKeyEvent * _ke )
 {
@@ -1000,6 +1007,9 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 }
 
+#ifdef QT3
+#define value data
+#endif
 
 
 
@@ -1056,7 +1066,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( pos_tact_64th >= it.key() &&
 					len > 0 &&
 					pos_tact_64th <= it.key() + len &&
-					it.data() == level )
+					it.value() == level )
 				{
 					break;
 				}
@@ -1259,7 +1269,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			    		pos_tact_64th <= it.key() +
 							//TODO: Add constant
 							4 &&
-					it.data() == level )
+					it.value() == level )
 				{
 					break;
 				}
@@ -1457,8 +1467,9 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 							value_tact_64th );
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
-						it.data() + level_diff, FALSE )]
-						= it.data() + level_diff;
+						it.value () + level_diff,
+									FALSE )]
+						= it.value() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -1524,6 +1535,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							height() -
 							SCROLLBAR_SIZE ) ) );
+#undef value
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
 				level = m_bottom_level;
@@ -1536,7 +1548,9 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					m_topBottomScroll->value() - 1 );
 				level = m_top_level;
 			}
-
+#ifdef QT3
+#define value data
+#endif
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
 			{
@@ -1648,6 +1662,9 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 
 
+#ifdef QT3
+#undef value
+#endif
 
 void automationEditor::wheelEvent( QWheelEvent * _we )
 {
@@ -1683,6 +1700,9 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 							_we->delta() / 30 );
 	}
 }
+#ifdef QT3
+#define value data
+#endif
 
 
 
@@ -1884,7 +1904,7 @@ void automationEditor::selectAll( void )
 		//TODO: Add constant
 		Uint32 len_tact_64th = 4;
 
-		const int level = it.data();
+		const int level = it.value();
 
 		Uint32 pos_tact_64th = it.key();
 		if( level <= m_selectStartLevel || first_time )
@@ -1950,7 +1970,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		//TODO: Add constant
 		Sint32 len_tact_64th = 4;
 
-		int level = it.data();
+		int level = it.value();
 		Sint32 pos_tact_64th = it.key();
 
 		if( level > sel_level_start && level <= sel_level_end &&
@@ -1979,7 +1999,7 @@ void automationEditor::copySelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = it.data();
+			m_valuesToCopy[it.key()] = it.value();
 		}
 		textFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
@@ -2013,7 +2033,7 @@ void automationEditor::cutSelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
-			m_valuesToCopy[it.key()] = it.data();
+			m_valuesToCopy[it.key()] = it.value();
 			m_pattern->removeValue( it.key() );
 		}
 	}
@@ -2038,7 +2058,7 @@ void automationEditor::pasteValues( void )
 					it != m_valuesToCopy.end(); ++it )
 		{
 			m_pattern->putValue( it.key() + m_currentPosition,
-								it.data() );
+								it.value() );
 		}
 
 		// we only have to do the following lines if we pasted at

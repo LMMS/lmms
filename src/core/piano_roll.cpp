@@ -1164,12 +1164,17 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			m_timeLine->updatePosition();
 			break;
 
-		case Key_Control:
+		case Qt::Key_Control:
 			if( mouseOverNote() )
 			{
 				m_editMode = OPEN;
+#ifndef QT3
+				QApplication::changeOverrideCursor(
+						QCursor( Qt::ArrowCursor ) );
+#else
 				QApplication::setOverrideCursor(
-						QCursor( ArrowCursor ), TRUE );
+					QCursor( Qt::ArrowCursor ), TRUE );
+#endif
 				update();
 			}
 
@@ -1191,7 +1196,7 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 	}
 	switch( _ke->key() )
 	{
-		case Key_Control:
+		case Qt::Key_Control:
 			if( m_editMode == OPEN )
 			{
 				m_editMode = DRAW;
@@ -1626,7 +1631,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		else if(
 #ifdef QT4
-			_me->buttons() == NoButton
+			_me->buttons() == Qt::NoButton
 #else
 			( _me->state() == NoButton
 					|| _me->state() == ControlButton )
@@ -1665,11 +1670,17 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// no note??
 			if( it != notes.end() )
 			{
-				if( _me->modifiers() & ControlModifier )
+				if( _me->modifiers() & Qt::ControlModifier )
 				{
 					m_editMode = OPEN;
+#ifndef QT3
+					QApplication::changeOverrideCursor(
+						QCursor( Qt::ArrowCursor ) );
+#else
 					QApplication::setOverrideCursor(
-						QCursor( ArrowCursor ), TRUE );
+						QCursor( Qt::ArrowCursor ),
+									TRUE );
+#endif
 				}
 				// cursor at the "tail" of the note?
 				else if( ( *it )->length() > 0 &&
@@ -1894,7 +1905,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			m_moveStartKey = key_num;
 		}
 		else if( m_editMode == OPEN && !( mouseOverNote()
-				&& _me->modifiers() & ControlModifier ) )
+				&& _me->modifiers() & Qt::ControlModifier ) )
 		{
 			m_editMode = DRAW;
 		}

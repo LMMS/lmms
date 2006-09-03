@@ -125,7 +125,13 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoShapeData( NULL ),
 	m_userWave( eng() ),
 	m_lfoShape( SIN ),
-	m_busyMutex( TRUE )
+	m_busyMutex(
+#ifdef QT3
+		TRUE
+#else
+		QMutex::Recursive
+#endif
+			)
 {
 	if( s_envGraph == NULL )
 	{

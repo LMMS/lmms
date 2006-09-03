@@ -45,7 +45,7 @@ rackView::rackView( QWidget * _parent,
 			engine * _engine, 
 			track * _track, 
 			audioPort * _port ):
-	QWidget( _parent, "rackView" ),
+	QWidget( _parent ),
 	journallingObject( _engine ),
 	m_track( _track ),
 	m_port( _port ),
@@ -54,10 +54,15 @@ rackView::rackView( QWidget * _parent,
 	setFixedSize( 230, 184 );
 	
 	m_mainLayout = new QVBoxLayout( this );
-	m_scrollView = new QScrollView( this );
-	m_scrollView->setFixedSize( 230, 184 );
-	m_scrollView->setVScrollBarMode( QScrollView::AlwaysOn );
-	m_mainLayout->addWidget( m_scrollView );
+	m_mainLayout->setMargin( 0 );
+	m_scrollArea = new QScrollArea( this );
+	m_scrollArea->setFixedSize( 230, 184 );
+#ifdef QT4
+	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+#else
+	m_scrollArea->setVScrollBarMode( QScrollArea::AlwaysOn );
+#endif
+	m_mainLayout->addWidget( m_scrollArea );
 	
 	m_lastY = 0;
 }
@@ -73,7 +78,19 @@ rackView::~rackView()
 
 void rackView::addPlugin( ladspa_key_t _key )
 {
-	rackPlugin * plugin = new rackPlugin( m_scrollView->viewport(),
+#ifdef QT4
+	if( !m_scrollArea->widget() )
+	{
+		QWidget * w = new QWidget( m_scrollArea->viewport() );
+		QVBoxLayout * vb = new QVBoxLayout( w );
+		w->show();
+		m_scrollArea->setWidget( w );
+	}
+	QWidget * w = m_scrollArea->widget();
+#else
+	QWidget * w = m_scrollArea->viewport();
+#endif
+	rackPlugin * plugin = new rackPlugin( w,
 						_key, m_track, eng(), m_port );
 	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), 
 				this, SLOT( moveUp( rackPlugin * ) ) );
@@ -81,11 +98,19 @@ void rackView::addPlugin( ladspa_key_t _key )
 				this, SLOT( moveDown( rackPlugin * ) ) );
 	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ),
 				this, SLOT( deletePlugin( rackPlugin * ) ) );
-	m_scrollView->addChild( plugin );
-	m_scrollView->moveChild( plugin, 0, m_lastY );
+#ifndef QT3
+	plugin->move( 0, m_lastY );
+#else
+	m_scrollArea->addChild( plugin );
+	m_scrollArea->moveChild( plugin, 0, m_lastY );
+#endif
 	plugin->show();
 	m_lastY += plugin->height();
-	m_scrollView->resizeContents( 210, m_lastY );
+#ifdef QT4
+	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
+#else
+	m_scrollArea->resizeContents( 210, m_lastY );
+#endif
 	m_rackInserts.append( plugin );
 }
 
@@ -101,7 +126,7 @@ void rackView::moveUp( rackPlugin * _plugin )
 						m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++, i++ )
 		{
-			if( (*it) == _plugin )
+			if( *it == _plugin )
 			{
 				break;
 			}
@@ -129,7 +154,7 @@ void rackView::moveDown( rackPlugin * _plugin )
 						m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++, i++ )
 		{
-			if( (*it) == _plugin )
+			if( *it == _plugin )
 			{
 				break;
 			}
@@ -150,14 +175,16 @@ void rackView::moveDown( rackPlugin * _plugin )
 void rackView::deletePlugin( rackPlugin * _plugin )
 {
 	m_port->getEffects()->deleteEffect( _plugin->getEffect() );
-	
-	m_scrollView->removeChild( _plugin );
+
+#ifdef QT3
+	m_scrollArea->removeChild( _plugin );
+#endif
 	
 	vvector<rackPlugin *>::iterator loc = NULL;
 	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
-		if( (*it) == _plugin )
+		if( *it == _plugin )
 		{
 			loc = it;
 			break;
@@ -181,10 +208,18 @@ void rackView::redraw()
 	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
-		m_scrollView->moveChild( (*it), 0, m_lastY );
-		m_lastY += (*it)->height();
+#ifdef QT4
+		( *it )->move( 0, m_lastY );
+#else
+		m_scrollArea->moveChild( *it, 0, m_lastY );
+#endif
+		m_lastY += ( *it )->height();
 	}
-	m_scrollView->resizeContents( 210, m_lastY );
+#ifdef QT4
+	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
+#else
+	m_scrollArea->resizeContents( 210, m_lastY );
+#endif
 }	
 
 
@@ -198,7 +233,7 @@ void FASTCALL rackView::saveSettings( QDomDocument & _doc,
 	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
-		ladspa_key_t key = (*it)->getKey();
+		ladspa_key_t key = ( *it )->getKey();
 		_this.setAttribute( "label" + QString::number(num), 
 								key.first );
 		_this.setAttribute( "lib" + QString::number(num), key.second );
@@ -206,7 +241,7 @@ void FASTCALL rackView::saveSettings( QDomDocument & _doc,
 						m_ladspa->getName( key ) );
 		_this.setAttribute( "maker" + QString::number(num), 
 						m_ladspa->getMaker( key ) );
-		(*it)->saveState( _doc, _this );
+		( *it )->saveState( _doc, _this );
 		num++;
 	}
 }

@@ -69,7 +69,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 			track * _track, 
 			engine * _engine, 
 			audioPort * _port ) :
-	QWidget( _parent, "rackPlugin" ),
+	QWidget( _parent ),
 	journallingObject( _engine ),
 	m_track( _track ),
 	m_port( _port ),
@@ -163,8 +163,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "The Gate knob controls the signal level that is considered to be 'silence' "
 "while deciding when to stop processing signals." ) );
 
-	m_editButton = new QPushButton( this, "Controls" );
-	m_editButton->setText( tr( "Controls" ) );
+	m_editButton = new QPushButton( tr( "Controls" ), this );
 	QFont f = m_editButton->font();
 	m_editButton->setFont( pointSize<7>( f ) );
 	m_editButton->setGeometry( 140, 14, 50, 20 );
@@ -179,15 +178,14 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_label->setFont( pointSize<7>( f ) );
 	m_label->setGeometry( 5, 44, 195, 10 );
 	
-	QPixmap back = QPixmap( bg.convertToImage().copy( 5, 44, 
-							195, 10 ) );
 #ifdef QT4
 	m_label->setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), back );
+	pal.setBrush( backgroundRole(), QPixmap::fromImage(
+					bg.toImage().copy( 5, 44, 195, 10 ) ) );
 	m_label->setPalette( pal );
 #else
-	m_label->setErasePixmap( back );
+	m_label->setErasePixmap( QPixmap( bg.convertToImage().copy( 5, 44, 
+							195, 10 ) ) );
 #endif
 	
 	m_controlView = new ladspaControlDialog( 

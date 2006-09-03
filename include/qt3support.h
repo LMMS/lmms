@@ -78,6 +78,7 @@ inline QString baseName( const QString & _file )
 #define vstack QValueStack
 #define vvector QValueVector
 
+#define qSort qHeapSort
 
 #define QMenu QPopupMenu
 #define QAbstractButton QButton
@@ -149,7 +150,6 @@ inline QString baseName( const QString & _file )
 #define toLower lower
 #define toUpper upper
 
-
 // QTextEdit
 #define setLineWrapMode setWordWrap
 #define setPlainText setText
@@ -199,7 +199,8 @@ inline QString baseName( const QString & _file )
 // Qt-namespace
 #define ShiftModifier ShiftButton
 #define ControlModifier ControlButton
-
+#define Alignment AlignmentFlags
+#define TextWordWrap WordBreak
 
 typedef unsigned int csize;
 

@@ -157,6 +157,7 @@ case "${host}" in
 	if test "$QT_MAJOR" = "4" ; then
 		QT_IS_MT="yes"
 		QT_LIB="-lQtCore -lQtGui -lQtXml -lQt3Support"
+		MOC="$MOC -DLADSPA_SUPPORT"
 	else
         	QT_CXXFLAGS="-DQT3 $QT_CXXFLAGS"
 	        if test "x`ls $QTDIR/lib/libqt-mt.* 2> /dev/null`" != x ; then

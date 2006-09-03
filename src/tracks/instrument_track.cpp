@@ -331,22 +331,30 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	vlayout->addWidget( m_pianoWidget );
 
 #ifdef QT4
-	m_midiInputAction = m_tswMidiMenu->addMenu(
-						m_midiWidget->m_readablePorts );
-	m_midiOutputAction = m_tswMidiMenu->addMenu(
-					m_midiWidget->m_writeablePorts );
-	m_midiInputAction->setText( tr( "MIDI input" ) );
-	m_midiOutputAction->setText( tr( "MIDI output" ) );
-	if( m_midiWidget->m_readablePorts == NULL )
+	if( m_midiWidget->m_readablePorts )
 	{
+		m_midiInputAction = m_tswMidiMenu->addMenu(
+					m_midiWidget->m_readablePorts );
+	}
+	else
+	{
+		m_midiInputAction = m_tswMidiMenu->addAction( "" );
 		connect( m_midiInputAction, SIGNAL( changed() ), this,
 						SLOT( midiInSelected() ) );
 	}
-	if( m_midiWidget->m_writeablePorts == NULL )
+	if( m_midiWidget->m_writeablePorts )
 	{
-		connect( m_midiOutputAction, SIGNAL( changed() ), this,
-						SLOT( midiOutSelected() ) );
+		m_midiOutputAction = m_tswMidiMenu->addMenu(
+					m_midiWidget->m_writeablePorts );
 	}
+	else
+	{
+		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
+		connect( m_midiOutputAction, SIGNAL( changed() ), this,
+					SLOT( midiOutSelected() ) );
+	}
+	m_midiInputAction->setText( tr( "MIDI input" ) );
+	m_midiOutputAction->setText( tr( "MIDI output" ) );
 #else
 	m_midiInputID = m_tswMidiMenu->insertItem( tr( "MIDI input" ),
 					m_midiWidget->m_readablePorts );

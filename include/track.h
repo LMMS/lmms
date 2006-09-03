@@ -515,7 +515,7 @@ protected:
 private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
-	QPtrList<automationPattern> m_automation_patterns;
+	vlist<automationPattern *> m_automation_patterns;
 
 } ;
 

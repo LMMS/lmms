@@ -127,7 +127,7 @@ ladspaManager::ladspaManager( engine * _engine )
 	{
 		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
 	}
-	qHeapSort( m_sortedPlugins );
+	qSort( m_sortedPlugins );
 }
 
 
@@ -214,7 +214,7 @@ Uint16 FASTCALL ladspaManager::getPluginInputs(
 		{
 			QString name = QString( 
 					_descriptor->PortNames[port] );
-			if( name.upper().contains( "IN" ) )
+			if( name.toUpper().contains( "IN" ) )
 			{
 				inputs++;
 			}
@@ -240,7 +240,7 @@ Uint16 FASTCALL ladspaManager::getPluginOutputs(
 		{
 			QString name = QString( 
 					_descriptor->PortNames[port] );
-			if( name.upper().contains( "OUT" ) )
+			if( name.toUpper().contains( "OUT" ) )
 			{
 				outputs++;
 			}

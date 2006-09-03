@@ -35,6 +35,7 @@
 #include <Qt/QtXml>
 #include <QtGui/QMenu>
 #include <QtGui/QToolButton>
+#include <QtGui/QCloseEvent>
 
 #else
 
@@ -101,7 +102,7 @@ void effectTabWidget::setupWidget( void )
 	m_rack = new rackView( m_effectsGroupBox, eng(), m_track, m_port );
 	m_rack->move( 6, 22 );
 		
-	m_addButton = new QPushButton( m_effectsGroupBox, "Add Effect" );
+	m_addButton = new QPushButton( m_effectsGroupBox/*, "Add Effect"*/ );
 	m_addButton->setText( tr( "Add" ) );
 	m_addButton->move( 75, 210 );
 	connect( m_addButton, SIGNAL( clicked( void ) ), 

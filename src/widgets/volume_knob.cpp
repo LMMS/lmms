@@ -37,6 +37,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QInputDialog>
+#include <QtGui/QMouseEvent>
 
 #else
 

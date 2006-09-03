@@ -37,8 +37,6 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QLayout>
-#include <QtGui/QScrollView>
-#include <QtGui/QVBox>
 
 #else
 

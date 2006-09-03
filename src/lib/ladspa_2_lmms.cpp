@@ -30,7 +30,10 @@
 
 #include "ladspa_2_lmms.h"
 
- 
+#ifdef QT3
+#define indexOf find
+#endif
+
 ladspa2LMMS::ladspa2LMMS( engine * _engine ):
 	ladspaManager( _engine )
 {
@@ -93,25 +96,30 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 {
 	QString name = getName( _key );
 	
-	if( name.find( "(" ) > 0 )
+	if( name.indexOf( "(" ) > 0 )
 	{
-		name = name.left( name.find( "(" ) );
+		name = name.left( name.indexOf( "(" ) );
 	}
-	if( name.find( " - " ) > 0 )
+	if( name.indexOf( " - " ) > 0 )
 	{
-		name = name.left( name.find( " - " ) );
+		name = name.left( name.indexOf( " - " ) );
 	}
-	if( name.find( "  " ) > 0 )
+	if( name.indexOf( "  " ) > 0 )
 	{
-		name = name.left( name.find( "  " ) );
+		name = name.left( name.indexOf( "  " ) );
 	}
-	if( name.find( " with ", 0, FALSE ) > 0 )
+#ifndef QT3
+	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
+#else
+	bool cs = FALSE;
+#endif
+	if( name.indexOf( " with ", 0, cs ) > 0 )
 	{
-		name = name.left( name.find( " with ", 0, FALSE ) );
+		name = name.left( name.indexOf( " with ", 0, cs ) );
 	}
-	if( name.find( ",", 0, FALSE ) > 0 )
+	if( name.indexOf( ",", 0, cs ) > 0 )
 	{
-		name = name.left( name.find( ",", 0, FALSE ) );
+		name = name.left( name.indexOf( ",", 0, cs ) );
 	}
 	if( name.length() > 40 )
 	{
@@ -129,6 +137,9 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	
 	return( name );	
 }
+
+
+#undef indexOf
 
 #endif
 

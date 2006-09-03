@@ -49,7 +49,11 @@ ladspaControl::ladspaControl( QWidget * _parent,
 				engine * _engine, 
 				track * _track,
 			    	bool _link) :
-	QWidget( _parent, "ladspaControl" ),
+	QWidget( _parent
+#ifdef QT3
+			, "ladspaControl"
+#endif
+					),
 	journallingObject( _engine ),
 	m_port( _port ),
 	m_track( _track ),
@@ -57,7 +61,11 @@ ladspaControl::ladspaControl( QWidget * _parent,
 	m_toggle( NULL ),
 	m_knob( NULL )
 {
-	m_layout = new QHBoxLayout( this, 0, 0, "ladspaControlLayout" );
+	m_layout = new QHBoxLayout( this
+#ifdef QT3
+					, 0, 0, "ladspaControlLayout"
+#endif
+					);
 	
 	if( _link )
 	{

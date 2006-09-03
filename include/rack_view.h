@@ -31,8 +31,8 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QLayout>
-#include <QtGui/QScrollView>
-#include <QtGui/QVBox>
+#include <QtGui/QScrollArea>
+#include <QtGui/QVBoxLayout>
 
 #else
 
@@ -82,7 +82,7 @@ private:
 	vvector<rackPlugin *> m_rackInserts;
 		
 	QVBoxLayout * m_mainLayout;
-	QScrollView * m_scrollView;
+	QScrollArea * m_scrollArea;
 	
 	track * m_track;
 	audioPort * m_port;

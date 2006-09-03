@@ -147,9 +147,18 @@ void nameLabel::selectPixmap( void )
 		ofd.selectFile( QFileInfo( m_pixmapFile ).fileName() );
 	}
 
-	if ( ofd.exec () == QDialog::Accepted )
+	if ( ofd.exec () == QDialog::Accepted
+#ifndef QT3
+		&& !ofd.selectedFiles().isEmpty()
+#endif
+	)
 	{
-		QString pf = ofd.selectedFile();
+		QString pf = ofd.
+#ifdef QT3
+				selectedFile();
+#else
+				selectedFiles()[0];
+#endif
 		if( !QFileInfo( pf ).isRelative() )
 		{
 #if QT_VERSION >= 0x030100

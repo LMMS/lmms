@@ -35,6 +35,7 @@
 #else
 
 #include <qdom.h>
+#define value data
 
 #endif
 
@@ -80,7 +81,7 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 	for( timeMap::const_iterator it = _pat_to_copy.m_time_map.begin();
 				it != _pat_to_copy.m_time_map.end(); ++it )
 	{
-		m_time_map[it.key()] = it.data();
+		m_time_map[it.key()] = it.value();
 	}
 
 	init();
@@ -99,7 +100,7 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy,
 	for( timeMap::const_iterator it = _pat_to_copy.m_time_map.begin();
 				it != _pat_to_copy.m_time_map.end(); ++it )
 	{
-		m_time_map[it.key()] = it.data();
+		m_time_map[it.key()] = it.value();
 	}
 
 	init();
@@ -217,7 +218,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		QDomElement element = _doc.createElement( "time" );
 		element.setAttribute( "pos", static_cast<Sint32>( it.key() ) );
 		element.setAttribute( "value", m_object->levelToLabel(
-								it.data() ) );
+								it.value() ) );
 		_this.appendChild( element );
 	}
 }
@@ -278,12 +279,12 @@ void automationPattern::processMidiTime( const midiTime & _time )
 	timeMap::iterator it = m_time_map.find( _time );
 	if( it != m_time_map.end() )
 	{
-		m_object->setLevel( it.data() );
+		m_object->setLevel( it.value() );
 	}
 }
 
 
-
+#undef value
 
 #include "automation_pattern.moc"
 

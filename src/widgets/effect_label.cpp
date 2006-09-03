@@ -35,6 +35,10 @@
 #include "rename_dialog.h"
 #include "main_window.h"
 
+#ifndef QT3
+#include <QtGui/QMouseEvent>
+#endif
+
 
 effectLabel::effectLabel( const QString & _initial_name, 
 				QWidget * _parent, 
