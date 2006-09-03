@@ -67,10 +67,6 @@ tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
 	m_custom = new meterDialog( eng()->getMainWindow()->workspace(),
 								_track );
-	connect( m_custom, SIGNAL( numeratorChanged( int ) ),
-		 	this, SLOT( updateCustom( int ) ) );
-	connect( m_custom, SIGNAL( denominatorChanged( int ) ),
-			this, SLOT( updateCustom( int ) ) );
 	m_custom->hide();
 	m_custom->setWindowTitle( "Meter" );
 }
@@ -119,6 +115,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	
 #ifdef QT4
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
+						m_tempoSyncDescription );
 #else
 	QMenu * syncMenu = new QMenu( this );
 #endif
@@ -297,12 +294,7 @@ void tempoSyncKnob::setTempoSync( QAction * ) { }
 
 void tempoSyncKnob::setTempoSync( int _note_type )
 {
-	m_tempoSyncMode = ( tempoSyncMode ) _note_type;
-	if( m_tempoSyncMode != CUSTOM )
-	{
-		m_custom->hide();
-	}
-	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	setSyncMode( ( tempoSyncMode ) _note_type );
 	eng()->getSongEditor()->setModified();
 }
 
@@ -438,7 +430,23 @@ tempoSyncKnob::tempoSyncMode tempoSyncKnob::getSyncMode( void )
 
 void tempoSyncKnob::setSyncMode( tempoSyncMode _new_mode )
 {
-	m_tempoSyncMode = _new_mode;
+	if( m_tempoSyncMode != _new_mode )
+	{
+		m_tempoSyncMode = _new_mode;
+		if( _new_mode == CUSTOM )
+		{
+			connect( m_custom, SIGNAL( numeratorChanged( int ) ),
+					this, SLOT( updateCustom( int ) ) );
+			connect( m_custom, SIGNAL( denominatorChanged( int ) ),
+					this, SLOT( updateCustom( int ) ) );
+		}
+		else
+		{
+			m_custom->hide();
+			disconnect( m_custom, 0,
+					this, SLOT( updateCustom( int ) ) );
+		}
+	}
 	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
 }
 
@@ -499,7 +507,7 @@ void tempoSyncKnob::setSyncIcon( const QPixmap & _new_icon )
 
 void tempoSyncKnob::updateCustom( int )
 {
-	setTempoSync( CUSTOM );
+	setSyncMode( CUSTOM );
 }
 
 
