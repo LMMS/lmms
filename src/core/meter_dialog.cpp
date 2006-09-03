@@ -53,8 +53,8 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	QWidget * num = new QWidget( this );
 	QHBoxLayout * num_layout = new QHBoxLayout( num );
 	num_layout->setSpacing( 10 );
-	m_numerator = new lcdSpinBox( 1, 32, 2, num, 
-						"",
+	m_numerator = new lcdSpinBox( 1, 32, 2, num,
+						tr( "Meter Numerator" ),
 						_track->eng(), _track );
 	connect( m_numerator, SIGNAL( valueChanged( int ) ), 
 			this, SIGNAL( numeratorChanged( int ) ) );
@@ -69,8 +69,8 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	QWidget * dem = new QWidget( this );
 	QHBoxLayout * dem_layout = new QHBoxLayout( dem );
 	dem_layout->setSpacing( 10 );
-	m_denominator = new lcdSpinBox( 1, 32, 2, dem, 
-						"",
+	m_denominator = new lcdSpinBox( 1, 32, 2, dem,
+						tr( "Meter Denominator" ),
 						_track->eng(), _track );
 	connect( m_denominator, SIGNAL( valueChanged( int ) ), 
 			this, SIGNAL( denominatorChanged( int ) ) );
