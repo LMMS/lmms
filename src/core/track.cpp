@@ -455,6 +455,10 @@ void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
+#ifdef QT3
+#define addSeparator insertSeparator
+#endif
+
 void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 {
 	QMenu contextMenu( this );
@@ -463,11 +467,7 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
 					tr( "Delete (middle mousebutton)" ),
 							this, SLOT( close() ) );
-#ifdef QT4
 		contextMenu.addSeparator();
-#else
-		contextMenu.insertSeparator();
-#endif
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut" ), this, SLOT( cut() ) );
 	}
@@ -475,7 +475,7 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Copy" ), this, SLOT( copy() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste" ), this, SLOT( paste() ) );
-	contextMenu.insertSeparator();
+	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<Ctrl> + middle click)" ),
 						this, SLOT( toggleMute() ) );
@@ -484,6 +484,7 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.exec( QCursor::pos() );
 }
 
+#undef addSeparator
 
 
 
@@ -1109,8 +1110,13 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 				mute_active_icon = "mute_on";
 				mute_inactive_icon = "mute_off";
 			}
+#ifndef QT3
+			m_trackOps->setIcon( embed::getIconPixmap(
+							trackOps_icon ) );
+#else
 			m_trackOps->setIconSet( embed::getIconPixmap(
 							trackOps_icon ) );
+#endif
 			m_muteBtn->setActiveGraphic( embed::getIconPixmap(
 							mute_active_icon ) );
 			m_muteBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -1188,7 +1194,12 @@ void trackOperationsWidget::muteBtnRightClicked( void )
 
 void trackOperationsWidget::updateMenu( void )
 {
-	QMenu * to_menu = m_trackOps->popup();
+	QMenu * to_menu = m_trackOps->
+#ifndef QT3
+					menu();
+#else
+					popup();
+#endif
 	to_menu->clear();
 	if( inBBEditor() )
 	{
@@ -1626,12 +1637,12 @@ track::~track()
 		m_trackWidget = NULL;
 	}
 
-	QPtrListIterator<automationPattern> it( m_automation_patterns );
-	automationPattern * pattern ;
-	while( ( pattern = it.current() ) )
+	for( vlist<automationPattern *>::iterator it =
+						m_automation_patterns.begin();
+					it != m_automation_patterns.end();
+					++it )
 	{
-		++it;
-		pattern->forgetTrack();
+		( *it )->forgetTrack();
 	}
 }
 
@@ -1884,7 +1895,11 @@ void track::addAutomationPattern( automationPattern * _pattern )
 
 void track::removeAutomationPattern( automationPattern * _pattern )
 {
-	m_automation_patterns.removeRef( _pattern );
+#ifndef QT3
+	m_automation_patterns.removeAll( _pattern );
+#else
+	m_automation_patterns.remove( _pattern );
+#endif
 }
 
 
@@ -1892,12 +1907,12 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 void track::sendMidiTime( const midiTime & _time )
 {
-	QPtrListIterator<automationPattern> it( m_automation_patterns );
-	automationPattern * pattern;
-	while( ( pattern = it.current() ) )
+	for( vlist<automationPattern *>::iterator it =
+						m_automation_patterns.begin();
+					it != m_automation_patterns.end();
+					++it )
 	{
-		++it;
-		pattern->processMidiTime( _time );
+		( *it )->processMidiTime( _time );
 	}
 }
 

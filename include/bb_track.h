@@ -122,7 +122,7 @@ public:
 
 	bool automationDisabled( track * _track )
 	{
-		return( m_disabled_tracks.containsRef( _track ) );
+		return( m_disabled_tracks.contains( _track ) );
 	}
 	void disableAutomation( track * _track )
 	{
@@ -130,7 +130,11 @@ public:
 	}
 	void enableAutomation( track * _track )
 	{
-		m_disabled_tracks.removeRef( _track );
+#ifndef QT3
+		m_disabled_tracks.removeAll( _track );
+#else
+		m_disabled_tracks.remove( _track );
+#endif
 	}
 
 
@@ -147,7 +151,7 @@ protected:
 
 private:
 	nameLabel * m_trackLabel;
-	QPtrList<track> m_disabled_tracks;
+	vlist<track *> m_disabled_tracks;
 
 	typedef QMap<bbTrack *, csize> infoMap;
 	static infoMap s_infoMap;
