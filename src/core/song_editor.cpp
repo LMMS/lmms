@@ -216,7 +216,7 @@ songEditor::songEditor( engine * _engine ) :
 
 	m_masterVolumeSlider = new automatableSlider( tb, tr( "Master volume" ),
 						eng(), m_automation_track );
-	m_masterVolumeSlider->setOrientation( Vertical );
+	m_masterVolumeSlider->setOrientation( Qt::Vertical );
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 1 );
 	m_masterVolumeSlider->setInitValue( 100 );
@@ -254,7 +254,7 @@ songEditor::songEditor( engine * _engine ) :
 
 	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ),
 						eng(), m_automation_track );
-	m_masterPitchSlider->setOrientation( Vertical );
+	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setInitValue( 0 );
@@ -634,7 +634,6 @@ void songEditor::masterVolumeChanged( int _new_val )
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
 	eng()->getMixer()->setMasterGain( _new_val / 100.0f );
-	setModified();
 }
 
 
@@ -683,7 +682,6 @@ void songEditor::masterPitchChanged( int _new_val )
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 		m_mpsStatus->setVisibilityTimeOut( 1000 );
 	}
-	setModified();
 }
 
 
