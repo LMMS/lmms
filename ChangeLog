@@ -1,5 +1,12 @@
 2006-09-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
 	* configure.in:
+	fixed check for STK headers and library
+	
+	* plugins/stk/mallets/mallets.h:
+	removed the meaningless index boundary limiter for m_delayRead and
+	m_delayWrite
+	
+	* configure.in:
 	* plugins/Makefile.am:
 	* plugins/stk/Makefile.am:
 	began work on supporting STK instruments

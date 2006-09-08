@@ -96,7 +96,6 @@ public:
 			StkFloat s = m_voice->tick();
 			m_delay[m_delayWrite] = s;
 			m_delayWrite++;
-			m_delayWrite %= 256;
 			return( s );
 		}
 	}
@@ -105,7 +104,6 @@ public:
 	{
 		StkFloat s = m_delay[m_delayRead];
 		m_delayRead++;
-		m_delayRead %= 256;
 		return( s );
 	}
 

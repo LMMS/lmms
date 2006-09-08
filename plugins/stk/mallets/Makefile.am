@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 
-INCLUDES = -I/usr/include/stk -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I.
+INCLUDES = -I@stk_includes@ -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I.
 
 
 AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="malletsstk"
@@ -29,6 +29,6 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 pkglib_LTLIBRARIES= libmalletsstk.la
 
 libmalletsstk_la_SOURCES = mallets.cpp mallets.h 
-libmalletsstk_la_LDFLAGS = -L/usr/lib -lstk
+libmalletsstk_la_LDFLAGS = -L@stk_lib@ -lstk
 
 $(libmalletsstk_la_SOURCES): ./embedded_resources.h

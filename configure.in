@@ -216,20 +216,23 @@ fi
 
 
 # check for STK
+AC_LANG_PUSH(C++)
 AC_ARG_WITH(stk,
-	AS_HELP_STRING([--with-stk], [enable support for STK plugins]), [ with_stk=yes ], [ with_stk=no ])
+	AS_HELP_STRING([--with-stk], [enable support for STK plugins]), 
+	[ with_stk=yes ], [ with_stk=no ])
 AH_TEMPLATE(HAVE_STK_H, [Define to 1 if you have the <stk/Stk.h> header file.])
-#if test "x$with_stk" = "xyes" ; then
-#	AC_CHECK_HEADER(stk/Stk.h, HAVE_STK_H="true")
-#	AC_CHECK_LIB([stk], [], HAVE_STK="true", HAVE_STK_H="")
-#fi
 if test "x$with_stk" = "xyes" ; then
-	HAVE_STK_H="true"
+	AC_CHECK_HEADER([stk/Stk.h], HAVE_STK_H="true")
+	AC_CHECK_LIB([stk], [main], HAVE_STK="true", HAVE_STK_H="", 
+							[-ljack -lasound])
 fi
 if test ! -z "$HAVE_STK_H" ; then
 	AC_DEFINE(HAVE_STK_H)
+	AC_SUBST(stk_includes, [/usr/include/stk])
+	AC_SUBST(stk_lib, [/usr/lib])
 fi
 AM_CONDITIONAL(STK_SUPPORT, test ! -z "$HAVE_STK_H")
+AC_LANG_POP(C++)
 
 
 # check for vorbis-lib
@@ -662,27 +665,6 @@ fi
 #fi
 
 
-
-
-if test -z "$HAVE_SAMPLERATE_H" ; then
-	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
-	echo " ========================"
-	echo " ="
-	echo " = You don't seem to have libsamplerate installed and/or libsamplerate-"
-	echo " = development-package is missing. This will disable resampling with"
-	echo " = libsamplerate and results in worse quality! Currently LMMS will also"
-	echo " = crash more often, because internal sample-rate-converter has some bugs..."
-	echo " = Consider installing the missing packages for using the full power of LMMS."
-	echo " ="
-	with_warnings="true"
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsamplerate for internal samplerate-conversion"
-fi
-
-
-
-
 if test -z "$HAVE_LADSPA_H" ; then
 	echo " ========================"
 	echo " ===  LMMS - WARNING  ======================================================="
@@ -700,6 +682,38 @@ else
 fi
 
 
+if test -z "$HAVE_STK_H" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = If you want support for STK based instruments, please pass"
+	echo " = "
+	echo " = --with-stk"
+	echo " = "
+	echo " = to configure, STK support is still experimental."
+	echo " ="
+	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* STK instrument plugins"
+fi
+
+
+if test -z "$HAVE_SAMPLERATE_H" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have libsamplerate installed and/or libsamplerate-"
+	echo " = development-package is missing. This will disable resampling with"
+	echo " = libsamplerate and results in worse quality! Currently LMMS will also"
+	echo " = crash more often, because internal sample-rate-converter has some bugs..."
+	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " ="
+	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsamplerate for internal samplerate-conversion"
+fi
 
 
 if test "x$with_vst" = "xno" ; then
