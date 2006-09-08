@@ -120,6 +120,9 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 #ifdef LADSPA_SUPPORT
 	m_ladDir( configManager::inst()->ladspaDir() ),
 #endif
+#ifdef HAVE_STK_H
+	m_stkDir( configManager::inst()->stkDir() ),
+#endif
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -144,7 +147,11 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	QWidget * ws = new QWidget( settings );
 #ifdef LADSPA_SUPPORT
+#ifdef HAVE_STK_H
+	ws->setFixedSize( 360, 412 );
+#else
 	ws->setFixedSize( 360, 356 );
+#endif
 #else
 	ws->setFixedSize( 360, 300 );
 #endif
@@ -263,7 +270,11 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	QWidget * directories = new QWidget( ws );
 #ifdef LADSPA_SUPPORT
+#ifdef HAVE_STK_H
+	directories->setFixedSize( 360, 362 );
+#else
 	directories->setFixedSize( 360, 316 );
+#endif
 #else
 	directories->setFixedSize( 360, 260 );
 #endif
@@ -368,6 +379,26 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 				 		SLOT( openLADSPADir() ) );
 #endif
 
+#ifdef HAVE_STK_H
+	// STK-dir
+	tabWidget * stk_tw = new tabWidget( tr(
+			"STK rawwave directory" ).toUpper(),
+							directories );
+	stk_tw->setFixedHeight( 56 );
+
+	m_stkLineEdit = new QLineEdit( m_stkDir, stk_tw );
+	m_stkLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_stkLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+		 SLOT( setSTKDir( const QString & ) ) );
+
+	QPushButton * stkdir_select_btn = new QPushButton(
+			embed::getIconPixmap( "project_open", 16, 16 ),
+								"", stk_tw );
+	stkdir_select_btn->setFixedSize( 24, 24 );
+	stkdir_select_btn->move( 320, 20 );
+	connect( stkdir_select_btn, SIGNAL( clicked() ), this,
+		 SLOT( openSTKDir() ) );
+#endif
 
 	dir_layout->addWidget( lmms_wd_tw );
 	dir_layout->addSpacing( 10 );
@@ -380,6 +411,10 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( lad_tw );
 #endif
+#ifdef HAVE_STK_H
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( stk_tw );
+#endif	
 	dir_layout->addStretch();
 
 
@@ -694,6 +729,9 @@ void setupDialog::accept( void )
 #ifdef LADSPA_SUPPORT
 	configManager::inst()->setLADSPADir( m_ladDir );
 #endif
+#ifdef HAVE_STK_H
+	configManager::inst()->setSTKDir( m_stkDir );
+#endif	
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -974,6 +1012,27 @@ void setupDialog::openLADSPADir( void )
 
 
 
+void setupDialog::openSTKDir( void )
+{
+#ifdef HAVE_STK_H
+#ifdef QT4
+	QString new_dir = QFileDialog::getExistingDirectory( this,
+				tr( "Choose STK rawwave directory" ),
+							m_ladDir );
+#else
+	QString new_dir = QFileDialog::getExistingDirectory( m_ladDir, 0, 0,
+			tr( "Choose STK rawwave directory" ), TRUE );
+#endif
+	if( new_dir != QString::null )
+	{
+		m_stkLineEdit->setText( new_dir );
+	}
+#endif
+}
+
+
+
+
 void setupDialog::setFLDir( const QString & _fd )
 {
 	m_flDir = _fd;
@@ -986,6 +1045,16 @@ void setupDialog::setLADSPADir( const QString & _fd )
 {
 #ifdef LADSPA_SUPPORT
 	m_ladDir = _fd;
+#endif
+}
+
+
+
+
+void setupDialog::setSTKDir( const QString & _fd )
+{
+#ifdef HAVE_STK_H
+	m_stkDir = _fd;
 #endif
 }
 

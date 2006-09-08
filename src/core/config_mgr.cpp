@@ -576,6 +576,16 @@ void configManager::setLADSPADir( const QString & _fd )
 
 
 
+void configManager::setSTKDir( const QString & _fd )
+{
+#ifdef HAVE_STK_H
+	m_stkDir = _fd;
+#endif
+}
+
+
+
+
 void configManager::accept( void )
 {
 	if( m_workingDir.right( 1 ) != "/" )
@@ -848,6 +858,9 @@ bool configManager::loadConfigFile( void )
 #ifdef LADSPA_SUPPORT
 	m_ladDir = value( "paths", "laddir" );
 #endif
+#ifdef HAVE_STK_H
+	m_stkDir = value( "paths", "stkdir" );
+#endif
 
 	if( m_vstDir == "" )
 	{
@@ -861,9 +874,16 @@ bool configManager::loadConfigFile( void )
 
 #ifdef LADSPA_SUPPORT
 	if( m_ladDir == "" )
-	{
-		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
-	}
+{
+	m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
+}
+#endif
+
+#ifdef HAVE_STK_H
+	if( m_stkDir == "" )
+{
+	m_stkDir = "/usr/share/stk/rawwaves/";
+}
 #endif
 
 	if( root.isElement() )
@@ -914,6 +934,9 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "fldir", m_flDir );
 #ifdef LADSPA_SUPPORT
 	setValue( "paths", "laddir", m_ladDir );
+#endif
+#ifdef HAVE_STK_H
+	setValue( "paths", "stkdir", m_stkDir );
 #endif
 
 	QDomDocument doc( "lmms-config-file" );

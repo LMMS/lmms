@@ -214,6 +214,24 @@ if test ! -z "$HAVE_LADSPA_H" ; then
 fi
 #AM_CONDITIONAL(HAVE_LADSPA_H, test ! -z "$HAVE_LADSPA_H")
 
+
+# check for STK
+AC_ARG_WITH(stk,
+	AS_HELP_STRING([--with-stk], [enable support for STK plugins]), [ with_stk=yes ], [ with_stk=no ])
+AH_TEMPLATE(HAVE_STK_H, [Define to 1 if you have the <stk/Stk.h> header file.])
+#if test "x$with_stk" = "xyes" ; then
+#	AC_CHECK_HEADER(stk/Stk.h, HAVE_STK_H="true")
+#	AC_CHECK_LIB([stk], [], HAVE_STK="true", HAVE_STK_H="")
+#fi
+if test "x$with_stk" = "xyes" ; then
+	HAVE_STK_H="true"
+fi
+if test ! -z "$HAVE_STK_H" ; then
+	AC_DEFINE(HAVE_STK_H)
+fi
+AM_CONDITIONAL(STK_SUPPORT, test ! -z "$HAVE_STK_H")
+
+
 # check for vorbis-lib
 AC_ARG_WITH(vorbis,
  	AS_HELP_STRING([--without-vorbis],
@@ -484,6 +502,8 @@ AC_CONFIG_FILES([Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile
+		 plugins/stk/Makefile
+		 plugins/stk/mallets/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
 		 plugins/vibed/Makefile

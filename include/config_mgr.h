@@ -166,6 +166,13 @@ public:
 	}
 #endif
 
+#ifdef HAVE_STK_H
+	const QString & stkDir( void ) const
+	{
+		return( m_stkDir );
+	}
+#endif
+
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
 	void setValue( const QString & _class, const QString & _attribute,
@@ -181,6 +188,7 @@ public slots:
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
+	void setSTKDir( const QString & _fd );
 
 
 protected slots:
@@ -221,6 +229,9 @@ private:
 	QString m_flDir;
 #ifdef LADSPA_SUPPORT
 	QString m_ladDir;
+#endif
+#ifdef HAVE_STK_H
+	QString m_stkDir;
 #endif
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;

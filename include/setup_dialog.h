@@ -85,7 +85,8 @@ private slots:
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
-
+	void setSTKDir( const QString & _fd );
+	
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
 	void displayAudioHelp( void );
@@ -107,7 +108,7 @@ private slots:
 	void openArtworkDir( void );
 	void openFLDir( void );
 	void openLADSPADir( void );
-
+	void openSTKDir( void );
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
@@ -135,6 +136,9 @@ private:
 #ifdef LADSPA_SUPPORT
 	QLineEdit * m_ladLineEdit;
 #endif
+#ifdef HAVE_STK_H
+	QLineEdit * m_stkLineEdit;
+#endif
 
 	QString m_workingDir;
 	QString m_vstDir;
@@ -142,6 +146,9 @@ private:
 	QString m_flDir;
 #ifdef LADSPA_SUPPORT
 	QString m_ladDir;
+#endif
+#ifdef HAVE_STK_H
+	QString m_stkDir;
 #endif
 
 	bool m_disableChActInd;

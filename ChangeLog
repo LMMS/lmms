@@ -1,3 +1,22 @@
+2006-09-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* configure.in:
+	* plugins/Makefile.am:
+	* plugins/stk/Makefile.am:
+	began work on supporting STK instruments
+
+	* plugins/stk/mallets/Makefile.am:
+	* plugins/stk/mallets/artwork.png:
+	* plugins/stk/mallets/logo.png:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/stk/mallets/mallets.cpp:
+	added mallets instrument
+	
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	added STK rawwave to directory selector
+	
 2006-09-03	Thomas Girard <thomas/dot/g/dot/girard/at/free/dot/fr>
 
 	* src/core/file_browser.cpp:
