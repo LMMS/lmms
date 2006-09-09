@@ -77,9 +77,6 @@
 #include "bb_editor.h"
 #include "piano_roll.h"
 
-#ifdef QT3
-#define value data
-#endif
 
 
 QPixmap * automationEditor::s_toolDraw = NULL;
@@ -443,7 +440,11 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 		for( timeMap::iterator it = time_map.begin();
 						it != time_map.end(); ++it )
 		{
+#ifdef QT3
+			central_key += it.data();
+#else
 			central_key += it.value();
+#endif
 			++total_values;
 		}
 
@@ -683,7 +684,11 @@ void automationEditor::updatePaintPixmap( void )
 		{
 			Sint32 len_tact_64th = 4;
 
+#ifdef QT3
+			const int level = it.data();
+#else
 			const int level = it.value();
+#endif
 
 			Sint32 pos_tact_64th = it.key();
 
@@ -855,9 +860,6 @@ void automationEditor::enterEvent( QEvent * _e )
 
 
 
-#ifdef QT3
-#undef value
-#endif
 
 void automationEditor::keyPressEvent( QKeyEvent * _ke )
 {
@@ -1007,9 +1009,6 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 }
 
-#ifdef QT3
-#define value data
-#endif
 
 
 
@@ -1066,7 +1065,11 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( pos_tact_64th >= it.key() &&
 					len > 0 &&
 					pos_tact_64th <= it.key() + len &&
+#ifdef QT3
+					it.data() == level )
+#else
 					it.value() == level )
+#endif
 				{
 					break;
 				}
@@ -1269,7 +1272,11 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			    		pos_tact_64th <= it.key() +
 							//TODO: Add constant
 							4 &&
+#ifdef QT3
+					it.data() == level )
+#else
 					it.value() == level )
+#endif
 				{
 					break;
 				}
@@ -1465,11 +1472,19 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				m_pattern->removeValue( it.key() );
 				midiTime new_value_pos( value_tact,
 							value_tact_64th );
+#ifdef QT3
+				new_selValuesForMove[
+					m_pattern->putValue( new_value_pos,
+						it.data () + level_diff,
+									FALSE )]
+						= it.data() + level_diff;
+#else
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
 									FALSE )]
 						= it.value() + level_diff;
+#endif
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -1535,7 +1550,6 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							height() -
 							SCROLLBAR_SIZE ) ) );
-#undef value
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
 				level = m_bottom_level;
@@ -1548,9 +1562,6 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					m_topBottomScroll->value() - 1 );
 				level = m_top_level;
 			}
-#ifdef QT3
-#define value data
-#endif
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
 			{
@@ -1662,9 +1673,6 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 
 
-#ifdef QT3
-#undef value
-#endif
 
 void automationEditor::wheelEvent( QWheelEvent * _we )
 {
@@ -1700,9 +1708,6 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 							_we->delta() / 30 );
 	}
 }
-#ifdef QT3
-#define value data
-#endif
 
 
 
@@ -1904,7 +1909,11 @@ void automationEditor::selectAll( void )
 		//TODO: Add constant
 		Uint32 len_tact_64th = 4;
 
+#ifdef QT3
+		const int level = it.data();
+#else
 		const int level = it.value();
+#endif
 
 		Uint32 pos_tact_64th = it.key();
 		if( level <= m_selectStartLevel || first_time )
@@ -1970,7 +1979,11 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		//TODO: Add constant
 		Sint32 len_tact_64th = 4;
 
+#ifdef QT3
+		int level = it.data();
+#else
 		int level = it.value();
+#endif
 		Sint32 pos_tact_64th = it.key();
 
 		if( level > sel_level_start && level <= sel_level_end &&
@@ -1999,7 +2012,11 @@ void automationEditor::copySelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
+#ifdef QT3
+			m_valuesToCopy[it.key()] = it.data();
+#else
 			m_valuesToCopy[it.key()] = it.value();
+#endif
 		}
 		textFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
@@ -2033,7 +2050,11 @@ void automationEditor::cutSelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
+#ifdef QT3
+			m_valuesToCopy[it.key()] = it.data();
+#else
 			m_valuesToCopy[it.key()] = it.value();
+#endif
 			m_pattern->removeValue( it.key() );
 		}
 	}
@@ -2058,7 +2079,11 @@ void automationEditor::pasteValues( void )
 					it != m_valuesToCopy.end(); ++it )
 		{
 			m_pattern->putValue( it.key() + m_currentPosition,
+#ifdef QT3
+								it.data() );
+#else
 								it.value() );
+#endif
 		}
 
 		// we only have to do the following lines if we pasted at
