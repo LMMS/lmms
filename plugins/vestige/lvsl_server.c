@@ -569,8 +569,8 @@ void VSTPlugin::getParameterDump( void ) const
 	VstParameterProperties vst_props;
 	vstParameterDumpItem dump_item;
 	writeValue<Sint16>( VST_PARAMETER_DUMP );
-	writeValue<Sint32>( (Sint32) m_plugin->numParams - 1 );
-	for( Sint32 i = 0; i < m_plugin->numParams - 1; ++i )
+	writeValue<Sint32>( (Sint32) m_plugin->numParams );
+	for( Sint32 i = 0; i < m_plugin->numParams; ++i )
 	{
 		dump_item.index = i;
 		m_plugin->dispatcher( m_plugin, effGetParameterProperties, i, 0,
@@ -588,8 +588,8 @@ void VSTPlugin::getParameterDump( void ) const
 void VSTPlugin::setParameterDump( void )
 {
 	const Sint32 sz = readValue<Sint32>();
-	const Sint32 params = ( sz > m_plugin->numParams - 1 ) ?
-					m_plugin->numParams - 1 : sz;
+	const Sint32 params = ( sz > m_plugin->numParams ) ?
+					m_plugin->numParams : sz;
 	for( Sint32 i = 0; i < params; ++i )
 	{
 		vstParameterDumpItem dump_item =
