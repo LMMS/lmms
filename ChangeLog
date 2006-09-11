@@ -1,3 +1,8 @@
+2006-09-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/vestige/lvsl_server.c:
+	save/load all plugin parameters
+
 2006-09-09	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/core/automation_editor.cpp:
