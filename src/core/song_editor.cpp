@@ -961,9 +961,11 @@ void songEditor::processNextBuffer( void )
 
 	// check for looping-mode and act if neccessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
-	if( tl != NULL && m_exporting == FALSE && tl->loopPointsEnabled() &&
-		!( m_playMode == PLAY_PATTERN &&
-		  		m_patternToPlay->freezing() == TRUE ) )
+	bool check_loop = tl != NULL && m_exporting == FALSE &&
+				tl->loopPointsEnabled() &&
+				!( m_playMode == PLAY_PATTERN &&
+					m_patternToPlay->freezing() == TRUE );
+	if( check_loop )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
@@ -972,8 +974,6 @@ void songEditor::processNextBuffer( void )
 						tl->loopBegin().getTact() );
 			m_playPos[m_playMode].setTact64th(
 						tl->loopBegin().getTact64th() );
-			// force reset of current-frame-var afterwards
-			m_playPos[m_playMode].setCurrentFrame( 0 );
 		}
 	}
 
@@ -1030,6 +1030,18 @@ void songEditor::processNextBuffer( void )
 				}
 			}
 			m_playPos[m_playMode].setTact64th( tact64th % 64 );
+
+			if( check_loop )
+			{
+				if( m_playPos[m_playMode] >= tl->loopEnd() )
+				{
+					m_playPos[m_playMode].setTact(
+						tl->loopBegin().getTact() );
+					m_playPos[m_playMode].setTact64th(
+						tl->loopBegin().getTact64th() );
+				}
+			}
+
 			current_frame = fmodf( current_frame,
 							frames_per_tact64th );
 			m_playPos[m_playMode].setCurrentFrame( current_frame );
