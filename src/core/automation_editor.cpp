@@ -1814,6 +1814,10 @@ void automationEditor::play( void )
 
 void automationEditor::stop( void )
 {
+	if( !validPattern() )
+	{
+		return;
+	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
 		eng()->getBBEditor()->stop();
