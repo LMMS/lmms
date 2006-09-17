@@ -1,3 +1,18 @@
+2006-09-17	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/tempo_sync_knob.h:
+	fixed save/load segfault in LADSPA controls
+
+	* src/core/song_editor.cpp:
+	fixed looping when processing the audio buffer
+
+	* include/timeline.h:
+	* src/core/timeline.cpp:
+	update loop points state button when loading a project
+
+	* src/core/automation_editor.cpp:
+	fixed segfault when stopping without pattern
+
 2006-09-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/audio_file_processor/audio_file_processor.cpp:
