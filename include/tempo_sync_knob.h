@@ -67,9 +67,10 @@ public:
 					float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
+	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+						QDomElement & _this,
 						const QString & _name );
-	virtual void loadSettings( const QDomElement & _this,
+	virtual void FASTCALL loadSettings( const QDomElement & _this,
 						const QString & _name );
 
 	tempoSyncMode getSyncMode( void );
