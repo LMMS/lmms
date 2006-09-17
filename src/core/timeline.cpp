@@ -137,40 +137,39 @@ timeLine::~timeLine()
 
 void timeLine::addToolButtons( QWidget * _tool_bar )
 {
-	nStateButton * m_autoScroll = new nStateButton( _tool_bar );
-	m_autoScroll->setGeneralToolTip( tr( "Enable/disable "
-							"auto-scrolling" ) );
-	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
-	m_autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
-	connect( m_autoScroll, SIGNAL( changedState( int ) ), this,
+	nStateButton * autoScroll = new nStateButton( _tool_bar );
+	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
+	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
+	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
+	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
 
-	nStateButton * m_loopPoints = new nStateButton( _tool_bar );
-	m_loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
-	m_loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
-	m_loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
-	connect( m_loopPoints, SIGNAL( changedState( int ) ), this,
+	nStateButton * loopPoints = new nStateButton( _tool_bar );
+	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
+	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
+	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
+	connect( loopPoints, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleLoopPoints( int ) ) );
+	connect( this, SIGNAL( loopPointStateLoaded( int ) ), loopPoints,
+					SLOT( changeState( int ) ) );
 
-	nStateButton * m_behaviourAtStop = new nStateButton( _tool_bar );
-	m_behaviourAtStop ->addState( embed::getIconPixmap( "back_to_zero" ),
+	nStateButton * behaviourAtStop = new nStateButton( _tool_bar );
+	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
 					tr( "After stopping go back to begin" )
 									);
-	m_behaviourAtStop ->addState( embed::getIconPixmap(
-							"back_to_start" ),
+	behaviourAtStop->addState( embed::getIconPixmap( "back_to_start" ),
 					tr( "After stopping go back to "
 						"position at which playing was "
 						"started" ) );
-	m_behaviourAtStop ->addState( embed::getIconPixmap(
-						"keep_stop_position" ),
+	behaviourAtStop->addState( embed::getIconPixmap( "keep_stop_position" ),
 					tr( "After stopping keep position" ) );
-	connect( m_behaviourAtStop, SIGNAL( changedState( int ) ), this,
+	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleBehaviourAtStop( int ) ) );
 
 	QBoxLayout * layout = dynamic_cast<QBoxLayout *>( _tool_bar->layout() );
-	layout->addWidget( m_autoScroll );
-	layout->addWidget( m_loopPoints );
-	layout->addWidget( m_behaviourAtStop );
+	layout->addWidget( autoScroll );
+	layout->addWidget( loopPoints );
+	layout->addWidget( behaviourAtStop );
 }
 
 
@@ -193,6 +192,7 @@ void timeLine::loadSettings( const QDomElement & _this )
 	m_loopPoints = static_cast<loopPointStates>(
 					_this.attribute( "lpstate" ).toInt() );
 	update();
+	emit loopPointStateLoaded( m_loopPoints );
 }
 
 

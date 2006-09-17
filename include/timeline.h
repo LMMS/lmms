@@ -185,6 +185,7 @@ private:
 
 signals:
 	void positionChanged( const midiTime & _t );
+	void loopPointStateLoaded( int _n );
 
 } ;
 
