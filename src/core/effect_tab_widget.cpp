@@ -25,8 +25,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #include "qt3support.h"
 
@@ -52,9 +50,10 @@
 #include "group_box.h"
 #include "tooltip.h"
 #include "embed.h"
-#include "select_ladspa_dialog.h"
+#include "effect_select_dialog.h"
 #include "rack_plugin.h"
 #include "audio_port.h"
+
 
 
 effectTabWidget::effectTabWidget( instrumentTrack * _track,
@@ -146,16 +145,16 @@ void effectTabWidget::loadSettings( const QDomElement & _this )
 
 void effectTabWidget::addEffect( void )
 {
-	selectLADSPADialog sl( this, eng() );
-	sl.exec();
-	
-	if( sl.result() == QDialog::Rejected )
+	effectSelectDialog esd( this, eng() );
+	esd.exec();
+
+	if( esd.result() == QDialog::Rejected )
 	{
 		return;
 	}
-	
-	ladspa_key_t key = sl.getSelection();
-	m_rack->addPlugin( key );
+
+	effect * e = esd.instantiateSelectedPlugin();
+	m_rack->addEffect( e );
 }
 
 
@@ -177,8 +176,5 @@ void effectTabWidget::closeEvent( QCloseEvent * _ce )
 
 
 #include "effect_tab_widget.moc"
-
-
-#endif
 
 #endif

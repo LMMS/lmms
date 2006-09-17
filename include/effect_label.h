@@ -26,8 +26,7 @@
 #ifndef _EFFECT_LABEL_H
 #define _EFFECT_LABEL_H
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -99,7 +98,5 @@ private:
 	tabWidget * m_tabWidget;
 	effectTabWidget * m_effWidget;
 };
-
-#endif
 
 #endif

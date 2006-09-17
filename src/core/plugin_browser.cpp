@@ -88,7 +88,7 @@ pluginBrowser::pluginBrowser( QWidget * _parent, engine * _engine ) :
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
-		if( it->type == plugin::INSTRUMENT )
+		if( it->type == plugin::Instrument )
 		{
 			pluginDescWidget * p = new pluginDescWidget( *it,
 								m_view, eng() );

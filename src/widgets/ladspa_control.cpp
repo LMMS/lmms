@@ -39,7 +39,7 @@
 
 
 #include "ladspa_control.h"
-#include "ladspa_effect.h"
+#include "ladspa_base.h"
 #include "tooltip.h"
 #include "tempo_sync_knob.h"
 

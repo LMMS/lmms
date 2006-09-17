@@ -49,6 +49,7 @@
 #include "types.h"
 #include "journalling_object.h"
 #include "embed.h"
+#include "base64.h"
 
 
 #define STRINGIFY_PLUGIN_NAME(s) STR(s)
@@ -56,6 +57,7 @@
 
 
 class QPixmap;
+class QWidget;
 
 
 class plugin : public journallingObject
@@ -63,11 +65,13 @@ class plugin : public journallingObject
 public:
 	enum pluginTypes
 	{
-		INSTRUMENT,	// instrument being used in channel-track
-		EFFECT,		// effect-plugin for effect-board
-		IMPORT_FILTER,	// filter for importing a file
-		EXPORT_FILTER,	// filter for exporting a file
-		UNDEFINED = 255
+		Instrument,	// instrument being used in channel-track
+		Effect,		// effect-plugin for effect-board
+		ImportFilter,	// filter for importing a file
+		ExportFilter,	// filter for exporting a file
+		AnalysisTools,	// analysis-tools (level-meter etc)
+		Other,
+		Undefined = 255
 	} ;
 
 	// descriptor holds information about a plugin - every external plugin
@@ -82,6 +86,68 @@ public:
 		int version;
 		pluginTypes type;
 		const QPixmap * logo;
+		class subPluginFeatures
+		{
+		public:
+			struct key
+			{
+				inline key( plugin::descriptor * _desc = NULL,
+					const QString & _name = QString::null,
+					const QVariant & _user = QVariant() )
+					:
+					desc( _desc ),
+					name( _name ),
+					user( _user )
+				{
+				}
+
+				inline key( const QString & _dump_data )	
+					:
+					desc( NULL )
+				{
+					const vlist<QVariant> l =
+						base64::decode( _dump_data ).
+								toList();
+					name = l[0].toString();
+					user = l[1];
+				}
+				inline QString dumpBase64( void ) const
+				{
+					return( base64::encode(
+						vlist<QVariant>()
+							<< name << user ) );
+				}
+				plugin::descriptor * desc;
+				QString name;
+				QVariant user;
+			};
+			typedef vlist<key> keyList;
+
+			subPluginFeatures( plugin::pluginTypes _type ) :
+				m_type( _type )
+			{
+			}
+
+			virtual ~subPluginFeatures()
+			{
+			}
+
+			virtual QWidget * createDescriptionWidget(
+					QWidget *, engine *, const key & )
+			{
+				return( NULL );
+			}
+			virtual void listSubPluginKeys( engine *,
+							plugin::descriptor *,
+							keyList & )
+			{
+			}
+
+		protected:
+			const plugin::pluginTypes m_type;
+		}
+			* sub_plugin_features;
+
 	} ;
 
 	// contructor of a plugin
@@ -89,7 +155,7 @@ public:
 	virtual ~plugin();
 
 	// returns public-name out of descriptor
-	inline QString publicName( void ) const
+	virtual inline QString publicName( void ) const
 	{
 		return( m_descriptor->public_name );
 	}

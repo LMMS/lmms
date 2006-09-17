@@ -1,3 +1,4 @@
+#if 0
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
@@ -42,10 +43,10 @@
 #include "audio_device.h"
 
 
-pluginDescription::pluginDescription( QWidget * _parent, engine * _engine ):
+ladspaSubPluginDescriptionWidget::ladspaSubPluginDescriptionWidget( QWidget * _parent, engine * _engine ):
 	QWidget( _parent
 #ifdef QT3
-			, "pluginDescription"
+			, "ladspaSubPluginDescriptionWidget"
 #endif
 						),
 	m_ladspaManager( _engine->getLADSPAManager() )
@@ -88,14 +89,14 @@ pluginDescription::pluginDescription( QWidget * _parent, engine * _engine ):
 
 
 
-pluginDescription::~pluginDescription()
+ladspaSubPluginDescriptionWidget::~ladspaSubPluginDescriptionWidget()
 {
 }
 
 
 
 
-void pluginDescription::onHighlighted( const ladspa_key_t & _key )
+void ladspaSubPluginDescriptionWidget::update( const ladspa_key_t & _key )
 {
 	m_label->setText( tr( "Name: " ) + 
 			m_ladspaManager->getName( _key ) );
@@ -142,7 +143,7 @@ void pluginDescription::onHighlighted( const ladspa_key_t & _key )
 
 ladspaDescription::ladspaDescription( QWidget * _parent, 
 					engine * _engine, 
-					pluginType _type ):
+					ladspaPluginType _type ):
 	QWidget( _parent
 #ifdef QT3
 			, "ladspaDescription"
@@ -205,11 +206,11 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 				SLOT( onDoubleClicked( QListBoxItem * ) ) );
 	m_boxer->addWidget( m_grouper );
 
-	m_pluginDescription = new pluginDescription( this, _engine );
+	m_ladspaSubPluginDescriptionWidget = new ladspaSubPluginDescriptionWidget( this, _engine );
 	connect( this, SIGNAL( highlighted( const ladspa_key_t & ) ),
-			m_pluginDescription, 
-			SLOT( onHighlighted( const ladspa_key_t & ) ) );
-	m_boxer->addWidget( m_pluginDescription );
+			m_ladspaSubPluginDescriptionWidget, 
+			SLOT( update( const ladspa_key_t & ) ) );
+	m_boxer->addWidget( m_ladspaSubPluginDescriptionWidget );
 	
 	if( m_pluginList->numRows() > 0 )
 	{
@@ -224,7 +225,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 
 ladspaDescription::~ladspaDescription()
 {
-	delete m_pluginDescription;
+	delete m_ladspaSubPluginDescriptionWidget;
 	delete m_pluginList;
 	delete m_grouper;
 	delete m_boxer;
@@ -257,6 +258,8 @@ void ladspaDescription::onAddButtonReleased()
 
 
 #include "ladspa_description.moc"
+
+#endif
 
 #endif
 

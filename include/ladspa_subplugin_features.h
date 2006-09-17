@@ -1,9 +1,10 @@
-#if 0
 /*
- * ladspa_browser.h - dialog to display information about installed LADSPA
- *                    plugins
+ * ladspa_subplugin_features.h - derivation from
+ *                               plugin::descriptor::subPluginFeatures for
+ *                               hosting LADSPA-plugins
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,55 +26,43 @@
  */
 
 
-#ifndef _LADSPA_BROWSER_H
-#define _LADSPA_BROWSER_H
+#ifndef _LADSPA_SUBPLUGIN_FEATURES_H
+#define _LADSPA_SUBPLUGIN_FEATURES_H
 
-#include "ladspa_manager.h"
+#include "plugin.h"
+#include "ladspa_2_lmms.h"
+
 #ifdef LADSPA_SUPPORT
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
-#include "engine.h"
-
-class QComboBox;
 class QLabel;
-class QLineEdit;
-class QSlider;
-
-class tabBar;
+class ladspa2LMMS;
 
 
-class ladspaBrowser : public QDialog, public engineObject
+class ladspaSubPluginDescriptionWidget : public QWidget
 {
-	Q_OBJECT
 public:
-	ladspaBrowser( engine * _engine );
-	virtual ~ladspaBrowser();
+	ladspaSubPluginDescriptionWidget( QWidget * _parent, engine * _engine,
+						const ladspa_key_t & _key );
 
-	inline void labelWidget( QWidget * _w, const QString & _txt );
 
-public slots:
-	void showPorts( const ladspa_key_t & _key );
-	void displayHelp( void );
-	
-private:
-	tabBar * m_tabBar;
+} ;
+
+
+
+class ladspaSubPluginFeatures : public plugin::descriptor::subPluginFeatures
+{
+public:
+	ladspaSubPluginFeatures( plugin::pluginTypes _type );
+
+	virtual QWidget * createDescriptionWidget( QWidget * _parent,
+							engine * _eng,
+							const key & _key );
+
+	virtual void listSubPluginKeys( engine * _eng,
+				plugin::descriptor * _desc, keyList & _kl );
 
 } ;
 
 #endif
 
 #endif
-
-#endif
-

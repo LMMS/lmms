@@ -1,6 +1,6 @@
 /*
- * effect_tab_widget.h - tab-widget in channel-track-window for setting up
- *                       effects
+ * rack_plugin.h - tab-widget in channel-track-window for setting up
+ *                 effects
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
@@ -25,9 +25,6 @@
 #ifndef _RACK_PLUGIN_H
 #define _RACK_PLUGIN_H
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
 #ifdef QT4
 
 #include <QtGui/QWidget>
@@ -48,13 +45,12 @@
 #include "journalling_object.h"
 #include "led_checkbox.h"
 #include "track.h"
-#include "ladspa_effect.h"
-#include "ladspa_control_dialog.h"
 #include "audio_port.h"
 
 
 class knob;
 class tempoSyncKnob;
+class effectControlDialog;
 
 
 class rackPlugin: public QWidget, public journallingObject
@@ -62,20 +58,15 @@ class rackPlugin: public QWidget, public journallingObject
 	Q_OBJECT
 
 public:
-	rackPlugin( QWidget * _parent, ladspa_key_t _key, 
-			track * _track, engine * _engine, audioPort * _port );
-	~rackPlugin();
+	rackPlugin( QWidget * _parent, effect * _eff, track * _track,
+							audioPort * _port );
+	virtual ~rackPlugin();
 	
 	inline effect * getEffect()
 	{
 		return( m_effect );
 	}
-	
-	inline const ladspa_key_t & getKey( void )
-	{
-		return( m_key );
-	}
-	
+
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
 						QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
@@ -113,16 +104,13 @@ private:
 	QGroupBox * m_controls;
 	QLabel * m_label;
 	QPushButton * m_editButton;
-	ladspaEffect * m_effect;
-	ladspaControlDialog * m_controlView;
+	effect * m_effect;
+	effectControlDialog * m_controlView;
 	track * m_track;
 	audioPort * m_port;
 	QMenu * m_contextMenu;
-	ladspa_key_t m_key;
-	QString m_name;
 	bool m_show;
-};
 
-#endif
+} ;
 
 #endif

@@ -81,10 +81,6 @@
 #include "project_journal.h"
 #include "automation_editor.h"
 
-#ifdef LADSPA_SUPPORT
-#include "ladspa_browser.h"
-#endif
-
 
 #if QT_VERSION >= 0x030100
 QSplashScreen * mainWindow::s_splashScreen = NULL;
@@ -532,7 +528,7 @@ void mainWindow::finalize( void )
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
-
+#if 0
 #ifdef LADSPA_SUPPORT
 #ifdef QT4
 	help_menu->addSeparator();
@@ -541,6 +537,7 @@ void mainWindow::finalize( void )
 #endif
 	help_menu->addAction( embed::getIconPixmap( "help" ), tr( "LADSPA Plugins..." ),
 			      this, SLOT( ladspaPluginBrowser() ) );
+#endif
 #endif
 
 	
@@ -830,7 +827,7 @@ void mainWindow::help( void )
 
 
 
-
+#if 0
 void mainWindow::ladspaPluginBrowser( void )
 {
 	// moc for Qt 3.x doesn't recognize preprocessor directives,
@@ -840,7 +837,7 @@ void mainWindow::ladspaPluginBrowser( void )
 	lb.exec();
 #endif
 }
-
+#endif
 
 
 

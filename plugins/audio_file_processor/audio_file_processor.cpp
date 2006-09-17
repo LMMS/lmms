@@ -57,10 +57,11 @@
 #include "tooltip.h"
 #include "string_pair_drag.h"
 #include "mmp.h"
+#include "volume_knob.h"
+
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-#include "volume_knob.h"
 
 
 extern "C"
@@ -76,8 +77,9 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 				"instrument-track" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::INSTRUMENT,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
+	plugin::Instrument,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
 } ;
 
 }

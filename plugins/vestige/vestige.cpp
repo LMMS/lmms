@@ -77,8 +77,9 @@ plugin::descriptor vestige_plugin_descriptor =
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::INSTRUMENT,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
+	plugin::Instrument,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
 } ;
 
 }

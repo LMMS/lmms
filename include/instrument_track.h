@@ -69,12 +69,8 @@ class notePlayHandle;
 class pianoWidget;
 class presetPreviewPlayHandle;
 class surroundArea;
-
 class flpImport;
-
-#ifdef LADSPA_SUPPORT
 class effectTabWidget;
-#endif
 
 
 class instrumentTrack : public QWidget, public track, public midiEventProcessor
@@ -248,9 +244,7 @@ private:
 	envelopeTabWidget * m_envWidget;
 	arpAndChordsTabWidget * m_arpWidget;
 	midiTabWidget * m_midiWidget;
-#ifdef LADSPA_SUPPORT
 	effectTabWidget * m_effWidget;
-#endif
 
 	// test-piano at the bottom of every instrument-settings-window
 	pianoWidget * m_pianoWidget;

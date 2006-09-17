@@ -83,7 +83,7 @@ void importFilter::import( const QString & _file_to_import,
 	for( vvector<plugin::descriptor>::iterator it = d.begin();
 							it != d.end(); ++it )
 	{
-		if( it->type == plugin::IMPORT_FILTER )
+		if( it->type == plugin::ImportFilter )
 		{
 			plugin * p = plugin::instantiate( it->name, s );
 			if( dynamic_cast<importFilter *>( p ) != NULL &&

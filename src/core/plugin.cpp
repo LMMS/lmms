@@ -57,7 +57,7 @@ static plugin::descriptor dummy_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "pluginBrowser", "no description" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::UNDEFINED,
+	plugin::Undefined,
 	NULL
 } ;
 
@@ -105,17 +105,9 @@ QString plugin::getParameter( const QString & )
 
 plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 {
-/*#ifdef HAVE_DLFCN_H
-	void * handle = dlopen( QString( "lib" + _plugin_name + ".so" ).
-#ifdef QT4
-					toAscii().constData()
-#else
-					ascii()
-#endif
-					, RTLD_NOW );*/
 	QLibrary plugin_lib( configManager::inst()->pluginDir() +
 								_plugin_name );
-	if( /*handle == NULL*/ plugin_lib.load() == FALSE )
+	if( plugin_lib.load() == FALSE )
 	{
 		QMessageBox::information( NULL,
 					mixer::tr( "Plugin not found" ),
@@ -127,13 +119,6 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 	}
 	instantiationHook inst_hook = ( instantiationHook ) plugin_lib.resolve(
 							"lmms_plugin_main" );
-/*	dlerror();
-	instantiationHook inst_hook = ( instantiationHook )( dlsym( handle,
-							"lmms_plugin_main" ) );
-	char * error = dlerror();
-	if( error != NULL )
-	{
-		printf( "%s\n", error );*/
 	if( inst_hook == NULL )
 	{
 		QMessageBox::information( NULL,
@@ -148,10 +133,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 	plugin_lib.setAutoUnload( FALSE );
 #endif
 	plugin * inst = inst_hook( _data );
-	//dlclose( handle );
 	return( inst );
-/*#endif
-	return( new dummyPlugin() );*/
 }
 
 
@@ -190,27 +172,6 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 #ifndef QT4
 		plugin_lib.setAutoUnload( FALSE );
 #endif
-/*
-		void * handle = dlopen( f.absoluteFilePath().
-#ifdef QT4
-							toAscii().constData(),
-#else
-							ascii(),
-#endif
-								RTLD_NOW );
-		char * msg = dlerror();
-		if( msg != NULL || handle == NULL )
-		{
-			printf( "plugin-loader: %s\n", msg );
-			continue;
-		}
-		void * foo = dlsym( handle, "lmms_plugin_main" );
-		msg = dlerror();
-		if( msg != NULL || foo == NULL )
-		{
-			printf( "plugin-loader: %s\n", msg );
-			continue;
-		}*/
 		QString desc_name = f.fileName().section( '.', 0, 0 ) +
 							"_plugin_descriptor";
 		if( desc_name.left( 3 ) == "lib" )
@@ -229,21 +190,7 @@ void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 		{
 			continue;
 		}
-/*			(descriptor *) dlsym( handle, desc_name.
-#ifdef QT4
-					      toAscii().constData()
-#else
-					      ascii()
-#endif
-					      );
-		msg = dlerror();
-		if( msg != NULL || plugin_desc == NULL )
-		{
-			printf( "plugin-loader: %s\n", msg );
-			continue;
-		}*/
 		_plugin_descs.push_back( *plugin_desc );
-		//dlclose( handle );
 	}
 
 }

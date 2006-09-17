@@ -2,6 +2,7 @@
  * effect.h - base class for effects
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,11 +23,9 @@
  *
  */
 
+
 #ifndef _EFFECT_H
 #define _EFFECT_H
-
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -35,24 +34,37 @@
 #ifdef QT4
 
 #include <QtCore/QMutex>
+#include <Qt/QtXml>
 
 #else
 
-#include<qmutex.h>
+#include <qmutex.h>
+#include <qdom.h>
 
 #endif
 
 
 #include "qt3support.h"
 
-#include "engine.h"
+#include "plugin.h"
 #include "mixer.h"
 
 
-class effect: public engineObject
+class effectControlDialog;
+class track;
+
+
+class effect : public plugin
 {
 public:
-	effect( engine * _engine );
+	struct constructionData
+	{
+		engine * eng;
+		descriptor::subPluginFeatures::key key;
+	} ;
+
+
+	effect( const plugin::descriptor * _desc, constructionData * _cdata );
 	virtual ~effect();
 	
 	virtual bool FASTCALL processAudioBuffer( 
@@ -129,17 +141,6 @@ public:
 	{
 		m_wetDry = _wet;
 	}
-	
-	inline const QString & getName( void )
-	{
-		return( m_name );
-	}
-	
-	inline void setName( QString _name )
-	{
-		m_name = _name;
-	}
-	
 	inline float getGate( void )
 	{
 		return( m_gate );
@@ -186,9 +187,21 @@ public:
 	{
 		m_noRun = _state;
 	}
-	
+
+	inline const descriptor::subPluginFeatures::key & getKey( void )
+	{
+		return( m_key );
+	}
+
+	virtual effectControlDialog * createControlDialog( track * _track ) = 0;
+
+	static effect * FASTCALL instantiate( const QString & _plugin_name,
+						constructionData & _cdata );
+
+
 private:
-	QString m_name;
+	descriptor::subPluginFeatures::key m_key;
+
 	ch_cnt_t m_processors;
 	
 	bool m_okay;
@@ -202,8 +215,12 @@ private:
 	float m_wetDry;
 	float m_gate;
 	QMutex m_processLock;
-};
 
-#endif
+} ;
+
+
+typedef effect::descriptor::subPluginFeatures::key effectKey;
+typedef effect::descriptor::subPluginFeatures::keyList effectKeyList;
+
 
 #endif

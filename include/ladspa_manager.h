@@ -58,7 +58,7 @@
 
 
 #include "types.h"
-#include "qt3support.h"
+//#include "qt3support.h"
 
 class engine;
 
@@ -82,7 +82,7 @@ calls using:
 	
 as the plug-in key. */
 
-enum pluginType
+enum ladspaPluginType
 {
 	SOURCE,
 	TRANSFER,
@@ -96,7 +96,7 @@ typedef struct ladspaManagerStorage
 {
 	LADSPA_Descriptor_Function descriptorFunction;
 	Uint32 index;
-	pluginType type;
+	ladspaPluginType type;
 	Uint16 inputChannels;
 	Uint16 outputChannels;
 } ladspaManagerDescription;

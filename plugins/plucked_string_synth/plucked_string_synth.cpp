@@ -58,8 +58,9 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 				"cheap synthesis of guitar/harp-like sounds" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::INSTRUMENT,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
+	plugin::Instrument,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
 } ;
 
 }

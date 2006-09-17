@@ -79,8 +79,9 @@ plugin::descriptor bitinvader_plugin_descriptor =
 				"Rough & Dirty Wavetable Synthesizer." ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
-	plugin::INSTRUMENT,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
+	plugin::Instrument,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
 } ;
 
 }

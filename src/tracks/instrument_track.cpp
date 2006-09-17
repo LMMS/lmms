@@ -26,12 +26,6 @@
  */
 
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-#include "effect_chain.h"
-#include "effect_tab_widget.h"
-#endif
-
 #include "qt3support.h"
 
 #ifdef QT4
@@ -93,6 +87,9 @@
 #include "mmp.h"
 #include "string_pair_drag.h"
 #include "volume_knob.h"
+#include "effect_chain.h"
+#include "effect_tab_widget.h"
+
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "instrumentTrack",
@@ -309,17 +306,11 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_envWidget = new envelopeTabWidget( this );
 	m_arpWidget = new arpAndChordsTabWidget( this );
 	m_midiWidget = new midiTabWidget( this, m_midiPort );
-#ifdef LADSPA_SUPPORT
 	m_effWidget = new effectTabWidget( this, m_audioPort );
-#endif
 	m_tabWidget->addTab( m_envWidget, tr( "ENV/LFO/FILTER" ), 1 );
 	m_tabWidget->addTab( m_arpWidget, tr( "ARP/CHORD" ), 2 );
-#ifdef LADSPA_SUPPORT
 	m_tabWidget->addTab( m_effWidget, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiWidget, tr( "MIDI" ), 4 );
-#else
-	m_tabWidget->addTab( m_midiWidget, tr( "MIDI" ), 3 );
-#endif
 
 	// setup piano-widget
 	m_pianoWidget = new pianoWidget( this );
@@ -575,9 +566,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 	float v_scale = (float) getVolume() / DEFAULT_VOLUME;
 	
-#ifdef LADSPA_SUPPORT
 	m_audioPort->getEffects()->startRunning();
-#endif
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for _n, which
@@ -1097,9 +1086,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_envWidget->saveState( _doc, _this );
 	m_arpWidget->saveState( _doc, _this );
 	m_midiWidget->saveState( _doc, _this );
-#ifdef LADSPA_SUPPORT
 	m_effWidget->saveState( _doc, _this );
-#endif
 }
 
 
@@ -1135,27 +1122,10 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_midiWidget->restoreState( node.toElement() );
 			}
-#ifdef LADSPA_SUPPORT
 			else if( m_effWidget->nodeName() == node.nodeName() )
 			{
 				m_effWidget->restoreState( node.toElement() );
 			}
-#else
-			else if( node.nodeName() == "fx" )
-			{
-				// A song saved using ladspa will segfault when
-				// a version of lmms compiled without ladspa tries
-				// to instantiate a plugin from "libfx.so", so
-				// we catch it here.
-				QMessageBox::information( 0, 
-						tr( "No LADSPA Support" ),
-						tr( "This instrument uses "
-						"features that aren't "
-						"available in this "
-						"version of LMMS." ),
-						QMessageBox::Ok );
-			}
-#endif
 			else if( automationPattern::classNodeName()
 							!= node.nodeName() )
 			{

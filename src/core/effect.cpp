@@ -1,9 +1,10 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * effect.cpp - class for processing LADSPA effects
+ * effect.cpp - base-class for effects
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,9 +25,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
 #ifdef QT4
 
 #include <QtGui/QMessageBox>
@@ -39,10 +37,12 @@
 
 
 #include "effect.h"
+#include "dummy_effect.h"
 
 
-effect::effect( engine * _engine ) :
-	engineObject( _engine ),
+effect::effect( const plugin::descriptor * _desc, constructionData * _cdata ) :
+	plugin( _desc, _cdata->eng ),
+	m_key( _cdata->key ),
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
 	m_running( FALSE ),
@@ -82,8 +82,22 @@ void FASTCALL effect::setGate( float _level )
 }
 
 
+effect * effect::instantiate( const QString & _plugin_name,
+						constructionData & _cdata )
+{
+	plugin * p = plugin::instantiate( _plugin_name, &_cdata );
+	// check whether instantiated plugin is an instrument
+	if( dynamic_cast<effect *>( p ) != NULL )
+	{
+		// everything ok, so return pointer
+		return( dynamic_cast<effect *>( p ) );
+	}
+
+	// not quite... so delete plugin and return dummy instrument
+	delete p;
+	return( new dummyEffect() );
+}
 
 
-#endif
 
 #endif

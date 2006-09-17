@@ -60,8 +60,9 @@ plugin::descriptor malletsstk_plugin_descriptor =
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
-	plugin::INSTRUMENT,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) )
+	plugin::Instrument,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
 } ;
 
 }

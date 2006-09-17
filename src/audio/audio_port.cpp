@@ -25,11 +25,9 @@
  */
 
 #include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 #include "mixer.h"
 #include "audio_device.h"
 #include "config_mgr.h"
-#endif
 
 #include "audio_port.h"
 #include "audio_device.h"
@@ -52,10 +50,8 @@ audioPort::audioPort( const QString & _name, engine * _engine ) :
 				eng()->getMixer()->framesPerAudioBuffer() );
 	eng()->getMixer()->addAudioPort( this );
 	setExtOutputEnabled( TRUE );
-#ifdef LADSPA_SUPPORT
 	m_frames = eng()->getMixer()->framesPerAudioBuffer();
 	m_effects = new effectChain( eng() );
-#endif
 }
 
 

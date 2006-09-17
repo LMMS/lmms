@@ -80,8 +80,9 @@ plugin::descriptor flpimport_plugin_descriptor =
 			"Filter for importing FL Studio projects into LMMS" ),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
-	plugin::IMPORT_FILTER,
-	new QPixmap()
+	plugin::ImportFilter,
+	new QPixmap(),
+	NULL
 } ;
 
 
@@ -109,7 +110,7 @@ extern QString outstring;
 }
 
 
-void dump_mem( const void * buffer, uint n_bytes )
+static void dump_mem( const void * buffer, uint n_bytes )
 {
 	uchar * cp = (uchar *) buffer;
 	for( uint k = 0; k < n_bytes; ++k )

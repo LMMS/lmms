@@ -25,9 +25,6 @@
 #ifndef _EFFECT_CHAIN_H
 #define _EFFECT_CHAIN_H
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
 #ifdef QT4
 
 #include <QtCore/QMutex>
@@ -49,7 +46,7 @@ class effectChain: public engineObject
 {
 public:
 	effectChain( engine * _engine );
-	~effectChain();
+	virtual ~effectChain();
 	
 	void FASTCALL appendEffect( effect * _effect );
 	void FASTCALL deleteEffect( effect * _effect );
@@ -78,10 +75,4 @@ private:
 };
 
 #endif
-
-#endif
-
-
-
-
 

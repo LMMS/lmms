@@ -1,6 +1,6 @@
 /*
- * effect_tab_widget.h - tab-widget in channel-track-window for setting up
- *                       effects
+ * ladspa_control_dialog.h - dialog for displaying and editing control port
+ *                           values for LADSPA plugins
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
@@ -23,86 +23,81 @@
  *
  */
 
+#ifndef _LADSPA_CONTROL_DIALOG_H
+#define _LADSPA_CONTROL_DIALOG_H
 
-#ifndef _EFFECT_TAB_WIDGET_H
-#define _EFFECT_TAB_WIDGET_H
+#include "ladspa_manager.h"
 
-#include "qt3support.h"
+#ifdef LADSPA_SUPPORT
 
 #ifdef QT4
 
-#include <QtGui/QWidget>
-#include <QtGui/QPushButton>
+#include <QtGui/QGroupBox>
 #include <QtGui/QLayout>
 
 #else
 
-#include <qwidget.h>
-#include <qpushbutton.h>
+#include <qgroupbox.h>
 #include <qlayout.h>
-#include <qscrollview.h>
-#include <qvbox.h>
 
 #endif
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "qt3support.h"
 
-#include "journalling_object.h"
-#include "engine.h"
-#include "rack_plugin.h"
-#include "rack_view.h"
-#include "audio_port.h"
+#include "effect_control_dialog.h"
+#include "ladspa_control.h"
 #include "track.h"
+#include "led_checkbox.h"
 
 
-class instrumentTrack;
-class sampleTrack;
-class groupBox;
+typedef vvector<ladspaControl *> control_list_t;
+
+class ladspaEffect;
 
 
-class effectTabWidget : public QWidget, public journallingObject
+class ladspaControlDialog : public effectControlDialog
 {
 	Q_OBJECT
 public:
-	effectTabWidget( instrumentTrack * _track, audioPort * _port );
-	effectTabWidget( QWidget * _parent, sampleTrack * _track, 
-							audioPort * _port );
-	virtual ~effectTabWidget();
+	ladspaControlDialog( QWidget * _parent, ladspaEffect * _eff, 
+							track * _track );
+	virtual ~ladspaControlDialog();
 
-
+	inline ch_cnt_t getControlCount( void )
+	{
+		return( m_controlCount );
+	}
+	
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
 						QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "fx" );
+		return( "controls" );
 	}
-	
-	void setupWidget( void );
 
-signals:
-	void closed( void );
 
-private slots:
-	void addEffect( void );
-	void setBypass( bool _state );
+protected slots:
+	void link( bool _state );
+	void linkPort( Uint16 _port, bool _state );
 
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
 
 private:
+	ladspaEffect * m_effect;
+	ch_cnt_t m_processors;
+	ch_cnt_t m_controlCount;
 	track * m_track;
+	bool m_noLink;
 	audioPort * m_port;
+	ledCheckBox * m_stereoLink;
+	vvector<QWidget *> m_blanks;
+	vvector<control_list_t> m_controls;
 	
-	groupBox * m_effectsGroupBox;
-	QPushButton * m_addButton;
-	
-	rackView * m_rack;
-		
-	friend class instrumentTrack;
+	QVBoxLayout * m_mainLay;
+	QHBoxLayout * m_effectLay;
 
 } ;
+
+#endif
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * right_frame.cpp - provides the display for the rackInsert instances
+ * rack_view.cpp - provides the display for the rackInsert instances
  *
  * Copyright (c) 2006 Danny McRae <khjklujn@netscape.net>
  *
@@ -24,8 +24,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #ifdef QT4
 
@@ -48,8 +46,7 @@ rackView::rackView( QWidget * _parent,
 	QWidget( _parent ),
 	journallingObject( _engine ),
 	m_track( _track ),
-	m_port( _port ),
-	m_ladspa( eng()->getLADSPAManager() )
+	m_port( _port )
 {
 	setFixedSize( 230, 184 );
 	
@@ -76,7 +73,7 @@ rackView::~rackView()
 
 
 
-void rackView::addPlugin( ladspa_key_t _key )
+void rackView::addEffect( effect * _e )
 {
 #ifdef QT4
 	if( !m_scrollArea->widget() )
@@ -90,8 +87,7 @@ void rackView::addPlugin( ladspa_key_t _key )
 #else
 	QWidget * w = m_scrollArea->viewport();
 #endif
-	rackPlugin * plugin = new rackPlugin( w,
-						_key, m_track, eng(), m_port );
+	rackPlugin * plugin = new rackPlugin( w, _e, m_track, m_port );
 	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), 
 				this, SLOT( moveUp( rackPlugin * ) ) );
 	connect( plugin, SIGNAL( moveDown( rackPlugin * ) ),
@@ -228,21 +224,15 @@ void rackView::redraw()
 void FASTCALL rackView::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-	int num = 0;
-	_this.setAttribute( "plugins", m_rackInserts.count() );
+	_this.setAttribute( "numofeffects", m_rackInserts.count() );
 	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
-		ladspa_key_t key = ( *it )->getKey();
-		_this.setAttribute( "label" + QString::number(num), 
-								key.first );
-		_this.setAttribute( "lib" + QString::number(num), key.second );
-		_this.setAttribute( "name" + QString::number(num), 
-						m_ladspa->getName( key ) );
-		_this.setAttribute( "maker" + QString::number(num), 
-						m_ladspa->getMaker( key ) );
-		( *it )->saveState( _doc, _this );
-		num++;
+		QDomElement ef = ( *it )->saveState( _doc, _this );
+		ef.setAttribute( "name", 
+				( *it )->getEffect()->getDescriptor()->name );
+		ef.setAttribute( "key", 
+				( *it )->getEffect()->getKey().dumpBase64() );
 	}
 }
 
@@ -251,19 +241,26 @@ void FASTCALL rackView::saveSettings( QDomDocument & _doc,
 
 void FASTCALL rackView::loadSettings( const QDomElement & _this )
 {
-	int plugin_cnt = _this.attribute( "plugins" ).toInt();
-	
+	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
+
 	QDomNode node = _this.firstChild();
 	for( int i = 0; i < plugin_cnt; i++ )
 	{
-		QString lib = _this.attribute( "lib" + QString::number( i ) );
-		QString label = _this.attribute( "label" + 
-							QString::number( i ) );
-		ladspa_key_t key( label, lib );
-		if( m_ladspa->getDescriptor( key ) != NULL )
+		if( node.isElement() && node.nodeName() == "effect" )
 		{
-			addPlugin( key );
-			
+			QDomElement cn = node.toElement();
+			const QString name = cn.attribute( "name" );
+			effect::constructionData cd =
+			{
+				eng(),
+				// we have this really convenient key-ctor
+				// which takes a QString and decodes the
+				// base64-data inside :-)
+				effectKey( cn.attribute( "key" ) )
+			} ;
+			addEffect(effect::instantiate( name, cd ) );
+			// TODO: somehow detect if effect is sub-plugin-capable
+			// but couldn't load sub-plugin with requsted key
 			if( node.isElement() )
 			{
 				if( m_rackInserts.last()->nodeName() == 
@@ -274,21 +271,6 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 				}
 			}
 		}
-		else
-		{
-			QString name = _this.attribute( "name" + 
-						QString::number( i ) );
-			QString maker = _this.attribute( "maker" + 
-						QString::number( i ) );
-			QString message = "Couldn't find " + name + 
-						" from:\n\n";
-			message += "Library: " + lib + "\n";
-			message += "Label: " + label + "\n";
-			message += "Maker: " + maker;
-			
-			QMessageBox::information( 0, tr( "Uknown plugin" ), 
-						message, QMessageBox::Ok );
-		}
 		node = node.nextSibling();
 	}
 	
@@ -297,7 +279,5 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 
 
 #include "rack_view.moc"
-
-#endif
 
 #endif

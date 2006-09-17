@@ -45,12 +45,7 @@
 #include "volume_knob.h"
 
 #include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 class effectLabel;
-#else
-class nameLabel;
-#endif
-
 class audioPort;
 class QLabel;
 
@@ -160,11 +155,7 @@ public:
 
 
 private:
-#ifdef LADSPA_SUPPORT
 	effectLabel * m_trackLabel;
-#else
-	nameLabel * m_trackLabel;
-#endif
 	audioPort * m_audioPort;
 	
 	volumeKnob * m_volumeKnob;

@@ -1,9 +1,7 @@
-#if 0
 /*
- * ladspa_browser.h - dialog to display information about installed LADSPA
- *                    plugins
+ * dummy_effect.h - effect used as fallback if an effect couldn't be loaded
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,55 +23,45 @@
  */
 
 
-#ifndef _LADSPA_BROWSER_H
-#define _LADSPA_BROWSER_H
+#ifndef _DUMMY_EFFECT_H
+#define _DUMMY_EFFECT_H
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
-#include "engine.h"
-
-class QComboBox;
-class QLabel;
-class QLineEdit;
-class QSlider;
-
-class tabBar;
+#include "effect.h"
 
 
-class ladspaBrowser : public QDialog, public engineObject
+class dummyEffect : public effect
 {
-	Q_OBJECT
 public:
-	ladspaBrowser( engine * _engine );
-	virtual ~ladspaBrowser();
+	inline dummyEffect( void ) :
+		effect( NULL, NULL )
+	{
+	}
 
-	inline void labelWidget( QWidget * _w, const QString & _txt );
+	inline virtual ~dummyEffect()
+	{
+	}
 
-public slots:
-	void showPorts( const ladspa_key_t & _key );
-	void displayHelp( void );
-	
-private:
-	tabBar * m_tabBar;
+
+	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	{
+	}
+
+	inline virtual void loadSettings( const QDomElement & )
+	{
+	}
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "dummyeffect" );
+	}
+
+	inline virtual effectControlDialog * createControlDialog( track * )
+	{
+		// TODO: setup a dummy control-dialog for not crashing LMMS
+		return( NULL );
+	}
 
 } ;
 
-#endif
 
 #endif
-
-#endif
-

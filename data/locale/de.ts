@@ -684,35 +684,35 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Draw mode (D)</source>
-        <translation>Zeichnen-Modus (D)</translation>
+        <translation type="obsolete">Zeichnen-Modus (D)</translation>
     </message>
     <message>
         <source>Erase mode (E)</source>
-        <translation>Löschen-Modus (E)</translation>
+        <translation type="obsolete">Löschen-Modus (E)</translation>
     </message>
     <message>
         <source>Select mode (S)</source>
-        <translation>Auswahl-Modus (S)</translation>
+        <translation type="obsolete">Auswahl-Modus (S)</translation>
     </message>
     <message>
         <source>Move selection mode (M)</source>
-        <translation>Verschieben-Modus (M)</translation>
+        <translation type="obsolete">Verschieben-Modus (M)</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
@@ -757,6 +757,38 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>All selected values were copied to the clipboard.</source>
         <translation>Alle ausgewählten Werte wurden in die Zwischenablage kopiert.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1119,6 +1151,32 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     <message>
         <source>Choose LMMS working directory</source>
         <translation>LMMS-Arbeitsverzeichnis wählen</translation>
+    </message>
+</context>
+<context>
+    <name>effectSelectDialog</name>
+    <message>
+        <source>Effects Selector</source>
+        <translation>Effektauswähler</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Hinzufügen</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+</context>
+<context>
+    <name>effectTabWidget</name>
+    <message>
+        <source>EFFECTS CHAIN</source>
+        <translation>EFFEKT-KETTE</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -1730,6 +1788,10 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
         <source>FX channel</source>
         <translation>FX-Kanal</translation>
     </message>
+    <message>
+        <source>FX</source>
+        <translation>FX</translation>
+    </message>
 </context>
 <context>
     <name>knob</name>
@@ -1760,6 +1822,146 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     <message>
         <source>&amp;Open in automation editor</source>
         <translation>Im Aut&amp;omation-Editor öffnen</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControl</name>
+    <message>
+        <source>Link channels</source>
+        <translation>Kanäle verbinden</translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation>Wert:</translation>
+    </message>
+    <message>
+        <source>Sorry, no help available.</source>
+        <translation>Sorry, keine Hilfe verfügbar.</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControlDialog</name>
+    <message>
+        <source>Channel </source>
+        <translation> Kanal</translation>
+    </message>
+    <message>
+        <source>Link Channels</source>
+        <translation>Kanäle verbinden</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaPortDialog</name>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Rate</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Richtung</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <source>Min &lt; Default &lt; Max</source>
+        <translation>Min &lt; Standard &lt; Max</translation>
+    </message>
+    <message>
+        <source>Logarithmic</source>
+        <translation>Logarithmisch</translation>
+    </message>
+    <message>
+        <source>SR Dependent</source>
+        <translation>SR-abhängig</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>Audio</translation>
+    </message>
+    <message>
+        <source>Control</source>
+        <translation>Steuerung</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Eingang</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Ausgang</translation>
+    </message>
+    <message>
+        <source>Toggled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integer</source>
+        <translation>Gannzahl</translation>
+    </message>
+    <message>
+        <source>Float</source>
+        <translation>Kommazahl</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaSubPluginDescriptionWidget</name>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <source>Name: </source>
+        <translation> Name:</translation>
+    </message>
+    <message>
+        <source>Maker: </source>
+        <translation> Hersteller:</translation>
+    </message>
+    <message>
+        <source>Copyright: </source>
+        <translation> Copyright:</translation>
+    </message>
+    <message>
+        <source>Requires Real Time: Yes</source>
+        <translation>Benötigt Echtzeit: ja</translation>
+    </message>
+    <message>
+        <source>Requires Real Time: No</source>
+        <translation>Benötigt Echtzeit: nein</translation>
+    </message>
+    <message>
+        <source>Real Time Capable: Yes</source>
+        <translation>Echtzeitfähig: ja</translation>
+    </message>
+    <message>
+        <source>Real Time Capable: No</source>
+        <translation>Echtzeitfähig: nein</translation>
+    </message>
+    <message>
+        <source>In Place Broken: Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Place Broken: No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels In: </source>
+        <translation> Eingangs-Kanäle:</translation>
+    </message>
+    <message>
+        <source>Channels Out: </source>
+        <translation> Ausgangs-Kanäle:</translation>
     </message>
 </context>
 <context>
@@ -1983,6 +2185,216 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Durch das Drücken dieses Knopfes können Sie den Automation-Editor ein- oder ausblenden. Mit Hilfe des Automation-Editors können Sie dynamische Werte auf eine einfache Art und Weise bearbeiten.</translation>
+    </message>
+    <message>
+        <source>LADSPA Plugins...</source>
+        <translation>LADSPA-Plugins...</translation>
+    </message>
+</context>
+<context>
+    <name>mallets</name>
+    <message>
+        <source>Spread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spread:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato Freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Freq:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stick Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stick Mix:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulator:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crossfade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crossfade:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADSR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADSR:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marimba</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibraphone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Agogo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wood1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reso</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wood2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beats</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Two Fixed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clump</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tubular Bells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uniform Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuned Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Glass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tibetan Bowl</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>meterDialog</name>
+    <message>
+        <source>Meter Numerator</source>
+        <translation>Takt/Zähler</translation>
+    </message>
+    <message>
+        <source>Meter Denominator</source>
+        <translation>Takt/Nenner</translation>
     </message>
 </context>
 <context>
@@ -2226,15 +2638,15 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <name>pianoRoll</name>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
@@ -2278,7 +2690,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen, deren Größe ändern oder sie verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen, deren Größe ändern oder sie verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
@@ -2302,19 +2714,19 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Draw mode (D)</source>
-        <translation>Zeichnen-Modus (D)</translation>
+        <translation type="obsolete">Zeichnen-Modus (D)</translation>
     </message>
     <message>
         <source>Erase mode (E)</source>
-        <translation>Löschen-Modus (E)</translation>
+        <translation type="obsolete">Löschen-Modus (E)</translation>
     </message>
     <message>
         <source>Select mode (S)</source>
-        <translation>Auswahl-Modus (S)</translation>
+        <translation type="obsolete">Auswahl-Modus (S)</translation>
     </message>
     <message>
         <source>Move selection mode (M)</source>
-        <translation>Verschieben-Modus (M)</translation>
+        <translation type="obsolete">Verschieben-Modus (M)</translation>
     </message>
     <message>
         <source>Notes copied</source>
@@ -2327,6 +2739,38 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Last note</source>
         <translation>Letzte Note</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2416,6 +2860,14 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Filter for importing FL Studio projects into LMMS</source>
         <translation>Filter für Import von FL Studio Projekten in LMMS</translation>
+    </message>
+    <message>
+        <source>Tuneful things to bang on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
+        <translation>Plugin, um beliebige LADSPA-Effekte in LMMS nutzen zu können.</translation>
     </message>
 </context>
 <context>
@@ -2535,6 +2987,97 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>&amp;Color...</source>
         <translation>&amp;Farbe...</translation>
+    </message>
+</context>
+<context>
+    <name>rackPlugin</name>
+    <message>
+        <source>Turn the effect off</source>
+        <translation>Effekt ausschalten</translation>
+    </message>
+    <message>
+        <source>On/Off</source>
+        <translation>An/aus</translation>
+    </message>
+    <message>
+        <source>Toggles the effect on or off.</source>
+        <translation>Schalten den Effekt an oder aus.</translation>
+    </message>
+    <message>
+        <source>Wet/Dry mix</source>
+        <translation>Wet/Dry-Mix</translation>
+    </message>
+    <message>
+        <source>W/D</source>
+        <translation>W/D</translation>
+    </message>
+    <message>
+        <source>Wet Level:</source>
+        <translation>Wet-Level:</translation>
+    </message>
+    <message>
+        <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Zeit:</translation>
+    </message>
+    <message>
+        <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gate</source>
+        <translation>Gate</translation>
+    </message>
+    <message>
+        <source>Gate:</source>
+        <translation>Gate:</translation>
+    </message>
+    <message>
+        <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Controls</source>
+        <translation type="unfinished">Eigensch.</translation>
+    </message>
+    <message>
+        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
+
+The On/Off switch allows you to bypass a given plugin at any point in time.
+
+The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for one stage is the output from the previous stage, so the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
+
+The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the signal has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
+
+The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
+
+The Controls button opens a dialog for editing the effect&apos;s parameters.
+
+Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move &amp;up</source>
+        <translation>Nach &amp;oben verschieben</translation>
+    </message>
+    <message>
+        <source>Move &amp;down</source>
+        <translation>Nach &amp;unten verschieben</translation>
+    </message>
+    <message>
+        <source>&amp;Remove this plugin</source>
+        <translation>Plugin entfe&amp;rnen</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
     </message>
 </context>
 <context>
@@ -2760,6 +3303,22 @@ Latenz: %2 ms</translation>
     <message>
         <source>Choose FL Studio installation directory</source>
         <translation>FL Studio Installationsverzeichnis wählen</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin directories</source>
+        <translation>LADSPA-Plugin-Verzeichnis</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation>STK RawWave-Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation>Wählen Sie Ihr LADSPA-Plugin-Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation>Wählen Sie Ihr STK-RawWave-Verzeichnis</translation>
     </message>
 </context>
 <context>
@@ -3090,6 +3649,14 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
         <source>&amp;Open in automation editor</source>
         <translation>Im Aut&amp;omation-Editor öffnen</translation>
     </message>
+    <message>
+        <source>Custom...</source>
+        <translation>Benutzerdefiniert...</translation>
+    </message>
+    <message>
+        <source>Custom </source>
+        <translation> Benutzerdefiniert</translation>
+    </message>
 </context>
 <context>
     <name>timeLine</name>
@@ -3269,6 +3836,14 @@ Klick rechts = alle anderen Spuren stummschalten (Solo)</translation>
     <message>
         <source>Mute</source>
         <translation>Stumm</translation>
+    </message>
+    <message>
+        <source>Enable automation</source>
+        <translation>Automation aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable automation</source>
+        <translation>Automation deaktivieren</translation>
     </message>
 </context>
 <context>

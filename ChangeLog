@@ -1,3 +1,88 @@
+2006-09-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/mallets/mallets.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vibed/vibed.cpp:
+	extended plugin-descriptor by sub_plugin_features-field (for
+	non-effects likely NULL)
+
+	* include/audio_port.h:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_label.h:
+	* include/effect_tab_widget.h:
+	* include/instrument.h:
+	* include/instrument_track.h:
+	* include/ladspa_browser.h:
+	* include/ladspa_manager.h:
+	* include/main_window.h:
+	* include/plugin.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* include/sample_track.h:
+	* src/lmms_single_source.cpp:
+	* src/audio/audio_port.cpp:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/ladspa_browser.cpp:
+	* src/core/main_window.cpp:
+	* src/core/mixer.cpp:
+	* src/core/plugin.cpp:
+	* src/core/plugin_browser.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/ladspa_control.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	added generic effect-framework based on LADSPA-effect-code for using
+	arbitrary effects inside LMMS and using sub-plugins (such as
+	LADSPA-plugins) transparently at the same time, now writing of any
+	other effects an begin
+
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	moved LADSPA-effect-support into separate plugin
+
+	* include/dummy_effect.h:
+	* include/effect_control_dialog.h:
+	* include/effect_select_dialog.h:
+	* include/ladspa_base.h:
+	* include/ladspa_subplugin_features.h:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/ladspa_subplugin_features.cpp:
+	added (see description above)
+
+	* include/ladspa_control_dialog.h:
+	* include/ladspa_description.h:
+	* include/ladspa_effect.h:
+	* include/select_ladspa_dialog.h:
+	* src/core/ladspa_control_dialog.cpp:
+	* src/core/ladspa_effect.cpp:
+	* src/core/select_ladspa_dialog.cpp:
+	removed
+
+	* data/locale/de.ts:
+	updated German translation
+
+	* configure.in:
+	- do not set wrong VST_SUPPORT-condition if winegcc was found and
+	  --with-vst specified but VST-headers are missing
+	- LADSPA-support not experimental anymore and enabled per default when
+	  header is found
+	- use -O2 per default
+
 2006-09-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/vestige/lvsl_server.c:

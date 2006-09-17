@@ -96,7 +96,7 @@ public:
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
 	static instrument * FASTCALL instantiate( const QString & _plugin_name,
-						instrumentTrack * _channel_track );
+					instrumentTrack * _channel_track );
 
 protected:
 	inline instrumentTrack * getInstrumentTrack( void ) const

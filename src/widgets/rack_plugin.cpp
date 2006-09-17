@@ -25,8 +25,8 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
+
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -57,31 +57,26 @@
 #include "knob.h"
 #include "tempo_sync_knob.h"
 #include "tooltip.h"
-#include "ladspa_2_lmms.h"
-#include "ladspa_control_dialog.h"
+#include "effect_control_dialog.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "main_window.h"
 
 
 rackPlugin::rackPlugin( QWidget * _parent, 
-			ladspa_key_t _key, 
+			effect * _eff, 
 			track * _track, 
-			engine * _engine, 
 			audioPort * _port ) :
 	QWidget( _parent ),
-	journallingObject( _engine ),
+	journallingObject( _track->eng() ),
+	m_effect( _eff ),
 	m_track( _track ),
 	m_port( _port ),
 	m_contextMenu( NULL ),
-	m_key( _key ),
 	m_show( TRUE )
 {
-	m_effect = new ladspaEffect( _key, eng() );
 	m_port->getEffects()->appendEffect( m_effect );
-	
-	m_name = m_effect->getName();
-	
+
 	setFixedSize( 210, 60 );
 
 	QPixmap bg = embed::getIconPixmap( "effect_plugin" );
@@ -170,9 +165,8 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	connect( m_editButton, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 		
-	QString name = eng()->getLADSPAManager()->getShortName( _key );
 	m_label = new QLabel( this );
-	m_label->setText( name );
+	m_label->setText( m_effect->publicName() );
 	f = m_label->font();
 	f.setBold( TRUE );
 	m_label->setFont( pointSize<7>( f ) );
@@ -188,9 +182,11 @@ rackPlugin::rackPlugin( QWidget * _parent,
 							195, 10 ) ) );
 #endif
 	
-	m_controlView = new ladspaControlDialog( 
+	m_controlView = m_effect->createControlDialog( m_track );
+/*				eng()->getMainWindow()->workspace(),
+				new ControlDialog( 
 				eng()->getMainWindow()->workspace(), 
-				m_effect, eng(), m_track );
+				m_effect, eng(), m_track );*/
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
 	m_controlView->hide();
@@ -300,10 +296,11 @@ void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 {
 	m_contextMenu = new QMenu( this );
 #ifdef QT4
-	m_contextMenu->setTitle( m_effect->getName() );
+	m_contextMenu->setTitle( m_effect->publicName() );
 #else
 	QLabel * caption = new QLabel( "<font color=white><b>" + 
-				QString( m_effect->getName() ) + "</b></font>",
+				QString( m_effect->publicName() ) +
+								"</b></font>",
 				this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
 	caption->setAlignment( Qt::AlignCenter );
@@ -433,7 +430,5 @@ void rackPlugin::closeEffects( void )
 
 
 #include "rack_plugin.moc"
-
-#endif
 
 #endif

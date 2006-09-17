@@ -21,11 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _RIGHT_FRAME_H
-#define _RIGHT_FRAME_H
-
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
+#ifndef _RACK_VIEW_H
+#define _RACK_VIEW_H
 
 #ifdef QT4
 
@@ -48,7 +45,6 @@
 #include "journalling_object.h"
 #include "rack_plugin.h"
 #include "track.h"
-#include "ladspa_2_lmms.h"
 #include "audio_port.h"
 
 
@@ -61,7 +57,7 @@ public:
 					track * _track, audioPort * _port );
 	~rackView();
 
-	void addPlugin( ladspa_key_t _key );
+	void addEffect( effect * _e );
 	
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
 							QDomElement & _parent );
@@ -88,10 +84,7 @@ private:
 	audioPort * m_port;
 	
 	Uint32 m_lastY;
-	
-	ladspa2LMMS * m_ladspa;
-};
 
-#endif
+} ;
 
 #endif

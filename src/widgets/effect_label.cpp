@@ -25,8 +25,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #include "effect_label.h"
 #include "sample_track.h"
@@ -191,8 +189,5 @@ void effectLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 
 
 #include "effect_label.moc"
-
-
-#endif
 
 #endif

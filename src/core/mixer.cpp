@@ -278,18 +278,12 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 		eng()->getSongEditor()->processNextBuffer();
 
-#ifdef LADSPA_SUPPORT
 		bool more_effects = FALSE;
-#endif
 		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
 		{
-#ifdef LADSPA_SUPPORT
 			more_effects = ( *it )->processEffects();
 			if( ( *it )->m_bufferUsage != audioPort::NONE || more_effects )
-#else
-			if( ( *it )->m_bufferUsage != audioPort::NONE )
-#endif
 			{
 				processBuffer( ( *it )->firstBuffer(),
 						( *it )->nextFxChannel() );

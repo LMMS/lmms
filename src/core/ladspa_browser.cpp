@@ -1,3 +1,4 @@
+#if 0
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
@@ -304,4 +305,5 @@ void ladspaBrowser::displayHelp( void )
 
 #endif
 
+#endif
 #endif

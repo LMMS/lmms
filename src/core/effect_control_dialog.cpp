@@ -1,9 +1,10 @@
-#if 0
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
- * ladspa_browser.h - dialog to display information about installed LADSPA
- *                    plugins
+ * effect_control_dialog.cpp - base-class for effect-dialogs for displaying
+ *                            and editing control port values
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,55 +26,53 @@
  */
 
 
-#ifndef _LADSPA_BROWSER_H
-#define _LADSPA_BROWSER_H
-
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
-#include "qt3support.h"
-
 #ifdef QT4
 
-#include <QtGui/QDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QCloseEvent>
 
 #else
 
-#include <qdialog.h>
+#include <qmessagebox.h>
 
 #endif
 
-#include "engine.h"
-
-class QComboBox;
-class QLabel;
-class QLineEdit;
-class QSlider;
-
-class tabBar;
+#include "effect_control_dialog.h"
 
 
-class ladspaBrowser : public QDialog, public engineObject
+effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
+	QWidget( _parent
+#ifdef QT3
+		, "effectControlDialog"
+#endif
+					),
+	journallingObject( _eff->eng() ),
+	m_effect( _eff )
 {
-	Q_OBJECT
-public:
-	ladspaBrowser( engine * _engine );
-	virtual ~ladspaBrowser();
+	setWindowTitle( m_effect->publicName() );
 
-	inline void labelWidget( QWidget * _w, const QString & _txt );
+}
 
-public slots:
-	void showPorts( const ladspa_key_t & _key );
-	void displayHelp( void );
-	
-private:
-	tabBar * m_tabBar;
 
-} ;
 
-#endif
 
-#endif
+effectControlDialog::~effectControlDialog()
+{
+}
+
+
+
+
+void effectControlDialog::closeEvent( QCloseEvent * _ce )
+{
+	_ce->ignore();
+	emit( closed() );
+}
+
+
+
+
+#include "effect_control_dialog.moc"
 
 #endif
 

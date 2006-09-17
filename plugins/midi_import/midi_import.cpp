@@ -62,8 +62,9 @@ plugin::descriptor midiimport_plugin_descriptor =
 				"Filter for importing MIDI-files into LMMS" ),
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
-	plugin::IMPORT_FILTER,
-	new QPixmap()
+	plugin::ImportFilter,
+	new QPixmap(),
+	NULL
 } ;
 
 }

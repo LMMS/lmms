@@ -44,12 +44,7 @@
 
 #endif
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 #include "effect_label.h"
-#else
-#include "name_label.h"
-#endif
 
 #include "sample_track.h"
 #include "song_editor.h"
@@ -370,10 +365,9 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
-#ifdef LADSPA_SUPPORT
 	m_trackLabel = new effectLabel( tr( "Sample track" ),
 				      getTrackSettingsWidget(), eng(), this );				
-#else
+#if 0
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
 					getTrackSettingsWidget(), eng() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
@@ -427,9 +421,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 {
 	sendMidiTime( _start );
 
-#ifdef LADSPA_SUPPORT
 	m_audioPort->getEffects()->startRunning();
-#endif
 	bool played_a_note = FALSE;	// will be return variable
 
 	for( csize i = 0; i < numOfTCOs(); ++i )
@@ -484,9 +476,8 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
-#ifdef LADSPA_SUPPORT
 	m_trackLabel->saveState( _doc, _this );
-#else
+#if 0
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 #endif
 	m_volumeKnob->saveSettings( _doc, _this, "vol" );
@@ -498,7 +489,6 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	m_trackLabel->setText( _this.attribute( "name" ) );
-#ifdef LADSPA_SUPPORT
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
@@ -511,7 +501,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
-#else
+#if 0
 	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );

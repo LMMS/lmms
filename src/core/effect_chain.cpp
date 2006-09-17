@@ -24,8 +24,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #include "effect_chain.h"
 
@@ -194,7 +192,5 @@ bool effectChain::isRunning( void )
 	return( running );
 }
 
-
-#endif
 
 #endif
