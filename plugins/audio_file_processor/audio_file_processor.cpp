@@ -392,7 +392,7 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 
 
 
-void audioFileProcessor::playNote( notePlayHandle * _n )
+void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 {
 	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );

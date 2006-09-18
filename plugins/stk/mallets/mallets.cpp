@@ -391,7 +391,7 @@ QString mallets::nodeName( void ) const
 
 
 
-void mallets::playNote( notePlayHandle * _n )
+void mallets::playNote( notePlayHandle * _n, bool )
 {
 	int p = m_presets->value();
 	

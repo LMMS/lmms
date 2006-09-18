@@ -29,7 +29,6 @@ libvestige_la_SOURCES = vestige.cpp vestige.h lvsl_client.cpp lvsl_client.h
 $(libvestige_la_SOURCES): ./embedded_resources.h 
 
 
-
 CC = wineg++
 pkglib_PROGRAMS = lvsl_server
 lvsl_server_SOURCES = lvsl_server.c communication.h

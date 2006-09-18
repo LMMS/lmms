@@ -63,6 +63,7 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"
+#include "lcd_spinbox.h"
 #include "ladspa_manager.h"
 
 
@@ -126,7 +127,9 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
-					"manualchannelpiano" ).toInt() )
+					"manualchannelpiano" ).toInt() ),
+	m_parLevel( configManager::inst()->value( "mixer",
+				"parallelizinglevel" ).toInt() )
 					
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
@@ -453,8 +456,45 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 
+	tabWidget * smp_supp_tw = new tabWidget( tr( "SMP support" ).toUpper(),
+								performance );
+	smp_supp_tw->setFixedHeight( 180 );
+
+	QLabel * par_level_lbl = new QLabel( tr( "Parallelizing level" ),
+								smp_supp_tw );
+	par_level_lbl->move( 10, 15 );
+	lcdSpinBox * par_level = new lcdSpinBox( 1, 16, 2, smp_supp_tw,
+							tr( "SMP-level" ),
+							eng(), NULL );
+	par_level->setValue( m_parLevel );
+	connect( par_level, SIGNAL( valueChanged( int ) ),
+			this, SLOT( setParallelizingLevel( int ) ) );
+
+	par_level->move( 120, 20 );
+
+	QLabel * smp_help = new QLabel(
+		tr( "If you have a machine with more then one processor "
+			"(e.g. dual-core systems) you should use a "
+			"parallelizing-level above 1 which means that LMMS "
+			"will try to split up sound-processing into several "
+			"threads which should should be run on several cores "
+			"by the underlaying operating-system.\n"
+			"Please note that in some cases parallelizing won't "
+			"work with small buffer-sizes. If you experience "
+			"problems (i.e. lot of xruns), try to increase buffer-"
+			"size." ), smp_supp_tw );
+	smp_help->setFixedSize( performance->width() - 20, 110 );
+#ifndef QT3
+	smp_help->setWordWrap( TRUE );
+#else
+	smp_help->setAlignment( Qt::WordBreak );
+#endif
+	smp_help->move( 10, 55 );
+
 
 	perf_layout->addWidget( ui_fx_tw );
+	perf_layout->addSpacing( 15 );
+	perf_layout->addWidget( smp_supp_tw );
 	perf_layout->addStretch();
 
 
@@ -721,6 +761,8 @@ void setupDialog::accept( void )
 					QString::number( m_disableChActInd ) );
 	configManager::inst()->setValue( "ui", "manualchannelpiano",
 					QString::number( m_manualChPiano ) );
+	configManager::inst()->setValue( "mixer", "parallelizinglevel",
+						QString::number( m_parLevel ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -874,6 +916,13 @@ void setupDialog::toggleDisableChActInd( bool _disabled )
 void setupDialog::toggleManualChPiano( bool _enabled )
 {
 	m_manualChPiano = _enabled;
+}
+
+
+
+void setupDialog::setParallelizingLevel( int _level )
+{
+	m_parLevel = _level;
 }
 
 

@@ -51,14 +51,14 @@ instrument::~instrument()
 
 
 
-void instrument::play( void )
+void instrument::play( bool )
 {
 }
 
 
 
 
-void instrument::playNote( notePlayHandle * )
+void instrument::playNote( notePlayHandle *, bool )
 {
 }
 

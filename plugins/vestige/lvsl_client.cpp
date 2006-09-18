@@ -102,7 +102,8 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
 	m_outputCount( 0 ),
 	m_shmID( -1 ),
 	m_shm( NULL ),
-	m_shmSize( 0 )
+	m_shmSize( 0 ),
+	m_initialized( FALSE )
 {
 	pipe( m_pipes[0] );
 	pipe( m_pipes[1] );
@@ -139,14 +140,14 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
 	lock();
 
 	writeValueS<Sint16>( VST_LANGUAGE );
-	hostLanguages hlang = LVSL_LANG_ENGLISH;
+	hostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::German: hlang = LVSL_LANG_GERMAN; break;
-		case QLocale::French: hlang = LVSL_LANG_FRENCH; break;
-		case QLocale::Italian: hlang = LVSL_LANG_ITALIAN; break;
-		case QLocale::Spanish: hlang = LVSL_LANG_SPANISH; break;
-		case QLocale::Japanese: hlang = LVSL_LANG_JAPANESE; break;
+		case QLocale::German: hlang = LanguageGerman; break;
+		case QLocale::French: hlang = LanguageFrench; break;
+		case QLocale::Italian: hlang = LanguageItalian; break;
+		case QLocale::Spanish: hlang = LanguageSpanish; break;
+		case QLocale::Japanese: hlang = LanguageJapanese; break;
 		default: break;
 	}
 	writeValueS<hostLanguages>( hlang );
@@ -276,8 +277,8 @@ void remoteVSTPlugin::hideEditor( void )
 
 
 
-void remoteVSTPlugin::process( const sampleFrame * _in_buf,
-							sampleFrame * _out_buf )
+bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
+					sampleFrame * _out_buf, bool _wait )
 {
 	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 
@@ -291,8 +292,11 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 		{
 			(void) processNextMessage();
 		}
-		eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
-		return;
+		if( _out_buf != NULL )
+		{
+			eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
+		}
+		return( FALSE );
 	}
 
 	memset( m_shm, 0, m_shmSize );
@@ -314,32 +318,50 @@ void remoteVSTPlugin::process( const sampleFrame * _in_buf,
 	writeValueS<Sint16>( VST_PROCESS );
 	unlock();
 
-	if( _out_buf != NULL && m_outputCount > 0 )
+	if( _wait )
 	{
-		// wait until server signals that process()ing is done
-		while( processNextMessage() != VST_PROCESS_DONE )
-		{
-			// hopefully scheduler gives process-time to plugin...
-			usleep( 10 );
-		}
+		waitForProcessingFinished( _out_buf );
+	}
+	m_initialized = TRUE;
+	return( TRUE );
+}
 
-		ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
+
+
+
+bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
+{
+	if( !m_initialized || _out_buf == NULL || m_outputCount == 0 )
+	{
+		return( FALSE );
+	}
+
+	// wait until server signals that process()ing is done
+	while( processNextMessage() != VST_PROCESS_DONE )
+	{
+		// hopefully scheduler gives process-time to plugin...
+		usleep( 10 );
+	}
+
+	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
-		if( outputs != DEFAULT_CHANNELS )
-		{
-			// clear buffer, if plugin didn't fill up both channels
-			eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
-		}
+	if( outputs != DEFAULT_CHANNELS )
+	{
+		// clear buffer, if plugin didn't fill up both channels
+		eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
+	}
 
-		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
+	for( ch_cnt_t ch = 0; ch < outputs; ++ch )
+	{
+		for( fpab_t frame = 0; frame < frames; ++frame )
 		{
-			for( fpab_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = m_shm[(m_inputCount+ch)*
+			_out_buf[frame][ch] = m_shm[(m_inputCount+ch)*
 								frames+frame];
-			}
 		}
 	}
+
+	return( TRUE );
 }
 
 

@@ -551,7 +551,7 @@ QString vibed::nodeName( void ) const
 
 
 
-void vibed::playNote( notePlayHandle * _n )
+void vibed::playNote( notePlayHandle * _n, bool )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{

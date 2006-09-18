@@ -328,7 +328,7 @@ private:
 	Uint8 m_writeBuffer;
 	Uint8 m_analBuffer;
 	Uint8 m_poolDepth;
-	
+
 	bool m_scaleClip;
 	surroundSampleFrame m_maxClip;
 	surroundSampleFrame m_previousSample;
@@ -338,6 +338,7 @@ private:
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
 	Uint8 m_cpuLoad;
+	int m_parallelizingLevel;
 
 	playHandleVector m_playHandles;
 	playHandleVector m_playHandlesToRemove;

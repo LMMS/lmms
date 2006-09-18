@@ -42,7 +42,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						const f_cnt_t _frames,
 						const note & _n,
 						const bool _arp_note ) :
-	playHandle( NOTE_PLAY_HANDLE ),
+	playHandle( NotePlayHandle ),
 	note( NULL, _n.length(), _n.pos(), _n.tone(), _n.octave(),
 					_n.getVolume(), _n.getPanning() ),
 	m_pluginData( NULL ),
@@ -121,7 +121,7 @@ notePlayHandle::~notePlayHandle()
 
 
 
-void notePlayHandle::play( void )
+void notePlayHandle::play( bool _try_parallelizing )
 {
 	if( m_muted == TRUE || m_instrumentTrack == NULL )
 	{
@@ -137,7 +137,7 @@ void notePlayHandle::play( void )
 	} 
 
 	// play note!
-	m_instrumentTrack->playNote( this );
+	m_instrumentTrack->playNote( this, _try_parallelizing );
 
 	if( m_released == TRUE )
 	{
@@ -198,7 +198,7 @@ void notePlayHandle::play( void )
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); )
 	{
-		( *it )->play();
+		( *it )->play( _try_parallelizing );
 		if( ( *it )->done() )
 		{
 			delete *it;

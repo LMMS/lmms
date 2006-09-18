@@ -127,7 +127,7 @@ QMap<const engine *, previewTrackContainer *>
 presetPreviewPlayHandle::presetPreviewPlayHandle(
 						const QString & _preset_file,
 						engine * _engine ) :
-	playHandle( PRESET_PREVIEW_PLAY_HANDLE ),
+	playHandle( PresetPreviewHandle ),
 	engineObject( _engine ),
 	m_previewNote( NULL )
 {
@@ -192,9 +192,9 @@ presetPreviewPlayHandle::~presetPreviewPlayHandle()
 
 
 
-void presetPreviewPlayHandle::play( void )
+void presetPreviewPlayHandle::play( bool _try_parallelizing )
 {
-	m_previewNote->play();
+	m_previewNote->play( _try_parallelizing );
 }
 
 

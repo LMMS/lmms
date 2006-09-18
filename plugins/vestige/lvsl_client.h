@@ -77,8 +77,15 @@ public:
 		return( m_productString );
 	}
 
-	void FASTCALL process( const sampleFrame * _in_buf,
-						sampleFrame * _out_buf );
+	// if _wait == TRUE, process() calls waitForProcessingFinished()
+	// immediately, otherwise, _out_buf can be zero and you've to call
+	// waitForProcessingFinished() on your own
+	bool FASTCALL process( const sampleFrame * _in_buf,
+					sampleFrame * _out_buf,
+					bool _wait );
+	bool FASTCALL waitForProcessingFinished( sampleFrame * _out_buf );
+
+
 	void FASTCALL enqueueMidiEvent( const midiEvent & _event,
 						const f_cnt_t _frames_ahead );
 	void FASTCALL setTempo( const bpm_t _bpm );
@@ -173,6 +180,8 @@ private:
 	int m_shmID;
 	float * m_shm;
 	size_t m_shmSize;
+
+	bool m_initialized;
 
 } ;
 

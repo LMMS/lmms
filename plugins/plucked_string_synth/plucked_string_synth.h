@@ -197,7 +197,8 @@ public:
 	pluckedStringSynth( instrumentTrack * _channel_track );
 	virtual ~pluckedStringSynth();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n );
+	virtual void FASTCALL playNote( notePlayHandle * _n,
+						bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 

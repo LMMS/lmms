@@ -681,7 +681,7 @@ void bitInvader::smoothClicked( void )
 
 
 
-void bitInvader::playNote( notePlayHandle * _n )
+void bitInvader::playNote( notePlayHandle * _n, bool )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{

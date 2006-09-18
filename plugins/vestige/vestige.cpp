@@ -324,20 +324,24 @@ void vestigeInstrument::setParameter( const QString & _param,
 
 
 
-void vestigeInstrument::play( void )
+void vestigeInstrument::waitForWorkerThread( void )
 {
-	QMutexLocker ml( &m_pluginMutex );
+	m_pluginMutex.lock();
 	if( m_plugin == NULL )
 	{
+		m_pluginMutex.unlock();
 		return;
 	}
 
 	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
-	m_plugin->process( NULL, buf );
-	
-	getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
+	if( m_plugin->waitForProcessingFinished( buf ) )
+	{
+		getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
+	}
+
+	m_pluginMutex.unlock();
 
 	bufferAllocator::free( buf );
 }
@@ -345,9 +349,30 @@ void vestigeInstrument::play( void )
 
 
 
+void vestigeInstrument::play( bool _try_parallelizing )
+{
+	m_pluginMutex.lock();
+	if( m_plugin == NULL )
+	{
+		m_pluginMutex.unlock();
+		return;
+	}
+
+	m_plugin->process( NULL, NULL, FALSE );
+	m_pluginMutex.unlock();
+
+	if( !_try_parallelizing )
+	{
+		waitForWorkerThread();
+	}
+}
 
 
-void vestigeInstrument::playNote( notePlayHandle * _n )
+
+
+
+
+void vestigeInstrument::playNote( notePlayHandle * _n, bool )
 {
 	m_pluginMutex.lock();
 	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )

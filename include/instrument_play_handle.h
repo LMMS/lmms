@@ -34,7 +34,7 @@ class instrumentPlayHandle : public playHandle
 {
 public:
 	inline instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( INSTRUMENT_PLAY_HANDLE ),
+		playHandle( InstrumentPlayHandle ),
 		m_instrument( _instrument )
 	{
 	}
@@ -44,11 +44,11 @@ public:
 	}
 
 
-	inline virtual void play( void )
+	inline virtual void play( bool _try_parallelizing )
 	{
 		if( m_instrument != NULL )
 		{
-			m_instrument->play();
+			m_instrument->play( _try_parallelizing );
 		}
 	}
 
@@ -62,6 +62,23 @@ public:
 		if( m_instrument != NULL && !m_instrument->valid() )
 		{
 			m_instrument = NULL;
+		}
+	}
+
+	inline virtual bool supportsParallelizing( void ) const
+	{
+		if( m_instrument != NULL )
+		{
+			return( m_instrument->supportsParallelizing() );
+		}
+		return( FALSE );
+	}
+
+	inline virtual void waitForWorkerThread( void )
+	{
+		if( m_instrument != NULL )
+		{
+			m_instrument->waitForWorkerThread();
 		}
 	}
 

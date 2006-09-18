@@ -67,10 +67,11 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes it's
 	// output buffer only once per mixer-period
-	virtual void play( void );
+	virtual void play( bool _try_parallelizing = FALSE );
 
 	// to be overloaded by actual plugin
-	virtual void FASTCALL playNote( notePlayHandle * note_to_play );
+	virtual void FASTCALL playNote( notePlayHandle * note_to_play,
+						bool _try_parallelizing );
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly
@@ -92,6 +93,10 @@ public:
 		return( m_valid );
 	}
 
+	inline virtual bool notePlayHandleBased( void ) const
+	{
+		return( TRUE );
+	}
 
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure

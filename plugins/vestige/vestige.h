@@ -56,9 +56,10 @@ public:
 	vestigeInstrument( instrumentTrack * _channel_track );
 	virtual ~vestigeInstrument();
 
-	virtual void play( void );
+	virtual void play( bool _try_parallelizing );
 
-	virtual void FASTCALL playNote( notePlayHandle * _n );
+	virtual void FASTCALL playNote( notePlayHandle * _n,
+						bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 
@@ -70,6 +71,18 @@ public:
 
 	virtual void FASTCALL setParameter( const QString & _param,
 						const QString & _value );
+
+	virtual bool supportsParallelizing( void ) const
+	{
+		return( TRUE );
+	}
+
+	virtual void waitForWorkerThread( void );
+
+	virtual bool notePlayHandleBased( void ) const
+	{
+		return( FALSE );
+	}
 
 
 protected slots:

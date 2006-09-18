@@ -70,6 +70,8 @@ public:
 		ImportFilter,	// filter for importing a file
 		ExportFilter,	// filter for exporting a file
 		AnalysisTools,	// analysis-tools (level-meter etc)
+		Libary,		// simple library holding a code-base for
+				// several other plugins (e.g. LADSPA-support)
 		Other,
 		Undefined = 255
 	} ;
@@ -187,7 +189,21 @@ public:
 	static plugin * FASTCALL instantiate( const QString & _plugin_name,
 							void * _data );
 
-	// fills given vector with descriptors for all available plugins
+	// some plugins run external programs for doing their actual work
+	// (e.g. LVSL-server) or can run in separate worker-threads, so the
+	// mixer can schedule processing for parallelizing work which is very
+	// important for at least trying to use the full power of SMP-systems,
+	// otherwise the mixer will create according threads on it's own which
+	// of course isn't that efficient
+	virtual bool supportsParallelizing( void ) const;
+
+	// plugins supporting parallelizing, should re-implement that as the
+	// mixer will call this at the end of processing according chain
+	// of plugins
+	virtual void waitForWorkerThread( void );
+
+
+	// fills given vector with descriptors of all available plugins
 	static void FASTCALL getDescriptorsOfAvailPlugins(
 					vvector<descriptor> & _plugin_descs );
 

@@ -56,7 +56,7 @@ public:
 						engine * _engine );
 	virtual ~presetPreviewPlayHandle();
 
-	virtual void play( void );
+	virtual void play( bool _try_parallelizing );
 	virtual bool done( void ) const;
 
 	static void cleanUp( engine * _engine );

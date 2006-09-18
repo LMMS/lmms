@@ -33,9 +33,9 @@
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "note.h"
+#include "instrument_track.h"
 
 
-class instrumentTrack;
 class notePlayHandle;
 
 typedef vvector<notePlayHandle *> notePlayHandleVector;
@@ -51,13 +51,14 @@ public:
 
 	float m_frequency;
 
-	notePlayHandle( instrumentTrack * _chnl_trk, const f_cnt_t _frames_ahead,
+	notePlayHandle( instrumentTrack * _chnl_trk,
+					const f_cnt_t _frames_ahead,
 					const f_cnt_t _frames, const note & _n,
 					const bool _arp_note = FALSE );
 	virtual ~notePlayHandle();
 
 
-	virtual void play( void );
+	virtual void play( bool _try_parallelizing );
 
 	virtual inline bool done( void ) const
 	{
@@ -179,6 +180,26 @@ public:
 	void setBBTrack( bbTrack * _bb_track )
 	{
 		m_bbTrack = _bb_track;
+	}
+
+
+	virtual bool supportsParallelizing( void ) const
+	{
+		return( m_instrumentTrack->m_instrument->
+						supportsParallelizing()
+				&&
+			// we must not parallelize note-play-handles, which
+			// belong to instruments that are instrument-play-
+			// handle-driven, because then waitForWorkerThread()
+			// would be additionally called for each
+			// note-play-handle which results in hangups
+			m_instrumentTrack->m_instrument->
+						notePlayHandleBased() );
+	}
+
+	virtual void waitForWorkerThread( void )
+	{
+		m_instrumentTrack->m_instrument->waitForWorkerThread();
 	}
 
 

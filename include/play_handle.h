@@ -49,8 +49,10 @@ class playHandle
 public:
 	enum types
 	{
-		NOTE_PLAY_HANDLE, INSTRUMENT_PLAY_HANDLE, SAMPLE_PLAY_HANDLE,
-		PRESET_PREVIEW_PLAY_HANDLE
+		NotePlayHandle,
+		InstrumentPlayHandle,
+		SamplePlayHandle,
+		PresetPreviewHandle
 	} ;
 
 	playHandle( const types _type ) :
@@ -67,7 +69,7 @@ public:
 		return( m_type );
 	}
 
-	virtual void play( void ) = 0;
+	virtual void play( bool _try_parallelizing = FALSE ) = 0;
 	virtual bool done( void ) const = 0;
 
 	// play-handles can invalidate themselves if an object they depend on
@@ -76,6 +78,15 @@ public:
 	// and set flag before, so LMMS doesn't crash because these play-handles
 	// would continue using pointers to deleted objects...
 	virtual void checkValidity( void )
+	{
+	}
+
+	virtual bool supportsParallelizing( void ) const
+	{
+		return( FALSE );
+	}
+
+	virtual void waitForWorkerThread( void )
 	{
 	}
 

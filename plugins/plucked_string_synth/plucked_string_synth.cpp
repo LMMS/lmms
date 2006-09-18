@@ -133,7 +133,7 @@ QString pluckedStringSynth::nodeName( void ) const
 
 
 
-void pluckedStringSynth::playNote( notePlayHandle * _n )
+void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{

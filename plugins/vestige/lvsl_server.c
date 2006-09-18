@@ -103,7 +103,7 @@ static pthread_key_t ejmpbuf_key;
 #endif
 
 
-static hostLanguages hlang = LVSL_LANG_ENGLISH;
+static hostLanguages hlang = LanguageEnglish;
 
 
 class VSTPlugin;
@@ -138,7 +138,7 @@ public:
 	{
 		if( m_window != NULL )
 		{
-			PostThreadMessageA( m_guiThreadID, WM_USER, SHOW_EDITOR,
+			PostThreadMessageA( m_guiThreadID, WM_USER, ShowEditor,
 									0 );
 		}
 	}
@@ -213,7 +213,7 @@ public:
 private:
 	enum guiThreadMessages
 	{
-		NONE, SHOW_EDITOR, CLOSE_PLUGIN
+		None, ShowEditor, ClosePlugin
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
@@ -348,7 +348,7 @@ VSTPlugin::~VSTPlugin()
 	{
 		// notify GUI-thread
 		if( !PostThreadMessageA( m_guiThreadID, WM_USER,
-							CLOSE_PLUGIN, 0 ) )
+							ClosePlugin, 0 ) )
 		{
 			//lvsMessage( "could not post message to gui thread" );
 		}
@@ -1077,9 +1077,12 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 	_this->m_windowHeight = er->bottom - er->top;
 		
 	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-			_this->m_windowHeight + 26,
+			_this->m_windowHeight + 26, 0
+#if 0
 			SWP_NOACTIVATE /*| SWP_NOREDRAW*/ | SWP_NOMOVE |
-			SWP_NOOWNERZORDER | SWP_NOZORDER );
+			SWP_NOOWNERZORDER | SWP_NOZORDER
+#endif
+			);
 #ifdef HAVE_TLS
 	ejmpbuf_valid = false;
 #else
@@ -1101,13 +1104,13 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 		{
 			switch( msg.wParam )
 			{
-				case SHOW_EDITOR:
+				case ShowEditor:
 					ShowWindow( _this->m_window,
 								SW_SHOWNORMAL );
 					UpdateWindow( _this->m_window );
 					break;
 
-				case CLOSE_PLUGIN:
+				case ClosePlugin:
 					quit = true;
 					break;
 

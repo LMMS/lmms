@@ -38,7 +38,7 @@
 
 samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 							engine * _engine ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
+	playHandle( SamplePlayHandle ),
 	engineObject( _engine ),
 	m_sampleBuffer( new sampleBuffer( eng(), _sample_file ) ),
 	m_doneMayReturnTrue( TRUE ),
@@ -55,7 +55,7 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file,
 
 
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
+	playHandle( SamplePlayHandle ),
 	engineObject( _sample_buffer->eng() ),
 	m_sampleBuffer( sharedObject::ref( _sample_buffer ) ),
 	m_doneMayReturnTrue( TRUE ),
@@ -72,7 +72,7 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 
 
 samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
+	playHandle( SamplePlayHandle ),
 	engineObject( _tco->eng() ),
 	m_sampleBuffer( sharedObject::ref( _tco->getSampleBuffer() ) ),
 	m_doneMayReturnTrue( TRUE ),
@@ -89,7 +89,7 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 
 
 samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
-	playHandle( SAMPLE_PLAY_HANDLE ),
+	playHandle( SamplePlayHandle ),
 	engineObject( _pattern->eng() ),
 	m_sampleBuffer( sharedObject::ref( _pattern->getFrozenPattern() ) ),
 	m_doneMayReturnTrue( TRUE ),
@@ -117,15 +117,15 @@ samplePlayHandle::~samplePlayHandle()
 
 
 
-void samplePlayHandle::play( void )
+void samplePlayHandle::play( bool _try_parallelizing )
 {
-	play( 0 );
+	play( 0, _try_parallelizing );
 }
 
 
 
 
-void samplePlayHandle::play( const fpab_t _frame_base )
+void samplePlayHandle::play( const fpab_t _frame_base, bool )
 {
 	if( framesDone() >= totalFrames() )
 	{

@@ -50,8 +50,8 @@ public:
 	samplePlayHandle( pattern * _pattern );
 	virtual ~samplePlayHandle();
 
-	virtual void play( void );
-	void play( const fpab_t _frame_base );
+	virtual void play( bool _try_parallelizing );
+	void play( const fpab_t _frame_base, bool _try_parallelizing );
 	virtual bool done( void ) const;
 
 	f_cnt_t totalFrames( void ) const;

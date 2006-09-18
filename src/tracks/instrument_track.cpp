@@ -734,7 +734,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 
 
 
-void instrumentTrack::playNote( notePlayHandle * _n )
+void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
@@ -743,7 +743,7 @@ void instrumentTrack::playNote( notePlayHandle * _n )
 	if( _n->arpBaseNote() == FALSE && m_instrument != NULL )
 	{
 		// all is done, so now lets play the note!
-		m_instrument->playNote( _n );
+		m_instrument->playNote( _n, _try_parallelizing );
 	}
 }
 
@@ -1031,7 +1031,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 								note_frames,
 								*cur_note );
 				note_play_handle->setBBTrack( bb_track );
-				note_play_handle->play();
+				note_play_handle->play( FALSE );
 				// could we play all within current number of
 				// frames per audio-buffer?
 				if( note_play_handle->done() == FALSE )

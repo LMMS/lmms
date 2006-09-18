@@ -68,6 +68,7 @@ mixer::mixer( engine * _engine ) :
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
 	m_cpuLoad( 0 ),
+	m_parallelizingLevel( 1 ),
 	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
@@ -86,6 +87,13 @@ mixer::mixer( engine * _engine ) :
 		configManager::inst()->setValue( "mixer",
 							"framesperaudiobuffer",
 				QString::number( m_framesPerAudioBuffer ) );
+	}
+
+	if( configManager::inst()->value( "mixer", "parallelizinglevel"
+						).toInt() > 0 )
+	{
+		m_parallelizingLevel =configManager::inst()->value( "mixer",
+					"parallelizinglevel" ).toInt();
 	}
 
 	for( Uint8 i = 0; i < 3; i++ )
@@ -258,21 +266,75 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 //	if( criticalXRuns() == FALSE )
 	{
 		csize idx = 0;
-		while( idx < m_playHandles.size() )
+		if( m_parallelizingLevel > 1 )
 		{
-			register playHandle * n = m_playHandles[idx];
-			// delete play-handle if it played completely
-			if( n->done() )
+// TODO: if not enough play-handles are found which are capable of
+// parallelizing, create according worker-threads. each of this threads
+// processes a certain part of our m_playHandles-vector
+// the question is the queueing model which we can use:
+// 	1) m_playHandles is divided into m_parallelizingLevel sub-vectors
+// 	   each sub-vector is processed by a worker-thread
+// 	2) create a stack with all play-handles that need to be processed,
+// 	   save it via a mutex and then let all worker-threads "fetch jobs"
+// 	   from the stack - this way it's guaranteed the work is
+// 	   balanced across all worker-threads. this would avoid cases
+// 	   where the sub-vector of a thread only contains notes that are
+// 	   done and only need to be deleted.
+			playHandleVector par_hndls;
+			while( idx < m_playHandles.size() )
 			{
-				delete n;
-				m_playHandles.erase( m_playHandles.begin() +
-									idx );
-			}
-			else
-			{
-				// play all uncompletely-played play-handles...
-				n->play();
+				playHandle * n = m_playHandles[idx];
+				if( !n->done() && n->supportsParallelizing() )
+				{
+					n->play( TRUE );
+					par_hndls.push_back( n );
+				}
 				++idx;
+			}
+			idx = 0;
+			while( idx < m_playHandles.size() )
+			{
+				playHandle * n =m_playHandles[idx];
+				if( n->supportsParallelizing() )
+				{
+					++idx;
+					continue;
+				}
+				else if( n->done() )
+				{
+					delete n;
+					m_playHandles.erase(
+						m_playHandles.begin() + idx );
+				}
+				else
+				{
+					n->play();
+					++idx;
+				}
+			}
+			for( playHandleVector::iterator it = par_hndls.begin();
+						it != par_hndls.end(); ++it )
+			{
+				( *it )->waitForWorkerThread();
+			}
+		}
+		else
+		{
+			while( idx < m_playHandles.size() )
+			{
+				register playHandle * n = m_playHandles[idx];
+				// delete play-handle if it played completely
+				if( n->done() )
+				{
+					delete n;
+					m_playHandles.erase(
+						m_playHandles.begin() + idx );
+				}
+				else
+				{
+					n->play();
+					++idx;
+				}
 			}
 		}
 
@@ -283,7 +345,8 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 						it != m_audioPorts.end(); ++it )
 		{
 			more_effects = ( *it )->processEffects();
-			if( ( *it )->m_bufferUsage != audioPort::NONE || more_effects )
+			if( ( *it )->m_bufferUsage != audioPort::NONE ||
+								more_effects )
 			{
 				processBuffer( ( *it )->firstBuffer(),
 						( *it )->nextFxChannel() );
@@ -324,7 +387,7 @@ void mixer::clear( bool _everything )
 		// parameter _everything is true (which is the case when
 		// clearing song for example)
 		if( _everything == TRUE ||
-			( *it )->type() != playHandle::INSTRUMENT_PLAY_HANDLE )
+			( *it )->type() != playHandle::InstrumentPlayHandle )
 		{
 			m_playHandlesToRemove.push_back( *it );
 		}

@@ -54,6 +54,7 @@
 #include "tab_widget.h"
 #include "engine.h"
 #include "volume_knob.h"
+#include "instrument.h"
 
 class QLineEdit;
 class arpAndChordsTabWidget;
@@ -61,7 +62,6 @@ class audioPort;
 class instrumentTrackButton;
 class envelopeTabWidget;
 class fadeButton;
-class instrument;
 class lcdSpinBox;
 class midiPort;
 class midiTabWidget;
@@ -96,6 +96,7 @@ public:
 	virtual void FASTCALL processOutEvent( const midiEvent & _me,
 						const midiTime & _time );
 
+
 	// returns the frequency of a given tone & octave.
 	// This function also includes base_tone & base_octave in
 	// its calculations
@@ -105,7 +106,7 @@ public:
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void FASTCALL playNote( notePlayHandle * _n );
+	void FASTCALL playNote( notePlayHandle * _n, bool _try_parallelizing );
 
 	QString instrumentName( void ) const;
 	void FASTCALL deleteNotePluginData( notePlayHandle * _n );

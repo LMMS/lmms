@@ -139,6 +139,21 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 
 
 
+bool plugin::supportsParallelizing( void ) const
+{
+	return( FALSE );
+}
+
+
+
+
+void plugin::waitForWorkerThread( void )
+{
+}
+
+
+
+
 void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );

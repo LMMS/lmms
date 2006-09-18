@@ -107,12 +107,12 @@ struct vstParamProperties
 
 enum hostLanguages
 {
-	LVSL_LANG_ENGLISH = 1,
-	LVSL_LANG_GERMAN,
-	LVSL_LANG_FRENCH,
-	LVSL_LANG_ITALIAN,
-	LVSL_LANG_SPANISH,
-	LVSL_LANG_JAPANESE
+	LanguageEnglish = 1,
+	LanguageGerman,
+	LanguageFrench,
+	LanguageItalian,
+	LanguageSpanish,
+	LanguageJapanese
 } ;
 
 

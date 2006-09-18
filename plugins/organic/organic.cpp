@@ -297,7 +297,7 @@ QString organicInstrument::nodeName( void ) const
 
 
 
-void organicInstrument::playNote( notePlayHandle * _n )
+void organicInstrument::playNote( notePlayHandle * _n, bool )
 {
 	if( _n->totalFramesPlayed() == 0 )
 	{

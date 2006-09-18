@@ -1,3 +1,46 @@
+2006-09-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	* plugin/vestige/lvsl_client.h:
+	* plugin/vestige/lvsl_client.cpp:
+	take advantage of LMMS' new parallelizing-support - works indeed the
+	way expected! all VST-servers are now balanced all over available CPUs
+
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/organic/organic.h:
+	* plugins/organic/organic.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.h:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/mallets/mallets.h:
+	* plugins/mallets/mallets.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* include/instrument.h:
+	* include/instrument_play_handle.h:
+	* include/mixer.h:
+	* include/note_play_handle.h:
+	* include/play_handle.h:
+	* include/plugin.h:
+	* include/preset_preview_play_handle.h:
+	* include/sample_play_handle.h:
+	* include/setup_dialog.h:
+	* include/track.h:
+	* src/core/instrument.cpp:
+	* src/core/mixer.cpp:
+	* src/core/plugin.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	added first simple support for parallelizing sound-processing for
+	using full power of SMP-systems (e.g. my new dual-core-notebook :-)
+
 2006-09-17	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/tempo_sync_knob.h:

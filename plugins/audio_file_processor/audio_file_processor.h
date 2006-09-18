@@ -56,7 +56,8 @@ public:
 	audioFileProcessor( instrumentTrack * _channel_track );
 	virtual ~audioFileProcessor();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n );
+	virtual void FASTCALL playNote( notePlayHandle * _n,
+						bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

@@ -112,6 +112,7 @@ private slots:
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
+	void setParallelizingLevel( int _level );
 
 
 private:
@@ -153,7 +154,7 @@ private:
 
 	bool m_disableChActInd;
 	bool m_manualChPiano;
-
+	int m_parLevel;
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;
 	typedef QMap<QString, midiClient::setupWidget *> mswMap;
