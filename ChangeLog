@@ -1,3 +1,8 @@
+2006-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.cvs:
+	renamed to Makefile.svn as LMMS-CVS-repo was migrated to subversion
+
 2006-09-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vestige/vestige.h:
