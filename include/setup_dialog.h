@@ -43,7 +43,6 @@
 
 #include "audio_device.h"
 #include "midi_client.h"
-#include "ladspa_manager.h"
 
 
 class QComboBox;
@@ -134,9 +133,7 @@ private:
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
-#ifdef LADSPA_SUPPORT
 	QLineEdit * m_ladLineEdit;
-#endif
 #ifdef HAVE_STK_H
 	QLineEdit * m_stkLineEdit;
 #endif
@@ -145,9 +142,7 @@ private:
 	QString m_vstDir;
 	QString m_artworkDir;
 	QString m_flDir;
-#ifdef LADSPA_SUPPORT
 	QString m_ladDir;
-#endif
 #ifdef HAVE_STK_H
 	QString m_stkDir;
 #endif

@@ -50,8 +50,6 @@
 
 #endif
 
-#include "ladspa_manager.h"
-
 
 class QLineEdit;
 class QLabel;
@@ -159,12 +157,10 @@ public:
 		return( m_flDir );
 	}
 
-#ifdef LADSPA_SUPPORT
 	const QString & ladspaDir( void ) const
 	{
 		return( m_ladDir );
 	}
-#endif
 
 #ifdef HAVE_STK_H
 	const QString & stkDir( void ) const
@@ -227,9 +223,7 @@ private:
 	QString m_pluginDir;
 	QString m_vstDir;
 	QString m_flDir;
-#ifdef LADSPA_SUPPORT
 	QString m_ladDir;
-#endif
 #ifdef HAVE_STK_H
 	QString m_stkDir;
 #endif

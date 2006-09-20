@@ -70,7 +70,7 @@ public:
 		ImportFilter,	// filter for importing a file
 		ExportFilter,	// filter for exporting a file
 		AnalysisTools,	// analysis-tools (level-meter etc)
-		Libary,		// simple library holding a code-base for
+		Library,	// simple library holding a code-base for
 				// several other plugins (e.g. LADSPA-support)
 		Other,
 		Undefined = 255

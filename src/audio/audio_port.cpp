@@ -24,7 +24,6 @@
  *
  */
 
-#include "ladspa_manager.h"
 #include "mixer.h"
 #include "audio_device.h"
 #include "config_mgr.h"

@@ -50,7 +50,6 @@
 
 #include "types.h"
 #include "engine.h"
-#include "ladspa_manager.h"
 
 
 class QDomElement;

@@ -34,8 +34,6 @@
 
 #ifdef HAVE_LADSPA_H
 
-#define LADSPA_SUPPORT
-
 #include <ladspa.h>
 
 #include "qt3support.h"

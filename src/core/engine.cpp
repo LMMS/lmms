@@ -38,7 +38,7 @@
 #include "song_editor.h"
 
 #ifdef LADSPA_SUPPORT
-#include "ladspa_2_lmms.h"
+#include "plugins/ladspa_base/ladspa_2_lmms.h"
 #endif
 
 

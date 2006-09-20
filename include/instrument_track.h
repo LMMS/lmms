@@ -27,8 +27,6 @@
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
-#include "ladspa_manager.h"
-
 #include "qt3support.h"
 
 #ifdef QT4

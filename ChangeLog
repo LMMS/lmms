@@ -1,5 +1,26 @@
 2006-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/*/*.png:
+	* data/locale/*.qm:
+	* data/samples/*:
+	* data/themes/*:
+	re-added all binary files as they were corrupted during SVN-migration
+	for some reason
+
+	* configure.in:
+	* Makefile.am:
+	* plugins/ladspa_base/*:
+	* include/config_mgr.h:
+	* include/engine.h:
+	* include/setup_dialog.h:
+	* src/audio/audio_port.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/engine.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/lmms_single_source.cpp:
+	moved all LADSPA-related code into separate library against which LMMS
+	is linked when compiling with LADSPA-support
+
 	* Makefile.cvs:
 	renamed to Makefile.svn as LMMS-CVS-repo was migrated to subversion
 

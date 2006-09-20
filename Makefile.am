@@ -71,9 +71,6 @@ lmms_MOC =						\
 		./kmultitabbar.moc			\
 		./kmultitabbar-qt3.moc			\
 		./knob.moc				\
-		./ladspa_control.moc			\
-		./ladspa_port_dialog.moc		\
-		./ladspa_subplugin_features.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./main_window.moc			\
@@ -153,8 +150,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
-		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
-		$(srcdir)/src/core/ladspa_subplugin_features.cpp	\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
@@ -181,8 +176,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
 		$(srcdir)/src/lib/embed.cpp				\
-		$(srcdir)/src/lib/ladspa_2_lmms.cpp			\
-		$(srcdir)/src/lib/ladspa_manager.cpp			\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
@@ -208,7 +201,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
-		$(srcdir)/src/widgets/ladspa_control.cpp		\
 		$(srcdir)/src/widgets/lcd_spinbox.cpp			\
 		$(srcdir)/src/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
@@ -330,7 +322,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/dummy_instrument.h			\
 		$(srcdir)/include/instrument_play_handle.h		\
 		$(srcdir)/include/string_pair_drag.h			\
-		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/midi_tab_widget.h			\
 		$(srcdir)/include/audio_port.h				\
 		$(srcdir)/include/tool_button.h				\
@@ -353,16 +344,11 @@ lmms_SOURCES =								\
 		$(srcdir)/include/effect_control_dialog.h		\
 		$(srcdir)/include/effect_label.h			\
 		$(srcdir)/include/effect_tab_widget.h			\
-		$(srcdir)/include/ladspa_2_lmms.h			\
-		$(srcdir)/include/ladspa_control.h			\
-		$(srcdir)/include/ladspa_port_dialog.h			\
 		$(srcdir)/include/rack_plugin.h				\
 		$(srcdir)/include/rack_view.h				\
 		$(srcdir)/include/effect_select_dialog.h		\
 		$(srcdir)/include/dummy_effect.h			\
 		$(srcdir)/include/meter_dialog.h			\
-		$(srcdir)/include/ladspa_subplugin_features.h		\
-		$(srcdir)/include/ladspa_base.h				\
 		$(srcdir)/include/qxembed.h
 
 
@@ -400,7 +386,11 @@ if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_FST_LDADD) -ldl
+if LADSPA_SUPPORT
+LIB_LADSPABASE_LDADD = -Lplugins/ladspa_base -lladspabase
+endif
+
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_LADSPABASE_LDADD) -ldl
 lmms_LDFLAGS = -rdynamic
 #-rpath $(pkglibdir)
 

@@ -44,7 +44,6 @@
 #include "sample_buffer.h"
 #include "volume_knob.h"
 
-#include "ladspa_manager.h"
 class effectLabel;
 class audioPort;
 class QLabel;

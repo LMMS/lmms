@@ -26,6 +26,10 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 class automationEditor;
 class bbEditor;
 class projectJournal;
@@ -34,8 +38,6 @@ class mixer;
 class pianoRoll;
 class projectNotes;
 class songEditor;
-
-#include "ladspa_manager.h"
 #ifdef LADSPA_SUPPORT
 class ladspa2LMMS;
 #endif
@@ -113,7 +115,7 @@ public:
 		return( m_ladspaManager );
 	}
 #endif
-	
+
 	void close( void );
 
 	float framesPerTact64th( void ) const

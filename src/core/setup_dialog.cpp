@@ -64,7 +64,6 @@
 #include "tooltip.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
-#include "ladspa_manager.h"
 
 
 // platform-specific audio-interface-classes
@@ -118,9 +117,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_flDir( configManager::inst()->flDir() ),
-#ifdef LADSPA_SUPPORT
 	m_ladDir( configManager::inst()->ladspaDir() ),
-#endif
 #ifdef HAVE_STK_H
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
@@ -149,14 +146,10 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-#ifdef LADSPA_SUPPORT
 #ifdef HAVE_STK_H
 	ws->setFixedSize( 360, 412 );
 #else
 	ws->setFixedSize( 360, 356 );
-#endif
-#else
-	ws->setFixedSize( 360, 300 );
 #endif
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 240 );
@@ -272,14 +265,10 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 	QWidget * directories = new QWidget( ws );
-#ifdef LADSPA_SUPPORT
 #ifdef HAVE_STK_H
 	directories->setFixedSize( 360, 362 );
 #else
 	directories->setFixedSize( 360, 316 );
-#endif
-#else
-	directories->setFixedSize( 360, 260 );
 #endif
 	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
 	dir_layout->setSpacing( 0 );
@@ -361,7 +350,6 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	fldir_select_btn->move( 320, 20 );
 	connect( fldir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openFLDir() ) );
-#ifdef LADSPA_SUPPORT
 	// LADSPA-dir
 	tabWidget * lad_tw = new tabWidget( tr(
 			"LADSPA plugin directories" ).toUpper(),
@@ -380,7 +368,6 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	laddir_select_btn->move( 320, 20 );
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
-#endif
 
 #ifdef HAVE_STK_H
 	// STK-dir
@@ -410,10 +397,8 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	dir_layout->addWidget( artwork_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( fl_tw );
-#ifdef LADSPA_SUPPORT
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( lad_tw );
-#endif
 #ifdef HAVE_STK_H
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( stk_tw );
@@ -768,9 +753,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setVSTDir( m_vstDir );
 	configManager::inst()->setArtworkDir( m_artworkDir );
 	configManager::inst()->setFLDir( m_flDir );
-#ifdef LADSPA_SUPPORT
 	configManager::inst()->setLADSPADir( m_ladDir );
-#endif
 #ifdef HAVE_STK_H
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
@@ -1034,7 +1017,6 @@ void setupDialog::openFLDir( void )
 
 void setupDialog::openLADSPADir( void )
 {
-#ifdef LADSPA_SUPPORT
 #ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose LADSPA plugin directory" ),
@@ -1055,7 +1037,6 @@ void setupDialog::openLADSPADir( void )
 								new_dir );
 		}
 	}
-#endif
 }
 
 
@@ -1092,9 +1073,7 @@ void setupDialog::setFLDir( const QString & _fd )
 
 void setupDialog::setLADSPADir( const QString & _fd )
 {
-#ifdef LADSPA_SUPPORT
 	m_ladDir = _fd;
-#endif
 }
 
 
