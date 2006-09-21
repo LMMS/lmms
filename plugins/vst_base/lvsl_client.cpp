@@ -160,7 +160,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
 	{
 		p = configManager::inst()->vstDir() + QDir::separator() + p;
 	}
-	printf("loading %s\n", p.ascii());
+
 	writeValueS<Sint16>( VST_LOAD_PLUGIN );
 	writeStringS( p.
 #ifdef QT4
