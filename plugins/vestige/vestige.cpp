@@ -108,9 +108,6 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
 	setErasePixmap( *s_artwork );
 #endif
 
-	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
-					 this, SLOT( changeTempo( bpm_t ) ) );
-
 	m_openPluginButton = new pixmapButton( this, NULL, eng(), NULL );
 	m_openPluginButton->setCheckable( FALSE );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
@@ -300,6 +297,9 @@ void vestigeInstrument::setParameter( const QString & _param,
 			return;
 		}*/
 		m_plugin->showEditor();
+		connect( eng()->getSongEditor(),
+					SIGNAL( tempoChanged( bpm_t ) ),
+				 m_plugin, SLOT( setTempo( bpm_t ) ) );
 		m_plugin->setTempo( eng()->getSongEditor()->getTempo() );
 		if( set_ch_name == TRUE )
 		{
@@ -500,7 +500,7 @@ void vestigeInstrument::noteOffAll( void )
 
 
 
-
+/*
 void vestigeInstrument::changeTempo( bpm_t _new_tempo )
 {
 	m_pluginMutex.lock();
@@ -510,7 +510,7 @@ void vestigeInstrument::changeTempo( bpm_t _new_tempo )
 	}
 	m_pluginMutex.unlock();
 }
-
+*/
 
 
 

@@ -48,11 +48,12 @@
 
 
 
-class remoteVSTPlugin : public engineObject
+class remoteVSTPlugin : public QObject, public engineObject
 {
+	Q_OBJECT
 public:
 	remoteVSTPlugin( const QString & _plugin, engine * _engine );
-	~remoteVSTPlugin();
+	virtual ~remoteVSTPlugin();
 
 	void showEditor( void );
 	void hideEditor( void );
@@ -88,7 +89,6 @@ public:
 
 	void FASTCALL enqueueMidiEvent( const midiEvent & _event,
 						const f_cnt_t _frames_ahead );
-	void FASTCALL setTempo( const bpm_t _bpm );
 
 	const QMap<QString, QString> & parameterDump( void );
 	void setParameterDump( const QMap<QString, QString> & _pdump );
@@ -113,6 +113,10 @@ public:
 	{
 		return( m_failed );
 	}
+
+
+public slots:
+	void setTempo( bpm_t _bpm );
 
 
 private:

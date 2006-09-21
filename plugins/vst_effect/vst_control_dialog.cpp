@@ -1,6 +1,5 @@
 /*
- * effect_control_dialog.h - base-class for effect-dialogs for displaying and
- *                           editing control port values
+ * vst_control_dialog.cpp - dialog for displaying GUI of VST-effect-plugin
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,54 +22,64 @@
  *
  */
 
-#ifndef _EFFECT_CONTROL_DIALOG_H
-#define _EFFECT_CONTROL_DIALOG_H
 
 #ifdef QT4
 
-#include <QtGui/QWidget>
+#include <QtGui/QMessageBox>
+#include <QtGui/QLayout>
 
 #else
 
-#include <qwidget.h>
+#include <qmessagebox.h>
+#include <qlayout.h>
 
 #endif
 
-#include "qt3support.h"
-
-#include "journalling_object.h"
-#include "effect.h"
+#include "vst_effect.h"
 
 
-class track;
-
-
-class effectControlDialog : public QWidget, public journallingObject
+vstControlDialog::vstControlDialog( QWidget * _parent, 
+						vstEffect * _eff ) :
+	effectControlDialog( _parent, _eff ),
+	m_effect( _eff )
 {
-	Q_OBJECT
-public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
-	virtual ~effectControlDialog();
-
-	virtual ch_cnt_t getControlCount( void ) = 0;
-
-
-signals:
-	void closed();
-
-
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
+	QVBoxLayout * l = new QVBoxLayout( this );
+	QWidget * pw = m_effect->m_plugin->pluginWidget();
+	if( pw )
 	{
-		return( dynamic_cast<T *>( m_effect ) );
+		pw->reparent( this, QPoint( 0, 0 ) );
+		pw->show();
+		l->addWidget( pw );
 	}
+}
 
 
-private:
-	effect * m_effect;
 
-} ;
 
-#endif
+vstControlDialog::~vstControlDialog()
+{
+	QWidget * pw = m_effect->m_plugin->pluginWidget();
+	if( pw )
+	{
+		pw->reparent( parentWidget(), QPoint( 0, 0 ) );
+	}
+}
+
+
+
+
+void FASTCALL vstControlDialog::saveSettings( QDomDocument & _doc, 
+							QDomElement & _this )
+{
+	// TODO: save settings of plugin
+}
+
+
+
+
+void FASTCALL vstControlDialog::loadSettings( const QDomElement & _this )
+{
+	// TODO: load settings of plugin
+}
+
+

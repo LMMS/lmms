@@ -1,10 +1,11 @@
 /*
- * ladspa_port_dialog.h - dialog to test a LADSPA plugin
+ * vst_base.cpp - VST-base-code to be used by any LMMS-plugins dealing with VST-
+ *                plugins
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -22,39 +23,25 @@
  *
  */
 
-#ifndef _LADSPA_PORT_DIALOG_H
-#define _LADSPA_PORT_DIALOG_H
 
-#include "qt3support.h"
+#include "plugin.h"
 
 
-#ifdef QT4
-
-#include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
-
-#include "ladspa_2_lmms.h"
-
-
-class ladspaPortDialog : public QDialog, public engineObject
+extern "C"
 {
-	Q_OBJECT
-public:
-	ladspaPortDialog( const ladspa_key_t & _key,
-				engine * _engine );
-	virtual ~ladspaPortDialog();
 
-private:
-	ladspa_key_t m_key;
-	ladspa2LMMS * m_ladspa;
+plugin::descriptor vstbase_plugin_descriptor =
+{
+	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	"VST Base",
+	"library for all LMMS-plugins dealing with VST-plugins",
+	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
+	0x0100,
+	plugin::Library,
+	NULL,
+	NULL
+} ;
 
-};
+}
 
-#endif
 

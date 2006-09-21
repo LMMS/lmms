@@ -25,8 +25,7 @@
 #ifndef _LADSPA_CONTROL_H
 #define _LADSPA_CONTROL_H
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -47,6 +46,8 @@
 #include "track.h"
 #include "knob.h"
 #include "led_checkbox.h"
+#include "ladspa_manager.h"
+
 
 typedef struct portDescription port_desc_t;
 
@@ -110,7 +111,5 @@ private:
 	
 	QMutex m_processLock;
 };
-
-#endif
 
 #endif

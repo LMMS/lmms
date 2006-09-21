@@ -1,3 +1,5 @@
+- try to make vestige-plugin-dlls relative
+- do song-editor-tempo-connection to vst-plugin inside remoteVSTPlugin
 - do not duplicate recorded notes when clicking on them
 - add/remove-steps button in bb-editor for adding/removing according number of steps to/from all patterns of visible beat/baseline
 - replace rest of wizard by simple directory-selection-dialog for working-dir when running the first time

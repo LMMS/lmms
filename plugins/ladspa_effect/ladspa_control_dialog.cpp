@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_control_dialog.cpp - dialog for displaying and editing control port
  *                             values for LADSPA plugins
@@ -25,6 +23,8 @@
  *
  */
 
+
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -280,6 +280,4 @@ void ladspaControlDialog::link( bool _state )
 
 
 #include "ladspa_control_dialog.moc"
-
-#endif
 

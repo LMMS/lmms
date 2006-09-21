@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_manager.cpp - a class to manage loading and instantiation
  *                      of ladspa plugins
@@ -26,10 +24,7 @@
  */
 
 
-#include "ladspa_manager.h"
-
-#ifdef LADSPA_SUPPORT
-
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -51,6 +46,7 @@
 #include <math.h>
 
 #include "config_mgr.h"
+#include "ladspa_manager.h"
 
 
 
@@ -1015,8 +1011,3 @@ bool FASTCALL ladspaManager::cleanup( const ladspa_key_t & _plugin,
 
 #undef value
 
-
-#endif
-
-
-#endif

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_2_lmms.cpp - class that identifies and instantiates LADSPA effects
  *                     for use with LMMS
@@ -25,8 +23,6 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #include "ladspa_2_lmms.h"
 
@@ -141,6 +137,3 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 
 #undef indexOf
 
-#endif
-
-#endif

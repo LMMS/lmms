@@ -30,12 +30,7 @@
 #define _LADSPA_SUBPLUGIN_FEATURES_H
 
 #include "plugin.h"
-#include "ladspa_2_lmms.h"
-
-#ifdef LADSPA_SUPPORT
-
-class QLabel;
-class ladspa2LMMS;
+#include "ladspa_base.h"
 
 
 class ladspaSubPluginDescriptionWidget : public QWidget
@@ -62,7 +57,5 @@ public:
 				plugin::descriptor * _desc, keyList & _kl );
 
 } ;
-
-#endif
 
 #endif

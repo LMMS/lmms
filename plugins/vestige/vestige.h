@@ -89,7 +89,6 @@ protected slots:
 	void openPlugin( void );
 	void toggleGUI( void );
 	void noteOffAll( void );
-	void changeTempo( bpm_t _new_tempo );
 
 
 protected:

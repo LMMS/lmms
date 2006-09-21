@@ -28,10 +28,6 @@
  */
 
 
-#include "ladspa_manager.h"
-
-#ifdef LADSPA_SUPPORT
-
 
 #ifdef QT4
 
@@ -50,7 +46,7 @@
 
 
 #include "ladspa_subplugin_features.h"
-#include "ladspa_base.h"
+#include "ladspa_2_lmms.h"
 #include "mixer.h"
 #include "audio_device.h"
 
@@ -186,7 +182,5 @@ void ladspaSubPluginFeatures::listSubPluginKeys( engine * _eng,
 
 
 #include "ladspa_subplugin_features.moc"
-
-#endif
 
 #endif

@@ -1,6 +1,5 @@
 /*
- * effect_control_dialog.h - base-class for effect-dialogs for displaying and
- *                           editing control port values
+ * vst_effect.h - class for handling VST effect plugins
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,54 +22,67 @@
  *
  */
 
-#ifndef _EFFECT_CONTROL_DIALOG_H
-#define _EFFECT_CONTROL_DIALOG_H
 
-#ifdef QT4
-
-#include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
+#ifndef _VST_EFFECT_H
+#define _VST_EFFECT_H
 
 #include "qt3support.h"
 
-#include "journalling_object.h"
+#ifdef QT4
+
+#include <QtCore/QMutex>
+
+#else
+
+#include <qmutex.h>
+
+#endif
+
+
 #include "effect.h"
+#include "main_window.h"
+#include "lvsl_client.h"
+#include "vst_control_dialog.h"
 
 
-class track;
-
-
-class effectControlDialog : public QWidget, public journallingObject
+class vstEffect : public effect
 {
-	Q_OBJECT
 public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
-	virtual ~effectControlDialog();
+	vstEffect( effect::constructionData * _cdata );
+	virtual ~vstEffect();
 
-	virtual ch_cnt_t getControlCount( void ) = 0;
+	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
+							const fpab_t _frames );
 
-
-signals:
-	void closed();
-
-
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
+	virtual inline QString publicName( void ) const
 	{
-		return( dynamic_cast<T *>( m_effect ) );
+		return( m_plugin->name() );
+	}
+
+	virtual inline effectControlDialog * createControlDialog( track * )
+	{
+		return( new vstControlDialog(
+					eng()->getMainWindow()->workspace(),
+								this ) );
+	}
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "vsteffect" );
 	}
 
 
 private:
-	effect * m_effect;
+	void openPlugin( const QString & _plugin );
+	void closePlugin( void );
+
+	remoteVSTPlugin * m_plugin;
+	QMutex m_pluginMutex;
+	effectKey m_key;
+
+	friend class vstControlDialog;
 
 } ;
+
 
 #endif

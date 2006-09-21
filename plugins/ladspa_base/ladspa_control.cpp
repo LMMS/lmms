@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_control.cpp - widget for controlling a LADSPA port
  *
@@ -24,8 +22,8 @@
  *
  */
 
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
+
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -395,7 +393,3 @@ void FASTCALL ladspaControl::setLink( bool _state )
 
 
 #include "ladspa_control.moc"
-
-#endif
-
-#endif

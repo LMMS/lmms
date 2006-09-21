@@ -27,9 +27,6 @@
 #define _LADSPA_BASE_H
 
 #include "ladspa_manager.h"
-
-#ifdef LADSPA_SUPPORT
-
 #include "plugin.h"
 
 class ladspaControl;
@@ -88,7 +85,5 @@ inline plugin::descriptor::subPluginFeatures::key ladspaKeyToSubPluginKey(
 		QVariant( QStringList() << _key.first << _key.second ) ) );
 }
 
-
-#endif
 
 #endif

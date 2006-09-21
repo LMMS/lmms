@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_port_dialog.cpp - dialog to test a LADSPA plugin
  *
@@ -25,9 +23,6 @@
  */
 
 #include "qt3support.h"
-
-#include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
 
 #ifdef QT4
 
@@ -269,8 +264,7 @@ ladspaPortDialog::~ ladspaPortDialog()
 {
 }
 
+
+
 #include  "ladspa_port_dialog.moc"
 
-#endif
-
-#endif

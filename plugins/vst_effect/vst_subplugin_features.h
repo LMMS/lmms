@@ -1,6 +1,7 @@
 /*
- * effect_control_dialog.h - base-class for effect-dialogs for displaying and
- *                           editing control port values
+ * vst_subplugin_features.h - derivation from
+ *                            plugin::descriptor::subPluginFeatures for
+ *                            hosting VST-plugins
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,54 +24,37 @@
  *
  */
 
-#ifndef _EFFECT_CONTROL_DIALOG_H
-#define _EFFECT_CONTROL_DIALOG_H
 
-#ifdef QT4
+#ifndef _VST_SUBPLUGIN_FEATURES_H
+#define _VST_SUBPLUGIN_FEATURES_H
 
-#include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
-#include "qt3support.h"
-
-#include "journalling_object.h"
 #include "effect.h"
 
 
-class track;
-
-
-class effectControlDialog : public QWidget, public journallingObject
+class vstSubPluginDescriptionWidget : public QWidget
 {
-	Q_OBJECT
 public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
-	virtual ~effectControlDialog();
-
-	virtual ch_cnt_t getControlCount( void ) = 0;
+	vstSubPluginDescriptionWidget( QWidget * _parent, engine * _engine,
+						const effectKey & _key );
 
 
-signals:
-	void closed();
+} ;
 
 
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
-	{
-		return( dynamic_cast<T *>( m_effect ) );
-	}
 
+class vstSubPluginFeatures : public plugin::descriptor::subPluginFeatures
+{
+public:
+	vstSubPluginFeatures( plugin::pluginTypes _type );
 
-private:
-	effect * m_effect;
+	virtual QWidget * createDescriptionWidget( QWidget * _parent,
+							engine * _eng,
+							const key & _key );
+
+	virtual void listSubPluginKeys( engine * _eng,
+				plugin::descriptor * _desc, keyList & _kl );
 
 } ;
 
 #endif
+

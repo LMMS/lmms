@@ -26,9 +26,7 @@
 #ifndef _LADSPA_CONTROL_DIALOG_H
 #define _LADSPA_CONTROL_DIALOG_H
 
-#include "ladspa_manager.h"
-
-#ifdef LADSPA_SUPPORT
+#include "qt3support.h"
 
 #ifdef QT4
 
@@ -41,8 +39,6 @@
 #include <qlayout.h>
 
 #endif
-
-#include "qt3support.h"
 
 #include "effect_control_dialog.h"
 #include "ladspa_control.h"
@@ -97,7 +93,5 @@ private:
 	QHBoxLayout * m_effectLay;
 
 } ;
-
-#endif
 
 #endif

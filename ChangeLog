@@ -1,3 +1,33 @@
+2006-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_effect/Makefile.am:
+	* plugins/vst_effect/logo.png:
+	* plugins/vst_effect/vst_effect.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_control_dialog.h:
+	* plugins/vst_effect/vst_control_dialog.cpp:
+	* plugins/vst_effect/vst_subplugin_features.h:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	added plugin for supporting VST-effects inside LMMS - currently very
+	experimental and incomplete, but it compiles and works somehow ;-)
+
+	* plugins/ladspa_effect/Makefile.am:
+	generating ladspa_effect.moc not needed ynmore
+
+	* plugins/vestige/Makefile.am:
+	- use new vstbase-library
+	- do not link against X11, as not needed anymore
+
+	* plugins/Makefile.am:
+	* plugins/vst_base/Makefile.am:
+	* plugins/vst_base/communication.h:
+	* plugins/vst_base/lvsl_client.h:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_server.c:
+	* plugins/vst_base/vst_base.cpp:
+	moved LVSL-code into separate library for allowing multiple
+	LMMS-plugins to deal with VST-plugins
+
 2006-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/*/*.png:

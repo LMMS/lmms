@@ -22,7 +22,7 @@ CLEANFILES = $(MOC_FILES)
 
 
 
-pkglib_LTLIBRARIES= libladspabase.la
+pkglib_LTLIBRARIES = libladspabase.la
 
 libladspabase_la_SOURCES =	ladspa_base.cpp			\
 				ladspa_port_dialog.cpp		\

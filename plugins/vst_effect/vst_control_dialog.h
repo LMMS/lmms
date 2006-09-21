@@ -1,6 +1,5 @@
 /*
- * effect_control_dialog.h - base-class for effect-dialogs for displaying and
- *                           editing control port values
+ * vst_control_dialog.h - dialog for displaying GUI of VST-effect-plugin
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,53 +22,37 @@
  *
  */
 
-#ifndef _EFFECT_CONTROL_DIALOG_H
-#define _EFFECT_CONTROL_DIALOG_H
+#ifndef _VST_CONTROL_DIALOG_H
+#define _VST_CONTROL_DIALOG_H
 
-#ifdef QT4
-
-#include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
-#include "qt3support.h"
-
-#include "journalling_object.h"
-#include "effect.h"
+#include "effect_control_dialog.h"
 
 
-class track;
+class vstEffect;
 
 
-class effectControlDialog : public QWidget, public journallingObject
+class vstControlDialog : public effectControlDialog
 {
-	Q_OBJECT
 public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
-	virtual ~effectControlDialog();
+	vstControlDialog( QWidget * _parent, vstEffect * _eff );
+	virtual ~vstControlDialog();
 
-	virtual ch_cnt_t getControlCount( void ) = 0;
-
-
-signals:
-	void closed();
-
-
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
+						QDomElement & _parent );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
 	{
-		return( dynamic_cast<T *>( m_effect ) );
+		return( "vstcontrols" );
+	}
+
+	virtual ch_cnt_t getControlCount( void )
+	{
+		return( 1 );
 	}
 
 
 private:
-	effect * m_effect;
+	vstEffect * m_effect;
 
 } ;
 

@@ -37,6 +37,7 @@
 
 #include <qapplication.h>
 #include <qlocale.h>
+#include <qdir.h>
 
 #include "qxembed.h"
 
@@ -85,6 +86,7 @@
 
 
 remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
+	QObject(),
 	engineObject( _engine ),
 	m_failed( TRUE ),
 	m_plugin( _plugin ),
@@ -118,6 +120,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
 		dup2( m_pipes[0][0], 0 );
 		dup2( m_pipes[1][1], 1 );
 		QString lvsl_server_exec = configManager::inst()->pluginDir() +
+							QDir::separator() +
 								"lvsl_server";
 		execlp( lvsl_server_exec.
 #ifdef QT4
@@ -151,9 +154,15 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
 		default: break;
 	}
 	writeValueS<hostLanguages>( hlang );
-	
+
+	QString p = m_plugin;
+	if( QFileInfo( p ).dir().isRelative() )
+	{
+		p = configManager::inst()->vstDir() + QDir::separator() + p;
+	}
+	printf("loading %s\n", p.ascii());
 	writeValueS<Sint16>( VST_LOAD_PLUGIN );
-	writeStringS( m_plugin.
+	writeStringS( p.
 #ifdef QT4
 				toAscii().constData()
 #else
@@ -380,7 +389,7 @@ void remoteVSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 
 
 
-void remoteVSTPlugin::setTempo( const bpm_t _bpm )
+void remoteVSTPlugin::setTempo( bpm_t _bpm )
 {
 	lock();
 	writeValueS<Sint16>( VST_BPM );
@@ -584,4 +593,7 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 	return( cmd );
 }
 
+
+
+#include "lvsl_client.moc"
 

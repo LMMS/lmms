@@ -72,7 +72,8 @@ private:
 	
 	bool m_bypassed;
 	QMutex m_processLock;
-};
+
+} ;
 
 #endif
 

@@ -28,9 +28,8 @@
 
 
 #include "ladspa_manager.h"
-#ifdef LADSPA_SUPPORT
-
 #include "engine.h"
+
 
 class ladspa2LMMS: public ladspaManager
 {
@@ -80,7 +79,5 @@ private:
 	friend class engine;
 
 };
-	
-#endif
 
 #endif
