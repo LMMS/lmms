@@ -327,11 +327,11 @@ bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
 	writeValueS<Sint16>( VST_PROCESS );
 	unlock();
 
+	m_initialized = TRUE;
 	if( _wait )
 	{
 		waitForProcessingFinished( _out_buf );
 	}
-	m_initialized = TRUE;
 	return( TRUE );
 }
 

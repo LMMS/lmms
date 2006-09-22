@@ -1,3 +1,9 @@
+2006-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/lvsl_client.cpp:
+	m_initialized is now set before calling waitForProcessingFinished(),
+	makes VST-effects work
+
 2006-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_effect/Makefile.am:
