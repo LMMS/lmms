@@ -12,8 +12,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspabase"
 
 
 MOC_FILES = 	./ladspa_control.moc			\
-		./ladspa_port_dialog.moc		\
-		./ladspa_subplugin_features.moc
+		./ladspa_port_dialog.moc
 
 BUILT_SOURCES = $(MOC_FILES)
 
@@ -26,7 +25,6 @@ pkglib_LTLIBRARIES = libladspabase.la
 
 libladspabase_la_SOURCES =	ladspa_base.cpp			\
 				ladspa_port_dialog.cpp		\
-				ladspa_subplugin_features.cpp	\
 				ladspa_2_lmms.cpp		\
 				ladspa_manager.cpp		\
 				ladspa_control.cpp		\
@@ -34,6 +32,5 @@ libladspabase_la_SOURCES =	ladspa_base.cpp			\
 				ladspa_2_lmms.h			\
 				ladspa_control.h		\
 				ladspa_port_dialog.h		\
-				ladspa_subplugin_features.h	\
 				ladspa_base.h
 

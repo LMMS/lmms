@@ -178,30 +178,7 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		if( m_plugin->pluginWidget() != NULL )
-		{
-			if( _this.attribute( "guivisible" ).toInt() )
-			{
-				m_plugin->pluginWidget()->show();
-			}
-			else
-			{
-				m_plugin->pluginWidget()->hide();
-			}
-		}
-		const Sint32 num_params = _this.attribute(
-							"numparams" ).toInt();
-		if( num_params > 0 )
-		{
-			QMap<QString, QString> dump;
-			for( Sint32 i = 0; i < num_params; ++i )
-			{
-				const QString key = "param" +
-							QString::number( i );
-				dump[key] = _this.attribute( key );
-			}
-			m_plugin->setParameterDump( dump );
-		}
+		m_plugin->loadSettings( _this );
 	}
 	m_pluginMutex.unlock();
 }
@@ -215,22 +192,7 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		if( m_plugin->pluginWidget() != NULL )
-		{
-			_this.setAttribute( "guivisible",
-					m_plugin->pluginWidget()->isVisible() );
-		}
-		const QMap<QString, QString> & dump = m_plugin->parameterDump();
-		_this.setAttribute( "numparams", dump.size() );
-		for( QMap<QString, QString>::const_iterator it = dump.begin();
-							it != dump.end(); ++it )
-		{
-#ifdef QT4
-			_this.setAttribute( it.key(), it.value() );
-#else
-			_this.setAttribute( it.key(), it.data() );
-#endif
-		}
+		m_plugin->saveSettings( _doc, _this );
 	}
 	m_pluginMutex.unlock();
 }
@@ -255,7 +217,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 		const bool set_ch_name = ( m_plugin != NULL &&
 			getInstrumentTrack()->name() == m_plugin->name() ) ||
 				getInstrumentTrack()->name() ==
-						instrumentTrack::tr( "Default" );
+					instrumentTrack::tr( "Default" );
 		m_pluginMutex.unlock();
 
 		closePlugin();

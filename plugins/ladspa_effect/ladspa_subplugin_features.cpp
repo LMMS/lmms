@@ -178,5 +178,3 @@ void ladspaSubPluginFeatures::listSubPluginKeys( engine * _eng,
 }
 
 
-
-#include "ladspa_subplugin_features.moc"

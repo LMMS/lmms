@@ -68,18 +68,33 @@ vstControlDialog::~vstControlDialog()
 
 
 
+void FASTCALL vstControlDialog::loadSettings( const QDomElement & _this )
+{
+	m_effect->closePlugin();
+	m_effect->openPlugin( _this.attribute( "plugin" ) );
+	m_effect->m_pluginMutex.lock();
+	if( m_effect->m_plugin != NULL )
+	{
+		m_effect->m_plugin->loadSettings( _this );
+	}
+	m_effect->m_pluginMutex.unlock();
+}
+
+
+
+
 void FASTCALL vstControlDialog::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-	// TODO: save settings of plugin
+	_this.setAttribute( "plugin", m_effect->m_key.user.toString() );
+	m_effect->m_pluginMutex.lock();
+	if( m_effect->m_plugin != NULL )
+	{
+		m_effect->m_plugin->saveSettings( _doc, _this );
+	}
+	m_effect->m_pluginMutex.unlock();
 }
 
 
-
-
-void FASTCALL vstControlDialog::loadSettings( const QDomElement & _this )
-{
-	// TODO: load settings of plugin
-}
 
 

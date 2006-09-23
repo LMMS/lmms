@@ -32,11 +32,13 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
+#include <Qt/QtXml>
 
 #else
 
 #include <qstring.h>
 #include <qmutex.h>
+#include <qdom.h>
 
 #endif
 
@@ -44,11 +46,11 @@
 #include "mixer.h"
 #include "communication.h"
 #include "midi.h"
-#include "engine.h"
+#include "journalling_object.h"
 
 
 
-class remoteVSTPlugin : public QObject, public engineObject
+class remoteVSTPlugin : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -112,6 +114,14 @@ public:
 	inline bool failed( void ) const
 	{
 		return( m_failed );
+	}
+
+	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "vstplugin" );
 	}
 
 

@@ -1,12 +1,31 @@
 2006-09-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vst_effect/vst_control_dialog.cpp:
+	save and load settings of VST-effect - with this VST-effect-support is
+	complete for now
+
+	* plugins/vst_base/lvsl_client.h:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vestige/vestige.cpp:
+	moved code from vestigeInstrument::saveSettings() and
+	vestigeInstrument::loadSettings() to remoteVSTPlugin
+
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	changed node-name from "controls" to "ladspacontrols" to be more
+	consistent with naming-conventions
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	moved ladspaSubPluginFeatures-code from LADSPA-base to where it
+	belongs/is used - in LADSPA-effect
+
 	* data/projects/demos/Zvonsully-RaceTheZBeat.mmp:
 	* data/projects/cool_songs/Malex-Horizon4.mmp:
 	added two projects
 
 	* plugins/ladspa_base/ladspa_browser.cpp:
 	* plugins/ladspa_base/ladspa_subplugin_features.cpp:
-	removed #ifdef SINGLE_SOURCE_COMPILE, as this doesn't effect plugins -
+	removed #ifdef SINGLE_SOURCE_COMPILE, as this doesn't affect plugins -
 	fixes bug with undefined symbol in libladspaeffect.so
 
 	* configure.in:

@@ -69,7 +69,7 @@ public:
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "controls" );
+		return( "ladspacontrols" );
 	}
 
 
