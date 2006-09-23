@@ -1,0 +1,4 @@
+?package(lmms):needs="X11" section="Apps/Sound" \
+  title="LMMS" hints="Audio" command="/usr/bin/lmms" \
+  longtitle="Linux MultiMedia Studio" \
+  icon="/usr/share/lmms/themes/default/icon.png"

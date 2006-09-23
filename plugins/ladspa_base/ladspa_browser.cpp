@@ -1,5 +1,4 @@
 #if 0
-#ifndef SINGLE_SOURCE_COMPILE
 
 /*
  * ladspa_browser.h - dialog to display information about installed LADSPA
@@ -305,5 +304,4 @@ void ladspaBrowser::displayHelp( void )
 
 #endif
 
-#endif
 #endif

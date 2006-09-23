@@ -1,3 +1,31 @@
+2006-09-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/projects/demos/Zvonsully-RaceTheZBeat.mmp:
+	* data/projects/cool_songs/Malex-Horizon4.mmp:
+	added two projects
+
+	* plugins/ladspa_base/ladspa_browser.cpp:
+	* plugins/ladspa_base/ladspa_subplugin_features.cpp:
+	removed #ifdef SINGLE_SOURCE_COMPILE, as this doesn't effect plugins -
+	fixes bug with undefined symbol in libladspaeffect.so
+
+	* configure.in:
+	enable VST-support per default
+
+	* include/aeffectx.h:
+	added Javier's header (with dssi-vst-patch)
+
+	* data/lmms:
+	* data/lmms.desktop:
+	* data/Makefile.am:
+	added desktop- and menu-entry-file for LMMS (thanks to Javier for the
+	latter one on debian-list)
+
+2006-09-23	Mikael Freeman <mikael/dot/freeman/at/mac/dot/se>
+
+	* data/locale/sv.ts:
+	added first Swedish translation (very incomplete)
+
 2006-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/lvsl_client.cpp:

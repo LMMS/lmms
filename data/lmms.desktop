@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Linux MultiMedia Studio
+GenericName=software for music-production
+GenericName[de]=Software zur Musik-Produktion
+Comment=easy music-production for everyone!
+Icon=/usr/share/lmms/themes/default/icon.png
+Exec=/usr/bin/lmms
+Terminal=false
+Type=Application
+Encoding=UTF-8
+X-Desktop-File-Install-Version=0.3
+Categories=Application;AudioVideo;Qt

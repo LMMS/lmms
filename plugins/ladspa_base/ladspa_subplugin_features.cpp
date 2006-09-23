@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * ladspa_subplugin_features.cpp - derivation from
  *                                 plugin::descriptor::subPluginFeatures for
@@ -182,5 +180,3 @@ void ladspaSubPluginFeatures::listSubPluginKeys( engine * _eng,
 
 
 #include "ladspa_subplugin_features.moc"
-
-#endif

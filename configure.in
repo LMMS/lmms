@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20060922, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20060922)
+AC_INIT(lmms, 0.2.1-svn20060923, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20060923)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -172,8 +172,8 @@ AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 
 # check for proper WINE-installation and existing Steinberg headers
 AC_ARG_WITH(vst,
-	AS_HELP_STRING([--with-vst],
-			[enable support for builtin VST-plugin-hosting]), [ with_vst=yes ], [ with_vst=no ])
+	AS_HELP_STRING([--without-vst],
+			[enable support for builtin VST-plugin-hosting]), , [ with_vst=yes ])
 AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <aeffectx.h> header file.])
 if test "x$with_vst" = "xyes" ; then
 
@@ -732,7 +732,7 @@ if test "x$with_vst" = "xno" ; then
 	echo " ="
 	echo " = --with-vst"
 	echo " ="
-	echo " = to configure, since it is disabled per default!"
+	echo " = to configure!"
 	echo " ="
 else
 

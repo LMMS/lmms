@@ -221,7 +221,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/visualization_widget.cpp		\
 		$(srcdir)/src/widgets/volume_knob.cpp			\
 		$(srcdir)/src/lmms_single_source.cpp			\
-		$(srcdir)/include/pch.h					\
+		$(srcdir)/include/aeffectx.h				\
 		$(srcdir)/include/debug.h				\
 		$(srcdir)/include/main_window.h				\
 		$(srcdir)/include/audio_alsa.h				\
