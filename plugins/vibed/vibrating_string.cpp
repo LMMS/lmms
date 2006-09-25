@@ -26,7 +26,7 @@
 #include "vibrating_string.h"
 #include "templates.h"
 #include "interpolation.h"
-
+#include "mixer.h"
 
 vibratingString::vibratingString(	float _pitch, 
 					float _pick,
@@ -39,7 +39,7 @@ vibratingString::vibratingString(	float _pitch,
 					float _string_loss,
 					float _detune,
 					bool _state ) :
-	m_oversample( _oversample ),
+	m_oversample( 2 * _oversample / (int)( _sample_rate / SAMPLE_RATES[0] ) ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )
@@ -47,10 +47,10 @@ vibratingString::vibratingString(	float _pitch,
 	m_outsamp = bufferAllocator::alloc<sample_t>( m_oversample );
 	int string_length;
 	
-	string_length = static_cast<int>( m_oversample *_sample_rate /
+	string_length = static_cast<int>( m_oversample * _sample_rate /
 								_pitch ) + 1;
 	string_length += static_cast<int>( string_length * -_detune );
-	
+
 	int pick = static_cast<int>( ceil( string_length * _pick ) );
 	
 	if( not _state )

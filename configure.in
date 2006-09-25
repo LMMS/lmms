@@ -508,7 +508,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/flp_import/Makefile
 		 plugins/ladspa_base/Makefile
 		 plugins/ladspa_effect/Makefile
-		 plugins/ladspa_effect/caps/Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile

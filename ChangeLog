@@ -1,3 +1,13 @@
+2006-09-25	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+	* plugins/vibed/vibrating_string.cpp:
+	2x oversampling in non-hq-mode to get the instument to sound the
+	same in both modes
+	
+	* configure.in:
+	* plugins/ladspa_effect/Makefile.am:
+	removed references to CAPS (sorry about that Toby, but I couldn't get
+	anything to build with them--there's no make info in the CAPS dir)
+
 2006-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_effect/vst_control_dialog.cpp:
