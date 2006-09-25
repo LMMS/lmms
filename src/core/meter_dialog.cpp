@@ -44,7 +44,7 @@
 
 
 meterDialog::meterDialog( QWidget * _parent, track * _track ):
-	QWidget( _parent, "meterDialog" )
+	QWidget( _parent )
 {
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 5 );

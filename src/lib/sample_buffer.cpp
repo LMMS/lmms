@@ -83,7 +83,6 @@
 
 #include "sample_buffer.h"
 #include "interpolation.h"
-#include "paths.h"
 #include "templates.h"
 #include "config_mgr.h"
 #include "endian_handling.h"

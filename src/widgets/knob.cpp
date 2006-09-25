@@ -250,7 +250,7 @@ void knob::valueChange( void )
 	recalcAngle();
 	update();
 	emit valueChanged( value() );
-	emit valueChanged( data() );
+	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
 }
 
 
@@ -490,7 +490,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( value() );
-		emit valueChanged( data() );
+		emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
 		if( !configManager::inst()->value( "knobs",
 						"classicalusability").toInt() )
 		{
@@ -605,7 +605,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( value() );
-	emit valueChanged( data() );
+	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
 }
 
 
@@ -614,7 +614,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 void knob::buttonReleased( void )
 {
 	emit valueChanged( value() );
-	emit valueChanged( data() );
+	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
 }
 
 

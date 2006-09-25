@@ -90,7 +90,12 @@ void vstSubPluginFeatures::listSubPluginKeys( engine * _eng,
 				plugin::descriptor * _desc, keyList & _kl )
 {
 	QStringList dlls = QDir( configManager::inst()->vstDir() ).
+#ifndef QT3
+				entryList( QStringList() << "*.dll",
+						QDir::Files, QDir::Name );
+#else
 				entryList( "*.dll", QDir::Files, QDir::Name );
+#endif
 	// TODO: eval m_type
 	for( QStringList::const_iterator it = dlls.begin();
 							it != dlls.end(); ++it )

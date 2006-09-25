@@ -21,8 +21,11 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef _RACK_VIEW_H
 #define _RACK_VIEW_H
+
+#include "qt3support.h"
 
 #ifdef QT4
 

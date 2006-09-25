@@ -15,7 +15,7 @@ else
 	QTDIR=""
 fi
 for i in $QT_SEARCH ; do
-	QT_INCLUDE_SEARCH="include include/qt include/qt3 include/Qt"
+	QT_INCLUDE_SEARCH="include include/qt include/qt3 include/qt4/Qt include/Qt"
 	for j in $QT_INCLUDE_SEARCH ; do
 	        if test -f $i/$j/qglobal.h -a x$QTDIR = x ; then
 			QTDIR=$i
@@ -80,12 +80,17 @@ if test x"$QT_TRANSLATIONS" = x ; then
 fi
 AC_MSG_RESULT([$QT_TRANSLATIONS])
 
+QTHOSTDIR=/usr
+
 # Check that moc is in path
 AC_CHECK_PROG(MOC, moc, $QTDIR/bin/moc,,$QTDIR/bin/)
 if test x$MOC = x ; then
 	AC_CHECK_PROG(MOC, moc-qt3, $QTDIR/bin/moc-qt3,,$QTDIR/bin/)
 	if test x$MOC = x ; then
-        	AC_MSG_ERROR([*** not found! Make sure you have Qt-devel-tools installed!])
+		AC_CHECK_PROG(MOC, moc-qt4, $QTHOSTDIR/bin/moc-qt4,,$QTHOSTDIR/bin/)
+		if test x$MOC = x ; then
+        		AC_MSG_ERROR([*** not found! Make sure you have Qt-devel-tools installed!])
+		fi
 	fi
 fi
 
@@ -110,7 +115,7 @@ fi
 # Calculate Qt include path
 QT_CXXFLAGS="-I$QT_INCLUDES"
 if test "$QT_MAJOR" = "4" ; then
-	QT_CXXFLAGS="$QT_CXXFLAGS -I$QTDIR/include"
+	QT_CXXFLAGS="$QT_CXXFLAGS -I$QTDIR/include/qt4 -I$QTDIR/include"
 fi
 
 
@@ -138,6 +143,10 @@ case "${host}" in
         fi
         ;;
 
+      *mingw32)
+	QT_IS_MT="yes"
+	QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtGui4 -lQtXml4 -lQt3Support4"
+        ;;
     *)
         QT_IS_STATIC=`ls $QTDIR/lib/*.a 2> /dev/null`
        	if test "x$QT_IS_STATIC" = x; then
@@ -261,7 +270,7 @@ fi
 
 if test x"$QT_IS_MT" = "xyes" ; then
         QT_CXXFLAGS="$QT_CXXFLAGS -D_REENTRANT -DQT_THREAD_SUPPORT"
-	QT_LIBS="$QT_LIBS -lpthread"
+	QT_LIBS="$QT_LIBS"
 fi
 
 if test x"$QT_TRANSLATIONS" != x ; then

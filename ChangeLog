@@ -1,4 +1,12 @@
+2006-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	added missing Makefile.am and re-added CAPS-support
+
 2006-09-25	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* plugins/vibed/vibrating_string.cpp:
 	2x oversampling in non-hq-mode to get the instument to sound the
 	same in both modes
@@ -9,6 +17,34 @@
 	anything to build with them--there's no make info in the CAPS dir)
 
 2006-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* acinclude.m4:
+	* configure.in:
+	* Makefile.am:
+	* include/piano_roll.h:
+	* include/piano_widget.h:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	made LMMS compile with mingw-cross-compiler
+
+	* include/automatable_slider.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* src/core/meter_dialog.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	Qt4-fixes
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* src/lib/sample_buffer.cpp:
+	removed obsolete inclusion of paths.h
+
+	* include/rack_view.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* src/core/effect_control_dialog.cpp:
+	include qt3-support-header first
 
 	* plugins/vst_effect/vst_control_dialog.cpp:
 	do not try to reparent effect's plugin-widget in destructor - fixes

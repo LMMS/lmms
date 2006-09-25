@@ -49,7 +49,6 @@
 #include "song_editor.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
-#include "paths.h"
 #include "interpolation.h"
 #include "buffer_allocator.h"
 #include "pixmap_button.h"

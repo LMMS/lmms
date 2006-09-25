@@ -105,7 +105,9 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
+#ifdef BUILD_LINUX
 	virtual bool x11Event( XEvent * _xe );
+#endif
 
 	int FASTCALL getKey( int _y );
 	static inline void drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,

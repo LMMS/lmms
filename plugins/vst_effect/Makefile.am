@@ -18,7 +18,7 @@ BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
 EMBEDDED_RESOURCES = $(wildcard *png)
 
 ./embedded_resources.h: $(EMBEDDED_RESOURCES)
-	$(top_builddir)/buildtools/bin2res $(EMBEDDED_RESOURCES) > $@
+	$(BIN2RES) $(EMBEDDED_RESOURCES) > $@
 
 EXTRA_DIST = $(EMBEDDED_RESOURCES)
 

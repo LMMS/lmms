@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
-#SUBDIRS = caps
+SUBDIRS = caps
 
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I. -I../ladspa_base/
@@ -20,7 +20,7 @@ BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
 EMBEDDED_RESOURCES = $(wildcard *png)
 
 ./embedded_resources.h: $(EMBEDDED_RESOURCES)
-	$(top_builddir)/buildtools/bin2res $(EMBEDDED_RESOURCES) > $@
+	$(BIN2RES) $(EMBEDDED_RESOURCES) > $@
 
 EXTRA_DIST = $(EMBEDDED_RESOURCES)
 

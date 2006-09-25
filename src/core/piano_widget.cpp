@@ -724,6 +724,7 @@ void pianoWidget::loadSettings( const QDomElement & _this,
 
 
 
+#ifdef BUILD_LINUX
 bool pianoWidget::x11Event( XEvent * _xe )
 {
 	switch( _xe->type )
@@ -734,7 +735,7 @@ bool pianoWidget::x11Event( XEvent * _xe )
 	}
 	return( FALSE );
 }
-
+#endif
 
 
 

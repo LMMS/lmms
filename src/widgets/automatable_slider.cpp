@@ -93,7 +93,7 @@ void automatableSlider::setRange( int _min, int _max )
 void automatableSlider::setValue( int _value )
 {
 	QSlider::setValue( _value );
-	m_knob->setValue( minValue() + maxValue() - _value );
+	m_knob->setValue( minimum() + maximum() - _value );
 }
 
 
@@ -102,7 +102,7 @@ void automatableSlider::setValue( int _value )
 void automatableSlider::setInitValue( int _value )
 {
 	m_knob->setInitValue( _value );
-	QSlider::setValue( minValue() + maxValue() - _value );
+	QSlider::setValue( minimum() + maximum() - _value );
 }
 
 
@@ -185,7 +185,7 @@ void automatableSlider::moveSlider( int _value )
 
 void automatableSlider::updateSlider( void )
 {
-	QSlider::setValue( minValue() + maxValue() - logicValue() );
+	QSlider::setValue( minimum() + maximum() - logicValue() );
 }
 
 

@@ -111,9 +111,9 @@ void mallets::setWidgetBackground( QWidget * _widget, const QString & _pic )
 {
 #ifdef QT4
 	_widget->setAutoFillBackground( TRUE );
-	_widget->QPalette pal;
-	_widget->pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								_pic ) );
+	QPalette pal;
+	pal.setBrush( _widget->backgroundRole(),
+		PLUGIN_NAME::getIconPixmap( _pic.toAscii().constData() ) );
 	_widget->setPalette( pal );
 #else
 	_widget->setErasePixmap( PLUGIN_NAME::getIconPixmap( _pic ) );
@@ -125,7 +125,7 @@ void mallets::setWidgetBackground( QWidget * _widget, const QString & _pic )
 
 QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 {
-	QWidget * widget = new QWidget( _parent, "ModalBar" );
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 		
 	m_hardness = new knob( knobBright_26, widget, tr( "Hardness" ),
@@ -176,7 +176,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 
 QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 {
-	QWidget * widget = new QWidget( _parent, "TubeBellWidget" );
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
 	m_modulator = new knob( knobBright_26, widget, tr( "Modulator" ),
@@ -228,7 +228,7 @@ QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 QWidget * mallets::setupBandedWGControls( QWidget * _parent, track * _track )
 {
 	// BandedWG
-	QWidget * widget = new QWidget( _parent, "BandedWGWidget" );
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
 	m_strike = new ledCheckBox( tr( "Bowed" ), widget, tr( "Bowed" ),
@@ -520,7 +520,11 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir() );
+		Stk::setRawwavePath( configManager::inst()->stkDir()
+#ifndef QT3
+						.toAscii().constData()
+#endif
+									);
 	
 		m_voice = new ModalBar();
 	
@@ -566,7 +570,11 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir() );
+		Stk::setRawwavePath( configManager::inst()->stkDir()
+#ifndef QT3
+						.toAscii().constData()
+#endif
+									);
 	
 		m_voice = new TubeBell();
 	
@@ -610,8 +618,12 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( configManager::inst()->stkDir() );
-	
+		Stk::setRawwavePath( configManager::inst()->stkDir()
+#ifndef QT3
+						.toAscii().constData()
+#endif
+									);
+
 		m_voice = new BandedWG();
 	
 		m_voice->controlChange( 1, 128.0 );

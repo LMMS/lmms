@@ -2670,7 +2670,7 @@ noteVector::iterator pianoRoll::noteIteratorUnderMouse( void )
 
 
 
-
+#ifdef BUILD_LINUX
 bool pianoRoll::x11Event( XEvent * _xe )
 {
 	if( validPattern() )
@@ -2680,7 +2680,7 @@ bool pianoRoll::x11Event( XEvent * _xe )
 	}
 	return( FALSE );
 }
-
+#endif
 
 
 

@@ -81,8 +81,9 @@ public:
 
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
+#ifndef BUILD_WIN32
 	virtual bool x11Event( XEvent * _xe );
-
+#endif
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );

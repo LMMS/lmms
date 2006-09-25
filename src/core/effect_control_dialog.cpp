@@ -26,6 +26,8 @@
  */
 
 
+#include "qt3support.h"
+
 #ifdef QT4
 
 #include <QtGui/QMessageBox>

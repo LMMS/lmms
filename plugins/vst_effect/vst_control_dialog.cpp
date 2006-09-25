@@ -47,7 +47,11 @@ vstControlDialog::vstControlDialog( QWidget * _parent,
 	QWidget * pw = m_effect->m_plugin->pluginWidget();
 	if( pw )
 	{
+#ifndef QT3
+		pw->setParent( this );
+#else
 		pw->reparent( this, QPoint( 0, 0 ) );
+#endif
 		pw->show();
 		l->addWidget( pw );
 	}

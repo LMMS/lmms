@@ -10,9 +10,45 @@ AM_CONFIG_HEADER(config.h)
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_LN_S
 AC_PROG_GCC_TRADITIONAL
-AC_PROG_LIBTOOL
+AM_PROG_LIBTOOL
+
+CFLAGS="$CFLAGS -I${prefix}/include"
+CPPFLAGS="$CPPFLAGS -I${prefix}/include"
+LDFLAGS="$LDFLAGS -L${prefix}/bin"
+
+AH_TEMPLATE(BUILD_LINUX, [Build LMMS for Linux])
+AH_TEMPLATE(BUILD_WIN32, [Build LMMS for Win32])
+AC_ARG_WITH(linux,
+	[  --with-linux		explicit build iTALC for Linux], [ build_linux=true ], [ build_linux=false ])
+AC_ARG_WITH(win32,
+	[  --with-win32		explicit build iTALC for Win32], [ build_win32=true ], [ build_win32=false ])
+AC_MSG_CHECKING([platform to build for])
+if test "x$build_win32" = "xtrue" ; then
+	AC_MSG_RESULT([Win32, will enable support for it])
+	AC_DEFINE(BUILD_WIN32)
+	AC_DEFINE(WIN32)
+	#WIN32_DEFINES="-D_WIN32_WINNT=Windows2000"
+	#AC_SUBST(WIN32_DEFINES)
+	build_linux="false"
+	build_win32="true"
+else
+#	if test `uname -s | tr -s 'LINUX' 'linux'` = "linux" -o "x$build_linux" = "xyes" ; then
+		AC_MSG_RESULT([Linux, will enable support for it])
+		AC_DEFINE(BUILD_LINUX)
+		build_linux="true"
+		build_win32="false"
+#	if uname -s | grep MINGW32 ; then
+#	else
+#		AC_MSG_ERROR([*** non usable found... Run ./configure --help to see a list of available platforms, you can also specify explicit, if your platform was not recognized properly. Otherwise your platform isn't supported yet. In this case please contact the maintainer (see README)])
+	#fi
+fi
+
+AM_CONDITIONAL(BUILD_WIN32, test "$build_win32" = "true")
+AM_CONDITIONAL(BUILD_LINUX, test "$build_linux" = "true")
+
 
 # -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
 #EXTRAFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
@@ -74,7 +110,7 @@ AH_TEMPLATE(SDL_SDL_AUDIO_H, [Define to location of SDL_audio.h])
 AH_TEMPLATE(SDL_SDL_SOUND_H, [Define to location of SDL_sound.h])
 
 OLD_LIBS="$LIBS"
-LIBS="$LIBS -lpthread"
+#LIBS="$LIBS -lpthread"
 
 # check for SDL-lib
 AC_ARG_WITH(sdl,
@@ -99,7 +135,7 @@ AC_ARG_WITH(sdlsound,
 	AS_HELP_STRING([--without-sdlsound],
 			[disable support for reading samples via SDL_sound]), ,
  	[ with_sdlsound=yes ])
-AH_TEMPLATE(HAVE_SDL_SDL_SOUND_H, [Define to 1 if you have the <$SDL_INCL_PATH/SDL_sound.h> header file.])
+AH_TEMPLATE(HAVE_SDL_SDL_SOUND_H, [Define to 1 if you have the <$SDL_INC_PATH/SDL_sound.h> header file.])
 if test "x$with_sdlsound" = "xyes" -a ! -z "$SDL_INC_PATH"; then
 	AC_CHECK_HEADER($SDL_INC_PATH/SDL_sound.h, HAVE_SDL_SDL_SOUND_H="true")
 	AC_CHECK_LIB([SDL_sound], [Sound_Init], HAVE_LIBSDL_SOUND="true", HAVE_SDL_SDL_SOUND_H="")
@@ -187,15 +223,17 @@ if test "x$with_vst" = "xyes" ; then
 	CFLAGS="$ORIG_CFLAGS"
 	CPPFLAGS="$ORIG_CPPFLAGS"
 
-	AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
-	AC_CHECK_LIB([wine], [wine_init])
-	if test ! -z "$WINEGCC" ; then
-		if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
-			WINE_OK_BUT_VST_INCOMPLETE=""
-			AC_DEFINE(HAVE_VST_AEFFECTX_H)
-		else
-			WINE_OK_BUT_VST_INCOMPLETE="true"
-			WINEGCC=""
+	if test "$build_linux" = "true" ; then
+		AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
+		AC_CHECK_LIB([wine], [wine_init])
+		if test ! -z "$WINEGCC" ; then
+			if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
+				WINE_OK_BUT_VST_INCOMPLETE=""
+				AC_DEFINE(HAVE_VST_AEFFECTX_H)
+			else
+				WINE_OK_BUT_VST_INCOMPLETE="true"
+				WINEGCC=""
+			fi
 		fi
 	fi
 	CC="$ORIG_CC"
@@ -444,6 +482,14 @@ else
 fi
 
 
+if [ "$build_win32" = "true" ] ; then
+	BIN2RES=`pwd`/buildtools/bin2res.exe
+else
+	BIN2RES=`pwd`/buildtools/bin2res
+fi
+AC_SUBST(BIN2RES)
+
+
 # check for rpm SOURCES path
 echo -n "checking for rpm sources path... "
 RPMSOURCEDIR="NOT-FOUND"
@@ -508,6 +554,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/flp_import/Makefile
 		 plugins/ladspa_base/Makefile
 		 plugins/ladspa_effect/Makefile
+		 plugins/ladspa_effect/caps/Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile

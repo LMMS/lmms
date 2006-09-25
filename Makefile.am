@@ -117,7 +117,7 @@ BUILT_SOURCES = $(lmms_MOC)
 lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 
 ./embedded_resources.h: $(lmms_EMBEDDED_RESOURCES)
-	$(top_builddir)/buildtools/bin2res $(lmms_EMBEDDED_RESOURCES) > $@
+	$(BIN2RES) $(lmms_EMBEDDED_RESOURCES) > $@
 
 ./embed.o: ./embedded_resources.h
 
@@ -390,7 +390,9 @@ if LADSPA_SUPPORT
 LIB_LADSPABASE_LDADD = -Lplugins/ladspa_base -lladspabase
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_LADSPABASE_LDADD) -ldl
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_LADSPABASE_LDADD)
+if BUILD_LINUX
 lmms_LDFLAGS = -rdynamic
+endif
 #-rpath $(pkglibdir)
 
