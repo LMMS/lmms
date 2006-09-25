@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
+SUBDIRS = caps
+
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I. -I../ladspa_base/
 
@@ -27,7 +29,7 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 
 
-pkglib_LTLIBRARIES= libladspaeffect.la
+pkglib_LTLIBRARIES = libladspaeffect.la
 
 libladspaeffect_la_SOURCES =	ladspa_effect.cpp 		\
 				ladspa_control_dialog.cpp 	\

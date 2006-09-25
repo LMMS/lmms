@@ -1,0 +1,67 @@
+This is caps, the C Audio Plugin Suite
+======================================
+
+Copyright 2002-5 Tim Goetze <tim@quitte.de> and others.
+
+
+License information
+-------------------
+
+See the file "COPYING" for licensing terms & conditions for usage, 
+and a DISCLAIMER OF ALL WARRANTIES.
+
+
+What is this caps thing?
+------------------------
+
+caps is a collection of refined realtime-capable LADSPA audio DSP 
+plugins. It helps your computer sound better.
+
+
+Documentation
+-------------
+
+Please point your browser to the file 'caps.html' in this directory.
+
+
+Web site and latest version
+---------------------------
+
+The latest information and package release reside at
+
+http://quitte.de/dsp/caps.html
+
+
+Installation
+============
+
+At the shell prompt, enter (without the '$' denoting the prompt itself):
+
+$ make
+
+then, as the superuser, enter:
+
+# make install
+
+and you're done. You can now use the plugins in any LADSPA-aware audio
+application. 
+
+Please note that the default installation path is /usr/local/lib/ladspa;
+if you prefer another place, you need to edit the makefile, or install
+manually.
+
+
+Bug reports
+-----------
+
+Bug reports should be sent to <tim@quitte.de>. Please include a detailed
+description of the misbehaviour and instructions on how to reproduce the
+bug.
+
+
+Troubleshooting
+---------------
+
+caps is known to compile well with gnu make, gcc 2.95, 3.3 and 4.0. 
+If you have trouble compiling it, please send mail containing the 
+output of the 'make' command to <tim@quitte.de>.

@@ -58,11 +58,6 @@ vstControlDialog::vstControlDialog( QWidget * _parent,
 
 vstControlDialog::~vstControlDialog()
 {
-	QWidget * pw = m_effect->m_plugin->pluginWidget();
-	if( pw )
-	{
-		pw->reparent( parentWidget(), QPoint( 0, 0 ) );
-	}
 }
 
 

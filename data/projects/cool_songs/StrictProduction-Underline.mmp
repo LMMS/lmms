@@ -1,0 +1,5068 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.2.1-svn20060925" type="song" version="1.0" >
+<head>
+<automation-pattern>
+<bpm>
+<time value="85" pos="0" />
+</bpm>
+<mastervol>
+<time value="100" pos="0" />
+</mastervol>
+<masterpitch>
+<time value="0" pos="0" />
+</masterpitch>
+</automation-pattern>
+</head>
+<song>
+<trackcontainer width="858" x="19" y="33" height="407" type="songeditor" visible="1" >
+<track muted="0" height="32" type="1" >
+<bbtrack icon="" name="Beat" >
+<trackcontainer width="641" x="-8" y="233" height="297" type="bbeditor" visible="1" >
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="253" y="0" height="436" name="kick_hiphop01.ogg" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="100" pos="0" />
+</vol>
+<surpos-x>
+<time value="0" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="0" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="0" looped="0" eframe="0.999444" sframe="0" amp="100" src="drums/kick_hiphop01.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="kick_hiphop01.ogg" pos="0" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="44" len="-64" />
+</pattern>
+<pattern steps="16" muted="0" type="0" name="kick_hiphop01.ogg" pos="64" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="kick_hiphop01.ogg" pos="128" frozen="0" len="64" />
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="440" y="92" height="436" name="snare_hiphop02.ogg" tab="3" visible="1" >
+<automation-pattern>
+<vol>
+<time value="176" pos="0" />
+</vol>
+<surpos-x>
+<time value="0" pos="0" />
+<time value="-1024" pos="20" />
+<time value="-1024" pos="24" />
+<time value="-1024" pos="28" />
+<time value="-1024" pos="32" />
+<time value="-1014" pos="36" />
+<time value="-1024" pos="40" />
+<time value="-1024" pos="44" />
+<time value="-7" pos="48" />
+<time value="1019" pos="52" />
+<time value="1019" pos="56" />
+<time value="1014" pos="60" />
+<time value="-17" pos="64" />
+<time value="-22" pos="68" />
+<time value="-22" pos="72" />
+<time value="-27" pos="76" />
+<time value="-17" pos="80" />
+<time value="-17" pos="84" />
+<time value="-7" pos="88" />
+<time value="-7" pos="92" />
+<time value="-7" pos="96" />
+<time value="2" pos="100" />
+<time value="2" pos="104" />
+<time value="2" pos="108" />
+<time value="2" pos="112" />
+<time value="-2" pos="116" />
+<time value="-2" pos="120" />
+<time value="2" pos="124" />
+<time value="12" pos="128" />
+</surpos-x>
+<surpos-y>
+<time value="0" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="0" looped="0" eframe="0.998898" sframe="0" amp="100" src="drums/snare_hiphop02.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="0" >
+<rack numofeffects="1" >
+<effect key="AAAAAgAAAAIAAAADAAAAbABDAEEAUABTADoAIABQAGwAYQB0AGUAMgB4ADIAIAAtACAAVgBlAHIAcwBhAHQAaQBsAGUAIABwAGwAYQB0AGUAIAByAGUAdgBlAHIAYgAsACAAcwB0AGUAcgBlAG8AIABpAG4AcAB1AHQAcwAAAAQAAAACAAAAEABQAGwAYQB0AGUAMgB4ADIAAAAOAGMAYQBwAHMALgBzAG8=" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
+<ladspacontrols ports="4" >
+<automation-pattern>
+<port02>
+<time value="0.99897" pos="0" />
+</port02>
+<port03>
+<time value="0.23219" pos="0" />
+</port03>
+<port04>
+<time value="0" pos="0" />
+</port04>
+<port05>
+<time value="0.26" pos="0" />
+</port05>
+</automation-pattern>
+</ladspacontrols>
+</effect>
+</rack>
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="snare_hiphop02.ogg" pos="0" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+</pattern>
+<pattern steps="16" muted="0" type="0" name="snare_hiphop02.ogg" pos="64" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="snare_hiphop02.ogg" pos="128" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="44" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="52" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="60" len="-64" />
+</pattern>
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="511" y="0" height="436" name="snare05.ogg" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="200" pos="0" />
+</vol>
+<surpos-x>
+<time value="-32" pos="0" />
+<time value="-47" pos="4" />
+<time value="-52" pos="8" />
+<time value="-22" pos="12" />
+<time value="-32" pos="16" />
+<time value="-32" pos="20" />
+<time value="-32" pos="24" />
+<time value="-32" pos="28" />
+<time value="-32" pos="32" />
+<time value="-32" pos="36" />
+<time value="-32" pos="40" />
+<time value="-22" pos="44" />
+<time value="-12" pos="48" />
+<time value="-32" pos="52" />
+<time value="-32" pos="56" />
+<time value="17" pos="60" />
+<time value="-32" pos="64" />
+<time value="-32" pos="68" />
+<time value="7" pos="72" />
+<time value="-32" pos="76" />
+<time value="-12" pos="80" />
+<time value="-32" pos="84" />
+<time value="-32" pos="88" />
+<time value="-32" pos="92" />
+<time value="52" pos="96" />
+<time value="-32" pos="100" />
+<time value="-42" pos="104" />
+<time value="-32" pos="108" />
+<time value="-52" pos="112" />
+<time value="-42" pos="116" />
+<time value="-42" pos="120" />
+<time value="72" pos="124" />
+<time value="950" pos="128" />
+<time value="945" pos="132" />
+<time value="915" pos="136" />
+<time value="886" pos="140" />
+<time value="718" pos="144" />
+<time value="683" pos="148" />
+<time value="649" pos="152" />
+<time value="-550" pos="156" />
+<time value="-580" pos="160" />
+<time value="-644" pos="164" />
+<time value="-688" pos="168" />
+<time value="-728" pos="172" />
+<time value="-762" pos="176" />
+</surpos-x>
+<surpos-y>
+<time value="-74" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="0" looped="0" eframe="0.997559" sframe="0" amp="100" src="drums/snare05.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="snare05.ogg" pos="0" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="snare05.ogg" pos="64" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="snare05.ogg" pos="128" frozen="0" len="64" />
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="0" y="157" height="436" name="snare07.ogg" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="100" pos="0" />
+</vol>
+<surpos-x>
+<time value="-254" pos="0" />
+<time value="-244" pos="4" />
+<time value="-249" pos="8" />
+<time value="-225" pos="12" />
+<time value="-225" pos="16" />
+<time value="-131" pos="20" />
+<time value="-151" pos="24" />
+<time value="1019" pos="28" />
+<time value="980" pos="32" />
+<time value="896" pos="36" />
+<time value="600" pos="40" />
+<time value="392" pos="44" />
+<time value="-308" pos="48" />
+<time value="-491" pos="52" />
+<time value="-832" pos="56" />
+<time value="-1014" pos="60" />
+<time value="-1019" pos="64" />
+<time value="-57" pos="68" />
+<time value="27" pos="72" />
+<time value="229" pos="76" />
+<time value="373" pos="80" />
+<time value="471" pos="84" />
+<time value="609" pos="88" />
+<time value="649" pos="92" />
+<time value="728" pos="96" />
+<time value="827" pos="100" />
+<time value="896" pos="104" />
+<time value="975" pos="108" />
+<time value="975" pos="112" />
+<time value="1014" pos="116" />
+<time value="1019" pos="120" />
+<time value="846" pos="124" />
+<time value="758" pos="128" />
+<time value="649" pos="132" />
+<time value="501" pos="136" />
+<time value="373" pos="140" />
+<time value="160" pos="144" />
+<time value="-239" pos="148" />
+<time value="-535" pos="152" />
+<time value="-822" pos="156" />
+<time value="-836" pos="160" />
+<time value="-896" pos="164" />
+<time value="-1009" pos="168" />
+<time value="-1004" pos="172" />
+<time value="-1004" pos="176" />
+</surpos-x>
+<surpos-y>
+<time value="574" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="1" looped="0" eframe="0.999863" sframe="0.649978" amp="100" src="drums/snare07.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="snare07.ogg" pos="0" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+</pattern>
+<pattern steps="16" muted="0" type="0" name="snare07.ogg" pos="64" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="snare07.ogg" pos="128" frozen="0" len="64" />
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="449" y="10" height="436" name="hihat_closed02.ogg" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="68" pos="0" />
+</vol>
+<surpos-x>
+<time value="574" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="-24" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="0" looped="0" eframe="0.448467" sframe="0.219609" amp="100" src="drums/hihat_closed02.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="hihat_closed02.ogg" pos="0" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="hihat_closed02.ogg" pos="64" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="36" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+</pattern>
+<pattern steps="16" muted="0" type="0" name="hihat_closed02.ogg" pos="128" frozen="0" len="64" />
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="253" y="0" height="436" name="hihat_closed01.ogg" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="104" pos="0" />
+</vol>
+<surpos-x>
+<time value="-524" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="24" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<audiofileprocessor reversed="0" looped="0" eframe="0.0589431" sframe="0" amp="100" src="drums/hihat_closed01.ogg" />
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="0" name="hihat_closed01.ogg" pos="0" frozen="0" len="64" />
+<pattern steps="16" muted="0" type="0" name="hihat_closed01.ogg" pos="64" frozen="0" len="64" >
+<note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+<note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+</pattern>
+<pattern steps="16" muted="0" type="0" name="hihat_closed01.ogg" pos="128" frozen="0" len="64" />
+</track>
+</trackcontainer>
+</bbtrack>
+<bbtco muted="0" name="Beat/Baseline 0" color="4282417407" pos="0" len="64" />
+<bbtco muted="0" name="Beat/Baseline 0" color="4282417407" pos="64" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="128" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="192" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="256" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="320" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="384" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="448" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="512" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="576" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="640" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="704" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="960" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1024" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1088" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1152" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1216" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1280" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1344" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1408" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1472" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1536" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1600" len="64" />
+<bbtco muted="0" name="Beat" color="4282417407" pos="1664" len="64" />
+</track>
+<track muted="0" height="32" type="1" >
+<bbtrack icon="" name="TrippinHats" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="64" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="192" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="320" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="448" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="576" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="704" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1024" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="960" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1088" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1152" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1216" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1280" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1344" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1408" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1472" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1536" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1600" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1664" len="64" />
+<bbtco muted="0" name="TrippinHats" color="4282417407" pos="1728" len="64" />
+</track>
+<track muted="0" height="32" type="1" >
+<bbtrack icon="" name="Snare" />
+<bbtco muted="0" name="Beat/Baseline 2" color="4282417407" pos="192" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="448" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="704" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="960" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="1216" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="1472" len="64" />
+<bbtco muted="0" name="Snare" color="4282417407" pos="1728" len="64" />
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="388" y="103" height="436" name="Default" tab="0" visible="1" >
+<automation-pattern>
+<vol>
+<time value="26" pos="0" />
+</vol>
+<surpos-x>
+<time value="0" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="0" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<vibedstrings graph0="AACAvwAAfL8AAHi/AAB0vwAAcL8AAGy/AABovwAAZL8AAGC/AABcvwAAWL8AAFS/AABQvwAATL8AAEi/AABEvwAAQL8AADy/AAA4vwAANL8AADC/AAAsvwAAKL8AACS/AAAgvwAAHL8AABi/AAAUvwAAEL8AAAy/AAAIvwAABL8AAAC/AAD4vgAA8L4AAOi+AADgvgAA2L4AANC+AADIvgAAwL4AALi+AACwvgAAqL4AAKC+AACYvgAAkL4AAIi+AACAvgAAcL4AAGC+AABQvgAAQL4AADC+AAAgvgAAEL4AAAC+AADgvQAAwL0AAKC9AACAvQAAQL0AAAC9AACAvAAAAAAAAIA8AAAAPQAAQD0AAIA9AACgPQAAwD0AAOA9AAAAPgAAED4AACA+AAAwPgAAQD4AAFA+AABgPgAAcD4AAIA+AACIPgAAkD4AAJg+AACgPgAAqD4AALA+AAC4PgAAwD4AAMg+AADQPgAA2D4AAOA+AADoPgAA8D4AAPg+AAAAPwAABD8AAAg/AAAMPwAAED8AABQ/AAAYPwAAHD8AACA/AAAkPwAAKD8AACw/AAAwPwAAND8AADg/AAA8PwAAQD8AAEQ/AABIPwAATD8AAFA/AABUPwAAWD8AAFw/AABgPwAAZD8AAGg/AABsPwAAcD8AAHQ/AAB4PwAAfD8=" active0="1" active1="0" active2="0" active3="0" active4="0" active5="0" octave0="2" version="0.1" active6="0" active7="0" active8="0" >
+<automation-pattern>
+<volume0>
+<time value="100" pos="0" />
+</volume0>
+<stiffness0>
+<time value="0" pos="0" />
+</stiffness0>
+<pick0>
+<time value="0" pos="0" />
+</pick0>
+<pickup0>
+<time value="0.05" pos="0" />
+</pickup0>
+<length0>
+<time value="1" pos="0" />
+</length0>
+<pan0>
+<time value="0" pos="0" />
+</pan0>
+<detune0>
+<time value="0" pos="0" />
+</detune0>
+<slap0>
+<time value="0" pos="0" />
+</slap0>
+<impulse0>
+<time value="0" pos="0" />
+</impulse0>
+</automation-pattern>
+</vibedstrings>
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="0" >
+<rack numofeffects="3" >
+<effect key="AAAAAgAAAAIAAAADAAAAGABDAGEAbgB5AG8AbgAgAEQAZQBsAGEAeQAAAAQAAAACAAAAGABjAGEAbgB5AG8AbgBfAGQAZQBsAGEAeQAAAAwAYwBtAHQALgBzAG8=" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
+<ladspacontrols syncmode="0" ports="5" >
+<automation-pattern>
+<port04>
+<time value="460.6" pos="0" />
+</port04>
+<port04_numerator>
+<time value="1" pos="0" />
+</port04_numerator>
+<port04_denominator>
+<time value="1" pos="0" />
+</port04_denominator>
+<port05>
+<time value="0.2" pos="0" />
+</port05>
+<port06>
+<time value="499.8" pos="0" />
+</port06>
+<port06_numerator>
+<time value="1" pos="0" />
+</port06_numerator>
+<port06_denominator>
+<time value="1" pos="0" />
+</port06_denominator>
+<port07>
+<time value="0" pos="0" />
+</port07>
+<port08>
+<time value="2449.51" pos="0" />
+</port08>
+</automation-pattern>
+</ladspacontrols>
+</effect>
+<effect key="AAAAAgAAAAIAAAADAAAAbABDAEEAUABTADoAIABQAGwAYQB0AGUAMgB4ADIAIAAtACAAVgBlAHIAcwBhAHQAaQBsAGUAIABwAGwAYQB0AGUAIAByAGUAdgBlAHIAYgAsACAAcwB0AGUAcgBlAG8AIABpAG4AcAB1AHQAcwAAAAQAAAACAAAAEABQAGwAYQB0AGUAMgB4ADIAAAAOAGMAYQBwAHMALgBzAG8=" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
+<ladspacontrols ports="4" >
+<automation-pattern>
+<port02>
+<time value="0.56161" pos="0" />
+</port02>
+<port03>
+<time value="0.749" pos="0" />
+</port03>
+<port04>
+<time value="0.849575" pos="0" />
+</port04>
+<port05>
+<time value="0.61" pos="0" />
+</port05>
+</automation-pattern>
+</ladspacontrols>
+</effect>
+<effect key="AAAAAgAAAAIAAAADAAAAQABDAEEAUABTADoAIABDAG8AbQBwAHIAZQBzAHMAIAAtACAATQBvAG4AbwAgAGMAbwBtAHAAcgBlAHMAcwBvAHIAAAAEAAAAAgAAABAAQwBvAG0AcAByAGUAcwBzAAAADgBjAGEAcABzAC4AcwBv" autoquit="0" name="ladspaeffect" gate="0" wet="1" on="1" >
+<ladspacontrols syncmode="0" link="1" ports="12" >
+<automation-pattern>
+<port01link>
+<time value="1" pos="0" />
+</port01link>
+<port01>
+<time value="8.64" pos="0" />
+</port01>
+<port02link>
+<time value="1" pos="0" />
+</port02link>
+<port02>
+<time value="9.99" pos="0" />
+</port02>
+<port03link>
+<time value="1" pos="0" />
+</port03link>
+<port03>
+<time value="999" pos="0" />
+</port03>
+<port03_numerator>
+<time value="1" pos="0" />
+</port03_numerator>
+<port03_denominator>
+<time value="1" pos="0" />
+</port03_denominator>
+<port04link>
+<time value="1" pos="0" />
+</port04link>
+<port04>
+<time value="999" pos="0" />
+</port04>
+<port04_numerator>
+<time value="1" pos="0" />
+</port04_numerator>
+<port04_denominator>
+<time value="1" pos="0" />
+</port04_denominator>
+<port05link>
+<time value="1" pos="0" />
+</port05link>
+<port05>
+<time value="399.9" pos="0" />
+</port05>
+<port06link>
+<time value="1" pos="0" />
+</port06link>
+<port06>
+<time value="9.99" pos="0" />
+</port06>
+<port11>
+<time value="8.64" pos="0" />
+</port11>
+<port12>
+<time value="9.99" pos="0" />
+</port12>
+<port13>
+<time value="999" pos="0" />
+</port13>
+<port13_numerator>
+<time value="1" pos="0" />
+</port13_numerator>
+<port13_denominator>
+<time value="1" pos="0" />
+</port13_denominator>
+<port14>
+<time value="999" pos="0" />
+</port14>
+<port14_numerator>
+<time value="1" pos="0" />
+</port14_numerator>
+<port14_denominator>
+<time value="1" pos="0" />
+</port14_denominator>
+<port15>
+<time value="399.9" pos="0" />
+</port15>
+<port16>
+<time value="9.99" pos="0" />
+</port16>
+</automation-pattern>
+</ladspacontrols>
+</effect>
+</rack>
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="1" name="Default" pos="0" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="128" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="768" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="896" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1152" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1024" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1280" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1408" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1536" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1664" frozen="0" len="128" >
+<note tone="0" pan="0" oct="4" vol="100" pos="0" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="0" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="16" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="2" vol="100" pos="32" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="1" vol="100" pos="64" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="2" vol="100" pos="80" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="9" pan="0" oct="2" vol="156" pos="96" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="2" vol="180" pos="112" len="12" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="4" vol="100" pos="112" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="382" y="122" height="436" name="Default" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="34" pos="0" />
+</vol>
+<surpos-x>
+<time value="0" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="0" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<tripleoscillator userwavefile1="" userwavefile2="" userwavefile0="" >
+<automation-pattern>
+<modalgo1>
+<time value="2" pos="0" />
+</modalgo1>
+<modalgo2>
+<time value="2" pos="0" />
+</modalgo2>
+<vol0>
+<time value="33" pos="0" />
+</vol0>
+<pan0>
+<time value="0" pos="0" />
+</pan0>
+<coarse0>
+<time value="0" pos="0" />
+</coarse0>
+<finel0>
+<time value="0" pos="0" />
+</finel0>
+<finer0>
+<time value="0" pos="0" />
+</finer0>
+<phoffset0>
+<time value="0" pos="0" />
+</phoffset0>
+<stphdetun0>
+<time value="0" pos="0" />
+</stphdetun0>
+<wavetype0>
+<time value="0" pos="0" />
+</wavetype0>
+<vol1>
+<time value="33" pos="0" />
+</vol1>
+<pan1>
+<time value="0" pos="0" />
+</pan1>
+<coarse1>
+<time value="0" pos="0" />
+</coarse1>
+<finel1>
+<time value="0" pos="0" />
+</finel1>
+<finer1>
+<time value="0" pos="0" />
+</finer1>
+<phoffset1>
+<time value="0" pos="0" />
+</phoffset1>
+<stphdetun1>
+<time value="0" pos="0" />
+</stphdetun1>
+<wavetype1>
+<time value="0" pos="0" />
+</wavetype1>
+<vol2>
+<time value="33" pos="0" />
+</vol2>
+<pan2>
+<time value="0" pos="0" />
+</pan2>
+<coarse2>
+<time value="0" pos="0" />
+</coarse2>
+<finel2>
+<time value="0" pos="0" />
+</finel2>
+<finer2>
+<time value="0" pos="0" />
+</finer2>
+<phoffset2>
+<time value="0" pos="0" />
+</phoffset2>
+<stphdetun2>
+<time value="0" pos="0" />
+</stphdetun2>
+<wavetype2>
+<time value="0" pos="0" />
+</wavetype2>
+</automation-pattern>
+</tripleoscillator>
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="1" name="Default" pos="0" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="128" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="256" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="384" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="512" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="640" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1024" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="1152" frozen="0" len="128" >
+<note tone="0" pan="0" oct="3" vol="100" pos="0" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="16" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="32" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="40" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="48" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="56" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="3" vol="100" pos="64" len="16" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="80" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="3" vol="100" pos="88" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="5" pan="0" oct="3" vol="100" pos="96" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="2" pan="0" oct="3" vol="100" pos="112" len="8" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+</track>
+<track muted="0" height="32" type="0" >
+<instrumenttrack width="250" x="0" y="0" height="436" name="Default" tab="0" visible="0" >
+<automation-pattern>
+<vol>
+<time value="12" pos="0" />
+</vol>
+<surpos-x>
+<time value="0" pos="0" />
+</surpos-x>
+<surpos-y>
+<time value="0" pos="0" />
+</surpos-y>
+<fxch>
+<time value="0" pos="0" />
+</fxch>
+<basenote>
+<time value="57" pos="0" />
+</basenote>
+</automation-pattern>
+<organic harmonic4="3" harmonic5="4" harmonic6="5" num_osc="8" harmonic7="6" harmonic0="0.5" harmonic1="0.75" harmonic2="1" harmonic3="2" >
+<automation-pattern>
+<foldback>
+<time value="0" pos="0" />
+</foldback>
+<vol>
+<time value="100" pos="0" />
+</vol>
+<vol0>
+<time value="100" pos="0" />
+</vol0>
+<pan0>
+<time value="0" pos="0" />
+</pan0>
+<detune0>
+<time value="0" pos="0" />
+</detune0>
+<wavetype0>
+<time value="0" pos="0" />
+</wavetype0>
+<vol1>
+<time value="100" pos="0" />
+</vol1>
+<pan1>
+<time value="0" pos="0" />
+</pan1>
+<detune1>
+<time value="0" pos="0" />
+</detune1>
+<wavetype1>
+<time value="0" pos="0" />
+</wavetype1>
+<vol2>
+<time value="100" pos="0" />
+</vol2>
+<pan2>
+<time value="0" pos="0" />
+</pan2>
+<detune2>
+<time value="0" pos="0" />
+</detune2>
+<wavetype2>
+<time value="0" pos="0" />
+</wavetype2>
+<vol3>
+<time value="100" pos="0" />
+</vol3>
+<pan3>
+<time value="0" pos="0" />
+</pan3>
+<detune3>
+<time value="0" pos="0" />
+</detune3>
+<wavetype3>
+<time value="0" pos="0" />
+</wavetype3>
+<vol4>
+<time value="100" pos="0" />
+</vol4>
+<pan4>
+<time value="0" pos="0" />
+</pan4>
+<detune4>
+<time value="0" pos="0" />
+</detune4>
+<wavetype4>
+<time value="0" pos="0" />
+</wavetype4>
+<vol5>
+<time value="100" pos="0" />
+</vol5>
+<pan5>
+<time value="0" pos="0" />
+</pan5>
+<detune5>
+<time value="0" pos="0" />
+</detune5>
+<wavetype5>
+<time value="0" pos="0" />
+</wavetype5>
+<vol6>
+<time value="100" pos="0" />
+</vol6>
+<pan6>
+<time value="0" pos="0" />
+</pan6>
+<detune6>
+<time value="0" pos="0" />
+</detune6>
+<wavetype6>
+<time value="0" pos="0" />
+</wavetype6>
+<vol7>
+<time value="100" pos="0" />
+</vol7>
+<pan7>
+<time value="0" pos="0" />
+</pan7>
+<detune7>
+<time value="0" pos="0" />
+</detune7>
+<wavetype7>
+<time value="0" pos="0" />
+</wavetype7>
+</automation-pattern>
+</organic>
+<eldata fwet="0" >
+<automation-pattern>
+<ftype>
+<time value="0" pos="0" />
+</ftype>
+<fcut>
+<time value="14000" pos="0" />
+</fcut>
+<fres>
+<time value="0.5" pos="0" />
+</fres>
+</automation-pattern>
+<elvol syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elvol>
+<elcut syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elcut>
+<elres syncmode="0" userwavefile="" >
+<automation-pattern>
+<pdel>
+<time value="0" pos="0" />
+</pdel>
+<att>
+<time value="0" pos="0" />
+</att>
+<hold>
+<time value="0.5" pos="0" />
+</hold>
+<dec>
+<time value="0.5" pos="0" />
+</dec>
+<sus>
+<time value="0.5" pos="0" />
+</sus>
+<rel>
+<time value="0.1" pos="0" />
+</rel>
+<amt>
+<time value="0" pos="0" />
+</amt>
+<lshp>
+<time value="0" pos="0" />
+</lshp>
+<lpdel>
+<time value="0" pos="0" />
+</lpdel>
+<latt>
+<time value="0" pos="0" />
+</latt>
+<lspd>
+<time value="0.1" pos="0" />
+</lspd>
+<lspd_numerator>
+<time value="1" pos="0" />
+</lspd_numerator>
+<lspd_denominator>
+<time value="1" pos="0" />
+</lspd_denominator>
+<lamt>
+<time value="0" pos="0" />
+</lamt>
+<x100>
+<time value="0" pos="0" />
+</x100>
+<ctlenvamt>
+<time value="0" pos="0" />
+</ctlenvamt>
+</automation-pattern>
+</elres>
+</eldata>
+<arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+<automation-pattern>
+<chord>
+<time value="0" pos="0" />
+</chord>
+<chordrange>
+<time value="1" pos="0" />
+</chordrange>
+<arp>
+<time value="0" pos="0" />
+</arp>
+<arprange>
+<time value="1" pos="0" />
+</arprange>
+<arptime>
+<time value="100" pos="0" />
+</arptime>
+<arptime_numerator>
+<time value="1" pos="0" />
+</arptime_numerator>
+<arptime_denominator>
+<time value="1" pos="0" />
+</arptime_denominator>
+<arpgate>
+<time value="100" pos="0" />
+</arpgate>
+<arpdir>
+<time value="0" pos="0" />
+</arpdir>
+<arpmode>
+<time value="0" pos="0" />
+</arpmode>
+</automation-pattern>
+</arpandchords>
+<midi>
+<automation-pattern>
+<inputchannel>
+<time value="0" pos="0" />
+</inputchannel>
+<outputchannel>
+<time value="1" pos="0" />
+</outputchannel>
+<receive>
+<time value="0" pos="0" />
+</receive>
+<send>
+<time value="0" pos="0" />
+</send>
+<defvelin>
+<time value="0" pos="0" />
+</defvelin>
+<defvelout>
+<time value="0" pos="0" />
+</defvelout>
+</automation-pattern>
+</midi>
+<fx fxdisabled="1" >
+<rack numofeffects="0" />
+</fx>
+</instrumenttrack>
+<pattern steps="16" muted="0" type="1" name="Default" pos="260" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="320" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="448" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="384" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="512" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="576" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="640" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="704" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="768" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="832" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="896" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+<pattern steps="16" muted="0" type="1" name="Default" pos="960" frozen="0" len="64" >
+<note tone="0" pan="0" oct="4" vol="100" pos="8" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="22" pos="12" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="7" pan="0" oct="3" vol="100" pos="24" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="40" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="26" pos="44" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="4" pan="0" oct="4" vol="100" pos="48" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+<note tone="0" pan="0" oct="4" vol="100" pos="56" len="4" >
+<automation-pattern>
+<detuning>
+<time value="0" pos="0" />
+</detuning>
+</automation-pattern>
+</note>
+</pattern>
+</track>
+</trackcontainer>
+<pianoroll width="640" x="58" y="119" height="480" visible="0" />
+<automation-editor width="640" x="5" y="63" height="480" visible="0" />
+<projectnotes width="483" x="0" y="180" height="249" visible="1" ><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:10pt;font-family:Sans Serif">
+<p>@Copyright StrictProduction</p>
+<p>contact rapprerul2000@yahoo.com</p>
+<p>Just an little chill rap track made in </p>
+<p>LMMS (With lots of saving (uhh!))</p>
+<p>More to come :) press the hy quality Button!</p>
+</body></html>
+]]></projectnotes>
+<timeline lp1pos="1792" lp0pos="0" lpstate="1" />
+</song>
+</multimediaproject>

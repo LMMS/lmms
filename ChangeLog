@@ -1,3 +1,26 @@
+2006-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_effect/vst_control_dialog.cpp:
+	do not try to reparent effect's plugin-widget in destructor - fixes
+	crash when deleting vst-effect from effect-chain
+
+	* src/lib/mmp.cpp:
+	do not indent mmp-files anymore as it wastes *a lot* of unneccesary
+	space
+
+	* data/projects/cool_songs/StrictProduction-Underline.mmp:
+	added another cool project
+
+	* plugins/ladspa_base/ladspa_manager.cpp:
+	- always add /usr/lib/ladspa and /usr/local/lib/ladspa to directories
+	  where to search for LADSPA-plugins
+	- also search in /usr/lib/lmms/ladspa for LADSPA-plugins (that's where
+	  for example CAPS is installed)
+
+	* plugins/ladspa_effect/caps/:
+	added CAPS (C Audio Plugin Suite) for providing a basic LADSPA-plugin-
+	collection
+
 2006-09-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_effect/vst_control_dialog.cpp:

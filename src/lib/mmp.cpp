@@ -263,7 +263,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 	}
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString(
 #if QT_VERSION >= 0x030100
-								2
+								0
 #endif
 									);
 #ifdef QT4

@@ -63,12 +63,13 @@ ladspaManager::ladspaManager( engine * _engine )
 					configManager::inst()->ladspaDir() );
 #endif
 	
-	// set default-directory if nothing is specified...
+	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
+/*	// set default-directory if nothing is specified...
 	if( ladspaDirectories.isEmpty() )
-	{
+	{*/
 		ladspaDirectories.push_back( "/usr/lib/ladspa" );
 		ladspaDirectories.push_back( "/usr/local/lib/ladspa" );
-	}
+//	}
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
 		    it != ladspaDirectories.end(); ++it )
 	{
