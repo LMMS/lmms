@@ -1,3 +1,19 @@
+2006-09-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/locale/de.ts:
+	updated German translation (still incomplete (mainly for
+	mallets-plugin))
+
+	* lmms.1:
+	updated manpage (added link to Wiki and updated description)
+
+	* configure.in:
+	* include/ladspa-1.1.h:
+	* plugins/ladspa_base/ladspa_manager.h:
+	added the latest LADSPA-header to be shipped with LMMS for always
+	building LMMS with LADSPA-support, even if no ladspa.h was found on
+	system (still causes warning)
+
 2006-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

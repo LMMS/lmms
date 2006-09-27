@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20060925, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20060925)
+AC_INIT(lmms, 0.2.1-svn20060928, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20060928)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -251,10 +251,12 @@ if test "x$with_ladspa" = "xyes" ; then
 fi
 if test ! -z "$HAVE_LADSPA_H" ; then
 	AC_DEFINE(HAVE_LADSPA_H)
+fi
+if [ "$build_linux" = "true" ] ; then
 	AC_DEFINE(LADSPA_SUPPORT)
 fi
 #AM_CONDITIONAL(HAVE_LADSPA_H, test ! -z "$HAVE_LADSPA_H")
-AM_CONDITIONAL(LADSPA_SUPPORT, test ! -z "$HAVE_LADSPA_H")
+AM_CONDITIONAL(LADSPA_SUPPORT, test "$build_linux" = "true" )
 
 
 # check for STK
@@ -703,37 +705,33 @@ fi
 
 
 
-if test -z "$HAVE_LADSPA_H" ; then
+if test "$build_linux" = "true" ; then
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA-plugins"
+	if test -z "$HAVE_LADSPA_H" ; then
+		echo " ========================"
+		echo " ===  LMMS - WARNING  ======================================================="
+		echo " ========================"
+		echo " ="
+		echo " = As the header file ladspa.h could not be found on your system, a version"
+		echo " = shipped with LMMS will be used. This is no problem at all but generally"
+		echo " = it's better to use files being customized to your system/distribution."
+		echo " = If you encounter problems related to LADSPA-support, try to install"
+		echo " = LADSPA-SDK-package (ladspa-sdk, ladspa-dev or similiar) and run configure"
+		echo " = again."
+		echo " ="
+		with_warnings="true"
+	fi
+else
 	echo " ========================"
 	echo " ===  LMMS - WARNING  ======================================================="
 	echo " ========================"
 	echo " ="
-	echo " = You don't seem to have installed LADSPA-SDK which is neccessary for"
-	echo " = building LMMS with LADSPA support. LADSPA-support is very useful"
-	echo " = as you're able to use a lot of LADSPA-effects inside LMMS."
-	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " = You're building LMMS for a platform other than Linux which will prevent"
+	echo " = configure from enabling LADSPA-support."
 	echo " ="
 	with_warnings="true"
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA-effect-hoster"
 fi
 
-
-#if test -z "$HAVE_LADSPA_H" ; then
-#	echo " ========================"
-#	echo " ===  LMMS - WARNING  ======================================================="
-#	echo " ========================"
-#	echo " ="
-#	echo " = If you want support for LADSPA based effects, please pass"
-#	echo " = "
-#	echo " = --with-ladspa"
-#	echo " = "
-#	echo " = to configure, LADSPA support is still experimental."
-#	echo " ="
-#	with_warnings="true"
-#else
-#	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA for effects processing"
-#fi
 
 
 if test -z "$HAVE_STK_H" ; then

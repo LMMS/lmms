@@ -33,8 +33,11 @@
 #endif
 
 #ifdef HAVE_LADSPA_H
-
 #include <ladspa.h>
+#else
+#include "ladspa-1.1.h"
+#endif
+
 
 #include "qt3support.h"
 
@@ -367,7 +370,5 @@ private:
 	friend class engine;
 
 } ;
-
-#endif
 
 #endif

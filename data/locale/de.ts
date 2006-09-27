@@ -760,35 +760,35 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichnen-Modus (Umschalt+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Radier-Modus (Umschalt+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl-Modus (Umschalt+S)</translation>
     </message>
     <message>
         <source>Move selection mode (Shift+M)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl-Verschieben-Modus (Umschalt+M)</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
 </context>
 <context>
@@ -1825,6 +1825,53 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
 </context>
 <context>
+    <name>ladspaBrowser</name>
+    <message>
+        <source>LADSPA Plugin Browser</source>
+        <translation>LADSPA-Plugin Browser</translation>
+    </message>
+    <message>
+        <source>Available Effects</source>
+        <translation>Verfügbare Effekte</translation>
+    </message>
+    <message>
+        <source>Unavailable Effects</source>
+        <translation>Nicht verfügbare Effekte</translation>
+    </message>
+    <message>
+        <source>Instruments</source>
+        <translation>Instrumente</translation>
+    </message>
+    <message>
+        <source>Analysis Tools</source>
+        <translation>Analysewerkzeuge</translation>
+    </message>
+    <message>
+        <source>Don&apos;t know</source>
+        <translation>Weiß nicht</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate.  The plugins are divided into five categories based upon an interpretation of the port types and names.
+
+Available Effects are those that can be used by LMMS.  In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels.  LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name.  Output channels are identified by the letters &apos;out&apos;.  Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
+
+Unavailable Effects are those that were identified as effects, but either didn&apos;t have the same number of input and output channels or weren&apos;t real time capable.
+
+Instruments are plugins for which only output channels were identified.
+
+Analysis Tools are plugins for which only input channels were identified.
+
+Don&apos;t Knows are plugins for which no input or output channels were identified.
+
+Double clicking any of the plugins will bring up information on the ports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ladspaControl</name>
     <message>
         <source>Link channels</source>
@@ -1898,11 +1945,11 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
     <message>
         <source>Toggled</source>
-        <translation type="unfinished"></translation>
+        <translation>Umgeschaltet</translation>
     </message>
     <message>
         <source>Integer</source>
-        <translation>Gannzahl</translation>
+        <translation>Ganzahl</translation>
     </message>
     <message>
         <source>Float</source>
@@ -2195,195 +2242,195 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <name>mallets</name>
     <message>
         <source>Spread</source>
-        <translation type="unfinished"></translation>
+        <translation>Weite</translation>
     </message>
     <message>
         <source>Spread:</source>
-        <translation type="unfinished"></translation>
+        <translation>Weite:</translation>
     </message>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation>Härte</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished"></translation>
+        <translation>Härte:</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Position</translation>
     </message>
     <message>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Position:</translation>
     </message>
     <message>
         <source>Vibrato Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Vibrato Gain</translation>
     </message>
     <message>
         <source>Vib Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Vib Gain</translation>
     </message>
     <message>
         <source>Vib Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vib Gain:</translation>
     </message>
     <message>
         <source>Vibrato Freq</source>
-        <translation type="unfinished"></translation>
+        <translation>Vibrato-Freq</translation>
     </message>
     <message>
         <source>Vib Freq</source>
-        <translation type="unfinished"></translation>
+        <translation>Vib-Freq</translation>
     </message>
     <message>
         <source>Vib Freq:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vib-Freq:</translation>
     </message>
     <message>
         <source>Stick Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Stick Mix</translation>
     </message>
     <message>
         <source>Stick Mix:</source>
-        <translation type="unfinished"></translation>
+        <translation>Stick Mix:</translation>
     </message>
     <message>
         <source>Modulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulator</translation>
     </message>
     <message>
         <source>Modulator:</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulator:</translation>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>Crossfade</translation>
     </message>
     <message>
         <source>Crossfade:</source>
-        <translation type="unfinished"></translation>
+        <translation>Crossfade:</translation>
     </message>
     <message>
         <source>LFO Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO-Geschwindigkeit</translation>
     </message>
     <message>
         <source>LFO Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO-Geschwindigkeit:</translation>
     </message>
     <message>
         <source>LFO Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO-Tiefe</translation>
     </message>
     <message>
         <source>LFO Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO-Tiefe:</translation>
     </message>
     <message>
         <source>ADSR</source>
-        <translation type="unfinished"></translation>
+        <translation>ADSR</translation>
     </message>
     <message>
         <source>ADSR:</source>
-        <translation type="unfinished"></translation>
+        <translation>ADSR:</translation>
     </message>
     <message>
         <source>Bowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestrichen</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>Druck</translation>
     </message>
     <message>
         <source>Pressure:</source>
-        <translation type="unfinished"></translation>
+        <translation>Druck:</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewegung</translation>
     </message>
     <message>
         <source>Motion:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewegung:</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschwindigkeit</translation>
     </message>
     <message>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschwindigkeit:</translation>
     </message>
     <message>
         <source>Vibrato</source>
-        <translation type="unfinished"></translation>
+        <translation>Vibrato</translation>
     </message>
     <message>
         <source>Vibrato:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vibrato:</translation>
     </message>
     <message>
         <source>Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>Instrument</translation>
     </message>
     <message>
         <source>Marimba</source>
-        <translation type="unfinished"></translation>
+        <translation>Marimba</translation>
     </message>
     <message>
         <source>Vibraphone</source>
-        <translation type="unfinished"></translation>
+        <translation>Vibraphon</translation>
     </message>
     <message>
         <source>Agogo</source>
-        <translation type="unfinished"></translation>
+        <translation>Agogo</translation>
     </message>
     <message>
         <source>Wood1</source>
-        <translation type="unfinished"></translation>
+        <translation>Holz 1</translation>
     </message>
     <message>
         <source>Reso</source>
-        <translation type="unfinished"></translation>
+        <translation>Reso</translation>
     </message>
     <message>
         <source>Wood2</source>
-        <translation type="unfinished"></translation>
+        <translation>Holz 2</translation>
     </message>
     <message>
         <source>Beats</source>
-        <translation type="unfinished"></translation>
+        <translation>Beats</translation>
     </message>
     <message>
         <source>Two Fixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Two Fixed</translation>
     </message>
     <message>
         <source>Clump</source>
-        <translation type="unfinished"></translation>
+        <translation>Clump</translation>
     </message>
     <message>
         <source>Tubular Bells</source>
-        <translation type="unfinished"></translation>
+        <translation>Glocken in Röhre</translation>
     </message>
     <message>
         <source>Uniform Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Uniform Bar</translation>
     </message>
     <message>
         <source>Tuned Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuned Bar</translation>
     </message>
     <message>
         <source>Glass</source>
-        <translation type="unfinished"></translation>
+        <translation>Glas</translation>
     </message>
     <message>
         <source>Tibetan Bowl</source>
-        <translation type="unfinished"></translation>
+        <translation>Tibetanische Schüssel</translation>
     </message>
 </context>
 <context>
@@ -2742,35 +2789,35 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichnen-Modus (Umschalt+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
+        <translation>Radier-Modus (Umschalt+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl-Modus (Umschalt+S)</translation>
     </message>
     <message>
         <source>Move selection mode (Shift+M)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl-Verschieben-Modus (Umschalt+M)</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
 </context>
 <context>
@@ -2863,11 +2910,15 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished"></translation>
+        <translation>Gegenstände, die nach etwas klingen, wenn man drauf rumkloppt</translation>
     </message>
     <message>
         <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
         <translation>Plugin, um beliebige LADSPA-Effekte in LMMS nutzen zu können.</translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary VST-effects inside LMMS.</source>
+        <translation>Plugin um beliebige VST-Effekte in LMMS nutzen zu können.</translation>
     </message>
 </context>
 <context>
@@ -3017,7 +3068,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
     </message>
     <message>
         <source>Decay</source>
@@ -3029,7 +3080,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
-        <translation type="unfinished"></translation>
+        <translation>  Der Abfallzeit-Knopf kontrolliert wie viele Puffer mit Stille durchgelaufen sein müssen, bis das Plugin mit der Verarbeitung stoppt. Kleinere Werte reduzieren den CPU-Overhead, können jedoch unter Umständen das Ende von Delay-Effekten usw. abschneiden.</translation>
     </message>
     <message>
         <source>Gate</source>
@@ -3041,7 +3092,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Gate-Knopf legt die Stärke des Signals fest, welches als Stille angesehen wird, um zu entscheiden, wann das Plugin mit der Verarbeitung aufhören kann.</translation>
     </message>
     <message>
         <source>Controls</source>
@@ -3078,6 +3129,27 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
+    </message>
+</context>
+<context>
+    <name>remoteVSTPlugin</name>
+    <message>
+        <source>Loading plugin</source>
+        <translation>Lade Plugin</translation>
+    </message>
+    <message>
+        <source>Please wait while loading VST-plugin...</source>
+        <translation>Bitte warten, während das VST-Plugin geladen wird...</translation>
+    </message>
+    <message>
+        <source>Failed loading VST-plugin</source>
+        <translation>Laden des VST-Plugins fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>The VST-plugin %1 could not be loaded for some reason.
+If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation>Das VST-Plugin %1 konnte aus irgendeinem Grund nicht geladen werden.
+Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitte einen LMMS-Entwickler!</translation>
     </message>
 </context>
 <context>
@@ -3319,6 +3391,24 @@ Latenz: %2 ms</translation>
     <message>
         <source>Choose STK rawwave directory</source>
         <translation>Wählen Sie Ihr STK-RawWave-Verzeichnis</translation>
+    </message>
+    <message>
+        <source>SMP support</source>
+        <translation>SMP-Unterstützung</translation>
+    </message>
+    <message>
+        <source>Parallelizing level</source>
+        <translation>Parallelisierungs-Level</translation>
+    </message>
+    <message>
+        <source>SMP-level</source>
+        <translation>SMP-Level</translation>
+    </message>
+    <message>
+        <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
+Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
+        <translation>Wenn Sie einen Computer mit mehr als einem Prozessor besitzen (z.B. Dual-Core-Systeme), sollten Sie einen Parallelisierungs-Level größer 1 wählen. Das bedeutet, dass LMMS versuchen wird, die Sound-Verarbeitung in mehrere Threads aufzuteilen, welche dann vom Betriebsystem auf unterschiedlichen Kernen ausgeführt werden sollten.
+Bitte beachten Sie, dass in einigen Fällen Parallelisierung nicht mit kleinen Puffergrößen funktionieren wird. Wenn Probleme auftreten (z.B. viele XRuns), versuchen Sie die Puffergröße zu erhöhen.</translation>
     </message>
 </context>
 <context>
@@ -4269,6 +4359,21 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
+    </message>
+</context>
+<context>
+    <name>vstSubPluginDescriptionWidget</name>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <source>Name: </source>
+        <translation> Name:</translation>
+    </message>
+    <message>
+        <source>File: </source>
+        <translation> Datei:</translation>
     </message>
 </context>
 </TS>
