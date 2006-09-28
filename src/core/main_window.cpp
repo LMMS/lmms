@@ -132,7 +132,7 @@ mainWindow::mainWindow( engine * _engine ) :
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factoryProjectsDir() + "*" +
 				configManager::inst()->userProjectsDir(),
-						"*.mmp *.xml *.mid *.flp",
+					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
 							splitter, eng() ),
@@ -710,10 +710,10 @@ void mainWindow::openProject( void )
 	{
 #ifdef QT4
 		QFileDialog ofd( this, tr( "Open project" ), "",
-				tr( "MultiMedia Project (*.mmp *.xml)" ) );
+			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
 #else
 		QFileDialog ofd( QString::null,
-				tr( "MultiMedia Project (*.mmp *.xml)" ),
+			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ),
 							this, "", TRUE );
 		ofd.setWindowTitle( tr( "Open project" ) );
 #endif
@@ -751,11 +751,11 @@ bool mainWindow::saveProjectAs( void )
 {
 #ifdef QT4
 	QFileDialog sfd( this, tr( "Save project" ), "",
-				tr( "MultiMedia Project (*.mmp);;"
+			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
 #else
 	QFileDialog sfd( QString::null,
-				tr( "MultiMedia Project (*.mmp);;"
+			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 					"MultiMedia Project Template (*.mpt)" ),
 							this, "", TRUE );
 	sfd.setWindowTitle( tr( "Save project" ) );

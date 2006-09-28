@@ -113,6 +113,8 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 						"nomsgaftersetup" ).toInt() ),
 	m_displaydBV( configManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
+	m_noMMPZ( configManager::inst()->value( "app",
+						"nommpz" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
@@ -198,7 +200,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 128 );
+	misc_tw->setFixedHeight( 150 );
 
 	ledCheckBox * disable_tooltips = new ledCheckBox(
 					tr( "Disable tooltips (no spurious "
@@ -256,6 +258,16 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	dbv->setChecked( m_displaydBV );
 	connect( dbv, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisplaydBV( bool ) ) );
+
+
+	ledCheckBox * no_mmpz = new ledCheckBox(
+			tr( "Do not compress project files per default" ),
+						misc_tw, NULL, eng(), NULL );
+	no_mmpz->move( 10, 126 );
+	no_mmpz->setChecked( m_noMMPZ );
+	connect( no_mmpz, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleNoMMPZ( bool ) ) );
+
 
 	gen_layout->addWidget( bufsize_tw );
 	gen_layout->addSpacing( 10 );
@@ -741,6 +753,8 @@ void setupDialog::accept( void )
 				QString::number( m_noMsgAfterSetup ) );
 	configManager::inst()->setValue( "app", "displaydbv",
 				QString::number( m_displaydBV ) );
+	configManager::inst()->setValue( "app", "nommpz",
+				QString::number( m_noMMPZ ) );
 	configManager::inst()->setValue( "ui",
 					"disablechannelactivityindicators",
 					QString::number( m_disableChActInd ) );
@@ -883,6 +897,14 @@ void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
 void setupDialog::toggleDisplaydBV( bool _enabled )
 {
 	m_displaydBV = _enabled;
+}
+
+
+
+
+void setupDialog::toggleNoMMPZ( bool _enabled )
+{
+	m_noMMPZ = _enabled;
 }
 
 

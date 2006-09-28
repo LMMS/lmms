@@ -101,6 +101,7 @@ private slots:
 	void toggleNoWizard( bool _enabled );
 	void toggleNoMsgAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
+	void toggleNoMMPZ( bool _enabled );
 
 	void openWorkingDir( void );
 	void openVSTDir( void );
@@ -127,6 +128,7 @@ private:
 	bool m_noWizard;
 	bool m_noMsgAfterSetup;
 	bool m_displaydBV;
+	bool m_noMMPZ;
 
 
 	QLineEdit * m_wdLineEdit;

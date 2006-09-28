@@ -41,12 +41,12 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
+#endif 
 
 
 #include "mmp.h"
 #include "song_editor.h"
-
+#include "config_mgr.h"
 
 
 multimediaProject::typeDescStruct
@@ -126,7 +126,18 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 	int col;
 	if( _is_filename == TRUE )
 	{
-		if( !setContent( &in_file, &error_msg, &line, &col ) )
+		bool error = FALSE;
+		if( _in_file_name.section( '.', -1 ) == "mmpz" )
+		{
+			QString data = qUncompress( in_file.readAll() );
+			error = !setContent( data, &error_msg, &line, &col );
+		}
+		else
+		{
+			error = !setContent( &in_file, &error_msg, &line,
+									&col );
+		}
+		if( error )
 		{
 			QMessageBox::critical( NULL, songEditor::tr( "Error in "
 							"multimedia-project" ),
@@ -188,6 +199,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 {
 	bool clean_meta_nodes = FALSE;
 	QString fn = _fn;
+	bool compress = FALSE;
 	if( type() == INSTRUMENT_TRACK_SETTINGS )
 	{
 		if( fn.section( '.', -2, -1 ) != "cs.xml" )
@@ -199,9 +211,23 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 	else if( type() == SONG_PROJECT )
 	{
 		if( fn.section( '.', -1 ) != "mmp" &&
-						fn.section( '.', -1 ) != "mpt" )
+				fn.section( '.', -1 ) != "mpt" &&
+				fn.section( '.', -1 ) != "mmpz" )
 		{
-			fn += ".mmp";
+			compress = configManager::inst()->value( "app",
+						"nommpz" ).toInt() == 0;
+			if( compress )
+			{
+				fn += ".mmpz";
+			}
+			else
+			{
+				fn += ".mmp";
+			}
+		}
+		else
+		{
+			compress = ( fn.section( '.', -1 ) == "mmpz" );
 		}
 		clean_meta_nodes = TRUE;
 	}
@@ -263,15 +289,27 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 	}
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString(
 #if QT_VERSION >= 0x030100
-								0
+								1
 #endif
 									);
-#ifdef QT4
-	outfile.write( xml.toUtf8().constData(), xml.length() );
+	if( compress )
+	{
+#ifndef QT3
+		outfile.write( qCompress( xml.toAscii() ) );
 #else
-	QCString xml_utf8 = xml.utf8();
-	outfile.writeBlock( xml_utf8.data(), xml_utf8.length() );
+		outfile.writeBlock( qCompress(
+				(const uchar *) xml.ascii(), xml.length() ) );
 #endif
+	}
+	else
+	{
+#ifdef QT4
+		outfile.write( xml.toUtf8().constData(), xml.length() );
+#else
+		QCString xml_utf8 = xml.utf8();
+		outfile.writeBlock( xml_utf8.data(), xml_utf8.length() );
+#endif
+	}
 	outfile.close();
 
 	return( TRUE );

@@ -1,5 +1,13 @@
 2006-09-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/setup_dialog.h:
+	* src/core/main_window.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/lib/mmp.cpp:
+	added support for compressed project ("mmpz"-extension), files are
+	compressed if extension given to multimediaProject::writeFile() is
+	mmpz or (if none given) user enabled compression as default
+
 	* data/locale/de.ts:
 	updated German translation (still incomplete (mainly for
 	mallets-plugin))

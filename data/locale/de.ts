@@ -2181,7 +2181,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation>MultiMedia-Projekt (*.mmp *.xml)</translation>
+        <translation type="obsolete">MultiMedia-Projekt (*.mmp *.xml)</translation>
     </message>
     <message>
         <source>Save project</source>
@@ -2189,7 +2189,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation>MultiMedia-Projekt (*.mmp);;MultiMedia-Projekt-Vorlage (*.mpt)</translation>
+        <translation type="obsolete">MultiMedia-Projekt (*.mmp);;MultiMedia-Projekt-Vorlage (*.mpt)</translation>
     </message>
     <message>
         <source>Help not available</source>
@@ -2236,6 +2236,14 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>LADSPA Plugins...</source>
         <translation>LADSPA-Plugins...</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
+        <translation>MultiMedia Projekt (*.mmp *.mmpz *.xml)</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
+        <translation>MultiMedia Projekt (*.mmp *.mmpz);;MultiMedia Projekt-Vorlage (*.mpt)</translation>
     </message>
 </context>
 <context>
@@ -3409,6 +3417,10 @@ Latenz: %2 ms</translation>
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation>Wenn Sie einen Computer mit mehr als einem Prozessor besitzen (z.B. Dual-Core-Systeme), sollten Sie einen Parallelisierungs-Level größer 1 wählen. Das bedeutet, dass LMMS versuchen wird, die Sound-Verarbeitung in mehrere Threads aufzuteilen, welche dann vom Betriebsystem auf unterschiedlichen Kernen ausgeführt werden sollten.
 Bitte beachten Sie, dass in einigen Fällen Parallelisierung nicht mit kleinen Puffergrößen funktionieren wird. Wenn Probleme auftreten (z.B. viele XRuns), versuchen Sie die Puffergröße zu erhöhen.</translation>
+    </message>
+    <message>
+        <source>Do not compress project files per default</source>
+        <translation>Projektdateien nicht standardmäßig komprimieren</translation>
     </message>
 </context>
 <context>
