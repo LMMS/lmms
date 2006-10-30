@@ -122,10 +122,10 @@ QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
 #ifdef QT4
 	return( QString( _de->mimeData()->data( "lmms/stringpair"
-						) ).section( ':', 1, 1 ) );
+						) ).section( ':', 1, -1 ) );
 #else
 	return( QString( _de->encodedData( "lmms/stringpair" ) ).section(
-								':', 1, 1 ) );
+								':', 1, -1 ) );
 #endif
 }
 

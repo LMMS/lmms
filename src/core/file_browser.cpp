@@ -911,7 +911,7 @@ void fileItem::determineFileType( void )
 #else
 	QString ext = QFileInfo( fullName() ).extension( FALSE ).toLower();
 #endif
-	if( ext == "mmp" || ext == "mpt" )
+	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
 	{
 		m_type = PROJECT_FILE;
 	}

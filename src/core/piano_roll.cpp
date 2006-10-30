@@ -102,7 +102,7 @@ const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
 const int PR_TOP_MARGIN = 48;
 
 // width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 3;
+const int RESIZE_AREA_WIDTH = 4;
 
 // width of line for setting volume/panning of note
 const int NE_LINE_WIDTH = 3;
@@ -1350,8 +1350,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_currentNote = *it;
 
 				// clicked at the "tail" of the note?
-				if( pos_tact_64th > m_currentNote->pos() +
-						m_currentNote->length() -
+				if( pos_tact_64th*m_ppt/64 >
+					( m_currentNote->pos() +
+					m_currentNote->length() )*m_ppt/64 -
 							RESIZE_AREA_WIDTH &&
 						m_currentNote->length() > 0 )
 				{
@@ -1684,8 +1685,9 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				}
 				// cursor at the "tail" of the note?
 				else if( ( *it )->length() > 0 &&
-					pos_tact_64th > ( *it )->pos() +
-						( *it )->length() -
+					pos_tact_64th*m_ppt/64 >
+						( ( *it )->pos() +
+						( *it )->length() )*m_ppt/64 -
 							RESIZE_AREA_WIDTH )
 				{
 					if( QApplication::overrideCursor() )

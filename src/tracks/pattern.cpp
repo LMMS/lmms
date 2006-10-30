@@ -488,6 +488,7 @@ void pattern::loadSettings( const QDomElement & _this )
 	}
 
 	ensureBeatNotes();
+	checkType();
 /*	if( _this.attribute( "frozen" ).toInt() )
 	{
 		freeze();

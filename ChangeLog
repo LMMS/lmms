@@ -1,3 +1,23 @@
+2006-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/lib/string_pair_drag.cpp:
+	when decoding value of stringPairDrag-class use everything after ":"
+	instead of first section as the value (string) itself might contain
+	":"-characters - makes it possible to drag'n'drop instrument-tracks
+	with VeSTige-instrument and avoids crash
+
+	* src/core/piano_roll.cpp:
+	when checking cursor-position in edit-mode (move/resize note), do
+	comparisons in pixels instead of tact64th - fixes bug that 32th- and
+	64th-notes could not be resized
+
+	* src/core/file_browser.cpp:
+	also recognize "mmpz"-files as projects and load them when
+	double-clicking them
+
+	* src/tracks/pattern.cpp:
+	when loading pattern, check type afterwards and correct if neccessary
+
 2006-10-09	Mikael Freeman <mikael/dot/freeman/at/mac/dot/se>
 
 	* data/locale/sv.ts:
