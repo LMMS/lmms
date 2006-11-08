@@ -1,3 +1,15 @@
+2006-11-08	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/bb_track.h:
+	* src/tracks/bb_track.cpp:
+	change color of selected group of TCOs
+
+	* plugins/vst_base/lvsl_server.c:
+	fixed segfault when initializing some VST plugins
+
+	* src/lib/sample_buffer.cpp:
+	fixed switching from normal play to resampling play
+
 2006-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/string_pair_drag.cpp:
