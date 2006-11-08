@@ -87,6 +87,8 @@ private:
 	QString m_name;
 	QColor m_color;
 
+	void setColor( QColor _new_color );
+
 } ;
 
 
