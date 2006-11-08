@@ -289,7 +289,37 @@ void bbTCO::changeName( void )
 void bbTCO::changeColor( void )
 {
 	QColor _new_color = QColorDialog::getColor( m_color );
-	if( _new_color.isValid() && _new_color != m_color )
+	if( !_new_color.isValid() )
+	{
+		return;
+	}
+	if( isSelected() )
+	{
+		vvector<selectableObject *> selected =
+				eng()->getSongEditor()->selectedObjects();
+		for( vvector<selectableObject *>::iterator it =
+							selected.begin();
+						it != selected.end(); ++it )
+		{
+			bbTCO * bb_tco = dynamic_cast<bbTCO *>( *it );
+			if( bb_tco )
+			{
+				bb_tco->setColor( _new_color );
+			}
+		}
+	}
+	else
+	{
+		setColor( _new_color );
+	}
+}
+
+
+
+
+void bbTCO::setColor( QColor _new_color )
+{
+	if( _new_color != m_color )
 	{
 		m_color = _new_color;
 		eng()->getSongEditor()->setModified();
