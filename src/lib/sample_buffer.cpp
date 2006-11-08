@@ -737,7 +737,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab,
 		SRC_STATE * state = m_srcState;
 		if( _resampling_data != NULL )
 		{
-			if( _start_frame == 0 )
+			if( *_resampling_data == NULL )
 			{
 				*_resampling_data = createResamplingContext();
 			}
