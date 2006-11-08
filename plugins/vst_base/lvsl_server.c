@@ -130,9 +130,11 @@ void lvsMessage( const char * _fmt, ... )
 class VSTPlugin
 {
 public:
-	VSTPlugin( const std::string & _plugin_file );
+	VSTPlugin( void );
 
 	~VSTPlugin();
+
+	void init( const std::string & _plugin_file );
 
 	void showEditor( void )
 	{
@@ -259,7 +261,7 @@ private:
 
 
 
-VSTPlugin::VSTPlugin( const std::string & _plugin_file ) :
+VSTPlugin::VSTPlugin( void ) :
 	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
@@ -278,6 +280,13 @@ VSTPlugin::VSTPlugin( const std::string & _plugin_file ) :
 	m_bpm( 0 ),
 	m_sampleRate( 44100 ),
 	m_currentSamplePos( 0 )
+{
+}
+
+
+
+
+void VSTPlugin::init( const std::string & _plugin_file )
 {
 	if( load( _plugin_file ) == false )
 	{
@@ -1172,7 +1181,8 @@ int main( void )
 		switch( cmd )
 		{
 			case VST_LOAD_PLUGIN:
-				plugin = new VSTPlugin( readString() );
+				plugin = new VSTPlugin();
+				plugin->init( readString() );
 				break;
 
 			case VST_SHOW_EDITOR:
