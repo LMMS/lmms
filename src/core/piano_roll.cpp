@@ -2230,9 +2230,10 @@ void pianoRoll::recordNote( const note & _n )
 {
 	if( m_recording == TRUE && validPattern() == TRUE )
 	{
-		note n( _n );
-		n.setPos( eng()->getSongEditor()->getPlayPos(
-				songEditor::PLAY_PATTERN ) - n.length() );
+		note n( eng(), _n.length(), eng()->getSongEditor()->getPlayPos(
+				songEditor::PLAY_PATTERN ) - _n.length(),
+				_n.tone(), _n.octave(),
+				_n.getVolume(), _n.getPanning() );
 		n.quantizeLength( quantization() );
 #ifndef QT4
 		qApp->lock();

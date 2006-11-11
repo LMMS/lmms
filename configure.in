@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20061108, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061108)
+AC_INIT(lmms, 0.2.1-svn20061111, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061111)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -51,19 +51,19 @@ AM_CONDITIONAL(BUILD_LINUX, test "$build_linux" = "true")
 
 
 # -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
-#EXTRAFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
-EXTRAFLAGS="-O2 -g0" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
+#DEFAULTFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
+DEFAULTFLAGS="-O2 -g0" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
 
 # Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
 if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
-	EXTRAFLAGS="$EXTRAFLAGS -ftree-vectorize -ftree-loop-linear"
+	DEFAULTFLAGS="$DEFAULTFLAGS -ftree-vectorize -ftree-loop-linear"
 	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" != "x0" ; then
-		EXTRAFLAGS="$EXTRAFLAGS -funsafe-loop-optimizations -Wunsafe-loop-optimizations"
+		DEFAULTFLAGS="$DEFAULTFLAGS -funsafe-loop-optimizations -Wunsafe-loop-optimizations"
 	fi	
 fi
 
-CFLAGS="$CFLAGS $EXTRAFLAGS"
-CXXFLAGS="$CXXFLAGS $EXTRAFLAGS"
+CFLAGS="$DEFAULTFLAGS $CFLAGS"
+CXXFLAGS="$DEFAULTFLAGS $CXXFLAGS"
 
 AC_PATH_XTRA
 gw_CHECK_QT
@@ -215,7 +215,7 @@ if test "x$with_vst" = "xyes" ; then
 
 	ORIG_CFLAGS=$CFLAGS
 	ORIG_CPPFLAGS=$CPPFLAGS
-	CFLAGS="$CLFAGS -I./include"
+	CFLAGS="$CFLAGS -I./include"
 	CPPFLAGS="$CPPFLAGS -I./include"
 	ORIG_CC="$CC"
 	CC="$CXX"
