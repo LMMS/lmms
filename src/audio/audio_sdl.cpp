@@ -47,6 +47,7 @@
 #include "debug.h"
 #include "config_mgr.h"
 #include "gui_templates.h"
+#include "templates.h"
 
 
 
@@ -55,9 +56,15 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
 				getMixer()->framesPerAudioBuffer() ) ),
+	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE )
 {
 	_success_ful = FALSE;
+
+	m_convertedBuf_size = getMixer()->framesPerAudioBuffer() * channels()
+						* sizeof( int_sample_t );
+	m_convertedBuf = (Uint8 *)bufferAllocator::allocBytes(
+							m_convertedBuf_size );
 
 /*	// if device is set, we set AUDIODEV-environment-variable, so that
 	// SDL can evaluate and use it
@@ -110,6 +117,7 @@ audioSDL::~audioSDL()
 	stopProcessing();
 	SDL_CloseAudio();
 	SDL_Quit();
+	bufferAllocator::free( m_convertedBuf );
 	bufferAllocator::free( m_outBuf );
 }
 
@@ -145,12 +153,33 @@ void audioSDL::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 	assert( _this != NULL );
 #endif
 
-	const fpab_t frames = _this->getNextBuffer( _this->m_outBuf );
+	_this->sdlAudioCallback( _buf, _len );
+}
 
-	_this->convertToS16( _this->m_outBuf, frames,
-						_this->getMixer()->masterGain(),
-						(int_sample_t *)( _buf ),
-						_this->m_convertEndian );
+
+
+
+void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
+{
+	while( _len )
+	{
+		if( m_convertedBuf_pos == 0 )
+		{
+			const fpab_t frames = getNextBuffer( m_outBuf );
+
+			convertToS16( m_outBuf, frames,
+						getMixer()->masterGain(),
+						(int_sample_t *)m_convertedBuf,
+						m_convertEndian );
+		}
+		int min_len = tMin( _len, m_convertedBuf_size
+							- m_convertedBuf_pos );
+		memcpy( _buf, m_convertedBuf + m_convertedBuf_pos, min_len );
+		_buf += min_len;
+		_len -= min_len;
+		m_convertedBuf_pos += min_len;
+		m_convertedBuf_pos %= m_convertedBuf_size;
+	}
 }
 
 

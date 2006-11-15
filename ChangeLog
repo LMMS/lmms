@@ -1,3 +1,16 @@
+2006-11-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/audio_alsa.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_file_wave.cpp:
+	convert-endian-based conversion instead of little-endian-based,
+	fixes OSS and SDL
+
+	* include/audio_sdl.h:
+	* src/audio/audio_sdl.cpp:
+	fill the whole audio buffer
+
 2006-11-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/core/piano_roll.cpp:

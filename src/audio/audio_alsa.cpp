@@ -65,7 +65,7 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_littleEndian( isLittleEndian() ),
+	m_convertEndian( FALSE ),
 	m_quit( FALSE )
 {
 	_success_ful = FALSE;
@@ -228,7 +228,7 @@ void audioALSA::run( void )
 		const f_cnt_t frames = getNextBuffer( temp );
 
 		convertToS16( temp, frames, getMixer()->masterGain(), outbuf,
-					m_littleEndian );
+					m_convertEndian );
 
 		f_cnt_t frame = 0;
 		int_sample_t * ptr = outbuf;
@@ -298,7 +298,11 @@ int audioALSA::setHWParams( const sample_rate_t _sample_rate,
 					"playback: %s\n", snd_strerror( err ) );
 			return( err );
 		}
-		m_littleEndian = FALSE;
+		m_convertEndian = isLittleEndian();
+	}
+	else
+	{
+		m_convertEndian = !isLittleEndian();
 	}
 
 	// set the count of channels

@@ -80,10 +80,14 @@ private:
 	virtual void stopProcessing( void );
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
+	void sdlAudioCallback( Uint8 * _buf, int _len );
 
 	SDL_AudioSpec m_audioHandle;
 
 	surroundSampleFrame * m_outBuf;
+	Uint8 * m_convertedBuf;
+	int m_convertedBuf_pos;
+	int m_convertedBuf_size;
 
 	bool m_convertEndian;
 

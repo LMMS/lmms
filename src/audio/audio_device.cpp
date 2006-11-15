@@ -297,23 +297,9 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 						const fpab_t _frames,
 						const float _master_gain,
 						int_sample_t * _output_buffer,
-						const bool _little_endian )
+						const bool _convert_endian )
 {
-	if( _little_endian )
-	{
-		for( fpab_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				( _output_buffer + frame * channels() )[chnl] =
-						static_cast<int_sample_t>(
-						mixer::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
-			}
-		}
-	}
-	else
+	if( _convert_endian )
 	{
 		Uint16 temp;
 		for( fpab_t frame = 0; frame < _frames; ++frame )
@@ -328,6 +314,20 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
 						( temp & 0xff00 ) >> 8;
+			}
+		}
+	}
+	else
+	{
+		for( fpab_t frame = 0; frame < _frames; ++frame )
+		{
+			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			{
+				( _output_buffer + frame * channels() )[chnl] =
+						static_cast<int_sample_t>(
+						mixer::clip( _ab[frame][chnl] *
+						_master_gain ) *
+						OUTPUT_SAMPLE_MULTIPLIER );
 			}
 		}
 	}
