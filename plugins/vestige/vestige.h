@@ -84,6 +84,9 @@ public:
 		return( FALSE );
 	}
 
+	virtual bool handleMidiEvent( const midiEvent & _me,
+						const midiTime & _time );
+
 
 protected slots:
 	void openPlugin( void );

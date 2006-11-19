@@ -192,10 +192,11 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 						_me.velocity() );
 			break;
 
-		case PITCH_BEND:
-			snd_seq_ev_set_pitchbend( &ev,
+		case CONTROL_CHANGE:
+			snd_seq_ev_set_controller( &ev,
 						_port->outputChannel(),
-						_me.m_data.m_param[0] - 8192 );
+						_me.m_data.m_param[0],
+						_me.m_data.m_param[1] );
 			break;
 
 		case PROGRAM_CHANGE:
@@ -208,6 +209,12 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 			snd_seq_ev_set_chanpress( &ev,
 						_port->outputChannel(),
 						_me.m_data.m_param[0] );
+			break;
+
+		case PITCH_BEND:
+			snd_seq_ev_set_pitchbend( &ev,
+						_port->outputChannel(),
+						_me.m_data.m_param[0] - 8192 );
 			break;
 
 		default:
@@ -517,6 +524,38 @@ void midiALSASeq::run( void )
 							NOTES_PER_OCTAVE,
 							ev->data.note.velocity
 							), midiTime() );
+				break;
+
+			case SND_SEQ_EVENT_CONTROLLER:
+				dest->processInEvent( midiEvent( CONTROL_CHANGE,
+						ev->data.control.channel,
+						ev->data.control.param,
+						ev->data.control.value ),
+								midiTime() );
+				break;
+
+			case SND_SEQ_EVENT_PGMCHANGE:
+				dest->processInEvent( midiEvent( PROGRAM_CHANGE,
+						ev->data.control.channel,
+						ev->data.control.param,
+						ev->data.control.value ),
+								midiTime() );
+				break;
+
+			case SND_SEQ_EVENT_CHANPRESS:
+				dest->processInEvent( midiEvent(
+							CHANNEL_PRESSURE,
+						ev->data.control.channel,
+						ev->data.control.param,
+						ev->data.control.value ),
+								midiTime() );
+				break;
+
+			case SND_SEQ_EVENT_PITCHBEND:
+				dest->processInEvent( midiEvent( PITCH_BEND,
+						ev->data.control.channel,
+						ev->data.control.value + 8192,
+							0 ), midiTime() );
 				break;
 
 			case SND_SEQ_EVENT_SENSING:

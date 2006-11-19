@@ -683,11 +683,16 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		case KEY_PRESSURE:
-			if( m_notes[_me.key()] != NULL )
+			if( !m_instrument->handleMidiEvent( _me, _time ) &&
+						m_notes[_me.key()] != NULL )
 			{
 				m_notes[_me.key()]->setVolume( _me.velocity() *
 								100 / 128 );
 			}
+			break;
+
+		case PITCH_BEND:
+			m_instrument->handleMidiEvent( _me, _time );
 			break;
 
 /*		case PITCH_BEND:
@@ -704,7 +709,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			break;*/
 
 		default:
-			printf( "channel-track: unhandled MIDI-event %d\n",
+			printf( "instrument-track: unhandled MIDI-event %d\n",
 								_me.m_type );
 			break;
 	}

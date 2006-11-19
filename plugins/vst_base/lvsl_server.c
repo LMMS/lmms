@@ -512,8 +512,18 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 	event.reserved1 = 0;
 	event.reserved2 = 0;
 	event.midiData[0] = _event.m_type + _event.m_channel;
-	event.midiData[1] = _event.key();
-	event.midiData[2] = _event.velocity();
+	switch( _event.m_type )
+	{
+		case PITCH_BEND:
+			event.midiData[1] = _event.m_data.m_param[0] & 0x7f;
+			event.midiData[2] = _event.m_data.m_param[0] >> 7;
+			break;
+		// TODO: handle more special cases
+		default:
+			event.midiData[1] = _event.key();
+			event.midiData[2] = _event.velocity();
+			break;
+	}
 	event.midiData[3] = 0;
 	m_midiEvents.push_back( event );
 }

@@ -1,3 +1,4 @@
+- MIDI over Ethernet-support
 - lock m_instrument in instrumentTrack-class for not crashing when using m_instrument in notePlayHandle::supportsParallelizing() while instrument is being deleted or so
 - try to make vestige-plugin-dlls relative
 - do song-editor-tempo-connection to vst-plugin inside remoteVSTPlugin

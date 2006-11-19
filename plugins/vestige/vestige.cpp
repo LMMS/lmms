@@ -364,6 +364,21 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
+bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
+						const midiTime & _time )
+{
+	m_pluginMutex.lock();
+	if( m_plugin != NULL )
+	{
+		m_plugin->enqueueMidiEvent( _me, _time );
+	}
+	m_pluginMutex.unlock();
+	return( TRUE );
+}
+
+
+
+
 void vestigeInstrument::openPlugin( void )
 {
 #ifdef QT4

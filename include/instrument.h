@@ -55,6 +55,7 @@
 // forward-declarations
 class instrumentTrack;
 class notePlayHandle;
+class midiEvent;
 
 
 class instrument : public QWidget, public plugin
@@ -96,6 +97,14 @@ public:
 	inline virtual bool notePlayHandleBased( void ) const
 	{
 		return( TRUE );
+	}
+
+	// sub-classes can re-implement this for receiving all incoming
+	// MIDI-events except NoteOn and NoteOff
+	inline virtual bool handleMidiEvent( const midiEvent & _me,
+						const midiTime & _time )
+	{
+		return( FALSE );
 	}
 
 	// instantiate instrument-plugin with given name or return NULL

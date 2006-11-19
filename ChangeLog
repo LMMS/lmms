@@ -1,3 +1,20 @@
+2006-11-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/lvsl_server.c:
+	proper handling of pitch-bend-events
+
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	handle MIDI-events by forwarding them to VST-plugin
+
+	* include/instrument.h:
+	* src/tracks/instrument_track.cpp:
+	if supported by according instrument, it now can handle all incoming
+	MIDI-events (except Noteon and Noteoff)
+
+	* src/midi/midi_alsa_seq.cpp:
+	more complete implementation of MIDI-event-handling
+
 2006-11-15	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/audio_alsa.h:
