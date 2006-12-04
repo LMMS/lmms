@@ -46,7 +46,15 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "ladspa.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef HAVE_LADSPA_H
+#include <ladspa.h>
+#else
+#include "ladspa-1.1.h"
+#endif
 
 #define BOUNDED (LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE)
 #define INTEGER LADSPA_HINT_INTEGER

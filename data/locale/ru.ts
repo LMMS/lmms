@@ -1,5 +1,12 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Note detuning</source>
+        <translation>Расстройка ноты</translation>
+    </message>
+</context>
+<context>
     <name>aboutDialog</name>
     <message>
         <source>About LMMS...</source>
@@ -521,15 +528,31 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Свободно</translation>
     </message>
     <message>
         <source>Sort</source>
-        <translation type="unfinished"></translation>
+        <translation>Упорядочить</translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>Синхронизировать</translation>
+    </message>
+    <message>
+        <source>Chord type</source>
+        <translation>Тип аккорда</translation>
+    </message>
+    <message>
+        <source>Arpeggio type</source>
+        <translation>Тип арпеджио</translation>
+    </message>
+    <message>
+        <source>Arpeggio direction</source>
+        <translation>Направление арпеджио</translation>
+    </message>
+    <message>
+        <source>Arpeggio mode</source>
+        <translation>Режим арпеджио</translation>
     </message>
 </context>
 <context>
@@ -631,6 +654,119 @@ http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
+    <name>automatableButton</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
+    </message>
+</context>
+<context>
+    <name>automatableSlider</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
+    </message>
+</context>
+<context>
+    <name>automationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>Воспроизведение ткущего шаблона/пауза (Пробел)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>Остановить воспроизвдение шаблона (Пробел)</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation>Нажмите, чтобы прослушать текущий шаблон. По окончании шаблона воспроизведение начнётся сначала.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of current pattern.</source>
+        <translation>Нажмите, если вам нужно остановить воспроизведение текущего шаблона.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>Режим рисования (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>Режим стирания нот (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>Режим выбора нот (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation>Режим перемещения  выбранных нот (Shift+M)</translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим рисования нот, который является режимом по умолчанию и используется большую часть времени. В этом режиме вы можете добавлять/перемещать ноты по одной.
+Для включения этого режима можно использовать комбинацию клавиш Shift+D.</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим выбора нот. В этом режиме вы можете выбирать ноты для последующих действий. Это необходимо, если вы хотите вырезать, копировать, вставлять или перемещать сразу несколько нот.
+Для включения этого режима можно использовать комбинацию клавиш Shift+S.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим перемещения. В этом режиме вы можете перемещать выбранные ранее (в режиме выбора) ноты.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>Вырезать выбранные ноты (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>Копировать выбранные ноты в буфер (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation>Вставить значения из буфера (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>При нажатии на эту кнопку выделеные ноты будут перемещены в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+    </message>
+    <message>
+        <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
+        <translation>При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+    </message>
+    <message>
+        <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
+        <translation>При нажатии на эту кнопку ноты из буфера будут вставлены в превый видимый такт.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation>Редактор временных зависимостей — нет шаблона</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation>Редактор временных зависимостей — %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation>Открывайте редатор временных зависимостей через контекстное меню регулятора!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation>Значения скопированы</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation>Выбранные значения скопированы в буфер обмена.</translation>
+    </message>
+</context>
+<context>
     <name>bbEditor</name>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -651,6 +787,10 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Beat+Baseline Editor</source>
         <translation>Редактор ритма/лейтмотива</translation>
+    </message>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation>Добавить ритм/лейтмотив</translation>
     </message>
 </context>
 <context>
@@ -683,7 +823,7 @@ http://lmms.sourceforge.net</translation>
     <name>bitInvader</name>
     <message>
         <source>Samplelength</source>
-        <translation type="unfinished"></translation>
+        <translation>Длительность</translation>
     </message>
     <message>
         <source>Sample Length</source>
@@ -721,92 +861,131 @@ http://lmms.sourceforge.net</translation>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
         <translation>Здесь вы можете рисовать собственный сигнал</translation>
     </message>
+    <message>
+        <source>Interpolation</source>
+        <translation>Интерполяция</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Нормализовать</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Синусоида</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Треугольник</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Пила</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Меандр</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Белый шум</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Пользовательская</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Сгладить</translation>
+    </message>
 </context>
 <context>
     <name>channelTrack</name>
     <message>
         <source>With this knob you can set the volume of the opened channel.</source>
-        <translation>Регулировка громкости текущего канала.</translation>
+        <translation type="obsolete">Регулировка громкости текущего канала.</translation>
     </message>
     <message>
         <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
-        <translation>Здесь вы можете указать, место, где канал должен быть слышен. Чтобы пользоваться этой возможностью, вам потребуется звуковая плата с поддержкой surround 4.0.</translation>
+        <translation type="obsolete">Здесь вы можете указать, место, где канал должен быть слышен. Чтобы пользоваться этой возможностью, вам потребуется звуковая плата с поддержкой surround 4.0.</translation>
     </message>
     <message>
         <source>Save current channel settings in a preset-file</source>
-        <translation>Сохранить текущие настройки в файл</translation>
+        <translation type="obsolete">Сохранить текущие настройки в файл</translation>
     </message>
     <message>
         <source>Channel volume</source>
-        <translation>Громкость канала</translation>
+        <translation type="obsolete">Громкость канала</translation>
     </message>
     <message>
         <source>Channel volume:</source>
-        <translation>Громкость канала:</translation>
+        <translation type="obsolete">Громкость канала:</translation>
     </message>
     <message>
         <source>Channel-Settings-File (*.cs.xml)</source>
-        <translation>Файл с настройками канала (*.cs.xml)</translation>
+        <translation type="obsolete">Файл с настройками канала (*.cs.xml)</translation>
     </message>
     <message>
         <source>Save channel-settings in file</source>
-        <translation>Сохранить настройки канала в файл</translation>
+        <translation type="obsolete">Сохранить настройки канала в файл</translation>
     </message>
     <message>
         <source>VOLUME</source>
-        <translation>ГРОМКОСТЬ</translation>
+        <translation type="obsolete">ГРОМКОСТЬ</translation>
     </message>
     <message>
         <source>FX CHNL</source>
-        <translation>КАНАЛ FX</translation>
+        <translation type="obsolete">КАНАЛ FX</translation>
     </message>
     <message>
         <source>ENV/LFO/FILTER</source>
-        <translation>ОБЛ/LFO/ФИЛЬТР</translation>
+        <translation type="obsolete">ОБЛ/LFO/ФИЛЬТР</translation>
     </message>
     <message>
         <source>ARP/CHORD</source>
-        <translation>АРП./АККОРД</translation>
+        <translation type="obsolete">АРП./АККОРД</translation>
     </message>
     <message>
         <source>PLUGIN</source>
-        <translation>МОДУЛЬ</translation>
+        <translation type="obsolete">МОДУЛЬ</translation>
     </message>
     <message>
         <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation>Нажмите сюда, чтобы сохранить настройки текущего канала в файл предустановок. Позже вы сможете загрузить эти настройки через просмотрщик.</translation>
+        <translation type="obsolete">Нажмите сюда, чтобы сохранить настройки текущего канала в файл предустановок. Позже вы сможете загрузить эти настройки через просмотрщик.</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation>ГРМК</translation>
+        <translation type="obsolete">ГРМК</translation>
     </message>
     <message>
         <source>GENERAL SETTINGS</source>
-        <translation>ОБЩИЕ ПАРАМЕТРЫ</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation></translation>
+        <translation type="obsolete">ОБЩИЕ ПАРАМЕТРЫ</translation>
     </message>
     <message>
         <source>unnamed_channel</source>
-        <translation>неназванный_канал</translation>
+        <translation type="obsolete">неназванный_канал</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation>Стандартный</translation>
+        <translation type="obsolete">Стандартный</translation>
     </message>
     <message>
         <source>MIDI input/output</source>
-        <translation>Ввод/вывод MIDI</translation>
+        <translation type="obsolete">Ввод/вывод MIDI</translation>
     </message>
     <message>
         <source>MIDI input</source>
-        <translation>Ввод MIDI</translation>
+        <translation type="obsolete">Ввод MIDI</translation>
     </message>
     <message>
         <source>MIDI output</source>
-        <translation>Вывод MIDI</translation>
+        <translation type="obsolete">Вывод MIDI</translation>
+    </message>
+</context>
+<context>
+    <name>comboBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
     </message>
 </context>
 <context>
@@ -819,29 +998,29 @@ http://lmms.sourceforge.net</translation>
         <source>For using the ready presets and samples of LMMS and enjoying the demo-songs the according files have to be copied or linked into your LMMS-working-directory.
 When copying files, you can modify them, but they need additional space in your working-directory. If you link files, you cannot modify them, but they need no extra space. So it&apos;s recommended to copy presets and demo-projects and link samples, which are bigger in size.
 </source>
-        <translation>Чтобы использовать настройки и образцы, распространяемые вместе с программой, а также чтобы посмотреть демонстрационные проекты LMMS, они должны быть в вашем рабочем каталоге LMMS.
+        <translation type="obsolete">Чтобы использовать настройки и образцы, распространяемые вместе с программой, а также чтобы посмотреть демонстрационные проекты LMMS, они должны быть в вашем рабочем каталоге LMMS.
 Сейчас вы можете выбрать - копировать ли файлы, или только создать ссылки на них. Ссылки не занимают места на жёстком диске, но вы не сможете изменять файлы, на которые они ссылаются. Если же вы решите копировать файлы, то это даст вам некоторую свободу действий, но потребуется больше дискового пространства.
 Рекомендуется копировать предусиановки и проекты и создавать ссылки на образцы, которые занимают гораздо больше места.</translation>
     </message>
     <message>
         <source>samples:</source>
-        <translation>Образцы:</translation>
+        <translation type="obsolete">Образцы:</translation>
     </message>
     <message>
         <source>copy</source>
-        <translation>копировать</translation>
+        <translation type="obsolete">копировать</translation>
     </message>
     <message>
         <source>link</source>
-        <translation>создавать ссылки</translation>
+        <translation type="obsolete">создавать ссылки</translation>
     </message>
     <message>
         <source>presets:</source>
-        <translation>Предустановленные настройки:</translation>
+        <translation type="obsolete">Предустановленные настройки:</translation>
     </message>
     <message>
         <source>demo projects:</source>
-        <translation>Демонстрационные проекты:</translation>
+        <translation type="obsolete">Демонстрационные проекты:</translation>
     </message>
     <message>
         <source>Welcome to LMMS</source>
@@ -853,7 +1032,7 @@ When copying files, you can modify them, but they need additional space in your 
     </message>
     <message>
         <source>Copy or link files</source>
-        <translation>Копировать файлы или создавать ссылки</translation>
+        <translation type="obsolete">Копировать файлы или создавать ссылки</translation>
     </message>
     <message>
         <source>Directory not existing</source>
@@ -945,6 +1124,32 @@ LMMS-working-directory. Run the setup-wizard now?</source>
     </message>
 </context>
 <context>
+    <name>effectSelectDialog</name>
+    <message>
+        <source>Effects Selector</source>
+        <translation>Эффекты</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отменить</translation>
+    </message>
+</context>
+<context>
+    <name>effectTabWidget</name>
+    <message>
+        <source>EFFECTS CHAIN</source>
+        <translation>ЦЕПЬ ФИЛЬТРОВ</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+</context>
+<context>
     <name>envelopeAndLFOWidget</name>
     <message>
         <source>Predelay:</source>
@@ -1016,7 +1221,7 @@ LMMS-working-directory. Run the setup-wizard now?</source>
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
-        <translation type="unfinished">Этот регулятор устанавлявает скорость текущего LFO.</translation>
+        <translation>Этот регулятор устанавлявает скорость текущего LFO.</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
@@ -1162,6 +1367,18 @@ LMMS-working-directory. Run the setup-wizard now?</source>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Перетащите в это окно какой-нибудь образец.</translation>
     </message>
+    <message>
+        <source>LFO wave shape</source>
+        <translation>Форма сигнала LFO</translation>
+    </message>
+    <message>
+        <source>Freq x 100</source>
+        <translation>ЧАСТ x 100</translation>
+    </message>
+    <message>
+        <source>Modulate Env-Amount</source>
+        <translation>Модулировать обложку</translation>
+    </message>
 </context>
 <context>
     <name>envelopeTabWidget</name>
@@ -1195,7 +1412,7 @@ LMMS-working-directory. Run the setup-wizard now?</source>
     </message>
     <message>
         <source>Here you can select the built-in filter you want to use in this channel. Filters are very important for changing the characteristics of a sound.</source>
-        <translation>Здесь вы можете выбрать фильтр для текущего канала. Фильтры могут довольно сильно менять звучание.</translation>
+        <translation type="obsolete">Здесь вы можете выбрать фильтр для текущего канала. Фильтры могут довольно сильно менять звучание.</translation>
     </message>
     <message>
         <source>Hz</source>
@@ -1253,6 +1470,14 @@ LMMS-working-directory. Run the setup-wizard now?</source>
     <message>
         <source>FILTER</source>
         <translation>ФИЛЬТР</translation>
+    </message>
+    <message>
+        <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
+        <translation>Здесь вы можете выбрать фильтр для этого инструмента. Фильтры могут довольно сильно менять звучание.</translation>
+    </message>
+    <message>
+        <source>Filter type</source>
+        <translation>Тип фильтра</translation>
     </message>
 </context>
 <context>
@@ -1334,15 +1559,209 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
     <message>
         <source>Send to active channel</source>
-        <translation>В активный канал</translation>
+        <translation type="obsolete">В активный канал</translation>
     </message>
     <message>
         <source>Open in new channel/Song-Editor</source>
-        <translation>В новый канал и открыть в редакторе</translation>
+        <translation type="obsolete">В новый канал и открыть в редакторе</translation>
     </message>
     <message>
         <source>Open in new channel/B+B Editor</source>
-        <translation>В новый канал и открыть в редакторе ритма/басов</translation>
+        <translation type="obsolete">В новый канал и открыть в редакторе ритма/басов</translation>
+    </message>
+    <message>
+        <source>Send to active instrument-track</source>
+        <translation>В активную дорожку инструмента</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation>В новую дорожку инструмента и открыть в редакторе композиции</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation>В новую дорожку инструмента и открыть в редакторе лейтмотива</translation>
+    </message>
+</context>
+<context>
+    <name>impulseEditor</name>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse onto this graph</source>
+        <translation>Здесь вы можете рисовать собственный сигнал</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Синусоида</translation>
+    </message>
+    <message>
+        <source>Click here if you want a sine-wave for current oscillator.</source>
+        <translation>Сгенерировать гармонический (синусоидальный) сигнал.</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Треугольник</translation>
+    </message>
+    <message>
+        <source>Click here if you want a triangle-wave for current oscillator.</source>
+        <translation>Сгенерировать треугольный сигнал.</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Пила</translation>
+    </message>
+    <message>
+        <source>Click here if you want a saw-wave for current oscillator.</source>
+        <translation>Сгенерировать пилообразный сигнал.</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Меандр</translation>
+    </message>
+    <message>
+        <source>Click here if you want a square-wave for current oscillator.</source>
+        <translation>Сгенерировать меандр.</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Белый шум</translation>
+    </message>
+    <message>
+        <source>Click here if you want a white-noise for current oscillator.</source>
+        <translation>Сгенерировать белый шум.</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Пользовательская</translation>
+    </message>
+    <message>
+        <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
+        <translation>Задать форму сигнала из файла.</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Сгладить</translation>
+    </message>
+    <message>
+        <source>Click here to smooth waveform.</source>
+        <translation>Щёлкните чтобы сгладить форму сигнала.</translation>
+    </message>
+    <message>
+        <source>Normalize</source>
+        <translation>Нормализовать</translation>
+    </message>
+    <message>
+        <source>Click here to normalize waveform.</source>
+        <translation>Нажмите, чтобы нормализовать сигнал.</translation>
+    </message>
+    <message>
+        <source>Enable waveform</source>
+        <translation>Включить</translation>
+    </message>
+    <message>
+        <source>Click here to enable/disable waveform.</source>
+        <translation>Нажмите, чтобы включить/выключить сигнал.</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Справка</translation>
+    </message>
+</context>
+<context>
+    <name>instrumentTrack</name>
+    <message>
+        <source>With this knob you can set the volume of the opened channel.</source>
+        <translation>Регулировка громкости текущего канала.</translation>
+    </message>
+    <message>
+        <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
+        <translation>Здесь вы можете указать, место, где канал должен быть слышен. Чтобы пользоваться этой возможностью, вам потребуется звуковая плата с поддержкой surround 4.0.</translation>
+    </message>
+    <message>
+        <source>unnamed_channel</source>
+        <translation>неназванный_канал</translation>
+    </message>
+    <message>
+        <source>Channel volume</source>
+        <translation>Громкость канала</translation>
+    </message>
+    <message>
+        <source>Channel volume:</source>
+        <translation>Громкость канала:</translation>
+    </message>
+    <message>
+        <source>VOL</source>
+        <translation>ГРМК</translation>
+    </message>
+    <message>
+        <source>MIDI input/output</source>
+        <translation>Ввод/вывод MIDI</translation>
+    </message>
+    <message>
+        <source>GENERAL SETTINGS</source>
+        <translation>ОБЩИЕ ПАРАМЕТРЫ</translation>
+    </message>
+    <message>
+        <source>VOLUME</source>
+        <translation>ГРОМКОСТЬ</translation>
+    </message>
+    <message>
+        <source>FX CHNL</source>
+        <translation>КАНАЛ FX</translation>
+    </message>
+    <message>
+        <source>Save current channel settings in a preset-file</source>
+        <translation>Сохранить текущие настройки в файл</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation>Нажмите сюда, чтобы сохранить настройки текущего канала в файл предустановок. Позже вы сможете загрузить эти настройки через просмотрщик.</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Стандартный</translation>
+    </message>
+    <message>
+        <source>ENV/LFO/FILTER</source>
+        <translation>ОБЛ/LFO/ФИЛЬТР</translation>
+    </message>
+    <message>
+        <source>ARP/CHORD</source>
+        <translation>АРП./АККОРД</translation>
+    </message>
+    <message>
+        <source>MIDI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>MIDI input</source>
+        <translation>Ввод MIDI</translation>
+    </message>
+    <message>
+        <source>MIDI output</source>
+        <translation>Вывод MIDI</translation>
+    </message>
+    <message>
+        <source>Save channel-settings in file</source>
+        <translation>Сохранить настройки канала в файл</translation>
+    </message>
+    <message>
+        <source>Channel-Settings-File (*.cs.xml)</source>
+        <translation>Файл с настройками канала (*.cs.xml)</translation>
+    </message>
+    <message>
+        <source>PLUGIN</source>
+        <translation>МОДУЛЬ</translation>
+    </message>
+    <message>
+        <source>Surround area</source>
+        <translation>Окружающее пространство</translation>
+    </message>
+    <message>
+        <source>FX channel</source>
+        <translation>Канал FX</translation>
+    </message>
+    <message>
+        <source>FX</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1371,6 +1790,216 @@ Make sure, you have write access to the selected file/device!</source>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Введите новое значение между %1 и %2:</translation>
     </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaBrowser</name>
+    <message>
+        <source>LADSPA Plugin Browser</source>
+        <translation>Просмотр модулей LADSPA</translation>
+    </message>
+    <message>
+        <source>Available Effects</source>
+        <translation>Доступные эффекты</translation>
+    </message>
+    <message>
+        <source>Unavailable Effects</source>
+        <translation>Недоступные эффекты</translation>
+    </message>
+    <message>
+        <source>Instruments</source>
+        <translation>Инструменты</translation>
+    </message>
+    <message>
+        <source>Analysis Tools</source>
+        <translation>Анализаторы</translation>
+    </message>
+    <message>
+        <source>Don&apos;t know</source>
+        <translation>Неизвестные</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate.  The plugins are divided into five categories based upon an interpretation of the port types and names.
+
+Available Effects are those that can be used by LMMS.  In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels.  LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name.  Output channels are identified by the letters &apos;out&apos;.  Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
+
+Unavailable Effects are those that were identified as effects, but either didn&apos;t have the same number of input and output channels or weren&apos;t real time capable.
+
+Instruments are plugins for which only output channels were identified.
+
+Analysis Tools are plugins for which only input channels were identified.
+
+Don&apos;t Knows are plugins for which no input or output channels were identified.
+
+Double clicking any of the plugins will bring up information on the ports.</source>
+        <translation>В этом окне показана информация обо всех модулях LADSPA, которые обнаружила LMMS. Они разделены на пять категорий, в зависимости от названий и типов портов.
+
+Доступные эффекты — это те, которые могут быть использоаны в LMMS. Чтобы эффект LADSPA мог быть использован, он должен, во-первых, быть собственно эффектом, т. е. иметь как входные так и выходные каналы. LMMS в качестве входного канала воспринимает аудиопорт, содержащий в названии „in“, а выходные узнаёт по подстроке „out“. Для использования в LMMS число входных каналов должно совпадать с числом выходных, и эффект должен иметь возможность использования в реальном времени.
+
+Недоступные эффекты — это модули LADSPA, опознанные в качестве эффектов, однако либо с несовпадающими количестами входных/выходных каналов, либо не предназначенные для использования в реальном времени.
+
+Инструменты — это модули, у которых есть только выходные каналы.
+
+Анализаторы — это модули, обладающие лишь входными каналами.
+
+Неизвестные — модули, у которых не было обнаружено ни входных, ни выходных каналов.
+
+Двойной щелчок лувой кнопкой мыши по модулю даст информацию о его портах.</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControl</name>
+    <message>
+        <source>Link channels</source>
+        <translation>Связать каналы</translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation>Значение: </translation>
+    </message>
+    <message>
+        <source>Sorry, no help available.</source>
+        <translation>Извините, справки нет.</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControlDialog</name>
+    <message>
+        <source>Channel </source>
+        <translation>Канал </translation>
+    </message>
+    <message>
+        <source>Link Channels</source>
+        <translation>Связать каналы</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaPortDialog</name>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Частота выборки</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Направление</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <source>Min &lt; Default &lt; Max</source>
+        <translation>Наим. &lt; Стандарт &lt; Наиб.</translation>
+    </message>
+    <message>
+        <source>Logarithmic</source>
+        <translation>Логарифмический</translation>
+    </message>
+    <message>
+        <source>SR Dependent</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>Аудио</translation>
+    </message>
+    <message>
+        <source>Control</source>
+        <translation>Управление</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Вход</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Выход</translation>
+    </message>
+    <message>
+        <source>Toggled</source>
+        <translation>Включено</translation>
+    </message>
+    <message>
+        <source>Integer</source>
+        <translation>Целое</translation>
+    </message>
+    <message>
+        <source>Float</source>
+        <translation>Дробное</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaSubPluginDescriptionWidget</name>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <source>Name: </source>
+        <translation>Название: </translation>
+    </message>
+    <message>
+        <source>Maker: </source>
+        <translation>Создал: </translation>
+    </message>
+    <message>
+        <source>Copyright: </source>
+        <translation>Права принадлежат: </translation>
+    </message>
+    <message>
+        <source>Requires Real Time: Yes</source>
+        <translation>Требуется обработка в реальном времени</translation>
+    </message>
+    <message>
+        <source>Requires Real Time: No</source>
+        <translation>Обработка в реальном времени не требуется</translation>
+    </message>
+    <message>
+        <source>Real Time Capable: Yes</source>
+        <translation>Может обрабатывать данные в реальном времени</translation>
+    </message>
+    <message>
+        <source>Real Time Capable: No</source>
+        <translation>Не может обрабатывать данные в реальном времени</translation>
+    </message>
+    <message>
+        <source>In Place Broken: Yes</source>
+        <translation type="unfinished">In Place Broken: Да</translation>
+    </message>
+    <message>
+        <source>In Place Broken: No</source>
+        <translation type="unfinished">In Place Broken: Нет</translation>
+    </message>
+    <message>
+        <source>Channels In: </source>
+        <translation>Входных каналов: </translation>
+    </message>
+    <message>
+        <source>Channels Out: </source>
+        <translation>Выходных каналов: </translation>
+    </message>
+</context>
+<context>
+    <name>lcdSpinBox</name>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
+    </message>
 </context>
 <context>
     <name>listView</name>
@@ -1385,6 +2014,10 @@ Make sure, you have write access to the selected file/device!</source>
     <message>
         <source>Please wait, loading sample for preview...</source>
         <translation>Подождите пожалуйста, образец загружается для прослушивания...</translation>
+    </message>
+    <message>
+        <source>--- Factory files ---</source>
+        <translation>--- Из поставки ---</translation>
     </message>
 </context>
 <context>
@@ -1531,7 +2164,7 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
     <message>
         <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation>Мультимедийный проект (*.mmp *.xml)</translation>
+        <translation type="obsolete">Мультимедийный проект (*.mmp *.xml)</translation>
     </message>
     <message>
         <source>Save project</source>
@@ -1539,7 +2172,7 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
     <message>
         <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation>Мультимедийный проект (*.mmp);;Шаблон мультимедийного проекта (*.mpt)</translation>
+        <translation type="obsolete">Мультимедийный проект (*.mmp);;Шаблон мультимедийного проекта (*.mpt)</translation>
     </message>
     <message>
         <source>Help not available</source>
@@ -1562,6 +2195,244 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>По нажатию этой кнопки запускается редактор ритма/лейтмотива произведения. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов и т. п.</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Правка</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Отменить действие</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>Вернуть отменённое действие</translation>
+    </message>
+    <message>
+        <source>Show/hide Automation Editor</source>
+        <translation>Показать/скрыть редактор временн&lt;b&gt;ы&lt;/b&gt;х зависимостей</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
+        <translation>Нажатием этой кнопки показывается/убирается окно редактора временн&lt;b&gt;ы&lt;/b&gt;х зависимостей. С его помощью вы можете редактировать изменения выбранных величин со временем.</translation>
+    </message>
+    <message>
+        <source>LADSPA Plugins...</source>
+        <translation>Модули LADSPA...</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
+        <translation>Мультимедийный проект (*.mmp *.mmpz *.xml)</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
+        <translation>Мультимедийный проект (*.mmp *.mmpz *.xml);;Шаблон мультимедийнйного проекта (*.mpt)</translation>
+    </message>
+</context>
+<context>
+    <name>mallets</name>
+    <message>
+        <source>Spread</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spread:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Положение</translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation>Положение:</translation>
+    </message>
+    <message>
+        <source>Vibrato Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato Freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Freq</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vib Freq:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stick Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stick Mix:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulator</source>
+        <translation>Модулятор</translation>
+    </message>
+    <message>
+        <source>Modulator:</source>
+        <translation>Модулятор:</translation>
+    </message>
+    <message>
+        <source>Crossfade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crossfade:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADSR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ADSR:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation>Вибрато</translation>
+    </message>
+    <message>
+        <source>Vibrato:</source>
+        <translation>Вибрато:</translation>
+    </message>
+    <message>
+        <source>Instrument</source>
+        <translation type="unfinished">Инструмент</translation>
+    </message>
+    <message>
+        <source>Marimba</source>
+        <translation type="unfinished">Маримба</translation>
+    </message>
+    <message>
+        <source>Vibraphone</source>
+        <translation type="unfinished">Вибрафон</translation>
+    </message>
+    <message>
+        <source>Agogo</source>
+        <translation type="unfinished">Дискотека</translation>
+    </message>
+    <message>
+        <source>Wood1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reso</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wood2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beats</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Two Fixed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clump</source>
+        <translation type="unfinished">Тяжёлая поступь</translation>
+    </message>
+    <message>
+        <source>Tubular Bells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uniform Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuned Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Glass</source>
+        <translation type="unfinished">Стекло</translation>
+    </message>
+    <message>
+        <source>Tibetan Bowl</source>
+        <translation type="unfinished">Тибетские шары</translation>
+    </message>
+</context>
+<context>
+    <name>meterDialog</name>
+    <message>
+        <source>Meter Numerator</source>
+        <translation>Числитель</translation>
+    </message>
+    <message>
+        <source>Meter Denominator</source>
+        <translation>Знаменатель</translation>
     </message>
 </context>
 <context>
@@ -1604,6 +2475,30 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
         <source>Send MIDI-events</source>
         <translation>Отправлять события MIDI</translation>
     </message>
+    <message>
+        <source>Input channel</source>
+        <translation>Входной канал</translation>
+    </message>
+    <message>
+        <source>Output channel</source>
+        <translation>Выходной канал</translation>
+    </message>
+    <message>
+        <source>Default velocity for all input-events</source>
+        <translation>Стандартная скорость</translation>
+    </message>
+    <message>
+        <source>Default input velocity</source>
+        <translation>Скорость по умолчанию на входе</translation>
+    </message>
+    <message>
+        <source>Default velocity for all output-events</source>
+        <translation>Стандартная скорость</translation>
+    </message>
+    <message>
+        <source>Default output velocity</source>
+        <translation>Скорость по умолчанию на выходе</translation>
+    </message>
 </context>
 <context>
     <name>mixer</name>
@@ -1633,6 +2528,13 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>All images (*.png *.jpg *.jpeg *.gif *.bmp)</source>
         <translation>Изображения (*.png *.jpg *.jpeg *.gif *.bmp)</translation>
+    </message>
+</context>
+<context>
+    <name>nineButtonSelector</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Справка</translation>
     </message>
 </context>
 <context>
@@ -1675,7 +2577,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>FX1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Randomise</source>
+        <translation>Случайно</translation>
     </message>
 </context>
 <context>
@@ -1718,7 +2624,7 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Channel muted</source>
-        <translation>Канал заглушён</translation>
+        <translation type="obsolete">Канал заглушён</translation>
     </message>
     <message>
         <source>1 step</source>
@@ -1738,13 +2644,21 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>The channel this pattern belongs to is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation>Канал, к которому относится этот шаблон, заглушён, так что заморозка не имеет смысла! Тем не менее, заморозить?</translation>
+        <translation type="obsolete">Канал, к которому относится этот шаблон, заглушён, так что заморозка не имеет смысла! Тем не менее, заморозить?</translation>
     </message>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
         <translation>Чтобы открыть этот шаблон в синтезаторе, дважды на нём щёлкните
 Используйте колёсико мыши для установки громкости отдельного шага</translation>
+    </message>
+    <message>
+        <source>Pattern muted</source>
+        <translation>Шаблон заглушён</translation>
+    </message>
+    <message>
+        <source>The track this pattern belongs to or the pattern itself is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
+        <translation>Шаблон или дорожка, которой он принадлежит, заглушён, так что замораживание не имеет смысла. Тем не менее, продолжить?</translation>
     </message>
 </context>
 <context>
@@ -1762,15 +2676,15 @@ use mouse wheel to set volume of a step</source>
     <name>pianoRoll</name>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation>Эта кнопка включает режим стирания нот по одной. Режим активируется также клавишей &apos;E&apos;.</translation>
+        <translation type="obsolete">Эта кнопка включает режим стирания нот по одной. Режим активируется также клавишей &apos;E&apos;.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation>Эта кнопка включает режим выделения нот. Это необходимо если вам нужно вырезать, копировать, вставлять или перемещать ноты. Режим активируется также клавишей &apos;S&apos;.</translation>
+        <translation type="obsolete">Эта кнопка включает режим выделения нот. Это необходимо если вам нужно вырезать, копировать, вставлять или перемещать ноты. Режим активируется также клавишей &apos;S&apos;.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation>Эта кнопка включает режим перемещения нот. Учтите, что ноты предварительно нужно выделить. Режим активируется также клавишей &apos;M&apos;.</translation>
+        <translation type="obsolete">Эта кнопка включает режим перемещения нот. Учтите, что ноты предварительно нужно выделить. Режим активируется также клавишей &apos;M&apos;.</translation>
     </message>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
@@ -1814,7 +2728,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation>Эта кнопка включает режим рисования. При этом вы можете добавлять, перемещать и изменять размер одиночных нот. Этот режим используется чаще всего, и он является режимом по умолчанию.. Режим активируется также клавишей &apos;D&apos;.</translation>
+        <translation type="obsolete">Эта кнопка включает режим рисования. При этом вы можете добавлять, перемещать и изменять размер одиночных нот. Этот режим используется чаще всего, и он является режимом по умолчанию.. Режим активируется также клавишей &apos;D&apos;.</translation>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
@@ -1838,19 +2752,19 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Draw mode (D)</source>
-        <translation>Режим рисования (D)</translation>
+        <translation type="obsolete">Режим рисования (D)</translation>
     </message>
     <message>
         <source>Erase mode (E)</source>
-        <translation>Режим удаления (E)</translation>
+        <translation type="obsolete">Режим удаления (E)</translation>
     </message>
     <message>
         <source>Select mode (S)</source>
-        <translation>Режим выделения (S)</translation>
+        <translation type="obsolete">Режим выделения (S)</translation>
     </message>
     <message>
         <source>Move selection mode (M)</source>
-        <translation>Режим перемещения выделенных нот</translation>
+        <translation type="obsolete">Режим перемещения выделенных нот</translation>
     </message>
     <message>
         <source>Notes copied</source>
@@ -1862,7 +2776,54 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Last note</source>
-        <translation type="unfinished">Вручную</translation>
+        <translation>По посл. ноте</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>Режим рисования (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>Режим стирания нот (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>Режим выбора нот (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим рисования нот, который является режимом по умолчанию и используется большую часть времени. В этом режиме вы можете добавлять/перемещать ноты по одной.
+Для включения этого режима можно использовать комбинацию клавиш Shift+D.</translation>
+    </message>
+    <message>
+        <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+    <message>
+        <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим выбора нот. В этом режиме вы можете выбирать ноты для последующих действий. Это необходимо, если вы хотите вырезать, копировать, вставлять или перемещать сразу несколько нот.
+Для включения этого режима можно использовать комбинацию клавиш Shift+S.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation>При нажатии на эту кнопку активируется режим перемещения. В этом режиме вы можете перемещать выбранные ранее (в режиме выбора) ноты.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+</context>
+<context>
+    <name>pianoWidget</name>
+    <message>
+        <source>Base note</source>
+        <translation type="unfinished">Опорная нота</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
     </message>
 </context>
 <context>
@@ -1877,11 +2838,11 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Pick position</source>
-        <translation type="unfinished"></translation>
+        <translation>Лад</translation>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Лад:</translation>
     </message>
 </context>
 <context>
@@ -1904,7 +2865,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>simple sampler with various settings for using samples (e.g. drums) in a channel</source>
-        <translation>Подключение произвольного звукового образца с некоторой возможностью настройки</translation>
+        <translation type="obsolete">Подключение произвольного звукового образца с некоторой возможностью настройки</translation>
     </message>
     <message>
         <source>no description</source>
@@ -1925,6 +2886,34 @@ use mouse wheel to set volume of a step</source>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
         <translation>Синтезатор звуков вроде органа</translation>
+    </message>
+    <message>
+        <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
+        <translation>Подключение произвольного звукового образца с некоторой возможностью настройки</translation>
+    </message>
+    <message>
+        <source>Filter for importing MIDI-files into LMMS</source>
+        <translation>Фильтр для включение файла MIDI в проект LMMS</translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
+        <translation>Модуль, позволяющий использовать в LMMS любые эффекты LADSPA.</translation>
+    </message>
+    <message>
+        <source>Tuneful things to bang on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary VST-effects inside LMMS.</source>
+        <translation>Модуль, позволяющий использовать в LMMS любые эффекты VST.</translation>
+    </message>
+    <message>
+        <source>Vibrating string modeler</source>
+        <translation>Эмуляция струн</translation>
+    </message>
+    <message>
+        <source>Filter for importing FL Studio projects into LMMS</source>
+        <translation>Фильтр для импортирования файлов FL Stuio</translation>
     </message>
 </context>
 <context>
@@ -2047,6 +3036,131 @@ use mouse wheel to set volume of a step</source>
     </message>
 </context>
 <context>
+    <name>rackPlugin</name>
+    <message>
+        <source>Turn the effect off</source>
+        <translation>Отключить эффект</translation>
+    </message>
+    <message>
+        <source>On/Off</source>
+        <translation>Вкл/Выкл</translation>
+    </message>
+    <message>
+        <source>Toggles the effect on or off.</source>
+        <translation>Включает/выключает фильтр.</translation>
+    </message>
+    <message>
+        <source>Wet/Dry mix</source>
+        <translation>Регулятор глубины фильтрации</translation>
+    </message>
+    <message>
+        <source>W/D</source>
+        <translation>На фильтр</translation>
+    </message>
+    <message>
+        <source>Wet Level:</source>
+        <translation>Глубина фильтрации</translation>
+    </message>
+    <message>
+        <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
+        <translation>Регулятор глубины фильтрации определяет долю сигнала, изменяемую фильтром, т. е. которая часть выходного сигнала прошла через этот фильтр.</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Длит.</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Задержка уничтожения фильтра:</translation>
+    </message>
+    <message>
+        <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
+        <translation>
+Этот регулятор устанавливает время, которое будет действовать фильтр после последней ноты. Чем меньше значение, тем меньше требования к ЦП, однако это может вызвать обрезку звука при использовании эффектов задержки.</translation>
+    </message>
+    <message>
+        <source>Gate</source>
+        <translation>Тишина</translation>
+    </message>
+    <message>
+        <source>Gate:</source>
+        <translation>Уровень тишины:</translation>
+    </message>
+    <message>
+        <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
+        <translation>Этот регулятор определяет наименьший уровень сигнала, который ещё будет посылаться фильтрам; всё, что ниже этого уровня, рассматриается как „тишина“ и не обрабатывается.</translation>
+    </message>
+    <message>
+        <source>Controls</source>
+        <translation>Параметры</translation>
+    </message>
+    <message>
+        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
+
+The On/Off switch allows you to bypass a given plugin at any point in time.
+
+The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for one stage is the output from the previous stage, so the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
+
+The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the signal has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
+
+The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
+
+The Controls button opens a dialog for editing the effect&apos;s parameters.
+
+Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
+        <translation>Сигнал проходит последовательно через все установленные фильтры (серху вниз).
+
+Переключатель Вкл/Выкл позволяет в любой момент включать/выключать фильтр.
+
+Регулятор глубины фильтрации определяет долю сигнала, изменяемую фильтром. Входной сигнал каждого фильтра является выходом предыдущего, так что доля нефильтрованного сигнала при прохождении по цепочке постоянно падает.
+
+Регулятор длительности последействия фильтра определяет время, которое будет действовать фильтр после окончания последней ноты. Чем меньше значение, тем меньше требования к ЦП, однако это может вызвать обрезку звука при использовании эффектов задержки. Для большинства же эффектов его можно выбирать достаточно малым.
+
+Регулятор уровня тишины служит для указания наименьшего уровня сигнала, который ещё будет посылаться фильтрам; всё, что ниже этого уровня, рассматриается как „тишина“ и не обрабатывается.
+
+Кнопка „Параметры“ открывает окно, где вы можете передать параметры модулю.
+
+Контекстное меню, вызываемое щелчком правой кнопкой мыши, позволяет менять порядок следования фильтров и удалять их.</translation>
+    </message>
+    <message>
+        <source>Move &amp;up</source>
+        <translation>Переместить &amp;выше</translation>
+    </message>
+    <message>
+        <source>Move &amp;down</source>
+        <translation>Переместить &amp;ниже</translation>
+    </message>
+    <message>
+        <source>&amp;Remove this plugin</source>
+        <translation>&amp;Убрать фильтр</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Справка</translation>
+    </message>
+</context>
+<context>
+    <name>remoteVSTPlugin</name>
+    <message>
+        <source>Loading plugin</source>
+        <translation>Загрузка модуля</translation>
+    </message>
+    <message>
+        <source>Please wait while loading VST-plugin...</source>
+        <translation>Подождите, пока загружается модуль VST...</translation>
+    </message>
+    <message>
+        <source>Failed loading VST-plugin</source>
+        <translation>Не смог загрузить модуль VST</translation>
+    </message>
+    <message>
+        <source>The VST-plugin %1 could not be loaded for some reason.
+If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation>Отчего-то модуль VST %1 не мог быть загружен.
+Если другое программное обеспечение VST работает у Вас под Linux&apos;ом, свяжитесь с разработчиком LMMS!</translation>
+    </message>
+</context>
+<context>
     <name>renameDialog</name>
     <message>
         <source>Rename...</source>
@@ -2104,6 +3218,22 @@ use mouse wheel to set volume of a step</source>
     <message>
         <source>Sample track</source>
         <translation>Дорожка</translation>
+    </message>
+    <message>
+        <source>Channel volume</source>
+        <translation>Громкость канала</translation>
+    </message>
+    <message>
+        <source>Channel volume:</source>
+        <translation>Громкость канала:</translation>
+    </message>
+    <message>
+        <source>VOL</source>
+        <translation>ГРМК</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the volume of the opened channel.</source>
+        <translation>Регулировка громкости текущего канала.</translation>
     </message>
 </context>
 <context>
@@ -2242,44 +3372,94 @@ Latency: %2 ms</source>
         <source>Choose artwork-theme directory</source>
         <translation>Выбор каталога с темой оформления для LMMS</translation>
     </message>
+    <message>
+        <source>Display volume as dbV </source>
+        <translation>Отображать громкости в децибелах (напр.) </translation>
+    </message>
+    <message>
+        <source>Do not compress project files per default</source>
+        <translation>По умолчанию не сжимать файлы проектов</translation>
+    </message>
+    <message>
+        <source>FL Studio installation directory</source>
+        <translation>Каталог установки FL Studio</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin directories</source>
+        <translation>Каталоги с модулями LADSPA</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation>Каталог STK</translation>
+    </message>
+    <message>
+        <source>SMP support</source>
+        <translation>Поддержка SMP</translation>
+    </message>
+    <message>
+        <source>Parallelizing level</source>
+        <translation>Уровень распараллеливания</translation>
+    </message>
+    <message>
+        <source>SMP-level</source>
+        <translation>Уровень SMP</translation>
+    </message>
+    <message>
+        <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
+Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
+        <translation>Если в системе установлено более одного процессора (н-р, двухъядерные системы), установите уроень распараллеливания больший единицы. В этом случае LMMS будет пытаться разбить процесс обработки звука на несколько потоков, которые (это уже обрабатыается ОС) могут выполняться на разных процессорах.
+Учтите, что иногда распараллеливание не работает при малом буфере. Если возникают проблемы со звуком, попробуйте уеличит размер буфера.</translation>
+    </message>
+    <message>
+        <source>Choose FL Studio installation directory</source>
+        <translation>Выбор каталога FL Studio</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation>Выбор каталога с модулями LADSPA </translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation>Выбор каталога STK</translation>
+    </message>
 </context>
 <context>
     <name>setupWidget</name>
     <message>
         <source>ALSA (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
+        <translation>ALSA (Улучшенная звуковая архитектура Linux)</translation>
     </message>
     <message>
         <source>Dummy (no sound output)</source>
-        <translation type="unfinished"></translation>
+        <translation> Нет (без звука)</translation>
     </message>
     <message>
         <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"></translation>
+        <translation>OSS (Открытая звуковая система)</translation>
     </message>
     <message>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
+        <translation>ALSA Raw-MIDI (Улучшенная звуковая архитектура Linux)</translation>
     </message>
     <message>
         <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"></translation>
+        <translation>OSS Raw-MIDI (Открытая звуковая система)</translation>
     </message>
     <message>
         <source>Dummy (no MIDI support)</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет (без поддержки MIDI)</translation>
     </message>
     <message>
         <source>SDL (Simple DirectMedia Layer)</source>
-        <translation type="unfinished"></translation>
+        <translation>SDL</translation>
     </message>
     <message>
         <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
+        <translation>ALSA Sequencer (Улучшенная звуковая архитектура Linux)</translation>
     </message>
     <message>
         <source>JACK (JACK Audio Connection Kit)</source>
-        <translation type="unfinished"></translation>
+        <translation>JACK (Звуковой инструментарий JACK)</translation>
     </message>
 </context>
 <context>
@@ -2385,7 +3565,7 @@ Please make sure you have at least read-access to the file and try again.</sourc
     </message>
     <message>
         <source>MIDI-files (*.mid)</source>
-        <translation>Файлы MIDI (*.mid; *.midi)
+        <translation type="obsolete">Файлы MIDI (*.mid; *.midi)
 </translation>
     </message>
     <message>
@@ -2442,12 +3622,36 @@ Please make sure you have write-access to the file and try again.</source>
         <source>Edit mode (select and move)</source>
         <translation>Правка (выделение/перемещение)</translation>
     </message>
+    <message>
+        <source>Tempo</source>
+        <translation>Темп</translation>
+    </message>
+    <message>
+        <source>Auto limiter</source>
+        <translation>Автоограничение</translation>
+    </message>
 </context>
 <context>
     <name>surroundArea</name>
     <message>
         <source>click to where this channel should be audible</source>
         <translation>Укажите, где должен быть слышен этот канал</translation>
+    </message>
+    <message>
+        <source>Surround area X</source>
+        <translation>Пространство, координата Y</translation>
+    </message>
+    <message>
+        <source>Surround area Y</source>
+        <translation>Пространство, координата X</translation>
+    </message>
+    <message>
+        <source>Open &amp;X in automation editor</source>
+        <translation>Зависимость от времени координаты &amp;X</translation>
+    </message>
+    <message>
+        <source>Open &amp;Y in automation editor</source>
+        <translation>Зависимость от времени координаты &amp;Y</translation>
     </message>
 </context>
 <context>
@@ -2543,6 +3747,18 @@ Please make sure you have write-access to the file and try again.</source>
         <source>Synced to 32nd Note</source>
         <translation>Синхронизировано по 1/32 ноты</translation>
     </message>
+    <message>
+        <source>Custom...</source>
+        <translation>Настроить...</translation>
+    </message>
+    <message>
+        <source>&amp;Open in automation editor</source>
+        <translation>&amp;Настройка зависимости от времени</translation>
+    </message>
+    <message>
+        <source>Custom </source>
+        <translation>Настроить </translation>
+    </message>
 </context>
 <context>
     <name>timeLine</name>
@@ -2591,23 +3807,53 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>Could not open file</source>
-        <translation>Не могу открыть файл</translation>
+        <translation type="obsolete">Не могу открыть файл</translation>
     </message>
     <message>
         <source>Could not open file %1 for reading.
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation>Не могу открыть файл %1 для чтения.
+        <translation type="obsolete">Не могу открыть файл %1 для чтения.
 Проверьте, обладаете ли вы правами на чтение выбранного файла и содержащего его каталога и попробуйте снова!</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Не могу открыть файл %1 для записи.
+        <translation type="obsolete">Не могу открыть файл %1 для записи.
 Проверьте, обладаете ли вы правами на запись в выбранный файл и содержащий его каталог и попробуйте снова!</translation>
     </message>
     <message>
         <source>Importing MIDI-file...</source>
         <translation>Импортирую файл MIDI...</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t import file</source>
+        <translation>Не могу импортировать файл</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find a filter for importing file %1.
+You should convert this file into a format supported by LMMS using another software. </source>
+        <translation type="obsolete">Не найден фильтр для импорта файла %1.
+Вам следует преобразовать его в формат, поддерживаемый LMMS. </translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file</source>
+        <translation>Не могу открыть файл</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file %1 for reading.
+Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
+        <translation>Не могу открыть файл %1 для записи.
+Проверьте, обладаете ли вы правами на запись в выбранный файл и содержащий его каталог и попробуйте снова!</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find a filter for importing file %1.
+You should convert this file into a format supported by LMMS using another software.</source>
+        <translation>Не могу найти фильтр для файла  %1.
+Для подключения этого файла преобразуйте его в формат, поддерживаемый LMMS.</translation>
+    </message>
+    <message>
+        <source>Importing FLP-file...</source>
+        <translation>Импортирую файл FLP...</translation>
     </message>
 </context>
 <context>
@@ -2652,6 +3898,10 @@ Please make sure you have write-permission to the file and the directory contain
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
         <translation>Для свободного перемещения нажмите &lt;Ctrl&gt;.</translation>
     </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation>Заглушить/включить (Crl + средняя кнопка мыши)</translation>
+    </message>
 </context>
 <context>
     <name>trackOperationsWidget</name>
@@ -2684,6 +3934,18 @@ right click = mute all other tracks (solo)</source>
     <message>
         <source>Actions for this track</source>
         <translation>Действия для этой дорожки</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Заглушить</translation>
+    </message>
+    <message>
+        <source>Enable automation</source>
+        <translation>Использовать настроенную зависимость от времени</translation>
+    </message>
+    <message>
+        <source>Disable automation</source>
+        <translation>Отключить настроенную зависимость от времени</translation>
     </message>
 </context>
 <context>
@@ -2848,6 +4110,26 @@ right click = mute all other tracks (solo)</source>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo-sounds.</source>
         <translation>Этот регулятор устанавливает фазовую расстройку генератора %1 между каналами, то есть разность фаз между левым и правым каналами. Это удобно для создания стереоэффектов.</translation>
     </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>Модулировать фазу второго генератора сигналом с первого</translation>
+    </message>
+    <message>
+        <source>Modulation type 1</source>
+        <translation>Первый тип модуляции</translation>
+    </message>
+    <message>
+        <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>Модулировать фазу третьего генератора сигналом со второго</translation>
+    </message>
+    <message>
+        <source>Modulation type 2</source>
+        <translation>Второй тип модуляции</translation>
+    </message>
+    <message>
+        <source>Osc %1 wave shape</source>
+        <translation>Форма сигнала генератора No %1</translation>
+    </message>
 </context>
 <context>
     <name>vestigeInstrument</name>
@@ -2911,10 +4193,205 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
 </context>
 <context>
+    <name>vibed</name>
+    <message>
+        <source>The waveform editor provides control over the initial state or impulse that is used to start the string vibrating.  The buttons to the right of the graph will initialize the waveform to the selected type.  The &apos;?&apos; button will load a waveform from a file--only the first 128 samples will be loaded.
+
+The waveform can also be drawn in the graph.
+
+The &apos;S&apos; button will smooth the waveform.
+
+The &apos;N&apos; button will normalize the waveform.</source>
+        <translation>Редактор формы позволяет явно указать профиль струны в начальный момент времени, либо её начальный импульс (в заисимости от состояния переключателя „Imp“). Кнопки справа от рисунка позволяют задавать некоторые стандартные формы, причём кнопка &apos;?&apos; служит для задания формы из произвольного звукового файла (загружаются первые 128 элементов выборки).
+
+Также форма сигнала может быть просто нарисована с помощью мыши.
+
+Кнопка &apos;S&apos; сгладит текущую форму.
+
+Кнопка &apos;N&apos; нормализует уровень.</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Громкость</translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation>Громкость:</translation>
+    </message>
+    <message>
+        <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
+        <translation>Регулятор &apos;V&apos; устанавливает громкость текущей струны.</translation>
+    </message>
+    <message>
+        <source>String stiffness</source>
+        <translation>Жёсткость струны</translation>
+    </message>
+    <message>
+        <source>String stiffness:</source>
+        <translation>Жёсткость:</translation>
+    </message>
+    <message>
+        <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
+        <translation>Регулятор &apos;S&apos; устанавливает жёсткость текущей струны. Этот параметр отвечает за длительность звучания струны (чем больше значение жёсткости, тем тольше звенит струна).</translation>
+    </message>
+    <message>
+        <source>Pick position</source>
+        <translation>Лад</translation>
+    </message>
+    <message>
+        <source>Pick position:</source>
+        <translation>Лад:</translation>
+    </message>
+    <message>
+        <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
+        <translation>Регулятор &apos;P&apos; устанавливает место струны, где она будет „прижата“. Чем ниже значение, тем ближе это место будет к кобылке.</translation>
+    </message>
+    <message>
+        <source>Pickup position</source>
+        <translation>Положение звукоснимателя</translation>
+    </message>
+    <message>
+        <source>Pickup position:</source>
+        <translation>Положение звукоснимателя:</translation>
+    </message>
+    <message>
+        <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
+        <translation>Регулятор &apos;PU&apos; устанавливает место струны, откуда будет сниматься звук. Чем ниже значение, тем ближе это место будет к кобылке.</translation>
+    </message>
+    <message>
+        <source>Pan</source>
+        <translation>Стереобаланс</translation>
+    </message>
+    <message>
+        <source>Pan:</source>
+        <translation>Стереобаланс:</translation>
+    </message>
+    <message>
+        <source>The Pan knob determines the location of the selected string in the stereo field.</source>
+        <translation>Этот регулятор устанавливает стереобаланс для текущей струны.</translation>
+    </message>
+    <message>
+        <source>Detune</source>
+        <translation>Расстройка</translation>
+    </message>
+    <message>
+        <source>Detune:</source>
+        <translation>Расстройка:</translation>
+    </message>
+    <message>
+        <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
+        <translation>Регулятор  расстройки изменяет сдвиг частоты для текущей струны. Отрицательные значения заставят струну звучать бемольно, положительные — диезно. </translation>
+    </message>
+    <message>
+        <source>Fuzziness</source>
+        <translation>Нечёткость</translation>
+    </message>
+    <message>
+        <source>Fuzziness:</source>
+        <translation>Нечёткость:</translation>
+    </message>
+    <message>
+        <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
+        <translation>Этот регулятор добавляет размытости звуку, что наиболее заметно во время нарастания, впрочем это может использоваться чтобы сделать звук более „металлическим“.</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Длина</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Длина:</translation>
+    </message>
+    <message>
+        <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
+        <translation>Регулятор длины устанавливает длину текущей струны. Чем длиннее струна, тем более чистый и долгий звук она даёт; однако это требует больше ресурсов ЦП.</translation>
+    </message>
+    <message>
+        <source>Impulse</source>
+        <translation>Импульс</translation>
+    </message>
+    <message>
+        <source>Impulse or initial state</source>
+        <translation>Начальная скорость/начальное состояние</translation>
+    </message>
+    <message>
+        <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
+        <translation>Переключатель „Imp“ устанавливает режим работы струны: если он включён, то указанная форма сигнала интерпретируется как начальный импульс, иначе — как начальная форма струны.</translation>
+    </message>
+    <message>
+        <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
+        <translation>Переключатель октав позволяет указать гармонику основной частоты, на которой будет звучать струна. Например, „-2“ означает, что струна будет звучать двумя октавами ниже основной частоты, „F“ заставит струну звенеть на основной частоте инструмента, а „6“ — на частоте, на шесть октав более высокой, чем основная.</translation>
+    </message>
+    <message>
+        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <translation>Переключатель струн позволяет выбрать струну, чьи свойства редактируются. Инструмент Vibed содержит до девяти независимо звучащих струн, индикатор в левом нижнем углу показывает, активна ли текущая струна (т. е. будет ли она слышна).</translation>
+    </message>
+    <message>
+        <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
+
+The graph allows you to control the initial state or impulse used to set the string in motion.
+
+The &apos;V&apos; knob controls the volume.  The &apos;S&apos; knob controls the string&apos;s stiffness.  The &apos;P&apos; knob controls the pick position.  The &apos;PU&apos; knob controls the pickup position.
+
+&apos;Pan&apos; and &apos;Detune&apos; hopefully don&apos;t need explanation.  The &apos;Slap&apos; knob adds a bit of fuzz to the sound of the string.
+
+The &apos;Length&apos; knob controls the length of the string.
+
+The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
+        <translation>Инструмент „Vibed“ моделирует до девяти независимых одновременно звучащих струн. 
+
+Переключатель „Strings“  позволяет выбрать струну, чьи свойства редактируются.
+
+Переключатель „Imp“ устанавливает режим работы струны: если он включён, то указанная форма сигнала интерпретируется как начальный импульс, иначе — как начальная форма струны.
+
+Переключатель „Octave“  позволяет указать гармонику основной частоты, на которой будет звучать струна.
+
+Редактор формы позволяет явно указать профиль струны в начальный момент времени, либо её начальный импульс.
+
+Регулятор &apos;V&apos; устанавливает громкость текущей струны, &apos;S&apos; — жёсткость, &apos;P&apos; — место, где прижата струна, а  &apos;PU&apos;&apos; — положение звукоснимателя
+
+Регуляторы расстройки и стереобаланса, есть надежда, не нуждаются в объяснениях.
+
+Ручка „Длина“ регулирует длину струны
+
+Индикатор-переключатель слева снизу определяет, включена ли текущая струна.</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Справка</translation>
+    </message>
+</context>
+<context>
     <name>visualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
         <translation>Нажмите, чтобы включить/выключить визуализацию</translation>
+    </message>
+</context>
+<context>
+    <name>volumeKnob</name>
+    <message>
+        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
+        <translation>Введите новое значение между –96,0 дБ и 6,0 дБ (по напряжению):</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>Введите новое значение между %1 и %2:</translation>
+    </message>
+</context>
+<context>
+    <name>vstSubPluginDescriptionWidget</name>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <source>Name: </source>
+        <translation>Название: </translation>
+    </message>
+    <message>
+        <source>File: </source>
+        <translation>Файл: </translation>
     </message>
 </context>
 </TS>
