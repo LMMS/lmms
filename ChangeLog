@@ -1,5 +1,9 @@
 2006-12-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/caps/Makefile.am:
+	added include-path of LMMS for successfully compiling CAPS with shipped
+	LADSPA-header
+
 	* src/tracks/instrument_track.cpp:
 	integrated patch from Jean-Yves Lefort <jylefort/at/freebsd/dot/org>
 
