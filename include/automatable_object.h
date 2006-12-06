@@ -62,13 +62,13 @@ public:
 					const T _max = 0,
 					const T _step = defaultRelStep() ) :
 		journallingObject( _engine ),
-		m_oldValue( _val ),
 		m_value( _val ),
 		m_minValue( _min ),
 		m_maxValue( _max ),
 		m_step( _step ),
 		m_automation_pattern( NULL ),
-		m_track( _track )
+		m_track( _track ),
+		m_journalEntryReady( FALSE )
 	{
 		m_curLevel = level( _val );
 		m_minLevel = level( _min );
@@ -161,13 +161,13 @@ public:
 
 	inline virtual void setInitValue( const T _value )
 	{
-		saveJournallingState( FALSE );
+		bool journalling = testAndSetJournalling( FALSE );
 		setValue( _value );
 		if( m_automation_pattern )
 		{
 			setFirstValue();
 		}
-		restoreJournallingState();
+		setJournalling( journalling );
 	}
 
 	inline virtual void setValue( const T _value )
@@ -197,10 +197,11 @@ public:
 					it->fittedValue( value() ) !=
 								it->value() )
 				{
-					it->saveJournallingState(
+					bool journalling =
+						it->testAndSetJournalling(
 							isJournalling() );
 					it->setValue( value() );
-					it->restoreJournallingState();
+					it->setJournalling( journalling );
 				}
 			}
 		}
@@ -380,7 +381,7 @@ public:
 protected:
 	virtual void redoStep( journalEntry & _je )
 	{
-		saveJournallingState( FALSE );
+		bool journalling = testAndSetJournalling( FALSE );
 /*#ifndef QT3
 		setValue( static_cast<T>( value() +
 					_je.data().value<EDIT_STEP_TYPE>() ) );
@@ -388,7 +389,7 @@ protected:
 		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
 						_je.data().toDouble() ) ) );
 //#endif
-		restoreJournallingState();
+		setJournalling( journalling );
 	}
 
 	virtual void undoStep( journalEntry & _je )
@@ -403,13 +404,25 @@ protected:
 		redoStep( je );
 	}
 
-
-	// most objects will need this temporarily
-	T m_oldValue;
+	inline void prepareJournalEntryFromOldVal( void )
+	{
+		m_oldValue = value();
+		saveJournallingState( FALSE );
+		m_journalEntryReady = TRUE;
+	}
 
 	inline void addJournalEntryFromOldToCurVal( void )
 	{
-		addJournalEntry( journalEntry( 0, value() - m_oldValue ) );
+		if( m_journalEntryReady )
+		{
+			restoreJournallingState();
+			if( value() != m_oldValue )
+			{
+				addJournalEntry( journalEntry( 0, value() -
+								m_oldValue ) );
+			}
+			m_journalEntryReady = FALSE;
+		}
 	}
 
 	inline void setFirstValue( void )
@@ -437,6 +450,10 @@ private:
 	int m_curLevel;
 	QPointer<automationPattern> m_automation_pattern;
 	track * m_track;
+
+	// most objects will need this temporarily
+	T m_oldValue;
+	bool m_journalEntryReady;
 
 	QVariant m_data;
 
@@ -483,11 +500,11 @@ private:
 		{
 			return;
 		}
-		saveJournallingState( FALSE );
+		bool journalling = testAndSetJournalling( FALSE );
 		m_automation_pattern->setUpdateFirst( FALSE );
 		setValue( _level * m_step );
 		m_automation_pattern->setUpdateFirst( TRUE );
-		restoreJournallingState();
+		setJournalling( journalling );
 	}
 
 	inline int level( T _value ) const

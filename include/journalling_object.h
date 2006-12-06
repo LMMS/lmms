@@ -172,6 +172,13 @@ protected:
 		m_journalling = _sr;
 	}
 
+	inline bool testAndSetJournalling( const bool _sr )
+	{
+		bool old_journalling = m_journalling;
+		m_journalling = _sr;
+		return( old_journalling );
+	}
+
 
 	// to be implemented by sub-objects
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

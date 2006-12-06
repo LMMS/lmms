@@ -145,7 +145,7 @@ midiTime automationPattern::length( void ) const
 							it != m_time_map.end();
 									++it )
 	{
-		max_length = tMax<Sint32>( max_length, it.key() );
+		max_length = tMax<Sint32>( max_length, -it.key() );
 	}
 	if( max_length % 64 == 0 )
 	{
@@ -166,7 +166,7 @@ midiTime automationPattern::putValue( const midiTime & _time, const int _value,
 				eng()->getAutomationEditor()->quantization() ) :
 		_time;
 
-	m_time_map[new_time] = _value;
+	m_time_map[-new_time] = _value;
 
 	return( new_time );
 }
@@ -178,7 +178,7 @@ void automationPattern::removeValue( const midiTime & _time )
 {
 	if( _time != 0 )
 	{
-		m_time_map.remove( _time );
+		m_time_map.remove( -_time );
 	}
 }
 
@@ -199,12 +199,7 @@ void automationPattern::clear( void )
 
 int automationPattern::valueAt( const midiTime & _time )
 {
-	if( m_time_map.contains( _time ) )
-	{
-		return( m_time_map[_time] );
-	}
-	//TODO: Return a better value!!
-	return( 0 );
+	return( m_time_map.lowerBound( -_time ).value() );
 }
 
 
@@ -216,7 +211,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 									++it )
 	{
 		QDomElement element = _doc.createElement( "time" );
-		element.setAttribute( "pos", static_cast<Sint32>( it.key() ) );
+		element.setAttribute( "pos", -it.key() );
 		element.setAttribute( "value", m_object->levelToLabel(
 								it.value() ) );
 		_this.appendChild( element );
@@ -238,7 +233,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 		{
 			continue;
 		}
-		m_time_map[midiTime( element.attribute( "pos" ).toInt() )]
+		m_time_map[-element.attribute( "pos" ).toInt()]
 				= m_object->labelToLevel(
 						element.attribute( "value" ) );
 	}
@@ -276,9 +271,9 @@ const QString automationPattern::name( void )
 
 void automationPattern::processMidiTime( const midiTime & _time )
 {
-	timeMap::iterator it = m_time_map.find( _time );
-	if( it != m_time_map.end() )
+	if( _time >= 0 )
 	{
+		timeMap::iterator it = m_time_map.lowerBound( -_time );
 		m_object->setLevel( it.value() );
 	}
 }

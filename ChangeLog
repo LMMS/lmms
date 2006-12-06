@@ -1,3 +1,73 @@
+2006-12-06	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/note.h:
+	* src/core/note.cpp:
+	show detuning in the piano roll
+
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	- show note detuning
+	- save last key when starting to play, fixes held notes bug
+	- removed cursor enter/leave events, they could be ignored
+	- optimized unsafe loops
+
+	* include/xqmap.h:
+	initial release, QMap with lowerBound for Qt3
+
+	* include/automation_pattern.h:
+	* src/tracks/automation_pattern.cpp:
+	- use lowerBound find, resets to proper values
+	- work with inverted midi time
+
+	* include/automation_editor.h:
+	* src/core/automation_editor.cpp:
+	- work with inverted midi time
+	- fixed display of hidden values
+	- added red cross
+	- update detuning in the piano roll
+	- removed cursor enter/leave events, they could be ignored
+	- optimized unsafe loops
+	- minor optimizations
+
+	* include/note_play_handle.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	set subnotes' BB track
+
+	* data/track_icons/*.png:
+	re-added corrupted images
+
+	* src/core/name_label.cpp:
+	added bad pixmap protection
+
+	* src/audio/audio_alsa.cpp:
+	- removed unnecessary asynchronous behaviour, fixes large audio buffers
+	- fill the whole period buffer, avoids underrun in synchronous mode
+
+	* src/core/setup_dialog.cpp:
+	don't use the journal
+
+	* include/journalling_object.h:
+	ease short disabling
+
+	* include/automatable_object.h:
+	- use light journal disabling
+	- use the journal if necessary
+
+	* src/widgets/knob.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/volume_knob.cpp:
+	use the journal if necessary
+
+	* src/widgets/tempo_sync_knob.cpp:
+	- change icon when changing mode, fixes automation crash
+	- disable the journal when calculating sync time
+
+	* src/core/bb_editor.cpp:
+	don't create TCOs when there aren't any BB tracks
+
+	* src/tracks/instrument_track.cpp:
+	removed temporary fix
+
 2006-12-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/caps/Makefile.am:

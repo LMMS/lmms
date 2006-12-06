@@ -219,7 +219,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 	{
 		m_origMousePos = _me->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
-		m_oldValue = value();
+		prepareJournalEntryFromOldVal();
 	}
 }
 

@@ -462,6 +462,11 @@ void bbEditor::updateAfterTrackAdd( void )
 
 void bbEditor::createTCOsForBB( csize _bb )
 {
+	if( numOfBBs() == 0 )
+	{
+		return;
+	}
+
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
 	{

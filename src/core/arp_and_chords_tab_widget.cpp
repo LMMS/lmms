@@ -476,6 +476,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 						_n->getInstrumentTrack(),
 						_n->framesAhead(),
 						_n->frames(), note_copy );
+				note_play_handle->setBBTrackFrom( _n );
 				// add sub-note to base-note, now all stuff is
 				// done by notePlayHandle::play_note()
 				_n->addSubNote( note_play_handle );
@@ -638,6 +639,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 						gated_frames,
 						new_note,
 						TRUE );
+		note_play_handle->setBBTrackFrom( _n );
 
 		// add sub-note to base-note - now all stuff is done by
 		// notePlayHandle::playNote()

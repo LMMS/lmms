@@ -316,8 +316,6 @@ void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 						"/" +
 				QString::number( m_custom->getDenominator() ) +
 						")";
-				m_tempoSyncIcon = embed::getIconPixmap(
-						"dont_know" );
 				conversionFactor = 
 			static_cast<float>( m_custom->getDenominator() ) /
 			static_cast<float>( m_custom->getNumerator() );
@@ -325,73 +323,101 @@ void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 			case DOUBLE_WHOLE_NOTE:
 				m_tempoSyncDescription = tr(
 						"Synced to Eight Beats" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-							"note_double_whole" );
 				conversionFactor = 0.125;
 				break;
 			case WHOLE_NOTE:
 				m_tempoSyncDescription = tr(
 						"Synced to Whole Note" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-								"note_whole" );
 				conversionFactor = 0.25;
 				break;
 			case HALF_NOTE:
 				m_tempoSyncDescription = tr(
 							"Synced to Half Note" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-								"note_half" );
 				conversionFactor = 0.5;
 				break;
 			case QUARTER_NOTE:
 				m_tempoSyncDescription = tr(
 						"Synced to Quarter Note" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-							"note_quarter" );
 				conversionFactor = 1.0;
 				break;
 			case EIGHTH_NOTE:
 				m_tempoSyncDescription = tr(
 							"Synced to 8th Note" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-								"note_eighth" );
 				conversionFactor = 2.0;
 				break;
 			case SIXTEENTH_NOTE:
 				m_tempoSyncDescription = tr(
 							"Synced to 16th Note" );
-				m_tempoSyncIcon = embed::getIconPixmap(
-							"note_sixteenth" );
 				conversionFactor = 4.0;
 				break;
 			case THIRTYSECOND_NOTE:
 				m_tempoSyncDescription = tr(
 							"Synced to 32nd Note" );
+				conversionFactor = 8.0;
+				break;
+			default: ;
+		}
+		bool journalling = testAndSetJournalling( FALSE );
+		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
+		setJournalling( journalling );
+	}
+	else
+	{
+		m_tempoSyncDescription = tr( "Tempo Sync" );
+	}
+	
+	if( m_tempoSyncMode != m_tempoLastSyncMode )
+	{
+		switch( m_tempoSyncMode )
+		{
+			case NO_SYNC:
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"tempo_sync" );
+				break;
+			case CUSTOM:
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"dont_know" );
+				break;
+			case DOUBLE_WHOLE_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_double_whole" );
+				break;
+			case WHOLE_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_whole" );
+				break;
+			case HALF_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_half" );
+				break;
+			case QUARTER_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_quarter" );
+				break;
+			case EIGHTH_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+								"note_eighth" );
+				break;
+			case SIXTEENTH_NOTE:
+				m_tempoSyncIcon = embed::getIconPixmap(
+							"note_sixteenth" );
+				break;
+			case THIRTYSECOND_NOTE:
 				m_tempoSyncIcon = embed::getIconPixmap(
 							"note_thirtysecond" );
-				conversionFactor = 8.0;
 				break;
 			default:
 				printf( "tempoSyncKnob::calculateTempoSyncTime"
 						": invalid tempoSyncMode" );
 				break;
 		}
-		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
-	}
-	else
-	{
-		m_tempoSyncDescription = tr( "Tempo Sync" );
-		m_tempoSyncIcon = embed::getIconPixmap( "tempo_sync" );
-	}
-	
-	if( m_tempoSyncMode != m_tempoLastSyncMode )
-	{
+
 		emit syncModeChanged( m_tempoSyncMode );
 		emit syncDescriptionChanged( m_tempoSyncDescription );
 		emit syncIconChanged();
+
+		m_tempoLastSyncMode = m_tempoSyncMode;
 	}
-	
-	m_tempoLastSyncMode = m_tempoSyncMode;
 }
 
 

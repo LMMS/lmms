@@ -432,8 +432,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 			eng()->getMainWindow()->isCtrlPressed() == FALSE &&
 			eng()->getMainWindow()->isShiftPressed() == FALSE )
 	{
-		setJournalling( FALSE );
-		m_oldValue = value();
+		prepareJournalEntryFromOldVal();
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -509,7 +508,6 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 //! Mouse Release Event handler
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	setJournalling( TRUE );
 	addJournalEntryFromOldToCurVal();
 
 	if( m_buttonPressed )

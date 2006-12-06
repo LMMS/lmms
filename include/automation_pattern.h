@@ -31,6 +31,12 @@
 #include "track.h"
 #include "level_object.h"
 
+#ifdef QT3
+
+#include "xqmap.h"
+
+#endif
+
 
 
 
@@ -38,7 +44,12 @@ class automationPattern : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
-	typedef QMap<midiTime, int> timeMap;
+	// map negative midiTime to level
+#ifdef QT3
+	typedef XQMap<int, int> timeMap;
+#else
+	typedef QMap<int, int> timeMap;
+#endif
 
 	automationPattern( track * _track, levelObject * _object );
 	automationPattern( engine * _engine, levelObject * _object );

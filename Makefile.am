@@ -350,7 +350,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/dummy_effect.h			\
 		$(srcdir)/include/ladspa-1.1.h			\
 		$(srcdir)/include/meter_dialog.h			\
-		$(srcdir)/include/qxembed.h
+		$(srcdir)/include/qxembed.h				\
+		$(srcdir)/include/xqmap.h
 
 
 

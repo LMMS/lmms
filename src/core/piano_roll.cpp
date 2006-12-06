@@ -79,6 +79,9 @@
 #include "piano_widget.h"
 
 
+typedef automationPattern::timeMap timeMap;
+
+
 extern tones whiteKeys[];	// defined in piano_widget.cpp
 
 
@@ -136,7 +139,6 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	QWidget( _engine->getMainWindow()->workspace() ),
 	journallingObject( _engine ),
 	m_paintPixmap(),
-	m_cursorInside( FALSE ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -148,7 +150,6 @@ pianoRoll::pianoRoll( engine * _engine ) :
 	m_ppt( DEFAULT_PR_PPT ),
 	m_lenOfNewNotes( midiTime( 0, 16 ) ),
 	m_startKey( INITIAL_START_KEY ),
-	m_keyMouseOver( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( DRAW ),
 	m_scrollBack( FALSE )
@@ -870,6 +871,12 @@ void pianoRoll::updatePaintPixmap( void )
 	int y_base = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
 	if( validPattern() == TRUE )
 	{
+		QPainter p_detuning( &m_paintPixmap );
+		p_detuning.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+				width() - WHITE_KEY_WIDTH,
+				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN
+							- m_notesEditHeight );
+
 		noteVector & notes = m_pattern->notes();
 
 		const int visible_keys = ( height() - PR_TOP_MARGIN -
@@ -946,6 +953,13 @@ void pianoRoll::updatePaintPixmap( void )
 						( *it )->getVolume() / 2,
 					x + WHITE_KEY_WIDTH + 1,
 					height() - PR_BOTTOM_MARGIN );
+
+			if( ( *it )->hasDetuningInfo() )
+			{
+				drawDetuningInfo( p_detuning, *it,
+					x + WHITE_KEY_WIDTH,
+					y_base - key * KEY_LINE_HEIGHT );
+			}
 		}
 	}
 	else
@@ -987,6 +1001,39 @@ void pianoRoll::updatePaintPixmap( void )
 
 
 
+inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
+								Uint16 _y )
+{
+	Uint16 middle_y = _y + KEY_LINE_HEIGHT / 2;
+	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+
+	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
+	timeMap::iterator it = map.end();
+	do
+	{
+		--it;
+		Sint32 pos_tact_64th = -it.key();
+		if( pos_tact_64th > _n->length() )
+		{
+			break;
+		}
+		Uint16 pos_x = _x + pos_tact_64th * m_ppt / 64;
+
+#ifdef QT3
+		const int level = it.data();
+#else
+		const int level = it.value();
+#endif
+		Uint16 pos_y = middle_y - level * KEY_LINE_HEIGHT / 10;
+
+		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
+		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
+	} while( it != map.begin() );
+}
+
+
+
+
 void pianoRoll::removeSelection( void )
 {
 	m_selectStartTact64th = 0;
@@ -1003,15 +1050,6 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 	QApplication::restoreOverrideCursor();
 	hide();
 	_ce->ignore ();
-}
-
-
-
-
-void pianoRoll::enterEvent( QEvent * _e )
-{
-	m_cursorInside = TRUE;
-	QWidget::enterEvent( _e );
 }
 
 
@@ -1215,7 +1253,6 @@ void pianoRoll::leaveEvent( QEvent * _e )
 	{
 		QApplication::restoreOverrideCursor();
 	}
-	m_cursorInside = FALSE;
 
 	QWidget::leaveEvent( _e );
 }
@@ -1455,6 +1492,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		if( play_note == TRUE && m_recording == FALSE &&
 				eng()->getSongEditor()->playing() == FALSE )
 		{
+			m_lastKey = key_num;
 			m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
 							vol * 127 / 100 ),
@@ -1479,7 +1517,7 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		else
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, getKey( _me->y() ), 0 ),
+					midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
 								midiTime() );
 		}
 	}
@@ -1505,22 +1543,18 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		return;
 	}
 
-	// save current last-key-var
-	int released_key = m_lastKey;
-
 	if( _me->y() > PR_TOP_MARGIN )
 	{
 		bool edit_note = ( _me->y() > height() -
 					PR_BOTTOM_MARGIN - m_notesEditHeight );
 
 		int key_num = getKey( _me->y() );
-		m_keyMouseOver = key_num;
 		int x = _me->x();
 
 		// is the calculated key different from current key?
 		// (could be the user just moved the cursor one pixel up/down
 		// but is still on the same key)
-		if( key_num != released_key &&
+		if( key_num != m_lastKey &&
 			m_action != CHANGE_NOTE_VOLUME &&
 			m_action != MOVE_SELECTION &&
 			edit_note == FALSE &&
@@ -1532,7 +1566,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					Qt::LeftButton )
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0, released_key, 0 ),
+					midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
 								midiTime() );
 			if(
 #ifdef QT4
@@ -1547,6 +1581,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_recording == FALSE &&
 				eng()->getSongEditor()->playing() == FALSE )
 			{
+				m_lastKey = key_num;
 				m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
 						DEFAULT_VOLUME * 127 / 100 ),
@@ -1886,15 +1921,11 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				int note_tact_64th =
 						( *it )->pos().getTact64th() +
 								tact_64th_diff;
-				while( note_tact_64th < 0 )
+				// ensure note_tact_64th range
+				if( note_tact_64th >> 6 )
 				{
-					--note_tact;
-					note_tact_64th += 64;
-				}
-				while( note_tact_64th > 64 )
-				{
-					++note_tact;
-					note_tact_64th -= 64;
+					note_tact += note_tact_64th >> 6;
+					note_tact_64th &= 63;
 				}
 				midiTime new_note_pos( note_tact,
 							note_tact_64th );
@@ -2019,33 +2050,31 @@ void pianoRoll::paintEvent( QPaintEvent * )
 #endif
 	p.drawPixmap( 0, 0, m_paintPixmap );
 
-	if( m_cursorInside == TRUE )
-	{
-		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
+	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
 				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
 					m_notesEditHeight - PR_BOTTOM_MARGIN );
-		if( validPattern() == TRUE )
-		{
-			p.fillRect( 10, height() + 3 - PR_BOTTOM_MARGIN -
+	if( validPattern() == TRUE )
+	{
+		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
+		p.fillRect( 10, height() + 3 - PR_BOTTOM_MARGIN -
 				m_notesEditHeight - KEY_LINE_HEIGHT *
-					( m_keyMouseOver - m_startKey + 1 ),
+					( key_num - m_startKey + 1 ),
 				width() - 10, KEY_LINE_HEIGHT - 7,
 							QColor( 64, 64, 64 ) );
-		}
-
-		const QPixmap * cursor = NULL;
-		// draw current edit-mode-icon below the cursor
-		switch( m_editMode )
-		{
-			case DRAW: cursor = s_toolDraw; break;
-			case ERASE: cursor = s_toolErase; break;
-			case SELECT: cursor = s_toolSelect; break;
-			case MOVE: cursor = s_toolMove; break;
-			case OPEN: cursor = s_toolOpen; break;
-		}
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
 	}
+
+	const QPixmap * cursor = NULL;
+	// draw current edit-mode-icon below the cursor
+	switch( m_editMode )
+	{
+		case DRAW: cursor = s_toolDraw; break;
+		case ERASE: cursor = s_toolErase; break;
+		case SELECT: cursor = s_toolSelect; break;
+		case MOVE: cursor = s_toolMove; break;
+		case OPEN: cursor = s_toolOpen; break;
+	}
+	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
+								*cursor );
 
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
@@ -2152,7 +2181,7 @@ int pianoRoll::getKey( int _y )
 		key_num = NOTES_PER_OCTAVE * OCTAVES - 1;
 	}
 
-	return( m_lastKey = key_num );
+	return( key_num );
 }
 
 

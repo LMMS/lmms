@@ -70,8 +70,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 		   eng()->getMainWindow()->isCtrlPressed() == FALSE )
 	{
-		setJournalling( FALSE );
-		m_oldValue = value();
+		prepareJournalEntryFromOldVal();
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;

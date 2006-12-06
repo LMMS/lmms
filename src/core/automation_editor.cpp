@@ -89,7 +89,6 @@ automationEditor::automationEditor( engine * _engine ) :
 	QWidget( _engine->getMainWindow()->workspace() ),
 	journallingObject( _engine ),
 	m_paintPixmap(),
-	m_cursorInside( FALSE ),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -678,10 +677,10 @@ void automationEditor::updatePaintPixmap( void )
 	if( validPattern() == TRUE )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
-
-		for( timeMap::iterator it = time_map.begin(), it_next;
-						it != time_map.end(); ++it )
+		timeMap::iterator it = time_map.end();
+		do
 		{
+			--it;
 			Sint32 len_tact_64th = 4;
 
 #ifdef QT3
@@ -690,34 +689,33 @@ void automationEditor::updatePaintPixmap( void )
 			const int level = it.value();
 #endif
 
-			Sint32 pos_tact_64th = it.key();
+			Sint32 pos_tact_64th = -it.key();
 
 			const int x = ( pos_tact_64th - m_currentPosition ) *
 								m_ppt / 64;
-
-			it_next = it;
-			++it_next;
-
-			int next_x;
-			int rect_width;
-			if( it_next != time_map.end() )
+			if( x > width() - VALUES_WIDTH )
 			{
-				Sint32 next_pos_tact_64th = it_next.key();
-				next_x = ( next_pos_tact_64th
+				break;
+			}
+
+			int rect_width;
+			if( it != time_map.begin() )
+			{
+				timeMap::iterator it_prev = it;
+				--it_prev;
+				Sint32 next_pos_tact_64th = -it_prev.key();
+				int next_x = ( next_pos_tact_64th
 					- m_currentPosition ) * m_ppt / 64;
+				// skip this value if not in visible area at all
+				if( next_x < 0 )
+				{
+					continue;
+				}
 				rect_width = next_x - x;
 			}
 			else
 			{
-				next_x = -1;
 				rect_width = width() - x;
-			}
-
-			// skip this value if not in visible area at all
-			if( !xVisible( x ) && !xVisible( next_x )
-						&& it_next != time_map.end() )
-			{
-				continue;
 			}
 
 			// is the value in visible area?
@@ -776,7 +774,7 @@ void automationEditor::updatePaintPixmap( void )
 							rect_width, rect_height,
 							is_selected );
 			}
-		}
+		} while( it != time_map.begin() );
 	}
 	else
 	{
@@ -847,15 +845,6 @@ void automationEditor::closeEvent( QCloseEvent * _ce )
 	QApplication::restoreOverrideCursor();
 	hide();
 	_ce->ignore ();
-}
-
-
-
-
-void automationEditor::enterEvent( QEvent * _e )
-{
-	m_cursorInside = TRUE;
-	QWidget::enterEvent( _e );
 }
 
 
@@ -1018,7 +1007,6 @@ void automationEditor::leaveEvent( QEvent * _e )
 	{
 		QApplication::restoreOverrideCursor();
 	}
-	m_cursorInside = FALSE;
 
 	QWidget::leaveEvent( _e );
 }
@@ -1062,9 +1050,9 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				// and check whether the user clicked on an
 				// existing value
-				if( pos_tact_64th >= it.key() &&
+				if( pos_tact_64th >= -it.key() &&
 					len > 0 &&
-					pos_tact_64th <= it.key() + len &&
+					pos_tact_64th <= -it.key() + len &&
 #ifdef QT3
 					it.data() == level )
 #else
@@ -1094,18 +1082,13 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = time_map.begin();
-					while( it != time_map.end() &&
-							it.key() != new_time )
-					{
-						++it;
-					}
+					it = time_map.find( -new_time );
 				}
 
 				// move it
 				m_action = MOVE_VALUE;
 				int aligned_x = (int)( (float)( (
-						it.key() -
+						-it.key() -
 						m_currentPosition ) *
 						m_ppt ) / 64.0f );
 				m_moveXOffset = x - aligned_x - 1;
@@ -1123,7 +1106,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				if( it != time_map.end() )
 				{
-					m_pattern->removeValue( it.key() );
+					m_pattern->removeValue( -it.key() );
 					eng()->getSongEditor()->setModified();
 				}
 			}
@@ -1268,8 +1251,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				// and check whether the cursor is over an
 				// existing value
-				if( pos_tact_64th >= it.key() &&
-			    		pos_tact_64th <= it.key() +
+				if( pos_tact_64th >= -it.key() &&
+			    		pos_tact_64th <= -it.key() +
 							//TODO: Add constant
 							4 &&
 #ifdef QT3
@@ -1456,31 +1439,27 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			for( timeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
-				int value_tact = it.key().getTact() + tact_diff;
-				int value_tact_64th = it.key().getTact64th() +
+				int value_tact = ( -it.key() >> 6 ) + tact_diff;
+				int value_tact_64th = ( -it.key() & 63 ) +
 								tact_64th_diff;
-				while( value_tact_64th < 0 )
+				// ensure value_tact_64th range
+				if( value_tact_64th >> 6 )
 				{
-					--value_tact;
-					value_tact_64th += 64;
+					value_tact += value_tact_64th >> 6;
+					value_tact_64th &= 63;
 				}
-				while( value_tact_64th > 64 )
-				{
-					++value_tact;
-					value_tact_64th -= 64;
-				}
-				m_pattern->removeValue( it.key() );
+				m_pattern->removeValue( -it.key() );
 				midiTime new_value_pos( value_tact,
 							value_tact_64th );
 #ifdef QT3
 				new_selValuesForMove[
-					m_pattern->putValue( new_value_pos,
+					-m_pattern->putValue( new_value_pos,
 						it.data () + level_diff,
 									FALSE )]
 						= it.data() + level_diff;
 #else
 				new_selValuesForMove[
-					m_pattern->putValue( new_value_pos,
+					-m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
 									FALSE )]
 						= it.value() + level_diff;
@@ -1590,35 +1569,50 @@ void automationEditor::paintEvent( QPaintEvent * )
 #endif
 	p.drawPixmap( 0, 0, m_paintPixmap );
 
-	if( m_cursorInside == TRUE )
-	{
-		p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
+	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
 				height() - TOP_MARGIN - SCROLLBAR_SIZE );
-		if( validPattern() == TRUE )
-		{
-//TODO: What's this?
-			p.fillRect( 10, height() + 3 - SCROLLBAR_SIZE,
-					width() - 10, DEFAULT_Y_DELTA - 7,
-							QColor( 64, 64, 64 ) );
-		}
 
-		const QPixmap * cursor = NULL;
-		// draw current edit-mode-icon below the cursor
-		switch( m_editMode )
-		{
-			case DRAW: cursor = s_toolDraw; break;
-			case ERASE: cursor = s_toolErase; break;
-			case SELECT: cursor = s_toolSelect; break;
-			case MOVE: cursor = s_toolMove; break;
-		}
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
+	if( validPattern() == TRUE )
+	{
+		drawCross( p );
 	}
+
+	const QPixmap * cursor = NULL;
+	// draw current edit-mode-icon below the cursor
+	switch( m_editMode )
+	{
+		case DRAW: cursor = s_toolDraw; break;
+		case ERASE: cursor = s_toolErase; break;
+		case SELECT: cursor = s_toolSelect; break;
+		case MOVE: cursor = s_toolMove; break;
+	}
+	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
+								*cursor );
 
 #ifndef QT4
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );
 #endif
+}
+
+
+
+
+inline void automationEditor::drawCross( QPainter & _p )
+{
+	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
+	int level = getLevel( mouse_pos.y() );
+	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	int cross_y = m_y_auto ?
+		grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( level - m_min_level )
+				/ (float)( m_max_level - m_min_level ) ) :
+		grid_bottom - ( level - m_bottom_level ) * m_y_delta;
+
+	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	_p.drawLine( VALUES_WIDTH, cross_y, width(), cross_y );
+	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
+						height() - SCROLLBAR_SIZE );
 }
 
 
@@ -1919,7 +1913,7 @@ void automationEditor::selectAll( void )
 		const int level = it.value();
 #endif
 
-		Uint32 pos_tact_64th = it.key();
+		Uint32 pos_tact_64th = -it.key();
 		if( level <= m_selectStartLevel || first_time )
 		{
 			// if we move start-level down, we have to add 
@@ -1988,7 +1982,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 #else
 		int level = it.value();
 #endif
-		Sint32 pos_tact_64th = it.key();
+		Sint32 pos_tact_64th = -it.key();
 
 		if( level > sel_level_start && level <= sel_level_end &&
 				pos_tact_64th >= sel_pos_start &&
@@ -2011,8 +2005,6 @@ void automationEditor::copySelectedValues( void )
 
 	if( !selected_values.isEmpty() )
 	{
-		midiTime start_pos( selected_values.begin().key().getTact(),
-									0 );
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
@@ -2048,9 +2040,6 @@ void automationEditor::cutSelectedValues( void )
 	{
 		eng()->getSongEditor()->setModified();
 
-		midiTime start_pos( selected_values.begin().key().getTact(),
-									0 );
-
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
@@ -2059,7 +2048,7 @@ void automationEditor::cutSelectedValues( void )
 #else
 			m_valuesToCopy[it.key()] = it.value();
 #endif
-			m_pattern->removeValue( it.key() );
+			m_pattern->removeValue( -it.key() );
 		}
 	}
 
@@ -2082,7 +2071,7 @@ void automationEditor::pasteValues( void )
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
-			m_pattern->putValue( it.key() + m_currentPosition,
+			m_pattern->putValue( -it.key() + m_currentPosition,
 #ifdef QT3
 								it.data() );
 #else
@@ -2116,7 +2105,7 @@ void automationEditor::deleteSelectedValues( void )
 	for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 	{
-		m_pattern->removeValue( it.key() );
+		m_pattern->removeValue( -it.key() );
 	}
 
 	if( update_after_delete == TRUE )
@@ -2241,18 +2230,23 @@ void automationEditor::updateTopBottomLevels( void )
 
 
 
-inline bool automationEditor::xVisible( int _x )
+inline bool automationEditor::inBBEditor( void )
 {
-	return( _x >= 0 && _x <= width() - VALUES_WIDTH );
+	return( m_pattern->getTrack()->getTrackContainer()
+						== eng()->getBBEditor() );
 }
 
 
 
 
-inline bool automationEditor::inBBEditor( void )
+void automationEditor::update( void )
 {
-	return( m_pattern->getTrack()->getTrackContainer()
-						== eng()->getBBEditor() );
+	QWidget::update();
+	// Note detuning?
+	if( m_pattern && !m_pattern->getTrack() )
+	{
+		eng()->getPianoRoll()->update();
+	}
 }
 
 

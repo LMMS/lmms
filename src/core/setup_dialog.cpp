@@ -205,7 +205,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	ledCheckBox * disable_tooltips = new ledCheckBox(
 					tr( "Disable tooltips (no spurious "
 						"interrupts while playing)" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	disable_tooltips->move( 10, 18 );
 	disable_tooltips->setChecked( m_disableToolTips );
 	connect( disable_tooltips, SIGNAL( toggled( bool ) ),
@@ -216,7 +216,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 					tr( "Classical knob usability (move "
 						"cursor around knob to change "
 						"value)" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	classical_knob_usability->move( 10, 36 );
 	classical_knob_usability->setChecked( m_classicalKnobUsability );
 	connect( classical_knob_usability, SIGNAL( toggled( bool ) ),
@@ -225,7 +225,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * gimp_like_windows = new ledCheckBox(
 					tr( "GIMP-like windows (no MDI)" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	gimp_like_windows->move( 10, 54 );
 	gimp_like_windows->setChecked( m_gimpLikeWindows );
 	connect( gimp_like_windows, SIGNAL( toggled( bool ) ),
@@ -234,7 +234,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * no_wizard = new ledCheckBox(
 				tr( "Do not show wizard after up-/downgrade" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	no_wizard->move( 10, 72 );
 	no_wizard->setChecked( m_noWizard );
 	connect( no_wizard, SIGNAL( toggled( bool ) ),
@@ -244,7 +244,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	ledCheckBox * no_msg = new ledCheckBox(
 					tr( "Do not show message after "
 						"closing this dialog" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	no_msg->move( 10, 90 );
 	no_msg->setChecked( m_noMsgAfterSetup );
 	connect( no_msg, SIGNAL( toggled( bool ) ),
@@ -253,7 +253,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * dbv = new ledCheckBox(
 					tr( "Display volume as dbV " ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	dbv->move( 10, 108 );
 	dbv->setChecked( m_displaydBV );
 	connect( dbv, SIGNAL( toggled( bool ) ),
@@ -262,7 +262,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * no_mmpz = new ledCheckBox(
 			tr( "Do not compress project files per default" ),
-						misc_tw, NULL, eng(), NULL );
+						misc_tw, NULL, NULL, NULL );
 	no_mmpz->move( 10, 126 );
 	no_mmpz->setChecked( m_noMMPZ );
 	connect( no_mmpz, SIGNAL( toggled( bool ) ),
@@ -436,7 +436,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
-						ui_fx_tw, NULL, eng(), NULL );
+						ui_fx_tw, NULL, NULL, NULL );
 	disable_ch_act_ind->move( 10, 20 );
 	disable_ch_act_ind->setChecked( m_disableChActInd );
 	connect( disable_ch_act_ind, SIGNAL( toggled( bool ) ),
@@ -445,7 +445,7 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 
 	ledCheckBox * manual_ch_piano = new ledCheckBox(
 			tr( "Only press keys on channel-piano manually" ),
-						ui_fx_tw, NULL, eng(), NULL );
+						ui_fx_tw, NULL, NULL, NULL );
 	manual_ch_piano->move( 10, 40 );
 	manual_ch_piano->setChecked( m_manualChPiano );
 	connect( manual_ch_piano, SIGNAL( toggled( bool ) ),
@@ -460,9 +460,8 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	QLabel * par_level_lbl = new QLabel( tr( "Parallelizing level" ),
 								smp_supp_tw );
 	par_level_lbl->move( 10, 15 );
-	lcdSpinBox * par_level = new lcdSpinBox( 1, 16, 2, smp_supp_tw,
-							tr( "SMP-level" ),
-							eng(), NULL );
+	lcdSpinBox * par_level = new lcdSpinBox( 1, 16, 2, smp_supp_tw, NULL,
+								NULL, NULL );
 	par_level->setValue( m_parLevel );
 	connect( par_level, SIGNAL( valueChanged( int ) ),
 			this, SLOT( setParallelizingLevel( int ) ) );

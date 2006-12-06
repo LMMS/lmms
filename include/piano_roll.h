@@ -95,7 +95,6 @@ public:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void enterEvent( QEvent * _e );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
@@ -215,7 +214,6 @@ private:
 	comboBox * m_noteLenComboBox;
 
 	QPixmap m_paintPixmap;
-	bool m_cursorInside;
 
 
 	pattern * m_pattern;
@@ -244,7 +242,6 @@ private:
 	midiTime m_lenOfNewNotes;
 
 	int m_startKey;			// first key when drawing
-	int m_keyMouseOver;
 	int m_lastKey;
 
 	noteVector m_notesToCopy;
@@ -257,6 +254,7 @@ private:
 	timeLine * m_timeLine;
 	bool m_scrollBack;
 
+	void drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x, Uint16 _y );
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
 	noteVector::iterator noteIteratorUnderMouse( void );

@@ -83,16 +83,22 @@ void nameLabel::setPixmap( const QPixmap & _pixmap )
 
 void nameLabel::setPixmapFile( const QString & _file )
 {
-	m_pixmapFile = _file;
-	if( QFileInfo( m_pixmapFile ).isRelative() )
+	QPixmap new_pixmap;
+	if( QFileInfo( _file ).isRelative() )
 	{
-		m_pixmap = QPixmap( configManager::inst()->trackIconsDir() +
-								m_pixmapFile );
+		new_pixmap = QPixmap( configManager::inst()->trackIconsDir() +
+									_file );
 	}
 	else
 	{
-		m_pixmap = QPixmap( m_pixmapFile );
+		new_pixmap = QPixmap( _file );
 	}
+	if( new_pixmap.isNull() )
+	{
+		return;
+	}
+	m_pixmap = new_pixmap;
+	m_pixmapFile = _file;
 	emit( pixmapChanged() );
 	update();
 }

@@ -88,11 +88,14 @@ public:
 	}
 
 
+public slots:
+	void update( void );
+
+
 protected:
 	typedef automationPattern::timeMap timeMap;
 
 	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void enterEvent( QEvent * _e );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -195,7 +198,6 @@ private:
 	comboBox * m_quantizeComboBox;
 
 	QPixmap m_paintPixmap;
-	bool m_cursorInside;
 
 
 	automationPattern * m_pattern;
@@ -238,7 +240,7 @@ private:
 	timeLine * m_timeLine;
 	bool m_scrollBack;
 
-	bool xVisible( int _x );
+	void drawCross( QPainter & _p );
 	bool inBBEditor( void );
 
 

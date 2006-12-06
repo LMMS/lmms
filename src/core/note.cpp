@@ -342,4 +342,14 @@ void note::detachCurrentDetuning( void )
 
 
 
+bool note::hasDetuningInfo( void )
+{
+	automationPattern::timeMap map =
+			m_detuning->getAutomationPattern()->getTimeMap();
+	return( map.size() > 1 || map[0] != 0 );
+}
+
+
+
+
 #endif

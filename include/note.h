@@ -177,6 +177,8 @@ public:
 	void editDetuningPattern( void );
 	void detachCurrentDetuning( void );
 
+	bool hasDetuningInfo( void );
+
 
 protected:
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

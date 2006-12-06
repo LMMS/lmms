@@ -79,7 +79,7 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 					probeDevice().ascii(),
 #endif
 						SND_PCM_STREAM_PLAYBACK,
-						SND_PCM_NONBLOCK ) ) < 0 )
+						0 ) ) < 0 )
 	{
 		printf( "Playback open error: %s\n", snd_strerror( err ) );
 		return;
@@ -221,25 +221,47 @@ void audioALSA::run( void )
 	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
 					getMixer()->framesPerAudioBuffer() *
 								channels() );
+	int_sample_t * pcmbuf = bufferAllocator::alloc<int_sample_t>(
+						m_periodSize * channels() );
 	m_quit = FALSE;
+
+	int outbuf_size = getMixer()->framesPerAudioBuffer() * channels();
+	int outbuf_pos = 0;
+	int pcmbuf_size = m_periodSize * channels();
 
 	while( m_quit == FALSE )
 	{
-		const f_cnt_t frames = getNextBuffer( temp );
+		int_sample_t * ptr = pcmbuf;
+		int len = pcmbuf_size;
+		while( len )
+		{
+			if( outbuf_pos == 0 )
+			{
+				const fpab_t frames = getNextBuffer( temp );
 
-		convertToS16( temp, frames, getMixer()->masterGain(), outbuf,
-					m_convertEndian );
+				convertToS16( temp, frames,
+						getMixer()->masterGain(),
+						outbuf,
+						m_convertEndian );
+			}
+			int min_len = tMin( len, outbuf_size - outbuf_pos );
+			memcpy( ptr, outbuf + outbuf_pos,
+					min_len * sizeof( int_sample_t ) );
+			ptr += min_len;
+			len -= min_len;
+			outbuf_pos += min_len;
+			outbuf_pos %= outbuf_size;
+		}
 
-		f_cnt_t frame = 0;
-		int_sample_t * ptr = outbuf;
+		f_cnt_t frames = m_periodSize;
+		ptr = pcmbuf;
 
-		while( frame < frames )
+		while( frames )
 		{
 			int err = snd_pcm_writei( m_handle, ptr, frames );
 
 			if( err == -EAGAIN )
 			{
-				usleep( 10 );
 				continue;
 			}
 
@@ -253,12 +275,13 @@ void audioALSA::run( void )
 				break;	// skip this buffer
 			}
 			ptr += err * channels();
-			frame += err;
+			frames -= err;
 		}
 	}
 
 	bufferAllocator::free( temp );
 	bufferAllocator::free( outbuf );
+	bufferAllocator::free( pcmbuf );
 }
 
 

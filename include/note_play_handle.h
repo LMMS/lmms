@@ -181,6 +181,10 @@ public:
 	{
 		m_bbTrack = _bb_track;
 	}
+	void setBBTrackFrom( notePlayHandle * _handle )
+	{
+		m_bbTrack = _handle->m_bbTrack;
+	}
 
 
 	virtual bool supportsParallelizing( void ) const
