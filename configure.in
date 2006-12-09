@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20061206, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061206)
+AC_INIT(lmms, 0.2.1-svn20061209, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061209)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -15,9 +15,11 @@ AC_PROG_LN_S
 AC_PROG_GCC_TRADITIONAL
 AM_PROG_LIBTOOL
 
-CFLAGS="$CFLAGS -I${prefix}/include"
-CPPFLAGS="$CPPFLAGS -I${prefix}/include"
-LDFLAGS="$LDFLAGS -L${prefix}/bin"
+if ! test -z "${prefix}" -o "${prefix}" = "NONE" ; then
+	CFLAGS="$CFLAGS -I${prefix}/include"
+	CPPFLAGS="$CPPFLAGS -I${prefix}/include"
+	LDFLAGS="$LDFLAGS -L${prefix}/bin"
+fi
 
 AH_TEMPLATE(BUILD_LINUX, [Build LMMS for Linux])
 AH_TEMPLATE(BUILD_WIN32, [Build LMMS for Win32])

@@ -235,8 +235,9 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		{
 			if( *it == m_playHandlesToRemove.front() )
 			{
+				delete *it;
 				m_playHandles.erase( it );
-				delete m_playHandlesToRemove.front();
+				//delete m_playHandlesToRemove.front();
 				break;
 			}
 			++it;

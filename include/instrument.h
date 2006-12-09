@@ -87,6 +87,22 @@ public:
 	virtual f_cnt_t FASTCALL beatLen( notePlayHandle * _n ) const;
 
 
+	// some instruments need a certain number of release-frames even
+	// if no envelope is active - such instruments can re-implement this
+	// method for returning how many frames they at least like to have for
+	// release
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return( 0 );
+	}
+
+	// monophonic instruments can re-implement this indicate that they do
+	// not allow more then one note being played at the same time
+	virtual bool isMonophonic( void ) const
+	{
+		return( FALSE );
+	}
+
 	// instrument-play-handles use this for checking whether they can mark
 	// themselves as done, so that mixer trashes them
 	inline virtual bool valid( void ) const

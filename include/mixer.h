@@ -172,7 +172,7 @@ public:
 		return( FALSE );
 	}
 
-	inline void removePlayHandle( playHandle * _ph )
+	inline void removePlayHandle( const playHandle * _ph )
 	{
 		m_playHandlesToRemove.push_back( _ph );
 	}
@@ -287,6 +287,7 @@ public slots:
 	void setHighQuality( bool _hq_on = FALSE );
 	void setClipScaling( bool _state );
 
+
 signals:
 	void sampleRateChanged( void );
 	void nextAudioBuffer( const surroundSampleFrame *, int _frames );
@@ -294,7 +295,7 @@ signals:
 
 private:
 	mixer( engine * _engine );
-	~mixer();
+	virtual ~mixer();
 
 	void startProcessing( void );
 	void stopProcessing( void );
@@ -341,7 +342,7 @@ private:
 	int m_parallelizingLevel;
 
 	playHandleVector m_playHandles;
-	playHandleVector m_playHandlesToRemove;
+	constPlayHandleVector m_playHandlesToRemove;
 
 	qualityLevels m_qualityLevel;
 	float m_masterGain;

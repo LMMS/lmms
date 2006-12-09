@@ -84,7 +84,8 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 
 envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	journallingObject( _instrument_track->eng() )
+	journallingObject( _instrument_track->eng() ),
+	m_instrumentTrack( _instrument_track )
 {
 
 	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );
@@ -525,6 +526,13 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 {
 	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->used() ?
 					m_envLFOWidgets[VOLUME]->m_rFrames : 0;
+	if( m_instrumentTrack->getInstrument()->desiredReleaseFrames() >
+								ret_val )
+	{
+		ret_val = m_instrumentTrack->getInstrument()->
+							desiredReleaseFrames();
+	}
+
 	if( m_envLFOWidgets[VOLUME]->used() == FALSE )
 	{
 		for( int i = VOLUME+1; i < TARGET_COUNT; ++i )

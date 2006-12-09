@@ -97,6 +97,7 @@ public:
 private:
 	tabWidget * m_targetsTabWidget;
 	envelopeAndLFOWidget * m_envLFOWidgets[TARGET_COUNT];
+	instrumentTrack * m_instrumentTrack;
 
 	// filter-stuff
 	groupBox * m_filterGroupBox;

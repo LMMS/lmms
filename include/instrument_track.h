@@ -107,6 +107,11 @@ public:
 	void FASTCALL playNote( notePlayHandle * _n, bool _try_parallelizing );
 
 	QString instrumentName( void ) const;
+	inline const instrument * getInstrument( void ) const
+	{
+		return( m_instrument );
+	}
+
 	void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 	// name-stuff
