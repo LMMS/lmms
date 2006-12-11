@@ -140,7 +140,7 @@ mainWindow::mainWindow( engine * _engine ) :
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factorySamplesDir() + "*" +
 					configManager::inst()->userSamplesDir(),
-					"*.wav *.ogg *.au"
+					"*.wav *.ogg *.spx *.au"
 					"*.voc *.aif *.aiff *.flac *.raw",
 							tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),

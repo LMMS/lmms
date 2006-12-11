@@ -938,7 +938,8 @@ void fileItem::determineFileType( void )
 	}
 	else if( ext == "wav" || ext == "ogg" || ext == "mp3" ||
 			ext == "aiff" || ext == "aif" || ext == "voc" ||
-			ext == "au" || ext == "raw" || ext == "flac" )
+			ext == "au" || ext == "raw" || ext == "flac" ||
+			ext == "spx" )
 	{
 		m_type = SAMPLE_FILE;
 	}

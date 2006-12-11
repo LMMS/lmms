@@ -1,3 +1,17 @@
+2006-12-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	- fixed SDL_sound decoding
+	- enabled speex samples
+
+	* src/core/file_browser.cpp:
+	* src/core/main_window.cpp:
+	enabled speex samples
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	fixed adding effect segfault
+
 2006-12-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

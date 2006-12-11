@@ -107,6 +107,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 			p->name = m_ladspa->getPortName( m_key, port );
 			p->proc = proc;
 			p->port_id = port;
+			p->control = NULL;
 			
 			// Determine the port's category.
 			if( m_ladspa->isPortAudio( m_key, port ) )
@@ -381,6 +382,11 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 					}
 					break;
 				case CONTROL_RATE_INPUT:
+					if( m_ports[proc][port]->control ==
+									NULL )
+					{
+						break;
+					}
 					m_ports[proc][port]->value = 
 						static_cast<LADSPA_Data>( 
 							m_ports[proc][port]->control->getValue() /

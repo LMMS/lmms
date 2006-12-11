@@ -201,8 +201,8 @@ private:
 #ifdef SDL_SDL_SOUND_H
 	f_cnt_t FASTCALL decodeSampleSDL( const char * _f,
 						int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+						ch_cnt_t _channels,
+						sample_rate_t _sample_rate );
 #endif
 #ifdef HAVE_SNDFILE_H
 	f_cnt_t FASTCALL decodeSampleSF( const char * _f,
