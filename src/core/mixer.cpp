@@ -295,23 +295,18 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			idx = 0;
 			while( idx < m_playHandles.size() )
 			{
-				playHandle * n =m_playHandles[idx];
-				if( n->supportsParallelizing() )
-				{
-					++idx;
-					continue;
-				}
-				else if( n->done() )
+				playHandle * n = m_playHandles[idx];
+				if( n->done() )
 				{
 					delete n;
 					m_playHandles.erase(
 						m_playHandles.begin() + idx );
 				}
-				else
+				else if( !n->supportsParallelizing() )
 				{
 					n->play();
-					++idx;
 				}
+				++idx;
 			}
 			for( playHandleVector::iterator it = par_hndls.begin();
 						it != par_hndls.end(); ++it )

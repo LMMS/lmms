@@ -85,8 +85,8 @@ const octaves MAX_OCTAVE = OCTAVE_8;
 const int WHITE_KEYS_PER_OCTAVE	= 7;
 const int BLACK_KEYS_PER_OCTAVE	= 5;
 const int NOTES_PER_OCTAVE = WHITE_KEYS_PER_OCTAVE + BLACK_KEYS_PER_OCTAVE;
-const int OCTAVES = 9;
-
+const int OCTAVES = MAX_OCTAVE+1;
+const int NOTES = OCTAVES*NOTES_PER_OCTAVE;
 
 class knob;
 

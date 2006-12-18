@@ -1,6 +1,6 @@
 /*
- * plucked_string_sytn.h - declaration of class pluckedStringSynth which
- *                         is a synth for plucked string-sounds
+ * plucked_string_synth.h - declaration of class pluckedStringSynth which
+ *                          is a synth for plucked string-sounds
  *
  * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

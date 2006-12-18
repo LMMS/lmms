@@ -46,6 +46,7 @@ instrument::instrument( instrumentTrack * _instrument_track,
 
 instrument::~instrument()
 {
+	invalidate();
 }
 
 

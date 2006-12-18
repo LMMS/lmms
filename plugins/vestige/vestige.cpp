@@ -88,8 +88,8 @@ plugin::descriptor vestige_plugin_descriptor =
 QPixmap * vestigeInstrument::s_artwork = NULL;
 
 
-vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &vestige_plugin_descriptor ),
+vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &vestige_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_plugin( NULL ),
 	m_pluginMutex()
@@ -153,6 +153,11 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
+	for( int i = 0; i < NOTES; ++i )
+	{
+		m_noteStates[i] = OFF;
+	}
+
 	// now we need a play-handle which cares for calling play()
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	eng()->getMixer()->addPlayHandle( iph );
@@ -163,9 +168,6 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _channel_track ) :
 
 vestigeInstrument::~vestigeInstrument()
 {
-	// this single call automates the rest of cleanup like trashing our
-	// play-handle and so on
-	invalidate();
 	closePlugin();
 }
 
@@ -339,8 +341,18 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool )
 	m_pluginMutex.lock();
 	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )
 	{
-		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0,
-					getInstrumentTrack()->masterKey( _n ),
+		const int k = getInstrumentTrack()->masterKey( _n );
+		if( m_noteStates[k] > OFF )
+		{
+			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
+								k, 0 ), 0 );
+			m_noteStates[k] = IGNORE_NEXT_NOTEOFF;
+		}
+		else
+		{
+			m_noteStates[k] = ON;
+		}
+		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0, k,
 					_n->getVolume() ), _n->framesAhead() );
 	}
 	m_pluginMutex.unlock();
@@ -354,9 +366,17 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
-					getInstrumentTrack()->masterKey( _n ),
+		const int k = getInstrumentTrack()->masterKey( _n );
+		if( m_noteStates[k] == ON )
+		{
+			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0, k,
 								0 ), 0 );
+			m_noteStates[k] = OFF;
+		}
+		else if( m_noteStates[k] == IGNORE_NEXT_NOTEOFF )
+		{
+			m_noteStates[k] = ON;
+		}
 	}
 	m_pluginMutex.unlock();
 }

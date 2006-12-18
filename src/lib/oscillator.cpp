@@ -115,7 +115,7 @@ void oscillator::updatePM( sampleFrame * _ab, const fpab_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
+	const float osc_coeff = *m_freq * *m_detuning;
 
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
@@ -132,7 +132,7 @@ void oscillator::updateAM( sampleFrame * _ab, const fpab_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
+	const float osc_coeff = *m_freq * *m_detuning;
 
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
@@ -148,7 +148,7 @@ void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
+	const float osc_coeff = *m_freq * *m_detuning;
 
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
@@ -163,9 +163,9 @@ void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
 void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
 						const ch_cnt_t _chnl )
 {
-	float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
+	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
 	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
+	const float osc_coeff = *m_freq * *m_detuning;
 
 	for( fpab_t frame = 0; frame < _frames ; ++frame )
 	{
@@ -187,7 +187,7 @@ void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
+	const float osc_coeff = *m_freq * *m_detuning;
 
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{

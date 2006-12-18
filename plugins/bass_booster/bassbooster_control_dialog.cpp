@@ -52,7 +52,7 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 	m_freqKnob->setLabel( tr( "FREQ" ) );
 	m_freqKnob->setHintText( tr( "Frequency:" ) + " ", "Hz" );
 	connect( m_freqKnob, SIGNAL( valueChanged( float ) ),
-			this, SLOT( changeFrequency( float ) ) );
+			this, SLOT( changeFrequency( void ) ) );
 
 	m_gainKnob = new knob( knobBright_26, this, tr( "Gain" ), eng(), NULL );
 	m_gainKnob->setRange( 0.1f, 5.0f, 0.1f );
@@ -60,7 +60,7 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 	m_gainKnob->setLabel( tr( "GAIN" ) );
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	connect( m_gainKnob, SIGNAL( valueChanged( float ) ),
-			this, SLOT( changeGain( float ) ) );
+			this, SLOT( changeGain( void ) ) );
 
 	m_ratioKnob = new knob( knobBright_26, this, tr( "Ratio" ), eng(),
 									NULL );
@@ -69,49 +69,69 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 	m_ratioKnob->setLabel( tr( "RATIO" ) );
 	m_ratioKnob->setHintText( tr( "Ratio:" ) + " ", "" );
 	connect( m_ratioKnob, SIGNAL( valueChanged( float ) ),
-			this, SLOT( changeRatio( float ) ) );
+			this, SLOT( changeRatio( void ) ) );
 
 	l->addWidget( m_freqKnob );
 	l->addWidget( m_gainKnob );
 	l->addWidget( m_ratioKnob );
 
-	updateEffect();
+	changeFrequency();
+	changeGain();
+	changeRatio();
 }
 
 
 
 
-void bassBoosterControlDialog::changeFrequency( float )
+void bassBoosterControlDialog::changeFrequency( void )
 {
-	updateEffect();
+	m_effect->m_bbFX.leftFX().setSelectivity( m_freqKnob->value() );
+	m_effect->m_bbFX.rightFX().setSelectivity( m_freqKnob->value() );
 }
 
 
 
 
-void bassBoosterControlDialog::changeGain( float )
+void bassBoosterControlDialog::changeGain( void )
 {
-	updateEffect();
+	m_effect->m_bbFX.leftFX().setGain( m_gainKnob->value() );
+	m_effect->m_bbFX.rightFX().setGain( m_gainKnob->value() );
 }
 
 
 
 
-void bassBoosterControlDialog::changeRatio( float )
+void bassBoosterControlDialog::changeRatio( void )
 {
-	updateEffect();
+	m_effect->m_bbFX.leftFX().setRatio( m_ratioKnob->value() );
+	m_effect->m_bbFX.rightFX().setRatio( m_ratioKnob->value() );
 }
 
 
 
 
+/*
 void bassBoosterControlDialog::updateEffect( void )
 {
-	// TODO: try to preserve effect and just change params
-	m_effect->m_bbFX = effectLib::bassBoost<>( m_freqKnob->value(),
-				m_gainKnob->value(), m_ratioKnob->value() );
+	//m_effect->m_bbFX = effectLib::bassBoost<>( m_freqKnob->value(),
+	//			m_gainKnob->value(), m_ratioKnob->value() );
+	m_effect->m_bbFX = effectLib::monoToStereoAdaptor<
+			effectLib::bassBoost<> >(
+		effectLib::bassBoost<>( m_freqKnob->value(),
+				m_gainKnob->value(), m_ratioKnob->value(),
+						m_effect->m_bbFX.leftFX() ),
+		effectLib::bassBoost<>( m_freqKnob->value(),
+				m_gainKnob->value(), m_ratioKnob->value(),
+						m_effect->m_bbFX.rightFX() )
+				);
+	m_effect->m_bbFX.leftFX().setSelectivity( m_freqKnob->value() );
+	m_effect->m_bbFX.rightFX().setSelectivity( m_freqKnob->value() );
+	m_effect->m_bbFX.leftFX().setGain( m_gainKnob->value() );
+	m_effect->m_bbFX.rightFX().setGain( m_gainKnob->value() );
+	m_effect->m_bbFX.leftFX().setRatio( m_ratioKnob->value() );
+	m_effect->m_bbFX.rightFX().setRatio( m_ratioKnob->value() );
 }
-
+*/
 
 
 

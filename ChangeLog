@@ -1,3 +1,38 @@
+2006-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/bass_booster/bassboster_control_dialog.h:
+	* plugins/bass_booster/bassboster_control_dialog.cpp:
+	set changed parameters directly using new set...-methods of effect-lib
+	(preserves current effect-state and therefore avoids clicks in sound-
+	stream)
+
+	* include/effect_lib.h:
+	- renamed class "base" to "monoBase"
+	- monoToStereoAdaptor can now have different effects for the two
+	  channels
+	- added stereoToMonoAdaptor
+	- extended baseBoost-class by several methods
+	
+	* plugins/vestige/vestige.h:
+	* plugins/vestige/vestige.cpp:
+	added note-state-array for handling sequences of "note-on note-off"
+	events while the according note is already on which for example is the
+	case when placing the two notes at the same key next to each other -
+	until now the plugin started playing the second note but stopped
+	immediately as the note-off-event of the first note arrived later than
+	the note-on-event of the second one
+
+	* src/core/instrument.cpp:
+	always call invalidate() in destructor so (instrumentPlayHandle-
+	driven) plugins do not have to care about it
+
+	* src/tracks/instrument_track.cpp:
+	make sure value returned by masterKey() is within allowed range	
+
+	* src/core/mixer.cpp:
+	fixed bug which caused LMMS to crash when using parallelizing-level
+	above 1 and invalidated play-handles were existing
+
 2006-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bass_booster/bassboster_control_dialog.cpp:

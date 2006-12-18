@@ -1,5 +1,5 @@
 /*
- * effect_lib.h - library with simple inline-effects
+ * effect_lib.h - library with template-based inline-effects
  *
  * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -32,11 +32,11 @@
 namespace effectLib
 {
 	template<typename SAMPLE = sample_t>
-	class base
+	class monoBase
 	{
 	public:
 		typedef SAMPLE sampleType;
-		virtual ~base()
+		virtual ~monoBase()
 		{
 		}
 		virtual SAMPLE nextSample( const SAMPLE _in ) const = 0;
@@ -54,15 +54,22 @@ namespace effectLib
 						SAMPLE & _in_right ) const = 0;
 	} ;
 
-	template<class FX>
-	class monoToStereoAdaptor : public stereoBase<typename FX::sampleType>
+	template<class FXL, class FXR = FXL>
+	class monoToStereoAdaptor : public stereoBase<typename FXL::sampleType>
 	{
 	public:
-		typedef typename FX::sampleType sampleType;
+		typedef typename FXL::sampleType sampleType;
 
-		monoToStereoAdaptor( const FX & _mono_fx ) :
+		monoToStereoAdaptor( const FXL & _mono_fx ) :
 			m_leftFX( _mono_fx ),
 			m_rightFX( _mono_fx )
+		{
+		}
+
+		monoToStereoAdaptor( const FXL & _left_fx,
+						const FXR & _right_fx ) :
+			m_leftFX( _left_fx ),
+			m_rightFX( _right_fx )
 		{
 		}
 
@@ -73,9 +80,42 @@ namespace effectLib
 			_in_right = m_rightFX.nextSample( _in_right );
 		}
 
+		FXL & leftFX( void )
+		{
+			return( m_leftFX );
+		}
+
+		FXR & rightFX( void )
+		{
+			return( m_rightFX );
+		}
+
 	private:
-		FX m_leftFX;
-		FX m_rightFX;
+		FXL m_leftFX;
+		FXR m_rightFX;
+	} ;
+
+
+	template<class FX>
+	class stereoToMonoAdaptor : public monoBase<typename FX::sampleType>
+	{
+	public:
+		typedef typename FX::sampleType sampleType;
+
+		stereoToMonoAdaptor( const FX & _stereo_fx ) :
+			m_FX( _stereo_fx )
+		{
+		}
+
+		virtual sampleType nextSample( const sampleType _in ) const
+		{
+			sampleType s[2] = { _in, _in };
+			m_FX.nextSample( s[0], s[1] );
+			return( ( s[0] + s[1] ) / 2.0f );
+		}
+
+	private:
+		FX m_FX;
 	} ;
 
 
@@ -87,17 +127,19 @@ namespace effectLib
 
 
 	template<typename SAMPLE = sample_t>
-	class bassBoost : public base<SAMPLE>
+	class bassBoost : public monoBase<SAMPLE>
 	{
 	public:
 		bassBoost( const float _selectivity,
 				const float _gain,
-				const float _ratio ) :
-			m_selectivity( _selectivity ),
+				const float _ratio,
+				const bassBoost<SAMPLE> & _orig =
+							bassBoost<SAMPLE>() ) :
+			m_selectivity( tMax<SAMPLE>( _selectivity, 10.0f ) ),
 			m_gain1( 1.0f / ( m_selectivity + 1.0f ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
-			m_cap( 0.0f )
+			m_cap( _orig.m_cap )
 		{
 		}
 
@@ -112,7 +154,7 @@ namespace effectLib
 								m_gain2/* )*/ );
 		}
 
-/*		void setSelectivity( const float _selectivity )
+		void setSelectivity( const float _selectivity )
 		{
 			m_selectivity = _selectivity;
 			m_gain1 = 1.0f / ( m_selectivity + 1.0f );
@@ -126,9 +168,14 @@ namespace effectLib
 		void setRatio( const float _ratio )
 		{
 			m_ratio = _ratio;
-		}*/
+		}
 
 	private:
+		bassBoost() :
+			m_cap( 0.0f )
+		{
+		}
+
 		float m_selectivity;
 		float m_gain1;
 		float m_gain2;

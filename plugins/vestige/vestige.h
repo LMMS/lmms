@@ -103,6 +103,14 @@ private:
 
 	static QPixmap * s_artwork;
 
+	enum states
+	{
+		OFF,
+		ON,
+		IGNORE_NEXT_NOTEOFF
+	} ;
+	states m_noteStates[NOTES];
+
 
 	remoteVSTPlugin * m_plugin;
 	QMutex m_pluginMutex;

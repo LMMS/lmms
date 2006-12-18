@@ -55,14 +55,12 @@ public:
 
 
 private slots:
-	void changeFrequency( float );
-	void changeGain( float );
-	void changeRatio( float );
+	void changeFrequency( void );
+	void changeGain( void );
+	void changeRatio( void );
 
 
 private:
-	void updateEffect( void );
-
 	bassBoosterEffect * m_effect;
 	knob * m_freqKnob;
 	knob * m_gainKnob;

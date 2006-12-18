@@ -134,7 +134,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 #endif
 {
 	m_notesMutex.lock();
-	for( int i = 0; i < NOTES_PER_OCTAVE * OCTAVES; ++i )
+	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
 	}
@@ -899,7 +899,8 @@ int instrumentTrack::masterKey( notePlayHandle * _n ) const
 {
 	int key = baseTone() + baseOctave() * NOTES_PER_OCTAVE +
 					eng()->getSongEditor()->masterPitch();
-	return( _n->key() - ( key - A - DEFAULT_OCTAVE * NOTES_PER_OCTAVE ) );
+	return( tLimit<int>( _n->key() -
+		( key - A - DEFAULT_OCTAVE * NOTES_PER_OCTAVE ), 0, NOTES ) );
 }
 
 
@@ -1288,7 +1289,7 @@ void instrumentTrack::invalidateAllMyNPH( void )
 	m_trackType = NULL_TRACK;
 
 	m_notesMutex.lock();
-	for( int i = 0; i < NOTES_PER_OCTAVE * OCTAVES; ++i )
+	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
 	}
