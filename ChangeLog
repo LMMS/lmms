@@ -1,3 +1,22 @@
+2006-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/bass_booster/bassboster_control_dialog.cpp:
+	* plugins/bass_booster/bassboster_control_dialog.h:
+	* plugins/bass_booster/bass_boster.h:
+	* plugins/bass_booster/bass_boster.cpp:
+	* plugins/bass_booster/Makefile.am:
+	* plugins/Makefile.am:
+	* configure.in:
+	added bassbooster-effect-plugin
+
+	* src/core/effect_select_dialog.cpp:
+	added support for effects without sub-plugin-support and fixed some
+	potential crashs
+
+	* include/effect_lib.h:
+	added simple but powerful template-based effect-library with currently
+	two basic effects
+
 2006-12-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/sample_buffer.h:

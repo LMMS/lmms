@@ -243,7 +243,7 @@ rackPlugin::~rackPlugin()
 
 void rackPlugin::editControls( void )
 {
-	if( m_show)
+	if( m_show )
 	{
 		m_controlView->show();
 		m_controlView->raise();

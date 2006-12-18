@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20061211, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061211)
+AC_INIT(lmms, 0.2.1-svn20061217, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061217)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -554,6 +554,7 @@ AC_CONFIG_FILES([Makefile
 		 data/track_icons/Makefile
 		 plugins/Makefile
 		 plugins/audio_file_processor/Makefile
+		 plugins/bass_booster/Makefile
 		 plugins/bit_invader/Makefile
 		 plugins/flp_import/Makefile
 		 plugins/ladspa_base/Makefile

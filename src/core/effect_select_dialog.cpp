@@ -192,7 +192,8 @@ effectList::effectList( QWidget * _parent, engine * _engine ) :
 		}
 		else
 		{
-			// TODO
+			m_effectKeys << effectKey( &( *it ), it->name );
+
 		}
 	}
 
@@ -200,8 +201,11 @@ effectList::effectList( QWidget * _parent, engine * _engine ) :
 	for( effectKeyList::const_iterator it = m_effectKeys.begin();
 						it != m_effectKeys.end(); ++it )
 	{
-		plugin_names += QString( ( *it ).desc->public_name ) + ": " +
-								( *it ).name;
+		plugin_names += QString( ( *it ).desc->public_name ) +
+			( ( ( *it ).desc->sub_plugin_features != NULL ) ?
+							": " + ( *it ).name
+						:
+							"" );
 	}
 
 	m_pluginList = new Q3ListBox( this );
@@ -239,6 +243,7 @@ void effectList::onHighlighted( int _pluginIndex )
 {
 	m_currentSelection = m_effectKeys[_pluginIndex];
 	delete m_descriptionWidget;
+	m_descriptionWidget = NULL;
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
@@ -247,9 +252,13 @@ void effectList::onHighlighted( int _pluginIndex )
 			createDescriptionWidget( m_descriptionWidgetParent,
 						eng(), m_currentSelection );
 	}
-	dynamic_cast<QVBoxLayout *>( m_descriptionWidgetParent->layout() )->
+	if( m_descriptionWidget != NULL )
+	{
+		dynamic_cast<QVBoxLayout *>(
+				m_descriptionWidgetParent->layout() )->
 					addWidget( m_descriptionWidget );
-	m_descriptionWidget->show();
+		m_descriptionWidget->show();
+	}
 	emit( highlighted( m_currentSelection ) );
 }
 
