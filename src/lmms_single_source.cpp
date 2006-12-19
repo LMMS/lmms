@@ -44,6 +44,7 @@
 #include "src/core/piano_widget.cpp"
 #include "src/core/name_label.cpp"
 #include "src/core/preset_preview_play_handle.cpp"
+#include "src/core/tool.cpp"
 #include "src/core/track_container.cpp"
 #include "src/core/track.cpp"
 #include "src/core/file_browser.cpp"

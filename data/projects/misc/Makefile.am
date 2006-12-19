@@ -1,6 +1,6 @@
 miscdir = $(lmmsdatadir)/projects/misc
 
-misc_DATA = $(wildcard *.mmp)
+misc_DATA = *.mmp
 
 EXTRA_DIST = $(misc_DATA)
 

@@ -153,7 +153,7 @@ void ladspaSubPluginFeatures::listSubPluginKeys( engine * _eng,
 			plugins = lm->getValidEffects();
 			//plugins += lm->getInvalidEffects();
 			break;
-		case plugin::AnalysisTools:
+		case plugin::Tool:
 			plugins = lm->getAnalysisTools();
 			break;
 		case plugin::Other:

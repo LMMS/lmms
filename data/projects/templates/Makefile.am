@@ -1,6 +1,6 @@
 templatesdir = $(lmmsdatadir)/projects/templates
 
-templates_DATA = $(wildcard *.mpt)
+templates_DATA = *.mpt
 
 EXTRA_DIST = $(templates_DATA)
 

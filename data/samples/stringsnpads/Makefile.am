@@ -1,6 +1,6 @@
 stringsnpadssamplesdir = $(lmmsdatadir)/samples/stringsnpads
 
-stringsnpadssamples_DATA = $(wildcard *.wav *.ogg)
+stringsnpadssamples_DATA = *.ogg
 
 EXTRA_DIST = $(stringsnpadssamples_DATA)
 

@@ -77,6 +77,7 @@
 #include "buffer_allocator.h"
 #include "setup_dialog.h"
 #include "audio_dummy.h"
+#include "tool.h"
 #include "tool_button.h"
 #include "project_journal.h"
 #include "automation_editor.h"
@@ -97,7 +98,8 @@ mainWindow::mainWindow( engine * _engine ) :
 		),
 	engineObject( _engine ),
 	m_workspace( NULL ),
-	m_templatesMenu( NULL )
+	m_templatesMenu( NULL ),
+	m_tools_menu( NULL )
 {
 #ifdef QT4
 	setAttribute( Qt::WA_DeleteOnClose );
@@ -500,7 +502,7 @@ void mainWindow::finalize( void )
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
 
-	
+
 	QMenu * settings_menu = new QMenu( this );
 #ifdef QT4
 	menuBar()->addMenu( settings_menu )->setText( tr( "&Settings" ) );
@@ -514,7 +516,33 @@ void mainWindow::finalize( void )
 					tr( "Show setup wizard" ),
 					configManager::inst(), SLOT( exec() ) );
 
-	
+
+	m_tools_menu = new QMenu( this );
+	vvector<plugin::descriptor> pluginDescriptors;
+	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
+	for( vvector<plugin::descriptor>::iterator it =
+						pluginDescriptors.begin();
+					it != pluginDescriptors.end(); ++it )
+	{
+		if( it->type == plugin::Tool )
+		{
+			m_tools_menu->addAction( *it->logo, it->public_name );
+			m_tools.push_back( tool::instantiate( it->name,
+								this ) );
+		}
+	}
+	if( m_tools_menu->count() )
+	{
+#ifdef QT4
+		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
+#else
+		menuBar()->insertItem( tr( "&Tools" ), m_tools_menu );
+#endif
+		connect( m_tools_menu, SIGNAL( activated( int ) ),
+						this, SLOT( showTool( int ) ) );
+	}
+
+
 	// help-popup-menu
 	QMenu * help_menu = new QMenu( this );
 #ifdef QT4
@@ -1046,6 +1074,16 @@ void mainWindow::fillTemplatesMenu( void )
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
 	}
+}
+
+
+
+
+void mainWindow::showTool( int _idx )
+{
+	tool * t = m_tools[m_tools_menu->indexOf( _idx )];
+	t->show();
+	t->setFocus();
 }
 
 

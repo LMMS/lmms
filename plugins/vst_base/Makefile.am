@@ -23,8 +23,7 @@ libvstbase_la_SOURCES =	vst_base.cpp		\
 CC = wineg++
 pkglib_PROGRAMS = lvsl_server
 lvsl_server_SOURCES = lvsl_server.c communication.h
-lvsl_server_LDFLAGS = -mwindows -lpthread -o $(pkglib_PROGRAMS)
-lvsl_server_LINK = wineg++
+lvsl_server_LINK = wineg++ -mwindows -lpthread -o $(pkglib_PROGRAMS)
 nobase_pkglib_DATA = $(pkglib_PROGRAMS).exe.so
 
 CLEANFILES = $(MOC_FILES) $(nobase_pkglib_DATA)

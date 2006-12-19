@@ -1,6 +1,6 @@
 coversdir = $(lmmsdatadir)/projects/covers
 
-covers_DATA = $(wildcard *.mmp)
+covers_DATA = *.mmp
 
 EXTRA_DIST = $(covers_DATA)
 

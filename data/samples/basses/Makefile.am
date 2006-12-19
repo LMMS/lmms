@@ -1,6 +1,6 @@
 bassessamplesdir = $(lmmsdatadir)/samples/basses
 
-bassessamples_DATA = $(wildcard *.wav *.ogg)
+bassessamples_DATA = *.ogg
 
 EXTRA_DIST = $(bassessamples_DATA)
 

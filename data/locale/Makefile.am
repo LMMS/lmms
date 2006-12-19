@@ -1,7 +1,7 @@
 localedir = $(lmmsdatadir)/locale
 
-locale_DATA = $(wildcard *.qm)
-locale_SOURCES = $(wildcard *.ts)
+locale_DATA = *.qm
+locale_TSOURCES = *.ts
 
-EXTRA_DIST = $(locale_DATA) $(locale_SOURCES)
+EXTRA_DIST = $(locale_DATA) $(locale_TSOURCES)
 

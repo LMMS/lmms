@@ -10,5 +10,17 @@ if STK_SUPPORT
 STK_DIR=stk
 endif
 
-SUBDIRS = audio_file_processor bass_booster bit_invader flp_import $(LADSPA_DIRS) midi_import organic plucked_string_synth $(STK_DIR) triple_oscillator $(VST_DIRS) vibed
-
+SUBDIRS =			\
+	audio_file_processor	\
+	bass_booster		\
+	bit_invader		\
+	flp_import		\
+	$(LADSPA_DIRS)		\
+	live_tool		\
+	midi_import		\
+	organic			\
+	plucked_string_synth	\
+	$(STK_DIR)		\
+	triple_oscillator	\
+	$(VST_DIRS)		\
+	vibed

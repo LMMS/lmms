@@ -69,7 +69,7 @@ public:
 		Effect,		// effect-plugin for effect-board
 		ImportFilter,	// filter for importing a file
 		ExportFilter,	// filter for exporting a file
-		AnalysisTools,	// analysis-tools (level-meter etc)
+		Tool,		// additional tool (level-meter etc)
 		Library,	// simple library holding a code-base for
 				// several other plugins (e.g. LADSPA-support)
 		Other,

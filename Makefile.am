@@ -166,6 +166,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/sample_play_handle.cpp		\
 		$(srcdir)/src/core/setup_dialog.cpp			\
 		$(srcdir)/src/core/song_editor.cpp			\
+		$(srcdir)/src/core/tool.cpp				\
 		$(srcdir)/src/core/track.cpp				\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
@@ -324,6 +325,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/string_pair_drag.h			\
 		$(srcdir)/include/midi_tab_widget.h			\
 		$(srcdir)/include/audio_port.h				\
+		$(srcdir)/include/tool.h				\
 		$(srcdir)/include/tool_button.h				\
 		$(srcdir)/include/cpuload_widget.h			\
 		$(srcdir)/include/midi_alsa_seq.h			\

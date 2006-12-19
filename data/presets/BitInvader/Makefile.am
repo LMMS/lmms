@@ -1,5 +1,5 @@
 bipresetsdir = $(lmmsdatadir)/presets/BitInvader
-bipresets_DATA = $(wildcard *.cs.xml)
+bipresets_DATA = *.cs.xml
 
 EXTRA_DIST = $(bipresets_DATA)
 

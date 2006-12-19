@@ -1,6 +1,6 @@
 psspresetsdir = $(lmmsdatadir)/presets/Organic
 
-psspresets_DATA = $(wildcard *.cs.xml)
+psspresets_DATA = *.cs.xml
 
 EXTRA_DIST = $(psspresets_DATA)
 

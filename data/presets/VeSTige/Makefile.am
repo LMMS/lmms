@@ -1,6 +1,6 @@
 vstpresetsdir = $(lmmsdatadir)/presets/VeSTige
 
-vstpresets_DATA = $(wildcard *.cs.xml)
+vstpresets_DATA = *.cs.xml
 
 EXTRA_DIST = $(vstpresets_DATA)
 

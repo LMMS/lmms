@@ -57,6 +57,7 @@ class QGridLayout;
 class QSplashScreen;
 
 class configManager;
+class tool;
 class toolButton;
 
 
@@ -165,12 +166,16 @@ private:
 		bool m_alt;
 	} m_keyMods;
 
+	QMenu * m_tools_menu;
+	vlist<tool *> m_tools;
+
 
 	friend class engine;
 
 
 private slots:
 	void fillTemplatesMenu( void );
+	void showTool( int _idx );
 
 } ;
 

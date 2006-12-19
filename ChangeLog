@@ -1,3 +1,39 @@
+2006-12-19	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/tool.h:
+	* src/core/tool.cpp:
+	initial release, base class for all tool plugins
+
+	* include/plugin.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	renamed AnalysisTools to Tool
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	added tools menu
+
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	added tool plugins
+
+	* configure.in:
+	* plugins/live_tool/artwork.png:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	* plugins/live_tool/logo.png:
+	* plugins/live_tool/Makefile.am:
+	added live tool, an example tool plugin
+
+	* plugins/Makefile.am:
+	- added live tool
+	- eased SVN merging
+
+	* data/*/Makefile.am:
+	* data/*/*/Makefile.am:
+	* plugins/vst_base/Makefile.am:
+	- removed wildcard extension for POSIX compliance
+	- fixed additional automake 1.10 issues
+
 2006-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bass_booster/bassboster_control_dialog.h:
