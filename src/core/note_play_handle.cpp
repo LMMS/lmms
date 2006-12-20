@@ -383,7 +383,7 @@ int notePlayHandle::index( void ) const
 
 
 constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
-						const instrumentTrack * _it )
+				const instrumentTrack * _it, bool _all_ph )
 {
 	const playHandleVector & phv = _it->eng()->getMixer()->playHandles();
 	constNotePlayHandleVector cnphv;
@@ -394,7 +394,7 @@ constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
 		if( nph != NULL && nph->m_instrumentTrack == _it &&
-						nph->released() == FALSE )
+			( nph->released() == FALSE || _all_ph == TRUE ) )
 		{
 			cnphv.push_back( nph );
 		}

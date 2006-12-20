@@ -220,13 +220,13 @@ namespace effectLib
 	class bassBoost : public monoBase<SAMPLE>
 	{
 	public:
-		bassBoost( const float _selectivity,
-				const float _gain,
-				const float _ratio,
+		bassBoost( const double _selectivity,
+				const double _gain,
+				const double _ratio,
 				const bassBoost<SAMPLE> & _orig =
 							bassBoost<SAMPLE>() ) :
-			m_selectivity( tMax<SAMPLE>( _selectivity, 10.0f ) ),
-			m_gain1( 1.0f / ( m_selectivity + 1.0f ) ),
+			m_selectivity( tMax<SAMPLE>( _selectivity, 10.0 ) ),
+			m_gain1( 1.0 / ( m_selectivity + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
 			m_cap( _orig.m_cap )
@@ -244,33 +244,33 @@ namespace effectLib
 								m_gain2/* )*/ );
 		}
 
-		void setSelectivity( const float _selectivity )
+		void setSelectivity( const double _selectivity )
 		{
 			m_selectivity = _selectivity;
-			m_gain1 = 1.0f / ( m_selectivity + 1.0f );
+			m_gain1 = 1.0 / ( m_selectivity + 1.0 );
 		}
 
-		void setGain( const float _gain )
+		void setGain( const double _gain )
 		{
 			m_gain2 = _gain;
 		}
 
-		void setRatio( const float _ratio )
+		void setRatio( const double _ratio )
 		{
 			m_ratio = _ratio;
 		}
 
 	private:
 		bassBoost() :
-			m_cap( 0.0f )
+			m_cap( 0.0 )
 		{
 		}
 
-		float m_selectivity;
-		float m_gain1;
-		float m_gain2;
-		float m_ratio;
-		mutable float m_cap;
+		double m_selectivity;
+		double m_gain1;
+		double m_gain2;
+		double m_ratio;
+		mutable double m_cap;
 	} ;
 
 
@@ -297,6 +297,41 @@ namespace effectLib
 								m_gain );
 			}
 			return( _in * m_gain );
+		}
+
+		void setThreshold( const float _threshold )
+		{
+			m_threshold = _threshold;
+		}
+
+		void setGain( const float _gain )
+		{
+			m_gain = _gain;
+		}
+
+
+	private:
+		float m_threshold;
+		float m_gain;
+
+	} ;
+
+
+	template<typename SAMPLE = sample_t>
+	class distortion : public monoBase<SAMPLE>
+	{
+	public:
+		distortion( const float _threshold, const float _gain ) :
+			m_threshold( _threshold ),
+			m_gain( _gain )
+		{
+		}
+
+		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		{
+			return( m_gain * ( _in * ( fabsf( _in )+m_threshold ) /
+					( _in*_in +( m_threshold-1 )*
+							fabsf( _in ) + 1 ) ) );
 		}
 
 		void setThreshold( const float _threshold )

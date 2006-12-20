@@ -166,9 +166,10 @@ public:
 	// belonging to this channel
 	int index( void ) const;
 
-	// note-play-handles belonging to given channel
+	// note-play-handles belonging to given channel, if _all_ph = TRUE,
+	// also released note-play-handles are returned
 	static constNotePlayHandleVector nphsOfInstrumentTrack(
-						const instrumentTrack * _ct );
+			const instrumentTrack * _ct, bool _all_ph = FALSE );
 
 	// return whether given note-play-handle is equal to *this
 	bool operator==( const notePlayHandle & _nph ) const;

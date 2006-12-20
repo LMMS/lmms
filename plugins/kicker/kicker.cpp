@@ -96,8 +96,8 @@ kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 
 	m_distKnob = new knob( knobDark_28, this, tr( "Distortion" ),
 						eng(), _instrument_track );
-	m_distKnob->setRange( 0.00f, 0.99f, 0.01f );
-	m_distKnob->setInitValue( 0.1f );
+	m_distKnob->setRange( 0.0f, 100.0f, 0.1f );
+	m_distKnob->setInitValue( 0.8f );
 	m_distKnob->setLabel( tr( "DIST" ) );
 	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
 
@@ -168,7 +168,8 @@ QString kickerInstrument::nodeName( void ) const
 
 
 
-typedef effectLib::foldbackDistortion<> distFX;
+//typedef effectLib::foldbackDistortion<> distFX;
+typedef effectLib::distortion<> distFX;
 typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 
 
@@ -181,7 +182,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 	if ( tfp == 0 )
 	{
 		_n->m_pluginData = new sweepOsc(
-					distFX( 1.0f-m_distKnob->value(),
+					distFX( m_distKnob->value(),
 							m_gainKnob->value() ) );
 	}
 	else if( tfp > decfr && !_n->released() )
