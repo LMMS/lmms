@@ -575,18 +575,19 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		m_envWidget->processAudioBuffer( _buf, _frames, _n );
 		v_scale *= ( (float) _n->getVolume() / DEFAULT_VOLUME );
-		const fpab_t ENV_FRAMES = 32;
+		const fpab_t ENV_FRAMES = 10;
 		if( _n->totalFramesPlayed() == 0 )
 		{
 			// very basic envelope for not having clicks at the
 			// beginning
-			for( fpab_t i = 0; i < tMin<fpab_t>( _frames,
-							ENV_FRAMES ); ++i )
+			const fpab_t frames = tMin<fpab_t>( _frames,
+								ENV_FRAMES );
+			for( fpab_t i = 0; i < frames; ++i )
 			{
 				for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS;
 									++ch )
 				{
-					_buf[i][ch] *= (float) i / ENV_FRAMES;
+					_buf[i][ch] *= (float) i / frames;
 				}
 			}
 		}
@@ -607,7 +608,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 				for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS;
 									++ch )
 				{
-					_buf[i][ch] *= (float) ( _frames - i ) /
+					_buf[i][ch] *= (float) ( _frames-i-1 ) /
 								ENV_FRAMES;
 				}
 			}
