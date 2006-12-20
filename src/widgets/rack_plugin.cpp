@@ -236,7 +236,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 rackPlugin::~rackPlugin()
 {
 	delete m_effect;
-	delete m_controlView;
+	m_controlView->deleteLater();
 }
 
 

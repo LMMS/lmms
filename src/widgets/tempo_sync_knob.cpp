@@ -76,7 +76,7 @@ tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 
 tempoSyncKnob::~tempoSyncKnob()
 {
-	delete m_custom;
+	m_custom->deleteLater();
 }
 
 
