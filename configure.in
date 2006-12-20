@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20061219, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061219)
+AC_INIT(lmms, 0.2.1-svn20061220, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061220)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -32,8 +32,6 @@ if test "x$build_win32" = "xtrue" ; then
 	AC_MSG_RESULT([Win32, will enable support for it])
 	AC_DEFINE(BUILD_WIN32)
 	AC_DEFINE(WIN32)
-	#WIN32_DEFINES="-D_WIN32_WINNT=Windows2000"
-	#AC_SUBST(WIN32_DEFINES)
 	build_linux="false"
 	build_win32="true"
 else
@@ -211,10 +209,13 @@ AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 # check for proper WINE-installation and existing Steinberg headers
 AC_ARG_WITH(vst,
 	AS_HELP_STRING([--without-vst],
-			[enable support for builtin VST-plugin-hosting]), , [ with_vst=yes ])
+			[disable support for builtin VST-plugin-hosting]), , [ with_vst=yes ])
 AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <aeffectx.h> header file.])
 if test "x$with_vst" = "xyes" ; then
 
+	if echo $CFLAGS $CXXFLAGS | grep "fomit-frame-pointer" > /dev/null ; then
+		AC_MSG_ERROR([*** passing -fomit-frame-pointer as compiler-flag will break LMMS' VST-support so either disable VST-support using --without-vst or remove it from compiler-flags])
+	fi
 	ORIG_CFLAGS=$CFLAGS
 	ORIG_CPPFLAGS=$CPPFLAGS
 	CFLAGS="$CFLAGS -I./include"
@@ -557,6 +558,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/bass_booster/Makefile
 		 plugins/bit_invader/Makefile
 		 plugins/flp_import/Makefile
+		 plugins/kicker/Makefile
 		 plugins/ladspa_base/Makefile
 		 plugins/ladspa_effect/Makefile
 		 plugins/ladspa_effect/caps/Makefile

@@ -69,18 +69,18 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 // TODO: make this synth stereo for better better spacial (room) feeling and
 // add distortion
 
-pluckedStringSynth::pluckedStringSynth( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &pluckedstringsynth_plugin_descriptor )
+pluckedStringSynth::pluckedStringSynth( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &pluckedstringsynth_plugin_descriptor )
 {
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
-							eng(), _channel_track );
+						eng(), _instrument_track );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
  	m_pickKnob->setInitValue( 0.0f );
 	m_pickKnob->move( 86, 134 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 
 	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
-							eng(), _channel_track );
+						eng(), _instrument_track );
 	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 	m_pickupKnob->setInitValue( 0.05f );
 	m_pickupKnob->move( 138, 134 );

@@ -15,6 +15,7 @@ SUBDIRS =			\
 	bass_booster		\
 	bit_invader		\
 	flp_import		\
+	kicker			\
 	$(LADSPA_DIRS)		\
 	live_tool		\
 	midi_import		\
