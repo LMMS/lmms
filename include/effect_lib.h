@@ -26,7 +26,10 @@
 #ifndef _EFFECT_LIB_H
 #define _EFFECT_LIB_H
 
+#include <math.h>
+
 #include "templates.h"
+#include "lmms_constants.h"
 #include "types.h"
 
 
@@ -217,20 +220,80 @@ namespace effectLib
 
 
 	template<typename SAMPLE = sample_t>
-	class bassBoost : public monoBase<SAMPLE>
+	class fastBassBoost : public monoBase<SAMPLE>
 	{
 	public:
-		bassBoost( const double _selectivity,
-				const double _gain,
-				const double _ratio,
-				const bassBoost<SAMPLE> & _orig =
-							bassBoost<SAMPLE>() ) :
-			m_selectivity( tMax<SAMPLE>( _selectivity, 10.0 ) ),
-			m_gain1( 1.0 / ( m_selectivity + 1.0 ) ),
+		fastBassBoost( const float _frequency,
+				const float _gain,
+				const float _ratio,
+				const fastBassBoost<SAMPLE> & _orig =
+						fastBassBoost<SAMPLE>() ) :
+			m_frequency( tMax<SAMPLE>( _frequency, 10.0 ) ),
+			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
 			m_cap( _orig.m_cap )
 		{
+		}
+
+		virtual ~fastBassBoost()
+		{
+		}
+
+		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		{
+			// TODO: somehow remove these horrible aliases...
+			m_cap = ( _in + m_cap*m_frequency ) * m_gain1;
+			return( /*saturate<SAMPLE>(*/ ( _in + m_cap*m_ratio ) *
+								m_gain2/* )*/ );
+		}
+
+		void setFrequency( const float _frequency )
+		{
+			m_frequency = _frequency;
+			m_gain1 = 1.0 / ( m_frequency + 1.0 );
+		}
+
+		void setGain( const float _gain )
+		{
+			m_gain2 = _gain;
+		}
+
+		void setRatio( const float _ratio )
+		{
+			m_ratio = _ratio;
+		}
+
+	private:
+		fastBassBoost() :
+			m_cap( 0.0 )
+		{
+		}
+
+		float m_frequency;
+		float m_gain1;
+		float m_gain2;
+		float m_ratio;
+		mutable float m_cap;
+	} ;
+
+
+	template<typename SAMPLE = sample_t>
+	class bassBoost : public monoBase<SAMPLE>
+	{
+	public:
+		bassBoost( const float _frequency,
+				const float _gain,
+				const float _ratio,
+				const float _sample_rate ) :
+			m_gain( _gain ),
+			m_beta( -1.0f ),
+			m_shape( 1.0f ),
+			m_sampleRate( _sample_rate )
+		{
+			xn1=xn2=yn1=yn2=0.0f;
+			setFrequency( _frequency );
+			setRatio( _ratio );
 		}
 
 		virtual ~bassBoost()
@@ -239,38 +302,58 @@ namespace effectLib
 
 		virtual SAMPLE nextSample( const SAMPLE _in ) const
 		{
-			m_cap = ( _in + m_cap*m_selectivity ) * m_gain1;
-			return( /*saturate<SAMPLE>(*/ ( _in + m_cap*m_ratio ) *
-								m_gain2/* )*/ );
+			const float out = ( m_b0*_in + m_b1*xn1 + m_b2*xn2 -
+						m_a1*yn1 - m_a2*yn2 ) / m_a0;
+			xn2 = xn1;
+			xn1 = _in;
+			yn2 = yn1;
+			yn1 = out;
+			return( out*m_gain );
 		}
 
-		void setSelectivity( const double _selectivity )
+		void setFrequency( const float _frequency )
 		{
-			m_selectivity = _selectivity;
-			m_gain1 = 1.0 / ( m_selectivity + 1.0 );
+			const float omega = 2*F_PI*_frequency/m_sampleRate;
+			m_sin = sinf( omega );
+			m_cos = cosf( omega );
+			if( m_beta > 0 )
+			{
+				updateFilter();
+			}
 		}
 
-		void setGain( const double _gain )
+		void setGain( const float _gain )
 		{
-			m_gain2 = _gain;
+			m_gain = _gain;
 		}
 
-		void setRatio( const double _ratio )
+		void setRatio( const float _ratio )
 		{
-			m_ratio = _ratio;
+			m_a = expf( logf( 1.0f ) * _ratio / 40 );
+			updateFilter();
 		}
 
 	private:
-		bassBoost() :
-			m_cap( 0.0 )
+		void updateFilter( void )
 		{
+			m_beta = sqrtf( ( m_a*m_a + 1 ) / m_shape -
+							powf( m_a - 1, 2 ) );
+			m_b0 = m_a*((m_a+1)-(m_a-1)*m_cos + m_beta*m_sin);
+			m_b1 = 2*m_a*((m_a-1) - (m_a+1) * m_cos);
+			m_b2 = m_a*((m_a+1) - (m_a-1)*m_cos - m_beta*m_sin);
+			m_a0 = ((m_a+1) + (m_a-1)*m_cos + m_beta*m_sin);
+			m_a1 = -2*((m_a-1) + (m_a+1) * m_cos);
+			m_a2 = (m_a+1) + (m_a-1)*m_cos-m_beta*m_sin;
 		}
-
-		double m_selectivity;
-		double m_gain1;
-		double m_gain2;
-		double m_ratio;
-		mutable double m_cap;
+		float m_gain;
+		float m_a;
+		float m_sin;
+		float m_cos;
+		float m_beta;
+		const float m_shape;
+		const float m_sampleRate;
+		float m_b0, m_b1, m_b2, m_a0, m_a1, m_a2;
+		mutable float xn1, xn2, yn1, yn2;
 	} ;
 
 

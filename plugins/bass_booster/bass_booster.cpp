@@ -53,7 +53,7 @@ plugin::descriptor bassbooster_plugin_descriptor =
 
 bassBoosterEffect::bassBoosterEffect( effect::constructionData * _cdata ) :
 	effect( &bassbooster_plugin_descriptor, _cdata ),
-	m_bbFX( effectLib::bassBoost<>( 70.0f, 1.0f, 2.8f ) )
+	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) )
 {
 }
 

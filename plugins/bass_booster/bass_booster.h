@@ -55,7 +55,7 @@ public:
 
 
 private:
-	effectLib::monoToStereoAdaptor<effectLib::bassBoost<> > m_bbFX;
+	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost<> > m_bbFX;
 
 	friend class bassBoosterControlDialog;
 } ;

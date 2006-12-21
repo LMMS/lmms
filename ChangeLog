@@ -6,7 +6,8 @@
 	to add note-play-handles even if they're released
 
 	* include/effect_lib.h:
-	made bassBoost using double-values internally
+	- renamed bassBosst to fastBastBoost
+	- added new bassBoost-class based on audacity's bass-boost-effect
 
 	* plugins/kicker/kicker.cpp:
 	* include/effect_lib.h:

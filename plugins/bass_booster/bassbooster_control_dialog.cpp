@@ -85,8 +85,8 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 
 void bassBoosterControlDialog::changeFrequency( void )
 {
-	m_effect->m_bbFX.leftFX().setSelectivity( m_freqKnob->value() );
-	m_effect->m_bbFX.rightFX().setSelectivity( m_freqKnob->value() );
+	m_effect->m_bbFX.leftFX().setFrequency( m_freqKnob->value() );
+	m_effect->m_bbFX.rightFX().setFrequency( m_freqKnob->value() );
 }
 
 
