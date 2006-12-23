@@ -1,3 +1,8 @@
+2006-12-23	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/kicker/kicker.cpp:
+	fixed envelope segfault
+
 2006-12-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/note_play_handle.h:
