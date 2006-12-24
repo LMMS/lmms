@@ -278,6 +278,7 @@ namespace effectLib
 	} ;
 
 
+	// for some reason this effect doesn't work... (in=out)
 	template<typename SAMPLE = sample_t>
 	class bassBoost : public monoBase<SAMPLE>
 	{

@@ -75,14 +75,14 @@ kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 	QHBoxLayout * hl = new QHBoxLayout;
 	m_startFreqKnob = new knob( knobDark_28, this, tr( "Start frequency" ),
 						eng(), _instrument_track );
-	m_startFreqKnob->setRange( 40.0f, 1000.0f, 1.0f );
+	m_startFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
  	m_startFreqKnob->setInitValue( 150.0f );
 	m_startFreqKnob->setLabel( tr( "START" ) );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
 
 	m_endFreqKnob = new knob( knobDark_28, this, tr( "End frequency" ),
 						eng(), _instrument_track );
-	m_endFreqKnob->setRange( 40.0f, 1000.0f, 1.0f );
+	m_endFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
 	m_endFreqKnob->setInitValue( 40.0f );
 	m_endFreqKnob->setLabel( tr( "END" ) );
 	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );

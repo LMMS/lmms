@@ -26,7 +26,7 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 
 
-pkglib_LTLIBRARIES= libkicker.la
+pkglib_LTLIBRARIES = libkicker.la
 
 libkicker_la_SOURCES = kicker.cpp kicker.h
 
