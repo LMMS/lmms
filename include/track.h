@@ -399,7 +399,7 @@ class track : public journallingObject
 public:
 	enum trackTypes
 	{
-		CHANNEL_TRACK,
+		INSTRUMENT_TRACK,
 		BB_TRACK,
 		SAMPLE_TRACK,
 		EVENT_TRACK,

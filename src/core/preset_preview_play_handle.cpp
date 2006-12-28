@@ -63,7 +63,7 @@ public:
 	{
 		setJournalling( FALSE );
 		m_previewInstrumentTrack =  dynamic_cast<instrumentTrack *>(
-					track::create( track::CHANNEL_TRACK,
+					track::create( track::INSTRUMENT_TRACK,
 								this ) );
 		m_previewInstrumentTrack->setJournalling( FALSE );
 		hide();

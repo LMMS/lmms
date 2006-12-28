@@ -1,6 +1,6 @@
 - select number of channels in export-project-dialog
 - MIDI over Ethernet support
-- lock m_instrument in instrumentTrack-class for not crashing when using m_instrument in notePlayHandle::supportsParallelizing() while instrument is being deleted or so
+- lock m_instrument in instrumentTrack-class for not crashing when using m_instrument in notePlayHandle::supportsParallelizing() while instrument is being deleted or so - toby 061228: already fixed on 061218?
 - try to make vestige-plugin-dlls relative
 - do song-editor-tempo-connection to vst-plugin inside remoteVSTPlugin
 - add/remove-steps button in bb-editor for adding/removing according number of steps to/from all patterns of visible beat/baseline
@@ -23,7 +23,6 @@
 - AMS/OMS-bindings
 - remove binary-embed-system
 - recording-functionality
-- show loading-vst-hint when cloning vestige-track
 - do not hang when saving while loading VST-plugin (because then we call dispatcher while the load-process is still going on)
 - tempo-recogn. and sync of beat-samples
 - do not quantize when importing from MIDI-file
@@ -40,10 +39,8 @@
 - pre-listen when opening sample with QFileDialog
 - panning-editing in piano-roll
 - speed up painting of sampleTCO
-- solve problems with different keyboard-layouts when playing channel-track with pc-keyboard -> use tr()
 - panning env+lfo
 - rewrite export-project-dialog using layout-mechanism
-- dynamic pitch-change
 - make piano-roll use the global clipboard??
 - add more localizations:
 	- Swedish

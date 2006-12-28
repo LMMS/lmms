@@ -1470,11 +1470,11 @@ void songEditor::createNewProject( void )
 	eng()->getProjectJournal()->setJournalling( FALSE );
 
 	track * t;
-	t = track::create( track::CHANNEL_TRACK, this );
+	t = track::create( track::INSTRUMENT_TRACK, this );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	track::create( track::SAMPLE_TRACK, this );
-	t = track::create( track::CHANNEL_TRACK, eng()->getBBEditor() );
+	t = track::create( track::INSTRUMENT_TRACK, eng()->getBBEditor() );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );

@@ -1659,7 +1659,7 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 
 	switch( _tt )
 	{
-		case CHANNEL_TRACK: t = new instrumentTrack( _tc ); break;
+		case INSTRUMENT_TRACK: t = new instrumentTrack( _tc ); break;
 		case BB_TRACK: t = new bbTrack( _tc ); break;
 		case SAMPLE_TRACK: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:

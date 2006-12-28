@@ -364,7 +364,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				printf( "new channel\n" );
 
 				it = dynamic_cast<instrumentTrack *>(
-	track::create( track::CHANNEL_TRACK, _tc->eng()->getBBEditor() ) );
+	track::create( track::INSTRUMENT_TRACK, _tc->eng()->getBBEditor() ) );
 				assert( it != NULL );
 				i_tracks.push_back( it );
 				it_inst = it->loadInstrument(

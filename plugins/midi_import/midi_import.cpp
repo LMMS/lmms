@@ -219,7 +219,7 @@ invalid_format:
 		// now create new channel-track for reading track
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 						track::create(
-							track::CHANNEL_TRACK,
+							track::INSTRUMENT_TRACK,
 							_tc ) );
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );

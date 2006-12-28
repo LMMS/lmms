@@ -106,8 +106,7 @@ const char * surroundarea_help = QT_TRANSLATE_NOOP( "instrumentTrack",
 						"feature." );
 
 
-const int CHANNEL_WIDTH		= 250;
-const int INSTRUMENT_WIDTH	= CHANNEL_WIDTH;
+const int INSTRUMENT_WIDTH	= 250;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 84;
 
@@ -116,7 +115,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	QWidget( _tc->eng()->getMainWindow()->workspace() ),
  	track( _tc ),
 	midiEventProcessor(),
-	m_trackType( CHANNEL_TRACK ),
+	m_trackType( INSTRUMENT_TRACK ),
 	m_midiPort( eng()->getMixer()->getMIDIClient()->addPort( this,
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( new audioPort( tr( "unnamed_channel" ), eng() ) ),
@@ -314,7 +313,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// setup piano-widget
 	m_pianoWidget = new pianoWidget( this );
-	m_pianoWidget->setFixedSize( CHANNEL_WIDTH, PIANO_HEIGHT );
+	m_pianoWidget->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
 
 
 	vlayout->addWidget( m_generalSettingsWidget );
@@ -380,7 +379,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	_tc->updateAfterTrackAdd();
 #ifndef QT3
-	setFixedWidth( CHANNEL_WIDTH );
+	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 #endif
 
@@ -653,9 +652,17 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 							_time.frames(
 						eng()->framesPerTact64th() ),
 						valueRanges<f_cnt_t>::max, n );
+					// as mixer::addPlayHandle() might
+					// delete note (when running into
+					// critical XRuns) which will call
+					// deleteNotePluginData which locks
+					// this mutex, we have to unlock
+					// it here temporarily
+					m_notesMutex.unlock();
 					if( eng()->getMixer()->addPlayHandle(
 									nph ) )
 					{
+						m_notesMutex.lock();
 						m_notes[_me.key()] = nph;
 					}
 				}
@@ -1299,7 +1306,7 @@ void instrumentTrack::invalidateAllMyNPH( void )
 	// invalidate all note-play-handles linked to this channel
 	eng()->getMixer()->checkValidityOfPlayHandles();
 
-	m_trackType = CHANNEL_TRACK;
+	m_trackType = INSTRUMENT_TRACK;
 }
 
 

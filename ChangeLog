@@ -1,3 +1,22 @@
+2006-12-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/tracks/instrument_track.cpp:
+	before calling mixer::addPlayHandle(), unlock m_notesMutex as in some
+	cases (when running into xruns)
+	instrumentTrack::deleteNotePluginData() is called while the mutex is
+	locked and the program was frozen
+
+	* include/track.h:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/instrument_track.cpp:
+	changed name of constant CHANNEL_TRACK to INSTRUMENT_TRACK
+
 2006-12-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/kicker/kicker.cpp:
@@ -2522,7 +2541,7 @@
 	* plugins/flp_import/flp_import.cpp:
 	improvements for having a working flp-filter as soon as possible
 
-2005-03-28	Danny McRae	<khjklujn/at/yahoo/dot/com>
+2006-03-28	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* src/lib/sample_buffer.cpp:
 	corrected miscalculation of buffer size in resample
@@ -2549,7 +2568,7 @@
 	support for default-velocity for MIDI-in and/or -out-events - useful
 	when recording with constant velocity
 
-2005-03-26	Danny McRae	<khjklujn/at/yahoo/dot/com>
+2006-03-26	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
 	* plugins/vibed/:
 	added "Vibed"-plugin, a powerful combination of PluckedStringSynth and

@@ -495,7 +495,7 @@ void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
 	stringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,sampledata,samplefile,instrument,midifile,"
 					"track_%1,track_%2" ).
-						arg( track::CHANNEL_TRACK ).
+						arg( track::INSTRUMENT_TRACK ).
 						arg( track::SAMPLE_TRACK ) );
 }
 
@@ -509,7 +509,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	if( type == "instrument" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::CHANNEL_TRACK,
+				track::create( track::INSTRUMENT_TRACK,
 								this ) );
 		it->loadInstrument( value );
 		it->toggledInstrumentTrackButton( TRUE );
@@ -518,7 +518,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	else if( type == "sampledata" || type == "samplefile" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::CHANNEL_TRACK,
+				track::create( track::INSTRUMENT_TRACK,
 								this ) );
 		instrument * i = it->loadInstrument( "audiofileprocessor" );
 		i->setParameter( type, value );
@@ -529,7 +529,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	{
 		multimediaProject mmp( value );
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::CHANNEL_TRACK,
+				track::create( track::INSTRUMENT_TRACK,
 								this ) );
 		it->loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );

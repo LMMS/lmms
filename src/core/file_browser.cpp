@@ -331,7 +331,7 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
-			track::create( track::CHANNEL_TRACK, _tc ) );
+			track::create( track::INSTRUMENT_TRACK, _tc ) );
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
 #endif
@@ -346,7 +346,7 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 	else if( m_contextMenuItem->type() == fileItem::PRESET_FILE )
 	{
 		multimediaProject mmp( m_contextMenuItem->fullName() );
-		track * t = track::create( track::CHANNEL_TRACK, _tc );
+		track * t = track::create( track::INSTRUMENT_TRACK, _tc );
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
 		if( ct != NULL )
 		{
@@ -418,7 +418,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			// samples are per default opened in bb-editor because
 			// they're likely drum-samples etc.
 			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::CHANNEL_TRACK,
+				track::create( track::INSTRUMENT_TRACK,
 						eng()->getBBEditor() ) );
 #ifdef LMMS_DEBUG
 			assert( it != NULL );
@@ -436,7 +436,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 		{
 			// presets are per default opened in bb-editor
 			multimediaProject mmp( f->fullName() );
-			track * t = track::create( track::CHANNEL_TRACK,
+			track * t = track::create( track::INSTRUMENT_TRACK,
 						eng()->getBBEditor() );
 			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 									t );
