@@ -220,8 +220,7 @@ if test "x$with_vst" = "xyes" ; then
 	ORIG_CPPFLAGS=$CPPFLAGS
 	CFLAGS="$CFLAGS -I./include"
 	CPPFLAGS="$CPPFLAGS -I./include"
-	ORIG_CC="$CC"
-	CC="$CXX"
+	AC_LANG_PUSH(C++)
 	AC_CHECK_HEADER(aeffectx.h, HAVE_VST_AEFFECTX_H="true")
 	CFLAGS="$ORIG_CFLAGS"
 	CPPFLAGS="$ORIG_CPPFLAGS"
@@ -239,14 +238,14 @@ if test "x$with_vst" = "xyes" ; then
 			fi
 		fi
 	fi
-	CC="$ORIG_CC"
+	AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINEGCC")
 
 
 # check for LADSPA-SDK
 AC_ARG_WITH(ladspa,
-	AS_HELP_STRING([--without-ladspa], [enable support for LADSPA]), , [ with_ladspa=yes ] )
+	AS_HELP_STRING([--without-ladspa], [disable support for LADSPA]), , [ with_ladspa=yes ] )
 AH_TEMPLATE(HAVE_LADSPA_H, [Define to 1 if you have the <ladspa.h> header file.])
 AH_TEMPLATE(LADSPA_SUPPORT, [Define to 1 if you have the <ladspa.h> header file.])
 if test "x$with_ladspa" = "xyes" ; then
@@ -265,8 +264,8 @@ AM_CONDITIONAL(LADSPA_SUPPORT, test "$build_linux" = "true" )
 # check for STK
 AC_LANG_PUSH(C++)
 AC_ARG_WITH(stk,
-	AS_HELP_STRING([--with-stk], [enable support for STK plugins]), 
-	[ with_stk=yes ], [ with_stk=no ])
+	AS_HELP_STRING([--without-stk], [disable support for STK plugins]), 
+	[ with_stk=no ], [ with_stk=yes ])
 AH_TEMPLATE(HAVE_STK_H, [Define to 1 if you have the <stk/Stk.h> header file.])
 if test "x$with_stk" = "xyes" ; then
 	AC_CHECK_HEADER([stk/Stk.h], HAVE_STK_H="true")
