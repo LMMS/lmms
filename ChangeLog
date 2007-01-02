@@ -1,3 +1,12 @@
+2007-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/note.cpp:
+	fixed segfault in hasDetuningInfo() if m_detuning was NULL
+
+	* README:
+	* src/core/about_dialog.cpp:
+	extended copyright from 2006 to 2007
+
 2006-12-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

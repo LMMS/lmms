@@ -3,7 +3,7 @@
 /*
  * note.cpp - implementation of class note
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -344,6 +344,10 @@ void note::detachCurrentDetuning( void )
 
 bool note::hasDetuningInfo( void )
 {
+	if( m_detuning == NULL )
+	{
+		return( FALSE );
+	}
 	automationPattern::timeMap map =
 			m_detuning->getAutomationPattern()->getTimeMap();
 	return( map.size() > 1 || map[0] != 0 );
