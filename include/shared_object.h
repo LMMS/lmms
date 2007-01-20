@@ -50,6 +50,7 @@ public:
 	template<class T>
 	static T * ref( T * _object )
 	{
+		// TODO: Use QShared
 		_object->m_reference_mutex.lock();
 		++_object->m_reference_count;
 		_object->m_reference_mutex.unlock();

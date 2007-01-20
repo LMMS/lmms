@@ -1,7 +1,7 @@
 /*
  * audio_file_processor.cpp - instrument for using audio-files
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -415,10 +415,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 
 void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 {
-	if( _n->m_pluginData != NULL )
-	{
-		m_sampleBuffer.deleteResamplingData( &_n->m_pluginData );
-	}
+	m_sampleBuffer.deleteResamplingData( &_n->m_pluginData );
 }
 
 

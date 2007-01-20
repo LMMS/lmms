@@ -4,7 +4,7 @@
  * arp_and_chords_tab_widget.cpp - widget for use in arp/chord-tab of 
  *                                 instrument-track-window
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -461,7 +461,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 					break;
 				}
 				// create copy of base-note
-				note note_copy( NULL, 0, 0,
+				note note_copy( NULL, _n->length(), 0,
 						(tones)( sub_note_key %
 							NOTES_PER_OCTAVE ),
 						(octaves)( sub_note_key /
@@ -477,6 +477,10 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 						_n->framesAhead(),
 						_n->frames(), note_copy );
 				note_play_handle->setBBTrackFrom( _n );
+#if SINGERBOT_SUPPORT
+				note_play_handle->setPatternIndex(
+							_n->patternIndex() );
+#endif
 				// add sub-note to base-note, now all stuff is
 				// done by notePlayHandle::play_note()
 				_n->addSubNote( note_play_handle );
@@ -640,6 +644,9 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 						new_note,
 						TRUE );
 		note_play_handle->setBBTrackFrom( _n );
+#if SINGERBOT_SUPPORT
+		note_play_handle->setPatternIndex( _n->patternIndex() );
+#endif
 
 		// add sub-note to base-note - now all stuff is done by
 		// notePlayHandle::playNote()

@@ -1,7 +1,7 @@
 /*
  * triple_oscillator.cpp - powerful instrument with three oscillators
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -769,10 +769,6 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 
 void tripleOscillator::deleteNotePluginData( notePlayHandle * _n )
 {
-	if( _n->m_pluginData == NULL )
-	{
-		return;
-	}
 	delete static_cast<oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscLeft );
 	delete static_cast<oscillator *>( static_cast<oscPtr *>(

@@ -73,7 +73,7 @@
 
 
 
-projectNotes::projectNotes( engine * _engine) :
+projectNotes::projectNotes( engine * _engine ) :
 	QMainWindow( _engine->getMainWindow()->workspace()
 #ifndef QT4
 				, 0, Qt::WStyle_Title

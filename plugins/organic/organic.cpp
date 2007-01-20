@@ -1,7 +1,7 @@
 /*
  * organic.cpp - additive synthesizer for organ-like sounds
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -402,10 +402,6 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 
 void organicInstrument::deleteNotePluginData( notePlayHandle * _n )
 {
-	if( _n->m_pluginData == NULL )
-	{
-		return;
-	}
 	delete static_cast<oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscLeft );
 	delete static_cast<oscillator *>( static_cast<oscPtr *>(

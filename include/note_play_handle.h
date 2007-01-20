@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -207,6 +207,18 @@ public:
 		m_instrumentTrack->m_instrument->waitForWorkerThread();
 	}
 
+#if SINGERBOT_SUPPORT
+	int patternIndex( void )
+	{
+		return( m_patternIndex );
+	}
+
+	void setPatternIndex( int _i )
+	{
+		m_patternIndex = _i;
+	}
+#endif
+
 
 private:
 	instrumentTrack * m_instrumentTrack;	// needed for calling
@@ -232,6 +244,9 @@ private:
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
 	bbTrack * m_bbTrack;		// related BB track
+#if SINGERBOT_SUPPORT
+	int m_patternIndex;		// position among relevant notes
+#endif
 
 
 private slots:

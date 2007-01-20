@@ -1,7 +1,7 @@
 /*
  * sample_buffer.h - container-class sampleBuffer
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -130,7 +130,7 @@ public:
 		return( m_data );
 	}
 
-	void FASTCALL deleteResamplingData( void * * _ptr );
+	static void FASTCALL deleteResamplingData( void * * _ptr );
 
 	QString openAudioFile( void ) const;
 
@@ -232,7 +232,7 @@ private:
 	void initResampling( void );
 	void quitResampling( void );
 	SRC_STATE * createResamplingContext( void );
-	void FASTCALL destroyResamplingContext( SRC_STATE * _context );
+	static void FASTCALL destroyResamplingContext( SRC_STATE * _context );
 
 	SRC_DATA m_srcData;
 	SRC_STATE * m_srcState;

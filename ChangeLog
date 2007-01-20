@@ -1,3 +1,54 @@
+2007-01-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/singerbot/artwork.png:
+	* plugins/singerbot/logo.png:
+	* plugins/singerbot/Makefile.am:
+	* plugins/singerbot/singerbot.h:
+	* plugins/singerbot/singerbot.cpp:
+	initial release, SingerBot (experimental) instrument plugin
+
+	* configure.in:
+	* include/note_play_handle.h:
+	* plugins/Makefile.am:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	added singerbot support
+
+	* include/sample_buffer.h:
+	deleteResampling methods made static
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	call deleteNotePluginData() only if there is plugin data, fixes
+	unprotected instruments
+
+	* plugins/vestige/vestige.cpp:
+	trigger deleteNotePluginData()
+
+	* src/tracks/instrument_track.cpp:
+	avoid double unlock
+
+	* configure.in:
+	fixed configuring with --with-stk
+
+	* acinclude.m4:
+	moved QT_TRANSLATIONS_DIR to config.h
+
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/flp_import/unrtf/word.c:
+	optimized unsafe loops
+
+	* src/lib/sample_buffer.cpp:
+	* src/widgets/project_notes.cpp:
+	minor cosmetic changes
+
+	* include/shared_object.h:
+	not really thread-safe, will be removed
+
 2007-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/note.cpp:

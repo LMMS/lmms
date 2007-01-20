@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-plugins
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -354,6 +354,8 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool )
 		}
 		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0, k,
 					_n->getVolume() ), _n->framesAhead() );
+		// notify when the handle stops, call to deleteNotePluginData
+		_n->m_pluginData = _n;
 	}
 	m_pluginMutex.unlock();
 }

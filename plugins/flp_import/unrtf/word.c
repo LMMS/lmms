@@ -45,6 +45,7 @@
  * 22 Sep 01, tuorfa@yahoo.com: moved word_dump to here from parse.c
  * 22 Sep 01, tuorfa@yahoo.com: added function-level comment blocks 
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 11 Jan 07, jasp00@users.sourceforge.net: optimized unsafe loop
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -164,10 +165,10 @@ void word_free (Word *w) {
 static void
 print_indentation (int level)
 {
-	int i;
-
 	if (level) {
-		for (i=0;i<level;i+=2)
+		/* indent in multiples of 2 */
+		level = (level >> 1) + (level & 1);
+		while (level-- > 0)
 			printf (". ");
 	} else {
 		printf ("\n-----------------------------------------------------------------------\n\n");

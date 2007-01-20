@@ -4,7 +4,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        play-engine
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -59,6 +59,9 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_arpNote( _arp_note ),
 	m_muted( FALSE ),
 	m_bbTrack( NULL )
+#if SINGERBOT_SUPPORT
+	, m_patternIndex( 0 )
+#endif
 {
 	// if the instrument is monophonic we do not allow other note-play-
 	// handles to exist for this track and therefore remove them
@@ -117,7 +120,7 @@ notePlayHandle::~notePlayHandle()
 		noteOff( 0 );
 	}
 
-	if( m_instrumentTrack != NULL )
+	if( m_instrumentTrack != NULL && m_pluginData != NULL )
 	{
 		m_instrumentTrack->deleteNotePluginData( this );
 	}
@@ -252,7 +255,10 @@ void notePlayHandle::checkValidity( void )
 		{
 			noteOff( 0 );
 		}
-		m_instrumentTrack->deleteNotePluginData( this );
+		if( m_pluginData )
+		{
+			m_instrumentTrack->deleteNotePluginData( this );
+		}
 		m_instrumentTrack = NULL;
 	}
 	// sub-notes might not be registered at mixer (for example arpeggio-

@@ -397,7 +397,7 @@ f_cnt_t sampleBuffer::decodeSampleSDL( const char * _f,
 	{
 		AUDIO_S16SYS,
 		_channels,
-		_samplerate,
+		_samplerate
 	} ;
 	f_cnt_t frames = 0;
 

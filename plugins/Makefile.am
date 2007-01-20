@@ -10,6 +10,10 @@ if STK_SUPPORT
 STK_DIR=stk
 endif
 
+if SINGERBOT_SUPPORT
+SINGERBOT_DIR=singerbot
+endif
+
 SUBDIRS =			\
 	audio_file_processor	\
 	bass_booster		\
@@ -21,6 +25,7 @@ SUBDIRS =			\
 	midi_import		\
 	organic			\
 	plucked_string_synth	\
+	$(SINGERBOT_DIR)	\
 	$(STK_DIR)		\
 	triple_oscillator	\
 	$(VST_DIRS)		\

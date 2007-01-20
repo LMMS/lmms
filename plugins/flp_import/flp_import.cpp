@@ -1,7 +1,7 @@
 /*
  * flp_import.cpp - support for importing FLP-files
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -739,7 +739,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 			{
 				//dump_mem( text, text_len );
 				const int bpn = 20;
-				for( Uint32 i = 0; i*bpn < text_len; ++i )
+				Uint32 imax = ( text_len + bpn - 1 ) / bpn;
+				for( Uint32 i = 0; i < imax; ++i )
 				{
 					int ch = *( text + i*bpn + 6 );
 					int pos = *( (int *)( text + i*bpn ) );

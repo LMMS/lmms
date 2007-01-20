@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20061228, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20061228)
+AC_INIT(lmms, 0.2.1-svn20070120, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070120)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -264,8 +264,8 @@ AM_CONDITIONAL(LADSPA_SUPPORT, test "$build_linux" = "true" )
 # check for STK
 AC_LANG_PUSH(C++)
 AC_ARG_WITH(stk,
-	AS_HELP_STRING([--without-stk], [disable support for STK plugins]), 
-	[ with_stk=no ], [ with_stk=yes ])
+	AS_HELP_STRING([--without-stk], [disable support for STK plugins]), ,
+	[ with_stk=yes ])
 AH_TEMPLATE(HAVE_STK_H, [Define to 1 if you have the <stk/Stk.h> header file.])
 if test "x$with_stk" = "xyes" ; then
 	AC_CHECK_HEADER([stk/Stk.h], HAVE_STK_H="true")
@@ -278,6 +278,29 @@ if test ! -z "$HAVE_STK_H" ; then
 	AC_SUBST(stk_lib, [/usr/lib])
 fi
 AM_CONDITIONAL(STK_SUPPORT, test ! -z "$HAVE_STK_H")
+AC_LANG_POP(C++)
+
+
+# check for Festival
+AC_LANG_PUSH(C++)
+AC_ARG_WITH(singerbot,
+	AS_HELP_STRING([--without-singerbot],
+		[disable support for SingerBot plugin]), ,
+	[ with_singerbot=yes ])
+AH_TEMPLATE(SINGERBOT_SUPPORT,
+	[Define to 1 to enable SingerBot plugin support.])
+if test "x$with_singerbot" = "xyes" ; then
+	ORIG_CPPFLAGS=$CPPFLAGS
+	CPPFLAGS+=" -I/usr/include/festival -I/usr/include/speech_tools"
+	CPPFLAGS+=" -Wno-non-template-friend"
+	AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
+	AC_CHECK_LIB([Festival], [main], , FESTIVAL_SUPPORT="")
+	CPPFLAGS=$ORIG_CPPFLAGS
+fi
+if test ! -z "$FESTIVAL_SUPPORT" ; then
+	AC_DEFINE(SINGERBOT_SUPPORT)
+fi
+AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT")
 AC_LANG_POP(C++)
 
 
@@ -565,6 +588,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/plucked_string_synth/Makefile
+		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
 		 plugins/triple_oscillator/Makefile
@@ -753,6 +777,27 @@ if test -z "$HAVE_STK_H" ; then
 	with_warnings="true"
 else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* STK instrument plugins"
+fi
+
+
+if test -z "$FESTIVAL_SUPPORT" ; then
+	if test "x$with_singerbot" = "xyes" ; then
+		echo " ========================"
+		echo " ===  LMMS - WARNING  ======================================================="
+		echo " ========================"
+		echo " ="
+		echo " = You don't seem to have Festival development files."
+		echo " = The SingerBot instrument plugin will be ignored."
+		echo " = Before enabling this plugin, bear in mind that it is still experimental."
+		echo " ="
+		echo " = To remove this warning, please pass"
+		echo " = "
+		echo " = --without-singerbot"
+		echo " ="
+		with_warnings="true"
+	fi
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SingerBot instrument plugin"
 fi
 
 

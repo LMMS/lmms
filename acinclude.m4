@@ -61,6 +61,7 @@ esac
 AC_MSG_RESULT([$QT_VER ($QT_MAJOR)])
 
 # Search for available Qt translations
+AH_TEMPLATE(QT_TRANSLATIONS_DIR, [Define to Qt translations directory])
 AC_MSG_CHECKING([Qt translations])
 case "${QT_VER}" in
     3*)
@@ -77,6 +78,8 @@ for i in $QT_TRANSLATIONS_SEARCH ; do
 done
 if test x"$QT_TRANSLATIONS" = x ; then
     AC_MSG_WARN([*** not found! You may want to install a Qt i18n package])
+else
+    AC_DEFINE_UNQUOTED(QT_TRANSLATIONS_DIR, "$QT_TRANSLATIONS")
 fi
 AC_MSG_RESULT([$QT_TRANSLATIONS])
 
@@ -271,10 +274,6 @@ fi
 if test x"$QT_IS_MT" = "xyes" ; then
         QT_CXXFLAGS="$QT_CXXFLAGS -D_REENTRANT -DQT_THREAD_SUPPORT"
 	QT_LIBS="$QT_LIBS"
-fi
-
-if test x"$QT_TRANSLATIONS" != x ; then
-    QT_CXXFLAGS="$QT_CXXFLAGS -DQT_TRANSLATIONS_DIR='\"$QT_TRANSLATIONS\"'"
 fi
 
 QT_LDADD="-L$QTDIR/lib $QT_LIBS"

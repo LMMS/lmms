@@ -4,7 +4,7 @@
  * instrument_track.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -664,7 +664,9 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					{
 						m_notesMutex.lock();
 						m_notes[_me.key()] = nph;
+						m_notesMutex.unlock();
 					}
+					return;
 				}
 				break;
 			}
@@ -777,7 +779,7 @@ QString instrumentTrack::instrumentName( void ) const
 
 void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 {
-	if( m_instrument != NULL )
+	if( m_instrument != NULL && _n->m_pluginData != NULL )
 	{
 		m_instrument->deleteNotePluginData( _n );
 	}
@@ -996,6 +998,9 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		noteVector & notes = p->notes();
 		// ...and set our index to zero
 		noteVector::iterator it = notes.begin();
+#if SINGERBOT_SUPPORT
+		int note_idx = 0;
+#endif
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
@@ -1006,6 +1011,12 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			// skip notes which are posated before start-tact
 			while( it != notes.end() && ( *it )->pos() < cur_start )
 			{
+#if SINGERBOT_SUPPORT
+				if( ( *it )->length() != 0 )
+				{
+					++note_idx;
+				}
+#endif
 				++it;
 			}
 		}
@@ -1045,6 +1056,9 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 								note_frames,
 								*cur_note );
 				note_play_handle->setBBTrack( bb_track );
+#if SINGERBOT_SUPPORT
+				note_play_handle->setPatternIndex( note_idx );
+#endif
 				note_play_handle->play( FALSE );
 				// could we play all within current number of
 				// frames per audio-buffer?
@@ -1061,6 +1075,9 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					delete note_play_handle;
 				}
 				played_a_note = TRUE;
+#if SINGERBOT_SUPPORT
+				++note_idx;
+#endif
 			}
 			++it;
 		}
