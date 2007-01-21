@@ -769,14 +769,16 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 				for( constNotePlayHandleVector::iterator it =
 						v.begin(); it != v.end(); ++it )
 				{
-					if( !( *it )->arpBaseNote() && ( *it )->totalFramesPlayed() <=
+					if( !( *it )->arpBaseNote() &&
+						( *it )->totalFramesPlayed() <=
 						( *youngest_note )->
 							totalFramesPlayed() )
 					{
 						youngest_note = it;
 					}
 				}
-				if( *youngest_note != _n && !( *youngest_note )->arpBaseNote() )
+				if( *youngest_note != _n &&
+					!( *youngest_note )->arpBaseNote() )
 				{
 					processInEvent( midiEvent( NOTE_OFF, 0,
 						_n->key(), 0 ), midiTime() );
