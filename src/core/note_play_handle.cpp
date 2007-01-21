@@ -63,20 +63,6 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	, m_patternIndex( 0 )
 #endif
 {
-	// if the instrument is monophonic we do not allow other note-play-
-	// handles to exist for this track and therefore remove them
-	if( m_instrumentTrack->getInstrument()->isMonophonic() )
-	{
-		constNotePlayHandleVector cphv = nphsOfInstrumentTrack(
-							m_instrumentTrack );
-		for( constNotePlayHandleVector::iterator it = cphv.begin();
-						it != cphv.end(); ++it )
-		{
-			m_instrumentTrack->eng()->getMixer()->
-						removePlayHandle( *it );
-		}
-	}
-
 	setDetuning( _n.detuning() );
 	if( detuning() )
 	{

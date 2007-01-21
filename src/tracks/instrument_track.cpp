@@ -757,6 +757,33 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 
 	if( _n->arpBaseNote() == FALSE && m_instrument != NULL )
 	{
+		if( m_instrument->isMonophonic() )
+		{
+			constNotePlayHandleVector v =
+				notePlayHandle::nphsOfInstrumentTrack( this,
+									TRUE );
+			if( v.size() > 1 )
+			{
+				constNotePlayHandleVector::iterator
+						youngest_note = v.begin();
+				for( constNotePlayHandleVector::iterator it =
+						v.begin(); it != v.end(); ++it )
+				{
+					if( !( *it )->arpBaseNote() && ( *it )->totalFramesPlayed() <=
+						( *youngest_note )->
+							totalFramesPlayed() )
+					{
+						youngest_note = it;
+					}
+				}
+				if( *youngest_note != _n && !( *youngest_note )->arpBaseNote() )
+				{
+					processInEvent( midiEvent( NOTE_OFF, 0,
+						_n->key(), 0 ), midiTime() );
+					return;
+				}
+			}
+		}
 		// all is done, so now lets play the note!
 		m_instrument->playNote( _n, _try_parallelizing );
 	}

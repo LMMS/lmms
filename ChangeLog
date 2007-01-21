@@ -1,3 +1,11 @@
+2007-01-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/note_play_handle.cpp:
+	removed obsolete support for monophonic instruments
+
+	* src/tracks/instrument_track.cpp:
+	added new code for better support of monophonic instrument
+
 2007-01-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/singerbot/artwork.png:
