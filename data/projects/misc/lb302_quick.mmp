@@ -7,7 +7,7 @@
     <time value="140" pos="0" />
    </bpm>
    <mastervol>
-    <time value="83" pos="0" />
+    <time value="100" pos="0" />
    </mastervol>
    <masterpitch>
     <time value="0" pos="0" />
@@ -383,7 +383,7 @@
           <time value="57" pos="0" />
          </basenote>
         </automation-pattern>
-        <audiofileprocessor reversed="0" looped="0" eframe="0.998431" sframe="0" amp="205" src="drums/bassdrum03.ogg" />
+        <audiofileprocessor reversed="0" looped="0" eframe="0.998356" sframe="0" amp="205" src="drums/bassdrum03.ogg" />
         <eldata fwet="0" >
          <automation-pattern>
           <ftype>
@@ -639,7 +639,7 @@
           <time value="57" pos="0" />
          </basenote>
         </automation-pattern>
-        <audiofileprocessor reversed="0" looped="0" eframe="0.996937" sframe="0" amp="100" src="drums/hihat_closed05.ogg" />
+        <audiofileprocessor reversed="0" looped="0" eframe="0.996631" sframe="0" amp="100" src="drums/hihat_closed05.ogg" />
         <eldata fwet="0" >
          <automation-pattern>
           <ftype>
@@ -903,7 +903,7 @@
           <time value="62" pos="0" />
          </basenote>
         </automation-pattern>
-        <audiofileprocessor reversed="0" looped="0" eframe="0.998579" sframe="0" amp="100" src="drums/clap04.ogg" />
+        <audiofileprocessor reversed="0" looped="0" eframe="0.998444" sframe="0" amp="100" src="drums/clap04.ogg" />
         <eldata fwet="1" >
          <automation-pattern>
           <ftype>
@@ -1165,13 +1165,13 @@
      <lb302>
       <automation-pattern>
        <vcf_cut>
-        <time value="0.975" pos="0" />
+        <time value="0.24" pos="0" />
        </vcf_cut>
        <vcf_res>
         <time value="0.965" pos="0" />
        </vcf_res>
        <vcf_mod>
-        <time value="0" pos="0" />
+        <time value="0.72" pos="0" />
        </vcf_mod>
        <vcf_dec>
         <time value="0" pos="0" />
@@ -1439,7 +1439,7 @@
      </midi>
      <fx fxdisabled="0" >
       <rack numofeffects="1" >
-       <effect key="AAAAAgAAAAIAAAADAAAAFgBiAGEAcwBzAGIAbwBvAHMAdABlAHIAAAAA/////wD/" autoquit="0" name="bassbooster" gate="0" wet="1" on="1" >
+       <effect key="AAAAAgAAAAIAAAADAAAAFgBiAGEAcwBzAGIAbwBvAHMAdABlAHIAAAAA/////2z/" autoquit="0" name="bassbooster" gate="0" wet="1" on="1" >
         <bassboostercontrols ratio="3.6" freq="100" gain="1.5" />
        </effect>
       </rack>
@@ -1535,8 +1535,8 @@
   </trackcontainer>
   <pianoroll width="640" x="447" y="378" height="480" visible="0" />
   <automation-editor width="640" x="471" y="422" height="480" visible="0" />
-  <projectnotes width="300" x="342" y="321" height="200" visible="1" ><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:12pt;font-family:Helvetica">
-<p>A Quick Demo. Note how slide is placed on the note to slide <span style="text-decoration:underline">from</span></p>
+  <projectnotes width="369" x="342" y="321" height="200" visible="1" ><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:12pt;font-family:Helvetica">
+<p>A Quick Demo. Note how slide is placed on the note to slide <span style="text-decoration:underline">from.</span> Tweak the filter settings for some fun!</p>
 </body></html>
 ]]></projectnotes>
   <timeline lp1pos="64" lp0pos="0" lpstate="1" />

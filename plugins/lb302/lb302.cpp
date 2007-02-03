@@ -213,7 +213,6 @@ void lb302Filter3Pole::envRecalc()
     kfco = 50.f+(k)*((2300.f-1600.f*(fs->envmod))+(w)*(700.f+1500.f*(k)+(1500.f+(k)*(44100.f/2.f-6000.f))*(fs->envmod)));
         //+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
-    //printf("w: %f  \t %f\n",w,kfco);
 
 
 
@@ -507,7 +506,6 @@ void lb302Synth::detuneChanged( float )
     float slidebase_freq=0;
 
     if(vco_slide) {
-        printf("Detune on slide.\n");
         slidebase_freq = vco_slidebase*LB_HZ/vco_detune;
     }
     
