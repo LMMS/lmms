@@ -1,3 +1,24 @@
+2007-02-03  Paul Giblock <pgib/at/users/dot/sourceforge/dot/net>
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* plugins/lb302/artwork.png:
+	* plugins/lb302/logo.png:
+	* plugins/lb302/Makefile.am:
+	* plugins/lb302/README:
+	Initial release.  LB302 Bass Synth beta instrument plugin
+
+	* configure.in:
+	* plugins/Makefile.am:
+	* src/tracks/instrument_track.cpp:
+	Added LB302 support
+
+	* data/projects/misc/lb302_quick.mmp:
+	Added LB302 demo
+
+	* src/widgets/knob.cpp:
+	Fixed compile-time bug caused by pointer casted to uint
+
 2007-01-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/note_play_handle.cpp:
