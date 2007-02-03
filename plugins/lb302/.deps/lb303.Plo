@@ -1,0 +1,981 @@
+lb303.lo lb303.o: lb303.cpp ../../include/qt3support.h \
+  /usr/qt/3/include/qglobal.h /usr/qt/3/include/qconfig.h \
+  /usr/qt/3/include/qmodules.h /usr/qt/3/include/qfeatures.h \
+  /usr/qt/3/include/qpair.h /usr/qt/3/include/qglobal.h \
+  /usr/qt/3/include/qdatastream.h /usr/qt/3/include/qiodevice.h \
+  /usr/qt/3/include/qcstring.h /usr/qt/3/include/qmemarray.h \
+  /usr/qt/3/include/qgarray.h /usr/qt/3/include/qshared.h \
+  /usr/qt/3/include/qwinexport.h /usr/include/string.h \
+  /usr/include/gentoo-multilib/amd64/string.h /usr/include/features.h \
+  /usr/include/gentoo-multilib/amd64/features.h /usr/include/sys/cdefs.h \
+  /usr/include/gentoo-multilib/amd64/sys/cdefs.h \
+  /usr/include/bits/wordsize.h \
+  /usr/include/gentoo-multilib/amd64/bits/wordsize.h \
+  /usr/include/gnu/stubs.h /usr/include/gentoo-multilib/amd64/gnu/stubs.h \
+  /usr/include/gnu/stubs-64.h \
+  /usr/include/gentoo-multilib/amd64/gnu/stubs-64.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/stddef.h \
+  /usr/include/xlocale.h /usr/include/gentoo-multilib/amd64/xlocale.h \
+  /usr/qt/3/include/qstring.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/limits.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/syslimits.h \
+  /usr/include/limits.h /usr/include/gentoo-multilib/amd64/limits.h \
+  /usr/include/bits/posix1_lim.h \
+  /usr/include/gentoo-multilib/amd64/bits/posix1_lim.h \
+  /usr/include/bits/local_lim.h \
+  /usr/include/gentoo-multilib/amd64/bits/local_lim.h \
+  /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h \
+  /usr/include/gentoo-multilib/amd64/bits/posix2_lim.h \
+  /usr/include/bits/xopen_lim.h \
+  /usr/include/gentoo-multilib/amd64/bits/xopen_lim.h \
+  /usr/include/bits/stdio_lim.h \
+  /usr/include/gentoo-multilib/amd64/bits/stdio_lim.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/string \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++config.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/os_defines.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/cpu_defines.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stringfwd.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/char_traits.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstring \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstddef \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_algobase.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/climits \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstdlib \
+  /usr/include/stdlib.h /usr/include/gentoo-multilib/amd64/stdlib.h \
+  /usr/include/bits/waitflags.h \
+  /usr/include/gentoo-multilib/amd64/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h \
+  /usr/include/gentoo-multilib/amd64/bits/waitstatus.h \
+  /usr/include/endian.h /usr/include/gentoo-multilib/amd64/endian.h \
+  /usr/include/bits/endian.h \
+  /usr/include/gentoo-multilib/amd64/bits/endian.h \
+  /usr/include/sys/types.h /usr/include/gentoo-multilib/amd64/sys/types.h \
+  /usr/include/bits/types.h \
+  /usr/include/gentoo-multilib/amd64/bits/types.h \
+  /usr/include/bits/typesizes.h \
+  /usr/include/gentoo-multilib/amd64/bits/typesizes.h /usr/include/time.h \
+  /usr/include/gentoo-multilib/amd64/time.h /usr/include/sys/select.h \
+  /usr/include/gentoo-multilib/amd64/sys/select.h \
+  /usr/include/bits/select.h \
+  /usr/include/gentoo-multilib/amd64/bits/select.h \
+  /usr/include/bits/sigset.h \
+  /usr/include/gentoo-multilib/amd64/bits/sigset.h \
+  /usr/include/bits/time.h /usr/include/gentoo-multilib/amd64/bits/time.h \
+  /usr/include/sys/sysmacros.h \
+  /usr/include/gentoo-multilib/amd64/sys/sysmacros.h \
+  /usr/include/bits/pthreadtypes.h \
+  /usr/include/gentoo-multilib/amd64/bits/pthreadtypes.h \
+  /usr/include/alloca.h /usr/include/gentoo-multilib/amd64/alloca.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iosfwd \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++locale.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstdio \
+  /usr/include/stdio.h /usr/include/gentoo-multilib/amd64/stdio.h \
+  /usr/include/libio.h /usr/include/gentoo-multilib/amd64/libio.h \
+  /usr/include/_G_config.h /usr/include/gentoo-multilib/amd64/_G_config.h \
+  /usr/include/wchar.h /usr/include/gentoo-multilib/amd64/wchar.h \
+  /usr/include/bits/wchar.h \
+  /usr/include/gentoo-multilib/amd64/bits/wchar.h /usr/include/gconv.h \
+  /usr/include/gentoo-multilib/amd64/gconv.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/stdarg.h \
+  /usr/include/bits/sys_errlist.h \
+  /usr/include/gentoo-multilib/amd64/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h \
+  /usr/include/gentoo-multilib/amd64/bits/stdio.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/clocale \
+  /usr/include/locale.h /usr/include/gentoo-multilib/amd64/locale.h \
+  /usr/include/bits/locale.h \
+  /usr/include/gentoo-multilib/amd64/bits/locale.h \
+  /usr/include/langinfo.h /usr/include/gentoo-multilib/amd64/langinfo.h \
+  /usr/include/nl_types.h /usr/include/gentoo-multilib/amd64/nl_types.h \
+  /usr/include/iconv.h /usr/include/gentoo-multilib/amd64/iconv.h \
+  /usr/include/libintl.h /usr/include/gentoo-multilib/amd64/libintl.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++io.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/gthr.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/gthr-default.h \
+  /usr/include/pthread.h /usr/include/gentoo-multilib/amd64/pthread.h \
+  /usr/include/sched.h /usr/include/gentoo-multilib/amd64/sched.h \
+  /usr/include/bits/sched.h \
+  /usr/include/gentoo-multilib/amd64/bits/sched.h /usr/include/signal.h \
+  /usr/include/gentoo-multilib/amd64/signal.h /usr/include/bits/setjmp.h \
+  /usr/include/gentoo-multilib/amd64/bits/setjmp.h /usr/include/unistd.h \
+  /usr/include/gentoo-multilib/amd64/unistd.h \
+  /usr/include/bits/posix_opt.h \
+  /usr/include/gentoo-multilib/amd64/bits/posix_opt.h \
+  /usr/include/bits/environments.h \
+  /usr/include/gentoo-multilib/amd64/bits/environments.h \
+  /usr/include/bits/confname.h \
+  /usr/include/gentoo-multilib/amd64/bits/confname.h \
+  /usr/include/getopt.h /usr/include/gentoo-multilib/amd64/getopt.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cctype \
+  /usr/include/ctype.h /usr/include/gentoo-multilib/amd64/ctype.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/postypes.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cwchar \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ctime \
+  /usr/include/stdint.h /usr/include/gentoo-multilib/amd64/stdint.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/functexcept.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/exception_defines.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_pair.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/cpp_type_traits.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator_base_types.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator_base_funcs.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/concept_check.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/debug/debug.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/memory \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/allocator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++allocator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ext/new_allocator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/new \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/exception \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_construct.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_uninitialized.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_raw_storage_iter.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/limits \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_function.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_string.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/atomicity.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/atomic_word.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/algorithm \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_algo.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_heap.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_tempbuf.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_string.tcc \
+  /usr/qt/3/include/qfileinfo.h /usr/qt/3/include/qfile.h \
+  /usr/qt/3/include/qdatetime.h /usr/qt/3/include/qnamespace.h \
+  /usr/qt/3/include/qdom.h lb303.h ../../include/instrument.h \
+  ../../config.h ../../include/qt3support.h /usr/qt/3/include/qwidget.h \
+  /usr/qt/3/include/qwindowdefs.h /usr/qt/3/include/qobjectdefs.h \
+  /usr/qt/3/include/qobject.h /usr/qt/3/include/qevent.h \
+  /usr/qt/3/include/qregion.h /usr/qt/3/include/qrect.h \
+  /usr/qt/3/include/qsize.h /usr/qt/3/include/qpoint.h \
+  /usr/qt/3/include/qmime.h /usr/qt/3/include/qmap.h \
+  /usr/qt/3/include/qpair.h /usr/qt/3/include/qvaluelist.h \
+  /usr/qt/3/include/qtl.h /usr/qt/3/include/qtextstream.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iterator \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ostream \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ios \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/localefwd.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/ios_base.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_classes.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/streambuf \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/streambuf.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_ios.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/streambuf_iterator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_facets.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cwctype \
+  /usr/include/wctype.h /usr/include/gentoo-multilib/amd64/wctype.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/ctype_base.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/ctype_inline.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/codecvt.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/time_members.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/messages_members.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_ios.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/ostream.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/locale \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_facets.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/typeinfo \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/istream \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/istream.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stream_iterator.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/list \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_list.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/list.tcc \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/map \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_tree.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_map.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_multimap.h \
+  /usr/qt/3/include/qpaintdevice.h /usr/qt/3/include/qpalette.h \
+  /usr/qt/3/include/qcolor.h /usr/qt/3/include/qstringlist.h \
+  /usr/qt/3/include/qstrlist.h /usr/qt/3/include/qptrlist.h \
+  /usr/qt/3/include/qglist.h /usr/qt/3/include/qptrcollection.h \
+  /usr/qt/3/include/qbrush.h /usr/qt/3/include/qfont.h \
+  /usr/qt/3/include/qfontmetrics.h /usr/qt/3/include/qfontinfo.h \
+  /usr/qt/3/include/qsizepolicy.h /usr/qt/3/include/qvaluevector.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/vector \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_vector.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_bvector.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/vector.tcc \
+  ../../include/plugin.h /usr/qt/3/include/qstring.h \
+  ../../include/types.h ../../include/journalling_object.h \
+  ../../include/engine.h /usr/qt/3/include/qvariant.h \
+  /usr/qt/3/include/qvaluestack.h ../../include/embed.h \
+  /usr/qt/3/include/qpixmap.h ../../include/base64.h \
+  ../../include/mixer.h /usr/qt/3/include/qobject.h \
+  /usr/qt/3/include/qmutex.h ../../include/volume.h \
+  ../../include/panning.h ../../include/note.h ../../include/midi_time.h \
+  ../../include/play_handle.h ../../include/effect_board.h \
+  ../../include/led_checkbox.h ../../include/automatable_button.h \
+  ../../include/automatable_object.h /usr/include/math.h \
+  /usr/include/gentoo-multilib/amd64/math.h /usr/include/bits/huge_val.h \
+  /usr/include/gentoo-multilib/amd64/bits/huge_val.h \
+  /usr/include/bits/huge_valf.h \
+  /usr/include/gentoo-multilib/amd64/bits/huge_valf.h \
+  /usr/include/bits/huge_vall.h \
+  /usr/include/gentoo-multilib/amd64/bits/huge_vall.h \
+  /usr/include/bits/inf.h /usr/include/gentoo-multilib/amd64/bits/inf.h \
+  /usr/include/bits/nan.h /usr/include/gentoo-multilib/amd64/bits/nan.h \
+  /usr/include/bits/mathdef.h \
+  /usr/include/gentoo-multilib/amd64/bits/mathdef.h \
+  /usr/include/bits/mathcalls.h \
+  /usr/include/gentoo-multilib/amd64/bits/mathcalls.h \
+  /usr/include/bits/mathinline.h \
+  /usr/include/gentoo-multilib/amd64/bits/mathinline.h \
+  ../../include/automation_editor.h ../../include/automation_pattern.h \
+  ../../include/track.h /usr/qt/3/include/qvaluelist.h \
+  ../../include/rubberband.h ../../include/level_object.h \
+  ../../include/xqmap.h /usr/qt/3/include/qmap.h \
+  ../../include/templates.h /usr/qt/3/include/qtl.h \
+  /usr/qt/3/include/qguardedptr.h ../../include/effect_lib.h \
+  ../../include/lmms_constants.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iostream \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/fstream \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/basic_file.h \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/fstream.tcc \
+  ../../include/instrument_track.h /usr/qt/3/include/qapplication.h \
+  /usr/qt/3/include/qdesktopwidget.h /usr/qt/3/include/qwidget.h \
+  /usr/qt/3/include/qasciidict.h /usr/qt/3/include/qgdict.h \
+  /usr/qt/3/include/qtranslator.h /usr/qt/3/include/qpushbutton.h \
+  /usr/qt/3/include/qbutton.h /usr/qt/3/include/qkeysequence.h \
+  /usr/qt/3/include/qiconset.h /usr/qt/3/include/qpixmap.h \
+  /usr/qt/3/include/qpainter.h /usr/qt/3/include/qpen.h \
+  /usr/qt/3/include/qpointarray.h /usr/qt/3/include/qwmatrix.h \
+  ../../include/midi_event_processor.h ../../include/gui_templates.h \
+  /usr/qt/3/include/qpaintdevicemetrics.h /usr/qt/3/include/qfont.h \
+  /usr/qt/3/include/qdesktopwidget.h ../../include/tab_widget.h \
+  ../../include/spc_bg_hndl_widget.h ../../include/volume_knob.h \
+  ../../include/knob.h /usr/qt/3/include/qpoint.h \
+  ../../include/instrument.h ../../include/instrument_play_handle.h \
+  ../../include/note_play_handle.h ../../include/basic_filters.h \
+  ../../include/bb_track.h ../../include/instrument_track.h \
+  ../../include/templates.h ../../include/buffer_allocator.h \
+  ../../include/knob.h ../../src/lib/embed.cpp ../../include/qt3support.h \
+  /usr/qt/3/include/qimage.h ../../include/embed.h \
+  ../../include/config_mgr.h /usr/qt/3/include/qdialog.h \
+  embedded_resources.h ../../include/embed.h lb303.moc \
+  /usr/qt/3/include/qmetaobject.h /usr/qt/3/include/qconnection.h \
+  /usr/qt/3/include/private/qucomextra_p.h \
+  /usr/qt/3/include/private/qucom_p.h /usr/qt/3/include/quuid.h
+
+../../include/qt3support.h:
+
+/usr/qt/3/include/qglobal.h:
+
+/usr/qt/3/include/qconfig.h:
+
+/usr/qt/3/include/qmodules.h:
+
+/usr/qt/3/include/qfeatures.h:
+
+/usr/qt/3/include/qpair.h:
+
+/usr/qt/3/include/qglobal.h:
+
+/usr/qt/3/include/qdatastream.h:
+
+/usr/qt/3/include/qiodevice.h:
+
+/usr/qt/3/include/qcstring.h:
+
+/usr/qt/3/include/qmemarray.h:
+
+/usr/qt/3/include/qgarray.h:
+
+/usr/qt/3/include/qshared.h:
+
+/usr/qt/3/include/qwinexport.h:
+
+/usr/include/string.h:
+
+/usr/include/gentoo-multilib/amd64/string.h:
+
+/usr/include/features.h:
+
+/usr/include/gentoo-multilib/amd64/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/gentoo-multilib/amd64/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gentoo-multilib/amd64/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gentoo-multilib/amd64/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/gentoo-multilib/amd64/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/stddef.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/gentoo-multilib/amd64/xlocale.h:
+
+/usr/qt/3/include/qstring.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/limits.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/gentoo-multilib/amd64/limits.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/gentoo-multilib/amd64/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/gentoo-multilib/amd64/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/bits/posix2_lim.h:
+
+/usr/include/gentoo-multilib/amd64/bits/posix2_lim.h:
+
+/usr/include/bits/xopen_lim.h:
+
+/usr/include/gentoo-multilib/amd64/bits/xopen_lim.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/gentoo-multilib/amd64/bits/stdio_lim.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/string:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++config.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/os_defines.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/cpu_defines.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stringfwd.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/char_traits.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstring:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstddef:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_algobase.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/climits:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstdlib:
+
+/usr/include/stdlib.h:
+
+/usr/include/gentoo-multilib/amd64/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/gentoo-multilib/amd64/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/gentoo-multilib/amd64/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/gentoo-multilib/amd64/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/gentoo-multilib/amd64/bits/endian.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/gentoo-multilib/amd64/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/gentoo-multilib/amd64/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/gentoo-multilib/amd64/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/gentoo-multilib/amd64/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/gentoo-multilib/amd64/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/gentoo-multilib/amd64/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/gentoo-multilib/amd64/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/gentoo-multilib/amd64/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/gentoo-multilib/amd64/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/gentoo-multilib/amd64/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/gentoo-multilib/amd64/alloca.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iosfwd:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++locale.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cstdio:
+
+/usr/include/stdio.h:
+
+/usr/include/gentoo-multilib/amd64/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/gentoo-multilib/amd64/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/gentoo-multilib/amd64/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/gentoo-multilib/amd64/wchar.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/gentoo-multilib/amd64/bits/wchar.h:
+
+/usr/include/gconv.h:
+
+/usr/include/gentoo-multilib/amd64/gconv.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/stdarg.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/gentoo-multilib/amd64/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/gentoo-multilib/amd64/bits/stdio.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/clocale:
+
+/usr/include/locale.h:
+
+/usr/include/gentoo-multilib/amd64/locale.h:
+
+/usr/include/bits/locale.h:
+
+/usr/include/gentoo-multilib/amd64/bits/locale.h:
+
+/usr/include/langinfo.h:
+
+/usr/include/gentoo-multilib/amd64/langinfo.h:
+
+/usr/include/nl_types.h:
+
+/usr/include/gentoo-multilib/amd64/nl_types.h:
+
+/usr/include/iconv.h:
+
+/usr/include/gentoo-multilib/amd64/iconv.h:
+
+/usr/include/libintl.h:
+
+/usr/include/gentoo-multilib/amd64/libintl.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++io.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/gthr.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/gthr-default.h:
+
+/usr/include/pthread.h:
+
+/usr/include/gentoo-multilib/amd64/pthread.h:
+
+/usr/include/sched.h:
+
+/usr/include/gentoo-multilib/amd64/sched.h:
+
+/usr/include/bits/sched.h:
+
+/usr/include/gentoo-multilib/amd64/bits/sched.h:
+
+/usr/include/signal.h:
+
+/usr/include/gentoo-multilib/amd64/signal.h:
+
+/usr/include/bits/setjmp.h:
+
+/usr/include/gentoo-multilib/amd64/bits/setjmp.h:
+
+/usr/include/unistd.h:
+
+/usr/include/gentoo-multilib/amd64/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/gentoo-multilib/amd64/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/gentoo-multilib/amd64/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/gentoo-multilib/amd64/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/include/gentoo-multilib/amd64/getopt.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cctype:
+
+/usr/include/ctype.h:
+
+/usr/include/gentoo-multilib/amd64/ctype.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/postypes.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cwchar:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ctime:
+
+/usr/include/stdint.h:
+
+/usr/include/gentoo-multilib/amd64/stdint.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/functexcept.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/exception_defines.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_pair.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/cpp_type_traits.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator_base_types.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator_base_funcs.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/concept_check.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_iterator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/debug/debug.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/memory:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/allocator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/c++allocator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ext/new_allocator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/new:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/exception:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_construct.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_uninitialized.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_raw_storage_iter.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/limits:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_function.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_string.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/atomicity.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/atomic_word.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/algorithm:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_algo.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_heap.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_tempbuf.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_string.tcc:
+
+/usr/qt/3/include/qfileinfo.h:
+
+/usr/qt/3/include/qfile.h:
+
+/usr/qt/3/include/qdatetime.h:
+
+/usr/qt/3/include/qnamespace.h:
+
+/usr/qt/3/include/qdom.h:
+
+lb303.h:
+
+../../include/instrument.h:
+
+../../config.h:
+
+../../include/qt3support.h:
+
+/usr/qt/3/include/qwidget.h:
+
+/usr/qt/3/include/qwindowdefs.h:
+
+/usr/qt/3/include/qobjectdefs.h:
+
+/usr/qt/3/include/qobject.h:
+
+/usr/qt/3/include/qevent.h:
+
+/usr/qt/3/include/qregion.h:
+
+/usr/qt/3/include/qrect.h:
+
+/usr/qt/3/include/qsize.h:
+
+/usr/qt/3/include/qpoint.h:
+
+/usr/qt/3/include/qmime.h:
+
+/usr/qt/3/include/qmap.h:
+
+/usr/qt/3/include/qpair.h:
+
+/usr/qt/3/include/qvaluelist.h:
+
+/usr/qt/3/include/qtl.h:
+
+/usr/qt/3/include/qtextstream.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iterator:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ostream:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/ios:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/localefwd.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/ios_base.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_classes.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/streambuf:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/streambuf.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_ios.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/streambuf_iterator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_facets.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/cwctype:
+
+/usr/include/wctype.h:
+
+/usr/include/gentoo-multilib/amd64/wctype.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/ctype_base.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/ctype_inline.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/codecvt.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/time_members.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/messages_members.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/basic_ios.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/ostream.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/locale:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/locale_facets.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/typeinfo:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/istream:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/istream.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stream_iterator.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/list:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_list.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/list.tcc:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/map:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_tree.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_map.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_multimap.h:
+
+/usr/qt/3/include/qpaintdevice.h:
+
+/usr/qt/3/include/qpalette.h:
+
+/usr/qt/3/include/qcolor.h:
+
+/usr/qt/3/include/qstringlist.h:
+
+/usr/qt/3/include/qstrlist.h:
+
+/usr/qt/3/include/qptrlist.h:
+
+/usr/qt/3/include/qglist.h:
+
+/usr/qt/3/include/qptrcollection.h:
+
+/usr/qt/3/include/qbrush.h:
+
+/usr/qt/3/include/qfont.h:
+
+/usr/qt/3/include/qfontmetrics.h:
+
+/usr/qt/3/include/qfontinfo.h:
+
+/usr/qt/3/include/qsizepolicy.h:
+
+/usr/qt/3/include/qvaluevector.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/vector:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_vector.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/stl_bvector.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/vector.tcc:
+
+../../include/plugin.h:
+
+/usr/qt/3/include/qstring.h:
+
+../../include/types.h:
+
+../../include/journalling_object.h:
+
+../../include/engine.h:
+
+/usr/qt/3/include/qvariant.h:
+
+/usr/qt/3/include/qvaluestack.h:
+
+../../include/embed.h:
+
+/usr/qt/3/include/qpixmap.h:
+
+../../include/base64.h:
+
+../../include/mixer.h:
+
+/usr/qt/3/include/qobject.h:
+
+/usr/qt/3/include/qmutex.h:
+
+../../include/volume.h:
+
+../../include/panning.h:
+
+../../include/note.h:
+
+../../include/midi_time.h:
+
+../../include/play_handle.h:
+
+../../include/effect_board.h:
+
+../../include/led_checkbox.h:
+
+../../include/automatable_button.h:
+
+../../include/automatable_object.h:
+
+/usr/include/math.h:
+
+/usr/include/gentoo-multilib/amd64/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/gentoo-multilib/amd64/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/gentoo-multilib/amd64/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/gentoo-multilib/amd64/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/gentoo-multilib/amd64/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/gentoo-multilib/amd64/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/gentoo-multilib/amd64/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/gentoo-multilib/amd64/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+/usr/include/gentoo-multilib/amd64/bits/mathinline.h:
+
+../../include/automation_editor.h:
+
+../../include/automation_pattern.h:
+
+../../include/track.h:
+
+/usr/qt/3/include/qvaluelist.h:
+
+../../include/rubberband.h:
+
+../../include/level_object.h:
+
+../../include/xqmap.h:
+
+/usr/qt/3/include/qmap.h:
+
+../../include/templates.h:
+
+/usr/qt/3/include/qtl.h:
+
+/usr/qt/3/include/qguardedptr.h:
+
+../../include/effect_lib.h:
+
+../../include/lmms_constants.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/iostream:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/fstream:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/x86_64-pc-linux-gnu/bits/basic_file.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.1.1/include/g++-v4/bits/fstream.tcc:
+
+../../include/instrument_track.h:
+
+/usr/qt/3/include/qapplication.h:
+
+/usr/qt/3/include/qdesktopwidget.h:
+
+/usr/qt/3/include/qwidget.h:
+
+/usr/qt/3/include/qasciidict.h:
+
+/usr/qt/3/include/qgdict.h:
+
+/usr/qt/3/include/qtranslator.h:
+
+/usr/qt/3/include/qpushbutton.h:
+
+/usr/qt/3/include/qbutton.h:
+
+/usr/qt/3/include/qkeysequence.h:
+
+/usr/qt/3/include/qiconset.h:
+
+/usr/qt/3/include/qpixmap.h:
+
+/usr/qt/3/include/qpainter.h:
+
+/usr/qt/3/include/qpen.h:
+
+/usr/qt/3/include/qpointarray.h:
+
+/usr/qt/3/include/qwmatrix.h:
+
+../../include/midi_event_processor.h:
+
+../../include/gui_templates.h:
+
+/usr/qt/3/include/qpaintdevicemetrics.h:
+
+/usr/qt/3/include/qfont.h:
+
+/usr/qt/3/include/qdesktopwidget.h:
+
+../../include/tab_widget.h:
+
+../../include/spc_bg_hndl_widget.h:
+
+../../include/volume_knob.h:
+
+../../include/knob.h:
+
+/usr/qt/3/include/qpoint.h:
+
+../../include/instrument.h:
+
+../../include/instrument_play_handle.h:
+
+../../include/note_play_handle.h:
+
+../../include/basic_filters.h:
+
+../../include/bb_track.h:
+
+../../include/instrument_track.h:
+
+../../include/templates.h:
+
+../../include/buffer_allocator.h:
+
+../../include/knob.h:
+
+../../src/lib/embed.cpp:
+
+../../include/qt3support.h:
+
+/usr/qt/3/include/qimage.h:
+
+../../include/embed.h:
+
+../../include/config_mgr.h:
+
+/usr/qt/3/include/qdialog.h:
+
+embedded_resources.h:
+
+../../include/embed.h:
+
+lb303.moc:
+
+/usr/qt/3/include/qmetaobject.h:
+
+/usr/qt/3/include/qconnection.h:
+
+/usr/qt/3/include/private/qucomextra_p.h:
+
+/usr/qt/3/include/private/qucom_p.h:
+
+/usr/qt/3/include/quuid.h:

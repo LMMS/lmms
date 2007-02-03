@@ -469,8 +469,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 /*			eng()->getMainWindow()->isCtrlPressed() == TRUE &&*/
 			eng()->getMainWindow()->isShiftPressed() == TRUE )
 	{
+        /* this pointer was casted to uint, 
+         * compile time error on 64 bit systems */
 		new stringPairDrag( "link_object",
-						QString::number( (uint) this ),
+						QString::number( (ulong) this ),
 						QPixmap(), this, eng() );
 	}
 	else if( _me->button() == Qt::MidButton )

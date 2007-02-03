@@ -584,6 +584,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/ladspa_base/Makefile
 		 plugins/ladspa_effect/Makefile
 		 plugins/ladspa_effect/caps/Makefile
+		 plugins/lb302/Makefile
 		 plugins/live_tool/Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile

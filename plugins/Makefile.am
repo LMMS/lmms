@@ -21,6 +21,7 @@ SUBDIRS =			\
 	flp_import		\
 	kicker			\
 	$(LADSPA_DIRS)		\
+	lb302 			\
 	live_tool		\
 	midi_import		\
 	organic			\
