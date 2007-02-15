@@ -354,6 +354,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/sweep_oscillator.h			\
 		$(srcdir)/include/meter_dialog.h			\
 		$(srcdir)/include/qxembed.h				\
+		$(srcdir)/include/effect_lib.h				\
 		$(srcdir)/include/xqmap.h
 
 

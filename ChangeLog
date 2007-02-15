@@ -1,4 +1,9 @@
-2007-02-03  Paul Giblock <pgib/at/users/dot/sourceforge/dot/net>
+2007-02-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.am:
+	added include/effect_lib.h to sources-list
+
+2007-02-03	Paul Giblock <pgib/at/users/dot/sourceforge/dot/net>
 
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
