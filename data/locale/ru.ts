@@ -54,9 +54,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 Copyright (c) 2004-2006 LMMS-Developers
 
 http://lmms.sourceforge.net</source>
-        <translation>LMMS - программа-синтезатор для компьютера
+        <translation type="obsolete">LMMS - программа-синтезатор для компьютера
 
 © Права на программу LMMS 2004-2006 принадлежат её разработчикам
+
+Наша страница в интернете:
+http://lmms.sourceforge.net</translation>
+    </message>
+    <message>
+        <source>LMMS - A powerful synthesizer-studio
+
+Copyright (c) 2004-2007 LMMS-Developers
+
+http://lmms.sourceforge.net</source>
+        <translation>LMMS - программа-синтезатор для компьютера
+
+© Права на программу LMMS 2004-2007 принадлежат её разработчикам
 
 Наша страница в интернете:
 http://lmms.sourceforge.net</translation>
@@ -764,6 +777,45 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>All selected values were copied to the clipboard.</source>
         <translation>Выбранные значения скопированы в буфер обмена.</translation>
+    </message>
+</context>
+<context>
+    <name>bassBoosterControlDialog</name>
+    <message>
+        <source>Frequency</source>
+        <translation>Частота</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>ЧАСТ</translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation>Частота:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Усиление</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>УСИЛ</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Усиление:</translation>
+    </message>
+    <message>
+        <source>Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RATIO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ratio:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1765,6 +1817,69 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
 </context>
 <context>
+    <name>kickerInstrument</name>
+    <message>
+        <source>Start frequency</source>
+        <translation>Начальная частота</translation>
+    </message>
+    <message>
+        <source>START</source>
+        <translation>НАЧАЛО</translation>
+    </message>
+    <message>
+        <source>Start frequency:</source>
+        <translation>Начальная частота:</translation>
+    </message>
+    <message>
+        <source>End frequency</source>
+        <translation>Конечная частота</translation>
+    </message>
+    <message>
+        <source>END</source>
+        <translation>КОНЕЦ</translation>
+    </message>
+    <message>
+        <source>End frequency:</source>
+        <translation>Конечная частота:</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Длит. спада</translation>
+    </message>
+    <message>
+        <source>DECAY</source>
+        <translation>СПАД</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Длительность спада:</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Искажение</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>ИСК</translation>
+    </message>
+    <message>
+        <source>Distortion:</source>
+        <translation>Искажение:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Усиление</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>УСИЛ</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Усиление:</translation>
+    </message>
+</context>
+<context>
     <name>knob</name>
     <message>
         <source>&amp;Help</source>
@@ -1992,6 +2107,145 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>Channels Out: </source>
         <translation>Выходных каналов: </translation>
+    </message>
+</context>
+<context>
+    <name>lb302Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation>Частота среза:</translation>
+    </message>
+    <message>
+        <source>CUT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Env Mod:</source>
+        <translation>Глубина модуляции:</translation>
+    </message>
+    <message>
+        <source>ENV MOD</source>
+        <translation>МОД</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Длительность спада:</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation>СПАД</translation>
+    </message>
+    <message>
+        <source>Slide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>303-es-que, 24dB/octave, 3 pole filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SLIDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DETUNE</source>
+        <translation>РАССТРОЙКА</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Искажение</translation>
+    </message>
+    <message>
+        <source>DIST:</source>
+        <translation>ИСК:</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>ИСК</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation>Форма сигнала</translation>
+    </message>
+    <message>
+        <source>EAVE:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <source>Sawtooth </source>
+        <translation>Пила </translation>
+    </message>
+    <message>
+        <source>Inverted Sawtooth </source>
+        <translation>Обр. пила </translation>
+    </message>
+    <message>
+        <source>Triangle </source>
+        <translation>Треугольник </translation>
+    </message>
+    <message>
+        <source>Square </source>
+        <translation>Меандр </translation>
+    </message>
+    <message>
+        <source>Rounded Square </source>
+        <translation>Сглаженный меандр </translation>
+    </message>
+    <message>
+        <source>Moog </source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2228,6 +2482,10 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>Мультимедийный проект (*.mmp *.mmpz *.xml);;Шаблон мультимедийнйного проекта (*.mpt)</translation>
     </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Сервис</translation>
+    </message>
 </context>
 <context>
     <name>mallets</name>
@@ -2269,15 +2527,15 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Vibrato Freq</source>
-        <translation type="unfinished"></translation>
+        <translation>Частота вибрато</translation>
     </message>
     <message>
         <source>Vib Freq</source>
-        <translation type="unfinished"></translation>
+        <translation>Част. виб</translation>
     </message>
     <message>
         <source>Vib Freq:</source>
-        <translation type="unfinished"></translation>
+        <translation>Вибрато:</translation>
     </message>
     <message>
         <source>Stick Mix</source>
@@ -2297,19 +2555,19 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation type="unfinished"></translation>
+        <translation>Переход</translation>
     </message>
     <message>
         <source>Crossfade:</source>
-        <translation type="unfinished"></translation>
+        <translation>Переход:</translation>
     </message>
     <message>
         <source>LFO Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость LFO</translation>
     </message>
     <message>
         <source>LFO Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость LFO:</translation>
     </message>
     <message>
         <source>LFO Depth</source>
@@ -2365,19 +2623,19 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Instrument</source>
-        <translation type="unfinished">Инструмент</translation>
+        <translation>Инструмент</translation>
     </message>
     <message>
         <source>Marimba</source>
-        <translation type="unfinished">Маримба</translation>
+        <translation>Маримба</translation>
     </message>
     <message>
         <source>Vibraphone</source>
-        <translation type="unfinished">Вибрафон</translation>
+        <translation>Вибрафон</translation>
     </message>
     <message>
         <source>Agogo</source>
-        <translation type="unfinished">Дискотека</translation>
+        <translation>Дискотека</translation>
     </message>
     <message>
         <source>Wood1</source>
@@ -2401,7 +2659,7 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Clump</source>
-        <translation type="unfinished">Тяжёлая поступь</translation>
+        <translation>Тяжёлая поступь</translation>
     </message>
     <message>
         <source>Tubular Bells</source>
@@ -2417,11 +2675,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Glass</source>
-        <translation type="unfinished">Стекло</translation>
+        <translation>Стекло</translation>
     </message>
     <message>
         <source>Tibetan Bowl</source>
-        <translation type="unfinished">Тибетские шары</translation>
+        <translation>Тибетские шары</translation>
     </message>
 </context>
 <context>
@@ -2915,6 +3173,22 @@ use mouse wheel to set volume of a step</source>
         <source>Filter for importing FL Studio projects into LMMS</source>
         <translation>Фильтр для импортирования файлов FL Stuio</translation>
     </message>
+    <message>
+        <source>Incomplete monophonic immitation tb303</source>
+        <translation>Незавершённая монофоническая имитация tb303</translation>
+    </message>
+    <message>
+        <source>Singer bot to add some basic vocals</source>
+        <translation>Робот для добавления простого вокала</translation>
+    </message>
+    <message>
+        <source>tool for live performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>versatile kick- &amp; bassdrum-synthesizer</source>
+        <translation>Многоцелевой синтезатор ударных</translation>
+    </message>
 </context>
 <context>
     <name>projectNotes</name>
@@ -3199,11 +3473,19 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation>Все звуковые файлы (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
+        <translation type="obsolete">Все звуковые файлы (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
     <message>
         <source>FLAC-Files (*.flac)</source>
         <translation>Файлы FLAC (*.flac)</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>Все звуковые файлы (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>SPEEX-Files (*.spx)</source>
+        <translation>Файлы SPEEX (*.spx)</translation>
     </message>
 </context>
 <context>
@@ -3402,7 +3684,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>SMP-level</source>
-        <translation>Уровень SMP</translation>
+        <translation type="obsolete">Уровень SMP</translation>
     </message>
     <message>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.

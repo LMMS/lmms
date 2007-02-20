@@ -1,3 +1,8 @@
+2007-02-20	Alexey Kouznetsov <alexey/dot/kouznetsov/at/gmail/dot/com>
+
+	* data/locale/ru.ts:
+	updated Russian translation
+
 2007-02-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* Makefile.am:
