@@ -3,7 +3,7 @@
  *                              plugin::descriptor::subPluginFeatures for
  *                              hosting VST-plugins
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,45 +28,18 @@
 #ifdef QT4
 
 #include <QtCore/QDir>
-#include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
-#include <QtGui/QLayout>
 
 #else
 
 #include <qdir.h>
-#include <qgroupbox.h>
 #include <qlabel.h>
-#include <qlayout.h>
 
 #endif
 
 
 #include "vst_subplugin_features.h"
 #include "config_mgr.h"
-
-
-vstSubPluginDescriptionWidget::vstSubPluginDescriptionWidget(
-					QWidget * _parent, engine * _engine,
-					const effectKey & _key ) :
-	QWidget( _parent )
-{
-	QVBoxLayout * l = new QVBoxLayout( this );
-
-#ifndef QT3
-	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
-#else
-	QGroupBox * groupbox = new QGroupBox( 9, Qt::Vertical, 
-						tr( "Description" ), this );
-#endif
-
-	new QLabel( tr( "Name: " ) + _key.name, groupbox );
-	new QLabel( tr( "File: " ) + _key.user.toString(), groupbox );
-
-	l->addWidget( groupbox );
-}
-
-
 
 
 vstSubPluginFeatures::vstSubPluginFeatures( plugin::pluginTypes _type ) :
@@ -77,10 +50,11 @@ vstSubPluginFeatures::vstSubPluginFeatures( plugin::pluginTypes _type ) :
 
 
 
-QWidget * vstSubPluginFeatures::createDescriptionWidget(
+void vstSubPluginFeatures::fillDescriptionWidget(
 			QWidget * _parent, engine * _eng, const key & _key  )
 {
-	return( new vstSubPluginDescriptionWidget( _parent, _eng, _key ) );
+	new QLabel( QWidget::tr( "Name: " ) + _key.name, _parent );
+	new QLabel( QWidget::tr( "File: " ) + _key.user.toString(), _parent );
 }
 
 

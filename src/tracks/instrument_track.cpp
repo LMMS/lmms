@@ -963,7 +963,6 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 				|| dynamic_cast<pattern *>( tco )->empty() ) )
 		{
 			sendMidiTime( _start );
-			emit sentMidiTime( _start );
 		}
 	}
 	else
@@ -972,8 +971,8 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					_frames / frames_per_tact64th ) );
 		bb_track = NULL;
 		sendMidiTime( _start );
-		emit sentMidiTime( _start );
 	}
+	emit sentMidiTime( _start );
 
 	if ( tcos.size() == 0 )
 	{

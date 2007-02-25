@@ -1,7 +1,7 @@
 /*
  * ladspa_effect.cpp - class for processing LADSPA effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -191,7 +191,8 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 			p->max = m_ladspa->getUpperBound( m_key, port );
 			if( p->max == NOHINT )
 			{
-				p->max = 1.0f;
+				p->max = p->name.toUpper() == "GAIN" ? 10.0f :
+					1.0f;
 			}
 			
 			if( m_ladspa->areHintsSampleRateDependent( 

@@ -147,9 +147,7 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 	sampleBuffer * sample_buffer = hdata->remaining_frames ?
 			readWave( hdata ) : new sampleBuffer( NULL, 0, eng() );
 
-	if( sample_buffer->play( buf, 0, frames, BASE_FREQ,
-					FALSE, //loop
-					&hdata->resampling_data ) )
+	if( sample_buffer->play( buf, 0, frames ) )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
@@ -163,13 +161,13 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 void singerBot::deleteNotePluginData( notePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
-	if( hdata->resampling_data )
-	{
-		sampleBuffer::deleteResamplingData( &hdata->resampling_data );
-	}
 	if( hdata->wave )
 	{
 		delete hdata->wave;
+	}
+	if( hdata->resampling_state )
+	{
+		src_delete( hdata->resampling_state );
 	}
 	delete hdata;
 }
@@ -236,9 +234,9 @@ void singerBot::createWave( notePlayHandle * _n )
 {
 	handle_data * hdata = new handle_data;
 	_n->m_pluginData = hdata;
-	hdata->resampling_data = NULL;
 	hdata->wave = NULL;
 	hdata->remaining_frames = 0;
+	hdata->resampling_state = NULL;
 
 	if( m_words_dirty )
 	{
@@ -267,7 +265,18 @@ void singerBot::createWave( notePlayHandle * _n )
 	{
 		return;
 	}
-	hdata->wave->resample( eng()->getMixer()->sampleRate() );
+
+	int error;
+	hdata->resampling_state = src_new( SRC_LINEAR, 1, &error );
+	if( !hdata->resampling_state )
+	{
+		printf( "%s: src_new() error: %s\n", __FILE__,
+							src_strerror( error ) );
+	}
+
+	hdata->resampling_data.src_ratio = eng()->getMixer()->sampleRate()
+					/ (double)hdata->wave->sample_rate();
+	hdata->resampling_data.end_of_input = 0;
 	hdata->remaining_frames = hdata->wave->num_samples();
 }
 
@@ -276,24 +285,49 @@ void singerBot::createWave( notePlayHandle * _n )
 
 sampleBuffer * singerBot::readWave( handle_data * _hdata )
 {
-	f_cnt_t buffer_size = eng()->getMixer()->framesPerAudioBuffer();
-	f_cnt_t frames = tMin( buffer_size, _hdata->remaining_frames );
+	f_cnt_t frames = eng()->getMixer()->framesPerAudioBuffer();
 	f_cnt_t offset = _hdata->wave->num_samples() - _hdata->remaining_frames;
 
 	const float fac = 1.0f / OUTPUT_SAMPLE_MULTIPLIER;
+	f_cnt_t fragment_size = tMin( _hdata->remaining_frames,
+					1 + (f_cnt_t)ceil( frames
+					/ _hdata->resampling_data.src_ratio ) );
+	sample_t * wave_samples = new sample_t[fragment_size];
+
+	for( f_cnt_t frame = 0; frame < fragment_size; ++frame )
+	{
+		wave_samples[frame] = _hdata->wave->a( offset + frame ) * fac;
+	}
+
+	sample_t * mono_data = new sample_t[frames];
+	memset( mono_data, 0, sizeof( sample_t ) * frames );
+
+	_hdata->resampling_data.data_in = wave_samples;
+	_hdata->resampling_data.data_out = mono_data;
+	_hdata->resampling_data.input_frames = fragment_size;
+	_hdata->resampling_data.output_frames = frames;
+	int error = src_process( _hdata->resampling_state,
+						&_hdata->resampling_data );
+	if( error )
+	{
+		printf( "%s: src_process() error: %s\n", __FILE__,
+							src_strerror( error ) );
+	}
+
 	sampleFrame * data = new sampleFrame[frames];
 
 	for( f_cnt_t frame = 0; frame < frames; ++frame )
 	{
-		sample_t wave_sample = _hdata->wave->a( offset + frame ) * fac;
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
-			data[frame][chnl] = wave_sample;
+			data[frame][chnl] = mono_data[frame];
 		}
 	}
 
 	sampleBuffer * buffer = new sampleBuffer( data, frames, eng() );
-	_hdata->remaining_frames -= frames;
+	_hdata->remaining_frames -= _hdata->resampling_data.input_frames_used;
+	delete[] wave_samples;
+	delete[] mono_data;
 	delete[] data;
 	return( buffer );
 }
@@ -376,36 +410,29 @@ void singerBot::synThread::text_to_wave( void )
 		"(set! word " + quote_string( m_data->text, "\"", "\\", 1 )
 									+ ")" );
 	festival_eval_command(
-		"(set! my_utt (eval (list 'Utterance 'Text word)))" );
-	festival_eval_command(
-		"  (get_segment my_utt)" );
-	festival_eval_command(
-		"(if (equal? (length (utt.relation.leafs my_utt 'Segment)) 1)"
-		"	(begin (set! my_utt (eval "
-		"(list 'Utterance 'Text (string-append word \" \" word))))"
-		"	(get_segment my_utt)"
-		"))" );
-	festival_eval_command(
-		"  (Pauses my_utt)" );
-	festival_eval_command(
-		"  (item.delete (utt.relation.first my_utt 'Segment))" );
-	festival_eval_command(
-		"  (item.delete (utt.relation.last my_utt 'Segment))" );
-	festival_eval_command(
-		"  (Intonation my_utt)" );
-	festival_eval_command(
-		"  (PostLex my_utt)" );
-	festival_eval_command(
-		"  (Duration my_utt)" );
-	festival_eval_command(
-		"(if (not (equal? total_time 0)) (begin"
-		"(set! utt_time"
-		"	(item.feat (utt.relation.last my_utt 'Segment) 'end))"
-		"(Parameter.set 'Duration_Stretch (/ total_time utt_time))"
-		"(Duration my_utt)"
-		"))" );
-	festival_eval_command(
-		"  (Int_Targets my_utt)" );
+		"(begin"
+		" (set! my_utt (eval (list 'Utterance 'Text word)))"
+		" (get_segment my_utt)"
+		" (if (equal? (length (utt.relation.leafs my_utt 'Segment)) 1)"
+		"  (begin (set! my_utt (eval "
+		"   (list 'Utterance 'Text (string-append word \" \" word))))"
+		"   (get_segment my_utt)"
+		"  ))"
+		" (Pauses my_utt)"
+		" (item.delete (utt.relation.first my_utt 'Segment))"
+		" (item.delete (utt.relation.last my_utt 'Segment))"
+		" (Intonation my_utt)"
+		" (PostLex my_utt)"
+		" (Duration my_utt)"
+		" (if (not (equal? total_time 0)) (begin"
+		"  (set! utt_time"
+		"   (item.feat (utt.relation.last my_utt 'Segment) 'end))"
+		"  (Parameter.set 'Duration_Stretch (/ total_time utt_time))"
+		"  (Duration my_utt)"
+		"  ))"
+		" (Int_Targets my_utt)"
+		")" );
+
 	if( festival_eval_command(
 		"  (Wave_Synth my_utt)" ) )
 	{

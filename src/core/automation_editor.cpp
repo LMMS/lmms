@@ -4,7 +4,7 @@
  * automation_editor.cpp - implementation of automationEditor which is used for
  *                         actual setting of dynamic values
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -661,7 +661,7 @@ void automationEditor::updatePaintPixmap( void )
 
 	// setup selection-vars
 	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = m_selectStartTact64th+m_selectedTact64th;
+	int sel_pos_end = m_selectStartTact64th + m_selectedTact64th;
 	if( sel_pos_start > sel_pos_end )
 	{
 		qSwap<int>( sel_pos_start, sel_pos_end );
@@ -731,9 +731,8 @@ void automationEditor::updatePaintPixmap( void )
 				// selection because the user moved it...
 				if( m_editMode == MOVE )
 				{
-					if( qFind( m_selValuesForMove.begin(),
-						m_selValuesForMove.end(), *it )
-						!= m_selValuesForMove.end() )
+					if( m_selValuesForMove.contains(
+								it.key() ) )
 					{
 						is_selected = TRUE;
 					}
@@ -1439,18 +1438,24 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			for( timeMap::iterator it = m_selValuesForMove.begin();
 					it != m_selValuesForMove.end(); ++it )
 			{
-				int value_tact = ( -it.key() >> 6 ) + tact_diff;
-				int value_tact_64th = ( -it.key() & 63 ) +
-								tact_64th_diff;
-				// ensure value_tact_64th range
-				if( value_tact_64th >> 6 )
+				midiTime new_value_pos;
+				if( -it.key() )
 				{
-					value_tact += value_tact_64th >> 6;
-					value_tact_64th &= 63;
-				}
-				m_pattern->removeValue( -it.key() );
-				midiTime new_value_pos( value_tact,
+					int value_tact = ( -it.key() >> 6 )
+								+ tact_diff;
+					int value_tact_64th = ( -it.key() & 63 )
+							+ tact_64th_diff;
+					// ensure value_tact_64th range
+					if( value_tact_64th >> 6 )
+					{
+						value_tact += value_tact_64th
+									>> 6;
+						value_tact_64th &= 63;
+					}
+					m_pattern->removeValue( -it.key() );
+					new_value_pos = midiTime( value_tact,
 							value_tact_64th );
+				}
 #ifdef QT3
 				new_selValuesForMove[
 					-m_pattern->putValue( new_value_pos,
@@ -1896,51 +1901,41 @@ void automationEditor::selectAll( void )
 		return;
 	}
 
+	//TODO: Add constant
+	int len_tact_64th = 4;
+
 	timeMap & time_map = m_pattern->getTimeMap();
 
-	// if first_time = TRUE, we HAVE to set the vars for select
-	bool first_time = TRUE;
+	timeMap::iterator it = time_map.begin();
+	m_selectStartTact64th = 0;
+	m_selectedTact64th = -it.key() + len_tact_64th;
+#ifdef QT3
+	m_selectStartLevel = it.data();
+#else
+	m_selectStartLevel = it.value();
+#endif
+	m_selectedLevels = 1;
 
-	for( timeMap::iterator it = time_map.begin(); it != time_map.end();
-									++it )
+	while( ++it != time_map.end() )
 	{
-		//TODO: Add constant
-		Uint32 len_tact_64th = 4;
-
 #ifdef QT3
 		const int level = it.data();
 #else
 		const int level = it.value();
 #endif
-
-		Uint32 pos_tact_64th = -it.key();
-		if( level <= m_selectStartLevel || first_time )
+		if( level < m_selectStartLevel )
 		{
 			// if we move start-level down, we have to add 
 			// the difference between old and new start-level
 			// to m_selectedLevels, otherwise the selection
 			// is just moved down...
-			int diff = m_selectStartLevel - ( level - 1 );
-			m_selectStartLevel = level - 1;
-			m_selectedLevels += diff;
+			m_selectedLevels += m_selectStartLevel - level;
+			m_selectStartLevel = level;
 		}
-		if( level >= m_selectedLevels + m_selectStartLevel
-								|| first_time )
+		else if( level >= m_selectStartLevel + m_selectedLevels )
 		{
-			m_selectedLevels = level - m_selectStartLevel;
+			m_selectedLevels = level - m_selectStartLevel + 1;
 		}
-		if( pos_tact_64th < m_selectStartTact64th || first_time )
-		{
-			m_selectStartTact64th = pos_tact_64th;
-		}
-		if( pos_tact_64th + len_tact_64th >
-				m_selectStartTact64th + m_selectedTact64th ||
-								first_time )
-		{
-			m_selectedTact64th = pos_tact_64th + len_tact_64th -
-							m_selectStartTact64th;
-		}
-		first_time = FALSE;
 	}
 }
 

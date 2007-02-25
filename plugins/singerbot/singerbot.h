@@ -38,6 +38,8 @@
 #endif
 
 
+#include <samplerate.h>
+
 #include "instrument.h"
 
 
@@ -73,12 +75,13 @@ public slots:
 private:
 	typedef struct
 	{
-		void * resampling_data;
 		EST_Wave * wave;
 		int remaining_frames;
 		float frequency;
 		float duration;
 		const char * text;
+		SRC_STATE * resampling_state;
+		SRC_DATA resampling_data;
 	} handle_data;
 
 

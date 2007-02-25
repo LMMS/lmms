@@ -1,7 +1,7 @@
 /*
  * effect_select_dialog.h - dialog to choose effect plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -88,6 +88,10 @@ signals:
 	void doubleClicked( const effectKey & _key );
 	
 
+protected:
+	virtual void resizeEvent( QResizeEvent * );
+
+
 protected slots:
 	void onHighlighted( int _plugin );
 	void onAddButtonReleased();
@@ -100,7 +104,6 @@ private:
 	effectKey m_currentSelection;
 	
 	Q3ListBox * m_pluginList;
-	QWidget * m_descriptionWidgetParent;
 	QWidget * m_descriptionWidget;
 
 } ;

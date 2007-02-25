@@ -1,7 +1,7 @@
 /*
  * ladspa_control.cpp - widget for controlling a LADSPA port
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -130,9 +130,11 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			connect( m_knob, SIGNAL( valueChanged( float ) ), 
 				 this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
-			m_knob->setRange( m_port->min, m_port->max, 
-					  ( m_port->max - 
-						m_port->min ) / 400.0f );
+			m_knob->setRange( m_port->min, m_port->max,
+				( m_port->max - m_port->min )
+				/ ( m_port->name.toUpper() == "GAIN"
+					&& m_port->max == 10.0f ? 4000.0f :
+								400.0f ) );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 #ifdef QT4

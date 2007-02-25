@@ -3,7 +3,7 @@
 /*
  * effect_select_dialog.cpp - dialog to choose effect plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,8 +34,10 @@
 
 #else
 
+#include <qgroupbox.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
+#include <qvbox.h>
 
 #endif
 
@@ -165,9 +167,7 @@ void effectSelectDialog::selectPlugin( void )
 
 effectList::effectList( QWidget * _parent, engine * _engine ) :
 	QWidget( _parent ),
-	engineObject( _engine ),
-	m_descriptionWidgetParent( new QWidget( this ) ),
-	m_descriptionWidget( NULL )
+	engineObject( _engine )
 {
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
@@ -214,13 +214,26 @@ effectList::effectList( QWidget * _parent, engine * _engine ) :
 				SLOT( onHighlighted( int ) ) );	
 	connect( m_pluginList, SIGNAL( doubleClicked( QListBoxItem * ) ),
 				SLOT( onDoubleClicked( QListBoxItem * ) ) );
+
+#ifndef QT3
+	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
+#else
+	QGroupBox * groupbox = new QGroupBox( 1, Qt::Vertical,
+						tr( "Description" ), this );
+#endif
+	groupbox->setFixedHeight( 200 );
+	groupbox->setInsideMargin( 2 );
+	QScrollView * scrollView = new QScrollView( groupbox );
+	scrollView->setFrameStyle( 0 );
+	scrollView->setMargin( 10 );
+	m_descriptionWidget = new QVBox( scrollView->viewport() );
+	scrollView->addChild( m_descriptionWidget );
+
 	QVBoxLayout * vboxl = new QVBoxLayout( this );
 	vboxl->setMargin( 0 );
 	vboxl->setSpacing( 10 );
 	vboxl->addWidget( m_pluginList );
-	vboxl->addWidget( m_descriptionWidgetParent );
-
-	new QVBoxLayout( m_descriptionWidgetParent );
+	vboxl->addWidget( groupbox );
 
 	if( m_pluginList->numRows() > 0 )
 	{
@@ -241,22 +254,20 @@ effectList::~effectList()
 
 void effectList::onHighlighted( int _pluginIndex )
 {
+	QLayoutIterator it = m_descriptionWidget->layout()->iterator();
+	while( it.current() )
+	{
+		it.deleteCurrent();
+	}
+	m_descriptionWidget->hide();
+
 	m_currentSelection = m_effectKeys[_pluginIndex];
-	delete m_descriptionWidget;
-	m_descriptionWidget = NULL;
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
-		m_descriptionWidget = m_currentSelection.desc->
-						sub_plugin_features->
-			createDescriptionWidget( m_descriptionWidgetParent,
+		m_currentSelection.desc->sub_plugin_features->
+			fillDescriptionWidget( m_descriptionWidget,
 						eng(), m_currentSelection );
-	}
-	if( m_descriptionWidget != NULL )
-	{
-		dynamic_cast<QVBoxLayout *>(
-				m_descriptionWidgetParent->layout() )->
-					addWidget( m_descriptionWidget );
 		m_descriptionWidget->show();
 	}
 	emit( highlighted( m_currentSelection ) );
@@ -277,6 +288,15 @@ void effectList::onAddButtonReleased()
 {
 	emit( addPlugin( m_currentSelection ) );
 }
+
+
+
+
+void effectList::resizeEvent( QResizeEvent * )
+{
+	m_descriptionWidget->setFixedWidth( width() - 40 );
+}
+
 
 
 

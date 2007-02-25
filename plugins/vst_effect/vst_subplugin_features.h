@@ -3,7 +3,7 @@
  *                            plugin::descriptor::subPluginFeatures for
  *                            hosting VST-plugins
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,23 +31,12 @@
 #include "effect.h"
 
 
-class vstSubPluginDescriptionWidget : public QWidget
-{
-public:
-	vstSubPluginDescriptionWidget( QWidget * _parent, engine * _engine,
-						const effectKey & _key );
-
-
-} ;
-
-
-
 class vstSubPluginFeatures : public plugin::descriptor::subPluginFeatures
 {
 public:
 	vstSubPluginFeatures( plugin::pluginTypes _type );
 
-	virtual QWidget * createDescriptionWidget( QWidget * _parent,
+	virtual void fillDescriptionWidget( QWidget * _parent,
 							engine * _eng,
 							const key & _key );
 

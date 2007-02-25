@@ -3,8 +3,8 @@
  *                               plugin::descriptor::subPluginFeatures for
  *                               hosting LADSPA-plugins
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,23 +33,12 @@
 #include "ladspa_base.h"
 
 
-class ladspaSubPluginDescriptionWidget : public QWidget
-{
-public:
-	ladspaSubPluginDescriptionWidget( QWidget * _parent, engine * _engine,
-						const ladspa_key_t & _key );
-
-
-} ;
-
-
-
 class ladspaSubPluginFeatures : public plugin::descriptor::subPluginFeatures
 {
 public:
 	ladspaSubPluginFeatures( plugin::pluginTypes _type );
 
-	virtual QWidget * createDescriptionWidget( QWidget * _parent,
+	virtual void fillDescriptionWidget( QWidget * _parent,
 							engine * _eng,
 							const key & _key );
 

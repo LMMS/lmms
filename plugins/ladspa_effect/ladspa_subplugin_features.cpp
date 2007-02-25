@@ -3,8 +3,8 @@
  *                                 plugin::descriptor::subPluginFeatures for
  *                                 hosting LADSPA-plugins
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,13 +31,11 @@
 
 #include <QtCore/QString>
 #include <QtGui/QLabel>
-#include <QtGui/QLayout>
 
 #else
 
-#include <qgroupbox.h>
+#include <qhbox.h>
 #include <qlabel.h>
-#include <qlayout.h>
 #include <qstring.h>
 
 #endif
@@ -49,77 +47,6 @@
 #include "audio_device.h"
 
 
-ladspaSubPluginDescriptionWidget::ladspaSubPluginDescriptionWidget(
-					QWidget * _parent, engine * _engine,
-					const ladspa_key_t & _key ) :
-	QWidget( _parent
-#ifdef QT3
-			, "ladspaSubPluginDescriptionWidget"
-#endif
-						)
-{
-	ladspa2LMMS * lm = _engine->getLADSPAManager();
-	QVBoxLayout * l = new QVBoxLayout( this );
-
-#ifndef QT3
-	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
-#else
-	QGroupBox * groupbox = new QGroupBox( 9, Qt::Vertical, 
-						tr( "Description" ), this );
-#endif
-
-	QLabel * label = new QLabel( groupbox );
-	label->setText( tr( "Name: " ) + lm->getName( _key ) );
-
-	QLabel * maker = new QLabel( groupbox );
-	maker->setText( tr( "Maker: " ) + lm->getMaker( _key ) );
-
-	QLabel * copyright = new QLabel( groupbox );
-	copyright->setText( tr( "Copyright: " ) + lm->getCopyright( _key ) );
-
-	QLabel * requiresRealTime = new QLabel( groupbox );
-	if( lm->hasRealTimeDependency( _key ) )
-	{
-		requiresRealTime->setText( tr( "Requires Real Time: Yes" ) );
-	}
-	else
-	{
-		requiresRealTime->setText( tr( "Requires Real Time: No" ) );
-	}
-
-	QLabel * realTimeCapable = new QLabel( groupbox );
-	if( lm->isRealTimeCapable( _key ) )
-	{
-		realTimeCapable->setText( tr( "Real Time Capable: Yes" ) );
-	}
-	else
-	{
-		realTimeCapable->setText( tr( "Real Time Capable: No" ) );
-	}		
-
-	QLabel * inplaceBroken = new QLabel( groupbox );
-	if( lm->isInplaceBroken( _key ) )
-	{
-		inplaceBroken->setText( tr( "In Place Broken: Yes" ) );
-	}
-	else
-	{
-		inplaceBroken->setText( tr( "In Place Broken: No" ) );
-	}
-	
-	QLabel * channelsIn = new QLabel( groupbox );
-	channelsIn->setText( tr( "Channels In: " ) +
-		QString::number( lm->getDescription( _key )->inputChannels ) );
-
-	QLabel * channelsOut = new QLabel( groupbox );
-	channelsOut->setText( tr( "Channels Out: " ) +
-		QString::number( lm->getDescription( _key )->outputChannels ) );	
-	l->addWidget( groupbox );
-}
-
-
-
-
 ladspaSubPluginFeatures::ladspaSubPluginFeatures( plugin::pluginTypes _type ) :
 	subPluginFeatures( _type )
 {
@@ -128,11 +55,59 @@ ladspaSubPluginFeatures::ladspaSubPluginFeatures( plugin::pluginTypes _type ) :
 
 
 
-QWidget * ladspaSubPluginFeatures::createDescriptionWidget(
+void ladspaSubPluginFeatures::fillDescriptionWidget(
 			QWidget * _parent, engine * _eng, const key & _key  )
 {
-	return( new ladspaSubPluginDescriptionWidget( _parent, _eng,
-					subPluginKeyToLadspaKey( _key )  ) );
+	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
+	ladspa2LMMS * lm = _eng->getLADSPAManager();
+
+	QLabel * label = new QLabel( _parent );
+	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
+
+	QHBox * maker = new QHBox( _parent );
+	QLabel * maker_label = new QLabel( maker );
+	maker_label->setText( QWidget::tr( "Maker: " ) );
+	maker_label->setAlignment( Qt::AlignTop );
+	QLabel * maker_content = new QLabel( maker );
+	maker_content->setText( lm->getMaker( lkey ) );
+	maker_content->setAlignment( Qt::WordBreak );
+	maker->setStretchFactor( maker_content, 100 );
+
+	QHBox * copyright = new QHBox( _parent );
+	copyright->setMinimumWidth( _parent->minimumWidth() );
+	QLabel * copyright_label = new QLabel( copyright );
+	copyright_label->setText( QWidget::tr( "Copyright: " ) );
+	copyright_label->setAlignment( Qt::AlignTop );
+	QLabel * copyright_content = new QLabel( copyright );
+	copyright_content->setText( lm->getCopyright( lkey ) );
+	copyright_content->setAlignment( Qt::WordBreak );
+	copyright->setStretchFactor( copyright_content, 100 );
+
+	QLabel * requiresRealTime = new QLabel( _parent );
+	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
+					( lm->hasRealTimeDependency( lkey ) ?
+							QWidget::tr( "Yes" ) :
+							QWidget::tr( "No" ) ) );
+
+	QLabel * realTimeCapable = new QLabel( _parent );
+	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
+					( lm->isRealTimeCapable( lkey ) ?
+							QWidget::tr( "Yes" ) :
+							QWidget::tr( "No" ) ) );
+
+	QLabel * inplaceBroken = new QLabel( _parent );
+	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
+					( lm->isInplaceBroken( lkey ) ?
+							QWidget::tr( "Yes" ) :
+							QWidget::tr( "No" ) ) );
+	
+	QLabel * channelsIn = new QLabel( _parent );
+	channelsIn->setText( QWidget::tr( "Channels In: " ) +
+		QString::number( lm->getDescription( lkey )->inputChannels ) );
+
+	QLabel * channelsOut = new QLabel( _parent );
+	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
+		QString::number( lm->getDescription( lkey )->outputChannels ) );	
 }
 
 

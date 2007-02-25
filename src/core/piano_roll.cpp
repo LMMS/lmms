@@ -4,7 +4,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -2368,9 +2368,9 @@ void pianoRoll::selectAll( void )
 				// the difference between old and new start-key
 				// to m_selectedKeys, otherwise the selection
 				// is just moved down...
-				int diff = m_selectStartKey - ( key - 1 );
+				m_selectedKeys += m_selectStartKey
+								- ( key - 1 );
 				m_selectStartKey = key - 1;
-				m_selectedKeys += diff;
 			}
 			if( key >= m_selectedKeys+m_selectStartKey ||
 								first_time )

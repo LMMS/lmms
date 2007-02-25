@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070216, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070216)
+AC_INIT(lmms, 0.2.1-svn20070225, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070225)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -227,7 +227,7 @@ if test "x$with_vst" = "xyes" ; then
 
 	if test "$build_linux" = "true" ; then
 		AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
-		AC_CHECK_LIB([wine], [wine_init])
+		AC_CHECK_LIB([wine], [wine_init], true)
 		if test ! -z "$WINEGCC" ; then
 			if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
 				WINE_OK_BUT_VST_INCOMPLETE=""
@@ -278,29 +278,6 @@ if test ! -z "$HAVE_STK_H" ; then
 	AC_SUBST(stk_lib, [/usr/lib])
 fi
 AM_CONDITIONAL(STK_SUPPORT, test ! -z "$HAVE_STK_H")
-AC_LANG_POP(C++)
-
-
-# check for Festival
-AC_LANG_PUSH(C++)
-AC_ARG_WITH(singerbot,
-	AS_HELP_STRING([--without-singerbot],
-		[disable support for SingerBot plugin]), ,
-	[ with_singerbot=yes ])
-AH_TEMPLATE(SINGERBOT_SUPPORT,
-	[Define to 1 to enable SingerBot plugin support.])
-if test "x$with_singerbot" = "xyes" ; then
-	ORIG_CPPFLAGS=$CPPFLAGS
-	CPPFLAGS+=" -I/usr/include/festival -I/usr/include/speech_tools"
-	CPPFLAGS+=" -Wno-non-template-friend"
-	AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
-	AC_CHECK_LIB([Festival], [main], , FESTIVAL_SUPPORT="")
-	CPPFLAGS=$ORIG_CPPFLAGS
-fi
-if test ! -z "$FESTIVAL_SUPPORT" ; then
-	AC_DEFINE(SINGERBOT_SUPPORT)
-fi
-AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT")
 AC_LANG_POP(C++)
 
 
@@ -360,6 +337,31 @@ if test ! -z "$HAVE_SAMPLERATE_H" ; then
 	AC_DEFINE(HAVE_SAMPLERATE_H)
 fi
 AM_CONDITIONAL(HAVE_LIBSRC, test ! -z "$HAVE_SAMPLERATE_H")
+
+
+# check for Festival
+if test ! -z "$HAVE_SAMPLERATE_H" ; then
+	AC_LANG_PUSH(C++)
+	AC_ARG_WITH(singerbot,
+		AS_HELP_STRING([--without-singerbot],
+			[disable support for SingerBot plugin]), ,
+		[ with_singerbot=yes ])
+	AH_TEMPLATE(SINGERBOT_SUPPORT,
+		[Define to 1 to enable SingerBot plugin support.])
+	if test "x$with_singerbot" = "xyes" ; then
+		ORIG_CPPFLAGS=$CPPFLAGS
+		CPPFLAGS+=" -I/usr/include/festival -I/usr/include/speech_tools"
+		CPPFLAGS+=" -Wno-non-template-friend"
+		AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
+		AC_CHECK_LIB([Festival], [main], true, FESTIVAL_SUPPORT="")
+		CPPFLAGS=$ORIG_CPPFLAGS
+	fi
+	if test ! -z "$FESTIVAL_SUPPORT" ; then
+		AC_DEFINE(SINGERBOT_SUPPORT)
+	fi
+	AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
+	AC_LANG_POP(C++)
+fi
 
 
 # libsndfile-stuff
@@ -781,27 +783,6 @@ else
 fi
 
 
-if test -z "$FESTIVAL_SUPPORT" ; then
-	if test "x$with_singerbot" = "xyes" ; then
-		echo " ========================"
-		echo " ===  LMMS - WARNING  ======================================================="
-		echo " ========================"
-		echo " ="
-		echo " = You don't seem to have Festival development files."
-		echo " = The SingerBot instrument plugin will be ignored."
-		echo " = Before enabling this plugin, bear in mind that it is still experimental."
-		echo " ="
-		echo " = To remove this warning, please pass"
-		echo " = "
-		echo " = --without-singerbot"
-		echo " ="
-		with_warnings="true"
-	fi
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SingerBot instrument plugin"
-fi
-
-
 if test -z "$HAVE_SAMPLERATE_H" ; then
 	echo " ========================"
 	echo " ===  LMMS - WARNING  ======================================================="
@@ -816,6 +797,31 @@ if test -z "$HAVE_SAMPLERATE_H" ; then
 	with_warnings="true"
 else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsamplerate for internal samplerate-conversion"
+fi
+
+
+if test -z "$FESTIVAL_SUPPORT" ; then
+	if test "x$with_singerbot" = "xyes" ; then
+		echo " ========================"
+		echo " ===  LMMS - WARNING  ======================================================="
+		echo " ========================"
+		echo " ="
+		if test -z "$HAVE_SAMPLERATE_H" ; then
+			echo " = You don't seem to have libsamplerate support."
+		else
+			echo " = You don't seem to have Festival development files."
+		fi
+		echo " = The SingerBot instrument plugin will be ignored."
+		echo " = Before enabling this plugin, bear in mind that it is still experimental."
+		echo " ="
+		echo " = To remove this warning, please pass"
+		echo " = "
+		echo " = --without-singerbot"
+		echo " ="
+		with_warnings="true"
+	fi
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SingerBot instrument plugin"
 fi
 
 

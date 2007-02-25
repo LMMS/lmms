@@ -1,3 +1,46 @@
+2007-02-25	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/singerbot/singerbot.h:
+	use libsamplerate
+
+	* plugins/singerbot/singerbot.cpp:
+	- resample while playing, reduced start-up CPU usage
+	- joined scheme commands
+
+	* configure.in:
+	- added libsamplerate dependency to singerbot
+	- don't add plugin libraries to global LIBS
+
+	* src/core/automation_editor.cpp:
+	- fixed selection
+	- values moved at time 0 don't move horizontally
+
+	* src/core/piano_roll.cpp:
+	little optimization when selecting all notes
+
+	* src/tracks/instrument_track.cpp:
+	emit sentMidiTime always, pitch automation mustn't be disabled
+
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	raise gain range up to 10
+
+	* include/effect_select_dialog.h:
+	* include/plugin.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* plugins/vst_effect/vst_subplugin_features.h:
+	* src/core/effect_select_dialog.cpp:
+	changed description layout
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	simplified translations
+
+	* plugins/live_tool/live_tool.cpp:
+	added what's-this-text
+
 2007-02-20	Alexey Kouznetsov <alexey/dot/kouznetsov/at/gmail/dot/com>
 
 	* data/locale/ru.ts:

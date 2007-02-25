@@ -1,7 +1,7 @@
 /*
  * live_tool.cpp - tool for live performance
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,6 +21,13 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
+
+#ifdef QT3
+
+#include <qwhatsthis.h>
+
+#endif
 
 
 #include "live_tool.h"
@@ -47,7 +54,7 @@ plugin::descriptor live_tool_plugin_descriptor =
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"LiveTool",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"tool for live performance" ),
+				"Tool for live performance" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
 	plugin::Tool,
@@ -66,6 +73,19 @@ liveTool::liveTool( mainWindow * _window ) :
 	QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
 	setPaletteBackgroundPixmap( background );
 	setFixedSize( background.size() );
+
+#ifdef QT4
+	setWhatsThis(
+#else
+	QWhatsThis::add( this,
+#endif
+				tr( 
+		"This tool is intended to be used in live performances, though "
+		"you can use it for music production as well.\n"
+		"The following keys will work only if this window is active.\n"
+		"The spacebar toggles play and pause in the Song Editor.\n"
+		"F1-F10 keys mute the first 10 instruments in the "
+		"Beat+Baseline Editor." ) );
 
 	hide();
 }
