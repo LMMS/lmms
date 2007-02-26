@@ -3,7 +3,7 @@
 /*
  * fade_button.cpp - implementation of fade-button
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,6 +52,7 @@ fadeButton::fadeButton( const QColor & _normal_color,
 #ifndef QT4
 	setBackgroundMode( NoBackground );
 #endif
+	QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
 }
 
 
@@ -66,15 +67,7 @@ fadeButton::~fadeButton()
 
 void fadeButton::activate( void )
 {
-	if( m_state > 0.0f )
-	{
-		m_state = 1.00f;
-	}
-	else
-	{
-		m_state = 1.1f;
-		nextState();
-	}
+	m_state = 1.00f;
 	update();
 }
 
@@ -125,12 +118,6 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );
 #endif
-	if( m_state > 0.0f )
-	{
-		// we might be called out of another thread than the GUI-/
-		// event-loop-thread, so let the timer update ourself
-		QTimer::singleShot( 20, this, SLOT( update( void ) ) );
-	}
 }
 
 
@@ -141,8 +128,9 @@ void fadeButton::nextState( void )
 	if( m_state > 0.0f )
 	{
 		m_state -= 0.1f;
-		QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
+		update();
 	}
+	QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
 }
 
 

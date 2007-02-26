@@ -3,7 +3,7 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -181,7 +181,8 @@ configManager::configManager( void ) :
 #endif
 	m_vstDir( QDir::home().absolutePath() ),
 	m_flDir( QDir::home().absolutePath() ),
-	m_currentPage( 0 )
+	m_currentPage( 0 ),
+	m_mainLayout( NULL )
 {
 }
 
@@ -771,7 +772,10 @@ void configManager::setValue( const QString & _class,
 
 bool configManager::loadConfigFile( void )
 {
-	createWidgets();
+	if( !m_mainLayout )
+	{
+		createWidgets();
+	}
 
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
