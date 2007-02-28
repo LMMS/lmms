@@ -1,7 +1,7 @@
 /*
  * midi_client.h - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -117,7 +117,7 @@ public:
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
 			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-						_caption ).toUpper(), _parent )
+					tr( _caption ) ).toUpper(), _parent )
 		{
 		}
 

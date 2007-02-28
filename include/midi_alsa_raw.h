@@ -1,7 +1,7 @@
 /*
  * midi_alsa_raw.h - midi-client for RawMIDI via ALSA
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -69,8 +69,8 @@ public:
 
 	inline static QString name( void )
 	{
-		return( setupWidget::tr( "ALSA Raw-MIDI (Advanced Linux Sound "
-							"Architecture)" ) );
+		return( QT_TRANSLATE_NOOP( "setupWidget",
+			"ALSA Raw-MIDI (Advanced Linux Sound Architecture)" ) );
 	}
 
 

@@ -1,3 +1,32 @@
+2007-02-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_sdl.cpp:
+	fixed high quality play
+
+	* include/audio_alsa.h:
+	* include/audio_device.h:
+	* include/audio_dummy.h:
+	* include/audio_jack.h:
+	* include/audio_oss.h:
+	* include/audio_sdl.h:
+	* include/midi_alsa_raw.h:
+	* include/midi_alsa_seq.h
+	* include/midi_client.h:
+	* include/midi_dummy.h:
+	* include/midi_oss.h:
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	save device names without localization
+
+	* data/locale/ca.ts:
+	updated translation
+
+	* plugins/lb302/lb302.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	fixed typos
+
 2007-02-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* src/widgets/fade_button.cpp:

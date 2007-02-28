@@ -3,7 +3,7 @@
 /*
  * audio_oss.cpp - device-class that implements OSS-PCM-output
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -216,7 +216,7 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
 		else
 		{
 			SAMPLE_RATES[0] = 44100;
-			SAMPLE_RATES[1] = 82000;
+			SAMPLE_RATES[1] = 88200;
 		}
 		setSampleRate( SAMPLE_RATES[q] );
 		value = sampleRate();

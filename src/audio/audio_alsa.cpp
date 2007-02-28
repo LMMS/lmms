@@ -3,7 +3,7 @@
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -237,7 +237,9 @@ void audioALSA::run( void )
 		{
 			if( outbuf_pos == 0 )
 			{
+				// frames depend on the sample rate
 				const fpab_t frames = getNextBuffer( temp );
+				outbuf_size = frames * channels();
 
 				convertToS16( temp, frames,
 						getMixer()->masterGain(),
@@ -355,7 +357,7 @@ int audioALSA::setHWParams( const sample_rate_t _sample_rate,
 		else
 		{
 			SAMPLE_RATES[0] = 44100;
-			SAMPLE_RATES[1] = 82000;
+			SAMPLE_RATES[1] = 88200;
 		}
 		setSampleRate( SAMPLE_RATES[q] );
 		if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,

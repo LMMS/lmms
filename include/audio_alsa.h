@@ -1,7 +1,7 @@
 /*
  * audio_alsa.h - device-class that implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,8 +57,8 @@ public:
 
 	inline static QString name( void )
 	{
-		return( setupWidget::tr( "ALSA (Advanced Linux Sound "
-							"Architecture)" ) );
+		return( QT_TRANSLATE_NOOP( "setupWidget",
+			"ALSA (Advanced Linux Sound Architecture)" ) );
 	}
 
 	static QString probeDevice( void );

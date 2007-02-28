@@ -1,7 +1,7 @@
 /*
  * setup_dialog.h - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -155,12 +155,15 @@ private:
 
 	typedef QMap<QString, audioDevice::setupWidget *> aswMap;
 	typedef QMap<QString, midiClient::setupWidget *> mswMap;
+	typedef QMap<QString, QString> trMap;
 
 	QComboBox * m_audioInterfaces;
 	aswMap m_audioIfaceSetupWidgets;
+	trMap m_audioIfaceNames;
 
 	QComboBox * m_midiInterfaces;
 	mswMap m_midiIfaceSetupWidgets;
+	trMap m_midiIfaceNames;
 
 
 } ;

@@ -3,7 +3,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -555,20 +555,26 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
+		m_audioIfaceNames[tr( it.key() )] = it.key();
+	}
+	for( trMap::iterator it = m_audioIfaceNames.begin();
+				it != m_audioIfaceNames.end(); ++it )
+	{
 #ifdef QT4
-		it.value()->hide();
-		asw_layout->addWidget( it.value() );
+		QWidget * audioWidget = m_audioIfaceSetupWidgets[it.value()];
 #else
-		it.data()->hide();
-		asw_layout->addWidget( it.data() );
+		QWidget * audioWidget = m_audioIfaceSetupWidgets[it.data()];
 #endif
+		audioWidget->hide();
+		asw_layout->addWidget( audioWidget );
 		m_audioInterfaces->addItem( it.key() );
 	}
 #ifdef QT4
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-					eng()->getMixer()->audioDevName() ) );
+				tr( eng()->getMixer()->audioDevName() ) ) );
 #else
-	m_audioInterfaces->setCurrentText( eng()->getMixer()->audioDevName() );
+	m_audioInterfaces->setCurrentText(
+				tr( eng()->getMixer()->audioDevName() ) );
 #endif
 	m_audioIfaceSetupWidgets[eng()->getMixer()->audioDevName()]->show();
 
@@ -635,21 +641,27 @@ setupDialog::setupDialog( engine * _engine, configTabs _tab_to_open ) :
 	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
+		m_midiIfaceNames[tr( it.key() )] = it.key();
+	}
+	for( trMap::iterator it = m_midiIfaceNames.begin();
+				it != m_midiIfaceNames.end(); ++it )
+	{
 #ifdef QT4
-		it.value()->hide();
-		msw_layout->addWidget( it.value() );
+		QWidget * midiWidget = m_midiIfaceSetupWidgets[it.value()];
 #else
-		msw_layout->addWidget( it.data() );
-		it.data()->hide();
+		QWidget * midiWidget = m_midiIfaceSetupWidgets[it.data()];
 #endif
+		midiWidget->hide();
+		msw_layout->addWidget( midiWidget );
 		m_midiInterfaces->addItem( it.key() );
 	}
 
 #ifdef QT4
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-					eng()->getMixer()->midiClientName() ) );
+				tr( eng()->getMixer()->midiClientName() ) ) );
 #else
-	m_midiInterfaces->setCurrentText( eng()->getMixer()->midiClientName() );
+	m_midiInterfaces->setCurrentText(
+				tr( eng()->getMixer()->midiClientName() ) );
 #endif
 	m_midiIfaceSetupWidgets[eng()->getMixer()->midiClientName()]->show();
 
@@ -737,9 +749,9 @@ void setupDialog::accept( void )
 	configManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
 	configManager::inst()->setValue( "mixer", "audiodev",
-					m_audioInterfaces->currentText() );
+			m_audioIfaceNames[m_audioInterfaces->currentText()] );
 	configManager::inst()->setValue( "mixer", "mididev",
-					m_midiInterfaces->currentText() );
+			m_midiIfaceNames[m_midiInterfaces->currentText()] );
 	configManager::inst()->setValue( "tooltips", "disabled",
 					QString::number( m_disableToolTips ) );
 	configManager::inst()->setValue( "knobs", "classicalusability",
@@ -1122,7 +1134,7 @@ void setupDialog::audioInterfaceChanged( const QString & _iface )
 #endif
 	}
 
-	m_audioIfaceSetupWidgets[_iface]->show();
+	m_audioIfaceSetupWidgets[m_audioIfaceNames[_iface]]->show();
 }
 
 
@@ -1160,7 +1172,7 @@ void setupDialog::midiInterfaceChanged( const QString & _iface )
 #endif
 	}
 
-	m_midiIfaceSetupWidgets[_iface]->show();
+	m_midiIfaceSetupWidgets[m_midiIfaceNames[_iface]]->show();
 }
 
 

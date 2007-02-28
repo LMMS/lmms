@@ -3,7 +3,7 @@
 /*
  * audio_sdl.cpp - device-class that performs PCM-output via SDL
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -165,7 +165,10 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 	{
 		if( m_convertedBuf_pos == 0 )
 		{
+			// frames depend on the sample rate
 			const fpab_t frames = getNextBuffer( m_outBuf );
+			m_convertedBuf_size = frames * channels()
+						* sizeof( int_sample_t );
 
 			convertToS16( m_outBuf, frames,
 						getMixer()->masterGain(),

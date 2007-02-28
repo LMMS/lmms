@@ -7,6 +7,53 @@
     </message>
 </context>
 <context>
+    <name>QWidget</name>
+    <message>
+        <source>Name: </source>
+        <translation>Nom: </translation>
+    </message>
+    <message>
+        <source>Maker: </source>
+        <translation>Fabricant: </translation>
+    </message>
+    <message>
+        <source>Copyright: </source>
+        <translation>Copyright: </translation>
+    </message>
+    <message>
+        <source>Requires Real Time: </source>
+        <translation>Requereix Temps Real: </translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Sí</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>Real Time Capable: </source>
+        <translation>Capaç de Temps Real: </translation>
+    </message>
+    <message>
+        <source>In Place Broken: </source>
+        <translation>Trencat En Lloc: </translation>
+    </message>
+    <message>
+        <source>Channels In: </source>
+        <translation>Canals d&apos;Entrada: </translation>
+    </message>
+    <message>
+        <source>Channels Out: </source>
+        <translation>Canals de Sortida: </translation>
+    </message>
+    <message>
+        <source>File: </source>
+        <translation>Fitxer: </translation>
+    </message>
+</context>
+<context>
     <name>aboutDialog</name>
     <message>
         <source>About LMMS...</source>
@@ -26,7 +73,7 @@
     </message>
     <message>
         <source>Close</source>
-        <translation>Tancar</translation>
+        <translation>Tanca</translation>
     </message>
     <message>
         <source>Translation</source>
@@ -40,20 +87,20 @@ If you&apos;re interested in translating LMMS in another language or want to imp
  &lt;jasp00@terra.es&gt;</translation>
     </message>
     <message>
-        <source>LMMS - A powerful synthesizer-studio
-
-Copyright (c) 2004-2006 LMMS-Developers
-
-http://lmms.sourceforge.net</source>
-        <translation>LMMS - Un potent estudi-sintetitzador
-
-© 2004-2006 Desenvolupadors de LMMS
-
-http://lmms.sourceforge.net</translation>
-    </message>
-    <message>
         <source>Linux MultiMedia Studio %1</source>
         <translation>Linux MultiMedia Studio %1</translation>
+    </message>
+    <message>
+        <source>LMMS - A powerful synthesizer-studio
+
+Copyright (c) 2004-2007 LMMS-Developers
+
+http://lmms.sourceforge.net</source>
+        <translation>LMMS - Un potent estudi sintetitzador
+
+© 2004-2007 Desenvolupadors de LMMS
+
+http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
@@ -755,6 +802,45 @@ http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
+    <name>bassBoosterControlDialog</name>
+    <message>
+        <source>Frequency</source>
+        <translation>Freqüència</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation>Freqüència:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Guany</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>GUANY</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Guany:</translation>
+    </message>
+    <message>
+        <source>Ratio</source>
+        <translation>Proporció</translation>
+    </message>
+    <message>
+        <source>RATIO</source>
+        <translation>PROPORCIÓ</translation>
+    </message>
+    <message>
+        <source>Ratio:</source>
+        <translation>Proporció:</translation>
+    </message>
+</context>
+<context>
     <name>bbEditor</name>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -995,6 +1081,39 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
     <message>
         <source>Choose LMMS working directory</source>
         <translation>Escull el directori de treball de LMMS</translation>
+    </message>
+</context>
+<context>
+    <name>effectList</name>
+    <message>
+        <source>Description</source>
+        <translation>Descripció</translation>
+    </message>
+</context>
+<context>
+    <name>effectSelectDialog</name>
+    <message>
+        <source>Effects Selector</source>
+        <translation>Selector d&apos;Efectes</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Afegeix</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel·la</translation>
+    </message>
+</context>
+<context>
+    <name>effectTabWidget</name>
+    <message>
+        <source>EFFECTS CHAIN</source>
+        <translation>CADENA D&apos;EFECTES</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Afegeix</translation>
     </message>
 </context>
 <context>
@@ -1590,6 +1709,73 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <source>FX channel</source>
         <translation>Canal FX</translation>
     </message>
+    <message>
+        <source>FX</source>
+        <translation>FX</translation>
+    </message>
+</context>
+<context>
+    <name>kickerInstrument</name>
+    <message>
+        <source>Start frequency</source>
+        <translation>Freqüència inicial</translation>
+    </message>
+    <message>
+        <source>START</source>
+        <translation>INICI</translation>
+    </message>
+    <message>
+        <source>Start frequency:</source>
+        <translation>Freqüència inicial:</translation>
+    </message>
+    <message>
+        <source>End frequency</source>
+        <translation>Freqüència final</translation>
+    </message>
+    <message>
+        <source>END</source>
+        <translation>FI</translation>
+    </message>
+    <message>
+        <source>End frequency:</source>
+        <translation>Freqüència final:</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Decaïment</translation>
+    </message>
+    <message>
+        <source>DECAY</source>
+        <translation>DECAÏMENT</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Decaïment:</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Distorsió</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>DIST</translation>
+    </message>
+    <message>
+        <source>Distortion:</source>
+        <translation>Distorsió:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Guany</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>GUANY</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Guany:</translation>
+    </message>
 </context>
 <context>
     <name>knob</name>
@@ -1623,6 +1809,293 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
     </message>
 </context>
 <context>
+    <name>ladspaBrowser</name>
+    <message>
+        <source>LADSPA Plugin Browser</source>
+        <translation>Navegador de connectors LADSPA</translation>
+    </message>
+    <message>
+        <source>Available Effects</source>
+        <translation>Efectes Disponibles</translation>
+    </message>
+    <message>
+        <source>Unavailable Effects</source>
+        <translation>Efectes No Disponibles</translation>
+    </message>
+    <message>
+        <source>Instruments</source>
+        <translation>Instruments</translation>
+    </message>
+    <message>
+        <source>Analysis Tools</source>
+        <translation>Eines d&apos;Anàlisi</translation>
+    </message>
+    <message>
+        <source>Don&apos;t know</source>
+        <translation>Desconegut</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Tanca</translation>
+    </message>
+    <message>
+        <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate.  The plugins are divided into five categories based upon an interpretation of the port types and names.
+
+Available Effects are those that can be used by LMMS.  In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels.  LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name.  Output channels are identified by the letters &apos;out&apos;.  Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
+
+Unavailable Effects are those that were identified as effects, but either didn&apos;t have the same number of input and output channels or weren&apos;t real time capable.
+
+Instruments are plugins for which only output channels were identified.
+
+Analysis Tools are plugins for which only input channels were identified.
+
+Don&apos;t Knows are plugins for which no input or output channels were identified.
+
+Double clicking any of the plugins will bring up information on the ports.</source>
+        <translation>Aquest diàleg mostra informació de tots els connectors LADSPA que LMMS ha pogut trobar. Els connectors estan dividits en cinc categories basades en la interpretació dels tipus i noms dels ports.
+
+Efectes Disponibles són aquells que LMMS pot usar. Per a que LMMS pugui usar un efecte, primerament, ha de ser un efecte, és a dir, ha de tenir canals d&apos;entrada i de sortida. LMMS identifica un canal d&apos;entrada com a un port d&apos;àudio que conté &apos;in&apos; al nom. Els canals de sortida són identificats amb les lletres &apos;out&apos;. A més, l&apos;efecte ha de tenir el mateix nombre d&apos;entrades que de sortides i ser capaç de temps real.
+
+Efectes No Disponibles són aquells que han estat identificats com a efectes, però no tenen el mateix nombre d&apos;entrades que de sortides o no són capaços de temps real.
+
+Instruments són connectors on només s&apos;han identificat canals de sortida.
+
+Eines d&apos;Anàlisi són connectors on només s&apos;han identificat canals d&apos;entrada.
+
+Desconeguts són connectors on no s&apos;han identificat canals d&apos;entrada o sortida.
+
+Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControl</name>
+    <message>
+        <source>Link channels</source>
+        <translation>Enllaça canals</translation>
+    </message>
+    <message>
+        <source>Value:</source>
+        <translation>Valor:</translation>
+    </message>
+    <message>
+        <source>Sorry, no help available.</source>
+        <translation>Ajuda no disponible.</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaControlDialog</name>
+    <message>
+        <source>Channel </source>
+        <translation>Canal </translation>
+    </message>
+    <message>
+        <source>Link Channels</source>
+        <translation>Enllaça Canals</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaPortDialog</name>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation>Taxa</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direcció</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipus</translation>
+    </message>
+    <message>
+        <source>Min &lt; Default &lt; Max</source>
+        <translation>Mín &lt; Defecte &lt; Màx</translation>
+    </message>
+    <message>
+        <source>Logarithmic</source>
+        <translation>Logarítmic</translation>
+    </message>
+    <message>
+        <source>SR Dependent</source>
+        <translation>Depenent SR</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation>Àudio</translation>
+    </message>
+    <message>
+        <source>Control</source>
+        <translation>Control</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Entrada</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Sortida</translation>
+    </message>
+    <message>
+        <source>Toggled</source>
+        <translation>Commutat</translation>
+    </message>
+    <message>
+        <source>Integer</source>
+        <translation>Enter</translation>
+    </message>
+    <message>
+        <source>Float</source>
+        <translation>Flotant</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Sí</translation>
+    </message>
+</context>
+<context>
+    <name>lb302Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation>Freqüència de Tall VCF</translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation>Freq Tall:</translation>
+    </message>
+    <message>
+        <source>CUT</source>
+        <translation>TALL</translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation>Resonància VCF</translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation>Resonància:</translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation>RES</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation>Mod Envoltant VCF</translation>
+    </message>
+    <message>
+        <source>Env Mod:</source>
+        <translation>Mod Env:</translation>
+    </message>
+    <message>
+        <source>ENV MOD</source>
+        <translation>MOD ENV</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation>Decaïment Envoltant VCF</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Decaïment:</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation>DEC</translation>
+    </message>
+    <message>
+        <source>Slide</source>
+        <translation>Lliscament</translation>
+    </message>
+    <message>
+        <source>Accent</source>
+        <translation>Accent</translation>
+    </message>
+    <message>
+        <source>Dead</source>
+        <translation>Mort</translation>
+    </message>
+    <message>
+        <source>303-es-que, 24dB/octave, 3 pole filter</source>
+        <translation>303-es-que, 24dB/octava, filtre 3 pols</translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation>Decaïment de Lliscament</translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation>Decaïment de Lliscament:</translation>
+    </message>
+    <message>
+        <source>SLIDE</source>
+        <translation>LLISCAMENT</translation>
+    </message>
+    <message>
+        <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
+        <translation>Desafinament fi del VCO. Graduat entre -100 i 100 cents.</translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation>Desafinament Fi VCO:</translation>
+    </message>
+    <message>
+        <source>DETUNE</source>
+        <translation>DESAFINAMENT</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Distorsió</translation>
+    </message>
+    <message>
+        <source>DIST:</source>
+        <translation>DIST:</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>DIST</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation>Forma d&apos;ona</translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation>ONA</translation>
+    </message>
+    <message>
+        <source>Sawtooth </source>
+        <translation>Dent de serra </translation>
+    </message>
+    <message>
+        <source>Inverted Sawtooth </source>
+        <translation>Dent de serra invertida </translation>
+    </message>
+    <message>
+        <source>Triangle </source>
+        <translation>Triangular </translation>
+    </message>
+    <message>
+        <source>Square </source>
+        <translation>Quadrada </translation>
+    </message>
+    <message>
+        <source>Rounded Square </source>
+        <translation>Quadrada Arrodonida </translation>
+    </message>
+    <message>
+        <source>Moog </source>
+        <translation>Moog </translation>
+    </message>
+    <message>
+        <source>WAVE:</source>
+        <translation>ONA:</translation>
+    </message>
+</context>
+<context>
     <name>lcdSpinBox</name>
     <message>
         <source>&amp;Open in automation editor</source>
@@ -1646,6 +2119,19 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
     <message>
         <source>--- Factory files ---</source>
         <translation>--- Fitxers de fàbrica ---</translation>
+    </message>
+</context>
+<context>
+    <name>liveTool</name>
+    <message>
+        <source>This tool is intended to be used in live performances, though you can use it for music production as well.
+The following keys will work only if this window is active.
+The spacebar toggles play and pause in the Song Editor.
+F1-F10 keys mute the first 10 instruments in the Beat+Baseline Editor.</source>
+        <translation>Aquesta eina està pensada per a ser usada en actuacions en directe, encara que també pots usar-la per a producció musical.
+Les tecles següents només funcionaran si aquesta finestra està activa.
+La barra d&apos;espai canvia entre reproducció i pausa a l&apos;Editor de Cançó.
+Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Base.</translation>
     </message>
 </context>
 <context>
@@ -1819,14 +2305,6 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <translation>Mostra el diàleg de configuració</translation>
     </message>
     <message>
-        <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation>Projecte MultiMèdia (*.mmp *.xml)</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation>Projecte MultiMèdia (*.mmp);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
-    </message>
-    <message>
         <source>Help not available</source>
         <translation>Ajuda no disponible</translation>
     </message>
@@ -1843,6 +2321,228 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     <message>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor d&apos;Automatització. Amb l&apos;ajuda de l&apos;Editor d&apos;Automatització pots editar valors dinàmics fàcilment.</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>E&amp;ines</translation>
+    </message>
+    <message>
+        <source>LADSPA Plugins...</source>
+        <translation>Connectors LADSPA...</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
+        <translation>Projecte MultiMèdia (*.mmp *.mmpz *.xml)</translation>
+    </message>
+    <message>
+        <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
+        <translation>Projecte MultiMèdia (*.mmp *.mmpz);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
+    </message>
+</context>
+<context>
+    <name>mallets</name>
+    <message>
+        <source>Spread</source>
+        <translation>Dispersió</translation>
+    </message>
+    <message>
+        <source>Spread:</source>
+        <translation>Dispersió:</translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation>Duresa</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation>Duresa:</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Posició</translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation>Posició:</translation>
+    </message>
+    <message>
+        <source>Vibrato Gain</source>
+        <translation>Guany de Vibrat</translation>
+    </message>
+    <message>
+        <source>Vib Gain</source>
+        <translation>Guany Vib</translation>
+    </message>
+    <message>
+        <source>Vib Gain:</source>
+        <translation>Guany Vib:</translation>
+    </message>
+    <message>
+        <source>Vibrato Freq</source>
+        <translation>Freq de Vibrat</translation>
+    </message>
+    <message>
+        <source>Vib Freq</source>
+        <translation>Freq Vib</translation>
+    </message>
+    <message>
+        <source>Vib Freq:</source>
+        <translation>Freq Vib:</translation>
+    </message>
+    <message>
+        <source>Stick Mix</source>
+        <translation>Mescla de Pals</translation>
+    </message>
+    <message>
+        <source>Stick Mix:</source>
+        <translation>Mescla de Pals:</translation>
+    </message>
+    <message>
+        <source>Modulator</source>
+        <translation>Modulador</translation>
+    </message>
+    <message>
+        <source>Modulator:</source>
+        <translation>Modulador:</translation>
+    </message>
+    <message>
+        <source>Crossfade</source>
+        <translation>Entremescla</translation>
+    </message>
+    <message>
+        <source>Crossfade:</source>
+        <translation>Entremescla:</translation>
+    </message>
+    <message>
+        <source>LFO Speed</source>
+        <translation>Velocitat OBF</translation>
+    </message>
+    <message>
+        <source>LFO Speed:</source>
+        <translation>Velocitat OBF:</translation>
+    </message>
+    <message>
+        <source>LFO Depth</source>
+        <translation>Profunditat OBF</translation>
+    </message>
+    <message>
+        <source>LFO Depth:</source>
+        <translation>Profunditat OBF:</translation>
+    </message>
+    <message>
+        <source>ADSR</source>
+        <translation>ADSR</translation>
+    </message>
+    <message>
+        <source>ADSR:</source>
+        <translation>ADSR:</translation>
+    </message>
+    <message>
+        <source>Bowed</source>
+        <translation>Doblegat</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Pressió</translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation>Pressió:</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation>Moviment</translation>
+    </message>
+    <message>
+        <source>Motion:</source>
+        <translation>Moviment:</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Velocitat</translation>
+    </message>
+    <message>
+        <source>Speed:</source>
+        <translation>Velocitat:</translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation>Vibrat</translation>
+    </message>
+    <message>
+        <source>Vibrato:</source>
+        <translation>Vibrat:</translation>
+    </message>
+    <message>
+        <source>Instrument</source>
+        <translation>Instrument</translation>
+    </message>
+    <message>
+        <source>Marimba</source>
+        <translation>Marimba</translation>
+    </message>
+    <message>
+        <source>Vibraphone</source>
+        <translation>Vibràfon</translation>
+    </message>
+    <message>
+        <source>Agogo</source>
+        <translation>Agogo</translation>
+    </message>
+    <message>
+        <source>Wood1</source>
+        <translation>Fusta1</translation>
+    </message>
+    <message>
+        <source>Reso</source>
+        <translation>Reso</translation>
+    </message>
+    <message>
+        <source>Wood2</source>
+        <translation>Fusta2</translation>
+    </message>
+    <message>
+        <source>Beats</source>
+        <translation>Batecs</translation>
+    </message>
+    <message>
+        <source>Two Fixed</source>
+        <translation>Fixat a Dos</translation>
+    </message>
+    <message>
+        <source>Clump</source>
+        <translation>Grup</translation>
+    </message>
+    <message>
+        <source>Tubular Bells</source>
+        <translation>Campanes Tubulars</translation>
+    </message>
+    <message>
+        <source>Uniform Bar</source>
+        <translation>Barra Uniforme</translation>
+    </message>
+    <message>
+        <source>Tuned Bar</source>
+        <translation>Barra Afinada</translation>
+    </message>
+    <message>
+        <source>Glass</source>
+        <translation>Cristall</translation>
+    </message>
+    <message>
+        <source>Tibetan Bowl</source>
+        <translation>Bol Tibetà</translation>
+    </message>
+</context>
+<context>
+    <name>meterDialog</name>
+    <message>
+        <source>Meter Numerator</source>
+        <translation>Numerador de Mesurador</translation>
+    </message>
+    <message>
+        <source>Meter Denominator</source>
+        <translation>Denominador de Mesurador</translation>
     </message>
 </context>
 <context>
@@ -2265,6 +2965,34 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <source>simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
         <translation>mostrejador simple amb diferents paràmetres per a usar mostres (p.e. bateria) en una pista d&apos;instrument</translation>
     </message>
+    <message>
+        <source>Tuneful things to bang on</source>
+        <translation>Coses melòdiques per a fer soroll</translation>
+    </message>
+    <message>
+        <source>Incomplete monophonic immitation tb303</source>
+        <translation>Imitació monofònica incompleta tb303</translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
+        <translation>connector per a usar efectes LADSPA arbitraris a LMMS.</translation>
+    </message>
+    <message>
+        <source>plugin for using arbitrary VST-effects inside LMMS.</source>
+        <translation>connector per a usar efectes VST arbitraris a LMMS.</translation>
+    </message>
+    <message>
+        <source>versatile kick- &amp; bassdrum-synthesizer</source>
+        <translation>sintetitzador versàtil de guitza &amp; bombo</translation>
+    </message>
+    <message>
+        <source>Singer bot to add some basic vocals</source>
+        <translation>Bot cantant per a afegir veus bàsiques</translation>
+    </message>
+    <message>
+        <source>Tool for live performance</source>
+        <translation>Eina per a actuació en directe</translation>
+    </message>
 </context>
 <context>
     <name>projectNotes</name>
@@ -2386,6 +3114,124 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
 </context>
 <context>
+    <name>rackPlugin</name>
+    <message>
+        <source>Turn the effect off</source>
+        <translation>Apaga l&apos;efecte</translation>
+    </message>
+    <message>
+        <source>On/Off</source>
+        <translation>Encès/Apagat</translation>
+    </message>
+    <message>
+        <source>Toggles the effect on or off.</source>
+        <translation>Encèn o apaga l&apos;efecte.</translation>
+    </message>
+    <message>
+        <source>Wet/Dry mix</source>
+        <translation>Mescla Moll/Sec</translation>
+    </message>
+    <message>
+        <source>W/D</source>
+        <translation>M/S</translation>
+    </message>
+    <message>
+        <source>Wet Level:</source>
+        <translation>Nivell de Moll:</translation>
+    </message>
+    <message>
+        <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
+        <translation>La roda Moll/Sec indica la proporció entre el senyal d&apos;entrada i l&apos;efecte que es mostra a la sortida.</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Decaïment</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Temps:</translation>
+    </message>
+    <message>
+        <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
+        <translation>La roda Decaïment controla quants períodes de silenci han de passar abans de que el connector aturi el processament. Valors més petits reduiran la càrrega de CPU, però augmenten el risc de tallar la cua als efectes de retard.</translation>
+    </message>
+    <message>
+        <source>Gate</source>
+        <translation>Porta</translation>
+    </message>
+    <message>
+        <source>Gate:</source>
+        <translation>Porta:</translation>
+    </message>
+    <message>
+        <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
+        <translation>La roda Porta controla el nivell de senyal que és considerat &apos;silenci&apos; mentre decideix quan aturar de processar senyals.</translation>
+    </message>
+    <message>
+        <source>Controls</source>
+        <translation>Controls</translation>
+    </message>
+    <message>
+        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
+
+The On/Off switch allows you to bypass a given plugin at any point in time.
+
+The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for one stage is the output from the previous stage, so the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
+
+The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the signal has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
+
+The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
+
+The Controls button opens a dialog for editing the effect&apos;s parameters.
+
+Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
+        <translation>Els connectors d&apos;efecte funcionen com una sèrie encadenada d&apos;efectes on el senyal serà processat de dalt a baix.
+El commutador Encès/Apagat et permet evitar un connector determinat en qualsevol moment.
+La roda Moll/Sec controla el balanç entre el senyal d&apos;entrada i el resultant d&apos;aplicar l&apos;efecte. L&apos;entrada d&apos;una etapa és la sortida de l&apos;etapa anterior, així que el senyal &apos;sec&apos; per a efectes inferiors a la cadena conté tots els efectes previs.
+La roda Decaïment controla quant de temps el senyal continuarà sent processat després d&apos;haver alliberat les notes. L&apos;efecte aturarà de processar senyals quan el senyal hagi caigut sota un llindar determinat per a una durada donada. Aquesta roda estableix la &apos;durada donada&apos;. Temps més llargs requeriran més CPU, així que aquest número hauria de ser baix per a la majoria d&apos;efectes. Necessita augmentar-se per a efectes que produeixen períodes perllongats de silenci, p.e. retards.
+La roda Porta controla el &apos;llindar determinat&apos; per a l&apos;aturada de l&apos;efecte. El rellotge per a la &apos;durada donada&apos; començarà així que el nivell del senyal processat caigui sota el nivell especificat amb aquesta roda.
+El botó Controls obre un diàleg per a editar els paràmetres de l&apos;efecte.
+Un clic dret mostrarà un menú contextual on podràs canviar l&apos;ordre en el qual els efectes són processats o esborrar un efecte.</translation>
+    </message>
+    <message>
+        <source>Move &amp;up</source>
+        <translation>Mou a&amp;munt</translation>
+    </message>
+    <message>
+        <source>Move &amp;down</source>
+        <translation>Mou a&amp;vall</translation>
+    </message>
+    <message>
+        <source>&amp;Remove this plugin</source>
+        <translation>&amp;Treu aquest connector</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Ajuda</translation>
+    </message>
+</context>
+<context>
+    <name>remoteVSTPlugin</name>
+    <message>
+        <source>Loading plugin</source>
+        <translation>Carregant connector</translation>
+    </message>
+    <message>
+        <source>Please wait while loading VST-plugin...</source>
+        <translation>Per favor, espera mentre es carrega el connector VST...</translation>
+    </message>
+    <message>
+        <source>Failed loading VST-plugin</source>
+        <translation>Ha fallat la càrrega del connector VST</translation>
+    </message>
+    <message>
+        <source>The VST-plugin %1 could not be loaded for some reason.
+If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation>El connector VST %1 no s&apos;ha pogut carregar per alguna raó.
+Si funciona amb altre programari VST sota Linux, per favor contacta amb un desenvolupador de LMMS!</translation>
+    </message>
+</context>
+<context>
     <name>renameDialog</name>
     <message>
         <source>Rename...</source>
@@ -2423,12 +3269,16 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Obre fitxer d&apos;àudio</translation>
     </message>
     <message>
-        <source>All Audio-Files (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation>Tots els Fitxers d&apos;Àudio (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
-    <message>
         <source>FLAC-Files (*.flac)</source>
         <translation>Fitxers FLAC (*.flac)</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>Tots els Fitxers d&apos;Àudio (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>SPEEX-Files (*.spx)</source>
+        <translation>Fitxers SPEEX (*.spx)</translation>
     </message>
 </context>
 <context>
@@ -2608,6 +3458,40 @@ Latència: %2 ms</translation>
     <message>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
         <translation>Aquí pots seleccionar la teva interfície MIDI preferida. Depenent de la configuració del teu sistema durant el temps de compilació, pots escollir entre ALSA, OSS i més. Abaix pots veure una caixa amb controls per a configurar la interfície MIDI seleccionada.</translation>
+    </message>
+    <message>
+        <source>Do not compress project files per default</source>
+        <translation>No comprimeixis per defecte els fitxers de projecte</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin directories</source>
+        <translation>Directoris de connectors LADSPA</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation>Directori d&apos;ones crues STK</translation>
+    </message>
+    <message>
+        <source>SMP support</source>
+        <translation>Suport SMP</translation>
+    </message>
+    <message>
+        <source>Parallelizing level</source>
+        <translation>Nivell de paral·lelització</translation>
+    </message>
+    <message>
+        <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
+Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
+        <translation>Si tens una màquina amb més d&apos;un processador (p.e. sistemes amb nucli dual) hauries d&apos;usar un nivell de paral·lelització més gran que 1, que vol dir que LMMS tractarà de dividir el processament de so en varis fils que haurien d&apos;executar-se en varis nuclis pel sistema operatiu subjacent.
+Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de petit tamany. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar el tamany de la memòria intermèdia.</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation>Escull un directori de connectors LADSPA</translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation>Escull el directori d&apos;ones crues STK</translation>
     </message>
 </context>
 <context>
@@ -2934,6 +3818,14 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
+    <message>
+        <source>Custom...</source>
+        <translation>Personalitzat...</translation>
+    </message>
+    <message>
+        <source>Custom </source>
+        <translation>Personalitzat </translation>
+    </message>
 </context>
 <context>
     <name>timeLine</name>
@@ -3091,6 +3983,14 @@ clic dret = apaga totes les altres pistes (solo)</translation>
     <message>
         <source>Mute</source>
         <translation>Apaga</translation>
+    </message>
+    <message>
+        <source>Enable automation</source>
+        <translation>Habilita automatització</translation>
+    </message>
+    <message>
+        <source>Disable automation</source>
+        <translation>Inhabilita automatització</translation>
     </message>
 </context>
 <context>

@@ -1,7 +1,7 @@
 /*
  * midi_oss.h - OSS-raw-midi-client
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,8 @@ public:
 
 	inline static QString name( void )
 	{
-		return( setupWidget::tr( "OSS Raw-MIDI (Open Sound System)" ) );
+		return( QT_TRANSLATE_NOOP( "setupWidget",
+			"OSS Raw-MIDI (Open Sound System)" ) );
 	}
 
 

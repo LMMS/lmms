@@ -345,7 +345,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	wave_knob->setRange( 0.0f, 5.0f, 1.0f );   // Originally [0,1.0]
 	wave_knob->setInitValue( 0.0f );
 	wave_knob->move( 120, 75 );
-	wave_knob->setHintText( tr( "EAVE:" ) + " ", "" );
+	wave_knob->setHintText( tr( "WAVE:" ) + " ", "" );
     wave_knob->setLabel( tr( "WAVE"));
 
 
