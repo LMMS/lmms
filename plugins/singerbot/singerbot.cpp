@@ -247,9 +247,7 @@ void singerBot::createWave( notePlayHandle * _n )
 		return;
 	}
 
-	hdata->frequency = getInstrumentTrack()->frequency( _n )
-					/ ( eng()->getMixer()->sampleRate()
-							/ DEFAULT_SAMPLE_RATE );
+	hdata->frequency = getInstrumentTrack()->frequency( _n );
 	hdata->duration = _n->length() > 0 ?
 		_n->length() * 60.0f * BEATS_PER_TACT
 				/ 64.0f / eng()->getSongEditor()->getTempo() :

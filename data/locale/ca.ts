@@ -2032,7 +2032,7 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
     </message>
     <message>
         <source>SLIDE</source>
-        <translation>LLISCAMENT</translation>
+        <translation>LLISCA</translation>
     </message>
     <message>
         <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
@@ -2044,7 +2044,7 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
     </message>
     <message>
         <source>DETUNE</source>
-        <translation>DESAFINAMENT</translation>
+        <translation>DESAF</translation>
     </message>
     <message>
         <source>Distortion</source>
