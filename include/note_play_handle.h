@@ -207,6 +207,8 @@ public:
 		m_instrumentTrack->m_instrument->waitForWorkerThread();
 	}
 
+	void processMidiTime( const midiTime & _time );
+
 #if SINGERBOT_SUPPORT
 	int patternIndex( void )
 	{
@@ -250,7 +252,6 @@ private:
 
 
 private slots:
-	void processMidiTime( const midiTime & _time );
 	void updateFrequency( void );
 
 } ;

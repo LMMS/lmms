@@ -407,7 +407,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
-        <translation>Usa aquesta roda per a ajustar el temps d&apos;arpegi en milisegons. El temps d&apos;arpegi especifica la durada de cada nota de l&apos;arpegi.</translation>
+        <translation>Usa aquesta roda per a ajustar el temps d&apos;arpegi en mil·lisegons. El temps d&apos;arpegi especifica la durada de cada nota de l&apos;arpegi.</translation>
     </message>
     <message>
         <source>Arpeggio gate:</source>
@@ -738,7 +738,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Si piques aqui, els valors seleccionats seran tallats cap al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
+        <translation>Si piques aquí, els valors seleccionats seran tallats cap al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
         <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
@@ -746,7 +746,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
-        <translation>Si piques aqui, els valors del portapapers seran enganxats al primer compàs visible.</translation>
+        <translation>Si piques aquí, els valors del portapapers seran enganxats al primer compàs visible.</translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
@@ -790,7 +790,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
+        <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
@@ -798,7 +798,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
+        <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
 </context>
 <context>
@@ -1038,7 +1038,7 @@ Es mostrarà l&apos;assistent per a reconfigurar LMMS.</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation>&lt; &amp;Enrera</translation>
+        <translation>&lt; &amp;Enrere</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
@@ -1383,15 +1383,15 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
     </message>
     <message>
         <source>Q/Resonance:</source>
-        <translation>Q/Resonància:</translation>
+        <translation>Q/Ressonància:</translation>
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter, how much it should amplify frequencies near Cutoff-frequency.</source>
-        <translation>Usa aquesta roda per a ajustar la Q/Resonància per al filtre seleccionat. Q/Resonància diu al filtre quant ha d&apos;amplificar les freqüències a prop de la freqüència de tall.</translation>
+        <translation>Usa aquesta roda per a ajustar la Q/Ressonància per al filtre seleccionat. Q/Ressonància diu al filtre quant ha d&apos;amplificar les freqüències a prop de la freqüència de tall.</translation>
     </message>
     <message>
         <source>Q/Resonance</source>
-        <translation>Q/Resonància</translation>
+        <translation>Q/Ressonància</translation>
     </message>
     <message>
         <source>2x LowPass</source>
@@ -1419,7 +1419,7 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
     </message>
     <message>
         <source>Q/RESO</source>
-        <translation>Q/RESO</translation>
+        <translation>Q/RESSO</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -1972,11 +1972,11 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
     </message>
     <message>
         <source>VCF Resonance</source>
-        <translation>Resonància VCF</translation>
+        <translation>Ressonància VCF</translation>
     </message>
     <message>
         <source>Resonance:</source>
-        <translation>Resonància:</translation>
+        <translation>Ressonància:</translation>
     </message>
     <message>
         <source>RES</source>
@@ -2311,7 +2311,7 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
     <message>
         <source>Currently there&apos;s no help available in LMMS.
 Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
-        <translation>Actualment no hi ha ajuda diponible a LMMS.
+        <translation>Actualment no hi ha ajuda disponible a LMMS.
 Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</translation>
     </message>
     <message>
@@ -2786,7 +2786,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>If you click here, selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Si piques aqui, les notes seleccionades seran tallades cap al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
+        <translation>Si piques aquí, les notes seleccionades seran tallades cap al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
         <source>If you click here, selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
@@ -2794,7 +2794,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>If you click here, the notes from the clipboard will be pasted at the first visible tact.</source>
-        <translation>Si piques aqui, les notes del portapapers seran enganxades al primer compàs visible.</translation>
+        <translation>Si piques aquí, les notes del portapapers seran enganxades al primer compàs visible.</translation>
     </message>
     <message>
         <source>Paste notes from clipboard (Ctrl+V)</source>
@@ -2870,7 +2870,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notas soltes. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
+        <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notes soltes. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
@@ -2878,7 +2878,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>Si piques aqui, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
+        <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
 </context>
 <context>
@@ -2992,6 +2992,141 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     <message>
         <source>Tool for live performance</source>
         <translation>Eina per a actuació en directe</translation>
+    </message>
+    <message>
+        <source>Incomplete polyphonic immitation tb303</source>
+        <translation>Imitació polifònica incompleta tb303</translation>
+    </message>
+</context>
+<context>
+    <name>polyb302Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation>Freqüència de Tall VCF</translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation>Freq Tall:</translation>
+    </message>
+    <message>
+        <source>CUT</source>
+        <translation>TALL</translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation>Ressonància VCF</translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation>Ressonància:</translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation>RES</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation>Mod Envoltant VCF</translation>
+    </message>
+    <message>
+        <source>Env Mod:</source>
+        <translation>Mod Env:</translation>
+    </message>
+    <message>
+        <source>ENV MOD</source>
+        <translation>MOD ENV</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation>Decaïment Envoltant VCF</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Decaïment:</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation>DEC</translation>
+    </message>
+    <message>
+        <source>Slide</source>
+        <translation>Lliscament</translation>
+    </message>
+    <message>
+        <source>303-es-que, 24dB/octave, 3 pole filter</source>
+        <translation>303-es-que, 24dB/octava, filtre 3 pols</translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation>Decaïment de Lliscament</translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation>Decaïment de Lliscament:</translation>
+    </message>
+    <message>
+        <source>SLIDE</source>
+        <translation>LLISCA</translation>
+    </message>
+    <message>
+        <source>VCO fine detuning</source>
+        <translation>Desafinament fi VCO</translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation>Desafinament Fi VCO:</translation>
+    </message>
+    <message>
+        <source>DETUNE</source>
+        <translation>DESAF</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Distorsió</translation>
+    </message>
+    <message>
+        <source>DIST:</source>
+        <translation>DIST:</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>DIST</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation>Forma d&apos;ona</translation>
+    </message>
+    <message>
+        <source>WAVE:</source>
+        <translation>ONA:</translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation>ONA</translation>
+    </message>
+    <message>
+        <source>Sawtooth </source>
+        <translation>Dent de serra </translation>
+    </message>
+    <message>
+        <source>Inverted Sawtooth </source>
+        <translation>Dent de serra invertida </translation>
+    </message>
+    <message>
+        <source>Triangle </source>
+        <translation>Triangular </translation>
+    </message>
+    <message>
+        <source>Square </source>
+        <translation>Quadrada </translation>
+    </message>
+    <message>
+        <source>Rounded Square </source>
+        <translation>Quadrada Arrodonida </translation>
+    </message>
+    <message>
+        <source>Moog </source>
+        <translation>Moog </translation>
     </message>
 </context>
 <context>
@@ -3125,7 +3260,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation>Encèn o apaga l&apos;efecte.</translation>
+        <translation>Encén o apaga l&apos;efecte.</translation>
     </message>
     <message>
         <source>Wet/Dry mix</source>
@@ -3433,7 +3568,7 @@ Latència: %2 ms</translation>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation>Aquí pots configurar el tamany de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
+        <translation>Aquí pots configurar la grandària de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
@@ -3483,7 +3618,7 @@ Latència: %2 ms</translation>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation>Si tens una màquina amb més d&apos;un processador (p.e. sistemes amb nucli dual) hauries d&apos;usar un nivell de paral·lelització més gran que 1, que vol dir que LMMS tractarà de dividir el processament de so en varis fils que haurien d&apos;executar-se en varis nuclis pel sistema operatiu subjacent.
-Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de petit tamany. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar el tamany de la memòria intermèdia.</translation>
+Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de grandària petita. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar la grandària de la memòria intermèdia.</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
@@ -4277,7 +4412,7 @@ El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation>La roda &apos;S&apos; ajusta la rigidesa de la corda seleccionada. La rigidesa de la corda afecta el temps que la corda resonarà. Quan més baix el valor, més temps sonarà la corda.</translation>
+        <translation>La roda &apos;S&apos; ajusta la rigidesa de la corda seleccionada. La rigidesa de la corda afecta el temps que la corda ressonarà. Quan més baix el valor, més temps sonarà la corda.</translation>
     </message>
     <message>
         <source>Pick position</source>

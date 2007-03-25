@@ -972,7 +972,13 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		bb_track = NULL;
 		sendMidiTime( _start );
 	}
-	emit sentMidiTime( _start );
+
+	// Handle automation: detuning
+	for( vlist<notePlayHandle *>::iterator it = m_processHandles.begin();
+					it != m_processHandles.end(); ++it )
+	{
+		( *it )->processMidiTime( _start );
+	}
 
 	if ( tcos.size() == 0 )
 	{
@@ -1349,6 +1355,7 @@ void instrumentTrack::invalidateAllMyNPH( void )
 	m_notesMutex.unlock();
 
 	// invalidate all note-play-handles linked to this channel
+	m_processHandles.clear();
 	eng()->getMixer()->checkValidityOfPlayHandles();
 
 	m_trackType = INSTRUMENT_TRACK;

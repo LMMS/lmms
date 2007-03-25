@@ -66,11 +66,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	setDetuning( _n.detuning() );
 	if( detuning() )
 	{
-		connect( m_instrumentTrack,
-				SIGNAL( sentMidiTime( const midiTime & ) ),
-				this,
-				SLOT( processMidiTime( const midiTime & ) ) );
 		processMidiTime( pos() );
+		m_instrumentTrack->m_processHandles.push_back( this );
 		connect( detuning(), SIGNAL( valueChanged( float ) ),
 					this, SLOT( updateFrequency() ) );
 	}
@@ -106,9 +103,16 @@ notePlayHandle::~notePlayHandle()
 		noteOff( 0 );
 	}
 
-	if( m_instrumentTrack != NULL && m_pluginData != NULL )
+	if( m_instrumentTrack != NULL )
 	{
-		m_instrumentTrack->deleteNotePluginData( this );
+		if( detuning() )
+		{
+			m_instrumentTrack->m_processHandles.remove( this );
+		}
+		if( m_pluginData != NULL )
+		{
+			m_instrumentTrack->deleteNotePluginData( this );
+		}
 	}
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();

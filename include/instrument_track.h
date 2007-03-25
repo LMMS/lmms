@@ -189,7 +189,7 @@ public slots:
 
 signals:
 	void baseNoteChanged( void );
-	void sentMidiTime( const midiTime & _time );
+	void noteDone( const note & _n );
 
 
 protected:
@@ -231,6 +231,8 @@ private:
 
 	tones m_baseTone;
 	octaves m_baseOctave;
+
+	vlist<notePlayHandle *> m_processHandles;
 
 
 	// widgets on the top of a instrument-track-window
@@ -275,10 +277,6 @@ private:
 	// base-tone stuff
 	void FASTCALL setBaseTone( tones _new_tone );
 	void FASTCALL setBaseOctave( octaves _new_octave );
-
-
-signals:
-	void noteDone( const note & _n );
 
 } ;
 

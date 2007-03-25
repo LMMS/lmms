@@ -26,6 +26,7 @@ SUBDIRS =			\
 	midi_import		\
 	organic			\
 	plucked_string_synth	\
+	polyb302		\
 	$(SINGERBOT_DIR)	\
 	$(STK_DIR)		\
 	triple_oscillator	\

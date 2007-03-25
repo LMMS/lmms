@@ -1,3 +1,27 @@
+2007-03-25	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/polyb302/artwork.png:
+	* plugins/polyb302/logo.png:
+	* plugins/polyb302/Makefile.am:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	initial release, polyphonic version of lb302 plugin
+
+	* include/instrument_track.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	trigger detuning without signals
+
+	* configure.in:
+	fixed singerbot error
+
+	* include/knob.h:
+	arranged private/protected members
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-03-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/singerbot/singerbot.cpp:

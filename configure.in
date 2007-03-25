@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070307, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070307)
+AC_INIT(lmms, 0.2.1-svn20070325, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070325)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -359,9 +359,9 @@ if test ! -z "$HAVE_SAMPLERATE_H" ; then
 	if test ! -z "$FESTIVAL_SUPPORT" ; then
 		AC_DEFINE(SINGERBOT_SUPPORT)
 	fi
-	AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
 	AC_LANG_POP(C++)
 fi
+AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
 
 
 # libsndfile-stuff
@@ -590,6 +590,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/live_tool/Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
+		 plugins/polyb302/Makefile
 		 plugins/plucked_string_synth/Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile

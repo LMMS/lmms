@@ -104,6 +104,19 @@ signals:
 
 
 protected:
+	static float s_copiedValue;
+	static textFloat * s_textFloat;
+
+	float m_mouseOffset;
+	QPoint m_origMousePos;
+	bool m_buttonPressed;
+
+	QPixmap * m_knobPixmap;
+	QString m_hintTextBeforeValue;
+	QString m_hintTextAfterValue;
+
+	float m_initValue;
+
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
@@ -118,45 +131,24 @@ protected:
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 
-
-// TODO: Need to figure out what is really used by tempoSyncKnob
-// to get the private/protected attributes sorted out.  Right
-// now, just make everything protected.
-//private:
-	void layoutKnob( bool _update = TRUE );
 	float getValue( const QPoint & _p );
+
+
+private:
+	void layoutKnob( bool _update = TRUE );
 	void recalcAngle( void );
     
 	void valueChange( void );
 	void rangeChange( void );
 
-
 	void buttonReleased( void );
-
-
-
-	static float s_copiedValue;
-	static textFloat * s_textFloat;
-
-
-	float m_mouseOffset;
-	QPoint m_origMousePos;
-	bool m_buttonPressed;
-
 
 	float m_pageSize;
 	float m_angle;
 	float m_totalAngle;
 
-
-	QPixmap * m_knobPixmap;
 	int m_knobNum;
-	QString m_hintTextBeforeValue;
-	QString m_hintTextAfterValue;
 	QString m_label;
-
-
-	float m_initValue;
 
 } ;
 
