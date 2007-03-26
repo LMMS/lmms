@@ -62,8 +62,8 @@ if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
 	fi	
 fi
 
-CFLAGS="$CFLAGS $DEFAULTFLAGS "
-CXXFLAGS="$CXXFLAGS $DEFAULTFLAGS"
+CFLAGS="$DEFAULTFLAGS $CFLAGS"
+CXXFLAGS="$DEFAULTFLAGS $CXXFLAGS"
 
 AC_PATH_XTRA
 gw_CHECK_QT
