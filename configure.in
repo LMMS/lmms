@@ -24,9 +24,9 @@ fi
 AH_TEMPLATE(BUILD_LINUX, [Build LMMS for Linux])
 AH_TEMPLATE(BUILD_WIN32, [Build LMMS for Win32])
 AC_ARG_WITH(linux,
-	[  --with-linux		explicit build iTALC for Linux], [ build_linux=true ], [ build_linux=false ])
+	[  --with-linux		explicit build LMMS for Linux], [ build_linux=true ], [ build_linux=false ])
 AC_ARG_WITH(win32,
-	[  --with-win32		explicit build iTALC for Win32], [ build_win32=true ], [ build_win32=false ])
+	[  --with-win32		explicit build LMMS for Win32], [ build_win32=true ], [ build_win32=false ])
 AC_MSG_CHECKING([platform to build for])
 if test "x$build_win32" = "xtrue" ; then
 	AC_MSG_RESULT([Win32, will enable support for it])
@@ -62,8 +62,8 @@ if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
 	fi	
 fi
 
-CFLAGS="$DEFAULTFLAGS $CFLAGS"
-CXXFLAGS="$DEFAULTFLAGS $CXXFLAGS"
+CFLAGS="$CFLAGS $DEFAULTFLAGS "
+CXXFLAGS="$CXXFLAGS $DEFAULTFLAGS"
 
 AC_PATH_XTRA
 gw_CHECK_QT
