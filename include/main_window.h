@@ -1,7 +1,7 @@
 /*
  * main_window.h - declaration of class mainWindow, the main window of LMMS
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -169,11 +169,14 @@ private:
 	QMenu * m_tools_menu;
 	vlist<tool *> m_tools;
 
+	bool have_www_browser( void );
+
 
 	friend class engine;
 
 
 private slots:
+	void browseHelp( void );
 	void fillTemplatesMenu( void );
 	void showTool( int _idx );
 

@@ -208,6 +208,7 @@ public:
 	}
 
 	void processMidiTime( const midiTime & _time );
+	void resize( const bpm_t _new_bpm );
 
 #if SINGERBOT_SUPPORT
 	int patternIndex( void )
@@ -249,6 +250,10 @@ private:
 #if SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif
+
+	// tempo reaction
+	bpm_t m_orig_bpm;		// original bpm
+	f_cnt_t m_orig_frames;		// original m_frames
 
 
 private slots:

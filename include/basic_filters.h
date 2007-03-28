@@ -4,7 +4,7 @@
  * original file by ??? 
  * modified and enhanced by Tobias Doerffel
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -115,14 +115,22 @@ public:
 
 				// four cascaded onepole filters
 				// (bilinear transform)
-				m_y1[_chnl] = x*m_p + m_oldx[_chnl]*m_p -
-								m_k*m_y1[_chnl];
-				m_y2[_chnl] = m_y1[_chnl]*m_p+m_oldy1[_chnl]*
-							m_p - m_k*m_y2[_chnl];
-				m_y3[_chnl] = m_y2[_chnl]*m_p+m_oldy2[_chnl]*
-							m_p - m_k*m_y3[_chnl];
-				m_y4[_chnl] = m_y3[_chnl]*m_p+m_oldy3[_chnl]*
-							m_p - m_k*m_y4[_chnl];
+				m_y1[_chnl] = tLimit(
+					x*m_p + m_oldx[_chnl]*m_p -
+								m_k*m_y1[_chnl],
+								-10.0f, 10.0f );
+				m_y2[_chnl] = tLimit(
+					m_y1[_chnl]*m_p+m_oldy1[_chnl]*
+							m_p - m_k*m_y2[_chnl],
+								-10.0f, 10.0f );
+				m_y3[_chnl] = tLimit(
+					m_y2[_chnl]*m_p+m_oldy2[_chnl]*
+							m_p - m_k*m_y3[_chnl],
+								-10.0f, 10.0f );
+				m_y4[_chnl] = tLimit(
+					m_y3[_chnl]*m_p+m_oldy3[_chnl]*
+							m_p - m_k*m_y4[_chnl],
+								-10.0f, 10.0f );
 
 				m_oldx[_chnl] = x;
 				m_oldy1[_chnl] = m_y1[_chnl];

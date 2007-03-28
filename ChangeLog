@@ -1,3 +1,32 @@
+2007-03-28	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/mixer.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/song_editor.cpp:
+	fixed notes with dynamic tempo
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	added online help
+
+	* include/file_browser.h:
+	* src/core/file_browser.cpp:
+	- filter directories without relevant content
+	- simplified entry retrieval
+
+	* include/basic_filters.h:
+	limit Moog instability
+
+	* src/core/main.cpp:
+	updated year
+
+	* src/widgets/knob.cpp:
+	initialize members according to last arrangement
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-03-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

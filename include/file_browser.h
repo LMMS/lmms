@@ -1,7 +1,7 @@
 /*
  * file_browser.h - include file for fileBrowser
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -67,6 +67,9 @@ public:
 			const QString & _title, const QPixmap & _pm,
 					QWidget * _parent, engine * _engine );
 	virtual ~fileBrowser();
+
+	static bool isDirWithContent( const QString & _path,
+						const QString & _filter );
 
 
 public slots:

@@ -4,7 +4,7 @@
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -160,7 +160,7 @@ void fileBrowser::reloadTree( void )
 void fileBrowser::addItems( const QString & _path )
 {
 	QDir cdir( _path );
-	QStringList files = cdir.entryList( QDir::NoFilter, QDir::Name );
+	QStringList files = cdir.entryList( QDir::Files, QDir::Name );
 
 	// TODO: after dropping qt3-support we can use QStringList's iterator
 	// which makes it possible to travel through the list in reverse
@@ -169,9 +169,7 @@ void fileBrowser::addItems( const QString & _path )
 	for( csize i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
-		if( cur_file[0] != '.' &&
-			QFileInfo( _path + QDir::separator() +
-						cur_file ).isDir() == FALSE
+		if( cur_file[0] != '.'
 #ifdef QT4
 // TBD
 #else
@@ -185,12 +183,13 @@ void fileBrowser::addItems( const QString & _path )
 		}
 	}
 
+	files = cdir.entryList( QDir::Dirs, QDir::Name );
 	for( csize i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
-			QFileInfo( _path + QDir::separator() +
-							cur_file ).isDir() )
+			isDirWithContent( _path + QDir::separator() + cur_file,
+								m_filter ) )
 		{
 			QListViewItem * item = m_l->findItem( cur_file, 0 );
 			if( item == NULL )
@@ -205,6 +204,44 @@ void fileBrowser::addItems( const QString & _path )
 			}
 		}
 	}
+}
+
+
+
+
+bool fileBrowser::isDirWithContent( const QString & _path,
+						const QString & _filter )
+{
+	QDir cdir( _path );
+	QStringList files = cdir.entryList( QDir::Files, QDir::Unsorted );
+	for( QStringList::iterator it = files.begin(); it != files.end(); ++it )
+	{
+		QString cur_file = *it;
+		if( cur_file[0] != '.'
+#ifdef QT4
+// TBD
+#else
+			&& QDir::match( _filter, cur_file.lower() )
+#endif
+	)
+		{
+			return( TRUE );
+		}
+	}
+
+	files = cdir.entryList( QDir::Dirs, QDir::Unsorted );
+	for( QStringList::iterator it = files.begin(); it != files.end(); ++it )
+	{
+		QString cur_file = *it;
+		if( cur_file[0] != '.' &&
+			isDirWithContent( _path + QDir::separator() + cur_file,
+								_filter ) )
+		{
+			return( TRUE );
+		}
+	}
+
+	return( FALSE );
 }
 
 
@@ -740,41 +777,34 @@ bool directory::addItems( const QString & _path )
 
 	bool added_something = FALSE;
 
-	QStringList files = thisDir.entryList( QDir::NoFilter, QDir::Name );
+	QStringList files = thisDir.entryList( QDir::Files, QDir::Name );
 	for( csize i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
+		if( cur_file[0] != '.'
 #ifdef QT4
-		if( cur_file[0] != '.' && !QFileInfo(
-				thisDir.absolutePath() + QDir::separator() +
-						cur_file ).isDir() &&
-			thisDir.match( m_filter, cur_file.toLower() )
-			/*QDir::match( FILE_FILTER, cur_file )*/ )
+				&& thisDir.match( m_filter, cur_file.toLower() )
 #else
-		if( cur_file[0] != '.' && !QFileInfo(
-					thisDir.absPath() + QDir::separator() +
-						cur_file ).isDir() &&
-			thisDir.match( m_filter, cur_file.lower() )
-			/*QDir::match( FILE_FILTER, cur_file )*/ )
+				&& thisDir.match( m_filter, cur_file.lower() )
 #endif
+			/*QDir::match( FILE_FILTER, cur_file )*/ )
 		{
 			(void) new fileItem( this, cur_file, _path );
 			added_something = TRUE;
 		}
 	}
 
+	files = thisDir.entryList( QDir::Dirs, QDir::Name );
 	for( csize i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
+		if( cur_file[0] != '.' && fileBrowser::isDirWithContent(
 #ifdef QT4
-		if( cur_file[0] != '.' && QFileInfo(
 				thisDir.absolutePath() + QDir::separator() +
-						cur_file ).isDir() )
 #else
-		if( cur_file[0] != '.' && QFileInfo(
 					thisDir.absPath() + QDir::separator() +
-						cur_file ).isDir() )
 #endif
+							cur_file, m_filter ) )
 		{
 			new directory( this, cur_file, _path, m_filter );
 			added_something = TRUE;

@@ -1,7 +1,7 @@
 /*
  * mixer.h - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -178,6 +178,11 @@ public:
 	}
 
 	inline const playHandleVector & playHandles( void ) const
+	{
+		return( m_playHandles );
+	}
+
+	inline playHandleVector & playHandles( void )
 	{
 		return( m_playHandles );
 	}

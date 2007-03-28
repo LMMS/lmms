@@ -58,10 +58,11 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_baseNote( TRUE  ),
 	m_arpNote( _arp_note ),
 	m_muted( FALSE ),
-	m_bbTrack( NULL )
+	m_bbTrack( NULL ),
 #if SINGERBOT_SUPPORT
-	, m_patternIndex( 0 )
+	m_patternIndex( 0 ),
 #endif
+	m_orig_bpm( _it->eng()->getSongEditor()->getTempo() )
 {
 	setDetuning( _n.detuning() );
 	if( detuning() )
@@ -320,6 +321,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 	{
 		m_frames = m_instrumentTrack->beatLen( this );
 	}
+	m_orig_frames = m_frames;
 }
 
 
@@ -432,6 +434,23 @@ void notePlayHandle::updateFrequency( void )
 void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	detuning()->getAutomationPattern()->processMidiTime( _time - pos() );
+}
+
+
+
+
+void notePlayHandle::resize( const bpm_t _new_bpm )
+{
+	double completed = m_totalFramesPlayed / (double)m_frames;
+	double new_frames = m_orig_frames * m_orig_bpm / (double)_new_bpm;
+	m_frames = (f_cnt_t)new_frames;
+	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
+
+	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+						it != m_subNotes.end(); ++it )
+	{
+		( *it )->resize( _new_bpm );
+	}
 }
 
 

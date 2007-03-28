@@ -2338,6 +2338,15 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
     </message>
+    <message>
+        <source>Online help</source>
+        <translation>Ajuda en línia</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <comment>doku.php id</comment>
+        <translation>start</translation>
+    </message>
 </context>
 <context>
     <name>mallets</name>

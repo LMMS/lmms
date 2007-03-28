@@ -3,7 +3,7 @@
 /*
  * song_editor.cpp - basic window for editing song
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,6 +79,7 @@
 #include "instrument_track.h"
 #include "mmp.h"
 #include "midi_client.h"
+#include "note_play_handle.h"
 #include "timeline.h"
 #include "pattern.h"
 #include "piano_roll.h"
@@ -755,6 +756,17 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 void songEditor::setTempo( int _new_bpm )
 {
+	playHandleVector & phv = eng()->getMixer()->playHandles();
+	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
+									++it )
+	{
+		notePlayHandle * nph = dynamic_cast<notePlayHandle *>( *it );
+		if( nph && !nph->released() )
+		{
+			nph->resize( _new_bpm );
+		}
+	}
+
 	m_bpmSpinBox->setInitValue( _new_bpm );
 	eng()->updateFramesPerTact64th();
 	emit tempoChanged( _new_bpm );

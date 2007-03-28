@@ -3,7 +3,7 @@
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -550,8 +550,18 @@ void mainWindow::finalize( void )
 #else
 	menuBar()->insertItem( tr( "&Help" ), help_menu );
 #endif
-	help_menu->addAction( embed::getIconPixmap( "help" ), tr( "Help" ),
+	if( have_www_browser() )
+	{
+		help_menu->addAction( embed::getIconPixmap( "help" ),
+						tr( "Online help" ),
+						this, SLOT( browseHelp() ) );
+	}
+	else
+	{
+		help_menu->addAction( embed::getIconPixmap( "help" ),
+							tr( "Help" ),
 							this, SLOT( help() ) );
+	}
 	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ) );
@@ -1084,6 +1094,41 @@ void mainWindow::showTool( int _idx )
 	tool * t = m_tools[m_tools_menu->indexOf( _idx )];
 	t->show();
 	t->setFocus();
+}
+
+
+
+
+bool mainWindow::have_www_browser( void )
+{
+	int ret = system( "which x-www-browser > /dev/null" );
+	return( WIFEXITED( ret ) && WEXITSTATUS( ret ) == EXIT_SUCCESS );
+}
+
+
+
+
+void mainWindow::browseHelp( void )
+{
+	pid_t pid = fork();
+	if( pid == -1 )
+	{
+		perror( "fork" );
+	}
+	else if( pid == 0 )
+	{
+		QString url = "http://wiki.mindrules.net/doku.php?id="
+						+ tr( "start", "doku.php id" );
+		execlp( "x-www-browser", "x-www-browser", url.
+#ifdef QT4
+							toAscii().constData(),
+#else
+							ascii(),
+#endif
+									NULL );
+		perror( "execlp" );
+		exit( EXIT_FAILURE );
+	}
 }
 
 

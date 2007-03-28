@@ -6,7 +6,7 @@
  * This file is partly based on the knob-widget of the Qwt Widget Library by
  * Josef Wilgen.
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -95,12 +95,12 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	autoObj( _engine, _track ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
-	m_angle( 0.0f ),
-	m_knobNum( _knob_num ),
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
-	m_label( "" ),
-	m_initValue( 0.0f )
+	m_initValue( 0.0f ),
+	m_angle( 0.0f ),
+	m_knobNum( _knob_num ),
+	m_label( "" )
 {
 	if( s_textFloat == NULL )
 	{
