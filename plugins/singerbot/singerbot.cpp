@@ -147,7 +147,9 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 	sampleBuffer * sample_buffer = hdata->remaining_frames ?
 			readWave( hdata ) : new sampleBuffer( NULL, 0, eng() );
 
-	if( sample_buffer->play( buf, 0, frames ) )
+	sampleBuffer::handleState hstate;
+
+	if( sample_buffer->play( buf, &hstate, frames ) )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}

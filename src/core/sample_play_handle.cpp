@@ -3,7 +3,7 @@
 /*
  * sample_play_handle.cpp - implementation of class samplePlayHandle
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -144,7 +144,7 @@ void samplePlayHandle::play( const fpab_t _frame_base, bool )
 						, m_volume, m_volume
 #endif
 				} } ;
-		m_sampleBuffer->play( buf, m_frame, frames );
+		m_sampleBuffer->play( buf, &m_state, frames );
 		eng()->getMixer()->bufferToPort( buf, frames, _frame_base, v,
 								m_audioPort );
 

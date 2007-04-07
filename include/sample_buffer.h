@@ -70,6 +70,26 @@ public:
 		DOTS
 	} ;
 
+
+	class handleState
+	{
+	public:
+		handleState( bool _varying_pitch = FALSE );
+		virtual ~handleState();
+
+
+	private:
+		f_cnt_t m_frame_index;
+		const bool m_varying_pitch;
+#ifdef HAVE_SAMPLERATE_H
+		SRC_STATE * m_resampling_data;
+#endif
+
+		friend class sampleBuffer;
+
+	} ;
+
+
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
 	sampleBuffer( engine * _engine, const QString & _audio_file = "",
@@ -80,11 +100,10 @@ public:
 	
 	virtual ~sampleBuffer();
 
-	bool FASTCALL play( sampleFrame * _ab, const f_cnt_t _start_frame,
+	bool FASTCALL play( sampleFrame * _ab, handleState * _state,
 				const fpab_t _frames,
 				const float _freq = BASE_FREQ,
-				const bool _looped = FALSE,
-				void * * _resampling_data = NULL );
+				const bool _looped = FALSE );
 
 	void FASTCALL visualize( QPainter & _p, const QRect & _dr,
 					const QRect & _clip,
@@ -110,6 +129,16 @@ public:
 		return( m_endFrame );
 	}
 
+	void setLoopStartFrame( f_cnt_t _start )
+	{
+		m_loop_startFrame = _start;
+	}
+
+	void setLoopEndFrame( f_cnt_t _end )
+	{
+		m_loop_endFrame = _end;
+	}
+
 	inline f_cnt_t frames( void ) const
 	{
 		return( m_frames );
@@ -125,12 +154,20 @@ public:
 		return( m_reversed );
 	}
 
+	inline float frequency( void ) const
+	{
+		return( m_frequency );
+	}
+
+	inline void setFrequency( float _freq )
+	{
+		m_frequency = _freq;
+	}
+
 	inline const sampleFrame * data( void ) const
 	{
 		return( m_data );
 	}
-
-	static void FASTCALL deleteResamplingData( void * * _ptr );
 
 	QString openAudioFile( void ) const;
 
@@ -151,6 +188,9 @@ public:
 		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
 						_dst_sr, _buf->eng() ) );
 	}
+
+	void normalize_sample_rate( const sample_rate_t _src_sr,
+						bool _keep_settings = FALSE );
 
 	inline sample_t userWaveSample( const float _sample )
 	{
@@ -182,6 +222,9 @@ public:
 		m_dataMutex.unlock();
 	}
 
+	static QString tryToMakeRelative( const QString & _file );
+	static QString tryToMakeAbsolute( const QString & _file );
+
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
@@ -194,8 +237,6 @@ public slots:
 
 private:
 	void FASTCALL update( bool _keep_settings = FALSE );
-
-	static QString tryToMakeRelative( const QString & _file );
 
 
 #ifdef SDL_SDL_SOUND_H
@@ -224,19 +265,23 @@ private:
 	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
+	f_cnt_t m_loop_startFrame;
+	f_cnt_t m_loop_endFrame;
 	float m_amplification;
 	bool m_reversed;
+	float m_frequency;
 	QMutex m_dataMutex;
 
 #ifdef HAVE_SAMPLERATE_H
 	void initResampling( void );
-	void quitResampling( void );
-	SRC_STATE * createResamplingContext( void );
-	static void FASTCALL destroyResamplingContext( SRC_STATE * _context );
 
 	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
 #endif
+
+	sampleFrame * m_sample_fragment;
+	sampleFrame * getSampleFragment( f_cnt_t _start, f_cnt_t _frames,
+								bool _looped );
+	f_cnt_t getLoopedIndex( f_cnt_t _index );
 
 
 signals:

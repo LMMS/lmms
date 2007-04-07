@@ -1,6 +1,6 @@
 /*
- * polyb302.cpp - implementation of class polyb302 which is a bass synth
- *             attempting to emulate the Roland TB303 bass synth
+ * polyb302.cpp - implementation of instrument polyb302, an attempt to emulate
+ *                the Roland TB303 bass synth
  *
  * Copyright (c) 2006-2007 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
@@ -28,28 +28,12 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
-
 
 #include "polyb302.h"
-#include "audio_device.h"
-#include "instrument_track.h"
-#include "instrument_play_handle.h"
-#include "led_checkbox.h"
-#include "note_play_handle.h"
-#include "templates.h"
 #include "buffer_allocator.h"
 #include "knob.h"
+#include "led_checkbox.h"
+#include "note_play_handle.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"

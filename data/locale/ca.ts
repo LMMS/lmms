@@ -2704,6 +2704,45 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     </message>
 </context>
 <context>
+    <name>patmanSynth</name>
+    <message>
+        <source>Open other patch</source>
+        <translation>Obre altre pedaç</translation>
+    </message>
+    <message>
+        <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
+        <translation>Pica aquí per a obrir un altre fitxer pedaç. La configuració de Bucle i Afina no es reinicia.</translation>
+    </message>
+    <message>
+        <source>Loop mode</source>
+        <translation>Mode Bucle</translation>
+    </message>
+    <message>
+        <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
+        <translation>Aquí pots canviar el mode Bucle. Si és actiu, PatMan farà servir la informació de bucle disponible al fitxer.</translation>
+    </message>
+    <message>
+        <source>Tune mode</source>
+        <translation>Mode Afina</translation>
+    </message>
+    <message>
+        <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
+        <translation>Aquí pots canviar el mode Afina. Si és actiu, PatMan afinarà la mostra a la freqüència de la nota.</translation>
+    </message>
+    <message>
+        <source>No file selected</source>
+        <translation>Cap fitxer seleccionat</translation>
+    </message>
+    <message>
+        <source>Open patch file</source>
+        <translation>Obre fitxer pedaç</translation>
+    </message>
+    <message>
+        <source>Patch-Files (*.pat)</source>
+        <translation>Fitxers Pedaç (*.pat)</translation>
+    </message>
+</context>
+<context>
     <name>pattern</name>
     <message>
         <source>Change name</source>
@@ -3005,6 +3044,10 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     <message>
         <source>Incomplete polyphonic immitation tb303</source>
         <translation>Imitació polifònica incompleta tb303</translation>
+    </message>
+    <message>
+        <source>GUS-compatible patch instrument</source>
+        <translation>Instrument de pedaç compatible GUS</translation>
     </message>
 </context>
 <context>

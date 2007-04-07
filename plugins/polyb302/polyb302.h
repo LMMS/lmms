@@ -1,6 +1,6 @@
 /*
- * polyb302.h - declaration of class polyb302 which is a bass synth attempting
- *           to emulate the Roland TB303 bass synth
+ * polyb302.h - declaration of instrument polyb302, an attempt to emulate the
+ *              Roland TB303 bass synth
  *
  * Copyright (c) 2006-2007 Paul Giblock <pgib/at/users.sourceforge.net>
  * 

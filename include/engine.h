@@ -1,7 +1,7 @@
 /*
  * engine.h - engine-system of LMMS
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,16 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
+#ifdef QT4
+
+#include <QtCore/QMap>
+
+#else
+
+#include <qmap.h>
+
 #endif
 
 class automationEditor;
@@ -124,6 +134,11 @@ public:
 	}
 	void updateFramesPerTact64th( void );
 
+	const QMap<QString, QString> & sampleExtensions( void )
+	{
+		return( m_sample_extensions );
+	}
+
 
 private:
 	bool m_hasGUI;
@@ -141,7 +156,11 @@ private:
 #ifdef LADSPA_SUPPORT
 	ladspa2LMMS * m_ladspaManager;
 #endif
-	
+
+	QMap<QString, QString> m_sample_extensions;
+
+	void load_extensions( void );
+
 } ;
 
 

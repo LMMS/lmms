@@ -1,7 +1,7 @@
 /*
  * sample_play_handle.h - play-handle for playing a sample
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,12 +29,12 @@
 #include <qobject.h>
 
 #include "play_handle.h"
+#include "sample_buffer.h"
 #include "types.h"
 #include "engine.h"
 
 class bbTrack;
 class pattern;
-class sampleBuffer;
 class sampleTCO;
 class track;
 class audioPort;
@@ -79,6 +79,7 @@ private:
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;
+	sampleBuffer::handleState m_state;
 
 	audioPort * m_audioPort;
 	const bool m_ownAudioPort;

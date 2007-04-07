@@ -3,8 +3,8 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2005 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -88,6 +88,7 @@ pattern::pattern ( instrumentTrack * _instrument_track ) :
 	m_patternType( BEAT_PATTERN ),
 	m_name( _instrument_track->name() ),
 	m_steps( DEFAULT_STEPS_PER_TACT ),
+//TODO: check mutex
 	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
 	m_freezing( FALSE ),
@@ -394,21 +395,6 @@ void pattern::checkType( void )
 		++it;
 	}
 	setType( pattern::BEAT_PATTERN );
-}
-
-
-
-
-//TODO: remove this method, check mutex
-void pattern::playFrozenData( sampleFrame * _ab, const f_cnt_t _start_frame,
-							const fpab_t _frames )
-{
-	m_frozenPatternMutex.lock();
-	if( m_frozenPattern != NULL )
-	{
-		m_frozenPattern->play( _ab, _start_frame, _frames );
-	}
-	m_frozenPatternMutex.unlock();
 }
 
 

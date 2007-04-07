@@ -1,3 +1,68 @@
+2007-04-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/patman/artwork.png:
+	* plugins/patman/logo.png:
+	* plugins/patman/loop_off.png:
+	* plugins/patman/loop_on.png:
+	* plugins/patman/Makefile.am:
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/patman/tune_off.png:
+	* plugins/patman/tune_on.png:
+	initial release, PatMan instrument plugin
+
+	* include/sample_buffer.h:
+	* src/lib/sample_buffer.cpp:
+	- added start/end loop points, different from start/end sample points
+	- added sample frequency
+	- reworked resampling, fixes resampling underruns/clicks
+	- reused try-to-make-relative and try-to-make-absolute file handling
+	- reused samplerate conversion
+
+	* include/sample_buffer.h:
+	* include/sample_play_handle.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/singerbot/singerbot.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/lib/sample_buffer.cpp:
+	added per handle state
+
+	* include/engine.h:
+	* include/file_browser.h:
+	* include/plugin.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* src/core/engine.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/main_window.cpp:
+	modularized sample extensions
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	- check dragged file extension
+	- accept dragged files from desktop
+	- fit displayed file name in the background box
+
+	* src/core/track_container.cpp:
+	fixed track swapping
+
+	* src/tracks/bb_track.cpp:
+	fixed loading last bb-track name
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	removed obsolete method
+
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	simplified inclusions and comments
+
+	* include/main_window.h:
+	cosmetic, grouped methods
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-04-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lmms_single_source.cpp:

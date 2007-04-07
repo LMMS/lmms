@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -143,12 +143,6 @@ public:
 	{
 		return( m_frozenPattern );
 	}
-
-	// if channel-track recognizes that this pattern is frozen, it calls
-	// this instead of playing all the notes
-	void FASTCALL playFrozenData( sampleFrame * _ab,
-						const f_cnt_t _start_frame,
-							const fpab_t _frames );
 
 	// settings-management
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

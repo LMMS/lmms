@@ -51,6 +51,7 @@
 #include "note_play_handle.h"
 #include "interpolation.h"
 #include "buffer_allocator.h"
+#include "file_browser.h"
 #include "pixmap_button.h"
 #include "knob.h"
 #include "tooltip.h"
@@ -78,7 +79,7 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
-	NULL
+	new audioFileProcessor::subPluginFeatures( plugin::Instrument )
 } ;
 
 }
@@ -400,10 +401,15 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 	const float note_freq = getInstrumentTrack()->frequency( _n ) /
 					( eng()->getMixer()->sampleRate() /
 							DEFAULT_SAMPLE_RATE );
-	if( m_sampleBuffer.play( buf, _n->totalFramesPlayed(),
+
+	if( !_n->m_pluginData )
+	{
+		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
+	}
+
+	if( m_sampleBuffer.play( buf, (handleState *)_n->m_pluginData,
 					frames, note_freq,
-					m_loopButton->isChecked(),
-					&_n->m_pluginData ) == TRUE )
+					m_loopButton->isChecked() ) == TRUE )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
@@ -415,7 +421,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 
 void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 {
-	m_sampleBuffer.deleteResamplingData( &_n->m_pluginData );
+	delete (handleState *)_n->m_pluginData;
 }
 
 
@@ -423,12 +429,63 @@ void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 
 void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( stringPairDrag::processDragEnterEvent( _dee,
-		QString( "samplefile,tco_%1" ).arg( track::SAMPLE_TRACK ) ) ==
-									FALSE )
+#ifdef QT4
+	if( _dee->mimeData()->hasFormat( "lmms/stringpair" ) )
+	{
+		QString txt = _dee->mimeData()->data( "lmms/stringpair" );
+		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
+							track::SAMPLE_TRACK ) )
+		{
+			_dee->acceptProposedAction();
+		}
+		else if( txt.section( ':', 0, 0 ) == "samplefile" )
+		{
+			_dee->acceptProposedAction();
+		}
+		else
+		{
+			_dee->ignore();
+		}
+	}
+	else
 	{
 		_dee->ignore();
 	}
+#else
+	QString txt = _dee->encodedData( "lmms/stringpair" );
+	if( txt != "" )
+	{
+		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
+							track::SAMPLE_TRACK ) )
+		{
+			_dee->accept();
+			return;
+		}
+		if( txt.section( ':', 0, 0 ) == "samplefile"
+			&& subPluginFeatures::supported_extensions().contains(
+				fileItem::extension( txt.section( ':', 1 ) ) ) )
+		{
+			_dee->accept();
+			return;
+		}
+		_dee->ignore();
+		return;
+	}
+
+	txt = QString( _dee->encodedData( "text/plain" ) );
+	if( txt != "" )
+	{
+		QString file = QUriDrag::uriToLocalFile(
+							txt.stripWhiteSpace() );
+		if( file && subPluginFeatures::supported_extensions().contains(
+						fileItem::extension( file ) ) )
+		{
+			_dee->accept();
+			return;
+		}
+	}
+	_dee->ignore();
+#endif
 }
 
 
@@ -442,6 +499,7 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 	{
 		setAudioFile( value );
 		_de->accept();
+		return;
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
 	{
@@ -449,11 +507,21 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 		setAudioFile( mmp.content().firstChild().toElement().
 							attribute( "src" ) );
 		_de->accept();
+		return;
 	}
-	else
+
+#ifndef QT4
+	QString txt = _de->encodedData( "text/plain" );
+	if( txt != "" )
 	{
-		_de->ignore();
+		setAudioFile( QUriDrag::uriToLocalFile(
+						txt.stripWhiteSpace() ) );
+		_de->accept();
+		return;
 	}
+#endif
+
+	_de->ignore();
 }
 
 
@@ -476,18 +544,18 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
  	QString file_name = "";
 	Uint16 idx = m_sampleBuffer.audioFile().length();
 
-	p.setFont( pointSize<8>( p.font() ) );
+	p.setFont( pointSize<8>( font() ) );
 
-	QFontMetrics fm( font() );
+	QFontMetrics fm( p.font() );
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
 #ifdef QT4
 	while( idx > 0 &&
-		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 225 )
+		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 210 )
 #else
 	while( idx > 0 &&
-		fm.size( Qt::SingleLine, file_name + "..." ).width() < 225 )
+		fm.size( Qt::SingleLine, file_name + "..." ).width() < 210 )
 #endif
 	{
 		file_name = m_sampleBuffer.audioFile()[--idx] + file_name;
@@ -661,6 +729,31 @@ void audioFileProcessor::openAudioFile( void )
 		setAudioFile( af );
 		eng()->getSongEditor()->setModified();
 	}
+}
+
+
+
+
+
+
+
+
+audioFileProcessor::subPluginFeatures::subPluginFeatures(
+						plugin::pluginTypes _type ) :
+	plugin::descriptor::subPluginFeatures( _type )
+{
+}
+
+
+
+
+const QStringList & audioFileProcessor::subPluginFeatures::supported_extensions(
+									void )
+{
+	static QStringList extensions = QStringList()
+				<< "wav" << "ogg" << "spx" << "au" << "voc"
+				<< "aif" << "aiff" << "flac" << "raw";
+	return( extensions );
 }
 
 

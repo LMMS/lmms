@@ -3,7 +3,7 @@
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -508,6 +508,8 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
+	eng()->getBBEditor()->updateComboBox();
+
 	QDomNode node = _this.namedItem( trackContainer::classNodeName() );
 	if( node.isElement() )
 	{

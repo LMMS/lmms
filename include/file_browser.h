@@ -133,13 +133,15 @@ private:
 
 
 
-class directory : public Q3ListViewItem
+class directory : public Q3ListViewItem, public engineObject
 {
 public:
 	directory( Q3ListView * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter );
+			const QString & _path, const QString & _filter,
+							engine * _engine );
 	directory( directory * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter );
+			const QString & _path, const QString & _filter,
+							engine * _engine );
 
 	void setOpen( bool );
 	void setup( void );
@@ -187,13 +189,15 @@ private:
 
 
 
-class fileItem : public Q3ListViewItem
+class fileItem : public Q3ListViewItem, public engineObject
 {
 public:
 	fileItem( Q3ListView * _parent, const QString & _name,
-						const QString & _path );
+							const QString & _path,
+							engine * _engine );
 	fileItem( Q3ListViewItem * _parent, const QString & _name,
-						const QString & _path );
+							const QString & _path,
+							engine * _engine );
 
 	inline QString fullName( void ) const
 	{
@@ -215,6 +219,9 @@ public:
 	{
 		return( m_type );
 	}
+
+	QString extension( void );
+	static QString extension( const QString & _file );
 
 
 private:

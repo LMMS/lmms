@@ -3,7 +3,7 @@
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,6 +52,8 @@ engine::engine( const bool _has_gui ) :
 	m_pianoRoll( NULL ),
 	m_projectJournal( NULL )
 {
+	load_extensions();
+
 	m_projectJournal = new projectJournal( this );
 	m_mainWindow = new mainWindow( this );
 	m_mixer = new mixer( this );
@@ -118,6 +120,35 @@ void engine::updateFramesPerTact64th( void )
 {
 	m_frames_per_tact64th = m_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
 					/ 64.0f / m_songEditor->getTempo();
+}
+
+
+
+
+void engine::load_extensions( void )
+{
+	vvector<plugin::descriptor> pluginDescriptors;
+	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
+	for( vvector<plugin::descriptor>::iterator it =
+						pluginDescriptors.begin();
+					it != pluginDescriptors.end(); ++it )
+	{
+		if( it->sub_plugin_features )
+		{
+			if( it->type == plugin::Instrument )
+			{
+				const QStringList & ext =
+						it->sub_plugin_features
+							->supportedExtensions();
+				for( QStringList::const_iterator itExt =
+								ext.begin();
+						itExt != ext.end(); ++itExt )
+				{
+					m_sample_extensions[*itExt] = it->name;
+				}
+			}
+		}
+	}
 }
 
 

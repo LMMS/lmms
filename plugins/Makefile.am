@@ -25,6 +25,7 @@ SUBDIRS =			\
 	live_tool		\
 	midi_import		\
 	organic			\
+	patman			\
 	plucked_string_synth	\
 	polyb302		\
 	$(SINGERBOT_DIR)	\

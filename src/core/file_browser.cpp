@@ -179,7 +179,7 @@ void fileBrowser::addItems( const QString & _path )
 		{
 			// remove existing file-items
 			delete m_l->findItem( cur_file, 0 );
-			(void) new fileItem( m_l, cur_file, _path );
+			(void) new fileItem( m_l, cur_file, _path, eng() );
 		}
 	}
 
@@ -195,7 +195,7 @@ void fileBrowser::addItems( const QString & _path )
 			if( item == NULL )
 			{
 				(void) new directory( m_l, cur_file, _path,
-							      	m_filter );
+						      	m_filter, eng() );
 			}
 			else if( dynamic_cast<directory *>( item ) != NULL )
 			{
@@ -333,7 +333,9 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 							fileItem::SAMPLE_FILE )
 				{
 					instrument * afp = ct->loadInstrument(
-							"audiofileprocessor" );
+						eng()->sampleExtensions()
+							[m_contextMenuItem
+							->extension()] );
 					if( afp != NULL )
 					{
 						afp->setParameter( "samplefile",
@@ -372,7 +374,9 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
 #endif
-		instrument * afp = ct->loadInstrument( "audiofileprocessor" );
+		instrument * afp = ct->loadInstrument( eng()->sampleExtensions()
+							[m_contextMenuItem
+							->extension()] );
 		if( afp != NULL )
 		{
 			afp->setParameter( "samplefile",
@@ -461,7 +465,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			assert( it != NULL );
 #endif
 			instrument * afp = it->loadInstrument(
-							"audiofileprocessor" );
+				eng()->sampleExtensions()[f->extension()] );
 			if( afp != NULL )
 			{
 				afp->setParameter( "samplefile",
@@ -649,8 +653,10 @@ QPixmap * directory::s_folderLockedPixmap = NULL;
 
 
 directory::directory( directory * _parent, const QString & _name,
-			const QString & _path, const QString & _filter ) :
+			const QString & _path, const QString & _filter,
+							engine * _engine ) :
 	Q3ListViewItem( _parent, _name ),
+	engineObject( _engine ),
 	m_p( _parent ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -663,8 +669,10 @@ directory::directory( directory * _parent, const QString & _name,
 
 
 directory::directory( Q3ListView * _parent, const QString & _name,
-			const QString & _path, const QString & _filter ) :
+			const QString & _path, const QString & _filter,
+							engine * _engine ) :
 	Q3ListViewItem( _parent, _name ),
+	engineObject( _engine ),
 	m_p( NULL ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -789,7 +797,7 @@ bool directory::addItems( const QString & _path )
 #endif
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
 		{
-			(void) new fileItem( this, cur_file, _path );
+			(void) new fileItem( this, cur_file, _path, eng() );
 			added_something = TRUE;
 		}
 	}
@@ -806,7 +814,7 @@ bool directory::addItems( const QString & _path )
 #endif
 							cur_file, m_filter ) )
 		{
-			new directory( this, cur_file, _path, m_filter );
+			new directory( this, cur_file, _path, m_filter, eng() );
 			added_something = TRUE;
 #if 0
 			if( firstChild() == NULL )
@@ -852,8 +860,10 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 
 fileItem::fileItem( Q3ListView * _parent, const QString & _name,
-						const QString & _path ) :
+							const QString & _path,
+							engine * _engine ) :
 	Q3ListViewItem( _parent, _name ),
+	engineObject( _engine ),
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -866,8 +876,10 @@ fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 
 
 fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
-						const QString & _path ) :
+							const QString & _path,
+							engine * _engine ) :
 	Q3ListViewItem( _parent, _name ),
+	engineObject( _engine ),
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -936,11 +948,7 @@ void fileItem::initPixmapStuff( void )
 
 void fileItem::determineFileType( void )
 {
-#ifdef QT4
-	QString ext = QFileInfo( fullName() ).suffix().toLower();
-#else
-	QString ext = QFileInfo( fullName() ).extension( FALSE ).toLower();
-#endif
+	QString ext = extension();
 	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
 	{
 		m_type = PROJECT_FILE;
@@ -966,10 +974,7 @@ void fileItem::determineFileType( void )
 	{
 		m_type = PRESET_FILE;
 	}
-	else if( ext == "wav" || ext == "ogg" || ext == "mp3" ||
-			ext == "aiff" || ext == "aif" || ext == "voc" ||
-			ext == "au" || ext == "raw" || ext == "flac" ||
-			ext == "spx" )
+	else if( eng()->sampleExtensions().contains( ext ) )
 	{
 		m_type = SAMPLE_FILE;
 	}
@@ -987,6 +992,25 @@ void fileItem::determineFileType( void )
 	}
 }
 
+
+
+
+QString fileItem::extension( void )
+{
+	return( extension( fullName() ) );
+}
+
+
+
+
+QString fileItem::extension( const QString & _file )
+{
+#ifdef QT4
+	return( QFileInfo( _file ).suffix().toLower() );
+#else
+	return( QFileInfo( _file ).extension( FALSE ).toLower() );
+#endif
+}
 
 
 

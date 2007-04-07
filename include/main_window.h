@@ -144,6 +144,8 @@ private:
 
 	void finalize( void );
 
+	bool have_www_browser( void );
+
 
 	QWorkspace * m_workspace;
 
@@ -168,8 +170,6 @@ private:
 
 	QMenu * m_tools_menu;
 	vlist<tool *> m_tools;
-
-	bool have_www_browser( void );
 
 
 	friend class engine;

@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070328, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070328)
+AC_INIT(lmms, 0.2.1-svn20070407, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070407)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -590,8 +590,9 @@ AC_CONFIG_FILES([Makefile
 		 plugins/live_tool/Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
-		 plugins/polyb302/Makefile
+		 plugins/patman/Makefile
 		 plugins/plucked_string_synth/Makefile
+		 plugins/polyb302/Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile

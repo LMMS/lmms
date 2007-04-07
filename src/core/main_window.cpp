@@ -128,6 +128,14 @@ mainWindow::mainWindow( engine * _engine ) :
 	splitter->setChildrenCollapsible( FALSE );
 #endif
 
+	QString sample_filter;
+	vlist<QString> ext_keys = eng()->sampleExtensions().keys();
+	for( vlist<QString>::iterator it = ext_keys.begin();
+						it != ext_keys.end(); ++it )
+	{
+		sample_filter += " *." + *it;
+	}
+
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter, eng() ), ++id );
@@ -142,9 +150,7 @@ mainWindow::mainWindow( engine * _engine ) :
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factorySamplesDir() + "*" +
 					configManager::inst()->userSamplesDir(),
-					"*.wav *.ogg *.spx *.au"
-					"*.voc *.aif *.aiff *.flac *.raw",
-							tr( "My samples" ),
+					sample_filter, tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),
 							splitter, eng() ),
 									++id );

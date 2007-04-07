@@ -144,6 +144,13 @@ public:
 			{
 			}
 
+			virtual const QStringList & supportedExtensions( void )
+			{
+				static QStringList no_extensions;
+				return( no_extensions );
+			}
+
+
 		protected:
 			const plugin::pluginTypes m_type;
 		}

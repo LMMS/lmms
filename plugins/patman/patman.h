@@ -1,8 +1,7 @@
 /*
- * audio_file_processor.h - declaration of class audioFileProcessor
- *                          (instrument-plugin for using audio-files)
+ * patman.h - header for a GUS-compatible patch instrument plugin
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,32 +23,29 @@
  */
 
 
-#ifndef _AUDIO_FILE_PROCESSOR_H
-#define _AUDIO_FILE_PROCESSOR_H
+#ifndef _PATMAN_H_
+#define _PATMAN_H_
 
-#include "qt3support.h"
-
-#ifdef QT4
-
-#include <QtGui/QPixmap>
-
-#else
-
-#include <qpixmap.h>
-
-#endif
 
 #include "instrument.h"
 #include "sample_buffer.h"
 #include "spc_bg_hndl_widget.h"
 
 
-class knob;
 class pixmapButton;
-class volumeKnob;
 
 
-class audioFileProcessor : public instrument, public specialBgHandlingWidget
+#define MODES_16BIT	( 1 << 0 )
+#define MODES_UNSIGNED	( 1 << 1 )
+#define MODES_LOOPING	( 1 << 2 )
+#define MODES_PINGPONG	( 1 << 3 )
+#define MODES_REVERSE	( 1 << 4 )
+#define MODES_SUSTAIN	( 1 << 5 )
+#define MODES_ENVELOPE	( 1 << 6 )
+#define MODES_CLAMPED	( 1 << 7 )
+
+
+class patmanSynth : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
 public:
@@ -68,15 +64,16 @@ public:
 	} ;
 
 
-	audioFileProcessor( instrumentTrack * _channel_track );
-	virtual ~audioFileProcessor();
+	patmanSynth( instrumentTrack * _track );
+	virtual ~patmanSynth();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
 						bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
+
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
+							QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 	virtual void FASTCALL setParameter( const QString & _param,
@@ -84,22 +81,10 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual Uint32 FASTCALL getBeatLen( notePlayHandle * _n ) const;
-
 
 public slots:
-	void setAudioFile( const QString & _audio_file, bool _rename = TRUE );
-
-
-protected slots:
-	void openAudioFile( void );
-	void reverseBtnToggled( bool _on );
-	void ampKnobChanged( float _new_value );
-	void startKnobChanged( float _new_value );
-	void endKnobChanged( float _new_value );
-	void lineDrawBtnToggled( bool _on );
-	void dotDrawBtnToggled( bool _on );
-	void sampleUpdated( void );
+	void openFile( void );
+	void setFile( const QString & _patch_file, bool _rename = TRUE );
 
 
 protected:
@@ -109,28 +94,35 @@ protected:
 
 
 private:
-	typedef sampleBuffer::handleState handleState;
+	typedef struct
+	{
+		sampleBuffer::handleState * state;
+		bool tuned;
+		sampleBuffer * sample;
+	} handle_data;
 
-	static QPixmap * s_artwork;
+	QString m_patchFile;
+	vvector<sampleBuffer *> m_patch_samples;
 
-
-	sampleBuffer m_sampleBuffer;
-	
-	sampleBuffer::drawMethods m_drawMethod;
-
-	QPixmap m_graph;
-	volumeKnob * m_ampKnob;
-	knob * m_startKnob;
-	knob * m_endKnob;
-	pixmapButton * m_openAudioFileButton;
-	pixmapButton * m_viewLinesPB;
-	pixmapButton * m_viewDotsPB;
-	pixmapButton * m_reverseButton;
+	pixmapButton * m_openFileButton;
 	pixmapButton * m_loopButton;
+	pixmapButton * m_tuneButton;
+	QString m_display_filename;
 
+	enum load_error
+	{
+		LOAD_OK,
+		LOAD_OPEN,
+		LOAD_NOT_GUS,
+		LOAD_INSTRUMENTS,
+		LOAD_LAYERS,
+		LOAD_IO
+	} ;
 
-	void updateSample( void );
-	void FASTCALL setStartAndEndKnob( float _s, float _e );
+	load_error load_patch( const QString & _filename );
+	void unload_current_patch( void );
+
+	void select_sample( notePlayHandle * _n );
 
 } ;
 

@@ -4,7 +4,7 @@
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -345,13 +345,14 @@ void trackContainer::clearAllTracks( void )
 
 const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
 {
+	const int abs_y = _y + m_scrollArea->contentsY();
 	int y_cnt = 0;
 	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
 	{
 		const int y_cnt1 = y_cnt;
 		y_cnt += ( *it )->height();
-		if( _y >= y_cnt1 && _y < y_cnt )
+		if( abs_y >= y_cnt1 && abs_y < y_cnt )
 		{
 			return( *it );
 		}
