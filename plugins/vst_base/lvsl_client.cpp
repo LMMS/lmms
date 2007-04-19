@@ -1,7 +1,7 @@
 /*
  * lvsl_client.cpp - client for LVSL Server
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,15 +79,15 @@
 
 #include "templates.h"
 #include "config_mgr.h"
+#include "engine.h"
 #include "main_window.h"
 #include "lvsl_client.h"
 
 
 
 
-remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin, engine * _engine ) :
+remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 	QObject(),
-	journallingObject( _engine ),
 	m_failed( TRUE ),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
@@ -253,11 +253,11 @@ void remoteVSTPlugin::showEditor( void )
 		return;
 	}
 
-	m_pluginWidget = new QWidget( eng()->getMainWindow()->workspace() );
+	m_pluginWidget = new QWidget( engine::getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
 #ifndef QT3
-	eng()->getMainWindow()->workspace()->addWindow( m_pluginWidget );
+	engine::getMainWindow()->workspace()->addWindow( m_pluginWidget );
 #endif
 	m_pluginWidget->show();
 
@@ -289,7 +289,7 @@ void remoteVSTPlugin::hideEditor( void )
 bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf, bool _wait )
 {
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 
 	if( m_shm == NULL )
 	{
@@ -303,7 +303,8 @@ bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
 		}
 		if( _out_buf != NULL )
 		{
-			eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
+			engine::getMixer()->clearAudioBuffer( _out_buf,
+								frames );
 		}
 		return( FALSE );
 	}
@@ -352,13 +353,13 @@ bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 		usleep( 10 );
 	}
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
 	if( outputs != DEFAULT_CHANNELS )
 	{
 		// clear buffer, if plugin didn't fill up both channels
-		eng()->getMixer()->clearAudioBuffer( _out_buf, frames );
+		engine::getMixer()->clearAudioBuffer( _out_buf, frames );
 	}
 
 	for( ch_cnt_t ch = 0; ch < outputs; ++ch )
@@ -553,14 +554,14 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 			writeValueS<Sint16>( VST_SAMPLE_RATE );
 			// handle is the same
 			writeValueS<sample_rate_t>(
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 			break;
 
 		case VST_GET_BUFFER_SIZE:
 			writeValueS<Sint16>( VST_BUFFER_SIZE );
 			// handle is the same
 			writeValueS<fpab_t>(
-				eng()->getMixer()->framesPerAudioBuffer() );
+				engine::getMixer()->framesPerAudioBuffer() );
 			break;
 
 		case VST_SHM_KEY_AND_SIZE:

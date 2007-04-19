@@ -32,6 +32,7 @@
 
 #include "live_tool.h"
 #include "bb_editor.h"
+#include "engine.h"
 #include "song_editor.h"
 
 #ifdef Q_WS_X11
@@ -113,19 +114,19 @@ void liveTool::keyPressEvent( QKeyEvent * _ke )
 	switch( _ke->key() )
 	{
 		case Qt::Key_Space:
-			if( eng()->getSongEditor()->playing() )
+			if( engine::getSongEditor()->playing() )
 			{
-				eng()->getSongEditor()->pause();
+				engine::getSongEditor()->pause();
 			}
-			else if( eng()->getSongEditor()->paused() &&
-				eng()->getSongEditor()->playMode() ==
+			else if( engine::getSongEditor()->paused() &&
+				engine::getSongEditor()->playMode() ==
 							songEditor::PLAY_SONG )
 			{
-				eng()->getSongEditor()->resumeFromPause();
+				engine::getSongEditor()->resumeFromPause();
 			}
 			else
 			{
-				eng()->getSongEditor()->play();
+				engine::getSongEditor()->play();
 			}
 			break;
 
@@ -161,7 +162,7 @@ bool liveTool::x11Event( XEvent * _xe )
 void liveTool::toggleInstrument( int _n )
 {
 	bool track_exists;
-	track * t = eng()->getBBEditor()->tracks().at( _n, &track_exists );
+	track * t = engine::getBBEditor()->tracks().at( _n, &track_exists );
 	if( track_exists )
 	{
 		t->setMuted( !t->muted() );

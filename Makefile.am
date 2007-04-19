@@ -331,6 +331,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/midi_alsa_seq.h			\
 		$(srcdir)/include/micro_timer.h				\
 		$(srcdir)/include/fade_button.h				\
+		$(srcdir)/include/fifo_buffer.h				\
 		$(srcdir)/include/combobox.h				\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\

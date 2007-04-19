@@ -1,8 +1,8 @@
 /*
  * effect.h - base class for effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,14 +57,8 @@ class track;
 class effect : public plugin
 {
 public:
-	struct constructionData
-	{
-		engine * eng;
-		descriptor::subPluginFeatures::key key;
-	} ;
-
-
-	effect( const plugin::descriptor * _desc, constructionData * _cdata );
+	effect( const plugin::descriptor * _desc,
+			const descriptor::subPluginFeatures::key * _key );
 	virtual ~effect();
 	
 	virtual bool FASTCALL processAudioBuffer( 
@@ -196,7 +190,7 @@ public:
 	virtual effectControlDialog * createControlDialog( track * _track ) = 0;
 
 	static effect * FASTCALL instantiate( const QString & _plugin_name,
-						constructionData & _cdata );
+				descriptor::subPluginFeatures::key * _key );
 
 
 private:

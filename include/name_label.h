@@ -2,7 +2,7 @@
  * name_label.h - class nameLabel, a label which is renamable by
  *                double-clicking it
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,15 +41,12 @@
 
 #endif
 
-#include "engine.h"
 
-
-class nameLabel : public QLabel, public engineObject
+class nameLabel : public QLabel
 {
 	Q_OBJECT
 public:
-	nameLabel( const QString & _initial_name, QWidget * _parent,
-							engine * _engine );
+	nameLabel( const QString & _initial_name, QWidget * _parent );
 	virtual ~nameLabel();
 
 	const QPixmap & pixmap( void ) const

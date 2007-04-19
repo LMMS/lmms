@@ -1,7 +1,7 @@
 /*
  * ladspa_port_dialog.h - dialog to test a LADSPA plugin
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,12 +42,11 @@
 #include "ladspa_2_lmms.h"
 
 
-class ladspaPortDialog : public QDialog, public engineObject
+class ladspaPortDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ladspaPortDialog( const ladspa_key_t & _key,
-				engine * _engine );
+	ladspaPortDialog( const ladspa_key_t & _key );
 	virtual ~ladspaPortDialog();
 
 private:

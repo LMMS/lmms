@@ -1,7 +1,7 @@
 /*
  * right_frame.h - provides the display for the rackInsert instances
  *
- * Copyright (c) 2006 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,8 +56,7 @@ class rackView: public QWidget, public journallingObject
 	Q_OBJECT
 
 public:
-	rackView( QWidget * _parent, engine * _engine, 
-					track * _track, audioPort * _port );
+	rackView( QWidget * _parent, track * _track, audioPort * _port );
 	~rackView();
 
 	void addEffect( effect * _e );

@@ -43,7 +43,7 @@ class QLineEdit;
 class midiOSS : public midiClientRaw, public QThread
 {
 public:
-	midiOSS( engine * _engine );
+	midiOSS( void );
 	virtual ~midiOSS();
 
 	static QString probeDevice( void );

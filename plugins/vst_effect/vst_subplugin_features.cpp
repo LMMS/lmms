@@ -50,18 +50,18 @@ vstSubPluginFeatures::vstSubPluginFeatures( plugin::pluginTypes _type ) :
 
 
 
-void vstSubPluginFeatures::fillDescriptionWidget(
-			QWidget * _parent, engine * _eng, const key & _key  )
+void vstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
+							const key * _key  )
 {
-	new QLabel( QWidget::tr( "Name: " ) + _key.name, _parent );
-	new QLabel( QWidget::tr( "File: " ) + _key.user.toString(), _parent );
+	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
+	new QLabel( QWidget::tr( "File: " ) + _key->user.toString(), _parent );
 }
 
 
 
 
-void vstSubPluginFeatures::listSubPluginKeys( engine * _eng,
-				plugin::descriptor * _desc, keyList & _kl )
+void vstSubPluginFeatures::listSubPluginKeys( plugin::descriptor * _desc,
+								keyList & _kl )
 {
 	QStringList dlls = QDir( configManager::inst()->vstDir() ).
 #ifndef QT3

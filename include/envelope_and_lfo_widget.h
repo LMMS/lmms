@@ -3,7 +3,7 @@
  *                             is used by envelope/lfo/filter-tab of
  *                              channel-window
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,13 +37,11 @@
 #ifdef QT4
 
 #include <QtGui/QWidget>
-#include <QtCore/QMap>
 #include <QtCore/QVector>
 
 #else
 
 #include <qwidget.h>
-#include <qmap.h>
 #include <qvaluevector.h>
 
 #endif
@@ -76,7 +74,7 @@ class envelopeAndLFOWidget : public QWidget, public journallingObject,
 	Q_OBJECT
 public:
 	envelopeAndLFOWidget( float _value_for_zero_amount, QWidget * _parent,
-					engine * _engine, track * _track );
+							track * _track );
 	virtual ~envelopeAndLFOWidget();
 
 	static inline float expKnobVal( float val )
@@ -84,8 +82,8 @@ public:
 		return( ( ( val < 0 ) ? -1 : 1 ) * val*val );
 	}
 
-	static void triggerLFO( engine * _engine );
-	static void resetLFO( engine * _engine );
+	static void triggerLFO( void );
+	static void resetLFO( void );
 
 	void FASTCALL fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
@@ -140,7 +138,7 @@ private:
 	static QPixmap * s_envGraph;
 	static QPixmap * s_lfoGraph;
 
-	static QMap<engine *, vvector<envelopeAndLFOWidget *> > s_EaLWidgets;
+	static vvector<envelopeAndLFOWidget *> s_EaLWidgets;
 
 	bool   m_used;
 

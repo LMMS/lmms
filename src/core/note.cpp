@@ -50,17 +50,15 @@ const float note::MAX_DETUNING = 4 * 12.0f;
 
 
 
-note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
+note::note( const midiTime & _length, const midiTime & _pos,
 		tones _tone, octaves _octave, volume _volume,
-							panning _panning ) :
-	journallingObject( _engine ),
+					panning _panning, knob * _detuning ) :
 	m_tone( C ),
 	m_octave( DEFAULT_OCTAVE ),
 	m_volume( DEFAULT_VOLUME ),
 	m_panning( DEFAULT_PANNING ),
 	m_length( _length ),
-	m_pos( _pos ),
-	m_detuning( NULL )
+	m_pos( _pos )
 {
 	//saveJournallingState( FALSE );
 	setJournalling( FALSE );
@@ -70,7 +68,11 @@ note::note( engine * _engine, const midiTime & _length, const midiTime & _pos,
 	setVolume( _volume );
 	setPanning( _panning );
 
-	if( _engine )
+	if( _detuning )
+	{
+		setDetuning( _detuning );
+	}
+	else
 	{
 		createDetuning();
 	}
@@ -315,8 +317,8 @@ void note::createDetuning( void )
 {
 	m_detuning = new knob( knobDark_28, NULL,
 						QObject::tr( "Note detuning" ),
-						eng(), NULL );
-	m_detuning->initAutomationPattern( eng() );
+						NULL );
+	m_detuning->initAutomationPattern();
 	m_detuning->setData( 0 );
 	m_detuning->setRange( -MAX_DETUNING, MAX_DETUNING, 0.1f );
 }

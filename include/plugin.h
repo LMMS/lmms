@@ -134,12 +134,11 @@ public:
 			{
 			}
 
-			virtual void fillDescriptionWidget(
-					QWidget *, engine *, const key & )
+			virtual void fillDescriptionWidget( QWidget *,
+								const key * )
 			{
 			}
-			virtual void listSubPluginKeys( engine *,
-							plugin::descriptor *,
+			virtual void listSubPluginKeys( plugin::descriptor *,
 							keyList & )
 			{
 			}
@@ -159,7 +158,7 @@ public:
 	} ;
 
 	// contructor of a plugin
-	plugin( const descriptor * _descriptor, engine * _engine );
+	plugin( const descriptor * _descriptor );
 	virtual ~plugin();
 
 	// returns public-name out of descriptor

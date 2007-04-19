@@ -1,7 +1,7 @@
 /*
  * bass_booster.cpp - bass-booster-effect-plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,8 +51,9 @@ plugin::descriptor bassbooster_plugin_descriptor =
 
 
 
-bassBoosterEffect::bassBoosterEffect( effect::constructionData * _cdata ) :
-	effect( &bassbooster_plugin_descriptor, _cdata ),
+bassBoosterEffect::bassBoosterEffect(
+			const descriptor::subPluginFeatures::key * _key ) :
+	effect( &bassbooster_plugin_descriptor, _key ),
 	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) )
 {
 }
@@ -116,7 +117,8 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new bassBoosterEffect(
-			static_cast<effect::constructionData *>( _data ) ) );
+		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+								_data ) ) );
 }
 
 }

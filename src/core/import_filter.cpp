@@ -3,7 +3,7 @@
 /*
  * import_filter.cpp - base-class for all import-filters (MIDI, FLP etc)
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,6 +26,7 @@
 
 
 #include "import_filter.h"
+#include "engine.h"
 #include "track_container.h"
 #include "project_journal.h"
 
@@ -43,9 +44,8 @@
 
 
 importFilter::importFilter( const QString & _file_name,
-				const descriptor * _descriptor,
-				engine * _eng ) :
-	plugin( _descriptor, _eng ),
+					const descriptor * _descriptor ) :
+	plugin( _descriptor ),
 	m_file( _file_name )
 {
 }
@@ -77,8 +77,8 @@ void importFilter::import( const QString & _file_to_import,
 						);
 
 	// do not record changes while importing files
-	const bool j = _tc->eng()->getProjectJournal()->isJournalling();
-	_tc->eng()->getProjectJournal()->setJournalling( FALSE );
+	const bool j = engine::getProjectJournal()->isJournalling();
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	for( vvector<plugin::descriptor>::iterator it = d.begin();
 							it != d.end(); ++it )
@@ -98,7 +98,7 @@ void importFilter::import( const QString & _file_to_import,
 		}
 	}
 
-	_tc->eng()->getProjectJournal()->setJournalling( j );
+	engine::getProjectJournal()->setJournalling( j );
 
 	delete[] s;
 

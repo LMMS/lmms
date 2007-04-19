@@ -4,7 +4,7 @@
  * automation_pattern.cpp - implementation of class automationPattern which
  *                          holds dynamic values
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,12 +43,12 @@
 #include "automation_pattern.h"
 #include "templates.h"
 #include "automation_editor.h"
+#include "engine.h"
 
 
 
 
 automationPattern::automationPattern( track * _track, levelObject * _object ) :
-	journallingObject( _track->eng() ),
 	m_track( _track ),
 	m_object( _object ),
 	m_update_first( TRUE )
@@ -59,21 +59,7 @@ automationPattern::automationPattern( track * _track, levelObject * _object ) :
 
 
 
-automationPattern::automationPattern( engine * _engine,
-						levelObject * _object ) :
-	journallingObject( _engine ),
-	m_track( NULL ),
-	m_object( _object ),
-	m_update_first( TRUE )
-{
-	init();
-}
-
-
-
-
 automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
-	journallingObject( _pat_to_copy.m_track->eng() ),
 	m_track( _pat_to_copy.m_track ),
 	m_object( _pat_to_copy.m_object ),
 	m_update_first( _pat_to_copy.m_update_first )
@@ -92,7 +78,6 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 automationPattern::automationPattern( const automationPattern & _pat_to_copy,
 						levelObject * _object ) :
-	journallingObject( _pat_to_copy.m_track->eng() ),
 	m_track( _pat_to_copy.m_track ),
 	m_object( _object ),
 	m_update_first( _pat_to_copy.m_update_first )
@@ -116,10 +101,10 @@ automationPattern::~automationPattern()
 		m_track->removeAutomationPattern( this );
 	}
 
-	if( eng()->getAutomationEditor()
-		&& eng()->getAutomationEditor()->currentPattern() == this )
+	if( engine::getAutomationEditor()
+		&& engine::getAutomationEditor()->currentPattern() == this )
 	{
-		eng()->getAutomationEditor()->setCurrentPattern( NULL );
+		engine::getAutomationEditor()->setCurrentPattern( NULL );
 	}
 }
 
@@ -163,7 +148,7 @@ midiTime automationPattern::putValue( const midiTime & _time, const int _value,
 {
 	midiTime new_time = _quant_pos ?
 		note::quantized( _time,
-				eng()->getAutomationEditor()->quantization() ) :
+			engine::getAutomationEditor()->quantization() ) :
 		_time;
 
 	m_time_map[-new_time] = _value;
@@ -188,9 +173,9 @@ void automationPattern::removeValue( const midiTime & _time )
 void automationPattern::clear( void )
 {
 	m_time_map.clear();
-	if( eng()->getAutomationEditor()->currentPattern() == this )
+	if( engine::getAutomationEditor()->currentPattern() == this )
 	{
-		eng()->getAutomationEditor()->update();
+		engine::getAutomationEditor()->update();
 	}
 }
 
@@ -244,9 +229,9 @@ void automationPattern::loadSettings( const QDomElement & _this )
 
 void automationPattern::openInAutomationEditor( void )
 {
-	eng()->getAutomationEditor()->setCurrentPattern( this );
-	eng()->getAutomationEditor()->show();
-	eng()->getAutomationEditor()->setFocus();
+	engine::getAutomationEditor()->setCurrentPattern( this );
+	engine::getAutomationEditor()->show();
+	engine::getAutomationEditor()->setFocus();
 }
 
 

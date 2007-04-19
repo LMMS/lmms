@@ -85,7 +85,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 {
 	setPaletteBackgroundPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 
-	m_openFileButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_openFileButton = new pixmapButton( this, NULL, NULL );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 200, 90 );
 	m_openFileButton->setActiveGraphic( embed::getIconPixmap(
@@ -106,7 +106,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 		tr( "Click here to open another patch-file. Loop and Tune "
 			"settings are not reset." ) );
 
-	m_loopButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_loopButton = new pixmapButton( this, tr( "Loop" ), _track );
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 160, 160 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -124,7 +124,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 			"will use the loop information available in the "
 			"file." ) );
 
-	m_tuneButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_tuneButton = new pixmapButton( this, tr( "Tune" ), _track );
 	m_tuneButton->setCheckable( TRUE );
 	m_tuneButton->setValue( TRUE );
 	m_tuneButton->move( 180, 160 );
@@ -200,12 +200,10 @@ QString patmanSynth::nodeName( void ) const
 
 void patmanSynth::playNote( notePlayHandle * _n, bool )
 {
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
-	float freq = getInstrumentTrack()->frequency( _n ) /
-					( eng()->getMixer()->sampleRate() /
-							DEFAULT_SAMPLE_RATE );
+	float freq = getInstrumentTrack()->frequency( _n );
 
 	if( !_n->m_pluginData )
 	{
@@ -240,9 +238,10 @@ void patmanSynth::deleteNotePluginData( notePlayHandle * _n )
 void patmanSynth::dragEnterEvent( QDragEnterEvent * _dee )
 {
 #ifdef QT4
-	if( _dee->mimeData()->hasFormat( "lmms/stringpair" ) )
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
-		QString txt = _dee->mimeData()->data( "lmms/stringpair" );
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == "samplefile" )
 		{
 			_dee->acceptProposedAction();
@@ -257,7 +256,7 @@ void patmanSynth::dragEnterEvent( QDragEnterEvent * _dee )
 		_dee->ignore();
 	}
 #else
-	QString txt = _dee->encodedData( "lmms/stringpair" );
+	QString txt = _dee->encodedData( stringPairDrag::mimeType() );
 	if( txt != "" )
 	{
 		if( txt.section( ':', 0, 0 ) == "samplefile"
@@ -386,7 +385,7 @@ void patmanSynth::openFile( void )
 		if( f != "" )
 		{
 			setFile( f );
-			eng()->getSongEditor()->setModified();
+			engine::getSongEditor()->setModified();
 		}
 	}
 }
@@ -589,19 +588,14 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 			}
 		}
 
-		sampleBuffer * psample = new sampleBuffer( data, frames,
-									eng() );
+		sampleBuffer * psample = new sampleBuffer( data, frames );
 		psample->setFrequency( root_freq / 1000.0f );
-		psample->normalize_sample_rate( sample_rate );
+		psample->setSampleRate( sample_rate );
 
 		if( modes & MODES_LOOPING )
 		{
-			psample->setLoopStartFrame( loop_start
-					* SAMPLE_RATES[DEFAULT_QUALITY_LEVEL]
-								/ sample_rate );
-			psample->setLoopEndFrame( loop_end
-					* SAMPLE_RATES[DEFAULT_QUALITY_LEVEL]
-								/ sample_rate );
+			psample->setLoopStartFrame( loop_start );
+			psample->setLoopEndFrame( loop_end );
 		}
 
 		m_patch_samples.push_back( psample );
@@ -630,9 +624,7 @@ void patmanSynth::unload_current_patch( void )
 
 void patmanSynth::select_sample( notePlayHandle * _n )
 {
-	float freq = getInstrumentTrack()->frequency( _n ) /
-					( eng()->getMixer()->sampleRate() /
-							DEFAULT_SAMPLE_RATE );
+	float freq = getInstrumentTrack()->frequency( _n );
 
 	float min_dist = HUGE_VALF;
 	sampleBuffer * sample = NULL;
@@ -659,7 +651,7 @@ void patmanSynth::select_sample( notePlayHandle * _n )
 	}
 	else
 	{
-		hdata->sample = new sampleBuffer( NULL, 0, eng() );
+		hdata->sample = new sampleBuffer( NULL, 0 );
 	}
 	hdata->state = new sampleBuffer::handleState( _n->hasDetuningInfo() );
 

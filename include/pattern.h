@@ -273,7 +273,7 @@ signals:
 
 
 
-class patternFreezeThread : public QThread, public engineObject
+class patternFreezeThread : public QThread
 {
 public:
 	patternFreezeThread( pattern * _pattern );

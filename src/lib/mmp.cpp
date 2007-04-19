@@ -3,7 +3,7 @@
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -74,7 +74,7 @@ multimediaProject::multimediaProject( projectTypes _project_type ) :
 	m_head(),
 	m_type( _project_type )
 {
-	QDomElement root = createElement( "multimediaproject" );
+	QDomElement root = createElement( "multimedia-project" );
 	root.setAttribute( "version", MMP_VERSION_STRING );
 	root.setAttribute( "type", typeName( _project_type ) );
 	root.setAttribute( "creator", "Linux MultiMedia Studio (LMMS)" );

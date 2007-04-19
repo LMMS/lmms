@@ -1,7 +1,7 @@
 /*
  * combobox.h - class comboBox, a very cool combo-box
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,8 +56,7 @@ class comboBox : public QWidget, public automatableObject<int>
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent, const QString & _name, engine * _engine,
-							track * _track );
+	comboBox( QWidget * _parent, const QString & _name, track * _track );
 	virtual ~comboBox();
 
 	void addItem( const QString & _item, const QPixmap & _pixmap =

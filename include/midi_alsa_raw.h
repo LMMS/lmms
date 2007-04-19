@@ -61,7 +61,7 @@ class QLineEdit;
 class midiALSARaw : public midiClientRaw, public QThread
 {
 public:
-	midiALSARaw( engine * _engine );
+	midiALSARaw( void );
 	virtual ~midiALSARaw();
 
 	static QString probeDevice( void );

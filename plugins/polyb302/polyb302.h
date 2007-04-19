@@ -53,10 +53,10 @@ typedef struct
 
 
 
-class lb302Filter : public engineObject
+class lb302Filter
 {
 public:
-	lb302Filter( lb302FilterState * _p_fs, engine * _engine );
+	lb302Filter( lb302FilterState * _p_fs );
 	virtual ~lb302Filter() {};
 
 	virtual void recalc( void );
@@ -82,7 +82,7 @@ protected:
 class lb302FilterIIR2 : public lb302Filter
 {
 public:
-	lb302FilterIIR2( lb302FilterState * _p_fs, engine * _engine );
+	lb302FilterIIR2( lb302FilterState * _p_fs );
 	virtual ~lb302FilterIIR2();
 
 	virtual void recalc( void );
@@ -110,7 +110,7 @@ protected:
 class lb302Filter3Pole : public lb302Filter
 {
 public:
-	lb302Filter3Pole( lb302FilterState * _p_fs, engine * _engine );
+	lb302Filter3Pole( lb302FilterState * _p_fs );
 
 	virtual void envRecalc( void );
 	virtual void recalc( void );
@@ -160,7 +160,7 @@ public slots:
 
 
 private:
-	class handleState : public engineObject
+	class handleState
 	{
 	public:
 		handleState( polyb302Synth * _synth );

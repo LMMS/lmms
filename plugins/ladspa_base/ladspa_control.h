@@ -1,7 +1,7 @@
 /*
  * ladspa_control.h - widget for controlling a LADSPA port
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,9 +56,8 @@ class ladspaControl : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	ladspaControl( QWidget * _parent, port_desc_t * _port, 
-					engine * _engine, track * _track,
-					bool _link = FALSE );
+	ladspaControl( QWidget * _parent, port_desc_t * _port, track * _track,
+							bool _link = FALSE );
 	~ladspaControl();
 	
 	LADSPA_Data getValue( void );

@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,6 @@
 #endif
 
 #include "export.h"
-#include "engine.h"
 
 
 class QLabel;
@@ -56,12 +55,11 @@ class ledCheckBox;
 class pixmapButton;
 
 
-class exportProjectDialog : public QDialog, public engineObject
+class exportProjectDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent,
-							engine * _engine );
+	exportProjectDialog( const QString & _file_name, QWidget * _parent );
 	virtual ~exportProjectDialog();
 
 

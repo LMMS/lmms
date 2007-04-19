@@ -1,7 +1,7 @@
 /*
  * effect_chain.h - class for processing and effects chain
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,15 +37,14 @@
 
 #include "qt3support.h"
 
-#include "engine.h"
 #include "effect.h"
 
 typedef vvector<effect *> effect_list_t;
 
-class effectChain: public engineObject
+class effectChain
 {
 public:
-	effectChain( engine * _engine );
+	effectChain( void );
 	virtual ~effectChain();
 	
 	void FASTCALL appendEffect( effect * _effect );

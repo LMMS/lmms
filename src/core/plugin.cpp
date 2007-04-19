@@ -3,7 +3,7 @@
 /*
  * plugin.cpp - implementation of plugin-class including plugin-loader
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,8 +63,7 @@ static plugin::descriptor dummy_plugin_descriptor =
 
 
 
-plugin::plugin( const descriptor * _descriptor, engine * _engine ) :
-	journallingObject( _engine ),
+plugin::plugin( const descriptor * _descriptor ) :
 	m_descriptor( _descriptor )
 {
 	if( dummy_plugin_descriptor.logo == NULL )

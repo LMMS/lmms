@@ -1,7 +1,7 @@
 /*
  * bass_booster.h - bass-booster-effect-plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +29,7 @@
 
 #include "effect.h"
 #include "effect_lib.h"
+#include "engine.h"
 #include "main_window.h"
 #include "bassbooster_control_dialog.h"
 
@@ -37,7 +38,7 @@
 class bassBoosterEffect : public effect
 {
 public:
-	bassBoosterEffect( effect::constructionData * _cdata );
+	bassBoosterEffect( const descriptor::subPluginFeatures::key * _key );
 	virtual ~bassBoosterEffect();
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
 							const fpab_t _frames );
@@ -49,7 +50,7 @@ public:
 	virtual inline effectControlDialog * createControlDialog( track * )
 	{
 		return( new bassBoosterControlDialog(
-					eng()->getMainWindow()->workspace(),
+					engine::getMainWindow()->workspace(),
 								this ) );
 	}
 

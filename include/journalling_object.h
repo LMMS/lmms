@@ -1,7 +1,7 @@
 /*
  * journalling_object.h - declaration of class journallingObject
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,6 @@
 #endif
 
 #include "types.h"
-#include "engine.h"
 #include "qt3support.h"
 
 #ifndef QT3
@@ -110,10 +109,10 @@ typedef vvector<journalEntry> journalEntryVector;
 
 
 
-class journallingObject : public engineObject
+class journallingObject
 {
 public:
-	journallingObject( engine * _engine );
+	journallingObject( void );
 	virtual ~journallingObject();
 
 	inline const jo_id_t id( void ) const

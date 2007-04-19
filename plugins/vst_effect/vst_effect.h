@@ -1,7 +1,7 @@
 /*
  * vst_effect.h - class for handling VST effect plugins
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,7 @@
 
 
 #include "effect.h"
+#include "engine.h"
 #include "main_window.h"
 #include "lvsl_client.h"
 #include "vst_control_dialog.h"
@@ -48,7 +49,7 @@
 class vstEffect : public effect
 {
 public:
-	vstEffect( effect::constructionData * _cdata );
+	vstEffect( const descriptor::subPluginFeatures::key * _key );
 	virtual ~vstEffect();
 
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
@@ -62,7 +63,7 @@ public:
 	virtual inline effectControlDialog * createControlDialog( track * )
 	{
 		return( new vstControlDialog(
-					eng()->getMainWindow()->workspace(),
+					engine::getMainWindow()->workspace(),
 								this ) );
 	}
 

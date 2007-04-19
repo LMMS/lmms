@@ -2,7 +2,7 @@
  * arp_and_chords_tab_widget.h - declaration of class arpAndChordWidget which
  *                               provides code for using arpeggio and chords
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,7 +45,6 @@
 
 #include "journalling_object.h"
 #include "types.h"
-#include "engine.h"
 
 
 class QPixmap;

@@ -1,7 +1,7 @@
 /*
  * graph.h - a QT widget for displaying and manipulating waveforms
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,14 +43,11 @@
 #endif
 
 
-#include "engine.h"
-
-
-class graph : public QWidget, public engineObject
+class graph : public QWidget
 {
 	Q_OBJECT
 public:
-	graph( QWidget * _parent, engine * _engine );
+	graph( QWidget * _parent );
 	virtual ~graph();
 
 	void setSamplePointer( float * pointer, int length );

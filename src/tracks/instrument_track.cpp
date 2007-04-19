@@ -112,13 +112,13 @@ const int PIANO_HEIGHT		= 84;
 
 
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
-	QWidget( _tc->eng()->getMainWindow()->workspace() ),
+	QWidget( engine::getMainWindow()->workspace() ),
  	track( _tc ),
 	midiEventProcessor(),
 	m_trackType( INSTRUMENT_TRACK ),
-	m_midiPort( eng()->getMixer()->getMIDIClient()->addPort( this,
+	m_midiPort( engine::getMixer()->getMIDIClient()->addPort( this,
 						tr( "unnamed_channel" ) ) ),
-	m_audioPort( new audioPort( tr( "unnamed_channel" ), eng() ) ),
+	m_audioPort( new audioPort( tr( "unnamed_channel" ) ) ),
 	m_notes(),
 	m_notesMutex(),
 	m_baseTone( A ),
@@ -141,7 +141,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 #ifdef QT4
-	eng()->getMainWindow()->workspace()->addWindow( this );
+	engine::getMainWindow()->workspace()->addWindow( this );
 #endif
 
 	setAcceptDrops( TRUE );
@@ -153,7 +153,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// creation of widgets for track-settings-widget
 	m_tswVolumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-					tr( "Channel volume" ), eng(), this );
+						tr( "Channel volume" ), this );
 	m_tswVolumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_tswVolumeKnob->setInitValue( DEFAULT_VOLUME );
 	m_tswVolumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
@@ -224,7 +224,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// setup volume-knob
 	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
-					tr( "Channel volume" ), eng(), this );
+						tr( "Channel volume" ), this );
 	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
@@ -244,7 +244,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// setup surround-area
 	m_surroundArea = new surroundArea( m_generalSettingsWidget,
-					tr( "Surround area" ), eng(), this );
+						tr( "Surround area" ), this );
 	m_surroundArea->move( 20 + m_volumeKnob->width(), 38 );
 	m_surroundArea->show();
 #ifdef QT4
@@ -265,7 +265,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						MAX_EFFECT_CHANNEL, 2,
 						m_generalSettingsWidget,
 						tr( "FX channel" ),
-						eng(), this );
+						this );
 	m_effectChannelNumber->setInitValue( DEFAULT_EFFECT_CHANNEL );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
 	m_effectChannelNumber->move( m_surroundArea->x() +
@@ -394,7 +394,7 @@ instrumentTrack::~instrumentTrack()
 {
 	invalidateAllMyNPH();
 	delete m_audioPort;
-	eng()->getMixer()->getMIDIClient()->removePort( m_midiPort );
+	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 }
 
 
@@ -524,7 +524,7 @@ void instrumentTrack::midiConfigChanged( bool )
 float instrumentTrack::frequency( notePlayHandle * _n ) const
 {
 	float pitch = (float)( _n->tone() - m_baseTone +
-			eng()->getSongEditor()->masterPitch() ) / 12.0f +
+			engine::getSongEditor()->masterPitch() ) / 12.0f +
 					(float)( _n->octave() - m_baseOctave );
 	if( _n->detuning() )
 	{
@@ -593,10 +593,10 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		// last time we're called for current note?
 		if( ( _n->actualReleaseFramesToDo() == 0 &&
 			_n->totalFramesPlayed() +
-				eng()->getMixer()->framesPerAudioBuffer() >=
+				engine::getMixer()->framesPerAudioBuffer() >=
 							_n->frames() ) ||
 				( _n->released() && _n->releaseFramesDone() +
-			eng()->getMixer()->framesPerAudioBuffer() >=
+			engine::getMixer()->framesPerAudioBuffer() >=
 					_n->actualReleaseFramesToDo() ) )
 		{
 			// then do a soft fade-out at the end to avoid clicks
@@ -616,7 +616,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 	volumeVector v = m_surroundArea->getVolumeVector( v_scale );
 
-	eng()->getMixer()->bufferToPort( _buf, _frames,
+	engine::getMixer()->bufferToPort( _buf, _frames,
 				( _n != NULL ) ? _n->framesAhead() : 0, v,
 								m_audioPort );
 }
@@ -650,7 +650,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					notePlayHandle * nph = new
 						notePlayHandle( this,
 							_time.frames(
-						eng()->framesPerTact64th() ),
+						engine::framesPerTact64th() ),
 						valueRanges<f_cnt_t>::max, n );
 					// as mixer::addPlayHandle() might
 					// delete note (when running into
@@ -659,7 +659,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					// this mutex, we have to unlock
 					// it here temporarily
 					m_notesMutex.unlock();
-					if( eng()->getMixer()->addPlayHandle(
+					if( engine::getMixer()->addPlayHandle(
 									nph ) )
 					{
 						m_notesMutex.lock();
@@ -680,10 +680,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// to all slots connected to signal noteDone()
 				// this is for example needed by piano-roll for
 				// recording notes into a pattern
-				note done_note( NULL,
+				note done_note(
 					midiTime( static_cast<f_cnt_t>(
 						n->totalFramesPlayed() /
-						eng()->framesPerTact64th() ) ),
+						engine::framesPerTact64th() ) ),
 					0, n->tone(), n->octave(),
 					n->getVolume(), n->getPanning() );
 				n->noteOff();
@@ -817,9 +817,9 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	// Notes deleted when keys still pressed
 	if( m_notes[_n->key()] == _n )
 	{
-		note done_note( NULL, midiTime( static_cast<f_cnt_t>(
+		note done_note( midiTime( static_cast<f_cnt_t>(
 						_n->totalFramesPlayed() /
-						eng()->framesPerTact64th() ) ),
+						engine::framesPerTact64th() ) ),
 					0, _n->tone(), _n->octave(),
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
@@ -904,7 +904,7 @@ void instrumentTrack::setBaseNote( Uint32 _new_note, bool _modified )
 	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
 	if( _modified )
 	{
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 	}
 	emit baseNoteChanged();
 }
@@ -937,7 +937,7 @@ void instrumentTrack::setBaseOctave( octaves _new_octave )
 int instrumentTrack::masterKey( notePlayHandle * _n ) const
 {
 	int key = baseTone() + baseOctave() * NOTES_PER_OCTAVE +
-					eng()->getSongEditor()->masterPitch();
+					engine::getSongEditor()->masterPitch();
 	return( tLimit<int>( _n->key() -
 		( key - A - DEFAULT_OCTAVE * NOTES_PER_OCTAVE ), 0, NOTES ) );
 }
@@ -950,7 +950,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num )
 {
-	float frames_per_tact64th = eng()->framesPerTact64th();
+	float frames_per_tact64th = engine::framesPerTact64th();
 
 	vlist<trackContentObject *> tcos;
 	bbTrack * bb_track;
@@ -958,7 +958,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	{
 		trackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num, eng() );
+		bb_track = bbTrack::findBBTrack( _tco_num );
 		if( !( bb_track->automationDisabled( this )
 				|| dynamic_cast<pattern *>( tco )->empty() ) )
 		{
@@ -1002,7 +1002,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			cur_start -= p->startPosition();
 		}
 		if( p->frozen() &&
-				eng()->getSongEditor()->exporting() == FALSE )
+				engine::getSongEditor()->exporting() == FALSE )
 		{
 			if( cur_start > 0 )
 			{
@@ -1022,7 +1022,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			else
 			{
 				// send it to the mixer
-				eng()->getMixer()->addPlayHandle( handle );
+				engine::getMixer()->addPlayHandle( handle );
 			}
 			played_a_note = TRUE;
 			continue;
@@ -1100,7 +1100,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 				{
 					// no, then insert it into
 					// play-handle-vector of mixer
-					eng()->getMixer()->addPlayHandle(
+					engine::getMixer()->addPlayHandle(
 							note_play_handle );
 				}
 				else
@@ -1256,7 +1256,7 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 void instrumentTrack::surroundAreaPosChanged( const QPoint & _p )
 {
 	setSurroundAreaPos( _p );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -1265,7 +1265,7 @@ void instrumentTrack::surroundAreaPosChanged( const QPoint & _p )
 void instrumentTrack::textChanged( const QString & _new_name )
 {
 	setName( _new_name );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -1324,7 +1324,7 @@ void instrumentTrack::dropEvent( QDropEvent * _de )
 	if( type == "instrument" )
 	{
 		loadInstrument( value );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 		_de->accept();
 	}
 	else if( type == "presetfile" )
@@ -1332,7 +1332,7 @@ void instrumentTrack::dropEvent( QDropEvent * _de )
 		multimediaProject mmp( value );
 		loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 		_de->accept();
 	}
 }
@@ -1356,7 +1356,7 @@ void instrumentTrack::invalidateAllMyNPH( void )
 
 	// invalidate all note-play-handles linked to this channel
 	m_processHandles.clear();
-	eng()->getMixer()->checkValidityOfPlayHandles();
+	engine::getMixer()->checkValidityOfPlayHandles();
 
 	m_trackType = INSTRUMENT_TRACK;
 }

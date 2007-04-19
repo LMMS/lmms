@@ -3,7 +3,7 @@
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,10 +55,9 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
-					const QString & _name,
-					engine * _engine, track * _track,
+					const QString & _name, track * _track,
 					ledColors _color ) :
-	automatableButton( _parent, _name, _engine, _track ),
+	automatableButton( _parent, _name, _track ),
 	m_text( _text )
 {
 	setCheckable( TRUE );

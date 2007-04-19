@@ -4,7 +4,7 @@
  * piano_widget.cpp - implementation of piano-widget used in channel-window
  *                    for testing channel
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -153,8 +153,7 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	setBackgroundMode( Qt::NoBackground );
 #endif
 
-	m_noteKnob = new knob( knobDark_28, NULL, tr ( "Base note" ),
-						_parent->eng(), _parent );
+	m_noteKnob = new knob( knobDark_28, NULL, tr( "Base note" ), _parent );
 	m_noteKnob->setRange( 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1.0f );
 	m_noteKnob->setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
 

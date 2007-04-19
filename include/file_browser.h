@@ -48,7 +48,6 @@
 
 
 #include "side_bar_widget.h"
-#include "engine.h"
 
 
 class fileItem;
@@ -59,13 +58,13 @@ class trackContainer;
 
 
 
-class fileBrowser : public sideBarWidget, public engineObject
+class fileBrowser : public sideBarWidget
 {
 	Q_OBJECT
 public:
 	fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-					QWidget * _parent, engine * _engine );
+							QWidget * _parent );
 	virtual ~fileBrowser();
 
 	static bool isDirWithContent( const QString & _path,
@@ -107,11 +106,11 @@ private:
 
 
 
-class listView : public Q3ListView, public engineObject
+class listView : public Q3ListView
 {
 	Q_OBJECT
 public:
-	listView( QWidget * _parent, engine * _engine );
+	listView( QWidget * _parent );
 	virtual ~listView();
 
 
@@ -133,15 +132,13 @@ private:
 
 
 
-class directory : public Q3ListViewItem, public engineObject
+class directory : public Q3ListViewItem
 {
 public:
 	directory( Q3ListView * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter,
-							engine * _engine );
+			const QString & _path, const QString & _filter );
 	directory( directory * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter,
-							engine * _engine );
+			const QString & _path, const QString & _filter );
 
 	void setOpen( bool );
 	void setup( void );
@@ -189,15 +186,13 @@ private:
 
 
 
-class fileItem : public Q3ListViewItem, public engineObject
+class fileItem : public Q3ListViewItem
 {
 public:
 	fileItem( Q3ListView * _parent, const QString & _name,
-							const QString & _path,
-							engine * _engine );
+							const QString & _path );
 	fileItem( Q3ListViewItem * _parent, const QString & _name,
-							const QString & _path,
-							engine * _engine );
+							const QString & _path );
 
 	inline QString fullName( void ) const
 	{

@@ -1,7 +1,7 @@
 /*
  * graph.cpp - a QT widget for displaying and manipulating waveforms
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,9 +50,8 @@ using namespace std;
 
 
 
-graph::graph( QWidget * _parent, engine * _engine ) :
-	QWidget( _parent ),
-	engineObject( _engine )
+graph::graph( QWidget * _parent ) :
+	QWidget( _parent )
 {
 
 //	m_background = 0; TODO
@@ -96,7 +95,7 @@ void graph::loadSampleFromFile( const QString & _filename )
 	}
 	
 	// load user shape
-	sampleBuffer buffer( eng(), _filename );
+	sampleBuffer buffer( _filename );
 
 	// copy buffer data
 	sampleLength = min( sampleLength, static_cast<int>(buffer.frames()) );		 

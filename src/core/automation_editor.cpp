@@ -85,9 +85,8 @@ QPixmap * automationEditor::s_toolSelect = NULL;
 QPixmap * automationEditor::s_toolMove = NULL;
 
 
-automationEditor::automationEditor( engine * _engine ) :
-	QWidget( _engine->getMainWindow()->workspace() ),
-	journallingObject( _engine ),
+automationEditor::automationEditor( void ) :
+	QWidget( engine::getMainWindow()->workspace() ),
 	m_paintPixmap(),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
@@ -129,14 +128,14 @@ automationEditor::automationEditor( engine * _engine ) :
 
 #ifdef QT4
 	// add us to workspace
-	eng()->getMainWindow()->workspace()->addWindow( this );
+	engine::getMainWindow()->workspace()->addWindow( this );
 #endif
 
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
-				eng()->getSongEditor()->getPlayPos(
+				engine::getSongEditor()->getPlayPos(
 					songEditor::PLAY_AUTOMATION_PATTERN ),
-					m_currentPosition, this, eng() );
+						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
@@ -321,7 +320,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
+	m_zoomingXComboBox = new comboBox( m_toolBar, NULL, NULL );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
@@ -335,7 +334,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
+	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, NULL );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 	m_zoomingYComboBox->addItem( "Auto" );
 	for( int i = 0; i < 6; ++i )
@@ -351,7 +350,7 @@ automationEditor::automationEditor( engine * _engine ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
+	m_quantizeComboBox = new comboBox( m_toolBar, NULL, NULL );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
@@ -737,7 +736,7 @@ void automationEditor::updatePaintPixmap( void )
 						is_selected = TRUE;
 					}
 				}
-				else if( level > sel_level_start &&
+				else if( level >= sel_level_start &&
 					level <= sel_level_end &&
 					pos_tact_64th >= sel_pos_start &&
 					pos_tact_64th + len_tact_64th <=
@@ -975,7 +974,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( eng()->getSongEditor()->playing() )
+			if( engine::getSongEditor()->playing() )
 			{
 				stop();
 			}
@@ -1095,7 +1094,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				QCursor c( Qt::SizeAllCursor );
 				QApplication::setOverrideCursor( c );
 
-				eng()->getSongEditor()->setModified();
+				engine::getSongEditor()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -1106,7 +1105,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( -it.key() );
-					eng()->getSongEditor()->setModified();
+					engine::getSongEditor()->setModified();
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
@@ -1140,7 +1139,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				m_action = MOVE_SELECTION;
 
-				eng()->getSongEditor()->setModified();
+				engine::getSongEditor()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -1222,7 +1221,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 								level );
 			}
 
-			eng()->getSongEditor()->setModified();
+			engine::getSongEditor()->setModified();
 
 		}
 		else if(
@@ -1658,9 +1657,9 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 	m_topBottomScroll->setValue( m_scroll_level );
 
-	if( eng()->getSongEditor() )
+	if( engine::getSongEditor() )
 	{
-		eng()->getSongEditor()->getPlayPos(
+		engine::getSongEditor()->getPlayPos(
 					songEditor::PLAY_AUTOMATION_PATTERN
 					).m_timeLine->setFixedWidth( width() );
 	}
@@ -1676,7 +1675,7 @@ void automationEditor::resizeEvent( QResizeEvent * )
 void automationEditor::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
+	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -1696,7 +1695,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( eng()->getMainWindow()->isShiftPressed() )
+	else if( engine::getMainWindow()->isShiftPressed() )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() * 2 / 15 );
@@ -1745,23 +1744,23 @@ void automationEditor::play( void )
 
 	if( !m_pattern->getTrack() )
 	{
-		if( eng()->getSongEditor()->playMode() !=
+		if( engine::getSongEditor()->playMode() !=
 						songEditor::PLAY_PATTERN )
 		{
-			eng()->getSongEditor()->stop();
-			eng()->getSongEditor()->playPattern( (pattern *)
-				eng()->getPianoRoll()->currentPattern() );
+			engine::getSongEditor()->stop();
+			engine::getSongEditor()->playPattern( (pattern *)
+				engine::getPianoRoll()->currentPattern() );
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		else if( eng()->getSongEditor()->playing() )
+		else if( engine::getSongEditor()->playing() )
 		{
-			eng()->getSongEditor()->pause();
+			engine::getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( eng()->getSongEditor()->paused() )
+		else if( engine::getSongEditor()->paused() )
 		{
-			eng()->getSongEditor()->resumeFromPause();
+			engine::getSongEditor()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
@@ -1769,13 +1768,13 @@ void automationEditor::play( void )
 		{
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
-			eng()->getSongEditor()->playPattern( (pattern *)
-				eng()->getPianoRoll()->currentPattern() );
+			engine::getSongEditor()->playPattern( (pattern *)
+				engine::getPianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		if( eng()->getSongEditor()->playing() )
+		if( engine::getSongEditor()->playing() )
 		{
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
@@ -1784,18 +1783,18 @@ void automationEditor::play( void )
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		eng()->getBBEditor()->play();
+		engine::getBBEditor()->play();
 	}
 	else
 	{
-		if( eng()->getSongEditor()->playing() )
+		if( engine::getSongEditor()->playing() )
 		{
-			eng()->getSongEditor()->pause();
+			engine::getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( eng()->getSongEditor()->paused() )
+		else if( engine::getSongEditor()->paused() )
 		{
-			eng()->getSongEditor()->resumeFromPause();
+			engine::getSongEditor()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
@@ -1803,7 +1802,7 @@ void automationEditor::play( void )
 		{
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
-			eng()->getSongEditor()->play();
+			engine::getSongEditor()->play();
 		}
 	}
 }
@@ -1819,11 +1818,11 @@ void automationEditor::stop( void )
 	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
-		eng()->getBBEditor()->stop();
+		engine::getBBEditor()->stop();
 	}
 	else
 	{
-		eng()->getSongEditor()->stop();
+		engine::getSongEditor()->stop();
 	}
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
@@ -1979,9 +1978,9 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 #endif
 		Sint32 pos_tact_64th = -it.key();
 
-		if( level > sel_level_start && level <= sel_level_end &&
+		if( level >= sel_level_start && level <= sel_level_end &&
 				pos_tact_64th >= sel_pos_start &&
-				pos_tact_64th+len_tact_64th <= sel_pos_end )
+				pos_tact_64th + len_tact_64th <= sel_pos_end )
 		{
 			_selected_values[it.key()] = level;
 		}
@@ -2033,7 +2032,7 @@ void automationEditor::cutSelectedValues( void )
 
 	if( !selected_values.isEmpty() )
 	{
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
@@ -2048,7 +2047,7 @@ void automationEditor::cutSelectedValues( void )
 	}
 
 	update();
-	eng()->getSongEditor()->update();
+	engine::getSongEditor()->update();
 }
 
 
@@ -2076,9 +2075,9 @@ void automationEditor::pasteValues( void )
 
 		// we only have to do the following lines if we pasted at
 		// least one value...
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 		update();
-		eng()->getSongEditor()->update();
+		engine::getSongEditor()->update();
 	}
 }
 
@@ -2105,9 +2104,9 @@ void automationEditor::deleteSelectedValues( void )
 
 	if( update_after_delete == TRUE )
 	{
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 		update();
-		eng()->getSongEditor()->update();
+		engine::getSongEditor()->update();
 	}
 }
 
@@ -2116,8 +2115,8 @@ void automationEditor::deleteSelectedValues( void )
 
 void automationEditor::updatePosition( const midiTime & _t )
 {
-	if( ( eng()->getSongEditor()->playing() &&
-			eng()->getSongEditor()->playMode() ==
+	if( ( engine::getSongEditor()->playing() &&
+			engine::getSongEditor()->playMode() ==
 					songEditor::PLAY_AUTOMATION_PATTERN ) ||
 							m_scrollBack == TRUE )
 	{
@@ -2228,7 +2227,7 @@ void automationEditor::updateTopBottomLevels( void )
 inline bool automationEditor::inBBEditor( void )
 {
 	return( m_pattern->getTrack()->getTrackContainer()
-						== eng()->getBBEditor() );
+						== engine::getBBEditor() );
 }
 
 
@@ -2240,7 +2239,7 @@ void automationEditor::update( void )
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		eng()->getPianoRoll()->update();
+		engine::getPianoRoll()->update();
 	}
 }
 

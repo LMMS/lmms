@@ -55,142 +55,97 @@ class ladspa2LMMS;
 class engine
 {
 public:
-	engine( const bool _has_gui = true );
-	engine( const engine & _engine );
-	~engine();
+	static void init( const bool _has_gui = true );
+	static void destroy( void );
 
-	engine * duplicate( const engine * _engine )
+	static bool hasGUI( void )
 	{
-		return( new engine( *_engine ) );
+		return( s_hasGUI );
 	}
 
-	inline bool hasGUI( void ) const
+	static mixer * getMixer( void )
 	{
-		return( m_hasGUI );
+		return( s_mixer );
 	}
 
-	inline mixer * getMixer( void )
+	static mainWindow * getMainWindow( void )
 	{
-		return( m_mixer );
+		return( s_mainWindow );
 	}
 
-	inline const mixer * getMixer( void ) const
+	static songEditor * getSongEditor( void )
 	{
-		return( m_mixer );
+		return( s_songEditor );
 	}
 
-	inline mainWindow * getMainWindow( void )
+	static bbEditor * getBBEditor( void )
 	{
-		return( m_mainWindow );
+		return( s_bbEditor );
 	}
 
-	inline songEditor * getSongEditor( void )
+	static pianoRoll * getPianoRoll( void )
 	{
-		return( m_songEditor );
+		return( s_pianoRoll );
 	}
 
-	inline const songEditor * getSongEditor( void ) const
+	static projectNotes * getProjectNotes( void )
 	{
-		return( m_songEditor );
+		return( s_projectNotes );
 	}
 
-	inline bbEditor * getBBEditor( void )
+	static projectJournal * getProjectJournal( void )
 	{
-		return( m_bbEditor );
+		return( s_projectJournal );
 	}
 
-	inline pianoRoll * getPianoRoll( void )
+	static automationEditor * getAutomationEditor( void )
 	{
-		return( m_pianoRoll );
-	}
-
-	inline projectNotes * getProjectNotes( void )
-	{
-		return( m_projectNotes );
-	}
-
-	inline projectJournal * getProjectJournal( void )
-	{
-		return( m_projectJournal );
-	}
-
-	inline automationEditor * getAutomationEditor( void )
-	{
-		return( m_automationEditor );
+		return( s_automationEditor );
 	}
 
 #ifdef LADSPA_SUPPORT
-	inline ladspa2LMMS * getLADSPAManager( void )
+	static ladspa2LMMS * getLADSPAManager( void )
 	{
-		return( m_ladspaManager );
+		return( s_ladspaManager );
 	}
 #endif
 
-	void close( void );
-
-	float framesPerTact64th( void ) const
+	static float framesPerTact64th( void )
 	{
-		return( m_frames_per_tact64th );
+		return( s_frames_per_tact64th );
 	}
-	void updateFramesPerTact64th( void );
+	static void updateFramesPerTact64th( void );
 
-	const QMap<QString, QString> & sampleExtensions( void )
+	static const QMap<QString, QString> & sampleExtensions( void )
 	{
-		return( m_sample_extensions );
+		return( s_sample_extensions );
 	}
 
 
 private:
-	bool m_hasGUI;
-	float m_frames_per_tact64th;
+	static bool s_hasGUI;
+	static float s_frames_per_tact64th;
 
-	mixer * m_mixer;
-	mainWindow * m_mainWindow;
-	songEditor * m_songEditor;
-	automationEditor * m_automationEditor;
-	bbEditor * m_bbEditor;
-	pianoRoll * m_pianoRoll;
-	projectNotes * m_projectNotes;
-	projectJournal * m_projectJournal;
+	static mixer * s_mixer;
+	static mainWindow * s_mainWindow;
+	static songEditor * s_songEditor;
+	static automationEditor * s_automationEditor;
+	static bbEditor * s_bbEditor;
+	static pianoRoll * s_pianoRoll;
+	static projectNotes * s_projectNotes;
+	static projectJournal * s_projectJournal;
 	
 #ifdef LADSPA_SUPPORT
-	ladspa2LMMS * m_ladspaManager;
+	static ladspa2LMMS * s_ladspaManager;
 #endif
 
-	QMap<QString, QString> m_sample_extensions;
+	static QMap<QString, QString> s_sample_extensions;
 
-	void load_extensions( void );
-
-} ;
-
-
-
-class engineObject
-{
-public:
-	engineObject( engine * _engine );
-	~engineObject();
-
-	inline engine * eng( void )
-	{
-		return( m_engine );
-	}
-
-	inline const engine * eng( void ) const
-	{
-		return( m_engine );
-	}
-
-	inline bool hasGUI( void ) const
-	{
-		return( m_engine->hasGUI() );
-	}
-
-
-private:
-	engine * m_engine;
+	static void load_extensions( void );
 
 } ;
+
+
 
 
 #endif

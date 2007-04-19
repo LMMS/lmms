@@ -2,7 +2,7 @@
  * automation_editor.h - declaration of class automationEditor which is a window
  *                       where you can edit dynamic values in an easy way
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,7 +45,6 @@
 
 #include "types.h"
 #include "note.h"
-#include "engine.h"
 #include "journalling_object.h"
 #include "automation_pattern.h"
 
@@ -168,7 +167,7 @@ private:
 
 	static const int VALUES_WIDTH = 64;
 
-	automationEditor( engine * _engine );
+	automationEditor( void );
 	automationEditor( const automationEditor & );
 	virtual ~automationEditor();
 

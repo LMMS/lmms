@@ -60,7 +60,7 @@
 class QPainter;
 
 
-class sampleBuffer : public QObject, public engineObject, public sharedObject
+class sampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
@@ -92,11 +92,10 @@ public:
 
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	sampleBuffer( engine * _engine, const QString & _audio_file = "",
+	sampleBuffer( const QString & _audio_file = "",
 						bool _is_base64_data = FALSE );
-	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
-							engine * _engine );
-	sampleBuffer( const f_cnt_t _frames, engine * _engine );
+	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
+	sampleBuffer( const f_cnt_t _frames );
 	
 	virtual ~sampleBuffer();
 
@@ -164,6 +163,11 @@ public:
 		m_frequency = _freq;
 	}
 
+	inline void setSampleRate( sample_rate_t _rate )
+	{
+		m_sample_rate = _rate;
+	}
+
 	inline const sampleFrame * data( void ) const
 	{
 		return( m_data );
@@ -177,8 +181,7 @@ public:
 	static sampleBuffer * FASTCALL resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr,
-						engine * _engine );
+						const sample_rate_t _dst_sr );
 
 	static inline sampleBuffer * FASTCALL resample(
 						sampleBuffer * _buf,
@@ -186,7 +189,7 @@ public:
 						const sample_rate_t _dst_sr )
 	{
 		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
-						_dst_sr, _buf->eng() ) );
+								_dst_sr ) );
 	}
 
 	void normalize_sample_rate( const sample_rate_t _src_sr,
@@ -270,6 +273,7 @@ private:
 	float m_amplification;
 	bool m_reversed;
 	float m_frequency;
+	sample_rate_t m_sample_rate;
 	QMutex m_dataMutex;
 
 #ifdef HAVE_SAMPLERATE_H

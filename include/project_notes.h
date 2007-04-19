@@ -1,7 +1,7 @@
 /*
  * project_notes.h - header for project-notes-editor
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,6 @@
 #endif
 
 #include "journalling_object.h"
-#include "engine.h"
 
 
 class QAction;
@@ -52,7 +51,7 @@ class projectNotes : public QMainWindow, public journallingObject
 {
 	Q_OBJECT
 public:
-	projectNotes( engine * _engine );
+	projectNotes( void );
 	virtual ~projectNotes();
 
 	void clear( void );

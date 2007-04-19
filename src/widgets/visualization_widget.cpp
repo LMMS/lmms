@@ -3,7 +3,7 @@
 /*
  * visualization_widget.cpp - widget for visualization of sound-data
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,6 +45,7 @@
 
 #include "visualization_widget.h"
 #include "embed.h"
+#include "engine.h"
 #include "buffer_allocator.h"
 #include "templates.h"
 #include "tooltip.h"
@@ -55,10 +56,8 @@ const int UPDATE_TIME = 1000 / 20;	// 20 fps
 
 
 visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
-						engine * _engine,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
-	engineObject( _engine ),
 	s_background( _bg ),
 	m_enabled( TRUE )
 {
@@ -68,10 +67,10 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	setFixedSize( s_background.width(), s_background.height() );
 
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
 
-	eng()->getMixer()->clearAudioBuffer( m_buffer, frames );
+	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
 
 
 	m_updateTimer = new QTimer( this );
@@ -81,7 +80,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 		m_updateTimer->start( UPDATE_TIME );
 	}
 
-	connect( eng()->getMixer(), SIGNAL( nextAudioBuffer(
+	connect( engine::getMixer(), SIGNAL( nextAudioBuffer(
 					const surroundSampleFrame *, int ) ),
 		this, SLOT( setAudioBuffer(
 					const surroundSampleFrame *, int ) ) );
@@ -125,7 +124,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	if( m_enabled == TRUE )
 	{
-		float master_output = eng()->getMixer()->masterGain();
+		float master_output = engine::getMixer()->masterGain();
 		Uint16 w = width()-4;
 		float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		Uint16 x_base = 2;
@@ -140,7 +139,8 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 		float max_level = 0.0;
 
-		const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+		const fpab_t frames =
+				engine::getMixer()->framesPerAudioBuffer();
 
 		// analyse wave-stream for max-level
 		for( fpab_t frame = 0; frame < frames; ++frame )

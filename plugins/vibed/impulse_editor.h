@@ -1,7 +1,7 @@
 /*
  * impulse_editor.cpp - graphic waveform editor
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,16 +44,14 @@
 #include "types.h"
 #include "graph.h"
 #include "pixmap_button.h"
-#include "engine.h"
 #include "led_checkbox.h"
 
-class impulseEditor: public QWidget, public engineObject
+class impulseEditor: public QWidget
 {
 	Q_OBJECT
 public:
-	impulseEditor( QWidget *parent, int _x, int _y, 
-					engine * _engine, track * _track,
-					Uint32 _len = 128 );
+	impulseEditor( QWidget *parent, int _x, int _y, track * _track,
+							Uint32 _len = 128 );
 	~impulseEditor();
 	
 	inline float * getValues() { return( m_sampleShape ); };

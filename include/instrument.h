@@ -2,7 +2,7 @@
  * instrument.h - declaration of class instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,7 @@
 #endif
 
 
+#include "engine.h"
 #include "plugin.h"
 #include "mixer.h"
 
@@ -140,7 +141,7 @@ protected:
 	inline void invalidate( void )
 	{
 		m_valid = FALSE;
-		eng()->getMixer()->checkValidityOfPlayHandles();
+		engine::getMixer()->checkValidityOfPlayHandles();
 	}
 
 

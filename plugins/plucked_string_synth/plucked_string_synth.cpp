@@ -1,7 +1,7 @@
 /*
  * plucked_string_synth.cpp - instrument which uses the Karplus-Strong-algorithm
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,14 +73,14 @@ pluckedStringSynth::pluckedStringSynth( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &pluckedstringsynth_plugin_descriptor )
 {
 	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
  	m_pickKnob->setInitValue( 0.0f );
 	m_pickKnob->move( 86, 134 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 
 	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 	m_pickupKnob->setInitValue( 0.05f );
 	m_pickupKnob->move( 138, 134 );
@@ -140,10 +140,10 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 		float freq = getInstrumentTrack()->frequency( _n );
 		_n->m_pluginData = new pluckSynth( freq, m_pickKnob->value(),
 						m_pickupKnob->value(),
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 	}
 
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );

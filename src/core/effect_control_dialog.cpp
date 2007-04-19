@@ -4,7 +4,7 @@
  * effect_control_dialog.cpp - base-class for effect-dialogs for displaying
  *                            and editing control port values
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,6 @@ effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
 		, "effectControlDialog"
 #endif
 					),
-	journallingObject( _eff->eng() ),
 	m_effect( _eff )
 {
 	setWindowTitle( m_effect->publicName() );

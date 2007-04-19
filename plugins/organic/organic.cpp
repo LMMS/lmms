@@ -122,7 +122,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 		// setup volume-knob
 		m_osc[i].oscKnob = new knob( knobGreen_17, this, tr(
-					"Osc %1 waveform" ).arg( i+1 ), eng(),
+						"Osc %1 waveform" ).arg( i+1 ),
 							_channel_track );
 		m_osc[i].oscKnob->move( 25+i*20, 90 );
 		m_osc[i].oscKnob->setRange( 0.0f, 5.0f, 0.25f );
@@ -136,7 +136,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 										
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobGreen_17, this, tr(
-					"Osc %1 volume" ).arg( i+1 ), eng(),
+						"Osc %1 volume" ).arg( i+1 ),
 							_channel_track );
 		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 25+i*20, 110 );
@@ -147,7 +147,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobGreen_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng(),
+					tr( "Osc %1 panning" ).arg( i + 1 ),
 							_channel_track );
 		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 25+i*20, 130 );
@@ -159,7 +159,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].detuneKnob = new knob( knobGreen_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-							eng(), _channel_track );
+							_channel_track );
 		m_osc[i].detuneKnob->setData( i );
 		m_osc[i].detuneKnob->move( 25+i*20, 150 );
 		m_osc[i].detuneKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -184,19 +184,19 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 	}
 
-	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
 
 		// setup knob for FX1
-		fx1Knob = new knob( knobGreen_17, this,
-				tr( "FX1" ), eng(), _channel_track );
+		fx1Knob = new knob( knobGreen_17, this, tr( "FX1" ),
+							_channel_track );
 		fx1Knob->move( 20, 200 );
 		fx1Knob->setRange( 0.0f, 0.99f, 0.01f );
 		fx1Knob->setInitValue( 0.0f);
 		
 		// setup volume-knob
 		volKnob = new knob( knobGreen_17, this, tr(
-					"Osc %1 volume" ).arg( 1 ), eng(),
+						"Osc %1 volume" ).arg( 1 ),
 							_channel_track );
 		volKnob->move( 50, 200 );
 		volKnob->setRange( 0, 200, 1.0f );
@@ -205,7 +205,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 							1 ) + " ", "%" );
 							
 		// randomise
-		m_randBtn = new pixmapButton( this, tr( "Randomise" ), eng(),
+		m_randBtn = new pixmapButton( this, tr( "Randomise" ),
 							_channel_track );
 		m_randBtn->move( 100, 200 );
 		m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -370,7 +370,7 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 	oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData
 								)->oscRight;
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 	
 	osc_l->update( buf, frames, 0 );
@@ -511,10 +511,10 @@ void organicInstrument::updateDetuning( const QVariant & _data )
 	const int _i = _data.toInt();
 	m_osc[_i].detuningLeft = powf( 2.0f, m_osc[_i].harmonic
 			+ (float)m_osc[_i].detuneKnob->value() / 100.0f )
-			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+					/ engine::getMixer()->sampleRate();
 	m_osc[_i].detuningRight = powf( 2.0f, m_osc[_i].harmonic
 			- (float)m_osc[_i].detuneKnob->value() / 100.0f )
-			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+					/ engine::getMixer()->sampleRate();
 }
 
 

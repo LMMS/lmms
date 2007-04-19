@@ -1,9 +1,9 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * meter_dialog.cpp - diloag for entering meter settings
+ * meter_dialog.cpp - dialog for entering meter settings
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,9 +53,8 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	QWidget * num = new QWidget( this );
 	QHBoxLayout * num_layout = new QHBoxLayout( num );
 	num_layout->setSpacing( 10 );
-	m_numerator = new lcdSpinBox( 1, 32, 2, num,
-						tr( "Meter Numerator" ),
-						_track->eng(), _track );
+	m_numerator = new lcdSpinBox( 1, 32, 2, num, tr( "Meter Numerator" ),
+								_track );
 	connect( m_numerator, SIGNAL( valueChanged( int ) ), 
 			this, SIGNAL( numeratorChanged( int ) ) );
 	m_numerator->setValue( 4 );
@@ -71,7 +70,7 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	dem_layout->setSpacing( 10 );
 	m_denominator = new lcdSpinBox( 1, 32, 2, dem,
 						tr( "Meter Denominator" ),
-						_track->eng(), _track );
+						_track );
 	connect( m_denominator, SIGNAL( valueChanged( int ) ), 
 			this, SIGNAL( denominatorChanged( int ) ) );
 	m_denominator->setValue( 4 );

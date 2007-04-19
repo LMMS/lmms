@@ -86,13 +86,13 @@ textFloat * knob::s_textFloat = NULL;
 
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track ) :
+							track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	autoObj( _engine, _track ),
+	autoObj( _track ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_hintTextBeforeValue( "" ),
@@ -138,9 +138,9 @@ knob::~knob()
 {
 /*	// make sure pointer to this knob isn't used anymore in active
 	// midi-device-class
-	if( eng()->getMixer()->getMIDIClient()->pitchBendKnob() == this )
+	if( engine::getMixer()->getMIDIClient()->pitchBendKnob() == this )
 	{
-		eng()->getMixer()->getMIDIClient()->setPitchBendKnob( NULL );
+		engine::getMixer()->getMIDIClient()->setPitchBendKnob( NULL );
 	}*/
 }
 
@@ -289,7 +289,7 @@ float knob::getValue( const QPoint & _p )
 		}
 		return( new_value );
 	}
-	if( eng()->getMainWindow()->isShiftPressed() )
+	if( engine::getMainWindow()->isShiftPressed() )
 	{
 		return( ( _p.y() - m_origMousePos.y() ) * step() );
 	}
@@ -429,8 +429,8 @@ void knob::dropEvent( QDropEvent * _de )
 void knob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == FALSE &&
-			eng()->getMainWindow()->isShiftPressed() == FALSE )
+			engine::getMainWindow()->isCtrlPressed() == FALSE &&
+			engine::getMainWindow()->isShiftPressed() == FALSE )
 	{
 		prepareJournalEntryFromOldVal();
 
@@ -459,21 +459,21 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == TRUE/* &&
-			eng()->getMainWindow()->isShiftPressed() == FALSE*/ )
+			engine::getMainWindow()->isCtrlPressed() == TRUE/* &&
+			engine::getMainWindow()->isShiftPressed() == FALSE*/ )
 	{
 		new stringPairDrag( "float_value", QString::number( value() ),
-						QPixmap(), this, eng() );
+							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-/*			eng()->getMainWindow()->isCtrlPressed() == TRUE &&*/
-			eng()->getMainWindow()->isShiftPressed() == TRUE )
+/*			engine::getMainWindow()->isCtrlPressed() == TRUE &&*/
+			engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
         /* this pointer was casted to uint, 
          * compile time error on 64 bit systems */
 		new stringPairDrag( "link_object",
 						QString::number( (ulong) this ),
-						QPixmap(), this, eng() );
+							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
@@ -734,7 +734,7 @@ void knob::enterValue( void )
 
 void knob::connectToMidiDevice( void )
 {
-	//eng()->getMixer()->getMIDIDevice()->setPitchBendKnob( this );
+	//engine::getMixer()->getMIDIDevice()->setPitchBendKnob( this );
 }
 
 

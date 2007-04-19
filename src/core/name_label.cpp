@@ -4,7 +4,7 @@
  * name_label.cpp - implementation of class nameLabel, a label which
  *                  is renamable by double-clicking it
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,13 +49,12 @@
 #include "bb_track.h"
 #include "gui_templates.h"
 #include "config_mgr.h"
+#include "engine.h"
 
 
 
-nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent,
-							engine * _engine ) :
+nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent ) :
 	QLabel( _initial_name, _parent ),
-	engineObject( _engine ),
 	m_pixmap(),
 	m_pixmapFile( "" )
 {
@@ -287,7 +286,7 @@ void nameLabel::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 0, 224, 0 ) );
 	bbTrack * bbt = bbTrack::findBBTrack(
-				eng()->getBBEditor()->currentBB(), eng() );
+					engine::getBBEditor()->currentBB() );
 	if( bbt != NULL && bbt->getTrackSettingsWidget() ==
 			dynamic_cast<trackSettingsWidget *>( parentWidget() ) )
 	{

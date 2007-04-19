@@ -35,8 +35,7 @@
 class midiDummy : public midiClientRaw
 {
 public:
-	midiDummy( engine * _engine ) :
-		midiClientRaw( _engine )
+	midiDummy( void )
 	{
 	}
 	virtual ~midiDummy()

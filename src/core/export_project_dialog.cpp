@@ -3,7 +3,7 @@
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -129,10 +129,8 @@ Sint16 exportProjectDialog::s_availableBitrates[] =
 // TODO: rewrite that crap using layouts!!
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
-						QWidget * _parent,
-						engine * _engine ) :
+							QWidget * _parent ) :
 	QDialog( _parent ),
-	engineObject( _engine ),
 	m_fileName( _file_name ),
 	m_hourglassLbl( NULL ),
 	m_deleteFile( FALSE )
@@ -153,7 +151,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new comboBox( this, NULL, eng(), NULL );
+	m_typeCombo = new comboBox( this, NULL, NULL );
 	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
 					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
 								TYPE_HEIGHT );
@@ -176,7 +174,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new comboBox( this, NULL, eng(), NULL );
+	m_kbpsCombo = new comboBox( this, NULL, NULL );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
@@ -192,15 +190,14 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 						QString::number( 128 ) ) );
 
 
-	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, NULL, eng(),
-									NULL );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, NULL, NULL );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
 	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
-						this, NULL, eng(), NULL );
+							this, NULL, NULL );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
 	m_hqmCb->setChecked( TRUE );
@@ -258,7 +255,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 {
 	if( _ke->key() == Qt::Key_Escape )
 	{
-		if( eng()->getSongEditor()->exporting() == FALSE )
+		if( engine::getSongEditor()->exporting() == FALSE )
 		{
 			accept();
 		}
@@ -274,7 +271,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( eng()->getSongEditor()->exporting() == TRUE )
+	if( engine::getSongEditor()->exporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
@@ -332,7 +329,7 @@ void exportProjectDialog::exportBtnClicked( void )
 					m_kbpsCombo->currentText().toInt(),
 					m_kbpsCombo->currentText().toInt() - 64,
 					m_kbpsCombo->currentText().toInt() + 64,
-					eng()->getMixer() );
+					engine::getMixer() );
 	if( success_ful == FALSE )
 	{
 		QMessageBox::information( this,
@@ -377,28 +374,29 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 
-	eng()->getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
-	eng()->getSongEditor()->startExport();
+	engine::getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
+	engine::getSongEditor()->startExport();
 
 	delete m_hqmCb;
 
-	songEditor::playPos & pp = eng()->getSongEditor()->getPlayPos(
+	songEditor::playPos & pp = engine::getSongEditor()->getPlayPos(
 							songEditor::PLAY_SONG );
 
-	while( eng()->getSongEditor()->exportDone() == FALSE &&
-				eng()->getSongEditor()->exporting() == TRUE )
+	while( engine::getSongEditor()->exportDone() == FALSE &&
+				engine::getSongEditor()->exporting() == TRUE )
 	{
 		dev->processNextBuffer();
 		int pval = pp * 100 /
-			( ( eng()->getSongEditor()->lengthInTacts() + 1 ) * 64 );
+			( ( engine::getSongEditor()->lengthInTacts() + 1 )
+									* 64 );
 #ifdef QT4
 		m_exportProgressBar->setValue( pval );
 #else
 		m_exportProgressBar->setProgress( pval );
 #endif
 		// update lmms-main-win-caption
-		eng()->getMainWindow()->setWindowTitle( tr( "Rendering:" ) + " " +
-						QString::number( pval ) + "%" );
+		engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
+					+ " " + QString::number( pval ) + "%" );
 		// process paint-events etc.
 		qApp->processEvents();
 	}
@@ -418,7 +416,7 @@ void exportProjectDialog::exportBtnClicked( void )
 void exportProjectDialog::cancelBtnClicked( void )
 {
 	// is song-export-thread active?
-	if( eng()->getSongEditor()->exporting() == TRUE )
+	if( engine::getSongEditor()->exporting() == TRUE )
 	{
 		// then dispose abort of export
 		abortProjectExport();
@@ -443,7 +441,7 @@ void exportProjectDialog::abortProjectExport( void )
 
 void exportProjectDialog::finishProjectExport( void )
 {
-	eng()->getMixer()->restoreAudioDevice();
+	engine::getMixer()->restoreAudioDevice();
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_deleteFile )
@@ -452,9 +450,9 @@ void exportProjectDialog::finishProjectExport( void )
 	}
 
 	// restore window-title
-	eng()->getMainWindow()->resetWindowTitle(); 
+	engine::getMainWindow()->resetWindowTitle(); 
 
-	eng()->getSongEditor()->stopExport();
+	engine::getSongEditor()->stopExport();
 
 	// if we rendered file from command line, quit after export
 	if( file_to_render != "" )

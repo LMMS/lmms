@@ -3,7 +3,7 @@
 /*
  * group_box.cpp - groupbox for LMMS
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,9 +58,8 @@ QPixmap * groupBox::s_ledBg = NULL;
 
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent,
-					engine * _engine, track * _track ) :
+							track * _track ) :
 	QWidget( _parent ),
-	engineObject( _engine ),
 	m_caption( _caption ),
 	m_origHeight( height() ),
 	m_animating( FALSE )
@@ -77,7 +76,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 
 	updatePixmap();
 
-	m_led = new pixmapButton( this, _caption, eng(), _track );
+	m_led = new pixmapButton( this, _caption, _track );
 	m_led->setCheckable( TRUE );
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );

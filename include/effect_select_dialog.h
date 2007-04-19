@@ -43,15 +43,14 @@
 
 #endif
 
-#include "engine.h"
 #include "effect.h"
 
 
-class effectSelectDialog : public QDialog, public engineObject
+class effectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	effectSelectDialog( QWidget * _parent, engine * _engine );
+	effectSelectDialog( QWidget * _parent );
 	virtual ~effectSelectDialog();
 
 	effect * instantiateSelectedPlugin( void );
@@ -68,11 +67,11 @@ private:
 
 
 
-class effectList : public QWidget, public engineObject
+class effectList : public QWidget
 {
 	Q_OBJECT
 public:
-	effectList( QWidget * _parent, engine * _engine );
+	effectList( QWidget * _parent );
 
 	virtual ~effectList();
 	

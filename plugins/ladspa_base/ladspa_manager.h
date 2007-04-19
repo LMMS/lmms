@@ -3,7 +3,7 @@
  *                    a class to manage loading and instantiation
  *                    of ladspa plugins
  *
- * Copyright (c) 2005 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -61,7 +61,6 @@
 #include "types.h"
 //#include "qt3support.h"
 
-class engine;
 
 const float NOHINT = -99342.2243f;
 
@@ -107,7 +106,7 @@ class ladspaManager
 {
 public:
 	
-	ladspaManager( engine * _engine );
+	ladspaManager( void );
 	~ladspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();

@@ -3,8 +3,8 @@
 /*
  * tempo_sync_knob.cpp - adds bpm to ms conversion for knob class
  *
- * Copyright (c) 2005 Danny McRae <khjklujn/at/yahoo.com>
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,19 +53,19 @@
 
 
 tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
-					const QString & _name,
-					engine * _engine, track * _track,
-					float _scale ) :
-	knob( _knob_num, _parent, _name, _engine, _track ),
+							const QString & _name,
+							track * _track,
+							float _scale ) :
+	knob( _knob_num, _parent, _name, _track ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
 	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
 	m_tempoLastSyncMode( NO_SYNC )
 {
-	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( engine::getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
-	m_custom = new meterDialog( eng()->getMainWindow()->workspace(),
+	m_custom = new meterDialog( engine::getMainWindow()->workspace(),
 								_track );
 	m_custom->hide();
 	m_custom->setWindowTitle( "Meter" );
@@ -110,7 +110,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
 	
-	float limit = 60000.0f / ( eng()->getSongEditor()->getTempo() *
+	float limit = 60000.0f / ( engine::getSongEditor()->getTempo() *
 								m_scale );
 	
 #ifdef QT4
@@ -261,7 +261,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 void tempoSyncKnob::mouseMoveEvent( QMouseEvent * _me )
 {
 	m_tempoSyncMode = NO_SYNC;
-	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	calculateTempoSyncTime( engine::getSongEditor()->getTempo() );
 	knob::mouseMoveEvent( _me );
 }
 
@@ -272,7 +272,7 @@ void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
 {
 	knob::wheelEvent( _we );
 	m_tempoSyncMode = NO_SYNC;
-	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	calculateTempoSyncTime( engine::getSongEditor()->getTempo() );
 }
 
 
@@ -295,7 +295,7 @@ void tempoSyncKnob::setTempoSync( QAction * ) { }
 void tempoSyncKnob::setTempoSync( int _note_type )
 {
 	setSyncMode( ( tempoSyncMode ) _note_type );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -473,7 +473,7 @@ void tempoSyncKnob::setSyncMode( tempoSyncMode _new_mode )
 					this, SLOT( updateCustom( int ) ) );
 		}
 	}
-	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	calculateTempoSyncTime( engine::getSongEditor()->getTempo() );
 }
 
 
@@ -490,7 +490,7 @@ float tempoSyncKnob::getScale( void )
 void tempoSyncKnob::setScale( float _new_scale )
 {
 	m_scale = _new_scale;
-	calculateTempoSyncTime( eng()->getSongEditor()->getTempo() );
+	calculateTempoSyncTime( engine::getSongEditor()->getTempo() );
 	emit scaleChanged( _new_scale );
 }
 

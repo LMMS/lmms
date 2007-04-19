@@ -3,7 +3,7 @@
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -85,10 +85,15 @@ audioDevice::~audioDevice()
 
 
 
-void audioDevice::processNextBuffer( void )
+bool audioDevice::processNextBuffer( void )
 {
 	const fpab_t frames = getNextBuffer( m_buffer );
+	if( !frames )
+	{
+		return( FALSE );
+	}
 	writeBuffer( m_buffer, frames, getMixer()->masterGain() );
+	return( TRUE );
 }
 
 
@@ -97,7 +102,11 @@ void audioDevice::processNextBuffer( void )
 fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 {
 	fpab_t frames = getMixer()->framesPerAudioBuffer();
-	const surroundSampleFrame * b = getMixer()->renderNextBuffer();
+	const surroundSampleFrame * b = getMixer()->nextBuffer();
+	if( !b )
+	{
+		return( 0 );
+	}
 
 	// make sure, no other thread is accessing device
 	lock();
@@ -117,7 +126,17 @@ fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// release lock
 	unlock();
 
+	delete[] b;
+
 	return( frames );
+}
+
+
+
+
+void audioDevice::stopProcessing( void )
+{
+	while( processNextBuffer() );
 }
 
 
@@ -346,6 +365,8 @@ void FASTCALL audioDevice::clearS16Buffer( int_sample_t * _outbuf,
 #endif
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
+
+
 
 
 #endif

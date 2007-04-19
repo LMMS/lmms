@@ -3,7 +3,7 @@
 /*
  * instrument.cpp - base-class for all instrument-plugins (synths, samplers etc)
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 instrument::instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	plugin( _descriptor, _instrument_track->eng() ),
+	plugin( _descriptor ),
 	m_instrumentTrack( _instrument_track ),
 	m_valid( TRUE )
 {

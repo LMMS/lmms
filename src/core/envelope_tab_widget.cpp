@@ -4,7 +4,7 @@
  * envelope_tab_widget.cpp - widget for use in envelope/lfo/filter-tab of
  *                           instrument-track-window
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -84,7 +84,6 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 
 envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	journallingObject( _instrument_track->eng() ),
 	m_instrumentTrack( _instrument_track )
 {
 
@@ -122,7 +121,6 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 		m_envLFOWidgets[i] = new envelopeAndLFOWidget(
 							value_for_zero_amount,
 							m_targetsTabWidget,
-							eng(),
 							_instrument_track );
 		m_targetsTabWidget->addTab( m_envLFOWidgets[i],
 						tr( targetNames[i][0]
@@ -138,14 +136,14 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	}
 	
 	
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this, eng(),
+	m_filterGroupBox = new groupBox( tr( "FILTER" ), this,
 							_instrument_track );
 	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
 	m_filterComboBox = new comboBox( m_filterGroupBox, tr( "Filter type" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
@@ -179,7 +177,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 
 	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox,
 						tr( "cutoff-frequency" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
 	m_filterCutKnob->setRange( 0.0, 14000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
@@ -199,8 +197,8 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 			"frequencies below cutoff-frequency and so on..." ) );
 
 	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox,
-						tr( "Q/Resonance" ),
-						eng(), _instrument_track );
+							tr( "Q/Resonance" ),
+							_instrument_track );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->setRange( basicFilters<>::minQ(), 10.0, 0.01 );
 	m_filterResKnob->move( 190, 18 );
@@ -236,7 +234,7 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 
 	if( _n->released() == FALSE )
 	{
-		release_begin += eng()->getMixer()->framesPerAudioBuffer();
+		release_begin += engine::getMixer()->framesPerAudioBuffer();
 	}
 
 	float volume_level;
@@ -261,7 +259,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 	if( _n->released() == FALSE )
 	{
-		release_begin += eng()->getMixer()->framesPerAudioBuffer();
+		release_begin += engine::getMixer()->framesPerAudioBuffer();
 	}
 
 	// because of optimizations, there's special code for several cases:
@@ -281,7 +279,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 	if( _n->m_filter == NULL )
 	{
 		_n->m_filter = new basicFilters<>(
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 	}
 
 	m_envLFOWidgets[VOLUME]->lock();

@@ -4,7 +4,7 @@
  * midi_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                       MIDI-related stuff
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,7 +63,6 @@
 midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 							midiPort * _port ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	journallingObject( _instrument_track->eng() ),
 	m_instrumentTrack( _instrument_track ),
 	m_midiPort( _port ),
 	m_readablePorts( NULL ),
@@ -75,9 +74,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 
 	m_inputChannelSpinBox = new lcdSpinBox( 0, MIDI_CHANNEL_COUNT, 3,
-						m_setupTabWidget,
-						tr( "Input channel" ),
-						eng(), _instrument_track );
+							m_setupTabWidget,
+							tr( "Input channel" ),
+							_instrument_track );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setValue( m_midiPort->inputChannel() + 1 );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -87,9 +86,9 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	inputChannelChanged( m_inputChannelSpinBox->value() );
 
 	m_outputChannelSpinBox = new lcdSpinBox( 1, MIDI_CHANNEL_COUNT, 3,
-						m_setupTabWidget,
-						tr( "Output channel" ),
-						eng(), _instrument_track );
+							m_setupTabWidget,
+							tr( "Output channel" ),
+							_instrument_track );
 	m_outputChannelSpinBox->setValue( m_midiPort->outputChannel() + 1 );
 	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
@@ -102,7 +101,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
 						m_setupTabWidget,
 						tr( "Receive MIDI-events" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_receiveCheckBox->move( 10, 34 );
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
@@ -113,7 +112,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 						"for all input-events" ),
 						m_setupTabWidget,
 						tr( "Default input velocity" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_defaultVelocityInCheckBox->move( 28, 84 );
 	connect( m_defaultVelocityInCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( defaultVelInChanged( bool ) ) );
@@ -122,7 +121,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
 						m_setupTabWidget,
 						tr( "Send MIDI-events" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_sendCheckBox->move( 10, 114 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( midiPortModeToggled( bool ) ) );
@@ -133,7 +132,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 						"for all output-events" ),
 						m_setupTabWidget,
 						tr( "Default output velocity" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_defaultVelocityOutCheckBox->move( 28, 164 );
 	connect( m_defaultVelocityOutCheckBox, SIGNAL( toggled( bool ) ),
 				this, SLOT( defaultVelOutChanged( bool ) ) );
@@ -147,7 +146,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	midiClient * mc = eng()->getMixer()->getMIDIClient();
+	midiClient * mc = engine::getMixer()->getMIDIClient();
 	if( mc->isRaw() == FALSE )
 	{
 		m_readablePorts = new QMenu( m_setupTabWidget );
@@ -374,7 +373,7 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 void midiTabWidget::inputChannelChanged( int _new_chnl )
 {
 	m_midiPort->setInputChannel( _new_chnl - 1 );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -383,7 +382,7 @@ void midiTabWidget::inputChannelChanged( int _new_chnl )
 void midiTabWidget::outputChannelChanged( int _new_chnl )
 {
 	m_midiPort->setOutputChannel( _new_chnl - 1 );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -465,7 +464,7 @@ void midiTabWidget::midiPortModeToggled( bool )
 		}
 #endif
 	}
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -497,7 +496,7 @@ void midiTabWidget::readablePortsChanged( void )
 #endif
 
 	m_readablePorts->clear();
-	const QStringList & rp = eng()->getMixer()->getMIDIClient()->
+	const QStringList & rp = engine::getMixer()->getMIDIClient()->
 								readablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = rp.begin(); it != rp.end(); ++it )
@@ -549,7 +548,7 @@ void midiTabWidget::writeablePortsChanged( void )
 #endif
 
 	m_writeablePorts->clear();
-	const QStringList & wp = eng()->getMixer()->getMIDIClient()->
+	const QStringList & wp = engine::getMixer()->getMIDIClient()->
 							writeablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
@@ -584,7 +583,7 @@ void midiTabWidget::activatedReadablePort( QAction * _item )
 	{
 		m_receiveCheckBox->setChecked( TRUE );
 	}
-	eng()->getMixer()->getMIDIClient()->subscribeReadablePort( m_midiPort,
+	engine::getMixer()->getMIDIClient()->subscribeReadablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }
 
@@ -600,7 +599,7 @@ void midiTabWidget::activatedWriteablePort( QAction * _item )
 	{
 		m_sendCheckBox->setChecked( TRUE );
 	}
-	eng()->getMixer()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
+	engine::getMixer()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
 				_item->text(), !_item->isChecked() );
 }
 
@@ -622,7 +621,7 @@ void midiTabWidget::activatedReadablePort( int _id )
 	}
 	m_readablePorts->setItemChecked( _id,
 				!m_readablePorts->isItemChecked( _id ) );
-	eng()->getMixer()->getMIDIClient()->subscribeReadablePort(
+	engine::getMixer()->getMIDIClient()->subscribeReadablePort(
 				m_midiPort, m_readablePorts->text( _id ),
 				!m_readablePorts->isItemChecked( _id ) );
 }
@@ -641,7 +640,7 @@ void midiTabWidget::activatedWriteablePort( int _id )
 	}
 	m_writeablePorts->setItemChecked( _id,
 				!m_writeablePorts->isItemChecked( _id ) );
-	eng()->getMixer()->getMIDIClient()->subscribeWriteablePort(
+	engine::getMixer()->getMIDIClient()->subscribeWriteablePort(
 				m_midiPort, m_writeablePorts->text( _id ),
 				!m_writeablePorts->isItemChecked( _id ) );
 }

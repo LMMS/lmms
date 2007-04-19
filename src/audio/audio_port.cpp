@@ -3,7 +3,7 @@
 /*
  * audio_port.cpp - base-class for objects providing sound at a port
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,26 +31,26 @@
 #include "audio_port.h"
 #include "audio_device.h"
 #include "buffer_allocator.h"
+#include "engine.h"
 
-audioPort::audioPort( const QString & _name, engine * _engine ) :
-	engineObject( _engine ),
+audioPort::audioPort( const QString & _name ) :
 	m_bufferUsage( NONE ),
 	m_firstBuffer( bufferAllocator::alloc<surroundSampleFrame>(
-				eng()->getMixer()->framesPerAudioBuffer() ) ),
+				engine::getMixer()->framesPerAudioBuffer() ) ),
 	m_secondBuffer( bufferAllocator::alloc<surroundSampleFrame>(
-				eng()->getMixer()->framesPerAudioBuffer() ) ),
+				engine::getMixer()->framesPerAudioBuffer() ) ),
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( -1 ),
 	m_name( "unnamed port" )
 {
-	eng()->getMixer()->clearAudioBuffer( m_firstBuffer,
-				eng()->getMixer()->framesPerAudioBuffer() );
-	eng()->getMixer()->clearAudioBuffer( m_secondBuffer,
-				eng()->getMixer()->framesPerAudioBuffer() );
-	eng()->getMixer()->addAudioPort( this );
+	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
+				engine::getMixer()->framesPerAudioBuffer() );
+	engine::getMixer()->clearAudioBuffer( m_secondBuffer,
+				engine::getMixer()->framesPerAudioBuffer() );
+	engine::getMixer()->addAudioPort( this );
 	setExtOutputEnabled( TRUE );
-	m_frames = eng()->getMixer()->framesPerAudioBuffer();
-	m_effects = new effectChain( eng() );
+	m_frames = engine::getMixer()->framesPerAudioBuffer();
+	m_effects = new effectChain;
 }
 
 
@@ -58,10 +58,10 @@ audioPort::audioPort( const QString & _name, engine * _engine ) :
 
 audioPort::~audioPort()
 {
-	eng()->getMixer()->removeAudioPort( this );
+	engine::getMixer()->removeAudioPort( this );
 	if( m_extOutputEnabled == TRUE )
 	{
-		eng()->getMixer()->audioDev()->unregisterPort( this );
+		engine::getMixer()->audioDev()->unregisterPort( this );
 	}
 	bufferAllocator::free( m_firstBuffer );
 	bufferAllocator::free( m_secondBuffer );
@@ -72,8 +72,8 @@ audioPort::~audioPort()
 
 void audioPort::nextPeriod( void )
 {
-	eng()->getMixer()->clearAudioBuffer( m_firstBuffer,
-				eng()->getMixer()->framesPerAudioBuffer() );
+	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
+				engine::getMixer()->framesPerAudioBuffer() );
 	qSwap( m_firstBuffer, m_secondBuffer );
 	// this is how we decrease state of buffer-usage ;-)
 	m_bufferUsage = ( m_bufferUsage != NONE ) ?
@@ -90,11 +90,11 @@ void audioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			eng()->getMixer()->audioDev()->registerPort( this );
+			engine::getMixer()->audioDev()->registerPort( this );
 		}
 		else
 		{
-			eng()->getMixer()->audioDev()->unregisterPort( this );
+			engine::getMixer()->audioDev()->unregisterPort( this );
 		}
 	}
 }
@@ -105,7 +105,7 @@ void audioPort::setExtOutputEnabled( bool _enabled )
 void audioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	eng()->getMixer()->audioDev()->renamePort( this );
+	engine::getMixer()->audioDev()->renamePort( this );
 }
 
 

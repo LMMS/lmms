@@ -1,7 +1,7 @@
 /*
  * vibed.cpp - combination of PluckedStringSynth and BitInvader
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -96,8 +96,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		m_editor = new impulseEditor( this, 76, 21, eng(),
-							_channel_track );
+		m_editor = new impulseEditor( this, 76, 21, _channel_track );
 		m_editor->setOn( FALSE );
 		m_editor->hide();
 		m_editors.append( m_editor );
@@ -119,8 +118,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 
 "The 'N' button will normalize the waveform.") );
 
-		m_volumeKnob = new volumeKnob( knobBright_26, this, 
-					tr( "Volume" ), eng(), _channel_track );
+		m_volumeKnob = new volumeKnob( knobBright_26, this,
+					tr( "Volume" ), _channel_track );
 		m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 		m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 		m_volumeKnob->move( 103, 142 );
@@ -137,7 +136,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 	
 		m_stiffnessKnob = new knob( knobBright_26, this, 
 							tr( "String stiffness" ),
-							eng(), _channel_track );
+							_channel_track );
 		m_stiffnessKnob->setRange( 0.0f, 0.05f, 0.001f );
 		m_stiffnessKnob->setInitValue( 0.0f );
 		m_stiffnessKnob->move( 129, 142 );
@@ -158,7 +157,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 		
 		m_pickKnob = new knob( knobBright_26, this, 
 							tr( "Pick position" ),
-							eng(), _channel_track );
+							_channel_track );
 		m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
 		m_pickKnob->setInitValue( 0.0f );
 		m_pickKnob->move( 153, 142 );
@@ -176,7 +175,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 	
 		m_pickupKnob = new knob( knobBright_26, this, 
 							tr( "Pickup position" ),
-							eng(), _channel_track );
+							_channel_track );
 		m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 		m_pickupKnob->setInitValue( 0.05f );
 		m_pickupKnob->move( 177, 142 );
@@ -194,8 +193,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "for the selected string.  The lower the setting, the closer the "
 "pickup is to the bridge." ) );
 
- 		m_panKnob = new knob( knobBright_26, this, 
- 					tr( "Pan" ), eng(), _channel_track );
+ 		m_panKnob = new knob( knobBright_26, this, tr( "Pan" ),
+							_channel_track );
 	 	m_panKnob->setRange( -1.0f, 1.0f, 0.01f );
  		m_panKnob->setInitValue( 0.0f );
 	 	m_panKnob->move( 105, 187 );
@@ -211,9 +210,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "The Pan knob determines the location of the selected string in the stereo "
 "field." ) );
 		
-	 	m_detuneKnob = new knob( knobBright_26, this, 
-							tr( "Detune" ),
-		 					eng(), _channel_track );
+	 	m_detuneKnob = new knob( knobBright_26, this, tr( "Detune" ),
+		 					_channel_track );
  		m_detuneKnob->setRange( -0.1f, 0.1f, 0.001f );
  		m_detuneKnob->setInitValue( 0.0f );
  		m_detuneKnob->move( 150, 187 );
@@ -230,9 +228,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "than zero will cause the string to sound flat.  Settings greater than zero "
 "will cause the string to sound sharp." ) );
 	
-		m_randomKnob = new knob( knobBright_26, this, 
-							tr( "Fuzziness" ),
-							eng(), _channel_track );
+		m_randomKnob = new knob( knobBright_26, this, tr( "Fuzziness" ),
+							_channel_track );
 		m_randomKnob->setRange( 0.0f, 0.75f, 0.01f );
 		m_randomKnob->setInitValue( 0.0f );
 		m_randomKnob->move( 194, 187 );
@@ -250,8 +247,8 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "apparent during the attack, though it can also be used to make the string "
 "sound more 'metallic'.") );
 
-		m_lengthKnob = new knob( knobBright_26, this, 
-					tr( "Length" ), eng(), _channel_track );
+		m_lengthKnob = new knob( knobBright_26, this, tr( "Length" ),
+							_channel_track );
 		m_lengthKnob->setRange( 1, 16, 1 );
 		m_lengthKnob->setInitValue( 1 );
 		m_lengthKnob->move( 23, 193 );
@@ -269,7 +266,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "will both ring longer and sound brighter, however, they will also eat up "
 "more CPU cycles." ) );
 
-		m_impulse = new ledCheckBox( "", this, tr( "Impulse" ), eng(),
+		m_impulse = new ledCheckBox( "", this, tr( "Impulse" ),
 							_channel_track );
 		m_impulse->move( 23, 94 );
 		m_impulse->setChecked( FALSE );
@@ -309,7 +306,6 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			2,
 			21, 127,
 			this,
-			eng(),
 			NULL );
 		m_harmonic->hide();
 		m_harmonics.append( m_harmonic );
@@ -348,7 +344,6 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			0,
 			21, 39,
 			this,
-			eng(),
 			NULL );
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
 			this, SLOT( showString( Uint8 ) ) );
@@ -559,7 +554,7 @@ void vibed::playNote( notePlayHandle * _n, bool )
 		
 		_n->m_pluginData = new stringContainer( 
 				freq,
-				eng()->getMixer()->sampleRate(),
+				engine::getMixer()->sampleRate(),
 				m_sampleLength );
 		
 		for( Uint8 i = 0; i < 9; ++i )
@@ -583,7 +578,7 @@ void vibed::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	stringContainer * ps = static_cast<stringContainer *>(
 			 				_n->m_pluginData );
 	

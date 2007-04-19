@@ -86,6 +86,7 @@
 #include "templates.h"
 #include "config_mgr.h"
 #include "endian_handling.h"
+#include "engine.h"
 #include "base64.h"
 #include "debug.h"
 
@@ -100,10 +101,8 @@
 
 
 
-sampleBuffer::sampleBuffer( engine * _engine, const QString & _audio_file,
+sampleBuffer::sampleBuffer( const QString & _audio_file,
 							bool _is_base64_data ) :
-	QObject(),
-	engineObject( _engine ),
 	m_audioFile( ( _is_base64_data == TRUE ) ? "" : _audio_file ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -116,6 +115,7 @@ sampleBuffer::sampleBuffer( engine * _engine, const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
+	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
 	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
@@ -136,10 +136,7 @@ sampleBuffer::sampleBuffer( engine * _engine, const QString & _audio_file,
 
 
 
-sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
-							engine * _engine ) :
-	QObject(),
-	engineObject( _engine ),
+sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -152,6 +149,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
+	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
 	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
@@ -171,9 +169,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames,
 
 
 
-sampleBuffer::sampleBuffer( const f_cnt_t _frames, engine * _engine ) :
-	QObject(),
-	engineObject( _engine ),
+sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -186,6 +182,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames, engine * _engine ) :
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
+	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
 	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
@@ -623,14 +620,15 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const bool _looped )
 {
-	eng()->getMixer()->clearAudioBuffer( _ab, _frames );
+	engine::getMixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_data == NULL || m_frames == 0 || m_endFrame == 0 || _frames == 0 )
 	{
 		return( FALSE );
 	}
 
-	const double freq_factor = (double) _freq / (double) m_frequency;
+	const double freq_factor = (double) _freq / (double) m_frequency
+			* m_sample_rate / engine::getMixer()->sampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
@@ -691,7 +689,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 //	foo = f2;
 
 	// check whether we have to change pitch...
-	if( _freq != m_frequency || _state->m_varying_pitch )
+	if( freq_factor != 1.0 || _state->m_varying_pitch )
 	{
 #ifdef HAVE_SAMPLERATE_H
 		// Generate output
@@ -725,7 +723,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 #else
 		f_cnt_t src_frame_base = 0;
 		// check whether we're in high-quality-mode
-		if( eng()->getMixer()->highQuality() == TRUE )
+		if( engine::getMixer()->highQuality() == TRUE )
 		{
 			// we are, so let's use cubic interpolation...
 			for( f_cnt_t frame = 0; frame < frames_to_process;
@@ -1130,7 +1128,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, TRUE );
 	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, TRUE );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 	QBuffer ba_writer;
 #ifdef QT4
 	ba_writer.open( QBuffer::WriteOnly );
@@ -1191,12 +1189,11 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr,
-						engine * _engine )
+						const sample_rate_t _dst_sr )
 {
 	const f_cnt_t dst_frames = static_cast<f_cnt_t>( _frames /
 					(float) _src_sr * (float) _dst_sr );
-	sampleBuffer * dst_sb = new sampleBuffer( dst_frames, _engine );
+	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
 	sampleFrame * dst_buf = dst_sb->m_origData;
 #ifdef HAVE_SAMPLERATE_H
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
@@ -1521,7 +1518,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 #ifdef HAVE_SAMPLERATE_H
 	int error;
 	if( ( m_resampling_data = src_new(/*
-		( eng()->getMixer()->highQuality() == TRUE ) ?
+		( engine::getMixer()->highQuality() == TRUE ) ?
 					SRC_SINC_FASTEST :*/
 					SRC_LINEAR,
 					DEFAULT_CHANNELS, &error ) ) == NULL )

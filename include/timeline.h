@@ -1,7 +1,7 @@
 /*
  * timeline.h - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -68,7 +68,7 @@ public:
 
 
 	timeLine( int _xoff, int _yoff, float _ppt, songEditor::playPos & _pos,
-		const midiTime & _begin, QWidget * _parent, engine * _engine );
+				const midiTime & _begin, QWidget * _parent );
 	virtual ~timeLine();
 
 	inline songEditor::playPos & pos( void )

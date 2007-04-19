@@ -691,6 +691,10 @@ http://lmms.sourceforge.net</translation>
         <source>END</source>
         <translation>FI</translation>
     </message>
+    <message>
+        <source>Loop</source>
+        <translation>Bucle</translation>
+    </message>
 </context>
 <context>
     <name>automatableButton</name>
@@ -2741,6 +2745,14 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
         <source>Patch-Files (*.pat)</source>
         <translation>Fitxers Pedaç (*.pat)</translation>
     </message>
+    <message>
+        <source>Loop</source>
+        <translation>Bucle</translation>
+    </message>
+    <message>
+        <source>Tune</source>
+        <translation>Afina</translation>
+    </message>
 </context>
 <context>
     <name>pattern</name>
@@ -3510,7 +3522,7 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
     </message>
     <message>
         <source>BUFFER SIZE</source>
-        <translation>TAMANY DE MEMÒRIA INTERMÈDIA</translation>
+        <translation>MIDA DE MEMÒRIA INTERMÈDIA</translation>
     </message>
     <message>
         <source>Reset to default-value</source>
@@ -3620,7 +3632,7 @@ Latència: %2 ms</translation>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation>Aquí pots configurar la grandària de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
+        <translation>Aquí pots configurar la mida de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
@@ -3670,7 +3682,7 @@ Latència: %2 ms</translation>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation>Si tens una màquina amb més d&apos;un processador (p.e. sistemes amb nucli dual) hauries d&apos;usar un nivell de paral·lelització més gran que 1, que vol dir que LMMS tractarà de dividir el processament de so en varis fils que haurien d&apos;executar-se en varis nuclis pel sistema operatiu subjacent.
-Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de grandària petita. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar la grandària de la memòria intermèdia.</translation>
+Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de mida petita. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar la mida de la memòria intermèdia.</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>

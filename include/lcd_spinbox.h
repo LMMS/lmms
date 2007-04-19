@@ -1,7 +1,7 @@
 /*
  * lcd_spinbox.h - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,8 +52,7 @@ class lcdSpinBox : public QWidget, public automatableObject<int>
 	Q_OBJECT
 public:
 	lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
-					const QString & _name,
-					engine * _engine, track * _track );
+					const QString & _name, track * _track );
 	virtual ~lcdSpinBox();
 
 	virtual void setStep( const int _step );

@@ -3,7 +3,7 @@
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,14 +52,14 @@
 
 
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
-					const QString & _name,
-					engine * _engine, track * _track ) :
+							const QString & _name,
+							track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	autoObj( _engine, _track, 0, _min, _max ),
+	autoObj( _track, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
 {

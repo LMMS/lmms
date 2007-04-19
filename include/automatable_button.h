@@ -1,7 +1,7 @@
 /*
  * automatable_button.h - class automatableButton, the base for all buttons
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,7 @@ class automatableButton : public QWidget, public automatableObject<bool,
 	Q_OBJECT
 public:
 	automatableButton( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track );
+							track * _track );
 	virtual ~automatableButton();
 
 
@@ -109,7 +109,7 @@ class automatableButtonGroup : public QWidget, public automatableObject<int>
 	Q_OBJECT
 public:
 	automatableButtonGroup( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track );
+							track * _track );
 	virtual ~automatableButtonGroup();
 
 	void addButton( automatableButton * _btn );

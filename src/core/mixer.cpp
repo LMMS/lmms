@@ -3,7 +3,7 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,6 +34,7 @@
 #include "envelope_and_lfo_widget.h"
 #include "buffer_allocator.h"
 #include "debug.h"
+#include "engine.h"
 #include "config_mgr.h"
 #include "audio_port.h"
 #include "sample_play_handle.h"
@@ -61,9 +62,7 @@
 sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
 
-mixer::mixer( engine * _engine ) :
-	QObject(),
-	engineObject( _engine ),
+mixer::mixer( void ) :
 	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
@@ -81,12 +80,24 @@ mixer::mixer( engine * _engine ) :
 	{
 		m_framesPerAudioBuffer = configManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt();
+
+		if( m_framesPerAudioBuffer > DEFAULT_BUFFER_SIZE )
+		{
+			m_fifo = new fifo( m_framesPerAudioBuffer
+							/ DEFAULT_BUFFER_SIZE );
+			m_framesPerAudioBuffer = DEFAULT_BUFFER_SIZE;
+		}
+		else
+		{
+			m_fifo = new fifo( 1 );
+		}
 	}
 	else
 	{
 		configManager::inst()->setValue( "mixer",
 							"framesperaudiobuffer",
 				QString::number( m_framesPerAudioBuffer ) );
+		m_fifo = new fifo( 1 );
 	}
 
 	if( configManager::inst()->value( "mixer", "parallelizinglevel"
@@ -113,6 +124,12 @@ mixer::mixer( engine * _engine ) :
 
 mixer::~mixer()
 {
+	while( m_fifo->available() )
+	{
+		delete[] m_fifo->read();
+	}
+	delete m_fifo;
+
 	delete m_audioDev;
 	delete m_midiClient;
 
@@ -136,6 +153,9 @@ void mixer::initDevices( void )
 
 void mixer::startProcessing( void )
 {
+	m_fifo_writer = new fifoWriter( this, m_fifo );
+	m_fifo_writer->start();
+
 	m_audioDev->startProcessing();
 }
 
@@ -144,6 +164,11 @@ void mixer::startProcessing( void )
 
 void mixer::stopProcessing( void )
 {
+	m_fifo_writer->finish();
+	m_fifo_writer->wait( 1000 );
+	m_fifo_writer->terminate();
+	delete m_fifo_writer;
+
 	m_audioDev->stopProcessing();
 }
 
@@ -153,7 +178,7 @@ void mixer::stopProcessing( void )
 bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
-			eng()->getSongEditor()->realTimeTask() == TRUE ) );
+			engine::getSongEditor()->realTimeTask() == TRUE ) );
 }
 
 
@@ -209,14 +234,13 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	static songEditor::playPos last_metro_pos = -1;
 
-	songEditor::playPos p = eng()->getSongEditor()->getPlayPos(
+	songEditor::playPos p = engine::getSongEditor()->getPlayPos(
 						songEditor::PLAY_PATTERN );
-	if( eng()->getSongEditor()->playMode() == songEditor::PLAY_PATTERN &&
-		eng()->getPianoRoll()->isRecording() == TRUE &&
+	if( engine::getSongEditor()->playMode() == songEditor::PLAY_PATTERN &&
+		engine::getPianoRoll()->isRecording() == TRUE &&
 		p != last_metro_pos && p.getTact64th() % 16 == 0 )
 	{
-		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg",
-								eng() ) );
+		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg" ) );
 		last_metro_pos = p;
 	}
 
@@ -334,7 +358,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			}
 		}
 
-		eng()->getSongEditor()->processNextBuffer();
+		engine::getSongEditor()->processNextBuffer();
 
 		bool more_effects = FALSE;
 		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
@@ -357,7 +381,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	m_mixMutex.unlock();
 
 	// and trigger LFOs
-	envelopeAndLFOWidget::triggerLFO( eng() );
+	envelopeAndLFOWidget::triggerLFO();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
 							m_framesPerAudioBuffer;
@@ -464,16 +488,14 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 
 void mixer::setHighQuality( bool _hq_on )
 {
-	// delete (= close) our audio-device
-	delete m_audioDev;
+	// don't delete the audio-device
+	stopProcessing();
 
 	// set new quality-level...
 	m_qualityLevel = ( _hq_on == TRUE ) ? HIGH_QUALITY_LEVEL :
 							DEFAULT_QUALITY_LEVEL;
 
-	// and re-open device
-	m_audioDev = tryAudioDevices();
-	m_audioDev->startProcessing();
+	startProcessing();
 
 	emit( sampleRateChanged() );
 
@@ -484,7 +506,7 @@ void mixer::setHighQuality( bool _hq_on )
 
 void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 {
-	m_audioDev->stopProcessing();
+	stopProcessing();
 
 	m_oldAudioDev = m_audioDev;
 
@@ -501,6 +523,8 @@ void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 
 	m_qualityLevel = _hq ? HIGH_QUALITY_LEVEL : DEFAULT_QUALITY_LEVEL;
 	emit sampleRateChanged();
+
+	startProcessing();
 }
 
 
@@ -510,8 +534,9 @@ void mixer::restoreAudioDevice( void )
 {
 	if( m_oldAudioDev != NULL )
 	{
-		delete m_audioDev;	// dtor automatically calls
-					// stopProcessing()
+		stopProcessing();
+		delete m_audioDev;
+
 		m_audioDev = m_oldAudioDev;
 		for( Uint8 qli = DEFAULT_QUALITY_LEVEL;
 						qli < QUALITY_LEVELS; ++qli )
@@ -525,7 +550,7 @@ void mixer::restoreAudioDevice( void )
 			}
 		}
 		m_oldAudioDev = NULL;
-		m_audioDev->startProcessing();
+		startProcessing();
 	}
 }
 
@@ -640,7 +665,7 @@ midiClient * mixer::tryMIDIClients( void )
 #ifdef ALSA_SUPPORT
 	if( client_name == midiALSASeq::name() || client_name == "" )
 	{
-		midiALSASeq * malsas = new midiALSASeq( eng() );
+		midiALSASeq * malsas = new midiALSASeq;
 		if( malsas->isRunning() )
 		{
 			m_midiClientName = midiALSASeq::name();
@@ -651,7 +676,7 @@ midiClient * mixer::tryMIDIClients( void )
 
 	if( client_name == midiALSARaw::name() || client_name == "" )
 	{
-		midiALSARaw * malsar = new midiALSARaw( eng() );
+		midiALSARaw * malsar = new midiALSARaw;
 		if( malsar->isRunning() )
 		{
 			m_midiClientName = midiALSARaw::name();
@@ -664,7 +689,7 @@ midiClient * mixer::tryMIDIClients( void )
 #ifdef OSS_SUPPORT
 	if( client_name == midiOSS::name() || client_name == "" )
 	{
-		midiOSS * moss = new midiOSS( eng() );
+		midiOSS * moss = new midiOSS;
 		if( moss->isRunning() )
 		{
 			m_midiClientName = midiOSS::name();
@@ -679,7 +704,7 @@ midiClient * mixer::tryMIDIClients( void )
 
 	m_midiClientName = midiDummy::name();
 
-	return( new midiDummy( eng() ) );
+	return( new midiDummy );
 }
 
 
@@ -777,6 +802,47 @@ void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
 			
 	m_previousSample[_chnl] = m_writeBuf[_frame][_chnl];
 }
+
+
+
+
+
+
+
+
+mixer::fifoWriter::fifoWriter( mixer * _mixer, fifo * _fifo ) :
+	m_mixer( _mixer ),
+	m_fifo( _fifo ),
+	m_writing( TRUE )
+{
+}
+
+
+
+
+void mixer::fifoWriter::finish( void )
+{
+	m_writing = FALSE;
+}
+
+
+
+
+void mixer::fifoWriter::run( void )
+{
+	while( m_writing )
+	{
+		fpab_t frames = m_mixer->framesPerAudioBuffer();
+		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
+		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
+		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
+		m_fifo->write( buffer );
+	}
+
+	m_fifo->write( NULL );
+}
+
+
 
 
 #include "mixer.moc"

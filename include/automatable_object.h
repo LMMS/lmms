@@ -1,7 +1,7 @@
 /*
  * automatable_object.h - declaration of class automatableObject
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 #include "qt3support.h"
 #include "automation_editor.h"
 #include "automation_pattern.h"
+#include "engine.h"
 #include "journalling_object.h"
 #include "templates.h"
 #include "midi_time.h"
@@ -57,11 +58,9 @@ class automatableObject : public journallingObject, public levelObject
 public:
 	typedef automatableObject<T, EDIT_STEP_TYPE> autoObj;
 
-	automatableObject( engine * _engine, track * _track = NULL,
-					const T _val = 0, const T _min = 0,
-					const T _max = 0,
+	automatableObject( track * _track = NULL, const T _val = 0,
+					const T _min = 0, const T _max = 0,
 					const T _step = defaultRelStep() ) :
-		journallingObject( _engine ),
 		m_value( _val ),
 		m_minValue( _min ),
 		m_maxValue( _max ),
@@ -372,9 +371,9 @@ public:
 		return( m_track == NULL );
 	}
 
-	void initAutomationPattern( engine * _engine )
+	void initAutomationPattern( void )
 	{
-		m_automation_pattern = new automationPattern( _engine, this );
+		m_automation_pattern = new automationPattern( NULL, this );
 	}
 
 
@@ -432,11 +431,11 @@ protected:
 		{
 			m_automation_pattern->putValue( midiTime( 0 ),
 							m_curLevel, FALSE );
-			if( eng()->getAutomationEditor() &&
-				eng()->getAutomationEditor()->currentPattern()
+			if( engine::getAutomationEditor() &&
+				engine::getAutomationEditor()->currentPattern()
 						== m_automation_pattern )
 			{
-				eng()->getAutomationEditor()->update();
+				engine::getAutomationEditor()->update();
 			}
 		}
 	}

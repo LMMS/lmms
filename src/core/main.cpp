@@ -52,6 +52,7 @@
 
 #include "main_window.h"
 #include "embed.h"
+#include "engine.h"
 #include "config_mgr.h"
 #include "export_project_dialog.h"
 #include "song_editor.h"
@@ -230,32 +231,32 @@ int main( int argc, char * * argv )
 							Qt::white );
 #endif
 
-	engine * main_engine = new engine();
+	engine::init();
 
 	// we try to load given file
 	if( file_to_load != "" )
 	{
-		main_engine->getSongEditor()->loadProject( file_to_load );
+		engine::getSongEditor()->loadProject( file_to_load );
 	}
 	else
 	{
-		main_engine->getSongEditor()->createNewProject();
+		engine::getSongEditor()->createNewProject();
 	}
 #ifndef QT4
-	app.setMainWidget( main_engine->getMainWindow() );
+	app.setMainWidget( engine::getMainWindow() );
 #endif
 	// MDI-mode?
-	if( main_engine->getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		// then maximize
-		main_engine->getMainWindow()->showMaximized();
+		engine::getMainWindow()->showMaximized();
 	}
 	else
 	{
 		// otherwise arrange at top-left edge of screen
-		main_engine->getMainWindow()->show();
-		main_engine->getMainWindow()->move( 0, 0 );
-		main_engine->getMainWindow()->resize( 200, 500 );
+		engine::getMainWindow()->show();
+		engine::getMainWindow()->move( 0, 0 );
+		engine::getMainWindow()->resize( 200, 500 );
 	}
 
 
@@ -267,8 +268,7 @@ int main( int argc, char * * argv )
 	{
 		exportProjectDialog * e = new exportProjectDialog(
 						file_to_render,
-						main_engine->getMainWindow(),
-						main_engine );
+						engine::getMainWindow() );
 		e->show();
 		e->exportBtnClicked();
 	}

@@ -35,12 +35,14 @@
 #ifdef QT4
 
 #include <QtCore/QMutex>
+#include <QtCore/QThread>
 #include <QtCore/QVector>
 
 #else
 
 #include <qobject.h>
 #include <qmutex.h>
+#include <qthread.h>
 #include <qvaluevector.h>
 
 #endif
@@ -52,7 +54,7 @@
 #include "note.h"
 #include "play_handle.h"
 #include "effect_board.h"
-#include "engine.h"
+#include "fifo_buffer.h"
 
 
 class audioDevice;
@@ -106,7 +108,7 @@ const octaves BASE_OCTAVE = OCTAVE_4;
 
 
 
-class mixer : public QObject, public engineObject
+class mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -285,7 +287,10 @@ public:
 
 	bool criticalXRuns( void ) const;
 
-	const surroundSampleFrame * renderNextBuffer( void );
+	const surroundSampleFrame * nextBuffer( void )
+	{
+		return( m_fifo->read() );
+	}
 
 
 public slots:
@@ -299,7 +304,27 @@ signals:
 
 
 private:
-	mixer( engine * _engine );
+	typedef fifoBuffer<surroundSampleFrame *> fifo;
+
+	class fifoWriter : public QThread
+	{
+	public:
+		fifoWriter( mixer * _mixer, fifo * _fifo );
+
+		void finish( void );
+
+
+	private:
+		mixer * m_mixer;
+		fifo * m_fifo;
+		bool m_writing;
+
+		virtual void run( void );
+
+	} ;
+
+
+	mixer( void );
 	virtual ~mixer();
 
 	void startProcessing( void );
@@ -307,8 +332,7 @@ private:
 
 
 	// we don't allow to create mixer by using copy-ctor
-	mixer( const mixer & ) :
-		engineObject( NULL )
+	mixer( const mixer & )
 	{
 	}
 
@@ -321,6 +345,8 @@ private:
 						const fx_ch_t _fx_chnl );
 
 	void FASTCALL scaleClip( fpab_t _frame, ch_cnt_t _chnl );
+
+	const surroundSampleFrame * renderNextBuffer( void );
 
 	vvector<audioPort *> m_audioPorts;
 
@@ -366,7 +392,12 @@ private:
 	Uint8 m_mixMutexLockLevel;
 
 
+	fifo * m_fifo;
+	fifoWriter * m_fifo_writer;
+
+
 	friend class engine;
+	friend class fifoWriter;
 
 } ;
 

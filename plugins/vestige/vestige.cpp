@@ -108,7 +108,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	setErasePixmap( *s_artwork );
 #endif
 
-	m_openPluginButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_openPluginButton = new pixmapButton( this, NULL, NULL );
 	m_openPluginButton->setCheckable( FALSE );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 200, 70 );
@@ -160,7 +160,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 
 	// now we need a play-handle which cares for calling play()
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
-	eng()->getMixer()->addPlayHandle( iph );
+	engine::getMixer()->addPlayHandle( iph );
 }
 
 
@@ -231,7 +231,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
 									0 );
 		m_pluginMutex.lock();
-		m_plugin = new remoteVSTPlugin( m_pluginDLL, eng() );
+		m_plugin = new remoteVSTPlugin( m_pluginDLL );
 		if( m_plugin->failed() )
 		{
 			m_pluginMutex.unlock();
@@ -261,10 +261,10 @@ void vestigeInstrument::setParameter( const QString & _param,
 			return;
 		}*/
 		m_plugin->showEditor();
-		connect( eng()->getSongEditor(),
+		connect( engine::getSongEditor(),
 					SIGNAL( tempoChanged( bpm_t ) ),
 				 m_plugin, SLOT( setTempo( bpm_t ) ) );
-		m_plugin->setTempo( eng()->getSongEditor()->getTempo() );
+		m_plugin->setTempo( engine::getSongEditor()->getTempo() );
 		if( set_ch_name == TRUE )
 		{
 			getInstrumentTrack()->setName( m_plugin->name() );
@@ -297,7 +297,7 @@ void vestigeInstrument::waitForWorkerThread( void )
 		return;
 	}
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	if( m_plugin->waitForProcessingFinished( buf ) )

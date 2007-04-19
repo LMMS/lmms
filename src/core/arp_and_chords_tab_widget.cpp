@@ -194,18 +194,18 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 
 
-arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_track ) :
-	QWidget( _instrument_track->tabWidgetParent() ),
-	journallingObject( _instrument_track->eng() )
+arpAndChordsTabWidget::arpAndChordsTabWidget(
+					instrumentTrack * _instrument_track ) :
+	QWidget( _instrument_track->tabWidgetParent() )
 {
-	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this, eng(),
+	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this,
 							_instrument_track );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
 
 	m_chordsComboBox = new comboBox( m_chordsGroupBox, tr( "Chord type" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -219,8 +219,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	}
 
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
-						tr( "Chord range" ),
-						eng(), _instrument_track );
+							tr( "Chord range" ),
+							_instrument_track );
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
 	m_chordRangeKnob->setInitValue( 1.0f );
@@ -239,7 +239,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 
-	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this, eng(),
+	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this,
 							_instrument_track );
 	m_arpGroupBox->setGeometry( ARP_GROUPBOX_X, ARP_GROUPBOX_Y,
 					ARP_GROUPBOX_WIDTH,
@@ -259,7 +259,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
 	m_arpComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio type" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
@@ -274,8 +274,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio range" ),
-						eng(), _instrument_track );
+							tr( "Arpeggio range" ),
+							_instrument_track );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
 	m_arpRangeKnob->setInitValue( 1.0f );
@@ -292,8 +292,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"amount of octaves." ) );
 
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio time" ),
-						eng(), _instrument_track );
+							tr( "Arpeggio time" ),
+							_instrument_track );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setRange( 25.0f, 2000.0f, 1.0f );
 	m_arpTimeKnob->setInitValue( 100.0f );
@@ -310,8 +310,8 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 			"each arpeggio-tone should be played." ) );
 
 	m_arpGateKnob = new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio gate" ),
-						eng(), _instrument_track );
+							tr( "Arpeggio gate" ),
+							_instrument_track );
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setRange( 1.0f, 200.0f, 1.0f );
 	m_arpGateKnob->setInitValue( 100.0f );
@@ -334,7 +334,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, NULL,
-								eng(), NULL );
+									NULL );
 	arp_up_btn->move( 10, 74 );
 	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
@@ -345,7 +345,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, NULL,
-								eng(), NULL );
+									NULL );
 	arp_down_btn->move( 30, 74 );
 	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -357,7 +357,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	pixmapButton * arp_up_and_down_btn = new pixmapButton( m_arpGroupBox,
-							NULL, eng(), NULL );
+								NULL, NULL );
 	arp_up_and_down_btn->move( 50, 74 );
 	arp_up_and_down_btn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
@@ -371,7 +371,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 
 	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox, NULL,
-								eng(), NULL );
+									NULL );
 	arp_random_btn->move( 70, 74 );
 	arp_random_btn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
@@ -384,7 +384,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 
 	m_arpDirectionBtnGrp = new automatableButtonGroup( this,
 						tr( "Arpeggio direction" ),
-						eng(), _instrument_track );
+						_instrument_track );
 	m_arpDirectionBtnGrp->addButton( arp_up_btn );
 	m_arpDirectionBtnGrp->addButton( arp_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
@@ -398,7 +398,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget( instrumentTrack * _instrument_trac
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
 	m_arpModeComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio mode" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
 	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
@@ -461,14 +461,14 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 					break;
 				}
 				// create copy of base-note
-				note note_copy( NULL, _n->length(), 0,
+				note note_copy( _n->length(), 0,
 						(tones)( sub_note_key %
 							NOTES_PER_OCTAVE ),
 						(octaves)( sub_note_key /
 							NOTES_PER_OCTAVE ),
 							_n->getVolume(),
-							_n->getPanning() );
-				note_copy.setDetuning( _n->detuning() );
+							_n->getPanning(),
+							_n->detuning() );
 				// duplicate note-play-handle, only note is
 				// different
 				notePlayHandle * note_play_handle =
@@ -524,7 +524,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 	// number of frames that every note should be played
 	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeKnob->value() / 1000.0f *
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateKnob->value() *
 							arp_frames / 100.0f );
 
@@ -537,13 +537,13 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = 0;
 
-	while( frames_processed < eng()->getMixer()->framesPerAudioBuffer() )
+	while( frames_processed < engine::getMixer()->framesPerAudioBuffer() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames -
 						( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
 		if( remaining_frames_for_cur_arp >
-				eng()->getMixer()->framesPerAudioBuffer() )
+				engine::getMixer()->framesPerAudioBuffer() )
 		{
 			// then we don't have to do something!
 			break;
@@ -609,7 +609,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 
 		// range-checking
 		if( sub_note_key >= NOTES_PER_OCTAVE * OCTAVES ||
-			sub_note_key < 0 || eng()->getMixer()->criticalXRuns() )
+			sub_note_key < 0 ||
+					engine::getMixer()->criticalXRuns() )
 		{
 			continue;
 		}
@@ -621,15 +622,14 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		}
 
 		// create new arp-note
-		note new_note( NULL, midiTime( 0 ), midiTime( 0 ),
+		note new_note( midiTime( 0 ), midiTime( 0 ),
 				static_cast<tones>( sub_note_key %
 							NOTES_PER_OCTAVE ),
 				static_cast<octaves>( sub_note_key /
 							NOTES_PER_OCTAVE ),
 				static_cast<volume>( _n->getVolume() *
 								vol_level ),
-				_n->getPanning() );
-		new_note.setDetuning( _n->detuning() );
+				_n->getPanning(), _n->detuning() );
 
 		// duplicate note-play-handle, only ptr to note is different
 		// and is_arp_note=TRUE

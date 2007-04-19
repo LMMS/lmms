@@ -135,7 +135,7 @@ singerBot::~singerBot()
 
 void singerBot::playNote( notePlayHandle * _n, bool )
 {
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	if( !_n->m_pluginData )
@@ -145,7 +145,7 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 
 	sampleBuffer * sample_buffer = hdata->remaining_frames ?
-			readWave( hdata ) : new sampleBuffer( NULL, 0, eng() );
+			readWave( hdata ) : new sampleBuffer( NULL, 0 );
 
 	sampleBuffer::handleState hstate;
 
@@ -252,7 +252,7 @@ void singerBot::createWave( notePlayHandle * _n )
 	hdata->frequency = getInstrumentTrack()->frequency( _n );
 	hdata->duration = _n->length() > 0 ?
 		_n->length() * 60.0f * BEATS_PER_TACT
-				/ 64.0f / eng()->getSongEditor()->getTempo() :
+				/ 64.0f / engine::getSongEditor()->getTempo() :
 		0;
 	int word_index = _n->patternIndex() % m_words.size();
 	hdata->text = m_words[word_index].ascii();
@@ -274,7 +274,7 @@ void singerBot::createWave( notePlayHandle * _n )
 							src_strerror( error ) );
 	}
 
-	hdata->resampling_data.src_ratio = eng()->getMixer()->sampleRate()
+	hdata->resampling_data.src_ratio = engine::getMixer()->sampleRate()
 					/ (double)hdata->wave->sample_rate();
 	hdata->resampling_data.end_of_input = 0;
 	hdata->remaining_frames = hdata->wave->num_samples();
@@ -285,7 +285,7 @@ void singerBot::createWave( notePlayHandle * _n )
 
 sampleBuffer * singerBot::readWave( handle_data * _hdata )
 {
-	f_cnt_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	f_cnt_t frames = engine::getMixer()->framesPerAudioBuffer();
 	f_cnt_t offset = _hdata->wave->num_samples() - _hdata->remaining_frames;
 
 	const float fac = 1.0f / OUTPUT_SAMPLE_MULTIPLIER;
@@ -324,7 +324,7 @@ sampleBuffer * singerBot::readWave( handle_data * _hdata )
 		}
 	}
 
-	sampleBuffer * buffer = new sampleBuffer( data, frames, eng() );
+	sampleBuffer * buffer = new sampleBuffer( data, frames );
 	_hdata->remaining_frames -= _hdata->resampling_data.input_frames_used;
 	delete[] wave_samples;
 	delete[] mono_data;

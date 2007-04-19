@@ -2,7 +2,7 @@
  * effect_label.h - a label which is renamable by double-clicking it and
  *                  offers access to an effect rack
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -54,9 +54,8 @@ class effectLabel: public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	effectLabel( const QString & _initial_name, 
-			QWidget * _parent, engine * _engine, 
-			sampleTrack * _track );
+	effectLabel( const QString & _initial_name, QWidget * _parent,
+							sampleTrack * _track );
 	virtual ~effectLabel();
 
 	inline const QString & text( void )

@@ -92,6 +92,9 @@ private:
 
 	bool m_convertEndian;
 
+	bool m_stopped;
+	QSemaphore m_stop_semaphore;
+
 } ;
 
 #endif

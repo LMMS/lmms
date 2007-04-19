@@ -4,7 +4,7 @@
  * This file is based on the knob-widget of the Qwt Widget Library by
  * Josef Wilgen
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,6 @@
 #endif
 
 
-#include "engine.h"
 #include "automatable_object.h"
 
 
@@ -64,7 +63,7 @@ class knob : public QWidget, public automatableObject<float>
 	Q_OBJECT
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track );
+							track * _track );
 	virtual ~knob();
 
     

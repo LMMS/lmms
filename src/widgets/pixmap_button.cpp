@@ -4,7 +4,7 @@
  * pixmap_button.cpp - implementation of pixmap-button (often used as "themed"
  *                     checkboxes/radiobuttons etc)
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,8 +46,8 @@
 
 
 pixmapButton::pixmapButton( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track ) :
-	automatableButton( _parent, _name, _engine, _track ),
+							track * _track ) :
+	automatableButton( _parent, _name, _track ),
 	m_activePixmap(),
 	m_inactivePixmap(),
 	m_bgPixmap()

@@ -3,7 +3,7 @@
  *                   position of a channel + calculation of volume for each
  *                   speaker
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,7 @@ class surroundArea : public QWidget
 	Q_OBJECT
 public:
 	surroundArea( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track );
+							track * _track );
 	virtual ~surroundArea();
 	volumeVector getVolumeVector( float _v_scale = 0.0f ) const;
 	inline const QPoint & value( void ) const

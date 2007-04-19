@@ -1,7 +1,7 @@
 /*
  * plugin_browser.h - include file for pluginBrowser
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,11 +55,11 @@
 class trackContainer;
 
 
-class pluginBrowser : public sideBarWidget, public engineObject
+class pluginBrowser : public sideBarWidget
 {
 	Q_OBJECT
 public:
-	pluginBrowser( QWidget * _parent, engine * _engine );
+	pluginBrowser( QWidget * _parent );
 	virtual ~pluginBrowser();
 
 
@@ -73,12 +73,11 @@ private:
 
 
 
-class pluginDescWidget : public QWidget, public engineObject
+class pluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	pluginDescWidget( const plugin::descriptor & _pd, QWidget * _parent,
-							engine * _engine );
+	pluginDescWidget( const plugin::descriptor & _pd, QWidget * _parent );
 	virtual ~pluginDescWidget();
 
 

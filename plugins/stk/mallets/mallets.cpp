@@ -1,7 +1,7 @@
 /*
  * mallets.h - tuned instruments that one would bang upon
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -85,7 +85,7 @@ mallets::mallets( instrumentTrack * _channel_track ) :
 	m_presets = setupPresets( this, _channel_track );
 	
 	m_spread = new knob( knobBright_26, this, tr( "Spread" ),
-					eng(), _channel_track );
+							_channel_track );
 	m_spread->setLabel( tr( "Spread" ) );
 	m_spread->setRange( 0, 255, 1 );
 	m_spread->setInitValue( 0 );
@@ -93,7 +93,7 @@ mallets::mallets( instrumentTrack * _channel_track ) :
 	m_spread->setHintText( tr( "Spread:" ) + " ", "" );
 
 	m_buffer = bufferAllocator::alloc<sampleFrame>(
-			eng()->getMixer()->framesPerAudioBuffer() );
+				engine::getMixer()->framesPerAudioBuffer() );
 }
 
 
@@ -129,7 +129,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 	widget->setFixedSize( 250, 250 );
 		
 	m_hardness = new knob( knobBright_26, widget, tr( "Hardness" ),
-					eng(), _track );
+								_track );
 	m_hardness->setLabel( tr( "Hardness" ) );
 	m_hardness->setRange( 0.0, 128.0, 0.1 );
 	m_hardness->setInitValue( 64.0 );
@@ -137,7 +137,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 	m_hardness->setHintText( tr( "Hardness:" ) + " ", "" );
 
 	m_position = new knob( knobBright_26, widget, tr( "Position" ),
-					eng(), _track );
+								_track );
 	m_position->setLabel( tr( "Position" ) );
 	m_position->setRange( 0.0, 128.0, 0.1 );
 	m_position->setInitValue( 64.0 );
@@ -145,7 +145,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 	m_position->setHintText( tr( "Position:" ) + " ", "" );
 
 	m_vibratoGain = new knob( knobBright_26, widget, tr( "Vibrato Gain" ),
-					eng(), _track );
+								_track );
 	m_vibratoGain->setLabel( tr( "Vib Gain" ) );
 	m_vibratoGain->setRange( 0.0, 128.0, 0.1 );
 	m_vibratoGain->setInitValue( 64.0 );
@@ -153,7 +153,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 	m_vibratoGain->setHintText( tr( "Vib Gain:" ) + " ", "" );
 
 	m_vibratoFreq = new knob( knobBright_26, widget, tr( "Vibrato Freq" ),
-					eng(), _track );
+								_track );
 	m_vibratoFreq->setLabel( tr( "Vib Freq" ) );
 	m_vibratoFreq->setRange( 0.0, 128.0, 0.1 );
 	m_vibratoFreq->setInitValue( 64.0 );
@@ -161,7 +161,7 @@ QWidget * mallets::setupModalBarControls( QWidget * _parent, track * _track )
 	m_vibratoFreq->setHintText( tr( "Vib Freq:" ) + " ", "" );
 
 	m_stick = new knob( knobBright_26, widget, tr( "Stick Mix" ),
-					eng(), _track );
+								_track );
 	m_stick->setLabel( tr( "Stick Mix" ) );
 	m_stick->setRange( 0.0, 128.0, 0.1 );
 	m_stick->setInitValue( 64.0 );
@@ -180,7 +180,7 @@ QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 	widget->setFixedSize( 250, 250 );
 	
 	m_modulator = new knob( knobBright_26, widget, tr( "Modulator" ),
-					eng(), _track );
+								_track );
 	m_modulator->setLabel( tr( "Modulator" ) );
 	m_modulator->setRange( 0.0, 128.0, 0.1 );
 	m_modulator->setInitValue( 100.0 );
@@ -188,7 +188,7 @@ QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 	m_modulator->setHintText( tr( "Modulator:" ) + " ", "" );
 
 	m_crossfade = new knob( knobBright_26, widget, tr( "Crossfade" ),
-					eng(), _track );
+								_track );
 	m_crossfade->setLabel( tr( "Crossfade" ) );
 	m_crossfade->setRange( 0.0, 128.0, 0.1 );
 	m_crossfade->setInitValue( 0.0 );
@@ -196,7 +196,7 @@ QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 	m_crossfade->setHintText( tr( "Crossfade:" ) + " ", "" );
 	
 	m_lfoSpeed = new knob( knobBright_26, widget, tr( "LFO Speed" ),
-					eng(), _track );
+								_track );
 	m_lfoSpeed->setLabel( tr( "LFO Speed" ) );
 	m_lfoSpeed->setRange( 0.0, 128.0, 0.1 );
 	m_lfoSpeed->setInitValue( 20.0 );
@@ -204,15 +204,14 @@ QWidget * mallets::setupTubeBellControls( QWidget * _parent, track * _track )
 	m_lfoSpeed->setHintText( tr( "LFO Speed:" ) + " ", "" );
 	
 	m_lfoDepth = new knob( knobBright_26, widget, tr( "LFO Depth" ),
-					eng(), _track );
+								_track );
 	m_lfoDepth->setLabel( tr( "LFO Depth" ) );
 	m_lfoDepth->setRange( 0.0, 128.0, 0.1 );
 	m_lfoDepth->setInitValue( 10.0 );
 	m_lfoDepth->move( 117, 86 );
 	m_lfoDepth->setHintText( tr( "LFO Depth:" ) + " ", "" );
 	
-	m_adsr = new knob( knobBright_26, widget, tr( "ADSR" ),
-					eng(), _track );
+	m_adsr = new knob( knobBright_26, widget, tr( "ADSR" ), _track );
 	m_adsr->setLabel( tr( "ADSR" ) );
 	m_adsr->setRange( 0.0, 128.0, 0.1 );
 	m_adsr->setInitValue( 0.0 );
@@ -232,35 +231,32 @@ QWidget * mallets::setupBandedWGControls( QWidget * _parent, track * _track )
 	widget->setFixedSize( 250, 250 );
 	
 	m_strike = new ledCheckBox( tr( "Bowed" ), widget, tr( "Bowed" ),
-					eng(), _track );
+								_track );
 	m_strike->move( 165, 30 );
 	
 	m_pressure = new knob( knobBright_26, widget, tr( "Pressure" ),
-					eng(), _track );
+								_track );
 	m_pressure->setLabel( tr( "Pressure" ) );
 	m_pressure->setRange( 0.0, 128.0, 0.1 );
 	m_pressure->setInitValue( 64.0 );
 	m_pressure->move( 56, 86 );
 	m_pressure->setHintText( tr( "Pressure:" ) + " ", "" );
 
-	m_motion = new knob( knobBright_26, widget, tr( "Motion" ),
-					eng(), _track );
+	m_motion = new knob( knobBright_26, widget, tr( "Motion" ), _track );
 	m_motion->setLabel( tr( "Motion" ) );
 	m_motion->setRange( 0.0, 128.0, 0.1 );
 	m_motion->setInitValue( 64.0 );
 	m_motion->move( 117, 86 );
 	m_motion->setHintText( tr( "Motion:" ) + " ", "" );
 	
-	m_velocity = new knob( knobBright_26, widget, tr( "Speed" ),
-					eng(), _track );
+	m_velocity = new knob( knobBright_26, widget, tr( "Speed" ), _track );
 	m_velocity->setLabel( tr( "Speed" ) );
 	m_velocity->setRange( 0.0, 128.0, 0.1 );
 	m_velocity->setInitValue( 74.5 );
 	m_velocity->move( 178, 86 );
 	m_velocity->setHintText( tr( "Speed:" ) + " ", "" );
 	
-	m_vibrato = new knob( knobBright_26, widget, tr( "Vibrato" ),
-					eng(), _track );
+	m_vibrato = new knob( knobBright_26, widget, tr( "Vibrato" ), _track );
 	m_vibrato->setLabel( tr( "Vibrato" ) );
 	m_vibrato->setRange( 0.0, 128.0, 0.1 );
 	m_vibrato->setInitValue( 64.0 );
@@ -276,7 +272,7 @@ QWidget * mallets::setupBandedWGControls( QWidget * _parent, track * _track )
 comboBox * mallets::setupPresets( QWidget * _parent, track * _track )
 {
 	comboBox * presets = new comboBox( _parent, tr( "Instrument" ),
-					eng(), _track );
+								_track );
 	presets->setGeometry( 64, 157, 99, 22 );
 	presets->setFont( pointSize<8>( presets->font() ) );
 	
@@ -412,7 +408,7 @@ void mallets::playNote( notePlayHandle * _n, bool )
 					m_vibratoFreq->value(),
 					p,
 					(Uint8) m_spread->value(),
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -426,7 +422,7 @@ void mallets::playNote( notePlayHandle * _n, bool )
 					m_lfoSpeed->value(),
 					m_adsr->value(),
 					(Uint8) m_spread->value(),
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 		}
 		else
 		{
@@ -440,11 +436,11 @@ void mallets::playNote( notePlayHandle * _n, bool )
 					m_strike->value() * 128.0,
 					m_velocity->value(),
 					(Uint8) m_spread->value(),
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 		}
 	}
 
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	sample_t add_scale = 0.0f;

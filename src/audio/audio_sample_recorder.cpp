@@ -5,7 +5,7 @@
  *                             surround-audio-buffers into RAM, maybe later
  *                             also harddisk
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -94,7 +94,7 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 		data += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*_sample_buf = new sampleBuffer( ac.ptr(), frames, getMixer()->eng() );
+	*_sample_buf = new sampleBuffer( ac.ptr(), frames );
 }
 
 

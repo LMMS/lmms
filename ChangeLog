@@ -1,3 +1,257 @@
+2007-04-19	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/audio_port.h:
+	* include/automatable_button.h:
+	* include/automatable_object.h:
+	* include/automatable_slider.h:
+	* include/automation_editor.h:
+	* include/automation_pattern.h:
+	* include/bb_editor.h:
+	* include/bb_track.h:
+	* include/combobox.h:
+	* include/cpuload_widget.h:
+	* include/dummy_plugin.h:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_label.h:
+	* include/effect_select_dialog.h:
+	* include/engine.h:
+	* include/envelope_and_lfo_widget.h:
+	* include/export_project_dialog.h:
+	* include/file_browser.h:
+	* include/group_box.h:
+	* include/import_filter.h:
+	* include/instrument.h:
+	* include/journalling_object.h:
+	* include/knob.h:
+	* include/lcd_spinbox.h:
+	* include/led_checkbox.h:
+	* include/main_window.h:
+	* include/midi_alsa_raw.h:
+	* include/midi_alsa_seq.h:
+	* include/midi_client.h:
+	* include/midi_dummy.h:
+	* include/midi_oss.h:
+	* include/mixer.h:
+	* include/name_label.h:
+	* include/note.h:
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* include/pixmap_button.h:
+	* include/plugin.h:
+	* include/plugin_browser.h:
+	* include/preset_preview_play_handle.h:
+	* include/project_journal.h:
+	* include/project_notes.h:
+	* include/rack_view.h:
+	* include/sample_buffer.h:
+	* include/sample_play_handle.h:
+	* include/setup_dialog.h:
+	* include/song_editor.h:
+	* include/string_pair_drag.h:
+	* include/surround_area.h:
+	* include/tempo_sync_knob.h:
+	* include/timeline.h:
+	* include/track_container.h:
+	* include/visualization_widget.h:
+	* include/volume_knob.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/bass_booster/bassbooster_control_dialog.cpp
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/graph.cpp:
+	* plugins/bit_invader/graph.h:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/ladspa_base/ladspa_2_lmms.cpp:
+	* plugins/ladspa_base/ladspa_2_lmms.h:
+	* plugins/ladspa_base/ladspa_base.h:
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_base/ladspa_control.h:
+	* plugins/ladspa_base/ladspa_manager.cpp:
+	* plugins/ladspa_base/ladspa_manager.h:
+	* plugins/ladspa_base/ladspa_port_dialog.cpp:
+	* plugins/ladspa_base/ladspa_port_dialog.h:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	* plugins/lb302/lb302.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vibed/graph.cpp:
+	* plugins/vibed/graph.h:
+	* plugins/vibed/impulse_editor.cpp:
+	* plugins/vibed/impulse_editor.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_client.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_effect.h:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* plugins/vst_effect/vst_subplugin_features.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_sample_recorder.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/engine.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/instrument.cpp:
+	* src/core/main.cpp:
+	* src/core/main_window.cpp:
+	* src/core/meter_dialog.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/mixer.cpp:
+	* src/core/name_label.cpp:
+	* src/core/note.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/plugin.cpp:
+	* src/core/plugin_browser.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/timeline.cpp:
+	* src/core/tool.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/lib/journalling_object.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/lib/string_pair_drag.cpp:
+	* src/midi/midi_alsa_raw.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/midi/midi_client.cpp:
+	* src/midi/midi_oss.cpp:
+	* src/tracks/automation_pattern.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/cpuload_widget.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/pixmap_button.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/rack_view.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/widgets/visualization_widget.cpp:
+	* src/widgets/volume_knob.cpp:
+	return of the singletons
+
+	* include/fifo_buffer.h:
+	initial release, allows chunked audio buffer
+
+	* include/audio_alsa.h:
+	* include/audio_device.h:
+	* include/audio_dummy.h:
+	* include/audio_jack.h:
+	* include/audio_oss.h:
+	* include/audio_sdl.h:
+	* include/mixer.h:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_sdl.cpp:
+	* src/core/mixer.cpp:
+	* src/core/setup_dialog.cpp:
+	use chunked audio buffer
+
+	* src/core/mixer.cpp:
+	don't delete the audio device when changing quality, fixes JACK without
+	external server
+
+	* include/sample_buffer.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/patman/patman.cpp:
+	* src/lib/sample_buffer.cpp:
+	handle different sample rates, fixes many looping patch samples
+
+	* src/core/sample_play_handle.cpp:
+	fixed high quality
+
+	* plugins/patman/patman.cpp:
+	automated Loop and Tune modes
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	automated Loop mode
+
+	* src/core/automation_editor.cpp:
+	fixed selections
+
+	* src/core/track_container.cpp:
+	use modularized sample extensions
+
+	* include/string_pair_drag.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/patman/patman.cpp:
+	* src/lib/string_pair_drag.cpp:
+	changed string pair MIME type
+
+	* src/lib/mmp.cpp:
+	renamed root element
+
+	* data/lmms.xml:
+	initial release, project MIME type
+
+	* data/Makefile.am:
+	install project MIME type
+
+	* data/lmms.desktop:
+	- added project MIME type
+	- added Catalan translation
+
+	* include/oscillator.h:
+	* src/lib/oscillator.cpp:
+	got switches out of for-loops
+
+	* include/arp_and_chords_tab_widget.h:
+	* include/effect_tab_widget.h:
+	* include/instrument_track.h:
+	* include/midi_tab_widget.h:
+	* include/track.h:
+	cleaned up dependencies
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-04-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/patman/artwork.png:

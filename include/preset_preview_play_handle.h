@@ -2,7 +2,7 @@
  * preset_preview_play_handle.h - play-handle for playing a short preview-sound
  *                                of a preset
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,19 +29,8 @@
 
 #include "qt3support.h"
 
-#ifdef QT4
-
-#include <QtCore/QMap>
-
-#else
-
-#include <qmap.h>
-
-#endif
-
 
 #include "note_play_handle.h"
-#include "engine.h"
 
 
 class instrumentTrack;
@@ -49,27 +38,21 @@ class notePlayHandle;
 class previewTrackContainer;
 
 
-class presetPreviewPlayHandle : public playHandle, public engineObject
+class presetPreviewPlayHandle : public playHandle
 {
 public:
-	presetPreviewPlayHandle( const QString & _preset_file,
-						engine * _engine );
+	presetPreviewPlayHandle( const QString & _preset_file );
 	virtual ~presetPreviewPlayHandle();
 
 	virtual void play( bool _try_parallelizing );
 	virtual bool done( void ) const;
 
-	static void cleanUp( engine * _engine );
+	static void cleanUp( void );
 	static constNotePlayHandleVector nphsOfInstrumentTrack(
 						const instrumentTrack * _ct );
 
 private:
-	inline previewTrackContainer * previewTC( void )
-	{
-		return( s_previewTCs[eng()] );
-	}
-
-	static QMap<const engine *, previewTrackContainer *> s_previewTCs;
+	static previewTrackContainer * s_previewTC;
 
 	notePlayHandle * m_previewNote;
 

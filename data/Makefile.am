@@ -6,6 +6,8 @@ menu_DATA = lmms
 applicationsdir = $(datadir)/applications
 applications_DATA = lmms.desktop
 
-EXTRA_DIST = $(menu_DATA) $(applications_DATA)
+mimedir = $(datadir)/mime/packages
+mime_DATA = lmms.xml
 
+EXTRA_DIST = $(menu_DATA) $(applications_DATA) $(mime_DATA)
 

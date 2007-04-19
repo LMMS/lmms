@@ -89,7 +89,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
-		m_osc[i].m_sampleBuffer = new sampleBuffer( eng() );
+		m_osc[i].m_sampleBuffer = new sampleBuffer;
 	}
 
 #ifdef QT4
@@ -102,8 +102,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
 
-	pixmapButton * pm_osc1_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * pm_osc1_btn = new pixmapButton( this, NULL, NULL );
 	pm_osc1_btn->move( 80, 50 );
 	pm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
@@ -115,8 +114,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	pixmapButton * am_osc1_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * am_osc1_btn = new pixmapButton( this, NULL, NULL );
 	am_osc1_btn->move( 120, 50 );
 	am_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
@@ -128,8 +126,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	pixmapButton * mix_osc1_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * mix_osc1_btn = new pixmapButton( this, NULL, NULL );
 	mix_osc1_btn->move( 160, 50 );
 	mix_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
@@ -139,8 +136,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"btn_mask" ).createHeuristicMask() ) );
 	toolTip::add( mix_osc1_btn, tr( "mix output of oscillator 1 & 2" ) );
 
-	pixmapButton * sync_osc1_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * sync_osc1_btn = new pixmapButton( this, NULL, NULL );
 	sync_osc1_btn->move( 200, 50 );
 	sync_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
@@ -151,8 +147,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc1_btn, tr( "synchronize oscillator 1 with "
 							"oscillator 2" ) );
 
-	pixmapButton * fm_osc1_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * fm_osc1_btn = new pixmapButton( this, NULL, NULL );
 	fm_osc1_btn->move( 330, 50 );
 	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
@@ -166,7 +161,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 	m_mod1BtnGrp = new automatableButtonGroup( this,
 						tr( "Modulation type 1" ),
-						eng(), _channel_track );
+						_channel_track );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
@@ -178,8 +173,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						this, SLOT( mod1Ch( int ) ) );
 
 
-	pixmapButton * pm_osc2_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * pm_osc2_btn = new pixmapButton( this, NULL, NULL );
 	pm_osc2_btn->move( 80, 70 );
 	pm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
@@ -191,8 +185,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	pixmapButton * am_osc2_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * am_osc2_btn = new pixmapButton( this, NULL, NULL );
 	am_osc2_btn->move( 120, 70 );
 	am_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
@@ -204,8 +197,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	pixmapButton * mix_osc2_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * mix_osc2_btn = new pixmapButton( this, NULL, NULL );
 	mix_osc2_btn->move( 160, 70 );
 	mix_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
@@ -215,8 +207,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"btn_mask" ).createHeuristicMask() ) );
 	toolTip::add( mix_osc2_btn, tr("mix output of oscillator 2 & 3" ) );
 
-	pixmapButton * sync_osc2_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * sync_osc2_btn = new pixmapButton( this, NULL, NULL );
 	sync_osc2_btn->move( 200, 70 );
 	sync_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
@@ -227,8 +218,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( sync_osc2_btn, tr( "synchronize oscillator 2 with "
 							"oscillator 3" ) );
 
-	pixmapButton * fm_osc2_btn = new pixmapButton( this, NULL, eng(),
-									NULL );
+	pixmapButton * fm_osc2_btn = new pixmapButton( this, NULL, NULL );
 	fm_osc2_btn->move( 330, 70 );
 	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
@@ -242,7 +232,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 	m_mod2BtnGrp = new automatableButtonGroup( this,
 						tr( "Modulation type 2" ),
-						eng(), _channel_track );
+						_channel_track );
 	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
 	m_mod2BtnGrp->addButton( mix_osc2_btn );
@@ -261,8 +251,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		
 		// setup volume-knob
 		m_osc[i].volKnob = new volumeKnob( knobSmall_17, this, tr(
-				"Osc %1 volume" ).arg( i+1 ), eng(),
-							_channel_track );
+				"Osc %1 volume" ).arg( i+1 ), _channel_track );
 		m_osc[i].volKnob->setData( i );
 		m_osc[i].volKnob->move( 6, 104+i*50 );
 		m_osc[i].volKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
@@ -283,7 +272,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		// setup panning-knob
 		m_osc[i].panKnob = new knob( knobSmall_17, this,
-				tr( "Osc %1 panning" ).arg( i + 1 ), eng(),
+				tr( "Osc %1 panning" ).arg( i + 1 ),
 							_channel_track );
 		m_osc[i].panKnob->setData( i );
 		m_osc[i].panKnob->move( 33, 104+i*50 );
@@ -304,7 +293,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup coarse-knob
 		m_osc[i].coarseKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 coarse detuning" ).arg( i + 1 ),
-							eng(), _channel_track );
+							_channel_track );
 		m_osc[i].coarseKnob->setData( i );
 		m_osc[i].coarseKnob->move( 66, 104 + i * 50 );
 		m_osc[i].coarseKnob->setRange( -2 * NOTES_PER_OCTAVE,
@@ -327,7 +316,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		// setup knob for left fine-detuning
 		m_osc[i].fineLKnob = new knob( knobSmall_17, this,
 				tr( "Osc %1 fine detuning left" ).arg( i+1 ),
-							eng(), _channel_track );
+							_channel_track );
 		m_osc[i].fineLKnob->setData( i );
 		m_osc[i].fineLKnob->move( 90, 104 + i * 50 );
 		m_osc[i].fineLKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -351,7 +340,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].fineRKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 fine detuning right"
 							).arg( i + 1 ),
-							eng(), _channel_track );
+							_channel_track );
 		m_osc[i].fineRKnob->setData( i );
 		m_osc[i].fineRKnob->move( 110, 104 + i * 50 );
 		m_osc[i].fineRKnob->setRange( -100.0f, 100.0f, 1.0f );
@@ -374,7 +363,6 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].phaseOffsetKnob = new knob( knobSmall_17, this,
 							tr( "Osc %1 phase-"
 							"offset" ).arg( i+1 ),
-							eng(),
 							_channel_track );
 		m_osc[i].phaseOffsetKnob->setData( i );
 		m_osc[i].phaseOffsetKnob->move( 142, 104 + i * 50 );
@@ -402,7 +390,6 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].stereoPhaseDetuningKnob = new knob( knobSmall_17, this,
 						tr( "Osc %1 stereo phase-"
 							"detuning" ).arg( i+1 ),
-							eng(),
 							_channel_track );
 		m_osc[i].stereoPhaseDetuningKnob->setData( i );
 		m_osc[i].stereoPhaseDetuningKnob->move( 166, 104 + i * 50 );
@@ -467,7 +454,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		updatePhaseOffsetRight( i );
 
 		pixmapButton * sin_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		sin_wave_btn->move( 188, 105 + i * 50 );
 		sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -479,7 +466,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						"current oscillator." ) );
 
 		pixmapButton * triangle_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		triangle_wave_btn->move( 203, 105 + i * 50 );
 		triangle_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -490,7 +477,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						"for current oscillator." ) );
 
 		pixmapButton * saw_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		saw_wave_btn->move( 218, 105 + i * 50 );
 		saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -501,7 +488,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						"current oscillator." ) );
 
 		pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		sqr_wave_btn->move( 233, 105 + i * 50 );
 		sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -512,7 +499,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						"current oscillator." ) );
 
 		pixmapButton * moog_saw_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		moog_saw_wave_btn->move( 188, 120+i*50 );
 		moog_saw_wave_btn->setActiveGraphic(
 			embed::getIconPixmap( "moog_saw_wave_active" ) );
@@ -523,7 +510,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 						"for current oscillator." ) );
 
 		pixmapButton * exp_wave_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		exp_wave_btn->move( 203, 120+i*50 );
 		exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 							"exp_wave_active" ) );
@@ -534,7 +521,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"wave for current oscillator." ) );
 
 		pixmapButton * white_noise_btn = new pixmapButton( this, NULL,
-								eng(), NULL );
+									NULL );
 		white_noise_btn->move( 218, 120+i*50 );
 		white_noise_btn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -544,8 +531,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a white-noise for "
 						"current oscillator." ) );
 
-		m_osc[i].usrWaveBtn = new pixmapButton( this, NULL, eng(),
-									NULL );
+		m_osc[i].usrWaveBtn = new pixmapButton( this, NULL, NULL );
 		m_osc[i].usrWaveBtn->move( 233, 120+i*50 );
 		m_osc[i].usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -557,7 +543,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 		m_osc[i].waveBtnGrp = new automatableButtonGroup( this,
 					tr( "Osc %1 wave shape" ).arg( i + 1 ),
-					eng(), _channel_track );
+					_channel_track );
 		m_osc[i].waveBtnGrp->addButton( sin_wave_btn );
 		m_osc[i].waveBtnGrp->addButton( triangle_wave_btn );
 		m_osc[i].waveBtnGrp->addButton( saw_wave_btn );
@@ -596,7 +582,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		}
 	}
 
-	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
 }
 
@@ -753,7 +739,7 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 	oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData
 								)->oscRight;
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 	
 	osc_l->update( buf, frames, 0 );
@@ -893,7 +879,7 @@ void tripleOscillator::updateDetuningLeft( const QVariant & _data )
 	m_osc[_i].detuningLeft = powf( 2.0f, (
 			(float)m_osc[_i].coarseKnob->value() * 100.0f +
 			(float)m_osc[_i].fineLKnob->value() ) / 1200.0f )
-			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+					/ engine::getMixer()->sampleRate();
 }
 
 
@@ -905,7 +891,7 @@ void tripleOscillator::updateDetuningRight( const QVariant & _data )
 	m_osc[_i].detuningRight = powf( 2.0f, (
 			(float)m_osc[_i].coarseKnob->value() * 100.0f +
 			(float)m_osc[_i].fineRKnob->value() ) / 1200.0f )
-			/ static_cast<float>( eng()->getMixer()->sampleRate() );
+					/ engine::getMixer()->sampleRate();
 }
 
 

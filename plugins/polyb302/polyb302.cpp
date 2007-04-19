@@ -88,8 +88,7 @@ plugin * lmms_plugin_main( void * _data )
 // lb302Filter
 //
 
-lb302Filter::lb302Filter( lb302FilterState * _p_fs, engine * _engine ) :
-	engineObject( _engine ),
+lb302Filter::lb302Filter( lb302FilterState * _p_fs ) :
 	m_fs( _p_fs ),
 	m_vcf_c0( 0 ),
 	m_vcf_e0( 0 ),
@@ -106,8 +105,8 @@ void lb302Filter::recalc( void )
 							+ 1.2 * m_fs->reso );
 	m_vcf_e0 = exp( 4.8434 - 0.8 * m_fs->envmod + 2.1553 * m_fs->cutoff
 							+ 0.7696 * m_fs->reso );
-	m_vcf_e0 *= M_PI / eng()->getMixer()->sampleRate();
-	m_vcf_e1 *= M_PI / eng()->getMixer()->sampleRate();
+	m_vcf_e0 *= M_PI / engine::getMixer()->sampleRate();
+	m_vcf_e1 *= M_PI / engine::getMixer()->sampleRate();
 	m_vcf_e1 -= m_vcf_e0;
 }
 
@@ -135,8 +134,8 @@ void lb302Filter::playNote( void )
 // lb302FilterIIR2
 //
 
-lb302FilterIIR2::lb302FilterIIR2( lb302FilterState * _p_fs, engine * _engine ) :
-	lb302Filter( _p_fs, _engine ),
+lb302FilterIIR2::lb302FilterIIR2( lb302FilterState * _p_fs ) :
+	lb302Filter( _p_fs ),
 	m_vcf_d1( 0 ),
 	m_vcf_d2( 0 ),
 	m_vcf_a( 0 ),
@@ -204,9 +203,8 @@ float lb302FilterIIR2::process( const float & _samp )
 // lb302Filter3Pole
 //
 
-lb302Filter3Pole::lb302Filter3Pole( lb302FilterState * _p_fs,
-							engine * _engine ) :
-	lb302Filter( _p_fs, _engine ),
+lb302Filter3Pole::lb302Filter3Pole( lb302FilterState * _p_fs ) :
+	lb302Filter( _p_fs ),
 	m_ay1( 0 ),
 	m_ay2( 0 ),
 	m_aout( 0 ),
@@ -239,14 +237,14 @@ void lb302Filter3Pole::envRecalc( void )
 	//TODO: Fix high quality
 	float kfco = 50.0f + k * ( 2300.0f - 1600.0f * m_fs->envmod
 		+ w * ( 700.0f + 1500.0f * k + ( 1500.0f + k * (
-			eng()->getMixer()->sampleRate() / 2.0f - 6000.0f ) )
+			engine::getMixer()->sampleRate() / 2.0f - 6000.0f ) )
 							* m_fs->envmod ) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// m_kfcn = m_fs->cutoff;
-	m_kfcn = 2.0 * kfco / eng()->getMixer()->sampleRate();
+	m_kfcn = 2.0 * kfco / engine::getMixer()->sampleRate();
 #else
 	m_kfcn = w;
 #endif
@@ -295,7 +293,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 {
 	m_vcf_cut_knob = new knob( knobBright_26, this,
 						tr( "VCF Cutoff Frequency" ),
-								eng(), _track );
+								_track );
 	m_vcf_cut_knob->setRange( 0.0f, 1.5f, 0.005f );   // Originally  [0,1.0]
  	m_vcf_cut_knob->setInitValue( 0.75f );
 	m_vcf_cut_knob->move( 75, 130 );
@@ -303,7 +301,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 	m_vcf_cut_knob->setLabel( tr( "CUT" ) );
 
 	m_vcf_res_knob = new knob( knobBright_26, this, tr( "VCF Resonance" ),
-								eng(), _track );
+								_track );
 	m_vcf_res_knob->setRange( 0.0f, 1.25f, 0.005f );   // Originally [0,1.0]
 	m_vcf_res_knob->setInitValue( 0.75f );
 	m_vcf_res_knob->move( 120, 130 );
@@ -312,7 +310,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 
 	m_vcf_mod_knob = new knob( knobBright_26, this,
 						tr( "VCF Envelope Mod" ),
-								eng(), _track );
+								_track );
 	m_vcf_mod_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally  [0,1.0]
  	m_vcf_mod_knob->setInitValue( 1.0f );
 	m_vcf_mod_knob->move( 165, 130 );
@@ -321,38 +319,37 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 
 	m_vcf_dec_knob = new knob( knobBright_26, this,
 						tr( "VCF Envelope Decay" ),
-								eng(), _track );
+								_track );
 	m_vcf_dec_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally [0,1.0]
 	m_vcf_dec_knob->setInitValue( 0.1f );
 	m_vcf_dec_knob->move( 210, 130 );
 	m_vcf_dec_knob->setHintText( tr( "Decay:" ) + " ", "" );
 	m_vcf_dec_knob->setLabel( tr( "DEC" ) );
 
-	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ),
-								eng(), _track );
+	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ), _track );
 	m_slideToggle->move( 10, 200 );
 
 
 //	m_accentToggle = new ledCheckBox( "Accent", this,
 //							tr( "Accent" ),
-//							eng(), _track );
+//							_track );
 //	m_accentToggle->move( 10, 200 );
 //	m_accentToggle->setDisabled(true);
 
 
 //	m_deadToggle = new ledCheckBox( "Dead", this,
 //							tr( "Dead" ),
-//							eng(), _track );
+//							_track );
 //	m_deadToggle->move( 10, 220 );
 
 	m_db24Toggle = new ledCheckBox( "24dB/oct", this,
 				tr( "303-es-que, 24dB/octave, 3 pole filter" ),
-								eng(), _track );
+								_track );
 	m_db24Toggle->move( 10, 150 );
 
 
 	m_slide_dec_knob = new knob( knobBright_26, this, tr( "Slide Decay" ),
-								eng(), _track );
+								_track );
 	m_slide_dec_knob->setRange( 0.0f, 1.0f, 0.005f );  // Originally [0,1.0]
 	m_slide_dec_knob->setInitValue( 0.6f );
 	m_slide_dec_knob->move( 210, 75 );
@@ -361,7 +358,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 
 	m_vco_fine_detune_knob = new knob( knobBright_26, this,
 						tr( "VCO fine detuning" ),
-								eng(), _track );
+								_track );
 	m_vco_fine_detune_knob->setRange( -100.0f, 100.0f, 1.0f );
 	m_vco_fine_detune_knob->setInitValue( 0.0f );
 	m_vco_fine_detune_knob->move( 165, 75 );
@@ -371,7 +368,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 
 
 	m_dist_knob = new knob( knobBright_26, this, tr( "Distortion" ),
-								eng(), _track );
+								_track );
 	m_dist_knob->setRange( 0.0f, 1.0f, 0.01f );   // Originally [0,1.0]
 	m_dist_knob->setInitValue( 0.0f );
 	m_dist_knob->move( 210, 190 );
@@ -379,8 +376,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 	m_dist_knob->setLabel( tr( "DIST" ) );
 
 
-	m_wave_knob = new knob( knobBright_26, this, tr( "Waveform" ),
-							eng(), _track );
+	m_wave_knob = new knob( knobBright_26, this, tr( "Waveform" ), _track );
 	m_wave_knob->setRange( 0.0f, 5.0f, 1.0f );   // Originally [0,1.0]
 	m_wave_knob->setInitValue( 0.0f );
 	m_wave_knob->move( 120, 75 );
@@ -519,7 +515,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 
 		// Adjust inc on SampRate change or detuning change
 		hstate->m_vco_inc = hstate->m_vco_detune
-					/ eng()->getMixer()->sampleRate();
+					/ engine::getMixer()->sampleRate();
 
 		// Initiate Slide
 		// TODO: Break out into function,
@@ -561,7 +557,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	if( buf )
@@ -660,8 +656,7 @@ void polyb302Synth::waveChanged( float )
 
 
 
-polyb302Synth::handleState::handleState( polyb302Synth * _synth ) :
-	engineObject( _synth->eng() )
+polyb302Synth::handleState::handleState( polyb302Synth * _synth )
 {
 	m_vco_inc = 0.0;
 	m_vco_c = 0;
@@ -692,11 +687,11 @@ polyb302Synth::handleState::handleState( polyb302Synth * _synth ) :
 
 	if( _synth->m_db24Toggle->isChecked() )
 	{
-		m_vcf = new lb302Filter3Pole( &m_fs, eng() );
+		m_vcf = new lb302Filter3Pole( &m_fs );
 	}
 	else
 	{
-		m_vcf = new lb302FilterIIR2( &m_fs, eng() );
+		m_vcf = new lb302FilterIIR2( &m_fs );
 	}
 	recalcFilter();
 
@@ -724,11 +719,11 @@ void polyb302Synth::handleState::db24Toggled( void )
 	delete m_vcf;
 	if( m_synth->m_db24Toggle->isChecked() )
 	{
-		m_vcf = new lb302Filter3Pole( &m_fs, eng() );
+		m_vcf = new lb302Filter3Pole( &m_fs );
 	}
 	else
 	{
-		m_vcf = new lb302FilterIIR2( &m_fs, eng() );
+		m_vcf = new lb302FilterIIR2( &m_fs );
 	}
 	recalcFilter();
 }
@@ -741,7 +736,7 @@ void polyb302Synth::handleState::detuneChanged( void )
 	m_vco_detune = powf( 2.0f,
 				(float)m_synth->m_vco_fine_detune_knob->value()
 								/ 1200.0f );
-	m_vco_inc = m_vco_detune / eng()->getMixer()->sampleRate();
+	m_vco_inc = m_vco_detune / engine::getMixer()->sampleRate();
 
 	// If a slide note is pending,
 	if( m_vco_slideinc )
@@ -754,7 +749,7 @@ void polyb302Synth::handleState::detuneChanged( void )
 	if( m_vco_slide )
 	{
 		m_vco_slidebase = m_vco_detune
-					/ eng()->getMixer()->sampleRate();
+					/ engine::getMixer()->sampleRate();
 	}
 }
 
@@ -771,7 +766,7 @@ void polyb302Synth::handleState::filterChanged( void )
         m_fs.dist   = LB_DIST_RATIO * m_synth->m_dist_knob->value();
 
         float d = 0.2 + 2.3 * m_synth->m_vcf_dec_knob->value();
-        d *= eng()->getMixer()->sampleRate();
+        d *= engine::getMixer()->sampleRate();
 	// decay is 0.1 to the 1/d * ENVINC
         m_fs.envdecay = pow( 0.1, ENVINC / d );
 	// vcf_envdecay is now adjusted for both
@@ -922,7 +917,7 @@ void polyb302Synth::handleState::process( sampleFrame * _outbuf,
 		// Handle Envelope
 		// TODO: Add decay once I figure out how to extend past the end
 		// of a note.
-		if( m_sample_cnt >= 0.5 * eng()->getMixer()->sampleRate() )
+		if( m_sample_cnt >= 0.5 * engine::getMixer()->sampleRate() )
 		{
 			m_vca_mode = 2;
 		}

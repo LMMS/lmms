@@ -3,7 +3,7 @@
 /*
  * journalling_object.cpp - implementation of journalling-object related stuff
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 #include "journalling_object.h"
 #include "project_journal.h"
 #include "base64.h"
+#include "engine.h"
 
 #include "qt3support.h"
 
@@ -43,10 +44,8 @@
 
 
 
-journallingObject::journallingObject( engine * _engine ) :
-	engineObject( _engine ),
-	m_id( ( eng() != NULL ) ? eng()->getProjectJournal()->allocID( this ) :
-									0 ),
+journallingObject::journallingObject( void ) :
+	m_id( engine::getProjectJournal()->allocID( this ) ),
 	m_journalEntries(),
 	m_currentJournalEntry( m_journalEntries.end() ),
 	m_journalling( TRUE )
@@ -58,9 +57,9 @@ journallingObject::journallingObject( engine * _engine ) :
 
 journallingObject::~journallingObject()
 {
-	if( eng() && eng()->getProjectJournal() )
+	if( engine::getProjectJournal() )
 	{
-		eng()->getProjectJournal()->freeID( id() );
+		engine::getProjectJournal()->freeID( id() );
 	}
 }
 
@@ -140,15 +139,13 @@ void journallingObject::restoreState( const QDomElement & _this )
 
 void journallingObject::addJournalEntry( const journalEntry & _je )
 {
-	if( !( eng() == NULL ||
-		eng()->getProjectJournal()->isJournalling() == FALSE ||
-		isJournalling() == FALSE ) )
+	if( engine::getProjectJournal()->isJournalling() && isJournalling() )
 	{
 		m_journalEntries.erase( m_currentJournalEntry,
 						m_journalEntries.end() );
 		m_journalEntries.push_back( _je );
 		m_currentJournalEntry = m_journalEntries.end();
-		eng()->getProjectJournal()->journalEntryAdded( id() );
+		engine::getProjectJournal()->journalEntryAdded( id() );
 	}
 }
 
@@ -199,8 +196,8 @@ void journallingObject::loadJournal( const QDomElement & _this )
 
 	if( id() != new_id )
 	{
-		eng()->getProjectJournal()->forgetAboutID( id() );
-		eng()->getProjectJournal()->reallocID( new_id, this );
+		engine::getProjectJournal()->forgetAboutID( id() );
+		engine::getProjectJournal()->reallocID( new_id, this );
 		m_id = new_id;
 	}
 

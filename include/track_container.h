@@ -2,7 +2,7 @@
  * track_container.h - base-class for all track-containers like Song-Editor,
  *                     BB-Editor...
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,7 +47,6 @@
 #include "track.h"
 #include "journalling_object.h"
 #include "rubberband.h"
-#include "engine.h"
 
 
 
@@ -60,7 +59,7 @@ class trackContainer : public QMainWindow, public journallingObject
 {
 	Q_OBJECT
 public:
-	trackContainer( engine * _engine );
+	trackContainer( void );
 	virtual ~trackContainer();
 
 	inline QWidget * containerWidget( void )

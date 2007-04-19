@@ -1,7 +1,7 @@
 /*
  * vst_effect.cpp - class for handling VST effect plugins
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -65,11 +65,11 @@ plugin::descriptor vsteffect_plugin_descriptor =
 }
 
 
-vstEffect::vstEffect( effect::constructionData * _cdata ) :
-	effect( &vsteffect_plugin_descriptor, _cdata ),
+vstEffect::vstEffect( const descriptor::subPluginFeatures::key * _key ) :
+	effect( &vsteffect_plugin_descriptor, _key ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
-	m_key( _cdata->key )
+	m_key( *_key )
 {
 	if( !m_key.user.toString().isEmpty() )
 	{
@@ -150,7 +150,7 @@ void vstEffect::openPlugin( const QString & _plugin )
 				"Please wait while loading VST-plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	m_pluginMutex.lock();
-	m_plugin = new remoteVSTPlugin( _plugin, eng() );
+	m_plugin = new remoteVSTPlugin( _plugin );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -168,10 +168,10 @@ void vstEffect::openPlugin( const QString & _plugin )
 		return;
 	}
 	m_plugin->showEditor();
-	remoteVSTPlugin::connect( eng()->getSongEditor(),
+	remoteVSTPlugin::connect( engine::getSongEditor(),
 				SIGNAL( tempoChanged( bpm_t ) ),
 			 m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( eng()->getSongEditor()->getTempo() );
+	m_plugin->setTempo( engine::getSongEditor()->getTempo() );
 	if( m_plugin->pluginWidget() != NULL )
 	{
 /*#ifdef QT4
@@ -206,7 +206,8 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new vstEffect(
-			static_cast<effect::constructionData *>( _data ) ) );
+		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+								_data ) ) );
 }
 
 }

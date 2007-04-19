@@ -2,7 +2,7 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -95,13 +95,13 @@ class knob;
 class note : public journallingObject
 {
 public:
-	note( engine * _engine = NULL,
-		const midiTime & _length = 0,
+	note( const midiTime & _length = 0,
 		const midiTime & _pos = 0,
 		tones _tone = A,
 		octaves _octave = DEFAULT_OCTAVE,
 		volume _volume = DEFAULT_VOLUME,
-		panning _panning = DEFAULT_PANNING ) FASTCALL;
+		panning _panning = DEFAULT_PANNING,
+		knob * _detuning = NULL ) FASTCALL;
 	note( const note & _note );
 	virtual ~note();
 
@@ -112,7 +112,6 @@ public:
 	void FASTCALL setKey( const int _key );
 	void FASTCALL setVolume( const volume _volume = DEFAULT_VOLUME );
 	void FASTCALL setPanning( const panning _panning = DEFAULT_PANNING );
-	void FASTCALL setDetuning( knob * _detuning );
 	void FASTCALL quantizeLength( const int _q_grid );
 	void FASTCALL quantizePos( const int _q_grid );
 
@@ -208,6 +207,7 @@ private:
 	knob * m_detuning;
 
 	void createDetuning( void );
+	void FASTCALL setDetuning( knob * _detuning );
 
 } ;
 

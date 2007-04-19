@@ -3,7 +3,7 @@
 /*
  * midi_oss.cpp - OSS-raw-midi-client
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,9 +55,7 @@
 
 
 
-midiOSS::midiOSS( engine * _engine ) :
-	midiClientRaw( _engine ),
-	QThread(),
+midiOSS::midiOSS( void ) :
 	m_midiDev( probeDevice() ),
 	m_quit( FALSE )
 {

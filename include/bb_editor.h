@@ -1,7 +1,7 @@
 /*
  * bb_editor.h - declaration of class bbEditor, a basic-component of LMMS
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -89,7 +89,7 @@ protected:
 
 
 private:
-	bbEditor( engine * _engine );
+	bbEditor( void );
 	//bbEditor( const bbEditor & );
 	virtual ~bbEditor();
 

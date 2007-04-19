@@ -107,9 +107,11 @@ private:
 
 	jack_client_t * m_client;
 
+	bool m_active;
 	bool m_stopped;
 
-	QMutex m_processCallbackMutex;
+//	QMutex m_processCallbackMutex;
+	QSemaphore m_stop_semaphore;
 
 	vvector<jack_port_t *> m_outputPorts;
 	surroundSampleFrame * m_outBuf;

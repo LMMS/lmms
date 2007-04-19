@@ -3,7 +3,7 @@
 /*
  * rack_view.cpp - provides the display for the rackInsert instances
  *
- * Copyright (c) 2006 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,12 +39,8 @@
 #include "rack_view.h"
 
 
-rackView::rackView( QWidget * _parent, 
-			engine * _engine, 
-			track * _track, 
-			audioPort * _port ):
+rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
 	QWidget( _parent ),
-	journallingObject( _engine ),
 	m_track( _track ),
 	m_port( _port )
 {
@@ -250,15 +246,11 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 		{
 			QDomElement cn = node.toElement();
 			const QString name = cn.attribute( "name" );
-			effect::constructionData cd =
-			{
-				eng(),
-				// we have this really convenient key-ctor
-				// which takes a QString and decodes the
-				// base64-data inside :-)
-				effectKey( cn.attribute( "key" ) )
-			} ;
-			addEffect(effect::instantiate( name, cd ) );
+			// we have this really convenient key-ctor
+			// which takes a QString and decodes the
+			// base64-data inside :-)
+			effectKey key( cn.attribute( "key" ) );
+			addEffect( effect::instantiate( name, &key ) );
 			// TODO: somehow detect if effect is sub-plugin-capable
 			// but couldn't load sub-plugin with requsted key
 			if( node.isElement() )

@@ -35,8 +35,7 @@ class audioDummy : public audioDevice, public QThread
 public:
 	audioDummy( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
-		audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
-		m_quit( FALSE )
+		audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer )
 	{
 		_success_ful = TRUE;
 	}
@@ -82,7 +81,6 @@ private:
 	{
 		if( isRunning() )
 		{
-			m_quit = TRUE;
 			wait( 1000 );
 			terminate();
 		}
@@ -91,10 +89,13 @@ private:
 	virtual void run( void )
 	{
 		microTimer timer;
-		while( m_quit == FALSE )
+		while( TRUE )
 		{
 			timer.reset();
-			processNextBuffer();
+			if ( !processNextBuffer() )
+			{
+				break;
+			}
 			const Sint32 microseconds = static_cast<Sint32>(
 					getMixer()->framesPerAudioBuffer() *
 					1000000.0f / getMixer()->sampleRate() -
@@ -105,9 +106,6 @@ private:
 			}
 		}
 	}
-
-
-	volatile bool m_quit;
 
 } ;
 

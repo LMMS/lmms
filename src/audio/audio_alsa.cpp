@@ -65,8 +65,7 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_convertEndian( FALSE ),
-	m_quit( FALSE )
+	m_convertEndian( FALSE )
 {
 	_success_ful = FALSE;
 
@@ -204,7 +203,6 @@ void audioALSA::stopProcessing( void )
 {
 	if( isRunning() )
 	{
-		m_quit = TRUE;
 		wait( 1000 );
 		terminate();
 	}
@@ -223,13 +221,13 @@ void audioALSA::run( void )
 								channels() );
 	int_sample_t * pcmbuf = bufferAllocator::alloc<int_sample_t>(
 						m_periodSize * channels() );
-	m_quit = FALSE;
 
 	int outbuf_size = getMixer()->framesPerAudioBuffer() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
-	while( m_quit == FALSE )
+	bool quit = FALSE;
+	while( quit == FALSE )
 	{
 		int_sample_t * ptr = pcmbuf;
 		int len = pcmbuf_size;
@@ -239,6 +237,13 @@ void audioALSA::run( void )
 			{
 				// frames depend on the sample rate
 				const fpab_t frames = getNextBuffer( temp );
+				if( !frames )
+				{
+					quit = TRUE;
+					memset( ptr, 0, len
+						* sizeof( int_sample_t ) );
+					break;
+				}
 				outbuf_size = frames * channels();
 
 				convertToS16( temp, frames,
@@ -488,7 +493,7 @@ audioALSA::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
 	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-						this, NULL, NULL, NULL );
+							this, NULL, NULL );
 	m_channels->setStep( 2 );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->setValue( configManager::inst()->value( "audioalsa",

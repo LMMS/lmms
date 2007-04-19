@@ -4,7 +4,7 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -60,7 +60,7 @@
 
 sampleTCO::sampleTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_sampleBuffer( new sampleBuffer( eng() ) )
+	m_sampleBuffer( new sampleBuffer )
 {
 #ifndef QT4
 	setBackgroundMode( Qt::NoBackground );
@@ -72,7 +72,7 @@ sampleTCO::sampleTCO( track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
-	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ), this,
+	connect( engine::getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ), this,
 						SLOT( updateLength( bpm_t ) ) );
 }
 
@@ -150,7 +150,7 @@ void sampleTCO::dropEvent( QDropEvent * _de )
 	{
 		m_sampleBuffer->loadFromBase64(
 					stringPairDrag::decodeValue( _de ) );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 		updateLength();
 		update();
 		_de->accept();
@@ -170,7 +170,7 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 	if( af != "" && af != m_sampleBuffer->audioFile() )
 	{
 		setSampleFile( af );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 	}
 }
 
@@ -243,7 +243,7 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 midiTime sampleTCO::getSampleLength( void ) const
 {
 	return( static_cast<Sint32>( m_sampleBuffer->frames() /
-						eng()->framesPerTact64th() ) );
+						engine::framesPerTact64th() ) );
 }
 
 
@@ -351,7 +351,7 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 {
 	m_fileLbl->setText( _f );
 	m_sampleTCO->setSampleFile( _f );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 */
 
@@ -361,22 +361,22 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ), eng() ) )
+	m_audioPort( new audioPort( tr( "Sample track" ) ) )
 {
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new effectLabel( tr( "Sample track" ),
-				      getTrackSettingsWidget(), eng(), this );				
+					      getTrackSettingsWidget(), this );
 #if 0
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
-					getTrackSettingsWidget(), eng() );
+						getTrackSettingsWidget() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
 #endif
 	m_trackLabel->setGeometry( 26, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
 	m_trackLabel->show();
 
 	m_volumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-				    tr( "Channel volume" ), eng(), this );
+					    tr( "Channel volume" ), this );
 	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
@@ -451,7 +451,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 			else
 			{
 				// send it to the mixer
-				eng()->getMixer()->addPlayHandle( handle );
+				engine::getMixer()->addPlayHandle( handle );
 			}
 			played_a_note = TRUE;
 		}

@@ -1,7 +1,7 @@
 /*
  * bassbooster_control_dialog.cpp - control-dialog for bassbooster-effect
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,8 +45,7 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 
-	m_freqKnob = new knob( knobBright_26, this, tr( "Frequency" ),
-						eng(), NULL );
+	m_freqKnob = new knob( knobBright_26, this, tr( "Frequency" ), NULL );
 	m_freqKnob->setRange( 50.0f, 200.0f, 1.0f );
 	m_freqKnob->setInitValue( 100.0f );
 	m_freqKnob->setLabel( tr( "FREQ" ) );
@@ -54,7 +53,7 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 	connect( m_freqKnob, SIGNAL( valueChanged( float ) ),
 			this, SLOT( changeFrequency( void ) ) );
 
-	m_gainKnob = new knob( knobBright_26, this, tr( "Gain" ), eng(), NULL );
+	m_gainKnob = new knob( knobBright_26, this, tr( "Gain" ), NULL );
 	m_gainKnob->setRange( 0.1f, 5.0f, 0.1f );
 	m_gainKnob->setInitValue( 1.0f );
 	m_gainKnob->setLabel( tr( "GAIN" ) );
@@ -62,8 +61,7 @@ bassBoosterControlDialog::bassBoosterControlDialog( QWidget * _parent,
 	connect( m_gainKnob, SIGNAL( valueChanged( float ) ),
 			this, SLOT( changeGain( void ) ) );
 
-	m_ratioKnob = new knob( knobBright_26, this, tr( "Ratio" ), eng(),
-									NULL );
+	m_ratioKnob = new knob( knobBright_26, this, tr( "Ratio" ), NULL );
 	m_ratioKnob->setRange( 0.1f, 10.0f, 0.1f );
 	m_ratioKnob->setInitValue( 2.0f );
 	m_ratioKnob->setLabel( tr( "RATIO" ) );

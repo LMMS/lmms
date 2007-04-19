@@ -1,7 +1,7 @@
 /*
  * tempo_sync_knob.h - adds bpm to ms conversion for knob class
  *
- * Copyright (c) 2005 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,8 +63,7 @@ public:
 
 
 	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track,
-					float _scale = 1.0f );
+					track * _track, float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

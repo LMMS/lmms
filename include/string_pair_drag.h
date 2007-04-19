@@ -2,7 +2,7 @@
  * string_pair_drag.h - class stringPairDrag which provides general support
  *                      for drag'n'drop of string-pairs
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,29 +39,30 @@
 #endif
 
 
-#include "engine.h"
-
-
 class QPixmap;
 
 
 class stringPairDrag : public
 #ifdef QT4
-				QDrag,
+				QDrag
 #else
-				QStoredDrag,
+				QStoredDrag
 #endif
-			public engineObject
 {
 public:
 	stringPairDrag( const QString & _key, const QString & _value,
-			const QPixmap & _icon, QWidget * _w, engine * _engine );
+					const QPixmap & _icon, QWidget * _w );
 	~stringPairDrag();
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );
+
+	static const char * mimeType( void )
+	{
+		return( "application/x-lmms-stringpair" );
+	}
 
 } ;
 

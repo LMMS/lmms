@@ -1,7 +1,7 @@
 /*
  * automatable_slider.h - class automatableSlider, a QSlider with automation
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@ class automatableSlider : public QSlider
 	Q_OBJECT
 public:
 	automatableSlider( QWidget * _parent, const QString & _name,
-				engine * _engine, class track * _track );
+							class track * _track );
 	virtual ~automatableSlider();
 
 	virtual void setRange( int _min, int _max );

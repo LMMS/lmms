@@ -70,13 +70,13 @@ plugin::descriptor ladspaeffect_plugin_descriptor =
 }
 
 
-ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
-	effect( &ladspaeffect_plugin_descriptor, _cdata ),
+ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
+	effect( &ladspaeffect_plugin_descriptor, _key ),
 	m_effName( "none" ),
-	m_key( subPluginKeyToLadspaKey( _cdata->key )
+	m_key( subPluginKeyToLadspaKey( _key )
 		/* ladspa_key_t( _cdata->settings.attribute( "label" ),
 				_cdata->settings.attribute( "lib" ) )*/ ),
-	m_ladspa( eng()->getLADSPAManager() )
+	m_ladspa( engine::getLADSPAManager() )
 {
 	if( m_ladspa->getDescription( m_key ) == NULL )
 	{
@@ -90,7 +90,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 	setPublicName( m_ladspa->getShortName( m_key ) );
 	
 	// Calculate how many processing units are needed.
-	const ch_cnt_t lmms_chnls = eng()->getMixer()->audioDev()->channels();
+	const ch_cnt_t lmms_chnls = engine::getMixer()->audioDev()->channels();
 	m_effectChannels = m_ladspa->getDescription( m_key )->inputChannels;
 	setProcessorCount( lmms_chnls / m_effectChannels );
 	
@@ -117,7 +117,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 		// during cleanup.  It was easier to troubleshoot with the
 		// memory management all taking place in one file.
 				p->buffer = 
-		new LADSPA_Data[eng()->getMixer()->framesPerAudioBuffer()];
+		new LADSPA_Data[engine::getMixer()->framesPerAudioBuffer()];
 				
 				if( p->name.toUpper().contains( "IN" ) && 
 					m_ladspa->isPortInput( m_key, port ) )
@@ -198,7 +198,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 			if( m_ladspa->areHintsSampleRateDependent( 
 								m_key, port ) )
 			{
-				p->max *= eng()->getMixer()->sampleRate();
+				p->max *= engine::getMixer()->sampleRate();
 			}
 			
 			p->min = m_ladspa->getLowerBound( m_key, port );
@@ -210,7 +210,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 			if( m_ladspa->areHintsSampleRateDependent( 
 								m_key, port ) )
 			{
-				p->min *= eng()->getMixer()->sampleRate();
+				p->min *= engine::getMixer()->sampleRate();
 			}
 				
 			p->def = m_ladspa->getDefaultSetting( m_key, port );
@@ -267,7 +267,7 @@ ladspaEffect::ladspaEffect( effect::constructionData * _cdata ) :
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
 		LADSPA_Handle effect = m_ladspa->instantiate( m_key,
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 		if( effect == NULL )
 		{
 			QMessageBox::warning( 0, "Effect", 
@@ -492,7 +492,8 @@ extern "C"
 plugin * lmms_plugin_main( void * _data )
 {
 	return( new ladspaEffect(
-			static_cast<effect::constructionData *>( _data ) ) );
+		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+								_data ) ) );
 }
 
 }

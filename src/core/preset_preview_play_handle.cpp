@@ -4,7 +4,7 @@
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,8 +55,7 @@
 class previewTrackContainer : public trackContainer
 {
 public:
-	previewTrackContainer( engine * _engine ) :
-		trackContainer( _engine ),
+	previewTrackContainer( void ) :
 		m_previewInstrumentTrack( NULL ),
 		m_previewNote( NULL ),
 		m_dataMutex()
@@ -119,58 +118,55 @@ private:
 } ;
 
 
-QMap<const engine *, previewTrackContainer *>
-					presetPreviewPlayHandle::s_previewTCs;
+previewTrackContainer * presetPreviewPlayHandle::s_previewTC;
 
 
 
 presetPreviewPlayHandle::presetPreviewPlayHandle(
-						const QString & _preset_file,
-						engine * _engine ) :
+						const QString & _preset_file ) :
 	playHandle( PresetPreviewHandle ),
-	engineObject( _engine ),
 	m_previewNote( NULL )
 {
-	if( s_previewTCs.contains( _engine ) == FALSE )
+	if( !s_previewTC )
 	{
-		s_previewTCs[_engine] = new previewTrackContainer( eng() );
+		s_previewTC = new previewTrackContainer;
 	}
 
-	previewTC()->lockData();
+	s_previewTC->lockData();
 
-	if( previewTC()->previewNote() != NULL )
+	if( s_previewTC->previewNote() != NULL )
 	{
-		previewTC()->previewNote()->mute();
+		s_previewTC->previewNote()->mute();
 	}
 
 
-	const bool j = eng()->getProjectJournal()->isJournalling();
-	eng()->getProjectJournal()->setJournalling( FALSE );
+	const bool j = engine::getProjectJournal()->isJournalling();
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	multimediaProject mmp( _preset_file );
-	previewTC()->previewInstrumentTrack()->loadTrackSpecificSettings(
+	s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(
 				mmp.content().firstChild().toElement() );
 	// preset also contains information about window-states etc. that's why
 	// here we have to make sure that the instrument-track-window is hidden
-	previewTC()->previewInstrumentTrack()->hide();
+	s_previewTC->previewInstrumentTrack()->hide();
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
-	previewTC()->previewInstrumentTrack()->m_midiPort->setMode(
+	s_previewTC->previewInstrumentTrack()->m_midiPort->setMode(
 							midiPort::DUMMY );
 
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle(
-			previewTC()->previewInstrumentTrack(), 0,
+			s_previewTC->previewInstrumentTrack(), 0,
 			valueRanges<f_cnt_t>::max,
-		note( NULL, 0, 0, static_cast<tones>( A ),
+		note( 0, 0, static_cast<tones>( A ),
 			static_cast<octaves>( DEFAULT_OCTAVE - 1 ), 100 ) );
 
 
-	previewTC()->setPreviewNote( m_previewNote );
+	s_previewTC->setPreviewNote( m_previewNote );
 
-	previewTC()->unlockData();
-	eng()->getProjectJournal()->setJournalling( j );
+	s_previewTC->unlockData();
+	engine::getProjectJournal()->setJournalling( j );
 }
 
 
@@ -178,15 +174,15 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 presetPreviewPlayHandle::~presetPreviewPlayHandle()
 {
-	previewTC()->lockData();
+	s_previewTC->lockData();
 	// not muted by other preset-preview-handle?
 	if( m_previewNote->muted() == FALSE )
 	{
 		// then set according state
-		previewTC()->setPreviewNote( NULL );
+		s_previewTC->setPreviewNote( NULL );
 	}
 	delete m_previewNote;
-	previewTC()->unlockData();
+	s_previewTC->unlockData();
 }
 
 
@@ -208,13 +204,10 @@ bool presetPreviewPlayHandle::done( void ) const
 
 
 
-void presetPreviewPlayHandle::cleanUp( engine * _engine )
+void presetPreviewPlayHandle::cleanUp( void )
 {
-	if( s_previewTCs.contains( _engine ) == TRUE )
-	{
-		delete s_previewTCs[_engine];
-		s_previewTCs.remove( _engine );
-	}
+	delete s_previewTC;
+	s_previewTC = NULL;
 }
 
 
@@ -224,17 +217,13 @@ constNotePlayHandleVector presetPreviewPlayHandle::nphsOfInstrumentTrack(
 						const instrumentTrack * _it )
 {
 	constNotePlayHandleVector cnphv;
-	if( s_previewTCs.contains( _it->eng() ) == TRUE )
+	s_previewTC->lockData();
+	if( s_previewTC->previewNote() != NULL &&
+		s_previewTC->previewNote()->getInstrumentTrack() == _it )
 	{
-		previewTrackContainer * tc = s_previewTCs[_it->eng()];
-		tc->lockData();
-		if( tc->previewNote() != NULL &&
-			tc->previewNote()->getInstrumentTrack() == _it )
-		{
-			cnphv.push_back( tc->previewNote() );
-		}
-		tc->unlockData();
+		cnphv.push_back( s_previewTC->previewNote() );
 	}
+	s_previewTC->unlockData();
 	return( cnphv );
 }
 

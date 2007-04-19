@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-lmms-project">
+    <sub-class-of type="application/xml"/>
+    <comment>LMMS project</comment>
+    <comment xml:lang="ca">Projecte LMMS</comment>
+    <glob pattern="*.mmp"/>
+    <glob pattern="*.mmpz"/>
+    <magic priority="80">
+      <match type="string" value="&lt;!DOCTYPE multimedia-project" offset="0:256"/>
+      <match type="string" value="&lt;multimedia-project" offset="0:64"/>
+    </magic>
+  </mime-type>
+</mime-info>

@@ -3,7 +3,7 @@
 /*
  * automatable_slider.cpp - implementation of class automatableSlider
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@
 
 
 automatableSlider::automatableSlider( QWidget * _parent, const QString & _name,
-				engine * _engine, class track * _track ) :
+							class track * _track ) :
 	QSlider( _parent
 #ifndef QT4
 			, _name.ascii()
@@ -56,7 +56,7 @@ automatableSlider::automatableSlider( QWidget * _parent, const QString & _name,
 		),
 	m_show_status( FALSE )
 {
-	m_knob = new knob( knobDark_28, NULL, _name, _engine, _track );
+	m_knob = new knob( knobDark_28, NULL, _name, _track );
 
 #ifdef QT4
 	setAccessibleName( _name );

@@ -47,9 +47,8 @@
 #include "embed.h"
 
 
-effectSelectDialog::effectSelectDialog( QWidget * _parent, engine * _engine ) :
-	QDialog( _parent ),
-	engineObject( _engine )
+effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
+	QDialog( _parent )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Effects Selector" ) );
@@ -59,7 +58,7 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent, engine * _engine ) :
 	vlayout->setSpacing( 10 );
 	vlayout->setMargin( 10 );
 
-	effectList * elist = new effectList( this, eng() );
+	effectList * elist = new effectList( this );
 	elist->setMinimumSize( 500, 400 );
 	connect( elist, SIGNAL( doubleClicked( const effectKey & ) ),
 				this, SLOT( selectPlugin() ) );
@@ -123,13 +122,8 @@ effect * effectSelectDialog::instantiateSelectedPlugin( void )
 {
 	if( !m_currentSelection.name.isEmpty() && m_currentSelection.desc )
 	{
-		effect::constructionData cd =
-		{
-			eng(),
-			m_currentSelection
-		} ;
 		return( effect::instantiate( m_currentSelection.desc->name,
-									cd ) );
+							&m_currentSelection ) );
 	}
 	return( NULL );
 }
@@ -139,7 +133,7 @@ effect * effectSelectDialog::instantiateSelectedPlugin( void )
 
 void effectSelectDialog::showPorts( void )
 {
-/*	ladspaPortDialog ports( m_currentSelection, eng() );
+/*	ladspaPortDialog ports( m_currentSelection );
 	ports.exec();*/
 }
 
@@ -165,9 +159,8 @@ void effectSelectDialog::selectPlugin( void )
 
 
 
-effectList::effectList( QWidget * _parent, engine * _engine ) :
-	QWidget( _parent ),
-	engineObject( _engine )
+effectList::effectList( QWidget * _parent ) :
+	QWidget( _parent )
 {
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
@@ -181,7 +174,7 @@ effectList::effectList( QWidget * _parent, engine * _engine ) :
 		}
 		if( it->sub_plugin_features )
 		{
-			it->sub_plugin_features->listSubPluginKeys( eng(),
+			it->sub_plugin_features->listSubPluginKeys(
 				// as iterators are always stated to be not
 				// equal with pointers, we dereference the
 				// iterator and take the address of the item,
@@ -267,7 +260,7 @@ void effectList::onHighlighted( int _pluginIndex )
 	{
 		m_currentSelection.desc->sub_plugin_features->
 			fillDescriptionWidget( m_descriptionWidget,
-						eng(), m_currentSelection );
+							&m_currentSelection );
 		m_descriptionWidget->show();
 	}
 	emit( highlighted( m_currentSelection ) );

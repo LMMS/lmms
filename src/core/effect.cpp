@@ -3,8 +3,8 @@
 /*
  * effect.cpp - base-class for effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,12 +37,14 @@
 
 
 #include "effect.h"
+#include "engine.h"
 #include "dummy_effect.h"
 
 
-effect::effect( const plugin::descriptor * _desc, constructionData * _cdata ) :
-	plugin( _desc, _cdata->eng ),
-	m_key( _cdata->key ),
+effect::effect( const plugin::descriptor * _desc,
+			const descriptor::subPluginFeatures::key * _key ) :
+	plugin( _desc ),
+	m_key( *_key ),
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
 	m_running( FALSE ),
@@ -77,15 +79,15 @@ void FASTCALL effect::setGate( float _level )
 {
 	m_processLock.lock();
 	m_gate = _level * _level * m_processors * 
-				eng()->getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerAudioBuffer();
 	m_processLock.unlock();
 }
 
 
 effect * effect::instantiate( const QString & _plugin_name,
-						constructionData & _cdata )
+				descriptor::subPluginFeatures::key * _key )
 {
-	plugin * p = plugin::instantiate( _plugin_name, &_cdata );
+	plugin * p = plugin::instantiate( _plugin_name, _key );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<effect *>( p ) != NULL )
 	{

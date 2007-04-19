@@ -3,7 +3,7 @@
 /*
  * combobox.cpp - implementation of LMMS-combobox
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,14 +58,13 @@ QPixmap * comboBox::s_arrow = NULL;
 const int CB_ARROW_BTN_WIDTH = 20;
 
 
-comboBox::comboBox( QWidget * _parent, const QString & _name, engine * _engine,
-							track * _track ) :
+comboBox::comboBox( QWidget * _parent, const QString & _name, track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	automatableObject<int>( _engine, _track ),
+	automatableObject<int>( _track ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {

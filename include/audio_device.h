@@ -97,15 +97,13 @@ public:
 		return( m_channels );
 	}
 
-	void processNextBuffer( void );
+	bool processNextBuffer( void );
 
 	virtual void startProcessing( void )
 	{
 	}
 
-	virtual void stopProcessing( void )
-	{
-	}
+	virtual void stopProcessing( void );
 
 
 	class setupWidget : public tabWidget

@@ -2,7 +2,7 @@
  * ladspa_2_lmms.h - class that identifies and instantiates LADSPA effects
  *                   for use with LMMS
  *
- * Copyright (c) 2005 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -28,7 +28,6 @@
 
 
 #include "ladspa_manager.h"
-#include "engine.h"
 
 
 class ladspa2LMMS: public ladspaManager
@@ -64,10 +63,9 @@ public:
 	QString getShortName( const ladspa_key_t & _key );
 
 private:
-	ladspa2LMMS( engine * _engine );
+	ladspa2LMMS( void );
 	~ladspa2LMMS();
 	
-//	engine * m_engine;
 //	ladspaManager * m_ladspa;
 
 	l_sortable_plugin_t m_instruments;

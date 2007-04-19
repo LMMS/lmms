@@ -67,15 +67,14 @@
 
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-					QWidget * _parent, engine * _engine  ) :
+							QWidget * _parent ) :
 	sideBarWidget( _title, _pm, _parent ),
-	engineObject( _engine ),
 	m_contextMenuItem( NULL ),
 	m_directories( _directories ),
 	m_filter( _filter )
 {
 	setWindowTitle( tr( "Browser" ) );
-	m_l = new listView( contentParent(), eng() );
+	m_l = new listView( contentParent() );
 	addContentWidget( m_l );
 
 #ifdef QT4
@@ -179,7 +178,7 @@ void fileBrowser::addItems( const QString & _path )
 		{
 			// remove existing file-items
 			delete m_l->findItem( cur_file, 0 );
-			(void) new fileItem( m_l, cur_file, _path, eng() );
+			(void) new fileItem( m_l, cur_file, _path );
 		}
 	}
 
@@ -195,7 +194,7 @@ void fileBrowser::addItems( const QString & _path )
 			if( item == NULL )
 			{
 				(void) new directory( m_l, cur_file, _path,
-						      	m_filter, eng() );
+							      	m_filter );
 			}
 			else if( dynamic_cast<directory *>( item ) != NULL )
 			{
@@ -298,11 +297,11 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 void fileBrowser::sendToActiveInstrumentTrack( void )
 {
-	if( eng()->getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		// get all windows opened in the workspace
 		QWidgetList pl =
-			eng()->getMainWindow()->workspace()->windowList(
+			engine::getMainWindow()->workspace()->windowList(
 #if QT_VERSION >= 0x030200
 						QWorkspace::StackingOrder
 #endif
@@ -333,7 +332,7 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 							fileItem::SAMPLE_FILE )
 				{
 					instrument * afp = ct->loadInstrument(
-						eng()->sampleExtensions()
+						engine::sampleExtensions()
 							[m_contextMenuItem
 							->extension()] );
 					if( afp != NULL )
@@ -374,8 +373,9 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
 #endif
-		instrument * afp = ct->loadInstrument( eng()->sampleExtensions()
-							[m_contextMenuItem
+		instrument * afp = ct->loadInstrument(
+					engine::sampleExtensions()
+						[m_contextMenuItem
 							->extension()] );
 		if( afp != NULL )
 		{
@@ -404,7 +404,7 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 
 void fileBrowser::openInNewInstrumentTrackSE( void )
 {
-	openInNewInstrumentTrack( eng()->getSongEditor() );
+	openInNewInstrumentTrack( engine::getSongEditor() );
 }
 
 
@@ -412,7 +412,7 @@ void fileBrowser::openInNewInstrumentTrackSE( void )
 
 void fileBrowser::openInNewInstrumentTrackBBE( void )
 {
-	openInNewInstrumentTrack( eng()->getBBEditor() );
+	openInNewInstrumentTrack( engine::getBBEditor() );
 }
 
 
@@ -422,9 +422,8 @@ void fileBrowser::openInNewInstrumentTrackBBE( void )
 
 
 
-listView::listView( QWidget * _parent, engine * _engine ) :
+listView::listView( QWidget * _parent ) :
 	Q3ListView( _parent ),
-	engineObject( _engine ),
 	m_mousePressed( FALSE ),
 	m_pressPos(),
 	m_previewPlayHandle( NULL )
@@ -460,12 +459,12 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			// they're likely drum-samples etc.
 			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::INSTRUMENT_TRACK,
-						eng()->getBBEditor() ) );
+						engine::getBBEditor() ) );
 #ifdef LMMS_DEBUG
 			assert( it != NULL );
 #endif
 			instrument * afp = it->loadInstrument(
-				eng()->sampleExtensions()[f->extension()] );
+				engine::sampleExtensions()[f->extension()] );
 			if( afp != NULL )
 			{
 				afp->setParameter( "samplefile",
@@ -478,7 +477,7 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 			// presets are per default opened in bb-editor
 			multimediaProject mmp( f->fullName() );
 			track * t = track::create( track::INSTRUMENT_TRACK,
-						eng()->getBBEditor() );
+						engine::getBBEditor() );
 			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 									t );
 			if( it != NULL )
@@ -491,9 +490,9 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 		}
 		else if( f->type() == fileItem::PROJECT_FILE )
 		{
-			if( eng()->getSongEditor()->mayChangeProject() == TRUE )
+			if( engine::getSongEditor()->mayChangeProject() )
 			{
-				eng()->getSongEditor()->loadProject(
+				engine::getSongEditor()->loadProject(
 								f->fullName() );
 			}
 		}
@@ -531,7 +530,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	{
 		if( m_previewPlayHandle != NULL )
 		{
-			eng()->getMixer()->removePlayHandle(
+			engine::getMixer()->removePlayHandle(
 							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
@@ -549,7 +548,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 			qApp->processEvents();
 #endif
 			samplePlayHandle * s = new samplePlayHandle(
-							f->fullName(), eng() );
+								f->fullName() );
 			s->setDoneMayReturnTrue( FALSE );
 			m_previewPlayHandle = s;
 			delete tf;
@@ -557,11 +556,12 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 		else if( f->type() == fileItem::PRESET_FILE )
 		{
 			m_previewPlayHandle = new presetPreviewPlayHandle(
-							f->fullName(), eng() );
+								f->fullName() );
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			eng()->getMixer()->addPlayHandle( m_previewPlayHandle );
+			engine::getMixer()->addPlayHandle(
+							m_previewPlayHandle );
 		}
 	}
 }
@@ -587,7 +587,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"preset_file" ),
-								this, eng() );
+									this );
 					break;
 
 				case fileItem::SAMPLE_FILE:
@@ -595,7 +595,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"sound_file" ),
-								this, eng() );
+									this );
 					break;
 
 				case fileItem::MIDI_FILE:
@@ -603,7 +603,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"midi_file" ),
-								this, eng() );
+									this );
 					break;
 
 				default:
@@ -629,14 +629,14 @@ void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
 		{
 			if( s->totalFrames() - s->framesDone() <=
 				static_cast<f_cnt_t>(
-					eng()->getMixer()->sampleRate() * 3 ) )
+					engine::getMixer()->sampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( TRUE );
 				m_previewPlayHandle = NULL;
 				return;
 			}
 		}
-		eng()->getMixer()->removePlayHandle( m_previewPlayHandle );
+		engine::getMixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
 }
@@ -653,10 +653,8 @@ QPixmap * directory::s_folderLockedPixmap = NULL;
 
 
 directory::directory( directory * _parent, const QString & _name,
-			const QString & _path, const QString & _filter,
-							engine * _engine ) :
+			const QString & _path, const QString & _filter ) :
 	Q3ListViewItem( _parent, _name ),
-	engineObject( _engine ),
 	m_p( _parent ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -669,10 +667,8 @@ directory::directory( directory * _parent, const QString & _name,
 
 
 directory::directory( Q3ListView * _parent, const QString & _name,
-			const QString & _path, const QString & _filter,
-							engine * _engine ) :
+			const QString & _path, const QString & _filter ) :
 	Q3ListViewItem( _parent, _name ),
-	engineObject( _engine ),
 	m_p( NULL ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -797,7 +793,7 @@ bool directory::addItems( const QString & _path )
 #endif
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
 		{
-			(void) new fileItem( this, cur_file, _path, eng() );
+			(void) new fileItem( this, cur_file, _path );
 			added_something = TRUE;
 		}
 	}
@@ -814,7 +810,7 @@ bool directory::addItems( const QString & _path )
 #endif
 							cur_file, m_filter ) )
 		{
-			new directory( this, cur_file, _path, m_filter, eng() );
+			new directory( this, cur_file, _path, m_filter );
 			added_something = TRUE;
 #if 0
 			if( firstChild() == NULL )
@@ -860,10 +856,8 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 
 fileItem::fileItem( Q3ListView * _parent, const QString & _name,
-							const QString & _path,
-							engine * _engine ) :
+						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
-	engineObject( _engine ),
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -876,10 +870,8 @@ fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 
 
 fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
-							const QString & _path,
-							engine * _engine ) :
+						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
-	engineObject( _engine ),
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -974,7 +966,7 @@ void fileItem::determineFileType( void )
 	{
 		m_type = PRESET_FILE;
 	}
-	else if( eng()->sampleExtensions().contains( ext ) )
+	else if( engine::sampleExtensions().contains( ext ) )
 	{
 		m_type = SAMPLE_FILE;
 	}

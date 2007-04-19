@@ -31,7 +31,6 @@
 #include "play_handle.h"
 #include "sample_buffer.h"
 #include "types.h"
-#include "engine.h"
 
 class bbTrack;
 class pattern;
@@ -40,11 +39,11 @@ class track;
 class audioPort;
 
 
-class samplePlayHandle : public QObject, public playHandle, public engineObject
+class samplePlayHandle : public QObject, public playHandle
 {
 	Q_OBJECT
 public:
-	samplePlayHandle( const QString & _sample_file, engine * _engine );
+	samplePlayHandle( const QString & _sample_file );
 	samplePlayHandle( sampleBuffer * _sample_buffer );
 	samplePlayHandle( sampleTCO * _tco );
 	samplePlayHandle( pattern * _pattern );

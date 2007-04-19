@@ -71,7 +71,7 @@ class midiALSASeq :
 {
 	Q_OBJECT
 public:
-	midiALSASeq( engine * _engine );
+	midiALSASeq( void );
 	virtual ~midiALSASeq();
 
 	static QString probeDevice( void );

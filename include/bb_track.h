@@ -2,7 +2,7 @@
  * bb_track.h - class bbTrack, a wrapper for using bbEditor
  *              (which is a singleton-class) as track
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -113,7 +113,7 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
-	static bbTrack * FASTCALL findBBTrack( csize _bb_num, engine * _engine );
+	static bbTrack * FASTCALL findBBTrack( csize _bb_num );
 	static csize FASTCALL numOfBBTrack( track * _track );
 	static void FASTCALL swapBBTracks( track * _track1, track * _track2 );
 

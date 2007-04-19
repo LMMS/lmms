@@ -1,7 +1,7 @@
 /*
  * project_journal.h - declaration of class projectJournal
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,6 @@
 #define _PROJECT_JOURNAL_H
 
 #include "types.h"
-#include "engine.h"
 #include "qt3support.h"
 
 #ifndef QT3
@@ -48,10 +47,10 @@
 class journallingObject;
 
 
-class projectJournal : public engineObject
+class projectJournal
 {
 public:
-	projectJournal( engine * _engine );
+	projectJournal( void );
 	virtual ~projectJournal();
 
 	void undo( void );

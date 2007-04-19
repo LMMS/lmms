@@ -3,7 +3,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,6 +49,7 @@
 
 #include "timeline.h"
 #include "embed.h"
+#include "engine.h"
 #include "templates.h"
 #include "nstate_button.h"
 #include "main_window.h"
@@ -64,9 +65,8 @@ QPixmap * timeLine::s_loopPointDisabledPixmap = NULL;
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			songEditor::playPos & _pos, const midiTime & _begin,
-					QWidget * _parent, engine * _engine ) :
+							QWidget * _parent ) :
 	QWidget( _parent ),
-	journallingObject( _engine ),
 	m_autoScroll( AUTOSCROLL_ENABLED ),
 	m_loopPoints( LOOP_POINTS_DISABLED ),
 	m_behaviourAtStop( BACK_TO_ZERO ),
@@ -361,7 +361,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 		case MOVE_LOOP_END:
 		{
 			const Uint8 i = m_action - MOVE_LOOP_BEGIN;
-			if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
+			if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;

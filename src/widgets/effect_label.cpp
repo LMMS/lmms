@@ -4,7 +4,7 @@
  * effect_label.cpp - a label which is renamable by double-clicking it and
  *                    offers access to an effect rack
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,12 +38,9 @@
 #endif
 
 
-effectLabel::effectLabel( const QString & _initial_name, 
-				QWidget * _parent, 
-				engine * _engine, 
-				sampleTrack * _track ) :
+effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
+							sampleTrack * _track ) :
 	QWidget( _parent ),
-	journallingObject( _engine ),
 	m_track( _track ),
 	m_show( TRUE )
 {
@@ -59,7 +56,7 @@ effectLabel::effectLabel( const QString & _initial_name,
 	m_label->setFont( pointSize<8>( f ) );
 	m_label->setGeometry( 38, 1, 200, 28 );
 	
-	m_effWidget = new effectTabWidget( eng()->getMainWindow()->workspace(),
+	m_effWidget = new effectTabWidget( engine::getMainWindow()->workspace(),
 						m_track, 
 						m_track->getAudioPort() );
 	m_effWidget->setFixedSize( 240, 242 );

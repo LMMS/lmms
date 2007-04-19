@@ -3,7 +3,7 @@
 /*
  * effect_chain.cpp - class for processing and effects chain
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,8 +27,7 @@
 
 #include "effect_chain.h"
 
-effectChain::effectChain( engine * _engine ):
-	engineObject( _engine ),
+effectChain::effectChain( void ) :
 	m_bypassed( TRUE )
 {
 }

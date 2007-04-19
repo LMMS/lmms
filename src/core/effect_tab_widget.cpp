@@ -4,7 +4,7 @@
  * effect_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                         effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -59,7 +59,6 @@
 effectTabWidget::effectTabWidget( instrumentTrack * _track,
 					audioPort * _port ) :
 	QWidget( _track->tabWidgetParent() ),
-	journallingObject( _track->eng() ),
 	m_track( dynamic_cast<track *>( _track ) ),
 	m_port( _port )
 {
@@ -73,7 +72,6 @@ effectTabWidget::effectTabWidget( QWidget * _parent,
 					sampleTrack * _track, 
 					audioPort * _port ) :
 	QWidget( _parent ),
-	journallingObject( _track->eng() ),
 	m_track( dynamic_cast<track *>( _track ) ),
 	m_port( _port )
 {
@@ -92,13 +90,13 @@ effectTabWidget::~effectTabWidget()
 
 void effectTabWidget::setupWidget( void )
 {
-	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), 
-							this, eng(), m_track );
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this,
+								m_track );
 	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), 
 					this, SLOT( setBypass( bool ) ) );
 	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
 	
-	m_rack = new rackView( m_effectsGroupBox, eng(), m_track, m_port );
+	m_rack = new rackView( m_effectsGroupBox, m_track, m_port );
 	m_rack->move( 6, 22 );
 		
 	m_addButton = new QPushButton( m_effectsGroupBox/*, "Add Effect"*/ );
@@ -145,7 +143,7 @@ void effectTabWidget::loadSettings( const QDomElement & _this )
 
 void effectTabWidget::addEffect( void )
 {
-	effectSelectDialog esd( this, eng() );
+	effectSelectDialog esd( this );
 	esd.exec();
 
 	if( esd.result() == QDialog::Rejected )

@@ -2,7 +2,7 @@
  * automation_pattern.h - declaration of class automationPattern, which contains
  *                        all information about an automation pattern
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,7 +52,6 @@ public:
 #endif
 
 	automationPattern( track * _track, levelObject * _object );
-	automationPattern( engine * _engine, levelObject * _object );
 	automationPattern( const automationPattern & _pat_to_copy );
 	automationPattern( const automationPattern & _pat_to_copy,
 							levelObject * _object );

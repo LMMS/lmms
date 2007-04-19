@@ -57,7 +57,8 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
 				getMixer()->framesPerAudioBuffer() ) ),
 	m_convertedBuf_pos( 0 ),
-	m_convertEndian( FALSE )
+	m_convertEndian( FALSE ),
+	m_stop_semaphore( 1 )
 {
 	_success_ful = FALSE;
 
@@ -106,6 +107,8 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	}
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
+	m_stop_semaphore += m_stop_semaphore.total();
+
 	_success_ful = TRUE;
 }
 
@@ -115,6 +118,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 audioSDL::~audioSDL()
 {
 	stopProcessing();
+	m_stop_semaphore -= m_stop_semaphore.total();
 	SDL_CloseAudio();
 	SDL_Quit();
 	bufferAllocator::free( m_convertedBuf );
@@ -126,6 +130,8 @@ audioSDL::~audioSDL()
 
 void audioSDL::startProcessing( void )
 {
+	m_stopped = FALSE;
+
 	SDL_PauseAudio( 0 );
 	SDL_UnlockAudio();
 }
@@ -137,6 +143,8 @@ void audioSDL::stopProcessing( void )
 {
 	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
 	{
+		m_stop_semaphore++;
+
 		SDL_LockAudio();
 		SDL_PauseAudio( 1 );
 	}
@@ -161,12 +169,25 @@ void audioSDL::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 {
+	if( m_stopped )
+	{
+		memset( _buf, 0, _len );
+		return;
+	}
+
 	while( _len )
 	{
 		if( m_convertedBuf_pos == 0 )
 		{
 			// frames depend on the sample rate
 			const fpab_t frames = getNextBuffer( m_outBuf );
+			if( !frames )
+			{
+				m_stopped = TRUE;
+				m_stop_semaphore--;
+				memset( _buf, 0, _len );
+				return;
+			}
 			m_convertedBuf_size = frames * channels()
 						* sizeof( int_sample_t );
 

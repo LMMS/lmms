@@ -63,15 +63,15 @@
 #include "rubberband.h"
 #include "project_journal.h"
 #include "debug.h"
+#include "file_browser.h"
 
 
-trackContainer::trackContainer( engine * _engine ) :
-	QMainWindow( _engine->getMainWindow()->workspace()
+trackContainer::trackContainer( void ) :
+	QMainWindow( engine::getMainWindow()->workspace()
 #ifdef QT3
 				, 0, Qt::WStyle_Title
 #endif
 			 ),
-	journallingObject( _engine ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
@@ -79,9 +79,9 @@ trackContainer::trackContainer( engine * _engine ) :
 	m_origin()
 {
 #ifdef QT4
-	if( eng()->getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() != NULL )
 	{
-		eng()->getMainWindow()->workspace()->addWindow( this );
+		engine::getMainWindow()->workspace()->addWindow( this );
 	}
 #endif
 
@@ -96,14 +96,14 @@ trackContainer::trackContainer( engine * _engine ) :
 
 trackContainer::~trackContainer()
 {
-	eng()->getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	while( m_trackWidgets.size() )
 	{
 		removeTrack( m_trackWidgets.front()->getTrack() );
 	}
 
-	eng()->getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -197,9 +197,9 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 void trackContainer::cloneTrack( track * _track )
 {
-	eng()->getMixer()->pause();
+	engine::getMixer()->pause();
 	track::clone( _track );
-	eng()->getMixer()->play();
+	engine::getMixer()->play();
 }
 
 
@@ -237,7 +237,7 @@ void trackContainer::removeTrack( track * _track )
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
 
-		eng()->getMixer()->pause();
+		engine::getMixer()->pause();
 #ifndef QT4
 		m_scrollArea->removeChild( _track->getTrackWidget() );
 #endif
@@ -245,12 +245,12 @@ void trackContainer::removeTrack( track * _track )
 
 		delete _track;
 
-		eng()->getMixer()->play();
+		engine::getMixer()->play();
 
 		realignTracks();
-		if( eng()->getSongEditor() )
+		if( engine::getSongEditor() )
 		{
-			eng()->getSongEditor()->setModified();
+			engine::getSongEditor()->setModified();
 		}
 	}
 }
@@ -446,8 +446,9 @@ void trackContainer::undoStep( journalEntry & _je )
 		{
 			QMap<QString, QVariant> map = _je.data().toMap();
 			track * tr =
-dynamic_cast<track *>(
-	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() ) );
+				dynamic_cast<track *>(
+			engine::getProjectJournal()->getJournallingObject(
+							map["id"].toInt() ) );
 			assert( tr != NULL );
 			multimediaProject mmp(
 					multimediaProject::JOURNAL_DATA );
@@ -521,7 +522,10 @@ void trackContainer::dropEvent( QDropEvent * _de )
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::INSTRUMENT_TRACK,
 								this ) );
-		instrument * i = it->loadInstrument( "audiofileprocessor" );
+		QString iname = type == "sampledata" ? "audiofileprocessor" :
+			engine::sampleExtensions()[fileItem::extension(
+								value )];
+		instrument * i = it->loadInstrument( iname );
 		i->setParameter( type, value );
 		it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();

@@ -1,7 +1,7 @@
 /*
  * led_checkbox.h - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,8 +42,8 @@ public:
 	} ;
 
 	ledCheckBox( const QString & _txt, QWidget * _parent,
-				const QString & _name, engine * _engine,
-				track * _track, ledColors _color = YELLOW );
+					const QString & _name, track * _track,
+					ledColors _color = YELLOW );
 	virtual ~ledCheckBox();
 
 

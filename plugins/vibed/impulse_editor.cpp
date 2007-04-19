@@ -1,7 +1,7 @@
 /*
  * impulse_editor.cpp - graphic waveform editor
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,11 +52,9 @@
 #include "song_editor.h"
 
 
-impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, 
-					engine * _engine, track * _track,
-					Uint32 _len ) :
+impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, track * _track,
+								Uint32 _len ) :
 	QWidget( _parent/*, "impulseEditor"*/ ),
-	engineObject( _engine ),
 	m_sampleLength( _len ),
 	m_normalizeFactor( 1.0f ),
 	m_forward( TRUE )
@@ -72,7 +70,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	setPaletteBackgroundPixmap( m_base );
 #endif
 	
-	m_graph = new graph( this, eng() );
+	m_graph = new graph( this );
 	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );
 	m_graph->move( 0, 0 );	
 	m_graph->setCursor( QCursor( Qt::CrossCursor ) );
@@ -82,8 +80,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	connect( m_graph, SIGNAL ( sampleChanged( void ) ),
 			this, SLOT ( sampleChanged( void ) ) );
 	
-	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ), eng(),
-								_track );
+	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ), _track );
 	m_sinWaveBtn->move( 136, 3 );
 	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"sin_wave_active" ) );
@@ -98,7 +95,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 
 	
 	m_triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ),
-								eng(), _track );
+								_track );
 	m_triangleWaveBtn->move( 136, 20 );
 	m_triangleWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -111,8 +108,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( triangleWaveClicked( void ) ) );
 
 	
-	m_sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ), eng(),
-								_track );
+	m_sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ), _track );
 	m_sawWaveBtn->move( 136, 37 );
 	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"saw_wave_active" ) );
@@ -125,8 +121,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( sawWaveClicked( void ) ) );
 
 	
-	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ), eng(),
-								_track );
+	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ), _track );
 	m_sqrWaveBtn->move( 136, 54 );
 	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"square_wave_active" ) );
@@ -140,7 +135,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 
 	
 	m_whiteNoiseWaveBtn = new pixmapButton( this, tr( "White noise wave" ),
-								eng(), _track );
+								_track );
 	m_whiteNoiseWaveBtn->move( 136, 71 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -153,7 +148,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( noiseWaveClicked( void ) ) );
 
 	
-	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ), eng(),
+	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ),
 								_track );
 	m_usrWaveBtn->move( 136, 88 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -167,7 +162,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( usrWaveClicked( void ) ) );
 
 	
-	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ), eng(), _track );
+	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ), _track );
 	m_smoothBtn->move( 3, 108 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"smooth_active" ) );
@@ -180,8 +175,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 			this, SLOT ( smoothClicked( void ) ) );
 
 	
-	m_normalizeBtn = new pixmapButton( this, tr( "Normalize" ), eng(),
-								_track );
+	m_normalizeBtn = new pixmapButton( this, tr( "Normalize" ), _track );
 	m_normalizeBtn->move( 20, 108 );
 	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"normalize_active" ) );
@@ -194,8 +188,7 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y,
 	connect( m_normalizeBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( normalizeClicked( void ) ) );
 
- 	m_state = new ledCheckBox( "", this, tr( "Enable waveform" ), eng(),
-								_track );
+ 	m_state = new ledCheckBox( "", this, tr( "Enable waveform" ), _track );
  	m_state->move( 136, 109 );
  	m_state->setChecked( TRUE );
 	toolTip::add( m_state,
@@ -325,7 +318,7 @@ void impulseEditor::usrWaveClicked( void )
 	}
 
 	// load user shape
-	sampleBuffer buffer( eng() );
+	sampleBuffer buffer;
 	QString af = buffer.openAudioFile();
 	if( af != "" )
 	{
@@ -379,7 +372,7 @@ void impulseEditor::smoothClicked( void )
 	update();
 	m_graph->update();
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 	
 	m_smoothBtn->setChecked( FALSE );
 	m_smoothBtn->update();
@@ -411,7 +404,7 @@ void impulseEditor::normalizeClicked( void )
 	update();
 	m_graph->update();
 	
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 	
 	m_normalizeBtn->setChecked( FALSE );
 	m_normalizeBtn->update();
@@ -439,7 +432,7 @@ void impulseEditor::sampleChanged()
 		m_graph->update();
 	}
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * midi_import.cpp - support for importing MIDI-files
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -71,7 +71,7 @@ plugin::descriptor midiimport_plugin_descriptor =
 
 
 midiImport::midiImport( const QString & _file ) :
-	importFilter( _file, &midiimport_plugin_descriptor, NULL )
+	importFilter( _file, &midiimport_plugin_descriptor )
 {
 }
 
@@ -269,8 +269,7 @@ invalid_format:
 						NOTES_PER_OCTAVE * OCTAVES &&
 							keys[ev.key()][0] >= 0 )
 					{
-			note n( eng(),
-				midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
+			note n( midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
 				midiTime( keys[ev.key()][0] / 10 ),
 				(tones)( ev.key() % NOTES_PER_OCTAVE ),
 				(octaves)( ev.key() / NOTES_PER_OCTAVE ),

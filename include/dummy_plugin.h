@@ -2,7 +2,7 @@
  * dummy_plugin.h - empty plugin which is used as fallback if a plugin couldn't
  *                  be found
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,8 +33,8 @@
 class dummyPlugin : public plugin
 {
 public:
-	inline dummyPlugin( engine * _engine = NULL ) :
-		plugin( NULL, _engine )
+	inline dummyPlugin( void ) :
+		plugin( NULL )
 	{
 	}
 

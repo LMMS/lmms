@@ -4,7 +4,7 @@
  * volume_knob.cpp - defines a knob that display it's value as either a
  *                   percentage or in dbV.
  *
- * Copyright (c) 2006  Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007  Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,8 +49,8 @@
 
 
 volumeKnob::volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track ) :
-	knob( _knob_num, _parent, _name, _engine, _track )
+							track * _track ) :
+	knob( _knob_num, _parent, _name, _track )
 {
 }
 
@@ -68,7 +68,7 @@ volumeKnob::~volumeKnob()
 void volumeKnob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		   eng()->getMainWindow()->isCtrlPressed() == FALSE )
+			   engine::getMainWindow()->isCtrlPressed() == FALSE )
 	{
 		prepareJournalEntryFromOldVal();
 
@@ -108,10 +108,10 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == TRUE )
+			engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		new stringPairDrag( "float_value", QString::number( value() ),
-				    QPixmap(), this, eng() );
+				    			QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
 	{

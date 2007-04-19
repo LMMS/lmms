@@ -1,7 +1,7 @@
 /*
  * audio_port.h - base-class for objects providing sound at a port
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,10 +43,10 @@
 #include "effect_chain.h"
 
 
-class audioPort : public engineObject
+class audioPort
 {
 public:
-	audioPort( const QString & _name, engine * _engine );
+	audioPort( const QString & _name );
 	~audioPort();
 
 	inline surroundSampleFrame * firstBuffer( void )

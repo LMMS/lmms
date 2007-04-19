@@ -67,6 +67,7 @@
 #include "song_editor.h"
 #include "piano_roll.h"
 #include "embed.h"
+#include "engine.h"
 #include "about_dialog.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
@@ -90,13 +91,12 @@ extern int splash_alignment_flags;
 
 
 
-mainWindow::mainWindow( engine * _engine ) :
+mainWindow::mainWindow( void ) :
 	QMainWindow(
 #ifndef QT4
 			0 , NULL, WDestructiveClose
 #endif
 		),
-	engineObject( _engine ),
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_tools_menu( NULL )
@@ -129,7 +129,7 @@ mainWindow::mainWindow( engine * _engine ) :
 #endif
 
 	QString sample_filter;
-	vlist<QString> ext_keys = eng()->sampleExtensions().keys();
+	vlist<QString> ext_keys = engine::sampleExtensions().keys();
 	for( vlist<QString>::iterator it = ext_keys.begin();
 						it != ext_keys.end(); ++it )
 	{
@@ -138,39 +138,34 @@ mainWindow::mainWindow( engine * _engine ) :
 
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
-	side_bar->appendTab( new pluginBrowser( splitter, eng() ), ++id );
+	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factoryProjectsDir() + "*" +
 				configManager::inst()->userProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
-							splitter, eng() ),
-									++id );
+							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factorySamplesDir() + "*" +
 					configManager::inst()->userSamplesDir(),
 					sample_filter, tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),
-							splitter, eng() ),
-									++id );
+							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
 			configManager::inst()->factoryPresetsDir() + "*" +
 					configManager::inst()->userPresetsDir(),
 						"*.cs.xml", tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
-							splitter, eng() ),
-									++id );
+							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser( QDir::homePath(), "*",
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ),
-							splitter, eng() ),
-									++id );
+							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser( QDir::rootPath(), "*",
 							tr( "Root directory" ),
 					embed::getIconPixmap( "root" ),
-							splitter, eng() ),
-									++id );
+							splitter ), ++id );
 
 	if( no_mdi == FALSE )
 	{
@@ -224,20 +219,20 @@ mainWindow::mainWindow( engine * _engine ) :
 mainWindow::~mainWindow()
 {
 /*	// first make sure, there're no mixing/audio-device-threads any more
-	eng()->getMixer()->stopProcessing();
+	engine::getMixer()->stopProcessing();
 
 	// destroy editors with all their children
-	delete eng()->getSongEditor();
-	delete eng()->getBBEditor();
+	delete engine::getSongEditor();
+	delete engine::getBBEditor();
 
 
 
 	// destroy mixer
-	delete eng()->getMixer();
+	delete engine::getMixer();
 
 	// destroy config-manager (which automatically saves config-file)
 */
-	eng()->close();
+	engine::destroy();
 }
 
 
@@ -305,7 +300,7 @@ void mainWindow::finalize( void )
 	toolButton * project_export = new toolButton( 
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					eng()->getSongEditor(),
+					engine::getSongEditor(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
@@ -471,7 +466,7 @@ void mainWindow::finalize( void )
 #endif
 	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
 					tr( "Import file" ),
-					eng()->getSongEditor(),
+					engine::getSongEditor(),
 					SLOT( importProject() ) );
 #ifdef QT4
 	project_menu->addSeparator();
@@ -480,7 +475,7 @@ void mainWindow::finalize( void )
 #endif
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport" ),
-					eng()->getSongEditor(),
+					engine::getSongEditor(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 #ifdef QT4
@@ -598,14 +593,14 @@ void mainWindow::finalize( void )
 	{
 		configManager::inst()->setValue( "app", "configured", "1" );
 		// no, so show it that user can setup everything
-		setupDialog sd( eng() );
+		setupDialog sd;
 		sd.exec();
 	}
 	// look whether mixer could use a audio-interface beside audioDummy
-	else if( eng()->getMixer()->audioDevName() == audioDummy::name() )
+	else if( engine::getMixer()->audioDevName() == audioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
-		setupDialog sd( eng(), setupDialog::AUDIO_SETTINGS );
+		setupDialog sd( setupDialog::AUDIO_SETTINGS );
 		sd.exec();
 	}
 }
@@ -646,9 +641,9 @@ void mainWindow::addSpacingToToolBar( int _size )
 void mainWindow::resetWindowTitle( const QString & _add )
 {
 	QString title = _add;
-	if( _add == "" && eng()->getSongEditor()->projectFileName() != "" )
+	if( _add == "" && engine::getSongEditor()->projectFileName() != "" )
 	{
-		title = QFileInfo( eng()->getSongEditor()->projectFileName()
+		title = QFileInfo( engine::getSongEditor()->projectFileName()
 #ifdef QT4
 						).completeBaseName();
 #else
@@ -717,9 +712,9 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 void mainWindow::createNewProject( void )
 {
-	if( eng()->getSongEditor()->mayChangeProject() == TRUE )
+	if( engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
-		eng()->getSongEditor()->createNewProject();
+		engine::getSongEditor()->createNewProject();
 	}
 }
 
@@ -732,13 +727,13 @@ void mainWindow::createNewProjectFromTemplate( int _idx )
 	// TODO!!!
 #else
 	if( m_templatesMenu != NULL &&
-			eng()->getSongEditor()->mayChangeProject() == TRUE )
+			engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
 		QString dir_base = m_templatesMenu->indexOf( _idx )
 						>= m_custom_templates_count ?
 				configManager::inst()->factoryProjectsDir() :
 				configManager::inst()->userProjectsDir();
-		eng()->getSongEditor()->createNewProjectFromTemplate(
+		engine::getSongEditor()->createNewProjectFromTemplate(
 				dir_base + "templates/" +
 				m_templatesMenu->text( _idx ) + ".mpt" );
 	}
@@ -750,7 +745,7 @@ void mainWindow::createNewProjectFromTemplate( int _idx )
 
 void mainWindow::openProject( void )
 {
-	if( eng()->getSongEditor()->mayChangeProject() == TRUE )
+	if( engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
 #ifdef QT4
 		QFileDialog ofd( this, tr( "Open project" ), "",
@@ -766,7 +761,7 @@ void mainWindow::openProject( void )
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-			eng()->getSongEditor()->loadProject(
+			engine::getSongEditor()->loadProject(
 						ofd.selectedFiles()[0] );
 		}
 	}
@@ -777,13 +772,13 @@ void mainWindow::openProject( void )
 
 bool mainWindow::saveProject( void )
 {
-	if( eng()->getSongEditor()->projectFileName() == "" )
+	if( engine::getSongEditor()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		eng()->getSongEditor()->saveProject();
+		engine::getSongEditor()->saveProject();
 	}
 	return( TRUE );
 }
@@ -805,7 +800,7 @@ bool mainWindow::saveProjectAs( void )
 	sfd.setWindowTitle( tr( "Save project" ) );
 #endif
 	sfd.setFileMode( QFileDialog::AnyFile );
-	QString f = eng()->getSongEditor()->projectFileName();
+	QString f = engine::getSongEditor()->projectFileName();
 	if( f != "" )
 	{
 		sfd.selectFile( QFileInfo( f ).fileName() );
@@ -829,9 +824,10 @@ bool mainWindow::saveProjectAs( void )
  		)
 	{
 #ifdef QT4
-		eng()->getSongEditor()->saveProjectAs( sfd.selectedFiles()[0] );
+		engine::getSongEditor()->saveProjectAs(
+						sfd.selectedFiles()[0] );
 #else
-		eng()->getSongEditor()->saveProjectAs( sfd.selectedFile() );
+		engine::getSongEditor()->saveProjectAs( sfd.selectedFile() );
 #endif
 		return( TRUE );
 	}
@@ -843,7 +839,7 @@ bool mainWindow::saveProjectAs( void )
 
 void mainWindow::showSettingsDialog( void )
 {
-	setupDialog sd( eng() );
+	setupDialog sd;
 	sd.exec();
 }
 
@@ -877,7 +873,7 @@ void mainWindow::ladspaPluginBrowser( void )
 	// moc for Qt 3.x doesn't recognize preprocessor directives,
 	// so we can't just block the whole thing out.
 #ifdef LADSPA_SUPPORT
-	ladspaBrowser lb( eng() );
+	ladspaBrowser lb;
 	lb.exec();
 #endif
 }
@@ -887,16 +883,16 @@ void mainWindow::ladspaPluginBrowser( void )
 
 void mainWindow::toggleBBEditorWin( void )
 {
-	if( eng()->getBBEditor()->isHidden() == TRUE ||
+	if( engine::getBBEditor()->isHidden() == TRUE ||
 		( m_workspace != NULL &&
-		  	m_workspace->activeWindow() != eng()->getBBEditor() ) )
+		  	m_workspace->activeWindow() != engine::getBBEditor() ) )
 	{
-		eng()->getBBEditor()->show();
-		eng()->getBBEditor()->setFocus();
+		engine::getBBEditor()->show();
+		engine::getBBEditor()->setFocus();
 	}
 	else
 	{
-		eng()->getBBEditor()->hide();
+		engine::getBBEditor()->hide();
 	}
 }
 
@@ -905,16 +901,16 @@ void mainWindow::toggleBBEditorWin( void )
 
 void mainWindow::toggleSongEditorWin( void )
 {
-	if( eng()->getSongEditor()->isHidden() == TRUE ||
-		( m_workspace != NULL &&
-			m_workspace->activeWindow() != eng()->getSongEditor() ) )
+	if( engine::getSongEditor()->isHidden() == TRUE ||
+		( m_workspace != NULL && m_workspace->activeWindow()
+						!= engine::getSongEditor() ) )
 	{
-		eng()->getSongEditor()->show();
-		eng()->getSongEditor()->setFocus();
+		engine::getSongEditor()->show();
+		engine::getSongEditor()->setFocus();
 	}
 	else
 	{
-		eng()->getSongEditor()->hide();
+		engine::getSongEditor()->hide();
 	}
 }
 
@@ -923,16 +919,16 @@ void mainWindow::toggleSongEditorWin( void )
 
 void mainWindow::toggleProjectNotesWin( void )
 {
-	if( eng()->getProjectNotes()->isHidden() == TRUE ||
+	if( engine::getProjectNotes()->isHidden() == TRUE ||
 		( m_workspace != NULL && m_workspace->activeWindow() !=
-						eng()->getProjectNotes() ) )
+						engine::getProjectNotes() ) )
 	{
-		eng()->getProjectNotes()->show();
-		eng()->getProjectNotes()->setFocus();
+		engine::getProjectNotes()->show();
+		engine::getProjectNotes()->setFocus();
 	}
 	else
 	{
-		eng()->getProjectNotes()->hide();
+		engine::getProjectNotes()->hide();
 	}
 }
 
@@ -941,16 +937,16 @@ void mainWindow::toggleProjectNotesWin( void )
 
 void mainWindow::togglePianoRollWin( void )
 {
-	if( eng()->getPianoRoll()->isHidden() == TRUE ||
-		( m_workspace != NULL &&
-			m_workspace->activeWindow() != eng()->getPianoRoll() ) )
+	if( engine::getPianoRoll()->isHidden() == TRUE ||
+		( m_workspace != NULL && m_workspace->activeWindow()
+						!= engine::getPianoRoll() ) )
 	{
-		eng()->getPianoRoll()->show();
-		eng()->getPianoRoll()->setFocus();
+		engine::getPianoRoll()->show();
+		engine::getPianoRoll()->setFocus();
 	}
 	else
 	{
-		eng()->getPianoRoll()->hide();
+		engine::getPianoRoll()->hide();
 	}
 }
 
@@ -959,16 +955,16 @@ void mainWindow::togglePianoRollWin( void )
 
 void mainWindow::toggleAutomationEditorWin( void )
 {
-	if( eng()->getAutomationEditor()->isHidden() == TRUE ||
+	if( engine::getAutomationEditor()->isHidden() == TRUE ||
 		( m_workspace != NULL && m_workspace->activeWindow()
-					!= eng()->getAutomationEditor() ) )
+					!= engine::getAutomationEditor() ) )
 	{
-		eng()->getAutomationEditor()->show();
-		eng()->getAutomationEditor()->setFocus();
+		engine::getAutomationEditor()->show();
+		engine::getAutomationEditor()->setFocus();
 	}
 	else
 	{
-		eng()->getAutomationEditor()->hide();
+		engine::getAutomationEditor()->hide();
 	}
 }
 
@@ -977,7 +973,7 @@ void mainWindow::toggleAutomationEditorWin( void )
 
 void mainWindow::undo( void )
 {
-	eng()->getProjectJournal()->undo();
+	engine::getProjectJournal()->undo();
 }
 
 
@@ -985,7 +981,7 @@ void mainWindow::undo( void )
 
 void mainWindow::redo( void )
 {
-	eng()->getProjectJournal()->redo();
+	engine::getProjectJournal()->redo();
 }
 
 
@@ -993,7 +989,7 @@ void mainWindow::redo( void )
 
 void mainWindow::closeEvent( QCloseEvent * _ce )
 {
-	if( eng()->getSongEditor()->mayChangeProject() == TRUE )
+	if( engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
 		_ce->accept();
 	}

@@ -53,7 +53,7 @@ class QSlider;
 class tabBar;
 
 
-class setupDialog : public QDialog, public engineObject
+class setupDialog : public QDialog
 {
 	Q_OBJECT
 public:
@@ -63,8 +63,7 @@ public:
 		AUDIO_SETTINGS, MIDI_SETTINGS
 	} ;
 
-	setupDialog( engine * _engine,
-				configTabs _tab_to_open = GENERAL_SETTINGS );
+	setupDialog( configTabs _tab_to_open = GENERAL_SETTINGS );
 	virtual ~setupDialog();
 
 

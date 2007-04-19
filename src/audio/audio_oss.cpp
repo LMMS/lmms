@@ -99,8 +99,7 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
 		configManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
-	m_convertEndian( FALSE ),
-	m_quit( FALSE )
+	m_convertEndian( FALSE )
 {
 	_success_ful = FALSE;
 
@@ -307,7 +306,6 @@ void audioOSS::stopProcessing( void )
 {
 	if( isRunning() )
 	{
-		m_quit = TRUE;
 		wait( 1000 );
 		terminate();
 	}
@@ -324,11 +322,14 @@ void audioOSS::run( void )
 	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
 					getMixer()->framesPerAudioBuffer() *
 								channels() );
-	m_quit = FALSE;
 
-	while( m_quit == FALSE )
+	while( TRUE )
 	{
 		const fpab_t frames = getNextBuffer( temp );
+		if( !frames )
+		{
+			break;
+		}
 
 		int bytes = convertToS16( temp, frames,
 				getMixer()->masterGain(), outbuf,
@@ -354,7 +355,7 @@ audioOSS::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
 	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-						this, NULL, NULL, NULL );
+							this, NULL, NULL );
 	m_channels->setStep( 2 );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->setValue( configManager::inst()->value( "audiooss",

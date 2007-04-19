@@ -4,7 +4,7 @@
  * track.cpp - implementation of classes concerning tracks -> neccessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -90,7 +90,6 @@ trackContentObject::trackContentObject( track * _track ) :
 		, Qt::WDestructiveClose
 #endif
  		),
-	journallingObject( _track->eng() ),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
@@ -147,7 +146,7 @@ void trackContentObject::movePosition( const midiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		//eng()->getSongEditor()->setModified();
+		//engine::getSongEditor()->setModified();
 		addJournalEntry( journalEntry( MOVE, m_startPosition - _pos ) );
 		m_startPosition = _pos;
 	}
@@ -164,7 +163,7 @@ void trackContentObject::changeLength( const midiTime & _length )
 {
 	if( m_length != _length )
 	{
-		//eng()->getSongEditor()->setModified();
+		//engine::getSongEditor()->setModified();
 		addJournalEntry( journalEntry( RESIZE, m_length - _length ) );
 		m_length = _length;
 	}
@@ -231,7 +230,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		// if rubberband is active, we can be selected
 		if( m_track->getTrackContainer()->rubberBandActive() == FALSE )
 		{
-			if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
+			if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 			{
 				setSelected( !isSelected() );
 			}
@@ -247,13 +246,13 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( eng()->getMainWindow()->isShiftPressed() == TRUE )
+	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
 		// add/remove object to/from selection
 		selectableObject::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			eng()->getMainWindow()->isCtrlPressed() == TRUE )
+			engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		// start drag-action
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
@@ -270,11 +269,10 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 					convertToImage().smoothScale( s );
 #endif
 		new stringPairDrag( QString( "tco_%1" ).arg( m_track->type() ),
-					mmp.toString(), thumbnail, this,
-									eng() );
+					mmp.toString(), thumbnail, this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-		/*	eng()->getMainWindow()->isShiftPressed() == FALSE &&*/
+		/*	engine::getMainWindow()->isShiftPressed() == FALSE &&*/
 							fixedTCOs() == FALSE )
 	{
 		// move or resize
@@ -315,7 +313,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
-		if( eng()->getMainWindow()->isCtrlPressed() )
+		if( engine::getMainWindow()->isCtrlPressed() )
 		{
 			toggleMute();
 		}
@@ -332,7 +330,7 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 
 void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
+	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		delete m_hint;
 		m_hint = NULL;
@@ -345,7 +343,7 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 		midiTime t = tMax( 0, (Sint32) m_track->getTrackContainer()->
 							currentPosition() +
 					static_cast<int>( x * 64 / ppt ) );
-		if( eng()->getMainWindow()->isCtrlPressed() ==
+		if( engine::getMainWindow()->isCtrlPressed() ==
 					FALSE && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
@@ -393,7 +391,7 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 	{
 		midiTime t = tMax( 64,
 				static_cast<int>( _me->x() * 64 / ppt ) );
-		if( eng()->getMainWindow()->isCtrlPressed() ==
+		if( engine::getMainWindow()->isCtrlPressed() ==
 					FALSE && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
@@ -594,7 +592,6 @@ void trackContentObject::setAutoResizeEnabled( bool _e )
 // ===========================================================================
 trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 	QWidget( _parent ),
-	journallingObject( _parent->eng() ),
 	m_trackWidget( _parent )
 {
 #ifdef QT4
@@ -654,7 +651,7 @@ trackContentObject * trackContentWidget::addTCO( trackContentObject * _tco )
 	m_trackWidget->changePosition();
 	_tco->restoreJournallingState();
 
-	//eng()->getSongEditor()->setModified();
+	//engine::getSongEditor()->setModified();
 	return( _tco );		// just for convenience
 }
 
@@ -690,7 +687,7 @@ void trackContentWidget::removeTCO( trackContentObject * _tco,
 		}
 
 		m_trackContentObjects.erase( it );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 	}
 }
 
@@ -830,7 +827,7 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		QWidget::mousePressEvent( _me );
 	}
-	else if( eng()->getMainWindow()->isShiftPressed() == TRUE )
+	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
 		QWidget::mousePressEvent( _me );
 	}
@@ -898,8 +895,9 @@ void trackContentWidget::undoStep( journalEntry & _je )
 		{
 			QMap<QString, QVariant> map = _je.data().toMap();
 			trackContentObject * tco =
-dynamic_cast<trackContentObject *>(
-	eng()->getProjectJournal()->getJournallingObject( map["id"].toInt() ) );
+				dynamic_cast<trackContentObject *>(
+			engine::getProjectJournal()->getJournallingObject(
+							map["id"].toInt() ) );
 			assert( tco != NULL );
 			multimediaProject mmp(
 					multimediaProject::JOURNAL_DATA );
@@ -997,7 +995,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
 
-	m_muteBtn = new pixmapButton( this, tr( "Mute" ), m_trackWidget->eng(),
+	m_muteBtn = new pixmapButton( this, tr( "Mute" ),
 						m_trackWidget->getTrack() );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "mute_on" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "mute_off" ) );
@@ -1026,7 +1024,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 
 	if( inBBEditor() )
 	{
-		connect( _parent->eng()->getBBEditor(),
+		connect( engine::getBBEditor(),
 				SIGNAL( positionChanged( const midiTime & ) ),
 				this, SLOT( update() ) );
 	}
@@ -1053,7 +1051,7 @@ bool trackOperationsWidget::muted( void ) const
 void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-	m_trackWidget->eng()->getMainWindow()->isCtrlPressed() == TRUE &&
+		engine::getMainWindow()->isCtrlPressed() == TRUE &&
 			m_trackWidget->getTrack()->type() != track::BB_TRACK )
 	{
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
@@ -1062,7 +1060,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 					m_trackWidget->getTrack()->type() ),
 			mmp.toString(), QPixmap::grabWidget(
 				&m_trackWidget->getTrackSettingsWidget() ),
-				this, m_trackWidget->eng() );
+									this );
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
@@ -1252,8 +1250,7 @@ void trackOperationsWidget::disableAutomation( void )
 
 bbTrack * trackOperationsWidget::currentBBTrack( void )
 {
-	engine * eng = m_trackWidget->eng();
-	return( bbTrack::findBBTrack( eng->getBBEditor()->currentBB(), eng ) );
+	return( bbTrack::findBBTrack( engine::getBBEditor()->currentBB() ) );
 }
 
 
@@ -1262,7 +1259,7 @@ bbTrack * trackOperationsWidget::currentBBTrack( void )
 bool trackOperationsWidget::inBBEditor( void )
 {
 	return( m_trackWidget->getTrack()->getTrackContainer()
-				== m_trackWidget->eng()->getBBEditor() );
+						== engine::getBBEditor() );
 }
 
 
@@ -1276,7 +1273,6 @@ bool trackOperationsWidget::inBBEditor( void )
 
 trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	QWidget( _parent ),
-	journallingObject( _track->eng() ),
 	m_track( _track ),
 	m_trackOperationsWidget( this ),
 	m_trackSettingsWidget( this ),
@@ -1452,7 +1448,7 @@ void trackWidget::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		if( eng()->getMainWindow()->isShiftPressed() == TRUE )
+		if( engine::getMainWindow()->isShiftPressed() == TRUE )
 		{
 			m_action = RESIZE_TRACK;
 			QCursor::setPos( mapToGlobal( QPoint( _me->x(),
@@ -1593,7 +1589,6 @@ midiTime trackWidget::endPosition( const midiTime & _pos_start )
 // ===========================================================================
 
 track::track( trackContainer * _tc, bool _create_widget ) :
-	journallingObject( _tc->eng() ),
 	m_trackContainer( _tc ),
 	m_trackWidget( NULL )
 {
@@ -1611,9 +1606,10 @@ track::track( trackContainer * _tc, bool _create_widget ) :
 
 track::~track()
 {
-	if( m_trackContainer == eng()->getBBEditor() && eng()->getSongEditor() )
+	if( m_trackContainer == engine::getBBEditor()
+						&& engine::getSongEditor() )
 	{
-		trackVector tracks = eng()->getSongEditor()->tracks();
+		trackVector tracks = engine::getSongEditor()->tracks();
 		for( trackVector::iterator it = tracks.begin();
 						it != tracks.end(); ++it )
 		{
@@ -1653,7 +1649,7 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 {
 	// while adding track, pause mixer for not getting into any trouble
 	// because of track being not created completely so far
-	_tc->eng()->getMixer()->pause();
+	engine::getMixer()->pause();
 
 	track * t = NULL;
 
@@ -1673,7 +1669,7 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 #endif
 
 	// allow mixer to continue
-	_tc->eng()->getMixer()->play();
+	engine::getMixer()->play();
 
 	return( t );
 }

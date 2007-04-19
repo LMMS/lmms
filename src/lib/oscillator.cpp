@@ -3,7 +3,7 @@
 /*
  * oscillator.cpp - implementation of powerful oscillator-class
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -94,136 +94,217 @@ void oscillator::update( sampleFrame * _ab, const fpab_t _frames,
 
 
 
-// if we have no sub-osc, we can't do any modulation... just get our samples
 void oscillator::updateNoSub( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	recalcPhase();
-	float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames; ++frame )
-	{
-		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-// do pm by using sub-osc as modulator
-void oscillator::updatePM( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	m_subOsc->update( _ab, _frames, _chnl );
-	recalcPhase();
-	const float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames; ++frame )
-	{
-		_ab[frame][_chnl] = getSample( m_phase + _ab[frame][_chnl] )
-								* *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-// do am by using sub-osc as modulator
-void oscillator::updateAM( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	m_subOsc->update( _ab, _frames, _chnl );
-	recalcPhase();
-	const float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames; ++frame )
-	{
-		_ab[frame][_chnl] *= getSample( m_phase ) * *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-// do mix by using sub-osc as mix-sample
-void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	m_subOsc->update( _ab, _frames, _chnl );
-	recalcPhase();
-	const float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames; ++frame )
-	{
-		_ab[frame][_chnl] += getSample( m_phase ) * *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-// sync with sub-osc (every time sub-osc starts new period, we also start new
-// period)
-void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
-	recalcPhase();
-	const float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames ; ++frame )
-	{
-		if( m_subOsc->syncOk( sub_osc_coeff ) )
-		{
-			m_phase = m_phaseOffset;
-		}
-		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-
-
-// do fm by using sub-osc as modulator
-void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
-						const ch_cnt_t _chnl )
-{
-	m_subOsc->update( _ab, _frames, _chnl );
-	recalcPhase();
-	const float osc_coeff = *m_freq * *m_detuning;
-
-	for( fpab_t frame = 0; frame < _frames; ++frame )
-	{
-		m_phase += _ab[frame][_chnl];
-		_ab[frame][_chnl] = getSample( m_phase ) * *m_volume;
-		m_phase += osc_coeff;
-	}
-}
-
-
-
-
-inline sample_t oscillator::getSample( const float _sample )
+							const ch_cnt_t _chnl )
 {
 	switch( *m_waveShape )
 	{
 		case SIN_WAVE:
-			return( sinSample( _sample ) );
-		case TRIANGLE_WAVE:
-			return( triangleSample( _sample ) );
-		case SAW_WAVE:
-			return( sawSample( _sample ) );
-		case SQUARE_WAVE:
-			return( squareSample( _sample ) );
-		case MOOG_SAW_WAVE:
-			return( moogSawSample( _sample ) );
-		case EXP_WAVE:
-			return( expSample( _sample ) );
-		case WHITE_NOISE_WAVE:
-			return( noiseSample( _sample ) );
-		case USER_DEF_WAVE:
-			return( userWaveSample( _sample ) );
 		default:
-			return( sinSample( _sample ) );
+			updateNoSub<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updateNoSub<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updateNoSub<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updateNoSub<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updateNoSub<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updateNoSub<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updateNoSub<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updateNoSub<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
 	}
+}
 
+
+
+
+void oscillator::updatePM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	switch( *m_waveShape )
+	{
+		case SIN_WAVE:
+		default:
+			updatePM<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updatePM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updatePM<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updatePM<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updatePM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updatePM<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updatePM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updatePM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
+	}
+}
+
+
+
+
+void oscillator::updateAM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	switch( *m_waveShape )
+	{
+		case SIN_WAVE:
+		default:
+			updateAM<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updateAM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updateAM<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updateAM<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updateAM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updateAM<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updateAM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updateAM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
+	}
+}
+
+
+
+
+void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	switch( *m_waveShape )
+	{
+		case SIN_WAVE:
+		default:
+			updateMix<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updateMix<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updateMix<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updateMix<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updateMix<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updateMix<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updateMix<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updateMix<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
+	}
+}
+
+
+
+
+void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	switch( *m_waveShape )
+	{
+		case SIN_WAVE:
+		default:
+			updateSync<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updateSync<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updateSync<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updateSync<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updateSync<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updateSync<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updateSync<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updateSync<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
+	}
+}
+
+
+
+
+void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	switch( *m_waveShape )
+	{
+		case SIN_WAVE:
+		default:
+			updateFM<SIN_WAVE>( _ab, _frames, _chnl );
+			break;
+		case TRIANGLE_WAVE:
+			updateFM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SAW_WAVE:
+			updateFM<SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case SQUARE_WAVE:
+			updateFM<SQUARE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case MOOG_SAW_WAVE:
+			updateFM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+			break;
+		case EXP_WAVE:
+			updateFM<EXP_WAVE>( _ab, _frames, _chnl );
+			break;
+		case WHITE_NOISE_WAVE:
+			updateFM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+			break;
+		case USER_DEF_WAVE:
+			updateFM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+			break;
+	}
 }
 
 
@@ -265,5 +346,208 @@ float oscillator::syncInit( sampleFrame * _ab, const fpab_t _frames,
 	recalcPhase();
 	return( *m_freq * *m_detuning );
 }
+
+
+
+
+// if we have no sub-osc, we can't do any modulation... just get our samples
+template<oscillator::waveShapes W>
+void oscillator::updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	recalcPhase();
+	float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] = getSample<W>( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+// do pm by using sub-osc as modulator
+template<oscillator::waveShapes W>
+void oscillator::updatePM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	const float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] = getSample<W>( m_phase + _ab[frame][_chnl] )
+								* *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+// do am by using sub-osc as modulator
+template<oscillator::waveShapes W>
+void oscillator::updateAM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	const float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] *= getSample<W>( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+// do mix by using sub-osc as mix-sample
+template<oscillator::waveShapes W>
+void oscillator::updateMix( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	const float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		_ab[frame][_chnl] += getSample<W>( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+// sync with sub-osc (every time sub-osc starts new period, we also start new
+// period)
+template<oscillator::waveShapes W>
+void oscillator::updateSync( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
+	recalcPhase();
+	const float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames ; ++frame )
+	{
+		if( m_subOsc->syncOk( sub_osc_coeff ) )
+		{
+			m_phase = m_phaseOffset;
+		}
+		_ab[frame][_chnl] = getSample<W>( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+// do fm by using sub-osc as modulator
+template<oscillator::waveShapes W>
+void oscillator::updateFM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl )
+{
+	m_subOsc->update( _ab, _frames, _chnl );
+	recalcPhase();
+	const float osc_coeff = *m_freq * *m_detuning;
+
+	for( fpab_t frame = 0; frame < _frames; ++frame )
+	{
+		m_phase += _ab[frame][_chnl];
+		_ab[frame][_chnl] = getSample<W>( m_phase ) * *m_volume;
+		m_phase += osc_coeff;
+	}
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::SIN_WAVE>(
+							const float _sample )
+{
+	return( sinSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::TRIANGLE_WAVE>(
+							const float _sample )
+{
+	return( triangleSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::SAW_WAVE>(
+							const float _sample )
+{
+	return( sawSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::SQUARE_WAVE>(
+							const float _sample )
+{
+	return( squareSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::MOOG_SAW_WAVE>(
+							const float _sample )
+{
+	return( moogSawSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::EXP_WAVE>(
+							const float _sample )
+{
+	return( expSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::WHITE_NOISE_WAVE>(
+							const float _sample )
+{
+	return( noiseSample( _sample ) );
+}
+
+
+
+
+template<>
+inline sample_t oscillator::getSample<oscillator::USER_DEF_WAVE>(
+							const float _sample )
+{
+	return( userWaveSample( _sample ) );
+}
+
+
+
 
 #endif

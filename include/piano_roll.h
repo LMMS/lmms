@@ -2,7 +2,7 @@
  * piano_roll.h - declaration of class pianoRoll which is a window where you
  *                can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,7 +45,6 @@
 
 #include "types.h"
 #include "note.h"
-#include "engine.h"
 #include "journalling_object.h"
 
 
@@ -173,7 +172,7 @@ private:
 	} ;
 
 
-	pianoRoll( engine * _engine );
+	pianoRoll( void );
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
 

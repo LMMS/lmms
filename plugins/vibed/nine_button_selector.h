@@ -1,7 +1,7 @@
 /*
  * nine_button_selector.h
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,7 @@
 #include "pixmap_button.h"
 
 
-class nineButtonSelector: public QWidget, public engineObject
+class nineButtonSelector: public QWidget
 {
 	Q_OBJECT
 			
@@ -56,7 +56,6 @@ public:
 				Uint8 _default,
 				Uint32 _x, Uint32 _y,
 				QWidget * _parent,
-				engine * _engine,
 				track * _track );
 	~nineButtonSelector();
 	

@@ -42,75 +42,80 @@
 #endif
 
 
-engine::engine( const bool _has_gui ) :
-	m_hasGUI( _has_gui ),
-	m_mixer( NULL ),
-	m_mainWindow( NULL ),
-	m_songEditor( NULL ),
-	m_automationEditor( NULL ),
-	m_bbEditor( NULL ),
-	m_pianoRoll( NULL ),
-	m_projectJournal( NULL )
+bool engine::s_hasGUI = TRUE;
+float engine::s_frames_per_tact64th;
+mixer * engine::s_mixer;
+mainWindow * engine::s_mainWindow;
+songEditor * engine::s_songEditor;
+automationEditor * engine::s_automationEditor;
+bbEditor * engine::s_bbEditor;
+pianoRoll * engine::s_pianoRoll;
+projectNotes * engine::s_projectNotes;
+projectJournal * engine::s_projectJournal;
+#ifdef LADSPA_SUPPORT
+ladspa2LMMS * engine::s_ladspaManager;
+#endif
+QMap<QString, QString> engine::s_sample_extensions;
+
+
+
+
+void engine::init( const bool _has_gui )
 {
+	s_hasGUI = _has_gui;
+
 	load_extensions();
 
-	m_projectJournal = new projectJournal( this );
-	m_mainWindow = new mainWindow( this );
-	m_mixer = new mixer( this );
-	m_songEditor = new songEditor( this );
-	m_projectNotes = new projectNotes( this );
-	m_bbEditor = new bbEditor( this );
-	m_pianoRoll = new pianoRoll( this );
-	m_automationEditor = new automationEditor( this );
+	s_projectJournal = new projectJournal;
+	s_mainWindow = new mainWindow;
+	s_mixer = new mixer;
+	s_songEditor = new songEditor;
+	s_projectNotes = new projectNotes;
+	s_bbEditor = new bbEditor;
+	s_pianoRoll = new pianoRoll;
+	s_automationEditor = new automationEditor;
 
 #ifdef LADSPA_SUPPORT
-	m_ladspaManager = new ladspa2LMMS( this );
+	s_ladspaManager = new ladspa2LMMS;
 #endif
 	
-	m_mixer->initDevices();
+	s_mixer->initDevices();
 
-	m_mainWindow->finalize();
+	s_mainWindow->finalize();
 
-	m_mixer->startProcessing();
+	s_mixer->startProcessing();
 }
 
 
 
 
-engine::~engine()
+void engine::destroy( void )
 {
-}
+	s_mixer->stopProcessing();
 
+	delete s_projectNotes;
+	s_projectNotes = NULL;
+	delete s_songEditor;
+	s_songEditor = NULL;
+	delete s_bbEditor;
+	s_bbEditor = NULL;
+	delete s_pianoRoll;
+	s_pianoRoll = NULL;
+	delete s_automationEditor;
+	s_automationEditor = NULL;
 
-
-
-void engine::close( void )
-{
-	m_mixer->stopProcessing();
-
-	delete m_projectNotes;
-	m_projectNotes = NULL;
-	delete m_songEditor;
-	m_songEditor = NULL;
-	delete m_bbEditor;
-	m_bbEditor = NULL;
-	delete m_pianoRoll;
-	m_pianoRoll = NULL;
-	delete m_automationEditor;
-	m_automationEditor = NULL;
-
-	presetPreviewPlayHandle::cleanUp( this );
+	presetPreviewPlayHandle::cleanUp();
 
 	// now we can clean up all allocated buffer
 	//bufferAllocator::cleanUp( 0 );
 
 
-	delete m_mixer;
-	m_mixer = NULL;
+	delete s_mixer;
+	s_mixer = NULL;
 	//delete configManager::inst();
-	delete m_projectJournal;
-	m_projectJournal = NULL;
-	m_mainWindow = NULL;
+	delete s_projectJournal;
+	s_projectJournal = NULL;
+	s_mainWindow = NULL;
 }
 
 
@@ -118,8 +123,8 @@ void engine::close( void )
 
 void engine::updateFramesPerTact64th( void )
 {
-	m_frames_per_tact64th = m_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
-					/ 64.0f / m_songEditor->getTempo();
+	s_frames_per_tact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
+					/ 64.0f / s_songEditor->getTempo();
 }
 
 
@@ -144,7 +149,7 @@ void engine::load_extensions( void )
 								ext.begin();
 						itExt != ext.end(); ++itExt )
 				{
-					m_sample_extensions[*itExt] = it->name;
+					s_sample_extensions[*itExt] = it->name;
 				}
 			}
 		}
@@ -152,20 +157,6 @@ void engine::load_extensions( void )
 }
 
 
-
-
-
-engineObject::engineObject( engine * _engine ) :
-	m_engine( _engine )
-{
-}
-
-
-
-
-engineObject::~engineObject()
-{
-}
 
 
 #endif

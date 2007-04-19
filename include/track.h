@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> neccessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,7 +55,6 @@
 #include "types.h"
 #include "midi_time.h"
 #include "rubberband.h"
-#include "engine.h"
 #include "journalling_object.h"
 
 

@@ -3,7 +3,7 @@
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,6 +43,7 @@
 
 #include "midi_alsa_seq.h"
 #include "config_mgr.h"
+#include "engine.h"
 #include "gui_templates.h"
 #include "song_editor.h"
 #include "midi_port.h"
@@ -52,18 +53,11 @@
 #ifdef ALSA_SUPPORT
 
 
-midiALSASeq::midiALSASeq( engine * _engine ) :
-#ifndef QT4
-	QObject(),
-#endif
-	midiClient( _engine ),
-	QThread(),
+midiALSASeq::midiALSASeq( void ) :
 	m_seqHandle( NULL ),
 	m_queueID( -1 ),
 	m_quit( FALSE ),
-	m_portListUpdateTimer( this ),
-	m_readablePorts(),
-	m_writeablePorts()
+	m_portListUpdateTimer( this )
 {
 	int err;
 	if( ( err = snd_seq_open( &m_seqHandle,
@@ -84,13 +78,13 @@ midiALSASeq::midiALSASeq( engine * _engine ) :
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_alloca( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
-					eng()->getSongEditor()->getTempo() );
+					engine::getSongEditor()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
-	changeQueueTempo( eng()->getSongEditor()->getTempo() );
-	connect( eng()->getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+	changeQueueTempo( engine::getSongEditor()->getTempo() );
+	connect( engine::getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( changeQueueTempo( bpm_t ) ) );
 
 	// initial list-update

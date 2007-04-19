@@ -5,7 +5,7 @@
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 
 
 #include "string_pair_drag.h"
+#include "engine.h"
 #include "main_window.h"
 
 #ifdef QT4
@@ -40,20 +41,18 @@
 
 
 stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
-				const QPixmap & _icon, QWidget * _w,
-							engine * _engine ) :
+					const QPixmap & _icon, QWidget * _w ) :
 #ifdef QT4
-				QDrag( _w ),
+				QDrag( _w )
 #else
-				QStoredDrag( "lmms/stringpair", _w ),
+				QStoredDrag( mimeType(), _w )
 #endif
-				engineObject( _engine )
 {
 	setPixmap( _icon );
 	QString txt = _key + ":" + _value;
 #ifdef QT4
 	QMimeData * m = new QMimeData();
-	m->setData( "lmms/stringpair", txt.toAscii() );
+	m->setData( mimeType(), txt.toAscii() );
 	setMimeData( m );
 	start( Qt::IgnoreAction );
 #else
@@ -69,7 +68,7 @@ stringPairDrag::~stringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	eng()->getMainWindow()->clearKeyModifiers();
+	engine::getMainWindow()->clearKeyModifiers();
 	// TODO: do we have to delete anything???
 }
 
@@ -80,11 +79,11 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
 #ifdef QT4
-	if( !_dee->mimeData()->hasFormat( "lmms/stringpair" ) )
+	if( !_dee->mimeData()->hasFormat( mimeType() ) )
 	{
 		return( FALSE );
 	}
-	QString txt = _dee->mimeData()->data( "lmms/stringpair" );
+	QString txt = _dee->mimeData()->data( mimeType() );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
@@ -93,7 +92,7 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	_dee->ignore();
 	return( FALSE );
 #else
-	QString txt = _dee->encodedData( "lmms/stringpair" );
+	QString txt = _dee->encodedData( mimeType() );
 	bool accepted = QStringList::split( ',', _allowed_keys ).contains(
 						txt.section( ':', 0, 0 ) );
 	_dee->accept( accepted );
@@ -107,10 +106,10 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 QString stringPairDrag::decodeKey( QDropEvent * _de )
 {
 #ifdef QT4
-	return( QString( _de->mimeData()->data( "lmms/stringpair"
+	return( QString( _de->mimeData()->data( mimeType()
 						) ).section( ':', 0, 0 ) );
 #else
-	return( QString( _de->encodedData( "lmms/stringpair" ) ).section(
+	return( QString( _de->encodedData( mimeType() ) ).section(
 								':', 0, 0 ) );
 #endif
 }
@@ -121,10 +120,10 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
 #ifdef QT4
-	return( QString( _de->mimeData()->data( "lmms/stringpair"
+	return( QString( _de->mimeData()->data( mimeType()
 						) ).section( ':', 1, -1 ) );
 #else
-	return( QString( _de->encodedData( "lmms/stringpair" ) ).section(
+	return( QString( _de->encodedData( mimeType() ) ).section(
 								':', 1, -1 ) );
 #endif
 }

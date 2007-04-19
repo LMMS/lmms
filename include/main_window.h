@@ -49,7 +49,6 @@
 
 
 #include "types.h"
-#include "engine.h"
 
 
 class QDomElement;
@@ -61,7 +60,7 @@ class tool;
 class toolButton;
 
 
-class mainWindow : public QMainWindow, public engineObject
+class mainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
@@ -138,7 +137,7 @@ protected:
 
 
 private:
-	mainWindow( engine * _engine );
+	mainWindow( void );
 	mainWindow( const mainWindow & );
 	virtual ~mainWindow();
 

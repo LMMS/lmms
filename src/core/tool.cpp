@@ -3,7 +3,7 @@
 /*
  * tool.cpp - base class for all tool plugins (graphs, extensions, etc)
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 
 tool::tool( mainWindow * _window, const descriptor * _descriptor ) :
 	QWidget( _window->workspace() ),
-	plugin( _descriptor, _window->eng() )
+	plugin( _descriptor )
 {
 	setWindowTitle( _descriptor->public_name );
 	setWindowIcon( *_descriptor->logo );

@@ -127,7 +127,7 @@ static void dump_mem( const void * buffer, uint n_bytes )
 
 
 flpImport::flpImport( const QString & _file ) :
-	importFilter( _file, &flpimport_plugin_descriptor, NULL )
+	importFilter( _file, &flpimport_plugin_descriptor )
 {
 }
 
@@ -246,9 +246,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 	int ev_cnt = 0;
 
-	_tc->eng()->getSongEditor()->clearProject();
-	const bool is_journ = _tc->eng()->getProjectJournal()->isJournalling();
-	_tc->eng()->getProjectJournal()->setJournalling( FALSE );
+	engine::getSongEditor()->clearProject();
+	const bool is_journ = engine::getProjectJournal()->isJournalling();
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 
 	while( file().atEnd() == FALSE )
@@ -333,7 +333,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MainVol:
 				printf( "main-volume: %d\n", data );
-				_tc->eng()->getSongEditor()->setMasterVolume(
+				engine::getSongEditor()->setMasterVolume(
 					static_cast<volume>( data * 100 /
 									128 ) );
 				break;
@@ -364,7 +364,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				printf( "new channel\n" );
 
 				it = dynamic_cast<instrumentTrack *>(
-	track::create( track::INSTRUMENT_TRACK, _tc->eng()->getBBEditor() ) );
+	track::create( track::INSTRUMENT_TRACK, engine::getBBEditor() ) );
 				assert( it != NULL );
 				i_tracks.push_back( it );
 				it_inst = it->loadInstrument(
@@ -384,7 +384,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_Tempo:
 				printf( "tempo: %d\n", data );
-				_tc->eng()->getSongEditor()->setTempo( data );
+				engine::getSongEditor()->setTempo( data );
 				break;
 
 			case FLP_CurrentPatNum:
@@ -417,8 +417,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_MainPitch:
-				_tc->eng()->getSongEditor()->setMasterPitch(
-									data );
+				engine::getSongEditor()->setMasterPitch( data );
 				break;
 
 			case FLP_Resonance:
@@ -533,7 +532,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				ba.resetRawData( text, text_len );
 #endif
 
-				_tc->eng()->getProjectNotes()->setText( out );
+				engine::getProjectNotes()->setText( out );
 				outstring = "";
 				break;
 			}
@@ -749,7 +748,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 									8 ) );
 					pos /= 6;
 					len /= 6;
-					note n( NULL, len, pos );
+					note n( len, pos );
 					n.setKey( key );
 					m_notes.push_back( qMakePair(
 				num_channels * current_pattern + ch, n ) );
@@ -816,10 +815,10 @@ bool flpImport::tryImport( trackContainer * _tc )
 		const int ch = ( *it ) >> 16;
 		const csize pat = ( ( *it ) & 0xffff ) / 16;
 		const csize pos = ( ( ( *it ) & 0xffff ) % 16 ) * 4;
-		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat )
+		while( engine::getBBEditor()->numOfBBs() <= pat )
 		{
 			track::create( track::BB_TRACK,
-						_tc->eng()->getSongEditor() );
+						engine::getSongEditor() );
 		}
 		pattern * p = dynamic_cast<pattern *>(
 						i_tracks[ch]->getTCO( pat ) );
@@ -827,7 +826,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		p->setNoteAt( pos / 4, note( NULL, -64, pos ) );
+		p->setNoteAt( pos / 4, note( -64, pos ) );
 	}
 
 	// now process all notes
@@ -841,10 +840,10 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat )
+		while( engine::getBBEditor()->numOfBBs() <= pat )
 		{
 			track::create( track::BB_TRACK,
-						_tc->eng()->getSongEditor() );
+						engine::getSongEditor() );
 #ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
 #else
@@ -868,10 +867,10 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		while( _tc->eng()->getBBEditor()->numOfBBs() <= pat_num )
+		while( engine::getBBEditor()->numOfBBs() <= pat_num )
 		{
 			track::create( track::BB_TRACK,
-						_tc->eng()->getSongEditor() );
+						engine::getSongEditor() );
 #ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
 #else
@@ -879,17 +878,17 @@ bool flpImport::tryImport( trackContainer * _tc )
 #endif
 		}
 		
-		bbTrack * bbt = bbTrack::findBBTrack( pat_num, _tc->eng() );
+		bbTrack * bbt = bbTrack::findBBTrack( pat_num );
 		trackContentObject * tco = bbt->addTCO( bbt->createTCO( 0 ) );
 		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
 	}
 
-	if( (csize) project_cur_pat < _tc->eng()->getBBEditor()->numOfBBs() )
+	if( (csize) project_cur_pat < engine::getBBEditor()->numOfBBs() )
 	{
-		_tc->eng()->getBBEditor()->setCurrentBB( project_cur_pat );
+		engine::getBBEditor()->setCurrentBB( project_cur_pat );
 	}
 
-	_tc->eng()->getProjectJournal()->setJournalling( is_journ );
+	engine::getProjectJournal()->setJournalling( is_journ );
         return( TRUE );
 }
 

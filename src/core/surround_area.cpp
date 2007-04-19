@@ -4,7 +4,7 @@
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -75,7 +75,7 @@ QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
 
 surroundArea::surroundArea( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track ) :
+							track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
@@ -84,12 +84,12 @@ surroundArea::surroundArea( QWidget * _parent, const QString & _name,
 	m_sndSrcPos( QPoint() )
 {
 	m_position_x = new knob( knobDark_28, NULL, tr ( "Surround area X" ),
-							_engine, _track );
+								_track );
 	m_position_x->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
 	m_position_x->setInitValue( 0.0f );
 
 	m_position_y = new knob( knobDark_28, NULL, tr ( "Surround area Y" ),
-							_engine, _track );
+								_track );
 	m_position_y->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
 	m_position_y->setInitValue( 0.0f );
 

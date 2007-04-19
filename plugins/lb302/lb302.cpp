@@ -258,7 +258,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     // GUI
 
 	vcf_cut_knob = new knob( knobBright_26, this, tr( "VCF Cutoff Frequency" ), 
-            eng(), _channel_track );
+            _channel_track );
 	vcf_cut_knob->setRange( 0.0f, 1.5f, 0.005f );   // Originally  [0,1.0]
  	vcf_cut_knob->setInitValue( 0.75f );
 	vcf_cut_knob->move( 75, 130 );
@@ -266,7 +266,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     vcf_cut_knob->setLabel( tr("CUT") );
 
 	vcf_res_knob = new knob( knobBright_26, this, tr( "VCF Resonance" ),
-							eng(), _channel_track );
+							_channel_track );
 	vcf_res_knob->setRange( 0.0f, 1.25f, 0.005f );   // Originally [0,1.0]
 	vcf_res_knob->setInitValue( 0.75f );
 	vcf_res_knob->move( 120, 130 );
@@ -274,7 +274,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     vcf_res_knob->setLabel( tr("RES") );
 
 	vcf_mod_knob = new knob( knobBright_26, this, tr( "VCF Envelope Mod" ), 
-            eng(), _channel_track );
+            _channel_track );
 	vcf_mod_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally  [0,1.0]
  	vcf_mod_knob->setInitValue( 1.0f );
 	vcf_mod_knob->move( 165, 130 );
@@ -282,7 +282,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     vcf_mod_knob->setLabel( tr("ENV MOD") );
 
 	vcf_dec_knob = new knob( knobBright_26, this, tr( "VCF Envelope Decay" ),
-							eng(), _channel_track );
+							_channel_track );
 	vcf_dec_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally [0,1.0]
 	vcf_dec_knob->setInitValue( 0.1f );
 	vcf_dec_knob->move( 210, 130 );
@@ -291,30 +291,30 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
      slideToggle = new ledCheckBox( "Slide", this,
 							tr( "Slide" ),
-							eng(), _channel_track );
+							_channel_track );
 	slideToggle->move( 10, 180 );
 
 
     accentToggle = new ledCheckBox( "Accent", this,
 							tr( "Accent" ),
-							eng(), _channel_track );
+							_channel_track );
 	accentToggle->move( 10, 200 );
     accentToggle->setDisabled(true);
 
 
     deadToggle = new ledCheckBox( "Dead", this,
 							tr( "Dead" ),
-							eng(), _channel_track );
+							_channel_track );
 	deadToggle->move( 10, 220 );
 
     db24Toggle = new ledCheckBox( "24dB/oct", this,
                             tr( "303-es-que, 24dB/octave, 3 pole filter" ),
-                            eng(), _channel_track );
+                            _channel_track );
     db24Toggle->move( 10, 150);
 
 
 	slide_dec_knob = new knob( knobBright_26, this, tr( "Slide Decay" ),
-							eng(), _channel_track );
+							_channel_track );
 	slide_dec_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally [0,1.0]
 	slide_dec_knob->setInitValue( 0.6f );
 	slide_dec_knob->move( 210, 75 );
@@ -323,7 +323,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
     vco_fine_detune_knob = new knob( knobBright_26, this, 
             tr("Fine detuning of the VCO. Ranged between -100 and 100 centes."),
-            eng(), _channel_track );
+            _channel_track );
     vco_fine_detune_knob->setRange(-100.0f, 100.0f, 1.0f);
     vco_fine_detune_knob->setInitValue(0.0f);
     vco_fine_detune_knob->move(165,75);
@@ -332,7 +332,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
 
     dist_knob = new knob( knobBright_26, this, tr( "Distortion" ),
-							eng(), _channel_track );
+							_channel_track );
 	dist_knob->setRange( 0.0f, 1.0f, 0.01f );   // Originally [0,1.0]
 	dist_knob->setInitValue( 0.0f );
 	dist_knob->move( 210, 190 );
@@ -341,7 +341,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
 
     wave_knob = new knob( knobBright_26, this, tr( "Waveform" ),
-							eng(), _channel_track );
+							_channel_track );
 	wave_knob->setRange( 0.0f, 5.0f, 1.0f );   // Originally [0,1.0]
 	wave_knob->setInitValue( 0.0f );
 	wave_knob->move( 120, 75 );
@@ -730,7 +730,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         }
     }
     
-    const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+    const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
     sampleFrame *buf = bufferAllocator::alloc<sampleFrame>( frames );
 
     if (buf) {

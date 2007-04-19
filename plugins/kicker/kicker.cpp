@@ -1,7 +1,7 @@
 /*
  * kicker.cpp - bassdrum-synthesizer
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -74,35 +74,35 @@ kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 	QVBoxLayout * vl = new QVBoxLayout( this );
 	QHBoxLayout * hl = new QHBoxLayout;
 	m_startFreqKnob = new knob( knobDark_28, this, tr( "Start frequency" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_startFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
  	m_startFreqKnob->setInitValue( 150.0f );
 	m_startFreqKnob->setLabel( tr( "START" ) );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
 
 	m_endFreqKnob = new knob( knobDark_28, this, tr( "End frequency" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_endFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
 	m_endFreqKnob->setInitValue( 40.0f );
 	m_endFreqKnob->setLabel( tr( "END" ) );
 	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
 
 	m_decayKnob = new knob( knobDark_28, this, tr( "Decay" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_decayKnob->setRange( 5.0f, 1000.0f, 1.0f );
 	m_decayKnob->setInitValue( 120.0f );
 	m_decayKnob->setLabel( tr( "DECAY" ) );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
 
 	m_distKnob = new knob( knobDark_28, this, tr( "Distortion" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_distKnob->setRange( 0.0f, 100.0f, 0.1f );
 	m_distKnob->setInitValue( 0.8f );
 	m_distKnob->setLabel( tr( "DIST" ) );
 	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
 
 	m_gainKnob = new knob( knobDark_28, this, tr( "Gain" ),
-						eng(), _instrument_track );
+							_instrument_track );
 	m_gainKnob->setRange( 0.1f, 5.0f, 0.05f );
 	m_gainKnob->setInitValue( 1.0f );
 	m_gainKnob->setLabel( tr( "GAIN" ) );
@@ -176,7 +176,7 @@ typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 void kickerInstrument::playNote( notePlayHandle * _n, bool )
 {
 	const float decfr = m_decayKnob->value() *
-				eng()->getMixer()->sampleRate() / 1000.0f;
+				engine::getMixer()->sampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
@@ -195,9 +195,9 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 	const fpab_t frames = _n->released() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
-				eng()->getMixer()->framesPerAudioBuffer() ), 0 )
+			engine::getMixer()->framesPerAudioBuffer() ), 0 )
 		:
-		eng()->getMixer()->framesPerAudioBuffer();
+		engine::getMixer()->framesPerAudioBuffer();
 	const float f1 = m_startFreqKnob->value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqKnob->value() + (frames+tfp-1)*fdiff/decfr;
 
@@ -205,7 +205,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 
 
 	sweepOsc * so = static_cast<sweepOsc *>( _n->m_pluginData );
-	so->update( buf, frames, f1, f2, eng()->getMixer()->sampleRate() );
+	so->update( buf, frames, f1, f2, engine::getMixer()->sampleRate() );
 
 	if( _n->released() )
 	{

@@ -1,7 +1,7 @@
 /*
  * oscillator.h - header-file for oscillator.cpp, a powerful oscillator-class
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -183,10 +183,33 @@ private:
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
+	template<waveShapes W>
+	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	template<waveShapes W>
+	void updatePM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	template<waveShapes W>
+	void updateAM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	template<waveShapes W>
+	void updateMix( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	template<waveShapes W>
+	void updateSync( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+	template<waveShapes W>
+	void updateFM( sampleFrame * _ab, const fpab_t _frames,
+							const ch_cnt_t _chnl );
+
+	template<waveShapes W>
 	inline sample_t getSample( const float _sample );
+
 	inline void FASTCALL recalcPhase( void );
 
 } ;
+
+
 
 
 #endif

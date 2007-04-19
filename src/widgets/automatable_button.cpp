@@ -4,7 +4,7 @@
  * automatable_button.cpp - implementation of class automatableButton and
  *                          automatableButtonGroup
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,13 +50,13 @@
 
 
 automatableButton::automatableButton( QWidget * _parent, const QString & _name,
-					engine * _engine, track * _track ) :
+							track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	autoObj( _engine, _track, FALSE, FALSE, TRUE ),
+	autoObj( _track, FALSE, FALSE, TRUE ),
 	m_group( NULL ),
 	m_checkable( FALSE )
 {
@@ -205,14 +205,14 @@ void automatableButton::setValue( const bool _on )
 
 
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
-					const QString & _name,
-					engine * _engine, track * _track ) :
+							const QString & _name,
+							track * _track ) :
 	QWidget( _parent
 #ifndef QT4
 			, _name.ascii()
 #endif
 		),
-	automatableObject<int>( _engine, _track )
+	automatableObject<int>( _track )
 {
 	hide();
 	if( _track != NULL )

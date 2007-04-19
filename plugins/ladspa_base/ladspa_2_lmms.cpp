@@ -2,7 +2,7 @@
  * ladspa_2_lmms.cpp - class that identifies and instantiates LADSPA effects
  *                     for use with LMMS
  *
- * Copyright (c) 2005 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -30,8 +30,7 @@
 #define indexOf find
 #endif
 
-ladspa2LMMS::ladspa2LMMS( engine * _engine ):
-	ladspaManager( _engine )
+ladspa2LMMS::ladspa2LMMS( void )
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 	

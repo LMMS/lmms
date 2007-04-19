@@ -44,7 +44,6 @@
 
 ladspaControl::ladspaControl( QWidget * _parent, 
 				port_desc_t * _port, 
-				engine * _engine, 
 				track * _track,
 			    	bool _link) :
 	QWidget( _parent
@@ -52,7 +51,6 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			, "ladspaControl"
 #endif
 					),
-	journallingObject( _engine ),
 	m_port( _port ),
 	m_track( _track ),
 	m_link( NULL ),
@@ -67,7 +65,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 	
 	if( _link )
 	{
-		m_link = new ledCheckBox( "", this, "", eng(), m_track );
+		m_link = new ledCheckBox( "", this, "", m_track );
 		m_link->setChecked( FALSE );
 		connect( m_link, SIGNAL( toggled( bool ) ),
 			 this, SLOT( portLink( bool ) ) );
@@ -78,9 +76,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle = new ledCheckBox( m_port->name, this, "", 
-					eng(), m_track,
-					ledCheckBox::GREEN );
+			m_toggle = new ledCheckBox( m_port->name, this, "",
+						m_track, ledCheckBox::GREEN );
 			connect( m_toggle, SIGNAL( toggled( bool ) ),
 				 this, SLOT( ledChange( bool ) ) );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
@@ -97,8 +94,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case INTEGER:
-			m_knob = new knob( knobBright_26, this, 
-					   m_port->name, eng(), m_track);
+			m_knob = new knob( knobBright_26, this, m_port->name,
+								m_track );
 			connect( m_knob, SIGNAL( valueChanged( float ) ),
 				 this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
@@ -125,8 +122,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case FLOAT:
-			m_knob = new knob( knobBright_26, this, 
-					   m_port->name, eng(), m_track);
+			m_knob = new knob( knobBright_26, this, m_port->name,
+								m_track );
 			connect( m_knob, SIGNAL( valueChanged( float ) ), 
 				 this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );
@@ -153,8 +150,8 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case TIME:
-			m_knob = new tempoSyncKnob( knobBright_26, this, 
-						m_port->name, eng(), m_track);
+			m_knob = new tempoSyncKnob( knobBright_26, this,
+							m_port->name, m_track );
 			connect( m_knob, SIGNAL( valueChanged( float ) ), 
 					this, SLOT( knobChange( float ) ) );
 			m_knob->setLabel( m_port->name );

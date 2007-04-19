@@ -3,7 +3,7 @@
 /*
  * bb_editor.cpp - basic main-window for editing of beats and basslines
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -62,8 +62,7 @@ const int BBE_PPT = 192;
 
 
 
-bbEditor::bbEditor( engine * _engine ) :
-	trackContainer( _engine )
+bbEditor::bbEditor( void )
 {
 	// create toolbar
 	m_toolBar = new QWidget( this );
@@ -91,7 +90,7 @@ bbEditor::bbEditor( engine * _engine ) :
 				DEFAULT_SCROLLBAR_SIZE );
 
 	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( eng()->getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		resize( minimumWidth(), 300 );
 		w->move( 10, 340 );
@@ -117,7 +116,7 @@ bbEditor::bbEditor( engine * _engine ) :
 	toolButton * add_bb_track = new toolButton(
 					embed::getIconPixmap( "add_bb_track" ),
 						tr( "Add beat/bassline" ),
-				eng()->getSongEditor(), SLOT( addBBTrack() ),
+				engine::getSongEditor(), SLOT( addBBTrack() ),
 								m_toolBar );
 
 
@@ -140,7 +139,7 @@ bbEditor::bbEditor( engine * _engine ) :
 	QLabel * l = new QLabel( m_toolBar );
 	l->setPixmap( embed::getIconPixmap( "drum" ) );
 
-	m_bbComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
+	m_bbComboBox = new comboBox( m_toolBar, NULL, NULL );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( setCurrentBB( int ) ) );
@@ -193,7 +192,7 @@ void bbEditor::setCurrentBB( int _bb )
 	// the others green)
 	for( csize i = 0; i < numOfBBs(); ++i )
 	{
-		bbTrack::findBBTrack( i, eng() )->trackLabel()->update();
+		bbTrack::findBBTrack( i )->trackLabel()->update();
 	}
 
 	emit positionChanged( m_currentPosition = midiTime(
@@ -257,7 +256,7 @@ bool FASTCALL bbEditor::play( midiTime _start, fpab_t _frames,
 
 csize bbEditor::numOfBBs( void ) const
 {
-	return( eng()->getSongEditor()->countTracks( track::BB_TRACK ) );
+	return( engine::getSongEditor()->countTracks( track::BB_TRACK ) );
 }
 
 
@@ -281,7 +280,7 @@ void bbEditor::removeBB( csize _bb )
 
 void bbEditor::updateBBTrack( trackContentObject * _tco )
 {
-	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64, eng() );
+	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
 	if( t != NULL )
 	{
 		t->getTrackContentWidget()->updateTCOs();
@@ -302,7 +301,7 @@ void bbEditor::updateComboBox( void )
 
 	for( csize i = 0; i < numOfBBs(); ++i )
 	{
-		bbTrack * bbt = bbTrack::findBBTrack( i, eng() );
+		bbTrack * bbt = bbTrack::findBBTrack( i );
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
 					bbt->trackLabel()->pixmap() );
 	}
@@ -330,7 +329,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
-		if( eng()->getSongEditor()->playing() )
+		if( engine::getSongEditor()->playing() )
 		{
 			stop();
 		}
@@ -388,31 +387,31 @@ QRect bbEditor::scrollAreaRect( void ) const
 
 void bbEditor::play( void )
 {
-	if( eng()->getSongEditor()->playing() )
+	if( engine::getSongEditor()->playing() )
 	{
-		if( eng()->getSongEditor()->playMode() != songEditor::PLAY_BB )
+		if( engine::getSongEditor()->playMode() != songEditor::PLAY_BB )
 		{
-			eng()->getSongEditor()->stop();
-			eng()->getSongEditor()->playBB();
+			engine::getSongEditor()->stop();
+			engine::getSongEditor()->playBB();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
-			eng()->getSongEditor()->pause();
+			engine::getSongEditor()->pause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"play" ) );
 		}
 	}
-	else if( eng()->getSongEditor()->paused() )
+	else if( engine::getSongEditor()->paused() )
 	{
-		eng()->getSongEditor()->resumeFromPause();
+		engine::getSongEditor()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		eng()->getSongEditor()->playBB();
+		engine::getSongEditor()->playBB();
 	}
 
 }
@@ -422,7 +421,7 @@ void bbEditor::play( void )
 
 void bbEditor::stop( void )
 {
-	eng()->getSongEditor()->stop();
+	engine::getSongEditor()->stop();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 }

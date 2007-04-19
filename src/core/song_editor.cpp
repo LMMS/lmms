@@ -102,8 +102,7 @@
 
 
 
-songEditor::songEditor( engine * _engine ) :
-	trackContainer( _engine ),
+songEditor::songEditor( void ) :
 	m_fileName( "" ),
 	m_oldFileName( "" ),
 	m_exporting( FALSE ),
@@ -121,7 +120,7 @@ songEditor::songEditor( engine * _engine ) :
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
 	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( eng()->getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		resize( 680, 300 );
 		w->move( 10, 10 );
@@ -147,7 +146,7 @@ songEditor::songEditor( engine * _engine ) :
 	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
 					pixelsPerTact(), m_playPos[PLAY_SONG],
-					m_currentPosition, cw, eng() );
+					m_currentPosition, cw );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				m_playPos[PLAY_SONG].m_timeLine,
 			SLOT( updatePosition( const midiTime & ) ) );
@@ -157,12 +156,12 @@ songEditor::songEditor( engine * _engine ) :
 	m_automation_track = track::create( track::AUTOMATION_TRACK, this );
 
 	// add some essential widgets to global tool-bar 
-	QWidget * tb = eng()->getMainWindow()->toolBar();
+	QWidget * tb = engine::getMainWindow()->toolBar();
 
-	eng()->getMainWindow()->addSpacingToToolBar( 10 );
+	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
 	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb, tr( "Tempo" ),
-						eng(), m_automation_track );
+							m_automation_track );
 	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
 	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setTempo( int ) ) );
@@ -182,32 +181,33 @@ songEditor::songEditor( engine * _engine ) :
 			"should be played within a minute (or how many tacts "
 			"should be played within four minutes)." ) );
 
-	int col = eng()->getMainWindow()->addWidgetToToolBar( m_bpmSpinBox, 0 );
+	int col = engine::getMainWindow()->addWidgetToToolBar( m_bpmSpinBox,
+									0 );
 
 
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
 	hq_btn->setCheckable( TRUE );
-	connect( hq_btn, SIGNAL( toggled( bool ) ), eng()->getMixer(),
+	connect( hq_btn, SIGNAL( toggled( bool ) ), engine::getMixer(),
 					SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	eng()->getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
+	engine::getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 
 
 	toolButton * cp_btn = new toolButton( embed::getIconPixmap( "auto_limit" ),
 					      tr( "Auto limiter" ),
 					      NULL, NULL, tb );
 	cp_btn->setCheckable( TRUE );
-	connect( cp_btn, SIGNAL( toggled( bool ) ), eng()->getMixer(),
+	connect( cp_btn, SIGNAL( toggled( bool ) ), engine::getMixer(),
 		 SLOT( setClipScaling( bool ) ) );
 	cp_btn->setFixedWidth( 30 );
-	eng()->getMainWindow()->addWidgetToToolBar( cp_btn, 1, col + 1 );
+	engine::getMainWindow()->addWidgetToToolBar( cp_btn, 1, col + 1 );
 
 
-	eng()->getMainWindow()->addSpacingToToolBar( 10 );
+	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
-	connect( eng()->getMixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
 					SLOT( updateFramesPerTact64th() ) );
 
 
@@ -216,7 +216,7 @@ songEditor::songEditor( engine * _engine ) :
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
 	m_masterVolumeSlider = new automatableSlider( tb, tr( "Master volume" ),
-						eng(), m_automation_track );
+							m_automation_track );
 	m_masterVolumeSlider->setOrientation( Qt::Vertical );
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 1 );
@@ -243,18 +243,18 @@ songEditor::songEditor( engine * _engine ) :
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	eng()->getMainWindow()->addWidgetToToolBar( master_vol_lbl );
-	eng()->getMainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
+	engine::getMainWindow()->addWidgetToToolBar( master_vol_lbl );
+	engine::getMainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
 
 
-	eng()->getMainWindow()->addSpacingToToolBar( 10 );
+	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
 	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ),
-						eng(), m_automation_track );
+							m_automation_track );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
@@ -280,10 +280,10 @@ songEditor::songEditor( engine * _engine ) :
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	eng()->getMainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	eng()->getMainWindow()->addWidgetToToolBar( m_masterPitchSlider );
+	engine::getMainWindow()->addWidgetToToolBar( master_pitch_lbl );
+	engine::getMainWindow()->addWidgetToToolBar( m_masterPitchSlider );
 
-	eng()->getMainWindow()->addSpacingToToolBar( 10 );
+	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
@@ -293,12 +293,12 @@ songEditor::songEditor( engine * _engine ) :
 
 	//vcw_layout->addStretch();
 	vcw_layout->addWidget( new visualizationWidget(
-			embed::getIconPixmap( "output_graph" ), vc_w, eng() ) );
+			embed::getIconPixmap( "output_graph" ), vc_w ) );
 
-	vcw_layout->addWidget( new cpuloadWidget( vc_w, eng() ) );
+	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
-	eng()->getMainWindow()->addWidgetToToolBar( vc_w );
+	engine::getMainWindow()->addWidgetToToolBar( vc_w );
 
 
 	// create own toolbar
@@ -399,7 +399,7 @@ songEditor::songEditor( engine * _engine ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, NULL, eng(), NULL );
+	m_zoomingComboBox = new comboBox( m_toolBar, NULL, NULL );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
@@ -516,13 +516,13 @@ void songEditor::resizeEvent( QResizeEvent * _re )
 void songEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		eng()->getMainWindow()->isShiftPressed() == TRUE &&
+		engine::getMainWindow()->isShiftPressed() == TRUE &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			eng()->getMainWindow()->isShiftPressed() == TRUE &&
+			engine::getMainWindow()->isShiftPressed() == TRUE &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		removeBar();
@@ -583,7 +583,7 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( eng()->getMainWindow()->isCtrlPressed() == TRUE )
+	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -605,7 +605,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks( TRUE );
 	} 
-	else if( eng()->getMainWindow()->isShiftPressed() == TRUE )
+	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -634,7 +634,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	eng()->getMixer()->setMasterGain( _new_val / 100.0f );
+	engine::getMixer()->setMasterGain( _new_val / 100.0f );
 }
 
 
@@ -756,7 +756,7 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 void songEditor::setTempo( int _new_bpm )
 {
-	playHandleVector & phv = eng()->getMixer()->playHandles();
+	playHandleVector & phv = engine::getMixer()->playHandles();
 	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
 									++it )
 	{
@@ -768,7 +768,7 @@ void songEditor::setTempo( int _new_bpm )
 	}
 
 	m_bpmSpinBox->setInitValue( _new_bpm );
-	eng()->updateFramesPerTact64th();
+	engine::updateFramesPerTact64th();
 	emit tempoChanged( _new_bpm );
 }
 
@@ -847,7 +847,7 @@ void songEditor::doActions( void )
 				updateTimeLinePosition();
 
 				// remove all note-play-handles that are active
-				eng()->getMixer()->clear();
+				engine::getMixer()->clear();
 
 				break;
 			}
@@ -935,7 +935,7 @@ void songEditor::processNextBuffer( void )
 			// at song-start we have to reset the LFOs
 			if( m_playPos[PLAY_SONG] == 0 )
 			{
-				envelopeAndLFOWidget::resetLFO( eng() );
+				envelopeAndLFOWidget::resetLFO();
 			}
 			break;
 
@@ -944,11 +944,10 @@ void songEditor::processNextBuffer( void )
 			break;
 
 		case PLAY_BB:
-			if( eng()->getBBEditor()->numOfBBs() > 0 )
+			if( engine::getBBEditor()->numOfBBs() > 0 )
 			{
-				tco_num = eng()->getBBEditor()->currentBB();
-				tv.push_back( bbTrack::findBBTrack( tco_num,
-								eng() ) );
+				tco_num = engine::getBBEditor()->currentBB();
+				tv.push_back( bbTrack::findBBTrack( tco_num ) );
 			}
 			break;
 
@@ -990,11 +989,12 @@ void songEditor::processNextBuffer( void )
 	}
 
 	f_cnt_t total_frames_played = 0;
-	float frames_per_tact64th = eng()->framesPerTact64th();
+	float frames_per_tact64th = engine::framesPerTact64th();
 
-	while( total_frames_played < eng()->getMixer()->framesPerAudioBuffer() )
+	while( total_frames_played
+				< engine::getMixer()->framesPerAudioBuffer() )
 	{
-		f_cnt_t played_frames = eng()->getMixer()
+		f_cnt_t played_frames = engine::getMixer()
 				->framesPerAudioBuffer() - total_frames_played;
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
@@ -1016,7 +1016,7 @@ void songEditor::processNextBuffer( void )
 				// or to loop back to first tact
 				if( m_playMode == PLAY_BB )
 				{
-					max_tact = eng()->getBBEditor()
+					max_tact = engine::getBBEditor()
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == PLAY_PATTERN &&
@@ -1129,7 +1129,7 @@ void songEditor::play( void )
 		if( m_playMode != PLAY_SONG )
 		{
 			// make sure, bb-editor updates/resets it play-button
-			eng()->getBBEditor()->stop();
+			engine::getBBEditor()->stop();
 			//pianoRoll::inst()->stop();
 		}
 		else
@@ -1374,7 +1374,7 @@ bool songEditor::mayChangeProject( void )
 #else
 		information
 #endif
-				( eng()->getMainWindow(),
+				( engine::getMainWindow(),
 						tr( "Project not saved" ),
 						tr( "The current project was "
 							"modified since last "
@@ -1395,12 +1395,12 @@ bool songEditor::mayChangeProject( void )
 				QMessageBox::Yes,
 				QMessageBox::No,
 				QMessageBox::Cancel,
-				eng()->getMainWindow() );
+				engine::getMainWindow() );
 	int answer = mb.exec();
 
 	if( answer == QMessageBox::Yes )
 	{
-		return( eng()->getMainWindow()->saveProject() );
+		return( engine::getMainWindow()->saveProject() );
 	}
 	else if( answer == QMessageBox::No )
 	{
@@ -1415,7 +1415,7 @@ bool songEditor::mayChangeProject( void )
 
 void songEditor::clearProject( void )
 {
-	eng()->getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	if( m_playing )
 	{
@@ -1427,8 +1427,8 @@ void songEditor::clearProject( void )
 
 	// make sure all running notes are cleared, otherwise the whole
 	// thing will end up in a SIGSEGV...
-	eng()->getMixer()->clear( TRUE );
-	while( eng()->getMixer()->haveNoRunningNotes() == FALSE )
+	engine::getMixer()->clear( TRUE );
+	while( engine::getMixer()->haveNoRunningNotes() == FALSE )
 	{
 #ifdef QT4
 		QApplication::processEvents( QEventLoop::AllEvents );
@@ -1439,19 +1439,19 @@ void songEditor::clearProject( void )
 
 	clearAllTracks();
 
-	eng()->getAutomationEditor()->setCurrentPattern( NULL );
+	engine::getAutomationEditor()->setCurrentPattern( NULL );
 	m_bpmSpinBox->getAutomationPattern()->clear();
 	m_masterVolumeSlider->clearAutomationValues();
 	m_masterPitchSlider->clearAutomationValues();
 
-	eng()->getBBEditor()->clearAllTracks();
+	engine::getBBEditor()->clearAllTracks();
 
-	eng()->getProjectNotes()->clear();
+	engine::getProjectNotes()->clear();
 
-	eng()->getProjectJournal()->clearInvalidJournallingObjects();
-	eng()->getProjectJournal()->clearJournal();
+	engine::getProjectJournal()->clearInvalidJournallingObjects();
+	engine::getProjectJournal()->clearJournal();
 
-	eng()->getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -1479,14 +1479,14 @@ void songEditor::createNewProject( void )
 
 	clearProject();
 
-	eng()->getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	track * t;
 	t = track::create( track::INSTRUMENT_TRACK, this );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	track::create( track::SAMPLE_TRACK, this );
-	t = track::create( track::INSTRUMENT_TRACK, eng()->getBBEditor() );
+	t = track::create( track::INSTRUMENT_TRACK, engine::getBBEditor() );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
@@ -1501,9 +1501,9 @@ void songEditor::createNewProject( void )
 
 	m_modified = FALSE;
 
-	eng()->getMainWindow()->resetWindowTitle( "" );
+	engine::getMainWindow()->resetWindowTitle( "" );
 
-	eng()->getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( TRUE );
 
 }
 
@@ -1527,7 +1527,7 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 {
 	clearProject();
 
-	eng()->getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( FALSE );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -1600,21 +1600,21 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 					restoreState( node.toElement() );
 			}
 			else if( node.nodeName() ==
-					eng()->getPianoRoll()->nodeName() )
+					engine::getPianoRoll()->nodeName() )
 			{
-				eng()->getPianoRoll()->restoreState(
+				engine::getPianoRoll()->restoreState(
 							node.toElement() );
 			}
 			else if( node.nodeName() ==
-				eng()->getAutomationEditor()->nodeName() )
+				engine::getAutomationEditor()->nodeName() )
 			{
-				eng()->getAutomationEditor()->restoreState(
+				engine::getAutomationEditor()->restoreState(
 							node.toElement() );
 			}
 			else if( node.nodeName() ==
-					eng()->getProjectNotes()->nodeName() )
+					engine::getProjectNotes()->nodeName() )
 			{
-				( (journallingObject *)( eng()->
+				( (journallingObject *)( engine::
 							getProjectNotes() ) )->
 					restoreState( node.toElement() );
 			}
@@ -1633,9 +1633,9 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 
 	m_loadingProject = FALSE;
 
-	eng()->getMainWindow()->resetWindowTitle( "" );
+	engine::getMainWindow()->resetWindowTitle( "" );
 
-	eng()->getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -1653,9 +1653,9 @@ bool songEditor::saveProject( void )
 
 	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );
 
-	eng()->getPianoRoll()->saveState( mmp, mmp.content() );
-	eng()->getAutomationEditor()->saveState( mmp, mmp.content() );
-	( (journallingObject *)( eng()->getProjectNotes() ) )->saveState( mmp,
+	engine::getPianoRoll()->saveState( mmp, mmp.content() );
+	engine::getAutomationEditor()->saveState( mmp, mmp.content() );
+	( (journallingObject *)( engine::getProjectNotes() ) )->saveState( mmp,
 								mmp.content() );
 	m_playPos[PLAY_SONG].m_timeLine->saveState( mmp, mmp.content() );
 
@@ -1669,7 +1669,7 @@ bool songEditor::saveProject( void )
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
-		eng()->getMainWindow()->resetWindowTitle( "" );
+		engine::getMainWindow()->resetWindowTitle( "" );
 	}
 	else
 	{
@@ -1739,7 +1739,7 @@ void songEditor::exportProject( void )
 	}
  	base_filename += fileEncodeDevices[0].m_extension;
 
-	QFileDialog efd( eng()->getMainWindow() );
+	QFileDialog efd( engine::getMainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
 
 	int idx = 0;
@@ -1777,7 +1777,7 @@ void songEditor::exportProject( void )
 		const QString export_file_name = efd.selectedFile();
 #endif
 		if( QFileInfo( export_file_name ).exists() == TRUE &&
-			QMessageBox::warning( eng()->getMainWindow(),
+			QMessageBox::warning( engine::getMainWindow(),
 						tr( "File already exists" ),
 						tr( "The file \"%1\" already "
 							"exists. Do you want "
@@ -1793,7 +1793,7 @@ void songEditor::exportProject( void )
 			return;
 		}
 		exportProjectDialog epd( export_file_name,
-						eng()->getMainWindow(), eng() );
+						engine::getMainWindow() );
 		epd.exec();
 	}
 }
@@ -1803,7 +1803,7 @@ void songEditor::exportProject( void )
 
 void songEditor::updateFramesPerTact64th( void )
 {
-	eng()->updateFramesPerTact64th();
+	engine::updateFramesPerTact64th();
 }
 
 

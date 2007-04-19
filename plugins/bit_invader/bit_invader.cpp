@@ -1,7 +1,7 @@
 /*
  * bit_invader.cpp - instrument which uses a usereditable wavetable
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -189,7 +189,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 
 	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ),
-							eng(), _channel_track );
+							_channel_track );
 	m_sampleLengthKnob->setRange( 8, 128, 1 );
  	m_sampleLengthKnob->setInitValue( 128 );
 	m_sampleLengthKnob->move( 10, 120 );
@@ -201,7 +201,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 	m_interpolationToggle = new ledCheckBox( "Interpolation", this,
 							tr( "Interpolation" ),
-							eng(), _channel_track );
+							_channel_track );
 	m_interpolationToggle->move( 55,80 );
 	
 	 connect( m_interpolationToggle, SIGNAL( toggled( bool ) ),
@@ -209,14 +209,14 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 	m_normalizeToggle = new ledCheckBox( "Normalize", this,
 							tr( "Normalize" ),
-							eng(), _channel_track );
+							_channel_track );
 	m_normalizeToggle->move( 55, 100 );
 	
 	connect( m_normalizeToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( normalizeToggle( bool ) ) );
 
 
-	m_graph = new graph( this, eng() );
+	m_graph = new graph( this );
 	m_graph->move(53,118);	// 55,120 - 2px border
 	m_graph->setCursor( QCursor( Qt::CrossCursor ) );
 
@@ -234,7 +234,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	connect( m_graph, SIGNAL ( sampleChanged( void ) ),
 		this, SLOT ( sampleChanged( void ) ) );
 	
-		sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ), eng(),
+		sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ),
 							_channel_track );
 		sinWaveBtn->move( 188, 120 );
 		sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -246,7 +246,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 						"current oscillator." ) );
 
 		triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ),
-							eng(), _channel_track );
+							_channel_track );
 		triangleWaveBtn->move( 188, 136 );
 		triangleWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "triangle_wave_active" ) );
@@ -256,7 +256,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a triangle-wave "
 						"for current oscillator." ) );
 
-		sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ), eng(),
+		sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ),
 							_channel_track );
 		sawWaveBtn->move( 188, 152 );
 		sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -267,7 +267,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 				tr( "Click here if you want a saw-wave for "
 						"current oscillator." ) );
 
-		sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ), eng(),
+		sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ),
 							_channel_track );
 		sqrWaveBtn->move( 188, 168 );
 		sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -280,7 +280,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 
 		whiteNoiseWaveBtn = new pixmapButton( this,
 						tr( "White noise wave" ),
-						eng(), _channel_track );
+							_channel_track );
 		whiteNoiseWaveBtn->move( 188, 184 );
 		whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
@@ -291,7 +291,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 						"current oscillator." ) );
 
 		usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ),
-							eng(), _channel_track );
+							_channel_track );
 		usrWaveBtn->move( 188, 200 );
 		usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -317,7 +317,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 		
 
 
-		smoothBtn = new pixmapButton( this, tr( "Smooth" ), eng(),
+		smoothBtn = new pixmapButton( this, tr( "Smooth" ),
 							_channel_track );
 		smoothBtn->move( 55, 225 );
 		smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -447,7 +447,7 @@ void bitInvader::usrWaveClicked( void )
 	}
 
 	// load user shape
-	sampleBuffer buffer( eng() );
+	sampleBuffer buffer;
 	QString af = buffer.openAudioFile();
 	if ( af != "" )
 	{
@@ -635,14 +635,14 @@ void bitInvader::interpolationToggle( bool value )
 {
       	interpolation = value;
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
         
 void bitInvader::normalizeToggle( bool value )
 {
        	normalize = value;
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 
 }
 
@@ -674,7 +674,7 @@ void bitInvader::smoothClicked( void )
 	update();
 	m_graph->update();
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 
 }
 
@@ -697,10 +697,10 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 		
 		_n->m_pluginData = new bSynth( sample_shape, sample_length,freq
 					, interpolation, factor,
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 	}
 
-	const fpab_t frames = eng()->getMixer()->framesPerAudioBuffer();
+	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
@@ -772,7 +772,7 @@ void bitInvader::sampleSizeChanged( float _new_sample_length )
        	m_graph->setSamplePointer( sample_shape, sample_length );
 
 	// set Song modified
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 
 }                                                
                                                
@@ -793,7 +793,7 @@ void bitInvader::sampleChanged()
              m_graph->update();
 	}
 
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
                                 
 }
 

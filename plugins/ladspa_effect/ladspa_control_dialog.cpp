@@ -2,7 +2,7 @@
  * ladspa_control_dialog.cpp - dialog for displaying and editing control port
  *                             values for LADSPA plugins
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -110,9 +110,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 					last_port == TOGGLED ) )
 				{
 					(*it)->control = 
-						new ladspaControl( 
-							grouper, (*it), 
-							eng(), m_track,
+						new ladspaControl( grouper, *it,
+							m_track,
 							linked_control );
 				}
 				else
@@ -123,9 +122,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 						new QWidget( grouper ) );
 						row_cnt++;
 					}
-					(*it)->control = new ladspaControl( 
+					(*it)->control = new ladspaControl(
 								grouper, (*it),
-								eng(), 
 								m_track,
 							linked_control );
 					row_cnt = 0;
@@ -163,8 +161,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 		QHBoxLayout * center = new QHBoxLayout();
 		m_mainLay->addLayout( center );
 #endif
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), 
-					this, "", eng(), m_track );
+		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this, "",
+								m_track );
 		connect( m_stereoLink, SIGNAL( toggled( bool ) ), 
 					this, SLOT( link( bool ) ) );
 		m_stereoLink->setChecked( TRUE );

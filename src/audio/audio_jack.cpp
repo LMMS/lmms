@@ -3,7 +3,7 @@
 /*
  * audio_jack.cpp - support for JACK-transport
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -65,8 +65,9 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_client( NULL ),
-	m_stopped( FALSE ),
-	m_processCallbackMutex(),
+	m_active( FALSE ),
+//	m_processCallbackMutex(),
+	m_stop_semaphore( 1 ),
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
 				getMixer()->framesPerAudioBuffer() ) ),
 	m_framesDoneInCurBuf( 0 ),
@@ -94,7 +95,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 								server_name );
 	if( m_client == NULL )
 	{
-		printf( "jack_client_open() failed with status %d\n", status );
+		printf( "jack_client_open() failed, status 0x%2.0x\n", status );
 		if( status & JackServerFailed )
 		{
 			printf( "Could not connect to JACK server.\n" );
@@ -165,12 +166,56 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 		}
 	}
 
+	m_stop_semaphore += m_stop_semaphore.total();
+
+
+	_success_ful = TRUE;
+}
+
+
+
+
+audioJACK::~audioJACK()
+{
+	m_stop_semaphore -= m_stop_semaphore.total();
+
+	while( m_portMap.size() )
+	{
+		unregisterPort( m_portMap.begin().key() );
+	}
+
+	if( m_client != NULL )
+	{
+		if( m_active )
+		{
+			jack_deactivate( m_client );
+		}
+		jack_client_close( m_client );
+	}
+
+	bufferAllocator::free( m_outBuf );
+
+}
+
+
+
+
+void audioJACK::startProcessing( void )
+{
+	m_stopped = FALSE;
+
+	if( m_active )
+	{
+		return;
+	}
 
 	if( jack_activate( m_client ) )
 	{
 		printf( "cannot activate client\n" );
 		return;
 	}
+
+	m_active = TRUE;
 
 
 	// make sure, JACK transport is rolling
@@ -209,37 +254,6 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 	}
 
 	free( ports );
-
-
-	_success_ful = TRUE;
-}
-
-
-
-
-audioJACK::~audioJACK()
-{
-	while( m_portMap.size() )
-	{
-		unregisterPort( m_portMap.begin().key() );
-	}
-
-	if( m_client != NULL )
-	{
-		jack_deactivate( m_client );
-		jack_client_close( m_client );
-	}
-
-	bufferAllocator::free( m_outBuf );
-
-}
-
-
-
-
-void audioJACK::startProcessing( void )
-{
-	m_stopped = FALSE;
 }
 
 
@@ -247,7 +261,7 @@ void audioJACK::startProcessing( void )
 
 void audioJACK::stopProcessing( void )
 {
-	m_stopped = TRUE;
+	m_stop_semaphore++;
 }
 
 
@@ -329,7 +343,7 @@ void audioJACK::renamePort( audioPort * _port )
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
 	audioJACK * _this = static_cast<audioJACK *>( _udata );
-	_this->m_processCallbackMutex.lock();
+//	_this->m_processCallbackMutex.lock();
 
 /*	printf( "%f\n", jack_cpu_load( _this->m_client ) );*/
 
@@ -397,6 +411,11 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		{
 			_this->m_framesToDoInCurBuf = _this->getNextBuffer(
 							_this->m_outBuf );
+			if( !_this->m_framesToDoInCurBuf )
+			{
+				_this->m_stopped = TRUE;
+				_this->m_stop_semaphore--;
+			}
 			_this->m_framesDoneInCurBuf = 0;
 		}
 	}
@@ -405,12 +424,12 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	{
 		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
 		{
-			jack_default_audio_sample_t * b = outbufs[ch];
-			memset( b, 0, sizeof( *b ) * _nframes );
+			jack_default_audio_sample_t * b = outbufs[ch] + done;
+			memset( b, 0, sizeof( *b ) * ( _nframes - done ) );
 		}
 	}
 
-	_this->m_processCallbackMutex.unlock();
+//	_this->m_processCallbackMutex.unlock();
 
 	return( 0 );
 }
@@ -451,7 +470,7 @@ audioJACK::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
 	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-						this, NULL, NULL, NULL );
+							this, NULL, NULL );
 	m_channels->setStep( 2 );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->setValue( configManager::inst()->value( "audiojack",

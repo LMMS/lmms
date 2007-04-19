@@ -83,7 +83,6 @@ private:
 	int m_audioFD;
 
 	bool m_convertEndian;
-	volatile bool m_quit;
 
 } ;
 

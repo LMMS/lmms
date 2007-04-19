@@ -2,7 +2,7 @@
  * song_editor.h - declaration of class songEditor, a window where you can
  *                 setup your songs
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -230,7 +230,7 @@ protected slots:
 
 
 private:
-	songEditor( engine * _engine );
+	songEditor( void );
 	songEditor( const songEditor & );
 	virtual ~songEditor();
 

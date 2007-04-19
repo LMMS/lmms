@@ -43,8 +43,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						const note & _n,
 						const bool _arp_note ) :
 	playHandle( NotePlayHandle ),
-	note( NULL, _n.length(), _n.pos(), _n.tone(), _n.octave(),
-					_n.getVolume(), _n.getPanning() ),
+	note( _n.length(), _n.pos(), _n.tone(), _n.octave(),
+			_n.getVolume(), _n.getPanning(), _n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_instrumentTrack( _it ),
@@ -62,9 +62,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 #if SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
-	m_orig_bpm( _it->eng()->getSongEditor()->getTempo() )
+	m_orig_bpm( engine::getSongEditor()->getTempo() )
 {
-	setDetuning( _n.detuning() );
 	if( detuning() )
 	{
 		processMidiTime( pos() );
@@ -90,8 +89,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 				(Uint16) ( ( getVolume() / 100.0f ) *
 				( m_instrumentTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
-			midiTime::fromFrames( m_framesAhead, m_instrumentTrack
-					->eng()->framesPerTact64th() ) );
+			midiTime::fromFrames( m_framesAhead,
+						engine::framesPerTact64th() ) );
 }
 
 
@@ -137,9 +136,8 @@ void notePlayHandle::play( bool _try_parallelizing )
 	}
 
 	if( m_released == FALSE &&
-		m_totalFramesPlayed +
-		m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer() >=
-								m_frames )
+		m_totalFramesPlayed + engine::getMixer()->framesPerAudioBuffer()
+								>= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
 	} 
@@ -149,8 +147,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 
 	if( m_released == TRUE )
 	{
-		f_cnt_t todo =
-	m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer();
+		f_cnt_t todo = engine::getMixer()->framesPerAudioBuffer();
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow notePlayHandle::done() to be true
@@ -159,7 +156,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 		if( arpBaseNote() == TRUE )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 *
-		m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerAudioBuffer();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -167,7 +164,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
 			if( m_framesBeforeRelease <=
-		m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer() )
+				engine::getMixer()->framesPerAudioBuffer() )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -180,7 +177,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 				// release-phase yet)
 				todo = 0;
 				m_framesBeforeRelease -=
-		m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerAudioBuffer();
 			}
 		}
 		// look whether we're in release-phase
@@ -228,8 +225,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 	}
 
 	// update internal data
-	m_totalFramesPlayed +=
-		m_instrumentTrack->eng()->getMixer()->framesPerAudioBuffer();
+	m_totalFramesPlayed += engine::getMixer()->framesPerAudioBuffer();
 }
 
 
@@ -290,8 +286,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 				m_instrumentTrack->m_midiPort->outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
-					m_instrumentTrack->eng()
-						->framesPerTact64th() ) );
+						engine::framesPerTact64th() ) );
 	}
 	else
 	{
@@ -354,8 +349,7 @@ void notePlayHandle::mute( void )
 
 int notePlayHandle::index( void ) const
 {
-	const playHandleVector & phv =
-			m_instrumentTrack->eng()->getMixer()->playHandles();
+	const playHandleVector & phv = engine::getMixer()->playHandles();
 	int idx = 0;
 	for( constPlayHandleVector::const_iterator it = phv.begin();
 							it != phv.end(); ++it )
@@ -383,7 +377,7 @@ int notePlayHandle::index( void ) const
 constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
 				const instrumentTrack * _it, bool _all_ph )
 {
-	const playHandleVector & phv = _it->eng()->getMixer()->playHandles();
+	const playHandleVector & phv = engine::getMixer()->playHandles();
 	constNotePlayHandleVector cnphv;
 
 	for( constPlayHandleVector::const_iterator it = phv.begin();

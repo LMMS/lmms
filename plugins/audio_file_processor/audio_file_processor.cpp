@@ -92,7 +92,6 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
-	m_sampleBuffer( eng(), "" ),
 	m_drawMethod( sampleBuffer::LINE_CONNECT )
 {
 	connect( &m_sampleBuffer, SIGNAL( sampleUpdated() ), this,
@@ -105,7 +104,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	}
 
 
-	m_openAudioFileButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_openAudioFileButton = new pixmapButton( this, NULL, NULL );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 200, 90 );
 	m_openAudioFileButton->setActiveGraphic( embed::getIconPixmap(
@@ -130,7 +129,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
 	
-	m_reverseButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_reverseButton = new pixmapButton( this, NULL, NULL );
 	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 160, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -150,7 +149,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this, NULL, eng(), NULL );
+	m_loopButton = new pixmapButton( this, tr( "Loop" ), _channel_track );
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 180, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -171,8 +170,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), eng(),
-									NULL );
+	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), NULL );
 	m_ampKnob->setRange( 0, 500, 1.0f );
 	m_ampKnob->move( 6, 114 );
 	m_ampKnob->setInitValue( 100.0f );
@@ -191,7 +189,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
-							eng(), _channel_track );
+							_channel_track );
 	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_startKnob->move( 46, 114 );
 	m_startKnob->setInitValue( 0.0f );
@@ -210,7 +208,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"which AudioFileProcessor returns if a note is longer "
 			"than the sample between start- and end-point." ) );
 
-	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ), eng(),
+	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ),
 							_channel_track );
 	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
 	m_endKnob->move( 84, 114 );
@@ -230,7 +228,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between start- and end-point." ) );
 
-	m_viewLinesPB = new pixmapButton( this, NULL, eng(), NULL );
+	m_viewLinesPB = new pixmapButton( this, NULL, NULL );
 	m_viewLinesPB->move( 154, 158 );
 	m_viewLinesPB->setBgGraphic( getBackground( m_viewLinesPB ) );
 	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
@@ -249,7 +247,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"sound itself. It just gives you another view to your "
 			"sample." ) );
 
-	m_viewDotsPB = new pixmapButton( this, NULL, eng(), NULL );
+	m_viewDotsPB = new pixmapButton( this, NULL, NULL );
 	m_viewDotsPB->move( 204, 158 );
 	m_viewDotsPB->setBgGraphic( getBackground( m_viewDotsPB ) );
 	if( m_drawMethod == sampleBuffer::DOTS )
@@ -268,7 +266,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"It just gives you another view to your sample." ) );
 	
 	automatableButtonGroup * view_group = new automatableButtonGroup( this,
-							NULL, eng(), NULL );
+								NULL, NULL );
 	view_group->addButton( m_viewLinesPB );
 	view_group->addButton( m_viewDotsPB );
 
@@ -360,7 +358,7 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 	const float freq_factor = BASE_FREQ /
 				( getInstrumentTrack()->frequency( _n ) *
 						DEFAULT_SAMPLE_RATE /
-					eng()->getMixer()->sampleRate() );
+					engine::getMixer()->sampleRate() );
 
 	return( static_cast<Uint32>( floorf( ( m_sampleBuffer.endFrame() -
 						m_sampleBuffer.startFrame() ) *
@@ -394,13 +392,11 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 
 void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 {
-	const Uint32 frames = eng()->getMixer()->framesPerAudioBuffer();
+	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
 
 	// calculate frequency of note
-	const float note_freq = getInstrumentTrack()->frequency( _n ) /
-					( eng()->getMixer()->sampleRate() /
-							DEFAULT_SAMPLE_RATE );
+	const float note_freq = getInstrumentTrack()->frequency( _n );
 
 	if( !_n->m_pluginData )
 	{
@@ -430,9 +426,10 @@ void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 {
 #ifdef QT4
-	if( _dee->mimeData()->hasFormat( "lmms/stringpair" ) )
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
-		QString txt = _dee->mimeData()->data( "lmms/stringpair" );
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
 							track::SAMPLE_TRACK ) )
 		{
@@ -452,7 +449,7 @@ void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 		_dee->ignore();
 	}
 #else
-	QString txt = _dee->encodedData( "lmms/stringpair" );
+	QString txt = _dee->encodedData( stringPairDrag::mimeType() );
 	if( txt != "" )
 	{
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
@@ -620,7 +617,7 @@ void audioFileProcessor::sampleUpdated( void )
 void audioFileProcessor::reverseBtnToggled( bool _on )
 {
 	m_sampleBuffer.setReversed( _on );
-	eng()->getSongEditor()->setModified();
+	engine::getSongEditor()->setModified();
 }
 
 
@@ -727,7 +724,7 @@ void audioFileProcessor::openAudioFile( void )
 	if( af != "" )
 	{
 		setAudioFile( af );
-		eng()->getSongEditor()->setModified();
+		engine::getSongEditor()->setModified();
 	}
 }
 

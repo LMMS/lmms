@@ -4,7 +4,7 @@
  * effect_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                         effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -68,7 +68,6 @@ rackPlugin::rackPlugin( QWidget * _parent,
 			track * _track, 
 			audioPort * _port ) :
 	QWidget( _parent ),
-	journallingObject( _track->eng() ),
 	m_effect( _eff ),
 	m_track( _track ),
 	m_port( _port ),
@@ -90,7 +89,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 #endif
 	
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), 
-							eng(), m_track );
+								m_track );
 	connect( m_bypass, SIGNAL( toggled( bool ) ), 
 				this, SLOT( bypassed( bool ) ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
@@ -104,8 +103,8 @@ rackPlugin::rackPlugin( QWidget * _parent,
 					tr( 
 "Toggles the effect on or off." ) );
 	
-	m_wetDry = new knob( knobBright_26, this, 
-					tr( "Wet/Dry mix" ), eng(), m_track );
+	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ),
+								m_track );
 	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
 				this, SLOT( setWetDry( float ) ) );
 	m_wetDry->setLabel( tr( "W/D" ) );
@@ -123,7 +122,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "shows up in the output." ) );
 
 	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ),
-							eng(), m_track );
+								m_track );
 	connect( m_autoQuit, SIGNAL( valueChanged( float ) ), 
 				this, SLOT( setAutoQuit( float ) ) );
 	m_autoQuit->setLabel( tr( "Decay" ) );
@@ -141,7 +140,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
 "run the risk of clipping the tail on delay effects." ) );
 
-	m_gate = new knob( knobBright_26, this, tr( "Gate" ), eng(), m_track );
+	m_gate = new knob( knobBright_26, this, tr( "Gate" ), m_track );
 	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
 				this, SLOT( setGate( float ) ) );
 	m_gate->setLabel( tr( "Gate" ) );
@@ -183,10 +182,10 @@ rackPlugin::rackPlugin( QWidget * _parent,
 #endif
 	
 	m_controlView = m_effect->createControlDialog( m_track );
-/*				eng()->getMainWindow()->workspace(),
+/*				engine::getMainWindow()->workspace(),
 				new ControlDialog( 
-				eng()->getMainWindow()->workspace(), 
-				m_effect, eng(), m_track );*/
+				engine::getMainWindow()->workspace(),
+				m_effect, m_track );*/
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
 	m_controlView->hide();
@@ -276,9 +275,9 @@ void rackPlugin::setWetDry( float _value )
 
 void rackPlugin::setAutoQuit( float _value )
 {
-	float samples = eng()->getMixer()->sampleRate() * _value / 1000.0f;
+	float samples = engine::getMixer()->sampleRate() * _value / 1000.0f;
 	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / 
-			eng()->getMixer()->framesPerAudioBuffer() );
+			engine::getMixer()->framesPerAudioBuffer() );
 	m_effect->setTimeout( buffers );
 }
 

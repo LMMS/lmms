@@ -1,8 +1,8 @@
 /*
  * ladspa_base.h - basic declarations concerning LADSPA
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -70,10 +70,10 @@ typedef struct portDescription
 
 
 inline ladspa_key_t subPluginKeyToLadspaKey(
-		const plugin::descriptor::subPluginFeatures::key & _key )
+		const plugin::descriptor::subPluginFeatures::key * _key )
 {
-	return( ladspa_key_t( _key.user.toStringList().first(),
-				_key.user.toStringList().last() ) );
+	return( ladspa_key_t( _key->user.toStringList().first(),
+				_key->user.toStringList().last() ) );
 }
 
 inline plugin::descriptor::subPluginFeatures::key ladspaKeyToSubPluginKey(

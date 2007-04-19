@@ -1,7 +1,7 @@
 /*
  * lvsl_client.h - client for LVSL Server
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -54,7 +54,7 @@ class remoteVSTPlugin : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
-	remoteVSTPlugin( const QString & _plugin, engine * _engine );
+	remoteVSTPlugin( const QString & _plugin );
 	virtual ~remoteVSTPlugin();
 
 	void showEditor( void );

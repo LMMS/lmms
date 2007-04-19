@@ -37,11 +37,10 @@ public:
 	vstSubPluginFeatures( plugin::pluginTypes _type );
 
 	virtual void fillDescriptionWidget( QWidget * _parent,
-							engine * _eng,
-							const key & _key );
+							const key * _key );
 
-	virtual void listSubPluginKeys( engine * _eng,
-				plugin::descriptor * _desc, keyList & _kl );
+	virtual void listSubPluginKeys( plugin::descriptor * _desc,
+								keyList & _kl );
 
 } ;
 
