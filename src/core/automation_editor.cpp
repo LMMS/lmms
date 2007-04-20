@@ -76,6 +76,7 @@
 #include "combobox.h"
 #include "bb_editor.h"
 #include "piano_roll.h"
+#include "debug.h"
 
 
 

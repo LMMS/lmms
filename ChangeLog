@@ -1,3 +1,11 @@
+2007-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/midi_import/midi_import.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	added inclusion of debug.h which includes assert.h for not failing to
+	compile on several platforms
+
 2007-04-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* executable files:

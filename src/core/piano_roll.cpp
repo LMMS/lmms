@@ -77,6 +77,7 @@
 #include "text_float.h"
 #include "combobox.h"
 #include "piano_widget.h"
+#include "debug.h"
 
 
 typedef automationPattern::timeMap timeMap;

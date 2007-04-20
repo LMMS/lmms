@@ -27,6 +27,7 @@
 #include "track_container.h"
 #include "instrument_track.h"
 #include "pattern.h"
+#include "debug.h"
 
 
 #ifdef QT4
