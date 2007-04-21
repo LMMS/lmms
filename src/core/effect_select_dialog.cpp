@@ -29,8 +29,10 @@
 
 #ifdef QT4
 
+#include <QtGui/QGroupBox>
 #include <QtGui/QLayout>
 #include <QtGui/QPushButton>
+#include <QtGui/QScrollArea>
 
 #else
 
@@ -215,12 +217,28 @@ effectList::effectList( QWidget * _parent ) :
 						tr( "Description" ), this );
 #endif
 	groupbox->setFixedHeight( 200 );
+#ifdef QT3
 	groupbox->setInsideMargin( 2 );
-	QScrollView * scrollView = new QScrollView( groupbox );
-	scrollView->setFrameStyle( 0 );
-	scrollView->setMargin( 10 );
-	m_descriptionWidget = new QVBox( scrollView->viewport() );
-	scrollView->addChild( m_descriptionWidget );
+#endif
+
+	QScrollArea * scrollArea = new QScrollArea( groupbox );
+	scrollArea->setFrameStyle( 0 );
+#ifdef QT3
+	scrollArea->setMargin( 10 );
+#endif
+#ifndef QT3
+	m_descriptionWidget = new QWidget;
+	QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
+	l->setMargin( 0 );
+	l->setSpacing( 0 );
+
+	scrollArea->setWidget( m_descriptionWidget );
+	m_descriptionWidget->show();
+	m_descriptionWidget->setFixedSize( 200, 200 );
+#else
+	m_descriptionWidget = new QVBox( scrollArea->viewport() );
+	scrollArea->addChild( m_descriptionWidget );
+#endif
 
 	QVBoxLayout * vboxl = new QVBoxLayout( this );
 	vboxl->setMargin( 0 );
@@ -247,11 +265,19 @@ effectList::~effectList()
 
 void effectList::onHighlighted( int _pluginIndex )
 {
+#ifndef QT3
+	QLayoutItem * i;
+	while( ( i = m_descriptionWidget->layout() ) != 0 )
+	{
+		delete i;
+	}
+#else
 	QLayoutIterator it = m_descriptionWidget->layout()->iterator();
 	while( it.current() )
 	{
 		it.deleteCurrent();
 	}
+#endif
 	m_descriptionWidget->hide();
 
 	m_currentSelection = m_effectKeys[_pluginIndex];

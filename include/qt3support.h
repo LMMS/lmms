@@ -182,6 +182,10 @@ inline QString baseName( const QString & _file )
 #define transformed xForm
 
 
+// QList
+#define removeAll remove
+
+
 // QGridLayout
 #define setColumnStretch setColStretch
 #define columnCount numCols

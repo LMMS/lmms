@@ -49,29 +49,53 @@ public:
 		m_size( _size )
 	{
 		m_buffer = new T[_size];
+#ifndef QT3
+		m_reader_sem.acquire( _size );
+#else
 		m_reader_sem += _size;
+#endif
 	}
 
 	~fifoBuffer()
 	{
 		delete[] m_buffer;
+#ifndef QT3
+		m_reader_sem.release( m_size );
+#else
 		m_reader_sem -= m_size;
+#endif
 	}
 
 	void write( T _element )
 	{
+#ifndef QT3
+		m_writer_sem.acquire();
+#else
 		m_writer_sem++;
+#endif
 		m_buffer[m_writer_index++] = _element;
 		m_writer_index %= m_size;
+#ifndef QT3
+		m_reader_sem.release();
+#else
 		m_reader_sem--;
+#endif
 	}
 
 	T read( void )
 	{
+#ifndef QT3
+		m_reader_sem.acquire();
+#else
 		m_reader_sem++;
+#endif
 		T element = m_buffer[m_reader_index++];
 		m_reader_index %= m_size;
+#ifndef QT3
+		m_writer_sem.release();
+#else
 		m_writer_sem--;
+#endif
 		return( element );
 	}
 

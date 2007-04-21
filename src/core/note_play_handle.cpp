@@ -107,7 +107,7 @@ notePlayHandle::~notePlayHandle()
 	{
 		if( detuning() )
 		{
-			m_instrumentTrack->m_processHandles.remove( this );
+			m_instrumentTrack->m_processHandles.removeAll( this );
 		}
 		if( m_pluginData != NULL )
 		{

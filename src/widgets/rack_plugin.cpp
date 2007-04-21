@@ -182,10 +182,9 @@ rackPlugin::rackPlugin( QWidget * _parent,
 #endif
 	
 	m_controlView = m_effect->createControlDialog( m_track );
-/*				engine::getMainWindow()->workspace(),
-				new ControlDialog( 
-				engine::getMainWindow()->workspace(),
-				m_effect, m_track );*/
+#ifndef QT3
+	engine::getMainWindow()->workspace()->addWindow( m_controlView );
+#endif
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
 	m_controlView->hide();

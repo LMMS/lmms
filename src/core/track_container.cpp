@@ -345,7 +345,12 @@ void trackContainer::clearAllTracks( void )
 
 const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
 {
-	const int abs_y = _y + m_scrollArea->contentsY();
+	const int abs_y = _y +
+#ifndef QT3
+				m_scrollArea->viewport()->y();
+#else
+				m_scrollArea->contentsY();
+#endif
 	int y_cnt = 0;
 	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )

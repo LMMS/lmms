@@ -577,7 +577,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 void polyb302Synth::deleteNotePluginData( notePlayHandle * _n )
 {
 	handleState * hstate = (handleState *)_n->m_pluginData;
-	m_handleStates.remove( hstate );
+	m_handleStates.removeAll( hstate );
 	delete hstate;
 }
 

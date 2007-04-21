@@ -23,7 +23,13 @@
  */
 
 
-#ifdef QT3
+#include "qt3support.h"
+
+#ifndef QT3
+
+#include <QtGui/QKeyEvent>
+
+#else
 
 #include <qwhatsthis.h>
 
@@ -71,8 +77,15 @@ plugin::descriptor live_tool_plugin_descriptor =
 liveTool::liveTool( mainWindow * _window ) :
 	tool( _window, &live_tool_plugin_descriptor )
 {
-	QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
+	const QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
+#ifndef QT3
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), background );
+	setPalette( pal );
+#else
 	setPaletteBackgroundPixmap( background );
+#endif
 	setFixedSize( background.size() );
 
 #ifdef QT4
@@ -161,12 +174,20 @@ bool liveTool::x11Event( XEvent * _xe )
 
 void liveTool::toggleInstrument( int _n )
 {
+#ifndef QT3
+	if( _n > 0 && _n < engine::getBBEditor()->tracks().count() )
+	{
+		track * t = engine::getBBEditor()->tracks().at( _n );
+		t->setMuted( !t->muted() );
+	}
+#else
 	bool track_exists;
 	track * t = engine::getBBEditor()->tracks().at( _n, &track_exists );
 	if( track_exists )
 	{
 		t->setMuted( !t->muted() );
 	}
+#endif
 }
 
 

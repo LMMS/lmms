@@ -29,7 +29,6 @@
 #include "tooltip.h"
 
 
-
 const QColor toolButton::s_stdColor = QColor( 216, 216, 216 );
 const QColor toolButton::s_hlColor = QColor( 240, 240, 240 );
 
@@ -44,6 +43,11 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 {
 #ifndef QT3
 	setAutoFillBackground( TRUE );
+	QPalette pal = palette();
+	pal.setColor( backgroundRole(), m_colorStandard );
+	pal.setColor( QPalette::Window, m_colorStandard );
+	pal.setColor( QPalette::Button, m_colorStandard );
+	setPalette( pal );
 #endif
 	if( _receiver != NULL && _slot != NULL )
 	{
@@ -70,8 +74,10 @@ toolButton::~toolButton()
 void toolButton::enterEvent( QEvent * )
 {
 #ifdef QT4
-	QPalette pal;
+	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorHighlighted );
+	pal.setColor( QPalette::Window, m_colorHighlighted );
+	pal.setColor( QPalette::Button, m_colorHighlighted );
 	setPalette( pal );
 #else
 	setPaletteBackgroundColor( m_colorHighlighted );
@@ -84,8 +90,10 @@ void toolButton::enterEvent( QEvent * )
 void toolButton::leaveEvent( QEvent * )
 {
 #ifdef QT4
-	QPalette pal;
+	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorStandard );
+	pal.setColor( QPalette::Window, m_colorStandard );
+	pal.setColor( QPalette::Button, m_colorStandard );
 	setPalette( pal );
 #else
 	setPaletteBackgroundColor( m_colorStandard );

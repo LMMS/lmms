@@ -132,11 +132,7 @@ public:
 	}
 	void enableAutomation( track * _track )
 	{
-#ifndef QT3
 		m_disabled_tracks.removeAll( _track );
-#else
-		m_disabled_tracks.remove( _track );
-#endif
 	}
 
 

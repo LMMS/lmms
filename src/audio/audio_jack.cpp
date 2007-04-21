@@ -58,6 +58,8 @@
 
 
 
+static const int total = 1;
+
 audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
 	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
@@ -67,7 +69,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_client( NULL ),
 	m_active( FALSE ),
 //	m_processCallbackMutex(),
-	m_stop_semaphore( 1 ),
+	m_stop_semaphore( total ),
 	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
 				getMixer()->framesPerAudioBuffer() ) ),
 	m_framesDoneInCurBuf( 0 ),
@@ -166,7 +168,11 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 		}
 	}
 
-	m_stop_semaphore += m_stop_semaphore.total();
+#ifndef QT3
+	m_stop_semaphore.acquire( total );
+#else
+	m_stop_semaphore += total;
+#endif
 
 
 	_success_ful = TRUE;
@@ -177,7 +183,11 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 
 audioJACK::~audioJACK()
 {
-	m_stop_semaphore -= m_stop_semaphore.total();
+#ifndef QT3
+	m_stop_semaphore.release( total );
+#else
+	m_stop_semaphore -= total;
+#endif
 
 	while( m_portMap.size() )
 	{
@@ -261,7 +271,11 @@ void audioJACK::startProcessing( void )
 
 void audioJACK::stopProcessing( void )
 {
+#ifndef QT3
+	m_stop_semaphore.acquire();
+#else
 	m_stop_semaphore++;
+#endif
 }
 
 
@@ -414,7 +428,11 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 			if( !_this->m_framesToDoInCurBuf )
 			{
 				_this->m_stopped = TRUE;
+#ifndef QT3
+				_this->m_stop_semaphore.release();
+#else
 				_this->m_stop_semaphore--;
+#endif
 			}
 			_this->m_framesDoneInCurBuf = 0;
 		}

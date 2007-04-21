@@ -28,6 +28,9 @@
 #include "tool.h"
 #include "main_window.h"
 
+#ifndef QT3
+#include <QtGui/QIcon>
+#endif
 
 
 

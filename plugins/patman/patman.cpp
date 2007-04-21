@@ -23,9 +23,12 @@
  */
 
 
+#include "qt3support.h"
+
 #ifdef QT4
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QDragEnterEvent>
 
 #else
 
@@ -83,8 +86,15 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 	instrument( _track, &patman_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
 {
+#ifndef QT3
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
+#else
 	setPaletteBackgroundPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-
+#endif
 	m_openFileButton = new pixmapButton( this, NULL, NULL );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 200, 90 );
@@ -448,7 +458,11 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 {
 	unload_current_patch();
 
-	FILE * fd = fopen( _filename, "rb" );
+	FILE * fd = fopen( _filename
+#ifndef QT3
+				.toAscii().constData()
+#endif
+							, "rb" );
 	if( !fd )
 	{
 		perror( "fopen" );

@@ -1,5 +1,31 @@
 2007-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/singerbot/singerbot.h:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* include/fifo_buffer.h:
+	* include/bb_track.h:
+	* include/audio_device.h:
+	* include/midi_client.h:
+	* include/qt3support.h:
+	* src/audio/audio_sdl.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/tool.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/track.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/main_window.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/tool_button.cpp:
+	* src/widgets/rack_view.cpp:
+	* src/widgets/effect_label.cpp:
+	fixes for Qt4-version
+
 	* plugins/midi_import/midi_import.cpp:
 	* src/core/automation_editor.cpp:
 	* src/core/piano_roll.cpp:

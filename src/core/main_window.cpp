@@ -532,7 +532,11 @@ void mainWindow::finalize( void )
 								this ) );
 		}
 	}
+#ifndef QT3
+	if( !m_tools_menu->isEmpty() )
+#else
 	if( m_tools_menu->count() )
+#endif
 	{
 #ifdef QT4
 		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
@@ -1093,9 +1097,13 @@ void mainWindow::fillTemplatesMenu( void )
 
 void mainWindow::showTool( int _idx )
 {
+#ifndef QT3
+	#warning TODO: Qt4-implementation
+#else
 	tool * t = m_tools[m_tools_menu->indexOf( _idx )];
 	t->show();
 	t->setFocus();
+#endif
 }
 
 

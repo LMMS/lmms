@@ -1891,11 +1891,7 @@ void track::addAutomationPattern( automationPattern * _pattern )
 
 void track::removeAutomationPattern( automationPattern * _pattern )
 {
-#ifndef QT3
 	m_automation_patterns.removeAll( _pattern );
-#else
-	m_automation_patterns.remove( _pattern );
-#endif
 }
 
 

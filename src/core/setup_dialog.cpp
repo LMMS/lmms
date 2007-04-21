@@ -556,7 +556,11 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
-		m_audioIfaceNames[tr( it.key() )] = it.key();
+		m_audioIfaceNames[tr( it.key()
+#ifndef QT3
+						.toAscii()
+#endif
+								)] = it.key();
 	}
 	for( trMap::iterator it = m_audioIfaceNames.begin();
 				it != m_audioIfaceNames.end(); ++it )
@@ -572,7 +576,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	}
 #ifdef QT4
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-				tr( engine::getMixer()->audioDevName() ) ) );
+			tr( engine::getMixer()->audioDevName().toAscii() ) ) );
 #else
 	m_audioInterfaces->setCurrentText(
 				tr( engine::getMixer()->audioDevName() ) );
@@ -642,7 +646,11 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
-		m_midiIfaceNames[tr( it.key() )] = it.key();
+		m_midiIfaceNames[tr( it.key()
+#ifndef QT3
+						.toAscii()
+#endif
+								)] = it.key();
 	}
 	for( trMap::iterator it = m_midiIfaceNames.begin();
 				it != m_midiIfaceNames.end(); ++it )
@@ -659,7 +667,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 #ifdef QT4
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-				tr( engine::getMixer()->midiClientName() ) ) );
+		tr( engine::getMixer()->midiClientName().toAscii() ) ) );
 #else
 	m_midiInterfaces->setCurrentText(
 				tr( engine::getMixer()->midiClientName() ) );

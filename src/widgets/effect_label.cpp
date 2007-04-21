@@ -59,6 +59,9 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 	m_effWidget = new effectTabWidget( engine::getMainWindow()->workspace(),
 						m_track, 
 						m_track->getAudioPort() );
+#ifndef QT3
+	engine::getMainWindow()->workspace()->addWindow( m_effWidget );
+#endif
 	m_effWidget->setFixedSize( 240, 242 );
 	m_effWidget->hide();
 	connect( m_effWidget, SIGNAL( closed() ), 

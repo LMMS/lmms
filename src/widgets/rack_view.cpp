@@ -25,9 +25,11 @@
  */
 
 
+#include "qt3support.h"
+
 #ifdef QT4
 
-#include <QtGui/QMessageBox>
+#include <QtGui/QApplication>
 
 #else
 
@@ -48,10 +50,12 @@ rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
 	
 	m_mainLayout = new QVBoxLayout( this );
 	m_mainLayout->setMargin( 0 );
+	m_mainLayout->setSpacing( 0 );
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setFixedSize( 230, 184 );
 #ifdef QT4
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 #else
 	m_scrollArea->setVScrollBarMode( QScrollArea::AlwaysOn );
 #endif
@@ -74,10 +78,9 @@ void rackView::addEffect( effect * _e )
 #ifdef QT4
 	if( !m_scrollArea->widget() )
 	{
-		QWidget * w = new QWidget( m_scrollArea->viewport() );
-		QVBoxLayout * vb = new QVBoxLayout( w );
-		w->show();
+		QWidget * w = new QWidget;
 		m_scrollArea->setWidget( w );
+		w->show();
 	}
 	QWidget * w = m_scrollArea->widget();
 #else

@@ -50,6 +50,7 @@
 #include "templates.h"
 
 
+static const int total = 1;
 
 audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
@@ -58,7 +59,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 				getMixer()->framesPerAudioBuffer() ) ),
 	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE ),
-	m_stop_semaphore( 1 )
+	m_stop_semaphore( total )
 {
 	_success_ful = FALSE;
 
@@ -107,7 +108,11 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	}
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
-	m_stop_semaphore += m_stop_semaphore.total();
+#ifndef QT3
+	m_stop_semaphore.acquire( total );
+#else
+	m_stop_semaphore += total;
+#endif
 
 	_success_ful = TRUE;
 }
@@ -118,7 +123,11 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 audioSDL::~audioSDL()
 {
 	stopProcessing();
-	m_stop_semaphore -= m_stop_semaphore.total();
+#ifndef QT3
+	m_stop_semaphore.release( total );
+#else
+	m_stop_semaphore -= total;
+#endif
 	SDL_CloseAudio();
 	SDL_Quit();
 	bufferAllocator::free( m_convertedBuf );
@@ -143,7 +152,11 @@ void audioSDL::stopProcessing( void )
 {
 	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
 	{
+#ifndef QT3
+		m_stop_semaphore.acquire();
+#else
 		m_stop_semaphore++;
+#endif
 
 		SDL_LockAudio();
 		SDL_PauseAudio( 1 );
@@ -184,7 +197,11 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 			if( !frames )
 			{
 				m_stopped = TRUE;
+#ifndef QT3
+				m_stop_semaphore.release();
+#else
 				m_stop_semaphore--;
+#endif
 				memset( _buf, 0, _len );
 				return;
 			}

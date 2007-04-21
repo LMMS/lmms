@@ -23,6 +23,8 @@
  */
 
 
+#include "qt3support.h"
+
 #ifdef QT4
 
 #include <QtCore/QDir>
@@ -96,7 +98,15 @@ singerBot::singerBot( instrumentTrack * _track ) :
 		s_thread->start();
 	}
 
+#ifndef QT3
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
+#else
 	setPaletteBackgroundPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
+#endif
 
 	QVBoxLayout * vbox = new QVBoxLayout( this );
 	vbox->setMargin( 10 );
@@ -106,7 +116,6 @@ singerBot::singerBot( instrumentTrack * _track ) :
 	m_lyrics = new QTextEdit( this );
 #ifdef QT4
 	m_lyrics->setAutoFillBackground( TRUE );
-	QPalette pal;
 	pal.setColor( m_lyrics->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_lyrics->setPalette( pal );
 #else
@@ -224,8 +233,13 @@ void singerBot::lyricsChanged( void )
 
 void singerBot::updateWords( void )
 {
+#ifndef QT3
+	m_words = m_lyrics->toPlainText().simplified().toLower().
+								split( ' ' );
+#else
 	m_words = QStringList::split( ' ',
 				m_lyrics->text().simplifyWhiteSpace().lower() );
+#endif
 	m_words_dirty = FALSE;
 }
 
@@ -255,7 +269,12 @@ void singerBot::createWave( notePlayHandle * _n )
 				/ 64.0f / engine::getSongEditor()->getTempo() :
 		0;
 	int word_index = _n->patternIndex() % m_words.size();
-	hdata->text = m_words[word_index].ascii();
+	hdata->text = m_words[word_index].
+#ifndef QT3
+						toAscii().constData();
+#else
+						ascii();
+#endif
 
 	s_thread->set_data( hdata );
 	s_thread->unlock_synth();
@@ -338,13 +357,19 @@ sampleBuffer * singerBot::readWave( handle_data * _hdata )
 
 
 
+static const int total = 1;
 
 singerBot::synThread::synThread( void ) :
-	m_handle_semaphore( 1 ),
-	m_synth_semaphore( 1 )
+	m_handle_semaphore( total ),
+	m_synth_semaphore( total )
 {
-	m_handle_semaphore += m_handle_semaphore.total();
-	m_synth_semaphore += m_synth_semaphore.total();
+#ifndef QT3
+	m_handle_semaphore.acquire( total );
+	m_synth_semaphore.acquire( total );
+#else
+	m_handle_semaphore += total;
+	m_synth_semaphore += total;
+#endif
 }
 
 
@@ -352,8 +377,13 @@ singerBot::synThread::synThread( void ) :
 
 singerBot::synThread::~synThread()
 {
-	m_handle_semaphore -= m_handle_semaphore.total();
-	m_synth_semaphore -= m_synth_semaphore.total();
+#ifndef QT3
+	m_handle_semaphore.release( total );
+	m_synth_semaphore.release( total );
+#else
+	m_handle_semaphore -= total;
+	m_synth_semaphore -= total;
+#endif
 }
 
 
@@ -384,9 +414,17 @@ void singerBot::synThread::run( void )
 
 	for( ; ; )
 	{
+#ifndef QT3
+		m_synth_semaphore.acquire();
+#else
 		m_synth_semaphore++;
+#endif
 		text_to_wave();
+#ifndef QT3
+		m_handle_semaphore.release();
+#else
 		m_handle_semaphore--;
+#endif
 	}
 }
 
