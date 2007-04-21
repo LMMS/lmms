@@ -50,7 +50,7 @@
 #include "templates.h"
 
 
-static const int total = 1;
+
 
 audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
@@ -59,7 +59,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 				getMixer()->framesPerAudioBuffer() ) ),
 	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE ),
-	m_stop_semaphore( total )
+	m_stop_semaphore( 1 )
 {
 	_success_ful = FALSE;
 
@@ -109,9 +109,9 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
 #ifndef QT3
-	m_stop_semaphore.acquire( total );
+	m_stop_semaphore.acquire();
 #else
-	m_stop_semaphore += total;
+	m_stop_semaphore++;
 #endif
 
 	_success_ful = TRUE;
@@ -124,9 +124,9 @@ audioSDL::~audioSDL()
 {
 	stopProcessing();
 #ifndef QT3
-	m_stop_semaphore.release( total );
+	m_stop_semaphore.release();
 #else
-	m_stop_semaphore -= total;
+	m_stop_semaphore--;
 #endif
 	SDL_CloseAudio();
 	SDL_Quit();

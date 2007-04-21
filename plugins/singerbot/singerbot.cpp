@@ -357,18 +357,17 @@ sampleBuffer * singerBot::readWave( handle_data * _hdata )
 
 
 
-static const int total = 1;
 
 singerBot::synThread::synThread( void ) :
-	m_handle_semaphore( total ),
-	m_synth_semaphore( total )
+	m_handle_semaphore( 1 ),
+	m_synth_semaphore( 1 )
 {
 #ifndef QT3
-	m_handle_semaphore.acquire( total );
-	m_synth_semaphore.acquire( total );
+	m_handle_semaphore.acquire();
+	m_synth_semaphore.acquire();
 #else
-	m_handle_semaphore += total;
-	m_synth_semaphore += total;
+	m_handle_semaphore++;
+	m_synth_semaphore++;
 #endif
 }
 
@@ -378,11 +377,11 @@ singerBot::synThread::synThread( void ) :
 singerBot::synThread::~synThread()
 {
 #ifndef QT3
-	m_handle_semaphore.release( total );
-	m_synth_semaphore.release( total );
+	m_handle_semaphore.release();
+	m_synth_semaphore.release();
 #else
-	m_handle_semaphore -= total;
-	m_synth_semaphore -= total;
+	m_handle_semaphore--;
+	m_synth_semaphore--;
 #endif
 }
 
