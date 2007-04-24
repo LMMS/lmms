@@ -48,7 +48,6 @@
 #ifdef ALSA_SUPPORT
 
 #include "endian_handling.h"
-#include "buffer_allocator.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
@@ -214,13 +213,11 @@ void audioALSA::stopProcessing( void )
 void audioALSA::run( void )
 {
 	surroundSampleFrame * temp =
-			bufferAllocator::alloc<surroundSampleFrame>(
-					getMixer()->framesPerAudioBuffer() );
-	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
-					getMixer()->framesPerAudioBuffer() *
-								channels() );
-	int_sample_t * pcmbuf = bufferAllocator::alloc<int_sample_t>(
-						m_periodSize * channels() );
+		new surroundSampleFrame[getMixer()->framesPerAudioBuffer()];
+	int_sample_t * outbuf =
+			new int_sample_t[getMixer()->framesPerAudioBuffer() *
+								channels()];
+	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
 
 	int outbuf_size = getMixer()->framesPerAudioBuffer() * channels();
 	int outbuf_pos = 0;
@@ -286,9 +283,9 @@ void audioALSA::run( void )
 		}
 	}
 
-	bufferAllocator::free( temp );
-	bufferAllocator::free( outbuf );
-	bufferAllocator::free( pcmbuf );
+	delete[] temp;
+	delete[] outbuf;
+	delete[] pcmbuf;
 }
 
 

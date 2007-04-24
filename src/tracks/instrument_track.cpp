@@ -69,6 +69,7 @@
 #include "arp_and_chords_tab_widget.h"
 #include "instrument.h"
 #include "audio_port.h"
+#include "automation_pattern.h"
 #include "midi_client.h"
 #include "midi_port.h"
 #include "midi_tab_widget.h"

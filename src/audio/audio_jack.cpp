@@ -51,7 +51,6 @@
 #include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
-#include "buffer_allocator.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
 #include "audio_port.h"
@@ -69,8 +68,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_active( FALSE ),
 //	m_processCallbackMutex(),
 	m_stop_semaphore( 1 ),
-	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
-				getMixer()->framesPerAudioBuffer() ) ),
+	m_outBuf( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -202,7 +200,7 @@ audioJACK::~audioJACK()
 		jack_client_close( m_client );
 	}
 
-	bufferAllocator::free( m_outBuf );
+	delete[] m_outBuf;
 
 }
 

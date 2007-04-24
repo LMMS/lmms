@@ -27,6 +27,7 @@
 
 
 #include "note_play_handle.h"
+#include "automatable_object_templates.h"
 #include "instrument_track.h"
 #include "envelope_tab_widget.h"
 #include "midi.h"

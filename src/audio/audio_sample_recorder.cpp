@@ -30,7 +30,6 @@
 
 #include "audio_sample_recorder.h"
 #include "sample_buffer.h"
-#include "buffer_allocator.h"
 #include "debug.h"
 
 
@@ -52,7 +51,7 @@ audioSampleRecorder::~audioSampleRecorder()
 {
 	while( !m_buffers.empty() )
 	{
-		bufferAllocator::free( m_buffers.front().first );
+		delete[] m_buffers.front().first;
 		m_buffers.erase( m_buffers.begin() );
 	}
 }
@@ -78,9 +77,9 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * data = new sampleFrame[frames];
 	// make sure buffer is cleaned up properly at the end...
-	bufferAllocator::autoCleaner<sampleFrame> ac( data );
+	sampleFrame * data_ptr = data;
 
 #ifdef LMMS_DEBUG
 	assert( data != NULL );
@@ -89,12 +88,14 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 	for( bufferList::const_iterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
 	{
-		memcpy( data, ( *it ).first, ( *it ).second *
+		memcpy( data_ptr, ( *it ).first, ( *it ).second *
 							sizeof( sampleFrame ) );
-		data += ( *it ).second;
+		data_ptr += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*_sample_buf = new sampleBuffer( ac.ptr(), frames );
+	*_sample_buf = new sampleBuffer( data, frames );
+	( *_sample_buf )->setSampleRate( sampleRate() );
+	delete[] data;
 }
 
 
@@ -103,7 +104,7 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 void audioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 					const fpab_t _frames, const float )
 {
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( _frames );
+	sampleFrame * buf = new sampleFrame[_frames];
 	for( fpab_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

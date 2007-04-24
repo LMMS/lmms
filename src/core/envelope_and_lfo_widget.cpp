@@ -49,6 +49,7 @@
 #include "envelope_and_lfo_widget.h"
 #include "song_editor.h"
 #include "embed.h"
+#include "engine.h"
 #include "knob.h"
 #include "pixmap_button.h"
 #include "oscillator.h"

@@ -29,6 +29,7 @@
 #include "effect_label.h"
 #include "sample_track.h"
 #include "embed.h"
+#include "engine.h"
 #include "gui_templates.h"
 #include "rename_dialog.h"
 #include "main_window.h"

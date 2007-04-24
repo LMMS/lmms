@@ -32,6 +32,7 @@
 #include "qt3support.h"
 
 #include "effect.h"
+#include "engine.h"
 #include "ladspa_2_lmms.h"
 #include "mixer.h"
 #include "ladspa_control.h"

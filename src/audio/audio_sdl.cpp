@@ -43,7 +43,6 @@
 #endif
 
 
-#include "buffer_allocator.h"
 #include "debug.h"
 #include "config_mgr.h"
 #include "gui_templates.h"
@@ -55,8 +54,7 @@
 audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
 	audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( bufferAllocator::alloc<surroundSampleFrame>(
-				getMixer()->framesPerAudioBuffer() ) ),
+	m_outBuf( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] ),
 	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE ),
 	m_stop_semaphore( 1 )
@@ -65,8 +63,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 
 	m_convertedBuf_size = getMixer()->framesPerAudioBuffer() * channels()
 						* sizeof( int_sample_t );
-	m_convertedBuf = (Uint8 *)bufferAllocator::allocBytes(
-							m_convertedBuf_size );
+	m_convertedBuf = new Uint8[m_convertedBuf_size];
 
 /*	// if device is set, we set AUDIODEV-environment-variable, so that
 	// SDL can evaluate and use it
@@ -130,8 +127,8 @@ audioSDL::~audioSDL()
 #endif
 	SDL_CloseAudio();
 	SDL_Quit();
-	bufferAllocator::free( m_convertedBuf );
-	bufferAllocator::free( m_outBuf );
+	delete[] m_convertedBuf;
+	delete[] m_outBuf;
 }
 
 

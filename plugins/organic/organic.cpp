@@ -54,7 +54,6 @@ using namespace std;
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
@@ -371,7 +370,7 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 								)->oscRight;
 
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 	
 	osc_l->update( buf, frames, 0 );
 	osc_r->update( buf, frames, 1 );
@@ -394,7 +393,7 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

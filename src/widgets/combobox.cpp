@@ -26,6 +26,7 @@
  
 
 #include "combobox.h"
+#include "automatable_object_templates.h"
 #include "templates.h"
 #include "embed.h"
 #include "gui_templates.h"

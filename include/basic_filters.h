@@ -82,7 +82,7 @@ public:
 		m_b2a0( 0.0f ),
 		m_a1a0( 0.0f ),
 		m_a2a0( 0.0f ),
-		m_sampleRate( 1.0f / _sample_rate ),
+		m_sampleRate( _sample_rate ),
 		m_subFilter( NULL )
 	{
 		// reset in/out history
@@ -231,13 +231,17 @@ public:
 		return( out );
 	}
 
-   
-	inline void calcFilterCoeffs( const filterTypes _type, float _freq,
-					float _q
+
+	void setType( const filterTypes _type )
+	{
+		m_type = _type;
+	}
+
+
+	inline void calcFilterCoeffs( float _freq, float _q
 				/*, const bool _q_is_bandwidth = FALSE*/ )
 	{
 		// temp coef vars
-		m_type = _type;
 		_freq = tMax( _freq, 0.01f );// limit freq and q for not getting
 					      // bad noise out of the filter...
 		_q = tMax( _q, minQ() );
@@ -250,21 +254,21 @@ public:
 				{
 					m_subFilter =
 						new basicFilters<CHANNELS>(
-			static_cast<sample_rate_t>( 1.0f / m_sampleRate ) );
+				static_cast<sample_rate_t>( m_sampleRate ) );
+					m_subFilter->setType( MOOG );
 				}
-				m_subFilter->calcFilterCoeffs( MOOG, _freq,
-									_q );
+				m_subFilter->calcFilterCoeffs( _freq, _q );
 			}
 
 			case MOOG:
 			{
 				// [ 0 - 1 ]
-				const float f = 2 * _freq * m_sampleRate;
+				const float f = 2 * _freq / m_sampleRate;
 				// (Empirical tunning)
-				m_k = 3.6f*f - 1.6f*f*f - 1;
-				m_p = (m_k+1)*0.5f;
-				m_r = _q*powf( M_E, ( ( 1-m_p ) * 1.386249f ) );
-				break;
+				m_k = 3.6f * f - 1.6f * f * f - 1;
+				m_p = ( m_k + 1 ) * 0.5f;
+				m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
+				return;
 			}
 
 /*			case DOUBLE_MOOG2:
@@ -273,7 +277,7 @@ public:
 				{
 					m_subFilter =
 						new basicFilters<CHANNELS>(
-							1.0f / m_sampleRate );
+							m_sampleRate );
 				}
 				m_subFilter->calcFilterCoeffs( MOOG2, _freq,
 									_q );
@@ -281,8 +285,8 @@ public:
 
 			case MOOG2:
 			{
-				const float kfc = 2 * _freq * m_sampleRate;
-				const float kf = _freq * m_sampleRate;
+				const float kfc = 2 * _freq / m_sampleRate;
+				const float kf = _freq / m_sampleRate;
 				const float kfcr = 1.8730 * ( kfc*kfc*kfc ) +
 							0.4955 * ( kfc*kfc ) +
 							0.6490 * kfc + 0.9988;
@@ -295,81 +299,79 @@ public:
 			}*/
 
 			default:
-			{
-				// other filters
-				const float omega	= F_2PI * _freq *
-								m_sampleRate;
-				const float tsin	= sinf( omega );
-				const float tcos	= cosf( omega );
-				//float alpha;
-  
-				//if (q_is_bandwidth)
-				//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
-				//					tsin);
-				//else
-				const float alpha = 0.5f * tsin / _q;
-
-				const float a0 = 1.0f / ( 1.0f + alpha );
-   
-				if( m_type == LOWPASS ||
-						m_type == DOUBLE_LOWPASS )
-				{
-					m_b0a0 = ((1.0f-tcos)*0.5f)*a0;
-					m_b1a0 = (1.0f-tcos)*a0;
-					m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
-					m_a1a0 = (-2.0f*tcos)*a0;
-					if( m_type == DOUBLE_LOWPASS )
-					{
-						if( m_subFilter == NULL )
-						{
-							m_subFilter =
-		new basicFilters<CHANNELS>( static_cast<sample_rate_t>(
-							1.0f / m_sampleRate ) );
-						}
-						m_subFilter->calcFilterCoeffs(
-							LOWPASS, _freq, _q );
-					}
-				}
-				else if( m_type == HIPASS )
-				{
-					m_b0a0 = ((1.0f+tcos)*0.5f)*a0;
-					m_b1a0 = (-1.0f-tcos)*a0;
-					m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
-					m_a1a0 = (-2.0f*tcos)*a0;
-				}
-				else if( m_type == BANDPASS_CSG )
-				{
-					m_b0a0 = tsin*0.5f*a0;
-					m_b1a0 = 0.0f;
-					m_b2a0 = -tsin*0.5f*a0;
-					m_a1a0 = (-2.0f*tcos)*a0;
-				}
-				else if( m_type == BANDPASS_CZPG )
-				{
-					m_b0a0 = alpha*a0;
-					m_b1a0 = 0.0f;
-					m_b2a0 = (-alpha)*a0;
-					m_a1a0 = (-2.0f*tcos)*a0;
-				}
-				else if( m_type == NOTCH )
-				{
-					m_b0a0 = a0;
-					m_b1a0 = (-2.0f*tcos)*a0;
-					m_b2a0 = a0;
-					m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
-				}
-				else if( m_type == ALLPASS )
-				{
-					m_b0a0 = (1.0f-alpha)*a0;
-					m_b1a0 = (-2.0f*tcos)*a0;
-					m_b2a0 = 1.0;//(1.0f+alpha)*a0;
-					m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
-					//m_a2a0 = m_b0a0;//(1.0f-alpha)*a0;
-				}
-				m_a2a0 = (1.0f-alpha)*a0;
 				break;
-			}
 		}
+
+		// other filters
+		const float omega = F_2PI * _freq / m_sampleRate;
+		const float tsin = sinf( omega );
+		const float tcos = cosf( omega );
+		//float alpha;
+
+		//if (q_is_bandwidth)
+		//alpha = tsin*sinhf(logf(2.0f)/2.0f*q*omega/
+		//					tsin);
+		//else
+		const float alpha = 0.5f * tsin / _q;
+
+		const float a0 = 1.0f / ( 1.0f + alpha );
+
+		switch( m_type )
+		{
+			case LOWPASS:
+			case DOUBLE_LOWPASS:
+				m_b0a0 = ( 1.0f - tcos ) * 0.5f * a0;
+				m_b1a0 = ( 1.0f - tcos ) * a0;
+				m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
+				m_a1a0 = -2.0f * tcos * a0;
+				if( m_type == DOUBLE_LOWPASS )
+				{
+					if( m_subFilter == NULL )
+					{
+						m_subFilter =
+			new basicFilters<CHANNELS>( static_cast<sample_rate_t>(
+							m_sampleRate ) );
+						m_subFilter->setType( LOWPASS );
+					}
+					m_subFilter->calcFilterCoeffs( _freq,
+									_q );
+				}
+				break;
+			case HIPASS:
+				m_b0a0 = ( 1.0f + tcos ) * 0.5f * a0;
+				m_b1a0 = ( -1.0f - tcos ) * a0;
+				m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
+				m_a1a0 = -2.0f * tcos * a0;
+				break;
+			case BANDPASS_CSG:
+				m_b0a0 = tsin * 0.5f * a0;
+				m_b1a0 = 0.0f;
+				m_b2a0 = -tsin * 0.5f * a0;
+				m_a1a0 = -2.0f * tcos * a0;
+				break;
+			case BANDPASS_CZPG:
+				m_b0a0 = alpha * a0;
+				m_b1a0 = 0.0f;
+				m_b2a0 = -alpha * a0;
+				m_a1a0 = -2.0f * tcos * a0;
+				break;
+			case NOTCH:
+				m_b0a0 = a0;
+				m_b1a0 = -2.0f * tcos * a0;
+				m_b2a0 = a0;
+				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
+				break;
+			case ALLPASS:
+				m_b0a0 = ( 1.0f - alpha ) * a0;
+				m_b1a0 = -2.0f * tcos * a0;
+				m_b2a0 = 1.0f;//(1.0f+alpha)*a0;
+				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
+				//m_a2a0 = m_b0a0;//(1.0f-alpha)*a0;
+				break;
+			default:
+				break;
+		}
+		m_a2a0 = ( 1.0f - alpha ) * a0;
 	}
 
 

@@ -48,7 +48,6 @@
 #include "note_play_handle.h"
 #include "instrument_track.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 #include "tooltip.h"
 #include "oscillator.h"
@@ -582,7 +581,7 @@ void vibed::playNote( notePlayHandle * _n, bool )
 	stringContainer * ps = static_cast<stringContainer *>(
 			 				_n->m_pluginData );
 	
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	for( fpab_t i = 0; i < frames; ++i )
 	{
@@ -609,7 +608,7 @@ void vibed::playNote( notePlayHandle * _n, bool )
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

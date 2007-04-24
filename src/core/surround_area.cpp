@@ -52,6 +52,7 @@
 #include <math.h>
 
 #include "surround_area.h"
+#include "automatable_object_templates.h"
 #include "embed.h"
 #include "templates.h"
 #include "tooltip.h"

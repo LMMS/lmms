@@ -62,6 +62,7 @@
 
 
 #include "piano_roll.h"
+#include "automatable_object_templates.h"
 #include "song_editor.h"
 #include "main_window.h"
 #include "pattern.h"

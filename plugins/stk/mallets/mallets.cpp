@@ -92,8 +92,7 @@ mallets::mallets( instrumentTrack * _channel_track ) :
 	m_spread->move( 178, 173 );
 	m_spread->setHintText( tr( "Spread:" ) + " ", "" );
 
-	m_buffer = bufferAllocator::alloc<sampleFrame>(
-				engine::getMixer()->framesPerAudioBuffer() );
+	m_buffer = new sampleFrame[engine::getMixer()->framesPerAudioBuffer()];
 }
 
 
@@ -101,7 +100,7 @@ mallets::mallets( instrumentTrack * _channel_track ) :
 
 mallets::~mallets()
 {
-	bufferAllocator::free( m_buffer );
+	delete[] m_buffer;
 }
 
 
@@ -539,7 +538,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		m_voice = NULL;
 	}
 	
-	m_delay = bufferAllocator::alloc<StkFloat>( 256 );
+	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
 	for( Uint16 i = 0; i < 256; i++ )
@@ -587,7 +586,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		m_voice = NULL;
 	}
 	
-	m_delay = bufferAllocator::alloc<StkFloat>( 256 );
+	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
 	for( Uint16 i = 0; i < 256; i++ )
@@ -637,7 +636,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		m_voice = NULL;
 	}
 	
-	m_delay = bufferAllocator::alloc<StkFloat>( 256 );
+	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
 	for( Uint16 i = 0; i < 256; i++ )

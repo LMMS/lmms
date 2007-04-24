@@ -97,10 +97,11 @@ public:
 		return( m_channels );
 	}
 
-	bool processNextBuffer( void );
+	void processNextBuffer( void );
 
 	virtual void startProcessing( void )
 	{
+		m_in_process = TRUE;
 	}
 
 	virtual void stopProcessing( void );
@@ -175,6 +176,7 @@ private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	mixer * m_mixer;
+	bool m_in_process;
 
 	QMutex m_devMutex;
 

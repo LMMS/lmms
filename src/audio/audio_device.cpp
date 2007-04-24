@@ -33,7 +33,6 @@
 
 
 #include "audio_device.h"
-#include "buffer_allocator.h"
 #include "debug.h"
 
 
@@ -43,8 +42,7 @@ audioDevice::audioDevice( const sample_rate_t _sample_rate,
 	m_sampleRate( _sample_rate ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
-	m_buffer( bufferAllocator::alloc<surroundSampleFrame>(
-				getMixer()->framesPerAudioBuffer() ) )
+	m_buffer( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] )
 {
 #ifdef HAVE_SAMPLERATE_H
 	int error;
@@ -70,7 +68,7 @@ audioDevice::~audioDevice()
 #ifdef HAVE_SAMPLERATE_H
 	src_delete( m_srcState );
 #endif
-	bufferAllocator::free( m_buffer );
+	delete[] m_buffer;
 #ifdef QT3
 	if( m_devMutex.locked() )
 	{
@@ -85,15 +83,17 @@ audioDevice::~audioDevice()
 
 
 
-bool audioDevice::processNextBuffer( void )
+void audioDevice::processNextBuffer( void )
 {
 	const fpab_t frames = getNextBuffer( m_buffer );
-	if( !frames )
+	if( frames )
 	{
-		return( FALSE );
+		writeBuffer( m_buffer, frames, getMixer()->masterGain() );
 	}
-	writeBuffer( m_buffer, frames, getMixer()->masterGain() );
-	return( TRUE );
+	else
+	{
+		m_in_process = FALSE;
+	}
 }
 
 
@@ -136,7 +136,10 @@ fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 
 void audioDevice::stopProcessing( void )
 {
-	while( processNextBuffer() );
+	while( m_in_process )
+	{
+		processNextBuffer();
+	}
 }
 
 

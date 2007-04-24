@@ -46,7 +46,6 @@
 #include "instrument_play_handle.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -731,14 +730,12 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     }
     
     const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-    sampleFrame *buf = bufferAllocator::alloc<sampleFrame>( frames );
+    sampleFrame *buf = new sampleFrame[frames];
 
-    if (buf) {
         process(buf, frames); 
         getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-        bufferAllocator::free( buf );
-    }
+        delete[] buf;
 
     lastFramesPlayed = _n->totalFramesPlayed();
 }

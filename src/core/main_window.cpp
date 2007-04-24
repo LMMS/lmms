@@ -75,7 +75,6 @@
 #include "config_mgr.h"
 #include "mixer.h"
 #include "project_notes.h"
-#include "buffer_allocator.h"
 #include "setup_dialog.h"
 #include "audio_dummy.h"
 #include "tool.h"

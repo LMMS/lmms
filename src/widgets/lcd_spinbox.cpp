@@ -46,6 +46,7 @@
 
 
 #include "lcd_spinbox.h"
+#include "automatable_object_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"

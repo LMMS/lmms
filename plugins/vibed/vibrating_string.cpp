@@ -1,7 +1,7 @@
 /*
  * vibrating_sring.h - model of a vibrating string lifted from pluckedSynth
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,7 @@ vibratingString::vibratingString(	float _pitch,
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )
 {
-	m_outsamp = bufferAllocator::alloc<sample_t>( m_oversample );
+	m_outsamp = new sample_t[m_oversample];
 	int string_length;
 	
 	string_length = static_cast<int>( m_oversample * _sample_rate /
@@ -55,12 +55,12 @@ vibratingString::vibratingString(	float _pitch,
 	
 	if( not _state )
 	{
-		m_impulse = bufferAllocator::alloc<float>( string_length );
+		m_impulse = new float[string_length];
 		resample( _impulse, _len, string_length );
 	}
 	else
  	{
-		m_impulse = bufferAllocator::alloc<float>( _len );
+		m_impulse = new float[_len];
 		for( Uint32 i = 0; i < _len; i++ )
 		{
 			m_impulse[i] = _impulse[i];

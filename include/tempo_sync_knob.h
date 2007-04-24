@@ -114,7 +114,8 @@ private:
 	QString m_tempoSyncDescription;
 	
 	tempoSyncMode m_tempoLastSyncMode;
-	meterDialog * m_custom;
+	QPointer<meterDialog> m_custom;
+
 } ;
 
 

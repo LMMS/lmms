@@ -32,7 +32,6 @@
 #include "song_editor.h"
 #include "templates.h"
 #include "envelope_and_lfo_widget.h"
-#include "buffer_allocator.h"
 #include "debug.h"
 #include "engine.h"
 #include "config_mgr.h"
@@ -109,8 +108,7 @@ mixer::mixer( void ) :
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		m_readBuf = bufferAllocator::alloc<surroundSampleFrame>(
-				m_framesPerAudioBuffer );
+		m_readBuf = new surroundSampleFrame[m_framesPerAudioBuffer];
 		
 		clearAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
 		m_bufferPool.push_back( m_readBuf );
@@ -135,7 +133,7 @@ mixer::~mixer()
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		bufferAllocator::free( m_bufferPool[i] );
+		delete[] m_bufferPool[i];
 	}
 }
 
@@ -165,11 +163,12 @@ void mixer::startProcessing( void )
 void mixer::stopProcessing( void )
 {
 	m_fifo_writer->finish();
+
+	m_audioDev->stopProcessing();
+
 	m_fifo_writer->wait( 1000 );
 	m_fifo_writer->terminate();
 	delete m_fifo_writer;
-
-	m_audioDev->stopProcessing();
 }
 
 

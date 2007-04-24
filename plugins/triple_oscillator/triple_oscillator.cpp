@@ -48,7 +48,6 @@
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "knob.h"
-#include "buffer_allocator.h"
 #include "debug.h"
 #include "tooltip.h"
 #include "sample_buffer.h"
@@ -103,7 +102,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 #endif
 
 	pixmapButton * pm_osc1_btn = new pixmapButton( this, NULL, NULL );
-	pm_osc1_btn->move( 80, 50 );
+	pm_osc1_btn->move( 46, 50 );
 	pm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
 	pm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -115,7 +114,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"oscillator 1" ) );
 
 	pixmapButton * am_osc1_btn = new pixmapButton( this, NULL, NULL );
-	am_osc1_btn->move( 120, 50 );
+	am_osc1_btn->move( 86, 50 );
 	am_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
 	am_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -127,7 +126,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"oscillator 1" ) );
 
 	pixmapButton * mix_osc1_btn = new pixmapButton( this, NULL, NULL );
-	mix_osc1_btn->move( 160, 50 );
+	mix_osc1_btn->move( 126, 50 );
 	mix_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
 	mix_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -137,7 +136,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( mix_osc1_btn, tr( "mix output of oscillator 1 & 2" ) );
 
 	pixmapButton * sync_osc1_btn = new pixmapButton( this, NULL, NULL );
-	sync_osc1_btn->move( 200, 50 );
+	sync_osc1_btn->move( 166, 50 );
 	sync_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
 	sync_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -148,7 +147,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 							"oscillator 2" ) );
 
 	pixmapButton * fm_osc1_btn = new pixmapButton( this, NULL, NULL );
-	fm_osc1_btn->move( 330, 50 );
+	fm_osc1_btn->move( 206, 50 );
 	fm_osc1_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
 	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -174,7 +173,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 
 
 	pixmapButton * pm_osc2_btn = new pixmapButton( this, NULL, NULL );
-	pm_osc2_btn->move( 80, 70 );
+	pm_osc2_btn->move( 46, 68 );
 	pm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"pm_active" ) );
 	pm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -186,7 +185,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"oscillator 2" ) );
 
 	pixmapButton * am_osc2_btn = new pixmapButton( this, NULL, NULL );
-	am_osc2_btn->move( 120, 70 );
+	am_osc2_btn->move( 86, 68 );
 	am_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"am_active" ) );
 	am_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -198,7 +197,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 					"oscillator 2" ) );
 
 	pixmapButton * mix_osc2_btn = new pixmapButton( this, NULL, NULL );
-	mix_osc2_btn->move( 160, 70 );
+	mix_osc2_btn->move( 126, 68 );
 	mix_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_active" ) );
 	mix_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -208,7 +207,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	toolTip::add( mix_osc2_btn, tr("mix output of oscillator 2 & 3" ) );
 
 	pixmapButton * sync_osc2_btn = new pixmapButton( this, NULL, NULL );
-	sync_osc2_btn->move( 200, 70 );
+	sync_osc2_btn->move( 166, 68 );
 	sync_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_active" ) );
 	sync_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -219,7 +218,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 							"oscillator 3" ) );
 
 	pixmapButton * fm_osc2_btn = new pixmapButton( this, NULL, NULL );
-	fm_osc2_btn->move( 330, 70 );
+	fm_osc2_btn->move( 206, 68 );
 	fm_osc2_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"fm_active" ) );
 	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -740,14 +739,14 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 								)->oscRight;
 
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 	
 	osc_l->update( buf, frames, 0 );
 	osc_r->update( buf, frames, 1 );
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

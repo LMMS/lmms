@@ -61,6 +61,7 @@
 #include "project_journal.h"
 #include "config_mgr.h"
 #include "embed.h"
+#include "engine.h"
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"

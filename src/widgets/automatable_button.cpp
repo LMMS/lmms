@@ -45,6 +45,7 @@
 
 #endif
 
+#include "automatable_object_templates.h"
 #include "embed.h"
 
 
@@ -296,7 +297,7 @@ void automatableButtonGroup::setValue( const int _value )
 
 
 #ifdef QT3
-#undef findIndex
+#undef indexOf
 #endif
 
 

@@ -36,7 +36,8 @@
 
 #else
 
-#include <qlayout.h>
+#include <qhbox.h>
+//#include <qlayout.h>
 #include <qlabel.h>
 #include <qstring.h>
 
@@ -67,10 +68,14 @@ void ladspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	QLabel * label = new QLabel( _parent );
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
 
+#ifndef QT3
 	QWidget * maker = new QWidget( _parent );
 	QHBoxLayout * l = new QHBoxLayout( maker );
 	l->setMargin( 0 );
 	l->setSpacing( 0 );
+#else
+	QHBox * maker = new QHBox( _parent );
+#endif
 
 	QLabel * maker_label = new QLabel( maker );
 	maker_label->setText( QWidget::tr( "Maker: " ) );
@@ -79,16 +84,21 @@ void ladspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	maker_content->setText( lm->getMaker( lkey ) );
 #ifndef QT3
 	maker_content->setWordWrap( TRUE );
+	l->setStretchFactor( maker_content, 100 );
 #else
 	maker_content->setAlignment( Qt::WordBreak );
+	maker->setStretchFactor( maker_content, 100 );
 #endif
-	l->setStretchFactor( maker_content, 100 );
 
 
+#ifndef QT3
 	QWidget * copyright = new QWidget( _parent );
 	l = new QHBoxLayout( copyright );
 	l->setMargin( 0 );
 	l->setSpacing( 0 );
+#else
+	QHBox * copyright = new QHBox( _parent );
+#endif
 
 	copyright->setMinimumWidth( _parent->minimumWidth() );
 	QLabel * copyright_label = new QLabel( copyright );
@@ -98,10 +108,11 @@ void ladspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	copyright_content->setText( lm->getCopyright( lkey ) );
 #ifndef QT3
 	copyright_content->setWordWrap( TRUE );
+	l->setStretchFactor( copyright_content, 100 );
 #else
 	copyright_content->setAlignment( Qt::WordBreak );
+	copyright->setStretchFactor( copyright_content, 100 );
 #endif
-	l->setStretchFactor( copyright_content, 100 );
 
 	QLabel * requiresRealTime = new QLabel( _parent );
 	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +

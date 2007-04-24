@@ -29,7 +29,6 @@
 
 #include "audio_file_wave.h"
 #include "endian_handling.h"
-#include "buffer_allocator.h"
 
 #include <cstring>
 
@@ -96,13 +95,12 @@ void FASTCALL audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpab_t _frames,
 						const float _master_gain )
 {
-	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
-							_frames * channels() );
+	int_sample_t * outbuf = new int_sample_t[_frames * channels()];
 	Uint32 bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
 							!isLittleEndian() );
 	writeData( outbuf, bytes );
 
-	bufferAllocator::free( outbuf );
+	delete[] outbuf;
 
 	m_bytesWritten += bytes;
 }

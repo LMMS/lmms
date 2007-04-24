@@ -77,9 +77,9 @@ public:
 							track * _track );
 	virtual ~envelopeAndLFOWidget();
 
-	static inline float expKnobVal( float val )
+	static inline float expKnobVal( float _val )
 	{
-		return( ( ( val < 0 ) ? -1 : 1 ) * val*val );
+		return( ( ( _val < 0 ) ? -_val : _val ) * _val );
 	}
 
 	static void triggerLFO( void );

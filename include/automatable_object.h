@@ -29,27 +29,22 @@
 #include <math.h>
 
 #include "qt3support.h"
-#include "automation_editor.h"
-#include "automation_pattern.h"
-#include "engine.h"
 #include "journalling_object.h"
-#include "templates.h"
-#include "midi_time.h"
 #include "level_object.h"
 
 #ifndef QT3
 
-#include <Qt/QtXml>
-#include <QtCore/QVariant>
 #include <QtCore/QPointer>
 
 #else
 
-#include <qdom.h>
-#include <qvariant.h>
 #include <qguardedptr.h>
 
 #endif
+
+
+class automationPattern;
+class track;
 
 
 template<typename T, typename EDIT_STEP_TYPE = T>
@@ -60,32 +55,9 @@ public:
 
 	automatableObject( track * _track = NULL, const T _val = 0,
 					const T _min = 0, const T _max = 0,
-					const T _step = defaultRelStep() ) :
-		m_value( _val ),
-		m_minValue( _min ),
-		m_maxValue( _max ),
-		m_step( _step ),
-		m_automation_pattern( NULL ),
-		m_track( _track ),
-		m_journalEntryReady( FALSE )
-	{
-		m_curLevel = level( _val );
-		m_minLevel = level( _min );
-		m_maxLevel = level( _max );
-	}
+					const T _step = defaultRelStep() );
 
-	virtual ~automatableObject()
-	{
-		if( m_automation_pattern )
-		{
-			delete m_automation_pattern;
-		}
-		while( m_linkedObjects.empty() == FALSE )
-		{
-			m_linkedObjects.last()->unlinkObject( this );
-			m_linkedObjects.erase( m_linkedObjects.end() - 1 );
-		}
-	}
+	virtual ~automatableObject();
 
 	static inline T minRelStep( void )
 	{
@@ -128,217 +100,32 @@ public:
 		return( m_curLevel );
 	}
 
-	inline T fittedValue( T _value )
-	{
-		_value = tLimit<T>( _value, minValue(), maxValue() );
+	inline T fittedValue( T _value );
 
-		if( m_step != 0 )
-		{
-			_value = static_cast<T>( roundf( _value
-						/ (float)step() ) * step() );
-		}
-		else
-		{
-			_value = minValue();
-		}
+	virtual void setInitValue( const T _value );
 
-		// correct rounding error at the border
-		if( tAbs<T>( _value - maxValue() ) < minEps() *
-							tAbs<T>( step() ) )
-		{
-			_value = maxValue();
-		}
-
-		// correct rounding error if value = 0
-		if( tAbs<T>( _value ) < minEps() * tAbs<T>( step() ) )
-		{
-			_value = 0;
-		}
-
-		return( _value );
-	}
-
-	inline virtual void setInitValue( const T _value )
-	{
-		bool journalling = testAndSetJournalling( FALSE );
-		setValue( _value );
-		if( m_automation_pattern )
-		{
-			setFirstValue();
-		}
-		setJournalling( journalling );
-	}
-
-	inline virtual void setValue( const T _value )
-	{
-		const T old_val = m_value;
-
-		m_value = fittedValue( _value );
-		if( old_val != m_value )
-		{
-			m_curLevel = level( m_value );
-
-			// add changes to history so user can undo it
-			addJournalEntry( journalEntry( 0,
-				static_cast<EDIT_STEP_TYPE>( m_value ) -
-				static_cast<EDIT_STEP_TYPE>( old_val ) ) );
-
-			// notify linked objects
-
-			// doesn't work because of implicit typename T
-			// for( autoObjVector::iterator it =
-			// 			m_linkedObjects.begin();
-			//		it != m_linkedObjects.end(); ++it )
-			for( csize i = 0; i < m_linkedObjects.size(); ++i )
-			{
-				autoObj * it = m_linkedObjects[i];
-				if( value() != it->value() &&
-					it->fittedValue( value() ) !=
-								it->value() )
-				{
-					bool journalling =
-						it->testAndSetJournalling(
-							isJournalling() );
-					it->setValue( value() );
-					it->setJournalling( journalling );
-				}
-			}
-		}
-	}
+	inline virtual void setValue( const T _value );
 
 	inline virtual void incValue( int _steps )
 	{
 		setValue( m_value + _steps * m_step );
 	}
 
-	inline virtual void setRange( const T _min, const T _max,
-					const T _step = defaultRelStep() )
-	{
-		m_minValue = _min;
-		m_maxValue = _max;
-		if( m_minValue > m_maxValue )
-		{
-			qSwap<T>( m_minValue, m_maxValue );
-		}
-		setStep( _step );
-		// re-adjust value
-		autoObj::setInitValue( value() );
-	}
+	virtual void setRange( const T _min, const T _max,
+					const T _step = defaultRelStep() );
 
-	inline virtual void setStep( const T _step )
-	{
-		/*
-		const T intv = maxValue() - minValue();
+	inline virtual void setStep( const T _step );
 
-		if( _step == 0 )
-		{
-			m_step = intv * defaultRelStep();
-		}
-		else
-		{
-			if( ( intv > 0 ) && ( _step < 0 ) || ( intv < 0 ) &&
-								( _step > 0 ) )
-			{
-				m_step = -_step;
-			}
-			else
-			{
-				m_step = _step;
-			}
-			if( tAbs<T>( m_step ) <
-					tAbs<T>( minRelStep() * intv ) )
-			{
-				m_step = minRelStep() * intv;
-			}
-		}*/
-		m_step = _step;
-		m_curLevel = level( m_value );
-		m_minLevel = level( m_minValue );
-		m_maxLevel = level( m_maxValue );
-	}
+	static void linkObjects( autoObj * _object1, autoObj * _object2 );
 
-	static inline void linkObjects( autoObj * _object1,
-					autoObj * _object2 )
-	{
-		_object1->linkObject( _object2 );
-		_object2->linkObject( _object1 );
-
-		if( _object1->m_automation_pattern
-				  != _object2->m_automation_pattern )
-		{
-			if( _object2->m_automation_pattern )
-			{
-				delete _object2->m_automation_pattern;
-			}
-			_object2->m_automation_pattern
-					= _object1->m_automation_pattern;
-		}
-	}
-
-	static void unlinkObjects( autoObj * _object1,
-					autoObj * _object2 )
-	{
-		_object1->unlinkObject( _object2 );
-		_object2->unlinkObject( _object1 );
-
-		if( _object1->m_automation_pattern
-				&& _object1->m_automation_pattern
-					== _object2->m_automation_pattern )
-		{
-			_object2->m_automation_pattern = new automationPattern(
-				*_object1->m_automation_pattern, _object2 );
-		}
-	}
+	static void unlinkObjects( autoObj * _object1, autoObj * _object2 );
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 					QDomElement & _this,
-					const QString & _name = "value" )
-	{
-		if( m_automation_pattern )
-		{
-			QDomElement pattern_element;
-			QDomNode node = _this.namedItem(
-					automationPattern::classNodeName() );
-			if( node.isElement() )
-			{
-				pattern_element = node.toElement();
-			}
-			else
-			{
-				pattern_element = _doc.createElement(
-					automationPattern::classNodeName() );
-				_this.appendChild( pattern_element );
-			}
-			QDomElement element = _doc.createElement( _name );
-			m_automation_pattern->saveSettings( _doc, element );
-			pattern_element.appendChild( element );
-		}
-		else
-		{
-			_this.setAttribute( _name, value() );
-		}
-	}
+					const QString & _name = "value" );
 
 	virtual void FASTCALL loadSettings( const QDomElement & _this,
-					const QString & _name = "value" )
-	{
-		QDomNode node = _this.namedItem(
-					automationPattern::classNodeName() );
-		if( node.isElement() )
-		{
-			node = node.namedItem( _name );
-			if( node.isElement() )
-			{
-				m_automation_pattern->loadSettings(
-							node.toElement() );
-				setLevel( m_automation_pattern->valueAt(
-							midiTime( 0 ) ) );
-				return;
-			}
-		}
-
-		setInitValue( attributeValue( _this.attribute( _name ) ) );
-	}
+					const QString & _name = "value" );
 
 	virtual QString nodeName( void ) const
 	{
@@ -355,16 +142,7 @@ public:
 		m_data = _data;
 	}
 
-	inline automationPattern * getAutomationPattern( void )
-	{
-		if( !m_automation_pattern )
-		{
-			m_automation_pattern = new automationPattern( m_track,
-									this );
-			syncAutomationPattern();
-		}
-		return( m_automation_pattern );
-	}
+	inline automationPattern * getAutomationPattern( void );
 
 	inline bool nullTrack( void )
 	{
@@ -378,67 +156,15 @@ public:
 
 
 protected:
-	virtual void redoStep( journalEntry & _je )
-	{
-		bool journalling = testAndSetJournalling( FALSE );
-/*#ifndef QT3
-		setValue( static_cast<T>( value() +
-					_je.data().value<EDIT_STEP_TYPE>() ) );
-#else*/
-		setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
-						_je.data().toDouble() ) ) );
-//#endif
-		setJournalling( journalling );
-	}
+	virtual void redoStep( journalEntry & _je );
 
-	virtual void undoStep( journalEntry & _je )
-	{
-		journalEntry je( _je.actionID(),
-/*#ifndef QT3
-					-_je.data().value<EDIT_STEP_TYPE>()
-#else*/
-			static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() )
-//#endif
-				);
-		redoStep( je );
-	}
+	virtual void undoStep( journalEntry & _je );
 
-	inline void prepareJournalEntryFromOldVal( void )
-	{
-		m_oldValue = value();
-		saveJournallingState( FALSE );
-		m_journalEntryReady = TRUE;
-	}
+	void prepareJournalEntryFromOldVal( void );
 
-	inline void addJournalEntryFromOldToCurVal( void )
-	{
-		if( m_journalEntryReady )
-		{
-			restoreJournallingState();
-			if( value() != m_oldValue )
-			{
-				addJournalEntry( journalEntry( 0, value() -
-								m_oldValue ) );
-			}
-			m_journalEntryReady = FALSE;
-		}
-	}
+	void addJournalEntryFromOldToCurVal( void );
 
-	inline void setFirstValue( void )
-	{
-		if( m_automation_pattern
-					&& m_automation_pattern->updateFirst() )
-		{
-			m_automation_pattern->putValue( midiTime( 0 ),
-							m_curLevel, FALSE );
-			if( engine::getAutomationEditor() &&
-				engine::getAutomationEditor()->currentPattern()
-						== m_automation_pattern )
-			{
-				engine::getAutomationEditor()->update();
-			}
-		}
-	}
+	inline void setFirstValue( void );
 
 
 private:
@@ -459,52 +185,15 @@ private:
 	typedef vvector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;
 
-	inline void linkObject( autoObj * _object )
-	{
-		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
-					_object ) == m_linkedObjects.end() )
-		{
-			m_linkedObjects.push_back( _object );
-		}
-	}
+	inline void linkObject( autoObj * _object );
 
-	inline void unlinkObject( autoObj * _object )
-	{
-		if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(),
-		    _object ) != m_linkedObjects.end() )
-		{
-			m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
-						m_linkedObjects.end(),
-						_object ) );
-		}
-	}
+	inline void unlinkObject( autoObj * _object );
 
-	static T attributeValue( QString _value );
+	static inline T attributeValue( QString _value );
 
-	inline void syncAutomationPattern( void )
-	{
-		for( csize i = 0; i < m_linkedObjects.size(); ++i )
-		{
-			autoObj * it = m_linkedObjects[i];
-			if( m_automation_pattern != it->m_automation_pattern )
-			{
-				it->m_automation_pattern = m_automation_pattern;
-			}
-		}
-	}
+	inline void syncAutomationPattern( void );
 
-	void setLevel( int _level )
-	{
-		if( m_curLevel == _level )
-		{
-			return;
-		}
-		bool journalling = testAndSetJournalling( FALSE );
-		m_automation_pattern->setUpdateFirst( FALSE );
-		setValue( _level * m_step );
-		m_automation_pattern->setUpdateFirst( TRUE );
-		setJournalling( journalling );
-	}
+	inline void setLevel( int _level );
 
 	inline int level( T _value ) const
 	{
@@ -522,54 +211,6 @@ private:
 	}
 
 } ;
-
-
-
-template<>
-inline float automatableObject<float>::minRelStep( void )
-{
-	return( 1.0e-10 );
-}
-
-
-
-template<>
-inline float automatableObject<float>::defaultRelStep( void )
-{
-	return( 1.0e-2 );
-}
-
-
-template<>
-inline float automatableObject<float>::minEps( void )
-{
-	return( 1.0e-10 );
-}
-
-
-
-template<>
-inline float automatableObject<float>::attributeValue( QString _value )
-{
-	return( _value.toFloat() );
-}
-
-
-
-template<>
-inline int automatableObject<int>::attributeValue( QString _value )
-{
-	return( _value.toInt() );
-}
-
-
-
-template<>
-inline bool automatableObject<bool, signed char>::attributeValue(
-								QString _value )
-{
-	return( static_cast<bool>( _value.toInt() ) );
-}
 
 
 

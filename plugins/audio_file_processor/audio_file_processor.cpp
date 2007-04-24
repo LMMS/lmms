@@ -50,7 +50,6 @@
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
-#include "buffer_allocator.h"
 #include "file_browser.h"
 #include "pixmap_button.h"
 #include "knob.h"
@@ -393,7 +392,7 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 {
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	// calculate frequency of note
 	const float note_freq = getInstrumentTrack()->frequency( _n );
@@ -409,7 +408,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

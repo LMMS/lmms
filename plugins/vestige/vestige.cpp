@@ -51,7 +51,6 @@
 
 #include "instrument_track.h"
 #include "note_play_handle.h"
-#include "buffer_allocator.h"
 #include "mixer.h"
 #include "instrument_play_handle.h"
 #include "pixmap_button.h"
@@ -298,7 +297,7 @@ void vestigeInstrument::waitForWorkerThread( void )
 	}
 
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	if( m_plugin->waitForProcessingFinished( buf ) )
 	{
@@ -307,7 +306,7 @@ void vestigeInstrument::waitForWorkerThread( void )
 
 	m_pluginMutex.unlock();
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

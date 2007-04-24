@@ -47,7 +47,6 @@
 #endif
 
 
-#include "buffer_allocator.h"
 #include "endian_handling.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
@@ -317,11 +316,10 @@ void audioOSS::stopProcessing( void )
 void audioOSS::run( void )
 {
 	surroundSampleFrame * temp =
-			bufferAllocator::alloc<surroundSampleFrame>(
-					getMixer()->framesPerAudioBuffer() );
-	int_sample_t * outbuf = bufferAllocator::alloc<int_sample_t>(
-					getMixer()->framesPerAudioBuffer() *
-								channels() );
+		new surroundSampleFrame[getMixer()->framesPerAudioBuffer()];
+	int_sample_t * outbuf =
+			new int_sample_t[getMixer()->framesPerAudioBuffer() *
+								channels()];
 
 	while( TRUE )
 	{
@@ -337,8 +335,8 @@ void audioOSS::run( void )
 		write( m_audioFD, outbuf, bytes );
 	}
 
-	bufferAllocator::free( temp );
-	bufferAllocator::free( outbuf );
+	delete[] temp;
+	delete[] outbuf;
 }
 
 

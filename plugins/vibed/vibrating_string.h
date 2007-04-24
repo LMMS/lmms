@@ -1,7 +1,7 @@
 /*
  * vibrating_string.h - model of a vibrating string lifted from pluckedSynth
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,7 +29,6 @@
 
 #include "config.h"
 #include "types.h"
-#include "buffer_allocator.h"
 
 class vibratingString
 {
@@ -49,8 +48,8 @@ public:
 	
 	inline ~vibratingString( void )
 	{
-		bufferAllocator::free( m_outsamp );
-		bufferAllocator::free( m_impulse );
+		delete[] m_outsamp;
+		delete[] m_impulse;
 		vibratingString::freeDelayLine( m_fromBridge );
 		vibratingString::freeDelayLine( m_toBridge );
 	}

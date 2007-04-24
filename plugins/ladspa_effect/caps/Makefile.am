@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign 1.4
 
 AM_CXXFLAGS := $(AM_CXXFLAGS) -O6 -ffast-math -funroll-loops -ftracer -I../../../include
 
-DEST = $(libdir)/$(PACKAGE)/ladspa
+DEST = $(DESTDIR)$(libdir)/$(PACKAGE)/ladspa
 SOURCES = $(wildcard *.cc)
 HDRS = $(wildcard *.h) $(wildcard dsp/*.h)
 OBJECTS	= $(SOURCES:.cc=.o) 

@@ -30,17 +30,18 @@
 #include <QtCore/QDir>
 #include <QtGui/QLayout>
 #include <QtGui/QTextEdit>
+#include <QtXml/QDomElement>
 
 #else
 
 #include <qdir.h>
+#include <qdom.h>
 #include <qlayout.h>
 #include <qtextedit.h>
 
 #endif
 
 #include "singerbot.h"
-#include "buffer_allocator.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -145,7 +146,7 @@ singerBot::~singerBot()
 void singerBot::playNote( notePlayHandle * _n, bool )
 {
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
 	{
@@ -163,7 +164,7 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
 	sharedObject::unref( sample_buffer );
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

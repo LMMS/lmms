@@ -172,7 +172,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/surround_area.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
 		$(srcdir)/src/lib/base64.cpp				\
-		$(srcdir)/src/lib/buffer_allocator.cpp			\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
@@ -309,7 +308,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/nstate_button.h			\
 		$(srcdir)/include/midi_dummy.h				\
 		$(srcdir)/include/midi_mapper.h				\
-		$(srcdir)/include/buffer_allocator.h			\
 		$(srcdir)/include/lcd_spinbox.h				\
 		$(srcdir)/include/tooltip.h				\
 		$(srcdir)/include/automatable_button.h			\
@@ -336,6 +334,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
 		$(srcdir)/include/automatable_object.h			\
+		$(srcdir)/include/automatable_object_templates.h	\
 		$(srcdir)/include/journalling_object.h			\
 		$(srcdir)/include/level_object.h			\
 		$(srcdir)/include/project_journal.h			\

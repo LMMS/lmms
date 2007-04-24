@@ -68,7 +68,6 @@
 #include "tooltip.h"
 #include "bb_editor.h"
 #include "string_pair_drag.h"
-#include "buffer_allocator.h"
 #include "main_window.h"
 
 
@@ -1317,8 +1316,6 @@ patternFreezeThread::~patternFreezeThread()
 
 void patternFreezeThread::run( void )
 {
-	bufferAllocator::disableAutoCleanup( TRUE );
-
 	// create and install audio-sample-recorder
 	bool b;
 	// we cannot create local copy, because at a later stage
@@ -1367,8 +1364,6 @@ void patternFreezeThread::run( void )
 						&m_pattern->m_frozenPattern );
 		m_pattern->m_frozenPatternMutex.unlock();
 	}
-
-	bufferAllocator::disableAutoCleanup( FALSE );
 
 	// restore original audio-device
 	engine::getMixer()->restoreAudioDevice();

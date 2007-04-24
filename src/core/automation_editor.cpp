@@ -65,6 +65,7 @@
 #include "song_editor.h"
 #include "main_window.h"
 #include "embed.h"
+#include "engine.h"
 #include "pixmap_button.h"
 #include "templates.h"
 #include "gui_templates.h"

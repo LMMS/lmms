@@ -38,7 +38,6 @@
 #include "vst_subplugin_features.h"
 #include "song_editor.h"
 #include "text_float.h"
-#include "buffer_allocator.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -98,8 +97,7 @@ bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf,
 
 	if( m_plugin )
 	{
-		sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
-								_frames );
+		sampleFrame * buf = new sampleFrame[_frames];
 		for( fpab_t f = 0; f < _frames; ++f )
 		{
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
@@ -121,7 +119,7 @@ bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf,
 				out_sum += _buf[f][ch]*_buf[f][ch];
 			}
 		}
-		bufferAllocator::free( buf );
+		delete[] buf;
 		if( out_sum <= getGate() )
 		{
 			incrementBufferCount();

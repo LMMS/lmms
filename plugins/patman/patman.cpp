@@ -29,17 +29,18 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QDragEnterEvent>
+#include <QtXml/QDomElement>
 
 #else
 
 #include <qcursor.h>
+#include <qdom.h>
 #include <qfiledialog.h>
 #include <qwhatsthis.h>
 
 #endif
 
 #include "patman.h"
-#include "buffer_allocator.h"
 #include "endian_handling.h"
 #include "file_browser.h"
 #include "note_play_handle.h"
@@ -211,7 +212,7 @@ QString patmanSynth::nodeName( void ) const
 void patmanSynth::playNote( notePlayHandle * _n, bool )
 {
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	float freq = getInstrumentTrack()->frequency( _n );
 
@@ -228,7 +229,7 @@ void patmanSynth::playNote( notePlayHandle * _n, bool )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

@@ -48,6 +48,7 @@
 
 
 #include "piano_widget.h"
+#include "automatable_object_templates.h"
 #include "instrument_track.h"
 #include "midi.h"
 #include "templates.h"

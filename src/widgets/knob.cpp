@@ -66,6 +66,7 @@
 #include <math.h>
 
 #include "knob.h"
+#include "automatable_object_templates.h"
 /*#include "midi_client.h"*/
 #include "embed.h"
 #include "spc_bg_hndl_widget.h"

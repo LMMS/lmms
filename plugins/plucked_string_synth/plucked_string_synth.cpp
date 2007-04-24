@@ -40,7 +40,6 @@
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -144,7 +143,7 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 	}
 
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );
 	for( Uint32 frame = 0; frame < frames; ++frame )
@@ -158,7 +157,7 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

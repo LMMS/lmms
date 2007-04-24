@@ -46,7 +46,6 @@
 #include "visualization_widget.h"
 #include "embed.h"
 #include "engine.h"
-#include "buffer_allocator.h"
 #include "templates.h"
 #include "tooltip.h"
 
@@ -68,7 +67,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 
 
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	m_buffer = bufferAllocator::alloc<surroundSampleFrame>( frames );
+	m_buffer = new surroundSampleFrame[frames];
 
 	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
 
@@ -94,6 +93,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 
 visualizationWidget::~visualizationWidget()
 {
+	delete[] m_buffer;
 }
 
 

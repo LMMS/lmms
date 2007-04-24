@@ -42,7 +42,6 @@
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "sweep_oscillator.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -201,7 +200,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 	const float f1 = m_startFreqKnob->value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqKnob->value() + (frames+tfp-1)*fdiff/decfr;
 
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 
 	sweepOsc * so = static_cast<sweepOsc *>( _n->m_pluginData );
@@ -223,7 +222,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

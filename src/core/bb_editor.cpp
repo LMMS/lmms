@@ -46,6 +46,7 @@
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "embed.h"
+#include "engine.h"
 #include "tool_button.h"
 #include "track_container.h"
 #include "bb_track.h"

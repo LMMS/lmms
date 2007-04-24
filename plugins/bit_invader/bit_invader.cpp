@@ -56,7 +56,6 @@ using namespace std;
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
@@ -701,7 +700,7 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( fpab_t frame = 0; frame < frames; ++frame )
@@ -715,7 +714,7 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-	bufferAllocator::free( buf );
+	delete[] buf;
 }
 
 

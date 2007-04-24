@@ -41,7 +41,6 @@
 
 #include "audio_file_device.h"
 #include "export_project_dialog.h"
-#include "buffer_allocator.h"
 
 
 audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,

@@ -37,6 +37,7 @@
 
 
 #include "ladspa_control.h"
+#include "automatable_object_templates.h"
 #include "ladspa_base.h"
 #include "tooltip.h"
 #include "tempo_sync_knob.h"

@@ -42,6 +42,7 @@
 
 
 #include "led_checkbox.h"
+#include "automatable_object_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "spc_bg_hndl_widget.h"

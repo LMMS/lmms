@@ -50,6 +50,7 @@
 
 
 #include "track.h"
+#include "automation_pattern.h"
 #include "track_container.h"
 #include "automation_track.h"
 #include "instrument_track.h"

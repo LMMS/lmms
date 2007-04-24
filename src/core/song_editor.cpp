@@ -69,6 +69,7 @@
 
 
 #include "song_editor.h"
+#include "automatable_object_templates.h"
 #include "automatable_slider.h"
 #include "bb_editor.h"
 #include "rename_dialog.h"

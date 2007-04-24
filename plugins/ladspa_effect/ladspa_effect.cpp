@@ -40,7 +40,6 @@
 #include "ladspa_effect.h"
 #include "mixer.h"
 #include "config_mgr.h"
-#include "buffer_allocator.h"
 #include "audio_device.h"
 #include "ladspa_control.h"
 #include "ladspa_subplugin_features.h"

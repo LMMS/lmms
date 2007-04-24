@@ -41,6 +41,7 @@
 
 
 #include "pixmap_button.h"
+#include "automatable_object_templates.h"
 #include "embed.h"
 
 

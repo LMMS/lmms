@@ -59,6 +59,7 @@
 #include "tooltip.h"
 #include "effect_control_dialog.h"
 #include "embed.h"
+#include "engine.h"
 #include "gui_templates.h"
 #include "main_window.h"
 

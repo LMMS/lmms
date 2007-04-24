@@ -30,7 +30,6 @@
 
 
 #include "polyb302.h"
-#include "buffer_allocator.h"
 #include "knob.h"
 #include "led_checkbox.h"
 #include "note_play_handle.h"
@@ -558,15 +557,12 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 	}
 
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = bufferAllocator::alloc<sampleFrame>( frames );
+	sampleFrame * buf = new sampleFrame[frames];
 
-	if( buf )
-	{
-		hstate->process( buf, frames, freq ); 
-		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
+	hstate->process( buf, frames, freq ); 
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
-		bufferAllocator::free( buf );
-	}
+	delete[] buf;
 
 	hstate->m_lastFramesPlayed = _n->totalFramesPlayed();
 }

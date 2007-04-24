@@ -92,10 +92,14 @@ private:
 		while( TRUE )
 		{
 			timer.reset();
-			if ( !processNextBuffer() )
+			const surroundSampleFrame * b =
+						getMixer()->nextBuffer();
+			if( !b )
 			{
 				break;
 			}
+			delete[] b;
+
 			const Sint32 microseconds = static_cast<Sint32>(
 					getMixer()->framesPerAudioBuffer() *
 					1000000.0f / getMixer()->sampleRate() -

@@ -4,7 +4,6 @@
 #include "src/core/effect_tab_widget.cpp"
 #include "src/core/midi_tab_widget.cpp"
 #include "src/lib/string_pair_drag.cpp"
-#include "src/lib/buffer_allocator.cpp"
 #include "src/lib/journalling_object.cpp"
 #include "src/lib/project_journal.cpp"
 #include "src/lib/embed.cpp"

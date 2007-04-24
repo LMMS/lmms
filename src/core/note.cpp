@@ -39,8 +39,8 @@
 
 #include <math.h>
 
-#include "debug.h"
 #include "note.h"
+#include "automatable_object_templates.h"
 #include "knob.h"
 #include "templates.h"
 

@@ -1,3 +1,120 @@
+2007-04-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/buffer_allocator.h:
+	* src/lib/buffer_allocator.cpp:
+	removed, obsoleted by small audio buffers
+
+	* Makefile.am:
+	* include/audio_device.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibrating_string.cpp:
+	* plugins/vibed/vibrating_string.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	* src/lmms_single_source.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_device.cpp:
+	* src/audio/audio_file_device.cpp:
+	* src/audio/audio_file_wave.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_sample_recorder.cpp:
+	* src/audio/audio_sdl.cpp:
+	* src/core/main_window.cpp:
+	* src/core/mixer.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/tracks/pattern.cpp:
+	* src/widgets/visualization_widget.cpp:
+	removed buffer allocator
+
+	* include/automatable_object_templates.h:
+	initial release, templates extracted from automatable_object.h
+
+	* Makefile.am:
+	* include/automatable_object.h:
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/patman/patman.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/note.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/pixmap_button.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	reduced dependencies on automatable object
+
+	* src/audio/audio_device.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/mixer.cpp:
+	fixed deadlocks
+
+	* include/audio_dummy.h:
+	don't process buffers
+
+	* src/audio/audio_sample_recorder.cpp:
+	fixed high quality
+
+	* include/basic_filters.h:
+	* include/envelope_and_lfo_widget.h:
+	* src/core/envelope_tab_widget.cpp:
+	simplified envelope processing
+
+	* include/basic_filters.h:
+	- use samplerate member as sample rate
+	- reformatted
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	reverted layout changes in QT3, fixes descriptions
+
+	* plugins/triple_oscillator/artwork.png:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	updated GUI
+
+	* include/tempo_sync_knob.h:
+	* src/widgets/tempo_sync_knob.cpp:
+	graceful shutdown
+
+	* src/widgets/automatable_button.cpp:
+	fixed undef
+
+	* plugins/ladspa_effect/caps/Makefile.am:
+	use DESTDIR
+
 2007-04-21	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/singerbot/singerbot.cpp:

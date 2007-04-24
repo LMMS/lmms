@@ -30,15 +30,14 @@
 
 #include "audio_port.h"
 #include "audio_device.h"
-#include "buffer_allocator.h"
 #include "engine.h"
 
 audioPort::audioPort( const QString & _name ) :
 	m_bufferUsage( NONE ),
-	m_firstBuffer( bufferAllocator::alloc<surroundSampleFrame>(
-				engine::getMixer()->framesPerAudioBuffer() ) ),
-	m_secondBuffer( bufferAllocator::alloc<surroundSampleFrame>(
-				engine::getMixer()->framesPerAudioBuffer() ) ),
+	m_firstBuffer( new surroundSampleFrame[
+				engine::getMixer()->framesPerAudioBuffer()] ),
+	m_secondBuffer( new surroundSampleFrame[
+				engine::getMixer()->framesPerAudioBuffer()] ),
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( -1 ),
 	m_name( "unnamed port" )
@@ -63,8 +62,8 @@ audioPort::~audioPort()
 	{
 		engine::getMixer()->audioDev()->unregisterPort( this );
 	}
-	bufferAllocator::free( m_firstBuffer );
-	bufferAllocator::free( m_secondBuffer );
+	delete[] m_firstBuffer;
+	delete[] m_secondBuffer;
 }
 
 

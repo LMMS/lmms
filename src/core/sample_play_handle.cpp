@@ -31,7 +31,6 @@
 #include "pattern.h"
 #include "sample_buffer.h"
 #include "sample_track.h"
-#include "buffer_allocator.h"
 #include "audio_port.h"
 
 
@@ -132,8 +131,7 @@ void samplePlayHandle::play( const fpab_t _frame_base, bool )
 	if( !( m_track && m_track->muted() )
 				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
-		sampleFrame * buf = bufferAllocator::alloc<sampleFrame>(
-								frames );
+		sampleFrame * buf = new sampleFrame[frames];
 		volumeVector v = { { m_volume, m_volume
 #ifndef DISABLE_SURROUND
 						, m_volume, m_volume
@@ -143,7 +141,7 @@ void samplePlayHandle::play( const fpab_t _frame_base, bool )
 		engine::getMixer()->bufferToPort( buf, frames, _frame_base, v,
 								m_audioPort );
 
-		bufferAllocator::free( buf );
+		delete[] buf;
 	}
 
 	m_frame += frames;

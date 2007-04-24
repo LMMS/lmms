@@ -55,6 +55,7 @@
 #include "combobox.h"
 #include "led_checkbox.h"
 #include "embed.h"
+#include "engine.h"
 
 #include "audio_file_wave.h"
 #include "audio_file_ogg.h"
@@ -383,7 +384,8 @@ void exportProjectDialog::exportBtnClicked( void )
 							songEditor::PLAY_SONG );
 
 	while( engine::getSongEditor()->exportDone() == FALSE &&
-				engine::getSongEditor()->exporting() == TRUE )
+				engine::getSongEditor()->exporting() == TRUE
+							&& !m_deleteFile )
 	{
 		dev->processNextBuffer();
 		int pval = pp * 100 /
@@ -401,13 +403,7 @@ void exportProjectDialog::exportBtnClicked( void )
 		qApp->processEvents();
 	}
 
-	// if m_deleteFile == TRUE, user aborted export and finalization-
-	// routines were already called, so we only need to call them if
-	// export went through without any problems
-	if( m_deleteFile == FALSE )
-	{
-		finishProjectExport();
-	}
+	finishProjectExport();
 }
 
 
@@ -432,8 +428,6 @@ void exportProjectDialog::cancelBtnClicked( void )
 void exportProjectDialog::abortProjectExport( void )
 {
 	m_deleteFile = TRUE;
-
-	finishProjectExport();
 }
 
 

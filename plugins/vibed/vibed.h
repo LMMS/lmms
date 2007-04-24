@@ -1,6 +1,6 @@
 /* vibed_strings.h - 
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,7 +29,6 @@
 #include "sample_buffer.h"
 #include "graph.h"
 #include "pixmap_button.h"
-#include "buffer_allocator.h"
 #include "led_checkbox.h"
 #include "impulse_editor.h"
 #include "lcd_spinbox.h"

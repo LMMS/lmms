@@ -1,7 +1,7 @@
 /*
  * mallets.h - tuned instruments that one would bang upon
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -33,7 +33,6 @@
 #include "combobox.h"
 #include "led_checkbox.h"
 #include "track.h"
-#include "buffer_allocator.h"
 
 class knob;
 class notePlayHandle;
@@ -81,7 +80,7 @@ public:
 	inline ~malletsSynth( void )
 	{
 		m_voice->noteOff( 0.0 );
-		bufferAllocator::free( m_delay );
+		delete[] m_delay;
 		delete m_voice;
 	}
 

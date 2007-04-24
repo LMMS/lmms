@@ -28,8 +28,10 @@
 #include <math.h>
 
 #include "volume_knob.h"
+#include "automatable_object_templates.h"
 #include "main_window.h"
 #include "config_mgr.h"
+#include "engine.h"
 #include "text_float.h"
 #include "string_pair_drag.h"
 
