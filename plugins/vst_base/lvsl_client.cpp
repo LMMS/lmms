@@ -453,6 +453,17 @@ void remoteVSTPlugin::setTempo( bpm_t _bpm )
 
 
 
+void remoteVSTPlugin::updateSampleRate( void )
+{
+	lock();
+	writeValueS<Sint16>( VST_SAMPLE_RATE );
+	writeValueS<sample_rate_t>( engine::getMixer()->sampleRate() );
+	unlock();
+}
+
+
+
+
 const QMap<QString, QString> & remoteVSTPlugin::parameterDump( void )
 {
 	writeValueS<Sint16>( VST_GET_PARAMETER_DUMP );

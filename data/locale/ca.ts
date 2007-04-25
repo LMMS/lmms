@@ -4236,11 +4236,11 @@ clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
         <source>use frequency modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>usa modulació de freqüència per a modular l&apos;oscil·lador 2 amb l&apos;oscil·lador 1</translation>
+        <translation>modula la freqüència de l&apos;oscil·lador 1 amb l&apos;oscil·lador 2</translation>
     </message>
     <message>
         <source>use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>usa modulació d&apos;amplitud per a modular l&apos;oscil·lador 2 amb l&apos;oscil·lador 1</translation>
+        <translation>modula l&apos;amplitud de l&apos;oscil·lador 1 amb l&apos;oscil·lador 2</translation>
     </message>
     <message>
         <source>mix output of oscillator 1 &amp; 2</source>
@@ -4252,11 +4252,11 @@ clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
         <source>use frequency modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>usa modulació de freqüència per a modular l&apos;oscil·lador 3 amb l&apos;oscil·lador 2</translation>
+        <translation>modula la freqüència de l&apos;oscil·lador 2 amb l&apos;oscil·lador 3</translation>
     </message>
     <message>
         <source>use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>usa modulació d&apos;amplitud per a modular l&apos;oscil·lador 3 amb l&apos;oscil·lador 2</translation>
+        <translation>modula l&apos;amplitud de l&apos;oscil·lador 2 amb l&apos;oscil·lador 3</translation>
     </message>
     <message>
         <source>mix output of oscillator 2 &amp; 3</source>
@@ -4356,11 +4356,11 @@ clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
         <source>use phase modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>usa modulació de fase per a modular l&apos;oscil·lador 2 amb l&apos;oscil·lador 1</translation>
+        <translation>modula la fase de l&apos;oscil·lador 1 amb l&apos;oscil·lador 2</translation>
     </message>
     <message>
         <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>usa modulació de fase per a modular l&apos;oscil·lador 3 amb l&apos;oscil·lador 2</translation>
+        <translation>modula la fase de l&apos;oscil·lador 2 amb l&apos;oscil·lador 3</translation>
     </message>
     <message>
         <source>Modulation type 1</source>

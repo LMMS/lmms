@@ -280,8 +280,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			_n->m_filter = new basicFilters<>(
 					engine::getMixer()->sampleRate() );
 		}
-		_n->m_filter->setType( basicFilters<>::getFilterType(
-						m_filterComboBox->value() ) );
+		_n->m_filter->setFilterType( m_filterComboBox->value() );
 
 		float * cut_buf = NULL;
 		float * res_buf = NULL;

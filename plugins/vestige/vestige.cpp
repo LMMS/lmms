@@ -262,8 +262,10 @@ void vestigeInstrument::setParameter( const QString & _param,
 		m_plugin->showEditor();
 		connect( engine::getSongEditor(),
 					SIGNAL( tempoChanged( bpm_t ) ),
-				 m_plugin, SLOT( setTempo( bpm_t ) ) );
+				m_plugin, SLOT( setTempo( bpm_t ) ) );
 		m_plugin->setTempo( engine::getSongEditor()->getTempo() );
+		connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+					m_plugin, SLOT( updateSampleRate() ) );
 		if( set_ch_name == TRUE )
 		{
 			getInstrumentTrack()->setName( m_plugin->name() );

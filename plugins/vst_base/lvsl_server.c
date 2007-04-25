@@ -1,7 +1,7 @@
 /*
  * lvsl_server.cpp - LMMS VST Support Layer Server
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -466,6 +466,7 @@ void VSTPlugin::process( void )
 	for( ch_cnt_t i = 0; i < outputCount(); ++i )
 	{
 		m_outputs[i] = &m_shm[( i + inputCount() ) * m_blockSize];
+		memset( m_outputs[i], 0, m_blockSize * sizeof( float ) );
 	}
 
 #ifdef OLD_VST_SDK

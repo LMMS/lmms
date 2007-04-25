@@ -127,6 +127,7 @@ public:
 
 public slots:
 	void setTempo( bpm_t _bpm );
+	void updateSampleRate( void );
 
 
 private:

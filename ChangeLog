@@ -1,3 +1,21 @@
+2007-04-25	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/basic_filters.h:
+	* plugins/flp_import/flp_import.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	simplified filtering
+
+	* plugins/vst_base/lvsl_server.c:
+	clear output buffers before processing
+
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_client.h:
+	fixed sample rate change
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-04-24	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/buffer_allocator.h:

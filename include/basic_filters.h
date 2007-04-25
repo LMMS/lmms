@@ -46,7 +46,6 @@ template<ch_cnt_t CHANNELS = DEFAULT_CHANNELS>
 class basicFilters
 {
 public:
-
 	enum filterTypes
 	{
 		LOWPASS,
@@ -56,9 +55,7 @@ public:
 		NOTCH,
 		ALLPASS,
 		MOOG,
-		SIMPLE_FLT_CNT,
-		DOUBLE_LOWPASS	= 16+LOWPASS,
-		DOUBLE_MOOG	= 16+MOOG
+		SIMPLE_FLT_CNT
 	} ;
 
 	static inline float minQ( void )
@@ -66,14 +63,23 @@ public:
 		return( 0.01f );
 	}
 
-	static inline filterTypes getFilterType( const int _idx )
+	inline void setFilterType( const int _idx )
 	{
-		if( _idx < SIMPLE_FLT_CNT )
+		m_double_filter = _idx >= SIMPLE_FLT_CNT;
+		if( !m_double_filter )
 		{
-			return( static_cast<filterTypes>( _idx ) );
+			m_type = static_cast<filterTypes>( _idx );
+			return;
 		}
-		return( static_cast<filterTypes>( DOUBLE_LOWPASS + _idx -
-							SIMPLE_FLT_CNT ) );
+		m_type = static_cast<filterTypes>( LOWPASS + _idx -
+							SIMPLE_FLT_CNT );
+		if( m_subFilter == NULL )
+		{
+			m_subFilter = new basicFilters<CHANNELS>(
+						static_cast<sample_rate_t>(
+							m_sampleRate ) );
+		}
+		m_subFilter->m_type = m_type;
 	}
 
 	inline basicFilters( const sample_rate_t _sample_rate ) :
@@ -82,6 +88,7 @@ public:
 		m_b2a0( 0.0f ),
 		m_a1a0( 0.0f ),
 		m_a2a0( 0.0f ),
+		m_double_filter( FALSE ),
 		m_sampleRate( _sample_rate ),
 		m_subFilter( NULL )
 	{
@@ -109,27 +116,26 @@ public:
 		switch( m_type )
 		{
 			case MOOG:
-			case DOUBLE_MOOG:
 			{
 				sample_t x = _in0 - m_r*m_y4[_chnl];
 
 				// four cascaded onepole filters
 				// (bilinear transform)
 				m_y1[_chnl] = tLimit(
-					x*m_p + m_oldx[_chnl]*m_p -
-								m_k*m_y1[_chnl],
+						( x + m_oldx[_chnl] ) * m_p
+							- m_k * m_y1[_chnl],
 								-10.0f, 10.0f );
 				m_y2[_chnl] = tLimit(
-					m_y1[_chnl]*m_p+m_oldy1[_chnl]*
-							m_p - m_k*m_y2[_chnl],
+					( m_y1[_chnl] + m_oldy1[_chnl] ) * m_p
+							- m_k * m_y2[_chnl],
 								-10.0f, 10.0f );
 				m_y3[_chnl] = tLimit(
-					m_y2[_chnl]*m_p+m_oldy2[_chnl]*
-							m_p - m_k*m_y3[_chnl],
+					( m_y2[_chnl] + m_oldy2[_chnl] ) * m_p
+							- m_k * m_y3[_chnl],
 								-10.0f, 10.0f );
 				m_y4[_chnl] = tLimit(
-					m_y3[_chnl]*m_p+m_oldy3[_chnl]*
-							m_p - m_k*m_y4[_chnl],
+					( m_y3[_chnl] + m_oldy3[_chnl] ) * m_p
+							- m_k * m_y4[_chnl],
 								-10.0f, 10.0f );
 
 				m_oldx[_chnl] = x;
@@ -222,19 +228,13 @@ public:
 				break;
 		}
 
-		if( m_subFilter != NULL )
+		if( m_double_filter )
 		{
 			return( m_subFilter->update( out, _chnl ) );
 		}
 
 		// Clipper band limited sigmoid
 		return( out );
-	}
-
-
-	void setType( const filterTypes _type )
-	{
-		m_type = _type;
 	}
 
 
@@ -246,30 +246,22 @@ public:
 					      // bad noise out of the filter...
 		_q = tMax( _q, minQ() );
 
-		switch( m_type )
+		if( m_type == MOOG )
 		{
-			case DOUBLE_MOOG:
-			{
-				if( m_subFilter == NULL )
-				{
-					m_subFilter =
-						new basicFilters<CHANNELS>(
-				static_cast<sample_rate_t>( m_sampleRate ) );
-					m_subFilter->setType( MOOG );
-				}
-				m_subFilter->calcFilterCoeffs( _freq, _q );
-			}
+			// [ 0 - 0.5 ]
+			const float f = _freq / m_sampleRate;
+			// (Empirical tunning)
+			m_p = ( 3.6f - 3.2f * f ) * f;
+			m_k = 2.0f * m_p - 1;
+			m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
 
-			case MOOG:
+			if( m_double_filter )
 			{
-				// [ 0 - 1 ]
-				const float f = 2 * _freq / m_sampleRate;
-				// (Empirical tunning)
-				m_k = 3.6f * f - 1.6f * f * f - 1;
-				m_p = ( m_k + 1 ) * 0.5f;
-				m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
-				return;
+				m_subFilter->m_r = m_r;
+				m_subFilter->m_p = m_p;
+				m_subFilter->m_k = m_k;
 			}
+			return;
 
 /*			case DOUBLE_MOOG2:
 			{
@@ -297,9 +289,6 @@ public:
 				m_r = 4 * _q * kacr;
 				break;
 			}*/
-
-			default:
-				break;
 		}
 
 		// other filters
@@ -316,62 +305,53 @@ public:
 
 		const float a0 = 1.0f / ( 1.0f + alpha );
 
+		m_a1a0 = -2.0f * tcos * a0;
+		m_a2a0 = ( 1.0f - alpha ) * a0;
+
 		switch( m_type )
 		{
 			case LOWPASS:
-			case DOUBLE_LOWPASS:
-				m_b0a0 = ( 1.0f - tcos ) * 0.5f * a0;
 				m_b1a0 = ( 1.0f - tcos ) * a0;
+				m_b0a0 = m_b1a0 * 0.5f;
 				m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
-				m_a1a0 = -2.0f * tcos * a0;
-				if( m_type == DOUBLE_LOWPASS )
-				{
-					if( m_subFilter == NULL )
-					{
-						m_subFilter =
-			new basicFilters<CHANNELS>( static_cast<sample_rate_t>(
-							m_sampleRate ) );
-						m_subFilter->setType( LOWPASS );
-					}
-					m_subFilter->calcFilterCoeffs( _freq,
-									_q );
-				}
 				break;
 			case HIPASS:
-				m_b0a0 = ( 1.0f + tcos ) * 0.5f * a0;
 				m_b1a0 = ( -1.0f - tcos ) * a0;
+				m_b0a0 = m_b1a0 * -0.5f;
 				m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
-				m_a1a0 = -2.0f * tcos * a0;
 				break;
 			case BANDPASS_CSG:
-				m_b0a0 = tsin * 0.5f * a0;
 				m_b1a0 = 0.0f;
-				m_b2a0 = -tsin * 0.5f * a0;
-				m_a1a0 = -2.0f * tcos * a0;
+				m_b0a0 = tsin * 0.5f * a0;
+				m_b2a0 = -m_b0a0;
 				break;
 			case BANDPASS_CZPG:
-				m_b0a0 = alpha * a0;
 				m_b1a0 = 0.0f;
-				m_b2a0 = -alpha * a0;
-				m_a1a0 = -2.0f * tcos * a0;
+				m_b0a0 = alpha * a0;
+				m_b2a0 = -m_b0a0;
 				break;
 			case NOTCH:
+				m_b1a0 = m_a1a0;
 				m_b0a0 = a0;
-				m_b1a0 = -2.0f * tcos * a0;
 				m_b2a0 = a0;
-				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
 				break;
 			case ALLPASS:
-				m_b0a0 = ( 1.0f - alpha ) * a0;
-				m_b1a0 = -2.0f * tcos * a0;
+				m_b1a0 = m_a1a0;
+				m_b0a0 = m_a2a0;
 				m_b2a0 = 1.0f;//(1.0f+alpha)*a0;
-				m_a1a0 = m_b1a0;//(-2.0f*tcos)*a0;
-				//m_a2a0 = m_b0a0;//(1.0f-alpha)*a0;
 				break;
 			default:
 				break;
 		}
-		m_a2a0 = ( 1.0f - alpha ) * a0;
+
+		if( m_double_filter )
+		{
+			m_subFilter->m_b0a0 = m_b0a0;
+			m_subFilter->m_b1a0 = m_b1a0;
+			m_subFilter->m_b2a0 = m_b2a0;
+			m_subFilter->m_a1a0 = m_a1a0;
+			m_subFilter->m_a2a0 = m_a2a0;
+		}
 	}
 
 
@@ -391,9 +371,11 @@ private:
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 
 	filterTypes m_type;
+	bool m_double_filter;
 
 	float m_sampleRate;
 	basicFilters<CHANNELS> * m_subFilter;
+
 } ;
 
 

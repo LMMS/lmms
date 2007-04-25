@@ -700,6 +700,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_FilterParams:
 			{
+				// TODO: Dirty hack!
+				// SIMPLE_FLT_CNT equals to old DOUBLE_LOWPASS
 				const basicFilters<>::filterTypes
 								mappedFilter[] =
 				{
@@ -708,9 +710,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 					basicFilters<>::BANDPASS_CSG,
 					basicFilters<>::HIPASS,
 					basicFilters<>::NOTCH,
-					basicFilters<>::DOUBLE_LOWPASS,
+					basicFilters<>::SIMPLE_FLT_CNT,
 					basicFilters<>::LOWPASS,
-					basicFilters<>::DOUBLE_LOWPASS
+					basicFilters<>::SIMPLE_FLT_CNT
 				} ;
 				Uint32 * p = (Uint32 *) text;
 				envelopeTabWidget * etw = it->m_envWidget;
