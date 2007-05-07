@@ -1,7 +1,7 @@
 /*
  * vst_control_dialog.cpp - dialog for displaying GUI of VST-effect-plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,14 +23,12 @@
  */
 
 
-#ifdef QT4
+#ifndef QT3
 
-#include <QtGui/QMessageBox>
 #include <QtGui/QLayout>
 
 #else
 
-#include <qmessagebox.h>
 #include <qlayout.h>
 
 #endif

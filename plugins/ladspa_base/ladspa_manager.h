@@ -365,8 +365,6 @@ private:
 						ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;
 	l_sortable_plugin_t m_sortedPlugins;
-	
-	friend class engine;
 
 } ;
 

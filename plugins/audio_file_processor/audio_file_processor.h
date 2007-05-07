@@ -130,7 +130,6 @@ private:
 
 
 	void updateSample( void );
-	void FASTCALL setStartAndEndKnob( float _s, float _e );
 
 } ;
 

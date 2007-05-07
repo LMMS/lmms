@@ -53,6 +53,8 @@ using namespace std;
 
 
 #include "bit_invader.h"
+#include "base64.h"
+#include "engine.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "templates.h"
@@ -62,7 +64,6 @@ using namespace std;
 #include "song_editor.h"
 #include "oscillator.h"
 #include "sample_buffer.h"
-#include "base64.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -685,17 +686,18 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 	if ( _n->totalFramesPlayed() == 0 )
 	{
 	
-		float freq = getInstrumentTrack()->frequency( _n );
-		
 		float factor;
-		if (!normalize) {
-			factor = 1.0; 
-		} else {
+		if( !normalize )
+		{
+			factor = 1.0f;
+		}
+		else
+		{
 			factor = normalizeFactor;
 		}
-		
-		_n->m_pluginData = new bSynth( sample_shape, sample_length,freq
-					, interpolation, factor,
+
+		_n->m_pluginData = new bSynth( sample_shape, sample_length,
+					_n->frequency(), interpolation, factor,
 					engine::getMixer()->sampleRate() );
 	}
 

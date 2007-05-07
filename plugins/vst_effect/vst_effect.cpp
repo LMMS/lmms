@@ -23,7 +23,7 @@
  */
 
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QMessageBox>
 

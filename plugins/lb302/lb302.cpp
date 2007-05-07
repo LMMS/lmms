@@ -42,11 +42,12 @@
 
 
 #include "lb302.h"
-#include "instrument_track.h"
+#include "engine.h"
 #include "instrument_play_handle.h"
+#include "instrument_track.h"
+#include "knob.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -141,6 +142,17 @@ lb302FilterIIR2::lb302FilterIIR2(lb302FilterState* p_fs) :
 	m_dist = new effectLib::distortion<>( 1.0, 1.0f);
 	
 };
+
+
+
+
+lb302FilterIIR2::~lb302FilterIIR2()
+{
+	delete m_dist;
+}
+
+
+
 
 void lb302FilterIIR2::recalc()
 {
@@ -685,9 +697,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 
     if ( _n->totalFramesPlayed() <= lastFramesPlayed ) {
-        float freq = getInstrumentTrack()->frequency( _n );
-
-
         // TODO: Try moving to the if() below
         if(deadToggle->value()==0) {
             sample_cnt = 0;
@@ -695,7 +704,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         }
 
         // Adjust inc on SampRate change or detuning change
-        vco_inc = freq*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+        vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
 
         // Initiate Slide
         // TODO: Break out into function, should be called again on detuneChanged

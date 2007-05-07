@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
+if SHIP_CAPS
 SUBDIRS = caps
+endif
 
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I. -I../ladspa_base/

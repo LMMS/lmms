@@ -2,7 +2,7 @@
  * ladspa_control_dialog.h - dialog for displaying and editing control port
  *                           values for LADSPA plugins
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,6 @@
 
 #include "effect_control_dialog.h"
 #include "ladspa_control.h"
-#include "track.h"
 #include "led_checkbox.h"
 
 

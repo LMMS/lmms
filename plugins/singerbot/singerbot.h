@@ -26,7 +26,7 @@
 #ifndef _SINGERBOT_H
 #define _SINGERBOT_H
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtCore/QThread>
 
@@ -40,12 +40,12 @@
 #include <samplerate.h>
 
 #include "instrument.h"
+#include "mixer.h"
 
 
 class EST_Wave;
 class QTextEdit;
 class sampleBuffer;
-class EST_String;
 
 
 class singerBot : public instrument
@@ -75,7 +75,7 @@ private:
 	typedef struct
 	{
 		EST_Wave * wave;
-		int remaining_frames;
+		f_cnt_t remaining_frames;
 		float frequency;
 		float duration;
 		const char * text;
@@ -136,7 +136,8 @@ private:
 	bool m_words_dirty;
 
 	void createWave( notePlayHandle * _n );
-	sampleBuffer * readWave( handle_data * _hdata );
+	void play( sampleFrame * _ab, handle_data * _hdata,
+							const fpab_t _frames );
 	void updateWords( void );
 
 } ;

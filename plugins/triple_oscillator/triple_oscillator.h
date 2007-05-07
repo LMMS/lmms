@@ -2,7 +2,7 @@
  * triple_oscillator.h - declaration of class tripleOscillator a powerful
  *                       instrument-plugin with 3 oscillators
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +41,55 @@ class volumeKnob;
 const int NUM_OF_OSCILLATORS = 3;
 
 
+class oscillatorObject : public QObject
+{
+	Q_OBJECT
+private:
+	oscillator::waveShapes m_waveShape;
+	volumeKnob * m_volKnob;
+	knob * m_panKnob;
+	knob * m_coarseKnob;
+	knob * m_fineLKnob;
+	knob * m_fineRKnob;
+	knob * m_phaseOffsetKnob;
+	knob * m_stereoPhaseDetuningKnob;
+	automatableButtonGroup * m_waveBtnGrp;
+	pixmapButton * m_usrWaveBtn;
+	sampleBuffer * m_sampleBuffer;
+	oscillator::modulationAlgos m_modulationAlgo;
+
+	float m_volumeLeft;
+	float m_volumeRight;
+	// normalized detuning -> x/sampleRate
+	float m_detuningLeft;
+	float m_detuningRight;
+	// normalized offset -> x/360
+	float m_phaseOffsetLeft;
+	float m_phaseOffsetRight;
+
+	oscillatorObject( void );
+	virtual ~oscillatorObject();
+
+	friend class tripleOscillator;
+
+
+private slots:
+	void oscWaveCh( int _n );
+	void oscUserDefWaveDblClick( void );
+
+	void modCh( int _n );
+
+	void updateVolume( void );
+	void updateDetuningLeft( void );
+	void updateDetuningRight( void );
+	void updatePhaseOffsetLeft( void );
+	void updatePhaseOffsetRight( void );
+
+} ;
+
+
+
+
 class tripleOscillator : public instrument
 {
 	Q_OBJECT
@@ -64,62 +113,19 @@ public:
 
 
 protected slots:
-	void osc0WaveCh( int _n );
-	void osc1WaveCh( int _n );
-	void osc2WaveCh( int _n );
-	void osc0UserDefWaveDblClick( void );
-	void osc1UserDefWaveDblClick( void );
-	void osc2UserDefWaveDblClick( void );
-
-	void mod1Ch( int _n );
-	void mod2Ch( int _n );
-
-	void updateVolume( const QVariant & _i );
-	void updateDetuningLeft( const QVariant & _i );
-	void updateDetuningRight( const QVariant & _i );
 	void updateAllDetuning( void );
-	void updatePhaseOffsetLeft( const QVariant & _i );
-	void updatePhaseOffsetRight( const QVariant & _i );
 
 
 private:
 	instrumentTrack * m_instrumentTrack;
 
-	struct oscillatorData
-	{
-		oscillator::waveShapes waveShape;
-		volumeKnob * volKnob;
-		knob * panKnob;
-		knob * coarseKnob;
-		knob * fineLKnob;
-		knob * fineRKnob;
-		knob * phaseOffsetKnob;
-		knob * stereoPhaseDetuningKnob;
-		automatableButtonGroup * waveBtnGrp;
-		pixmapButton * usrWaveBtn;
-		sampleBuffer * m_sampleBuffer;
-		float volumeLeft;
-		float volumeRight;
-		// normalized detuning -> x/sampleRate
-		float detuningLeft;
-		float detuningRight;
-		// normalized offset -> x/360
-		float phaseOffsetLeft;
-		float phaseOffsetRight;
-	} m_osc[NUM_OF_OSCILLATORS];
+	oscillatorObject m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
 	{
 		oscillator * oscLeft;
 		oscillator * oscRight;
 	} ;
-
-
-	oscillator::modulationAlgos * FASTCALL getModulationAlgo( int _n );
-
-	oscillator::modulationAlgos m_modulationAlgo1;
-	oscillator::modulationAlgos m_modulationAlgo2;
-	const oscillator::modulationAlgos m_modulationAlgo3;
 
 	automatableButtonGroup * m_mod1BtnGrp;
 	automatableButtonGroup * m_mod2BtnGrp;

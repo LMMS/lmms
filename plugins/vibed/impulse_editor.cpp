@@ -46,10 +46,12 @@
 #endif
 
 #include "impulse_editor.h"
-#include "vibed.h"
-#include "tooltip.h"
+#include "embed.h"
+#include "engine.h"
 #include "oscillator.h"
 #include "song_editor.h"
+#include "tooltip.h"
+#include "vibed.h"
 
 
 impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, track * _track,

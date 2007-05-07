@@ -23,6 +23,8 @@
  */
 
 
+#include "vestige.h"
+
 #include "qt3support.h"
 
 #ifdef QT4
@@ -49,17 +51,18 @@
 #endif
 
 
-#include "instrument_track.h"
-#include "note_play_handle.h"
-#include "mixer.h"
+#include "engine.h"
+#include "gui_templates.h"
 #include "instrument_play_handle.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
-#include "spc_bg_hndl_widget.h"
-#include "vestige.h"
-#include "text_float.h"
-#include "song_editor.h"
+#include "instrument_track.h"
 #include "lvsl_client.h"
+#include "mixer.h"
+#include "note_play_handle.h"
+#include "pixmap_button.h"
+#include "song_editor.h"
+#include "spc_bg_hndl_widget.h"
+#include "text_float.h"
+#include "tooltip.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -167,6 +170,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 
 vestigeInstrument::~vestigeInstrument()
 {
+	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
 	closePlugin();
 }
 

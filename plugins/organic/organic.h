@@ -1,7 +1,7 @@
 /*
  * organic.h - additive synthesizer for organ-like sounds
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,43 @@ class pixmapButton;
 class volumeKnob;
 
 
+class oscillatorObject : public QObject
+{
+	Q_OBJECT
+private:
+	int m_num_oscillators;
+	oscillator::waveShapes m_waveShape;
+	knob * m_oscKnob;
+	volumeKnob * m_volKnob;
+	knob * m_panKnob;
+	knob * m_detuneKnob;
+
+	float m_harmonic;
+	float m_volumeLeft;
+	float m_volumeRight;
+	// normalized detuning -> x/sampleRate
+	float m_detuningLeft;
+	float m_detuningRight;
+	// normalized offset -> x/360
+	float m_phaseOffsetLeft;
+	float m_phaseOffsetRight;
+
+	oscillatorObject( void );
+	virtual ~oscillatorObject();
+
+	friend class organicInstrument;
+
+
+private slots:
+	void oscButtonChanged( void );
+	void updateVolume( void );
+	void updateDetuning( void );
+
+} ;
+
+
+
+
 class organicInstrument : public instrument, public specialBgHandlingWidget
 {
 	Q_OBJECT
@@ -62,12 +99,10 @@ public:
 
 
 public slots:
+	void randomiseSettings( void );
 
-	void oscButtonChanged( void );
-	void randomiseSettings();
 
 private:
-
 	float inline waveshape(float in, float amount);
 
 	
@@ -81,25 +116,7 @@ private:
 	
 	int m_num_oscillators;
 	
-	struct oscillatorData
-	{
-		oscillator::waveShapes waveShape;
-		knob * oscKnob;
-		volumeKnob * volKnob;
-		knob * panKnob;
-		knob * detuneKnob;
-		float harmonic;
-		float volumeLeft;
-		float volumeRight;
-		// normalized detuning -> x/sampleRate
-		float detuningLeft;
-		float detuningRight;
-		// normalized offset -> x/360
-		float phaseOffsetLeft;
-		float phaseOffsetRight;
-	};
-	
-	oscillatorData* m_osc;
+	oscillatorObject * m_osc;
 	
 	struct oscPtr
 	{
@@ -109,14 +126,12 @@ private:
 
 	const oscillator::modulationAlgos m_modulationAlgo;
 
-		knob * fx1Knob;
-		knob * volKnob;
-		pixmapButton * m_randBtn;
+	knob * m_fx1Knob;
+	knob * m_volKnob;
+	pixmapButton * m_randBtn;
+
 
 private slots:
-
-	void updateVolume( const QVariant & _i );
-	void updateDetuning( const QVariant & _i );
 	void updateAllDetuning( void );
 
 } ;

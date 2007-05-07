@@ -32,8 +32,9 @@
 #ifndef _POLYB302_H_
 #define _POLYB302_H_
 
-#include "instrument.h"
 #include "effect_lib.h"
+#include "instrument.h"
+#include "mixer.h"
 
 
 class knob;
@@ -163,7 +164,7 @@ private:
 	class handleState
 	{
 	public:
-		handleState( polyb302Synth * _synth );
+		handleState( const polyb302Synth * _synth );
 		virtual ~handleState();
 
 		enum vco_shape_t {
@@ -212,7 +213,7 @@ private:
 		int m_sample_cnt;
 
 		// TODO: split synth slots
-		polyb302Synth * m_synth;
+		const polyb302Synth * m_synth;
 
 		void recalcFilter( void );
 
@@ -236,7 +237,7 @@ private:
 	knob * m_dist_knob;
 	knob * m_wave_knob;
     
-	ledCheckBox * m_slideToggle;
+//	ledCheckBox * m_slideToggle;
 //	ledCheckBox * m_accentToggle;
 //	ledCheckBox * m_deadToggle;
 	ledCheckBox * m_db24Toggle;

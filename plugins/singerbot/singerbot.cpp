@@ -42,10 +42,10 @@
 #endif
 
 #include "singerbot.h"
+#include "engine.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "pattern.h"
-#include "sample_buffer.h"
 #include "song_editor.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -146,7 +146,6 @@ singerBot::~singerBot()
 void singerBot::playNote( notePlayHandle * _n, bool )
 {
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
-	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
 	{
@@ -154,16 +153,14 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 	}
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 
-	sampleBuffer * sample_buffer = hdata->remaining_frames ?
-			readWave( hdata ) : new sampleBuffer( NULL, 0 );
-
-	sampleBuffer::handleState hstate;
-
-	if( sample_buffer->play( buf, &hstate, frames ) )
+	if( hdata->remaining_frames <= 0 )
 	{
-		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
+		return;
 	}
-	sharedObject::unref( sample_buffer );
+
+	sampleFrame * buf = new sampleFrame[frames];
+	play( buf, hdata, frames );
+	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	delete[] buf;
 }
 
@@ -173,14 +170,8 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 void singerBot::deleteNotePluginData( notePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
-	if( hdata->wave )
-	{
-		delete hdata->wave;
-	}
-	if( hdata->resampling_state )
-	{
-		src_delete( hdata->resampling_state );
-	}
+	delete hdata->wave;
+	src_delete( hdata->resampling_state );
 	delete hdata;
 }
 
@@ -264,7 +255,7 @@ void singerBot::createWave( notePlayHandle * _n )
 		return;
 	}
 
-	hdata->frequency = getInstrumentTrack()->frequency( _n );
+	hdata->frequency = _n->frequency();
 	hdata->duration = _n->length() > 0 ?
 		_n->length() * 60.0f * BEATS_PER_TACT
 				/ 64.0f / engine::getSongEditor()->getTempo() :
@@ -294,8 +285,6 @@ void singerBot::createWave( notePlayHandle * _n )
 							src_strerror( error ) );
 	}
 
-	hdata->resampling_data.src_ratio = engine::getMixer()->sampleRate()
-					/ (double)hdata->wave->sample_rate();
 	hdata->resampling_data.end_of_input = 0;
 	hdata->remaining_frames = hdata->wave->num_samples();
 }
@@ -303,53 +292,74 @@ void singerBot::createWave( notePlayHandle * _n )
 
 
 
-sampleBuffer * singerBot::readWave( handle_data * _hdata )
+void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
+							const fpab_t _frames )
 {
-	f_cnt_t frames = engine::getMixer()->framesPerAudioBuffer();
-	f_cnt_t offset = _hdata->wave->num_samples() - _hdata->remaining_frames;
+	const f_cnt_t offset = _hdata->wave->num_samples()
+						- _hdata->remaining_frames;
 
-	const float fac = 1.0f / OUTPUT_SAMPLE_MULTIPLIER;
-	f_cnt_t fragment_size = tMin( _hdata->remaining_frames,
-					1 + (f_cnt_t)ceil( frames
-					/ _hdata->resampling_data.src_ratio ) );
-	sample_t * wave_samples = new sample_t[fragment_size];
+	const double ratio = engine::getMixer()->sampleRate()
+					/ (double)_hdata->wave->sample_rate();
 
-	for( f_cnt_t frame = 0; frame < fragment_size; ++frame )
+	const f_cnt_t margin = 2;
+	f_cnt_t fragment_size = (f_cnt_t)( _frames / ratio ) + margin;
+
+	sample_t * sample_fragment = new sample_t[fragment_size];
+
+	if( fragment_size <= _hdata->remaining_frames )
 	{
-		wave_samples[frame] = _hdata->wave->a( offset + frame ) * fac;
+		for( f_cnt_t frame = 0; frame < fragment_size; ++frame )
+		{
+			sample_fragment[frame] = _hdata->wave->a( offset
+								+ frame )
+						/ OUTPUT_SAMPLE_MULTIPLIER;
+		}
+	}
+	else
+	{
+		for( f_cnt_t frame = 0; frame < _hdata->remaining_frames;
+								++frame )
+		{
+			sample_fragment[frame] = _hdata->wave->a( offset
+								+ frame )
+						/ OUTPUT_SAMPLE_MULTIPLIER;
+		}
+		memset( sample_fragment + _hdata->remaining_frames, 0,
+				( fragment_size - _hdata->remaining_frames )
+							* sizeof( sample_t ) );
 	}
 
-	sample_t * mono_data = new sample_t[frames];
-	memset( mono_data, 0, sizeof( sample_t ) * frames );
+	sample_t * data = new sample_t[_frames];
 
-	_hdata->resampling_data.data_in = wave_samples;
-	_hdata->resampling_data.data_out = mono_data;
+	_hdata->resampling_data.data_in = sample_fragment;
+	_hdata->resampling_data.data_out = data;
 	_hdata->resampling_data.input_frames = fragment_size;
-	_hdata->resampling_data.output_frames = frames;
+	_hdata->resampling_data.output_frames = _frames;
+	_hdata->resampling_data.src_ratio = ratio;
 	int error = src_process( _hdata->resampling_state,
 						&_hdata->resampling_data );
 	if( error )
 	{
-		printf( "%s: src_process() error: %s\n", __FILE__,
+		printf( "%s: error while resampling: %s\n", __FILE__,
 							src_strerror( error ) );
 	}
+	if( _hdata->resampling_data.output_frames_gen != _frames )
+	{
+		printf( "%s: not enough frames: %ld / %d\n", __FILE__,
+			_hdata->resampling_data.output_frames_gen, _frames );
+	}
+	_hdata->remaining_frames -= _hdata->resampling_data.input_frames_used;
 
-	sampleFrame * data = new sampleFrame[frames];
-
-	for( f_cnt_t frame = 0; frame < frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
-			data[frame][chnl] = mono_data[frame];
+			_ab[frame][chnl] = data[frame];
 		}
 	}
 
-	sampleBuffer * buffer = new sampleBuffer( data, frames );
-	_hdata->remaining_frames -= _hdata->resampling_data.input_frames_used;
-	delete[] wave_samples;
-	delete[] mono_data;
+	delete[] sample_fragment;
 	delete[] data;
-	return( buffer );
 }
 
 
@@ -420,6 +430,15 @@ void singerBot::synThread::run( void )
 		m_synth_semaphore++;
 #endif
 		text_to_wave();
+		if( !m_data->wave )
+		{
+			// Damaged SIOD environment? Retrying...
+			text_to_wave();
+			if( !m_data->wave )
+			{
+				printf( "Unsupported frequency?\n" );
+			}
+		}
 #ifndef QT3
 		m_handle_semaphore.release();
 #else
@@ -447,7 +466,7 @@ void singerBot::synThread::text_to_wave( void )
 	festival_eval_command(
 		"(set! word " + quote_string( m_data->text, "\"", "\\", 1 )
 									+ ")" );
-	festival_eval_command(
+	if( festival_eval_command(
 		"(begin"
 		" (set! my_utt (eval (list 'Utterance 'Text word)))"
 		" (get_segment my_utt)"
@@ -469,17 +488,12 @@ void singerBot::synThread::text_to_wave( void )
 		"  (Duration my_utt)"
 		"  ))"
 		" (Int_Targets my_utt)"
-		")" );
+		")" )
 
-	if( festival_eval_command(
+		&& festival_eval_command(
 		"  (Wave_Synth my_utt)" ) )
 	{
 		m_data->wave = get_wave( "my_utt" );
-	}
-	else
-	{
-		// Unsupported frequency
-		m_data->wave = NULL;
 	}
 }
 

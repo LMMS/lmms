@@ -24,27 +24,28 @@
 
 
 #include "flp_import.h"
-#include "project_notes.h"
+#include "arp_and_chords_tab_widget.h"
+#include "basic_filters.h"
 #include "bb_editor.h"
-#include "song_editor.h"
 #include "bb_track.h"
-#include "track_container.h"
-#include "instrument_track.h"
-#include "pattern.h"
-#include "project_journal.h"
-#include "instrument.h"
+#include "combobox.h"
 #include "config_mgr.h"
+#include "debug.h"
+#include "engine.h"
 #include "envelope_tab_widget.h"
 #include "envelope_and_lfo_widget.h"
+#include "group_box.h"
+#include "instrument.h"
+#include "instrument_track.h"
 #include "knob.h"
 #include "oscillator.h"
-#include "basic_filters.h"
-#include "combobox.h"
-#include "group_box.h"
-#include "arp_and_chords_tab_widget.h"
-#include "tempo_sync_knob.h"
+#include "pattern.h"
 #include "piano_widget.h"
-#include "debug.h"
+#include "project_journal.h"
+#include "project_notes.h"
+#include "song_editor.h"
+#include "tempo_sync_knob.h"
+#include "track_container.h"
 
 
 #ifdef QT4
@@ -480,7 +481,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 			case FLP_MiddleNote:
 				data += 8;
 				it->setBaseNote( data );
-				it->m_pianoWidget->update();
+				it->getPianoWidget()->update();
 				break;
 
 			case FLP_DelayReso:
@@ -828,7 +829,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		p->setNoteAt( pos / 4, note( -64, pos ) );
+		p->addNote( note( -64, pos ), FALSE );
 	}
 
 	// now process all notes

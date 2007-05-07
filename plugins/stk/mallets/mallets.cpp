@@ -40,10 +40,12 @@
 #include "TubeBell.h"
 
 #include "mallets.h"
+#include "engine.h"
+#include "gui_templates.h"
 #include "instrument_track.h"
+#include "knob.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -390,7 +392,7 @@ void mallets::playNote( notePlayHandle * _n, bool )
 {
 	int p = m_presets->value();
 	
-	float freq = getInstrumentTrack()->frequency( _n );
+	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 )
 	{
 		float vel = static_cast<float>( _n->getVolume() ) / 100.0f;

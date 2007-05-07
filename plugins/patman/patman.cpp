@@ -42,7 +42,9 @@
 
 #include "patman.h"
 #include "endian_handling.h"
+#include "engine.h"
 #include "file_browser.h"
+#include "gui_templates.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
@@ -214,15 +216,14 @@ void patmanSynth::playNote( notePlayHandle * _n, bool )
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = new sampleFrame[frames];
 
-	float freq = getInstrumentTrack()->frequency( _n );
-
 	if( !_n->m_pluginData )
 	{
 		select_sample( _n );
 	}
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 
-	float play_freq = hdata->tuned ? freq : hdata->sample->frequency();
+	float play_freq = hdata->tuned ? _n->frequency() :
+						hdata->sample->frequency();
 
 	if( hdata->sample->play( buf, hdata->state, frames, play_freq,
 						m_loopButton->isChecked() ) )
@@ -639,7 +640,7 @@ void patmanSynth::unload_current_patch( void )
 
 void patmanSynth::select_sample( notePlayHandle * _n )
 {
-	float freq = getInstrumentTrack()->frequency( _n );
+	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
 	sampleBuffer * sample = NULL;

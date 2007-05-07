@@ -37,10 +37,11 @@
 
 
 #include "plucked_string_synth.h"
+#include "engine.h"
 #include "instrument_track.h"
+#include "knob.h"
 #include "note_play_handle.h"
 #include "templates.h"
-#include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -136,9 +137,9 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getInstrumentTrack()->frequency( _n );
-		_n->m_pluginData = new pluckSynth( freq, m_pickKnob->value(),
-						m_pickupKnob->value(),
+		_n->m_pluginData = new pluckSynth( _n->frequency(),
+					m_pickKnob->value(),
+					m_pickupKnob->value(),
 					engine::getMixer()->sampleRate() );
 	}
 
@@ -196,13 +197,11 @@ pluckSynth::delayLine * FASTCALL pluckSynth::initDelayLine( int _len )
 
 void FASTCALL pluckSynth::freeDelayLine( delayLine * _dl )
 {
-	if( _dl && _dl->data )
+	if( _dl )
 	{
 		delete[] _dl->data;
+		delete[] _dl;
 	}
-
-	_dl->data = NULL;
-	delete[] _dl;
 }
 
 

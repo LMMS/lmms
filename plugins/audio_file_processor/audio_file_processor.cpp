@@ -46,11 +46,13 @@
 
 
 #include "audio_file_processor.h"
+#include "engine.h"
 #include "song_editor.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
 #include "file_browser.h"
+#include "gui_templates.h"
 #include "pixmap_button.h"
 #include "knob.h"
 #include "tooltip.h"
@@ -294,15 +296,11 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 		QString s;
 		_this.setAttribute( "sampledata", m_sampleBuffer.toBase64( s ) );
 	}
-	_this.setAttribute( "sframe", QString::number(
-						m_sampleBuffer.startFrame() /
-					(float)m_sampleBuffer.frames() ) );
-	_this.setAttribute( "eframe", QString::number(
-						m_sampleBuffer.endFrame() /
-					(float)m_sampleBuffer.frames() ) );
 	m_reverseButton->saveSettings( _doc, _this, "reversed" );
 	m_loopButton->saveSettings( _doc, _this, "looped" );
 	m_ampKnob->saveSettings( _doc, _this, "amp" );
+	m_startKnob->saveSettings( _doc, _this, "sframe" );
+	m_endKnob->saveSettings( _doc, _this, "eframe" );
 }
 
 
@@ -318,11 +316,14 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	{
 		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
 	}
-	setStartAndEndKnob( _this.attribute( "sframe" ).toFloat(),
-				_this.attribute( "eframe" ).toFloat() );  
 	m_reverseButton->loadSettings( _this, "reversed" );
 	m_loopButton->loadSettings( _this, "looped" );
 	m_ampKnob->loadSettings( _this, "amp" );
+	m_startKnob->loadSettings( _this, "sframe" );
+	m_endKnob->loadSettings( _this, "eframe" );
+
+	startKnobChanged( m_startKnob->value()  );
+	endKnobChanged( m_endKnob->value() );
 }
 
 
@@ -354,10 +355,8 @@ QString audioFileProcessor::nodeName( void ) const
 
 Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 {
-	const float freq_factor = BASE_FREQ /
-				( getInstrumentTrack()->frequency( _n ) *
-						DEFAULT_SAMPLE_RATE /
-					engine::getMixer()->sampleRate() );
+	const float freq_factor = BASE_FREQ / _n->frequency() *
+			engine::getMixer()->sampleRate() / DEFAULT_SAMPLE_RATE;
 
 	return( static_cast<Uint32>( floorf( ( m_sampleBuffer.endFrame() -
 						m_sampleBuffer.startFrame() ) *
@@ -382,7 +381,8 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 	// else we don't touch the channel-name, because the user named it self
 
 	m_sampleBuffer.setAudioFile( _audio_file );
-	setStartAndEndKnob( 0.0f, 1.0f );
+	startKnobChanged( m_startKnob->value()  );
+	endKnobChanged( m_endKnob->value() );
 }
 
 
@@ -394,16 +394,13 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = new sampleFrame[frames];
 
-	// calculate frequency of note
-	const float note_freq = getInstrumentTrack()->frequency( _n );
-
 	if( !_n->m_pluginData )
 	{
 		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
 	}
 
 	if( m_sampleBuffer.play( buf, (handleState *)_n->m_pluginData,
-					frames, note_freq,
+					frames, _n->frequency(),
 					m_loopButton->isChecked() ) == TRUE )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
@@ -649,27 +646,6 @@ void audioFileProcessor::dotDrawBtnToggled( bool _on )
 void audioFileProcessor::ampKnobChanged( float _val )
 {
 	m_sampleBuffer.setAmplification( _val / 100.0f );
-}
-
-
-
-
-void audioFileProcessor::setStartAndEndKnob( float _s, float _e )
-{
-/*	// because the signal-handlers of valuechanges of start- and end-knob
-	// do range checking, depending on value of the other knob, we have to
-	// disconnect the signal-handlers, set then the values, connect again
-	// and then let the changes take effect...
-	m_startKnob->disconnect();
-	m_endKnob->disconnect();*/
-	m_startKnob->setValue( _s );
-	m_endKnob->setValue( _e );
-/*	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( startKnobChanged( float ) ) );
-	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( endKnobChanged( float ) ) );*/
-	startKnobChanged( _s );
-	endKnobChanged( _e );
 }
 
 

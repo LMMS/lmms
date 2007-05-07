@@ -315,8 +315,6 @@ ladspaEffect::~ladspaEffect()
 		return;
 	}
 	
-	lock();
-	
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
 		m_ladspa->deactivate( m_key, m_handles[proc] );
@@ -330,8 +328,6 @@ ladspaEffect::~ladspaEffect()
 	}
 	m_ports.clear();
 	m_handles.clear();
-	
-	unlock();
 }
 
 
@@ -340,8 +336,7 @@ ladspaEffect::~ladspaEffect()
 bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpab_t _frames )
 {
-	if( !isOkay() || dontRun() || !isRunning() || 
-					isBypassed() || !tryLock() )
+	if( !isOkay() || dontRun() || !isRunning() || isBypassed() )
 	{
 		return( FALSE );
 	}
@@ -463,7 +458,6 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 		resetBufferCount();
 	}
 	
-	unlock();
 	return( isRunning() );
 }
 
@@ -476,9 +470,7 @@ void FASTCALL ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
 	{
 		return;
 	}
-	lock();
 	m_controls[_control]->value = _value;
-	unlock();
 }
 
 

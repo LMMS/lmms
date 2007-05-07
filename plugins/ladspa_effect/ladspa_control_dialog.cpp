@@ -161,8 +161,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 		QHBoxLayout * center = new QHBoxLayout();
 		m_mainLay->addLayout( center );
 #endif
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this, "",
-								m_track );
+		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this,
+								NULL, NULL );
 		connect( m_stereoLink, SIGNAL( toggled( bool ) ), 
 					this, SLOT( link( bool ) ) );
 		m_stereoLink->setChecked( TRUE );

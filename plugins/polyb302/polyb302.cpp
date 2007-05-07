@@ -30,6 +30,7 @@
 
 
 #include "polyb302.h"
+#include "engine.h"
 #include "knob.h"
 #include "led_checkbox.h"
 #include "note_play_handle.h"
@@ -325,9 +326,8 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 	m_vcf_dec_knob->setHintText( tr( "Decay:" ) + " ", "" );
 	m_vcf_dec_knob->setLabel( tr( "DEC" ) );
 
-	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ), _track );
-	m_slideToggle->move( 10, 200 );
-
+//	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ), _track );
+//	m_slideToggle->move( 10, 180 );
 
 //	m_accentToggle = new ledCheckBox( "Accent", this,
 //							tr( "Accent" ),
@@ -335,10 +335,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 //	m_accentToggle->move( 10, 200 );
 //	m_accentToggle->setDisabled(true);
 
-
-//	m_deadToggle = new ledCheckBox( "Dead", this,
-//							tr( "Dead" ),
-//							_track );
+//	m_deadToggle = new ledCheckBox( "Dead", this, tr( "Dead" ), _track );
 //	m_deadToggle->move( 10, 220 );
 
 	m_db24Toggle = new ledCheckBox( "24dB/oct", this,
@@ -383,7 +380,7 @@ polyb302Synth::polyb302Synth( instrumentTrack * _track ) :
 	m_wave_knob->setLabel( tr( "WAVE" ) );
 
 
-#ifdef QT4
+#ifndef QT3
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
@@ -433,7 +430,7 @@ void polyb302Synth::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_dist_knob->saveSettings( _doc, _this, "dist" );
 	m_slide_dec_knob->saveSettings( _doc, _this, "slide_dec" );
 
-	m_slideToggle->saveSettings( _doc, _this, "slide" );
+//	m_slideToggle->saveSettings( _doc, _this, "slide" );
 //	m_deadToggle->saveSettings( _doc, _this, "dead" );
 	m_db24Toggle->saveSettings( _doc, _this, "db24");
 }
@@ -453,7 +450,7 @@ void polyb302Synth::loadSettings( const QDomElement & _this )
 	m_wave_knob->loadSettings( _this, "shape" );
 	m_slide_dec_knob->loadSettings( _this, "slide_dec" );
 
-	m_slideToggle->loadSettings( _this, "slide" );
+//	m_slideToggle->loadSettings( _this, "slide" );
 //	m_deadToggle->loadSettings( _this, "dead" );
 	m_db24Toggle->loadSettings( _this, "db24" );
 }
@@ -500,8 +497,6 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 		hstate = (handleState *)_n->m_pluginData;
 	}
 
-	float freq = getInstrumentTrack()->frequency( _n );
-
 	if( _n->totalFramesPlayed() <= hstate->m_lastFramesPlayed )
 	{
 	        // TODO: Try moving to the if() below
@@ -533,12 +528,12 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 		// End break-out
 
 		// Slide note, save inc for next note
-		if (m_slideToggle->value())
-		{
-			hstate->m_vco_slideinc = hstate->m_vco_inc;
+//		if( m_slideToggle->value() )
+//		{
+//			hstate->m_vco_slideinc = hstate->m_vco_inc;
 			// May need to equal m_vco_slidebase+m_vco_slide if last
 			// note slid
-		}
+//		}
 
 
 		hstate->recalcFilter();
@@ -549,7 +544,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 			hstate->m_vcf->playNote();
 			// Ensure envelope is recalculated
 			hstate->m_vcf_envpos = ENVINC;
-    
+
 			// Double Check 
 			hstate->m_vca_mode = 0;
 			hstate->m_vca_a = 0.0;
@@ -559,7 +554,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
 	sampleFrame * buf = new sampleFrame[frames];
 
-	hstate->process( buf, frames, freq ); 
+	hstate->process( buf, frames, _n->frequency() ); 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	delete[] buf;
@@ -652,7 +647,7 @@ void polyb302Synth::waveChanged( float )
 
 
 
-polyb302Synth::handleState::handleState( polyb302Synth * _synth )
+polyb302Synth::handleState::handleState( const polyb302Synth * _synth )
 {
 	m_vco_inc = 0.0;
 	m_vco_c = 0;
@@ -672,11 +667,11 @@ polyb302Synth::handleState::handleState( polyb302Synth * _synth )
 
 	m_vca_mode = 2;
 	m_vca_a = 0;
-	//m_vca_attack = 1.0 - 0.94406088;      
-	m_vca_attack = 1.0 - 0.96406088;      
-	m_vca_decay = 0.99897516;            
+	//m_vca_attack = 1.0 - 0.94406088;
+	m_vca_attack = 1.0 - 0.96406088;
+	m_vca_decay = 0.99897516;
 
-	m_vco_shape = SAWTOOTH; 
+	m_vco_shape = SAWTOOTH;
 
 	// Experimenting between original (0.5) and 1.0
 	m_vca_a0 = 0.5;

@@ -39,10 +39,11 @@
 
 
 #include "kicker.h"
+#include "engine.h"
 #include "instrument_track.h"
+#include "knob.h"
 #include "note_play_handle.h"
 #include "sweep_oscillator.h"
-#include "knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"

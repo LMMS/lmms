@@ -32,9 +32,10 @@
 #ifndef _LB302_H_
 #define _LB302_H_
 
+#include "effect_lib.h"
 #include "instrument.h"
 #include "led_checkbox.h"
-#include "effect_lib.h"
+#include "mixer.h"
 #include <iostream>
 
 
@@ -76,6 +77,7 @@ class lb302FilterIIR2 : public lb302Filter
 {
     public:
     lb302FilterIIR2(lb302FilterState* p_fs);
+	virtual ~lb302FilterIIR2();
 
     virtual void recalc();
     virtual void envRecalc();

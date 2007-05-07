@@ -45,19 +45,20 @@
 
 
 #include "vibed.h"
-#include "note_play_handle.h"
+#include "base64.h"
+#include "engine.h"
 #include "instrument_track.h"
-#include "templates.h"
 #include "knob.h"
-#include "tooltip.h"
+#include "note_play_handle.h"
 #include "oscillator.h"
 #include "string_container.h"
-#include "base64.h"
+#include "templates.h"
+#include "tooltip.h"
+#include "volume.h"
+#include "volume_knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-#include "volume_knob.h"
-#include "volume.h"
 
 
 extern "C"
@@ -549,12 +550,9 @@ void vibed::playNote( notePlayHandle * _n, bool )
 {
 	if ( _n->totalFramesPlayed() == 0 )
 	{
-		float freq = getInstrumentTrack()->frequency( _n );
-		
-		_n->m_pluginData = new stringContainer( 
-				freq,
-				engine::getMixer()->sampleRate(),
-				m_sampleLength );
+		_n->m_pluginData = new stringContainer( _n->frequency(),
+					engine::getMixer()->sampleRate(),
+					m_sampleLength );
 		
 		for( Uint8 i = 0; i < 9; ++i )
 		{

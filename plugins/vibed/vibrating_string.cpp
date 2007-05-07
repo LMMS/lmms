@@ -123,13 +123,11 @@ vibratingString::delayLine * FASTCALL vibratingString::initDelayLine(
 
 void FASTCALL vibratingString::freeDelayLine( delayLine * _dl )
 {
-	if( _dl && _dl->data )
+	if( _dl )
 	{
 		delete[] _dl->data;
+		delete[] _dl;
 	}
-
-	_dl->data = NULL;
-	delete[] _dl;
 }
 
 

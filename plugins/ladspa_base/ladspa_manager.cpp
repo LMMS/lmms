@@ -132,6 +132,15 @@ ladspaManager::ladspaManager( void )
 
 ladspaManager::~ladspaManager()
 {
+	for( ladspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
+					it != m_ladspaManagerMap.end(); ++it )
+	{
+#ifndef QT3
+		delete it.value();
+#else
+		delete it.data();
+#endif
+	}
 }
 
 
@@ -158,10 +167,17 @@ void FASTCALL ladspaManager::addPlugins(
 						const QString & _file )
 {
 	const LADSPA_Descriptor * descriptor;
-	long pluginIndex = 0;
-	
-	while( ( descriptor = _descriptor_func( pluginIndex ) ) != NULL )
+
+	for( long pluginIndex = 0;
+		( descriptor = _descriptor_func( pluginIndex ) ) != NULL;
+								++pluginIndex )
 	{
+		ladspa_key_t key( QString( descriptor->Label ), _file );
+		if( m_ladspaManagerMap.contains( key ) )
+		{
+			continue;
+		}
+
 		ladspaManagerDescription * plugIn = 
 				new ladspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
@@ -188,9 +204,7 @@ void FASTCALL ladspaManager::addPlugins(
 			plugIn->type = OTHER;
 		}
 		
-		ladspa_key_t key( QString( descriptor->Label ), _file );
 		m_ladspaManagerMap[key] = plugIn;
-		++pluginIndex;
 	}
 }
 

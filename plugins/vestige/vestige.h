@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,10 +26,8 @@
 #ifndef _VESTIGE_H
 #define _VESTIGE_H
 
-#include "instrument.h"
-#include "midi.h"
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtCore/QMutex>
 
@@ -40,6 +38,9 @@
 #endif
 
 
+#include "instrument.h"
+#include "midi.h"
+#include "note.h"
 #include "spc_bg_hndl_widget.h"
 
 

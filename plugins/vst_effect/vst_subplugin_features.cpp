@@ -25,7 +25,7 @@
  */
 
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtCore/QDir>
 #include <QtGui/QLabel>

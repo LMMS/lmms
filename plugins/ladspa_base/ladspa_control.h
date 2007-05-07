@@ -31,22 +31,32 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QLayout>
-#include <QtCore/QMutex>
 
 #else
 
 #include <qwidget.h>
-#include <qmutex.h>
 #include <qlayout.h>
 
 #endif
 
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef HAVE_LADSPA_H
+#include <ladspa.h>
+#else
+#include "ladspa-1.1.h"
+#endif
+
+
 #include "journalling_object.h"
-#include "track.h"
-#include "knob.h"
-#include "led_checkbox.h"
-#include "ladspa_manager.h"
+
+
+class knob;
+class ledCheckBox;
+class track;
 
 
 typedef struct portDescription port_desc_t;
@@ -107,8 +117,6 @@ private:
 	ledCheckBox * m_link;
 	ledCheckBox * m_toggle;
 	knob * m_knob;
-	
-	QMutex m_processLock;
 };
 
 #endif

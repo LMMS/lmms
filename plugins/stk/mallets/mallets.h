@@ -29,10 +29,10 @@
 
 #include "Instrmnt.h"
 
-#include "instrument.h"
 #include "combobox.h"
+#include "instrument.h"
 #include "led_checkbox.h"
-#include "track.h"
+#include "mixer.h"
 
 class knob;
 class notePlayHandle;
