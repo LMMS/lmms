@@ -48,20 +48,21 @@
 
 
 #include "file_browser.h"
-#include "song_editor.h"
 #include "bb_editor.h"
+#include "config_mgr.h"
+#include "debug.h"
 #include "embed.h"
+#include "engine.h"
+#include "gui_templates.h"
+#include "instrument.h"
 #include "instrument_track.h"
+#include "main_window.h"
 #include "mmp.h"
 #include "preset_preview_play_handle.h"
 #include "sample_play_handle.h"
-#include "debug.h"
-#include "gui_templates.h"
-#include "instrument.h"
-#include "text_float.h"
+#include "song_editor.h"
 #include "string_pair_drag.h"
-#include "main_window.h"
-#include "config_mgr.h"
+#include "text_float.h"
 
 
 
@@ -297,67 +298,67 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 void fileBrowser::sendToActiveInstrumentTrack( void )
 {
-	if( engine::getMainWindow()->workspace() != NULL )
+	if( engine::getMainWindow()->workspace() == NULL )
 	{
-		// get all windows opened in the workspace
-		QWidgetList pl =
-			engine::getMainWindow()->workspace()->windowList(
+		return;
+	}
+
+	// get all windows opened in the workspace
+	QWidgetList pl = engine::getMainWindow()->workspace()->windowList(
 #if QT_VERSION >= 0x030200
 						QWorkspace::StackingOrder
 #endif
 									);
 #ifdef QT4
-		QListIterator<QWidget *> w( pl );
-		w.toBack();
-		// now we travel through the window-list until we find an
-		// instrument-track
-		while( w.hasPrevious() )
-		{
-			instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+	QListIterator<QWidget *> w( pl );
+	w.toBack();
+	// now we travel through the window-list until we find an
+	// instrument-track
+	while( w.hasPrevious() )
+	{
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 								w.previous() );
 #else
-		QWidget * w = pl.last();
-		// now we travel through the window-list until we find an
-		// instrument-track
-		while( w != NULL )
-		{
-			instrumentTrack * ct =
-					dynamic_cast<instrumentTrack *>( w );
+	QWidget * w = pl.last();
+	// now we travel through the window-list until we find an
+	// instrument-track
+	while( w != NULL )
+	{
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( w );
 #endif
-			if( ct != NULL && ct->isHidden() == FALSE )
+		if( ct != NULL && ct->isHidden() == FALSE )
+		{
+			// ok, it's an instrument-track, so we can apply the
+			// sample or the preset
+			engine::getMixer()->lock();
+			if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
 			{
-				// ok, it's an instrument-track, so we can apply
-				// the sample or the preset
-				if( m_contextMenuItem->type() ==
-							fileItem::SAMPLE_FILE )
-				{
-					instrument * afp = ct->loadInstrument(
+				instrument * afp = ct->loadInstrument(
 						engine::sampleExtensions()
 							[m_contextMenuItem
 							->extension()] );
-					if( afp != NULL )
-					{
-						afp->setParameter( "samplefile",
-						m_contextMenuItem->fullName() );
-					}
-				}
-				else if( m_contextMenuItem->type() ==
-							fileItem::PRESET_FILE )
+				if( afp != NULL )
 				{
-					multimediaProject mmp(
+					afp->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
-					ct->loadTrackSpecificSettings(
-								mmp.content().
+				}
+			}
+			else if( m_contextMenuItem->type() ==
+							fileItem::PRESET_FILE )
+			{
+				multimediaProject mmp(
+						m_contextMenuItem->fullName() );
+				ct->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
-				}
-				ct->toggledInstrumentTrackButton( TRUE );
-				break;
 			}
-#ifndef QT4
-			w = pl.prev();
-#endif
+			ct->toggledInstrumentTrackButton( TRUE );
+			engine::getMixer()->unlock();
+			break;
 		}
+#ifndef QT4
+		w = pl.prev();
+#endif
 	}
 }
 
@@ -366,6 +367,7 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 
 void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 {
+	engine::getMixer()->lock();
 	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
@@ -397,6 +399,7 @@ void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
 			ct->toggledInstrumentTrackButton( TRUE );
 		}
 	}
+	engine::getMixer()->unlock();
 }
 
 
@@ -451,50 +454,53 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 	Q3ListView::contentsMouseDoubleClickEvent( _me );
 	fileItem * f = dynamic_cast<fileItem *>( itemAt(
 					contentsToViewport( _me->pos() ) ) );
-	if( f != NULL )
+	if( f == NULL )
 	{
-		if( f->type() == fileItem::SAMPLE_FILE )
-		{
-			// samples are per default opened in bb-editor because
-			// they're likely drum-samples etc.
-			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		return;
+	}
+
+	if( f->type() == fileItem::SAMPLE_FILE )
+	{
+		// samples are per default opened in bb-editor because they're
+		// likely drum-samples etc.
+		engine::getMixer()->lock();
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::INSTRUMENT_TRACK,
 						engine::getBBEditor() ) );
 #ifdef LMMS_DEBUG
-			assert( it != NULL );
+		assert( it != NULL );
 #endif
-			instrument * afp = it->loadInstrument(
+		instrument * afp = it->loadInstrument(
 				engine::sampleExtensions()[f->extension()] );
-			if( afp != NULL )
-			{
-				afp->setParameter( "samplefile",
-								f->fullName() );
-			}
-			it->toggledInstrumentTrackButton( TRUE );
-		}
-		else if( f->type() == fileItem::PRESET_FILE )
+		if( afp != NULL )
 		{
-			// presets are per default opened in bb-editor
-			multimediaProject mmp( f->fullName() );
-			track * t = track::create( track::INSTRUMENT_TRACK,
-						engine::getBBEditor() );
-			instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-									t );
-			if( it != NULL )
-			{
-				it->loadTrackSpecificSettings( mmp.content().
+			afp->setParameter( "samplefile", f->fullName() );
+		}
+		it->toggledInstrumentTrackButton( TRUE );
+		engine::getMixer()->unlock();
+	}
+	else if( f->type() == fileItem::PRESET_FILE )
+	{
+		// presets are per default opened in bb-editor
+		multimediaProject mmp( f->fullName() );
+		engine::getMixer()->lock();
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+				track::create( track::INSTRUMENT_TRACK,
+						engine::getBBEditor() ) );
+		if( it != NULL )
+		{
+			it->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
-				it->toggledInstrumentTrackButton( TRUE );
-			}
+			it->toggledInstrumentTrackButton( TRUE );
 		}
-		else if( f->type() == fileItem::PROJECT_FILE )
+		engine::getMixer()->unlock();
+	}
+	else if( f->type() == fileItem::PROJECT_FILE )
+	{
+		if( engine::getSongEditor()->mayChangeProject() )
 		{
-			if( engine::getSongEditor()->mayChangeProject() )
-			{
-				engine::getSongEditor()->loadProject(
-								f->fullName() );
-			}
+			engine::getSongEditor()->loadProject( f->fullName() );
 		}
 	}
 }

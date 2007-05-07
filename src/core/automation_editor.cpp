@@ -89,7 +89,6 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 automationEditor::automationEditor( void ) :
 	QWidget( engine::getMainWindow()->workspace() ),
-	m_paintPixmap(),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -502,14 +501,10 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 
 
 
-void automationEditor::updatePaintPixmap( void )
+void automationEditor::updatePaintPixmap( QPixmap & _p )
 {
-	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
-	{
-		m_paintPixmap = QPixmap( size() );
-	}
-	m_paintPixmap.fill( QColor( 0, 0, 0 ) );
-	QPainter p( &m_paintPixmap );
+	_p.fill( QColor( 0, 0, 0 ) );
+	QPainter p( &_p );
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -1562,9 +1557,30 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 
 
+inline void automationEditor::drawCross( QPainter & _p )
+{
+	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
+	int level = getLevel( mouse_pos.y() );
+	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	int cross_y = m_y_auto ?
+		grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( level - m_min_level )
+				/ (float)( m_max_level - m_min_level ) ) :
+		grid_bottom - ( level - m_bottom_level ) * m_y_delta;
+
+	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	_p.drawLine( VALUES_WIDTH, cross_y, width(), cross_y );
+	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
+						height() - SCROLLBAR_SIZE );
+}
+
+
+
+
 void automationEditor::paintEvent( QPaintEvent * )
 {
-	updatePaintPixmap();
+	QPixmap paintPixmap( size() );
+	updatePaintPixmap( paintPixmap );
 #ifdef QT4
 	QPainter p( this );
 #else
@@ -1573,7 +1589,7 @@ void automationEditor::paintEvent( QPaintEvent * )
 
 	QPainter p( &draw_pm, this );
 #endif
-	p.drawPixmap( 0, 0, m_paintPixmap );
+	p.drawPixmap( 0, 0, paintPixmap );
 
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
 				height() - TOP_MARGIN - SCROLLBAR_SIZE );
@@ -1599,26 +1615,6 @@ void automationEditor::paintEvent( QPaintEvent * )
 	// and blit all the drawn stuff on the screen...
 	bitBlt( this, rect().topLeft(), &draw_pm );
 #endif
-}
-
-
-
-
-inline void automationEditor::drawCross( QPainter & _p )
-{
-	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
-	int level = getLevel( mouse_pos.y() );
-	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
-	int cross_y = m_y_auto ?
-		grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( level - m_min_level )
-				/ (float)( m_max_level - m_min_level ) ) :
-		grid_bottom - ( level - m_bottom_level ) * m_y_delta;
-
-	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
-	_p.drawLine( VALUES_WIDTH, cross_y, width(), cross_y );
-	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
-						height() - SCROLLBAR_SIZE );
 }
 
 
@@ -1732,6 +1728,15 @@ int automationEditor::getLevel( int _y )
 	}
 
 	return( level );
+}
+
+
+
+
+inline bool automationEditor::inBBEditor( void )
+{
+	return( m_pattern->getTrack()->getTrackContainer()
+						== engine::getBBEditor() );
 }
 
 
@@ -2221,15 +2226,6 @@ void automationEditor::updateTopBottomLevels( void )
 		m_bottom_level = m_min_level;
 		m_top_level = m_max_level;
 	}
-}
-
-
-
-
-inline bool automationEditor::inBBEditor( void )
-{
-	return( m_pattern->getTrack()->getTrackContainer()
-						== engine::getBBEditor() );
 }
 
 

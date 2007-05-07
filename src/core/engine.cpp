@@ -104,6 +104,10 @@ void engine::destroy( void )
 	delete s_automationEditor;
 	s_automationEditor = NULL;
 
+#ifdef LADSPA_SUPPORT
+	delete s_ladspaManager;
+#endif
+
 	presetPreviewPlayHandle::cleanUp();
 
 	// now we can clean up all allocated buffer

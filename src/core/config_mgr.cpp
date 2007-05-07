@@ -661,7 +661,11 @@ void configManager::nextButtonClicked( void )
 
 void configManager::switchPage( csize _pg )
 {
+#ifdef QT4
 	if( m_currentPage >= 0 && m_currentPage < m_pages.size() )
+#else
+	if( m_currentPage < m_pages.size() )
+#endif
 	{
 		m_pages[m_currentPage].first->hide();
 #ifdef QT4

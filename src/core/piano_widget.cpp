@@ -49,10 +49,13 @@
 
 #include "piano_widget.h"
 #include "automatable_object_templates.h"
+#include "embed.h"
+#include "gui_templates.h"
 #include "instrument_track.h"
+#include "knob.h"
 #include "midi.h"
 #include "templates.h"
-#include "embed.h"
+#include "update_event.h"
 
 #ifdef Q_WS_X11
 
@@ -478,6 +481,28 @@ void pianoWidget::keyReleaseEvent( QKeyEvent * _ke )
 	{
 		_ke->ignore();
 	}
+}
+
+
+
+
+void pianoWidget::setKeyState( int _key, bool _on )
+{
+	m_pressedKeys[tLimit( _key, 0, NOTES_PER_OCTAVE * OCTAVES - 1 )] = _on;
+	QApplication::postEvent( this, new updateEvent() );
+}
+
+
+
+
+
+#ifndef QT3
+void pianoWidget::customEvent( QEvent * )
+#else
+void pianoWidget::customEvent( QCustomEvent * )
+#endif
+{
+	update();
 }
 
 

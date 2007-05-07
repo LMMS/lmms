@@ -32,12 +32,14 @@
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QtGui/QMessageBox>
+#include <QtGui/QPixmap>
 
 #else
 
 #include <qmessagebox.h>
 #include <qdir.h>
 #include <qlibrary.h>
+#include <qpixmap.h>
 
 #endif
 
@@ -58,6 +60,7 @@ static plugin::descriptor dummy_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::Undefined,
+	NULL,
 	NULL
 } ;
 

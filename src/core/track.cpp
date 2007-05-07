@@ -44,7 +44,6 @@
 #include <qlayout.h>
 #include <qcursor.h>
 #include <qwhatsthis.h>
-#include <qtimer.h>
 
 #endif
 
@@ -61,6 +60,8 @@
 #include "templates.h"
 #include "clipboard.h"
 #include "embed.h"
+#include "engine.h"
+#include "gui_templates.h"
 #include "pixmap_button.h"
 #include "debug.h"
 #include "tooltip.h"
@@ -1141,8 +1142,9 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 
 void trackOperationsWidget::cloneTrack( void )
 {
-	m_trackWidget->getTrack()->getTrackContainer()->cloneTrack(
-						m_trackWidget->getTrack() );
+	engine::getMixer()->lock();
+	m_trackWidget->getTrack()->clone();
+	engine::getMixer()->unlock();
 }
 
 
@@ -1150,21 +1152,10 @@ void trackOperationsWidget::cloneTrack( void )
 
 void trackOperationsWidget::removeTrack( void )
 {
-#ifdef QT3
-	QTimer::singleShot( 10, this, SLOT( removeTrackTimer() ) );
-#else
-//#warning fixme
-	removeTrackTimer();
-#endif
-}
-
-
-
-
-void trackOperationsWidget::removeTrackTimer( void )
-{
+	engine::getMixer()->lock();
 	m_trackWidget->getTrack()->getTrackContainer()->removeTrack(
 						m_trackWidget->getTrack() );
+	engine::getMixer()->unlock();
 }
 
 
@@ -1648,10 +1639,6 @@ track::~track()
 
 track * track::create( trackTypes _tt, trackContainer * _tc )
 {
-	// while adding track, pause mixer for not getting into any trouble
-	// because of track being not created completely so far
-	engine::getMixer()->pause();
-
 	track * t = NULL;
 
 	switch( _tt )
@@ -1669,33 +1656,27 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 	assert( t != NULL );
 #endif
 
-	// allow mixer to continue
-	engine::getMixer()->play();
-
 	return( t );
 }
 
 
 
 
-track * track::create( const QDomElement & _this, trackContainer * _tc )
+void track::create( const QDomElement & _this, trackContainer * _tc )
 {
-	track * t = create( static_cast<trackTypes>( _this.attribute(
-						"type" ).toInt() ), _tc );
-	t->restoreState( _this );
-	return( t );
+	create( static_cast<trackTypes>( _this.attribute( "type" ).toInt() ),
+						_tc )->restoreState( _this );
 }
 
 
 
 
-track * track::clone( track * _track )
+void track::clone( void )
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
-	_track->saveState( doc, parent );
-	QDomElement e = parent.firstChild().toElement();
-	return( create( e, _track->getTrackContainer() ) );
+	saveState( doc, parent );
+	create( parent.firstChild().toElement(), m_trackContainer );
 }
 
 

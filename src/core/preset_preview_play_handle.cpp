@@ -41,13 +41,14 @@
 
 
 #include "preset_preview_play_handle.h"
-#include "note_play_handle.h"
-#include "instrument_track.h"
-#include "track_container.h"
-#include "mmp.h"
 #include "debug.h"
+#include "engine.h"
+#include "instrument_track.h"
 #include "midi_port.h"
+#include "mmp.h"
+#include "note_play_handle.h"
 #include "project_journal.h"
+#include "track_container.h"
 
 
 
@@ -199,6 +200,14 @@ void presetPreviewPlayHandle::play( bool _try_parallelizing )
 bool presetPreviewPlayHandle::done( void ) const
 {
 	return( m_previewNote->muted() );
+}
+
+
+
+
+bool presetPreviewPlayHandle::isFromTrack( const track * _track ) const
+{
+	return( s_previewTC->previewInstrumentTrack() == _track );
 }
 
 

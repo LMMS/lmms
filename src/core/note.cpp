@@ -41,7 +41,7 @@
 
 #include "note.h"
 #include "automatable_object_templates.h"
-#include "knob.h"
+#include "detuning_helper.h"
 #include "templates.h"
 
 
@@ -52,7 +52,7 @@ const float note::MAX_DETUNING = 4 * 12.0f;
 
 note::note( const midiTime & _length, const midiTime & _pos,
 		tones _tone, octaves _octave, volume _volume,
-					panning _panning, knob * _detuning ) :
+				panning _panning, detuningHelper * _detuning ) :
 	m_tone( C ),
 	m_octave( DEFAULT_OCTAVE ),
 	m_volume( DEFAULT_VOLUME ),
@@ -70,7 +70,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 
 	if( _detuning )
 	{
-		setDetuning( _detuning );
+		m_detuning = sharedObject::ref( _detuning );
 	}
 	else
 	{
@@ -91,7 +91,7 @@ note::note( const note & _note ) :
 	m_length( _note.m_length ),
 	m_pos( _note.m_pos )
 {
-	setDetuning( _note.m_detuning );
+	m_detuning = sharedObject::ref( _note.m_detuning );
 }
 
 
@@ -99,18 +99,7 @@ note::note( const note & _note ) :
 
 note::~note()
 {
-	if( m_detuning )
-	{
-		knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
-		if( o->data().toInt() )
-		{
-			o->setData( o->data().toInt() - 1 );
-		}
-		else
-		{
-			delete m_detuning;
-		}
-	}
+	sharedObject::unref( m_detuning );
 }
 
 
@@ -229,7 +218,7 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pan", m_panning );
 	_this.setAttribute( "len", m_length );
 	_this.setAttribute( "pos", m_pos );
-	if( m_length > 0 && m_detuning )
+	if( m_length > 0 )
 	{
 		m_detuning->saveSettings( _doc, _this, "detuning" );
 	}
@@ -300,26 +289,10 @@ void note::editDetuningPattern( void )
 
 
 
-void note::setDetuning( knob * _detuning )
-{
-	m_detuning = _detuning;
-	if( m_detuning )
-	{
-		knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
-		o->setData( o->data().toInt() + 1 );
-	}
-}
-
-
-
-
 void note::createDetuning( void )
 {
-	m_detuning = new knob( knobDark_28, NULL,
-						QObject::tr( "Note detuning" ),
-						NULL );
+	m_detuning = new detuningHelper;
 	m_detuning->initAutomationPattern();
-	m_detuning->setData( 0 );
 	m_detuning->setRange( -MAX_DETUNING, MAX_DETUNING, 0.1f );
 }
 
@@ -328,17 +301,12 @@ void note::createDetuning( void )
 
 void note::detachCurrentDetuning( void )
 {
-	knob::autoObj * o = dynamic_cast<knob::autoObj *>( m_detuning );
-	if( o->data().toInt() )
-	{
-		o->setData( o->data().toInt() - 1 );
-
-		QDomDocument doc;
-		QDomElement parent = doc.createElement( "clone" );
-		m_detuning->saveSettings( doc, parent );
-		createDetuning();
-		m_detuning->loadSettings( parent );
-	}
+	QDomDocument doc;
+	QDomElement parent = doc.createElement( "clone" );
+	m_detuning->saveSettings( doc, parent );
+	sharedObject::unref( m_detuning );
+	createDetuning();
+	m_detuning->loadSettings( parent );
 }
 
 
@@ -346,10 +314,6 @@ void note::detachCurrentDetuning( void )
 
 bool note::hasDetuningInfo( void )
 {
-	if( m_detuning == NULL )
-	{
-		return( FALSE );
-	}
 	automationPattern::timeMap map =
 			m_detuning->getAutomationPattern()->getTimeMap();
 	return( map.size() > 1 || map[0] != 0 );

@@ -40,7 +40,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QAction>
-#include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QFileDialog>
 #include <QtGui/QKeyEvent>
@@ -51,7 +50,6 @@
 
 #else
 
-#include <qapplication.h>
 #include <qfile.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
@@ -114,8 +112,7 @@ songEditor::songEditor( void ) :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE ),
-	m_scrollBack( FALSE ),
-	m_destroyed( FALSE )
+	m_scrollBack( FALSE )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
@@ -453,8 +450,8 @@ songEditor::songEditor( void ) :
 
 songEditor::~songEditor()
 {
+	m_playing = FALSE;
 	delete m_automation_track;
-	m_destroyed = TRUE;
 }
 
 
@@ -1239,10 +1236,6 @@ void songEditor::updateTimeLinePosition( void )
 
 void songEditor::stop( void )
 {
-	if( m_destroyed )
-	{
-		return;
-	}
 	m_actions.push_back( ACT_STOP_PLAY );
 #ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
@@ -1420,24 +1413,10 @@ void songEditor::clearProject( void )
 
 	if( m_playing )
 	{
-		// stop play, because it's dangerous that play-routines try to
-		// access non existing data (as you can see in the next lines,
-		// all data is cleared!)
 		stop();
 	}
 
-	// make sure all running notes are cleared, otherwise the whole
-	// thing will end up in a SIGSEGV...
-	engine::getMixer()->clear( TRUE );
-	while( engine::getMixer()->haveNoRunningNotes() == FALSE )
-	{
-#ifdef QT4
-		QApplication::processEvents( QEventLoop::AllEvents );
-#else
-		qApp->processEvents();
-#endif
-	}
-
+	engine::getMixer()->lock();
 	clearAllTracks();
 
 	engine::getAutomationEditor()->setCurrentPattern( NULL );
@@ -1446,6 +1425,7 @@ void songEditor::clearProject( void )
 	m_masterPitchSlider->clearAutomationValues();
 
 	engine::getBBEditor()->clearAllTracks();
+	engine::getMixer()->unlock();
 
 	engine::getProjectNotes()->clear();
 
@@ -1545,52 +1525,11 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 	}
 
 	// get the header information from the DOM
-	QDomNode node = mmp.head().firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement() )
-		{
-			if( node.nodeName() == "bpm" &&
-		node.toElement().attribute( "value" ).toInt() > 0 )
-			{
-				m_bpmSpinBox->setInitValue( node.toElement()
-						.attribute( "value" ).toInt() );
-			}
-			else if( node.nodeName() == "mastervol" )
-			{
-				if( node.toElement().attribute( "value"
-								).toInt() > 0 )
-				{
-					m_masterVolumeSlider->setInitValue(
-						node.toElement().attribute(
-							"value" ).toInt() );
-				}
-				else
-				{
-					m_masterVolumeSlider->setInitValue(
-							DEFAULT_VOLUME );
-				}
-			}
-			else if( node.nodeName() == "masterpitch" )
-			{
-				m_masterPitchSlider->setInitValue(
-					-node.toElement().attribute( "value"
-								).toInt() );
-			}
-			else if( node.nodeName()
-					== automationPattern::classNodeName() )
-			{
-				m_bpmSpinBox->loadSettings( mmp.head(), "bpm" );
-				m_masterVolumeSlider->loadSettings( mmp.head(),
-								"mastervol" );
-				m_masterPitchSlider->loadSettings( mmp.head(),
-								"masterpitch" );
-			}
-		}
-		node = node.nextSibling();
-	}
+	m_bpmSpinBox->loadSettings( mmp.head(), "bpm" );
+	m_masterVolumeSlider->loadSettings( mmp.head(), "mastervol" );
+	m_masterPitchSlider->loadSettings( mmp.head(), "masterpitch" );
 
-	node = mmp.content().firstChild();
+	QDomNode node = mmp.content().firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )

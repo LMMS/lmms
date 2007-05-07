@@ -121,14 +121,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( FALSE ),
 	m_lfoShapeData( NULL ),
-	m_lfoShape( SIN ),
-	m_busyMutex(
-#ifdef QT3
-		TRUE
-#else
-		QMutex::Recursive
-#endif
-			)
+	m_lfoShape( SIN )
 {
 	if( s_envGraph == NULL )
 	{
@@ -511,15 +504,44 @@ envelopeAndLFOWidget::~envelopeAndLFOWidget()
 
 
 
+inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpab_t _frame_offset )
+{
+	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
+	const float phase = frame / static_cast<float>(
+						m_lfoOscillationFrames );
+	sample_t shape_sample;
+	switch( m_lfoShape  )
+	{
+		case TRIANGLE:
+			shape_sample = oscillator::triangleSample( phase );
+			break;
+		case SQUARE:
+			shape_sample = oscillator::squareSample( phase );
+			break;
+		case SAW:
+			shape_sample = oscillator::sawSample( phase );
+			break;
+		case USER:
+			shape_sample = m_userWave.userWaveSample( phase );
+			break;
+		case SIN:
+		default:
+			shape_sample = oscillator::sinSample( phase );
+			break;
+	}
+	return( shape_sample * m_lfoAmount );
+}
+
+
+
+
 void envelopeAndLFOWidget::updateLFOShapeData( void )
 {
 	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	m_userWave.lock();
 	for( fpab_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
-	m_userWave.unlock();
 	m_bad_lfoShapeData = FALSE;
 }
 
@@ -655,8 +677,6 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 
 void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 {
-	m_busyMutex.lock();
-
 	m_predelayKnob->loadSettings( _this, "pdel" );
 	m_attackKnob->loadSettings( _this, "att" );
 	m_holdKnob->loadSettings( _this, "hold" );
@@ -681,8 +701,6 @@ void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 	}
 	
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
-
-	m_busyMutex.unlock();
 
 	updateSampleVars();
 }
@@ -939,10 +957,11 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 
 void envelopeAndLFOWidget::updateSampleVars( void )
 {
-	m_busyMutex.lock();
+	engine::getMixer()->lock();
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 					engine::getMixer()->sampleRate();
+	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
 					expKnobVal( m_predelayKnob->value() ) );
@@ -979,46 +998,43 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 		m_rFrames = 0;
 	}
 
-	sample_t * new_pahd_env = new sample_t[m_pahdFrames];
-	sample_t * new_r_env = new sample_t[m_rFrames];
+	delete[] m_pahdEnv;
+	delete[] m_rEnv;
+
+	m_pahdEnv = new sample_t[m_pahdFrames];
+	m_rEnv = new sample_t[m_rFrames];
 
 	for( f_cnt_t i = 0; i < predelay_frames; ++i )
 	{
-		new_pahd_env[i] = m_amountAdd;
+		m_pahdEnv[i] = m_amountAdd;
 	}
 
 	f_cnt_t add = predelay_frames;
 
 	for( f_cnt_t i = 0; i < attack_frames; ++i )
 	{
-		new_pahd_env[add+i] = ( (float)i / attack_frames ) *
+		m_pahdEnv[add + i] = ( (float)i / attack_frames ) *
 							m_amount + m_amountAdd;
 	}
 
 	add += attack_frames;
 	for( f_cnt_t i = 0; i < hold_frames; ++i )
 	{
-		new_pahd_env[add+i] = m_amount + m_amountAdd;
+		m_pahdEnv[add + i] = m_amount + m_amountAdd;
 	}
 
 	add += hold_frames;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
-		new_pahd_env[add+i] = ( m_sustainLevel + ( 1.0f -
+		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
 						( 1.0f - m_sustainLevel ) ) *
 							m_amount + m_amountAdd;
 	}
 
-	delete[] m_pahdEnv;
-	delete[] m_rEnv;
-
-	m_pahdEnv = new_pahd_env;
-	m_rEnv = new_r_env;
-
 	for( f_cnt_t i = 0; i < m_rFrames; ++i )
 	{
-		new_r_env[i] = ( (float)( m_rFrames - i ) / m_rFrames
+		m_rEnv[i] = ( (float)( m_rFrames - i ) / m_rFrames
 					// * m_sustainLevel
 					 		) * m_amount;
 	}
@@ -1058,40 +1074,9 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 	m_bad_lfoShapeData = TRUE;
 
-	m_busyMutex.unlock();
-
 	update();
-}
 
-
-
-
-inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpab_t _frame_offset )
-{
-	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
-	const float phase = frame / static_cast<float>(
-						m_lfoOscillationFrames );
-	sample_t shape_sample;
-	switch( m_lfoShape  )
-	{
-		case TRIANGLE:
-			shape_sample = oscillator::triangleSample( phase );
-			break;
-		case SQUARE:
-			shape_sample = oscillator::squareSample( phase );
-			break;
-		case SAW:
-			shape_sample = oscillator::sawSample( phase );
-			break;
-		case USER:
-			shape_sample = m_userWave.userWaveSample( phase );
-			break;
-		case SIN:
-		default:
-			shape_sample = oscillator::sinSample( phase );
-			break;
-	}
-	return( shape_sample * m_lfoAmount );
+	engine::getMixer()->unlock();
 }
 
 

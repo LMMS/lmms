@@ -48,22 +48,23 @@
 
 
 #include "track_container.h"
-#include "track.h"
-#include "templates.h"
 #include "bb_track.h"
-#include "main_window.h"
-#include "mixer.h"
-#include "song_editor.h"
-#include "string_pair_drag.h"
-#include "instrument_track.h"
-#include "mmp.h"
 #include "config_mgr.h"
+#include "debug.h"
+#include "engine.h"
+#include "file_browser.h"
 #include "import_filter.h"
 #include "instrument.h"
-#include "rubberband.h"
+#include "instrument_track.h"
+#include "main_window.h"
+#include "mixer.h"
+#include "mmp.h"
 #include "project_journal.h"
-#include "debug.h"
-#include "file_browser.h"
+#include "rubberband.h"
+#include "song_editor.h"
+#include "string_pair_drag.h"
+#include "templates.h"
+#include "track.h"
 
 
 trackContainer::trackContainer( void ) :
@@ -195,16 +196,6 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 
 
-void trackContainer::cloneTrack( track * _track )
-{
-	engine::getMixer()->pause();
-	track::clone( _track );
-	engine::getMixer()->play();
-}
-
-
-
-
 void trackContainer::addTrack( track * _track )
 {
 	QMap<QString, QVariant> map;
@@ -237,15 +228,12 @@ void trackContainer::removeTrack( track * _track )
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
 
-		engine::getMixer()->pause();
 #ifndef QT4
 		m_scrollArea->removeChild( _track->getTrackWidget() );
 #endif
 		m_trackWidgets.erase( it );
 
 		delete _track;
-
-		engine::getMixer()->play();
 
 		realignTracks();
 		if( engine::getSongEditor() )
@@ -334,7 +322,7 @@ void trackContainer::realignTracks( bool _complete_update )
 
 void trackContainer::clearAllTracks( void )
 {
-	while( m_trackWidgets.size() )
+	while( !m_trackWidgets.empty() )
 	{
 		removeTrack( m_trackWidgets.front()->getTrack() );
 	}
@@ -513,6 +501,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
+	engine::getMixer()->lock();
 	if( type == "instrument" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
@@ -560,6 +549,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 		updateAfterTrackAdd();
 		_de->accept();
 	}
+	engine::getMixer()->unlock();
 }
 
 

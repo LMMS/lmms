@@ -77,10 +77,8 @@ bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf,
 
 void FASTCALL effect::setGate( float _level )
 {
-	m_processLock.lock();
 	m_gate = _level * _level * m_processors * 
 				engine::getMixer()->framesPerAudioBuffer();
-	m_processLock.unlock();
 }
 
 

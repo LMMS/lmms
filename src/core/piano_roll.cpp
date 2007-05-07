@@ -63,22 +63,23 @@
 
 #include "piano_roll.h"
 #include "automatable_object_templates.h"
-#include "song_editor.h"
-#include "main_window.h"
-#include "pattern.h"
-#include "embed.h"
-#include "pixmap_button.h"
-#include "templates.h"
-#include "gui_templates.h"
-#include "timeline.h"
-#include "instrument_track.h"
-#include "tooltip.h"
-#include "midi.h"
-#include "tool_button.h"
-#include "text_float.h"
 #include "combobox.h"
-#include "piano_widget.h"
 #include "debug.h"
+#include "detuning_helper.h"
+#include "embed.h"
+#include "gui_templates.h"
+#include "instrument_track.h"
+#include "main_window.h"
+#include "midi.h"
+#include "pattern.h"
+#include "piano_widget.h"
+#include "pixmap_button.h"
+#include "song_editor.h"
+#include "templates.h"
+#include "text_float.h"
+#include "timeline.h"
+#include "tool_button.h"
+#include "tooltip.h"
 
 
 typedef automationPattern::timeMap timeMap;
@@ -139,7 +140,6 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 pianoRoll::pianoRoll( void ) :
 	QWidget( engine::getMainWindow()->workspace() ),
-	m_paintPixmap(),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -524,13 +524,13 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	}
 
 
-	noteVector & notes = m_pattern->notes();
+	const noteVector & notes = m_pattern->notes();
 	int central_key = 0;
 	if( notes.empty() == FALSE )
 	{
 		// determine the central key so that we can scroll to it
 		int total_notes = 0;
-		for( noteVector::iterator it = notes.begin();
+		for( noteVector::const_iterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
 			if( ( *it )->length() > 0 )
@@ -634,14 +634,43 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 
 
 
-void pianoRoll::updatePaintPixmap( void )
+inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
+								Uint16 _y )
 {
-	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
+	Uint16 middle_y = _y + KEY_LINE_HEIGHT / 2;
+	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+
+	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
+	timeMap::iterator it = map.end();
+	do
 	{
-		m_paintPixmap = QPixmap( size() );
-	}
-	m_paintPixmap.fill( QColor( 0, 0, 0 ) );
-	QPainter p( &m_paintPixmap );
+		--it;
+		Sint32 pos_tact_64th = -it.key();
+		if( pos_tact_64th > _n->length() )
+		{
+			break;
+		}
+		Uint16 pos_x = _x + pos_tact_64th * m_ppt / 64;
+
+#ifdef QT3
+		const int level = it.data();
+#else
+		const int level = it.value();
+#endif
+		Uint16 pos_y = middle_y - level * KEY_LINE_HEIGHT / 10;
+
+		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
+		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
+	} while( it != map.begin() );
+}
+
+
+
+
+void pianoRoll::updatePaintPixmap( QPixmap & _p )
+{
+	_p.fill( QColor( 0, 0, 0 ) );
+	QPainter p( &_p );
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -871,20 +900,20 @@ void pianoRoll::updatePaintPixmap( void )
 	int y_base = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
 	if( validPattern() == TRUE )
 	{
-		QPainter p_detuning( &m_paintPixmap );
+		QPainter p_detuning( &_p );
 		p_detuning.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
 				width() - WHITE_KEY_WIDTH,
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN
 							- m_notesEditHeight );
 
-		noteVector & notes = m_pattern->notes();
+		const noteVector & notes = m_pattern->notes();
 
 		const int visible_keys = ( height() - PR_TOP_MARGIN -
 					PR_BOTTOM_MARGIN - m_notesEditHeight ) /
 							KEY_LINE_HEIGHT + 2;
 
-		for( noteVector::iterator it = notes.begin(); it != notes.end();
-									++it )
+		for( noteVector::const_iterator it = notes.begin();
+						it != notes.end(); ++it )
 		{
 			Sint32 len_tact_64th = ( *it )->length();
 
@@ -996,39 +1025,6 @@ void pianoRoll::updatePaintPixmap( void )
 #else
 	m_leftRightScroll->setSteps( 1, l );
 #endif
-}
-
-
-
-
-inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
-								Uint16 _y )
-{
-	Uint16 middle_y = _y + KEY_LINE_HEIGHT / 2;
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
-
-	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
-	timeMap::iterator it = map.end();
-	do
-	{
-		--it;
-		Sint32 pos_tact_64th = -it.key();
-		if( pos_tact_64th > _n->length() )
-		{
-			break;
-		}
-		Uint16 pos_x = _x + pos_tact_64th * m_ppt / 64;
-
-#ifdef QT3
-		const int level = it.data();
-#else
-		const int level = it.value();
-#endif
-		Uint16 pos_y = middle_y - level * KEY_LINE_HEIGHT / 10;
-
-		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
-		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
-	} while( it != map.begin() );
 }
 
 
@@ -1296,10 +1292,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 							m_currentPosition;
 
 			// get note-vector of current pattern
-			noteVector & notes = m_pattern->notes();
+			const noteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			noteVector::iterator it = notes.begin();
+			noteVector::const_iterator it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -1680,10 +1676,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							m_currentPosition;
 
 			// get note-vector of current pattern
-			noteVector & notes = m_pattern->notes();
+			const noteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			noteVector::iterator it = notes.begin();
+			noteVector::const_iterator it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -2038,7 +2034,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 void pianoRoll::paintEvent( QPaintEvent * )
 {
-	updatePaintPixmap();
+	QPixmap paintPixmap( size() );
+	updatePaintPixmap( paintPixmap );
 #ifdef QT4
 	QPainter p( this );
 #else
@@ -2047,7 +2044,7 @@ void pianoRoll::paintEvent( QPaintEvent * )
 
 	QPainter p( &draw_pm, this );
 #endif
-	p.drawPixmap( 0, 0, m_paintPixmap );
+	p.drawPixmap( 0, 0, paintPixmap );
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
 				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
@@ -2263,14 +2260,8 @@ void pianoRoll::recordNote( const note & _n )
 				_n.tone(), _n.octave(),
 				_n.getVolume(), _n.getPanning() );
 		n.quantizeLength( quantization() );
-#ifndef QT4
-		qApp->lock();
-#endif
 		m_pattern->addNote( n );
 		update();
-#ifndef QT4
-		qApp->unlock();
-#endif
 		engine::getSongEditor()->setModified();
 	}
 }
@@ -2347,12 +2338,13 @@ void pianoRoll::selectAll( void )
 		return;
 	}
 
-	noteVector & notes = m_pattern->notes();
+	const noteVector & notes = m_pattern->notes();
 
 	// if first_time = TRUE, we HAVE to set the vars for select
 	bool first_time = TRUE;
 
-	for( noteVector::iterator it = notes.begin(); it != notes.end(); ++it )
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+									++it )
 	{
 		Uint32 len_tact_64th = ( *it )->length();
 
@@ -2419,9 +2411,10 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	noteVector & notes = m_pattern->notes();
+	const noteVector & notes = m_pattern->notes();
 
-	for( noteVector::iterator it = notes.begin(); it != notes.end(); ++it )
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+									++it )
 	{
 		Sint32 len_tact_64th = ( *it )->length();
 
@@ -2661,12 +2654,12 @@ note * pianoRoll::noteUnderMouse( void )
 
 
 
-noteVector::iterator pianoRoll::noteIteratorUnderMouse( void )
+noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 {
 	QPoint pos = mapFromGlobal( QCursor::pos() );
 
 	// get note-vector of current pattern
-	noteVector & notes = m_pattern->notes();
+	const noteVector & notes = m_pattern->notes();
 
 	if( pos.x() <= WHITE_KEY_WIDTH || pos.x() > width() - SCROLLBAR_SIZE
 		|| pos.y() < PR_TOP_MARGIN
@@ -2680,7 +2673,7 @@ noteVector::iterator pianoRoll::noteIteratorUnderMouse( void )
 							+ m_currentPosition;
 
 	// will be our iterator in the following loop
-	noteVector::iterator it = notes.begin();
+	noteVector::const_iterator it = notes.begin();
 
 	// loop through whole note-vector...
 	while( it != notes.end() )

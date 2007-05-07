@@ -26,12 +26,13 @@
 
 
 #include "sample_play_handle.h"
+#include "audio_port.h"
 #include "bb_track.h"
+#include "engine.h"
 #include "instrument_track.h"
 #include "pattern.h"
 #include "sample_buffer.h"
 #include "sample_track.h"
-#include "audio_port.h"
 
 
 
@@ -153,6 +154,14 @@ void samplePlayHandle::play( const fpab_t _frame_base, bool )
 bool samplePlayHandle::done( void ) const
 {
 	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == TRUE );
+}
+
+
+
+
+bool samplePlayHandle::isFromTrack( const track * _track ) const
+{
+	return( m_track == _track || m_bbTrack == _track );
 }
 
 

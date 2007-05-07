@@ -48,15 +48,17 @@
 
 
 #include "midi_tab_widget.h"
+#include "embed.h"
+#include "engine.h"
+#include "gui_templates.h"
 #include "instrument_track.h"
+#include "midi_client.h"
 #include "midi_port.h"
-#include "tab_widget.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
-#include "tooltip.h"
 #include "song_editor.h"
-#include "midi_client.h"
-#include "embed.h"
+#include "tab_widget.h"
+#include "tooltip.h"
 
 
 
@@ -81,6 +83,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	m_inputChannelSpinBox->setValue( m_midiPort->inputChannel() + 1 );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_inputChannelSpinBox->move( 28, 52 );
+	m_inputChannelSpinBox->setEnabled( FALSE );
 	connect( m_inputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( inputChannelChanged( int ) ) );
 	inputChannelChanged( m_inputChannelSpinBox->value() );
@@ -93,6 +96,7 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	//m_outputChannelSpinBox->addTextForValue( 0, "---" );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->move( 28, 132 );
+	m_outputChannelSpinBox->setEnabled( FALSE );
 	connect( m_outputChannelSpinBox, SIGNAL( valueChanged( int ) ),
 				this, SLOT( outputChannelChanged( int ) ) );
 	outputChannelChanged( m_outputChannelSpinBox->value() );

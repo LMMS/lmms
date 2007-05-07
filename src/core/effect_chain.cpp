@@ -26,6 +26,10 @@
 
 
 #include "effect_chain.h"
+#include "engine.h"
+
+
+
 
 effectChain::effectChain( void ) :
 	m_bypassed( TRUE )
@@ -35,15 +39,13 @@ effectChain::effectChain( void ) :
 
 
 
-effectChain::~ effectChain()
+effectChain::~effectChain()
 {
-	m_processLock.lock();
-	for( Uint32 eff = 0; eff < m_effects.count(); eff++ )
+	for( effect_list_t::size_type eff = 0; eff < m_effects.count(); eff++ )
 	{
-		free( m_effects[eff] );
+		delete m_effects[eff];
 	}
 	m_effects.clear();
-	m_processLock.unlock();
 }
 
 
@@ -51,33 +53,18 @@ effectChain::~ effectChain()
 
 void FASTCALL effectChain::appendEffect( effect * _effect )
 {
-	m_processLock.lock();
+	engine::getMixer()->lock();
 	m_effects.append( _effect );
-	m_processLock.unlock();
+	engine::getMixer()->unlock();
 }
 
 
 
-void FASTCALL effectChain::deleteEffect( effect * _effect )
+void FASTCALL effectChain::removeEffect( effect * _effect )
 {
-	m_processLock.lock();
-	effect_list_t::iterator which = NULL;
-	for( effect_list_t::iterator it = m_effects.begin(); 
-						it != m_effects.end(); it++ )
-	{
-		if( (*it) == _effect )
-		{
-			which = it;
-			break;
-		}
-	}
-	
-	if( which != NULL )
-	{
-		m_effects.erase( which );
-	}
-	
-	m_processLock.unlock();
+	engine::getMixer()->lock();
+	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
+	engine::getMixer()->unlock();
 }
 
 
@@ -85,8 +72,6 @@ void FASTCALL effectChain::deleteEffect( effect * _effect )
 
 void FASTCALL effectChain::moveDown( effect * _effect )
 {
-	m_processLock.lock();
-	
 	if( _effect != m_effects.last() )
 	{
 		int i = 0;
@@ -103,8 +88,6 @@ void FASTCALL effectChain::moveDown( effect * _effect )
 		m_effects[i + 1] = _effect;
 		m_effects[i] = temp;	
 	}
-	
-	m_processLock.unlock();
 }
 
 
@@ -112,8 +95,6 @@ void FASTCALL effectChain::moveDown( effect * _effect )
 
 void FASTCALL effectChain::moveUp( effect * _effect )
 {
-	m_processLock.lock();
-	
 	if( _effect != m_effects.first() )
 	{
 		int i = 0;
@@ -130,8 +111,6 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 		m_effects[i - 1] = _effect;
 		m_effects[i] = temp;	
 	}
-	
-	m_processLock.unlock();
 }
 
 
@@ -140,7 +119,7 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpab_t _frames )
 {
-	if( m_bypassed || ! m_processLock.tryLock() )
+	if( m_bypassed )
 	{
 		return( FALSE );
 	}
@@ -150,7 +129,6 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf,
 	{
 		more_effects |= (*it)->processAudioBuffer( _buf, _frames );
 	}
-	m_processLock.unlock();
 	return( more_effects );
 }
 

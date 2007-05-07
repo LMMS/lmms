@@ -41,16 +41,17 @@
 
 
 #include "envelope_tab_widget.h"
-#include "envelope_and_lfo_widget.h"
-#include "note_play_handle.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "group_box.h"
-#include "tab_widget.h"
+#include "combobox.h"
 #include "embed.h"
+#include "engine.h"
+#include "envelope_and_lfo_widget.h"
+#include "group_box.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
-#include "combobox.h"
+#include "knob.h"
+#include "note_play_handle.h"
+#include "pixmap_button.h"
+#include "tab_widget.h"
 
 
 
@@ -238,10 +239,8 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 	}
 
 	float volume_level;
-	m_envLFOWidgets[VOLUME]->lock();
 	m_envLFOWidgets[VOLUME]->fillLevel( &volume_level, _frame,
 							release_begin, 1 );
-	m_envLFOWidgets[VOLUME]->unlock();
 
 	return( volume_level );
 }
@@ -284,9 +283,6 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 		float * cut_buf = NULL;
 		float * res_buf = NULL;
-
-		m_envLFOWidgets[CUT]->lock();
-		m_envLFOWidgets[RES]->lock();
 
 		if( m_envLFOWidgets[CUT]->used() )
 		{
@@ -377,14 +373,10 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			}
 		}
 
-		m_envLFOWidgets[RES]->unlock();
-		m_envLFOWidgets[CUT]->unlock();
-
 		delete[] cut_buf;
 		delete[] res_buf;
 	}
 
-	m_envLFOWidgets[VOLUME]->lock();
 	if( m_envLFOWidgets[VOLUME]->used() )
 	{
 		float * vol_buf = new float[_frames];
@@ -403,7 +395,6 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		}
 		delete[] vol_buf;
 	}
-	m_envLFOWidgets[VOLUME]->unlock();
 
 /*	else if( m_envLFOWidgets[VOLUME]->used() == FALSE && m_envLFOWidgets[PANNING]->used() )
 	{

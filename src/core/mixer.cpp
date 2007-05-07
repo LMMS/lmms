@@ -71,8 +71,11 @@ mixer::mixer( void ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-	m_mixMutex(),
-	m_mixMutexLockLevel( 0 )
+#ifndef QT3
+	m_mixMutex( QMutex::Recursive )
+#else
+	m_mixMutex( TRUE )
+#endif
 {
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
@@ -250,23 +253,19 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
-	while( !m_playHandlesToRemove.empty() )
+	constPlayHandleVector::iterator it_rem = m_playHandlesToRemove.begin();
+	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		playHandleVector::iterator it = m_playHandles.begin();
+		playHandleVector::iterator it = qFind( m_playHandles.begin(),
+						m_playHandles.end(), *it_rem );
 
-		while( it != m_playHandles.end() )
+		if( it != m_playHandles.end() )
 		{
-			if( *it == m_playHandlesToRemove.front() )
-			{
-				delete *it;
-				m_playHandles.erase( it );
-				//delete m_playHandlesToRemove.front();
-				break;
-			}
-			++it;
+			delete *it;
+			m_playHandles.erase( it );
 		}
 
-		m_playHandlesToRemove.erase( m_playHandlesToRemove.begin() );
+		m_playHandlesToRemove.erase( it_rem );
 	}
 
 	// now swap the buffers... current buffer becomes next (last)
@@ -395,18 +394,15 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 // removes all play-handles. this is neccessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
-void mixer::clear( bool _everything )
+void mixer::clear( void )
 {
 	// TODO: m_midiClient->noteOffAll();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
-		// during the whole lifetime of an instrument - exception if
-		// parameter _everything is true (which is the case when
-		// clearing song for example)
-		if( _everything == TRUE ||
-			( *it )->type() != playHandle::InstrumentPlayHandle )
+		// during the whole lifetime of an instrument
+		if( ( *it )->type() != playHandle::InstrumentPlayHandle )
 		{
 			m_playHandlesToRemove.push_back( *it );
 		}
@@ -556,13 +552,20 @@ void mixer::restoreAudioDevice( void )
 
 
 
-void mixer::checkValidityOfPlayHandles( void )
+void mixer::removePlayHandles( track * _track )
 {
 	playHandleVector::iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		( *it )->checkValidity();
-		++it;
+		if( ( *it )->isFromTrack( _track ) )
+		{
+			delete *it;
+			m_playHandles.erase( it );
+		}
+		else
+		{
+			++it;
+		}
 	}
 }
 

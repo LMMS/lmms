@@ -28,20 +28,43 @@
 
 #include "note_play_handle.h"
 #include "automatable_object_templates.h"
-#include "instrument_track.h"
+#include "config_mgr.h"
+#include "detuning_helper.h"
 #include "envelope_tab_widget.h"
-#include "midi.h"
+#include "instrument_track.h"
 #include "midi_port.h"
 #include "song_editor.h"
-#include "piano_widget.h"
-#include "config_mgr.h"
-#include "project_journal.h"
+
+
+inline notePlayHandle::baseDetuning::baseDetuning(
+						detuningHelper * _detuning ) :
+	m_detuning( _detuning )
+{
+	m_level = m_detuning->getAutomationPattern()->valueAt( 0 );
+	m_value = m_detuning->value( m_level );
+}
+
+
+
+
+inline void notePlayHandle::baseDetuning::setLevel( int _level )
+{
+	m_level = _level;
+	m_value = m_detuning->value( m_level );
+}
+
+
+
+
+
+
 
 
 notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						const f_cnt_t _frames_ahead,
 						const f_cnt_t _frames,
 						const note & _n,
+						notePlayHandle * _parent,
 						const bool _arp_note ) :
 	playHandle( NotePlayHandle ),
 	note( _n.length(), _n.pos(), _n.tone(), _n.octave(),
@@ -56,7 +79,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
 	m_released( FALSE ),
-	m_baseNote( TRUE  ),
+	m_baseNote( _parent == NULL  ),
 	m_arpNote( _arp_note ),
 	m_muted( FALSE ),
 	m_bbTrack( NULL ),
@@ -65,23 +88,30 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 #endif
 	m_orig_bpm( engine::getSongEditor()->getTempo() )
 {
-	if( detuning() )
+	if( m_baseNote )
 	{
-		processMidiTime( pos() );
+		m_base_detuning = new baseDetuning( detuning() );
 		m_instrumentTrack->m_processHandles.push_back( this );
-		connect( detuning(), SIGNAL( valueChanged( float ) ),
-					this, SLOT( updateFrequency() ) );
 	}
-	connect( m_instrumentTrack, SIGNAL( baseNoteChanged() ),
-					this, SLOT( updateFrequency() ) );
+	else
+	{
+		m_base_detuning = _parent->m_base_detuning;
+
+		_parent->m_subNotes.push_back( this );
+		// if there was an arp-note added and parent is a base-note
+		// we set arp-note-flag for indicating that parent is an
+		// arpeggio-base-note
+		_parent->m_arpNote = arpNote() && _parent->baseNote();
+
+		m_bbTrack = _parent->m_bbTrack;
+#if SINGERBOT_SUPPORT
+		m_patternIndex = _parent->m_patternIndex;
+#endif
+	}
+
 	updateFrequency();
 
 	setFrames( _frames );
-	if( !configManager::inst()->value( "ui",
-						"manualchannelpiano" ).toInt() )
-	{
-		m_instrumentTrack->m_pianoWidget->setKeyState( key(), TRUE );
-	}
 	// send MIDI-note-on-event
 	m_instrumentTrack->processOutEvent( midiEvent( NOTE_ON,
 				m_instrumentTrack->m_midiPort->outputChannel(),
@@ -104,16 +134,15 @@ notePlayHandle::~notePlayHandle()
 		noteOff( 0 );
 	}
 
-	if( m_instrumentTrack != NULL )
+	if( m_baseNote )
 	{
-		if( detuning() )
-		{
-			m_instrumentTrack->m_processHandles.removeAll( this );
-		}
-		if( m_pluginData != NULL )
-		{
-			m_instrumentTrack->deleteNotePluginData( this );
-		}
+		delete m_base_detuning;
+		m_instrumentTrack->m_processHandles.removeAll( this );
+	}
+
+	if( m_pluginData != NULL )
+	{
+		m_instrumentTrack->deleteNotePluginData( this );
 	}
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
@@ -131,7 +160,7 @@ notePlayHandle::~notePlayHandle()
 
 void notePlayHandle::play( bool _try_parallelizing )
 {
-	if( m_muted == TRUE || m_instrumentTrack == NULL )
+	if( m_muted == TRUE )
 	{
 		return;
 	}
@@ -232,30 +261,9 @@ void notePlayHandle::play( bool _try_parallelizing )
 
 
 
-void notePlayHandle::checkValidity( void )
+bool notePlayHandle::isFromTrack( const track * _track ) const
 {
-	if( m_instrumentTrack != NULL &&
-				m_instrumentTrack->type() == track::NULL_TRACK )
-	{
-		// track-type being track::NULL_TRACK indicates a track whose
-		// removal is in progress, so we have to invalidate ourself
-		if( m_released == FALSE )
-		{
-			noteOff( 0 );
-		}
-		if( m_pluginData )
-		{
-			m_instrumentTrack->deleteNotePluginData( this );
-		}
-		m_instrumentTrack = NULL;
-	}
-	// sub-notes might not be registered at mixer (for example arpeggio-
-	// notes), so they wouldn't invalidate them-selves
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
-						it != m_subNotes.end(); ++it )
-	{
-		( *it )->checkValidity();
-	}
+	return( m_instrumentTrack == _track || m_bbTrack == _track );
 }
 
 
@@ -272,27 +280,14 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	if( m_instrumentTrack != NULL )
-	{
-		m_releaseFramesToDo = tMax<f_cnt_t>( 10,
+	m_releaseFramesToDo = tMax<f_cnt_t>( 10,
 			m_instrumentTrack->m_envWidget->releaseFrames() );
-		if( !configManager::inst()->value( "ui",
-						"manualchannelpiano" ).toInt() )
-		{
-			m_instrumentTrack->m_pianoWidget->setKeyState( key(),
-									FALSE );
-		}
-		// send MIDI-note-off-event
-		m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
+	// send MIDI-note-off-event
+	m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_instrumentTrack->m_midiPort->outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTact64th() ) );
-	}
-	else
-	{
-		m_releaseFramesToDo = 10;
-	}
 
 	m_released = TRUE;
 }
@@ -302,9 +297,8 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
-	return( ( m_instrumentTrack != NULL ) ?
-			m_instrumentTrack->m_envWidget->releaseFrames(
-							arpBaseNote() ) : 0 );
+	return( m_instrumentTrack->m_envWidget->releaseFrames(
+							arpBaseNote() ) );
 }
 
 
@@ -313,7 +307,7 @@ f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 void notePlayHandle::setFrames( const f_cnt_t _frames )
 {
 	m_frames = _frames;
-	if( m_frames == 0 && m_instrumentTrack != NULL )
+	if( m_frames == 0 )
 	{
 		m_frames = m_instrumentTrack->beatLen( this );
 	}
@@ -325,10 +319,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 
 float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
-	return( ( m_instrumentTrack != NULL ) ?
-		m_instrumentTrack->m_envWidget->volumeLevel( this, _frame )
-		:
-		0 );
+	return( m_instrumentTrack->m_envWidget->volumeLevel( this, _frame ) );
 }
 
 
@@ -420,7 +411,17 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 void notePlayHandle::updateFrequency( void )
 {
-	m_frequency = m_instrumentTrack->frequency( this );
+	float pitch = (float)( tone() - m_instrumentTrack->baseTone() +
+			engine::getSongEditor()->masterPitch() ) / 12.0f +
+			(float)( octave() - m_instrumentTrack->baseOctave() )
+			+ m_base_detuning->value() / 12.0f;
+	m_frequency = BASE_FREQ * powf( 2.0f, pitch );
+
+	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+						it != m_subNotes.end(); ++it )
+	{
+		( *it )->updateFrequency();
+	}
 }
 
 
@@ -428,7 +429,16 @@ void notePlayHandle::updateFrequency( void )
 
 void notePlayHandle::processMidiTime( const midiTime & _time )
 {
-	detuning()->getAutomationPattern()->processMidiTime( _time - pos() );
+	if( _time >= pos() )
+	{
+		int level = detuning()->getAutomationPattern()->valueAt( _time -
+									pos() );
+		if( level != m_base_detuning->level() )
+		{
+			m_base_detuning->setLevel( level );
+			updateFrequency();
+		}
+	}
 }
 
 
@@ -449,9 +459,6 @@ void notePlayHandle::resize( const bpm_t _new_bpm )
 }
 
 
-
-
-#include "note_play_handle.moc"
 
 
 #endif

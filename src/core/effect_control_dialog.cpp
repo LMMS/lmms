@@ -40,6 +40,7 @@
 #endif
 
 #include "effect_control_dialog.h"
+#include "effect.h"
 
 
 effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :

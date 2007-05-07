@@ -64,6 +64,7 @@ audioPort::~audioPort()
 	}
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
+	delete m_effects;
 }
 
 

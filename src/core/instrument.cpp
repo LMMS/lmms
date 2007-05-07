@@ -34,8 +34,7 @@ instrument::instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
 	plugin( _descriptor ),
-	m_instrumentTrack( _instrument_track ),
-	m_valid( TRUE )
+	m_instrumentTrack( _instrument_track )
 {
 	setFixedSize( 250, 250 );
 	m_instrumentTrack->setWindowIcon( *getDescriptor()->logo );
@@ -46,7 +45,6 @@ instrument::instrument( instrumentTrack * _instrument_track,
 
 instrument::~instrument()
 {
-	invalidate();
 }
 
 
@@ -96,6 +94,16 @@ instrument * instrument::instantiate( const QString & _plugin_name,
 	delete p;
 	return( new dummyInstrument( _instrument_track ) );
 }
+
+
+
+
+bool instrument::isFromTrack( const track * _track ) const
+{
+	return( m_instrumentTrack == _track );
+}
+
+
 
 
 #endif

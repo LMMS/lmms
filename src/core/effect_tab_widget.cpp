@@ -52,6 +52,7 @@
 #include "embed.h"
 #include "effect_select_dialog.h"
 #include "rack_plugin.h"
+#include "rack_view.h"
 #include "audio_port.h"
 
 

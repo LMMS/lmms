@@ -66,7 +66,6 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 								_mixer ),
 	m_client( NULL ),
 	m_active( FALSE ),
-//	m_processCallbackMutex(),
 	m_stop_semaphore( 1 ),
 	m_outBuf( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] ),
 	m_framesDoneInCurBuf( 0 ),
@@ -286,7 +285,6 @@ void audioJACK::registerPort( audioPort * _port )
 	const QString name[2] = { _port->name() + " L",
 					_port->name() + " R" } ;
 
-	m_processCallbackMutex.lock();
 	for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 	{
 		m_portMap[_port].ports[ch] = jack_port_register( m_client,
@@ -298,8 +296,7 @@ void audioJACK::registerPort( audioPort * _port )
 #endif
 				JACK_DEFAULT_AUDIO_TYPE,
 				JackPortIsOutput, 0 );
-	}
-	m_processCallbackMutex.unlock();*/
+	}*/
 }
 
 
@@ -310,7 +307,6 @@ void audioJACK::unregisterPort( audioPort * _port )
 	return;
 /*	if( m_portMap.contains( _port ) )
 	{
-		m_processCallbackMutex.lock();
 		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			if( m_portMap[_port].ports[ch] != NULL )
@@ -320,7 +316,6 @@ void audioJACK::unregisterPort( audioPort * _port )
 			}
 		}
 		m_portMap.erase( m_portMap.find( _port ) );
-		m_processCallbackMutex.unlock();
 	}*/
 }
 
@@ -354,7 +349,6 @@ void audioJACK::renamePort( audioPort * _port )
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
 	audioJACK * _this = static_cast<audioJACK *>( _udata );
-//	_this->m_processCallbackMutex.lock();
 
 /*	printf( "%f\n", jack_cpu_load( _this->m_client ) );*/
 
@@ -443,8 +437,6 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 			memset( b, 0, sizeof( *b ) * ( _nframes - done ) );
 		}
 	}
-
-//	_this->m_processCallbackMutex.unlock();
 
 	return( 0 );
 }

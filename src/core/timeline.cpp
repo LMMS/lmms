@@ -128,7 +128,10 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 
 timeLine::~timeLine()
 {
-	m_pos.m_timeLine = NULL;
+	if( engine::getSongEditor() )
+	{
+		m_pos.m_timeLine = NULL;
+	}
 	delete m_hint;
 }
 

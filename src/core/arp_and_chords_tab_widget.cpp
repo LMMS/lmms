@@ -42,25 +42,21 @@
 #endif
 
 
-/*#ifdef HAVE_STDLIB_H*/
-#include <stdlib.h>
-/*#endif*/
-
-
 #include "arp_and_chords_tab_widget.h"
+#include "combobox.h"
 #include "embed.h"
+#include "engine.h"
+#include "group_box.h"
+#include "gui_templates.h"
+#include "instrument_track.h"
+#include "knob.h"
+#include "led_checkbox.h"
 #include "note_play_handle.h"
 #include "song_editor.h"
-#include "group_box.h"
 #include "pixmap_button.h"
-#include "knob.h"
-#include "tooltip.h"
-#include "gui_templates.h"
-#include "tempo_sync_knob.h"
-#include "instrument_track.h"
-#include "led_checkbox.h"
 #include "preset_preview_play_handle.h"
-#include "combobox.h"
+#include "tempo_sync_knob.h"
+#include "tooltip.h"
 
 
 
@@ -469,21 +465,12 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 							_n->getVolume(),
 							_n->getPanning(),
 							_n->detuning() );
-				// duplicate note-play-handle, only note is
+				// create sub-note-play-handle, only note is
 				// different
-				notePlayHandle * note_play_handle =
-					new notePlayHandle(
-						_n->getInstrumentTrack(),
-						_n->framesAhead(),
-						_n->frames(), note_copy );
-				note_play_handle->setBBTrackFrom( _n );
-#if SINGERBOT_SUPPORT
-				note_play_handle->setPatternIndex(
-							_n->patternIndex() );
-#endif
-				// add sub-note to base-note, now all stuff is
-				// done by notePlayHandle::play_note()
-				_n->addSubNote( note_play_handle );
+				new notePlayHandle( _n->getInstrumentTrack(),
+							_n->framesAhead(),
+							_n->frames(), note_copy,
+							_n );
 			}
 		}
 	}
@@ -631,26 +618,16 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 								vol_level ),
 				_n->getPanning(), _n->detuning() );
 
-		// duplicate note-play-handle, only ptr to note is different
+		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=TRUE
-		notePlayHandle * note_play_handle = new notePlayHandle(
-						_n->getInstrumentTrack(),
-					( ( m_arpModeComboBox->value() !=
-					    				FREE ) ?
+		new notePlayHandle( _n->getInstrumentTrack(),
+				( ( m_arpModeComboBox->value() != FREE ) ?
 						cnphv.first()->framesAhead() :
 						_n->framesAhead() ) +
 							frames_processed,
 						gated_frames,
 						new_note,
-						TRUE );
-		note_play_handle->setBBTrackFrom( _n );
-#if SINGERBOT_SUPPORT
-		note_play_handle->setPatternIndex( _n->patternIndex() );
-#endif
-
-		// add sub-note to base-note - now all stuff is done by
-		// notePlayHandle::playNote()
-		_n->addSubNote( note_play_handle );
+						_n, TRUE );
 
 		// update counters
 		frames_processed += arp_frames;
@@ -698,21 +675,9 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpRangeKnob->loadSettings( _this, "arprange" );
 	m_arpTimeKnob->loadSettings( _this, "arptime" );
 	m_arpGateKnob->loadSettings( _this, "arpgate" );
-	if( _this.hasAttribute( "arpdir" ) )
-	{
-		m_arpDirectionBtnGrp->setInitValue(
-				_this.attribute( "arpdir" ).toInt() - 1 );
-		m_arpGroupBox->setState( 
-				_this.attribute( "arpdir" ).toInt() != OFF &&
-				!_this.attribute( "arpdisabled" ).toInt() );
-	}
-	else
-	{
-		m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
-		m_arpGroupBox->setState( 
-				!_this.attribute( "arpdisabled" ).toInt() );
-	}
-	
+	m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
+	m_arpGroupBox->setState( !_this.attribute( "arpdisabled" ).toInt() );
+
 	// Keep compatibility with version 2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
