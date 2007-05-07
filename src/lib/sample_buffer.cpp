@@ -36,7 +36,6 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtCore/QMutex>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
@@ -44,7 +43,6 @@
 #else
 
 #include <qpainter.h>
-#include <qmutex.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qfileinfo.h>
@@ -116,7 +114,6 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
 	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
 #ifdef SDL_SDL_SOUND_H
@@ -150,7 +147,6 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
 	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
 	m_origData = new sampleFrame[_frames];
@@ -183,7 +179,6 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
 	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_dataMutex(),
 	m_sample_fragment( NULL )
 {
 	m_origData = new sampleFrame[_frames];
@@ -204,18 +199,9 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 
 sampleBuffer::~sampleBuffer()
 {
-	m_dataMutex.lock();
 	delete[] m_origData;
-	m_origData = NULL;
 	delete[] m_data;
-	m_data = NULL;
-
-	m_dataMutex.unlock();
-
-	if( m_sample_fragment )
-	{
-		delete[] m_sample_fragment;
-	}
+	delete[] m_sample_fragment;
 }
 
 
@@ -225,11 +211,9 @@ sampleBuffer::~sampleBuffer()
 
 void sampleBuffer::update( bool _keep_settings )
 {
-	m_dataMutex.lock();
+	engine::getMixer()->lock();
 
 	delete[] m_data;
-	m_data = NULL;
-	m_frames = 0;
 
 	if( m_audioFile == "" && m_origData != NULL && m_origFrames > 0 )
 	{
@@ -256,6 +240,8 @@ void sampleBuffer::update( bool _keep_settings )
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
+
+		m_frames = 0;
 
 #ifdef HAVE_SNDFILE_H
 		if( m_frames == 0 )
@@ -337,13 +323,13 @@ m_data[frame][chnl] = buf[idx] * fac;
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
 		m_data = new sampleFrame[1];
-		memset( m_data, 0, sizeof( *m_data ) * 1 );
+		memset( m_data, 0, sizeof( *m_data ) );
 		m_frames = 1;
 		m_loop_startFrame = m_startFrame = 0;
 		m_loop_endFrame = m_endFrame = 1;
 	}
 
-	m_dataMutex.unlock();
+	engine::getMixer()->unlock();
 
 	emit sampleUpdated();
 }
@@ -622,7 +608,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 {
 	engine::getMixer()->clearAudioBuffer( _ab, _frames );
 
-	if( m_data == NULL || m_frames == 0 || m_endFrame == 0 || _frames == 0 )
+	if( m_endFrame == 0 || _frames == 0 )
 	{
 		return( FALSE );
 	}
@@ -669,10 +655,6 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 			return( FALSE );
 		}
 	}
-
-	// make sure, data isn't accessed in any other way (e.g. deleting
-	// of this buffer...)
-	m_dataMutex.lock();
 
 /*	Uint32 f2 = 0;
 	while( f2 < f1 )
@@ -813,8 +795,6 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	m_dataMutex.unlock();
-
 	_state->m_frame_index = play_frame;
 
 	return( TRUE );
@@ -842,10 +822,7 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 		}
 	}
 
-	if( m_sample_fragment )
-	{
-		delete[] m_sample_fragment;
-	}
+	delete[] m_sample_fragment;
 	m_sample_fragment = new sampleFrame[_frames];
 
 	if( _looped )
@@ -909,12 +886,7 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	const QRect isect = _dr.intersect( _clip );
 
-	if( m_data == NULL || m_frames == 0 )
-	{
-		_p.drawLine( isect.x(), y_base, isect.right(), y_base );
-		return;
-	}
-	else if( _dm == LINE_CONNECT )
+	if( _dm == LINE_CONNECT )
 	{
 #ifdef QT4
 		float old_x = _dr.x();
@@ -1114,11 +1086,6 @@ void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
 
 QString & sampleBuffer::toBase64( QString & _dst ) const
 {
-	if( m_data == NULL || m_frames == 0 )
-	{
-		return( _dst = "" );
-	}
-
 #ifdef HAVE_FLAC_STREAM_ENCODER_H
 	const f_cnt_t FRAMES_PER_BUF = 1152;
 
@@ -1429,10 +1396,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 void sampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	// don't set this parameter while playing
-	m_dataMutex.lock();
 	m_loop_startFrame = m_startFrame = _s;
-	m_dataMutex.unlock();
 }
 
 
@@ -1440,10 +1404,7 @@ void sampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void sampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	// don't set this parameter while playing
-	m_dataMutex.lock();
 	m_loop_endFrame = m_endFrame = _e;
-	m_dataMutex.unlock();
 }
 
 

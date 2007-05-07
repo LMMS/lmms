@@ -45,8 +45,9 @@
 
 
 #include "mmp.h"
-#include "song_editor.h"
 #include "config_mgr.h"
+#include "project_version.h"
+#include "song_editor.h"
 
 
 multimediaProject::typeDescStruct
@@ -93,7 +94,8 @@ multimediaProject::multimediaProject( projectTypes _project_type ) :
 
 
 multimediaProject::multimediaProject( const QString & _in_file_name,
-							bool _is_filename ) :
+							bool _is_filename,
+							bool _upgrade ) :
 	QDomDocument(),
 	m_content(),
 	m_head()
@@ -182,6 +184,12 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 			}
 		}
 		node = node.nextSibling();
+	}
+
+	if( _upgrade && root.hasAttribute( "creatorversion" )
+			&& root.attribute( "creatorversion" ) != VERSION )
+	{
+		upgrade();
 	}
 }
 
@@ -321,7 +329,7 @@ bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
 multimediaProject::projectTypes multimediaProject::typeOfFile(
 							const QString & _fn )
 {
-	multimediaProject m( _fn );
+	multimediaProject m( _fn, TRUE, FALSE );
 	return( m.type() );
 }
 
@@ -387,6 +395,132 @@ void multimediaProject::cleanMetaNodes( QDomElement _de )
 		node = node.nextSibling();
 	}
 }
+
+
+
+
+void multimediaProject::upgrade( void )
+{
+	projectVersion version = documentElement().attribute(
+							"creatorversion" );
+
+	if( version < "0.2.1-svn20070501" )
+	{
+		QDomNodeList list = elementsByTagName( "arpandchords" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.hasAttribute( "arpdir" ) )
+			{
+				int arpdir = el.attribute( "arpdir" ).toInt();
+				if( arpdir > 0 )
+				{
+					el.setAttribute( "arpdir", arpdir - 1 );
+				}
+				else
+				{
+					el.setAttribute( "arpdisabled", "1" );
+				}
+			}
+		}
+
+		list = elementsByTagName( "sampletrack" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.attribute( "vol" ) != "" )
+			{
+				el.setAttribute( "vol", el.attribute(
+						"vol" ).toFloat() * 100.0f );
+			}
+			else
+			{
+				QDomNode node = el.namedItem(
+							"automation-pattern" );
+				if( !node.isElement() ||
+					!node.namedItem( "vol" ).isElement() )
+				{
+					el.setAttribute( "vol", 100.0f );
+				}
+			}
+		}
+
+		list = elementsByTagName( "ladspacontrols" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			QDomNode anode = el.namedItem( "automation-pattern" );
+			QDomNode node = anode.firstChild();
+			while( !node.isNull() )
+			{
+				if( node.isElement() )
+				{
+					QString name = node.nodeName();
+					if( name.endsWith( "link" ) )
+					{
+						el.setAttribute( name,
+							node.namedItem( "time" )
+							.toElement()
+							.attribute( "value" ) );
+						QDomNode oldNode = node;
+						node = node.nextSibling();
+						anode.removeChild( oldNode );
+						continue;
+					}
+				}
+				node = node.nextSibling();
+			}
+		}
+
+		QDomNode node = m_head.firstChild();
+		while( !node.isNull() )
+		{
+			if( node.isElement() )
+			{
+				if( node.nodeName() == "bpm" )
+				{
+					int value = node.toElement().attribute(
+							"value" ).toInt();
+					if( value > 0 )
+					{
+						m_head.setAttribute( "bpm",
+									value );
+						QDomNode oldNode = node;
+						node = node.nextSibling();
+						m_head.removeChild( oldNode );
+						continue;
+					}
+				}
+				else if( node.nodeName() == "mastervol" )
+				{
+					int value = node.toElement().attribute(
+							"value" ).toInt();
+					if( value > 0 )
+					{
+						m_head.setAttribute(
+							"mastervol", value );
+						QDomNode oldNode = node;
+						node = node.nextSibling();
+						m_head.removeChild( oldNode );
+						continue;
+					}
+				}
+				else if( node.nodeName() == "masterpitch" )
+				{
+					m_head.setAttribute( "masterpitch",
+						-node.toElement().attribute(
+							"value" ).toInt() );
+					QDomNode oldNode = node;
+					node = node.nextSibling();
+					m_head.removeChild( oldNode );
+					continue;
+				}
+			}
+			node = node.nextSibling();
+		}
+	}
+}
+
 
 
 

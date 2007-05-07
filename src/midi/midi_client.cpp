@@ -87,6 +87,7 @@ void midiClient::removePort( midiPort * _port )
 							_port );
 	if( it != m_midiPorts.end() )
 	{
+		delete *it;
 		m_midiPorts.erase( it );
 	}
 }
