@@ -1,12 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Note detuning</source>
-        <translation>Desafinament de nota</translation>
-    </message>
-</context>
-<context>
     <name>QWidget</name>
     <message>
         <source>Name: </source>
@@ -803,6 +796,10 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
+    </message>
+    <message>
+        <source>Note detuning</source>
+        <translation>Desafinament de nota</translation>
     </message>
 </context>
 <context>
@@ -1703,7 +1700,7 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
     </message>
     <message>
         <source>PLUGIN</source>
-        <translation>CONNECTOR</translation>
+        <translation>CONN</translation>
     </message>
     <message>
         <source>Surround area</source>
@@ -2588,7 +2585,7 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     </message>
     <message>
         <source>Default velocity for all input-events</source>
-        <translation>Velocitat per defecte per a tots els esdeveniments d&apos;entrada</translation>
+        <translation>Velocitat per defecte per a l&apos;entrada</translation>
     </message>
     <message>
         <source>Send MIDI-events</source>
@@ -2596,7 +2593,7 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     </message>
     <message>
         <source>Default velocity for all output-events</source>
-        <translation>Velocitat per defecte per a tots els esdeveniments de sortida</translation>
+        <translation>Velocitat per defecte per a la sortida</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
@@ -2616,11 +2613,11 @@ Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</tra
     </message>
     <message>
         <source>Default input velocity</source>
-        <translation>Velocitat per defecte d&apos;entrada</translation>
+        <translation>Velocitat d&apos;entrada per defecte</translation>
     </message>
     <message>
         <source>Default output velocity</source>
-        <translation>Velocitat per defecte de sortida</translation>
+        <translation>Velocitat de sortida per defecte</translation>
     </message>
 </context>
 <context>
@@ -3113,10 +3110,6 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>DEC</translation>
     </message>
     <message>
-        <source>Slide</source>
-        <translation>Lliscament</translation>
-    </message>
-    <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
         <translation>303-es-que, 24dB/octava, filtre 3 pols</translation>
     </message>
@@ -3534,11 +3527,11 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
     </message>
     <message>
         <source>Disable tooltips (no spurious interrupts while playing)</source>
-        <translation>Desactiva els avisos d&apos;eina (sense interrupcions espúries mentre es reprodueix)</translation>
+        <translation>Desactiva els avisos d&apos;eina</translation>
     </message>
     <message>
         <source>Classical knob usability (move cursor around knob to change value)</source>
-        <translation>Usabilitat de roda clàssica (mou el cursor al voltant de la roda per a canviar el valor)</translation>
+        <translation>Usabilitat de roda clàssica (moure el cursor al voltant de la roda)</translation>
     </message>
     <message>
         <source>GIMP-like windows (no MDI)</source>
