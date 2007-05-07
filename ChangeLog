@@ -1,3 +1,398 @@
+2007-05-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/audio_jack.h:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/envelope_and_lfo_widget.h:
+	* include/instrument_track.h:
+	* include/mixer.h:
+	* include/pattern.h:
+	* include/sample_buffer.h:
+	* include/shared_object.h:
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_base/ladspa_control.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/mixer.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/lib/oscillator.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	- removed process locks
+	- use mixer lock if necessary
+
+	* include/detuning_helper.h:
+	initial release, light replacement for the note detuning knob
+
+	* Makefile.am:
+	* include/automatable_object.h:
+	* include/automatable_object_templates.h:
+	* include/note.h:
+	* include/note_play_handle.h:
+	* src/core/note.cpp:
+	* src/core/note_play_handle.cpp:
+	use detuning helpers
+
+	* Makefile.am:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	dropped QObject inheritance
+
+	* include/note_play_handle.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/note_play_handle.cpp:
+	simplified subnote creation
+
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* src/core/piano_roll.cpp:
+	* src/tracks/instrument_track.cpp:
+	note list became read-only
+
+	* include/oscillator.h:
+	* plugins/organic/organic.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* src/lib/oscillator.cpp:
+	use references instead of pointers
+
+	* include/oscillator.h:
+	* include/sample_buffer.h:
+	use read-only user waveform
+
+	* include/custom_events.h:
+	initial release, custom events list
+
+	* include/update_event.h:
+	initial release, allow thread-safe GUI updates
+
+	* Makefile.am:
+	* include/fade_button.h:
+	* include/piano_widget.h:
+	* src/core/piano_widget.cpp:
+	* src/widgets/fade_button.cpp:
+	use thread-safe GUI updates
+
+	* include/automation_editor.h:
+	* include/piano_roll.h:
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	simplified paint event
+
+	* include/instrument.h:
+	* include/instrument_play_handle.h:
+	* include/mixer.h:
+	* include/note_play_handle.h:
+	* include/play_handle.h:
+	* include/preset_preview_play_handle.h:
+	* include/sample_play_handle.h:
+	* include/track.h:
+	* plugins/vestige/vestige.cpp:
+	* src/core/instrument.cpp:
+	* src/core/mixer.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	simplified handle removal
+
+	* include/mixer.h:
+	- removed duplicate playHandles()
+	- removed unnecessary private copy constructor
+
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	simplified track clonation
+
+	* include/track.h:
+	* src/core/track.cpp:
+	simplified track removal
+
+	* include/instrument_track.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	- moved piano widget control to instrument track
+	- calculate frequencies in note play handle
+
+	* include/note_play_handle.h:
+	* plugins/organic/organic.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	public note frequency became read-only
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/vibed/vibed.cpp:
+	use precalculated note frequency
+
+	* include/automatable_object_templates.h:
+	reduced XML size for single-valued patterns
+
+	* src/core/automation_pattern.cpp:
+	* src/tracks/automation_pattern.cpp:
+	- moved to core
+	- initialize copy constructor
+
+	* include/automation_pattern.h:
+	* src/core/automation_pattern.cpp:
+	- show read-only data
+	- disconnect single-valued patterns from track
+
+	* include/level_object.h:
+	* src/core/automation_pattern.cpp:
+	added display name
+
+	* include/project_version.h:
+	* src/lib/project_version.cpp:
+	initial release, compare application versions
+
+	* include/mmp.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/song_editor.cpp:
+	* src/lib/mmp.cpp:
+	* src/tracks/sample_track.cpp:
+	added upgrade feature
+
+	* Makefile.am:
+	* src/lmms_single_source.cpp:
+	- moved automation pattern to core
+	- added project version
+
+	* include/arp_and_chords_tab_widget.h:
+	* include/audio_jack.h:
+	* include/audio_oss.h:
+	* include/audio_port.h:
+	* include/audio_sdl.h:
+	* include/automatable_slider.h:
+	* include/automation_editor.h:
+	* include/automation_pattern.h:
+	* include/config_mgr.h:
+	* include/effect.h:
+	* include/effect_control_dialog.h:
+	* include/effect_label.h:
+	* include/effect_tab_widget.h:
+	* include/engine.h:
+	* include/envelope_tab_widget.h:
+	* include/fifo_buffer.h:
+	* include/instrument.h:
+	* include/instrument_track.h:
+	* include/level_object.h:
+	* include/main_window.h:
+	* include/meter_dialog.h:
+	* include/midi_dummy.h:
+	* include/midi_event_processor.h:
+	* include/midi_port.h:
+	* include/mixer.h:
+	* include/note_play_handle.h:
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* include/piano_widget.h:
+	* include/plugin.h:
+	* include/preset_preview_play_handle.h:
+	* include/rack_plugin.h:
+	* include/rack_view.h:
+	* include/sample_play_handle.h:
+	* include/sample_track.h:
+	* include/side_bar.h:
+	* include/surround_area.h:
+	* include/tempo_sync_knob.h:
+	* include/tool.h:
+	* include/track_container.h:
+	* include/volume_knob.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_base/ladspa_control.h:
+	* plugins/ladspa_base/ladspa_manager.h:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* plugins/organic/organic.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/singerbot/singerbot.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/vibed/impulse_editor.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/vst_effect/vst_control_dialog.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/plugin.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	reduced dependencies
+
+	* plugins/ladspa_base/ladspa_manager.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* src/audio/audio_port.cpp:
+	* src/core/engine.cpp:
+	* src/midi/midi_client.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/rack_view.cpp:
+	fixed memory leaks
+
+	* include/automatable_object_templates.h:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/vibed/vibrating_string.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/lib/sample_buffer.cpp:
+	simplified deletions
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	improved destructor workaround (still a workaround)
+
+	* src/core/timeline.cpp:
+	avoid invalid reference
+
+	* src/core/config_mgr.cpp:
+	removed invariant condition
+
+	* src/core/automation_editor.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/piano_roll.cpp:
+	reordered inline functions
+
+	* src/core/plugin.cpp:
+	initialize dummy plugin subfeatures
+
+	* include/effect_chain.h:
+	* src/core/effect_chain.cpp:
+	- normalized destructor
+	- renamed deleteEffect() to removeEffect(), the effect isn't deleted
+	  actually
+	- simplified removeEffect()
+
+	* src/widgets/rack_view.cpp:
+	simplified deletePlugin()
+
+	* include/rack_plugin.h:
+	* src/widgets/rack_plugin.cpp:
+	- fixed hot insertion/removal
+	- simplified context menu
+
+	* src/lib/project_journal.cpp:
+	initialize journalling state
+
+	* include/arp_and_chords_tab_widget.h:
+	arpeggio directions are public
+
+	* src/core/midi_tab_widget.cpp:
+	spin boxes are initially disabled
+
+	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	disabled link automation
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	- save/load start/end knobs automation
+	- don't reset start/end knob values when changing the sample file
+	- removed unused setStartAndEndKnob()
+
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	removed slide toggle
+
+	* include/effect_label.h:
+	* src/widgets/effect_label.cpp:
+	- delete related effect window
+	- display label text
+
+	* include/audio_device.h:
+	* include/audio_dummy.h
+	* include/midi_client.h:
+	* include/midi_dummy.h:
+	hide empty settings box
+
+	* include/pattern.h:
+	* plugins/flp_import/flp_import.cpp:
+	* src/tracks/pattern.cpp:
+	- simplified beat insertion/display
+	- removed unused functions
+
+	* include/mixer.h:
+	* src/tracks/pattern.cpp:
+	render note tails in frozen patterns
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	added oscillator objects
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	- normalized member names
+	- simplified waveshape selection
+
+	* include/automatable_object.h:
+	* include/knob.h:
+	* src/widgets/knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	removed automatable object custom data
+
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/singerbot/singerbot.h:
+	- reworked play process without sample buffers
+	- retry wave generation on damaged environment
+
+	* configure.in:
+	* plugins/ladspa_effect/Makefile.am:
+	added --without-caps configure option
+
+	* configure.in:
+	added extra compilation warnings
+
+	* include/qt3support.h:
+	removed (non-)bug comment
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-04-25	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/basic_filters.h:

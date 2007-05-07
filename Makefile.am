@@ -80,7 +80,6 @@ lmms_MOC =						\
 		./meter_dialog.moc			\
 		./midi_alsa_seq.moc			\
 		./midi_tab_widget.moc			\
-		./note_play_handle.moc			\
 		./pattern.moc				\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
@@ -136,6 +135,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/about_dialog.cpp			\
 		$(srcdir)/src/core/arp_and_chords_tab_widget.cpp	\
 		$(srcdir)/src/core/automation_editor.cpp		\
+		$(srcdir)/src/core/automation_pattern.cpp		\
 		$(srcdir)/src/core/bb_editor.cpp			\
 		$(srcdir)/src/core/config_mgr.cpp			\
 		$(srcdir)/src/core/effect_chain.cpp			\
@@ -175,6 +175,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
+		$(srcdir)/src/lib/project_version.cpp			\
 		$(srcdir)/src/lib/embed.cpp				\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
@@ -186,7 +187,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/midi/midi_mapper.cpp			\
 		$(srcdir)/src/midi/midi_oss.cpp				\
 		$(srcdir)/src/midi/midi_port.cpp			\
-		$(srcdir)/src/tracks/automation_pattern.cpp		\
 		$(srcdir)/src/tracks/automation_track.cpp		\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/instrument_track.cpp		\
@@ -223,6 +223,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lmms_single_source.cpp			\
 		$(srcdir)/include/aeffectx.h				\
 		$(srcdir)/include/debug.h				\
+		$(srcdir)/include/detuning_helper.h			\
 		$(srcdir)/include/main_window.h				\
 		$(srcdir)/include/audio_alsa.h				\
 		$(srcdir)/include/audio_device.h			\
@@ -293,6 +294,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/midi_time.h				\
 		$(srcdir)/include/clipboard.h				\
 		$(srcdir)/include/types.h				\
+		$(srcdir)/include/update_event.h			\
 		$(srcdir)/include/qt3support.h				\
 		$(srcdir)/include/embed.h				\
 		$(srcdir)/include/timeline.h				\
@@ -301,6 +303,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/tab_bar.h				\
 		$(srcdir)/include/tab_button.h				\
 		$(srcdir)/include/project_notes.h			\
+		$(srcdir)/include/project_version.h			\
 		$(srcdir)/include/visualization_widget.h		\
 		$(srcdir)/include/endian_handling.h			\
 		$(srcdir)/include/preset_preview_play_handle.h		\
@@ -326,6 +329,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/tool.h				\
 		$(srcdir)/include/tool_button.h				\
 		$(srcdir)/include/cpuload_widget.h			\
+		$(srcdir)/include/custom_events.h			\
 		$(srcdir)/include/midi_alsa_seq.h			\
 		$(srcdir)/include/micro_timer.h				\
 		$(srcdir)/include/fade_button.h				\

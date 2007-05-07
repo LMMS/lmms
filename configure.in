@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070425, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070425)
+AC_INIT(lmms, 0.2.1-svn20070507, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070507)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -512,6 +512,19 @@ else
 fi
 
 
+AC_MSG_CHECKING([whether to ship caps])
+AC_ARG_WITH([caps],
+	AS_HELP_STRING([--without-caps],
+		[do not ship C* Audio Plugin Suite]), ,
+	[ with_caps=yes ])
+if test "x$with_caps" = "xyes" ; then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(SHIP_CAPS, test "x$with_caps" = "xyes")
+
+
 if [ "$build_win32" = "true" ] ; then
 	BIN2RES=`pwd`/buildtools/bin2res.exe
 else
@@ -538,8 +551,9 @@ AC_SUBST(lmmsdatadir)
 
 #CFLAGS="$CXXFLAGS -g -O2"
 #CXXFLAGS="$CXXFLAGS -g -O2"
+EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Winline -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
-	CXXFLAGS="$CXXFLAGS -ansi -Wall -fno-exceptions"
+	CXXFLAGS="$CXXFLAGS -ansi -Wall $EXTRA_WARNINGS -fno-exceptions"
 fi
 
 LDFLAGS="$LDFLAGS -L/usr/local/lib"
