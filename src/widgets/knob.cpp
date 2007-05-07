@@ -137,6 +137,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 // Destructor
 knob::~knob()
 {
+	delete m_knobPixmap;
 /*	// make sure pointer to this knob isn't used anymore in active
 	// midi-device-class
 	if( engine::getMixer()->getMIDIClient()->pitchBendKnob() == this )
@@ -251,7 +252,7 @@ void knob::valueChange( void )
 	recalcAngle();
 	update();
 	emit valueChanged( value() );
-	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+	emit valueChanged();
 }
 
 
@@ -492,7 +493,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( value() );
-		emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+		emit valueChanged();
 		if( !configManager::inst()->value( "knobs",
 						"classicalusability").toInt() )
 		{
@@ -606,7 +607,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( value() );
-	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+	emit valueChanged();
 }
 
 
@@ -615,7 +616,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 void knob::buttonReleased( void )
 {
 	emit valueChanged( value() );
-	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+	emit valueChanged();
 }
 
 

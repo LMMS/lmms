@@ -45,13 +45,14 @@
 
 
 #include "bb_track.h"
-#include "song_editor.h"
 #include "bb_editor.h"
-#include "gui_templates.h"
-#include "name_label.h"
 #include "embed.h"
 #include "engine.h"
+#include "gui_templates.h"
+#include "mixer.h"
+#include "name_label.h"
 #include "rename_dialog.h"
+#include "song_editor.h"
 #include "templates.h"
 
 
@@ -368,6 +369,8 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 
 bbTrack::~bbTrack()
 {
+	engine::getMixer()->removePlayHandles( this );
+
 	csize bb = s_infoMap[this];
 	engine::getBBEditor()->removeBB( bb );
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();

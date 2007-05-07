@@ -61,35 +61,37 @@
 
 
 #include "instrument_track.h"
-#include "pattern.h"
-#include "main_window.h"
-#include "song_editor.h"
-#include "effect_board.h"
-#include "envelope_tab_widget.h"
 #include "arp_and_chords_tab_widget.h"
-#include "instrument.h"
 #include "audio_port.h"
 #include "automation_pattern.h"
+#include "config_mgr.h"
+#include "debug.h"
+#include "effect_board.h"
+#include "effect_chain.h"
+#include "effect_tab_widget.h"
+#include "embed.h"
+#include "engine.h"
+#include "envelope_tab_widget.h"
+#include "fade_button.h"
+#include "gui_templates.h"
+#include "instrument.h"
+#include "lcd_spinbox.h"
+#include "led_checkbox.h"
+#include "main_window.h"
 #include "midi_client.h"
 #include "midi_port.h"
 #include "midi_tab_widget.h"
-#include "note_play_handle.h"
-#include "sample_play_handle.h"
-#include "embed.h"
-#include "fade_button.h"
-#include "lcd_spinbox.h"
-#include "led_checkbox.h"
-#include "piano_widget.h"
-#include "surround_area.h"
-#include "tooltip.h"
-#include "tab_widget.h"
-#include "config_mgr.h"
-#include "debug.h"
 #include "mmp.h"
+#include "note_play_handle.h"
+#include "pattern.h"
+#include "piano_widget.h"
+#include "sample_play_handle.h"
+#include "song_editor.h"
 #include "string_pair_drag.h"
+#include "surround_area.h"
+#include "tab_widget.h"
+#include "tooltip.h"
 #include "volume_knob.h"
-#include "effect_chain.h"
-#include "effect_tab_widget.h"
 
 
 
@@ -121,7 +123,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( new audioPort( tr( "unnamed_channel" ) ) ),
 	m_notes(),
-	m_notesMutex(),
 	m_baseTone( A ),
 	m_baseOctave( OCTAVE_4 ),
 	m_instrument( NULL ),
@@ -133,12 +134,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_midiOutputID( -1 )
 #endif
 {
-	m_notesMutex.lock();
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
 	}
-	m_notesMutex.unlock();
 
 
 #ifdef QT4
@@ -393,7 +392,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 instrumentTrack::~instrumentTrack()
 {
-	invalidateAllMyNPH();
+	engine::getMixer()->removePlayHandles( this );
+	delete m_effWidget;
 	delete m_audioPort;
 	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 }
@@ -522,21 +522,6 @@ void instrumentTrack::midiConfigChanged( bool )
 
 
 
-float instrumentTrack::frequency( notePlayHandle * _n ) const
-{
-	float pitch = (float)( _n->tone() - m_baseTone +
-			engine::getSongEditor()->masterPitch() ) / 12.0f +
-					(float)( _n->octave() - m_baseOctave );
-	if( _n->detuning() )
-	{
-		pitch += _n->detuning()->value() / 12.0f;
-	}
-	return( BASE_FREQ * powf( 2.0f, pitch ) );
-}
-
-
-
-
 f_cnt_t instrumentTrack::beatLen( notePlayHandle * _n ) const
 {
 	if( m_instrument != NULL )
@@ -628,7 +613,6 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 void instrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
-	m_notesMutex.lock();
 	switch( _me.m_type )
 	{
 		case NOTE_ON: 
@@ -653,19 +637,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 							_time.frames(
 						engine::framesPerTact64th() ),
 						valueRanges<f_cnt_t>::max, n );
-					// as mixer::addPlayHandle() might
-					// delete note (when running into
-					// critical XRuns) which will call
-					// deleteNotePluginData which locks
-					// this mutex, we have to unlock
-					// it here temporarily
-					m_notesMutex.unlock();
 					if( engine::getMixer()->addPlayHandle(
 									nph ) )
 					{
-						m_notesMutex.lock();
 						m_notes[_me.key()] = nph;
-						m_notesMutex.unlock();
 					}
 					return;
 				}
@@ -724,7 +699,6 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 								_me.m_type );
 			break;
 	}
-	m_notesMutex.unlock();
 }
 
 
@@ -733,15 +707,35 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 void instrumentTrack::processOutEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
-	if( _me.m_type == NOTE_ON && !configManager::inst()->value( "ui",
-				"disablechannelactivityindicators" ).toInt() )
+	switch( _me.m_type )
 	{
-		//QMutexLocker ml( &m_notesMutex );
-		if( m_notes[_me.key()] != NULL )
-		{
-			return;
-		}
-		m_tswActivityIndicator->activate();
+		case NOTE_ON:
+			if( !configManager::inst()->value( "ui",
+						"manualchannelpiano" ).toInt() )
+			{
+				m_pianoWidget->setKeyState( _me.key(), TRUE );
+			}
+			if( !configManager::inst()->value( "ui",
+				"disablechannelactivityindicators" ).toInt() )
+			{
+				if( m_notes[_me.key()] != NULL )
+				{
+					return;
+				}
+				m_tswActivityIndicator->activate();
+			}
+			break;
+
+		case NOTE_OFF:
+			if( !configManager::inst()->value( "ui",
+						"manualchannelpiano" ).toInt() )
+			{
+				m_pianoWidget->setKeyState( _me.key(), FALSE );
+			}
+			break;
+
+		default:
+			break;
 	}
 	// if appropriate, midi-port does futher routing
 	m_midiPort->processOutEvent( _me, _time );
@@ -814,7 +808,6 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 		m_instrument->deleteNotePluginData( _n );
 	}
 
-	m_notesMutex.lock();
 	// Notes deleted when keys still pressed
 	if( m_notes[_n->key()] == _n )
 	{
@@ -827,7 +820,6 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 		m_notes[_n->key()] = NULL;
 		emit noteDone( done_note );
 	}
-	m_notesMutex.unlock();
 }
 
 
@@ -901,13 +893,21 @@ void instrumentTrack::setSurroundAreaPos( const QPoint & _p )
 
 void instrumentTrack::setBaseNote( Uint32 _new_note, bool _modified )
 {
+	engine::getMixer()->lock();
 	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
 	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
+
+	for( vlist<notePlayHandle *>::iterator it = m_processHandles.begin();
+					it != m_processHandles.end(); ++it )
+	{
+		( *it )->updateFrequency();
+	}
+	engine::getMixer()->unlock();
+
 	if( _modified )
 	{
 		engine::getSongEditor()->setModified();
 	}
-	emit baseNoteChanged();
 }
 
 
@@ -1030,9 +1030,9 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		}
 
 		// get all notes from the given pattern...
-		noteVector & notes = p->notes();
+		const noteVector & notes = p->notes();
 		// ...and set our index to zero
-		noteVector::iterator it = notes.begin();
+		noteVector::const_iterator it = notes.begin();
 #if SINGERBOT_SUPPORT
 		int note_idx = 0;
 #endif
@@ -1343,23 +1343,14 @@ void instrumentTrack::dropEvent( QDropEvent * _de )
 
 void instrumentTrack::invalidateAllMyNPH( void )
 {
-	// note-play-handles check track-type to determine whether their
-	// channel-track is being deleted (if this is the case, they
-	// invalidate themselves)
-	m_trackType = NULL_TRACK;
-
-	m_notesMutex.lock();
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
 	}
-	m_notesMutex.unlock();
 
 	// invalidate all note-play-handles linked to this channel
 	m_processHandles.clear();
-	engine::getMixer()->checkValidityOfPlayHandles();
-
-	m_trackType = INSTRUMENT_TRACK;
+	engine::getMixer()->removePlayHandles( this );
 }
 
 

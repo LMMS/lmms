@@ -30,16 +30,20 @@
 #ifdef QT4
 
 #include <QtCore/QTimer>
+#include <QtGui/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
 #else
 
+#include <qapplication.h>
 #include <qtimer.h>
 #include <qpainter.h>
 #include <qpixmap.h>
 
 #endif
+
+#include "update_event.h"
 
 
 fadeButton::fadeButton( const QColor & _normal_color,
@@ -52,7 +56,6 @@ fadeButton::fadeButton( const QColor & _normal_color,
 #ifndef QT4
 	setBackgroundMode( NoBackground );
 #endif
-	QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
 }
 
 
@@ -68,7 +71,7 @@ fadeButton::~fadeButton()
 void fadeButton::activate( void )
 {
 	m_state = 1.00f;
-	update();
+	signalUpdate();
 }
 
 
@@ -76,9 +79,21 @@ void fadeButton::activate( void )
 void fadeButton::reset( void )
 {
 	m_state = 0.0f;
-	update();
+	signalUpdate();
 }
 
+
+
+
+
+#ifndef QT3
+void fadeButton::customEvent( QEvent * )
+#else
+void fadeButton::customEvent( QCustomEvent * )
+#endif
+{
+	update();
+}
 
 
 
@@ -98,6 +113,9 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 					( 1.0f - m_state ) +
 			m_activatedColor.blue() * m_state );
 		col.setRgb( r, g, b );
+
+		m_state -= 0.1f;
+		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
 #ifdef QT4
 	QPainter p( this );
@@ -123,14 +141,9 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 
 
 
-void fadeButton::nextState( void )
+void fadeButton::signalUpdate( void )
 {
-	if( m_state > 0.0f )
-	{
-		m_state -= 0.1f;
-		update();
-	}
-	QTimer::singleShot( 20, this, SLOT( nextState( void ) ) );
+	QApplication::postEvent( this, new updateEvent() );
 }
 
 

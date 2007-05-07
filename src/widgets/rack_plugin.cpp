@@ -54,7 +54,9 @@
 #endif
 
 #include "rack_plugin.h"
+#include "audio_port.h"
 #include "knob.h"
+#include "led_checkbox.h"
 #include "tempo_sync_knob.h"
 #include "tooltip.h"
 #include "effect_control_dialog.h"
@@ -72,11 +74,8 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_effect( _eff ),
 	m_track( _track ),
 	m_port( _port ),
-	m_contextMenu( NULL ),
 	m_show( TRUE )
 {
-	m_port->getEffects()->appendEffect( m_effect );
-
 	setFixedSize( 210, 60 );
 
 	QPixmap bg = embed::getIconPixmap( "effect_plugin" );
@@ -228,12 +227,15 @@ rackPlugin::rackPlugin( QWidget * _parent,
 
 "Right clicking will bring up a context menu where you can change the order "
 "in which the effects are processed or delete an effect altogether." ) );
+
+	m_port->getEffects()->appendEffect( m_effect );
 }
 
 
 
 rackPlugin::~rackPlugin()
 {
+	m_port->getEffects()->removeEffect( m_effect );
 	delete m_effect;
 	m_controlView->deleteLater();
 }
@@ -293,9 +295,9 @@ void rackPlugin::setGate( float _value )
 
 void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 {
-	m_contextMenu = new QMenu( this );
+	QPointer<QMenu> contextMenu = new QMenu( this );
 #ifdef QT4
-	m_contextMenu->setTitle( m_effect->publicName() );
+	contextMenu->setTitle( m_effect->publicName() );
 #else
 	QLabel * caption = new QLabel( "<font color=white><b>" + 
 				QString( m_effect->publicName() ) +
@@ -303,27 +305,24 @@ void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 				this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
 	caption->setAlignment( Qt::AlignCenter );
-	m_contextMenu->addAction( caption );
+	contextMenu->addAction( caption );
 #endif
-	m_contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ), 
+	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ), 
 						tr( "Move &up" ), 
 						this, SLOT( moveUp() ) );
-	m_contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ), 
+	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ), 
 						tr( "Move &down" ),
 						this, SLOT( moveDown() ) );
-	m_contextMenu->addSeparator();
-	m_contextMenu->addAction( embed::getIconPixmap( "cancel" ), 
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), 
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
-	m_contextMenu->addSeparator();
-	m_contextMenu->addAction( embed::getIconPixmap( "help" ), 
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "help" ), 
 						tr( "&Help" ),  
 						this, SLOT( displayHelp() ) );
-	m_contextMenu->exec( QCursor::pos() );
-	if( m_contextMenu != NULL )
-	{
-		delete m_contextMenu;
-	}
+	contextMenu->exec( QCursor::pos() );
+	delete contextMenu;
 }
 
 
@@ -331,11 +330,6 @@ void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 
 void rackPlugin::moveUp()
 {
-	if( m_contextMenu != NULL )
-	{
-		delete m_contextMenu;
-		m_contextMenu = NULL;
-	}
 	emit( moveUp( this ) );
 }
 
@@ -344,11 +338,6 @@ void rackPlugin::moveUp()
 
 void rackPlugin::moveDown()
 {
-	if( m_contextMenu != NULL )
-	{
-		delete m_contextMenu;
-		m_contextMenu = NULL;
-	}
 	emit( moveDown( this ) );
 }
 
@@ -356,11 +345,6 @@ void rackPlugin::moveDown()
 
 void rackPlugin::deletePlugin()
 {
-	if( m_contextMenu != NULL )
-	{
-		delete m_contextMenu;
-		m_contextMenu = NULL;
-	}
 	emit( deletePlugin( this ) );
 }
 

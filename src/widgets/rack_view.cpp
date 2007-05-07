@@ -39,6 +39,8 @@
 
 
 #include "rack_view.h"
+#include "audio_port.h"
+#include "rack_plugin.h"
 
 
 rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
@@ -68,6 +70,12 @@ rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
 
 rackView::~rackView()
 {
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin();
+						it != m_rackInserts.end(); )
+	{
+		delete *it;
+		m_rackInserts.erase( it );
+	}
 }
 
 
@@ -169,29 +177,14 @@ void rackView::moveDown( rackPlugin * _plugin )
 
 void rackView::deletePlugin( rackPlugin * _plugin )
 {
-	m_port->getEffects()->deleteEffect( _plugin->getEffect() );
-
 #ifdef QT3
 	m_scrollArea->removeChild( _plugin );
 #endif
 	
-	vvector<rackPlugin *>::iterator loc = NULL;
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++ )
-	{
-		if( *it == _plugin )
-		{
-			loc = it;
-			break;
-		}
-	}
-	
-	if( loc != NULL )
-	{
-		delete _plugin;
-		m_rackInserts.erase( loc );
-		redraw();	
-	}
+	m_rackInserts.erase( qFind( m_rackInserts.begin(), m_rackInserts.end(),
+								_plugin ) );
+	delete _plugin;
+	redraw();	
 }
 
 

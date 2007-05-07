@@ -131,7 +131,7 @@ void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( value() );
-		emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+		emit valueChanged();
 		if( !configManager::inst()->value( "knobs",
 		     "classicalusability").toInt() )
 		{
@@ -183,7 +183,7 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( value() );
-	emit valueChanged( dynamic_cast<autoObj *>( this )->data() );
+	emit valueChanged();
 }
 
 

@@ -27,6 +27,18 @@
 
 
 #include "effect_label.h"
+
+#ifndef QT3
+
+#include <QtXml/QDomElement>
+
+#else
+
+#include <qdom.h>
+
+#endif
+
+#include "effect_tab_widget.h"
 #include "sample_track.h"
 #include "embed.h"
 #include "engine.h"
@@ -74,6 +86,15 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 
 effectLabel::~effectLabel()
 {
+	delete m_effWidget;
+}
+
+
+
+
+QString effectLabel::text( void ) const
+{
+	return( m_label->text() );
 }
 
 

@@ -44,6 +44,7 @@
 
 #include "automatable_object_templates.h"
 #include "embed.h"
+#include "knob.h"
 
 
 

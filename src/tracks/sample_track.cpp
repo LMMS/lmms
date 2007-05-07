@@ -56,8 +56,8 @@
 #include "automation_pattern.h"
 #include "sample_play_handle.h"
 #include "string_pair_drag.h"
-#include "knob.h"
 #include "volume.h"
+#include "volume_knob.h"
 
 
 sampleTCO::sampleTCO( track * _track ) :
@@ -402,6 +402,7 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 
 sampleTrack::~sampleTrack()
 {
+	engine::getMixer()->removePlayHandles( this );
 	delete m_audioPort;
 }
 
@@ -509,24 +510,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
 #endif
-	if( _this.attribute( "vol" ) != "" )
-	{
-		m_volumeKnob->setInitValue( _this.attribute( "vol" ).toFloat()
-								* 100.0f );
-	}
-	else
-	{
-		QDomNode node = _this.namedItem(
-					automationPattern::classNodeName() );
-		if( node.isElement() && node.namedItem( "vol" ).isElement() )
-		{
-			m_volumeKnob->loadSettings( _this, "vol" );
-		}
-		else
-		{
-			m_volumeKnob->setInitValue( 100.0f );
-		}
-	}
+	m_volumeKnob->loadSettings( _this, "vol" );
 }
 
 

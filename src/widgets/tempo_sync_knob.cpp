@@ -48,9 +48,10 @@
 
 #include "tempo_sync_knob.h"
 #include "automatable_object_templates.h"
-#include "song_editor.h"
 #include "embed.h"
 #include "main_window.h"
+#include "meter_dialog.h"
+#include "song_editor.h"
 
 
 tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,

@@ -59,6 +59,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
+#include "engine.h"
 #include "piano_roll.h"
 #include "track_container.h"
 #include "rename_dialog.h"
@@ -87,8 +88,6 @@ pattern::pattern ( instrumentTrack * _instrument_track ) :
 	m_patternType( BEAT_PATTERN ),
 	m_name( _instrument_track->name() ),
 	m_steps( DEFAULT_STEPS_PER_TACT ),
-//TODO: check mutex
-	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
 	m_freezing( FALSE ),
 	m_freezeAborted( FALSE )
@@ -107,7 +106,6 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
 	m_steps( _pat_to_copy.m_steps ),
-	m_frozenPatternMutex(),
 	m_frozenPattern( NULL ),
 	m_freezeAborted( FALSE )
 {
@@ -146,12 +144,10 @@ pattern::~pattern()
 
 	m_notes.clear();
 
-	m_frozenPatternMutex.lock();
 	if( m_frozenPattern )
 	{
 		sharedObject::unref( m_frozenPattern );
 	}
-	m_frozenPatternMutex.unlock();
 }
 
 
@@ -250,6 +246,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 		new_note->quantizePos( engine::getPianoRoll()->quantization() );
 	}
 
+	engine::getMixer()->lock();
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
 		m_notes.push_back( new_note );
@@ -272,6 +269,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 		m_notes.insert( it, new_note );
 	}
+	engine::getMixer()->unlock();
 
 	checkType();
 	update();
@@ -287,6 +285,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 void pattern::removeNote( const note * _note_to_del )
 {
+	engine::getMixer()->lock();
 	noteVector::iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
@@ -298,6 +297,7 @@ void pattern::removeNote( const note * _note_to_del )
 		}
 		++it;
 	}
+	engine::getMixer()->unlock();
 
 	checkType();
 	update();
@@ -325,44 +325,20 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 
 void pattern::clearNotes( void )
 {
+	engine::getMixer()->lock();
 	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
 		delete *it;
 	}
-
 	m_notes.clear();
+	engine::getMixer()->unlock();
+
 	checkType();
 	update();
 	if( engine::getPianoRoll()->currentPattern() == this )
 	{
 		engine::getPianoRoll()->update();
-	}
-}
-
-
-
-
-note * pattern::noteAt( int _note_num )
-{
-	if( (csize) _note_num < m_notes.size() )
-	{
-		return( m_notes[_note_num] );
-	}
-	return( NULL );
-}
-
-
-
-
-void pattern::setNoteAt( int _note_num, note _new_note )
-{
-	if( static_cast<csize>( _note_num ) < m_notes.size() )
-	{
-		delete m_notes[_note_num];
-		m_notes[_note_num] = new note( _new_note );
-		checkType();
-		update();
 	}
 }
 
@@ -597,10 +573,8 @@ void pattern::unfreeze( void )
 {
 	if( m_frozenPattern != NULL )
 	{
-		m_frozenPatternMutex.lock();
 		sharedObject::unref( m_frozenPattern );
 		m_frozenPattern = NULL;
-		m_frozenPatternMutex.unlock();
 		update();
 	}
 }
@@ -1069,7 +1043,7 @@ void pattern::paintEvent( QPaintEvent * )
 		for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
-			Sint16 no = it - m_notes.begin();
+			Sint16 no = ( *it )->pos() / 4;
 			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
 								w / steps );
 			Sint16 y = height() - s_stepBtnOff->height() - 1;
@@ -1348,6 +1322,13 @@ void patternFreezeThread::run( void )
 		freeze_recorder->processNextBuffer();
 		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
 	}
+	m_statusDlg->setProgress( 100 );
+	// render tails
+	while( engine::getMixer()->hasPlayHandles() &&
+					m_pattern->m_freezeAborted == FALSE )
+	{
+		freeze_recorder->processNextBuffer();
+	}
 
 
 	m_pattern->m_freezing = FALSE;
@@ -1359,10 +1340,8 @@ void patternFreezeThread::run( void )
 	// create final sample-buffer if freezing was successful
 	if( m_pattern->m_freezeAborted == FALSE )
 	{
-		m_pattern->m_frozenPatternMutex.lock();
 		freeze_recorder->createSampleBuffer(
 						&m_pattern->m_frozenPattern );
-		m_pattern->m_frozenPatternMutex.unlock();
 	}
 
 	// restore original audio-device
