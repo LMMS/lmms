@@ -1,7 +1,7 @@
 /*
- * midi_event_processor.h - base-class for midi-processing classes
+ * update_event.h - signal GUI updates
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,36 +23,34 @@
  */
 
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
+#ifndef _UPDATE_EVENT_H
+#define _UPDATE_EVENT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+
+#include "custom_events.h"
+
+
+
+
+#ifndef QT3
+class updateEvent : public QEvent
+#else
+class updateEvent : public QCustomEvent
 #endif
-
-
-class midiEvent;
-class midiTime;
-
-
-// all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
 {
 public:
-	inline midiEventProcessor( void )
+	updateEvent( void ) :
+#ifndef QT3
+		QEvent( (QEvent::Type)customEvents::GUI_UPDATE )
+#else
+		QCustomEvent( customEvents::GUI_UPDATE )
+#endif
 	{
 	}
-
-	virtual inline ~midiEventProcessor()
-	{
-	}
-
-	// to be implemented by inheriting classes
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
 
 } ;
+
+
+
 
 #endif

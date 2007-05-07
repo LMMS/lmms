@@ -41,14 +41,12 @@
 
 #ifdef QT4
 
-#include <QtCore/QMutex>
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 
 #else
 
-#include <qmutex.h>
 #include <qvaluevector.h>
 #include <qvaluelist.h>
 #include <qmap.h>
@@ -57,7 +55,6 @@
 
 
 #include "audio_device.h"
-#include "tab_widget.h"
 
 
 class QLineEdit;
@@ -110,7 +107,6 @@ private:
 	bool m_active;
 	bool m_stopped;
 
-//	QMutex m_processCallbackMutex;
 	QSemaphore m_stop_semaphore;
 
 	vvector<jack_port_t *> m_outputPorts;

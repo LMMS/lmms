@@ -46,7 +46,6 @@
 
 #include "track.h"
 #include "journalling_object.h"
-#include "rubberband.h"
 
 
 
@@ -96,7 +95,6 @@ public:
 
 	virtual void updateAfterTrackAdd( void );
 	void FASTCALL setPixelsPerTact( Uint16 _ppt );
-	void FASTCALL cloneTrack( track * _track );
 	void FASTCALL addTrack( track * _track );
 	void FASTCALL removeTrack( track * _track );
 	void FASTCALL moveTrackUp( track * _track );
@@ -188,9 +186,6 @@ private:
 
 	rubberBand * m_rubberBand;
 	QPoint m_origin;
-
-
-	friend class scrollArea;
 
 
 signals:

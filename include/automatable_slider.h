@@ -31,14 +31,16 @@
 #ifdef QT4
 
 #include <QtGui/QSlider>
+#include <QtXml/QDomElement>
 
 #else
 
+#include <qdom.h>
 #include <qslider.h>
 
 #endif
 
-#include "knob.h"
+class knob;
 
 
 

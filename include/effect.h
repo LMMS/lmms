@@ -31,20 +31,16 @@
 #include <config.h>
 #endif
 
-#ifdef QT4
+#ifndef QT3
 
-#include <QtCore/QMutex>
 #include <Qt/QtXml>
 
 #else
 
-#include <qmutex.h>
 #include <qdom.h>
 
 #endif
 
-
-#include "qt3support.h"
 
 #include "plugin.h"
 #include "mixer.h"
@@ -157,21 +153,6 @@ public:
 		m_bufferCount++;
 	}
 	
-	inline bool tryLock( void )
-	{
-		return( m_processLock.tryLock() );
-	}
-	
-	inline void lock( void )
-	{
-		m_processLock.lock();
-	}
-	
-	inline void unlock( void )
-	{
-		m_processLock.unlock();
-	}
-	
 	inline bool dontRun( void )
 	{
 		return( m_noRun );
@@ -208,7 +189,6 @@ private:
 	
 	float m_wetDry;
 	float m_gate;
-	QMutex m_processLock;
 
 } ;
 

@@ -1,7 +1,7 @@
 /*
  * tool.h - declaration of class tool, standard interface for all tool plugins
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,7 @@
 #define _TOOL_H
 
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QWidget>
 

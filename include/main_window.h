@@ -48,9 +48,6 @@
 #endif
 
 
-#include "types.h"
-
-
 class QDomElement;
 class QGridLayout;
 class QSplashScreen;

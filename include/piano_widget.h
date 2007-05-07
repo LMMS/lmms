@@ -2,7 +2,7 @@
  * piano_widget.h - declaration of class pianoWidget, a widget which provides
  *                  an interactive piano/keyboard-widget
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,12 +44,11 @@
 #endif
 
 
-#include "knob.h"
 #include "note.h"
-#include "templates.h"
 
 
 class instrumentTrack;
+class knob;
 class notePlayHandle;
 
 
@@ -67,12 +66,7 @@ public:
 	pianoWidget( instrumentTrack * _channel_track );
 	virtual ~pianoWidget();
 
-	inline void setKeyState( int _key, bool _on = FALSE )
-	{
-		m_pressedKeys[tLimit( _key, 0, NOTES_PER_OCTAVE *
-							OCTAVES -1 )] = _on;
-		update();
-	}
+	void setKeyState( int _key, bool _on = FALSE );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
 							const QString & _name );
@@ -87,6 +81,11 @@ public:
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
+#ifndef QT3
+	virtual void customEvent( QEvent * );
+#else
+	virtual void customEvent( QCustomEvent * );
+#endif
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );

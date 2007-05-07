@@ -268,7 +268,6 @@ private slots:
 	void disableAutomation( void );
 	void enableAutomation( void );
 	void removeTrack( void );
-	void removeTrackTimer( void );
 	void muteBtnRightClicked( void );
 	void updateMenu( void );
 
@@ -403,7 +402,6 @@ public:
 		SAMPLE_TRACK,
 		EVENT_TRACK,
 		VIDEO_TRACK,
-		NULL_TRACK,
 		AUTOMATION_TRACK,
 		TOTAL_TRACK_TYPES
 	} ;
@@ -412,9 +410,9 @@ public:
 	virtual ~track();
 
 	static track * FASTCALL create( trackTypes _tt, trackContainer * _tc );
-	static track * FASTCALL create( const QDomElement & _this,
+	static void FASTCALL create( const QDomElement & _this,
 							trackContainer * _tc );
-	static track * FASTCALL clone( track * _track );
+	void FASTCALL clone( void );
 
 	tact length( void ) const;
 
@@ -467,7 +465,7 @@ public:
 		return( m_trackWidget );
 	}
 
-	inline trackContainer * getTrackContainer( void )
+	inline trackContainer * getTrackContainer( void ) const
 	{
 		return( m_trackContainer );
 	}

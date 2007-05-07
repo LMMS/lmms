@@ -33,19 +33,17 @@
 
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
-#include <QtGui/QPixmap>
 
 #else
 
 #include <qwidget.h>
 #include <qvaluevector.h>
-#include <qpixmap.h>
 
 #endif
 
 #include "types.h"
-#include "note.h"
 #include "journalling_object.h"
+#include "midi_time.h"
 #include "automation_pattern.h"
 
 
@@ -196,8 +194,6 @@ private:
 	comboBox * m_zoomingYComboBox;
 	comboBox * m_quantizeComboBox;
 
-	QPixmap m_paintPixmap;
-
 
 	automationPattern * m_pattern;
 	int m_min_level;
@@ -206,7 +202,7 @@ private:
 	int m_bottom_level;
 	int m_top_level;
 
-	void updatePaintPixmap( void );
+	void updatePaintPixmap( QPixmap & _p );
 	void updateTopBottomLevels( void );
 
 	QScrollBar * m_leftRightScroll;

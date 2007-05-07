@@ -2,7 +2,7 @@
  * midi_port.h - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *               sequencing system
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,11 +46,11 @@
 
 #include "types.h"
 #include "midi.h"
-#include "midi_time.h"
 
 
 class midiClient;
 class midiEventProcessor;
+class midiTime;
 
 
 // class for abstraction of MIDI-port

@@ -27,12 +27,11 @@
 #ifndef _NOTE_PLAY_HANDLE_H
 #define _NOTE_PLAY_HANDLE_H
 
-#include <qobject.h>
-
 #include "play_handle.h"
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "note.h"
+#include "instrument.h"
 #include "instrument_track.h"
 
 
@@ -42,32 +41,36 @@ typedef vvector<notePlayHandle *> notePlayHandleVector;
 typedef vvector<const notePlayHandle *> constNotePlayHandleVector;
 
 
-class notePlayHandle : public QObject, public playHandle, public note
+class notePlayHandle : public playHandle, public note
 {
-	Q_OBJECT
 public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	float m_frequency;
-
 	notePlayHandle( instrumentTrack * _chnl_trk,
 					const f_cnt_t _frames_ahead,
 					const f_cnt_t _frames, const note & _n,
+					notePlayHandle * _parent = NULL,
 					const bool _arp_note = FALSE );
 	virtual ~notePlayHandle();
 
+
+	const float & frequency( void )
+	{
+		return( m_frequency );
+	}
+
+	void updateFrequency( void );
 
 	virtual void play( bool _try_parallelizing );
 
 	virtual inline bool done( void ) const
 	{
 		return( ( m_released && m_framesBeforeRelease == 0 &&
-			m_releaseFramesDone >= m_releaseFramesToDo ) ||
-						m_instrumentTrack == NULL );
+				m_releaseFramesDone >= m_releaseFramesToDo ) );
 	}
 
-	virtual void checkValidity( void );
+	virtual bool isFromTrack( const track * _track ) const;
 
 
 	void FASTCALL noteOff( const f_cnt_t _s = 0 );
@@ -113,17 +116,6 @@ public:
 
 	// returns volume-level at frame _frame (envelope/LFO)
 	float FASTCALL volumeLevel( const f_cnt_t _frame );
-
-	// adds note-play-handle _n as subnote
-	inline void addSubNote( notePlayHandle * _n )
-	{
-		m_subNotes.push_back( _n );
-		_n->m_baseNote = FALSE;
-		// if there was an arp-note added and this note is a base-note
-		// we set arp-note-flag for indicating that this note is an
-		// arpeggio-base-note
-		m_arpNote = _n->arpNote() && baseNote();
-	}
 
 	// returns instrument-track this note-play-handle plays
 	inline instrumentTrack * getInstrumentTrack( void )
@@ -182,15 +174,11 @@ public:
 	{
 		m_bbTrack = _bb_track;
 	}
-	void setBBTrackFrom( notePlayHandle * _handle )
-	{
-		m_bbTrack = _handle->m_bbTrack;
-	}
 
 
 	virtual bool supportsParallelizing( void ) const
 	{
-		return( m_instrumentTrack->m_instrument->
+		return( m_instrumentTrack->getInstrument()->
 						supportsParallelizing()
 				&&
 			// we must not parallelize note-play-handles, which
@@ -198,7 +186,7 @@ public:
 			// handle-driven, because then waitForWorkerThread()
 			// would be additionally called for each
 			// note-play-handle which results in hangups
-			m_instrumentTrack->m_instrument->
+			m_instrumentTrack->getInstrument()->
 						notePlayHandleBased() );
 	}
 
@@ -224,6 +212,32 @@ public:
 
 
 private:
+	class baseDetuning
+	{
+	public:
+		baseDetuning( detuningHelper * _detuning );
+
+		int level( void )
+		{
+			return( m_level );
+		}
+
+		void setLevel( int _level );
+
+		float value( void )
+		{
+			return( m_value );
+		}
+
+
+	private:
+		int m_level;
+		float m_value;
+		detuningHelper * m_detuning;
+
+	} ;
+
+
 	instrumentTrack * m_instrumentTrack;	// needed for calling
 					// instrumentTrack::playNote
 	f_cnt_t m_frames;		// total frames to play
@@ -255,9 +269,9 @@ private:
 	bpm_t m_orig_bpm;		// original bpm
 	f_cnt_t m_orig_frames;		// original m_frames
 
+	float m_frequency;
 
-private slots:
-	void updateFrequency( void );
+	baseDetuning * m_base_detuning;
 
 } ;
 

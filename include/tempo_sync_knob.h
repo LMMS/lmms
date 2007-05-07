@@ -26,7 +26,7 @@
 #ifndef _TEMPO_SYNC_KNOB_H
 #define _TEMPO_SYNC_KNOB_H
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QPixmap>
 
@@ -37,11 +37,10 @@
 #endif
 
 #include "knob.h"
-#include "types.h"
-#include "meter_dialog.h"
 
 
 class QAction;
+class meterDialog;
 
 
 class tempoSyncKnob : public knob

@@ -47,6 +47,7 @@
 #include "types.h"
 
 
+class QLabel;
 class QPixmap;
 
 class automatableButtonGroup;
@@ -66,6 +67,15 @@ class arpAndChordsTabWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
+	enum arpDirections
+	{
+		OFF,
+		UP,
+		DOWN,
+		UP_AND_DOWN,
+		RANDOM
+	} ;
+
 	arpAndChordsTabWidget( instrumentTrack * _channel_track );
 	virtual ~arpAndChordsTabWidget();
 
@@ -97,16 +107,6 @@ public:
 
 
 private:
-
-	enum arpDirections
-	{
-		OFF,
-		UP,
-		DOWN,
-		UP_AND_DOWN,
-		RANDOM
-	} ;
-
 	enum arpModes
 	{
 		FREE,

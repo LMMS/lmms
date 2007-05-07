@@ -34,31 +34,28 @@
 #include <QtGui/QApplication>
 #include <QtGui/QPushButton>
 #include <QtGui/QPainter>
-#include <QtCore/QMutex>
 
 #else
 
 #include <qapplication.h>
 #include <qpushbutton.h>
 #include <qpainter.h>
-#include <qmutex.h>
 
 #endif
 
-#include "track.h"
-#include "mixer.h"
 #include "midi_event_processor.h"
-#include "gui_templates.h"
+#include "mixer.h"
 #include "tab_widget.h"
-#include "volume_knob.h"
-#include "instrument.h"
+#include "track.h"
 
 class QLineEdit;
 class arpAndChordsTabWidget;
 class audioPort;
-class instrumentTrackButton;
+class effectTabWidget;
 class envelopeTabWidget;
 class fadeButton;
+class instrument;
+class instrumentTrackButton;
 class lcdSpinBox;
 class midiPort;
 class midiTabWidget;
@@ -66,8 +63,7 @@ class notePlayHandle;
 class pianoWidget;
 class presetPreviewPlayHandle;
 class surroundArea;
-class flpImport;
-class effectTabWidget;
+class volumeKnob;
 
 
 class instrumentTrack : public QWidget, public track, public midiEventProcessor
@@ -94,10 +90,6 @@ public:
 						const midiTime & _time );
 
 
-	// returns the frequency of a given tone & octave.
-	// This function also includes base_tone & base_octave in
-	// its calculations
-	float FASTCALL frequency( notePlayHandle * _n ) const;
 	f_cnt_t FASTCALL beatLen( notePlayHandle * _n ) const;
 
 
@@ -187,7 +179,6 @@ public slots:
 
 
 signals:
-	void baseNoteChanged( void );
 	void noteDone( const note & _n );
 
 
@@ -224,8 +215,6 @@ private:
 
 
 	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
-
-	QMutex m_notesMutex;
 
 
 	tones m_baseTone;

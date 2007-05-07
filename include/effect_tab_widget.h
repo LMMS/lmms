@@ -50,15 +50,14 @@
 #endif
 
 #include "journalling_object.h"
-#include "rack_plugin.h"
-#include "rack_view.h"
-#include "audio_port.h"
-#include "track.h"
 
 
-class instrumentTrack;
-class sampleTrack;
+class audioPort;
 class groupBox;
+class instrumentTrack;
+class rackView;
+class sampleTrack;
+class track;
 
 
 class effectTabWidget : public QWidget, public journallingObject
@@ -99,8 +98,6 @@ private:
 	QPushButton * m_addButton;
 	
 	rackView * m_rack;
-		
-	friend class instrumentTrack;
 
 } ;
 

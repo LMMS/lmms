@@ -2,7 +2,7 @@
  * play_handle.h - base-class playHandle which is needed by
  *                 LMMS-Player-Engine
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,6 +44,9 @@
 #endif
 
 
+class track;
+
+
 class playHandle
 {
 public:
@@ -72,14 +75,7 @@ public:
 	virtual void play( bool _try_parallelizing = FALSE ) = 0;
 	virtual bool done( void ) const = 0;
 
-	// play-handles can invalidate themselves if an object they depend on
-	// is going to be deleted or things like that - every of those objects
-	// has to call mixer::inst()->checkValidityOfPlayHandles() in it's dtor
-	// and set flag before, so LMMS doesn't crash because these play-handles
-	// would continue using pointers to deleted objects...
-	virtual void checkValidity( void )
-	{
-	}
+	virtual bool isFromTrack( const track * _track ) const = 0;
 
 	virtual bool supportsParallelizing( void ) const
 	{

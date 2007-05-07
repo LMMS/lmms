@@ -68,6 +68,14 @@ public:
 		{
 		}
 
+
+	public slots:
+		virtual void show( void )
+		{
+			parentWidget()->hide();
+			QWidget::show();
+		}
+
 	} ;
 
 

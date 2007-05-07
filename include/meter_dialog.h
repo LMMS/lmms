@@ -1,7 +1,7 @@
 /*
- * meter_dialog.h - diloag for entering meter settings
+ * meter_dialog.h - dialog for entering meter settings
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,7 +25,7 @@
 #ifndef _METER_DIALOG_H
 #define _METER_DIALOG_H
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QWidget>
 
@@ -36,11 +36,10 @@
 #endif
 
 
-#include "track.h"
 #include "lcd_spinbox.h"
 
 
-class meterDialog: public QWidget
+class meterDialog : public QWidget
 {
 	Q_OBJECT
 public:

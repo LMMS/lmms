@@ -30,7 +30,6 @@
 
 #include "play_handle.h"
 #include "sample_buffer.h"
-#include "types.h"
 
 class bbTrack;
 class pattern;
@@ -52,6 +51,8 @@ public:
 	virtual void play( bool _try_parallelizing );
 	void play( const fpab_t _frame_base, bool _try_parallelizing );
 	virtual bool done( void ) const;
+
+	virtual bool isFromTrack( const track * _track ) const;
 
 	f_cnt_t totalFrames( void ) const;
 	inline f_cnt_t framesDone( void ) const

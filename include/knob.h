@@ -96,7 +96,7 @@ public slots:
 
 signals:
 	void valueChanged( float value );
-	void valueChanged( const QVariant & _data );
+	void valueChanged( void );
 	void sliderPressed( void );
 	void sliderReleased( void );
 	void sliderMoved( float value );

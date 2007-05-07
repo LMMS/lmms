@@ -42,7 +42,6 @@
 
 
 #include "audio_device.h"
-#include "tab_widget.h"
 
 
 class QLineEdit;

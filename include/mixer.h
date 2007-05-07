@@ -49,11 +49,8 @@
 
 
 #include "types.h"
-#include "volume.h"
-#include "panning.h"
 #include "note.h"
 #include "play_handle.h"
-#include "effect_board.h"
 #include "fifo_buffer.h"
 
 
@@ -113,7 +110,7 @@ class mixer : public QObject
 	Q_OBJECT
 public:
 	void initDevices( void );
-	void FASTCALL clear( const bool _everything = FALSE );
+	void FASTCALL clear( void );
 
 
 	// audio-device-stuff
@@ -133,9 +130,9 @@ public:
 	// audio-port-stuff
 	inline void addAudioPort( audioPort * _port )
 	{
-		pause();
+		lock();
 		m_audioPorts.push_back( _port );
-		play();
+		unlock();
 	}
 
 	inline void removeAudioPort( audioPort * _port )
@@ -179,21 +176,16 @@ public:
 		m_playHandlesToRemove.push_back( _ph );
 	}
 
-	inline const playHandleVector & playHandles( void ) const
-	{
-		return( m_playHandles );
-	}
-
 	inline playHandleVector & playHandles( void )
 	{
 		return( m_playHandles );
 	}
 
-	void checkValidityOfPlayHandles( void );
+	void removePlayHandles( track * _track );
 
-	inline bool haveNoRunningNotes( void ) const
+	inline bool hasPlayHandles( void ) const
 	{
-		return( m_playHandles.size() == 0 );
+		return( !m_playHandles.empty() );
 	}
 
 
@@ -251,23 +243,15 @@ public:
 	}
 
 
-	// methods for controlling mixer-state
-	void pause( void )
+	// methods needed by other threads to alter knob values, waveforms, etc
+	void lock( void )
 	{
-		if( m_mixMutexLockLevel == 0 )
-		{
-			m_mixMutex.lock();
-		}
-		++m_mixMutexLockLevel;
+		m_mixMutex.lock();
 	}
 
-	void play( void )
+	void unlock( void )
 	{
-		if( m_mixMutexLockLevel == 1 )
-		{
-			m_mixMutex.unlock();
-		}
-		--m_mixMutexLockLevel;
+		m_mixMutex.unlock();
 	}
 
 
@@ -331,13 +315,6 @@ private:
 	void stopProcessing( void );
 
 
-	// we don't allow to create mixer by using copy-ctor
-	mixer( const mixer & )
-	{
-	}
-
-
-
 	audioDevice * tryAudioDevices( void );
 	midiClient * tryMIDIClients( void );
 
@@ -389,7 +366,6 @@ private:
 
 
 	QMutex m_mixMutex;
-	Uint8 m_mixMutexLockLevel;
 
 
 	fifo * m_fifo;
@@ -397,7 +373,6 @@ private:
 
 
 	friend class engine;
-	friend class fifoWriter;
 
 } ;
 

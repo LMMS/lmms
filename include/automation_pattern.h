@@ -27,15 +27,21 @@
 #ifndef _AUTOMATION_PATTERN_H
 #define _AUTOMATION_PATTERN_H
 
+#include <qobject.h>
+
 #include "qt3support.h"
-#include "track.h"
-#include "level_object.h"
+#include "journalling_object.h"
 
 #ifdef QT3
 
 #include "xqmap.h"
 
 #endif
+
+
+class levelObject;
+class midiTime;
+class track;
 
 
 
@@ -89,12 +95,12 @@ public:
 		return( classNodeName() );
 	}
 
-	inline track * getTrack( void )
+	inline const track * getTrack( void )
 	{
 		return( m_track );
 	}
 
-	inline levelObject * object( void )
+	inline const levelObject * object( void )
 	{
 		return( m_object );
 	}
@@ -127,8 +133,7 @@ private:
 	levelObject * m_object;
 	timeMap m_time_map;
 	bool m_update_first;
-
-	void init( void );
+	bool m_dynamic;
 
 } ;
 

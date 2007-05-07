@@ -30,7 +30,7 @@
 #include <config.h>
 #endif
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtCore/QMap>
 

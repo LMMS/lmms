@@ -26,21 +26,11 @@
 #ifndef _VOLUME_KNOB_H
 #define _VOLUME_KNOB_H
 
-#ifdef QT4
 
-#include <QtGui/QPixmap>
-
-#else
-
-#include <qpixmap.h>
-
-#endif
-
-#include "types.h"
 #include "knob.h"
 
 
-class volumeKnob: public knob
+class volumeKnob : public knob
 {
 	Q_OBJECT
 public:
@@ -57,6 +47,7 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
+
 } ;
 
 #endif

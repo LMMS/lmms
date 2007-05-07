@@ -1,7 +1,7 @@
 /*
  * config_mgr.h - class configManager, a class for managing LMMS-configuration
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -256,9 +256,6 @@ private:
 	QHBoxLayout * m_buttonLayout;
 	QHBoxLayout * m_mainLayout;
 	QVBoxLayout * m_contentLayout;
-
-
-	friend class engine;
 
 } ;
 

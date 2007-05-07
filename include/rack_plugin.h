@@ -2,7 +2,7 @@
  * rack_plugin.h - tab-widget in channel-track-window for setting up
  *                 effects
  *
- * Copyright (c) 2006 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,7 +25,7 @@
 #ifndef _RACK_PLUGIN_H
 #define _RACK_PLUGIN_H
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QWidget>
 #include <QtGui/QGroupBox>
@@ -43,14 +43,15 @@
 
 
 #include "journalling_object.h"
-#include "led_checkbox.h"
-#include "track.h"
-#include "audio_port.h"
 
 
-class knob;
-class tempoSyncKnob;
+class audioPort;
+class effect;
 class effectControlDialog;
+class knob;
+class ledCheckBox;
+class tempoSyncKnob;
+class track;
 
 
 class rackPlugin: public QWidget, public journallingObject
@@ -108,7 +109,6 @@ private:
 	effectControlDialog * m_controlView;
 	track * m_track;
 	audioPort * m_port;
-	QMenu * m_contextMenu;
 	bool m_show;
 
 } ;

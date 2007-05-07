@@ -3,7 +3,7 @@
  *                         provides UI- and DSP-code for using envelopes, LFOs
  *                         and a filter
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,21 +41,19 @@
 #endif
 
 
-#include "basic_filters.h"
-#include "envelope_and_lfo_widget.h"
+#include "mixer.h"
 
 
 class QLabel;
 
 class instrumentTrack;
 class comboBox;
+class envelopeAndLFOWidget;
 class groupBox;
 class knob;
 class notePlayHandle;
 class pixmapButton;
 class tabWidget;
-
-class flpImport;
 
 
 class envelopeTabWidget : public QWidget, public journallingObject

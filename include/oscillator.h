@@ -60,19 +60,19 @@ public:
 		PHASE_MODULATION, AMP_MODULATION, MIX, SYNC, FREQ_MODULATION
 	} ;
 
-	oscillator( const waveShapes * _wave_shape,
-			const modulationAlgos * _modulation_algo,
-			const float * _freq,
-			const float * _detuning,
-			const float * _phase_offset,
-			const float * _volume,
+	oscillator( const waveShapes & _wave_shape,
+			const modulationAlgos & _modulation_algo,
+			const float & _freq,
+			const float & _detuning,
+			const float & _phase_offset,
+			const float & _volume,
 			oscillator * _m_subOsc = NULL ) FASTCALL;
 	virtual ~oscillator()
 	{
 		delete m_subOsc;
 	}
 
-	inline void setUserWave( sampleBuffer * _wave )
+	inline void setUserWave( const sampleBuffer * _wave )
 	{
 		m_userWave = _wave;
 	}
@@ -154,16 +154,16 @@ public:
 
 
 private:
-	const waveShapes * m_waveShape;
-	const modulationAlgos * m_modulationAlgo;
-	const float * m_freq;
-	const float * m_detuning;
-	const float * m_volume;
-	const float * m_ext_phaseOffset;
+	const waveShapes & m_waveShape;
+	const modulationAlgos & m_modulationAlgo;
+	const float & m_freq;
+	const float & m_detuning;
+	const float & m_volume;
+	const float & m_ext_phaseOffset;
 	oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	sampleBuffer * m_userWave;
+	const sampleBuffer * m_userWave;
 
 
 	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,

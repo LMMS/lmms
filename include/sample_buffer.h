@@ -31,12 +31,10 @@
 #ifdef QT4
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
 
 #else
 
 #include <qobject.h>
-#include <qmutex.h>
 
 #endif
 
@@ -195,7 +193,7 @@ public:
 	void normalize_sample_rate( const sample_rate_t _src_sr,
 						bool _keep_settings = FALSE );
 
-	inline sample_t userWaveSample( const float _sample )
+	inline sample_t userWaveSample( const float _sample ) const
 	{
 		// Precise implementation
 //		const float frame = fraction( _sample ) * m_frames;
@@ -214,15 +212,6 @@ public:
 			f1 += m_frames;
 		}
 		return( m_data[f1][0] );
-	}
-
-	void lock( void )
-	{
-		m_dataMutex.lock();
-	}
-	void unlock( void )
-	{
-		m_dataMutex.unlock();
 	}
 
 	static QString tryToMakeRelative( const QString & _file );
@@ -274,7 +263,6 @@ private:
 	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sample_rate;
-	QMutex m_dataMutex;
 
 #ifdef HAVE_SAMPLERATE_H
 	void initResampling( void );

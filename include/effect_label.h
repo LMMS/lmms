@@ -43,11 +43,11 @@
 #endif
 
 #include "journalling_object.h"
-#include "tab_widget.h"
-#include "effect_tab_widget.h"
 
 
+class effectTabWidget;
 class sampleTrack;
+class tabWidget;
 
 
 class effectLabel: public QWidget, public journallingObject
@@ -58,10 +58,7 @@ public:
 							sampleTrack * _track );
 	virtual ~effectLabel();
 
-	inline const QString & text( void )
-	{
-		return( m_text );
-	}
+	QString text( void ) const;
 	void FASTCALL setText( const QString & _text );
 	
 	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
@@ -89,7 +86,6 @@ protected:
 
 private:
 	sampleTrack * m_track;
-	QString m_text;
 	bool m_show;
 	
 	QLabel * m_label;

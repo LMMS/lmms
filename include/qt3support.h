@@ -1,7 +1,7 @@
 /*
  * qt3support.h - layer for supporting Qt3
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,9 +26,6 @@
 #ifndef _QT3SUPPORT_H
 #define _QT3SUPPORT_H
 
-// don't know why following line is neccessary, it's a bug in qt-headers -
-// otherwise LMMS sometimes fails to compile
-//#include <qmap.h>
 
 #include <qglobal.h>
 #include <qpair.h>

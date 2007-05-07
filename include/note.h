@@ -48,6 +48,9 @@
 #include "midi_time.h"
 #include "journalling_object.h"
 
+class detuningHelper;
+
+
 enum tones
 {
 	C = 0,
@@ -88,8 +91,6 @@ const int NOTES_PER_OCTAVE = WHITE_KEYS_PER_OCTAVE + BLACK_KEYS_PER_OCTAVE;
 const int OCTAVES = MAX_OCTAVE+1;
 const int NOTES = OCTAVES*NOTES_PER_OCTAVE;
 
-class knob;
-
 
 
 class note : public journallingObject
@@ -101,7 +102,7 @@ public:
 		octaves _octave = DEFAULT_OCTAVE,
 		volume _volume = DEFAULT_VOLUME,
 		panning _panning = DEFAULT_PANNING,
-		knob * _detuning = NULL ) FASTCALL;
+		detuningHelper * _detuning = NULL ) FASTCALL;
 	note( const note & _note );
 	virtual ~note();
 
@@ -168,7 +169,7 @@ public:
 	static midiTime FASTCALL quantized( const midiTime & _m,
 							const int _q_grid );
 
-	knob * detuning( void ) const
+	detuningHelper * detuning( void ) const
 	{
 		return( m_detuning );
 	}
@@ -204,10 +205,9 @@ private:
 	panning m_panning;
 	midiTime m_length;
 	midiTime m_pos;
-	knob * m_detuning;
+	detuningHelper * m_detuning;
 
 	void createDetuning( void );
-	void FASTCALL setDetuning( knob * _detuning );
 
 } ;
 

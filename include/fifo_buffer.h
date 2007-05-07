@@ -26,7 +26,7 @@
 #define _FIFO_BUFFER_H
 
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtCore/QSemaphore>
 

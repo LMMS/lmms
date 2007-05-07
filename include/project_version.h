@@ -1,7 +1,7 @@
 /*
- * midi_event_processor.h - base-class for midi-processing classes
+ * project_version.h - version compared in import upgrades
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,36 +23,45 @@
  */
 
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
+#ifndef _PROJECT_VERSION_H
+#define _PROJECT_VERSION_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+
+#ifndef QT3
+
+#include <QtCore/QString>
+
+#else
+
+#include <qstring.h>
+
 #endif
 
 
-class midiEvent;
-class midiTime;
 
 
-// all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
+class projectVersion : public QString
 {
 public:
-	inline midiEventProcessor( void )
+	projectVersion( const QString & _s ) :
+		QString( _s )
 	{
 	}
 
-	virtual inline ~midiEventProcessor()
-	{
-	}
-
-	// to be implemented by inheriting classes
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
+	static int compare( const projectVersion & _v1,
+						const projectVersion & _v2 );
 
 } ;
+
+
+
+
+inline bool operator<( const projectVersion & _v1, const char * _str )
+{
+	return( projectVersion::compare( _v1, projectVersion( _str ) ) < 0 );
+}
+
+
+
 
 #endif

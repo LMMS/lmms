@@ -1,7 +1,7 @@
 /*
  * side_bar.h - code for side-bar in LMMS
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,6 @@
 
 
 #include "kmultitabbar.h"
-#include "side_bar_widget.h"
 
 
 class sideBar : public KMultiTabBar

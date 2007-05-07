@@ -100,7 +100,12 @@ public:
 		return( m_curLevel );
 	}
 
-	inline T fittedValue( T _value );
+	inline T fittedValue( T _value ) const;
+
+	T value( int _level ) const
+	{
+		return( fittedValue( _level * m_step ) );
+	}
 
 	virtual void setInitValue( const T _value );
 
@@ -130,16 +135,6 @@ public:
 	virtual QString nodeName( void ) const
 	{
 		return( "automatableobject" );
-	}
-
-	inline const QVariant & data( void ) const
-	{
-		return( m_data );
-	}
-
-	void setData( const QVariant & _data )
-	{
-		m_data = _data;
 	}
 
 	inline automationPattern * getAutomationPattern( void );
@@ -180,8 +175,6 @@ private:
 	T m_oldValue;
 	bool m_journalEntryReady;
 
-	QVariant m_data;
-
 	typedef vvector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;
 
@@ -200,9 +193,9 @@ private:
 		return( (int)roundf( _value / (float)m_step ) );
 	}
 
-	QString levelToLabel( int _level )
+	QString levelToLabel( int _level ) const
 	{
-		return( QString::number( _level * m_step ) );
+		return( QString::number( value( _level ) ) );
 	}
 
 	int labelToLevel( QString _label )

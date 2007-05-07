@@ -1,7 +1,7 @@
 /*
- * midi_event_processor.h - base-class for midi-processing classes
+ * detuning_helper.h - detuning automation helper
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,36 +23,29 @@
  */
 
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#ifndef _DETUNING_HELPER_H
+#define _DETUNING_HELPER_H
 
 
-class midiEvent;
-class midiTime;
+#include "shared_object.h"
 
 
-// all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
+class detuningHelper : public automatableObject<float>, public sharedObject
 {
 public:
-	inline midiEventProcessor( void )
+	detuningHelper( void ) :
+		autoObj( NULL )
 	{
 	}
 
-	virtual inline ~midiEventProcessor()
+	virtual QString displayName( void ) const
 	{
+		return( automationEditor::tr( "Note detuning" ) );
 	}
-
-	// to be implemented by inheriting classes
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
 
 } ;
+
+
+
 
 #endif

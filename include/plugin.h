@@ -46,9 +46,7 @@
 #endif
 
 
-#include "types.h"
 #include "journalling_object.h"
-#include "embed.h"
 #include "base64.h"
 
 

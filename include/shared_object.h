@@ -1,7 +1,7 @@
 /*
- * shared_object.h - class sharedObject for use among threads
+ * shared_object.h - class sharedObject for use among other objects
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,16 +26,6 @@
 #ifndef _SHARED_OBJECT_H
 #define _SHARED_OBJECT_H
 
-#ifdef QT4
-
-#include <QtCore/QMutex>
-
-#else
-
-#include <qmutex.h>
-
-#endif
-
 
 
 
@@ -51,18 +41,14 @@ public:
 	static T * ref( T * _object )
 	{
 		// TODO: Use QShared
-		_object->m_reference_mutex.lock();
 		++_object->m_reference_count;
-		_object->m_reference_mutex.unlock();
 		return( _object );
 	}
 
 	template<class T>
 	static void unref( T * _object )
 	{
-		_object->m_reference_mutex.lock();
 		bool delete_object = --_object->m_reference_count == 0;
-		_object->m_reference_mutex.unlock();
 		if ( delete_object )
 		{
 			delete _object;
@@ -72,7 +58,6 @@ public:
 
 private:
 	unsigned m_reference_count;
-	QMutex m_reference_mutex;
 
 } ;
 

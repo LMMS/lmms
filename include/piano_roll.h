@@ -33,13 +33,11 @@
 
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
-#include <QtGui/QPixmap>
 
 #else
 
 #include <qwidget.h>
 #include <qvaluevector.h>
-#include <qpixmap.h>
 
 #endif
 
@@ -178,7 +176,7 @@ private:
 
 	midiTime newNoteLen( void ) const;
 
-	void updatePaintPixmap( void );
+	void updatePaintPixmap( QPixmap & _p );
 
 
 	static QPixmap * s_whiteKeyBigPm;
@@ -211,8 +209,6 @@ private:
 	comboBox * m_zoomingComboBox;
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
-
-	QPixmap m_paintPixmap;
 
 
 	pattern * m_pattern;
@@ -256,7 +252,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x, Uint16 _y );
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
-	noteVector::iterator noteIteratorUnderMouse( void );
+	noteVector::const_iterator noteIteratorUnderMouse( void );
 
 
 

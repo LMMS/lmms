@@ -67,10 +67,7 @@ automatableObject<T, EDIT_STEP_TYPE>::automatableObject( track * _track,
 template<typename T, typename EDIT_STEP_TYPE>
 automatableObject<T, EDIT_STEP_TYPE>::~automatableObject()
 {
-	if( m_automation_pattern )
-	{
-		delete m_automation_pattern;
-	}
+	delete m_automation_pattern;
 	while( m_linkedObjects.empty() == FALSE )
 	{
 		m_linkedObjects.last()->unlinkObject( this );
@@ -82,7 +79,7 @@ automatableObject<T, EDIT_STEP_TYPE>::~automatableObject()
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-T automatableObject<T, EDIT_STEP_TYPE>::fittedValue( T _value )
+T automatableObject<T, EDIT_STEP_TYPE>::fittedValue( T _value ) const
 {
 	_value = tLimit<T>( _value, minValue(), maxValue() );
 
@@ -230,10 +227,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::linkObjects( autoObj * _object1,
 
 	if( _object1->m_automation_pattern != _object2->m_automation_pattern )
 	{
-		if( _object2->m_automation_pattern )
-		{
-			delete _object2->m_automation_pattern;
-		}
+		delete _object2->m_automation_pattern;
 		_object2->m_automation_pattern = _object1->m_automation_pattern;
 	}
 }
@@ -264,7 +258,8 @@ void automatableObject<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
 							QDomElement & _this,
 							const QString & _name )
 {
-	if( m_automation_pattern )
+	if( m_automation_pattern && m_automation_pattern->getTimeMap().size()
+									> 1 )
 	{
 		QDomElement pattern_element;
 		QDomNode node = _this.namedItem(
@@ -304,8 +299,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::loadSettings(
 		if( node.isElement() )
 		{
 			m_automation_pattern->loadSettings( node.toElement() );
-			setLevel( m_automation_pattern->valueAt(
-							midiTime( 0 ) ) );
+			setLevel( m_automation_pattern->valueAt( 0 ) );
 			return;
 		}
 	}
@@ -399,8 +393,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::setFirstValue( void )
 {
 	if( m_automation_pattern && m_automation_pattern->updateFirst() )
 	{
-		m_automation_pattern->putValue( midiTime( 0 ), m_curLevel,
-									FALSE );
+		m_automation_pattern->putValue( 0, m_curLevel, FALSE );
 		if( engine::getAutomationEditor() &&
 				engine::getAutomationEditor()->currentPattern()
 						== m_automation_pattern )

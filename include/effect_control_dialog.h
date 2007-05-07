@@ -2,7 +2,7 @@
  * effect_control_dialog.h - base-class for effect-dialogs for displaying and
  *                           editing control port values
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
 #ifndef _EFFECT_CONTROL_DIALOG_H
 #define _EFFECT_CONTROL_DIALOG_H
 
-#ifdef QT4
+#ifndef QT3
 
 #include <QtGui/QWidget>
 
@@ -36,12 +36,10 @@
 
 #endif
 
-#include "qt3support.h"
-
 #include "journalling_object.h"
-#include "effect.h"
 
 
+class effect;
 class track;
 
 

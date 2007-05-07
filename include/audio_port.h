@@ -38,8 +38,6 @@
 
 #endif
 
-#include "mixer.h"
-#include "effect_board.h"
 #include "effect_chain.h"
 
 

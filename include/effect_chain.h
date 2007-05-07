@@ -25,16 +25,6 @@
 #ifndef _EFFECT_CHAIN_H
 #define _EFFECT_CHAIN_H
 
-#ifdef QT4
-
-#include <QtCore/QMutex>
-
-#else
-
-#include <qmutex.h>
-
-#endif
-
 #include "qt3support.h"
 
 #include "effect.h"
@@ -48,7 +38,7 @@ public:
 	virtual ~effectChain();
 	
 	void FASTCALL appendEffect( effect * _effect );
-	void FASTCALL deleteEffect( effect * _effect );
+	void FASTCALL removeEffect( effect * _effect );
 	void FASTCALL moveDown( effect * _effect );
 	void FASTCALL moveUp( effect * _effect );
 	bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, 
@@ -70,7 +60,6 @@ private:
 	effect_list_t m_effects;
 	
 	bool m_bypassed;
-	QMutex m_processLock;
 
 } ;
 

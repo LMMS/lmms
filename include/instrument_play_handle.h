@@ -1,7 +1,7 @@
 /*
  * instrument_play_handle.h - play-handle for playing an instrument
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,40 +46,27 @@ public:
 
 	inline virtual void play( bool _try_parallelizing )
 	{
-		if( m_instrument != NULL )
-		{
-			m_instrument->play( _try_parallelizing );
-		}
+		m_instrument->play( _try_parallelizing );
 	}
 
 	inline virtual bool done( void ) const
 	{
-		return( m_instrument == NULL );
+		return( FALSE );
 	}
 
-	inline virtual void checkValidity( void )
+	virtual bool isFromTrack( const track * _track ) const
 	{
-		if( m_instrument != NULL && !m_instrument->valid() )
-		{
-			m_instrument = NULL;
-		}
+		return( m_instrument->isFromTrack( _track ) );
 	}
 
 	inline virtual bool supportsParallelizing( void ) const
 	{
-		if( m_instrument != NULL )
-		{
-			return( m_instrument->supportsParallelizing() );
-		}
-		return( FALSE );
+		return( m_instrument->supportsParallelizing() );
 	}
 
 	inline virtual void waitForWorkerThread( void )
 	{
-		if( m_instrument != NULL )
-		{
-			m_instrument->waitForWorkerThread();
-		}
+		m_instrument->waitForWorkerThread();
 	}
 
 

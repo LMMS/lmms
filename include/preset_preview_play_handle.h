@@ -34,7 +34,6 @@
 
 
 class instrumentTrack;
-class notePlayHandle;
 class previewTrackContainer;
 
 
@@ -46,6 +45,8 @@ public:
 
 	virtual void play( bool _try_parallelizing );
 	virtual bool done( void ) const;
+
+	virtual bool isFromTrack( const track * _track ) const;
 
 	static void cleanUp( void );
 	static constNotePlayHandleVector nphsOfInstrumentTrack(

@@ -46,9 +46,12 @@
 
 #include "types.h"
 #include "journalling_object.h"
-#include "rack_plugin.h"
-#include "track.h"
-#include "audio_port.h"
+
+
+class audioPort;
+class effect;
+class rackPlugin;
+class track;
 
 
 class rackView: public QWidget, public journallingObject

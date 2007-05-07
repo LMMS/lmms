@@ -1,7 +1,7 @@
 /*
  * fade_button.h - declaration of class fadeButton 
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,17 +58,20 @@ public slots:
 
 
 protected:
+#ifndef QT3
+	virtual void customEvent( QEvent * );
+#else
+	virtual void customEvent( QCustomEvent * );
+#endif
 	virtual void paintEvent( QPaintEvent * _pe );
-
-
-private slots:
-	void nextState( void );
 
 
 private:
 	float m_state;
 	QColor m_normalColor;
 	QColor m_activatedColor;
+
+	void signalUpdate( void );
 
 } ;
 

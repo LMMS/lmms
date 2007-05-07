@@ -103,15 +103,6 @@ public:
 		return( "el" );
 	}
 
-	void lock( void )
-	{
-		m_busyMutex.lock();
-	}
-	void unlock( void )
-	{
-		m_busyMutex.unlock();
-	}
-
 
 public slots:
 	void updateSampleVars( void );
@@ -190,8 +181,6 @@ private:
 		SQUARE,
 		USER
 	} m_lfoShape;
-
-	QMutex m_busyMutex;
 
 	sample_t lfoShapeSample( fpab_t _frame_offset );
 	void updateLFOShapeData( void );

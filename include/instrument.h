@@ -48,15 +48,15 @@
 #endif
 
 
-#include "engine.h"
 #include "plugin.h"
-#include "mixer.h"
 
 
 // forward-declarations
 class instrumentTrack;
 class notePlayHandle;
 class midiEvent;
+class midiTime;
+class track;
 
 
 class instrument : public QWidget, public plugin
@@ -104,13 +104,6 @@ public:
 		return( FALSE );
 	}
 
-	// instrument-play-handles use this for checking whether they can mark
-	// themselves as done, so that mixer trashes them
-	inline virtual bool valid( void ) const
-	{
-		return( m_valid );
-	}
-
 	inline virtual bool notePlayHandleBased( void ) const
 	{
 		return( TRUE );
@@ -129,25 +122,18 @@ public:
 	static instrument * FASTCALL instantiate( const QString & _plugin_name,
 					instrumentTrack * _channel_track );
 
+	virtual bool isFromTrack( const track * _track ) const;
+
+
 protected:
 	inline instrumentTrack * getInstrumentTrack( void ) const
 	{
 		return( m_instrumentTrack );
 	}
 
-	// instruments can use this for invalidating themselves, which is for
-	// example neccessary when being destroyed and having instrument-play-
-	// handles running
-	inline void invalidate( void )
-	{
-		m_valid = FALSE;
-		engine::getMixer()->checkValidityOfPlayHandles();
-	}
-
 
 private:
 	instrumentTrack * m_instrumentTrack;
-	bool m_valid;
 
 } ;
 

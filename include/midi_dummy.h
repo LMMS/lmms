@@ -28,8 +28,6 @@
 
 
 #include "midi_client.h"
-#include "midi_port.h"
-#include "tab_widget.h"
 
 
 class midiDummy : public midiClientRaw
@@ -63,6 +61,14 @@ public:
 
 		virtual void saveSettings( void )
 		{
+		}
+
+
+	public slots:
+		virtual void show( void )
+		{
+			parentWidget()->hide();
+			QWidget::show();
 		}
 
 	} ;

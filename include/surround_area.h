@@ -41,13 +41,13 @@
 #endif
 
 
-#include "knob.h"
-#include "types.h"
 #include "mixer.h"
-#include "templates.h"
 
 
 class QPixmap;
+class knob;
+class track;
+
 
 const int SURROUND_AREA_SIZE = 1024;
 

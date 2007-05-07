@@ -33,7 +33,6 @@
 
 #include <QtCore/QVector>
 #include <QtGui/QWidget>
-#include <QtCore/QMutex>
 #include <QtGui/QDialog>
 #include <QtCore/QThread>
 #include <QtGui/QPixmap>
@@ -42,7 +41,6 @@
 
 #include <qvaluevector.h>
 #include <qwidget.h>
-#include <qmutex.h>
 #include <qdialog.h>
 #include <qthread.h>
 #include <qpixmap.h>
@@ -52,7 +50,6 @@
 
 #include "note.h"
 #include "track.h"
-#include "mixer.h"
 
 
 class QAction;
@@ -97,14 +94,10 @@ public:
 
 	void clearNotes( void );
 	
-	inline noteVector & notes( void )
+	inline const noteVector & notes( void )
 	{
 		return( m_notes );
 	}
-
-	note * FASTCALL noteAt( int _note_num );
-
-	void FASTCALL setNoteAt( int _note_num, note _new_note );
 
 	// pattern-type stuff
 	inline patternTypes type( void ) const
@@ -219,7 +212,6 @@ private:
 	int m_steps;
 
 	// pattern freezing
-	QMutex m_frozenPatternMutex;
 	sampleBuffer * m_frozenPattern;
 	bool m_freezing;
 	volatile bool m_freezeAborted;

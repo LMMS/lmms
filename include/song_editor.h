@@ -293,8 +293,6 @@ private:
 
 	track * m_automation_track;
 
-	bool m_destroyed;
-
 
 
 	enum ACTIONS

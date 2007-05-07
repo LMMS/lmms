@@ -1,7 +1,7 @@
 /*
- * midi_event_processor.h - base-class for midi-processing classes
+ * custom_events.h - custom event types list
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,36 +23,30 @@
  */
 
 
-#ifndef _MIDI_EVENT_PROCESSOR_H
-#define _MIDI_EVENT_PROCESSOR_H
+#ifndef _CUSTOM_EVENTS_H
+#define _CUSTOM_EVENTS_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+
+#ifdef QT3
+
+#include <qevent.h>
+
 #endif
 
 
-class midiEvent;
-class midiTime;
 
 
-// all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
+namespace customEvents
 {
-public:
-	inline midiEventProcessor( void )
+
+	enum Type
 	{
-	}
+		GUI_UPDATE = QEvent::User
+	} ;
 
-	virtual inline ~midiEventProcessor()
-	{
-	}
+}
 
-	// to be implemented by inheriting classes
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
 
-} ;
+
 
 #endif
