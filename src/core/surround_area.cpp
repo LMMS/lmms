@@ -60,16 +60,6 @@
 
 
 
-const QPoint surroundArea::s_defaultSpeakerPositions[SURROUND_CHANNELS] =
-{
-	QPoint( -SURROUND_AREA_SIZE, -SURROUND_AREA_SIZE ),
-	QPoint( SURROUND_AREA_SIZE, -SURROUND_AREA_SIZE)
-#ifndef DISABLE_SURROUND
-,
-	QPoint( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE ),
-	QPoint( SURROUND_AREA_SIZE, SURROUND_AREA_SIZE )
-#endif
-} ;
 
 QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
@@ -131,12 +121,39 @@ surroundArea::~surroundArea()
 
 volumeVector surroundArea::getVolumeVector( float _v_scale ) const
 {
-	volumeVector v;
-	for( Uint8 chnl = 0; chnl < SURROUND_CHANNELS; ++chnl )
+	volumeVector v = { { _v_scale, _v_scale
+#ifndef DISABLE_SURROUND
+					, _v_scale, _v_scale
+#endif
+			} } ;
+
+	if( m_sndSrcPos.x() >= 0 )
 	{
-		v.vol[chnl] = getVolume( s_defaultSpeakerPositions[chnl],
-								_v_scale );
+		v.vol[0] *= 1.0f - m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
+#ifndef DISABLE_SURROUND
+		v.vol[2] *= 1.0f - m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
+#endif
 	}
+	else
+	{
+		v.vol[1] *= 1.0f + m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
+#ifndef DISABLE_SURROUND
+		v.vol[3] *= 1.0f + m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
+#endif
+	}
+
+	if( m_sndSrcPos.y() >= 0 )
+	{
+		v.vol[0] *= 1.0f - m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
+		v.vol[1] *= 1.0f - m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
+	}
+#ifndef DISABLE_SURROUND
+	else
+	{
+		v.vol[2] *= 1.0f + m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
+		v.vol[3] *= 1.0f + m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
+	}
+#endif
 
 	return( v );
 }
@@ -157,20 +174,6 @@ void surroundArea::setValue( const QPoint & _p )
 		m_sndSrcPos = _p;
 	}
 	update();
-}
-
-
-
-
-FASTCALL float surroundArea::getVolume( const QPoint & _speaker_pos,
-							float _v_scale ) const
-{
-	const int x = _speaker_pos.x() - m_sndSrcPos.x();
-	const int y = _speaker_pos.y() - m_sndSrcPos.y();
-	const float new_vol = 2.0f - sqrt( x*x + y*y ) *
-						( 1.0f / SURROUND_AREA_SIZE );
-
-	return( tLimit( new_vol, 0.0f, 1.0f ) * _v_scale );
 }
 
 

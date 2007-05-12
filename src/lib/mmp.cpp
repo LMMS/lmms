@@ -25,7 +25,9 @@
  */
 
 
-#include "qt3support.h"
+#include "mmp.h"
+
+#include <math.h>
 
 #ifdef QT4
 
@@ -39,12 +41,7 @@
 
 #endif
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif 
 
-
-#include "mmp.h"
 #include "config_mgr.h"
 #include "project_version.h"
 #include "song_editor.h"
@@ -56,10 +53,11 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::UNKNOWN, "unknown" },
 	{ multimediaProject::SONG_PROJECT, "song" },
 	{ multimediaProject::SONG_PROJECT_TEMPLATE, "songtemplate" },
-#warning compat-code, remove in 0.3.0
+#warning compat-code, use upgrade feature
 	{ multimediaProject::INSTRUMENT_TRACK_SETTINGS,
 				"instrumenttracksettings,channelsettings" },
 	{ multimediaProject::DRAG_N_DROP_DATA, "dnddata" },
+	{ multimediaProject::CLIPBOARD_DATA, "clipboard-data" },
 	{ multimediaProject::JOURNAL_DATA, "journaldata" },
 	{ multimediaProject::EFFECT_SETTINGS, "effectsettings" },
 	{ multimediaProject::VIDEO_PROJECT, "videoproject" },
@@ -177,7 +175,7 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 				m_head = node.toElement();
 			}
 			else if( node.nodeName() == typeName( m_type ) ||
-#warning compat-code, remove in 0.3.0
+#warning compat-code, use upgrade feature
 					node.nodeName() == "channelsettings" )
 			{
 				m_content = node.toElement();
@@ -363,7 +361,7 @@ QString multimediaProject::typeName( projectTypes _project_type )
 	if( _project_type >= UNKNOWN && _project_type < PROJ_TYPE_COUNT )
 	{
 		return( s_types[_project_type].m_name
-#warning compat-code, remove in 0.3.0
+#warning compat-code, use upgrade feature
 				.section( ',', 0, 0 )
 				);
 	}
@@ -517,6 +515,61 @@ void multimediaProject::upgrade( void )
 				}
 			}
 			node = node.nextSibling();
+		}
+	}
+
+	if( version < "0.2.1-svn20070508" )
+	{
+		QDomNodeList list = elementsByTagName( "arpandchords" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.hasAttribute( "chorddisabled" ) )
+			{
+				el.setAttribute( "chord-enabled",
+					!el.attribute( "chorddisabled" )
+								.toInt() );
+				el.setAttribute( "arp-enabled",
+					!el.attribute( "arpdisabled" )
+								.toInt() );
+			}
+		}
+
+		list = elementsByTagName( "channeltrack" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setTagName( "instrumenttrack" );
+		}
+
+		list = elementsByTagName( "instrumenttrack" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.hasAttribute( "vol" ) )
+			{
+				float value = el.attribute( "vol" ).toFloat();
+				value = roundf( value * 0.585786438f );
+				el.setAttribute( "vol", value );
+			}
+			else
+			{
+				QDomNodeList vol_list = el.namedItem(
+							"automation-pattern" )
+						.namedItem( "vol" ).toElement()
+						.elementsByTagName( "time" );
+				for( int j = 0; !vol_list.item( j ).isNull();
+									++j )
+				{
+					QDomElement timeEl = list.item( j )
+								.toElement();
+					int value = timeEl.attribute( "value" )
+								.toInt();
+					value = (int)roundf( value *
+								0.585786438f );
+					timeEl.setAttribute( "value", value );
+				}
+			}
 		}
 	}
 }

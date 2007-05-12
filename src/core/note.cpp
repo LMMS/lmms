@@ -299,19 +299,6 @@ void note::createDetuning( void )
 
 
 
-void note::detachCurrentDetuning( void )
-{
-	QDomDocument doc;
-	QDomElement parent = doc.createElement( "clone" );
-	m_detuning->saveSettings( doc, parent );
-	sharedObject::unref( m_detuning );
-	createDetuning();
-	m_detuning->loadSettings( parent );
-}
-
-
-
-
 bool note::hasDetuningInfo( void )
 {
 	automationPattern::timeMap map =

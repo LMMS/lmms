@@ -2796,14 +2796,6 @@ use mouse wheel to set volume of a step</source>
 usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
-        <source>Pattern muted</source>
-        <translation>Patró apagat</translation>
-    </message>
-    <message>
-        <source>The track this pattern belongs to or the pattern itself is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation>La pista a la que pertany aquest patró o el patró mateix està apagat actualment, per tant congelar no té sentit! Encara vols continuar?</translation>
-    </message>
-    <message>
         <source>Add steps</source>
         <translation>Afegeix passos</translation>
     </message>

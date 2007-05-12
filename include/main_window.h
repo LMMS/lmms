@@ -48,6 +48,7 @@
 #endif
 
 
+class QAction;
 class QDomElement;
 class QGridLayout;
 class QSplashScreen;
@@ -108,6 +109,7 @@ public slots:
 		QWhatsThis::enterWhatsThisMode();
 	}
 	void createNewProject( void );
+	void createNewProjectFromTemplate( QAction * _idx );
 	void createNewProjectFromTemplate( int _idx );
 	void openProject( void );
 	bool saveProject( void );
@@ -174,6 +176,7 @@ private:
 private slots:
 	void browseHelp( void );
 	void fillTemplatesMenu( void );
+	void showTool( QAction * _idx );
 	void showTool( int _idx );
 
 } ;

@@ -3,7 +3,7 @@
 /*
  * clipboard.cpp - the clipboard for patterns, notes etc.
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,33 +29,33 @@
 #include "journalling_object.h"
 
 
-namespace clipboard
+
+
+clipboard::map clipboard::content;
+
+
+
+
+void clipboard::copy( journallingObject * _obj )
 {
+	QDomDocument doc;
+	QDomElement parent = doc.createElement( "clipboard" );
+	_obj->saveState( doc, parent );
+	content[_obj->nodeName()] = parent.firstChild().toElement();
+}
 
-	map content;
 
 
-	void copy( journallingObject * _obj )
+
+const QDomElement * clipboard::getContent( const QString & _node_name )
+{
+	if( content.find( _node_name ) != content.end() )
 	{
-		QDomDocument doc;
-		QDomElement parent = doc.createElement( "clipboard" );
-		_obj->saveState( doc, parent );
-		content[_obj->nodeName()] = parent.firstChild().toElement();
+		return( &content[_node_name] );
 	}
+	return( NULL );
+}
 
-
-
-
-	const QDomElement * getContent( const QString & _node_name )
-	{
-		if( content.find( _node_name ) != content.end() )
-		{
-			return( &content[_node_name] );
-		}
-		return( NULL );
-	}
-
-} ;
 
 
 

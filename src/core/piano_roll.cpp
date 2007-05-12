@@ -33,6 +33,7 @@
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QClipboard>
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWheelEvent>
@@ -43,10 +44,12 @@
 
 #include <qapplication.h>
 #include <qbuttongroup.h>
-#include <qpainter.h>
-#include <qlayout.h>
-#include <qlabel.h>
+#include <qclipboard.h>
 #include <qdom.h>
+#include <qdragobject.h>
+#include <qlabel.h>
+#include <qlayout.h>
+#include <qpainter.h>
 
 #define addButton insert
 #define setCheckable setToggleButton
@@ -63,6 +66,7 @@
 
 #include "piano_roll.h"
 #include "automatable_object_templates.h"
+#include "clipboard.h"
 #include "combobox.h"
 #include "debug.h"
 #include "detuning_helper.h"
@@ -71,6 +75,7 @@
 #include "instrument_track.h"
 #include "main_window.h"
 #include "midi.h"
+#include "mmp.h"
 #include "pattern.h"
 #include "piano_widget.h"
 #include "pixmap_button.h"
@@ -2159,7 +2164,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 
 
 
-int pianoRoll::getKey( int _y )
+int pianoRoll::getKey( int _y ) const
 {
 	int key_line_y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
 	// pressed key on piano
@@ -2437,31 +2442,46 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 
 
 
-void pianoRoll::copySelectedNotes( void )
+void pianoRoll::copy_to_clipboard( const noteVector & _notes ) const
 {
-	for( noteVector::iterator it = m_notesToCopy.begin();
-					it != m_notesToCopy.end(); ++it )
+	multimediaProject mmp( multimediaProject::CLIPBOARD_DATA );
+	QDomElement note_list = mmp.createElement( "note-list" );
+	mmp.content().appendChild( note_list );
+
+	midiTime start_pos( _notes.front()->pos().getTact(), 0 );
+	for( noteVector::const_iterator it = _notes.begin(); it != _notes.end();
+									++it )
 	{
-		delete *it;
+		note clip_note( **it );
+		clip_note.setPos( clip_note.pos( start_pos ) );
+		clip_note.saveState( mmp, note_list );
 	}
 
-	m_notesToCopy.clear();
+#ifdef QT4
+	QMimeData * clip_content = new QMimeData;
+	clip_content->setData( clipboard::mimeType(), mmp.toString().toUtf8() );
+	QApplication::clipboard()->setMimeData( clip_content,
+							QClipboard::Clipboard );
+#else
+	QStoredDrag * clip_content = new QStoredDrag( clipboard::mimeType() );
+	clip_content->setEncodedData( mmp.toString().utf8() );
+	QApplication::clipboard()->setData( clip_content,
+							QClipboard::Clipboard );
+#endif
+}
 
+
+
+
+void pianoRoll::copySelectedNotes( void )
+{
 	noteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
 	if( selected_notes.empty() == FALSE )
 	{
-		midiTime start_pos( selected_notes.front()->pos().getTact(),
-									0 );
-		for( noteVector::iterator it = selected_notes.begin();
-			it != selected_notes.end(); ++it )
-		{
-			m_notesToCopy.push_back( new note( **it ) );
-			m_notesToCopy.back()->setPos( m_notesToCopy.back()->pos(
-								start_pos ) );
-			m_notesToCopy.back()->detachCurrentDetuning();
-		}
+		copy_to_clipboard( selected_notes );
+
 		textFloat::displayMessage( tr( "Notes copied" ),
 				tr( "All selected notes were copied to the "
 								"clipboard." ),
@@ -2479,34 +2499,21 @@ void pianoRoll::cutSelectedNotes( void )
 		return;
 	}
 
-	for( noteVector::iterator it = m_notesToCopy.begin();
-					it != m_notesToCopy.end(); ++it )
-	{
-		delete *it;
-	}
-
-	m_notesToCopy.clear();
-
 	noteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
 	if( selected_notes.empty() == FALSE )
 	{
+		copy_to_clipboard( selected_notes );
+
 		engine::getSongEditor()->setModified();
 
-		midiTime start_pos( selected_notes.front()->pos().getTact(),
-									0 );
-
-		while( selected_notes.empty() == FALSE )
+		for( noteVector::iterator it = selected_notes.begin();
+					it != selected_notes.end(); ++it )
 		{
-			note * new_note = new note( *selected_notes.front() );
-			new_note->setPos( new_note->pos( start_pos ) );
-			m_notesToCopy.push_back( new_note );
-
 			// note (the memory of it) is also deleted by
 			// pattern::removeNote(...) so we don't have to do that
-			m_pattern->removeNote( selected_notes.front() );
-			selected_notes.erase( selected_notes.begin() );
+			m_pattern->removeNote( *it );
 		}
 	}
 
@@ -2524,14 +2531,26 @@ void pianoRoll::pasteNotes( void )
 		return;
 	}
 
-	if( m_notesToCopy.empty() == FALSE )
+#ifdef QT4
+	QString value = QApplication::clipboard()
+				->mimeData( QClipboard::Clipboard )
+						->data( clipboard::mimeType() );
+#else
+	QString value = QApplication::clipboard()->data( QClipboard::Clipboard )
+					->encodedData( clipboard::mimeType() );
+#endif
+
+	if( !value.isEmpty() )
 	{
-		for( noteVector::iterator it = m_notesToCopy.begin();
-					it != m_notesToCopy.end(); ++it )
+		multimediaProject mmp( value, FALSE );
+
+		QDomNodeList list = mmp.elementsByTagName(
+							note::classNodeName() );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
 		{
-			note cur_note( **it );
+			note cur_note;
+			cur_note.restoreState( list.item( i ).toElement() );
 			cur_note.setPos( cur_note.pos() + m_currentPosition );
-			cur_note.detachCurrentDetuning();
 			m_pattern->addNote( cur_note );
 		}
 

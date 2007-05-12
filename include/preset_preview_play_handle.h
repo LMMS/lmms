@@ -48,9 +48,11 @@ public:
 
 	virtual bool isFromTrack( const track * _track ) const;
 
+	static void init( void );
 	static void cleanUp( void );
 	static constNotePlayHandleVector nphsOfInstrumentTrack(
 						const instrumentTrack * _ct );
+
 
 private:
 	static previewTrackContainer * s_previewTC;

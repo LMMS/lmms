@@ -253,6 +253,24 @@ void groupBox::updatePixmap( void )
 
 
 
+
+void groupBox::saveSettings( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name )
+{
+	m_led->saveSettings( _doc, _this, _name );
+}
+
+
+
+
+void groupBox::loadSettings( const QDomElement & _this, const QString & _name )
+{
+	m_led->loadSettings( _this, _name );
+}
+
+
+
+
 #include "group_box.moc"
 
 

@@ -273,8 +273,13 @@ void mainWindow::finalize( void )
 	m_templatesMenu = new QMenu( project_new );
 	connect( m_templatesMenu, SIGNAL( aboutToShow( void ) ),
 				this, SLOT( fillTemplatesMenu( void ) ) );
+#ifdef QT4
+	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
+		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
+#else
 	connect( m_templatesMenu, SIGNAL( activated( int ) ),
 			this, SLOT( createNewProjectFromTemplate( int ) ) );
+#endif
 	project_new->setMenu( m_templatesMenu );
 #ifdef QT4
 	project_new->setPopupMode( toolButton::MenuButtonPopup );
@@ -539,11 +544,13 @@ void mainWindow::finalize( void )
 	{
 #ifdef QT4
 		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
+		connect( m_tools_menu, SIGNAL( triggered( QAction * ) ),
+					this, SLOT( showTool( QAction * ) ) );
 #else
 		menuBar()->insertItem( tr( "&Tools" ), m_tools_menu );
-#endif
 		connect( m_tools_menu, SIGNAL( activated( int ) ),
 						this, SLOT( showTool( int ) ) );
+#endif
 	}
 
 
@@ -724,23 +731,42 @@ void mainWindow::createNewProject( void )
 
 
 
-void mainWindow::createNewProjectFromTemplate( int _idx )
-{
 #ifdef QT4
-	// TODO!!!
+void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 #else
+void mainWindow::createNewProjectFromTemplate( int _idx )
+#endif
+{
 	if( m_templatesMenu != NULL &&
 			engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
+#ifdef QT4
+		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
+#else
 		QString dir_base = m_templatesMenu->indexOf( _idx )
+#endif
 						>= m_custom_templates_count ?
 				configManager::inst()->factoryProjectsDir() :
 				configManager::inst()->userProjectsDir();
 		engine::getSongEditor()->createNewProjectFromTemplate(
 				dir_base + "templates/" +
+#ifdef QT4
+							_idx->text() + ".mpt" );
+#else
 				m_templatesMenu->text( _idx ) + ".mpt" );
-	}
 #endif
+	}
+}
+
+
+
+
+#ifdef QT4
+void mainWindow::createNewProjectFromTemplate( int _idx )
+#else
+void mainWindow::createNewProjectFromTemplate( QAction * _idx )
+#endif
+{
 }
 
 
@@ -1094,15 +1120,30 @@ void mainWindow::fillTemplatesMenu( void )
 
 
 
+#ifndef QT3
+void mainWindow::showTool( QAction * _idx )
+#else
 void mainWindow::showTool( int _idx )
+#endif
 {
 #ifndef QT3
-	#warning TODO: Qt4-implementation
+	tool * t = m_tools[m_tools_menu->actions().indexOf( _idx )];
 #else
 	tool * t = m_tools[m_tools_menu->indexOf( _idx )];
+#endif
 	t->show();
 	t->setFocus();
+}
+
+
+
+
+#ifndef QT3
+void mainWindow::showTool( int _idx )
+#else
+void mainWindow::showTool( QAction * _idx )
 #endif
+{
 }
 
 

@@ -177,7 +177,7 @@ pianoWidget::~pianoWidget()
 
 
 // gets the key from the given mouse-position
-int pianoWidget::getKeyFromMouse( const QPoint & _p )
+int pianoWidget::getKeyFromMouse( const QPoint & _p ) const
 {
 
 	int key_num = (int)( (float) _p.x() / (float) PW_WHITE_KEY_WIDTH );
@@ -220,9 +220,7 @@ int pianoWidget::getKeyFromMouse( const QPoint & _p )
 	}
 
 	// some range-checking-stuff
-	key_num = tLimit( key_num, 0, NOTES_PER_OCTAVE * OCTAVES - 1 );
-
-	return( m_lastKey = key_num );
+	return( tLimit( key_num, 0, NOTES_PER_OCTAVE * OCTAVES - 1 ) );
 }
 
 
@@ -301,6 +299,7 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 							vol * 127 / 100 ),
 								midiTime() );
 			m_pressedKeys[key_num] = TRUE;
+			m_lastKey = key_num;
 		}
 		else
 		{
@@ -319,14 +318,17 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 // handler for mouse-release-event
 void pianoWidget::mouseReleaseEvent( QMouseEvent * _me )
 {
-	int released_key = getKeyFromMouse( _me->pos() );
+	if( m_lastKey != -1 )
+	{
+		m_instrumentTrack->processInEvent(
+			midiEvent( NOTE_OFF, 0, m_lastKey, 0 ), midiTime() );
+		m_pressedKeys[m_lastKey] = FALSE;
 
-	m_instrumentTrack->processInEvent(
-			midiEvent( NOTE_OFF, 0, released_key, 0 ), midiTime() );
-	m_pressedKeys[released_key] = FALSE;
+		// and let the user see that he released a key... :)
+		update();
 
-	// and let the user see that he released a key... :)
-	update();
+		m_lastKey = -1;
+	}
 }
 
 
@@ -335,8 +337,6 @@ void pianoWidget::mouseReleaseEvent( QMouseEvent * _me )
 // handler for mouse-move-event
 void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 {
-	// save current last-key-var
-	int released_key = m_lastKey;
 	int key_num = getKeyFromMouse( _me->pos() );
 	int y_diff = _me->pos().y() - PIANO_BASE;
 	volume vol = (volume)( (float) y_diff /
@@ -359,14 +359,15 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 
 	// is the calculated key different from current key? (could be the
 	// user just moved the cursor one pixel left but on the same key)
-	if( key_num != released_key )
+	if( key_num != m_lastKey )
 	{
-		m_instrumentTrack->processInEvent(
-				midiEvent( NOTE_OFF, 0, released_key, 0 ),
-								midiTime() );
-		if( released_key >= 0 )
+		if( m_lastKey != -1 )
 		{
-			m_pressedKeys[released_key] = FALSE;
+			m_instrumentTrack->processInEvent(
+				midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
+								midiTime() );
+			m_pressedKeys[m_lastKey] = FALSE;
+			m_lastKey = -1;
 		}
 #ifdef QT4
 		if( _me->buttons() & Qt::LeftButton )
@@ -380,6 +381,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 					midiEvent( NOTE_ON, 0, key_num, vol ),
 								midiTime() );
 				m_pressedKeys[key_num] = TRUE;
+				m_lastKey = key_num;
 			}
 			else
 			{
@@ -529,7 +531,7 @@ void pianoWidget::focusOutEvent( QFocusEvent * )
 
 
 
-int pianoWidget::getKeyX( int _key_num )
+int pianoWidget::getKeyX( int _key_num ) const
 {
 	int k = m_startOctave*NOTES_PER_OCTAVE + m_startTone;
 	if( _key_num < k )

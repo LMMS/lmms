@@ -105,7 +105,7 @@ protected:
 	virtual bool x11Event( XEvent * _xe );
 #endif
 
-	int FASTCALL getKey( int _y );
+	int FASTCALL getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
 					Sint16 _width,
 					const bool _is_selected,
@@ -239,7 +239,6 @@ private:
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
 
-	noteVector m_notesToCopy;
 	noteVector m_selNotesForMove;
 
 
@@ -248,6 +247,8 @@ private:
 
 	timeLine * m_timeLine;
 	bool m_scrollBack;
+
+	void copy_to_clipboard( const noteVector & _notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x, Uint16 _y );
 	bool mouseOverNote( void );

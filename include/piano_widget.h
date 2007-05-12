@@ -94,9 +94,9 @@ protected:
 
 
 private:
-	int FASTCALL getKeyFromMouse( const QPoint & _p );
+	int FASTCALL getKeyFromMouse( const QPoint & _p ) const;
 	int FASTCALL getKeyFromKeyboard( int _k ) const;
-	int FASTCALL getKeyX( int _key_num );
+	int FASTCALL getKeyX( int _key_num ) const;
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;

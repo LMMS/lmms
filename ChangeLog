@@ -1,3 +1,56 @@
+2007-05-12	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/clipboard.h:
+	* include/mmp.h:
+	* include/note.h:
+	* include/piano_roll.h:
+	* src/core/note.cpp:
+	* src/core/piano_roll.cpp:
+	* src/lib/clipboard.cpp:
+	* src/lib/mmp.cpp:
+	use the global clipboard to copy notes
+
+	* include/group_box.h:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/lib/mmp.cpp:
+	* src/widgets/group_box.cpp:
+	save groupbox automation
+
+	* include/surround_area.h:
+	* src/core/surround_area.cpp:
+	* src/core/track.cpp:
+	* src/lib/mmp.cpp:
+	calculate volume vector in a more consistent way
+
+	* src/core/track.cpp:
+	fixed drag track onto another segfault
+
+	* include/piano_widget.h:
+	* src/core/piano_widget.cpp:
+	fixed release invalid key segfault
+
+	* src/tracks/instrument_track.cpp:
+	fixed freeze pattern segfault
+
+	* include/preset_preview_play_handle.h:
+	* src/core/engine.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	fixed uninitialized preset preview container segfault
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	added Qt4 menu implementations
+
+	* include/file_browser.h:
+	* include/qt3support.h:
+	* src/core/file_browser.cpp:
+	fixed Qt4 context menu
+
+	* data/locale/ca.ts:
+	* src/tracks/pattern.cpp:
+	hide irrelevant freeze options from context menu
+
 2007-05-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/audio_jack.h:
@@ -9,7 +62,7 @@
 	* include/pattern.h:
 	* include/sample_buffer.h:
 	* include/shared_object.h:
-	* plugins/ladspa_base/ladspa_control.cpp:
+	* plugins/ladspa_bas:e/ladspa_control.cpp:
 	* plugins/ladspa_base/ladspa_control.h:
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* src/audio/audio_jack.cpp:

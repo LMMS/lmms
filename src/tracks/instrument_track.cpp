@@ -960,7 +960,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 		trackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
 		bb_track = bbTrack::findBBTrack( _tco_num );
-		if( !( bb_track->automationDisabled( this )
+		if( !( ( bb_track && bb_track->automationDisabled( this ) )
 				|| dynamic_cast<pattern *>( tco )->empty() ) )
 		{
 			sendMidiTime( _start );

@@ -59,7 +59,7 @@ public:
 	surroundArea( QWidget * _parent, const QString & _name,
 							track * _track );
 	virtual ~surroundArea();
-	volumeVector getVolumeVector( float _v_scale = 0.0f ) const;
+	volumeVector getVolumeVector( float _v_scale ) const;
 	inline const QPoint & value( void ) const
 	{
 		return( m_sndSrcPos );
@@ -85,12 +85,8 @@ signals:
 
 
 private:
-	float FASTCALL getVolume( const QPoint & _speaker_pos,
-							float _v_scale ) const;
-
 	QPoint m_sndSrcPos;
 
-	static const QPoint s_defaultSpeakerPositions[SURROUND_CHANNELS];
 	static QPixmap * s_backgroundArtwork;
 
 	knob * m_position_x;

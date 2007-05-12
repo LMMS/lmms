@@ -1424,7 +1424,9 @@ void trackWidget::dropEvent( QDropEvent * _de )
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
 		multimediaProject mmp( value, FALSE );
+		engine::getMixer()->lock();
 		m_track->restoreState( mmp.content().firstChild().toElement() );
+		engine::getMixer()->unlock();
 		_de->accept();
 	}
 }
@@ -1734,11 +1736,7 @@ void track::loadSettings( const QDomElement & _this )
 	{
 		if( node.isElement() )
 		{
-			if( node.nodeName() == nodeName() ||
-#warning compat-code, remove in 0.3.0
-				( node.nodeName() == "channeltrack" &&
-				  nodeName() == "instrumenttrack" )
-				)
+			if( node.nodeName() == nodeName() )
 			{
 				loadTrackSpecificSettings( node.toElement() );
 			}

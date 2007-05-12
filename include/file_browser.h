@@ -50,10 +50,16 @@
 #include "side_bar_widget.h"
 
 
+#ifndef QT3
+class QListViewItem;
+#else
+class Q3ListViewItem;
+#endif
+class QPixmap;
+
 class fileItem;
 class listView;
 class playHandle;
-class QPixmap;
 class trackContainer;
 
 
@@ -76,13 +82,10 @@ public slots:
 
 
 protected slots:
-#ifdef QT4
 	void contextMenuRequest( Q3ListViewItem * _i, const QPoint & _pos,
 								int _col );
-#else
 	void contextMenuRequest( QListViewItem * _i, const QPoint & _pos,
 								int _col );
-#endif
 	void sendToActiveInstrumentTrack( void );
 	void openInNewInstrumentTrackSE( void );
 	void openInNewInstrumentTrackBBE( void );
@@ -132,7 +135,16 @@ private:
 
 
 
-class directory : public Q3ListViewItem
+class directory :
+#ifndef QT3
+	public Q3ListViewItem
+// trick moc
+#if 0
+		,
+#endif
+#else
+	public QListViewItem
+#endif
 {
 public:
 	directory( Q3ListView * _parent, const QString & _filename,
@@ -186,13 +198,27 @@ private:
 
 
 
-class fileItem : public Q3ListViewItem
+class fileItem :
+#ifndef QT3
+	public Q3ListViewItem
+// trick moc
+#if 0
+		,
+#endif
+#else
+	public QListViewItem
+#endif
 {
 public:
 	fileItem( Q3ListView * _parent, const QString & _name,
 							const QString & _path );
+#ifndef QT3
 	fileItem( Q3ListViewItem * _parent, const QString & _name,
 							const QString & _path );
+#else
+	fileItem( QListViewItem * _parent, const QString & _name,
+							const QString & _path );
+#endif
 
 	inline QString fullName( void ) const
 	{

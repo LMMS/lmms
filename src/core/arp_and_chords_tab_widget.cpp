@@ -648,11 +648,11 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "chorddisabled", !m_chordsGroupBox->isActive() );
+	m_chordsGroupBox->saveSettings( _doc, _this, "chord-enabled" );
 	m_chordsComboBox->saveSettings( _doc, _this, "chord" );
 	m_chordRangeKnob->saveSettings( _doc, _this, "chordrange" );
 
-	_this.setAttribute( "arpdisabled", !m_arpGroupBox->isActive() );
+	m_arpGroupBox->saveSettings( _doc, _this, "arp-enabled" );
 	m_arpComboBox->saveSettings( _doc, _this, "arp" );
 	m_arpRangeKnob->saveSettings( _doc, _this, "arprange" );
 	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
@@ -667,16 +667,16 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 
 void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_chordsGroupBox->setState( !_this.attribute
-						( "chorddisabled" ).toInt() );
+	m_chordsGroupBox->loadSettings( _this, "chord-enabled" );
 	m_chordsComboBox->loadSettings( _this, "chord" );
 	m_chordRangeKnob->loadSettings( _this, "chordrange" );
+
+	m_arpGroupBox->loadSettings( _this, "arp-enabled" );
 	m_arpComboBox->loadSettings( _this, "arp" );
 	m_arpRangeKnob->loadSettings( _this, "arprange" );
 	m_arpTimeKnob->loadSettings( _this, "arptime" );
 	m_arpGateKnob->loadSettings( _this, "arpgate" );
 	m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
-	m_arpGroupBox->setState( !_this.attribute( "arpdisabled" ).toInt() );
 
 	// Keep compatibility with version 2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )

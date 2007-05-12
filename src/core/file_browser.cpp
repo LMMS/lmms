@@ -123,7 +123,11 @@ void fileBrowser::reloadTree( void )
 		addItems( *it );
 	}
 
+#ifndef QT3
 	Q3ListViewItem * item = m_l->firstChild();
+#else
+	QListViewItem * item = m_l->firstChild();
+#endif
 	bool resort = FALSE;
 
 	// sort merged directories
@@ -136,7 +140,11 @@ void fileBrowser::reloadTree( void )
 		}
 		else if( resort == TRUE )
 		{
+#ifndef QT3
 			Q3ListViewItem * i2 = m_l->firstChild();
+#else
+			QListViewItem * i2 = m_l->firstChild();
+#endif
 			d->moveItem( i2 );
 			i2->moveItem( d );
 			directory * d2 = NULL;
@@ -191,7 +199,11 @@ void fileBrowser::addItems( const QString & _path )
 			isDirWithContent( _path + QDir::separator() + cur_file,
 								m_filter ) )
 		{
+#ifdef QT4
+			Q3ListViewItem * item = m_l->findItem( cur_file, 0 );
+#else
 			QListViewItem * item = m_l->findItem( cur_file, 0 );
+#endif
 			if( item == NULL )
 			{
 				(void) new directory( m_l, cur_file, _path,
@@ -262,7 +274,6 @@ void fileBrowser::keyPressEvent( QKeyEvent * _ke )
 
 
 
-
 #ifdef QT4
 void fileBrowser::contextMenuRequest( Q3ListViewItem * i, const QPoint &, int )
 #else
@@ -291,6 +302,17 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 		delete contextMenu;
 	}
 
+}
+
+
+
+
+#ifdef QT4
+void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
+#else
+void fileBrowser::contextMenuRequest( Q3ListViewItem * i, const QPoint &, int )
+#endif
+{
 }
 
 
@@ -517,7 +539,11 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	}
 
 	QPoint p( contentsToViewport( _me->pos() ) );
+#ifndef QT3
 	Q3ListViewItem * i = itemAt( p );
+#else
+	QListViewItem * i = itemAt( p );
+#endif
         if ( i )
 	{
 		if ( p.x() > header()->cellPos( header()->mapToActual( 0 ) ) +
@@ -660,7 +686,11 @@ QPixmap * directory::s_folderLockedPixmap = NULL;
 
 directory::directory( directory * _parent, const QString & _name,
 			const QString & _path, const QString & _filter ) :
+#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
+#else
+	QListViewItem( _parent, _name ),
+#endif
 	m_p( _parent ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -674,7 +704,11 @@ directory::directory( directory * _parent, const QString & _name,
 
 directory::directory( Q3ListView * _parent, const QString & _name,
 			const QString & _path, const QString & _filter ) :
+#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
+#else
+	QListViewItem( _parent, _name ),
+#endif
 	m_p( NULL ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -752,13 +786,21 @@ void directory::setOpen( bool _o )
 				( *it ).contains(
 					configManager::inst()->dataDir() ) )
 			{
+#ifndef QT3
+				( new Q3ListViewItem( this,
+#else
 				( new QListViewItem( this,
+#endif
 		listView::tr( "--- Factory files ---" ) ) )->setPixmap( 0,
 				embed::getIconPixmap( "factory_files" ) );
 			}
 		}
 	}
+#ifndef QT3
 	Q3ListViewItem::setOpen( _o );
+#else
+	QListViewItem::setOpen( _o );
+#endif
 }
 
 
@@ -767,7 +809,11 @@ void directory::setOpen( bool _o )
 void directory::setup( void )
 {
 	setExpandable( TRUE );
+#ifndef QT3
 	Q3ListViewItem::setup();
+#else
+	QListViewItem::setup();
+#endif
 }
 
 
@@ -863,7 +909,11 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 						const QString & _path ) :
+#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
+#else
+	QListViewItem( _parent, _name ),
+#endif
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -875,9 +925,15 @@ fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 
 
 
+#ifndef QT3
 fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
 						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
+#else
+fileItem::fileItem( QListViewItem * _parent, const QString & _name,
+						const QString & _path ) :
+	QListViewItem( _parent, _name ),
+#endif
 	m_pix( NULL ),
 	m_path( _path )
 {

@@ -128,11 +128,6 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	playHandle( PresetPreviewHandle ),
 	m_previewNote( NULL )
 {
-	if( !s_previewTC )
-	{
-		s_previewTC = new previewTrackContainer;
-	}
-
 	s_previewTC->lockData();
 
 	if( s_previewTC->previewNote() != NULL )
@@ -208,6 +203,17 @@ bool presetPreviewPlayHandle::done( void ) const
 bool presetPreviewPlayHandle::isFromTrack( const track * _track ) const
 {
 	return( s_previewTC->previewInstrumentTrack() == _track );
+}
+
+
+
+
+void presetPreviewPlayHandle::init( void )
+{
+	if( !s_previewTC )
+	{
+		s_previewTC = new previewTrackContainer;
+	}
 }
 
 

@@ -50,7 +50,6 @@
 #include "instrument_track.h"
 #include "knob.h"
 #include "note_play_handle.h"
-#include "pixmap_button.h"
 #include "tab_widget.h"
 
 
@@ -468,7 +467,7 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_filterComboBox->saveSettings( _doc, _this, "ftype" );
 	m_filterCutKnob->saveSettings( _doc, _this, "fcut" );
 	m_filterResKnob->saveSettings( _doc, _this, "fres" );
-	_this.setAttribute( "fwet", m_filterGroupBox->isActive() );
+	m_filterGroupBox->saveSettings( _doc, _this, "fwet" );
 
 	for( int i = 0; i < TARGET_COUNT; ++i )
 	{
@@ -486,8 +485,7 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 	m_filterComboBox->loadSettings( _this, "ftype" );
 	m_filterCutKnob->loadSettings( _this, "fcut" );
 	m_filterResKnob->loadSettings( _this, "fres" );
-/*	m_filterState->setChecked( _this.attribute( "fwet" ).toInt() );*/
-	m_filterGroupBox->setState( _this.attribute( "fwet" ).toInt() );
+	m_filterGroupBox->loadSettings( _this, "fwet" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )

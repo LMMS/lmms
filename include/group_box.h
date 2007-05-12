@@ -56,13 +56,19 @@ public:
 		return( m_led->isChecked() );
 	}
 
+	void saveSettings( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name );
+	void loadSettings( const QDomElement & _this, const QString & _name );
+
 
 public slots:
 	void setState( bool _on, bool _anim = FALSE );
 	void animate( void );
 
+
 signals:
 	void toggled( bool _state );
+
 
 protected:
 	virtual void resizeEvent( QResizeEvent * _re );

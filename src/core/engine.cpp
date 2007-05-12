@@ -83,6 +83,8 @@ void engine::init( const bool _has_gui )
 
 	s_mainWindow->finalize();
 
+	presetPreviewPlayHandle::init();
+
 	s_mixer->startProcessing();
 }
 
@@ -109,10 +111,6 @@ void engine::destroy( void )
 #endif
 
 	presetPreviewPlayHandle::cleanUp();
-
-	// now we can clean up all allocated buffer
-	//bufferAllocator::cleanUp( 0 );
-
 
 	delete s_mixer;
 	s_mixer = NULL;

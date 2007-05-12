@@ -161,9 +161,14 @@ public:
 		return( m_panning );
 	}
 
-	inline virtual QString nodeName( void ) const
+	static QString classNodeName( void )
 	{
 		return( "note" );
+	}
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( classNodeName() );
 	}
 
 	static midiTime FASTCALL quantized( const midiTime & _m,
@@ -175,7 +180,6 @@ public:
 	}
 
 	void editDetuningPattern( void );
-	void detachCurrentDetuning( void );
 
 	bool hasDetuningInfo( void );
 

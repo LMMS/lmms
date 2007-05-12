@@ -39,6 +39,11 @@
 #endif
 
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif 
+
+
 #include "types.h"
 
 
@@ -52,6 +57,7 @@ public:
 		SONG_PROJECT_TEMPLATE,
 		INSTRUMENT_TRACK_SETTINGS,
 		DRAG_N_DROP_DATA,
+		CLIPBOARD_DATA,
 		JOURNAL_DATA,
 		EFFECT_SETTINGS,
 		VIDEO_PROJECT,		// might come later...

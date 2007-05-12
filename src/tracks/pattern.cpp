@@ -527,33 +527,6 @@ void pattern::freeze( void )
 						QMessageBox::Ok );
 		return;
 	}
-	if( m_instrumentTrack->muted() || muted() )
-	{
-		if( QMessageBox::
-#if QT_VERSION >= 0x030200		
-				 question
-#else
-				 information
-#endif				 
-		
-					    ( 0, tr( "Pattern muted" ),
-						tr( "The track this pattern "
-							"belongs to or the "
-							"pattern itself is "
-							"currently muted "
-							"therefore "
-							"freezing makes no "
-							"sense! Do you still "
-							"want to continue?" ),
-						QMessageBox::Yes,
-						QMessageBox::No |
-						QMessageBox::Default |
-						QMessageBox::Escape ) ==
-			QMessageBox::No )
-		{
-			return;
-		}
-	}
 
 	// already frozen?
 	if( m_frozenPattern != NULL )
@@ -683,13 +656,24 @@ void pattern::constructContextMenu( QMenu * _cm )
 						this, SLOT( changeName() ) );
 	_cm->addSeparator();
 
-	_cm->addAction( embed::getIconPixmap( "freeze" ),
-		( m_frozenPattern != NULL )? tr( "Refreeze" ) : tr( "Freeze" ),
+	bool freeze_separator = FALSE;
+	if( !( m_instrumentTrack->muted() || muted() ) )
+	{
+		_cm->addAction( embed::getIconPixmap( "freeze" ),
+			m_frozenPattern ? tr( "Refreeze" ) : tr( "Freeze" ),
 						this, SLOT( freeze() ) );
-	_cm->addAction( embed::getIconPixmap( "unfreeze" ), tr( "Unfreeze" ),
-						this, SLOT( unfreeze() ) );
-
-	_cm->addSeparator();
+		freeze_separator = TRUE;
+	}
+	if( m_frozenPattern )
+	{
+		_cm->addAction( embed::getIconPixmap( "unfreeze" ),
+				tr( "Unfreeze" ), this, SLOT( unfreeze() ) );
+		freeze_separator = TRUE;
+	}
+	if( freeze_separator )
+	{
+		_cm->addSeparator();
+	}
 
 #ifdef QT4
 	QMenu * add_step_menu = _cm->addMenu(

@@ -53,7 +53,6 @@ class QColorGroup;
 
 
 typedef int csize;
-#define QListViewItem Q3ListViewItem
 
 #define vlist QList 
 #define vstack QStack
@@ -82,7 +81,6 @@ inline QString baseName( const QString & _file )
 #define QScrollArea QScrollView
 
 #define Q3ListView QListView
-#define Q3ListViewItem QListViewItem
 #define Q3ScrollView QScrollView
 
 #define QMatrix QWMatrix
