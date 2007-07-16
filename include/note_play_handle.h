@@ -33,6 +33,7 @@
 #include "note.h"
 #include "instrument.h"
 #include "instrument_track.h"
+#include "engine.h"
 
 
 class notePlayHandle;
@@ -70,6 +71,55 @@ public:
 				m_releaseFramesDone >= m_releaseFramesToDo ) );
 	}
 
+	bool willFinishThisPeriod( void ) const
+	{
+		f_cnt_t rftd = m_releaseFramesToDo;
+		f_cnt_t fbr = m_framesBeforeRelease;
+		f_cnt_t rfd = m_releaseFramesDone;
+		if( m_released == TRUE )
+		{
+			f_cnt_t todo = engine::getMixer()->framesPerAudioBuffer();
+			if( arpBaseNote() == TRUE )
+			{
+				rftd = rfd + 2 *
+					engine::getMixer()->framesPerAudioBuffer();
+			}
+			if( fbr )
+			{
+				if( fbr <=
+					engine::getMixer()->framesPerAudioBuffer() )
+				{
+					todo -= fbr;
+					fbr = 0;
+				}
+				else
+				{
+					todo = 0;
+					fbr -=
+					engine::getMixer()->framesPerAudioBuffer();
+				}
+			}
+			if( todo && rfd < rftd )
+			{
+				if( rftd - rfd >= todo )
+				{
+					rfd += todo;
+				}
+				else
+				{
+					rfd = rftd;
+				}
+			}
+		}
+
+		if( arpBaseNote() == TRUE && m_subNotes.size() == 0 )
+		{
+			rfd = rftd;
+		}
+
+		return( ( m_released && fbr == 0 && rfd >= rftd ) );
+	}
+
 	virtual bool isFromTrack( const track * _track ) const;
 
 
@@ -86,6 +136,7 @@ public:
 	}
 
 	f_cnt_t actualReleaseFramesToDo( void ) const;
+
 
 	// returns how many samples this note is aligned ahead, i.e.
 	// at which position it is inserted in the according buffer

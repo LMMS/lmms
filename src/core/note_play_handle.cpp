@@ -202,7 +202,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 			}
 			else
 			{
-				// no, then just decrese framesBeforeRelease
+				// no, then just decrease framesBeforeRelease
 				// and wait for next loop... (we're not in
 				// release-phase yet)
 				todo = 0;

@@ -1,3 +1,14 @@
+2007-07-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/mixer.cpp:
+	fixed logical error in mixer::renderNextBuffer() which led to lot of
+	clicks and pops when using parallelization-level > 1
+
+	* include/note_play_handle.h:
+	* src/tracks/instrument_track-cpp:
+	fixed broken detection of last period of a note which resulted in
+	clicks and pops as the soft fade-out at the end sometimes was done twice
+
 2007-05-12	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/clipboard.h:

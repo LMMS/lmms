@@ -576,14 +576,9 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 				}
 			}
 		}
+
 		// last time we're called for current note?
-		if( ( _n->actualReleaseFramesToDo() == 0 &&
-			_n->totalFramesPlayed() +
-				engine::getMixer()->framesPerAudioBuffer() >=
-							_n->frames() ) ||
-				( _n->released() && _n->releaseFramesDone() +
-			engine::getMixer()->framesPerAudioBuffer() >=
-					_n->actualReleaseFramesToDo() ) )
+		if( _n->willFinishThisPeriod() )
 		{
 			// then do a soft fade-out at the end to avoid clicks
 			for( fpab_t i = ( _frames >= ENV_FRAMES ) ?

@@ -327,8 +327,12 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				else if( !n->supportsParallelizing() )
 				{
 					n->play();
+					++idx;
 				}
-				++idx;
+				else
+				{
+					++idx;
+				}
 			}
 			for( playHandleVector::iterator it = par_hndls.begin();
 						it != par_hndls.end(); ++it )
@@ -340,7 +344,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		{
 			while( idx < m_playHandles.size() )
 			{
-				register playHandle * n = m_playHandles[idx];
+				playHandle * n = m_playHandles[idx];
 				// delete play-handle if it played completely
 				if( n->done() )
 				{
