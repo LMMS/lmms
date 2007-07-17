@@ -32,6 +32,7 @@
 #include "audio_device.h"
 #include "engine.h"
 
+
 audioPort::audioPort( const QString & _name ) :
 	m_bufferUsage( NONE ),
 	m_firstBuffer( new surroundSampleFrame[
@@ -40,7 +41,9 @@ audioPort::audioPort( const QString & _name ) :
 				engine::getMixer()->framesPerAudioBuffer()] ),
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( -1 ),
-	m_name( "unnamed port" )
+	m_name( "unnamed port" ),
+	m_effects( new effectChain ),
+	m_frames( engine::getMixer()->framesPerAudioBuffer() )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerAudioBuffer() );
@@ -48,8 +51,6 @@ audioPort::audioPort( const QString & _name ) :
 				engine::getMixer()->framesPerAudioBuffer() );
 	engine::getMixer()->addAudioPort( this );
 	setExtOutputEnabled( TRUE );
-	m_frames = engine::getMixer()->framesPerAudioBuffer();
-	m_effects = new effectChain;
 }
 
 

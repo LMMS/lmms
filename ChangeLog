@@ -1,5 +1,10 @@
 2007-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/audio/audio_port.cpp:
+	initialize all member-variables in initialization-list of
+	audioPort-constructor - this way the audio-port isn't being added to
+	the mixer before it's completely initialized - fixes some segfaults
+
 	* include/midi.h:
 	* plugins/midi_import/midi_import.h:
 	* plugins/midi_import/midi_import.cpp:
