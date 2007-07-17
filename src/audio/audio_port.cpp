@@ -58,11 +58,8 @@ audioPort::audioPort( const QString & _name ) :
 
 audioPort::~audioPort()
 {
+	setExtOutputEnabled( FALSE );
 	engine::getMixer()->removeAudioPort( this );
-	if( m_extOutputEnabled == TRUE )
-	{
-		engine::getMixer()->audioDev()->unregisterPort( this );
-	}
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
 	delete m_effects;
