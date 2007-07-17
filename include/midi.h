@@ -58,7 +58,8 @@ enum midiEventTypes
 	MIDI_ACTIVE_SENSING = 0xFE,
 	MIDI_SYSTEM_RESET = 0xFF,
 	// meta event - for midi files only
-	MIDI_META_EVENT = 0xFF
+	MIDI_META_EVENT = 0xFF,
+	MIDI_TEMPO = 0xFF51
 } ;
 
 

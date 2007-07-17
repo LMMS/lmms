@@ -1,3 +1,11 @@
+2007-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/midi.h:
+	* plugins/midi_import/midi_import.h:
+	* plugins/midi_import/midi_import.cpp:
+	- initial incomplete handling for tempo-events
+	- properly aligned imported notes
+
 2007-07-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:

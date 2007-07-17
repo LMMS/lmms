@@ -134,6 +134,7 @@ private:
 	typedef vvector<QPair<int, midiEvent> > eventVector;
 	eventVector m_events;
 	bool m_smpteTiming;
+	int m_tempo;
 
 } ;
 

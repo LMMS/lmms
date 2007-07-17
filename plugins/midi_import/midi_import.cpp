@@ -72,7 +72,10 @@ plugin::descriptor midiimport_plugin_descriptor =
 
 
 midiImport::midiImport( const QString & _file ) :
-	importFilter( _file, &midiimport_plugin_descriptor )
+	importFilter( _file, &midiimport_plugin_descriptor ),
+	m_events(),
+	m_smpteTiming( FALSE ),
+	m_tempo( 120 )
 {
 }
 
@@ -270,14 +273,18 @@ invalid_format:
 						NOTES_PER_OCTAVE * OCTAVES &&
 							keys[ev.key()][0] >= 0 )
 					{
-			note n( midiTime( ( tick - keys[ev.key()][0] ) / 10 ),
-				midiTime( keys[ev.key()][0] / 10 ),
+			note n( midiTime( ( tick - keys[ev.key()][0] ) * 16 / m_tempo ),
+				midiTime( keys[ev.key()][0] * 16 / m_tempo ),
 				(tones)( ev.key() % NOTES_PER_OCTAVE ),
 				(octaves)( ev.key() / NOTES_PER_OCTAVE ),
 				keys[ev.key()][1] * 100 / 128 );
 						p->addNote( n );
 						keys[ev.key()][0] = -1;
 					}
+					break;
+
+				case MIDI_TEMPO:
+					
 					break;
 
 				default:
@@ -485,6 +492,15 @@ bool FASTCALL midiImport::readTrack( int _track_end )
 							}
 							else
 							{
+								int tempo = readByte() << 16;
+								tempo |= readByte() << 8;
+								tempo |= readByte();
+								tempo = ( 60*1000*1000 ) / tempo;
+				m_events.push_back( qMakePair( tick,
+					midiEvent( MIDI_TEMPO,
+							0,
+							tempo,
+							0 ) ) );
 /*			event = new_event(track, 0);
 			event->type = SND_SEQ_EVENT_TEMPO;
 			event->port = port;
@@ -493,7 +509,7 @@ bool FASTCALL midiImport::readTrack( int _track_end )
 			event->data.tempo |= read_byte() << 8;
 			event->data.tempo |= read_byte();
 			skip( len -3 );*/
-								skip( len );
+								skip( len-3 );
 							}
 							break;
 
