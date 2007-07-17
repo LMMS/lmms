@@ -1,5 +1,9 @@
 2007-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* configure.in:
+	- removed unsafe flags
+	- disabled single-source-compiling per default
+
 	* src/audio/audio_port.cpp:
 	initialize all member-variables in initialization-list of
 	audioPort-constructor - this way the audio-port isn't being added to
