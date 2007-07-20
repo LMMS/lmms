@@ -1,26 +1,80 @@
-%define _suse		%(if [ -f /etc/SuSE-release ] ; then echo 1 ; else echo 0 ; fi)
+# Configuration variables
+%define name            lmms
+%define version         0.2.1
+%define rel             1
+%define release         %{rel}%{?disttag}%{?repotag}
 
+# Define what you can/want to build:
+%define with_sdl        0%{nil}
+%define with_jack       1%{nil}
+%define with_vorbis     1%{nil}
+%define with_flac       1%{nil}
+%define with_sr         1%{nil}
+%define with_sf         1%{nil}
 
-Name:		@PACKAGE@
-Version:	@VERSION@
-Release:	0
+# Build by setting these defines on the command line, for example:
+# rpmbuild --define 'disttag .EL' --define 'repotag .fc6' 
+%{!?desktop_vendor:     %{expand: %%define desktop_vendor rpmfarm}}
+# This can be changed at build time:
+# rpmbuild --define 'desktop_vendor RPMfarm'
+
+#--------------------------------------------------------------------
+
+Name:		%{name}
+Version:	%{version}
+Release:	%{release}
 Summary:	powerful sequencer-, synthesizer- and sample-studio for Linux
 Summary(de):	Leistungsfaehiges Sequenzer-, Synthesizer- und Sample-Studio fuer Linux
 License:	GPL
 URL:		http://lmms.sourceforge.net/
-Group:		Applications/Multimedia/Sound
-Packager:	Tobias Doerffel <tobydox/at/users.sourceforge.net>
+Group:		Applications/Multimedia
 Provides:	lmms = %{version}-%{release}
-%if %_suse
-BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make alsa
-BuildRequires:	alsa-devel SDL SDL-devel SDL_sound libvorbis libvorbis-devel
-BuildRequires:	libsamplerate libsamplerate-devel libsndfile libsndfile-devel
-BuildRequires:	jack-devel
-BuildRequires:	qt3 qt3-devel qt3-devel-tools
-Requires:	qt3 alsa SDL_sound libvorbis libsamplerate libsndfile jack
+BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make
+BuildRequires:	alsa-lib-devel 
+BuildRequires:	qt-devel > 3.0
+# ------------- BuildRequires:
+%if %{with_vorbis}
+BuildRequires:  libvorbis libvorbis-devel
 %endif
+%if %{with_sdl}
+BuildRequires:	SDL SDL-devel SDL_sound
+%endif
+%if %{with_sr}
+BuildRequires:	libsamplerate libsamplerate-devel 
+%endif
+%if %{with_sf}
+BuildRequires:  libsndfile libsndfile-devel
+%endif
+%if %{with_jack}
+BuildRequires:	jack-audio-connection-kit-devel
+%endif
+%if %{with_flac}
+BuildRequires:	flac-devel
+%endif
+# ------------- Requires:
+Requires:	qt >= 3.0 alsa-lib
+%if %{with_sr}
+Requires:	libsamplerate
+%endif
+%if %{with_sf}
+Requires:	libsndfile 
+%endif
+%if %{with_jack}
+Requires:	jack-audio-connection-kit
+%endif
+%if %{with_vorbis}
+Requires:	libvorbis
+%endif
+%if %{with_flac}
+Requires:	flac
+%endif
+%if %{with_sdl}
+Requires:	SDL_sound
+%endif
+
 Requires:	lmms-data
-Source:		%{name}-%{version}.tar.gz
+Source:		%{name}-%{version}.tar.bz2
+Patch1:		%{name}-%{version}-patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 Prefix:		%{_prefix}
 
@@ -58,7 +112,7 @@ dieser Version nicht ein vollstaendiges, fertiges und fehlerfreies Programm!!
 %package data
 Summary:	samples, presets, demo-projects and localization-files for LMMS
 Summary(de):	Samples, Presets, Demo-Projekte und Lokalisierungsdateien fuer LMMS
-Group:		Applications/Multimedia/Sound
+Group:		Applications/Multimedia
 Provides:	lmms-data = %{version}-%{release}
 
 %description data
@@ -73,40 +127,79 @@ MultiMedia Studio (LMMS), wie z.B. Samples, Presets und Demo-Projekte.
 
 %prep
 %setup -n %{name}-%{version}
-
+%patch1 -p1 -b .EL
 
 %build
-CXXFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix}
+%configure \
+%if !%{with_jack}
+    --without-jack \
+%endif
+%if !%{with_sdl}
+    --without-sdl \
+    --without-sdlsound \
+%endif
+%if !%{with_vorbis}
+    --without-vorbis \
+%endif
+%if !%{with_flac}
+    --without-flac \
+%endif
+%if !%{with_sr}
+    --without-libsrc \
+%endif
+%if !%{with_sf}
+    --without-libsf \
+%endif
 
-make
+%{__make} %{?_smp_mflags}
 
+# Create a desktop menu entry
+%{__cat} > %{name}.desktop << EOF
+[Desktop Entry]
+Name=Linux MultiMedia Studio
+Comment=Powerful sequencer-, synthesizer- and sample-studio for Linux
+Exec=lmms
+Icon=%{_datadir}/%{name}/themes/default/icon.png
+Terminal=false
+Type=Application
+Categories=Application;AudioVideo;X-Fedora;X-RPMfarm;
+Encoding=UTF-8
+EOF
 
 %install
+%{__rm} -rf %{buildroot}
 make DESTDIR=$RPM_BUILD_ROOT install
 
+# Install menu entry
+%{__mkdir_p} %{buildroot}%{_datadir}/applications
+desktop-file-install \
+    --vendor %{desktop_vendor} \
+    --dir %{buildroot}%{_datadir}/applications \
+    %{name}.desktop || :
+
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-
-
-%pre
-%post
-%preun
-%postun
-
+%{__rm} -rf %{buildroot}
 
 %files
-%defattr(-,root,root)
+%defattr(-, root, root, 0755)
+%doc AUTHORS ChangeLog COPYING README TODO
 %{_bindir}/lmms
-%{_libdir}/lmms/
-
+%dir %{_libdir}/lmms
+%{_libdir}/lmms/*
+%{_mandir}/man*/lmms.*
+%{_datadir}/applications/%{desktop_vendor}-%{name}.desktop
 
 %files data
 %defattr(-,root,root)
-%{_datadir}/lmms/
-
-
+%dir %{_datadir}/lmms
+%{_datadir}/lmms/*
 
 %changelog
+* Fri Apr 13 2007 Eric Lassauge <lassauge@users.fr.net> - 0.2.1-1
+- build for FC6
+- added dependencies and build configuration
+- added .desktop file
+
 * Tue Sep 20 2005 Tobias Doerffel
 - added JACK-dependencies
 

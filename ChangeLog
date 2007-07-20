@@ -1,5 +1,9 @@
 2007-07-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* lmms.spec.in:
+	merged changes found in
+	https://sourceforge.net/tracker/download.php?group_id=105168&atid=640436&file_id=225331&aid=1702303
+
 	* configure.in:
 	- cleaned up and improved detection of WINE-development-files and/or
 	  single components of it and removed aeffectx.h-detection-stuff as
