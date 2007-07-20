@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070717, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070717)
+AC_INIT(lmms, 0.2.1-svn20070720, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070720)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -210,37 +210,33 @@ AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
 AC_ARG_WITH(vst,
 	AS_HELP_STRING([--without-vst],
 			[disable support for builtin VST-plugin-hosting]), , [ with_vst=yes ])
-AH_TEMPLATE(HAVE_VST_AEFFECTX_H, [Define to 1 if you have the <aeffectx.h> header file.])
 if test "x$with_vst" = "xyes" ; then
 
 	if echo $CFLAGS $CXXFLAGS | grep "fomit-frame-pointer" > /dev/null ; then
 		AC_MSG_ERROR([*** passing -fomit-frame-pointer as compiler-flag will break LMMS' VST-support so either disable VST-support using --without-vst or remove it from compiler-flags])
 	fi
-	ORIG_CFLAGS=$CFLAGS
-	ORIG_CPPFLAGS=$CPPFLAGS
-	CFLAGS="$CFLAGS -I./include"
-	CPPFLAGS="$CPPFLAGS -I./include"
-	AC_LANG_PUSH(C++)
-	AC_CHECK_HEADER(aeffectx.h, HAVE_VST_AEFFECTX_H="true")
-	CFLAGS="$ORIG_CFLAGS"
-	CPPFLAGS="$ORIG_CPPFLAGS"
 
 	if test "$build_linux" = "true" ; then
-		AC_CHECK_PROG(WINEGCC, winegcc, /usr/bin/winegcc,,/usr/bin)
+		AC_CHECK_PROG(WINECXX, wineg++, /usr/bin/wineg++,,/usr/bin)
 		AC_CHECK_LIB([wine], [wine_init], true)
-		if test ! -z "$WINEGCC" ; then
-			if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
-				WINE_OK_BUT_VST_INCOMPLETE=""
-				AC_DEFINE(HAVE_VST_AEFFECTX_H)
-			else
-				WINE_OK_BUT_VST_INCOMPLETE="true"
-				WINEGCC=""
+		if test ! -z "$WINECXX" ; then
+			AC_LANG_PUSH(C++)
+#			CXXFLAGS="$CXXFLAGS -I${prefix}/include/wine/windows"
+			OLDCXX="$CXX"
+			OLDCPPFLAGS="$CPPFLAGS"
+			CXX="$WINECXX"
+			CPPFLAGS="$CPPFLAGS -I${prefix}/include/wine/windows"
+			AC_CHECK_HEADER(windows.h, HAVE_WINDOWS_H="true")
+			CXX="$OLDCXX"
+			CPPFLAGS="$OLDCPPFLAGS"
+			AC_LANG_POP(C++)
+			if test -z "$HAVE_WINDOWS_H" ; then
+				WINECXX=""
 			fi
 		fi
 	fi
-	AC_LANG_POP(C++)
 fi
-AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINEGCC")
+AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINECXX")
 
 
 # check for LADSPA-SDK
@@ -788,11 +784,10 @@ if test -z "$HAVE_STK_H" ; then
 	echo " ===  LMMS - WARNING  ======================================================="
 	echo " ========================"
 	echo " ="
-	echo " = If you want support for STK based instruments, please pass"
-	echo " = "
-	echo " = --with-stk"
-	echo " = "
-	echo " = to configure, STK support is still experimental."
+	echo " = You don't seem to have STK installed and/or STK-development-package"
+	echo " = (Debian/Ubuntu: libstk0-dev) is missing. Without this package, the "
+	echo " = STK instrument plugins (\"Mallets\") won't be built."
+	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
 else
@@ -842,57 +837,22 @@ else
 fi
 
 
-if test "x$with_vst" = "xno" ; then
-	echo " ========================"
-	echo " ===  LMMS - INFORMATION  ==================================================="
-	echo " ========================"
-	echo " ="
-	echo " = If you want VST-support within LMMS, please pass"
-	echo " ="
-	echo " = --with-vst"
-	echo " ="
-	echo " = to configure!"
-	echo " ="
+if test ! -z "$WINECXX" ; then
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LMMS VST Support Layer (LVSL) for built-in VST-plugin usage"
 else
-
-	if test ! -z "$WINE_OK_BUT_VST_INCOMPLETE" ; then
-		echo " ========================"
-		echo " ===  LMMS - WARNING  ======================================================="
-		echo " ========================"
-		echo " ="
-		echo " = You seem to have a proper WINE-installation, but the header-files"
-		echo " = (AEffect.h and aeffectx.h) from Steinberg-VST-SDK are missing or not present"
-		echo " = in /usr/include/ or ./include. We cannot distribute them as they're licensed under"
-		echo " = a GPL-incompatible license, so you'll have to download them at"
-		echo " ="
-		echo " = http://audacity.cvs.sourceforge.net/*checkout*/audacity/audacity-old/effects/aeffectx.h"
-		echo " = http://audacity.cvs.sourceforge.net/*checkout*/audacity/audacity-old/effects/AEffect.h"
-		echo " ="
-		echo " = and put the mentioned files into /usr/include/ or ./include."
-		echo " = Otherwise (now!) configure will disable LMMS's support for built-in VST-"
-		echo " = plugin-usage. If you do not intend to use VST-plugins with LMMS you can "
-		echo " = ignore this warning."
-		echo " = Consider installing the missing packages for using the full power of LMMS."
-		echo " ="
-		with_warnings="true"
-	else
-		if test ! -z "$HAVE_VST_AEFFECTX_H" ; then
-			PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LMMS VST Support Layer (LVSL) for integrated VST-plugin usage"
-		else
-			echo " ========================"
-			echo " ===  LMMS - WARNING  ======================================================="
-			echo " ========================"
-			echo " ="
-			echo " = You don't seem to have installed WINE or it's development-packages (headers,"
-			echo " = winegcc etc.) which are neccessary for building LMMS with built-in"
-			echo " = VST-support."
-			echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
-			echo " = warning."
-			echo " = Consider installing the missing packages for using the full power of LMMS."
-			echo " ="
-			with_warnings="true"
-		fi
-	fi
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have installed WINE or it's development-packages (headers,"
+	echo " = winegcc etc.) which are neccessary for building LMMS with built-in"
+	echo " = VST-support."
+	echo " = If you do not intend to use VST-plugins with LMMS you can ignore this "
+	echo " = warning."
+	echo " = Consider installing the missing packages (Debian: libwine-dev,"
+	echo " = Ubuntu: wine-dev, openSUSE: wine-devel) for using the full power of LMMS."
+	echo " ="
+	with_warnings="true"
 fi
 
 
@@ -908,7 +868,7 @@ echo " ="
 if test "$with_warnings" = "false" ; then
 	echo " = LMMS has been configured successfully. Now you can build it by typing 'make'."
 	echo " = After the compilation-process has finished, you can install LMMS by"
-	echo " = typing 'make install'."
+	echo " = typing 'make install' (do this as \"root\"!)."
 else
 	echo " = LMMS has been configured, but there were one or more warnings you should"
 	echo " = not ignore. First try to solve the mentioned problems before"
@@ -917,7 +877,7 @@ else
 fi
 echo " ="
 echo " = If there're problems while compiling LMMS, please send a mail to "
-echo " = lmms-devel [at] lists.sf.net!"
+echo " = lmms-devel \[at\] lists.sf.net!"
 echo " ="
 echo
 
