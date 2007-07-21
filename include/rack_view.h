@@ -72,14 +72,19 @@ public:
 		return( "rack" );
 	}
 
+	void deleteAllPlugins( void );
+
+
 public slots:
 	void moveUp( rackPlugin * _plugin );
 	void moveDown( rackPlugin * _plugin );
 	void deletePlugin( rackPlugin * _plugin );
-	
+
+
 private:
 	void redraw();
-	
+
+
 	vvector<rackPlugin *> m_rackInserts;
 		
 	QVBoxLayout * m_mainLayout;

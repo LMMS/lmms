@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070720, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070720)
+AC_INIT(lmms, 0.2.1-svn20070721, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070721)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -52,7 +52,7 @@ AM_CONDITIONAL(BUILD_LINUX, test "$build_linux" = "true")
 
 # -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
 #DEFAULTFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
-DEFAULTFLAGS="-O2 -g0 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
+DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
 
 # Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
 if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
@@ -545,8 +545,6 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-#CFLAGS="$CXXFLAGS -g -O2"
-#CXXFLAGS="$CXXFLAGS -g -O2"
 EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Winline -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall $EXTRA_WARNINGS -fno-exceptions"

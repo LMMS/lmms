@@ -70,12 +70,7 @@ rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
 
 rackView::~rackView()
 {
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin();
-						it != m_rackInserts.end(); )
-	{
-		delete *it;
-		m_rackInserts.erase( it );
-	}
+	deleteAllPlugins();
 }
 
 
@@ -115,6 +110,75 @@ void rackView::addEffect( effect * _e )
 	m_scrollArea->resizeContents( 210, m_lastY );
 #endif
 	m_rackInserts.append( plugin );
+}
+
+
+
+
+void FASTCALL rackView::saveSettings( QDomDocument & _doc, 
+							QDomElement & _this )
+{
+	_this.setAttribute( "numofeffects", m_rackInserts.count() );
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+					it != m_rackInserts.end(); it++ )
+	{
+		QDomElement ef = ( *it )->saveState( _doc, _this );
+		ef.setAttribute( "name", 
+				( *it )->getEffect()->getDescriptor()->name );
+		ef.setAttribute( "key", 
+				( *it )->getEffect()->getKey().dumpBase64() );
+	}
+}
+
+
+
+
+void FASTCALL rackView::loadSettings( const QDomElement & _this )
+{
+	deleteAllPlugins();
+
+	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
+
+	QDomNode node = _this.firstChild();
+	for( int i = 0; i < plugin_cnt; i++ )
+	{
+		if( node.isElement() && node.nodeName() == "effect" )
+		{
+			QDomElement cn = node.toElement();
+			const QString name = cn.attribute( "name" );
+			// we have this really convenient key-ctor
+			// which takes a QString and decodes the
+			// base64-data inside :-)
+			effectKey key( cn.attribute( "key" ) );
+			addEffect( effect::instantiate( name, &key ) );
+			// TODO: somehow detect if effect is sub-plugin-capable
+			// but couldn't load sub-plugin with requsted key
+			if( node.isElement() )
+			{
+				if( m_rackInserts.last()->nodeName() == 
+							node.nodeName() )
+				{
+					m_rackInserts.last()->restoreState( 
+							node.toElement() );
+				}
+			}
+		}
+		node = node.nextSibling();
+	}
+	
+}
+
+
+
+
+void rackView::deleteAllPlugins( void )
+{
+	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin();
+					it != m_rackInserts.end(); ++it )
+	{
+		delete *it;
+	}
+	m_rackInserts.clear();
 }
 
 
@@ -180,7 +244,7 @@ void rackView::deletePlugin( rackPlugin * _plugin )
 #ifdef QT3
 	m_scrollArea->removeChild( _plugin );
 #endif
-	
+
 	m_rackInserts.erase( qFind( m_rackInserts.begin(), m_rackInserts.end(),
 								_plugin ) );
 	delete _plugin;
@@ -210,59 +274,6 @@ void rackView::redraw()
 #endif
 }	
 
-
-
-
-void FASTCALL rackView::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
-{
-	_this.setAttribute( "numofeffects", m_rackInserts.count() );
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++ )
-	{
-		QDomElement ef = ( *it )->saveState( _doc, _this );
-		ef.setAttribute( "name", 
-				( *it )->getEffect()->getDescriptor()->name );
-		ef.setAttribute( "key", 
-				( *it )->getEffect()->getKey().dumpBase64() );
-	}
-}
-
-
-
-
-void FASTCALL rackView::loadSettings( const QDomElement & _this )
-{
-	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
-
-	QDomNode node = _this.firstChild();
-	for( int i = 0; i < plugin_cnt; i++ )
-	{
-		if( node.isElement() && node.nodeName() == "effect" )
-		{
-			QDomElement cn = node.toElement();
-			const QString name = cn.attribute( "name" );
-			// we have this really convenient key-ctor
-			// which takes a QString and decodes the
-			// base64-data inside :-)
-			effectKey key( cn.attribute( "key" ) );
-			addEffect( effect::instantiate( name, &key ) );
-			// TODO: somehow detect if effect is sub-plugin-capable
-			// but couldn't load sub-plugin with requsted key
-			if( node.isElement() )
-			{
-				if( m_rackInserts.last()->nodeName() == 
-							node.nodeName() )
-				{
-					m_rackInserts.last()->restoreState( 
-							node.toElement() );
-				}
-			}
-		}
-		node = node.nextSibling();
-	}
-	
-}
 
 
 

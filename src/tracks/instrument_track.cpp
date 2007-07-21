@@ -1157,6 +1157,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	invalidateAllMyNPH();
 
+	engine::getMixer()->lock();
 	setName( _this.attribute( "name" ) );
 	m_volumeKnob->loadSettings( _this, "vol" );
 
@@ -1165,6 +1166,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	m_effectChannelNumber->loadSettings( _this, "fxch" );
 	m_pianoWidget->loadSettings( _this, "basenote" );
 	int tab = _this.attribute( "tab" ).toInt();
+
+	bool had_fx = FALSE;
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -1186,6 +1189,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			else if( m_effWidget->nodeName() == node.nodeName() )
 			{
 				m_effWidget->restoreState( node.toElement() );
+				had_fx = TRUE;
 			}
 			else if( automationPattern::classNodeName()
 							!= node.nodeName() )
@@ -1208,6 +1212,11 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
         }
+	if( !had_fx )
+	{
+		m_effWidget->deleteAllEffects();
+	}
+	engine::getMixer()->unlock();
 
 	m_tabWidget->setActiveTab( tab );
 
@@ -1227,8 +1236,10 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 {
 	invalidateAllMyNPH();
 
+	engine::getMixer()->lock();
 	delete m_instrument;
 	m_instrument = instrument::instantiate( _plugin_name, this );
+	engine::getMixer()->unlock();
 
 	m_tabWidget->addTab( m_instrument, tr( "PLUGIN" ), 0 );
 	m_tabWidget->setActiveTab( 0 );
@@ -1338,6 +1349,7 @@ void instrumentTrack::dropEvent( QDropEvent * _de )
 
 void instrumentTrack::invalidateAllMyNPH( void )
 {
+	engine::getMixer()->lock();
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
@@ -1346,6 +1358,7 @@ void instrumentTrack::invalidateAllMyNPH( void )
 	// invalidate all note-play-handles linked to this channel
 	m_processHandles.clear();
 	engine::getMixer()->removePlayHandles( this );
+	engine::getMixer()->unlock();
 }
 
 

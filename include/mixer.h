@@ -137,6 +137,7 @@ public:
 
 	inline void removeAudioPort( audioPort * _port )
 	{
+		lock();
 		vvector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
@@ -144,6 +145,7 @@ public:
 		{
 			m_audioPorts.erase( it );
 		}
+		unlock();
 	}
 
 
@@ -164,7 +166,9 @@ public:
 	{
 		if( criticalXRuns() == FALSE )
 		{
+			lockPlayHandles();
 			m_playHandles.push_back( _ph );
+			unlockPlayHandles();
 			return( TRUE );
 		}
 		delete _ph;
@@ -173,7 +177,9 @@ public:
 
 	inline void removePlayHandle( const playHandle * _ph )
 	{
+		lockPlayHandlesToRemove();
 		m_playHandlesToRemove.push_back( _ph );
+		unlockPlayHandlesToRemove();
 	}
 
 	inline playHandleVector & playHandles( void )
@@ -246,14 +252,33 @@ public:
 	// methods needed by other threads to alter knob values, waveforms, etc
 	void lock( void )
 	{
-		m_mixMutex.lock();
+		m_globalMutex.lock();
 	}
 
 	void unlock( void )
 	{
-		m_mixMutex.unlock();
+		m_globalMutex.unlock();
 	}
 
+	void lockPlayHandles( void )
+	{
+		m_playHandlesMutex.lock();
+	}
+
+	void unlockPlayHandles( void )
+	{
+		m_playHandlesMutex.unlock();
+	}
+
+	void lockPlayHandlesToRemove( void )
+	{
+		m_playHandlesToRemoveMutex.lock();
+	}
+
+	void unlockPlayHandlesToRemove( void )
+	{
+		m_playHandlesToRemoveMutex.unlock();
+	}
 
 	// audio-buffer-mgm
 	void FASTCALL bufferToPort( const sampleFrame * _buf,
@@ -365,7 +390,9 @@ private:
 	QString m_midiClientName;
 
 
-	QMutex m_mixMutex;
+	QMutex m_globalMutex;
+	QMutex m_playHandlesMutex;
+	QMutex m_playHandlesToRemoveMutex;
 
 
 	fifo * m_fifo;

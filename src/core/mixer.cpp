@@ -72,9 +72,9 @@ mixer::mixer( void ) :
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 #ifndef QT3
-	m_mixMutex( QMutex::Recursive )
+	m_globalMutex( QMutex::Recursive )
 #else
-	m_mixMutex( TRUE )
+	m_globalMutex( TRUE )
 #endif
 {
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
@@ -188,7 +188,7 @@ bool mixer::criticalXRuns( void ) const
 
 void mixer::setClipScaling( bool _state )
 {
-	m_mixMutex.lock();
+	lock();
 
 	m_scaleClip = _state;
 
@@ -224,7 +224,7 @@ void mixer::setClipScaling( bool _state )
 		m_analBuffer = 1;
 	}
 
-	m_mixMutex.unlock();
+	unlock();
 }
 
 
@@ -248,11 +248,13 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	// now we have to make sure no other thread does anything bad
 	// while we're acting...
-	m_mixMutex.lock();
+	lock();
 
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
+	lockPlayHandles();
+	lockPlayHandlesToRemove();
 	constPlayHandleVector::iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
@@ -267,6 +269,8 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 		m_playHandlesToRemove.erase( it_rem );
 	}
+	unlockPlayHandlesToRemove();
+	unlockPlayHandles();
 
 	// now swap the buffers... current buffer becomes next (last)
 	// buffer and the next buffer becomes current (first) buffer
@@ -288,6 +292,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 //	if( criticalXRuns() == FALSE )
 	{
+		lockPlayHandles();
 		csize idx = 0;
 		if( m_parallelizingLevel > 1 )
 		{
@@ -359,6 +364,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				}
 			}
 		}
+		unlockPlayHandles();
 
 		engine::getSongEditor()->processNextBuffer();
 
@@ -380,7 +386,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	emit nextAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
 
-	m_mixMutex.unlock();
+	unlock();
 
 	// and trigger LFOs
 	envelopeAndLFOWidget::triggerLFO();
@@ -401,6 +407,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 void mixer::clear( void )
 {
 	// TODO: m_midiClient->noteOffAll();
+	lockPlayHandlesToRemove();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
@@ -411,6 +418,7 @@ void mixer::clear( void )
 			m_playHandlesToRemove.push_back( *it );
 		}
 	}
+	unlockPlayHandlesToRemove();
 }
 
 
@@ -558,6 +566,7 @@ void mixer::restoreAudioDevice( void )
 
 void mixer::removePlayHandles( track * _track )
 {
+	lockPlayHandles();
 	playHandleVector::iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
@@ -571,6 +580,7 @@ void mixer::removePlayHandles( track * _track )
 			++it;
 		}
 	}
+	unlockPlayHandles();
 }
 
 

@@ -50,12 +50,12 @@
 #endif
 
 #include "journalling_object.h"
+#include "rack_view.h"
 
 
 class audioPort;
 class groupBox;
 class instrumentTrack;
-class rackView;
 class sampleTrack;
 class track;
 
@@ -80,23 +80,32 @@ public:
 	
 	void setupWidget( void );
 
+	inline void deleteAllEffects( void )
+	{
+		m_rack->deleteAllPlugins();
+	}
+
+
 signals:
 	void closed( void );
+
 
 private slots:
 	void addEffect( void );
 	void setBypass( bool _state );
 
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
+
 
 private:
 	track * m_track;
 	audioPort * m_port;
-	
+
 	groupBox * m_effectsGroupBox;
 	QPushButton * m_addButton;
-	
+
 	rackView * m_rack;
 
 } ;

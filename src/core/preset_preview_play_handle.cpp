@@ -62,7 +62,7 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( FALSE );
-		m_previewInstrumentTrack =  dynamic_cast<instrumentTrack *>(
+		m_previewInstrumentTrack = dynamic_cast<instrumentTrack *>(
 					track::create( track::INSTRUMENT_TRACK,
 								this ) );
 		m_previewInstrumentTrack->setJournalling( FALSE );

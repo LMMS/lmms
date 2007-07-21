@@ -1,3 +1,27 @@
+2007-07-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	added more mutexes to protect all important data-structures more
+	granularly and safely - fixes some potential segfaults
+
+	* src/tracks/instrument_track.cpp:
+	- lock mixer while loading instrument / track-specific settings - fixes
+	  segfault when dragging preset/instrument plugin to existing track
+	  while playing
+	- remove effects in loadTrackSpecificSettings() if none were in preset
+	  (e.g. old preset-file)
+
+	* include/rack_view.h:
+	* include/effect_tab_widget.h:
+	* src/widgets/rack_view.cpp:
+	- delete all existing plugins before adding new ones in
+	  rackView::loadSettings()
+	- cleanups
+
+	* configure.in:
+	cleanups
+
 2007-07-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* lmms.spec.in:
