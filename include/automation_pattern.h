@@ -95,19 +95,24 @@ public:
 		return( classNodeName() );
 	}
 
-	inline const track * getTrack( void )
+	inline const track * getTrack( void ) const
 	{
 		return( m_track );
 	}
 
-	inline const levelObject * object( void )
+	inline const levelObject * object( void ) const
+	{
+		return( m_object );
+	}
+
+	inline levelObject * object( void )
 	{
 		return( m_object );
 	}
 
 	void processMidiTime( const midiTime & _time );
 
-	inline bool updateFirst( void )
+	inline bool updateFirst( void ) const
 	{
 		return( m_update_first );
 	}
@@ -117,7 +122,7 @@ public:
 		m_update_first = _update;
 	}
 
-	void forgetTrack()
+	void forgetTrack( void )
 	{
 		m_track = NULL;
 	}

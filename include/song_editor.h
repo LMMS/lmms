@@ -130,6 +130,7 @@ public:
 
 
 	bpm_t getTempo( void );
+	virtual automationPattern * tempoAutomationPattern( void );
 
 
 	// every function that replaces current file (e.g. creates new file,

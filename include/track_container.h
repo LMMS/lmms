@@ -82,6 +82,11 @@ public:
 		return( m_currentPosition );
 	}
 
+	virtual automationPattern * tempoAutomationPattern( void )
+	{
+		return( NULL );
+	}
+
 	virtual bool fixedTCOs( void ) const
 	{
 		return( FALSE );

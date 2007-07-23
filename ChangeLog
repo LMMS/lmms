@@ -1,3 +1,29 @@
+2007-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/midi_import/midi_import.h:
+	* plugins/midi_import/midi_import.cpp:
+	- when adding notes to pattern *never* let them be quantized - fixes
+	  bug where notes of imported MIDI-files were not where they should have
+	  been
+	- added support for tempo-change-events by modifying
+	  automation-pattern of tempo-knob of track-container (if such exists)
+	- import track-names
+	- proper handling of time-base, -division etc.
+
+	* include/midi.h:
+	added midiMetaEvents-enum
+
+	* include/song_editor.h:
+	* include/track_container.h:
+	* src/core/song_editor.cpp:
+	added virtual tempoAutomationPattern()-method which returns
+	automation-pattern of tempo-object (i.e. bpmSpinBox) if such exists
+	for a certain track-container
+
+	* include/automation_pattern.h:
+	- added non-const version of object()-method
+	- made lot of other methods const
+
 2007-07-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/mixer.h:

@@ -27,7 +27,10 @@
 #include "track_container.h"
 #include "instrument_track.h"
 #include "pattern.h"
+#include "automation_pattern.h"
+#include "level_object.h"
 #include "debug.h"
+
 
 
 #ifdef QT4
@@ -74,8 +77,7 @@ plugin::descriptor midiimport_plugin_descriptor =
 midiImport::midiImport( const QString & _file ) :
 	importFilter( _file, &midiimport_plugin_descriptor ),
 	m_events(),
-	m_smpteTiming( FALSE ),
-	m_tempo( 120 )
+	m_timingDivision( 0 )
 {
 }
 
@@ -114,6 +116,26 @@ bool midiImport::tryImport( trackContainer * _tc )
 
 
 
+static inline unsigned long gcd( unsigned long a, unsigned long b )
+{
+	unsigned long r;
+	if( a < b )
+	{
+		r = a;
+		a = b;
+		b = r;
+	}
+	while( ( r = a % b ) != 0 )
+	{
+		a = b;
+		b = r;
+	}
+	return b;
+}
+
+
+
+
 bool FASTCALL midiImport::readSMF( trackContainer * _tc )
 {
 	// the curren position is immediately after the "MThd" id
@@ -145,15 +167,14 @@ invalid_format:
 	printf( "tracks: %d\n", num_tracks );
 #endif
 
-	int time_division = readInt( 2 );
-	if( time_division < 0 )
+	m_timingDivision = readInt( 2 );
+	if( m_timingDivision < 0 )
 	{
 		goto invalid_format;
 	}
 #ifdef LMMS_DEBUG
 	printf( "time-division: %d\n", time_division );
 #endif
-	m_smpteTiming = !!( time_division & 0x8000 );
 
 #ifdef QT4
 	QProgressDialog pd( trackContainer::tr( "Importing MIDI-file..." ),
@@ -165,6 +186,22 @@ invalid_format:
 #endif
 	pd.setWindowTitle( trackContainer::tr( "Please wait..." ) );
 	pd.show();
+
+	// calculate some timing stuff
+	int crotchet_time = 16;
+	int divisor = m_timingDivision ? m_timingDivision : 96;
+	int multiplier = crotchet_time;
+	int g = gcd( crotchet_time, divisor );
+	multiplier /= g;
+	divisor /= g;
+
+	// try to set default tempo
+	automationPattern * tap = _tc->tempoAutomationPattern();
+	if( tap != NULL )
+	{
+		tap->object()->setLevel( 120 );
+		tap->putValue( 0, 120 );
+	}
 
         // read tracks
 	for( int i = 0; i < num_tracks; ++i )
@@ -211,33 +248,64 @@ invalid_format:
 			continue;
 		}
 
-		if( !readTrack( file().pos() + len ) )
+		QString track_name = "";
+
+		if( !readTrack( file().pos() + len, track_name ) )
 		{
 			return( FALSE );
 		}
 		if( i == 0 )
 		{
+			if( tap == NULL )
+			{
+				continue;
+			}
+			for( eventVector::const_iterator it = m_events.begin();
+							it != m_events.end(); ++it )
+			{
+				const int tick = it->first;
+				const midiEvent & ev = it->second;
+				if( ev.m_type == MIDI_META_EVENT )
+				{
+					switch( ev.m_data.m_param[0] )
+					{
+						case MIDI_SET_TEMPO:
+						{
+	tap->putValue( midiTime( ( tick * multiplier ) / divisor ),
+						ev.m_data.m_param[1], FALSE );
+							break;
+						}
+						default:
+							break;
+					}
+				}
+			}
 			continue;
 		}
 
-		// now create new channel-track for reading track
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+		// now create new instrument-track for reading in track
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 						track::create(
 							track::INSTRUMENT_TRACK,
 							_tc ) );
 #ifdef LMMS_DEBUG
-		assert( ct != NULL );
+		assert( it != NULL );
 #endif
 		// TODO: setup program, channel etc.
-		ct->loadInstrument( "tripleoscillator" );
-		ct->toggledInstrumentTrackButton( FALSE );
+		it->loadInstrument( "tripleoscillator" );
+		it->toggledInstrumentTrackButton( FALSE );
+		// TODO: track_name.trimmed().isEmpty() (Qt4)
+		if( !track_name.isEmpty() )
+		{
+			it->setName( track_name );
+		}
 
 		// now create pattern to store notes in
-		pattern * p = dynamic_cast<pattern *>( ct->createTCO( 0 ) );
+		pattern * p = dynamic_cast<pattern *>( it->createTCO( 0 ) );
 #ifdef LMMS_DEBUG
 		assert( p != NULL );
 #endif
-		ct->addTCO( p );
+		it->addTCO( p );
 
 		// init keys
 		int keys[NOTES_PER_OCTAVE * OCTAVES][2];
@@ -273,23 +341,33 @@ invalid_format:
 						NOTES_PER_OCTAVE * OCTAVES &&
 							keys[ev.key()][0] >= 0 )
 					{
-			note n( midiTime( ( tick - keys[ev.key()][0] ) * 16 / m_tempo ),
-				midiTime( keys[ev.key()][0] * 16 / m_tempo ),
+			note n( midiTime( ( ( tick - keys[ev.key()][0] ) * multiplier ) / divisor ),
+				midiTime( ( keys[ev.key()][0] * multiplier ) / divisor ),
 				(tones)( ev.key() % NOTES_PER_OCTAVE ),
 				(octaves)( ev.key() / NOTES_PER_OCTAVE ),
 				keys[ev.key()][1] * 100 / 128 );
-						p->addNote( n );
+						p->addNote( n, FALSE );
 						keys[ev.key()][0] = -1;
 					}
 					break;
 
-				case MIDI_TEMPO:
-					
+/*				case MIDI_META_EVENT:
+				{
+					switch( ev.m_data.m_param[0] )
+					{
+						case MIDI_SET_TEMPO:
+						{
+							break;
+						}
+						default:
+							break;
+					}
 					break;
+				}*/
 
 				default:
-/*					printf( "Unhandled event: %#x\n",
-								ev.m_type );*/
+				/*	printf( "Unhandled event: %#x\n",
+								(int) ev.m_type );*/
 					break;
 			}
 		}
@@ -345,7 +423,7 @@ data_not_found:
 
 
 
-bool FASTCALL midiImport::readTrack( int _track_end )
+bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 {
         int tick = 0;
         unsigned char last_cmd = 0;
@@ -460,7 +538,17 @@ bool FASTCALL midiImport::readTrack( int _track_end )
 						}*/
 						switch( c )
 						{
-						case 0x21: // port number
+						case MIDI_TRACK_NAME:
+							if( len > 0 )
+							{
+								char * n = new char[len+1];
+								readBlock( n, len );
+								n[len] = 0;
+								_track_name += n;
+								delete[] n;
+							}
+							break;
+						case MIDI_PORT_NUMBER:
 							if( len < 1 )
 							{
 								error();
@@ -472,49 +560,50 @@ bool FASTCALL midiImport::readTrack( int _track_end )
 							skip( len );
 							break;
 
-						case 0x2F: // end of track
+						case MIDI_EOT:
 						//track->end_tick = tick;
 							skip( _track_end -
 								file().pos() );
 							return( TRUE );
 
-						case 0x51: // tempo
+						case MIDI_SET_TEMPO: // tempo
+						{
 							if( len < 3 )
 							{
 								error();
 								return( FALSE );
 							}
-							if( m_smpteTiming )
-							{
-								// SMPTE timing
-								// doesnt change
-								skip( len );
-							}
-							else
-							{
-								int tempo = readByte() << 16;
-								tempo |= readByte() << 8;
-								tempo |= readByte();
-								tempo = ( 60*1000*1000 ) / tempo;
-				m_events.push_back( qMakePair( tick,
-					midiEvent( MIDI_TEMPO,
-							0,
-							tempo,
-							0 ) ) );
-/*			event = new_event(track, 0);
-			event->type = SND_SEQ_EVENT_TEMPO;
-			event->port = port;
-			event->tick = tick;
-			event->data.tempo = read_byte() << 16;
-			event->data.tempo |= read_byte() << 8;
-			event->data.tempo |= read_byte();
-			skip( len -3 );*/
-								skip( len-3 );
-							}
+							int tempo = readByte() << 16;
+							tempo |= readByte() << 8;
+							tempo |= readByte();
+							tempo = ( 60*1000*1000 ) / tempo;
+	m_events.push_back( qMakePair( tick, midiEvent( MIDI_META_EVENT, 0, MIDI_SET_TEMPO, tempo ) ) );
 							break;
-
+						}
+						case MIDI_TIME_SIGNATURE:
+						{
+							int nominator = readByte();
+							int denominator = 1 << (int) readByte();
+							int clocks = readByte();
+							int notes = readByte();
+							if( nominator == 0 )
+							{
+								nominator = 4;
+							}
+							if( denominator == 0 )
+							{
+								denominator = 4;
+							}
+#ifdef LMMS_DEBUG
+							printf("nom:%d  denom:%d  clocks:%d  notes:%d\n",nominator,denominator,clocks,notes);
+#endif
+							break;
+						}
 						default:// ignore all other
 							// meta events
+#ifdef LMMS_DEBUG
+							printf("meta event %d\n", (int) c ); 
+#endif
 							skip( len );
 							break;
 						}

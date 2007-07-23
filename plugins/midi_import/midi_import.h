@@ -64,7 +64,7 @@ private:
 
 	bool FASTCALL readSMF( trackContainer * _tc );
 	bool FASTCALL readRIFF( trackContainer * _tc );
-	bool FASTCALL readTrack( int _track_end );
+	bool FASTCALL readTrack( int _track_end, QString & _track_name );
 
 	void error( void );
 
@@ -133,8 +133,7 @@ private:
 
 	typedef vvector<QPair<int, midiEvent> > eventVector;
 	eventVector m_events;
-	bool m_smpteTiming;
-	int m_tempo;
+	int m_timingDivision;
 
 } ;
 

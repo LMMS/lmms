@@ -1355,6 +1355,14 @@ bpm_t songEditor::getTempo( void )
 
 
 
+automationPattern * songEditor::tempoAutomationPattern( void )
+{
+	return( m_bpmSpinBox->getAutomationPattern() );
+}
+
+
+
+
 bool songEditor::mayChangeProject( void )
 {
 	if( m_modified == FALSE )
