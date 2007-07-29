@@ -1,3 +1,14 @@
+2007-07-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	- made 0.3.0-rc1 release
+	- replaced "+=" operator by according X="$X ..." constructs as older
+	  bashes have problems with it
+
+	* acinclude.m4:
+	disabled Qt4-support - re-enable it / rewrite Qt4-detection code in
+	0.4.x-devel-branch
+
 2007-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/midi_import/midi_import.h:

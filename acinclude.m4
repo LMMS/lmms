@@ -9,13 +9,13 @@ AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [defau
 # Check that QTDIR is defined or that --with-qtdir given
 if test x"$QTDIR" = x ; then
 	# some usual Qt-locations
-	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 /usr/local/qt /usr/local/qt3 /usr/local/qt31 /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6 /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
+	QT_SEARCH="/usr /usr/lib/qt /usr/lib/qt3 /usr/lib/qt31 /usr/lib/qt32 /usr/lib/qt33 /usr/lib/qt-3.0 /usr/lib/qt-3.1 /usr/lib/qt-3.2 /usr/lib/qt-3.3 /usr/local/qt /usr/local/qt3 /usr/local/qt31 /usr/local/qt32 /usr/local/qt33 /usr/share/qt3 /usr/X11R6" # /usr/share/qt4 /usr/local/Trolltech/Qt-4.0.0 /usr/local/Trolltech/Qt-4.0.1 /usr/local/Trolltech/Qt-4.1.0 /usr/local/Trolltech/Qt-4.1.0"
 else
 	QT_SEARCH=$QTDIR
 	QTDIR=""
 fi
 for i in $QT_SEARCH ; do
-	QT_INCLUDE_SEARCH="include include/qt include/qt3 include/qt4/Qt include/Qt"
+	QT_INCLUDE_SEARCH="include include/qt include/qt3" # include/qt4/Qt include/Qt"
 	for j in $QT_INCLUDE_SEARCH ; do
 	        if test -f $i/$j/qglobal.h -a x$QTDIR = x ; then
 			QTDIR=$i
@@ -51,9 +51,9 @@ case "${QT_VER}" in
     3*)
         QT_MAJOR="3"
     ;;
-    4*)
-	QT_MAJOR="4"
-    ;;
+#    4*)
+#	QT_MAJOR="4"
+#    ;;
     *)
         AC_MSG_ERROR([*** Don't know how to handle this Qt major version])
     ;;

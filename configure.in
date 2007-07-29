@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.2.1-svn20070723, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.2.1-svn20070723)
+AC_INIT(lmms, 0.3.0-rc1, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.3.0-rc1)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -346,8 +346,7 @@ if test ! -z "$HAVE_SAMPLERATE_H" ; then
 		[Define to 1 to enable SingerBot plugin support.])
 	if test "x$with_singerbot" = "xyes" ; then
 		ORIG_CPPFLAGS=$CPPFLAGS
-		CPPFLAGS+=" -I/usr/include/festival -I/usr/include/speech_tools"
-		CPPFLAGS+=" -Wno-non-template-friend"
+		CPPFLAGS="$CPPFLAGS -I/usr/include/festival -I/usr/include/speech_tools -Wno-non-template-friend"
 		AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
 		AC_CHECK_LIB([Festival], [main], true, FESTIVAL_SUPPORT="")
 		CPPFLAGS=$ORIG_CPPFLAGS
