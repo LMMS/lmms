@@ -388,9 +388,7 @@ if HAVE_LIBVORBIS
 LIB_VORBIS_LDADD = -lvorbis -lvorbisenc -lvorbisfile
 endif
 
-if HAVE_LIBSRC
 LIB_SRC_LDADD = -lsamplerate
-endif
 
 if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile

@@ -320,47 +320,37 @@ AM_CONDITIONAL(HAVE_LIBFLAC, test ! -z "$HAVE_LIBFLAC")
 
 
 # check for libsamplerate
-AC_ARG_WITH(libsrc,
-	AS_HELP_STRING([--without-libsrc],
-		[disable support for resampling via libsamplerate]), ,
- 	[ with_libsrc=yes ])
-AH_TEMPLATE(HAVE_SAMPLERATE_H, [Define to 1 if you have the <samplerate.h> header file.])
-if test "x$with_libsrc" = "xyes" ; then
-	AC_CHECK_HEADER(samplerate.h, HAVE_SAMPLERATE_H="true")
-	AC_CHECK_LIB([samplerate], [src_simple], HAVE_LIBSRC="true", HAVE_SAMPLERATE_H="")
+AC_CHECK_HEADER(samplerate.h, HAVE_SAMPLERATE_H="true")
+AC_CHECK_LIB([samplerate], [src_simple], HAVE_LIBSRC="true", HAVE_SAMPLERATE_H="")
+if test -z "$HAVE_SAMPLERATE_H" ; then
+	AC_MSG_ERROR([*** libsamplerate and/or it's devel-package is missing. Please make sure to fulfill this requirement in order to successfully configure and compile LMMS.])
 fi
-if test ! -z "$HAVE_SAMPLERATE_H" ; then
-	AC_DEFINE(HAVE_SAMPLERATE_H)
-fi
-AM_CONDITIONAL(HAVE_LIBSRC, test ! -z "$HAVE_SAMPLERATE_H")
 
 
 # check for Festival
-if test ! -z "$HAVE_SAMPLERATE_H" ; then
-	AC_LANG_PUSH(C++)
-	AC_ARG_WITH(singerbot,
-		AS_HELP_STRING([--without-singerbot],
-			[disable support for SingerBot plugin]), ,
-		[ with_singerbot=yes ])
-	AH_TEMPLATE(SINGERBOT_SUPPORT,
-		[Define to 1 to enable SingerBot plugin support.])
-	if test "x$with_singerbot" = "xyes" ; then
-		ORIG_CPPFLAGS=$CPPFLAGS
-		CPPFLAGS="$CPPFLAGS -I/usr/include/festival -I/usr/include/speech_tools -Wno-non-template-friend"
-		AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
-		AC_CHECK_LIB([Festival], [main], true, FESTIVAL_SUPPORT="")
-		CPPFLAGS=$ORIG_CPPFLAGS
-	fi
-	if test ! -z "$FESTIVAL_SUPPORT" ; then
-		AC_DEFINE(SINGERBOT_SUPPORT)
-	fi
-	AC_LANG_POP(C++)
+AC_LANG_PUSH(C++)
+AC_ARG_WITH(singerbot,
+	AS_HELP_STRING([--without-singerbot],
+		[disable support for SingerBot plugin]), ,
+	[ with_singerbot=yes ])
+AH_TEMPLATE(SINGERBOT_SUPPORT,
+	[Define to 1 to enable SingerBot plugin support.])
+if test "x$with_singerbot" = "xyes" ; then
+	ORIG_CPPFLAGS=$CPPFLAGS
+	CPPFLAGS="$CPPFLAGS -I/usr/include/festival -I/usr/include/speech_tools -Wno-non-template-friend"
+	AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
+	AC_CHECK_LIB([Festival], [main], true, FESTIVAL_SUPPORT="")
+	CPPFLAGS=$ORIG_CPPFLAGS
 fi
+if test ! -z "$FESTIVAL_SUPPORT" ; then
+	AC_DEFINE(SINGERBOT_SUPPORT)
+fi
+AC_LANG_POP(C++)
 AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
 
 
 # libsndfile-stuff
-AC_ARG_WITH(sndfile,
+AC_ARG_WITH(libsf,
  	AS_HELP_STRING([--without-libsf],
 		[disable support for importing files via libsndfile]), ,
  	[ with_libsf=yes ])
@@ -792,22 +782,6 @@ else
 fi
 
 
-if test -z "$HAVE_SAMPLERATE_H" ; then
-	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
-	echo " ========================"
-	echo " ="
-	echo " = You don't seem to have libsamplerate installed and/or libsamplerate-"
-	echo " = development-package is missing. This will disable resampling with"
-	echo " = libsamplerate and results in worse quality! Currently LMMS will also"
-	echo " = crash more often, because internal sample-rate-converter has some bugs..."
-	echo " = Consider installing the missing packages for using the full power of LMMS."
-	echo " ="
-	with_warnings="true"
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libsamplerate for internal samplerate-conversion"
-fi
-
 
 if test -z "$FESTIVAL_SUPPORT" ; then
 	if test "x$with_singerbot" = "xyes" ; then
@@ -815,11 +789,7 @@ if test -z "$FESTIVAL_SUPPORT" ; then
 		echo " ===  LMMS - WARNING  ======================================================="
 		echo " ========================"
 		echo " ="
-		if test -z "$HAVE_SAMPLERATE_H" ; then
-			echo " = You don't seem to have libsamplerate support."
-		else
-			echo " = You don't seem to have Festival development files."
-		fi
+		echo " = You don't seem to have Festival development files."
 		echo " = The SingerBot instrument plugin will be ignored."
 		echo " = Before enabling this plugin, bear in mind that it is still experimental."
 		echo " ="

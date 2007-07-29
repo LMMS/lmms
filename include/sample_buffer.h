@@ -43,9 +43,7 @@
 #include <config.h>
 #endif
 
-#ifdef HAVE_SAMPLERATE_H
 #include <samplerate.h>
-#endif
 
 
 #include "mixer.h"
@@ -79,9 +77,7 @@ public:
 	private:
 		f_cnt_t m_frame_index;
 		const bool m_varying_pitch;
-#ifdef HAVE_SAMPLERATE_H
 		SRC_STATE * m_resampling_data;
-#endif
 
 		friend class sampleBuffer;
 
@@ -264,11 +260,9 @@ private:
 	float m_frequency;
 	sample_rate_t m_sample_rate;
 
-#ifdef HAVE_SAMPLERATE_H
 	void initResampling( void );
 
 	SRC_DATA m_srcData;
-#endif
 
 	sampleFrame * m_sample_fragment;
 	sampleFrame * getSampleFragment( f_cnt_t _start, f_cnt_t _frames,

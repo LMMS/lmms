@@ -46,9 +46,7 @@
 #include <config.h>
 #endif
 
-#ifdef HAVE_SAMPLERATE_H
 #include <samplerate.h>
-#endif
 
 
 #include "mixer.h"
@@ -188,10 +186,8 @@ private:
 
 	QMutex m_devMutex;
 
-#ifdef HAVE_SAMPLERATE_H
 	SRC_DATA m_srcData;
 	SRC_STATE * m_srcState;
-#endif
 
 	surroundSampleFrame * m_buffer;
 

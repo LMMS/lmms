@@ -44,7 +44,6 @@ audioDevice::audioDevice( const sample_rate_t _sample_rate,
 	m_mixer( _mixer ),
 	m_buffer( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] )
 {
-#ifdef HAVE_SAMPLERATE_H
 	int error;
 	if( ( m_srcState = src_new(
 #ifdef HQ_SINC
@@ -57,7 +56,6 @@ audioDevice::audioDevice( const sample_rate_t _sample_rate,
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
 	m_srcData.end_of_input = 0;
-#endif
 }
 
 
@@ -65,9 +63,7 @@ audioDevice::audioDevice( const sample_rate_t _sample_rate,
 
 audioDevice::~audioDevice()
 {
-#ifdef HAVE_SAMPLERATE_H
 	src_delete( m_srcState );
-#endif
 	delete[] m_buffer;
 #ifdef QT3
 	if( m_devMutex.locked() )
@@ -166,45 +162,12 @@ void audioDevice::renamePort( audioPort * )
 
 
 
-#ifndef HAVE_SAMPLERATE_H
-const Uint8 LP_FILTER_TAPS = 24;
-const float LP_FILTER_COEFFS[LP_FILTER_TAPS] =
-{
-	+0.000511851442,
-	-0.001446936402,
-	-0.005058312516,
-	-0.002347181570,
-	+0.011236146012,
-	+0.020351310667,
-	-0.000479735368,
-	-0.045333228189
-	-0.055186434405,
-	+0.032962246498,
-	+0.202439670159,
-	+0.342350604673,
-	+0.342350604673,
-	+0.202439670159,
-	+0.032962246498,
-	-0.055186434405,
-	-0.045333228189
-	-0.000479735368,
-	+0.020351310667,
-	+0.011236146012,
-	-0.002347181570,
-	-0.005058312516,
-	-0.001446936402,
-	+0.000511851442
-} ;
-#endif
-
-
 void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
 						const fpab_t _frames,
 						surroundSampleFrame * _dst,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
-#ifdef HAVE_SAMPLERATE_H
 	if( m_srcState == NULL )
 	{
 		return;
@@ -221,95 +184,6 @@ void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
 		printf( "audioDevice::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
-#else
-	if( _src_sr == 2 * SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
-	{
-		// we use a simple N-tap FIR-Filter with
-		// precalculated/-designed LP-Coeffs
-		static surroundSampleFrame lp_hist[LP_FILTER_TAPS] =
-		{
-#ifndef DISABLE_SURROUND
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f },
-			{ 0.0f, 0.0f, 0.0f, 0.0f }
-#else
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f },
-			{ 0.0f, 0.0f }
-#endif
-		} ;
-		static Uint8 oldest = 0;
-
-		for( fpab_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
-									++chnl )
-			{
-				lp_hist[oldest][chnl] = _src[frame][chnl];
-				if( frame % 2 == 0 )
-				{
-					const fpab_t f = frame / 2;
-					_dst[f][chnl] = 0.0f;
-					for( Uint8 tap = 0;
-						tap < LP_FILTER_TAPS; ++tap )
-					{
-						_dst[f][chnl] +=
-LP_FILTER_COEFFS[tap] * lp_hist[( oldest + tap ) % LP_FILTER_TAPS][chnl];
-					}
-				}
-			}
-			oldest = ( oldest + 1 ) % LP_FILTER_TAPS;
-		}
-	}
-	else if( _src_sr == SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] / 2 )
-	{
-		printf( "No resampling for given sample-rates implemented!\n"
-			"Consider installing libsamplerate and recompile "
-								"LMMS!\n" );
-	}
-#endif
 }
 
 

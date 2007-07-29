@@ -120,9 +120,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-#ifdef HAVE_SAMPLERATE_H
 	initResampling();
-#endif
 	if( _is_base64_data == TRUE )
 	{
 		loadFromBase64( _audio_file );
@@ -156,9 +154,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-#ifdef HAVE_SAMPLERATE_H
 	initResampling();
-#endif
 	update();
 }
 
@@ -188,9 +184,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-#ifdef HAVE_SAMPLERATE_H
 	initResampling();
-#endif
 	update();
 }
 
@@ -591,12 +585,10 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 
 
 
-#ifdef HAVE_SAMPLERATE_H
 void sampleBuffer::initResampling( void )
 {
 	m_srcData.end_of_input = 0;
 }
-#endif
 
 
 
@@ -656,24 +648,9 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-/*	Uint32 f2 = 0;
-	while( f2 < f1 )
-	{
-		f2 += frames_to_process * freq_factor;
-	}
-	if( f2 > f1 && f2 >= frames_to_process )
-	{
-		f2 -= frames_to_process * freq_factor;
-	}*/
-//	static int foo = 0;
-	// calc pointer of first frame
-	//printf("diff:%d %f  %d f2: %d  input: %d\n", f2 -foo, play_frame * freq_factor, static_cast<Uint32>( play_frame * freq_factor ), f2, (Uint32)( frames_for_loop * freq_factor ) );
-//	foo = f2;
-
 	// check whether we have to change pitch...
 	if( freq_factor != 1.0 || _state->m_varying_pitch )
 	{
-#ifdef HAVE_SAMPLERATE_H
 		// Generate output
 		const f_cnt_t margin = 64;
 		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor )
@@ -702,82 +679,6 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		{
 			play_frame = getLoopedIndex( play_frame );
 		}
-#else
-		f_cnt_t src_frame_base = 0;
-		// check whether we're in high-quality-mode
-		if( engine::getMixer()->highQuality() == TRUE )
-		{
-			// we are, so let's use cubic interpolation...
-			for( f_cnt_t frame = 0; frame < frames_to_process;
-								++frame )
-			{
-				// current loop done?
-				if( _looped && ( frame-src_frame_base ) >
-							frames_for_loop )
-				{
-					start_frame = loop_start;
-					src_frame_base = frame;
-					frames_for_loop = frames_to_process %
-						total_frames_for_current_pitch;
-				}
-
-				const float src_frame_idx = frame * freq_factor;
-				f_cnt_t frame_num = static_cast<f_cnt_t>(
-						src_frame_idx) - src_frame_base;
-				const float frac_pos = src_frame_idx -
-					static_cast<f_cnt_t>( src_frame_idx );
-
-				// because of cubic interpolation we have to
-				// access start_frame[frame_num-1], so make
-				// sure we don't access data out of
-				// buffer-array-boundaries
-				if( frame_num == 0 && play_frame == 0 )
-				{
-					frame_num = 1;
-				}
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-				{
-					_ab[frame][chnl] = cubicInterpolate(
-						start_frame[frame_num-1][chnl],
-						start_frame[frame_num+0][chnl],
-						start_frame[frame_num+1][chnl],
-						start_frame[frame_num+2][chnl],
-								frac_pos );
-				}
-			}
-		}
-		else
-		{
-			// just normal mode, so we can use linear
-			// interpolation...
-			for( f_cnt_t frame = 0; frame < frames_to_process;
-								++frame )
-			{
-				if( _looped && ( frame - src_frame_base ) >
-							frames_for_loop )
-				{
-					start_frame = loop_start;
-					src_frame_base = frame;
-					frames_for_loop = frames_to_process %
-						total_frames_for_current_pitch;
-				}
-				const float src_frame_idx = frame * freq_factor;
-				const f_cnt_t frame_num =
-					(f_cnt_t)src_frame_idx-src_frame_base;
-				const float frac_pos = src_frame_idx -
-							(f_cnt_t) src_frame_idx;
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-				{
-					_ab[frame][chnl] = linearInterpolate(
-						start_frame[frame_num][chnl],
-						start_frame[frame_num+1][chnl],
-								frac_pos );
-				}
-			}
-		}
-#endif
 	}
 	else
 	{
@@ -1162,7 +1063,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 					(float) _src_sr * (float) _dst_sr );
 	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
 	sampleFrame * dst_buf = dst_sb->m_origData;
-#ifdef HAVE_SAMPLERATE_H
+
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
 	int error;
 	SRC_STATE * state;
@@ -1188,27 +1089,6 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 	{
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
 	}
-#else
-	// no libsamplerate, so do simple cubic interpolation
-	for( f_cnt_t frame = 0; frame < dst_frames; ++frame )
-	{
-		const float src_frame_float = frame * (float) _src_sr / _dst_sr;
-		const float frac_pos = src_frame_float -
-					static_cast<f_cnt_t>( src_frame_float );
-		const f_cnt_t src_frame = tLimit<f_cnt_t>(
-					static_cast<f_cnt_t>( src_frame_float ),
-							1, _frames - 3 );
-		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-		{
-			dst_buf[frame][ch] = cubicInterpolate(
-						_data[src_frame - 1][ch],
-						_data[src_frame + 0][ch],
-						_data[src_frame + 1][ch],
-						_data[src_frame + 2][ch],
-								frac_pos );
-		}
-	}
-#endif
 	dst_sb->update();
 	return( dst_sb );
 }
@@ -1476,7 +1356,6 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	m_frame_index( 0 ),
 	m_varying_pitch( _varying_pitch )
 {
-#ifdef HAVE_SAMPLERATE_H
 	int error;
 	if( ( m_resampling_data = src_new(/*
 		( engine::getMixer()->highQuality() == TRUE ) ?
@@ -1486,7 +1365,6 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	{
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
 	}
-#endif
 }
 
 
@@ -1494,9 +1372,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 
 sampleBuffer::handleState::~handleState()
 {
-#ifdef HAVE_SAMPLERATE_H
 	src_delete( m_resampling_data );
-#endif
 }
 
 

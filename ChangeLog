@@ -5,6 +5,14 @@
 	- replaced "+=" operator by according X="$X ..." constructs as older
 	  bashes have problems with it
 
+	* configure.in:
+	* Makefile.am:
+	* include/audio_device.h:
+	* include/sample_buffer.h:
+	* src/audio/audio_device.cpp:
+	* src/lib/sample_buffer.cpp:
+	removed already broken support for building LMMS without libsamplerate
+
 	* acinclude.m4:
 	disabled Qt4-support - re-enable it / rewrite Qt4-detection code in
 	0.4.x-devel-branch
