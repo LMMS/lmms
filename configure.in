@@ -322,10 +322,39 @@ AM_CONDITIONAL(HAVE_LIBFLAC, test ! -z "$HAVE_LIBFLAC")
 # check for libsamplerate
 AC_CHECK_HEADER(samplerate.h, HAVE_SAMPLERATE_H="true")
 AC_CHECK_LIB([samplerate], [src_simple], HAVE_LIBSRC="true", HAVE_SAMPLERATE_H="")
+AH_TEMPLATE(USE_3RDPARTY_LIBSRC, [Define to 1 if you do not have the <samplerate.h> header file.])
+AM_CONDITIONAL(USE_3RDPARTY_LIBSRC, test -z "$HAVE_SAMPLERATE_H")
 if test -z "$HAVE_SAMPLERATE_H" ; then
-	AC_MSG_ERROR([*** libsamplerate and/or it's devel-package is missing. Please make sure to fulfill this requirement in order to successfully configure and compile LMMS.])
-fi
+	AC_DEFINE(USE_3RDPARTY_LIBSRC)
+	AC_CHECK_FUNCS(malloc calloc free memcpy memmove)
 
+	AC_CHECK_LIB([m],floor)
+	AC_CHECK_FUNCS(floor ceil fmod)
+
+	AC_C99_FUNC_LRINT
+	AC_C99_FUNC_LRINTF
+	# AC_C99_FUNC_LLRINT  Don't need this (yet?).
+
+	case "x$ac_cv_c99_lrint$ac_cv_c99_lrintf" in
+		xyesyes)
+			;;
+		*)
+			AC_MSG_WARN([[*** Missing C99 standard functions lrint() and lrintf().]])
+			AC_MSG_WARN([[*** This may cause benign compiler warnings on some systems (ie Solaris).]])
+			;;
+		esac
+
+	#====================================================================================
+	# Determine if the processor can do clipping on float to int conversions.
+
+	AC_C_CLIP_MODE
+
+	AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
+		[Target processor clips on positive float to int conversion.])
+	AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
+		[Target processor clips on negative float to int conversion.])
+
+fi
 
 # check for Festival
 AC_LANG_PUSH(C++)

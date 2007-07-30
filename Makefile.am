@@ -121,6 +121,22 @@ lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 ./embed.o: ./embedded_resources.h
 
 
+if USE_3RDPARTY_LIBSRC
+LIBSAMPLERATE_SOURCES=	$(srcdir)/src/3rdparty/samplerate/samplerate.c		\
+			$(srcdir)/src/3rdparty/samplerate/src_sinc.c		\
+			$(srcdir)/src/3rdparty/samplerate/high_qual_coeffs.h	\
+			$(srcdir)/src/3rdparty/samplerate/mid_qual_coeffs.h	\
+			$(srcdir)/src/3rdparty/samplerate/fastest_coeffs.h	\
+			$(srcdir)/src/3rdparty/samplerate/common.h		\
+			$(srcdir)/src/3rdparty/samplerate/float_cast.h		\
+			$(srcdir)/src/3rdparty/samplerate/src_zoh.c		\
+			$(srcdir)/src/3rdparty/samplerate/src_linear.c
+endif
+
+THIRD_PARTY_CODE=$(LIBSAMPLERATE_SOURCES)
+
+
+
 lmms_SOURCES =								\
 		$(srcdir)/src/audio/audio_alsa.cpp			\
 		$(srcdir)/src/audio/audio_device.cpp			\
@@ -359,7 +375,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/meter_dialog.h			\
 		$(srcdir)/include/qxembed.h				\
 		$(srcdir)/include/effect_lib.h				\
-		$(srcdir)/include/xqmap.h
+		$(srcdir)/include/xqmap.h				\
+		$(THIRD_PARTY_CODE)
 
 
 
@@ -388,7 +405,10 @@ if HAVE_LIBVORBIS
 LIB_VORBIS_LDADD = -lvorbis -lvorbisenc -lvorbisfile
 endif
 
+if USE_3RDPARTY_LIBSRC
+else
 LIB_SRC_LDADD = -lsamplerate
+endif
 
 if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile

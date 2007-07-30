@@ -46,7 +46,11 @@
 #include <config.h>
 #endif
 
+#ifndef USE_3RDPARTY_LIBSRC
 #include <samplerate.h>
+#else
+#include "src/3rdparty/samplerate/samplerate.h"
+#endif
 
 
 #include "mixer.h"

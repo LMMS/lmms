@@ -1,3 +1,25 @@
+2007-07-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/singerbot/singerbot.h:
+	* include/sample_buffer.h:
+	* include/audio_device.h:
+	* configure.in:
+	* acinclude.m4:
+	* Makefile.am:
+	use 3rd-party code if libsamplerate is not available on system
+
+	* src/3rdparty/samplerate/src_linear.c:
+	* src/3rdparty/samplerate/samplerate.h:
+	* src/3rdparty/samplerate/fastest_coeffs.h:
+	* src/3rdparty/samplerate/src_sinc.c:
+	* src/3rdparty/samplerate/float_cast.h:
+	* src/3rdparty/samplerate/mid_qual_coeffs.h:
+	* src/3rdparty/samplerate/src_zoh.c:
+	* src/3rdparty/samplerate/high_qual_coeffs.h:
+	* src/3rdparty/samplerate/samplerate.c:
+	* src/3rdparty/samplerate/common.h:
+	added libsamplerate-source-code
+
 2007-07-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
