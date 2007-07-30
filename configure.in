@@ -765,6 +765,21 @@ else
 fi
 
 
+if test -z "$HAVE_SAMPLERATE_H" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have libsamplerate installed and/or libsamplerate-"
+	echo " = development-package is missing. If you ignore this warning the"
+	echo " = according source-code of libsamplerate will be directly compiled into"
+	echo " = LMMS which is no problem at all. If you're building official LMMS-packages"
+	echo " = for a distribution DO NOT IGNORE THIS WARNING."
+	echo " ="
+fi
+
+
+
 
 if test "$build_linux" = "true" ; then
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA-plugins"
