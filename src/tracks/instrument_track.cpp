@@ -661,9 +661,9 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// for not modifying it's member variables
 				// asynchronously (while rendering!)
 				// which can result in segfaults
-				engine::getMixer()->lockPlayHandles();
+				engine::getMixer()->lock();
 				n->noteOff();
-				engine::getMixer()->unlockPlayHandles();
+				engine::getMixer()->unlock();
 				m_notes[_me.key()] = NULL;
 				emit noteDone( done_note );
 			}
