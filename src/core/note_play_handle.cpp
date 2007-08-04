@@ -61,19 +61,18 @@ inline void notePlayHandle::baseDetuning::setLevel( int _level )
 
 
 notePlayHandle::notePlayHandle( instrumentTrack * _it,
-						const f_cnt_t _frames_ahead,
+						const f_cnt_t _offset,
 						const f_cnt_t _frames,
 						const note & _n,
 						notePlayHandle * _parent,
 						const bool _arp_note ) :
-	playHandle( NotePlayHandle ),
+	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.tone(), _n.octave(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_instrumentTrack( _it ),
 	m_frames( 0 ),
-	m_framesAhead( _frames_ahead ),
 	m_totalFramesPlayed( 0 ), 
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
@@ -120,7 +119,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 				(Uint16) ( ( getVolume() / 100.0f ) *
 				( m_instrumentTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
-			midiTime::fromFrames( m_framesAhead,
+			midiTime::fromFrames( offset(),
 						engine::framesPerTact64th() ) );
 }
 
@@ -166,7 +165,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 	}
 
 	if( m_released == FALSE &&
-		m_totalFramesPlayed + engine::getMixer()->framesPerAudioBuffer()
+		m_totalFramesPlayed + engine::getMixer()->framesPerPeriod()
 								>= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
@@ -177,7 +176,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 
 	if( m_released == TRUE )
 	{
-		f_cnt_t todo = engine::getMixer()->framesPerAudioBuffer();
+		f_cnt_t todo = engine::getMixer()->framesPerPeriod();
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow notePlayHandle::done() to be true
@@ -186,7 +185,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 		if( arpBaseNote() == TRUE )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 *
-				engine::getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -194,7 +193,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
 			if( m_framesBeforeRelease <=
-				engine::getMixer()->framesPerAudioBuffer() )
+				engine::getMixer()->framesPerPeriod() )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -207,7 +206,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 				// release-phase yet)
 				todo = 0;
 				m_framesBeforeRelease -=
-				engine::getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerPeriod();
 			}
 		}
 		// look whether we're in release-phase
@@ -255,7 +254,27 @@ void notePlayHandle::play( bool _try_parallelizing )
 	}
 
 	// update internal data
-	m_totalFramesPlayed += engine::getMixer()->framesPerAudioBuffer();
+	m_totalFramesPlayed += engine::getMixer()->framesPerPeriod();
+}
+
+
+
+
+f_cnt_t notePlayHandle::framesLeft( void ) const
+{
+	const instrument * i = ( m_instrumentTrack != NULL ) ?
+				m_instrumentTrack->getInstrument() : NULL;
+	f_cnt_t rftd = ( i != NULL && i->isMonophonic() ) ?
+						0 : m_releaseFramesToDo;
+	if( m_released && rftd == 0 )
+	{
+		return( m_framesBeforeRelease );
+	}
+	else if( m_released && m_releaseFramesToDo >= m_releaseFramesDone )
+	{
+		return(  m_releaseFramesToDo - m_releaseFramesDone );
+	}
+	return( m_frames+rftd-m_totalFramesPlayed );
 }
 
 
@@ -280,7 +299,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = tMax<f_cnt_t>( 10,
+	m_releaseFramesToDo = tMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_envWidget->releaseFrames() );
 	// send MIDI-note-off-event
 	m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
@@ -398,7 +417,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			getPanning() == _nph.getPanning() &&
 			m_instrumentTrack == _nph.m_instrumentTrack &&
 			m_frames == _nph.m_frames &&
-			m_framesAhead == _nph.m_framesAhead &&
+			offset() == _nph.offset() &&
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
 			m_released == _nph.m_released &&
 			m_baseNote == _nph.m_baseNote &&

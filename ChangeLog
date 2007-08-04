@@ -1,5 +1,34 @@
 2007-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/tracks/instrument_track.cpp:
+	- do not simply pass-through _frames-parameter, use
+	  notePlayHandle::framesLeftForCurrentPeriod() if possible
+	- disabled basic envelopes for the time being
+	- better handling of monophonic instruments
+	- do not play new notePlayHandles directly, set offset instead and let
+	  mixer manage the rest
+
+	* src/tracks/sample_track.cpp:
+	do not play new samplePlayHandles directly, set offset instead and let
+	mixer manage the rest
+
+	* include/note_play_handle.h:
+	- removed framesAhead-property - now replaced by offset-property of
+	  base-class
+	- introduced methods framesLeft() and framesLeftForCurrentPeriod() -
+	  proper usage of them in plugins etc. fixes more clicks/pops especially
+	  in monophonic instruments (LB302!)
+
+	* src/core/mixer.cpp:
+	call songEditor::processNextBuffer() *before* playing all play-handles
+
+	* src/core/mixer.cpp:
+	* include/mixer.h:
+	extended clearAudioBuffer()-methods by offset
+
+	* include/play_handle.h:
+	added offset-property
+
 	* include/mixer.h:
 	* most other files:
 	renamed "framesPerAudioBuffer()" to "framesPerPeriod()"

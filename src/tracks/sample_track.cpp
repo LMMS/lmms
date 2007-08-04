@@ -418,8 +418,8 @@ track::trackTypes sampleTrack::type( void ) const
 
 
 bool FASTCALL sampleTrack::play( const midiTime & _start,
-						const fpab_t _frames,
-						const f_cnt_t _frame_base,
+						const fpp_t _frames,
+						const f_cnt_t _offset,
 							Sint16 /*_tco_num*/ )
 {
 	sendMidiTime( _start );
@@ -443,19 +443,9 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 			handle->setVolume( m_volumeKnob->value() );
 //TODO: do we need sample tracks in BB editor?
 //			handle->setBBTrack( bb_track );
-			handle->play( _frame_base );
-			// could we play all within current number of frames per
-			// audio-buffer?
-			if( handle->done() )
-			{
-				// throw it away...
-				delete handle;
-			}
-			else
-			{
-				// send it to the mixer
-				engine::getMixer()->addPlayHandle( handle );
-			}
+			handle->setOffset( _offset );
+			// send it to the mixer
+			engine::getMixer()->addPlayHandle( handle );
 			played_a_note = TRUE;
 		}
 	}

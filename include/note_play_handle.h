@@ -48,8 +48,8 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	notePlayHandle( instrumentTrack * _chnl_trk,
-					const f_cnt_t _frames_ahead,
+	notePlayHandle( instrumentTrack * _instrument_track,
+					const f_cnt_t _offset,
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
 					const bool _arp_note = FALSE );
@@ -67,8 +67,8 @@ public:
 
 	virtual inline bool done( void ) const
 	{
-		return( ( m_released && m_framesBeforeRelease == 0 &&
-				m_releaseFramesDone >= m_releaseFramesToDo ) );
+		return( m_released && framesLeft() == 0 );/* ( m_released && m_framesBeforeRelease == 0 &&
+				m_releaseFramesDone >= m_releaseFramesToDo ) );*/
 	}
 
 	bool willFinishThisPeriod( void ) const
@@ -78,16 +78,16 @@ public:
 		f_cnt_t rfd = m_releaseFramesDone;
 		if( m_released == TRUE )
 		{
-			f_cnt_t todo = engine::getMixer()->framesPerAudioBuffer();
+			f_cnt_t todo = engine::getMixer()->framesPerPeriod();
 			if( arpBaseNote() == TRUE )
 			{
 				rftd = rfd + 2 *
-					engine::getMixer()->framesPerAudioBuffer();
+					engine::getMixer()->framesPerPeriod();
 			}
 			if( fbr )
 			{
 				if( fbr <=
-					engine::getMixer()->framesPerAudioBuffer() )
+					engine::getMixer()->framesPerPeriod() )
 				{
 					todo -= fbr;
 					fbr = 0;
@@ -96,7 +96,7 @@ public:
 				{
 					todo = 0;
 					fbr -=
-					engine::getMixer()->framesPerAudioBuffer();
+					engine::getMixer()->framesPerPeriod();
 				}
 			}
 			if( todo && rfd < rftd )
@@ -120,6 +120,15 @@ public:
 		return( ( m_released && fbr == 0 && rfd >= rftd ) );
 	}
 
+	f_cnt_t framesLeft( void ) const;
+
+	inline f_cnt_t framesLeftForCurrentPeriod( void ) const
+	{
+		return( tMin<f_cnt_t>( framesLeft(),
+				engine::getMixer()->framesPerPeriod() ) );
+	}
+
+
 	virtual bool isFromTrack( const track * _track ) const;
 
 
@@ -137,13 +146,6 @@ public:
 
 	f_cnt_t actualReleaseFramesToDo( void ) const;
 
-
-	// returns how many samples this note is aligned ahead, i.e.
-	// at which position it is inserted in the according buffer
-	inline f_cnt_t framesAhead( void ) const
-	{
-		return ( m_framesAhead );
-	}
 
 	// returns total numbers of frames to play
 	inline f_cnt_t frames( void ) const
@@ -292,8 +294,6 @@ private:
 	instrumentTrack * m_instrumentTrack;	// needed for calling
 					// instrumentTrack::playNote
 	f_cnt_t m_frames;		// total frames to play
-	f_cnt_t m_framesAhead;		// numbers of frames ahead in buffer
-					// to mix in
 	f_cnt_t m_totalFramesPlayed;	// total frame-counter - used for
 					// figuring out whether a whole note
 					// has been played

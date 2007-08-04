@@ -62,7 +62,7 @@ sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
 
 mixer::mixer( void ) :
-	m_framesPerAudioBuffer( DEFAULT_BUFFER_SIZE ),
+	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
 	m_cpuLoad( 0 ),
@@ -80,14 +80,14 @@ mixer::mixer( void ) :
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
-		m_framesPerAudioBuffer = configManager::inst()->value( "mixer",
+		m_framesPerPeriod = configManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt();
 
-		if( m_framesPerAudioBuffer > DEFAULT_BUFFER_SIZE )
+		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
-			m_fifo = new fifo( m_framesPerAudioBuffer
+			m_fifo = new fifo( m_framesPerPeriod
 							/ DEFAULT_BUFFER_SIZE );
-			m_framesPerAudioBuffer = DEFAULT_BUFFER_SIZE;
+			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
 		else
 		{
@@ -98,7 +98,7 @@ mixer::mixer( void ) :
 	{
 		configManager::inst()->setValue( "mixer",
 							"framesperaudiobuffer",
-				QString::number( m_framesPerAudioBuffer ) );
+				QString::number( m_framesPerPeriod ) );
 		m_fifo = new fifo( 1 );
 	}
 
@@ -111,9 +111,9 @@ mixer::mixer( void ) :
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		m_readBuf = new surroundSampleFrame[m_framesPerAudioBuffer];
+		m_readBuf = new surroundSampleFrame[m_framesPerPeriod];
 		
-		clearAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
+		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
 	
@@ -202,7 +202,7 @@ void mixer::setClipScaling( bool _state )
 		for( ch_cnt_t chnl=0; chnl < m_audioDev->channels(); ++chnl )
 		{
 			m_clipped[chnl] = FALSE;
-			m_halfStart[chnl] = m_framesPerAudioBuffer;
+			m_halfStart[chnl] = m_framesPerPeriod;
 			m_maxClip[chnl] = 1.0f;
 			m_previousSample[chnl] = 0.0;
 			m_newBuffer[chnl] = FALSE;
@@ -213,7 +213,7 @@ void mixer::setClipScaling( bool _state )
 		for( Uint8 i = 0; i < 3; i++ )
 		{
 			m_readBuf = m_bufferPool[i];
-			clearAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
+			clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		}
 	}
 	else
@@ -233,7 +233,6 @@ void mixer::setClipScaling( bool _state )
 const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
 	microTimer timer;
-
 	static songEditor::playPos last_metro_pos = -1;
 
 	songEditor::playPos p = engine::getSongEditor()->getPlayPos(
@@ -288,10 +287,12 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	m_readBuf = m_bufferPool[m_readBuffer];
 
 	// clear last audio-buffer
-	clearAudioBuffer( m_writeBuf, m_framesPerAudioBuffer );
+	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 //	if( criticalXRuns() == FALSE )
 	{
+		engine::getSongEditor()->processNextBuffer();
+
 		lockPlayHandles();
 		csize idx = 0;
 		if( m_parallelizingLevel > 1 )
@@ -366,8 +367,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		}
 		unlockPlayHandles();
 
-		engine::getSongEditor()->processNextBuffer();
-
 		bool more_effects = FALSE;
 		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
@@ -384,7 +383,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	}
 
 
-	emit nextAudioBuffer( m_readBuf, m_framesPerAudioBuffer );
+	emit nextAudioBuffer( m_readBuf, m_framesPerPeriod );
 
 	unlock();
 
@@ -392,7 +391,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	envelopeAndLFOWidget::triggerLFO();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
-							m_framesPerAudioBuffer;
+							m_framesPerPeriod;
 	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
 									100 );
 
@@ -425,34 +424,36 @@ void mixer::clear( void )
 
 
 void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
-							const f_cnt_t _frames )
+							const f_cnt_t _frames,
+							const f_cnt_t _offset )
 {
-	memset( _ab, 0, sizeof( *_ab ) * _frames );
+	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
 }
 
 
 
 #ifndef DISABLE_SURROUND
 void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
-							const f_cnt_t _frames )
+							const f_cnt_t _frames,
+							const f_cnt_t _offset )
 {
-	memset( _ab, 0, sizeof( *_ab ) * _frames );
+	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
 }
 #endif
 
 
 
 void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
-					const fpab_t _frames,
-					const f_cnt_t _frames_ahead,
+					const fpp_t _frames,
+					const f_cnt_t _offset,
 					const volumeVector & _volume_vector,
 						audioPort * _port )
 {
-	const fpab_t start_frame = _frames_ahead % m_framesPerAudioBuffer;
-	fpab_t end_frame = start_frame + _frames;
-	const fpab_t loop1_frame = tMin( end_frame, m_framesPerAudioBuffer );
+	const fpp_t start_frame = _offset % m_framesPerPeriod;
+	fpp_t end_frame = start_frame + _frames;
+	const fpp_t loop1_frame = tMin( end_frame, m_framesPerPeriod );
 
-	for( fpab_t frame = start_frame; frame < loop1_frame; ++frame )
+	for( fpp_t frame = start_frame; frame < loop1_frame; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
 		{
@@ -463,12 +464,12 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 		}
 	}
 
-	if( end_frame > m_framesPerAudioBuffer )
+	if( end_frame > m_framesPerPeriod )
 	{
-		fpab_t frames_done = m_framesPerAudioBuffer - start_frame;
-		end_frame = tMin( end_frame -= m_framesPerAudioBuffer,
-						m_framesPerAudioBuffer );
-		for( fpab_t frame = 0; frame < end_frame; ++frame )
+		fpp_t frames_done = m_framesPerPeriod - start_frame;
+		end_frame = tMin( end_frame -= m_framesPerPeriod,
+						m_framesPerPeriod );
+		for( fpp_t frame = 0; frame < end_frame; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels();
 									++chnl )
@@ -741,7 +742,7 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 		}
 	}
 	
-	for( fpab_t frame = 0; frame < m_framesPerAudioBuffer; ++frame )
+	for( fpp_t frame = 0; frame < m_framesPerPeriod; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
 		{
@@ -758,7 +759,7 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 
 
 
-void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
+void FASTCALL mixer::scaleClip( fpp_t _frame, ch_cnt_t _chnl )
 {
 	// Check for zero crossing
 	if( ( m_writeBuf[_frame][_chnl] >=0 &&
@@ -772,15 +773,15 @@ void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
 		{
 			if( m_newBuffer[_chnl] )
 			{
-				for( fpab_t i = m_halfStart[_chnl];
-					i < m_framesPerAudioBuffer;
+				for( fpp_t i = m_halfStart[_chnl];
+					i < m_framesPerPeriod;
 					i++ )
 				{
 					m_bufferPool[m_analBuffer][i][_chnl] /=
 							m_maxClip[_chnl];
 				}
 					
-				for( fpab_t i = 0;
+				for( fpp_t i = 0;
 					i < _frame;
 					i++ )
 				{
@@ -790,7 +791,7 @@ void FASTCALL mixer::scaleClip( fpab_t _frame, ch_cnt_t _chnl )
 			}
 			else
 			{
-				for( fpab_t i = m_halfStart[_chnl];
+				for( fpp_t i = m_halfStart[_chnl];
 					 i < _frame;
 					 i++ )
 				{
@@ -848,7 +849,7 @@ void mixer::fifoWriter::run( void )
 {
 	while( m_writing )
 	{
-		fpab_t frames = m_mixer->framesPerAudioBuffer();
+		fpp_t frames = m_mixer->framesPerPeriod();
 		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );

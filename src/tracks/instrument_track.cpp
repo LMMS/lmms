@@ -541,7 +541,7 @@ f_cnt_t instrumentTrack::beatLen( notePlayHandle * _n ) const
 
 
 void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
-							const fpab_t _frames,
+							const fpp_t _frames,
 							notePlayHandle * _n )
 {
 	// we must not play the sound if this instrumentTrack is muted...
@@ -560,14 +560,14 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		m_envWidget->processAudioBuffer( _buf, _frames, _n );
 		v_scale *= ( (float) _n->getVolume() / DEFAULT_VOLUME );
-		const fpab_t ENV_FRAMES = 10;
+/*		const fpp_t ENV_FRAMES = 10;
 		if( _n->totalFramesPlayed() == 0 )
 		{
 			// very basic envelope for not having clicks at the
 			// beginning
-			const fpab_t frames = tMin<fpab_t>( _frames,
+			const fpp_t frames = tMin<fpp_t>( _frames,
 								ENV_FRAMES );
-			for( fpab_t i = 0; i < frames; ++i )
+			for( fpp_t i = 0; i < frames; ++i )
 			{
 				for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS;
 									++ch )
@@ -581,7 +581,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		if( _n->willFinishThisPeriod() )
 		{
 			// then do a soft fade-out at the end to avoid clicks
-			for( fpab_t i = ( _frames >= ENV_FRAMES ) ?
+			for( fpp_t i = ( _frames >= ENV_FRAMES ) ?
 						_frames - ENV_FRAMES : 0;
 							i < _frames; ++i )
 			{
@@ -592,14 +592,13 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 								ENV_FRAMES;
 				}
 			}
-		}
+		}*/
 	}
-
 	volumeVector v = m_surroundArea->getVolumeVector( v_scale );
 
-	engine::getMixer()->bufferToPort( _buf, _frames,
-				( _n != NULL ) ? _n->framesAhead() : 0, v,
-								m_audioPort );
+	engine::getMixer()->bufferToPort( _buf,
+		( _n != NULL ) ? _n->framesLeftForCurrentPeriod() : _frames,
+			( _n != NULL ) ? _n->offset() : 0, v, m_audioPort );
 }
 
 
@@ -768,11 +767,33 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 					}
 				}
 				if( *youngest_note != _n &&
-					!( *youngest_note )->arpBaseNote() )
+					!( *youngest_note )->arpBaseNote() &&
+					!_n->released() )
 				{
 					processInEvent( midiEvent( NOTE_OFF, 0,
 						_n->key(), 0 ), midiTime() );
-					return;
+					if( ( *youngest_note )->offset() >
+								_n->offset() )
+					{
+						_n->noteOff( ( *youngest_note )->
+								offset() -
+								_n->offset() );
+					}
+					else
+					{
+						// for the case the youngest
+						// note has an offset smaller
+						// then the current note we
+						// already played everything
+						// in last period and have
+						// to clear it
+						_n->noteOff();
+	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
+				engine::getMixer()->framesPerPeriod() );
+	engine::getMixer()->clearAudioBuffer( m_audioPort->secondBuffer(),
+				engine::getMixer()->framesPerPeriod() );
+						return;
+					}
 				}
 			}
 		}
@@ -942,8 +963,8 @@ int instrumentTrack::masterKey( notePlayHandle * _n ) const
 
 
 bool FASTCALL instrumentTrack::play( const midiTime & _start,
-					const fpab_t _frames,
-					const f_cnt_t _frame_base,
+					const fpp_t _frames,
+					const f_cnt_t _offset,
 							Sint16 _tco_num )
 {
 	float frames_per_tact64th = engine::framesPerTact64th();
@@ -1007,19 +1028,9 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 
 			samplePlayHandle * handle = new samplePlayHandle( p );
 			handle->setBBTrack( bb_track );
-			handle->play( _frame_base );
-			// could we play all within current number of frames per
-			// audio-buffer?
-			if( handle->done() )
-			{
-				// throw it away...
-				delete handle;
-			}
-			else
-			{
-				// send it to the mixer
-				engine::getMixer()->addPlayHandle( handle );
-			}
+			handle->setOffset( _offset );
+			// send it to the mixer
+			engine::getMixer()->addPlayHandle( handle );
 			played_a_note = TRUE;
 			continue;
 		}
@@ -1068,42 +1079,28 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 							cur_note->getVolume() *
 								128 / 100 ),
 						midiTime::fromFrames(
-							_frame_base,
+							_offset,
 							frames_per_tact64th ) );
 
 				processOutEvent( midiEvent( NOTE_OFF,
 						m_midiPort->outputChannel(),
 							cur_note->key(), 0 ),
 						midiTime::fromFrames(
-							_frame_base +
+							_offset+
 								note_frames,
 							frames_per_tact64th ) );
 */
 
 				notePlayHandle * note_play_handle =
-					new notePlayHandle( this,
-								_frame_base,
+					new notePlayHandle( this, _offset,
 								note_frames,
 								*cur_note );
 				note_play_handle->setBBTrack( bb_track );
 #if SINGERBOT_SUPPORT
 				note_play_handle->setPatternIndex( note_idx );
 #endif
-				note_play_handle->play( FALSE );
-				// could we play all within current number of
-				// frames per audio-buffer?
-				if( note_play_handle->done() == FALSE )
-				{
-					// no, then insert it into
-					// play-handle-vector of mixer
-					engine::getMixer()->addPlayHandle(
+				engine::getMixer()->addPlayHandle(
 							note_play_handle );
-				}
-				else
-				{
-					// otherwise just throw it away...
-					delete note_play_handle;
-				}
 				played_a_note = TRUE;
 #if SINGERBOT_SUPPORT
 				++note_idx;

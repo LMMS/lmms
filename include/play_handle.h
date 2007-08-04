@@ -43,6 +43,7 @@
 
 #endif
 
+#include "types.h"
 
 class track;
 
@@ -58,8 +59,9 @@ public:
 		PresetPreviewHandle
 	} ;
 
-	playHandle( const types _type ) :
-		m_type( _type )
+	playHandle( const types _type, f_cnt_t _offset = 0 ) :
+		m_type( _type ),
+		m_offset( _offset )
 	{
 	}
 
@@ -75,6 +77,19 @@ public:
 	virtual void play( bool _try_parallelizing = FALSE ) = 0;
 	virtual bool done( void ) const = 0;
 
+	// returns how many frames this play-handle is aligned ahead, i.e.
+	// at which position it is inserted in the according buffer
+	inline f_cnt_t offset( void ) const
+	{
+		return ( m_offset );
+	}
+
+	inline void setOffset( f_cnt_t _offset )
+	{
+		m_offset = _offset;
+	}
+
+
 	virtual bool isFromTrack( const track * _track ) const = 0;
 
 	virtual bool supportsParallelizing( void ) const
@@ -89,6 +104,7 @@ public:
 
 private:
 	types m_type;
+	f_cnt_t m_offset;
 
 } ;
 
