@@ -642,9 +642,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			}
 
 		case NOTE_OFF:
-			if( m_notes[_me.key()] != NULL )
+		{
+			notePlayHandle * n = m_notes[_me.key()];
+			if( n != NULL )
 			{
-				notePlayHandle * n = m_notes[_me.key()];
 				// create dummy-note which has the same length
 				// as the played note for sending it later
 				// to all slots connected to signal noteDone()
@@ -656,18 +657,25 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						engine::framesPerTact64th() ) ),
 					0, n->tone(), n->octave(),
 					n->getVolume(), n->getPanning() );
+				// lock our play-handle while calling noteOff()
+				// for not modifying it's member variables
+				// asynchronously (while rendering!)
+				// which can result in segfaults
+				engine::getMixer()->lockPlayHandles();
 				n->noteOff();
+				engine::getMixer()->unlockPlayHandles();
 				m_notes[_me.key()] = NULL;
 				emit noteDone( done_note );
 			}
 			break;
+		}
 
 		case KEY_PRESSURE:
 			if( !m_instrument->handleMidiEvent( _me, _time ) &&
 						m_notes[_me.key()] != NULL )
 			{
 				m_notes[_me.key()]->setVolume( _me.velocity() *
-								100 / 128 );
+								100 / 127 );
 			}
 			break;
 
