@@ -1,5 +1,8 @@
 2007-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/widget/visualization_widget.cpp:
+	proper visualization even with period-sizes < 128
+
 	* plugins/audio_file_processor/audio_file_processor.cpp:
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/kicker/kicker.cpp:
@@ -14,10 +17,13 @@
 	patch below
 
 	* src/tracks/instrument_track.cpp:
-	acquire play-handle-lock of mixer while calling noteOff() in
-	instrumentTrack::processInEvent( ... ) - fixes asynchronously
-	modifications of variables in notePlayHandle which led to segfaults in
-	some cases
+	- acquire mixer-lock while calling noteOff() in
+	  instrumentTrack::processInEvent( ... ) - fixes asynchronously
+	  modifications of variables in notePlayHandle which led to segfaults in
+	  some cases
+	- when encountering old running notes on monophonic instruments only
+	  clear the part of the audio-port-buffer where the new note will be
+	  mixed in
 
 2007-08-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

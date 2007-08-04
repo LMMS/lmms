@@ -794,12 +794,12 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 						// then the current note we
 						// already played everything
 						// in last period and have
-						// to clear it
+						// to clear parts of it
 						_n->noteOff();
 	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
-				engine::getMixer()->framesPerPeriod() );
-	engine::getMixer()->clearAudioBuffer( m_audioPort->secondBuffer(),
-				engine::getMixer()->framesPerPeriod() );
+				engine::getMixer()->framesPerPeriod() -
+					( *youngest_note )->offset(),
+					( *youngest_note )->offset() );
 						return;
 					}
 				}
