@@ -739,6 +739,10 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     }
     
     const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
     sampleFrame *buf = new sampleFrame[frames];
 
         process(buf, frames); 

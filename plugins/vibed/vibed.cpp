@@ -576,6 +576,10 @@ void vibed::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
 	stringContainer * ps = static_cast<stringContainer *>(
 			 				_n->m_pluginData );
 	

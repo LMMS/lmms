@@ -442,6 +442,10 @@ void mallets::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	sample_t add_scale = 0.0f;

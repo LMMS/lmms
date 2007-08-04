@@ -702,6 +702,10 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
 	sampleFrame * buf = new sampleFrame[frames];
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );

@@ -144,6 +144,10 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
 	sampleFrame * buf = new sampleFrame[frames];
 
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );

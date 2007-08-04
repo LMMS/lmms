@@ -1,5 +1,18 @@
 2007-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/vibed/vibed.cpp:
+	added check for framesLeftForCurrentPeriod() being zero - fixes
+	segfault in some cases
+
 	* src/tracks/instrument_track.cpp:
 	- do not simply pass-through _frames-parameter, use
 	  notePlayHandle::framesLeftForCurrentPeriod() if possible

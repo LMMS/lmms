@@ -199,6 +199,10 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 		:
 		engine::getMixer()->framesPerAudioBuffer();*/
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	if( frames == 0 )
+	{
+		return;
+	}
 	const float f1 = m_startFreqKnob->value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqKnob->value() + (frames+tfp-1)*fdiff/decfr;
 
