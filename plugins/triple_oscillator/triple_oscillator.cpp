@@ -687,10 +687,6 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 								)->oscRight;
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	if( frames == 0 )
-	{
-		return;
-	}
 	sampleFrame * buf = new sampleFrame[frames];
 	
 	osc_l->update( buf, frames, 0 );

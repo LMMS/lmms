@@ -392,10 +392,6 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	if( frames == 0 )
-	{
-		return;
-	}
 	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )

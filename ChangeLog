@@ -1,5 +1,18 @@
 2007-08-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/vibed/vibed.cpp:
+	removed check for framesLeftForCurrentPeriod() being zero - fixed by
+	patch below
+
 	* src/tracks/instrument_track.cpp:
 	acquire play-handle-lock of mixer while calling noteOff() in
 	instrumentTrack::processInEvent( ... ) - fixes asynchronously

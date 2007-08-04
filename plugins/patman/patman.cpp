@@ -214,10 +214,6 @@ QString patmanSynth::nodeName( void ) const
 void patmanSynth::playNote( notePlayHandle * _n, bool )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	if( frames == 0 )
-	{
-		return;
-	}
 	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
