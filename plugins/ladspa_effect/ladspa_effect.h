@@ -50,7 +50,7 @@ public:
 	virtual ~ladspaEffect();
 
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-							const fpab_t _frames );
+							const fpp_t _frames );
 	
 	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );
 
@@ -89,7 +89,7 @@ private:
 	ladspa2LMMS * m_ladspa;
 	Uint16 m_effectChannels;
 	Uint16 m_portCount;
-	fpab_t m_bufferSize;
+	fpp_t m_bufferSize;
 			
 	const LADSPA_Descriptor * m_descriptor;
 	vvector<LADSPA_Handle> m_handles;

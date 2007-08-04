@@ -302,7 +302,7 @@ void vestigeInstrument::waitForWorkerThread( void )
 		return;
 	}
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	if( m_plugin->waitForProcessingFinished( buf ) )
@@ -358,7 +358,7 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool )
 			m_noteStates[k] = ON;
 		}
 		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0, k,
-					_n->getVolume() ), _n->framesAhead() );
+					_n->getVolume() ), _n->offset() );
 		// notify when the handle stops, call to deleteNotePluginData
 		_n->m_pluginData = _n;
 	}

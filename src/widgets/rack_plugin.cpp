@@ -279,7 +279,7 @@ void rackPlugin::setAutoQuit( float _value )
 {
 	float samples = engine::getMixer()->sampleRate() * _value / 1000.0f;
 	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / 
-			engine::getMixer()->framesPerAudioBuffer() );
+			engine::getMixer()->framesPerPeriod() );
 	m_effect->setTimeout( buffers );
 }
 

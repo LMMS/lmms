@@ -112,23 +112,15 @@ samplePlayHandle::~samplePlayHandle()
 
 
 
-void samplePlayHandle::play( bool _try_parallelizing )
+void samplePlayHandle::play( bool /* _try_parallelizing */ )
 {
-	play( 0, _try_parallelizing );
-}
-
-
-
-
-void samplePlayHandle::play( const fpab_t _frame_base, bool )
-{
+	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
 		return;
 	}
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer()
-								- _frame_base;
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	if( !( m_track && m_track->muted() )
 				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
@@ -139,7 +131,7 @@ void samplePlayHandle::play( const fpab_t _frame_base, bool )
 #endif
 				} } ;
 		m_sampleBuffer->play( buf, &m_state, frames );
-		engine::getMixer()->bufferToPort( buf, frames, _frame_base, v,
+		engine::getMixer()->bufferToPort( buf, frames, offset(), v,
 								m_audioPort );
 
 		delete[] buf;

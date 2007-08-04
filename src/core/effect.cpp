@@ -67,7 +67,7 @@ effect::~effect()
 
 
 bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	return( FALSE );
 }
@@ -78,7 +78,7 @@ bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf,
 void FASTCALL effect::setGate( float _level )
 {
 	m_gate = _level * _level * m_processors * 
-				engine::getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerPeriod();
 }
 
 

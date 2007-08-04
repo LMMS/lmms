@@ -48,12 +48,12 @@ public:
 	{
 	}
 
-	void update( sampleFrame * _ab, const fpab_t _frames, 
+	void update( sampleFrame * _ab, const fpp_t _frames, 
 					const float _freq1, const float _freq2,
 						const float _sample_rate )
 	{
 		const float df = _freq2 - _freq1;
-		for( fpab_t frame = 0; frame < _frames; ++frame )
+		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			sample_t s = oscillator::sinSample( m_phase );
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )

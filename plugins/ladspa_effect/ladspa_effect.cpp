@@ -116,7 +116,7 @@ ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
 		// during cleanup.  It was easier to troubleshoot with the
 		// memory management all taking place in one file.
 				p->buffer = 
-		new LADSPA_Data[engine::getMixer()->framesPerAudioBuffer()];
+		new LADSPA_Data[engine::getMixer()->framesPerPeriod()];
 				
 				if( p->name.toUpper().contains( "IN" ) && 
 					m_ladspa->isPortInput( m_key, port ) )
@@ -334,7 +334,7 @@ ladspaEffect::~ladspaEffect()
 
 
 bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	if( !isOkay() || dontRun() || !isRunning() || isBypassed() )
 	{
@@ -353,7 +353,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 			switch( m_ports[proc][port]->rate )
 			{
 				case CHANNEL_IN:
-					for( fpab_t frame = 0; 
+					for( fpp_t frame = 0; 
 						frame < _frames; frame++ )
 					{
 						m_ports[proc][port]->buffer[frame] = 
@@ -369,7 +369,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 					// This only supports control rate ports, so the audio rates are
 					// treated as though they were control rate by setting the
 					// port buffer to all the same value.
-					for( fpab_t frame = 0; 
+					for( fpp_t frame = 0; 
 						frame < _frames; frame++ )
 					{
 						m_ports[proc][port]->buffer[frame] = 
@@ -419,7 +419,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 				case CONTROL_RATE_INPUT:
 					break;
 				case CHANNEL_OUT:
-					for( fpab_t frame = 0; 
+					for( fpp_t frame = 0; 
 						frame < _frames; frame++ )
 					{
 						_buf[frame][channel] = 

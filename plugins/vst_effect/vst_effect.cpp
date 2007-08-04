@@ -88,7 +88,7 @@ vstEffect::~vstEffect()
 
 
 bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	if( isBypassed() || !isRunning () )
 	{
@@ -98,7 +98,7 @@ bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	if( m_plugin )
 	{
 		sampleFrame * buf = new sampleFrame[_frames];
-		for( fpab_t f = 0; f < _frames; ++f )
+		for( fpp_t f = 0; f < _frames; ++f )
 		{
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
@@ -109,7 +109,7 @@ bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf,
 		m_plugin->process( buf, buf, TRUE );
 		m_pluginMutex.unlock();
 		double out_sum = 0.0;
-		for( fpab_t f = 0; f < _frames; ++f )
+		for( fpp_t f = 0; f < _frames; ++f )
 		{
 			for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
 			{

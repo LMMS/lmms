@@ -53,7 +53,7 @@ public:
 	virtual ~vstEffect();
 
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-							const fpab_t _frames );
+							const fpp_t _frames );
 
 	virtual inline QString publicName( void ) const
 	{

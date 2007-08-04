@@ -117,7 +117,7 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 
 
 bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	if( m_bypassed )
 	{

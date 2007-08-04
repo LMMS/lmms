@@ -77,7 +77,7 @@ public:
 		m_userWave = _wave;
 	}
 
-	void update( sampleFrame * _ab, const fpab_t _frames,
+	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
 /*#define	FLOAT_TO_INT(in,out)		\
@@ -166,40 +166,40 @@ private:
 	const sampleBuffer * m_userWave;
 
 
-	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updatePM( sampleFrame * _ab, const fpab_t _frames,
+	void updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateAM( sampleFrame * _ab, const fpab_t _frames,
+	void updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateMix( sampleFrame * _ab, const fpab_t _frames,
+	void updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateSync( sampleFrame * _ab, const fpab_t _frames,
+	void updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateFM( sampleFrame * _ab, const fpab_t _frames,
+	void updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	float syncInit( sampleFrame * _ab, const fpab_t _frames,
+	float syncInit( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
 	template<waveShapes W>
-	void updateNoSub( sampleFrame * _ab, const fpab_t _frames,
+	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<waveShapes W>
-	void updatePM( sampleFrame * _ab, const fpab_t _frames,
+	void updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<waveShapes W>
-	void updateAM( sampleFrame * _ab, const fpab_t _frames,
+	void updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<waveShapes W>
-	void updateMix( sampleFrame * _ab, const fpab_t _frames,
+	void updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<waveShapes W>
-	void updateSync( sampleFrame * _ab, const fpab_t _frames,
+	void updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	template<waveShapes W>
-	void updateFM( sampleFrame * _ab, const fpab_t _frames,
+	void updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
 	template<waveShapes W>

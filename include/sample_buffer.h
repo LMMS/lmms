@@ -98,7 +98,7 @@ public:
 	virtual ~sampleBuffer();
 
 	bool FASTCALL play( sampleFrame * _ab, handleState * _state,
-				const fpab_t _frames,
+				const fpp_t _frames,
 				const float _freq = BASE_FREQ,
 				const bool _looped = FALSE );
 

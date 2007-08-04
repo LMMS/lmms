@@ -686,7 +686,7 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 	oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData
 								)->oscRight;
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 	
 	osc_l->update( buf, frames, 0 );

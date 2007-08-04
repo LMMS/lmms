@@ -59,7 +59,7 @@ class midiClient;
 class audioPort;
 
 
-const fpab_t DEFAULT_BUFFER_SIZE = 512;
+const fpp_t DEFAULT_BUFFER_SIZE = 512;
 
 const ch_cnt_t DEFAULT_CHANNELS = 2;
 
@@ -196,9 +196,9 @@ public:
 
 
 	// methods providing information for other classes
-	inline fpab_t framesPerAudioBuffer( void ) const
+	inline fpp_t framesPerPeriod( void ) const
 	{
-		return( m_framesPerAudioBuffer );
+		return( m_framesPerPeriod );
 	}
 
 	inline const surroundSampleFrame * currentAudioBuffer( void ) const
@@ -282,16 +282,18 @@ public:
 
 	// audio-buffer-mgm
 	void FASTCALL bufferToPort( const sampleFrame * _buf,
-					const fpab_t _frames,
-					const f_cnt_t _framesAhead,
+					const fpp_t _frames,
+					const f_cnt_t _offset,
 					const volumeVector & _volumeVector,
 							audioPort * _port );
 
 	void FASTCALL clearAudioBuffer( sampleFrame * _ab,
-							const f_cnt_t _frames );
+						const f_cnt_t _frames,
+						const f_cnt_t _offset = 0 );
 #ifndef DISABLE_SURROUND
 	void FASTCALL clearAudioBuffer( surroundSampleFrame * _ab,
-							const f_cnt_t _frames );
+						const f_cnt_t _frames,
+						const f_cnt_t _offset = 0 );
 #endif
 
 	bool criticalXRuns( void ) const;
@@ -346,13 +348,13 @@ private:
 	void processBuffer( const surroundSampleFrame * _buf,
 						const fx_ch_t _fx_chnl );
 
-	void FASTCALL scaleClip( fpab_t _frame, ch_cnt_t _chnl );
+	void FASTCALL scaleClip( fpp_t _frame, ch_cnt_t _chnl );
 
 	const surroundSampleFrame * renderNextBuffer( void );
 
 	vvector<audioPort *> m_audioPorts;
 
-	fpab_t m_framesPerAudioBuffer;
+	fpp_t m_framesPerPeriod;
 
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;
@@ -366,7 +368,7 @@ private:
 	bool m_scaleClip;
 	surroundSampleFrame m_maxClip;
 	surroundSampleFrame m_previousSample;
-	fpab_t m_halfStart[SURROUND_CHANNELS];
+	fpp_t m_halfStart[SURROUND_CHANNELS];
 	bool m_clipped[SURROUND_CHANNELS];
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];

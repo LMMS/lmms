@@ -144,29 +144,29 @@ protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
 	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain )
 	{
 	}
 
 	// called by according driver for fetching new sound-data
-	fpab_t FASTCALL getNextBuffer( surroundSampleFrame * _ab );
+	fpp_t FASTCALL getNextBuffer( surroundSampleFrame * _ab );
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	Uint32 FASTCALL convertToS16( const surroundSampleFrame * _ab,
-					const fpab_t _frames,
+					const fpp_t _frames,
 					const float _master_gain,
 					int_sample_t * _output_buffer,
 					const bool _convert_endian = FALSE );
 
 	// clear given signed-int-16-buffer
 	void FASTCALL clearS16Buffer( int_sample_t * _outbuf,
-							const fpab_t _frames );
+							const fpp_t _frames );
 
 	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
 	void FASTCALL resample( const surroundSampleFrame * _src,
-					const fpab_t _frames,
+					const fpp_t _frames,
 					surroundSampleFrame * _dst,
 					const sample_rate_t _src_sr,
 					const sample_rate_t _dst_sr );

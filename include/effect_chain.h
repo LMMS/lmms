@@ -42,7 +42,7 @@ public:
 	void FASTCALL moveDown( effect * _effect );
 	void FASTCALL moveUp( effect * _effect );
 	bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpab_t _frames );
+							const fpp_t _frames );
 	void startRunning( void );
 	bool isRunning( void );
 	

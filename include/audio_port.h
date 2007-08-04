@@ -109,7 +109,7 @@ private:
 	QString m_name;
 	
 	effectChain * m_effects;
-	fpab_t m_frames;
+	fpp_t m_frames;
 
 } ;
 

@@ -67,7 +67,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_client( NULL ),
 	m_active( FALSE ),
 	m_stop_semaphore( 1 ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] ),
+	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -232,7 +232,7 @@ void audioJACK::startProcessing( void )
 
 
 	// try to sync JACK's and LMMS's buffer-size
-	jack_set_buffer_size( m_client, getMixer()->framesPerAudioBuffer() );
+	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
 
 
 
@@ -369,7 +369,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 /*	const Uint32 frames = tMin<Uint32>( _nframes,
-					getMixer()->framesPerAudioBuffer() );
+					getMixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = _this->m_portMap.begin();
 					it != _this->m_portMap.end(); ++it )
 	{

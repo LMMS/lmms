@@ -94,7 +94,7 @@ mallets::mallets( instrumentTrack * _channel_track ) :
 	m_spread->move( 178, 173 );
 	m_spread->setHintText( tr( "Spread:" ) + " ", "" );
 
-	m_buffer = new sampleFrame[engine::getMixer()->framesPerAudioBuffer()];
+	m_buffer = new sampleFrame[engine::getMixer()->framesPerPeriod()];
 }
 
 
@@ -441,7 +441,7 @@ void mallets::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
-	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
 	sample_t add_scale = 0.0f;
@@ -450,7 +450,7 @@ void mallets::playNote( notePlayHandle * _n, bool )
 		add_scale = 
 		static_cast<sample_t>( m_strike->value() ) * freq * 2.5f;
 	}
-	for( Uint32 frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
 		const sample_t left = ps->nextSampleLeft() * 
 				( m_scalers[m_presets->value()] + add_scale );

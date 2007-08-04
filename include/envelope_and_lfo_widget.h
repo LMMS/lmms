@@ -87,7 +87,7 @@ public:
 
 	void FASTCALL fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
-				const fpab_t _frames );
+				const fpp_t _frames );
 
 	inline bool used( void ) const
 	{
@@ -115,7 +115,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 
 	void FASTCALL fillLFOLevel( float * _buf, f_cnt_t _frame,
-							const fpab_t _frames );
+							const fpp_t _frames );
 
 
 protected slots:
@@ -182,7 +182,7 @@ private:
 		USER
 	} m_lfoShape;
 
-	sample_t lfoShapeSample( fpab_t _frame_offset );
+	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLFOShapeData( void );
 
 

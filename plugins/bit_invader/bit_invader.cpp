@@ -701,11 +701,11 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 					engine::getMixer()->sampleRate() );
 	}
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
-	for( fpab_t frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

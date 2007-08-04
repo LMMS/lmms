@@ -161,7 +161,7 @@ public:
 	}
 
 	// set given block-size for plugin
-	void setBlockSize( const fpab_t _bsize );
+	void setBlockSize( const fpp_t _bsize );
 
 	// set given tempo
 	void setBPM( const bpm_t _bpm )
@@ -244,7 +244,7 @@ private:
 	DWORD m_guiThreadID;
 
 
-	fpab_t m_blockSize;
+	fpp_t m_blockSize;
 	float * m_shm;
 
 	float * * m_inputs;
@@ -532,7 +532,7 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 
 
 
-void VSTPlugin::setBlockSize( const fpab_t _bsize )
+void VSTPlugin::setBlockSize( const fpp_t _bsize )
 {
 	if( _bsize == m_blockSize )
 	{
@@ -1219,7 +1219,7 @@ int main( void )
 
 
 			case VST_BUFFER_SIZE:
-				plugin->setBlockSize( readValue<fpab_t>() );
+				plugin->setBlockSize( readValue<fpp_t>() );
 				break;
 
 			case VST_BPM:

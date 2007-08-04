@@ -40,7 +40,7 @@ class bbEditor : public trackContainer
 {
 	Q_OBJECT
 public:
-	virtual bool FASTCALL play( midiTime _start, const fpab_t _frames,
+	virtual bool FASTCALL play( midiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 

@@ -551,7 +551,7 @@ void polyb302Synth::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
-	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	hstate->process( buf, frames, _n->frequency() ); 

@@ -990,10 +990,10 @@ void songEditor::processNextBuffer( void )
 	float frames_per_tact64th = engine::framesPerTact64th();
 
 	while( total_frames_played
-				< engine::getMixer()->framesPerAudioBuffer() )
+				< engine::getMixer()->framesPerPeriod() )
 	{
 		f_cnt_t played_frames = engine::getMixer()
-				->framesPerAudioBuffer() - total_frames_played;
+				->framesPerPeriod() - total_frames_played;
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
 		// did we play a 64th of a tact?

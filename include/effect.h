@@ -58,7 +58,7 @@ public:
 	virtual ~effect();
 	
 	virtual bool FASTCALL processAudioBuffer( 
-			surroundSampleFrame * _buf, const fpab_t _frames );
+			surroundSampleFrame * _buf, const fpp_t _frames );
 	
 	inline ch_cnt_t getProcessorCount( void )
 	{

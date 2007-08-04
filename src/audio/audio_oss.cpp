@@ -127,7 +127,7 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
 
 	int frag_spec;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		getMixer()->framesPerAudioBuffer() * channels() *
+		getMixer()->framesPerPeriod() * channels() *
 							BYTES_PER_INT_SAMPLE;
 		++frag_spec )
 	{
@@ -316,14 +316,14 @@ void audioOSS::stopProcessing( void )
 void audioOSS::run( void )
 {
 	surroundSampleFrame * temp =
-		new surroundSampleFrame[getMixer()->framesPerAudioBuffer()];
+		new surroundSampleFrame[getMixer()->framesPerPeriod()];
 	int_sample_t * outbuf =
-			new int_sample_t[getMixer()->framesPerAudioBuffer() *
+			new int_sample_t[getMixer()->framesPerPeriod() *
 								channels()];
 
 	while( TRUE )
 	{
-		const fpab_t frames = getNextBuffer( temp );
+		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
 			break;

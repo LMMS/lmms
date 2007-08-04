@@ -289,7 +289,7 @@ void remoteVSTPlugin::hideEditor( void )
 bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf, bool _wait )
 {
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	if( m_shm == NULL )
 	{
@@ -317,7 +317,7 @@ bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
 	{
 		for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 		{
-			for( fpab_t frame = 0; frame < frames; ++frame )
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
 				m_shm[ch * frames + frame] = _in_buf[frame][ch];
 			}
@@ -353,7 +353,7 @@ bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 		usleep( 10 );
 	}
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
 	if( outputs != DEFAULT_CHANNELS )
@@ -364,7 +364,7 @@ bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 
 	for( ch_cnt_t ch = 0; ch < outputs; ++ch )
 	{
-		for( fpab_t frame = 0; frame < frames; ++frame )
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			_out_buf[frame][ch] = m_shm[(m_inputCount+ch)*
 								frames+frame];
@@ -571,8 +571,8 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 		case VST_GET_BUFFER_SIZE:
 			writeValueS<Sint16>( VST_BUFFER_SIZE );
 			// handle is the same
-			writeValueS<fpab_t>(
-				engine::getMixer()->framesPerAudioBuffer() );
+			writeValueS<fpp_t>(
+				engine::getMixer()->framesPerPeriod() );
 			break;
 
 		case VST_SHM_KEY_AND_SIZE:

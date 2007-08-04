@@ -144,7 +144,7 @@ private:
 
 	void createWave( notePlayHandle * _n );
 	void play( sampleFrame * _ab, handle_data * _hdata,
-							const fpab_t _frames );
+							const fpp_t _frames );
 	void updateWords( void );
 
 } ;

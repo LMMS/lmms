@@ -109,7 +109,7 @@ private:
 			delete[] b;
 
 			const Sint32 microseconds = static_cast<Sint32>(
-					getMixer()->framesPerAudioBuffer() *
+					getMixer()->framesPerPeriod() *
 					1000000.0f / getMixer()->sampleRate() -
 							timer.elapsed() );
 			if( microseconds > 0 )

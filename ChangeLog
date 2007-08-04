@@ -1,3 +1,13 @@
+2007-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mixer.h:
+	* most other files:
+	renamed "framesPerAudioBuffer()" to "framesPerPeriod()"
+
+	* include/types.h:
+	* most other files:
+	renamed type "fpab_t" to "fpp_t"
+
 2007-07-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/singerbot/singerbot.h:

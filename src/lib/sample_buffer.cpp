@@ -594,7 +594,7 @@ void sampleBuffer::initResampling( void )
 
 
 bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
-					const fpab_t _frames,
+					const fpp_t _frames,
 					const float _freq,
 					const bool _looped )
 {

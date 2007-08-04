@@ -69,7 +69,7 @@ bassBoosterEffect::~bassBoosterEffect()
 
 
 bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	if( isBypassed() || !isRunning () )
 	{
@@ -77,7 +77,7 @@ bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	}
 
 	double out_sum = 0.0;
-	for( fpab_t f = 0; f < _frames; ++f )
+	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
 		m_bbFX.nextSample( s[0], s[1] );

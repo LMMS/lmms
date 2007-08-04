@@ -145,7 +145,7 @@ singerBot::~singerBot()
 
 void singerBot::playNote( notePlayHandle * _n, bool )
 {
-	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
 	if( !_n->m_pluginData )
 	{
@@ -293,7 +293,7 @@ void singerBot::createWave( notePlayHandle * _n )
 
 
 void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	const f_cnt_t offset = _hdata->wave->num_samples()
 						- _hdata->remaining_frames;

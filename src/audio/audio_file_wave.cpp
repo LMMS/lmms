@@ -92,7 +92,7 @@ bool audioFileWave::startEncoding( void )
 
 
 void FASTCALL audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain )
 {
 	int_sample_t * outbuf = new int_sample_t[_frames * channels()];

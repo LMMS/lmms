@@ -213,7 +213,7 @@ QString patmanSynth::nodeName( void ) const
 
 void patmanSynth::playNote( notePlayHandle * _n, bool )
 {
-	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )

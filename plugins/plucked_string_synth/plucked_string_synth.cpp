@@ -143,11 +143,11 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 					engine::getMixer()->sampleRate() );
 	}
 
-	const Uint32 frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	pluckSynth * ps = static_cast<pluckSynth *>( _n->m_pluginData );
-	for( Uint32 frame = 0; frame < frames; ++frame )
+	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

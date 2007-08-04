@@ -179,7 +179,7 @@ bool audioFileOgg::startEncoding( void )
 
 
 void FASTCALL audioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain )
 {
 	int eos = 0;
@@ -187,7 +187,7 @@ void FASTCALL audioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	float * * buffer = vorbis_analysis_buffer( &m_vd, _frames *
 							BYTES_PER_SAMPLE *
 								channels() );
-	for( fpab_t frame = 0; frame < _frames; ++frame )
+	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{

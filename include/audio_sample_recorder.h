@@ -64,10 +64,10 @@ public:
 
 private:
 	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain );
 
-	typedef vlist<QPair<sampleFrame *, fpab_t> > bufferList;
+	typedef vlist<QPair<sampleFrame *, fpp_t> > bufferList;
 	bufferList m_buffers;
 
 } ;

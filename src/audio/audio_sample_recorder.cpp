@@ -102,10 +102,10 @@ void audioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 
 
 void audioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
-					const fpab_t _frames, const float )
+					const fpp_t _frames, const float )
 {
 	sampleFrame * buf = new sampleFrame[_frames];
-	for( fpab_t frame = 0; frame < _frames; ++frame )
+	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{

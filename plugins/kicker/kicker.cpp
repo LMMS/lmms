@@ -192,12 +192,13 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 
 	//const float freq = getInstrumentTrack()->frequency( _n ) / 2;
 	const float fdiff = m_endFreqKnob->value() - m_startFreqKnob->value();
-	const fpab_t frames = _n->released() ?
+/*	const fpp_t frames = _n->released() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
 			engine::getMixer()->framesPerAudioBuffer() ), 0 )
 		:
-		engine::getMixer()->framesPerAudioBuffer();
+		engine::getMixer()->framesPerAudioBuffer();*/
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const float f1 = m_startFreqKnob->value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqKnob->value() + (frames+tfp-1)*fdiff/decfr;
 
@@ -209,7 +210,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 
 	if( _n->released() )
 	{
-		for( fpab_t f = 0; f < frames; ++f )
+		for( fpp_t f = 0; f < frames; ++f )
 		{
 			const float fac = 1.0f -
 				(float)( _n->releaseFramesDone()+f ) /

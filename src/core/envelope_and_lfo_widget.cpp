@@ -481,7 +481,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 						SLOT( updateSampleVars() ) );
 
 	m_lfoShapeData =
-		new sample_t[engine::getMixer()->framesPerAudioBuffer()];
+		new sample_t[engine::getMixer()->framesPerPeriod()];
 	updateSampleVars();
 }
 
@@ -504,7 +504,7 @@ envelopeAndLFOWidget::~envelopeAndLFOWidget()
 
 
 
-inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpab_t _frame_offset )
+inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpp_t _frame_offset )
 {
 	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(
@@ -537,8 +537,8 @@ inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpab_t _frame_offset )
 
 void envelopeAndLFOWidget::updateLFOShapeData( void )
 {
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
-	for( fpab_t offset = 0; offset < frames; ++offset )
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	for( fpp_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
@@ -555,7 +555,7 @@ void envelopeAndLFOWidget::triggerLFO( void )
 							it != v.end(); ++it )
 	{
 		( *it )->m_lfoFrame +=
-				engine::getMixer()->framesPerAudioBuffer();
+				engine::getMixer()->framesPerPeriod();
 		( *it )->m_bad_lfoShapeData = TRUE;
 	}
 }
@@ -579,11 +579,11 @@ void envelopeAndLFOWidget::resetLFO( void )
 
 inline void FASTCALL envelopeAndLFOWidget::fillLFOLevel( float * _buf,
 							f_cnt_t _frame,
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
-		for( fpab_t offset = 0; offset < _frames; ++offset )
+		for( fpp_t offset = 0; offset < _frames; ++offset )
 		{
 			*_buf++ = 0.0f;
 		}
@@ -596,7 +596,7 @@ inline void FASTCALL envelopeAndLFOWidget::fillLFOLevel( float * _buf,
 		updateLFOShapeData();
 	}
 
-	fpab_t offset = 0;
+	fpp_t offset = 0;
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -613,11 +613,11 @@ inline void FASTCALL envelopeAndLFOWidget::fillLFOLevel( float * _buf,
 
 void FASTCALL envelopeAndLFOWidget::fillLevel( float * _buf, f_cnt_t _frame,
 					const f_cnt_t _release_begin,
-					const fpab_t _frames )
+					const fpp_t _frames )
 {
 	fillLFOLevel( _buf, _frame, _frames );
 
-	for( fpab_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
+	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
 		if( _frame < _release_begin )

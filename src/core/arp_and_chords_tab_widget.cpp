@@ -468,7 +468,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 				// create sub-note-play-handle, only note is
 				// different
 				new notePlayHandle( _n->getInstrumentTrack(),
-							_n->framesAhead(),
+							_n->offset(),
 							_n->frames(), note_copy,
 							_n );
 			}
@@ -524,13 +524,13 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = 0;
 
-	while( frames_processed < engine::getMixer()->framesPerAudioBuffer() )
+	while( frames_processed < engine::getMixer()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames -
 						( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
 		if( remaining_frames_for_cur_arp >
-				engine::getMixer()->framesPerAudioBuffer() )
+				engine::getMixer()->framesPerPeriod() )
 		{
 			// then we don't have to do something!
 			break;
@@ -622,8 +622,8 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 		// and is_arp_note=TRUE
 		new notePlayHandle( _n->getInstrumentTrack(),
 				( ( m_arpModeComboBox->value() != FREE ) ?
-						cnphv.first()->framesAhead() :
-						_n->framesAhead() ) +
+						cnphv.first()->offset() :
+						_n->offset() ) +
 							frames_processed,
 						gated_frames,
 						new_note,

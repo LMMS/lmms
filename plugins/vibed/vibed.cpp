@@ -575,13 +575,13 @@ void vibed::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	stringContainer * ps = static_cast<stringContainer *>(
 			 				_n->m_pluginData );
 	
 	sampleFrame * buf = new sampleFrame[frames];
 
-	for( fpab_t i = 0; i < frames; ++i )
+	for( fpp_t i = 0; i < frames; ++i )
 	{
 		buf[i][0] = 0.0f;
 		buf[i][1] = 0.0f;

@@ -64,7 +64,7 @@ public:
 	virtual ~envelopeTabWidget();
 
 	void FASTCALL processAudioBuffer( sampleFrame * _ab,
-							const fpab_t _frames,
+							const fpp_t _frames,
 							notePlayHandle * _n );
 
 	enum targets

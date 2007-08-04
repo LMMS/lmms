@@ -54,14 +54,14 @@
 audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 							mixer * _mixer ) :
 	audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] ),
+	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
 	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE ),
 	m_stop_semaphore( 1 )
 {
 	_success_ful = FALSE;
 
-	m_convertedBuf_size = getMixer()->framesPerAudioBuffer() * channels()
+	m_convertedBuf_size = getMixer()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
 	m_convertedBuf = new Uint8[m_convertedBuf_size];
 
@@ -90,7 +90,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 						// of system, so we don't have
 						// to convert the buffers
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = getMixer()->framesPerAudioBuffer();
+	m_audioHandle.samples = getMixer()->framesPerPeriod();
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -190,7 +190,7 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 		if( m_convertedBuf_pos == 0 )
 		{
 			// frames depend on the sample rate
-			const fpab_t frames = getNextBuffer( m_outBuf );
+			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
 				m_stopped = TRUE;

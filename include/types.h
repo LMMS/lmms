@@ -47,7 +47,7 @@ typedef Sint16 int_sample_t;		// 16-bit-int-sample
 
 
 typedef Uint32 sample_rate_t;		// sample-rate
-typedef Sint16 fpab_t;			// frames per audio-buffer (0-16384)
+typedef Sint16 fpp_t;			// frames per period (0-16384)
 typedef Sint32 f_cnt_t;			// standard frame-count
 typedef Uint8 ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
 typedef Uint16 bpm_t;			// tempo (MIN_BPM to MAX_BPM)

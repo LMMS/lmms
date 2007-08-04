@@ -41,7 +41,7 @@ public:
 	bassBoosterEffect( const descriptor::subPluginFeatures::key * _key );
 	virtual ~bassBoosterEffect();
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-							const fpab_t _frames );
+							const fpp_t _frames );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "bassboostereffect" );

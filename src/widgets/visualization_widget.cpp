@@ -66,7 +66,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	setFixedSize( s_background.width(), s_background.height() );
 
 
-	const fpab_t frames = engine::getMixer()->framesPerAudioBuffer();
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	m_buffer = new surroundSampleFrame[frames];
 
 	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
@@ -139,11 +139,11 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 		float max_level = 0.0;
 
-		const fpab_t frames =
-				engine::getMixer()->framesPerAudioBuffer();
+		const fpp_t frames =
+				engine::getMixer()->framesPerPeriod();
 
 		// analyse wave-stream for max-level
-		for( fpab_t frame = 0; frame < frames; ++frame )
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
 									++chnl )
@@ -171,7 +171,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		}
 
 		// now draw all that stuff
-		for( fpab_t frame = 0; frame < frames; ++frame )
+		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 			{

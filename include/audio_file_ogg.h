@@ -72,7 +72,7 @@ public:
 
 private:
 	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain );
 
 	bool startEncoding( void );

@@ -213,13 +213,13 @@ void audioALSA::stopProcessing( void )
 void audioALSA::run( void )
 {
 	surroundSampleFrame * temp =
-		new surroundSampleFrame[getMixer()->framesPerAudioBuffer()];
+		new surroundSampleFrame[getMixer()->framesPerPeriod()];
 	int_sample_t * outbuf =
-			new int_sample_t[getMixer()->framesPerAudioBuffer() *
+			new int_sample_t[getMixer()->framesPerPeriod() *
 								channels()];
 	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
 
-	int outbuf_size = getMixer()->framesPerAudioBuffer() * channels();
+	int outbuf_size = getMixer()->framesPerPeriod() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
@@ -233,7 +233,7 @@ void audioALSA::run( void )
 			if( outbuf_pos == 0 )
 			{
 				// frames depend on the sample rate
-				const fpab_t frames = getNextBuffer( temp );
+				const fpp_t frames = getNextBuffer( temp );
 				if( !frames )
 				{
 					quit = TRUE;
@@ -371,7 +371,7 @@ int audioALSA::setHWParams( const sample_rate_t _sample_rate,
 		}
 	}
 
-	m_periodSize = getMixer()->framesPerAudioBuffer();
+	m_periodSize = getMixer()->framesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
 	dir = 0;
 	err = snd_pcm_hw_params_set_period_size_near( m_handle, m_hwParams,

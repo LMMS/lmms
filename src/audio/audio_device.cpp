@@ -42,7 +42,7 @@ audioDevice::audioDevice( const sample_rate_t _sample_rate,
 	m_sampleRate( _sample_rate ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
-	m_buffer( new surroundSampleFrame[getMixer()->framesPerAudioBuffer()] )
+	m_buffer( new surroundSampleFrame[getMixer()->framesPerPeriod()] )
 {
 	int error;
 	if( ( m_srcState = src_new(
@@ -81,7 +81,7 @@ audioDevice::~audioDevice()
 
 void audioDevice::processNextBuffer( void )
 {
-	const fpab_t frames = getNextBuffer( m_buffer );
+	const fpp_t frames = getNextBuffer( m_buffer );
 	if( frames )
 	{
 		writeBuffer( m_buffer, frames, getMixer()->masterGain() );
@@ -95,9 +95,9 @@ void audioDevice::processNextBuffer( void )
 
 
 
-fpab_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
+fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 {
-	fpab_t frames = getMixer()->framesPerAudioBuffer();
+	fpp_t frames = getMixer()->framesPerPeriod();
 	const surroundSampleFrame * b = getMixer()->nextBuffer();
 	if( !b )
 	{
@@ -163,7 +163,7 @@ void audioDevice::renamePort( audioPort * )
 
 
 void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						surroundSampleFrame * _dst,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
@@ -190,7 +190,7 @@ void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
 
 
 Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
-						const fpab_t _frames,
+						const fpp_t _frames,
 						const float _master_gain,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian )
@@ -198,7 +198,7 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 	if( _convert_endian )
 	{
 		Uint16 temp;
-		for( fpab_t frame = 0; frame < _frames; ++frame )
+		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
@@ -215,7 +215,7 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 	}
 	else
 	{
-		for( fpab_t frame = 0; frame < _frames; ++frame )
+		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
@@ -235,7 +235,7 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 
 
 void FASTCALL audioDevice::clearS16Buffer( int_sample_t * _outbuf,
-							const fpab_t _frames )
+							const fpp_t _frames )
 {
 #ifdef LMMS_DEBUG
 	assert( _outbuf != NULL );

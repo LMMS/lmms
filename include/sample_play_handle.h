@@ -49,7 +49,6 @@ public:
 	virtual ~samplePlayHandle();
 
 	virtual void play( bool _try_parallelizing );
-	void play( const fpab_t _frame_base, bool _try_parallelizing );
 	virtual bool done( void ) const;
 
 	virtual bool isFromTrack( const track * _track ) const;
