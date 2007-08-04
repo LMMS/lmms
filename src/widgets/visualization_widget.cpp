@@ -170,17 +170,18 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 			p.setPen( QColor( 255, 64, 64 ) );
 		}
 
+		const int xd = w / frames;
 		// now draw all that stuff
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
-			for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
 				Uint16 cur_y = y_base +
-					(Uint16)( m_buffer[frame][chnl] *
+					(Uint16)( m_buffer[frame][ch] *
 								half_h );
 				Uint16 xp = x_base + frame * w / frames;
-				p.drawLine( xp, old_y[chnl], xp, cur_y );
-				old_y[chnl] = cur_y;
+				p.drawLine( xp, old_y[ch], xp+xd, cur_y );
+				old_y[ch] = cur_y;
 			}
 		}
 
