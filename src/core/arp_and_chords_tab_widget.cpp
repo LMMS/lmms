@@ -386,7 +386,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_random_btn );
 
-	m_arpDirectionBtnGrp->setInitValue( UP - 1 );
+	m_arpDirectionBtnGrp->setInitValue( UP );
 
 
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
@@ -479,7 +479,6 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// now follows code for arpeggio
 
 	if( _n->baseNote() == FALSE ||
-		( m_arpDirectionBtnGrp->value() + 1) == OFF ||
 			!m_arpGroupBox->isActive() ||
 			( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )
@@ -553,8 +552,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 			continue;
 		}
 
-		arpDirections dir = static_cast<arpDirections>(
-					m_arpDirectionBtnGrp->value() + 1 );
+		const int dir = m_arpDirectionBtnGrp->value();
 		// process according to arpeggio-direction...
 		if( dir == UP )
 		{
@@ -678,7 +676,7 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 	m_arpGateKnob->loadSettings( _this, "arpgate" );
 	m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
 
-	// Keep compatibility with version 2.1 file format
+	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
 	 	m_arpTimeKnob->setSyncMode( 

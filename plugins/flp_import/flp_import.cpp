@@ -635,7 +635,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				const arpAndChordsTabWidget::arpDirections
 					mappedArpDir[] =
 				{
-					arpAndChordsTabWidget::OFF,
+					arpAndChordsTabWidget::UP,
 					arpAndChordsTabWidget::UP,
 					arpAndChordsTabWidget::DOWN,
 					arpAndChordsTabWidget::UP_AND_DOWN,
@@ -645,16 +645,14 @@ bool flpImport::tryImport( trackContainer * _tc )
 				const Uint32 * p = (const Uint32 *) text;
 				arpAndChordsTabWidget * actw = it->m_arpWidget;
 				actw->m_arpDirectionBtnGrp->setValue(
-						mappedArpDir[p[10]] - 1 );
+							mappedArpDir[p[10]] );
 				actw->m_arpRangeKnob->setValue( p[11] );
 				actw->m_arpComboBox->setValue( p[12] );
 				actw->m_arpTimeKnob->setValue( p[13] / 8.0f );
 							////	100.0f );
 				actw->m_arpGateKnob->setValue( p[14] * 100.0f /
 									48.0f );
-				actw->m_arpGroupBox->setState(
-					mappedArpDir[p[10]] !=
-						arpAndChordsTabWidget::OFF );
+				actw->m_arpGroupBox->setState( p[10] > 0 );
 				printf( "channel params: " );
 				dump_mem( text, text_len );
 				//printf( "channel params: arpdir: %d  range: %d  time: %d  gate: %d\n", p[10], p[11], p[13], p[14] );

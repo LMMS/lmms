@@ -69,7 +69,6 @@ class arpAndChordsTabWidget : public QWidget, public journallingObject
 public:
 	enum arpDirections
 	{
-		OFF,
 		UP,
 		DOWN,
 		UP_AND_DOWN,

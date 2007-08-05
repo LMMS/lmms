@@ -533,6 +533,12 @@ void multimediaProject::upgrade( void )
 					!el.attribute( "arpdisabled" )
 								.toInt() );
 			}
+			else if( !el.hasAttribute( "chord-enabled" ) )
+			{
+				el.setAttribute( "chord-enabled", TRUE );
+				el.setAttribute( "arp-enabled",
+						el.attribute( "arpdir" ).toInt() != 0 );
+			}
 		}
 
 		list = elementsByTagName( "channeltrack" );
@@ -571,6 +577,26 @@ void multimediaProject::upgrade( void )
 				}
 			}
 		}
+	}
+
+
+	if( version < "0.3.0-rc2" )
+	{
+		QDomNodeList list = elementsByTagName( "arpandchords" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.attribute( "arpdir" ).toInt() > 0 )
+			{
+				el.setAttribute( "arpdir",
+					el.attribute( "arpdir" ).toInt() - 1 );
+			}
+		}
+	}
+
+	if( !m_head.hasAttribute( "mastervol" ) )
+	{
+		m_head.setAttribute( "mastervol", 100 );
 	}
 }
 
