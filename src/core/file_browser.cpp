@@ -451,7 +451,8 @@ listView::listView( QWidget * _parent ) :
 	Q3ListView( _parent ),
 	m_mousePressed( FALSE ),
 	m_pressPos(),
-	m_previewPlayHandle( NULL )
+	m_previewPlayHandle( NULL ),
+	m_pphMutex()
 {
 	addColumn( tr( "Files" ) );
 	setTreeStepSize( 12 );
@@ -560,6 +561,10 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	fileItem * f = dynamic_cast<fileItem *>( i );
 	if( f != NULL )
 	{
+		if( !m_pphMutex.tryLock() )
+		{
+			return;
+		}
 		if( m_previewPlayHandle != NULL )
 		{
 			engine::getMixer()->removePlayHandle(
@@ -595,6 +600,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 			engine::getMixer()->addPlayHandle(
 							m_previewPlayHandle );
 		}
+		m_pphMutex.unlock();
 	}
 }
 
@@ -650,6 +656,11 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 
 void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
 {
+	if( !m_pphMutex.tryLock() )
+	{
+		return;
+	}
+
 	m_mousePressed = FALSE;
 	if( m_previewPlayHandle != NULL )
 	{
@@ -665,12 +676,14 @@ void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
 			{
 				s->setDoneMayReturnTrue( TRUE );
 				m_previewPlayHandle = NULL;
+				m_pphMutex.unlock();
 				return;
 			}
 		}
 		engine::getMixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
+	m_pphMutex.unlock();
 }
 
 

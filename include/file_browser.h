@@ -36,11 +36,13 @@
 #ifdef QT4
 
 #include <QtCore/QDir>
+#include <QtCore/QMutex>
 
 #else
 
 #include <qlistview.h>
 #include <qdir.h>
+#include <qmutex.h>
 
 #define cleanPath cleanDirPath
 
@@ -129,6 +131,7 @@ private:
 	QPoint m_pressPos;
 
 	playHandle * m_previewPlayHandle;
+	QMutex m_pphMutex;
 
 } ;
 
