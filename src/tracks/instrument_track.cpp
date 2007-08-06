@@ -630,7 +630,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						notePlayHandle( this,
 							_time.frames(
 						engine::framesPerTact64th() ),
-						valueRanges<f_cnt_t>::max, n );
+						valueRanges<f_cnt_t>::max / 2,
+									n );
 					if( engine::getMixer()->addPlayHandle(
 									nph ) )
 					{
