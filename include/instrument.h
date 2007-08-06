@@ -49,6 +49,7 @@
 
 
 #include "plugin.h"
+#include "mixer.h"
 
 
 // forward-declarations
@@ -130,6 +131,11 @@ protected:
 	{
 		return( m_instrumentTrack );
 	}
+
+	// instruments may use this to apply a soft fade out at the end of
+	// notes - method does this only if really less or equal
+	// desiredReleaseFrames() frames are left
+	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
 
 
 private:

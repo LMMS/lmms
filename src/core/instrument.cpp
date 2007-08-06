@@ -28,6 +28,7 @@
 #include "instrument.h"
 #include "instrument_track.h"
 #include "dummy_instrument.h"
+#include "note_play_handle.h"
 
 
 instrument::instrument( instrumentTrack * _instrument_track,
@@ -105,5 +106,25 @@ bool instrument::isFromTrack( const track * _track ) const
 
 
 
+void instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
+{
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+	const f_cnt_t fl = _n->framesLeft();
+	if( fl <= desiredReleaseFrames()+fpp )
+	{
+		for( fpp_t f = fl > desiredReleaseFrames() ?
+				( tMax( fpp - desiredReleaseFrames(), 0 ) +
+					fl % fpp ) : 0; f < frames; ++f )
+		{
+			const float fac = (float)( fl-f-1 ) /
+							desiredReleaseFrames();
+			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			{
+				buf[f][ch] *= fac;
+			}
+		}
+	}
+}
 
 #endif
