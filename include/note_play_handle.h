@@ -67,8 +67,7 @@ public:
 
 	virtual inline bool done( void ) const
 	{
-		return( m_released && framesLeft() == 0 );/* ( m_released && m_framesBeforeRelease == 0 &&
-				m_releaseFramesDone >= m_releaseFramesToDo ) );*/
+		return( m_released && framesLeft() <= 0 );
 	}
 
 	bool willFinishThisPeriod( void ) const
