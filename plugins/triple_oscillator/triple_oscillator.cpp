@@ -692,6 +692,8 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 	osc_l->update( buf, frames, 0 );
 	osc_r->update( buf, frames, 1 );
 
+	applyRelease( buf, _n );
+
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	delete[] buf;

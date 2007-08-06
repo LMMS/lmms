@@ -1,5 +1,29 @@
 2007-08-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	use new applyRelease()-method
+
+	* include/instrument.h:
+	* src/core/instrument.cpp:
+	added method instrument::applyRelease( ... ) which applies a release
+	on given buffer according to the value returned by
+	desiredReleaseFrames() - instruments can use this easily by simply
+	calling this method before calling
+	getInstrumentTrack()->processAudioBuffer()
+
+	* src/core/preset_preview_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	use only half of valueRange<f_cnt_t>::max because otherwise we have
+	overflows at several places
+
+	* src/core/note_play_handle.cpp:
+	fixed framesLeft()-method to return correct values if plugin has
+	desiredReleaseFrames() > 0
+
+	* include/note_play_handle.h:
+	cleanups
+
 	* configure.in:
 	bumped to 0.3.0-rc2
 

@@ -111,6 +111,11 @@ public:
 
 	virtual QString nodeName( void ) const;
 
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return( 128 );
+	}
+
 
 protected slots:
 	void updateAllDetuning( void );
