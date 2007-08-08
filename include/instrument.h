@@ -105,6 +105,15 @@ public:
 		return( FALSE );
 	}
 
+	// some monophonic instruments need a certain number of frames for a
+	// transition between notes - such instruments can re-implement this
+	// method for returning how many frames they at least like to have for
+	// transition
+	virtual f_cnt_t desiredTransitionFrames( void ) const
+	{
+		return( 0 );
+	}
+
 	inline virtual bool notePlayHandleBased( void ) const
 	{
 		return( TRUE );

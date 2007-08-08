@@ -120,6 +120,21 @@ class lb302Filter3Pole : public lb302Filter
           value;
 };
 
+class lb302State
+{
+public:
+    float vco_c;
+    float vca_a;
+    int sample_cnt;
+};
+
+class lb302Note
+{
+public:
+    float vco_inc;
+    bool dead;
+};
+
 
 class lb302Synth : public instrument
 {
@@ -143,7 +158,15 @@ public:
         return true;
     }
 
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return 2000;
+	}
+    
+
 private:
+
+    void initNote(lb302Note *note);
 
 
 private:
@@ -192,7 +215,8 @@ private:
     // User settings
     lb302FilterState  fs;
     lb302Filter       *vcf;
-    
+    lb302Note         hold_note;
+    bool use_hold_note;
   	
     float lastFramesPlayed;
 
@@ -210,6 +234,15 @@ private:
 
     // My hacks
     int   sample_cnt;
+    
+    int   last_offset;
+
+    lb302State *period_states;
+    int period_states_cnt;
+
+    int catch_frame;
+    int catch_decay;
+    int note_count;
 
     void recalcFilter();
 

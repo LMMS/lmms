@@ -781,6 +781,8 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 				{
 					processInEvent( midiEvent( NOTE_OFF, 0,
 						_n->key(), 0 ), midiTime() );
+					_n->noteOff( ( *youngest_note )->offset()+m_instrument->desiredTransitionFrames() );
+#if 0
 					if( ( *youngest_note )->offset() >
 								_n->offset() )
 					{
@@ -797,12 +799,13 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 						// in last period and have
 						// to clear parts of it
 						_n->noteOff();
-	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
+/*	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
 				engine::getMixer()->framesPerPeriod() -
 					( *youngest_note )->offset(),
 					( *youngest_note )->offset() );
-						return;
+						return;*/
 					}
+#endif
 				}
 			}
 		}

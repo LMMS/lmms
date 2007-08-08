@@ -61,11 +61,12 @@
 // New config
 //
 #define LB_24_IGNORE_ENVELOPE   
-#define LB_FILTERED 
+//#define LB_FILTERED 
 //#define LB_24_RES_TRICK         
 
 #define LB_DIST_RATIO    4.0
 #define LB_24_VOL_ADJUST 3.0
+//#define LB_DECAY_NOTES
 
 //
 // Old config
@@ -410,7 +411,8 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	vcf_envpos = ENVINC;
     vco_detune = 0;
 
-	vca_mode = 2;  vca_a = 0;
+	vca_mode = 0;  vca_a = 0;   // Start VCA on an attack.
+
 	//vca_attack = 1.0 - 0.94406088;      
 	vca_attack = 1.0 - 0.96406088;      
 	vca_decay = 0.99897516;            
@@ -424,6 +426,11 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     recalcFilter();
 
     lastFramesPlayed = 0;
+    last_offset = 0;
+
+    period_states = NULL;
+    period_states_cnt = 0;
+    note_count = 0;
 
     filterChanged(0.0);
     detuneChanged(0.0);
@@ -576,6 +583,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	unsigned int i;
 	float w;
     float samp;
+
     
 	for(i=0;i<size;i++) {
 		// update vcf
@@ -595,22 +603,29 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         sample_cnt++;
 		vcf_envpos++;
 
-		// 01/21/07 Changed to VCF -> VCA instead of VCA -> VCF
-#ifdef LB_FILTERED
-        samp = vcf->process(vco_k)*2.0*vca_a;
-#else
-        samp = vco_k*vca_a;
-#endif
-
-        for(int c=0; c<DEFAULT_CHANNELS; c++) {
-            outbuf[i][c]=samp;
-        }
-
+        float old_vco_k = vco_k;
+        bool looking;
 
 		// update vco
-		vco_c += vco_inc;
+	    vco_c += vco_inc;
+
         if(vco_c > 0.5) vco_c -= 1.0;
 
+        if (catch_decay > 0) {
+            if (catch_decay < desiredReleaseFrames())
+                catch_decay++;
+            else if (use_hold_note) {
+                printf("RETRIGGER\n");
+                // We would retrigger the actual note we *should* be playing.
+                // I removed this for now, to help detect the true problem.
+                /*initNote(&hold_note);
+                catch_decay=0;
+                */
+                use_hold_note = 0;
+            }
+        }
+    
+         
         switch(int(rint(wave_knob->value()))) {
             case 0: vco_shape = SAWTOOTH; break;
             case 1: vco_shape = INVERTED_SAWTOOTH; break;
@@ -658,15 +673,37 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
                 break;
         }
 
-        // Make it louder. For the better?
-        //vco_k*=2.0;
-		
+        // Write out samples.
+#ifdef LB_FILTERED
+        samp = vcf->process(vco_k)*2.0*vca_a;
+#else
+        samp = vco_k*vca_a;
+#endif
+        float releaseFrames = desiredReleaseFrames();
+        samp *= (releaseFrames - catch_decay)/releaseFrames;
+
+
+        for(int c=0; c<DEFAULT_CHANNELS; c++) {
+            outbuf[i][c]=samp;
+        }
+
+        // Store state
+        period_states[i].vco_c = vco_c;
+        period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
+        period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
+
+
         // Handle Envelope
         // TODO: Add decay once I figure out how to extend past the end of a note.
-		if(sample_cnt>=0.5*44100 /*sz/2*/) vca_mode = 2;
-		if(vca_mode==0) vca_a+=(vca_a0-vca_a)*vca_attack;
+		if(vca_mode==0) {
+            vca_a+=(vca_a0-vca_a)*vca_attack;
+	    	if(sample_cnt>=0.5*44100) 
+                vca_mode = 2;
+        }
 		else if(vca_mode == 1) {
 			vca_a *= vca_decay;
+            //printf("VCA: %d %f\n", dbgshit++, vca_a);
+            
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 2; }
 		}
@@ -675,76 +712,148 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	return 1;
 }
 
+/*  Prepares the active LB302 note.  I separated this into a function because it
+ *  needs to be called on playNote() when a new note is started.  It also needs
+ *  to be called from process() when a prior edge-to-edge note is done releasing.
+ */
+void lb302Synth::initNote( lb302Note *n)
+{
+    catch_decay = 0;
+
+    vco_inc = n->vco_inc;
+    
+    // TODO: Try moving to the if() below
+    if(n->dead == 0) {
+        sample_cnt = 0;
+        vca_mode = 0;  vca_a = 0;
+    }
+
+        // Initiate Slide
+    // TODO: Break out into function, should be called again on detuneChanged
+    if (vco_slideinc) {
+        vco_slide = vco_inc-vco_slideinc;
+        vco_slidebase = vco_inc;
+        vco_slideinc = 0;
+    }
+    else {
+        vco_slide = 0;
+    }
+    // End break-out
+
+    // Slide note, save inc for next note
+    if (slideToggle->value()) {
+        vco_slideinc = vco_inc; // May need to equal vco_slidebase+vco_slide if last note slid
+    }
+
+
+    recalcFilter();
+    
+    if(n->dead ==0){
+        // Swap next two blocks??
+        vcf->playNote();
+        // Ensure envelope is recalculated
+        vcf_envpos = ENVINC;
+
+        // Double Check 
+        vca_mode = 0;
+        vca_a = 0.0;
+    }
+}
+
 
 void lb302Synth::playNote( notePlayHandle * _n, bool )
 {
-    //int nidx = _n->index();
+    int framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
-    //if( _n->nphsOfInstrumentTrack(_n->getInstrumentTrack()).first() != _n )
-    //if( _n->released() && _n->nphsOfInstrumentTrack( _n->getInstrumentTrack() ).count() > 1 )
-    //    return;
-
-/*
-    if (_n->released() ) {
-      if( notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack() ).size() > 0
-        && notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack(),
-        TRUE ).last() == _n )
-        {
-            return;
-        }
-    }
-*/
+    // Malloc our period history buffer
+    if (period_states == NULL) 
+        period_states = new lb302State[framesPerPeriod];
 
 
-    if ( _n->totalFramesPlayed() <= lastFramesPlayed ) {
-        // TODO: Try moving to the if() below
-        if(deadToggle->value()==0) {
-            sample_cnt = 0;
-            vca_mode = 0;  vca_a = 0;
-        }
+    // Print debug garbage
+    constNotePlayHandleVector v =
+        notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack() );
 
-        // Adjust inc on SampRate change or detuning change
-        vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+    if ( _n->totalFramesPlayed() <= 0 ) 
+        printf("New Note count: %d nphs: %d\n", note_count, v.size());
 
-        // Initiate Slide
-        // TODO: Break out into function, should be called again on detuneChanged
-        if (vco_slideinc) {
-            vco_slide = vco_inc-vco_slideinc;
-            vco_slidebase = vco_inc;
-            vco_slideinc = 0;
-        }
-        else {
-            vco_slide = 0;
-        }
-        // End break-out
-
-        // Slide note, save inc for next note
-        if (slideToggle->value()) {
-            vco_slideinc = vco_inc; // May need to equal vco_slidebase+vco_slide if last note slid
-        }
+    // OH HOLY FUCK!!  These get interleaved between two different notes.
+    // is LMMS properly handling monophonic?  I assumed that the youngest
+    // note would kill all earlier notes, even if they are released.
+    if (_n->released()) 
+        printf("    RELEASED!!!   %ld\n", _n);
+    else
+        printf("not released...   %ld\n", _n);
+    // end debug garbage
 
 
-        recalcFilter();
-        
-        if(deadToggle->value()==0){
-            // Swap next two blocks??
-            vcf->playNote();
-            // Ensure envelope is recalculated
-            vcf_envpos = ENVINC;
+    // Start the release decay if this is the first release period.
+    if (_n->released() && catch_decay == 0)
+            catch_decay = 1;
     
-            // Double Check 
-            vca_mode = 0;
-            vca_a = 0.0;
+
+    // I don't know if and when we will ever need this code again.
+    /*
+    if (_n->totalFramesPlayed() > 0) {
+        period_states_cnt = _n->framesLeftForCurrentPeriod();
+    }
+    else {
+    // New note (not overlapping), restore
+        if (period_states_cnt > 0) {
+            lb302State *st = &period_states[period_states_cnt-1];
+
+            //printf("Restoring from: %d\n", period_states_cnt-1);
+            vco_c = st->vco_c;
         }
+        //vca_a = st->vca_a;
+        //sample_cnt = st->sample_cnt;
+    }
+    */
+
+    if ( _n->totalFramesPlayed() <= 0 ) {
+
+        // Existing note. Allow it to decay. 
+        if(note_count) {
+            // BEGIN NOT SURE OF...
+            //lb302State *st = &period_states[period_states_cnt-1];
+            //vca_a = st->vca_a;
+            //sample_cnt = st->sample_cnt;
+            // END NOT SURE OF
+
+            // Reserve this note for retrigger in process()
+            hold_note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+            hold_note.dead = deadToggle->value();
+            use_hold_note = true;
+        }
+        // Start a new note
+        else {
+            lb302Note note;
+            note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+            note.dead = deadToggle->value();
+            initNote(&note);
+            use_hold_note = false;
+        }
+
+        note_count=1;
     }
     
     const fpp_t frames = _n->framesLeftForCurrentPeriod();
     sampleFrame *buf = new sampleFrame[frames];
 
+    bool dec_count;
+    if (_n->willFinishThisPeriod())
+        dec_count = true;
+    else
+        dec_count = false;
+
         process(buf, frames); 
         getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
         delete[] buf;
+
+    if (dec_count)
+        note_count=0;
+
 
     lastFramesPlayed = _n->totalFramesPlayed();
 }
@@ -754,7 +863,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 {
-
 }
 
 
