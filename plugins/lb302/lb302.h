@@ -36,7 +36,6 @@
 #include "instrument.h"
 #include "led_checkbox.h"
 #include "mixer.h"
-#include <iostream>
 
 
 class knob;
@@ -160,9 +159,8 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return 2000;
+		return 512;
 	}
-    
 
 private:
 
@@ -218,7 +216,7 @@ private:
     lb302Note         hold_note;
     bool use_hold_note;
   	
-    float lastFramesPlayed;
+    int lastFramesPlayed;
 
 	
     // More States

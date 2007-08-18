@@ -597,7 +597,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	volumeVector v = m_surroundArea->getVolumeVector( v_scale );
 
 	engine::getMixer()->bufferToPort( _buf,
-		( _n != NULL ) ? _n->framesLeftForCurrentPeriod() : _frames,
+		( _n != NULL ) ? tMin<f_cnt_t>( _n->framesLeftForCurrentPeriod(), _frames ) : _frames,
 			( _n != NULL ) ? _n->offset() : 0, v, m_audioPort );
 }
 
@@ -799,10 +799,10 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 						// in last period and have
 						// to clear parts of it
 						_n->noteOff();
-/*	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
+	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
 				engine::getMixer()->framesPerPeriod() -
 					( *youngest_note )->offset(),
-					( *youngest_note )->offset() );*/
+					( *youngest_note )->offset() );
 						return;
 					}
 				}

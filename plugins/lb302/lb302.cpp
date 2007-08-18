@@ -48,6 +48,7 @@
 #include "knob.h"
 #include "note_play_handle.h"
 #include "templates.h"
+#include "audio_port.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -68,6 +69,12 @@
 #define LB_24_VOL_ADJUST 3.0
 //#define LB_DECAY_NOTES
 
+#define LB_DEBUG
+
+#ifdef LB_DEBUG
+#include <assert.h>
+#endif
+
 //
 // Old config
 //
@@ -76,7 +83,6 @@
 #define LB_HZ 44100.0f
 
 
-using namespace std;
 extern "C"
 {
 
@@ -425,7 +431,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
     recalcFilter();
 
-    lastFramesPlayed = 0;
+    lastFramesPlayed = 1;	// because we subtract 1 later
     last_offset = 0;
 
     period_states = NULL;
@@ -576,6 +582,9 @@ void lb302Synth::recalcFilter()
     vcf_envpos = ENVINC; // Trigger filter update in process()
 }
 
+inline int MIN(int a, int b) {
+    return (a<b)?a:b;
+}
 
 int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 {
@@ -583,9 +592,19 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	unsigned int i;
 	float w;
     float samp;
-
+         
+       
     
 	for(i=0;i<size;i++) {
+        /* TODO: ONLY DO THIS IF WE ARE EDGE-TO-EDGE NON-DEAD */
+        /*if (sample_cnt < desiredTransitionFrames()) {
+            for(int c=0; c<DEFAULT_CHANNELS; c++)
+                outbuf[i][c]=0;
+            sample_cnt++;
+            continue;
+        }
+        */
+
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
             vcf->envRecalc();       
@@ -610,20 +629,11 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	    vco_c += vco_inc;
 
         if(vco_c > 0.5) vco_c -= 1.0;
-
-        if (catch_decay > 0) {
-            if (catch_decay < desiredReleaseFrames())
-                catch_decay++;
-            else if (use_hold_note) {
-                printf("RETRIGGER\n");
-                // We would retrigger the actual note we *should* be playing.
-                // I removed this for now, to help detect the true problem.
-                /*initNote(&hold_note);
-                catch_decay=0;
-                */
-                use_hold_note = 0;
-            }
-        }
+/*
+        if (catch_decay < desiredTransitionFrames()) {
+            catch_decay++;
+            continue;
+        }*/
     
          
         switch(int(rint(wave_knob->value()))) {
@@ -666,22 +676,24 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
                 vco_k = (vco_c*2.0)+0.5;
                 if (vco_k>1.0) vco_k = -0.5 ;
                 else if (vco_k>0.5) {
-                    w = 2*(vco_k-0.5)-1;
-                    vco_k = 0.5 - sqrtf(1-(w*w));
-                    vco_k *= 2.0;  // MOOG wave gets filtered away 
+                    w = 2.0*(vco_k-0.5)-1.0;
+                    vco_k = 0.5 - sqrtf(1.0-(w*w));
                 }
+                vco_k *= 2.0;  // MOOG wave gets filtered away 
                 break;
         }
 
+	vca_a = 0.5;
         // Write out samples.
 #ifdef LB_FILTERED
         samp = vcf->process(vco_k)*2.0*vca_a;
 #else
         samp = vco_k*vca_a;
 #endif
+        /*
         float releaseFrames = desiredReleaseFrames();
         samp *= (releaseFrames - catch_decay)/releaseFrames;
-
+        */
 
         for(int c=0; c<DEFAULT_CHANNELS; c++) {
             outbuf[i][c]=samp;
@@ -763,57 +775,115 @@ void lb302Synth::initNote( lb302Note *n)
 
 void lb302Synth::playNote( notePlayHandle * _n, bool )
 {
-    int framesPerPeriod = engine::getMixer()->framesPerPeriod();
+	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
-    // Malloc our period history buffer
-    if (period_states == NULL) 
-        period_states = new lb302State[framesPerPeriod];
+	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN === ///
+
+	// number of frames to play - only modified below if we have to play
+	// the rest of an old note
+	fpp_t frames = _n->framesLeftForCurrentPeriod();
+
+	surroundSampleFrame * trkBuffer;
+
+	// per default we resume at the last played frames - only in
+	// some special-cases (which we catch below) we have to resume
+	// somewhere else
+	f_cnt_t resume_pos = lastFramesPlayed-1;
+
+	// find out which situation we're in
+	constNotePlayHandleVector v =
+		notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack(), TRUE );
+	// more than one note running?
+	if( v.count() > 1 )
+	{
+		const notePlayHandle * on = v.first();	// oldest note
+		const notePlayHandle * yn = v.last();	// youngest note
+		// are we playing a released note and the new (youngest) note
+		// has taken over successfully (i.e. played more than the
+		// difference of the two offsets)?
+		if ( _n->released() &&
+			yn->totalFramesPlayed() >= yn->offset() - on->offset() )
+		{
+			// then we do not need to play something anymore
+	                return;
+		}
+
+		// have to fill up the frames left to the new note so limit
+		// frames to play for not getting into trouble
+		if( _n != yn )
+		{
+			frames = tMin<fpp_t>( frames, yn->offset() - on->offset() );
+#ifdef LB_DEBUG
+			// should be always true - why? I don't know... ;-)
+			assert( frames > 0 );
+#endif
+		}
+
+		// new note while other notes are running?
+		if( v.count() > 1 && yn == _n &&
+						_n->totalFramesPlayed() == 0 )
+		{
+			// if there had been a previous note whose
+			// offset > _n->offset() it played more frames than
+			// we actually need - therefore clear everything before
+			// the offset of the youngest note, otherwise we get
+			// frames with both waves overlapped
+			engine::getMixer()->clearAudioBuffer(
+				_n->getInstrumentTrack()->getAudioPort()->
+								firstBuffer(),
+				framesPerPeriod - yn->offset(), yn->offset() );
+			resume_pos = yn->offset() - on->offset() - 1;
+			// make sure we have positive value, otherwise we're
+			// accessing states out of borders
+			while( resume_pos < 0 )
+			{
+				resume_pos += framesPerPeriod;
+			}
+	        }
+	}
+
+#ifdef LB_DEBUG
+	if( _n->released() )
+	{
+		printf( "    RELEASED!!!   %ld\n", _n );
+	}
+	else
+	{
+		printf( "not released...   %ld\n", _n );
+	}
+	printf( "offset: %d   frames:%d\n", _n->offset(), frames );
+
+	printf( "Resuming at %d\n", resume_pos );
+#endif
+
+	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - END === ///
+
+	/// Malloc our period history buffer
+	if (period_states == NULL) 
+		period_states = new lb302State[framesPerPeriod];
 
 
-    // Print debug garbage
-    constNotePlayHandleVector v =
-        notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack() );
+    // now resume at the proper position and process as usual
+    lb302State *state = &period_states[resume_pos];
 
-    if ( _n->totalFramesPlayed() <= 0 ) 
-        printf("New Note count: %d nphs: %d\n", note_count, v.size());
-
-    // OH HOLY FUCK!!  These get interleaved between two different notes.
-    // is LMMS properly handling monophonic?  I assumed that the youngest
-    // note would kill all earlier notes, even if they are released.
-    if (_n->released()) 
-        printf("    RELEASED!!!   %ld\n", _n);
-    else
-        printf("not released...   %ld\n", _n);
-    // end debug garbage
+    /// Actually resume the state, now that we have the right state object.
+    vco_c = state->vco_c;
+    vca_a = state->vca_a;
+    sample_cnt = state->sample_cnt;
 
 
+
+    /// Currently have release/decay disabled
     // Start the release decay if this is the first release period.
-    if (_n->released() && catch_decay == 0)
-            catch_decay = 1;
+    //if (_n->released() && catch_decay == 0)
+    //        catch_decay = 1;
     
 
-    // I don't know if and when we will ever need this code again.
-    /*
-    if (_n->totalFramesPlayed() > 0) {
-        period_states_cnt = _n->framesLeftForCurrentPeriod();
-    }
-    else {
-    // New note (not overlapping), restore
-        if (period_states_cnt > 0) {
-            lb302State *st = &period_states[period_states_cnt-1];
-
-            //printf("Restoring from: %d\n", period_states_cnt-1);
-            vco_c = st->vco_c;
-        }
-        //vca_a = st->vca_a;
-        //sample_cnt = st->sample_cnt;
-    }
-    */
-
     if ( _n->totalFramesPlayed() <= 0 ) {
+        /// This code is obsolete, hence the "if false"
 
         // Existing note. Allow it to decay. 
-        if(note_count) {
+        if(/*note_count*/ false) {
             // BEGIN NOT SURE OF...
             //lb302State *st = &period_states[period_states_cnt-1];
             //vca_a = st->vca_a;
@@ -825,7 +895,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
             hold_note.dead = deadToggle->value();
             use_hold_note = true;
         }
-        // Start a new note
+        /// Start a new note.
         else {
             lb302Note note;
             note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
@@ -837,25 +907,14 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         note_count=1;
     }
     
-    const fpp_t frames = _n->framesLeftForCurrentPeriod();
-    sampleFrame *buf = new sampleFrame[frames];
-
-    bool dec_count;
-    if (_n->willFinishThisPeriod())
-        dec_count = true;
-    else
-        dec_count = false;
+	sampleFrame *buf = new sampleFrame[frames];
 
         process(buf, frames); 
         getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
         delete[] buf;
 
-    if (dec_count)
-        note_count=0;
-
-
-    lastFramesPlayed = _n->totalFramesPlayed();
+	lastFramesPlayed = frames;//_n->framesLeftForCurrentPeriod(); //_n->totalFramesPlayed();
 }
 
 

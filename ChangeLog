@@ -1,5 +1,11 @@
 2007-08-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	- rewrote code for monophonic behaviour (calculation of position at
+	  which to resume states etc.)
+	- added some debugging-stuff
+	
 	* src/core/mixer.cpp:
 	remove play-handles *after* we played all play-handles
 
