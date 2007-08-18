@@ -1,3 +1,11 @@
+2007-08-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/mixer.cpp:
+	remove play-handles *after* we played all play-handles
+
+	* src/tracks/instrument_track.cpp:
+	fixed a bug in monophonic behaviour
+
 2007-08-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/instrument.h:

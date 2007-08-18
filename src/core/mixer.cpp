@@ -288,7 +288,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	// clear last audio-buffer
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
-
+printf("---------------------------next period\n");
 //	if( criticalXRuns() == FALSE )
 	{
 		engine::getSongEditor()->processNextBuffer();
@@ -320,24 +320,14 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				}
 				++idx;
 			}
-			idx = 0;
-			while( idx < m_playHandles.size() )
+			for( playHandleVector::iterator it =
+							m_playHandles.begin();
+					it != m_playHandles.end(); ++it )
 			{
-				playHandle * n = m_playHandles[idx];
-				if( n->done() )
+				if( !( *it )->done() &&
+					!( *it )->supportsParallelizing() )
 				{
-					delete n;
-					m_playHandles.erase(
-						m_playHandles.begin() + idx );
-				}
-				else if( !n->supportsParallelizing() )
-				{
-					n->play();
-					++idx;
-				}
-				else
-				{
-					++idx;
+					( *it )->play();
 				}
 			}
 			for( playHandleVector::iterator it = par_hndls.begin();
@@ -348,21 +338,29 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		}
 		else
 		{
-			while( idx < m_playHandles.size() )
+			for( playHandleVector::iterator it =
+						m_playHandles.begin();
+					it != m_playHandles.end(); ++it )
 			{
-				playHandle * n = m_playHandles[idx];
-				// delete play-handle if it played completely
-				if( n->done() )
+				if( !( *it )->done() )
 				{
-					delete n;
-					m_playHandles.erase(
-						m_playHandles.begin() + idx );
+					( *it )->play();
 				}
-				else
-				{
-					n->play();
-					++idx;
-				}
+			}
+		}
+		idx = 0;
+		while( idx < m_playHandles.size() )
+		{
+			playHandle * n = m_playHandles[idx];
+			if( n->done() )
+			{
+				delete n;
+				m_playHandles.erase(
+					m_playHandles.begin() + idx );
+			}
+			else
+			{
+				++idx;
 			}
 		}
 		unlockPlayHandles();

@@ -799,10 +799,10 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 						// in last period and have
 						// to clear parts of it
 						_n->noteOff();
-	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
+/*	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
 				engine::getMixer()->framesPerPeriod() -
 					( *youngest_note )->offset(),
-					( *youngest_note )->offset() );
+					( *youngest_note )->offset() );*/
 						return;
 					}
 				}
@@ -811,7 +811,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 				else if( *youngest_note != _n &&
 							_n->released() )
 				{
-					return;
+					//return;
 				}
 			}
 		}
