@@ -783,8 +783,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 	// the rest of an old note
 	fpp_t frames = _n->framesLeftForCurrentPeriod();
 
-	surroundSampleFrame * trkBuffer;
-
 	// per default we resume at the last played frames - only in
 	// some special-cases (which we catch below) we have to resume
 	// somewhere else
