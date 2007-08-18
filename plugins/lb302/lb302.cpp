@@ -779,6 +779,11 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN === ///
 
+	if( _n->arpBaseNote() )
+	{
+		return;
+	}
+
 	// number of frames to play - only modified below if we have to play
 	// the rest of an old note
 	fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -808,7 +813,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 		// have to fill up the frames left to the new note so limit
 		// frames to play for not getting into trouble
-		if( _n != yn )
+		if( _n != yn && !yn->arpBaseNote() )
 		{
 			frames = tMin<fpp_t>( frames, yn->offset() - on->offset() );
 #ifdef LB_DEBUG
