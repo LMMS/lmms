@@ -480,7 +480,8 @@ void vibed::loadSettings( const QDomElement & _this )
 		name = "active" + QString::number( i );
 		m_editors[i]->setOn( _this.attribute( name ).toInt() );
 		
-		if( m_editors[i]->isOn() )
+		if( m_editors[i]->isOn() &&
+			_this.hasAttribute( "volume" + QString::number( i ) ) )
 		{
 			name = "volume" + QString::number( i );
 			m_volumeKnobs[i]->loadSettings( _this, name );

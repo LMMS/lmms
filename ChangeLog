@@ -1,3 +1,58 @@
+2007-08-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	updated German localization-file
+
+	* Makefile.am:
+	fixed command for updating TS-files
+
+	* include/config_mgr.h:
+	* include/main_window.h:
+	* src/core/config_mgr.cpp:
+	* src/core/main_window.cpp:
+	added support for "Recently opened files"-menu
+
+	* src/core/main_window.cpp:
+	- cleanups
+	- limit x-coordinate of a widget to be >= 0 in
+	  mainWindow::restoreWidgetState( ... ) - fixes bug with appearently
+	  inacccessible title-bars of piano-roll, song-editor etc. after
+	  loading project
+
+	* include/config_mgr.h:
+	* src/core/engine.cpp:
+	also destroy config-manager at engine::destroy()
+
+	* src/audio/audio_jack.cpp:
+	added define for support for per-track audio-ports - almost works
+	except that the buffers of the audio-port are already cleared again at
+	the time the callback fills the buffers - will need an additional
+	buffer in audio-ports or something like that
+
+	* src/core/mixer.cpp:
+	* src/lib/journalling_object.cpp:
+	* src/lib/project_journal.cpp:
+	* src/widgets/knob.cpp:
+	removed debug-out
+
+	* plugins/patman/patman.cpp:
+	set directory of sample-selection-dialog to /usr/share/midi/freepats
+	if it exists
+
+	* plugins/Makefile.am:
+	* plugins/vibed/vibed.cpp:
+	* lib/src/mmp.cpp:
+	replaced obsolete PluckedStringSynth with Vibed
+
+	* plugins/Makefile.am:
+	removed Polyb302 from build as the same results can be achieved either
+	via (improved and maintained) LB302 or TripleOsc+filter - Polyb302
+	just increases redundancy and adds extra maintainance-work
+
+	* plugins/stk/mallets/mallets.cpp:
+	do not crash if Stk-files are missing
+
 2007-08-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/lb302/lb302.cpp:

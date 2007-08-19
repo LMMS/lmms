@@ -103,7 +103,6 @@ void projectJournal::journalEntryAdded( const jo_id_t _id )
 	m_journalEntries.push_back( _id );
 	m_currentJournalEntry = m_journalEntries.end();
 	engine::getSongEditor()->setModified();
-	printf("history size: %d\n", m_journalEntries.size() );
 }
 
 

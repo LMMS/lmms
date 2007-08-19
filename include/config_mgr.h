@@ -169,6 +169,13 @@ public:
 	}
 #endif
 
+	inline const QStringList & recentlyOpenedProjects( void ) const
+	{
+		return( m_recentlyOpenedProjects );
+	}
+
+	void addRecentlyOpenedProject( const QString & _file );
+
 	const QString & value( const QString & _class,
 					const QString & _attribute ) const;
 	void setValue( const QString & _class, const QString & _attribute,
@@ -227,6 +234,8 @@ private:
 #ifdef HAVE_STK_H
 	QString m_stkDir;
 #endif
+	QStringList m_recentlyOpenedProjects;
+
 
 	typedef vvector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;
@@ -256,6 +265,9 @@ private:
 	QHBoxLayout * m_buttonLayout;
 	QHBoxLayout * m_mainLayout;
 	QVBoxLayout * m_contentLayout;
+
+
+	friend class engine;
 
 } ;
 

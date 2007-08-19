@@ -172,7 +172,9 @@ private:
 	
 	vvector<sample_t> m_scalers;
 	sampleFrame * m_buffer;
-};
+	bool m_filesMissing;
+
+} ;
 
 
 #endif

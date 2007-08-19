@@ -27,6 +27,7 @@
 
 #include "automation_editor.h"
 #include "bb_editor.h"
+#include "config_mgr.h"
 #include "project_journal.h"
 #include "engine.h"
 #include "main_window.h"
@@ -118,6 +119,8 @@ void engine::destroy( void )
 	delete s_projectJournal;
 	s_projectJournal = NULL;
 	s_mainWindow = NULL;
+
+	delete configManager::inst();
 }
 
 

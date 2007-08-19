@@ -372,7 +372,15 @@ void patmanSynth::openFile( void )
 
 	if( m_patchFile == "" )
 	{
-		ofd.setDirectory( configManager::inst()->userSamplesDir() );
+		if( QDir( "/usr/share/midi/freepats" ).exists() )
+		{
+			ofd.setDirectory( "/usr/share/midi/freepats" );
+		}
+		else
+		{
+			ofd.setDirectory(
+				configManager::inst()->userSamplesDir() );
+		}
 	}
 	else if( QFileInfo( m_patchFile ).isRelative() )
 	{

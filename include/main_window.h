@@ -110,14 +110,15 @@ public slots:
 	}
 	void createNewProject( void );
 	void createNewProjectFromTemplate( QAction * _idx );
-	void createNewProjectFromTemplate( int _idx );
+	void createNewProjectFromTemplate( int _id );
 	void openProject( void );
+	void updateRecentlyOpenedProjectsMenu( void );
+	void openRecentlyOpenedProject( int );
 	bool saveProject( void );
 	bool saveProjectAs( void );
 	void showSettingsDialog( void );
 	void aboutLMMS( void );
 	void help( void );
-//	void ladspaPluginBrowser( void );
 	void toggleAutomationEditorWin( void );
 	void toggleBBEditorWin( void );
 	void toggleSongEditorWin( void );
@@ -151,6 +152,7 @@ private:
 	QGridLayout * m_toolBarLayout;
 
 	QMenu * m_templatesMenu;
+	QMenu * m_recentlyOpenedProjectsMenu;
 	int m_custom_templates_count;
 
 	struct keyModifiers

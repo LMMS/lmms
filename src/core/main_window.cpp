@@ -81,6 +81,7 @@
 #include "tool_button.h"
 #include "project_journal.h"
 #include "automation_editor.h"
+#include "templates.h"
 
 
 #if QT_VERSION >= 0x030100
@@ -98,6 +99,7 @@ mainWindow::mainWindow( void ) :
 		),
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
+	m_recentlyOpenedProjectsMenu( NULL ),
 	m_tools_menu( NULL )
 {
 #ifdef QT4
@@ -217,20 +219,7 @@ mainWindow::mainWindow( void ) :
 
 mainWindow::~mainWindow()
 {
-/*	// first make sure, there're no mixing/audio-device-threads any more
-	engine::getMixer()->stopProcessing();
-
-	// destroy editors with all their children
-	delete engine::getSongEditor();
-	delete engine::getBBEditor();
-
-
-
-	// destroy mixer
-	delete engine::getMixer();
-
-	// destroy config-manager (which automatically saves config-file)
-*/
+	// destroy engine which will do further cleanups etc.
 	engine::destroy();
 }
 
@@ -436,6 +425,10 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 
+	m_recentlyOpenedProjectsMenu = new QMenu( NULL );
+	connect( m_recentlyOpenedProjectsMenu, SIGNAL( activated( int ) ),
+			this, SLOT( openRecentlyOpenedProject( int ) ) );
+	updateRecentlyOpenedProjectsMenu();
 
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
@@ -454,6 +447,10 @@ void mainWindow::finalize( void )
 					this, SLOT( openProject() ),
 					Qt::CTRL + Qt::Key_O );	
 
+	project_menu->addAction( embed::getIconPixmap( "project_open" ),
+					tr( "Recently opened projects" ),
+					m_recentlyOpenedProjectsMenu );
+
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
 					this, SLOT( saveProject() ),
@@ -469,16 +466,11 @@ void mainWindow::finalize( void )
 	project_menu->insertSeparator();
 #endif
 	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
-					tr( "Import file" ),
+					tr( "Import..." ),
 					engine::getSongEditor(),
 					SLOT( importProject() ) );
-#ifdef QT4
-	project_menu->addSeparator();
-#else
-	project_menu->insertSeparator();
-#endif
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "E&xport" ),
+					tr( "E&xport..." ),
 					engine::getSongEditor(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
@@ -577,19 +569,6 @@ void mainWindow::finalize( void )
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
-#if 0
-#ifdef LADSPA_SUPPORT
-#ifdef QT4
-	help_menu->addSeparator();
-#else
-	help_menu->insertSeparator();
-#endif
-	help_menu->addAction( embed::getIconPixmap( "help" ), tr( "LADSPA Plugins..." ),
-			      this, SLOT( ladspaPluginBrowser() ) );
-#endif
-#endif
-
-	
 #ifdef QT4
 	help_menu->addSeparator();
 #else
@@ -702,7 +681,8 @@ void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 
 void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
-	QRect r( _de.attribute( "x" ).toInt(), _de.attribute( "y" ).toInt(),
+	QRect r( tMax( 0, _de.attribute( "x" ).toInt() ),
+			tMax( 0, _de.attribute( "y" ).toInt() ),
 			_de.attribute( "width" ).toInt(),
 			_de.attribute( "height" ).toInt() );
 	if( !r.isNull() && _w->parentWidget() != NULL )
@@ -792,8 +772,35 @@ void mainWindow::openProject( void )
 		{
 			engine::getSongEditor()->loadProject(
 						ofd.selectedFiles()[0] );
+			configManager::inst()->addRecentlyOpenedProject(
+							ofd.selectedFiles()[0] );
+			updateRecentlyOpenedProjectsMenu();
 		}
 	}
+}
+
+
+
+
+void mainWindow::updateRecentlyOpenedProjectsMenu( void )
+{
+	m_recentlyOpenedProjectsMenu->clear();
+	QStringList rup = configManager::inst()->recentlyOpenedProjects();
+	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
+	{
+		m_recentlyOpenedProjectsMenu->addAction( *it );
+	}
+}
+
+
+
+
+void mainWindow::openRecentlyOpenedProject( int _id )
+{
+	const QString & f = m_recentlyOpenedProjectsMenu->text( _id );
+	engine::getSongEditor()->loadProject( f );
+	configManager::inst()->addRecentlyOpenedProject( f );
+	updateRecentlyOpenedProjectsMenu();
 }
 
 
@@ -858,6 +865,9 @@ bool mainWindow::saveProjectAs( void )
 #else
 		engine::getSongEditor()->saveProjectAs( sfd.selectedFile() );
 #endif
+		configManager::inst()->addRecentlyOpenedProject(
+							sfd.selectedFiles()[0] );
+		updateRecentlyOpenedProjectsMenu();
 		return( TRUE );
 	}
 	return( FALSE );
@@ -894,19 +904,6 @@ void mainWindow::help( void )
 				  QMessageBox::Ok );
 }
 
-
-
-#if 0
-void mainWindow::ladspaPluginBrowser( void )
-{
-	// moc for Qt 3.x doesn't recognize preprocessor directives,
-	// so we can't just block the whole thing out.
-#ifdef LADSPA_SUPPORT
-	ladspaBrowser lb;
-	lb.exec();
-#endif
-}
-#endif
 
 
 
@@ -1167,8 +1164,8 @@ void mainWindow::browseHelp( void )
 	}
 	else if( pid == 0 )
 	{
-		QString url = "http://wiki.mindrules.net/doku.php?id="
-						+ tr( "start", "doku.php id" );
+// TODO: use QDesktopService with Qt4
+		QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
 		execlp( "x-www-browser", "x-www-browser", url.
 #ifdef QT4
 							toAscii().constData(),

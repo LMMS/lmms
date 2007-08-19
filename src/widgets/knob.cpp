@@ -411,13 +411,13 @@ void knob::dropEvent( QDropEvent * _de )
 	QString val = stringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		printf("set val\n");
+		//printf("set val\n");
 		setValue( val.toFloat() );
 		_de->accept();
 	}
 	else if( type == "link_object" )
 	{
-		printf("link!\n");
+		//printf("link!\n");
 		knob * obj = (knob *)( val.toULong() );
 		linkObjects( this, obj );
 		obj->setValue( value() );

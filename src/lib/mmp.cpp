@@ -537,7 +537,7 @@ void multimediaProject::upgrade( void )
 			{
 				el.setAttribute( "chord-enabled", TRUE );
 				el.setAttribute( "arp-enabled",
-						el.attribute( "arpdir" ).toInt() != 0 );
+					el.attribute( "arpdir" ).toInt() != 0 );
 			}
 		}
 
@@ -591,6 +591,24 @@ void multimediaProject::upgrade( void )
 				el.setAttribute( "arpdir",
 					el.attribute( "arpdir" ).toInt() - 1 );
 			}
+		}
+	}
+
+	if( version < "0.3.0" )
+	{
+		QDomNodeList list = elementsByTagName( "pluckedstringsynth" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setTagName( "vibedstrings" );
+			el.setAttribute( "active0", 1 );
+		}
+
+		list = elementsByTagName( "lb303" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setTagName( "lb302" );
 		}
 	}
 

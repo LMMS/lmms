@@ -729,6 +729,25 @@ void configManager::addPage( QWidget * _w, const QString & _title )
 
 
 
+void configManager::addRecentlyOpenedProject( const QString & _file )
+{
+	if( m_recentlyOpenedProjects.size() > 15 )
+	{
+		m_recentlyOpenedProjects.remove(
+					m_recentlyOpenedProjects.last() );
+	}
+	QStringList::iterator it;
+	while( ( it = m_recentlyOpenedProjects.find( _file ) ) !=
+					m_recentlyOpenedProjects.end() )
+	{
+		m_recentlyOpenedProjects.remove( it );
+	}
+	m_recentlyOpenedProjects.push_front( _file );
+}
+
+
+
+
 const QString & configManager::value( const QString & _class,
 					const QString & _attribute ) const
 {
@@ -844,6 +863,22 @@ bool configManager::loadConfigFile( void )
 				}
 			}
 			m_settings[node.nodeName()] = attr;
+		}
+		else if( node.nodeName() == "recentfiles" )
+		{
+			m_recentlyOpenedProjects.clear();
+			QDomNode n = node.firstChild();
+			while( !n.isNull() )
+			{
+				if( n.isElement() &&
+					n.toElement().hasAttributes() )
+				{
+					m_recentlyOpenedProjects <<
+						n.toElement().
+							attribute( "path" );
+				}
+				n = n.nextSibling();
+			}
 		}
 		node = node.nextSibling();
 	}
@@ -964,6 +999,17 @@ void configManager::saveConfigFile( void )
 		}
 		lmms_config.appendChild( n );
 	}
+
+	QDomElement recent_files = doc.createElement( "recentfiles" );
+
+	for( QStringList::iterator it = m_recentlyOpenedProjects.begin();
+				it != m_recentlyOpenedProjects.end(); ++it )
+	{
+		QDomElement n = doc.createElement( "file" );
+		n.setAttribute( "path", *it );
+		recent_files.appendChild( n );
+	}
+	lmms_config.appendChild( recent_files );
 
 #if QT_VERSION >= 0x030100
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString( 2 );

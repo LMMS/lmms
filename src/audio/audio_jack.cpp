@@ -279,8 +279,8 @@ void audioJACK::stopProcessing( void )
 
 void audioJACK::registerPort( audioPort * _port )
 {
-	return;
-/*	// make sure, port is not already registered
+#ifdef AUDIO_PORT_SUPPORT
+	// make sure, port is not already registered
 	unregisterPort( _port );
 	const QString name[2] = { _port->name() + " L",
 					_port->name() + " R" } ;
@@ -296,7 +296,8 @@ void audioJACK::registerPort( audioPort * _port )
 #endif
 				JACK_DEFAULT_AUDIO_TYPE,
 				JackPortIsOutput, 0 );
-	}*/
+	}
+#endif
 }
 
 
@@ -304,8 +305,8 @@ void audioJACK::registerPort( audioPort * _port )
 
 void audioJACK::unregisterPort( audioPort * _port )
 {
-	return;
-/*	if( m_portMap.contains( _port ) )
+#ifdef AUDIO_PORT_SUPPORT
+	if( m_portMap.contains( _port ) )
 	{
 		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
@@ -316,7 +317,8 @@ void audioJACK::unregisterPort( audioPort * _port )
 			}
 		}
 		m_portMap.erase( m_portMap.find( _port ) );
-	}*/
+	}
+#endif
 }
 
 
@@ -324,8 +326,8 @@ void audioJACK::unregisterPort( audioPort * _port )
 
 void audioJACK::renamePort( audioPort * _port )
 {
-	return;
-/*	if( m_portMap.contains( _port ) )
+#ifdef AUDIO_PORT_SUPPORT
+	if( m_portMap.contains( _port ) )
 	{
 		const QString name[2] = { _port->name() + " L",
 					_port->name() + " R" };
@@ -340,7 +342,8 @@ void audioJACK::renamePort( audioPort * _port )
 #endif
 					) ;
 		}
-	}*/
+	}
+#endif
 }
 
 
@@ -368,12 +371,13 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 					_this->m_outputPorts[chnl], _nframes );
 	}
 
-/*	const Uint32 frames = tMin<Uint32>( _nframes,
-					getMixer()->framesPerPeriod() );
+#ifdef AUDIO_PORT_SUPPORT
+	const Uint32 frames = tMin<Uint32>( _nframes,
+					_this->getMixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = _this->m_portMap.begin();
 					it != _this->m_portMap.end(); ++it )
 	{
-		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
 		{
 			if( it.data().ports[ch] == NULL )
 			{
@@ -385,10 +389,11 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 								_nframes );
 			for( Uint32 frame = 0; frame < frames; ++frame )
 			{
-				buf[frame] = it.key()->firstBuffer()[ch][frame];
+				buf[frame] = it.key()->firstBuffer()[frame][ch];
 			}
 		}
-	}*/
+	}
+#endif
 
 	jack_nframes_t done = 0;
 	while( done < _nframes && _this->m_stopped == FALSE )
@@ -465,7 +470,7 @@ audioJACK::setupWidget::setupWidget( QWidget * _parent ) :
 	audioDevice::setupWidget( audioJACK::name(), _parent )
 {
 	QString cn = configManager::inst()->value( "audiojack", "clientname" );
-	if( cn == "" )
+	if( cn.isEmpty() )
 	{
 		cn = "lmms";
 	}

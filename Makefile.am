@@ -35,7 +35,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 	$(MOC) -o $@ $<
 
 %.ts: 
-	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name *.cpp` -ts data/locale/$@
+	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name "*.cpp"` -ts data/locale/$@
 
 %.qm: %.ts
 	$(LRELEASE) $<

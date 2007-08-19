@@ -288,7 +288,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 	// clear last audio-buffer
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
-printf("---------------------------next period\n");
+//printf("---------------------------next period\n");
 //	if( criticalXRuns() == FALSE )
 	{
 		engine::getSongEditor()->processNextBuffer();
@@ -745,7 +745,7 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
 		{
 			m_writeBuf[frame][chnl] += _buf[frame][chnl];
-			
+
 			if( m_scaleClip )
 			{
 				scaleClip( frame, chnl );

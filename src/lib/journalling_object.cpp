@@ -68,7 +68,6 @@ journallingObject::~journallingObject()
 
 void journallingObject::undo( void )
 {
-	printf("undo: %d\n", id() );
 	if( m_journalEntries.empty() == TRUE )
 	{
 		return;
@@ -85,7 +84,6 @@ void journallingObject::undo( void )
 
 void journallingObject::redo( void )
 {
-	printf("undo: %d\n", id() );
 	if( m_journalEntries.empty() == TRUE )
 	{
 		return;

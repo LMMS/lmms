@@ -3,7 +3,54 @@
     <name>QObject</name>
     <message>
         <source>Note detuning</source>
-        <translation>Noten-Verstimmung</translation>
+        <translation type="obsolete">Noten-Verstimmung</translation>
+    </message>
+</context>
+<context>
+    <name>QWidget</name>
+    <message>
+        <source>Name: </source>
+        <translation> Name: </translation>
+    </message>
+    <message>
+        <source>Maker: </source>
+        <translation>Hersteller: </translation>
+    </message>
+    <message>
+        <source>Copyright: </source>
+        <translation>Copyright: </translation>
+    </message>
+    <message>
+        <source>Requires Real Time: </source>
+        <translation>Benötigt Echtzeit: </translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Real Time Capable: </source>
+        <translation>Echtzeitfähig: </translation>
+    </message>
+    <message>
+        <source>In Place Broken: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels In: </source>
+        <translation>Eingangs-Kanäle: </translation>
+    </message>
+    <message>
+        <source>Channels Out: </source>
+        <translation>Ausgangs-Kanäle: </translation>
+    </message>
+    <message>
+        <source>File: </source>
+        <translation>Datei: </translation>
     </message>
 </context>
 <context>
@@ -50,9 +97,21 @@ Wenn Sie an der Übersetzung von LMMS in eine andere Sprache interessiert sind o
 Copyright (c) 2004-2006 LMMS-Developers
 
 http://lmms.sourceforge.net</source>
-        <translation>LMMS - Ein leistungsfähiges Synthesizer-Studio
+        <translation type="obsolete">LMMS - Ein leistungsfähiges Synthesizer-Studio
 
 Copyright (c) 2004-2006 LMMS-Entwickler
+
+http://lmms.sourceforge.net</translation>
+    </message>
+    <message>
+        <source>LMMS - A powerful synthesizer-studio
+
+Copyright (c) 2004-2007 LMMS-Developers
+
+http://lmms.sourceforge.net</source>
+        <translation>LMMS - Ein leistungsfähiges Synthesizer-Studio
+
+Copyright (c) 2004-2007 LMMS-Entwickler
 
 http://lmms.sourceforge.net</translation>
     </message>
@@ -649,6 +708,10 @@ http://lmms.sourceforge.net</translation>
         <source>END</source>
         <translation>ENDE</translation>
     </message>
+    <message>
+        <source>Loop</source>
+        <translation>Wiederholen</translation>
+    </message>
 </context>
 <context>
     <name>automatableButton</name>
@@ -789,6 +852,49 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Note detuning</source>
+        <translation>Noten-Verstimmung</translation>
+    </message>
+</context>
+<context>
+    <name>bassBoosterControlDialog</name>
+    <message>
+        <source>Frequency</source>
+        <translation>Frequenz</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>Frequency:</source>
+        <translation>Frequenz:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Gain</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>GAIN</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Gain:</translation>
+    </message>
+    <message>
+        <source>Ratio</source>
+        <translation>Rate</translation>
+    </message>
+    <message>
+        <source>RATIO</source>
+        <translation>RATE</translation>
+    </message>
+    <message>
+        <source>Ratio:</source>
+        <translation>Rate:</translation>
     </message>
 </context>
 <context>
@@ -1151,6 +1257,13 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     <message>
         <source>Choose LMMS working directory</source>
         <translation>LMMS-Arbeitsverzeichnis wählen</translation>
+    </message>
+</context>
+<context>
+    <name>effectList</name>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
     </message>
 </context>
 <context>
@@ -1794,6 +1907,69 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     </message>
 </context>
 <context>
+    <name>kickerInstrument</name>
+    <message>
+        <source>Start frequency</source>
+        <translation>Startfrequenz</translation>
+    </message>
+    <message>
+        <source>START</source>
+        <translation>START</translation>
+    </message>
+    <message>
+        <source>Start frequency:</source>
+        <translation>Startfrequenz:</translation>
+    </message>
+    <message>
+        <source>End frequency</source>
+        <translation>Endfrequenz</translation>
+    </message>
+    <message>
+        <source>END</source>
+        <translation>ENDE</translation>
+    </message>
+    <message>
+        <source>End frequency:</source>
+        <translation>Endfrequenz:</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Abfallzeit</translation>
+    </message>
+    <message>
+        <source>DECAY</source>
+        <translation>ABFALL</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Abfallzeit (decay):</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Verzerrung</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation>DIST</translation>
+    </message>
+    <message>
+        <source>Distortion:</source>
+        <translation>Verzerrung:</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>Gain</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation>GAIN</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>Gain:</translation>
+    </message>
+</context>
+<context>
     <name>knob</name>
     <message>
         <source>&amp;Help</source>
@@ -1964,51 +2140,245 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>ladspaSubPluginDescriptionWidget</name>
     <message>
         <source>Description</source>
-        <translation>Beschreibung</translation>
+        <translation type="obsolete">Beschreibung</translation>
     </message>
     <message>
         <source>Name: </source>
-        <translation> Name:</translation>
+        <translation type="obsolete"> Name:</translation>
     </message>
     <message>
         <source>Maker: </source>
-        <translation> Hersteller:</translation>
+        <translation type="obsolete"> Hersteller:</translation>
     </message>
     <message>
         <source>Copyright: </source>
-        <translation> Copyright:</translation>
+        <translation type="obsolete"> Copyright:</translation>
     </message>
     <message>
         <source>Requires Real Time: Yes</source>
-        <translation>Benötigt Echtzeit: ja</translation>
+        <translation type="obsolete">Benötigt Echtzeit: ja</translation>
     </message>
     <message>
         <source>Requires Real Time: No</source>
-        <translation>Benötigt Echtzeit: nein</translation>
+        <translation type="obsolete">Benötigt Echtzeit: nein</translation>
     </message>
     <message>
         <source>Real Time Capable: Yes</source>
-        <translation>Echtzeitfähig: ja</translation>
+        <translation type="obsolete">Echtzeitfähig: ja</translation>
     </message>
     <message>
         <source>Real Time Capable: No</source>
-        <translation>Echtzeitfähig: nein</translation>
-    </message>
-    <message>
-        <source>In Place Broken: Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Place Broken: No</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Echtzeitfähig: nein</translation>
     </message>
     <message>
         <source>Channels In: </source>
-        <translation> Eingangs-Kanäle:</translation>
+        <translation type="obsolete"> Eingangs-Kanäle:</translation>
     </message>
     <message>
         <source>Channels Out: </source>
-        <translation> Ausgangs-Kanäle:</translation>
+        <translation type="obsolete"> Ausgangs-Kanäle:</translation>
+    </message>
+</context>
+<context>
+    <name>lb302Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation>VCF-Kennfrequenz</translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation>Kennfrequenz:</translation>
+    </message>
+    <message>
+        <source>CUT</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation>VCF-Resonanz</translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation>Resonanz:</translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation>RES</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation>VCF-Hüllkurvenintensität</translation>
+    </message>
+    <message>
+        <source>Env Mod:</source>
+        <translation>Hüllkurven-Modulation:</translation>
+    </message>
+    <message>
+        <source>ENV MOD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation>VCF-Hüllkurvenabfallzeit</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>Abfallzeit (decay):</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation>DEC</translation>
+    </message>
+    <message>
+        <source>Slide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accent</source>
+        <translation>Betonung</translation>
+    </message>
+    <message>
+        <source>Dead</source>
+        <translation>Tot</translation>
+    </message>
+    <message>
+        <source>303-es-que, 24dB/octave, 3 pole filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation>Slide-Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation>Slide-Abfallzeit:</translation>
+    </message>
+    <message>
+        <source>SLIDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
+        <translation>Feinverstimmung des VCOs. Bereich zwischen -100 und 100 Cents.</translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation>VCO Feinverstimmung:</translation>
+    </message>
+    <message>
+        <source>DETUNE</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation>Verzerrung</translation>
+    </message>
+    <message>
+        <source>DIST:</source>
+        <translation>Verzerrung:</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation>Wellenform</translation>
+    </message>
+    <message>
+        <source>WAVE:</source>
+        <translation type="unfinished">Wellenform:</translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation>WELLE</translation>
+    </message>
+    <message>
+        <source>Sawtooth </source>
+        <translation>Sägezahn </translation>
+    </message>
+    <message>
+        <source>Inverted Sawtooth </source>
+        <translation>Invertierter Sägezahn </translation>
+    </message>
+    <message>
+        <source>Triangle </source>
+        <translation>Dreieck </translation>
+    </message>
+    <message>
+        <source>Square </source>
+        <translation>Rechteck</translation>
+    </message>
+    <message>
+        <source>Rounded Square </source>
+        <translation>Abgerundetes Reckteck</translation>
+    </message>
+    <message>
+        <source>Moog </source>
+        <translation>Moog </translation>
+    </message>
+</context>
+<context>
+    <name>lb303Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation type="obsolete">VCF-Kennfrequenz</translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation type="obsolete">Kennfreq.:</translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation type="obsolete">VCF-Resonanz</translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation type="obsolete">Resonanz:</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation type="obsolete">VCF-Hüllkurvenintensität</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation type="obsolete">VCF-Hüllkurvenabfallzeit</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation type="obsolete">Abfallzeit (decay):</translation>
+    </message>
+    <message>
+        <source>Accent</source>
+        <translation type="obsolete">Betonung</translation>
+    </message>
+    <message>
+        <source>Dead</source>
+        <translation type="obsolete">Tot</translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation type="obsolete">Slide-Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation type="obsolete">Slide-Abfallzeit:</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation type="obsolete">Wellenform</translation>
+    </message>
+    <message>
+        <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
+        <translation type="obsolete">Feinverstimmung des VCOs. Bereich zwischen -100 und 100 Cents.</translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation type="obsolete">VCO Feinverstimmung:</translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation type="obsolete">Verzerrung</translation>
     </message>
 </context>
 <context>
@@ -2035,6 +2405,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>--- Factory files ---</source>
         <translation>--- Distributions-Dateien ---</translation>
+    </message>
+</context>
+<context>
+    <name>liveTool</name>
+    <message>
+        <source>This tool is intended to be used in live performances, though you can use it for music production as well.
+The following keys will work only if this window is active.
+The spacebar toggles play and pause in the Song Editor.
+F1-F10 keys mute the first 10 instruments in the Beat+Baseline Editor.</source>
+        <translation>Dieses Werkzeug ist für die Verwendung in Live-Auftritten gedacht, allerdings können Sie es natürlich auch für die Musikproduktion verwenden.
+Die folgenden Tasten funktionieren nur, wenn dieses Fenster im Vordergrund ist.
+Leertaste wechselt zwischen Abspielen und Pause im Song-Editor.
+F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wieder zurück.</translation>
     </message>
 </context>
 <context>
@@ -2133,11 +2516,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Import file</source>
-        <translation>Datei importieren</translation>
+        <translation type="obsolete">Datei importieren</translation>
     </message>
     <message>
         <source>E&amp;xport</source>
-        <translation>E&amp;xportieren</translation>
+        <translation type="obsolete">E&amp;xportieren</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
@@ -2235,7 +2618,7 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     </message>
     <message>
         <source>LADSPA Plugins...</source>
-        <translation>LADSPA-Plugins...</translation>
+        <translation type="obsolete">LADSPA-Plugins...</translation>
     </message>
     <message>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
@@ -2244,6 +2627,26 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>MultiMedia Projekt (*.mmp *.mmpz);;MultiMedia Projekt-Vorlage (*.mpt)</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Werkzeuge</translation>
+    </message>
+    <message>
+        <source>Online help</source>
+        <translation>Online-Hilfe</translation>
+    </message>
+    <message>
+        <source>Recently opened projects</source>
+        <translation>Zuletzt geöffnete Projekte</translation>
+    </message>
+    <message>
+        <source>Import...</source>
+        <translation>Importieren...</translation>
+    </message>
+    <message>
+        <source>E&amp;xport...</source>
+        <translation>E&amp;xportieren...</translation>
     </message>
 </context>
 <context>
@@ -2440,6 +2843,14 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <source>Tibetan Bowl</source>
         <translation>Tibetanische Schüssel</translation>
     </message>
+    <message>
+        <source>Missing files</source>
+        <translation>Fehlende Dateien</translation>
+    </message>
+    <message>
+        <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
+        <translation>Ihre Stk-Installation scheint unvollständig zu sein. Bitte stellen Sie sicher, dass das volle Stk-Paket installiert ist!</translation>
+    </message>
 </context>
 <context>
     <name>meterDialog</name>
@@ -2602,6 +3013,53 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     </message>
 </context>
 <context>
+    <name>patmanSynth</name>
+    <message>
+        <source>Open other patch</source>
+        <translation>Andere Patch-Datei öffnen</translation>
+    </message>
+    <message>
+        <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
+        <translation>Klicken Sie hier, um eine andere Patch-Datei zu laden. Wiederholungs- und Stimmungseinstellungen werden nicht zurückgesetzt.</translation>
+    </message>
+    <message>
+        <source>Loop</source>
+        <translation>Wiederholen</translation>
+    </message>
+    <message>
+        <source>Loop mode</source>
+        <translation>Modus beim Wiederholen</translation>
+    </message>
+    <message>
+        <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
+        <translation>Hier können Sie den Wiederholen-Modus (de-)aktivieren. Wenn aktiviert, verwendet PatMan die in der Datei verfügbaren Informationen zum Wiederholen.</translation>
+    </message>
+    <message>
+        <source>Tune</source>
+        <translation>Stimmung</translation>
+    </message>
+    <message>
+        <source>Tune mode</source>
+        <translation>Stimmungsmodus</translation>
+    </message>
+    <message>
+        <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
+        <translation>Hier können Sie den Stimmungs-Modus (de-)aktivieren. Wenn aktiviert, wird der Klang automatisch an die Frequenz der Note angepasst.</translation>
+    </message>
+    <message>
+        <source>No file selected</source>
+        <translation>Keine Datei ausgewählt</translation>
+    </message>
+    <message>
+        <source>Open patch file</source>
+        <translation>Patch-Datei öffnen</translation>
+    </message>
+    <message>
+        <source>Patch-Files (*.pat)</source>
+        <translation>Patch-Dateien (*.pat)</translation>
+    </message>
+</context>
+<context>
     <name>pattern</name>
     <message>
         <source>Change name</source>
@@ -2671,11 +3129,11 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Pattern muted</source>
-        <translation>Pattern stummgeschaltet</translation>
+        <translation type="obsolete">Pattern stummgeschaltet</translation>
     </message>
     <message>
         <source>The track this pattern belongs to or the pattern itself is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation>Die Spur, zu der dieser Pattern gehört oder dieser Pattern selbst sind derzeit stummgeschaltet, weshalb das Einfrieren keinen Sinn ergibt. Wollen Sie trotzdem fortfahren?</translation>
+        <translation type="obsolete">Die Spur, zu der dieser Pattern gehört oder dieser Pattern selbst sind derzeit stummgeschaltet, weshalb das Einfrieren keinen Sinn ergibt. Wollen Sie trotzdem fortfahren?</translation>
     </message>
 </context>
 <context>
@@ -2890,7 +3348,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Rough &amp; Dirty Wavetable Synthesizer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einfacher &amp; roher Wavetable-Synthesizer.</translation>
     </message>
     <message>
         <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
@@ -2927,6 +3385,26 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>plugin for using arbitrary VST-effects inside LMMS.</source>
         <translation>Plugin um beliebige VST-Effekte in LMMS nutzen zu können.</translation>
+    </message>
+    <message>
+        <source>Incomplete monophonic immitation tb303</source>
+        <translation>Unvollständiger monophonischer TB303-Klon</translation>
+    </message>
+    <message>
+        <source>versatile kick- &amp; bassdrum-synthesizer</source>
+        <translation>Vielfältiger Kick- &amp; Bassdrum-Synthesizer</translation>
+    </message>
+    <message>
+        <source>GUS-compatible patch instrument</source>
+        <translation>GUS-kompatibles Patch-Instrument</translation>
+    </message>
+    <message>
+        <source>Singer bot to add some basic vocals</source>
+        <translation>Künstlicher Sänger für ein paar einfache Vokale</translation>
+    </message>
+    <message>
+        <source>Tool for live performance</source>
+        <translation>Werkzeug für Live-Auftritte</translation>
     </message>
 </context>
 <context>
@@ -3104,7 +3582,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Controls</source>
-        <translation type="unfinished">Eigensch.</translation>
+        <translation>Regler</translation>
     </message>
     <message>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
@@ -3199,11 +3677,19 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation>Alle Audio-Dateien (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
+        <translation type="obsolete">Alle Audio-Dateien (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
     <message>
         <source>FLAC-Files (*.flac)</source>
         <translation>FLAC-Dateien (*.flac)</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>Alle Audio-Dateien (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>SPEEX-Files (*.spx)</source>
+        <translation>SPEEX-Dateien (*.spx)</translation>
     </message>
 </context>
 <context>
@@ -3410,7 +3896,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>SMP-level</source>
-        <translation>SMP-Level</translation>
+        <translation type="obsolete">SMP-Level</translation>
     </message>
     <message>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
@@ -4377,15 +4863,15 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <name>vstSubPluginDescriptionWidget</name>
     <message>
         <source>Description</source>
-        <translation>Beschreibung</translation>
+        <translation type="obsolete">Beschreibung</translation>
     </message>
     <message>
         <source>Name: </source>
-        <translation> Name:</translation>
+        <translation type="obsolete"> Name:</translation>
     </message>
     <message>
         <source>File: </source>
-        <translation> Datei:</translation>
+        <translation type="obsolete"> Datei:</translation>
     </message>
 </context>
 </TS>

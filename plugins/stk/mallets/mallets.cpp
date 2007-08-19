@@ -32,6 +32,8 @@
 #else
 
 #include <qdom.h>
+#include <qmessagebox.h>
+#include <qdir.h>
 
 #endif
 
@@ -70,24 +72,40 @@ plugin::descriptor malletsstk_plugin_descriptor =
 }
 
 
-mallets::mallets( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &malletsstk_plugin_descriptor )
+mallets::mallets( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &malletsstk_plugin_descriptor ),
+	m_filesMissing( TRUE )
 {
-	m_modalBarWidget = setupModalBarControls( this, _channel_track );
+	m_filesMissing =
+		!QDir( configManager::inst()->stkDir() ).exists() ||
+		!QFileInfo( configManager::inst()->stkDir()+QDir::separator()
+			+ "sinewave.raw" ).exists();
+#if 0
+	// for some reason this crashes...???
+	if( m_filesMissing )
+	{
+		QMessageBox::information( 0, tr( "Missing files" ),
+				tr( "Your Stk-installation seems to be "
+					"incomplete. Please make sure "
+					"the full Stk-package is installed!" ),
+				QMessageBox::Ok );
+	}
+#endif
+	m_modalBarWidget = setupModalBarControls( this, _instrument_track );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
 	
-	m_tubeBellWidget = setupTubeBellControls( this, _channel_track );
+	m_tubeBellWidget = setupTubeBellControls( this, _instrument_track );
 	setWidgetBackground( m_tubeBellWidget, "artwork" );
 	m_tubeBellWidget->hide();
 	
-	m_bandedWGWidget = setupBandedWGControls( this, _channel_track );
+	m_bandedWGWidget = setupBandedWGControls( this, _instrument_track );
 	setWidgetBackground( m_bandedWGWidget, "artwork" );
 	m_bandedWGWidget->hide();
 	
-	m_presets = setupPresets( this, _channel_track );
+	m_presets = setupPresets( this, _instrument_track );
 	
 	m_spread = new knob( knobBright_26, this, tr( "Spread" ),
-							_channel_track );
+							_instrument_track );
 	m_spread->setLabel( tr( "Spread" ) );
 	m_spread->setRange( 0, 255, 1 );
 	m_spread->setInitValue( 0 );
@@ -390,6 +408,11 @@ QString mallets::nodeName( void ) const
 
 void mallets::playNote( notePlayHandle * _n, bool )
 {
+	if( m_filesMissing )
+	{
+		return;
+	}
+
 	int p = m_presets->value();
 	
 	const float freq = _n->frequency();
