@@ -62,7 +62,7 @@
 // New config
 //
 #define LB_24_IGNORE_ENVELOPE   
-//#define LB_FILTERED 
+#define LB_FILTERED 
 //#define LB_24_RES_TRICK         
 
 #define LB_DIST_RATIO    4.0
@@ -593,6 +593,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	float w;
     float samp;
          
+
        
     
 	for(i=0;i<size;i++) {
@@ -624,16 +625,22 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 
         float old_vco_k = vco_k;
         bool looking;
+        int  decay_frames = 128;
 
 		// update vco
 	    vco_c += vco_inc;
 
         if(vco_c > 0.5) vco_c -= 1.0;
-/*
-        if (catch_decay < desiredTransitionFrames()) {
-            catch_decay++;
-            continue;
-        }*/
+
+        if (catch_decay > 0) {
+            if (catch_decay < decay_frames) {
+                catch_decay++;
+            }
+            else if (use_hold_note) {
+                use_hold_note = false;
+                initNote(&hold_note);
+            }
+        }
     
          
         switch(int(rint(wave_knob->value()))) {
@@ -683,7 +690,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
                 break;
         }
 
-	vca_a = 0.5;
+	//vca_a = 0.5;
         // Write out samples.
 #ifdef LB_FILTERED
         samp = vcf->process(vco_k)*2.0*vca_a;
@@ -694,17 +701,17 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         float releaseFrames = desiredReleaseFrames();
         samp *= (releaseFrames - catch_decay)/releaseFrames;
         */
+        samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
         for(int c=0; c<DEFAULT_CHANNELS; c++) {
             outbuf[i][c]=samp;
         }
 
-        // Store state
-        period_states[i].vco_c = vco_c;
-        period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
-        period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
 
-
+       /* if(i>release_frame) {
+            vca_mode=1;
+        }*/
+       
         // Handle Envelope
         // TODO: Add decay once I figure out how to extend past the end of a note.
 		if(vca_mode==0) {
@@ -719,13 +726,19 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 2; }
 		}
-        
+         // Store state
+        period_states[i].vco_c = vco_c;
+        period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
+        period_states[i].vca_mode = vca_mode;             // Doesn't change anything (currently)
+        period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
+
+
 	}
 	return 1;
 }
 
 /*  Prepares the active LB302 note.  I separated this into a function because it
- *  needs to be called on playNote() when a new note is started.  It also needs
+ *  needs to be called on0playNote() when a new note is started.  It also needs
  *  to be called from process() when a prior edge-to-edge note is done releasing.
  */
 void lb302Synth::initNote( lb302Note *n)
@@ -793,6 +806,8 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 	// somewhere else
 	f_cnt_t resume_pos = lastFramesPlayed-1;
 
+    bool decay_note = false;
+
 	// find out which situation we're in
 	constNotePlayHandleVector v =
 		notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack(), TRUE );
@@ -842,7 +857,8 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 			{
 				resume_pos += framesPerPeriod;
 			}
-	        }
+            decay_note = true;
+        }
 	}
 
 #ifdef LB_DEBUG
@@ -872,6 +888,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     /// Actually resume the state, now that we have the right state object.
     vco_c = state->vco_c;
     vca_a = state->vca_a;
+    vca_mode = state->vca_mode;
     sample_cnt = state->sample_cnt;
 
 
@@ -882,21 +899,26 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     //        catch_decay = 1;
     
 
+    release_frame = _n->framesLeft() - desiredReleaseFrames();
+
     if ( _n->totalFramesPlayed() <= 0 ) {
         /// This code is obsolete, hence the "if false"
 
         // Existing note. Allow it to decay. 
-        if(/*note_count*/ false) {
-            // BEGIN NOT SURE OF...
-            //lb302State *st = &period_states[period_states_cnt-1];
-            //vca_a = st->vca_a;
-            //sample_cnt = st->sample_cnt;
-            // END NOT SURE OF
+        if(deadToggle->value()==0 && decay_note) {
+            if (catch_decay < 1) {
+                // BEGIN NOT SURE OF...
+                //lb302State *st = &period_states[period_states_cnt-1];
+                //vca_a = st->vca_a;
+                //sample_cnt = st->sample_cnt;
+                // END NOT SURE OF
 
-            // Reserve this note for retrigger in process()
-            hold_note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
-            hold_note.dead = deadToggle->value();
-            use_hold_note = true;
+                // Reserve this note for retrigger in process()
+                hold_note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+                hold_note.dead = deadToggle->value();
+                use_hold_note = true;
+                catch_decay = 1;
+            }
         }
         /// Start a new note.
         else {

@@ -124,6 +124,7 @@ class lb302State
 public:
     float vco_c;
     float vca_a;
+    int vca_mode;
     int sample_cnt;
 };
 
@@ -217,6 +218,7 @@ private:
     bool use_hold_note;
   	
     int lastFramesPlayed;
+    int release_frame;
 
 	
     // More States
