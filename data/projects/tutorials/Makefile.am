@@ -1,6 +1,6 @@
 tutorialsdir = $(lmmsdatadir)/projects/tutorials
 
-tutorials_DATA = *.mmp *.mmpz
+tutorials_DATA = *.mmp*
 
 EXTRA_DIST = $(tutorials_DATA)
 
