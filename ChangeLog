@@ -1,3 +1,80 @@
+2007-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/projects/covers/MonkeyIsland1-Intro.mmpz:
+	another cool cover
+
+	* data/projects/covers/J.S.Bach-Preludium_and_Fugue_A-Minor.mmp:
+	removed
+
+	* data/projects/covers/J.S.Bach-Preludium_and_Fugue_A-Minor.mmpz:
+	reworked
+
+	* data/projects/demos/demo1.mmp:
+	* data/projects/demos/demo2.mmp:
+	* data/projects/demos/demo3.mmp:
+	* data/projects/cool_songs/Siegel-DreamWave.mmp:
+	updated
+
+	* data/projects/misc/lb302quick.mmp:
+	* data/projects/demos/basses-demo.mmp:
+	removed because of really low-quality and/or duplicate
+
+	* data/projects/demos/lb302quick.mmpz:
+	added another demo
+
+	* data/projects/cool_songs/StrictProduction-Lamentelnes.mmp:
+	* data/projects/cool_songs/StrictProduction-DearJonDoe.mmp:
+	* data/projects/cool_songs/OrtalDj-FirstProyect.mmp:
+	* data/projects/cool_songs/Siegel-SpeedTrack.mmp:
+	* data/projects/cool_songs/Chris-RaveRiff.mmpz:
+	* data/projects/cool_songs/MysthR-Living.mmpz:
+	* data/projects/cool_songs/j1m-DingDong.mmp:
+	* data/projects/cool_songs/BlueWolf-DreamTravel.mmp:
+	* data/projects/cool_songs/Silva-ElvesCall.mmp:
+	added some more really cool projects
+
+	* data/samples/drums/bassdrum04.ogg:
+	resampled to end at zero-level - fixes clicks in some projects
+
+	* data/samples/drums/nasty_bass01.ogg:
+	* data/samples/drums/nasty_snare01.ogg:
+	* data/samples/drums/rim01.ogg:
+	* data/samples/drums/ride02.ogg:
+	* data/samples/drums/nasty_rim01.ogg:
+	* data/samples/drums/hihat_opened03.ogg
+	* data/samples/misc/applause01.ogg:
+	added samples
+
+	* data/presets/TripleOscillator/SawLead.cs.xml:
+	* data/presets/TripleOscillator/SawLead2.cs.xml:
+	* data/presets/TripleOscillator/HardClipping.cs.xml:
+	* data/presets/TripleOscillator/PowerStrings.cs.xml:
+	* data/presets/TripleOscillator/SquareLead.cs.xml:
+	* data/presets/TripleOscillator/SquareLead2.cs.xml:
+	added some presets
+
+	* plugins/lb302/lb302.cpp:
+	removed debug-out
+
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	added applyRelease(...)-call in playNote(...) and
+	re-implemented desiredReleaseFrames()-method
+
+	* include/mmp.h:
+	* src/lib/mmp.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	fixed some bugs concerning recent-files-list
+
+2007-08-20	dieEasy <dieeasy/at/cheapnet/dot/it>
+
+	* data/locale/it.ts:
+	updated Italian localization-file
+
 2007-08-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/de.ts:
@@ -40,11 +117,13 @@
 	set directory of sample-selection-dialog to /usr/share/midi/freepats
 	if it exists
 
+	* configure.in:
 	* plugins/Makefile.am:
 	* plugins/vibed/vibed.cpp:
 	* lib/src/mmp.cpp:
 	replaced obsolete PluckedStringSynth with Vibed
 
+	* configure.in:
 	* plugins/Makefile.am:
 	removed Polyb302 from build as the same results can be achieved either
 	via (improved and maintained) LB302 or TripleOsc+filter - Polyb302

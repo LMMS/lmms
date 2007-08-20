@@ -1537,6 +1537,9 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 	m_masterVolumeSlider->loadSettings( mmp.head(), "mastervol" );
 	m_masterPitchSlider->loadSettings( mmp.head(), "masterpitch" );
 
+	// reset loop-point-state
+	m_playPos[PLAY_SONG].m_timeLine->toggleLoopPoints( 0 );
+
 	QDomNode node = mmp.content().firstChild();
 	while( !node.isNull() )
 	{
@@ -1581,7 +1584,10 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 
 	m_loadingProject = FALSE;
 
+	configManager::inst()->addRecentlyOpenedProject( _file_name );
+
 	engine::getMainWindow()->resetWindowTitle( "" );
+	engine::getMainWindow()->updateRecentlyOpenedProjectsMenu();
 
 	engine::getProjectJournal()->setJournalling( TRUE );
 }
@@ -1617,7 +1623,9 @@ bool songEditor::saveProject( void )
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
+		configManager::inst()->addRecentlyOpenedProject( m_fileName );
 		engine::getMainWindow()->resetWindowTitle( "" );
+		engine::getMainWindow()->updateRecentlyOpenedProjectsMenu();
 	}
 	else
 	{

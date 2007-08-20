@@ -714,6 +714,8 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 		}
 	}
 
+	applyRelease( buf, _n );
+
 	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
 	delete[] buf;

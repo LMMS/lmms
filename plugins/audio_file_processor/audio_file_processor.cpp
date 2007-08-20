@@ -403,6 +403,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool )
 					frames, _n->frequency(),
 					m_loopButton->isChecked() ) == TRUE )
 	{
+		applyRelease( buf, _n );
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
 	delete[] buf;

@@ -1,0 +1,336 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.2.1-svn20061204" type="instrumenttracksettings" version="1.0" >
+ <head/>
+ <instrumenttracksettings>
+  <instrumenttrack width="250" x="290" y="54" height="436" name="Default" tab="0" visible="1" >
+   <automation-pattern>
+    <vol>
+     <time value="100" pos="0" />
+    </vol>
+    <surpos-x>
+     <time value="0" pos="0" />
+    </surpos-x>
+    <surpos-y>
+     <time value="0" pos="0" />
+    </surpos-y>
+    <fxch>
+     <time value="0" pos="0" />
+    </fxch>
+    <basenote>
+     <time value="57" pos="0" />
+    </basenote>
+   </automation-pattern>
+   <tripleoscillator userwavefile1="" userwavefile2="" userwavefile0="" >
+    <automation-pattern>
+     <modalgo1>
+      <time value="2" pos="0" />
+     </modalgo1>
+     <modalgo2>
+      <time value="2" pos="0" />
+     </modalgo2>
+     <vol0>
+      <time value="33" pos="0" />
+     </vol0>
+     <pan0>
+      <time value="0" pos="0" />
+     </pan0>
+     <coarse0>
+      <time value="0" pos="0" />
+     </coarse0>
+     <finel0>
+      <time value="-10" pos="0" />
+     </finel0>
+     <finer0>
+      <time value="12" pos="0" />
+     </finer0>
+     <phoffset0>
+      <time value="0" pos="0" />
+     </phoffset0>
+     <stphdetun0>
+      <time value="0" pos="0" />
+     </stphdetun0>
+     <wavetype0>
+      <time value="3" pos="0" />
+     </wavetype0>
+     <vol1>
+      <time value="33" pos="0" />
+     </vol1>
+     <pan1>
+      <time value="0" pos="0" />
+     </pan1>
+     <coarse1>
+      <time value="0" pos="0" />
+     </coarse1>
+     <finel1>
+      <time value="-16" pos="0" />
+     </finel1>
+     <finer1>
+      <time value="-16" pos="0" />
+     </finer1>
+     <phoffset1>
+      <time value="0" pos="0" />
+     </phoffset1>
+     <stphdetun1>
+      <time value="0" pos="0" />
+     </stphdetun1>
+     <wavetype1>
+      <time value="4" pos="0" />
+     </wavetype1>
+     <vol2>
+      <time value="33" pos="0" />
+     </vol2>
+     <pan2>
+      <time value="0" pos="0" />
+     </pan2>
+     <coarse2>
+      <time value="0" pos="0" />
+     </coarse2>
+     <finel2>
+      <time value="4" pos="0" />
+     </finel2>
+     <finer2>
+      <time value="8" pos="0" />
+     </finer2>
+     <phoffset2>
+      <time value="0" pos="0" />
+     </phoffset2>
+     <stphdetun2>
+      <time value="0" pos="0" />
+     </stphdetun2>
+     <wavetype2>
+      <time value="3" pos="0" />
+     </wavetype2>
+    </automation-pattern>
+   </tripleoscillator>
+   <eldata fwet="0" >
+    <automation-pattern>
+     <ftype>
+      <time value="0" pos="0" />
+     </ftype>
+     <fcut>
+      <time value="14000" pos="0" />
+     </fcut>
+     <fres>
+      <time value="0.5" pos="0" />
+     </fres>
+    </automation-pattern>
+    <elvol syncmode="0" userwavefile="" >
+     <automation-pattern>
+      <pdel>
+       <time value="0" pos="0" />
+      </pdel>
+      <att>
+       <time value="0" pos="0" />
+      </att>
+      <hold>
+       <time value="0.5" pos="0" />
+      </hold>
+      <dec>
+       <time value="0.5" pos="0" />
+      </dec>
+      <sus>
+       <time value="0.5" pos="0" />
+      </sus>
+      <rel>
+       <time value="0.1" pos="0" />
+      </rel>
+      <amt>
+       <time value="0" pos="0" />
+      </amt>
+      <lshp>
+       <time value="0" pos="0" />
+      </lshp>
+      <lpdel>
+       <time value="0" pos="0" />
+      </lpdel>
+      <latt>
+       <time value="0" pos="0" />
+      </latt>
+      <lspd>
+       <time value="0.1" pos="0" />
+      </lspd>
+      <lspd_numerator>
+       <time value="1" pos="0" />
+      </lspd_numerator>
+      <lspd_denominator>
+       <time value="1" pos="0" />
+      </lspd_denominator>
+      <lamt>
+       <time value="0" pos="0" />
+      </lamt>
+      <x100>
+       <time value="0" pos="0" />
+      </x100>
+      <ctlenvamt>
+       <time value="0" pos="0" />
+      </ctlenvamt>
+     </automation-pattern>
+    </elvol>
+    <elcut syncmode="0" userwavefile="" >
+     <automation-pattern>
+      <pdel>
+       <time value="0" pos="0" />
+      </pdel>
+      <att>
+       <time value="0" pos="0" />
+      </att>
+      <hold>
+       <time value="0.5" pos="0" />
+      </hold>
+      <dec>
+       <time value="0.5" pos="0" />
+      </dec>
+      <sus>
+       <time value="0.5" pos="0" />
+      </sus>
+      <rel>
+       <time value="0.1" pos="0" />
+      </rel>
+      <amt>
+       <time value="0" pos="0" />
+      </amt>
+      <lshp>
+       <time value="0" pos="0" />
+      </lshp>
+      <lpdel>
+       <time value="0" pos="0" />
+      </lpdel>
+      <latt>
+       <time value="0" pos="0" />
+      </latt>
+      <lspd>
+       <time value="0.1" pos="0" />
+      </lspd>
+      <lspd_numerator>
+       <time value="1" pos="0" />
+      </lspd_numerator>
+      <lspd_denominator>
+       <time value="1" pos="0" />
+      </lspd_denominator>
+      <lamt>
+       <time value="0" pos="0" />
+      </lamt>
+      <x100>
+       <time value="0" pos="0" />
+      </x100>
+      <ctlenvamt>
+       <time value="0" pos="0" />
+      </ctlenvamt>
+     </automation-pattern>
+    </elcut>
+    <elres syncmode="0" userwavefile="" >
+     <automation-pattern>
+      <pdel>
+       <time value="0" pos="0" />
+      </pdel>
+      <att>
+       <time value="0" pos="0" />
+      </att>
+      <hold>
+       <time value="0.5" pos="0" />
+      </hold>
+      <dec>
+       <time value="0.5" pos="0" />
+      </dec>
+      <sus>
+       <time value="0.5" pos="0" />
+      </sus>
+      <rel>
+       <time value="0.1" pos="0" />
+      </rel>
+      <amt>
+       <time value="0" pos="0" />
+      </amt>
+      <lshp>
+       <time value="0" pos="0" />
+      </lshp>
+      <lpdel>
+       <time value="0" pos="0" />
+      </lpdel>
+      <latt>
+       <time value="0" pos="0" />
+      </latt>
+      <lspd>
+       <time value="0.1" pos="0" />
+      </lspd>
+      <lspd_numerator>
+       <time value="1" pos="0" />
+      </lspd_numerator>
+      <lspd_denominator>
+       <time value="1" pos="0" />
+      </lspd_denominator>
+      <lamt>
+       <time value="0" pos="0" />
+      </lamt>
+      <x100>
+       <time value="0" pos="0" />
+      </x100>
+      <ctlenvamt>
+       <time value="0" pos="0" />
+      </ctlenvamt>
+     </automation-pattern>
+    </elres>
+   </eldata>
+   <arpandchords arpdisabled="1" syncmode="0" chorddisabled="1" >
+    <automation-pattern>
+     <chord>
+      <time value="0" pos="0" />
+     </chord>
+     <chordrange>
+      <time value="1" pos="0" />
+     </chordrange>
+     <arp>
+      <time value="0" pos="0" />
+     </arp>
+     <arprange>
+      <time value="1" pos="0" />
+     </arprange>
+     <arptime>
+      <time value="100" pos="0" />
+     </arptime>
+     <arptime_numerator>
+      <time value="1" pos="0" />
+     </arptime_numerator>
+     <arptime_denominator>
+      <time value="1" pos="0" />
+     </arptime_denominator>
+     <arpgate>
+      <time value="100" pos="0" />
+     </arpgate>
+     <arpdir>
+      <time value="0" pos="0" />
+     </arpdir>
+     <arpmode>
+      <time value="0" pos="0" />
+     </arpmode>
+    </automation-pattern>
+   </arpandchords>
+   <midi>
+    <automation-pattern>
+     <inputchannel>
+      <time value="0" pos="0" />
+     </inputchannel>
+     <outputchannel>
+      <time value="1" pos="0" />
+     </outputchannel>
+     <receive>
+      <time value="0" pos="0" />
+     </receive>
+     <send>
+      <time value="0" pos="0" />
+     </send>
+     <defvelin>
+      <time value="0" pos="0" />
+     </defvelin>
+     <defvelout>
+      <time value="0" pos="0" />
+     </defvelout>
+    </automation-pattern>
+   </midi>
+   <fx fxdisabled="1" >
+    <rack numofeffects="0" />
+   </fx>
+  </instrumenttrack>
+ </instrumenttracksettings>
+</multimediaproject>

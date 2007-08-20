@@ -648,8 +648,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
     float samp;
          
 
-    printf("process\n");
-       
     
 	for(i=0;i<size;i++) {
         /* TODO: ONLY DO THIS IF WE ARE EDGE-TO-EDGE NON-DEAD */
@@ -765,7 +763,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 
         if(i>=release_frame) {
             vca_mode=1;
-            printf("Releasing!\n");
         }
        
         // Handle Envelope
@@ -777,7 +774,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         }
 		else if(vca_mode == 1) {
 			vca_a *= vca_decay;
-            printf("VCA: %d %f\n", i, vca_a);
             
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 3; }
@@ -923,15 +919,11 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 #ifdef LB_DEBUG
 	if( _n->released() )
 	{
-		printf( "    RELEASED!!!   %ld\n", _n );
 	}
 	else
 	{
-		printf( "not released...   %ld\n", _n );
 	}
-	printf( "offset: %d   frames:%d\n", _n->offset(), frames );
 
-	printf( "Resuming at %d\n", resume_pos );
 #endif
 
 	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - END === ///
@@ -968,7 +960,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     
 
     release_frame = _n->framesLeft() - desiredReleaseFrames();
-    printf("release at %d\n", release_frame);
 
     if ( _n->totalFramesPlayed() <= 0 ) {
         /// This code is obsolete, hence the "if false"
@@ -990,7 +981,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
                 catch_decay = 1;
             }
             else {
-                printf("Oh no!\n");
             }
 #else
             lb302Note note;

@@ -79,6 +79,12 @@ public:
 
 	virtual QString nodeName( void ) const;
 
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return( 64 );
+	}
+
+
 public slots:
         void sampleSizeChanged( float _new_sample_length );
         void sampleChanged( void );

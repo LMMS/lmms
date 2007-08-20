@@ -201,7 +201,7 @@ multimediaProject::~multimediaProject()
 
 
 
-bool multimediaProject::writeFile( const QString & _fn, bool _overwrite_check )
+bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 {
 	bool clean_meta_nodes = FALSE;
 	QString fn = _fn;

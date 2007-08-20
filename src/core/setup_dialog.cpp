@@ -152,9 +152,9 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	QWidget * ws = new QWidget( settings );
 #ifdef HAVE_STK_H
-	ws->setFixedSize( 360, 412 );
+	ws->setFixedSize( 360, 422 );
 #else
-	ws->setFixedSize( 360, 356 );
+	ws->setFixedSize( 360, 366 );
 #endif
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 240 );
@@ -280,9 +280,9 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	QWidget * directories = new QWidget( ws );
 #ifdef HAVE_STK_H
-	directories->setFixedSize( 360, 362 );
+	directories->setFixedSize( 360, 372 );
 #else
-	directories->setFixedSize( 360, 316 );
+	directories->setFixedSize( 360, 326 );
 #endif
 	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
 	dir_layout->setSpacing( 0 );
@@ -425,7 +425,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 	QWidget * performance = new QWidget( ws );
-	performance->setFixedSize( 360, 200 );
+	performance->setFixedSize( 360, 240 );
 	QVBoxLayout * perf_layout = new QVBoxLayout( performance );
 	perf_layout->setSpacing( 0 );
 	perf_layout->setMargin( 0 );
@@ -457,18 +457,19 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	tabWidget * smp_supp_tw = new tabWidget( tr( "SMP support" ).toUpper(),
 								performance );
-	smp_supp_tw->setFixedHeight( 180 );
+	smp_supp_tw->setFixedHeight( 200 );
 
 	QLabel * par_level_lbl = new QLabel( tr( "Parallelizing level" ),
 								smp_supp_tw );
 	par_level_lbl->move( 10, 15 );
+	par_level_lbl->setFixedSize( 120, 16 );
 	lcdSpinBox * par_level = new lcdSpinBox( 1, 16, 2, smp_supp_tw, NULL,
 									NULL );
 	par_level->setValue( m_parLevel );
 	connect( par_level, SIGNAL( valueChanged( int ) ),
 			this, SLOT( setParallelizingLevel( int ) ) );
 
-	par_level->move( 120, 20 );
+	par_level->move( 140, 20 );
 
 	QLabel * smp_help = new QLabel(
 		tr( "If you have a machine with more then one processor "
@@ -481,7 +482,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 			"work with small buffer-sizes. If you experience "
 			"problems (i.e. lot of xruns), try to increase buffer-"
 			"size." ), smp_supp_tw );
-	smp_help->setFixedSize( performance->width() - 20, 110 );
+	smp_help->setFixedSize( performance->width() - 20, 140 );
 #ifndef QT3
 	smp_help->setWordWrap( TRUE );
 #else

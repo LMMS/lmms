@@ -73,8 +73,7 @@ public:
 	multimediaProject( projectTypes _project_type );
 	~multimediaProject();
 
-	bool FASTCALL writeFile( const QString & _fn,
-						bool _overwrite_check = TRUE );
+	bool FASTCALL writeFile( QString & _fn, bool _overwrite_check = TRUE );
 
 	inline QDomElement & content( void )
 	{

@@ -441,10 +441,11 @@ void instrumentTrack::saveSettingsBtnClicked( void )
 		saveTrackSpecificSettings( mmp, _this );
 		mmp.content().appendChild( _this );
 #ifdef QT4
-		mmp.writeFile( sfd.selectedFiles()[0] );
+		QString f = sfd.selectedFiles()[0];
 #else
-		mmp.writeFile( sfd.selectedFile() );
+		QString f = sfd.selectedFile();
 #endif
+		mmp.writeFile( f );
 	}
 }
 

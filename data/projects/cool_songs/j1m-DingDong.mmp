@@ -1,0 +1,871 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.4" type="song" version="1.0" >
+  <head>
+    <bpm value="180" />
+    <mastervol value="100" />
+    <masterpitch value="0" />
+  </head>
+  <song>
+    <trackcontainer type="songeditor" >
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Noise" >
+          <trackcontainer type="bbeditor" >
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="kick02.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998703" sframe="0" amp="100" src="drums/kick02.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="kick02.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="64" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="kick02.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="kick02.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="snare01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.994236" sframe="0" amp="100" src="drums/snare01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="snare01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="64" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare01.ogg" pos="128" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="1" name="snare01.ogg" pos="192" frozen="0" len="192" >
+                <note tone="9" pan="0" oct="4" vol="6" pos="0" len="4" />
+                <note tone="9" pan="0" oct="4" vol="6" pos="4" len="4" />
+                <note tone="9" pan="0" oct="4" vol="6" pos="8" len="4" />
+                <note tone="9" pan="0" oct="4" vol="6" pos="12" len="4" />
+                <note tone="9" pan="0" oct="4" vol="8" pos="16" len="4" />
+                <note tone="9" pan="0" oct="4" vol="8" pos="20" len="4" />
+                <note tone="9" pan="0" oct="4" vol="8" pos="24" len="4" />
+                <note tone="9" pan="0" oct="4" vol="8" pos="28" len="4" />
+                <note tone="9" pan="0" oct="4" vol="10" pos="32" len="4" />
+                <note tone="9" pan="0" oct="4" vol="12" pos="36" len="4" />
+                <note tone="9" pan="0" oct="4" vol="12" pos="40" len="4" />
+                <note tone="9" pan="0" oct="4" vol="12" pos="44" len="4" />
+                <note tone="9" pan="0" oct="4" vol="12" pos="48" len="4" />
+                <note tone="9" pan="0" oct="4" vol="14" pos="52" len="4" />
+                <note tone="9" pan="0" oct="4" vol="16" pos="56" len="4" />
+                <note tone="9" pan="0" oct="4" vol="16" pos="60" len="4" />
+                <note tone="9" pan="0" oct="4" vol="18" pos="64" len="4" />
+                <note tone="9" pan="0" oct="4" vol="18" pos="68" len="4" />
+                <note tone="9" pan="0" oct="4" vol="22" pos="72" len="4" />
+                <note tone="9" pan="0" oct="4" vol="26" pos="76" len="4" />
+                <note tone="9" pan="0" oct="4" vol="28" pos="80" len="4" />
+                <note tone="9" pan="0" oct="4" vol="28" pos="84" len="4" />
+                <note tone="9" pan="0" oct="4" vol="32" pos="88" len="4" />
+                <note tone="9" pan="0" oct="4" vol="34" pos="92" len="4" />
+                <note tone="9" pan="0" oct="4" vol="36" pos="96" len="4" />
+                <note tone="9" pan="0" oct="4" vol="38" pos="100" len="4" />
+                <note tone="9" pan="0" oct="4" vol="44" pos="104" len="4" />
+                <note tone="9" pan="0" oct="4" vol="48" pos="108" len="4" />
+                <note tone="9" pan="0" oct="4" vol="54" pos="112" len="4" />
+                <note tone="9" pan="0" oct="4" vol="60" pos="116" len="4" />
+                <note tone="9" pan="0" oct="4" vol="64" pos="120" len="4" />
+                <note tone="9" pan="0" oct="4" vol="70" pos="124" len="4" />
+                <note tone="9" pan="0" oct="4" vol="74" pos="128" len="4" />
+                <note tone="9" pan="0" oct="4" vol="80" pos="132" len="4" />
+                <note tone="9" pan="0" oct="4" vol="80" pos="136" len="4" />
+                <note tone="9" pan="0" oct="4" vol="84" pos="140" len="4" />
+                <note tone="9" pan="0" oct="4" vol="90" pos="144" len="4" />
+                <note tone="9" pan="0" oct="4" vol="96" pos="148" len="4" />
+                <note tone="9" pan="0" oct="4" vol="98" pos="152" len="4" />
+                <note tone="9" pan="0" oct="4" vol="108" pos="156" len="4" />
+                <note tone="9" pan="0" oct="4" vol="116" pos="160" len="4" />
+                <note tone="9" pan="0" oct="4" vol="120" pos="164" len="4" />
+                <note tone="9" pan="0" oct="4" vol="126" pos="168" len="4" />
+                <note tone="9" pan="0" oct="4" vol="134" pos="172" len="4" />
+                <note tone="9" pan="0" oct="4" vol="140" pos="176" len="4" />
+                <note tone="9" pan="0" oct="4" vol="144" pos="180" len="4" />
+                <note tone="9" pan="0" oct="4" vol="148" pos="184" len="4" />
+                <note tone="9" pan="0" oct="4" vol="156" pos="188" len="4" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="36" name="hihat_closed01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.988914" sframe="0" amp="100" src="drums/hihat_closed01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="64" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_closed01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="135792616" fxch="0" baseoct="4" vol="100" name="zap02.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.992926" sframe="0" amp="100" src="drums/zap02.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="1120" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="1" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="zap02.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="zap02.ogg" pos="512" frozen="0" len="192" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="72" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="88" len="8" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="128" len="8" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="136" len="8" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="152" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="moog01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="zap02.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="160" name="sidestick01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.962766" sframe="0" amp="100" src="drums/sidestick01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="3200" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.0999" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="448" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="sidestick01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="139790762" fxch="0" baseoct="4" vol="80" name="matrix1000_pluck01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999753" sframe="0" amp="100" src="basses/matrix1000_pluck01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="480" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.0298" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - low freq" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - low freq" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - low freq" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="moog01 - low freq" pos="576" frozen="0" len="128" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="56" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="72" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="88" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="104" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="moog01 - low freq" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - low freq" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="80" name="matrix1000_pluck01.ogg" basetone="9" tab="1" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999753" sframe="0" amp="100" src="basses/matrix1000_pluck01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="1120" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.4354" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - medium freq" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - medium freq" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - medium freq" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="moog01 - medium freq" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="matrix1000_pluck01.ogg" pos="640" frozen="0" len="128" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="56" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="72" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="88" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="104" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="moog01 - medium freq" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="matrix1000_pluck01.ogg" basetone="9" tab="1" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999753" sframe="0" amp="100" src="basses/matrix1000_pluck01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="2240" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.0302" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="matrix1000_pluck01.ogg" pos="704" frozen="0" len="128" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="10" pan="0" oct="4" vol="100" pos="8" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="56" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="3" pan="0" oct="5" vol="100" pos="72" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="88" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="104" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="matrix1000_pluck01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="132646936" fxch="0" baseoct="4" vol="100" name="Weird" basetone="9" tab="1" >
+                <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="0" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="2" coarse2="12" vol0="100" vol1="61" finel0="0" vol2="81" finel1="-18" finel2="0" modalgo1="3" stphdetun0="0" pan0="0" modalgo2="0" stphdetun1="0" pan1="0" stphdetun2="104" pan2="0" phoffset0="0" phoffset1="307" phoffset2="304" finer0="0" finer1="13" finer2="0" userwavefile0="samples/empty.wav" wavetype0="0" coarse0="0" />
+                <eldata fres="3" ftype="0" fcut="160" fwet="1" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.301" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.123" pdel="0" lamt="0" dec="0.437" userwavefile="" x100="0" lshp="0" hold="0" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="0" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="1" name="Weird" pos="0" frozen="0" len="256" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="64" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="64" len="64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="128" len="64" />
+                <note tone="4" pan="0" oct="5" vol="100" pos="192" len="64" />
+              </pattern>
+              <pattern steps="16" type="0" name="Weird" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="Weird" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="132646936" fxch="0" baseoct="4" vol="100" name="dong01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999338" sframe="0" amp="100" src="misc/dong01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="dong01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="wood01.ogg" pos="256" frozen="0" len="128" >
+                <note tone="0" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="16" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="20" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="24" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="28" len="4" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="48" len="4" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="52" len="4" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="56" len="4" />
+                <note tone="1" pan="0" oct="5" vol="100" pos="60" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="72" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="80" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="84" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="88" len="4" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="92" len="4" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="104" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="2" pan="0" oct="5" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="moog01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="moog01.ogg" pos="384" frozen="0" len="128" >
+                <note tone="5" pan="0" oct="5" vol="100" pos="0" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="4" len="8" />
+                <note tone="3" pan="0" oct="5" vol="100" pos="8" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="16" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="24" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="32" len="8" />
+                <note tone="3" pan="0" oct="5" vol="100" pos="36" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="40" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="48" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="56" len="8" />
+                <note tone="10" pan="0" oct="5" vol="100" pos="64" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="68" len="8" />
+                <note tone="8" pan="0" oct="5" vol="100" pos="73" len="8" />
+                <note tone="10" pan="0" oct="5" vol="100" pos="80" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="84" len="8" />
+                <note tone="8" pan="0" oct="5" vol="100" pos="88" len="8" />
+                <note tone="0" pan="0" oct="5" vol="100" pos="96" len="8" />
+                <note tone="3" pan="0" oct="5" vol="100" pos="104" len="8" />
+                <note tone="5" pan="0" oct="5" vol="100" pos="112" len="8" />
+                <note tone="6" pan="0" oct="5" vol="100" pos="116" len="8" />
+                <note tone="7" pan="0" oct="5" vol="100" pos="120" len="8" />
+              </pattern>
+              <pattern steps="16" type="0" name="dong01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="135792066" fxch="0" baseoct="4" vol="100" name="dong01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999321" sframe="0" amp="100" src="misc/dong01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="dong01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="wood01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="1" name="moog01.ogg" pos="320" frozen="0" len="64" >
+                <note tone="0" pan="0" oct="5" vol="20" pos="0" len="16" />
+                <note tone="0" pan="0" oct="5" vol="40" pos="16" len="16" />
+                <note tone="0" pan="0" oct="5" vol="52" pos="32" len="8" />
+                <note tone="0" pan="0" oct="5" vol="62" pos="40" len="8" />
+                <note tone="0" pan="0" oct="5" vol="74" pos="48" len="4" />
+                <note tone="0" pan="0" oct="5" vol="80" pos="52" len="4" />
+                <note tone="0" pan="0" oct="5" vol="82" pos="56" len="4" />
+                <note tone="0" pan="0" oct="5" vol="88" pos="60" len="4" />
+              </pattern>
+              <pattern steps="16" type="0" name="moog01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="dong01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_opened02.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.999669" sframe="0.0699459" amp="100" src="drums/hihat_opened02.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="768" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="832" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="hihat_opened02.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="snare_acoustic01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998884" sframe="0" amp="100" src="drums/snare_acoustic01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="768" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="832" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare_acoustic01.ogg" pos="896" frozen="0" len="64" />
+            </track>
+            <track muted="0" height="32" type="0" >
+              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="snare_short01.ogg" basetone="9" tab="0" >
+                <audiofileprocessor reversed="0" looped="0" eframe="0.998257" sframe="0" amp="100" src="drums/snare_short01.ogg" />
+                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
+                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                </eldata>
+                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="1" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
+                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
+              </channeltrack>
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="0" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="64" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="128" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="192" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="256" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="320" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="384" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="448" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="512" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="576" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="640" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="704" frozen="0" len="64" />
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="768" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="832" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+              </pattern>
+              <pattern steps="16" type="0" name="snare_short01.ogg" pos="896" frozen="0" len="64" >
+                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
+                <note tone="9" pan="0" oct="4" vol="100" pos="60" len="-64" />
+              </pattern>
+            </track>
+          </trackcontainer>
+        </bbtrack>
+        <bbtco name="Noise" color="4294967295" pos="0" len="9980" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums" />
+        <bbtco name="Drums" color="4294902015" pos="256" len="704" />
+        <bbtco name="Drums" color="4294902015" pos="2304" len="1472" />
+        <bbtco name="Drums" color="4294902015" pos="1088" len="768" />
+        <bbtco name="Drums" color="4294902015" pos="4224" len="1856" />
+        <bbtco name="Drums" color="4294902015" pos="7360" len="1920" />
+        <bbtco name="Drums" color="4294902015" pos="3840" len="192" />
+        <bbtco name="Drums" color="4294902015" pos="6848" len="64" />
+        <bbtco name="Drums" color="4294902015" pos="6976" len="64" />
+        <bbtco name="Drums" color="4294902015" pos="7104" len="64" />
+        <bbtco name="Drums" color="4294902015" pos="9472" len="316" />
+        <bbtco name="Drums" color="4294902015" pos="7232" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums - final" />
+        <bbtco name="Drums - final" color="4294945535" pos="256" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="512" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="768" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1280" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1536" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1792" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2304" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2560" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2816" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3072" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3328" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3584" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4544" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4800" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5056" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5312" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5696" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5952" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8000" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8128" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3968" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="384" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="640" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="896" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1152" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1408" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="1664" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2432" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2688" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="2944" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3200" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3456" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3712" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="3840" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4416" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4672" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4928" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5184" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5440" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5824" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="5568" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8256" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8384" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8768" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8512" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8640" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7360" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7488" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7616" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7744" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7868" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="9468" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="9728" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="8896" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="9024" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="9148" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="4288" len="64" />
+        <bbtco name="Drums - final" color="4294945535" pos="7232" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums - fast" />
+        <bbtco name="Drums - fast" color="4294901887" pos="2112" len="192" />
+        <bbtco name="Drums - fast" color="4294901887" pos="4032" len="192" />
+        <bbtco name="Drums - fast" color="4294901887" pos="6080" len="192" />
+        <bbtco name="Drums - fast" color="4294901887" pos="9280" len="192" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Dong" />
+        <bbtco name="Dong" color="4289396480" pos="1856" len="448" />
+        <bbtco name="Dong" color="4289396480" pos="2944" len="768" />
+        <bbtco name="Dong" color="4289396480" pos="4992" len="1280" />
+        <bbtco name="Dong" color="4289396480" pos="7744" len="1728" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Dong - start" />
+        <bbtco name="Dong - start" color="4289396480" pos="1792" len="64" />
+        <bbtco name="Dong - start" color="4289396480" pos="2880" len="64" />
+        <bbtco name="Dong - start" color="4289396480" pos="4928" len="64" />
+        <bbtco name="Dong - start" color="4289396480" pos="7680" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Dong melody" />
+        <bbtco name="Dong melody" color="4289396607" pos="3840" len="384" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Sidestick" />
+        <bbtco name="Sidestick" color="4282417407" pos="128" len="960" />
+        <bbtco name="Sidestick" color="4282417407" pos="2304" len="1472" />
+        <bbtco name="Sidestick" color="4282417407" pos="1216" len="640" />
+        <bbtco name="Sidestick" color="4282417407" pos="4224" len="2044" />
+        <bbtco name="Sidestick" color="4282417407" pos="6332" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="6588" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="6716" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="6848" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="6976" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="6460" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="7100" len="64" />
+        <bbtco name="Sidestick" color="4282417407" pos="7360" len="1920" />
+        <bbtco name="Sidestick" color="4282417407" pos="7228" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Zap" />
+        <bbtco name="Zap" color="4289396480" pos="0" len="1024" />
+        <bbtco name="Zap" color="4289396480" pos="3712" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Bass2 - low freq " />
+        <bbtco name="Bass2 - low freq" color="4282417407" pos="1088" len="128" />
+        <bbtco name="Bass2 - low freq " color="4282417407" pos="7872" len="128" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Bass2 - medium freq - LFO" />
+        <bbtco name="Bass2 - medium freq - LFO" color="4282417407" pos="1216" len="1088" />
+        <bbtco name="Bass2 - medium freq - LFO" color="4282417407" pos="8000" len="128" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Bass2" />
+        <bbtco name="Bass2" color="4282417407" pos="2304" len="1408" />
+        <bbtco name="Bass2" color="4282417407" pos="4224" len="2048" />
+        <bbtco name="Bass2" color="4282417407" pos="8128" len="1152" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums2" />
+        <bbtco name="Drums2" color="4294923647" pos="5116" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5248" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5376" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5504" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5632" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5760" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="5888" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6272" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6400" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6528" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6656" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6016" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6144" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6784" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="6908" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7424" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7552" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7676" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7808" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7932" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8064" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8192" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8316" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8448" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8576" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8700" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8828" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="8956" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="9088" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="9216" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="9344" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="9664" len="128" />
+        <bbtco name="Drums2" color="4294923647" pos="9532" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7168" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7292" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4988" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4860" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4732" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4604" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4476" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4352" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="4220" len="64" />
+        <bbtco name="Drums2" color="4294923647" pos="7040" len="64" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums3" />
+        <bbtco name="Drums3" color="4294923647" pos="5184" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5312" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5440" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5568" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5696" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5824" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5952" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6332" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6464" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6592" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6080" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6208" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6720" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6844" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="6976" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7104" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7356" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7484" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7616" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7740" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7872" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8000" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8128" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8256" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8380" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8508" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8640" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8764" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="8892" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="9020" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="9152" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="9280" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="9408" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="9596" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="7228" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="5056" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4928" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4800" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4668" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4540" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4412" len="64" />
+        <bbtco name="Drums3" color="4294923647" pos="4284" len="64" />
+        <bbtco name="Drums3" color="4294901887" pos="4096" len="128" />
+      </track>
+      <track muted="0" height="32" type="1" >
+        <bbtrack icon="" name="Drums4" />
+        <bbtco name="Drums4" color="4294923647" pos="5248" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="5504" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="5760" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="6528" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="6016" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="6784" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="6272" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="7040" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="7296" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="7552" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="7808" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="8064" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="8320" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="8572" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="8832" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="9084" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="4992" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="4732" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="4480" len="64" />
+        <bbtco name="Drums4" color="4294923647" pos="4224" len="64" />
+        <bbtco name="Drums4" color="4294901887" pos="4096" len="128" />
+      </track>
+    </trackcontainer>
+    <projectnotes><![CDATA[<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:12pt;font-family:Bitstream Vera Sans">
+<p>My second song.</p>
+<p>j1m.</p>
+<p>e-mail: j1m@list.ru</p>
+</body></html>
+]]></projectnotes>
+  </song>
+</multimediaproject>

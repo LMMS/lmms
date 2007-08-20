@@ -772,9 +772,6 @@ void mainWindow::openProject( void )
 		{
 			engine::getSongEditor()->loadProject(
 						ofd.selectedFiles()[0] );
-			configManager::inst()->addRecentlyOpenedProject(
-							ofd.selectedFiles()[0] );
-			updateRecentlyOpenedProjectsMenu();
 		}
 	}
 }
@@ -865,9 +862,6 @@ bool mainWindow::saveProjectAs( void )
 #else
 		engine::getSongEditor()->saveProjectAs( sfd.selectedFile() );
 #endif
-		configManager::inst()->addRecentlyOpenedProject(
-							sfd.selectedFiles()[0] );
-		updateRecentlyOpenedProjectsMenu();
 		return( TRUE );
 	}
 	return( FALSE );

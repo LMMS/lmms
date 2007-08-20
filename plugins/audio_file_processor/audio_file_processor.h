@@ -86,6 +86,11 @@ public:
 
 	virtual Uint32 FASTCALL getBeatLen( notePlayHandle * _n ) const;
 
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return( 128 );
+	}
+
 
 public slots:
 	void setAudioFile( const QString & _audio_file, bool _rename = TRUE );
