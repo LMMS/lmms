@@ -1,5 +1,12 @@
 2007-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/projects/cool_songs/Makefile.am:
+	* data/projects/covers/Makefile.am:
+	* data/projects/demos/Makefile.am:
+	* data/projects/misc/Makefile.am:
+	* data/projects/tutorials/Makefile.am:
+	added missing mmpz-wildcard
+
 	* data/projects/covers/MonkeyIsland1-Intro.mmpz:
 	another cool cover
 
