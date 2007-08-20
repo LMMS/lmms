@@ -1,4 +1,4 @@
-Linux MultiMedia Studio 0.2.1
+Linux MultiMedia Studio 0.3.0
 ==============================
 
 Copyright (c) 2004-2007 by LMMS-developers
@@ -47,8 +47,8 @@ least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 
 Required libraries:
 
-- multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher (tested
-  up to 4.1.0) with devel-files
+- multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher with
+  devel-files
 
 Optional, but strongly recommended:
 - JACK with devel-files
@@ -58,12 +58,11 @@ Optional, but strongly recommended:
 - SDL with devel-files
 - libsamplerate with devel-files
 - libsndfile with devel-files
-- WINE, WINE-devel-files + header-files from Steinberg SDK
+- WINE + WINE-devel-files
+- stk, libstk + libstk-dev
+- festival-devel-files and default-voice
 
 For compiling you should have an up to date GCC with g++.
-LMMS has been (successfully) tested under Debian Sarge 3.1 / unstable,
-Fedora Core 2-4, and SuSE Linux 9.0-9.3 with Qt 3.[23].x and Qt 4.0.0.
-It was compiled using GCC 3.3.x, GCC 3.4.x and GCC 4.x.y.
 
 If you have problems with compiling or running LMMS, find any bug or have
 suggestions and so on, please feel free to e-mail me (for mail-address see
@@ -105,10 +104,10 @@ http://lmms.sourceforge.net/development.php
 
 or in the Wiki:
 
-http://wiki.mindrules.net
+http://lmms.sourceforge.net/wiki/
 
 Before coding a new big feature, please ALWAYS post your idea and suggestions
 about your feature and about the intended implementation to the
 LMMS-devel-mailinglist (lmms-devel@lists.sourceforge.net) and wait for replies!
 Maybe there're different ideas, improvements, hints or maybe your feature is
-not welcome/needed at the moment (but for sure this will be very seldom).
+not welcome/needed at the moment.

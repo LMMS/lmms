@@ -1,6 +1,6 @@
 # Configuration variables
 %define name            lmms
-%define version         0.2.1
+%define version         0.3.0
 %define rel             1
 %define release         %{rel}%{?disttag}%{?repotag}
 
