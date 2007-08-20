@@ -123,6 +123,7 @@ lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 
 if USE_3RDPARTY_LIBSRC
 LIBSAMPLERATE_SOURCES=	$(srcdir)/src/3rdparty/samplerate/samplerate.c		\
+			$(srcdir)/src/3rdparty/samplerate/samplerate.h		\
 			$(srcdir)/src/3rdparty/samplerate/src_sinc.c		\
 			$(srcdir)/src/3rdparty/samplerate/high_qual_coeffs.h	\
 			$(srcdir)/src/3rdparty/samplerate/mid_qual_coeffs.h	\
