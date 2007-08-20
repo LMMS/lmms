@@ -41,7 +41,7 @@
 class knob;
 class notePlayHandle;
 
-class lb302FilterState
+class lb302FilterKnobState
 {
     public:
     float cutoff;
@@ -51,10 +51,43 @@ class lb302FilterState
     float dist;
 };
 
+class lb302FilterIIR2State
+{
+    public:
+    float vcf_c0;
+    float vcf_a;
+    float vcf_b;
+    float vcf_c;
+    float vcf_d1;
+    float vcf_d2;
+};
+
+class lb302Filter3PoleState
+{
+    public:
+    float vcf_c0;
+    float kp,
+          kp1h,
+          kres,
+          ay1,
+          ay2,
+          lastin,
+          value;
+    float aout;
+};
+         
+typedef union 
+{
+    lb302FilterIIR2State iir;
+    lb302Filter3PoleState pole;
+} 
+lb302FilterState;
+
+
 class lb302Filter
 {
     public:
-    lb302Filter(lb302FilterState* p_fs);
+    lb302Filter(lb302FilterKnobState* p_fs);
     virtual ~lb302Filter() {};
 
     virtual void recalc();
@@ -62,8 +95,11 @@ class lb302Filter
     virtual float process(const float& samp)=0;
     virtual void playNote();
 
+    virtual void getState(lb302FilterState* fs)=0;
+    virtual void setState(const lb302FilterState* fs)=0;
+
     protected:
-    lb302FilterState *fs;  
+    lb302FilterKnobState *fs;  
     
     // Filter Decay
 	float vcf_c0;           // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
@@ -75,12 +111,15 @@ class lb302Filter
 class lb302FilterIIR2 : public lb302Filter
 {
     public:
-    lb302FilterIIR2(lb302FilterState* p_fs);
+    lb302FilterIIR2(lb302FilterKnobState* p_fs);
 	virtual ~lb302FilterIIR2();
 
     virtual void recalc();
     virtual void envRecalc();
     virtual float process(const float& samp);
+
+    virtual void getState(lb302FilterState* fs);
+    virtual void setState(const lb302FilterState* fs);
 
     protected:
     float vcf_d1,           //   d1 and d2 are added back into the sample with 
@@ -96,15 +135,19 @@ class lb302FilterIIR2 : public lb302Filter
 	effectLib::distortion<> * m_dist;
 };
 
+
 class lb302Filter3Pole : public lb302Filter
 {
     public:
-    lb302Filter3Pole(lb302FilterState* p_fs);
+    lb302Filter3Pole(lb302FilterKnobState* p_fs);
 
     //virtual void recalc();
     virtual void envRecalc();
     virtual void recalc();
     virtual float process(const float& samp);
+
+    virtual void getState(lb302FilterState* fs);
+    virtual void setState(const lb302FilterState* fs);
 
     protected:
     float kfcn, 
@@ -119,6 +162,8 @@ class lb302Filter3Pole : public lb302Filter
           value;
 };
 
+ 
+
 class lb302State
 {
 public:
@@ -126,6 +171,8 @@ public:
     float vca_a;
     int vca_mode;
     int sample_cnt;
+
+    lb302FilterState fs;
 };
 
 class lb302Note
@@ -160,7 +207,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return 512;
+		return 4048;
 	}
 
 private:
@@ -212,7 +259,7 @@ private:
     vco_shape_t vco_shape;
 
     // User settings
-    lb302FilterState  fs;
+    lb302FilterKnobState  fs;
     lb302Filter       *vcf;
     lb302Note         hold_note;
     bool use_hold_note;
@@ -242,7 +289,6 @@ private:
 
     int catch_frame;
     int catch_decay;
-    int note_count;
 
     void recalcFilter();
 

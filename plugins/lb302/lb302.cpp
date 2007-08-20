@@ -63,6 +63,7 @@
 //
 #define LB_24_IGNORE_ENVELOPE   
 #define LB_FILTERED 
+//#define LB_DECAY
 //#define LB_24_RES_TRICK         
 
 #define LB_DIST_RATIO    4.0
@@ -105,7 +106,7 @@ plugin::descriptor lb302_plugin_descriptor =
 // lb302Filter
 //
 
-lb302Filter::lb302Filter(lb302FilterState* p_fs) : 
+lb302Filter::lb302Filter(lb302FilterKnobState* p_fs) : 
     fs(p_fs), 
 	vcf_c0(0),
     vcf_e0(0), 
@@ -120,12 +121,14 @@ void lb302Filter::recalc()
     vcf_e0*=M_PI/44100.0;
     vcf_e1*=M_PI/44100.0;
     vcf_e1 -= vcf_e0;
+
+    vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
 };
 
 void lb302Filter::envRecalc()
 {
     vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is adjusted for Hz and ENVINC
-    vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
+    // vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso)); moved above
 };
 
 void lb302Filter::playNote()
@@ -137,7 +140,7 @@ void lb302Filter::playNote()
 // lb302FilterIIR2
 //
 
-lb302FilterIIR2::lb302FilterIIR2(lb302FilterState* p_fs) :
+lb302FilterIIR2::lb302FilterIIR2(lb302FilterKnobState* p_fs) :
     lb302Filter(p_fs),
     vcf_d1(0),
     vcf_d2(0),
@@ -196,12 +199,30 @@ float lb302FilterIIR2::process(const float& samp)
     return ret;
 }
 
+void lb302FilterIIR2::getState(lb302FilterState* fs)
+{
+    fs->iir.vcf_c0 = vcf_c0;
+    fs->iir.vcf_a = vcf_a;
+    fs->iir.vcf_b = vcf_b;
+    fs->iir.vcf_c = vcf_c;
+    fs->iir.vcf_d1 = vcf_d1;
+    fs->iir.vcf_d2 = vcf_d2;
+}
 
+void lb302FilterIIR2::setState(const lb302FilterState* fs)
+{
+    vcf_c0 = fs->iir.vcf_c0;
+    vcf_a = fs->iir.vcf_a;
+    vcf_b = fs->iir.vcf_b;
+    vcf_c = fs->iir.vcf_c;
+    vcf_d1 = fs->iir.vcf_d1;
+    vcf_d2 = fs->iir.vcf_d2;
+}
 //
 // lb302Filter3Pole
 //
 
-lb302Filter3Pole::lb302Filter3Pole(lb302FilterState *p_fs) :
+lb302Filter3Pole::lb302Filter3Pole(lb302FilterKnobState *p_fs) :
     lb302Filter(p_fs),
     ay1(0), 
     ay2(0),
@@ -265,6 +286,31 @@ float lb302Filter3Pole::process(const float& samp)
     return tanh(aout*value)*LB_24_VOL_ADJUST/(1.0+fs->dist);
 }
 
+void lb302Filter3Pole::getState(lb302FilterState* fs)
+{
+    fs->pole.aout = aout;
+    fs->pole.vcf_c0 = vcf_c0;
+    fs->pole.kp = kp;
+    fs->pole.kp1h = kp1h;
+    fs->pole.kres = kres;
+    fs->pole.ay1 = ay1;
+    fs->pole.ay2 = ay2;
+    fs->pole.lastin = lastin;
+    fs->pole.value = value;
+}
+
+void lb302Filter3Pole::setState(const lb302FilterState* fs)
+{
+    aout = fs->pole.aout;
+    vcf_c0 = fs->pole.vcf_c0;
+    kp = fs->pole.kp;
+    kp1h = fs->pole.kp1h;
+    kres = fs->pole.kres;
+    ay1 = fs->pole.ay1;
+    ay2 = fs->pole.ay2;
+    lastin = fs->pole.lastin;
+    value = fs->pole.value;
+}
 
 //
 // LBSynth
@@ -409,6 +455,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	vco_k = 0;
 	
     vco_slide = 0; vco_slideinc = 0;
+    vco_slidebase = 0;
 
 	fs.cutoff = 0; fs.envmod = 0;
 	fs.reso = 0; fs.envdecay = 0;
@@ -417,7 +464,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	vcf_envpos = ENVINC;
     vco_detune = 0;
 
-	vca_mode = 0;  vca_a = 0;   // Start VCA on an attack.
+	vca_mode = 3;  vca_a = 0;   // Start VCA on an attack.
 
 	//vca_attack = 1.0 - 0.94406088;      
 	vca_attack = 1.0 - 0.96406088;      
@@ -426,8 +473,16 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     vco_shape = SAWTOOTH; 
 
 	vca_a0 = 0.5;                       // Experimenting between original (0.5) and 1.0
+    vca_a = 9;
+    vca_mode = 3;
 
     vcf = new lb302FilterIIR2(&fs);
+
+    use_hold_note = false;
+    sample_cnt = 0;
+    release_frame = 1<<24;
+    catch_frame = 0;
+    catch_decay = 0;
 
     recalcFilter();
 
@@ -436,7 +491,6 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 
     period_states = NULL;
     period_states_cnt = 0;
-    note_count = 0;
 
     filterChanged(0.0);
     detuneChanged(0.0);
@@ -594,6 +648,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
     float samp;
          
 
+    printf("process\n");
        
     
 	for(i=0;i<size;i++) {
@@ -708,9 +763,10 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         }
 
 
-       /* if(i>release_frame) {
+        if(i>=release_frame) {
             vca_mode=1;
-        }*/
+            printf("Releasing!\n");
+        }
        
         // Handle Envelope
         // TODO: Add decay once I figure out how to extend past the end of a note.
@@ -721,17 +777,17 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         }
 		else if(vca_mode == 1) {
 			vca_a *= vca_decay;
-            //printf("VCA: %d %f\n", dbgshit++, vca_a);
+            printf("VCA: %d %f\n", i, vca_a);
             
 			// the following line actually speeds up processing
-			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 2; }
+			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 3; }
 		}
          // Store state
         period_states[i].vco_c = vco_c;
         period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
         period_states[i].vca_mode = vca_mode;             // Doesn't change anything (currently)
         period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
-
+        vcf->getState(&period_states[i].fs);
 
 	}
 	return 1;
@@ -748,9 +804,12 @@ void lb302Synth::initNote( lb302Note *n)
     vco_inc = n->vco_inc;
     
     // TODO: Try moving to the if() below
-    if(n->dead == 0) {
+    if(n->dead == 0 || (vca_mode==1 || vca_mode==3)) {
         sample_cnt = 0;
         vca_mode = 0;  vca_a = 0;
+    }
+    else {
+        vca_mode = 2;
     }
 
         // Initiate Slide
@@ -878,8 +937,17 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - END === ///
 
 	/// Malloc our period history buffer
-	if (period_states == NULL) 
+	if (period_states == NULL) {
 		period_states = new lb302State[framesPerPeriod];
+
+        for (int i=0; i < framesPerPeriod; i++) {
+            period_states[i].vco_c = vco_c;
+            period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
+            period_states[i].vca_mode = vca_mode;             // Doesn't change anything (currently)
+            period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
+            vcf->getState(&period_states[i].fs);
+        }
+    }
 
 
     // now resume at the proper position and process as usual
@@ -890,7 +958,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     vca_a = state->vca_a;
     vca_mode = state->vca_mode;
     sample_cnt = state->sample_cnt;
-
+    vcf->setState(&state->fs);
 
 
     /// Currently have release/decay disabled
@@ -900,12 +968,14 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
     
 
     release_frame = _n->framesLeft() - desiredReleaseFrames();
+    printf("release at %d\n", release_frame);
 
     if ( _n->totalFramesPlayed() <= 0 ) {
         /// This code is obsolete, hence the "if false"
 
         // Existing note. Allow it to decay. 
         if(deadToggle->value()==0 && decay_note) {
+#ifdef LB_DECAY
             if (catch_decay < 1) {
                 // BEGIN NOT SURE OF...
                 //lb302State *st = &period_states[period_states_cnt-1];
@@ -919,6 +989,18 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
                 use_hold_note = true;
                 catch_decay = 1;
             }
+            else {
+                printf("Oh no!\n");
+            }
+#else
+            lb302Note note;
+            note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
+            note.dead = deadToggle->value();
+            initNote(&note);
+            vca_mode=0;
+            vca_a = state->vca_a;
+
+#endif
         }
         /// Start a new note.
         else {
@@ -929,7 +1011,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
             use_hold_note = false;
         }
 
-        note_count=1;
     }
     
 	sampleFrame *buf = new sampleFrame[frames];
