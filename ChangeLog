@@ -1,5 +1,8 @@
 2007-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* configure.in:
+	made 0.3.0 release :)
+
 	* Makefile.am:
 	added missing entry for 3rd-party samplerate.h
 
