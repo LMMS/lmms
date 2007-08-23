@@ -1,3 +1,8 @@
+2007-08-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	bumped to 0.4.x development series
+
 2007-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
@@ -214,7 +219,6 @@
 	mouse button on preset-file with VST-plugin/-effect while VST-plugin
 	is still loading
 
-	
 2007-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widget/visualization_widget.cpp:
