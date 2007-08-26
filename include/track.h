@@ -31,21 +31,9 @@
 #include <config.h>
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-#include <qvaluelist.h>
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -179,14 +167,14 @@ public:
 	trackContentWidget( trackWidget * _parent );
 	virtual ~trackContentWidget();
 
-	trackContentObject * FASTCALL getTCO( csize _tco_num );
-	csize numOfTCOs( void );
+	trackContentObject * FASTCALL getTCO( int _tco_num );
+	int numOfTCOs( void );
 	trackContentObject * FASTCALL addTCO( trackContentObject * _tco );
-	void FASTCALL removeTCO( csize _tco_num, bool _also_delete = TRUE );
+	void FASTCALL removeTCO( int _tco_num, bool _also_delete = TRUE );
 	void FASTCALL removeTCO( trackContentObject * _tco,
 						bool _also_delete = TRUE );
 	void removeAllTCOs( void );
-	void FASTCALL swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 );
+	void FASTCALL swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
 
 	inline Uint16 pixelsPerTact( void ) const
 	{
@@ -232,7 +220,7 @@ private:
 	track * getTrack( void );
 	midiTime getPosition( int _mouse_x );
 
-	typedef vvector<trackContentObject *> tcoVector;
+	typedef QVector<trackContentObject *> tcoVector;
 
 	tcoVector m_trackContentObjects;
 	trackWidget * m_trackWidget;
@@ -451,14 +439,14 @@ public:
 
 
 	trackContentObject * FASTCALL addTCO( trackContentObject * _tco );
-	void FASTCALL removeTCO( csize _tco_num );
-	csize numOfTCOs( void );
-	trackContentObject * FASTCALL getTCO( csize _tco_num );
-	csize FASTCALL getTCONum( trackContentObject * _tco );
-	void FASTCALL getTCOsInRange( vlist<trackContentObject *> & _tco_v,
+	void FASTCALL removeTCO( int _tco_num );
+	int numOfTCOs( void );
+	trackContentObject * FASTCALL getTCO( int _tco_num );
+	int FASTCALL getTCONum( trackContentObject * _tco );
+	void FASTCALL getTCOsInRange( QList<trackContentObject *> & _tco_v,
 							const midiTime & _start,
 							const midiTime & _end );
-	void FASTCALL swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 );
+	void FASTCALL swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
 
 	inline trackWidget * getTrackWidget( void )
 	{
@@ -512,13 +500,13 @@ protected:
 private:
 	trackContainer * m_trackContainer;
 	trackWidget * m_trackWidget;
-	vlist<automationPattern *> m_automation_patterns;
+	QList<automationPattern *> m_automation_patterns;
 
 } ;
 
 
-typedef vvector<track *> trackVector;
-typedef vvector<const track *> constTrackVector;
+typedef QVector<track *> trackVector;
+typedef QVector<const track *> constTrackVector;
 
 
 #endif

@@ -22,27 +22,12 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <Qt/QtXml>
 #include <QtCore/QMap>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
-
-#else
-
-#include <qdom.h>
-#include <qmap.h>
-#include <qwhatsthis.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-
-#endif
-
 
 #include "vibed.h"
 #include "base64.h"
@@ -80,32 +65,23 @@ plugin::descriptor vibedstrings_plugin_descriptor =
 }
 
 
-vibed::vibed( instrumentTrack * _channel_track ) :
-		instrument( _channel_track, &vibedstrings_plugin_descriptor ),
+vibed::vibed( instrumentTrack * instrument_track ) :
+		instrument( instrument_track, &vibedstrings_plugin_descriptor ),
 	m_sampleLength( 128 )
 {
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 			"artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		m_editor = new impulseEditor( this, 76, 21, _channel_track );
+		m_editor = new impulseEditor( this, 76, 21, instrument_track );
 		m_editor->setOn( FALSE );
 		m_editor->hide();
 		m_editors.append( m_editor );
-#ifdef QT4
-	m_editor->setWhatsThis(
-#else
-	QWhatsThis::add( m_editor,
-#endif
-				tr( 
+	m_editor->setWhatsThis( tr( 
 "The waveform editor provides control over the initial state or impulse "
 "that is used to start the string vibrating.  The buttons to the right of "
 "the graph will initialize the waveform to the selected type.  The '?' "
@@ -119,24 +95,19 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 "The 'N' button will normalize the waveform.") );
 
 		m_volumeKnob = new volumeKnob( knobBright_26, this,
-					tr( "Volume" ), _channel_track );
+					tr( "Volume" ), instrument_track );
 		m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
 		m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 		m_volumeKnob->move( 103, 142 );
 		m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
 		m_volumeKnob->hide();
 		m_volumeKnobs.append( m_volumeKnob );
-#ifdef QT4
-		m_volumeKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_volumeKnob,
-#endif
-					tr( 
-"The 'V' knob sets the volume of the selected string." ) );
+		m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
+						"of the selected string." ) );
 	
 		m_stiffnessKnob = new knob( knobBright_26, this, 
-							tr( "String stiffness" ),
-							_channel_track );
+						tr( "String stiffness" ),
+							instrument_track );
 		m_stiffnessKnob->setRange( 0.0f, 0.05f, 0.001f );
 		m_stiffnessKnob->setInitValue( 0.0f );
 		m_stiffnessKnob->move( 129, 142 );
@@ -144,12 +115,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 						" ", "" );
 		m_stiffnessKnob->hide();
 		m_stiffnessKnobs.append( m_stiffnessKnob );
-#ifdef QT4
-		m_stiffnessKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_stiffnessKnob,
-#endif
-					tr( 
+		m_stiffnessKnob->setWhatsThis( tr( 
 "The 'S' knob sets the stiffness of the selected string.  The stiffness "
 "of the string affects how long the string will ring out.  The lower "
 "the setting, the longer the string will ring." ) );
@@ -157,25 +123,20 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 		
 		m_pickKnob = new knob( knobBright_26, this, 
 							tr( "Pick position" ),
-							_channel_track );
+							instrument_track );
 		m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
 		m_pickKnob->setInitValue( 0.0f );
 		m_pickKnob->move( 153, 142 );
 		m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 		m_pickKnob->hide();
 		m_pickKnobs.append( m_pickKnob );
-#ifdef QT4
-		m_pickKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_pickKnob,
-#endif
-					tr( 
+		m_pickKnob->setWhatsThis( tr( 
 "The 'P' knob sets the position where the selected string will be 'picked'.  "
 "The lower the setting the closer the pick is to the bridge." ) );
 	
 		m_pickupKnob = new knob( knobBright_26, this, 
 							tr( "Pickup position" ),
-							_channel_track );
+							instrument_track );
 		m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
 		m_pickupKnob->setInitValue( 0.05f );
 		m_pickupKnob->move( 177, 142 );
@@ -183,53 +144,38 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 					" ", "" );
 		m_pickupKnob->hide();
 		m_pickupKnobs.append( m_pickupKnob );
-#ifdef QT4
-		m_pickupKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_pickupKnob,
-#endif
-					tr( 
+		m_pickupKnob->setWhatsThis( tr( 
 "The 'PU' knob sets the position where the vibrations will be monitored "
 "for the selected string.  The lower the setting, the closer the "
 "pickup is to the bridge." ) );
 
  		m_panKnob = new knob( knobBright_26, this, tr( "Pan" ),
-							_channel_track );
+							instrument_track );
 	 	m_panKnob->setRange( -1.0f, 1.0f, 0.01f );
  		m_panKnob->setInitValue( 0.0f );
 	 	m_panKnob->move( 105, 187 );
  		m_panKnob->setHintText( tr( "Pan:" ) + " ", "" );
 		m_panKnob->hide();
 		m_panKnobs.append( m_panKnob );
-#ifdef QT4
-		m_panKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_panKnob,
-#endif
-					tr( 
+		m_panKnob->setWhatsThis( tr( 
 "The Pan knob determines the location of the selected string in the stereo "
 "field." ) );
 		
 	 	m_detuneKnob = new knob( knobBright_26, this, tr( "Detune" ),
-		 					_channel_track );
+		 					instrument_track );
  		m_detuneKnob->setRange( -0.1f, 0.1f, 0.001f );
  		m_detuneKnob->setInitValue( 0.0f );
  		m_detuneKnob->move( 150, 187 );
  		m_detuneKnob->setHintText( tr( "Detune:" ) + " ", "" );
 		m_detuneKnob->hide();
 		m_detuneKnobs.append( m_detuneKnob );
-#ifdef QT4
-		m_detuneKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_detuneKnob,
-#endif
-					tr( 
+		m_detuneKnob->setWhatsThis( tr( 
 "The Detune knob modifies the pitch of the selected string.  Settings less "
 "than zero will cause the string to sound flat.  Settings greater than zero "
 "will cause the string to sound sharp." ) );
 	
 		m_randomKnob = new knob( knobBright_26, this, tr( "Fuzziness" ),
-							_channel_track );
+							instrument_track );
 		m_randomKnob->setRange( 0.0f, 0.75f, 0.01f );
 		m_randomKnob->setInitValue( 0.0f );
 		m_randomKnob->move( 194, 187 );
@@ -237,18 +183,13 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 					" ", "" );
 		m_randomKnob->hide();
 		m_randomKnobs.append( m_randomKnob );
-#ifdef QT4
-		m_randomKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_randomKnob,
-#endif
-					tr( 
+		m_randomKnob->setWhatsThis( tr( 
 "The Slap knob adds a bit of fuzz to the selected string which is most "
 "apparent during the attack, though it can also be used to make the string "
 "sound more 'metallic'.") );
 
 		m_lengthKnob = new knob( knobBright_26, this, tr( "Length" ),
-							_channel_track );
+							instrument_track );
 		m_lengthKnob->setRange( 1, 16, 1 );
 		m_lengthKnob->setInitValue( 1 );
 		m_lengthKnob->move( 23, 193 );
@@ -256,30 +197,20 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 					" ", "" );
 		m_lengthKnob->hide();
 		m_lengthKnobs.append( m_lengthKnob );
-#ifdef QT4
-		m_lengthKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_lengthKnob,
-#endif
-					tr( 
+		m_lengthKnob->setWhatsThis( tr( 
 "The Length knob sets the length of the selected string.  Longer strings "
 "will both ring longer and sound brighter, however, they will also eat up "
 "more CPU cycles." ) );
 
 		m_impulse = new ledCheckBox( "", this, tr( "Impulse" ),
-							_channel_track );
+							instrument_track );
 		m_impulse->move( 23, 94 );
 		m_impulse->setChecked( FALSE );
 		toolTip::add( m_impulse,
 			      tr( "Impulse or initial state" ) );
 		m_impulse->hide();
 		m_impulses.append( m_impulse );
-#ifdef QT4
-		m_impulse->setWhatsThis(
-#else
-		QWhatsThis::add( m_impulse,
-#endif
-					tr( 
+		m_impulse->setWhatsThis( tr( 
 "The 'Imp' selector determines whether the waveform in the graph is to be "
 "treated as an impulse imparted to the string by the pick or the initial "
 "state of the string." ) );
@@ -309,12 +240,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			NULL );
 		m_harmonic->hide();
 		m_harmonics.append( m_harmonic );
-#ifdef QT4
-		m_harmonic->setWhatsThis(
-#else
-		QWhatsThis::add( m_harmonic,
-#endif
-					tr( 
+		m_harmonic->setWhatsThis( tr( 
 "The Octave selector is used to choose which harmonic of the note the "
 "string will ring at.  For example, '-2' means the string will ring two "
 "octaves below the fundamental, 'F' means the string will ring at the "
@@ -347,12 +273,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 			NULL );
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
 			this, SLOT( showString( Uint8 ) ) );
-#ifdef QT4
-		m_stringSelector->setWhatsThis(
-#else
-		QWhatsThis::add( m_stringSelector,
-#endif
-					tr( 
+		m_stringSelector->setWhatsThis( tr( 
 "The String selector is used to choose which string the controls are "
 "editting.  A Vibed instrument can contain up to nine independently "
 "vibrating strings.  The LED in the lower right corner of the "
@@ -373,12 +294,7 @@ vibed::vibed( instrumentTrack * _channel_track ) :
 	m_editor->setOn( TRUE );
 	showString( 0 );
 
-#ifdef QT4
-	this->setWhatsThis(
-#else
-	QWhatsThis::add( this,
-#endif
-				tr( 
+	setWhatsThis( tr( 
 "Vibed models up to nine independently vibrating strings.  The 'String' "
 "selector allows you to choose which string is being edited.  The 'Imp' " "selector chooses whether the graph represents an impulse or the initial "
 "state of the string.  The 'Octave' selector chooses which harmonic the "
@@ -673,9 +589,9 @@ void vibed::showString( Uint8 _string )
 void vibed::contextMenuEvent( QContextMenuEvent * )
 {
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: CSS-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( "Vibed" ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -692,13 +608,8 @@ void vibed::contextMenuEvent( QContextMenuEvent * )
 
 void vibed::displayHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-			      whatsThis() );
-#else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal(
-						rect().bottomRight() ) );
-#endif
+							      whatsThis() );
 }
 
 

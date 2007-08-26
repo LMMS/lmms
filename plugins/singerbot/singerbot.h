@@ -26,15 +26,7 @@
 #ifndef _SINGERBOT_H
 #define _SINGERBOT_H
 
-#ifndef QT3
-
 #include <QtCore/QThread>
-
-#else
-
-#include <qthread.h>
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -104,19 +96,11 @@ private:
 
 		void unlock_synth( void )
 		{
-#ifndef QT3
 			m_synth_semaphore.release();
-#else
-			m_synth_semaphore--;
-#endif
 		}
 		void lock_handle( void )
 		{
-#ifndef QT3
 			m_handle_semaphore.acquire();
-#else
-			m_handle_semaphore++;
-#endif
 		}
 
 

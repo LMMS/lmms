@@ -23,6 +23,10 @@
  */
 
 
+#include <Qt/QtXml>
+#include <QtGui/QApplication>
+#include <QtGui/QProgressDialog>
+
 #include "midi_import.h"
 #include "track_container.h"
 #include "instrument_track.h"
@@ -31,24 +35,6 @@
 #include "level_object.h"
 #include "debug.h"
 
-
-
-#ifdef QT4
-
-#include <Qt/QtXml>
-#include <QtGui/QApplication>
-#include <QtGui/QProgressDialog>
-
-#else
-
-#include <qdom.h>
-#include <qapplication.h>
-#include <qprogressdialog.h>
-
-#define pos at
-#define setValue setProgress
-
-#endif
 
 #define makeID(_c0, _c1, _c2, _c3) \
 	( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) )
@@ -176,14 +162,8 @@ invalid_format:
 	printf( "time-division: %d\n", time_division );
 #endif
 
-#ifdef QT4
 	QProgressDialog pd( trackContainer::tr( "Importing MIDI-file..." ),
 				trackContainer::tr( "Cancel" ), 0, num_tracks );
-#else
-	QProgressDialog pd( trackContainer::tr( "Importing MIDI-file..." ),
-				trackContainer::tr( "Cancel" ), num_tracks,
-								0, 0, TRUE );
-#endif
 	pd.setWindowTitle( trackContainer::tr( "Please wait..." ) );
 	pd.show();
 
@@ -207,11 +187,7 @@ invalid_format:
 	for( int i = 0; i < num_tracks; ++i )
 	{
 		pd.setValue( i );
-#ifdef QT4
 		qApp->processEvents( QEventLoop::AllEvents, 100 );
-#else
-		qApp->processEvents( 100 );
-#endif
 
 		if( pd.wasCanceled() )
 		{

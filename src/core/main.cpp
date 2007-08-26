@@ -25,25 +25,11 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
+#include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
 #include <QtGui/QSplashScreen>
-
-#else
-
-#include <qapplication.h>
-#include <qtextcodec.h>
-#if QT_VERSION >= 0x030200
-#include <qsplashscreen.h>
-#endif
-#include <qtranslator.h>
-
-#endif
 
 #ifdef HAVE_SCHED_H
 #include <sched.h>
@@ -58,13 +44,17 @@
 #include "song_editor.h"
 #include "gui_templates.h"
 
+#warning TODO: move somewhere else
+static inline QString baseName( const QString & _file )
+{
+	return( QFileInfo( _file ).absolutePath() + "/" +
+			QFileInfo( _file ).completeBaseName() );
+}
 
 QString file_to_render;
 
 
-#if QT_VERSION >= 0x030100
 int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
-#endif
 
 inline void loadTranslation( const QString & _tname,
 	const QString & _dir = configManager::inst()->localeDir() )
@@ -168,12 +158,7 @@ int main( int argc, char * * argv )
 	}
 
 
-	QString pos =
-#ifdef QT4
-			QLocale::system().name().left( 2 );
-#else
-			QString( QTextCodec::locale() ).section( '_', 0, 0 );
-#endif
+	QString pos = QLocale::system().name().left( 2 );
 	// load translation for Qt-widgets/-dialogs
 #ifdef QT_TRANSLATIONS_DIR
 	loadTranslation( QString( "qt_" ) + pos,
@@ -184,9 +169,7 @@ int main( int argc, char * * argv )
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
-#ifdef QT4
 	app.setFont( pointSize<10>( app.font() ) );
-#endif
 
 
 	if( !configManager::inst()->loadConfigFile() )
@@ -195,7 +178,6 @@ int main( int argc, char * * argv )
 	}
 
 	QPalette pal = app.palette();
-#ifdef QT4
 	pal.setColor( QPalette::Background, QColor( 128, 128, 128 ) );
 	pal.setColor( QPalette::Foreground, QColor( 240, 240, 240 ) );
 	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
@@ -204,20 +186,9 @@ int main( int argc, char * * argv )
 	pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
 	pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
 	pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
-#else
-	pal.setColor( QColorGroup::Background, QColor( 128, 128, 128 ) );
-	pal.setColor( QColorGroup::Foreground, QColor( 240, 240, 240 ) );
-	pal.setColor( QColorGroup::Base, QColor( 128, 128, 128 ) );
-	pal.setColor( QColorGroup::Text, QColor( 224, 224, 224 ) );
-	pal.setColor( QColorGroup::Button, QColor( 160, 160, 160 ) );
-	pal.setColor( QColorGroup::ButtonText, QColor( 255, 255, 255 ) );
-	pal.setColor( QColorGroup::Highlight, QColor( 224, 224, 224 ) );
-	pal.setColor( QColorGroup::HighlightedText, QColor( 0, 0, 0 ) );
-#endif
 	app.setPalette( pal );
 
 
-#if QT_VERSION >= 0x030200
 	// init splash screen
 	QPixmap splash = embed::getIconPixmap( "splash" );
 	mainWindow::s_splashScreen = new QSplashScreen( splash );
@@ -229,7 +200,6 @@ int main( int argc, char * * argv )
 							"workspace..." ),
 							splash_alignment_flags,
 							Qt::white );
-#endif
 
 	engine::init();
 
@@ -242,9 +212,7 @@ int main( int argc, char * * argv )
 	{
 		engine::getSongEditor()->createNewProject();
 	}
-#ifndef QT4
-	app.setMainWidget( engine::getMainWindow() );
-#endif
+
 	// MDI-mode?
 	if( engine::getMainWindow()->workspace() != NULL )
 	{
@@ -260,10 +228,9 @@ int main( int argc, char * * argv )
 	}
 
 
-#if QT_VERSION >= 0x030200
 	delete mainWindow::s_splashScreen;
 	mainWindow::s_splashScreen = NULL;
-#endif
+
 	if( file_to_render != "" )
 	{
 		exportProjectDialog * e = new exportProjectDialog(

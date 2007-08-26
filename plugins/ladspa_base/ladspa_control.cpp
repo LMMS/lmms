@@ -23,18 +23,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWhatsThis>
-
-#else
-
-#include <qwhatsthis.h>
-
-#endif
-
 
 #include "ladspa_control.h"
 #include "automatable_object_templates.h"
@@ -48,22 +37,14 @@ ladspaControl::ladspaControl( QWidget * _parent,
 				port_desc_t * _port, 
 				track * _track,
 			    	bool _link) :
-	QWidget( _parent
-#ifdef QT3
-			, "ladspaControl"
-#endif
-					),
+	QWidget( _parent ),
 	m_port( _port ),
 	m_track( _track ),
 	m_link( NULL ),
 	m_toggle( NULL ),
 	m_knob( NULL )
 {
-	m_layout = new QHBoxLayout( this
-#ifdef QT3
-					, 0, 0, "ladspaControlLayout"
-#endif
-					);
+	m_layout = new QHBoxLayout( this );
 	
 	if( _link )
 	{
@@ -109,11 +90,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 					static_cast<int>( m_port->def ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-#ifdef QT4
 			m_knob->setWhatsThis(
-#else
-			QWhatsThis::add( m_knob,
-#endif
 					tr( "Sorry, no help available." ) );
 			if( _link )
 			{
@@ -136,11 +113,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 								400.0f ) );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-#ifdef QT4
 			m_knob->setWhatsThis(
-#else
-			QWhatsThis::add( m_knob,
-#endif
 					tr( "Sorry, no help available." ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			if( _link )
@@ -162,11 +135,7 @@ ladspaControl::ladspaControl( QWidget * _parent,
 						m_port->min ) / 400.0f );
 			m_knob->setInitValue( m_port->def );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-#ifdef QT4
 			m_knob->setWhatsThis(
-#else
-			QWhatsThis::add( m_knob,
-#endif
 					tr( "Sorry, no help available." ) );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			if( _link )

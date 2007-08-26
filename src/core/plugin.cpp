@@ -25,23 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qmessagebox.h>
-#include <qdir.h>
-#include <qlibrary.h>
-#include <qpixmap.h>
-
-#endif
 
 
 #include "plugin.h"
@@ -131,9 +118,6 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 						QMessageBox::Default );
 		return( new dummyPlugin() );
 	}
-#ifndef QT4
-	plugin_lib.setAutoUnload( FALSE );
-#endif
 	plugin * inst = inst_hook( _data );
 	return( inst );
 }
@@ -156,53 +140,30 @@ void plugin::waitForWorkerThread( void )
 
 
 
-void plugin::getDescriptorsOfAvailPlugins( vvector<descriptor> & _plugin_descs )
+void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
-#ifdef QT4
 	QFileInfoList list = directory.entryInfoList(
 						QStringList( "lib*.so" ) );
-#else
-	const QFileInfoList * lp = directory.entryInfoList( "lib*.so" );
-	// if directory doesn't exist or isn't readable, we get NULL which would
-	// crash LMMS...
-	if( lp == NULL )
-	{
-		return;
-	}
-	QFileInfoList list = *lp;
-#endif
 	for( QFileInfoList::iterator file = list.begin();
 						file != list.end(); ++file )
 	{
-#ifdef QT4
 		const QFileInfo & f = *file;
-#else
-		const QFileInfo & f = **file;
-#endif
 		QLibrary plugin_lib( f.absoluteFilePath() );
 		if( plugin_lib.load() == FALSE ||
 			plugin_lib.resolve( "lmms_plugin_main" ) == NULL )
 		{
 			continue;
 		}
-#ifndef QT4
-		plugin_lib.setAutoUnload( FALSE );
-#endif
 		QString desc_name = f.fileName().section( '.', 0, 0 ) +
 							"_plugin_descriptor";
 		if( desc_name.left( 3 ) == "lib" )
 		{
 			desc_name = desc_name.mid( 3 );
 		}
-		descriptor * plugin_desc = (descriptor *) plugin_lib.resolve(
-						desc_name.
-#ifdef QT4
-							toAscii().constData()
-#else
-							ascii()
-#endif
-								);
+		descriptor * plugin_desc =
+			(descriptor *) plugin_lib.resolve(
+					desc_name.toAscii().constData() );
 		if( plugin_desc == NULL )
 		{
 			continue;

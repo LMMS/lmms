@@ -23,24 +23,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
 #include <Qt/QtXml>
 #include <QtGui/QDropEvent>
-
-#else
-
-#include <qpainter.h>
-#include <qdom.h>
-#include <qdom.h>
-#include <qmap.h>
-#include <qcanvas.h>
-#include <qlabel.h>
-
-#endif
 
 #include <iostream>
 #include <cstdlib>
@@ -214,15 +199,11 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 
 
 
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 }
 
 

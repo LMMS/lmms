@@ -23,6 +23,12 @@
  */
 
 
+#include <Qt/QtXml>
+#include <QtGui/QApplication>
+#include <QtGui/QProgressDialog>
+#include <QtCore/QDir>
+#include <QtCore/QBuffer>
+
 #include "flp_import.h"
 #include "arp_and_chords_tab_widget.h"
 #include "basic_filters.h"
@@ -47,23 +53,8 @@
 #include "tempo_sync_knob.h"
 #include "track_container.h"
 
-
-#ifdef QT4
-
-#include <Qt/QtXml>
-#include <QtGui/QApplication>
-#include <QtGui/QProgressDialog>
-#include <QtCore/QDir>
-#include <QtCore/QBuffer>
-
-#else
-
-#include <qdom.h>
-#include <qapplication.h>
-#include <qprogressdialog.h>
-#include <qdir.h>
-#include <qbuffer.h>
-
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
 
 #ifdef HAVE_CTYPE_H
@@ -185,14 +176,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 		return( FALSE );
 	}
 
-#ifdef QT4
 	QProgressDialog pd( trackContainer::tr( "Importing FLP-file..." ),
 			trackContainer::tr( "Cancel" ), 0, num_channels );
-#else
-	QProgressDialog pd( trackContainer::tr( "Importing FLP-file..." ),
-				trackContainer::tr( "Cancel" ), num_channels,
-								0, 0, TRUE );
-#endif
 	pd.setWindowTitle( trackContainer::tr( "Please wait..." ) );
 	pd.show();
 
@@ -237,7 +222,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 	int current_pattern = 0;
 	char * text = NULL;
 	Uint32 text_len = 0;
-	vlist<instrumentTrack *> i_tracks;
+	QList<instrumentTrack *> i_tracks;
 	int project_cur_pat = 0;
 
 	int step_pattern = 0;
@@ -257,13 +242,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 		if( ++ev_cnt > 100 )
 		{
 			ev_cnt = 0;
-#ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
 			pd.setValue( i_tracks.size() );
-#else
-			qApp->processEvents( 100 );
-			pd.setProgress( i_tracks.size() );
-#endif
 
 			if( pd.wasCanceled() )
 			{
@@ -510,16 +490,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_Text_CommentRTF:
 			{
-#ifndef QT3
 				QByteArray ba( text, text_len );
 				QBuffer buf( &ba );
 				buf.open( QBuffer::ReadOnly );
-#else
-				QByteArray ba;
-				ba.setRawData( text, text_len );
-				QBuffer buf( ba );
-				buf.open( IO_ReadOnly );
-#endif
 				lineno = 0;
 				attr_clear_all();
 				op = html_init();
@@ -529,9 +502,6 @@ bool flpImport::tryImport( trackContainer * _tc )
 				word_print( word, out );
 				word_free( word );
 				op_free( op );
-#ifdef QT3
-				ba.resetRawData( text, text_len );
-#endif
 
 				engine::getProjectNotes()->setText( out );
 				outstring = "";
@@ -814,8 +784,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 						it != m_steps.end(); ++it )
 	{
 		const int ch = ( *it ) >> 16;
-		const csize pat = ( ( *it ) & 0xffff ) / 16;
-		const csize pos = ( ( ( *it ) & 0xffff ) % 16 ) * 4;
+		const int pat = ( ( *it ) & 0xffff ) / 16;
+		const int pos = ( ( ( *it ) & 0xffff ) % 16 ) * 4;
 		while( engine::getBBEditor()->numOfBBs() <= pat )
 		{
 			track::create( track::BB_TRACK,
@@ -836,7 +806,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 	{
 		const int where = ( *it ).first;
 		const int ch = where % num_channels;
-		const csize pat = where / num_channels;
+		const int pat = where / num_channels;
 		if( pat > 100 )
 		{
 			continue;
@@ -845,11 +815,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			track::create( track::BB_TRACK,
 						engine::getSongEditor() );
-#ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
-#else
-			qApp->processEvents( 100 );
-#endif
 		}
 		pattern * p = dynamic_cast<pattern *>(
 						i_tracks[ch]->getTCO( pat ) );
@@ -863,7 +829,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 	for( playListItems::const_iterator it = m_plItems.begin();
 						it != m_plItems.end(); ++it )
 	{
-		csize pat_num = ( ( *it ) >> 16 ) - 1;
+		int pat_num = ( ( *it ) >> 16 ) - 1;
 		if( pat_num > 100 )
 		{
 			continue;
@@ -872,11 +838,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			track::create( track::BB_TRACK,
 						engine::getSongEditor() );
-#ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
-#else
-			qApp->processEvents( 100 );
-#endif
 		}
 		
 		bbTrack * bbt = bbTrack::findBBTrack( pat_num );
@@ -884,7 +846,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
 	}
 
-	if( (csize) project_cur_pat < engine::getBBEditor()->numOfBBs() )
+	if( project_cur_pat < engine::getBBEditor()->numOfBBs() )
 	{
 		engine::getBBEditor()->setCurrentBB( project_cur_pat );
 	}

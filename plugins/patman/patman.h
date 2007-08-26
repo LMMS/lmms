@@ -102,7 +102,7 @@ private:
 	} handle_data;
 
 	QString m_patchFile;
-	vvector<sampleBuffer *> m_patch_samples;
+	QVector<sampleBuffer *> m_patch_samples;
 
 	pixmapButton * m_openFileButton;
 	pixmapButton * m_loopButton;

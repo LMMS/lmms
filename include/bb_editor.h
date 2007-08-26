@@ -26,7 +26,6 @@
 #ifndef _BB_EDITOR_H
 #define _BB_EDITOR_H
 
-#include "qt3support.h"
 #include "track_container.h"
 
 
@@ -59,16 +58,16 @@ public:
 		return( TRUE );
 	}
 
-	csize currentBB( void ) const;
-	tact FASTCALL lengthOfBB( const csize _bb );
+	int currentBB( void ) const;
+	tact FASTCALL lengthOfBB( const int _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
 		return( lengthOfBB( currentBB() ) );
 	}
-	void FASTCALL removeBB( const csize _bb );
-	csize numOfBBs( void ) const;
+	void FASTCALL removeBB( const int _bb );
+	int numOfBBs( void ) const;
 
-	void FASTCALL swapBB( const csize _bb1, const csize _bb2 );
+	void FASTCALL swapBB( const int _bb1, const int _bb2 );
 
 	void updateBBTrack( trackContentObject * _tco );
 
@@ -93,7 +92,7 @@ private:
 	//bbEditor( const bbEditor & );
 	virtual ~bbEditor();
 
-	void FASTCALL createTCOsForBB( const csize _bb );
+	void FASTCALL createTCOsForBB( const int _bb );
 
 
 	QWidget * m_toolBar;

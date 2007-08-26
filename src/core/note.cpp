@@ -25,17 +25,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
 
 #include <math.h>
 

@@ -25,14 +25,6 @@
  */
  
 
-#include "combobox.h"
-#include "automatable_object_templates.h"
-#include "templates.h"
-#include "embed.h"
-#include "gui_templates.h"
-
-#ifndef QT3
-
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
 #include <QtGui/QDesktopWidget>
@@ -41,16 +33,11 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
-#else
-
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qapplication.h>
-
-#endif
+#include "combobox.h"
+#include "automatable_object_templates.h"
+#include "templates.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 
 QPixmap * comboBox::s_background = NULL;
@@ -60,11 +47,7 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 
 comboBox::comboBox( QWidget * _parent, const QString & _name, track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	automatableObject<int>( _track ),
 	m_menu( this ),
 	m_pressed( FALSE )
@@ -84,26 +67,15 @@ comboBox::comboBox( QWidget * _parent, const QString & _name, track * _track ) :
 	setFont( pointSize<8>( font() ) );
 	m_menu.setFont( pointSize<8>( m_menu.font() ) );
 
-#ifndef QT3
 	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
 				this, SLOT( setItem( QAction * ) ) );
-#else
-	connect( &m_menu, SIGNAL( activated( int ) ),
-				this, SLOT( setItem( int ) ) );
-#endif
-
-#ifdef QT3
-	setBackgroundMode( NoBackground );
-#endif
 
 	if( _track != NULL )
 	{
 		getAutomationPattern();
 	}
 	setInitValue( 0 );
-#ifdef QT4
 	setAccessibleName( _name );
-#endif
 }
 
 
@@ -121,26 +93,14 @@ void comboBox::addItem( const QString & _item, const QPixmap & _pixmap )
 	QPixmap pm = _pixmap;
 	if( pm.height() > 16 )
 	{
-#ifndef QT3
 		pm = pm.scaledToHeight( 16, Qt::SmoothTransformation );
-#else
-		pm.convertFromImage( pm.convertToImage().smoothScale(
-							pm.width(), 16,
-							QImage::ScaleMin ) );
-#endif
 	}
 	m_items.push_back( qMakePair( _item, pm ) );
 	m_menu.clear();
-	for( vvector<item>::iterator it = m_items.begin();
+	for( QVector<item>::iterator it = m_items.begin();
 						it != m_items.end(); ++it )
 	{
-		m_menu.addAction( ( *it ).second, ( *it ).first
-		// when using Qt3, we pass item-index as id for using
-		// it in setItem( int ) as index
-#ifdef QT3
-				, it - m_items.begin()
-#endif
-				);
+		m_menu.addAction( ( *it ).second, ( *it ).first );
 	}
 	setRange( 0, m_items.size() - 1 );
 }
@@ -150,7 +110,7 @@ void comboBox::addItem( const QString & _item, const QPixmap & _pixmap )
 
 int comboBox::findText( const QString & _txt ) const
 {
-	for( vvector<item>::const_iterator it = m_items.begin();
+	for( QVector<item>::const_iterator it = m_items.begin();
 						it != m_items.end(); ++it )
 	{
 		if( ( *it ).first == _txt )
@@ -187,9 +147,9 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: add css-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( accessibleName() ) + "</b></font>",
 			this );
@@ -247,12 +207,8 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 
 void comboBox::paintEvent( QPaintEvent * _pe )
 {
-#ifndef QT3
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-	QPainter p( &draw_pm, this );
-#endif
+
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	for( int x = 2; x < width() - 2; x += s_background->width() )
@@ -303,11 +259,6 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 		p.drawText( tx, p.fontMetrics().height(),
 						m_items[value()].first );
 	}
-
-#ifdef QT3
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 
@@ -321,32 +272,11 @@ void comboBox::wheelEvent( QWheelEvent * _we )
 
 
 
-#ifndef QT3
-
 void comboBox::setItem( QAction * _item )
 {
 	setInitValue( findText( _item->text() ) );
 }
 
-
-void comboBox::setItem( int )
-{
-}
-
-#else
-
-void comboBox::setItem( QAction * )
-{
-}
-
-
-void comboBox::setItem( int _item )
-{
-	setInitValue( _item );
-}
-
-
-#endif
 
 
 

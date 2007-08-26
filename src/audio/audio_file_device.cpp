@@ -26,17 +26,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMessageBox>
-
-#else
-
-#include <qmessagebox.h>
-
-#endif
 
 
 #include "audio_file_device.h"
@@ -58,11 +48,7 @@ audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,
 	m_minBitrate( _min_bitrate ),
 	m_maxBitrate( _max_bitrate )
 {
-#ifdef QT4
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == FALSE )
-#else
-	if( m_outputFile.open( IO_WriteOnly | IO_Truncate ) == FALSE )
-#endif
 	{
 		QMessageBox::critical( NULL,
 			exportProjectDialog::tr( "Could not open file" ),
@@ -91,11 +77,7 @@ audioFileDevice::~audioFileDevice()
 
 Sint32 audioFileDevice::writeData( const void * _data, Sint32 _len )
 {
-#ifdef QT4
 	return( m_outputFile.write( (const char *) _data, _len ) );
-#else
-	return( m_outputFile.writeBlock( (const char *) _data, _len ) );
-#endif
 }
 
 

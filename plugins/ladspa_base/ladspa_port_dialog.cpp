@@ -22,21 +22,9 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <QtGui/QLayout>
 #include <QtGui/QTableWidget>
-
-#else
-
-#include <qlayout.h>
-#include <qtable.h>
-
-#define QTableWidget QTable
-
-#endif
 
 #include "ladspa_port_dialog.h"
 
@@ -76,74 +64,41 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key ) :
 	{
 		port_nums.append( QString::number( row ) );
 		Uint8 col = 0;
-#ifdef QT3
-		display->setText( row, col, m_ladspa->getPortName( 
-							m_key, row ) );
-#else
 		display->item( row, col )->setText( m_ladspa->getPortName( 
 							m_key, row ) );
-#endif
 		col++;
 		
 		if( m_ladspa->isPortAudio( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Audio" ) );
-#else
 			display->item( row, col )->setText( tr( "Audio" ) );
-#endif
 		}
 		else
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Control" ) );
-#else
 			display->item( row, col )->setText( tr( "Control" ) );
-#endif
 		}
 		col++;
 		
 		if( m_ladspa->isPortInput( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Input" ) );
-#else
 			display->item( row, col )->setText( tr( "Input" ) );
-#endif
 		}
 		else
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Output" ) );
-#else
 			display->item( row, col )->setText( tr( "Output" ) );
-#endif
 		}
 		col++;
 			
 		if( m_ladspa->isPortToggled( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Toggled" ) );
-#else
 			display->item( row, col )->setText( tr( "Toggled" ) );
-#endif
 		}
 		else if( m_ladspa->isInteger( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Integer" ) );
-#else
 			display->item( row, col )->setText( tr( "Integer" ) );
-#endif
 		}
 		else
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Float" ) );
-#else
 			display->item( row, col )->setText( tr( "Float" ) );
-#endif
 		}
 		col++;
 		
@@ -210,45 +165,23 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key ) :
 		{
 			range = "";
 		}
-#ifdef QT3
-		display->setText( row, col, range );
-#else
 		display->item( row, col )->setText( range );
-#endif
 		col++;
 				
 		if( m_ladspa->isLogarithmic( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Yes" ) );
-#else
 			display->item( row, col )->setText( tr( "Yes" ) );
-#endif
 		}
 		col++;
 		
 		if( m_ladspa->areHintsSampleRateDependent( m_key, row ) )
 		{
-#ifdef QT3
-			display->setText( row, col, tr( "Yes" ) );
-#else
 			display->item( row, col )->setText( tr( "Yes" ) );
-#endif
 		}
 		col++;
 	}
 
-#ifdef QT3
-	display->setColumnLabels( ports );
-	display->setRowLabels( port_nums );
-	display->setReadOnly( true );
 
-	for(Uint8 col = 0; col < ports.count(); col++ )
-	{
-		display->adjustColumn( col );
-	}
-#endif
-	
 	vlayout->addWidget( settings );
 	
 	setFixedSize( display->width(), display->height() );

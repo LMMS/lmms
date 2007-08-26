@@ -39,35 +39,21 @@
 #endif
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#else
-
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qmap.h>
-#include <qpair.h>
-
-#endif
-
 
 #include "types.h"
-//#include "qt3support.h"
 
 
 const float NOHINT = -99342.2243f;
 
 typedef QPair<QString, QString> ladspa_key_t;
 typedef QPair<QString, ladspa_key_t> sortable_plugin_t;
-typedef vlist<sortable_plugin_t> l_sortable_plugin_t;
-typedef vlist<ladspa_key_t> l_ladspa_key_t;
+typedef QList<sortable_plugin_t> l_sortable_plugin_t;
+typedef QList<ladspa_key_t> l_ladspa_key_t;
 
 /* ladspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
 it loads all of the plug-ins found in the LADSPA_PATH environmental variable

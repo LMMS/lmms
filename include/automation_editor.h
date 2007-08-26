@@ -27,19 +27,7 @@
 #ifndef _AUTOMATION_EDITOR_H
 #define _AUTOMATION_EDITOR_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-#include <QtCore/QVector>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-
-#endif
 
 #include "types.h"
 #include "journalling_object.h"

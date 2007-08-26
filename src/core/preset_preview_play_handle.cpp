@@ -25,20 +25,9 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
-
-#else
-
-#include <qmutex.h>
-
-#endif
-
-
 
 #include "preset_preview_play_handle.h"
 #include "debug.h"

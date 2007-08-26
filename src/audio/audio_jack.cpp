@@ -30,19 +30,9 @@
 
 #ifdef JACK_SUPPORT
 
-#ifdef QT4
-
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtGui/QMessageBox>
-
-#else
-
-#include <qlineedit.h>
-#include <qlabel.h>
-#include <qmessagebox.h>
-
-#endif
 
 
 #include <stdlib.h>
@@ -83,12 +73,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 #ifndef OLD_JACK
 	const char * server_name = NULL;
 	jack_status_t status;
-	m_client = jack_client_open( client_name.
-#ifdef QT4
-							toAscii().constData(),
-#else
-							ascii(),
-#endif
+	m_client = jack_client_open( client_name.toAscii().constData(),
 						JackNullOption, &status,
 								server_name );
 	if( m_client == NULL )
@@ -104,23 +89,13 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 	{
 		printf( "there's already a client with name '%s', so unique "
 			"name '%s' was assigned\n", client_name.
-#ifdef QT4
 							toAscii().constData(),
-#else
-							ascii(),
-#endif
 					jack_get_client_name( m_client ) );
 	}
 
 #else /* OLD_JACK */
 
-	m_client = jack_client_new( client_name.
-#ifdef QT4
-						toAscii().constData()
-#else
-						ascii()
-#endif
-					);
+	m_client = jack_client_new( client_name.toAscii().constData() );
 	if( m_client == NULL )
 	{
 		printf( "jack_client_new() failed\n" );
@@ -150,11 +125,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 				( ( ch % 2 ) ? "R" : "L" ) +
 				QString::number( ch / 2 + 1 );
 		m_outputPorts.push_back( jack_port_register( m_client,
-#ifdef QT4
 						name.toAscii().constData(),
-#else
-						name.ascii(),
-#endif
 						JACK_DEFAULT_AUDIO_TYPE,
 						JackPortIsOutput, 0 ) );
 		if( m_outputPorts.back() == NULL )
@@ -164,12 +135,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 		}
 	}
 
-#ifndef QT3
 	m_stop_semaphore.acquire();
-#else
-	m_stop_semaphore++;
-#endif
-
 
 	_success_ful = TRUE;
 }
@@ -179,11 +145,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 
 audioJACK::~audioJACK()
 {
-#ifndef QT3
 	m_stop_semaphore.release();
-#else
-	m_stop_semaphore--;
-#endif
 
 	while( m_portMap.size() )
 	{
@@ -267,11 +229,7 @@ void audioJACK::startProcessing( void )
 
 void audioJACK::stopProcessing( void )
 {
-#ifndef QT3
 	m_stop_semaphore.acquire();
-#else
-	m_stop_semaphore++;
-#endif
 }
 
 
@@ -288,14 +246,9 @@ void audioJACK::registerPort( audioPort * _port )
 	for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 	{
 		m_portMap[_port].ports[ch] = jack_port_register( m_client,
-						name[ch].
-#ifdef QT4
-							toAscii().constData(),
-#else
-							ascii(),
-#endif
-				JACK_DEFAULT_AUDIO_TYPE,
-				JackPortIsOutput, 0 );
+						name[ch].toAscii().constData(),
+						JACK_DEFAULT_AUDIO_TYPE,
+							JackPortIsOutput, 0 );
 	}
 #endif
 }
@@ -334,13 +287,7 @@ void audioJACK::renamePort( audioPort * _port )
 		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			jack_port_set_name( m_portMap[_port].ports[ch],
-						name[ch].
-#ifdef QT4
-							toAscii().constData()
-#else
-							ascii()
-#endif
-					) ;
+					name[ch].toAscii().constData() );
 		}
 	}
 #endif
@@ -361,10 +308,10 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	jack_transport_state_t ts = jack_transport_query( _this->m_client,
 									NULL );
 
-	vvector<jack_default_audio_sample_t *> outbufs( _this->channels(),
+	QVector<jack_default_audio_sample_t *> outbufs( _this->channels(),
 									NULL );
 	Uint8 chnl = 0;
-	for( vvector<jack_default_audio_sample_t *>::iterator it =
+	for( QVector<jack_default_audio_sample_t *>::iterator it =
 			outbufs.begin(); it != outbufs.end(); ++it, ++chnl )
 	{
 		*it = (jack_default_audio_sample_t *) jack_port_get_buffer(
@@ -424,11 +371,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 			if( !_this->m_framesToDoInCurBuf )
 			{
 				_this->m_stopped = TRUE;
-#ifndef QT3
 				_this->m_stop_semaphore.release();
-#else
-				_this->m_stop_semaphore--;
-#endif
 			}
 			_this->m_framesDoneInCurBuf = 0;
 		}

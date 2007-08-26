@@ -41,14 +41,13 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	m_colorStandard( s_stdColor ),
 	m_colorHighlighted( s_hlColor )
 {
-#ifndef QT3
 	setAutoFillBackground( TRUE );
 	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorStandard );
 	pal.setColor( QPalette::Window, m_colorStandard );
 	pal.setColor( QPalette::Button, m_colorStandard );
 	setPalette( pal );
-#endif
+
 	if( _receiver != NULL && _slot != NULL )
 	{
 		connect( this, SIGNAL( clicked() ), _receiver, _slot );
@@ -73,15 +72,11 @@ toolButton::~toolButton()
 
 void toolButton::enterEvent( QEvent * )
 {
-#ifdef QT4
 	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorHighlighted );
 	pal.setColor( QPalette::Window, m_colorHighlighted );
 	pal.setColor( QPalette::Button, m_colorHighlighted );
 	setPalette( pal );
-#else
-	setPaletteBackgroundColor( m_colorHighlighted );
-#endif
 }
 
 
@@ -89,15 +84,11 @@ void toolButton::enterEvent( QEvent * )
 
 void toolButton::leaveEvent( QEvent * )
 {
-#ifdef QT4
 	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorStandard );
 	pal.setColor( QPalette::Window, m_colorStandard );
 	pal.setColor( QPalette::Button, m_colorStandard );
 	setPalette( pal );
-#else
-	setPaletteBackgroundColor( m_colorStandard );
-#endif
 }
 
 

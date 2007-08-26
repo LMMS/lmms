@@ -25,22 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 #include <QtGui/QWheelEvent>
-
-#else
-
-#include <qpainter.h>
-#include <qpixmap.h>
-
-#endif
-
 
 #include "tab_widget.h"
 #include "gui_templates.h"
@@ -54,15 +42,7 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	m_caption( _caption )
 {
 	setFont( pointSize<7>( font() ) );
-/*#ifdef QT4
-	QPalette pal = palette();
-	pal.setColor( QPalette::Background, QColor( 96, 96, 96 ) );
-	setPalette( pal );
-#else
-	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
-	setBackgroundMode( Qt::NoBackground );
-#endif*/
-#ifndef QT3
+
 	setAutoFillBackground( TRUE );
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background ).
@@ -70,11 +50,6 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
-#else
-	QColor bg_color = QApplication::palette().active().background().dark(
-									132 );
-	setPaletteBackgroundColor( bg_color );
-#endif
 }
 
 
@@ -170,17 +145,11 @@ void tabWidget::resizeEvent( QResizeEvent * )
 
 void tabWidget::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
-	p.fillRect( 0, 0, width() - 1, height() - 1, QColor( 96, 96, 96 ) );
-	const int c = 0;
-#else
-	QPixmap pm( size() );
-	pm.fill( QColor( 96, 96, 96 ) );
 
-	QPainter p( &pm );
-	const int c = 1;
-#endif
+	p.fillRect( 0, 0, width() - 1, height() - 1, QColor( 96, 96, 96 ) );
+
+	const int c = 0;
 	bool big_tab_captions = ( m_caption == "" );
 	int add = big_tab_captions ? 1 : 0;
 
@@ -232,10 +201,6 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 		p.setPen( cap_col );
 		cx += ( *it ).nwidth;
 	}
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -246,7 +211,7 @@ void tabWidget::wheelEvent( QWheelEvent * _we )
 	_we->accept();
 	int dir = ( _we->delta() < 0 ) ? 1 : -1;
 	int tab = m_activeTab;
-	while( tab > -1 && static_cast<csize>( tab ) < m_widgets.count() )
+	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{
 		tab += dir;
 		if( m_widgets.contains( tab ) )

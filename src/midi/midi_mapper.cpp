@@ -28,17 +28,7 @@
 
 #include "midi_mapper.h"
 
-#ifdef QT4
-
 #include <QtCore/QRegExp>
-
-#else
-
-#include <qregexp.h>
-
-#define indexOf find
-
-#endif
 
 
 midiMapper::midiMapper( const QString & _map ) :
@@ -59,11 +49,7 @@ midiMapper::midiMapper( const QString & _map ) :
 		m_channelMap[i] = i;
 	}
 	QFile map( _map );
-#ifdef QT4
 	if( !map.open( QIODevice::ReadOnly ) )
-#else
-	if( !map.open( IO_ReadOnly ) )
-#endif
 	{
 		return;
 	}
@@ -76,14 +62,7 @@ midiMapper::midiMapper( const QString & _map ) :
 			continue;
 		}
 		QString line( buf );
-#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
-#else
-		if( line.contains( '\n' ) )
-		{
-			line = line.left( line.length() - 1 );
-		}
-#endif
 		if( line.left( 6 ) == "DEFINE" )
 		{
 			if( line.section( ' ', 1, 1 ) == "PATCHMAP" )
@@ -127,14 +106,7 @@ void midiMapper::readPatchMap( QFile & _f )
 			continue;
 		}
 		QString line( buf );
-#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
-#else
-		if( line.contains( '\n' ) )
-		{
-			line = line.left( line.length() - 1 );
-		}
-#endif
 		if( line.left( 3 ) == "END" )
 		{
 			return;
@@ -144,11 +116,8 @@ void midiMapper::readPatchMap( QFile & _f )
 			continue;
 		}
 		m_patchMap[prog_idx].first = line.section( '=', 1, 1 ).toInt();
-		m_patchMap[prog_idx].second = line.section( '=', 0, 0 )
-#if QT_VERSION >= 0x030100
-							.replace( ' ', "" )
-#endif
-						;
+		m_patchMap[prog_idx].second =
+				line.section( '=', 0, 0 ).replace( ' ', "" );
 		++prog_idx;
 	}
 }
@@ -168,14 +137,7 @@ void midiMapper::readDrumsetKeyMap( QFile & _f )
 			continue;
 		}
 		QString line( buf );
-#if QT_VERSION >= 0x030100
 		line.replace( '\n', "" );
-#else
-		if( line.contains( '\n' ) )
-		{
-			line = line.left( line.length() - 1 );
-		}
-#endif
 		if( line.left( 3 ) == "END" )
 		{
 			return;
@@ -189,13 +151,9 @@ void midiMapper::readDrumsetKeyMap( QFile & _f )
 			m_drumsetKeyMap[key].first = line.section( '=', 1, 1 ).
 									toInt();
 
-			m_drumsetKeyMap[key].second = line.mid( 4 ).
-							section( '=', 0, 0 ).
-							section( ' ', 1, 1 )
-#if QT_VERSION >= 0x030100
-							.replace( ' ', "" )
-#endif
-							;
+			m_drumsetKeyMap[key].second =
+				line.mid( 4 ).section( '=', 0, 0 )
+					.section( ' ', 1, 1 ).replace( ' ', "" );
 		}
 		++key;
 	}

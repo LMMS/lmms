@@ -31,24 +31,10 @@
 #endif
 
 
-#include "qt3support.h"
-
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
 #include <QtCore/QMap>
 #include <QtCore/QVector>
 #include <QtCore/QPair>
-
-#else
-
-#include <qdialog.h>
-#include <qmap.h>
-#include <qvaluevector.h>
-#include <qpair.h>
-
-#endif
 
 
 class QLineEdit;
@@ -201,7 +187,7 @@ protected slots:
 
         void backButtonClicked( void );
         void nextButtonClicked( void );
-	void switchPage( csize _pg );
+	void switchPage( int _pg );
 	void switchPage( QWidget * _pg );
 
 
@@ -237,7 +223,7 @@ private:
 	QStringList m_recentlyOpenedProjects;
 
 
-	typedef vvector<QPair<QString, QString> > stringPairVector;
+	typedef QVector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;
 	settingsMap m_settings;
 
@@ -253,8 +239,8 @@ private:
 	QLineEdit * m_wdLineEdit;
 
 	// wizard stuff
-	vlist<QPair<QWidget *, QString> > m_pages;
-	csize m_currentPage;
+	QList<QPair<QWidget *, QString> > m_pages;
+	int m_currentPage;
 	QFrame * m_hbar;
 	QWidget * m_contentWidget;
 	QLabel * m_title;

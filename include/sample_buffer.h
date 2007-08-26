@@ -26,18 +26,7 @@
 #ifndef _SAMPLE_BUFFER_H
 #define _SAMPLE_BUFFER_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QObject>
-
-#else
-
-#include <qobject.h>
-
-#endif
-
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

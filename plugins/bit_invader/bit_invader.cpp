@@ -23,26 +23,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
 #include <Qt/QtXml>
 #include <QtGui/QDropEvent>
-
-#else
-
-#include <qpainter.h>
-#include <qbitmap.h>
-#include <qdom.h>
-#include <qfileinfo.h>
-#include <qdom.h>
-#include <qmap.h>
-#include <qcanvas.h>
-#include <qlabel.h>
-
-#endif
 
 #include <iostream>
 #include <cstdlib>
@@ -333,16 +316,11 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 			this, SLOT ( smoothClicked( void ) ) );		
 
 
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
-
 
 	sample_length = 128;
 	sample_shape = new float[128];

@@ -26,26 +26,15 @@
 #ifndef _LADSPA_CONTROL_DIALOG_H
 #define _LADSPA_CONTROL_DIALOG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QGroupBox>
 #include <QtGui/QLayout>
-
-#else
-
-#include <qgroupbox.h>
-#include <qlayout.h>
-
-#endif
 
 #include "effect_control_dialog.h"
 #include "ladspa_control.h"
 #include "led_checkbox.h"
 
 
-typedef vvector<ladspaControl *> control_list_t;
+typedef QVector<ladspaControl *> control_list_t;
 
 class ladspaEffect;
 
@@ -85,8 +74,8 @@ private:
 	bool m_noLink;
 	audioPort * m_port;
 	ledCheckBox * m_stereoLink;
-	vvector<QWidget *> m_blanks;
-	vvector<control_list_t> m_controls;
+	QVector<QWidget *> m_blanks;
+	QVector<control_list_t> m_controls;
 	
 	QVBoxLayout * m_mainLay;
 	QHBoxLayout * m_effectLay;

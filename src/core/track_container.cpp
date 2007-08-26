@@ -26,25 +26,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
 #include <QtGui/QWheelEvent>
-
-#else
-
-#include <qdom.h>
-#include <qapplication.h>
-#include <qprogressdialog.h>
-
-#define setValue setProgress
-#define maximum totalSteps
-
-#endif
 
 
 #include "track_container.h"
@@ -68,23 +53,17 @@
 
 
 trackContainer::trackContainer( void ) :
-	QMainWindow( engine::getMainWindow()->workspace()
-#ifdef QT3
-				, 0, Qt::WStyle_Title
-#endif
-			 ),
+	QMainWindow( engine::getMainWindow()->workspace() ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
 	m_rubberBand( new rubberBand( m_scrollArea ) ),
 	m_origin()
 {
-#ifdef QT4
 	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		engine::getMainWindow()->workspace()->addWindow( this );
 	}
-#endif
 
 	m_scrollArea->show();
 	m_rubberBand->hide();
@@ -134,40 +113,23 @@ void trackContainer::loadSettings( const QDomElement & _this )
 	int start_val = 0;
 	if( pd == NULL )
 	{
-#ifdef QT4
 		pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count() );
-#else
-		pd = new QProgressDialog( tr( "Loading project..." ),
-						tr( "Cancel" ),
-						_this.childNodes().count(),
-								0, 0, TRUE );
-#endif
 		pd->setWindowTitle( tr( "Please wait..." ) );
 		pd->show();
 	}
 	else
 	{
-#ifdef QT4
 		start_val = pd->value();
 		pd->setMaximum( pd->maximum() + _this.childNodes().count() );
-#else
-		start_val = pd->progress();
-		pd->setTotalSteps( pd->maximum() + _this.childNodes().count() );
-#endif
 	}
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-#ifdef QT4
 		pd->setValue( pd->value() + 1 );
 		qApp->processEvents( QEventLoop::AllEvents, 100 );
-#else
-		pd->setValue( pd->progress() + 1 );
-		qApp->processEvents( 100 );
-#endif
 
 		if( pd->wasCanceled() )
 		{
@@ -203,9 +165,6 @@ void trackContainer::addTrack( track * _track )
 	addJournalEntry( journalEntry( ADD_TRACK, map ) );
 
 	m_trackWidgets.push_back( _track->getTrackWidget() );
-#ifndef QT4
-	m_scrollArea->addChild( _track->getTrackWidget() );
-#endif
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				_track->getTrackWidget(),
 				SLOT( changePosition( const midiTime & ) ) );
@@ -228,9 +187,6 @@ void trackContainer::removeTrack( track * _track )
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
 
-#ifndef QT4
-		m_scrollArea->removeChild( _track->getTrackWidget() );
-#endif
 		m_trackWidgets.erase( it );
 
 		delete _track;
@@ -301,19 +257,12 @@ void trackContainer::realignTracks( bool _complete_update )
 	{
 		( *it )->show();
 		( *it )->update();
-#ifdef QT4
 		( *it )->move( 0, y );
-#else
-		m_scrollArea->moveChild( *it, 0, y );
-#endif
 		( *it )->resize( width() - DEFAULT_SCROLLBAR_SIZE,
 				 			( *it )->height() );
 		( *it )->changePosition( m_currentPosition );
 		y += ( *it )->height();
 	}
-#ifdef QT3
-	m_scrollArea->resizeContents( width() - DEFAULT_SCROLLBAR_SIZE, y );
-#endif
 	updateScrollArea();
 }
 
@@ -333,12 +282,7 @@ void trackContainer::clearAllTracks( void )
 
 const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
 {
-	const int abs_y = _y +
-#ifndef QT3
-				m_scrollArea->viewport()->y();
-#else
-				m_scrollArea->contentsY();
-#endif
+	const int abs_y = _y + m_scrollArea->viewport()->y();
 	int y_cnt = 0;
 	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
 					it != m_trackWidgets.end(); ++it )
@@ -615,20 +559,8 @@ trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
 	m_trackContainer( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
-	setHorizontalScrollBarPolicy( 
-#ifdef QT4
-					Qt::ScrollBarAlwaysOff
-#else
-					QScrollArea::AlwaysOff
-#endif
-					);
-	setVerticalScrollBarPolicy( 
-#ifdef QT4
-					Qt::ScrollBarAlwaysOn
-#else
-					QScrollArea::AlwaysOn
-#endif
-					);
+	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 }
 
 

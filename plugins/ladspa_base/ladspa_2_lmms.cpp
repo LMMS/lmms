@@ -26,9 +26,6 @@
 
 #include "ladspa_2_lmms.h"
 
-#ifdef QT3
-#define indexOf find
-#endif
 
 ladspa2LMMS::ladspa2LMMS( void )
 {
@@ -103,11 +100,7 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	{
 		name = name.left( name.indexOf( "  " ) );
 	}
-#ifndef QT3
 	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-#else
-	bool cs = FALSE;
-#endif
 	if( name.indexOf( " with ", 0, cs ) > 0 )
 	{
 		name = name.left( name.indexOf( " with ", 0, cs ) );
@@ -132,7 +125,4 @@ QString ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	
 	return( name );	
 }
-
-
-#undef indexOf
 

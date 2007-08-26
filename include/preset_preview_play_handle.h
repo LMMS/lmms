@@ -27,9 +27,6 @@
 #ifndef _PRESET_PREVIEW_PLAY_HANDLE_H
 #define _PRESET_PREVIEW_PLAY_HANDLE_H
 
-#include "qt3support.h"
-
-
 #include "note_play_handle.h"
 
 

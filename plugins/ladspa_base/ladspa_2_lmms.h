@@ -32,7 +32,6 @@
 
 class ladspa2LMMS: public ladspaManager
 {
-	
 public:
 	
 	inline l_sortable_plugin_t getInstruments( void )

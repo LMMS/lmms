@@ -26,25 +26,12 @@
  */
 
 
-#include "automatable_button.h"
-
-#ifndef QT3
-
 #include <QtGui/QCursor>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
-#else
-
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-
-#define indexOf findIndex
-
-#endif
-
+#include "automatable_button.h"
 #include "automatable_object_templates.h"
 #include "embed.h"
 
@@ -52,11 +39,7 @@
 
 automatableButton::automatableButton( QWidget * _parent, const QString & _name,
 							track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	autoObj( _track, FALSE, FALSE, TRUE ),
 	m_group( NULL ),
 	m_checkable( FALSE )
@@ -66,9 +49,7 @@ automatableButton::automatableButton( QWidget * _parent, const QString & _name,
 		getAutomationPattern();
 	}
 	setInitValue( FALSE );
-#ifdef QT4
 	setAccessibleName( _name );
-#endif
 }
 
 
@@ -113,9 +94,9 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	QMenu contextMenu( target );
-#ifdef QT4
+#warning TODO: set according CSS-formatting
 	contextMenu.setTitle( target->accessibleName() );
-#else
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( target->accessibleName() ) + "</b></font>",
 									this );
@@ -208,11 +189,7 @@ void automatableButton::setValue( const bool _on )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 							const QString & _name,
 							track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	automatableObject<int>( _track )
 {
 	hide();
@@ -221,9 +198,7 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 		getAutomationPattern();
 	}
 	setInitValue( 0 );
-#ifdef QT4
 	setAccessibleName( _name );
-#endif
 }
 
 
@@ -294,11 +269,6 @@ void automatableButtonGroup::setValue( const int _value )
 
 	emit valueChanged( value() );
 }
-
-
-#ifdef QT3
-#undef indexOf
-#endif
 
 
 #include "automatable_button.moc"

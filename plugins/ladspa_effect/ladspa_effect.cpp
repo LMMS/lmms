@@ -23,19 +23,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMessageBox>
-
-#else
-
-#include "qmessagebox.h"
-#define indexOf find
-
-#endif
-
 
 #include "ladspa_effect.h"
 #include "mixer.h"

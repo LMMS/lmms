@@ -38,8 +38,8 @@
 
 class notePlayHandle;
 
-typedef vvector<notePlayHandle *> notePlayHandleVector;
-typedef vvector<const notePlayHandle *> constNotePlayHandleVector;
+typedef QVector<notePlayHandle *> notePlayHandleVector;
+typedef QVector<const notePlayHandle *> constNotePlayHandleVector;
 
 
 class notePlayHandle : public playHandle, public note

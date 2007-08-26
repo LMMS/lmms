@@ -25,11 +25,9 @@
 #ifndef _EFFECT_CHAIN_H
 #define _EFFECT_CHAIN_H
 
-#include "qt3support.h"
-
 #include "effect.h"
 
-typedef vvector<effect *> effect_list_t;
+typedef QVector<effect *> effect_list_t;
 
 class effectChain
 {

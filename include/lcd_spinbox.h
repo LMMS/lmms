@@ -26,20 +26,8 @@
 #ifndef _LCD_SPINBOX_H
 #define _LCD_SPINBOX_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMap>
 #include <QtGui/QLCDNumber>
-
-#else
-
-#include <qlcdnumber.h>
-#include <qmap.h>
-
-#endif
-
 
 #include "automatable_object.h"
 

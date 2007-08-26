@@ -25,23 +25,13 @@
  */
 
 
-#include "automatable_slider.h"
-
-#ifndef QT3
 
 #include <QtGui/QCursor>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
-#else
-
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-
-#endif
-
+#include "automatable_slider.h"
 #include "automatable_object_templates.h"
 #include "embed.h"
 #include "knob.h"
@@ -51,18 +41,12 @@
 
 automatableSlider::automatableSlider( QWidget * _parent, const QString & _name,
 							class track * _track ) :
-	QSlider( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QSlider( _parent ),
 	m_show_status( FALSE )
 {
 	m_knob = new knob( knobDark_28, NULL, _name, _track );
 
-#ifdef QT4
 	setAccessibleName( _name );
-#endif
 
 	connect( m_knob, SIGNAL( valueChanged( float ) ), this,
 						SLOT( updateSlider( void ) ) );
@@ -119,9 +103,9 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 	mouseReleaseEvent( NULL );
 
 	QMenu contextMenu( this );
-#ifdef QT4
+#warning TODO: use according CSS formatting
 	contextMenu.setTitle( accessibleName() );
-#else
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( accessibleName() ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );

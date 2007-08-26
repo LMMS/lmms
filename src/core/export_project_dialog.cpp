@@ -25,10 +25,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QProgressBar>
@@ -36,17 +32,6 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QApplication>
-
-#else
-
-#include <qfiledialog.h>
-#include <qmessagebox.h>
-#include <qprogressbar.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qapplication.h>
-
-#endif
 
 
 #include "export_project_dialog.h"
@@ -136,14 +121,9 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_hourglassLbl( NULL ),
 	m_deleteFile( FALSE )
 {
-#ifdef QT4
 	m_fileType = getFileTypeFromExtension( "." +
 						QFileInfo( _file_name
 							).completeSuffix() );
-#else
-	m_fileType = getFileTypeFromExtension( "." + QFileInfo( _file_name
-								).extension() );
-#endif
 	setWindowTitle( tr( "Export project to %1" ).arg( 
 					QFileInfo( _file_name ).fileName() ) );
 
@@ -358,11 +338,7 @@ void exportProjectDialog::exportBtnClicked( void )
 
 	m_exportProgressBar = new QProgressBar( this );
 	m_exportProgressBar->setGeometry( EPB_X, EPB_Y, EPB_WIDTH, EPB_HEIGHT );
-#ifdef QT4
 	m_exportProgressBar->setMaximum( 100 );
-#else
-	m_exportProgressBar->setTotalSteps( 100 );
-#endif
 	m_exportProgressBar->show();
 	
 	m_hourglassLbl = new QLabel( this );
@@ -391,11 +367,7 @@ void exportProjectDialog::exportBtnClicked( void )
 		int pval = pp * 100 /
 			( ( engine::getSongEditor()->lengthInTacts() + 1 )
 									* 64 );
-#ifdef QT4
 		m_exportProgressBar->setValue( pval );
-#else
-		m_exportProgressBar->setProgress( pval );
-#endif
 		// update lmms-main-win-caption
 		engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
 					+ " " + QString::number( pval ) + "%" );

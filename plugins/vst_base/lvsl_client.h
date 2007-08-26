@@ -26,22 +26,9 @@
 #ifndef _LVSL_CLIENT_H
 #define _LVSL_CLIENT_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <Qt/QtXml>
-
-#else
-
-#include <qstring.h>
-#include <qmutex.h>
-#include <qdom.h>
-
-#endif
-
 
 #include "mixer.h"
 #include "communication.h"

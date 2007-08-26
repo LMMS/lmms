@@ -26,20 +26,8 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qdom.h>
-#include <qlabel.h>
-#include <qwhatsthis.h>
-
-#endif
 
 
 #include "arp_and_chords_tab_widget.h"
@@ -208,10 +196,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
 		m_chordsComboBox->addItem( tr( s_chords[i].name
-#ifdef QT4
-							.toAscii().constData()
-#endif
-						) );
+						.toAscii().constData() ) );
 	}
 
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
@@ -223,11 +208,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	m_chordRangeKnob->move( 164, 24 );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " +
 							tr( "octave(s)" ) );
-#ifdef QT4
 	m_chordRangeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_chordRangeKnob,
-#endif
 		tr( "Use this knob for setting the chord range in octaves. "
 			"The selected chord will be played within specified "
 			"amount of octaves." ) );
@@ -241,11 +222,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 					ARP_GROUPBOX_WIDTH,
 					ARP_GROUPBOX_HEIGHT );
 
-#ifdef QT4
 	m_arpGroupBox->setWhatsThis(
-#else
-	QWhatsThis::add( m_arpGroupBox,
-#endif
 		tr( "An arpeggio is a type of playing (especially plucked) "
 			"instruments, which makes the music much livelier. "
 			"The strings of such instruments (e.g. harps) are "
@@ -262,10 +239,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
 		m_arpComboBox->addItem( tr( s_chords[i].name
-#ifdef QT4
-							.toAscii().constData()
-#endif
-						) );
+						.toAscii().constData() ) );
 	}
 
 
@@ -278,11 +252,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	m_arpRangeKnob->move( 164, 24 );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " +
 							tr( "octave(s)" ) );
-#ifdef QT4
 	m_arpRangeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_arpRangeKnob,
-#endif
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
 			"amount of octaves." ) );
@@ -296,11 +266,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	m_arpTimeKnob->move( 164, 70 );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +
 								tr( "ms" ) );
-#ifdef QT4
 	m_arpTimeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_arpTimeKnob,
-#endif
 		tr( "Use this knob for setting the arpeggio time in "
 			"milliseconds. The arpeggio time specifies how long "
 			"each arpeggio-tone should be played." ) );
@@ -313,11 +279,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	m_arpGateKnob->setInitValue( 100.0f );
 	m_arpGateKnob->move( 204, 70 );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
-#ifdef QT4
 	m_arpGateKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_arpGateKnob,
-#endif
 		tr( "Use this knob for setting the arpeggio gate. The "
 			"arpeggio gate specifies the percent of a whole "
 			"arpeggio-tone that should be played. With this you "
@@ -334,9 +296,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	arp_up_btn->move( 10, 74 );
 	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
-#ifdef QT3
-	arp_up_btn->setBackgroundMode( Qt::PaletteBackground );
-#endif
 	toolTip::add( arp_up_btn, tr( "arpeggio direction = up" ) );
 
 
@@ -346,9 +305,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_down_off" ) );
-#ifdef QT3
-	arp_down_btn->setBackgroundMode( Qt::PaletteBackground );
-#endif
 	toolTip::add( arp_down_btn, tr( "arpeggio direction = down" ) );
 
 
@@ -359,9 +315,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 						"arp_up_and_down_on" ) );
 	arp_up_and_down_btn->setInactiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_off" ) );
-#ifdef QT3
-	arp_up_and_down_btn->setBackgroundMode( Qt::PaletteBackground );
-#endif
 	toolTip::add( arp_up_and_down_btn,
 				tr( "arpeggio direction = up and down" ) );
 
@@ -373,9 +326,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 							"arp_random_on" ) );
 	arp_random_btn->setInactiveGraphic( embed::getIconPixmap(
 							"arp_random_off" ) );
-#ifdef QT3
-	arp_random_btn->setBackgroundMode( Qt::PaletteBackground );
-#endif
 	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
 
 	m_arpDirectionBtnGrp = new automatableButtonGroup( this,

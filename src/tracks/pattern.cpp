@@ -26,10 +26,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QTimer>
 #include <QtGui/QMenu>
@@ -37,21 +33,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
-
-#else
-
-#include <qdom.h>
-#include <qpopupmenu.h>
-#include <qprogressbar.h>
-#include <qpushbutton.h>
-#include <qmessagebox.h>
-#include <qimage.h>
-#include <qtimer.h>
-
-#define addSeparator insertSeparator
-#define addMenu insertItem
-
-#endif
 
 
 #include "pattern.h"
@@ -190,11 +171,6 @@ void pattern::init( void )
 
 	changeLength( length() );
 	restoreJournallingState();
-
-#ifdef QT3
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
 
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( FALSE );
@@ -563,8 +539,6 @@ void pattern::abortFreeze( void )
 
 
 
-#ifdef QT4
-
 void pattern::addSteps( QAction * _item )
 {
 	addSteps( _item->text().toInt() );
@@ -579,13 +553,6 @@ void pattern::removeSteps( QAction * _item )
 }
 
 
-
-#else
-
-void pattern::addSteps( QAction * ) { }
-void pattern::removeSteps( QAction * ) { }
-
-#endif
 
 
 
@@ -626,23 +593,12 @@ void pattern::removeSteps( int _n )
 
 void pattern::constructContextMenu( QMenu * _cm )
 {
-#ifdef QT4
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ), this,
 					SLOT( openInPianoRoll( bool ) ) );
-#else
-	_cm->insertItem( embed::getIconPixmap( "piano" ),
-					tr( "Open in piano-roll" ),
-					this, SLOT( openInPianoRoll() ),
-								0, -1, 0 );
-#endif
-#ifdef QT4
 	_cm->insertSeparator( _cm->actions()[1] );
-#else
-	_cm->insertSeparator( 1 );
-#endif
 
 	_cm->addSeparator();
 
@@ -675,7 +631,6 @@ void pattern::constructContextMenu( QMenu * _cm )
 		_cm->addSeparator();
 	}
 
-#ifdef QT4
 	QMenu * add_step_menu = _cm->addMenu(
 					embed::getIconPixmap( "step_btn_add" ),
 							tr( "Add steps" ) );
@@ -686,33 +641,14 @@ void pattern::constructContextMenu( QMenu * _cm )
 			this, SLOT( addSteps( QAction * ) ) );
 	connect( remove_step_menu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( removeSteps( QAction * ) ) );
-#else
-	QMenu * add_step_menu = new QMenu( this );
-	QMenu * remove_step_menu = new QMenu( this );
-#endif
 	for( int i = 1; i <= 16; i *= 2 )
 	{
 		const QString label = ( i == 1 ) ?
 					tr( "1 step" ) :
 					tr( "%1 steps" ).arg( i );
-#ifdef QT4
 		add_step_menu->addAction( label );
 		remove_step_menu->addAction( label );
-#else
-		int menu_id = add_step_menu->addAction( label, this,
-						SLOT( addSteps( int ) ) );
-		add_step_menu->setItemParameter( menu_id, i );
-		menu_id = remove_step_menu->addAction( label, this,
-						SLOT( removeSteps( int ) ) );
-		remove_step_menu->setItemParameter( menu_id, i );
-#endif
 	}
-#ifndef QT4
-	_cm->addMenu( embed::getIconPixmap( "step_btn_add" ),
-					tr( "Add steps" ), add_step_menu );
-	_cm->addMenu( embed::getIconPixmap( "step_btn_remove" ),
-				tr( "Remove steps" ), remove_step_menu );
-#endif
 }
 
 
@@ -861,7 +797,7 @@ void pattern::paintEvent( QPaintEvent * )
 	}
 
 	QPainter p( &m_paintPixmap );
-#ifdef QT4
+
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
 							QColor( 96, 96, 96 );
@@ -869,34 +805,6 @@ void pattern::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0.5, Qt::black );
 	lingrad.setColorAt( 1, c );
 	p.fillRect( QRect( 1, 1, width() - 2, height() - 2 ), lingrad );
-#else
-	for( int y = 1; y < height() / 2; ++y )
-	{
-		const int gray = 96 - y * 192 / height();
-		if( isSelected() == TRUE )
-		{
-			p.setPen( QColor( 0, 0, 128 + gray ) );
-		}
-		else
-		{
-			p.setPen( QColor( gray, gray, gray ) );
-		}
-		p.drawLine( 1, y, width() - 1, y );
-	}
-	for( int y = height() / 2; y < height() - 1; ++y )
-	{
-		const int gray = ( y - height() / 2 ) * 192 / height();
-		if( isSelected() == TRUE )
-		{
-			p.setPen( QColor( 0, 0, 128 + gray ) );
-		}
-		else
-		{
-			p.setPen( QColor( gray, gray, gray ) );
-		}
-		p.drawLine( 1, y, width() - 1, y );
-	}
-#endif
 
 	p.setPen( QColor( 57, 69, 74 ) );
 	p.drawLine( 0, 0, width(), 0 );
@@ -994,7 +902,6 @@ void pattern::paintEvent( QPaintEvent * )
 		QPixmap stepoffl;
 		const int steps = length() / BEATS_PER_TACT;
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
-#ifdef QT4
 		stepon = s_stepBtnOn->scaled( w / steps,
 					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
@@ -1011,19 +918,6 @@ void pattern::paintEvent( QPaintEvent * )
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-#else
-		stepon.convertFromImage( 
-				s_stepBtnOn->convertToImage().scale(
-					w / steps, s_stepBtnOn->height() ) );
-		stepoverlay.convertFromImage( 
-				s_stepBtnOverlay->convertToImage().scale(
-				w / steps, s_stepBtnOverlay->height() ) );
-		stepoff.convertFromImage( s_stepBtnOff->convertToImage().scale(
-					w / steps, s_stepBtnOff->height() ) );
-		stepoffl.convertFromImage( s_stepBtnOffLight->convertToImage().
-					scale( w / steps,
-						s_stepBtnOffLight->height() ) );
-#endif
 		for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
@@ -1153,17 +1047,11 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 	m_progress( 0 )
 {
 	setWindowTitle( tr( "Freezing pattern..." ) );
-#if QT_VERSION >= 0x030200
 	setModal( TRUE );
-#endif
 
 	m_progressBar = new QProgressBar( this );
 	m_progressBar->setGeometry( 10, 10, 200, 24 );
-#ifdef QT4
 	m_progressBar->setMaximum( 100 );
-#else
-	m_progressBar->setTotalSteps( 100 );
-#endif
 	m_progressBar->setTextVisible( FALSE );
 	m_progressBar->show();
 	m_cancelBtn = new QPushButton( embed::getIconPixmap( "cancel" ),
@@ -1179,11 +1067,7 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 					this, SLOT( updateProgress() ) );
 	update_timer->start( 100 );
 
-#ifdef QT4
 	setAttribute( Qt::WA_DeleteOnClose, TRUE );
-#else
-	setWFlags( getWFlags() | Qt::WDestructiveClose );
-#endif
 	connect( this, SIGNAL( aborted() ), this, SLOT( reject() ) );
 
 }
@@ -1235,11 +1119,7 @@ void patternFreezeStatusDialog::updateProgress( void )
 	}
 	else
 	{
-#ifdef QT4
 		m_progressBar->setValue( m_progress );
-#else
-		m_progressBar->setProgress( m_progress );
-#endif
 	}
 }
 

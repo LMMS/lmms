@@ -27,17 +27,7 @@
 #ifndef _MIDI_PORT_H
 #define _MIDI_PORT_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
-
-#else
-
-#include <qstring.h>
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

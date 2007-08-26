@@ -30,23 +30,9 @@
 #include <config.h>
 #endif
 
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
 #include <QtCore/QPair>
 #include <QtCore/QVector>
-
-#else
-
-#include <qstring.h>
-#include <qpair.h>
-#include <qvaluevector.h>
-
-#endif
-
 
 #include "midi.h"
 #include "import_filter.h"
@@ -131,7 +117,7 @@ private:
 	}
 
 
-	typedef vvector<QPair<int, midiEvent> > eventVector;
+	typedef QVector<QPair<int, midiEvent> > eventVector;
 	eventVector m_events;
 	int m_timingDivision;
 

@@ -27,21 +27,14 @@
 #ifndef _BASE64_H
 #define _BASE64_H
 
-#include "qt3support.h"
-
-#ifndef QT3
-
 #include <QtCore/QByteArray>
-
-#endif
-
+#include <QtCore/QString>
 
 class QVariant;
 
 
 namespace base64
 {
-#ifndef QT3
 	inline void encode( const char * _data, const int _size,
 								QString & _dst )
 	{
@@ -55,10 +48,6 @@ namespace base64
 		*_data = new char[*_size];
 		memcpy( *_data, data.constData(), *_size );
 	}
-#else
-	void encode( const char * _data, const int _size, QString & _dst );
-	void decode( const QString & _b64, char * * _data, int * _size );
-#endif
 	QString encode( const QVariant & _data );
 	QVariant decode( const QString & _b64 );
 

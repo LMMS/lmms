@@ -26,32 +26,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QMap>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
 #include <QtGui/QColor>
-
-#else
-
-#include <qdom.h>
-#include <qmap.h>
-#include <qwhatsthis.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-#include <qcolor.h>
-#include <qimage.h>
-
-#define addSeparator insertSeparator
-#define addMenu insertItem
-
-#endif
 
 #include "rack_plugin.h"
 #include "audio_port.h"
@@ -79,14 +59,11 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	setFixedSize( 210, 60 );
 
 	QPixmap bg = embed::getIconPixmap( "effect_plugin" );
-#ifdef QT4
+
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), bg );
 	setPalette( pal );
-#else
-	setErasePixmap( bg );
-#endif
 	
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), 
 								m_track );
@@ -95,14 +72,8 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 	m_bypass->setChecked( TRUE );
 	m_bypass->move( 3, 3 );
-#ifdef QT4
-		m_bypass->setWhatsThis(
-#else
-		QWhatsThis::add( m_bypass,
-#endif
-					tr( 
-"Toggles the effect on or off." ) );
-	
+	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
+
 	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ),
 								m_track );
 	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
@@ -112,14 +83,9 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_wetDry->setInitValue( 1.0f );
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
-#ifdef QT4
-		m_wetDry->setWhatsThis(
-#else
-		QWhatsThis::add( m_wetDry,
-#endif
-					tr( 
-"The Wet/Dry knob sets the ratio between the input signal and the effect that "
-"shows up in the output." ) );
+	m_wetDry->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
+					"the input signal and the effect that "
+					"shows up in the output." ) );
 
 	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ),
 								m_track );
@@ -130,12 +96,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_autoQuit->setInitValue( 1 );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
-#ifdef QT4
-		m_autoQuit->setWhatsThis(
-#else
-		QWhatsThis::add( m_autoQuit,
-#endif
-					tr( 
+	m_autoQuit->setWhatsThis( tr( 
 "The Decay knob controls how many buffers of silence must pass before the "
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
 "run the risk of clipping the tail on delay effects." ) );
@@ -148,12 +109,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_gate->setInitValue( 0.0f );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
-#ifdef QT4
-		m_gate->setWhatsThis(
-#else
-		QWhatsThis::add( m_gate,
-#endif
-					tr( 
+	m_gate->setWhatsThis( tr( 
 "The Gate knob controls the signal level that is considered to be 'silence' "
 "while deciding when to stop processing signals." ) );
 
@@ -171,20 +127,13 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_label->setFont( pointSize<7>( f ) );
 	m_label->setGeometry( 5, 44, 195, 10 );
 	
-#ifdef QT4
 	m_label->setAutoFillBackground( TRUE );
 	pal.setBrush( backgroundRole(), QPixmap::fromImage(
 					bg.toImage().copy( 5, 44, 195, 10 ) ) );
 	m_label->setPalette( pal );
-#else
-	m_label->setErasePixmap( QPixmap( bg.convertToImage().copy( 5, 44, 
-							195, 10 ) ) );
-#endif
-	
+
 	m_controlView = m_effect->createControlDialog( m_track );
-#ifndef QT3
 	engine::getMainWindow()->workspace()->addWindow( m_controlView );
-#endif
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
 	m_controlView->hide();
@@ -194,12 +143,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 		m_editButton->hide();
 	}
 	
-#ifdef QT4
-	this->setWhatsThis(
-#else
-	QWhatsThis::add( this,
-#endif
-				tr( 
+	setWhatsThis( tr( 
 "Effect plugins function as a chained series of effects where the signal will "
 "be processed from top to bottom.\n\n"
 
@@ -296,9 +240,9 @@ void rackPlugin::setGate( float _value )
 void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<QMenu> contextMenu = new QMenu( this );
-#ifdef QT4
 	contextMenu->setTitle( m_effect->publicName() );
-#else
+#warning TODO: CSS-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" + 
 				QString( m_effect->publicName() ) +
 								"</b></font>",
@@ -353,13 +297,8 @@ void rackPlugin::deletePlugin()
 
 void rackPlugin::displayHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
-#else
-	QWhatsThis::display( QWhatsThis::textFor( this ),
-					mapToGlobal( rect().bottomRight() ) );
-#endif
 }
 
 

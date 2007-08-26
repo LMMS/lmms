@@ -25,20 +25,8 @@
 #ifndef _LADSPA_CONTROL_H
 #define _LADSPA_CONTROL_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QLayout>
-
-#else
-
-#include <qwidget.h>
-#include <qlayout.h>
-
-#endif
-
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

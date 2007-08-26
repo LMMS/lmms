@@ -31,21 +31,11 @@
 #endif
 
 #include "types.h"
-#include "qt3support.h"
-
-#ifndef QT3
 
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 #include <QtCore/QStack>
 
-#else
-
-#include <qvariant.h>
-#include <qvaluevector.h>
-#include <qvaluestack.h>
-
-#endif
 
 
 class QDomDocument;
@@ -105,7 +95,7 @@ private:
 } ;
 
 
-typedef vvector<journalEntry> journalEntryVector;
+typedef QVector<journalEntry> journalEntryVector;
 
 
 
@@ -209,7 +199,7 @@ private:
 
 	bool m_journalling;
 
-	vstack<bool> m_journallingStateStack;
+	QStack<bool> m_journallingStateStack;
 
 } ;
 

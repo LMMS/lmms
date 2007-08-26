@@ -1,7 +1,7 @@
 /*
  * gui_templates.h - GUI-specific templates
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,22 +26,10 @@
 #ifndef _GUI_TEMPLATES_H
 #define _GUI_TEMPLATES_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QFont>
 #include <QtGui/QDesktopWidget>
 
-#else
-
-#include <qpaintdevicemetrics.h>
-#include <qfont.h>
-#include <qapplication.h>
-#include <qdesktopwidget.h>
-
-#endif
 
 
 // return DPI-independent font-size - font with returned font-size has always
@@ -50,13 +38,8 @@ template<int SIZE>
 inline QFont pointSize( QFont _f )
 {
 	static const int DPI = 96;
-#ifdef QT4
 	_f.setPointSizeF( (float) SIZE * DPI /
 			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeFloat( (float) SIZE * DPI /
-			QPaintDeviceMetrics( qApp->desktop() ).logicalDpiY() );
-#endif
 	return( _f );
 }
 
@@ -64,13 +47,8 @@ inline QFont pointSize( QFont _f )
 inline QFont pointSizeF( QFont _f, float SIZE )
 {
 	static const int DPI = 96;
-#ifdef QT4
 	_f.setPointSizeF( SIZE * DPI /
 			QApplication::desktop()->logicalDpiY() );
-#else
-	_f.setPointSizeFloat( SIZE * DPI /
-			QPaintDeviceMetrics( qApp->desktop() ).logicalDpiY() );
-#endif
 	return( _f );
 }
 

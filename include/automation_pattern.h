@@ -27,16 +27,9 @@
 #ifndef _AUTOMATION_PATTERN_H
 #define _AUTOMATION_PATTERN_H
 
-#include <qobject.h>
+#include <QtCore/QObject>
 
-#include "qt3support.h"
 #include "journalling_object.h"
-
-#ifdef QT3
-
-#include "xqmap.h"
-
-#endif
 
 
 class levelObject;
@@ -50,12 +43,7 @@ class automationPattern : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
-	// map negative midiTime to level
-#ifdef QT3
-	typedef XQMap<int, int> timeMap;
-#else
 	typedef QMap<int, int> timeMap;
-#endif
 
 	automationPattern( track * _track, levelObject * _object );
 	automationPattern( const automationPattern & _pat_to_copy );

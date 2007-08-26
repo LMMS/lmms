@@ -29,31 +29,12 @@
 #include <config.h>
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qpainter.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include <qfileinfo.h>
-#include <qfile.h>
-#include <qbuffer.h>
-
-#if QT_VERSION < 0x030100
-#include <qregexp.h>
-#endif
-
-#endif
 
 
 #include <cstring>
@@ -87,15 +68,6 @@
 #include "engine.h"
 #include "base64.h"
 #include "debug.h"
-
-
-#ifndef QT4
-
-#define write writeBlock
-#define read readBlock
-#define pos at
-
-#endif
 
 
 
@@ -225,12 +197,7 @@ void sampleBuffer::update( bool _keep_settings )
 	else if( m_audioFile != "" )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
-		const char * f =
-#ifdef QT4
-				file.toAscii().constData();
-#else
-				file.ascii();
-#endif
+		const char * f = file.toAscii().constData();
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
@@ -509,11 +476,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 	f_cnt_t frames = 0;
 
 	QFile * f = new QFile( _f );
-#ifdef QT4
 	if( f->open( QFile::ReadOnly | QFile::Truncate ) == FALSE )
-#else
-	if( f->open( IO_ReadOnly | IO_Truncate ) == FALSE )
-#endif
 	{
 		delete f;
 		return( 0 );
@@ -775,10 +738,8 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 //	_p.setClipRect( _clip );
 //	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
 	//_p.setPen( QColor( 64, 224, 160 ) );
-#ifdef QT4
-	// TODO: save and restore aa-settings
+#warning TODO: save and restore aa-settings
 	_p.setRenderHint( QPainter::Antialiasing );
-#endif
 	const int w = _dr.width();
 	const int h = _dr.height();
 
@@ -789,7 +750,6 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	if( _dm == LINE_CONNECT )
 	{
-#ifdef QT4
 		float old_x = _dr.x();
 		float old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 	
@@ -810,32 +770,6 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 			}
 			old_x = x;
 		}
-#else
-		int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
-	
-		const f_cnt_t fpp = tMax<f_cnt_t>( tMin<f_cnt_t>( m_frames / w,
-								20 ), 1 );
-		const f_cnt_t fbase = m_frames * _clip.x() / _clip.width();
-		const f_cnt_t fmax = tMin<f_cnt_t>( m_frames,
-							_clip.width() * fpp );
-		int old_x = _clip.x();
-		//printf("%d\n", fmax );
-		for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
-		{
-			const int x = _dr.x() + static_cast<int>( frame /
-						(float) m_frames * _dr.width() );
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-			{
-				const Uint16 y = y_base +
-			static_cast<Uint16>( m_data[frame][chnl] *
-								y_space );
-				_p.drawLine( old_x, old_y[chnl], x, y );
-				old_y[chnl] = y;
-			}
-			old_x = x;
-		}
-#endif
 
 	}
 	else if( _dm == DOTS )
@@ -859,12 +793,7 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 QString sampleBuffer::openAudioFile( void ) const
 {
-#ifdef QT4
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
-#else
-	QFileDialog ofd( QString::null, QString::null, NULL, "", TRUE );
-	ofd.setWindowTitle( tr( "Open audio file" ) );
-#endif
 
 	QString dir;
 	if( m_audioFile != "" )
@@ -879,11 +808,7 @@ QString sampleBuffer::openAudioFile( void ) const
 								m_audioFile;
 			}
 		}
-#ifdef QT4
 		dir = QFileInfo( f ).absolutePath();
-#else
-		dir = QFileInfo( f ).dirPath( TRUE );
-#endif
 	}
 	else
 	{
@@ -894,7 +819,6 @@ QString sampleBuffer::openAudioFile( void ) const
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	// set filters
-#ifdef QT4
 	QStringList types;
 	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif "
 							"*.aiff *.au *.raw)" )
@@ -911,23 +835,6 @@ QString sampleBuffer::openAudioFile( void ) const
 		//<< tr( "MOD-Files (*.mod)" )
 		;
 	ofd.setFilters( types );
-#else
-	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.spx *.voc "
-						"*.aif *.aiff *.au *.raw)" ) );
-	ofd.addFilter( tr( "Wave-Files (*.wav)" ) );
-	ofd.addFilter( tr( "OGG-Files (*.ogg)" ) );
-	ofd.addFilter( tr( "FLAC-Files (*.flac)" ) );
-	ofd.addFilter( tr( "SPEEX-Files (*.spx)" ) );
-	//ofd.addFilter (tr("MP3-Files (*.mp3)"));
-	//ofd.addFilter (tr("MIDI-Files (*.mid)"));^
-	ofd.addFilter( tr( "VOC-Files (*.voc)" ) );
-	ofd.addFilter( tr( "AIFF-Files (*.aif *.aiff)" ) );
-	ofd.addFilter( tr( "AU-Files (*.au)" ) );
-	ofd.addFilter( tr( "RAW-Files (*.raw)" ) );
-	//ofd.addFilter (tr("MOD-Files (*.mod)"));
-	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.spx "
-					"*.voc *.aif *.aiff *.au *.raw)" ) );
-#endif
 	if( m_audioFile != "" )
 	{
 		// select previously opened file
@@ -998,11 +905,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
 					engine::getMixer()->sampleRate() );
 	QBuffer ba_writer;
-#ifdef QT4
 	ba_writer.open( QBuffer::WriteOnly );
-#else
-	ba_writer.open( IO_WriteOnly );
-#endif
 
 	FLAC__stream_encoder_set_write_callback( flac_enc,
 					flacStreamEncoderWriteCallback );
@@ -1205,23 +1108,12 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 #ifdef HAVE_FLAC_STREAM_DECODER_H
 
-#ifndef QT3
 	QByteArray orig_data = QByteArray::fromRawData( dst, dsize );
 	QBuffer ba_reader( &orig_data );
 	ba_reader.open( QBuffer::ReadOnly );
-#else
-	QByteArray orig_data;
-	orig_data.setRawData( dst, dsize );
-	QBuffer ba_reader( orig_data );
-	ba_reader.open( IO_ReadOnly );
-#endif
 
 	QBuffer ba_writer;
-#ifdef QT4
 	ba_writer.open( QBuffer::WriteOnly );
-#else
-	ba_writer.open( IO_WriteOnly );
-#endif
 
 	flacStreamDecoderClientData cdata = { &ba_reader, &ba_writer } ;
 
@@ -1263,9 +1155,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 #endif
 
-#ifndef QT3
 	delete[] dst;
-#endif
 
 	m_audioFile = "";
 	update();

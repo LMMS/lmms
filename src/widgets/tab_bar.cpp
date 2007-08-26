@@ -30,29 +30,17 @@
 #include "gui_templates.h"
 #include "tooltip.h"
 
-#ifndef QT4
-
-#define value data
-#define removeWidget remove
-
-#endif
-
 
 
 tabBar::tabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
-#ifdef QT4
 	m_layout( new QBoxLayout( _dir, this ) ),
-#else
-	m_layout( new QBoxLayout( this, _dir ) ),
-#endif
 	m_exclusive( FALSE )
 {
 	m_layout->setMargin( 0 );
 	m_layout->setSpacing( 0 );
-#ifdef QT4
+
 	setLayout( m_layout );
-#endif
 }
 
 
@@ -90,9 +78,7 @@ tabButton * tabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
-#if QT_VERSION >= 0x030100
 		m_layout->removeWidget( it.value().first );
-#endif
 	}
 	m_tabs.insert( _id, qMakePair( b, _w ) );
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )

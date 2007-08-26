@@ -27,38 +27,26 @@
  */
 
 
-#include "string_pair_drag.h"
-#include "engine.h"
-#include "main_window.h"
-
-#ifdef QT4
-
 #include <QtCore/QMimeData>
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDropEvent>
 
-#endif
+
+#include "string_pair_drag.h"
+#include "engine.h"
+#include "main_window.h"
 
 
 stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
-#ifdef QT4
-				QDrag( _w )
-#else
-				QStoredDrag( mimeType(), _w )
-#endif
+	QDrag( _w )
 {
 	setPixmap( _icon );
 	QString txt = _key + ":" + _value;
-#ifdef QT4
 	QMimeData * m = new QMimeData();
 	m->setData( mimeType(), txt.toAscii() );
 	setMimeData( m );
 	start( Qt::IgnoreAction );
-#else
-	setEncodedData( txt.utf8() );
-	drag( QDragObject::DragDefault );
-#endif
 }
 
 
@@ -78,7 +66,6 @@ stringPairDrag::~stringPairDrag()
 bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-#ifdef QT4
 	if( !_dee->mimeData()->hasFormat( mimeType() ) )
 	{
 		return( FALSE );
@@ -91,13 +78,6 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	}
 	_dee->ignore();
 	return( FALSE );
-#else
-	QString txt = _dee->encodedData( mimeType() );
-	bool accepted = QStringList::split( ',', _allowed_keys ).contains(
-						txt.section( ':', 0, 0 ) );
-	_dee->accept( accepted );
-	return( accepted );
-#endif
 }
 
 
@@ -105,13 +85,8 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString stringPairDrag::decodeKey( QDropEvent * _de )
 {
-#ifdef QT4
 	return( QString( _de->mimeData()->data( mimeType()
 						) ).section( ':', 0, 0 ) );
-#else
-	return( QString( _de->encodedData( mimeType() ) ).section(
-								':', 0, 0 ) );
-#endif
 }
 
 
@@ -119,13 +94,8 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 
 QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
-#ifdef QT4
 	return( QString( _de->mimeData()->data( mimeType()
 						) ).section( ':', 1, -1 ) );
-#else
-	return( QString( _de->encodedData( mimeType() ) ).section(
-								':', 1, -1 ) );
-#endif
 }
 
 

@@ -24,17 +24,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMessageBox>
-
-#else
-
-#include <qmessagebox.h>
-
-#endif
 
 #include "ladspa_effect.h"
 
@@ -49,13 +39,9 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 	m_noLink( FALSE )
 {
 	m_mainLay = new QVBoxLayout( this );
-#ifdef QT3
-	m_effectLay = new QHBoxLayout( m_mainLay );
-#else
 	m_effectLay = new QHBoxLayout();
 	m_mainLay->addLayout( m_effectLay );
-#endif
-	
+
 	multi_proc_t controls = m_effect->getControls();
 	m_controlCount = controls.count();
 	
@@ -73,16 +59,10 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 		QGroupBox * grouper;
 		if( m_processors > 1 )
 		{
-#ifdef QT3
-			grouper = new QGroupBox( rows, Qt::Vertical, 
-				tr( "Channel " ) + QString::number( proc + 1 ),
-				this );
-#else
 			grouper = new QGroupBox( tr( "Channel " ) +
 						QString::number( proc + 1 ),
 									this );
 			grouper->setAlignment( Qt::Vertical );
-#endif
 			if( proc == 0 )
 			{
 				linked_control = TRUE;
@@ -90,13 +70,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 		}
 		else
 		{
-#ifdef QT3
-			grouper = new QGroupBox( rows, Qt::Vertical, 
-								"", this );
-#else
 			grouper = new QGroupBox( this );
 			grouper->setAlignment( Qt::Vertical );
-#endif
 		}
 		
 		for( multi_proc_t::iterator it = controls.begin(); 
@@ -155,12 +130,8 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 	if( m_processors > 1 )
 	{
 		m_mainLay->addSpacing( 3 );
-#ifdef QT3
-		QHBoxLayout * center = new QHBoxLayout( m_mainLay );
-#else
 		QHBoxLayout * center = new QHBoxLayout();
 		m_mainLay->addLayout( center );
-#endif
 		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this,
 								NULL, NULL );
 		connect( m_stereoLink, SIGNAL( toggled( bool ) ), 

@@ -26,22 +26,11 @@
 #ifndef _PROJECT_JOURNAL_H
 #define _PROJECT_JOURNAL_H
 
-#include "types.h"
-#include "qt3support.h"
-
-#ifndef QT3
-
 #include <QtCore/QHash>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 
-#else
-
-#include <qvariant.h>
-#include <qvaluevector.h>
-#include <qmap.h>
-
-#endif
+#include "types.h"
 
 
 class journallingObject;
@@ -108,12 +97,8 @@ public:
 
 
 private:
-#ifndef QT3
 	typedef QHash<jo_id_t, journallingObject *> joIDMap;
-#else
-	typedef QMap<jo_id_t, journallingObject *> joIDMap;
-#endif
-	typedef vvector<jo_id_t> journalEntryVector;
+	typedef QVector<jo_id_t> journalEntryVector;
 
 	joIDMap m_joIDs;
 

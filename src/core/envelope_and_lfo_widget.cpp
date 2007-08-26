@@ -26,24 +26,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include <Qt/QtXml>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qwhatsthis.h>
-#include <qpainter.h>
-#include <qpen.h>
-#include <qdom.h>
-#include <qlabel.h>
-
-#endif
 
 
 #include "envelope_and_lfo_widget.h"
@@ -101,7 +87,7 @@ const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 QPixmap * envelopeAndLFOWidget::s_envGraph = NULL;
 QPixmap * envelopeAndLFOWidget::s_lfoGraph = NULL;
 
-vvector<envelopeAndLFOWidget *> envelopeAndLFOWidget::s_EaLWidgets;
+QVector<envelopeAndLFOWidget *> envelopeAndLFOWidget::s_EaLWidgets;
 
 
 
@@ -109,11 +95,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							QWidget * _parent,
 							track * _track ) :
 	QWidget( _parent ),
-#ifdef QT4
 	specialBgHandlingWidget( palette().color( backgroundRole() ) ),
-#else
-	specialBgHandlingWidget( paletteBackgroundColor() ),
-#endif
 	m_used( FALSE ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdEnv( NULL ),
@@ -143,11 +125,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_predelayKnob->setInitValue( 0.0 );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
-#ifdef QT4
 	m_predelayKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_predelayKnob,
-#endif
 		tr( "Use this knob for setting predelay of the current "
 			"envelope. The bigger this value the longer the time "
 			"before start of actual envelope." ) );
@@ -161,11 +139,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_attackKnob->setInitValue( 0.0 );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
-#ifdef QT4
 	m_attackKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_attackKnob,
-#endif
 		tr( "Use this knob for setting attack-time of the current "
 			"envelope. The bigger this value the longer the "
 			"envelope needs to increase to attack-level. "
@@ -180,11 +154,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_holdKnob->setInitValue( 0.5 );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
-#ifdef QT4
 	m_holdKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_holdKnob,
-#endif
 		tr( "Use this knob for setting hold-time of the current "
 			"envelope. The bigger this value the longer the "
 			"envelope holds attack-level before it begins to "
@@ -199,11 +169,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_decayKnob->setInitValue( 0.5 );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
-#ifdef QT4
 	m_decayKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_decayKnob,
-#endif
 		tr( "Use this knob for setting decay-time of the current "
 			"envelope. The bigger this value the longer the "
 			"envelope needs to decrease from attack-level to "
@@ -219,11 +185,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_sustainKnob->setInitValue( 0.5 );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
-#ifdef QT4
 	m_sustainKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_sustainKnob,
-#endif
 		tr( "Use this knob for setting sustain-level of the current "
 			"envelope. The bigger this value the higher the level "
 			"on which the envelope stays before going down to "
@@ -238,11 +200,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_releaseKnob->setInitValue( 0.1 );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
 	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
-#ifdef QT4
 	m_releaseKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_releaseKnob,
-#endif
 		tr( "Use this knob for setting release-time of the current "
 			"envelope. The bigger this value the longer the "
 			"envelope needs to decrease from sustain-level to "
@@ -259,11 +217,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_amountKnob->setInitValue( 0.0 );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
-#ifdef QT4
 	m_amountKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_amountKnob,
-#endif
 		tr( "Use this knob for setting modulation amount of the "
 			"current envelope. The bigger this value the more the "
 			"according size (e.g. volume or cutoff-frequency) "
@@ -281,11 +235,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoPredelayKnob->setInitValue( 0.0 );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "LFO-predelay:" ) + " ", "" );
-#ifdef QT4
 	m_lfoPredelayKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_lfoPredelayKnob,
-#endif
 		tr( "Use this knob for setting predelay-time of the current "
 			"LFO. The bigger this value the the time until the "
 			"LFO starts to oscillate." ) );
@@ -300,11 +250,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAttackKnob->setInitValue( 0.0 );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
-#ifdef QT4
 	m_lfoAttackKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_lfoAttackKnob,
-#endif
 		tr( "Use this knob for setting attack-time of the current LFO. "
 			"The bigger this value the longer the LFO needs to "
 			"increase its amplitude to maximum." ) );
@@ -319,11 +265,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoSpeedKnob->setInitValue( 0.1 );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
-#ifdef QT4
 	m_lfoSpeedKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_lfoSpeedKnob,
-#endif
 		tr( "Use this knob for setting speed of the current LFO. The "
 			"bigger this value the faster the LFO oscillates and "
 			"the faster will be your effect." ) );
@@ -338,11 +280,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_lfoAmountKnob->setInitValue( 0.0 );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
-#ifdef QT4
 	m_lfoAmountKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_lfoAmountKnob,
-#endif
 		tr( "Use this knob for setting modulation amount of the "
 			"current LFO. The bigger this value the more the "
 			"selected size (e.g. volume or cutoff-frequency) will "
@@ -357,11 +295,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"sin_wave_active" ) );
 	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
-#ifdef QT4
 	sin_lfo_btn->setWhatsThis(
-#else
-	QWhatsThis::add( sin_lfo_btn,
-#endif
 		tr( "Click here if you want a sine-wave for current "
 							"oscillator." ) );
 
@@ -371,11 +305,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 						"triangle_wave_active" ) );
 	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"triangle_wave_inactive" ) );
-#ifdef QT4
 	triangle_lfo_btn->setWhatsThis(
-#else
-	QWhatsThis::add( triangle_lfo_btn,
-#endif
 		tr( "Click here if you want a triangle-wave for current "
 							"oscillator." ) );
 
@@ -385,11 +315,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"saw_wave_active" ) );
 	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
-#ifdef QT4
 	saw_lfo_btn->setWhatsThis(
-#else
-	QWhatsThis::add( saw_lfo_btn,
-#endif
 		tr( "Click here if you want a saw-wave for current "
 							"oscillator." ) );
 
@@ -399,11 +325,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 						"square_wave_active" ) );
 	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
-#ifdef QT4
 	sqr_lfo_btn->setWhatsThis(
-#else
-	QWhatsThis::add( sqr_lfo_btn,
-#endif
 		tr( "Click here if you want a square-wave for current "
 							"oscillator." ) );
 
@@ -413,11 +335,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							"usr_wave_active" ) );
 	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"usr_wave_inactive" ) );
-#ifdef QT4
 	m_userLfoBtn->setWhatsThis(
-#else
-	QWhatsThis::add( m_userLfoBtn,
-#endif
 		tr( "Click here if you want a user-defined wave for current "
 			"oscillator. Afterwards drag an according sample-"
 			"file into LFO-graph." ) );
@@ -442,11 +360,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 						tr( "Freq x 100" ), _track );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
-#ifdef QT4
 	m_x100Cb->setWhatsThis(
-#else
-	QWhatsThis::add( m_x100Cb,
-#endif
 		tr( "Click here if the frequency of this LFO should be "
 						"multiplied with 100." ) );
 	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
@@ -460,21 +374,13 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSize<6>(
 					m_controlEnvAmountCb->font() ) );
-#ifdef QT4
 	m_controlEnvAmountCb ->setWhatsThis(
-#else
-	QWhatsThis::add( m_controlEnvAmountCb,
-#endif
 		tr( "Click here to make the envelope-amount controlled by this "
 								"LFO." ) );
 	toolTip::add( m_controlEnvAmountCb,
 				tr( "control envelope-amount by this LFO" ) );
 
 
-#ifndef QT4
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setAcceptDrops( TRUE );
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
@@ -494,7 +400,7 @@ envelopeAndLFOWidget::~envelopeAndLFOWidget()
 	delete[] m_rEnv;
 	delete[] m_lfoShapeData;
 
-	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
+	QVector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
 	if( qFind( v.begin(), v.end(), this ) != v.end() )
 	{
 		v.erase( qFind( v.begin(), v.end(), this ) );
@@ -550,8 +456,8 @@ void envelopeAndLFOWidget::updateLFOShapeData( void )
 
 void envelopeAndLFOWidget::triggerLFO( void )
 {
-	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
-	for( vvector<envelopeAndLFOWidget *>::iterator it = v.begin();
+	QVector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
+	for( QVector<envelopeAndLFOWidget *>::iterator it = v.begin();
 							it != v.end(); ++it )
 	{
 		( *it )->m_lfoFrame +=
@@ -565,8 +471,8 @@ void envelopeAndLFOWidget::triggerLFO( void )
 
 void envelopeAndLFOWidget::resetLFO( void )
 {
-	vvector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
-	for( vvector<envelopeAndLFOWidget *>::iterator it = v.begin();
+	QVector<envelopeAndLFOWidget *> & v = s_EaLWidgets;
+	for( QVector<envelopeAndLFOWidget *>::iterator it = v.begin();
 							it != v.end(); ++it )
 	{
 		( *it )->m_lfoFrame = 0;
@@ -783,17 +689,8 @@ void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
 
 void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
 	p.setRenderHint( QPainter::Antialiasing );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( size() );
-	pm.fill( this, rect().topLeft() );
-
-	// and a painter for it
-	QPainter p( &pm, this );
-#endif
 
 	// set smaller font
 	p.setFont( pointSize<6>( p.font() ) );
@@ -886,11 +783,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 		osc_frames *= 100.0f;
 	}
 
-#ifdef QT4
 	float old_y = 0;
-#else
-	int old_y = 0;
-#endif
 	for( int x = 0; x <= LFO_GRAPH_W; ++x )
 	{
 		float val = 0.0;
@@ -924,16 +817,10 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 				val *= cur_sample / m_lfoAttackFrames;
 			}
 		}
-#ifdef QT4
 		float cur_y = -LFO_GRAPH_H / 2.0f * val;
 		p.drawLine( QLineF( graph_x_base + x - 1, graph_y_base + old_y,
 						graph_x_base + x,
 						graph_y_base + cur_y ) );
-#else
-		int cur_y = static_cast<int>( -LFO_GRAPH_H / 2.0f * val );
-		p.drawLine( graph_x_base + x - 1, graph_y_base + old_y,
-				graph_x_base + x, graph_y_base + cur_y );
-#endif
 		old_y = cur_y;
 	}
 
@@ -946,10 +833,6 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 	p.drawText( LFO_GRAPH_X + 52, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 						QString::number( ms_per_osc ) );
 
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 

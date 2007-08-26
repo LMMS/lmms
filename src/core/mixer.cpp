@@ -71,11 +71,7 @@ mixer::mixer( void ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-#ifndef QT3
 	m_globalMutex( QMutex::Recursive )
-#else
-	m_globalMutex( TRUE )
-#endif
 {
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
@@ -294,7 +290,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		engine::getSongEditor()->processNextBuffer();
 
 		lockPlayHandles();
-		csize idx = 0;
+		int idx = 0;
 		if( m_parallelizingLevel > 1 )
 		{
 // TODO: if not enough play-handles are found which are capable of
@@ -366,7 +362,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		unlockPlayHandles();
 
 		bool more_effects = FALSE;
-		for( vvector<audioPort *>::iterator it = m_audioPorts.begin();
+		for( QVector<audioPort *>::iterator it = m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
 		{
 			more_effects = ( *it )->processEffects();

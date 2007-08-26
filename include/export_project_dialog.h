@@ -27,21 +27,7 @@
 #ifndef _EXPORT_PROJECT_DIALOG_H
 #define _EXPORT_PROJECT_DIALOG_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
 
 #include "export.h"
 
@@ -81,8 +67,7 @@ private:
 	void finishProjectExport( void );
 	void abortProjectExport( void );
 
-	static fileTypes FASTCALL getFileTypeFromExtension( const QString &
-									_ext );
+	static fileTypes getFileTypeFromExtension( const QString & _ext );
 	static Sint16 s_availableBitrates[];
 
 

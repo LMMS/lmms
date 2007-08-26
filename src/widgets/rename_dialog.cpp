@@ -25,19 +25,8 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLineEdit>
-
-#else
-
-#include <qlineedit.h>
-
-#endif
-
 
 #include "rename_dialog.h"
 

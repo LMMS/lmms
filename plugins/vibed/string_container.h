@@ -20,22 +20,11 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _TWO_STRINGS_H
-#define _TWO_STRINGS_H
 
-
-#include "qt3support.h"
-
-#ifndef QT3
+#ifndef _STRING_CONTAINER_H
+#define _STRING_CONTAINER_H
 
 #include <QtCore/QVector>
-
-#else
-
-#include <qvaluevector.h>
-
-#endif
-
 
 #include "config.h"
 #include "types.h"
@@ -82,11 +71,11 @@ public:
 	}
 	
 private:
-	vvector<vibratingString *> m_strings;
+	QVector<vibratingString *> m_strings;
 	const float m_pitch;
 	const sample_rate_t m_sampleRate;
 	const Uint32 m_bufferLength;
-	vvector<bool> m_exists;
+	QVector<bool> m_exists;
 } ;
 
 #endif

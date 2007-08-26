@@ -23,22 +23,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QFileDialog>
 #include <QtGui/QDragEnterEvent>
 #include <QtXml/QDomElement>
-
-#else
-
-#include <qcursor.h>
-#include <qdom.h>
-#include <qfiledialog.h>
-#include <qwhatsthis.h>
-
-#endif
 
 #include "patman.h"
 #include "endian_handling.h"
@@ -89,15 +76,12 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 	instrument( _track, &patman_plugin_descriptor ),
 	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
 {
-#ifndef QT3
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-#else
-	setPaletteBackgroundPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
+
 	m_openFileButton = new pixmapButton( this, NULL, NULL );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 200, 90 );
@@ -111,11 +95,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 						SLOT( openFile() ) );
 	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
 
-#ifdef QT4
 	m_openFileButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_openFileButton,
-#endif
 		tr( "Click here to open another patch-file. Loop and Tune "
 			"settings are not reset." ) );
 
@@ -128,11 +108,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 								"loop_off" ) );
 	m_loopButton->setBgGraphic( getBackground( m_loopButton ) );
 	toolTip::add( m_loopButton, tr( "Loop mode" ) );
-#ifdef QT4
 	m_loopButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_loopButton,
-#endif
 		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
 			"will use the loop information available in the "
 			"file." ) );
@@ -147,11 +123,7 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 								"tune_off" ) );
 	m_tuneButton->setBgGraphic( getBackground( m_tuneButton ) );
 	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
-#ifdef QT4
 	m_tuneButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_tuneButton,
-#endif
 		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
 			"will tune the sample to match the note's "
 			"frequency." ) );
@@ -249,7 +221,6 @@ void patmanSynth::deleteNotePluginData( notePlayHandle * _n )
 
 void patmanSynth::dragEnterEvent( QDragEnterEvent * _dee )
 {
-#ifdef QT4
 	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
@@ -267,35 +238,6 @@ void patmanSynth::dragEnterEvent( QDragEnterEvent * _dee )
 	{
 		_dee->ignore();
 	}
-#else
-	QString txt = _dee->encodedData( stringPairDrag::mimeType() );
-	if( txt != "" )
-	{
-		if( txt.section( ':', 0, 0 ) == "samplefile"
-			&& subPluginFeatures::supported_extensions().contains(
-				fileItem::extension( txt.section( ':', 1 ) ) ) )
-		{
-			_dee->accept();
-			return;
-		}
-		_dee->ignore();
-		return;
-	}
-
-	txt = QString( _dee->encodedData( "text/plain" ) );
-	if( txt != "" )
-	{
-		QString file = QUriDrag::uriToLocalFile(
-							txt.stripWhiteSpace() );
-		if( file && subPluginFeatures::supported_extensions().contains(
-						fileItem::extension( file ) ) )
-		{
-			_dee->accept();
-			return;
-		}
-	}
-	_dee->ignore();
-#endif
 }
 
 
@@ -312,16 +254,6 @@ void patmanSynth::dropEvent( QDropEvent * _de )
 		return;
 	}
 
-#ifndef QT4
-	QString txt = _de->encodedData( "text/plain" );
-	if( txt != "" )
-	{
-		setFile( QUriDrag::uriToLocalFile( txt.stripWhiteSpace() ) );
-		_de->accept();
-		return;
-	}
-#endif
-
 	_de->ignore();
 }
 
@@ -330,22 +262,11 @@ void patmanSynth::dropEvent( QDropEvent * _de )
 
 void patmanSynth::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap pm( rect().size() );
-	pm.fill( this, rect().topLeft() );
-
-	QPainter p( &pm, this );
-#endif
 
 	p.setFont( pointSize<8>( font() ) );
 	p.setPen( QColor( 0x66, 0xFF, 0x66 ) );
 	p.drawText( 8, 140, m_display_filename );
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -353,22 +274,12 @@ void patmanSynth::paintEvent( QPaintEvent * )
 
 void patmanSynth::openFile( void )
 {
-#ifdef QT4
 	QFileDialog ofd( NULL, tr( "Open patch file" ) );
-#else
-	QFileDialog ofd( QString::null, QString::null, NULL, "", TRUE );
-	ofd.setWindowTitle( tr( "Open patch file" ) );
-#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
-	// set filters
-#ifdef QT4
 	QStringList types;
 	types << tr( "Patch-Files (*.pat)" );
 	ofd.setFilters( types );
-#else
-	ofd.addFilter( tr( "Patch-Files (*.pat)" ) );
-#endif
 
 	if( m_patchFile == "" )
 	{
@@ -442,12 +353,7 @@ void patmanSynth::setFile( const QString & _patch_file, bool _rename )
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
-	while( idx > 0 && fm.size(
-#ifdef QT4
-		Qt::TextSingleLine,
-#else
-		Qt::SingleLine,
-#endif
+	while( idx > 0 && fm.size( Qt::TextSingleLine,
 				m_display_filename + "..." ).width() < 225 )
 	{
 		m_display_filename = m_patchFile[--idx] + m_display_filename;
@@ -468,11 +374,7 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 {
 	unload_current_patch();
 
-	FILE * fd = fopen( _filename
-#ifndef QT3
-				.toAscii().constData()
-#endif
-							, "rb" );
+	FILE * fd = fopen( _filename.toAscii().constData() , "rb" );
 	if( !fd )
 	{
 		perror( "fopen" );
@@ -653,7 +555,7 @@ void patmanSynth::select_sample( notePlayHandle * _n )
 	float min_dist = HUGE_VALF;
 	sampleBuffer * sample = NULL;
 
-	for( vvector<sampleBuffer *>::iterator it = m_patch_samples.begin();
+	for( QVector<sampleBuffer *>::iterator it = m_patch_samples.begin();
 					it != m_patch_samples.end(); ++it )
 	{
 		float patch_freq = ( *it )->frequency();

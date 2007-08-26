@@ -26,27 +26,10 @@
 #ifndef _MAIN_WINDOW_H
 #define _MAIN_WINDOW_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
+#include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWorkspace>
 #include <QtGui/QWhatsThis>
-
-#else
-
-#include <qmainwindow.h>
-#include <qworkspace.h>
-#include <qwhatsthis.h>
-
-#endif
-
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 
 class QAction;
 class QDomElement;
@@ -75,7 +58,7 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void FASTCALL resetWindowTitle( const QString & _add = "" );
+	void resetWindowTitle( const QString & _add = "" );
 
 	void clearKeyModifiers( void );
 
@@ -110,7 +93,6 @@ public slots:
 	}
 	void createNewProject( void );
 	void createNewProjectFromTemplate( QAction * _idx );
-	void createNewProjectFromTemplate( int _id );
 	void openProject( void );
 	void updateRecentlyOpenedProjectsMenu( void );
 	void openRecentlyOpenedProject( int );
@@ -169,7 +151,7 @@ private:
 	} m_keyMods;
 
 	QMenu * m_tools_menu;
-	vlist<tool *> m_tools;
+	QList<tool *> m_tools;
 
 
 	friend class engine;
@@ -179,7 +161,6 @@ private slots:
 	void browseHelp( void );
 	void fillTemplatesMenu( void );
 	void showTool( QAction * _idx );
-	void showTool( int _idx );
 
 } ;
 

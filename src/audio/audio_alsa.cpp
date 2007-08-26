@@ -26,20 +26,8 @@
 
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qpair.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-
-#endif
 
 
 #include "audio_alsa.h"
@@ -71,11 +59,7 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 	int err;
 
 	if( ( err = snd_pcm_open( &m_handle,
-#ifdef QT4
 					probeDevice().toAscii().constData(),
-#else
-					probeDevice().ascii(),
-#endif
 						SND_PCM_STREAM_PLAYBACK,
 						0 ) ) < 0 )
 	{

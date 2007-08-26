@@ -27,19 +27,8 @@
 #ifndef _NAME_LABEL_H
 #define _NAME_LABEL_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qlabel.h>
-#include <qpixmap.h>
-
-#endif
 
 
 class nameLabel : public QLabel

@@ -25,8 +25,6 @@
 #ifndef _KMultitabbar_h_
 #define _KMultitabbar_h_
 
-#ifndef QT3
-
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtGui/QLayout>
@@ -307,10 +305,5 @@ protected:
 };
 
 
-#else
-
-#include "kmultitabbar-qt3.h"
-
-#endif
 
 #endif

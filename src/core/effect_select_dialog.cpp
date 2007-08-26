@@ -25,23 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QGroupBox>
 #include <QtGui/QLayout>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
-
-#else
-
-#include <qgroupbox.h>
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qvbox.h>
-
-#endif
 
 #include "effect_select_dialog.h"
 
@@ -166,7 +153,7 @@ effectList::effectList( QWidget * _parent ) :
 {
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
-	for( vvector<plugin::descriptor>::iterator it =
+	for( QVector<plugin::descriptor>::iterator it =
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
@@ -207,26 +194,14 @@ effectList::effectList( QWidget * _parent ) :
 	m_pluginList->insertStringList( plugin_names );
 	connect( m_pluginList, SIGNAL( highlighted( int ) ),
 				SLOT( onHighlighted( int ) ) );	
-	connect( m_pluginList, SIGNAL( doubleClicked( QListBoxItem * ) ),
-				SLOT( onDoubleClicked( QListBoxItem * ) ) );
+	connect( m_pluginList, SIGNAL( doubleClicked( Q3ListBoxItem * ) ),
+				SLOT( onDoubleClicked( Q3ListBoxItem * ) ) );
 
-#ifndef QT3
 	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
-#else
-	QGroupBox * groupbox = new QGroupBox( 1, Qt::Vertical,
-						tr( "Description" ), this );
-#endif
 	groupbox->setFixedHeight( 200 );
-#ifdef QT3
-	groupbox->setInsideMargin( 2 );
-#endif
 
 	QScrollArea * scrollArea = new QScrollArea( groupbox );
 	scrollArea->setFrameStyle( 0 );
-#ifdef QT3
-	scrollArea->setMargin( 10 );
-#endif
-#ifndef QT3
 	m_descriptionWidget = new QWidget;
 	QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
 	l->setMargin( 0 );
@@ -235,10 +210,6 @@ effectList::effectList( QWidget * _parent ) :
 	scrollArea->setWidget( m_descriptionWidget );
 	m_descriptionWidget->show();
 	m_descriptionWidget->setFixedSize( 200, 200 );
-#else
-	m_descriptionWidget = new QVBox( scrollArea->viewport() );
-	scrollArea->addChild( m_descriptionWidget );
-#endif
 
 	QVBoxLayout * vboxl = new QVBoxLayout( this );
 	vboxl->setMargin( 0 );
@@ -265,19 +236,11 @@ effectList::~effectList()
 
 void effectList::onHighlighted( int _pluginIndex )
 {
-#ifndef QT3
 	QLayoutItem * i;
 	while( ( i = m_descriptionWidget->layout() ) != 0 )
 	{
 		delete i;
 	}
-#else
-	QLayoutIterator it = m_descriptionWidget->layout()->iterator();
-	while( it.current() )
-	{
-		it.deleteCurrent();
-	}
-#endif
 	m_descriptionWidget->hide();
 
 	m_currentSelection = m_effectKeys[_pluginIndex];
@@ -295,7 +258,7 @@ void effectList::onHighlighted( int _pluginIndex )
 
 
 
-void effectList::onDoubleClicked( QListBoxItem * _item )
+void effectList::onDoubleClicked( Q3ListBoxItem * _item )
 {
 	emit( doubleClicked( m_currentSelection ) );
 }

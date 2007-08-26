@@ -25,22 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QPainter>
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
-
-#else
-
-#include <qlabel.h>
-#include <qpainter.h>
-#include <qcursor.h>
-
-#endif
 
 
 #include "plugin_browser.h"
@@ -74,16 +62,12 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 					"corresponding channel-button." ),
 								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
-#ifdef QT4
 	hint->setWordWrap( TRUE );
-#else
-	hint->setAlignment( hint->alignment() | Qt::WordBreak );
-#endif
 	view_layout->addWidget( hint );
 
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
-	for( vvector<plugin::descriptor>::iterator it =
+	for( QVector<plugin::descriptor>::iterator it =
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
@@ -124,9 +108,6 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
 	setFixedHeight( m_targetHeight );
 	setMouseTracking( TRUE );
-#ifdef QT3
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setCursor( Qt::PointingHandCursor );
 }
 
@@ -145,35 +126,16 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
 						QColor( 192, 192, 192 );
 
-#ifdef QT4
 	QPainter p( this );
 	p.fillRect( rect(), fill_color );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	pm.fill( fill_color );
-
-	// and a painter for it
-	QPainter p( &pm );
-#endif
 
 	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
-#ifndef QT3
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-#else
-	QPixmap logo;
-	logo.convertFromImage( m_logo.convertToImage().smoothScale( logo_size,
-							QImage::ScaleMin ) );
-#endif
 	p.setPen( QColor( 64, 64, 64 ) );
-#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-#else
-	p.drawRect( rect() );
-#endif
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
@@ -188,15 +150,8 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<7>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-#ifndef QT3
 							Qt::TextWordWrap,
-#else
-							Qt::WordBreak,
-#endif
 			pluginBrowser::tr( m_pluginDescriptor.description ),
-#ifdef QT3
-								-1,
-#endif
 								&br );
 		if( m_mouseOver )
 		{
@@ -204,10 +159,6 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 		}
 	}
 
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 

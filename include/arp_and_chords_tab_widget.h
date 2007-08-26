@@ -27,21 +27,7 @@
 #ifndef _ARP_AND_CHORDS_TAB_WIDGET_H
 #define _ARP_AND_CHORDS_TAB_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include "journalling_object.h"
 #include "types.h"

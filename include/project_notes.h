@@ -26,18 +26,7 @@
 #ifndef _PROJECT_NOTES_H
 #define _PROJECT_NOTES_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMainWindow>
-
-#else
-
-#include <qmainwindow.h>
-#define textColor color
-
-#endif
 
 #include "journalling_object.h"
 

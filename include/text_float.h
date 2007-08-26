@@ -26,19 +26,8 @@
 #ifndef _TEXT_FLOAT
 #define _TEXT_FLOAT
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-
-#endif
 
 
 class textFloat : public QWidget

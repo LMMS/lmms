@@ -25,18 +25,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QImage>
-
-#else
-
-#include <qimage.h>
-
-#endif
-
 
 #include "embed.h"
 #include "config_mgr.h"
@@ -80,13 +69,8 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 		}
 		if( p.isNull() )
 		{
-#ifdef QT4
 			const embed::descriptor & e = findEmbeddedData(
 						name.toAscii().constData() );
-#else
-			const embed::descriptor & e = findEmbeddedData(
-								name.ascii() );
-#endif
 			// found?
 			if( QString( e.name ) == name )
 			{
@@ -99,12 +83,8 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 		}
 		return( p );
 	}
-#ifdef QT4
 	return( getIconPixmap( _name ).scaled( _w, _h, Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation ) );
-#else
-	return( getIconPixmap( _name ).convertToImage().smoothScale( _w, _h ) );
-#endif
 }
 
 

@@ -25,20 +25,8 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
-
-#else
-
-#include <qpair.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-
-#endif
 
 
 #include "midi_alsa_raw.h"
@@ -56,11 +44,7 @@ midiALSARaw::midiALSARaw( void ) :
 {
 	int err;
 	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
-#ifdef QT4
 					probeDevice().toAscii().constData(),
-#else
-					probeDevice().ascii(),
-#endif
 								0 ) ) < 0 )
 	{
 		printf( "cannot open MIDI-device: %s\n", snd_strerror( err ) );
@@ -74,11 +58,7 @@ midiALSARaw::midiALSARaw( void ) :
 	m_pfds = new pollfd[m_npfds];
 	snd_rawmidi_poll_descriptors( m_input, m_pfds, m_npfds );
 
-	start( 
-#if QT_VERSION >= 0x030505
-	    	QThread::LowPriority 
-#endif
-					);
+	start( QThread::LowPriority );
 }
 
 

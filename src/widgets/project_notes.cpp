@@ -25,10 +25,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -40,32 +36,6 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QToolBar>
 
-#else
-
-#include <qdom.h>
-#include <qapplication.h>
-#include <qtextedit.h>
-#include <qaction.h>
-#include <qlineedit.h>
-#include <qtoolbar.h>
-#include <qfontdatabase.h>
-#include <qcombobox.h>
-#include <qcolordialog.h>
-
-#define isChecked isOn
-#define setChecked setOn
-#define setFontWeight setBold
-#define setFontUnderline setUnderline
-#define setFontItalic setItalic
-#define setFontFamily setFamily
-#define setFontPointSize setPointSize
-#define setTextColor setColor
-#define setHtml setText
-#define toHtml text
-
-#endif
-
-
 #include "project_notes.h"
 #include "embed.h"
 #include "engine.h"
@@ -75,26 +45,16 @@
 
 
 projectNotes::projectNotes( void ) :
-	QMainWindow( engine::getMainWindow()->workspace()
-#ifndef QT4
-				, 0, Qt::WStyle_Title
-#endif
-		)
+	QMainWindow( engine::getMainWindow()->workspace() )
 {
-#ifdef QT4
 	engine::getMainWindow()->workspace()->addWindow( this );
-#endif
 
 	m_edit = new QTextEdit( this );
-#ifdef QT4
 	m_edit->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_edit->setPalette( pal );
-#else
-	m_edit->setTextFormat( RichText );
-	m_edit->setPaletteBackgroundColor( QColor( 64, 64, 64 ) );
-#endif
+
 	clear();
 
 	connect( m_edit, SIGNAL( currentFontChanged( const QFont & ) ),
@@ -141,15 +101,9 @@ projectNotes::~projectNotes()
 void projectNotes::clear( void )
 {
 	m_edit->setHtml( tr( "Put down your project notes here." ) );
-#ifdef QT4
 	m_edit->selectAll();
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
 	m_edit->setTextCursor( QTextCursor() );
-#else
-	m_edit->selectAll( TRUE );
-	m_edit->setTextColor( QColor( 224, 224, 224 ) );
-	m_edit->selectAll( FALSE );
-#endif
 }
 
 
@@ -168,9 +122,6 @@ void projectNotes::setupActions()
 	QToolBar * tb = new QToolBar( tr( "Edit Actions" ), this );
 	QAction * a;
 
-	// changes between qt3's toolbar-system and this of qt4 are too
-	// big, so we completely implement two versions
-#ifdef QT4
 	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
 									tb );
 	a->setShortcut( tr( "Ctrl+Z" ) );
@@ -209,8 +160,8 @@ void projectNotes::setupActions()
 
 	m_comboSize = new QComboBox( tb );
 	m_comboSize->setEditable( TRUE );
-	vlist<int> sizes = db.standardSizes();
-	vlist<int>::Iterator it = sizes.begin();
+	QList<int> sizes = db.standardSizes();
+	QList<int>::Iterator it = sizes.begin();
 	for ( ; it != sizes.end(); ++it )
 	{
 		m_comboSize->addItem( QString::number( *it ) );
@@ -269,167 +220,6 @@ void projectNotes::setupActions()
 	connect( m_actionTextColor, SIGNAL( activated() ), this,
 							SLOT( textColor() ) );
 
-#else
-#if QT_VERSION >= 0x030100
-	a = new QAction( 
-#if QT_VERSION < 0x030200
-			"",
-#endif			
-			embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
-							CTRL + Key_Z, this );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( undo() ) );
-	a->addTo( tb );
-
-	a = new QAction( 
-#if QT_VERSION < 0x030200
-			"",
-#endif		    
-			embed::getIconPixmap( "edit_redo" ), tr( "&Redo" ),
-							CTRL + Key_Y, this );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( redo() ) );
-	a->addTo( tb );
-
-	a = new QAction( 
-#if QT_VERSION < 0x030200
-			"",
-#endif		    
-			embed::getIconPixmap( "edit_copy" ), tr( "&Copy" ),
-							CTRL + Key_C, this );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( copy() ) );
-	a->addTo( tb );
-
-	a = new QAction( 
-#if QT_VERSION < 0x030200
-			"",
-#endif		    
-			embed::getIconPixmap( "edit_cut" ), tr( "Cu&t" ),
-							CTRL + Key_X, this );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( cut() ) );
-	a->addTo( tb );
-
-	a = new QAction( 
-#if QT_VERSION < 0x030200
-			"",
-#endif		    
-			embed::getIconPixmap( "edit_paste" ), tr( "&Paste" ),
-							CTRL + Key_V, this );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( paste() ) );
-	a->addTo( tb );
-
-
-	tb = new QToolBar( this );
-	tb->setLabel( tr( "Format Actions" ) );
-
-	m_comboFont = new QComboBox( TRUE, tb );
-	QFontDatabase db;
-	m_comboFont->insertStringList( db.families() );
-	connect( m_comboFont, SIGNAL( activated( const QString & ) ),
-			m_edit, SLOT( setFamily( const QString & ) ) );
-	m_comboFont->lineEdit()->setText( QApplication::font().family() );
-
-	m_comboSize = new QComboBox( TRUE, tb );
-	vlist<int> sizes = db.standardSizes();
-	vlist<int>::Iterator it = sizes.begin();
-	for ( ; it != sizes.end(); ++it )
-	{
-		m_comboSize->insertItem( QString::number( *it ) );
-	}
-	connect( m_comboSize, SIGNAL( activated( const QString & ) ),
-		     this, SLOT( textSize( const QString & ) ) );
-	m_comboSize->lineEdit()->setText( QString::number(
-					QApplication::font().pointSize() ) );
-
-	m_actionTextBold = new QAction( 
-#if QT_VERSION < 0x030200
-					"",
-#endif		    
-		    			embed::getIconPixmap( "text_bold" ),
-					tr( "&Bold" ), CTRL + Key_B, this );
-	connect( m_actionTextBold, SIGNAL( activated() ), this,
-							SLOT( textBold() ) );
-	m_actionTextBold->addTo( tb );
-	m_actionTextBold->setToggleAction( TRUE );
-
-	m_actionTextItalic = new QAction( 
-#if QT_VERSION < 0x030200
-				    	"",
-#endif		    
-					embed::getIconPixmap( "text_italic" ),
-					tr( "&Italic" ), CTRL + Key_I, this );
-	connect( m_actionTextItalic, SIGNAL( activated() ), this,
-							SLOT( textItalic() ) );
-	m_actionTextItalic->addTo( tb );
-	m_actionTextItalic->setToggleAction( TRUE );
-
-	m_actionTextUnderline = new QAction( 
-#if QT_VERSION < 0x030200
-						"",
-#endif		    
-						embed::getIconPixmap(
-								"text_under" ),
-						tr( "&Underline" ),
-						CTRL + Key_U, this );
-	connect( m_actionTextUnderline, SIGNAL( activated() ), this,
-						SLOT( textUnderline() ) );
-	m_actionTextUnderline->addTo( tb );
-	m_actionTextUnderline->setToggleAction( TRUE );
-
-	QActionGroup * grp = new QActionGroup( this );
-	connect( grp, SIGNAL( selected( QAction* ) ), this,
-						SLOT( textAlign( QAction* ) ) );
-
-	m_actionAlignLeft = new QAction( 
-#if QT_VERSION < 0x030200
-					"",
-#endif		    
-					embed::getIconPixmap( "text_left" ),
-						tr( "&Left" ), CTRL + Key_L,
-									grp );
-	m_actionAlignLeft->setToggleAction( TRUE );
-	m_actionAlignCenter = new QAction( 
-#if QT_VERSION < 0x030200
-						"",
-#endif		    
-						embed::getIconPixmap(
-								"text_center" ),
-						tr( "C&enter" ), CTRL + Key_E,
-									grp );
-	m_actionAlignCenter->setToggleAction( TRUE );
-
-	m_actionAlignRight = new QAction( 
-#if QT_VERSION < 0x030200
-					    "",
-#endif		    
-					    embed::getIconPixmap( "text_right" ),
-						tr( "&Right" ), CTRL + Key_R,
-									grp );
-	m_actionAlignRight->setToggleAction( TRUE );
-
-	m_actionAlignJustify = new QAction( 
-#if QT_VERSION < 0x030200
-						"",
-#endif		    
-						embed::getIconPixmap(
-								"text_block" ),
-						tr( "&Justify" ), CTRL + Key_J,
-									grp );
-	m_actionAlignJustify->setToggleAction( TRUE );
-
-	grp->addTo( tb );
-
-
-	QPixmap pix( 16, 16 );
-	pix.fill( Qt::black );
-	m_actionTextColor = new QAction( 
-#if QT_VERSION < 0x030200
-					"",
-#endif		    
-					pix, tr( "&Color..." ), 0, this );
-	connect( m_actionTextColor, SIGNAL( activated() ), this,
-							SLOT( textColor() ) );
-	m_actionTextColor->addTo( tb );
-#endif
-#endif
 }
 
 
@@ -492,11 +282,7 @@ void projectNotes::textColor()
 	m_edit->setTextColor( col );
 	QPixmap pix( 16, 16 );
 	pix.fill( Qt::black );
-#ifdef QT4
 	m_actionTextColor->setIcon( pix );
-#else
-	m_actionTextColor->setIconSet( pix );
-#endif
 }
 
 
@@ -542,11 +328,7 @@ void projectNotes::colorChanged( const QColor & _c )
 {
 	QPixmap pix( 16, 16 );
 	pix.fill( _c );
-#ifdef QT4
 	m_actionTextColor->setIcon( pix );
-#else
-	m_actionTextColor->setIconSet( pix );
-#endif
 	engine::getSongEditor()->setModified();
 }
 
@@ -555,11 +337,7 @@ void projectNotes::colorChanged( const QColor & _c )
 
 void projectNotes::alignmentChanged( int _a )
 {
-	if (
-#ifndef QT4
-	( _a == Qt::AlignAuto ) ||
-#endif
-		 ( _a & Qt::AlignLeft ) )
+	if ( _a & Qt::AlignLeft )
 	{
 		m_actionAlignLeft->setChecked( TRUE );
 	}

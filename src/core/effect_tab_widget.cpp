@@ -26,22 +26,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QMenu>
 #include <QtGui/QToolButton>
 #include <QtGui/QCloseEvent>
-
-#else
-
-#include <qdom.h>
-#include <qlistbox.h>
-#include <qtoolbutton.h>
-
-#endif
 
 
 #include "effect_tab_widget.h"

@@ -26,23 +26,11 @@
 #ifndef _AUTOMATABLE_SLIDER_H
 #define _AUTOMATABLE_SLIDER_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QSlider>
 #include <QtXml/QDomElement>
 
-#else
-
-#include <qdom.h>
-#include <qslider.h>
-
-#endif
 
 class knob;
-
-
 
 
 class automatableSlider : public QSlider

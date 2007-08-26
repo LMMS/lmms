@@ -24,27 +24,16 @@
 #ifndef _IMPULSE_EDITOR_H
 #define _IMPULSE_EDITOR_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 #include <QtGui/QCursor>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-#include <qcursor.h>
-
-#endif
 
 #include "config.h"
 #include "types.h"
 #include "graph.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
+
 
 class impulseEditor: public QWidget
 {

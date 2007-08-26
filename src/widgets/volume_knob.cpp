@@ -25,6 +25,11 @@
  *
  */
 
+
+#include <QtGui/QApplication>
+#include <QtGui/QInputDialog>
+#include <QtGui/QMouseEvent>
+
 #include <math.h>
 
 #include "volume_knob.h"
@@ -34,19 +39,6 @@
 #include "engine.h"
 #include "text_float.h"
 #include "string_pair_drag.h"
-
-#ifndef QT3
-
-#include <QtGui/QApplication>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMouseEvent>
-
-#else
-
-#include <qapplication.h>
-#include <qinputdialog.h>
-
-#endif
 
 
 
@@ -196,19 +188,11 @@ void volumeKnob::enterValue( void )
 	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-#ifdef QT4
-			this,
-#endif
-			accessibleName(),
+			this, accessibleName(),
 			tr( "Please enter a new value between "
 					"-96.0 dbV and 6.0 dbV:" ),
 					20.0 * log10( value() / 100.0 ), 
-					-96.0, 6.0,
-					4, &ok
-#ifndef QT4
-					, this
-#endif
-					       );
+							-96.0, 6.0, 4, &ok );
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
@@ -221,19 +205,12 @@ void volumeKnob::enterValue( void )
 	else
 	{
 		new_val = QInputDialog::getDouble(
-#ifdef QT4
-				this,
-#endif
-			accessibleName(),
-			tr( "Please enter a new value between "
-					"%1 and %2:" ).arg(
+				this, accessibleName(),
+				tr( "Please enter a new value between "
+						"%1 and %2:" ).arg(
 					minValue() ).arg( maxValue() ),
 					value(), minValue(), maxValue(),
-					4, &ok
-#ifndef QT4
-					, this
-#endif
-						       );
+								4, &ok );
 	}
 		
 	if( ok )

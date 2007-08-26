@@ -26,19 +26,8 @@
  */
  
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qpainter.h>
-
-#endif
-
 
 #include "pixmap_button.h"
 #include "automatable_object_templates.h"
@@ -56,10 +45,6 @@ pixmapButton::pixmapButton( QWidget * _parent, const QString & _name,
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
 	setInactiveGraphic( embed::getIconPixmap( "led_off" ), FALSE );
 
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
-
 	//setCheckable( TRUE );
 }
 
@@ -75,14 +60,7 @@ pixmapButton::~pixmapButton()
 
 void pixmapButton::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
-
-	QPainter p( &draw_pm, this );
-#endif
 
 	if( !m_bgPixmap.isNull() )
 	{
@@ -100,11 +78,6 @@ void pixmapButton::paintEvent( QPaintEvent * )
 	{
 		p.drawPixmap( 0, 0, m_inactivePixmap );
 	}
-
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 

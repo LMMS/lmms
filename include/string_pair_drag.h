@@ -26,28 +26,15 @@
 #ifndef _STRING_PAIR_DRAG_H
 #define _STRING_PAIR_DRAG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDrag>
-
-#else
-
-#include <qdragobject.h>
-
-#endif
+#include <QtGui/QDragEnterEvent>
+#include <QtGui/QDropEvent>
 
 
 class QPixmap;
 
 
-class stringPairDrag : public
-#ifdef QT4
-				QDrag
-#else
-				QStoredDrag
-#endif
+class stringPairDrag : public QDrag
 {
 public:
 	stringPairDrag( const QString & _key, const QString & _value,

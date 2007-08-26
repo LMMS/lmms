@@ -27,19 +27,8 @@
 #ifndef _RUBBERBAND_H
 #define _RUBBERBAND_H
 
-#include "qt3support.h"
-
-#ifndef QT3
-
 #include <QtGui/QRubberBand>
 #include <QtCore/QVector>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-
-#endif
 
 
 class selectableObject : public QWidget
@@ -90,33 +79,21 @@ private:
 
 
 
-typedef
-#ifndef QT3
-	QRubberBand
-#else
-	QWidget
-#endif
-			rubberBandBase;
 
-
-class rubberBand : public rubberBandBase
+class rubberBand : public QRubberBand
 {
 public:
 	rubberBand( QWidget * _parent );
 	virtual ~rubberBand();
 
-	vvector<selectableObject *> selectedObjects( void ) const;
+	QVector<selectableObject *> selectedObjects( void ) const;
 
 
 protected:
 	virtual void resizeEvent( QResizeEvent * _re );
-#ifdef QT3
-	virtual bool event( QEvent * _e );
-	void updateMask( void );
-#endif
 
 private:
-	vvector<selectableObject *> selectableObjects( void ) const;
+	QVector<selectableObject *> selectableObjects( void ) const;
 
 };
 

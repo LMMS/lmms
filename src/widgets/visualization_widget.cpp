@@ -25,23 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QTimer>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qtimer.h>
-
-#endif
-
 
 #include "visualization_widget.h"
 #include "embed.h"
@@ -60,9 +47,6 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	s_background( _bg ),
 	m_enabled( TRUE )
 {
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setFixedSize( s_background.width(), s_background.height() );
 
 
@@ -113,13 +97,8 @@ void visualizationWidget::setAudioBuffer( const surroundSampleFrame * _ab,
 
 void visualizationWidget::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
 
-	QPainter p( &draw_pm, this );
-#endif
 	p.drawPixmap( 0, 0, s_background );
 
 	if( m_enabled == TRUE )
@@ -186,11 +165,6 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		}
 
 	}
-
-#ifndef QT4
-	// and blit all drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 

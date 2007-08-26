@@ -23,28 +23,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
+#include <QtCore/QDir>
 #include <QtGui/QApplication>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
-
-#else
-
-#include <qapplication.h>
-#include <qlocale.h>
-#include <qdir.h>
-
-#include "qxembed.h"
-
-#define QX11EmbedContainer QXEmbed
-#define embedClient embed
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -122,18 +106,8 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		QString lvsl_server_exec = configManager::inst()->pluginDir() +
 							QDir::separator() +
 								"lvsl_server";
-		execlp( lvsl_server_exec.
-#ifdef QT4
-					toAscii().constData(),
-#else
-					ascii(),
-#endif
-					lvsl_server_exec.
-#ifdef QT4
-							toAscii().constData(),
-#else
-									ascii(),
-#endif
+		execlp( lvsl_server_exec.toAscii().constData(),
+					lvsl_server_exec.toAscii().constData(),
 								"", NULL );
 		return;
 	}
@@ -162,13 +136,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 	}
 
 	writeValueS<Sint16>( VST_LOAD_PLUGIN );
-	writeStringS( p.
-#ifdef QT4
-				toAscii().constData()
-#else
-				ascii()
-#endif
-			);
+	writeStringS( p.toAscii().constData() );
 	unlock();
 
 	while( 1 )
@@ -187,11 +155,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		{
 			break;
 		}
-#ifdef QT4
 		QApplication::processEvents( QEventLoop::AllEvents, 50 );
-#else
-		qApp->processEvents( 50 );
-#endif
 	}
 }
 
@@ -256,9 +220,7 @@ void remoteVSTPlugin::showEditor( void )
 	m_pluginWidget = new QWidget( engine::getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
-#ifndef QT3
 	engine::getMainWindow()->workspace()->addWindow( m_pluginWidget );
-#endif
 	m_pluginWidget->show();
 
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
@@ -431,11 +393,7 @@ void remoteVSTPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	for( QMap<QString, QString>::const_iterator it = dump.begin();
 							it != dump.end(); ++it )
 	{
-#ifdef QT4
 		_this.setAttribute( it.key(), it.value() );
-#else
-		_this.setAttribute( it.key(), it.data() );
-#endif
 	}
 }
 

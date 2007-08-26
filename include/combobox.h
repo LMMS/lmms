@@ -26,25 +26,11 @@
 #ifndef _COMBOBOX_H
 #define _COMBOBOX_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
 #include <QtGui/QMenu>
 #include <QtGui/QPixmap>
 #include <QtCore/QPair>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-#include <qpopupmenu.h>
-#include <qpixmap.h>
-#include <qpair.h>
-
-#endif
 
 #include "automatable_object.h"
 
@@ -95,14 +81,13 @@ private:
 
 	typedef QPair<QString, QPixmap> item;
 
-	vvector<item> m_items;
+	QVector<item> m_items;
 
 	bool m_pressed;
 
 
 private slots:
 	void setItem( QAction * _item );
-	void setItem( int _item );
 
 
 signals:

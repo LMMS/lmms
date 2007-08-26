@@ -26,25 +26,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
-
-#else
-
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-
-#define addSeparator insertSeparator
-#define addMenu insertItem
-
-#endif
-
 
 #include "tempo_sync_knob.h"
 #include "automatable_object_templates.h"
@@ -90,9 +74,9 @@ tempoSyncKnob::~tempoSyncKnob()
 void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: CSS-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( accessibleName() ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -118,15 +102,10 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	float limit = 60000.0f / ( engine::getSongEditor()->getTempo() *
 								m_scale );
 	
-#ifdef QT4
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
 						m_tempoSyncDescription );
-#else
-	QMenu * syncMenu = new QMenu( this );
-#endif
 	if( limit / 8.0f <= maxValue() )
 	{
-#ifdef QT4
 	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( setTempoSync( QAction * ) ) );
 	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
@@ -174,74 +153,6 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 				tr( "Custom..." ),
 				this, SLOT( showCustom( void ) )
 						)->setData( (int) CUSTOM );
-#else
-	int menuId;
-	menuId = syncMenu->addAction( embed::getIconPixmap( "note_none" ),
-					tr( "No Sync" ),
-					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) NO_SYNC );
-	if( limit / 0.125f <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_double_whole" ),
-					tr( "Eight beats" ),
-					this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) DOUBLE_WHOLE_NOTE );
-	}
-	if( limit / 0.25f <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_whole" ),
-					tr( "Whole note" ),
-					this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) WHOLE_NOTE );
-	}
-	if( limit / 0.5f <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_half" ),
-					tr( "Half note" ),
-					this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) HALF_NOTE );
-	}
-	if( limit <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_quarter" ),
-					tr( "Quarter note" ),
-			     		this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) QUARTER_NOTE );
-	}
-	if( limit / 2.0f <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_eighth" ),
-					tr( "8th note" ),
-					this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) EIGHTH_NOTE );
-	}
-	if( limit / 4.0f <= maxValue() )
-	{
-		menuId = syncMenu->addAction( 
-				embed::getIconPixmap( "note_sixteenth" ),
-					tr( "16th note" ),
-					this, SLOT( setTempoSync( int ) ) );
-		syncMenu->setItemParameter( menuId, ( int ) SIXTEENTH_NOTE );
-	}
-	menuId = syncMenu->addAction( embed::getIconPixmap(
-							"note_thirtysecond" ),
-					tr( "32nd note" ),
-					this, SLOT( setTempoSync( int ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) THIRTYSECOND_NOTE );
-	menuId = syncMenu->addAction( embed::getIconPixmap( "dont_know" ),
-					tr( "Custom..." ),
-					this, SLOT( showCustom( void ) ) );
-	syncMenu->setItemParameter( menuId, ( int ) CUSTOM );
-	
-	contextMenu.addMenu( m_tempoSyncIcon, m_tempoSyncDescription,
-								syncMenu );
-#endif
-
 	contextMenu.addSeparator();
 	}
 	
@@ -282,18 +193,11 @@ void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
 
 
 
-#ifdef QT4
 
 void tempoSyncKnob::setTempoSync( QAction * _item )
 {
 	setTempoSync( _item->data().toInt() );
 }
-
-#else
-
-void tempoSyncKnob::setTempoSync( QAction * ) { }
-
-#endif
 
 
 
@@ -550,11 +454,6 @@ void tempoSyncKnob::showCustom( void )
 	setTempoSync( CUSTOM );
 }
 
-
-
-#ifndef QT4
-#undef addSeparator
-#endif
 
 
 #include "tempo_sync_knob.moc"

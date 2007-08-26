@@ -26,18 +26,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
-
-#else
-
-#include <qpainter.h>
-
-#endif
-
 
 #include "cpuload_widget.h"
 #include "embed.h"
@@ -61,10 +50,6 @@ cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
 	connect( &m_updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updateCpuLoad() ) );
 	m_updateTimer.start( 100 );	// update cpu-load at 10 fps
-
-#ifndef QT4
-	setBackgroundMode( NoBackground );
-#endif
 }
 
 

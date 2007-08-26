@@ -27,21 +27,9 @@
 #ifndef _PIANO_WIDGET_H
 #define _PIANO_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 #include <QtGui/QScrollBar>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-#include <qscrollbar.h>
-
-#endif
 
 
 #include "note.h"
@@ -81,11 +69,7 @@ public:
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
-#ifndef QT3
 	virtual void customEvent( QEvent * );
-#else
-	virtual void customEvent( QCustomEvent * );
-#endif
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );

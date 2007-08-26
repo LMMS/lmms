@@ -27,18 +27,7 @@
 #ifndef _SAMPLE_TRACK_H
 #define _SAMPLE_TRACK_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
 
 #include "track.h"
 

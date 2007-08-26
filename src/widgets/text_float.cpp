@@ -3,7 +3,7 @@
 /*
  * text_float.cpp - class textFloat, a floating text-label
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,23 +25,8 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qtimer.h>
-
-#define setParent reparent
-
-#endif
-
 
 #include "text_float.h"
 #include "gui_templates.h"
@@ -51,7 +36,7 @@
 
 textFloat::textFloat( QWidget * _parent ) :
 	QWidget( _parent
-#ifndef QT4
+#if 0
 	, "textFloat", WStyle_Customize  | WStyle_NoBorder | WStyle_StaysOnTop
 #endif
 		),
@@ -59,10 +44,6 @@ textFloat::textFloat( QWidget * _parent ) :
 	m_text( "" ),
 	m_pixmap()
 {
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
-
 	reparent( parentWidget() );
 	resize( 20, 20 );
 	hide();
@@ -111,12 +92,7 @@ void textFloat::reparent( QWidget * _new_parent )
 	// Get position and reparent to either top level or dialog
 	//
 	while( _new_parent->parentWidget() && !_new_parent->isTopLevel() &&
-#ifdef QT4
-			!_new_parent->windowType() == Qt::Dialog
-#else
-			!_new_parent->isDialog()
-#endif
-						)
+				!_new_parent->windowType() == Qt::Dialog )
 	{
 		_new_parent = _new_parent->parentWidget();
 		position += _new_parent->pos();
@@ -126,15 +102,8 @@ void textFloat::reparent( QWidget * _new_parent )
 	//
 	//move(pos + QPoint(parent->width() + 5, 5));
 
-	QWidget::setParent( _new_parent,
-#ifdef QT4
-				Qt::FramelessWindowHint |
+	QWidget::setParent( _new_parent, Qt::FramelessWindowHint |
 						Qt::WindowStaysOnTopHint );
-#else
-				WStyle_Customize | WStyle_NoBorder |
-							WStyle_StaysOnTop,
-				position + QPoint( 20, 5 ) );
-#endif
 }
 
 
@@ -152,7 +121,6 @@ void textFloat::setVisibilityTimeOut( int _msecs )
 textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
-#ifdef QT4
 	QWidget * mw = QApplication::activeWindow();
 	if( mw == NULL )
 	{
@@ -164,13 +132,7 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 			}
 		}
 	}
-#else
-	QWidget * mw = qApp->mainWidget();
-	if( mw == NULL )
-	{
-		mw = qApp->desktop();
-	}
-#endif
+
 	textFloat * tf = new textFloat( ( _parent == NULL ) ? mw : _parent );
 	if( _parent != NULL )
 	{
@@ -186,11 +148,7 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 	tf->show();
 	if( _timeout > 0 )
 	{
-#ifdef QT4
 		tf->setAttribute( Qt::WA_DeleteOnClose, TRUE );
-#else
-		tf->setWFlags( tf->getWFlags() | Qt::WDestructiveClose );
-#endif
 		QTimer::singleShot( _timeout, tf, SLOT( close() ) );
 	}
 	return( tf );
@@ -215,22 +173,15 @@ textFloat * textFloat::displayMessage( const QString & _title,
 
 void textFloat::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( size() );
-	QPainter p( &draw_pm );
-#endif
+
 	p.setPen( QColor( 0, 0, 0 ) );
+
 	p.setBrush( QColor( 224, 224, 224 ) );
 
 	p.setFont( pointSize<8>( p.font() ) );
 
-#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-#else
-	p.drawRect( rect() );
-#endif
 
 //	p.setPen( Qt::black );
 	// small message?
@@ -252,10 +203,6 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 		p.setFont( f );
 		p.drawText( text_x, 12, m_title );
 	}
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 

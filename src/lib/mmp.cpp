@@ -29,17 +29,8 @@
 
 #include <math.h>
 
-#ifdef QT4
-
 #include <QtCore/QFile>
 #include <QtGui/QMessageBox>
-
-#else
-
-#include <qfile.h>
-#include <qmessagebox.h>
-
-#endif
 
 
 #include "config_mgr.h"
@@ -101,11 +92,7 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 	QFile in_file( _in_file_name );
 	if( _is_filename == TRUE )
 	{
-#ifdef QT4
 		if( !in_file.open( QIODevice::ReadOnly ) )
-#else
-		if( !in_file.open( IO_ReadOnly ) )
-#endif
 		{
 			QMessageBox::critical( NULL,
 					songEditor::tr( "Could not open file" ),
@@ -255,13 +242,7 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 	QFile outfile( fn );
 	if( _overwrite_check == TRUE &&
 		outfile.exists() == TRUE &&
-		QMessageBox::
-#if QT_VERSION >= 0x030200
-		question
-#else
-		information
-#endif
-				( NULL,
+		QMessageBox::question( NULL,
 					songEditor::tr( "File already exists" ),
 					songEditor::tr( "The file %1 already "
 							"exists.\nDo you want "
@@ -274,11 +255,7 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 	}
 
 
-#ifdef QT4
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
-#else
-	if( !outfile.open( IO_WriteOnly | IO_Truncate ) )
-#endif
 	{
 		QMessageBox::critical( NULL, songEditor::tr( "Could not write "
 								"file" ),
@@ -293,28 +270,14 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 						).arg( fn ) );
 		return( FALSE );
 	}
-	QString xml = "<?xml version=\"1.0\"?>\n" + toString(
-#if QT_VERSION >= 0x030100
-								1
-#endif
-									);
+	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 1 );
 	if( compress )
 	{
-#ifndef QT3
 		outfile.write( qCompress( xml.toAscii() ) );
-#else
-		outfile.writeBlock( qCompress(
-				(const uchar *) xml.ascii(), xml.length() ) );
-#endif
 	}
 	else
 	{
-#ifdef QT4
 		outfile.write( xml.toUtf8().constData(), xml.length() );
-#else
-		QCString xml_utf8 = xml.utf8();
-		outfile.writeBlock( xml_utf8.data(), xml_utf8.length() );
-#endif
 	}
 	outfile.close();
 

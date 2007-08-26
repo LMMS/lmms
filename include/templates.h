@@ -1,7 +1,7 @@
 /*
  * templates.h - miscellanous templates and algorithms
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,17 +26,7 @@
 #ifndef _TEMPLATES_H
 #define _TEMPLATES_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QtAlgorithms>
-
-#else
-
-#include <qtl.h>
-
-#endif
 
 
 template<class T>

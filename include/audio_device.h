@@ -26,21 +26,9 @@
 #ifndef _AUDIO_DEVICE_H
 #define _AUDIO_DEVICE_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QPair>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
-
-#else
-
-#include <qpair.h>
-#include <qmutex.h>
-#include <qthread.h>
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

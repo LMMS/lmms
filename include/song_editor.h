@@ -301,7 +301,7 @@ private:
 		ACT_STOP_PLAY, ACT_PLAY_SONG, ACT_PLAY_TRACK, ACT_PLAY_BB,
 		ACT_PLAY_PATTERN, ACT_PAUSE, ACT_RESUME_FROM_PAUSE
 	} ;
-	vvector<ACTIONS> m_actions;
+	QVector<ACTIONS> m_actions;
 
 
 	friend class engine;

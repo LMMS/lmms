@@ -27,21 +27,9 @@
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QPushButton>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qapplication.h>
-#include <qpushbutton.h>
-#include <qpainter.h>
-
-#endif
 
 #include "midi_event_processor.h"
 #include "mixer.h"
@@ -220,7 +208,7 @@ private:
 	tones m_baseTone;
 	octaves m_baseOctave;
 
-	vlist<notePlayHandle *> m_processHandles;
+	QList<notePlayHandle *> m_processHandles;
 
 
 	// widgets on the top of a instrument-track-window
@@ -248,14 +236,10 @@ private:
 	volumeKnob * m_tswVolumeKnob;
 	fadeButton * m_tswActivityIndicator;
 	instrumentTrackButton * m_tswInstrumentTrackButton;
+
 	QMenu * m_tswMidiMenu;
-#ifdef QT4
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
-#else
-	int m_midiInputID;
-	int m_midiOutputID;
-#endif
 
 	friend class instrumentTrackButton;
 	friend class notePlayHandle;
@@ -276,23 +260,6 @@ class instrumentTrackButton : public QPushButton
 public:
 	instrumentTrackButton( instrumentTrack * _instrument_track );
 	virtual ~instrumentTrackButton();
-
-#ifdef QT3
-	inline void setChecked( bool _on )
-	{
-		setOn( _on );
-	}
-
-	inline bool isChecked( void ) const
-	{
-		return( isOn() );
-	}
-
-	inline void setCheckable( bool _on )
-	{
-		QPushButton::setToggleButton( _on );
-	}
-#endif
 
 
 protected:

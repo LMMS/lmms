@@ -1,7 +1,7 @@
 /*
  * tab_button.h - declaration of class tabButton
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,18 +26,7 @@
 #ifndef _TAB_BUTTON_H
 #define _TAB_BUTTON_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPushButton>
-
-#else
-
-#include <qpushbutton.h>
-
-#endif
-
 
 
 class tabButton : public QPushButton

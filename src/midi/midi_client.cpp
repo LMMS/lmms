@@ -26,11 +26,6 @@
  */
 
 
-#include "qt3support.h"
-#ifndef QT4
-#include <qmap.h>
-#endif
-
 #include "midi_client.h"
 /*#include "midi_mapper.h"*/
 #include "templates.h"
@@ -82,7 +77,7 @@ midiPort * midiClient::addPort( midiEventProcessor * _mep,
 
 void midiClient::removePort( midiPort * _port )
 {
-	vvector<midiPort *>::iterator it = qFind( m_midiPorts.begin(),
+	QVector<midiPort *>::iterator it = qFind( m_midiPorts.begin(),
 							m_midiPorts.end(),
 							_port );
 	if( it != m_midiPorts.end() )
@@ -281,7 +276,7 @@ void midiClientRaw::parseData( const Uint8 _c )
 
 void midiClientRaw::processParsedEvent()
 {
-	for( csize i = 0; i < m_midiPorts.size(); ++i )
+	for( int i = 0; i < m_midiPorts.size(); ++i )
 	{
 		m_midiPorts[i]->processInEvent( m_midiParseData.m_midiEvent,
 							midiTime() );

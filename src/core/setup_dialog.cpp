@@ -25,10 +25,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QComboBox>
 #include <QtGui/QFileDialog>
 #include <QtGui/QLabel>
@@ -37,19 +33,6 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSlider>
 #include <QtGui/QWhatsThis>
-
-#else
-
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qslider.h>
-#include <qwhatsthis.h>
-#include <qcombobox.h>
-#include <qmessagebox.h>
-#include <qlineedit.h>
-#include <qfiledialog.h>
-
-#endif
 
 
 #include "setup_dialog.h"
@@ -167,15 +150,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	bufsize_tw->setFixedHeight( 80 );
 
 	m_bufSizeSlider = new QSlider( Qt::Horizontal, bufsize_tw );
-#ifdef QT4
 	m_bufSizeSlider->setRange( 1, 256 );
 	m_bufSizeSlider->setTickPosition( QSlider::TicksBelow );
-#else
-	m_bufSizeSlider->setMinimum( 1 );
-	m_bufSizeSlider->setMaximum( 256 );
-	m_bufSizeSlider->setLineStep( 8 );
-	m_bufSizeSlider->setTickmarks( QSlider::Below );
-#endif
 	m_bufSizeSlider->setPageStep( 8 );
 	m_bufSizeSlider->setTickInterval( 8 );
 	m_bufSizeSlider->setGeometry( 10, 16, 340, 18 );
@@ -483,11 +459,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 			"problems (i.e. lot of xruns), try to increase buffer-"
 			"size." ), smp_supp_tw );
 	smp_help->setFixedSize( performance->width() - 20, 140 );
-#ifndef QT3
 	smp_help->setWordWrap( TRUE );
-#else
-	smp_help->setAlignment( Qt::WordBreak );
-#endif
 	smp_help->move( 10, 55 );
 
 
@@ -523,9 +495,6 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	// create ifaces-settings-widget
 	QWidget * asw = new QWidget( audio );
 	asw->setFixedHeight( 60 );
-#ifndef QT4
-	asw->setBackgroundMode( NoBackground );
-#endif
 
 	QHBoxLayout * asw_layout = new QHBoxLayout( asw );
 	asw_layout->setSpacing( 0 );
@@ -558,31 +527,18 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
-		m_audioIfaceNames[tr( it.key()
-#ifndef QT3
-						.toAscii()
-#endif
-								)] = it.key();
+		m_audioIfaceNames[tr( it.key().toAscii())] = it.key();
 	}
 	for( trMap::iterator it = m_audioIfaceNames.begin();
 				it != m_audioIfaceNames.end(); ++it )
 	{
-#ifdef QT4
 		QWidget * audioWidget = m_audioIfaceSetupWidgets[it.value()];
-#else
-		QWidget * audioWidget = m_audioIfaceSetupWidgets[it.data()];
-#endif
 		audioWidget->hide();
 		asw_layout->addWidget( audioWidget );
 		m_audioInterfaces->addItem( it.key() );
 	}
-#ifdef QT4
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
 			tr( engine::getMixer()->audioDevName().toAscii() ) ) );
-#else
-	m_audioInterfaces->setCurrentText(
-				tr( engine::getMixer()->audioDevName() ) );
-#endif
 	m_audioIfaceSetupWidgets[engine::getMixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
@@ -621,9 +577,6 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	// create ifaces-settings-widget
 	QWidget * msw = new QWidget( midi );
 	msw->setFixedHeight( 60 );
-#ifndef QT4
-	msw->setBackgroundMode( NoBackground );
-#endif
 
 	QHBoxLayout * msw_layout = new QHBoxLayout( msw );
 	msw_layout->setSpacing( 0 );
@@ -648,32 +601,19 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
-		m_midiIfaceNames[tr( it.key()
-#ifndef QT3
-						.toAscii()
-#endif
-								)] = it.key();
+		m_midiIfaceNames[tr( it.key().toAscii())] = it.key();
 	}
 	for( trMap::iterator it = m_midiIfaceNames.begin();
 				it != m_midiIfaceNames.end(); ++it )
 	{
-#ifdef QT4
 		QWidget * midiWidget = m_midiIfaceSetupWidgets[it.value()];
-#else
-		QWidget * midiWidget = m_midiIfaceSetupWidgets[it.data()];
-#endif
 		midiWidget->hide();
 		msw_layout->addWidget( midiWidget );
 		m_midiInterfaces->addItem( it.key() );
 	}
 
-#ifdef QT4
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
 		tr( engine::getMixer()->midiClientName().toAscii() ) ) );
-#else
-	m_midiInterfaces->setCurrentText(
-				tr( engine::getMixer()->midiClientName() ) );
-#endif
 	m_midiIfaceSetupWidgets[engine::getMixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
@@ -685,10 +625,6 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	midi_layout->addWidget( msw );
 	midi_layout->addStretch();
 
-
-#ifndef QT4
-#define setIcon setPixmap
-#endif
 
 	m_tabBar->addTab( general, tr( "General settings" ), 0, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap( "setup_general" ) );
@@ -799,21 +735,13 @@ void setupDialog::accept( void )
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
-#ifdef QT4
 		it.value()->saveSettings();
-#else
-		it.data()->saveSettings();
-#endif
 	}
 	// tell all MIDI-settings-widget to save their settings
 	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
-#ifdef QT4
 		it.value()->saveSettings();
-#else
-		it.data()->saveSettings();
-#endif
 	}
 
 	configManager::inst()->saveConfigFile();
@@ -875,11 +803,7 @@ void setupDialog::resetBufSize( void )
 
 void setupDialog::displayBufSizeHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( QCursor::pos(),
-#else
-	QWhatsThis::display(
-#endif
 			tr( "Here you can setup the internal buffer-size "
 					"used by LMMS. Smaller values result "
 					"in a lower latency but also may cause "
@@ -973,16 +897,9 @@ void setupDialog::setParallelizingLevel( int _level )
 
 void setupDialog::openWorkingDir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ),
 							m_workingDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_workingDir,
-									0, 0,
-					tr( "Choose LMMS working directory" ),
-									TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_wdLineEdit->setText( new_dir );
@@ -1002,15 +919,9 @@ void setupDialog::setWorkingDir( const QString & _wd )
 
 void setupDialog::openVSTDir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose your VST-plugin directory" ),
 							m_vstDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_vstDir, 0, 0,
-				tr( "Choose your VST-plugin directory" ),
-									TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_vdLineEdit->setText( new_dir );
@@ -1030,15 +941,9 @@ void setupDialog::setVSTDir( const QString & _vd )
 
 void setupDialog::openArtworkDir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose artwork-theme directory" ),
 							m_artworkDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_artworkDir,
-									0, 0,
-				tr( "Choose artwork-theme directory" ), TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_adLineEdit->setText( new_dir );
@@ -1058,14 +963,9 @@ void setupDialog::setArtworkDir( const QString & _ad )
 
 void setupDialog::openFLDir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose FL Studio installation directory" ),
 							m_flDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_flDir, 0, 0,
-			tr( "Choose FL Studio installation directory" ), TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_fdLineEdit->setText( new_dir );
@@ -1077,14 +977,9 @@ void setupDialog::openFLDir( void )
 
 void setupDialog::openLADSPADir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose LADSPA plugin directory" ),
 							m_ladDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_ladDir, 0, 0,
-			tr( "Choose LADSPA plugin directory" ), TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		if( m_ladLineEdit->text() == "" )
@@ -1105,14 +1000,9 @@ void setupDialog::openLADSPADir( void )
 void setupDialog::openSTKDir( void )
 {
 #ifdef HAVE_STK_H
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose STK rawwave directory" ),
 							m_ladDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_ladDir, 0, 0,
-			tr( "Choose STK rawwave directory" ), TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_stkLineEdit->setText( new_dir );
@@ -1154,11 +1044,7 @@ void setupDialog::audioInterfaceChanged( const QString & _iface )
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
-#ifdef QT4
 		it.value()->hide();
-#else
-		it.data()->hide();
-#endif
 	}
 
 	m_audioIfaceSetupWidgets[m_audioIfaceNames[_iface]]->show();
@@ -1169,11 +1055,7 @@ void setupDialog::audioInterfaceChanged( const QString & _iface )
 
 void setupDialog::displayAudioHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( QCursor::pos(),
-#else
-	QWhatsThis::display(
-#endif
 				tr( "Here you can select your preferred "
 					"audio-interface. Depending on the "
 					"configuration of your system during "
@@ -1192,11 +1074,7 @@ void setupDialog::midiInterfaceChanged( const QString & _iface )
 	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
-#ifdef QT4
 		it.value()->hide();
-#else
-		it.data()->hide();
-#endif
 	}
 
 	m_midiIfaceSetupWidgets[m_midiIfaceNames[_iface]]->show();
@@ -1207,11 +1085,7 @@ void setupDialog::midiInterfaceChanged( const QString & _iface )
 
 void setupDialog::displayMIDIHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( QCursor::pos(),
-#else
-	QWhatsThis::display(
-#endif
 				tr( "Here you can select your preferred "
 					"MIDI-interface. Depending on the "
 					"configuration of your system during "

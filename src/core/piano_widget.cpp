@@ -26,25 +26,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QCursor>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qpainter.h>
-#include <qpopupmenu.h>
-
-#endif
 
 
 #include "piano_widget.h"
@@ -100,11 +87,7 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	m_startOctave( OCTAVE_3 ),
 	m_lastKey( -1 )
 {
-#ifdef QT4
 	setFocusPolicy( Qt::StrongFocus );
-#else
-	setFocusPolicy( StrongFocus );
-#endif
 
 	if( s_whiteKeyPm == NULL )
 	{
@@ -132,30 +115,18 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 		m_pressedKeys[i] = FALSE;
 	}
 
-#ifdef QT4
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
 	m_pianoScroll->setRange( 0, WHITE_KEYS_PER_OCTAVE * ( OCTAVES - 3 ) -
 									4 );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
 	m_pianoScroll->setValue( OCTAVE_3 * WHITE_KEYS_PER_OCTAVE );
-#else
-	// create scrollbar below piano-widget...
-	m_pianoScroll = new QScrollBar( 0, WHITE_KEYS_PER_OCTAVE *
-					( OCTAVES - 3 ) - 4, 1, 20,
-					OCTAVE_3 * WHITE_KEYS_PER_OCTAVE,
-							Qt::Horizontal, this );
-#endif
 	m_pianoScroll->setGeometry( 0, PIANO_BASE + PW_WHITE_KEY_HEIGHT, 250,
 									16 );
 	// ...and connect it to this widget...
 	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( pianoScrolled( int ) ) );
 
-#ifndef QT4
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
 
 	m_noteKnob = new knob( knobDark_28, NULL, tr( "Base note" ), _parent );
 	m_noteKnob->setRange( 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1.0f );
@@ -247,9 +218,9 @@ void pianoWidget::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	QMenu contextMenu( this );
-#ifdef QT4
+#warning TODO: use CSS-formatting
 	contextMenu.setTitle( m_noteKnob->accessibleName() );
-#else
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( m_noteKnob->accessibleName() ) + "</b></font>",
 			this );
@@ -369,11 +340,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 			m_pressedKeys[m_lastKey] = FALSE;
 			m_lastKey = -1;
 		}
-#ifdef QT4
 		if( _me->buttons() & Qt::LeftButton )
-#else
-		if( _me->state() == Qt::LeftButton )
-#endif
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
@@ -498,11 +465,7 @@ void pianoWidget::setKeyState( int _key, bool _on )
 
 
 
-#ifndef QT3
 void pianoWidget::customEvent( QEvent * )
-#else
-void pianoWidget::customEvent( QCustomEvent * )
-#endif
 {
 	update();
 }
@@ -575,14 +538,7 @@ int pianoWidget::getKeyX( int _key_num ) const
 
 void pianoWidget::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );//width(), PIANO_BASE+PW_WHITE_KEY_HEIGHT);
-	// and a painter for it
-	QPainter p( &pm, this );
-#endif
 
 	// set smaller font for printing number of every octave
 	p.setFont( pointSize<LABEL_TEXT_SIZE>( p.font() ) );
@@ -704,10 +660,6 @@ void pianoWidget::paintEvent( QPaintEvent * )
 		}
 		++cur_key;
 	}
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 

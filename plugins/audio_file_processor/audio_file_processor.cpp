@@ -23,26 +23,11 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
 #include <QtGui/QBitmap>
 #include <Qt/QtXml>
 #include <QtCore/QFileInfo>
 #include <QtGui/QDropEvent>
-
-#else
-
-#include <qpainter.h>
-#include <qbitmap.h>
-#include <qdom.h>
-#include <qfileinfo.h>
-#include <qcursor.h>
-#include <qwhatsthis.h>
-
-#endif
 
 
 #include "audio_file_processor.h"
@@ -118,11 +103,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 						SLOT( openAudioFile() ) );
 	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
 
-#ifdef QT4
 	m_openAudioFileButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_openAudioFileButton,
-#endif
 		tr( "Click here, if you want to open another audio-file. After "
 			"clicking on this button, a file-open-dialog appears "
 			"and you can select your file. Settings like Looping-"
@@ -141,11 +122,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	connect( m_reverseButton, SIGNAL( toggled( bool ) ), this,
 					SLOT( reverseBtnToggled( bool ) ) );
 	toolTip::add( m_reverseButton, tr( "Reverse sample" ) );
-#ifdef QT4
 	m_reverseButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_reverseButton,
-#endif
 		tr( "If you enable this button, the whole sample is reversed. "
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
@@ -160,11 +137,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	m_loopButton->setBgGraphic( getBackground( m_loopButton ) );
 	toolTip::add( m_loopButton,
 				tr( "Loop sample at start- and end-point" ) );
-#ifdef QT4
 	m_loopButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_loopButton,
-#endif
 		tr( "Here you can set, whether Looping-Mode is enabled. If "
 			"enabled, AudioFileProcessor loops between start- and "
 			"end-point of a sample until the whole note is played. "
@@ -179,11 +152,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	m_ampKnob->setLabel( tr( "AMP" ) );
 	connect( m_ampKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( ampKnobChanged( float ) ) );
-#ifdef QT4
 	m_ampKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_ampKnob,
-#endif
 		tr( "With this knob you can set the amplify-ratio. When you "
 			"set a value of 100% your sample isn't changed. "
 			"Otherwise it will be amplified up or down (your "
@@ -198,11 +167,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	m_startKnob->setLabel( tr( "START" ) );
 	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( startKnobChanged( float ) ) );
-#ifdef QT4
 	m_startKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_startKnob,
-#endif
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should begin playing your sample. "
 			"If you enable Looping-Mode, this is the point to "
@@ -218,11 +183,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	m_endKnob->setLabel( tr( "END" ) );
 	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( endKnobChanged( float ) ) );
-#ifdef QT4
 	m_endKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_endKnob,
-#endif
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should stop playing your sample. "
 			"If you enable Looping-Mode, this is the point where "
@@ -238,11 +199,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	}
 	connect( m_viewLinesPB, SIGNAL( toggled( bool ) ), this,
 					SLOT( lineDrawBtnToggled( bool ) ) );
-#ifdef QT4
 	m_viewLinesPB->setWhatsThis(
-#else
-	QWhatsThis::add( m_viewLinesPB,
-#endif
 		tr( "Activate this button, if your sample should be drawn "
 			"with connected lines. This doesn't change the "
 			"sound itself. It just gives you another view to your "
@@ -257,11 +214,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	}
 	connect( m_viewDotsPB, SIGNAL( toggled( bool ) ), this,
 					SLOT( dotDrawBtnToggled( bool ) ) );
-#ifdef QT4
 	m_viewDotsPB->setWhatsThis(
-#else
-	QWhatsThis::add( m_viewDotsPB,
-#endif
 		tr( "Activate this button, if your sample should be drawn "
 			"with dots. This doesn't change the sound itself. "
 			"It just gives you another view to your sample." ) );
@@ -271,9 +224,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	view_group->addButton( m_viewLinesPB );
 	view_group->addButton( m_viewDotsPB );
 
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setAcceptDrops( TRUE );
 }
 
@@ -422,7 +372,6 @@ void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
 
 void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 {
-#ifdef QT4
 	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
@@ -445,41 +394,6 @@ void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 	{
 		_dee->ignore();
 	}
-#else
-	QString txt = _dee->encodedData( stringPairDrag::mimeType() );
-	if( txt != "" )
-	{
-		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
-							track::SAMPLE_TRACK ) )
-		{
-			_dee->accept();
-			return;
-		}
-		if( txt.section( ':', 0, 0 ) == "samplefile"
-			&& subPluginFeatures::supported_extensions().contains(
-				fileItem::extension( txt.section( ':', 1 ) ) ) )
-		{
-			_dee->accept();
-			return;
-		}
-		_dee->ignore();
-		return;
-	}
-
-	txt = QString( _dee->encodedData( "text/plain" ) );
-	if( txt != "" )
-	{
-		QString file = QUriDrag::uriToLocalFile(
-							txt.stripWhiteSpace() );
-		if( file && subPluginFeatures::supported_extensions().contains(
-						fileItem::extension( file ) ) )
-		{
-			_dee->accept();
-			return;
-		}
-	}
-	_dee->ignore();
-#endif
 }
 
 
@@ -504,17 +418,6 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 		return;
 	}
 
-#ifndef QT4
-	QString txt = _de->encodedData( "text/plain" );
-	if( txt != "" )
-	{
-		setAudioFile( QUriDrag::uriToLocalFile(
-						txt.stripWhiteSpace() ) );
-		_de->accept();
-		return;
-	}
-#endif
-
 	_de->ignore();
 }
 
@@ -523,14 +426,7 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 
 void audioFileProcessor::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap pm( rect().size() );
-	pm.fill( this, rect().topLeft() );
-
-	QPainter p( &pm, this );
-#endif
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
@@ -544,13 +440,8 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
-#ifdef QT4
 	while( idx > 0 &&
 		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 210 )
-#else
-	while( idx > 0 &&
-		fm.size( Qt::SingleLine, file_name + "..." ).width() < 210 )
-#endif
 	{
 		file_name = m_sampleBuffer.audioFile()[--idx] + file_name;
 	}
@@ -582,9 +473,6 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 					end_frame_x + graph_rect.x(),
 					graph_rect.height() + graph_rect.y() );
 
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -593,14 +481,8 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 void audioFileProcessor::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
-#ifdef QT4
 	QPainter p( &m_graph );
 	p.drawPixmap( 2, 172, m_graph );
-#else
-	copyBlt( &m_graph, 0, 0, s_artwork, 2, 172, m_graph.width(),
-							m_graph.height() );
-	QPainter p( &m_graph );
-#endif
 	p.setPen( QColor( 64, 255, 160 ) );
 	m_sampleBuffer.visualize( p, QRect( 2, 2, m_graph.width() - 4,
 							m_graph.height() - 4 ),

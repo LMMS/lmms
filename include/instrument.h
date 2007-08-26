@@ -28,25 +28,8 @@
 #define _INSTRUMENT_H
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-
-#endif
-
 
 #include "plugin.h"
 #include "mixer.h"

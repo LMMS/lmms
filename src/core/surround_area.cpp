@@ -26,27 +26,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qapplication.h>
-#include <qlabel.h>
-#include <qpainter.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-#include <qimage.h>
-
-#endif
 
 
 #include <math.h>
@@ -68,11 +53,7 @@ QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
 surroundArea::surroundArea( QWidget * _parent, const QString & _name,
 							track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	m_sndSrcPos( QPoint() )
 {
 	m_position_x = new knob( knobDark_28, NULL, tr ( "Surround area X" ),
@@ -98,11 +79,7 @@ surroundArea::surroundArea( QWidget * _parent, const QString & _name,
 
 	setFixedSize( s_backgroundArtwork->width(),
 						s_backgroundArtwork->height() );
-#ifdef QT4
 	setAccessibleName( _name );
-#else
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	toolTip::add( this,
 			tr( "click to where this channel should be audible" ) );
 }
@@ -188,15 +165,7 @@ void surroundArea::contextMenuEvent( QContextMenuEvent * )
 	mouseReleaseEvent( NULL );
 
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &X in automation editor" ),
 					m_position_x->getAutomationPattern(),
@@ -213,7 +182,6 @@ void surroundArea::contextMenuEvent( QContextMenuEvent * )
 
 void surroundArea::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
 	if( s_backgroundArtwork->size() != size() )
 	{
@@ -226,20 +194,6 @@ void surroundArea::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation ) );
 	}
-#else
-	QPixmap pm;
-	if( s_backgroundArtwork->size() != size() )
-	{
-		pm.convertFromImage(
-			s_backgroundArtwork->convertToImage().smoothScale(
-							width(), height() ) );
-	}
-	else
-	{
-		pm = *s_backgroundArtwork;
-	}
-	QPainter p( &pm );
-#endif
 	const int x = ( width() + m_sndSrcPos.x() * ( width() - 4 ) /
 						SURROUND_AREA_SIZE ) / 2;
 	const int y = ( height() + m_sndSrcPos.y() * ( height() - 4 ) /
@@ -250,11 +204,6 @@ void surroundArea::paintEvent( QPaintEvent * )
 	p.drawPoint( x, y );
 	p.drawPoint( x + 1, y );
 	p.drawPoint( x, y + 1 );
-
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 

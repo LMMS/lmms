@@ -23,23 +23,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QDir>
 #include <QtGui/QLayout>
 #include <QtGui/QTextEdit>
 #include <QtXml/QDomElement>
-
-#else
-
-#include <qdir.h>
-#include <qdom.h>
-#include <qlayout.h>
-#include <qtextedit.h>
-
-#endif
 
 #include "singerbot.h"
 #include "engine.h"
@@ -99,15 +86,11 @@ singerBot::singerBot( instrumentTrack * _track ) :
 		s_thread->start();
 	}
 
-#ifndef QT3
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-#else
-	setPaletteBackgroundPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 
 	QVBoxLayout * vbox = new QVBoxLayout( this );
 	vbox->setMargin( 10 );
@@ -115,14 +98,9 @@ singerBot::singerBot( instrumentTrack * _track ) :
 	vbox->addSpacing( 45 );
 
 	m_lyrics = new QTextEdit( this );
-#ifdef QT4
 	m_lyrics->setAutoFillBackground( TRUE );
 	pal.setColor( m_lyrics->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_lyrics->setPalette( pal );
-#else
-	m_lyrics->setTextFormat( PlainText );
-	m_lyrics->setPaletteBackgroundColor( QColor( 64, 64, 64 ) );
-#endif
 	m_lyrics->setText( "Hello, world!" );
 
 	connect( m_lyrics, SIGNAL( textChanged( void ) ),
@@ -182,12 +160,8 @@ void singerBot::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	QDomElement element = _doc.createElement( "lyrics" );
 	_this.appendChild( element );
-#ifdef QT4
 	QDomCDATASection ds = _doc.createCDATASection(
 						m_lyrics->toPlainText() );
-#else
-	QDomCDATASection ds = _doc.createCDATASection( m_lyrics->text() );
-#endif
 	element.appendChild( ds );
 }
 
@@ -196,12 +170,8 @@ void singerBot::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void singerBot::loadSettings( const QDomElement & _this )
 {
-#ifdef QT4
 	m_lyrics->setPlainText(
 			_this.namedItem( "lyrics" ).toElement().text() );
-#else
-	m_lyrics->setText( _this.namedItem( "lyrics" ).toElement().text() );
-#endif
 }
 
 
@@ -225,13 +195,8 @@ void singerBot::lyricsChanged( void )
 
 void singerBot::updateWords( void )
 {
-#ifndef QT3
 	m_words = m_lyrics->toPlainText().simplified().toLower().
 								split( ' ' );
-#else
-	m_words = QStringList::split( ' ',
-				m_lyrics->text().simplifyWhiteSpace().lower() );
-#endif
 	m_words_dirty = FALSE;
 }
 
@@ -261,12 +226,7 @@ void singerBot::createWave( notePlayHandle * _n )
 				/ 64.0f / engine::getSongEditor()->getTempo() :
 		0;
 	int word_index = _n->patternIndex() % m_words.size();
-	hdata->text = m_words[word_index].
-#ifndef QT3
-						toAscii().constData();
-#else
-						ascii();
-#endif
+	hdata->text = m_words[word_index].toAscii().constData();
 
 	s_thread->set_data( hdata );
 	s_thread->unlock_synth();
@@ -373,13 +333,8 @@ singerBot::synThread::synThread( void ) :
 	m_handle_semaphore( 1 ),
 	m_synth_semaphore( 1 )
 {
-#ifndef QT3
 	m_handle_semaphore.acquire();
 	m_synth_semaphore.acquire();
-#else
-	m_handle_semaphore++;
-	m_synth_semaphore++;
-#endif
 }
 
 
@@ -387,13 +342,8 @@ singerBot::synThread::synThread( void ) :
 
 singerBot::synThread::~synThread()
 {
-#ifndef QT3
 	m_handle_semaphore.release();
 	m_synth_semaphore.release();
-#else
-	m_handle_semaphore--;
-	m_synth_semaphore--;
-#endif
 }
 
 
@@ -424,11 +374,7 @@ void singerBot::synThread::run( void )
 
 	for( ; ; )
 	{
-#ifndef QT3
 		m_synth_semaphore.acquire();
-#else
-		m_synth_semaphore++;
-#endif
 		text_to_wave();
 		if( !m_data->wave )
 		{
@@ -439,11 +385,7 @@ void singerBot::synThread::run( void )
 				printf( "Unsupported frequency?\n" );
 			}
 		}
-#ifndef QT3
 		m_handle_semaphore.release();
-#else
-		m_handle_semaphore--;
-#endif
 	}
 }
 

@@ -1,7 +1,7 @@
 /*
  * midi_mapper.h - MIDI-mapper for any midiDevice
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,24 +26,12 @@
 #ifndef _MIDI_MAPPER_H
 #define _MIDI_MAPPER_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QPair>
 #include <QtCore/QFile>
 
-#else
-
-#include <qmap.h>
-#include <qpair.h>
-#include <qfile.h>
-
-#endif
-
-
 #include "types.h"
 #include "midi.h"
+
 
 const Uint8 MIDI_PROGRAMS = 128;
 const Uint8 MIDI_KEYS     = 128;

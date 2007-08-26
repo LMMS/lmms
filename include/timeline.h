@@ -26,18 +26,7 @@
 #ifndef _TIMELINE_H
 #define _TIMELINE_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "song_editor.h"
 

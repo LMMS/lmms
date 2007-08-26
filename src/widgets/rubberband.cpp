@@ -28,27 +28,11 @@
 
 #include "rubberband.h"
 
-#ifdef QT3
-
-#include <qbitmap.h>
-#include <qevent.h>
-#include <qobjectlist.h>
-#include <qpainter.h>
-
-#endif
-
 
 
 rubberBand::rubberBand( QWidget * _parent ) :
-#ifndef QT3
 	QRubberBand( Rectangle, _parent )
-#else
-	QWidget( _parent )
-#endif
 {
-#ifdef QT3
-	setBackgroundColor( QColor( 0, 64, 255 ) );
-#endif
 }
 
 
@@ -61,10 +45,10 @@ rubberBand::~rubberBand()
 
 
 
-vvector<selectableObject *> rubberBand::selectedObjects( void ) const
+QVector<selectableObject *> rubberBand::selectedObjects( void ) const
 {
-	vvector<selectableObject *> so = selectableObjects();
-	for( vvector<selectableObject *>::iterator it = so.begin();
+	QVector<selectableObject *> so = selectableObjects();
+	for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); )
 	{
 		if( ( *it )->isSelected() == FALSE )
@@ -84,12 +68,9 @@ vvector<selectableObject *> rubberBand::selectedObjects( void ) const
 
 void rubberBand::resizeEvent( QResizeEvent * _re )
 {
-	rubberBandBase::resizeEvent( _re );
-#ifdef QT3
-	updateMask();
-#endif
-	vvector<selectableObject *> so = selectableObjects();
-	for( vvector<selectableObject *>::iterator it = so.begin();
+	QRubberBand::resizeEvent( _re );
+	QVector<selectableObject *> so = selectableObjects();
+	for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 	{
 		( *it )->setSelected( QRect( pos(), size() ).intersects(
@@ -102,44 +83,14 @@ void rubberBand::resizeEvent( QResizeEvent * _re )
 
 
 
-#ifdef QT3
-
-bool rubberBand::event( QEvent * _e )
+QVector<selectableObject *> rubberBand::selectableObjects( void ) const
 {
-	bool ret = QWidget::event( _e );
-	if( isVisible() == TRUE )
-	{
-		raise();
-	}
-	return( ret );
-}
-
-
-
-
-void rubberBand::updateMask( void )
-{
-	QBitmap rb_mask( size(), TRUE );
-	QPainter p( &rb_mask );
-	p.setPen( Qt::color1 );
-	p.drawRect( 0, 0, width() - 1, height() - 1 );
-	p.end();
-	setMask( rb_mask );
-}
-
-#endif
-
-
-
-
-vvector<selectableObject *> rubberBand::selectableObjects( void ) const
-{
-	vvector<selectableObject *> so;
+	QVector<selectableObject *> so;
 	if( parentWidget() == NULL )
 	{
 		return( so );
 	}
-#ifndef QT3
+
 	QList<selectableObject *> l =
 			parentWidget()->findChildren<selectableObject *>();
 	for( QList<selectableObject *>::iterator it = l.begin(); it != l.end();
@@ -147,14 +98,6 @@ vvector<selectableObject *> rubberBand::selectableObjects( void ) const
 	{
 		so.push_back( *it );
 	}
-#else
-	QObjectList * l = parentWidget()->queryList( "selectableObject" );
-	for( QObjectListIt it = *l; it.current() != NULL; ++it )
-	{
-		so.push_back( static_cast<selectableObject *>( *it ) );
-	}
-	delete l;
-#endif
 	return( so );
 }
 

@@ -25,22 +25,12 @@
  */
 
 
+#include <Qt/QtXml>
+
 #include "journalling_object.h"
 #include "project_journal.h"
 #include "base64.h"
 #include "engine.h"
-
-#include "qt3support.h"
-
-#ifndef QT3
-
-#include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
 
 
 

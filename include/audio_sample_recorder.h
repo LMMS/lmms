@@ -29,20 +29,8 @@
 #define _AUDIO_SAMPLE_RECORDER_H
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QList>
 #include <QtCore/QPair>
-
-#else
-
-#include <qvaluelist.h>
-#include <qpair.h>
-
-#endif
-
 
 #include "audio_device.h"
 
@@ -67,7 +55,7 @@ private:
 						const fpp_t _frames,
 						const float _master_gain );
 
-	typedef vlist<QPair<sampleFrame *, fpp_t> > bufferList;
+	typedef QList<QPair<sampleFrame *, fpp_t> > bufferList;
 	bufferList m_buffers;
 
 } ;

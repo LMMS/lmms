@@ -1,7 +1,7 @@
 /*
  * spc_bg_hndl_widget.h - class specialBgHandlingWidget
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,20 +26,10 @@
 #ifndef _SPC_BG_HNDL_WIDGET_H
 #define _SPC_BG_HNDL_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-
-#endif
 
 
 class specialBgHandlingWidget
@@ -80,16 +70,10 @@ public:
 					const specialBgHandlingWidget *>( pw );
 			if( s->backgroundPixmap().isNull() == FALSE )
 			{
-#ifdef QT4
 				QPainter p( &pm );
 				p.drawPixmap( 0, 0, s->backgroundPixmap(),
 						_w->x(), _w->y(), _w->width(),
 						_w->height() );
-#else
-				bitBlt( &pm, 0, 0, &s->backgroundPixmap(),
-						_w->x(), _w->y(), _w->width(),
-						_w->height() );
-#endif
 			}
 			else
 			{
@@ -98,7 +82,6 @@ public:
 		}
 		else
 		{
-#ifdef QT4
 			QPainter p( &pm );
 			const QBrush & br = pw->palette().brush(
 							pw->backgroundRole() );
@@ -112,22 +95,6 @@ public:
 			{
 				pm.fill( br.color() );
 			}
-#else
-			const QPixmap * pbp = pw->paletteBackgroundPixmap();
-			if( pbp == NULL )
-			{
-				pbp = pw->erasePixmap();
-			}
-			if( pbp )
-			{
-				bitBlt( &pm, 0, 0, pbp, _w->x(), _w->y(),
-						_w->width(), _w->height() );
-			}
-			else
-			{
-				pm.fill( pw->paletteBackgroundColor() );
-			}
-#endif
 		}
 		return( pm );
 	}

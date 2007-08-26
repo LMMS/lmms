@@ -69,7 +69,6 @@ lmms_MOC =						\
 		./file_browser.moc			\
 		./group_box.moc				\
 		./kmultitabbar.moc			\
-		./kmultitabbar-qt3.moc			\
 		./knob.moc				\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
@@ -89,7 +88,6 @@ lmms_MOC =						\
 		./rack_plugin.moc			\
 		./rack_view.moc				\
 		./rubberband.moc			\
-		./qxembed.moc				\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
 		./sample_play_handle.moc		\
@@ -188,11 +186,11 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
-		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
 		$(srcdir)/src/lib/project_version.cpp			\
+		$(srcdir)/src/lib/base64.cpp				\
 		$(srcdir)/src/lib/embed.cpp				\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
@@ -226,7 +224,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/rack_plugin.cpp			\
 		$(srcdir)/src/widgets/rack_view.cpp			\
 		$(srcdir)/src/widgets/rubberband.cpp			\
-		$(srcdir)/src/widgets/qxembed.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
 		$(srcdir)/src/widgets/side_bar_widget.cpp		\
 		$(srcdir)/src/widgets/tab_bar.cpp			\
@@ -291,7 +288,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/gui_templates.h			\
 		$(srcdir)/include/surround_area.h			\
 		$(srcdir)/include/kmultitabbar.h			\
-		$(srcdir)/include/kmultitabbar-qt3.h			\
 		$(srcdir)/include/side_bar.h				\
 		$(srcdir)/include/side_bar_widget.h			\
 		$(srcdir)/include/track.h				\
@@ -312,7 +308,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/clipboard.h				\
 		$(srcdir)/include/types.h				\
 		$(srcdir)/include/update_event.h			\
-		$(srcdir)/include/qt3support.h				\
 		$(srcdir)/include/embed.h				\
 		$(srcdir)/include/timeline.h				\
 		$(srcdir)/include/config_mgr.h				\
@@ -374,9 +369,17 @@ lmms_SOURCES =								\
 		$(srcdir)/include/ladspa-1.1.h				\
 		$(srcdir)/include/sweep_oscillator.h			\
 		$(srcdir)/include/meter_dialog.h			\
-		$(srcdir)/include/qxembed.h				\
 		$(srcdir)/include/effect_lib.h				\
-		$(srcdir)/include/xqmap.h				\
+		$(srcdir)/plugins/ladspa_base/ladspa_base.cpp		\
+		$(srcdir)/plugins/ladspa_base/ladspa_port_dialog.cpp	\
+		$(srcdir)/plugins/ladspa_base/ladspa_2_lmms.cpp		\
+		$(srcdir)/plugins/ladspa_base/ladspa_manager.cpp	\
+		$(srcdir)/plugins/ladspa_base/ladspa_control.cpp	\
+		$(srcdir)/plugins/ladspa_base/ladspa_manager.h		\
+		$(srcdir)/plugins/ladspa_base/ladspa_2_lmms.h		\
+		$(srcdir)/plugins/ladspa_base/ladspa_control.h		\
+		$(srcdir)/plugins/ladspa_base/ladspa_port_dialog.h	\
+		$(srcdir)/plugins/ladspa_base/ladspa_base.h		\
 		$(THIRD_PARTY_CODE)
 
 

@@ -26,10 +26,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -41,23 +37,6 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
-
-#else
-
-#include <qfiledialog.h>
-#include <qdir.h>
-#include <qfile.h>
-#include <qapplication.h>
-#include <qdom.h>
-#include <qlineedit.h>
-#include <qbuttongroup.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qwhatsthis.h>
-#include <qmessagebox.h>
-
-#endif
 
 
 #include "instrument_track.h"
@@ -126,13 +105,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_baseTone( A ),
 	m_baseOctave( OCTAVE_4 ),
 	m_instrument( NULL ),
-#ifdef QT4
 	m_midiInputAction( NULL ),
 	m_midiOutputAction( NULL )
-#else
-	m_midiInputID( -1 ),
-	m_midiOutputID( -1 )
-#endif
 {
 	for( int i = 0; i < NOTES; ++i )
 	{
@@ -140,9 +114,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	}
 
 
-#ifdef QT4
 	engine::getMainWindow()->workspace()->addWindow( this );
-#endif
 
 	setAcceptDrops( TRUE );
 
@@ -162,12 +134,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_tswVolumeKnob->show();
 /*	connect( m_tswVolumeKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( volValueChanged( float ) ) );*/
-#ifdef QT4
-	m_tswVolumeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_tswVolumeKnob,
-#endif
-		tr( volume_help ) );
+	m_tswVolumeKnob->setWhatsThis( tr( volume_help ) );
 
 	QPushButton * tsw_midi = new QPushButton(
 				embed::getIconPixmap( "piano" ), QString::null,
@@ -200,11 +167,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	// init own layout + widgets
-#ifdef QT4
 	setFocusPolicy( Qt::StrongFocus );
-#else
-	setFocusPolicy( StrongFocus );
-#endif
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
@@ -231,12 +194,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOLUME" ) );
 
-#ifdef QT4
-	m_volumeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_volumeKnob,
-#endif
-		tr( volume_help ) );
+	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 /*	connect( m_volumeKnob, SIGNAL( valueChanged( float ) ), this,
 					SLOT( volValueChanged( float ) ) );*/
 	volumeKnob::linkObjects( m_tswVolumeKnob, m_volumeKnob );
@@ -247,12 +205,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "Surround area" ), this );
 	m_surroundArea->move( 20 + m_volumeKnob->width(), 38 );
 	m_surroundArea->show();
-#ifdef QT4
-	m_surroundArea->setWhatsThis(
-#else
-	QWhatsThis::add( m_surroundArea,
-#endif
-		tr( surroundarea_help ) );
+	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
 
 	connect( m_surroundArea, SIGNAL( valueChanged( const QPoint & ) ),
 			this,
@@ -282,11 +235,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 					SLOT( saveSettingsBtnClicked() ) );
 	toolTip::add( m_saveSettingsBtn, 
 		tr( "Save current channel settings in a preset-file" ) );
-#ifdef QT4
 	m_saveSettingsBtn->setWhatsThis(
-#else
-	QWhatsThis::add( m_saveSettingsBtn,
-#endif
 		tr( "Click here, if you want to save current channel settings "
 			"in a preset-file. Later you can load this preset by "
 			"double-clicking it in the preset-browser." ) );
@@ -320,7 +269,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	vlayout->addWidget( m_tabWidget );
 	vlayout->addWidget( m_pianoWidget );
 
-#ifdef QT4
 	if( m_midiWidget->m_readablePorts )
 	{
 		m_midiInputAction = m_tswMidiMenu->addMenu(
@@ -345,22 +293,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	}
 	m_midiInputAction->setText( tr( "MIDI input" ) );
 	m_midiOutputAction->setText( tr( "MIDI output" ) );
-#else
-	m_midiInputID = m_tswMidiMenu->insertItem( tr( "MIDI input" ),
-					m_midiWidget->m_readablePorts );
-	if( m_midiWidget->m_readablePorts == NULL )
-	{
-		m_tswMidiMenu->connectItem( m_midiInputID, this,
-						SLOT( midiInSelected() ) );
-	}
-	m_midiOutputID = m_tswMidiMenu->insertItem( tr( "MIDI output" ),
-					m_midiWidget->m_writeablePorts );
-	if( m_midiWidget->m_writeablePorts == NULL )
-	{
-		m_tswMidiMenu->connectItem( m_midiOutputID, this,
-						SLOT( midiOutSelected() ) );
-	}
-#endif
 	if( m_midiWidget->m_readablePorts == NULL ||
 					m_midiWidget->m_writeablePorts == NULL )
 	{
@@ -378,10 +310,9 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 
 	_tc->updateAfterTrackAdd();
-#ifndef QT3
+
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
-#endif
 
 }
 
@@ -406,14 +337,8 @@ instrumentTrack::~instrumentTrack()
 
 void instrumentTrack::saveSettingsBtnClicked( void )
 {
-#ifdef QT4
 	QFileDialog sfd( this, tr( "Save channel-settings in file" ), "",
 				tr( "Channel-Settings-File (*.cs.xml)" ) );
-#else
-	QFileDialog sfd( this, "", TRUE );
-	sfd.setWindowTitle( tr( "Save channel-settings in file" ) );
-	sfd.setFilter( tr( "Channel-Settings-File (*.cs.xml)" ) );
-#endif
 
 	QString preset_root = configManager::inst()->userPresetsDir();
 	if( !QDir( preset_root ).exists() )
@@ -428,11 +353,7 @@ void instrumentTrack::saveSettingsBtnClicked( void )
 	sfd.setDirectory( preset_root + instrumentName() );
 	sfd.setFileMode( QFileDialog::AnyFile );
 	if( sfd.exec () == QDialog::Accepted &&
-#ifdef QT4
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != ""
-#else
-		sfd.selectedFile() != ""
-#endif
 	)
 	{
 		multimediaProject mmp(
@@ -440,11 +361,7 @@ void instrumentTrack::saveSettingsBtnClicked( void )
 		QDomElement _this = mmp.createElement( nodeName() );
 		saveTrackSpecificSettings( mmp, _this );
 		mmp.content().appendChild( _this );
-#ifdef QT4
 		QString f = sfd.selectedFiles()[0];
-#else
-		QString f = sfd.selectedFile();
-#endif
 		mmp.writeFile( f );
 	}
 }
@@ -474,32 +391,18 @@ void instrumentTrack::activityIndicatorReleased( void )
 
 void instrumentTrack::midiInSelected( void )
 {
-#ifdef QT4
 	m_midiInputAction->setChecked( !m_midiInputAction->isChecked() );
 	m_midiWidget->m_receiveCheckBox->setChecked(
 					m_midiInputAction->isChecked() );
-#else
-	m_tswMidiMenu->setItemChecked( m_midiInputID,
-			!m_tswMidiMenu->isItemChecked( m_midiInputID ) );
-	m_midiWidget->m_receiveCheckBox->setChecked(
-			m_tswMidiMenu->isItemChecked( m_midiInputID ) );
-#endif
 }
 
 
 
 void instrumentTrack::midiOutSelected( void )
 {
-#ifdef QT4
 	m_midiOutputAction->setChecked( !m_midiOutputAction->isChecked() );
 	m_midiWidget->m_sendCheckBox->setChecked(
 					m_midiOutputAction->isChecked() );
-#else
-	m_tswMidiMenu->setItemChecked( m_midiOutputID,
-			!m_tswMidiMenu->isItemChecked( m_midiOutputID ) );
-	m_midiWidget->m_sendCheckBox->setChecked(
-			m_tswMidiMenu->isItemChecked( m_midiOutputID ) );
-#endif
 }
 
 
@@ -507,17 +410,10 @@ void instrumentTrack::midiOutSelected( void )
 
 void instrumentTrack::midiConfigChanged( bool )
 {
-#ifdef QT4
 	m_midiInputAction->setChecked(
 				m_midiWidget->m_receiveCheckBox->isChecked() );
 	m_midiOutputAction->setChecked(
 				m_midiWidget->m_sendCheckBox->isChecked() );
-#else
-	m_tswMidiMenu->setItemChecked( m_midiInputID,
-				m_midiWidget->m_receiveCheckBox->isChecked( ) );
-	m_tswMidiMenu->setItemChecked( m_midiOutputID,
-				m_midiWidget->m_sendCheckBox->isChecked( ) );
-#endif
 }
 
 
@@ -864,7 +760,7 @@ void instrumentTrack::setName( const QString & _new_name )
 {
 	// when changing name of channel, also change name of those patterns,
 	// which have the same name as the channel
-	for( csize i = 0; i < numOfTCOs(); ++i )
+	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		pattern * p = dynamic_cast<pattern *>( getTCO( i ) );
 		if( p != NULL && p->name() == m_name || p->name() == "" )
@@ -932,7 +828,7 @@ void instrumentTrack::setBaseNote( Uint32 _new_note, bool _modified )
 	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
 	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
 
-	for( vlist<notePlayHandle *>::iterator it = m_processHandles.begin();
+	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->updateFrequency();
@@ -988,7 +884,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 {
 	float frames_per_tact64th = engine::framesPerTact64th();
 
-	vlist<trackContentObject *> tcos;
+	QList<trackContentObject *> tcos;
 	bbTrack * bb_track;
 	if( _tco_num >= 0 )
 	{
@@ -1010,7 +906,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	}
 
 	// Handle automation: detuning
-	for( vlist<notePlayHandle *>::iterator it = m_processHandles.begin();
+	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->processMidiTime( _start );
@@ -1023,7 +919,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 
 	bool played_a_note = FALSE;	// will be return variable
 
-	for( vlist<trackContentObject *>::iterator it = tcos.begin();
+	for( QList<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 	{
 		pattern * p = dynamic_cast<pattern *>( *it );
@@ -1408,12 +1304,7 @@ void instrumentTrackButton::drawButtonLabel( QPainter * _p )
 	QString in = m_instrumentTrack->instrumentName() + ":";
 	int extra = isChecked() ? -1 : -3;
 	_p->setFont( pointSize<7>( _p->font() ) );
-#ifdef QT4
 	_p->setPen( QApplication::palette().buttonText().color() );
-#else
-	_p->setPen( QApplication::palette().color( QPalette::Normal,
-						QColorGroup::ButtonText ) );
-#endif
 	_p->drawText( ( width() - QFontMetrics( _p->font() ).width( in ) ) / 2 +
 					extra, height() / 2 + extra, in );
 	_p->setPen( QColor( 0, 0, 0 ) );

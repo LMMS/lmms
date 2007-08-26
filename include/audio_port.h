@@ -26,17 +26,7 @@
 #ifndef _AUDIO_PORT_H
 #define _AUDIO_PORT_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
-
-#else
-
-#include <qstring.h>
-
-#endif
 
 #include "effect_chain.h"
 

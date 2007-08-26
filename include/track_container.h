@@ -27,21 +27,9 @@
 #ifndef _TRACK_CONTAINER_H
 #define _TRACK_CONTAINER_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QScrollArea>
 #include <QtCore/QVector>
 #include <QtGui/QMainWindow>
-
-#else
-
-#include <qscrollview.h>
-#include <qvaluevector.h>
-#include <qmainwindow.h>
-
-#endif
 
 
 #include "track.h"
@@ -118,15 +106,15 @@ public:
 		return( m_rubberBand->isVisible() );
 	}
 
-	inline vvector<selectableObject *> selectedObjects( void )
+	inline QVector<selectableObject *> selectedObjects( void )
 	{
 		if( allowRubberband() == TRUE )
 		{
 			return( m_rubberBand->selectedObjects() );
 		}
-		//return( vvector<selectableObject *>() );
-		vvector<selectableObject *> foo;
-		return( foo );
+		return( QVector<selectableObject *>() );
+/*		QVector<selectableObject *> foo;
+		return( foo );*/
 	}
 
 	trackVector tracks( void );
@@ -184,7 +172,7 @@ private:
 
 
 	scrollArea * m_scrollArea;
-	typedef vvector<trackWidget *> trackWidgetVector; 
+	typedef QVector<trackWidget *> trackWidgetVector; 
 
 	trackWidgetVector m_trackWidgets;
 	float m_ppt;

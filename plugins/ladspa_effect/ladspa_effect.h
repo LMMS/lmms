@@ -25,12 +25,6 @@
 #ifndef _LADSPA_EFFECT_H
 #define _LADSPA_EFFECT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
 #include "effect.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
@@ -41,7 +35,7 @@
 #include "main_window.h"
 
 
-typedef vvector<port_desc_t *> multi_proc_t;
+typedef QVector<port_desc_t *> multi_proc_t;
 
 class ladspaEffect : public effect
 {
@@ -92,9 +86,9 @@ private:
 	fpp_t m_bufferSize;
 			
 	const LADSPA_Descriptor * m_descriptor;
-	vvector<LADSPA_Handle> m_handles;
+	QVector<LADSPA_Handle> m_handles;
 
-	vvector<multi_proc_t> m_ports;
+	QVector<multi_proc_t> m_ports;
 	multi_proc_t m_controls;
 } ;
 

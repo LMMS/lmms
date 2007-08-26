@@ -28,18 +28,7 @@
 #ifndef _SURROUND_AREA_H
 #define _SURROUND_AREA_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "mixer.h"
 

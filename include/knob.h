@@ -29,20 +29,8 @@
 #ifndef _KNOB_H
 #define _KNOB_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
-
-#else
-
-#include <qwidget.h>
-#include <qpoint.h>
-
-#endif
-
 
 #include "automatable_object.h"
 

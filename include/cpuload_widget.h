@@ -27,21 +27,9 @@
 #ifndef _CPULOAD_WIDGET_H
 #define _CPULOAD_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QTimer>
 #include <QtGui/QPixmap>
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-#include <qtimer.h>
-
-#endif
 
 #include "types.h"
 

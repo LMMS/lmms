@@ -137,9 +137,9 @@ void engine::updateFramesPerTact64th( void )
 
 void engine::load_extensions( void )
 {
-	vvector<plugin::descriptor> pluginDescriptors;
+	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( vvector<plugin::descriptor>::iterator it =
+	for( QVector<plugin::descriptor>::iterator it =
 						pluginDescriptors.begin();
 					it != pluginDescriptors.end(); ++it )
 	{

@@ -25,26 +25,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qpainter.h>
-#include <qapplication.h>
-#include <qlayout.h>
-#include <qtimer.h>
-#include <qdom.h>
-
-#endif
 
 
 #include "timeline.h"
@@ -110,10 +96,6 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	setFixedHeight( s_timeLinePixmap->height() );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
-
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 
 	m_pos.m_timeLine = this;
 
@@ -247,13 +229,7 @@ void timeLine::toggleBehaviourAtStop( int _n )
 
 void timeLine::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-
-	QPainter p( &draw_pm, this );
-#endif
 
 	for( int x = 0; x < width(); x += s_timeLinePixmap->width() )
 	{
@@ -290,11 +266,6 @@ void timeLine::paintEvent( QPaintEvent * )
 	}
 
 	p.drawPixmap( m_posMarkerX, 4, *s_posMarkerPixmap );
-
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 

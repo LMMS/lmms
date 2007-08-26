@@ -38,18 +38,7 @@
 
 #include <alsa/asoundlib.h>
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QThread>
-
-#else
-
-#include <qthread.h>
-
-#endif
-
 
 #include "midi_client.h"
 

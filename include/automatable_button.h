@@ -26,18 +26,7 @@
 #ifndef _AUTOMATABLE_BUTTON_H
 #define _AUTOMATABLE_BUTTON_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "automatable_object.h"
 
@@ -121,7 +110,7 @@ public:
 
 
 private:
-	vlist<automatableButton *> m_buttons;
+	QList<automatableButton *> m_buttons;
 
 
 signals:

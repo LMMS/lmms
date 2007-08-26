@@ -29,10 +29,6 @@
 #include <config.h>
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -46,34 +42,6 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QApplication>
 
-#else
-
-#include <qdir.h>
-#include <qdom.h>
-#include <qfile.h>
-#include <qmessagebox.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qfiledialog.h>
-#include <qbuttongroup.h>
-#include <qradiobutton.h>
-#include <qapplication.h>
-
-#define absolutePath absPath
-#define addButton insert
-
-#ifndef __USE_XOPEN_EXTENDED
-#define __USE_XOPEN_EXTENDED
-#endif
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#endif
-
 
 #include "config_mgr.h"
 #include "embed.h"
@@ -81,29 +49,11 @@
 
 
 
-void mkPath( const QString & _path )
+inline void mkPath( const QString & _path )
 {
-#ifdef QT4
+#warning TODO: directly integrate
 	// simple clean solution with Qt4...
 	QDir().mkpath( _path );
-#else
-	// ...but Qt3 needs additional code...
-	QDir d( _path );
-	vlist<QString> dirs;
-	dirs.push_front( _path );
-	QString dir = _path;
-	while( !QDir( dir ).exists() )
-	{
-		dir = dir.section( '/', 0, -2 );
-		dirs.push_front( dir );
-	}
-	while( !dirs.isEmpty() )
-	{
-		d.mkdir( dirs.front() );
-		d.setPath( dirs.front() );
-		dirs.erase( dirs.begin() );
-	}
-#endif
 }
 
 
@@ -160,25 +110,11 @@ configManager::configManager( void ) :
 	QDialog(),
 	m_lmmsRcFile( QDir::home().absolutePath() + "/.lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + "/lmms" ),
-#if QT_VERSION >= 0x030200
 	m_dataDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/share/lmms/" ),
-#else
-	// hardcode since qt < 3.2 doesn't know something like
-	// applicationDirPath and implementing own function would be senseless
-	// since real support for qt < 3.2 is senseless too ;-)
-	m_dataDir( "/usr/share/lmms/" ),
-#endif
 	m_artworkDir( defaultArtworkDir() ),
-#if QT_VERSION >= 0x030200
 	m_pluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
 							"/lib/lmms/" ),
-#else
-	// hardcode since qt < 3.2 doesn't know something like
-	// applicationDirPath and implementing own function would be senseless
-	// since real support for qt < 3.2 is senseless too ;-)
-	m_pluginDir( "/usr/lib/lmms" ),
-#endif
 	m_vstDir( QDir::home().absolutePath() ),
 	m_flDir( QDir::home().absolutePath() ),
 	m_currentPage( 0 ),
@@ -203,18 +139,14 @@ void configManager::createWidgets( void )
 	m_mainLayout->setMargin( 0 );
 	m_mainLayout->setSpacing( 10 );
 	m_mainLayout->addSpacing( 8 );
-#ifdef QT4
 	setLayout( m_mainLayout );
-#endif
 
 	m_contentWidget = new QWidget( this );
 	m_contentLayout = new QVBoxLayout( m_contentWidget );
 	m_contentLayout->setMargin( 0 );
 	m_contentLayout->setSpacing( 10 );
 	m_contentLayout->addSpacing( 8 );
-#ifdef QT4
 	m_contentWidget->setLayout( m_contentLayout );
-#endif
 	m_mainLayout->addWidget( m_contentWidget );
 	m_mainLayout->addSpacing( 8 );
 
@@ -235,9 +167,7 @@ void configManager::createWidgets( void )
 	m_buttonLayout->setMargin( 0 );
 	m_buttonLayout->setSpacing( 0 );
 	m_buttonLayout->addStretch( 1 );
-#ifdef QT4
 	button_widget->setLayout( m_buttonLayout );
-#endif
 
 	m_cancelButton = new QPushButton( tr( "&Cancel" ), button_widget );
 	m_backButton = new QPushButton( tr( "< &Back" ), button_widget );
@@ -270,9 +200,7 @@ void configManager::createWidgets( void )
 	QHBoxLayout * intro_layout = new QHBoxLayout( m_pageIntro );
 	intro_layout->setMargin( 0 );
 	intro_layout->setSpacing( 15 );
-#ifdef QT4
 	m_pageIntro->setLayout( intro_layout );
-#endif
 
 	QLabel * intro_logo_lbl = new QLabel( m_pageIntro );
 	intro_logo_lbl->setPixmap( embed::getIconPixmap( "wizard_intro" ) );
@@ -292,11 +220,7 @@ void configManager::createWidgets( void )
 						"Now click on 'Next' to get to "
 						"the next page." ),
 								m_pageIntro );
-#ifdef QT4
 	intro_txt_lbl->setWordWrap( TRUE );
-#else
-	intro_txt_lbl->setAlignment( intro_txt_lbl->alignment() | WordBreak );
-#endif
 
 	intro_layout->addWidget( intro_logo_lbl );
 	intro_layout->addWidget( intro_txt_lbl );
@@ -326,12 +250,7 @@ void configManager::createWidgets( void )
 					"projects, presets, samples etc.\n\n\n"
 					"Please select a directory:" ),
 					workingdir_content );
-#ifdef QT4
 	workingdir_txt_lbl->setWordWrap( TRUE );
-#else
-	workingdir_txt_lbl->setAlignment( workingdir_txt_lbl->alignment() |
-								WordBreak );
-#endif
 
 	QWidget * workingdir_input_fields = new QWidget( workingdir_content );
 	QHBoxLayout * workingdir_input_fields_layout = new QHBoxLayout(
@@ -413,7 +332,7 @@ void configManager::createWidgets( void )
 	samples_txt_lbl->setFixedWidth( 144 );
 
 	QButtonGroup * samples_bg = new QButtonGroup( samples_widget );
-#ifndef QT4
+#ifndef qt4
 	samples_bg->hide();
 #endif
 	m_samplesCopyRB = new QRadioButton( tr( "copy" ), samples_widget );
@@ -509,7 +428,7 @@ void configManager::createWidgets( void )
 	addPage( m_pageIntro, tr( "Welcome to LMMS" ) );
 	addPage( m_pageWorkingDir, tr( "Select working directory" ) );
 	//addPage( m_pageFiles, tr( "Copy or link files" ) );
-	switchPage( static_cast<csize>( 0 ) );
+	switchPage( static_cast<int>( 0 ) );
 }
 
 
@@ -517,15 +436,9 @@ void configManager::createWidgets( void )
 
 void configManager::openWorkingDir( void )
 {
-#ifdef QT4
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ),
 								m_workingDir );
-#else
-	QString new_dir = QFileDialog::getExistingDirectory( m_workingDir, 0, 0,
-					tr( "Choose LMMS working directory" ),
-									TRUE );
-#endif
 	if( new_dir != QString::null )
 	{
 		m_wdLineEdit->setText( new_dir );
@@ -595,12 +508,7 @@ void configManager::accept( void )
 	}
 	if( !QDir( m_workingDir ).exists() )
 	{
-		if( QMessageBox::
-#if QT_VERSION >= 0x030200
-				question
-#else
-				information
-#endif
+		if( QMessageBox::question
 				( 0, tr( "Directory not existing" ),
 						tr( "The directory you "
 							"specified does not "
@@ -659,24 +567,12 @@ void configManager::nextButtonClicked( void )
 
 
 
-void configManager::switchPage( csize _pg )
+void configManager::switchPage( int _pg )
 {
-#ifdef QT4
 	if( m_currentPage >= 0 && m_currentPage < m_pages.size() )
-#else
-	if( m_currentPage < m_pages.size() )
-#endif
 	{
 		m_pages[m_currentPage].first->hide();
-#ifdef QT4
 		m_contentLayout->removeWidget( m_pages[m_currentPage].first );
-#else
-#if QT_VERSION >= 0x030100
-		m_contentLayout->remove( m_pages[m_currentPage].first );
-#else
-		m_pages[m_currentPage].first->hide();
-#endif
-#endif
 	}
 	if( _pg < m_pages.size() )
 	{
@@ -707,7 +603,7 @@ void configManager::switchPage( csize _pg )
 
 void configManager::switchPage( QWidget * _pg )
 {
-	for( csize i = 0; i < m_pages.size(); ++i )
+	for( int i = 0; i < m_pages.size(); ++i )
 	{
 		if( m_pages[i].first == _pg )
 		{
@@ -731,16 +627,10 @@ void configManager::addPage( QWidget * _w, const QString & _title )
 
 void configManager::addRecentlyOpenedProject( const QString & _file )
 {
+	m_recentlyOpenedProjects.removeAll( _file );
 	if( m_recentlyOpenedProjects.size() > 15 )
 	{
-		m_recentlyOpenedProjects.remove(
-					m_recentlyOpenedProjects.last() );
-	}
-	QStringList::iterator it;
-	while( ( it = m_recentlyOpenedProjects.find( _file ) ) !=
-					m_recentlyOpenedProjects.end() )
-	{
-		m_recentlyOpenedProjects.remove( it );
+		m_recentlyOpenedProjects.removeLast();
 	}
 	m_recentlyOpenedProjects.push_front( _file );
 }
@@ -802,17 +692,9 @@ bool configManager::loadConfigFile( void )
 
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
-#ifdef QT4
 	if( !cfg_file.open( QIODevice::ReadOnly ) )
-#else
-	if( !cfg_file.open( IO_ReadOnly ) )
-#endif
 	{
-#ifdef QT4
 		if( !( exec() && cfg_file.open( QIODevice::ReadOnly ) ) )
-#else
-		if( !( exec() && cfg_file.open( IO_ReadOnly ) ) )
-#endif
 		{
 			return( FALSE );
 		}
@@ -852,7 +734,7 @@ bool configManager::loadConfigFile( void )
 			stringPairVector attr;
 			QDomNamedNodeMap node_attr =
 						node.toElement().attributes();
-			for( csize i = 0; i < node_attr.count(); ++i )
+			for( int i = 0; i < node_attr.count(); ++i )
 			{
 				QDomNode n = node_attr.item( i );
 				if( n.isAttr() )
@@ -934,12 +816,7 @@ bool configManager::loadConfigFile( void )
 		QString cfg_file_ver = root.toElement().attribute( "version" );
 		if( ( cfg_file_ver.length() == 0 || cfg_file_ver != VERSION ) &&
 				value( "app", "nowizard" ).toInt() == FALSE &&
-			QMessageBox::
-#if QT_VERSION >= 0x030200
-				question
-#else
-				information
-#endif
+			QMessageBox::question
 				( 0, tr( "Version mismatches" ),
 					tr( "Accordingly to the information in "
 						"your LMMS-configuration-file "
@@ -1011,18 +888,10 @@ void configManager::saveConfigFile( void )
 	}
 	lmms_config.appendChild( recent_files );
 
-#if QT_VERSION >= 0x030100
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString( 2 );
-#else
-	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString();
-#endif
 
 	QFile outfile( m_lmmsRcFile );
-#ifdef QT4
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
-#else
-	if( !outfile.open( IO_WriteOnly | IO_Truncate ) )
-#endif
 	{
 		QMessageBox::critical( NULL, tr( "Could not save config-file" ),
 					tr( "Could not save configuration "
@@ -1036,12 +905,7 @@ void configManager::saveConfigFile( void )
 		return;
 	}
 
-#ifdef QT4
 	outfile.write( xml.toUtf8().constData(), xml.length() );
-#else
-	QCString xml_utf8 = xml.utf8();
-	outfile.writeBlock( xml_utf8.data(), xml_utf8.length() );
-#endif
 	outfile.close();
 }
 

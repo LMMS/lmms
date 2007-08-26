@@ -30,21 +30,9 @@
 #include <config.h>
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPixmap>
 #include <QtCore/QVector>
 #include <QtCore/QPair>
-
-#else
-
-#include <qpixmap.h>
-#include <qvaluevector.h>
-#include <qpair.h>
-
-#endif
 
 #include "tool_button.h"
 
@@ -81,7 +69,7 @@ protected:
 
 
 private:
-	vvector<QPair<QPixmap, QString> > m_states;
+	QVector<QPair<QPixmap, QString> > m_states;
 	QString m_generalToolTip;
 
 	int m_curState;

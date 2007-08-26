@@ -26,37 +26,16 @@
 #ifndef _FILE_BROWSER_H
 #define _FILE_BROWSER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
-
-#else
-
-#include <qlistview.h>
-#include <qdir.h>
-#include <qmutex.h>
-
-#define cleanPath cleanDirPath
-
-#endif
+class QColorGroup;
+#include <Qt3Support/Q3ListView>
 
 
 #include "side_bar_widget.h"
 
 
-#ifndef QT3
 class QListViewItem;
-#else
-class Q3ListViewItem;
-#endif
 class QPixmap;
 
 class fileItem;
@@ -138,16 +117,7 @@ private:
 
 
 
-class directory :
-#ifndef QT3
-	public Q3ListViewItem
-// trick moc
-#if 0
-		,
-#endif
-#else
-	public QListViewItem
-#endif
+class directory : public Q3ListViewItem
 {
 public:
 	directory( Q3ListView * _parent, const QString & _filename,
@@ -182,7 +152,7 @@ public:
 
 private:
 	void initPixmapStuff( void );
-	void FASTCALL setPixmap( const QPixmap * _px );
+	void setPixmap( const QPixmap * _px );
 
 	bool addItems( const QString & _path );
 
@@ -201,27 +171,13 @@ private:
 
 
 
-class fileItem :
-#ifndef QT3
-	public Q3ListViewItem
-// trick moc
-#if 0
-		,
-#endif
-#else
-	public QListViewItem
-#endif
+class fileItem : public Q3ListViewItem
 {
 public:
 	fileItem( Q3ListView * _parent, const QString & _name,
 							const QString & _path );
-#ifndef QT3
 	fileItem( Q3ListViewItem * _parent, const QString & _name,
 							const QString & _path );
-#else
-	fileItem( QListViewItem * _parent, const QString & _name,
-							const QString & _path );
-#endif
 
 	inline QString fullName( void ) const
 	{
@@ -264,10 +220,6 @@ private:
 	fileTypes m_type;
 } ;
 
-
-#ifdef QT3
-#undef cleanPath
-#endif
 
 
 #endif

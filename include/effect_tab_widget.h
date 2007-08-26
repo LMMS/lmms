@@ -27,27 +27,9 @@
 #ifndef _EFFECT_TAB_WIDGET_H
 #define _EFFECT_TAB_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QLayout>
-
-#else
-
-#include <qwidget.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qscrollview.h>
-#include <qvbox.h>
-
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include "journalling_object.h"
 #include "rack_view.h"

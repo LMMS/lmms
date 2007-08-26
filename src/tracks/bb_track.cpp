@@ -25,23 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QColorDialog>
 #include <QtGui/QMenu>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qdom.h>
-#include <qpainter.h>
-#include <qcolordialog.h>
-#include <qpopupmenu.h>
-
-#endif
 
 
 #include "bb_track.h"
@@ -67,9 +54,6 @@ bbTCO::bbTCO( track * _track, const QColor & _c ) :
 								QString( "" ) ),
 	m_color( _c.isValid() ? _c : QColor( 64, 128, 255 ) )
 {
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	tact t = engine::getBBEditor()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
@@ -92,29 +76,14 @@ bbTCO::~bbTCO()
 
 void bbTCO::constructContextMenu( QMenu * _cm )
 {
-#ifdef QT4
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
 					tr( "Open in Beat+Baseline-Editor" ),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ), this,
 					SLOT( openInBBEditor( bool ) ) );
-#else
-	_cm->insertItem( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Baseline-Editor" ),
-					this, SLOT( openInBBEditor() ),
-								0, -1, 0 );
-#endif
-#ifdef QT4
 	_cm->insertSeparator( _cm->actions()[1] );
-#else
-	_cm->insertSeparator( 1 );
-#endif
-#ifdef QT4
 	_cm->addSeparator();
-#else
-	_cm->insertSeparator();
-#endif
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
 	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
@@ -146,26 +115,12 @@ void bbTCO::paintEvent( QPaintEvent * )
 		col = QColor( tMax( col.red() - 128, 0 ),
 					tMax( col.green() - 128, 0 ), 255 );
 	}
-#ifdef QT4
 	QPainter p( this );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	lingrad.setColorAt( 0, col.light( 130 ) );
 	lingrad.setColorAt( 1, col.light( 70 ) );
 	p.fillRect( rect(), lingrad );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	// and a painter for it
-	QPainter p( &pm );
-
-	// COOL gradient ;-)
-	for( int y = 1; y < height() - 1; ++y )
-	{
-		p.setPen( col.light( 130 - y * 60 / height() ) );
-		p.drawLine( 1, y, width() - 1, y );
-	}
-#endif
 
 	tact t = engine::getBBEditor()->lengthOfBB( bbTrack::numOfBBTrack(
 								getTrack() ) );
@@ -183,11 +138,7 @@ void bbTCO::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( col.dark() );
-#ifndef QT3
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-#else
-	p.drawRect( rect() );
-#endif
 
 	p.setFont( pointSize<7>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );
@@ -198,10 +149,6 @@ void bbTCO::paintEvent( QPaintEvent * )
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
 				embed::getIconPixmap( "muted", 16, 16 ) );
 	}
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -297,9 +244,9 @@ void bbTCO::changeColor( void )
 	}
 	if( isSelected() )
 	{
-		vvector<selectableObject *> selected =
+		QVector<selectableObject *> selected =
 				engine::getSongEditor()->selectedObjects();
-		for( vvector<selectableObject *>::iterator it =
+		for( QVector<selectableObject *>::iterator it =
 							selected.begin();
 						it != selected.end(); ++it )
 		{
@@ -341,7 +288,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	// too), so disable it
 	getTrackWidget()->setAcceptDrops( FALSE );
 
-	csize bbNum = s_infoMap.size();
+	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
 	m_trackLabel = new nameLabel( tr( "Beat/Baseline %1" ).arg( bbNum ),
@@ -371,22 +318,15 @@ bbTrack::~bbTrack()
 {
 	engine::getMixer()->removePlayHandles( this );
 
-	csize bb = s_infoMap[this];
+	int bb = s_infoMap[this];
 	engine::getBBEditor()->removeBB( bb );
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-#ifdef QT4
 		if( it.value() > bb )
 		{
 			--it.value();
 		}
-#else
-		if( it.data() > bb )
-		{
-			--it.data();
-		}
-#endif
 	}
 	s_infoMap.remove( this );
 	engine::getBBEditor()->updateComboBox();
@@ -417,7 +357,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 							s_infoMap[this] ) );
 	}
 
-	vlist<trackContentObject *> tcos;
+	QList<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start + static_cast<Sint32>( _frames /
 						engine::framesPerTact64th() ) );
 
@@ -428,7 +368,7 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 
 	midiTime lastPosition;
 	midiTime lastLen;
-	for( vlist<trackContentObject *>::iterator it = tcos.begin();
+	for( QList<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 	{
 		if( !( *it )->muted() &&
@@ -456,7 +396,7 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 	// if we're creating a new bbTCO, we colorize it according to the
 	// previous bbTCO, so we have to get all TCOs from 0 to _pos and
 	// pickup the last and take the color if it
-	vlist<trackContentObject *> tcos;
+	QList<trackContentObject *> tcos;
 	getTCOsInRange( tcos, 0, _pos );
 	if( tcos.size() > 0 && dynamic_cast<bbTCO *>( tcos.back() ) != NULL )
 	{
@@ -546,16 +486,12 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 // return pointer to bbTrack specified by _bb_num
-bbTrack * bbTrack::findBBTrack( csize _bb_num )
+bbTrack * bbTrack::findBBTrack( int _bb_num )
 {
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-#ifdef QT4
 		if( it.value() == _bb_num )
-#else
-		if( it.data() == _bb_num )
-#endif
 		{
 			return( it.key() );
 		}
@@ -566,7 +502,7 @@ bbTrack * bbTrack::findBBTrack( csize _bb_num )
 
 
 
-csize bbTrack::numOfBBTrack( track * _track )
+int bbTrack::numOfBBTrack( track * _track )
 {
 	if( dynamic_cast<bbTrack *>( _track ) != NULL )
 	{

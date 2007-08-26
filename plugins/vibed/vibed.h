@@ -23,8 +23,6 @@
 #ifndef _VIBED_STRINGS_H
 #define _VIBED_STRINGS_H
 
-#include "qt3support.h"
-
 #include "instrument.h"
 #include "sample_buffer.h"
 #include "graph.h"
@@ -64,17 +62,17 @@ public slots:
 	void displayHelp( void );
 		
 private:
-	vlist<knob*> m_pickKnobs;
-	vlist<knob*> m_pickupKnobs;
-	vlist<knob*> m_stiffnessKnobs;
-	vlist<volumeKnob*> m_volumeKnobs;
-	vlist<knob*> m_panKnobs;
-	vlist<knob*> m_detuneKnobs;
-	vlist<knob*> m_randomKnobs;
-	vlist<knob*> m_lengthKnobs;
-	vlist<impulseEditor*> m_editors;
-	vlist<ledCheckBox*> m_impulses;
-	vlist<nineButtonSelector*> m_harmonics;
+	QList<knob*> m_pickKnobs;
+	QList<knob*> m_pickupKnobs;
+	QList<knob*> m_stiffnessKnobs;
+	QList<volumeKnob*> m_volumeKnobs;
+	QList<knob*> m_panKnobs;
+	QList<knob*> m_detuneKnobs;
+	QList<knob*> m_randomKnobs;
+	QList<knob*> m_lengthKnobs;
+	QList<impulseEditor*> m_editors;
+	QList<ledCheckBox*> m_impulses;
+	QList<nineButtonSelector*> m_harmonics;
 	
 	knob * m_pickKnob;
 	knob * m_pickupKnob;

@@ -26,18 +26,7 @@
 #ifndef _PIXMAP_BUTTON_H
 #define _PIXMAP_BUTTON_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qpixmap.h>
-
-#endif
-
 
 #include "automatable_button.h"
 

@@ -26,26 +26,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QDropEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 
-#else
-
-#include <qpushbutton.h>
-#include <qpainter.h>
-#include <qdom.h>
-#include <qwhatsthis.h>
-
-#endif
-
 #include "effect_label.h"
-
 #include "sample_track.h"
 #include "song_editor.h"
 #include "embed.h"
@@ -64,10 +50,6 @@ sampleTCO::sampleTCO( track * _track ) :
 	trackContentObject( _track ),
 	m_sampleBuffer( new sampleBuffer )
 {
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
-
 	saveJournallingState( FALSE );
 	setSampleFile( "" );
 	restoreJournallingState();
@@ -181,11 +163,10 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 
 void sampleTCO::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
 #warning TODO: set according brush for gradient!
 	p.fillRect( _pe->rect(), QColor( 64, 64, 64 ) );
-#else
+#if 0
 	// create pixmap for our widget
 	QPixmap pm( _pe->rect().size() );
 	// and a painter for it
@@ -233,10 +214,6 @@ void sampleTCO::paintEvent( QPaintEvent * _pe )
 	{
 		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
 	}
-
-#ifndef QT4
-	bitBlt( this, _pe->rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -385,11 +362,7 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_volumeKnob->move( 4, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-#ifdef QT4
 	m_volumeKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_volumeKnob,
-#endif
 		tr( "With this knob you can set "
 			"the volume of the opened "
 			"channel." ) ); 
@@ -427,7 +400,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 	m_audioPort->getEffects()->startRunning();
 	bool played_a_note = FALSE;	// will be return variable
 
-	for( csize i = 0; i < numOfTCOs(); ++i )
+	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		trackContentObject * tco = getTCO( i );
 		if( tco->startPosition() != _start )

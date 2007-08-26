@@ -26,20 +26,8 @@
 #ifndef _VISUALIZATION_WIDGET
 #define _VISUALIZATION_WIDGET
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-
-#endif
-
 
 #include "mixer.h"
 

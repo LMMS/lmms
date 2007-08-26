@@ -23,20 +23,8 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLayout>
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-#include <qlayout.h>
-
-#endif
-
 
 #include "kicker.h"
 #include "engine.h"
@@ -115,15 +103,12 @@ kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 	hl->addWidget( m_gainKnob );
 
 	vl->addLayout( hl );
-#ifdef QT4
+
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 }
 
 

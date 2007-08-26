@@ -27,21 +27,7 @@
 #ifndef _PLAY_HANDLE_H
 #define _PLAY_HANDLE_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QVector>
-
-#else
-
-#include <qvaluevector.h>
-
-#endif
 
 #include "types.h"
 
@@ -109,8 +95,8 @@ private:
 } ;
 
 
-typedef vvector<playHandle *> playHandleVector;
-typedef vvector<const playHandle *> constPlayHandleVector;
+typedef QVector<playHandle *> playHandleVector;
+typedef QVector<const playHandle *> constPlayHandleVector;
 
 
 #endif

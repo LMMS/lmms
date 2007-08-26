@@ -26,17 +26,7 @@
 #ifndef _GROUP_BOX_H
 #define _GROUP_BOX_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
 
 #include "pixmap_button.h"
 

@@ -1,7 +1,7 @@
 /*
  * about_dialog.h - declaration of class aboutDialog
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,18 +26,7 @@
 #ifndef _ABOUT_DIALOG_H
 #define _ABOUT_DIALOG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
 
 class QPushButton;
 class QLabel;

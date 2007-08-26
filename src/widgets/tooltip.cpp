@@ -25,17 +25,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QToolTip>
-
-#else
-
-#include <qtooltip.h>
-
-#endif
 
 #include "tooltip.h"
 #include "config_mgr.h"
@@ -45,11 +35,7 @@ void toolTip::add( QWidget * _w, const QString & _txt )
 {
 	if( !configManager::inst()->value( "tooltips", "disabled" ).toInt() )
 	{
-#ifdef QT4
 		//_w->setToolTip( _txt );
-#else
-		QToolTip::add( _w, _txt );
-#endif
 	}
 }
 

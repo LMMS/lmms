@@ -30,22 +30,9 @@
 
 #ifdef OSS_SUPPORT
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QFileInfo>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
-
-#else
-
-#include <qfileinfo.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-
-#endif
-
 
 #include "endian_handling.h"
 #include "lcd_spinbox.h"
@@ -102,13 +89,7 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
 {
 	_success_ful = FALSE;
 
-	m_audioFD = open(
-#ifdef QT4
-				probeDevice().toAscii().constData(),
-#else
-				probeDevice().ascii(),
-#endif
-				O_WRONLY, 0 );
+	m_audioFD = open( probeDevice().toAscii().constData(), O_WRONLY, 0 );
 
 	if( m_audioFD == -1 )
 	{
@@ -286,15 +267,7 @@ void audioOSS::startProcessing( void )
 {
 	if( !isRunning() )
 	{
-		start(
-#ifdef QT4
-			QThread::HighPriority
-#else
-#if QT_VERSION >= 0x030505
-			QThread::HighestPriority
-#endif
-#endif
-							);
+		start( QThread::HighPriority );
 	}
 }
 

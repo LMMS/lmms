@@ -28,18 +28,8 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
-
 
 #include "lb302.h"
 #include "engine.h"
@@ -437,15 +427,11 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     connect( wave_knob, SIGNAL( valueChanged(float) ),
             this, SLOT ( waveChanged( float )));
 
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 
 
     // SYNTH

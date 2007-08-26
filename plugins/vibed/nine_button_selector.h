@@ -24,7 +24,6 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include "qt3support.h"
 #include "config.h"
 #include "types.h"
 #include "pixmap_button.h"
@@ -79,7 +78,7 @@ signals:
 	void nineButtonSelection( Uint8 );
 	
 private:
-	vlist<pixmapButton *> m_buttons;
+	QList<pixmapButton *> m_buttons;
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
 	QPixmap m_base;

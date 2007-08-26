@@ -28,18 +28,7 @@
 #ifndef _ENVELOPE_TAB_WIDGET_H
 #define _ENVELOPE_TAB_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "mixer.h"
 

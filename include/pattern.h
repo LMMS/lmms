@@ -27,25 +27,11 @@
 #ifndef _PATTERN_H
 #define _PATTERN_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QVector>
 #include <QtGui/QWidget>
 #include <QtGui/QDialog>
 #include <QtCore/QThread>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qvaluevector.h>
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qthread.h>
-#include <qpixmap.h>
-
-#endif
 
 
 #include "note.h"

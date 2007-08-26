@@ -26,22 +26,8 @@
 #ifndef _EFFECT_SELECT_DIALOG_H
 #define _EFFECT_SELECT_DIALOG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
 #include <Qt3Support/Q3ListBox>
-#define QListBoxItem Q3ListBoxItem
-
-#else
-
-#include <qdialog.h>
-#include <qlistbox.h>
-
-#define Q3ListBox QListBox
-
-#endif
 
 #include "effect.h"
 
@@ -94,11 +80,11 @@ protected:
 protected slots:
 	void onHighlighted( int _plugin );
 	void onAddButtonReleased();
-	void onDoubleClicked( QListBoxItem * _item );
+	void onDoubleClicked( Q3ListBoxItem * _item );
 	
 
 private:
-	vvector<plugin::descriptor> m_pluginDescriptors;
+	QVector<plugin::descriptor> m_pluginDescriptors;
 	effectKeyList m_effectKeys;
 	effectKey m_currentSelection;
 	

@@ -26,20 +26,8 @@
 #ifndef _FADE_BUTTON_H
 #define _FADE_BUTTON_H 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QAbstractButton>
 #include <QtGui/QColor>
-
-#else
-
-#include <qbutton.h>
-#include <qcolor.h>
-
-#endif
-
 
 
 class fadeButton : public QAbstractButton
@@ -58,11 +46,7 @@ public slots:
 
 
 protected:
-#ifndef QT3
 	virtual void customEvent( QEvent * );
-#else
-	virtual void customEvent( QCustomEvent * );
-#endif
 	virtual void paintEvent( QPaintEvent * _pe );
 
 

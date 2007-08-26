@@ -22,9 +22,6 @@
  *
  */
  
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <QtCore/QPoint>
 #include <Qt/QtXml>
@@ -32,18 +29,6 @@
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
-
-#else
-
-#include <qpoint.h>
-#include <qdom.h>
-#include <qmap.h>
-#include <qwhatsthis.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-
-#endif
 
 #include "impulse_editor.h"
 #include "embed.h"
@@ -63,15 +48,11 @@ impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, track * _track,
 {
 	setFixedSize( 153, 124 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
-#ifndef QT3
 	setAutoFillBackground( TRUE );
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), m_base );
 	setPalette( pal );
-#else
-	setPaletteBackgroundPixmap( m_base );
-#endif
-	
+
 	m_graph = new graph( this );
 	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );
 	m_graph->move( 0, 0 );	
@@ -458,9 +439,9 @@ void impulseEditor::setOn( bool _on )
 void impulseEditor::contextMenuEvent( QContextMenuEvent * )
 {
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: css-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( "Impulse Editor" ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -477,13 +458,8 @@ void impulseEditor::contextMenuEvent( QContextMenuEvent * )
 
 void impulseEditor::displayHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-			      whatsThis() );
-#else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal(
-						rect().bottomRight() ) );
-#endif
+							      whatsThis() );
 }
 
 

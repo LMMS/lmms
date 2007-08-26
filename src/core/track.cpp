@@ -26,26 +26,11 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
-
-#else
-
-#include <qapplication.h>
-#include <qdom.h>
-#include <qpopupmenu.h>
-#include <qlayout.h>
-#include <qcursor.h>
-#include <qwhatsthis.h>
-
-#endif
 
 
 #include "track.h"
@@ -87,11 +72,7 @@ textFloat * trackContentObject::s_textFloat = NULL;
 // trackContentObject
 // ===========================================================================
 trackContentObject::trackContentObject( track * _track ) :
-	selectableObject( _track->getTrackContentWidget()
-#ifdef QT3
-		, Qt::WDestructiveClose
-#endif
- 		),
+	selectableObject( _track->getTrackContentWidget() ),
 	m_track( _track ),
 	m_startPosition(),
 	m_length(),
@@ -107,12 +88,8 @@ trackContentObject::trackContentObject( track * _track ) :
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
-#ifdef QT4
 	setAttribute( Qt::WA_DeleteOnClose );
 	setFocusPolicy( Qt::StrongFocus );
-#else
-	setFocusPolicy( StrongFocus );
-#endif
 	show();
 
 	setJournalling( FALSE );
@@ -259,17 +236,10 @@ void trackContentObject::mousePressEvent( QMouseEvent * _me )
 		// start drag-action
 		multimediaProject mmp( multimediaProject::DRAG_N_DROP_DATA );
 		saveState( mmp, mmp.content() );
-#ifdef QT4
 		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
 						128, 128,
 						Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-#else
-		QSize s( size() );
-		s.scale( 128, 128, QSize::ScaleMin );
-		QPixmap thumbnail = QPixmap::grabWidget( this ).
-					convertToImage().smoothScale( s );
-#endif
 		new stringPairDrag( QString( "tco_%1" ).arg( m_track->type() ),
 					mmp.toString(), thumbnail, this );
 	}
@@ -361,13 +331,13 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 	else if( m_action == MOVE_SELECTION )
 	{
 		const int dx = _me->x() - m_initialMouseX;
-		vvector<selectableObject *> so =
+		QVector<selectableObject *> so =
 				m_track->getTrackContainer()->selectedObjects();
-		vvector<trackContentObject *> tcos;
+		QVector<trackContentObject *> tcos;
 		midiTime smallest_pos;
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
-		for( vvector<selectableObject *>::iterator it = so.begin();
+		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
 			trackContentObject * tco =
@@ -381,7 +351,7 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 					(Sint32)tco->startPosition() +
 					static_cast<int>( dx * 64 / ppt ) );
 		}
-		for( vvector<trackContentObject *>::iterator it = tcos.begin();
+		for( QVector<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
 			( *it )->movePosition( ( *it )->startPosition() +
@@ -454,10 +424,6 @@ void trackContentObject::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-
-#ifdef QT3
-#define addSeparator insertSeparator
-#endif
 
 void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 {
@@ -596,14 +562,10 @@ trackContentWidget::trackContentWidget( trackWidget * _parent ) :
 	QWidget( _parent ),
 	m_trackWidget( _parent )
 {
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( backgroundRole(), QColor( 96, 96, 96 ) );
 	setPalette( pal );
-#else
-	setPaletteBackgroundColor( QColor( 96, 96, 96 ) );
-#endif
 	setAcceptDrops( TRUE );
 }
 
@@ -617,7 +579,7 @@ trackContentWidget::~trackContentWidget()
 
 
 
-trackContentObject * trackContentWidget::getTCO( csize _tco_num )
+trackContentObject * trackContentWidget::getTCO( int _tco_num )
 {
 	if( _tco_num < m_trackContentObjects.size() )
 	{
@@ -632,7 +594,7 @@ trackContentObject * trackContentWidget::getTCO( csize _tco_num )
 
 
 
-csize trackContentWidget::numOfTCOs( void )
+int trackContentWidget::numOfTCOs( void )
 {
 	return( m_trackContentObjects.size() );
 }
@@ -660,7 +622,7 @@ trackContentObject * trackContentWidget::addTCO( trackContentObject * _tco )
 
 
 
-void trackContentWidget::removeTCO( csize _tco_num, bool _also_delete )
+void trackContentWidget::removeTCO( int _tco_num, bool _also_delete )
 {
 	removeTCO( getTCO( _tco_num ), _also_delete );
 }
@@ -708,7 +670,7 @@ void trackContentWidget::removeAllTCOs( void )
 
 
 
-void trackContentWidget::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
+void trackContentWidget::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 {
 	// TODO: range-checking
 	qSwap( m_trackContentObjects[_tco_num1],
@@ -850,17 +812,8 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 96, 96, 96 ) );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	pm.fill( QColor( 96, 96, 96 ) );
-
-	// and a painter for it
-	QPainter p( &pm );
-#endif
 	const trackContainer * tc = getTrack()->getTrackContainer();
 	const int offset = (int)( ( tc->currentPosition() % 4 ) *
 							tc->pixelsPerTact() );
@@ -870,11 +823,6 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 	{
 		p.drawLine( x, 0, x, height() );
 	}
-
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -1008,11 +956,7 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 						SLOT( setMuted( bool ) ) );
 	connect( m_muteBtn, SIGNAL( clickedRight() ), this,
 					SLOT( muteBtnRightClicked() ) );
-#ifdef QT4
 	m_muteBtn->setWhatsThis(
-#else
-	QWhatsThis::add( m_muteBtn,
-#endif
 		tr( "With this switch you can either mute this track or mute "
 			"all other tracks.\nBy clicking left, this track is "
 			"muted. This is useful, if you only want to listen to "
@@ -1077,17 +1021,8 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 
 void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 128, 128, 128 ) );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	pm.fill( QColor( 128, 128, 128 ) );
-
-	// and a painter for it
-	QPainter p( &pm );
-#endif
 	if( m_trackWidget->isMovingTrack() == FALSE )
 	{
 		p.drawPixmap( 2, 2, *s_grip );
@@ -1110,13 +1045,8 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 				mute_active_icon = "mute_on";
 				mute_inactive_icon = "mute_off";
 			}
-#ifndef QT3
 			m_trackOps->setIcon( embed::getIconPixmap(
 							trackOps_icon ) );
-#else
-			m_trackOps->setIconSet( embed::getIconPixmap(
-							trackOps_icon ) );
-#endif
 			m_muteBtn->setActiveGraphic( embed::getIconPixmap(
 							mute_active_icon ) );
 			m_muteBtn->setInactiveGraphic( embed::getIconPixmap(
@@ -1130,11 +1060,6 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 		m_trackOps->hide();
 		m_muteBtn->hide();
 	}
-
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -1184,12 +1109,7 @@ void trackOperationsWidget::muteBtnRightClicked( void )
 
 void trackOperationsWidget::updateMenu( void )
 {
-	QMenu * to_menu = m_trackOps->
-#ifndef QT3
-					menu();
-#else
-					popup();
-#endif
+	QMenu * to_menu = m_trackOps->menu();
 	to_menu->clear();
 	if( inBBEditor() )
 	{
@@ -1271,31 +1191,18 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 	m_trackContentWidget( this ),
 	m_action( NONE )
 {
-#ifdef QT4
 	m_trackOperationsWidget.setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setColor( m_trackOperationsWidget.backgroundRole(),
 						QColor( 128, 128, 128 ) );
 	m_trackOperationsWidget.setPalette( pal );
-#else
-	m_trackOperationsWidget.setPaletteBackgroundColor(
-						QColor( 128, 128, 128 ) );
-#endif
 
 
-
-#ifdef QT4
 	m_trackSettingsWidget.setAutoFillBackground( TRUE );
 	pal.setColor( m_trackSettingsWidget.backgroundRole(),
 							QColor( 64, 64, 64 ) );
 	m_trackSettingsWidget.setPalette( pal );
-#else
-	m_trackSettingsWidget.setPaletteBackgroundColor( QColor( 64, 64, 64 ) );
 
-
-	// set background-mode for flicker-free redraw
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setAcceptDrops( TRUE );
 }
 
@@ -1340,9 +1247,9 @@ void trackWidget::changePosition( const midiTime & _new_pos )
 	const Sint32 begin = pos;
 	const Sint32 end = endPosition( pos );
 	const float ppt = m_track->getTrackContainer()->pixelsPerTact();
-	const csize tcos = m_trackContentWidget.numOfTCOs();
+	const int tcos = m_trackContentWidget.numOfTCOs();
 
-	for( csize i = 0; i < tcos; ++i )
+	for( int i = 0; i < tcos; ++i )
 	{
 		trackContentObject * tco = m_trackContentWidget.getTCO( i );
 		tco->changeLength( tco->length() );
@@ -1526,23 +1433,9 @@ void trackWidget::mouseReleaseEvent( QMouseEvent * _me )
 
 void trackWidget::paintEvent( QPaintEvent * _pe )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	// create pixmap for whole widget
-	QPixmap pm( rect().size() );
-	pm.fill( QColor( 224, 224, 224 ) );
-
-	// and a painter for it
-	QPainter p( &pm );
-#endif
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
-
-#ifndef QT4
-	// blit drawn pixmap to actual widget
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 
@@ -1627,7 +1520,7 @@ track::~track()
 		m_trackWidget = NULL;
 	}
 
-	for( vlist<automationPattern *>::iterator it =
+	for( QList<automationPattern *>::iterator it =
 						m_automation_patterns.begin();
 					it != m_automation_patterns.end();
 					++it )
@@ -1694,7 +1587,7 @@ tact track::length( void ) const
 
 void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	csize num_of_tcos = getTrackContentWidget()->numOfTCOs();
+	int num_of_tcos = getTrackContentWidget()->numOfTCOs();
 
 	_this.setTagName( "track" );
 	_this.setAttribute( "type", type() );
@@ -1708,7 +1601,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	saveTrackSpecificSettings( _doc, ts_de );
 
 	// now save settings of all TCO's
-	for( csize i = 0; i < num_of_tcos; ++i )
+	for( int i = 0; i < num_of_tcos; ++i )
 	{
 		trackContentObject * tco = getTCO( i );
 		tco->saveState( _doc, _this );
@@ -1774,7 +1667,7 @@ trackContentObject * track::addTCO( trackContentObject * _tco )
 
 
 
-void track::removeTCO( csize _tco_num )
+void track::removeTCO( int _tco_num )
 {
 	getTrackContentWidget()->removeTCO( _tco_num );
 }
@@ -1782,7 +1675,7 @@ void track::removeTCO( csize _tco_num )
 
 
 
-csize track::numOfTCOs( void )
+int track::numOfTCOs( void )
 {
 	return( getTrackContentWidget()->numOfTCOs() );
 }
@@ -1790,7 +1683,7 @@ csize track::numOfTCOs( void )
 
 
 
-trackContentObject * track::getTCO( csize _tco_num )
+trackContentObject * track::getTCO( int _tco_num )
 {
 	return( getTrackContentWidget()->getTCO( _tco_num ) );
 	
@@ -1799,9 +1692,9 @@ trackContentObject * track::getTCO( csize _tco_num )
 
 
 
-csize track::getTCONum( trackContentObject * _tco )
+int track::getTCONum( trackContentObject * _tco )
 {
-	for( csize i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
+	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	{
 		if( getTCO( i ) == _tco )
 		{
@@ -1815,11 +1708,11 @@ csize track::getTCONum( trackContentObject * _tco )
 
 
 
-void track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
+void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
 							const midiTime & _start,
 							const midiTime & _end )
 {
-	for( csize i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
+	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	{
 		trackContentObject * tco = getTCO( i );
 		Sint32 s = tco->startPosition();
@@ -1830,7 +1723,7 @@ void track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
 			// now let's search according position for TCO in list
 			// 	-> list is ordered by TCO's position afterwards
 			bool inserted = FALSE;
-			for( vlist<trackContentObject *>::iterator it =
+			for( QList<trackContentObject *>::iterator it =
 								_tco_v.begin();
 						it != _tco_v.end(); ++it )
 			{
@@ -1853,7 +1746,7 @@ void track::getTCOsInRange( vlist<trackContentObject *> & _tco_v,
 
 
 
-void track::swapPositionOfTCOs( csize _tco_num1, csize _tco_num2 )
+void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 {
 	getTrackContentWidget()->swapPositionOfTCOs( _tco_num1, _tco_num2 );
 }
@@ -1879,7 +1772,7 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 void track::sendMidiTime( const midiTime & _time )
 {
-	for( vlist<automationPattern *>::iterator it =
+	for( QList<automationPattern *>::iterator it =
 						m_automation_patterns.begin();
 					it != m_automation_patterns.end();
 					++it )

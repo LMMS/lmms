@@ -25,25 +25,11 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
-
-#else
-
-#include <qapplication.h>
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-
-#endif
-
 
 #include "lcd_spinbox.h"
 #include "automatable_object_templates.h"
@@ -55,11 +41,7 @@
 lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
 							const QString & _name,
 							track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	autoObj( _track, 0, _min, _max ),
 	m_label( NULL ),
 	m_origMousePos()
@@ -68,7 +50,7 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
 	m_number->setFrameShape( QFrame::Panel );
 	m_number->setFrameShadow( QFrame::Sunken );
 	m_number->setSegmentStyle( QLCDNumber::Flat );
-#ifndef QT3
+
 	QPalette pal;
 	pal.setColor( QPalette::Light, Qt::gray );
 	pal.setColor( QPalette::Mid, Qt::darkGray );
@@ -76,7 +58,7 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
 	pal.setColor( m_number->backgroundRole(), Qt::black );
 	m_number->setPalette( pal );
 	m_number->setAutoFillBackground( TRUE );
-#endif
+
 	setEnabled( TRUE );
 
 	if( _track != NULL )
@@ -86,9 +68,8 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
 
 	// value is automatically limited to given range
 	setInitValue( 0 );
-#ifdef QT4
+
 	setAccessibleName( _name );
-#endif
 
 	m_number->setFixedSize( m_number->sizeHint() * 0.9 );
 	setFixedSize( m_number->size() );
@@ -163,15 +144,11 @@ void lcdSpinBox::setEnabled( bool _on )
 	{
 		fg = QColor( 160, 160, 160 );
 	}
-#ifdef QT4
 	QPalette pal = m_number->palette();
 	pal.setColor( QPalette::Background, QColor( 32, 32, 32 ) );
 	pal.setColor( QPalette::Foreground, fg );
 	m_number->setPalette( pal );
-#else
-	m_number->setPaletteBackgroundColor( QColor( 32, 32, 32 ) );
-	m_number->setPaletteForegroundColor( fg );
-#endif
+
 	QWidget::setEnabled( _on );
 }
 
@@ -195,9 +172,9 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 	mouseReleaseEvent( NULL );
 
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: CSS-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( accessibleName() ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -229,11 +206,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 
 void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 {
-#ifdef QT4
 	if( _me->buttons() & Qt::LeftButton )
-#else
-	if( _me->modifiers() == Qt::LeftButton )
-#endif
 	{
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )

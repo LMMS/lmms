@@ -25,24 +25,11 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QTabWidget>
 #include <QtGui/QTextEdit>
-
-#else
-
-#include <qtextedit.h>
-#include <qtabwidget.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-
-#endif
 
 
 #ifdef HAVE_CONFIG_H

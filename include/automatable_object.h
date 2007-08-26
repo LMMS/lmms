@@ -28,19 +28,11 @@
 
 #include <math.h>
 
-#include "qt3support.h"
 #include "journalling_object.h"
 #include "level_object.h"
 
-#ifndef QT3
-
 #include <QtCore/QPointer>
 
-#else
-
-#include <qguardedptr.h>
-
-#endif
 
 
 class automationPattern;
@@ -175,7 +167,7 @@ private:
 	T m_oldValue;
 	bool m_journalEntryReady;
 
-	typedef vvector<autoObj *> autoObjVector;
+	typedef QVector<autoObj *> autoObjVector;
 	autoObjVector m_linkedObjects;
 
 	inline void linkObject( autoObj * _object );

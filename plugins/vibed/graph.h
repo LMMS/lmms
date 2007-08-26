@@ -26,21 +26,9 @@
 #ifndef _GRAPH_H
 #define _GRAPH_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 #include <QtGui/QCursor>
-
-#else
-
-#include <qwidget.h>
-#include <qpixmap.h>
-#include <qcursor.h>
-
-#endif
 
 
 class graph : public QWidget

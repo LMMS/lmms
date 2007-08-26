@@ -28,10 +28,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QBitmap>
 #include <QtGui/QFontMetrics>
@@ -42,23 +38,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPalette>
 
-#else
-
-#include <qpainter.h>
-#include <qpalette.h>
-#include <qbitmap.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qstatusbar.h>
-#include <qfontmetrics.h>
-#include <qapplication.h>
-#include <qinputdialog.h>
-#include <qcursor.h>
-#include <qwhatsthis.h>
-
-#define addSeparator insertSeparator
-
-#endif
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -67,7 +46,6 @@
 
 #include "knob.h"
 #include "automatable_object_templates.h"
-/*#include "midi_client.h"*/
 #include "embed.h"
 #include "spc_bg_hndl_widget.h"
 #include "config_mgr.h"
@@ -88,11 +66,7 @@ textFloat * knob::s_textFloat = NULL;
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 							track * _track ) :
-	QWidget( _parent
-#ifndef QT4
-			, _name.ascii()
-#endif
-		),
+	QWidget( _parent ),
 	autoObj( _track ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
@@ -110,15 +84,10 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 
 	setAcceptDrops( TRUE );
 
-#ifdef QT4
 	setAccessibleName( _name );
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
 		QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
-#else
-	setBackgroundMode( Qt::NoBackground );
-	m_knobPixmap = new QPixmap( embed::getIconPixmap( "knob0" +
-					QString::number( m_knobNum + 1 ) ) );
-#endif
+
 	if( _track != NULL )
 	{
 		getAutomationPattern();
@@ -353,9 +322,9 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	mouseReleaseEvent( NULL );
 
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: css-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( accessibleName() ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -546,37 +515,23 @@ void knob::mouseDoubleClickEvent( QMouseEvent * )
 void knob::paintEvent( QPaintEvent * _me )
 {
 	QRect ur = _me->rect();
-#ifndef QT4
-	if( ur.isValid() )
-	{
-#endif
-#ifdef QT4
-		QPainter p( this );
-#else
-		QPixmap pix( ur.size() );
-		pix.fill( this, ur.topLeft() );
-		QPainter p( &pix, this );
-#endif
-		p.translate( -ur.x(), -ur.y() );
-		drawKnob( &p );
-		if( m_label != "" )
-		{
-			p.setFont( pointSize<6>( p.font() ) );
-			p.setPen( QColor( 64, 64, 64 ) );
-			p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2 + 1,
-					height() - 1, m_label );
-			p.setPen( QColor( 255, 255, 255 ) );
-			p.drawText( width() / 2 -
-					p.fontMetrics().width( m_label ) / 2,
-					height() - 2, m_label );
-		}
-#ifndef QT4
-		p.end();
-		bitBlt( this, ur.topLeft(), &pix );
-	}
-#endif
 
+	QPainter p( this );
+
+	p.translate( -ur.x(), -ur.y() );
+	drawKnob( &p );
+	if( m_label != "" )
+	{
+		p.setFont( pointSize<6>( p.font() ) );
+		p.setPen( QColor( 64, 64, 64 ) );
+		p.drawText( width() / 2 -
+			p.fontMetrics().width( m_label ) / 2 + 1,
+				height() - 1, m_label );
+		p.setPen( QColor( 255, 255, 255 ) );
+		p.drawText( width() / 2 -
+				p.fontMetrics().width( m_label ) / 2,
+				height() - 2, m_label );
+	}
 }
 
 
@@ -712,19 +667,13 @@ void knob::enterValue( void )
 {
 	bool ok;
 	float new_val = QInputDialog::getDouble(
-#ifdef QT4
 					this,
-#endif
 					accessibleName(),
 					tr( "Please enter a new value between "
 						"%1 and %2:" ).arg(
 						minValue() ).arg( maxValue() ),
 					value(), minValue(), maxValue(),
-					4, &ok
-#ifndef QT4
-					, this
-#endif
-						);
+					4, &ok );
 	if( ok )
 	{
 		setValue( new_val );
@@ -744,13 +693,8 @@ void knob::connectToMidiDevice( void )
 
 void knob::displayHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
-#else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal(
-						rect().bottomRight() ) );
-#endif
 }
 
 
@@ -758,9 +702,5 @@ void knob::displayHelp( void )
 
 #include "knob.moc"
 
-
-#ifndef QT4
-#undef addSeparator
-#endif
 
 #endif

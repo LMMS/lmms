@@ -25,23 +25,10 @@
 #ifndef _RACK_VIEW_H
 #define _RACK_VIEW_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QLayout>
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
-
-#else
-
-#include <qwidget.h>
-#include <qlayout.h>
-#include <qscrollview.h>
-#include <qvbox.h>
-
-#endif
 
 
 #include "types.h"
@@ -85,7 +72,7 @@ private:
 	void redraw();
 
 
-	vvector<rackPlugin *> m_rackInserts;
+	QVector<rackPlugin *> m_rackInserts;
 		
 	QVBoxLayout * m_mainLayout;
 	QScrollArea * m_scrollArea;

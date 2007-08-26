@@ -3,7 +3,7 @@ VST_DIRS=vst_base vst_effect vestige
 endif
 
 if LADSPA_SUPPORT
-LADSPA_DIRS=ladspa_base ladspa_effect
+LADSPA_DIRS=ladspa_effect
 endif
 
 if STK_SUPPORT

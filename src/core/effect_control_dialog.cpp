@@ -26,29 +26,15 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMessageBox>
 #include <QtGui/QCloseEvent>
-
-#else
-
-#include <qmessagebox.h>
-
-#endif
 
 #include "effect_control_dialog.h"
 #include "effect.h"
 
 
 effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
-	QWidget( _parent
-#ifdef QT3
-		, "effectControlDialog"
-#endif
-					),
+	QWidget( _parent ),
 	m_effect( _eff )
 {
 	setWindowTitle( m_effect->publicName() );

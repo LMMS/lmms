@@ -24,24 +24,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLibrary>
-
-#else
-
-#include <qdir.h>
-#include <qfileinfo.h>
-#include <qlibrary.h>
-
-#define value data
-
-#endif
-
 
 #include <math.h>
 
@@ -52,17 +37,10 @@
 
 ladspaManager::ladspaManager( void )
 {
-#ifdef QT4
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( ':' );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
-#else
-	QStringList ladspaDirectories = QStringList::split( ':',
-		QString( getenv( "LADSPA_PATH" ) ) );
-	ladspaDirectories += QStringList::split( ':', 
-					configManager::inst()->ladspaDir() );
-#endif
-	
+
 	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
 /*	// set default-directory if nothing is specified...
 	if( ladspaDirectories.isEmpty() )
@@ -74,26 +52,11 @@ ladspaManager::ladspaManager( void )
 		    it != ladspaDirectories.end(); ++it )
 	{
 		QDir directory( ( *it ) );
-#ifdef QT4
 		QFileInfoList list = directory.entryInfoList();
-#else
-		const QFileInfoList * lp = directory.entryInfoList();
-		// if directory doesn't exist or isn't readable, we get NULL
-		// which would crash LMMS...
-		if( lp == NULL )
-		{
-			continue;
-		}
-		QFileInfoList list = *lp;
-#endif
 		for( QFileInfoList::iterator file = list.begin();
 						file != list.end(); ++file )
-{
-#ifdef QT4
+		{
 			const QFileInfo & f = *file;
-#else
-			const QFileInfo & f = **file;
-#endif
 			if( !f.isFile() || f.fileName().right(2) != "so" )
 			{
 				continue;
@@ -108,9 +71,6 @@ ladspaManager::ladspaManager( void )
 							"ladspa_descriptor" );
 				if( descriptorFunction != NULL )
 				{
-#ifndef QT4
-					plugin_lib.setAutoUnload( FALSE );
-#endif
 					addPlugins( descriptorFunction,
 							f.fileName() );
 				}
@@ -135,11 +95,7 @@ ladspaManager::~ladspaManager()
 	for( ladspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
 					it != m_ladspaManagerMap.end(); ++it )
 	{
-#ifndef QT3
 		delete it.value();
-#else
-		delete it.data();
-#endif
 	}
 }
 

@@ -26,18 +26,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-#include <qwhatsthis.h>
-
-#endif
 
 
 #include "envelope_tab_widget.h"
@@ -92,11 +81,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 						TARGETS_TABWIDGET_Y,
 						TARGETS_TABWIDGET_WIDTH,
 						TARGETS_TABWIDGET_HEIGTH );
-#ifdef QT4
 	m_targetsTabWidget->setWhatsThis(
-#else
-	QWhatsThis::add( m_targetsTabWidget,
-#endif
 		tr( "These tabs contain envelopes. They're very important for "
 			"modifying a sound, for not saying that they're almost "
 			"always neccessary for substractive synthesis. For "
@@ -124,15 +109,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 							_instrument_track );
 		m_targetsTabWidget->addTab( m_envLFOWidgets[i],
 						tr( targetNames[i][0]
-#ifdef QT4
-						.toAscii().constData()
-#endif
-						) );
-/*
-#ifdef QT4
-											.toAscii().constData()
-#endif
-						) );*/
+						.toAscii().constData() ) );
 	}
 	
 	
@@ -165,11 +142,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	m_filterComboBox->addItem( tr( "2x LowPass" ),
 					embed::getIconPixmap( "filter_2lp" ) );
 
-#ifdef QT4
 	m_filterComboBox->setWhatsThis(
-#else
-	QWhatsThis::add( m_filterComboBox,
-#endif
 		tr( "Here you can select the built-in filter you want to use "
 			"for this instrument-track. Filters are very important "
 			"for changing the characteristics of a sound." ) );
@@ -184,11 +157,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	m_filterCutKnob->setInitValue( 16000.0 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
 								tr( "Hz" ) );
-#ifdef QT4
 	m_filterCutKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_filterCutKnob,
-#endif
 		tr( "Use this knob for setting the cutoff-frequency for the "
 			"selected filter. The cutoff-frequency specifies the "
 			"frequency for cutting the signal by a filter. For "
@@ -204,11 +173,7 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	m_filterResKnob->move( 190, 18 );
 	m_filterResKnob->setInitValue( 0.5 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
-#ifdef QT4
 	m_filterResKnob->setWhatsThis(
-#else
-	QWhatsThis::add( m_filterResKnob,
-#endif
 		tr( "Use this knob for setting Q/Resonance for the selected "
 			"filter. Q/Resonance tells the filter, how much it "
 			"should amplify frequencies near Cutoff-frequency." ) );

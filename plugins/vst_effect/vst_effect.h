@@ -26,18 +26,7 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMutex>
-
-#else
-
-#include <qmutex.h>
-
-#endif
-
 
 #include "effect.h"
 #include "engine.h"

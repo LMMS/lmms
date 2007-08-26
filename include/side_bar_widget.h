@@ -1,7 +1,7 @@
 /*
  * side_bar_widget.h - base-class for all side-bar-widgets
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,21 +26,9 @@
 #ifndef _SIDE_BAR_WIDGET_H
 #define _SIDE_BAR_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPixmap>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-#include <qlayout.h>
-#include <qpixmap.h>
-
-#endif
 
 
 class sideBarWidget : public QWidget

@@ -25,22 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLayout>
-
-#else
-
-#include <qpainter.h>
-#include <qlayout.h>
-#include <qwhatsthis.h>
-
-#endif
 
 
 #include "bb_editor.h"
@@ -69,16 +57,11 @@ bbEditor::bbEditor( void )
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-#ifdef QT4
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-#else
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -121,19 +104,11 @@ bbEditor::bbEditor( void )
 								m_toolBar );
 
 
-#ifdef QT4
 	m_playButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_playButton,
-#endif
 		tr( "Click here, if you want to play the current "
 			"beat/bassline. The beat/bassline is automatically "
 			"looped when its end is reached." ) );
-#ifdef QT4
 	m_stopButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_stopButton,
-#endif
 		tr( "Click here, if you want to stop playing of current "
 							"beat/bassline." ) );
 
@@ -169,9 +144,9 @@ bbEditor::~bbEditor()
 
 
 
-csize bbEditor::currentBB( void ) const
+int bbEditor::currentBB( void ) const
 {
-	return( static_cast<csize>( currentPosition().getTact() ) );
+	return( static_cast<int>( currentPosition().getTact() ) );
 }
 
 
@@ -185,25 +160,25 @@ void bbEditor::setCurrentBB( int _bb )
 	}
 
 	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( static_cast<csize>( _bb ) );
+	createTCOsForBB( static_cast<int>( _bb ) );
 
 	realignTracks();
 
 	// now update all track-labels (the current one has to become white,
 	// the others green)
-	for( csize i = 0; i < numOfBBs(); ++i )
+	for( int i = 0; i < numOfBBs(); ++i )
 	{
 		bbTrack::findBBTrack( i )->trackLabel()->update();
 	}
 
 	emit positionChanged( m_currentPosition = midiTime(
-					static_cast<csize>( _bb ), 0 ) );
+					static_cast<int>( _bb ), 0 ) );
 }
 
 
 
 
-tact bbEditor::lengthOfBB( csize _bb )
+tact bbEditor::lengthOfBB( int _bb )
 {
 	midiTime max_length;
 
@@ -255,7 +230,7 @@ bool FASTCALL bbEditor::play( midiTime _start, fpp_t _frames,
 
 
 
-csize bbEditor::numOfBBs( void ) const
+int bbEditor::numOfBBs( void ) const
 {
 	return( engine::getSongEditor()->countTracks( track::BB_TRACK ) );
 }
@@ -263,7 +238,7 @@ csize bbEditor::numOfBBs( void ) const
 
 
 
-void bbEditor::removeBB( csize _bb )
+void bbEditor::removeBB( int _bb )
 {
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
@@ -296,11 +271,11 @@ void bbEditor::updateComboBox( void )
 	disconnect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 					this, SLOT( setCurrentBB( int ) ) );
 
-	csize current_bb = currentBB();
+	int current_bb = currentBB();
 
 	m_bbComboBox->clear();
 
-	for( csize i = 0; i < numOfBBs(); ++i )
+	for( int i = 0; i < numOfBBs(); ++i )
 	{
 		bbTrack * bbt = bbTrack::findBBTrack( i );
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
@@ -451,7 +426,7 @@ void bbEditor::loadSettings( const QDomElement & _this )
 void bbEditor::updateAfterTrackAdd( void )
 {
 	// make sure, new track(s) have TCOs for every beat/bassline
-	for( csize i = 0; i < tMax<csize>( 1, numOfBBs() ); ++i )
+	for( int i = 0; i < tMax<int>( 1, numOfBBs() ); ++i )
 	{
 		createTCOsForBB( i );
 	}
@@ -460,7 +435,7 @@ void bbEditor::updateAfterTrackAdd( void )
 
 
 
-void bbEditor::createTCOsForBB( csize _bb )
+void bbEditor::createTCOsForBB( int _bb )
 {
 	if( numOfBBs() == 0 )
 	{
@@ -484,7 +459,7 @@ void bbEditor::createTCOsForBB( csize _bb )
 
 
 
-void bbEditor::swapBB( csize _bb1, csize _bb2 )
+void bbEditor::swapBB( int _bb1, int _bb2 )
 {
 	trackVector tv = tracks();
 	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )

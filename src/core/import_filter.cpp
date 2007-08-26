@@ -25,22 +25,13 @@
  */
 
 
+#include <QtGui/QMessageBox>
+
 #include "import_filter.h"
 #include "engine.h"
 #include "track_container.h"
 #include "project_journal.h"
 
-#ifdef QT4
-
-#include <QtGui/QMessageBox>
-
-#else
-
-#include <qmessagebox.h>
-
-#define fileName name
-
-#endif
 
 
 importFilter::importFilter( const QString & _file_name,
@@ -63,24 +54,18 @@ importFilter::~importFilter()
 void importFilter::import( const QString & _file_to_import,
 						trackContainer * _tc )
 {
-	vvector<descriptor> d;
+	QVector<descriptor> d;
 	plugin::getDescriptorsOfAvailPlugins( d );
 
 	bool successful = FALSE;
 
-	char * s = qstrdup( _file_to_import.
-#ifndef QT3
-			toAscii().constData()
-#else
-			ascii()
-#endif
-						);
+	char * s = qstrdup( _file_to_import.toAscii().constData() );
 
 	// do not record changes while importing files
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( FALSE );
 
-	for( vvector<plugin::descriptor>::iterator it = d.begin();
+	for( QVector<plugin::descriptor>::iterator it = d.begin();
 							it != d.end(); ++it )
 	{
 		if( it->type == plugin::ImportFilter )
@@ -122,11 +107,7 @@ void importFilter::import( const QString & _file_to_import,
 
 bool importFilter::openFile( void )
 {
-#ifdef QT4
 	if( m_file.open( QFile::ReadOnly ) == FALSE )
-#else
-	if( m_file.open( IO_ReadOnly ) == FALSE )
-#endif
 	{
 		QMessageBox::critical( NULL,
 			trackContainer::tr( "Couldn't open file" ),

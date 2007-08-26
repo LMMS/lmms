@@ -28,23 +28,8 @@
 #ifndef _ENVELOPE_AND_LFO_WIDGET_H
 #define _ENVELOPE_AND_LFO_WIDGET_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-
-#endif
 
 
 #include "journalling_object.h"
@@ -129,7 +114,7 @@ private:
 	static QPixmap * s_envGraph;
 	static QPixmap * s_lfoGraph;
 
-	static vvector<envelopeAndLFOWidget *> s_EaLWidgets;
+	static QVector<envelopeAndLFOWidget *> s_EaLWidgets;
 
 	bool   m_used;
 

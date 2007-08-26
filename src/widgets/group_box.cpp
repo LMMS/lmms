@@ -25,21 +25,10 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 
-#else
-
-#include <qpainter.h>
-#include <qtimer.h>
-#include <qobjectlist.h>
-
-#endif
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -64,9 +53,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 	m_origHeight( height() ),
 	m_animating( FALSE )
 {
-#ifndef QT3
 	setAutoFillBackground( TRUE );
-#endif
 
 	if( s_ledBg == NULL )
 	{
@@ -153,12 +140,8 @@ void groupBox::animate( void )
 	}
 	resize( width(), height() + dy );
 	QTimer::singleShot( 10, this, SLOT( animate() ) );
-#ifdef QT4
 	QObjectList ch = parent()->children();
-#else
-	QObjectList ch = *( parent()->children() );
-#endif
-	for( csize i = 0; i < ch.count(); ++i )
+	for( int i = 0; i < ch.count(); ++i )
 	{
 		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
 		if( w == NULL || w->y() < y() + height() )
@@ -167,12 +150,8 @@ void groupBox::animate( void )
 		}
 		w->move( w->x(), w->y() + dy );
 	}
-#ifdef QT4
 	ch = children();
-#else
-	ch = *children();
-#endif
-	for( csize i = 0; i < ch.count(); ++i )
+	for( int i = 0; i < ch.count(); ++i )
 	{
 		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
 		if( w == NULL || w == m_led )
@@ -196,14 +175,9 @@ void groupBox::animate( void )
 
 void groupBox::updatePixmap( void )
 {
-#ifndef QT3
 	const int c = 0;
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
-#else
-	const int c = 1;
-	QColor bg_color = QApplication::palette().active().background();
-#endif
 	QPixmap pm( size() );
 	pm.fill( bg_color.dark( 132 ) );
 
@@ -233,22 +207,13 @@ void groupBox::updatePixmap( void )
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
-#ifndef QT3
 	p.setPen( palette().color( QPalette::Active, QPalette::ButtonText ) );
-#else
-	p.setPen( colorGroup().buttonText() );
-#endif
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 
-#ifdef QT4
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );
 	setPalette( pal );
-#else
-	setPaletteBackgroundColor( bg_color.dark( 132 ) );
-	setErasePixmap( pm );
-#endif
 }
 
 

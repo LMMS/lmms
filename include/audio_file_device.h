@@ -27,18 +27,7 @@
 #define _AUDIO_FILE_DEVICE_H
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QFile>
-
-#else
-
-#include <qfile.h>
-
-#endif
-
 
 #include "audio_device.h"
 

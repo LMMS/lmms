@@ -27,22 +27,7 @@
 #ifndef _IMPORT_FILTER_H
 #define _IMPORT_FILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QFile>
-
-#else
-
-#include <qfile.h>
-
-#endif
 
 
 #include "plugin.h"
@@ -82,34 +67,22 @@ protected:
 
 	inline int readByte( void )
 	{
-#ifdef QT4
 		char c;
 		if( m_file.getChar( &c ) )
 		{
 			return( static_cast<int>( c ) );
 		}
 		return( -1 );
-#else
-		return( m_file.getch() );
-#endif
 	}
 
 	inline int readBlock( char * _data, int _len )
 	{
-#ifndef QT3
 		return( m_file.read( _data, _len ) );
-#else
-		return( m_file.readBlock( _data, _len ) );
-#endif
 	}
 
 	inline void ungetChar( int _ch )
 	{
-#ifndef QT3
 		m_file.ungetChar( _ch );
-#else
-		m_file.ungetch( _ch );
-#endif
 	}
 
 	virtual void FASTCALL saveSettings( QDomDocument &,

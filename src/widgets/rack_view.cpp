@@ -25,18 +25,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
-
-#else
-
-#include <qmessagebox.h>
-
-#endif
-
 
 #include "rack_view.h"
 #include "audio_port.h"
@@ -55,12 +44,9 @@ rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
 	m_mainLayout->setSpacing( 0 );
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setFixedSize( 230, 184 );
-#ifdef QT4
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
-#else
-	m_scrollArea->setVScrollBarMode( QScrollArea::AlwaysOn );
-#endif
+
 	m_mainLayout->addWidget( m_scrollArea );
 	
 	m_lastY = 0;
@@ -78,7 +64,6 @@ rackView::~rackView()
 
 void rackView::addEffect( effect * _e )
 {
-#ifdef QT4
 	if( !m_scrollArea->widget() )
 	{
 		QWidget * w = new QWidget;
@@ -86,9 +71,6 @@ void rackView::addEffect( effect * _e )
 		w->show();
 	}
 	QWidget * w = m_scrollArea->widget();
-#else
-	QWidget * w = m_scrollArea->viewport();
-#endif
 	rackPlugin * plugin = new rackPlugin( w, _e, m_track, m_port );
 	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), 
 				this, SLOT( moveUp( rackPlugin * ) ) );
@@ -96,19 +78,10 @@ void rackView::addEffect( effect * _e )
 				this, SLOT( moveDown( rackPlugin * ) ) );
 	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ),
 				this, SLOT( deletePlugin( rackPlugin * ) ) );
-#ifndef QT3
 	plugin->move( 0, m_lastY );
-#else
-	m_scrollArea->addChild( plugin );
-	m_scrollArea->moveChild( plugin, 0, m_lastY );
-#endif
 	plugin->show();
 	m_lastY += plugin->height();
-#ifdef QT4
 	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
-#else
-	m_scrollArea->resizeContents( 210, m_lastY );
-#endif
 	m_rackInserts.append( plugin );
 }
 
@@ -119,7 +92,7 @@ void FASTCALL rackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "numofeffects", m_rackInserts.count() );
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
 		QDomElement ef = ( *it )->saveState( _doc, _this );
@@ -173,7 +146,7 @@ void FASTCALL rackView::loadSettings( const QDomElement & _this )
 
 void rackView::deleteAllPlugins( void )
 {
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin();
+	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin();
 					it != m_rackInserts.end(); ++it )
 	{
 		delete *it;
@@ -189,7 +162,7 @@ void rackView::moveUp( rackPlugin * _plugin )
 	if( _plugin != m_rackInserts.first() )
 	{
 		int i = 0;
-		for( vvector<rackPlugin *>::iterator it = 
+		for( QVector<rackPlugin *>::iterator it = 
 						m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++, i++ )
 		{
@@ -217,7 +190,7 @@ void rackView::moveDown( rackPlugin * _plugin )
 	if( _plugin != m_rackInserts.last() )
 	{
 		int i = 0;
-		for( vvector<rackPlugin *>::iterator it = 
+		for( QVector<rackPlugin *>::iterator it = 
 						m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++, i++ )
 		{
@@ -241,10 +214,6 @@ void rackView::moveDown( rackPlugin * _plugin )
 
 void rackView::deletePlugin( rackPlugin * _plugin )
 {
-#ifdef QT3
-	m_scrollArea->removeChild( _plugin );
-#endif
-
 	m_rackInserts.erase( qFind( m_rackInserts.begin(), m_rackInserts.end(),
 								_plugin ) );
 	delete _plugin;
@@ -257,21 +226,13 @@ void rackView::deletePlugin( rackPlugin * _plugin )
 void rackView::redraw()
 {
 	m_lastY = 0;
-	for( vvector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
+	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
 					it != m_rackInserts.end(); it++ )
 	{
-#ifdef QT4
 		( *it )->move( 0, m_lastY );
-#else
-		m_scrollArea->moveChild( *it, 0, m_lastY );
-#endif
 		m_lastY += ( *it )->height();
 	}
-#ifdef QT4
 	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
-#else
-	m_scrollArea->resizeContents( 210, m_lastY );
-#endif
 }	
 
 

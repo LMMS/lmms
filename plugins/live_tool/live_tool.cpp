@@ -23,18 +23,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifndef QT3
-
 #include <QtGui/QKeyEvent>
-
-#else
-
-#include <qwhatsthis.h>
-
-#endif
-
 
 #include "live_tool.h"
 #include "bb_editor.h"
@@ -78,22 +67,14 @@ liveTool::liveTool( mainWindow * _window ) :
 	tool( _window, &live_tool_plugin_descriptor )
 {
 	const QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
-#ifndef QT3
+
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), background );
 	setPalette( pal );
-#else
-	setPaletteBackgroundPixmap( background );
-#endif
 	setFixedSize( background.size() );
 
-#ifdef QT4
-	setWhatsThis(
-#else
-	QWhatsThis::add( this,
-#endif
-				tr( 
+	setWhatsThis( tr( 
 		"This tool is intended to be used in live performances, though "
 		"you can use it for music production as well.\n"
 		"The following keys will work only if this window is active.\n"
@@ -174,20 +155,11 @@ bool liveTool::x11Event( XEvent * _xe )
 
 void liveTool::toggleInstrument( int _n )
 {
-#ifndef QT3
 	if( _n > 0 && _n < engine::getBBEditor()->tracks().count() )
 	{
 		track * t = engine::getBBEditor()->tracks().at( _n );
 		t->setMuted( !t->muted() );
 	}
-#else
-	bool track_exists;
-	track * t = engine::getBBEditor()->tracks().at( _n, &track_exists );
-	if( track_exists )
-	{
-		t->setMuted( !t->muted() );
-	}
-#endif
 }
 
 

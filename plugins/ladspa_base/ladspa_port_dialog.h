@@ -25,19 +25,7 @@
 #ifndef _LADSPA_PORT_DIALOG_H
 #define _LADSPA_PORT_DIALOG_H
 
-#include "qt3support.h"
-
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
-
 
 #include "ladspa_2_lmms.h"
 

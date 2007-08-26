@@ -26,18 +26,7 @@
 #ifndef _SIDE_BAR_H
 #define _SIDE_BAR_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMap>
-
-#else
-
-#include <qmap.h>
-
-#endif
-
 
 #include "kmultitabbar.h"
 

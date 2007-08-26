@@ -26,21 +26,9 @@
 #ifndef _EFFECT_LABEL_H
 #define _EFFECT_LABEL_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qwidget.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-
-#endif
 
 #include "journalling_object.h"
 

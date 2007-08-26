@@ -23,22 +23,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPaintEvent>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qfontmetrics.h>
-#include <qpainter.h>
-#include <qcursor.h>
-
-#endif
-
 
 #include "graph.h"
 #include "string_pair_drag.h"
@@ -58,11 +45,6 @@ graph::graph( QWidget * _parent ) :
 	setFixedSize( 132, 104 );
 	
 	setAcceptDrops( TRUE );
-
-#ifndef QT4
-	setBackgroundMode( NoBackground );
-#endif
-		
 }
 
 
@@ -149,11 +131,7 @@ void graph::mousePressEvent( QMouseEvent * _me )
 
 		// toggle mouse state
 		m_mouseDown = true;	
-#ifndef QT3
 		setCursor( Qt::BlankCursor );
-#else
-		setCursor( QCursor::BlankCursor );
-#endif
 		m_lastCursorX = x;
 	}
 }
@@ -184,11 +162,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		// toggle mouse state
 		m_mouseDown = false;
-#ifndef QT3
 		setCursor( Qt::ArrowCursor );
-#else
-		setCursor( QCursor::ArrowCursor );
-#endif
 		update();
 	}
 }	
@@ -198,14 +172,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 void graph::paintEvent( QPaintEvent * )
 {
 
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( this, rect().topLeft() );
-	
-	QPainter p( &draw_pm, this );
-#endif
 
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 
@@ -230,13 +197,9 @@ void graph::paintEvent( QPaintEvent * )
 		p.drawLine( cursor.x(), 2, cursor.x(), 102 );
 	}
 	p.drawPixmap( 0, 0, m_foreground );
-
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
-
 }
+
+
 
 
 void graph::dropEvent( QDropEvent * _de )

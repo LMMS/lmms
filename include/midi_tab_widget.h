@@ -27,21 +27,7 @@
 #ifndef _MIDI_TAB_WIDGET_H
 #define _MIDI_TAB_WIDGET_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include "journalling_object.h"
 
@@ -87,9 +73,6 @@ protected slots:
 	void writeablePortsChanged( void );
 	void activatedReadablePort( QAction * _item );
 	void activatedWriteablePort( QAction * _item );
-	// Qt3-version
-	void activatedReadablePort( int _id );
-	void activatedWriteablePort( int _id );
 
 private:
 	instrumentTrack * m_instrumentTrack;

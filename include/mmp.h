@@ -26,23 +26,7 @@
 #ifndef _MMP_H
 #define _MMP_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
-
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif 
-
 
 #include "types.h"
 
@@ -73,7 +57,7 @@ public:
 	multimediaProject( projectTypes _project_type );
 	~multimediaProject();
 
-	bool FASTCALL writeFile( QString & _fn, bool _overwrite_check = TRUE );
+	bool writeFile( QString & _fn, bool _overwrite_check = TRUE );
 
 	inline QDomElement & content( void )
 	{
@@ -89,12 +73,12 @@ public:
 		return( m_type );
 	}
 
-	static projectTypes FASTCALL typeOfFile( const QString & _fn );
+	static projectTypes typeOfFile( const QString & _fn );
 
 
 private:
-	static projectTypes FASTCALL type( const QString & _type_name );
-	static QString FASTCALL typeName( projectTypes _project_type );
+	static projectTypes type( const QString & _type_name );
+	static QString typeName( projectTypes _project_type );
 
 	void cleanMetaNodes( QDomElement _de );
 

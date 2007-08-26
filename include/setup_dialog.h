@@ -26,20 +26,8 @@
 #ifndef _SETUP_DIALOG_H
 #define _SETUP_DIALOG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
 #include <QtCore/QMap>
-
-#else
-
-#include <qdialog.h>
-#include <qmap.h>
-
-#endif
-
 
 #include "audio_device.h"
 #include "midi_client.h"

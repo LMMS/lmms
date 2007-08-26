@@ -26,19 +26,8 @@
 #ifndef _TOOL_BUTTON_H
 #define _TOOL_BUTTON_H 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QToolButton>
 #include <QtGui/QColor>
-
-#else
-
-#include <qtoolbutton.h>
-#include <qcolor.h>
-
-#endif
 
 
 class toolButton : public QToolButton

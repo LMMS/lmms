@@ -26,26 +26,9 @@
 #ifndef _PLUGIN_BROWSER_H
 #define _PLUGIN_BROWSER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QTimer>
 #include <QtCore/QVector>
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qvaluevector.h>
-#include <qpixmap.h>
-#include <qtimer.h>
-
-#endif
 
 
 #include "side_bar_widget.h"
@@ -64,7 +47,7 @@ public:
 
 
 private:
-	vvector<plugin::descriptor> m_pluginDescriptors;
+	QVector<plugin::descriptor> m_pluginDescriptors;
 
 	QWidget * m_view;
 

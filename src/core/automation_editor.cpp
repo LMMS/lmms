@@ -26,10 +26,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
@@ -38,20 +34,7 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qapplication.h>
-#include <qbuttongroup.h>
-#include <qpainter.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qdom.h>
-
-#define addButton insert
-#define setCheckable setToggleButton
-
-#endif
+#include <QtGui/QScrollBar>
 
 
 #ifndef __USE_XOPEN
@@ -127,10 +110,8 @@ automationEditor::automationEditor( void ) :
 							"edit_move" ) );
 	}
 
-#ifdef QT4
 	// add us to workspace
 	engine::getMainWindow()->workspace()->addWindow( this );
-#endif
 
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
@@ -146,16 +127,11 @@ automationEditor::automationEditor( void ) :
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-#ifdef QT4
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-#else
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -172,19 +148,11 @@ automationEditor::automationEditor( void ) :
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
-#ifdef QT4
 	m_playButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_playButton,
-#endif
 		tr( "Click here, if you want to play the current pattern. "
 			"This is useful while editing it. The pattern is "
 			"automatically looped when its end is reached." ) );
-#ifdef QT4
 	m_stopButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_stopButton,
-#endif
 		tr( "Click here, if you want to stop playing of current "
 			"pattern." ) );
 
@@ -233,43 +201,24 @@ automationEditor::automationEditor( void ) :
 	tool_button_group->addButton( m_selectButton );
 	tool_button_group->addButton( m_moveButton );
 	tool_button_group->setExclusive( TRUE );
-#ifndef QT4
-	tool_button_group->hide();
-#endif
 
-#ifdef QT4
 	m_drawButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_drawButton,
-#endif
 		tr( "If you click here, draw-mode will be activated. In this "
 			"mode you can add and move single values. This "
 			"is the default-mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
-#ifdef QT4
 	m_eraseButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_eraseButton,
-#endif
 		tr( "If you click here, erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
-#ifdef QT4
 	m_selectButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_selectButton,
-#endif
 		tr( "If you click here, select-mode will be activated. In this "
 			"mode you can select values. This is neccessary "
 			"if you want to cut, copy, paste, delete or move "
 			"values. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );
-#ifdef QT4
 	m_moveButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_moveButton,
-#endif
 		tr( "If you click here, move-mode will be activated. In this "
 			"mode you can move the values you selected in select-"
 			"mode. You can also press 'Shift+M' on your keyboard "
@@ -291,27 +240,15 @@ automationEditor::automationEditor( void ) :
 					this, SLOT( pasteValues() ),
 					m_toolBar );
 
-#ifdef QT4
 	m_cutButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_cutButton,
-#endif
 		tr( "If you click here, selected values will be cut into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste-button." ) );
-#ifdef QT4
 	m_copyButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_copyButton,
-#endif
 		tr( "If you click here, selected values will be copied into "
 			"the clipboard. You can paste them anywhere in any "
 			"pattern by clicking on the paste-button." ) );
-#ifdef QT4
 	m_pasteButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_pasteButton,
-#endif
 		tr( "If you click here, the values from the clipboard will be "
 			"pasted at the first visible tact." ) );
 
@@ -393,9 +330,6 @@ automationEditor::automationEditor( void ) :
 	resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 	setCurrentPattern( NULL );
 
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setMouseTracking( TRUE );
 
 	hide();
@@ -439,11 +373,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 		for( timeMap::iterator it = time_map.begin();
 						it != time_map.end(); ++it )
 		{
-#ifdef QT3
-			central_key += it.data();
-#else
 			central_key += it.value();
-#endif
 			++total_values;
 		}
 
@@ -679,11 +609,7 @@ void automationEditor::updatePaintPixmap( QPixmap & _p )
 			--it;
 			Sint32 len_tact_64th = 4;
 
-#ifdef QT3
-			const int level = it.data();
-#else
 			const int level = it.value();
-#endif
 
 			Sint32 pos_tact_64th = -it.key();
 
@@ -813,12 +739,8 @@ void automationEditor::updatePaintPixmap( QPixmap & _p )
 
 	// reset scroll-range
 	m_leftRightScroll->setRange( 0, l );
-#ifdef QT4
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( l );
-#else
-	m_leftRightScroll->setSteps( 1, l );
-#endif
 }
 
 
@@ -1048,11 +970,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( pos_tact_64th >= -it.key() &&
 					len > 0 &&
 					pos_tact_64th <= -it.key() + len &&
-#ifdef QT3
-					it.data() == level )
-#else
 					it.value() == level )
-#endif
 				{
 					break;
 				}
@@ -1187,13 +1105,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 		}
 		x -= VALUES_WIDTH;
 
-		if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-			Qt::LeftButton && m_editMode == DRAW )
+		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
 			if( m_action == MOVE_VALUE )
 			{
@@ -1221,13 +1133,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			engine::getSongEditor()->setModified();
 
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-					Qt::NoButton && m_editMode == DRAW )
+		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
 
@@ -1249,12 +1155,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				if( pos_tact_64th >= -it.key() &&
 			    		pos_tact_64th <= -it.key() +
 							//TODO: Add constant
-							4 &&
-#ifdef QT3
-					it.data() == level )
-#else
-					it.value() == level )
-#endif
+						4 && it.value() == level )
 				{
 					break;
 				}
@@ -1295,13 +1196,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				}
 			}
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-					Qt::LeftButton &&
+		else if( _me->buttons() & Qt::LeftButton &&
 						m_editMode == SELECT &&
 						m_action == SELECT_VALUES )
 		{
@@ -1350,13 +1245,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				--m_selectedLevels;
 			}
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-				Qt::LeftButton &&
+		else if( _me->buttons() & Qt::LeftButton &&
 					m_editMode == MOVE &&
 					m_action == MOVE_SELECTION )
 		{
@@ -1452,19 +1341,11 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					new_value_pos = midiTime( value_tact,
 							value_tact_64th );
 				}
-#ifdef QT3
-				new_selValuesForMove[
-					-m_pattern->putValue( new_value_pos,
-						it.data () + level_diff,
-									FALSE )]
-						= it.data() + level_diff;
-#else
 				new_selValuesForMove[
 					-m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
 									FALSE )]
 						= it.value() + level_diff;
-#endif
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
@@ -1474,13 +1355,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-				Qt::LeftButton &&
+		if( _me->buttons() & Qt::LeftButton &&
 					m_editMode == SELECT &&
 					m_action == SELECT_VALUES )
 		{
@@ -1581,14 +1456,7 @@ void automationEditor::paintEvent( QPaintEvent * )
 {
 	QPixmap paintPixmap( size() );
 	updatePaintPixmap( paintPixmap );
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( size() );
-	draw_pm.fill( QColor( 0, 0, 0 ) );
-
-	QPainter p( &draw_pm, this );
-#endif
 	p.drawPixmap( 0, 0, paintPixmap );
 
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
@@ -1611,10 +1479,6 @@ void automationEditor::paintEvent( QPaintEvent * )
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
 
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 
@@ -1646,12 +1510,8 @@ void automationEditor::resizeEvent( QResizeEvent * )
 		m_topBottomScroll->setRange( m_scroll_level, m_scroll_level );
 	}
 
-#ifdef QT4
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-#else
-	m_topBottomScroll->setSteps( 1, 20 );
-#endif
 
 	m_topBottomScroll->setValue( m_scroll_level );
 
@@ -1915,20 +1775,12 @@ void automationEditor::selectAll( void )
 	timeMap::iterator it = time_map.begin();
 	m_selectStartTact64th = 0;
 	m_selectedTact64th = -it.key() + len_tact_64th;
-#ifdef QT3
-	m_selectStartLevel = it.data();
-#else
 	m_selectStartLevel = it.value();
-#endif
 	m_selectedLevels = 1;
 
 	while( ++it != time_map.end() )
 	{
-#ifdef QT3
-		const int level = it.data();
-#else
 		const int level = it.value();
-#endif
 		if( level < m_selectStartLevel )
 		{
 			// if we move start-level down, we have to add 
@@ -1978,11 +1830,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		//TODO: Add constant
 		Sint32 len_tact_64th = 4;
 
-#ifdef QT3
-		int level = it.data();
-#else
 		int level = it.value();
-#endif
 		Sint32 pos_tact_64th = -it.key();
 
 		if( level >= sel_level_start && level <= sel_level_end &&
@@ -2009,11 +1857,7 @@ void automationEditor::copySelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 			it != selected_values.end(); ++it )
 		{
-#ifdef QT3
-			m_valuesToCopy[it.key()] = it.data();
-#else
 			m_valuesToCopy[it.key()] = it.value();
-#endif
 		}
 		textFloat::displayMessage( tr( "Values copied" ),
 				tr( "All selected values were copied to the "
@@ -2044,11 +1888,7 @@ void automationEditor::cutSelectedValues( void )
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 		{
-#ifdef QT3
-			m_valuesToCopy[it.key()] = it.data();
-#else
 			m_valuesToCopy[it.key()] = it.value();
-#endif
 			m_pattern->removeValue( -it.key() );
 		}
 	}
@@ -2073,11 +1913,7 @@ void automationEditor::pasteValues( void )
 					it != m_valuesToCopy.end(); ++it )
 		{
 			m_pattern->putValue( -it.key() + m_currentPosition,
-#ifdef QT3
-								it.data() );
-#else
 								it.value() );
-#endif
 		}
 
 		// we only have to do the following lines if we pasted at
@@ -2245,12 +2081,6 @@ void automationEditor::update( void )
 
 
 #include "automation_editor.moc"
-
-
-#ifdef QT3
-#undef addButton
-#undef setCheckable
-#endif
 
 
 #endif

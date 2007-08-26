@@ -25,10 +25,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QFileDialog>
 #include <QtGui/QCloseEvent>
@@ -38,24 +34,6 @@
 #include <QtGui/QMenuBar>
 #include <Qt/QtXml>
 
-#else
-
-#include <qsplitter.h>
-#include <qapplication.h>
-#include <qdir.h>
-#include <qfiledialog.h>
-#include <qpopupmenu.h>
-#include <qmessagebox.h>
-#include <qmenubar.h>
-#include <qdom.h>
-
-#if QT_VERSION >= 0x030200
-#include <qsplashscreen.h>
-#endif
-
-#define addSeparator insertSeparator
-
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -84,27 +62,19 @@
 #include "templates.h"
 
 
-#if QT_VERSION >= 0x030100
 QSplashScreen * mainWindow::s_splashScreen = NULL;
 extern int splash_alignment_flags;
-#endif
 
 
 
 mainWindow::mainWindow( void ) :
-	QMainWindow(
-#ifndef QT4
-			0 , NULL, WDestructiveClose
-#endif
-		),
+	QMainWindow(),
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_tools_menu( NULL )
 {
-#ifdef QT4
 	setAttribute( Qt::WA_DeleteOnClose );
-#endif
 
 	bool no_mdi = configManager::inst()->value( "app", "gimplikewindows"
 								).toInt();
@@ -125,13 +95,11 @@ mainWindow::mainWindow( void ) :
 	side_bar->setPosition( sideBar::Left );
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
-#if QT_VERSION >= 0x030200
 	splitter->setChildrenCollapsible( FALSE );
-#endif
 
 	QString sample_filter;
-	vlist<QString> ext_keys = engine::sampleExtensions().keys();
-	for( vlist<QString>::iterator it = ext_keys.begin();
+	QList<QString> ext_keys = engine::sampleExtensions().keys();
+	for( QList<QString>::iterator it = ext_keys.begin();
 						it != ext_keys.end(); ++it )
 	{
 		sample_filter += " *." + *it;
@@ -173,13 +141,9 @@ mainWindow::mainWindow( void ) :
 		m_workspace = new QWorkspace( splitter );
 		m_workspace->setScrollBarsEnabled( TRUE );
 
-#ifdef QT4
+#warning TODO
 /*		m_workspace->setBackground( embed::getIconPixmap(
 						"background_artwork" ) );*/
-#else
-		m_workspace->setPaletteBackgroundPixmap( embed::getIconPixmap(
-						"background_artwork" ) );
-#endif
 	}
 
 	hbox->addWidget( side_bar );
@@ -190,16 +154,11 @@ mainWindow::mainWindow( void ) :
 	m_toolBar = new QWidget( main_widget );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
-#ifdef QT4
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 				embed::getIconPixmap( "main_toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-#else
-	m_toolBar->setPaletteBackgroundPixmap(
-				embed::getIconPixmap( "main_toolbar_bg" ) );
-#endif
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
@@ -227,7 +186,6 @@ mainWindow::~mainWindow()
 
 void mainWindow::finalize( void )
 {
-#if QT_VERSION >= 0x030200
 	if( qApp->argc() > 1 )
 	{
 		s_splashScreen->showMessage( tr( "Loading song..." ),
@@ -240,14 +198,11 @@ void mainWindow::finalize( void )
 							splash_alignment_flags,
 								Qt::white );
 	}
-#endif
 
 
-#if QT_VERSION >= 0x030200
 	s_splashScreen->showMessage( tr( "Creating GUI..." ),
 							splash_alignment_flags,
 								Qt::white );
-#endif
 	resetWindowTitle( "" );
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
 
@@ -262,19 +217,10 @@ void mainWindow::finalize( void )
 	m_templatesMenu = new QMenu( project_new );
 	connect( m_templatesMenu, SIGNAL( aboutToShow( void ) ),
 				this, SLOT( fillTemplatesMenu( void ) ) );
-#ifdef QT4
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
-#else
-	connect( m_templatesMenu, SIGNAL( activated( int ) ),
-			this, SLOT( createNewProjectFromTemplate( int ) ) );
-#endif
 	project_new->setMenu( m_templatesMenu );
-#ifdef QT4
 	project_new->setPopupMode( toolButton::MenuButtonPopup );
-#else
-	project_new->setPopupDelay( 0 );
-#endif
 
 	toolButton * project_open = new toolButton( 
 					embed::getIconPixmap( "project_open" ),
@@ -314,11 +260,7 @@ void mainWindow::finalize( void )
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
-#ifdef QT4
 	bb_editor_window->setWhatsThis(
-#else
-	QWhatsThis::add( bb_editor_window, 
-#endif
 		tr( "By pressing this button, you can show or hide the "
 			"Beat+Baseline Editor. The Beat+Baseline Editor is "
 			"needed for creating beats, opening, adding and "
@@ -334,11 +276,7 @@ void mainWindow::finalize( void )
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
-#ifdef QT4
 	piano_roll_window->setWhatsThis(
-#else
-	QWhatsThis::add( piano_roll_window,
-#endif
 			tr( "By pressing this button, you can show or hide the "
 				"Piano-Roll. With the help of the Piano-Roll "
 				"you can edit melody-patterns in an easy way."
@@ -350,11 +288,7 @@ void mainWindow::finalize( void )
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::Key_F8 );
-#ifdef QT4
 	song_editor_window->setWhatsThis(
-#else
-	QWhatsThis::add( song_editor_window,
-#endif
 		tr( "By pressing this button, you can show or hide the "
 			"Song-Editor. With the help of the Song-Editor you can "
 			"edit song-playlist and specify when which track "
@@ -371,11 +305,7 @@ void mainWindow::finalize( void )
 					SLOT( toggleAutomationEditorWin() ),
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::Key_F9 );
-#ifdef QT4
 	automation_editor_window->setWhatsThis(
-#else
-	QWhatsThis::add( automation_editor_window,
-#endif
 			tr( "By pressing this button, you can show or hide the "
 				"Automation Editor. With the help of the "
 				"Automation Editor you can edit dynamic values "
@@ -405,11 +335,7 @@ void mainWindow::finalize( void )
 					this, SLOT( toggleProjectNotesWin() ),
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::Key_F10 );
-#ifdef QT4
 	project_notes_window->setWhatsThis(
-#else
-	QWhatsThis::add( project_notes_window,
-#endif
 		tr( "By pressing this button, you can show or hide the "
 			"project notes window. In this window you can put "
 			"down your project notes.") );
@@ -432,11 +358,7 @@ void mainWindow::finalize( void )
 
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
-#ifdef QT4
 	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
-#else
-	menuBar()->insertItem( tr( "&Project" ), project_menu );
-#endif
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
 					this, SLOT( createNewProject() ),
@@ -446,10 +368,10 @@ void mainWindow::finalize( void )
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
 					Qt::CTRL + Qt::Key_O );	
-
+/*
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "Recently opened projects" ),
-					m_recentlyOpenedProjectsMenu );
+					m_recentlyOpenedProjectsMenu );*/
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
@@ -460,11 +382,7 @@ void mainWindow::finalize( void )
 					tr( "Save &As..." ),
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
-#ifdef QT4
 	project_menu->addSeparator();
-#else
-	project_menu->insertSeparator();
-#endif
 	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
 					tr( "Import..." ),
 					engine::getSongEditor(),
@@ -474,22 +392,14 @@ void mainWindow::finalize( void )
 					engine::getSongEditor(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
-#ifdef QT4
 	project_menu->addSeparator();
-#else
-	project_menu->insertSeparator();
-#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
 
 
 	QMenu * edit_menu = new QMenu( this );
-#ifdef QT4
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-#else
-	menuBar()->insertItem( tr( "&Edit" ), edit_menu );
-#endif
 	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
 					this, SLOT( undo() ),
@@ -501,11 +411,7 @@ void mainWindow::finalize( void )
 
 
 	QMenu * settings_menu = new QMenu( this );
-#ifdef QT4
 	menuBar()->addMenu( settings_menu )->setText( tr( "&Settings" ) );
-#else
-	menuBar()->insertItem( tr( "&Settings" ), settings_menu );
-#endif
 	settings_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Show settings dialog" ),
 					this, SLOT( showSettingsDialog() ) );
@@ -515,9 +421,9 @@ void mainWindow::finalize( void )
 
 
 	m_tools_menu = new QMenu( this );
-	vvector<plugin::descriptor> pluginDescriptors;
+	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( vvector<plugin::descriptor>::iterator it =
+	for( QVector<plugin::descriptor>::iterator it =
 						pluginDescriptors.begin();
 					it != pluginDescriptors.end(); ++it )
 	{
@@ -528,31 +434,17 @@ void mainWindow::finalize( void )
 								this ) );
 		}
 	}
-#ifndef QT3
 	if( !m_tools_menu->isEmpty() )
-#else
-	if( m_tools_menu->count() )
-#endif
 	{
-#ifdef QT4
 		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
 		connect( m_tools_menu, SIGNAL( triggered( QAction * ) ),
 					this, SLOT( showTool( QAction * ) ) );
-#else
-		menuBar()->insertItem( tr( "&Tools" ), m_tools_menu );
-		connect( m_tools_menu, SIGNAL( activated( int ) ),
-						this, SLOT( showTool( int ) ) );
-#endif
 	}
 
 
 	// help-popup-menu
 	QMenu * help_menu = new QMenu( this );
-#ifdef QT4
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
-#else
-	menuBar()->insertItem( tr( "&Help" ), help_menu );
-#endif
 	if( have_www_browser() )
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
@@ -569,11 +461,7 @@ void mainWindow::finalize( void )
 					tr( "What's this?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
-#ifdef QT4
 	help_menu->addSeparator();
-#else
-	help_menu->insertSeparator();
-#endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 			      this, SLOT( aboutLMMS() ) );
 
@@ -602,11 +490,7 @@ int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 6 : _col;
 	if( _w->height() > 32 || _row == -1 )
 	{
-#ifdef QT4
 		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
-#else
-		m_toolBarLayout->addMultiCellWidget( _w, 0, 1, col, col );
-#endif
 	}
 	else
 	{
@@ -633,11 +517,7 @@ void mainWindow::resetWindowTitle( const QString & _add )
 	if( _add == "" && engine::getSongEditor()->projectFileName() != "" )
 	{
 		title = QFileInfo( engine::getSongEditor()->projectFileName()
-#ifdef QT4
-						).completeBaseName();
-#else
-						).baseName( TRUE );
-#endif
+							).completeBaseName();
 	}
 	if( title != "" )
 	{
@@ -711,43 +591,20 @@ void mainWindow::createNewProject( void )
 
 
 
-#ifdef QT4
 void mainWindow::createNewProjectFromTemplate( QAction * _idx )
-#else
-void mainWindow::createNewProjectFromTemplate( int _idx )
-#endif
 {
 	if( m_templatesMenu != NULL &&
 			engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
-#ifdef QT4
 		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
-#else
-		QString dir_base = m_templatesMenu->indexOf( _idx )
-#endif
 						>= m_custom_templates_count ?
 				configManager::inst()->factoryProjectsDir() :
 				configManager::inst()->userProjectsDir();
 		engine::getSongEditor()->createNewProjectFromTemplate(
-				dir_base + "templates/" +
-#ifdef QT4
-							_idx->text() + ".mpt" );
-#else
-				m_templatesMenu->text( _idx ) + ".mpt" );
-#endif
+			dir_base + "templates/" + _idx->text() + ".mpt" );
 	}
 }
 
-
-
-
-#ifdef QT4
-void mainWindow::createNewProjectFromTemplate( int _idx )
-#else
-void mainWindow::createNewProjectFromTemplate( QAction * _idx )
-#endif
-{
-}
 
 
 
@@ -756,15 +613,8 @@ void mainWindow::openProject( void )
 {
 	if( engine::getSongEditor()->mayChangeProject() == TRUE )
 	{
-#ifdef QT4
 		QFileDialog ofd( this, tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
-#else
-		QFileDialog ofd( QString::null,
-			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ),
-							this, "", TRUE );
-		ofd.setWindowTitle( tr( "Open project" ) );
-#endif
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
 		ofd.setFileMode( QFileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
@@ -794,10 +644,11 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 
 void mainWindow::openRecentlyOpenedProject( int _id )
 {
-	const QString & f = m_recentlyOpenedProjectsMenu->text( _id );
+#warning TODO
+/*	const QString & f = m_recentlyOpenedProjectsMenu->text( _id );
 	engine::getSongEditor()->loadProject( f );
 	configManager::inst()->addRecentlyOpenedProject( f );
-	updateRecentlyOpenedProjectsMenu();
+	updateRecentlyOpenedProjectsMenu();*/
 }
 
 
@@ -821,27 +672,15 @@ bool mainWindow::saveProject( void )
 
 bool mainWindow::saveProjectAs( void )
 {
-#ifdef QT4
 	QFileDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
-#else
-	QFileDialog sfd( QString::null,
-			tr( "MultiMedia Project (*.mmp *.mmpz);;"
-					"MultiMedia Project Template (*.mpt)" ),
-							this, "", TRUE );
-	sfd.setWindowTitle( tr( "Save project" ) );
-#endif
 	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSongEditor()->projectFileName();
 	if( f != "" )
 	{
 		sfd.selectFile( QFileInfo( f ).fileName() );
-#ifdef QT4
 		sfd.setDirectory( QFileInfo( f ).absolutePath() );
-#else
-		sfd.setDirectory( QFileInfo( f ).dirPath( TRUE ) );
-#endif
 	}
 	else
 	{
@@ -849,19 +688,10 @@ bool mainWindow::saveProjectAs( void )
 	}
 
 	if( sfd.exec () == QFileDialog::Accepted &&
-#ifdef QT4
-		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != ""
-#else
-		sfd.selectedFile() != ""
-#endif
- 		)
+		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-#ifdef QT4
 		engine::getSongEditor()->saveProjectAs(
 						sfd.selectedFiles()[0] );
-#else
-		engine::getSongEditor()->saveProjectAs( sfd.selectedFile() );
-#endif
 		return( TRUE );
 	}
 	return( FALSE );
@@ -1068,12 +898,7 @@ void mainWindow::fillTemplatesMenu( void )
 	m_templatesMenu->clear();
 
 	QDir user_d( configManager::inst()->userProjectsDir() + "templates" );
-	QStringList templates = user_d.entryList(
-#ifdef QT4
-						QStringList( "*.mpt" ),
-#else
-						"*.mpt",
-#endif
+	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 
 	m_custom_templates_count = templates.count();
@@ -1086,12 +911,7 @@ void mainWindow::fillTemplatesMenu( void )
 	}
 
 	QDir d( configManager::inst()->factoryProjectsDir() + "templates" );
-	templates = d.entryList(
-#ifdef QT4
-						QStringList( "*.mpt" ),
-#else
-						"*.mpt",
-#endif
+	templates = d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 
 
@@ -1111,31 +931,13 @@ void mainWindow::fillTemplatesMenu( void )
 
 
 
-#ifndef QT3
 void mainWindow::showTool( QAction * _idx )
-#else
-void mainWindow::showTool( int _idx )
-#endif
 {
-#ifndef QT3
 	tool * t = m_tools[m_tools_menu->actions().indexOf( _idx )];
-#else
-	tool * t = m_tools[m_tools_menu->indexOf( _idx )];
-#endif
 	t->show();
 	t->setFocus();
 }
 
-
-
-
-#ifndef QT3
-void mainWindow::showTool( int _idx )
-#else
-void mainWindow::showTool( QAction * _idx )
-#endif
-{
-}
 
 
 
@@ -1160,24 +962,14 @@ void mainWindow::browseHelp( void )
 	{
 // TODO: use QDesktopService with Qt4
 		QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
-		execlp( "x-www-browser", "x-www-browser", url.
-#ifdef QT4
-							toAscii().constData(),
-#else
-							ascii(),
-#endif
-									NULL );
+		execlp( "x-www-browser", "x-www-browser",
+					url.toAscii().constData(), NULL );
 		perror( "execlp" );
 		exit( EXIT_FAILURE );
 	}
 }
 
 
-
-
-#ifndef QT4
-#undef addSeparator
-#endif
 
 
 #include "main_window.moc"

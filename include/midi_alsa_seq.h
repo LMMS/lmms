@@ -40,20 +40,8 @@
 
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
-
-#else
-
-#include <qobject.h>
-#include <qthread.h>
-#include <qtimer.h>
-
-#endif
 
 
 #include "midi_client.h"
@@ -63,11 +51,7 @@ struct pollfd;
 class QLineEdit;
 
 
-class midiALSASeq :
-#ifndef QT4
-			public QObject,
-#endif
-			public midiClient, public QThread
+class midiALSASeq : public QThread, public midiClient
 {
 	Q_OBJECT
 public:

@@ -26,27 +26,9 @@
 #ifndef _FLP_IMPORT_H
 #define _FLP_IMPORT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
 #include <QtCore/QPair>
 #include <QtCore/QVector>
-
-#else
-
-#include <qstring.h>
-#include <qpair.h>
-#include <qvaluevector.h>
-
-#endif
-
 
 #include "import_filter.h"
 #include "note.h"
@@ -239,13 +221,13 @@ private:
 	}
 
 
-	typedef vlist<QPair<int, note> > patternNoteVector;
+	typedef QList<QPair<int, note> > patternNoteVector;
 	patternNoteVector m_notes;
 
-	typedef vlist<int> stepVector;
+	typedef QList<int> stepVector;
 	stepVector m_steps;
 
-	typedef vlist<Uint32> playListItems;
+	typedef QList<Uint32> playListItems;
 	playListItems m_plItems;
 
 } ;

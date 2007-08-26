@@ -23,6 +23,7 @@ fi
 
 AH_TEMPLATE(BUILD_LINUX, [Build LMMS for Linux])
 AH_TEMPLATE(BUILD_WIN32, [Build LMMS for Win32])
+AH_TEMPLATE(WIN32, [Build LMMS for Win32])
 AC_ARG_WITH(linux,
 	[  --with-linux		explicit build LMMS for Linux], [ build_linux=true ], [ build_linux=false ])
 AC_ARG_WITH(win32,

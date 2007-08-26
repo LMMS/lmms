@@ -26,10 +26,6 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
@@ -39,22 +35,6 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qapplication.h>
-#include <qbuttongroup.h>
-#include <qclipboard.h>
-#include <qdom.h>
-#include <qdragobject.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
-
-#define addButton insert
-#define setCheckable setToggleButton
-
-#endif
 
 
 #ifndef __USE_XOPEN
@@ -202,10 +182,8 @@ pianoRoll::pianoRoll( void ) :
 							"automation" ) );
 	}
 
-#ifdef QT4
 	// add us to workspace
 	engine::getMainWindow()->workspace()->addWindow( this );
-#endif
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
@@ -221,16 +199,11 @@ pianoRoll::pianoRoll( void ) :
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-#ifdef QT4
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-#else
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -251,29 +224,17 @@ pianoRoll::pianoRoll( void ) :
 				tr( "Stop playing of current pattern (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
-#ifdef QT4
 	m_playButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_playButton,
-#endif
 		tr( "Click here, if you want to play the current pattern. "
 			"This is useful while editing it. The pattern is "
 			"automatically looped when its end is reached." ) );
-#ifdef QT4
 	m_recordButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_recordButton,
-#endif
 		tr( "Click here, if you want to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you can play and edit them afterwards." ) );
-#ifdef QT4
 	m_stopButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_stopButton,
-#endif
 		tr( "Click here, if you want to stop playing of current "
 			"pattern." ) );
 
@@ -322,43 +283,24 @@ pianoRoll::pianoRoll( void ) :
 	tool_button_group->addButton( m_selectButton );
 	tool_button_group->addButton( m_moveButton );
 	tool_button_group->setExclusive( TRUE );
-#ifndef QT4
-	tool_button_group->hide();
-#endif
 
-#ifdef QT4
 	m_drawButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_drawButton,
-#endif
 		tr( "If you click here, draw-mode will be activated. In this "
 			"mode you can add, resize and move single notes. This "
 			"is the default-mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
-#ifdef QT4
 	m_eraseButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_eraseButton,
-#endif
 		tr( "If you click here, erase-mode will be activated. In this "
 			"mode you can erase single notes. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
-#ifdef QT4
 	m_selectButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_selectButton,
-#endif
 		tr( "If you click here, select-mode will be activated. "
 			"In this mode you can select notes. This is neccessary "
 			"if you want to cut, copy, paste, delete or move "
 			"notes. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );
-#ifdef QT4
 	m_moveButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_moveButton,
-#endif
 		tr( "If you click here, move-mode will be activated. In this "
 			"mode you can move the notes you selected in select-"
 			"mode. You can also press 'Shift+M' on your keyboard "
@@ -380,27 +322,15 @@ pianoRoll::pianoRoll( void ) :
 					this, SLOT( pasteNotes() ),
 					m_toolBar );
 
-#ifdef QT4
 	m_cutButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_cutButton,
-#endif
 		tr( "If you click here, selected notes will be cut into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste-button." ) );
-#ifdef QT4
 	m_copyButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_copyButton,
-#endif
 		tr( "If you click here, selected notes will be copied into the "
 			"clipboard. You can paste them anywhere in any pattern "
 			"by clicking on the paste-button." ) );
-#ifdef QT4
 	m_pasteButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_pasteButton,
-#endif
 		tr( "If you click here, the notes from the clipboard will be "
 			"pasted at the first visible tact." ) );
 
@@ -450,12 +380,7 @@ pianoRoll::pianoRoll( void ) :
 		m_noteLenComboBox->addItem( "1/" + QString::number( 1 << i ),
 				embed::getIconPixmap(
 					QString( "note_" + pixmaps[i] ).
-#ifndef QT3
-					toAscii().constData()
-#else
-					ascii()
-#endif
-					) );
+						toAscii().constData() ) );
 	}
 	m_noteLenComboBox->setValue( 0 );
 
@@ -494,9 +419,6 @@ pianoRoll::pianoRoll( void ) :
 	resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
 	setCurrentPattern( NULL );
 
-#ifndef QT4
-	setBackgroundMode( Qt::NoBackground );
-#endif
 	setMouseTracking( TRUE );
 
 	hide();
@@ -657,11 +579,8 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
 		}
 		Uint16 pos_x = _x + pos_tact_64th * m_ppt / 64;
 
-#ifdef QT3
-		const int level = it.data();
-#else
 		const int level = it.value();
-#endif
+
 		Uint16 pos_y = middle_y - level * KEY_LINE_HEIGHT / 10;
 
 		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
@@ -1024,12 +943,8 @@ void pianoRoll::updatePaintPixmap( QPixmap & _p )
 
 	// reset scroll-range
 	m_leftRightScroll->setRange( 0, l );
-#ifdef QT4
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( l );
-#else
-	m_leftRightScroll->setSteps( 1, l );
-#endif
 }
 
 
@@ -1207,13 +1122,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			if( mouseOverNote() )
 			{
 				m_editMode = OPEN;
-#ifndef QT3
 				QApplication::changeOverrideCursor(
 						QCursor( Qt::ArrowCursor ) );
-#else
-				QApplication::setOverrideCursor(
-					QCursor( Qt::ArrowCursor ), TRUE );
-#endif
 				update();
 			}
 
@@ -1558,23 +1468,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			m_action != CHANGE_NOTE_VOLUME &&
 			m_action != MOVE_SELECTION &&
 			edit_note == FALSE &&
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-					Qt::LeftButton )
+			_me->buttons() & Qt::LeftButton )
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
 								midiTime() );
-			if(
-#ifdef QT4
-				_me->buttons() &
-#else
-				_me->modifiers() ==
-#endif
-				Qt::LeftButton &&
+			if( _me->buttons() & Qt::LeftButton &&
 				m_action != RESIZE_NOTE &&
 				m_action != SELECT_NOTES &&
 				m_action != MOVE_SELECTION &&
@@ -1614,12 +1513,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 		else if( m_currentNote != NULL &&
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->state() ==
-#endif
-			Qt::LeftButton && m_editMode == DRAW )
+			_me->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
 			int key_num = getKey( _me->y() );
 			
@@ -1665,14 +1559,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			engine::getSongEditor()->setModified();
 
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() == Qt::NoButton
-#else
-			( _me->state() == NoButton
-					|| _me->state() == ControlButton )
-#endif
-							&& m_editMode == DRAW )
+		else if( _me->buttons() == Qt::NoButton && m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
 
@@ -1709,14 +1596,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				if( _me->modifiers() & Qt::ControlModifier )
 				{
 					m_editMode = OPEN;
-#ifndef QT3
 					QApplication::changeOverrideCursor(
 						QCursor( Qt::ArrowCursor ) );
-#else
-					QApplication::setOverrideCursor(
-						QCursor( Qt::ArrowCursor ),
-									TRUE );
-#endif
 				}
 				// cursor at the "tail" of the note?
 				else if( ( *it )->length() > 0 &&
@@ -1778,13 +1659,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				}
 			}
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-					Qt::LeftButton &&
+		else if( _me->buttons() & Qt::LeftButton &&
 						m_editMode == SELECT &&
 						m_action == SELECT_NOTES )
 		{
@@ -1834,13 +1709,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				--m_selectedKeys;
 			}
 		}
-		else if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-				Qt::LeftButton &&
+		else if( _me->buttons() & Qt::LeftButton &&
 					m_editMode == MOVE &&
 					m_action == MOVE_SELECTION )
 		{
@@ -1945,13 +1814,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		if(
-#ifdef QT4
-			_me->buttons() &
-#else
-			_me->modifiers() ==
-#endif
-				Qt::LeftButton &&
+		if( _me->buttons() & Qt::LeftButton &&
 					m_editMode == SELECT &&
 					m_action == SELECT_NOTES )
 		{
@@ -2041,14 +1904,8 @@ void pianoRoll::paintEvent( QPaintEvent * )
 {
 	QPixmap paintPixmap( size() );
 	updatePaintPixmap( paintPixmap );
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( size() );
-	draw_pm.fill( QColor( 0, 0, 0 ) );
 
-	QPainter p( &draw_pm, this );
-#endif
 	p.drawPixmap( 0, 0, paintPixmap );
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
@@ -2077,10 +1934,6 @@ void pianoRoll::paintEvent( QPaintEvent * )
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
 
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 
@@ -2104,12 +1957,8 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 	m_totalKeysToScroll = total_pixels * NOTES_PER_OCTAVE / OCTAVE_HEIGHT;
 
 	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
-#ifdef QT4
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-#else
-	m_topBottomScroll->setSteps( 1, 20 );
-#endif
 
 	if( m_startKey > m_totalKeysToScroll )
 	{
@@ -2457,17 +2306,10 @@ void pianoRoll::copy_to_clipboard( const noteVector & _notes ) const
 		clip_note.saveState( mmp, note_list );
 	}
 
-#ifdef QT4
 	QMimeData * clip_content = new QMimeData;
 	clip_content->setData( clipboard::mimeType(), mmp.toString().toUtf8() );
 	QApplication::clipboard()->setMimeData( clip_content,
 							QClipboard::Clipboard );
-#else
-	QStoredDrag * clip_content = new QStoredDrag( clipboard::mimeType() );
-	clip_content->setEncodedData( mmp.toString().utf8() );
-	QApplication::clipboard()->setData( clip_content,
-							QClipboard::Clipboard );
-#endif
 }
 
 
@@ -2531,14 +2373,9 @@ void pianoRoll::pasteNotes( void )
 		return;
 	}
 
-#ifdef QT4
 	QString value = QApplication::clipboard()
 				->mimeData( QClipboard::Clipboard )
 						->data( clipboard::mimeType() );
-#else
-	QString value = QApplication::clipboard()->data( QClipboard::Clipboard )
-					->encodedData( clipboard::mimeType() );
-#endif
 
 	if( !value.isEmpty() )
 	{
@@ -2728,12 +2565,6 @@ bool pianoRoll::x11Event( XEvent * _xe )
 
 
 #include "piano_roll.moc"
-
-
-#ifdef QT3
-#undef addButton
-#undef setCheckable
-#endif
 
 
 #endif

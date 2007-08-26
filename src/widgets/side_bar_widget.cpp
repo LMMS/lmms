@@ -25,22 +25,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QApplication>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qfontmetrics.h>
-
-#endif
-
 
 #include "side_bar_widget.h"
 #include "types.h"
@@ -74,41 +61,21 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 {
 	const Uint16 TITLE_FONT_HEIGHT = 13;
 
-#ifdef QT4
 	QPainter p( this );
 	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
-#else
-	QPixmap draw_pm( rect().size() );
-	draw_pm.fill( QApplication::palette().color( QPalette::Normal,
-						QColorGroup::Background ) );
-
-	QPainter p( &draw_pm, this );
-	p.fillRect( 0, 0, width(), 27, QApplication::palette().color(
-							QPalette::Normal,
-						QColorGroup::Highlight ) );
-#endif
 
 	QFont f = p.font();
 	f.setBold( TRUE );
 	p.setFont( pointSize<TITLE_FONT_HEIGHT>( f ) );
 
-#ifdef QT4
 	p.setPen( palette().highlightedText().color() );
-#else
-	p.setPen( QApplication::palette().color( QPalette::Normal,
-					QColorGroup::HighlightedText ) );
-#endif
+
 	const Uint16 tx = m_icon.width()+4;
 	const Uint16 ty = 2+TITLE_FONT_HEIGHT;
 	p.drawText( tx, ty, m_title );
 	p.drawLine( tx, ty+4, width()-4, ty+4 );
 
 	p.drawPixmap( 2, 2, m_icon );
-
-#ifndef QT4
-	// and blit all drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 
@@ -117,7 +84,7 @@ void sideBarWidget::resizeEvent( QResizeEvent * )
 {
 	const Uint16 MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
-							height() - MARGIN * 2 - 40 );
+						height() - MARGIN * 2 - 40 );
 }
 
 

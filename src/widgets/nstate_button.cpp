@@ -25,14 +25,7 @@
  */
  
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QMouseEvent>
-
-#endif
-
 
 #include "nstate_button.h"
 #include "embed.h"

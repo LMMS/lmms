@@ -23,25 +23,9 @@
  */
  
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QBitmap>
 #include <QtGui/QPainter>
-
-#else
-
-#include <qbitmap.h>
-#include <qpainter.h>
-#include <qdom.h>
-#include <qwhatsthis.h>
-
-#define setChecked setOn
-
-#endif
-
 
 #include "triple_oscillator.h"
 #include "automatable_button.h"
@@ -84,15 +68,11 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &tripleoscillator_plugin_descriptor )
 {
-#ifdef QT4
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 
 	pixmapButton * pm_osc1_btn = new pixmapButton( this, NULL, NULL );
 	pm_osc1_btn->move( 46, 50 );
@@ -247,11 +227,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 							/ NUM_OF_OSCILLATORS );
 		m_osc[i].m_volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
-#ifdef QT4
 		m_osc[i].m_volKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_volKnob,
-#endif
 			tr( "With this knob you can set the volume of "
 				"oscillator %1. When setting a value of 0 the "
 				"oscillator is turned off. Otherwise you can "
@@ -269,11 +245,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].m_panKnob->setHintText( tr("Osc %1 panning:").arg(
 									i + 1 )
 						+ " ", "" );
-#ifdef QT4
 		m_osc[i].m_panKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_panKnob,
-#endif
 			tr( "With this knob you can set the panning of the "
 				"oscillator %1. A value of -100 means 100% "
 				"left and a value of 100 moves oscillator-"
@@ -290,11 +262,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].m_coarseKnob->setHintText(
 			tr( "Osc %1 coarse detuning:" ).arg( i + 1 ) + " ",
 						" " + tr( "semitones" ) );
-#ifdef QT4
 		m_osc[i].m_coarseKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_coarseKnob,
-#endif
 			tr( "With this knob you can set the coarse detuning of "
 				"oscillator %1. You can detune the oscillator "
 				"12 semitones (1 octave) up and down. This is "
@@ -312,11 +280,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 							"left:" ).arg( i + 1 )
 							+ " ", " " +
 							tr( "cents" ) );
-#ifdef QT4
 		m_osc[i].m_fineLKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_fineLKnob,
-#endif
 			tr( "With this knob you can set the fine detuning of "
 				"oscillator %1 for the left channel. The fine-"
 				"detuning is ranged between -100 cents and "
@@ -334,11 +298,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 		m_osc[i].m_fineRKnob->setHintText( tr( "Osc %1 fine detuning "
 							"right:").arg( i + 1 ) +
 						" ", " " + tr( "cents" ) );
-#ifdef QT4
 		m_osc[i].m_fineRKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_fineRKnob,
-#endif
 			tr( "With this knob you can set the fine detuning of "
 				"oscillator %1 for the right channel. The "
 				"fine-detuning is ranged between -100 cents "
@@ -357,11 +317,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 								"offset:" ).
 								arg( i + 1 ) +
 						" ", " " + tr( "degrees" ) );
-#ifdef QT4
 		m_osc[i].m_phaseOffsetKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_phaseOffsetKnob,
-#endif
 			tr( "With this knob you can set the phase-offset of "
 				"oscillator %1. That means you can move the "
 				"point within an oscillation where the "
@@ -386,11 +342,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _channel_track ) :
 								arg( i + 1 ) +
 								" ", " " +
 							tr( "degrees" ) );
-#ifdef QT4
 		m_osc[i].m_stereoPhaseDetuningKnob->setWhatsThis(
-#else
-		QWhatsThis::add( m_osc[i].m_stereoPhaseDetuningKnob,
-#endif
 			tr( "With this knob you can set the stereo phase-"
 				"detuning of oscillator %1. The stereo phase-"
 				"detuning specifies the size of the difference "

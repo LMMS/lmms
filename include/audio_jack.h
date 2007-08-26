@@ -37,21 +37,9 @@
 #include <jack/jack.h>
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-
-#else
-
-#include <qvaluevector.h>
-#include <qvaluelist.h>
-#include <qmap.h>
-
-#endif
 
 
 #include "audio_device.h"
@@ -109,7 +97,7 @@ private:
 
 	QSemaphore m_stop_semaphore;
 
-	vvector<jack_port_t *> m_outputPorts;
+	QVector<jack_port_t *> m_outputPorts;
 	surroundSampleFrame * m_outBuf;
 
 

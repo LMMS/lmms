@@ -25,21 +25,9 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
-
-#else
-
-#include <qfontmetrics.h>
-#include <qpainter.h>
-
-#endif
-
 
 #include "led_checkbox.h"
 #include "automatable_object_templates.h"
@@ -67,16 +55,9 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	{
 		_color = YELLOW;
 	}
-	m_ledOnPixmap = new QPixmap( embed::getIconPixmap( names[_color]
-#ifdef QT4
-							.toAscii().constData()
-#endif
-							 ) );
+	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
+					names[_color].toAscii().constData() ) );
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
-
-#ifndef QT4
-	setBackgroundMode( Qt::PaletteBackground );
-#endif
 
 	setFont( pointSizeF( font(), 7.5f ) );
 	setFixedSize( m_ledOffPixmap->width() + 4 +
@@ -98,14 +79,8 @@ ledCheckBox::~ledCheckBox()
 
 void ledCheckBox::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap draw_pm( rect().size() );
-	//draw_pm.fill( this, rect().topLeft() );
 
-	QPainter p( &draw_pm, this );
-#endif
 	p.drawPixmap( 0, 0, specialBgHandlingWidget::getBackground( this ) );
 
 	if( isChecked() == TRUE )
@@ -121,11 +96,6 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	p.drawText( m_ledOffPixmap->width() + 3, 9, text() );
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( m_ledOffPixmap->width() + 2, 8, text() );
-
-#ifndef QT4
-	// and blit all the drawn stuff on the screen...
-	bitBlt( this, rect().topLeft(), &draw_pm );
-#endif
 }
 
 

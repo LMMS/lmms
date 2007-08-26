@@ -30,20 +30,8 @@
 #include <config.h>
 #endif
 
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMap>
 #include <Qt/QtXml>
-
-#else
-
-#include <qmap.h>
-#include <qdom.h>
-
-#endif
 
 
 class journallingObject;

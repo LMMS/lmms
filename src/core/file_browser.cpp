@@ -26,25 +26,12 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPushButton>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QCursor>
+class QColorGroup;
 #include <Qt3Support/Q3Header>
-
-#else
-
-#include <qpushbutton.h>
-#include <qpopupmenu.h>
-#include <qheader.h>
-#include <qcursor.h>
-#include <qworkspace.h>
-
-#endif
 
 
 #include "file_browser.h"
@@ -78,17 +65,10 @@ fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 	m_l = new listView( contentParent() );
 	addContentWidget( m_l );
 
-#ifdef QT4
 	connect( m_l, SIGNAL( contextMenuRequested( Q3ListViewItem *,
 							const QPoint &, int ) ),
 			this, SLOT( contextMenuRequest( Q3ListViewItem *,
 						const QPoint &, int ) ) );
-#else
-	connect( m_l, SIGNAL( contextMenuRequested( QListViewItem *,
-							const QPoint &, int ) ),
-			this, SLOT( contextMenuRequest( QListViewItem *,
-						const QPoint &, int ) ) );
-#endif
 
 
 	QPushButton * reload_btn = new QPushButton( embed::getIconPixmap(
@@ -113,21 +93,13 @@ fileBrowser::~fileBrowser()
 void fileBrowser::reloadTree( void )
 {
 	m_l->clear();
-#ifndef QT3
 	QStringList paths = m_directories.split( '*' );
-#else
-	QStringList paths = QStringList::split( '*', m_directories );
-#endif
 	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
 	{
 		addItems( *it );
 	}
 
-#ifndef QT3
 	Q3ListViewItem * item = m_l->firstChild();
-#else
-	QListViewItem * item = m_l->firstChild();
-#endif
 	bool resort = FALSE;
 
 	// sort merged directories
@@ -140,11 +112,7 @@ void fileBrowser::reloadTree( void )
 		}
 		else if( resort == TRUE )
 		{
-#ifndef QT3
 			Q3ListViewItem * i2 = m_l->firstChild();
-#else
-			QListViewItem * i2 = m_l->firstChild();
-#endif
 			d->moveItem( i2 );
 			i2->moveItem( d );
 			directory * d2 = NULL;
@@ -174,14 +142,15 @@ void fileBrowser::addItems( const QString & _path )
 	// which makes it possible to travel through the list in reverse
 	// direction
 
-	for( csize i = 0; i < files.size(); ++i )
+	for( int i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.'
+#warning TODO: add match here
 #ifdef QT4
 // TBD
 #else
-			&& QDir::match( m_filter, cur_file.lower() )
+//			&& QDir::match( m_filter, cur_file.lower() )
 #endif
 	)
 		{
@@ -192,18 +161,14 @@ void fileBrowser::addItems( const QString & _path )
 	}
 
 	files = cdir.entryList( QDir::Dirs, QDir::Name );
-	for( csize i = 0; i < files.size(); ++i )
+	for( int i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' &&
 			isDirWithContent( _path + QDir::separator() + cur_file,
 								m_filter ) )
 		{
-#ifdef QT4
 			Q3ListViewItem * item = m_l->findItem( cur_file, 0 );
-#else
-			QListViewItem * item = m_l->findItem( cur_file, 0 );
-#endif
 			if( item == NULL )
 			{
 				(void) new directory( m_l, cur_file, _path,
@@ -230,10 +195,11 @@ bool fileBrowser::isDirWithContent( const QString & _path,
 	{
 		QString cur_file = *it;
 		if( cur_file[0] != '.'
+#warning TODO: add match here
 #ifdef QT4
 // TBD
 #else
-			&& QDir::match( _filter, cur_file.lower() )
+//			&& QDir::match( _filter, cur_file.lower() )
 #endif
 	)
 		{
@@ -274,11 +240,7 @@ void fileBrowser::keyPressEvent( QKeyEvent * _ke )
 
 
 
-#ifdef QT4
 void fileBrowser::contextMenuRequest( Q3ListViewItem * i, const QPoint &, int )
-#else
-void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
-#endif
 {
 	fileItem * f = dynamic_cast<fileItem *>( i );
 	if( f != NULL && ( f->type() == fileItem::SAMPLE_FILE ||
@@ -307,11 +269,7 @@ void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
 
 
 
-#ifdef QT4
 void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
-#else
-void fileBrowser::contextMenuRequest( Q3ListViewItem * i, const QPoint &, int )
-#endif
 {
 }
 
@@ -327,11 +285,7 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 
 	// get all windows opened in the workspace
 	QWidgetList pl = engine::getMainWindow()->workspace()->windowList(
-#if QT_VERSION >= 0x030200
-						QWorkspace::StackingOrder
-#endif
-									);
-#ifdef QT4
+						QWorkspace::StackingOrder );
 	QListIterator<QWidget *> w( pl );
 	w.toBack();
 	// now we travel through the window-list until we find an
@@ -340,14 +294,6 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 								w.previous() );
-#else
-	QWidget * w = pl.last();
-	// now we travel through the window-list until we find an
-	// instrument-track
-	while( w != NULL )
-	{
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( w );
-#endif
 		if( ct != NULL && ct->isHidden() == FALSE )
 		{
 			// ok, it's an instrument-track, so we can apply the
@@ -378,9 +324,6 @@ void fileBrowser::sendToActiveInstrumentTrack( void )
 			engine::getMixer()->unlock();
 			break;
 		}
-#ifndef QT4
-		w = pl.prev();
-#endif
 	}
 }
 
@@ -540,11 +483,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 	}
 
 	QPoint p( contentsToViewport( _me->pos() ) );
-#ifndef QT3
 	Q3ListViewItem * i = itemAt( p );
-#else
-	QListViewItem * i = itemAt( p );
-#endif
         if ( i )
 	{
 		if ( p.x() > header()->cellPos( header()->mapToActual( 0 ) ) +
@@ -579,11 +518,7 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 								"preview..." ),
 					embed::getIconPixmap( "sound_file",
 								24, 24 ), 0 );
-#ifdef QT4
 			qApp->processEvents( QEventLoop::AllEvents );
-#else
-			qApp->processEvents();
-#endif
 			samplePlayHandle * s = new samplePlayHandle(
 								f->fullName() );
 			s->setDoneMayReturnTrue( FALSE );
@@ -699,11 +634,7 @@ QPixmap * directory::s_folderLockedPixmap = NULL;
 
 directory::directory( directory * _parent, const QString & _name,
 			const QString & _path, const QString & _filter ) :
-#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
-#else
-	QListViewItem( _parent, _name ),
-#endif
 	m_p( _parent ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -717,11 +648,7 @@ directory::directory( directory * _parent, const QString & _name,
 
 directory::directory( Q3ListView * _parent, const QString & _name,
 			const QString & _path, const QString & _filter ) :
-#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
-#else
-	QListViewItem( _parent, _name ),
-#endif
 	m_p( NULL ),
 	m_pix( NULL ),
 	m_directories( _path ),
@@ -799,21 +726,13 @@ void directory::setOpen( bool _o )
 				( *it ).contains(
 					configManager::inst()->dataDir() ) )
 			{
-#ifndef QT3
 				( new Q3ListViewItem( this,
-#else
-				( new QListViewItem( this,
-#endif
 		listView::tr( "--- Factory files ---" ) ) )->setPixmap( 0,
 				embed::getIconPixmap( "factory_files" ) );
 			}
 		}
 	}
-#ifndef QT3
 	Q3ListViewItem::setOpen( _o );
-#else
-	QListViewItem::setOpen( _o );
-#endif
 }
 
 
@@ -822,11 +741,7 @@ void directory::setOpen( bool _o )
 void directory::setup( void )
 {
 	setExpandable( TRUE );
-#ifndef QT3
 	Q3ListViewItem::setup();
-#else
-	QListViewItem::setup();
-#endif
 }
 
 
@@ -847,15 +762,11 @@ bool directory::addItems( const QString & _path )
 	bool added_something = FALSE;
 
 	QStringList files = thisDir.entryList( QDir::Files, QDir::Name );
-	for( csize i = 0; i < files.size(); ++i )
+	for( int i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.'
-#ifdef QT4
 				&& thisDir.match( m_filter, cur_file.toLower() )
-#else
-				&& thisDir.match( m_filter, cur_file.lower() )
-#endif
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
 		{
 			(void) new fileItem( this, cur_file, _path );
@@ -864,15 +775,11 @@ bool directory::addItems( const QString & _path )
 	}
 
 	files = thisDir.entryList( QDir::Dirs, QDir::Name );
-	for( csize i = 0; i < files.size(); ++i )
+	for( int i = 0; i < files.size(); ++i )
 	{
 		QString cur_file = files[files.size() - i - 1];
 		if( cur_file[0] != '.' && fileBrowser::isDirWithContent(
-#ifdef QT4
 				thisDir.absolutePath() + QDir::separator() +
-#else
-					thisDir.absPath() + QDir::separator() +
-#endif
 							cur_file, m_filter ) )
 		{
 			new directory( this, cur_file, _path, m_filter );
@@ -922,11 +829,7 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 						const QString & _path ) :
-#ifndef QT3
 	Q3ListViewItem( _parent, _name ),
-#else
-	QListViewItem( _parent, _name ),
-#endif
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -938,15 +841,9 @@ fileItem::fileItem( Q3ListView * _parent, const QString & _name,
 
 
 
-#ifndef QT3
 fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
 						const QString & _path ) :
 	Q3ListViewItem( _parent, _name ),
-#else
-fileItem::fileItem( QListViewItem * _parent, const QString & _name,
-						const QString & _path ) :
-	QListViewItem( _parent, _name ),
-#endif
 	m_pix( NULL ),
 	m_path( _path )
 {
@@ -1072,11 +969,7 @@ QString fileItem::extension( void )
 
 QString fileItem::extension( const QString & _file )
 {
-#ifdef QT4
 	return( QFileInfo( _file ).suffix().toLower() );
-#else
-	return( QFileInfo( _file ).extension( FALSE ).toLower() );
-#endif
 }
 
 

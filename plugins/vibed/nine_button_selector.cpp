@@ -22,26 +22,14 @@
  *
  */
 
-#include "qt3support.h"
-
-#ifdef QT4
 
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
 
-#else
-
-#include <qwhatsthis.h>
-#include <qlabel.h>
-#include <qpopupmenu.h>
-#include <qcursor.h>
-
-#endif
-
-
 #include "nine_button_selector.h"
 #include "embed.h"
+
 
 nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					QPixmap _button0_off,
@@ -71,14 +59,11 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 	setFixedSize( 50, 50 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
 	move( _x, _y );
-#ifndef QT3
+
 	setAutoFillBackground( TRUE );
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), m_base );
 	setPalette( pal );
-#else
-	setPaletteBackgroundPixmap( m_base );
-#endif
 
 	m_button = new pixmapButton( this, NULL, _track );
 	m_button->move( 1, 1 );
@@ -266,9 +251,9 @@ void FASTCALL nineButtonSelector::setSelected( Uint8 _new_button )
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
 	QMenu contextMenu( this );
-#ifdef QT4
 	contextMenu.setTitle( accessibleName() );
-#else
+#warning TODO: CSS-formatting
+#if 0
 	QLabel * caption = new QLabel( "<font color=white><b>" +
 			QString( "Selector" ) + "</b></font>", this );
 	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
@@ -285,13 +270,8 @@ void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 
 void nineButtonSelector::displayHelp( void )
 {
-#ifdef QT4
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-			      whatsThis() );
-#else
-	QWhatsThis::display( QWhatsThis::textFor( this ), mapToGlobal(
-						rect().bottomRight() ) );
-#endif
+							      whatsThis() );
 }
 
 

@@ -170,7 +170,7 @@ private:
 	comboBox * m_presets;
 	knob * m_spread;
 	
-	vvector<sample_t> m_scalers;
+	QVector<sample_t> m_scalers;
 	sampleFrame * m_buffer;
 	bool m_filesMissing;
 

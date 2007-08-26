@@ -23,19 +23,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-#include <qmessagebox.h>
-#include <qdir.h>
-
-#endif
 
 #include "BandedWG.h"
 #include "ModalBar.h"
@@ -128,15 +116,11 @@ mallets::~mallets()
 
 void mallets::setWidgetBackground( QWidget * _widget, const QString & _pic )
 {
-#ifdef QT4
 	_widget->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( _widget->backgroundRole(),
 		PLUGIN_NAME::getIconPixmap( _pic.toAscii().constData() ) );
 	_widget->setPalette( pal );
-#else
-	_widget->setErasePixmap( PLUGIN_NAME::getIconPixmap( _pic ) );
-#endif
 }
 
 
@@ -541,10 +525,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-#ifndef QT3
-						.toAscii().constData()
-#endif
-									);
+						.toAscii().constData() );
 	
 		m_voice = new ModalBar();
 	
@@ -591,10 +572,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-#ifndef QT3
-						.toAscii().constData()
-#endif
-									);
+						.toAscii().constData() );
 	
 		m_voice = new TubeBell();
 	
@@ -639,10 +617,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( configManager::inst()->stkDir()
-#ifndef QT3
-						.toAscii().constData()
-#endif
-									);
+						.toAscii().constData() );
 
 		m_voice = new BandedWG();
 	

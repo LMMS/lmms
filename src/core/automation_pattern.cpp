@@ -26,18 +26,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-#define value data
-
-#endif
 
 
 #include "automation_pattern.h"

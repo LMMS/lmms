@@ -27,17 +27,7 @@
 #ifndef _AUDIO_FILE_PROCESSOR_H
 #define _AUDIO_FILE_PROCESSOR_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qpixmap.h>
-
-#endif
 
 #include "instrument.h"
 #include "sample_buffer.h"

@@ -26,19 +26,8 @@
 #ifndef _MIDI_CLIENT_H
 #define _MIDI_CLIENT_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
-
-#else
-
-#include <qvaluevector.h>
-#include <qstringlist.h>
-
-#endif
 
 
 #include "midi.h"
@@ -116,11 +105,7 @@ public:
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
 			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tr( _caption
-#ifndef QT3
-						.toAscii()
-#endif
-							) ).toUpper(), _parent )
+					tr( _caption.toAscii() ) ).toUpper(), _parent )
 		{
 		}
 
@@ -142,7 +127,7 @@ public:
 
 
 protected:
-	vvector<midiPort *> m_midiPorts;
+	QVector<midiPort *> m_midiPorts;
 
 } ;
 

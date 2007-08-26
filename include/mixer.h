@@ -30,22 +30,9 @@
 #include <config.h>
 #endif
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
-
-#else
-
-#include <qobject.h>
-#include <qmutex.h>
-#include <qthread.h>
-#include <qvaluevector.h>
-
-#endif
 
 
 #include "types.h"
@@ -138,7 +125,7 @@ public:
 	inline void removeAudioPort( audioPort * _port )
 	{
 		lock();
-		vvector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
+		QVector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 		if( it != m_audioPorts.end() )
@@ -352,14 +339,14 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer( void );
 
-	vvector<audioPort *> m_audioPorts;
+	QVector<audioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;
 	
-	vvector<surroundSampleFrame *> m_bufferPool;
+	QVector<surroundSampleFrame *> m_bufferPool;
 	Uint8 m_readBuffer;
 	Uint8 m_writeBuffer;
 	Uint8 m_analBuffer;

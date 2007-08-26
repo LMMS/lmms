@@ -30,20 +30,9 @@
 #ifdef OSS_SUPPORT
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 
-#else
-
-#include <qmap.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-
-#endif
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -61,18 +50,10 @@ midiOSS::midiOSS( void ) :
 {
 	// only start thread, if opening of MIDI-device is successful,
 	// otherwise isRunning()==FALSE indicates error
-#ifdef QT4
 	if( m_midiDev.open( QIODevice::ReadWrite ) ||
 					m_midiDev.open( QIODevice::ReadOnly ) )
-#else
-	if( m_midiDev.open( IO_ReadWrite ) || m_midiDev.open( IO_ReadOnly ) )
-#endif
 	{
-		start(
-#if QT_VERSION >= 0x030505
-				QThread::LowPriority
-#endif
-							);
+		start( QThread::LowPriority );
 	}
 }
 
@@ -111,11 +92,7 @@ QString midiOSS::probeDevice( void )
 
 void midiOSS::sendByte( const Uint8 _c )
 {
-#ifdef QT4
 	m_midiDev.putChar( _c );
-#else
-	m_midiDev.putch( _c );
-#endif
 }
 
 
@@ -125,16 +102,12 @@ void midiOSS::run( void )
 {
 	while( m_quit == FALSE && m_midiDev.isOpen() )
 	{
-#ifdef QT4
 		char c;
 		if( !m_midiDev.getChar( &c ) )
 		{
 			continue;
 		}
 		parseData( c );
-#else
-		parseData( m_midiDev.getch() );
-#endif
 	}
 }
 

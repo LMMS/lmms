@@ -27,20 +27,8 @@
 #ifndef _BB_TRACK_H
 #define _BB_TRACK_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QObject>
 #include <QtCore/QMap>
-
-#else
-
-#include <qobject.h>
-#include <qmap.h>
-
-#endif
-
 
 #include "track.h"
 
@@ -113,8 +101,8 @@ public:
 	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
 									_this );
 
-	static bbTrack * FASTCALL findBBTrack( csize _bb_num );
-	static csize FASTCALL numOfBBTrack( track * _track );
+	static bbTrack * FASTCALL findBBTrack( int _bb_num );
+	static int FASTCALL numOfBBTrack( track * _track );
 	static void FASTCALL swapBBTracks( track * _track1, track * _track2 );
 
 	inline nameLabel * trackLabel( void )
@@ -149,9 +137,9 @@ protected:
 
 private:
 	nameLabel * m_trackLabel;
-	vlist<track *> m_disabled_tracks;
+	QList<track *> m_disabled_tracks;
 
-	typedef QMap<bbTrack *, csize> infoMap;
+	typedef QMap<bbTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
 } ;

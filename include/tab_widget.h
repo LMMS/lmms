@@ -1,7 +1,7 @@
 /*
  * tab_widget.h - LMMS-tabwidget
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,25 +26,8 @@
 #ifndef _TAB_WIDGET_H
 #define _TAB_WIDGET_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
 #include <QtCore/QMap>
-
-#else
-
-#include <qwidget.h>
-#include <qmap.h>
-
-#endif
-
 
 #include "spc_bg_hndl_widget.h"
 
@@ -56,10 +39,10 @@ public:
 	tabWidget( const QString & _caption, QWidget * _parent );
 	~tabWidget();
 
-	void FASTCALL addTab( QWidget * _w, const QString & _name,
+	void addTab( QWidget * _w, const QString & _name,
 								int _idx = -1 );
 
-	void FASTCALL setActiveTab( int _idx );
+	void setActiveTab( int _idx );
 
 	inline int activeTab( void ) const
 	{

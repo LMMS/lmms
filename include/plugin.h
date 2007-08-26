@@ -27,24 +27,9 @@
 #define _PLUGIN_H
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QVector>
-
-#else
-
-#include <qstring.h>
-#include <qvaluevector.h>
-
-#endif
-
 
 #include "journalling_object.h"
 #include "base64.h"
@@ -105,7 +90,7 @@ public:
 					:
 					desc( NULL )
 				{
-					const vlist<QVariant> l =
+					const QList<QVariant> l =
 						base64::decode( _dump_data ).
 								toList();
 					name = l[0].toString();
@@ -114,14 +99,14 @@ public:
 				inline QString dumpBase64( void ) const
 				{
 					return( base64::encode(
-						vlist<QVariant>()
+						QList<QVariant>()
 							<< name << user ) );
 				}
 				plugin::descriptor * desc;
 				QString name;
 				QVariant user;
 			};
-			typedef vlist<key> keyList;
+			typedef QList<key> keyList;
 
 			subPluginFeatures( plugin::pluginTypes _type ) :
 				m_type( _type )
@@ -208,7 +193,7 @@ public:
 
 	// fills given vector with descriptors of all available plugins
 	static void FASTCALL getDescriptorsOfAvailPlugins(
-					vvector<descriptor> & _plugin_descs );
+					QVector<descriptor> & _plugin_descs );
 
 private:
 	const descriptor * m_descriptor;

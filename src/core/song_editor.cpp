@@ -32,10 +32,6 @@
 #include <math.h>
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -46,24 +42,8 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMessageBox>
+#include <QtGui/QScrollBar>
 #include <QtGui/QStatusBar>
-
-#else
-
-#include <qfile.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include <qfileinfo.h>
-#include <qdom.h>
-#include <qlabel.h>
-#include <qstatusbar.h>
-#include <qlayout.h>
-#include <qbuttongroup.h>
-
-#define addButton insert
-#define setCheckable setToggleButton
-
-#endif
 
 
 #include "song_editor.h"
@@ -129,11 +109,7 @@ songEditor::songEditor( void ) :
 		w->move( 210, 10 );
 	}
 
-#ifdef QT4
 	setFocusPolicy( Qt::StrongFocus );
-#else
-	setFocusPolicy( StrongFocus );
-#endif
 	setFocus();
 
 	QWidget * cw = new QWidget( this );
@@ -167,11 +143,7 @@ songEditor::songEditor( void ) :
 						SLOT( setModified() ) );
 	toolTip::add( m_bpmSpinBox, tr( "tempo of song" ) );
 
-#ifdef QT4
 	m_bpmSpinBox->setWhatsThis(
-#else
-	QWhatsThis::add( m_bpmSpinBox,
-#endif
 		tr( "The tempo of a song is specified in beats per minute "
 			"(BPM). If you want to change the tempo of your "
 			"song, change this value. Every tact has four beats, "
@@ -219,11 +191,7 @@ songEditor::songEditor( void ) :
 	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 1 );
 	m_masterVolumeSlider->setInitValue( 100 );
-#ifdef QT4
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-#else
-	m_masterVolumeSlider->setTickPosition( QSlider::Left );
-#endif
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
 	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
@@ -257,11 +225,7 @@ songEditor::songEditor( void ) :
 	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setInitValue( 0 );
-#ifdef QT4
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-#else
-	m_masterPitchSlider->setTickPosition( QSlider::Left );
-#endif
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
 	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
@@ -303,26 +267,17 @@ songEditor::songEditor( void ) :
 	m_toolBar = new QWidget( cw );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-#ifdef QT4
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(), 
 				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-#else
-	m_toolBar->setPaletteBackgroundPixmap( embed::getIconPixmap(
-							"toolbar_bg" ) );
-#endif
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
 	tb_layout->setSpacing( 0 );
 
-#ifdef QT4
 	containerWidget()->setParent( cw );
-#else
-	containerWidget()->reparent( cw, 0, QPoint( 0, 0 ) );
-#endif
 	containerWidget()->move( 0, m_toolBar->height() + tl->height() );
 
 
@@ -365,13 +320,9 @@ songEditor::songEditor( void ) :
 	tool_button_group->addButton( m_drawModeButton );
 	tool_button_group->addButton( m_editModeButton );
 	tool_button_group->setExclusive( TRUE );
-#ifndef QT4
-	tool_button_group->hide();
-#endif
 
-
-#ifdef QT4
-#else
+#if 0
+#warning TODO
 	QWhatsThis::add( m_playButton, tr( "Click here, if you want to play "
 						"your whole song. Playing will "
 						"be started at the "
@@ -431,12 +382,8 @@ songEditor::songEditor( void ) :
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, cw );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
-#ifndef QT3
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( 20 );
-#else
-	m_leftRightScroll->setSteps( 1, 20 );
-#endif
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
 					this, SLOT( scrolled( int ) ) );
 
@@ -1136,11 +1083,7 @@ void songEditor::play( void )
 			return;
 		}
 	}
-#ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-#else
-	m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
-#endif
 	m_actions.push_back( ACT_PLAY_SONG );
 }
 
@@ -1237,11 +1180,7 @@ void songEditor::updateTimeLinePosition( void )
 void songEditor::stop( void )
 {
 	m_actions.push_back( ACT_STOP_PLAY );
-#ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-#else
-	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
-#endif
 	m_scrollBack = TRUE;
 }
 
@@ -1253,11 +1192,7 @@ void songEditor::stop( void )
 void songEditor::pause( void )
 {
 	m_actions.push_back( ACT_PAUSE );
-#ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-#else
-	m_playButton->setPixmap( embed::getIconPixmap( "play" ) );
-#endif
 }
 
 
@@ -1266,11 +1201,7 @@ void songEditor::pause( void )
 void songEditor::resumeFromPause( void )
 {
 	m_actions.push_back( ACT_RESUME_FROM_PAUSE );
-#ifdef QT4
 	m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-#else
-	m_playButton->setPixmap( embed::getIconPixmap( "pause" ) );
-#endif
 }
 
 
@@ -1370,30 +1301,11 @@ bool songEditor::mayChangeProject( void )
 		return( TRUE );
 	}
 
-/*	int answer = QMessageBox::
-#if QT_VERSION >= 0x030200
-		question
-#else
-		information
-#endif
-				( engine::getMainWindow(),
-						tr( "Project not saved" ),
-						tr( "The current project was "
-							"modified since last "
-							"saving. Do you want "
-							"to save it now?" ),
-						QMessageBox::Yes,
-						QMessageBox::No,
-						QMessageBox::Cancel );*/
 	QMessageBox mb ( tr( "Project not saved" ),
 				tr( "The current project was modified since "
 					"last saving. Do you want to save it "
 								"now?" ),
-#if QT_VERSION >= 0x030200
 				QMessageBox::Question,
-#else
-				QMessageBox::Information,
-#endif
 				QMessageBox::Yes,
 				QMessageBox::No,
 				QMessageBox::Cancel,
@@ -1662,14 +1574,8 @@ bool FASTCALL songEditor::saveProjectAs( const QString & _file_name )
 
 void songEditor::importProject( void )
 {
-#ifdef QT4
 	QFileDialog ofd( this, tr( "Import file" ), ""/*,
 					tr( "MIDI-files (*.mid)" )*/ );
-#else
-	QFileDialog ofd( QString::null,/* tr( "MIDI-files (*.mid)" )*/ QString::null,
-							this, "", TRUE );
-	ofd.setWindowTitle( tr( "Import file" ) );
-#endif
 	ofd.setDirectory( configManager::inst()->userProjectsDir() );
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
@@ -1679,6 +1585,12 @@ void songEditor::importProject( void )
 }
 
 
+#warning TODO: move somewhere else
+static inline QString baseName( const QString & _file )
+{
+	return( QFileInfo( _file ).absolutePath() + "/" +
+			QFileInfo( _file ).completeBaseName() );
+}
 
 
 void songEditor::exportProject( void )
@@ -1699,7 +1611,6 @@ void songEditor::exportProject( void )
 	efd.setFileMode( QFileDialog::AnyFile );
 
 	int idx = 0;
-#ifdef QT4
 	QStringList types;
 	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
 	{
@@ -1708,30 +1619,13 @@ void songEditor::exportProject( void )
 	}
 	efd.setFilters( types );
 	efd.selectFile( base_filename );
-#else
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
-	{
-		efd.addFilter( tr( fileEncodeDevices[idx].m_description ) );
-		++idx;
-	}
-	efd.setSelectedFilter( tr( fileEncodeDevices[0].m_description ) );
-	efd.setSelection( base_filename );
-#endif
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	if( efd.exec() == QDialog::Accepted &&
-#ifdef QT4
 		!efd.selectedFiles().isEmpty() && efd.selectedFiles()[0] != ""
-#else
-		efd.selectedFile() != ""
-#endif
 		)
 	{
-#ifdef QT4
 		const QString export_file_name = efd.selectedFiles()[0];
-#else
-		const QString export_file_name = efd.selectedFile();
-#endif
 		if( QFileInfo( export_file_name ).exists() == TRUE &&
 			QMessageBox::warning( engine::getMainWindow(),
 						tr( "File already exists" ),
@@ -1766,12 +1660,6 @@ void songEditor::updateFramesPerTact64th( void )
 
 
 #include "song_editor.moc"
-
-
-#ifdef QT3
-#undef addButton
-#undef setCheckable
-#endif
 
 
 #endif

@@ -147,7 +147,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::setValue( const T _value )
 		// for( autoObjVector::iterator it =
 		// 			m_linkedObjects.begin();
 		//		it != m_linkedObjects.end(); ++it )
-		for( csize i = 0; i < m_linkedObjects.size(); ++i )
+		for( int i = 0; i < m_linkedObjects.size(); ++i )
 		{
 			autoObj * it = m_linkedObjects[i];
 			if( value() != it->value() && it->fittedValue( value() )
@@ -437,7 +437,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::unlinkObject( autoObj * _object )
 template<typename T, typename EDIT_STEP_TYPE>
 void automatableObject<T, EDIT_STEP_TYPE>::syncAutomationPattern( void )
 {
-	for( csize i = 0; i < m_linkedObjects.size(); ++i )
+	for( int i = 0; i < m_linkedObjects.size(); ++i )
 	{
 		autoObj * it = m_linkedObjects[i];
 		if( m_automation_pattern != it->m_automation_pattern )

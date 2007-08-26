@@ -27,21 +27,7 @@
 #ifndef _NOTE_H
 #define _NOTE_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtCore/QVector>
-
-#else
-
-#include <qvaluevector.h>
-
-#endif
 
 #include "volume.h"
 #include "panning.h"
@@ -216,7 +202,7 @@ private:
 } ;
 
 
-typedef vvector<note *> noteVector;
+typedef QVector<note *> noteVector;
 
 
 #endif

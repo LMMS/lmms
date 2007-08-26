@@ -27,19 +27,7 @@
 #ifndef _PIANO_ROLL_H
 #define _PIANO_ROLL_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QWidget>
-#include <QtCore/QVector>
-
-#else
-
-#include <qwidget.h>
-#include <qvaluevector.h>
-
-#endif
 
 #include "types.h"
 #include "note.h"

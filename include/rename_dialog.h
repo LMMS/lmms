@@ -27,17 +27,7 @@
 #ifndef _RENAME_DIALOG_H
 #define _RENAME_DIALOG_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QDialog>
-
-#else
-
-#include <qdialog.h>
-
-#endif
 
 
 class QLineEdit;

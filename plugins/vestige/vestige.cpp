@@ -23,12 +23,6 @@
  */
 
 
-#include "vestige.h"
-
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileDialog>
@@ -37,21 +31,8 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QCursor>
 
-#else
-
-#include <qdom.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include <qfileinfo.h>
-#include <qdir.h>
-#include <qpushbutton.h>
-#include <qcursor.h>
-#include <qwhatsthis.h>
-
-#endif
-
-
 #include "engine.h"
+#include "vestige.h"
 #include "gui_templates.h"
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
@@ -102,14 +83,6 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 								"artwork" ) );
 	}
 
-#ifdef QT4
-/*	QPalette pal;
-	pal.setBrush( backgroundRole(), *s_artwork);
-	setPalette( pal );*/
-#else
-	setErasePixmap( *s_artwork );
-#endif
-
 	m_openPluginButton = new pixmapButton( this, NULL, NULL );
 	m_openPluginButton->setCheckable( FALSE );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
@@ -124,11 +97,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 						SLOT( openPlugin() ) );
 	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
 
-#ifdef QT4
 	m_openPluginButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_openPluginButton,
-#endif
 		tr( "Click here, if you want to open another VST-plugin. After "
 			"clicking on this button, a file-open-dialog appears "
 			"and you can select your file." ) );
@@ -139,11 +108,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
-#ifdef QT4
 	m_toggleGUIButton->setWhatsThis(
-#else
-	QWhatsThis::add( m_toggleGUIButton,
-#endif
 		tr( "Click here to show or hide the graphical user interface "
 			"(GUI) of your VST-plugin." ) );
 
@@ -276,13 +241,8 @@ void vestigeInstrument::setParameter( const QString & _param,
 		}
 		if( m_plugin->pluginWidget() != NULL )
 		{
-#ifdef QT4
 			m_plugin->pluginWidget()->setWindowIcon(
 					getInstrumentTrack()->windowIcon() );
-#else
-			m_plugin->pluginWidget()->setWindowIcon(
-					*( getInstrumentTrack()->windowIcon() ) );
-#endif
 		}
 		m_pluginMutex.unlock();
 		update();
@@ -408,21 +368,12 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 
 void vestigeInstrument::openPlugin( void )
 {
-#ifdef QT4
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
-#else
-	QFileDialog ofd( QString::null, QString::null, NULL, "", TRUE );
-	ofd.setWindowTitle( tr( "Open VST-plugin" ) );
-#endif
 
 	QString dir;
 	if( m_pluginDLL != "" )
 	{
-#ifdef QT4
 		dir = QFileInfo( m_pluginDLL ).absolutePath();
-#else
-		dir = QFileInfo( m_pluginDLL ).dirPath( TRUE );
-#endif
 	}
 	else
 	{
@@ -433,17 +384,11 @@ void vestigeInstrument::openPlugin( void )
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	// set filters
-#ifdef QT4
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
 		;
 	ofd.setFilters( types );
-#else
-	ofd.addFilter( tr( "DLL-files (*.dll)" ) );
-	ofd.addFilter( tr( "EXE-files (*.exe)" ) );
-	ofd.setSelectedFilter( tr( "DLL-files (*.dll)" ) );
-#endif
 	if( m_pluginDLL != "" )
 	{
 		// select previously opened file
@@ -520,14 +465,7 @@ void vestigeInstrument::changeTempo( bpm_t _new_tempo )
 
 void vestigeInstrument::paintEvent( QPaintEvent * )
 {
-#ifdef QT4
 	QPainter p( this );
-#else
-	QPixmap pm( rect().size() );
-	pm.fill( this, rect().topLeft() );
-
-	QPainter p( &pm, this );
-#endif
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
@@ -553,10 +491,6 @@ void vestigeInstrument::paintEvent( QPaintEvent * )
 						m_plugin->vendorString() );
 	}
 //	m_pluginMutex.unlock();
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
 }
 
 

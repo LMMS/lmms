@@ -1,7 +1,7 @@
 /*
  * embed.h - misc. stuff for using embedded data (resources linked into binary)
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,19 +26,9 @@
 #ifndef _EMBED_H
 #define _EMBED_H
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <QtGui/QPixmap>
 #include <QtCore/QString>
 
-#else
-
-#include <qpixmap.h>
-#include <qstring.h>
-
-#endif
 
 namespace embed
 {
