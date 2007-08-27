@@ -26,6 +26,7 @@
 #ifndef _AUTOMATABLE_OBJECT_TEMPLATES_H
 #define _AUTOMATABLE_OBJECT_TEMPLATES_H
 
+#include <QtXml/QDomElement>
 
 #include "automatable_object.h"
 #include "automation_editor.h"
@@ -33,15 +34,6 @@
 #include "engine.h"
 #include "templates.h"
 
-#ifndef QT3
-
-#include <QtXml/QDomElement>
-
-#else
-
-#include <qdom.h>
-
-#endif
 
 
 template<typename T, typename EDIT_STEP_TYPE>
@@ -329,13 +321,8 @@ template<typename T, typename EDIT_STEP_TYPE>
 void automatableObject<T, EDIT_STEP_TYPE>::redoStep( journalEntry & _je )
 {
 	bool journalling = testAndSetJournalling( FALSE );
-/*#ifndef QT3
-	setValue( static_cast<T>( value() +
-					_je.data().value<EDIT_STEP_TYPE>() ) );
-#else*/
 	setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
 						_je.data().toDouble() ) ) );
-//#endif
 	setJournalling( journalling );
 }
 
@@ -346,12 +333,7 @@ template<typename T, typename EDIT_STEP_TYPE>
 void automatableObject<T, EDIT_STEP_TYPE>::undoStep( journalEntry & _je )
 {
 	journalEntry je( _je.actionID(),
-/*#ifndef QT3
-					-_je.data().value<EDIT_STEP_TYPE>()
-#else*/
-			static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() )
-//#endif
-				);
+		 static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() ) );
 	redoStep( je );
 }
 

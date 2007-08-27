@@ -24,19 +24,9 @@
  *
  */
 
-#ifdef QT4
-
 #include <QtGui/QLayout>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-
-#endif
 
 #include "meter_dialog.h"
 #include "embed.h"

@@ -59,23 +59,6 @@ public:
 		m_colorHighlighted = _color;
 	}
 
-#ifdef QT3
-	inline void setIcon( const QPixmap & _icon )
-	{
-		setIconSet( _icon );
-	}
-
-	inline void setChecked( bool _on )
-	{
-		setOn( _on );
-	}
-
-	inline bool isChecked( void ) const
-	{
-		return( isOn() );
-	}
-#endif
-
 
 protected:
 	virtual void enterEvent( QEvent * _ev );

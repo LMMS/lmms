@@ -27,13 +27,7 @@
 #define _CUSTOM_EVENTS_H
 
 
-#ifdef QT3
-
-#include <qevent.h>
-
-#endif
-
-
+#include <QtCore/QEvent>
 
 
 namespace customEvents

@@ -25,16 +25,7 @@
 #ifndef _METER_DIALOG_H
 #define _METER_DIALOG_H
 
-#ifndef QT3
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "lcd_spinbox.h"
 

@@ -65,15 +65,9 @@ audioDevice::~audioDevice()
 {
 	src_delete( m_srcState );
 	delete[] m_buffer;
-#ifdef QT3
-	if( m_devMutex.locked() )
-	{
-		unlock();
-	}
-#else
+
 	m_devMutex.tryLock();
 	unlock();
-#endif
 }
 
 

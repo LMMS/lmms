@@ -331,31 +331,7 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 }
 
 
-/*
-void bitInvader::paintEvent( QPaintEvent * )
-{
-#ifdef QT4
-	QPainter p( this );
-#else
-	QPixmap pm( rect().size() );
-	pm.fill( this, rect().topLeft() );
 
-	QPainter p( &pm, this );
-#endif
-	p.drawPixmap( 0, 0, *s_artwork );
-
-	p.setPen( QColor( 255, 255, 255 ) );
-//	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
-
-//	p.drawLine(0,0,200,200);
-
-#ifndef QT4
-	bitBlt( this, rect().topLeft(), &pm );
-#endif
-
-
-}
-*/
 
 void bitInvader::sinWaveClicked( void )
 {

@@ -30,18 +30,8 @@
 
 #ifdef SDL_AUDIO_SUPPORT
 
-#ifdef QT4
-
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
-
-#else
-
-#include <qlineedit.h>
-#include <qlabel.h>
-
-#endif
-
 
 #include "debug.h"
 #include "config_mgr.h"
@@ -64,19 +54,6 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	m_convertedBuf_size = getMixer()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
 	m_convertedBuf = new Uint8[m_convertedBuf_size];
-
-/*	// if device is set, we set AUDIODEV-environment-variable, so that
-	// SDL can evaluate and use it
-	QString dev = configManager::inst()->value( "audiosdl", "device" );
-	if( dev != "" )
-	{
-		putenv( const_cast<char *>( ( "AUDIODEV=" + dev ).
-#ifdef QT4
-			toAscii().constData() ) );
-#else
-			ascii() ) );
-#endif
-	}*/
 
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
@@ -105,11 +82,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 	}
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
-#ifndef QT3
 	m_stop_semaphore.acquire();
-#else
-	m_stop_semaphore++;
-#endif
 
 	_success_ful = TRUE;
 }
@@ -120,11 +93,8 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 audioSDL::~audioSDL()
 {
 	stopProcessing();
-#ifndef QT3
 	m_stop_semaphore.release();
-#else
-	m_stop_semaphore--;
-#endif
+
 	SDL_CloseAudio();
 	SDL_Quit();
 	delete[] m_convertedBuf;
@@ -149,11 +119,7 @@ void audioSDL::stopProcessing( void )
 {
 	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
 	{
-#ifndef QT3
 		m_stop_semaphore.acquire();
-#else
-		m_stop_semaphore++;
-#endif
 
 		SDL_LockAudio();
 		SDL_PauseAudio( 1 );
@@ -194,11 +160,7 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 			if( !frames )
 			{
 				m_stopped = TRUE;
-#ifndef QT3
 				m_stop_semaphore.release();
-#else
-				m_stop_semaphore--;
-#endif
 				memset( _buf, 0, _len );
 				return;
 			}

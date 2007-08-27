@@ -63,9 +63,6 @@ aboutDialog::aboutDialog() :
 						"Copyright (c) 2004-2007 "
 						"LMMS-Developers\n\n"
 						"http://lmms.sourceforge.net" )
-#ifndef QT4
-					, m_aboutTabs 
-#endif
 					);
 	about_lbl->setAlignment( Qt::AlignVCenter | Qt::AlignLeft );
 	about_lbl->setIndent( 30 );

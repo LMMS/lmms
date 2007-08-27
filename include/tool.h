@@ -26,17 +26,7 @@
 #ifndef _TOOL_H
 #define _TOOL_H
 
-
-#ifndef QT3
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
-
 
 #include "plugin.h"
 

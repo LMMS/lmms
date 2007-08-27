@@ -26,15 +26,7 @@
 #ifndef _EFFECT_CONTROL_DIALOG_H
 #define _EFFECT_CONTROL_DIALOG_H
 
-#ifndef QT3
-
 #include <QtGui/QWidget>
-
-#else
-
-#include <qwidget.h>
-
-#endif
 
 #include "journalling_object.h"
 

@@ -35,16 +35,8 @@ class selectableObject : public QWidget
 {
 	Q_OBJECT
 public:
-	selectableObject( QWidget * _parent
-#ifdef QT3
-				, WFlags _f
-#endif
-						) :
-		QWidget( _parent
-#ifdef QT3
-				, NULL, _f
-#endif
-				),
+	selectableObject( QWidget * _parent ) :
+		QWidget( _parent ),
 		m_selected( FALSE )
 	{
 	}

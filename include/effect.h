@@ -31,16 +31,7 @@
 #include <config.h>
 #endif
 
-#ifndef QT3
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
-
 
 #include "plugin.h"
 #include "mixer.h"
@@ -136,7 +127,7 @@ public:
 		return( m_gate );
 	}
 	
-	void FASTCALL setGate( float _level );
+	void setGate( float _level );
 	
 	inline Uint32 getBufferCount( void )
 	{
@@ -170,7 +161,7 @@ public:
 
 	virtual effectControlDialog * createControlDialog( track * _track ) = 0;
 
-	static effect * FASTCALL instantiate( const QString & _plugin_name,
+	static effect * instantiate( const QString & _plugin_name,
 				descriptor::subPluginFeatures::key * _key );
 
 

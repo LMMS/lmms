@@ -25,22 +25,10 @@
 #ifndef _RACK_PLUGIN_H
 #define _RACK_PLUGIN_H
 
-#ifndef QT3
-
 #include <QtGui/QWidget>
 #include <QtGui/QGroupBox>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
-
-#else
-
-#include <qwidget.h>
-#include <qgroupbox.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-
-#endif
-
 
 #include "journalling_object.h"
 

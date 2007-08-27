@@ -58,17 +58,6 @@ public:
 		return( m_show_status );
 	}
 
-#ifdef QT3
-	inline int minimum( void ) const
-	{
-		return( minValue() );
-	}
-	inline int maximum( void ) const
-	{
-		return( maxValue() );
-	}
-#endif
-
 
 signals:
 	void logicValueChanged( int _value );

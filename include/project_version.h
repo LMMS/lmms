@@ -26,18 +26,7 @@
 #ifndef _PROJECT_VERSION_H
 #define _PROJECT_VERSION_H
 
-
-#ifndef QT3
-
 #include <QtCore/QString>
-
-#else
-
-#include <qstring.h>
-
-#endif
-
-
 
 
 class projectVersion : public QString

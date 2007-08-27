@@ -37,11 +37,7 @@ public:
 		QPushButton( _text, _parent ),
 		m_id( _id )
 	{
-#ifndef QT3
 		setCheckable( TRUE );
-#else
-		setToggleButton( TRUE );
-#endif
 		connect( this, SIGNAL( clicked() ), this,
 						SLOT( slotClicked() ) );
 	}
@@ -50,17 +46,6 @@ public:
 	{
 	}
 
-#ifdef QT3
-	inline void setChecked( bool _on )
-	{
-		setOn( _on );
-	}
-
-	inline bool isChecked( void ) const
-	{
-		return( isOn() );
-	}
-#endif
 
 signals:
 	void clicked( int );

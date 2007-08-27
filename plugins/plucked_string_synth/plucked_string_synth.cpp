@@ -23,18 +23,7 @@
  */
 
 
-#include "qt3support.h"
-
-#ifdef QT4
-
 #include <Qt/QtXml>
-
-#else
-
-#include <qdom.h>
-
-#endif
-
 
 #include "plucked_string_synth.h"
 #include "engine.h"

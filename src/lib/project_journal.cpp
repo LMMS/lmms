@@ -32,11 +32,6 @@
 #include "journalling_object.h"
 #include "song_editor.h"
 
-#ifdef QT3
-#define value data
-#endif
-
-
 
 projectJournal::projectJournal( void ) :
 	m_joIDs(),
@@ -173,11 +168,6 @@ void projectJournal::clearInvalidJournallingObjects( void )
 	//clearJournal();
 }
 
-
-
-#ifdef QT3
-#undef value
-#endif
 
 
 #endif

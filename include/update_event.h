@@ -26,31 +26,19 @@
 #ifndef _UPDATE_EVENT_H
 #define _UPDATE_EVENT_H
 
-
 #include "custom_events.h"
 
 
 
-
-#ifndef QT3
 class updateEvent : public QEvent
-#else
-class updateEvent : public QCustomEvent
-#endif
 {
 public:
 	updateEvent( void ) :
-#ifndef QT3
 		QEvent( (QEvent::Type)customEvents::GUI_UPDATE )
-#else
-		QCustomEvent( customEvents::GUI_UPDATE )
-#endif
 	{
 	}
 
 } ;
-
-
 
 
 #endif

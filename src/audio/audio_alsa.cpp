@@ -167,15 +167,7 @@ void audioALSA::startProcessing( void )
 {
 	if( !isRunning() )
 	{
-		start(
-#ifdef QT4
-			QThread::HighPriority
-#else
-#if QT_VERSION >= 0x030505
-			QThread::HighestPriority
-#endif
-#endif
-							);
+		start( QThread::HighPriority );
 	}
 }
 

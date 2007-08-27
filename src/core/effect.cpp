@@ -25,16 +25,7 @@
  *
  */
 
-#ifdef QT4
-
 #include <QtGui/QMessageBox>
-
-#else
-
-#include "qmessagebox.h"
-
-#endif
-
 
 #include "effect.h"
 #include "engine.h"

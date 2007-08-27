@@ -26,15 +26,7 @@
 #ifndef _TEMPO_SYNC_KNOB_H
 #define _TEMPO_SYNC_KNOB_H
 
-#ifndef QT3
-
 #include <QtGui/QPixmap>
-
-#else
-
-#include <qpixmap.h>
-
-#endif
 
 #include "knob.h"
 

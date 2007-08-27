@@ -30,15 +30,7 @@
 #include <config.h>
 #endif
 
-#ifndef QT3
-
 #include <QtCore/QMap>
-
-#else
-
-#include <qmap.h>
-
-#endif
 
 class automationEditor;
 class bbEditor;

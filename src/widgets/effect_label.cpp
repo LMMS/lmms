@@ -26,18 +26,10 @@
  */
 
 
-#include "effect_label.h"
-
-#ifndef QT3
-
 #include <QtXml/QDomElement>
+#include <QtGui/QMouseEvent>
 
-#else
-
-#include <qdom.h>
-
-#endif
-
+#include "effect_label.h"
 #include "effect_tab_widget.h"
 #include "sample_track.h"
 #include "embed.h"
@@ -46,9 +38,6 @@
 #include "rename_dialog.h"
 #include "main_window.h"
 
-#ifndef QT3
-#include <QtGui/QMouseEvent>
-#endif
 
 
 effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
@@ -72,9 +61,9 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 	m_effWidget = new effectTabWidget( engine::getMainWindow()->workspace(),
 						m_track, 
 						m_track->getAudioPort() );
-#ifndef QT3
+
 	engine::getMainWindow()->workspace()->addWindow( m_effWidget );
-#endif
+
 	m_effWidget->setFixedSize( 240, 242 );
 	m_effWidget->hide();
 	connect( m_effWidget, SIGNAL( closed() ), 

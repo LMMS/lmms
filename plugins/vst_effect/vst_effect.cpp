@@ -172,13 +172,6 @@ void vstEffect::openPlugin( const QString & _plugin )
 	m_plugin->setTempo( engine::getSongEditor()->getTempo() );
 	if( m_plugin->pluginWidget() != NULL )
 	{
-/*#ifdef QT4
-		m_plugin->pluginWidget()->setWindowIcon(
-				getInstrumentTrack()->windowIcon() );
-#else
-		m_plugin->pluginWidget()->setWindowIcon(
-				*( getInstrumentTrack()->windowIcon() ) );
-#endif*/
 		m_plugin->hideEditor();
 	}
 	m_pluginMutex.unlock();
