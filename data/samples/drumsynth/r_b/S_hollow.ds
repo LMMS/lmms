@@ -1,0 +1,58 @@
+[General]
+Version=DrumSynth v1.0
+Comment=Teddy Riley hollow snare
+Tuning=0.00
+Stretch=100.0
+Filter=0
+HighPass=0
+FilterEnv=0,100 442000,100 442000,0
+
+[Tone]
+On=1
+Level=149
+F1=375
+F2=375
+Droop=11
+Phase=90
+Envelope=0,100 1341,0
+
+[Noise]
+On=1
+Level=123
+Slope=36
+Envelope=0,100 819,98 1862,34 3576,17 9163,7 11174,0
+
+[Overtones]
+On=0
+Level=134
+F1=13000
+Wave1=0
+Track1=0
+F2=125
+Wave2=0
+Track2=0
+Filter=0
+Method=2
+Param=100
+Envelope1=0,100 1043,31 2533,9 6250,0
+Envelope2=0,100 775,35 2354,9 5000,0
+
+[NoiseBand]
+On=1
+Level=104
+F=845
+dF=31
+Envelope=0,100 894,91 1937,30 2831,14 6034,5 8865,1 12440,0
+
+[NoiseBand2]
+On=1
+Level=28
+F=3700
+dF=30
+Envelope=0,37 6704,35 11025,8 14526,0
+
+[Distortion]
+On=1
+Clipping=0
+Bits=0
+Rate=1

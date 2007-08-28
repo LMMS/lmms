@@ -1,0 +1,61 @@
+[General]
+Version=DrumSynth v2.0
+Comment=DrumSynth 2.0 by maxim digital audio, Copyright ©2000 Paul Kellett  http://www.maxim.abel.co.uk
+Tuning=0
+Stretch=100
+Level=-9
+Filter=1
+HighPass=1
+Resonance=0
+FilterEnv=0,15 444000,100 444000,0
+
+[Tone]
+On=0
+Level=43
+F1=261.63
+F2=261.63
+Droop=0
+Phase=0
+Envelope=0,100 58250,100 67641,0
+
+[Noise]
+On=0
+Level=128
+Slope=0
+Envelope=0,100 500,20 1500,0
+FixedSeq=1
+
+[Overtones]
+On=1
+Level=128
+F1=261.63
+Wave1=3
+Track1=0
+F2=261.63
+Wave2=2
+Track2=0
+Method=2
+Param=97
+Envelope1=0,100 58250,100 67641,0
+Envelope2=0,86 32520,4 70671,86 84948,0
+Filter=0
+
+[NoiseBand]
+On=0
+Level=166
+F=261.63
+dF=0
+Envelope=0,100 58250,100 67641,0
+
+[NoiseBand2]
+On=0
+Level=128
+F=3100
+dF=39
+Envelope=0,100 1500,20 4500,0
+
+[Distortion]
+On=1
+Clipping=60
+Bits=0
+Rate=0

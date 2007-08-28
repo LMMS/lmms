@@ -1,0 +1,34 @@
+[General]
+Version=DrumSynth v1.0
+Comment=
+
+[Tone]
+On=1
+Level=157
+F1=480
+F2=48
+Droop=59
+Phase=15
+Envelope=0,100 968,87 2160,49 4097,21 6630,7 12813,0
+
+[Noise]
+On=0
+Level=128
+Slope=0
+Envelope=0,100 1937,80 3501,53 5066,32 6481,19 10131,4 19890,0
+
+[Overtones]
+On=0
+Level=128
+F1=200
+F2=125
+Method=0
+Envelope1=0,100 3750,30 7500,0
+Envelope2=0,100 3000,30 6000,0
+
+[NoiseBand]
+On=0
+Level=128
+F=630
+dF=50
+Envelope=0,100 2250,30 4500,0

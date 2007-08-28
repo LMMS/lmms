@@ -1,0 +1,58 @@
+[General]
+Version=DrumSynth v1.0
+Comment=©1997 Paul Kellett  -  http://www.abel.co.uk/~maxim/
+Tuning=0.00
+Stretch=100.0
+Filter=0
+HighPass=0
+FilterEnv=0,100 442000,100 443000,0
+
+[Tone]
+On=1
+Level=147
+F1=80
+F2=80
+Droop=0
+Phase=0
+Envelope=0,100 1564,56 5250,30 19368,7 34863,0
+
+[Noise]
+On=0
+Level=128
+Slope=0
+Envelope=0,100 596,23 9000,0
+
+[Overtones]
+On=1
+Level=94
+F1=80
+F2=125
+Method=0
+Envelope1=0,0 2235,51 11993,0
+Envelope2=0,100 1117,19 3799,0
+Wave1=2
+Track1=0
+Wave2=0
+Track2=0
+Filter=0
+Param=0
+
+[NoiseBand]
+On=0
+Level=128
+F=630
+dF=50
+Envelope=0,100 2250,30 4500,0
+
+[NoiseBand2]
+On=0
+Level=128
+F=1000
+dF=50
+Envelope=0,100 100,30 200,0
+
+[Distortion]
+On=0
+Clipping=0
+Bits=0
+Rate=0

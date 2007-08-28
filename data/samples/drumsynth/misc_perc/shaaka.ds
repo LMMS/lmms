@@ -1,0 +1,61 @@
+[General]
+Version=DrumSynth v2.0
+Comment=Adjust the overtones 'drive' to hit harder!
+Tuning=0.00
+Stretch=100.0
+Level=0
+Filter=0
+HighPass=0
+Resonance=0
+FilterEnv=0,100 442000,100 442000,0
+
+[Tone]
+On=0
+Level=133
+F1=120
+F2=50
+Droop=73
+Phase=0
+Envelope=0,100 2049,51 5647,21 11743,9 22386,0
+
+[Noise]
+On=1
+Level=144
+Slope=100
+Envelope=0,6 397,84 714,12 991,20 1210,30 1527,12 1824,24 2023,9 5195,0
+FixedSeq=0
+
+[Overtones]
+On=0
+Level=128
+F1=350
+Wave1=0
+Track1=0
+F2=312.3
+Wave2=1
+Track2=1
+Method=2
+Param=86
+Envelope1=0,100 714,20 4997,6 10232,3 17132,1 22367,0
+Envelope2=0,48 6425,17 15943,0
+Filter=0
+
+[NoiseBand]
+On=0
+Level=36
+F=130
+dF=15
+Envelope=0,100 1500,20 3750,0
+
+[NoiseBand2]
+On=0
+Level=16
+F=10000
+dF=15
+Envelope=0,100 1000,20 2500,0
+
+[Distortion]
+On=0
+Clipping=13
+Bits=1
+Rate=1

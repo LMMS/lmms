@@ -1,0 +1,61 @@
+[General]
+Version=DrumSynth v2.0
+Comment=Remember to send any good .ds files to paul.kellett@maxim.abel.co.uk
+Tuning=0.00
+Stretch=100.0
+Level=3
+Filter=1
+HighPass=1
+Resonance=60
+FilterEnv=0,0 550,21 849,31 1549,37 2399,40 4247,40 444000,100 444000,0
+
+[Tone]
+On=1
+Level=101
+F1=5000
+F2=230
+Droop=62
+Phase=0
+Envelope=0,100 700,44 1750,20 2748,9 4347,4 6596,3 12043,0 19488,0
+
+[Noise]
+On=1
+Level=104
+Slope=100
+Envelope=0,68 1699,59 1899,30 3448,13 5147,4 8495,1 14841,0
+FixedSeq=1
+
+[Overtones]
+On=1
+Level=128
+F1=802
+Wave1=1
+Track1=0
+F2=290
+Wave2=1
+Track2=0
+Method=2
+Param=90
+Envelope1=0,100 1250,20 11293,0
+Envelope2=0,100 1000,20 13941,0
+Filter=0
+
+[NoiseBand]
+On=1
+Level=38
+F=5000
+dF=37
+Envelope=0,100 100,44 1249,51 2898,32 7046,8 9044,2 11443,0
+
+[NoiseBand2]
+On=1
+Level=65
+F=3100
+dF=40
+Envelope=0,100 1500,20 10743,0
+
+[Distortion]
+On=1
+Clipping=3
+Bits=2
+Rate=2

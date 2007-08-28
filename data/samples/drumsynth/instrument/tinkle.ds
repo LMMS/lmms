@@ -1,0 +1,57 @@
+[General]
+Version=DrumSynth v1.0
+Tuning=0.00
+Stretch=100.0
+Filter=0
+HighPass=0
+FilterEnv=0,100 442000,100 442000,0
+
+[Tone]
+On=0
+Level=22
+F1=6520
+F2=6520
+Droop=0
+Phase=0
+Envelope=0,0 9000,59 17700,28 28500,5 40500,26 48900,3 57600,16 67200,0
+
+[Noise]
+On=0
+Level=57
+Slope=100
+Envelope=0,0 248,98 248,0
+
+[Overtones]
+On=1
+Level=128
+F1=6520
+Wave1=0
+Track1=0
+F2=3520
+Wave2=1
+Track2=0
+Filter=0
+Method=1
+Param=40
+Envelope1=0,0 30,100 900,38 8025,22 25800,8 58800,0
+Envelope2=0,100 33000,72 62400,0
+
+[NoiseBand]
+On=1
+Level=117
+F=8000
+dF=53
+Envelope=0,100 300,0
+
+[NoiseBand2]
+On=0
+Level=59
+F=220
+dF=6
+Envelope=0,0 225,100 1000,20 2500,0
+
+[Distortion]
+On=0
+Clipping=0
+Bits=0
+Rate=0

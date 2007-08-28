@@ -1,0 +1,58 @@
+[General]
+Version=DrumSynth v1.0
+Comment=Teddy Riley pitched snare
+Tuning=0.00
+Stretch=100.0
+Filter=0
+HighPass=0
+FilterEnv=0,100 442000,100 442000,0
+
+[Tone]
+On=1
+Level=89
+F1=418
+F2=387
+Droop=11
+Phase=0
+Envelope=0,100 834,89 1877,11 3308,5 3903,0
+
+[Noise]
+On=1
+Level=123
+Slope=1
+Envelope=0,100 328,100 715,89 1341,37 2533,14 3397,9 3456,0
+
+[Overtones]
+On=0
+Level=134
+F1=13000
+Wave1=0
+Track1=0
+F2=125
+Wave2=0
+Track2=0
+Filter=0
+Method=2
+Param=100
+Envelope1=0,100 1043,31 2533,9 6250,0
+Envelope2=0,100 775,35 2354,9 5000,0
+
+[NoiseBand]
+On=0
+Level=81
+F=3000
+dF=40
+Envelope=0,90 268,91 1251,16 5483,0
+
+[NoiseBand2]
+On=0
+Level=128
+F=3150
+dF=50
+Envelope=0,100 1000,20 2500,0
+
+[Distortion]
+On=0
+Clipping=4
+Bits=0
+Rate=0
