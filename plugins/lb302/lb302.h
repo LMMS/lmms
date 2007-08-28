@@ -283,7 +283,9 @@ private:
     int   sample_cnt;
     
     int   last_offset;
+   
 
+    int framesPerPeriod;
     lb302State *period_states;
     int period_states_cnt;
 

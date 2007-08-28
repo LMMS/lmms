@@ -249,6 +249,11 @@ private:
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
+	f_cnt_t FASTCALL decodeSampleDS( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _sample_rate );
+
 
 	QString m_audioFile;
 	sampleFrame * m_origData;

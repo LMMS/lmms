@@ -724,8 +724,8 @@ const QStringList & audioFileProcessor::subPluginFeatures::supported_extensions(
 									void )
 {
 	static QStringList extensions = QStringList()
-				<< "wav" << "ogg" << "spx" << "au" << "voc"
-				<< "aif" << "aiff" << "flac" << "raw";
+				<< "wav" << "ogg" << "ds" << "spx" << "au" 
+                << "voc" << "aif" << "aiff" << "flac" << "raw";
 	return( extensions );
 }
 

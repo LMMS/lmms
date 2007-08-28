@@ -88,6 +88,8 @@
 #include "base64.h"
 #include "debug.h"
 
+#include "drumsynth.h"
+
 
 #ifndef QT4
 
@@ -258,6 +260,12 @@ void sampleBuffer::update( bool _keep_settings )
 								samplerate );
 		}
 #endif
+        if( m_frames == 0 )
+        {
+            m_frames = decodeSampleDS( f, buf, channels, 
+                                samplerate );
+        }
+
 		if( m_frames > 0 && buf != NULL )
 		{
 			// following code transforms int-samples into
@@ -489,7 +497,18 @@ long qfileTellCallback( void * _udata )
 }
 
 
+f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _samplerate )
+{
+    f_cnt_t frames = 0;
 
+    DrumSynth ds;
+    frames = ds.GetDSFileSamples( _f, _buf, _channels);
+    
+    return frames;
+}
 
 f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 						int_sample_t * & _buf,
@@ -896,10 +915,11 @@ QString sampleBuffer::openAudioFile( void ) const
 	// set filters
 #ifdef QT4
 	QStringList types;
-	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif "
+	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.ds *.spx *.voc *.aif "
 							"*.aiff *.au *.raw)" )
 		<< tr( "Wave-Files (*.wav)" )
 		<< tr( "OGG-Files (*.ogg)" )
+		<< tr( "DrumSynth-Files (*.ds)" )
 		<< tr( "FLAC-Files (*.flac)" )
 		<< tr( "SPEEX-Files (*.spx)" )
 		//<< tr( "MP3-Files (*.mp3)" )
@@ -912,10 +932,11 @@ QString sampleBuffer::openAudioFile( void ) const
 		;
 	ofd.setFilters( types );
 #else
-	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.spx *.voc "
+	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.ds *.spx *.voc "
 						"*.aif *.aiff *.au *.raw)" ) );
 	ofd.addFilter( tr( "Wave-Files (*.wav)" ) );
 	ofd.addFilter( tr( "OGG-Files (*.ogg)" ) );
+	ofd.addFilter( tr( "DrumSynth-Files (*.ds)" ) );
 	ofd.addFilter( tr( "FLAC-Files (*.flac)" ) );
 	ofd.addFilter( tr( "SPEEX-Files (*.spx)" ) );
 	//ofd.addFilter (tr("MP3-Files (*.mp3)"));
@@ -925,7 +946,7 @@ QString sampleBuffer::openAudioFile( void ) const
 	ofd.addFilter( tr( "AU-Files (*.au)" ) );
 	ofd.addFilter( tr( "RAW-Files (*.raw)" ) );
 	//ofd.addFilter (tr("MOD-Files (*.mod)"));
-	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.spx "
+	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx "
 					"*.voc *.aif *.aiff *.au *.raw)" ) );
 #endif
 	if( m_audioFile != "" )

@@ -127,7 +127,7 @@ void lb302Filter::recalc()
 
 void lb302Filter::envRecalc()
 {
-    vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is adjusted for Hz and ENVINC
+    vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is already adjusted for Hz and ENVINC
     // vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso)); moved above
 };
 
@@ -250,9 +250,7 @@ void lb302Filter3Pole::envRecalc()
     w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
     k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
     kfco = 50.f+(k)*((2300.f-1600.f*(fs->envmod))+(w)*(700.f+1500.f*(k)+(1500.f+(k)*(44100.f/2.f-6000.f))*(fs->envmod)));
-        //+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
-
-
+    //+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000  The accent code
 
 
 #ifdef LB_24_IGNORE_ENVELOPE
@@ -270,7 +268,7 @@ void lb302Filter3Pole::envRecalc()
 #else
     kres = (((fs->reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
 #endif
-    value = 1.0+( (fs->dist) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST*/
+    value = 1.0+( (fs->dist) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST
 }
 
 float lb302Filter3Pole::process(const float& samp) 
@@ -317,7 +315,22 @@ void lb302Filter3Pole::setState(const lb302FilterState* fs)
 //
 
 lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &lb302_plugin_descriptor )
+	instrument( _channel_track, &lb302_plugin_descriptor ),
+    vco_shape( SAWTOOTH ), 
+    vco_inc( 0.0 ),
+	vco_c( 0 ),
+	vco_k( 0 ),
+    vco_detune( 0 ),
+    vco_slide( 0 ), 
+    vco_slideinc( 0 ),
+    vco_slidebase( 0 ),
+	vcf_envpos( ENVINC ),
+	vca_a0( 0.5 ),
+	vca_mode( 3 ), 
+    vca_a( 0 ),   
+	//vca_attack( 1.0 - 0.94406088 ),      
+	vca_attack( 1.0 - 0.96406088 ),      
+	vca_decay( 0.99897516 )            
 {
     // GUI
 
@@ -353,7 +366,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	vcf_dec_knob->setHintText( tr( "Decay:" ) + " ", "" );
     vcf_dec_knob->setLabel( tr("DEC") );
 
-     slideToggle = new ledCheckBox( "Slide", this,
+    slideToggle = new ledCheckBox( "Slide", this,
 							tr( "Slide" ),
 							_channel_track );
 	slideToggle->move( 10, 180 );
@@ -447,36 +460,11 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 #endif
 
-
     // SYNTH
-
-    vco_inc = 0.0;
-	vco_c = 0;
-	vco_k = 0;
-	
-    vco_slide = 0; vco_slideinc = 0;
-    vco_slidebase = 0;
-
 	fs.cutoff = 0; fs.envmod = 0;
 	fs.reso = 0; fs.envdecay = 0;
     fs.dist = 0;
 
-	vcf_envpos = ENVINC;
-    vco_detune = 0;
-
-	vca_mode = 3;  vca_a = 0;   // Start VCA on an attack.
-
-	//vca_attack = 1.0 - 0.94406088;      
-	vca_attack = 1.0 - 0.96406088;      
-	vca_decay = 0.99897516;            
-    
-    vco_shape = SAWTOOTH; 
-
-	vca_a0 = 0.5;                       // Experimenting between original (0.5) and 1.0
-    vca_a = 9;
-    vca_mode = 3;
-
-    vcf = new lb302FilterIIR2(&fs);
 
     use_hold_note = false;
     sample_cnt = 0;
@@ -484,16 +472,28 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
     catch_frame = 0;
     catch_decay = 0;
 
-    recalcFilter();
 
+	framesPerPeriod = engine::getMixer()->framesPerPeriod();
     lastFramesPlayed = 1;	// because we subtract 1 later
     last_offset = 0;
 
-    period_states = NULL;
-    period_states_cnt = 0;
+    
+    vcf = new lb302FilterIIR2(&fs);
 
+    recalcFilter();
     filterChanged(0.0);
     detuneChanged(0.0);
+
+    period_states_cnt = 0;
+    period_states = new lb302State[framesPerPeriod];
+    for (int i=0; i < framesPerPeriod; i++) {
+        period_states[i].vco_c = vco_c;
+        period_states[i].vca_a = vca_a;
+        period_states[i].vca_mode = vca_mode;
+        period_states[i].sample_cnt = sample_cnt;
+        vcf->getState(&period_states[i].fs);
+    }
+
 }
 
 
@@ -559,7 +559,7 @@ void lb302Synth::filterChanged( float )
 
         float d = 0.2 + (2.3*vcf_dec_knob->value());
         d*=LB_HZ;                                   // d *= smpl rate
-        fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
+        fs.envdecay = pow(0.1, 1.0/d * ENVINC);     // decay is 0.1 to the 1/d * ENVINC
                                                     // vcf_envdecay is now adjusted for both
                                                     // sampling rate and ENVINC
         recalcFilter();
@@ -618,7 +618,7 @@ QString lb302Synth::nodeName( void ) const
 	return( lb302_plugin_descriptor.name );
 }
 
-// OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
+// OBSOLETE
 void lb302Synth::recalcFilter()
 {
     vcf->recalc();
@@ -636,29 +636,14 @@ void lb302Synth::recalcFilter()
     vcf_envpos = ENVINC; // Trigger filter update in process()
 }
 
-inline int MIN(int a, int b) {
-    return (a<b)?a:b;
-}
-
 int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 {
 
 	unsigned int i;
 	float w;
     float samp;
-         
-
     
 	for(i=0;i<size;i++) {
-        /* TODO: ONLY DO THIS IF WE ARE EDGE-TO-EDGE NON-DEAD */
-        /*if (sample_cnt < desiredTransitionFrames()) {
-            for(int c=0; c<DEFAULT_CHANNELS; c++)
-                outbuf[i][c]=0;
-            sample_cnt++;
-            continue;
-        }
-        */
-
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
             vcf->envRecalc();       
@@ -669,15 +654,12 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
                 vco_inc=vco_slidebase-vco_slide;
                 // Calculate coeff from dec_knob on knob change.
                 vco_slide*= 0.9+(slide_dec_knob->value()*0.0999); // TODO: Adjust for Hz and ENVINC
-
             }
 		}
 
         sample_cnt++;
 		vcf_envpos++;
 
-        float old_vco_k = vco_k;
-        bool looking;
         int  decay_frames = 128;
 
 		// update vco
@@ -695,7 +677,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
             }
         }
     
-         
         switch(int(rint(wave_knob->value()))) {
             case 0: vco_shape = SAWTOOTH; break;
             case 1: vco_shape = INVERTED_SAWTOOTH; break;
@@ -709,51 +690,46 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         // add vco_shape_param the changes the shape of each curve.
         // merge sawtooths with triangle and square with round square?
         switch (vco_shape) {
-            case SAWTOOTH: // p0: curviness of line
-                vco_k = vco_c;  // Is this sawtooth backwards?
+            case SAWTOOTH:          // p0: curviness of line
+                vco_k = vco_c;      // Is this sawtooth backwards?
                 break;
 
             case INVERTED_SAWTOOTH: // p0: curviness of line
-                vco_k = -vco_c;  // Is this sawtooth backwards?
+                vco_k = -vco_c;     // Is this sawtooth backwards?
                 break;
 
             // TODO: I think TRIANGLE is broken.
-            case TRIANGLE:  // p0: duty rev.saw<->triangle<->saw p1: curviness
+            case TRIANGLE:          // p0: duty rev.saw<->triangle<->saw p1: curviness
                 vco_k = (vco_c*2.0)+0.5;
                 if (vco_k>0.5) vco_k = 1.0-vco_k;
                 break;
 
-            case SQUARE: // p0: slope of top
+            case SQUARE:            // p0: slope of top
                 vco_k = (vco_c<0)?0.5:-0.5;
                 break;
 
-            case ROUND_SQUARE: // p0: width of round
+            case ROUND_SQUARE:      // p0: width of round
                 vco_k = (vco_c<0)?(sqrtf(1-(vco_c*vco_c*4))-0.5):-0.5;
                 break;
 
-            case MOOG: // Maybe the fall should be exponential/sinsoidal instead of quadric.
-                // [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low 
+            case MOOG:              // Maybe the fall should be exponential/sinsoidal instead of quadric.
+                                    // [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low 
                 vco_k = (vco_c*2.0)+0.5;
                 if (vco_k>1.0) vco_k = -0.5 ;
                 else if (vco_k>0.5) {
                     w = 2.0*(vco_k-0.5)-1.0;
                     vco_k = 0.5 - sqrtf(1.0-(w*w));
                 }
-                vco_k *= 2.0;  // MOOG wave gets filtered away 
+                vco_k *= 2.0;       // MOOG wave gets filtered away 
                 break;
         }
 
-	//vca_a = 0.5;
         // Write out samples.
 #ifdef LB_FILTERED
         samp = vcf->process(vco_k)*2.0*vca_a;
 #else
         samp = vco_k*vca_a;
 #endif
-        /*
-        float releaseFrames = desiredReleaseFrames();
-        samp *= (releaseFrames - catch_decay)/releaseFrames;
-        */
         samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
         for(int c=0; c<DEFAULT_CHANNELS; c++) {
@@ -778,7 +754,8 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			// the following line actually speeds up processing
 			if(vca_a < (1/65536.0)) { vca_a = 0; vca_mode = 3; }
 		}
-         // Store state
+         
+        // Store state
         period_states[i].vco_c = vco_c;
         period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
         period_states[i].vca_mode = vca_mode;             // Doesn't change anything (currently)
@@ -843,7 +820,6 @@ void lb302Synth::initNote( lb302Note *n)
 
 void lb302Synth::playNote( notePlayHandle * _n, bool )
 {
-	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
 	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN === ///
 
@@ -929,17 +905,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - END === ///
 
 	/// Malloc our period history buffer
-	if (period_states == NULL) {
-		period_states = new lb302State[framesPerPeriod];
-
-        for (int i=0; i < framesPerPeriod; i++) {
-            period_states[i].vco_c = vco_c;
-            period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
-            period_states[i].vca_mode = vca_mode;             // Doesn't change anything (currently)
-            period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
-            vcf->getState(&period_states[i].fs);
-        }
-    }
 
 
     // now resume at the proper position and process as usual
@@ -968,19 +933,11 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         if(deadToggle->value()==0 && decay_note) {
 #ifdef LB_DECAY
             if (catch_decay < 1) {
-                // BEGIN NOT SURE OF...
-                //lb302State *st = &period_states[period_states_cnt-1];
-                //vca_a = st->vca_a;
-                //sample_cnt = st->sample_cnt;
-                // END NOT SURE OF
-
                 // Reserve this note for retrigger in process()
                 hold_note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
                 hold_note.dead = deadToggle->value();
                 use_hold_note = true;
                 catch_decay = 1;
-            }
-            else {
             }
 #else
             lb302Note note;

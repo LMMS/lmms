@@ -196,6 +196,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/lib/embed.cpp				\
 		$(srcdir)/src/lib/mmp.cpp				\
 		$(srcdir)/src/lib/oscillator.cpp			\
+		$(srcdir)/src/lib/drumsynth.cpp				\
 		$(srcdir)/src/lib/sample_buffer.cpp			\
 		$(srcdir)/src/lib/string_pair_drag.cpp			\
 		$(srcdir)/src/midi/midi_alsa_raw.cpp			\
@@ -298,6 +299,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/track_container.h			\
 		$(srcdir)/include/bb_track.h				\
 		$(srcdir)/include/sample_track.h			\
+		$(srcdir)/include/drumsynth.h				\
 		$(srcdir)/include/sample_buffer.h			\
 		$(srcdir)/include/name_label.h				\
 		$(srcdir)/include/play_handle.h				\

@@ -596,6 +596,32 @@ AC_CONFIG_FILES([Makefile
 		 data/samples/bassloopes/Makefile
 		 data/samples/beats/Makefile
 		 data/samples/drums/Makefile
+		 data/samples/drumsynth/Makefile
+		 data/samples/drumsynth/acoustic/Makefile
+		 data/samples/drumsynth/cr78/Makefile
+		 data/samples/drumsynth/cr8000/Makefile
+		 data/samples/drumsynth/effects/Makefile
+		 data/samples/drumsynth/electro/Makefile
+		 data/samples/drumsynth/farfisa/Makefile
+		 data/samples/drumsynth/ferraro/Makefile
+		 data/samples/drumsynth/instrument/Makefile
+		 data/samples/drumsynth/jorgensohn/Makefile
+		 data/samples/drumsynth/latin/Makefile
+		 data/samples/drumsynth/linn/Makefile
+		 data/samples/drumsynth/magnetboy/Makefile
+		 data/samples/drumsynth/misc/Makefile
+		 data/samples/drumsynth/misc_bass/Makefile
+		 data/samples/drumsynth/misc_claps/Makefile
+		 data/samples/drumsynth/misc_electro/Makefile
+		 data/samples/drumsynth/misc_fx/Makefile
+		 data/samples/drumsynth/misc_hats/Makefile
+		 data/samples/drumsynth/misc_perc/Makefile
+		 data/samples/drumsynth/misc_synth/Makefile
+		 data/samples/drumsynth/r_b/Makefile
+		 data/samples/drumsynth/tr606/Makefile
+		 data/samples/drumsynth/tr77/Makefile
+		 data/samples/drumsynth/tr808/Makefile
+		 data/samples/drumsynth/tr909/Makefile
 		 data/samples/effects/Makefile
 		 data/samples/instruments/Makefile
 		 data/samples/latin/Makefile
