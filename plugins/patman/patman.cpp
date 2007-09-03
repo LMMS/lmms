@@ -30,7 +30,6 @@
 #include "patman.h"
 #include "endian_handling.h"
 #include "engine.h"
-#include "file_browser.h"
 #include "gui_templates.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"

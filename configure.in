@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20070823, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20070823)
+AC_INIT(lmms, 0.4.0-svn20070903, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20070903)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -611,7 +611,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/bit_invader/Makefile
 		 plugins/flp_import/Makefile
 		 plugins/kicker/Makefile
-		 plugins/ladspa_base/Makefile
 		 plugins/ladspa_effect/Makefile
 		 plugins/ladspa_effect/caps/Makefile
 		 plugins/lb302/Makefile

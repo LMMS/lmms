@@ -36,7 +36,6 @@
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
-#include "file_browser.h"
 #include "gui_templates.h"
 #include "pixmap_button.h"
 #include "knob.h"

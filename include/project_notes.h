@@ -33,6 +33,7 @@
 
 class QAction;
 class QComboBox;
+class QTextCharFormat;
 class QTextEdit;
 
 
@@ -68,8 +69,7 @@ private slots:
 	void textColor( void );
 	void textAlign( QAction * _a );
 
-	void fontChanged( const QFont & _f );
-	void colorChanged( const QColor & _c );
+	void formatChanged( const QTextCharFormat & _f );
 	void alignmentChanged( int _a );
 
 

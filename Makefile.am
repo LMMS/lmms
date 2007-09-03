@@ -70,6 +70,8 @@ lmms_MOC =						\
 		./group_box.moc				\
 		./kmultitabbar.moc			\
 		./knob.moc				\
+ 		./ladspa_control.moc			\
+		./ladspa_port_dialog.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./main_window.moc			\
@@ -165,6 +167,11 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
+		$(srcdir)/src/core/ladspa_base.cpp			\
+		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
+		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
+		$(srcdir)/src/core/ladspa_manager.cpp			\
+		$(srcdir)/src/core/ladspa_control.cpp			\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
@@ -370,16 +377,11 @@ lmms_SOURCES =								\
 		$(srcdir)/include/sweep_oscillator.h			\
 		$(srcdir)/include/meter_dialog.h			\
 		$(srcdir)/include/effect_lib.h				\
-		$(srcdir)/plugins/ladspa_base/ladspa_base.cpp		\
-		$(srcdir)/plugins/ladspa_base/ladspa_port_dialog.cpp	\
-		$(srcdir)/plugins/ladspa_base/ladspa_2_lmms.cpp		\
-		$(srcdir)/plugins/ladspa_base/ladspa_manager.cpp	\
-		$(srcdir)/plugins/ladspa_base/ladspa_control.cpp	\
-		$(srcdir)/plugins/ladspa_base/ladspa_manager.h		\
-		$(srcdir)/plugins/ladspa_base/ladspa_2_lmms.h		\
-		$(srcdir)/plugins/ladspa_base/ladspa_control.h		\
-		$(srcdir)/plugins/ladspa_base/ladspa_port_dialog.h	\
-		$(srcdir)/plugins/ladspa_base/ladspa_base.h		\
+		$(srcdir)/include/ladspa_manager.h			\
+		$(srcdir)/include/ladspa_2_lmms.h			\
+		$(srcdir)/include/ladspa_control.h			\
+		$(srcdir)/include/ladspa_port_dialog.h			\
+		$(srcdir)/include/ladspa_base.h				\
 		$(THIRD_PARTY_CODE)
 
 

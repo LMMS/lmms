@@ -47,7 +47,10 @@
 projectNotes::projectNotes( void ) :
 	QMainWindow( engine::getMainWindow()->workspace() )
 {
-	engine::getMainWindow()->workspace()->addWindow( this );
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addWindow( this );
+	}
 
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( TRUE );
@@ -57,12 +60,11 @@ projectNotes::projectNotes( void ) :
 
 	clear();
 
-	connect( m_edit, SIGNAL( currentFontChanged( const QFont & ) ),
-			this, SLOT( fontChanged( const QFont & ) ) );
-	connect( m_edit, SIGNAL( currentColorChanged( const QColor & ) ),
-			this, SLOT( colorChanged( const QColor & ) ) );
-	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
-			this, SLOT( alignmentChanged( int ) ) );
+	connect( m_edit,
+		SIGNAL( currentCharFormatChanged( const QTextCharFormat & ) ),
+		this, SLOT( formatChanged( const QTextCharFormat & ) ) );
+//	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
+//			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
 			engine::getSongEditor(), SLOT( setModified() ) );
 
@@ -103,7 +105,9 @@ void projectNotes::clear( void )
 	m_edit->setHtml( tr( "Put down your project notes here." ) );
 	m_edit->selectAll();
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
-	m_edit->setTextCursor( QTextCursor() );
+	QTextCursor cursor = m_edit->textCursor();
+	cursor.clearSelection();
+	m_edit->setTextCursor( cursor );
 }
 
 
@@ -119,36 +123,41 @@ void projectNotes::setText( const QString & _text )
 
 void projectNotes::setupActions()
 {
-	QToolBar * tb = new QToolBar( tr( "Edit Actions" ), this );
+	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
 	QAction * a;
 
 	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
-									tb );
+									this );
 	a->setShortcut( tr( "Ctrl+Z" ) );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( undo() ) );
+	connect( a, SIGNAL( triggered() ), m_edit, SLOT( undo() ) );
+	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_redo" ), tr( "&Redo" ),
-									tb );
+									this );
 	a->setShortcut( tr( "Ctrl+Y" ) );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( redo() ) );
+	connect( a, SIGNAL( triggered() ), m_edit, SLOT( redo() ) );
+	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_copy" ), tr( "&Copy" ),
-									tb );
+									this );
 	a->setShortcut( tr( "Ctrl+C" ) );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( copy() ) );
+	connect( a, SIGNAL( triggered() ), m_edit, SLOT( copy() ) );
+	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_cut" ), tr( "Cu&t" ),
-									tb );
+									this );
 	a->setShortcut( tr( "Ctrl+X" ) );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( cut() ) );
+	connect( a, SIGNAL( triggered() ), m_edit, SLOT( cut() ) );
+	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_paste" ), tr( "&Paste" ),
-									tb );
+									this );
 	a->setShortcut( tr( "Ctrl+V" ) );
-	connect( a, SIGNAL( activated() ), m_edit, SLOT( paste() ) );
+	connect( a, SIGNAL( triggered() ), m_edit, SLOT( paste() ) );
+	tb->addAction( a );
 
 
-	tb = new QToolBar( tr( "Format Actions" ), this );
+	tb = addToolBar( tr( "Format Actions" ) );
 
 	m_comboFont = new QComboBox( tb );
 	m_comboFont->setEditable( TRUE );
@@ -172,54 +181,79 @@ void projectNotes::setupActions()
 					QApplication::font().pointSize() ) );
 
 	m_actionTextBold = new QAction( embed::getIconPixmap( "text_bold" ),
-					tr( "&Bold" ), tb );
+							tr( "&Bold" ), this );
 	m_actionTextBold->setShortcut( tr( "Ctrl+B" ) );
-	connect( m_actionTextBold, SIGNAL( activated() ), this,
+	m_actionTextBold->setCheckable( TRUE );
+	connect( m_actionTextBold, SIGNAL( triggered() ), this,
 							SLOT( textBold() ) );
 
 	m_actionTextItalic = new QAction( embed::getIconPixmap( "text_italic" ),
-						tr( "&Italic" ), tb );
+							tr( "&Italic" ), this );
 	m_actionTextItalic->setShortcut( tr( "Ctrl+I" ) );
-	connect( m_actionTextItalic, SIGNAL( activated() ), this,
+	m_actionTextItalic->setCheckable( TRUE );
+	connect( m_actionTextItalic, SIGNAL( triggered() ), this,
 							SLOT( textItalic() ) );
 
 	m_actionTextUnderline = new QAction( embed::getIconPixmap(
 								"text_under" ),
-						tr( "&Underline" ), tb );
+						tr( "&Underline" ), this );
 	m_actionTextUnderline->setShortcut( tr( "Ctrl+U" ) );
-	connect( m_actionTextUnderline, SIGNAL( activated() ), this,
+	m_actionTextUnderline->setCheckable( TRUE );
+	connect( m_actionTextUnderline, SIGNAL( triggered() ), this,
 						SLOT( textUnderline() ) );
 
 
 	QActionGroup * grp = new QActionGroup( tb );
-	connect( grp, SIGNAL( selected( QAction* ) ), this,
-						SLOT( textAlign( QAction* ) ) );
+	connect( grp, SIGNAL( triggered( QAction * ) ), this,
+					SLOT( textAlign( QAction * ) ) );
 
 	m_actionAlignLeft = new QAction( embed::getIconPixmap( "text_left" ),
-						tr( "&Left" ), grp );
+						tr( "&Left" ), m_edit );
 	m_actionAlignLeft->setShortcut( tr( "Ctrl+L" ) );
+	m_actionAlignLeft->setCheckable( TRUE );
+	grp->addAction( m_actionAlignLeft );
 
 	m_actionAlignCenter = new QAction( embed::getIconPixmap(
 								"text_center" ),
-						tr( "C&enter" ), grp );
+						tr( "C&enter" ), m_edit );
+	m_actionAlignCenter->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignCenter->setShortcut( tr( "Ctrl+E" ) );
+	m_actionAlignCenter->setCheckable( TRUE );
+	grp->addAction( m_actionAlignCenter );
 
 	m_actionAlignRight = new QAction( embed::getIconPixmap( "text_right" ),
-						tr( "&Right" ), grp );
+						tr( "&Right" ), m_edit );
+	m_actionAlignRight->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignRight->setShortcut( tr( "Ctrl+R" ) );
+	m_actionAlignRight->setCheckable( TRUE );
+	grp->addAction( m_actionAlignRight );
 
 	m_actionAlignJustify = new QAction( embed::getIconPixmap(
 								"text_block" ),
-						tr( "&Justify" ), grp );
+						tr( "&Justify" ), m_edit );
 	m_actionAlignJustify->setShortcut( tr( "Ctrl+J" ) );
+	m_actionAlignJustify->setCheckable( TRUE );
+	grp->addAction( m_actionAlignJustify );
 
 
 	QPixmap pix( 16, 16 );
 	pix.fill( Qt::black );
-	m_actionTextColor = new QAction( pix, tr( "&Color..." ), tb );
-	connect( m_actionTextColor, SIGNAL( activated() ), this,
+	m_actionTextColor = new QAction( pix, tr( "&Color..." ), this );
+	connect( m_actionTextColor, SIGNAL( triggered() ), this,
 							SLOT( textColor() ) );
 
+	tb->addWidget( m_comboFont );
+	tb->addWidget( m_comboSize );
+	tb->addAction( m_actionTextBold );
+	tb->addAction( m_actionTextItalic );
+	tb->addAction( m_actionTextUnderline );
+
+	tb->addAction( m_actionAlignLeft );
+	tb->addAction( m_actionAlignCenter );
+	tb->addAction( m_actionAlignRight );
+	tb->addAction( m_actionAlignJustify );
+
+	tb->addAction( m_actionTextColor );
 }
 
 
@@ -227,7 +261,8 @@ void projectNotes::setupActions()
 
 void projectNotes::textBold()
 {
-	m_edit->setFontWeight( m_actionTextBold->isChecked() );
+	m_edit->setFontWeight( m_actionTextBold->isChecked() ? QFont::Bold :
+								QFont::Normal );
 	engine::getSongEditor()->setModified();
 }
 
@@ -311,24 +346,19 @@ void projectNotes::textAlign( QAction * _a )
 
 
 
-void projectNotes::fontChanged( const QFont & _f )
+void projectNotes::formatChanged( const QTextCharFormat & _f )
 {
-	m_comboFont->lineEdit()->setText( _f.family() );
-	m_comboSize->lineEdit()->setText( QString::number( _f.pointSize() ) );
-	m_actionTextBold->setChecked( _f.bold() );
-	m_actionTextItalic->setChecked( _f.italic() );
-	m_actionTextUnderline->setChecked( _f.underline() );
-	engine::getSongEditor()->setModified();
-}
+	QFont font = _f.font();
+	m_comboFont->lineEdit()->setText( font.family() );
+	m_comboSize->lineEdit()->setText( QString::number( font.pointSize() ) );
+	m_actionTextBold->setChecked( font.bold() );
+	m_actionTextItalic->setChecked( font.italic() );
+	m_actionTextUnderline->setChecked( font.underline() );
 
-
-
-
-void projectNotes::colorChanged( const QColor & _c )
-{
 	QPixmap pix( 16, 16 );
-	pix.fill( _c );
+	pix.fill( _f.foreground().color() );
 	m_actionTextColor->setIcon( pix );
+
 	engine::getSongEditor()->setModified();
 }
 
@@ -378,19 +408,6 @@ void projectNotes::loadSettings( const QDomElement & _this )
 
 
 #include "project_notes.moc"
-
-
-
-#undef isChecked
-#undef setChecked
-#undef setFontWeight
-#undef setFontUnderline
-#undef setFontItalic
-#undef setFontFamily
-#undef setFontPointSize
-#undef setTextColor
-#undef setHtml
-#undef toHtml
 
 
 #endif

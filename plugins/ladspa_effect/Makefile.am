@@ -5,7 +5,7 @@ SUBDIRS = caps
 endif
 
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I. -I../ladspa_base/
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I.
 
 
 AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspaeffect"
