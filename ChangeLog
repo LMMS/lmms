@@ -1,3 +1,35 @@
+2007-09-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/patman/patman.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	cleanups
+
+	* plugins/ladspa_base:
+	* plugins/ladspa_base/Makefile.am:
+	removed
+
+	* configure.in:
+	* Makefile.am:
+	* plugins/ladspa_effect/Makefile.am:
+	* src/core/engine.cpp:
+	* src/core/ladspa_base.cpp:
+	* src/core/ladspa_port_dialog.cpp:
+	* src/core/ladspa_2_lmms.cpp:
+	* src/core/ladspa_manager.cpp:
+	* src/core/ladspa_control.cpp:
+	* include/ladspa_manager.h:
+	* include/ladspa_2_lmms.h:
+	* include/ladspa_control.h:
+	* include/ladspa_port_dialog.h:
+	* include/ladspa_base.h:
+	moved all code from LADSPA-base-library into LMMS-core
+
+2007-09-02	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/project_notes.h:
+	* src/widgets/project_notes.cpp:
+	made usable with Qt4
+
 2007-08-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/patman/patman.cpp:
