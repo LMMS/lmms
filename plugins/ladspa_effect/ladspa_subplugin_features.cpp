@@ -66,8 +66,9 @@ void ladspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	QLabel * maker_content = new QLabel( maker );
 	maker_content->setText( lm->getMaker( lkey ) );
 	maker_content->setWordWrap( TRUE );
+	l->addWidget( maker_label );
+	l->addWidget( maker_content );
 	l->setStretchFactor( maker_content, 100 );
-
 
 	QWidget * copyright = new QWidget( _parent );
 	l = new QHBoxLayout( copyright );
@@ -82,6 +83,8 @@ void ladspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	QLabel * copyright_content = new QLabel( copyright );
 	copyright_content->setText( lm->getCopyright( lkey ) );
 	copyright_content->setWordWrap( TRUE );
+	l->addWidget( copyright_label );
+	l->addWidget( copyright_content );
 	l->setStretchFactor( copyright_content, 100 );
 
 	QLabel * requiresRealTime = new QLabel( _parent );

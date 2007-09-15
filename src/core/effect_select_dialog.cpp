@@ -149,7 +149,8 @@ void effectSelectDialog::selectPlugin( void )
 
 
 effectList::effectList( QWidget * _parent ) :
-	QWidget( _parent )
+	QWidget( _parent ),
+	m_descriptionWidget( NULL )
 {
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
@@ -190,26 +191,24 @@ effectList::effectList( QWidget * _parent ) :
 							"" );
 	}
 
-	m_pluginList = new Q3ListBox( this );
-	m_pluginList->insertStringList( plugin_names );
-	connect( m_pluginList, SIGNAL( highlighted( int ) ),
-				SLOT( onHighlighted( int ) ) );	
-	connect( m_pluginList, SIGNAL( doubleClicked( Q3ListBoxItem * ) ),
-				SLOT( onDoubleClicked( Q3ListBoxItem * ) ) );
+	m_pluginList = new QListWidget( this );
+	m_pluginList->insertItems( 0, plugin_names );
+	connect( m_pluginList, SIGNAL( currentRowChanged( int ) ),
+				SLOT( rowChanged( int ) ) );	
+	connect( m_pluginList, SIGNAL( itemDoubleClicked( QListWidgetItem * ) ),
+				SLOT( onDoubleClicked( QListWidgetItem * ) ) );
 
 	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
 	groupbox->setFixedHeight( 200 );
 
-	QScrollArea * scrollArea = new QScrollArea( groupbox );
-	scrollArea->setFrameStyle( 0 );
-	m_descriptionWidget = new QWidget;
-	QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
-	l->setMargin( 0 );
-	l->setSpacing( 0 );
+	QVBoxLayout * gbl = new QVBoxLayout( groupbox );
+	gbl->setMargin( 0 );
+	gbl->setSpacing( 10 );
 
-	scrollArea->setWidget( m_descriptionWidget );
-	m_descriptionWidget->show();
-	m_descriptionWidget->setFixedSize( 200, 200 );
+	m_scrollArea = new QScrollArea( groupbox );
+	m_scrollArea->setFrameStyle( 0 );
+
+	gbl->addWidget( m_scrollArea );
 
 	QVBoxLayout * vboxl = new QVBoxLayout( this );
 	vboxl->setMargin( 0 );
@@ -217,10 +216,10 @@ effectList::effectList( QWidget * _parent ) :
 	vboxl->addWidget( m_pluginList );
 	vboxl->addWidget( groupbox );
 
-	if( m_pluginList->numRows() > 0 )
+	if( m_pluginList->count() > 0 )
 	{
-		m_pluginList->setSelected( 0, true );
-		onHighlighted( 0 );
+		m_pluginList->setCurrentRow( 0 );
+		rowChanged( 0 );
 	}
 }
 
@@ -234,22 +233,33 @@ effectList::~effectList()
 
 
 
-void effectList::onHighlighted( int _pluginIndex )
+void effectList::rowChanged( int _pluginIndex )
 {
-	QLayoutItem * i;
-	while( ( i = m_descriptionWidget->layout() ) != 0 )
-	{
-		delete i;
-	}
-	m_descriptionWidget->hide();
+	delete m_descriptionWidget;
+	m_descriptionWidget = NULL;
 
 	m_currentSelection = m_effectKeys[_pluginIndex];
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
+		m_descriptionWidget = new QWidget;
+		QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
+		l->setMargin( 4 );
+		l->setSpacing( 0 );
+
+		m_scrollArea->setWidget( m_descriptionWidget );
+
 		m_currentSelection.desc->sub_plugin_features->
 			fillDescriptionWidget( m_descriptionWidget,
 							&m_currentSelection );
+		foreach( QWidget * w, m_descriptionWidget->findChildren<QWidget *>() )
+		{
+			if( w->parent() == m_descriptionWidget )
+			{
+				l->addWidget( w );
+			}
+		}
+		l->setSizeConstraint( QLayout::SetFixedSize );
 		m_descriptionWidget->show();
 	}
 	emit( highlighted( m_currentSelection ) );
@@ -258,7 +268,7 @@ void effectList::onHighlighted( int _pluginIndex )
 
 
 
-void effectList::onDoubleClicked( Q3ListBoxItem * _item )
+void effectList::onDoubleClicked( QListWidgetItem * _item )
 {
 	emit( doubleClicked( m_currentSelection ) );
 }
@@ -276,7 +286,7 @@ void effectList::onAddButtonReleased()
 
 void effectList::resizeEvent( QResizeEvent * )
 {
-	m_descriptionWidget->setFixedWidth( width() - 40 );
+	//m_descriptionWidget->setFixedWidth( width() - 40 );
 }
 
 

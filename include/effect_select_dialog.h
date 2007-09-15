@@ -27,7 +27,7 @@
 #define _EFFECT_SELECT_DIALOG_H
 
 #include <QtGui/QDialog>
-#include <Qt3Support/Q3ListBox>
+#include <QtGui/QListWidget>
 
 #include "effect.h"
 
@@ -78,9 +78,9 @@ protected:
 
 
 protected slots:
-	void onHighlighted( int _plugin );
+	void rowChanged( int _plugin );
 	void onAddButtonReleased();
-	void onDoubleClicked( Q3ListBoxItem * _item );
+	void onDoubleClicked( QListWidgetItem * _item );
 	
 
 private:
@@ -88,7 +88,8 @@ private:
 	effectKeyList m_effectKeys;
 	effectKey m_currentSelection;
 	
-	Q3ListBox * m_pluginList;
+	QListWidget * m_pluginList;
+	QScrollArea * m_scrollArea;
 	QWidget * m_descriptionWidget;
 
 } ;

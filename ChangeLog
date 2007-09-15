@@ -1,3 +1,14 @@
+2007-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* include/effect_select_dialog.h:
+	* src/core/effect_select_dialog.cpp:
+	replaced Q3ListBox with QListWidget and made layouting-stuff of
+	plugin-description-widget working properly
+
+	* data/locale/de.ts:
+	fixed some strings in German localization
+
 2007-09-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/patman/patman.cpp:
