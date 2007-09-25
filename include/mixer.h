@@ -201,9 +201,9 @@ public:
 		return( m_framesPerPeriod );
 	}
 
-	inline const surroundSampleFrame * currentAudioBuffer( void ) const
+	inline const surroundSampleFrame * currentReadBuffer( void ) const
 	{
-		return( m_writeBuf );
+		return( m_readBuf );
 	}
 
 
@@ -311,7 +311,7 @@ public slots:
 
 signals:
 	void sampleRateChanged( void );
-	void nextAudioBuffer( const surroundSampleFrame *, int _frames );
+	void nextAudioBuffer( void );
 
 
 private:

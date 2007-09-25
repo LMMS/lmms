@@ -75,6 +75,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 #ifndef QT3
 	engine::getMainWindow()->workspace()->addWindow( m_effWidget );
 #endif
+	m_effWidget->setWindowTitle( _initial_name );
 	m_effWidget->setFixedSize( 240, 242 );
 	m_effWidget->hide();
 	connect( m_effWidget, SIGNAL( closed() ), 
@@ -103,6 +104,7 @@ QString effectLabel::text( void ) const
 void FASTCALL effectLabel::setText( const QString & _text )
 {
 	m_label->setText( _text );
+	m_effWidget->setWindowTitle( _text );
 }
 
 

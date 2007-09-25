@@ -79,10 +79,8 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 		m_updateTimer->start( UPDATE_TIME );
 	}
 
-	connect( engine::getMixer(), SIGNAL( nextAudioBuffer(
-					const surroundSampleFrame *, int ) ),
-		this, SLOT( setAudioBuffer(
-					const surroundSampleFrame *, int ) ) );
+	connect( engine::getMixer(), SIGNAL( nextAudioBuffer() ),
+					this, SLOT( updateAudioBuffer() ) );
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
 							"master-output" ) );
@@ -99,12 +97,15 @@ visualizationWidget::~visualizationWidget()
 
 
 
-void visualizationWidget::setAudioBuffer( const surroundSampleFrame * _ab,
-								int _frames )
+void visualizationWidget::updateAudioBuffer( void )
 {
 	if( m_enabled == TRUE )
 	{
-		memcpy( m_buffer, *_ab, _frames * BYTES_PER_SURROUND_FRAME);
+		engine::getMixer()->lock();
+		memcpy( m_buffer, engine::getMixer()->currentReadBuffer(),
+				engine::getMixer()->framesPerPeriod() *
+						BYTES_PER_SURROUND_FRAME );
+		engine::getMixer()->unlock();
 	}
 }
 

@@ -1,3 +1,17 @@
+2007-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mixer.h:
+	* include/visualization_widget.h:
+	* src/core/mixer.cpp:
+	* src/widget/visualization_widget.cpp:
+	reworked code for retrieving current mixer-buffer for visualizing it -
+	do not use signal/slot-mechanism for passing pointer and use
+	currentReadBuffer() + mixer-mutex instead which probably fixes some
+	mixer-related crashes
+
+	* src/widget/effect_label.cpp:
+	set window-title for effect-chain-windows of a sample-track etc.
+
 2007-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
