@@ -376,10 +376,9 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		}
 	}
 
-
-	emit nextAudioBuffer( m_readBuf, m_framesPerPeriod );
-
 	unlock();
+
+	emit nextAudioBuffer();
 
 	// and trigger LFOs
 	envelopeAndLFOWidget::triggerLFO();
