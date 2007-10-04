@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20070916, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20070916)
+AC_INIT(lmms, 0.4.0-svn20071004, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20071004)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -219,7 +219,17 @@ if test "x$with_vst" = "xyes" ; then
 
 	if test "$build_linux" = "true" ; then
 		AC_CHECK_PROG(WINECXX, wineg++, /usr/bin/wineg++,,/usr/bin)
-		AC_CHECK_LIB([wine], [wine_init], true)
+
+		if test "x`uname -m`" != "xx86_64" ; then
+			AC_CHECK_LIB([wine], [wine_init], true)
+		else
+			AMD64_BUILD=yes
+			OLDCFLAGS="$CFLAGS"
+			CFLAGS="-m32 $CFLAGS"
+			AC_CHECK_LIB([wine], [wine_init], true)
+			CFLAGS="$OLDCFLAGS"
+		fi
+
 		if test ! -z "$WINECXX" ; then
 			AC_LANG_PUSH(C++)
 #			CXXFLAGS="$CXXFLAGS -I${prefix}/include/wine/windows"
@@ -227,6 +237,7 @@ if test "x$with_vst" = "xyes" ; then
 			OLDCPPFLAGS="$CPPFLAGS"
 			CXX="$WINECXX"
 			CPPFLAGS="$CPPFLAGS -I${prefix}/include/wine/windows"
+			CPPFLAGS+=" -I/usr/include/wine/windows"
 			AC_CHECK_HEADER(windows.h, HAVE_WINDOWS_H="true")
 			CXX="$OLDCXX"
 			CPPFLAGS="$OLDCPPFLAGS"
@@ -238,6 +249,7 @@ if test "x$with_vst" = "xyes" ; then
 	fi
 fi
 AM_CONDITIONAL(VST_SUPPORT, test ! -z "$WINECXX")
+AM_CONDITIONAL(AMD64_BUILD, test "x$AMD64_BUILD" = "xyes")
 
 
 # check for LADSPA-SDK
@@ -627,6 +639,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/vst_base/Makefile
 		 plugins/vst_effect/Makefile
 		 lmms.spec])
+LOCAL_EXTRA_PLUGINS
 AC_OUTPUT
 
 with_warnings="false"

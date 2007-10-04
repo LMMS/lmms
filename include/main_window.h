@@ -125,8 +125,6 @@ private:
 
 	void finalize( void );
 
-	bool have_www_browser( void );
-
 
 	QWorkspace * m_workspace;
 

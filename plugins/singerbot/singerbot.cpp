@@ -394,6 +394,7 @@ void singerBot::synThread::run( void )
 
 void singerBot::synThread::text_to_wave( void )
 {
+	//TODO: Heap corruption too -> move to separate process?
 	char command[80];
 	sprintf( command,
 		"(set! duffint_params '((start %f) (end %f)))",
@@ -450,7 +451,7 @@ EST_Wave * singerBot::synThread::get_wave( const char * _name )
         	return( NULL );
 	}
 
-	EST_Relation *r = utterance( lutt )->relation( "Wave" );
+	EST_Relation * r = utterance( lutt )->relation( "Wave" );
 
 	//TODO: This check is useless. The error is fatal.
 	if ( !r || !r->head() )

@@ -114,7 +114,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	}
 
 
-	engine::getMainWindow()->workspace()->addWindow( this );
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addWindow( this );
+	}
 
 	setAcceptDrops( TRUE );
 

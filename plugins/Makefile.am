@@ -30,4 +30,5 @@ SUBDIRS =			\
 	$(STK_DIR)		\
 	triple_oscillator	\
 	$(VST_DIRS)		\
-	vibed
+	vibed			\
+	$(EXTRA_PLUGINS)

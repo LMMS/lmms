@@ -1,3 +1,65 @@
+2007-10-04	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* configure.in:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_server.cpp:
+	* plugins/vst_base/Makefile.am:
+	* src/lib/journalling_object.cpp:
+	amd64 fixes
+
+	* plugins/vestige/vestige.cpp:
+	fixed loading deadlock
+
+	* plugins/vst_base/Makefile.am:
+	renamed lvsl_server.c to lvsl_server.cpp
+
+	* plugins/vst_base/lvsl_server.cpp:
+	restricted shared memory permissions
+
+	* plugins/vst_base/communication.h:
+	improved string communication
+
+	* configure.in:
+	look for wine header in system folder too
+
+	* configure.in:
+	* Makefile.am:
+	* plugins/Makefile.am:
+	added extra plugins support
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	use desktop services for online help
+
+	* src/core/main_window.cpp:
+	- use background artwork
+	- updated wiki URL
+
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/effect_label.cpp:
+	fixed null workspace segfaults
+
+	* plugins/stk/mallets/mallets.cpp:
+	enabled missing files message
+
+	* src/core/main.cpp:
+	use processed argc/argv rather than deprecated functions
+
+	* plugins/singerbot/singerbot.cpp:
+	detected heap corruption
+
+	* data/locale/ca.ts:
+	updated translation
+
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/polyb302.h:
+	dropped Qt3-support
+
+	* plugins/polyb302/polyb302.cpp:
+	applied relevant LB302 changes
+
 2007-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/mixer.h:

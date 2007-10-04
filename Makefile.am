@@ -1,4 +1,5 @@
 AUTOMAKE_OPTIONS = foreign 1.4
+ACLOCAL_AMFLAGS = -I m4
 
 dist-hook:
 	rm -rf `find $(distdir) -name \*.moc`

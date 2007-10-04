@@ -26,7 +26,6 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
 #include <QtCore/QDir>
-#include <QtGui/QApplication>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 
@@ -155,7 +154,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		{
 			break;
 		}
-		QApplication::processEvents( QEventLoop::AllEvents, 50 );
+		QCoreApplication::processEvents( QEventLoop::AllEvents, 50 );
 	}
 }
 
@@ -328,8 +327,8 @@ bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 	{
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
-			_out_buf[frame][ch] = m_shm[(m_inputCount+ch)*
-								frames+frame];
+			_out_buf[frame][ch] = m_shm[( m_inputCount + ch ) *
+								frames + frame];
 		}
 	}
 
@@ -344,7 +343,12 @@ void remoteVSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 {
 	lock();
 	writeValueS<Sint16>( VST_ENQUEUE_MIDI_EVENT );
-	writeValueS<midiEvent>( _event );
+
+	writeValueS<midiEventTypes>( _event.m_type );
+	writeValueS<Sint8>( _event.m_channel );
+	writeValueS<Uint16>( _event.m_data.m_param[0] );
+	writeValueS<Uint16>( _event.m_data.m_param[1] );
+
 	writeValueS<f_cnt_t>( _frames_ahead );
 	unlock();
 }
@@ -536,7 +540,7 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 		case VST_SHM_KEY_AND_SIZE:
 		{
 			Uint16 shm_key = readValueS<Uint16>();
-			size_t shm_size = readValueS<size_t>();
+			size_t shm_size = readValueS<Uint32>();
 			setShmKeyAndSize( shm_key, shm_size );
 			break;
 		}

@@ -62,7 +62,10 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 						m_track, 
 						m_track->getAudioPort() );
 
-	engine::getMainWindow()->workspace()->addWindow( m_effWidget );
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addWindow( m_effWidget );
+	}
 
  	m_effWidget->setWindowTitle( _initial_name );
 	m_effWidget->setFixedSize( 240, 242 );

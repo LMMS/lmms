@@ -111,7 +111,10 @@ automationEditor::automationEditor( void ) :
 	}
 
 	// add us to workspace
-	engine::getMainWindow()->workspace()->addWindow( this );
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addWindow( this );
+	}
 
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,

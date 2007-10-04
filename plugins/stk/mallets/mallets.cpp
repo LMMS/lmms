@@ -1,5 +1,5 @@
 /*
- * mallets.h - tuned instruments that one would bang upon
+ * mallets.cpp - tuned instruments that one would bang upon
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
@@ -23,19 +23,20 @@
  */
 
 
-#include <Qt/QtXml>
+#include "mallets.h"
+
+#include <QtCore/QDir>
+#include <QtGui/QMessageBox>
 
 #include "BandedWG.h"
 #include "ModalBar.h"
 #include "TubeBell.h"
 
-#include "mallets.h"
 #include "engine.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
 #include "knob.h"
 #include "note_play_handle.h"
-#include "templates.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -66,9 +67,9 @@ mallets::mallets( instrumentTrack * _instrument_track ) :
 {
 	m_filesMissing =
 		!QDir( configManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( configManager::inst()->stkDir()+QDir::separator()
+		!QFileInfo( configManager::inst()->stkDir() + QDir::separator()
 			+ "sinewave.raw" ).exists();
-#if 0
+
 	// for some reason this crashes...???
 	if( m_filesMissing )
 	{
@@ -78,7 +79,7 @@ mallets::mallets( instrumentTrack * _instrument_track ) :
 					"the full Stk-package is installed!" ),
 				QMessageBox::Ok );
 	}
-#endif
+
 	m_modalBarWidget = setupModalBarControls( this, _instrument_track );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
 	

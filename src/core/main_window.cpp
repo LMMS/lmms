@@ -25,7 +25,11 @@
  */
 
 
+#include "main_window.h"
+
+
 #include <QtGui/QApplication>
+#include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QSplitter>
@@ -40,7 +44,6 @@
 #endif
 
 
-#include "main_window.h"
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "piano_roll.h"
@@ -142,8 +145,11 @@ mainWindow::mainWindow( void ) :
 		m_workspace->setScrollBarsEnabled( TRUE );
 
 #warning TODO
-/*		m_workspace->setBackground( embed::getIconPixmap(
-						"background_artwork" ) );*/
+		m_workspace->setAutoFillBackground( TRUE );
+		QPalette pal;
+		pal.setBrush( m_workspace->backgroundRole(),
+				embed::getIconPixmap( "background_artwork" ) );
+		m_workspace->setPalette( pal );
 	}
 
 	hbox->addWidget( side_bar );
@@ -445,7 +451,8 @@ void mainWindow::finalize( void )
 	// help-popup-menu
 	QMenu * help_menu = new QMenu( this );
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
-	if( have_www_browser() )
+	// May use offline help
+	if( TRUE )
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
 						tr( "Online help" ),
@@ -723,7 +730,7 @@ void mainWindow::help( void )
 				  tr( "Currently there's no help "
 						  "available in LMMS.\n"
 						  "Please visit "
-						  "http://wiki.mindrules.net "
+						  "http://lmms.sf.net/wiki "
 						  "for documentation on LMMS." ),
 				  QMessageBox::Ok );
 }
@@ -941,32 +948,12 @@ void mainWindow::showTool( QAction * _idx )
 
 
 
-
-bool mainWindow::have_www_browser( void )
-{
-	int ret = system( "which x-www-browser > /dev/null" );
-	return( WIFEXITED( ret ) && WEXITSTATUS( ret ) == EXIT_SUCCESS );
-}
-
-
-
-
 void mainWindow::browseHelp( void )
 {
-	pid_t pid = fork();
-	if( pid == -1 )
-	{
-		perror( "fork" );
-	}
-	else if( pid == 0 )
-	{
-// TODO: use QDesktopService with Qt4
-		QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
-		execlp( "x-www-browser", "x-www-browser",
-					url.toAscii().constData(), NULL );
-		perror( "execlp" );
-		exit( EXIT_FAILURE );
-	}
+	// file:// alternative for offline help
+	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
+	QDesktopServices::openUrl( url );
+	// TODO: Handle error
 }
 
 

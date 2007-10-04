@@ -244,7 +244,7 @@ private:
 
 	knob * m_slide_dec_knob;
 
-	vlist<handleState *> m_handleStates;
+	QList<handleState *> m_handleStates;
 
 } ;
 

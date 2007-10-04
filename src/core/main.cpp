@@ -86,10 +86,10 @@ int main( int argc, char * * argv )
 	QString extension = "wav";
 	QString file_to_load;
 
-	for( int i = 1; i < app.argc(); ++i )
+	for( int i = 1; i < argc; ++i )
 	{
-		if( QString( app.argv()[i] ) == "--version" ||
-					QString( app.argv()[i] ) == "-v" )
+		if( QString( argv[i] ) == "--version" ||
+						QString( argv[i] ) == "-v" )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n\n"
 	"Copyright (c) 2004-2007 Tobias Doerffel and others.\n\n"
@@ -101,9 +101,8 @@ int main( int argc, char * * argv )
 								argv[0] );
 			return( 0 );
 		}
-		else if( app.argc() > i &&
-				( QString( app.argv()[i] ) == "--help" ||
-					QString( app.argv()[i] ) == "-h" ) )
+		else if( argc > i && ( QString( argv[i] ) == "--help" ||
+						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
 	"Copyright (c) 2004-2007 Tobias Doerffel and others.\n\n"
@@ -117,38 +116,35 @@ int main( int argc, char * * argv )
 							PACKAGE_VERSION );
 			return( 0 );
 		}
-		else if( app.argc() > i &&
-				( QString( app.argv()[i] ) == "--render" ||
-					QString( app.argv()[i] ) == "-r" ) )
+		else if( argc > i && ( QString( argv[i] ) == "--render" ||
+						QString( argv[i] ) == "-r" ) )
 		{
-			file_to_load = QString( app.argv()[i+1] );
+			file_to_load = QString( argv[i + 1] );
 			file_to_render = baseName( file_to_load ) + ".";
 			++i;
 		}
-		else if( app.argc() > i &&
-			( QString( app.argv()[i] ) == "--output-format" ||
-					QString( app.argv()[i] ) == "-o" ) )
+		else if( argc > i &&
+				( QString( argv[i] ) == "--output-format" ||
+						QString( argv[i] ) == "-o" ) )
 		{
-			extension = QString( app.argv()[i+1] );
+			extension = QString( argv[i + 1] );
 			if( extension != "wav" && extension != "ogg" )
 			{
 				printf( "\nInvalid output format %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", app.argv()[i+1],
-								argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
 				return( -1 );
 			}
 			++i;
 		}
 		else
 		{
-			if( app.argv()[i][0] == '-' )
+			if( argv[i][0] == '-' )
 			{
 				printf( "\nInvalid option %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", app.argv()[i],
-								argv[0] );
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
 				return( -1 );
 			}
-			file_to_load = app.argv()[i];
+			file_to_load = argv[i];
 		}
 	}
 
