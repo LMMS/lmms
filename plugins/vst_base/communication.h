@@ -2,7 +2,7 @@
  * communication.h - header file defining stuff concerning communication between
  *                   LVSL-server and -client
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -61,8 +61,9 @@ inline void writeValue( const T & _i, int _fd = 1 )
 static inline std::string readString( int _fd = 0 )
 {
 	Sint16 len = readValue<Sint16>( _fd );
-	char * sc = new char[len];
+	char * sc = new char[len + 1];
 	read( _fd, sc, len );
+	sc[len] = '\0';
 	std::string s( sc );
 	delete[] sc;
 	return( s );
@@ -73,7 +74,7 @@ static inline std::string readString( int _fd = 0 )
 
 static inline void writeString( const char * _str, int _fd = 1 )
 {
-	int len = strlen( _str ) + 1;
+	int len = strlen( _str );
 	writeValue<Sint16>( len, _fd );
 	write( _fd, _str, len );
 }

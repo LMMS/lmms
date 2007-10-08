@@ -665,7 +665,7 @@ void VSTPlugin::resizeSharedMemory( void )
 	int shm_id;
 	Uint16 shm_key = 0;
 	while( ( shm_id = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-								0666 ) ) == -1 )
+								0600 ) ) == -1 )
 	{
 	}
 
@@ -688,7 +688,7 @@ void VSTPlugin::resizeSharedMemory( void )
 
 	writeValue<Sint16>( VST_SHM_KEY_AND_SIZE );
 	writeValue<Uint16>( shm_key );
-	writeValue<size_t>( s );
+	writeValue<Uint32>( s );
 }
 
 
@@ -1206,7 +1206,14 @@ int main( void )
 
 			case VST_ENQUEUE_MIDI_EVENT:
 			{
-				const midiEvent ev = readValue<midiEvent>();
+				midiEventTypes type =
+						readValue<midiEventTypes>();
+				Sint8 channel = readValue<Sint8>();
+				Uint16 param1 = readValue<Uint16>();
+				Uint16 param2 = readValue<Uint16>();
+				const midiEvent ev = midiEvent( type, channel,
+							param1, param2 );
+
 				const f_cnt_t fr_ahead = readValue<f_cnt_t>();
 				plugin->enqueueMidiEvent( ev, fr_ahead );
 				break;

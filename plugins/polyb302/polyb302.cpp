@@ -665,7 +665,8 @@ polyb302Synth::handleState::handleState( const polyb302Synth * _synth )
 	m_vcf_envpos = ENVINC;
 	m_vco_detune = 0;
 
-	m_vca_mode = 2;
+	// Start VCA on an attack.
+	m_vca_mode = 0;
 	m_vca_a = 0;
 	//m_vca_attack = 1.0 - 0.94406088;
 	m_vca_attack = 1.0 - 0.96406088;
@@ -816,19 +817,6 @@ void polyb302Synth::handleState::process( sampleFrame * _outbuf,
 		m_sample_cnt++;
 		m_vcf_envpos++;
 
-		// 01/21/07 Changed to VCF -> VCA instead of VCA -> VCF
-#ifdef LB_FILTERED
-		float samp = m_vcf->process( m_vco_k ) * 2.0 * m_vca_a;
-#else
-		float samp = m_vco_k * m_vca_a;
-#endif
-
-		for( int c = 0; c < DEFAULT_CHANNELS; c++ )
-		{
-			_outbuf[i][c] = samp;
-		}
-
-
 		// update vco
 		m_vco_c += m_vco_inc * _freq;
 		if( m_vco_c > 0.5 )
@@ -902,19 +890,30 @@ void polyb302Synth::handleState::process( sampleFrame * _outbuf,
 				break;
 		}
 
-		// Make it louder. For the better?
-		//m_vco_k*=2.0;
+		// Write out samples.
+#ifdef LB_FILTERED
+		float samp = m_vcf->process( m_vco_k ) * 2.0 * m_vca_a;
+#else
+		float samp = m_vco_k * m_vca_a;
+#endif
+
+		for( int c = 0; c < DEFAULT_CHANNELS; c++ )
+		{
+			_outbuf[i][c] = samp;
+		}
+
 
 		// Handle Envelope
 		// TODO: Add decay once I figure out how to extend past the end
 		// of a note.
-		if( m_sample_cnt >= 0.5 * engine::getMixer()->sampleRate() )
-		{
-			m_vca_mode = 2;
-		}
 		if( m_vca_mode == 0 )
 		{
 			m_vca_a += ( m_vca_a0 - m_vca_a ) * m_vca_attack;
+			if( m_sample_cnt >= 0.5
+					* engine::getMixer()->sampleRate() )
+			{
+				m_vca_mode = 2;
+			}
 		}
 		else if( m_vca_mode == 1 )
 		{

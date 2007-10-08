@@ -161,15 +161,16 @@ void journallingObject::saveJournal( QDomDocument & _doc,
 	QDomElement journal_de = _doc.createElement( "journal" );
 	journal_de.setAttribute( "id", id() );
 	journal_de.setAttribute( "entries", m_journalEntries.size() );
-	journal_de.setAttribute( "curentry", m_currentJournalEntry -
-						m_journalEntries.begin() );
+	journal_de.setAttribute( "curentry", (int)( m_currentJournalEntry -
+						m_journalEntries.begin() ) );
 	journal_de.setAttribute( "metadata", TRUE );
 
 	for( journalEntryVector::const_iterator it = m_journalEntries.begin();
 					it != m_journalEntries.end(); ++it )
 	{
 		QDomElement je_de = _doc.createElement( "entry" );
-		je_de.setAttribute( "pos", it - m_journalEntries.begin() );
+		je_de.setAttribute( "pos", (int)( it -
+						m_journalEntries.begin() ) );
 		je_de.setAttribute( "actionid", it->actionID() );
 		je_de.setAttribute( "data", base64::encode( it->data() ) );
 		journal_de.appendChild( je_de );

@@ -456,7 +456,9 @@ void vestigeInstrument::openPlugin( void )
 		{
 			return;
 		}
+		engine::getMixer()->lock();
 		setParameter( "plugin", ofd.selectedFiles()[0] );
+		engine::getMixer()->unlock();
 	}
 }
 

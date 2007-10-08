@@ -1,3 +1,32 @@
+2007-10-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	merged some of Javiers recent changes to trunk:
+
+	* configure.in:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_server.cpp:
+	* plugins/vst_base/Makefile.am:
+	* src/lib/journalling_object.cpp:
+	amd64 fixes
+
+	* plugins/vestige/vestige.cpp:
+	fixed loading deadlock
+
+	* plugins/vst_base/lvsl_server.c:
+	restricted shared memory permissions
+
+	* plugins/vst_base/communication.h:
+	improved string communication
+
+	* configure.in:
+	look for wine header in system folder too
+
+	* plugins/singerbot/singerbot.cpp:
+	detected heap corruption
+
+	* plugins/polyb302/polyb302.cpp:
+	applied relevant LB302 changes
+
 2007-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/mixer.h:
