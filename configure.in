@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.3.0-svn20071008, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.3.0-svn20071008)
+AC_INIT(lmms, 0.3.0-svn20071030, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.3.0-svn20071030)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -657,6 +657,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/organic/Makefile
 		 plugins/patman/Makefile
 		 plugins/singerbot/Makefile
+		 plugins/stereo_enhancer/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
 		 plugins/triple_oscillator/Makefile

@@ -1,3 +1,10 @@
+2007-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/note_play_handle.cpp:
+	fixed crash in case of framesLeft() being less or equal zero while
+	instrument::playNote is being called (e.g. when decreasing release
+	while a note is active)
+
 2007-10-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	merged some of Javiers recent changes to trunk:

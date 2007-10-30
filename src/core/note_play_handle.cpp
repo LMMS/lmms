@@ -169,10 +169,16 @@ void notePlayHandle::play( bool _try_parallelizing )
 								>= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
-	} 
+	}
 
-	// play note!
-	m_instrumentTrack->playNote( this, _try_parallelizing );
+	// under some circumstances we're called even if there's nothing to play
+	// therefore do an additional check which fixes crash e.g. when
+	// decreasing release of an instrument-track while the note is active
+	if( framesLeft() > 0 )
+	{
+		// play note!
+		m_instrumentTrack->playNote( this, _try_parallelizing );
+	}
 
 	if( m_released == TRUE )
 	{
