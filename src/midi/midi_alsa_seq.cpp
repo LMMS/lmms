@@ -60,11 +60,12 @@ midiALSASeq::midiALSASeq( void ) :
 
 	m_queueID = snd_seq_alloc_queue( m_seqHandle );
 	snd_seq_queue_tempo_t * tempo;
-	snd_seq_queue_tempo_alloca( &tempo );
+	snd_seq_queue_tempo_malloc( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
 					engine::getSongEditor()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
+	snd_seq_queue_tempo_free( tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
 	changeQueueTempo( engine::getSongEditor()->getTempo() );
@@ -341,8 +342,9 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 	snd_seq_port_info_malloc( &port_info );
 	snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][0], port_info );
 	const snd_seq_addr_t * dest = snd_seq_port_info_get_addr( port_info );
+	snd_seq_port_info_free( port_info );
 	snd_seq_port_subscribe_t * subs;
-	snd_seq_port_subscribe_alloca( &subs );
+	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, &sender );
 	snd_seq_port_subscribe_set_dest( subs, dest );
 	if( _unsubscribe )
@@ -353,7 +355,7 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 	{
 		snd_seq_subscribe_port( m_seqHandle, subs );
 	}
-	snd_seq_port_info_free( port_info );
+	snd_seq_port_subscribe_free( subs );
 }
 
 
@@ -383,8 +385,9 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						m_portIDs[_port][1],
 						port_info );
 	const snd_seq_addr_t * sender = snd_seq_port_info_get_addr( port_info );
+	snd_seq_port_info_free( port_info );
 	snd_seq_port_subscribe_t * subs;
-	snd_seq_port_subscribe_alloca( &subs );
+	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, sender );
 	snd_seq_port_subscribe_set_dest( subs, &dest );
 	if( _unsubscribe )
@@ -395,7 +398,7 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	{
 		snd_seq_subscribe_port( m_seqHandle, subs );
 	}
-	snd_seq_port_info_free( port_info );
+	snd_seq_port_subscribe_free( subs );
 }
 
 
@@ -547,8 +550,8 @@ void midiALSASeq::updatePortList( void )
 	snd_seq_client_info_t * cinfo;
 	snd_seq_port_info_t * pinfo;
 
-	snd_seq_client_info_alloca( &cinfo );
-	snd_seq_port_info_alloca( &pinfo );
+	snd_seq_client_info_malloc( &cinfo );
+	snd_seq_port_info_malloc( &pinfo );
 
 	snd_seq_client_info_set_client( cinfo, -1 );
 	while( snd_seq_query_next_client( m_seqHandle, cinfo ) >= 0 )
@@ -597,8 +600,8 @@ void midiALSASeq::updatePortList( void )
 		}
 	}
 
-/*	snd_seq_client_info_free( cinfo );
-	snd_seq_port_info_free( pinfo );*/
+	snd_seq_client_info_free( cinfo );
+	snd_seq_port_info_free( pinfo );
 
 	if( m_readablePorts != readable_ports )
 	{

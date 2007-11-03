@@ -28,15 +28,16 @@
 #include "main_window.h"
 
 
+#include <Qt/QtXml>
 #include <QtGui/QApplication>
+#include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QSplitter>
-#include <QtGui/QSplashScreen>
-#include <QtGui/QMessageBox>
 #include <QtGui/QMenuBar>
-#include <Qt/QtXml>
+#include <QtGui/QMessageBox>
+#include <QtGui/QSplashScreen>
+#include <QtGui/QSplitter>
+#include <QtGui/QWorkspace>
 
 
 #ifdef HAVE_CONFIG_H
@@ -112,21 +113,21 @@ mainWindow::mainWindow( void ) :
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
-			configManager::inst()->factoryProjectsDir() + "*" +
-				configManager::inst()->userProjectsDir(),
+				configManager::inst()->userProjectsDir() + "*" +
+				configManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
 							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
-			configManager::inst()->factorySamplesDir() + "*" +
-					configManager::inst()->userSamplesDir(),
+				configManager::inst()->userSamplesDir() + "*" +
+				configManager::inst()->factorySamplesDir(),
 					sample_filter, tr( "My samples" ),
 					embed::getIconPixmap( "sound_file" ),
 							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
-			configManager::inst()->factoryPresetsDir() + "*" +
-					configManager::inst()->userPresetsDir(),
+				configManager::inst()->userPresetsDir() + "*" +
+				configManager::inst()->factoryPresetsDir(),
 						"*.cs.xml", tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
 							splitter ), ++id );
@@ -143,13 +144,8 @@ mainWindow::mainWindow( void ) :
 	{
 		m_workspace = new QWorkspace( splitter );
 		m_workspace->setScrollBarsEnabled( TRUE );
-
-#warning TODO
-		m_workspace->setAutoFillBackground( TRUE );
-		QPalette pal;
-		pal.setBrush( m_workspace->backgroundRole(),
-				embed::getIconPixmap( "background_artwork" ) );
-		m_workspace->setPalette( pal );
+		m_workspace->setBackground( embed::getIconPixmap(
+						"background_artwork" ) );
 	}
 
 	hbox->addWidget( side_bar );
@@ -158,13 +154,9 @@ mainWindow::mainWindow( void ) :
 
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
+	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-				embed::getIconPixmap( "main_toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
 
 	// add layout for organizing quite complex toolbar-layouting
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
@@ -221,8 +213,8 @@ void mainWindow::finalize( void )
 							m_toolBar );
 
 	m_templatesMenu = new QMenu( project_new );
-	connect( m_templatesMenu, SIGNAL( aboutToShow( void ) ),
-				this, SLOT( fillTemplatesMenu( void ) ) );
+	connect( m_templatesMenu, SIGNAL( aboutToShow() ),
+					this, SLOT( fillTemplatesMenu() ) );
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
 	project_new->setMenu( m_templatesMenu );
@@ -357,11 +349,6 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 
-	m_recentlyOpenedProjectsMenu = new QMenu( NULL );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( activated( int ) ),
-			this, SLOT( openRecentlyOpenedProject( int ) ) );
-	updateRecentlyOpenedProjectsMenu();
-
 	// project-popup-menu
 	QMenu * project_menu = new QMenu( this );
 	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
@@ -374,10 +361,14 @@ void mainWindow::finalize( void )
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
 					Qt::CTRL + Qt::Key_O );	
-/*
-	project_menu->addAction( embed::getIconPixmap( "project_open" ),
-					tr( "Recently opened projects" ),
-					m_recentlyOpenedProjectsMenu );*/
+
+	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
+					embed::getIconPixmap( "project_open" ),
+					tr( "Recently opened projects" ) );
+	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
+			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
+	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
@@ -649,13 +640,11 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 
 
 
-void mainWindow::openRecentlyOpenedProject( int _id )
+void mainWindow::openRecentlyOpenedProject( QAction * _action )
 {
-#warning TODO
-/*	const QString & f = m_recentlyOpenedProjectsMenu->text( _id );
+	const QString & f = _action->text();
 	engine::getSongEditor()->loadProject( f );
 	configManager::inst()->addRecentlyOpenedProject( f );
-	updateRecentlyOpenedProjectsMenu();*/
 }
 
 

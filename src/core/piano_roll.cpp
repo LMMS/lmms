@@ -26,15 +26,19 @@
  */
 
 
+#include "piano_roll.h"
+
+
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QClipboard>
-#include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QWheelEvent>
-#include <QtGui/QLayout>
 #include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QPainter>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QWorkspace>
 
 
 #ifndef __USE_XOPEN
@@ -44,7 +48,6 @@
 #include <math.h>
 
 
-#include "piano_roll.h"
 #include "automatable_object_templates.h"
 #include "clipboard.h"
 #include "combobox.h"

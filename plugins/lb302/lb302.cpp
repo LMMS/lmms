@@ -662,8 +662,9 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         sample_cnt++;
 		vcf_envpos++;
 
-        float old_vco_k = vco_k;
-        bool looking;
+	// unused variables
+        //float old_vco_k = vco_k;
+        //bool looking;
         int  decay_frames = 128;
 
 		// update vco
@@ -747,7 +748,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         }
 
 
-        if(i>=release_frame) {
+        if((int)i>=release_frame) {
             vca_mode=1;
         }
        

@@ -31,7 +31,10 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 pkglib_LTLIBRARIES = libsingerbot.la
 
-libsingerbot_la_SOURCES = singerbot.cpp singerbot.h
-libsingerbot_la_LDFLAGS = -lFestival -lestools -lestbase -lesd -lncurses
+libsingerbot_la_SOURCES = singerbot.cpp singerbot.h file.h
 
 $(libsingerbot_la_SOURCES): ./embedded_resources.h
+
+pkglib_PROGRAMS = singerbot_proxy
+singerbot_proxy_SOURCES = singerbot_proxy.cpp
+singerbot_proxy_LDFLAGS = -lFestival -lestools -lestbase -lesd -lncurses -lrt

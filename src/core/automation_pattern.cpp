@@ -283,7 +283,7 @@ void automationPattern::processMidiTime( const midiTime & _time )
 }
 
 
-#undef value
+
 
 #include "automation_pattern.moc"
 

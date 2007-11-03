@@ -26,15 +26,19 @@
  */
 
 
+#include "automation_editor.h"
+
+
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
-#include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QWheelEvent>
-#include <QtGui/QLayout>
 #include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QWorkspace>
 
 
 #ifndef __USE_XOPEN
@@ -44,7 +48,6 @@
 #include <math.h>
 
 
-#include "automation_editor.h"
 #include "song_editor.h"
 #include "main_window.h"
 #include "embed.h"

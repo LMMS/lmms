@@ -55,6 +55,7 @@ lmms_MOC =						\
 		./automation_track.moc			\
 		./bb_editor.moc				\
 		./bb_track.moc				\
+		./caption_menu.moc			\
 		./instrument_track.moc			\
 		./combobox.moc				\
 		./config_mgr.moc			\
@@ -217,6 +218,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/sample_track.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
 		$(srcdir)/src/widgets/automatable_slider.cpp		\
+		$(srcdir)/src/widgets/caption_menu.cpp			\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/effect_label.cpp			\
@@ -301,6 +303,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/track.h				\
 		$(srcdir)/include/track_container.h			\
 		$(srcdir)/include/bb_track.h				\
+		$(srcdir)/include/caption_menu.h			\
 		$(srcdir)/include/sample_track.h			\
 		$(srcdir)/include/sample_buffer.h			\
 		$(srcdir)/include/name_label.h				\

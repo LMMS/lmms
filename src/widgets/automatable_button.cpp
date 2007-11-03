@@ -26,14 +26,15 @@
  */
 
 
+#include "automatable_button.h"
+
 #include <QtGui/QCursor>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_button.h"
 #include "automatable_object_templates.h"
+#include "caption_menu.h"
 #include "embed.h"
+
 
 
 
@@ -93,17 +94,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 		pattern = getAutomationPattern();
 	}
 
-	QMenu contextMenu( target );
-#warning TODO: set according CSS-formatting
-	contextMenu.setTitle( target->accessibleName() );
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( target->accessibleName() ) + "</b></font>",
-									this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( target->accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					pattern,

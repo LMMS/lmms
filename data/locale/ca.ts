@@ -860,7 +860,7 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>automatableButton</name>
     <message>
-        <location filename="../../src/widgets/automatable_button.cpp" line="108"/>
+        <location filename="../../src/widgets/automatable_button.cpp" line="99"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -868,7 +868,7 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>automatableSlider</name>
     <message>
-        <location filename="../../src/widgets/automatable_slider.cpp" line="116"/>
+        <location filename="../../src/widgets/automatable_slider.cpp" line="100"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -1209,7 +1209,7 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>comboBox</name>
     <message>
-        <location filename="../../src/widgets/combobox.cpp" line="161"/>
+        <location filename="../../src/widgets/combobox.cpp" line="151"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -1291,12 +1291,12 @@ Es mostrarà l&apos;assistent per a reconfigurar LMMS.</translation>
         <translation>&amp;Finalitza</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="896"/>
+        <location filename="../../src/core/config_mgr.cpp" line="898"/>
         <source>Could not save config-file</source>
         <translation>No s&apos;ha pogut desar el fitxer de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="903"/>
+        <location filename="../../src/core/config_mgr.cpp" line="905"/>
         <source>Could not save configuration file %1. You probably are not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation>No s&apos;ha pogut desar el fitxer de configuració %1.
@@ -1306,19 +1306,6 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <location filename="../../src/core/config_mgr.cpp" line="820"/>
         <source>Version mismatches</source>
         <translation>La versió no coincideix</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/config_mgr.cpp" line="832"/>
-        <source>Accordingly to the information in your LMMS-configuration-file you seem
-to have run a different (probably older) version of LMMS before.
-It is recommended to run the setup-wizard again to ensure that
-the latest samples, presets, demo-projects etc. are installed in your
-LMMS-working-directory. Run the setup-wizard now?</source>
-        <translation>Segons la informació del fitxer de configuració de LMMS, sembla que abans
-has executat una versió diferent (probablement més antiga) de LMMS.
-Es recomana executar l&apos;assistent de configuració un altre cop per a assegurar
-que les darreres mostres, plantilles, projectes demo, etc. s&apos;instal·lin al teu
-directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
     </message>
     <message>
         <location filename="../../src/core/config_mgr.cpp" line="172"/>
@@ -1334,6 +1321,15 @@ directori de treball de LMMS. Executar ara l&apos;assistent?</translation>
         <location filename="../../src/core/config_mgr.cpp" line="440"/>
         <source>Choose LMMS working directory</source>
         <translation>Escull el directori de treball de LMMS</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/config_mgr.cpp" line="832"/>
+        <source>Accordingly to the information in your LMMS-configuration-file you seem to have run a different (probably older) version of LMMS before.
+It is recommended to run the setup-wizard again to ensure that the latest samples, presets, demo-projects etc. are installed in your LMMS-working-directory.
+Run the setup-wizard now?</source>
+        <translation>Segons la informació del fitxer de configuració de LMMS, sembla que abans has executat una versió diferent (probablement més antiga) de LMMS.
+Es recomana executar l&apos;assistent de configuració un altre cop per a assegurar que les darreres mostres, plantilles, projectes demo, etc. s&apos;instal·lin al teu directori de treball de LMMS.
+Executar ara l&apos;assistent?</translation>
     </message>
 </context>
 <context>
@@ -1866,29 +1862,14 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>fileBrowser</name>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="64"/>
+        <location filename="../../src/core/file_browser.cpp" line="62"/>
         <source>Browser</source>
         <translation>Navegador</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="75"/>
+        <location filename="../../src/core/file_browser.cpp" line="67"/>
         <source>Reload (F5)</source>
         <translation>Recarrega (F5)</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/file_browser.cpp" line="251"/>
-        <source>Send to active instrument-track</source>
-        <translation>Envia a la pista d&apos;instrument activa</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/file_browser.cpp" line="255"/>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>Obre en una nova pista d&apos;instrument/Editor de Cançó</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/file_browser.cpp" line="259"/>
-        <source>Open in new instrument-track/B+B Editor</source>
-        <translation>Obre en una nova pista d&apos;instrument/Editor R+B</translation>
     </message>
 </context>
 <context>
@@ -1944,7 +1925,7 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <translation>Pica aquí per a activar/desactivar la forma d&apos;ona.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/impulse_editor.cpp" line="451"/>
+        <location filename="../../plugins/vibed/impulse_editor.cpp" line="442"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
@@ -2198,37 +2179,37 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>knob</name>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="360"/>
+        <location filename="../../src/widgets/knob.cpp" line="351"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="335"/>
+        <location filename="../../src/widgets/knob.cpp" line="326"/>
         <source>&amp;Reset (%1%2)</source>
         <translation>&amp;Restaura (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="340"/>
+        <location filename="../../src/widgets/knob.cpp" line="331"/>
         <source>&amp;Copy value (%1%2)</source>
         <translation>&amp;Copia valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="345"/>
+        <location filename="../../src/widgets/knob.cpp" line="336"/>
         <source>&amp;Paste value (%1%2)</source>
         <translation>&amp;Enganxa valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="357"/>
+        <location filename="../../src/widgets/knob.cpp" line="348"/>
         <source>Connect to MIDI-device</source>
         <translation>Connecta a dispositiu MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="673"/>
+        <location filename="../../src/widgets/knob.cpp" line="664"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Per favor, introdueix un nou valor entre %1 i %2:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="352"/>
+        <location filename="../../src/widgets/knob.cpp" line="343"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -2518,7 +2499,7 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>lcdSpinBox</name>
     <message>
-        <location filename="../../src/widgets/lcd_spinbox.cpp" line="185"/>
+        <location filename="../../src/widgets/lcd_spinbox.cpp" line="176"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -2526,24 +2507,39 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>listView</name>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="400"/>
+        <location filename="../../src/core/file_browser.cpp" line="230"/>
         <source>Files</source>
         <translation>Fitxers</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="516"/>
+        <location filename="../../src/core/file_browser.cpp" line="498"/>
         <source>Loading sample</source>
         <translation>Carregant mostra</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="518"/>
+        <location filename="../../src/core/file_browser.cpp" line="500"/>
         <source>Please wait, loading sample for preview...</source>
         <translation>Per favor espera, carregant mostra per a previsualitzar...</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="730"/>
+        <location filename="../../src/core/file_browser.cpp" line="684"/>
         <source>--- Factory files ---</source>
         <translation>--- Fitxers de fàbrica ---</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/file_browser.cpp" line="440"/>
+        <source>Send to active instrument-track</source>
+        <translation>Envia a la pista d&apos;instrument activa</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/file_browser.cpp" line="444"/>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation>Obre en una nova pista d&apos;instrument/Editor de Cançó</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/file_browser.cpp" line="448"/>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation>Obre en una nova pista d&apos;instrument/Editor R+B</translation>
     </message>
 </context>
 <context>
@@ -2563,137 +2559,137 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../../src/core/main.cpp" line="196"/>
+        <location filename="../../src/core/main.cpp" line="192"/>
         <source>Setting up main-window and workspace...</source>
         <translation>Preparant finestra principal i espai de treball...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="200"/>
+        <location filename="../../src/core/main_window.cpp" line="203"/>
         <source>Creating new song...</source>
         <translation>Creant nova cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="206"/>
+        <location filename="../../src/core/main_window.cpp" line="209"/>
         <source>Creating GUI...</source>
         <translation>Creant interfície...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="366"/>
+        <location filename="../../src/core/main_window.cpp" line="364"/>
         <source>&amp;New</source>
         <translation>&amp;Nou</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="371"/>
+        <location filename="../../src/core/main_window.cpp" line="369"/>
         <source>&amp;Open...</source>
         <translation>&amp;Obre...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="380"/>
+        <location filename="../../src/core/main_window.cpp" line="382"/>
         <source>&amp;Save</source>
         <translation>&amp;Desa</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="385"/>
+        <location filename="../../src/core/main_window.cpp" line="387"/>
         <source>Save &amp;As...</source>
         <translation>&amp;Anomena i desa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="399"/>
+        <location filename="../../src/core/main_window.cpp" line="401"/>
         <source>&amp;Quit</source>
         <translation>&amp;Surt</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="461"/>
+        <location filename="../../src/core/main_window.cpp" line="463"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="469"/>
+        <location filename="../../src/core/main_window.cpp" line="471"/>
         <source>About</source>
         <translation>Quant a</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="450"/>
+        <location filename="../../src/core/main_window.cpp" line="452"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="465"/>
+        <location filename="../../src/core/main_window.cpp" line="467"/>
         <source>What&apos;s this?</source>
         <translation>Què és això?</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="121"/>
+        <location filename="../../src/core/main_window.cpp" line="124"/>
         <source>My samples</source>
         <translation>Les meves mostres</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="127"/>
+        <location filename="../../src/core/main_window.cpp" line="130"/>
         <source>My presets</source>
         <translation>Les meves plantilles</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="115"/>
+        <location filename="../../src/core/main_window.cpp" line="118"/>
         <source>My projects</source>
         <translation>Els meus projectes</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="194"/>
+        <location filename="../../src/core/main_window.cpp" line="197"/>
         <source>Loading song...</source>
         <translation>Carregant cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="417"/>
+        <location filename="../../src/core/main_window.cpp" line="419"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="422"/>
+        <location filename="../../src/core/main_window.cpp" line="424"/>
         <source>Show setup wizard</source>
         <translation>Mostra l&apos;assistent de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="344"/>
+        <location filename="../../src/core/main_window.cpp" line="347"/>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
         <translation>Pitjant aquest botó, pots mostrar o amagar la finestra de notes del projecte. En aquesta finestra pots escriure les teves notes del projecte.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="530"/>
+        <location filename="../../src/core/main_window.cpp" line="532"/>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="216"/>
+        <location filename="../../src/core/main_window.cpp" line="219"/>
         <source>Create new project</source>
         <translation>Crea nou projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="230"/>
+        <location filename="../../src/core/main_window.cpp" line="233"/>
         <source>Open existing project</source>
         <translation>Obre projecte existent</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="237"/>
+        <location filename="../../src/core/main_window.cpp" line="240"/>
         <source>Save current project</source>
         <translation>Desa projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="244"/>
+        <location filename="../../src/core/main_window.cpp" line="247"/>
         <source>Export current project</source>
         <translation>Exporta projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="286"/>
+        <location filename="../../src/core/main_window.cpp" line="289"/>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar el Rotlle de Piano. Amb l&apos;ajuda del Rotlle de Piano pots editar patrons de melodia fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="364"/>
+        <location filename="../../src/core/main_window.cpp" line="362"/>
         <source>&amp;Project</source>
         <translation>&amp;Projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="620"/>
+        <location filename="../../src/core/main_window.cpp" line="622"/>
         <source>Open project</source>
         <translation>Obre projecte</translation>
     </message>
@@ -2703,62 +2699,62 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Desa projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="131"/>
+        <location filename="../../src/core/main_window.cpp" line="134"/>
         <source>My home</source>
         <translation>El meu cau</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="135"/>
+        <location filename="../../src/core/main_window.cpp" line="138"/>
         <source>Root directory</source>
         <translation>Directori arrel</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="262"/>
+        <location filename="../../src/core/main_window.cpp" line="265"/>
         <source>Show/hide Beat+Baseline Editor</source>
         <translation>Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="272"/>
+        <location filename="../../src/core/main_window.cpp" line="275"/>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Ritme Base. L&apos;Editor de Ritme Base és necessari per a crear ritmes; obrir, afegir i eliminar canals; tallar, copiar i enganxar patrons de ritme; i altres funcions similars.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="278"/>
+        <location filename="../../src/core/main_window.cpp" line="281"/>
         <source>Show/hide Piano-Roll</source>
         <translation>Mostra/amaga Rotlle de Piano</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="290"/>
+        <location filename="../../src/core/main_window.cpp" line="293"/>
         <source>Show/hide Song-Editor</source>
         <translation>Mostra/amaga Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="300"/>
+        <location filename="../../src/core/main_window.cpp" line="303"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Cançó. Amb l&apos;ajuda de l&apos;Editor de Cançó pots editar la llista de reproducció de la cançó i especificar quan ha de tocar-se cada pista. També pots inserir i moure mostres (p.e. mostres de rap) directament a la llista de reproducció.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="337"/>
+        <location filename="../../src/core/main_window.cpp" line="340"/>
         <source>Show/hide project notes</source>
         <translation>Mostra/amaga les notes del projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="405"/>
+        <location filename="../../src/core/main_window.cpp" line="407"/>
         <source>&amp;Edit</source>
         <translation>&amp;Edita</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="407"/>
+        <location filename="../../src/core/main_window.cpp" line="409"/>
         <source>Undo</source>
         <translation>Desfés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="411"/>
+        <location filename="../../src/core/main_window.cpp" line="413"/>
         <source>Redo</source>
         <translation>Refés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="419"/>
+        <location filename="../../src/core/main_window.cpp" line="421"/>
         <source>Show settings dialog</source>
         <translation>Mostra el diàleg de configuració</translation>
     </message>
@@ -2768,22 +2764,22 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Ajuda no disponible</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="306"/>
+        <location filename="../../src/core/main_window.cpp" line="309"/>
         <source>Show/hide Automation Editor</source>
         <translation>Mostra/amaga Editor d&apos;Automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="316"/>
+        <location filename="../../src/core/main_window.cpp" line="319"/>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor d&apos;Automatització. Amb l&apos;ajuda de l&apos;Editor d&apos;Automatització pots editar valors dinàmics fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="442"/>
+        <location filename="../../src/core/main_window.cpp" line="444"/>
         <source>&amp;Tools</source>
         <translation>E&amp;ines</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="621"/>
+        <location filename="../../src/core/main_window.cpp" line="623"/>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz *.xml)</translation>
     </message>
@@ -2793,17 +2789,17 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Projecte MultiMèdia (*.mmp *.mmpz);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="455"/>
+        <location filename="../../src/core/main_window.cpp" line="457"/>
         <source>Online help</source>
         <translation>Ajuda en línia</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="390"/>
+        <location filename="../../src/core/main_window.cpp" line="392"/>
         <source>Import...</source>
         <translation>Importa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="394"/>
+        <location filename="../../src/core/main_window.cpp" line="396"/>
         <source>E&amp;xport...</source>
         <translation>E&amp;xporta...</translation>
     </message>
@@ -2813,6 +2809,11 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Actualment no hi ha ajuda disponible a LMMS.
 Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/main_window.cpp" line="375"/>
+        <source>Recently opened projects</source>
+        <translation>Projectes oberts recentment</translation>
     </message>
 </context>
 <context>
@@ -3084,7 +3085,7 @@ Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</trans
 <context>
     <name>midiClient</name>
     <message>
-        <location filename="../../src/midi/midi_alsa_seq.cpp" line="628"/>
+        <location filename="../../src/midi/midi_alsa_seq.cpp" line="631"/>
         <source>DEVICE</source>
         <translation>DISPOSITIU</translation>
     </message>
@@ -3199,7 +3200,7 @@ Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</trans
 <context>
     <name>nineButtonSelector</name>
     <message>
-        <location filename="../../plugins/vibed/nine_button_selector.cpp" line="263"/>
+        <location filename="../../plugins/vibed/nine_button_selector.cpp" line="254"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
@@ -3544,12 +3545,12 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>pianoWidget</name>
     <message>
-        <location filename="../../src/core/piano_widget.cpp" line="131"/>
+        <location filename="../../src/core/piano_widget.cpp" line="132"/>
         <source>Base note</source>
         <translation>Nota base</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_widget.cpp" line="232"/>
+        <location filename="../../src/core/piano_widget.cpp" line="223"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -3670,7 +3671,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>sintetitzador versàtil de guitza &amp; bombo</translation>
     </message>
     <message>
-        <location filename="../../plugins/singerbot/singerbot.cpp" line="55"/>
+        <location filename="../../plugins/singerbot/singerbot.cpp" line="59"/>
         <source>Singer bot to add some basic vocals</source>
         <translation>Bot cantant per a afegir veus bàsiques</translation>
     </message>
@@ -3999,77 +4000,77 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>rackPlugin</name>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="68"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="66"/>
         <source>Turn the effect off</source>
         <translation>Apaga l&apos;efecte</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="72"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="70"/>
         <source>On/Off</source>
         <translation>Encès/Apagat</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="75"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="73"/>
         <source>Toggles the effect on or off.</source>
         <translation>Encén o apaga l&apos;efecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="77"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="75"/>
         <source>Wet/Dry mix</source>
         <translation>Mescla Moll/Sec</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="81"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="79"/>
         <source>W/D</source>
         <translation>M/S</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="85"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="83"/>
         <source>Wet Level:</source>
         <translation>Nivell de Moll:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="88"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="86"/>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
         <translation>La roda Moll/Sec indica la proporció entre el senyal d&apos;entrada i l&apos;efecte que es mostra a la sortida.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="94"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="92"/>
         <source>Decay</source>
         <translation>Decaïment</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="98"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="96"/>
         <source>Time:</source>
         <translation>Temps:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="102"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="100"/>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
         <translation>La roda Decaïment controla quants períodes de silenci han de passar abans de que el connector aturi el processament. Valors més petits reduiran la càrrega de CPU, però augmenten el risc de tallar la cua als efectes de retard.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="107"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="105"/>
         <source>Gate</source>
         <translation>Porta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="111"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="109"/>
         <source>Gate:</source>
         <translation>Porta:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="114"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="112"/>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
         <translation>La roda Porta controla el nivell de senyal que és considerat &apos;silenci&apos; mentre decideix quan aturar de processar senyals.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="116"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="114"/>
         <source>Controls</source>
         <translation>Controls</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="173"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="171"/>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
 
 The On/Off switch allows you to bypass a given plugin at any point in time.
@@ -4092,22 +4093,22 @@ El botó Controls obre un diàleg per a editar els paràmetres de l&apos;efecte.
 Un clic dret mostrarà un menú contextual on podràs canviar l&apos;ordre en el qual els efectes són processats o esborrar un efecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="255"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="243"/>
         <source>Move &amp;up</source>
         <translation>Mou a&amp;munt</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="258"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="246"/>
         <source>Move &amp;down</source>
         <translation>Mou a&amp;vall</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="262"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="250"/>
         <source>&amp;Remove this plugin</source>
         <translation>&amp;Treu aquest connector</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="266"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="254"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
@@ -4357,64 +4358,64 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
         <translation>INTERFÍCIE MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="657"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="656"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="662"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="661"/>
         <source>Cancel</source>
         <translation>Cancel·la</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="752"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="751"/>
         <source>Restart LMMS</source>
         <translation>Reinicia LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="755"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="754"/>
         <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
         <translation>Per favor, tingues en compte que la majoria de canvis no s&apos;aplicaran fins que reiniciïs LMMS!</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="786"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="785"/>
         <source>Frames: %1
 Latency: %2 ms</source>
         <translation>Marcs: %1
 Latència: %2 ms</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="813"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="812"/>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
         <translation>Aquí pots configurar la mida de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="901"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="900"/>
         <source>Choose LMMS working directory</source>
         <translation>Escull el directori de treball de LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="923"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="922"/>
         <source>Choose your VST-plugin directory</source>
         <translation>Escull el teu directori de connectors VST</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="945"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="944"/>
         <source>Choose artwork-theme directory</source>
         <translation>Escull el directori de material gràfic</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="967"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="966"/>
         <source>Choose FL Studio installation directory</source>
         <translation>Escull el directori d&apos;instal·lació de FL Studio</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1066"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1065"/>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
         <translation>Aquí pots seleccionar la teva interfície d&apos;àudio preferida. Depenent de la configuració del teu sistema durant el temps de compilació, pots escollir entre ALSA, JACK, OSS i altres. Abaix pots veure una caixa amb controls per a configurar la interfície d&apos;àudio seleccionada.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1096"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1095"/>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
         <translation>Aquí pots seleccionar la teva interfície MIDI preferida. Depenent de la configuració del teu sistema durant el temps de compilació, pots escollir entre ALSA, OSS i més. Abaix pots veure una caixa amb controls per a configurar la interfície MIDI seleccionada.</translation>
     </message>
@@ -4451,12 +4452,12 @@ Please note that in some cases parallelizing won&apos;t work with small buffer-s
 Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de mida petita. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar la mida de la memòria intermèdia.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="981"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="980"/>
         <source>Choose LADSPA plugin directory</source>
         <translation>Escull un directori de connectors LADSPA</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1004"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1003"/>
         <source>Choose STK rawwave directory</source>
         <translation>Escull el directori d&apos;ones crues STK</translation>
     </message>
@@ -4517,12 +4518,12 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>Pica aquí si vols aturar la reproducció de la cançó. El marcador de posició de cançó serà col·locat a l&apos;inici de la cançó.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1606"/>
+        <location filename="../../src/core/song_editor.cpp" line="1605"/>
         <source>untitled</source>
         <translation>sense títol</translation>
     </message>
     <message>
-        <location filename="../../src/lib/mmp.cpp" line="246"/>
+        <location filename="../../src/lib/mmp.cpp" line="242"/>
         <source>File already exists</source>
         <translation>El fitxer ja existeix</translation>
     </message>
@@ -4542,7 +4543,7 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>El projecte multimèdia %1 sembla contenir errors. LMMS farà el que pot per a recuperar el màxim possible de dades d&apos;aquest fitxer.</translation>
     </message>
     <message>
-        <location filename="../../src/lib/mmp.cpp" line="261"/>
+        <location filename="../../src/lib/mmp.cpp" line="257"/>
         <source>Could not write file</source>
         <translation>No es pot escriure el fitxer</translation>
     </message>
@@ -4552,7 +4553,7 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1635"/>
+        <location filename="../../src/core/song_editor.cpp" line="1634"/>
         <source>The file &quot;%1&quot; already exists. Do you want to overwrite it?</source>
         <translation>El fitxer &quot;%1&quot; ja existeix. Vols sobreescriure&apos;l?</translation>
     </message>
@@ -4597,19 +4598,19 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>Afegeix pista de mostra</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1544"/>
+        <location filename="../../src/core/song_editor.cpp" line="1543"/>
         <source>Project NOT saved.</source>
         <translation>Projecte NO desat.</translation>
     </message>
     <message>
-        <location filename="../../src/lib/mmp.cpp" line="250"/>
+        <location filename="../../src/lib/mmp.cpp" line="246"/>
         <source>The file %1 already exists.
 Do you want to overwrite it?</source>
         <translation>El fitxer %1 ja existeix.
 Vols sobreescriure&apos;l?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1622"/>
+        <location filename="../../src/core/song_editor.cpp" line="1621"/>
         <source>Select file for project-export...</source>
         <translation>Selecciona fitxer per a exportar projecte...</translation>
     </message>
@@ -4624,7 +4625,7 @@ Vols sobreescriure&apos;l?</translation>
         <translation>El projecte actual ha estat modificat des del darrer desament. Vols desar-lo ara?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1577"/>
+        <location filename="../../src/core/song_editor.cpp" line="1576"/>
         <source>Import file</source>
         <translation>Importa fitxer</translation>
     </message>
@@ -4696,12 +4697,12 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i torna-ho 
         <translation>El projecte %1 està desat.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1545"/>
+        <location filename="../../src/core/song_editor.cpp" line="1544"/>
         <source>The project %1 was not saved!</source>
         <translation>El projecte %1 no està desat!</translation>
     </message>
     <message>
-        <location filename="../../src/lib/mmp.cpp" line="270"/>
+        <location filename="../../src/lib/mmp.cpp" line="266"/>
         <source>Could not write file %1. You probably are not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation>No es pot escriure el fitxer %1. Probablement no tens permís per a escriure aquest fitxer.
@@ -4716,27 +4717,27 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>surroundArea</name>
     <message>
-        <location filename="../../src/core/surround_area.cpp" line="84"/>
+        <location filename="../../src/core/surround_area.cpp" line="82"/>
         <source>click to where this channel should be audible</source>
         <translation>pica a on aquest canal ha de ser audible</translation>
     </message>
     <message>
-        <location filename="../../src/core/surround_area.cpp" line="59"/>
+        <location filename="../../src/core/surround_area.cpp" line="57"/>
         <source>Surround area X</source>
         <translation>Àrea envoltant X</translation>
     </message>
     <message>
-        <location filename="../../src/core/surround_area.cpp" line="64"/>
+        <location filename="../../src/core/surround_area.cpp" line="62"/>
         <source>Surround area Y</source>
         <translation>Àrea envoltant Y</translation>
     </message>
     <message>
-        <location filename="../../src/core/surround_area.cpp" line="170"/>
+        <location filename="../../src/core/surround_area.cpp" line="167"/>
         <source>Open &amp;X in automation editor</source>
         <translation>Obre &amp;X a l&apos;editor d&apos;automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/surround_area.cpp" line="174"/>
+        <location filename="../../src/core/surround_area.cpp" line="171"/>
         <source>Open &amp;Y in automation editor</source>
         <translation>Obre &amp;Y a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -4752,122 +4753,122 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>tempoSyncKnob</name>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="275"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="266"/>
         <source>Tempo Sync</source>
         <translation>Sinc Tempo</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="87"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="78"/>
         <source>&amp;Reset (%1%2)</source>
         <translation>&amp;Restaura (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="92"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="83"/>
         <source>&amp;Copy value (%1%2)</source>
         <translation>&amp;Copia valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="97"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="88"/>
         <source>&amp;Paste value (%1%2)</source>
         <translation>&amp;Enganxa valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="112"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="103"/>
         <source>No Sync</source>
         <translation>Sense Sinc</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="116"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="107"/>
         <source>Eight beats</source>
         <translation>Vuit batecs</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="122"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="113"/>
         <source>Whole note</source>
         <translation>Nota sencera</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="128"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="119"/>
         <source>Half note</source>
         <translation>Mitja nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="134"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="125"/>
         <source>Quarter note</source>
         <translation>Quart de nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="140"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="131"/>
         <source>8th note</source>
         <translation>8è de nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="146"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="137"/>
         <source>16th note</source>
         <translation>16è de nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="150"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="141"/>
         <source>32nd note</source>
         <translation>32è de nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="164"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="155"/>
         <source>Connect to MIDI-device</source>
         <translation>Connecta a dispositiu MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="167"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="158"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="234"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="225"/>
         <source>Synced to Eight Beats</source>
         <translation>Sincronitzat a Vuit Batecs</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="239"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="230"/>
         <source>Synced to Whole Note</source>
         <translation>Sincronitzat a Nota Sencera</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="244"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="235"/>
         <source>Synced to Half Note</source>
         <translation>Sincronitzat a Mitja Nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="249"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="240"/>
         <source>Synced to Quarter Note</source>
         <translation>Sincronitzat a Quart de Nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="254"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="245"/>
         <source>Synced to 8th Note</source>
         <translation>Sincronitzat a 8è de Nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="259"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="250"/>
         <source>Synced to 16th Note</source>
         <translation>Sincronitzat a 16è de Nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="264"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="255"/>
         <source>Synced to 32nd Note</source>
         <translation>Sincronitzat a 32è de Nota</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="160"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="151"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="153"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="144"/>
         <source>Custom...</source>
         <translation>Personalitzat...</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="223"/>
+        <location filename="../../src/widgets/tempo_sync_knob.cpp" line="214"/>
         <source>Custom </source>
         <translation>Personalitzat </translation>
     </message>
@@ -5023,27 +5024,27 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <location filename="../../src/core/track.cpp" line="934"/>
+        <location filename="../../src/core/track.cpp" line="933"/>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Pitja &lt;Ctrl&gt; quan piquis el control de moviment per a iniciar una nova acció d&apos;arrossegar i amollar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1137"/>
+        <location filename="../../src/core/track.cpp" line="1136"/>
         <source>Clone this track</source>
         <translation>Clona aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1140"/>
+        <location filename="../../src/core/track.cpp" line="1139"/>
         <source>Remove this track</source>
         <translation>Elimina aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="945"/>
+        <location filename="../../src/core/track.cpp" line="944"/>
         <source>Actions for this track</source>
         <translation>Accions per a aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="967"/>
+        <location filename="../../src/core/track.cpp" line="966"/>
         <source>With this switch you can either mute this track or mute all other tracks.
 By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
 When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
@@ -5052,24 +5053,24 @@ Amb un clic esquerre, aquesta pista s&apos;apaga. Això és útil si només vols
 Amb un clic dret a l&apos;interruptor, totes les altres pistes s&apos;apagaran. Això és útil si només vols escoltar aquesta pista.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="969"/>
+        <location filename="../../src/core/track.cpp" line="968"/>
         <source>left click = mute this track
 right click = mute all other tracks (solo)</source>
         <translation>clic esquerre = apaga aquesta pista
 clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="948"/>
+        <location filename="../../src/core/track.cpp" line="947"/>
         <source>Mute</source>
         <translation>Apaga</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1124"/>
+        <location filename="../../src/core/track.cpp" line="1123"/>
         <source>Enable automation</source>
         <translation>Habilita automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1131"/>
+        <location filename="../../src/core/track.cpp" line="1130"/>
         <source>Disable automation</source>
         <translation>Inhabilita automatització</translation>
     </message>
@@ -5380,7 +5381,7 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
 <context>
     <name>vibed</name>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="95"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="96"/>
         <source>The waveform editor provides control over the initial state or impulse that is used to start the string vibrating.  The buttons to the right of the graph will initialize the waveform to the selected type.  The &apos;?&apos; button will load a waveform from a file--only the first 128 samples will be loaded.
 
 The waveform can also be drawn in the graph.
@@ -5397,147 +5398,147 @@ El botó &apos;S&apos; suavitzarà la forma d&apos;ona.
 El botó &apos;N&apos; normalitzarà la forma d&apos;ona.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="98"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="99"/>
         <source>Volume</source>
         <translation>Volum</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="102"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="103"/>
         <source>Volume:</source>
         <translation>Volum:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="106"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="107"/>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
         <translation>La roda &apos;V&apos; ajusta el volum de la corda seleccionada.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="109"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="110"/>
         <source>String stiffness</source>
         <translation>Rigidesa de corda</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="115"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="116"/>
         <source>String stiffness:</source>
         <translation>Rigidesa de corda:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="121"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="122"/>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
         <translation>La roda &apos;S&apos; ajusta la rigidesa de la corda seleccionada. La rigidesa de la corda afecta el temps que la corda ressonarà. Quan més baix el valor, més temps sonarà la corda.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="125"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="126"/>
         <source>Pick position</source>
         <translation>Posició per a tocar</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="130"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="131"/>
         <source>Pick position:</source>
         <translation>Posició per a tocar:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="135"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="136"/>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
         <translation>La roda &apos;P&apos; ajusta la posició on serà tocada la corda seleccionada. Quan més baix el valor, es toca més a prop del pont.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="138"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="139"/>
         <source>Pickup position</source>
         <translation>Posició per a recollir</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="144"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="145"/>
         <source>Pickup position:</source>
         <translation>Posició per a recollir:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="150"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="151"/>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
         <translation>La roda &apos;PU&apos; ajusta la posició on les vibracions seran monitoritzades per a la corda seleccionada. Quan més baix aquest valor, la recollida és més a prop del pont.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="152"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="153"/>
         <source>Pan</source>
         <translation>Panorama</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="157"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="158"/>
         <source>Pan:</source>
         <translation>Panorama:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="162"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="163"/>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
         <translation>La roda Pan determina la localització de la corda seleccionada al camp estèreo.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="164"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="165"/>
         <source>Detune</source>
         <translation>Desafinament</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="169"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="170"/>
         <source>Detune:</source>
         <translation>Desafinament:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="175"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="176"/>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
         <translation>La roda Detune modifica el to de la corda seleccionada. Valors menors que zero faran que la corda soni amb bemoll. Valors majors que zero faran que la corda soni amb sostingut.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="177"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="178"/>
         <source>Fuzziness</source>
         <translation>Arrissada</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="183"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="184"/>
         <source>Fuzziness:</source>
         <translation>Arrissada:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="189"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="190"/>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
         <translation>La roda Slap afegeix una mica d&apos;arrissada a la corda seleccionada que és més notable durant l&apos;atac, encara que també pot usar-se per a que la corda soni més &apos;metàl·lica&apos;.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="191"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="192"/>
         <source>Length</source>
         <translation>Longitud</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="197"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="198"/>
         <source>Length:</source>
         <translation>Longitud:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="203"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="204"/>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
         <translation>La roda Length ajusta la longitud de la corda seleccionada. Les cordes més llargues sonaran a la vegada més temps i més brillants, emperò també es menjaran més cicles de CPU.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="210"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="211"/>
         <source>Impulse or initial state</source>
         <translation>Impuls o estat inicial</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="216"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="217"/>
         <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
         <translation>El selector &apos;Imp&apos; determina si la forma d&apos;ona del gràfic s&apos;ha de tractar com un impuls impartit a la corda quan es toca o l&apos;estat inicial de la corda.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="248"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="250"/>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation>El selector Octave s&apos;usa per a escollir a quin harmònic de la nota la corda sonarà. Per exemple, &apos;-2&apos; significa que la corda sonarà dues octaves per sota de la fonamental, &apos;F&apos; significa que la corda sonarà a la fonamental, i &apos;6&apos; significa que la corda sonarà sis octaves per sobre de la fonamental.</translation>
+        <translation>El selector Octava s&apos;usa per a escollir a quin harmònic de la nota la corda sonarà. Per exemple, &apos;-2&apos; significa que la corda sonarà dues octaves per sota de la fonamental, &apos;F&apos; significa que la corda sonarà a la fonamental, i &apos;6&apos; significa que la corda sonarà sis octaves per sobre de la fonamental.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="280"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="283"/>
         <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
-        <translation>El selector String s&apos;usa per a escollir quina corda estan editant els controls. Un instrument Vibed pot tenir fins a nou cordes vibrants independents. El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona indica si la corda seleccionada està activa.</translation>
+        <translation>El selector Corda s&apos;usa per a escollir quina corda estan editant els controls. Un instrument Vibed pot tenir fins a nou cordes vibrants independents. El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona indica si la corda seleccionada està activa.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="316"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="319"/>
         <source>Vibed models up to nine independently vibrating strings.  The &apos;String&apos; selector allows you to choose which string is being edited.  The &apos;Imp&apos; selector chooses whether the graph represents an impulse or the initial state of the string.  The &apos;Octave&apos; selector chooses which harmonic the string should vibrate at.
 
 The graph allows you to control the initial state or impulse used to set the string in motion.
@@ -5562,14 +5563,29 @@ La roda &apos;Length&apos; controla la longitud de la corda.
 El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona determina si la corda està activa a l&apos;instrument actual.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="601"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="595"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="205"/>
+        <location filename="../../plugins/vibed/vibed.cpp" line="206"/>
         <source>Impulse</source>
         <translation>Impuls</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/vibed/vibed.cpp" line="81"/>
+        <source>Impulse Editor</source>
+        <translation>Editor d&apos;Impuls</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/vibed/vibed.cpp" line="242"/>
+        <source>Octave</source>
+        <translation>Octava</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/vibed/vibed.cpp" line="276"/>
+        <source>String</source>
+        <translation>Corda</translation>
     </message>
 </context>
 <context>

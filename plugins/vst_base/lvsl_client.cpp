@@ -23,9 +23,12 @@
  */
 
 
+#include "lvsl_client.h"
+
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
 #include <QtCore/QDir>
+#include <QtGui/QWorkspace>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 
@@ -60,11 +63,10 @@
 #endif
 
 
-#include "templates.h"
 #include "config_mgr.h"
 #include "engine.h"
 #include "main_window.h"
-#include "lvsl_client.h"
+#include "templates.h"
 
 
 

@@ -26,12 +26,13 @@
  */
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
-#include <QtGui/QMouseEvent>
-
 #include "tempo_sync_knob.h"
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWorkspace>
+
 #include "automatable_object_templates.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "main_window.h"
 #include "meter_dialog.h"
@@ -73,16 +74,7 @@ tempoSyncKnob::~tempoSyncKnob()
 
 void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: CSS-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "reload" ),
 				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
 							m_hintTextAfterValue ),

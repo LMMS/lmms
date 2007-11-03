@@ -26,13 +26,16 @@
  */
 
 
+#include "track_container.h"
+
+
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
 #include <QtGui/QWheelEvent>
+#include <QtGui/QWorkspace>
 
 
-#include "track_container.h"
 #include "bb_track.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -591,7 +594,5 @@ void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
 
 #include "track_container.moc"
 
-#undef setValue
-#undef maximum
 
 #endif

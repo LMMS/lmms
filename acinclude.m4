@@ -52,10 +52,9 @@ for i in $QT_TRANSLATIONS_SEARCH ; do
     fi
 done
 if test x"$QT_TRANSLATIONS" = x ; then
-    AC_MSG_WARN([*** not found! You may want to install a Qt i18n package])
-else
-    AC_DEFINE_UNQUOTED(QT_TRANSLATIONS_DIR, "$QT_TRANSLATIONS")
+    AC_MSG_ERROR([*** not found! Either install Qt i18n files or define QT_TRANSLATIONS.])
 fi
+AC_DEFINE_UNQUOTED(QT_TRANSLATIONS_DIR, "$QT_TRANSLATIONS")
 AC_MSG_RESULT([$QT_TRANSLATIONS])
 
 
@@ -136,7 +135,7 @@ case "${host}" in
         if test "x$QT_LIBS" = x;  then
             AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
         fi
-	QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4 -lQt3Support4 -lws2_32"
+	QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4 -lws2_32"
 	# Check that windres is in path
 	AC_PATH_PROGS([WINDRES],[i586-mingw32-windres windres],,[${prefix}/bin:$PATH])
 	if test x$WINDRES = x ; then
@@ -154,7 +153,7 @@ case "${host}" in
 	else
 		QT_LIB="-L$QTDIR/lib64 -L$QTDIR/lib64/qt4"
         fi
- 	QT_LIB="$QT_LIB -lQtCore -lQtXml -lQtNetwork -lQtGui -lQt3Support"
+ 	QT_LIB="$QT_LIB -lQtCore -lQtXml -lQtNetwork -lQtGui"
         ;;
 esac
 AC_MSG_RESULT([found: $QT_LIB])

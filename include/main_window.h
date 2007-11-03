@@ -28,13 +28,13 @@
 
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
-#include <QtGui/QWorkspace>
 #include <QtGui/QWhatsThis>
 
 class QAction;
 class QDomElement;
 class QGridLayout;
 class QSplashScreen;
+class QWorkspace;
 
 class configManager;
 class tool;
@@ -94,8 +94,6 @@ public slots:
 	void createNewProject( void );
 	void createNewProjectFromTemplate( QAction * _idx );
 	void openProject( void );
-	void updateRecentlyOpenedProjectsMenu( void );
-	void openRecentlyOpenedProject( int );
 	bool saveProject( void );
 	bool saveProjectAs( void );
 	void showSettingsDialog( void );
@@ -158,7 +156,9 @@ private:
 private slots:
 	void browseHelp( void );
 	void fillTemplatesMenu( void );
+	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
+	void updateRecentlyOpenedProjectsMenu( void );
 
 } ;
 

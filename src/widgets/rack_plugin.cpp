@@ -26,24 +26,23 @@
  */
 
 
-#include <Qt/QtXml>
-#include <QtCore/QMap>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
-#include <QtGui/QWhatsThis>
-#include <QtGui/QColor>
-
 #include "rack_plugin.h"
+
+#include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QWorkspace>
+
 #include "audio_port.h"
-#include "knob.h"
-#include "led_checkbox.h"
-#include "tempo_sync_knob.h"
-#include "tooltip.h"
+#include "caption_menu.h"
 #include "effect_control_dialog.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
+#include "knob.h"
+#include "led_checkbox.h"
 #include "main_window.h"
+#include "tempo_sync_knob.h"
+#include "tooltip.h"
 
 
 rackPlugin::rackPlugin( QWidget * _parent, 
@@ -239,31 +238,21 @@ void rackPlugin::setGate( float _value )
 
 void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<QMenu> contextMenu = new QMenu( this );
-	contextMenu->setTitle( m_effect->publicName() );
-#warning TODO: CSS-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" + 
-				QString( m_effect->publicName() ) +
-								"</b></font>",
-				this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu->addAction( caption );
-#endif
-	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ), 
-						tr( "Move &up" ), 
+	QPointer<captionMenu> contextMenu = new captionMenu(
+						m_effect->publicName() );
+	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
+						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ), 
+	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
 						tr( "Move &down" ),
 						this, SLOT( moveDown() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), 
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ), 
-						tr( "&Help" ),  
+	contextMenu->addAction( embed::getIconPixmap( "help" ),
+						tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;

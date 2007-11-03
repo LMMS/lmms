@@ -978,7 +978,3 @@ bool FASTCALL ladspaManager::cleanup( const ladspa_key_t & _plugin,
 	}
 	return( FALSE );
 }
-
-
-#undef value
-

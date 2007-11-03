@@ -26,15 +26,15 @@
  */
 
 
-#include <QtGui/QPushButton>
+#include "file_browser.h"
+
+
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMenu>
-#include <QtGui/QCursor>
-class QColorGroup;
-#include <Qt3Support/Q3Header>
+#include <QtGui/QPushButton>
+#include <QtGui/QWorkspace>
 
 
-#include "file_browser.h"
 #include "bb_editor.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -57,19 +57,12 @@ fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
 							QWidget * _parent ) :
 	sideBarWidget( _title, _pm, _parent ),
-	m_contextMenuItem( NULL ),
 	m_directories( _directories ),
 	m_filter( _filter )
 {
 	setWindowTitle( tr( "Browser" ) );
 	m_l = new listView( contentParent() );
 	addContentWidget( m_l );
-
-	connect( m_l, SIGNAL( contextMenuRequested( Q3ListViewItem *,
-							const QPoint &, int ) ),
-			this, SLOT( contextMenuRequest( Q3ListViewItem *,
-						const QPoint &, int ) ) );
-
 
 	QPushButton * reload_btn = new QPushButton( embed::getIconPixmap(
 			"reload" ), tr( "Reload (F5)" ), contentParent() );
@@ -98,36 +91,6 @@ void fileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-
-	Q3ListViewItem * item = m_l->firstChild();
-	bool resort = FALSE;
-
-	// sort merged directories
-	while( item != NULL )
-	{
-		directory * d = dynamic_cast<directory *>( item );
-		if( d == NULL )
-		{
-			resort = TRUE;
-		}
-		else if( resort == TRUE )
-		{
-			Q3ListViewItem * i2 = m_l->firstChild();
-			d->moveItem( i2 );
-			i2->moveItem( d );
-			directory * d2 = NULL;
-			while( ( d2 = dynamic_cast<directory *>( i2 ) ) !=
-									NULL )
-			{
-				if( d->text( 0 ) > d2->text( 0 ) )
-				{
-					d->moveItem( d2 );
-				}
-				i2 = i2->nextSibling();
-			}
-		}
-		item = item->nextSibling();
-	}
 }
 
 
@@ -136,15 +99,48 @@ void fileBrowser::reloadTree( void )
 void fileBrowser::addItems( const QString & _path )
 {
 	QDir cdir( _path );
-	QStringList files = cdir.entryList( QDir::Files, QDir::Name );
-
-	// TODO: after dropping qt3-support we can use QStringList's iterator
-	// which makes it possible to travel through the list in reverse
-	// direction
-
-	for( int i = 0; i < files.size(); ++i )
+	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
+	for( QStringList::const_iterator it = files.constBegin();
+						it != files.constEnd(); ++it )
 	{
-		QString cur_file = files[files.size() - i - 1];
+		QString cur_file = *it;
+		if( cur_file[0] != '.' &&
+			isDirWithContent( _path + QDir::separator() + cur_file,
+								m_filter ) )
+		{
+			bool orphan = TRUE;
+			for( int i = 0; i < m_l->topLevelItemCount(); ++i )
+			{
+				directory * d = dynamic_cast<directory *>(
+						m_l->topLevelItem( i ) );
+				if( d == NULL || cur_file < d->text( 0 ) )
+				{
+					m_l->insertTopLevelItem( i,
+						new directory( cur_file, _path,
+								m_filter ) );
+					orphan = FALSE;
+					break;
+				}
+				else if( cur_file == d->text( 0 ) )
+				{
+					d->addDirectory( _path );
+					orphan = FALSE;
+					break;
+				}
+			}
+			if( orphan )
+			{
+				m_l->addTopLevelItem( new directory( cur_file,
+							_path, m_filter ) );
+			}
+		}
+	}
+
+	files = cdir.entryList( QDir::Files, QDir::Name );
+	for( QStringList::const_iterator it = files.constBegin();
+						it != files.constEnd(); ++it )
+	{
+		QString cur_file = *it;
 		if( cur_file[0] != '.'
 #warning TODO: add match here
 #ifdef QT4
@@ -154,31 +150,15 @@ void fileBrowser::addItems( const QString & _path )
 #endif
 	)
 		{
+			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
-			delete m_l->findItem( cur_file, 0 );
+			QList<QTreeWidgetItem *> existing = m_l->findItems(
+					cur_file, Qt::MatchFixedString );
+			if( !existing.empty() )
+			{
+				delete existing.front();
+			}
 			(void) new fileItem( m_l, cur_file, _path );
-		}
-	}
-
-	files = cdir.entryList( QDir::Dirs, QDir::Name );
-	for( int i = 0; i < files.size(); ++i )
-	{
-		QString cur_file = files[files.size() - i - 1];
-		if( cur_file[0] != '.' &&
-			isDirWithContent( _path + QDir::separator() + cur_file,
-								m_filter ) )
-		{
-			Q3ListViewItem * item = m_l->findItem( cur_file, 0 );
-			if( item == NULL )
-			{
-				(void) new directory( m_l, cur_file, _path,
-							      	m_filter );
-			}
-			else if( dynamic_cast<directory *>( item ) != NULL )
-			{
-				dynamic_cast<directory *>( item )->
-							addDirectory( _path );
-			}
 		}
 	}
 }
@@ -196,11 +176,7 @@ bool fileBrowser::isDirWithContent( const QString & _path,
 		QString cur_file = *it;
 		if( cur_file[0] != '.'
 #warning TODO: add match here
-#ifdef QT4
-// TBD
-#else
-//			&& QDir::match( _filter, cur_file.lower() )
-#endif
+				&& QDir::match( _filter, cur_file.toLower() )
 	)
 		{
 			return( TRUE );
@@ -240,169 +216,30 @@ void fileBrowser::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void fileBrowser::contextMenuRequest( Q3ListViewItem * i, const QPoint &, int )
-{
-	fileItem * f = dynamic_cast<fileItem *>( i );
-	if( f != NULL && ( f->type() == fileItem::SAMPLE_FILE ||
-				f->type() == fileItem::PRESET_FILE ) )
-	{
-		m_contextMenuItem = f;
-		QMenu * contextMenu = new QMenu( this );
-		contextMenu->addAction( tr( "Send to active instrument-track" ),
-						this,
-					SLOT( sendToActiveInstrumentTrack() ) );
-		contextMenu->addAction( tr( "Open in new instrument-track/"
-								"Song-Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackSE() ) );
-		contextMenu->addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
-						this,
-					SLOT( openInNewInstrumentTrackBBE() ) );
-		contextMenu->exec( QCursor::pos() );
-		m_contextMenuItem = NULL;
-		delete contextMenu;
-	}
-
-}
-
-
-
-
-void fileBrowser::contextMenuRequest( QListViewItem * i, const QPoint &, int )
-{
-}
-
-
-
-
-void fileBrowser::sendToActiveInstrumentTrack( void )
-{
-	if( engine::getMainWindow()->workspace() == NULL )
-	{
-		return;
-	}
-
-	// get all windows opened in the workspace
-	QWidgetList pl = engine::getMainWindow()->workspace()->windowList(
-						QWorkspace::StackingOrder );
-	QListIterator<QWidget *> w( pl );
-	w.toBack();
-	// now we travel through the window-list until we find an
-	// instrument-track
-	while( w.hasPrevious() )
-	{
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
-								w.previous() );
-		if( ct != NULL && ct->isHidden() == FALSE )
-		{
-			// ok, it's an instrument-track, so we can apply the
-			// sample or the preset
-			engine::getMixer()->lock();
-			if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
-			{
-				instrument * afp = ct->loadInstrument(
-						engine::sampleExtensions()
-							[m_contextMenuItem
-							->extension()] );
-				if( afp != NULL )
-				{
-					afp->setParameter( "samplefile",
-						m_contextMenuItem->fullName() );
-				}
-			}
-			else if( m_contextMenuItem->type() ==
-							fileItem::PRESET_FILE )
-			{
-				multimediaProject mmp(
-						m_contextMenuItem->fullName() );
-				ct->loadTrackSpecificSettings( mmp.content().
-								firstChild().
-								toElement() );
-			}
-			ct->toggledInstrumentTrackButton( TRUE );
-			engine::getMixer()->unlock();
-			break;
-		}
-	}
-}
-
-
-
-
-void fileBrowser::openInNewInstrumentTrack( trackContainer * _tc )
-{
-	engine::getMixer()->lock();
-	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
-	{
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
-			track::create( track::INSTRUMENT_TRACK, _tc ) );
-#ifdef LMMS_DEBUG
-		assert( ct != NULL );
-#endif
-		instrument * afp = ct->loadInstrument(
-					engine::sampleExtensions()
-						[m_contextMenuItem
-							->extension()] );
-		if( afp != NULL )
-		{
-			afp->setParameter( "samplefile",
-						m_contextMenuItem->fullName() );
-		}
-		ct->toggledInstrumentTrackButton( TRUE );
-	}
-	else if( m_contextMenuItem->type() == fileItem::PRESET_FILE )
-	{
-		multimediaProject mmp( m_contextMenuItem->fullName() );
-		track * t = track::create( track::INSTRUMENT_TRACK, _tc );
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
-		if( ct != NULL )
-		{
-			ct->loadTrackSpecificSettings( mmp.content().
-							firstChild().
-							toElement() );
-			ct->toggledInstrumentTrackButton( TRUE );
-		}
-	}
-	engine::getMixer()->unlock();
-}
-
-
-
-
-void fileBrowser::openInNewInstrumentTrackSE( void )
-{
-	openInNewInstrumentTrack( engine::getSongEditor() );
-}
-
-
-
-
-void fileBrowser::openInNewInstrumentTrackBBE( void )
-{
-	openInNewInstrumentTrack( engine::getBBEditor() );
-}
-
-
-
-
 
 
 
 
 listView::listView( QWidget * _parent ) :
-	Q3ListView( _parent ),
+	QTreeWidget( _parent ),
 	m_mousePressed( FALSE ),
 	m_pressPos(),
 	m_previewPlayHandle( NULL ),
-	m_pphMutex()
+	m_pphMutex(),
+	m_contextMenuItem( NULL )
 {
-	addColumn( tr( "Files" ) );
-	setTreeStepSize( 12 );
-	setSorting( -1 );
-	setShowToolTips( TRUE );
+	setColumnCount( 1 );
+	setHeaderLabel( tr( "Files" ) );
+	setSortingEnabled( FALSE );
 
 	setFont( pointSizeF( font(), 7.5f ) );
+
+	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
+			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
+	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
+				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
+	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
+				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 }
 
 
@@ -415,11 +252,9 @@ listView::~listView()
 
 
 
-void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
+void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 {
-	Q3ListView::contentsMouseDoubleClickEvent( _me );
-	fileItem * f = dynamic_cast<fileItem *>( itemAt(
-					contentsToViewport( _me->pos() ) ) );
+	fileItem * f = dynamic_cast<fileItem *>( _item );
 	if( f == NULL )
 	{
 		return;
@@ -474,27 +309,176 @@ void listView::contentsMouseDoubleClickEvent( QMouseEvent * _me )
 
 
 
-void listView::contentsMousePressEvent( QMouseEvent * _me )
+void listView::sendToActiveInstrumentTrack( void )
 {
-	Q3ListView::contentsMousePressEvent( _me );
+	if( engine::getMainWindow()->workspace() == NULL )
+	{
+		return;
+	}
+
+	// get all windows opened in the workspace
+	QWidgetList pl = engine::getMainWindow()->workspace()->windowList(
+						QWorkspace::StackingOrder );
+	QListIterator<QWidget *> w( pl );
+	w.toBack();
+	// now we travel through the window-list until we find an
+	// instrument-track
+	while( w.hasPrevious() )
+	{
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+								w.previous() );
+		if( ct != NULL && ct->isHidden() == FALSE )
+		{
+			// ok, it's an instrument-track, so we can apply the
+			// sample or the preset
+			engine::getMixer()->lock();
+			if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
+			{
+				instrument * afp = ct->loadInstrument(
+						engine::sampleExtensions()
+							[m_contextMenuItem
+							->extension()] );
+				if( afp != NULL )
+				{
+					afp->setParameter( "samplefile",
+						m_contextMenuItem->fullName() );
+				}
+			}
+			else if( m_contextMenuItem->type() ==
+							fileItem::PRESET_FILE )
+			{
+				multimediaProject mmp(
+						m_contextMenuItem->fullName() );
+				ct->loadTrackSpecificSettings( mmp.content().
+								firstChild().
+								toElement() );
+			}
+			ct->toggledInstrumentTrackButton( TRUE );
+			engine::getMixer()->unlock();
+			break;
+		}
+	}
+}
+
+
+
+
+void listView::openInNewInstrumentTrack( trackContainer * _tc )
+{
+	engine::getMixer()->lock();
+	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
+	{
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+			track::create( track::INSTRUMENT_TRACK, _tc ) );
+#ifdef LMMS_DEBUG
+		assert( ct != NULL );
+#endif
+		instrument * afp = ct->loadInstrument(
+					engine::sampleExtensions()
+						[m_contextMenuItem
+							->extension()] );
+		if( afp != NULL )
+		{
+			afp->setParameter( "samplefile",
+						m_contextMenuItem->fullName() );
+		}
+		ct->toggledInstrumentTrackButton( TRUE );
+	}
+	else if( m_contextMenuItem->type() == fileItem::PRESET_FILE )
+	{
+		multimediaProject mmp( m_contextMenuItem->fullName() );
+		track * t = track::create( track::INSTRUMENT_TRACK, _tc );
+		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
+		if( ct != NULL )
+		{
+			ct->loadTrackSpecificSettings( mmp.content().
+							firstChild().
+							toElement() );
+			ct->toggledInstrumentTrackButton( TRUE );
+		}
+	}
+	engine::getMixer()->unlock();
+}
+
+
+
+
+void listView::openInNewInstrumentTrackBBE( void )
+{
+	openInNewInstrumentTrack( engine::getBBEditor() );
+}
+
+
+
+
+void listView::openInNewInstrumentTrackSE( void )
+{
+	openInNewInstrumentTrack( engine::getSongEditor() );
+}
+
+
+
+
+void listView::updateDirectory( QTreeWidgetItem * _item )
+{
+	directory * dir = dynamic_cast<directory *>( _item );
+	if( dir != NULL )
+	{
+		dir->update();
+	}
+}
+
+
+
+
+void listView::contextMenuEvent( QContextMenuEvent * _e )
+{
+	fileItem * f = dynamic_cast<fileItem *>( itemAt( _e->pos() ) );
+	if( f != NULL && ( f->type() == fileItem::SAMPLE_FILE ||
+				f->type() == fileItem::PRESET_FILE ) )
+	{
+		m_contextMenuItem = f;
+		QMenu contextMenu( this );
+		contextMenu.addAction( tr( "Send to active instrument-track" ),
+						this,
+					SLOT( sendToActiveInstrumentTrack() ) );
+		contextMenu.addAction( tr( "Open in new instrument-track/"
+								"Song-Editor" ),
+						this,
+					SLOT( openInNewInstrumentTrackSE() ) );
+		contextMenu.addAction( tr( "Open in new instrument-track/"
+								"B+B Editor" ),
+						this,
+					SLOT( openInNewInstrumentTrackBBE() ) );
+		contextMenu.exec( _e->globalPos() );
+		m_contextMenuItem = NULL;
+	}
+}
+
+
+
+
+void listView::mousePressEvent( QMouseEvent * _me )
+{
+	QTreeWidget::mousePressEvent( _me );
 	if( _me->button() != Qt::LeftButton )
 	{
 		return;
 	}
 
-	QPoint p( contentsToViewport( _me->pos() ) );
-	Q3ListViewItem * i = itemAt( p );
+	QTreeWidgetItem * i = itemAt( _me->pos() );
         if ( i )
 	{
-		if ( p.x() > header()->cellPos( header()->mapToActual( 0 ) ) +
-			treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
-						1 : 0 ) ) + itemMargin() ||
-				p.x() < header()->cellPos(
-						header()->mapToActual( 0 ) ) )
-		{
+		// TODO: Restrict to visible selection
+//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
+//			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
+//						1 : 0 ) ) + itemMargin() ||
+//				_me->x() < header()->cellPos(
+//						header()->mapToActual( 0 ) ) )
+//		{
 			m_pressPos = _me->pos();
 			m_mousePressed = TRUE;
-		}
+//		}
 	}
 
 	fileItem * f = dynamic_cast<fileItem *>( i );
@@ -542,15 +526,14 @@ void listView::contentsMousePressEvent( QMouseEvent * _me )
 
 
 
-void listView::contentsMouseMoveEvent( QMouseEvent * _me )
+void listView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_mousePressed == TRUE &&
 		( m_pressPos - _me->pos() ).manhattanLength() >
 					QApplication::startDragDistance() )
 	{
-		contentsMouseReleaseEvent( NULL );
-		fileItem * f = dynamic_cast<fileItem *>( itemAt(
-					contentsToViewport( m_pressPos ) ) );
+		mouseReleaseEvent( NULL );
+		fileItem * f = dynamic_cast<fileItem *>( itemAt( m_pressPos ) );
 		if( f != NULL )
 		{
 			switch( f->type() )
@@ -589,7 +572,7 @@ void listView::contentsMouseMoveEvent( QMouseEvent * _me )
 
 
 
-void listView::contentsMouseReleaseEvent( QMouseEvent * _me )
+void listView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( !m_pphMutex.tryLock() )
 	{
@@ -632,31 +615,25 @@ QPixmap * directory::s_folderOpenedPixmap = NULL;
 QPixmap * directory::s_folderLockedPixmap = NULL;
 
 
-directory::directory( directory * _parent, const QString & _name,
-			const QString & _path, const QString & _filter ) :
-	Q3ListViewItem( _parent, _name ),
-	m_p( _parent ),
-	m_pix( NULL ),
+directory::directory( const QString & _name, const QString & _path,
+						const QString & _filter ) :
 	m_directories( _path ),
 	m_filter( _filter )
 {
 	initPixmapStuff();
+
+	setText( 0, _name );
+	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
+
+	if( !QDir( fullName() ).isReadable() )
+	{
+		setIcon( 0, *s_folderLockedPixmap );
+	}
+	else
+	{
+		setIcon( 0, *s_folderPixmap );
+	}
 }
-
-
-
-
-directory::directory( Q3ListView * _parent, const QString & _name,
-			const QString & _path, const QString & _filter ) :
-	Q3ListViewItem( _parent, _name ),
-	m_p( NULL ),
-	m_pix( NULL ),
-	m_directories( _path ),
-	m_filter( _filter )
-{
-	initPixmapStuff();
-}
-
 
 
 
@@ -680,68 +657,39 @@ void directory::initPixmapStuff( void )
 		s_folderLockedPixmap = new QPixmap(
 				embed::getIconPixmap( "folder_locked" ) );
 	}
-
-	if( !QDir( fullName() ).isReadable() )
-	{
-		setPixmap( s_folderLockedPixmap );
-	}
-	else
-	{
-		setPixmap( s_folderPixmap );
-	}
 }
 
 
 
 
-void directory::setPixmap( const QPixmap * _px )
+void directory::update( void )
 {
-	m_pix = _px;
-	setup();
-	widthChanged( 0 ); 
-	invalidateHeight();
-	repaint();
-}
-
-
-
-
-void directory::setOpen( bool _o )
-{
-	if( _o )
+	if( !isExpanded() )
 	{
-		setPixmap( s_folderOpenedPixmap );
-	}
-	else
-	{
-		setPixmap( s_folderPixmap );
+		setIcon( 0, *s_folderPixmap );
+		return;
 	}
 
-	if( _o && !childCount() )
+	setIcon( 0, *s_folderOpenedPixmap );
+	if( !childCount() )
 	{
 		for( QStringList::iterator it = m_directories.begin();
 					it != m_directories.end(); ++it )
 		{
+			int top_index = childCount();
 			if( addItems( fullName( *it ) ) &&
 				( *it ).contains(
 					configManager::inst()->dataDir() ) )
 			{
-				( new Q3ListViewItem( this,
-		listView::tr( "--- Factory files ---" ) ) )->setPixmap( 0,
-				embed::getIconPixmap( "factory_files" ) );
+				QTreeWidgetItem * sep = new QTreeWidgetItem;
+				sep->setText( 0, listView::tr(
+						"--- Factory files ---" ) );
+				sep->setIcon( 0, embed::getIconPixmap(
+							"factory_files" ) );
+				insertChild( top_index, sep );
 			}
 		}
 	}
-	Q3ListViewItem::setOpen( _o );
-}
-
-
-
-
-void directory::setup( void )
-{
-	setExpandable( TRUE );
-	Q3ListViewItem::setup();
 }
 
 
@@ -752,19 +700,56 @@ bool directory::addItems( const QString & _path )
 	QDir thisDir( _path );
 	if( !thisDir.isReadable() )
 	{
-		//readable = FALSE;
-		setExpandable( FALSE );
 		return( FALSE );
 	}
 
-	listView()->setUpdatesEnabled( FALSE );
+	treeWidget()->setUpdatesEnabled( FALSE );
 
 	bool added_something = FALSE;
 
-	QStringList files = thisDir.entryList( QDir::Files, QDir::Name );
-	for( int i = 0; i < files.size(); ++i )
+	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
+	for( QStringList::const_iterator it = files.constBegin();
+						it != files.constEnd(); ++it )
 	{
-		QString cur_file = files[files.size() - i - 1];
+		QString cur_file = *it;
+		if( cur_file[0] != '.' && fileBrowser::isDirWithContent(
+				thisDir.absolutePath() + QDir::separator() +
+							cur_file, m_filter ) )
+		{
+			bool orphan = TRUE;
+			for( int i = 0; i < childCount(); ++i )
+			{
+				directory * d = dynamic_cast<directory *>(
+								child( i ) );
+				if( d == NULL || cur_file < d->text( 0 ) )
+				{
+					insertChild( i, new directory( cur_file,
+							_path, m_filter ) );
+					orphan = FALSE;
+					break;
+				}
+				else if( cur_file == d->text( 0 ) )
+				{
+					d->addDirectory( _path );
+					orphan = FALSE;
+					break;
+				}
+			}
+			if( orphan )
+			{
+				addChild( new directory( cur_file, _path,
+								m_filter ) );
+			}
+
+			added_something = TRUE;
+		}
+	}
+
+	files = thisDir.entryList( QDir::Files, QDir::Name );
+	for( QStringList::const_iterator it = files.constBegin();
+						it != files.constEnd(); ++it )
+	{
+		QString cur_file = *it;
 		if( cur_file[0] != '.'
 				&& thisDir.match( m_filter, cur_file.toLower() )
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
@@ -774,44 +759,7 @@ bool directory::addItems( const QString & _path )
 		}
 	}
 
-	files = thisDir.entryList( QDir::Dirs, QDir::Name );
-	for( int i = 0; i < files.size(); ++i )
-	{
-		QString cur_file = files[files.size() - i - 1];
-		if( cur_file[0] != '.' && fileBrowser::isDirWithContent(
-				thisDir.absolutePath() + QDir::separator() +
-							cur_file, m_filter ) )
-		{
-			new directory( this, cur_file, _path, m_filter );
-			added_something = TRUE;
-#if 0
-			if( firstChild() == NULL )
-			{
-				continue;
-			}
-			bool moved = FALSE;
-			QListViewItem * item = firstChild();
-			while( item != NULL )
-			{
-				directory * cd =
-					dynamic_cast<directory *>( item );
-				if( cd != NULL )
-				{
-/*					if( moved == FALSE ||
-						cd->text( 0 ) < cur_file )
-					{*/
-						printf( "move item %s after %s\n", d->text(0).ascii(), cd->text(0).ascii());
-						d->moveItem( cd );
-						moved = TRUE;
-					//}
-				}
-				item = item->nextSibling();
-			}
-#endif
-		}
-	}
-
-	listView()->setUpdatesEnabled( TRUE );
+	treeWidget()->setUpdatesEnabled( TRUE );
 
 	return( added_something );
 }
@@ -827,29 +775,27 @@ QPixmap * fileItem::s_flpFilePixmap = NULL;
 QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 
-fileItem::fileItem( Q3ListView * _parent, const QString & _name,
+fileItem::fileItem( QTreeWidget * _parent, const QString & _name,
 						const QString & _path ) :
-	Q3ListViewItem( _parent, _name ),
-	m_pix( NULL ),
+	QTreeWidgetItem( _parent ),
 	m_path( _path )
 {
+	setText( 0, _name );
 	determineFileType();
 	initPixmapStuff();
-	setDragEnabled( TRUE );
 }
 
 
 
 
-fileItem::fileItem( Q3ListViewItem * _parent, const QString & _name,
+fileItem::fileItem( QTreeWidgetItem * _parent, const QString & _name,
 						const QString & _path ) :
-	Q3ListViewItem( _parent, _name ),
-	m_pix( NULL ),
+	QTreeWidgetItem( _parent ),
 	m_path( _path )
 {
+	setText( 0, _name );
 	determineFileType();
 	initPixmapStuff();
-	setDragEnabled( TRUE );
 }
 
 
@@ -895,14 +841,24 @@ void fileItem::initPixmapStuff( void )
 
 	switch( m_type )
 	{
-		case PROJECT_FILE: m_pix = s_projectFilePixmap; break;
-		case PRESET_FILE: m_pix = s_presetFilePixmap; break;
-		case SAMPLE_FILE: m_pix = s_sampleFilePixmap; break;
-		case MIDI_FILE: m_pix = s_midiFilePixmap; break;
-		case FLP_FILE: m_pix = s_flpFilePixmap; break;
+		case PROJECT_FILE:
+			setIcon( 0, *s_projectFilePixmap );
+			break;
+		case PRESET_FILE:
+			setIcon( 0, *s_presetFilePixmap );
+			break;
+		case SAMPLE_FILE:
+			setIcon( 0, *s_sampleFilePixmap );
+			break;
+		case MIDI_FILE:
+			setIcon( 0, *s_midiFilePixmap );
+			break;
+		case FLP_FILE:
+			setIcon( 0, *s_flpFilePixmap );
+			break;
 		case UNKNOWN:
 		default:
-			m_pix = s_unknownFilePixmap;
+			setIcon( 0, *s_unknownFilePixmap );
 			break;
 	}
 }

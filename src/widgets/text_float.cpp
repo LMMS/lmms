@@ -242,7 +242,5 @@ void textFloat::updateSize( void )
 
 
 
-#undef setParent
-
 
 #endif

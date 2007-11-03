@@ -26,17 +26,20 @@
  */
 
 
-#include <QtXml/QDomElement>
-#include <QtGui/QMouseEvent>
-
 #include "effect_label.h"
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWorkspace>
+#include <QtXml/QDomElement>
+
 #include "effect_tab_widget.h"
-#include "sample_track.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "rename_dialog.h"
 #include "main_window.h"
+#include "rename_dialog.h"
+#include "sample_track.h"
+
 
 
 

@@ -450,7 +450,6 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.exec( QCursor::pos() );
 }
 
-#undef addSeparator
 
 
 

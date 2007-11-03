@@ -67,8 +67,8 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 		return;
 	}
 
-	snd_pcm_hw_params_alloca( &m_hwParams );
-	snd_pcm_sw_params_alloca( &m_swParams );
+	snd_pcm_hw_params_malloc( &m_hwParams );
+	snd_pcm_sw_params_malloc( &m_swParams );
 
 	if( ( err = setHWParams( _sample_rate, channels(),
 					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
@@ -97,8 +97,8 @@ audioALSA::~audioALSA()
 	{
 		snd_pcm_close( m_handle );
 	}
-	// the following code doesn't work and leads to a crash...
-/*	if( m_hwParams != NULL )
+
+	if( m_hwParams != NULL )
 	{
 		snd_pcm_hw_params_free( m_hwParams );
 	}
@@ -106,7 +106,7 @@ audioALSA::~audioALSA()
 	if( m_swParams != NULL )
 	{
 		snd_pcm_sw_params_free( m_swParams );
-	}*/
+	}
 }
 
 

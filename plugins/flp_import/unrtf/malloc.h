@@ -28,10 +28,11 @@
  *----------------------------------------------------------------------
  * Changes:
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 extern char * my_malloc (unsigned long);
 extern void my_free (char*);
 extern unsigned long total_malloced (void);
-extern char * my_strdup (char*);
+extern char * my_strdup (const char*);
 

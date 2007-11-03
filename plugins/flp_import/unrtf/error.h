@@ -29,6 +29,7 @@
  *----------------------------------------------------------------------
  * Changes
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 
@@ -38,7 +39,7 @@
 
 
 extern void usage(void);
-extern void error_handler (char*);
-extern void warning_handler (char*);
+extern void error_handler (const char*);
+extern void warning_handler (const char*);
 
 

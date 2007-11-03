@@ -25,14 +25,16 @@
 #ifndef _LADSPA_EFFECT_H
 #define _LADSPA_EFFECT_H
 
+#include <QtGui/QWorkspace>
+
 #include "effect.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
-#include "mixer.h"
+#include "ladspa_base.h"
 #include "ladspa_control.h"
 #include "ladspa_control_dialog.h"
-#include "ladspa_base.h"
 #include "main_window.h"
+#include "mixer.h"
 
 
 typedef QVector<port_desc_t *> multi_proc_t;

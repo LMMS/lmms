@@ -1,9 +1,9 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * tool.cpp - base class for all tool plugins (graphs, extensions, etc)
+ * caption_menu.cpp - context menu with a caption
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,50 +25,29 @@
  */
 
 
-#include "tool.h"
-
-#include <QtGui/QIcon>
-#include <QtGui/QWorkspace>
-
-#include "main_window.h"
+#include "caption_menu.h"
 
 
 
 
-tool::tool( mainWindow * _window, const descriptor * _descriptor ) :
-	QWidget( _window->workspace() ),
-	plugin( _descriptor )
+captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
+	QMenu( _title, _parent )
 {
-	setWindowTitle( _descriptor->public_name );
-	setWindowIcon( *_descriptor->logo );
+	QAction * caption = addAction( _title );
+	caption->setEnabled( FALSE );
 }
 
 
 
 
-tool::~tool()
+captionMenu::~captionMenu()
 {
 }
 
 
 
 
-tool * tool::instantiate( const QString & _plugin_name, mainWindow * _window )
-{
-	plugin * p = plugin::instantiate( _plugin_name, _window );
-	// check whether instantiated plugin is an instrument
-	if( dynamic_cast<tool *>( p ) != NULL )
-	{
-		// everything ok, so return pointer
-		return( dynamic_cast<tool *>( p ) );
-	}
-
-	// not quite... so delete plugin
-	delete p;
-	return( NULL );
-}
-
-
+#include "caption_menu.moc"
 
 
 #endif

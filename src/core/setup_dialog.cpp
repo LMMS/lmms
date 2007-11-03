@@ -639,7 +639,6 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_tabBar->addTab( midi, tr( "MIDI settings" ), 4, TRUE, TRUE
 			)->setIcon( embed::getIconPixmap( "setup_midi" ) );
 
-#undef setIcon
 
 	m_tabBar->setActiveTab( _tab_to_open );
 

@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20071030, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20071030)
+AC_INIT(lmms, 0.4.0-svn20071103, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20071103)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -59,7 +59,7 @@ DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
 if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
 	DEFAULTFLAGS="$DEFAULTFLAGS -ftree-vectorize -ftree-loop-linear"
 #	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" != "x0" ; then
-#		DEFAULTFLAGS="$DEFAULTFLAGS -funsafe-loop-optimizations -Wunsafe-loop-optimizations"
+#		DEFAULTFLAGS="$DEFAULTFLAGS -funsafe-loop-optimizations"
 #	fi	
 fi
 
@@ -576,7 +576,7 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Winline -Wdisabled-optimization"
+EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Wunsafe-loop-optimizations -Winline -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
 	CXXFLAGS="$CXXFLAGS -ansi -Wall $EXTRA_WARNINGS -fno-exceptions"
 fi

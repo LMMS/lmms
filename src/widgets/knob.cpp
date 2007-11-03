@@ -28,12 +28,12 @@
  */
 
 
+#include "knob.h"
+
 #include <QtGui/QApplication>
 #include <QtGui/QBitmap>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QInputDialog>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPalette>
@@ -44,17 +44,17 @@
 #endif
 #include <math.h>
 
-#include "knob.h"
 #include "automatable_object_templates.h"
-#include "embed.h"
-#include "spc_bg_hndl_widget.h"
+#include "caption_menu.h"
 #include "config_mgr.h"
-#include "text_float.h"
-#include "mixer.h"
+#include "embed.h"
+#include "engine.h"
 #include "gui_templates.h"
-#include "templates.h"
-#include "string_pair_drag.h"
 #include "main_window.h"
+#include "spc_bg_hndl_widget.h"
+#include "string_pair_drag.h"
+#include "templates.h"
+#include "text_float.h"
 
 
 
@@ -321,16 +321,7 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: css-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "reload" ),
 				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
 							m_hintTextAfterValue ),

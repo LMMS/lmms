@@ -23,11 +23,11 @@
  */
 
 
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
+#include "nine_button_selector.h"
+
 #include <QtGui/QWhatsThis>
 
-#include "nine_button_selector.h"
+#include "caption_menu.h"
 #include "embed.h"
 
 
@@ -53,7 +53,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					Uint32 _x, Uint32 _y,
 					QWidget * _parent,
 					track * _track ):
-	QWidget( _parent/*, "nineButtonSelector"*/ ),
+	QWidget( _parent ),
 	m_selected( _default )
 {
 	setFixedSize( 50, 50 );
@@ -250,16 +250,7 @@ void FASTCALL nineButtonSelector::setSelected( Uint8 _new_button )
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: CSS-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( "Selector" ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 			       this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

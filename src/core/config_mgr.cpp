@@ -820,15 +820,15 @@ bool configManager::loadConfigFile( void )
 				( 0, tr( "Version mismatches" ),
 					tr( "Accordingly to the information in "
 						"your LMMS-configuration-file "
-						"you seem\nto have run a "
+						"you seem to have run a "
 						"different (probably older) "
 						"version of LMMS before.\n"
 						"It is recommended to run the "
 						"setup-wizard again to ensure "
-						"that\nthe latest samples, "
+						"that the latest samples, "
 						"presets, demo-projects etc. "
-						"are installed in your\n"
-						"LMMS-working-directory. "
+						"are installed in your "
+						"LMMS-working-directory.\n"
 						"Run the setup-wizard now?" ),
 					QMessageBox::Yes, QMessageBox::No )
 			== QMessageBox::Yes )
@@ -839,6 +839,11 @@ bool configManager::loadConfigFile( void )
 			}
 		}
 	}
+
+	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
+						<< defaultArtworkDir() );
+
+	loadStyleSheet();
 
 	return( TRUE );
 }
@@ -911,6 +916,16 @@ void configManager::saveConfigFile( void )
 
 
 
+
+void configManager::loadStyleSheet( void )
+{
+	QFile file( "resources:style.css" );
+	file.open( QIODevice::ReadOnly );
+	qApp->setStyleSheet( file.readAll() );
+}
+
+
+
 /*
 void configManager::processFilesRecursively( const QString & _src_dir,
 						const QString & _dst_dir,
@@ -941,7 +956,5 @@ void configManager::processFilesRecursively( const QString & _src_dir,
 
 
 #include "config_mgr.moc"
-#undef absolutePath
-#undef addButton
 
 #endif

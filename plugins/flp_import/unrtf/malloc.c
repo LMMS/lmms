@@ -34,6 +34,7 @@
  * 28 Sep 01, tuorfa@yahoo.com: removed Turbo C support.
  * 08 Oct 03, daved@physiol.usyd.edu.au: added stdlib.h for linux
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -114,7 +115,7 @@ total_malloced (void) {
  *=======================================================================*/
 
 char *
-my_strdup (char *src) {
+my_strdup (const char *src) {
 	unsigned long len;
 	char *ptr;
 

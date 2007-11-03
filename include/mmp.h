@@ -57,6 +57,8 @@ public:
 	multimediaProject( projectTypes _project_type );
 	~multimediaProject();
 
+	QString nameWithExtension( const QString & _fn ) const;
+
 	bool writeFile( QString & _fn, bool _overwrite_check = TRUE );
 
 	inline QDomElement & content( void )

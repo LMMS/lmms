@@ -560,8 +560,10 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 						{
 							int nominator = readByte();
 							int denominator = 1 << (int) readByte();
-							int clocks = readByte();
-							int notes = readByte();
+							// clocks
+							readByte();
+							// notes
+							readByte();
 							if( nominator == 0 )
 							{
 								nominator = 4;

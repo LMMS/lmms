@@ -28,14 +28,13 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
-class QColorGroup;
-#include <Qt3Support/Q3ListView>
+#include <QtGui/QTreeWidget>
 
 
 #include "side_bar_widget.h"
 
 
-class QListViewItem;
+class QColorGroup;
 class QPixmap;
 
 class fileItem;
@@ -62,24 +61,12 @@ public slots:
 	void reloadTree( void );
 
 
-protected slots:
-	void contextMenuRequest( Q3ListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void contextMenuRequest( QListViewItem * _i, const QPoint & _pos,
-								int _col );
-	void sendToActiveInstrumentTrack( void );
-	void openInNewInstrumentTrackSE( void );
-	void openInNewInstrumentTrackBBE( void );
-
-
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 
 	void addItems( const QString & _path );
-	void openInNewInstrumentTrack( trackContainer * _tc );
 
 	listView * m_l;
-	fileItem * m_contextMenuItem;
 
 	QString m_directories;
 	QString m_filter;
@@ -90,7 +77,7 @@ private:
 
 
 
-class listView : public Q3ListView
+class listView : public QTreeWidget
 {
 	Q_OBJECT
 public:
@@ -99,10 +86,10 @@ public:
 
 
 protected:
-	virtual void contentsMouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void contentsMousePressEvent( QMouseEvent * _me );
-	virtual void contentsMouseMoveEvent( QMouseEvent * _me );
-	virtual void contentsMouseReleaseEvent( QMouseEvent * _me );
+	virtual void contextMenuEvent( QContextMenuEvent * _e );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 
 private:
@@ -112,21 +99,30 @@ private:
 	playHandle * m_previewPlayHandle;
 	QMutex m_pphMutex;
 
+	fileItem * m_contextMenuItem;
+
+	void openInNewInstrumentTrack( trackContainer * _tc );
+
+
+private slots:
+	void activateListItem( QTreeWidgetItem * _item, int _column );
+	void openInNewInstrumentTrackBBE( void );
+	void openInNewInstrumentTrackSE( void );
+	void sendToActiveInstrumentTrack( void );
+	void updateDirectory( QTreeWidgetItem * _item );
+
 } ;
 
 
 
 
-class directory : public Q3ListViewItem
+class directory : public QTreeWidgetItem
 {
 public:
-	directory( Q3ListView * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter );
-	directory( directory * _parent, const QString & _filename,
-			const QString & _path, const QString & _filter );
+	directory( const QString & _filename, const QString & _path,
+						const QString & _filter );
 
-	void setOpen( bool );
-	void setup( void );
+	void update( void );
 
 	inline QString fullName( QString _path = QString::null )
 	{
@@ -139,11 +135,6 @@ public:
 							QDir::separator() );
 	}
 
-	inline const QPixmap * pixmap( int ) const
-	{
-		return( m_pix );
-	}
-
 	inline void addDirectory( const QString & _dir )
 	{
 		m_directories.push_back( _dir );
@@ -152,7 +143,6 @@ public:
 
 private:
 	void initPixmapStuff( void );
-	void setPixmap( const QPixmap * _px );
 
 	bool addItems( const QString & _path );
 
@@ -161,8 +151,6 @@ private:
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
-	directory * m_p;
-	const QPixmap * m_pix;
 	QStringList m_directories;
 	QString m_filter;
 
@@ -171,22 +159,18 @@ private:
 
 
 
-class fileItem : public Q3ListViewItem
+class fileItem : public QTreeWidgetItem
 {
 public:
-	fileItem( Q3ListView * _parent, const QString & _name,
+	fileItem( QTreeWidget * _parent, const QString & _name,
 							const QString & _path );
-	fileItem( Q3ListViewItem * _parent, const QString & _name,
+	fileItem( QTreeWidgetItem * _parent, const QString & _name,
 							const QString & _path );
 
 	inline QString fullName( void ) const
 	{
 		return( QDir::cleanPath( m_path ) + QDir::separator() +
 								text( 0 ) );
-	}
-	inline const QPixmap * pixmap( int ) const
-	{
-		return( m_pix );
 	}
 
 	enum fileTypes
@@ -215,7 +199,6 @@ private:
 	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 	
-	QPixmap * m_pix;
 	QString m_path;
 	fileTypes m_type;
 } ;

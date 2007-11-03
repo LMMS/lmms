@@ -26,6 +26,9 @@
  */
 
 
+#include "instrument_track.h"
+
+
 #include <Qt/QtXml>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -37,9 +40,9 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
+#include <QtGui/QWorkspace>
 
 
-#include "instrument_track.h"
 #include "arp_and_chords_tab_widget.h"
 #include "audio_port.h"
 #include "automation_pattern.h"

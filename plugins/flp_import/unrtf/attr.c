@@ -32,6 +32,7 @@
  * 18 Sep 01, tuorfa@yahoo.com: added AttrStack (stack of stacks) paradigm
  * 22 Sep 01, tuorfa@yahoo.com: added comment blocks
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -101,7 +102,7 @@ void attr_clear_all( void )
  *=======================================================================*/
 
 void 
-attr_express_begin (int attr, char* param) {
+attr_express_begin (int attr, const char* param) {
 	switch(attr) 
 	{
 	case ATTR_BOLD: 
@@ -302,7 +303,7 @@ attr_express_end (int attr, char *param)
  *=======================================================================*/
 
 void 
-attr_push(int attr, char* param) 
+attr_push(int attr, const char* param) 
 {
 	AttrStack *stack = stack_of_stacks_top;
 	if (!stack) {

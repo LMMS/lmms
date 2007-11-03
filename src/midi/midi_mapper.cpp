@@ -3,7 +3,7 @@
 /*
  * midi_mapper.cpp - MIDI-mapper for any midiDevice
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -212,8 +212,6 @@ void midiMapper::readChannelMap( QFile & _f )
 }
 
 
-
-#undef indexOf
 
 
 #endif

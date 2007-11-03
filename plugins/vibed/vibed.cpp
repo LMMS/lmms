@@ -23,14 +23,14 @@
  */
 
 
+#include "vibed.h"
+
 #include <Qt/QtXml>
 #include <QtCore/QMap>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QWhatsThis>
 
-#include "vibed.h"
 #include "base64.h"
+#include "caption_menu.h"
 #include "engine.h"
 #include "instrument_track.h"
 #include "knob.h"
@@ -78,6 +78,7 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
 		m_editor = new impulseEditor( this, 76, 21, instrument_track );
+		m_editor->setAccessibleName( tr( "Impulse Editor" ) );
 		m_editor->setOn( FALSE );
 		m_editor->hide();
 		m_editors.append( m_editor );
@@ -238,6 +239,7 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 			21, 127,
 			this,
 			NULL );
+		m_harmonic->setAccessibleName( tr( "Octave" ) );
 		m_harmonic->hide();
 		m_harmonics.append( m_harmonic );
 		m_harmonic->setWhatsThis( tr( 
@@ -271,6 +273,7 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 			21, 39,
 			this,
 			NULL );
+	m_stringSelector->setAccessibleName( tr( "String" ) );
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
 			this, SLOT( showString( Uint8 ) ) );
 		m_stringSelector->setWhatsThis( tr( 
@@ -588,16 +591,7 @@ void vibed::showString( Uint8 _string )
 
 void vibed::contextMenuEvent( QContextMenuEvent * )
 {
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: CSS-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( "Vibed" ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( publicName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

@@ -25,17 +25,17 @@
  */
  
 
+#include "combobox.h"
+
 #include <QtGui/QApplication>
 #include <QtGui/QCursor>
 #include <QtGui/QDesktopWidget>
-#include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
-#include "combobox.h"
 #include "automatable_object_templates.h"
-#include "templates.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
 
@@ -146,17 +146,7 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: add css-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>",
-			this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					getAutomationPattern(),

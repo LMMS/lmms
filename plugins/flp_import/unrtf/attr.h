@@ -31,6 +31,7 @@
  * 06 Aug 01, tuorfa@yahoo.com: added several attributes
  * 18 Sep 01, tuorfa@yahoo.com: updates for AttrStack paradigm
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 #ifndef _ATTR
@@ -73,7 +74,7 @@ extern void attr_push_core (int attr, char* param);
 
 extern void attr_pop_core (int attr);
 
-extern void attr_push(int attr, char* param);
+extern void attr_push(int attr, const char* param);
 
 extern void attrstack_push();
 extern void attrstack_drop();

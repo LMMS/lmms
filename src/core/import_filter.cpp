@@ -126,7 +126,6 @@ bool importFilter::openFile( void )
 }
 
 
-#undef fileName
 
 
 #endif

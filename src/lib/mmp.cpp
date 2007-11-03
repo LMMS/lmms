@@ -188,57 +188,53 @@ multimediaProject::~multimediaProject()
 
 
 
+QString multimediaProject::nameWithExtension( const QString & _fn ) const
+{
+	switch( type() )
+	{
+		case SONG_PROJECT:
+			if( _fn.section( '.', -1 ) != "mmp" &&
+					_fn.section( '.', -1 ) != "mpt" &&
+					_fn.section( '.', -1 ) != "mmpz" )
+			{
+				if( configManager::inst()->value( "app",
+						"nommpz" ).toInt() == 0 )
+				{
+					return( _fn + ".mmpz" );
+				}
+				return( _fn + ".mmp" );
+			}
+			break;
+		case SONG_PROJECT_TEMPLATE:
+			if( _fn.section( '.',-1 ) != "mpt" )
+			{
+				return( _fn + ".mpt" );
+			}
+			break;
+		case INSTRUMENT_TRACK_SETTINGS:
+			if( _fn.section( '.', -2, -1 ) != "cs.xml" )
+			{
+				return( _fn + ".cs.xml" );
+			}
+			break;
+		default: ;
+	}
+	return( _fn );
+}
+
+
+
+
 bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 {
-	bool clean_meta_nodes = FALSE;
-	QString fn = _fn;
-	bool compress = FALSE;
-	if( type() == INSTRUMENT_TRACK_SETTINGS )
-	{
-		if( fn.section( '.', -2, -1 ) != "cs.xml" )
-		{
-			fn += ".cs.xml";
-		}
-		clean_meta_nodes = TRUE;
-	}
-	else if( type() == SONG_PROJECT )
-	{
-		if( fn.section( '.', -1 ) != "mmp" &&
-				fn.section( '.', -1 ) != "mpt" &&
-				fn.section( '.', -1 ) != "mmpz" )
-		{
-			compress = configManager::inst()->value( "app",
-						"nommpz" ).toInt() == 0;
-			if( compress )
-			{
-				fn += ".mmpz";
-			}
-			else
-			{
-				fn += ".mmp";
-			}
-		}
-		else
-		{
-			compress = ( fn.section( '.', -1 ) == "mmpz" );
-		}
-		clean_meta_nodes = TRUE;
-	}
-	else if( type() == SONG_PROJECT_TEMPLATE )
-	{
-		if( fn.section( '.',-1 ) != "mpt" )
-		{
-			fn += ".mpt";
-		}
-		clean_meta_nodes = TRUE;
-	}
-
-	if( clean_meta_nodes == TRUE )
+	if( type() == SONG_PROJECT || type() == SONG_PROJECT_TEMPLATE
+					|| type() == INSTRUMENT_TRACK_SETTINGS )
 	{
 		cleanMetaNodes( documentElement() );
 	}
 
 
+	QString fn = nameWithExtension( _fn );
 	QFile outfile( fn );
 	if( _overwrite_check == TRUE &&
 		outfile.exists() == TRUE &&
@@ -271,7 +267,7 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 		return( FALSE );
 	}
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 1 );
-	if( compress )
+	if( fn.section( '.', -1 ) == "mmpz" )
 	{
 		outfile.write( qCompress( xml.toAscii() ) );
 	}

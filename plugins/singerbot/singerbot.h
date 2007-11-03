@@ -26,8 +26,6 @@
 #ifndef _SINGERBOT_H
 #define _SINGERBOT_H
 
-#include <QtCore/QThread>
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -38,11 +36,13 @@
 #include "src/3rdparty/samplerate/samplerate.h"
 #endif
 
+#include <semaphore.h>
+
 #include "instrument.h"
 #include "mixer.h"
 
 
-class EST_Wave;
+class File;
 class QTextEdit;
 class sampleBuffer;
 
@@ -73,7 +73,9 @@ public slots:
 private:
 	typedef struct
 	{
-		EST_Wave * wave;
+		short * wave;
+		int num_samples;
+		int sample_rate;
 		f_cnt_t remaining_frames;
 		float frequency;
 		float duration;
@@ -83,44 +85,11 @@ private:
 	} handle_data;
 
 
-	class synThread : public QThread
-	{
-	public:
-		synThread( void );
-		virtual ~synThread();
+	QString m_file_suffix;
 
-		void set_data( handle_data * _hdata )
-		{
-			m_data = _hdata;
-		}
-
-		void unlock_synth( void )
-		{
-			m_synth_semaphore.release();
-		}
-		void lock_handle( void )
-		{
-			m_handle_semaphore.acquire();
-		}
-
-
-	protected:
-		virtual void run( void );
-
-
-	private:
-		QSemaphore m_handle_semaphore;
-		QSemaphore m_synth_semaphore;
-
-		handle_data * m_data;
-
-		void text_to_wave( void );
-		EST_Wave * get_wave( const char * _name );
-
-	} ;
-
-
-	static synThread * s_thread;
+	File * m_shm;
+	sem_t * m_handle_semaphore;
+	sem_t * m_synth_semaphore;
 
 	QTextEdit * m_lyrics;
 	QStringList m_words;
@@ -130,6 +99,14 @@ private:
 	void play( sampleFrame * _ab, handle_data * _hdata,
 							const fpp_t _frames );
 	void updateWords( void );
+
+	void synth_init( void );
+	void synth_destroy( void );
+
+	void synth_send( handle_data * _hdata );
+	void synth_read( handle_data * _hdata );
+
+	const char * addSuffix( const char * _s );
 
 } ;
 

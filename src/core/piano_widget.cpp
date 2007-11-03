@@ -26,16 +26,17 @@
  */
 
 
+#include "piano_widget.h"
+
+
 #include <QtGui/QCursor>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
 
-#include "piano_widget.h"
 #include "automatable_object_templates.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
@@ -217,17 +218,7 @@ void pianoWidget::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	QMenu contextMenu( this );
-#warning TODO: use CSS-formatting
-	contextMenu.setTitle( m_noteKnob->accessibleName() );
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( m_noteKnob->accessibleName() ) + "</b></font>",
-			this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( m_noteKnob->accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					m_noteKnob->getAutomationPattern(),

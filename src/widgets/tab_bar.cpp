@@ -3,7 +3,7 @@
 /*
  * tab_bar.cpp - implementation of tab-bar
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -240,9 +240,6 @@ bool tabBar::allHidden( void )
 }
 
 
-
-#undef value
-#undef removeWidget
 
 
 #include "tab_bar.moc"

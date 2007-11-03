@@ -25,6 +25,8 @@
  */
 
 
+#include "project_notes.h"
+
 #include <Qt/QtXml>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -35,8 +37,8 @@
 #include <QtGui/QTextCursor>
 #include <QtGui/QTextEdit>
 #include <QtGui/QToolBar>
+#include <QtGui/QWorkspace>
 
-#include "project_notes.h"
 #include "embed.h"
 #include "engine.h"
 #include "main_window.h"

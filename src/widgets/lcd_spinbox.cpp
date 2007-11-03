@@ -25,14 +25,14 @@
  */
 
 
+#include "lcd_spinbox.h"
+
 #include <QtGui/QApplication>
-#include <QtGui/QCursor>
 #include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include "lcd_spinbox.h"
 #include "automatable_object_templates.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
@@ -171,16 +171,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: CSS-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( accessibleName() ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
 					getAutomationPattern(),

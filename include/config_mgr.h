@@ -203,6 +203,8 @@ private:
 
 	void FASTCALL addPage( QWidget * _w, const QString & _title );
 
+	void loadStyleSheet( void );
+
 /*	static void processFilesRecursively( const QString & _src_dir,
 						const QString & _dst_dir,
 		void( * _proc_func )( const QString & _src, const QString &

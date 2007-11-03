@@ -1,5 +1,5 @@
 theme_defaultdir = $(lmmsdatadir)/themes/default
-theme_default_DATA = default/*.png
+theme_default_DATA = default/*.png default/style.css
 
 theme_blue_scenedir = $(lmmsdatadir)/themes/blue_scene
 theme_blue_scene_DATA = blue_scene/*.png

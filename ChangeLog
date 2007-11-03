@@ -1,3 +1,158 @@
+2007-11-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* plugins/singerbot/singerbot_proxy.cpp:
+	initial release, separate process to deal with Festival
+
+	* plugins/singerbot/file.h:
+	initial release, file descriptor wrapper
+
+	* plugins/singerbot/Makefile.am:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/singerbot/singerbot.h:
+	use external proxy
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	upgraded recently opened files feature
+
+	* include/main_window.h:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	fixed recently opened files segfault
+
+	* include/mmp.h:
+	* src/lib/mmp.cpp:
+	simplified save extension handling
+
+	* src/core/song_editor.cpp:
+	* src/lib/mmp.cpp:
+	fixed recently opened files bug (#1800364)
+
+	* data/themes/default/style.css:
+	* data/themes/Makefile.am:
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	* src/core/main_window.cpp:
+	added style sheet support
+
+	* include/caption_menu.h:
+	* src/widgets/caption_menu.cpp:
+	initial release, context menu with a caption
+
+	* plugins/vibed/impulse_editor.cpp:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/vibed.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/surround_area.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	use caption menu
+
+	* src/core/main_window.cpp:
+	set workspace's background with its own method
+
+	* acinclude.m4:
+	* include/file_browser.h:
+	* src/core/file_browser.cpp:
+	* src/core/main_window.cpp:
+	replaced Qt3-based file browser implementation
+
+	* src/core/file_browser.cpp:
+	enabled match in directory content filter
+
+	* src/widgets/automatable_slider.cpp:
+	fixed mouse release segfault
+
+	* acinclude.m4:
+	* src/core/main.cpp:
+	assume Qt translations are properly configured
+
+	* src/core/main.cpp:
+	use standard return values
+
+	* src/core/config_mgr.cpp:
+	removed line breaks inside paragraphs, wrapping should work
+
+	* src/audio/audio_alsa.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	removed discouraged alloca calls
+
+	* include/main_window.h:
+	* include/rack_plugin.h:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_effect/vst_effect.h:
+	* src/core/automation_editor.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/main_window.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/tool.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	reduced include dependencies
+
+	* plugins/flp_import/unrtf/attr.c:
+	* plugins/flp_import/unrtf/attr.h:
+	* plugins/flp_import/unrtf/convert.c:
+	* plugins/flp_import/unrtf/error.c:
+	* plugins/flp_import/unrtf/error.h:
+	* plugins/flp_import/unrtf/html.c:
+	* plugins/flp_import/unrtf/malloc.c:
+	* plugins/flp_import/unrtf/malloc.h:
+	* plugins/flp_import/unrtf/output.c:
+	* plugins/flp_import/unrtf/output.h:
+	* src/audio/audio_file_ogg.cpp:
+	replaced deprecated string conversions
+
+	* plugins/lb302/lb302.cpp:
+	* src/widgets/kmultitabbar.cpp:
+	fixed different signedness comparison
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	commented out unused variables
+
+	* plugins/flp_import/unrtf/convert.c:
+	replaced empty conditional
+
+	* src/widgets/kmultitabbar.cpp:
+	added copyright notice
+
+	* src/core/automation_pattern.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/ladspa_manager.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/midi/midi_mapper.cpp:
+	* src/widgets/tab_bar.cpp:
+	* src/widgets/text_float.cpp:
+	removed old undefs
+
+	* configure.in:
+	readded unsafe-loop-optimizations warning
+
+	* data/locale/ca.ts:
+	updated translation
+
+	* data/locale/qt_*.qm:
+	removed old Qt3 translations
+
 2007-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/note_play_handle.cpp:

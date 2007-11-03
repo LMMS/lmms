@@ -59,6 +59,7 @@
 		and added support for accented characters in titles from
 		Laurent Monin
  # 09 Mar 06, daved@physiol.usyd.edu.au: don't print null post_trans
+ * 31 Oct 07, jasp00@users.sourceforge.net: fixed several warnings
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -156,7 +157,7 @@ static int picture_height;
 static int picture_bits_per_pixel=1;
 static int picture_type=PICT_UNKNOWN;
 static int picture_wmetafile_type;
-static char *picture_wmetafile_type_str;
+static const char *picture_wmetafile_type_str;
 
 
 static int have_printed_body=FALSE;
@@ -208,7 +209,7 @@ starting_body ()
 /*-------------------------------------------------------------------*/
 
 
-static char *month_strings[12]= {
+static const char *month_strings[12]= {
 #ifdef ENGLISH
   "January","February","March","April","May","June","July","August",
   "September","October","November","December"
@@ -491,7 +492,7 @@ process_info_group (Word *w)
 							{
 								int ch = h2toi (&s2[2]);
 
-								char *s3;
+								const char *s3;
 								s3 = op_translate_char (op, charset_type, ch, numchar_table);
 								if (!s3 || !*s3)
 								{
@@ -834,7 +835,7 @@ cmd_field (Word *w, int align, char has_param, int num) {
 						op->symbol_last_char >= char_num
 					   )
 					   {
-					   	char * string;
+					   	const char * string;
 						if ((string = op->symbol_translation_table[char_num - op->symbol_first_char]) != 0)
 						outstring+=QString().sprintf("%s", string);
 					   }
@@ -1423,8 +1424,7 @@ static int cmd_ulnone (Word *w, int align, char has_param, int param) {
 		    attr==ATTR_THICK_UL ||
 		    attr==ATTR_DOUBLE_UL)
 		{
-		  if (!attr_pop(ATTR_UNDERLINE))
-		    ;
+		  attr_pop(ATTR_UNDERLINE);
 		} else
 		  more=FALSE;
 	} while(more);
@@ -1681,7 +1681,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 		(uchar)param <= op->unisymbol1_last_char
 	)
 	{
-		char *string;
+		const char *string;
 		if ((string = op->unisymbol1_translation_table[param - op->unisymbol1_first_char]) != 0)
 			outstring+=QString().sprintf("%s", string);
 		else
@@ -1695,7 +1695,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 		(uchar)param <= op->unisymbol2_last_char
 	)
 	{
-		char *string;
+		const char *string;
 		if ((string = op->unisymbol2_translation_table[param - op->unisymbol2_first_char]) != 0)
 			outstring+=QString().sprintf("%s", string);
 		else
@@ -1709,7 +1709,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 		(uchar)param <= op->unisymbol3_last_char
 	)
 	{
-		char *string;
+		const char *string;
 		if ((string = op->unisymbol3_translation_table[param - op->unisymbol3_first_char]) != 0)
 			outstring+=QString().sprintf("%s", string);
 		else
@@ -1724,7 +1724,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 		(uchar)param <= op->unisymbol4_last_char
 	)
 	{
-		char *string;
+		const char *string;
 		if ((string = op->unisymbol4_translation_table[param - op->unisymbol4_first_char]) != 0)
 			outstring+=QString().sprintf("%s", string);
 		else
@@ -2291,9 +2291,9 @@ static int cmd_tcn (Word *w, int align, char has_param, int param) {
 
 
 typedef struct {
-	char *name;
+	const char *name;
 	int (*func)(Word*, int, char, int);
-	char *debug_print;
+	const char *debug_print;
 } HashItem;
 
 
@@ -2616,7 +2616,7 @@ enum { SMALL=0, BIG=1 };
 	}
 
 	while ((ch=*s)) {
-		char *post_trans = NULL;
+		const char *post_trans = NULL;
 
 		if (simulate_allcaps || simulate_smallcaps)
 			ch = toupper (ch);
@@ -2844,7 +2844,7 @@ word_print_core (Word *w)
 				if (within_picture) {
 					starting_body();
 					if (!pictfile && !nopict_mode) {
-						char *ext=NULL;
+						const char *ext=NULL;
 						switch (picture_type) {
 						case PICT_WB: ext="bmp"; break;
 						case PICT_WM: ext="wmf"; break;
@@ -2985,7 +2985,7 @@ word_print_core (Word *w)
 				else if (*s == '\'') {
 					/* \'XX is a hex char code expression */
 					int ch = h2toi (&s[1]);
-					char *s2;
+					const char *s2;
 
 #if 1 /* daved - 0.19.6 */
 					s2 = op_translate_char (op, charset_type, ch, numchar_table);
@@ -3050,7 +3050,7 @@ word_print_core (Word *w)
 								match = !strcmp(s, hip[index].name);
 
 							if (match) {
-								char *debug;
+								const char *debug;
 								int terminate_group;
 
 								if (hip[index].func) {

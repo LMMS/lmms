@@ -36,6 +36,7 @@
  * 25 Sep 04, st001906@hrz1.hrz.tu-darmstadt.de: added stdlib.h for djgpp
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
  * 22 Aug 05, ax2groin@arbornet.org: added lineno to error_handler
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -79,7 +80,7 @@ usage ()
  *=======================================================================*/
 
 void
-error_handler (char* message)
+error_handler (const char* message)
 {
 #if 1
 	fprintf(stderr, "Error (line %d): %s\n", lineno, message);
@@ -98,7 +99,7 @@ error_handler (char* message)
  *=======================================================================*/
 
 void
-warning_handler (char* message)
+warning_handler (const char* message)
 {
 	fprintf(stderr, "Warning: %s\n", message);
 }

@@ -1268,11 +1268,6 @@ sampleBuffer::handleState::~handleState()
 
 
 
-#undef write
-#undef read
-#undef pos
-
-
 #include "sample_buffer.moc"
 
 

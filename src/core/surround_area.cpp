@@ -26,18 +26,16 @@
  */
 
 
+#include "surround_area.h"
+
+
 #include <QtGui/QApplication>
-#include <QtGui/QCursor>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
 
-#include <math.h>
-
-#include "surround_area.h"
 #include "automatable_object_templates.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "knob.h"
 #include "templates.h"
@@ -164,8 +162,7 @@ void surroundArea::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &X in automation editor" ),
 					m_position_x->getAutomationPattern(),

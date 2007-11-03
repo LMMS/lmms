@@ -99,7 +99,7 @@ int main( int argc, char * * argv )
 	"version 2 of the License, or (at your option) any later version.\n\n"
 	"Try \"%s --help\" for more information.\n\n", PACKAGE_VERSION,
 								argv[0] );
-			return( 0 );
+			return( EXIT_SUCCESS );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) )
@@ -114,7 +114,7 @@ int main( int argc, char * * argv )
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage message and exit.\n\n",
 							PACKAGE_VERSION );
-			return( 0 );
+			return( EXIT_SUCCESS );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
 						QString( argv[i] ) == "-r" ) )
@@ -132,7 +132,7 @@ int main( int argc, char * * argv )
 			{
 				printf( "\nInvalid output format %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
-				return( -1 );
+				return( EXIT_FAILURE );
 			}
 			++i;
 		}
@@ -142,7 +142,7 @@ int main( int argc, char * * argv )
 			{
 				printf( "\nInvalid option %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return( -1 );
+				return( EXIT_FAILURE );
 			}
 			file_to_load = argv[i];
 		}
@@ -156,12 +156,8 @@ int main( int argc, char * * argv )
 
 	QString pos = QLocale::system().name().left( 2 );
 	// load translation for Qt-widgets/-dialogs
-#ifdef QT_TRANSLATIONS_DIR
 	loadTranslation( QString( "qt_" ) + pos,
 					QString( QT_TRANSLATIONS_DIR ) );
-#else
-	loadTranslation( QString( "qt_" ) + pos );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
@@ -170,7 +166,7 @@ int main( int argc, char * * argv )
 
 	if( !configManager::inst()->loadConfigFile() )
 	{
-		return( -1 );
+		return( EXIT_FAILURE );
 	}
 
 	QPalette pal = app.palette();

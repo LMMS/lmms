@@ -1,7 +1,30 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
-#include "templates.h"
-#include "tooltip.h"
+/*
+ * kmultitabbar.cpp - widget for horizontal and vertical tabs
+ *
+ * Copyright (c) 2001-2003 Joseph Wenninger <jowenn@kde.org>
+ * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
 
 #include "kmultitabbar.h"
 
@@ -15,6 +38,9 @@
 #include <QtGui/QStyleOptionButton>
 
 #include <math.h>
+
+#include "templates.h"
+#include "tooltip.h"
 
 #define NEARBYINT(i) ((int(float(i) + 0.5)))
 
@@ -87,7 +113,7 @@ void KMultiTabBarInternal::setStyle(enum KMultiTabBar::KMultiTabBarStyle style)
 					diff=0; \
 					for (int i2=i;i2<tabCount;i2++) {\
 						int l1=m_tabs.at(i2)->neededSize();\
-						if ((ulen+l1)>space){\
+						if ((ulen+l1)>(int)space){\
 							if (ulen==0) diff=0;\
 							else diff=((float)(space-ulen))/(i2-i);\
 							break;\

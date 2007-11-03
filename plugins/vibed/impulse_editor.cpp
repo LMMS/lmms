@@ -23,14 +23,14 @@
  */
  
 
-#include <QtCore/QPoint>
+#include "impulse_editor.h"
+
 #include <Qt/QtXml>
 #include <QtCore/QMap>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
+#include <QtCore/QPoint>
 #include <QtGui/QWhatsThis>
 
-#include "impulse_editor.h"
+#include "caption_menu.h"
 #include "embed.h"
 #include "engine.h"
 #include "oscillator.h"
@@ -41,7 +41,7 @@
 
 impulseEditor::impulseEditor( QWidget * _parent, int _x, int _y, track * _track,
 								Uint32 _len ) :
-	QWidget( _parent/*, "impulseEditor"*/ ),
+	QWidget( _parent ),
 	m_sampleLength( _len ),
 	m_normalizeFactor( 1.0f ),
 	m_forward( TRUE )
@@ -438,16 +438,7 @@ void impulseEditor::setOn( bool _on )
 
 void impulseEditor::contextMenuEvent( QContextMenuEvent * )
 {
-	QMenu contextMenu( this );
-	contextMenu.setTitle( accessibleName() );
-#warning TODO: css-formatting
-#if 0
-	QLabel * caption = new QLabel( "<font color=white><b>" +
-			QString( "Impulse Editor" ) + "</b></font>", this );
-	caption->setPaletteBackgroundColor( QColor( 0, 0, 192 ) );
-	caption->setAlignment( Qt::AlignCenter );
-	contextMenu.addAction( caption );
-#endif
+	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 			       this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

@@ -23,13 +23,20 @@
  */
 
 
+#include "singerbot.h"
+
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <QtCore/QDir>
 #include <QtGui/QLayout>
 #include <QtGui/QTextEdit>
 #include <QtXml/QDomElement>
 
-#include "singerbot.h"
 #include "engine.h"
+#include "file.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -37,9 +44,6 @@
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-
-#undef HAVE_CONFIG_H
-#include <festival.h>
 
 
 
@@ -72,19 +76,10 @@ plugin * lmms_plugin_main( void * _data )
 
 
 
-singerBot::synThread * singerBot::s_thread = NULL;
-
-
-
-
 singerBot::singerBot( instrumentTrack * _track ) :
 	instrument( _track, &singerbot_plugin_descriptor )
 {
-	if( !s_thread )
-	{
-		s_thread = new synThread();
-		s_thread->start();
-	}
+	synth_init();
 
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -116,6 +111,7 @@ singerBot::singerBot( instrumentTrack * _track ) :
 
 singerBot::~singerBot()
 {
+	synth_destroy();
 }
 
 
@@ -148,7 +144,7 @@ void singerBot::playNote( notePlayHandle * _n, bool )
 void singerBot::deleteNotePluginData( notePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
-	delete hdata->wave;
+	delete[] hdata->wave;
 	src_delete( hdata->resampling_state );
 	delete hdata;
 }
@@ -228,9 +224,8 @@ void singerBot::createWave( notePlayHandle * _n )
 	int word_index = _n->patternIndex() % m_words.size();
 	hdata->text = m_words[word_index].toAscii().constData();
 
-	s_thread->set_data( hdata );
-	s_thread->unlock_synth();
-	s_thread->lock_handle();
+	synth_send( hdata );
+	synth_read( hdata );
 
 	if( !hdata->wave )
 	{
@@ -246,7 +241,7 @@ void singerBot::createWave( notePlayHandle * _n )
 	}
 
 	hdata->resampling_data.end_of_input = 0;
-	hdata->remaining_frames = hdata->wave->num_samples();
+	hdata->remaining_frames = hdata->num_samples;
 }
 
 
@@ -255,11 +250,10 @@ void singerBot::createWave( notePlayHandle * _n )
 void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
 							const fpp_t _frames )
 {
-	const f_cnt_t offset = _hdata->wave->num_samples()
-						- _hdata->remaining_frames;
+	const f_cnt_t offset = _hdata->num_samples - _hdata->remaining_frames;
 
 	const double ratio = engine::getMixer()->sampleRate()
-					/ (double)_hdata->wave->sample_rate();
+						/ (double)_hdata->sample_rate;
 
 	const f_cnt_t margin = 2;
 	f_cnt_t fragment_size = (f_cnt_t)( _frames / ratio ) + margin;
@@ -270,8 +264,7 @@ void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
 	{
 		for( f_cnt_t frame = 0; frame < fragment_size; ++frame )
 		{
-			sample_fragment[frame] = _hdata->wave->a( offset
-								+ frame )
+			sample_fragment[frame] = _hdata->wave[offset + frame]
 						/ OUTPUT_SAMPLE_MULTIPLIER;
 		}
 	}
@@ -280,8 +273,7 @@ void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
 		for( f_cnt_t frame = 0; frame < _hdata->remaining_frames;
 								++frame )
 		{
-			sample_fragment[frame] = _hdata->wave->a( offset
-								+ frame )
+			sample_fragment[frame] = _hdata->wave[offset + frame]
 						/ OUTPUT_SAMPLE_MULTIPLIER;
 		}
 		memset( sample_fragment + _hdata->remaining_frames, 0,
@@ -325,141 +317,104 @@ void singerBot::play( sampleFrame * _ab, handle_data * _hdata,
 
 
 
-
-
-
-
-singerBot::synThread::synThread( void ) :
-	m_handle_semaphore( 1 ),
-	m_synth_semaphore( 1 )
+void singerBot::synth_init( void )
 {
-	m_handle_semaphore.acquire();
-	m_synth_semaphore.acquire();
+	static int suffix_index = 0;
+	m_file_suffix = '.' + QString::number( getpid() ) + '.'
+					+ QString::number( suffix_index++, 16 );
+
+	int fd = shm_open( addSuffix( "/lmms_singerbot" ),
+				O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR );
+	m_shm = new File( fd );
+	m_handle_semaphore = sem_open( addSuffix( "/lmms_singerbot_s1" ),
+				O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 0 );
+	m_synth_semaphore = sem_open( addSuffix( "/lmms_singerbot_s2" ),
+				O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 0 );
+
+	pid_t cpid = fork();
+	if( cpid == -1 )
+	{
+		perror( "fork" );
+		exit( EXIT_FAILURE );
+	}
+	else if( cpid == 0 )
+	{
+		sem_close( m_handle_semaphore );
+		sem_close( m_synth_semaphore );
+
+		QString proxy_exec = configManager::inst()->pluginDir() +
+							QDir::separator() +
+							"singerbot_proxy";
+		execlp( proxy_exec.toAscii().constData(),
+					proxy_exec.toAscii().constData(),
+					m_file_suffix.toAscii().constData(),
+									NULL );
+		exit( EXIT_FAILURE );
+	}
+
+	sem_wait( m_handle_semaphore );
 }
 
 
 
 
-singerBot::synThread::~synThread()
+void singerBot::synth_destroy( void )
 {
-	m_handle_semaphore.release();
-	m_synth_semaphore.release();
+	m_shm->rewind();
+	float stop = -1.0;
+	m_shm->write( &stop );
+
+	sem_post( m_synth_semaphore );
+	wait( NULL );
+
+	sem_close( m_handle_semaphore );
+	sem_close( m_synth_semaphore );
+	sem_unlink( addSuffix( "/lmms_singerbot_s1" ) );
+	sem_unlink( addSuffix( "/lmms_singerbot_s2" ) );
+
+	delete m_shm;
+	shm_unlink( addSuffix( "/lmms_singerbot" ) );
 }
 
 
 
 
-void singerBot::synThread::run( void )
+void singerBot::synth_send( handle_data * _hdata )
 {
-	const int load_init_files = 1;
-	festival_initialize( load_init_files, FESTIVAL_HEAP_SIZE );
+	m_shm->rewind();
+	m_shm->write( &_hdata->frequency );
+	m_shm->write( &_hdata->duration );
+	Uint8 len = strlen( _hdata->text );
+	m_shm->write( &len );
+	m_shm->write( _hdata->text, len );
 
-	festival_eval_command(
-		"(define get_segment"
-		"	(lambda (utt) (begin"
-		"		(Initialize utt)"
-		"		(Text utt)"
-		"		(Token_POS utt)"
-		"		(Token utt)"
-		"		(POS utt)"
-		"		(Phrasify utt)"
-		"		(Word utt)"
-		"	))"
-		")" );
-
-	festival_eval_command(
-		"(Parameter.set 'Int_Method 'DuffInt)" );
-	festival_eval_command(
-		"(Parameter.set 'Int_Target_Method Int_Targets_Default)" );
-
-	for( ; ; )
-	{
-		m_synth_semaphore.acquire();
-		text_to_wave();
-		if( !m_data->wave )
-		{
-			// Damaged SIOD environment? Retrying...
-			text_to_wave();
-			if( !m_data->wave )
-			{
-				printf( "Unsupported frequency?\n" );
-			}
-		}
-		m_handle_semaphore.release();
-	}
+	sem_post( m_synth_semaphore );
 }
 
 
 
 
-void singerBot::synThread::text_to_wave( void )
+void singerBot::synth_read( handle_data * _hdata )
 {
-	//TODO: Heap corruption too -> move to separate process?
-	char command[80];
-	sprintf( command,
-		"(set! duffint_params '((start %f) (end %f)))",
-					m_data->frequency, m_data->frequency );
-	festival_eval_command( command );
-	festival_eval_command(
-		"(Parameter.set 'Duration_Stretch 1)" );
+	sem_wait( m_handle_semaphore );
 
-	sprintf( command,
-		"(set! total_time (parse-number %f))", m_data->duration );
-	festival_eval_command( command );
-	festival_eval_command(
-		"(set! word " + quote_string( m_data->text, "\"", "\\", 1 )
-									+ ")" );
-	if( festival_eval_command(
-		"(begin"
-		" (set! my_utt (eval (list 'Utterance 'Text word)))"
-		" (get_segment my_utt)"
-		" (if (equal? (length (utt.relation.leafs my_utt 'Segment)) 1)"
-		"  (begin (set! my_utt (eval "
-		"   (list 'Utterance 'Text (string-append word \" \" word))))"
-		"   (get_segment my_utt)"
-		"  ))"
-		" (Pauses my_utt)"
-		" (item.delete (utt.relation.first my_utt 'Segment))"
-		" (item.delete (utt.relation.last my_utt 'Segment))"
-		" (Intonation my_utt)"
-		" (PostLex my_utt)"
-		" (Duration my_utt)"
-		" (if (not (equal? total_time 0)) (begin"
-		"  (set! utt_time"
-		"   (item.feat (utt.relation.last my_utt 'Segment) 'end))"
-		"  (Parameter.set 'Duration_Stretch (/ total_time utt_time))"
-		"  (Duration my_utt)"
-		"  ))"
-		" (Int_Targets my_utt)"
-		")" )
-
-		&& festival_eval_command(
-		"  (Wave_Synth my_utt)" ) )
+	m_shm->rewind();
+	m_shm->read( &_hdata->num_samples );
+	if( !_hdata->num_samples )
 	{
-		m_data->wave = get_wave( "my_utt" );
+		return;
 	}
+	m_shm->read( &_hdata->sample_rate );
+	_hdata->wave = new short[_hdata->num_samples];
+	m_shm->read( _hdata->wave, _hdata->num_samples );
 }
 
 
 
 
-EST_Wave * singerBot::synThread::get_wave( const char * _name )
+const char * singerBot::addSuffix( const char * _s )
 {
-	LISP lutt = siod_get_lval( _name, NULL );
-	if( !utterance_p( lutt ) )
-	{
-        	return( NULL );
-	}
-
-	EST_Relation * r = utterance( lutt )->relation( "Wave" );
-
-	//TODO: This check is useless. The error is fatal.
-	if ( !r || !r->head() )
-	{
-		return( NULL );
-	}
-
-	return( new EST_Wave( *wave( r->head()->f( "wave" ) ) ) );
+	return( QString( _s + m_file_suffix ).toAscii().constData() );
 }
 
 

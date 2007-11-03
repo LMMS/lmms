@@ -38,6 +38,7 @@
  * 21 Jul 05, daved@physiol.usyd.edu.au: added endash
  * 19 Aug 05, ax2groin@arbornet.org: added more chars and changes to ANSI
  * 05 Jan 06, marcossamaral@terra.com.br: fixed bugs #14982 and #14983
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 #ifdef HAVE_CONFIG_H
@@ -59,7 +60,7 @@
 #include "output.h"
 
 
-static char* ascii [96] = {
+static const char* ascii [96] = {
 	/* 0x20 */ " ", "!", "&quot;", "#", "$", "%", "&amp;", "'", 
 	/* 0x28 */ "(", ")", "*", "+", ",", "-", ".", "/", 
 	/* 0x30 */ "0", "1", "2", "3", "4", "5", "6", "7", 
@@ -75,7 +76,7 @@ static char* ascii [96] = {
 };
 
 
-static char* ansi [] = {
+static const char* ansi [] = {
 /* 0x78 */ "x",
 /* 0x79 */ "y",
 /* 0x7a */ "z",
@@ -123,7 +124,7 @@ static char* ansi [] = {
 /* 0xf8 */ "&oslash;","&ugrave;","&uacute;","&ucirc;","&uuml;","&yacute;","&thorn;","&yuml;"
 };
 
-static char* mac [] = {
+static const char* mac [] = {
 /* 0xa4 */ "&bull;", NULL,NULL,NULL,
 /* 0xa8 */ NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
 /* 0xb0 */ NULL,NULL,NULL,NULL,NULL,"&mu;",NULL,NULL,
@@ -134,7 +135,7 @@ static char* mac [] = {
 };
 
 #if 1 /* daved - 0.19.4 - unicode symbol character support */
-static char * unisymbol1[] = {
+static const char * unisymbol1[] = {
 	/* 913 */	"&Alpha;",
 	/* 914 */	"&Beta;",
 	/* 915 */	"&Gamma;",
@@ -208,7 +209,7 @@ static char * unisymbol1[] = {
 };
 #endif
 #if 1 /* daved - 0.19.4 - unicode symbol character support */
-static char * unisymbol2[] = {
+static const char * unisymbol2[] = {
 /* 57516 */	"&Gamma;",
 /* 57517 */	"&Delta;",
 /* 57518 */	"&Theta;",
@@ -253,7 +254,7 @@ static char * unisymbol2[] = {
 /* 57557 */	"&delta;",
 };
 
-static char * unisymbol3[] = {
+static const char * unisymbol3[] = {
  /* 61505 */   "&Alpha;",
  /* 61506 */   "&Beta;",
  /* 61507 */   "&Chi;",
@@ -316,7 +317,7 @@ static char * unisymbol3[] = {
 #endif
 
 #if 1 /* 0.19.5 more unicode characters */
-static char * unisymbol4[] = {
+static const char * unisymbol4[] = {
  /* 61600 */    "&euro;",
  /* 61601 */	"&upsih;",
  /* 61602 */	"&prime;",
@@ -414,7 +415,7 @@ static char * unisymbol4[] = {
 };
 #endif
 #if 1 /* daved - SYMBOL font characters */
-static char* symbol[] = {
+static const char* symbol[] = {
 /*  60 */	"&lt;",
 /*  61 */	"=",
 /*  62 */	"&gt;",
@@ -612,7 +613,7 @@ static char* symbol[] = {
 /*  254 */	0,
 };
 #endif 
-static char* cp437 [] = {
+static const char* cp437 [] = {
 /* 0x80 */ "&ccedil;",
 /* 0x81 */ "&uuml;",
 /* 0x82 */ "&eacute;",
@@ -743,7 +744,7 @@ static char* cp437 [] = {
 /* 0xff */ "&nbsp;",
 };
 
-static char* cp850 [] = {
+static const char* cp850 [] = {
 /* 0x80 */  "&ccedil;",
 /* 0x81 */  "&uuml;",
 /* 0x82 */  "&eacute;",

@@ -33,6 +33,7 @@
  * 25 Sep 04, st001906@hrz1.hrz.tu-darmstadt.de: added stdlib.h for djgpp
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
  * 06 Jan 06, marcossamaral@terra.com.br: changes in STDOUT   
+ * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 
@@ -111,7 +112,7 @@ op_free (OutputPersonality *op)
  * Returns:	String.
  *=======================================================================*/
 
-char *
+const char *
 #if 1 /* daved - 0.19.6 */
 op_translate_char (OutputPersonality *op, int charset, int ch, int ntable)
 #else
@@ -119,7 +120,7 @@ op_translate_char (OutputPersonality *op, int charset, int ch)
 #endif
 {
 	short start;
-	char *result=NULL;
+	const char *result=NULL;
 
 	CHECK_PARAM_NOT_NULL(op);
 

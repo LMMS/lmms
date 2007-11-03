@@ -26,12 +26,13 @@
 #define _RACK_PLUGIN_H
 
 #include <QtGui/QWidget>
-#include <QtGui/QGroupBox>
-#include <QtGui/QPushButton>
-#include <QtGui/QLabel>
 
 #include "journalling_object.h"
 
+
+class QGroupBox;
+class QLabel;
+class QPushButton;
 
 class audioPort;
 class effect;
