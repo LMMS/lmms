@@ -1,0 +1,11 @@
+/* LMMS style sheet */
+
+captionMenu::item:disabled {
+	color: white;
+	background-color: rgb(0, 0, 192);
+	text-align: center;
+}
+
+QWidget#mainToolbar {
+	background: url(resources:main_toolbar_bg.png);
+}
