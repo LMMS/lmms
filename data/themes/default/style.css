@@ -6,6 +6,19 @@ captionMenu::item:disabled {
 	text-align: center;
 }
 
+trackOperationsWidget QPushButton {
+	margin-left: 12px;
+	margin-top: 1px;
+	max-height: 26px;
+	max-width: 26px;
+	min-height: 26px;
+	min-width: 26px;
+}
+
+/*trackOperationsWidget QPushButton::menu-indicator {
+	image: url(resources:track_op_menu.png);
+}*/
+
 QWidget#mainToolbar {
-	background: url(resources:main_toolbar_bg.png);
+	background-image: url(resources:main_toolbar_bg.png);
 }

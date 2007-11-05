@@ -917,16 +917,35 @@ midiTime trackContentWidget::getPosition( int _mouse_x )
 
 
 QPixmap * trackOperationsWidget::s_grip = NULL;
+QPixmap * trackOperationsWidget::s_muteOffDisabled;
+QPixmap * trackOperationsWidget::s_muteOffEnabled;
+QPixmap * trackOperationsWidget::s_muteOnDisabled;
+QPixmap * trackOperationsWidget::s_muteOnEnabled;
+QPixmap * trackOperationsWidget::s_trackOpsDisabled;
+QPixmap * trackOperationsWidget::s_trackOpsEnabled;
 
 
 trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	QWidget( _parent ),
-	m_trackWidget( _parent )
+	m_trackWidget( _parent ),
+	m_automationDisabled( FALSE )
 {
 	if( s_grip == NULL )
 	{
 		s_grip = new QPixmap( embed::getIconPixmap(
 							"track_op_grip" ) );
+		s_muteOffDisabled = new QPixmap( embed::getIconPixmap(
+							"mute_off_disabled" ) );
+		s_muteOffEnabled = new QPixmap( embed::getIconPixmap(
+							"mute_off" ) );
+		s_muteOnDisabled = new QPixmap( embed::getIconPixmap(
+							"mute_on_disabled" ) );
+		s_muteOnEnabled = new QPixmap( embed::getIconPixmap(
+							"mute_on" ) );
+		s_trackOpsDisabled = new QPixmap( embed::getIconPixmap(
+						"track_op_menu_disabled" ) );
+		s_trackOpsEnabled = new QPixmap( embed::getIconPixmap(
+							"track_op_menu" ) );
 	}
 
 	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
@@ -937,17 +956,16 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	connect( to_menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
-	m_trackOps = new QPushButton( embed::getIconPixmap( "track_op_menu" ),
-								"", this );
-	m_trackOps->setGeometry( 12, 1, 28, 28 );
+	m_trackOps = new QPushButton( this );
+	m_trackOps->setIcon( *s_trackOpsEnabled );
 	m_trackOps->setMenu( to_menu );
 	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
 
 	m_muteBtn = new pixmapButton( this, tr( "Mute" ),
 						m_trackWidget->getTrack() );
-	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "mute_on" ) );
-	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "mute_off" ) );
+	m_muteBtn->setActiveGraphic( *s_muteOnEnabled );
+	m_muteBtn->setInactiveGraphic( *s_muteOffEnabled );
 	m_muteBtn->setCheckable( TRUE );
 	m_muteBtn->move( 44, 4 );
 	m_muteBtn->show();
@@ -1027,29 +1045,34 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 		p.drawPixmap( 2, 2, *s_grip );
 		if( inBBEditor() )
 		{
-			const char * trackOps_icon;
-			const char * mute_active_icon;
-			const char * mute_inactive_icon;
 			bbTrack * bb_track = currentBBTrack();
 			if( !bb_track || bb_track->automationDisabled(
 						m_trackWidget->getTrack() ) )
 			{
-				trackOps_icon = "track_op_menu_disabled";
-				mute_active_icon = "mute_on_disabled";
-				mute_inactive_icon = "mute_off_disabled";
+				if( !m_automationDisabled )
+				{
+					m_automationDisabled = TRUE;
+					m_trackOps->setIcon(
+							*s_trackOpsDisabled );
+					m_muteBtn->setActiveGraphic(
+							*s_muteOnDisabled );
+					m_muteBtn->setInactiveGraphic(
+							*s_muteOffDisabled );
+				}
 			}
 			else
 			{
-				trackOps_icon = "track_op_menu";
-				mute_active_icon = "mute_on";
-				mute_inactive_icon = "mute_off";
+				if( m_automationDisabled )
+				{
+					m_automationDisabled = FALSE;
+					m_trackOps->setIcon(
+							*s_trackOpsEnabled );
+					m_muteBtn->setActiveGraphic(
+							*s_muteOnEnabled );
+					m_muteBtn->setInactiveGraphic(
+							*s_muteOffEnabled );
+				}
 			}
-			m_trackOps->setIcon( embed::getIconPixmap(
-							trackOps_icon ) );
-			m_muteBtn->setActiveGraphic( embed::getIconPixmap(
-							mute_active_icon ) );
-			m_muteBtn->setInactiveGraphic( embed::getIconPixmap(
-							mute_inactive_icon ) );
 		}
 		m_trackOps->show();
 		m_muteBtn->show();

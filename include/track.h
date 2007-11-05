@@ -262,11 +262,19 @@ private slots:
 
 private:
 	static QPixmap * s_grip;
+	static QPixmap * s_muteOffDisabled;
+	static QPixmap * s_muteOffEnabled;
+	static QPixmap * s_muteOnDisabled;
+	static QPixmap * s_muteOnEnabled;
+	static QPixmap * s_trackOpsDisabled;
+	static QPixmap * s_trackOpsEnabled;
 
 	trackWidget * m_trackWidget;
 
 	QPushButton * m_trackOps;
 	pixmapButton * m_muteBtn;
+
+	bool m_automationDisabled;
 
 	bbTrack * currentBBTrack( void );
 	bool inBBEditor( void );

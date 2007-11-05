@@ -1,3 +1,13 @@
+2007-11-06	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/track.h:
+	* src/core/track.cpp:
+	optimized trackOperationsWidget paint event
+
+	* data/themes/default/style.css:
+	* src/core/track.cpp:
+	turned some code into style sheet
+
 2007-11-03	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* plugins/singerbot/singerbot_proxy.cpp:
