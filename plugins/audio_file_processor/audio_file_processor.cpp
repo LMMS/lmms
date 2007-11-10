@@ -76,7 +76,6 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 
 audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_drawMethod( sampleBuffer::LINE_CONNECT )
 {
 	connect( &m_sampleBuffer, SIGNAL( sampleUpdated() ), this,
@@ -96,8 +95,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 							"project_open_down" ) );
 	m_openAudioFileButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_open" ) );
-	m_openAudioFileButton->setBgGraphic( getBackground(
-						m_openAudioFileButton ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ), this,
 						SLOT( openAudioFile() ) );
 	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
@@ -117,7 +114,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_off" ) );
-	m_reverseButton->setBgGraphic( getBackground( m_reverseButton ) );
 	connect( m_reverseButton, SIGNAL( toggled( bool ) ), this,
 					SLOT( reverseBtnToggled( bool ) ) );
 	toolTip::add( m_reverseButton, tr( "Reverse sample" ) );
@@ -133,7 +129,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
-	m_loopButton->setBgGraphic( getBackground( m_loopButton ) );
 	toolTip::add( m_loopButton,
 				tr( "Loop sample at start- and end-point" ) );
 	m_loopButton->setWhatsThis(
@@ -191,7 +186,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 
 	m_viewLinesPB = new pixmapButton( this, NULL, NULL );
 	m_viewLinesPB->move( 154, 158 );
-	m_viewLinesPB->setBgGraphic( getBackground( m_viewLinesPB ) );
 	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
 	{
 		m_viewLinesPB->setChecked( TRUE );
@@ -206,7 +200,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 
 	m_viewDotsPB = new pixmapButton( this, NULL, NULL );
 	m_viewDotsPB->move( 204, 158 );
-	m_viewDotsPB->setBgGraphic( getBackground( m_viewDotsPB ) );
 	if( m_drawMethod == sampleBuffer::DOTS )
 	{
 		m_viewDotsPB->setChecked( TRUE );

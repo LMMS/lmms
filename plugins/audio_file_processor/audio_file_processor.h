@@ -31,7 +31,6 @@
 
 #include "instrument.h"
 #include "sample_buffer.h"
-#include "spc_bg_hndl_widget.h"
 
 
 class knob;
@@ -39,7 +38,7 @@ class pixmapButton;
 class volumeKnob;
 
 
-class audioFileProcessor : public instrument, public specialBgHandlingWidget
+class audioFileProcessor : public instrument
 {
 	Q_OBJECT
 public:

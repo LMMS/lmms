@@ -23,25 +23,21 @@
  */
 
 
-#include <Qt/QtXml>
-#include <QtGui/QMessageBox>
+#include "vestige.h"
+
 #include <QtGui/QFileDialog>
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
+#include <QtGui/QMessageBox>
 #include <QtGui/QPushButton>
-#include <QtGui/QCursor>
+#include <QtXml/QDomElement>
 
 #include "engine.h"
-#include "vestige.h"
 #include "gui_templates.h"
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
 #include "lvsl_client.h"
-#include "mixer.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
-#include "spc_bg_hndl_widget.h"
 #include "text_float.h"
 #include "tooltip.h"
 
@@ -73,7 +69,6 @@ QPixmap * vestigeInstrument::s_artwork = NULL;
 
 vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &vestige_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_plugin( NULL ),
 	m_pluginMutex()
 {
@@ -91,8 +86,6 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 							"project_open_down" ) );
 	m_openPluginButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_open" ) );
-	m_openPluginButton->setBgGraphic( getBackground(
-						m_openPluginButton ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
 	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );

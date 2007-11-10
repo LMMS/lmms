@@ -322,7 +322,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/embed.h				\
 		$(srcdir)/include/timeline.h				\
 		$(srcdir)/include/config_mgr.h				\
-		$(srcdir)/include/spc_bg_hndl_widget.h			\
 		$(srcdir)/include/tab_bar.h				\
 		$(srcdir)/include/tab_button.h				\
 		$(srcdir)/include/project_notes.h			\

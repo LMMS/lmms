@@ -25,15 +25,15 @@
  */
 
 
+#include "led_checkbox.h"
+
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 
-#include "led_checkbox.h"
 #include "automatable_object_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "spc_bg_hndl_widget.h"
 
 
 static const QString names[ledCheckBox::TOTAL_COLORS] =
@@ -80,8 +80,6 @@ ledCheckBox::~ledCheckBox()
 void ledCheckBox::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-
-	p.drawPixmap( 0, 0, specialBgHandlingWidget::getBackground( this ) );
 
 	if( isChecked() == TRUE )
 	{

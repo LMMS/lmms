@@ -28,8 +28,6 @@
 
 
 #include "instrument.h"
-#include "spc_bg_hndl_widget.h"
-#include "led_checkbox.h"
 #include "oscillator.h"
 
 class QPixmap;
@@ -77,7 +75,7 @@ private slots:
 
 
 
-class organicInstrument : public instrument, public specialBgHandlingWidget
+class organicInstrument : public instrument
 {
 	Q_OBJECT
 public:
@@ -137,7 +135,6 @@ private slots:
 } ;
 
 
-#include "organic.moc"
 
 
 #endif

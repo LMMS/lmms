@@ -29,7 +29,6 @@
 
 #include "instrument.h"
 #include "sample_buffer.h"
-#include "spc_bg_hndl_widget.h"
 
 
 class pixmapButton;
@@ -45,7 +44,7 @@ class pixmapButton;
 #define MODES_CLAMPED	( 1 << 7 )
 
 
-class patmanSynth : public instrument, public specialBgHandlingWidget
+class patmanSynth : public instrument
 {
 	Q_OBJECT
 public:

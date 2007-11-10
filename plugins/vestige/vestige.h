@@ -27,30 +27,22 @@
 #define _VESTIGE_H
 
 
-#ifndef QT3
-
 #include <QtCore/QMutex>
-
-#else
-
-#include <qmutex.h>
-
-#endif
 
 
 #include "instrument.h"
 #include "midi.h"
 #include "note.h"
-#include "spc_bg_hndl_widget.h"
 
+
+class QPixmap;
+class QPushButton;
 
 class pixmapButton;
-class QPushButton;
 class remoteVSTPlugin;
-class QPixmap;
 
 
-class vestigeInstrument : public instrument, public specialBgHandlingWidget
+class vestigeInstrument : public instrument
 {
 	Q_OBJECT
 public:

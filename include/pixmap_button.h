@@ -41,7 +41,6 @@ public:
 
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = TRUE );
-	void setBgGraphic( const QPixmap & _pm );
 
 
 signals:
@@ -58,7 +57,6 @@ protected:
 private:
 	QPixmap m_activePixmap;
 	QPixmap m_inactivePixmap;
-	QPixmap m_bgPixmap;
 
 } ;
 

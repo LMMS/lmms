@@ -671,6 +671,7 @@ bool mainWindow::saveProjectAs( void )
 	QFileDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
+	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSongEditor()->projectFileName();
 	if( f != "" )

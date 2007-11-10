@@ -25,20 +25,11 @@
  */
 
 
-#ifndef QT3
+#include "vst_subplugin_features.h"
 
 #include <QtCore/QDir>
 #include <QtGui/QLabel>
 
-#else
-
-#include <qdir.h>
-#include <qlabel.h>
-
-#endif
-
-
-#include "vst_subplugin_features.h"
 #include "config_mgr.h"
 
 
@@ -64,12 +55,8 @@ void vstSubPluginFeatures::listSubPluginKeys( plugin::descriptor * _desc,
 								keyList & _kl )
 {
 	QStringList dlls = QDir( configManager::inst()->vstDir() ).
-#ifndef QT3
 				entryList( QStringList() << "*.dll",
 						QDir::Files, QDir::Name );
-#else
-				entryList( "*.dll", QDir::Files, QDir::Name );
-#endif
 	// TODO: eval m_type
 	for( QStringList::const_iterator it = dlls.begin();
 							it != dlls.end(); ++it )

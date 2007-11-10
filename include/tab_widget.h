@@ -29,10 +29,8 @@
 #include <QtGui/QWidget>
 #include <QtCore/QMap>
 
-#include "spc_bg_hndl_widget.h"
 
-
-class tabWidget : public QWidget, public specialBgHandlingWidget
+class tabWidget : public QWidget
 {
 	Q_OBJECT
 public:

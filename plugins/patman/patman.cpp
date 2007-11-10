@@ -23,11 +23,12 @@
  */
 
 
+#include "patman.h"
+
 #include <QtGui/QFileDialog>
 #include <QtGui/QDragEnterEvent>
 #include <QtXml/QDomElement>
 
-#include "patman.h"
 #include "endian_handling.h"
 #include "engine.h"
 #include "gui_templates.h"
@@ -72,8 +73,7 @@ plugin * lmms_plugin_main( void * _data )
 
 
 patmanSynth::patmanSynth( instrumentTrack * _track ) :
-	instrument( _track, &patman_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
+	instrument( _track, &patman_plugin_descriptor )
 {
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -88,8 +88,6 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 							"project_open_down" ) );
 	m_openFileButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_open" ) );
-	m_openFileButton->setBgGraphic( getBackground(
-						m_openFileButton ) );
 	connect( m_openFileButton, SIGNAL( clicked() ), this,
 						SLOT( openFile() ) );
 	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
@@ -105,7 +103,6 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
-	m_loopButton->setBgGraphic( getBackground( m_loopButton ) );
 	toolTip::add( m_loopButton, tr( "Loop mode" ) );
 	m_loopButton->setWhatsThis(
 		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
@@ -120,7 +117,6 @@ patmanSynth::patmanSynth( instrumentTrack * _track ) :
 								"tune_on" ) );
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
-	m_tuneButton->setBgGraphic( getBackground( m_tuneButton ) );
 	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
 	m_tuneButton->setWhatsThis(
 		tr( "Here you can toggle the Tune mode. If enabled, PatMan "

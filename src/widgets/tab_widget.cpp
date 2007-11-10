@@ -3,7 +3,7 @@
 /*
  * tab_widget.cpp - tabwidget for LMMS
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,19 +25,19 @@
  */
 
 
+#include "tab_widget.h"
+
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 #include <QtGui/QWheelEvent>
 
-#include "tab_widget.h"
 #include "gui_templates.h"
 
 
 
 tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	specialBgHandlingWidget( QColor( 96, 96, 96 ) ),
 	m_activeTab( 0 ),
 	m_caption( _caption )
 {

@@ -23,30 +23,26 @@
  */
 
 
-#include <QtGui/QPainter>
-#include <Qt/QtXml>
-#include <QtGui/QDropEvent>
+#include "bit_invader.h"
 
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include "math.h"
+
+#include <QtXml/QDomElement>
+
 
 using namespace std;
 
 
-#include "bit_invader.h"
-#include "base64.h"
 #include "engine.h"
+#include "graph.h"
 #include "instrument_track.h"
-#include "note_play_handle.h"
-#include "templates.h"
 #include "knob.h"
-#include "pixmap_button.h"
-#include "tooltip.h"
-#include "song_editor.h"
+#include "led_checkbox.h"
+#include "note_play_handle.h"
 #include "oscillator.h"
-#include "sample_buffer.h"
+#include "pixmap_button.h"
+#include "song_editor.h"
+#include "templates.h"
+#include "tooltip.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -72,7 +68,8 @@ plugin::descriptor bitinvader_plugin_descriptor =
 QPixmap * bitInvader::s_artwork = NULL;
 
 
-bSynth::bSynth(float* shape, int length, float _pitch, bool _interpolation, float factor, const sample_rate_t _sample_rate )
+bSynth::bSynth( float * shape, int length, float _pitch, bool _interpolation,
+				float factor, const sample_rate_t _sample_rate )
 {
 
 	interpolation = _interpolation;
@@ -155,8 +152,7 @@ sample_t bSynth::nextStringSample( void )
 
 bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	instrument( _channel_track,
-			&bitinvader_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) )
+			&bitinvader_plugin_descriptor )
 {
 
 
@@ -336,24 +332,25 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 void bitInvader::sinWaveClicked( void )
 {
 	// generate a Sinus wave using static oscillator-method
-        for (int i=0; i < sample_length; i++)
-        {
-	    sample_shape[i] = oscillator::sinSample( i/static_cast<float>(sample_length) );
-        }
-	
+	for (int i=0; i < sample_length; i++)
+	{
+		sample_shape[i] = oscillator::sinSample( i / static_cast<float>(
+							sample_length ) );
+	}
+
 	sampleChanged();
 }
 
 void bitInvader::triangleWaveClicked( void )
 {
 	// generate a Triangle wave using static oscillator-method
-    for (int i=0; i < sample_length; i++)
-        {
-	    sample_shape[i] = oscillator::triangleSample( i/static_cast<float>(sample_length) );
-        }
-	
-	sampleChanged();
+	for (int i=0; i < sample_length; i++)
+	{
+		sample_shape[i] = oscillator::triangleSample( i /
+					static_cast<float>( sample_length) );
+	}
 
+	sampleChanged();
 }
 
 
@@ -361,35 +358,36 @@ void bitInvader::sawWaveClicked( void )
 {
 	// generate a Saw wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-    {
-	    sample_shape[i] = oscillator::sawSample( i/static_cast<float>(sample_length) );
-    }
-        
-    sampleChanged();
+	{
+		sample_shape[i] = oscillator::sawSample( i / static_cast<float>(
+							sample_length ) );
+	}
+
+	sampleChanged();
 }
 
 void bitInvader::sqrWaveClicked( void )
 {
 	// generate a Sqr wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-    {
-	    sample_shape[i] = oscillator::squareSample( i/static_cast<float>(sample_length) );
-    }
-        
-    sampleChanged();
+	{
+		sample_shape[i] = oscillator::squareSample( i /
+					static_cast<float>( sample_length ) );
+	}
 
+	sampleChanged();
 }
 
 void bitInvader::noiseWaveClicked( void )
 {
 	// generate a Noise wave using static oscillator-method
 	for (int i=0; i < sample_length; i++)
-    {
-	    sample_shape[i] = oscillator::noiseSample( i/static_cast<float>(sample_length) );
-    }
-        
-    sampleChanged();
+	{
+		sample_shape[i] = oscillator::noiseSample( i /
+					static_cast<float>( sample_length ) );
+	}
 
+	sampleChanged();
 }
 
 void bitInvader::usrWaveClicked( void )
@@ -408,118 +406,18 @@ void bitInvader::usrWaveClicked( void )
 		buffer.setAudioFile( af );
 		
 		// copy buffer data
-		sample_length = min( sample_length, static_cast<int>(buffer.frames()) );		 
+		sample_length = min( sample_length, static_cast<int>(
+							buffer.frames() ) );
 		for ( int i = 0; i < sample_length; i++ )
 		{
 			sample_shape[i] = (float)*buffer.data()[i];
 		}
 	}
-	
+
 	sampleChanged();
-		
 }
 
 
-
-/*
-
-	deprecated code
-	
-	was replaced by static oscillator methods
-
-void bitInvader::sinWaveClicked( void )
-{
-	// generate sample data
-        for (int i=0; i < sample_length; i++)
-        {
-          // sin(x)
-          sample_shape[i] = sinf(i * 6.2831853 / sample_length);
-        }
-
-        sampleChanged();
-}
-
-void bitInvader::triangleWaveClicked( void )
-{
-	int half_sample_length = sample_length / 2;
-
-	if ((sample_length % 2) == 0) {
-
-		for (int i=0; i < half_sample_length; i++)
-       		{
-		  // triangle
-       		  sample_shape[i] = (((float)i) / half_sample_length * 2) - 1;
-       		}
-	        for (int i=half_sample_length; i < sample_length; i++)
-	        {
-	          // triangle
-	          sample_shape[i] = - (((float)(i-half_sample_length)) / half_sample_length * 2) + 1;
-	        }
-
-        } else {
-		for (int i=0; i < half_sample_length; i++)
-       		{
-		  // triangle
-       		  sample_shape[i] = (((float)i) / half_sample_length * 2) - 1;
-       		}
-       		sample_shape[half_sample_length] = 1;
-	        for (int i=half_sample_length+1; i < sample_length; i++)
-	        {
-	          // triangle
-	          sample_shape[i] = - (((float)(i-half_sample_length)) / half_sample_length * 2) + 1;
-	        }
-
-        }
-
-	sampleChanged();        
-}
-
-void bitInvader::sawWaveClicked( void )
-{
-	for (int i=0; i < sample_length; i++)
-        {
-          // saw
-          sample_shape[i] = (((float)i) / sample_length * 2) - 1;
-        }
-        
-        sampleChanged();
-}
-
-void bitInvader::sqrWaveClicked( void )
-{
-	int half_sample_length = sample_length / 2;
-
-		for (int i=0; i < half_sample_length; i++)
-       		{
-		  // triangle
-       		  sample_shape[i] = 1;
-       		}
-	        for (int i=half_sample_length; i < sample_length; i++)
-	        {
-	          // triangle
-	          sample_shape[i] = -1;
-	        }
-
-	sampleChanged();                                
-                                
-
-}
-
-void bitInvader::noiseWaveClicked( void)
-{
-	srand(time(NULL));
-
-	for (int i=0; i < sample_length; i++)
-	{
-		sample_shape[i]= ((float)rand() / RAND_MAX * 2.0) - 1.0;
-	}
-	
-	sampleChanged();	                                
-	                                
-}
-
-
-*/
 
 
 bitInvader::~bitInvader()
@@ -769,3 +667,6 @@ plugin * lmms_plugin_main( void * _data )
 }
 
 
+
+
+#include "bit_invader.moc"

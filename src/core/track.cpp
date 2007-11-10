@@ -921,8 +921,6 @@ QPixmap * trackOperationsWidget::s_muteOffDisabled;
 QPixmap * trackOperationsWidget::s_muteOffEnabled;
 QPixmap * trackOperationsWidget::s_muteOnDisabled;
 QPixmap * trackOperationsWidget::s_muteOnEnabled;
-QPixmap * trackOperationsWidget::s_trackOpsDisabled;
-QPixmap * trackOperationsWidget::s_trackOpsEnabled;
 
 
 trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
@@ -942,10 +940,6 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 							"mute_on_disabled" ) );
 		s_muteOnEnabled = new QPixmap( embed::getIconPixmap(
 							"mute_on" ) );
-		s_trackOpsDisabled = new QPixmap( embed::getIconPixmap(
-						"track_op_menu_disabled" ) );
-		s_trackOpsEnabled = new QPixmap( embed::getIconPixmap(
-							"track_op_menu" ) );
 	}
 
 	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
@@ -956,8 +950,11 @@ trackOperationsWidget::trackOperationsWidget( trackWidget * _parent ) :
 	connect( to_menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
+	setObjectName( "automationEnabled" );
+
+
 	m_trackOps = new QPushButton( this );
-	m_trackOps->setIcon( *s_trackOpsEnabled );
+	m_trackOps->move( 12, 1 );
 	m_trackOps->setMenu( to_menu );
 	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
@@ -1052,8 +1049,8 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 				if( !m_automationDisabled )
 				{
 					m_automationDisabled = TRUE;
-					m_trackOps->setIcon(
-							*s_trackOpsDisabled );
+					setObjectName( "automationDisabled" );
+					setStyle( NULL );
 					m_muteBtn->setActiveGraphic(
 							*s_muteOnDisabled );
 					m_muteBtn->setInactiveGraphic(
@@ -1065,8 +1062,8 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 				if( m_automationDisabled )
 				{
 					m_automationDisabled = FALSE;
-					m_trackOps->setIcon(
-							*s_trackOpsEnabled );
+					setObjectName( "automationEnabled" );
+					setStyle( NULL );
 					m_muteBtn->setActiveGraphic(
 							*s_muteOnEnabled );
 					m_muteBtn->setInactiveGraphic(

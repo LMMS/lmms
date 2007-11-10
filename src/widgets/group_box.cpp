@@ -25,9 +25,12 @@
  */
 
 
+#include "group_box.h"
+
+
 #include <QtCore/QTimer>
-#include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 
 #ifndef __USE_XOPEN
@@ -37,9 +40,7 @@
 #include <math.h>
 
 
-#include "group_box.h"
 #include "embed.h"
-#include "spc_bg_hndl_widget.h"
 #include "gui_templates.h"
 
 
@@ -68,7 +69,6 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_led->setBgGraphic( specialBgHandlingWidget::getBackground( m_led ) );
 	connect( m_led, SIGNAL( toggled( bool ) ),
 					this, SLOT( setState( bool ) ) );
 }

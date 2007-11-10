@@ -23,21 +23,13 @@
  */
 
 
-#ifndef QT3
+#include "vst_effect.h"
 
 #include <QtGui/QMessageBox>
 
-#else
-
-#include <qmessagebox.h>
-
-#endif
-
-
-#include "vst_effect.h"
-#include "vst_subplugin_features.h"
 #include "song_editor.h"
 #include "text_float.h"
+#include "vst_subplugin_features.h"
 
 
 #undef SINGLE_SOURCE_COMPILE

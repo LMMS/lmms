@@ -1,3 +1,61 @@
+2007-11-10	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* Makefile.am:
+	* include/envelope_and_lfo_widget.h:
+	* include/pixmap_button.h:
+	* include/spc_bg_hndl_widget.h:
+	* include/tab_widget.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/pixmap_button.cpp:
+	* src/widgets/tab_widget.cpp:
+	removed obsolete specialBgHandlingWidget
+
+	* src/core/main_window.cpp:
+	fixed label in save project dialog
+
+	* data/themes/default/style.css:
+	* include/track.h:
+	* src/core/track.cpp:
+	turned more code into style sheet
+
+	* data/themes/default/style.css:
+	* src/core/track.cpp:
+	reverted positioning in style sheet
+
+	* data/themes/default/style.css:
+	restricted style inheritance
+
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/flp_import/unrtf/parse.c:
+	* plugins/vestige/vestige.h:
+	* plugins/vst_effect/vst_control_dialog.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	removed Qt3 code
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/vestige/vestige.cpp:
+	reduced dependencies
+
+	* plugins/bit_invader/bit_invader.cpp:
+	removed deprecated code
+
 2007-11-06	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/track.h:

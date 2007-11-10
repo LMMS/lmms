@@ -23,15 +23,7 @@
  */
 
 
-#ifndef QT3
-
 #include <QtGui/QLayout>
-
-#else
-
-#include <qlayout.h>
-
-#endif
 
 #include "bass_booster.h"
 #include "knob.h"

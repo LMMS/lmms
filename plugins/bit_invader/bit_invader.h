@@ -2,7 +2,7 @@
  * bit_invader.h - declaration of class bitInvader and bSynth which
  *                         are a wavetable synthesizer
  *
- * Copyright (c) 2006 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,28 +29,27 @@
 
 
 #include "instrument.h"
-#include "spc_bg_hndl_widget.h"
-#include "graph.h"
-#include "led_checkbox.h"
-#include "oscillator.h"
+#include "types.h"
 
 class QPixmap;
 
+class graph;
 class knob;
-class notePlayHandle;
+class ledCheckBox;
+class oscillator;
 class pixmapButton;
 
 class bSynth
 {
 public:
-	bSynth(float* sample, int length, float _pitch, bool _interpolation, float factor, const sample_rate_t _sample_rate);
+	bSynth( float * sample, int length, float _pitch, bool _interpolation,
+			float factor, const sample_rate_t _sample_rate );
 	virtual ~bSynth();
 	
-	sample_t nextStringSample();	
+	sample_t nextStringSample();
 
 
 private:
-
 	int sample_index;
 	float sample_realindex;
 	int sample_length;
@@ -61,7 +60,7 @@ private:
 	
 } ;
 
-class bitInvader : public instrument, public specialBgHandlingWidget
+class bitInvader : public instrument
 {
 	Q_OBJECT
 public:
@@ -132,7 +131,6 @@ private:
 } ;
 
 
-#include "bit_invader.moc"
 
 
 #endif

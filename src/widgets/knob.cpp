@@ -51,7 +51,6 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "main_window.h"
-#include "spc_bg_hndl_widget.h"
 #include "string_pair_drag.h"
 #include "templates.h"
 #include "text_float.h"
@@ -160,8 +159,6 @@ void knob::setTotalAngle( float _angle )
 
 void knob::drawKnob( QPainter * _p )
 {
-	_p->drawPixmap( 0, 0, specialBgHandlingWidget::getBackground( this ) );
-
 	const float radius = m_knobPixmap->width() / 2 - 1;
 	const float xm = m_knobPixmap->width() / 2;//radius + 1;
 	const float ym = m_knobPixmap->height() / 2;//radius+1;

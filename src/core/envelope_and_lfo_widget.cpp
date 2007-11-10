@@ -26,27 +26,28 @@
  */
 
 
-#include <QtGui/QPainter>
-#include <QtGui/QPaintEvent>
-#include <Qt/QtXml>
-#include <QtGui/QLabel>
-
-
 #include "envelope_and_lfo_widget.h"
-#include "song_editor.h"
+
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtXml/QDomElement>
+
+
+#include "debug.h"
 #include "embed.h"
 #include "engine.h"
-#include "knob.h"
-#include "pixmap_button.h"
-#include "oscillator.h"
-#include "debug.h"
-#include "tooltip.h"
 #include "gui_templates.h"
+#include "knob.h"
 #include "led_checkbox.h"
-#include "tempo_sync_knob.h"
-#include "string_pair_drag.h"
 #include "mmp.h"
+#include "oscillator.h"
+#include "pixmap_button.h"
+#include "song_editor.h"
+#include "string_pair_drag.h"
+#include "tempo_sync_knob.h"
 #include "text_float.h"
+#include "tooltip.h"
 
 
 
@@ -95,7 +96,6 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							QWidget * _parent,
 							track * _track ) :
 	QWidget( _parent ),
-	specialBgHandlingWidget( palette().color( backgroundRole() ) ),
 	m_used( FALSE ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdEnv( NULL ),

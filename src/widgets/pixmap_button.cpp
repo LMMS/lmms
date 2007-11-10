@@ -39,13 +39,10 @@ pixmapButton::pixmapButton( QWidget * _parent, const QString & _name,
 							track * _track ) :
 	automatableButton( _parent, _name, _track ),
 	m_activePixmap(),
-	m_inactivePixmap(),
-	m_bgPixmap()
+	m_inactivePixmap()
 {
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
 	setInactiveGraphic( embed::getIconPixmap( "led_off" ), FALSE );
-
-	//setCheckable( TRUE );
 }
 
 
@@ -61,11 +58,6 @@ pixmapButton::~pixmapButton()
 void pixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-
-	if( !m_bgPixmap.isNull() )
-	{
-		p.drawPixmap( 0, 0, m_bgPixmap );
-	}
 
 	if( isChecked() )
 	{
@@ -127,13 +119,6 @@ void pixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 	}
 }
 
-
-
-
-void pixmapButton::setBgGraphic( const QPixmap & _pm )
-{
-	m_bgPixmap = _pm;
-}
 
 
 

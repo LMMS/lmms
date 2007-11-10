@@ -23,15 +23,9 @@
  */
 
 
-#ifndef QT3
+#include "vst_control_dialog.h"
 
 #include <QtGui/QLayout>
-
-#else
-
-#include <qlayout.h>
-
-#endif
 
 #include "vst_effect.h"
 
@@ -45,11 +39,7 @@ vstControlDialog::vstControlDialog( QWidget * _parent,
 	QWidget * pw = m_effect->m_plugin->pluginWidget();
 	if( pw )
 	{
-#ifndef QT3
 		pw->setParent( this );
-#else
-		pw->reparent( this, QPoint( 0, 0 ) );
-#endif
 		pw->show();
 		l->addWidget( pw );
 	}

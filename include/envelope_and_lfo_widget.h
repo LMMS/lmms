@@ -28,14 +28,13 @@
 #ifndef _ENVELOPE_AND_LFO_WIDGET_H
 #define _ENVELOPE_AND_LFO_WIDGET_H
 
-#include <QtGui/QWidget>
 #include <QtCore/QVector>
+#include <QtGui/QWidget>
 
 
 #include "journalling_object.h"
-#include "types.h"
-#include "spc_bg_hndl_widget.h"
 #include "sample_buffer.h"
+#include "types.h"
 
 
 class QPaintEvent;
@@ -53,8 +52,7 @@ class track;
 class flpImport;
 
 
-class envelopeAndLFOWidget : public QWidget, public journallingObject,
-				public specialBgHandlingWidget
+class envelopeAndLFOWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:

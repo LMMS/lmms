@@ -23,19 +23,12 @@
  */
 
 
-#include <QtGui/QPainter>
-#include <Qt/QtXml>
-#include <QtGui/QDropEvent>
-
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include "math.h"
-
-using namespace std;
-
-
 #include "organic.h"
+
+
+#include <QtXml/QDomElement>
+
+
 #include "engine.h"
 #include "instrument_track.h"
 #include "knob.h"
@@ -83,7 +76,6 @@ QPixmap * organicInstrument::s_artwork = NULL;
 organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track,
 			&organic_plugin_descriptor ),
-	specialBgHandlingWidget( PLUGIN_NAME::getIconPixmap( "artwork" ) ),
 	m_modulationAlgo( oscillator::MIX )
 {
 	m_num_oscillators = 8;
@@ -525,3 +517,7 @@ plugin * lmms_plugin_main( void * _data )
  * - randomize preset
  */
 
+
+
+
+#include "organic.moc"
