@@ -913,26 +913,7 @@ QString sampleBuffer::openAudioFile( void ) const
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	// set filters
-#ifdef QT4
-	QStringList types;
-	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.ds *.spx *.voc *.aif "
-							"*.aiff *.au *.raw)" )
-		<< tr( "Wave-Files (*.wav)" )
-		<< tr( "OGG-Files (*.ogg)" )
-		<< tr( "DrumSynth-Files (*.ds)" )
-		<< tr( "FLAC-Files (*.flac)" )
-		<< tr( "SPEEX-Files (*.spx)" )
-		//<< tr( "MP3-Files (*.mp3)" )
-		//<< tr( "MIDI-Files (*.mid)" )
-		<< tr( "VOC-Files (*.voc)" )
-		<< tr( "AIFF-Files (*.aif *.aiff)" )
-		<< tr( "AU-Files (*.au)" )
-		<< tr( "RAW-Files (*.raw)" )
-		//<< tr( "MOD-Files (*.mod)" )
-		;
-	ofd.setFilters( types );
-#else
-	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.flac *.ds *.spx *.voc "
+	ofd.addFilter( tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
 						"*.aif *.aiff *.au *.raw)" ) );
 	ofd.addFilter( tr( "Wave-Files (*.wav)" ) );
 	ofd.addFilter( tr( "OGG-Files (*.ogg)" ) );
@@ -948,7 +929,6 @@ QString sampleBuffer::openAudioFile( void ) const
 	//ofd.addFilter (tr("MOD-Files (*.mod)"));
 	ofd.setSelectedFilter( tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx "
 					"*.voc *.aif *.aiff *.au *.raw)" ) );
-#endif
 	if( m_audioFile != "" )
 	{
 		// select previously opened file

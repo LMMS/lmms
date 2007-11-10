@@ -1,12 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Note detuning</source>
-        <translation type="obsolete">Noten-Verstimmung</translation>
-    </message>
-</context>
-<context>
     <name>QWidget</name>
     <message>
         <source>Name: </source>
@@ -90,18 +83,6 @@ Wenn Sie an der Übersetzung von LMMS in eine andere Sprache interessiert sind o
     <message>
         <source>Linux MultiMedia Studio %1</source>
         <translation>Linux MultiMedia Studio %1</translation>
-    </message>
-    <message>
-        <source>LMMS - A powerful synthesizer-studio
-
-Copyright (c) 2004-2006 LMMS-Developers
-
-http://lmms.sourceforge.net</source>
-        <translation type="obsolete">LMMS - Ein leistungsfähiges Synthesizer-Studio
-
-Copyright (c) 2004-2006 LMMS-Entwickler
-
-http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>LMMS - A powerful synthesizer-studio
@@ -746,38 +727,6 @@ http://lmms.sourceforge.net</translation>
         <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
     </message>
     <message>
-        <source>Draw mode (D)</source>
-        <translation type="obsolete">Zeichnen-Modus (D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (E)</source>
-        <translation type="obsolete">Löschen-Modus (E)</translation>
-    </message>
-    <message>
-        <source>Select mode (S)</source>
-        <translation type="obsolete">Auswahl-Modus (S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (M)</source>
-        <translation type="obsolete">Verschieben-Modus (M)</translation>
-    </message>
-    <message>
-        <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
-    </message>
-    <message>
-        <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
         <source>Cut selected values (Ctrl+X)</source>
         <translation>Ausgewählte Werte ausschneiden (Strg+X)</translation>
     </message>
@@ -1030,93 +979,6 @@ http://lmms.sourceforge.net</translation>
     </message>
 </context>
 <context>
-    <name>channelTrack</name>
-    <message>
-        <source>With this knob you can set the volume of the opened channel.</source>
-        <translation type="obsolete">Mit diesem Knopf können Sie die Lautstärke des geöffneten Kanals ändern.</translation>
-    </message>
-    <message>
-        <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
-        <translation type="obsolete">Innerhalb dieses Rechtecks können Sie die Position setzen, an der dieser Kanal zu hören sein soll. Um dieses Feature sinnvoll zu nutzen, sollten Sie eine Soundkarte haben, die mindestens Surround 4.0 unterstützt.</translation>
-    </message>
-    <message>
-        <source>Save current channel settings in a preset-file</source>
-        <translation type="obsolete">Aktuelle Kanal-Einstellungen in einer Preset-Datei speichern</translation>
-    </message>
-    <message>
-        <source>Channel volume</source>
-        <translation type="obsolete">Kanal Lautstärke</translation>
-    </message>
-    <message>
-        <source>Channel volume:</source>
-        <translation type="obsolete">Kanal Lautstärke:</translation>
-    </message>
-    <message>
-        <source>Channel-Settings-File (*.cs.xml)</source>
-        <translation type="obsolete">Channel-Settings-Datei (*.cs.xml)</translation>
-    </message>
-    <message>
-        <source>Save channel-settings in file</source>
-        <translation type="obsolete">Kanal-Einstellungen in Datei speichern</translation>
-    </message>
-    <message>
-        <source>VOLUME</source>
-        <translation type="obsolete">LAUTSTÄRKE</translation>
-    </message>
-    <message>
-        <source>FX CHNL</source>
-        <translation type="obsolete">FX KANAL</translation>
-    </message>
-    <message>
-        <source>ENV/LFO/FILTER</source>
-        <translation type="obsolete">HÜLLK./LFO/FILTER</translation>
-    </message>
-    <message>
-        <source>ARP/CHORD</source>
-        <translation type="obsolete">ARP/AKK.</translation>
-    </message>
-    <message>
-        <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation type="obsolete">Klicken Sie hier, wenn Sie die aktuellen Kanal-Einstellungen in einer Preset-Datei speichern wollen. Spätern können Sie dieses Preset laden, indem Sie es im Preset-Browser doppelt anklicken.</translation>
-    </message>
-    <message>
-        <source>VOL</source>
-        <translation type="obsolete">LAUT</translation>
-    </message>
-    <message>
-        <source>GENERAL SETTINGS</source>
-        <translation type="obsolete">GRUNDLEGENDE EINSTELLUNGEN</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation type="obsolete">MIDI</translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
-        <translation type="obsolete">PLUGIN</translation>
-    </message>
-    <message>
-        <source>unnamed_channel</source>
-        <translation type="obsolete">Unbenannter_Kanal</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">Default</translation>
-    </message>
-    <message>
-        <source>MIDI input/output</source>
-        <translation type="obsolete">MIDI-Eingabe/Ausgabe</translation>
-    </message>
-    <message>
-        <source>MIDI input</source>
-        <translation type="obsolete">MIDI-Eingabe</translation>
-    </message>
-    <message>
-        <source>MIDI output</source>
-        <translation type="obsolete">MIDI-Ausgabe</translation>
-    </message>
-</context>
-<context>
     <name>comboBox</name>
     <message>
         <source>&amp;Open in automation editor</source>
@@ -1156,43 +1018,12 @@ Dieses Verzeichnis wird genutzt, um Ihre Projekte, Presets, Samples usw. darin a
 Bitte wählen Sie ein Verzeichnis:</translation>
     </message>
     <message>
-        <source>For using the ready presets and samples of LMMS and enjoying the demo-songs the according files have to be copied or linked into your LMMS-working-directory.
-When copying files, you can modify them, but they need additional space in your working-directory. If you link files, you cannot modify them, but they need no extra space. So it&apos;s recommended to copy presets and demo-projects and link samples, which are bigger in size.
-</source>
-        <translation type="obsolete">Damit Sie die fertigen Presets und Samples von LMMS nutzen können und mit den Demo-Songs herumspielen können, müssen die entsprechenden Dateien in Ihr LMMS-Arbeitsverzeichnis kopiert oder verknüpft werden.
-Kopierte Dateien können Sie ändern, aber gleichzeitig belegen diese auch zusätzlichen Speicherplatz in Ihrem Arbeitsverzeichnis. Wenn Sie Dateien verknüpfen, können Sie diese nicht verändern, brauchen dafür aber auch keinen extra Speicherplatz. Deshalb wird empfohlen, Presets und Demo-Projekte zu kopieren und die Samples zu verknüpfen, da letztere doch eine gewisse Größe haben.</translation>
-    </message>
-    <message>
-        <source>samples:</source>
-        <translation type="obsolete">Samples:</translation>
-    </message>
-    <message>
-        <source>copy</source>
-        <translation type="obsolete">Kopieren</translation>
-    </message>
-    <message>
-        <source>link</source>
-        <translation type="obsolete">Verknüpfen</translation>
-    </message>
-    <message>
-        <source>presets:</source>
-        <translation type="obsolete">Presets:</translation>
-    </message>
-    <message>
-        <source>demo projects:</source>
-        <translation type="obsolete">Demo Projekte:</translation>
-    </message>
-    <message>
         <source>Welcome to LMMS</source>
         <translation>Willkommen bei LMMS</translation>
     </message>
     <message>
         <source>Select working directory</source>
         <translation>Arbeitsverzeichnis auswählen</translation>
-    </message>
-    <message>
-        <source>Copy or link files</source>
-        <translation type="obsolete">Dateien kopieren oder verknüpfen</translation>
     </message>
     <message>
         <source>Directory not existing</source>
@@ -1554,10 +1385,6 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
         <translation>Moog</translation>
     </message>
     <message>
-        <source>Here you can select the built-in filter you want to use in this channel. Filters are very important for changing the characteristics of a sound.</source>
-        <translation type="obsolete">Hier können Sie den eingebauten Filter wählen, den Sie in diesem Kanal verwenden wollen. Filter sind sehr wichtig, um den Charakter eines Klangs zu ändern.</translation>
-    </message>
-    <message>
         <source>Hz</source>
         <translation>Hz</translation>
     </message>
@@ -1698,18 +1525,6 @@ Stellen Sie sicher, dass Sie Schreibzugriff auf die gewählte Datei/Gerät haben
     <message>
         <source>Reload (F5)</source>
         <translation>Neu laden (F5)</translation>
-    </message>
-    <message>
-        <source>Send to active channel</source>
-        <translation type="obsolete">An aktiven Kanal senden</translation>
-    </message>
-    <message>
-        <source>Open in new channel/Song-Editor</source>
-        <translation type="obsolete">In neuem Kanal im Song-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Open in new channel/B+B Editor</source>
-        <translation type="obsolete">In neuem Kanal im B+B Editor öffnen</translation>
     </message>
     <message>
         <source>Send to active instrument-track</source>
@@ -2137,49 +1952,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ladspaSubPluginDescriptionWidget</name>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Beschreibung</translation>
-    </message>
-    <message>
-        <source>Name: </source>
-        <translation type="obsolete"> Name:</translation>
-    </message>
-    <message>
-        <source>Maker: </source>
-        <translation type="obsolete"> Hersteller:</translation>
-    </message>
-    <message>
-        <source>Copyright: </source>
-        <translation type="obsolete"> Copyright:</translation>
-    </message>
-    <message>
-        <source>Requires Real Time: Yes</source>
-        <translation type="obsolete">Benötigt Echtzeit: ja</translation>
-    </message>
-    <message>
-        <source>Requires Real Time: No</source>
-        <translation type="obsolete">Benötigt Echtzeit: nein</translation>
-    </message>
-    <message>
-        <source>Real Time Capable: Yes</source>
-        <translation type="obsolete">Echtzeitfähig: ja</translation>
-    </message>
-    <message>
-        <source>Real Time Capable: No</source>
-        <translation type="obsolete">Echtzeitfähig: nein</translation>
-    </message>
-    <message>
-        <source>Channels In: </source>
-        <translation type="obsolete"> Eingangs-Kanäle:</translation>
-    </message>
-    <message>
-        <source>Channels Out: </source>
-        <translation type="obsolete"> Ausgangs-Kanäle:</translation>
-    </message>
-</context>
-<context>
     <name>lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
@@ -2279,7 +2051,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>DIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DIST</translation>
     </message>
     <message>
         <source>Waveform</source>
@@ -2316,69 +2088,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>Moog </source>
         <translation>Moog </translation>
-    </message>
-</context>
-<context>
-    <name>lb303Synth</name>
-    <message>
-        <source>VCF Cutoff Frequency</source>
-        <translation type="obsolete">VCF-Kennfrequenz</translation>
-    </message>
-    <message>
-        <source>Cutoff Freq:</source>
-        <translation type="obsolete">Kennfreq.:</translation>
-    </message>
-    <message>
-        <source>VCF Resonance</source>
-        <translation type="obsolete">VCF-Resonanz</translation>
-    </message>
-    <message>
-        <source>Resonance:</source>
-        <translation type="obsolete">Resonanz:</translation>
-    </message>
-    <message>
-        <source>VCF Envelope Mod</source>
-        <translation type="obsolete">VCF-Hüllkurvenintensität</translation>
-    </message>
-    <message>
-        <source>VCF Envelope Decay</source>
-        <translation type="obsolete">VCF-Hüllkurvenabfallzeit</translation>
-    </message>
-    <message>
-        <source>Decay:</source>
-        <translation type="obsolete">Abfallzeit (decay):</translation>
-    </message>
-    <message>
-        <source>Accent</source>
-        <translation type="obsolete">Betonung</translation>
-    </message>
-    <message>
-        <source>Dead</source>
-        <translation type="obsolete">Tot</translation>
-    </message>
-    <message>
-        <source>Slide Decay</source>
-        <translation type="obsolete">Slide-Abfallzeit</translation>
-    </message>
-    <message>
-        <source>Slide Decay:</source>
-        <translation type="obsolete">Slide-Abfallzeit:</translation>
-    </message>
-    <message>
-        <source>Waveform</source>
-        <translation type="obsolete">Wellenform</translation>
-    </message>
-    <message>
-        <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
-        <translation type="obsolete">Feinverstimmung des VCOs. Bereich zwischen -100 und 100 Cents.</translation>
-    </message>
-    <message>
-        <source>VCO Fine Detuning:</source>
-        <translation type="obsolete">VCO Feinverstimmung:</translation>
-    </message>
-    <message>
-        <source>Distortion</source>
-        <translation type="obsolete">Verzerrung</translation>
     </message>
 </context>
 <context>
@@ -2515,14 +2224,6 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
         <translation>Speichern &amp;als...</translation>
     </message>
     <message>
-        <source>Import file</source>
-        <translation type="obsolete">Datei importieren</translation>
-    </message>
-    <message>
-        <source>E&amp;xport</source>
-        <translation type="obsolete">E&amp;xportieren</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
@@ -2563,16 +2264,8 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
         <translation>Projekt öffnen</translation>
     </message>
     <message>
-        <source>MultiMedia Project (*.mmp *.xml)</source>
-        <translation type="obsolete">MultiMedia-Projekt (*.mmp *.xml)</translation>
-    </message>
-    <message>
         <source>Save project</source>
         <translation>Projekt speichern</translation>
-    </message>
-    <message>
-        <source>MultiMedia Project (*.mmp);;MultiMedia Project Template (*.mpt)</source>
-        <translation type="obsolete">MultiMedia-Projekt (*.mmp);;MultiMedia-Projekt-Vorlage (*.mpt)</translation>
     </message>
     <message>
         <source>Help not available</source>
@@ -2615,10 +2308,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     <message>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Durch das Drücken dieses Knopfes können Sie den Automation-Editor ein- oder ausblenden. Mit Hilfe des Automation-Editors können Sie dynamische Werte auf eine einfache Art und Weise bearbeiten.</translation>
-    </message>
-    <message>
-        <source>LADSPA Plugins...</source>
-        <translation type="obsolete">LADSPA-Plugins...</translation>
     </message>
     <message>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
@@ -3098,14 +2787,6 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
         <translation>Erneut einfrieren</translation>
     </message>
     <message>
-        <source>Channel muted</source>
-        <translation type="obsolete">Kanal stumm geschalten</translation>
-    </message>
-    <message>
-        <source>The channel this pattern belongs to is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation type="obsolete">Der Kanal, zu dem dieser Pattern gehört, ist derzeit stumm geschaltet, weshalb das Einfrieren keinen Sinn ergibt! Wollen Sie trotzdem fortfahren?</translation>
-    </message>
-    <message>
         <source>Add steps</source>
         <translation>Steps hinzufügen</translation>
     </message>
@@ -3127,14 +2808,6 @@ use mouse wheel to set volume of a step</source>
         <translation>Doppelklick, um diesen Pattern im Piano-Roll zu öffnen
 Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
-    <message>
-        <source>Pattern muted</source>
-        <translation type="obsolete">Pattern stummgeschaltet</translation>
-    </message>
-    <message>
-        <source>The track this pattern belongs to or the pattern itself is currently muted therefore freezing makes no sense! Do you still want to continue?</source>
-        <translation type="obsolete">Die Spur, zu der dieser Pattern gehört oder dieser Pattern selbst sind derzeit stummgeschaltet, weshalb das Einfrieren keinen Sinn ergibt. Wollen Sie trotzdem fortfahren?</translation>
-    </message>
 </context>
 <context>
     <name>patternFreezeStatusDialog</name>
@@ -3149,18 +2822,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
 </context>
 <context>
     <name>pianoRoll</name>
-    <message>
-        <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;E&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;S&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;M&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Verschiebe-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
     <message>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Ausgewählte Noten ausschneiden (Strg+X)</translation>
@@ -3202,10 +2863,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
     </message>
     <message>
-        <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;D&apos; on your keyboard to activate this mode.</source>
-        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen, deren Größe ändern oder sie verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
-    </message>
-    <message>
         <source>Piano-Roll - %1</source>
         <translation>Piano-Roll - %1</translation>
     </message>
@@ -3224,22 +2881,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
         <translation>Klicken Sie hier, wenn Sie Noten von einem MIDI-Gerät oder dem virtuellen Test-Klavier des zugehörigen Kanal-Fensters in den aktuellen Pattern aufnehmen wollen. Beim Aufnehmen werden alle Noten, die Sie spielen, in diesen Pattern geschrieben und hinterher können Sie diese abspielen und bearbeiten.</translation>
-    </message>
-    <message>
-        <source>Draw mode (D)</source>
-        <translation type="obsolete">Zeichnen-Modus (D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (E)</source>
-        <translation type="obsolete">Löschen-Modus (E)</translation>
-    </message>
-    <message>
-        <source>Select mode (S)</source>
-        <translation type="obsolete">Auswahl-Modus (S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (M)</source>
-        <translation type="obsolete">Verschieben-Modus (M)</translation>
     </message>
     <message>
         <source>Notes copied</source>
@@ -3335,10 +2976,6 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <translation>Drei leistungsfähige Oszillatoren, die Sie auf verschiedene Art und Weise modulieren können</translation>
     </message>
     <message>
-        <source>simple sampler with various settings for using samples (e.g. drums) in a channel</source>
-        <translation type="obsolete">Einfacher Sampler mit verschiedenen Einstellungen zum Benutzen von Samples (z.B. Drums) in einem Kanal</translation>
-    </message>
-    <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
         <translation>VST-Host zum Benutzen von VST(i)-Plugins innerhalb von LMMS</translation>
     </message>
@@ -3405,6 +3042,141 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Tool for live performance</source>
         <translation>Werkzeug für Live-Auftritte</translation>
+    </message>
+    <message>
+        <source>Incomplete polyphonic immitation tb303</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin for enhancing stereo separation of a stereo input file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>polyb302Synth</name>
+    <message>
+        <source>VCF Cutoff Frequency</source>
+        <translation type="unfinished">VCF-Kennfrequenz</translation>
+    </message>
+    <message>
+        <source>Cutoff Freq:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CUT</source>
+        <translation type="unfinished">FREQ</translation>
+    </message>
+    <message>
+        <source>VCF Resonance</source>
+        <translation type="unfinished">VCF-Resonanz</translation>
+    </message>
+    <message>
+        <source>Resonance:</source>
+        <translation type="unfinished">Resonanz:</translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished">RES</translation>
+    </message>
+    <message>
+        <source>VCF Envelope Mod</source>
+        <translation type="unfinished">VCF-Hüllkurvenintensität</translation>
+    </message>
+    <message>
+        <source>Env Mod:</source>
+        <translation type="unfinished">Hüllkurven-Modulation:</translation>
+    </message>
+    <message>
+        <source>ENV MOD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCF Envelope Decay</source>
+        <translation type="unfinished">VCF-Hüllkurvenabfallzeit</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation type="unfinished">Abfallzeit (decay):</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation type="unfinished">DEC</translation>
+    </message>
+    <message>
+        <source>303-es-que, 24dB/octave, 3 pole filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slide Decay</source>
+        <translation type="unfinished">Slide-Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Slide Decay:</source>
+        <translation type="unfinished">Slide-Abfallzeit:</translation>
+    </message>
+    <message>
+        <source>SLIDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCO fine detuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCO Fine Detuning:</source>
+        <translation type="unfinished">VCO Feinverstimmung:</translation>
+    </message>
+    <message>
+        <source>DETUNE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distortion</source>
+        <translation type="unfinished">Verzerrung</translation>
+    </message>
+    <message>
+        <source>DIST:</source>
+        <translation type="unfinished">Verzerrung:</translation>
+    </message>
+    <message>
+        <source>DIST</source>
+        <translation type="unfinished">DIST</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation type="unfinished">Wellenform</translation>
+    </message>
+    <message>
+        <source>WAVE:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WAVE</source>
+        <translation type="unfinished">WELLE</translation>
+    </message>
+    <message>
+        <source>Sawtooth </source>
+        <translation type="unfinished">Sägezahn </translation>
+    </message>
+    <message>
+        <source>Inverted Sawtooth </source>
+        <translation type="unfinished">Invertierter Sägezahn </translation>
+    </message>
+    <message>
+        <source>Triangle </source>
+        <translation type="unfinished">Dreieck </translation>
+    </message>
+    <message>
+        <source>Square </source>
+        <translation type="unfinished">Rechteck</translation>
+    </message>
+    <message>
+        <source>Rounded Square </source>
+        <translation type="unfinished">Abgerundetes Reckteck</translation>
+    </message>
+    <message>
+        <source>Moog </source>
+        <translation type="unfinished">Moog </translation>
     </message>
 </context>
 <context>
@@ -3676,20 +3448,20 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
         <translation>Audio-Datei öffnen</translation>
     </message>
     <message>
-        <source>All Audio-Files (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation type="obsolete">Alle Audio-Dateien (*.wav *.ogg *.flac *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
-    <message>
         <source>FLAC-Files (*.flac)</source>
         <translation>FLAC-Dateien (*.flac)</translation>
     </message>
     <message>
-        <source>All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation>Alle Audio-Dateien (*.wav *.ogg *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
-    <message>
         <source>SPEEX-Files (*.spx)</source>
         <translation>SPEEX-Dateien (*.spx)</translation>
+    </message>
+    <message>
+        <source>DrumSynth-Files (*.ds)</source>
+        <translation>DrumSynth-Dateien (*.ds)</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>Alle Audio-Dateien (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
 </context>
 <context>
@@ -3895,10 +3667,6 @@ Latenz: %2 ms</translation>
         <translation>Parallelisierungs-Level</translation>
     </message>
     <message>
-        <source>SMP-level</source>
-        <translation type="obsolete">SMP-Level</translation>
-    </message>
-    <message>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation>Wenn Sie einen Computer mit mehr als einem Prozessor besitzen (z.B. Dual-Core-Systeme), sollten Sie einen Parallelisierungs-Level größer 1 wählen. Das bedeutet, dass LMMS versuchen wird, die Sound-Verarbeitung in mehrere Threads aufzuteilen, welche dann vom Betriebsystem auf unterschiedlichen Kernen ausgeführt werden sollten.
@@ -4045,10 +3813,6 @@ Wollen Sie diese überschreiben?</translation>
         <translation>Datei importieren</translation>
     </message>
     <message>
-        <source>MIDI-files (*.mid)</source>
-        <translation type="obsolete">MIDI-Dateien (*.mid)</translation>
-    </message>
-    <message>
         <source>TEMPO/BPM</source>
         <translation>TEMPO/BPM</translation>
     </message>
@@ -4115,6 +3879,21 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Tempo</source>
         <translation>Tempo</translation>
+    </message>
+</context>
+<context>
+    <name>stereoEnhancerControlDialog</name>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WIDE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4292,34 +4071,12 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
         <translation>Bitte warten...</translation>
     </message>
     <message>
-        <source>Could not open file</source>
-        <translation type="obsolete">Konnte Datei nicht öffnen</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for reading.
-Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation type="obsolete">Die Datei %1 konnte nicht zum Lesen geöffnet werden.
-Bitte stellen Sie sicher, dass Sie Leserechte auf die Datei und auf das Verzeichnis, das diese Datei beinhaltet, haben und versuchen es erneut!</translation>
-    </message>
-    <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="obsolete">Die Datei %1 konnte nicht zum Schreiben geöffnet werden.
-Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeichnis, das diese Datei enthält, besitzen und versuchen es erneut!</translation>
-    </message>
-    <message>
         <source>Importing MIDI-file...</source>
         <translation>Importiere MIDI-Datei...</translation>
     </message>
     <message>
         <source>Couldn&apos;t import file</source>
         <translation>Konnte Datei nicht importieren</translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t find a filter for importing file %1.
-You should convert this file into a format supported by LMMS using another software. </source>
-        <translation type="obsolete">Konnte keinen Filter finden, um die Datei %1 zu importieren.
-Sie sollten diese Datei mit Hilfe einer anderen Software in ein Format konvertieren, das von LMMS unterstützt wird.</translation>
     </message>
     <message>
         <source>Couldn&apos;t open file</source>
@@ -4857,21 +4614,6 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Bitte geben Sie einen neuen Wert zwischen %1 und %2 ein:</translation>
-    </message>
-</context>
-<context>
-    <name>vstSubPluginDescriptionWidget</name>
-    <message>
-        <source>Description</source>
-        <translation type="obsolete">Beschreibung</translation>
-    </message>
-    <message>
-        <source>Name: </source>
-        <translation type="obsolete"> Name:</translation>
-    </message>
-    <message>
-        <source>File: </source>
-        <translation type="obsolete"> Datei:</translation>
     </message>
 </context>
 </TS>
