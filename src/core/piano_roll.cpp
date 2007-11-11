@@ -1363,7 +1363,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// then set new note
 					midiTime note_pos( note::quantized(
 								midiTime( pos_tact_64th ),
-								quantization(), 0.8f ) );
+								quantization(), 0.9f ) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos,
