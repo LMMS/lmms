@@ -1,3 +1,23 @@
+2007-11-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/note.h:
+	* src/core/note.cpp:
+	* src/core/piano_roll.cpp:
+	when adding new notes in piano-roll via mouse use alignment-border of
+	80/20 instead of 50/50 which makes piano-roll more usable
+
+2007-11-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/presets/AudioFileProcessor/Erazor.cs.xml:
+	added preset
+
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	updated German localization-files
+
+	* src/lib/sample_buffer.cpp:
+	fixed file-filter in file-selection-dialog
+
 2007-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/note_play_handle.cpp:

@@ -1361,7 +1361,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 						pattern::MELODY_PATTERN );
 
 					// then set new note
-					midiTime note_pos( pos_tact_64th );
+					midiTime note_pos( note::quantized(
+								midiTime( pos_tact_64th ),
+								quantization(), 0.8f ) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos,
@@ -1371,7 +1373,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 							NOTES_PER_OCTAVE) );
 
 					note * created_new_note =
-						m_pattern->addNote( new_note );
+						m_pattern->addNote( new_note, FALSE );
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this

@@ -177,10 +177,11 @@ void note::setPanning( const panning _panning )
 
 
 
-midiTime note::quantized( const midiTime & _m, const int _q_grid )
+midiTime note::quantized( const midiTime & _m, const int _q_grid,
+							const float _align )
 {
-	float p = ( (float) _m / _q_grid );
-	if( p - floorf( p ) < 0.5f )
+	const float p = ( (float) _m / _q_grid );
+	if( p - floorf( p ) < _align )
 	{
 		return( static_cast<int>( p ) * _q_grid );
 	}

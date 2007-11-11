@@ -172,7 +172,8 @@ public:
 	}
 
 	static midiTime FASTCALL quantized( const midiTime & _m,
-							const int _q_grid );
+						const int _q_grid,
+						const float _align = 0.5f );
 
 	detuningHelper * detuning( void ) const
 	{
