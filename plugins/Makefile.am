@@ -27,6 +27,7 @@ SUBDIRS =			\
 	organic			\
 	patman			\
 	$(SINGERBOT_DIR)	\
+	stereo_enhancer		\
 	$(STK_DIR)		\
 	triple_oscillator	\
 	$(VST_DIRS)		\
