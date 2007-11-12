@@ -169,7 +169,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
-		$(srcdir)/src/core/ladspa_base.cpp			\
 		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\

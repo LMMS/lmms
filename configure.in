@@ -263,11 +263,12 @@ fi
 if test ! -z "$HAVE_LADSPA_H" ; then
 	AC_DEFINE(HAVE_LADSPA_H)
 fi
-if [ "$build_linux" = "true" ] ; then
+#if [ "$build_linux" = "true" ] ; then
 	AC_DEFINE(LADSPA_SUPPORT)
-fi
+#fi
 #AM_CONDITIONAL(HAVE_LADSPA_H, test ! -z "$HAVE_LADSPA_H")
-AM_CONDITIONAL(LADSPA_SUPPORT, test "$build_linux" = "true" )
+#AM_CONDITIONAL(LADSPA_SUPPORT, test "$build_linux" = "true" )
+AM_CONDITIONAL(LADSPA_SUPPORT, test true )
 
 
 # check for STK
@@ -792,7 +793,7 @@ fi
 
 
 
-if test "$build_linux" = "true" ; then
+#if test "$build_linux" = "true" ; then
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* LADSPA-plugins"
 	if test -z "$HAVE_LADSPA_H" ; then
 		echo " ========================"
@@ -808,16 +809,16 @@ if test "$build_linux" = "true" ; then
 		echo " ="
 		with_warnings="true"
 	fi
-else
-	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
-	echo " ========================"
-	echo " ="
-	echo " = You're building LMMS for a platform other than Linux which will prevent"
-	echo " = configure from enabling LADSPA-support."
-	echo " ="
-	with_warnings="true"
-fi
+#else
+#	echo " ========================"
+#	echo " ===  LMMS - WARNING  ======================================================="
+#	echo " ========================"
+#	echo " ="
+#	echo " = You're building LMMS for a platform other than Linux which will prevent"
+#	echo " = configure from enabling LADSPA-support."
+#	echo " ="
+#	with_warnings="true"
+#fi
 
 
 
