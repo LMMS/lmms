@@ -31,4 +31,5 @@ SUBDIRS =			\
 	triple_oscillator	\
 	$(VST_DIRS)		\
 	vibed			\
+	stereo_enhancer		\
 	$(EXTRA_PLUGINS)
