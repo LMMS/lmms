@@ -639,6 +639,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/vibed/Makefile
 		 plugins/vst_base/Makefile
 		 plugins/vst_effect/Makefile
+		 plugins/stereo_enhancer/Makefile
 		 lmms.spec])
 LOCAL_EXTRA_PLUGINS
 AC_OUTPUT
