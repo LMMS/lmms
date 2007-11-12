@@ -1,3 +1,13 @@
+2007-11-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
+	* plugins/stereo_enhancer/Makefile.am:
+	added StereoEnhancer-plugin from
+	Lou Herard <lherard /at/ gmail /dot/ com>
+
 2007-11-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/note.h:
