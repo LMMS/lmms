@@ -444,18 +444,42 @@ namespace effectLib
 			m_wideCoeff( _wide_coeff )
 		{
 		}
+		
+		// Lou's Hack
+		void setWideCoeff( const float _wideCoeff )
+		{
+			m_wideCoeff = _wideCoeff;
+		}
+		
+		int getWideCoeff()
+		{
+			return m_wideCoeff;
+		}
+		// -----------
 
 		virtual void nextSample( SAMPLE & _in_left,
 						SAMPLE & _in_right ) const
 		{
+			/*
 			const float delta = ( _in_left -
 				( _in_left+_in_right ) / 2.0f ) * m_wideCoeff;
 			_in_left += delta;
 			_in_right -= delta;
+			*/
+
+			
+			// Lou's Hack
+			// I really can't tell you why this math works, but it sounds good
+			float toRad = 3.141592 / 180;
+			_in_left += _in_right * sinf( m_wideCoeff * .5 * toRad);
+			_in_right -= _in_left * sinf( m_wideCoeff * .5 * toRad);
+			
 		}
 
 	private:
-		const float m_wideCoeff;
+		// Lou's Hack
+		int m_wideCoeff;
+		//-----------
 	} ;
 
 } ;
