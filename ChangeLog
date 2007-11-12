@@ -1,5 +1,8 @@
 2007-11-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* configure.in:
+	made 0.3.1 release
+
 	* samples/data/drumsynth/*:
 	replaced spaces in filenames with underscores
 
