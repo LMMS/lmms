@@ -23,7 +23,7 @@
  */
 
 
-#include <QtGui/QLayout>
+#include <qlayout.h>
 
 #include "stereo_enhancer.h"
 #include "knob.h"
