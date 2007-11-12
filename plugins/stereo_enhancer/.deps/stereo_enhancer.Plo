@@ -1,0 +1,1054 @@
+stereo_enhancer.lo stereo_enhancer.o: stereo_enhancer.cpp \
+  stereo_enhancer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWorkspace \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qworkspace.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwidget.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwindowdefs.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectdefs.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnamespace.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qglobal.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/include/stddef.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qconfig.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfeatures.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobject.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstring.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qchar.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearray.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic_arch.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic_i386.h \
+  /usr/include/string.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-32.h /usr/include/xlocale.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/include/stdarg.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/string \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++config.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/os_defines.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/cpu_defines.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stringfwd.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/char_traits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstring \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstddef \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_algobase.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/climits \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/include/limits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/include/syslimits.h \
+  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
+  /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
+  /usr/include/bits/stdio_lim.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstdlib \
+  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/sys/types.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/time.h /usr/include/sys/select.h \
+  /usr/include/bits/select.h /usr/include/bits/sigset.h \
+  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+  /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/iosfwd \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++locale.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstdio \
+  /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/wchar.h /usr/include/bits/wchar.h /usr/include/gconv.h \
+  /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/clocale \
+  /usr/include/locale.h /usr/include/bits/locale.h \
+  /usr/include/langinfo.h /usr/include/nl_types.h /usr/include/iconv.h \
+  /usr/include/libintl.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++io.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/gthr.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/gthr-default.h \
+  /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
+  /usr/include/signal.h /usr/include/bits/setjmp.h /usr/include/unistd.h \
+  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+  /usr/include/bits/confname.h /usr/include/getopt.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cctype \
+  /usr/include/ctype.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/postypes.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cwchar \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ctime \
+  /usr/include/stdint.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/functexcept.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/exception_defines.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_pair.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/cpp_type_traits.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator_base_types.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator_base_funcs.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/concept_check.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/debug/debug.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/memory \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/allocator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++allocator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ext/new_allocator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/new \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/exception \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_construct.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_uninitialized.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_raw_storage_iter.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/limits \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_function.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_string.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/atomicity.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/atomic_word.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/algorithm \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_algo.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_heap.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_tempbuf.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_string.tcc \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlist.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiterator.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qalgorithms.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/iterator \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ostream \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ios \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/localefwd.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/ios_base.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_classes.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/streambuf \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/streambuf.tcc \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_ios.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/streambuf_iterator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_facets.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cwctype \
+  /usr/include/wctype.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/ctype_base.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/ctype_inline.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/codecvt.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/time_members.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/messages_members.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_ios.tcc \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/ostream.tcc \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/locale \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_facets.tcc \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/typeinfo \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/istream \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/istream.tcc \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stream_iterator.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/list \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_list.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/list.tcc \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpaintdevice.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qrect.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsize.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpoint.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpalette.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qcolor.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qrgb.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringlist.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatastream.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiodevice.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qregexp.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringmatcher.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qbrush.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpair.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvector.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/vector \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_vector.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_bvector.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/vector.tcc \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qmatrix.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpolygon.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qregion.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qline.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qtransform.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpainterpath.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qimage.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpixmap.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfont.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfontmetrics.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfontinfo.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qsizepolicy.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qcursor.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qkeysequence.h \
+  ../../include/effect.h ../../config.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/Qt/QtXml \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QtCore \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatastream.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdebug.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qhash.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmap.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/map \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_tree.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_map.h \
+  /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_multimap.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextstream.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qset.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextstream.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtemporaryfile.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfile.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfsfileengine.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractfileengine.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdir.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfileinfo.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiodevice.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qprocess.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qresource.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlocale.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdiriterator.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbuffer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfilesystemwatcher.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdir.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qurl.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractfileengine.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfileinfo.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsettings.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvariant.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetatype.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfile.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcache.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qline.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlist.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpair.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpoint.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qrect.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsize.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringlist.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringmatcher.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlinkedlist.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbitarray.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvector.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearraymatcher.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qqueue.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearray.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qalgorithms.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvarlengtharray.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcontainerfwd.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qshareddata.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcryptographichash.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiterator.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlocale.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstack.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmap.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qset.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatetime.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstring.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcontainerfwd.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qregexp.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qchar.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qhash.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtimeline.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextcodecplugin.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qplugin.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpointer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfactoryinterface.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextcodec.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlibraryinfo.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qendian.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfeatures.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qglobal.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnamespace.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnumeric.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtranslator.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvariant.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmimedata.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qeventloop.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreapplication.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreevent.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qeventloop.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractitemmodel.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsignalmapper.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectcleanuphandler.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbasictimer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsocketnotifier.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobject.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtimer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbasictimer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetatype.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstracteventdispatcher.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpointer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetaobject.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreevent.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectdefs.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpluginloader.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/quuid.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlibrary.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qplugin.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfactoryinterface.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsemaphore.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qthreadstorage.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qwaitcondition.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qthread.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmutex.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qreadwritelock.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/Qt/qdom.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/Qt/qxml.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/Qt/qxmlstream.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QIODevice \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QString \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QVector \
+  ../../include/plugin.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QStringList \
+  ../../include/journalling_object.h ../../include/types.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QVariant \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QStack \
+  ../../include/base64.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QByteArray \
+  ../../include/mixer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QMutex \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QThread \
+  ../../include/note.h ../../include/volume.h ../../include/panning.h \
+  ../../include/midi_time.h ../../include/play_handle.h \
+  ../../include/fifo_buffer.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QSemaphore \
+  ../../include/effect_lib.h /usr/include/math.h \
+  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+  /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+  /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+  /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
+  ../../include/templates.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QtAlgorithms \
+  ../../include/lmms_constants.h ../../include/engine.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QMap \
+  ../../include/main_window.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QList \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QMainWindow \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qmainwindow.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWhatsThis \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwhatsthis.h \
+  stereoenhancer_control_dialog.h ../../include/effect_control_dialog.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWidget \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwidget.h \
+  ../../src/lib/embed.cpp \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QImage \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qimage.h \
+  ../../include/embed.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QPixmap \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpixmap.h \
+  ../../include/config_mgr.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/QDialog \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtGui/qdialog.h \
+  /usr/local/Trolltech/Qt-4.3.2/include/QtCore/QPair embedded_resources.h \
+  ../../include/embed.h
+
+stereo_enhancer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWorkspace:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qworkspace.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwidget.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwindowdefs.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectdefs.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnamespace.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qglobal.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/include/stddef.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qconfig.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfeatures.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobject.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstring.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qchar.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearray.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic_arch.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic_i386.h:
+
+/usr/include/string.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-32.h:
+
+/usr/include/xlocale.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/include/stdarg.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/string:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++config.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/os_defines.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/cpu_defines.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stringfwd.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/char_traits.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstring:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstddef:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_algobase.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/climits:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/include/limits.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/bits/posix2_lim.h:
+
+/usr/include/bits/xopen_lim.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstdlib:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/iosfwd:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++locale.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cstdio:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/gconv.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/clocale:
+
+/usr/include/locale.h:
+
+/usr/include/bits/locale.h:
+
+/usr/include/langinfo.h:
+
+/usr/include/nl_types.h:
+
+/usr/include/iconv.h:
+
+/usr/include/libintl.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++io.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/gthr.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/gthr-default.h:
+
+/usr/include/pthread.h:
+
+/usr/include/sched.h:
+
+/usr/include/bits/sched.h:
+
+/usr/include/signal.h:
+
+/usr/include/bits/setjmp.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cctype:
+
+/usr/include/ctype.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/postypes.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cwchar:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ctime:
+
+/usr/include/stdint.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/functexcept.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/exception_defines.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_pair.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/cpp_type_traits.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator_base_types.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator_base_funcs.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/concept_check.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_iterator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/debug/debug.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/memory:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/allocator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/c++allocator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ext/new_allocator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/new:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/exception:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_construct.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_uninitialized.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_raw_storage_iter.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/limits:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_function.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_string.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/atomicity.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/atomic_word.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/algorithm:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_algo.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_heap.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_tempbuf.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_string.tcc:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlist.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiterator.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qalgorithms.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/iterator:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ostream:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/ios:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/localefwd.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/ios_base.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_classes.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/streambuf:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/streambuf.tcc:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_ios.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/streambuf_iterator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_facets.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/cwctype:
+
+/usr/include/wctype.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/ctype_base.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/ctype_inline.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/codecvt.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/time_members.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/i486-linux-gnu/bits/messages_members.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/basic_ios.tcc:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/ostream.tcc:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/locale:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/locale_facets.tcc:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/typeinfo:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/istream:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/istream.tcc:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stream_iterator.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/list:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_list.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/list.tcc:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpaintdevice.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qrect.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsize.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpoint.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpalette.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qcolor.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qrgb.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringlist.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatastream.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiodevice.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qregexp.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringmatcher.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qbrush.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpair.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvector.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/vector:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_vector.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_bvector.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/vector.tcc:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qmatrix.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpolygon.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qregion.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qline.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qtransform.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpainterpath.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qimage.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpixmap.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfont.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfontmetrics.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qfontinfo.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qsizepolicy.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qcursor.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qkeysequence.h:
+
+../../include/effect.h:
+
+../../config.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/Qt/QtXml:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QtCore:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatastream.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdebug.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qhash.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmap.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/map:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_tree.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_map.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/bits/stl_multimap.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextstream.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qset.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextstream.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtemporaryfile.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfile.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfsfileengine.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractfileengine.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdir.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfileinfo.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiodevice.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qprocess.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qresource.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlocale.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdiriterator.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbuffer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfilesystemwatcher.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdir.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qurl.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractfileengine.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfileinfo.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsettings.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvariant.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetatype.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfile.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcache.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qline.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlist.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpair.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpoint.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qrect.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsize.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringlist.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstringmatcher.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlinkedlist.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbitarray.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvector.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearraymatcher.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qqueue.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbytearray.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qalgorithms.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvarlengtharray.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcontainerfwd.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qshareddata.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcryptographichash.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qiterator.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlocale.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstack.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmap.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qset.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qdatetime.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qstring.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcontainerfwd.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qregexp.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qchar.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qhash.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtimeline.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextcodecplugin.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qplugin.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpointer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfactoryinterface.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtextcodec.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlibraryinfo.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qendian.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfeatures.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qglobal.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnamespace.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qnumeric.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtranslator.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qvariant.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmimedata.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qeventloop.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreapplication.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreevent.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qeventloop.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstractitemmodel.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsignalmapper.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectcleanuphandler.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbasictimer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsocketnotifier.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobject.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qtimer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qbasictimer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetatype.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qabstracteventdispatcher.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpointer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmetaobject.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qcoreevent.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qobjectdefs.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qpluginloader.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/quuid.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qlibrary.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qplugin.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qfactoryinterface.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qsemaphore.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qthreadstorage.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qwaitcondition.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qthread.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qmutex.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qreadwritelock.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/qatomic.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/Qt/qdom.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/Qt/qxml.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/Qt/qxmlstream.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QIODevice:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QString:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QVector:
+
+../../include/plugin.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QStringList:
+
+../../include/journalling_object.h:
+
+../../include/types.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QVariant:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QStack:
+
+../../include/base64.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QByteArray:
+
+../../include/mixer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QMutex:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QThread:
+
+../../include/note.h:
+
+../../include/volume.h:
+
+../../include/panning.h:
+
+../../include/midi_time.h:
+
+../../include/play_handle.h:
+
+../../include/fifo_buffer.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QSemaphore:
+
+../../include/effect_lib.h:
+
+/usr/include/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+../../include/templates.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QtAlgorithms:
+
+../../include/lmms_constants.h:
+
+../../include/engine.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QMap:
+
+../../include/main_window.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QList:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QMainWindow:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qmainwindow.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWhatsThis:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwhatsthis.h:
+
+stereoenhancer_control_dialog.h:
+
+../../include/effect_control_dialog.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QWidget:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qwidget.h:
+
+../../src/lib/embed.cpp:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QImage:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qimage.h:
+
+../../include/embed.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QPixmap:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qpixmap.h:
+
+../../include/config_mgr.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/QDialog:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtGui/qdialog.h:
+
+/usr/local/Trolltech/Qt-4.3.2/include/QtCore/QPair:
+
+embedded_resources.h:
+
+../../include/embed.h:
