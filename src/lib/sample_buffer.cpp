@@ -25,6 +25,9 @@
  */
 
 
+#include "sample_buffer.h"
+
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -60,14 +63,14 @@
 #endif
 
 
-#include "sample_buffer.h"
-#include "interpolation.h"
-#include "templates.h"
+#include "base64.h"
 #include "config_mgr.h"
+#include "debug.h"
+#include "drumsynth.h"
 #include "endian_handling.h"
 #include "engine.h"
-#include "base64.h"
-#include "debug.h"
+#include "interpolation.h"
+#include "templates.h"
 
 
 
@@ -225,6 +228,12 @@ void sampleBuffer::update( bool _keep_settings )
 								samplerate );
 		}
 #endif
+		if( m_frames == 0 )
+		{
+			m_frames = decodeSampleDS( f, buf, channels,
+								samplerate );
+		}
+
 		if( m_frames > 0 && buf != NULL )
 		{
 			// following code transforms int-samples into
@@ -548,6 +557,18 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 
 
 
+f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _samplerate )
+{
+	DrumSynth ds;
+	return( ds.GetDSFileSamples( _f, _buf, _channels ) );
+}
+
+
+
+
 void sampleBuffer::initResampling( void )
 {
 	m_srcData.end_of_input = 0;
@@ -733,7 +754,7 @@ f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index )
 
 
 void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
-					const QRect & _clip, drawMethods _dm )
+							const QRect & _clip )
 {
 //	_p.setClipRect( _clip );
 //	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
@@ -748,42 +769,22 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	const QRect isect = _dr.intersect( _clip );
 
-	if( _dm == LINE_CONNECT )
-	{
-		float old_x = _dr.x();
-		float old_y[DEFAULT_CHANNELS] = { y_base, y_base };
-	
-		const float fpp = tMax<float>( tMin<float>( m_frames / (float)w,
-								20.0f ), 1.0f );
-		const float fmax = tMin<float>( m_frames, isect.right() * fpp );
-		for( float frame = fpp * _clip.x(); frame < fmax; frame += fpp )
-		{
-			const float x = frame*w / m_frames + _dr.x();
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-			{
-				const float y = y_base +
-			m_data[static_cast<int>( frame )][chnl] * y_space;
-				_p.drawLine(
-					QLineF( old_x, old_y[chnl], x, y ) );
-				old_y[chnl] = y;
-			}
-			old_x = x;
-		}
+	int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 
-	}
-	else if( _dm == DOTS )
+	const f_cnt_t fpp = tLimit<f_cnt_t>( m_frames / w, 1, 20 );
+	int old_x = _clip.x();
+	for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
 	{
-		for( f_cnt_t frame = 0; frame < m_frames; ++frame )
+		const int x = _dr.x() + static_cast<int>( frame /
+					(float) m_frames * _dr.width() );
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
-			const int x = frame * w / m_frames + _dr.x();
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-			{
-				_p.drawPoint( x, y_base +
-			static_cast<Uint16>( m_data[frame][chnl] * y_space ) );
-			}
+			const Uint16 y = y_base - static_cast<Uint16>(
+						m_data[frame][chnl] * y_space );
+			_p.drawLine( old_x, old_y[chnl], x, y );
+			old_y[chnl] = y;
 		}
+		old_x = x;
 	}
 //	_p.setClipping( FALSE );
 }
@@ -820,10 +821,11 @@ QString sampleBuffer::openAudioFile( void ) const
 
 	// set filters
 	QStringList types;
-	types << tr( "All Audio-Files (*.wav *.ogg *.flac *.spx *.voc *.aif "
-							"*.aiff *.au *.raw)" )
+	types << tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
+						"*.aif *.aiff *.au *.raw)" )
 		<< tr( "Wave-Files (*.wav)" )
 		<< tr( "OGG-Files (*.ogg)" )
+		<< tr( "DrumSynth-Files (*.ds)" )
 		<< tr( "FLAC-Files (*.flac)" )
 		<< tr( "SPEEX-Files (*.spx)" )
 		//<< tr( "MP3-Files (*.mp3)" )

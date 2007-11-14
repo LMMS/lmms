@@ -1,3 +1,38 @@
+2007-11-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* configure.in:
+	* data/samples/drumsynth/*:
+	* data/samples/Makefile.am:
+	* include/drumsynth.h:
+	* include/sample_buffer.h:
+	* licenses/drumsynth.LICENSE:
+	* Makefile.am:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* src/lib/drumsynth.cpp:
+	* src/lib/sample_buffer.cpp:
+	imported DrumSynth from 0.3 branch
+
+	* include/sample_buffer.h:
+	* plugins/audio_file_processor/artwork.png:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* src/lib/sample_buffer.cpp:
+	dropped dot drawing method
+
+	* src/lib/sample_buffer.cpp:
+	- fixed DrumSynth support when missing Vorbis
+	- use working line drawing method from 0.3 branch
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	fixed sample display
+
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	fixed track removal segfault
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-11-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.h:

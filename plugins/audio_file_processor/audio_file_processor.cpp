@@ -75,8 +75,7 @@ QPixmap * audioFileProcessor::s_artwork = NULL;
 
 
 audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &audiofileprocessor_plugin_descriptor ),
-	m_drawMethod( sampleBuffer::LINE_CONNECT )
+	instrument( _channel_track, &audiofileprocessor_plugin_descriptor )
 {
 	connect( &m_sampleBuffer, SIGNAL( sampleUpdated() ), this,
 						SLOT( sampleUpdated() ) );
@@ -106,7 +105,7 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"Mode, start- and end-point, amplify-value and so on "
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
-	
+
 	m_reverseButton = new pixmapButton( this, NULL, NULL );
 	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 160, 124 );
@@ -183,38 +182,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
 			"If you enable Looping-Mode, this is the point where "
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between start- and end-point." ) );
-
-	m_viewLinesPB = new pixmapButton( this, NULL, NULL );
-	m_viewLinesPB->move( 154, 158 );
-	if( m_drawMethod == sampleBuffer::LINE_CONNECT )
-	{
-		m_viewLinesPB->setChecked( TRUE );
-	}
-	connect( m_viewLinesPB, SIGNAL( toggled( bool ) ), this,
-					SLOT( lineDrawBtnToggled( bool ) ) );
-	m_viewLinesPB->setWhatsThis(
-		tr( "Activate this button, if your sample should be drawn "
-			"with connected lines. This doesn't change the "
-			"sound itself. It just gives you another view to your "
-			"sample." ) );
-
-	m_viewDotsPB = new pixmapButton( this, NULL, NULL );
-	m_viewDotsPB->move( 204, 158 );
-	if( m_drawMethod == sampleBuffer::DOTS )
-	{
-		m_viewDotsPB->setChecked( TRUE );
-	}
-	connect( m_viewDotsPB, SIGNAL( toggled( bool ) ), this,
-					SLOT( dotDrawBtnToggled( bool ) ) );
-	m_viewDotsPB->setWhatsThis(
-		tr( "Activate this button, if your sample should be drawn "
-			"with dots. This doesn't change the sound itself. "
-			"It just gives you another view to your sample." ) );
-	
-	automatableButtonGroup * view_group = new automatableButtonGroup( this,
-								NULL, NULL );
-	view_group->addButton( m_viewLinesPB );
-	view_group->addButton( m_viewDotsPB );
 
 	setAcceptDrops( TRUE );
 }
@@ -473,12 +440,11 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 void audioFileProcessor::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
+	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
-	p.drawPixmap( 2, 172, m_graph );
 	p.setPen( QColor( 64, 255, 160 ) );
 	m_sampleBuffer.visualize( p, QRect( 2, 2, m_graph.width() - 4,
-							m_graph.height() - 4 ),
-								m_drawMethod );
+						m_graph.height() - 4 ) );
 	update();
 }
 
@@ -489,30 +455,6 @@ void audioFileProcessor::reverseBtnToggled( bool _on )
 {
 	m_sampleBuffer.setReversed( _on );
 	engine::getSongEditor()->setModified();
-}
-
-
-
-
-void audioFileProcessor::lineDrawBtnToggled( bool _on )
-{
-	if( _on == TRUE )
-	{
-		m_drawMethod = sampleBuffer::LINE_CONNECT;
-		sampleUpdated();
-	}
-}
-
-
-
-
-void audioFileProcessor::dotDrawBtnToggled( bool _on )
-{
-	if( _on == TRUE )
-	{
-		m_drawMethod = sampleBuffer::DOTS;
-		sampleUpdated();
-	}
 }
 
 
@@ -598,8 +540,8 @@ const QStringList & audioFileProcessor::subPluginFeatures::supported_extensions(
 									void )
 {
 	static QStringList extensions = QStringList()
-				<< "wav" << "ogg" << "spx" << "au" << "voc"
-				<< "aif" << "aiff" << "flac" << "raw";
+				<< "wav" << "ogg" << "ds" << "spx" << "au"
+				<< "voc" << "aif" << "aiff" << "flac" << "raw";
 	return( extensions );
 }
 

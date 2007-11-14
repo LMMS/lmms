@@ -1,0 +1,1 @@
+SUBDIRS = acoustic cr78 cr8000 effects electro farfisa ferraro instrument jorgensohn latin linn magnetboy misc misc_bass misc_claps misc_electro misc_fx misc_hats misc_perc misc_synth r_b tr606 tr77 tr808 tr909 

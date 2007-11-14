@@ -190,6 +190,7 @@ void trackContainer::removeTrack( track * _track )
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
 
+		disconnect( *it );
 		m_trackWidgets.erase( it );
 
 		delete _track;

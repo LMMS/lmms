@@ -1,0 +1,61 @@
+[General]
+Version=DrumSynth v2.0
+Comment=Use FruityLoops to sequence your DrumSynth sounds!  http://www.fruityloops.com
+Tuning=0
+Stretch=100
+Level=0
+Filter=1
+HighPass=1
+Resonance=40
+FilterEnv=0,14 4981,42 442000,100 442000,0
+
+[Tone]
+On=0
+Level=128
+F1=150
+F2=300
+Droop=78
+Phase=0
+Envelope=0,100 5250,30 10500,0
+
+[Noise]
+On=1
+Level=41
+Slope=-59
+Envelope=0,100 222,14 508,0
+FixedSeq=1
+
+[Overtones]
+On=1
+Level=128
+F1=500
+Wave1=0
+Track1=1
+F2=200
+Wave2=0
+Track2=0
+Method=2
+Param=61
+Envelope1=0,100 3750,30 7500,0
+Envelope2=0,100 3750,30 7500,0
+Filter=0
+
+[NoiseBand]
+On=0
+Level=128
+F=6000
+dF=8
+Envelope=0,100 2250,30 4500,0
+
+[NoiseBand2]
+On=0
+Level=128
+F=2370
+dF=7
+Envelope=0,100 1500,30 3000,0
+
+[Distortion]
+On=0
+Clipping=2
+Bits=1
+Rate=4

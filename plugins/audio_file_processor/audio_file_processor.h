@@ -91,8 +91,6 @@ protected slots:
 	void ampKnobChanged( float _new_value );
 	void startKnobChanged( float _new_value );
 	void endKnobChanged( float _new_value );
-	void lineDrawBtnToggled( bool _on );
-	void dotDrawBtnToggled( bool _on );
 	void sampleUpdated( void );
 
 
@@ -110,15 +108,11 @@ private:
 
 	sampleBuffer m_sampleBuffer;
 	
-	sampleBuffer::drawMethods m_drawMethod;
-
 	QPixmap m_graph;
 	volumeKnob * m_ampKnob;
 	knob * m_startKnob;
 	knob * m_endKnob;
 	pixmapButton * m_openAudioFileButton;
-	pixmapButton * m_viewLinesPB;
-	pixmapButton * m_viewDotsPB;
 	pixmapButton * m_reverseButton;
 	pixmapButton * m_loopButton;
 

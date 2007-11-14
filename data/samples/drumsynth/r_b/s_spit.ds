@@ -1,0 +1,58 @@
+[General]
+Version=DrumSynth v1.0
+Comment=Teddy Riley 'spit' snare
+Tuning=0.00
+Stretch=100.0
+Filter=0
+HighPass=0
+FilterEnv=0,100 442000,100 442000,0
+
+[Tone]
+On=0
+Level=128
+F1=200
+F2=120
+Droop=0
+Phase=0
+Envelope=0,100 3500,20 8750,0
+
+[Noise]
+On=1
+Level=151
+Slope=-77
+Envelope=0,100 298,100 670,2 10429,0
+
+[Overtones]
+On=1
+Level=117
+F1=48
+Wave1=2
+Track1=0
+F2=250
+Wave2=1
+Track2=0
+Filter=0
+Method=0
+Param=19
+Envelope1=0,100 1117,19 2533,0
+Envelope2=0,100 2000,20 7598,0
+
+[NoiseBand]
+On=1
+Level=153
+F=1900
+dF=37
+Envelope=0,100 968,20 2011,7 6034,9 7300,0
+
+[NoiseBand2]
+On=1
+Level=43
+F=11000
+dF=71
+Envelope=0,100 2235,43 2980,2 6853,0
+
+[Distortion]
+On=0
+Clipping=0
+Bits=0
+Rate=0

@@ -1,0 +1,58 @@
+[General]
+Version=DrumSynth v1.0
+Comment=backwards flick loop
+Tuning=0.00
+Stretch=100.0
+Filter=1
+HighPass=0
+FilterEnv=0,71 442000,100 442000,0
+
+[Tone]
+On=0
+Level=161
+F1=2000
+F2=40
+Droop=0
+Phase=0
+Envelope=0,64 521,58 521,0
+
+[Noise]
+On=1
+Level=181
+Slope=3
+Envelope=0,0 2384,2 4023,7 5364,22 5364,0 24136,0 29797,3 32181,16 34565,48 34714,0
+
+[Overtones]
+On=1
+Level=147
+F1=8000
+Wave1=0
+Track1=1
+F2=4000
+Wave2=0
+Track2=0
+Filter=0
+Method=1
+Param=100
+Envelope1=0,13 45,0 5215,0 5364,74 5364,0 10280,0 10429,66 10429,0 15346,0 15495,65 15495,0 20411,0 20560,78 20560,0 25477,0 25626,64 25626,0
+Envelope2=0,100 36204,100 37396,0
+
+[NoiseBand]
+On=1
+Level=140
+F=7000
+dF=90
+Envelope=0,75 89,0 5066,0 5364,74 5364,0 10131,0 10429,66 10429,0 15197,0 15495,65 15495,0 20262,0 20560,78 20560,0 25328,0 25626,64 25626,0
+
+[NoiseBand2]
+On=0
+Level=62
+F=3800
+dF=100
+Envelope=0,100 119,95 313,0
+
+[Distortion]
+On=0
+Clipping=14
+Bits=0
+Rate=0

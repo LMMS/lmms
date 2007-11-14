@@ -1535,7 +1535,8 @@ track::~track()
 	{
 		m_trackContainer->removeTrack( this );
 
-		delete m_trackWidget;
+		m_trackWidget->hide();
+		m_trackWidget->deleteLater();
 		m_trackWidget = NULL;
 	}
 

@@ -53,13 +53,6 @@ class sampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
-	enum drawMethods
-	{
-		LINE_CONNECT,
-		DOTS
-	} ;
-
-
 	class handleState
 	{
 	public:
@@ -92,12 +85,10 @@ public:
 				const bool _looped = FALSE );
 
 	void FASTCALL visualize( QPainter & _p, const QRect & _dr,
-					const QRect & _clip,
-					drawMethods _dm = LINE_CONNECT );
-	inline void visualize( QPainter & _p, const QRect & _dr,
-					drawMethods _dm = LINE_CONNECT )
+							const QRect & _clip );
+	inline void visualize( QPainter & _p, const QRect & _dr )
 	{
-		visualize( _p, _dr, _dr, _dm );
+		visualize( _p, _dr, _dr );
 	}
 
 	inline const QString & audioFile( void ) const
@@ -238,6 +229,11 @@ private:
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
+	f_cnt_t FASTCALL decodeSampleDS( const char * _f,
+						int_sample_t * & _buf,
+						ch_cnt_t & _channels,
+						sample_rate_t & _sample_rate );
+
 
 	QString m_audioFile;
 	sampleFrame * m_origData;

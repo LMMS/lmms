@@ -195,6 +195,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/surround_area.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
 		$(srcdir)/src/lib/clipboard.cpp				\
+		$(srcdir)/src/lib/drumsynth.cpp				\
 		$(srcdir)/src/lib/journalling_object.cpp		\
 		$(srcdir)/src/lib/project_journal.cpp			\
 		$(srcdir)/src/lib/project_version.cpp			\
@@ -247,6 +248,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/aeffectx.h				\
 		$(srcdir)/include/debug.h				\
 		$(srcdir)/include/detuning_helper.h			\
+		$(srcdir)/include/drumsynth.h				\
 		$(srcdir)/include/main_window.h				\
 		$(srcdir)/include/audio_alsa.h				\
 		$(srcdir)/include/audio_device.h			\

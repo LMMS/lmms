@@ -1,0 +1,61 @@
+[General]
+Version=DrumSynth v2.0
+Comment=You can use [Ctrl] and [Enter] to trigger the Play button!
+Tuning=0.00
+Stretch=200
+Level=-11
+Filter=0
+HighPass=0
+Resonance=0
+FilterEnv=0,100 444000,100 444000,0
+
+[Tone]
+On=0
+Level=181
+F1=50
+F2=50
+Droop=0
+Phase=0
+Envelope=0,100 1777,58 5250,30 15990,8 42006,0
+
+[Noise]
+On=1
+Level=181
+Slope=100
+Envelope=0,100 1777,58 5250,30 9772,20 16117,10 23478,5 31854,2 45559,0
+FixedSeq=1
+
+[Overtones]
+On=0
+Level=181
+F1=50
+Wave1=0
+Track1=0
+F2=200
+Wave2=0
+Track2=0
+Method=3
+Param=0
+Envelope1=0,100 3750,30 7500,0
+Envelope2=0,100 3000,30 6000,0
+Filter=0
+
+[NoiseBand]
+On=0
+Level=45
+F=300
+dF=12
+Envelope=0,100 2250,30 4500,0
+
+[NoiseBand2]
+On=0
+Level=128
+F=3100
+dF=40
+Envelope=0,100 1500,20 4500,0
+
+[Distortion]
+On=0
+Clipping=1
+Bits=2
+Rate=1

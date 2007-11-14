@@ -1,0 +1,34 @@
+[General]
+Version=DrumSynth v1.0
+Comment=©1997 Paul Kellett    http://www.abel.co.uk/~maxim/
+
+[Tone]
+On=1
+Level=128
+F1=3000
+F2=3000
+Droop=0
+Phase=0
+Envelope=0,100 1490,23 3203,8 11621,0
+
+[Noise]
+On=0
+Level=128
+Slope=0
+Envelope=0,100 4500,30 9000,0
+
+[Overtones]
+On=0
+Level=128
+F1=789
+F2=861
+Method=2
+Envelope1=0,100 1266,13 8418,0
+Envelope2=0,99 447,31 3129,0
+
+[NoiseBand]
+On=1
+Level=79
+F=1024
+dF=19
+Envelope=0,100 670,17 1713,5 4500,0
