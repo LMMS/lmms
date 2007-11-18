@@ -34,7 +34,7 @@ class QAction;
 class QDomElement;
 class QGridLayout;
 class QSplashScreen;
-class QWorkspace;
+class QMdiArea;
 
 class configManager;
 class tool;
@@ -45,7 +45,7 @@ class mainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	inline QWorkspace * workspace( void )
+	inline QMdiArea * workspace( void )
 	{
 		return( m_workspace );
 	}
@@ -124,7 +124,7 @@ private:
 	void finalize( void );
 
 
-	QWorkspace * m_workspace;
+	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;

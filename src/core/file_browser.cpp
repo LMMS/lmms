@@ -32,7 +32,8 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QPushButton>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 
 
 #include "bb_editor.h"
@@ -317,16 +318,16 @@ void listView::sendToActiveInstrumentTrack( void )
 	}
 
 	// get all windows opened in the workspace
-	QWidgetList pl = engine::getMainWindow()->workspace()->windowList(
-						QWorkspace::StackingOrder );
-	QListIterator<QWidget *> w( pl );
+	QList<QMdiSubWindow*> pl = engine::getMainWindow()->workspace()->subWindowList(
+						QMdiArea::StackingOrder );
+	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
 	// now we travel through the window-list until we find an
 	// instrument-track
 	while( w.hasPrevious() )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
-								w.previous() );
+								w.previous()->widget() );
 		if( ct != NULL && ct->isHidden() == FALSE )
 		{
 			// ok, it's an instrument-track, so we can apply the

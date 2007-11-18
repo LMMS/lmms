@@ -29,13 +29,14 @@
 
 class knob;
 class stereoEnhancerEffect;
+class QMdiArea;
 
 
 class stereoEnhancerControlDialog : public effectControlDialog
 {
 	Q_OBJECT
 public:
-	stereoEnhancerControlDialog( QWidget * _parent, stereoEnhancerEffect * _eff );
+	stereoEnhancerControlDialog( QMdiArea * _parent, stereoEnhancerEffect * _eff );
 	virtual ~stereoEnhancerControlDialog()
 	{
 	}

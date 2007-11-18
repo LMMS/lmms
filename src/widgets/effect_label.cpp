@@ -29,7 +29,7 @@
 #include "effect_label.h"
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 #include <QtXml/QDomElement>
 
 #include "effect_tab_widget.h"
@@ -67,7 +67,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 
 	if( engine::getMainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addWindow( m_effWidget );
+		engine::getMainWindow()->workspace()->addSubWindow( m_effWidget );
 	}
 
  	m_effWidget->setWindowTitle( _initial_name );

@@ -30,6 +30,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QPushButton>
 #include <QtGui/QPainter>
+#include <QtGui/QMdiSubWindow>
 
 #include "midi_event_processor.h"
 #include "mixer.h"
@@ -54,7 +55,7 @@ class surroundArea;
 class volumeKnob;
 
 
-class instrumentTrack : public QWidget, public track, public midiEventProcessor
+class instrumentTrack : public QMdiSubWindow, public track, public midiEventProcessor
 {
 	Q_OBJECT
 public:

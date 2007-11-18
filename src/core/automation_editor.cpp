@@ -38,7 +38,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 
 #ifndef __USE_XOPEN
@@ -74,7 +74,7 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 
 automationEditor::automationEditor( void ) :
-	QWidget( engine::getMainWindow()->workspace() ),
+	QWidget( ),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -111,12 +111,6 @@ automationEditor::automationEditor( void ) :
 	{
 		s_toolMove = new QPixmap( embed::getIconPixmap(
 							"edit_move" ) );
-	}
-
-	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addWindow( this );
 	}
 
 	// add time-line
@@ -333,12 +327,18 @@ automationEditor::automationEditor( void ) :
 
 	// setup our actual window
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
-	resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 	setCurrentPattern( NULL );
 
 	setMouseTracking( TRUE );
 
-	hide();
+	// add us to workspace
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+
+	parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+	parentWidget()->hide();
 
 }
 

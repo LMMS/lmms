@@ -38,7 +38,7 @@
 #include <QtGui/QLayout>
 #include <QtGui/QPainter>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 
 #ifndef __USE_XOPEN
@@ -127,7 +127,7 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
 pianoRoll::pianoRoll( void ) :
-	QWidget( engine::getMainWindow()->workspace() ),
+	QWidget( ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -185,11 +185,6 @@ pianoRoll::pianoRoll( void ) :
 							"automation" ) );
 	}
 
-	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addWindow( this );
-	}
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
@@ -422,12 +417,17 @@ pianoRoll::pianoRoll( void ) :
 
 	// setup our actual window
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
-	resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
 	setCurrentPattern( NULL );
 
 	setMouseTracking( TRUE );
 
-	hide();
+    // add us to workspace
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+	parentWidget()->resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
+	parentWidget()->hide();
 
 }
 
@@ -970,7 +970,7 @@ void pianoRoll::removeSelection( void )
 void pianoRoll::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
-	hide();
+	parentWidget()->hide();
 	_ce->ignore ();
 }
 
@@ -1906,7 +1906,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void pianoRoll::paintEvent( QPaintEvent * )
+void pianoRoll::paintEvent( QPaintEvent * _pe)
 {
 	QPixmap paintPixmap( size() );
 	updatePaintPixmap( paintPixmap );

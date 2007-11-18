@@ -169,6 +169,7 @@ int main( int argc, char * * argv )
 		return( EXIT_FAILURE );
 	}
 
+	// set palette
 	QPalette pal = app.palette();
 	pal.setColor( QPalette::Background, QColor( 128, 128, 128 ) );
 	pal.setColor( QPalette::Foreground, QColor( 240, 240, 240 ) );

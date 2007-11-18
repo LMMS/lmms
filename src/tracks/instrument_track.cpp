@@ -40,7 +40,8 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 
 
 #include "arp_and_chords_tab_widget.h"
@@ -97,8 +98,8 @@ const int PIANO_HEIGHT		= 84;
 
 
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
-	QWidget( engine::getMainWindow()->workspace() ),
- 	track( _tc ),
+	QMdiSubWindow( engine::getMainWindow()->workspace() ),
+	track( _tc ),
 	midiEventProcessor(),
 	m_trackType( INSTRUMENT_TRACK ),
 	m_midiPort( engine::getMixer()->getMIDIClient()->addPort( this,
@@ -111,20 +112,16 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_midiInputAction( NULL ),
 	m_midiOutputAction( NULL )
 {
+
+	QWidget * widget = new QWidget();
+
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
 	}
 
 
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addWindow( this );
-	}
-
 	setAcceptDrops( TRUE );
-
-	hide();
 
 	getTrackWidget()->setFixedHeight( 32 );
 
@@ -174,12 +171,12 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// init own layout + widgets
 	setFocusPolicy( Qt::StrongFocus );
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
+	QVBoxLayout * vlayout = new QVBoxLayout( widget );
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
 	m_generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ),
-									this );
+									widget );
 	m_generalSettingsWidget->setFixedHeight( 90 );
 
 	// setup line-edit for changing channel-name
@@ -317,9 +314,17 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	_tc->updateAfterTrackAdd();
 
+	setWidget( widget );
+
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+
+	hide();
 }
 
 

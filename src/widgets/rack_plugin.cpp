@@ -30,7 +30,8 @@
 
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 
 #include "audio_port.h"
 #include "caption_menu.h"
@@ -132,10 +133,11 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_label->setPalette( pal );
 
 	m_controlView = m_effect->createControlDialog( m_track );
-	engine::getMainWindow()->workspace()->addWindow( m_controlView );
+	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( m_controlView );
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
-	m_controlView->hide();
+
+    m_subWindow->hide();
 	
 	if( m_controlView->getControlCount() == 0 )
 	{
@@ -189,13 +191,13 @@ void rackPlugin::editControls( void )
 {
 	if( m_show )
 	{
-		m_controlView->show();
-		m_controlView->raise();
+		m_subWindow->show();
+		m_subWindow->raise();
 		m_show = FALSE;
 	}
 	else
 	{
-		m_controlView->hide();
+		m_subWindow->hide();
 		m_show = TRUE;
 	}
 }
@@ -333,7 +335,7 @@ void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
 
 void rackPlugin::closeEffects( void )
 {
-	m_controlView->hide();
+	m_subWindow->hide();
 	m_show = TRUE;
 }
 

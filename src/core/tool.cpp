@@ -28,7 +28,7 @@
 #include "tool.h"
 
 #include <QtGui/QIcon>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 #include "main_window.h"
 

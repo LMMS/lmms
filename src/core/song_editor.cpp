@@ -44,6 +44,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QScrollBar>
 #include <QtGui/QStatusBar>
+#include <QtGui/QMdiArea>
 
 
 #include "song_editor.h"
@@ -97,23 +98,10 @@ songEditor::songEditor( void ) :
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
-	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		resize( 680, 300 );
-		w->move( 10, 10 );
-	}
-	else
-	{
-		resize( 580, 300 );
-		w->move( 210, 10 );
-	}
-
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 
-	QWidget * cw = new QWidget( this );
-	setCentralWidget( cw );
+	QWidget * cw = this;
 
 
 	// create time-line
@@ -388,7 +376,24 @@ songEditor::songEditor( void ) :
 					this, SLOT( scrolled( int ) ) );
 
 
-	show();
+	if( engine::getMainWindow()->workspace() != NULL )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+
+	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
+	if( engine::getMainWindow()->workspace() != NULL )
+	{
+		w->resize( 680, 300 );
+		w->move( 10, 10 );
+	}
+	else
+	{
+		resize( 580, 300 );
+		w->move( 210, 10 );
+	}
+
+	w->show();
 
 }
 

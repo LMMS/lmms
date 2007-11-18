@@ -33,7 +33,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 
 #include "bb_track.h"
@@ -56,18 +56,13 @@
 
 
 trackContainer::trackContainer( void ) :
-	QMainWindow( engine::getMainWindow()->workspace() ),
+	QWidget( ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),
 	m_rubberBand( new rubberBand( m_scrollArea ) ),
 	m_origin()
 {
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		engine::getMainWindow()->workspace()->addWindow( this );
-	}
-
 	m_scrollArea->show();
 	m_rubberBand->hide();
 

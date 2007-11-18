@@ -37,7 +37,7 @@
 #include <QtGui/QTextCursor>
 #include <QtGui/QTextEdit>
 #include <QtGui/QToolBar>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 #include "embed.h"
 #include "engine.h"
@@ -49,11 +49,6 @@
 projectNotes::projectNotes( void ) :
 	QMainWindow( engine::getMainWindow()->workspace() )
 {
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addWindow( this );
-	}
-
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -78,6 +73,11 @@ projectNotes::projectNotes( void ) :
 
 	resize( 300, 200 );
 
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+
 	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
 	if( engine::getMainWindow()->workspace() != NULL )
 	{
@@ -87,8 +87,6 @@ projectNotes::projectNotes( void ) :
 	{
 		w->move( 800, 10 );
 	}
-
-	//show();
 
 }
 

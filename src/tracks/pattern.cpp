@@ -457,7 +457,7 @@ void pattern::openInPianoRoll( void )
 void pattern::openInPianoRoll( bool )
 {
 	engine::getPianoRoll()->setCurrentPattern( this );
-	engine::getPianoRoll()->show();
+	engine::getPianoRoll()->parentWidget()->show();
 	engine::getPianoRoll()->setFocus();
 }
 

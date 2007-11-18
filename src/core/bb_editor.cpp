@@ -29,6 +29,7 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
 
 
 #include "bb_editor.h"
@@ -72,18 +73,6 @@ bbEditor::bbEditor( void )
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
 				BBE_PPT + 2 * TCO_BORDER_WIDTH +
 				DEFAULT_SCROLLBAR_SIZE );
-
-	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		resize( minimumWidth(), 300 );
-		w->move( 10, 340 );
-	}
-	else
-	{
-		resize( minimumWidth(), 300 );
-		w->move( 210, 340 );
-	}
 
 	containerWidget()->move( 0, 32 );
 	setPixelsPerTact( BBE_PPT );
@@ -131,7 +120,24 @@ bbEditor::bbEditor( void )
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
-	show();
+	if( engine::getMainWindow()->workspace() != NULL )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	}
+
+	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
+	if( engine::getMainWindow()->workspace() != NULL )
+	{
+		w->resize( minimumWidth(), 300 );
+		w->move( 10, 340 );
+	}
+	else
+	{
+		resize( minimumWidth(), 300 );
+		w->move( 210, 340 );
+	}
+
+	w->show();
 }
 
 

@@ -29,7 +29,7 @@
 
 #include <QtGui/QScrollArea>
 #include <QtCore/QVector>
-#include <QtGui/QMainWindow>
+#include <QtGui/QWidget>
 
 
 #include "track.h"
@@ -42,7 +42,7 @@ const Uint16 DEFAULT_SCROLLBAR_SIZE = 16;
 
 
 
-class trackContainer : public QMainWindow, public journallingObject
+class trackContainer : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -52,6 +52,15 @@ public:
 	inline QWidget * containerWidget( void )
 	{
 		return( m_scrollArea );
+	}
+
+#warning centralWidget is obsolete
+	QWidget * centralWidget() const {
+		return (QWidget*)this;
+	}
+
+	void setCentralWidget( QWidget *cw ) {
+		//m_centralWidget = cw;
 	}
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -98,7 +107,6 @@ public:
 
 	const trackWidget * trackWidgetAt( const int _y ) const;
 
-
 	virtual bool allowRubberband( void ) const;
 
 	inline bool rubberBandActive( void ) const
@@ -131,10 +139,14 @@ protected:
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
+	
+    virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
+
 	virtual void resizeEvent( QResizeEvent * );
+
+	void addToWorkspace();
 
 	constTrackVector tracks( void ) const;
 
@@ -144,7 +156,6 @@ protected:
 	}
 
 	midiTime m_currentPosition;
-
 
 protected slots:
 	void updateScrollArea( void );

@@ -37,7 +37,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QSplitter>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 
 
 #ifdef HAVE_CONFIG_H
@@ -142,10 +143,10 @@ mainWindow::mainWindow( void ) :
 
 	if( no_mdi == FALSE )
 	{
-		m_workspace = new QWorkspace( splitter );
-		m_workspace->setScrollBarsEnabled( TRUE );
+		m_workspace = new QMdiArea( splitter );
 		m_workspace->setBackground( embed::getIconPixmap(
 						"background_artwork" ) );
+   // m_workspace->setBackgroundMode (QWidget::NoBackground);
 	}
 
 	hbox->addWidget( side_bar );
@@ -730,16 +731,16 @@ void mainWindow::help( void )
 
 void mainWindow::toggleBBEditorWin( void )
 {
-	if( engine::getBBEditor()->isHidden() == TRUE ||
+	if( engine::getBBEditor()->parentWidget()->isHidden() == TRUE ||
 		( m_workspace != NULL &&
-		  	m_workspace->activeWindow() != engine::getBBEditor() ) )
+		  	m_workspace->activeSubWindow()->widget() != engine::getBBEditor() ) )
 	{
-		engine::getBBEditor()->show();
+		engine::getBBEditor()->parentWidget()->show();
 		engine::getBBEditor()->setFocus();
 	}
 	else
 	{
-		engine::getBBEditor()->hide();
+		engine::getBBEditor()->parentWidget()->hide();
 	}
 }
 
@@ -748,16 +749,16 @@ void mainWindow::toggleBBEditorWin( void )
 
 void mainWindow::toggleSongEditorWin( void )
 {
-	if( engine::getSongEditor()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeWindow()
+	if( engine::getSongEditor()->parentWidget()->isHidden() == TRUE ||
+		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
 						!= engine::getSongEditor() ) )
 	{
-		engine::getSongEditor()->show();
+		engine::getSongEditor()->parentWidget()->show();
 		engine::getSongEditor()->setFocus();
 	}
 	else
 	{
-		engine::getSongEditor()->hide();
+		engine::getSongEditor()->parentWidget()->hide();
 	}
 }
 
@@ -767,7 +768,7 @@ void mainWindow::toggleSongEditorWin( void )
 void mainWindow::toggleProjectNotesWin( void )
 {
 	if( engine::getProjectNotes()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeWindow() !=
+		( m_workspace != NULL && m_workspace->activeSubWindow()->widget() !=
 						engine::getProjectNotes() ) )
 	{
 		engine::getProjectNotes()->show();
@@ -784,16 +785,16 @@ void mainWindow::toggleProjectNotesWin( void )
 
 void mainWindow::togglePianoRollWin( void )
 {
-	if( engine::getPianoRoll()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeWindow()
+	if( engine::getPianoRoll()->parentWidget()->isHidden() == TRUE ||
+		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
 						!= engine::getPianoRoll() ) )
 	{
-		engine::getPianoRoll()->show();
+		engine::getPianoRoll()->parentWidget()->show();
 		engine::getPianoRoll()->setFocus();
 	}
 	else
 	{
-		engine::getPianoRoll()->hide();
+		engine::getPianoRoll()->parentWidget()->hide();
 	}
 }
 
@@ -802,16 +803,16 @@ void mainWindow::togglePianoRollWin( void )
 
 void mainWindow::toggleAutomationEditorWin( void )
 {
-	if( engine::getAutomationEditor()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeWindow()
+	if( engine::getAutomationEditor()->parentWidget()->isHidden() == TRUE ||
+		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
 					!= engine::getAutomationEditor() ) )
 	{
-		engine::getAutomationEditor()->show();
+		engine::getAutomationEditor()->parentWidget()->show();
 		engine::getAutomationEditor()->setFocus();
 	}
 	else
 	{
-		engine::getAutomationEditor()->hide();
+		engine::getAutomationEditor()->parentWidget()->hide();
 	}
 }
 

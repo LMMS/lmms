@@ -29,7 +29,7 @@
 #include "tempo_sync_knob.h"
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 #include "automatable_object_templates.h"
 #include "caption_menu.h"

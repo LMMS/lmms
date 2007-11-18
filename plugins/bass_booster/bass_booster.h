@@ -52,7 +52,7 @@ public:
 	virtual inline effectControlDialog * createControlDialog( track * )
 	{
 		return( new bassBoosterControlDialog(
-					engine::getMainWindow()->workspace(),
+					NULL /*engine::getMainWindow()->workspace()*/,
 								this ) );
 	}
 

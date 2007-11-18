@@ -26,6 +26,7 @@
 #ifndef QT3
 
 #include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
 
 #else
 
@@ -38,7 +39,7 @@
 
 
 
-stereoEnhancerControlDialog::stereoEnhancerControlDialog( QWidget * _parent,
+stereoEnhancerControlDialog::stereoEnhancerControlDialog( QMdiArea * _parent,
 						stereoEnhancerEffect * _eff ) :
 		effectControlDialog( _parent, _eff ),
 		m_effect( _eff )

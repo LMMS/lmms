@@ -33,6 +33,7 @@
 class QGroupBox;
 class QLabel;
 class QPushButton;
+class QMdiSubWindow;
 
 class audioPort;
 class effect;
@@ -94,6 +95,7 @@ private:
 	QGroupBox * m_controls;
 	QLabel * m_label;
 	QPushButton * m_editButton;
+	QMdiSubWindow *m_subWindow;
 	effect * m_effect;
 	effectControlDialog * m_controlView;
 	track * m_track;

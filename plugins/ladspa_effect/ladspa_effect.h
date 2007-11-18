@@ -69,7 +69,7 @@ public:
 								track * _track )
 	{
 		return( new ladspaControlDialog(
-					engine::getMainWindow()->workspace(),
+					NULL /*engine::getMainWindow()->workspace()*/,
 							this, _track ) );
 	}
 

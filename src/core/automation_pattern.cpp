@@ -250,7 +250,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 void automationPattern::openInAutomationEditor( void )
 {
 	engine::getAutomationEditor()->setCurrentPattern( this );
-	engine::getAutomationEditor()->show();
+	engine::getAutomationEditor()->parentWidget()->show();
 	engine::getAutomationEditor()->setFocus();
 }
 
