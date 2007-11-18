@@ -1,3 +1,8 @@
+2007-11-18	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/track_container.h:
+	removed some obsolete functions
+
 2007-11-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/lvsl_client.cpp:
@@ -11,6 +16,57 @@
 
 	* acinclude.m4:
 	reverted Paul's private changes
+
+2007-11-18	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h
+	* include/main_window.h:
+	* include/instrument_track.h:
+	* include/track_container.h:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/track_container.cpp:
+	* src/core/tool.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/main.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	Replaced references to QWorkspace, made everything work with QMdiArea
+
+	* include/main_window.h:
+	mainWindow::workspace() now	returns a QMdiArea
+
+	* include/rack_plugin.h:
+	Add m_subWindow to track QMdiSubWindow independently of the 
+	control dialog
+
+	* include/track_container.h:
+	Emulate centralWidget by returning this pointer
+
+	* AUTHORS:
+	Added Paul Giblock as an author
+
+	* src/core/track_container.cpp:
+	Adding a subwindow before the widget is fully constructed causes
+	problems: no icon, no geometry, and sometime multiple windows.
+	Force each subclass to do their own workspace()->addWindow()
+
+	* src/core/main_window.cpp:
+	toggling of subWindows is performed on the parentWidgets. However,
+	things like instrumentTrack are actually QMdiSubWindows themselves
+
+
+
 
 2007-11-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
 

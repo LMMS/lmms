@@ -60,11 +60,6 @@ public:
 		return( (QWidget *) this );
 	}
 
-/*	void setCentralWidget( QWidget *cw )
-	{
-		//m_centralWidget = cw;
-	}*/
-
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 
@@ -147,8 +142,6 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 	virtual void resizeEvent( QResizeEvent * );
-
-	void addToWorkspace( void );
 
 	constTrackVector tracks( void ) const;
 
