@@ -221,7 +221,7 @@ void remoteVSTPlugin::showEditor( void )
 	m_pluginWidget = new QWidget( engine::getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
-	engine::getMainWindow()->workspace()->addWindow( m_pluginWidget );
+	engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget );
 	m_pluginWidget->show();
 
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );

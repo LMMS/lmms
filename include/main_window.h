@@ -28,13 +28,13 @@
 
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
+#include <QtGui/QMdiArea>
 #include <QtGui/QWhatsThis>
 
 class QAction;
 class QDomElement;
 class QGridLayout;
 class QSplashScreen;
-class QMdiArea;
 
 class configManager;
 class tool;

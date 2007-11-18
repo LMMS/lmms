@@ -7,13 +7,13 @@ AC_REQUIRE([AC_PATH_X])
 AC_MSG_CHECKING([QTDIR])
 AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [default=$QTDIR]], QTDIR=$withval)
 # Check that QTDIR is defined or that --with-qtdir given
-#if test x"$QTDIR" = x ; then
+if test x"$QTDIR" = x ; then
 	# some usual Qt-locations
-	QT_SEARCH="/home/llama/projects/lmms/lmms/qtdir /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.1.0"
-#else
-#	QT_SEARCH=$QTDIR
-#	QTDIR=""
-#fi
+	QT_SEARCH="/usr /usr/lib/qt4 /usr/share/qt4 /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.3.2 /usr/local/Trolltech/Qt-4.1.0"
+else
+	QT_SEARCH=$QTDIR
+	QTDIR=""
+fi
 for i in $QT_SEARCH ; do
 	QT_INCLUDE_SEARCH="include/qt4 include"
 	for j in $QT_INCLUDE_SEARCH ; do
@@ -23,9 +23,6 @@ for i in $QT_SEARCH ; do
 		fi
 	done
 done
-
-QTDIR="/home/llama/projects/lmms/qtdir"
-QT_INCLUDES="/home/llama/projects/lmms/qtdir/include"
 if test x"$QTDIR" = x ; then
 	AC_MSG_ERROR([*** QTDIR must be defined, or --with-qtdir option given])
 fi

@@ -55,13 +55,15 @@ public:
 	}
 
 #warning centralWidget is obsolete
-	QWidget * centralWidget() const {
-		return (QWidget*)this;
+	QWidget * centralWidget( void ) const
+	{
+		return( (QWidget *) this );
 	}
 
-	void setCentralWidget( QWidget *cw ) {
+/*	void setCentralWidget( QWidget *cw )
+	{
 		//m_centralWidget = cw;
-	}
+	}*/
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
@@ -140,13 +142,13 @@ protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	
-    virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 	virtual void resizeEvent( QResizeEvent * );
 
-	void addToWorkspace();
+	void addToWorkspace( void );
 
 	constTrackVector tracks( void ) const;
 

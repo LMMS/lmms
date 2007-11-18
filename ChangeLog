@@ -1,3 +1,17 @@
+2007-11-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/lvsl_client.cpp:
+	fixed usage of QMdiArea instead of QWorkspace
+
+	* include/main_window.h:
+	added inclusion of QMdiArea-header
+
+	* include/track_container.h:
+	fixed some code to match coding-style-guidelines
+
+	* acinclude.m4:
+	reverted Paul's private changes
+
 2007-11-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* configure.in:
