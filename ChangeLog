@@ -44,7 +44,7 @@
 	Replaced references to QWorkspace, made everything work with QMdiArea
 
 	* include/main_window.h:
-	mainWindow::workspace() now	returns a QMdiArea
+	mainWindow::workspace() now returns a QMdiArea
 
 	* include/rack_plugin.h:
 	Add m_subWindow to track QMdiSubWindow independently of the 
@@ -64,9 +64,6 @@
 	* src/core/main_window.cpp:
 	toggling of subWindows is performed on the parentWidgets. However,
 	things like instrumentTrack are actually QMdiSubWindows themselves
-
-
-
 
 2007-11-14	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
