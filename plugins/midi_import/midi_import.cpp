@@ -159,7 +159,7 @@ invalid_format:
 		goto invalid_format;
 	}
 #ifdef LMMS_DEBUG
-	printf( "time-division: %d\n", time_division );
+    printf( "time-division: %d\n", m_timingDivision );
 #endif
 
 	QProgressDialog pd( trackContainer::tr( "Importing MIDI-file..." ),
@@ -573,7 +573,7 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 								denominator = 4;
 							}
 #ifdef LMMS_DEBUG
-							printf("nom:%d  denom:%d  clocks:%d  notes:%d\n",nominator,denominator,clocks,notes);
+							printf("nom:%d  denom:%d\n",nominator,denominator);
 #endif
 							break;
 						}

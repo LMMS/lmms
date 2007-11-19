@@ -1,3 +1,8 @@
+2007-11-19  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/midi_import/midi_import.cpp:
+	fixed debugging code so file would compile
+
 2007-11-18	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/track_container.h:
