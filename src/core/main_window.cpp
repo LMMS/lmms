@@ -540,19 +540,18 @@ void mainWindow::clearKeyModifiers( void )
 
 void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	if( _w->parentWidget() != NULL )
+	if( _w->parentWidget() != NULL && 
+		_w->parentWidget()->inherits("QMdiSubWindow")) 
 	{
-		_de.setAttribute( "x", _w->parentWidget()->x() );
-		_de.setAttribute( "y", _w->parentWidget()->y() );
+		_w = _w->parentWidget();
 	}
-	else
-	{
-		_de.setAttribute( "x", 0 );
-		_de.setAttribute( "y", 0 );
-	}
+	
+	_de.setAttribute( "x", _w->x() );
+	_de.setAttribute( "y", _w->y() );
+	_de.setAttribute( "visible", _w->isVisible() );
+
 	_de.setAttribute( "width", _w->width() );
 	_de.setAttribute( "height", _w->height() );
-	_de.setAttribute( "visible", _w->isVisible() );
 }
 
 
@@ -567,17 +566,16 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 	if( !r.isNull())
 	{
 		_w->show();
+
 		if (_w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits("QMdiSubWindow")) 
 		{
 			_w = _w->parentWidget();
 		}
 
-		_w->show();
-
+		_w->resize( r.size() );
 		_w->move( r.topLeft() );
 		_w->setShown( _de.attribute( "visible" ).toInt() );
-		_w->resize( r.size() );
 	}
 }
 

@@ -3,6 +3,9 @@
 	* src/core/main_window:
 	fixed flashing/moving windows on project load 
 
+	* src/core/song_editor.cpp:
+	inverted direction of master-volume and master-pitch sliders
+
 2007-11-19  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/midi_import/midi_import.cpp:

@@ -182,6 +182,7 @@ songEditor::songEditor( void ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
+    m_masterVolumeSlider->setInvertedAppearance( true );
 	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
@@ -216,6 +217,7 @@ songEditor::songEditor( void ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
+    m_masterPitchSlider->setInvertedAppearance( true );
 	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterPitchChanged( int ) ) );
