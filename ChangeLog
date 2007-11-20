@@ -1,3 +1,8 @@
+2007-11-20  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/core/main_window:
+	fixed flashing/moving windows on project load 
+
 2007-11-19  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/midi_import/midi_import.cpp:

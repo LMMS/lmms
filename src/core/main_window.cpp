@@ -564,13 +564,18 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			tMax( 0, _de.attribute( "y" ).toInt() ),
 			_de.attribute( "width" ).toInt(),
 			_de.attribute( "height" ).toInt() );
-	if( !r.isNull() && _w->parentWidget() != NULL )
+	if( !r.isNull())
 	{
 		_w->show();
-		if( _w->parentWidget() != NULL )
+		if (_w->parentWidget() != NULL &&
+			_w->parentWidget()->inherits("QMdiSubWindow")) 
 		{
-			_w->parentWidget()->move( r.topLeft() );
+			_w = _w->parentWidget();
 		}
+
+		_w->show();
+
+		_w->move( r.topLeft() );
 		_w->setShown( _de.attribute( "visible" ).toInt() );
 		_w->resize( r.size() );
 	}
