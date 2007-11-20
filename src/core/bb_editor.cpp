@@ -300,8 +300,15 @@ void bbEditor::updateComboBox( void )
 // instead of closing it's being hidden
 void bbEditor::closeEvent( QCloseEvent * _ce )
 {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
 	_ce->ignore();
-	hide();
 }
 
 

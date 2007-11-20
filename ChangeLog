@@ -1,3 +1,71 @@
+2007-11-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/drumsynth.h:
+	* licenses/drumsynth.LICENSE:
+	* src/lib/drumsynth.cpp:
+	relicensed under GPL, thanks to Paul Kellett.
+
+	* src/lib/sample_buffer.cpp:
+	fixed Vorbis loading
+
+	* include/effect_label.h:
+	* plugins/live_tool/live_tool.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/tool.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/project_notes.cpp:
+	fixed MDI windows
+
+	* include/main_window.h:
+	* src/core/automation_editor.cpp:
+	* src/core/main_window.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/song_editor.cpp:
+	fixed non-MDI mode
+
+	* include/automatable_button.h:
+	* src/widgets/automatable_button.cpp:
+	inherit from QPushButton
+
+	* include/tool.h:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	* src/core/main_window.cpp:
+	* src/core/tool.cpp:
+	simplified tool interface
+
+	* plugins/live_tool/live_tool.cpp:
+	fixed instrument toggling
+
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	fixed focus bug
+
+	* include/effect_label.h:
+	* src/widgets/effect_label.cpp:
+	simplified window management
+
+	* include/effect_label.h:
+	* include/main_window.h:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_effect/vst_effect.h:
+	* src/core/track_container.cpp:
+	reduced dependencies
+
+	* data/samples/drumsynth/misc_bass/Makefile.am:
+	* data/samples/drumsynth/misc_claps/Makefile.am:
+	* data/samples/drumsynth/misc_electro/Makefile.am:
+	* data/samples/drumsynth/misc_fx/Makefile.am:
+	* data/samples/drumsynth/misc_hats/Makefile.am:
+	* data/samples/drumsynth/misc_perc/Makefile.am:
+	* data/samples/drumsynth/misc_synth/Makefile.am:
+	* data/samples/drumsynth/r_b/Makefile.am:
+	replaced more filenames with underscores, thanks to Vik.
+
 2007-11-20  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/core/main_window:

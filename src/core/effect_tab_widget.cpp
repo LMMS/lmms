@@ -26,22 +26,22 @@
  */
 
 
-#include <Qt/QtXml>
+#include "effect_tab_widget.h"
+
+
 #include <QtGui/QMenu>
 #include <QtGui/QToolButton>
-#include <QtGui/QCloseEvent>
 
 
-#include "effect_tab_widget.h"
-#include "instrument_track.h"
-#include "sample_track.h"
-#include "group_box.h"
-#include "tooltip.h"
-#include "embed.h"
+#include "audio_port.h"
 #include "effect_select_dialog.h"
+#include "embed.h"
+#include "group_box.h"
+#include "instrument_track.h"
 #include "rack_plugin.h"
 #include "rack_view.h"
-#include "audio_port.h"
+#include "sample_track.h"
+#include "tooltip.h"
 
 
 
@@ -153,13 +153,6 @@ void effectTabWidget::setBypass( bool _state )
 }
 
 
-
-
-void effectTabWidget::closeEvent( QCloseEvent * _ce )
-{
-	_ce->ignore();
-	emit( closed() );
-}
 
 
 #include "effect_tab_widget.moc"

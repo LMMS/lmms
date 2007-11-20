@@ -28,12 +28,12 @@
 #define _EFFECT_TAB_WIDGET_H
 
 #include <QtGui/QWidget>
-#include <QtGui/QPushButton>
-#include <QtGui/QLayout>
 
 #include "journalling_object.h"
 #include "rack_view.h"
 
+
+class QPushButton;
 
 class audioPort;
 class groupBox;
@@ -68,17 +68,9 @@ public:
 	}
 
 
-signals:
-	void closed( void );
-
-
 private slots:
 	void addEffect( void );
 	void setBypass( bool _state );
-
-
-protected:
-	virtual void closeEvent( QCloseEvent * _ce );
 
 
 private:

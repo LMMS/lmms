@@ -27,17 +27,18 @@
 
 #include "project_notes.h"
 
-#include <Qt/QtXml>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
+#include <QtGui/QCloseEvent>
 #include <QtGui/QColorDialog>
 #include <QtGui/QComboBox>
 #include <QtGui/QFontDatabase>
 #include <QtGui/QLineEdit>
+#include <QtGui/QMdiArea>
 #include <QtGui/QTextCursor>
 #include <QtGui/QTextEdit>
 #include <QtGui/QToolBar>
-#include <QtGui/QMdiArea>
+#include <QtXml/QDomCDATASection>
 
 #include "embed.h"
 #include "engine.h"
@@ -71,23 +72,18 @@ projectNotes::projectNotes( void ) :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	resize( 300, 200 );
-
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
-	}
-
-	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		w->move( 700, 10 );
+		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		parentWidget()->move( 700, 10 );
+		parentWidget()->resize( 300, 200 );
 	}
 	else
 	{
-		w->move( 800, 10 );
+		move( 800, 10 );
+		resize( 300, 200 );
 	}
-
 }
 
 

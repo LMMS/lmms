@@ -23,9 +23,11 @@
  */
 
 
-#include <QtGui/QKeyEvent>
-
 #include "live_tool.h"
+
+#include <QtGui/QKeyEvent>
+#include <QtGui/QLayout>
+
 #include "bb_editor.h"
 #include "engine.h"
 #include "song_editor.h"
@@ -63,8 +65,8 @@ plugin::descriptor live_tool_plugin_descriptor =
 
 
 
-liveTool::liveTool( mainWindow * _window ) :
-	tool( _window, &live_tool_plugin_descriptor )
+liveTool::liveTool( void ) :
+	tool( &live_tool_plugin_descriptor )
 {
 	const QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
 
@@ -83,6 +85,12 @@ liveTool::liveTool( mainWindow * _window ) :
 		"Beat+Baseline Editor." ) );
 
 	hide();
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+		parentWidget()->layout()->setSizeConstraint(
+							QLayout::SetFixedSize );
+	}
 }
 
 
@@ -133,6 +141,16 @@ void liveTool::keyPressEvent( QKeyEvent * _ke )
 
 
 
+void liveTool::mousePressEvent( QMouseEvent * _me )
+{
+	// MDI window gets focus otherwise
+	setFocus();
+	_me->accept();
+}
+
+
+
+
 #ifdef Q_WS_X11
 bool liveTool::x11Event( XEvent * _xe )
 {
@@ -155,7 +173,7 @@ bool liveTool::x11Event( XEvent * _xe )
 
 void liveTool::toggleInstrument( int _n )
 {
-	if( _n > 0 && _n < engine::getBBEditor()->tracks().count() )
+	if( _n < engine::getBBEditor()->tracks().count() )
 	{
 		track * t = engine::getBBEditor()->tracks().at( _n );
 		t->setMuted( !t->muted() );
@@ -171,7 +189,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
-	return( new liveTool( static_cast<mainWindow *>( _data ) ) );
+	return( new liveTool() );
 }
 
 }

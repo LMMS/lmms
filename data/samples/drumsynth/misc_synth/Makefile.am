@@ -1,4 +1,4 @@
-miscsynthdrumsynthsamplesdir = $(lmmsdatadir)/samples/drumsynth/misc synth
+miscsynthdrumsynthsamplesdir = $(lmmsdatadir)/samples/drumsynth/misc_synth
 
 miscsynthdrumsynthsamples_DATA = *.ds
 

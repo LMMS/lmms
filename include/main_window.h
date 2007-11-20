@@ -28,12 +28,12 @@
 
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
-#include <QtGui/QMdiArea>
 #include <QtGui/QWhatsThis>
 
 class QAction;
 class QDomElement;
 class QGridLayout;
+class QMdiArea;
 class QSplashScreen;
 
 class configManager;
@@ -122,6 +122,8 @@ private:
 	virtual ~mainWindow();
 
 	void finalize( void );
+
+	void toggleWindow( QWidget * _w );
 
 
 	QMdiArea * m_workspace;

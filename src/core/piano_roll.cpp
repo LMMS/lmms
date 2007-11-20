@@ -127,7 +127,6 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
 pianoRoll::pianoRoll( void ) :
-	QWidget( ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -421,14 +420,19 @@ pianoRoll::pianoRoll( void ) :
 
 	setMouseTracking( TRUE );
 
-    // add us to workspace
+	// add us to workspace
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->resize( INITIAL_PIANOROLL_WIDTH,
+						INITIAL_PIANOROLL_HEIGHT );
+		parentWidget()->hide();
 	}
-	parentWidget()->resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
-	parentWidget()->hide();
-
+	else
+	{
+		resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
+		hide();
+	}
 }
 
 
@@ -970,8 +974,15 @@ void pianoRoll::removeSelection( void )
 void pianoRoll::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
-	parentWidget()->hide();
-	_ce->ignore ();
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
 }
 
 

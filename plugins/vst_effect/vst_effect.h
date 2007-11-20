@@ -27,7 +27,7 @@
 #define _VST_EFFECT_H
 
 #include <QtCore/QMutex>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 
 #include "effect.h"
 #include "engine.h"

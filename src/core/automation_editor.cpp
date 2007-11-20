@@ -74,7 +74,6 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 
 automationEditor::automationEditor( void ) :
-	QWidget( ),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -335,11 +334,14 @@ automationEditor::automationEditor( void ) :
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		parentWidget()->hide();
 	}
-
-	parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
-	parentWidget()->hide();
-
+	else
+	{
+		resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		hide();
+	}
 }
 
 
@@ -766,8 +768,15 @@ void automationEditor::removeSelection( void )
 void automationEditor::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
-	hide();
-	_ce->ignore ();
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
+	_ce->ignore();
 }
 
 

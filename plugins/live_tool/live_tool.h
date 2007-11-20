@@ -1,7 +1,7 @@
 /*
  * live_tool.h - declaration of class liveTool, for live performance
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,7 @@
 class liveTool : public tool
 {
 public:
-	liveTool( mainWindow * _window );
+	liveTool( void );
 	virtual ~liveTool();
 
 	virtual QString nodeName( void ) const;
@@ -43,6 +43,7 @@ public:
 
 protected:
 	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void mousePressEvent( QMouseEvent * _me );
 #ifdef Q_WS_X11
 	virtual bool x11Event( XEvent * _xe );
 #endif

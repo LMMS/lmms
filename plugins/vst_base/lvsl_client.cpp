@@ -28,7 +28,7 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
 #include <QtCore/QDir>
-#include <QtGui/QWorkspace>
+#include <QtGui/QMdiArea>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 

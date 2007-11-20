@@ -56,7 +56,6 @@
 
 
 trackContainer::trackContainer( void ) :
-	QWidget( ),
 	m_currentPosition( 0, 0 ),
 	m_scrollArea( new scrollArea( this ) ),
 	m_ppt( DEFAULT_PIXELS_PER_TACT ),

@@ -26,7 +26,7 @@
 #ifndef _AUTOMATABLE_BUTTON_H
 #define _AUTOMATABLE_BUTTON_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QPushButton>
 
 #include "automatable_object.h"
 
@@ -34,7 +34,7 @@
 class automatableButtonGroup;
 
 
-class automatableButton : public QWidget, public automatableObject<bool,
+class automatableButton : public QPushButton, public automatableObject<bool,
 			  					signed char>
 {
 	Q_OBJECT
@@ -44,22 +44,12 @@ public:
 	virtual ~automatableButton();
 
 
-	inline virtual bool isChecked( void ) const
-	{
-		return( value() );
-	}
-
 	virtual void setValue( const bool _on );
 
 	inline void setCheckable( bool _on )
 	{
-		m_checkable = _on;
-		setJournalling( m_checkable );
-	}
-
-	inline bool isCheckable( void ) const
-	{
-		return( m_checkable );
+		QPushButton::setCheckable( _on );
+		setJournalling( _on );
 	}
 
 
@@ -67,6 +57,7 @@ public slots:
 	virtual void toggle( void );
 	virtual void setChecked( bool _on )
 	{
+		// QPushButton::setChecked is called in setValue()
 		setValue( _on );
 	}
 
@@ -79,15 +70,9 @@ protected:
 
 private:
 	automatableButtonGroup * m_group;
-	bool m_checkable;
 
 
 	friend class automatableButtonGroup;
-
-
-signals:
-	void clicked( void );
-	void toggled( bool );
 
 } ;
 

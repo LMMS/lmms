@@ -31,19 +31,15 @@
 #include "plugin.h"
 
 
-class mainWindow;
-
-
 class tool : public QWidget, public plugin
 {
 public:
-	tool( mainWindow * _window, const descriptor * _descriptor );
+	tool( const descriptor * _descriptor );
 	virtual ~tool();
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
-	static tool * FASTCALL instantiate( const QString & _plugin_name,
-							mainWindow * _window );
+	static tool * FASTCALL instantiate( const QString & _plugin_name );
 
 } ;
 

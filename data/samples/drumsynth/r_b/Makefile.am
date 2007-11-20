@@ -1,4 +1,4 @@
-rbdrumsynthsamplesdir = $(lmmsdatadir)/samples/drumsynth/r&b
+rbdrumsynthsamplesdir = $(lmmsdatadir)/samples/drumsynth/r_b
 
 rbdrumsynthsamples_DATA = *.ds
 

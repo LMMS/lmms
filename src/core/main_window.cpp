@@ -73,7 +73,6 @@ extern int splash_alignment_flags;
 
 
 mainWindow::mainWindow( void ) :
-	QMainWindow(),
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
@@ -177,6 +176,7 @@ mainWindow::mainWindow( void ) :
 
 mainWindow::~mainWindow()
 {
+	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
 	engine::destroy();
 }
@@ -428,8 +428,7 @@ void mainWindow::finalize( void )
 		if( it->type == plugin::Tool )
 		{
 			m_tools_menu->addAction( *it->logo, it->public_name );
-			m_tools.push_back( tool::instantiate( it->name,
-								this ) );
+			m_tools.push_back( tool::instantiate( it->name ) );
 		}
 	}
 	if( !m_tools_menu->isEmpty() )
@@ -540,8 +539,8 @@ void mainWindow::clearKeyModifiers( void )
 
 void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	if( _w->parentWidget() != NULL && 
-		_w->parentWidget()->inherits("QMdiSubWindow")) 
+	if( _w->parentWidget() != NULL &&
+			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
 	}
@@ -568,7 +567,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		_w->show();
 
 		if (_w->parentWidget() != NULL &&
-			_w->parentWidget()->inherits("QMdiSubWindow")) 
+			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();
 		}
@@ -732,19 +731,42 @@ void mainWindow::help( void )
 
 
 
-void mainWindow::toggleBBEditorWin( void )
+void mainWindow::toggleWindow( QWidget * _w )
 {
-	if( engine::getBBEditor()->parentWidget()->isHidden() == TRUE ||
-		( m_workspace != NULL &&
-		  	m_workspace->activeSubWindow()->widget() != engine::getBBEditor() ) )
+	if( m_workspace )
 	{
-		engine::getBBEditor()->parentWidget()->show();
-		engine::getBBEditor()->setFocus();
+		if( m_workspace->activeSubWindow() != _w->parentWidget()
+					|| _w->parentWidget()->isHidden() )
+		{
+			_w->parentWidget()->show();
+			_w->show();
+			_w->setFocus();
+		}
+		else
+		{
+			_w->parentWidget()->hide();
+		}
 	}
 	else
 	{
-		engine::getBBEditor()->parentWidget()->hide();
+		if( _w->isHidden() )
+		{
+			_w->show();
+			_w->setFocus();
+		}
+		else
+		{
+			_w->hide();
+		}
 	}
+}
+
+
+
+
+void mainWindow::toggleBBEditorWin( void )
+{
+	toggleWindow( engine::getBBEditor() );
 }
 
 
@@ -752,17 +774,7 @@ void mainWindow::toggleBBEditorWin( void )
 
 void mainWindow::toggleSongEditorWin( void )
 {
-	if( engine::getSongEditor()->parentWidget()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
-						!= engine::getSongEditor() ) )
-	{
-		engine::getSongEditor()->parentWidget()->show();
-		engine::getSongEditor()->setFocus();
-	}
-	else
-	{
-		engine::getSongEditor()->parentWidget()->hide();
-	}
+	toggleWindow( engine::getSongEditor() );
 }
 
 
@@ -770,17 +782,7 @@ void mainWindow::toggleSongEditorWin( void )
 
 void mainWindow::toggleProjectNotesWin( void )
 {
-	if( engine::getProjectNotes()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeSubWindow()->widget() !=
-						engine::getProjectNotes() ) )
-	{
-		engine::getProjectNotes()->show();
-		engine::getProjectNotes()->setFocus();
-	}
-	else
-	{
-		engine::getProjectNotes()->hide();
-	}
+	toggleWindow( engine::getProjectNotes() );
 }
 
 
@@ -788,17 +790,7 @@ void mainWindow::toggleProjectNotesWin( void )
 
 void mainWindow::togglePianoRollWin( void )
 {
-	if( engine::getPianoRoll()->parentWidget()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
-						!= engine::getPianoRoll() ) )
-	{
-		engine::getPianoRoll()->parentWidget()->show();
-		engine::getPianoRoll()->setFocus();
-	}
-	else
-	{
-		engine::getPianoRoll()->parentWidget()->hide();
-	}
+	toggleWindow( engine::getPianoRoll() );
 }
 
 
@@ -806,17 +798,7 @@ void mainWindow::togglePianoRollWin( void )
 
 void mainWindow::toggleAutomationEditorWin( void )
 {
-	if( engine::getAutomationEditor()->parentWidget()->isHidden() == TRUE ||
-		( m_workspace != NULL && m_workspace->activeSubWindow()->widget()
-					!= engine::getAutomationEditor() ) )
-	{
-		engine::getAutomationEditor()->parentWidget()->show();
-		engine::getAutomationEditor()->setFocus();
-	}
-	else
-	{
-		engine::getAutomationEditor()->parentWidget()->hide();
-	}
+	toggleWindow( engine::getAutomationEditor() );
 }
 
 
@@ -936,6 +918,10 @@ void mainWindow::showTool( QAction * _idx )
 {
 	tool * t = m_tools[m_tools_menu->actions().indexOf( _idx )];
 	t->show();
+	if( m_workspace )
+	{
+		t->parentWidget()->show();
+	}
 	t->setFocus();
 }
 

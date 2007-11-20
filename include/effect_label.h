@@ -27,11 +27,12 @@
 #define _EFFECT_LABEL_H
 
 #include <QtGui/QWidget>
-#include <QtGui/QPushButton>
-#include <QtGui/QLabel>
 
 #include "journalling_object.h"
 
+
+class QLabel;
+class QPushButton;
 
 class effectTabWidget;
 class sampleTrack;
@@ -56,11 +57,12 @@ public:
 	{
 		return( "sample_track" );
 	}
+
 	
 public slots:
 	void showEffects( void );
-	void closeEffects( void );
 	void rename( void );
+
 	
 signals:
 	void clicked( void );
@@ -68,18 +70,21 @@ signals:
 	void nameChanged( const QString & _new_name );
 	void pixmapChanged( void );
 
+
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 
+
 private:
 	sampleTrack * m_track;
-	bool m_show;
 	
 	QLabel * m_label;
 	QPushButton * m_effectBtn;
 	tabWidget * m_tabWidget;
 	effectTabWidget * m_effWidget;
+	QWidget * m_effWindow;
+
 };
 
 #endif

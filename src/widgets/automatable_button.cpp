@@ -40,10 +40,9 @@
 
 automatableButton::automatableButton( QWidget * _parent, const QString & _name,
 							track * _track ) :
-	QWidget( _parent ),
+	QPushButton( _parent ),
 	autoObj( _track, FALSE, FALSE, TRUE ),
-	m_group( NULL ),
-	m_checkable( FALSE )
+	m_group( NULL )
 {
 	if( _track != NULL )
 	{
@@ -71,7 +70,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
 	if( nullTrack() && ( m_group == NULL || m_group->nullTrack() ) )
 	{
-		QWidget::contextMenuEvent( _me );
+		QPushButton::contextMenuEvent( _me );
 		return;
 	}
 
@@ -109,11 +108,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		if( m_checkable == FALSE )
-		{
-			setChecked( TRUE );
-		}
-		else
+		if( isCheckable() )
 		{
 			toggle();
 		}
@@ -121,7 +116,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		QWidget::mousePressEvent( _me );
+		QPushButton::mousePressEvent( _me );
 	}
 }
 
@@ -130,10 +125,6 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 
 void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
-	if( m_checkable == FALSE )
-	{
-		setChecked( FALSE );
-	}
 	emit clicked();
 }
 
@@ -142,7 +133,7 @@ void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 
 void automatableButton::toggle( void )
 {
-	if( m_checkable == TRUE && m_group != NULL )
+	if( isCheckable() && m_group != NULL )
 	{
 		if( value() == FALSE )
 		{
@@ -165,6 +156,7 @@ void automatableButton::setValue( const bool _on )
 	{
 		autoObj::setValue( _on );
 		setFirstValue();
+		QPushButton::setChecked( _on );
 		update();
 		emit( toggled( value() ) );
 	}

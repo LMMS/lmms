@@ -485,7 +485,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 	f_cnt_t frames = 0;
 
 	QFile * f = new QFile( _f );
-	if( f->open( QFile::ReadOnly | QFile::Truncate ) == FALSE )
+	if( f->open( QFile::ReadOnly ) == FALSE )
 	{
 		delete f;
 		return( 0 );

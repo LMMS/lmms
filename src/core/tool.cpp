@@ -30,17 +30,29 @@
 #include <QtGui/QIcon>
 #include <QtGui/QMdiArea>
 
+#include "engine.h"
 #include "main_window.h"
 
 
 
 
-tool::tool( mainWindow * _window, const descriptor * _descriptor ) :
-	QWidget( _window->workspace() ),
+tool::tool( const descriptor * _descriptor ) :
 	plugin( _descriptor )
 {
-	setWindowTitle( _descriptor->public_name );
-	setWindowIcon( *_descriptor->logo );
+	QWidget * window;
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+		window = parentWidget();
+		window->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	}
+	else
+	{
+		window = this;
+	}
+
+	window->setWindowTitle( _descriptor->public_name );
+	window->setWindowIcon( *_descriptor->logo );
 }
 
 
@@ -53,9 +65,9 @@ tool::~tool()
 
 
 
-tool * tool::instantiate( const QString & _plugin_name, mainWindow * _window )
+tool * tool::instantiate( const QString & _plugin_name )
 {
-	plugin * p = plugin::instantiate( _plugin_name, _window );
+	plugin * p = plugin::instantiate( _plugin_name, NULL );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<tool *>( p ) != NULL )
 	{

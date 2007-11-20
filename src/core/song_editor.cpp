@@ -413,8 +413,15 @@ songEditor::~songEditor()
 
 void songEditor::closeEvent( QCloseEvent * _ce )
 {
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
 	_ce->ignore();
-	hide();
 }
 
 

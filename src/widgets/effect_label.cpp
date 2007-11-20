@@ -28,8 +28,10 @@
 
 #include "effect_label.h"
 
-#include <QtGui/QMouseEvent>
+#include <QtGui/QLabel>
 #include <QtGui/QMdiArea>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPushButton>
 #include <QtXml/QDomElement>
 
 #include "effect_tab_widget.h"
@@ -46,8 +48,7 @@
 effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 							sampleTrack * _track ) :
 	QWidget( _parent ),
-	m_track( _track ),
-	m_show( TRUE )
+	m_track( _track )
 {
 	m_effectBtn = new QPushButton( embed::getIconPixmap( "setup_audio" ),
 								"", this );
@@ -67,14 +68,21 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 
 	if( engine::getMainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( m_effWidget );
+		engine::getMainWindow()->workspace()->addSubWindow(
+								m_effWidget );
+		m_effWindow = m_effWidget->parentWidget();
+		m_effWindow->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		m_effWindow->layout()->setSizeConstraint(
+							QLayout::SetFixedSize );
+	}
+	else
+	{
+		m_effWindow = m_effWidget;
 	}
 
- 	m_effWidget->setWindowTitle( _initial_name );
+ 	m_effWindow->setWindowTitle( _initial_name );
 	m_effWidget->setFixedSize( 240, 242 );
-	m_effWidget->hide();
-	connect( m_effWidget, SIGNAL( closed() ), 
-					this, SLOT( closeEffects() ) );
+	m_effWindow->hide();
 }
 
 
@@ -82,7 +90,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 
 effectLabel::~effectLabel()
 {
-	delete m_effWidget;
+	m_effWindow->deleteLater();
 }
 
 
@@ -99,7 +107,7 @@ QString effectLabel::text( void ) const
 void FASTCALL effectLabel::setText( const QString & _text )
 {
 	m_label->setText( _text );
-	m_effWidget->setWindowTitle( _text );
+	m_effWindow->setWindowTitle( _text );
 }
 
 
@@ -107,16 +115,18 @@ void FASTCALL effectLabel::setText( const QString & _text )
 
 void effectLabel::showEffects( void )
 {
-	if( m_show )
+	if( m_effWindow->isHidden() )
 	{
 		m_effWidget->show();
-		m_effWidget->raise();
-		m_show = FALSE;
+		if( m_effWindow != m_effWidget )
+		{
+			m_effWindow->show();
+		}
+		m_effWindow->raise();
 	}
 	else
 	{
-		m_effWidget->hide();
-		m_show = TRUE;
+		m_effWindow->hide();
 	}
 }
 
@@ -149,15 +159,6 @@ void effectLabel::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
-}
-
-
-
-
-void effectLabel::closeEffects( void )
-{
-	m_effWidget->hide();
-	m_show = TRUE;
 }
 
 
