@@ -59,7 +59,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 					names[_color].toAscii().constData() ) );
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
-	setFont( pointSizeF( font(), 7.5f ) );
+	setFont( pointSize<7>( font() ) );
 	setFixedSize( m_ledOffPixmap->width() + 4 +
 					QFontMetrics( font() ).width( text() ),
 			m_ledOffPixmap->height() );
@@ -80,6 +80,7 @@ ledCheckBox::~ledCheckBox()
 void ledCheckBox::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
+	p.setFont( pointSize<7>( font() ) );
 
 	if( isChecked() == TRUE )
 	{
@@ -91,9 +92,9 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	}
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( m_ledOffPixmap->width() + 3, 9, text() );
+	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
 	p.setPen( QColor( 255, 255, 255 ) );
-	p.drawText( m_ledOffPixmap->width() + 2, 8, text() );
+	p.drawText( m_ledOffPixmap->width() + 2, 9, text() );
 }
 
 

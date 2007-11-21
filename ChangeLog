@@ -1,3 +1,37 @@
+2007-11-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/lib/sample_buffer.cpp:
+	- duplicate ASCII-string from file.toAscii().constData() in order to not
+	  get corrupted - fixes random problems with loading OGG-files
+	- sample-visualization now floating-point-based
+	
+	* src/widgets/combobox.cpp:
+	fixed text-drawing
+
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/tab_widget.cpp:
+	added workarounds for obviously non-working font-property
+
+	* src/widgets/knob.cpp:
+	- knob::drawKnob( ... ) now completely works with floats
+	- use anti-aliasing when drawing tick
+
+	* src/tracks/sample_track.cpp:
+	fixed painting of sample-TCO's
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	removed obviously non-working comboBox::setFont( ... )-calls
+
+	* src/core/envelope_and_lfo_widget.cpp:
+	use line-width of 1.5 instead of 2 for drawing LFO
+
+	* src/core/main.cpp:
+	do not set default font-size
+
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	fixed German localization
+
 2007-11-20	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/drumsynth.h:

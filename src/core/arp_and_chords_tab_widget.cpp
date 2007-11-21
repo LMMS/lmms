@@ -190,7 +190,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 
 	m_chordsComboBox = new comboBox( m_chordsGroupBox, tr( "Chord type" ),
 							_instrument_track );
-	m_chordsComboBox->setFont( pointSize<8>( m_chordsComboBox->font() ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
@@ -233,7 +232,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 			"possible chords, you can select." ) );
 	m_arpComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio type" ),
 							_instrument_track );
-	m_arpComboBox->setFont( pointSize<8>( m_arpComboBox->font() ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
@@ -345,7 +343,6 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 
 	m_arpModeComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio mode" ),
 							_instrument_track );
-	m_arpModeComboBox->setFont( pointSize<8>( m_arpModeComboBox->font() ) );
 	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
 	m_arpModeComboBox->addItem( tr( "Free" ),

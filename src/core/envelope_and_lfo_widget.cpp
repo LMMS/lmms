@@ -773,7 +773,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 				static_cast<int>( 255 - 159 * lfo_gray_amount ),
 				static_cast<int>( 128 - 32 *
 							lfo_gray_amount ) ),
-									2 ) );
+									1.5 ) );
 
 
 	float osc_frames = m_lfoOscillationFrames;

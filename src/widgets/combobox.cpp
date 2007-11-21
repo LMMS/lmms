@@ -64,7 +64,7 @@ comboBox::comboBox( QWidget * _parent, const QString & _name, track * _track ) :
 							"combobox_arrow" ) );
 	}
 
-	setFont( pointSize<8>( font() ) );
+	setFont( pointSize<9>( font() ) );
 	m_menu.setFont( pointSize<8>( m_menu.font() ) );
 
 	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
@@ -243,10 +243,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			tx += item_pm.width() + 2;
 		}
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, p.fontMetrics().height()+1,
+		p.drawText( tx+1, p.fontMetrics().height()-1,
 						m_items[value()].first );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, p.fontMetrics().height(),
+		p.drawText( tx, p.fontMetrics().height()-2,
 						m_items[value()].first );
 	}
 }

@@ -161,7 +161,7 @@ int main( int argc, char * * argv )
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
-	app.setFont( pointSize<10>( app.font() ) );
+//	app.setFont( pointSize<10>( app.font() ) );
 
 
 	if( !configManager::inst()->loadConfigFile() )

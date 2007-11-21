@@ -1844,7 +1844,7 @@ installiert sind. Soll der Einrichtungsassistent jetzt gestartet werden?</transl
     <message>
         <location filename="" line="0"/>
         <source>MODULATE ENV-AMOUNT</source>
-        <translation>HK.INTENS. MODULIEREN</translation>
+        <translation>HÜLLK. MODULIEREN</translation>
     </message>
     <message>
         <location filename="" line="0"/>

@@ -200,7 +200,7 @@ void sampleBuffer::update( bool _keep_settings )
 	else if( m_audioFile != "" )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
-		const char * f = file.toAscii().constData();
+		char * f = qstrdup( file.toAscii().constData() );
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
@@ -233,6 +233,8 @@ void sampleBuffer::update( bool _keep_settings )
 			m_frames = decodeSampleDS( f, buf, channels,
 								samplerate );
 		}
+
+		delete[] f;
 
 		if( m_frames > 0 && buf != NULL )
 		{
@@ -764,24 +766,25 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const int w = _dr.width();
 	const int h = _dr.height();
 
-	const Uint16 y_base = h / 2 + _dr.y();
+	const float y_base = h / 2 + _dr.y();
 	const float y_space = h / 2;
 
 	const QRect isect = _dr.intersect( _clip );
 
 	int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
 
+	_p.setPen( QPen( _p.pen().color(), 0.5 ) );
 	const f_cnt_t fpp = tLimit<f_cnt_t>( m_frames / w, 1, 20 );
 	int old_x = _clip.x();
 	for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
 	{
-		const int x = _dr.x() + static_cast<int>( frame /
+		const float x = _dr.x() + ( frame /
 					(float) m_frames * _dr.width() );
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
-			const Uint16 y = y_base - static_cast<Uint16>(
+			const Uint16 y = y_base - (
 						m_data[frame][chnl] * y_space );
-			_p.drawLine( old_x, old_y[chnl], x, y );
+			_p.drawLine( QLineF( old_x, old_y[chnl], x, y+0.5 ) );
 			old_y[chnl] = y;
 		}
 		old_x = x;

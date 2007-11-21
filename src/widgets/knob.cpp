@@ -159,9 +159,9 @@ void knob::setTotalAngle( float _angle )
 
 void knob::drawKnob( QPainter * _p )
 {
-	const float radius = m_knobPixmap->width() / 2 - 1;
-	const float xm = m_knobPixmap->width() / 2;//radius + 1;
-	const float ym = m_knobPixmap->height() / 2;//radius+1;
+	const float radius = m_knobPixmap->width() / 2.0f - 1;
+	const float xm = m_knobPixmap->width() / 2.0f;//radius + 1;
+	const float ym = m_knobPixmap->height() / 2.0f;//radius+1;
 
 	const float rarc = m_angle * M_PI / 180.0;
 	const float ca = cos( rarc );
@@ -171,21 +171,22 @@ void knob::drawKnob( QPainter * _p )
 								*m_knobPixmap );
 
 	_p->setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
+	_p->setRenderHint( QPainter::Antialiasing );
 
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			_p->drawLine( (int)( xm-sa ), (int)( ym-ca ),
-					(int)( xm - sa*radius ),
-					(int)( ym - ca*radius ) );
+			_p->drawLine( QLineF( xm-sa, ym-ca,
+					xm - sa*radius,
+					ym - ca*radius ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			_p->drawLine( (int)( xm-sa ), (int)( ym-ca ),
-					(int)( xm - sa*( radius-5 ) ),
-					(int)( ym - ca*( radius-5 ) ) );
+			_p->drawLine( QLineF( xm-sa, ym-ca,
+					xm - sa*( radius-5 ),
+					ym - ca*( radius-5 ) ) );
 			break;
 		}
 		case knobDark_28:
@@ -193,18 +194,18 @@ void knob::drawKnob( QPainter * _p )
 			const float rb = tMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = tMax<float>( ( radius - 4 ), 0.0 );
-			_p->drawLine( (int)( xm-sa*rb ) + 1,
-					(int)( ym - ca*rb ) + 1,
-					(int)( xm - sa*re ) + 1,
-					(int)( ym - ca*re ) + 1 );
+			_p->drawLine( QLineF( xm-sa*rb + 1,
+					ym - ca*rb + 1,
+					xm - sa*re + 1,
+					ym - ca*re + 1 ) );
 			break;
 		}
 		case knobGreen_17:
 		{
 			_p->setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
-			_p->drawLine( (int)( xm-sa ), (int)( ym-ca ),
-					(int)( xm - sa*radius ),
-					(int)( ym - ca*radius ) );
+			_p->drawLine( QLineF( xm-sa, ym-ca,
+					xm - sa*radius,
+					ym - ca*radius ) );
 			break;
 		}
 	}

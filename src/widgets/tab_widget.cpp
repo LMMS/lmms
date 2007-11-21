@@ -64,6 +64,7 @@ tabWidget::~tabWidget()
 
 void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 {
+	setFont( pointSize<7>( font() ) );
 	widgetDesc d = { _w, _name, fontMetrics().width( _name ) + 10 } ;
 	if( _idx < 0/* || m_widgets.contains( _idx ) == TRUE*/ )
 	{
@@ -145,6 +146,7 @@ void tabWidget::resizeEvent( QResizeEvent * )
 
 void tabWidget::paintEvent( QPaintEvent * _pe )
 {
+	setFont( pointSize<7>( font() ) );
 	QPainter p( this );
 
 	p.fillRect( 0, 0, width() - 1, height() - 1, QColor( 96, 96, 96 ) );
@@ -169,7 +171,6 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 	if( !big_tab_captions )
 	{
 		p.setPen( QColor( 255, 255, 255 ) );
-		p.setFont( font() );
 		p.drawText( 5, 10, m_caption );
 	}
 

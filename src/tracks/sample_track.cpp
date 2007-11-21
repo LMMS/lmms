@@ -164,32 +164,22 @@ void sampleTCO::mouseDoubleClickEvent( QMouseEvent * )
 void sampleTCO::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-#warning TODO: set according brush for gradient!
-	p.fillRect( _pe->rect(), QColor( 64, 64, 64 ) );
-#if 0
-	// create pixmap for our widget
-	QPixmap pm( _pe->rect().size() );
-	// and a painter for it
-	QPainter p( &pm );
-	p.translate( -_pe->rect().x(), -_pe->rect().y() );
 
-	for( int y = 1; y < height() - 1; ++y )
+	QLinearGradient grad( 0, 0, 0, height() );
+	if( isSelected() )
 	{
-		const int gray = 96 - y * 96 / height();
-		if( isSelected() == TRUE )
-		{
-			p.setPen( QColor( 0, 0, 128 + gray ) );
-		}
-		else
-		{
-			p.setPen( QColor( gray, gray, gray ) );
-		}
-		p.drawLine( 1, y, width() - 1, y );
+		grad.setColorAt( 1, QColor( 0, 0, 224 ) );
+		grad.setColorAt( 0, QColor( 0, 0, 128 ) );
 	}
-#endif
+	else
+	{
+		grad.setColorAt( 0, QColor( 96, 96, 96 ) );
+		grad.setColorAt( 1, QColor( 16, 16, 16 ) );
+	}
+	p.fillRect( _pe->rect(), grad );
 
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 0, 0, width(), height() );
+	p.drawRect( 0, 0, width()-1, height()-1 );
 	if( getTrack()->muted() || muted() )
 	{
 		p.setPen( QColor( 128, 128, 128 ) );
