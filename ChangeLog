@@ -1,3 +1,12 @@
+2007-11-22  Paul Giblock <drfaygo/at/gmail/dot/com>
+	* src/widgets/text_float.cpp:
+	* src/core/track.cpp:
+	- fixed segfaults from clicking on track content objects after loading a
+	  project.  
+	- I don't have a copy of 3.1 to reference, so I don't know where the
+	  textFloat is normally displayed.  Feel free to adjust.
+
+
 2007-11-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/lib/sample_buffer.cpp:

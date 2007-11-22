@@ -91,8 +91,7 @@ void textFloat::reparent( QWidget * _new_parent )
 
 	// Get position and reparent to either top level or dialog
 	//
-	while( _new_parent->parentWidget() && !_new_parent->isTopLevel() &&
-				!_new_parent->windowType() == Qt::Dialog )
+	while( _new_parent->parentWidget() && !_new_parent->inherits("QMdiSubWindow"))
 	{
 		_new_parent = _new_parent->parentWidget();
 		position += _new_parent->pos();

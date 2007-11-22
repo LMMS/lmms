@@ -325,8 +325,8 @@ void trackContentObject::mouseMoveEvent( QMouseEvent * _me )
 		s_textFloat->setText( QString( "%1:%2" ).
 					arg( m_startPosition.getTact() + 1 ).
 					arg( m_startPosition.getTact64th() ) );
-		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-				QPoint( -2 - s_textFloat->width(), 8 ) );
+		s_textFloat->move( QPoint(8, s_textFloat->parentWidget()->height() -
+					s_textFloat->height() - 24 ) );
 	}
 	else if( m_action == MOVE_SELECTION )
 	{
@@ -587,7 +587,6 @@ trackContentObject * trackContentWidget::getTCO( int _tco_num )
 	printf( "called trackContentWidget::getTCO( %d, TRUE ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
 	return( getTrack()->addTCO( getTrack()->createTCO( _tco_num * 64 ) ) );
-//	return( NULL );
 }
 
 
