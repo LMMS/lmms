@@ -1,0 +1,216 @@
+/*
+ * ladspa_browser.cpp - dialog to display information about installed LADSPA
+ *                      plugins
+ *
+ * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+
+#include "ladspa_browser.h"
+
+
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
+
+
+#include "gui_templates.h"
+#include "ladspa_description.h"
+#include "ladspa_port_dialog.h"
+#include "tab_bar.h"
+#include "tab_button.h"
+
+
+#undef SINGLE_SOURCE_COMPILE
+#include "embed.cpp"
+
+
+
+
+extern "C"
+{
+
+plugin::descriptor ladspa_browser_plugin_descriptor =
+{
+	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	"LADSPA Plugin Browser",
+	QT_TRANSLATE_NOOP( "pluginBrowser",
+				"List installed LADSPA plugins" ),
+	"Danny McRae <khjklujn/at/users.sourceforge.net>",
+	0x0100,
+	plugin::Tool,
+	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	NULL
+} ;
+
+
+// neccessary for getting instance out of shared lib
+plugin * lmms_plugin_main( void * _data )
+{
+	return( new ladspaBrowser );
+}
+
+}
+
+
+
+
+ladspaBrowser::ladspaBrowser( void ) :
+	tool( &ladspa_browser_plugin_descriptor )
+{
+	QHBoxLayout * hlayout = new QHBoxLayout( this );
+	hlayout->setSpacing( 0 );
+	hlayout->setMargin( 0 );
+
+	m_tabBar = new tabBar( this, QBoxLayout::TopToBottom );
+	m_tabBar->setExclusive( TRUE );
+	m_tabBar->setFixedWidth( 72 );
+
+	QWidget * ws = new QWidget( this );
+	ws->setFixedSize( 500, 400 );
+
+	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
+	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ),
+								INVALID );
+	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
+	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
+	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
+
+
+	m_tabBar->addTab( available, tr( "Available Effects" ), 
+				0, FALSE, TRUE 
+			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
+	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
+				1, FALSE, TRUE 
+			)->setIcon( embed::getIconPixmap(
+						"unavailable_sound" ) );
+	m_tabBar->addTab( instruments, tr( "Instruments" ), 
+				2, FALSE, TRUE 
+			)->setIcon( embed::getIconPixmap(
+							"setup_midi" ) );
+	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
+				3, FALSE, TRUE
+			)->setIcon( embed::getIconPixmap( "analysis" ) );
+	m_tabBar->addTab( other, tr( "Don't know" ), 
+				4, TRUE, TRUE
+			)->setIcon( embed::getIconPixmap( "uhoh" ) );
+
+
+	m_tabBar->setActiveTab( 0 );
+
+	hlayout->addWidget( m_tabBar );
+	hlayout->addSpacing( 10 );
+	hlayout->addWidget( ws );
+	hlayout->addSpacing( 10 );
+	hlayout->addStretch();
+
+	setWhatsThis( tr(
+"This dialog displays information on all of the LADSPA plugins LMMS was "
+"able to locate. The plugins are divided into five categories based "
+"upon an interpretation of the port types and names.\n\n"
+
+"Available Effects are those that can be used by LMMS. In order for LMMS "
+"to be able to use an effect, it must, first and foremost, be an effect, "
+"which is to say, it has to have both input channels and output channels. "
+"LMMS identifies an input channel as an audio rate port containing 'in' in "
+"the name. Output channels are identified by the letters 'out'. Furthermore, "
+"the effect must have the same number of inputs and outputs and be real time "
+"capable.\n\n"
+
+"Unavailable Effects are those that were identified as effects, but either "
+"didn't have the same number of input and output channels or weren't real "
+"time capable.\n\n"
+
+"Instruments are plugins for which only output channels were identified.\n\n"
+
+"Analysis Tools are plugins for which only input channels were identified.\n\n"
+
+"Don't Knows are plugins for which no input or output channels were "
+"identified.\n\n"
+
+"Double clicking any of the plugins will bring up information on the "
+"ports." ) );
+
+	hide();
+	if( parentWidget() )
+	{
+		parentWidget()->hide();
+		parentWidget()->layout()->setSizeConstraint(
+							QLayout::SetFixedSize );
+	}
+}
+
+
+
+
+ladspaBrowser::~ladspaBrowser()
+{
+}
+
+
+
+
+QString ladspaBrowser::nodeName( void ) const
+{
+	return( ladspa_browser_plugin_descriptor.name );
+}
+
+
+
+
+QWidget * ladspaBrowser::createTab( QWidget * _parent, const QString & _txt,
+							ladspaPluginType _type )
+{
+	QWidget * tab = new QWidget( _parent );
+	tab->setFixedSize( 500, 340 );
+	QVBoxLayout * layout = new QVBoxLayout( tab );
+	layout->setSpacing( 0 );
+	layout->setMargin( 0 );
+
+	QLabel * title = new QLabel( _txt, tab );
+	QFont f = title->font();
+	f.setBold( TRUE );
+	title->setFont( pointSize<12>( f ) );
+
+	layout->addSpacing( 5 );
+	layout->addWidget( title );
+	layout->addSpacing( 10 );
+
+	ladspaDescription * description = new ladspaDescription( tab, _type );
+	connect( description, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
+				SLOT( showPorts( const ladspa_key_t & ) ) );
+	layout->addWidget( description, 1 );
+
+	return( tab );
+}
+
+
+
+
+void ladspaBrowser::showPorts( const ladspa_key_t & _key )
+{
+	ladspaPortDialog ports( _key );
+	ports.exec();
+}
+
+
+
+
+#include "ladspa_browser.moc"
