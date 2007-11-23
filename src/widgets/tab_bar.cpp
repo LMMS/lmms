@@ -37,7 +37,7 @@ tabBar::tabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	m_layout( new QBoxLayout( _dir, this ) ),
 	m_exclusive( FALSE )
 {
-	m_layout->setMargin( 0 );
+	m_layout->setMargin( 8 );
 	m_layout->setSpacing( 0 );
 
 	setLayout( m_layout );
@@ -66,6 +66,8 @@ tabButton * tabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	// create tab-button
 	tabButton * b = new tabButton( caption, _id, this );
 	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );
+	b->setIconSize( QSize( 48, 48 ) );
+	b->setFixedSize( 64, 64 );
 	b->show();
 	if( _text_is_tooltip )
 	{

@@ -84,14 +84,15 @@ ladspaBrowser::ladspaBrowser( void ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( this );
-	ws->setFixedSize( 500, 400 );
+	ws->setFixedSize( 500, 480 );
 
-	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
-	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ),
+	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
+	QWidget * available = createTab( ws, type + tr( "Available Effects" ), VALID );
+	QWidget * unavailable = createTab( ws, type + tr( "Unavailable Effects" ),
 								INVALID );
-	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
-	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
-	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
+	QWidget * instruments = createTab( ws, type + tr( "Instruments" ), SOURCE );
+	QWidget * analysis = createTab( ws, type + tr( "Analysis Tools" ), SINK );
+	QWidget * other = createTab( ws, type + tr( "Don't know" ), OTHER );
 
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 
@@ -179,7 +180,7 @@ QWidget * ladspaBrowser::createTab( QWidget * _parent, const QString & _txt,
 							ladspaPluginType _type )
 {
 	QWidget * tab = new QWidget( _parent );
-	tab->setFixedSize( 500, 340 );
+	tab->setFixedSize( 500, 400 );
 	QVBoxLayout * layout = new QVBoxLayout( tab );
 	layout->setSpacing( 0 );
 	layout->setMargin( 0 );

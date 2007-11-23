@@ -1,3 +1,13 @@
+2007-11-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	improved layout
+
+	* src/widgets/tab_bar.cpp:
+	- improved layout
+	- change icon-size-property for tabButtons in order to make them look
+	  as in 0.3.x
+
 2007-11-23	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* Makefile.am:
