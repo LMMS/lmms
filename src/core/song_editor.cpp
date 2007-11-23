@@ -182,7 +182,6 @@ songEditor::songEditor( void ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-    m_masterVolumeSlider->setInvertedAppearance( true );
 	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
@@ -217,7 +216,6 @@ songEditor::songEditor( void ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-    m_masterPitchSlider->setInvertedAppearance( true );
 	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( masterPitchChanged( int ) ) );
@@ -438,14 +436,9 @@ void songEditor::paintEvent( QPaintEvent * _pe )
 
 QRect songEditor::scrollAreaRect( void ) const
 {
-	if( centralWidget() == NULL )
-	{
-		return( rect() );
-	}
-	return( QRect( 0, 0, centralWidget()->width(),
-			centralWidget()->height() - m_toolBar->height() -
-			m_playPos[PLAY_SONG].m_timeLine->height() -
-			DEFAULT_SCROLLBAR_SIZE ) );
+	return( QRect( 0, 0, width(), height() - m_toolBar->height() -
+				m_playPos[PLAY_SONG].m_timeLine->height() -
+				DEFAULT_SCROLLBAR_SIZE ) );
 }
 
 
@@ -454,18 +447,10 @@ QRect songEditor::scrollAreaRect( void ) const
 // responsible for moving scrollbars after resizing
 void songEditor::resizeEvent( QResizeEvent * _re )
 {
-	if( centralWidget() != NULL )
-	{
-		m_leftRightScroll->setGeometry( 0,
-					centralWidget()->height() -
-							DEFAULT_SCROLLBAR_SIZE,
-					centralWidget()->width(),
-					DEFAULT_SCROLLBAR_SIZE );
-
-		m_playPos[PLAY_SONG].m_timeLine->setFixedWidth(
-						centralWidget()->width() );
-		m_toolBar->setFixedWidth( centralWidget()->width() );
-	}
+	m_leftRightScroll->setGeometry( 0, height() - DEFAULT_SCROLLBAR_SIZE,
+					width(), DEFAULT_SCROLLBAR_SIZE );
+	m_playPos[PLAY_SONG].m_timeLine->setFixedWidth( width() );
+	m_toolBar->setFixedWidth( width() );
 	trackContainer::resizeEvent( _re );
 }
 
@@ -682,8 +667,8 @@ void songEditor::updatePosition( const midiTime & _t )
 {
 	if( ( m_playing && m_playMode == PLAY_SONG ) || m_scrollBack == TRUE )
 	{
-		const int w = centralWidget()->width() -
-				DEFAULT_SETTINGS_WIDGET_WIDTH - TRACK_OP_WIDTH;
+		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
+							- TRACK_OP_WIDTH;
 		if( _t > m_currentPosition + w * 64 / pixelsPerTact() )
 		{
 			m_leftRightScroll->setValue( _t.getTact() );

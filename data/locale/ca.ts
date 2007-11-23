@@ -1,55 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ca_ES">
-<defaultcodec></defaultcodec>
 <context>
     <name>QWidget</name>
     <message>
-        <location filename="../../plugins/vst_effect/vst_subplugin_features.cpp" line="47"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="138"/>
         <source>Name: </source>
         <translation>Nom: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="64"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="148"/>
         <source>Maker: </source>
         <translation>Fabricant: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="80"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="163"/>
         <source>Copyright: </source>
         <translation>Copyright: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="92"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="174"/>
         <source>Requires Real Time: </source>
         <translation>Requereix Temps Real: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="105"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="189"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="106"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="190"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="98"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="181"/>
         <source>Real Time Capable: </source>
         <translation>Capaç de Temps Real: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="104"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="188"/>
         <source>In Place Broken: </source>
         <translation>Trencat En Lloc: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="110"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="194"/>
         <source>Channels In: </source>
         <translation>Canals d&apos;Entrada: </translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_effect/ladspa_subplugin_features.cpp" line="114"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="199"/>
         <source>Channels Out: </source>
         <translation>Canals de Sortida: </translation>
     </message>
@@ -456,102 +455,102 @@ http://lmms.sourceforge.net</translation>
         <translation>m-Maj13</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="209"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="208"/>
         <source>Chord range:</source>
         <translation>Rang d&apos;acord:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="254"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="252"/>
         <source>octave(s)</source>
         <translation>octava(es)</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="214"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="213"/>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
         <translation>Usa aquesta roda per a ajustar el rang d&apos;acord en octaves. L&apos;acord seleccionat serà reproduït amb la quantitat especificada d&apos;octaves.</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="233"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="232"/>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
         <translation>Un arpegi és una forma de tocar (especialment puntejada) els instruments, que fa la música més animada. Les cordes d&apos;aquests instruments (p.e. l&apos;arpa) són puntejades com els acords, l&apos;única diferència és que això es fa en un ordre seqüencial, així les notes no sonen a la vegada. Arpegis típics són les tríades majors o menors. Però hi ha molts més acords que pots seleccionar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="253"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="251"/>
         <source>Arpeggio range:</source>
         <translation>Rang d&apos;arpegi:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="258"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="256"/>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified amount of octaves.</source>
         <translation>Usa aquesta roda per a ajustar el rang d&apos;arpegi en octaves. L&apos;arpegi seleccionat serà reproduït amb la quantitat especificada d&apos;octaves.</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="267"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="265"/>
         <source>Arpeggio time:</source>
         <translation>Temps d&apos;arpegi:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="268"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="266"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="272"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="270"/>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
         <translation>Usa aquesta roda per a ajustar el temps d&apos;arpegi en mil·lisegons. El temps d&apos;arpegi especifica la durada de cada nota de l&apos;arpegi.</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="281"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="279"/>
         <source>Arpeggio gate:</source>
         <translation>Porta d&apos;arpegi:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="281"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="279"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="286"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="284"/>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato-arpeggios.</source>
         <translation>Usa aquesta roda per a ajustar la porta d&apos;arpegi. La porta d&apos;arpegi especifica el percentatge de la nota de l&apos;arpegi que serà reproduït. Amb això pots fer arpegis amb staccato genials.</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="299"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="297"/>
         <source>arpeggio direction = up</source>
         <translation>direcció d&apos;arpegi = amunt</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="308"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="306"/>
         <source>arpeggio direction = down</source>
         <translation>direcció d&apos;arpegi = abaix</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="319"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="317"/>
         <source>arpeggio direction = up and down</source>
         <translation>direcció d&apos;arpegi = amunt i abaix</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="329"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="327"/>
         <source>arpeggio direction = random</source>
         <translation>direcció d&apos;arpegi = aleatori</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="203"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="202"/>
         <source>Chord range</source>
         <translation>Rang d&apos;acord</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="247"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="245"/>
         <source>Arpeggio range</source>
         <translation>Rang d&apos;arpegi</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="261"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="259"/>
         <source>Arpeggio time</source>
         <translation>Temps d&apos;arpegi</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="275"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="273"/>
         <source>Arpeggio gate</source>
         <translation>Porta d&apos;arpegi</translation>
     </message>
@@ -666,47 +665,47 @@ http://lmms.sourceforge.net</translation>
         <translation>ACORDS</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="249"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="247"/>
         <source>RANGE</source>
         <translation>RANG</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="219"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="218"/>
         <source>ARPEGGIO</source>
         <translation>ARPEGI</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="263"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="261"/>
         <source>TIME</source>
         <translation>TEMPS</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="277"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="275"/>
         <source>GATE</source>
         <translation>PORTA</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="288"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="286"/>
         <source>Direction:</source>
         <translation>Direcció:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="342"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="340"/>
         <source>Mode:</source>
         <translation>Mode:</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="351"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="348"/>
         <source>Free</source>
         <translation>Lliure</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="353"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="350"/>
         <source>Sort</source>
         <translation>Ordena</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="355"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="352"/>
         <source>Sync</source>
         <translation>Sinc</translation>
     </message>
@@ -716,17 +715,17 @@ http://lmms.sourceforge.net</translation>
         <translation>Tipus d&apos;acord</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="234"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="233"/>
         <source>Arpeggio type</source>
         <translation>Tipus d&apos;arpegi</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="332"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="330"/>
         <source>Arpeggio direction</source>
         <translation>Direcció d&apos;arpegi</translation>
     </message>
     <message>
-        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="346"/>
+        <location filename="../../src/core/arp_and_chords_tab_widget.cpp" line="344"/>
         <source>Arpeggio mode</source>
         <translation>Mode d&apos;arpegi</translation>
     </message>
@@ -850,7 +849,7 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>automatableButton</name>
     <message>
-        <location filename="../../src/widgets/automatable_button.cpp" line="99"/>
+        <location filename="../../src/widgets/automatable_button.cpp" line="98"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
     </message>
@@ -866,117 +865,117 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>automationEditor</name>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="150"/>
+        <location filename="../../src/core/automation_editor.cpp" line="143"/>
         <source>Play/pause current pattern (Space)</source>
         <translation>Reprodueix/pausa el patró actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="154"/>
+        <location filename="../../src/core/automation_editor.cpp" line="147"/>
         <source>Stop playing of current pattern (Space)</source>
         <translation>Atura la reproducció del patró actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="160"/>
+        <location filename="../../src/core/automation_editor.cpp" line="153"/>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
         <translation>Pica aquí si vols reproduir el patró actual. Això és útil mentre s&apos;edita. El patró es repeteix automàticament quan arriba al final.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="163"/>
+        <location filename="../../src/core/automation_editor.cpp" line="156"/>
         <source>Click here, if you want to stop playing of current pattern.</source>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="234"/>
+        <location filename="../../src/core/automation_editor.cpp" line="227"/>
         <source>Cut selected values (Ctrl+X)</source>
         <translation>Talla els valors seleccionats (Ctrl+X)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="239"/>
+        <location filename="../../src/core/automation_editor.cpp" line="232"/>
         <source>Copy selected values (Ctrl+C)</source>
         <translation>Copia els valors seleccionats (Ctrl+C)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="245"/>
+        <location filename="../../src/core/automation_editor.cpp" line="238"/>
         <source>Paste values from clipboard (Ctrl+V)</source>
         <translation>Enganxa valors des del portapapers (Ctrl+V)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="252"/>
+        <location filename="../../src/core/automation_editor.cpp" line="245"/>
         <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, els valors seleccionats seran tallats cap al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="256"/>
+        <location filename="../../src/core/automation_editor.cpp" line="249"/>
         <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, els valors seleccionats seran copiats al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="259"/>
+        <location filename="../../src/core/automation_editor.cpp" line="252"/>
         <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
         <translation>Si piques aquí, els valors del portapapers seran enganxats al primer compàs visible.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="362"/>
+        <location filename="../../src/core/automation_editor.cpp" line="364"/>
         <source>Automation Editor - no pattern</source>
         <translation>Editor d&apos;Automatització - sense patró</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="391"/>
+        <location filename="../../src/core/automation_editor.cpp" line="393"/>
         <source>Automation Editor - %1</source>
         <translation>Editor d&apos;Automatització - %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="716"/>
+        <location filename="../../src/core/automation_editor.cpp" line="718"/>
         <source>Please open an automation pattern with the context menu of a control!</source>
         <translation>Per favor, obre un patró d&apos;automatització amb el menú contextual d&apos;un control!</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="1868"/>
+        <location filename="../../src/core/automation_editor.cpp" line="1877"/>
         <source>Values copied</source>
         <translation>Valors copiats</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="1870"/>
+        <location filename="../../src/core/automation_editor.cpp" line="1879"/>
         <source>All selected values were copied to the clipboard.</source>
         <translation>Tots els valors seleccionats s&apos;han copiat al portapapers.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="179"/>
+        <location filename="../../src/core/automation_editor.cpp" line="172"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Mode dibuixar (Maj+D)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="186"/>
+        <location filename="../../src/core/automation_editor.cpp" line="179"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Mode esborrar (Maj+E)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="193"/>
+        <location filename="../../src/core/automation_editor.cpp" line="186"/>
         <source>Select mode (Shift+S)</source>
         <translation>Mode seleccionar (Maj+S)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="199"/>
+        <location filename="../../src/core/automation_editor.cpp" line="192"/>
         <source>Move selection mode (Shift+M)</source>
         <translation>Mode moure selecció (Maj+M)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="216"/>
+        <location filename="../../src/core/automation_editor.cpp" line="209"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir i moure valors solts. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="220"/>
+        <location filename="../../src/core/automation_editor.cpp" line="213"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="226"/>
+        <location filename="../../src/core/automation_editor.cpp" line="219"/>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar valors. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure valors. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="231"/>
+        <location filename="../../src/core/automation_editor.cpp" line="224"/>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
@@ -1037,32 +1036,32 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>bbEditor</name>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="93"/>
+        <location filename="../../src/core/bb_editor.cpp" line="82"/>
         <source>Play/pause current beat/bassline (Space)</source>
         <translation>Reprodueix/pausa el ritme base actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="97"/>
+        <location filename="../../src/core/bb_editor.cpp" line="86"/>
         <source>Stop playing of current beat/bassline (Space)</source>
         <translation>Atura el ritme base actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="110"/>
+        <location filename="../../src/core/bb_editor.cpp" line="99"/>
         <source>Click here, if you want to play the current beat/bassline. The beat/bassline is automatically looped when its end is reached.</source>
         <translation>Pica aquí si vols reproduir el ritme base actual. El ritme base és repetit automàticament quan arriba al final.</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="113"/>
+        <location filename="../../src/core/bb_editor.cpp" line="102"/>
         <source>Click here, if you want to stop playing of current beat/bassline.</source>
         <translation>Pica aquí si vols aturar el ritme base actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="71"/>
+        <location filename="../../src/core/bb_editor.cpp" line="72"/>
         <source>Beat+Baseline Editor</source>
         <translation>Editor de Ritme Base</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="102"/>
+        <location filename="../../src/core/bb_editor.cpp" line="91"/>
         <source>Add beat/bassline</source>
         <translation>Afegeix ritme de base</translation>
     </message>
@@ -1249,24 +1248,24 @@ Per favor, selecciona un directori:</translation>
         <translation>Selecciona directori de treball</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="512"/>
+        <location filename="../../src/core/config_mgr.cpp" line="510"/>
         <source>Directory not existing</source>
         <translation>El directori no existeix</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="705"/>
+        <location filename="../../src/core/config_mgr.cpp" line="703"/>
         <source>Error in configuration-file</source>
         <translation>Error al fitxer de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="710"/>
+        <location filename="../../src/core/config_mgr.cpp" line="708"/>
         <source>Error while parsing configuration-file %1.
 The setup-wizard will be shown for reconfiguring LMMS.</source>
         <translation>Error analitzant el fitxer de configuració %1. 
 Es mostrarà l&apos;assistent per a reconfigurar LMMS.</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="515"/>
+        <location filename="../../src/core/config_mgr.cpp" line="513"/>
         <source>The directory you specified does not exist. Create it?</source>
         <translation>El directori especificat no existeix. Crear-lo?</translation>
     </message>
@@ -1281,19 +1280,19 @@ Es mostrarà l&apos;assistent per a reconfigurar LMMS.</translation>
         <translation>&amp;Finalitza</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="901"/>
+        <location filename="../../src/core/config_mgr.cpp" line="893"/>
         <source>Could not save config-file</source>
         <translation>No s&apos;ha pogut desar el fitxer de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="908"/>
+        <location filename="../../src/core/config_mgr.cpp" line="900"/>
         <source>Could not save configuration file %1. You probably are not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation>No s&apos;ha pogut desar el fitxer de configuració %1.
 Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i torna-ho a provar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="820"/>
+        <location filename="../../src/core/config_mgr.cpp" line="814"/>
         <source>Version mismatches</source>
         <translation>La versió no coincideix</translation>
     </message>
@@ -1313,7 +1312,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation>Escull el directori de treball de LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/config_mgr.cpp" line="832"/>
+        <location filename="../../src/core/config_mgr.cpp" line="826"/>
         <source>Accordingly to the information in your LMMS-configuration-file you seem to have run a different (probably older) version of LMMS before.
 It is recommended to run the setup-wizard again to ensure that the latest samples, presets, demo-projects etc. are installed in your LMMS-working-directory.
 Run the setup-wizard now?</source>
@@ -1852,12 +1851,12 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>fileBrowser</name>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="63"/>
+        <location filename="../../src/core/file_browser.cpp" line="64"/>
         <source>Browser</source>
         <translation>Navegador</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="68"/>
+        <location filename="../../src/core/file_browser.cpp" line="69"/>
         <source>Reload (F5)</source>
         <translation>Recarrega (F5)</translation>
     </message>
@@ -1968,62 +1967,62 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>instrumentTrack</name>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="83"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="84"/>
         <source>With this knob you can set the volume of the opened channel.</source>
         <translation>Amb aquesta roda pots ajustar el volum del canal obert.</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="91"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="92"/>
         <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
         <translation>Amb aquest rectangle pots ajustar la posició on el canal ha de ser audible. Necessites una targeta de so que suporti almenys l&apos;envoltant 4.0 per a gaudir d&apos;aquesta característica.</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="106"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="107"/>
         <source>unnamed_channel</source>
         <translation>canal_sense_nom</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="196"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="193"/>
         <source>Channel volume</source>
         <translation>Volum del canal</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="200"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="197"/>
         <source>Channel volume:</source>
         <translation>Volum del canal:</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="139"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="136"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="150"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="147"/>
         <source>MIDI input/output</source>
         <translation>Entrada/sortida MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="181"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="178"/>
         <source>GENERAL SETTINGS</source>
         <translation>CONFIGURACIÓ GENERAL</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="201"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="198"/>
         <source>VOLUME</source>
         <translation>VOLUM</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="229"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="226"/>
         <source>FX CHNL</source>
         <translation>CANAL FX</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="243"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="240"/>
         <source>Save current channel settings in a preset-file</source>
         <translation>Desa la configuració del canal actual en una plantilla</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="247"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="244"/>
         <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
         <translation>Pica aquí si vols desar la configuració del canal actual en una plantilla. Més tard podràs carregar aquesta plantilla picant-la dos cops al navegador de plantilles.</translation>
     </message>
@@ -2033,57 +2032,57 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <translation>Defecte</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="264"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="261"/>
         <source>ENV/LFO/FILTER</source>
         <translation>ENV/OBF/FILTRE</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="265"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="262"/>
         <source>ARP/CHORD</source>
         <translation>ARP/ACORD</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="267"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="264"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="300"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="297"/>
         <source>MIDI input</source>
         <translation>Entrada MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="301"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="298"/>
         <source>MIDI output</source>
         <translation>Sortida MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="346"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="351"/>
         <source>Save channel-settings in file</source>
         <translation>Desa configuració de canal en fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="347"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="352"/>
         <source>Channel-Settings-File (*.cs.xml)</source>
         <translation>Fitxer de Configuració de Canal (*.cs.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1162"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1167"/>
         <source>PLUGIN</source>
         <translation>CONN</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="211"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="208"/>
         <source>Surround area</source>
         <translation>Àrea envoltant</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="226"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="223"/>
         <source>FX channel</source>
         <translation>Canal FX</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="266"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="263"/>
         <source>FX</source>
         <translation>FX</translation>
     </message>
@@ -2169,39 +2168,96 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>knob</name>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="348"/>
+        <location filename="../../src/widgets/knob.cpp" line="349"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="323"/>
+        <location filename="../../src/widgets/knob.cpp" line="324"/>
         <source>&amp;Reset (%1%2)</source>
         <translation>&amp;Restaura (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="328"/>
+        <location filename="../../src/widgets/knob.cpp" line="329"/>
         <source>&amp;Copy value (%1%2)</source>
         <translation>&amp;Copia valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="333"/>
+        <location filename="../../src/widgets/knob.cpp" line="334"/>
         <source>&amp;Paste value (%1%2)</source>
         <translation>&amp;Enganxa valor (%1%2)</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="345"/>
+        <location filename="../../src/widgets/knob.cpp" line="346"/>
         <source>Connect to MIDI-device</source>
         <translation>Connecta a dispositiu MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="661"/>
+        <location filename="../../src/widgets/knob.cpp" line="662"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Per favor, introdueix un nou valor entre %1 i %2:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/knob.cpp" line="340"/>
+        <location filename="../../src/widgets/knob.cpp" line="341"/>
         <source>&amp;Open in automation editor</source>
         <translation>&amp;Obre a l&apos;editor d&apos;automatització</translation>
+    </message>
+</context>
+<context>
+    <name>ladspaBrowser</name>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="97"/>
+        <source>Available Effects</source>
+        <translation>Efectes Disponibles</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="100"/>
+        <source>Unavailable Effects</source>
+        <translation>Efectes No Disponibles</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="104"/>
+        <source>Instruments</source>
+        <translation>Instruments</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="108"/>
+        <source>Analysis Tools</source>
+        <translation>Eines d&apos;Anàlisi</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="111"/>
+        <source>Don&apos;t know</source>
+        <translation>Desconeguts</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="149"/>
+        <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate. The plugins are divided into five categories based upon an interpretation of the port types and names.
+
+Available Effects are those that can be used by LMMS. In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels. LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name. Output channels are identified by the letters &apos;out&apos;. Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
+
+Unavailable Effects are those that were identified as effects, but either didn&apos;t have the same number of input and output channels or weren&apos;t real time capable.
+
+Instruments are plugins for which only output channels were identified.
+
+Analysis Tools are plugins for which only input channels were identified.
+
+Don&apos;t Knows are plugins for which no input or output channels were identified.
+
+Double clicking any of the plugins will bring up information on the ports.</source>
+        <translation>Aquest diàleg mostra informació de tots els connectors LADSPA que LMMS ha pogut trobar. Els connectors estan dividits en cinc categories basades en la interpretació dels tipus i noms dels ports.
+
+Efectes Disponibles són aquells que LMMS pot usar. Per a que LMMS pugui usar un efecte, primerament, ha de ser un efecte, és a dir, ha de tenir canals d&apos;entrada i de sortida. LMMS identifica un canal d&apos;entrada com a un port d&apos;àudio que conté &apos;in&apos; al nom. Els canals de sortida són identificats amb les lletres &apos;out&apos;. A més, l&apos;efecte ha de tenir el mateix nombre d&apos;entrades que de sortides i ser capaç de temps real.
+
+Efectes No Disponibles són aquells que han estat identificats com a efectes, però no tenen el mateix nombre d&apos;entrades que de sortides o no són capaços de temps real.
+
+Instruments són connectors on només s&apos;han identificat canals de sortida.
+
+Eines d&apos;Anàlisi són connectors on només s&apos;han identificat canals d&apos;entrada.
+
+Desconeguts són connectors on no s&apos;han identificat canals d&apos;entrada o sortida.
+
+Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</translation>
     </message>
 </context>
 <context>
@@ -2236,81 +2292,99 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
     </message>
 </context>
 <context>
+    <name>ladspaDescription</name>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="88"/>
+        <source>Plugins</source>
+        <translation>Connectors</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="97"/>
+        <source>Description</source>
+        <translation>Descripció</translation>
+    </message>
+</context>
+<context>
     <name>ladspaPortDialog</name>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="54"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="54"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="55"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="55"/>
         <source>Rate</source>
         <translation>Taxa</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="56"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="56"/>
         <source>Direction</source>
         <translation>Direcció</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="57"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="57"/>
         <source>Type</source>
         <translation>Tipus</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="58"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="58"/>
         <source>Min &lt; Default &lt; Max</source>
         <translation>Mín &lt; Defecte &lt; Màx</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="59"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="59"/>
         <source>Logarithmic</source>
         <translation>Logarítmic</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="60"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="60"/>
         <source>SR Dependent</source>
         <translation>Depenent SR</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="73"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="77"/>
         <source>Audio</source>
         <translation>Àudio</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="77"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="77"/>
         <source>Control</source>
         <translation>Control</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="83"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="81"/>
         <source>Input</source>
         <translation>Entrada</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="87"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="81"/>
         <source>Output</source>
         <translation>Sortida</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="93"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="84"/>
         <source>Toggled</source>
         <translation>Commutat</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="97"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="85"/>
         <source>Integer</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="101"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="86"/>
         <source>Float</source>
         <translation>Flotant</translation>
     </message>
     <message>
-        <location filename="../../src/core/ladspa_port_dialog.cpp" line="179"/>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="162"/>
         <source>Yes</source>
         <translation>Sí</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="42"/>
+        <source>Ports</source>
+        <translation>Ports</translation>
     </message>
 </context>
 <context>
@@ -2497,37 +2571,37 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>listView</name>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="232"/>
+        <location filename="../../src/core/file_browser.cpp" line="233"/>
         <source>Files</source>
         <translation>Fitxers</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="500"/>
+        <location filename="../../src/core/file_browser.cpp" line="501"/>
         <source>Loading sample</source>
         <translation>Carregant mostra</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="502"/>
+        <location filename="../../src/core/file_browser.cpp" line="503"/>
         <source>Please wait, loading sample for preview...</source>
         <translation>Per favor espera, carregant mostra per a previsualitzar...</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="686"/>
+        <location filename="../../src/core/file_browser.cpp" line="687"/>
         <source>--- Factory files ---</source>
         <translation>--- Fitxers de fàbrica ---</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="442"/>
+        <location filename="../../src/core/file_browser.cpp" line="443"/>
         <source>Send to active instrument-track</source>
         <translation>Envia a la pista d&apos;instrument activa</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="446"/>
+        <location filename="../../src/core/file_browser.cpp" line="447"/>
         <source>Open in new instrument-track/Song-Editor</source>
         <translation>Obre en una nova pista d&apos;instrument/Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/file_browser.cpp" line="450"/>
+        <location filename="../../src/core/file_browser.cpp" line="451"/>
         <source>Open in new instrument-track/B+B Editor</source>
         <translation>Obre en una nova pista d&apos;instrument/Editor R+B</translation>
     </message>
@@ -2535,7 +2609,7 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
 <context>
     <name>liveTool</name>
     <message>
-        <location filename="../../plugins/live_tool/live_tool.cpp" line="83"/>
+        <location filename="../../plugins/live_tool/live_tool.cpp" line="92"/>
         <source>This tool is intended to be used in live performances, though you can use it for music production as well.
 The following keys will work only if this window is active.
 The spacebar toggles play and pause in the Song Editor.
@@ -2549,62 +2623,62 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
 <context>
     <name>mainWindow</name>
     <message>
-        <location filename="../../src/core/main.cpp" line="192"/>
+        <location filename="../../src/core/main.cpp" line="193"/>
         <source>Setting up main-window and workspace...</source>
         <translation>Preparant finestra principal i espai de treball...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="195"/>
+        <location filename="../../src/core/main_window.cpp" line="198"/>
         <source>Creating new song...</source>
         <translation>Creant nova cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="201"/>
+        <location filename="../../src/core/main_window.cpp" line="204"/>
         <source>Creating GUI...</source>
         <translation>Creant interfície...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="356"/>
+        <location filename="../../src/core/main_window.cpp" line="359"/>
         <source>&amp;New</source>
         <translation>&amp;Nou</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="361"/>
+        <location filename="../../src/core/main_window.cpp" line="364"/>
         <source>&amp;Open...</source>
         <translation>&amp;Obre...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="374"/>
+        <location filename="../../src/core/main_window.cpp" line="377"/>
         <source>&amp;Save</source>
         <translation>&amp;Desa</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="379"/>
+        <location filename="../../src/core/main_window.cpp" line="382"/>
         <source>Save &amp;As...</source>
         <translation>&amp;Anomena i desa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="393"/>
+        <location filename="../../src/core/main_window.cpp" line="396"/>
         <source>&amp;Quit</source>
         <translation>&amp;Surt</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="455"/>
+        <location filename="../../src/core/main_window.cpp" line="457"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="463"/>
+        <location filename="../../src/core/main_window.cpp" line="465"/>
         <source>About</source>
         <translation>Quant a</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="444"/>
+        <location filename="../../src/core/main_window.cpp" line="446"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="459"/>
+        <location filename="../../src/core/main_window.cpp" line="461"/>
         <source>What&apos;s this?</source>
         <translation>Què és això?</translation>
     </message>
@@ -2624,67 +2698,67 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Els meus projectes</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="189"/>
+        <location filename="../../src/core/main_window.cpp" line="192"/>
         <source>Loading song...</source>
         <translation>Carregant cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="411"/>
+        <location filename="../../src/core/main_window.cpp" line="414"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="416"/>
+        <location filename="../../src/core/main_window.cpp" line="419"/>
         <source>Show setup wizard</source>
         <translation>Mostra l&apos;assistent de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="339"/>
+        <location filename="../../src/core/main_window.cpp" line="342"/>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
         <translation>Pitjant aquest botó, pots mostrar o amagar la finestra de notes del projecte. En aquesta finestra pots escriure les teves notes del projecte.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="524"/>
+        <location filename="../../src/core/main_window.cpp" line="526"/>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="211"/>
+        <location filename="../../src/core/main_window.cpp" line="214"/>
         <source>Create new project</source>
         <translation>Crea nou projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="225"/>
+        <location filename="../../src/core/main_window.cpp" line="228"/>
         <source>Open existing project</source>
         <translation>Obre projecte existent</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="232"/>
+        <location filename="../../src/core/main_window.cpp" line="235"/>
         <source>Save current project</source>
         <translation>Desa projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="239"/>
+        <location filename="../../src/core/main_window.cpp" line="242"/>
         <source>Export current project</source>
         <translation>Exporta projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="281"/>
+        <location filename="../../src/core/main_window.cpp" line="284"/>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar el Rotlle de Piano. Amb l&apos;ajuda del Rotlle de Piano pots editar patrons de melodia fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="354"/>
+        <location filename="../../src/core/main_window.cpp" line="357"/>
         <source>&amp;Project</source>
         <translation>&amp;Projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="614"/>
+        <location filename="../../src/core/main_window.cpp" line="619"/>
         <source>Open project</source>
         <translation>Obre projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="671"/>
+        <location filename="../../src/core/main_window.cpp" line="676"/>
         <source>Save project</source>
         <translation>Desa projecte</translation>
     </message>
@@ -2699,109 +2773,109 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Directori arrel</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="257"/>
+        <location filename="../../src/core/main_window.cpp" line="260"/>
         <source>Show/hide Beat+Baseline Editor</source>
         <translation>Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="267"/>
+        <location filename="../../src/core/main_window.cpp" line="270"/>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Ritme Base. L&apos;Editor de Ritme Base és necessari per a crear ritmes; obrir, afegir i eliminar canals; tallar, copiar i enganxar patrons de ritme; i altres funcions similars.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="273"/>
+        <location filename="../../src/core/main_window.cpp" line="276"/>
         <source>Show/hide Piano-Roll</source>
         <translation>Mostra/amaga Rotlle de Piano</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="285"/>
+        <location filename="../../src/core/main_window.cpp" line="288"/>
         <source>Show/hide Song-Editor</source>
         <translation>Mostra/amaga Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="295"/>
+        <location filename="../../src/core/main_window.cpp" line="298"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Cançó. Amb l&apos;ajuda de l&apos;Editor de Cançó pots editar la llista de reproducció de la cançó i especificar quan ha de tocar-se cada pista. També pots inserir i moure mostres (p.e. mostres de rap) directament a la llista de reproducció.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="332"/>
+        <location filename="../../src/core/main_window.cpp" line="335"/>
         <source>Show/hide project notes</source>
         <translation>Mostra/amaga les notes del projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="399"/>
+        <location filename="../../src/core/main_window.cpp" line="402"/>
         <source>&amp;Edit</source>
         <translation>&amp;Edita</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="401"/>
+        <location filename="../../src/core/main_window.cpp" line="404"/>
         <source>Undo</source>
         <translation>Desfés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="405"/>
+        <location filename="../../src/core/main_window.cpp" line="408"/>
         <source>Redo</source>
         <translation>Refés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="413"/>
+        <location filename="../../src/core/main_window.cpp" line="416"/>
         <source>Show settings dialog</source>
         <translation>Mostra el diàleg de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="719"/>
+        <location filename="../../src/core/main_window.cpp" line="724"/>
         <source>Help not available</source>
         <translation>Ajuda no disponible</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="301"/>
+        <location filename="../../src/core/main_window.cpp" line="304"/>
         <source>Show/hide Automation Editor</source>
         <translation>Mostra/amaga Editor d&apos;Automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="311"/>
+        <location filename="../../src/core/main_window.cpp" line="314"/>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor d&apos;Automatització. Amb l&apos;ajuda de l&apos;Editor d&apos;Automatització pots editar valors dinàmics fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="436"/>
+        <location filename="../../src/core/main_window.cpp" line="438"/>
         <source>&amp;Tools</source>
         <translation>E&amp;ines</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="615"/>
+        <location filename="../../src/core/main_window.cpp" line="620"/>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz *.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="673"/>
+        <location filename="../../src/core/main_window.cpp" line="678"/>
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="449"/>
+        <location filename="../../src/core/main_window.cpp" line="451"/>
         <source>Online help</source>
         <translation>Ajuda en línia</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="384"/>
+        <location filename="../../src/core/main_window.cpp" line="387"/>
         <source>Import...</source>
         <translation>Importa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="388"/>
+        <location filename="../../src/core/main_window.cpp" line="391"/>
         <source>E&amp;xport...</source>
         <translation>E&amp;xporta...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="724"/>
+        <location filename="../../src/core/main_window.cpp" line="729"/>
         <source>Currently there&apos;s no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Actualment no hi ha ajuda disponible a LMMS.
 Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="367"/>
+        <location filename="../../src/core/main_window.cpp" line="370"/>
         <source>Recently opened projects</source>
         <translation>Projectes oberts recentment</translation>
     </message>
@@ -3402,132 +3476,132 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>pianoRoll</name>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="316"/>
+        <location filename="../../src/core/piano_roll.cpp" line="310"/>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Talla les notes seleccionades (Ctrl+X)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="321"/>
+        <location filename="../../src/core/piano_roll.cpp" line="315"/>
         <source>Copy selected notes (Ctrl+C)</source>
         <translation>Copia les notes seleccionades (Ctrl+C)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="334"/>
+        <location filename="../../src/core/piano_roll.cpp" line="328"/>
         <source>If you click here, selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, les notes seleccionades seran tallades cap al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="338"/>
+        <location filename="../../src/core/piano_roll.cpp" line="332"/>
         <source>If you click here, selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, les notes seleccionades seran copiades al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="341"/>
+        <location filename="../../src/core/piano_roll.cpp" line="335"/>
         <source>If you click here, the notes from the clipboard will be pasted at the first visible tact.</source>
         <translation>Si piques aquí, les notes del portapapers seran enganxades al primer compàs visible.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="327"/>
+        <location filename="../../src/core/piano_roll.cpp" line="321"/>
         <source>Paste notes from clipboard (Ctrl+V)</source>
         <translation>Enganxa notes des del portapapers (Ctrl+V)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="222"/>
+        <location filename="../../src/core/piano_roll.cpp" line="216"/>
         <source>Play/pause current pattern (Space)</source>
         <translation>Reprodueix/pausa el patró actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="230"/>
+        <location filename="../../src/core/piano_roll.cpp" line="224"/>
         <source>Stop playing of current pattern (Space)</source>
         <translation>Atura la reproducció del patró actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="236"/>
+        <location filename="../../src/core/piano_roll.cpp" line="230"/>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
         <translation>Pica aquí si vols reproduir el patró actual. Això és útil mentre s&apos;edita. El patró es repeteix automàticament quan arriba al final.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="245"/>
+        <location filename="../../src/core/piano_roll.cpp" line="239"/>
         <source>Click here, if you want to stop playing of current pattern.</source>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="453"/>
+        <location filename="../../src/core/piano_roll.cpp" line="457"/>
         <source>Piano-Roll - no pattern</source>
         <translation>Rotlle de Piano - sense patró</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="932"/>
+        <location filename="../../src/core/piano_roll.cpp" line="936"/>
         <source>Please open a pattern by double-clicking on it!</source>
         <translation>Per favor, obre un patró picant-lo dos cops!</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="498"/>
+        <location filename="../../src/core/piano_roll.cpp" line="502"/>
         <source>Piano-Roll - %1</source>
         <translation>Rotlle de Piano - %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="226"/>
+        <location filename="../../src/core/piano_roll.cpp" line="220"/>
         <source>Record notes from MIDI-device/channel-piano</source>
         <translation>Enregistra notes des d&apos;un dispositiu MIDI o piano de canal</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="242"/>
+        <location filename="../../src/core/piano_roll.cpp" line="236"/>
         <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
         <translation>Pica aquí si vols enregistrar notes des d&apos;un dispositiu MIDI o el piano virtual de prova de la finestra de canal corresponent al patró actual. Mentre s&apos;enregistra, totes les notes que toquis seran escrites en aquest patró i les podràs reproduir i editar després.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="380"/>
+        <location filename="../../src/core/piano_roll.cpp" line="374"/>
         <source>Last note</source>
         <translation>Darrera nota</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="2333"/>
+        <location filename="../../src/core/piano_roll.cpp" line="2344"/>
         <source>Notes copied</source>
         <translation>Notes copiades</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="2335"/>
+        <location filename="../../src/core/piano_roll.cpp" line="2346"/>
         <source>All selected notes were copied to the clipboard.</source>
         <translation>Totes les notes seleccionades s&apos;han copiat al portapapers.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="261"/>
+        <location filename="../../src/core/piano_roll.cpp" line="255"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Mode dibuixar (Maj+D)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="268"/>
+        <location filename="../../src/core/piano_roll.cpp" line="262"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Mode esborrar (Maj+E)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="275"/>
+        <location filename="../../src/core/piano_roll.cpp" line="269"/>
         <source>Select mode (Shift+S)</source>
         <translation>Mode seleccionar (Maj+S)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="281"/>
+        <location filename="../../src/core/piano_roll.cpp" line="275"/>
         <source>Move selection mode (Shift+M)</source>
         <translation>Mode moure selecció (Maj+M)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="298"/>
+        <location filename="../../src/core/piano_roll.cpp" line="292"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir, redimensionar i moure notes soltes. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="302"/>
+        <location filename="../../src/core/piano_roll.cpp" line="296"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notes soltes. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="308"/>
+        <location filename="../../src/core/piano_roll.cpp" line="302"/>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar notes. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure notes. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="313"/>
+        <location filename="../../src/core/piano_roll.cpp" line="307"/>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
@@ -3666,7 +3740,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Bot cantant per a afegir veus bàsiques</translation>
     </message>
     <message>
-        <location filename="../../plugins/live_tool/live_tool.cpp" line="53"/>
+        <location filename="../../plugins/live_tool/live_tool.cpp" line="55"/>
         <source>Tool for live performance</source>
         <translation>Eina per a actuació en directe</translation>
     </message>
@@ -3684,6 +3758,11 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <location filename="../../plugins/stereo_enhancer/stereo_enhancer.cpp" line="41"/>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
         <translation>Connector per a millorar la separació estèreo</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="55"/>
+        <source>List installed LADSPA plugins</source>
+        <translation>Llista connectors LADSPA instal·lats</translation>
     </message>
 </context>
 <context>
@@ -3847,147 +3926,147 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>projectNotes</name>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="107"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="101"/>
         <source>Put down your project notes here.</source>
         <translation>Escriu aquí les teves notes del projecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="76"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="72"/>
         <source>Project notes</source>
         <translation>Notes del projecte</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="128"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="122"/>
         <source>Edit Actions</source>
         <translation>Accions d&apos;Editar</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="131"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="125"/>
         <source>&amp;Undo</source>
         <translation>&amp;Desfés</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="133"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="127"/>
         <source>Ctrl+Z</source>
         <translation>Ctrl+Z</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="137"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="131"/>
         <source>&amp;Redo</source>
         <translation>&amp;Refés</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="139"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="133"/>
         <source>Ctrl+Y</source>
         <translation>Ctrl+Y</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="143"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="137"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copia</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="145"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="139"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="149"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="143"/>
         <source>Cu&amp;t</source>
         <translation>&amp;Talla</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="151"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="145"/>
         <source>Ctrl+X</source>
         <translation>Ctrl+X</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="155"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="149"/>
         <source>&amp;Paste</source>
         <translation>&amp;Enganxa</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="157"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="151"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="162"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="156"/>
         <source>Format Actions</source>
         <translation>Accions de Format</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="186"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="180"/>
         <source>&amp;Bold</source>
         <translation>&amp;Negreta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="187"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="181"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="193"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="187"/>
         <source>&amp;Italic</source>
         <translation>Curs&amp;iva</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="194"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="188"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="201"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="195"/>
         <source>&amp;Underline</source>
         <translation>&amp;Subratllat</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="202"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="196"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="213"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="207"/>
         <source>&amp;Left</source>
         <translation>&amp;Esquerra</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="214"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="208"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="220"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="214"/>
         <source>C&amp;enter</source>
         <translation>Cen&amp;tre</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="222"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="216"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="227"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="221"/>
         <source>&amp;Right</source>
         <translation>&amp;Dreta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="229"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="223"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="235"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="229"/>
         <source>&amp;Justify</source>
         <translation>&amp;Justifica</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="236"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="230"/>
         <source>Ctrl+J</source>
         <translation>Ctrl+J</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="243"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="237"/>
         <source>&amp;Color...</source>
         <translation>&amp;Color...</translation>
     </message>
@@ -3995,77 +4074,77 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>rackPlugin</name>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="67"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="68"/>
         <source>Turn the effect off</source>
         <translation>Apaga l&apos;efecte</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="71"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="72"/>
         <source>On/Off</source>
         <translation>Encès/Apagat</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="74"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="75"/>
         <source>Toggles the effect on or off.</source>
         <translation>Encén o apaga l&apos;efecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="76"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="77"/>
         <source>Wet/Dry mix</source>
         <translation>Mescla Moll/Sec</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="80"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="81"/>
         <source>W/D</source>
         <translation>M/S</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="84"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="85"/>
         <source>Wet Level:</source>
         <translation>Nivell de Moll:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="87"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="88"/>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
         <translation>La roda Moll/Sec indica la proporció entre el senyal d&apos;entrada i l&apos;efecte que es mostra a la sortida.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="93"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="94"/>
         <source>Decay</source>
         <translation>Decaïment</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="97"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="98"/>
         <source>Time:</source>
         <translation>Temps:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="101"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="102"/>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
         <translation>La roda Decaïment controla quants períodes de silenci han de passar abans de que el connector aturi el processament. Valors més petits reduiran la càrrega de CPU, però augmenten el risc de tallar la cua als efectes de retard.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="106"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="107"/>
         <source>Gate</source>
         <translation>Porta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="110"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="111"/>
         <source>Gate:</source>
         <translation>Porta:</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="113"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="114"/>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
         <translation>La roda Porta controla el nivell de senyal que és considerat &apos;silenci&apos; mentre decideix quan aturar de processar senyals.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="115"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="116"/>
         <source>Controls</source>
         <translation>Controls</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="172"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="174"/>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
 
 The On/Off switch allows you to bypass a given plugin at any point in time.
@@ -4088,22 +4167,22 @@ El botó Controls obre un diàleg per a editar els paràmetres de l&apos;efecte.
 Un clic dret mostrarà un menú contextual on podràs canviar l&apos;ordre en el qual els efectes són processats o esborrar un efecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="244"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="246"/>
         <source>Move &amp;up</source>
         <translation>Mou a&amp;munt</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="247"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="249"/>
         <source>Move &amp;down</source>
         <translation>Mou a&amp;vall</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="251"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="253"/>
         <source>&amp;Remove this plugin</source>
         <translation>&amp;Treu aquest connector</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/rack_plugin.cpp" line="255"/>
+        <location filename="../../src/widgets/rack_plugin.cpp" line="257"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
@@ -4144,57 +4223,57 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
 <context>
     <name>sampleBuffer</name>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="827"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="830"/>
         <source>Wave-Files (*.wav)</source>
         <translation>Fitxers WAV (*.wav)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="828"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="831"/>
         <source>OGG-Files (*.ogg)</source>
         <translation>Fitxers OGG (*.ogg)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="834"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="837"/>
         <source>VOC-Files (*.voc)</source>
         <translation>Fitxers VOC (*.voc)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="835"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="838"/>
         <source>AIFF-Files (*.aif *.aiff)</source>
         <translation>Fitxers AIFF (*.aif *.aiff)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="836"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="839"/>
         <source>AU-Files (*.au)</source>
         <translation>Fitxers AU (*.au)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="838"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="841"/>
         <source>RAW-Files (*.raw)</source>
         <translation>Fitxers RAW (*.raw)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="797"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="800"/>
         <source>Open audio file</source>
         <translation>Obre fitxer d&apos;àudio</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="830"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="833"/>
         <source>FLAC-Files (*.flac)</source>
         <translation>Fitxers FLAC (*.flac)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="833"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="836"/>
         <source>SPEEX-Files (*.spx)</source>
         <translation>Fitxers SPEEX (*.spx)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="826"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="829"/>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Tots els Fitxers d&apos;Àudio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
     <message>
-        <location filename="../../src/lib/sample_buffer.cpp" line="829"/>
+        <location filename="../../src/lib/sample_buffer.cpp" line="832"/>
         <source>DrumSynth-Files (*.ds)</source>
         <translation>Fitxers DrumSynth (*.ds)</translation>
     </message>
@@ -4210,27 +4289,27 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
 <context>
     <name>sampleTrack</name>
     <message>
-        <location filename="../../src/tracks/sample_track.cpp" line="350"/>
+        <location filename="../../src/tracks/sample_track.cpp" line="340"/>
         <source>Sample track</source>
         <translation>Pista de mostra</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/sample_track.cpp" line="358"/>
+        <location filename="../../src/tracks/sample_track.cpp" line="348"/>
         <source>Channel volume</source>
         <translation>Volum del canal</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/sample_track.cpp" line="361"/>
+        <location filename="../../src/tracks/sample_track.cpp" line="351"/>
         <source>Channel volume:</source>
         <translation>Volum del canal:</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/sample_track.cpp" line="363"/>
+        <location filename="../../src/tracks/sample_track.cpp" line="353"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/sample_track.cpp" line="368"/>
+        <location filename="../../src/tracks/sample_track.cpp" line="358"/>
         <source>With this knob you can set the volume of the opened channel.</source>
         <translation>Amb aquesta roda pots ajustar el volum del canal obert.</translation>
     </message>
@@ -4513,12 +4592,12 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
 <context>
     <name>songEditor</name>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="336"/>
+        <location filename="../../src/core/song_editor.cpp" line="324"/>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Pica aquí si vols aturar la reproducció de la cançó. El marcador de posició de cançó serà col·locat a l&apos;inici de la cançó.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1605"/>
+        <location filename="../../src/core/song_editor.cpp" line="1604"/>
         <source>untitled</source>
         <translation>sense títol</translation>
     </message>
@@ -4548,57 +4627,57 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>No es pot escriure el fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="97"/>
+        <location filename="../../src/core/song_editor.cpp" line="98"/>
         <source>Song-Editor</source>
         <translation>Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1634"/>
+        <location filename="../../src/core/song_editor.cpp" line="1633"/>
         <source>The file &quot;%1&quot; already exists. Do you want to overwrite it?</source>
         <translation>El fitxer &quot;%1&quot; ja existeix. Vols sobreescriure&apos;l?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="331"/>
+        <location filename="../../src/core/song_editor.cpp" line="319"/>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
         <translation>Pica aquí si vols reproduir la cançó sencera. La reproducció començarà al marcador de posició de cançó (verd). També pots moure&apos;l mentre es reprodueix.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="287"/>
+        <location filename="../../src/core/song_editor.cpp" line="275"/>
         <source>Play song (Space)</source>
         <translation>Reprodueix cançó (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="291"/>
+        <location filename="../../src/core/song_editor.cpp" line="279"/>
         <source>Stop song (Space)</source>
         <translation>Atura cançó (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="152"/>
+        <location filename="../../src/core/song_editor.cpp" line="140"/>
         <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every tact has four beats, so the tempo in BPM specifies, how many tacts / 4 should be played within a minute (or how many tacts should be played within four minutes).</source>
         <translation>El tempo d&apos;una cançó s&apos;especifica en batecs per minut (BPM). Si vols canviar el tempo de la cançó, canvia aquest valor. Cada compàs té quatre batecs, llavors el tempo en BPM especifica quants compassos / 4 s&apos;han de tocar en un minut (o quants compassos s&apos;han de tocar en quatre minuts).</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="231"/>
+        <location filename="../../src/core/song_editor.cpp" line="219"/>
         <source>master pitch</source>
         <translation>to mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="144"/>
+        <location filename="../../src/core/song_editor.cpp" line="132"/>
         <source>tempo of song</source>
         <translation>tempo de cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="296"/>
+        <location filename="../../src/core/song_editor.cpp" line="284"/>
         <source>Add beat/bassline</source>
         <translation>Afegeix ritme base</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="302"/>
+        <location filename="../../src/core/song_editor.cpp" line="290"/>
         <source>Add sample-track</source>
         <translation>Afegeix pista de mostra</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1543"/>
+        <location filename="../../src/core/song_editor.cpp" line="1542"/>
         <source>Project NOT saved.</source>
         <translation>Projecte NO desat.</translation>
     </message>
@@ -4610,27 +4689,27 @@ Do you want to overwrite it?</source>
 Vols sobreescriure&apos;l?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1621"/>
+        <location filename="../../src/core/song_editor.cpp" line="1620"/>
         <source>Select file for project-export...</source>
         <translation>Selecciona fitxer per a exportar projecte...</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1304"/>
+        <location filename="../../src/core/song_editor.cpp" line="1303"/>
         <source>Project not saved</source>
         <translation>Projecte no desat</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1307"/>
+        <location filename="../../src/core/song_editor.cpp" line="1306"/>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
         <translation>El projecte actual ha estat modificat des del darrer desament. Vols desar-lo ara?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1576"/>
+        <location filename="../../src/core/song_editor.cpp" line="1575"/>
         <source>Import file</source>
         <translation>Importa fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="139"/>
+        <location filename="../../src/core/song_editor.cpp" line="127"/>
         <source>TEMPO/BPM</source>
         <translation>TEMPO/BPM</translation>
     </message>
@@ -4642,62 +4721,62 @@ Please make sure you have at least read-access to the file and try again.</sourc
 Per favor, assegura&apos;t que tens permís de lectura per al fitxer i torna-ho a provar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="159"/>
+        <location filename="../../src/core/song_editor.cpp" line="147"/>
         <source>High quality mode</source>
         <translation>Mode alta qualitat</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="169"/>
+        <location filename="../../src/core/song_editor.cpp" line="157"/>
         <source>Auto limiter</source>
         <translation>Autolimitador</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="197"/>
+        <location filename="../../src/core/song_editor.cpp" line="185"/>
         <source>master volume</source>
         <translation>volum mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="209"/>
+        <location filename="../../src/core/song_editor.cpp" line="197"/>
         <source>Master volume</source>
         <translation>Volum mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="242"/>
+        <location filename="../../src/core/song_editor.cpp" line="230"/>
         <source>Master pitch</source>
         <translation>To mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="308"/>
+        <location filename="../../src/core/song_editor.cpp" line="296"/>
         <source>Draw mode</source>
         <translation>Mode dibuixar</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="315"/>
+        <location filename="../../src/core/song_editor.cpp" line="303"/>
         <source>Edit mode (select and move)</source>
         <translation>Mode editar (selecciona i mou)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="604"/>
+        <location filename="../../src/core/song_editor.cpp" line="603"/>
         <source>Value: %1%</source>
         <translation>Valor: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="652"/>
+        <location filename="../../src/core/song_editor.cpp" line="651"/>
         <source>Value: %1 semitones</source>
         <translation>Valor: %1 semitons</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1533"/>
+        <location filename="../../src/core/song_editor.cpp" line="1532"/>
         <source>Project saved</source>
         <translation>Projecte desat</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1535"/>
+        <location filename="../../src/core/song_editor.cpp" line="1534"/>
         <source>The project %1 is now saved.</source>
         <translation>El projecte %1 està desat.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1544"/>
+        <location filename="../../src/core/song_editor.cpp" line="1543"/>
         <source>The project %1 was not saved!</source>
         <translation>El projecte %1 no està desat!</translation>
     </message>
@@ -4709,7 +4788,7 @@ Please make sure you have write-access to the file and try again.</source>
 Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxer i torna-ho a provar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="137"/>
+        <location filename="../../src/core/song_editor.cpp" line="125"/>
         <source>Tempo</source>
         <translation>Tempo</translation>
     </message>
@@ -4717,17 +4796,17 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>stereoEnhancerControlDialog</name>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="48"/>
+        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="49"/>
         <source>Width</source>
         <translation>Amplada</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="51"/>
+        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="52"/>
         <source>WIDE</source>
         <translation>AMPLE</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="52"/>
+        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="53"/>
         <source>Width:</source>
         <translation>Amplada:</translation>
     </message>
@@ -4932,7 +5011,7 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>trackContainer</name>
     <message>
-        <location filename="../../src/core/track_container.cpp" line="119"/>
+        <location filename="../../src/core/track_container.cpp" line="113"/>
         <source>Loading project...</source>
         <translation>Carregant projecte...</translation>
     </message>
@@ -5042,27 +5121,27 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <location filename="../../src/core/track.cpp" line="946"/>
+        <location filename="../../src/core/track.cpp" line="945"/>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Pitja &lt;Ctrl&gt; quan piquis el control de moviment per a iniciar una nova acció d&apos;arrossegar i amollar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1156"/>
+        <location filename="../../src/core/track.cpp" line="1155"/>
         <source>Clone this track</source>
         <translation>Clona aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1159"/>
+        <location filename="../../src/core/track.cpp" line="1158"/>
         <source>Remove this track</source>
         <translation>Elimina aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="959"/>
+        <location filename="../../src/core/track.cpp" line="958"/>
         <source>Actions for this track</source>
         <translation>Accions per a aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="981"/>
+        <location filename="../../src/core/track.cpp" line="980"/>
         <source>With this switch you can either mute this track or mute all other tracks.
 By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
 When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
@@ -5071,24 +5150,24 @@ Amb un clic esquerre, aquesta pista s&apos;apaga. Això és útil si només vols
 Amb un clic dret a l&apos;interruptor, totes les altres pistes s&apos;apagaran. Això és útil si només vols escoltar aquesta pista.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="983"/>
+        <location filename="../../src/core/track.cpp" line="982"/>
         <source>left click = mute this track
 right click = mute all other tracks (solo)</source>
         <translation>clic esquerre = apaga aquesta pista
 clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="962"/>
+        <location filename="../../src/core/track.cpp" line="961"/>
         <source>Mute</source>
         <translation>Apaga</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1143"/>
+        <location filename="../../src/core/track.cpp" line="1142"/>
         <source>Enable automation</source>
         <translation>Habilita automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1150"/>
+        <location filename="../../src/core/track.cpp" line="1149"/>
         <source>Disable automation</source>
         <translation>Inhabilita automatització</translation>
     </message>

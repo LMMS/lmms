@@ -54,12 +54,6 @@ public:
 		return( m_scrollArea );
 	}
 
-#warning centralWidget is obsolete
-	QWidget * centralWidget( void ) const
-	{
-		return( (QWidget *) this );
-	}
-
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 

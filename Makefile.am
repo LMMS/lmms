@@ -73,7 +73,6 @@ lmms_MOC =						\
 		./kmultitabbar.moc			\
 		./knob.moc				\
  		./ladspa_control.moc			\
-		./ladspa_port_dialog.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./main_window.moc			\
@@ -169,7 +168,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
-		$(srcdir)/src/core/ladspa_port_dialog.cpp		\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\
 		$(srcdir)/src/core/ladspa_control.cpp			\
@@ -384,7 +382,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/ladspa_2_lmms.h			\
 		$(srcdir)/include/ladspa_control.h			\
-		$(srcdir)/include/ladspa_port_dialog.h			\
 		$(srcdir)/include/ladspa_base.h				\
 		$(THIRD_PARTY_CODE)
 

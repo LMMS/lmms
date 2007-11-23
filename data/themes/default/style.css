@@ -1,5 +1,9 @@
 /* LMMS style sheet */
 
+QMdiArea {
+	background-image: url(resources:background_artwork.png);
+}
+
 captionMenu::item:disabled {
 	color: white;
 	background-color: rgb(0, 0, 192);

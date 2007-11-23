@@ -1,3 +1,55 @@
+2007-11-23	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* Makefile.am:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	* plugins/ladspa_browser/ladspa_description.cpp:
+	* plugins/ladspa_browser/ladspa_description.h:
+	* plugins/ladspa_browser/ladspa_port_dialog.cpp:
+	* plugins/ladspa_browser/ladspa_port_dialog.h:
+	* plugins/ladspa_browser/logo.png:
+	* plugins/ladspa_browser/Makefile.am:
+	* plugins/Makefile.am:
+	resurrected LADSPA browser
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	minor simplification
+
+	* src/core/song_editor.cpp:
+	* src/widgets/automatable_slider.cpp:
+	upgraded automatable sliders to Qt4
+
+	* configure.in:
+	* include/engine.h:
+	* plugins/Makefile.am:
+	* src/core/config_mgr.cpp:
+	* src/core/engine.cpp:
+	removed references to optional LADSPA support
+
+	* data/themes/default/style.css:
+	* src/core/main_window.cpp:
+	moved workspace background to style sheet
+
+	* src/core/main_window.cpp:
+	added workspace scroll bars
+
+	* include/track_container.h:
+	* src/core/song_editor.cpp:
+	removed obsolete centralWiget()
+
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	fixed i18n
+
+	* plugins/live_tool/live_tool.cpp:
+	cosmetic changes
+
+	* data/locale/ca.ts:
+	updated translation
+
+	* resources/*:
+	removed unused images
+
 2007-11-22  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/widgets/text_float.cpp:

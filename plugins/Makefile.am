@@ -2,10 +2,6 @@ if VST_SUPPORT
 VST_DIRS=vst_base vst_effect vestige
 endif
 
-if LADSPA_SUPPORT
-LADSPA_DIRS=ladspa_effect
-endif
-
 if STK_SUPPORT
 STK_DIR=stk
 endif
@@ -20,7 +16,8 @@ SUBDIRS =			\
 	bit_invader		\
 	flp_import		\
 	kicker			\
-	$(LADSPA_DIRS)		\
+	ladspa_browser		\
+	ladspa_effect		\
 	lb302 			\
 	live_tool		\
 	midi_import		\

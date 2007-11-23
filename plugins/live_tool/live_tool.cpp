@@ -60,6 +60,13 @@ plugin::descriptor live_tool_plugin_descriptor =
 	NULL
 } ;
 
+
+// neccessary for getting instance out of shared lib
+plugin * lmms_plugin_main( void * _data )
+{
+	return( new liveTool );
+}
+
 }
 
 
@@ -76,7 +83,7 @@ liveTool::liveTool( void ) :
 	setPalette( pal );
 	setFixedSize( background.size() );
 
-	setWhatsThis( tr( 
+	setWhatsThis( tr(
 		"This tool is intended to be used in live performances, though "
 		"you can use it for music production as well.\n"
 		"The following keys will work only if this window is active.\n"
@@ -183,13 +190,4 @@ void liveTool::toggleInstrument( int _n )
 
 
 
-extern "C"
-{
-
-// neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
-{
-	return( new liveTool() );
-}
-
-}
+#include "live_tool.moc"

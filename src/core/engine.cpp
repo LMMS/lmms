@@ -25,22 +25,19 @@
  */
 
 
+#include "engine.h"
 #include "automation_editor.h"
 #include "bb_editor.h"
 #include "config_mgr.h"
-#include "project_journal.h"
-#include "engine.h"
+#include "ladspa_2_lmms.h"
 #include "main_window.h"
 #include "mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
 #include "preset_preview_play_handle.h"
+#include "project_journal.h"
 #include "project_notes.h"
 #include "song_editor.h"
-
-#ifdef LADSPA_SUPPORT
-#include "ladspa_2_lmms.h"
-#endif
 
 
 bool engine::s_hasGUI = TRUE;
@@ -53,9 +50,7 @@ bbEditor * engine::s_bbEditor;
 pianoRoll * engine::s_pianoRoll;
 projectNotes * engine::s_projectNotes;
 projectJournal * engine::s_projectJournal;
-#ifdef LADSPA_SUPPORT
 ladspa2LMMS * engine::s_ladspaManager;
-#endif
 QMap<QString, QString> engine::s_sample_extensions;
 
 
@@ -75,11 +70,8 @@ void engine::init( const bool _has_gui )
 	s_bbEditor = new bbEditor;
 	s_pianoRoll = new pianoRoll;
 	s_automationEditor = new automationEditor;
-
-#ifdef LADSPA_SUPPORT
 	s_ladspaManager = new ladspa2LMMS;
-#endif
-	
+
 	s_mixer->initDevices();
 
 	s_mainWindow->finalize();
@@ -106,10 +98,7 @@ void engine::destroy( void )
 	s_pianoRoll = NULL;
 	delete s_automationEditor;
 	s_automationEditor = NULL;
-
-#ifdef LADSPA_SUPPORT
 	delete s_ladspaManager;
-#endif
 
 	presetPreviewPlayHandle::cleanUp();
 

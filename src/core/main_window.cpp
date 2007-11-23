@@ -143,9 +143,11 @@ mainWindow::mainWindow( void ) :
 	if( no_mdi == FALSE )
 	{
 		m_workspace = new QMdiArea( splitter );
-		m_workspace->setBackground( embed::getIconPixmap(
-						"background_artwork" ) );
-   // m_workspace->setBackgroundMode (QWidget::NoBackground);
+		m_workspace->setBackground( Qt::NoBrush );
+		m_workspace->setHorizontalScrollBarPolicy(
+							Qt::ScrollBarAsNeeded );
+		m_workspace->setVerticalScrollBarPolicy(
+							Qt::ScrollBarAsNeeded );
 	}
 
 	hbox->addWidget( side_bar );

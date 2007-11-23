@@ -34,6 +34,7 @@
 
 class liveTool : public tool
 {
+	Q_OBJECT
 public:
 	liveTool( void );
 	virtual ~liveTool();

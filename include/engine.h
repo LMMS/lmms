@@ -40,9 +40,8 @@ class mixer;
 class pianoRoll;
 class projectNotes;
 class songEditor;
-#ifdef LADSPA_SUPPORT
 class ladspa2LMMS;
-#endif
+
 
 class engine
 {
@@ -95,12 +94,10 @@ public:
 		return( s_automationEditor );
 	}
 
-#ifdef LADSPA_SUPPORT
 	static ladspa2LMMS * getLADSPAManager( void )
 	{
 		return( s_ladspaManager );
 	}
-#endif
 
 	static float framesPerTact64th( void )
 	{
@@ -126,10 +123,7 @@ private:
 	static pianoRoll * s_pianoRoll;
 	static projectNotes * s_projectNotes;
 	static projectJournal * s_projectJournal;
-	
-#ifdef LADSPA_SUPPORT
 	static ladspa2LMMS * s_ladspaManager;
-#endif
 
 	static QMap<QString, QString> s_sample_extensions;
 

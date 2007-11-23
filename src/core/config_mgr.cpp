@@ -482,9 +482,7 @@ void configManager::setFLDir( const QString & _fd )
 
 void configManager::setLADSPADir( const QString & _fd )
 {
-#ifdef LADSPA_SUPPORT
 	m_ladDir = _fd;
-#endif
 }
 
 
@@ -780,9 +778,7 @@ bool configManager::loadConfigFile( void )
 	m_workingDir = value( "paths", "workingdir" );
 	m_vstDir = value( "paths", "vstdir" );
 	m_flDir = value( "paths", "fldir" );
-#ifdef LADSPA_SUPPORT
 	m_ladDir = value( "paths", "laddir" );
-#endif
 #ifdef HAVE_STK_H
 	m_stkDir = value( "paths", "stkdir" );
 #endif
@@ -797,12 +793,10 @@ bool configManager::loadConfigFile( void )
 		m_flDir = QDir::home().absolutePath();
 	}
 
-#ifdef LADSPA_SUPPORT
 	if( m_ladDir == "" )
-{
-	m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
-}
-#endif
+	{
+		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
+	}
 
 #ifdef HAVE_STK_H
 	if( m_stkDir == "" )
@@ -857,9 +851,7 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
-#ifdef LADSPA_SUPPORT
 	setValue( "paths", "laddir", m_ladDir );
-#endif
 #ifdef HAVE_STK_H
 	setValue( "paths", "stkdir", m_stkDir );
 #endif
