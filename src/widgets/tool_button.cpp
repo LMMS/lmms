@@ -41,7 +41,7 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	m_colorStandard( s_stdColor ),
 	m_colorHighlighted( s_hlColor )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( FALSE );
 	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorStandard );
 	pal.setColor( QPalette::Window, m_colorStandard );

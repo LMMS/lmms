@@ -1,3 +1,12 @@
+2007-11-23  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	reformated code to match code style rules
+
+	* src/widgets/tool_button.cpp:
+	improved appearance of toolbar buttons
+
 2007-11-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_browser/ladspa_browser.cpp:
