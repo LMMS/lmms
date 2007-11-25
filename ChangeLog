@@ -1,3 +1,11 @@
+2007-11-24  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/lb302/lb302.cpp:
+	re-enabled lb302 background
+
+	* plugins/lb302/artwork.png:
+	updated skin I had sitting around
+
 2007-11-23  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/lb302/lb302.cpp:

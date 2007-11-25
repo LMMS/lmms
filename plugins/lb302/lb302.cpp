@@ -493,7 +493,7 @@ lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
 	connect( m_waveKnob, SIGNAL( valueChanged(float) ),
 			this, SLOT ( waveChanged( float ) ) );
 
-	setAutoFillBackground( FALSE );
+	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 	              PLUGIN_NAME::getIconPixmap( "artwork" ) );
