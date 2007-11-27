@@ -48,6 +48,7 @@
 	* plugins/lb302/lb302.h:
 	reverted to old lb302. There is a bug in sound output, will look
 	into it, but I'd rather have a working repository
+
 	* data/presets/LB302/Oh Synth.cs.xml:
 	new preset
 
