@@ -1,3 +1,10 @@
+2007-11-26  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	reverted to old lb302. There is a bug in sound output, will look
+	into it, but I'd rather have a working repository
+
 2007-11-24  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/lb302/lb302.cpp:
