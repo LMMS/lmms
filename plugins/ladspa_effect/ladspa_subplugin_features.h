@@ -29,8 +29,8 @@
 #ifndef _LADSPA_SUBPLUGIN_FEATURES_H
 #define _LADSPA_SUBPLUGIN_FEATURES_H
 
+#include "ladspa_manager.h"
 #include "plugin.h"
-#include "ladspa_base.h"
 
 
 class ladspaSubPluginFeatures : public plugin::descriptor::subPluginFeatures
@@ -43,6 +43,8 @@ public:
 
 	virtual void listSubPluginKeys( plugin::descriptor * _desc,
 								keyList & _kl );
+
+	static ladspa_key_t subPluginKeyToLadspaKey( const key * _key );
 
 } ;
 

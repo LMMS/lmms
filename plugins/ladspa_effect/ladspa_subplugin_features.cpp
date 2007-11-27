@@ -26,16 +26,18 @@
  */
 
 
-#include <QtCore/QString>
-#include <QtGui/QLabel>
-#include <QtGui/QBoxLayout>
-
-
 #include "ladspa_subplugin_features.h"
-#include "ladspa_2_lmms.h"
-#include "mixer.h"
+
+
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
+
+
 #include "audio_device.h"
 #include "engine.h"
+#include "ladspa_2_lmms.h"
+#include "ladspa_base.h"
+#include "mixer.h"
 
 
 ladspaSubPluginFeatures::ladspaSubPluginFeatures( plugin::pluginTypes _type ) :
@@ -155,3 +157,15 @@ void ladspaSubPluginFeatures::listSubPluginKeys( plugin::descriptor * _desc,
 }
 
 
+
+
+ladspa_key_t ladspaSubPluginFeatures::subPluginKeyToLadspaKey(
+							const key * _key )
+{
+	QStringList list = _key->user.toStringList();
+	if( list.empty() )
+	{
+		return( ladspa_key_t() );
+	}
+	return( ladspa_key_t( list.first(), list.last() ) );
+}

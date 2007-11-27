@@ -69,13 +69,6 @@ typedef struct portDescription
 } port_desc_t;
 
 
-inline ladspa_key_t subPluginKeyToLadspaKey(
-		const plugin::descriptor::subPluginFeatures::key * _key )
-{
-	return( ladspa_key_t( _key->user.toStringList().first(),
-				_key->user.toStringList().last() ) );
-}
-
 inline plugin::descriptor::subPluginFeatures::key ladspaKeyToSubPluginKey(
 						plugin::descriptor * _desc,
 						const QString & _name,

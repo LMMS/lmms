@@ -113,6 +113,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count() );
+		pd->setWindowModality( Qt::ApplicationModal );
 		pd->setWindowTitle( tr( "Please wait..." ) );
 		pd->show();
 	}

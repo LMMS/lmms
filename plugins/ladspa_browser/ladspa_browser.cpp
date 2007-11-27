@@ -86,13 +86,12 @@ ladspaBrowser::ladspaBrowser( void ) :
 	QWidget * ws = new QWidget( this );
 	ws->setFixedSize( 500, 480 );
 
-	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
-	QWidget * available = createTab( ws, type + tr( "Available Effects" ), VALID );
-	QWidget * unavailable = createTab( ws, type + tr( "Unavailable Effects" ),
+	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
+	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ),
 								INVALID );
-	QWidget * instruments = createTab( ws, type + tr( "Instruments" ), SOURCE );
-	QWidget * analysis = createTab( ws, type + tr( "Analysis Tools" ), SINK );
-	QWidget * other = createTab( ws, type + tr( "Don't know" ), OTHER );
+	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
+	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
+	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
 
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 
@@ -185,7 +184,8 @@ QWidget * ladspaBrowser::createTab( QWidget * _parent, const QString & _txt,
 	layout->setSpacing( 0 );
 	layout->setMargin( 0 );
 
-	QLabel * title = new QLabel( _txt, tab );
+	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
+	QLabel * title = new QLabel( type + _txt, tab );
 	QFont f = title->font();
 	f.setBold( TRUE );
 	title->setFont( pointSize<12>( f ) );

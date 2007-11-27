@@ -72,6 +72,8 @@ void engine::init( const bool _has_gui )
 	s_automationEditor = new automationEditor;
 	s_ladspaManager = new ladspa2LMMS;
 
+	s_projectJournal->setJournalling( TRUE );
+
 	s_mixer->initDevices();
 
 	s_mainWindow->finalize();

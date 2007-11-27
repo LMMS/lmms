@@ -37,7 +37,7 @@ projectJournal::projectJournal( void ) :
 	m_joIDs(),
 	m_journalEntries(),
 	m_currentJournalEntry( m_journalEntries.end() ),
-	m_journalling( TRUE )
+	m_journalling( FALSE )
 {
 }
 

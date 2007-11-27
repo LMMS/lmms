@@ -204,7 +204,7 @@ void mainWindow::finalize( void )
 	s_splashScreen->showMessage( tr( "Creating GUI..." ),
 							splash_alignment_flags,
 								Qt::white );
-	resetWindowTitle( "" );
+	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
 
 
@@ -511,19 +511,20 @@ void mainWindow::addSpacingToToolBar( int _size )
 
 
 
-void mainWindow::resetWindowTitle( const QString & _add )
+void mainWindow::resetWindowTitle( void )
 {
-	QString title = _add;
-	if( _add == "" && engine::getSongEditor()->projectFileName() != "" )
+	QString title = "";
+	if( engine::getSongEditor()->projectFileName() != "" )
 	{
 		title = QFileInfo( engine::getSongEditor()->projectFileName()
 							).completeBaseName();
 	}
-	if( title != "" )
+	if( title == "" )
 	{
-		title += " - ";
+		title = tr( "Untitled" );
 	}
-	setWindowTitle( title + tr( "LMMS %1" ).arg( VERSION ) );
+	setWindowTitle( title + "[*] - " + tr( "LMMS %1" ).arg( VERSION ) );
+	setWindowModified( FALSE );
 }
 
 
@@ -566,9 +567,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			_de.attribute( "height" ).toInt() );
 	if( !r.isNull())
 	{
-		_w->show();
-
-		if (_w->parentWidget() != NULL &&
+		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();
@@ -576,7 +575,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 		_w->resize( r.size() );
 		_w->move( r.topLeft() );
-		_w->setShown( _de.attribute( "visible" ).toInt() );
+		_w->setVisible( _de.attribute( "visible" ).toInt() );
 	}
 }
 

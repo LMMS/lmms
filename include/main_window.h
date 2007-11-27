@@ -58,7 +58,7 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void resetWindowTitle( const QString & _add = "" );
+	void resetWindowTitle( void );
 
 	void clearKeyModifiers( void );
 

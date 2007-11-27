@@ -1,3 +1,47 @@
+2007-11-27	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/main_window.h:
+	* include/song_editor.h:
+	* src/core/engine.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	* src/lib/project_journal.cpp:
+	added modified project indicator
+
+	* include/ladspa_base.h:
+	* include/plugin.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	fixed invalid key segfault
+
+	* src/core/main_window.cpp:
+	fixed instrument track visual glitches when loading
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	removed QMdiSubWindow inheritance, fixes MDI focus segfault
+
+	* src/core/track_container.cpp:
+	fixed interrupted loading segfault
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	removed singleton reference
+
+	* src/core/config_mgr.cpp:
+	integrated mkPath() calls
+
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	centralized title change
+
+	* include/song_editor.h:
+	* src/core/song_editor.cpp:
+	reduced dependencies
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-11-26  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/lb302/lb302.cpp:

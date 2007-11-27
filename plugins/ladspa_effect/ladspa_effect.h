@@ -29,7 +29,6 @@
 
 #include "effect.h"
 #include "engine.h"
-#include "ladspa_2_lmms.h"
 #include "ladspa_base.h"
 #include "ladspa_control.h"
 #include "ladspa_control_dialog.h"
@@ -82,7 +81,6 @@ public:
 private:
 	QString m_effName;
 	ladspa_key_t m_key;
-	ladspa2LMMS * m_ladspa;
 	Uint16 m_effectChannels;
 	Uint16 m_portCount;
 	fpp_t m_bufferSize;

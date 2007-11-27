@@ -25,6 +25,9 @@
  */
 
 
+#include "song_editor.h"
+
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -32,7 +35,6 @@
 #include <math.h>
 
 
-#include <Qt/QtXml>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QAction>
@@ -41,41 +43,40 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
 #include <QtGui/QMessageBox>
 #include <QtGui/QScrollBar>
 #include <QtGui/QStatusBar>
-#include <QtGui/QMdiArea>
 
 
-#include "song_editor.h"
 #include "automatable_object_templates.h"
 #include "automatable_slider.h"
 #include "bb_editor.h"
-#include "rename_dialog.h"
-#include "embed.h"
-#include "templates.h"
-#include "export_project_dialog.h"
 #include "bb_track.h"
+#include "combobox.h"
+#include "config_mgr.h"
+#include "cpuload_widget.h"
+#include "embed.h"
+#include "envelope_and_lfo_widget.h"
+#include "export_project_dialog.h"
+#include "import_filter.h"
 #include "instrument_track.h"
-#include "mmp.h"
+#include "lcd_spinbox.h"
+#include "main_window.h"
 #include "midi_client.h"
+#include "mmp.h"
 #include "note_play_handle.h"
-#include "timeline.h"
 #include "pattern.h"
 #include "piano_roll.h"
-#include "envelope_and_lfo_widget.h"
-#include "visualization_widget.h"
-#include "project_notes.h"
-#include "config_mgr.h"
-#include "lcd_spinbox.h"
-#include "tooltip.h"
-#include "tool_button.h"
-#include "cpuload_widget.h"
-#include "text_float.h"
-#include "combobox.h"
-#include "main_window.h"
-#include "import_filter.h"
 #include "project_journal.h"
+#include "project_notes.h"
+#include "rename_dialog.h"
+#include "templates.h"
+#include "text_float.h"
+#include "timeline.h"
+#include "tool_button.h"
+#include "tooltip.h"
+#include "visualization_widget.h"
 
 #include "debug.h"
 
@@ -1295,7 +1296,7 @@ automationPattern * songEditor::tempoAutomationPattern( void )
 
 bool songEditor::mayChangeProject( void )
 {
-	if( m_modified == FALSE )
+	if( engine::getMainWindow()->isWindowModified() == FALSE )
 	{
 		return( TRUE );
 	}
@@ -1377,9 +1378,15 @@ void songEditor::createNewProject( void )
 		return;
 	}
 
+	m_loadingProject = TRUE;
+
 	clearProject();
 
 	engine::getProjectJournal()->setJournalling( FALSE );
+
+	m_fileName = m_oldFileName = "";
+
+	engine::getMainWindow()->resetWindowTitle();
 
 	track * t;
 	t = track::create( track::INSTRUMENT_TRACK, this );
@@ -1391,20 +1398,13 @@ void songEditor::createNewProject( void )
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
 
-	m_loadingProject = TRUE;
 	m_bpmSpinBox->setInitValue( DEFAULT_BPM );
 	m_masterVolumeSlider->setInitValue( 100 );
 	m_masterPitchSlider->setInitValue( 0 );
-	m_loadingProject = FALSE;
-
-	m_fileName = m_oldFileName = "";
-
-	m_modified = FALSE;
-
-	engine::getMainWindow()->resetWindowTitle( "" );
 
 	engine::getProjectJournal()->setJournalling( TRUE );
 
+	m_loadingProject = FALSE;
 }
 
 
@@ -1425,14 +1425,14 @@ void FASTCALL songEditor::createNewProjectFromTemplate( const QString &
 // load given song
 void FASTCALL songEditor::loadProject( const QString & _file_name )
 {
+	m_loadingProject = TRUE;
+
 	clearProject();
 
 	engine::getProjectJournal()->setJournalling( FALSE );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
-
-	m_loadingProject = TRUE;
 
 	multimediaProject mmp( m_fileName );
 	// if file could not be opened, head-node is null and we create
@@ -1442,6 +1442,8 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 		createNewProject();
 		return;
 	}
+
+	engine::getMainWindow()->resetWindowTitle();
 
 	// get the header information from the DOM
 	m_bpmSpinBox->loadSettings( mmp.head(), "bpm" );
@@ -1490,16 +1492,13 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 		node = node.nextSibling();
 	}
 
-	m_modified = FALSE;
 	m_leftRightScroll->setValue( 0 );
-
-	m_loadingProject = FALSE;
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
-	engine::getMainWindow()->resetWindowTitle( "" );
-
 	engine::getProjectJournal()->setJournalling( TRUE );
+
+	m_loadingProject = FALSE;
 }
 
 
@@ -1527,15 +1526,13 @@ bool songEditor::saveProject( void )
 	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||
 					m_fileName != m_oldFileName ) == TRUE )
 	{
-		m_modified = FALSE;
-
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
 							).arg( m_fileName ),
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
 		configManager::inst()->addRecentlyOpenedProject( m_fileName );
-		engine::getMainWindow()->resetWindowTitle( "" );
+		engine::getMainWindow()->resetWindowTitle();
 	}
 	else
 	{
@@ -1652,6 +1649,25 @@ void songEditor::exportProject( void )
 void songEditor::updateFramesPerTact64th( void )
 {
 	engine::updateFramesPerTact64th();
+}
+
+
+
+
+void songEditor::setModified( void )
+{
+	if( !m_loadingProject )
+	{
+		engine::getMainWindow()->setWindowModified( TRUE );
+	}
+}
+
+
+
+
+bool songEditor::allowRubberband( void ) const
+{
+	return( m_editModeButton->isChecked() );
 }
 
 

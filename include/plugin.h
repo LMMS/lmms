@@ -93,8 +93,16 @@ public:
 					const QList<QVariant> l =
 						base64::decode( _dump_data ).
 								toList();
-					name = l[0].toString();
-					user = l[1];
+					if( l.empty() )
+					{
+						name = QString::null;
+						user = QVariant();
+					}
+					else
+					{
+						name = l[0].toString();
+						user = l[1];
+					}
 				}
 				inline QString dumpBase64( void ) const
 				{

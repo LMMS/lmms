@@ -28,7 +28,6 @@
 #define _SONG_EDITOR_H
 
 #include "track_container.h"
-#include "tool_button.h"
 
 
 class QLabel;
@@ -40,6 +39,7 @@ class lcdSpinBox;
 class pattern;
 class textFloat;
 class timeLine;
+class toolButton;
 
 
 const bpm_t MIN_BPM = 10;
@@ -183,10 +183,7 @@ public slots:
 	void setMasterVolume( volume _vol );
 	void setMasterPitch( int _master_pitch );
 
-	inline void setModified( void )
-	{
-		m_modified = TRUE;
-	}
+	void setModified( void );
 
 	void clearProject( void );
 
@@ -200,10 +197,7 @@ protected:
 
 	virtual QRect scrollAreaRect( void ) const;
 
-	virtual bool allowRubberband( void ) const
-	{
-		return( m_editModeButton->isChecked() );
-	}
+	virtual bool allowRubberband( void ) const;
 
 
 protected slots:
@@ -275,7 +269,6 @@ private:
 
 	QString m_fileName;
 	QString m_oldFileName;
-	bool m_modified;
 
 	volatile bool m_exporting;
 	volatile bool m_playing;

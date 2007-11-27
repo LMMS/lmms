@@ -49,15 +49,6 @@
 
 
 
-inline void mkPath( const QString & _path )
-{
-#warning TODO: directly integrate
-	// simple clean solution with Qt4...
-	QDir().mkpath( _path );
-}
-
-
-
 /*
 void linkFile( const QString & _src, const QString & _dst )
 {
@@ -514,7 +505,7 @@ void configManager::accept( void )
 					QMessageBox::Yes, QMessageBox::No )
 			== QMessageBox::Yes )
 		{
-			mkPath( m_workingDir );
+			QDir().mkpath( m_workingDir );
 		}
 		else
 		{
@@ -523,9 +514,9 @@ void configManager::accept( void )
 		}
 	}
 
-	mkPath( userProjectsDir() );
-	mkPath( userSamplesDir() );
-	mkPath( userPresetsDir() );
+	QDir().mkpath( userProjectsDir() );
+	QDir().mkpath( userSamplesDir() );
+	QDir().mkpath( userPresetsDir() );
 /*	processFilesRecursively( m_dataDir + "samples/", m_workingDir +
 								"samples/",
 					m_samplesCopyRB->isChecked() ?
@@ -923,7 +914,7 @@ void configManager::processFilesRecursively( const QString & _src_dir,
 						const QString & _dst_dir,
 	void( * _proc_func )( const QString & _src, const QString & _dst ) )
 {
-	mkPath( _dst_dir );
+	QDir().mkpath( _dst_dir );
 	QStringList files = QDir( _src_dir ).entryList();
 	for( QStringList::iterator it = files.begin(); it != files.end(); ++it )
 	{

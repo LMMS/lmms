@@ -29,7 +29,6 @@
 #include "instrument_track.h"
 
 
-#include <Qt/QtXml>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtGui/QApplication>
@@ -38,10 +37,9 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QLineEdit>
+#include <QtGui/QMdiArea>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
 
 
 #include "arp_and_chords_tab_widget.h"
@@ -98,7 +96,6 @@ const int PIANO_HEIGHT		= 84;
 
 
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
-	QMdiSubWindow( engine::getMainWindow()->workspace() ),
 	track( _tc ),
 	midiEventProcessor(),
 	m_trackType( INSTRUMENT_TRACK ),
@@ -112,9 +109,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_midiInputAction( NULL ),
 	m_midiOutputAction( NULL )
 {
-
-	QWidget * widget = new QWidget();
-
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
@@ -171,12 +165,12 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// init own layout + widgets
 	setFocusPolicy( Qt::StrongFocus );
-	QVBoxLayout * vlayout = new QVBoxLayout( widget );
+	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setMargin( 0 );
 	vlayout->setSpacing( 0 );
 
 	m_generalSettingsWidget = new tabWidget( tr( "GENERAL SETTINGS" ),
-									widget );
+									this );
 	m_generalSettingsWidget->setFixedHeight( 90 );
 
 	// setup line-edit for changing channel-name
@@ -314,20 +308,19 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	_tc->updateAfterTrackAdd();
 
-	setWidget( widget );
-
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->hide();
 	}
-
-	hide();
+	else
+	{
+		hide();
+	}
 }
-
-
 
 
 
@@ -338,10 +331,13 @@ instrumentTrack::~instrumentTrack()
 	delete m_effWidget;
 	delete m_audioPort;
 	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
+
+	if( engine::getMainWindow()->workspace() )
+	{
+		parentWidget()->hide();
+		parentWidget()->deleteLater();
+	}
 }
-
-
-
 
 
 
@@ -1209,12 +1205,28 @@ void instrumentTrack::toggledInstrumentTrackButton( bool _on )
 	}
 	if( _on )
 	{
-		show();
-		raise();
+		if( engine::getMainWindow()->workspace() )
+		{
+			show();
+			parentWidget()->show();
+			parentWidget()->raise();
+		}
+		else
+		{
+			show();
+			raise();
+		}
 	}
 	else
 	{
-		hide();
+		if( engine::getMainWindow()->workspace() )
+		{
+			parentWidget()->hide();
+		}
+		else
+		{
+			hide();
+		}
 	}
 }
 
@@ -1224,7 +1236,14 @@ void instrumentTrack::toggledInstrumentTrackButton( bool _on )
 void instrumentTrack::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();
-	hide();
+	if( engine::getMainWindow()->workspace() )
+	{
+		parentWidget()->hide();
+	}
+	else
+	{
+		hide();
+	}
 	m_tswInstrumentTrackButton->setChecked( FALSE );
 }
 
