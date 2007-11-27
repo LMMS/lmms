@@ -91,7 +91,7 @@ public:
 					desc( NULL )
 				{
 					const QList<QVariant> l =
-						base64::decode( _dump_data ).
+						base64::decode( _dump_data, QVariant::List ).
 								toList();
 					if( l.empty() )
 					{

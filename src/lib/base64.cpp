@@ -52,7 +52,7 @@ QString encode( const QVariant & _data )
 
 
 
-QVariant decode( const QString & _b64 )
+QVariant decode( const QString & _b64, QVariant::Type _force_type )
 {
 	char * dst = NULL;
 	int dsize = 0;
@@ -63,6 +63,12 @@ QVariant decode( const QString & _b64 )
 	QDataStream in( &buf );
 	QVariant ret;
 	in >> ret;
+	if( _force_type != QVariant::Invalid && ret.type() != _force_type )
+	{
+		buf.reset();
+		in.setVersion( QDataStream::Qt_3_3 );
+		in >> ret;
+	}
 	return( ret );
 }
 

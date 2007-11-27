@@ -29,8 +29,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
-
-class QVariant;
+#include <QtCore/QVariant>
 
 
 namespace base64
@@ -49,7 +48,8 @@ namespace base64
 		memcpy( *_data, data.constData(), *_size );
 	}
 	QString encode( const QVariant & _data );
-	QVariant decode( const QString & _b64 );
+	QVariant decode( const QString & _b64,
+			QVariant::Type _force_type = QVariant::Invalid );
 
 } ;
 
