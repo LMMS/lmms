@@ -29,6 +29,7 @@
 #include "pattern.h"
 #include "automation_pattern.h"
 #include "level_object.h"
+#include "instrument.h"
 #include "debug.h"
 
 
@@ -41,6 +42,7 @@
 
 #else
 
+#include <qdir.h>
 #include <qdom.h>
 #include <qapplication.h>
 #include <qprogressdialog.h>
@@ -292,8 +294,10 @@ invalid_format:
 		assert( it != NULL );
 #endif
 		// TODO: setup program, channel etc.
-		it->loadInstrument( "tripleoscillator" );
+		instrument * it_inst = it->loadInstrument( "patman" );
 		it->toggledInstrumentTrackButton( FALSE );
+		bool sample_loaded = FALSE;
+
 		// TODO: track_name.trimmed().isEmpty() (Qt4)
 		if( !track_name.isEmpty() )
 		{
@@ -351,19 +355,22 @@ invalid_format:
 					}
 					break;
 
-/*				case MIDI_META_EVENT:
+				case PROGRAM_CHANGE:
 				{
-					switch( ev.m_data.m_param[0] )
+					const QString num = QString::number( ev.key() );
+					const QString filter = QString().fill( '0', 3 - num.length() ) + num + "*.pat";
+					const QString dir = "/usr/share/midi/"
+							"freepats/Tone_000/";
+					const QStringList files = QDir( dir ).
+							entryList( filter );
+					if( !files.empty() && !sample_loaded )
 					{
-						case MIDI_SET_TEMPO:
-						{
-							break;
-						}
-						default:
-							break;
+						it_inst->setParameter( "samplefile",
+								dir+files.front() );
+						sample_loaded = TRUE;
 					}
 					break;
-				}*/
+				}
 
 				default:
 				/*	printf( "Unhandled event: %#x\n",

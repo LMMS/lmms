@@ -1,3 +1,9 @@
+2007-12-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/midi_import/midi_import.cpp:
+	load Patman-plugin instead of TripleOsc and try to load patch
+	according to program-change-events
+
 2007-11-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
