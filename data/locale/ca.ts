@@ -1037,32 +1037,32 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>bbEditor</name>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="82"/>
+        <location filename="../../src/core/bb_editor.cpp" line="78"/>
         <source>Play/pause current beat/bassline (Space)</source>
         <translation>Reprodueix/pausa el ritme base actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="86"/>
+        <location filename="../../src/core/bb_editor.cpp" line="82"/>
         <source>Stop playing of current beat/bassline (Space)</source>
         <translation>Atura el ritme base actual (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="99"/>
+        <location filename="../../src/core/bb_editor.cpp" line="95"/>
         <source>Click here, if you want to play the current beat/bassline. The beat/bassline is automatically looped when its end is reached.</source>
         <translation>Pica aquí si vols reproduir el ritme base actual. El ritme base és repetit automàticament quan arriba al final.</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="102"/>
+        <location filename="../../src/core/bb_editor.cpp" line="98"/>
         <source>Click here, if you want to stop playing of current beat/bassline.</source>
         <translation>Pica aquí si vols aturar el ritme base actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="72"/>
+        <location filename="../../src/core/bb_editor.cpp" line="71"/>
         <source>Beat+Baseline Editor</source>
         <translation>Editor de Ritme Base</translation>
     </message>
     <message>
-        <location filename="../../src/core/bb_editor.cpp" line="91"/>
+        <location filename="../../src/core/bb_editor.cpp" line="87"/>
         <source>Add beat/bassline</source>
         <translation>Afegeix ritme de base</translation>
     </message>
@@ -2058,17 +2058,17 @@ Assegura&apos;t que tens permís d&apos;escriptura per al fitxer/dispositiu sele
         <translation>Sortida MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="347"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="345"/>
         <source>Save channel-settings in file</source>
         <translation>Desa configuració de canal en fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="348"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="346"/>
         <source>Channel-Settings-File (*.cs.xml)</source>
         <translation>Fitxer de Configuració de Canal (*.cs.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1163"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1161"/>
         <source>PLUGIN</source>
         <translation>CONN</translation>
     </message>
@@ -2634,261 +2634,271 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
         <translation>Preparant finestra principal i espai de treball...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="198"/>
+        <location filename="../../src/core/main_window.cpp" line="199"/>
         <source>Creating new song...</source>
         <translation>Creant nova cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="204"/>
+        <location filename="../../src/core/main_window.cpp" line="205"/>
         <source>Creating GUI...</source>
         <translation>Creant interfície...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="359"/>
+        <location filename="../../src/core/main_window.cpp" line="360"/>
         <source>&amp;New</source>
         <translation>&amp;Nou</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="364"/>
+        <location filename="../../src/core/main_window.cpp" line="365"/>
         <source>&amp;Open...</source>
         <translation>&amp;Obre...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="377"/>
+        <location filename="../../src/core/main_window.cpp" line="378"/>
         <source>&amp;Save</source>
         <translation>&amp;Desa</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="382"/>
+        <location filename="../../src/core/main_window.cpp" line="383"/>
         <source>Save &amp;As...</source>
         <translation>&amp;Anomena i desa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="396"/>
+        <location filename="../../src/core/main_window.cpp" line="397"/>
         <source>&amp;Quit</source>
         <translation>&amp;Surt</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="457"/>
+        <location filename="../../src/core/main_window.cpp" line="458"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="465"/>
+        <location filename="../../src/core/main_window.cpp" line="466"/>
         <source>About</source>
         <translation>Quant a</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="446"/>
+        <location filename="../../src/core/main_window.cpp" line="447"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="461"/>
+        <location filename="../../src/core/main_window.cpp" line="462"/>
         <source>What&apos;s this?</source>
         <translation>Què és això?</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="125"/>
+        <location filename="../../src/core/main_window.cpp" line="126"/>
         <source>My samples</source>
         <translation>Les meves mostres</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="131"/>
+        <location filename="../../src/core/main_window.cpp" line="132"/>
         <source>My presets</source>
         <translation>Les meves plantilles</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="119"/>
+        <location filename="../../src/core/main_window.cpp" line="120"/>
         <source>My projects</source>
         <translation>Els meus projectes</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="192"/>
+        <location filename="../../src/core/main_window.cpp" line="193"/>
         <source>Loading song...</source>
         <translation>Carregant cançó...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="414"/>
+        <location filename="../../src/core/main_window.cpp" line="415"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="419"/>
+        <location filename="../../src/core/main_window.cpp" line="420"/>
         <source>Show setup wizard</source>
         <translation>Mostra l&apos;assistent de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="342"/>
+        <location filename="../../src/core/main_window.cpp" line="343"/>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
         <translation>Pitjant aquest botó, pots mostrar o amagar la finestra de notes del projecte. En aquesta finestra pots escriure les teves notes del projecte.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="526"/>
+        <location filename="../../src/core/main_window.cpp" line="531"/>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="214"/>
+        <location filename="../../src/core/main_window.cpp" line="215"/>
         <source>Create new project</source>
         <translation>Crea nou projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="228"/>
+        <location filename="../../src/core/main_window.cpp" line="229"/>
         <source>Open existing project</source>
         <translation>Obre projecte existent</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="235"/>
+        <location filename="../../src/core/main_window.cpp" line="236"/>
         <source>Save current project</source>
         <translation>Desa projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="242"/>
+        <location filename="../../src/core/main_window.cpp" line="243"/>
         <source>Export current project</source>
         <translation>Exporta projecte actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="284"/>
+        <location filename="../../src/core/main_window.cpp" line="285"/>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar el Rotlle de Piano. Amb l&apos;ajuda del Rotlle de Piano pots editar patrons de melodia fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="357"/>
+        <location filename="../../src/core/main_window.cpp" line="358"/>
         <source>&amp;Project</source>
         <translation>&amp;Projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="618"/>
+        <location filename="../../src/core/main_window.cpp" line="655"/>
         <source>Open project</source>
         <translation>Obre projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="675"/>
+        <location filename="../../src/core/main_window.cpp" line="712"/>
         <source>Save project</source>
         <translation>Desa projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="135"/>
+        <location filename="../../src/core/main_window.cpp" line="136"/>
         <source>My home</source>
         <translation>El meu cau</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="139"/>
+        <location filename="../../src/core/main_window.cpp" line="140"/>
         <source>Root directory</source>
         <translation>Directori arrel</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="260"/>
+        <location filename="../../src/core/main_window.cpp" line="261"/>
         <source>Show/hide Beat+Baseline Editor</source>
         <translation>Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="270"/>
+        <location filename="../../src/core/main_window.cpp" line="271"/>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Ritme Base. L&apos;Editor de Ritme Base és necessari per a crear ritmes; obrir, afegir i eliminar canals; tallar, copiar i enganxar patrons de ritme; i altres funcions similars.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="276"/>
+        <location filename="../../src/core/main_window.cpp" line="277"/>
         <source>Show/hide Piano-Roll</source>
         <translation>Mostra/amaga Rotlle de Piano</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="288"/>
+        <location filename="../../src/core/main_window.cpp" line="289"/>
         <source>Show/hide Song-Editor</source>
         <translation>Mostra/amaga Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="298"/>
+        <location filename="../../src/core/main_window.cpp" line="299"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Cançó. Amb l&apos;ajuda de l&apos;Editor de Cançó pots editar la llista de reproducció de la cançó i especificar quan ha de tocar-se cada pista. També pots inserir i moure mostres (p.e. mostres de rap) directament a la llista de reproducció.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="335"/>
+        <location filename="../../src/core/main_window.cpp" line="336"/>
         <source>Show/hide project notes</source>
         <translation>Mostra/amaga les notes del projecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="402"/>
+        <location filename="../../src/core/main_window.cpp" line="403"/>
         <source>&amp;Edit</source>
         <translation>&amp;Edita</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="404"/>
+        <location filename="../../src/core/main_window.cpp" line="405"/>
         <source>Undo</source>
         <translation>Desfés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="408"/>
+        <location filename="../../src/core/main_window.cpp" line="409"/>
         <source>Redo</source>
         <translation>Refés</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="416"/>
+        <location filename="../../src/core/main_window.cpp" line="417"/>
         <source>Show settings dialog</source>
         <translation>Mostra el diàleg de configuració</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="723"/>
+        <location filename="../../src/core/main_window.cpp" line="760"/>
         <source>Help not available</source>
         <translation>Ajuda no disponible</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="304"/>
+        <location filename="../../src/core/main_window.cpp" line="305"/>
         <source>Show/hide Automation Editor</source>
         <translation>Mostra/amaga Editor d&apos;Automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="314"/>
+        <location filename="../../src/core/main_window.cpp" line="315"/>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor d&apos;Automatització. Amb l&apos;ajuda de l&apos;Editor d&apos;Automatització pots editar valors dinàmics fàcilment.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="438"/>
+        <location filename="../../src/core/main_window.cpp" line="439"/>
         <source>&amp;Tools</source>
         <translation>E&amp;ines</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="619"/>
+        <location filename="../../src/core/main_window.cpp" line="656"/>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz *.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="677"/>
+        <location filename="../../src/core/main_window.cpp" line="714"/>
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>Projecte MultiMèdia (*.mmp *.mmpz);;Plantilla de Projecte MultiMèdia (*.mpt)</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="451"/>
+        <location filename="../../src/core/main_window.cpp" line="452"/>
         <source>Online help</source>
         <translation>Ajuda en línia</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="387"/>
+        <location filename="../../src/core/main_window.cpp" line="388"/>
         <source>Import...</source>
         <translation>Importa...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="391"/>
+        <location filename="../../src/core/main_window.cpp" line="392"/>
         <source>E&amp;xport...</source>
         <translation>E&amp;xporta...</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="728"/>
+        <location filename="../../src/core/main_window.cpp" line="765"/>
         <source>Currently there&apos;s no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Actualment no hi ha ajuda disponible a LMMS.
 Per favor, visita http://lmms.sf.net/wiki per a documentació sobre LMMS.</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="370"/>
+        <location filename="../../src/core/main_window.cpp" line="371"/>
         <source>Recently opened projects</source>
         <translation>Projectes oberts recentment</translation>
     </message>
     <message>
-        <location filename="../../src/core/main_window.cpp" line="524"/>
+        <location filename="../../src/core/main_window.cpp" line="525"/>
         <source>Untitled</source>
         <translation>Sense títol</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/main_window.cpp" line="545"/>
+        <source>Project not saved</source>
+        <translation>Projecte no desat</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/main_window.cpp" line="548"/>
+        <source>The current project was modified since last saving. Do you want to save it now?</source>
+        <translation>El projecte actual ha estat modificat des del darrer desament. Vols desar-lo ara?</translation>
     </message>
 </context>
 <context>
@@ -3474,12 +3484,12 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>patternFreezeStatusDialog</name>
     <message>
-        <location filename="../../src/tracks/pattern.cpp" line="1049"/>
+        <location filename="../../src/tracks/pattern.cpp" line="1053"/>
         <source>Freezing pattern...</source>
         <translation>Congelant patró...</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/pattern.cpp" line="1058"/>
+        <location filename="../../src/tracks/pattern.cpp" line="1062"/>
         <source>Cancel</source>
         <translation>Cancel·la</translation>
     </message>
@@ -3937,147 +3947,147 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>projectNotes</name>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="101"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="100"/>
         <source>Put down your project notes here.</source>
         <translation>Escriu aquí les teves notes del projecte.</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="72"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="71"/>
         <source>Project notes</source>
         <translation>Notes del projecte</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="122"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="121"/>
         <source>Edit Actions</source>
         <translation>Accions d&apos;Editar</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="125"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="124"/>
         <source>&amp;Undo</source>
         <translation>&amp;Desfés</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="127"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="126"/>
         <source>Ctrl+Z</source>
         <translation>Ctrl+Z</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="131"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="130"/>
         <source>&amp;Redo</source>
         <translation>&amp;Refés</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="133"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="132"/>
         <source>Ctrl+Y</source>
         <translation>Ctrl+Y</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="137"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="136"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copia</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="139"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="138"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="143"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="142"/>
         <source>Cu&amp;t</source>
         <translation>&amp;Talla</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="145"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="144"/>
         <source>Ctrl+X</source>
         <translation>Ctrl+X</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="149"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="148"/>
         <source>&amp;Paste</source>
         <translation>&amp;Enganxa</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="151"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="150"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="156"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="155"/>
         <source>Format Actions</source>
         <translation>Accions de Format</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="180"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="179"/>
         <source>&amp;Bold</source>
         <translation>&amp;Negreta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="181"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="180"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="187"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="186"/>
         <source>&amp;Italic</source>
         <translation>Curs&amp;iva</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="188"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="187"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="195"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="194"/>
         <source>&amp;Underline</source>
         <translation>&amp;Subratllat</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="196"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="195"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="207"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="206"/>
         <source>&amp;Left</source>
         <translation>&amp;Esquerra</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="208"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="207"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="214"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="213"/>
         <source>C&amp;enter</source>
         <translation>Cen&amp;tre</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="216"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="215"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="221"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="220"/>
         <source>&amp;Right</source>
         <translation>&amp;Dreta</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="223"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="222"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="229"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="228"/>
         <source>&amp;Justify</source>
         <translation>&amp;Justifica</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="230"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="229"/>
         <source>Ctrl+J</source>
         <translation>Ctrl+J</translation>
     </message>
     <message>
-        <location filename="../../src/widgets/project_notes.cpp" line="237"/>
+        <location filename="../../src/widgets/project_notes.cpp" line="236"/>
         <source>&amp;Color...</source>
         <translation>&amp;Color...</translation>
     </message>
@@ -4603,12 +4613,12 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
 <context>
     <name>songEditor</name>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="325"/>
+        <location filename="../../src/core/song_editor.cpp" line="318"/>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Pica aquí si vols aturar la reproducció de la cançó. El marcador de posició de cançó serà col·locat a l&apos;inici de la cançó.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1601"/>
+        <location filename="../../src/core/song_editor.cpp" line="1524"/>
         <source>untitled</source>
         <translation>sense títol</translation>
     </message>
@@ -4638,57 +4648,57 @@ Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòri
         <translation>No es pot escriure el fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="99"/>
+        <location filename="../../src/core/song_editor.cpp" line="97"/>
         <source>Song-Editor</source>
         <translation>Editor de Cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1630"/>
+        <location filename="../../src/core/song_editor.cpp" line="1553"/>
         <source>The file &quot;%1&quot; already exists. Do you want to overwrite it?</source>
         <translation>El fitxer &quot;%1&quot; ja existeix. Vols sobreescriure&apos;l?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="320"/>
+        <location filename="../../src/core/song_editor.cpp" line="313"/>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
         <translation>Pica aquí si vols reproduir la cançó sencera. La reproducció començarà al marcador de posició de cançó (verd). També pots moure&apos;l mentre es reprodueix.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="276"/>
+        <location filename="../../src/core/song_editor.cpp" line="269"/>
         <source>Play song (Space)</source>
         <translation>Reprodueix cançó (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="280"/>
+        <location filename="../../src/core/song_editor.cpp" line="273"/>
         <source>Stop song (Space)</source>
         <translation>Atura cançó (Espai)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="141"/>
+        <location filename="../../src/core/song_editor.cpp" line="136"/>
         <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every tact has four beats, so the tempo in BPM specifies, how many tacts / 4 should be played within a minute (or how many tacts should be played within four minutes).</source>
         <translation>El tempo d&apos;una cançó s&apos;especifica en batecs per minut (BPM). Si vols canviar el tempo de la cançó, canvia aquest valor. Cada compàs té quatre batecs, llavors el tempo en BPM especifica quants compassos / 4 s&apos;han de tocar en un minut (o quants compassos s&apos;han de tocar en quatre minuts).</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="220"/>
+        <location filename="../../src/core/song_editor.cpp" line="215"/>
         <source>master pitch</source>
         <translation>to mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="133"/>
+        <location filename="../../src/core/song_editor.cpp" line="128"/>
         <source>tempo of song</source>
         <translation>tempo de cançó</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="285"/>
+        <location filename="../../src/core/song_editor.cpp" line="278"/>
         <source>Add beat/bassline</source>
         <translation>Afegeix ritme base</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="291"/>
+        <location filename="../../src/core/song_editor.cpp" line="284"/>
         <source>Add sample-track</source>
         <translation>Afegeix pista de mostra</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1539"/>
+        <location filename="../../src/core/song_editor.cpp" line="1462"/>
         <source>Project NOT saved.</source>
         <translation>Projecte NO desat.</translation>
     </message>
@@ -4700,27 +4710,17 @@ Do you want to overwrite it?</source>
 Vols sobreescriure&apos;l?</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1617"/>
+        <location filename="../../src/core/song_editor.cpp" line="1540"/>
         <source>Select file for project-export...</source>
         <translation>Selecciona fitxer per a exportar projecte...</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1304"/>
-        <source>Project not saved</source>
-        <translation>Projecte no desat</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/song_editor.cpp" line="1307"/>
-        <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation>El projecte actual ha estat modificat des del darrer desament. Vols desar-lo ara?</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/song_editor.cpp" line="1572"/>
+        <location filename="../../src/core/song_editor.cpp" line="1495"/>
         <source>Import file</source>
         <translation>Importa fitxer</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="128"/>
+        <location filename="../../src/core/song_editor.cpp" line="123"/>
         <source>TEMPO/BPM</source>
         <translation>TEMPO/BPM</translation>
     </message>
@@ -4732,62 +4732,62 @@ Please make sure you have at least read-access to the file and try again.</sourc
 Per favor, assegura&apos;t que tens permís de lectura per al fitxer i torna-ho a provar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="148"/>
+        <location filename="../../src/core/song_editor.cpp" line="143"/>
         <source>High quality mode</source>
         <translation>Mode alta qualitat</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="158"/>
+        <location filename="../../src/core/song_editor.cpp" line="153"/>
         <source>Auto limiter</source>
         <translation>Autolimitador</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="186"/>
+        <location filename="../../src/core/song_editor.cpp" line="181"/>
         <source>master volume</source>
         <translation>volum mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="198"/>
+        <location filename="../../src/core/song_editor.cpp" line="193"/>
         <source>Master volume</source>
         <translation>Volum mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="231"/>
+        <location filename="../../src/core/song_editor.cpp" line="226"/>
         <source>Master pitch</source>
         <translation>To mestre</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="297"/>
+        <location filename="../../src/core/song_editor.cpp" line="290"/>
         <source>Draw mode</source>
         <translation>Mode dibuixar</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="304"/>
+        <location filename="../../src/core/song_editor.cpp" line="297"/>
         <source>Edit mode (select and move)</source>
         <translation>Mode editar (selecciona i mou)</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="604"/>
+        <location filename="../../src/core/song_editor.cpp" line="560"/>
         <source>Value: %1%</source>
         <translation>Valor: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="652"/>
+        <location filename="../../src/core/song_editor.cpp" line="608"/>
         <source>Value: %1 semitones</source>
         <translation>Valor: %1 semitons</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1529"/>
+        <location filename="../../src/core/song_editor.cpp" line="1452"/>
         <source>Project saved</source>
         <translation>Projecte desat</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1531"/>
+        <location filename="../../src/core/song_editor.cpp" line="1454"/>
         <source>The project %1 is now saved.</source>
         <translation>El projecte %1 està desat.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="1540"/>
+        <location filename="../../src/core/song_editor.cpp" line="1463"/>
         <source>The project %1 was not saved!</source>
         <translation>El projecte %1 no està desat!</translation>
     </message>
@@ -4799,7 +4799,7 @@ Please make sure you have write-access to the file and try again.</source>
 Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxer i torna-ho a provar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/song_editor.cpp" line="126"/>
+        <location filename="../../src/core/song_editor.cpp" line="121"/>
         <source>Tempo</source>
         <translation>Tempo</translation>
     </message>
@@ -5022,7 +5022,7 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>trackContainer</name>
     <message>
-        <location filename="../../src/core/track_container.cpp" line="113"/>
+        <location filename="../../src/core/track_container.cpp" line="122"/>
         <source>Loading project...</source>
         <translation>Carregant projecte...</translation>
     </message>
@@ -5074,57 +5074,57 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
 <context>
     <name>trackContentObject</name>
     <message>
-        <location filename="../../src/core/track.cpp" line="438"/>
+        <location filename="../../src/core/track.cpp" line="448"/>
         <source>Cut</source>
         <translation>Talla</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="441"/>
+        <location filename="../../src/core/track.cpp" line="451"/>
         <source>Copy</source>
         <translation>Copia</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="443"/>
+        <location filename="../../src/core/track.cpp" line="453"/>
         <source>Paste</source>
         <translation>Enganxa</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="261"/>
+        <location filename="../../src/core/track.cpp" line="271"/>
         <source>Current position</source>
         <translation>Posició actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="276"/>
+        <location filename="../../src/core/track.cpp" line="286"/>
         <source>Hint</source>
         <translation>Consell</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="265"/>
+        <location filename="../../src/core/track.cpp" line="275"/>
         <source>Press &lt;Ctrl&gt; for free positioning.</source>
         <translation>Pitja &lt;Ctrl&gt; per a col·locar lliurement.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="274"/>
+        <location filename="../../src/core/track.cpp" line="284"/>
         <source>Current length</source>
         <translation>Longitud actual</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="278"/>
+        <location filename="../../src/core/track.cpp" line="288"/>
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
         <translation>Pitja &lt;Ctrl&gt; per a redimensionar lliurement.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="373"/>
+        <location filename="../../src/core/track.cpp" line="383"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 a %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="434"/>
+        <location filename="../../src/core/track.cpp" line="444"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Esborra (botó del mig del ratolí)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="446"/>
+        <location filename="../../src/core/track.cpp" line="456"/>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
         <translation>Apaga/encén (&lt;Ctrl&gt; + clic del mig)</translation>
     </message>
@@ -5132,27 +5132,27 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <location filename="../../src/core/track.cpp" line="945"/>
+        <location filename="../../src/core/track.cpp" line="952"/>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Pitja &lt;Ctrl&gt; quan piquis el control de moviment per a iniciar una nova acció d&apos;arrossegar i amollar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1155"/>
+        <location filename="../../src/core/track.cpp" line="1162"/>
         <source>Clone this track</source>
         <translation>Clona aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1158"/>
+        <location filename="../../src/core/track.cpp" line="1165"/>
         <source>Remove this track</source>
         <translation>Elimina aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="958"/>
+        <location filename="../../src/core/track.cpp" line="965"/>
         <source>Actions for this track</source>
         <translation>Accions per a aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="980"/>
+        <location filename="../../src/core/track.cpp" line="987"/>
         <source>With this switch you can either mute this track or mute all other tracks.
 By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
 When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
@@ -5161,24 +5161,24 @@ Amb un clic esquerre, aquesta pista s&apos;apaga. Això és útil si només vols
 Amb un clic dret a l&apos;interruptor, totes les altres pistes s&apos;apagaran. Això és útil si només vols escoltar aquesta pista.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="982"/>
+        <location filename="../../src/core/track.cpp" line="989"/>
         <source>left click = mute this track
 right click = mute all other tracks (solo)</source>
         <translation>clic esquerre = apaga aquesta pista
 clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="961"/>
+        <location filename="../../src/core/track.cpp" line="968"/>
         <source>Mute</source>
         <translation>Apaga</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1142"/>
+        <location filename="../../src/core/track.cpp" line="1149"/>
         <source>Enable automation</source>
         <translation>Habilita automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1149"/>
+        <location filename="../../src/core/track.cpp" line="1156"/>
         <source>Disable automation</source>
         <translation>Inhabilita automatització</translation>
     </message>

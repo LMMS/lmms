@@ -307,8 +307,6 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 
 	engine::getBBEditor()->setCurrentBB( bbNum );
 	engine::getBBEditor()->updateComboBox();
-
-	_tc->updateAfterTrackAdd();
 }
 
 
@@ -428,11 +426,10 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	}
 
 	int track_num = 0;
-	trackVector tracks = engine::getBBEditor()->tracks();
-	for( trackVector::iterator it = tracks.begin(); it != tracks.end();
-							++it, ++track_num )
+	QList<track *> tracks = engine::getBBEditor()->tracks();
+	for( int i = 0; i < tracks.size(); ++i, ++track_num )
 	{
-		if( automationDisabled( *it ) )
+		if( automationDisabled( tracks[i] ) )
 		{
 			QDomElement disabled = _doc.createElement(
 							"automation-disabled" );
@@ -468,7 +465,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		engine::getBBEditor()->setCurrentBB( s_infoMap[this] );
 	}*/
 
-	trackVector tracks = engine::getBBEditor()->tracks();
+	QList<track *> tracks = engine::getBBEditor()->tracks();
 	node = _this.firstChild();
 	while( !node.isNull() )
 	{

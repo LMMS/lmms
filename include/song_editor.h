@@ -133,12 +133,6 @@ public:
 	virtual automationPattern * tempoAutomationPattern( void );
 
 
-	// every function that replaces current file (e.g. creates new file,
-	// opens another file...) has to call this before and may only process
-	// if this function returns true
-	bool mayChangeProject( void );
-
-
 	// file management
 	void createNewProject( void );
 	void FASTCALL createNewProjectFromTemplate( const QString & _template );
@@ -189,13 +183,9 @@ public slots:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void wheelEvent( QWheelEvent * _we );
 	virtual void paintEvent( QPaintEvent * _pe );
-
-	virtual QRect scrollAreaRect( void ) const;
 
 	virtual bool allowRubberband( void ) const;
 

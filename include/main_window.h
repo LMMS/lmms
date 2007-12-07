@@ -58,7 +58,14 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void resetWindowTitle( void );
+	void resetWindowTitle( bool _modified = FALSE );
+
+
+	// every function that replaces current file (e.g. creates new file,
+	// opens another file...) has to call this before and may only process
+	// if this function returns true
+	bool mayChangeProject( void );
+
 
 	void clearKeyModifiers( void );
 
@@ -150,6 +157,8 @@ private:
 
 	QMenu * m_tools_menu;
 	QList<tool *> m_tools;
+
+	bool m_modified;
 
 
 	friend class engine;

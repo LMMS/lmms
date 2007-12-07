@@ -29,11 +29,11 @@
 #include "track_container.h"
 
 
-#include <Qt/QtXml>
 #include <QtGui/QApplication>
-#include <QtGui/QProgressDialog>
-#include <QtGui/QWheelEvent>
 #include <QtGui/QMdiArea>
+#include <QtGui/QProgressDialog>
+#include <QtGui/QScrollBar>
+#include <QtGui/QWheelEvent>
 
 
 #include "bb_track.h"
@@ -51,7 +51,6 @@
 #include "rubberband.h"
 #include "song_editor.h"
 #include "string_pair_drag.h"
-#include "templates.h"
 #include "track.h"
 
 
@@ -62,6 +61,19 @@ trackContainer::trackContainer( void ) :
 	m_rubberBand( new rubberBand( m_scrollArea ) ),
 	m_origin()
 {
+	QVBoxLayout * layout = new QVBoxLayout( this );
+	layout->setMargin( 0 );
+	layout->setSpacing( 0 );
+	layout->addWidget( m_scrollArea );
+
+	QWidget * scrollContent = new QWidget;
+	m_scrollLayout = new QVBoxLayout( scrollContent );
+	m_scrollLayout->setMargin( 0 );
+	m_scrollLayout->setSpacing( 0 );
+	m_scrollLayout->setSizeConstraint( QLayout::SetMinimumSize );
+
+	m_scrollArea->setWidget( scrollContent );
+
 	m_scrollArea->show();
 	m_rubberBand->hide();
 
@@ -73,14 +85,10 @@ trackContainer::trackContainer( void ) :
 
 trackContainer::~trackContainer()
 {
-	engine::getProjectJournal()->setJournalling( FALSE );
-
-	while( m_trackWidgets.size() )
+	while( !m_tracks.empty() )
 	{
-		removeTrack( m_trackWidgets.front()->getTrack() );
+		delete m_tracks.takeFirst();
 	}
-
-	engine::getProjectJournal()->setJournalling( TRUE );
 }
 
 
@@ -93,10 +101,9 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	mainWindow::saveWidgetState( this, _this );
 
 	// save settings of each track
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		( *it )->getTrack()->saveState( _doc, _this );
+		m_tracks[i]->saveState( _doc, _this );
 	}
 }
 
@@ -162,7 +169,8 @@ void trackContainer::addTrack( track * _track )
 	map["id"] = _track->id();
 	addJournalEntry( journalEntry( ADD_TRACK, map ) );
 
-	m_trackWidgets.push_back( _track->getTrackWidget() );
+	m_tracks.push_back( _track );
+	m_scrollLayout->addWidget( _track->getTrackWidget() );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				_track->getTrackWidget(),
 				SLOT( changePosition( const midiTime & ) ) );
@@ -174,9 +182,8 @@ void trackContainer::addTrack( track * _track )
 
 void trackContainer::removeTrack( track * _track )
 {
-	trackWidgetVector::iterator it = qFind( m_trackWidgets.begin(),
-			m_trackWidgets.end(), _track->getTrackWidget() );
-	if( it != m_trackWidgets.end() )
+	int index = m_tracks.indexOf( _track );
+	if( index != -1 )
 	{
 		QMap<QString, QVariant> map;
 		multimediaProject mmp( multimediaProject::JOURNAL_DATA );
@@ -185,8 +192,10 @@ void trackContainer::removeTrack( track * _track )
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
 
-		disconnect( *it );
-		m_trackWidgets.erase( it );
+		m_tracks.removeAt( index );
+
+		disconnect( _track->getTrackWidget() );
+		m_scrollLayout->removeWidget( _track->getTrackWidget() );
 
 		delete _track;
 
@@ -203,15 +212,15 @@ void trackContainer::removeTrack( track * _track )
 
 void trackContainer::moveTrackUp( track * _track )
 {
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 1; i < m_tracks.size(); ++i )
 	{
-		if( *it == _track->getTrackWidget() &&
-						it > m_trackWidgets.begin() )
+		if( m_tracks[i] == _track )
 		{
-			bbTrack::swapBBTracks( ( *it )->getTrack(),
-						( *( it - 1 ) )->getTrack() );
-			qSwap( *it, *( it - 1 ) );
+			bbTrack::swapBBTracks( m_tracks[i], m_tracks[i - 1] );
+			QWidget * tw = m_tracks[i]->getTrackWidget();
+			m_scrollLayout->removeWidget( tw );
+			m_scrollLayout->insertWidget( i - 1, tw );
+			m_tracks.swap( i - 1, i );
 			realignTracks();
 			break;
 		}
@@ -223,15 +232,15 @@ void trackContainer::moveTrackUp( track * _track )
 
 void trackContainer::moveTrackDown( track * _track )
 {
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 0; i < m_tracks.size() - 1; ++i )
 	{
-		if( *it == _track->getTrackWidget() &&
-						it + 1 < m_trackWidgets.end() )
+		if( m_tracks[i] == _track )
 		{
-			bbTrack::swapBBTracks( ( *it )->getTrack(),
-						( *( it + 1 ) )->getTrack() );
-			qSwap( *it, *( it + 1 ) );
+			bbTrack::swapBBTracks( m_tracks[i], m_tracks[i + 1] );
+			QWidget * tw = m_tracks[i]->getTrackWidget();
+			m_scrollLayout->removeWidget( tw );
+			m_scrollLayout->insertWidget( i + 1, tw );
+			m_tracks.swap( i, i + 1 );
 			realignTracks();
 			break;
 		}
@@ -248,21 +257,19 @@ void trackContainer::updateAfterTrackAdd( void )
 
 
 
-void trackContainer::realignTracks( bool _complete_update )
+void trackContainer::realignTracks( void )
 {
-	int y = 0;
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	QWidget * content = m_scrollArea->widget();
+	content->setFixedWidth( width()
+				- m_scrollArea->verticalScrollBar()->width() );
+	content->setFixedHeight( content->minimumSizeHint().height() );
+
+	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		( *it )->show();
-		( *it )->update();
-		( *it )->move( 0, y );
-		( *it )->resize( width() - DEFAULT_SCROLLBAR_SIZE,
-				 			( *it )->height() );
-		( *it )->changePosition( m_currentPosition );
-		y += ( *it )->height();
+		trackWidget * tw = m_tracks[i]->getTrackWidget();
+		tw->show();
+		tw->update();
 	}
-	updateScrollArea();
 }
 
 
@@ -270,9 +277,9 @@ void trackContainer::realignTracks( bool _complete_update )
 
 void trackContainer::clearAllTracks( void )
 {
-	while( !m_trackWidgets.empty() )
+	while( !m_tracks.empty() )
 	{
-		removeTrack( m_trackWidgets.front()->getTrack() );
+		removeTrack( m_tracks.front() );
 	}
 }
 
@@ -283,14 +290,13 @@ const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->viewport()->y();
 	int y_cnt = 0;
-	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 0; i < m_tracks.size(); ++i )
 	{
 		const int y_cnt1 = y_cnt;
-		y_cnt += ( *it )->height();
+		y_cnt += m_tracks[i]->getTrackWidget()->height();
 		if( abs_y >= y_cnt1 && abs_y < y_cnt )
 		{
-			return( *it );
+			return( m_tracks[i]->getTrackWidget() );
 		}
 	}
 	return( NULL );
@@ -310,10 +316,9 @@ bool trackContainer::allowRubberband( void ) const
 Uint16 trackContainer::countTracks( track::trackTypes _tt ) const
 {
 	Uint16 cnt = 0;
-	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		if( ( *it )->getTrack()->type() == _tt ||
+		if( m_tracks[i]->type() == _tt ||
 					_tt == track::TOTAL_TRACK_TYPES )
 		{
 			++cnt;
@@ -327,39 +332,26 @@ Uint16 trackContainer::countTracks( track::trackTypes _tt ) const
 
 void trackContainer::setMutedOfAllTracks( bool _muted )
 {
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
+	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		( *it )->getTrack()->setMuted( _muted );
+		m_tracks[i]->setMuted( _muted );
 	}
 }
 
 
 
 
-constTrackVector trackContainer::tracks( void ) const
+const QList<track *> trackContainer::tracks( void ) const
 {
-	constTrackVector tracks;
-	for( trackWidgetVector::const_iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
-	{
-		tracks.push_back( ( *it )->getTrack() );
-	}
-	return( tracks );
+	return( m_tracks );
 }
 
 
 
 
-trackVector trackContainer::tracks( void )
+QList<track *> trackContainer::tracks( void )
 {
-	trackVector tracks;
-	for( trackWidgetVector::iterator it = m_trackWidgets.begin();
-					it != m_trackWidgets.end(); ++it )
-	{
-		tracks.push_back( ( *it )->getTrack() );
-	}
-	return( tracks );
+	return( m_tracks );
 }
 
 
@@ -487,9 +479,6 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	{
 		multimediaProject mmp( value, FALSE );
 		track::create( mmp.content().firstChild().toElement(), this );
-		// after adding a track, we have to make sure, actual editor
-		// can setup new track (e.g. adding TCO's (bbEditor does so))
-		updateAfterTrackAdd();
 		_de->accept();
 	}
 	engine::getMixer()->unlock();
@@ -536,18 +525,6 @@ void trackContainer::mouseReleaseEvent( QMouseEvent * _me )
 void trackContainer::resizeEvent( QResizeEvent * )
 {
 	realignTracks();
-}
-
-
-
-
-void trackContainer::updateScrollArea( void )
-{
-	m_scrollArea->resize( width(), scrollAreaRect().height() );
-/*	m_scrollArea->resize( tMax( m_scrollArea->parentWidget()->width() - 
-					m_scrollArea->x() - 2, 0 ),
-				tMax( m_scrollArea->parentWidget()->height() -
-					m_scrollArea->y() - 2, 0 ) );*/
 }
 
 

@@ -306,8 +306,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
 
 
-	_tc->updateAfterTrackAdd();
-
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 

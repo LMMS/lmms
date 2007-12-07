@@ -78,8 +78,6 @@
 #include "tooltip.h"
 #include "visualization_widget.h"
 
-#include "debug.h"
-
 
 
 
@@ -102,14 +100,11 @@ songEditor::songEditor( void ) :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 
-	QWidget * cw = this;
-
-
 	// create time-line
 	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
 					pixelsPerTact(), m_playPos[PLAY_SONG],
-					m_currentPosition, cw );
+					m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				m_playPos[PLAY_SONG].m_timeLine,
 			SLOT( updatePosition( const midiTime & ) ) );
@@ -253,22 +248,20 @@ songEditor::songEditor( void ) :
 
 
 	// create own toolbar
-	m_toolBar = new QWidget( cw );
+	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(), 
 				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, tl );
+
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
 	tb_layout->setSpacing( 0 );
-
-	containerWidget()->setParent( cw );
-	containerWidget()->move( 0, m_toolBar->height() + tl->height() );
-
 
 
 	// fill own tool-bar
@@ -368,11 +361,12 @@ songEditor::songEditor( void ) :
 	tb_layout->addStretch();
 
 
-	m_leftRightScroll = new QScrollBar( Qt::Horizontal, cw );
+	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( 20 );
+	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
 					this, SLOT( scrolled( int ) ) );
 
@@ -380,6 +374,7 @@ songEditor::songEditor( void ) :
 	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	}
 
 	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
@@ -410,49 +405,10 @@ songEditor::~songEditor()
 
 
 
-void songEditor::closeEvent( QCloseEvent * _ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
-}
-
-
-
-
 void songEditor::paintEvent( QPaintEvent * _pe )
 {
 	m_leftRightScroll->setMaximum( lengthInTacts() );
 	trackContainer::paintEvent( _pe );
-}
-
-
-
-
-QRect songEditor::scrollAreaRect( void ) const
-{
-	return( QRect( 0, 0, width(), height() - m_toolBar->height() -
-				m_playPos[PLAY_SONG].m_timeLine->height() -
-				DEFAULT_SCROLLBAR_SIZE ) );
-}
-
-
-
-
-// responsible for moving scrollbars after resizing
-void songEditor::resizeEvent( QResizeEvent * _re )
-{
-	m_leftRightScroll->setGeometry( 0, height() - DEFAULT_SCROLLBAR_SIZE,
-					width(), DEFAULT_SCROLLBAR_SIZE );
-	m_playPos[PLAY_SONG].m_timeLine->setFixedWidth( width() );
-	m_toolBar->setFixedWidth( width() );
-	trackContainer::resizeEvent( _re );
 }
 
 
@@ -548,7 +504,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
 							pixelsPerTact() );
 		// and make sure, all TCO's are resized and relocated
-		realignTracks( TRUE );
+		realignTracks();
 	} 
 	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
@@ -693,7 +649,7 @@ void songEditor::zoomingChanged( const QString & _zfac )
 	setPixelsPerTact( _zfac.left( _zfac.length() - 1 ).toInt() *
 					DEFAULT_PIXELS_PER_TACT / 100 );
 	m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact( pixelsPerTact() );
-	realignTracks( TRUE );
+	realignTracks();
 }
 
 
@@ -870,13 +826,13 @@ void songEditor::processNextBuffer( void )
 		return;
 	}
 
-	trackVector tv;
+	QList<track *> trackList;
 	Sint16 tco_num = -1;
 
 	switch( m_playMode )
 	{
 		case PLAY_SONG:
-			tv = tracks();
+			trackList = tracks();
 			// at song-start we have to reset the LFOs
 			if( m_playPos[PLAY_SONG] == 0 )
 			{
@@ -885,14 +841,15 @@ void songEditor::processNextBuffer( void )
 			break;
 
 		case PLAY_TRACK:
-			tv.push_back( m_trackToPlay );
+			trackList.push_back( m_trackToPlay );
 			break;
 
 		case PLAY_BB:
 			if( engine::getBBEditor()->numOfBBs() > 0 )
 			{
 				tco_num = engine::getBBEditor()->currentBB();
-				tv.push_back( bbTrack::findBBTrack( tco_num ) );
+				trackList.push_back( bbTrack::findBBTrack(
+								tco_num ) );
 			}
 			break;
 
@@ -901,7 +858,8 @@ void songEditor::processNextBuffer( void )
 			{
 				tco_num = m_patternToPlay->getTrack()->getTCONum(
 							m_patternToPlay );
-				tv.push_back( m_patternToPlay->getTrack() );
+				trackList.push_back(
+						m_patternToPlay->getTrack() );
 			}
 			break;
 
@@ -910,7 +868,7 @@ void songEditor::processNextBuffer( void )
 
 	}
 
-	if( tv.empty() == TRUE )
+	if( trackList.empty() == TRUE )
 	{
 		return;
 	}
@@ -1033,10 +991,9 @@ void songEditor::processNextBuffer( void )
 			}
 
 			// loop through all tracks and play them
-			for( trackVector::iterator it = tv.begin();
-							it != tv.end(); ++it )
+			for( int i = 0; i < trackList.size(); ++i )
 			{
-				( *it )->play( m_playPos[m_playMode],
+				trackList[i]->play( m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}
@@ -1136,11 +1093,10 @@ void songEditor::playPattern( pattern * _patternToPlay, bool _loop )
 tact songEditor::lengthInTacts( void ) const
 {
 	tact len = 0;
-	constTrackVector ctv = tracks();
-	for( constTrackVector::const_iterator it = ctv.begin(); it != ctv.end();
-									++it )
+	const QList<track *> ctl = tracks();
+	for( int i = 0; i < ctl.size(); ++i )
 	{
-		len = tMax( ( *it )->length(), len );
+		len = tMax( ctl[i]->length(), len );
 	}
 	return( len );
 }
@@ -1234,10 +1190,10 @@ void songEditor::stopExport( void )
 
 void songEditor::insertBar( void )
 {
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		( *it )->getTrackContentWidget()->insertTact(
+		tl[i]->getTrackContentWidget()->insertTact(
 							m_playPos[PLAY_SONG] );
 	}
 }
@@ -1247,10 +1203,10 @@ void songEditor::insertBar( void )
 
 void songEditor::removeBar( void )
 {
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		( *it )->getTrackContentWidget()->removeTact(
+		tl[i]->getTrackContentWidget()->removeTact(
 							m_playPos[PLAY_SONG] );
 	}
 }
@@ -1289,39 +1245,6 @@ bpm_t songEditor::getTempo( void )
 automationPattern * songEditor::tempoAutomationPattern( void )
 {
 	return( m_bpmSpinBox->getAutomationPattern() );
-}
-
-
-
-
-bool songEditor::mayChangeProject( void )
-{
-	if( engine::getMainWindow()->isWindowModified() == FALSE )
-	{
-		return( TRUE );
-	}
-
-	QMessageBox mb ( tr( "Project not saved" ),
-				tr( "The current project was modified since "
-					"last saving. Do you want to save it "
-								"now?" ),
-				QMessageBox::Question,
-				QMessageBox::Yes,
-				QMessageBox::No,
-				QMessageBox::Cancel,
-				engine::getMainWindow() );
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Yes )
-	{
-		return( engine::getMainWindow()->saveProject() );
-	}
-	else if( answer == QMessageBox::No )
-	{
-		return( TRUE );
-	}
-
-	return( FALSE );
 }
 
 
@@ -1658,7 +1581,7 @@ void songEditor::setModified( void )
 {
 	if( !m_loadingProject )
 	{
-		engine::getMainWindow()->setWindowModified( TRUE );
+		engine::getMainWindow()->resetWindowTitle( TRUE );
 	}
 }
 

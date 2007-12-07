@@ -33,12 +33,12 @@
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QMenuBar>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QSplitter>
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
 
 
 #ifdef HAVE_CONFIG_H
@@ -76,7 +76,8 @@ mainWindow::mainWindow( void ) :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_tools_menu( NULL )
+	m_tools_menu( NULL ),
+	m_modified( FALSE )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -511,7 +512,7 @@ void mainWindow::addSpacingToToolBar( int _size )
 
 
 
-void mainWindow::resetWindowTitle( void )
+void mainWindow::resetWindowTitle( bool _modified )
 {
 	QString title = "";
 	if( engine::getSongEditor()->projectFileName() != "" )
@@ -523,8 +524,45 @@ void mainWindow::resetWindowTitle( void )
 	{
 		title = tr( "Untitled" );
 	}
-	setWindowTitle( title + "[*] - " + tr( "LMMS %1" ).arg( VERSION ) );
-	setWindowModified( FALSE );
+	if( _modified )
+	{
+		title += '*';
+	}
+	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( VERSION ) );
+	m_modified = _modified;
+}
+
+
+
+
+bool mainWindow::mayChangeProject( void )
+{
+	if( !m_modified )
+	{
+		return( TRUE );
+	}
+
+	QMessageBox mb ( tr( "Project not saved" ),
+				tr( "The current project was modified since "
+					"last saving. Do you want to save it "
+								"now?" ),
+				QMessageBox::Question,
+				QMessageBox::Yes,
+				QMessageBox::No,
+				QMessageBox::Cancel,
+				this );
+	int answer = mb.exec();
+
+	if( answer == QMessageBox::Yes )
+	{
+		return( saveProject() );
+	}
+	else if( answer == QMessageBox::No )
+	{
+		return( TRUE );
+	}
+
+	return( FALSE );
 }
 
 
@@ -584,7 +622,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 void mainWindow::createNewProject( void )
 {
-	if( engine::getSongEditor()->mayChangeProject() == TRUE )
+	if( mayChangeProject() )
 	{
 		engine::getSongEditor()->createNewProject();
 	}
@@ -595,8 +633,7 @@ void mainWindow::createNewProject( void )
 
 void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
-	if( m_templatesMenu != NULL &&
-			engine::getSongEditor()->mayChangeProject() == TRUE )
+	if( m_templatesMenu != NULL && mayChangeProject() )
 	{
 		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
 						>= m_custom_templates_count ?
@@ -613,7 +650,7 @@ void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 void mainWindow::openProject( void )
 {
-	if( engine::getSongEditor()->mayChangeProject() == TRUE )
+	if( mayChangeProject() )
 	{
 		QFileDialog ofd( this, tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
@@ -823,7 +860,7 @@ void mainWindow::redo( void )
 
 void mainWindow::closeEvent( QCloseEvent * _ce )
 {
-	if( engine::getSongEditor()->mayChangeProject() == TRUE )
+	if( mayChangeProject() )
 	{
 		_ce->accept();
 	}

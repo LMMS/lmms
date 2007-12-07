@@ -25,37 +25,35 @@
  */
 
 
-#include <QtGui/QPainter>
+#include "bb_editor.h"
+
+
 #include <QtGui/QKeyEvent>
-#include <QtGui/QCloseEvent>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QPainter>
 
 
-#include "bb_editor.h"
-#include "song_editor.h"
+#include "bb_track.h"
+#include "combobox.h"
 #include "embed.h"
 #include "engine.h"
-#include "tool_button.h"
-#include "track_container.h"
-#include "bb_track.h"
-#include "name_label.h"
-#include "templates.h"
-#include "debug.h"
-#include "tooltip.h"
-#include "combobox.h"
 #include "main_window.h"
+#include "name_label.h"
+#include "song_editor.h"
+#include "templates.h"
+#include "tool_button.h"
+#include "tooltip.h"
+#include "track_container.h"
 
 
-const int BBE_PPT = 192;
 
 
-
-
-bbEditor::bbEditor( void )
+bbEditor::bbEditor( void ) :
+	m_currentBB( -1 )
 {
 	// create toolbar
-	m_toolBar = new QWidget( this );
+	m_toolBar = new QWidget;
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( TRUE );
@@ -63,6 +61,7 @@ bbEditor::bbEditor( void )
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -70,12 +69,9 @@ bbEditor::bbEditor( void )
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
 	setWindowTitle( tr( "Beat+Baseline Editor" ) );
-	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH +
-				BBE_PPT + 2 * TCO_BORDER_WIDTH +
-				DEFAULT_SCROLLBAR_SIZE );
-
-	containerWidget()->move( 0, 32 );
-	setPixelsPerTact( BBE_PPT );
+	// TODO: Use style sheet
+	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
+						+ 2 * TCO_BORDER_WIDTH + 192 );
 
 
 	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
@@ -123,6 +119,9 @@ bbEditor::bbEditor( void )
 	if( engine::getMainWindow()->workspace() != NULL )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		parentWidget()->layout()->setSizeConstraint(
+						QLayout::SetMinimumSize );
 	}
 
 	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
@@ -150,23 +149,17 @@ bbEditor::~bbEditor()
 
 
 
-int bbEditor::currentBB( void ) const
-{
-	return( static_cast<int>( currentPosition().getTact() ) );
-}
-
-
-
-
 void bbEditor::setCurrentBB( int _bb )
 {
+	m_currentBB = _bb;
+
 	if( m_bbComboBox->value() != _bb )
 	{
 		m_bbComboBox->setValue( _bb );
 	}
 
 	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( static_cast<int>( _bb ) );
+	createTCOsForBB( _bb );
 
 	realignTracks();
 
@@ -177,8 +170,7 @@ void bbEditor::setCurrentBB( int _bb )
 		bbTrack::findBBTrack( i )->trackLabel()->update();
 	}
 
-	emit positionChanged( m_currentPosition = midiTime(
-					static_cast<int>( _bb ), 0 ) );
+	emit positionChanged( NULL );
 }
 
 
@@ -188,13 +180,10 @@ tact bbEditor::lengthOfBB( int _bb )
 {
 	midiTime max_length;
 
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		trackContentObject * tco = ( *it )->getTCO( _bb );
-#ifdef LMMS_DEBUG
-		assert( tco != NULL );
-#endif
+		trackContentObject * tco = tl[i]->getTCO( _bb );
 		max_length = tMax( max_length, tco->length() );
 	}
 	if( max_length.getTact64th() == 0 )
@@ -220,11 +209,10 @@ bool FASTCALL bbEditor::play( midiTime _start, fpp_t _frames,
 
 	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) * 64 +
 							_start.getTact64th();
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		if( ( *it )->play( _start, _frames, _offset,
-							_tco_num ) == TRUE )
+		if( tl[i]->play( _start, _frames, _offset, _tco_num ) == TRUE )
 		{
 			played_a_note = TRUE;
 		}
@@ -246,15 +234,15 @@ int bbEditor::numOfBBs( void ) const
 
 void bbEditor::removeBB( int _bb )
 {
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		( *it )->removeTCO( _bb );
-		( *it )->getTrackContentWidget()->removeTact( _bb * 64 );
+		tl[i]->removeTCO( _bb );
+		tl[i]->getTrackContentWidget()->removeTact( _bb * 64 );
 	}
-	if( _bb <= currentBB() )
+	if( _bb <= m_currentBB )
 	{
-		setCurrentBB( tMax( (int)currentBB() - 1, 0 ) );
+		setCurrentBB( tMax( m_currentBB - 1, 0 ) );
 	}
 }
 
@@ -265,7 +253,7 @@ void bbEditor::updateBBTrack( trackContentObject * _tco )
 	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
 	if( t != NULL )
 	{
-		t->getTrackContentWidget()->updateTCOs();
+		t->getTrackContentWidget()->update();
 	}
 }
 
@@ -277,8 +265,6 @@ void bbEditor::updateComboBox( void )
 	disconnect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 					this, SLOT( setCurrentBB( int ) ) );
 
-	int current_bb = currentBB();
-
 	m_bbComboBox->clear();
 
 	for( int i = 0; i < numOfBBs(); ++i )
@@ -287,28 +273,10 @@ void bbEditor::updateComboBox( void )
 		m_bbComboBox->addItem( bbt->trackLabel()->text(),
 					bbt->trackLabel()->pixmap() );
 	}
-	m_bbComboBox->setValue( current_bb );
+	m_bbComboBox->setValue( m_currentBB );
 
 	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
 					this, SLOT( setCurrentBB( int ) ) );
-}
-
-
-
-
-// close-handler for bb-editor-window because closing of bb-editor isn't allowed
-// instead of closing it's being hidden
-void bbEditor::closeEvent( QCloseEvent * _ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
 }
 
 
@@ -329,16 +297,16 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if ( _ke->key() == Qt::Key_Plus )
 	{
-		if( currentBB() + 1 < numOfBBs() )
+		if( m_currentBB + 1 < numOfBBs() )
 		{
-			setCurrentBB( currentBB() + 1 );
+			setCurrentBB( m_currentBB + 1 );
 		}
 	}
 	else if ( _ke->key() == Qt::Key_Minus )
 	{
-		if( currentBB() > 0 )
+		if( m_currentBB > 0 )
 		{
-			setCurrentBB( currentBB() - 1 );
+			setCurrentBB( m_currentBB - 1 );
 		}
 	}
 	else
@@ -347,28 +315,6 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 		_ke->ignore();
 	}
 
-}
-
-
-
-
-void bbEditor::resizeEvent( QResizeEvent * _re )
-{
-	setPixelsPerTact( width() - ( TRACK_OP_WIDTH +
-					DEFAULT_SETTINGS_WIDGET_WIDTH + 2 *
-					TCO_BORDER_WIDTH +
-					DEFAULT_SCROLLBAR_SIZE ) );
-	trackContainer::resizeEvent( _re );
-	m_toolBar->setFixedWidth( width() );
-}
-
-
-
-
-QRect bbEditor::scrollAreaRect( void ) const
-{
-	return( QRect( 0, 0, (int) pixelsPerTact(),
-					height() - m_toolBar->height() ) );
 }
 
 
@@ -455,14 +401,14 @@ void bbEditor::createTCOsForBB( int _bb )
 		return;
 	}
 
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		while( ( *it )->numOfTCOs() < _bb + 1 )
+		while( tl[i]->numOfTCOs() < _bb + 1 )
 		{
-			midiTime position = midiTime( ( *it )->numOfTCOs(), 0 );
-			trackContentObject * tco = ( *it )->addTCO(
-					( *it )->createTCO( position ) );
+			midiTime position = midiTime( tl[i]->numOfTCOs(), 0 );
+			trackContentObject * tco = tl[i]->addTCO(
+						tl[i]->createTCO( position ) );
 			tco->movePosition( position );
 			tco->changeLength( midiTime( 1, 0 ) );
 		}
@@ -474,10 +420,10 @@ void bbEditor::createTCOsForBB( int _bb )
 
 void bbEditor::swapBB( int _bb1, int _bb2 )
 {
-	trackVector tv = tracks();
-	for( trackVector::iterator it = tv.begin(); it != tv.end(); ++it )
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
+		tl[i]->swapPositionOfTCOs( _bb1, _bb2 );
 	}
 	updateComboBox();
 }

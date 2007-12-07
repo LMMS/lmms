@@ -356,8 +356,6 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 		tr( "With this knob you can set "
 			"the volume of the opened "
 			"channel." ) ); 
-	
-	_tc->updateAfterTrackAdd();
 }
 
 
@@ -365,6 +363,12 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 
 sampleTrack::~sampleTrack()
 {
+	// disconnect sampleTCOs
+	for( int i = 0; i < numOfTCOs(); ++i )
+	{
+		disconnect( engine::getSongEditor(), 0, getTCO( i ), 0 );
+	}
+
 	engine::getMixer()->removePlayHandles( this );
 	delete m_audioPort;
 }

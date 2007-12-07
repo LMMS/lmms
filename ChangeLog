@@ -1,3 +1,62 @@
+2007-12-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/main_window.h:
+	* include/song_editor.h:
+	* src/core/file_browser.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	use custom modified project indicator, fixed
+
+	* include/bb_editor.h:
+	* include/song_editor.h:
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/pattern.cpp:
+	* src/tracks/sample_track.cpp:
+	added layouts, fixes scrolling
+
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/bb_track.cpp:
+	associate track containers with tracks directly
+
+	* src/core/track.cpp:
+	* src/core/track_container.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	simplified updateAfterTrackAdd() calls
+
+	* data/themes/default/style.css:
+	* src/core/track.cpp:
+	use style sheet painting
+
+	* include/track.h:
+	* src/core/track.cpp:
+	removed discouraged repaint()
+
+	* include/bb_editor.h:
+	* include/song_editor.h:
+	* src/core/bb_editor.cpp:
+	* src/core/song_editor.cpp:
+	* src/widgets/project_notes.cpp:
+	use default close event handler
+
+	* src/core/bb_editor.cpp:
+	* src/core/track.cpp:
+	removed trivial asserts
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-11-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/plugin.h:

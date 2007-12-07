@@ -26,35 +26,36 @@
  */
 
 
-#include <Qt/QtXml>
+#include "track.h"
+
+
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QStyleOption>
 
 
-#include "track.h"
 #include "automation_pattern.h"
-#include "track_container.h"
 #include "automation_track.h"
-#include "instrument_track.h"
 #include "bb_editor.h"
 #include "bb_track.h"
-#include "sample_track.h"
-#include "song_editor.h"
-#include "templates.h"
 #include "clipboard.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "pixmap_button.h"
-#include "debug.h"
-#include "tooltip.h"
-#include "string_pair_drag.h"
-#include "mmp.h"
+#include "instrument_track.h"
 #include "main_window.h"
-#include "text_float.h"
+#include "mmp.h"
+#include "pixmap_button.h"
 #include "project_journal.h"
+#include "sample_track.h"
+#include "song_editor.h"
+#include "string_pair_drag.h"
+#include "templates.h"
+#include "text_float.h"
+#include "tooltip.h"
+#include "track_container.h"
 
 
 const Sint16 RESIZE_GRIP_WIDTH = 4;
@@ -140,17 +141,26 @@ void trackContentObject::movePosition( const midiTime & _pos )
 
 void trackContentObject::changeLength( const midiTime & _length )
 {
+	if( fixedTCOs() )
+	{
+		setFixedWidth( parentWidget()->width() );
+	}
+	else
+	{
+		setFixedWidth( static_cast<int>( m_length * pixelsPerTact() /
+						64 ) + TCO_BORDER_WIDTH * 2 );
+	}
+
 	if( m_length != _length )
 	{
 		//engine::getSongEditor()->setModified();
 		addJournalEntry( journalEntry( RESIZE, m_length - _length ) );
 		m_length = _length;
+
+		// changing length of TCO can result in change of song-length
+		// etc., therefore we update the track-container
+		m_track->getTrackContainer()->update();
 	}
-	setFixedWidth( static_cast<int>( m_length * pixelsPerTact() /
-					64 ) + TCO_BORDER_WIDTH * 2 );
-	// changing length of TCO can result in change of song-length etc.,
-	// therefore we update the track-container
-	m_track->getTrackContainer()->update();
 }
 
 
@@ -455,13 +465,6 @@ void trackContentObject::contextMenuEvent( QContextMenuEvent * _cme )
 
 float trackContentObject::pixelsPerTact( void )
 {
-	if( fixedTCOs() )
-	{
-		return( ( getTrack()->getTrackContentWidget()->width() -
-				2 * TCO_BORDER_WIDTH -
-						DEFAULT_SCROLLBAR_SIZE ) /
-				tMax<float>( length().getTact(), 1.0f ) );
-	}
 	return( getTrack()->getTrackContainer()->pixelsPerTact() );
 }
 
@@ -734,7 +737,7 @@ void trackContentWidget::removeTact( const midiTime & _pos )
 
 
 
-void trackContentWidget::updateTCOs( void )
+void trackContentWidget::update( void )
 {
 	for( tcoVector::iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
@@ -742,6 +745,7 @@ void trackContentWidget::updateTCOs( void )
 		( *it )->setFixedHeight( height() - 2 );
 		( *it )->update();
 	}
+	QWidget::update();
 }
 
 
@@ -812,14 +816,19 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 96, 96, 96 ) );
+
 	const trackContainer * tc = getTrack()->getTrackContainer();
-	const int offset = (int)( ( tc->currentPosition() % 4 ) *
-							tc->pixelsPerTact() );
-	// draw vertical lines
-	p.setPen( QColor( 128, 128, 128 ) );
-	for( int x = -offset; x < width(); x += (int) tc->pixelsPerTact() )
+	if( !tc->fixedTCOs() )
 	{
-		p.drawLine( x, 0, x, height() );
+		const int offset = (int)( ( tc->currentPosition() % 4 ) *
+							tc->pixelsPerTact() );
+		// draw vertical lines
+		p.setPen( QColor( 128, 128, 128 ) );
+		for( int x = -offset; x < width();
+						x += (int) tc->pixelsPerTact() )
+		{
+			p.drawLine( x, 0, x, height() );
+		}
 	}
 }
 
@@ -828,7 +837,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 
 void trackContentWidget::resizeEvent( QResizeEvent * _re )
 {
-	updateTCOs();
+	update();
 }
 
 
@@ -846,7 +855,6 @@ void trackContentWidget::undoStep( journalEntry & _je )
 				dynamic_cast<trackContentObject *>(
 			engine::getProjectJournal()->getJournallingObject(
 							map["id"].toInt() ) );
-			assert( tco != NULL );
 			multimediaProject mmp(
 					multimediaProject::JOURNAL_DATA );
 			tco->saveState( mmp, mmp.content() );
@@ -1107,7 +1115,7 @@ void trackOperationsWidget::removeTrack( void )
 void trackOperationsWidget::setMuted( bool _muted )
 {
 	m_muteBtn->setChecked( _muted );
-	m_trackWidget->getTrackContentWidget().updateTCOs();
+	m_trackWidget->getTrackContentWidget().update();
 }
 
 
@@ -1221,6 +1229,15 @@ trackWidget::trackWidget( track * _track, QWidget * _parent ) :
 							QColor( 64, 64, 64 ) );
 	m_trackSettingsWidget.setPalette( pal );
 
+	QHBoxLayout * layout = new QHBoxLayout( this );
+	layout->setMargin( 0 );
+	layout->setSpacing( 0 );
+	layout->addWidget( &m_trackOperationsWidget );
+	layout->addWidget( &m_trackSettingsWidget );
+	layout->addWidget( &m_trackContentWidget, 1 );
+
+	resizeEvent( NULL );
+
 	setAcceptDrops( TRUE );
 }
 
@@ -1234,10 +1251,12 @@ trackWidget::~trackWidget()
 
 
 
-void trackWidget::repaint( void )
+void trackWidget::resizeEvent( QResizeEvent * _re )
 {
-	m_trackContentWidget.repaint();
-	QWidget::repaint();
+	m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
+	m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH,
+								height() - 1 );
+	m_trackContentWidget.setFixedHeight( height() - 1 );
 }
 
 
@@ -1246,6 +1265,10 @@ void trackWidget::repaint( void )
 void trackWidget::update( void )
 {
 	m_trackContentWidget.update();
+	if( !m_track->getTrackContainer()->fixedTCOs() )
+	{
+		changePosition();
+	}
 	QWidget::update();
 }
 
@@ -1256,6 +1279,28 @@ void trackWidget::update( void )
 // change of visible viewport
 void trackWidget::changePosition( const midiTime & _new_pos )
 {
+	const int tcos = m_trackContentWidget.numOfTCOs();
+
+	if( m_track->getTrackContainer() == engine::getBBEditor() )
+	{
+		const int showTco = engine::getBBEditor()->currentBB();
+		for( int i = 0; i < tcos; ++i )
+		{
+			trackContentObject * tco = m_trackContentWidget.getTCO(
+									i );
+			if( i == showTco )
+			{
+				tco->move( 0, tco->y() );
+				tco->show();
+			}
+			else
+			{
+				tco->hide();
+			}
+		}
+		return;
+	}
+
 	midiTime pos = _new_pos;
 	if( pos < 0 )
 	{
@@ -1265,7 +1310,6 @@ void trackWidget::changePosition( const midiTime & _new_pos )
 	const Sint32 begin = pos;
 	const Sint32 end = endPosition( pos );
 	const float ppt = m_track->getTrackContainer()->pixelsPerTact();
-	const int tcos = m_trackContentWidget.numOfTCOs();
 
 	for( int i = 0; i < tcos; ++i )
 	{
@@ -1408,7 +1452,7 @@ void trackWidget::mouseMoveEvent( QMouseEvent * _me )
 		trackContainer * tc = m_track->getTrackContainer();
 		// look which track-widget the mouse-cursor is over
 		const trackWidget * track_at_y = tc->trackWidgetAt(
-			mapTo( tc->containerWidget(), _me->pos() ).y() );
+			mapTo( tc->contentWidget(), _me->pos() ).y() );
 		// a track-widget not equal to ourself?
 		if( track_at_y != NULL && track_at_y != this )
 		{
@@ -1451,27 +1495,10 @@ void trackWidget::mouseReleaseEvent( QMouseEvent * _me )
 
 void trackWidget::paintEvent( QPaintEvent * _pe )
 {
+	QStyleOption opt;
+	opt.initFrom( this );
 	QPainter p( this );
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
-}
-
-
-
-
-void trackWidget::resizeEvent( QResizeEvent * _re )
-{
-	m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
-	m_trackOperationsWidget.move( 0, 0 );
-	m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH,
-								height() - 1 );
-	m_trackSettingsWidget.move( TRACK_OP_WIDTH, 0 );
-	m_trackContentWidget.resize( m_track->getTrackContainer()->width() -
-								TRACK_OP_WIDTH -
-						DEFAULT_SETTINGS_WIDGET_WIDTH,
-								height() - 1 );
-	m_trackContentWidget.move( m_trackOperationsWidget.width() +
-					m_trackSettingsWidget.width(), 0 );
+	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 }
 
 
@@ -1499,9 +1526,7 @@ track::track( trackContainer * _tc, bool _create_widget ) :
 {
 	if( _create_widget )
 	{
-		m_trackWidget = new trackWidget( this,
-					m_trackContainer->containerWidget() );
-
+		m_trackWidget = new trackWidget( this, m_trackContainer );
 		m_trackContainer->addTrack( this );
 	}
 }
@@ -1514,13 +1539,12 @@ track::~track()
 	if( m_trackContainer == engine::getBBEditor()
 						&& engine::getSongEditor() )
 	{
-		trackVector tracks = engine::getSongEditor()->tracks();
-		for( trackVector::iterator it = tracks.begin();
-						it != tracks.end(); ++it )
+		QList<track *> tracks = engine::getSongEditor()->tracks();
+		for( int i = 0; i < tracks.size(); ++i )
 		{
-			if( ( *it )->type() == BB_TRACK )
+			if( tracks[i]->type() == BB_TRACK )
 			{
-				bbTrack * bb_track = (bbTrack *)*it;
+				bbTrack * bb_track = (bbTrack *)tracks[i];
 				if( bb_track->automationDisabled( this ) )
 				{
 					// Remove reference from bbTrack
@@ -1566,9 +1590,7 @@ track * track::create( trackTypes _tt, trackContainer * _tc )
 		default: break;
 	}
 
-#ifdef DEBUG_LMMS
-	assert( t != NULL );
-#endif
+	_tc->updateAfterTrackAdd();
 
 	return( t );
 }

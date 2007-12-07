@@ -192,7 +192,7 @@ public:
 public slots:
 	void insertTact( const midiTime & _pos );
 	void removeTact( const midiTime & _pos );
-	void updateTCOs( void );
+	void update( void );
 
 
 protected:
@@ -338,7 +338,6 @@ public:
 		return( m_action == MOVE_TRACK );
 	}
 	
-	virtual void repaint( void );
 	virtual void update( void );
 
 
@@ -511,8 +510,6 @@ private:
 } ;
 
 
-typedef QVector<track *> trackVector;
-typedef QVector<const track *> constTrackVector;
 
 
 #endif

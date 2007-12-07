@@ -300,7 +300,7 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 	}
 	else if( f->type() == fileItem::PROJECT_FILE )
 	{
-		if( engine::getSongEditor()->mayChangeProject() )
+		if( engine::getMainWindow()->mayChangeProject() )
 		{
 			engine::getSongEditor()->loadProject( f->fullName() );
 		}

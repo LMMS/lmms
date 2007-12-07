@@ -25,6 +25,11 @@ trackOperationsWidget#automationEnabled > QPushButton::menu-indicator {
 	image: url(resources:track_op_menu.png);
 }
 
+trackWidget {
+/*	border-bottom: 1px solid rgb(0, 0, 0);*/
+	background-color: rgb(0, 0, 0);
+}
+
 QWidget#mainToolbar {
 	background-image: url(resources:main_toolbar_bg.png);
 }

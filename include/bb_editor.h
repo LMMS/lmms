@@ -58,7 +58,11 @@ public:
 		return( TRUE );
 	}
 
-	int currentBB( void ) const;
+	int currentBB( void ) const
+	{
+		return( m_currentBB );
+	}
+
 	tact FASTCALL lengthOfBB( const int _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
@@ -80,11 +84,7 @@ public slots:
 
 
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void resizeEvent( QResizeEvent * _re );
-
-	virtual QRect scrollAreaRect( void ) const;
 
 
 private:
@@ -94,6 +94,8 @@ private:
 
 	void FASTCALL createTCOsForBB( const int _bb );
 
+
+	int m_currentBB;
 
 	QWidget * m_toolBar;
 

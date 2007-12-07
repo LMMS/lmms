@@ -36,9 +36,7 @@
 #include "journalling_object.h"
 
 
-
-const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
-const Uint16 DEFAULT_SCROLLBAR_SIZE = 16;
+class QVBoxLayout;
 
 
 
@@ -49,7 +47,7 @@ public:
 	trackContainer( void );
 	virtual ~trackContainer();
 
-	inline QWidget * containerWidget( void )
+	QWidget * contentWidget( void )
 	{
 		return( m_scrollArea );
 	}
@@ -93,7 +91,7 @@ public:
 	void FASTCALL moveTrackUp( track * _track );
 	void FASTCALL moveTrackDown( track * _track );
 
-	void FASTCALL realignTracks( bool _complete_update = FALSE );
+	void FASTCALL realignTracks( void );
 	void clearAllTracks( void );
 
 	const trackWidget * trackWidgetAt( const int _y ) const;
@@ -116,7 +114,7 @@ public:
 		return( foo );*/
 	}
 
-	trackVector tracks( void );
+	QList<track *> tracks( void );
 
 	static const QString classNodeName( void )
 	{
@@ -124,7 +122,13 @@ public:
 	}
 
 
+signals:
+	void positionChanged( const midiTime & _pos );
+
+
 protected:
+	static const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
+
 	virtual void undoStep( journalEntry & _je );
 	virtual void redoStep( journalEntry & _je );
 
@@ -137,17 +141,9 @@ protected:
 
 	virtual void resizeEvent( QResizeEvent * );
 
-	constTrackVector tracks( void ) const;
-
-	virtual QRect scrollAreaRect( void ) const
-	{
-		return( rect() );
-	}
+	const QList<track *> tracks( void ) const;
 
 	midiTime m_currentPosition;
-
-protected slots:
-	void updateScrollArea( void );
 
 
 private:
@@ -172,18 +168,13 @@ private:
 
 
 	scrollArea * m_scrollArea;
-	typedef QVector<trackWidget *> trackWidgetVector; 
+	QVBoxLayout * m_scrollLayout;
 
-	trackWidgetVector m_trackWidgets;
+	QList<track *> m_tracks;
 	float m_ppt;
 
 	rubberBand * m_rubberBand;
 	QPoint m_origin;
-
-
-signals:
-	void positionChanged( const midiTime & _pos );
-
 
 } ;
 

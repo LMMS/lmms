@@ -29,7 +29,6 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
-#include <QtGui/QCloseEvent>
 #include <QtGui/QColorDialog>
 #include <QtGui/QComboBox>
 #include <QtGui/QFontDatabase>

@@ -677,10 +677,10 @@ void pattern::mouseDoubleClickEvent( QMouseEvent * _me )
 void pattern::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		   m_patternType == pattern::BEAT_PATTERN &&
-		   ( pixelsPerTact() >= 192 ||
-		   m_steps != DEFAULT_STEPS_PER_TACT ) &&
-		   _me->y() > height() - s_stepBtnOff->height() )
+				m_patternType == pattern::BEAT_PATTERN &&
+				( fixedTCOs() || pixelsPerTact() >= 192 ||
+				m_steps != DEFAULT_STEPS_PER_TACT ) &&
+				_me->y() > height() - s_stepBtnOff->height() )
 	{
 		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
 				length() / BEATS_PER_TACT / width();
@@ -725,9 +725,9 @@ void pattern::mousePressEvent( QMouseEvent * _me )
 void pattern::wheelEvent( QWheelEvent * _we )
 {
 	if( m_patternType == pattern::BEAT_PATTERN &&
-		   ( pixelsPerTact() >= 192 ||
-		   m_steps != DEFAULT_STEPS_PER_TACT ) &&
-		   _we->y() > height() - s_stepBtnOff->height() )
+				( fixedTCOs() || pixelsPerTact() >= 192 ||
+				m_steps != DEFAULT_STEPS_PER_TACT ) &&
+				_we->y() > height() - s_stepBtnOff->height() )
 	{
 		int step = ( _we->x() - TCO_BORDER_WIDTH ) *
 				length() / BEATS_PER_TACT / width();
@@ -816,7 +816,10 @@ void pattern::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 2, height() - 2 );
 
-	const float ppt = pixelsPerTact();
+	const float ppt = fixedTCOs() ?
+			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+						/ (float)length().getTact() :
+								pixelsPerTact();
 
 	if( m_patternType == pattern::MELODY_PATTERN )
 	{
@@ -894,7 +897,8 @@ void pattern::paintEvent( QPaintEvent * )
 		}
 	}
 	else if( m_patternType == pattern::BEAT_PATTERN &&
-			( ppt >= 96 || m_steps != DEFAULT_STEPS_PER_TACT ) )
+				( fixedTCOs() || ppt >= 96
+					|| m_steps != DEFAULT_STEPS_PER_TACT ) )
 	{
 		QPixmap stepon;
 		QPixmap stepoverlay;
