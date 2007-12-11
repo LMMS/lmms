@@ -29,16 +29,16 @@
 #include "automation_editor.h"
 
 
-#include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
 #include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
+#include <QtGui/QStyleOption>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QMdiArea>
 
 
 #ifndef __USE_XOPEN
@@ -161,9 +161,13 @@ automationEditor::automationEditor( void ) :
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
-	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
+	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( horScrolled( int ) ) );
+
+	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
+	m_topBottomScroll->setSingleStep( 1 );
+	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( verScrolled( int ) ) );
 
@@ -434,321 +438,6 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 //	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
 
 //	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
-}
-
-
-
-
-void automationEditor::updatePaintPixmap( QPixmap & _p )
-{
-	_p.fill( QColor( 0, 0, 0 ) );
-	QPainter p( &_p );
-
-	// set font-size to 8
-	p.setFont( pointSize<8>( p.font() ) );
-
-	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
-
-	// start drawing at the bottom
-	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
-
-	p.fillRect( 0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
-						QColor( 0x33, 0x33, 0x33 ) );
-
-	// print value numbers
-	int font_height = p.fontMetrics().height();
-	Qt::Alignment text_flags =
-		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
-
-	if( m_pattern )
-	{
-		if( m_y_auto )
-		{
-			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
-			int level[] = { m_min_level, m_max_level };
-			for( int i = 0; i < 2; ++i )
-			{
-				const QString & label = m_pattern->object()
-						->levelToLabel( level[i] );
-				p.setPen( QColor( 240, 240, 240 ) );
-				p.drawText( 1, y[i] - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( QColor( 0, 0, 0 ) );
-				p.drawText( 0, y[i] - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
-		}
-		else
-		{
-			int y = grid_bottom;
-			int level = m_bottom_level;
-			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
-								/ m_y_delta );
-			int module = level % printable;
-			if( module )
-			{
-				int inv_module = ( printable - module )
-								% printable;
-				y -= inv_module * m_y_delta;
-				level += inv_module;
-			}
-			for( ; y >= TOP_MARGIN && level <= m_top_level;
-				y -= printable * m_y_delta, level += printable )
-			{
-				const QString & label = m_pattern->object()
-							->levelToLabel( level );
-				p.setPen( QColor( 240, 240, 240 ) );
-				p.drawText( 1, y - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( QColor( 0, 0, 0 ) );
-				p.drawText( 0, y - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
-		}
-	}
-
-	// set clipping area, because we are not allowed to paint over
-	// keyboard...
-	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
-								grid_height  );
-
-	// draw vertical raster
-	int tact_16th = m_currentPosition / 4;
-	const int offset = ( m_currentPosition % 4 ) * m_ppt /
-						DEFAULT_STEPS_PER_TACT / 4;
-
-	if( m_pattern )
-	{
-		int x_line_end = m_y_auto || m_top_level < m_max_level ?
-			TOP_MARGIN :
-			grid_bottom - ( m_top_level - m_bottom_level )
-								* m_y_delta;
-
-		for( int x = VALUES_WIDTH - offset; x < width();
-			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
-		{
-			if( x >= VALUES_WIDTH )
-			{
-				// every tact-start needs to be a bright line
-				if( tact_16th % 16 == 0 )
-				{
-	 				p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
-				}
-				// normal line
-				else if( tact_16th % 4 == 0 )
-				{
-					p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
-				}
-				// weak line
-				else
-				{
-					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
-				}
-				p.drawLine( x, grid_bottom, x, x_line_end );
-			}
-		}
-
-
-		if( m_y_auto )
-		{
-			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
-			p.setPen( pen );
-			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
-								grid_bottom );
-			pen.setStyle( Qt::DotLine );
-			p.setPen( pen );
-			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
-			for( int i = 1; i < 8; ++i )
-			{
-				int y = (int)( grid_bottom - i * y_delta );
-				p.drawLine( VALUES_WIDTH, y, width(), y );
-			}
-		}
-		else
-		{
-			for( int y = grid_bottom, level = m_bottom_level;
-					y >= TOP_MARGIN && level <= m_top_level;
-					y -= m_y_delta, ++level )
-			{
-				if( level % 5 == 0 )
-				{
-					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
-				}
-				else
-				{
-					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
-				}
-
-				// draw level line
-				p.drawLine( VALUES_WIDTH, y, width(), y );
-			}
-		}
-	}
-
-
-
-	// following code draws all visible values
-
-	// setup selection-vars
-	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = m_selectStartTact64th + m_selectedTact64th;
-	if( sel_pos_start > sel_pos_end )
-	{
-		qSwap<int>( sel_pos_start, sel_pos_end );
-	}
-
-	int sel_level_start = m_selectStartLevel;
-	int sel_level_end = sel_level_start + m_selectedLevels;
-	if( sel_level_start > sel_level_end )
-	{
-		qSwap<int>( sel_level_start, sel_level_end );
-	}
-
-	if( validPattern() == TRUE )
-	{
-		timeMap & time_map = m_pattern->getTimeMap();
-		timeMap::iterator it = time_map.end();
-		do
-		{
-			--it;
-			Sint32 len_tact_64th = 4;
-
-			const int level = it.value();
-
-			Sint32 pos_tact_64th = -it.key();
-
-			const int x = ( pos_tact_64th - m_currentPosition ) *
-								m_ppt / 64;
-			if( x > width() - VALUES_WIDTH )
-			{
-				break;
-			}
-
-			int rect_width;
-			if( it != time_map.begin() )
-			{
-				timeMap::iterator it_prev = it;
-				--it_prev;
-				Sint32 next_pos_tact_64th = -it_prev.key();
-				int next_x = ( next_pos_tact_64th
-					- m_currentPosition ) * m_ppt / 64;
-				// skip this value if not in visible area at all
-				if( next_x < 0 )
-				{
-					continue;
-				}
-				rect_width = next_x - x;
-			}
-			else
-			{
-				rect_width = width() - x;
-			}
-
-			// is the value in visible area?
-			if( ( level >= m_bottom_level && level <= m_top_level )
-				|| ( level > m_top_level && m_top_level >= 0 )
-				|| ( level < m_bottom_level
-						&& m_bottom_level <= 0 ) )
-			{
-				bool is_selected = FALSE;
-				// if we're in move-mode, we may only draw
-				// values in selected area, that have originally
-				// been selected and not values that are now in
-				// selection because the user moved it...
-				if( m_editMode == MOVE )
-				{
-					if( m_selValuesForMove.contains(
-								it.key() ) )
-					{
-						is_selected = TRUE;
-					}
-				}
-				else if( level >= sel_level_start &&
-					level <= sel_level_end &&
-					pos_tact_64th >= sel_pos_start &&
-					pos_tact_64th + len_tact_64th <=
-								sel_pos_end )
-				{
-					is_selected = TRUE;
-				}
-
-				// we've done and checked all, lets draw the
-				// value
-				int y_start;
-				int rect_height;
-				if( m_y_auto )
-				{
-					y_start = grid_bottom
-						- ( grid_bottom - TOP_MARGIN )
-						* ( level - m_min_level )
-						/ ( m_max_level - m_min_level );
-					int y_end = grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
-						* m_min_level
-						/ ( m_max_level - m_min_level );
-					rect_height = y_end - y_start;
-				}
-				else
-				{
-					y_start = grid_bottom - ( level
-							- m_bottom_level )
-							* m_y_delta;
-					rect_height = level * m_y_delta;
-				}
-				drawValueRect( p, x + VALUES_WIDTH, y_start,
-							rect_width, rect_height,
-							is_selected );
-			}
-		} while( it != time_map.begin() );
-	}
-	else
-	{
-		QFont f = p.font();
-		f.setBold( TRUE );
-		p.setFont( pointSize<14>( f ) );
-		p.setPen( QColor( 0, 255, 0 ) );
-		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
-				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
-				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation pattern with "
-					"the context menu of a control!" ) );
-	}
-
-	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
-								grid_height );
-
-	// now draw selection-frame
-	int x = ( sel_pos_start - m_currentPosition ) * m_ppt / 64;
-	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / 64;
-	int y, h;
-	if( m_y_auto )
-	{
-		y = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( sel_level_start - m_min_level )
-				/ (float)( m_max_level - m_min_level ) );
-		h = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( sel_level_end - m_min_level )
-				/ (float)( m_max_level - m_min_level ) ) - y;
-	}
-	else
-	{
-		y = grid_bottom - ( sel_level_start - m_bottom_level )
-								* m_y_delta;
-		h = ( sel_level_start - sel_level_end ) * m_y_delta;
-	}
-	p.setPen( QColor( 0, 64, 192 ) );
-	p.drawRect( x + VALUES_WIDTH, y, w, h );
-
-	int l = ( validPattern() == TRUE )? (int) m_pattern->length() : 0;
-
-	// reset scroll-range
-	m_leftRightScroll->setRange( 0, l );
-	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( l );
 }
 
 
@@ -1467,15 +1156,318 @@ inline void automationEditor::drawCross( QPainter & _p )
 
 
 
-void automationEditor::paintEvent( QPaintEvent * )
+void automationEditor::paintEvent( QPaintEvent * _pe )
 {
-	QPixmap paintPixmap( size() );
-	updatePaintPixmap( paintPixmap );
+	QStyleOption opt;
+	opt.initFrom( this );
 	QPainter p( this );
-	p.drawPixmap( 0, 0, paintPixmap );
+	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
+	// set font-size to 8
+	p.setFont( pointSize<8>( p.font() ) );
+
+	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
+
+	// start drawing at the bottom
+	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+
+	p.fillRect( 0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
+						QColor( 0x33, 0x33, 0x33 ) );
+
+	// print value numbers
+	int font_height = p.fontMetrics().height();
+	Qt::Alignment text_flags =
+		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
+
+	if( m_pattern )
+	{
+		if( m_y_auto )
+		{
+			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
+			int level[] = { m_min_level, m_max_level };
+			for( int i = 0; i < 2; ++i )
+			{
+				const QString & label = m_pattern->object()
+						->levelToLabel( level[i] );
+				p.setPen( QColor( 240, 240, 240 ) );
+				p.drawText( 1, y[i] - font_height + 1,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+				p.setPen( QColor( 0, 0, 0 ) );
+				p.drawText( 0, y[i] - font_height,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+			}
+		}
+		else
+		{
+			int y = grid_bottom;
+			int level = m_bottom_level;
+			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
+								/ m_y_delta );
+			int module = level % printable;
+			if( module )
+			{
+				int inv_module = ( printable - module )
+								% printable;
+				y -= inv_module * m_y_delta;
+				level += inv_module;
+			}
+			for( ; y >= TOP_MARGIN && level <= m_top_level;
+				y -= printable * m_y_delta, level += printable )
+			{
+				const QString & label = m_pattern->object()
+							->levelToLabel( level );
+				p.setPen( QColor( 240, 240, 240 ) );
+				p.drawText( 1, y - font_height + 1,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+				p.setPen( QColor( 0, 0, 0 ) );
+				p.drawText( 0, y - font_height,
+					VALUES_WIDTH - 10, 2 * font_height,
+					text_flags, label );
+			}
+		}
+	}
+
+	// set clipping area, because we are not allowed to paint over
+	// keyboard...
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
-				height() - TOP_MARGIN - SCROLLBAR_SIZE );
+								grid_height  );
+
+	// draw vertical raster
+	int tact_16th = m_currentPosition / 4;
+	const int offset = ( m_currentPosition % 4 ) * m_ppt /
+						DEFAULT_STEPS_PER_TACT / 4;
+
+	if( m_pattern )
+	{
+		int x_line_end = m_y_auto || m_top_level < m_max_level ?
+			TOP_MARGIN :
+			grid_bottom - ( m_top_level - m_bottom_level )
+								* m_y_delta;
+
+		for( int x = VALUES_WIDTH - offset; x < width();
+			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
+		{
+			if( x >= VALUES_WIDTH )
+			{
+				// every tact-start needs to be a bright line
+				if( tact_16th % 16 == 0 )
+				{
+	 				p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
+				}
+				// normal line
+				else if( tact_16th % 4 == 0 )
+				{
+					p.setPen( QColor( 0x5F, 0x5F, 0x5F ) );
+				}
+				// weak line
+				else
+				{
+					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+				}
+				p.drawLine( x, grid_bottom, x, x_line_end );
+			}
+		}
+
+
+		if( m_y_auto )
+		{
+			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
+			p.setPen( pen );
+			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
+								grid_bottom );
+			pen.setStyle( Qt::DotLine );
+			p.setPen( pen );
+			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
+			for( int i = 1; i < 8; ++i )
+			{
+				int y = (int)( grid_bottom - i * y_delta );
+				p.drawLine( VALUES_WIDTH, y, width(), y );
+			}
+		}
+		else
+		{
+			for( int y = grid_bottom, level = m_bottom_level;
+					y >= TOP_MARGIN && level <= m_top_level;
+					y -= m_y_delta, ++level )
+			{
+				if( level % 5 == 0 )
+				{
+					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
+				}
+				else
+				{
+					p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
+				}
+
+				// draw level line
+				p.drawLine( VALUES_WIDTH, y, width(), y );
+			}
+		}
+	}
+
+
+
+	// following code draws all visible values
+
+	// setup selection-vars
+	int sel_pos_start = m_selectStartTact64th;
+	int sel_pos_end = m_selectStartTact64th + m_selectedTact64th;
+	if( sel_pos_start > sel_pos_end )
+	{
+		qSwap<int>( sel_pos_start, sel_pos_end );
+	}
+
+	int sel_level_start = m_selectStartLevel;
+	int sel_level_end = sel_level_start + m_selectedLevels;
+	if( sel_level_start > sel_level_end )
+	{
+		qSwap<int>( sel_level_start, sel_level_end );
+	}
+
+	if( validPattern() == TRUE )
+	{
+		timeMap & time_map = m_pattern->getTimeMap();
+		timeMap::iterator it = time_map.end();
+		do
+		{
+			--it;
+			Sint32 len_tact_64th = 4;
+
+			const int level = it.value();
+
+			Sint32 pos_tact_64th = -it.key();
+
+			const int x = ( pos_tact_64th - m_currentPosition ) *
+								m_ppt / 64;
+			if( x > width() - VALUES_WIDTH )
+			{
+				break;
+			}
+
+			int rect_width;
+			if( it != time_map.begin() )
+			{
+				timeMap::iterator it_prev = it;
+				--it_prev;
+				Sint32 next_pos_tact_64th = -it_prev.key();
+				int next_x = ( next_pos_tact_64th
+					- m_currentPosition ) * m_ppt / 64;
+				// skip this value if not in visible area at all
+				if( next_x < 0 )
+				{
+					continue;
+				}
+				rect_width = next_x - x;
+			}
+			else
+			{
+				rect_width = width() - x;
+			}
+
+			// is the value in visible area?
+			if( ( level >= m_bottom_level && level <= m_top_level )
+				|| ( level > m_top_level && m_top_level >= 0 )
+				|| ( level < m_bottom_level
+						&& m_bottom_level <= 0 ) )
+			{
+				bool is_selected = FALSE;
+				// if we're in move-mode, we may only draw
+				// values in selected area, that have originally
+				// been selected and not values that are now in
+				// selection because the user moved it...
+				if( m_editMode == MOVE )
+				{
+					if( m_selValuesForMove.contains(
+								it.key() ) )
+					{
+						is_selected = TRUE;
+					}
+				}
+				else if( level >= sel_level_start &&
+					level <= sel_level_end &&
+					pos_tact_64th >= sel_pos_start &&
+					pos_tact_64th + len_tact_64th <=
+								sel_pos_end )
+				{
+					is_selected = TRUE;
+				}
+
+				// we've done and checked all, lets draw the
+				// value
+				int y_start;
+				int rect_height;
+				if( m_y_auto )
+				{
+					y_start = grid_bottom
+						- ( grid_bottom - TOP_MARGIN )
+						* ( level - m_min_level )
+						/ ( m_max_level - m_min_level );
+					int y_end = grid_bottom
+						+ ( grid_bottom - TOP_MARGIN )
+						* m_min_level
+						/ ( m_max_level - m_min_level );
+					rect_height = y_end - y_start;
+				}
+				else
+				{
+					y_start = grid_bottom - ( level
+							- m_bottom_level )
+							* m_y_delta;
+					rect_height = level * m_y_delta;
+				}
+				drawValueRect( p, x + VALUES_WIDTH, y_start,
+							rect_width, rect_height,
+							is_selected );
+			}
+		} while( it != time_map.begin() );
+	}
+	else
+	{
+		QFont f = p.font();
+		f.setBold( TRUE );
+		p.setFont( pointSize<14>( f ) );
+		p.setPen( QColor( 0, 255, 0 ) );
+		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
+				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
+				grid_height - 40, Qt::TextWordWrap,
+				tr( "Please open an automation pattern with "
+					"the context menu of a control!" ) );
+	}
+
+	// now draw selection-frame
+	int x = ( sel_pos_start - m_currentPosition ) * m_ppt / 64;
+	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / 64;
+	int y, h;
+	if( m_y_auto )
+	{
+		y = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( sel_level_start - m_min_level )
+				/ (float)( m_max_level - m_min_level ) );
+		h = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
+				* ( sel_level_end - m_min_level )
+				/ (float)( m_max_level - m_min_level ) ) - y;
+	}
+	else
+	{
+		y = grid_bottom - ( sel_level_start - m_bottom_level )
+								* m_y_delta;
+		h = ( sel_level_start - sel_level_end ) * m_y_delta;
+	}
+	p.setPen( QColor( 0, 64, 192 ) );
+	p.drawRect( x + VALUES_WIDTH, y, w, h );
+
+	// TODO: Get this out of paint event
+	int l = ( validPattern() == TRUE )? (int) m_pattern->length() : 0;
+
+	// reset scroll-range
+	if( m_leftRightScroll->maximum() != l )
+	{
+		m_leftRightScroll->setRange( 0, l );
+		m_leftRightScroll->setPageStep( l );
+	}
 
 	if( validPattern() == TRUE )
 	{
@@ -1493,7 +1485,6 @@ void automationEditor::paintEvent( QPaintEvent * )
 	}
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
-
 }
 
 
@@ -1524,9 +1515,6 @@ void automationEditor::resizeEvent( QResizeEvent * )
 	{
 		m_topBottomScroll->setRange( m_scroll_level, m_scroll_level );
 	}
-
-	m_topBottomScroll->setSingleStep( 1 );
-	m_topBottomScroll->setPageStep( 20 );
 
 	m_topBottomScroll->setValue( m_scroll_level );
 

@@ -151,6 +151,8 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 	mainWindow::restoreWidgetState( this, _this );
 
+	realignTracks();
+
 	pd->setValue( start_val + _this.childNodes().count() );
 
 	if( was_null )

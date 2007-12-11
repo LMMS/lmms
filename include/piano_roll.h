@@ -164,8 +164,6 @@ private:
 
 	midiTime newNoteLen( void ) const;
 
-	void updatePaintPixmap( QPixmap & _p );
-
 
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;

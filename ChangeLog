@@ -1,3 +1,19 @@
+2007-12-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/automation_editor.h:
+	* include/piano_roll.h:
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	optimized paint events
+
+	* data/themes/default/style.css:
+	* src/core/automation_editor.cpp:
+	* src/core/piano_roll.cpp:
+	use styled background
+
+	* src/core/track_container.cpp:
+	update display after loading settings
+
 2007-12-07	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/main_window.h:

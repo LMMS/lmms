@@ -190,7 +190,6 @@ private:
 	int m_bottom_level;
 	int m_top_level;
 
-	void updatePaintPixmap( QPixmap & _p );
 	void updateTopBottomLevels( void );
 
 	QScrollBar * m_leftRightScroll;
