@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ca_ES">
-<defaultcodec></defaultcodec>
 <context>
     <name>QWidget</name>
     <message>
@@ -886,97 +885,97 @@ http://lmms.sourceforge.net</translation>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="227"/>
+        <location filename="../../src/core/automation_editor.cpp" line="231"/>
         <source>Cut selected values (Ctrl+X)</source>
         <translation>Talla els valors seleccionats (Ctrl+X)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="232"/>
+        <location filename="../../src/core/automation_editor.cpp" line="236"/>
         <source>Copy selected values (Ctrl+C)</source>
         <translation>Copia els valors seleccionats (Ctrl+C)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="238"/>
+        <location filename="../../src/core/automation_editor.cpp" line="242"/>
         <source>Paste values from clipboard (Ctrl+V)</source>
         <translation>Enganxa valors des del portapapers (Ctrl+V)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="245"/>
+        <location filename="../../src/core/automation_editor.cpp" line="249"/>
         <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, els valors seleccionats seran tallats cap al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="249"/>
+        <location filename="../../src/core/automation_editor.cpp" line="253"/>
         <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, els valors seleccionats seran copiats al portapapers. Pots enganxar-los a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="252"/>
+        <location filename="../../src/core/automation_editor.cpp" line="256"/>
         <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
         <translation>Si piques aquí, els valors del portapapers seran enganxats al primer compàs visible.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="364"/>
+        <location filename="../../src/core/automation_editor.cpp" line="368"/>
         <source>Automation Editor - no pattern</source>
         <translation>Editor d&apos;Automatització - sense patró</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="393"/>
+        <location filename="../../src/core/automation_editor.cpp" line="397"/>
         <source>Automation Editor - %1</source>
         <translation>Editor d&apos;Automatització - %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="718"/>
+        <location filename="../../src/core/automation_editor.cpp" line="1437"/>
         <source>Please open an automation pattern with the context menu of a control!</source>
         <translation>Per favor, obre un patró d&apos;automatització amb el menú contextual d&apos;un control!</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="1877"/>
+        <location filename="../../src/core/automation_editor.cpp" line="1865"/>
         <source>Values copied</source>
         <translation>Valors copiats</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="1879"/>
+        <location filename="../../src/core/automation_editor.cpp" line="1867"/>
         <source>All selected values were copied to the clipboard.</source>
         <translation>Tots els valors seleccionats s&apos;han copiat al portapapers.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="172"/>
+        <location filename="../../src/core/automation_editor.cpp" line="176"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Mode dibuixar (Maj+D)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="179"/>
+        <location filename="../../src/core/automation_editor.cpp" line="183"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Mode esborrar (Maj+E)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="186"/>
+        <location filename="../../src/core/automation_editor.cpp" line="190"/>
         <source>Select mode (Shift+S)</source>
         <translation>Mode seleccionar (Maj+S)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="192"/>
+        <location filename="../../src/core/automation_editor.cpp" line="196"/>
         <source>Move selection mode (Shift+M)</source>
         <translation>Mode moure selecció (Maj+M)</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="209"/>
+        <location filename="../../src/core/automation_editor.cpp" line="213"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir i moure valors solts. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="213"/>
+        <location filename="../../src/core/automation_editor.cpp" line="217"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar valors solts. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="219"/>
+        <location filename="../../src/core/automation_editor.cpp" line="223"/>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar valors. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure valors. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/automation_editor.cpp" line="224"/>
+        <location filename="../../src/core/automation_editor.cpp" line="228"/>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure els valors que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
@@ -3497,32 +3496,32 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
 <context>
     <name>pianoRoll</name>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="310"/>
+        <location filename="../../src/core/piano_roll.cpp" line="314"/>
         <source>Cut selected notes (Ctrl+X)</source>
         <translation>Talla les notes seleccionades (Ctrl+X)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="315"/>
+        <location filename="../../src/core/piano_roll.cpp" line="319"/>
         <source>Copy selected notes (Ctrl+C)</source>
         <translation>Copia les notes seleccionades (Ctrl+C)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="328"/>
+        <location filename="../../src/core/piano_roll.cpp" line="332"/>
         <source>If you click here, selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, les notes seleccionades seran tallades cap al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="332"/>
+        <location filename="../../src/core/piano_roll.cpp" line="336"/>
         <source>If you click here, selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation>Si piques aquí, les notes seleccionades seran copiades al portapapers. Pots enganxar-les a qualsevol banda de qualsevol patró picant el botó enganxar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="335"/>
+        <location filename="../../src/core/piano_roll.cpp" line="339"/>
         <source>If you click here, the notes from the clipboard will be pasted at the first visible tact.</source>
         <translation>Si piques aquí, les notes del portapapers seran enganxades al primer compàs visible.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="321"/>
+        <location filename="../../src/core/piano_roll.cpp" line="325"/>
         <source>Paste notes from clipboard (Ctrl+V)</source>
         <translation>Enganxa notes des del portapapers (Ctrl+V)</translation>
     </message>
@@ -3547,17 +3546,17 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Pica aquí si vols aturar la reproducció del patró actual.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="457"/>
+        <location filename="../../src/core/piano_roll.cpp" line="461"/>
         <source>Piano-Roll - no pattern</source>
         <translation>Rotlle de Piano - sense patró</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="936"/>
+        <location filename="../../src/core/piano_roll.cpp" line="1894"/>
         <source>Please open a pattern by double-clicking on it!</source>
         <translation>Per favor, obre un patró picant-lo dos cops!</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="502"/>
+        <location filename="../../src/core/piano_roll.cpp" line="506"/>
         <source>Piano-Roll - %1</source>
         <translation>Rotlle de Piano - %1</translation>
     </message>
@@ -3572,57 +3571,57 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Pica aquí si vols enregistrar notes des d&apos;un dispositiu MIDI o el piano virtual de prova de la finestra de canal corresponent al patró actual. Mentre s&apos;enregistra, totes les notes que toquis seran escrites en aquest patró i les podràs reproduir i editar després.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="374"/>
+        <location filename="../../src/core/piano_roll.cpp" line="378"/>
         <source>Last note</source>
         <translation>Darrera nota</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="2344"/>
+        <location filename="../../src/core/piano_roll.cpp" line="2331"/>
         <source>Notes copied</source>
         <translation>Notes copiades</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="2346"/>
+        <location filename="../../src/core/piano_roll.cpp" line="2333"/>
         <source>All selected notes were copied to the clipboard.</source>
         <translation>Totes les notes seleccionades s&apos;han copiat al portapapers.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="255"/>
+        <location filename="../../src/core/piano_roll.cpp" line="259"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Mode dibuixar (Maj+D)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="262"/>
+        <location filename="../../src/core/piano_roll.cpp" line="266"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Mode esborrar (Maj+E)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="269"/>
+        <location filename="../../src/core/piano_roll.cpp" line="273"/>
         <source>Select mode (Shift+S)</source>
         <translation>Mode seleccionar (Maj+S)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="275"/>
+        <location filename="../../src/core/piano_roll.cpp" line="279"/>
         <source>Move selection mode (Shift+M)</source>
         <translation>Mode moure selecció (Maj+M)</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="292"/>
+        <location filename="../../src/core/piano_roll.cpp" line="296"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode dibuixar serà activat. En aquest mode pots afegir, redimensionar i moure notes soltes. Aquest és el mode per defecte que s&apos;utilitza més temps. També pots pitjar &apos;Maj+D&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="296"/>
+        <location filename="../../src/core/piano_roll.cpp" line="300"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, s&apos;activarà el mode esborrar. En aquest mode pots esborrar notes soltes. També pots pitjar &apos;Maj+E&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="302"/>
+        <location filename="../../src/core/piano_roll.cpp" line="306"/>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode seleccionar serà activat. En aquest mode pots seleccionar notes. Això és necessari si vols tallar, copiar, enganxar, esborrar o moure notes. També pots pitjar &apos;Maj+S&apos; al teclat per a activar aquest mode.</translation>
     </message>
     <message>
-        <location filename="../../src/core/piano_roll.cpp" line="307"/>
+        <location filename="../../src/core/piano_roll.cpp" line="311"/>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Si piques aquí, el mode moure serà activat. En aquest mode pots moure les notes que has seleccionat en el mode seleccionar. També pots pitjar &apos;Maj+M&apos; al teclat per a activar aquest mode.</translation>
     </message>
@@ -4338,228 +4337,228 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
 <context>
     <name>setupDialog</name>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="119"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="118"/>
         <source>Setup LMMS</source>
         <translation>Configuració de LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="629"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="626"/>
         <source>General settings</source>
         <translation>Configuració general</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="149"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="148"/>
         <source>BUFFER SIZE</source>
         <translation>MIDA DE MEMÒRIA INTERMÈDIA</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="172"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="171"/>
         <source>Reset to default-value</source>
         <translation>Restaura al valor per defecte</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="181"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="180"/>
         <source>MISC</source>
         <translation>MISC</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="186"/>
-        <source>Disable tooltips (no spurious interrupts while playing)</source>
-        <translation>Desactiva els avisos d&apos;eina</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="197"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="195"/>
         <source>Classical knob usability (move cursor around knob to change value)</source>
         <translation>Usabilitat de roda clàssica (moure el cursor al voltant de la roda)</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="206"/>
-        <source>GIMP-like windows (no MDI)</source>
-        <translation>Finestres com al GIMP (sense MDI)</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="215"/>
-        <source>Do not show wizard after up-/downgrade</source>
-        <translation>No mostris l&apos;assistent després d&apos;actualitzar/desactualitzar</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="225"/>
-        <source>Do not show message after closing this dialog</source>
-        <translation>No mostris el missatge que surt en tancar aquest diàleg</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="233"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="230"/>
         <source>Display volume as dbV </source>
         <translation>Mostra el volum en dbV</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="631"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="628"/>
         <source>Directories</source>
         <translation>Directoris</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="270"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="267"/>
         <source>LMMS working directory</source>
         <translation>Directori de treball de LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="289"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="286"/>
         <source>VST-plugin directory</source>
         <translation>Directori de connectors VST</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="308"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="305"/>
         <source>Artwork directory</source>
         <translation>Directori de material gràfic</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="327"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="324"/>
         <source>FL Studio installation directory</source>
         <translation>Directori d&apos;instal·lació de FL Studio</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="634"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="631"/>
         <source>Performance settings</source>
         <translation>Configuració de rendiment</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="411"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="408"/>
         <source>UI effects vs. performance</source>
         <translation>Efectes UI vs. rendiment</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="416"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="413"/>
         <source>Disable channel activity indicators</source>
         <translation>Desactiva els indicadors d&apos;activitat de canal</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="425"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="422"/>
         <source>Only press keys on channel-piano manually</source>
         <translation>Pitja les tecles del piano de canal només manualment</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="637"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="634"/>
         <source>Audio settings</source>
         <translation>Configuració d&apos;àudio</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="480"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="477"/>
         <source>AUDIO INTERFACE</source>
         <translation>INTERFÍCIE D&apos;ÀUDIO</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="639"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="636"/>
         <source>MIDI settings</source>
         <translation>Configuració MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="562"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="559"/>
         <source>MIDI INTERFACE</source>
         <translation>INTERFÍCIE MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="656"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="653"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="661"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="658"/>
         <source>Cancel</source>
         <translation>Cancel·la</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="751"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="748"/>
         <source>Restart LMMS</source>
         <translation>Reinicia LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="754"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="751"/>
         <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
         <translation>Per favor, tingues en compte que la majoria de canvis no s&apos;aplicaran fins que reiniciïs LMMS!</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="785"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="782"/>
         <source>Frames: %1
 Latency: %2 ms</source>
         <translation>Marcs: %1
 Latència: %2 ms</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="812"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="809"/>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
         <translation>Aquí pots configurar la mida de la memòria intermèdia interna usada per LMMS. Els valors més petits donen menor latència però també poden causar so inservible o baix rendiment, especialment a ordinadors antics o sistemes amb un nucli sense temps real.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="900"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="897"/>
         <source>Choose LMMS working directory</source>
         <translation>Escull el directori de treball de LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="922"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="919"/>
         <source>Choose your VST-plugin directory</source>
         <translation>Escull el teu directori de connectors VST</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="944"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="941"/>
         <source>Choose artwork-theme directory</source>
         <translation>Escull el directori de material gràfic</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="966"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="963"/>
         <source>Choose FL Studio installation directory</source>
         <translation>Escull el directori d&apos;instal·lació de FL Studio</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1065"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1062"/>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
         <translation>Aquí pots seleccionar la teva interfície d&apos;àudio preferida. Depenent de la configuració del teu sistema durant el temps de compilació, pots escollir entre ALSA, JACK, OSS i altres. Abaix pots veure una caixa amb controls per a configurar la interfície d&apos;àudio seleccionada.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1095"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1092"/>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
         <translation>Aquí pots seleccionar la teva interfície MIDI preferida. Depenent de la configuració del teu sistema durant el temps de compilació, pots escollir entre ALSA, OSS i més. Abaix pots veure una caixa amb controls per a configurar la interfície MIDI seleccionada.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="242"/>
-        <source>Do not compress project files per default</source>
-        <translation>No comprimeixis per defecte els fitxers de projecte</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="345"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="342"/>
         <source>LADSPA plugin directories</source>
         <translation>Directoris de connectors LADSPA</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="365"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="362"/>
         <source>STK rawwave directory</source>
         <translation>Directori d&apos;ones crues STK</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="434"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="431"/>
         <source>SMP support</source>
         <translation>Suport SMP</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="438"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="435"/>
         <source>Parallelizing level</source>
         <translation>Nivell de paral·lelització</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="460"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="457"/>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation>Si tens una màquina amb més d&apos;un processador (p.e. sistemes amb nucli dual) hauries d&apos;usar un nivell de paral·lelització més gran que 1, que vol dir que LMMS tractarà de dividir el processament de so en varis fils que haurien d&apos;executar-se en varis nuclis pel sistema operatiu subjacent.
 Fixa&apos;t que en alguns casos la paral·lelització no funcionarà amb memòries intermèdies de mida petita. Si experimentes problemes (p.e. molts xruns), prova d&apos;augmentar la mida de la memòria intermèdia.</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="980"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="977"/>
         <source>Choose LADSPA plugin directory</source>
         <translation>Escull un directori de connectors LADSPA</translation>
     </message>
     <message>
-        <location filename="../../src/core/setup_dialog.cpp" line="1003"/>
+        <location filename="../../src/core/setup_dialog.cpp" line="1000"/>
         <source>Choose STK rawwave directory</source>
         <translation>Escull el directori d&apos;ones crues STK</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/setup_dialog.cpp" line="184"/>
+        <source>Enable tooltips</source>
+        <translation>Activa els avisos d&apos;eina</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/setup_dialog.cpp" line="204"/>
+        <source>Multiple Document Interface</source>
+        <translation>Interfície de Múltiples Documents</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/setup_dialog.cpp" line="213"/>
+        <source>Show wizard after up-/downgrade</source>
+        <translation>Mostra l&apos;assistent després d&apos;actualitzar/desactualitzar</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/setup_dialog.cpp" line="222"/>
+        <source>Show restart warning after changing settings</source>
+        <translation>Mostra l&apos;avís de reinici després de canviar la configuració</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/setup_dialog.cpp" line="239"/>
+        <source>Compress project files per default</source>
+        <translation>Comprimeix per defecte els fitxers de projecte</translation>
     </message>
 </context>
 <context>
@@ -5022,7 +5021,7 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per a aquest fitxe
 <context>
     <name>trackContainer</name>
     <message>
-        <location filename="../../src/core/track_container.cpp" line="122"/>
+        <location filename="../../src/core/track_container.cpp" line="120"/>
         <source>Loading project...</source>
         <translation>Carregant projecte...</translation>
     </message>
@@ -5132,27 +5131,27 @@ Per favor, assegura&apos;t que tens permís de lectura per al fitxer i el direct
 <context>
     <name>trackOperationsWidget</name>
     <message>
-        <location filename="../../src/core/track.cpp" line="952"/>
+        <location filename="../../src/core/track.cpp" line="953"/>
         <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Pitja &lt;Ctrl&gt; quan piquis el control de moviment per a iniciar una nova acció d&apos;arrossegar i amollar.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1162"/>
+        <location filename="../../src/core/track.cpp" line="1163"/>
         <source>Clone this track</source>
         <translation>Clona aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1165"/>
+        <location filename="../../src/core/track.cpp" line="1166"/>
         <source>Remove this track</source>
         <translation>Elimina aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="965"/>
+        <location filename="../../src/core/track.cpp" line="966"/>
         <source>Actions for this track</source>
         <translation>Accions per a aquesta pista</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="987"/>
+        <location filename="../../src/core/track.cpp" line="988"/>
         <source>With this switch you can either mute this track or mute all other tracks.
 By clicking left, this track is muted. This is useful, if you only want to listen to the other tracks without changing this track and loosing information.
 When you click right on this switch, all other tracks will be muted. This is useful, if you only want to listen to this track.</source>
@@ -5161,24 +5160,24 @@ Amb un clic esquerre, aquesta pista s&apos;apaga. Això és útil si només vols
 Amb un clic dret a l&apos;interruptor, totes les altres pistes s&apos;apagaran. Això és útil si només vols escoltar aquesta pista.</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="989"/>
+        <location filename="../../src/core/track.cpp" line="990"/>
         <source>left click = mute this track
 right click = mute all other tracks (solo)</source>
         <translation>clic esquerre = apaga aquesta pista
 clic dret = apaga totes les altres pistes (solo)</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="968"/>
+        <location filename="../../src/core/track.cpp" line="969"/>
         <source>Mute</source>
         <translation>Apaga</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1149"/>
+        <location filename="../../src/core/track.cpp" line="1150"/>
         <source>Enable automation</source>
         <translation>Habilita automatització</translation>
     </message>
     <message>
-        <location filename="../../src/core/track.cpp" line="1156"/>
+        <location filename="../../src/core/track.cpp" line="1157"/>
         <source>Disable automation</source>
         <translation>Inhabilita automatització</translation>
     </message>

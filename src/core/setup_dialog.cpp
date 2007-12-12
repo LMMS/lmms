@@ -86,19 +86,18 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_bufferSize( configManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt() ),
-	m_disableToolTips( configManager::inst()->value( "tooltips",
+	m_toolTips( !configManager::inst()->value( "tooltips",
 							"disabled" ).toInt() ),
 	m_classicalKnobUsability( configManager::inst()->value( "knobs",
 					"classicalusability" ).toInt() ),
-	m_gimpLikeWindows( configManager::inst()->value( "app",
+	m_MDI( !configManager::inst()->value( "app",
 						"gimplikewindows" ).toInt() ),
-	m_noWizard( configManager::inst()->value( "app", "nowizard" ).toInt() ),
-	m_noMsgAfterSetup( configManager::inst()->value( "app",
+	m_wizard( !configManager::inst()->value( "app", "nowizard" ).toInt() ),
+	m_warnAfterSetup( !configManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
 	m_displaydBV( configManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
-	m_noMMPZ( configManager::inst()->value( "app",
-						"nommpz" ).toInt() ),
+	m_MMPZ( !configManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
@@ -181,14 +180,13 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
 	misc_tw->setFixedHeight( 150 );
 
-	ledCheckBox * disable_tooltips = new ledCheckBox(
-					tr( "Disable tooltips (no spurious "
-						"interrupts while playing)" ),
+	ledCheckBox * enable_tooltips = new ledCheckBox(
+							tr( "Enable tooltips" ),
 							misc_tw, NULL, NULL );
-	disable_tooltips->move( 10, 18 );
-	disable_tooltips->setChecked( m_disableToolTips );
-	connect( disable_tooltips, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggleToolTips( bool ) ) );
+	enable_tooltips->move( 10, 18 );
+	enable_tooltips->setChecked( m_toolTips );
+	connect( enable_tooltips, SIGNAL( toggled( bool ) ),
+					this, SLOT( toggleToolTips( bool ) ) );
 
 
 	ledCheckBox * classical_knob_usability = new ledCheckBox(
@@ -199,35 +197,34 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	classical_knob_usability->move( 10, 36 );
 	classical_knob_usability->setChecked( m_classicalKnobUsability );
 	connect( classical_knob_usability, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggleKnobUsability( bool ) ) );
+				this, SLOT( toggleKnobUsability( bool ) ) );
 
 
-	ledCheckBox * gimp_like_windows = new ledCheckBox(
-					tr( "GIMP-like windows (no MDI)" ),
+	ledCheckBox * mdi_windows = new ledCheckBox(
+					tr( "Multiple Document Interface" ),
 							misc_tw, NULL, NULL );
-	gimp_like_windows->move( 10, 54 );
-	gimp_like_windows->setChecked( m_gimpLikeWindows );
-	connect( gimp_like_windows, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggleGIMPLikeWindows( bool ) ) );
+	mdi_windows->move( 10, 54 );
+	mdi_windows->setChecked( m_MDI );
+	connect( mdi_windows, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleMdiWindows( bool ) ) );
 
 
-	ledCheckBox * no_wizard = new ledCheckBox(
-				tr( "Do not show wizard after up-/downgrade" ),
+	ledCheckBox * wizard = new ledCheckBox(
+					tr( "Show wizard after up-/downgrade" ),
 							misc_tw, NULL, NULL );
-	no_wizard->move( 10, 72 );
-	no_wizard->setChecked( m_noWizard );
-	connect( no_wizard, SIGNAL( toggled( bool ) ),
-					this, SLOT( toggleNoWizard( bool ) ) );
+	wizard->move( 10, 72 );
+	wizard->setChecked( m_wizard );
+	connect( wizard, SIGNAL( toggled( bool ) ),
+					this, SLOT( toggleWizard( bool ) ) );
 
 
-	ledCheckBox * no_msg = new ledCheckBox(
-					tr( "Do not show message after "
-							"closing this dialog" ),
+	ledCheckBox * restart_msg = new ledCheckBox(
+			tr( "Show restart warning after changing settings" ),
 							misc_tw, NULL, NULL );
-	no_msg->move( 10, 90 );
-	no_msg->setChecked( m_noMsgAfterSetup );
-	connect( no_msg, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleNoMsgAfterSetup( bool ) ) );
+	restart_msg->move( 10, 90 );
+	restart_msg->setChecked( m_warnAfterSetup );
+	connect( restart_msg, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleWarnAfterSetup( bool ) ) );
 
 
 	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dbV " ),
@@ -238,13 +235,13 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 				this, SLOT( toggleDisplaydBV( bool ) ) );
 
 
-	ledCheckBox * no_mmpz = new ledCheckBox(
-			tr( "Do not compress project files per default" ),
+	ledCheckBox * mmpz = new ledCheckBox(
+				tr( "Compress project files per default" ),
 							misc_tw, NULL, NULL );
-	no_mmpz->move( 10, 126 );
-	no_mmpz->setChecked( m_noMMPZ );
-	connect( no_mmpz, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleNoMMPZ( bool ) ) );
+	mmpz->move( 10, 126 );
+	mmpz->setChecked( m_MMPZ );
+	connect( mmpz, SIGNAL( toggled( bool ) ),
+					this, SLOT( toggleMMPZ( bool ) ) );
 
 
 	gen_layout->addWidget( bufsize_tw );
@@ -700,19 +697,19 @@ void setupDialog::accept( void )
 	configManager::inst()->setValue( "mixer", "mididev",
 			m_midiIfaceNames[m_midiInterfaces->currentText()] );
 	configManager::inst()->setValue( "tooltips", "disabled",
-					QString::number( m_disableToolTips ) );
+					QString::number( !m_toolTips ) );
 	configManager::inst()->setValue( "knobs", "classicalusability",
 				QString::number( m_classicalKnobUsability ) );
 	configManager::inst()->setValue( "app", "gimplikewindows",
-				QString::number( m_gimpLikeWindows ) );
+						QString::number( !m_MDI ) );
 	configManager::inst()->setValue( "app", "nowizard",
-				QString::number( m_noWizard ) );
+						QString::number( !m_wizard ) );
 	configManager::inst()->setValue( "app", "nomsgaftersetup",
-				QString::number( m_noMsgAfterSetup ) );
+					QString::number( !m_warnAfterSetup ) );
 	configManager::inst()->setValue( "app", "displaydbv",
-				QString::number( m_displaydBV ) );
+					QString::number( m_displaydBV ) );
 	configManager::inst()->setValue( "app", "nommpz",
-				QString::number( m_noMMPZ ) );
+						QString::number( !m_MMPZ ) );
 	configManager::inst()->setValue( "ui",
 					"disablechannelactivityindicators",
 					QString::number( m_disableChActInd ) );
@@ -746,7 +743,7 @@ void setupDialog::accept( void )
 	configManager::inst()->saveConfigFile();
 
 	QDialog::accept();
-	if( m_noMsgAfterSetup == FALSE )
+	if( m_warnAfterSetup )
 	{
 		QMessageBox::information( NULL, tr( "Restart LMMS" ),
 					tr( "Please note that most changes "
@@ -815,9 +812,9 @@ void setupDialog::displayBufSizeHelp( void )
 
 
 
-void setupDialog::toggleToolTips( bool _disabled )
+void setupDialog::toggleToolTips( bool _enabled )
 {
-	m_disableToolTips = _disabled;
+	m_toolTips = _enabled;
 }
 
 
@@ -831,25 +828,25 @@ void setupDialog::toggleKnobUsability( bool _classical )
 
 
 
-void setupDialog::toggleGIMPLikeWindows( bool _enabled )
+void setupDialog::toggleMdiWindows( bool _enabled )
 {
-	m_gimpLikeWindows = _enabled;
+	m_MDI = _enabled;
 }
 
 
 
 
-void setupDialog::toggleNoWizard( bool _enabled )
+void setupDialog::toggleWizard( bool _enabled )
 {
-	m_noWizard = _enabled;
+	m_wizard = _enabled;
 }
 
 
 
 
-void setupDialog::toggleNoMsgAfterSetup( bool _enabled )
+void setupDialog::toggleWarnAfterSetup( bool _enabled )
 {
-	m_noMsgAfterSetup = _enabled;
+	m_warnAfterSetup = _enabled;
 }
 
 
@@ -863,9 +860,9 @@ void setupDialog::toggleDisplaydBV( bool _enabled )
 
 
 
-void setupDialog::toggleNoMMPZ( bool _enabled )
+void setupDialog::toggleMMPZ( bool _enabled )
 {
-	m_noMMPZ = _enabled;
+	m_MMPZ = _enabled;
 }
 
 

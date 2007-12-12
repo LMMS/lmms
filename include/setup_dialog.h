@@ -82,13 +82,13 @@ private slots:
 	void displayMIDIHelp( void );
 
 
-	void toggleToolTips( bool _disabled );
+	void toggleToolTips( bool _enabled );
 	void toggleKnobUsability( bool _classical );
-	void toggleGIMPLikeWindows( bool _enabled );
-	void toggleNoWizard( bool _enabled );
-	void toggleNoMsgAfterSetup( bool _enabled );
+	void toggleMdiWindows( bool _enabled );
+	void toggleWizard( bool _enabled );
+	void toggleWarnAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
-	void toggleNoMMPZ( bool _enabled );
+	void toggleMMPZ( bool _enabled );
 
 	void openWorkingDir( void );
 	void openVSTDir( void );
@@ -109,13 +109,13 @@ private:
 	QLabel * m_bufSizeLbl;
 	int m_bufferSize;
 
-	bool m_disableToolTips;
+	bool m_toolTips;
 	bool m_classicalKnobUsability;
-	bool m_gimpLikeWindows;
-	bool m_noWizard;
-	bool m_noMsgAfterSetup;
+	bool m_MDI;
+	bool m_wizard;
+	bool m_warnAfterSetup;
 	bool m_displaydBV;
-	bool m_noMMPZ;
+	bool m_MMPZ;
 
 
 	QLineEdit * m_wdLineEdit;

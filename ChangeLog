@@ -1,3 +1,13 @@
+2007-12-12	Javier Serrano Polo <jasp00/at/terra/dot/es>
+
+	* include/setup_dialog.h:
+	* src/core/setup_dialog.cpp:
+	- removed negative wording in general settings
+	- removed GIMP references
+
+	* data/locale/ca.ts:
+	updated translation
+
 2007-12-11	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/automation_editor.h:
