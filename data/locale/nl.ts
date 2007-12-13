@@ -2816,8 +2816,8 @@ Vertraging: %2 ms</translation>
         <translation>Artwork-thema map kiezen</translation>
     </message>
     <message>
-        <source>Display volume as dbV </source>
-        <translation>Volume in dbV tonen </translation>
+        <source>Display volume as dBV </source>
+        <translation>Volume in dBV tonen </translation>
     </message>
     <message>
         <source>FL Studio installation directory</source>
@@ -3755,8 +3755,8 @@ De LED in de rechter benedenhoek van de golfvorm bewerker geeft aan of de snaar 
 <context>
     <name>volumeKnob</name>
     <message>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
-        <translation>Voer aub. een waarde tussen -96.0 dbV en 6.0 dbV in:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Voer aub. een waarde tussen -96.0 dBV en 6.0 dBV in:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>

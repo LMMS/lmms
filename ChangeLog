@@ -1,3 +1,7 @@
+2007-12-14	Paul Wayper <paulway/at/mabula/dot/net>
+
+	* Changed dbV to dBV throughout.
+
 2007-12-12	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* include/setup_dialog.h:

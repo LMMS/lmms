@@ -4368,8 +4368,8 @@ Si funciona amb altre programari VST sota Linux, per favor contacta amb un desen
     </message>
     <message>
         <location filename="../../src/core/setup_dialog.cpp" line="230"/>
-        <source>Display volume as dbV </source>
-        <translation>Mostra el volum en dbV</translation>
+        <source>Display volume as dBV </source>
+        <translation>Mostra el volum en dBV</translation>
     </message>
     <message>
         <location filename="../../src/core/setup_dialog.cpp" line="628"/>
@@ -5707,8 +5707,8 @@ El LED a la cantonada dreta baixa de l&apos;editor de forma d&apos;ona determina
     <name>volumeKnob</name>
     <message>
         <location filename="../../src/widgets/volume_knob.cpp" line="193"/>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
-        <translation>Per favor, introdueix un nou valor entre -96,0 dbV i 6,0 dbV:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Per favor, introdueix un nou valor entre -96,0 dBV i 6,0 dBV:</translation>
     </message>
     <message>
         <location filename="../../src/widgets/volume_knob.cpp" line="210"/>

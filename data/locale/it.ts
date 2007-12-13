@@ -2944,8 +2944,8 @@ LATENZA: %2 ms</translation>
         <translation>Non mostrare il messaggio dopo aver chiuso questa finestra</translation>
     </message>
     <message>
-        <source>Display volume as dbV </source>
-        <translation>Mostra il volume in dbV </translation>
+        <source>Display volume as dBV </source>
+        <translation>Mostra il volume in dBV </translation>
     </message>
     <message>
         <source>Directories</source>
@@ -3988,8 +3988,8 @@ Il LED nell&apos;angolo in basso a destra dell&apos;editor della forma d&apos;on
 <context>
     <name>volumeKnob</name>
     <message>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
-        <translation>Inserisci un nuovo valore tra -96.0 dbV e 6.0 dbV:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Inserisci un nuovo valore tra -96.0 dBV e 6.0 dBV:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
