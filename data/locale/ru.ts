@@ -3655,7 +3655,7 @@ Latency: %2 ms</source>
         <translation>Выбор каталога с темой оформления для LMMS</translation>
     </message>
     <message>
-        <source>Display volume as dbV </source>
+        <source>Display volume as dBV </source>
         <translation>Отображать громкости в децибелах (напр.) </translation>
     </message>
     <message>
@@ -4653,7 +4653,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
 <context>
     <name>volumeKnob</name>
     <message>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
         <translation>Введите новое значение между –96,0 дБ и 6,0 дБ (по напряжению):</translation>
     </message>
     <message>

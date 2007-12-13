@@ -2870,8 +2870,8 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>Visa inte meddelande efter stägandet av denna dialogen</translation>
     </message>
     <message>
-        <source>Display volume as dbV </source>
-        <translation>Visa volym i dbV</translation>
+        <source>Display volume as dBV </source>
+        <translation>Visa volym i dBV</translation>
     </message>
     <message>
         <source>Directories</source>
@@ -3876,8 +3876,8 @@ The LED in the lower right corner of the waveform editor determines whether the 
 <context>
     <name>volumeKnob</name>
     <message>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
-        <translation>Skriv in ett nytt värde mellan  -96.0 dbV och 6.0 dbV:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Skriv in ett nytt värde mellan  -96.0 dBV och 6.0 dBV:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>

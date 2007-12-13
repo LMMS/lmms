@@ -254,7 +254,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 				this, SLOT( toggleNoMsgAfterSetup( bool ) ) );
 
 
-	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dbV " ),
+	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dBV " ),
 							misc_tw, NULL, NULL );
 	dbv->move( 10, 108 );
 	dbv->setChecked( m_displaydBV );

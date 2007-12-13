@@ -2,7 +2,7 @@
 
 /*
  * volume_knob.cpp - defines a knob that display it's value as either a
- *                   percentage or in dbV.
+ *                   percentage or in dBV.
  *
  * Copyright (c) 2006-2007  Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
@@ -201,7 +201,7 @@ void volumeKnob::enterValue( void )
 #endif
 			accessibleName(),
 			tr( "Please enter a new value between "
-					"-96.0 dbV and 6.0 dbV:" ),
+					"-96.0 dBV and 6.0 dBV:" ),
 					20.0 * log10( value() / 100.0 ), 
 					-96.0, 6.0,
 					4, &ok

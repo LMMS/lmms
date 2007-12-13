@@ -3631,8 +3631,8 @@ Latenz: %2 ms</translation>
         <translation>Artwork-Verzeichnis wählen</translation>
     </message>
     <message>
-        <source>Display volume as dbV </source>
-        <translation>Lautstärke als in dbV anzeigen </translation>
+        <source>Display volume as dBV </source>
+        <translation>Lautstärke als in dBV anzeigen </translation>
     </message>
     <message>
         <source>FL Studio installation directory</source>
@@ -4608,8 +4608,8 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
 <context>
     <name>volumeKnob</name>
     <message>
-        <source>Please enter a new value between -96.0 dbV and 6.0 dbV:</source>
-        <translation>Bitte geben Sie einen Wert zwischen -96.0 dbV und 6.0 dbV ein:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Bitte geben Sie einen Wert zwischen -96.0 dBV und 6.0 dBV ein:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
