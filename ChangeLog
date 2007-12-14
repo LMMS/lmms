@@ -1,5 +1,15 @@
-2007-12-11	Paul Wayper <paulway/at/mabula/dot/net>
-	* Changed dbV to dBV throughout.
+2007-12-14	Paul Wayper <paulway/at/mabula/dot/net>
+
+	* include/volume_knob.h:
+	* src/widgets/volume_knob.cpp:
+	* src/core/setup_dialog.cpp:
+	* data/locale/nl.ts:
+	* data/locale/it.ts:
+	* data/locale/ca.ts:
+	* data/locale/ru.t:	
+	* data/locale/de.t:	
+	* data/locale/sv.t:	
+	Changed dbV to dBV throughout
 
 2007-12-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
