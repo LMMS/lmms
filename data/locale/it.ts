@@ -1997,9 +1997,9 @@ Assicurarsi di avere i permessi in scrittura per il file/periferica selezionato!
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation type="obsolete">Al momento non è disponibile l&apos;aiuto in LMMS.
-Si prega di visitare http://wiki.mindrules.net per la documentazione su LMMS.</translation>
+Si prega di visitare http://lmms.sourceforge.net/wiki/ per la documentazione su LMMS.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>
@@ -2194,9 +2194,9 @@ Si prega di visitare http://wiki.mindrules.net per la documentazione su LMMS.</t
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Al momento non è disponibile l&apos;aiuto in LMMS.
-Si prega di visitare http://wiki.mindrules.net per la documentazione su LMMS.</translation>
+Si prega di visitare http://lmms.sourceforge.net/wiki/ per la documentazione su LMMS.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>

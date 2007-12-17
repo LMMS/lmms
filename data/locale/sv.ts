@@ -1991,9 +1991,9 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>För tillfället finns det ingen aktuell hjälp i LMMS.
-Besök http://wiki.mindrules.net för dokumentation för LMMS.</translation>
+Besök http://lmms.sourceforge.net/wiki/ för dokumentation för LMMS.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>

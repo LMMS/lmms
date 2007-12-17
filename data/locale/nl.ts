@@ -1982,9 +1982,9 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor het geselecteerde bestand/appar
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Op dit moment is er nog geen hulp beschikbaar in LMMS.
-Bezoek http://wiki.mindrules.net voor documentatie over LMMS.</translation>
+Bezoek http://lmms.sourceforge.net/wiki/ voor documentatie over LMMS.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>

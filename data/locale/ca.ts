@@ -2311,9 +2311,9 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Actualment no hi ha ajuda disponible a LMMS.
-Per favor, visita http://wiki.mindrules.net per a documentació sobre LMMS.</translation>
+Per favor, visita http://lmms.sourceforge.net/wiki/ per a documentació sobre LMMS.</translation>
     </message>
     <message>
         <source>Show/hide Automation Editor</source>

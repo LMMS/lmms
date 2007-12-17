@@ -893,7 +893,7 @@ void mainWindow::help( void )
 				  tr( "Currently there's no help "
 						  "available in LMMS.\n"
 						  "Please visit "
-						  "http://wiki.mindrules.net "
+						  "http://lmms.sourceforge.net/wiki/ "
 						  "for documentation on LMMS." ),
 				  QMessageBox::Ok );
 }

@@ -2273,9 +2273,9 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Derzeit ist in LMMS keine Hilfe verfügbar.
-Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</translation>
+Bitte besuchen Sie http://lmms.sourceforge.net/wiki/ für Dokumentationen über LMMS.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>

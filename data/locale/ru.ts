@@ -2434,9 +2434,9 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Пока что справка для LMMS не написана.
-Вероятно, Вы сможете найти нужные материалы на http://wiki.mindrules.net.</translation>
+Вероятно, Вы сможете найти нужные материалы на http://lmms.sourceforge.net/wiki/.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>
