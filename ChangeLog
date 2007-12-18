@@ -1,3 +1,9 @@
+2007-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/midi_import/midi_import.cpp:
+	load Patman-plugin instead of TripleOsc and try to load patch
+	according to program-change-events
+
 2007-12-14	Paul Wayper <paulway/at/mabula/dot/net>
 
 	* include/volume_knob.h:
@@ -6,9 +12,9 @@
 	* data/locale/nl.ts:
 	* data/locale/it.ts:
 	* data/locale/ca.ts:
-	* data/locale/ru.t:	
-	* data/locale/de.t:	
-	* data/locale/sv.t:	
+	* data/locale/ru.ts:
+	* data/locale/de.ts:
+	* data/locale/sv.ts:
 	Changed dbV to dBV throughout
 
 2007-12-12	Javier Serrano Polo <jasp00/at/terra/dot/es>
