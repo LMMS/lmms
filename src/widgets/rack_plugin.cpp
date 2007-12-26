@@ -141,7 +141,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "run the risk of clipping the tail on delay effects." ) );
 
 	m_gate = new knob( knobBright_26, this, tr( "Gate" ), m_track );
-	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
+	connect( m_gate, SIGNAL( valueChanged( float ) ), 
 				this, SLOT( setGate( float ) ) );
 	m_gate->setLabel( tr( "Gate" ) );
 	m_gate->setRange( 0.0f, 1.0f, 0.01f );

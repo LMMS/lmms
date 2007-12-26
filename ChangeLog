@@ -1,3 +1,9 @@
+2007-12-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/rack_plugin.cpp:
+	fixed wrong signal-slot-connection which made gate-parameter of
+	effects not working
+
 2007-12-17	Paul Wayper <paulway/at/mabula/dot/net>
 
 	* src/core/main_window.cpp:
