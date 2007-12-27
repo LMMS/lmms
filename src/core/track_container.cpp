@@ -101,7 +101,7 @@ trackContainer::~trackContainer()
 
 	while( m_trackWidgets.size() )
 	{
-		removeTrack( m_trackWidgets.front()->getTrack() );
+		removeTrack( m_trackWidgets.last()->getTrack() );
 	}
 
 	engine::getProjectJournal()->setJournalling( TRUE );
@@ -324,7 +324,7 @@ void trackContainer::clearAllTracks( void )
 {
 	while( !m_trackWidgets.empty() )
 	{
-		removeTrack( m_trackWidgets.front()->getTrack() );
+		removeTrack( m_trackWidgets.last()->getTrack() );
 	}
 }
 
