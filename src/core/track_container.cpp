@@ -87,7 +87,7 @@ trackContainer::~trackContainer()
 {
 	while( !m_tracks.empty() )
 	{
-		delete m_tracks.takeFirst();
+		delete m_tracks.takeLast();
 	}
 }
 
@@ -281,7 +281,7 @@ void trackContainer::clearAllTracks( void )
 {
 	while( !m_tracks.empty() )
 	{
-		removeTrack( m_tracks.front() );
+		removeTrack( m_tracks.last() );
 	}
 }
 

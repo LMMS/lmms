@@ -1,3 +1,18 @@
+2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/rack_plugin.cpp:
+	fixed wrong signal-slot-connection which made gate-parameter of
+	effects not working
+
+	* src/core/track_container.cpp:
+	when removing tracks start removing at the end of track-vector (i.e.
+	use m_trackWidgets.last() instead of m_trackWidgets.first()) - speeds
+	up things *a lot*
+
+	* README:
+	* src/core/about_dialog.cpp:
+	fixed version and extended copyright from 2007 to 2008
+
 2007-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/midi_import/midi_import.cpp:
