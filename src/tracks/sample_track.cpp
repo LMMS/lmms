@@ -330,8 +330,11 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ) ) )
+	m_audioPort( new audioPort( tr( "Sample track" ) ) ),
+	m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1/*, this*/ )
 {
+	m_volumeModel.setTrack( this );
+
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new effectLabel( tr( "Sample track" ),
@@ -345,9 +348,8 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_trackLabel->show();
 
 	m_volumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-					    tr( "Channel volume" ), this );
-	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
+					    tr( "Channel volume" ) );
+	m_volumeKnob->setModel( &m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
 	m_volumeKnob->move( 4, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
@@ -405,11 +407,9 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 		if( !st->muted() )
 		{
 			samplePlayHandle * handle = new samplePlayHandle( st );
-			connect( m_volumeKnob, SIGNAL( valueChanged( float ) ),
-					handle, SLOT( setVolume( float ) ) );
-			handle->setVolume( m_volumeKnob->value() );
-//TODO: do we need sample tracks in BB editor?
-//			handle->setBBTrack( bb_track );
+			handle->setVolumeModel( &m_volumeModel );
+//TODO: check whether this works
+//			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
 			engine::getMixer()->addPlayHandle( handle );
@@ -440,7 +440,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #if 0
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 #endif
-	m_volumeKnob->saveSettings( _doc, _this, "vol" );
+	m_volumeModel.saveSettings( _doc, _this, "vol" );
 }
 
 
@@ -467,7 +467,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
 #endif
-	m_volumeKnob->loadSettings( _this, "vol" );
+	m_volumeModel.loadSettings( _this, "vol" );
 }
 
 

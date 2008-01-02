@@ -147,10 +147,6 @@ public:
 	// to be implemented by actual object
 	virtual QString nodeName( void ) const = 0;
 
-
-protected:
-	void addJournalEntry( const journalEntry & _je );
-
 	inline bool isJournalling( void ) const
 	{
 		return( m_journalling );
@@ -168,6 +164,10 @@ protected:
 		return( old_journalling );
 	}
 
+
+
+protected:
+	void addJournalEntry( const journalEntry & _je );
 
 	// to be implemented by sub-objects
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,

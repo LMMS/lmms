@@ -30,6 +30,7 @@
 #include <QtCore/QMutexLocker>
 
 #include "preset_preview_play_handle.h"
+#include "automatable_model_templates.h"
 #include "debug.h"
 #include "engine.h"
 #include "instrument_track.h"

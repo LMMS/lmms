@@ -22,12 +22,13 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
 #ifndef _RACK_PLUGIN_H
 #define _RACK_PLUGIN_H
 
 #include <QtGui/QWidget>
 
-#include "journalling_object.h"
+#include "automatable_model.h"
 
 
 class QGroupBox;
@@ -68,10 +69,10 @@ public:
 
 public slots:
 	void editControls( void );
-	void bypassed( bool _state );
-	void setWetDry( float _value );
-	void setAutoQuit( float _value );
-	void setGate( float _value );
+	void updateAutoQuit( void );
+/*	void bypassChanged( void );
+	void updateWetDry( void );
+	void updateGate( void );*/
 	void moveUp( void );
 	void moveDown( void );
 	void deletePlugin( void );
@@ -87,6 +88,8 @@ protected:
 	void contextMenuEvent( QContextMenuEvent * _me );
 	
 private:
+	floatModel m_autoQuitModel;
+
 	ledCheckBox * m_bypass;
 	knob * m_wetDry;
 	tempoSyncKnob * m_autoQuit;
@@ -95,7 +98,7 @@ private:
 	QGroupBox * m_controls;
 	QLabel * m_label;
 	QPushButton * m_editButton;
-	QMdiSubWindow *m_subWindow;
+	QMdiSubWindow * m_subWindow;
 	effect * m_effect;
 	effectControlDialog * m_controlView;
 	track * m_track;

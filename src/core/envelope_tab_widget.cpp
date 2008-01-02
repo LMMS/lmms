@@ -73,9 +73,12 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 
 envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	m_instrumentTrack( _instrument_track )
+	m_instrumentTrack( _instrument_track ),
+	m_filterEnabledModel( new boolModel( /* this */ ) ),
+	m_filterModel( new comboBoxModel( /* this */ ) ),
+	m_filterCutModel( new floatModel( /* this */ ) ),
+	m_filterResModel( new floatModel( /* this */ ) )
 {
-
 	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );
 	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
 						TARGETS_TABWIDGET_Y,
@@ -111,36 +114,38 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 						tr( targetNames[i][0]
 						.toAscii().constData() ) );
 	}
-	
-	
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this,
-							_instrument_track );
+
+
+	m_filterEnabledModel->setTrack( _instrument_track );
+	m_filterGroupBox = new groupBox( tr( "FILTER" ), this );
+	m_filterGroupBox->setModel( m_filterEnabledModel );
 	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
 						FILTER_GROUPBOX_WIDTH,
 						FILTER_GROUPBOX_HEIGHT );
 
-	m_filterComboBox = new comboBox( m_filterGroupBox, tr( "Filter type" ),
-							_instrument_track );
+
+	m_filterModel->addItem( tr( "LowPass" ), new QPixmap(
+					embed::getIconPixmap( "filter_lp" ) ) );
+	m_filterModel->addItem( tr( "HiPass" ), new QPixmap(
+					embed::getIconPixmap( "filter_hp" ) ) );
+	m_filterModel->addItem( tr( "BandPass csg" ), new QPixmap(
+					embed::getIconPixmap( "filter_bp" ) ) );
+	m_filterModel->addItem( tr( "BandPass czpg" ), new QPixmap(
+					embed::getIconPixmap( "filter_bp" ) ) );
+	m_filterModel->addItem( tr( "Notch" ), new QPixmap(
+				embed::getIconPixmap( "filter_notch" ) ) );
+	m_filterModel->addItem( tr( "Allpass" ), new QPixmap(
+					embed::getIconPixmap( "filter_ap" ) ) );
+	m_filterModel->addItem( tr( "Moog" ), new QPixmap(
+					embed::getIconPixmap( "filter_lp" ) ) );
+	m_filterModel->addItem( tr( "2x LowPass" ), new QPixmap(
+					embed::getIconPixmap( "filter_2lp" ) ) );
+
+	m_filterModel->setTrack( _instrument_track );
+	m_filterComboBox = new comboBox( m_filterGroupBox, tr( "Filter type" ) );
+	m_filterComboBox->setModel( m_filterModel );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
-
-
-	m_filterComboBox->addItem( tr( "LowPass" ),
-					embed::getIconPixmap( "filter_lp" ) );
-	m_filterComboBox->addItem( tr( "HiPass" ),
-					embed::getIconPixmap( "filter_hp" ) );
-	m_filterComboBox->addItem( tr( "BandPass csg" ),
-					embed::getIconPixmap( "filter_bp" ) );
-	m_filterComboBox->addItem( tr( "BandPass czpg" ),
-					embed::getIconPixmap( "filter_bp" ) );
-	m_filterComboBox->addItem( tr( "Notch" ),
-				embed::getIconPixmap( "filter_notch" ) );
-	m_filterComboBox->addItem( tr( "Allpass" ),
-					embed::getIconPixmap( "filter_ap" ) );
-	m_filterComboBox->addItem( tr( "Moog" ),
-					embed::getIconPixmap( "filter_lp" ) );
-	m_filterComboBox->addItem( tr( "2x LowPass" ),
-					embed::getIconPixmap( "filter_2lp" ) );
 
 	m_filterComboBox->setWhatsThis(
 		tr( "Here you can select the built-in filter you want to use "
@@ -148,13 +153,15 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 			"for changing the characteristics of a sound." ) );
 
 
+	m_filterCutModel->setTrack( _instrument_track );
+	m_filterCutModel->setRange( 0.0, 14000.0, 1.0 );
+	m_filterCutModel->setInitValue( 16000.0 );
+
 	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox,
-						tr( "cutoff-frequency" ),
-						_instrument_track );
+						tr( "cutoff-frequency" ) );
+	m_filterCutKnob->setModel( m_filterCutModel );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
-	m_filterCutKnob->setRange( 0.0, 14000.0, 1.0 );
 	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setInitValue( 16000.0 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
 								tr( "Hz" ) );
 	m_filterCutKnob->setWhatsThis(
@@ -165,13 +172,17 @@ envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 			"the cutoff-frequency. A highpass-filter cuts all "
 			"frequencies below cutoff-frequency and so on..." ) );
 
+
+
+	m_filterResModel->setTrack( _instrument_track );
+	m_filterResModel->setRange( basicFilters<>::minQ(), 10.0, 0.01 );
+	m_filterResModel->setInitValue( 0.5 );
+
 	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox,
-							tr( "Q/Resonance" ),
-							_instrument_track );
+							tr( "Q/Resonance" ) );
+	m_filterResKnob->setModel( m_filterResModel );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->setRange( basicFilters<>::minQ(), 10.0, 0.01 );
 	m_filterResKnob->move( 190, 18 );
-	m_filterResKnob->setInitValue( 0.5 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
 	m_filterResKnob->setWhatsThis(
 		tr( "Use this knob for setting Q/Resonance for the selected "
@@ -233,7 +244,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 	// only use filter, if it is really needed
 
-	if( m_filterGroupBox->isActive() )
+	if( m_filterEnabledModel->value() )
 	{
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
@@ -429,10 +440,10 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 
 void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	m_filterComboBox->saveSettings( _doc, _this, "ftype" );
-	m_filterCutKnob->saveSettings( _doc, _this, "fcut" );
-	m_filterResKnob->saveSettings( _doc, _this, "fres" );
-	m_filterGroupBox->saveSettings( _doc, _this, "fwet" );
+	m_filterModel->saveSettings( _doc, _this, "ftype" );
+	m_filterCutModel->saveSettings( _doc, _this, "fcut" );
+	m_filterResModel->saveSettings( _doc, _this, "fres" );
+	m_filterEnabledModel->saveSettings( _doc, _this, "fwet" );
 
 	for( int i = 0; i < TARGET_COUNT; ++i )
 	{
@@ -447,10 +458,10 @@ void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void envelopeTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_filterComboBox->loadSettings( _this, "ftype" );
-	m_filterCutKnob->loadSettings( _this, "fcut" );
-	m_filterResKnob->loadSettings( _this, "fres" );
-	m_filterGroupBox->loadSettings( _this, "fwet" );
+	m_filterModel->loadSettings( _this, "ftype" );
+	m_filterCutModel->loadSettings( _this, "fcut" );
+	m_filterResModel->loadSettings( _this, "fres" );
+	m_filterEnabledModel->loadSettings( _this, "fwet" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )

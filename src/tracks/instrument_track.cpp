@@ -44,6 +44,7 @@
 
 #include "arp_and_chords_tab_widget.h"
 #include "audio_port.h"
+#include "automatable_model_templates.h"
 #include "automation_pattern.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -56,7 +57,6 @@
 #include "fade_button.h"
 #include "gui_templates.h"
 #include "instrument.h"
-#include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "main_window.h"
 #include "midi_client.h"
@@ -69,7 +69,6 @@
 #include "sample_play_handle.h"
 #include "song_editor.h"
 #include "string_pair_drag.h"
-#include "surround_area.h"
 #include "tab_widget.h"
 #include "tooltip.h"
 #include "volume_knob.h"
@@ -103,12 +102,26 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( new audioPort( tr( "unnamed_channel" ) ) ),
 	m_notes(),
-	m_baseTone( A ),
-	m_baseOctave( OCTAVE_4 ),
+	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1/* this */ ),
+        m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
+							1.0f /* this */ ),
+        m_surroundAreaModel( NULL /* this */, this ),
+        m_effectChannelModel( DEFAULT_EFFECT_CHANNEL,
+					MIN_EFFECT_CHANNEL, MAX_EFFECT_CHANNEL
+								 /* this */ ),
 	m_instrument( NULL ),
 	m_midiInputAction( NULL ),
 	m_midiOutputAction( NULL )
 {
+	m_baseNoteModel.setTrack( this );
+	m_baseNoteModel.setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
+	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
+					this, SLOT( updateBaseNote() ) );
+
+	m_volumeModel.setTrack( this );
+	m_effectChannelModel.setTrack( this );
+
+
 	for( int i = 0; i < NOTES; ++i )
 	{
 		m_notes[i] = NULL;
@@ -122,15 +135,12 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// creation of widgets for track-settings-widget
 	m_tswVolumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-						tr( "Channel volume" ), this );
-	m_tswVolumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-	m_tswVolumeKnob->setInitValue( DEFAULT_VOLUME );
+							tr( "Channel volume" ) );
+	m_tswVolumeKnob->setModel( &m_volumeModel );
 	m_tswVolumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
 	m_tswVolumeKnob->move( 4, 4 );
 	m_tswVolumeKnob->setLabel( tr( "VOL" ) );
 	m_tswVolumeKnob->show();
-/*	connect( m_tswVolumeKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( volValueChanged( float ) ) );*/
 	m_tswVolumeKnob->setWhatsThis( tr( volume_help ) );
 
 	QPushButton * tsw_midi = new QPushButton(
@@ -184,39 +194,28 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 	// setup volume-knob
 	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
-						tr( "Channel volume" ), this );
+						tr( "Channel volume" ) );
+	m_volumeKnob->setModel( &m_volumeModel );
 	m_volumeKnob->move( 10, 44 );
-	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOLUME" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
-/*	connect( m_volumeKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( volValueChanged( float ) ) );*/
-	volumeKnob::linkObjects( m_tswVolumeKnob, m_volumeKnob );
+	//volumeKnob::linkObjects( m_tswVolumeKnob, m_volumeKnob );
 
 
 	// setup surround-area
 	m_surroundArea = new surroundArea( m_generalSettingsWidget,
-						tr( "Surround area" ), this );
+							tr( "Surround area" ) );
+	m_surroundArea->setModel( &m_surroundAreaModel );
 	m_surroundArea->move( 20 + m_volumeKnob->width(), 38 );
 	m_surroundArea->show();
 	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
 
-	connect( m_surroundArea, SIGNAL( valueChanged( const QPoint & ) ),
-			this,
-			SLOT( surroundAreaPosChanged( const QPoint & ) ) );
-
-
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new lcdSpinBox( MIN_EFFECT_CHANNEL,
-						MAX_EFFECT_CHANNEL, 2,
-						m_generalSettingsWidget,
-						tr( "FX channel" ),
-						this );
-	m_effectChannelNumber->setInitValue( DEFAULT_EFFECT_CHANNEL );
+	m_effectChannelNumber = new lcdSpinBox( 2, m_generalSettingsWidget,
+						tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
 	m_effectChannelNumber->move( m_surroundArea->x() +
 					m_surroundArea->width() + 16, 40 );
@@ -238,8 +237,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 			"double-clicking it in the preset-browser." ) );
 
 
-	setVolume( DEFAULT_VOLUME );
-	setSurroundAreaPos( QPoint() );
 	setName( tr( "Default" ) );
 
 
@@ -416,9 +413,9 @@ void instrumentTrack::midiOutSelected( void )
 void instrumentTrack::midiConfigChanged( bool )
 {
 	m_midiInputAction->setChecked(
-				m_midiWidget->m_receiveCheckBox->isChecked() );
+				m_midiWidget->m_receiveCheckBox->model()->value() );
 	m_midiOutputAction->setChecked(
-				m_midiWidget->m_sendCheckBox->isChecked() );
+				m_midiWidget->m_sendCheckBox->model()->value() );
 }
 
 
@@ -462,44 +459,12 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		m_envWidget->processAudioBuffer( _buf, _frames, _n );
 		v_scale *= ( (float) _n->getVolume() / DEFAULT_VOLUME );
-/*		const fpp_t ENV_FRAMES = 10;
-		if( _n->totalFramesPlayed() == 0 )
-		{
-			// very basic envelope for not having clicks at the
-			// beginning
-			const fpp_t frames = tMin<fpp_t>( _frames,
-								ENV_FRAMES );
-			for( fpp_t i = 0; i < frames; ++i )
-			{
-				for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS;
-									++ch )
-				{
-					_buf[i][ch] *= (float) i / frames;
-				}
-			}
-		}
-
-		// last time we're called for current note?
-		if( _n->willFinishThisPeriod() )
-		{
-			// then do a soft fade-out at the end to avoid clicks
-			for( fpp_t i = ( _frames >= ENV_FRAMES ) ?
-						_frames - ENV_FRAMES : 0;
-							i < _frames; ++i )
-			{
-				for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS;
-									++ch )
-				{
-					_buf[i][ch] *= (float) ( _frames-i-1 ) /
-								ENV_FRAMES;
-				}
-			}
-		}*/
 	}
-	volumeVector v = m_surroundArea->getVolumeVector( v_scale );
+	volumeVector v = m_surroundArea->model()->getVolumeVector( v_scale );
 
 	engine::getMixer()->bufferToPort( _buf,
-		( _n != NULL ) ? tMin<f_cnt_t>( _n->framesLeftForCurrentPeriod(), _frames ) : _frames,
+		( _n != NULL ) ? tMin<f_cnt_t>( _n->framesLeftForCurrentPeriod(), _frames ) :
+											_frames,
 			( _n != NULL ) ? _n->offset() : 0, v, m_audioPort );
 }
 
@@ -683,8 +648,6 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 				{
 					processInEvent( midiEvent( NOTE_OFF, 0,
 						_n->key(), 0 ), midiTime() );
-					//printf("%d\n",( *youngest_note )->offset()+m_instrument->desiredTransitionFrames());
-					//_n->noteOff( ( *youngest_note )->offset()+m_instrument->desiredTransitionFrames() );
 					if( ( *youngest_note )->offset() >
 								_n->offset() )
 					{
@@ -792,80 +755,22 @@ void instrumentTrack::setName( const QString & _new_name )
 
 
 
-void instrumentTrack::setVolume( volume _new_volume )
-{
-	if( _new_volume <= MAX_VOLUME )
-	{
-		m_volumeKnob->setValue( _new_volume );
-		//m_tswVolumeKnob->setValue( _new_volume );
-	}
-}
 
 
-
-
-volume instrumentTrack::getVolume( void ) const
-{
-	return( static_cast<volume>( m_volumeKnob->value() ) );
-}
-
-
-
-
-void instrumentTrack::setSurroundAreaPos( const QPoint & _p )
-{
-	if( m_surroundArea->value() != _p )
-	{
-		m_surroundArea->setValue( _p );
-	}
-/*	if( m_tswSurroundArea->value() != _p )
-	{
-		m_tswSurroundArea->setValue( _p );
-	}*/
-}
-
-
-
-
-void instrumentTrack::setBaseNote( Uint32 _new_note, bool _modified )
+void instrumentTrack::updateBaseNote( /* bool _modified*/ void )
 {
 	engine::getMixer()->lock();
-	setBaseTone( (tones)( _new_note % NOTES_PER_OCTAVE ) );
-	setBaseOctave( (octaves)( _new_note / NOTES_PER_OCTAVE ) );
-
 	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->updateFrequency();
 	}
 	engine::getMixer()->unlock();
-
+/*
 	if( _modified )
 	{
 		engine::getSongEditor()->setModified();
-	}
-}
-
-
-
-
-void instrumentTrack::setBaseTone( tones _new_tone )
-{
-	if( _new_tone >= C && _new_tone <= H )
-	{
-		m_baseTone = _new_tone;
-	}
-}
-
-
-
-
-void instrumentTrack::setBaseOctave( octaves _new_octave )
-{
-	if( _new_octave >= MIN_OCTAVE && _new_octave <= MAX_OCTAVE )
-	{
-		m_baseOctave = _new_octave;
-	}
+	}*/
 }
 
 
@@ -873,7 +778,7 @@ void instrumentTrack::setBaseOctave( octaves _new_octave )
 
 int instrumentTrack::masterKey( notePlayHandle * _n ) const
 {
-	int key = baseTone() + baseOctave() * NOTES_PER_OCTAVE +
+	int key = m_baseNoteModel.value() +
 					engine::getSongEditor()->masterPitch();
 	return( tLimit<int>( _n->key() -
 		( key - A - DEFAULT_OCTAVE * NOTES_PER_OCTAVE ), 0, NOTES ) );
@@ -1047,12 +952,12 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", name() );
-	m_volumeKnob->saveSettings( _doc, _this, "vol" );
+	m_volumeModel.saveSettings( _doc, _this, "vol" );
 
-	m_surroundArea->saveSettings( _doc, _this, "surpos" );
+	m_surroundAreaModel.saveSettings( _doc, _this, "surpos" );
 
-	m_effectChannelNumber->saveSettings( _doc, _this, "fxch" );
-	m_pianoWidget->saveSettings( _doc, _this, "basenote" );
+	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
+	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
 	_this.setAttribute( "tab", m_tabWidget->activeTab() );
 
 	mainWindow::saveWidgetState( this, _this );
@@ -1076,12 +981,24 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 	engine::getMixer()->lock();
 	setName( _this.attribute( "name" ) );
-	m_volumeKnob->loadSettings( _this, "vol" );
+	m_volumeModel.loadSettings( _this, "vol" );
 
-	m_surroundArea->loadSettings( _this, "surpos" );
+	m_surroundAreaModel.loadSettings( _this, "surpos" );
 
-	m_effectChannelNumber->loadSettings( _this, "fxch" );
-	m_pianoWidget->loadSettings( _this, "basenote" );
+	m_effectChannelModel.loadSettings( _this, "fxch" );
+
+	if( _this.hasAttribute( "baseoct" ) )
+	{
+		// TODO: move this compat code to mmp.cpp -> upgrade()
+		m_baseNoteModel.setInitValue( _this.attribute( "baseoct" ).toInt()
+				* NOTES_PER_OCTAVE
+				+ _this.attribute( "basetone" ).toInt() );
+	}
+	else
+	{
+		m_baseNoteModel.loadSettings( _this, "basenote" );
+	}
+
 	int tab = _this.attribute( "tab" ).toInt();
 
 	bool had_fx = FALSE;
@@ -1164,23 +1081,6 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 	m_tswInstrumentTrackButton->update();
 
 	return( m_instrument );
-}
-
-
-
-
-/*void instrumentTrack::volValueChanged( float _new_value )
-{
-	setVolume( (volume) _new_value );
-}*/
-
-
-
-
-void instrumentTrack::surroundAreaPosChanged( const QPoint & _p )
-{
-	setSurroundAreaPos( _p );
-	engine::getSongEditor()->setModified();
 }
 
 

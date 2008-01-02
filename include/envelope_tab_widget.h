@@ -31,10 +31,12 @@
 #include <QtGui/QWidget>
 
 #include "mixer.h"
+#include "automatable_model.h"
 
 
 class QLabel;
 
+class comboBoxModel;
 class instrumentTrack;
 class comboBox;
 class envelopeAndLFOWidget;
@@ -91,6 +93,11 @@ private:
 	comboBox * m_filterComboBox;
 	knob * m_filterCutKnob;
 	knob * m_filterResKnob;
+
+	boolModel * m_filterEnabledModel;
+	comboBoxModel * m_filterModel;
+	floatModel * m_filterCutModel;
+	floatModel * m_filterResModel;
 
 	friend class flpImport;
 

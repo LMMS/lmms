@@ -36,6 +36,7 @@
 #include <QtGui/QWheelEvent>
 
 
+#include "automatable_model_templates.h"
 #include "bb_track.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -87,7 +88,7 @@ trackContainer::~trackContainer()
 {
 	while( !m_tracks.empty() )
 	{
-		delete m_tracks.takeFirst();
+		delete m_tracks.takeLast();
 	}
 }
 
@@ -281,7 +282,7 @@ void trackContainer::clearAllTracks( void )
 {
 	while( !m_tracks.empty() )
 	{
-		removeTrack( m_tracks.front() );
+		removeTrack( m_tracks.last() );
 	}
 }
 

@@ -1,7 +1,7 @@
 /*
- * pixmap_button.h - declaration of class pixmapButton
+ * mv_base.cpp - base for M/V-architecture of LMMS
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,41 +22,43 @@
  *
  */
 
+#include <assert.h>
 
-#ifndef _PIXMAP_BUTTON_H
-#define _PIXMAP_BUTTON_H
-
-#include <QtGui/QPixmap>
-
-#include "automatable_button.h"
+#include <QtGui/QWidget>
 
 
-class pixmapButton : public automatableButton
+#include "mv_base.h"
+
+
+void modelView::setModel( model * _model, bool _old_model_valid )
 {
-	Q_OBJECT
-public:
-	pixmapButton( QWidget * _parent, const QString & _name );
-	virtual ~pixmapButton();
+	QWidget * w = dynamic_cast<QWidget *>( this );
+	assert( w != NULL );
 
-	void setActiveGraphic( const QPixmap & _pm );
-	void setInactiveGraphic( const QPixmap & _pm, bool _update = TRUE );
+	if( _old_model_valid && m_model != NULL )
+	{
+		if( m_model->defaultConstructed() )
+		{
+			delete m_model;
+		}
+		else
+		{
+			m_model->disconnect( w );
+		}
+	}
+
+	m_model = _model;
+	QObject::connect( _model, SIGNAL( dataChanged() ),
+						w, SLOT( update() ) );
+	QObject::connect( _model, SIGNAL( propertiesChanged() ),
+						w, SLOT( update() ) );
+
+	w->update();
+
+	modelChanged();
+}
 
 
-signals:
-	void doubleClicked( void );
-	void clickedRight( void );
 
+#include "mv_base.moc"
 
-protected:
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-
-
-private:
-	QPixmap m_activePixmap;
-	QPixmap m_inactivePixmap;
-
-} ;
-
-#endif

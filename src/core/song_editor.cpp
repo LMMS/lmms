@@ -49,7 +49,6 @@
 #include <QtGui/QStatusBar>
 
 
-#include "automatable_object_templates.h"
 #include "automatable_slider.h"
 #include "bb_editor.h"
 #include "bb_track.h"
@@ -82,6 +81,10 @@
 
 
 songEditor::songEditor( void ) :
+	m_automationTrack( track::create( track::AUTOMATION_TRACK, this ) ),
+	m_tempoModel( DEFAULT_BPM, MIN_BPM, MAX_BPM ),
+	m_masterVolumeModel( 100, 0, 200, 1 ),
+	m_masterPitchModel( 0, -12, 12, 1 ),
 	m_fileName( "" ),
 	m_oldFileName( "" ),
 	m_exporting( FALSE ),
@@ -111,23 +114,24 @@ songEditor::songEditor( void ) :
 	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
-	m_automation_track = track::create( track::AUTOMATION_TRACK, this );
 
 	// add some essential widgets to global tool-bar 
 	QWidget * tb = engine::getMainWindow()->toolBar();
 
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
-	m_bpmSpinBox = new lcdSpinBox( MIN_BPM, MAX_BPM, 3, tb, tr( "Tempo" ),
-							m_automation_track );
-	m_bpmSpinBox->setLabel( tr( "TEMPO/BPM" ) );
-	connect( m_bpmSpinBox, SIGNAL( valueChanged( int ) ), this,
-						SLOT( setTempo( int ) ) );
-	connect( m_bpmSpinBox, SIGNAL( manualChange() ), this,
-						SLOT( setModified() ) );
-	toolTip::add( m_bpmSpinBox, tr( "tempo of song" ) );
+	m_tempoModel.setTrack( m_automationTrack );
+	m_tempoSpinBox = new lcdSpinBox( 3, tb, tr( "Tempo" ) );
+	m_tempoSpinBox->setModel( &m_tempoModel );
+	m_tempoSpinBox->setLabel( tr( "TEMPO/BPM" ) );
+	toolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );
 
-	m_bpmSpinBox->setWhatsThis(
+	connect( &m_tempoModel, SIGNAL( dataChanged() ),
+						this, SLOT( setTempo() ) );
+	connect( m_tempoSpinBox, SIGNAL( manualChange() ), this,
+						SLOT( setModified() ) );
+
+	m_tempoSpinBox->setWhatsThis(
 		tr( "The tempo of a song is specified in beats per minute "
 			"(BPM). If you want to change the tempo of your "
 			"song, change this value. Every tact has four beats, "
@@ -135,7 +139,7 @@ songEditor::songEditor( void ) :
 			"should be played within a minute (or how many tacts "
 			"should be played within four minutes)." ) );
 
-	int col = engine::getMainWindow()->addWidgetToToolBar( m_bpmSpinBox,
+	int col = engine::getMainWindow()->addWidgetToToolBar( m_tempoSpinBox,
 									0 );
 
 
@@ -169,12 +173,11 @@ songEditor::songEditor( void ) :
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	m_masterVolumeSlider = new automatableSlider( tb, tr( "Master volume" ),
-							m_automation_track );
+	m_masterVolumeModel.setTrack( m_automationTrack );
+	m_masterVolumeSlider = new automatableSlider( tb, tr( "Master volume" ) );
+	m_masterVolumeSlider->setModel( &m_masterVolumeModel );
 	m_masterVolumeSlider->setOrientation( Qt::Vertical );
-	m_masterVolumeSlider->setRange( 0, 200 );
 	m_masterVolumeSlider->setPageStep( 1 );
-	m_masterVolumeSlider->setInitValue( 100 );
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
@@ -199,16 +202,16 @@ songEditor::songEditor( void ) :
 
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
+
 	QLabel * master_pitch_lbl = new QLabel( tb );
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 	master_pitch_lbl->setFixedHeight( 64 );
 
-	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ),
-							m_automation_track );
+	m_masterPitchModel.setTrack( m_automationTrack );
+	m_masterPitchSlider = new automatableSlider( tb, tr( "Master pitch" ) );
+	m_masterPitchSlider->setModel( &m_masterPitchModel );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
-	m_masterPitchSlider->setRange( -12, 12 );
 	m_masterPitchSlider->setPageStep( 1 );
-	m_masterPitchSlider->setInitValue( 0 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
@@ -330,17 +333,18 @@ songEditor::songEditor( void ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_zoomingComboBox = new comboBox( m_toolBar );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_zoomingComboBox->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingComboBox->model()->addItem(
+					QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingComboBox->setInitValue( m_zoomingComboBox->findText(
-								"100%" ) );
-	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingChanged( const QString & ) ) );
+	m_zoomingComboBox->model()->setInitValue(
+			m_zoomingComboBox->model()->findText( "100%" ) );
+	connect( m_zoomingComboBox->model(), SIGNAL( dataChanged() ),
+					this, SLOT( zoomingChanged( void ) ) );
 
 
 	tb_layout->addSpacing( 5 );
@@ -399,7 +403,7 @@ songEditor::songEditor( void ) :
 songEditor::~songEditor()
 {
 	m_playing = FALSE;
-	delete m_automation_track;
+	delete m_automationTrack;
 }
 
 
@@ -496,10 +500,12 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 			setPixelsPerTact( (int) pixelsPerTact() / 2 );
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->setValue(
-				m_zoomingComboBox->findText( QString::number(
+		m_zoomingComboBox->model()->setValue(
+			m_zoomingComboBox->model()->findText(
+				QString::number(
 					static_cast<int>( pixelsPerTact() *
-				100 / DEFAULT_PIXELS_PER_TACT ) ) + "%" ) );
+					100 / DEFAULT_PIXELS_PER_TACT ) ) +
+									"%" ) );
 		// update timeline
 		m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact(
 							pixelsPerTact() );
@@ -549,7 +555,7 @@ void songEditor::masterVolumePressed( void )
 							QPoint( 0, 0 ) ) +
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 	m_mvsStatus->show();
-	masterVolumeMoved( m_masterVolumeSlider->logicValue() );
+	masterVolumeMoved( m_masterVolumeModel.value() );
 }
 
 
@@ -597,7 +603,7 @@ void songEditor::masterPitchPressed( void )
 							QPoint( 0, 0 ) ) +
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
-	masterPitchMoved( m_masterPitchSlider->logicValue() );
+	masterPitchMoved( m_masterPitchModel.value() );
 }
 
 
@@ -644,9 +650,10 @@ void songEditor::updatePosition( const midiTime & _t )
 
 
 
-void songEditor::zoomingChanged( const QString & _zfac )
+void songEditor::zoomingChanged( void )
 {
-	setPixelsPerTact( _zfac.left( _zfac.length() - 1 ).toInt() *
+	const QString & zfac = m_zoomingComboBox->model()->currentText();
+	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
 					DEFAULT_PIXELS_PER_TACT / 100 );
 	m_playPos[PLAY_SONG].m_timeLine->setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
@@ -655,8 +662,9 @@ void songEditor::zoomingChanged( const QString & _zfac )
 
 
 
-void songEditor::setTempo( int _new_bpm )
+void songEditor::setTempo( void )
 {
+	const bpm_t tempo = m_tempoModel.value();
 	playHandleVector & phv = engine::getMixer()->playHandles();
 	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
 									++it )
@@ -664,37 +672,13 @@ void songEditor::setTempo( int _new_bpm )
 		notePlayHandle * nph = dynamic_cast<notePlayHandle *>( *it );
 		if( nph && !nph->released() )
 		{
-			nph->resize( _new_bpm );
+			nph->resize( tempo );
 		}
 	}
 
-	m_bpmSpinBox->setInitValue( _new_bpm );
+//	m_bpmSpinBox->setInitValue( _new_bpm );
 	engine::updateFramesPerTact64th();
-	emit tempoChanged( _new_bpm );
-}
-
-
-
-
-void songEditor::setMasterVolume( volume _vol )
-{
-	m_masterVolumeSlider->setInitValue( _vol );
-}
-
-
-
-
-void songEditor::setMasterPitch( int _master_pitch )
-{
-	m_masterPitchSlider->setInitValue( _master_pitch );
-}
-
-
-
-
-int songEditor::masterPitch( void ) const
-{
-	return( m_masterPitchSlider->logicValue() );
+	emit tempoChanged( tempo );
 }
 
 
@@ -985,7 +969,7 @@ void songEditor::processNextBuffer( void )
 		{
 			if( m_playMode == PLAY_SONG )
 			{
-				m_automation_track->play( m_playPos[m_playMode],
+				m_automationTrack->play( m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}
@@ -1236,7 +1220,7 @@ void songEditor::addSampleTrack( void )
 
 bpm_t songEditor::getTempo( void )
 {
-	return( m_bpmSpinBox->value() );
+	return( m_tempoModel.value() );
 }
 
 
@@ -1244,7 +1228,7 @@ bpm_t songEditor::getTempo( void )
 
 automationPattern * songEditor::tempoAutomationPattern( void )
 {
-	return( m_bpmSpinBox->getAutomationPattern() );
+	return( m_tempoModel.getAutomationPattern() );
 }
 
 
@@ -1263,9 +1247,9 @@ void songEditor::clearProject( void )
 	clearAllTracks();
 
 	engine::getAutomationEditor()->setCurrentPattern( NULL );
-	m_bpmSpinBox->getAutomationPattern()->clear();
-	m_masterVolumeSlider->clearAutomationValues();
-	m_masterPitchSlider->clearAutomationValues();
+	m_tempoModel.getAutomationPattern()->clear();
+	m_masterVolumeModel.getAutomationPattern()->clear();
+	m_masterPitchModel.getAutomationPattern()->clear();
 
 	engine::getBBEditor()->clearAllTracks();
 	engine::getMixer()->unlock();
@@ -1321,9 +1305,9 @@ void songEditor::createNewProject( void )
 						"tripleoscillator" );
 	track::create( track::BB_TRACK, this );
 
-	m_bpmSpinBox->setInitValue( DEFAULT_BPM );
-	m_masterVolumeSlider->setInitValue( 100 );
-	m_masterPitchSlider->setInitValue( 0 );
+	m_tempoModel.setInitValue( DEFAULT_BPM );
+	m_masterVolumeModel.setInitValue( 100 );
+	m_masterPitchModel.setInitValue( 0 );
 
 	engine::getProjectJournal()->setJournalling( TRUE );
 
@@ -1369,9 +1353,9 @@ void FASTCALL songEditor::loadProject( const QString & _file_name )
 	engine::getMainWindow()->resetWindowTitle();
 
 	// get the header information from the DOM
-	m_bpmSpinBox->loadSettings( mmp.head(), "bpm" );
-	m_masterVolumeSlider->loadSettings( mmp.head(), "mastervol" );
-	m_masterPitchSlider->loadSettings( mmp.head(), "masterpitch" );
+	m_tempoModel.loadSettings( mmp.head(), "bpm" );
+	m_masterVolumeModel.loadSettings( mmp.head(), "mastervol" );
+	m_masterPitchModel.loadSettings( mmp.head(), "masterpitch" );
 
 	// reset loop-point-state
 	m_playPos[PLAY_SONG].m_timeLine->toggleLoopPoints( 0 );
@@ -1432,9 +1416,9 @@ bool songEditor::saveProject( void )
 {
 	multimediaProject mmp( multimediaProject::SONG_PROJECT );
 
-	m_bpmSpinBox->saveSettings( mmp, mmp.head(), "bpm" );
-	m_masterVolumeSlider->saveSettings( mmp, mmp.head(), "mastervol" );
-	m_masterPitchSlider->saveSettings( mmp, mmp.head(), "masterpitch" );
+	m_tempoModel.saveSettings( mmp, mmp.head(), "bpm" );
+	m_masterVolumeModel.saveSettings( mmp, mmp.head(), "mastervol" );
+	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
 
 
 	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );

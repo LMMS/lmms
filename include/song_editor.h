@@ -28,14 +28,14 @@
 #define _SONG_EDITOR_H
 
 #include "track_container.h"
+#include "lcd_spinbox.h"
+#include "automatable_slider.h"
 
 
 class QLabel;
 class QScrollBar;
 
-class automatableSlider;
 class comboBox;
-class lcdSpinBox;
 class pattern;
 class textFloat;
 class timeLine;
@@ -51,6 +51,8 @@ const Uint16 MAX_SONG_LENGTH = 9999;
 class songEditor : public trackContainer
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,masterPitch,setMasterPitch,m_masterPitchModel);
+	mapPropertyFromModel(int,masterVolume,setMasterVolume,m_masterVolumeModel);
 public:
 	enum playModes
 	{
@@ -154,8 +156,6 @@ public:
 		return( FALSE );
 	}
 
-	int masterPitch( void ) const;
-
 
 public slots:
 	void play( void );
@@ -172,10 +172,6 @@ public slots:
 	void startExport( void );
 	void stopExport( void );
 
-	// set tempo in BPM (beats per minute)
-	void setTempo( int _new_bpm = DEFAULT_BPM );
-	void setMasterVolume( volume _vol );
-	void setMasterPitch( int _master_pitch );
 
 	void setModified( void );
 
@@ -198,6 +194,8 @@ protected slots:
 	void scrolled( int _new_pos );
 	void updateTimeLinePosition( void );
 
+	void setTempo( void );
+
 	void masterVolumeChanged( int _new_val );
 	void masterVolumePressed( void );
 	void masterVolumeMoved( int _new_val );
@@ -209,7 +207,7 @@ protected slots:
 
 	void updatePosition( const midiTime & _t );
 
-	void zoomingChanged( const QString & _zfac );
+	void zoomingChanged( void );
 
 	void doActions( void );
 
@@ -235,16 +233,22 @@ private:
 
 
 
+	track * m_automationTrack;
+
 	QScrollBar * m_leftRightScroll;
 
 	QWidget * m_toolBar;
 
 	toolButton * m_playButton;
 	toolButton * m_stopButton;
-	lcdSpinBox * m_bpmSpinBox;
+	lcdSpinBox * m_tempoSpinBox;
+	lcdSpinBoxModel m_tempoModel;
 
 	automatableSlider * m_masterVolumeSlider;
 	automatableSlider * m_masterPitchSlider;
+	sliderModel m_masterVolumeModel;
+	sliderModel m_masterPitchModel;
+
 	textFloat * m_mvsStatus;
 	textFloat * m_mpsStatus;
 
@@ -274,8 +278,6 @@ private:
 	bool m_loopPattern;
 
 	bool m_scrollBack;
-
-	track * m_automation_track;
 
 
 

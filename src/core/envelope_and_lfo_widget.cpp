@@ -48,6 +48,7 @@
 #include "tempo_sync_knob.h"
 #include "text_float.h"
 #include "tooltip.h"
+#include "automatable_model_templates.h"
 
 
 
@@ -97,13 +98,26 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 							track * _track ) :
 	QWidget( _parent ),
 	m_used( FALSE ),
+	m_predelayModel(),
+	m_attackModel(),
+	m_holdModel(),
+	m_decayModel(),
+	m_sustainModel(),
+	m_releaseModel(),
+	m_amountModel(),
+	m_lfoPredelayModel(),
+	m_lfoAttackModel(),
+	m_lfoSpeedModel(),
+	m_lfoAmountModel(),
+	m_lfoWaveModel(),
+	m_x100Model( FALSE, FALSE, TRUE ),
+	m_controlEnvAmountModel( FALSE, FALSE, TRUE ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdEnv( NULL ),
 	m_rEnv( NULL ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( FALSE ),
-	m_lfoShapeData( NULL ),
-	m_lfoShape( SIN )
+	m_lfoShapeData( NULL )
 {
 	if( s_envGraph == NULL )
 	{
@@ -117,26 +131,28 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 	s_EaLWidgets.push_back( this );
 
-
-	m_predelayKnob = new knob( knobBright_26, this, tr( "Predelay-time" ),
-								_track );
+	m_predelayModel.setTrack( _track );
+	m_predelayModel.setRange( 0.0, 1.0, 0.001 );
+	m_predelayModel.setInitValue( 0.0 );
+	m_predelayKnob = new knob( knobBright_26, this, tr( "Predelay-time" ) );
+	m_predelayKnob->setModel( &m_predelayModel );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
-	m_predelayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_predelayKnob->setInitValue( 0.0 );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
 	m_predelayKnob->setHintText( tr( "Predelay:" ) + " ", "" );
 	m_predelayKnob->setWhatsThis(
 		tr( "Use this knob for setting predelay of the current "
 			"envelope. The bigger this value the longer the time "
 			"before start of actual envelope." ) );
-	connect( m_predelayKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_predelayModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
-	m_attackKnob = new knob( knobBright_26, this, tr( "Attack-time" ),
-								_track );
+
+	m_attackModel.setTrack( _track );
+	m_attackModel.setRange( 0.0, 1.0, 0.001 );
+	m_attackModel.setInitValue( 0.0 );
+	m_attackKnob = new knob( knobBright_26, this, tr( "Attack-time" ) );
+	m_attackKnob->setModel( &m_attackModel );
 	m_attackKnob->setLabel( tr( "ATT" ) );
-	m_attackKnob->setRange( 0.0, 1.0, 0.001 );
-	m_attackKnob->setInitValue( 0.0 );
 	m_attackKnob->move( ATTACK_KNOB_X, ENV_KNOBS_Y );
 	m_attackKnob->setHintText( tr( "Attack:" )+" ", "" );
 	m_attackKnob->setWhatsThis(
@@ -145,13 +161,15 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"envelope needs to increase to attack-level. "
 			"Choose a small value for instruments like pianos "
 			"and a big value for strings." ) );
-	connect( m_attackKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_attackModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
-	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ), _track );
+	m_holdModel.setTrack( _track );
+	m_holdModel.setRange( 0.0, 1.0, 0.001 );
+	m_holdModel.setInitValue( 0.5 );
+	m_holdKnob = new knob( knobBright_26, this, tr( "Hold-time" ) );
+	m_holdKnob->setModel( &m_holdModel );
 	m_holdKnob->setLabel( tr( "HOLD" ) );
-	m_holdKnob->setRange( 0.0, 1.0, 0.001 );
-	m_holdKnob->setInitValue( 0.5 );
 	m_holdKnob->move( HOLD_KNOB_X, ENV_KNOBS_Y );
 	m_holdKnob->setHintText( tr( "Hold:" ) + " ", "" );
 	m_holdKnob->setWhatsThis(
@@ -159,14 +177,16 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"envelope. The bigger this value the longer the "
 			"envelope holds attack-level before it begins to "
 			"decrease to sustain-level." ) );
-	connect( m_holdKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_holdModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
-	m_decayKnob = new knob( knobBright_26, this, tr( "Decay-time" ),
-								_track );
+
+	m_decayModel.setTrack( _track );
+	m_decayModel.setRange( 0.0, 1.0, 0.001 );
+	m_decayModel.setInitValue( 0.5 );
+	m_decayKnob = new knob( knobBright_26, this, tr( "Decay-time" ) );
+	m_decayKnob->setModel( &m_decayModel );
 	m_decayKnob->setLabel( tr( "DEC" ) );
-	m_decayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_decayKnob->setInitValue( 0.5 );
 	m_decayKnob->move( DECAY_KNOB_X, ENV_KNOBS_Y );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "" );
 	m_decayKnob->setWhatsThis(
@@ -175,14 +195,16 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"envelope needs to decrease from attack-level to "
 			"sustain-level. Choose a small value for instruments "
 			"like pianos." ) );
-	connect( m_decayKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_decayModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
-	m_sustainKnob = new knob( knobBright_26, this, tr( "Sustain-level" ),
-								_track );
+
+	m_sustainModel.setTrack( _track );
+	m_sustainModel.setRange( 0.0, 1.0, 0.001 );
+	m_sustainModel.setInitValue( 0.5 );
+	m_sustainKnob = new knob( knobBright_26, this, tr( "Sustain-level" ) );
+	m_sustainKnob->setModel( &m_sustainModel );
 	m_sustainKnob->setLabel( tr( "SUST" ) );
-	m_sustainKnob->setRange( 0.0, 1.0, 0.001 );
-	m_sustainKnob->setInitValue( 0.5 );
 	m_sustainKnob->move( SUSTAIN_KNOB_X, ENV_KNOBS_Y );
 	m_sustainKnob->setHintText( tr( "Sustain:" ) + " ", "" );
 	m_sustainKnob->setWhatsThis(
@@ -190,14 +212,17 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"envelope. The bigger this value the higher the level "
 			"on which the envelope stays before going down to "
 			"zero." ) );
-	connect( m_sustainKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_sustainModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
-	m_releaseKnob = new knob( knobBright_26, this, tr( "Release-time" ),
-								_track );
+
+
+	m_releaseModel.setTrack( _track );
+	m_releaseModel.setRange( 0.0, 1.0, 0.001 );
+	m_releaseModel.setInitValue( 0.1 );
+	m_releaseKnob = new knob( knobBright_26, this, tr( "Release-time" ) );
+	m_releaseKnob->setModel( &m_releaseModel );
 	m_releaseKnob->setLabel( tr( "REL" ) );
-	m_releaseKnob->setRange( 0.0, 1.0, 0.001 );
-	m_releaseKnob->setInitValue( 0.1 );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
 	m_releaseKnob->setHintText( tr( "Release:" ) + " ", "" );
 	m_releaseKnob->setWhatsThis(
@@ -206,15 +231,17 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"envelope needs to decrease from sustain-level to "
 			"zero. Choose a big value for soft instruments like "
 			"strings." ) );
-	connect( m_releaseKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_releaseModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
+
+	m_amountModel.setTrack( _track );
+	m_amountModel.setRange( -1.0, 1.0, 0.005 );
+	m_amountModel.setInitValue( 0.0 );
 	m_amountKnob = new knob( knobBright_26, this,
-						tr( "Modulation amount" ),
-						_track );
+						tr( "Modulation amount" ) );
+	m_amountKnob->setModel( &m_amountModel );
 	m_amountKnob->setLabel( tr( "AMT" ) );
-	m_amountKnob->setRange( -1.0, 1.0, 0.005 );
-	m_amountKnob->setInitValue( 0.0 );
 	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 	m_amountKnob->setWhatsThis(
@@ -222,62 +249,70 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"current envelope. The bigger this value the more the "
 			"according size (e.g. volume or cutoff-frequency) "
 			"will be influenced by this envelope." ) );
-	connect( m_amountKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_amountModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
 
 
+
+	m_lfoPredelayModel.setTrack( _track );
+	m_lfoPredelayModel.setRange( 0.0, 1.0, 0.001 );
+	m_lfoPredelayModel.setInitValue( 0.0 );
 	m_lfoPredelayKnob = new knob( knobBright_26, this,
-						tr( "LFO-predelay-time" ),
-						_track );
+						tr( "LFO-predelay-time" ) );
+	m_lfoPredelayKnob->setModel( &m_lfoPredelayModel );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
-	m_lfoPredelayKnob->setRange( 0.0, 1.0, 0.001 );
-	m_lfoPredelayKnob->setInitValue( 0.0 );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
 	m_lfoPredelayKnob->setHintText( tr( "LFO-predelay:" ) + " ", "" );
 	m_lfoPredelayKnob->setWhatsThis(
 		tr( "Use this knob for setting predelay-time of the current "
 			"LFO. The bigger this value the the time until the "
 			"LFO starts to oscillate." ) );
-	connect( m_lfoPredelayKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_lfoPredelayModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
+
+	m_lfoAttackModel.setTrack( _track );
+	m_lfoAttackModel.setRange( 0.0, 1.0, 0.001 );
+	m_lfoAttackModel.setInitValue( 0.0 );
 	m_lfoAttackKnob = new knob( knobBright_26, this,
-						tr( "LFO-attack-time" ),
-						_track );
+						tr( "LFO-attack-time" ) );
+	m_lfoAttackKnob->setModel( &m_lfoAttackModel );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
-	m_lfoAttackKnob->setRange( 0.0, 1.0, 0.001 );
-	m_lfoAttackKnob->setInitValue( 0.0 );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
 	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
 	m_lfoAttackKnob->setWhatsThis(
 		tr( "Use this knob for setting attack-time of the current LFO. "
 			"The bigger this value the longer the LFO needs to "
 			"increase its amplitude to maximum." ) );
-	connect( m_lfoAttackKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_lfoAttackModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
+
+	m_lfoSpeedModel.setTrack( _track );
+	m_lfoSpeedModel.setRange( 0.01, 1.0, 0.0001 );
+	m_lfoSpeedModel.setInitValue( 0.1 );
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
-							tr( "LFO-speed" ),
-							_track, 20000.0 );
+						tr( "LFO-speed" ), 20000.0 );
+	m_lfoSpeedKnob->setModel( &m_lfoSpeedModel );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
-	m_lfoSpeedKnob->setRange( 0.01, 1.0, 0.0001 );
-	m_lfoSpeedKnob->setInitValue( 0.1 );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
 	m_lfoSpeedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the current LFO. The "
 			"bigger this value the faster the LFO oscillates and "
 			"the faster will be your effect." ) );
-	connect( m_lfoSpeedKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_lfoSpeedModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
+
+	m_lfoAmountModel.setTrack( _track );
+	m_lfoAmountModel.setRange( -1.0, 1.0, 0.005 );
+	m_lfoAmountModel.setInitValue( 0.0 );
 	m_lfoAmountKnob = new knob( knobBright_26, this,
-						tr( "LFO-modulation-amount" ),
-						_track );
+						tr( "LFO-modulation-amount" ) );
+	m_lfoAmountKnob->setModel( &m_lfoAmountModel );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
-	m_lfoAmountKnob->setRange( -1.0, 1.0, 0.005 );
-	m_lfoAmountKnob->setInitValue( 0.0 );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 	m_lfoAmountKnob->setWhatsThis(
@@ -285,11 +320,11 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"current LFO. The bigger this value the more the "
 			"selected size (e.g. volume or cutoff-frequency) will "
 			"be influenced by this LFO." ) );
-	connect( m_lfoAmountKnob, SIGNAL( valueChanged( float ) ), this,
-				SLOT( updateAfterKnobChange( float ) ) );
+	connect( &m_lfoAmountModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
 
 
-	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL, NULL );
+	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL );
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
@@ -299,7 +334,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a sine-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL, NULL );
+	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
@@ -309,7 +344,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a triangle-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL, NULL );
+	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
@@ -319,7 +354,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a saw-wave for current "
 							"oscillator." ) );
 
-	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL, NULL );
+	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
@@ -329,7 +364,7 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 		tr( "Click here if you want a square-wave for current "
 							"oscillator." ) );
 
-	m_userLfoBtn = new pixmapButton( this, NULL, NULL );
+	m_userLfoBtn = new pixmapButton( this, NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
 	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -340,37 +375,42 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 			"oscillator. Afterwards drag an according sample-"
 			"file into LFO-graph." ) );
 
-	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ), this,
-					SLOT( lfoUserWaveCh( bool ) ) );
+	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
+				this, SLOT( lfoUserWaveChanged() ) );
 
 	m_lfoWaveBtnGrp = new automatableButtonGroup( this,
-							tr( "LFO wave shape" ),
-							_track );
+						tr( "LFO wave shape" ) );
+	m_lfoWaveBtnGrp->setModel( &m_lfoWaveModel );
 	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( sqr_lfo_btn );
 	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
-	m_lfoWaveBtnGrp->setInitValue( SIN );
 
-	connect( m_lfoWaveBtnGrp, SIGNAL( valueChanged( int ) ),
-						SLOT( lfoWaveCh( int ) ) );
+	m_lfoWaveModel.setTrack( _track );
+	m_lfoWaveModel.setInitValue( SIN );
 
+	connect( &m_lfoWaveModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
+
+	m_x100Model.setTrack( _track );
 	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this,
-						tr( "Freq x 100" ), _track );
+							tr( "Freq x 100" ) );
+	m_x100Cb->setModel( &m_x100Model );
 	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 	m_x100Cb->setWhatsThis(
 		tr( "Click here if the frequency of this LFO should be "
 						"multiplied with 100." ) );
 	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
-	connect( m_x100Cb, SIGNAL( toggled( bool ) ), this,
-						SLOT( x100Toggled( bool ) ) );
+	connect( &m_x100Model, SIGNAL( dataChanged() ),
+				this, SLOT( updateSampleVars() ) );
 
 
+	m_controlEnvAmountModel.setTrack( _track );
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),
-					this, tr( "Modulate Env-Amount" ),
-					_track );
+					this, tr( "Modulate Env-Amount" ) );
+	m_controlEnvAmountCb->setModel( &m_controlEnvAmountModel );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSize<6>(
 					m_controlEnvAmountCb->font() ) );
@@ -396,6 +436,20 @@ envelopeAndLFOWidget::envelopeAndLFOWidget( float _value_for_zero_amount,
 
 envelopeAndLFOWidget::~envelopeAndLFOWidget()
 {
+	m_predelayModel.disconnect( this );
+	m_attackModel.disconnect( this );
+	m_holdModel.disconnect( this );
+	m_decayModel.disconnect( this );
+	m_sustainModel.disconnect( this );
+	m_releaseModel.disconnect( this );
+	m_amountModel.disconnect( this );
+	m_lfoPredelayModel.disconnect( this );
+	m_lfoAttackModel.disconnect( this );
+	m_lfoSpeedModel.disconnect( this );
+	m_lfoAmountModel.disconnect( this );
+	m_lfoWaveModel.disconnect( this );
+	m_x100Model.disconnect( this );
+
 	delete[] m_pahdEnv;
 	delete[] m_rEnv;
 	delete[] m_lfoShapeData;
@@ -405,6 +459,8 @@ envelopeAndLFOWidget::~envelopeAndLFOWidget()
 	{
 		v.erase( qFind( v.begin(), v.end(), this ) );
 	}
+
+	delete m_lfoWaveBtnGrp;
 }
 
 
@@ -416,7 +472,7 @@ inline sample_t envelopeAndLFOWidget::lfoShapeSample( fpp_t _frame_offset )
 	const float phase = frame / static_cast<float>(
 						m_lfoOscillationFrames );
 	sample_t shape_sample;
-	switch( m_lfoShape  )
+	switch( m_lfoWaveModel.value()  )
 	{
 		case TRIANGLE:
 			shape_sample = oscillator::triangleSample( phase );
@@ -549,7 +605,7 @@ void FASTCALL envelopeAndLFOWidget::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = m_controlEnvAmountCb->isChecked() ?
+		*_buf = m_controlEnvAmountModel.value() ?
 			env_level * ( 0.5f + *_buf ) :
 			env_level + *_buf;
 	}
@@ -561,20 +617,20 @@ void FASTCALL envelopeAndLFOWidget::fillLevel( float * _buf, f_cnt_t _frame,
 void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	m_predelayKnob->saveSettings( _doc, _parent, "pdel" );
-	m_attackKnob->saveSettings( _doc, _parent, "att" );
-	m_holdKnob->saveSettings( _doc, _parent, "hold" );
-	m_decayKnob->saveSettings( _doc, _parent, "dec" );
-	m_sustainKnob->saveSettings( _doc, _parent, "sus" );
-	m_releaseKnob->saveSettings( _doc, _parent, "rel" );
-	m_amountKnob->saveSettings( _doc, _parent, "amt" );
-	m_lfoWaveBtnGrp->saveSettings( _doc, _parent, "lshp" );
-	m_lfoPredelayKnob->saveSettings( _doc, _parent, "lpdel" );
-	m_lfoAttackKnob->saveSettings( _doc, _parent, "latt" );
-	m_lfoSpeedKnob->saveSettings( _doc, _parent, "lspd" );
-	m_lfoAmountKnob->saveSettings( _doc, _parent, "lamt" );
-	m_x100Cb->saveSettings( _doc, _parent, "x100" );
-	m_controlEnvAmountCb->saveSettings( _doc, _parent, "ctlenvamt" );
+	m_predelayModel.saveSettings( _doc, _parent, "pdel" );
+	m_attackModel.saveSettings( _doc, _parent, "att" );
+	m_holdModel.saveSettings( _doc, _parent, "hold" );
+	m_decayModel.saveSettings( _doc, _parent, "dec" );
+	m_sustainModel.saveSettings( _doc, _parent, "sus" );
+	m_releaseModel.saveSettings( _doc, _parent, "rel" );
+	m_amountModel.saveSettings( _doc, _parent, "amt" );
+	m_lfoWaveModel.saveSettings( _doc, _parent, "lshp" );
+	m_lfoPredelayModel.saveSettings( _doc, _parent, "lpdel" );
+	m_lfoAttackModel.saveSettings( _doc, _parent, "latt" );
+	m_lfoSpeedModel.saveSettings( _doc, _parent, "lspd" );
+	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
+	m_x100Model.saveSettings( _doc, _parent, "x100" );
+	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
 	_parent.setAttribute( "userwavefile", m_userWave.audioFile() );
 }
 
@@ -583,20 +639,20 @@ void envelopeAndLFOWidget::saveSettings( QDomDocument & _doc,
 
 void envelopeAndLFOWidget::loadSettings( const QDomElement & _this )
 {
-	m_predelayKnob->loadSettings( _this, "pdel" );
-	m_attackKnob->loadSettings( _this, "att" );
-	m_holdKnob->loadSettings( _this, "hold" );
-	m_decayKnob->loadSettings( _this, "dec" );
-	m_sustainKnob->loadSettings( _this, "sus" );
-	m_releaseKnob->loadSettings( _this, "rel" );
-	m_amountKnob->loadSettings( _this, "amt" );
-	m_lfoWaveBtnGrp->loadSettings( _this, "lshp" );
-	m_lfoPredelayKnob->loadSettings( _this, "lpdel" );
-	m_lfoAttackKnob->loadSettings( _this, "latt" );
-	m_lfoSpeedKnob->loadSettings( _this, "lspd" );
-	m_lfoAmountKnob->loadSettings( _this, "lamt" );
-	m_x100Cb->loadSettings( _this, "x100" );
-	m_controlEnvAmountCb->loadSettings( _this, "ctlenvamt" );
+	m_predelayModel.loadSettings( _this, "pdel" );
+	m_attackModel.loadSettings( _this, "att" );
+	m_holdModel.loadSettings( _this, "hold" );
+	m_decayModel.loadSettings( _this, "dec" );
+	m_sustainModel.loadSettings( _this, "sus" );
+	m_releaseModel.loadSettings( _this, "rel" );
+	m_amountModel.loadSettings( _this, "amt" );
+	m_lfoWaveModel.loadSettings( _this, "lshp" );
+	m_lfoPredelayModel.loadSettings( _this, "lpdel" );
+	m_lfoAttackModel.loadSettings( _this, "latt" );
+	m_lfoSpeedModel.loadSettings( _this, "lspd" );
+	m_lfoAmountModel.loadSettings( _this, "lamt" );
+	m_x100Model.loadSettings( _this, "x100" );
+	m_controlEnvAmountModel.loadSettings( _this, "ctlenvamt" );
 	
 	// Keep compatibility with version 2.1 file format
 	if( _this.hasAttribute( "lfosyncmode" ) )
@@ -669,8 +725,7 @@ void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
 	if( type == "samplefile" )
 	{
 		m_userWave.setAudioFile( stringPairDrag::decodeValue( _de ) );
-		m_userLfoBtn->setChecked( TRUE );
-		lfoUserWaveCh( TRUE );
+		m_userLfoBtn->model()->setValue( TRUE );
 		_de->accept();
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
@@ -678,8 +733,7 @@ void envelopeAndLFOWidget::dropEvent( QDropEvent * _de )
 		multimediaProject mmp( value, FALSE );
 		m_userWave.setAudioFile( mmp.content().firstChild().toElement().
 							attribute( "src" ) );
-		m_userLfoBtn->setChecked( TRUE );
-		lfoUserWaveCh( TRUE );
+		m_userLfoBtn->model()->setValue( TRUE );
 		_de->accept();
 	}
 }
@@ -778,7 +832,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 
 	float osc_frames = m_lfoOscillationFrames;
 
-	if( m_x100Cb->isChecked() )
+	if( m_x100Model.value() )
 	{
 		osc_frames *= 100.0f;
 	}
@@ -792,7 +846,7 @@ void envelopeAndLFOWidget::paintEvent( QPaintEvent * )
 		{
 			float phase = ( cur_sample -= m_lfoPredelayFrames ) /
 								osc_frames;
-			switch( m_lfoShape )
+			switch( m_lfoWaveModel.value() )
 			{
 				case SIN:
 					val = oscillator::sinSample( phase );
@@ -935,7 +989,7 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 	m_lfoOscillationFrames = static_cast<f_cnt_t>(
 						frames_per_lfo_oscillation *
 						m_lfoSpeedKnob->value() );
-	if( m_x100Cb->isChecked() )
+	if( m_x100Model.value() )
 	{
 		m_lfoOscillationFrames /= 100;
 	}
@@ -965,35 +1019,9 @@ void envelopeAndLFOWidget::updateSampleVars( void )
 
 
 
-void envelopeAndLFOWidget::x100Toggled( bool )
+void envelopeAndLFOWidget::lfoUserWaveChanged( void )
 {
-	engine::getSongEditor()->setModified();
-	updateSampleVars();
-}
-
-
-
-
-void envelopeAndLFOWidget::updateAfterKnobChange( float )
-{
-	updateSampleVars();
-}
-
-
-
-
-void envelopeAndLFOWidget::lfoWaveCh( int _val )
-{
-	m_lfoShape = static_cast<lfoShapes>( _val );
-	updateSampleVars();
-}
-
-
-
-
-void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
-{
-	if( _on && m_lfoShape != USER )
+	if( m_lfoWaveModel.value() == USER )
 	{
 		if( m_userWave.frames() <= 1 )
 		{
@@ -1002,11 +1030,7 @@ void envelopeAndLFOWidget::lfoUserWaveCh( bool _on )
 					"it in this window." ),
 					embed::getIconPixmap( "hint" ), 3000 );
 		}
-		m_lfoShape = USER;
 	}
-	engine::getSongEditor()->setModified();
-
-	updateSampleVars();
 }
 
 

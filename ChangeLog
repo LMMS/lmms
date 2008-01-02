@@ -1,3 +1,102 @@
+2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/knob.h:
+	* include/effect.h:
+	* include/automatable_slider.h:
+	* include/lcd_spinbox.h:
+	* include/meter_dialog.h:
+	* include/midi_tab_widget.h:
+	* include/instrument_track.h:
+	* include/ladspa_control.h:
+	* include/piano_widget.h:
+	* include/detuning_helper.h:
+	* include/sample_play_handle.h:
+	* include/piano_roll.h:
+	* include/group_box.h:
+	* include/envelope_tab_widget.h:
+	* include/song_editor.h:
+	* include/automatable_button.h:
+	* include/tempo_sync_knob.h:
+	* include/journalling_object.h:
+	* include/setup_dialog.h:
+	* include/export_project_dialog.h:
+	* include/pixmap_button.h:
+	* include/sample_track.h:
+	* include/surround_area.h:
+	* include/volume_knob.h:
+	* include/bb_editor.h:
+	* include/rack_plugin.h:
+	* include/arp_and_chords_tab_widget.h:
+	* include/envelope_and_lfo_widget.h:
+	* include/combobox.h:
+	* include/led_checkbox.h:
+	* configure.in:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/volume_knob.cpp:
+	* src/widgets/pixmap_button.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/effect.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/track.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/note.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/instrument.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/meter_dialog.cpp:
+	* Makefile.am:
+	adaption of M/V-architecture
+
+	* include/automatable_object_templates.h:
+	* include/automatable_object.h:
+	removed as replaced by automatable_model.h and
+	automatable_model_templates.h
+
+	* include/mv_base.h:
+	* src/core/mv_base.cpp:
+	* include/automatable_model.h:
+	* include/automatable_model_templates.h:
+	added base-files for new M/V-architecture
+
+	* src/widgets/rack_plugin.cpp:
+	fixed wrong signal-slot-connection which made gate-parameter of
+	effects not working
+
+	* src/core/track_container.cpp:
+	when removing tracks start removing at the end of track-vector (i.e.
+	use m_trackWidgets.last() instead of m_trackWidgets.first()) - speeds
+	up things *a lot*
+
+	* README:
+	* src/core/about_dialog.cpp:
+	fixed version and extended copyright from 2007 to 2008
+
 2007-12-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/midi_import/midi_import.cpp:

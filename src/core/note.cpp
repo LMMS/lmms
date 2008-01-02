@@ -30,7 +30,7 @@
 #include <math.h>
 
 #include "note.h"
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "detuning_helper.h"
 #include "templates.h"
 

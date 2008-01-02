@@ -30,8 +30,11 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QPainter>
 
+#include "automatable_model.h"
+#include "lcd_spinbox.h"
 #include "midi_event_processor.h"
 #include "mixer.h"
+#include "surround_area.h"
 #include "tab_widget.h"
 #include "track.h"
 
@@ -56,6 +59,7 @@ class volumeKnob;
 class instrumentTrack : public QWidget, public track, public midiEventProcessor
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	instrumentTrack( trackContainer * _tc );
 	virtual ~instrumentTrack();
@@ -100,13 +104,12 @@ public:
 	void FASTCALL setName( const QString & _new_name );
 
 	// volume & surround-position-stuff
-	void FASTCALL setVolume( volume _new_volume );
-	volume getVolume( void ) const;
-	void FASTCALL setSurroundAreaPos( const QPoint & _p );
+/*	void FASTCALL setVolume( volume _new_volume );
+	volume getVolume( void ) const;*/
 
-	void FASTCALL setBaseNote( Uint32 _new_note, bool _modified = TRUE );
+//	void FASTCALL setBaseNote( Uint32 _new_note, bool _modified = TRUE );
 
-	inline tones baseTone( void ) const
+/*	inline tones baseTone( void ) const
 	{
 		return( m_baseTone );
 	}
@@ -114,7 +117,7 @@ public:
 	inline octaves baseOctave( void ) const
 	{
 		return( m_baseOctave );
-	}
+	}*/
 
 	int FASTCALL masterKey( notePlayHandle * _n ) const;
 
@@ -158,9 +161,13 @@ public:
 		return( m_audioPort );
 	}
 
+	intModel * baseNoteModel( void )
+	{
+		return( &m_baseNoteModel );
+	}
+
 
 public slots:
-	void surroundAreaPosChanged( const QPoint & _new_p );
 	void textChanged( const QString & _new_name );
 	void toggledInstrumentTrackButton( bool _on );
 
@@ -192,6 +199,8 @@ protected slots:
 	void midiOutSelected( void );
 	void midiConfigChanged( bool );
 
+	void updateBaseNote( void );
+
 
 private:
 	trackTypes m_trackType;
@@ -204,13 +213,12 @@ private:
 	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
 
 
-	tones m_baseTone;
-	octaves m_baseOctave;
+	intModel m_baseNoteModel;
 
 	QList<notePlayHandle *> m_processHandles;
 
 
-	// widgets on the top of a instrument-track-window
+	// widgets on the top of an instrument-track-window
 	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_instrumentNameLE;
 	volumeKnob * m_volumeKnob;
@@ -218,7 +226,11 @@ private:
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 
-	
+	floatModel m_volumeModel;
+	surroundAreaModel m_surroundAreaModel;
+	lcdSpinBoxModel m_effectChannelModel;
+
+
 	// tab-widget with all children
 	tabWidget * m_tabWidget;
 	instrument * m_instrument;
@@ -245,9 +257,9 @@ private:
 	friend class presetPreviewPlayHandle;
 	friend class flpImport;
 
-	// base-tone stuff
+/*	// base-tone stuff
 	void FASTCALL setBaseTone( tones _new_tone );
-	void FASTCALL setBaseOctave( octaves _new_octave );
+	void FASTCALL setBaseOctave( octaves _new_octave );*/
 
 } ;
 

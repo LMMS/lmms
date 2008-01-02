@@ -50,7 +50,7 @@
 
 
 bbEditor::bbEditor( void ) :
-	m_currentBB( -1 )
+	trackContainer()
 {
 	// create toolbar
 	m_toolBar = new QWidget;
@@ -100,10 +100,13 @@ bbEditor::bbEditor( void ) :
 	QLabel * l = new QLabel( m_toolBar );
 	l->setPixmap( embed::getIconPixmap( "drum" ) );
 
-	m_bbComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_bbComboBox = new comboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
-	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
-				this, SLOT( setCurrentBB( int ) ) );
+
+	m_bbComboBoxModel = new comboBoxModel( /* this */ );
+	m_bbComboBox->setModel( m_bbComboBoxModel );
+	connect( m_bbComboBoxModel, SIGNAL( dataChanged() ),
+				this, SLOT( currentBBChanged() ) );
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
@@ -149,17 +152,10 @@ bbEditor::~bbEditor()
 
 
 
-void bbEditor::setCurrentBB( int _bb )
+void bbEditor::currentBBChanged( void )
 {
-	m_currentBB = _bb;
-
-	if( m_bbComboBox->value() != _bb )
-	{
-		m_bbComboBox->setValue( _bb );
-	}
-
 	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( _bb );
+	createTCOsForBB( currentBB() );
 
 	realignTracks();
 
@@ -240,9 +236,9 @@ void bbEditor::removeBB( int _bb )
 		tl[i]->removeTCO( _bb );
 		tl[i]->getTrackContentWidget()->removeTact( _bb * 64 );
 	}
-	if( _bb <= m_currentBB )
+	if( _bb <= currentBB() )
 	{
-		setCurrentBB( tMax( m_currentBB - 1, 0 ) );
+		setCurrentBB( tMax( currentBB() - 1, 0 ) );
 	}
 }
 
@@ -262,21 +258,17 @@ void bbEditor::updateBBTrack( trackContentObject * _tco )
 
 void bbEditor::updateComboBox( void )
 {
-	disconnect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
-					this, SLOT( setCurrentBB( int ) ) );
+	const int cur_bb = currentBB();
 
-	m_bbComboBox->clear();
+	m_bbComboBoxModel->clear();
 
 	for( int i = 0; i < numOfBBs(); ++i )
 	{
 		bbTrack * bbt = bbTrack::findBBTrack( i );
-		m_bbComboBox->addItem( bbt->trackLabel()->text(),
-					bbt->trackLabel()->pixmap() );
+		m_bbComboBoxModel->addItem( bbt->trackLabel()->text(),
+				new QPixmap( bbt->trackLabel()->pixmap() ) );
 	}
-	m_bbComboBox->setValue( m_currentBB );
-
-	connect( m_bbComboBox, SIGNAL( valueChanged( int ) ),
-					this, SLOT( setCurrentBB( int ) ) );
+	setCurrentBB( cur_bb );
 }
 
 
@@ -297,16 +289,16 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if ( _ke->key() == Qt::Key_Plus )
 	{
-		if( m_currentBB + 1 < numOfBBs() )
+		if( currentBB()+ 1 < numOfBBs() )
 		{
-			setCurrentBB( m_currentBB + 1 );
+			setCurrentBB( currentBB() + 1 );
 		}
 	}
 	else if ( _ke->key() == Qt::Key_Minus )
 	{
-		if( m_currentBB > 0 )
+		if( currentBB() > 0 )
 		{
-			setCurrentBB( m_currentBB - 1 );
+			setCurrentBB( currentBB() - 1 );
 		}
 	}
 	else

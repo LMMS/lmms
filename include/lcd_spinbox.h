@@ -29,33 +29,38 @@
 #include <QtCore/QMap>
 #include <QtGui/QLCDNumber>
 
-#include "automatable_object.h"
+#include "automatable_model.h"
 
 
 class QLabel;
 
 
-class lcdSpinBox : public QWidget, public automatableObject<int>
+class lcdSpinBox : public QWidget, public automatableModelView<int>
 {
 	Q_OBJECT
 public:
-	lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
-					const QString & _name, track * _track );
+	lcdSpinBox( int _num_digits, QWidget * _parent, const QString & _name =
+								QString::null );
 	virtual ~lcdSpinBox();
-
-	virtual void setStep( const int _step );
 
 	void setLabel( const QString & _txt );
 
 	inline void addTextForValue( int _val, const QString & _text )
 	{
 		m_textForValue[_val] = _text;
+		update();
+	}
+
+	virtual void modelChanged( void )
+	{
+		modelView::modelChanged();
+		update();
 	}
 
 
 public slots:
-	virtual void setValue( const int _value );
 	virtual void setEnabled( bool _on );
+	virtual void update( void );
 
 
 protected:
@@ -76,9 +81,10 @@ private:
 
 
 signals:
-	void valueChanged( int );
 	void manualChange( void );
 
 } ;
+
+typedef lcdSpinBox::autoModel lcdSpinBoxModel;
 
 #endif

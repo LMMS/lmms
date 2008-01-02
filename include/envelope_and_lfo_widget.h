@@ -33,6 +33,7 @@
 
 
 #include "journalling_object.h"
+#include "automatable_model.h"
 #include "sample_buffer.h"
 #include "types.h"
 
@@ -102,10 +103,7 @@ protected:
 
 
 protected slots:
-	void updateAfterKnobChange( float );
-	void lfoWaveCh( int );
-	void lfoUserWaveCh( bool );
-	void x100Toggled( bool );
+	void lfoUserWaveChanged( void );
 
 
 private:
@@ -126,6 +124,15 @@ private:
 	knob * m_releaseKnob;
 	knob * m_amountKnob;
 
+	// models
+	floatModel m_predelayModel;
+	floatModel m_attackModel;
+	floatModel m_holdModel;
+	floatModel m_decayModel;
+	floatModel m_sustainModel;
+	floatModel m_releaseModel;
+	floatModel m_amountModel;
+
 	float  m_sustainLevel;
 	float  m_amount;
 	float  m_valueForZeroAmount;
@@ -134,6 +141,7 @@ private:
 	f_cnt_t m_rFrames;
 	sample_t * m_pahdEnv;
 	sample_t * m_rEnv;
+
 
 	// LFO-stuff
 	knob * m_lfoPredelayKnob;
@@ -145,6 +153,17 @@ private:
 
 	ledCheckBox * m_x100Cb;
 	ledCheckBox * m_controlEnvAmountCb;
+
+	// models
+	floatModel m_lfoPredelayModel;
+	floatModel m_lfoAttackModel;
+	floatModel m_lfoSpeedModel;
+	floatModel m_lfoAmountModel;
+	intModel m_lfoWaveModel;
+
+	boolModel m_x100Model;
+	boolModel m_controlEnvAmountModel;
+
 
 	f_cnt_t m_lfoPredelayFrames;
 	f_cnt_t m_lfoAttackFrames;
@@ -163,7 +182,7 @@ private:
 		SAW,
 		SQUARE,
 		USER
-	} m_lfoShape;
+	} ;
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLFOShapeData( void );

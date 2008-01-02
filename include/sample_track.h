@@ -30,12 +30,12 @@
 #include <QtGui/QDialog>
 
 #include "track.h"
+#include "volume_knob.h"
 
 class QLabel;
 class audioPort;
 class effectLabel;
 class sampleBuffer;
-class volumeKnob;
 
 //class sampleTCOSettingsDialog;
 
@@ -147,6 +147,7 @@ private:
 	audioPort * m_audioPort;
 	
 	volumeKnob * m_volumeKnob;
+	knobModel m_volumeModel;
 
 } ;
 

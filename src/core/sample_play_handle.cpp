@@ -26,6 +26,7 @@
 
 
 #include "sample_play_handle.h"
+#include "automatable_model_templates.h"
 #include "audio_port.h"
 #include "bb_track.h"
 #include "engine.h"
@@ -43,7 +44,8 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle" ) ),
 	m_ownAudioPort( TRUE ),
-	m_volume( 1.0f ),
+	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
@@ -59,7 +61,8 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle" ) ),
 	m_ownAudioPort( TRUE ),
-	m_volume( 1.0f ),
+	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
@@ -75,7 +78,8 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 	m_frame( 0 ),
 	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
 	m_ownAudioPort( FALSE ),
-	m_volume( 1.0f ),
+	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _tco->getTrack() ),
 	m_bbTrack( NULL )
 {
@@ -91,7 +95,8 @@ samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 	m_frame( 0 ),
 	m_audioPort( _pattern->getInstrumentTrack()->getAudioPort() ),
 	m_ownAudioPort( FALSE ),
-	m_volume( 1.0f ),
+	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _pattern->getInstrumentTrack() ),
 	m_bbTrack( NULL )
 {
@@ -125,9 +130,11 @@ void samplePlayHandle::play( bool /* _try_parallelizing */ )
 				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
 		sampleFrame * buf = new sampleFrame[frames];
-		volumeVector v = { { m_volume, m_volume
+		volumeVector v = { { m_volumeModel->value(),
+					m_volumeModel->value()
 #ifndef DISABLE_SURROUND
-						, m_volume, m_volume
+					, m_volumeModel->value(),
+						m_volumeModel->value()
 #endif
 				} } ;
 		m_sampleBuffer->play( buf, &m_state, frames );
@@ -167,20 +174,6 @@ f_cnt_t samplePlayHandle::totalFrames( void ) const
 }
 
 
-
-
-void samplePlayHandle::setVolume( float _new_volume )
-{
-	if( _new_volume <= MAX_VOLUME )
-	{
-		m_volume = _new_volume / 100.0f;
-	}
-}
-
-
-
-
-#include "sample_play_handle.moc"
 
 
 #endif

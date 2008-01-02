@@ -33,6 +33,7 @@
 
 
 #include "note.h"
+#include "automatable_model.h"
 
 
 class instrumentTrack;
@@ -55,11 +56,6 @@ public:
 	virtual ~pianoWidget();
 
 	void setKeyState( int _key, bool _on = FALSE );
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name );
-	virtual void loadSettings( const QDomElement & _this,
-							const QString & _name );
 
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
@@ -95,14 +91,12 @@ private:
 	octaves m_startOctave;
 
 	int m_lastKey;
-	unsigned int m_keycode;
+	unsigned int m_keyCode;
 
-	knob * m_noteKnob;
 
 
 private slots:
 	void pianoScrolled( int _new_pos );
-	void updateBaseNote( void );
 
 } ;
 

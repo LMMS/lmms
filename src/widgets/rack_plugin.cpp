@@ -51,6 +51,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 			track * _track, 
 			audioPort * _port ) :
 	QWidget( _parent ),
+	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f /* this */ ),
 	m_effect( _eff ),
 	m_track( _track ),
 	m_port( _port ),
@@ -65,35 +66,33 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	pal.setBrush( backgroundRole(), bg );
 	setPalette( pal );
 	
-	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ), 
-								m_track );
-	connect( m_bypass, SIGNAL( toggled( bool ) ), 
-				this, SLOT( bypassed( bool ) ) );
-	toolTip::add( m_bypass, tr( "On/Off" ) );
-	m_bypass->setChecked( TRUE );
+	m_effect->m_enabledModel.setTrack( m_track );
+	m_effect->m_enabledModel.setValue( TRUE );
+	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ) );
+	m_bypass->setModel( &m_effect->m_enabledModel );
 	m_bypass->move( 3, 3 );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
+	toolTip::add( m_bypass, tr( "On/Off" ) );
 
-	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ),
-								m_track );
-	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
-				this, SLOT( setWetDry( float ) ) );
+
+	m_effect->m_wetDryModel.setTrack( m_track );
+	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ) );
+	m_wetDry->setModel( &m_effect->m_wetDryModel );
 	m_wetDry->setLabel( tr( "W/D" ) );
-	m_wetDry->setRange( 0.0f, 1.0f, 0.01f );
-	m_wetDry->setInitValue( 1.0f );
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
 	m_wetDry->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
 					"the input signal and the effect that "
 					"shows up in the output." ) );
 
-	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ),
-								m_track );
-	connect( m_autoQuit, SIGNAL( valueChanged( float ) ), 
-				this, SLOT( setAutoQuit( float ) ) );
+
+	m_autoQuitModel.setTrack( m_track );
+	m_autoQuitModel.setInitValue( 1.0f );
+	connect( &m_autoQuitModel, SIGNAL( dataChanged( void ) ), 
+				this, SLOT( updateAutoQuit( void ) ) );
+	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ) );
+	m_autoQuit->setModel( &m_autoQuitModel );
 	m_autoQuit->setLabel( tr( "Decay" ) );
-	m_autoQuit->setRange( 1.0f, 8000.0f, 100.0f );
-	m_autoQuit->setInitValue( 1 );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
 	m_autoQuit->setWhatsThis( tr( 
@@ -101,17 +100,17 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
 "run the risk of clipping the tail on delay effects." ) );
 
-	m_gate = new knob( knobBright_26, this, tr( "Gate" ), m_track );
-	connect( m_wetDry, SIGNAL( valueChanged( float ) ), 
-				this, SLOT( setGate( float ) ) );
+
+	m_effect->m_gateModel.setTrack( m_track );
+	m_gate = new knob( knobBright_26, this, tr( "Gate" ) );
+	m_gate->setModel( &m_effect->m_gateModel );
 	m_gate->setLabel( tr( "Gate" ) );
-	m_gate->setRange( 0.0f, 1.0f, 0.01f );
-	m_gate->setInitValue( 0.0f );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
 	m_gate->setWhatsThis( tr( 
 "The Gate knob controls the signal level that is considered to be 'silence' "
 "while deciding when to stop processing signals." ) );
+
 
 	m_editButton = new QPushButton( tr( "Controls" ), this );
 	QFont f = m_editButton->font();
@@ -133,17 +132,18 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	m_label->setPalette( pal );
 
 	m_controlView = m_effect->createControlDialog( m_track );
-	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( m_controlView );
+	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
+								m_controlView );
 	connect( m_controlView, SIGNAL( closed() ),
 				this, SLOT( closeEffects() ) );
 
-    m_subWindow->hide();
-	
+	m_subWindow->hide();
+
 	if( m_controlView->getControlCount() == 0 )
 	{
 		m_editButton->hide();
 	}
-	
+
 	setWhatsThis( tr( 
 "Effect plugins function as a chained series of effects where the signal will "
 "be processed from top to bottom.\n\n"
@@ -178,12 +178,14 @@ rackPlugin::rackPlugin( QWidget * _parent,
 
 
 
+
 rackPlugin::~rackPlugin()
 {
 	m_port->getEffects()->removeEffect( m_effect );
 	delete m_effect;
 	m_controlView->deleteLater();
 }
+
 
 
 
@@ -205,34 +207,13 @@ void rackPlugin::editControls( void )
 
 
 
-void rackPlugin::bypassed( bool _state )
+void rackPlugin::updateAutoQuit( void )
 {
-	m_effect->setBypass( !_state );
-}
-
-
-
-
-void rackPlugin::setWetDry( float _value )
-{
-	m_effect->setWetLevel( _value );
-}
-
-
-
-void rackPlugin::setAutoQuit( float _value )
-{
-	float samples = engine::getMixer()->sampleRate() * _value / 1000.0f;
+	float samples = engine::getMixer()->sampleRate() *
+					m_autoQuitModel.value() / 1000.0f;
 	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / 
 			engine::getMixer()->framesPerPeriod() );
 	m_effect->setTimeout( buffers );
-}
-
-
-
-void rackPlugin::setGate( float _value )
-{
-	m_effect->setGate( _value );
 }
 
 
@@ -298,10 +279,10 @@ void rackPlugin::displayHelp( void )
 void FASTCALL rackPlugin::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
-	_this.setAttribute( "on", m_bypass->isChecked() );
-	_this.setAttribute( "wet", m_wetDry->value() );
-	_this.setAttribute( "autoquit", m_autoQuit->value() );
-	_this.setAttribute( "gate", m_gate->value() );
+	_this.setAttribute( "on", m_effect->m_enabledModel.value() );
+	_this.setAttribute( "wet", m_effect->m_wetDryModel.value() );
+	_this.setAttribute( "autoquit", m_autoQuitModel.value() );
+	_this.setAttribute( "gate", m_effect->m_gateModel.value() );
 	m_controlView->saveState( _doc, _this );
 }
 
@@ -310,10 +291,10 @@ void FASTCALL rackPlugin::saveSettings( QDomDocument & _doc,
 
 void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
 {
-	m_bypass->setChecked( _this.attribute( "on" ).toInt() );
-	m_wetDry->setValue( _this.attribute( "wet" ).toFloat() );
-	m_autoQuit->setValue( _this.attribute( "autoquit" ).toFloat() );
-	m_gate->setValue( _this.attribute( "gate" ).toFloat() );
+	m_effect->m_enabledModel.setValue( _this.attribute( "on" ).toInt() );
+	m_effect->m_wetDryModel.setValue( _this.attribute( "wet" ).toFloat() );
+	m_autoQuitModel.setValue( _this.attribute( "autoquit" ).toFloat() );
+	m_effect->m_gateModel.setValue( _this.attribute( "gate" ).toFloat() );
 	
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )

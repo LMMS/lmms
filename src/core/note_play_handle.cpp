@@ -27,7 +27,7 @@
 
 
 #include "note_play_handle.h"
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "config_mgr.h"
 #include "detuning_helper.h"
 #include "envelope_tab_widget.h"
@@ -436,10 +436,14 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 void notePlayHandle::updateFrequency( void )
 {
-	float pitch = (float)( tone() - m_instrumentTrack->baseTone() +
+	const int base_tone = m_instrumentTrack->baseNoteModel()->value() %
+							NOTES_PER_OCTAVE;
+	const int base_octave = m_instrumentTrack->baseNoteModel()->value() /
+							NOTES_PER_OCTAVE;
+	const float pitch = (float)( tone() - base_tone +
 			engine::getSongEditor()->masterPitch() ) / 12.0f +
-			(float)( octave() - m_instrumentTrack->baseOctave() )
-			+ m_base_detuning->value() / 12.0f;
+			(float)( octave() - base_octave ) +
+					 m_base_detuning->value() / 12.0f;
 	m_frequency = BASE_FREQ * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();

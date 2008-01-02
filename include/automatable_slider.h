@@ -30,18 +30,18 @@
 #include <QtXml/QDomElement>
 
 
-class knob;
+#include "automatable_model.h"
 
 
-class automatableSlider : public QSlider
+
+class automatableSlider : public QSlider, public automatableModelView<int>
 {
 	Q_OBJECT
 public:
-	automatableSlider( QWidget * _parent, const QString & _name,
-							class track * _track );
+	automatableSlider( QWidget * _parent, const QString & _name );
 	virtual ~automatableSlider();
 
-	virtual void setRange( int _min, int _max );
+/*	virtual void setRange( int _min, int _max );
 	virtual void setValue( int _value );
 	virtual void setInitValue( int _value );
 
@@ -51,11 +51,11 @@ public:
 							const QString & _name );
 
 	int logicValue( void );
-	void clearAutomationValues( void );
+	void clearAutomationValues( void );*/
 
 	bool showStatus( void )
 	{
-		return( m_show_status );
+		return( m_showStatus );
 	}
 
 
@@ -70,10 +70,11 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 
+	virtual void modelChanged( void );
+
 
 private:
-	knob * m_knob;
-	bool m_show_status;
+	bool m_showStatus;
 
 
 private slots:
@@ -84,6 +85,7 @@ private slots:
 } ;
 
 
+typedef automatableSlider::autoModel sliderModel;
 
 
 #endif

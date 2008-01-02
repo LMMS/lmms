@@ -48,7 +48,6 @@
 #include <math.h>
 
 
-#include "automatable_object_templates.h"
 #include "clipboard.h"
 #include "combobox.h"
 #include "debug.h"
@@ -127,6 +126,9 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
 pianoRoll::pianoRoll( void ) :
+	m_zoomingModel( new comboBoxModel( /* this */ ) ),
+	m_quantizeModel( new comboBoxModel( /* this */ ) ),
+	m_noteLenModel( new comboBoxModel( /* this */ ) ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -344,49 +346,51 @@ pianoRoll::pianoRoll( void ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingComboBox->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingModel->addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
-								"100%" ) );
-	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingChanged( const QString & ) ) );
+	m_zoomingModel->setValue( m_zoomingModel->findText( "100%" ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					this, SLOT( zoomingChanged() ) );
+	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox->setModel( m_zoomingModel );
+	m_zoomingComboBox->setFixedSize( 80, 22 );
 
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeComboBox->addItem( "1/" + QString::number( 1 << i ) );
+		m_quantizeModel->addItem( "1/" + QString::number( 1 << i ) );
 	}
-	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
-								"1/16" ) );
+	m_quantizeModel->setValue( m_quantizeModel->findText( "1/16" ) );
+	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox->setModel( m_quantizeModel );
+	m_quantizeComboBox->setFixedSize( 60, 22 );
+
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_noteLenComboBox->setFixedSize( 120, 22 );
-	m_noteLenComboBox->addItem( tr( "Last note" ),
-					embed::getIconPixmap( "edit_draw" ) );
+	m_noteLenModel->addItem( tr( "Last note" ), new QPixmap(
+					embed::getIconPixmap( "edit_draw" ) ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond" } ;
 	for( int i = 0; i < 6; ++i )
 	{
-		m_noteLenComboBox->addItem( "1/" + QString::number( 1 << i ),
-				embed::getIconPixmap(
+		m_noteLenModel->addItem( "1/" + QString::number( 1 << i ),
+				new QPixmap( embed::getIconPixmap(
 					QString( "note_" + pixmaps[i] ).
-						toAscii().constData() ) );
+						toAscii().constData() ) ) );
 	}
-	m_noteLenComboBox->setValue( 0 );
+	m_noteLenModel->setValue( 0 );
+	m_noteLenComboBox = new comboBox( m_toolBar );
+	m_noteLenComboBox->setModel( m_noteLenModel );
+	m_noteLenComboBox->setFixedSize( 120, 22 );
 
 
 	tb_layout->addSpacing( 5 );
@@ -1994,8 +1998,8 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->setValue(
-				m_zoomingComboBox->findText( QString::number(
+		m_zoomingModel->setValue(
+				m_zoomingModel->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" ) );
 		// update timeline
@@ -2459,9 +2463,10 @@ void pianoRoll::updatePosition( const midiTime & _t )
 
 
 
-void pianoRoll::zoomingChanged( const QString & _zfac )
+void pianoRoll::zoomingChanged( void )
 {
-	m_ppt = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
+	const QString & zfac = m_zoomingModel->currentText();
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -2475,8 +2480,8 @@ void pianoRoll::zoomingChanged( const QString & _zfac )
 
 int pianoRoll::quantization( void ) const
 {
-	return( 64 / m_quantizeComboBox->currentText().right(
-				m_quantizeComboBox->currentText().length() -
+	return( 64 / m_quantizeModel->currentText().right(
+				m_quantizeModel->currentText().length() -
 								2 ).toInt() );
 }
 
@@ -2485,12 +2490,12 @@ int pianoRoll::quantization( void ) const
 
 midiTime pianoRoll::newNoteLen( void ) const
 {
-	if( m_noteLenComboBox->value() == 0 )
+	if( m_noteLenModel->value() == 0 )
 	{
 		return( m_lenOfNewNotes );
 	}
-	return( 64 / m_noteLenComboBox->currentText().right(
-				m_noteLenComboBox->currentText().length() -
+	return( 64 / m_noteLenModel->currentText().right(
+				m_noteLenModel->currentText().length() -
 								2 ).toInt() );
 }
 

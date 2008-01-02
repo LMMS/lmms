@@ -77,6 +77,7 @@ lmms_MOC =						\
 		./led_checkbox.moc			\
 		./main_window.moc			\
 		./mixer.moc				\
+		./mv_base.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
 		./meter_dialog.moc			\
@@ -93,7 +94,6 @@ lmms_MOC =						\
 		./rubberband.moc			\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
-		./sample_play_handle.moc		\
 		./sample_track.moc			\
 		./setup_dialog.moc			\
 		./side_bar.moc				\
@@ -176,6 +176,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/meter_dialog.cpp			\
 		$(srcdir)/src/core/midi_tab_widget.cpp			\
 		$(srcdir)/src/core/mixer.cpp				\
+		$(srcdir)/src/core/mv_base.cpp				\
 		$(srcdir)/src/core/name_label.cpp			\
 		$(srcdir)/src/core/note.cpp				\
 		$(srcdir)/src/core/note_play_handle.cpp			\
@@ -288,6 +289,9 @@ lmms_SOURCES =								\
 		$(srcdir)/include/oscillator.h				\
 		$(srcdir)/include/arp_and_chords_tab_widget.h		\
 		$(srcdir)/include/export.h				\
+		$(srcdir)/include/mv_base.h				\
+		$(srcdir)/include/automatable_model.h			\
+		$(srcdir)/include/automatable_model_templates.h		\
 		$(srcdir)/include/group_box.h				\
 		$(srcdir)/include/tab_widget.h				\
 		$(srcdir)/include/knob.h				\
@@ -358,8 +362,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/combobox.h				\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
-		$(srcdir)/include/automatable_object.h			\
-		$(srcdir)/include/automatable_object_templates.h	\
 		$(srcdir)/include/journalling_object.h			\
 		$(srcdir)/include/level_object.h			\
 		$(srcdir)/include/project_journal.h			\

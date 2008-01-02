@@ -261,13 +261,18 @@ automationEditor::automationEditor( void ) :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_zoomingXComboBox = new comboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
+
+	comboBoxModel * zoom_x_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingXComboBox->addItem( QString::number( 25 << i ) + "%" );
+		zoom_x_model->addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingXComboBox->setValue( m_zoomingXComboBox->findText( "100%" ) );
+	zoom_x_model->setValue( zoom_x_model->findText( "100%" ) );
+
+	m_zoomingXComboBox->setModel( zoom_x_model );
+
 	connect( m_zoomingXComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingXChanged( const QString & ) ) );
 
@@ -275,14 +280,19 @@ automationEditor::automationEditor( void ) :
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_zoomingYComboBox = new comboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
-	m_zoomingYComboBox->addItem( "Auto" );
+
+	comboBoxModel * zoom_y_model = new comboBoxModel( /* this */ );
+	zoom_y_model->addItem( "Auto" );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingYComboBox->addItem( QString::number( 25 << i ) + "%" );
+		zoom_y_model->addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingYComboBox->setValue( m_zoomingYComboBox->findText( "Auto" ) );
+	zoom_y_model->setValue( zoom_y_model->findText( "Auto" ) );
+
+	m_zoomingYComboBox->setModel( zoom_y_model );
+
 	connect( m_zoomingYComboBox, SIGNAL( activated( const QString & ) ),
 			this, SLOT( zoomingYChanged( const QString & ) ) );
 
@@ -291,14 +301,18 @@ automationEditor::automationEditor( void ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
+
+	comboBoxModel * quantize_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeComboBox->addItem( "1/" + QString::number( 1 << i ) );
+		quantize_model->addItem( "1/" + QString::number( 1 << i ) );
 	}
-	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
-								"1/16" ) );
+	quantize_model->setValue( quantize_model->findText( "1/16" ) );
+
+	m_quantizeComboBox->setModel( quantize_model );
+
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
@@ -1548,8 +1562,8 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingXComboBox->setValue(
-				m_zoomingXComboBox->findText( QString::number(
+		m_zoomingXComboBox->model()->setValue(
+			m_zoomingXComboBox->model()->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PPT ) ) +"%" ) );
 		// update timeline
@@ -2015,8 +2029,8 @@ void automationEditor::zoomingYChanged( const QString & _zfac )
 
 int automationEditor::quantization( void ) const
 {
-	return( 64 / m_quantizeComboBox->currentText().right(
-				m_quantizeComboBox->currentText().length() -
+	return( 64 / m_quantizeComboBox->model()->currentText().right(
+			m_quantizeComboBox->model()->currentText().length() -
 								2 ).toInt() );
 }
 

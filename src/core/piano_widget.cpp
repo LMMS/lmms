@@ -35,8 +35,8 @@
 #include <QtGui/QPainter>
 
 
-#include "automatable_object_templates.h"
 #include "caption_menu.h"
+#include "automatable_model_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
@@ -86,8 +86,13 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	m_instrumentTrack( _parent ),
 	m_startTone( C ),
 	m_startOctave( OCTAVE_3 ),
-	m_lastKey( -1 )
+	m_lastKey( -1 ),
+	m_keyCode( 0 )
 {
+	connect( m_instrumentTrack->baseNoteModel(), SIGNAL( dataChanged() ),
+						this, SLOT( update( void ) ) );
+
+
 	setFocusPolicy( Qt::StrongFocus );
 
 	if( s_whiteKeyPm == NULL )
@@ -128,13 +133,6 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( pianoScrolled( int ) ) );
 
-
-	m_noteKnob = new knob( knobDark_28, NULL, tr( "Base note" ), _parent );
-	m_noteKnob->setRange( 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1.0f );
-	m_noteKnob->setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
-
-	connect( m_noteKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( updateBaseNote( void ) ) );
 }
 
 
@@ -142,7 +140,6 @@ pianoWidget::pianoWidget( instrumentTrack * _parent ) :
 
 pianoWidget::~pianoWidget()
 {
-	delete m_noteKnob;
 }
 
 
@@ -218,10 +215,10 @@ void pianoWidget::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	captionMenu contextMenu( m_noteKnob->accessibleName() );
+	captionMenu contextMenu( tr( "Base note" ) );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
-					m_noteKnob->getAutomationPattern(),
+		m_instrumentTrack->baseNoteModel()->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -265,8 +262,8 @@ void pianoWidget::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			m_noteKnob->setInitValue( key_num );
-			m_instrumentTrack->setBaseNote( key_num );
+			m_instrumentTrack->baseNoteModel()->
+							setInitValue( key_num );
 		}
 
 		// and let the user see that he pressed a key... :)
@@ -343,8 +340,8 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else
 			{
-				m_noteKnob->setInitValue( key_num );
-				m_instrumentTrack->setBaseNote( key_num );
+				m_instrumentTrack->baseNoteModel()->
+							setInitValue( key_num );
 			}
 		}
 		// and let the user see that he pressed a key... :)
@@ -364,7 +361,7 @@ void pianoWidget::mouseMoveEvent( QMouseEvent * _me )
 
 int pianoWidget::getKeyFromKeyboard( int _k ) const
 {
-	switch( m_keycode )
+	switch( m_keyCode )
 	{
 		case 52: return( 0 ); // Y
 		case 39: return( 1 ); // S
@@ -547,8 +544,7 @@ void pianoWidget::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor ( 0xFF, 0xFF, 0xFF ) );
 
-	int base_key = m_instrumentTrack->baseTone() +
-			m_instrumentTrack->baseOctave() * NOTES_PER_OCTAVE;
+	int base_key = m_instrumentTrack->baseNoteModel()->value();
 	if( KEY_ORDER[base_key % NOTES_PER_OCTAVE] == WHITE_KEY )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
@@ -656,44 +652,6 @@ void pianoWidget::paintEvent( QPaintEvent * )
 
 
 
-void pianoWidget::updateBaseNote( void )
-{
-	m_instrumentTrack->setBaseNote( (int)roundf( m_noteKnob->value() ),
-									FALSE );
-	update();
-}
-
-
-
-
-void pianoWidget::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
-{
-	m_noteKnob->saveSettings( _doc, _this, _name );
-}
-
-
-
-
-void pianoWidget::loadSettings( const QDomElement & _this,
-							const QString & _name )
-{
-	if( _this.hasAttribute( "baseoct" ) )
-	{
-		m_noteKnob->setInitValue( _this.attribute( "baseoct" ).toInt()
-				* NOTES_PER_OCTAVE
-				+ _this.attribute( "basetone" ).toInt() );
-	}
-	else
-	{
-		m_noteKnob->loadSettings( _this, _name );
-	}
-	updateBaseNote();
-}
-
-
-
-
 #ifdef BUILD_LINUX
 bool pianoWidget::x11Event( XEvent * _xe )
 {
@@ -701,7 +659,7 @@ bool pianoWidget::x11Event( XEvent * _xe )
 	{
 		case KeyPress:
 		case KeyRelease:
-			m_keycode = _xe->xkey.keycode;
+			m_keyCode = _xe->xkey.keycode;
 	}
 	return( FALSE );
 }

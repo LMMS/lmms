@@ -44,21 +44,26 @@ public:
 
 	inline int getNumerator( void )
 	{
-		return( m_numerator->value() );
+		return( m_numeratorModel->value() );
 	}
 
 	inline int getDenominator( void )
 	{
-		return( m_denominator->value() );
+		return( m_denominatorModel->value() );
 	}
-	
+
+
 private:
 	lcdSpinBox * m_numerator;
 	lcdSpinBox * m_denominator;
+	lcdSpinBoxModel * m_numeratorModel;
+	lcdSpinBoxModel * m_denominatorModel;
+
 
 signals:
-	void numeratorChanged( int );
-	void denominatorChanged( int );
-};
+	void numeratorChanged( void );
+	void denominatorChanged( void );
+
+} ;
 
 #endif

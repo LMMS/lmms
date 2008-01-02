@@ -30,6 +30,7 @@
 
 #include "play_handle.h"
 #include "sample_buffer.h"
+#include "automatable_model.h"
 
 class bbTrack;
 class pattern;
@@ -38,9 +39,8 @@ class track;
 class audioPort;
 
 
-class samplePlayHandle : public QObject, public playHandle
+class samplePlayHandle : public playHandle
 {
-	Q_OBJECT
 public:
 	samplePlayHandle( const QString & _sample_file );
 	samplePlayHandle( sampleBuffer * _sample_buffer );
@@ -68,9 +68,10 @@ public:
 		m_bbTrack = _bb_track;
 	}
 
-
-public slots:
-	void setVolume( float _new_volume );
+	void setVolumeModel( floatModel * _model )
+	{
+		m_volumeModel = _model;
+	}
 
 
 private:
@@ -83,7 +84,8 @@ private:
 	audioPort * m_audioPort;
 	const bool m_ownAudioPort;
 
-	float m_volume;
+	floatModel m_defaultVolumeModel;
+	floatModel * m_volumeModel;
 	track * m_track;
 
 	bbTrack * m_bbTrack;

@@ -117,8 +117,11 @@ Sint16 exportProjectDialog::s_availableBitrates[] =
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
 							QWidget * _parent ) :
 	QDialog( _parent ),
+	m_typeModel( new comboBoxModel( /* this */ ) ),
+	m_kbpsModel( new comboBoxModel( /* this */ ) ),
+	m_vbrEnabledModel( new boolModel( /* this */ ) ),
+	m_hqmEnabledModel( new boolModel( /* this */ ) ),
 	m_fileName( _file_name ),
-	m_hourglassLbl( NULL ),
 	m_deleteFile( FALSE )
 {
 	m_fileType = getFileTypeFromExtension( "." +
@@ -132,22 +135,23 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new comboBox( this, NULL, NULL );
-	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
-					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
-								TYPE_HEIGHT );
-	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
-				SLOT( changedType( const QString & ) ) );
-
 	Uint8 idx = 0;
 	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
 	{
-		m_typeCombo->addItem(
+		m_typeModel->addItem(
 				tr( fileEncodeDevices[idx].m_description ) );
 		++idx;
 	}
-	m_typeCombo->setValue( m_typeCombo->findText( tr(
+	m_typeModel->setValue( m_typeModel->findText( tr(
 			fileEncodeDevices[m_fileType].m_description ) ) );
+
+	m_typeCombo = new comboBox( this );
+	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
+					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
+								TYPE_HEIGHT );
+	m_typeCombo->setModel( m_typeModel );
+/*	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
+				SLOT( changedType( const QString & ) ) );*/
 
 
 	// kbps-ui-stuff
@@ -155,30 +159,33 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new comboBox( this, NULL, NULL );
+	idx = 0;
+	while( s_availableBitrates[idx] != -1 )
+	{
+		m_kbpsModel->addItem( QString::number(
+						s_availableBitrates[idx] ) );
+		++idx;
+	}
+	m_kbpsModel->setValue( m_kbpsModel->findText(
+						QString::number( 128 ) ) );
+
+	m_kbpsCombo = new comboBox( this );
+	m_kbpsCombo->setModel( m_kbpsModel );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
 
-	idx = 0;
-	while( s_availableBitrates[idx] != -1 )
-	{
-		m_kbpsCombo->addItem( QString::number(
-						s_availableBitrates[idx] ) );
-		++idx;
-	}
-	m_typeCombo->setValue( m_typeCombo->findText(
-						QString::number( 128 ) ) );
 
-
-	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, NULL, NULL );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this );
+	m_vbrCb->setModel( m_vbrEnabledModel );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
 	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
-							this, NULL, NULL );
+									this );
+	m_hqmCb->setModel( m_hqmEnabledModel );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
 	m_hqmCb->setChecked( TRUE );
@@ -306,10 +313,10 @@ void exportProjectDialog::exportBtnClicked( void )
 							DEFAULT_CHANNELS,
 							success_ful,
 							m_fileName,
-							m_vbrCb->isChecked(),
-					m_kbpsCombo->currentText().toInt(),
-					m_kbpsCombo->currentText().toInt() - 64,
-					m_kbpsCombo->currentText().toInt() + 64,
+						m_vbrCb->model()->value(),
+					m_kbpsModel->currentText().toInt(),
+					m_kbpsModel->currentText().toInt() - 64,
+					m_kbpsModel->currentText().toInt() + 64,
 					engine::getMixer() );
 	if( success_ful == FALSE )
 	{
@@ -351,7 +358,7 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 
-	engine::getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
+	engine::getMixer()->setAudioDevice( dev, m_hqmCb->model()->value() );
 	engine::getSongEditor()->startExport();
 
 	delete m_hqmCb;

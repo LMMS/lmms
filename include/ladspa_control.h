@@ -39,10 +39,10 @@
 #endif
 
 
-#include "journalling_object.h"
+#include "automatable_model.h"
+#include "knob.h"
 
 
-class knob;
 class ledCheckBox;
 class track;
 
@@ -65,14 +65,14 @@ public:
 	void FASTCALL linkControls( ladspaControl * _control );
 	void FASTCALL unlinkControls( ladspaControl * _control );
 
-	inline ledCheckBox * getToggle( void )
+	inline boolModel * getToggledModel( void )
 	{
-		return( m_toggle );
+		return( &m_toggledModel );
 	}
 	
-	inline knob * getKnob( void )
+	inline knobModel * getKnobModel( void )
 	{
-		return( m_knob );
+		return( &m_knobModel );
 	}
 	
 	inline port_desc_t * getPort( void )
@@ -89,15 +89,18 @@ public:
 		return( "port" );
 	}
 
+
 signals:
 	void changed( Uint16 _port, LADSPA_Data _value );
 	void linkChanged( Uint16 _port, bool _state );
 
+
 protected slots:
-	void ledChange( bool _state );
-	void knobChange( float _value );
-	void portLink( bool _state );
-	
+	void ledChanged( void );
+	void knobChanged( void );
+	void linkStateChanged( void );
+
+
 private:
 	port_desc_t * m_port;
 	track * m_track;
@@ -105,6 +108,11 @@ private:
 	ledCheckBox * m_link;
 	ledCheckBox * m_toggle;
 	knob * m_knob;
-};
+
+	boolModel m_linkEnabledModel;
+	boolModel m_toggledModel;
+	knobModel m_knobModel;
+
+} ;
 
 #endif

@@ -54,7 +54,7 @@ public:
 
 
 	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
-					track * _track, float _scale = 1.0f );
+							float _scale = 1.0f );
 	virtual ~tempoSyncKnob();
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
@@ -95,7 +95,7 @@ protected:
 
 protected slots:
 	void calculateTempoSyncTime( bpm_t _bpm );
-	void updateCustom( int );
+	void updateCustom( void );
 	void showCustom( void );
 
 private:
@@ -103,7 +103,7 @@ private:
 	float m_scale;
 	QPixmap m_tempoSyncIcon;
 	QString m_tempoSyncDescription;
-	
+
 	tempoSyncMode m_tempoLastSyncMode;
 	QPointer<meterDialog> m_custom;
 

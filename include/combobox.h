@@ -29,41 +29,93 @@
 #include <QtGui/QWidget>
 #include <QtCore/QVector>
 #include <QtGui/QMenu>
-#include <QtGui/QPixmap>
 #include <QtCore/QPair>
 
-#include "automatable_object.h"
+#include "automatable_model.h"
+#include "automatable_model_templates.h"
 
 
-class QAction;
-
-
-class comboBox : public QWidget, public automatableObject<int>
+class comboBoxModel : public intModel
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent, const QString & _name, track * _track );
-	virtual ~comboBox();
-
-	void addItem( const QString & _item, const QPixmap & _pixmap =
-								QPixmap() );
-
-	inline void clear( void )
+	comboBoxModel( ::model * _parent = NULL ) :
+		automatableModel<int>( 0, 0, 0, defaultRelStep(), _parent )
 	{
-		setRange( 0, 0 );
-		m_items.clear();
-		m_menu.clear();
-		update();
 	}
+
+	void addItem( const QString & _item, QPixmap * _data = NULL );
+
+	void clear( void );
 
 	int findText( const QString & _txt ) const;
 
-	QString currentText( void ) const
+	inline const QString & currentText( void ) const
 	{
 		return( m_items[value()].first );
 	}
 
-	void setValue( const int _idx );
+	inline const QPixmap * currentData( void ) const
+	{
+		return( m_items[value()].second );
+	}
+
+	inline const QString & itemText( int _i ) const
+	{
+		return( m_items[tLimit<int>( _i, minValue(), maxValue() )].
+									first );
+	}
+
+	inline const QPixmap * itemPixmap( int _i ) const
+	{
+		return( m_items[tLimit<int>( _i, minValue(), maxValue() )].
+									second );
+	}
+
+	inline int size( void ) const
+	{
+		return( m_items.size() );
+	}
+
+private:
+	typedef QPair<QString, QPixmap *> item;
+
+	QVector<item> m_items;
+
+
+signals:
+	void itemPixmapRemoved( QPixmap * _item );
+	
+} ;
+
+
+
+class comboBox : public QWidget, public intModelView
+{
+	Q_OBJECT
+public:
+	comboBox( QWidget * _parent, const QString & _name = QString::null );
+	virtual ~comboBox();
+
+        comboBoxModel * model( void )
+        {
+                return( castModel<comboBoxModel>() );
+        }
+
+        const comboBoxModel * model( void ) const
+        {
+                return( castModel<comboBoxModel>() );
+        }
+
+
+        virtual void modelChanged( void )
+        {
+                if( model() != NULL )
+                {
+                        connect( model(), SIGNAL( itemPixmapRemoved( QPixmap * ) ),
+                                        this, SLOT( deletePixmap( QPixmap * ) ) );
+                }                       
+        }
 
 
 protected:
@@ -79,20 +131,17 @@ private:
 
 	QMenu m_menu;
 
-	typedef QPair<QString, QPixmap> item;
-
-	QVector<item> m_items;
-
 	bool m_pressed;
 
 
 private slots:
+	void deletePixmap( QPixmap * _pixmap );
 	void setItem( QAction * _item );
 
-
+/*
 signals:
 	void activated( const QString & );
-	void valueChanged( int );
+	void valueChanged( int );*/
 
 } ;
 

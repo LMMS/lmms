@@ -31,7 +31,8 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QMdiArea>
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
+#include "engine.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "main_window.h"
@@ -41,9 +42,8 @@
 
 tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 							const QString & _name,
-							track * _track,
 							float _scale ) :
-	knob( _knob_num, _parent, _name, _track ),
+	knob( _knob_num, _parent, _name ),
 	m_tempoSyncMode( NO_SYNC ),
 	m_scale( _scale ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
@@ -53,7 +53,7 @@ tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 	connect( engine::getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
 	m_custom = new meterDialog( engine::getMainWindow()->workspace(),
-								_track );
+									NULL );
 	m_custom->hide();
 	m_custom->setWindowTitle( "Meter" );
 }
@@ -76,19 +76,21 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "reload" ),
-				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
-							m_hintTextAfterValue ),
-							this, SLOT( reset() ) );
+				tr( "&Reset (%1%2)" ).
+						arg( model()->initValue() ).
+						arg( m_hintTextAfterValue ),
+					this, SLOT( reset() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-				tr( "&Copy value (%1%2)" ).arg( value() ).arg(
-							m_hintTextAfterValue ),
-						this, SLOT( copyValue() ) );
+				tr( "&Copy value (%1%2)" ).
+						arg( value() ).
+						arg( m_hintTextAfterValue ),
+					this, SLOT( copyValue() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-				tr( "&Paste value (%1%2)"
-						).arg( s_copiedValue ).arg(
-							m_hintTextAfterValue ),
-				this, SLOT( pasteValue() ) );
+				tr( "&Paste value (%1%2)" ).
+						arg( s_copiedValue ).
+						arg( m_hintTextAfterValue ),
+					this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
 	
 	float limit = 60000.0f / ( engine::getSongEditor()->getTempo() *
@@ -96,43 +98,44 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,
 						m_tempoSyncDescription );
-	if( limit / 8.0f <= maxValue() )
+	if( limit / 8.0f <= model()->maxValue() )
 	{
+
 	connect( syncMenu, SIGNAL( triggered( QAction * ) ),
 			this, SLOT( setTempoSync( QAction * ) ) );
 	syncMenu->addAction( embed::getIconPixmap( "note_none" ),
 				tr( "No Sync" ) )->setData( (int) NO_SYNC );
-	if( limit / 0.125f <= maxValue() )
+	if( limit / 0.125f <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_double_whole" ),
 				tr( "Eight beats" ) )->setData(
 						(int) DOUBLE_WHOLE_NOTE );
 	}
-	if( limit / 0.25f <= maxValue() )
+	if( limit / 0.25f <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_whole" ),
 					tr( "Whole note" ) )->setData(
 						(int) WHOLE_NOTE );
 	}
-	if( limit / 0.5f <= maxValue() )
+	if( limit / 0.5f <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_half" ),
 					tr( "Half note" ) )->setData(
 						(int) HALF_NOTE );
 	}
-	if( limit <= maxValue() )
+	if( limit <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_quarter" ),
 					tr( "Quarter note" ) )->setData(
 						(int) QUARTER_NOTE );
 	}
-	if( limit / 2.0f <= maxValue() )
+	if( limit / 2.0f <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_eighth" ),
 					tr( "8th note" ) )->setData(
 						(int) EIGHTH_NOTE );
 	}
-	if( limit / 4.0f <= maxValue() )
+	if( limit / 4.0f <= model()->maxValue() )
 	{
 		syncMenu->addAction( embed::getIconPixmap( "note_sixteenth" ),
 					tr( "16th note" ) )->setData(
@@ -146,11 +149,12 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 				this, SLOT( showCustom( void ) )
 						)->setData( (int) CUSTOM );
 	contextMenu.addSeparator();
+
 	}
-	
+
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
-					getAutomationPattern(),
+					model()->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
@@ -190,6 +194,7 @@ void tempoSyncKnob::setTempoSync( QAction * _item )
 {
 	setTempoSync( _item->data().toInt() );
 }
+
 
 
 
@@ -258,9 +263,10 @@ void tempoSyncKnob::calculateTempoSyncTime( bpm_t _bpm )
 				break;
 			default: ;
 		}
-		bool journalling = testAndSetJournalling( FALSE );
-		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
-		setJournalling( journalling );
+		bool journalling = model()->testAndSetJournalling( FALSE );
+		model()->setValue( 60000.0 /
+					( _bpm * conversionFactor * m_scale ) );
+		model()->setJournalling( journalling );
 	}
 	else
 	{
@@ -328,7 +334,7 @@ void tempoSyncKnob::saveSettings( QDomDocument & _doc, QDomElement & _this,
 							const QString & _name )
 {
  	_this.setAttribute( "syncmode", ( int ) getSyncMode() );
-	automatableObject<float>::saveSettings( _doc, _this, _name );
+	model()->saveSettings( _doc, _this, _name );
 	m_custom->saveSettings( _doc, _this, _name );
 }
 
@@ -340,7 +346,7 @@ void tempoSyncKnob::loadSettings( const QDomElement & _this,
 {
  	setSyncMode( ( tempoSyncMode ) _this.attribute(
  						"syncmode" ).toInt() );
-	automatableObject<float>::loadSettings( _this, _name );
+	model()->loadSettings( _this, _name );
 	m_custom->loadSettings( _this, _name );
 }
 
@@ -362,16 +368,16 @@ void tempoSyncKnob::setSyncMode( tempoSyncMode _new_mode )
 		m_tempoSyncMode = _new_mode;
 		if( _new_mode == CUSTOM )
 		{
-			connect( m_custom, SIGNAL( numeratorChanged( int ) ),
-					this, SLOT( updateCustom( int ) ) );
-			connect( m_custom, SIGNAL( denominatorChanged( int ) ),
-					this, SLOT( updateCustom( int ) ) );
+			connect( m_custom, SIGNAL( numeratorChanged() ),
+					this, SLOT( updateCustom() ) );
+			connect( m_custom, SIGNAL( denominatorChanged() ),
+					this, SLOT( updateCustom() ) );
 		}
 		else
 		{
 			m_custom->hide();
 			disconnect( m_custom, 0,
-					this, SLOT( updateCustom( int ) ) );
+					this, SLOT( updateCustom() ) );
 		}
 	}
 	calculateTempoSyncTime( engine::getSongEditor()->getTempo() );
@@ -432,7 +438,7 @@ void tempoSyncKnob::setSyncIcon( const QPixmap & _new_icon )
 
 
 
-void tempoSyncKnob::updateCustom( int )
+void tempoSyncKnob::updateCustom( void )
 {
 	setSyncMode( CUSTOM );
 }

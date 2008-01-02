@@ -28,36 +28,26 @@
 
 #include <QtGui/QWidget>
 
+#include "automatable_model.h"
 #include "pixmap_button.h"
 
 
 class QPixmap;
 
 
-class groupBox : public QWidget
+class groupBox : public QWidget, public boolModelView
 {
 	Q_OBJECT
 public:
-	groupBox( const QString & _caption, QWidget * _parent, track * _track );
+	groupBox( const QString & _caption, QWidget * _parent );
 	virtual ~groupBox();
 
-	bool isActive( void ) const
-	{
-		return( m_led->isChecked() );
-	}
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name );
-	void loadSettings( const QDomElement & _this, const QString & _name );
+	virtual void modelChanged( void );
 
 
 public slots:
-	void setState( bool _on, bool _anim = FALSE );
+//	void setState( bool _on, bool _anim = FALSE );
 	void animate( void );
-
-
-signals:
-	void toggled( bool _state );
 
 
 protected:
@@ -77,5 +67,9 @@ private:
 	bool m_animating;
 
 } ;
+
+
+typedef groupBox::autoModel groupBoxModel;
+
 
 #endif

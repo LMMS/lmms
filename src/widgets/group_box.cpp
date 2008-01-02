@@ -47,15 +47,13 @@
 QPixmap * groupBox::s_ledBg = NULL;
 
 
-groupBox::groupBox( const QString & _caption, QWidget * _parent,
-							track * _track ) :
+groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
+	autoModelView(),
 	m_caption( _caption ),
 	m_origHeight( height() ),
 	m_animating( FALSE )
 {
-	setAutoFillBackground( TRUE );
-
 	if( s_ledBg == NULL )
 	{
 		s_ledBg = new QPixmap( embed::getIconPixmap(
@@ -64,13 +62,15 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 
 	updatePixmap();
 
-	m_led = new pixmapButton( this, _caption, _track );
+	m_led = new pixmapButton( this, _caption );
 	m_led->setCheckable( TRUE );
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	connect( m_led, SIGNAL( toggled( bool ) ),
-					this, SLOT( setState( bool ) ) );
+
+	setModel( new autoModel( FALSE, FALSE, TRUE, 1, NULL, FALSE ) );
+	setAutoFillBackground( TRUE );
+
 }
 
 
@@ -80,6 +80,13 @@ groupBox::~groupBox()
 {
 }
 
+
+
+
+void groupBox::modelChanged( void )
+{
+	m_led->setModel( model(), FALSE );
+}
 
 
 
@@ -99,25 +106,25 @@ void groupBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->y() > 1 && _me->y() < 13 )
 	{
-		setState( !isActive(), TRUE );
+		//setState( !isActive(), TRUE );
+		if( ( model()->value() == TRUE && height() < m_origHeight ) &&
+							m_animating == FALSE )
+		{
+			m_animating = TRUE;
+			animate();
+		}
 	}
 }
 
 
 
-
+/*
 void groupBox::setState( bool _on, bool _anim )
 {
 	m_led->setChecked( _on );
-	if( ( _anim == TRUE || ( _on == TRUE && height() < m_origHeight ) ) &&
-							m_animating == FALSE )
-	{
-		m_animating = TRUE;
-		animate();
-	}
 	emit( toggled( _on ) );
 }
-
+*/
 
 
 
@@ -126,10 +133,10 @@ void groupBox::animate( void )
 	float state = (float)( m_origHeight - height() ) /
 						(float)( m_origHeight - 19 );
 	int dy = static_cast<int>( 3 - 2 * cosf( state * 2 * M_PI ) );
-	if( isActive() && height() < m_origHeight )
+	if( model()->value() && height() < m_origHeight )
 	{
 	}
-	else if( !isActive() && height() > 19 )
+	else if( !model()->value() && height() > 19 )
 	{
 		dy = -dy;
 	}
@@ -214,23 +221,6 @@ void groupBox::updatePixmap( void )
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );
 	setPalette( pal );
-}
-
-
-
-
-void groupBox::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
-{
-	m_led->saveSettings( _doc, _this, _name );
-}
-
-
-
-
-void groupBox::loadSettings( const QDomElement & _this, const QString & _name )
-{
-	m_led->loadSettings( _this, _name );
 }
 
 

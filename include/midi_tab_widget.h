@@ -29,7 +29,7 @@
 
 #include <QtGui/QWidget>
 
-#include "journalling_object.h"
+#include "automatable_model.h"
 
 
 class QMenu;
@@ -61,14 +61,14 @@ public:
 
 
 public slots:
-	void midiPortModeToggled( bool = FALSE );
+	void midiPortModeChanged( void );
 
 
 protected slots:
-	void inputChannelChanged( int );
-	void outputChannelChanged( int );
-	void defaultVelInChanged( bool );
-	void defaultVelOutChanged( bool );
+	void inputChannelChanged( void );
+	void outputChannelChanged( void );
+	void defaultVelInChanged( void );
+	void defaultVelOutChanged( void );
 	void readablePortsChanged( void );
 	void writeablePortsChanged( void );
 	void activatedReadablePort( QAction * _item );
@@ -85,6 +85,12 @@ private:
 	ledCheckBox * m_sendCheckBox;
 	ledCheckBox * m_defaultVelocityInCheckBox;
 	ledCheckBox * m_defaultVelocityOutCheckBox;
+	intModel m_inputChannelModel;
+	intModel m_outputChannelModel;
+	boolModel m_receiveEnabledModel;
+	boolModel m_sendEnabledModel;
+	boolModel m_defaultVelocityInEnabledModel;
+	boolModel m_defaultVelocityOutEnabledModel;
 
 	QMenu * m_readablePorts;
 	QMenu * m_writeablePorts;

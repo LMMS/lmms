@@ -261,8 +261,8 @@ const QString automationPattern::name( void )
 {
 	if( m_track )
 	{
-		QString widget_name = dynamic_cast<QWidget *>( m_object )
-							->accessibleName();
+		QString widget_name = m_object->displayName();
+/* dynamic_cast<QWidget *>( m_object )->accessibleName();*/
 		return( m_track->name() + " - " + widget_name );
 	}
 	else

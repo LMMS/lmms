@@ -27,14 +27,16 @@
 #define _DETUNING_HELPER_H
 
 
+#include "automatable_model.h"
 #include "shared_object.h"
+#include "automation_editor.h"
 
 
-class detuningHelper : public automatableObject<float>, public sharedObject
+class detuningHelper : public floatModel, public sharedObject
 {
 public:
 	detuningHelper( void ) :
-		autoObj( NULL )
+		autoModel( NULL )
 	{
 	}
 

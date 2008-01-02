@@ -180,30 +180,48 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 arpAndChordsTabWidget::arpAndChordsTabWidget(
 					instrumentTrack * _instrument_track ) :
-	QWidget( _instrument_track->tabWidgetParent() )
+	QWidget( _instrument_track->tabWidgetParent() ),
+	m_chordsEnabledModel( new boolModel( /* this */ ) ),
+	m_chordsModel( new comboBoxModel( /* this */ ) ),
+	m_chordRangeModel( new floatModel( 1.0f, 1.0f, 9.0f, 1.0f
+								/* this */ ) ),
+	m_arpEnabledModel( new boolModel( /* this */ ) ),
+	m_arpModel( new comboBoxModel( /* this */ ) ),
+	m_arpRangeModel( new floatModel( 1.0f, 1.0f, 9.0f, 1.0f
+								/* this */ ) ),
+	m_arpTimeModel( new floatModel( 100.0f, 25.0f, 2000.0f, 1.0f
+								/* this */ ) ),
+	m_arpGateModel( new floatModel( 100.0f, 1.0f, 200.0f, 1.0f
+								/* this */ ) ),
+	m_arpDirectionModel( new intModel( /* this */ ) ),
+	m_arpModeModel( new comboBoxModel( /* this */ ) )
 {
-	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this,
-							_instrument_track );
+	m_chordsEnabledModel->setTrack( _instrument_track );
+	m_chordsGroupBox = new groupBox( tr( "CHORDS" ), this );
 	m_chordsGroupBox->setGeometry( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y,
 						CHORDS_GROUPBOX_WIDTH,
 						CHORDS_GROUPBOX_HEIGHT );
+	m_chordsGroupBox->setModel( m_chordsEnabledModel );
 
-	m_chordsComboBox = new comboBox( m_chordsGroupBox, tr( "Chord type" ),
-							_instrument_track );
+
+	m_chordsModel->setTrack( _instrument_track );
+	m_chordsComboBox = new comboBox( m_chordsGroupBox, tr( "Chord type" ) );
 	m_chordsComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
-		m_chordsComboBox->addItem( tr( s_chords[i].name
-						.toAscii().constData() ) );
+		m_chordsModel->addItem( tr( s_chords[i].name.toAscii().
+								constData() ) );
 	}
+	m_chordsComboBox->setModel( m_chordsModel );
 
+
+	m_chordRangeModel->setTrack( _instrument_track );
+	m_chordRangeModel->setInitValue( 1.0f );
 	m_chordRangeKnob = new knob( knobBright_26, m_chordsGroupBox,
-							tr( "Chord range" ),
-							_instrument_track );
+							tr( "Chord range" ) );
+	m_chordRangeKnob->setModel( m_chordRangeModel );
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
-	m_chordRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
-	m_chordRangeKnob->setInitValue( 1.0f );
 	m_chordRangeKnob->move( 164, 24 );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ) + " ", " " +
 							tr( "octave(s)" ) );
@@ -214,9 +232,9 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 
 
 
-
-	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this,
-							_instrument_track );
+	m_arpEnabledModel->setTrack( _instrument_track );
+	m_arpGroupBox = new groupBox( tr( "ARPEGGIO" ), this );
+	m_arpGroupBox->setModel( m_arpEnabledModel );
 	m_arpGroupBox->setGeometry( ARP_GROUPBOX_X, ARP_GROUPBOX_Y,
 					ARP_GROUPBOX_WIDTH,
 					ARP_GROUPBOX_HEIGHT );
@@ -230,23 +248,26 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 			"not played at the same time. Typical arpeggios are "
 			"major or minor triads. But there're a lot of other "
 			"possible chords, you can select." ) );
-	m_arpComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio type" ),
-							_instrument_track );
+
+
+	m_arpModel->setTrack( _instrument_track );
+	m_arpComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio type" ) );
 	m_arpComboBox->setGeometry( 10, 25, 140, 22 );
 
 	for( int i = 0; s_chords[i].interval[0] != -1; ++i )
 	{
-		m_arpComboBox->addItem( tr( s_chords[i].name
-						.toAscii().constData() ) );
+		m_arpModel->addItem( tr( s_chords[i].name.toAscii().
+								constData() ) );
 	}
+	m_arpComboBox->setModel( m_arpModel );
 
 
+	m_arpRangeModel->setTrack( _instrument_track );
+	m_arpRangeModel->setInitValue( 1.0f );
 	m_arpRangeKnob = new knob( knobBright_26, m_arpGroupBox,
-							tr( "Arpeggio range" ),
-							_instrument_track );
+						tr( "Arpeggio range" ) );
+	m_arpRangeKnob->setModel( m_arpRangeModel );
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
-	m_arpRangeKnob->setRange( 1.0f, 9.0f, 1.0f );
-	m_arpRangeKnob->setInitValue( 1.0f );
 	m_arpRangeKnob->move( 164, 24 );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ) + " ", " " +
 							tr( "octave(s)" ) );
@@ -255,12 +276,13 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 			"The selected arpeggio will be played within specified "
 			"amount of octaves." ) );
 
+
+	m_arpTimeModel->setTrack( _instrument_track );
+	m_arpTimeModel->setInitValue( 100.0f );
 	m_arpTimeKnob = new tempoSyncKnob( knobBright_26, m_arpGroupBox,
-							tr( "Arpeggio time" ),
-							_instrument_track );
+							tr( "Arpeggio time" ) );
+	m_arpTimeKnob->setModel( m_arpTimeModel );
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
-	m_arpTimeKnob->setRange( 25.0f, 2000.0f, 1.0f );
-	m_arpTimeKnob->setInitValue( 100.0f );
 	m_arpTimeKnob->move( 164, 70 );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ) + " ", " " +
 								tr( "ms" ) );
@@ -269,12 +291,13 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 			"milliseconds. The arpeggio time specifies how long "
 			"each arpeggio-tone should be played." ) );
 
+
+	m_arpGateModel->setTrack( _instrument_track );
+	m_arpGateModel->setInitValue( 100.0f );
 	m_arpGateKnob = new knob( knobBright_26, m_arpGroupBox,
-							tr( "Arpeggio gate" ),
-							_instrument_track );
+							tr( "Arpeggio gate" ) );
+	m_arpGateKnob->setModel( m_arpGateModel );
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
-	m_arpGateKnob->setRange( 1.0f, 200.0f, 1.0f );
-	m_arpGateKnob->setInitValue( 100.0f );
 	m_arpGateKnob->move( 204, 70 );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ) + " ", tr( "%" ) );
 	m_arpGateKnob->setWhatsThis(
@@ -289,16 +312,14 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 
 
 
-	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, NULL,
-									NULL );
+	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, NULL );
 	arp_up_btn->move( 10, 74 );
 	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
 	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
 	toolTip::add( arp_up_btn, tr( "arpeggio direction = up" ) );
 
 
-	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, NULL,
-									NULL );
+	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, NULL );
 	arp_down_btn->move( 30, 74 );
 	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
 	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -307,7 +328,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 
 
 	pixmapButton * arp_up_and_down_btn = new pixmapButton( m_arpGroupBox,
-								NULL, NULL );
+									NULL );
 	arp_up_and_down_btn->move( 50, 74 );
 	arp_up_and_down_btn->setActiveGraphic( embed::getIconPixmap(
 						"arp_up_and_down_on" ) );
@@ -317,8 +338,7 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 				tr( "arpeggio direction = up and down" ) );
 
 
-	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox, NULL,
-									NULL );
+	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox, NULL );
 	arp_random_btn->move( 70, 74 );
 	arp_random_btn->setActiveGraphic( embed::getIconPixmap(
 							"arp_random_on" ) );
@@ -327,31 +347,33 @@ arpAndChordsTabWidget::arpAndChordsTabWidget(
 	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
 
 	m_arpDirectionBtnGrp = new automatableButtonGroup( this,
-						tr( "Arpeggio direction" ),
-						_instrument_track );
+						tr( "Arpeggio direction" ) );
+	m_arpDirectionBtnGrp->setModel( m_arpDirectionModel );
 	m_arpDirectionBtnGrp->addButton( arp_up_btn );
 	m_arpDirectionBtnGrp->addButton( arp_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_random_btn );
 
-	m_arpDirectionBtnGrp->setInitValue( UP );
+	m_arpDirectionModel->setTrack( _instrument_track );
+	m_arpDirectionModel->setInitValue( UP );
 
 
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
 	mode_lbl->setGeometry( 10, 104, 64, 10 );
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
-	m_arpModeComboBox = new comboBox( m_arpGroupBox, tr( "Arpeggio mode" ),
-							_instrument_track );
+	m_arpModeComboBox = new comboBox( m_arpGroupBox,
+							tr( "Arpeggio mode" ) );
 	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
 
-	m_arpModeComboBox->addItem( tr( "Free" ),
-					embed::getIconPixmap( "arp_free" ) );
-	m_arpModeComboBox->addItem( tr( "Sort" ),
-					embed::getIconPixmap( "arp_sort" ) );
-	m_arpModeComboBox->addItem( tr( "Sync" ),
-					embed::getIconPixmap( "arp_sync" ) );
-	//m_arpModeComboBox->setValue( 0 );
+	m_arpModeModel->setTrack( _instrument_track );
+	m_arpModeModel->addItem( tr( "Free" ), new QPixmap(
+					embed::getIconPixmap( "arp_free" ) ) );
+	m_arpModeModel->addItem( tr( "Sort" ), new QPixmap(
+					embed::getIconPixmap( "arp_sort" ) ) );
+	m_arpModeModel->addItem( tr( "Sync" ), new QPixmap(
+					embed::getIconPixmap( "arp_sync" ) ) );
+	m_arpModeComboBox->setModel( m_arpModeModel );
 }
 
 
@@ -372,10 +394,10 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if( ( ( _n->baseNote() && m_arpGroupBox->isActive() == FALSE ) ||
+	if( ( ( _n->baseNote() && m_arpEnabledModel->value() == FALSE ) ||
 							_n->arpNote() ) &&
-					_n->totalFramesPlayed() == 0 &&
-					m_chordsGroupBox->isActive() == TRUE )
+				_n->totalFramesPlayed() == 0 &&
+				m_chordsEnabledModel->value() == TRUE )
 	{
 		// then insert sub-notes for chord
 		const int selected_chord = m_chordsComboBox->value();
@@ -426,7 +448,7 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 	// now follows code for arpeggio
 
 	if( _n->baseNote() == FALSE ||
-			!m_arpGroupBox->isActive() ||
+			!m_arpEnabledModel->value() ||
 			( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )
 	{
@@ -593,18 +615,18 @@ void arpAndChordsTabWidget::processNote( notePlayHandle * _n )
 void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	m_chordsGroupBox->saveSettings( _doc, _this, "chord-enabled" );
-	m_chordsComboBox->saveSettings( _doc, _this, "chord" );
-	m_chordRangeKnob->saveSettings( _doc, _this, "chordrange" );
+	m_chordsEnabledModel->saveSettings( _doc, _this, "chord-enabled" );
+	m_chordsModel->saveSettings( _doc, _this, "chord" );
+	m_chordRangeModel->saveSettings( _doc, _this, "chordrange" );
 
-	m_arpGroupBox->saveSettings( _doc, _this, "arp-enabled" );
-	m_arpComboBox->saveSettings( _doc, _this, "arp" );
-	m_arpRangeKnob->saveSettings( _doc, _this, "arprange" );
-	m_arpTimeKnob->saveSettings( _doc, _this, "arptime" );
-	m_arpGateKnob->saveSettings( _doc, _this, "arpgate" );
-	m_arpDirectionBtnGrp->saveSettings( _doc, _this, "arpdir" );
+	m_arpEnabledModel->saveSettings( _doc, _this, "arp-enabled" );
+	m_arpModel->saveSettings( _doc, _this, "arp" );
+	m_arpRangeModel->saveSettings( _doc, _this, "arprange" );
+	m_arpTimeModel->saveSettings( _doc, _this, "arptime" );
+	m_arpGateModel->saveSettings( _doc, _this, "arpgate" );
+	m_arpDirectionModel->saveSettings( _doc, _this, "arpdir" );
 
-	m_arpModeComboBox->saveSettings( _doc, _this, "arpmode" );
+	m_arpModeModel->saveSettings( _doc, _this, "arpmode" );
 }
 
 
@@ -612,16 +634,16 @@ void arpAndChordsTabWidget::saveSettings( QDomDocument & _doc,
 
 void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_chordsGroupBox->loadSettings( _this, "chord-enabled" );
-	m_chordsComboBox->loadSettings( _this, "chord" );
-	m_chordRangeKnob->loadSettings( _this, "chordrange" );
+	m_chordsEnabledModel->loadSettings( _this, "chord-enabled" );
+	m_chordsModel->loadSettings( _this, "chord" );
+	m_chordRangeModel->loadSettings( _this, "chordrange" );
 
-	m_arpGroupBox->loadSettings( _this, "arp-enabled" );
-	m_arpComboBox->loadSettings( _this, "arp" );
-	m_arpRangeKnob->loadSettings( _this, "arprange" );
-	m_arpTimeKnob->loadSettings( _this, "arptime" );
-	m_arpGateKnob->loadSettings( _this, "arpgate" );
-	m_arpDirectionBtnGrp->loadSettings( _this, "arpdir" );
+	m_arpEnabledModel->loadSettings( _this, "arp-enabled" );
+	m_arpModel->loadSettings( _this, "arp" );
+	m_arpRangeModel->loadSettings( _this, "arprange" );
+	m_arpTimeModel->loadSettings( _this, "arptime" );
+	m_arpGateModel->loadSettings( _this, "arpgate" );
+	m_arpDirectionModel->loadSettings( _this, "arpdir" );
 
 	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
@@ -631,7 +653,7 @@ void arpAndChordsTabWidget::loadSettings( const QDomElement & _this )
  						 "arpsyncmode" ).toInt() );
 	}
 
-	m_arpModeComboBox->loadSettings( _this, "arpmode" );
+	m_arpModeModel->loadSettings( _this, "arpmode" );
 }
 
 

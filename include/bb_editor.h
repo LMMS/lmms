@@ -27,17 +27,18 @@
 #define _BB_EDITOR_H
 
 #include "track_container.h"
+#include "combobox.h"
 
 
 class QPixmap;
 
-class comboBox;
 class toolButton;
 
 
 class bbEditor : public trackContainer
 {
 	Q_OBJECT
+	mapPropertyFromModelPtr(int,currentBB,setCurrentBB,m_bbComboBoxModel);
 public:
 	virtual bool FASTCALL play( midiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
@@ -58,11 +59,6 @@ public:
 		return( TRUE );
 	}
 
-	int currentBB( void ) const
-	{
-		return( m_currentBB );
-	}
-
 	tact FASTCALL lengthOfBB( const int _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
@@ -80,7 +76,7 @@ public slots:
 	void play( void );
 	void stop( void );
 	void updateComboBox( void );
-	void setCurrentBB( int _bb );
+	void currentBBChanged( void );
 
 
 protected:
@@ -95,15 +91,13 @@ private:
 	void FASTCALL createTCOsForBB( const int _bb );
 
 
-	int m_currentBB;
-
 	QWidget * m_toolBar;
 
 	toolButton * m_playButton;
 	toolButton * m_stopButton;
 
 	comboBox * m_bbComboBox;
-
+	comboBoxModel * m_bbComboBoxModel;
 
 	friend class engine;
 

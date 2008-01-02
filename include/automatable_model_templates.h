@@ -1,7 +1,7 @@
 /*
- * automatable_object_templates.h - definition of automatableObject templates
+ * automatable_model_templates.h - definition of automatableModel templates
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,12 +23,12 @@
  */
 
 
-#ifndef _AUTOMATABLE_OBJECT_TEMPLATES_H
-#define _AUTOMATABLE_OBJECT_TEMPLATES_H
+#ifndef _AUTOMATABLE_MODEL_TEMPLATES_H
+#define _AUTOMATABLE_MODEL_TEMPLATES_H
 
 #include <QtXml/QDomElement>
 
-#include "automatable_object.h"
+#include "automatable_model.h"
 #include "automation_editor.h"
 #include "automation_pattern.h"
 #include "engine.h"
@@ -37,15 +37,21 @@
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-automatableObject<T, EDIT_STEP_TYPE>::automatableObject( track * _track,
-						const T _val, const T _min,
-						const T _max, const T _step ) :
+automatableModel<T, EDIT_STEP_TYPE>::automatableModel(
+						const T _val,
+						const T _min,
+						const T _max,
+						const T _step,
+						::model * _parent,
+						bool _default_constructed ) :
+	model( _parent, _default_constructed ),
 	m_value( _val ),
+	m_initValue( _val ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
 	m_step( _step ),
-	m_automation_pattern( NULL ),
-	m_track( _track ),
+	m_automationPattern( NULL ),
+	m_track( NULL ),
 	m_journalEntryReady( FALSE )
 {
 	m_curLevel = level( _val );
@@ -57,13 +63,13 @@ automatableObject<T, EDIT_STEP_TYPE>::automatableObject( track * _track,
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-automatableObject<T, EDIT_STEP_TYPE>::~automatableObject()
+automatableModel<T, EDIT_STEP_TYPE>::~automatableModel()
 {
-	delete m_automation_pattern;
-	while( m_linkedObjects.empty() == FALSE )
+	delete m_automationPattern;
+	while( m_linkedModels.empty() == FALSE )
 	{
-		m_linkedObjects.last()->unlinkObject( this );
-		m_linkedObjects.erase( m_linkedObjects.end() - 1 );
+		m_linkedModels.last()->unlinkModel( this );
+		m_linkedModels.erase( m_linkedModels.end() - 1 );
 	}
 }
 
@@ -71,7 +77,7 @@ automatableObject<T, EDIT_STEP_TYPE>::~automatableObject()
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-T automatableObject<T, EDIT_STEP_TYPE>::fittedValue( T _value ) const
+T automatableModel<T, EDIT_STEP_TYPE>::fittedValue( T _value ) const
 {
 	_value = tLimit<T>( _value, minValue(), maxValue() );
 
@@ -104,11 +110,12 @@ T automatableObject<T, EDIT_STEP_TYPE>::fittedValue( T _value ) const
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setInitValue( const T _value )
+void automatableModel<T, EDIT_STEP_TYPE>::setInitValue( const T _value )
 {
+	m_initValue = _value;
 	bool journalling = testAndSetJournalling( FALSE );
 	setValue( _value );
-	if( m_automation_pattern )
+	if( m_automationPattern )
 	{
 		setFirstValue();
 	}
@@ -119,7 +126,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::setInitValue( const T _value )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setValue( const T _value )
+void automatableModel<T, EDIT_STEP_TYPE>::setValue( const T _value )
 {
 	const T old_val = m_value;
 
@@ -133,15 +140,15 @@ void automatableObject<T, EDIT_STEP_TYPE>::setValue( const T _value )
 				static_cast<EDIT_STEP_TYPE>( m_value ) -
 				static_cast<EDIT_STEP_TYPE>( old_val ) ) );
 
-		// notify linked objects
+		// notify linked models
 
 		// doesn't work because of implicit typename T
-		// for( autoObjVector::iterator it =
-		// 			m_linkedObjects.begin();
-		//		it != m_linkedObjects.end(); ++it )
-		for( int i = 0; i < m_linkedObjects.size(); ++i )
+		// for( autoModelVector::iterator it =
+		// 			m_linkedModels.begin();
+		//		it != m_linkedModels.end(); ++it )
+		for( int i = 0; i < m_linkedModels.size(); ++i )
 		{
-			autoObj * it = m_linkedObjects[i];
+			autoModel * it = m_linkedModels[i];
 			if( value() != it->value() && it->fittedValue( value() )
 								!= it->value() )
 			{
@@ -151,6 +158,8 @@ void automatableObject<T, EDIT_STEP_TYPE>::setValue( const T _value )
 				it->setJournalling( journalling );
 			}
 		}
+		setFirstValue();
+		emit dataChanged();
 	}
 }
 
@@ -158,25 +167,30 @@ void automatableObject<T, EDIT_STEP_TYPE>::setValue( const T _value )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setRange( const T _min, const T _max,
+void automatableModel<T, EDIT_STEP_TYPE>::setRange( const T _min, const T _max,
 								const T _step )
 {
-	m_minValue = _min;
-	m_maxValue = _max;
-	if( m_minValue > m_maxValue )
+        if( ( m_maxValue != _max ) || ( m_minValue != _min ) )
 	{
-		qSwap<T>( m_minValue, m_maxValue );
+		m_minValue = _min;
+		m_maxValue = _max;
+		if( m_minValue > m_maxValue )
+		{
+			qSwap<T>( m_minValue, m_maxValue );
+		}
+		setStep( _step );
+		// re-adjust value
+		autoModel::setInitValue( value() );
+
+		emit propertiesChanged();
 	}
-	setStep( _step );
-	// re-adjust value
-	autoObj::setInitValue( value() );
 }
 
 
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setStep( const T _step )
+void automatableModel<T, EDIT_STEP_TYPE>::setStep( const T _step )
 {
 	/*
 	const T intv = maxValue() - minValue();
@@ -201,26 +215,32 @@ void automatableObject<T, EDIT_STEP_TYPE>::setStep( const T _step )
 			m_step = minRelStep() * intv;
 		}
 	}*/
-	m_step = _step;
-	m_curLevel = level( m_value );
-	m_minLevel = level( m_minValue );
-	m_maxLevel = level( m_maxValue );
+	if( m_step != _step )
+	{
+		m_step = _step;
+		m_curLevel = level( m_value );
+		m_minLevel = level( m_minValue );
+		m_maxLevel = level( m_maxValue );
+
+		emit propertiesChanged();
+	}
 }
 
 
 
 
-template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::linkObjects( autoObj * _object1,
-							autoObj * _object2 )
-{
-	_object1->linkObject( _object2 );
-	_object2->linkObject( _object1 );
 
-	if( _object1->m_automation_pattern != _object2->m_automation_pattern )
+template<typename T, typename EDIT_STEP_TYPE>
+void automatableModel<T, EDIT_STEP_TYPE>::linkModels( autoModel * _model1,
+							autoModel * _model2 )
+{
+	_model1->linkModel( _model2 );
+	_model2->linkModel( _model1 );
+
+	if( _model1->m_automationPattern != _model2->m_automationPattern )
 	{
-		delete _object2->m_automation_pattern;
-		_object2->m_automation_pattern = _object1->m_automation_pattern;
+		delete _model2->m_automationPattern;
+		_model2->m_automationPattern = _model1->m_automationPattern;
 	}
 }
 
@@ -228,17 +248,17 @@ void automatableObject<T, EDIT_STEP_TYPE>::linkObjects( autoObj * _object1,
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::unlinkObjects( autoObj * _object1,
-							autoObj * _object2 )
+void automatableModel<T, EDIT_STEP_TYPE>::unlinkModels( autoModel * _model1,
+							autoModel * _model2 )
 {
-	_object1->unlinkObject( _object2 );
-	_object2->unlinkObject( _object1 );
+	_model1->unlinkModel( _model2 );
+	_model2->unlinkModel( _model1 );
 
-	if( _object1->m_automation_pattern && _object1->m_automation_pattern
-					== _object2->m_automation_pattern )
+	if( _model1->m_automationPattern && _model1->m_automationPattern
+					== _model2->m_automationPattern )
 	{
-		_object2->m_automation_pattern = new automationPattern(
-				*_object1->m_automation_pattern, _object2 );
+		_model2->m_automationPattern = new automationPattern(
+				*_model1->m_automationPattern, _model2 );
 	}
 }
 
@@ -246,11 +266,11 @@ void automatableObject<T, EDIT_STEP_TYPE>::unlinkObjects( autoObj * _object1,
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
+void automatableModel<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
 							QDomElement & _this,
 							const QString & _name )
 {
-	if( m_automation_pattern && m_automation_pattern->getTimeMap().size()
+	if( m_automationPattern && m_automationPattern->getTimeMap().size()
 									> 1 )
 	{
 		QDomElement pattern_element;
@@ -267,7 +287,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
 			_this.appendChild( pattern_element );
 		}
 		QDomElement element = _doc.createElement( _name );
-		m_automation_pattern->saveSettings( _doc, element );
+		m_automationPattern->saveSettings( _doc, element );
 		pattern_element.appendChild( element );
 	}
 	else
@@ -280,7 +300,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::loadSettings(
+void automatableModel<T, EDIT_STEP_TYPE>::loadSettings(
 						const QDomElement & _this,
 						const QString & _name )
 {
@@ -290,8 +310,8 @@ void automatableObject<T, EDIT_STEP_TYPE>::loadSettings(
 		node = node.namedItem( _name );
 		if( node.isElement() )
 		{
-			m_automation_pattern->loadSettings( node.toElement() );
-			setLevel( m_automation_pattern->valueAt( 0 ) );
+			m_automationPattern->loadSettings( node.toElement() );
+			setLevel( m_automationPattern->valueAt( 0 ) );
 			return;
 		}
 	}
@@ -303,22 +323,22 @@ void automatableObject<T, EDIT_STEP_TYPE>::loadSettings(
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-automationPattern * automatableObject<T, EDIT_STEP_TYPE>::getAutomationPattern(
+automationPattern * automatableModel<T, EDIT_STEP_TYPE>::getAutomationPattern(
 									void )
 {
-	if( !m_automation_pattern )
+	if( !m_automationPattern )
 	{
-		m_automation_pattern = new automationPattern( m_track, this );
+		m_automationPattern = new automationPattern( m_track, this );
 		syncAutomationPattern();
 	}
-	return( m_automation_pattern );
+	return( m_automationPattern );
 }
 
 
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::redoStep( journalEntry & _je )
+void automatableModel<T, EDIT_STEP_TYPE>::redoStep( journalEntry & _je )
 {
 	bool journalling = testAndSetJournalling( FALSE );
 	setValue( static_cast<T>( value() + static_cast<EDIT_STEP_TYPE>(
@@ -330,7 +350,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::redoStep( journalEntry & _je )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::undoStep( journalEntry & _je )
+void automatableModel<T, EDIT_STEP_TYPE>::undoStep( journalEntry & _je )
 {
 	journalEntry je( _je.actionID(),
 		 static_cast<EDIT_STEP_TYPE>( -_je.data().toDouble() ) );
@@ -341,7 +361,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::undoStep( journalEntry & _je )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::prepareJournalEntryFromOldVal( void )
+void automatableModel<T, EDIT_STEP_TYPE>::prepareJournalEntryFromOldVal( void )
 {
 	m_oldValue = value();
 	saveJournallingState( FALSE );
@@ -352,7 +372,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::prepareJournalEntryFromOldVal( void )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::addJournalEntryFromOldToCurVal(
+void automatableModel<T, EDIT_STEP_TYPE>::addJournalEntryFromOldToCurVal(
 									void )
 {
 	if( m_journalEntryReady )
@@ -371,14 +391,14 @@ void automatableObject<T, EDIT_STEP_TYPE>::addJournalEntryFromOldToCurVal(
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setFirstValue( void )
+void automatableModel<T, EDIT_STEP_TYPE>::setFirstValue( void )
 {
-	if( m_automation_pattern && m_automation_pattern->updateFirst() )
+	if( m_automationPattern && m_automationPattern->updateFirst() )
 	{
-		m_automation_pattern->putValue( 0, m_curLevel, FALSE );
+		m_automationPattern->putValue( 0, m_curLevel, FALSE );
 		if( engine::getAutomationEditor() &&
 				engine::getAutomationEditor()->currentPattern()
-						== m_automation_pattern )
+						== m_automationPattern )
 		{
 			engine::getAutomationEditor()->update();
 		}
@@ -389,12 +409,12 @@ void automatableObject<T, EDIT_STEP_TYPE>::setFirstValue( void )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::linkObject( autoObj * _object )
+void automatableModel<T, EDIT_STEP_TYPE>::linkModel( autoModel * _model )
 {
-	if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(), _object )
-						== m_linkedObjects.end() )
+	if( qFind( m_linkedModels.begin(), m_linkedModels.end(), _model )
+						== m_linkedModels.end() )
 	{
-		m_linkedObjects.push_back( _object );
+		m_linkedModels.push_back( _model );
 	}
 }
 
@@ -402,14 +422,14 @@ void automatableObject<T, EDIT_STEP_TYPE>::linkObject( autoObj * _object )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::unlinkObject( autoObj * _object )
+void automatableModel<T, EDIT_STEP_TYPE>::unlinkModel( autoModel * _model )
 {
-	if( qFind( m_linkedObjects.begin(), m_linkedObjects.end(), _object )
-						!= m_linkedObjects.end() )
+	if( qFind( m_linkedModels.begin(), m_linkedModels.end(), _model )
+						!= m_linkedModels.end() )
 	{
-		m_linkedObjects.erase( qFind( m_linkedObjects.begin(),
-							m_linkedObjects.end(),
-							_object ) );
+		m_linkedModels.erase( qFind( m_linkedModels.begin(),
+							m_linkedModels.end(),
+							_model ) );
 	}
 }
 
@@ -417,14 +437,14 @@ void automatableObject<T, EDIT_STEP_TYPE>::unlinkObject( autoObj * _object )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::syncAutomationPattern( void )
+void automatableModel<T, EDIT_STEP_TYPE>::syncAutomationPattern( void )
 {
-	for( int i = 0; i < m_linkedObjects.size(); ++i )
+	for( int i = 0; i < m_linkedModels.size(); ++i )
 	{
-		autoObj * it = m_linkedObjects[i];
-		if( m_automation_pattern != it->m_automation_pattern )
+		autoModel * it = m_linkedModels[i];
+		if( m_automationPattern != it->m_automationPattern )
 		{
-			it->m_automation_pattern = m_automation_pattern;
+			it->m_automationPattern = m_automationPattern;
 		}
 	}
 }
@@ -433,16 +453,16 @@ void automatableObject<T, EDIT_STEP_TYPE>::syncAutomationPattern( void )
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-void automatableObject<T, EDIT_STEP_TYPE>::setLevel( int _level )
+void automatableModel<T, EDIT_STEP_TYPE>::setLevel( int _level )
 {
 	if( m_curLevel == _level )
 	{
 		return;
 	}
 	bool journalling = testAndSetJournalling( FALSE );
-	m_automation_pattern->setUpdateFirst( FALSE );
+	m_automationPattern->setUpdateFirst( FALSE );
 	setValue( _level * m_step );
-	m_automation_pattern->setUpdateFirst( TRUE );
+	m_automationPattern->setUpdateFirst( TRUE );
 	setJournalling( journalling );
 }
 
@@ -450,7 +470,7 @@ void automatableObject<T, EDIT_STEP_TYPE>::setLevel( int _level )
 
 
 template<>
-inline float automatableObject<float>::minRelStep( void )
+inline float automatableModel<float>::minRelStep( void )
 {
 	return( 1.0e-10 );
 }
@@ -459,7 +479,7 @@ inline float automatableObject<float>::minRelStep( void )
 
 
 template<>
-inline float automatableObject<float>::defaultRelStep( void )
+inline float automatableModel<float>::defaultRelStep( void )
 {
 	return( 1.0e-2 );
 }
@@ -468,7 +488,7 @@ inline float automatableObject<float>::defaultRelStep( void )
 
 
 template<>
-inline float automatableObject<float>::minEps( void )
+inline float automatableModel<float>::minEps( void )
 {
 	return( 1.0e-10 );
 }
@@ -477,7 +497,7 @@ inline float automatableObject<float>::minEps( void )
 
 
 template<>
-inline float automatableObject<float>::attributeValue( QString _value )
+inline float automatableModel<float>::attributeValue( QString _value )
 {
 	return( _value.toFloat() );
 }
@@ -486,7 +506,7 @@ inline float automatableObject<float>::attributeValue( QString _value )
 
 
 template<>
-inline int automatableObject<int>::attributeValue( QString _value )
+inline int automatableModel<int>::attributeValue( QString _value )
 {
 	return( _value.toInt() );
 }
@@ -495,7 +515,15 @@ inline int automatableObject<int>::attributeValue( QString _value )
 
 
 template<>
-inline bool automatableObject<bool, signed char>::attributeValue(
+inline bool automatableModel<bool>::attributeValue( QString _value )
+{
+	return( static_cast<bool>( _value.toInt() ) );
+}
+
+
+
+template<>
+inline bool automatableModel<bool, signed char>::attributeValue(
 								QString _value )
 {
 	return( static_cast<bool>( _value.toInt() ) );

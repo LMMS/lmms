@@ -39,6 +39,7 @@ class QPixmap;
 class QScrollBar;
 
 class comboBox;
+class comboBoxModel;
 class notePlayHandle;
 class pattern;
 class timeLine;
@@ -125,7 +126,7 @@ protected slots:
 
 	void updatePosition( const midiTime & _t );
 
-	void zoomingChanged( const QString & _zfac );
+	void zoomingChanged( void );
 
 
 private:
@@ -195,6 +196,11 @@ private:
 	comboBox * m_zoomingComboBox;
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
+
+	comboBoxModel * m_zoomingModel;
+	comboBoxModel * m_quantizeModel;
+	comboBoxModel * m_noteLenModel;
+
 
 
 	pattern * m_pattern;

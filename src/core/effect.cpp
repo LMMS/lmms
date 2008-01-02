@@ -39,11 +39,11 @@ effect::effect( const plugin::descriptor * _desc,
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
 	m_running( FALSE ),
-	m_bypass( FALSE ),
+	m_enabledModel( FALSE, FALSE, TRUE ),
 	m_bufferCount( 0 ),
 	m_silenceTimeout( 10 ),
-	m_wetDry( 1.0f ),
-	m_gate( 0.0f )
+	m_wetDryModel( 1.0f, 0.0f, 1.0f, 0.01f ),
+	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f )
 {
 }
 
@@ -65,13 +65,13 @@ bool FASTCALL effect::processAudioBuffer( surroundSampleFrame * _buf,
 
 
 
-
+/*
 void FASTCALL effect::setGate( float _level )
 {
 	m_gate = _level * _level * m_processors * 
 				engine::getMixer()->framesPerPeriod();
 }
-
+*/
 
 effect * effect::instantiate( const QString & _plugin_name,
 				descriptor::subPluginFeatures::key * _key )

@@ -465,12 +465,15 @@ audioALSA::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-							this, NULL, NULL );
-	m_channels->setStep( 2 );
-	m_channels->setLabel( tr( "CHANNELS" ) );
-	m_channels->setValue( configManager::inst()->value( "audioalsa",
+	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );
+	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setStep( 2 );
+	m->setValue( configManager::inst()->value( "audioalsa",
 							"channels" ).toInt() );
+
+	m_channels = new lcdSpinBox( 1, this );
+	m_channels->setModel( m );
+	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );
 
 }

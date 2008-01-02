@@ -31,6 +31,7 @@
 
 #include "journalling_object.h"
 #include "types.h"
+#include "automatable_model.h"
 
 
 class QLabel;
@@ -44,6 +45,7 @@ class groupBox;
 class knob;
 class notePlayHandle;
 class tempoSyncKnob;
+class comboBoxModel;
 
 
 const int MAX_CHORD_POLYPHONY = 10;
@@ -101,20 +103,32 @@ private:
 
 	// chord-stuff
 	groupBox * m_chordsGroupBox;
+	boolModel * m_chordsEnabledModel;
 	comboBox * m_chordsComboBox;
+	comboBoxModel * m_chordsModel;
 	knob * m_chordRangeKnob;
+	floatModel * m_chordRangeModel;
 
 	// arpeggio-stuff
 	groupBox * m_arpGroupBox;
+	boolModel * m_arpEnabledModel;
 	comboBox * m_arpComboBox;
+	comboBoxModel * m_arpModel;
 	knob * m_arpRangeKnob;
+	floatModel * m_arpRangeModel;
 	tempoSyncKnob * m_arpTimeKnob;
+	floatModel * m_arpTimeModel;
 	knob * m_arpGateKnob;
+	floatModel * m_arpGateModel;
+
 	QLabel * m_arpDirectionLbl;
 
 	automatableButtonGroup * m_arpDirectionBtnGrp;
+	intModel * m_arpDirectionModel;
 
 	comboBox * m_arpModeComboBox;
+	comboBoxModel * m_arpModeModel;
+
 
 	friend class flpImport;
 

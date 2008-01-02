@@ -31,7 +31,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 
-#include "automatable_object_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
 
@@ -44,9 +43,8 @@ static const QString names[ledCheckBox::TOTAL_COLORS] =
 
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
-					const QString & _name, track * _track,
-					ledColors _color ) :
-	automatableButton( _parent, _name, _track ),
+				const QString & _name, ledColors _color ) :
+	automatableButton( _parent, _name ),
 	m_text( _text )
 {
 	setCheckable( TRUE );
@@ -82,7 +80,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.setFont( pointSize<7>( font() ) );
 
-	if( isChecked() == TRUE )
+	if( model()->value() == TRUE )
 	{
 		p.drawPixmap( 0, 0, *m_ledOnPixmap );
 	}

@@ -34,8 +34,7 @@ class volumeKnob : public knob
 {
 	Q_OBJECT
 public:
-	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-							track * _track );
+	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name );
 	virtual ~volumeKnob();
 
 

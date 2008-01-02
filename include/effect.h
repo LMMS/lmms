@@ -34,11 +34,14 @@
 #include <Qt/QtXml>
 
 #include "plugin.h"
+#include "engine.h"
 #include "mixer.h"
+#include "automatable_model.h"
 
 
 class effectControlDialog;
 class track;
+class rackPlugin;
 
 
 class effect : public plugin
@@ -88,14 +91,9 @@ public:
 		m_running = FALSE;
 	}
 	
-	inline bool isBypassed( void )
+	inline bool enabled( void )
 	{
-		return( m_bypass );
-	}
-	
-	inline void setBypass( bool _mode )
-	{
-		m_bypass = _mode;
+		return( m_enabledModel.value() );
 	}
 	
 	inline Uint32 getTimeout( void )
@@ -110,45 +108,41 @@ public:
 	
 	inline float getWetLevel( void )
 	{
-		return( m_wetDry );
+		return( m_wetDryModel.value() );
 	}
 	
 	inline float getDryLevel( void )
 	{
-		return( 1.0f - m_wetDry );
+		return( 1.0f - m_wetDryModel.value() );
 	}
 	
-	inline void setWetLevel( float _wet )
-	{
-		m_wetDry = _wet;
-	}
 	inline float getGate( void )
 	{
-		return( m_gate );
+		const float level = m_gateModel.value();
+		return( level*level * m_processors *
+				engine::getMixer()->framesPerPeriod()  );
 	}
-	
-	void setGate( float _level );
-	
+
 	inline Uint32 getBufferCount( void )
 	{
 		return( m_bufferCount );
 	}
-	
+
 	inline void resetBufferCount( void )
 	{
 		m_bufferCount = 0;
 	}
-	
+
 	inline void incrementBufferCount( void )
 	{
 		m_bufferCount++;
 	}
-	
+
 	inline bool dontRun( void )
 	{
 		return( m_noRun );
 	}
-	
+
 	inline void setDontRun( bool _state )
 	{
 		m_noRun = _state;
@@ -169,17 +163,20 @@ private:
 	descriptor::subPluginFeatures::key m_key;
 
 	ch_cnt_t m_processors;
-	
+
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
-	bool m_bypass;
-	
+	boolModel m_enabledModel;
+
 	Uint32 m_bufferCount;
 	Uint32 m_silenceTimeout;
-	
-	float m_wetDry;
-	float m_gate;
+
+	floatModel m_wetDryModel;
+	floatModel m_gateModel;
+
+
+	friend class rackPlugin;
 
 } ;
 

@@ -26,7 +26,7 @@
 #include <QtGui/QWhatsThis>
 
 #include "ladspa_control.h"
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "ladspa_base.h"
 #include "led_checkbox.h"
 #include "tempo_sync_knob.h"
@@ -42,31 +42,41 @@ ladspaControl::ladspaControl( QWidget * _parent,
 	m_track( _track ),
 	m_link( NULL ),
 	m_toggle( NULL ),
-	m_knob( NULL )
+	m_knob( NULL ),
+        m_linkEnabledModel( FALSE, FALSE, TRUE ),
+        m_toggledModel( FALSE, FALSE, TRUE ),
+        m_knobModel()
 {
 	m_layout = new QHBoxLayout( this );
 	
 	if( _link )
 	{
-		m_link = new ledCheckBox( "", this, NULL, NULL );
-		m_link->setChecked( FALSE );
-		connect( m_link, SIGNAL( toggled( bool ) ),
-			 this, SLOT( portLink( bool ) ) );
-		m_layout->addWidget( m_link );
+		m_link = new ledCheckBox( "", this );
 		toolTip::add( m_link, tr( "Link channels" ) );
+
+		m_linkEnabledModel.setValue( FALSE );
+		m_linkEnabledModel.setTrack( _track );
+		m_link->setModel( &m_linkEnabledModel );
+		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
+					 this, SLOT( linkStateChanged() ) );
+
+		m_layout->addWidget( m_link );
 	}
 	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle = new ledCheckBox( m_port->name, this, "",
-						m_track, ledCheckBox::GREEN );
-			connect( m_toggle, SIGNAL( toggled( bool ) ),
-				 this, SLOT( ledChange( bool ) ) );
+			m_toggledModel.setTrack( m_track );
+			m_toggle = new ledCheckBox( m_port->name, this,
+							QString::null,
+							ledCheckBox::GREEN );
+			m_toggle->setModel( &m_toggledModel );
+			connect( &m_toggledModel, SIGNAL( dataChanged() ),
+					 this, SLOT( ledChanged() ) );
 			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
-				m_toggle->setChecked( TRUE );
+				m_toggledModel.setValue( TRUE );
 			}
 			if( _link )
 			{
@@ -77,17 +87,19 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case INTEGER:
-			m_knob = new knob( knobBright_26, this, m_port->name,
-								m_track );
-			connect( m_knob, SIGNAL( valueChanged( float ) ),
-				 this, SLOT( knobChange( float ) ) );
-			m_knob->setLabel( m_port->name );
-			m_knob->setRange( static_cast<int>( m_port->max ), 
+			m_knobModel.setTrack( m_track );
+			m_knobModel.setRange( static_cast<int>( m_port->max ), 
 					  static_cast<int>( m_port->min ), 
 					  1 + static_cast<int>( m_port->max - 
 							  m_port->min ) / 400 );
-			m_knob->setInitValue( 
+			m_knobModel.setInitValue( 
 					static_cast<int>( m_port->def ) );
+			m_knob = new knob( knobBright_26, this, m_port->name );
+			m_knob->setModel( &m_knobModel );
+			connect( &m_knobModel, SIGNAL( dataChanged() ),
+						 this, SLOT( knobChanged() ) );
+
+			m_knob->setLabel( m_port->name );
 			setFixedSize( m_knob->width(), m_knob->height() );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 			m_knob->setWhatsThis(
@@ -101,17 +113,18 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case FLOAT:
-			m_knob = new knob( knobBright_26, this, m_port->name,
-								m_track );
-			connect( m_knob, SIGNAL( valueChanged( float ) ), 
-				 this, SLOT( knobChange( float ) ) );
-			m_knob->setLabel( m_port->name );
-			m_knob->setRange( m_port->min, m_port->max,
+			m_knobModel.setTrack( m_track );
+			m_knobModel.setRange( m_port->min, m_port->max,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
 								400.0f ) );
-			m_knob->setInitValue( m_port->def );
+			m_knobModel.setInitValue( m_port->def );
+			m_knob = new knob( knobBright_26, this, m_port->name );
+			m_knob->setModel( &m_knobModel );
+			connect( &m_knobModel, SIGNAL( dataChanged() ),
+						 this, SLOT( knobChanged() ) );
+			m_knob->setLabel( m_port->name );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 			m_knob->setWhatsThis(
 					tr( "Sorry, no help available." ) );
@@ -125,15 +138,17 @@ ladspaControl::ladspaControl( QWidget * _parent,
 			}
 			break;
 		case TIME:
-			m_knob = new tempoSyncKnob( knobBright_26, this,
-							m_port->name, m_track );
-			connect( m_knob, SIGNAL( valueChanged( float ) ), 
-					this, SLOT( knobChange( float ) ) );
-			m_knob->setLabel( m_port->name );
-			m_knob->setRange( m_port->min, m_port->max, 
+			m_knobModel.setTrack( m_track );
+			m_knobModel.setRange( m_port->min, m_port->max, 
 					  ( m_port->max - 
 						m_port->min ) / 400.0f );
-			m_knob->setInitValue( m_port->def );
+			m_knobModel.setInitValue( m_port->def );
+			m_knob = new tempoSyncKnob( knobBright_26, this,
+								m_port->name );
+			m_knob->setModel( &m_knobModel );
+			connect( &m_knobModel, SIGNAL( dataChanged() ),
+						 this, SLOT( knobChanged() ) );
+			m_knob->setLabel( m_port->name );
 			m_knob->setHintText( tr( "Value:" ) + " ", "" );
 			m_knob->setWhatsThis(
 					tr( "Sorry, no help available." ) );
@@ -169,12 +184,13 @@ LADSPA_Data ladspaControl::getValue( void )
 	{
 		case TOGGLED:
 			value = static_cast<LADSPA_Data>( 
-							m_toggle->isChecked() );
+						m_toggledModel.value() );
 			break;
 		case INTEGER:
 		case FLOAT:
 		case TIME:
-			value = static_cast<LADSPA_Data>( m_knob->value() );
+			value = static_cast<LADSPA_Data>(
+							m_knobModel.value() );
 			break;		
 		default:
 			printf( "ladspaControl::getValue BAD BAD BAD\n" );
@@ -192,14 +208,14 @@ void ladspaControl::setValue( LADSPA_Data _value )
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle->setChecked( static_cast<bool>( _value ) );
+			m_toggledModel.setValue( static_cast<bool>( _value ) );
 			break;
 		case INTEGER:
-			m_knob->setValue( static_cast<int>( _value ) );
+			m_knobModel.setValue( static_cast<int>( _value ) );
 			break;
 		case FLOAT:
 		case TIME:
-			m_knob->setValue( static_cast<float>( _value ) );
+			m_knobModel.setValue( static_cast<float>( _value ) );
 			break;
 		default:
 			printf("ladspaControl::setValue BAD BAD BAD\n");
@@ -216,17 +232,17 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 {
 	if( m_link != NULL )
 	{
-		m_link->saveSettings( _doc, _this, _name + "link" );
+		m_linkEnabledModel.saveSettings( _doc, _this, _name + "link" );
 	}
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle->saveSettings( _doc, _this, _name );
+			m_toggledModel.saveSettings( _doc, _this, _name );
 			break;
 		case INTEGER:
 		case FLOAT:
 		case TIME:
-			m_knob->saveSettings( _doc, _this, _name );
+			m_knobModel.saveSettings( _doc, _this, _name );
 			break;
 		default:
 			printf("ladspaControl::saveSettings BAD BAD BAD\n");
@@ -241,17 +257,17 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 {
 	if( m_link != NULL )
 	{
-		m_link->loadSettings( _this, _name + "link" );
+		m_linkEnabledModel.loadSettings( _this, _name + "link" );
 	}
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggle->loadSettings( _this, _name );
+			m_toggledModel.loadSettings( _this, _name );
 			break;
 		case INTEGER:
 		case FLOAT:
 		case TIME:
-			m_knob->loadSettings( _this, _name );
+			m_knobModel.loadSettings( _this, _name );
 			break;
 		default:
 			printf("ladspaControl::loadSettings BAD BAD BAD\n");
@@ -267,12 +283,14 @@ void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			ledCheckBox::linkObjects( m_toggle, _control->getToggle() );
+			boolModel::linkModels( &m_toggledModel,
+						_control->getToggledModel() );
 			break;
 		case INTEGER:
 		case FLOAT:
 		case TIME:
-			knob::linkObjects( m_knob, _control->getKnob() );
+			knobModel::linkModels( &m_knobModel,
+						_control->getKnobModel() );
 			break;
 		default:
 			break;
@@ -282,17 +300,19 @@ void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 
 
 
-void ladspaControl::ledChange( bool _state )
+void ladspaControl::ledChanged( void )
 {
-	emit( changed( m_port->port_id, static_cast<LADSPA_Data>( _state ) ) );
+	emit( changed( m_port->port_id, static_cast<LADSPA_Data>(
+						m_toggledModel.value() ) ) );
 }
 
 
 
 
-void ladspaControl::knobChange( float _value )
+void ladspaControl::knobChanged( void )
 {
-	emit( changed( m_port->port_id, static_cast<LADSPA_Data>( _value ) ) );
+	emit( changed( m_port->port_id, static_cast<LADSPA_Data>(
+						m_knobModel.value() ) ) );
 }
 
 
@@ -303,12 +323,14 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			ledCheckBox::unlinkObjects( m_toggle, _control->getToggle() );
+			boolModel::unlinkModels( &m_toggledModel,
+						_control->getToggledModel() );
 			break;
 		case INTEGER:
 		case FLOAT:
 		case TIME:
-			knob::unlinkObjects( m_knob, _control->getKnob() );
+			knobModel::unlinkModels( &m_knobModel,
+						_control->getKnobModel() );
 			break;
 		default:
 			break;
@@ -318,9 +340,9 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 
 
 
-void ladspaControl::portLink( bool _state )
+void ladspaControl::linkStateChanged( void )
 {
-	emit( linkChanged( m_port->control_id, _state ) );
+	emit( linkChanged( m_port->control_id, m_linkEnabledModel.value() ) );
 }
 
 
@@ -328,10 +350,7 @@ void ladspaControl::portLink( bool _state )
 
 void FASTCALL ladspaControl::setLink( bool _state )
 {
-	if( m_link != NULL )
-	{
-		m_link->setChecked( _state );
-	}
+	m_linkEnabledModel.setValue( _state );
 }
 
 

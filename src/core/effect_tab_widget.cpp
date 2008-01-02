@@ -42,6 +42,7 @@
 #include "rack_view.h"
 #include "sample_track.h"
 #include "tooltip.h"
+#include "automatable_model_templates.h"
 
 
 
@@ -79,8 +80,8 @@ effectTabWidget::~effectTabWidget()
 
 void effectTabWidget::setupWidget( void )
 {
-	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this,
-								m_track );
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
+	m_effectsGroupBox->model()->setTrack( m_track );
 	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), 
 					this, SLOT( setBypass( bool ) ) );
 	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
@@ -100,7 +101,8 @@ void effectTabWidget::setupWidget( void )
 
 void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "fxdisabled", !m_effectsGroupBox->isActive() );
+	_this.setAttribute( "fxdisabled",
+					!m_effectsGroupBox->model()->value() );
 	m_rack->saveState( _doc, _this );
 
 }
@@ -110,7 +112,7 @@ void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effectTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_effectsGroupBox->setState( 
+	m_effectsGroupBox->model()->setValue( 
 				!_this.attribute( "fxdisabled" ).toInt() );
 	
 	QDomNode node = _this.firstChild();
