@@ -3,7 +3,7 @@
 /*
  * about_dialog.cpp - implementation of about-dialog
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,7 +73,7 @@ aboutDialog::aboutDialog() :
 
 	QLabel * about_lbl = new QLabel( tr( "LMMS - A powerful "
 						"synthesizer-studio\n\n"
-						"Copyright (c) 2004-2007 "
+						"Copyright (c) 2004-2008 "
 						"LMMS-Developers\n\n"
 						"http://lmms.sourceforge.net" )
 #ifndef QT4
