@@ -1,7 +1,7 @@
 /*
  * dummy_effect.h - effect used as fallback if an effect couldn't be loaded
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,29 @@
 #define _DUMMY_EFFECT_H
 
 #include "effect.h"
+#include "effect_control_dialog.h"
+
+
+class dummyEffectControlDialog : public effectControlDialog
+{
+public:
+	dummyEffectControlDialog( effect * _eff ) :
+		effectControlDialog( NULL, _eff )
+	{
+	}
+
+	virtual ch_cnt_t getControlCount( void )
+	{
+		return( 0 );
+	}
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "dummycontrols" );
+	}
+
+} ;
+
 
 
 class dummyEffect : public effect
@@ -57,8 +80,7 @@ public:
 
 	inline virtual effectControlDialog * createControlDialog( track * )
 	{
-		// TODO: setup a dummy control-dialog for not crashing LMMS
-		return( NULL );
+		return( new dummyEffectControlDialog( this ) );
 	}
 
 } ;
