@@ -4,7 +4,7 @@
  * effect.cpp - base-class for effects
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,7 @@
 effect::effect( const plugin::descriptor * _desc,
 			const descriptor::subPluginFeatures::key * _key ) :
 	plugin( _desc ),
-	m_key( *_key ),
+	m_key( _key ? *_key : descriptor::subPluginFeatures::key()  ),
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
 	m_running( FALSE ),
