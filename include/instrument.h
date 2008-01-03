@@ -2,7 +2,7 @@
  * instrument.h - declaration of class instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,28 +27,32 @@
 #ifndef _INSTRUMENT_H
 #define _INSTRUMENT_H
 
-
 #include <QtGui/QWidget>
-#include <QtCore/QVector>
 
 #include "plugin.h"
 #include "mixer.h"
+#include "mv_base.h"
 
 
 // forward-declarations
 class instrumentTrack;
-class notePlayHandle;
+class instrumentView;
 class midiEvent;
 class midiTime;
+class notePlayHandle;
 class track;
 
 
-class instrument : public QWidget, public plugin
+class instrument : public plugin, public model
 {
 public:
-	instrument( instrumentTrack * _channel_track,
+	instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor );
 	virtual ~instrument();
+
+	// --------------------------------------------------------------------
+	// functions that can/should be re-implemented:
+	// --------------------------------------------------------------------
 
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes it's
@@ -101,12 +105,19 @@ public:
 		return( FALSE );
 	}
 
+
+	// --------------------------------------------------------------------
+	// provided functions:
+	// --------------------------------------------------------------------
+
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
 	static instrument * FASTCALL instantiate( const QString & _plugin_name,
-					instrumentTrack * _channel_track );
+					instrumentTrack * _instrument_track );
 
 	virtual bool isFromTrack( const track * _track ) const;
+
+	instrumentView * createEditor( QWidget * _parent );
 
 
 protected:
@@ -120,11 +131,38 @@ protected:
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
 
+	// instruments have to implement this to create an according view for
+	// themselves
+	virtual instrumentView * createView( QWidget * _parent ) = 0;
+
 
 private:
 	instrumentTrack * m_instrumentTrack;
 
 } ;
+
+
+
+class instrumentView : public QWidget, public modelView
+{
+public:
+	instrumentView( instrument * _instrument, QWidget * _parent );
+	virtual ~instrumentView();
+
+	instrument * model( void )
+	{
+		return( castModel<instrument>() );
+	}
+
+	const instrument * model( void ) const
+	{
+		return( castModel<instrument>() );
+	}
+
+	virtual void setModel( ::model * _model, bool = FALSE );
+
+} ;
+
 
 
 #endif

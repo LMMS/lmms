@@ -2,7 +2,7 @@
  * dummy_instrument.h - instrument used as fallback if an instrument couldn't
  *                      be loaded
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,8 +33,8 @@
 class dummyInstrument : public instrument
 {
 public:
-	inline dummyInstrument( instrumentTrack * _channel_track ) :
-		instrument( _channel_track, NULL )
+	inline dummyInstrument( instrumentTrack * _instrument_track ) :
+		instrument( _instrument_track, NULL )
 	{
 	}
 
@@ -56,6 +56,10 @@ public:
 		return( "dummyinstrument" );
 	}
 
+	virtual instrumentView * createView( QWidget * _parent )
+	{
+		return( new instrumentView( this, _parent ) );
+	}
 } ;
 
 

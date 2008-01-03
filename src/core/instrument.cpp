@@ -3,7 +3,7 @@
 /*
  * instrument.cpp - base-class for all instrument-plugins (synths, samplers etc)
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,12 +34,10 @@
 
 instrument::instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor ) :
-	QWidget( _instrument_track->tabWidgetParent() ),
 	plugin( _descriptor ),
+	model( /* _instrument_track */ NULL ),
 	m_instrumentTrack( _instrument_track )
 {
-	setFixedSize( 250, 250 );
-	m_instrumentTrack->setWindowIcon( *getDescriptor()->logo );
 }
 
 
@@ -107,6 +105,16 @@ bool instrument::isFromTrack( const track * _track ) const
 
 
 
+instrumentView * instrument::createEditor( QWidget * _parent )
+{
+	instrumentView * i = createView( _parent );
+	i->setModel( this );
+	return( i );
+}
+
+
+
+
 void instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -127,5 +135,44 @@ void instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 		}
 	}
 }
+
+
+
+
+
+
+
+
+instrumentView::instrumentView( instrument * _instrument, QWidget * _parent ) :
+	QWidget( _parent ),
+	modelView()
+{
+	setModel( _instrument );
+	setFixedSize( 250, 250 );
+}
+
+
+
+
+instrumentView::~instrumentView()
+{
+}
+
+
+
+void instrumentView::setModel( ::model * _model, bool )
+{
+	if( dynamic_cast<instrument *>( _model ) != NULL )
+	{
+		modelView::setModel( _model );
+		if( dynamic_cast<instrumentTrack *>( parentWidget() ) != NULL )
+		{
+			dynamic_cast<instrumentTrack *>( parentWidget() )->
+				setWindowIcon( *( model()->
+						getDescriptor()->logo ) );
+		}
+	}
+}
+
 
 #endif

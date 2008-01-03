@@ -1,7 +1,7 @@
 /*
  * mv_base.h - base for M/V-architecture of LMMS
  *
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -77,12 +77,7 @@ public:
 	{
 	}
 
-	void setModel( model * _model, bool _old_model_valid = TRUE );
-
-	// sub-classes can re-implement this to track model-changes
-	virtual void modelChanged( void )
-	{
-	}
+	virtual void setModel( model * _model, bool _old_model_valid = TRUE );
 
 	template<class T>
 	T * castModel( void )
@@ -94,6 +89,13 @@ public:
 	const T * castModel( void ) const
 	{
 		return( dynamic_cast<T *>( m_model ) );
+	}
+
+
+protected:
+	// sub-classes can re-implement this to track model-changes
+	virtual void modelChanged( void )
+	{
 	}
 
 

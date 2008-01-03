@@ -1,7 +1,7 @@
 /*
  * kicker.h - bassdrum-synthesizer
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,10 +27,11 @@
 #define _KICKER_H
 
 #include "instrument.h"
+#include "knob.h"
 
 
+class kickerInstrumentView;
 class notePlayHandle;
-class knob;
 
 
 class kickerInstrument : public instrument
@@ -55,13 +56,40 @@ public:
 		return( 512 );
 	}
 
+	virtual instrumentView * createView( QWidget * _parent );
+
+
 private:
+	knobModel m_startFreqModel;
+	knobModel m_endFreqModel;
+	knobModel m_decayModel;
+	knobModel m_distModel;
+	knobModel m_gainModel;
+
+	friend class kickerInstrumentView;
+
+} ;
+
+
+
+class kickerInstrumentView : public instrumentView
+{
+public:
+	kickerInstrumentView( instrument * _instrument,
+					QWidget * _parent );
+	virtual ~kickerInstrumentView();
+
+private:
+	virtual void modelChanged( void );
+
 	knob * m_startFreqKnob;
 	knob * m_endFreqKnob;
 	knob * m_decayKnob;
 	knob * m_distKnob;
 	knob * m_gainKnob;
+
 } ;
+
 
 
 #endif

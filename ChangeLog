@@ -1,5 +1,18 @@
 2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	make plugin work with M/V-architecture
+
+	* include/instrument.h:
+	* include/dummy_instrument.h:
+	* include/mv_base.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/instrument.cpp:
+	M/V-split for instrument-tracks
+
+2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
 	* include/dummy_effect.h:
 	* src/core/effect.cpp:
 	make dummyEffect really work in case we need it

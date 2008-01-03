@@ -4,7 +4,7 @@
  * instrument_track.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1040,7 +1040,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					m_instrument->restoreState(
 							node.toElement() );
 				}
-				m_tabWidget->addTab( m_instrument,
+				m_tabWidget->addTab( m_instrument->
+						createEditor( m_tabWidget ),
 							tr( "PLUGIN" ), 0 );
 			}
 		}
@@ -1075,7 +1076,8 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 	m_instrument = instrument::instantiate( _plugin_name, this );
 	engine::getMixer()->unlock();
 
-	m_tabWidget->addTab( m_instrument, tr( "PLUGIN" ), 0 );
+	m_tabWidget->addTab( m_instrument->createEditor( m_tabWidget ),
+							tr( "PLUGIN" ), 0 );
 	m_tabWidget->setActiveTab( 0 );
 
 	m_tswInstrumentTrackButton->update();

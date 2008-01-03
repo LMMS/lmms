@@ -1,7 +1,7 @@
 /*
  * kicker.cpp - bassdrum-synthesizer
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,6 +32,7 @@
 #include "knob.h"
 #include "note_play_handle.h"
 #include "sweep_oscillator.h"
+#include "automatable_model_templates.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -57,58 +58,13 @@ plugin::descriptor kicker_plugin_descriptor =
 
 
 kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &kicker_plugin_descriptor )
+	instrument( _instrument_track, &kicker_plugin_descriptor ),
+	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this ),
+	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this ),
+	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this ),
+	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this ),
+	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this )
 {
-	QVBoxLayout * vl = new QVBoxLayout( this );
-	QHBoxLayout * hl = new QHBoxLayout;
-	m_startFreqKnob = new knob( knobDark_28, this, tr( "Start frequency" ),
-							_instrument_track );
-	m_startFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
- 	m_startFreqKnob->setInitValue( 150.0f );
-	m_startFreqKnob->setLabel( tr( "START" ) );
-	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
-
-	m_endFreqKnob = new knob( knobDark_28, this, tr( "End frequency" ),
-							_instrument_track );
-	m_endFreqKnob->setRange( 5.0f, 1000.0f, 1.0f );
-	m_endFreqKnob->setInitValue( 40.0f );
-	m_endFreqKnob->setLabel( tr( "END" ) );
-	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
-
-	m_decayKnob = new knob( knobDark_28, this, tr( "Decay" ),
-							_instrument_track );
-	m_decayKnob->setRange( 5.0f, 1000.0f, 1.0f );
-	m_decayKnob->setInitValue( 120.0f );
-	m_decayKnob->setLabel( tr( "DECAY" ) );
-	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
-
-	m_distKnob = new knob( knobDark_28, this, tr( "Distortion" ),
-							_instrument_track );
-	m_distKnob->setRange( 0.0f, 100.0f, 0.1f );
-	m_distKnob->setInitValue( 0.8f );
-	m_distKnob->setLabel( tr( "DIST" ) );
-	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
-
-	m_gainKnob = new knob( knobDark_28, this, tr( "Gain" ),
-							_instrument_track );
-	m_gainKnob->setRange( 0.1f, 5.0f, 0.05f );
-	m_gainKnob->setInitValue( 1.0f );
-	m_gainKnob->setLabel( tr( "GAIN" ) );
-	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
-
-	hl->addWidget( m_startFreqKnob );
-	hl->addWidget( m_endFreqKnob );
-	hl->addWidget( m_decayKnob );
-	hl->addWidget( m_distKnob );
-	hl->addWidget( m_gainKnob );
-
-	vl->addLayout( hl );
-
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	setPalette( pal );
 }
 
 
@@ -124,11 +80,11 @@ kickerInstrument::~kickerInstrument()
 void kickerInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	m_startFreqKnob->saveSettings( _doc, _this, "startfreq" );
-	m_endFreqKnob->saveSettings( _doc, _this, "endfreq" );
-	m_decayKnob->saveSettings( _doc, _this, "decay" );
-	m_distKnob->saveSettings( _doc, _this, "dist" );
-	m_gainKnob->saveSettings( _doc, _this, "gain" );
+	m_startFreqModel.saveSettings( _doc, _this, "startfreq" );
+	m_endFreqModel.saveSettings( _doc, _this, "endfreq" );
+	m_decayModel.saveSettings( _doc, _this, "decay" );
+	m_distModel.saveSettings( _doc, _this, "dist" );
+	m_gainModel.saveSettings( _doc, _this, "gain" );
 }
 
 
@@ -136,11 +92,11 @@ void kickerInstrument::saveSettings( QDomDocument & _doc,
 
 void kickerInstrument::loadSettings( const QDomElement & _this )
 {
-	m_startFreqKnob->loadSettings( _this, "startfreq" );
-	m_endFreqKnob->loadSettings( _this, "endfreq" );
-	m_decayKnob->loadSettings( _this, "decay" );
-	m_distKnob->loadSettings( _this, "dist" );
-	m_gainKnob->loadSettings( _this, "gain" );
+	m_startFreqModel.loadSettings( _this, "startfreq" );
+	m_endFreqModel.loadSettings( _this, "endfreq" );
+	m_decayModel.loadSettings( _this, "decay" );
+	m_distModel.loadSettings( _this, "dist" );
+	m_gainModel.loadSettings( _this, "gain" );
 }
 
 
@@ -160,15 +116,15 @@ typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 
 void kickerInstrument::playNote( notePlayHandle * _n, bool )
 {
-	const float decfr = m_decayKnob->value() *
+	const float decfr = m_decayModel.value() *
 				engine::getMixer()->sampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
 	{
 		_n->m_pluginData = new sweepOsc(
-					distFX( m_distKnob->value(),
-							m_gainKnob->value() ) );
+					distFX( m_distModel.value(),
+							m_gainModel.value() ) );
 	}
 	else if( tfp > decfr && !_n->released() )
 	{
@@ -176,7 +132,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 	}
 
 	//const float freq = getInstrumentTrack()->frequency( _n ) / 2;
-	const float fdiff = m_endFreqKnob->value() - m_startFreqKnob->value();
+	const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
 /*	const fpp_t frames = _n->released() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
@@ -184,8 +140,8 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 		:
 		engine::getMixer()->framesPerAudioBuffer();*/
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const float f1 = m_startFreqKnob->value() + tfp * fdiff / decfr;
-	const float f2 = m_startFreqKnob->value() + (frames+tfp-1)*fdiff/decfr;
+	const float f1 = m_startFreqModel.value() + tfp * fdiff / decfr;
+	const float f2 = m_startFreqModel.value() + (frames+tfp-1)*fdiff/decfr;
 
 	sampleFrame * buf = new sampleFrame[frames];
 
@@ -220,6 +176,76 @@ void kickerInstrument::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
+
+
+instrumentView * kickerInstrument::createView( QWidget * _parent )
+{
+	return( new kickerInstrumentView( this, _parent ) );
+}
+
+
+
+
+kickerInstrumentView::kickerInstrumentView( instrument * _instrument,
+							QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
+{
+	QVBoxLayout * vl = new QVBoxLayout( this );
+	QHBoxLayout * hl = new QHBoxLayout;
+	m_startFreqKnob = new knob( knobDark_28, this, tr( "Start frequency" ) );
+	m_startFreqKnob->setLabel( tr( "START" ) );
+	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
+
+	m_endFreqKnob = new knob( knobDark_28, this, tr( "End frequency" ) );
+	m_endFreqKnob->setLabel( tr( "END" ) );
+	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
+
+	m_decayKnob = new knob( knobDark_28, this, tr( "Decay" ) );
+	m_decayKnob->setLabel( tr( "DECAY" ) );
+	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
+
+	m_distKnob = new knob( knobDark_28, this, tr( "Distortion" ) );
+	m_distKnob->setLabel( tr( "DIST" ) );
+	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
+
+	m_gainKnob = new knob( knobDark_28, this, tr( "Gain" ) );
+	m_gainKnob->setLabel( tr( "GAIN" ) );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
+
+	hl->addWidget( m_startFreqKnob );
+	hl->addWidget( m_endFreqKnob );
+	hl->addWidget( m_decayKnob );
+	hl->addWidget( m_distKnob );
+	hl->addWidget( m_gainKnob );
+
+	vl->addLayout( hl );
+
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
+								"artwork" ) );
+	setPalette( pal );
+}
+
+
+
+
+kickerInstrumentView::~kickerInstrumentView()
+{
+}
+
+
+
+
+void kickerInstrumentView::modelChanged( void )
+{
+	kickerInstrument * k = castModel<kickerInstrument>();
+	m_startFreqKnob->setModel( &k->m_startFreqModel );
+	m_endFreqKnob->setModel( &k->m_endFreqModel );
+	m_decayKnob->setModel( &k->m_decayModel );
+	m_distKnob->setModel( &k->m_distModel );
+	m_gainKnob->setModel( &k->m_gainModel );
+}
 
 
 
