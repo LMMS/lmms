@@ -1,5 +1,16 @@
 2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/bb_editor.cpp:
+	fix missing pattern in new projects by also tracking
+	dataUnchanged()-signals of bbComboBoxModel
+
+	* include/automatable_model_templates.h:
+	* include/mv_base.h:
+	added dataUnchanged()-signal which should be emitted in case new data
+	was not set for the model because it's been equal to old data
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
 	* plugins/stk/mallets/mallets.h:
 	* plugins/stk/mallets/mallets.cpp:
 	fixed outstanding issues with LED-checkbox and its model

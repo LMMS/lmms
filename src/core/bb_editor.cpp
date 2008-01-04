@@ -107,6 +107,10 @@ bbEditor::bbEditor( void ) :
 	m_bbComboBox->setModel( m_bbComboBoxModel );
 	connect( m_bbComboBoxModel, SIGNAL( dataChanged() ),
 				this, SLOT( currentBBChanged() ) );
+	// we *always* want to receive updates even in case BB actually did
+	// not change upon setCurrentBB()-call
+	connect( m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
+				this, SLOT( currentBBChanged() ) );
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
