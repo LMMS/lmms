@@ -161,6 +161,10 @@ void automatableModel<T, EDIT_STEP_TYPE>::setValue( const T _value )
 		setFirstValue();
 		emit dataChanged();
 	}
+	else
+	{
+		emit dataUnchanged();
+	}
 }
 
 

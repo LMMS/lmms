@@ -57,6 +57,9 @@ signals:
 	// emitted if actual data of the model (e.g. values) have changed
 	void dataChanged( void );
 
+	// emitted in case new data was not set as it's been equal to old data
+	void dataUnchanged( void );
+
 	// emitted if properties of the model (e.g. ranges) have changed
 	void propertiesChanged( void );
 
