@@ -181,11 +181,11 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 arpAndChordsTabWidget::arpAndChordsTabWidget(
 					instrumentTrack * _instrument_track ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
-	m_chordsEnabledModel( new boolModel( /* this */ ) ),
+	m_chordsEnabledModel( new boolModel( FALSE, FALSE, TRUE, 1 /* this */ ) ),
 	m_chordsModel( new comboBoxModel( /* this */ ) ),
 	m_chordRangeModel( new floatModel( 1.0f, 1.0f, 9.0f, 1.0f
 								/* this */ ) ),
-	m_arpEnabledModel( new boolModel( /* this */ ) ),
+	m_arpEnabledModel( new boolModel( FALSE, FALSE, TRUE, 1/* this */ ) ),
 	m_arpModel( new comboBoxModel( /* this */ ) ),
 	m_arpRangeModel( new floatModel( 1.0f, 1.0f, 9.0f, 1.0f
 								/* this */ ) ),

@@ -45,14 +45,9 @@ public:
 	virtual void modelChanged( void );
 
 
-public slots:
-//	void setState( bool _on, bool _anim = FALSE );
-	void animate( void );
-
-
 protected:
-	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void resizeEvent( QResizeEvent * _re );
 
 
 private:
@@ -62,9 +57,6 @@ private:
 
 	pixmapButton * m_led;
 	QString m_caption;
-
-	int m_origHeight;
-	bool m_animating;
 
 } ;
 

@@ -50,9 +50,7 @@ QPixmap * groupBox::s_ledBg = NULL;
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
 	autoModelView(),
-	m_caption( _caption ),
-	m_origHeight( height() ),
-	m_animating( FALSE )
+	m_caption( _caption )
 {
 	if( s_ledBg == NULL )
 	{
@@ -68,9 +66,9 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new autoModel( FALSE, FALSE, TRUE, 1, NULL, FALSE ) );
+	setModel( new autoModel( FALSE, FALSE, TRUE,
+				autoModel::defaultRelStep(), NULL, FALSE ) );
 	setAutoFillBackground( TRUE );
-
 }
 
 
@@ -90,93 +88,23 @@ void groupBox::modelChanged( void )
 
 
 
-void groupBox::resizeEvent( QResizeEvent * )
-{
-	updatePixmap();
-	if( m_animating == FALSE )
-	{
-		m_origHeight = height();
-	}
-}
-
-
-
 
 void groupBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->y() > 1 && _me->y() < 13 )
 	{
-		//setState( !isActive(), TRUE );
-		if( ( model()->value() == TRUE && height() < m_origHeight ) &&
-							m_animating == FALSE )
-		{
-			m_animating = TRUE;
-			animate();
-		}
+		model()->setValue( !model()->value() );
 	}
 }
 
 
 
-/*
-void groupBox::setState( bool _on, bool _anim )
+
+void groupBox::resizeEvent( QResizeEvent * _ev )
 {
-	m_led->setChecked( _on );
-	emit( toggled( _on ) );
+	updatePixmap();
+	QWidget::resizeEvent( _ev );
 }
-*/
-
-
-
-void groupBox::animate( void )
-{
-	float state = (float)( m_origHeight - height() ) /
-						(float)( m_origHeight - 19 );
-	int dy = static_cast<int>( 3 - 2 * cosf( state * 2 * M_PI ) );
-	if( model()->value() && height() < m_origHeight )
-	{
-	}
-	else if( !model()->value() && height() > 19 )
-	{
-		dy = -dy;
-	}
-	else
-	{
-		m_animating = FALSE;
-		return;
-	}
-	resize( width(), height() + dy );
-	QTimer::singleShot( 10, this, SLOT( animate() ) );
-	QObjectList ch = parent()->children();
-	for( int i = 0; i < ch.count(); ++i )
-	{
-		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
-		if( w == NULL || w->y() < y() + height() )
-		{
-			continue;
-		}
-		w->move( w->x(), w->y() + dy );
-	}
-	ch = children();
-	for( int i = 0; i < ch.count(); ++i )
-	{
-		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
-		if( w == NULL || w == m_led )
-		{
-			continue;
-		}
-		w->move( w->x(), w->y() + dy );
-		if( w->y() < 14)
-		{
-			w->hide();
-		}
-		else if( w->isHidden() == TRUE )
-		{
-			w->show();
-		}
-	}
-}
-
 
 
 

@@ -1,3 +1,14 @@
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/group_box.h:
+	* src/widgets/group_box.cpp:
+	removed animation-functionality as it's useless
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	fixed boolModel-initializations - makes filter, arpeggio and chords
+	work again
+
 2008-01-03	Danny McRae <khjklujn/at/yahoo/dot/com>
 
 	* plugins/stk/mallets/mallets.h:

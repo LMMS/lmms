@@ -74,7 +74,7 @@ static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
 envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
 	QWidget( _instrument_track->tabWidgetParent() ),
 	m_instrumentTrack( _instrument_track ),
-	m_filterEnabledModel( new boolModel( /* this */ ) ),
+	m_filterEnabledModel( new boolModel( FALSE, FALSE, TRUE, 1 /* this */ ) ),
 	m_filterModel( new comboBoxModel( /* this */ ) ),
 	m_filterCutModel( new floatModel( /* this */ ) ),
 	m_filterResModel( new floatModel( /* this */ ) )
