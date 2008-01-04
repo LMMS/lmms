@@ -31,11 +31,9 @@
 
 #include "instrument.h"
 #include "sample_buffer.h"
+#include "volume_knob.h"
+#include "pixmap_button.h"
 
-
-class knob;
-class pixmapButton;
-class volumeKnob;
 
 
 class audioFileProcessor : public instrument
@@ -47,17 +45,12 @@ public:
 	public:
 		subPluginFeatures( plugin::pluginTypes _type );
 
-		virtual const QStringList & supportedExtensions( void )
-		{
-			return( supported_extensions() );
-		}
-
-		static const QStringList & supported_extensions( void );
+		virtual const QStringList & supportedExtensions( void );
 
 	} ;
 
 
-	audioFileProcessor( instrumentTrack * _channel_track );
+	audioFileProcessor( instrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
@@ -80,18 +73,49 @@ public:
 		return( 128 );
 	}
 
+	virtual instrumentView * createView( QWidget * _parent );
+
 
 public slots:
 	void setAudioFile( const QString & _audio_file, bool _rename = TRUE );
 
 
+private slots:
+	void reverseModelChanged( void );
+	void ampModelChanged( void );
+	void startPointModelChanged( void );
+	void endPointModelChanged( void );
+
+
+private:
+	typedef sampleBuffer::handleState handleState;
+
+	sampleBuffer m_sampleBuffer;
+	
+	knobModel m_ampModel;
+	knobModel m_startPointModel;
+	knobModel m_endPointModel;
+	boolModel m_reverseModel;
+	boolModel m_loopModel;
+
+
+	friend class audioFileProcessorView;
+
+} ;
+
+
+
+class audioFileProcessorView : public instrumentView
+{
+	Q_OBJECT
+public:
+	audioFileProcessorView( instrument * _instrument, QWidget * _parent );
+	virtual ~audioFileProcessorView();
+
+
 protected slots:
-	void openAudioFile( void );
-	void reverseBtnToggled( bool _on );
-	void ampKnobChanged( float _new_value );
-	void startKnobChanged( float _new_value );
-	void endKnobChanged( float _new_value );
 	void sampleUpdated( void );
+	void openAudioFile( void );
 
 
 protected:
@@ -101,13 +125,10 @@ protected:
 
 
 private:
-	typedef sampleBuffer::handleState handleState;
+	virtual void modelChanged( void );
 
 	static QPixmap * s_artwork;
 
-
-	sampleBuffer m_sampleBuffer;
-	
 	QPixmap m_graph;
 	volumeKnob * m_ampKnob;
 	knob * m_startKnob;
@@ -116,10 +137,9 @@ private:
 	pixmapButton * m_reverseButton;
 	pixmapButton * m_loopButton;
 
-
-	void updateSample( void );
-
 } ;
+
+
 
 
 #endif

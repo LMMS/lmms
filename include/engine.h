@@ -101,19 +101,19 @@ public:
 
 	static float framesPerTact64th( void )
 	{
-		return( s_frames_per_tact64th );
+		return( s_framesPerTact64th );
 	}
 	static void updateFramesPerTact64th( void );
 
 	static const QMap<QString, QString> & sampleExtensions( void )
 	{
-		return( s_sample_extensions );
+		return( s_sampleExtensions );
 	}
 
 
 private:
 	static bool s_hasGUI;
-	static float s_frames_per_tact64th;
+	static float s_framesPerTact64th;
 
 	static mixer * s_mixer;
 	static mainWindow * s_mainWindow;
@@ -125,9 +125,9 @@ private:
 	static projectJournal * s_projectJournal;
 	static ladspa2LMMS * s_ladspaManager;
 
-	static QMap<QString, QString> s_sample_extensions;
+	static QMap<QString, QString> s_sampleExtensions;
 
-	static void load_extensions( void );
+	static void loadExtensions( void );
 
 } ;
 

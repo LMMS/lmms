@@ -41,7 +41,7 @@
 
 
 bool engine::s_hasGUI = TRUE;
-float engine::s_frames_per_tact64th;
+float engine::s_framesPerTact64th;
 mixer * engine::s_mixer;
 mainWindow * engine::s_mainWindow;
 songEditor * engine::s_songEditor;
@@ -51,7 +51,7 @@ pianoRoll * engine::s_pianoRoll;
 projectNotes * engine::s_projectNotes;
 projectJournal * engine::s_projectJournal;
 ladspa2LMMS * engine::s_ladspaManager;
-QMap<QString, QString> engine::s_sample_extensions;
+QMap<QString, QString> engine::s_sampleExtensions;
 
 
 
@@ -60,7 +60,7 @@ void engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
 
-	load_extensions();
+	loadExtensions();
 
 	s_projectJournal = new projectJournal;
 	s_mainWindow = new mainWindow;
@@ -119,14 +119,14 @@ void engine::destroy( void )
 
 void engine::updateFramesPerTact64th( void )
 {
-	s_frames_per_tact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
+	s_framesPerTact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
 					/ 64.0f / s_songEditor->getTempo();
 }
 
 
 
 
-void engine::load_extensions( void )
+void engine::loadExtensions( void )
 {
 	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
@@ -145,7 +145,7 @@ void engine::load_extensions( void )
 								ext.begin();
 						itExt != ext.end(); ++itExt )
 				{
-					s_sample_extensions[*itExt] = it->name;
+					s_sampleExtensions[*itExt] = it->name;
 				}
 			}
 		}

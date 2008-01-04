@@ -1,8 +1,19 @@
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	made plugin work with M/V-architecture
+
+	* include/engine.h:
+	* include/plugin.h:
+	* src/core/engine.cpp:
+	fixes regarding coding style guidelines
+
 2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/kicker/kicker.cpp:
 	* plugins/kicker/kicker.h:
-	make plugin work with M/V-architecture
+	made plugin work with M/V-architecture
 
 	* include/instrument.h:
 	* include/dummy_instrument.h:
