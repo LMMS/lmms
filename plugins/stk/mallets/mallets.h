@@ -31,11 +31,9 @@
 
 #include "combobox.h"
 #include "instrument.h"
+#include "knob.h"
+#include "note_play_handle.h"
 #include "led_checkbox.h"
-#include "mixer.h"
-
-class knob;
-class notePlayHandle;
 
 
 class malletsSynth
@@ -118,12 +116,11 @@ protected:
 
 
 
-class mallets : public instrument
+class malletsInstrument : public instrument
 {
-	Q_OBJECT
 public:
-	mallets( instrumentTrack * _channel_track );
-	virtual ~mallets();
+	malletsInstrument( instrumentTrack * _channel_track );
+	virtual ~malletsInstrument( void );
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
 						bool _try_parallelizing );
@@ -136,45 +133,83 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-public slots:
-	void changePreset( int _preset );
+	virtual instrumentView * createView( QWidget * _parent );
 
 private:
-	void setWidgetBackground( QWidget * _widget, const QString & _pic );
-	QWidget * setupModalBarControls( QWidget * _parent, track * _track );
-	QWidget * setupTubeBellControls( QWidget * _parent, track * _track );
-	QWidget * setupBandedWGControls( QWidget * _parent, track * _track );
-	comboBox * setupPresets( QWidget * _parent, track * _track );
+	knobModel m_hardnessModel;
+	knobModel m_positionModel;
+	knobModel m_vibratoGainModel;
+	knobModel m_vibratoFreqModel;
+	knobModel m_stickModel;
 	
-	QWidget * m_modalBarWidget;
-	knob * m_hardness;
-	knob * m_position;
-	knob * m_vibratoGain;
-	knob * m_vibratoFreq;
-	knob * m_stick;
+	knobModel m_modulatorModel;
+	knobModel m_crossfadeModel;
+	knobModel m_lfoSpeedModel;
+	knobModel m_lfoDepthModel;
+	knobModel m_adsrModel;
 	
-	QWidget * m_tubeBellWidget;
-	knob * m_modulator;
-	knob * m_crossfade;
-	knob * m_lfoSpeed;
-	knob * m_lfoDepth;
-	knob * m_adsr;
+	knobModel m_pressureModel;
+	knobModel m_motionModel;
+	knobModel m_vibratoModel;
+	knobModel m_velocityModel;
 	
-	QWidget * m_bandedWGWidget;
-	knob * m_pressure;
-	knob * m_motion;
-	knob * m_vibrato;
-	knob * m_velocity;
+	// FIXME: Can't change the model of a ledCheckBox.
 	ledCheckBox * m_strike;
 	
-	comboBox * m_presets;
-	knob * m_spread;
+	comboBoxModel m_presetsModel;
+	knobModel m_spreadModel;
 	
 	QVector<sample_t> m_scalers;
 	sampleFrame * m_buffer;
+	
 	bool m_filesMissing;
-
+	
+	friend class malletsInstrumentView;
 } ;
 
+
+class malletsInstrumentView: public instrumentView
+{
+	Q_OBJECT
+public:
+	malletsInstrumentView( malletsInstrument * _instrument,
+				QWidget * _parent );
+	virtual ~malletsInstrumentView( void );
+	
+public slots:
+	void changePreset( void );
+
+private:
+	virtual void modelChanged( void );
+	
+	void setWidgetBackground( QWidget * _widget, const QString & _pic );
+	QWidget * setupModalBarControls( QWidget * _parent );
+	QWidget * setupTubeBellControls( QWidget * _parent );
+	QWidget * setupBandedWGControls( QWidget * _parent );
+	
+	QWidget * m_modalBarWidget;
+	knob * m_hardnessKnob;
+	knob * m_positionKnob;
+	knob * m_vibratoGainKnob;
+	knob * m_vibratoFreqKnob;
+	knob * m_stickKnob;
+	
+	QWidget * m_tubeBellWidget;
+	knob * m_modulatorKnob;
+	knob * m_crossfadeKnob;
+	knob * m_lfoSpeedKnob;
+	knob * m_lfoDepthKnob;
+	knob * m_adsrKnob;
+	
+	QWidget * m_bandedWGWidget;
+	knob * m_pressureKnob;
+	knob * m_motionKnob;
+	knob * m_vibratoKnob;
+	knob * m_velocityKnob;
+	ledCheckBox * m_strikeLED;
+	
+	comboBox * m_presetsCombo;
+	knob * m_spreadKnob;
+};
 
 #endif
