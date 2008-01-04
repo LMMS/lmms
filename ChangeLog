@@ -1,5 +1,11 @@
 2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/stk/mallets/mallets.h:
+	* plugins/stk/mallets/mallets.cpp:
+	fixed outstanding issues with LED-checkbox and its model
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
 	* include/group_box.h:
 	* src/widgets/group_box.cpp:
 	removed animation-functionality as it's useless

@@ -1,7 +1,7 @@
 /*
  * mallets.cpp - tuned instruments that one would bang upon
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,7 +73,7 @@ malletsInstrument::malletsInstrument( instrumentTrack * _channel_track ):
 	m_pressureModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_velocityModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_strike(NULL),
+	m_strikeModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(), this ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this)
 {
@@ -90,6 +90,7 @@ malletsInstrument::malletsInstrument( instrumentTrack * _channel_track ):
 	m_pressureModel.setTrack( _channel_track );
 	m_motionModel.setTrack( _channel_track );
 	m_velocityModel.setTrack( _channel_track );
+	m_strikeModel.setTrack( _channel_track );
 	m_spreadModel.setTrack( _channel_track );
 	
 	// ModalBar
@@ -161,11 +162,8 @@ void malletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_motionModel.saveSettings( _doc, _this, "motion" );
 	m_vibratoModel.saveSettings( _doc, _this, "vibrato" );
 	m_velocityModel.saveSettings( _doc, _this, "velocity" );
-	if( m_strike != NULL )
-	{
-		m_strike->model()->saveSettings( _doc, _this, "strike" );
-	}
-	
+	m_strikeModel.saveSettings( _doc, _this, "strike" );
+
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
 }
@@ -194,11 +192,8 @@ void malletsInstrument::loadSettings( const QDomElement & _this )
 	m_motionModel.loadSettings( _this, "motion" );
 	m_vibratoModel.loadSettings( _this, "vibrato" );
 	m_velocityModel.loadSettings( _this, "velocity" );
-	if( m_strike != NULL )
-	{
-		m_strike->model()->loadSettings( _this, "strike" );
-	}
-	
+	m_strikeModel.loadSettings( _this, "strike" );
+
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
 }
@@ -262,7 +257,7 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool )
 								m_motionModel.value(),
 								m_vibratoModel.value(),
 								p - 10,
-								m_strike->value() * 128.0,
+								m_strikeModel.value() * 128.0,
 								m_velocityModel.value(),
 								(Uint8) m_spreadModel.value(),
 								engine::getMixer()->sampleRate() );
@@ -275,7 +270,7 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool )
 	sample_t add_scale = 0.0f;
 	if( p == 10 )
 	{
-		add_scale = static_cast<sample_t>( m_strike->value() ) * freq * 2.5f;
+		add_scale = static_cast<sample_t>( m_strikeModel.value() ) * freq * 2.5f;
 	}
 	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
@@ -455,9 +450,7 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	
 	m_strikeLED = new ledCheckBox( tr( "Bowed" ), widget, tr( "Bowed" ) );
 	m_strikeLED->move( 165, 30 );
-	m_strikeLED->model()->setTrack( castModel<malletsInstrument>()->getInstrumentTrack() );
-	castModel<malletsInstrument>()->m_strike = m_strikeLED;
-	
+
 	m_pressureKnob = new knob( knobBright_26, widget, tr( "Pressure" ) );
 	m_pressureKnob->setLabel( tr( "Pressure" ) );
 	m_pressureKnob->move( 56, 86 );
@@ -501,7 +494,7 @@ void malletsInstrumentView::modelChanged( void )
 	m_motionKnob->setModel( &inst->m_motionModel );
 	m_vibratoKnob->setModel( &inst->m_vibratoModel );
 	m_velocityKnob->setModel( &inst->m_velocityModel );
-	//m_strikeLED->setModel( &inst->m_strikeModel );
+	m_strikeLED->setModel( &inst->m_strikeModel );
 	m_presetsCombo->setModel( &inst->m_presetsModel );
 	m_spreadKnob->setModel( &inst->m_spreadModel );
 }

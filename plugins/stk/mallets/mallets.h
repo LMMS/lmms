@@ -1,7 +1,7 @@
 /*
  * mallets.h - tuned instruments that one would bang upon
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -107,7 +107,7 @@ public:
 
 protected:
 	Instrmnt * m_voice;
-	
+
 	StkFloat * m_delay;
 	Uint8 m_delayRead;
 	Uint8 m_delayWrite;
@@ -141,30 +141,31 @@ private:
 	knobModel m_vibratoGainModel;
 	knobModel m_vibratoFreqModel;
 	knobModel m_stickModel;
-	
+
 	knobModel m_modulatorModel;
 	knobModel m_crossfadeModel;
 	knobModel m_lfoSpeedModel;
 	knobModel m_lfoDepthModel;
 	knobModel m_adsrModel;
-	
+
 	knobModel m_pressureModel;
 	knobModel m_motionModel;
 	knobModel m_vibratoModel;
 	knobModel m_velocityModel;
-	
-	// FIXME: Can't change the model of a ledCheckBox.
-	ledCheckBox * m_strike;
-	
+
+	boolModel m_strikeModel;
+
 	comboBoxModel m_presetsModel;
 	knobModel m_spreadModel;
-	
+
 	QVector<sample_t> m_scalers;
 	sampleFrame * m_buffer;
-	
+
 	bool m_filesMissing;
-	
+
+
 	friend class malletsInstrumentView;
+
 } ;
 
 
@@ -175,39 +176,39 @@ public:
 	malletsInstrumentView( malletsInstrument * _instrument,
 				QWidget * _parent );
 	virtual ~malletsInstrumentView( void );
-	
+
 public slots:
 	void changePreset( void );
 
 private:
 	virtual void modelChanged( void );
-	
+
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupModalBarControls( QWidget * _parent );
 	QWidget * setupTubeBellControls( QWidget * _parent );
 	QWidget * setupBandedWGControls( QWidget * _parent );
-	
+
 	QWidget * m_modalBarWidget;
 	knob * m_hardnessKnob;
 	knob * m_positionKnob;
 	knob * m_vibratoGainKnob;
 	knob * m_vibratoFreqKnob;
 	knob * m_stickKnob;
-	
+
 	QWidget * m_tubeBellWidget;
 	knob * m_modulatorKnob;
 	knob * m_crossfadeKnob;
 	knob * m_lfoSpeedKnob;
 	knob * m_lfoDepthKnob;
 	knob * m_adsrKnob;
-	
+
 	QWidget * m_bandedWGWidget;
 	knob * m_pressureKnob;
 	knob * m_motionKnob;
 	knob * m_vibratoKnob;
 	knob * m_velocityKnob;
 	ledCheckBox * m_strikeLED;
-	
+
 	comboBox * m_presetsCombo;
 	knob * m_spreadKnob;
 };
