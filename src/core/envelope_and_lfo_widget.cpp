@@ -521,6 +521,11 @@ void FASTCALL envelopeAndLFOWidget::fillLevel( float * _buf, f_cnt_t _frame,
 					const f_cnt_t _release_begin,
 					const fpp_t _frames )
 {
+	if( _frame < 0 || _release_begin < 0 )
+	{
+		return;
+	}
+
 	fillLFOLevel( _buf, _frame, _frames );
 
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
