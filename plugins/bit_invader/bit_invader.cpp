@@ -535,7 +535,7 @@ void bitInvader::smoothClicked( void )
 
 void bitInvader::playNote( notePlayHandle * _n, bool )
 {
-	if ( _n->totalFramesPlayed() == 0 )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 	
 		float factor;

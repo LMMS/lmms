@@ -219,7 +219,7 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool )
 	int p = m_presetsModel.value();
 	
 	const float freq = _n->frequency();
-	if ( _n->totalFramesPlayed() == 0 )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		float vel = static_cast<float>( _n->getVolume() ) / 100.0f;
 		
