@@ -3,7 +3,7 @@
 /*
  * effect_chain.cpp - class for processing and effects chain
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,7 +32,7 @@
 
 
 effectChain::effectChain( void ) :
-	m_bypassed( TRUE )
+	m_enabledModel( FALSE, FALSE, TRUE )
 {
 }
 
@@ -78,7 +78,7 @@ void FASTCALL effectChain::moveDown( effect * _effect )
 		for( effect_list_t::iterator it = m_effects.begin(); 
 					it != m_effects.end(); it++, i++ )
 		{
-			if( (*it) == _effect )
+			if( *it == _effect )
 			{
 				break;
 			}
@@ -101,7 +101,7 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 		for( effect_list_t::iterator it = m_effects.begin(); 
 					it != m_effects.end(); it++, i++ )
 		{
-			if( (*it) == _effect )
+			if( *it == _effect )
 			{
 				break;
 			}
@@ -119,7 +119,7 @@ void FASTCALL effectChain::moveUp( effect * _effect )
 bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpp_t _frames )
 {
-	if( m_bypassed )
+	if( m_enabledModel.value() == FALSE )
 	{
 		return( FALSE );
 	}
@@ -127,7 +127,7 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf,
 	for( effect_list_t::iterator it = m_effects.begin(); 
 						it != m_effects.end(); it++ )
 	{
-		more_effects |= (*it)->processAudioBuffer( _buf, _frames );
+		more_effects |= ( *it )->processAudioBuffer( _buf, _frames );
 	}
 	return( more_effects );
 }
@@ -137,7 +137,7 @@ bool FASTCALL effectChain::processAudioBuffer( surroundSampleFrame * _buf,
 
 void effectChain::startRunning( void )
 {
-	if( m_bypassed )
+	if( m_enabledModel.value() == FALSE )
 	{
 		return;
 	}
@@ -145,7 +145,7 @@ void effectChain::startRunning( void )
 	for( effect_list_t::iterator it = m_effects.begin(); 
 						it != m_effects.end(); it++ )
 	{
-		(*it)->startRunning();
+		( *it )->startRunning();
 	}
 }
 
@@ -154,7 +154,7 @@ void effectChain::startRunning( void )
 
 bool effectChain::isRunning( void )
 {
-	if( m_bypassed )
+	if( m_enabledModel.value() == FALSE )
 	{
 		return( FALSE );
 	}
@@ -164,7 +164,7 @@ bool effectChain::isRunning( void )
 	for( effect_list_t::iterator it = m_effects.begin(); 
 				it != m_effects.end() || !running; it++ )
 	{
-		running = (*it)->isRunning() && running;
+		running = ( *it )->isRunning() && running;
 	}
 	return( running );
 }

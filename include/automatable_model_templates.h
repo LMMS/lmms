@@ -1,7 +1,7 @@
 /*
  * automatable_model_templates.h - definition of automatableModel templates
  *
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

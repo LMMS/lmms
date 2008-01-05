@@ -1,7 +1,7 @@
 /*
  * effect_chain.h - class for processing and effects chain
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,9 @@
 
 #include "effect.h"
 
+
 typedef QVector<effect *> effect_list_t;
+
 
 class effectChain
 {
@@ -43,21 +45,20 @@ public:
 							const fpp_t _frames );
 	void startRunning( void );
 	bool isRunning( void );
-	
-	inline void setBypass( bool _mode )
-	{
-		m_bypassed = _mode;
-	}
-	
+
 	inline const effect_list_t & getEffects( void )
 	{
 		return( m_effects );
 	}
-	
+
+
 private:
 	effect_list_t m_effects;
-	
-	bool m_bypassed;
+
+	boolModel m_enabledModel;
+
+
+	friend class effectTabWidget;
 
 } ;
 

@@ -2,7 +2,7 @@
  * ladspa_control_dialog.cpp - dialog for displaying and editing control port
  *                             values for LADSPA plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -132,10 +132,9 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 		m_mainLay->addSpacing( 3 );
 		QHBoxLayout * center = new QHBoxLayout();
 		m_mainLay->addLayout( center );
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this,
-								NULL, NULL );
-		connect( m_stereoLink, SIGNAL( toggled( bool ) ), 
-					this, SLOT( link( bool ) ) );
+		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this );
+		connect( m_stereoLink, SIGNAL( dataChanged() ), 
+				this, SLOT( updateChannelLinkState() ) );
 		m_stereoLink->setChecked( TRUE );
 		center->addWidget( m_stereoLink );
 	}
@@ -161,7 +160,7 @@ void FASTCALL ladspaControlDialog::saveSettings( QDomDocument & _doc,
 {
 	if( m_processors > 1 )
 	{
-		_this.setAttribute( "link", m_stereoLink->isChecked() );
+		_this.setAttribute( "link", m_stereoLink->model()->value() );
 	}
 	
 	multi_proc_t controls = m_effect->getControls();
@@ -182,7 +181,8 @@ void FASTCALL ladspaControlDialog::loadSettings( const QDomElement & _this )
 {
 	if( m_processors > 1 )
 	{
-		m_stereoLink->setChecked( _this.attribute( "link" ).toInt() );
+		m_stereoLink->model()->setValue(
+					_this.attribute( "link" ).toInt() );
 	}
 	
 	multi_proc_t controls = m_effect->getControls();
@@ -221,9 +221,9 @@ void ladspaControlDialog::linkPort( Uint16 _port, bool _state )
 
 
 
-void ladspaControlDialog::link( bool _state )
+void ladspaControlDialog::updateChannelLinkState( void )
 {
-	if( _state )
+	if( m_stereoLink->model()->value() )
 	{
 		for( Uint16 port = 0; 
 			port < m_controlCount / m_processors;

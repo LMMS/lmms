@@ -4,7 +4,7 @@
  * effect_tab_widget.cpp - tab-widget in channel-track-window for setting up
  *                         effects
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,6 +52,7 @@ effectTabWidget::effectTabWidget( instrumentTrack * _track,
 	m_track( dynamic_cast<track *>( _track ) ),
 	m_port( _port )
 {
+	m_port->getEffects()->m_enabledModel.setTrack( m_track );
 	setupWidget();
 }
 
@@ -65,6 +66,7 @@ effectTabWidget::effectTabWidget( QWidget * _parent,
 	m_track( dynamic_cast<track *>( _track ) ),
 	m_port( _port )
 {
+	m_port->getEffects()->m_enabledModel.setTrack( m_track );
 	setupWidget();
 }
 
@@ -81,9 +83,7 @@ effectTabWidget::~effectTabWidget()
 void effectTabWidget::setupWidget( void )
 {
 	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
-	m_effectsGroupBox->model()->setTrack( m_track );
-	connect( m_effectsGroupBox, SIGNAL( toggled( bool ) ), 
-					this, SLOT( setBypass( bool ) ) );
+	m_effectsGroupBox->setModel( &m_port->getEffects()->m_enabledModel );
 	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
 	
 	m_rack = new rackView( m_effectsGroupBox, m_track, m_port );
@@ -101,8 +101,8 @@ void effectTabWidget::setupWidget( void )
 
 void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "fxdisabled",
-					!m_effectsGroupBox->model()->value() );
+	_this.setAttribute( "fxenabled",
+				m_port->getEffects()->m_enabledModel.value() );
 	m_rack->saveState( _doc, _this );
 
 }
@@ -112,8 +112,8 @@ void effectTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effectTabWidget::loadSettings( const QDomElement & _this )
 {
-	m_effectsGroupBox->model()->setValue( 
-				!_this.attribute( "fxdisabled" ).toInt() );
+	m_port->getEffects()->m_enabledModel.setValue( 
+				_this.attribute( "fxenabled" ).toInt() );
 	
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -144,14 +144,6 @@ void effectTabWidget::addEffect( void )
 
 	effect * e = esd.instantiateSelectedPlugin();
 	m_rack->addEffect( e );
-}
-
-
-
-
-void effectTabWidget::setBypass( bool _state )
-{
-	m_port->getEffects()->setBypass( !_state );
 }
 
 

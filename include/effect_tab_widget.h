@@ -2,7 +2,7 @@
  * effect_tab_widget.h - tab-widget in channel-track-window for setting up
  *                       effects
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -70,7 +70,6 @@ public:
 
 private slots:
 	void addEffect( void );
-	void setBypass( bool _state );
 
 
 private:

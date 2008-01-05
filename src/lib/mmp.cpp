@@ -3,7 +3,7 @@
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -568,6 +568,20 @@ void multimediaProject::upgrade( void )
 		{
 			QDomElement el = list.item( i ).toElement();
 			el.setTagName( "lb302" );
+		}
+	}
+
+	if( version < "0.4.0-svn20080104" )
+	{
+		QDomNodeList list = elementsByTagName( "fx" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			if( el.hasAttribute( "fxdisabled" ) &&
+				el.attribute( "fxdisabled" ).toInt() == 0 )
+			{
+				el.setAttribute( "fxenabled", 1 );
+			}
 		}
 	}
 

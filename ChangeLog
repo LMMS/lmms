@@ -1,5 +1,30 @@
 2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	minor fixes in order to compile again with lately changed effect-API
+
+	* src/core/effect_tab_widget.cpp:
+	* src/lib/mmp.cpp:
+	renabled XML-attribute "fxdisabled" to "fxenabled"
+
+	* src/core/effect_tab_widget.cpp:
+	* include/effect_tab_widget.h:
+	made effects working again by using effect-chain's m_enabledModel as
+	model for effect-groupbox
+
+	* include/effect_chain.h:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_tab_widget.cpp:
+	removed bypassed-property and introduced m_enabledModel
+
+	* include/effect.h:
+	- made lot of methods const
+	- renamed enabled() to isEnabled()
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
 	* src/core/bb_editor.cpp:
 	fix missing pattern in new projects by also tracking
 	dataUnchanged()-signals of bbComboBoxModel

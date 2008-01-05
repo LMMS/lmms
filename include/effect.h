@@ -54,7 +54,7 @@ public:
 	virtual bool FASTCALL processAudioBuffer( 
 			surroundSampleFrame * _buf, const fpp_t _frames );
 	
-	inline ch_cnt_t getProcessorCount( void )
+	inline ch_cnt_t getProcessorCount( void ) const
 	{
 		return( m_processors );
 	}
@@ -64,7 +64,7 @@ public:
 		m_processors = _processors;
 	}
 	
-	inline bool isOkay( void )
+	inline bool isOkay( void ) const
 	{
 		return( m_okay );
 	}
@@ -75,7 +75,7 @@ public:
 	}
 	
 	
-	inline bool isRunning( void )
+	inline bool isRunning( void ) const
 	{
 		return( m_running );
 	}
@@ -91,12 +91,12 @@ public:
 		m_running = FALSE;
 	}
 	
-	inline bool enabled( void )
+	inline bool isEnabled( void ) const
 	{
 		return( m_enabledModel.value() );
 	}
 	
-	inline Uint32 getTimeout( void )
+	inline Uint32 getTimeout( void ) const
 	{
 		return( m_silenceTimeout );
 	}
@@ -106,24 +106,24 @@ public:
 		m_silenceTimeout = _time_out;
 	}
 	
-	inline float getWetLevel( void )
+	inline float getWetLevel( void ) const
 	{
 		return( m_wetDryModel.value() );
 	}
 	
-	inline float getDryLevel( void )
+	inline float getDryLevel( void ) const
 	{
 		return( 1.0f - m_wetDryModel.value() );
 	}
 	
-	inline float getGate( void )
+	inline float getGate( void ) const
 	{
 		const float level = m_gateModel.value();
 		return( level*level * m_processors *
 				engine::getMixer()->framesPerPeriod()  );
 	}
 
-	inline Uint32 getBufferCount( void )
+	inline Uint32 getBufferCount( void ) const
 	{
 		return( m_bufferCount );
 	}
@@ -138,7 +138,7 @@ public:
 		m_bufferCount++;
 	}
 
-	inline bool dontRun( void )
+	inline bool dontRun( void ) const
 	{
 		return( m_noRun );
 	}
@@ -148,7 +148,7 @@ public:
 		m_noRun = _state;
 	}
 
-	inline const descriptor::subPluginFeatures::key & getKey( void )
+	inline const descriptor::subPluginFeatures::key & getKey( void ) const
 	{
 		return( m_key );
 	}

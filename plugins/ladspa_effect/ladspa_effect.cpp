@@ -1,7 +1,7 @@
 /*
  * ladspa_effect.cpp - class for processing LADSPA effects
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -326,7 +326,7 @@ ladspaEffect::~ladspaEffect()
 bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpp_t _frames )
 {
-	if( !isOkay() || dontRun() || !isRunning() || isBypassed() )
+	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
 	{
 		return( FALSE );
 	}
