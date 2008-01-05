@@ -549,7 +549,7 @@ QString vibed::nodeName( void ) const
 
 void vibed::playNote( notePlayHandle * _n, bool )
 {
-	if ( _n->totalFramesPlayed() == 0 )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
 					engine::getMixer()->sampleRate(),

@@ -288,7 +288,7 @@ QString organicInstrument::nodeName( void ) const
 
 void organicInstrument::playNote( notePlayHandle * _n, bool )
 {
-	if( _n->totalFramesPlayed() == 0 )
+	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		oscillator * oscs_l[m_num_oscillators];
 		oscillator * oscs_r[m_num_oscillators];
