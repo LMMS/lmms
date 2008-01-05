@@ -186,6 +186,7 @@ void rackView::deleteAllPlugins( void )
 
 void rackView::moveUp( rackPlugin * _plugin )
 {
+	m_port->getEffects()->moveUp( _plugin->getEffect() );
 	if( _plugin != m_rackInserts.first() )
 	{
 		int i = 0;
