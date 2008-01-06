@@ -1,7 +1,7 @@
 /*
  * ladspa_effect.h - class for handling LADSPA effect plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,7 +41,8 @@ typedef QVector<port_desc_t *> multi_proc_t;
 class ladspaEffect : public effect
 {
 public:
-	ladspaEffect( const descriptor::subPluginFeatures::key * _key );
+	ladspaEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key );
 	virtual ~ladspaEffect();
 
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
@@ -84,7 +85,7 @@ private:
 	Uint16 m_effectChannels;
 	Uint16 m_portCount;
 	fpp_t m_bufferSize;
-			
+
 	const LADSPA_Descriptor * m_descriptor;
 	QVector<LADSPA_Handle> m_handles;
 

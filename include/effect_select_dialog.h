@@ -29,7 +29,7 @@
 #include <QtGui/QDialog>
 #include <QtGui/QListWidget>
 
-#include "effect.h"
+#include "effect_chain.h"
 
 
 class effectSelectDialog : public QDialog
@@ -39,7 +39,7 @@ public:
 	effectSelectDialog( QWidget * _parent );
 	virtual ~effectSelectDialog();
 
-	effect * instantiateSelectedPlugin( void );
+	effect * instantiateSelectedPlugin( effectChain * _parent );
 
 public slots:
 	void showPorts( void );
@@ -53,13 +53,13 @@ private:
 
 
 
-class effectList : public QWidget
+class effectListWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	effectList( QWidget * _parent );
+	effectListWidget( QWidget * _parent );
 
-	virtual ~effectList();
+	virtual ~effectListWidget();
 	
 	inline effectKey getSelected( void )
 	{

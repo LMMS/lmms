@@ -57,6 +57,7 @@
 #include "side_bar.h"
 #include "config_mgr.h"
 #include "mixer.h"
+#include "plugin_view.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
 #include "audio_dummy.h"
@@ -76,7 +77,7 @@ mainWindow::mainWindow( void ) :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_tools_menu( NULL ),
+	m_toolsMenu( NULL ),
 	m_modified( FALSE )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
@@ -421,7 +422,7 @@ void mainWindow::finalize( void )
 					configManager::inst(), SLOT( exec() ) );
 
 
-	m_tools_menu = new QMenu( this );
+	m_toolsMenu = new QMenu( this );
 	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
 	for( QVector<plugin::descriptor>::iterator it =
@@ -430,14 +431,15 @@ void mainWindow::finalize( void )
 	{
 		if( it->type == plugin::Tool )
 		{
-			m_tools_menu->addAction( *it->logo, it->public_name );
-			m_tools.push_back( tool::instantiate( it->name ) );
+			m_toolsMenu->addAction( *it->logo, it->public_name );
+			m_tools.push_back( tool::instantiate( it->name,
+					/*this*/NULL )->createView( this ) );
 		}
 	}
-	if( !m_tools_menu->isEmpty() )
+	if( !m_toolsMenu->isEmpty() )
 	{
-		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
-		connect( m_tools_menu, SIGNAL( triggered( QAction * ) ),
+		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
+		connect( m_toolsMenu, SIGNAL( triggered( QAction * ) ),
 					this, SLOT( showTool( QAction * ) ) );
 	}
 
@@ -954,13 +956,13 @@ void mainWindow::fillTemplatesMenu( void )
 
 void mainWindow::showTool( QAction * _idx )
 {
-	tool * t = m_tools[m_tools_menu->actions().indexOf( _idx )];
-	t->show();
+	pluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
+	p->show();
 	if( m_workspace )
 	{
-		t->parentWidget()->show();
+		p->parentWidget()->show();
 	}
-	t->setFocus();
+	p->setFocus();
 }
 
 

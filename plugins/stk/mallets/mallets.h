@@ -31,6 +31,7 @@
 
 #include "combobox.h"
 #include "instrument.h"
+#include "instrument_view.h"
 #include "knob.h"
 #include "note_play_handle.h"
 #include "led_checkbox.h"
@@ -133,7 +134,7 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual instrumentView * createView( QWidget * _parent );
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 private:
 	knobModel m_hardnessModel;

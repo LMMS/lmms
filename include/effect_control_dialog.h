@@ -2,7 +2,7 @@
  * effect_control_dialog.h - base-class for effect-dialogs for displaying and
  *                           editing control port values
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,14 +28,15 @@
 
 #include <QtGui/QWidget>
 
-#include "journalling_object.h"
+#include "mv_base.h"
+#include "types.h"
 
 
 class effect;
 class track;
 
 
-class effectControlDialog : public QWidget, public journallingObject
+class effectControlDialog : public QWidget, public modelView
 {
 	Q_OBJECT
 public:

@@ -2,7 +2,7 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,11 +29,11 @@
 
 #include <QtGui/QDialog>
 
+#include "audio_port.h"
 #include "track.h"
 #include "volume_knob.h"
 
 class QLabel;
-class audioPort;
 class effectLabel;
 class sampleBuffer;
 
@@ -133,7 +133,7 @@ public:
 
 	inline audioPort * getAudioPort( void )
 	{
-		return( m_audioPort );
+		return( &m_audioPort );
 	}
 
 	virtual QString nodeName( void ) const
@@ -144,7 +144,7 @@ public:
 
 private:
 	effectLabel * m_trackLabel;
-	audioPort * m_audioPort;
+	audioPort m_audioPort;
 	
 	volumeKnob * m_volumeKnob;
 	knobModel m_volumeModel;

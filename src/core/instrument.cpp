@@ -26,6 +26,7 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "automatable_model_templates.h"
 #include "instrument_track.h"
 #include "dummy_instrument.h"
@@ -34,8 +35,7 @@
 
 instrument::instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor ) :
-	plugin( _descriptor ),
-	model( /* _instrument_track */ NULL ),
+	plugin( _descriptor, NULL/* _instrument_track*/ ),
 	m_instrumentTrack( _instrument_track )
 {
 }
@@ -82,7 +82,8 @@ f_cnt_t instrument::beatLen( notePlayHandle * ) const
 instrument * instrument::instantiate( const QString & _plugin_name,
 					instrumentTrack * _instrument_track )
 {
-	plugin * p = plugin::instantiate( _plugin_name, _instrument_track );
+	plugin * p = plugin::instantiate( _plugin_name, /*_instrument_track*/ NULL,
+							_instrument_track );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<instrument *>( p ) != NULL )
 	{
@@ -102,16 +103,6 @@ bool instrument::isFromTrack( const track * _track ) const
 {
 	return( m_instrumentTrack == _track );
 }
-
-
-
-instrumentView * instrument::createEditor( QWidget * _parent )
-{
-	instrumentView * i = createView( _parent );
-	i->setModel( this );
-	return( i );
-}
-
 
 
 
@@ -144,8 +135,7 @@ void instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 
 
 instrumentView::instrumentView( instrument * _instrument, QWidget * _parent ) :
-	QWidget( _parent ),
-	modelView()
+	pluginView( _instrument, _parent )
 {
 	setModel( _instrument );
 	setFixedSize( 250, 250 );

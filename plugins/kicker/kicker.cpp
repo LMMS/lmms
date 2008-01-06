@@ -178,7 +178,7 @@ void kickerInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-instrumentView * kickerInstrument::createView( QWidget * _parent )
+pluginView * kickerInstrument::instantiateView( QWidget * _parent )
 {
 	return( new kickerInstrumentView( this, _parent ) );
 }
@@ -255,7 +255,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new kickerInstrument(
 				static_cast<instrumentTrack *>( _data ) ) );

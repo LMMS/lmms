@@ -1,10 +1,10 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * effect_tab_widget.cpp - tab-widget in channel-track-window for setting up
- *                         effects
+ * effect_view.cpp - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
  */
 
 
-#include "rack_plugin.h"
+#include "effect_view.h"
 
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
@@ -46,15 +46,8 @@
 #include "tooltip.h"
 
 
-rackPlugin::rackPlugin( QWidget * _parent, 
-			effect * _eff, 
-			track * _track, 
-			audioPort * _port ) :
-	QWidget( _parent ),
-	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f /* this */ ),
-	m_effect( _eff ),
-	m_track( _track ),
-	m_port( _port ),
+effectView::effectView( effect * _model, QWidget * _parent ) :
+	pluginView( _model, _parent ),
 	m_show( TRUE )
 {
 	setFixedSize( 210, 60 );
@@ -66,18 +59,13 @@ rackPlugin::rackPlugin( QWidget * _parent,
 	pal.setBrush( backgroundRole(), bg );
 	setPalette( pal );
 	
-	m_effect->m_enabledModel.setTrack( m_track );
-	m_effect->m_enabledModel.setValue( TRUE );
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ) );
-	m_bypass->setModel( &m_effect->m_enabledModel );
 	m_bypass->move( 3, 3 );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 
 
-	m_effect->m_wetDryModel.setTrack( m_track );
 	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ) );
-	m_wetDry->setModel( &m_effect->m_wetDryModel );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
@@ -86,12 +74,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 					"shows up in the output." ) );
 
 
-	m_autoQuitModel.setTrack( m_track );
-	m_autoQuitModel.setInitValue( 1.0f );
-	connect( &m_autoQuitModel, SIGNAL( dataChanged( void ) ), 
-				this, SLOT( updateAutoQuit( void ) ) );
 	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ) );
-	m_autoQuit->setModel( &m_autoQuitModel );
 	m_autoQuit->setLabel( tr( "Decay" ) );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
@@ -101,9 +84,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "run the risk of clipping the tail on delay effects." ) );
 
 
-	m_effect->m_gateModel.setTrack( m_track );
 	m_gate = new knob( knobBright_26, this, tr( "Gate" ) );
-	m_gate->setModel( &m_effect->m_gateModel );
 	m_gate->setLabel( tr( "Gate" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
@@ -120,7 +101,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 				this, SLOT( editControls() ) );
 		
 	m_label = new QLabel( this );
-	m_label->setText( m_effect->publicName() );
+	m_label->setText( getEffect()->publicName() );
 	f = m_label->font();
 	f.setBold( TRUE );
 	m_label->setFont( pointSize<7>( f ) );
@@ -131,7 +112,7 @@ rackPlugin::rackPlugin( QWidget * _parent,
 					bg.toImage().copy( 5, 44, 195, 10 ) ) );
 	m_label->setPalette( pal );
 
-	m_controlView = m_effect->createControlDialog( m_track );
+	m_controlView = getEffect()->createControlDialog( NULL );
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
 								m_controlView );
 	connect( m_controlView, SIGNAL( closed() ),
@@ -173,23 +154,24 @@ rackPlugin::rackPlugin( QWidget * _parent,
 "Right clicking will bring up a context menu where you can change the order "
 "in which the effects are processed or delete an effect altogether." ) );
 
-	m_port->getEffects()->appendEffect( m_effect );
+//	m_port->getEffects()->appendEffect( m_effect );
+	setModel( _model );
 }
 
 
 
 
-rackPlugin::~rackPlugin()
+effectView::~effectView()
 {
-	m_port->getEffects()->removeEffect( m_effect );
-	delete m_effect;
+//	m_port->getEffects()->removeEffect( m_effect );
+//	delete m_effect;
 	m_controlView->deleteLater();
 }
 
 
 
 
-void rackPlugin::editControls( void )
+void effectView::editControls( void )
 {
 	if( m_show )
 	{
@@ -207,22 +189,10 @@ void rackPlugin::editControls( void )
 
 
 
-void rackPlugin::updateAutoQuit( void )
-{
-	float samples = engine::getMixer()->sampleRate() *
-					m_autoQuitModel.value() / 1000.0f;
-	Uint32 buffers = 1 + ( static_cast<Uint32>( samples ) / 
-			engine::getMixer()->framesPerPeriod() );
-	m_effect->setTimeout( buffers );
-}
-
-
-
-
-void rackPlugin::contextMenuEvent( QContextMenuEvent * )
+void effectView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<captionMenu> contextMenu = new captionMenu(
-						m_effect->publicName() );
+						getEffect()->publicName() );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
@@ -244,7 +214,7 @@ void rackPlugin::contextMenuEvent( QContextMenuEvent * )
 
 
 
-void rackPlugin::moveUp()
+void effectView::moveUp()
 {
 	emit( moveUp( this ) );
 }
@@ -252,14 +222,14 @@ void rackPlugin::moveUp()
 
 
 
-void rackPlugin::moveDown()
+void effectView::moveDown()
 {
 	emit( moveDown( this ) );
 }
 
 
 
-void rackPlugin::deletePlugin()
+void effectView::deletePlugin()
 {
 	emit( deletePlugin( this ) );
 }
@@ -267,7 +237,7 @@ void rackPlugin::deletePlugin()
 
 
 
-void rackPlugin::displayHelp( void )
+void effectView::displayHelp( void )
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
@@ -276,53 +246,22 @@ void rackPlugin::displayHelp( void )
 
 
 
-void FASTCALL rackPlugin::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
-{
-	_this.setAttribute( "on", m_effect->m_enabledModel.value() );
-	_this.setAttribute( "wet", m_effect->m_wetDryModel.value() );
-	_this.setAttribute( "autoquit", m_autoQuitModel.value() );
-	_this.setAttribute( "gate", m_effect->m_gateModel.value() );
-	m_controlView->saveState( _doc, _this );
-}
-
-
-
-
-void FASTCALL rackPlugin::loadSettings( const QDomElement & _this )
-{
-	m_effect->m_enabledModel.setValue( _this.attribute( "on" ).toInt() );
-	m_effect->m_wetDryModel.setValue( _this.attribute( "wet" ).toFloat() );
-	m_autoQuitModel.setValue( _this.attribute( "autoquit" ).toFloat() );
-	m_effect->m_gateModel.setValue( _this.attribute( "gate" ).toFloat() );
-	
-	QDomNode node = _this.firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement() )
-		{
-			if( m_controlView->nodeName() == node.nodeName() )
-			{
-				m_controlView->restoreState( 
-							node.toElement() );
-			}
-		}
-		node = node.nextSibling();
-	}
-}
-
-
-
-
-void rackPlugin::closeEffects( void )
+void effectView::closeEffects( void )
 {
 	m_subWindow->hide();
 	m_show = TRUE;
 }
 
 
+void effectView::modelChanged( void )
+{
+	m_bypass->setModel( &getEffect()->m_enabledModel );
+	m_wetDry->setModel( &getEffect()->m_wetDryModel );
+	m_autoQuit->setModel( &getEffect()->m_autoQuitModel );
+	m_gate->setModel( &getEffect()->m_gateModel );
+}
 
 
-#include "rack_plugin.moc"
+#include "effect_view.moc"
 
 #endif

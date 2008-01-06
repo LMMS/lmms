@@ -1,7 +1,7 @@
 /*
  * automatable_model.h - declaration of class automatableModel
  *
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -247,7 +247,8 @@ public:
 	typedef automatableModel<T, EDIT_STEP_TYPE> autoModel;
 	typedef automatableModelView<T, EDIT_STEP_TYPE> autoModelView;
 
-	automatableModelView( void ) : modelView()
+	automatableModelView( ::model * _model ) :
+		modelView( _model )
 	{
 	}
 

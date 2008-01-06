@@ -35,6 +35,7 @@
 
 effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
 	QWidget( _parent ),
+	modelView( _eff ),
 	m_effect( _eff )
 {
 	setWindowTitle( m_effect->publicName() );

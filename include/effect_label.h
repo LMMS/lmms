@@ -3,6 +3,7 @@
  *                  offers access to an effect rack
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,18 +29,15 @@
 
 #include <QtGui/QWidget>
 
-#include "journalling_object.h"
-
 
 class QLabel;
 class QPushButton;
 
-class effectTabWidget;
+class effectRackView;
 class sampleTrack;
-class tabWidget;
 
 
-class effectLabel: public QWidget, public journallingObject
+class effectLabel: public QWidget
 {
 	Q_OBJECT
 public:
@@ -48,22 +46,14 @@ public:
 	virtual ~effectLabel();
 
 	QString text( void ) const;
-	void FASTCALL setText( const QString & _text );
-	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "sample_track" );
-	}
+	void setText( const QString & _text );
 
-	
+
 public slots:
 	void showEffects( void );
 	void rename( void );
 
-	
+
 signals:
 	void clicked( void );
 	void nameChanged( void );
@@ -78,13 +68,12 @@ protected:
 
 private:
 	sampleTrack * m_track;
-	
+
 	QLabel * m_label;
 	QPushButton * m_effectBtn;
-	tabWidget * m_tabWidget;
-	effectTabWidget * m_effWidget;
 	QWidget * m_effWindow;
+	effectRackView * m_effectRack;
 
-};
+} ;
 
 #endif

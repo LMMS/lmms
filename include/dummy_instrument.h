@@ -56,7 +56,7 @@ public:
 		return( "dummyinstrument" );
 	}
 
-	virtual instrumentView * createView( QWidget * _parent )
+	virtual pluginView * instantiateView( QWidget * _parent )
 	{
 		return( new instrumentView( this, _parent ) );
 	}

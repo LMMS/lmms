@@ -63,7 +63,6 @@ lmms_MOC =						\
 		./effect_control_dialog.moc		\
 		./effect_label.moc			\
 		./effect_select_dialog.moc		\
-		./effect_tab_widget.moc			\
 		./envelope_and_lfo_widget.moc		\
 		./envelope_tab_widget.moc		\
 		./export_project_dialog.moc		\
@@ -89,8 +88,8 @@ lmms_MOC =						\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
-		./rack_plugin.moc			\
-		./rack_view.moc				\
+		./effect_view.moc			\
+		./effect_rack_view.moc			\
 		./rubberband.moc			\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
@@ -159,7 +158,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/effect_chain.cpp			\
 		$(srcdir)/src/core/effect_control_dialog.cpp		\
 		$(srcdir)/src/core/effect_select_dialog.cpp		\
-		$(srcdir)/src/core/effect_tab_widget.cpp		\
 		$(srcdir)/src/core/effect.cpp				\
 		$(srcdir)/src/core/engine.cpp				\
 		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
@@ -221,6 +219,8 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/effect_label.cpp			\
+		$(srcdir)/src/widgets/effect_rack_view.cpp		\
+		$(srcdir)/src/widgets/effect_view.cpp			\
 		$(srcdir)/src/widgets/fade_button.cpp			\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
@@ -230,8 +230,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
 		$(srcdir)/src/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/widgets/project_notes.cpp			\
-		$(srcdir)/src/widgets/rack_plugin.cpp			\
-		$(srcdir)/src/widgets/rack_view.cpp			\
 		$(srcdir)/src/widgets/rubberband.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
 		$(srcdir)/src/widgets/side_bar_widget.cpp		\
@@ -273,7 +271,9 @@ lmms_SOURCES =								\
 		$(srcdir)/include/panning.h				\
 		$(srcdir)/include/song_editor.h				\
 		$(srcdir)/include/plugin.h				\
+		$(srcdir)/include/plugin_view.h				\
 		$(srcdir)/include/instrument.h				\
+		$(srcdir)/include/instrument_view.h			\
 		$(srcdir)/include/bb_editor.h				\
 		$(srcdir)/include/piano_widget.h			\
 		$(srcdir)/include/effect_board.h			\
@@ -372,10 +372,9 @@ lmms_SOURCES =								\
 		$(srcdir)/include/effect_chain.h			\
 		$(srcdir)/include/effect_control_dialog.h		\
 		$(srcdir)/include/effect_label.h			\
-		$(srcdir)/include/effect_tab_widget.h			\
-		$(srcdir)/include/rack_plugin.h				\
-		$(srcdir)/include/rack_view.h				\
+		$(srcdir)/include/effect_rack_view.h			\
 		$(srcdir)/include/effect_select_dialog.h		\
+		$(srcdir)/include/effect_view.h				\
 		$(srcdir)/include/dummy_effect.h			\
 		$(srcdir)/include/ladspa-1.1.h				\
 		$(srcdir)/include/sweep_oscillator.h			\

@@ -216,7 +216,7 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 
 
 
-instrumentView * audioFileProcessor::createView( QWidget * _parent )
+pluginView * audioFileProcessor::instantiateView( QWidget * _parent )
 {
 	return( new audioFileProcessorView( this, _parent ) );
 }
@@ -600,7 +600,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new audioFileProcessor(
 				static_cast<instrumentTrack *>( _data ) ) );

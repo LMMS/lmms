@@ -50,7 +50,7 @@
 #include "debug.h"
 #include "effect_board.h"
 #include "effect_chain.h"
-#include "effect_tab_widget.h"
+#include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
 #include "envelope_tab_widget.h"
@@ -66,6 +66,7 @@
 #include "note_play_handle.h"
 #include "pattern.h"
 #include "piano_widget.h"
+#include "plugin_view.h"
 #include "sample_play_handle.h"
 #include "song_editor.h"
 #include "string_pair_drag.h"
@@ -100,7 +101,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_trackType( INSTRUMENT_TRACK ),
 	m_midiPort( engine::getMixer()->getMIDIClient()->addPort( this,
 						tr( "unnamed_channel" ) ) ),
-	m_audioPort( new audioPort( tr( "unnamed_channel" ) ) ),
+	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1/* this */ ),
         m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
@@ -109,7 +110,9 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
         m_effectChannelModel( DEFAULT_EFFECT_CHANNEL,
 					MIN_EFFECT_CHANNEL, MAX_EFFECT_CHANNEL
 								 /* this */ ),
+//	m_effects( /* this */ NULL ),
 	m_instrument( NULL ),
+	m_instrumentView( NULL ),
 	m_midiInputAction( NULL ),
 	m_midiOutputAction( NULL )
 {
@@ -248,10 +251,11 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_envWidget = new envelopeTabWidget( this );
 	m_arpWidget = new arpAndChordsTabWidget( this );
 	m_midiWidget = new midiTabWidget( this, m_midiPort );
-	m_effWidget = new effectTabWidget( this, m_audioPort );
+	m_effectRack = new effectRackView( m_audioPort.getEffects(),
+								m_tabWidget );
 	m_tabWidget->addTab( m_envWidget, tr( "ENV/LFO/FILTER" ), 1 );
 	m_tabWidget->addTab( m_arpWidget, tr( "ARP/CHORD" ), 2 );
-	m_tabWidget->addTab( m_effWidget, tr( "FX" ), 3 );
+	m_tabWidget->addTab( m_effectRack, tr( "FX" ), 3 );
 	m_tabWidget->addTab( m_midiWidget, tr( "MIDI" ), 4 );
 
 	// setup piano-widget
@@ -323,8 +327,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 instrumentTrack::~instrumentTrack()
 {
 	engine::getMixer()->removePlayHandles( this );
-	delete m_effWidget;
-	delete m_audioPort;
+	delete m_effectRack;
 	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 
 	if( engine::getMainWindow()->workspace() )
@@ -450,7 +453,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 	float v_scale = (float) getVolume() / DEFAULT_VOLUME;
 	
-	m_audioPort->getEffects()->startRunning();
+	m_audioPort.getEffects()->startRunning();
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for _n, which
@@ -465,7 +468,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	engine::getMixer()->bufferToPort( _buf,
 		( _n != NULL ) ? tMin<f_cnt_t>( _n->framesLeftForCurrentPeriod(), _frames ) :
 											_frames,
-			( _n != NULL ) ? _n->offset() : 0, v, m_audioPort );
+			( _n != NULL ) ? _n->offset() : 0, v, &m_audioPort );
 }
 
 
@@ -664,7 +667,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 						// in last period and have
 						// to clear parts of it
 						_n->noteOff();
-	engine::getMixer()->clearAudioBuffer( m_audioPort->firstBuffer(),
+	engine::getMixer()->clearAudioBuffer( m_audioPort.firstBuffer(),
 				engine::getMixer()->framesPerPeriod() -
 					( *youngest_note )->offset(),
 					( *youngest_note )->offset() );
@@ -749,7 +752,7 @@ void instrumentTrack::setName( const QString & _new_name )
 #endif
 	m_tswInstrumentTrackButton->setText( m_name );
 	m_midiPort->setName( m_name );
-	m_audioPort->setName( m_name );
+	m_audioPort.setName( m_name );
 }
 
 
@@ -969,7 +972,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_envWidget->saveState( _doc, _this );
 	m_arpWidget->saveState( _doc, _this );
 	m_midiWidget->saveState( _doc, _this );
-	m_effWidget->saveState( _doc, _this );
+	m_audioPort.getEffects()->saveState( _doc, _this );
 }
 
 
@@ -990,7 +993,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "baseoct" ) )
 	{
 		// TODO: move this compat code to mmp.cpp -> upgrade()
-		m_baseNoteModel.setInitValue( _this.attribute( "baseoct" ).toInt()
+		m_baseNoteModel.setInitValue( _this.
+			attribute( "baseoct" ).toInt()
 				* NOTES_PER_OCTAVE
 				+ _this.attribute( "basetone" ).toInt() );
 	}
@@ -1020,9 +1024,11 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_midiWidget->restoreState( node.toElement() );
 			}
-			else if( m_effWidget->nodeName() == node.nodeName() )
+			else if( m_audioPort.getEffects()->nodeName() ==
+							node.nodeName() )
 			{
-				m_effWidget->restoreState( node.toElement() );
+				m_audioPort.getEffects()->restoreState(
+							node.toElement() );
 				had_fx = TRUE;
 			}
 			else if( automationPattern::classNodeName()
@@ -1031,6 +1037,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 				// if node-name doesn't match any known one,
 				// we assume that it is an instrument-plugin
 				// which we'll try to load
+				delete m_instrumentView;
 				delete m_instrument;
 				m_instrument = instrument::instantiate(
 							node.nodeName(), this );
@@ -1040,16 +1047,18 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					m_instrument->restoreState(
 							node.toElement() );
 				}
-				m_tabWidget->addTab( m_instrument->
-						createEditor( m_tabWidget ),
+				m_instrumentView = m_instrument->
+						createView( m_tabWidget );
+				m_tabWidget->addTab( m_instrumentView,
 							tr( "PLUGIN" ), 0 );
 			}
 		}
 		node = node.nextSibling();
         }
+	// TODO: why not move above without any condition??
 	if( !had_fx )
 	{
-		m_effWidget->deleteAllEffects();
+		m_audioPort.getEffects()->deleteAllPlugins();
 	}
 	engine::getMixer()->unlock();
 
@@ -1072,12 +1081,13 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 	invalidateAllMyNPH();
 
 	engine::getMixer()->lock();
+	delete m_instrumentView;
 	delete m_instrument;
 	m_instrument = instrument::instantiate( _plugin_name, this );
 	engine::getMixer()->unlock();
 
-	m_tabWidget->addTab( m_instrument->createEditor( m_tabWidget ),
-							tr( "PLUGIN" ), 0 );
+	m_instrumentView = m_instrument->createView( m_tabWidget );
+	m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
 	m_tabWidget->setActiveTab( 0 );
 
 	m_tswInstrumentTrackButton->update();

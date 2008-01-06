@@ -1,7 +1,7 @@
 /*
  * tab_widget.h - LMMS-tabwidget
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,10 +35,9 @@ class tabWidget : public QWidget
 	Q_OBJECT
 public:
 	tabWidget( const QString & _caption, QWidget * _parent );
-	~tabWidget();
+	virtual ~tabWidget();
 
-	void addTab( QWidget * _w, const QString & _name,
-								int _idx = -1 );
+	void addTab( QWidget * _w, const QString & _name, int _idx = -1 );
 
 	void setActiveTab( int _idx );
 

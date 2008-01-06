@@ -65,7 +65,7 @@ textFloat * knob::s_textFloat = NULL;
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView(),
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_hintTextBeforeValue( "" ),
@@ -73,8 +73,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_knobNum( _knob_num ),
 	m_label( "" )
 {
-	setModel( new autoModel( 0, 0, 0, 1, NULL, TRUE ) );
-
 	if( s_textFloat == NULL )
 	{
 		s_textFloat = new textFloat( this );

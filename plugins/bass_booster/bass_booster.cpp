@@ -51,9 +51,9 @@ plugin::descriptor bassbooster_plugin_descriptor =
 
 
 
-bassBoosterEffect::bassBoosterEffect(
+bassBoosterEffect::bassBoosterEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &bassbooster_plugin_descriptor, _key ),
+	effect( &bassbooster_plugin_descriptor, _parent, _key ),
 	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) )
 {
 }
@@ -71,7 +71,7 @@ bassBoosterEffect::~bassBoosterEffect()
 bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
 							const fpp_t _frames )
 {
-	if( isBypassed() || !isRunning () )
+	if( !isEnabled() || !isRunning () )
 	{
 		return( FALSE );
 	}
@@ -114,9 +114,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new bassBoosterEffect(
+	return( new bassBoosterEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

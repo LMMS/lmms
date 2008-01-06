@@ -2,7 +2,7 @@
  * effect.h - base class for effects
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,83 +39,91 @@
 #include "automatable_model.h"
 
 
+class effectChain;
 class effectControlDialog;
 class track;
-class rackPlugin;
 
 
 class effect : public plugin
 {
 public:
 	effect( const plugin::descriptor * _desc,
+			model * _parent,
 			const descriptor::subPluginFeatures::key * _key );
 	virtual ~effect();
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "effect" );
+	}
+
 	
-	virtual bool FASTCALL processAudioBuffer( 
+	virtual bool processAudioBuffer( 
 			surroundSampleFrame * _buf, const fpp_t _frames );
-	
+
 	inline ch_cnt_t getProcessorCount( void ) const
 	{
 		return( m_processors );
 	}
-	
+
 	inline void setProcessorCount( ch_cnt_t _processors )
 	{
 		m_processors = _processors;
 	}
-	
+
 	inline bool isOkay( void ) const
 	{
 		return( m_okay );
 	}
-	
+
 	inline void setOkay( bool _state )
 	{
 		m_okay = _state;
 	}
-	
-	
+
+
 	inline bool isRunning( void ) const
 	{
 		return( m_running );
 	}
-	
+
 	inline void startRunning( void ) 
 	{ 
 		m_bufferCount = 0;
 		m_running = TRUE; 
 	}
-	
+
 	inline void stopRunning( void )
 	{
 		m_running = FALSE;
 	}
-	
+
 	inline bool isEnabled( void ) const
 	{
 		return( m_enabledModel.value() );
 	}
-	
-	inline Uint32 getTimeout( void ) const
+
+	inline f_cnt_t getTimeout( void ) const
 	{
-		return( m_silenceTimeout );
+		const float samples = engine::getMixer()->sampleRate() *
+					m_autoQuitModel.value() / 1000.0f;
+		return( 1 + ( static_cast<Uint32>( samples ) / 
+				engine::getMixer()->framesPerPeriod() ) );
 	}
-	
-	inline void setTimeout( Uint32 _time_out )
-	{
-		m_silenceTimeout = _time_out;
-	}
-	
+
 	inline float getWetLevel( void ) const
 	{
 		return( m_wetDryModel.value() );
 	}
-	
+
 	inline float getDryLevel( void ) const
 	{
 		return( 1.0f - m_wetDryModel.value() );
 	}
-	
+
 	inline float getGate( void ) const
 	{
 		const float level = m_gateModel.value();
@@ -123,7 +131,7 @@ public:
 				engine::getMixer()->framesPerPeriod()  );
 	}
 
-	inline Uint32 getBufferCount( void ) const
+	inline f_cnt_t getBufferCount( void ) const
 	{
 		return( m_bufferCount );
 	}
@@ -135,7 +143,7 @@ public:
 
 	inline void incrementBufferCount( void )
 	{
-		m_bufferCount++;
+		++m_bufferCount;
 	}
 
 	inline bool dontRun( void ) const
@@ -156,7 +164,12 @@ public:
 	virtual effectControlDialog * createControlDialog( track * _track ) = 0;
 
 	static effect * instantiate( const QString & _plugin_name,
+				model * _parent,
 				descriptor::subPluginFeatures::key * _key );
+
+
+protected:
+	virtual pluginView * instantiateView( QWidget * );
 
 
 private:
@@ -167,16 +180,16 @@ private:
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
+	f_cnt_t m_bufferCount;
+
 	boolModel m_enabledModel;
-
-	Uint32 m_bufferCount;
-	Uint32 m_silenceTimeout;
-
 	floatModel m_wetDryModel;
 	floatModel m_gateModel;
+	floatModel m_autoQuitModel;
 
 
-	friend class rackPlugin;
+	friend class effectView;
+	friend class effectChain;
 
 } ;
 

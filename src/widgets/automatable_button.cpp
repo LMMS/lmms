@@ -41,10 +41,10 @@
 automatableButton::automatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
-	autoModelView(),
+	autoModelView( new autoModel( FALSE, FALSE, TRUE,
+				autoModel::defaultRelStep(), NULL, TRUE ) ),
 	m_group( NULL )
 {
-	setModel( new autoModel( FALSE, FALSE, TRUE, 1, NULL, TRUE ) );
 	setAccessibleName( _name );
 }
 
@@ -165,9 +165,8 @@ void automatableButton::toggle( void )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView()
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) )
 {
-	setModel( new autoModel( 0, 0, 0, 1, NULL, TRUE ) );
 	hide();
 	setAccessibleName( _name );
 }

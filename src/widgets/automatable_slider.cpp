@@ -4,7 +4,7 @@
  * automatable_slider.cpp - implementation of class automatableSlider
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,10 +41,9 @@
 
 automatableSlider::automatableSlider( QWidget * _parent, const QString & _name ) :
 	QSlider( _parent ),
-	autoModelView(),
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_showStatus( FALSE )
 {
-	setModel( new autoModel( 0, 0, 0, 1, NULL, TRUE ) );
 	setAccessibleName( _name );
 
 	connect( this, SIGNAL( valueChanged( int ) ),

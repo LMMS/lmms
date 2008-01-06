@@ -32,6 +32,7 @@
 #include <QtCore/QVector>
 
 #include "journalling_object.h"
+#include "mv_base.h"
 #include "base64.h"
 
 
@@ -42,8 +43,10 @@
 class QPixmap;
 class QWidget;
 
+class pluginView;
 
-class plugin : public journallingObject
+
+class plugin : public journallingObject, public model
 {
 public:
 	enum pluginTypes
@@ -150,7 +153,7 @@ public:
 	} ;
 
 	// contructor of a plugin
-	plugin( const descriptor * _descriptor );
+	plugin( const descriptor * _descriptor, model * _parent );
 	virtual ~plugin();
 
 	// returns public-name out of descriptor
@@ -184,6 +187,7 @@ public:
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
 	static plugin * FASTCALL instantiate( const QString & _plugin_name,
+							model * _parent,
 							void * _data );
 
 	// some plugins run external programs for doing their actual work
@@ -194,21 +198,29 @@ public:
 	// of course isn't that efficient
 	virtual bool supportsParallelizing( void ) const;
 
-	// plugins supporting parallelizing, should re-implement that as the
+	// plugins supporting parallelization, should re-implement that as the
 	// mixer will call this at the end of processing according chain
 	// of plugins
 	virtual void waitForWorkerThread( void );
-
 
 	// fills given vector with descriptors of all available plugins
 	static void FASTCALL getDescriptorsOfAvailPlugins(
 					QVector<descriptor> & _plugin_descs );
 
+	// create a view for the model 
+	pluginView * createView( QWidget * _parent );
+
+
+protected:
+	// create a view for the model 
+	virtual pluginView * instantiateView( QWidget * ) = 0;
+
+
 private:
 	const descriptor * m_descriptor;
 
 	// pointer to instantiation-function in plugin
-	typedef plugin * ( * instantiationHook )( void * );
+	typedef plugin * ( * instantiationHook )( model *, void * );
 
 } ;
 

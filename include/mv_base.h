@@ -28,6 +28,8 @@
 
 #include <QtCore/QObject>
 
+class modelView;
+
 
 class model : public QObject
 {
@@ -71,8 +73,8 @@ signals:
 class modelView
 {
 public:
-	modelView() :
-		m_model( NULL )
+	modelView( model * _model ) :
+		m_model( _model )
 	{
 	}
 

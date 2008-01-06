@@ -1,9 +1,10 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * rack_view.cpp - provides the display for the rackInsert instances
+ * effect_rack_view.cpp - view for effectChain-model
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,218 +27,239 @@
 
 
 #include <QtGui/QApplication>
+#include <QtGui/QLayout>
+#include <QtGui/QPushButton>
+#include <QtGui/QScrollArea>
+#include <QtGui/QVBoxLayout>
 
-#include "rack_view.h"
-#include "audio_port.h"
-#include "rack_plugin.h"
+#include "effect_rack_view.h"
+#include "effect_select_dialog.h"
+#include "effect_view.h"
+#include "group_box.h"
 
 
-rackView::rackView( QWidget * _parent, track * _track, audioPort * _port ) :
+effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	QWidget( _parent ),
-	m_track( _track ),
-	m_port( _port )
+	modelView( NULL )
 {
 	setFixedSize( 230, 184 );
 	
-	m_mainLayout = new QVBoxLayout( this );
+/*	m_mainLayout = new QVBoxLayout( this );
 	m_mainLayout->setMargin( 0 );
-	m_mainLayout->setSpacing( 0 );
-	m_scrollArea = new QScrollArea( this );
+	m_mainLayout->setSpacing( 0 );*/
+
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
+	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
+
+	m_scrollArea = new QScrollArea( m_effectsGroupBox );
 	m_scrollArea->setFixedSize( 230, 184 );
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	m_scrollArea->move( 6, 22 );
+		
+	m_addButton = new QPushButton( m_effectsGroupBox/*, "Add Effect"*/ );
+	m_addButton->setText( tr( "Add" ) );
+	m_addButton->move( 75, 210 );
+	connect( m_addButton, SIGNAL( clicked( void ) ), 
+					this, SLOT( addEffect( void ) ) );
 
-	m_mainLayout->addWidget( m_scrollArea );
+	//m_mainLayout->addWidget( m_scrollArea );
+
+	QWidget * w = new QWidget;
+	m_scrollArea->setWidget( w );
+	w->show();
 	
 	m_lastY = 0;
+
+	setModel( _model );
 }
 
 
 
-rackView::~rackView()
+effectRackView::~effectRackView()
 {
-	deleteAllPlugins();
-}
-
-
-
-
-void rackView::addEffect( effect * _e )
-{
-	if( !m_scrollArea->widget() )
-	{
-		QWidget * w = new QWidget;
-		m_scrollArea->setWidget( w );
-		w->show();
-	}
-	QWidget * w = m_scrollArea->widget();
-	rackPlugin * plugin = new rackPlugin( w, _e, m_track, m_port );
-	connect( plugin, SIGNAL( moveUp( rackPlugin * ) ), 
-				this, SLOT( moveUp( rackPlugin * ) ) );
-	connect( plugin, SIGNAL( moveDown( rackPlugin * ) ),
-				this, SLOT( moveDown( rackPlugin * ) ) );
-	connect( plugin, SIGNAL( deletePlugin( rackPlugin * ) ),
-				this, SLOT( deletePlugin( rackPlugin * ) ) );
-	plugin->move( 0, m_lastY );
-	plugin->show();
-	m_lastY += plugin->height();
-	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
-	m_rackInserts.append( plugin );
+	//deleteAllPlugins();
 }
 
 
 
 
-void FASTCALL rackView::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
+/*
+void effectRackView::deleteAllPlugins( void )
 {
-	_this.setAttribute( "numofeffects", m_rackInserts.count() );
-	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++ )
-	{
-		QDomElement ef = ( *it )->saveState( _doc, _this );
-		ef.setAttribute( "name", 
-				( *it )->getEffect()->getDescriptor()->name );
-		ef.setAttribute( "key", 
-				( *it )->getEffect()->getKey().dumpBase64() );
-	}
-}
-
-
-
-
-void FASTCALL rackView::loadSettings( const QDomElement & _this )
-{
-	deleteAllPlugins();
-
-	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
-
-	QDomNode node = _this.firstChild();
-	for( int i = 0; i < plugin_cnt; i++ )
-	{
-		if( node.isElement() && node.nodeName() == "effect" )
-		{
-			QDomElement cn = node.toElement();
-			const QString name = cn.attribute( "name" );
-			// we have this really convenient key-ctor
-			// which takes a QString and decodes the
-			// base64-data inside :-)
-			effectKey key( cn.attribute( "key" ) );
-			addEffect( effect::instantiate( name, &key ) );
-			// TODO: somehow detect if effect is sub-plugin-capable
-			// but couldn't load sub-plugin with requsted key
-			if( node.isElement() )
-			{
-				if( m_rackInserts.last()->nodeName() == 
-							node.nodeName() )
-				{
-					m_rackInserts.last()->restoreState( 
-							node.toElement() );
-				}
-			}
-		}
-		node = node.nextSibling();
-	}
-	
-}
-
-
-
-
-void rackView::deleteAllPlugins( void )
-{
-	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin();
-					it != m_rackInserts.end(); ++it )
+	for( QVector<effectView *>::iterator it = m_effectViews.begin();
+					it != m_effectViews.end(); ++it )
 	{
 		delete *it;
 	}
-	m_rackInserts.clear();
+	m_effectViews.clear();
 }
+*/
 
 
 
-
-void rackView::moveUp( rackPlugin * _plugin )
+void effectRackView::moveUp( effectView * _view )
 {
-	if( _plugin != m_rackInserts.first() )
+	fxChain()->moveUp( _view->getEffect() );
+	if( _view != m_effectViews.first() )
 	{
 		int i = 0;
-		for( QVector<rackPlugin *>::iterator it = 
-						m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++, i++ )
+		for( QVector<effectView *>::iterator it = 
+						m_effectViews.begin(); 
+					it != m_effectViews.end(); it++, i++ )
 		{
-			if( *it == _plugin )
+			if( *it == _view )
 			{
 				break;
 			}
 		}
 		
-		rackPlugin * temp = m_rackInserts[ i - 1 ];
+		effectView * temp = m_effectViews[ i - 1 ];
 		
-		m_rackInserts[i - 1] = _plugin;
-		m_rackInserts[i] = temp;
+		m_effectViews[i - 1] = _view;
+		m_effectViews[i] = temp;
 		
-		redraw();
+		updateView();
 	}
 }
 
 
 
 
-void rackView::moveDown( rackPlugin * _plugin )
+void effectRackView::moveDown( effectView * _view )
 {
-	m_port->getEffects()->moveDown( _plugin->getEffect() );
-	if( _plugin != m_rackInserts.last() )
+	if( _view != m_effectViews.last() )
+	{
+		// moving next effect up is the same
+		moveUp( *( qFind( m_effectViews.begin(), m_effectViews.end(),
+							_view ) + 1 ) );
+	}
+/*
+	fxChain()->moveDown( _view->getEffect() );
+	if( _view != m_effectViews.last() )
 	{
 		int i = 0;
-		for( QVector<rackPlugin *>::iterator it = 
-						m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++, i++ )
+		for( QVector<effectView *>::iterator it = 
+						m_effectViews.begin(); 
+					it != m_effectViews.end(); it++, i++ )
 		{
-			if( *it == _plugin )
+			if( *it == _view )
 			{
 				break;
 			}
 		}
 		
-		rackPlugin * temp = m_rackInserts.at( i + 1 );
+		effectView * temp = m_effectViews.at( i + 1 );
 		
-		m_rackInserts[i + 1] = _plugin;
-		m_rackInserts[i] = temp;
+		m_effectViews[i + 1] = _view;
+		m_effectViews[i] = temp;
 		
 		redraw();
-	}
+	}*/
 }
 
 
 
 
-void rackView::deletePlugin( rackPlugin * _plugin )
+void effectRackView::deletePlugin( effectView * _view )
 {
-	m_rackInserts.erase( qFind( m_rackInserts.begin(), m_rackInserts.end(),
-								_plugin ) );
-	delete _plugin;
-	redraw();	
+	effect * e = _view->getEffect();
+	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(),
+								_view ) );
+	delete _view;
+	fxChain()->m_effects.erase( qFind( fxChain()->m_effects.begin(),
+						fxChain()->m_effects.end(),
+									e ) );
+	delete e;
+	updateView();
 }
 
 
 
 
-void rackView::redraw()
+void effectRackView::updateView( void )
 {
-	m_lastY = 0;
-	for( QVector<rackPlugin *>::iterator it = m_rackInserts.begin(); 
-					it != m_rackInserts.end(); it++ )
+	QWidget * w = m_scrollArea->widget();
+	QVector<bool> view_map( fxChain()->m_effects.size(), FALSE );
+
+	for( QVector<effect *>::iterator it = fxChain()->m_effects.begin();
+					it != fxChain()->m_effects.end(); ++it )
 	{
-		( *it )->move( 0, m_lastY );
-		m_lastY += ( *it )->height();
+		int i = 0;
+		for( QVector<effectView *>::iterator vit =
+							m_effectViews.begin();
+				vit != m_effectViews.end(); ++vit, ++i )
+		{
+			if( ( *vit )->getEffect() == *it )
+			{
+				view_map[i] = TRUE;
+				break;
+			}
+		}
+		if( i >= m_effectViews.size() )
+		{
+			effectView * view = new effectView( *it, w );
+			connect( view, SIGNAL( moveUp( effectView * ) ), 
+					this, SLOT( moveUp( effectView * ) ) );
+			connect( view, SIGNAL( moveDown( effectView * ) ),
+				this, SLOT( moveDown( effectView * ) ) );
+			connect( view, SIGNAL( deletePlugin( effectView * ) ),
+				this, SLOT( deletePlugin( effectView * ) ) );
+			view->show();
+			m_effectViews.append( view );
+			view_map[i] = TRUE;
+
+		}
 	}
-	m_scrollArea->widget()->setFixedSize( 210, m_lastY );
-}	
+
+	int i = m_lastY = 0;
+	for( QVector<effectView *>::iterator it = m_effectViews.begin(); 
+					it != m_effectViews.end(); )
+	{
+		if( i < view_map.size() && view_map[i] == FALSE )
+		{
+			delete m_effectViews[i];
+			m_effectViews.erase( it );
+		}
+		else
+		{
+			( *it )->move( 0, m_lastY );
+			m_lastY += ( *it )->height();
+			++it;
+			++i;
+		}
+	}
+	w->setFixedSize( 210, m_lastY );
+}
 
 
 
 
-#include "rack_view.moc"
+void effectRackView::addEffect( void )
+{
+	effectSelectDialog esd( this );
+	esd.exec();
+
+	if( esd.result() == QDialog::Rejected )
+	{
+		return;
+	}
+
+	fxChain()->appendEffect( esd.instantiateSelectedPlugin( fxChain() ) );
+	updateView();
+}
+
+
+
+
+void effectRackView::modelChanged( void )
+{
+	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
+	updateView();
+}
+
+
+
+#include "effect_rack_view.moc"
 
 #endif

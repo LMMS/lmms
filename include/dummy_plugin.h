@@ -2,7 +2,7 @@
  * dummy_plugin.h - empty plugin which is used as fallback if a plugin couldn't
  *                  be found
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,13 +28,14 @@
 #define _DUMMY_PLUGIN_H
 
 #include "plugin.h"
+#include "plugin_view.h"
 
 
 class dummyPlugin : public plugin
 {
 public:
 	inline dummyPlugin( void ) :
-		plugin( NULL )
+		plugin( NULL, NULL )
 	{
 	}
 
@@ -54,6 +55,12 @@ public:
 	inline virtual QString nodeName( void ) const
 	{
 		return( "dummyplugin" );
+	}
+
+protected:
+	virtual pluginView * instantiateView( QWidget * _parent )
+	{
+		return( new pluginView( this, _parent ) );
 	}
 
 } ;

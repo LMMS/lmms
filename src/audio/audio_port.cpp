@@ -3,7 +3,7 @@
 /*
  * audio_port.cpp - base-class for objects providing sound at a port
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 #include "engine.h"
 
 
-audioPort::audioPort( const QString & _name ) :
+audioPort::audioPort( const QString & _name, track * _track ) :
 	m_bufferUsage( NONE ),
 	m_firstBuffer( new surroundSampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
@@ -42,7 +42,7 @@ audioPort::audioPort( const QString & _name ) :
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( -1 ),
 	m_name( "unnamed port" ),
-	m_effects( new effectChain ),
+	m_effects( this, _track ),
 	m_frames( engine::getMixer()->framesPerPeriod() )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
@@ -62,7 +62,6 @@ audioPort::~audioPort()
 	engine::getMixer()->removeAudioPort( this );
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
-	delete m_effects;
 }
 
 

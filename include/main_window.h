@@ -37,7 +37,7 @@ class QMdiArea;
 class QSplashScreen;
 
 class configManager;
-class tool;
+class pluginView;
 class toolButton;
 
 
@@ -155,8 +155,8 @@ private:
 		bool m_alt;
 	} m_keyMods;
 
-	QMenu * m_tools_menu;
-	QList<tool *> m_tools;
+	QMenu * m_toolsMenu;
+	QList<pluginView *> m_tools;
 
 	bool m_modified;
 

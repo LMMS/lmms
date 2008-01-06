@@ -330,7 +330,7 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ) ) ),
+	m_audioPort( tr( "Sample track" ), this ),
 	m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1/*, this*/ )
 {
 	m_volumeModel.setTrack( this );
@@ -372,7 +372,6 @@ sampleTrack::~sampleTrack()
 	}
 
 	engine::getMixer()->removePlayHandles( this );
-	delete m_audioPort;
 }
 
 
@@ -393,7 +392,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 {
 	sendMidiTime( _start );
 
-	m_audioPort->getEffects()->startRunning();
+	m_audioPort.getEffects()->startRunning();
 	bool played_a_note = FALSE;	// will be return variable
 
 	for( int i = 0; i < numOfTCOs(); ++i )
@@ -436,7 +435,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
-	m_trackLabel->saveState( _doc, _this );
+	m_audioPort.getEffects()->saveState( _doc, _this );
 #if 0
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 #endif
@@ -454,9 +453,11 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		if( node.isElement() )
 		{
-			if( m_trackLabel->nodeName() == node.nodeName() )
+			if( m_audioPort.getEffects()->nodeName() ==
+							node.nodeName() )
 			{
-				m_trackLabel->restoreState( node.toElement() );
+				m_audioPort.getEffects()->restoreState(
+							node.toElement() );
 			}
 		}
 		node = node.nextSibling();

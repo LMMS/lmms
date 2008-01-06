@@ -2,6 +2,7 @@
  * tool.h - declaration of class tool, standard interface for all tool plugins
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,24 +27,31 @@
 #ifndef _TOOL_H
 #define _TOOL_H
 
-#include <QtGui/QWidget>
-
 #include "plugin.h"
+#include "plugin_view.h"
 
 
-class tool : public QWidget, public plugin
+class tool : public plugin
 {
 public:
-	tool( const descriptor * _descriptor );
+	tool( const descriptor * _descriptor, model * _parent );
 	virtual ~tool();
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
-	static tool * FASTCALL instantiate( const QString & _plugin_name );
+	static tool * FASTCALL instantiate( const QString & _plugin_name,
+							model * _parent );
 
 } ;
 
 
+
+class toolView : public pluginView
+{
+public:
+	toolView( tool * _tool, QWidget * _parent );
+
+} ;
 
 
 #endif

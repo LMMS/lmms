@@ -1,7 +1,8 @@
 /*
- * right_frame.h - provides the display for the rackInsert instances
+ * effect_rack_view.h - view for effectChain-model
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,63 +23,61 @@
  *
  */
 
-#ifndef _RACK_VIEW_H
-#define _RACK_VIEW_H
+#ifndef _EFFECT_RACK_VIEW_H
+#define _EFFECT_RACK_VIEW_H
 
 #include <QtGui/QWidget>
-#include <QtGui/QLayout>
-#include <QtGui/QScrollArea>
-#include <QtGui/QVBoxLayout>
 
-
+#include "effect_chain.h"
 #include "types.h"
-#include "journalling_object.h"
+
+class QPushButton;
+class QScrollArea;
+class QVBoxLayout;
+
+class effectView;
+class groupBox;
 
 
-class audioPort;
-class effect;
-class rackPlugin;
-class track;
-
-
-class rackView: public QWidget, public journallingObject
+class effectRackView : public QWidget, public modelView
 {
 	Q_OBJECT
-
 public:
-	rackView( QWidget * _parent, track * _track, audioPort * _port );
-	~rackView();
-
-	void addEffect( effect * _e );
-	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "rack" );
-	}
-
-	void deleteAllPlugins( void );
+	effectRackView( effectChain * _model, QWidget * _parent );
+	virtual ~effectRackView();
 
 
 public slots:
-	void moveUp( rackPlugin * _plugin );
-	void moveDown( rackPlugin * _plugin );
-	void deletePlugin( rackPlugin * _plugin );
+	void moveUp( effectView * _view );
+	void moveDown( effectView * _view );
+	void deletePlugin( effectView * _view );
+
+
+private slots:
+	void updateView( void );
+	void addEffect( void );
 
 
 private:
-	void redraw();
+	virtual void modelChanged( void );
+
+	inline effectChain * fxChain( void )
+	{
+		return( castModel<effectChain>() );
+	}
+
+	inline const effectChain * fxChain( void ) const
+	{
+		return( castModel<effectChain>() );
+	}
 
 
-	QVector<rackPlugin *> m_rackInserts;
-		
+	QVector<effectView *> m_effectViews;
+
 	QVBoxLayout * m_mainLayout;
+	groupBox * m_effectsGroupBox;
 	QScrollArea * m_scrollArea;
-	
-	track * m_track;
-	audioPort * m_port;
+	QPushButton * m_addButton;
 	
 	Uint32 m_lastY;
 

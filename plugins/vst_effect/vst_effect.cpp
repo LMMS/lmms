@@ -82,7 +82,7 @@ vstEffect::~vstEffect()
 bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpp_t _frames )
 {
-	if( isBypassed() || !isRunning () )
+	if( !isEnabled() || !isRunning () )
 	{
 		return( FALSE );
 	}

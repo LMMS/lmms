@@ -30,6 +30,7 @@
 #include <QtGui/QPixmap>
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "sample_buffer.h"
 #include "volume_knob.h"
 #include "pixmap_button.h"
@@ -73,7 +74,7 @@ public:
 		return( 128 );
 	}
 
-	virtual instrumentView * createView( QWidget * _parent );
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 
 public slots:

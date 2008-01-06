@@ -59,8 +59,9 @@ plugin::descriptor ladspaeffect_plugin_descriptor =
 }
 
 
-ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
-	effect( &ladspaeffect_plugin_descriptor, _key ),
+ladspaEffect::ladspaEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key ) :
+	effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
 	m_effName( "none" ),
 	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key )
 		/* ladspa_key_t( _cdata->settings.attribute( "label" ),
@@ -464,15 +465,13 @@ void FASTCALL ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
 }
 
 
-#undef indexOf
-
 extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new ladspaEffect(
+	return( new ladspaEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

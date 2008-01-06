@@ -27,6 +27,7 @@
 #define _KICKER_H
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "knob.h"
 
 
@@ -56,7 +57,7 @@ public:
 		return( 512 );
 	}
 
-	virtual instrumentView * createView( QWidget * _parent );
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 
 private:

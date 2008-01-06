@@ -58,8 +58,8 @@ plugin::descriptor malletsstk_plugin_descriptor =
 }
 
 
-malletsInstrument::malletsInstrument( instrumentTrack * _channel_track ):
-	instrument( _channel_track, &malletsstk_plugin_descriptor ),
+malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
+	instrument( _instrument_track, &malletsstk_plugin_descriptor ),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_positionModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_vibratoGainModel(64.0f, 0.0f, 128.0f, 0.1f, this),
@@ -77,21 +77,21 @@ malletsInstrument::malletsInstrument( instrumentTrack * _channel_track ):
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this)
 {
-	m_hardnessModel.setTrack( _channel_track );
-	m_positionModel.setTrack( _channel_track );
-	m_vibratoGainModel.setTrack( _channel_track );
-	m_vibratoFreqModel.setTrack( _channel_track );
-	m_stickModel.setTrack( _channel_track );
-	m_modulatorModel.setTrack( _channel_track );
-	m_crossfadeModel.setTrack( _channel_track );
-	m_lfoSpeedModel.setTrack( _channel_track );
-	m_lfoDepthModel.setTrack( _channel_track );
-	m_adsrModel.setTrack( _channel_track );
-	m_pressureModel.setTrack( _channel_track );
-	m_motionModel.setTrack( _channel_track );
-	m_velocityModel.setTrack( _channel_track );
-	m_strikeModel.setTrack( _channel_track );
-	m_spreadModel.setTrack( _channel_track );
+	m_hardnessModel.setTrack( _instrument_track );
+	m_positionModel.setTrack( _instrument_track );
+	m_vibratoGainModel.setTrack( _instrument_track );
+	m_vibratoFreqModel.setTrack( _instrument_track );
+	m_stickModel.setTrack( _instrument_track );
+	m_modulatorModel.setTrack( _instrument_track );
+	m_crossfadeModel.setTrack( _instrument_track );
+	m_lfoSpeedModel.setTrack( _instrument_track );
+	m_lfoDepthModel.setTrack( _instrument_track );
+	m_adsrModel.setTrack( _instrument_track );
+	m_pressureModel.setTrack( _instrument_track );
+	m_motionModel.setTrack( _instrument_track );
+	m_velocityModel.setTrack( _instrument_track );
+	m_strikeModel.setTrack( _instrument_track );
+	m_spreadModel.setTrack( _instrument_track );
 	
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
@@ -299,7 +299,7 @@ void malletsInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-instrumentView * malletsInstrument::createView( QWidget * _parent )
+pluginView * malletsInstrument::instantiateView( QWidget * _parent )
 {
 	return( new malletsInstrumentView( this, _parent ) );
 }
@@ -307,7 +307,8 @@ instrumentView * malletsInstrument::createView( QWidget * _parent )
 
 
 
-malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument, QWidget * _parent ) :
+malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
+							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
 	_instrument->m_filesMissing =
@@ -673,7 +674,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new malletsInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }

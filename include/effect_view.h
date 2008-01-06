@@ -1,8 +1,8 @@
 /*
- * rack_plugin.h - tab-widget in channel-track-window for setting up
- *                 effects
+ * effect_view.h - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,13 +23,11 @@
  *
  */
 
-#ifndef _RACK_PLUGIN_H
-#define _RACK_PLUGIN_H
-
-#include <QtGui/QWidget>
+#ifndef _EFFECT_VIEW_H
+#define _EFFECT_VIEW_H
 
 #include "automatable_model.h"
-
+#include "plugin_view.h"
 
 class QGroupBox;
 class QLabel;
@@ -45,51 +43,44 @@ class tempoSyncKnob;
 class track;
 
 
-class rackPlugin: public QWidget, public journallingObject
+class effectView : public pluginView
 {
 	Q_OBJECT
-
 public:
-	rackPlugin( QWidget * _parent, effect * _eff, track * _track,
-							audioPort * _port );
-	virtual ~rackPlugin();
+	effectView( effect * _model, QWidget * _parent );
+	virtual ~effectView();
 	
-	inline effect * getEffect()
+	inline effect * getEffect( void )
 	{
-		return( m_effect );
+		return( castModel<effect>() );
+	}
+	inline const effect * getEffect( void ) const
+	{
+		return( castModel<effect>() );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "effect" );
-	}
 
 public slots:
 	void editControls( void );
-	void updateAutoQuit( void );
-/*	void bypassChanged( void );
-	void updateWetDry( void );
-	void updateGate( void );*/
 	void moveUp( void );
 	void moveDown( void );
 	void deletePlugin( void );
 	void displayHelp( void );
 	void closeEffects( void );
+
 	
 signals:
-	void moveUp( rackPlugin * _plugin );
-	void moveDown( rackPlugin * _plugin );
-	void deletePlugin( rackPlugin * _plugin );
+	void moveUp( effectView * _plugin );
+	void moveDown( effectView * _plugin );
+	void deletePlugin( effectView * _plugin );
+
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me );
-	
-private:
-	floatModel m_autoQuitModel;
+	virtual void modelChanged( void );
 
+
+private:
 	ledCheckBox * m_bypass;
 	knob * m_wetDry;
 	tempoSyncKnob * m_autoQuit;
@@ -99,10 +90,7 @@ private:
 	QLabel * m_label;
 	QPushButton * m_editButton;
 	QMdiSubWindow * m_subWindow;
-	effect * m_effect;
 	effectControlDialog * m_controlView;
-	track * m_track;
-	audioPort * m_port;
 	bool m_show;
 
 } ;

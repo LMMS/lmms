@@ -31,7 +31,6 @@
 
 #include "plugin.h"
 #include "mixer.h"
-#include "mv_base.h"
 
 
 // forward-declarations
@@ -43,7 +42,7 @@ class notePlayHandle;
 class track;
 
 
-class instrument : public plugin, public model
+class instrument : public plugin
 {
 public:
 	instrument( instrumentTrack * _instrument_track,
@@ -117,8 +116,6 @@ public:
 
 	virtual bool isFromTrack( const track * _track ) const;
 
-	instrumentView * createEditor( QWidget * _parent );
-
 
 protected:
 	inline instrumentTrack * getInstrumentTrack( void ) const
@@ -131,38 +128,10 @@ protected:
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
 
-	// instruments have to implement this to create an according view for
-	// themselves
-	virtual instrumentView * createView( QWidget * _parent ) = 0;
-
-
 private:
 	instrumentTrack * m_instrumentTrack;
 
 } ;
-
-
-
-class instrumentView : public QWidget, public modelView
-{
-public:
-	instrumentView( instrument * _instrument, QWidget * _parent );
-	virtual ~instrumentView();
-
-	instrument * model( void )
-	{
-		return( castModel<instrument>() );
-	}
-
-	const instrument * model( void ) const
-	{
-		return( castModel<instrument>() );
-	}
-
-	virtual void setModel( ::model * _model, bool = FALSE );
-
-} ;
-
 
 
 #endif

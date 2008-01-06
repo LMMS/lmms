@@ -36,7 +36,7 @@
 
 importFilter::importFilter( const QString & _file_name,
 					const descriptor * _descriptor ) :
-	plugin( _descriptor ),
+	plugin( _descriptor, NULL ),
 	m_file( _file_name )
 {
 }
@@ -70,7 +70,7 @@ void importFilter::import( const QString & _file_to_import,
 	{
 		if( it->type == plugin::ImportFilter )
 		{
-			plugin * p = plugin::instantiate( it->name, s );
+			plugin * p = plugin::instantiate( it->name, NULL, s );
 			if( dynamic_cast<importFilter *>( p ) != NULL &&
 				dynamic_cast<importFilter *>( p )->tryImport(
 								_tc ) == TRUE )

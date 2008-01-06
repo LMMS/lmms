@@ -1,3 +1,76 @@
+2008-01-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	changes for making effects work again with new effect-framework
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	* include/dummy_plugin.h:
+	* include/instrument.h:
+	* include/plugin.h:
+	* include/tool.h:
+	* include/main_window.h:
+	* include/mv_base.h:
+	* include/dummy_instrument.h:
+	* src/core/plugin.cpp:
+	* src/core/tool.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/instrument.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/main_window.cpp:
+	moved createView()-functionality from instrument- to plugin-class
+
+	* include/tab_widget.h:
+	code-formatting stuff
+
+	* include/audio_port.h:
+	* include/instrument_track.h:
+	* include/sample_track.h:
+	* src/audio/audio_port.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	integrated new effect-framework
+
+	* Makefile.am:
+	* include/dummy_effect.h:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_control_dialog.h:
+	* include/effect_label.h:
+	* include/effect_rack_view.h:
+	* include/effect_select_dialog.h:
+	* include/effect_tab_widget.h:
+	* include/effect_view.h:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/effect_view.cpp:
+	* src/widgets/effect_rack_view.cpp:
+	rewrote view-component of effect-framework and removed effectTabWidget
+
+	* include/automatable_model.h:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/automatable_button.cpp:
+	pass model-pointer to modelView-constructor
+
 2008-01-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/organic/organic.cpp:

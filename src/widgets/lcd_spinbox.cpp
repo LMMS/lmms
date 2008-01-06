@@ -41,7 +41,7 @@
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView(),
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_number( new QLCDNumber( _num_digits, this ) ),
 	m_label( NULL ),
 	m_origMousePos()
@@ -49,8 +49,6 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 	m_number->setFrameShape( QFrame::Panel );
 	m_number->setFrameShadow( QFrame::Sunken );
 	m_number->setSegmentStyle( QLCDNumber::Flat );
-
-	setModel( new autoModel( 0, 0, 0, 1, NULL, TRUE ) );
 
 	QPalette pal;
 	pal.setColor( QPalette::Light, Qt::gray );

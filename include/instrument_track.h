@@ -2,7 +2,7 @@
  * instrument_track.h - declaration of class instrumentTrack, a track + window
  *                      which holds an instrument-plugin
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,18 +30,20 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QPainter>
 
+#include "audio_port.h"
 #include "automatable_model.h"
 #include "lcd_spinbox.h"
 #include "midi_event_processor.h"
 #include "mixer.h"
+#include "effect_chain.h"
 #include "surround_area.h"
 #include "tab_widget.h"
 #include "track.h"
 
+
 class QLineEdit;
 class arpAndChordsTabWidget;
-class audioPort;
-class effectTabWidget;
+class effectRackView;
 class envelopeTabWidget;
 class fadeButton;
 class instrument;
@@ -158,7 +160,7 @@ public:
 	
 	inline audioPort * getAudioPort( void )
 	{
-		return( m_audioPort );
+		return( &m_audioPort );
 	}
 
 	intModel * baseNoteModel( void )
@@ -207,7 +209,7 @@ private:
 
 	midiPort * m_midiPort;
 
-	audioPort * m_audioPort;
+	audioPort m_audioPort;
 
 
 	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
@@ -237,7 +239,11 @@ private:
 	envelopeTabWidget * m_envWidget;
 	arpAndChordsTabWidget * m_arpWidget;
 	midiTabWidget * m_midiWidget;
-	effectTabWidget * m_effWidget;
+
+	pluginView * m_instrumentView;
+	effectRackView * m_effectRack;
+
+//	effectChain m_effects;
 
 	// test-piano at the bottom of every instrument-settings-window
 	pianoWidget * m_pianoWidget;

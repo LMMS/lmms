@@ -55,8 +55,8 @@ public:
 class dummyEffect : public effect
 {
 public:
-	inline dummyEffect( void ) :
-		effect( NULL, NULL )
+	inline dummyEffect( model * _parent ) :
+		effect( NULL, _parent, NULL )
 	{
 	}
 

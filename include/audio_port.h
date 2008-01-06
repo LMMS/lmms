@@ -1,7 +1,7 @@
 /*
  * audio_port.h - base-class for objects providing sound at a port
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,7 @@
 class audioPort
 {
 public:
-	audioPort( const QString & _name );
+	audioPort( const QString & _name, track * _track );
 	~audioPort();
 
 	inline surroundSampleFrame * firstBuffer( void )
@@ -66,7 +66,7 @@ public:
 
 	inline effectChain * getEffects( void )
 	{
-		return( m_effects );
+		return( &m_effects );
 	}
 
 	void setNextFxChannel( const fx_ch_t _chnl )
@@ -88,7 +88,11 @@ public:
 		NONE, FIRST, BOTH
 	} m_bufferUsage;
 	
-	inline bool processEffects( void ) { return( m_effects->processAudioBuffer( m_firstBuffer, m_frames ) ); };
+	inline bool processEffects( void )
+	{
+		return( m_effects.processAudioBuffer( m_firstBuffer,
+								m_frames ) );
+	}
 
 private:
 	surroundSampleFrame * m_firstBuffer;
@@ -98,7 +102,7 @@ private:
 
 	QString m_name;
 	
-	effectChain * m_effects;
+	effectChain m_effects;
 	fpp_t m_frames;
 
 } ;

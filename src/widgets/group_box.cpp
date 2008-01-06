@@ -49,7 +49,7 @@ QPixmap * groupBox::s_ledBg = NULL;
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	autoModelView(),
+	autoModelView( NULL ),
 	m_caption( _caption )
 {
 	if( s_ledBg == NULL )

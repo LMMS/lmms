@@ -47,11 +47,10 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView(),
+	autoModelView( new comboBoxModel ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {
-	setModel( new comboBoxModel );
 	if( s_background == NULL )
 	{
 		s_background = new QPixmap( embed::getIconPixmap(
