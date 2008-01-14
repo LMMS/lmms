@@ -3,7 +3,7 @@
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

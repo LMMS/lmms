@@ -4,7 +4,7 @@
  * envelope_and_lfo_widget.cpp - widget which is m_used by envelope/lfo/filter-
  *                               tab of channel-window
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
