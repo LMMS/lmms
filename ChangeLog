@@ -1,3 +1,9 @@
+2008-01-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	updated German localization
+
 2008-01-09	Paul Giblock	<pgllama/at/gmail/dot/com>
 	
 	* acinclude.m4:
