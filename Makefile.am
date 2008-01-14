@@ -370,6 +370,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/effect.h				\
 		$(srcdir)/include/effect_chain.h			\
+		$(srcdir)/include/effect_controls.h			\
 		$(srcdir)/include/effect_control_dialog.h		\
 		$(srcdir)/include/effect_label.h			\
 		$(srcdir)/include/effect_rack_view.h			\

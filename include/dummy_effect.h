@@ -27,14 +27,30 @@
 #define _DUMMY_EFFECT_H
 
 #include "effect.h"
+#include "effect_controls.h"
 #include "effect_control_dialog.h"
 
 
 class dummyEffectControlDialog : public effectControlDialog
 {
 public:
-	dummyEffectControlDialog( effect * _eff ) :
-		effectControlDialog( NULL, _eff )
+	dummyEffectControlDialog( effectControls * _controls ) :
+		effectControlDialog( _controls )
+	{
+	}
+
+} ;
+
+
+class dummyEffectControls : public effectControls
+{
+public:
+	dummyEffectControls( effect * _eff ) :
+		effectControls( _eff )
+	{
+	}
+
+	virtual ~dummyEffectControls()
 	{
 	}
 
@@ -42,28 +58,6 @@ public:
 	{
 		return( 0 );
 	}
-
-	inline virtual QString nodeName( void ) const
-	{
-		return( "dummycontrols" );
-	}
-
-} ;
-
-
-
-class dummyEffect : public effect
-{
-public:
-	inline dummyEffect( model * _parent ) :
-		effect( NULL, _parent, NULL )
-	{
-	}
-
-	inline virtual ~dummyEffect()
-	{
-	}
-
 
 	inline virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
@@ -75,13 +69,37 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "dummyeffect" );
+		return( "dummycontrols" );
 	}
 
-	inline virtual effectControlDialog * createControlDialog( track * )
+	virtual effectControlDialog * createView( void )
 	{
 		return( new dummyEffectControlDialog( this ) );
 	}
+} ;
+
+
+
+class dummyEffect : public effect
+{
+public:
+	inline dummyEffect( model * _parent ) :
+		effect( NULL, _parent, NULL ),
+		m_controls( this )
+	{
+	}
+
+	inline virtual ~dummyEffect()
+	{
+	}
+
+	inline virtual effectControls * getControls( void )
+	{
+		return( &m_controls );
+	}
+
+private:
+	dummyEffectControls m_controls;
 
 } ;
 

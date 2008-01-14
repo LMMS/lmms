@@ -1,7 +1,7 @@
 /*
- * bass_booster.h - bass-booster-effect-plugin
+ * effect_controls.h - model for effect-controls
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,52 +22,47 @@
  *
  */
 
+#ifndef _EFFECT_CONTROLS_H
+#define _EFFECT_CONTROLS_H
 
-#ifndef _BASS_BOOSTER_H
-#define _BASS_BOOSTER_H
-
-
-#include <QtGui/QWorkspace>
-
+#include "mv_base.h"
+#include "journalling_object.h"
 #include "effect.h"
-#include "effect_lib.h"
-#include "engine.h"
-#include "main_window.h"
-#include "bassbooster_controls.h"
 
 
+class track;
+class effectControlDialog;
 
-class bassBoosterEffect : public effect
+
+class effectControls : public journallingObject, public model
 {
 public:
-	bassBoosterEffect( model * _parent,
-			const descriptor::subPluginFeatures::key * _key );
-	virtual ~bassBoosterEffect();
-	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-							const fpp_t _frames );
-
-	virtual effectControls * getControls( void )
+	effectControls( effect * _eff ) :
+		journallingObject(),
+		model( _eff ),
+		m_effect( _eff )
 	{
-		return( &m_bbControls );
 	}
 
-/*	inline virtual QString nodeName( void ) const
+	virtual ~effectControls()
 	{
-		return( "bassboostereffect" );
-	}*/
+	}
+
+	virtual ch_cnt_t getControlCount( void ) = 0;
+	virtual effectControlDialog * createView( void ) = 0;
+
+
+//	template<class T>
+	effect * getEffect( void )
+	{
+		return( m_effect );
+		//return( dynamic_cast<T *>( m_effect ) );
+	}
 
 
 private:
-	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost<> > m_bbFX;
-
-	bassBoosterControls m_bbControls;
-
-	friend class bassBoosterControls;
+	effect * m_effect;
 
 } ;
-
-
-
-
 
 #endif

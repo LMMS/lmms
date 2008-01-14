@@ -65,7 +65,7 @@ void effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "wet", m_wetDryModel.value() );
 	_this.setAttribute( "autoquit", m_autoQuitModel.value() );
 	_this.setAttribute( "gate", m_gateModel.value() );
-//	m_controlView->saveState( _doc, _this );
+	getControls()->saveState( _doc, _this );
 }
 
 
@@ -77,20 +77,19 @@ void effect::loadSettings( const QDomElement & _this )
 	m_wetDryModel.setValue( _this.attribute( "wet" ).toFloat() );
 	m_autoQuitModel.setValue( _this.attribute( "autoquit" ).toFloat() );
 	m_gateModel.setValue( _this.attribute( "gate" ).toFloat() );
-/*
+
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
 		{
-			if( m_controlView->nodeName() == node.nodeName() )
+			if( getControls()->nodeName() == node.nodeName() )
 			{
-				m_controlView->restoreState( 
-							node.toElement() );
+				getControls()->restoreState( node.toElement() );
 			}
 		}
 		node = node.nextSibling();
-	}*/
+	}
 }
 
 

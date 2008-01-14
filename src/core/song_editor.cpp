@@ -128,6 +128,8 @@ songEditor::songEditor( void ) :
 
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
+	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
+						this, SLOT( setTempo() ) );
 	connect( m_tempoSpinBox, SIGNAL( manualChange() ), this,
 						SLOT( setModified() ) );
 

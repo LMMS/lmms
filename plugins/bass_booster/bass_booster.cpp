@@ -54,7 +54,8 @@ plugin::descriptor bassbooster_plugin_descriptor =
 bassBoosterEffect::bassBoosterEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &bassbooster_plugin_descriptor, _parent, _key ),
-	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) )
+	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) ),
+	m_bbControls( this )
 {
 }
 

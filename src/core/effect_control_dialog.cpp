@@ -30,15 +30,16 @@
 #include <QtGui/QCloseEvent>
 
 #include "effect_control_dialog.h"
+#include "effect_controls.h"
 #include "effect.h"
 
 
-effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
-	QWidget( _parent ),
-	modelView( _eff ),
-	m_effect( _eff )
+effectControlDialog::effectControlDialog( effectControls * _controls ) :
+	QWidget( NULL ),
+	modelView( _controls ),
+	m_effectControls( _controls )
 {
-	setWindowTitle( m_effect->publicName() );
+	setWindowTitle( m_effectControls->getEffect()->publicName() );
 
 }
 

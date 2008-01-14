@@ -35,6 +35,7 @@
 
 #include "audio_port.h"
 #include "caption_menu.h"
+#include "effect_controls.h"
 #include "effect_control_dialog.h"
 #include "embed.h"
 #include "engine.h"
@@ -112,7 +113,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 					bg.toImage().copy( 5, 44, 195, 10 ) ) );
 	m_label->setPalette( pal );
 
-	m_controlView = getEffect()->createControlDialog( NULL );
+	m_controlView = getEffect()->getControls()->createView();
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
 								m_controlView );
 	connect( m_controlView, SIGNAL( closed() ),
@@ -120,7 +121,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 	m_subWindow->hide();
 
-	if( m_controlView->getControlCount() == 0 )
+	if( getEffect()->getControls()->getControlCount() == 0 )
 	{
 		m_editButton->hide();
 	}

@@ -1,5 +1,29 @@
 2008-01-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/bass_booster/bassbooster_controls.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/bass_booster/Makefile.am:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/bass_booster/bassbooster_control_dialog.h:
+	made work with M/V as well as rewritten effect-framework
+
+	* include/effect.h:
+	* include/effect_control_dialog.h:
+	* include/dummy_effect.h:
+	* include/effect_controls.h:
+	* src/widgets/effect_view.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect.cpp:
+	* Makefile.am:
+	split off effectControlDialog into effectControlDialog and
+	effectControls
+
+	* src/core/song_editor.cpp:
+	also connect to dataUnchanged()-signal of tempo-model in order to
+	setup everything correct by connected slot
+
 	* configure.in:
 	- removed single-source-compile-feature
 	- made FASTCALL-usage optional for the time being

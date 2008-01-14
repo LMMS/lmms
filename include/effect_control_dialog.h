@@ -29,21 +29,17 @@
 #include <QtGui/QWidget>
 
 #include "mv_base.h"
-#include "types.h"
 
 
-class effect;
-class track;
+class effectControls;
 
 
 class effectControlDialog : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
+	effectControlDialog( effectControls * _controls );
 	virtual ~effectControlDialog();
-
-	virtual ch_cnt_t getControlCount( void ) = 0;
 
 
 signals:
@@ -52,15 +48,10 @@ signals:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
-	{
-		return( dynamic_cast<T *>( m_effect ) );
-	}
 
 
 private:
-	effect * m_effect;
+	effectControls * m_effectControls;
 
 } ;
 

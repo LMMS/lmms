@@ -40,7 +40,7 @@
 
 
 class effectChain;
-class effectControlDialog;
+class effectControls;
 class track;
 
 
@@ -161,7 +161,7 @@ public:
 		return( m_key );
 	}
 
-	virtual effectControlDialog * createControlDialog( track * _track ) = 0;
+	virtual effectControls * getControls( void ) = 0;
 
 	static effect * instantiate( const QString & _plugin_name,
 				model * _parent,
