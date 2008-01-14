@@ -4,43 +4,47 @@ AC_DEFUN([gw_CHECK_QT],
 AC_REQUIRE([AC_PROG_CXX])
 AC_REQUIRE([AC_PATH_X])
 
-AC_MSG_CHECKING([QTDIR])
-AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [default=$QTDIR]], QTDIR=$withval)
-# Check that QTDIR is defined or that --with-qtdir given
-if test x"$QTDIR" = x ; then
-	# some usual Qt-locations
-	QT_SEARCH="/usr /usr/lib/qt4 /usr/share/qt4 /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.3.2 /usr/local/Trolltech/Qt-4.1.0"
-else
-	QT_SEARCH=$QTDIR
-	QTDIR=""
-fi
-for i in $QT_SEARCH ; do
-	QT_INCLUDE_SEARCH="include/qt4 include"
-	for j in $QT_INCLUDE_SEARCH ; do
-	        if test -f $i/$j/Qt/qglobal.h -a x$QTDIR = x ; then
-			QTDIR=$i
-			QT_INCLUDES=$i/$j
-		fi
+AC_PATH_PROG([PKGCONFIG], [pkg-config])
+
+# Only search manually if no pkgconfig
+if test -z "$PKGCONFIG" ; then
+	AC_MSG_CHECKING([QTDIR])
+	AC_ARG_WITH([qtdir], [  --with-qtdir=DIR        Qt installation directory [default=$QTDIR]], QTDIR=$withval)
+	# Check that QTDIR is defined or that --with-qtdir given
+	if test x"$QTDIR" = x ; then
+		# some usual Qt-locations
+		QT_SEARCH="/usr /usr/lib/qt4 /usr/share/qt4 /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.3.2 /usr/local/Trolltech/Qt-4.1.0"
+	else
+		QT_SEARCH=$QTDIR
+		QTDIR=""
+	fi
+	for i in $QT_SEARCH ; do
+		QT_INCLUDE_SEARCH="include/qt4 include"
+		for j in $QT_INCLUDE_SEARCH ; do
+			if test -f $i/$j/Qt/qglobal.h -a x$QTDIR = x ; then
+				QTDIR=$i
+				QT_INCLUDES=$i/$j
+			fi
+		done
 	done
-done
-if test x"$QTDIR" = x ; then
-	AC_MSG_ERROR([*** QTDIR must be defined, or --with-qtdir option given])
+	if test x"$QTDIR" = x ; then
+		AC_MSG_ERROR([*** QTDIR must be defined, or --with-qtdir option given])
+	fi
+	AC_MSG_RESULT([$QTDIR])
+
+	# Change backslashes in QTDIR to forward slashes to prevent escaping
+	# problems later on in the build process, mainly for Cygwin build
+	# environment using MSVC as the compiler
+	# TODO: Use sed instead of perl
+	QTDIR=`echo $QTDIR | perl -p -e 's/\\\\/\\//g'`
+
+	AC_MSG_CHECKING([Qt includes])
+	# Check where includes are located
+	if test x"$QT_INCLUDES" = x ; then
+		AC_MSG_ERROR([*** could not find Qt-includes! Make sure you have the Qt-devel-files installed!])
+	fi
+	AC_MSG_RESULT([$QT_INCLUDES])
 fi
-AC_MSG_RESULT([$QTDIR])
-
-# Change backslashes in QTDIR to forward slashes to prevent escaping
-# problems later on in the build process, mainly for Cygwin build
-# environment using MSVC as the compiler
-# TODO: Use sed instead of perl
-QTDIR=`echo $QTDIR | perl -p -e 's/\\\\/\\//g'`
-
-AC_MSG_CHECKING([Qt includes])
-# Check where includes are located
-if test x"$QT_INCLUDES" = x ; then
-	AC_MSG_ERROR([*** could not find Qt-includes! Make sure you have the Qt-devel-files installed!])
-fi
-AC_MSG_RESULT([$QT_INCLUDES])
-
 
 # Search for available Qt translations
 AH_TEMPLATE(QT_TRANSLATIONS_DIR, [Define to Qt translations directory])
@@ -57,6 +61,11 @@ fi
 AC_DEFINE_UNQUOTED(QT_TRANSLATIONS_DIR, "$QT_TRANSLATIONS")
 AC_MSG_RESULT([$QT_TRANSLATIONS])
 
+# First try to set QTHOSTDIR according to pkg-config
+#
+if test -n "$PKGCONFIG" ; then
+	QTHOSTDIR=$(pkg-config QtCore --variable=prefix)
+fi
 
 if test -z "$QTHOSTDIR" ; then
 	case "${prefix}" in
@@ -120,7 +129,13 @@ if test x$LRELEASE = x ; then
 fi
 
 # construct CXXFLAGS
-QT_CXXFLAGS="-I$QT_INCLUDES -I$QT_INCLUDES/Qt -D_REENTRANT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_XML_LIB -DQT_THREAD_SUPPORT"
+if test -n "$PKGCONFIG" ; then
+	QT_CXXFLAGS=$(pkg-config --cflags QtCore QtGui QtXml)
+fi
+
+if test -z "$QT_CXXFLAGS" ; then
+	QT_CXXFLAGS="-I$QT_INCLUDES -I$QT_INCLUDES/Qt -D_REENTRANT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_XML_LIB -DQT_THREAD_SUPPORT"
+fi
 
 AC_MSG_CHECKING([QT_CXXFLAGS])
 AC_MSG_RESULT([$QT_CXXFLAGS])
@@ -129,33 +144,39 @@ AC_MSG_RESULT([$QT_CXXFLAGS])
 # check libraries
 AC_MSG_CHECKING([Qt4 libraries])
 
-case "${host}" in
-      *mingw32)
-        QT_LIBS=`ls $QTDIR/lib/libQt*.a 2> /dev/null` 
-        if test "x$QT_LIBS" = x;  then
-            AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
-        fi
-	QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4 -lws2_32"
-	# Check that windres is in path
-	AC_PATH_PROGS([WINDRES],[i586-mingw32-windres windres],,[${prefix}/bin:$PATH])
-	if test x$WINDRES = x ; then
-		AC_MSG_ERROR([*** not found! Make sure you have mingw32 binutils installed!])
-	fi
-        ;;
-    *)
-       	QT_LIBS=`ls $QTDIR/lib64/libQt*.so 2> /dev/null` 
-        if test "x$QT_LIBS" = x;  then
-        	QT_LIBS=`ls $QTDIR/lib/libQt*.so 2> /dev/null` 
-            	if test "x$QT_LIBS" = x;  then
-			AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
-            	fi
-		QT_LIB="-L$QTDIR/lib -L$QTDIR/lib/qt4"
-	else
-		QT_LIB="-L$QTDIR/lib64 -L$QTDIR/lib64/qt4"
-        fi
- 	QT_LIB="$QT_LIB -lQtCore -lQtXml -lQtNetwork -lQtGui"
-        ;;
-esac
+if test -n "$PKGCONFIG" ; then
+	QT_LIB=$(pkg-config --libs QtCore QtGui QtXml)
+fi
+
+if test -z "$QT_LIB" ; then
+	case "${host}" in
+	      *mingw32)
+		QT_LIBS=`ls $QTDIR/lib/libQt*.a 2> /dev/null` 
+		if test "x$QT_LIBS" = x;  then
+		    AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
+		fi
+		QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4 -lws2_32"
+		# Check that windres is in path
+		AC_PATH_PROGS([WINDRES],[i586-mingw32-windres windres],,[${prefix}/bin:$PATH])
+		if test x$WINDRES = x ; then
+			AC_MSG_ERROR([*** not found! Make sure you have mingw32 binutils installed!])
+		fi
+		;;
+	    *)
+		QT_LIBS=`ls $QTDIR/lib64/libQt*.so 2> /dev/null` 
+		if test "x$QT_LIBS" = x;  then
+			QT_LIBS=`ls $QTDIR/lib/libQt*.so 2> /dev/null` 
+			if test "x$QT_LIBS" = x;  then
+				AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
+			fi
+			QT_LIB="-L$QTDIR/lib -L$QTDIR/lib/qt4"
+		else
+			QT_LIB="-L$QTDIR/lib64 -L$QTDIR/lib64/qt4"
+		fi
+		QT_LIB="$QT_LIB -lQtCore -lQtXml -lQtNetwork -lQtGui"
+		;;
+	esac
+fi
 AC_MSG_RESULT([found: $QT_LIB])
 
 QT_LDADD="$QT_LIB"
