@@ -1,6 +1,5 @@
 /*
- * ladspa_control_dialog.h - dialog for displaying and editing control port
- *                           values for LADSPA plugins
+ * ladspa_control_view.h - widget for controlling a LADSPA port
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
@@ -23,22 +22,25 @@
  *
  */
 
-#ifndef _LADSPA_CONTROL_DIALOG_H
-#define _LADSPA_CONTROL_DIALOG_H
+#ifndef _LADSPA_CONTROL_VIEW_H
+#define _LADSPA_CONTROL_VIEW_H
 
-#include "effect_control_dialog.h"
+#include <QtGui/QWidget>
+
+#include "mv_base.h"
 
 
-class ladspaControls;
+class ladspaControl;
 
 
-class ladspaControlDialog : public effectControlDialog
+class ladspaControlView : public QWidget, public modelView
 {
 public:
-	ladspaControlDialog( ladspaControls * _ctl );
-	~ladspaControlDialog();
-
-
+	ladspaControlView( QWidget * _parent, ladspaControl * _ctl );
+	virtual ~ladspaControlView();
+	
+private:
+	ladspaControl * m_ctl;
 
 } ;
 

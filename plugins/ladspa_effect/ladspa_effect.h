@@ -30,8 +30,7 @@
 #include "effect.h"
 #include "engine.h"
 #include "ladspa_base.h"
-#include "ladspa_control.h"
-#include "ladspa_control_dialog.h"
+#include "ladspa_controls.h"
 #include "main_window.h"
 #include "mixer.h"
 
@@ -50,9 +49,14 @@ public:
 	
 	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );
 
-	inline const multi_proc_t & getControls( void )
+	virtual effectControls * getControls( void )
 	{
 		return( m_controls );
+	}
+
+	inline const multi_proc_t & getPortControls( void )
+	{
+		return( m_portControls );
 	}
 
 	virtual inline QString publicName( void ) const
@@ -65,14 +69,6 @@ public:
 		m_effName = _name;
 	}
 
-	virtual inline effectControlDialog * createControlDialog(
-								track * _track )
-	{
-		return( new ladspaControlDialog(
-					NULL /*engine::getMainWindow()->workspace()*/,
-							this, _track ) );
-	}
-
 	inline virtual QString nodeName( void ) const
 	{
 		return( "ladspaeffect" );
@@ -80,6 +76,8 @@ public:
 
 
 private:
+	ladspaControls * m_controls;
+
 	QString m_effName;
 	ladspa_key_t m_key;
 	Uint16 m_effectChannels;
@@ -90,7 +88,7 @@ private:
 	QVector<LADSPA_Handle> m_handles;
 
 	QVector<multi_proc_t> m_ports;
-	multi_proc_t m_controls;
+	multi_proc_t m_portControls;
 } ;
 
 #endif

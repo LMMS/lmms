@@ -169,6 +169,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\
 		$(srcdir)/src/core/ladspa_control.cpp			\
+		$(srcdir)/src/core/ladspa_control_view.cpp		\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
@@ -384,6 +385,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/ladspa_2_lmms.h			\
 		$(srcdir)/include/ladspa_control.h			\
+		$(srcdir)/include/ladspa_control_view.h			\
 		$(srcdir)/include/ladspa_base.h				\
 		$(THIRD_PARTY_CODE)
 

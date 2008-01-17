@@ -1,7 +1,7 @@
 /*
- * ladspa_control.cpp - widget for controlling a LADSPA port
+ * ladspa_control.cpp - model for controlling a LADSPA port
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,144 +23,76 @@
  */
 
 
-#include <QtGui/QWhatsThis>
-
 #include "ladspa_control.h"
 #include "automatable_model_templates.h"
 #include "ladspa_base.h"
-#include "led_checkbox.h"
-#include "tempo_sync_knob.h"
-#include "tooltip.h"
 
 
-ladspaControl::ladspaControl( QWidget * _parent, 
-				port_desc_t * _port, 
-				track * _track,
-			    	bool _link) :
-	QWidget( _parent ),
+ladspaControl::ladspaControl( model * _parent, port_desc_t * _port, 
+					track * _track, bool _link ) :
+	model( _parent ),
 	m_port( _port ),
-	m_track( _track ),
-	m_link( NULL ),
-	m_toggle( NULL ),
-	m_knob( NULL ),
-        m_linkEnabledModel( FALSE, FALSE, TRUE ),
-        m_toggledModel( FALSE, FALSE, TRUE ),
-        m_knobModel()
+        m_linkEnabledModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(),
+								this ),
+        m_toggledModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(),
+								this ),
+        m_knobModel( 0, 0, 0, 1, this )
 {
-	m_layout = new QHBoxLayout( this );
-	
 	if( _link )
 	{
-		m_link = new ledCheckBox( "", this );
-		toolTip::add( m_link, tr( "Link channels" ) );
-
 		m_linkEnabledModel.setValue( FALSE );
 		m_linkEnabledModel.setTrack( _track );
-		m_link->setModel( &m_linkEnabledModel );
 		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( linkStateChanged() ) );
 
-		m_layout->addWidget( m_link );
 	}
 	
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggledModel.setTrack( m_track );
-			m_toggle = new ledCheckBox( m_port->name, this,
-							QString::null,
-							ledCheckBox::GREEN );
-			m_toggle->setModel( &m_toggledModel );
+			m_toggledModel.setTrack( _track );
 			connect( &m_toggledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( ledChanged() ) );
-			setFixedSize( m_toggle->width(), m_toggle->height() );
 			if( m_port->def == 1.0f )
 			{
 				m_toggledModel.setValue( TRUE );
 			}
-			if( _link )
-			{
-				m_layout->addWidget( m_toggle );
-				setFixedSize( m_link->width() + 
-						m_toggle->width(),
-						m_toggle->height() );
-			}
 			break;
+
 		case INTEGER:
-			m_knobModel.setTrack( m_track );
+			m_knobModel.setTrack( _track );
 			m_knobModel.setRange( static_cast<int>( m_port->max ), 
 					  static_cast<int>( m_port->min ), 
 					  1 + static_cast<int>( m_port->max - 
 							  m_port->min ) / 400 );
 			m_knobModel.setInitValue( 
 					static_cast<int>( m_port->def ) );
-			m_knob = new knob( knobBright_26, this, m_port->name );
-			m_knob->setModel( &m_knobModel );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
-
-			m_knob->setLabel( m_port->name );
-			setFixedSize( m_knob->width(), m_knob->height() );
-			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-			m_knob->setWhatsThis(
-					tr( "Sorry, no help available." ) );
-			if( _link )
-			{
-				m_layout->addWidget( m_knob );
-				setFixedSize( m_link->width() + 
-						m_knob->width(),
-						m_knob->height() );
-			}
 			break;
+
 		case FLOAT:
-			m_knobModel.setTrack( m_track );
+			m_knobModel.setTrack( _track );
 			m_knobModel.setRange( m_port->min, m_port->max,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
 					&& m_port->max == 10.0f ? 4000.0f :
 								400.0f ) );
 			m_knobModel.setInitValue( m_port->def );
-			m_knob = new knob( knobBright_26, this, m_port->name );
-			m_knob->setModel( &m_knobModel );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
-			m_knob->setLabel( m_port->name );
-			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-			m_knob->setWhatsThis(
-					tr( "Sorry, no help available." ) );
-			setFixedSize( m_knob->width(), m_knob->height() );
-			if( _link )
-			{
-				m_layout->addWidget( m_knob );
-				setFixedSize( m_link->width() + 
-						m_knob->width(),
-						m_knob->height() );
-			}
 			break;
+
 		case TIME:
-			m_knobModel.setTrack( m_track );
+			m_knobModel.setTrack( _track );
 			m_knobModel.setRange( m_port->min, m_port->max, 
 					  ( m_port->max - 
 						m_port->min ) / 400.0f );
 			m_knobModel.setInitValue( m_port->def );
-			m_knob = new tempoSyncKnob( knobBright_26, this,
-								m_port->name );
-			m_knob->setModel( &m_knobModel );
 			connect( &m_knobModel, SIGNAL( dataChanged() ),
 						 this, SLOT( knobChanged() ) );
-			m_knob->setLabel( m_port->name );
-			m_knob->setHintText( tr( "Value:" ) + " ", "" );
-			m_knob->setWhatsThis(
-					tr( "Sorry, no help available." ) );
-			setFixedSize( m_knob->width(), m_knob->height() );
-			if( _link )
-			{
-				m_layout->addWidget( m_knob );
-				setFixedSize( m_link->width() + 
-						m_knob->width(),
-						m_knob->height() );
-			}
 			break;
+
 		default:
 			break;
 	}
@@ -230,7 +162,7 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 					   QDomElement & _this, 
 					   const QString & _name )
 {
-	if( m_link != NULL )
+	if( m_link )
 	{
 		m_linkEnabledModel.saveSettings( _doc, _this, _name + "link" );
 	}
@@ -255,7 +187,7 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, 
 					   const QString & _name )
 {
-	if( m_link != NULL )
+	if( m_link )
 	{
 		m_linkEnabledModel.loadSettings( _this, _name + "link" );
 	}

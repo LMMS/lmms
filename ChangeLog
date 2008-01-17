@@ -1,3 +1,21 @@
+2008-01-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_controls.h:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	made work again after all the changes in the last days...
+
+	* Makefile.am:
+	* include/ladspa_control.h:
+	* include/ladspa_control_view.h:
+	* src/core/ladspa_control.cpp:
+	* src/core/ladspa_control_view.cpp:
+	splitted ladspaControl-class into ladspaControl and ladspaControlView
+
 2008-01-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bass_booster/bassbooster_controls.h:

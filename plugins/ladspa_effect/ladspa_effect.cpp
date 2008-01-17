@@ -62,10 +62,9 @@ plugin::descriptor ladspaeffect_plugin_descriptor =
 ladspaEffect::ladspaEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
+	m_controls( NULL ),
 	m_effName( "none" ),
-	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key )
-		/* ladspa_key_t( _cdata->settings.attribute( "label" ),
-				_cdata->settings.attribute( "lib" ) )*/ )
+	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
@@ -230,8 +229,8 @@ ladspaEffect::ladspaEffect( model * _parent,
 			if( p->rate == AUDIO_RATE_INPUT || 
 					p->rate == CONTROL_RATE_INPUT )
 			{
-				p->control_id = m_controls.count();
-				m_controls.append( p );
+				p->control_id = m_portControls.count();
+				m_portControls.append( p );
 			}
 		}
 		m_ports.append( ports );
@@ -293,6 +292,8 @@ ladspaEffect::ladspaEffect( model * _parent,
 	{
 		manager->activate( m_key, m_handles[proc] );
 	}
+
+	m_controls = new ladspaControls( this, NULL /* TODO!! */ );
 }
 
 
@@ -461,7 +462,7 @@ void FASTCALL ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
 	{
 		return;
 	}
-	m_controls[_control]->value = _value;
+	m_portControls[_control]->value = _value;
 }
 
 

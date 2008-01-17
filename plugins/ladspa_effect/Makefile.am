@@ -15,7 +15,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspaeffect"
 	$(MOC) -o $@ $<
 
 
-MOC_FILES =	./ladspa_control_dialog.moc
+MOC_FILES = ./ladspa_controls.moc
 
 
 BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
@@ -34,9 +34,11 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 pkglib_LTLIBRARIES = libladspaeffect.la
 
 libladspaeffect_la_SOURCES =	ladspa_effect.cpp 		\
+				ladspa_controls.cpp 		\
 				ladspa_control_dialog.cpp 	\
 				ladspa_subplugin_features.cpp	\
 				ladspa_effect.h			\
+				ladspa_controls.h		\
 				ladspa_control_dialog.h		\
 				ladspa_subplugin_features.h
 
