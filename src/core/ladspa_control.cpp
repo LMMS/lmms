@@ -31,16 +31,16 @@
 ladspaControl::ladspaControl( model * _parent, port_desc_t * _port, 
 					track * _track, bool _link ) :
 	model( _parent ),
+	m_link( _link ),
 	m_port( _port ),
-        m_linkEnabledModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(),
+        m_linkEnabledModel( _link, FALSE, TRUE, boolModel::defaultRelStep(),
 								this ),
         m_toggledModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(),
 								this ),
         m_knobModel( 0, 0, 0, 1, this )
 {
-	if( _link )
+	if( m_link )
 	{
-		m_linkEnabledModel.setValue( FALSE );
 		m_linkEnabledModel.setTrack( _track );
 		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( linkStateChanged() ) );

@@ -84,8 +84,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
 		QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
 
-	//setRange( 0.0f, 100.0f, 1.0f );
-
 	setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	setTotalAngle( 270.0f );
 }
@@ -451,7 +449,7 @@ void knob::paintEvent( QPaintEvent * _me )
 
 	p.translate( -ur.x(), -ur.y() );
 	drawKnob( &p );
-	if( m_label != "" )
+	if( !m_label.isEmpty() )
 	{
 		p.setFont( pointSize<6>( p.font() ) );
 		p.setPen( QColor( 64, 64, 64 ) );

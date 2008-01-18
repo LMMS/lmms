@@ -202,10 +202,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			tx += pm.width() + 2;
 		}
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, p.fontMetrics().height()-1,
+		p.drawText( tx+1, p.fontMetrics().height()-3,
 						model()->currentText() );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, p.fontMetrics().height()-2,
+		p.drawText( tx, p.fontMetrics().height()-4,
 						model()->currentText() );
 	}
 }

@@ -40,6 +40,8 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 	m_ctl( _ctl )
 {
 	QHBoxLayout * layout = new QHBoxLayout( this );
+	layout->setMargin( 0 );
+	layout->setSpacing( 0 );
 
 	ledCheckBox * link = NULL;
 
@@ -62,11 +64,15 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 							QString::null,
 							ledCheckBox::GREEN );
 			toggle->setModel( m_ctl->getToggledModel() );
-			setFixedSize( toggle->width(), toggle->height() );
-			if( m_ctl->m_link )
+			layout->addWidget( toggle );
+			if( link != NULL )
 			{
-				layout->addWidget( toggle );
 				setFixedSize( link->width() + toggle->width(),
+							toggle->height() );
+			}
+			else
+			{
+				setFixedSize( toggle->width(),
 							toggle->height() );
 			}
 			break;
@@ -93,12 +99,15 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 		knb->setLabel( m_ctl->getPort()->name );
 		knb->setHintText( tr( "Value:" ) + " ", "" );
 		knb->setWhatsThis( tr( "Sorry, no help available." ) );
-		setFixedSize( knb->width(), knb->height() );
-		if( m_ctl->m_link )
+		layout->addWidget( knb );
+		if( link != NULL )
 		{
-			layout->addWidget( knb );
 			setFixedSize( link->width() + knb->width(),
 						knb->height() );
+		}
+		else
+		{
+			setFixedSize( knb->width(), knb->height() );
 		}
 	}
 }

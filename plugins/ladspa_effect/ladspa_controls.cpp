@@ -43,10 +43,10 @@ ladspaControls::ladspaControls( ladspaEffect * _eff,
 	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )
 	{
 		control_list_t p;
-		
-		bool linked_control = ( m_processors > 1 && proc == 0 );
+
+		const bool linked_control = ( m_processors > 1 && proc == 0 );
 		buffer_data_t last_port = NONE;
-		
+
 		for( multi_proc_t::iterator it = controls.begin(); 
 						it != controls.end(); it++ )
 		{
@@ -69,7 +69,7 @@ ladspaControls::ladspaControls( ladspaEffect * _eff,
 				}
 			}
 		}
-		
+
 		m_controls.append( p );
 	}
 }

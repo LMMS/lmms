@@ -169,7 +169,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\
 		$(srcdir)/src/core/ladspa_control.cpp			\
-		$(srcdir)/src/core/ladspa_control_view.cpp		\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
@@ -226,6 +225,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
+		$(srcdir)/src/widgets/ladspa_control_view.cpp		\
 		$(srcdir)/src/widgets/lcd_spinbox.cpp			\
 		$(srcdir)/src/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/widgets/nstate_button.cpp			\

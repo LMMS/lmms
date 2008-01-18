@@ -1,3 +1,23 @@
+2008-01-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/combobox.cpp:
+	fixed painting
+
+	* src/widgets/ladspa_control_view.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	made control-layouting work again (did not work at all after Qt4-port)
+
+	* src/core/ladspa_control.cpp:
+	added initialization for m_link-member-variable, optimized
+	linkEnabledModel-initialization
+
+	* src/widgets/knob.cpp:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	coding style fixes
+
+	* Makefile.am:
+	moved ladspa_control_view.cpp to src/widgets/
+
 2008-01-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/Makefile.am:

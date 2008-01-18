@@ -41,13 +41,14 @@ ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
 	QHBoxLayout * effectLay = new QHBoxLayout();
 	mainLay->addLayout( effectLay );
 
-	int rows = static_cast<int>( sqrt( 
-		static_cast<double>( _ctl->m_controlCount ) ) );
-	
+	const int cols = static_cast<int>( sqrt( 
+		static_cast<double>( _ctl->m_controlCount /
+						_ctl->m_processors ) ) );
 	for( ch_cnt_t proc = 0; proc < _ctl->m_processors; proc++ )
 	{
 		control_list_t & controls = _ctl->m_controls[proc];
-		int row_cnt = 0;
+		int row = 0;
+		int col = 0;
 		buffer_data_t last_port = NONE;
 
 		QGroupBox * grouper;
@@ -61,6 +62,9 @@ ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
 		{
 			grouper = new QGroupBox( this );
 		}
+
+		QGridLayout * gl = new QGridLayout( grouper );
+		grouper->setLayout( gl );
 		grouper->setAlignment( Qt::Vertical );
 
 		for( control_list_t::iterator it = controls.begin(); 
@@ -68,28 +72,23 @@ ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
 		{
 			if( (*it)->getPort()->proc == proc )
 			{
-				if( last_port == NONE || 
-					(*it)->getPort()->data_type != TOGGLED || 
-					( (*it)->getPort()->data_type == TOGGLED && 
-					last_port == TOGGLED ) )
+				if( last_port != NONE &&
+					(*it)->getPort()->data_type ==
+								TOGGLED &&
+					!( (*it)->getPort()->data_type ==
+								TOGGLED && 
+							last_port == TOGGLED ) )
 				{
-					new ladspaControlView( grouper, *it );
+					++row;
+					col = 0;
 				}
-				else
+				gl->addWidget( new ladspaControlView(
+							grouper, *it ),
+							row, col );
+				if( ++col == cols )
 				{
-					while( row_cnt < rows )
-					{
-						new QWidget( grouper );
-						row_cnt++;
-					}
-					new ladspaControlView( grouper, *it );
-					row_cnt = 0;
-				}
-
-				row_cnt++;
-				if( row_cnt == ( rows - 1 ) )
-				{
-					row_cnt = 0;
+					++row;
+					col = 0;
 				}
 				last_port = (*it)->getPort()->data_type;
 			}
