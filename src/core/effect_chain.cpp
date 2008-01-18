@@ -53,7 +53,7 @@ effectChain::~effectChain()
 
 void effectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "fxenabled", m_enabledModel.value() );
+	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 	for( effectList::iterator it = m_effects.begin(); 
 					it != m_effects.end(); it++ )
@@ -69,19 +69,15 @@ void effectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effectChain::loadSettings( const QDomElement & _this )
 {
-//	deleteAllPlugins();
-	for( int i = 0; i < m_effects.count(); ++i )
-	{
-		delete m_effects[i];
-	}
-	m_effects.clear();
+	deleteAllPlugins();
 
-	m_enabledModel.setValue( _this.attribute( "fxenabled" ).toInt() );
+	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
 
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
 
 	QDomNode node = _this.firstChild();
-	for( int i = 0; i < plugin_cnt; i++ )
+	int fx_loaded = 0;
+	while( !node.isNull() && fx_loaded < plugin_cnt )
 	{
 		if( node.isElement() && node.nodeName() == "effect" )
 		{
@@ -102,6 +98,7 @@ void effectChain::loadSettings( const QDomElement & _this )
 					e->restoreState( node.toElement() );
 				}
 			}
+			++fx_loaded;
 		}
 		node = node.nextSibling();
 	}

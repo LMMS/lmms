@@ -54,7 +54,7 @@ public slots:
 
 
 private slots:
-	void updateView( void );
+	virtual void update( void );
 	void addEffect( void );
 
 

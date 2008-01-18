@@ -69,11 +69,6 @@ public:
 		m_effName = _name;
 	}
 
-	inline virtual QString nodeName( void ) const
-	{
-		return( "ladspaeffect" );
-	}
-
 
 private:
 	ladspaControls * m_controls;

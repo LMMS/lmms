@@ -1,5 +1,21 @@
 2008-01-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/effect_chain.cpp:
+	* src/lib/mmp.cpp:
+	added upgrade-path in order to properly load projects not using the
+	new effect-data-structure
+
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/vst_effect/vst_effect.h:
+	removed nodeName()-function as effects must not overload it (they have
+	descriptors with they unique name in it)
+
+	* include/effect_rack_view.h:
+	* src/widgets/effect_rack_view.cpp:
+	renamed updateView() to update() in order to also track
+	dataChanged()-signals of model without an additional connection
+
 	* src/widgets/combobox.cpp:
 	fixed painting
 

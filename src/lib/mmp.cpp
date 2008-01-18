@@ -580,8 +580,28 @@ void multimediaProject::upgrade( void )
 			if( el.hasAttribute( "fxdisabled" ) &&
 				el.attribute( "fxdisabled" ).toInt() == 0 )
 			{
-				el.setAttribute( "fxenabled", 1 );
+				el.setAttribute( "enabled", 1 );
 			}
+		}
+	}
+
+	if( version < "0.4.0-svn20080118" )
+	{
+		QDomNodeList list = elementsByTagName( "fx" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement fxchain = list.item( i ).toElement();
+			fxchain.setTagName( "fxchain" );
+			QDomNode rack = list.item( i ).firstChild();
+			QDomNodeList effects = rack.childNodes();
+			// move items one level up
+			while( effects.count() )
+			{
+				fxchain.appendChild( effects.at( 0 ) );
+			}
+			fxchain.setAttribute( "numofeffects",
+				rack.toElement().attribute( "numofeffects" ) );
+			fxchain.removeChild( rack );
 		}
 	}
 

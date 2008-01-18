@@ -56,7 +56,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->move( 6, 22 );
-		
+
 	m_addButton = new QPushButton( m_effectsGroupBox/*, "Add Effect"*/ );
 	m_addButton->setText( tr( "Add" ) );
 	m_addButton->move( 75, 210 );
@@ -119,7 +119,7 @@ void effectRackView::moveUp( effectView * _view )
 		m_effectViews[i - 1] = _view;
 		m_effectViews[i] = temp;
 		
-		updateView();
+		update();
 	}
 }
 
@@ -171,13 +171,13 @@ void effectRackView::deletePlugin( effectView * _view )
 						fxChain()->m_effects.end(),
 									e ) );
 	delete e;
-	updateView();
+	update();
 }
 
 
 
 
-void effectRackView::updateView( void )
+void effectRackView::update( void )
 {
 	QWidget * w = m_scrollArea->widget();
 	QVector<bool> view_map( fxChain()->m_effects.size(), FALSE );
@@ -230,6 +230,8 @@ void effectRackView::updateView( void )
 		}
 	}
 	w->setFixedSize( 210, m_lastY );
+
+	QWidget::update();
 }
 
 
@@ -246,7 +248,7 @@ void effectRackView::addEffect( void )
 	}
 
 	fxChain()->appendEffect( esd.instantiateSelectedPlugin( fxChain() ) );
-	updateView();
+	update();
 }
 
 
@@ -255,7 +257,7 @@ void effectRackView::addEffect( void )
 void effectRackView::modelChanged( void )
 {
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
-	updateView();
+	update();
 }
 
 
