@@ -288,10 +288,20 @@ public:
 
 // some model-primitives
 
-generateModelPrimitive(bool,signed char);
+//generateModelPrimitive(bool,signed char);
 generateModelPrimitive(float,float);
 generateModelPrimitive(int,int);
 
+class boolModel : public automatableModel<bool, signed char> {
+public:
+	boolModel(  const bool _val = FALSE,
+				::model * _parent = NULL,
+				bool _default_constructed = FALSE ) : 
+	automatableModel<bool, signed char>( _val, FALSE, TRUE, defaultRelStep(), _parent, _default_constructed )
+	{}
+};
+
+typedef automatableModelView<bool, signed char> boolModelView;
 
 #endif
 

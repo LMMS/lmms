@@ -77,8 +77,8 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
 	m_ampModel( 100, 0, 500, 1, this ),
 	m_startPointModel( 0, 0, 1, 0.0000001f, this ),
 	m_endPointModel( 1, 0, 1, 0.0000001f, this ),
-	m_reverseModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(), this ),
-	m_loopModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(), this )
+	m_reverseModel( FALSE, this ),
+	m_loopModel( FALSE, this )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
 				this, SLOT( reverseModelChanged() ) );

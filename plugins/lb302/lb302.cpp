@@ -39,6 +39,7 @@
 #include "note_play_handle.h"
 #include "templates.h"
 #include "audio_port.h"
+#include "automatable_model_templates.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -306,132 +307,65 @@ void lb302Filter3Pole::setState(const lb302FilterState* fs)
 // LBSynth
 //
 
-lb302Synth::lb302Synth( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &lb302_plugin_descriptor )
+lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
+	instrument( _instrumentTrack, &lb302_plugin_descriptor ),
+	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this ),
+	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this ),
+	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this ),
+	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this ),
+	vco_fine_detune_knob( 0.0f, -100.0f, 100.0f, 1.0f, this ),
+	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this ),
+	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this ),
+	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this ),
+	slideToggle( FALSE, this ),
+	accentToggle( FALSE, this ),
+	deadToggle( FALSE, this ),
+	db24Toggle( FALSE, this )	
+
 {
-    // GUI
+printf("Set track: %Lx\n", (unsigned long long)_instrumentTrack);
 
-	vcf_cut_knob = new knob( knobBright_26, this, tr( "VCF Cutoff Frequency" ), 
-            _channel_track );
-	vcf_cut_knob->setRange( 0.0f, 1.5f, 0.005f );   // Originally  [0,1.0]
- 	vcf_cut_knob->setInitValue( 0.75f );
-	vcf_cut_knob->move( 75, 130 );
-	vcf_cut_knob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
-    vcf_cut_knob->setLabel( tr("CUT") );
-
-	vcf_res_knob = new knob( knobBright_26, this, tr( "VCF Resonance" ),
-							_channel_track );
-	vcf_res_knob->setRange( 0.0f, 1.25f, 0.005f );   // Originally [0,1.0]
-	vcf_res_knob->setInitValue( 0.75f );
-	vcf_res_knob->move( 120, 130 );
-	vcf_res_knob->setHintText( tr( "Resonance:" ) + " ", "" );
-    vcf_res_knob->setLabel( tr("RES") );
-
-	vcf_mod_knob = new knob( knobBright_26, this, tr( "VCF Envelope Mod" ), 
-            _channel_track );
-	vcf_mod_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally  [0,1.0]
- 	vcf_mod_knob->setInitValue( 1.0f );
-	vcf_mod_knob->move( 165, 130 );
-	vcf_mod_knob->setHintText( tr( "Env Mod:" ) + " ", "" );
-    vcf_mod_knob->setLabel( tr("ENV MOD") );
-
-	vcf_dec_knob = new knob( knobBright_26, this, tr( "VCF Envelope Decay" ),
-							_channel_track );
-	vcf_dec_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally [0,1.0]
-	vcf_dec_knob->setInitValue( 0.1f );
-	vcf_dec_knob->move( 210, 130 );
-	vcf_dec_knob->setHintText( tr( "Decay:" ) + " ", "" );
-    vcf_dec_knob->setLabel( tr("DEC") );
-
-     slideToggle = new ledCheckBox( "Slide", this,
-							tr( "Slide" ),
-							_channel_track );
-	slideToggle->move( 10, 180 );
-
-
-    accentToggle = new ledCheckBox( "Accent", this,
-							tr( "Accent" ),
-							_channel_track );
-	accentToggle->move( 10, 200 );
-    accentToggle->setDisabled(true);
-
-
-    deadToggle = new ledCheckBox( "Dead", this,
-							tr( "Dead" ),
-							_channel_track );
-	deadToggle->move( 10, 220 );
-
-    db24Toggle = new ledCheckBox( "24dB/oct", this,
-                            tr( "303-es-que, 24dB/octave, 3 pole filter" ),
-                            _channel_track );
-    db24Toggle->move( 10, 150);
-
-
-	slide_dec_knob = new knob( knobBright_26, this, tr( "Slide Decay" ),
-							_channel_track );
-	slide_dec_knob->setRange( 0.0f, 1.0f, 0.005f );   // Originally [0,1.0]
-	slide_dec_knob->setInitValue( 0.6f );
-	slide_dec_knob->move( 210, 75 );
-	slide_dec_knob->setHintText( tr( "Slide Decay:" ) + " ", "" );
-    slide_dec_knob->setLabel( tr( "SLIDE"));
-
-    vco_fine_detune_knob = new knob( knobBright_26, this, 
-            tr("Fine detuning of the VCO. Ranged between -100 and 100 centes."),
-            _channel_track );
-    vco_fine_detune_knob->setRange(-100.0f, 100.0f, 1.0f);
-    vco_fine_detune_knob->setInitValue(0.0f);
-    vco_fine_detune_knob->move(165,75);
-    vco_fine_detune_knob->setHintText( tr( "VCO Fine Detuning:") + " ", "cents");
-    vco_fine_detune_knob->setLabel( tr( "DETUNE"));
-
-
-    dist_knob = new knob( knobBright_26, this, tr( "Distortion" ),
-							_channel_track );
-	dist_knob->setRange( 0.0f, 1.0f, 0.01f );   // Originally [0,1.0]
-	dist_knob->setInitValue( 0.0f );
-	dist_knob->move( 210, 190 );
-	dist_knob->setHintText( tr( "DIST:" ) + " ", "" );
-    dist_knob->setLabel( tr( "DIST"));
-
-
-    wave_knob = new knob( knobBright_26, this, tr( "Waveform" ),
-							_channel_track );
-	wave_knob->setRange( 0.0f, 5.0f, 1.0f );   // Originally [0,1.0]
-	wave_knob->setInitValue( 0.0f );
-	wave_knob->move( 120, 75 );
-	wave_knob->setHintText( tr( "WAVE:" ) + " ", "" );
-    wave_knob->setLabel( tr( "WAVE"));
-
-
-    connect( vcf_cut_knob, SIGNAL( valueChanged( float ) ),
+/*
+    connect( &vcf_cut_knob, SIGNAL( valueChanged( float ) ),
 		this, SLOT ( filterChanged( float ) ) );
 
-    connect( vcf_res_knob, SIGNAL( valueChanged( float ) ),
+    connect( &vcf_res_knob, SIGNAL( valueChanged( float ) ),
 		this, SLOT ( filterChanged( float ) ) );
 
-    connect( vcf_mod_knob, SIGNAL( valueChanged( float ) ),
+    connect( &vcf_mod_knob, SIGNAL( valueChanged( float ) ),
 		this, SLOT ( filterChanged( float ) ) );
 
-    connect( vcf_dec_knob, SIGNAL( valueChanged( float ) ),
+    connect( &vcf_dec_knob, SIGNAL( valueChanged( float ) ),
 		this, SLOT ( filterChanged( float ) ) );
 
-    connect( vco_fine_detune_knob, SIGNAL( valueChanged( float ) ),
+    connect( &vco_fine_detune_knob, SIGNAL( valueChanged( float ) ),
         this, SLOT ( detuneChanged( float) ) );
 
-    connect( db24Toggle, SIGNAL( toggled( bool ) ),
+    connect( &db24Toggle, SIGNAL( toggled( bool ) ),
         this, SLOT ( db24Toggled( bool) ) );
 
-    connect( dist_knob, SIGNAL( valueChanged(float) ),
+    connect( &dist_knob, SIGNAL( valueChanged(float) ),
             this, SLOT ( filterChanged( float )));
 
-    connect( wave_knob, SIGNAL( valueChanged(float) ),
+    connect( &wave_knob, SIGNAL( valueChanged(float) ),
             this, SLOT ( waveChanged( float )));
+*/
 
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	setPalette( pal );
+    vcf_cut_knob.setTrack( _instrumentTrack );
+    vcf_res_knob.setTrack( _instrumentTrack );
+    vcf_mod_knob.setTrack( _instrumentTrack );
+    vcf_dec_knob.setTrack( _instrumentTrack );
+
+    vco_fine_detune_knob.setTrack( _instrumentTrack );
+
+    dist_knob.setTrack( _instrumentTrack );
+    wave_knob.setTrack( _instrumentTrack );
+    slide_dec_knob.setTrack( _instrumentTrack );
+   
+    slideToggle.setTrack( _instrumentTrack );
+    accentToggle.setTrack( _instrumentTrack );
+    deadToggle.setTrack( _instrumentTrack );
+    db24Toggle.setTrack( _instrumentTrack );
 
 
     // SYNTH
@@ -496,19 +430,19 @@ lb302Synth::~lb302Synth()
 void lb302Synth::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	vcf_cut_knob->saveSettings( _doc, _this, "vcf_cut" );
-	vcf_res_knob->saveSettings( _doc, _this, "vcf_res" );
-	vcf_mod_knob->saveSettings( _doc, _this, "vcf_mod" );
-	vcf_dec_knob->saveSettings( _doc, _this, "vcf_dec" );
+	vcf_cut_knob.saveSettings( _doc, _this, "vcf_cut" );
+	vcf_res_knob.saveSettings( _doc, _this, "vcf_res" );
+	vcf_mod_knob.saveSettings( _doc, _this, "vcf_mod" );
+	vcf_dec_knob.saveSettings( _doc, _this, "vcf_dec" );
 
-    vco_fine_detune_knob->saveSettings( _doc, _this, "vco_detune" );
-    wave_knob->saveSettings( _doc, _this, "shape");
-    dist_knob->saveSettings( _doc, _this, "dist");
-    slide_dec_knob->saveSettings( _doc, _this, "slide_dec");
+    vco_fine_detune_knob.saveSettings( _doc, _this, "vco_detune" );
+    wave_knob.saveSettings( _doc, _this, "shape");
+    dist_knob.saveSettings( _doc, _this, "dist");
+    slide_dec_knob.saveSettings( _doc, _this, "slide_dec");
 
-    slideToggle->saveSettings( _doc, _this, "slide");
-    deadToggle->saveSettings( _doc, _this, "dead");
-    db24Toggle->saveSettings( _doc, _this, "db24");
+    slideToggle.saveSettings( _doc, _this, "slide");
+    deadToggle.saveSettings( _doc, _this, "dead");
+    db24Toggle.saveSettings( _doc, _this, "db24");
 }
 
 
@@ -516,19 +450,19 @@ void lb302Synth::saveSettings( QDomDocument & _doc,
 
 void lb302Synth::loadSettings( const QDomElement & _this )
 {
-	vcf_cut_knob->loadSettings( _this, "vcf_cut" );
-	vcf_res_knob->loadSettings( _this, "vcf_res" );
-	vcf_mod_knob->loadSettings( _this, "vcf_mod" );
-	vcf_dec_knob->loadSettings( _this, "vcf_dec" );
+	vcf_cut_knob.loadSettings( _this, "vcf_cut" );
+	vcf_res_knob.loadSettings( _this, "vcf_res" );
+	vcf_mod_knob.loadSettings( _this, "vcf_mod" );
+	vcf_dec_knob.loadSettings( _this, "vcf_dec" );
 
-    vco_fine_detune_knob->loadSettings( _this, "vco_detune" );
-    dist_knob->loadSettings( _this, "dist");
-    wave_knob->loadSettings( _this, "shape");
-    slide_dec_knob->loadSettings( _this, "slide_dec");
+    vco_fine_detune_knob.loadSettings( _this, "vco_detune" );
+    dist_knob.loadSettings( _this, "dist");
+    wave_knob.loadSettings( _this, "shape");
+    slide_dec_knob.loadSettings( _this, "slide_dec");
 
-    slideToggle->loadSettings( _this, "slide");
-    deadToggle->loadSettings( _this, "dead");
-    db24Toggle->loadSettings( _this, "db24");
+    slideToggle.loadSettings( _this, "slide");
+    deadToggle.loadSettings( _this, "dead");
+    db24Toggle.loadSettings( _this, "db24");
 
     filterChanged(0.0);
     detuneChanged(0.0);
@@ -538,12 +472,12 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 // recalcFilter.
 void lb302Synth::filterChanged( float )
 {
-        fs.cutoff = vcf_cut_knob->value();
-        fs.reso   = vcf_res_knob->value();
-        fs.envmod = vcf_mod_knob->value();
-        fs.dist   = LB_DIST_RATIO*dist_knob->value();
+        fs.cutoff = vcf_cut_knob.value();
+        fs.reso   = vcf_res_knob.value();
+        fs.envmod = vcf_mod_knob.value();
+        fs.dist   = LB_DIST_RATIO*dist_knob.value();
 
-        float d = 0.2 + (2.3*vcf_dec_knob->value());
+        float d = 0.2 + (2.3*vcf_dec_knob.value());
         d*=LB_HZ;                                   // d *= smpl rate
         fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
                                                     // vcf_envdecay is now adjusted for both
@@ -554,7 +488,7 @@ void lb302Synth::filterChanged( float )
 void lb302Synth::db24Toggled( bool )
 {
     delete vcf;
-    if(db24Toggle->isChecked())  {
+    if(db24Toggle.value())  {
         vcf = new lb302Filter3Pole(&fs);
     }
     else {
@@ -573,7 +507,7 @@ void lb302Synth::detuneChanged( float )
         slidebase_freq = vco_slidebase*LB_HZ/vco_detune;
     }
     
-    vco_detune = powf(2.0f, (float)vco_fine_detune_knob->value()/1200.0f);
+    vco_detune = powf(2.0f, (float)vco_fine_detune_knob.value()/1200.0f);
     vco_inc = freq*vco_detune/LB_HZ;
 
     // If a slide note is pending,
@@ -589,14 +523,16 @@ void lb302Synth::detuneChanged( float )
 // TODO: Set vco_shape in here.
 void lb302Synth::waveChanged( float ) 
 {
-    switch(int(rint(wave_knob->value()))) {
-        case 0: wave_knob->setHintText(tr("Sawtooth "),""); break;
-        case 1: wave_knob->setHintText(tr("Inverted Sawtooth "),""); break;
-        case 2: wave_knob->setHintText(tr("Triangle "),""); break;
-        case 3: wave_knob->setHintText(tr("Square "),""); break;
-        case 4: wave_knob->setHintText(tr("Rounded Square "),""); break;
-        case 5: wave_knob->setHintText(tr("Moog "),""); break;
+/*
+    switch(int(rint(wave_knob.value()))) {
+        case 0: wave_knob.setHintText(tr("Sawtooth "),""); break;
+        case 1: wave_knob.setHintText(tr("Inverted Sawtooth "),""); break;
+        case 2: wave_knob.setHintText(tr("Triangle "),""); break;
+        case 3: wave_knob.setHintText(tr("Square "),""); break;
+        case 4: wave_knob.setHintText(tr("Rounded Square "),""); break;
+        case 5: wave_knob.setHintText(tr("Moog "),""); break;
     }
+*/
 }
 
 QString lb302Synth::nodeName( void ) const
@@ -654,7 +590,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
             if (vco_slide) {
                 vco_inc=vco_slidebase-vco_slide;
                 // Calculate coeff from dec_knob on knob change.
-                vco_slide*= 0.9+(slide_dec_knob->value()*0.0999); // TODO: Adjust for Hz and ENVINC
+                vco_slide*= 0.9+(slide_dec_knob.value()*0.0999); // TODO: Adjust for Hz and ENVINC
 
             }
 		}
@@ -683,7 +619,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
         }
     
          
-        switch(int(rint(wave_knob->value()))) {
+        switch(int(rint(wave_knob.value()))) {
             case 0: vco_shape = SAWTOOTH; break;
             case 1: vco_shape = INVERTED_SAWTOOTH; break;
             case 2: vco_shape = TRIANGLE; break;
@@ -704,7 +640,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
                 vco_k = -vco_c;  // Is this sawtooth backwards?
                 break;
 
-            // TODO: I think TRIANGLE is broken.
             case TRIANGLE:  // p0: duty rev.saw<->triangle<->saw p1: curviness
                 vco_k = (vco_c*2.0)+0.5;
                 if (vco_k>0.5) vco_k = 1.0-vco_k;
@@ -808,7 +743,7 @@ void lb302Synth::initNote( lb302Note *n)
     // End break-out
 
     // Slide note, save inc for next note
-    if (slideToggle->value()) {
+    if (slideToggle.value()) {
         vco_slideinc = vco_inc; // May need to equal vco_slidebase+vco_slide if last note slid
     }
 
@@ -832,7 +767,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 {
 	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
-	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN === ///
+	// <WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN>
 
 	if( _n->arpBaseNote() )
 	{
@@ -913,7 +848,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 #endif
 
-	///=== WEIRD CODE FOR MONOPHONIC BEHAVIOUR - END === ///
+	//  </WEIRD CODE FOR MONOPHONIC BEHAVIOUR>
 
 	/// Malloc our period history buffer
 	if (period_states == NULL) {
@@ -952,7 +887,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         /// This code is obsolete, hence the "if false"
 
         // Existing note. Allow it to decay. 
-        if(deadToggle->value()==0 && decay_note) {
+        if(deadToggle.value() == 0 && decay_note) {
 #ifdef LB_DECAY
             if (catch_decay < 1) {
                 // BEGIN NOT SURE OF...
@@ -972,7 +907,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 #else
             lb302Note note;
             note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
-            note.dead = deadToggle->value();
+            note.dead = deadToggle.value();
             initNote(&note);
             vca_mode=0;
             vca_a = state->vca_a;
@@ -983,7 +918,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
         else {
             lb302Note note;
             note.vco_inc = _n->frequency()*vco_detune/LB_HZ;  // TODO: Use actual sampling rate.
-            note.dead = deadToggle->value();
+            note.dead = deadToggle.value();
             initNote(&note);
             use_hold_note = false;
         }
@@ -993,6 +928,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 	sampleFrame *buf = new sampleFrame[frames];
 
         process(buf, frames); 
+	printf("track %Lx\n", getInstrumentTrack());
         getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 
         delete[] buf;
@@ -1008,6 +944,106 @@ void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
+pluginView * lb302Synth::instantiateView( QWidget * _parent )
+{
+	return( new lb302SynthView( this, _parent ) );
+}
+
+
+lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
+{
+	// GUI
+	m_vcfCutKnob = new knob( knobBright_26, this, tr( "VCF Cutoff Frequency" ) );
+	m_vcfCutKnob->move( 75, 130 );
+	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
+	m_vcfCutKnob->setLabel( tr("CUT") );
+
+	m_vcfResKnob = new knob( knobBright_26, this, tr( "VCF Resonance" ) );
+	m_vcfResKnob->move( 120, 130 );
+	m_vcfResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
+	m_vcfResKnob->setLabel( tr("RES") );
+
+	m_vcfModKnob = new knob( knobBright_26, this, tr( "VCF Envelope Mod" ) );
+	m_vcfModKnob->move( 165, 130 );
+	m_vcfModKnob->setHintText( tr( "Env Mod:" ) + " ", "" );
+	m_vcfModKnob->setLabel( tr("ENV MOD") );
+
+	m_vcfDecKnob = new knob( knobBright_26, this, tr( "VCF Envelope Decay" ) );
+	m_vcfDecKnob->move( 210, 130 );
+	m_vcfDecKnob->setHintText( tr( "Decay:" ) + " ", "" );
+	m_vcfDecKnob->setLabel( tr("DEC") );
+
+	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ) );
+	m_slideToggle->move( 10, 180 );
+
+	m_accentToggle = new ledCheckBox( "Accent", this, tr( "Accent" ) );
+	m_accentToggle->move( 10, 200 );
+	m_accentToggle->setDisabled(true);
+
+	m_deadToggle = new ledCheckBox( "Dead", this, tr( "Dead" ) );
+	m_deadToggle->move( 10, 220 );
+
+	m_db24Toggle = new ledCheckBox( "24dB/oct", this,
+			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
+	m_db24Toggle->move( 10, 150);
+
+
+	m_slideDecKnob = new knob( knobBright_26, this, tr( "Slide Decay" ) );
+	m_slideDecKnob->move( 210, 75 );
+	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
+	m_slideDecKnob->setLabel( tr( "SLIDE"));
+
+	m_vcoFineDetuneKnob = new knob( knobBright_26, this, 
+			tr("Fine detuning of the VCO. Ranged between -100 and 100 centes.") );
+	m_vcoFineDetuneKnob->move(165, 75);
+	m_vcoFineDetuneKnob->setHintText( tr( "VCO Fine Detuning:") + " ", "cents");
+	m_vcoFineDetuneKnob->setLabel( tr( "DETUNE"));
+
+	m_distKnob = new knob( knobBright_26, this, tr( "Distortion" ) );
+	m_distKnob->move( 210, 190 );
+	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
+	m_distKnob->setLabel( tr( "DIST"));
+
+
+	m_waveKnob = new knob( knobBright_26, this, tr( "Waveform" ) );
+	m_waveKnob->move( 120, 75 );
+	m_waveKnob->setHintText( tr( "WAVE:" ) + " ", "" );
+	m_waveKnob->setLabel( tr( "WAVE"));
+
+
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
+			"artwork" ) );
+	setPalette( pal );
+}
+
+lb302SynthView::~lb302SynthView()
+{
+}
+
+void lb302SynthView::modelChanged( void )
+{
+	lb302Synth * syn = castModel<lb302Synth>();
+	
+	m_vcfCutKnob->setModel( &syn->vcf_cut_knob );
+	m_vcfResKnob->setModel( &syn->vcf_res_knob );
+    m_vcfDecKnob->setModel( &syn->vcf_dec_knob );
+	m_vcfModKnob->setModel( &syn->vcf_mod_knob );
+
+    m_vcoFineDetuneKnob->setModel( &syn->vco_fine_detune_knob );
+
+    m_distKnob->setModel( &syn->dist_knob );
+    m_waveKnob->setModel( &syn->wave_knob );
+    
+    m_slideToggle->setModel( &syn->slideToggle );
+    m_accentToggle->setModel( &syn->accentToggle );
+    m_deadToggle->setModel( &syn->deadToggle );
+    m_db24Toggle->setModel( &syn->db24Toggle );
+}
+
+	
 
 extern "C"
 {
@@ -1015,6 +1051,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( void * _data )
 {
+
 return( new lb302Synth(
             static_cast<instrumentTrack *>( _data ) ) );
 }

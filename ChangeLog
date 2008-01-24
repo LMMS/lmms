@@ -1,3 +1,20 @@
+2008-01-24	Paul Giblock <pgllama/at/gmail/dot/dotcom>
+
+	* include/automatable_model.h:
+	* src/widgets/knob.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/effect.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	add boolModel subclass in order to simplify the constructor
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	split lb302 for M/V.  However, lmms_plugin_main() receives null data,
+	which means the instrumentTrack cannot be set..
+
+
 2008-01-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/effect_chain.cpp:

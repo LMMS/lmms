@@ -42,7 +42,7 @@ effect::effect( const plugin::descriptor * _desc,
 	m_noRun( FALSE ),
 	m_running( FALSE ),
 	m_bufferCount( 0 ),
-	m_enabledModel( TRUE, FALSE, TRUE, boolModel::defaultRelStep(), this ),
+	m_enabledModel( TRUE, this ),
 	m_wetDryModel( 1.0f, 0.0f, 1.0f, 0.01f, this ),
 	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, this )

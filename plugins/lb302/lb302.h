@@ -34,11 +34,12 @@
 
 #include "effect_lib.h"
 #include "instrument.h"
+#include "instrument_view.h"
 #include "led_checkbox.h"
+#include "knob.h"
 #include "mixer.h"
 
-
-class knob;
+class lb302SynthView;
 class notePlayHandle;
 
 class lb302FilterKnobState
@@ -210,38 +211,36 @@ public:
 		return 4048;
 	}
 
+	virtual pluginView * instantiateView( QWidget * _parent );
+
 private:
 
     void initNote(lb302Note *note);
 
 
 private:
-	knob * vcf_cut_knob;
-	knob * vcf_res_knob;
-    knob * vcf_dec_knob;
-	knob * vcf_mod_knob;
+	knobModel vcf_cut_knob;
+	knobModel vcf_res_knob;
+	knobModel vcf_mod_knob;
+    knobModel vcf_dec_knob;
 
-    knob * vco_fine_detune_knob;
+    knobModel vco_fine_detune_knob;
 
-    knob * dist_knob;
-    knob * wave_knob;
+    knobModel dist_knob;
+    knobModel wave_knob;
+    knobModel slide_dec_knob;
     
-    ledCheckBox * slideToggle;
-    ledCheckBox * accentToggle;
-    ledCheckBox * deadToggle;
-    ledCheckBox * db24Toggle;
+    boolModel slideToggle;
+    boolModel accentToggle;
+    boolModel deadToggle;
+    boolModel db24Toggle;
 
-    knob * slide_dec_knob;
 
 public slots:
     void filterChanged(float);
     void detuneChanged(float);
     void waveChanged(float);
     void db24Toggled( bool );
-
-private:
-
-    
 
 private:
     // Oscillator
@@ -294,7 +293,37 @@ private:
 
     int process(sampleFrame *outbuf, const Uint32 size);
 
+	friend class lb302SynthView;
+
 } ;
 
+
+class lb302SynthView : public instrumentView
+{
+public:
+	lb302SynthView( instrument * _instrument,
+					QWidget * _parent );
+	virtual ~lb302SynthView();
+
+private:
+	virtual void modelChanged( void );
+	
+	knob * m_vcfCutKnob;
+	knob * m_vcfResKnob;
+    knob * m_vcfDecKnob;
+	knob * m_vcfModKnob;
+
+    knob * m_vcoFineDetuneKnob;
+
+    knob * m_distKnob;
+    knob * m_waveKnob;
+    knob * m_slideDecKnob;
+    
+    ledCheckBox * m_slideToggle;
+    ledCheckBox * m_accentToggle;
+    ledCheckBox * m_deadToggle;
+    ledCheckBox * m_db24Toggle;
+
+} ;
 
 #endif
