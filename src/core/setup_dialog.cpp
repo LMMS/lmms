@@ -3,7 +3,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,6 +49,7 @@
 #include "tooltip.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
+#include "automatable_model_templates.h"
 
 
 // platform-specific audio-interface-classes

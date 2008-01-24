@@ -32,6 +32,7 @@
 #include "effect_control_dialog.h"
 #include "effect_controls.h"
 #include "effect.h"
+#include "automatable_model_templates.h"
 
 
 effectControlDialog::effectControlDialog( effectControls * _controls ) :

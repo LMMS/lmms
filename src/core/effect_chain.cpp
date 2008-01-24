@@ -28,6 +28,7 @@
 
 #include "effect_chain.h"
 #include "engine.h"
+#include "automatable_model_templates.h"
 
 
 

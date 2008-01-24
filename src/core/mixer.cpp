@@ -3,7 +3,7 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,6 +39,7 @@
 #include "sample_play_handle.h"
 #include "piano_roll.h"
 #include "micro_timer.h"
+#include "automatable_model_templates.h"
 
 #include "audio_device.h"
 #include "midi_client.h"

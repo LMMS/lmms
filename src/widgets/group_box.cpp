@@ -42,6 +42,7 @@
 
 #include "embed.h"
 #include "gui_templates.h"
+#include "automatable_model_templates.h"
 
 
 QPixmap * groupBox::s_ledBg = NULL;

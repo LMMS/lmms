@@ -3,7 +3,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,7 @@
 #include "nstate_button.h"
 #include "main_window.h"
 #include "text_float.h"
+#include "automatable_model_templates.h"
 
 
 

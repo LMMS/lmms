@@ -31,6 +31,7 @@
 #include "audio_port.h"
 #include "audio_device.h"
 #include "engine.h"
+#include "automatable_model_templates.h"
 
 
 audioPort::audioPort( const QString & _name, track * _track ) :

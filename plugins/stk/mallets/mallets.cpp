@@ -73,7 +73,7 @@ malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 	m_pressureModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this),
 	m_velocityModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_strikeModel( FALSE, FALSE, TRUE, boolModel::defaultRelStep(), this ),
+	m_strikeModel( FALSE, this ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this)
 {

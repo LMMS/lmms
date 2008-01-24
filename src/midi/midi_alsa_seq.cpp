@@ -3,7 +3,7 @@
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,6 +36,7 @@
 #include "song_editor.h"
 #include "midi_port.h"
 #include "note.h"
+#include "automatable_model_templates.h"
 
 
 #ifdef ALSA_SUPPORT

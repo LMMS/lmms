@@ -3,7 +3,7 @@
 /*
  * project_journal.cpp - implementation of project-journal
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 #include "engine.h"
 #include "journalling_object.h"
 #include "song_editor.h"
+#include "automatable_model_templates.h"
 
 
 projectJournal::projectJournal( void ) :

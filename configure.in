@@ -574,9 +574,9 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Wunsafe-loop-optimizations -Winline -Wdisabled-optimization"
+EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Wunsafe-loop-optimizations -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
-	CXXFLAGS="$CXXFLAGS -ansi -Wall $EXTRA_WARNINGS -fno-exceptions"
+	CXXFLAGS="-ansi -Wall $EXTRA_WARNINGS $CXXFLAGS -fno-exceptions"
 fi
 
 LDFLAGS="$LDFLAGS -L/usr/local/lib"

@@ -3,7 +3,7 @@
 /*
  * effect_select_dialog.cpp - dialog to choose effect plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,6 +33,7 @@
 #include "effect_select_dialog.h"
 
 #include "gui_templates.h"
+#include "automatable_model_templates.h"
 #include "embed.h"
 
 

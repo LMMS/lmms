@@ -24,6 +24,7 @@
 
 
 #include "bass_booster.h"
+#include "automatable_model_templates.h"
 
 
 #undef SINGLE_SOURCE_COMPILE

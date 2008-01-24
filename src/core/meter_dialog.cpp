@@ -31,6 +31,7 @@
 #include "meter_dialog.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "automatable_model_templates.h"
 
 
 meterDialog::meterDialog( QWidget * _parent, track * _track ):

@@ -105,7 +105,7 @@ public:
 	journallingObject( void );
 	virtual ~journallingObject();
 
-	inline const jo_id_t id( void ) const
+	inline jo_id_t id( void ) const
 	{
 		return( m_id );
 	}

@@ -500,7 +500,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						notePlayHandle( this,
 							_time.frames(
 						engine::framesPerTact64th() ),
-						valueRanges<f_cnt_t>::max / 2,
+						valueRanges<f_cnt_t>::max() / 2,
 									n );
 					if( engine::getMixer()->addPlayHandle(
 									nph ) )
@@ -734,7 +734,7 @@ void instrumentTrack::setName( const QString & _new_name )
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		pattern * p = dynamic_cast<pattern *>( getTCO( i ) );
-		if( p != NULL && p->name() == m_name || p->name() == "" )
+		if( ( p != NULL && p->name() == m_name ) || p->name() == "" )
 		{
 			p->setName( _new_name );
 		}

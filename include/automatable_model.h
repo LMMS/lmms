@@ -279,8 +279,6 @@ public:
 } ;
 
 
-//#include "automatable_model_templates.h"
-
 
 #define generateModelPrimitive(type,type2)					\
 		typedef automatableModel<type,type2> type##Model;		\
@@ -292,16 +290,21 @@ public:
 generateModelPrimitive(float,float);
 generateModelPrimitive(int,int);
 
-class boolModel : public automatableModel<bool, signed char> {
+class boolModel : public automatableModel<bool, signed char>
+{
 public:
 	boolModel(  const bool _val = FALSE,
 				::model * _parent = NULL,
 				bool _default_constructed = FALSE ) : 
-	automatableModel<bool, signed char>( _val, FALSE, TRUE, defaultRelStep(), _parent, _default_constructed )
-	{}
-};
+	autoModel( _val, FALSE, TRUE, defaultRelStep(), _parent,
+							_default_constructed )
+	{
+	}
+
+} ;
 
 typedef automatableModelView<bool, signed char> boolModelView;
+
 
 #endif
 

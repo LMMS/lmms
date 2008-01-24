@@ -1,3 +1,47 @@
+2008-01-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/types.h:
+	replaced own buggy valueRanges-calculations by numeric_limits-class
+
+	* plugins/lb302/lb302.cpp:
+	fixed broken plugin-entry-point
+
+	* configure.in:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* include/automatable_model.h:
+	* include/journalling_object.h:
+	* src/audio/audio_file_device.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/mmp.cpp:
+	* src/lib/drumsynth.cpp:
+	* src/widgets/group_box.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/main.cpp:
+	* src/core/mixer.cpp:
+	* src/core/effect.cpp:
+	* src/core/timeline.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/meter_dialog.cpp:
+	various fixes for GCC 4.3
+
+	* README:
+	cleanups / fixes
+
+	* include/automatable_model.h:
+	cleanups / coding-style fixes
+
 2008-01-24	Paul Giblock <pgllama/at/gmail/dot/dotcom>
 
 	* include/automatable_model.h:
@@ -13,7 +57,6 @@
 	* plugins/lb302/lb302.h:
 	split lb302 for M/V.  However, lmms_plugin_main() receives null data,
 	which means the instrumentTrack cannot be set..
-
 
 2008-01-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
