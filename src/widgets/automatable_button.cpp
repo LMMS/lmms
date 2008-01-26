@@ -234,6 +234,7 @@ void automatableButtonGroup::modelChanged( void )
 	connect( model(), SIGNAL( dataChanged() ),
 			this, SLOT( updateButtons() ) );
 	autoModelView::modelChanged();
+	updateButtons();
 }
 
 
@@ -244,7 +245,7 @@ void automatableButtonGroup::updateButtons( void )
 	int i = 0;
 	foreach( automatableButton * btn, m_buttons )
 	{
-		btn->model()->setValue( i == value() );
+		btn->model()->setValue( i == model()->value() );
 		++i;
 	}
 }
