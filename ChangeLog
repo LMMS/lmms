@@ -1,3 +1,25 @@
+2008-01-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	initial M/V-split - lots of debugging and cleanups pending, however
+	basically works :)
+
+	* include/transformable_auto_model.h:
+	added transformableAutoModel-class which is not used yet but might be
+	helpful in some cases in the future
+
+	* include/oscillator.h:
+	* src/lib/oscillator.cpp:
+	- changed coding-style for enum-constants
+	- use model for external wave-shape- and modulation-algo-parameter
+
+	* src/widgets/ladspa_control_view.cpp:
+	added missing header
+
+	* src/widgets/automatable_button.cpp:
+	update buttons after changing button-group's value
+
 2008-01-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/types.h:

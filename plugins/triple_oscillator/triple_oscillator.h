@@ -2,7 +2,7 @@
  * triple_oscillator.h - declaration of class tripleOscillator a powerful
  *                       instrument-plugin with 3 oscillators
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,7 +28,9 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "oscillator.h"
+#include "automatable_model.h"
 
 
 class automatableButtonGroup;
@@ -41,25 +43,29 @@ class volumeKnob;
 const int NUM_OF_OSCILLATORS = 3;
 
 
-class oscillatorObject : public QObject
+class oscillatorObject : public model
 {
 	Q_OBJECT
+public:
+	oscillatorObject( model * _parent, track * _track );
+	virtual ~oscillatorObject();
+
+
 private:
-	oscillator::waveShapes m_waveShape;
-	volumeKnob * m_volKnob;
-	knob * m_panKnob;
-	knob * m_coarseKnob;
-	knob * m_fineLKnob;
-	knob * m_fineRKnob;
-	knob * m_phaseOffsetKnob;
-	knob * m_stereoPhaseDetuningKnob;
-	automatableButtonGroup * m_waveBtnGrp;
-	pixmapButton * m_usrWaveBtn;
+	floatModel m_volumeModel;
+	floatModel m_panModel;
+	floatModel m_coarseModel;
+	floatModel m_fineLeftModel;
+	floatModel m_fineRightModel;
+	floatModel m_phaseOffsetModel;
+	floatModel m_stereoPhaseDetuningModel;
+	intModel m_waveShapeModel;
+	intModel m_modulationAlgoModel;
 	sampleBuffer * m_sampleBuffer;
-	oscillator::modulationAlgos m_modulationAlgo;
 
 	float m_volumeLeft;
 	float m_volumeRight;
+
 	// normalized detuning -> x/sampleRate
 	float m_detuningLeft;
 	float m_detuningRight;
@@ -67,17 +73,12 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	oscillatorObject( void );
-	virtual ~oscillatorObject();
-
 	friend class tripleOscillator;
+	friend class tripleOscillatorView;
 
 
 private slots:
-	void oscWaveCh( int _n );
 	void oscUserDefWaveDblClick( void );
-
-	void modCh( int _n );
 
 	void updateVolume( void );
 	void updateDetuningLeft( void );
@@ -94,7 +95,7 @@ class tripleOscillator : public instrument
 {
 	Q_OBJECT
 public:
-	tripleOscillator( instrumentTrack * _channel );
+	tripleOscillator( instrumentTrack * _track );
 	virtual ~tripleOscillator();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
@@ -116,6 +117,8 @@ public:
 		return( 128 );
 	}
 
+	virtual pluginView * instantiateView( QWidget * _parent );
+
 
 protected slots:
 	void updateAllDetuning( void );
@@ -124,7 +127,7 @@ protected slots:
 private:
 	instrumentTrack * m_instrumentTrack;
 
-	oscillatorObject m_osc[NUM_OF_OSCILLATORS];
+	oscillatorObject * m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
 	{
@@ -132,10 +135,66 @@ private:
 		oscillator * oscRight;
 	} ;
 
+
+	friend class tripleOscillatorView;
+
+} ;
+
+
+
+class tripleOscillatorView : public instrumentView
+{
+public:
+	tripleOscillatorView( instrument * _instrument, QWidget * _parent );
+	virtual ~tripleOscillatorView();
+
+
+private:
+	virtual void modelChanged( void );
+
 	automatableButtonGroup * m_mod1BtnGrp;
 	automatableButtonGroup * m_mod2BtnGrp;
 
+	struct oscillatorKnobs
+	{
+		oscillatorKnobs( volumeKnob * v,
+					knob * p,
+					knob * c,
+					knob * fl,
+					knob * fr,
+					knob * po,
+					knob * spd,
+					pixmapButton * uwb,
+					automatableButtonGroup * wsbg ) :
+			m_volKnob( v ),
+			m_panKnob( p ),
+			m_coarseKnob( c ),
+			m_fineLeftKnob( fl ),
+			m_fineRightKnob( fr ),
+			m_phaseOffsetKnob( po ),
+			m_stereoPhaseDetuningKnob( spd ),
+			m_userWaveButton( uwb ),
+			m_waveShapeBtnGrp( wsbg )
+		{
+		}
+		oscillatorKnobs()
+		{
+		}
+		volumeKnob * m_volKnob;
+		knob * m_panKnob;
+		knob * m_coarseKnob;
+		knob * m_fineLeftKnob;
+		knob * m_fineRightKnob;
+		knob * m_phaseOffsetKnob;
+		knob * m_stereoPhaseDetuningKnob;
+		pixmapButton * m_userWaveButton;
+		automatableButtonGroup * m_waveShapeBtnGrp;
+
+	} ;
+
+	oscillatorKnobs m_oscKnobs[NUM_OF_OSCILLATORS];
 } ;
+
 
 
 #endif
