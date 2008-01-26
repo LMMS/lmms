@@ -26,18 +26,19 @@
 
 
 #include "oscillator.h"
+#include "automatable_model_templates.h"
 
 
 
-oscillator::oscillator( const waveShapes & _wave_shape,
-			const modulationAlgos & _modulation_algo,
-			const float & _freq,
-			const float & _detuning,
-			const float & _phase_offset,
-			const float & _volume,
+oscillator::oscillator( const intModel & _wave_shape_model,
+				const intModel & _mod_algo_model,
+				const float & _freq,
+				const float & _detuning,
+				const float & _phase_offset,
+				const float & _volume,
 			oscillator * _sub_osc ) :
-	m_waveShape( _wave_shape ),
-	m_modulationAlgo( _modulation_algo ),
+	m_waveShapeModel( _wave_shape_model ),
+	m_modulationAlgoModel( _mod_algo_model ),
 	m_freq( _freq ),
 	m_detuning( _detuning ),
 	m_volume( _volume ),
@@ -57,21 +58,21 @@ void oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 {
 	if( m_subOsc != NULL )
 	{
-		switch( m_modulationAlgo )
+		switch( m_modulationAlgoModel.value() )
 		{
-			case PHASE_MODULATION:
+			case PhaseModulation:
 				updatePM( _ab, _frames, _chnl );
 				break;
-			case AMP_MODULATION:
+			case AmplitudeModulation:
 				updateAM( _ab, _frames, _chnl );
 				break;
-			case MIX:
+			case SignalMix:
 				updateMix( _ab, _frames, _chnl );
 				break;
-			case SYNC:
+			case SynchronizedBySubOsc:
 				updateSync( _ab, _frames, _chnl );
 				break;
-			case FREQ_MODULATION:
+			case FrequencyModulation:
 				updateFM( _ab, _frames, _chnl );
 		}
 	}
@@ -87,32 +88,32 @@ void oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updateNoSub<SIN_WAVE>( _ab, _frames, _chnl );
+			updateNoSub<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updateNoSub<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updateNoSub<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updateNoSub<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updateNoSub<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updateNoSub<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updateNoSub<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updateNoSub<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updateNoSub<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updateNoSub<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updateNoSub<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updateNoSub<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updateNoSub<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updateNoSub<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updateNoSub<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -123,32 +124,32 @@ void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updatePM<SIN_WAVE>( _ab, _frames, _chnl );
+			updatePM<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updatePM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updatePM<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updatePM<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updatePM<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updatePM<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updatePM<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updatePM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updatePM<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updatePM<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updatePM<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updatePM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updatePM<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updatePM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updatePM<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -159,32 +160,32 @@ void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updateAM<SIN_WAVE>( _ab, _frames, _chnl );
+			updateAM<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updateAM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updateAM<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updateAM<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updateAM<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updateAM<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updateAM<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updateAM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updateAM<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updateAM<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updateAM<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updateAM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updateAM<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updateAM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updateAM<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -195,32 +196,32 @@ void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updateMix<SIN_WAVE>( _ab, _frames, _chnl );
+			updateMix<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updateMix<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updateMix<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updateMix<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updateMix<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updateMix<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updateMix<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updateMix<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updateMix<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updateMix<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updateMix<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updateMix<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updateMix<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updateMix<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updateMix<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -231,32 +232,32 @@ void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updateSync<SIN_WAVE>( _ab, _frames, _chnl );
+			updateSync<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updateSync<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updateSync<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updateSync<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updateSync<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updateSync<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updateSync<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updateSync<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updateSync<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updateSync<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updateSync<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updateSync<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updateSync<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updateSync<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updateSync<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -267,32 +268,32 @@ void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShape )
+	switch( m_waveShapeModel.value() )
 	{
-		case SIN_WAVE:
+		case SineWave:
 		default:
-			updateFM<SIN_WAVE>( _ab, _frames, _chnl );
+			updateFM<SineWave>( _ab, _frames, _chnl );
 			break;
-		case TRIANGLE_WAVE:
-			updateFM<TRIANGLE_WAVE>( _ab, _frames, _chnl );
+		case TriangleWave:
+			updateFM<TriangleWave>( _ab, _frames, _chnl );
 			break;
-		case SAW_WAVE:
-			updateFM<SAW_WAVE>( _ab, _frames, _chnl );
+		case SawWave:
+			updateFM<SawWave>( _ab, _frames, _chnl );
 			break;
-		case SQUARE_WAVE:
-			updateFM<SQUARE_WAVE>( _ab, _frames, _chnl );
+		case SquareWave:
+			updateFM<SquareWave>( _ab, _frames, _chnl );
 			break;
-		case MOOG_SAW_WAVE:
-			updateFM<MOOG_SAW_WAVE>( _ab, _frames, _chnl );
+		case MoogSawWave:
+			updateFM<MoogSawWave>( _ab, _frames, _chnl );
 			break;
-		case EXP_WAVE:
-			updateFM<EXP_WAVE>( _ab, _frames, _chnl );
+		case ExponentialWave:
+			updateFM<ExponentialWave>( _ab, _frames, _chnl );
 			break;
-		case WHITE_NOISE_WAVE:
-			updateFM<WHITE_NOISE_WAVE>( _ab, _frames, _chnl );
+		case WhiteNoise:
+			updateFM<WhiteNoise>( _ab, _frames, _chnl );
 			break;
-		case USER_DEF_WAVE:
-			updateFM<USER_DEF_WAVE>( _ab, _frames, _chnl );
+		case UserDefinedWave:
+			updateFM<UserDefinedWave>( _ab, _frames, _chnl );
 			break;
 	}
 }
@@ -341,7 +342,7 @@ float oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
 
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -359,7 +360,7 @@ void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 
 
 // do pm by using sub-osc as modulator
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -370,7 +371,7 @@ void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		_ab[frame][_chnl] = getSample<W>( m_phase + _ab[frame][_chnl] )
-								* m_volume;
+							* m_volume;
 		m_phase += osc_coeff;
 	}
 }
@@ -379,7 +380,7 @@ void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 
 
 // do am by using sub-osc as modulator
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -398,7 +399,7 @@ void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 
 
 // do mix by using sub-osc as mix-sample
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -418,7 +419,7 @@ void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -441,7 +442,7 @@ void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 
 
 // do fm by using sub-osc as modulator
-template<oscillator::waveShapes W>
+template<oscillator::WaveShapes W>
 void oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
@@ -461,7 +462,7 @@ void oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::SIN_WAVE>(
+inline sample_t oscillator::getSample<oscillator::SineWave>(
 							const float _sample )
 {
 	return( sinSample( _sample ) );
@@ -471,7 +472,7 @@ inline sample_t oscillator::getSample<oscillator::SIN_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::TRIANGLE_WAVE>(
+inline sample_t oscillator::getSample<oscillator::TriangleWave>(
 							const float _sample )
 {
 	return( triangleSample( _sample ) );
@@ -481,7 +482,7 @@ inline sample_t oscillator::getSample<oscillator::TRIANGLE_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::SAW_WAVE>(
+inline sample_t oscillator::getSample<oscillator::SawWave>(
 							const float _sample )
 {
 	return( sawSample( _sample ) );
@@ -491,7 +492,7 @@ inline sample_t oscillator::getSample<oscillator::SAW_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::SQUARE_WAVE>(
+inline sample_t oscillator::getSample<oscillator::SquareWave>(
 							const float _sample )
 {
 	return( squareSample( _sample ) );
@@ -501,7 +502,7 @@ inline sample_t oscillator::getSample<oscillator::SQUARE_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::MOOG_SAW_WAVE>(
+inline sample_t oscillator::getSample<oscillator::MoogSawWave>(
 							const float _sample )
 {
 	return( moogSawSample( _sample ) );
@@ -511,7 +512,7 @@ inline sample_t oscillator::getSample<oscillator::MOOG_SAW_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::EXP_WAVE>(
+inline sample_t oscillator::getSample<oscillator::ExponentialWave>(
 							const float _sample )
 {
 	return( expSample( _sample ) );
@@ -521,7 +522,7 @@ inline sample_t oscillator::getSample<oscillator::EXP_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::WHITE_NOISE_WAVE>(
+inline sample_t oscillator::getSample<oscillator::WhiteNoise>(
 							const float _sample )
 {
 	return( noiseSample( _sample ) );
@@ -531,7 +532,7 @@ inline sample_t oscillator::getSample<oscillator::WHITE_NOISE_WAVE>(
 
 
 template<>
-inline sample_t oscillator::getSample<oscillator::USER_DEF_WAVE>(
+inline sample_t oscillator::getSample<oscillator::UserDefinedWave>(
 							const float _sample )
 {
 	return( userWaveSample( _sample ) );
