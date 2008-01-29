@@ -44,94 +44,94 @@ class notePlayHandle;
 
 class lb302FilterKnobState
 {
-    public:
-    float cutoff;
-    float reso;
-    float envmod;
-    float envdecay;
-    float dist;
+	public:
+	float cutoff;
+	float reso;
+	float envmod;
+	float envdecay;
+	float dist;
 };
 
 class lb302FilterIIR2State
 {
-    public:
-    float vcf_c0;
-    float vcf_a;
-    float vcf_b;
-    float vcf_c;
-    float vcf_d1;
-    float vcf_d2;
+	public:
+	float vcf_c0;
+	float vcf_a;
+	float vcf_b;
+	float vcf_c;
+	float vcf_d1;
+	float vcf_d2;
 };
 
 class lb302Filter3PoleState
 {
-    public:
-    float vcf_c0;
-    float kp,
-          kp1h,
-          kres,
-          ay1,
-          ay2,
-          lastin,
-          value;
-    float aout;
+	public:
+	float vcf_c0;
+	float kp,
+	      kp1h,
+	      kres,
+	      ay1,
+	      ay2,
+	      lastin,
+	      value;
+	float aout;
 };
          
 typedef union 
 {
-    lb302FilterIIR2State iir;
-    lb302Filter3PoleState pole;
+	lb302FilterIIR2State iir;
+	lb302Filter3PoleState pole;
 } 
 lb302FilterState;
 
 
 class lb302Filter
 {
-    public:
-    lb302Filter(lb302FilterKnobState* p_fs);
-    virtual ~lb302Filter() {};
+	public:
+	lb302Filter(lb302FilterKnobState* p_fs);
+	virtual ~lb302Filter() {};
 
-    virtual void recalc();
-    virtual void envRecalc();
-    virtual float process(const float& samp)=0;
-    virtual void playNote();
+	virtual void recalc();
+	virtual void envRecalc();
+	virtual float process(const float& samp)=0;
+	virtual void playNote();
 
-    virtual void getState(lb302FilterState* fs)=0;
-    virtual void setState(const lb302FilterState* fs)=0;
+	virtual void getState(lb302FilterState* fs)=0;
+	virtual void setState(const lb302FilterState* fs)=0;
 
-    protected:
-    lb302FilterKnobState *fs;  
-    
-    // Filter Decay
+	protected:
+	lb302FilterKnobState *fs;  
+
+	// Filter Decay
 	float vcf_c0;           // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
 	float vcf_e0,           // e0 and e1 for interpolation
-          vcf_e1;           
-    float vcf_rescoeff;     // Resonance coefficient [0.30,9.54]
+	      vcf_e1;           
+	float vcf_rescoeff;     // Resonance coefficient [0.30,9.54]
 };
 
 class lb302FilterIIR2 : public lb302Filter
 {
-    public:
-    lb302FilterIIR2(lb302FilterKnobState* p_fs);
+	public:
+	lb302FilterIIR2(lb302FilterKnobState* p_fs);
 	virtual ~lb302FilterIIR2();
 
-    virtual void recalc();
-    virtual void envRecalc();
-    virtual float process(const float& samp);
+	virtual void recalc();
+	virtual void envRecalc();
+	virtual float process(const float& samp);
 
-    virtual void getState(lb302FilterState* fs);
-    virtual void setState(const lb302FilterState* fs);
+	virtual void getState(lb302FilterState* fs);
+	virtual void setState(const lb302FilterState* fs);
 
-    protected:
-    float vcf_d1,           //   d1 and d2 are added back into the sample with 
-          vcf_d2;           //   vcf_a and b as coefficients. IIR2 resonance
-                            //   loop.
+	protected:
+	float vcf_d1,           //   d1 and d2 are added back into the sample with 
+	      vcf_d2;           //   vcf_a and b as coefficients. IIR2 resonance
+	                        //   loop.
 
-    // IIR2 Coefficients for mixing dry and delay.
-    float vcf_a,            //   Mixing coefficients for the final sound.  
-          vcf_b,            //  
-          vcf_c;
-    
+	                        // IIR2 Coefficients for mixing dry and delay.
+	float vcf_a,            //   Mixing coefficients for the final sound.  
+	      vcf_b,            //  
+	      vcf_c;
+
 	effectLib::monoToStereoAdaptor<effectLib::distortion<> > * m_dist_fx;
 	effectLib::distortion<> * m_dist;
 };
@@ -139,72 +139,72 @@ class lb302FilterIIR2 : public lb302Filter
 
 class lb302Filter3Pole : public lb302Filter
 {
-    public:
-    lb302Filter3Pole(lb302FilterKnobState* p_fs);
+	public:
+	lb302Filter3Pole(lb302FilterKnobState* p_fs);
 
-    //virtual void recalc();
-    virtual void envRecalc();
-    virtual void recalc();
-    virtual float process(const float& samp);
+	//virtual void recalc();
+	virtual void envRecalc();
+	virtual void recalc();
+	virtual float process(const float& samp);
 
-    virtual void getState(lb302FilterState* fs);
-    virtual void setState(const lb302FilterState* fs);
+	virtual void getState(lb302FilterState* fs);
+	virtual void setState(const lb302FilterState* fs);
 
-    protected:
-    float kfcn, 
-          kp, 
-          kp1, 
-          kp1h, 
-          kres;
-    float ay1, 
-          ay2, 
-          aout, 
-          lastin, 
-          value;
+	protected:
+	float kfcn, 
+	      kp, 
+	      kp1, 
+	      kp1h, 
+	      kres;
+	float ay1, 
+	      ay2, 
+	      aout, 
+	      lastin, 
+	      value;
 };
 
- 
+
 
 class lb302State
 {
 public:
-    float vco_c;
-    float vca_a;
-    int vca_mode;
-    int sample_cnt;
+	float vco_c;
+	float vca_a;
+	int vca_mode;
+	int sample_cnt;
 
-    lb302FilterState fs;
+	lb302FilterState fs;
 };
 
 class lb302Note
 {
 public:
-    float vco_inc;
-    bool dead;
+	float vco_inc;
+	bool dead;
 };
 
 
 class lb302Synth : public instrument
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	lb302Synth( instrumentTrack * _channel_track );
 	virtual ~lb302Synth();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
+	                                bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+	                                    QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
 
-    virtual bool isMonophonic(void) const {
-        return true;
-    }
+	virtual bool isMonophonic(void) const {
+		return true;
+	}
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
@@ -215,83 +215,83 @@ public:
 
 private:
 
-    void initNote(lb302Note *note);
+	void initNote(lb302Note *note);
 
 
 private:
 	knobModel vcf_cut_knob;
 	knobModel vcf_res_knob;
 	knobModel vcf_mod_knob;
-    knobModel vcf_dec_knob;
+	knobModel vcf_dec_knob;
 
-    knobModel vco_fine_detune_knob;
+	knobModel vco_fine_detune_knob;
 
-    knobModel dist_knob;
-    knobModel wave_knob;
-    knobModel slide_dec_knob;
+	knobModel dist_knob;
+	knobModel wave_knob;
+	knobModel slide_dec_knob;
     
-    boolModel slideToggle;
-    boolModel accentToggle;
-    boolModel deadToggle;
-    boolModel db24Toggle;
+	boolModel slideToggle;
+	boolModel accentToggle;
+	boolModel deadToggle;
+	boolModel db24Toggle;
 
 
 public slots:
-    void filterChanged(float);
-    void detuneChanged(float);
-    void waveChanged(float);
-    void db24Toggled( bool );
+	void filterChanged( void );
+	void detuneChanged( void );
+	void waveChanged( void );
+	void db24Toggled( void );
 
 private:
-    // Oscillator
-    float vco_inc,          // Sample increment for the frequency. Creates Sawtooth.
-          vco_k,            // Raw oscillator sample [-0.5,0.5]
-          vco_c;            // Raw oscillator sample [-0.5,0.5]
+	// Oscillator
+	float vco_inc,          // Sample increment for the frequency. Creates Sawtooth.
+	      vco_k,            // Raw oscillator sample [-0.5,0.5]
+	      vco_c;            // Raw oscillator sample [-0.5,0.5]
 
-    float vco_slide,        //* Current value of slide exponential curve. Nonzero=sliding
-          vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
-          vco_slidebase;    //* The base vco_inc while sliding.
+	float vco_slide,        //* Current value of slide exponential curve. Nonzero=sliding
+	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
+	      vco_slidebase;    //* The base vco_inc while sliding.
 
-    float vco_detune;
+	float vco_detune;
 
-    enum  vco_shape_t { SAWTOOTH, INVERTED_SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE };
-    vco_shape_t vco_shape;
+	enum  vco_shape_t { SAWTOOTH, INVERTED_SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE };
+	vco_shape_t vco_shape;
 
-    // User settings
-    lb302FilterKnobState  fs;
-    lb302Filter       *vcf;
-    lb302Note         hold_note;
-    bool use_hold_note;
-  	
-    int lastFramesPlayed;
-    int release_frame;
+	// User settings
+	lb302FilterKnobState fs;
+	lb302Filter *vcf;
+	lb302Note hold_note;
+	bool use_hold_note;
 
-	
-    // More States
-    int   vcf_envpos;       // Update counter. Updates when >= ENVINC
+	int lastFramesPlayed;
+	int release_frame;
+
+
+	// More States
+	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
 
 	float vca_attack,       // Amp attack 
-          vca_decay,        // Amp decay
-          vca_a0,           // Initial amplifier coefficient 
-          vca_a;            // Amplifier coefficient.
-    
-    // Envelope State
+	      vca_decay,        // Amp decay
+	      vca_a0,           // Initial amplifier coefficient 
+	      vca_a;            // Amplifier coefficient.
+
+	// Envelope State
 	int   vca_mode;         // 0: attack, 1: decay, 2: idle
 
-    // My hacks
-    int   sample_cnt;
-    
-    int   last_offset;
+	// My hacks
+	int   sample_cnt;
 
-    lb302State *period_states;
-    int period_states_cnt;
+	int   last_offset;
 
-    int catch_frame;
-    int catch_decay;
+	lb302State *period_states;
+	int period_states_cnt;
 
-    void recalcFilter();
+	int catch_frame;
+	int catch_decay;
 
-    int process(sampleFrame *outbuf, const Uint32 size);
+	void recalcFilter();
+
+	int process(sampleFrame *outbuf, const Uint32 size);
 
 	friend class lb302SynthView;
 
@@ -302,7 +302,7 @@ class lb302SynthView : public instrumentView
 {
 public:
 	lb302SynthView( instrument * _instrument,
-					QWidget * _parent );
+	                QWidget * _parent );
 	virtual ~lb302SynthView();
 
 private:
@@ -310,19 +310,19 @@ private:
 	
 	knob * m_vcfCutKnob;
 	knob * m_vcfResKnob;
-    knob * m_vcfDecKnob;
+	knob * m_vcfDecKnob;
 	knob * m_vcfModKnob;
 
-    knob * m_vcoFineDetuneKnob;
+	knob * m_vcoFineDetuneKnob;
 
-    knob * m_distKnob;
-    knob * m_waveKnob;
-    knob * m_slideDecKnob;
+	knob * m_distKnob;
+	knob * m_waveKnob;
+	knob * m_slideDecKnob;
     
-    ledCheckBox * m_slideToggle;
-    ledCheckBox * m_accentToggle;
-    ledCheckBox * m_deadToggle;
-    ledCheckBox * m_db24Toggle;
+	ledCheckBox * m_slideToggle;
+	ledCheckBox * m_accentToggle;
+	ledCheckBox * m_deadToggle;
+	ledCheckBox * m_db24Toggle;
 
 } ;
 

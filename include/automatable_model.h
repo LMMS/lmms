@@ -286,7 +286,6 @@ public:
 
 // some model-primitives
 
-//generateModelPrimitive(bool,signed char);
 generateModelPrimitive(float,float);
 generateModelPrimitive(int,int);
 

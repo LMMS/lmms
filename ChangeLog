@@ -1,3 +1,12 @@
+2008-01-28	Paul Giblock <pgllama/at/gmail/dot/dotcom>
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	finished LB302 M/V-split. however, more changes can be made to meet
+	the coding guidelines.  Let's save this job for LB303
+
+	* include/automatable_model.h:
+	cleaned up code for boolModel
+	
 2008-01-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/automatable_button.cpp:
