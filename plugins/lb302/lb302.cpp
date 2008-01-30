@@ -703,7 +703,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		}
 
 		// Handle Envelope
-		// TODO: Add decay once I figure out how to extend past the end of a note.
 		if(vca_mode==0) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
 			if(sample_cnt>=0.5*44100) 
@@ -732,7 +731,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 
 
 /*  Prepares the active LB302 note.  I separated this into a function because it
- *  needs to be called on0playNote() when a new note is started.  It also needs
+ *  needs to be called onplayNote() when a new note is started.  It also needs
  *  to be called from process() when a prior edge-to-edge note is done releasing.
  */
 
@@ -743,6 +742,7 @@ void lb302Synth::initNote( lb302Note *n)
 	vco_inc = n->vco_inc;
     
 	// TODO: Try moving to the if() below
+	// Why vca_mode==3?
 	if(n->dead == 0 || (vca_mode==1 || vca_mode==3)) {
 		sample_cnt = 0;
 		vca_mode = 0;

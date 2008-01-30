@@ -28,7 +28,9 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "oscillator.h"
+#include "automatable_model.h"
 
 class QPixmap;
 
@@ -38,16 +40,16 @@ class pixmapButton;
 class volumeKnob;
 
 
-class oscillatorObject : public QObject
+class oscillatorObject : public model
 {
 	Q_OBJECT
 private:
-	int m_num_oscillators;
-	oscillator::waveShapes m_waveShape;
-	knob * m_oscKnob;
-	volumeKnob * m_volKnob;
-	knob * m_panKnob;
-	knob * m_detuneKnob;
+	int m_numOscillators;
+	intModel m_waveShape;
+	floatModel m_oscKnob;
+	floatModel m_volKnob;
+	floatModel m_panKnob;
+	floatModel m_detuneKnob;
 
 	float m_harmonic;
 	float m_volumeLeft;
@@ -59,10 +61,11 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	oscillatorObject( void );
+	oscillatorObject( model * _parent, track * _track );
 	virtual ~oscillatorObject();
 
 	friend class organicInstrument;
+	friend class organicInstrumentView;
 
 
 private slots:
@@ -71,8 +74,6 @@ private slots:
 	void updateDetuning( void );
 
 } ;
-
-
 
 
 class organicInstrument : public instrument
@@ -110,11 +111,9 @@ private:
     	return (x / (1.0 + 0.28 * (x * x)));
 	}
 	
-	static QPixmap * s_artwork;
+	int m_numOscillators;
 	
-	int m_num_oscillators;
-	
-	oscillatorObject * m_osc;
+	oscillatorObject ** m_osc;
 	
 	struct oscPtr
 	{
@@ -122,19 +121,61 @@ private:
 		oscillator * oscRight;
 	} ;
 
-	const oscillator::modulationAlgos m_modulationAlgo;
+	const intModel m_modulationAlgo;
 
-	knob * m_fx1Knob;
-	knob * m_volKnob;
-	pixmapButton * m_randBtn;
+	floatModel  m_fx1Knob;
+	floatModel  m_volKnob;
+	/*pixmapButton * m_randBtn;*/
 
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 private slots:
 	void updateAllDetuning( void );
 
+	friend class organicInstrumentView;
 } ;
 
 
+class organicInstrumentView : public instrumentView
+{
+public:
+	organicInstrumentView( instrument * _instrument, QWidget * _parent );
+	virtual ~organicInstrumentView();
+
+private:
+	virtual void modelChanged( void );
+
+	struct oscillatorKnobs
+	{
+		oscillatorKnobs( volumeKnob * v,
+					knob * o,
+					knob * p,
+					knob * dt ) :
+			m_volKnob( v ),
+			m_oscKnob( o ),
+			m_panKnob( p ),
+			m_detuneKnob( dt )
+		{
+		}
+		oscillatorKnobs()
+		{
+		}
+		
+		volumeKnob * m_volKnob;
+		knob * m_oscKnob;
+		knob * m_panKnob;
+		knob * m_detuneKnob;
+	} ;
+
+	oscillatorKnobs * m_oscKnobs;
+
+	knob * m_fx1Knob;
+	knob * m_volKnob;
+
+	int m_numOscillators;
+	
+	static QPixmap * s_artwork;
+};
 
 
 #endif
