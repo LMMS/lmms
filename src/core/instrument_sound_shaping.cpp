@@ -29,11 +29,11 @@
 #include <Qt/QtXml>
 
 
-#include "envelope_tab_widget.h"
+#include "instrument_sound_shaping.h"
 #include "combobox.h"
 #include "embed.h"
 #include "engine.h"
-#include "envelope_and_lfo_widget.h"
+#include "envelope_and_lfo_parameters.h"
 #include "group_box.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
@@ -486,7 +486,7 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 
 
 
-#include "envelope_tab_widget.moc"
+#include "instrument_sound_shaping.moc"
 
 
 

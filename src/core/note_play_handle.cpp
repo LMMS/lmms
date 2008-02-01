@@ -30,7 +30,7 @@
 #include "automatable_model_templates.h"
 #include "config_mgr.h"
 #include "detuning_helper.h"
-#include "envelope_tab_widget.h"
+#include "instrument_sound_shaping.h"
 #include "instrument_track.h"
 #include "midi_port.h"
 #include "song_editor.h"

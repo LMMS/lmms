@@ -26,7 +26,7 @@
  */
 
 
-#include "envelope_and_lfo_widget.h"
+#include "envelope_and_lfo_parameters.h"
 
 
 #include <QtGui/QMouseEvent>
@@ -1041,7 +1041,7 @@ void envelopeAndLFOWidget::lfoUserWaveChanged( void )
 
 
 
-#include "envelope_and_lfo_widget.moc"
+#include "envelope_and_lfo_parameters.moc"
 
 
 #endif

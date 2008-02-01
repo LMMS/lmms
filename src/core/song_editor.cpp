@@ -56,7 +56,7 @@
 #include "config_mgr.h"
 #include "cpuload_widget.h"
 #include "embed.h"
-#include "envelope_and_lfo_widget.h"
+#include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
 #include "import_filter.h"
 #include "instrument_track.h"

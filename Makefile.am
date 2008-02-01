@@ -63,8 +63,8 @@ lmms_MOC =						\
 		./effect_control_dialog.moc		\
 		./effect_label.moc			\
 		./effect_select_dialog.moc		\
-		./envelope_and_lfo_widget.moc		\
-		./envelope_tab_widget.moc		\
+		./envelope_and_lfo_parameters.moc	\
+		./instrument_sound_shaping.moc		\
 		./export_project_dialog.moc		\
 		./fade_button.moc			\
 		./file_browser.moc			\
@@ -81,7 +81,7 @@ lmms_MOC =						\
 		./nstate_button.moc			\
 		./meter_dialog.moc			\
 		./midi_alsa_seq.moc			\
-		./midi_tab_widget.moc			\
+		./instrument_midi_io.moc		\
 		./pattern.moc				\
 		./piano_roll.moc			\
 		./piano_widget.moc			\
@@ -160,8 +160,8 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/effect_select_dialog.cpp		\
 		$(srcdir)/src/core/effect.cpp				\
 		$(srcdir)/src/core/engine.cpp				\
-		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
-		$(srcdir)/src/core/envelope_tab_widget.cpp		\
+		$(srcdir)/src/core/envelope_and_lfo_parameters.cpp	\
+		$(srcdir)/src/core/instrument_sound_shaping.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
@@ -172,7 +172,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
-		$(srcdir)/src/core/midi_tab_widget.cpp			\
+		$(srcdir)/src/core/instrument_midi_io.cpp		\
 		$(srcdir)/src/core/mixer.cpp				\
 		$(srcdir)/src/core/mv_base.cpp				\
 		$(srcdir)/src/core/name_label.cpp			\
@@ -284,8 +284,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/note_play_handle.h			\
 		$(srcdir)/include/piano_roll.h				\
 		$(srcdir)/include/basic_filters.h			\
-		$(srcdir)/include/envelope_tab_widget.h			\
-		$(srcdir)/include/envelope_and_lfo_widget.h		\
+		$(srcdir)/include/instrument_sound_shaping.h		\
+		$(srcdir)/include/envelope_and_lfo_parameters.h		\
 		$(srcdir)/include/about_dialog.h			\
 		$(srcdir)/include/oscillator.h				\
 		$(srcdir)/include/arp_and_chords_tab_widget.h		\
@@ -350,7 +350,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/dummy_instrument.h			\
 		$(srcdir)/include/instrument_play_handle.h		\
 		$(srcdir)/include/string_pair_drag.h			\
-		$(srcdir)/include/midi_tab_widget.h			\
+		$(srcdir)/include/instrument_midi_io.h			\
 		$(srcdir)/include/audio_port.h				\
 		$(srcdir)/include/tool.h				\
 		$(srcdir)/include/tool_button.h				\

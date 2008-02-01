@@ -31,7 +31,7 @@
 #include "play_handle.h"
 #include "song_editor.h"
 #include "templates.h"
-#include "envelope_and_lfo_widget.h"
+#include "envelope_and_lfo_parameters.h"
 #include "debug.h"
 #include "engine.h"
 #include "config_mgr.h"

@@ -1,3 +1,15 @@
+2008-02-01	Danny McRae <khjklujn/at/yahoo/dot/com>
+	* Makefile.am:
+	* src/tracks/instrument_track.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mixer.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/song_editor.cpp:
+	Some of the files have been renamed, so I updated the
+	include references to get the build to work again.
+	
 2007-01-30	Paul Giblock <pgllama/at/gmail/dot/com>
 	* plugins/organic/organic.cpp:
 	* plugins/organic/organic.h:

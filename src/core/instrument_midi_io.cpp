@@ -31,7 +31,7 @@
 #include <QtGui/QToolButton>
 
 
-#include "midi_tab_widget.h"
+#include "instrument_midi_io.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
@@ -485,7 +485,7 @@ void midiTabWidget::activatedWriteablePort( QAction * _item )
 
 
 
-#include "midi_tab_widget.moc"
+#include "instrument_midi_io.moc"
 
 
 #endif
