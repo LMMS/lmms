@@ -92,22 +92,27 @@ public:
 		m_sampleRate( _sample_rate ),
 		m_subFilter( NULL )
 	{
-		// reset in/out history
-		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )
-		{
-			// reset in/out history for simple filters
-			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
-							m_in2[_chnl] = 0.0f;
-			// reset in/out historey for moog-filter
-			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
-				m_oldx[_chnl] = m_oldy1[_chnl] =
-				m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
-		}
+		clearHistory();
 	}
 
 	inline ~basicFilters()
 	{
 		delete m_subFilter;
+	}
+
+	inline void clearHistory( void )
+	{
+		// reset in/out history
+		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )
+		{
+			// reset in/out history for simple filters
+			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
+					m_in2[_chnl] = 0.0f;
+			// reset in/out historey for moog-filter
+			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
+					m_oldx[_chnl] = m_oldy1[_chnl] =
+					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
+		}
 	}
 
 	inline sample_t update( sample_t _in0, ch_cnt_t _chnl )

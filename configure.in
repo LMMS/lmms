@@ -658,6 +658,23 @@ AC_CONFIG_FILES([Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
+		 plugins/stk/voices/Makefile
+		 plugins/stk/voices/b3/Makefile
+		 plugins/stk/voices/bandedwg/Makefile
+		 plugins/stk/voices/blow_bottle/Makefile
+		 plugins/stk/voices/blow_hole/Makefile
+		 plugins/stk/voices/bowed/Makefile
+		 plugins/stk/voices/brass/Makefile
+		 plugins/stk/voices/clarinet/Makefile
+		 plugins/stk/voices/flute/Makefile
+		 plugins/stk/voices/fmvoices/Makefile
+		 plugins/stk/voices/metal/Makefile
+		 plugins/stk/voices/moog/Makefile
+		 plugins/stk/voices/percflute/Makefile
+		 plugins/stk/voices/resonate/Makefile
+		 plugins/stk/voices/rhodey/Makefile
+		 plugins/stk/voices/tubebell/Makefile
+		 plugins/stk/voices/wurley/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
 		 plugins/vibed/Makefile

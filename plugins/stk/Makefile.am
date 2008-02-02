@@ -1,1 +1,2 @@
-SUBDIRS = mallets
+SUBDIRS = mallets	
+#	  voices
