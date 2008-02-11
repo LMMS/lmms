@@ -3,7 +3,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -86,7 +86,7 @@ pattern::pattern ( instrumentTrack * _instrument_track ) :
 	m_needsUpdate( TRUE ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BEAT_PATTERN ),
-	m_name( _instrument_track->name() ),
+	m_name( _instrument_track->track::name() ),
 	m_steps( DEFAULT_STEPS_PER_TACT ),
 	m_frozenPattern( NULL ),
 	m_freezing( FALSE ),
@@ -499,7 +499,7 @@ void pattern::clear( void )
 
 void pattern::resetName( void )
 {
-	m_name = m_instrumentTrack->name();
+	m_name = m_instrumentTrack->track::name();
 }
 
 

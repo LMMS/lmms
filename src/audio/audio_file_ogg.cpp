@@ -80,7 +80,7 @@ inline Sint32 audioFileOgg::writePage( void )
 bool audioFileOgg::startEncoding( void )
 {
 	vorbis_comment vc;
-	char * comments = "Cool=This song has been made using Linux "
+	char * comments = (char *) "Cool=This song has been made using Linux "
 							"MultiMedia Studio";
 	Sint32 comment_length = strlen( comments );
 

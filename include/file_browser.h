@@ -1,7 +1,7 @@
 /*
  * file_browser.h - include file for fileBrowser
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -223,7 +223,7 @@ public:
 							const QString & _path );
 #endif
 
-	inline QString fullName( void ) const
+	QString fullName( void ) const
 	{
 		return( QDir::cleanPath( m_path ) + QDir::separator() +
 								text( 0 ) );

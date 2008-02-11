@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-plugins
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -220,8 +220,8 @@ void vestigeInstrument::setParameter( const QString & _param,
 	{
 		m_pluginMutex.lock();
 		const bool set_ch_name = ( m_plugin != NULL &&
-			getInstrumentTrack()->name() == m_plugin->name() ) ||
-				getInstrumentTrack()->name() ==
+			getInstrumentTrack()->track::name() == m_plugin->name() ) ||
+				getInstrumentTrack()->track::name() ==
 					instrumentTrack::tr( "Default" );
 		m_pluginMutex.unlock();
 

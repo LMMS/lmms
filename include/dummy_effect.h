@@ -55,30 +55,30 @@ public:
 class dummyEffect : public effect
 {
 public:
-	inline dummyEffect( void ) :
+	dummyEffect( void ) :
 		effect( NULL, NULL )
 	{
 	}
 
-	inline virtual ~dummyEffect()
+	virtual ~dummyEffect()
 	{
 	}
 
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void FASTCALL saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void FASTCALL loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName( void ) const
+	virtual QString nodeName( void ) const
 	{
 		return( "dummyeffect" );
 	}
 
-	inline virtual effectControlDialog * createControlDialog( track * )
+	virtual effectControlDialog * createControlDialog( track * )
 	{
 		return( new dummyEffectControlDialog( this ) );
 	}

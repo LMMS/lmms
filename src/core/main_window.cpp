@@ -3,7 +3,7 @@
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -61,6 +61,7 @@
 #include <config.h>
 #endif
 
+#include <cstdlib>
 
 #include "main_window.h"
 #include "bb_editor.h"

@@ -154,7 +154,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle(
 			s_previewTC->previewInstrumentTrack(), 0,
-			valueRanges<f_cnt_t>::max / 2,
+			valueRanges<f_cnt_t>::max() / 2,
 		note( 0, 0, static_cast<tones>( A ),
 			static_cast<octaves>( DEFAULT_OCTAVE - 1 ), 100 ) );
 

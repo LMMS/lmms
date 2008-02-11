@@ -2,7 +2,7 @@
  * dummy_plugin.h - empty plugin which is used as fallback if a plugin couldn't
  *                  be found
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,25 +33,25 @@
 class dummyPlugin : public plugin
 {
 public:
-	inline dummyPlugin( void ) :
+	dummyPlugin( void ) :
 		plugin( NULL )
 	{
 	}
 
-	inline virtual ~dummyPlugin()
+	virtual ~dummyPlugin()
 	{
 	}
 
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void FASTCALL saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void FASTCALL loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName( void ) const
+	virtual QString nodeName( void ) const
 	{
 		return( "dummyplugin" );
 	}

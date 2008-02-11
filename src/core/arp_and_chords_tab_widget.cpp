@@ -4,7 +4,7 @@
  * arp_and_chords_tab_widget.cpp - widget for use in arp/chord-tab of 
  *                                 instrument-track-window
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +41,7 @@
 
 #endif
 
+#include <cstdlib>
 
 #include "arp_and_chords_tab_widget.h"
 #include "combobox.h"

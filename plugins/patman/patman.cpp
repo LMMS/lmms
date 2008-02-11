@@ -417,7 +417,7 @@ void patmanSynth::setFile( const QString & _patch_file, bool _rename )
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
-		( getInstrumentTrack()->name() ==
+		( getInstrumentTrack()->track::name() ==
 					QFileInfo( m_patchFile ).fileName() ||
 				   	m_patchFile == "" ) )
 	{

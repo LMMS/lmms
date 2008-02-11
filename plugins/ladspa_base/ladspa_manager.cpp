@@ -2,7 +2,7 @@
  * ladspa_manager.cpp - a class to manage loading and instantiation
  *                      of ladspa plugins
  *
- * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@
 
 #endif
 
-
+#include <cstdlib>
 #include <math.h>
 
 #include "config_mgr.h"

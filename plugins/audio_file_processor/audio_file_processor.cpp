@@ -1,7 +1,7 @@
 /*
  * audio_file_processor.cpp - instrument for using audio-files
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -370,7 +370,7 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename && 
-		( getInstrumentTrack()->name() ==
+		( getInstrumentTrack()->track::name() ==
 			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
 		   	m_sampleBuffer.audioFile() == "" ) )
 	{

@@ -4,7 +4,7 @@
  * instrument_track.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,6 +63,7 @@
 #include "instrument_track.h"
 #include "arp_and_chords_tab_widget.h"
 #include "audio_port.h"
+#include "automatable_object_templates.h"
 #include "automation_pattern.h"
 #include "config_mgr.h"
 #include "debug.h"
@@ -631,7 +632,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						notePlayHandle( this,
 							_time.frames(
 						engine::framesPerTact64th() ),
-						valueRanges<f_cnt_t>::max / 2,
+						valueRanges<f_cnt_t>::max() / 2,
 									n );
 					if( engine::getMixer()->addPlayHandle(
 									nph ) )
@@ -873,19 +874,19 @@ void instrumentTrack::setName( const QString & _new_name )
 		}
 	}
 
-	m_name = _new_name;
-	setWindowTitle( m_name );
+	track::setName( _new_name );
+	setWindowTitle( _new_name );
 
 	if( m_instrumentNameLE->text() != _new_name )
 	{
-		m_instrumentNameLE->setText( m_name );
+		m_instrumentNameLE->setText( _new_name );
 	}
 #ifdef LMMS_DEBUG
 	assert( m_tswInstrumentTrackButton != NULL );
 #endif
-	m_tswInstrumentTrackButton->setText( m_name );
-	m_midiPort->setName( m_name );
-	m_audioPort->setName( m_name );
+	m_tswInstrumentTrackButton->setText( _new_name );
+	m_midiPort->setName( _new_name );
+	m_audioPort->setName( _new_name );
 }
 
 
@@ -1145,7 +1146,7 @@ trackContentObject * instrumentTrack::createTCO( const midiTime & )
 void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "name", name() );
+	_this.setAttribute( "name", track::name() );
 	m_volumeKnob->saveSettings( _doc, _this, "vol" );
 
 	m_surroundArea->saveSettings( _doc, _this, "surpos" );

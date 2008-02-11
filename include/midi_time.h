@@ -2,7 +2,7 @@
  * midi_time.h - declaration of class midiTime which provides data-type for
  *               position- and length-variables
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	inline midiTime( const Sint32 _abs = 0 ) :
+	midiTime( const Sint32 _abs = 0 ) :
 		m_tact( _abs / 64 ),
 		m_tact64th( _abs % 64 )
 	{
@@ -50,7 +50,7 @@ public:
 		*this = _t;
 	}
 
-	inline midiTime toNearestTact( void ) const
+	midiTime toNearestTact( void ) const
 	{
 		if( m_tact64th >= 32 )
 		{

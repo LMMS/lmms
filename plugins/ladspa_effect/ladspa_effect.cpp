@@ -36,6 +36,7 @@
 
 #endif
 
+#include <malloc.h>
 
 #include "ladspa_effect.h"
 #include "mixer.h"

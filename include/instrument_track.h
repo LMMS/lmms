@@ -106,11 +106,7 @@ public:
 	void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 	// name-stuff
-	inline const QString & name( void ) const
-	{
-		return( m_name );
-	}
-	void FASTCALL setName( const QString & _new_name );
+	virtual void setName( const QString & _new_name );
 
 	// volume & surround-position-stuff
 	void FASTCALL setVolume( volume _new_volume );

@@ -10,6 +10,8 @@
 
 #include <fstream>
 #include <string>
+#include <limits>
+#include <cstring>
 
 #include <math.h>     //sin(), exp(), etc.
 #include <stdio.h>    //sscanf(), sprintf()

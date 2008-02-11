@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> neccessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -498,7 +498,7 @@ public:
 	{
 		return( m_name );
 	}
-	inline virtual void setName( const QString & _new_name )
+	virtual void setName( const QString & _new_name )
 	{
 		m_name = _new_name;
 	}

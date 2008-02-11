@@ -1,7 +1,7 @@
 /*
  * lvsl_client.h - client for LVSL Server
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -116,10 +116,10 @@ public:
 		return( m_failed );
 	}
 
-	virtual void loadSettings( const QDomElement & _this );
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _this );
 
-	inline virtual QString nodeName( void ) const
+	virtual QString nodeName( void ) const
 	{
 		return( "vstplugin" );
 	}

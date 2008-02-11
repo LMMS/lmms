@@ -1,3 +1,32 @@
+2008-02-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/ladspa_base/ladspa_manager.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/lvsl_client.h:
+	* include/track.h:
+	* include/dummy_plugin.h:
+	* include/config_mgr.h:
+	* include/instrument_track.h:
+	* include/file_browser.h:
+	* include/dummy_instrument.h:
+	* include/midi_time.h:
+	* include/basic_filters.h:
+	* include/journalling_object.h:
+	* include/types.h:
+	* include/dummy_effect.h:
+	* src/audio/audio_file_ogg.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/main_window.cpp:
+	* src/lib/drumsynth.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	fixed compilation issues with GCC 4.3
+
 2008-01-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/rack_view.cpp:

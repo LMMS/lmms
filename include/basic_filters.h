@@ -238,7 +238,7 @@ public:
 	}
 
 
-	inline void calcFilterCoeffs( float _freq, float _q
+	void calcFilterCoeffs( float _freq, float _q
 				/*, const bool _q_is_bandwidth = FALSE*/ )
 	{
 		// temp coef vars

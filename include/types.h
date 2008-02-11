@@ -1,7 +1,7 @@
 /*
  * types.h - typedefs for common types that are used in the whole app
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,6 +25,8 @@
 
 #ifndef _TYPES_H
 #define _TYPES_H
+
+#include <limits>
 
 typedef unsigned char	Uint8;
 typedef signed char	Sint8;
@@ -60,13 +62,15 @@ typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
 template<typename T>
 struct valueRanges
 {
-	enum
+	static inline T min( void )
 	{
-		max = static_cast<T>( static_cast<T>( ~0 ) > 0 ?
-			~0 : ( ( ( T ) 1 << ( sizeof( T ) * 8 - 1 ) ) - 1 ) ),
-		min = static_cast<T>( static_cast<T>( ~0 ) > 0 ?
-							0 : ( -max - 1 ) )
-	} ;
+		return( std::numeric_limits<T>::min() );
+	}
+
+	static inline T max( void )
+	{
+		return( std::numeric_limits<T>::max() );
+	}
 } ;
 
 

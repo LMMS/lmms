@@ -2,7 +2,7 @@
  * dummy_instrument.h - instrument used as fallback if an instrument couldn't
  *                      be loaded
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,25 +33,25 @@
 class dummyInstrument : public instrument
 {
 public:
-	inline dummyInstrument( instrumentTrack * _channel_track ) :
+	dummyInstrument( instrumentTrack * _channel_track ) :
 		instrument( _channel_track, NULL )
 	{
 	}
 
-	inline virtual ~dummyInstrument()
+	virtual ~dummyInstrument()
 	{
 	}
 
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void FASTCALL saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void FASTCALL loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName( void ) const
+	virtual QString nodeName( void ) const
 	{
 		return( "dummyinstrument" );
 	}
