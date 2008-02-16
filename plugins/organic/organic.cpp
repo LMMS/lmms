@@ -81,10 +81,24 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 {
 	m_numOscillators = 8;
 
+	m_osc = new oscillatorObject*[ m_numOscillators ];
 	for (int i=0; i < m_numOscillators; i++)
 	{
 		m_osc[i] = new oscillatorObject( this, _channel_track );
 		m_osc[i]->m_numOscillators = m_numOscillators;
+
+		// Connect events 
+		connect( &m_osc[i]->m_oscKnob, SIGNAL( dataChanged() ),
+				m_osc[i], SLOT ( oscButtonChanged() ) );
+		connect( &m_osc[i]->m_volKnob, SIGNAL( dataChanged() ),
+				m_osc[i], SLOT( updateVolume() ) );
+		connect( &m_osc[i]->m_panKnob, SIGNAL( dataChanged() ),
+				m_osc[i], SLOT( updateVolume() ) );
+		connect( &m_osc[i]->m_detuneKnob, SIGNAL( dataChanged() ),
+				m_osc[i], SLOT( updateDetuning() ) );
+		
+		m_osc[i]->updateVolume();
+
 	}
 
 	m_osc[0]->m_harmonic = log2f( 0.5f );	// one octave below
@@ -102,8 +116,9 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	}
 	
 
-	//connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
-	//				this, SLOT( updateAllDetuning() ) );
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+					this, SLOT( updateAllDetuning() ) );
+
 }
 
 
@@ -129,7 +144,7 @@ void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_volKnob.saveSettings( _doc, _this, "vol" + is );
 		m_osc[i]->m_panKnob.saveSettings( _doc, _this, "pan" + is );
 		_this.setAttribute( "harmonic" + is, QString::number(
-					powf( 2.0f, m_osc[i]->m_harmonic ) ) );
+			d		powf( 2.0f, m_osc[i]->m_harmonic ) ) );
 		m_osc[i]->m_detuneKnob.saveSettings( _doc, _this, "detune"
 									+ is );
 		m_osc[i]->m_oscKnob.saveSettings( _doc, _this, "wavetype"
@@ -304,20 +319,20 @@ float inline organicInstrument::waveshape(float in, float amount)
 
 void organicInstrument::randomiseSettings( void )
 {
-/*
+
 	for( int i = 0; i < m_numOscillators; i++ )
 	{
-		m_osc[i].m_volKnob->setValue( intRand( 0, 100 ) );
+		m_osc[i]->m_volKnob.setValue( intRand( 0, 100 ) );
 
-		m_osc[i].m_detuneKnob->setValue( intRand( -5, 5 ) );
+		m_osc[i]->m_detuneKnob.setValue( intRand( -5, 5 ) );
 
-		m_osc[i].m_panKnob->setValue(
+		m_osc[i]->m_panKnob.setValue(
 			//(int)gaussRand(PANNING_LEFT, PANNING_RIGHT,1,0)
 			0 );
 
-		m_osc[i].m_oscKnob->setValue( intRand( 0, 5 ) );
+		m_osc[i]->m_oscKnob.setValue( intRand( 0, 5 ) );
 	}
-*/
+
 }
 
 
@@ -342,17 +357,79 @@ int organicInstrument::intRand( int min, int max )
 	return( randn );
 }
 
+
+pluginView * organicInstrument::instantiateView( QWidget * _parent )
+{
+	return( new organicInstrumentView( this, _parent ) );
+}
+
+
 organicInstrumentView::organicInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
+	organicInstrument * oi = castModel<organicInstrument>();
+
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
 
-	for (int i=0; i < m_numOscillators; ++i)
+	// setup knob for FX1
+	m_fx1Knob = new knob( knobGreen_17, this, tr( "FX1" ) );
+	m_fx1Knob->move( 20, 200 );
+
+	// setup volume-knob
+	m_volKnob = new knob( knobGreen_17, this, tr( "Osc %1 volume" ).arg(
+							1 ) );
+	m_volKnob->move( 50, 200 );
+	m_volKnob->setHintText( tr( "Osc %1 volume:" ).arg( 1 ) + " ", "%" );
+
+	// randomise
+	m_randBtn = new pixmapButton( this, tr( "Randomise" ) );
+	m_randBtn->move( 100, 200 );
+	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"randomise_pressed" ) );
+	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"randomise" ) );
+	//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
+	//				createHeuristicMask() ) );
+
+	connect( m_randBtn, SIGNAL ( clicked() ),
+					oi, SLOT( randomiseSettings() ) );
+
+
+	if( s_artwork == NULL )
+	{
+		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
+								"artwork" ) );
+	}
+
+}
+
+
+organicInstrumentView::~organicInstrumentView()
+{
+	delete[] m_oscKnobs;
+}
+
+
+void organicInstrumentView::modelChanged( void )
+{
+	organicInstrument * oi = castModel<organicInstrument>();
+
+	m_numOscillators = oi->m_numOscillators;
+	
+	m_fx1Knob->setModel( &oi->m_fx1Knob );
+	m_volKnob->setModel( &oi->m_volKnob );
+
+	// TODO: Delete existing oscKnobs if they exist
+	
+	m_oscKnobs = new oscillatorKnobs[ m_numOscillators ];
+
+	// Create knobs, now that we know how many to make
+	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		// setup waveform-knob
 		knob * oscKnob = new knob( knobGreen_17, this, tr(
@@ -360,9 +437,6 @@ organicInstrumentView::organicInstrumentView( instrument * _instrument,
 		oscKnob->move( 25 + i * 20, 90 );
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
 					i + 1 ) + " ", "%" );
-										
-		//connect( m_osc[i].m_oscKnob, SIGNAL( valueChanged() ),
-		//		&m_osc[i], SLOT ( oscButtonChanged() ) );
 										
 		// setup volume-knob
 		volumeKnob * volKnob = new volumeKnob( knobGreen_17, this, tr(
@@ -389,65 +463,7 @@ organicInstrumentView::organicInstrumentView( instrument * _instrument,
 
 		m_oscKnobs[i] = oscillatorKnobs( volKnob, oscKnob, panKnob, detuneKnob );
 
-
-		/*connect( m_osc[i].m_volKnob, SIGNAL( valueChanged() ),
-					&m_osc[i], SLOT( updateVolume() ) );
-		connect( m_osc[i].m_panKnob, SIGNAL( valueChanged() ),
-					&m_osc[i], SLOT( updateVolume() ) );
-		//m_osc[i].updateVolume();
-
-		connect( m_osc[i].m_detuneKnob, SIGNAL( valueChanged() ),
-					&m_osc[i], SLOT( updateDetuning() ) );
-		//m_osc[i].updateDetuning();*/
-	}
-
-
-	// setup knob for FX1
-	m_fx1Knob = new knob( knobGreen_17, this, tr( "FX1" ) );
-	m_fx1Knob->move( 20, 200 );
-
-	// setup volume-knob
-	m_volKnob = new knob( knobGreen_17, this, tr( "Osc %1 volume" ).arg(
-							1 ) );
-	m_volKnob->move( 50, 200 );
-	m_volKnob->setHintText( tr( "Osc %1 volume:" ).arg( 1 ) + " ", "%" );
-
-	// randomise
-	/*m_randBtn = new pixmapButton( this, tr( "Randomise" ), _channel_track );
-	m_randBtn->move( 100, 200 );
-	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"randomise_pressed" ) );
-	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"randomise" ) );
-	//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-	//				createHeuristicMask() ) );
-
-	connect( m_randBtn, SIGNAL ( clicked() ),
-					this, SLOT( randomiseSettings() ) );
-*/
-	
-
-
-	if( s_artwork == NULL )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-}
-
-
-
-void organicInstrumentView::modelChanged( void )
-{
-	organicInstrument * oi = castModel<organicInstrument>();
-
-	m_numOscillators = oi->m_numOscillators;
-	
-	m_fx1Knob->setModel( &oi->m_fx1Knob );
-	m_volKnob->setModel( &oi->m_volKnob );
-
-	for( int i = 0; i < m_numOscillators; ++i )
-	{
+		// Attach to models
 		m_oscKnobs[i].m_volKnob->setModel(
 					&oi->m_osc[i]->m_volKnob );
 		m_oscKnobs[i].m_oscKnob->setModel(
@@ -456,6 +472,8 @@ void organicInstrumentView::modelChanged( void )
 					&oi->m_osc[i]->m_panKnob );
 		m_oscKnobs[i].m_detuneKnob->setModel(
 					&oi->m_osc[i]->m_detuneKnob );
+
+
 		/*connect( m_oscKnobs[i].m_userWaveButton,
 						SIGNAL( doubleClicked() ),
 				t->m_osc[i], SLOT( oscUserDefWaveDblClick() ) );
@@ -467,7 +485,7 @@ void organicInstrumentView::modelChanged( void )
 oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
 	model( _parent ),
 	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, 1, this ),
-	m_oscKnob( 0.0f, 0.0f, 5.0f, 0.25f, this ),
+	m_oscKnob( 0.0f, 0.0f, 5.0f, 1.0f, this ),
 	m_volKnob( 100.0f, 0.0f, 100.0f, 1.0f, this ),
 	m_panKnob( DEFAULT_PANNING, PANNING_LEFT, PANNING_RIGHT, 1.0f, this ),
 	m_detuneKnob( 0.0f, -100.0f, 100.0f, 1.0f, this ) 
@@ -486,19 +504,19 @@ oscillatorObject::~oscillatorObject()
 
 void oscillatorObject::oscButtonChanged( void )
 {
-/*
-	static oscillator::waveShapes shapes[] =
+
+	static oscillator::WaveShapes shapes[] =
 	{
-		oscillator::SIN_WAVE,
-		oscillator::SAW_WAVE,
-		oscillator::SQUARE_WAVE,
-		oscillator::TRIANGLE_WAVE,
-		oscillator::MOOG_SAW_WAVE,
-		oscillator::EXP_WAVE
+		oscillator::SineWave,
+		oscillator::SawWave,
+		oscillator::SquareWave,
+		oscillator::TriangleWave,
+		oscillator::MoogSawWave,
+		oscillator::ExponentialWave
 	} ;
 
-	m_waveShape = shapes[(int)roundf( m_oscKnob->value() )];
-*/
+	m_waveShape.setValue( shapes[(int)roundf( m_oscKnob.value() )] );
+
 }
 
 
@@ -506,6 +524,7 @@ void oscillatorObject::oscButtonChanged( void )
 
 void oscillatorObject::updateVolume( void )
 {
+	printf("Updating VOL\n");
 	m_volumeLeft = ( 1.0f - m_panKnob.value() / (float)PANNING_RIGHT )
 			* m_volKnob.value() / m_numOscillators / 100.0f;
 	m_volumeRight = ( 1.0f + m_panKnob.value() / (float)PANNING_RIGHT )

@@ -125,7 +125,6 @@ private:
 
 	floatModel  m_fx1Knob;
 	floatModel  m_volKnob;
-	/*pixmapButton * m_randBtn;*/
 
 	virtual pluginView * instantiateView( QWidget * _parent );
 
@@ -171,6 +170,7 @@ private:
 
 	knob * m_fx1Knob;
 	knob * m_volKnob;
+	pixmapButton * m_randBtn;
 
 	int m_numOscillators;
 	

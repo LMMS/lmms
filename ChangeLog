@@ -1,3 +1,11 @@
+2008-02-15	Paul Giblock	<drfaygo/at/gmail/dot/net>
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	Updated some instruments for M/V. Unfortunately one is an old version
+	and the other is obsoleted
+
 2008-02-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_controls.cpp:
