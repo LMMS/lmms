@@ -144,7 +144,7 @@ void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_volKnob.saveSettings( _doc, _this, "vol" + is );
 		m_osc[i]->m_panKnob.saveSettings( _doc, _this, "pan" + is );
 		_this.setAttribute( "harmonic" + is, QString::number(
-			d		powf( 2.0f, m_osc[i]->m_harmonic ) ) );
+					powf( 2.0f, m_osc[i]->m_harmonic ) ) );
 		m_osc[i]->m_detuneKnob.saveSettings( _doc, _this, "detune"
 									+ is );
 		m_osc[i]->m_oscKnob.saveSettings( _doc, _this, "wavetype"
