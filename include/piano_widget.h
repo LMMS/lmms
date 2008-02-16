@@ -1,8 +1,8 @@
 /*
- * piano_widget.h - declaration of class pianoWidget, a widget which provides
+ * piano_widget.h - declaration of class pianoView, a widget which provides
  *                  an interactive piano/keyboard-widget
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,35 +37,54 @@
 
 
 class instrumentTrack;
-class knob;
+class instrumentTrackView;
 class notePlayHandle;
 
 
-enum keyTypes
+enum KeyTypes
 {
-	WHITE_KEY,
-	BLACK_KEY
+	WhiteKey,
+	BlackKey
 } ;
 
 
-class pianoWidget : public QWidget
+class piano : public model
+{
+public:
+	piano( instrumentTrack * _it );
+	virtual ~piano();
+
+	void setKeyState( int _key, bool _on = FALSE );
+	static int getKeyFromKeycode( int _kc );
+
+
+private:
+	instrumentTrack * m_instrumentTrack;
+	bool m_pressedKeys[NOTES_PER_OCTAVE * OCTAVES];
+
+
+	friend class pianoView;
+
+} ;
+
+
+
+class pianoView : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	pianoWidget( instrumentTrack * _channel_track );
-	virtual ~pianoWidget();
+	pianoView( QWidget * _parent );
+	virtual ~pianoView();
 
-	void setKeyState( int _key, bool _on = FALSE );
 
+protected:
+	virtual void modelChanged( void );
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
 #ifndef BUILD_WIN32
 	virtual bool x11Event( XEvent * _xe );
 #endif
-
-protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void customEvent( QEvent * );
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
@@ -74,25 +93,22 @@ protected:
 
 
 private:
-	int FASTCALL getKeyFromMouse( const QPoint & _p ) const;
-	int FASTCALL getKeyFromKeyboard( int _k ) const;
-	int FASTCALL getKeyX( int _key_num ) const;
+	int getKeyFromMouse( const QPoint & _p ) const;
+	int getKeyX( int _key_num ) const;
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;
 	static QPixmap * s_whiteKeyPressedPm;
 	static QPixmap * s_blackKeyPressedPm;
-	
-	bool m_pressedKeys[NOTES_PER_OCTAVE * OCTAVES];
+
+	piano * m_piano;
 
 	QScrollBar * m_pianoScroll;
-	instrumentTrack * m_instrumentTrack;
 	tones m_startTone;			// first key when drawing
 	octaves m_startOctave;
 
 	int m_lastKey;
 	unsigned int m_keyCode;
-
 
 
 private slots:

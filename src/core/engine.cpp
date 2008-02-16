@@ -38,12 +38,15 @@
 #include "project_journal.h"
 #include "project_notes.h"
 #include "song_editor.h"
+#include "song.h"
 
 
 bool engine::s_hasGUI = TRUE;
 float engine::s_framesPerTact64th;
 mixer * engine::s_mixer;
 mainWindow * engine::s_mainWindow;
+bbTrackContainer * engine::s_bbTrackContainer;
+song * engine::s_song;
 songEditor * engine::s_songEditor;
 automationEditor * engine::s_automationEditor;
 bbEditor * engine::s_bbEditor;
@@ -63,11 +66,14 @@ void engine::init( const bool _has_gui )
 	loadExtensions();
 
 	s_projectJournal = new projectJournal;
-	s_mainWindow = new mainWindow;
 	s_mixer = new mixer;
-	s_songEditor = new songEditor;
+	s_song = new song;
+	s_bbTrackContainer = new bbTrackContainer;
+
+	s_mainWindow = new mainWindow;
+	s_songEditor = new songEditor( s_song );
 	s_projectNotes = new projectNotes;
-	s_bbEditor = new bbEditor;
+	s_bbEditor = new bbEditor( s_bbTrackContainer );
 	s_pianoRoll = new pianoRoll;
 	s_automationEditor = new automationEditor;
 	s_ladspaManager = new ladspa2LMMS;
@@ -120,7 +126,7 @@ void engine::destroy( void )
 void engine::updateFramesPerTact64th( void )
 {
 	s_framesPerTact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
-					/ 64.0f / s_songEditor->getTempo();
+						/ 64.0f / s_song->getTempo();
 }
 
 

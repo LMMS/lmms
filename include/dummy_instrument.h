@@ -33,25 +33,25 @@
 class dummyInstrument : public instrument
 {
 public:
-	inline dummyInstrument( instrumentTrack * _instrument_track ) :
+	dummyInstrument( instrumentTrack * _instrument_track ) :
 		instrument( _instrument_track, NULL )
 	{
 	}
 
-	inline virtual ~dummyInstrument()
+	virtual ~dummyInstrument()
 	{
 	}
 
 
-	inline virtual void saveSettings( QDomDocument &, QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	inline virtual void loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & )
 	{
 	}
 
-	inline virtual QString nodeName( void ) const
+	virtual QString nodeName( void ) const
 	{
 		return( "dummyinstrument" );
 	}

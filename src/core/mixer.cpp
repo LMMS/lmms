@@ -29,7 +29,7 @@
 
 #include "mixer.h"
 #include "play_handle.h"
-#include "song_editor.h"
+#include "song.h"
 #include "templates.h"
 #include "envelope_and_lfo_parameters.h"
 #include "debug.h"
@@ -177,7 +177,7 @@ void mixer::stopProcessing( void )
 bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
-			engine::getSongEditor()->realTimeTask() == TRUE ) );
+				engine::getSong()->realTimeTask() == TRUE ) );
 }
 
 
@@ -230,11 +230,11 @@ void mixer::setClipScaling( bool _state )
 const surroundSampleFrame * mixer::renderNextBuffer( void )
 {
 	microTimer timer;
-	static songEditor::playPos last_metro_pos = -1;
+	static song::playPos last_metro_pos = -1;
 
-	songEditor::playPos p = engine::getSongEditor()->getPlayPos(
-						songEditor::PLAY_PATTERN );
-	if( engine::getSongEditor()->playMode() == songEditor::PLAY_PATTERN &&
+	song::playPos p = engine::getSong()->getPlayPos(
+						song::Mode_PlayPattern );
+	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
 		engine::getPianoRoll()->isRecording() == TRUE &&
 		p != last_metro_pos && p.getTact64th() % 16 == 0 )
 	{
@@ -288,7 +288,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 //printf("---------------------------next period\n");
 //	if( criticalXRuns() == FALSE )
 	{
-		engine::getSongEditor()->processNextBuffer();
+		engine::getSong()->processNextBuffer();
 
 		lockPlayHandles();
 		int idx = 0;
@@ -382,7 +382,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	emit nextAudioBuffer();
 
 	// and trigger LFOs
-	envelopeAndLFOWidget::triggerLFO();
+	envelopeAndLFOParameters::triggerLFO();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
 							m_framesPerPeriod;

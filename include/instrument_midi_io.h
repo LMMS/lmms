@@ -1,8 +1,7 @@
 /*
- * midi_tab_widget.h - tab-widget in channel-track-window for setting up
- *                     MIDI-related stuff
+ * instrument_midi_io.h - class instrumentMidiIO
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,37 +23,33 @@
  */
 
 
-#ifndef _MIDI_TAB_WIDGET_H
-#define _MIDI_TAB_WIDGET_H
+#ifndef _INSTRUMENT_MIDI_IO_H
+#define _INSTRUMENT_MIDI_IO_H
 
-#include <QtGui/QWidget>
+#include <QtCore/QList>
 
 #include "automatable_model.h"
 
 
-class QMenu;
-class QPixmap;
-class QAction;
-
 class instrumentTrack;
-class tabWidget;
-class ledCheckBox;
-class lcdSpinBox;
 class midiPort;
 
 
-class midiTabWidget : public QWidget, public journallingObject
+class instrumentMidiIO : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	midiTabWidget( instrumentTrack * _channel_track, midiPort * _port );
-	virtual ~midiTabWidget();
+	typedef QPair<QString, bool> descriptiveMidiPort;
+	typedef QList<descriptiveMidiPort> midiPortMap;
+
+	instrumentMidiIO( instrumentTrack * _instrument_track,
+							midiPort * _port );
+	virtual ~instrumentMidiIO();
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+	virtual QString nodeName( void ) const
 	{
 		return( "midi" );
 	}
@@ -71,20 +66,15 @@ protected slots:
 	void defaultVelOutChanged( void );
 	void readablePortsChanged( void );
 	void writeablePortsChanged( void );
-	void activatedReadablePort( QAction * _item );
-	void activatedWriteablePort( QAction * _item );
+
+	void activatedReadablePort( const descriptiveMidiPort & _port );
+	void activatedWriteablePort( const descriptiveMidiPort & _port );
+
 
 private:
 	instrumentTrack * m_instrumentTrack;
 	midiPort * m_midiPort;
 
-	tabWidget * m_setupTabWidget;
-	lcdSpinBox * m_inputChannelSpinBox;
-	lcdSpinBox * m_outputChannelSpinBox;
-	ledCheckBox * m_receiveCheckBox;
-	ledCheckBox * m_sendCheckBox;
-	ledCheckBox * m_defaultVelocityInCheckBox;
-	ledCheckBox * m_defaultVelocityOutCheckBox;
 	intModel m_inputChannelModel;
 	intModel m_outputChannelModel;
 	boolModel m_receiveEnabledModel;
@@ -92,10 +82,11 @@ private:
 	boolModel m_defaultVelocityInEnabledModel;
 	boolModel m_defaultVelocityOutEnabledModel;
 
-	QMenu * m_readablePorts;
-	QMenu * m_writeablePorts;
+	midiPortMap m_readablePorts;
+	midiPortMap m_writeablePorts;
 
-	friend class instrumentTrack;
+
+	friend class instrumentMidiIOView;
 
 } ;
 

@@ -1,7 +1,7 @@
 /*
  * bb_editor.h - declaration of class bbEditor, a basic-component of LMMS
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,39 +35,36 @@ class QPixmap;
 class toolButton;
 
 
-class bbEditor : public trackContainer
+class bbTrackContainer : public trackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModelPtr(int,currentBB,setCurrentBB,m_bbComboBoxModel);
+	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
 public:
-	virtual bool FASTCALL play( midiTime _start, const fpp_t _frames,
+	bbTrackContainer( void );
+	virtual ~bbTrackContainer();
+
+	virtual bool play( midiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+//	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+//	virtual void loadSettings( const QDomElement & _this );
 	virtual void updateAfterTrackAdd( void );
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "bbeditor" );
+		return( "bbtrackcontainer" );
 	}
 
-	virtual inline bool fixedTCOs( void ) const
-	{
-		return( TRUE );
-	}
-
-	tact FASTCALL lengthOfBB( const int _bb );
+	tact lengthOfBB( int _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
 		return( lengthOfBB( currentBB() ) );
 	}
-	void FASTCALL removeBB( const int _bb );
 	int numOfBBs( void ) const;
+	void removeBB( int _bb );
 
-	void FASTCALL swapBB( const int _bb1, const int _bb2 );
+	void swapBB( int _bb1, int _bb2 );
 
 	void updateBBTrack( trackContentObject * _tco );
 
@@ -79,27 +76,49 @@ public slots:
 	void currentBBChanged( void );
 
 
-protected:
-	virtual void keyPressEvent( QKeyEvent * _ke );
+private:
+	void createTCOsForBB( int _bb );
+
+	comboBoxModel m_bbComboBoxModel;
+
+
+	friend class bbEditor;
+
+} ;
+
+
+
+class bbEditor : public trackContainerView
+{
+	Q_OBJECT
+public:
+	bbEditor( bbTrackContainer * _tc );
+	virtual ~bbEditor();
+
+	virtual inline bool fixedTCOs( void ) const
+	{
+		return( TRUE );
+	}
+
+	void removeBBView( int _bb );
+
+
+public slots:
+	void play( void );
+	void stop( void );
+	void updatePosition( void );
 
 
 private:
-	bbEditor( void );
-	//bbEditor( const bbEditor & );
-	virtual ~bbEditor();
+	virtual void keyPressEvent( QKeyEvent * _ke );
 
-	void FASTCALL createTCOsForBB( const int _bb );
-
-
+	bbTrackContainer * m_bbtc;
 	QWidget * m_toolBar;
 
 	toolButton * m_playButton;
 	toolButton * m_stopButton;
 
 	comboBox * m_bbComboBox;
-	comboBoxModel * m_bbComboBoxModel;
-
-	friend class engine;
 
 } ;
 

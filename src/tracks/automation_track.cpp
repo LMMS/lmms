@@ -4,7 +4,7 @@
  * automation_track.cpp - automationTrack handles automation of objects without
  *                        a track
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,12 +27,13 @@
 
 
 #include "automation_track.h"
+#include "automatable_model_templates.h"
 
 
 
 
 automationTrack::automationTrack( trackContainer * _tc ) :
-	track( _tc, FALSE )
+	track( AutomationTrack, _tc )
 {
 }
 
@@ -46,18 +47,8 @@ automationTrack::~automationTrack()
 
 
 
-track::trackTypes automationTrack::type( void ) const
-{
-	return( AUTOMATION_TRACK );
-}
-
-
-
-
-bool automationTrack::play( const midiTime & _start,
-					const fpp_t _frames,
-					const f_cnt_t _frame_base,
-							Sint16 _tco_num )
+bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
+				const f_cnt_t _frame_base, Sint16 _tco_num )
 {
 	sendMidiTime( _start );
 	return( FALSE );
@@ -86,10 +77,6 @@ void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 }
 
-
-
-
-#include "automation_track.moc"
 
 
 #endif

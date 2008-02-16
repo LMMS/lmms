@@ -28,13 +28,16 @@
 #define _INSTRUMENT_TRACK_H
 
 #include <QtGui/QPushButton>
-#include <QtGui/QPainter>
 
 #include "audio_port.h"
 #include "automatable_model.h"
+#include "instrument_functions.h"
+#include "instrument_midi_io.h"
+#include "instrument_sound_shaping.h"
 #include "lcd_spinbox.h"
 #include "midi_event_processor.h"
 #include "mixer.h"
+#include "piano_widget.h"
 #include "effect_chain.h"
 #include "surround_area.h"
 #include "tab_widget.h"
@@ -42,23 +45,23 @@
 
 
 class QLineEdit;
-class arpAndChordsTabWidget;
+class arpeggiatorView;
+class chordCreatorView;
 class effectRackView;
-class envelopeTabWidget;
+class instrumentSoundShapingView;
 class fadeButton;
 class instrument;
+class instrumentMidiIOView;
 class instrumentTrackButton;
-class lcdSpinBox;
+class instrumentTrackWindow;
 class midiPort;
-class midiTabWidget;
 class notePlayHandle;
-class pianoWidget;
+class pluginView;
 class presetPreviewPlayHandle;
-class surroundArea;
 class volumeKnob;
 
 
-class instrumentTrack : public QWidget, public track, public midiEventProcessor
+class instrumentTrack : public track, public midiEventProcessor
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
@@ -66,29 +69,22 @@ public:
 	instrumentTrack( trackContainer * _tc );
 	virtual ~instrumentTrack();
 
-	inline virtual trackTypes type( void ) const
-	{
-		return( m_trackType );
-	}
-
-
 	// used by instrument
-	void FASTCALL processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames,
+	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
 							notePlayHandle * _n );
 
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
+	virtual void processInEvent( const midiEvent & _me,
 						const midiTime & _time );
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time );
 
 
-	f_cnt_t FASTCALL beatLen( notePlayHandle * _n ) const;
+	f_cnt_t beatLen( notePlayHandle * _n ) const;
 
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void FASTCALL playNote( notePlayHandle * _n, bool _try_parallelizing );
+	void playNote( notePlayHandle * _n, bool _try_parallelizing );
 
 	QString instrumentName( void ) const;
 	inline const instrument * getInstrument( void ) const
@@ -96,68 +92,36 @@ public:
 		return( m_instrument );
 	}
 
-	void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	void deleteNotePluginData( notePlayHandle * _n );
 
 	// name-stuff
-	inline const QString & name( void ) const
-	{
-		return( m_name );
-	}
-	void FASTCALL setName( const QString & _new_name );
+	virtual void setName( const QString & _new_name );
 
-	// volume & surround-position-stuff
-/*	void FASTCALL setVolume( volume _new_volume );
-	volume getVolume( void ) const;*/
-
-//	void FASTCALL setBaseNote( Uint32 _new_note, bool _modified = TRUE );
-
-/*	inline tones baseTone( void ) const
-	{
-		return( m_baseTone );
-	}
-
-	inline octaves baseOctave( void ) const
-	{
-		return( m_baseOctave );
-	}*/
-
-	int FASTCALL masterKey( notePlayHandle * _n ) const;
+	int masterKey( notePlayHandle * _n ) const;
 
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool FASTCALL play( const midiTime & _start,
-						const fpp_t _frames,
-						const f_cnt_t _frame_base,
+	virtual bool play( const midiTime & _start, const fpp_t _frames,
+					const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
+	// create new view for me
+	virtual trackView * createView( trackContainerView * _tcv );
+
 	// create new track-content-object = pattern
-	virtual trackContentObject * FASTCALL createTCO( const midiTime &
-									_pos );
+	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 
 	// called by track
-	virtual void FASTCALL saveTrackSpecificSettings( QDomDocument & _doc,
+	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
-									_this );
+	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	using track::setJournalling;
 
 
 	// load instrument whose name matches given one
-	instrument * FASTCALL loadInstrument( const QString &
-							_instrument_name );
+	instrument * loadInstrument( const QString & _instrument_name );
 
-	// parent for all internal tab-widgets
-	QWidget * tabWidgetParent( void )
-	{
-		return( m_tabWidget );
-	}
-
-	pianoWidget * getPianoWidget( void )
-	{
-		return( m_pianoWidget );
-	}
-	
 	inline audioPort * getAudioPort( void )
 	{
 		return( &m_audioPort );
@@ -168,14 +132,146 @@ public:
 		return( &m_baseNoteModel );
 	}
 
+	piano * getPiano( void )
+	{
+		return( &m_piano );
+	}
+
+	bool arpeggiatorEnabled( void ) const
+	{
+		return( m_arpeggiator.m_arpEnabledModel.value() );
+	}
+
+
+signals:
+	void instrumentChanged( void );
+	void newNote( void );
+	void noteDone( const note & _n );
+	void nameChanged( void );
+
+
+protected:
+	virtual QString nodeName( void ) const
+	{
+		return( "instrumenttrack" );
+	}
+	// invalidates all note-play-handles linked to this instrument
+	void invalidateAllMyNPH( void );
+
+
+protected slots:
+	void updateBaseNote( void );
+
+
+private:
+	midiPort * m_midiPort;
+	audioPort m_audioPort;
+
+	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
+
+	intModel m_baseNoteModel;
+
+	QList<notePlayHandle *> m_processHandles;
+
+
+	floatModel m_volumeModel;
+	surroundAreaModel m_surroundAreaModel;
+	lcdSpinBoxModel m_effectChannelModel;
+
+
+	instrument * m_instrument;
+	instrumentSoundShaping m_soundShaping;
+	arpeggiator m_arpeggiator;
+	chordCreator m_chordCreator;
+	instrumentMidiIO m_midiIO;
+
+	piano m_piano;
+
+
+	friend class instrumentTrackView;
+	friend class instrumentTrackWindow;
+	friend class notePlayHandle;
+	friend class presetPreviewPlayHandle;
+	friend class flpImport;
+
+} ;
+
+
+
+
+class instrumentTrackView : public trackView
+{
+	Q_OBJECT
+public:
+	instrumentTrackView( instrumentTrack * _it, trackContainerView * _tc );
+	virtual ~instrumentTrackView();
+
+	instrumentTrackWindow * getInstrumentTrackWindow( void )
+	{
+		return( m_window );
+	}
+
+	instrumentTrack * model( void )
+	{
+		return( castModel<instrumentTrack>() );
+	}
+
+	const instrumentTrack * model( void ) const
+	{
+		return( castModel<instrumentTrack>() );
+	}
+
+
+private slots:
+	void activityIndicatorPressed( void );
+	void activityIndicatorReleased( void );
+
+	void updateName( void );
+
+
+private:
+	instrumentTrackWindow * m_window;
+
+	// widgets in track-settings-widget
+	volumeKnob * m_tswVolumeKnob;
+	fadeButton * m_tswActivityIndicator;
+	instrumentTrackButton * m_tswInstrumentTrackButton;
+
+	QMenu * m_tswMidiMenu;
+
+
+	friend class instrumentTrackButton;
+	friend class instrumentTrackWindow;
+
+} ;
+
+
+
+
+class instrumentTrackWindow : public QWidget, public modelView,
+						public journallingObjectHook
+{
+	Q_OBJECT
+public:
+	instrumentTrackWindow( instrumentTrackView * _tv );
+	virtual ~instrumentTrackWindow();
+
+	// parent for all internal tab-widgets
+	QWidget * tabWidgetParent( void )
+	{
+		return( m_tabWidget );
+	}
+
 
 public slots:
 	void textChanged( const QString & _new_name );
 	void toggledInstrumentTrackButton( bool _on );
+	void updateName( void );
+	void updateInstrumentView( void );
 
-
-signals:
-	void noteDone( const note & _n );
+	void midiInSelected( void );
+	void midiOutSelected( void );
+	void midiConfigChanged( bool );
 
 
 protected:
@@ -185,40 +281,19 @@ protected:
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void focusInEvent( QFocusEvent * _fe );
 
-	inline virtual QString nodeName( void ) const
-	{
-		return( "instrumenttrack" );
-	}
-	// invalidates all note-play-handles linked to this instrument
-	void invalidateAllMyNPH( void );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 
 protected slots:
 	void saveSettingsBtnClicked( void );
-	void activityIndicatorPressed( void );
-	void activityIndicatorReleased( void );
-	void midiInSelected( void );
-	void midiOutSelected( void );
-	void midiConfigChanged( bool );
-
-	void updateBaseNote( void );
 
 
 private:
-	trackTypes m_trackType;
+	virtual void modelChanged( void );
 
-	midiPort * m_midiPort;
-
-	audioPort m_audioPort;
-
-
-	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
-
-
-	intModel m_baseNoteModel;
-
-	QList<notePlayHandle *> m_processHandles;
-
+	instrumentTrack * m_track;
+	instrumentTrackView * m_itv;
 
 	// widgets on the top of an instrument-track-window
 	tabWidget * m_generalSettingsWidget;
@@ -228,44 +303,23 @@ private:
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 
-	floatModel m_volumeModel;
-	surroundAreaModel m_surroundAreaModel;
-	lcdSpinBoxModel m_effectChannelModel;
-
 
 	// tab-widget with all children
 	tabWidget * m_tabWidget;
-	instrument * m_instrument;
-	envelopeTabWidget * m_envWidget;
-	arpAndChordsTabWidget * m_arpWidget;
-	midiTabWidget * m_midiWidget;
-
 	pluginView * m_instrumentView;
-	effectRackView * m_effectRack;
-
-//	effectChain m_effects;
+	instrumentSoundShapingView * m_ssView;
+	chordCreatorView * m_chordView;
+	arpeggiatorView * m_arpView;
+	instrumentMidiIOView * m_midiView;
+	effectRackView * m_effectView;
 
 	// test-piano at the bottom of every instrument-settings-window
-	pianoWidget * m_pianoWidget;
+	pianoView * m_pianoView;
 
-
-	// widgets in track-settings-widget
-	volumeKnob * m_tswVolumeKnob;
-	fadeButton * m_tswActivityIndicator;
-	instrumentTrackButton * m_tswInstrumentTrackButton;
-
-	QMenu * m_tswMidiMenu;
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
 
 	friend class instrumentTrackButton;
-	friend class notePlayHandle;
-	friend class presetPreviewPlayHandle;
-	friend class flpImport;
-
-/*	// base-tone stuff
-	void FASTCALL setBaseTone( tones _new_tone );
-	void FASTCALL setBaseOctave( octaves _new_octave );*/
 
 } ;
 
@@ -275,14 +329,14 @@ private:
 class instrumentTrackButton : public QPushButton
 {
 public:
-	instrumentTrackButton( instrumentTrack * _instrument_track );
+	instrumentTrackButton( instrumentTrackView * _instrument_track_view );
 	virtual ~instrumentTrackButton();
 
 
 protected:
 	// since we want to draw a special label (instrument- and instrument-
 	// name) on our button, we have to re-implement this for doing so
-	virtual void drawButtonLabel( QPainter * _p );
+	virtual void paintEvent( QPaintEvent * _pe );
 
 	// allow drops on this button - we simply forward them to
 	// instrument-track
@@ -291,7 +345,7 @@ protected:
 
 
 private:
-	instrumentTrack * m_instrumentTrack;
+	instrumentTrackView * m_instrumentTrackView;
 
 } ;
 

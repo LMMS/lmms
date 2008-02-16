@@ -3,7 +3,7 @@
 /*
  * journalling_object.cpp - implementation of journalling-object related stuff
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,7 +38,9 @@ journallingObject::journallingObject( void ) :
 	m_id( engine::getProjectJournal()->allocID( this ) ),
 	m_journalEntries(),
 	m_currentJournalEntry( m_journalEntries.end() ),
-	m_journalling( TRUE )
+	m_journalling( TRUE ),
+	m_journallingStateStack(),
+	m_hook( NULL )
 {
 }
 
@@ -47,6 +49,10 @@ journallingObject::journallingObject( void ) :
 
 journallingObject::~journallingObject()
 {
+	if( m_hook )
+	{
+		m_hook->m_hookedIn = NULL;
+	}
 	if( engine::getProjectJournal() )
 	{
 		engine::getProjectJournal()->freeID( id() );
@@ -120,6 +126,15 @@ void journallingObject::restoreState( const QDomElement & _this )
         }
 
 	restoreJournallingState();
+}
+
+
+
+
+void journallingObject::setHook( journallingObjectHook * _hook )
+{
+	m_hook = _hook;
+	m_hook->m_hookedIn = this;
 }
 
 

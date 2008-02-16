@@ -58,7 +58,7 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void resetWindowTitle( bool _modified = FALSE );
+	void resetWindowTitle( void );
 
 
 	// every function that replaces current file (e.g. creates new file,
@@ -157,8 +157,6 @@ private:
 
 	QMenu * m_toolsMenu;
 	QList<pluginView *> m_tools;
-
-	bool m_modified;
 
 
 	friend class engine;

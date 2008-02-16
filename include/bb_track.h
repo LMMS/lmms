@@ -2,7 +2,7 @@
  * bb_track.h - class bbTrack, a wrapper for using bbEditor
  *              (which is a singleton-class) as track
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,27 +38,51 @@ class trackContainer;
 
 class bbTCO : public trackContentObject
 {
-	Q_OBJECT
 public:
-	bbTCO( track * _track, const QColor & _c = QColor() );
+	bbTCO( track * _track, unsigned int _color = 0 );
 	virtual ~bbTCO();
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "bbtco" );
 	}
 
-	const QColor & color( void ) const
+	inline unsigned int color( void ) const
 	{
 		return( m_color );
 	}
 
+	virtual trackContentObjectView * createView( trackView * _tv );
+
+
+private:
+	QString m_name;
+	unsigned int m_color;
+
+
+	friend class bbTCOView;
+
+} ;
+
+
+
+class bbTCOView : public trackContentObjectView
+{
+	Q_OBJECT
+public:
+	bbTCOView( trackContentObject * _tco, trackView * _tv );
+	virtual ~bbTCOView();
+
+	QColor color( void ) const
+	{
+		return( m_bbTCO->m_color );
+	}
+	void setColor( QColor _new_color );
+
 
 protected slots:
-	void openInBBEditor( bool _c );
 	void openInBBEditor( void );
 	void resetName( void );
 	void changeName( void );
@@ -72,60 +96,46 @@ protected:
 
 
 private:
-	QString m_name;
-	QColor m_color;
-
-	void setColor( QColor _new_color );
+	bbTCO * m_bbTCO;
 
 } ;
 
 
 
-class bbTrack : public QObject, public track
+
+class bbTrack : public track
 {
-	Q_OBJECT
 public:
 	bbTrack( trackContainer * _tc );
 	virtual ~bbTrack();
 
-	virtual trackTypes type( void ) const;
-	virtual bool FASTCALL play( const midiTime & _start,
+	virtual bool play( const midiTime & _start,
 					const fpp_t _frames,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
-	virtual trackContentObject * FASTCALL createTCO( const midiTime &
-									_pos );
+	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackContentObject * createTCO( const midiTime & _pos );
 
-	virtual void FASTCALL saveTrackSpecificSettings( QDomDocument & _doc,
+	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
-									_this );
+	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
-	static bbTrack * FASTCALL findBBTrack( int _bb_num );
-	static int FASTCALL numOfBBTrack( track * _track );
-	static void FASTCALL swapBBTracks( track * _track1, track * _track2 );
-
-	inline nameLabel * trackLabel( void )
-	{
-		return( m_trackLabel );
-	}
+	static bbTrack * findBBTrack( int _bb_num );
+	static int numOfBBTrack( track * _track );
+	static void swapBBTracks( track * _track1, track * _track2 );
 
 	bool automationDisabled( track * _track )
 	{
-		return( m_disabled_tracks.contains( _track ) );
+		return( m_disabledTracks.contains( _track ) );
 	}
 	void disableAutomation( track * _track )
 	{
-		m_disabled_tracks.append( _track );
+		m_disabledTracks.append( _track );
 	}
 	void enableAutomation( track * _track )
 	{
-		m_disabled_tracks.removeAll( _track );
+		m_disabledTracks.removeAll( _track );
 	}
-
-
-public slots:
-	void clickedTrackLabel( void );
 
 
 protected:
@@ -136,13 +146,43 @@ protected:
 
 
 private:
-	nameLabel * m_trackLabel;
-	QList<track *> m_disabled_tracks;
+	QList<track *> m_disabledTracks;
 
 	typedef QMap<bbTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
+
+	friend class bbTrackView;
+
 } ;
+
+
+
+class bbTrackView : public trackView
+{
+	Q_OBJECT
+public:
+	bbTrackView( bbTrack * _bbt, trackContainerView * _tcv );
+	virtual ~bbTrackView();
+
+	inline nameLabel * trackLabel( void )
+	{
+		return( m_trackLabel );
+	}
+
+	virtual bool close( void );
+
+
+public slots:
+	void clickedTrackLabel( void );
+
+
+private:
+	bbTrack * m_bbTrack;
+	nameLabel * m_trackLabel;
+
+} ;
+
 
 
 #endif

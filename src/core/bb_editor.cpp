@@ -40,17 +40,280 @@
 #include "engine.h"
 #include "main_window.h"
 #include "name_label.h"
-#include "song_editor.h"
+#include "song.h"
 #include "templates.h"
 #include "tool_button.h"
 #include "tooltip.h"
 #include "track_container.h"
 
 
+bbTrackContainer::bbTrackContainer( void ) :
+	trackContainer(),
+	m_bbComboBoxModel( this )
+{
+	connect( &m_bbComboBoxModel, SIGNAL( dataChanged() ),
+			this, SLOT( currentBBChanged() ),
+			Qt::QueuedConnection );
+	// we *always* want to receive updates even in case BB actually did
+	// not change upon setCurrentBB()-call
+	connect( &m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
+			this, SLOT( currentBBChanged() ),
+			Qt::QueuedConnection );
+}
 
 
-bbEditor::bbEditor( void ) :
-	trackContainer()
+
+
+bbTrackContainer::~bbTrackContainer()
+{
+}
+
+
+
+
+bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
+							f_cnt_t _offset,
+							Sint16 _tco_num )
+{
+	bool played_a_note = FALSE;
+	if( lengthOfBB( _tco_num ) <= 0 )
+	{
+		return( played_a_note );
+	}
+
+	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) * 64 +
+							_start.getTact64th();
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
+	{
+		if( tl[i]->play( _start, _frames, _offset, _tco_num ) == TRUE )
+		{
+			played_a_note = TRUE;
+		}
+	}
+
+	return( played_a_note );
+}
+
+
+
+/*
+void bbTrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+{
+	trackContainer::saveSettings( _doc, _parent );
+}
+
+
+
+
+void bbTrackContainer::loadSettings( const QDomElement & _this )
+{
+	trackContainer::loadSettings( _this );
+}
+*/
+
+
+
+void bbTrackContainer::updateAfterTrackAdd( void )
+{
+	// make sure, new track(s) have TCOs for every beat/bassline
+	for( int i = 0; i < tMax<int>( 1, numOfBBs() ); ++i )
+	{
+		createTCOsForBB( i );
+	}
+}
+
+
+
+
+tact bbTrackContainer::lengthOfBB( int _bb )
+{
+	midiTime max_length;
+
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
+	{
+		trackContentObject * tco = tl[i]->getTCO( _bb );
+		max_length = tMax( max_length, tco->length() );
+	}
+	if( max_length.getTact64th() == 0 )
+	{
+		return( max_length.getTact() );
+	}
+
+	return( max_length.getTact() + 1 );
+}
+
+
+
+
+int bbTrackContainer::numOfBBs( void ) const
+{
+	return( engine::getSong()->countTracks( track::BBTrack ) );
+}
+
+
+
+
+void bbTrackContainer::removeBB( int _bb )
+{
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
+	{
+		delete tl[i]->getTCO( _bb );
+		tl[i]->removeTact( _bb * 64 );
+	}
+	if( _bb <= currentBB() )
+	{
+		setCurrentBB( tMax( currentBB() - 1, 0 ) );
+	}
+}
+
+
+
+
+void bbTrackContainer::swapBB( int _bb1, int _bb2 )
+{
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
+	{
+		tl[i]->swapPositionOfTCOs( _bb1, _bb2 );
+	}
+	updateComboBox();
+}
+
+
+
+
+void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
+{
+	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
+	if( t != NULL )
+	{
+		t->dataChanged();
+		//t->getTrackContentWidget()->update();
+	}
+}
+
+
+
+
+void bbTrackContainer::play( void )
+{
+	if( engine::getSong()->playing() )
+	{
+		if( engine::getSong()->playMode() != song::Mode_PlayBB )
+		{
+			engine::getSong()->stop();
+			engine::getSong()->playBB();
+		}
+		else
+		{
+			engine::getSong()->pause();
+		}
+	}
+	else if( engine::getSong()->paused() )
+	{
+		engine::getSong()->resumeFromPause();
+	}
+	else
+	{
+		engine::getSong()->playBB();
+	}
+
+}
+
+
+
+
+void bbTrackContainer::stop( void )
+{
+	engine::getSong()->stop();
+}
+
+
+
+
+void bbTrackContainer::updateComboBox( void )
+{
+	const int cur_bb = currentBB();
+
+	m_bbComboBoxModel.clear();
+
+	for( int i = 0; i < numOfBBs(); ++i )
+	{
+		bbTrack * bbt = bbTrack::findBBTrack( i );
+		m_bbComboBoxModel.addItem( bbt->name(),
+				bbt->pixmap() ? new QPixmap( *bbt->pixmap() )
+								: NULL );
+	}
+	setCurrentBB( cur_bb );
+}
+
+
+
+
+void bbTrackContainer::currentBBChanged( void )
+{
+	// first make sure, all channels have a TCO at current BB
+	createTCOsForBB( currentBB() );
+
+	// now update all track-labels (the current one has to become white,
+	// the others green)
+	for( int i = 0; i < numOfBBs(); ++i )
+	{
+		bbTrack::findBBTrack( i )->dataChanged();
+//trackLabel()->update();
+	}
+
+	//emit dataChanged();
+	//emit positionChanged( NULL );
+}
+
+
+
+
+void bbTrackContainer::createTCOsForBB( int _bb )
+{
+	if( numOfBBs() == 0 || engine::getSong()->isLoadingProject() )
+	{
+		return;
+	}
+
+	QList<track *> tl = tracks();
+	for( int i = 0; i < tl.size(); ++i )
+	{
+		while( tl[i]->numOfTCOs() < _bb + 1 )
+		{
+			midiTime position = midiTime( tl[i]->numOfTCOs(), 0 );
+			trackContentObject * tco = tl[i]->addTCO(
+						tl[i]->createTCO( position ) );
+			tco->movePosition( position );
+			tco->changeLength( midiTime( 1, 0 ) );
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bbEditor::bbEditor( bbTrackContainer * _tc ) :
+	trackContainerView( _tc ),
+	m_bbtc( _tc )
 {
 	// create toolbar
 	m_toolBar = new QWidget;
@@ -85,7 +348,7 @@ bbEditor::bbEditor( void ) :
 	toolButton * add_bb_track = new toolButton(
 					embed::getIconPixmap( "add_bb_track" ),
 						tr( "Add beat/bassline" ),
-				engine::getSongEditor(), SLOT( addBBTrack() ),
+				engine::getSong(), SLOT( addBBTrack() ),
 								m_toolBar );
 
 
@@ -102,15 +365,7 @@ bbEditor::bbEditor( void ) :
 
 	m_bbComboBox = new comboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
-
-	m_bbComboBoxModel = new comboBoxModel( /* this */ );
-	m_bbComboBox->setModel( m_bbComboBoxModel );
-	connect( m_bbComboBoxModel, SIGNAL( dataChanged() ),
-				this, SLOT( currentBBChanged() ) );
-	// we *always* want to receive updates even in case BB actually did
-	// not change upon setCurrentBB()-call
-	connect( m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
-				this, SLOT( currentBBChanged() ) );
+	m_bbComboBox->setModel( &_tc->m_bbComboBoxModel );
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
@@ -144,6 +399,12 @@ bbEditor::bbEditor( void ) :
 	}
 
 	w->show();
+
+
+	setModel( _tc );
+	connect( &_tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePosition() ),
+			Qt::QueuedConnection );
 }
 
 
@@ -156,123 +417,66 @@ bbEditor::~bbEditor()
 
 
 
-void bbEditor::currentBBChanged( void )
+void bbEditor::removeBBView( int _bb )
 {
-	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( currentBB() );
-
-	realignTracks();
-
-	// now update all track-labels (the current one has to become white,
-	// the others green)
-	for( int i = 0; i < numOfBBs(); ++i )
+	QList<trackView *> tl = trackViews();
+	for( int i = 0; i < tl.size(); ++i )
 	{
-		bbTrack::findBBTrack( i )->trackLabel()->update();
+		tl[i]->getTrackContentWidget()->removeTCOView( _bb );
 	}
-
-	emit positionChanged( NULL );
 }
 
 
 
 
-tact bbEditor::lengthOfBB( int _bb )
+void bbEditor::play( void )
 {
-	midiTime max_length;
-
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	if( engine::getSong()->playing() )
 	{
-		trackContentObject * tco = tl[i]->getTCO( _bb );
-		max_length = tMax( max_length, tco->length() );
-	}
-	if( max_length.getTact64th() == 0 )
-	{
-		return( max_length.getTact() );
-	}
-
-	return( max_length.getTact() + 1 );
-}
-
-
-
-
-bool FASTCALL bbEditor::play( midiTime _start, fpp_t _frames,
-							f_cnt_t _offset,
-							Sint16 _tco_num )
-{
-	bool played_a_note = FALSE;
-	if( lengthOfBB( _tco_num ) <= 0 )
-	{
-		return( played_a_note );
-	}
-
-	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) * 64 +
-							_start.getTact64th();
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
-	{
-		if( tl[i]->play( _start, _frames, _offset, _tco_num ) == TRUE )
+		if( engine::getSong()->playMode() != song::Mode_PlayBB )
 		{
-			played_a_note = TRUE;
+			engine::getSong()->stop();
+			engine::getSong()->playBB();
+			m_playButton->setIcon( embed::getIconPixmap(
+								"pause" ) );
+		}
+		else
+		{
+			engine::getSong()->pause();
+			m_playButton->setIcon( embed::getIconPixmap(
+								"play" ) );
 		}
 	}
+	else if( engine::getSong()->paused() )
+	{
+		engine::getSong()->resumeFromPause();
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+	}
+	else
+	{
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		engine::getSong()->playBB();
+	}
 
-	return( played_a_note );
 }
 
 
 
 
-int bbEditor::numOfBBs( void ) const
+void bbEditor::stop( void )
 {
-	return( engine::getSongEditor()->countTracks( track::BB_TRACK ) );
+	engine::getSong()->stop();
+	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+	m_playButton->update();
 }
 
 
 
 
-void bbEditor::removeBB( int _bb )
+void bbEditor::updatePosition( void )
 {
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
-	{
-		tl[i]->removeTCO( _bb );
-		tl[i]->getTrackContentWidget()->removeTact( _bb * 64 );
-	}
-	if( _bb <= currentBB() )
-	{
-		setCurrentBB( tMax( currentBB() - 1, 0 ) );
-	}
-}
-
-
-
-void bbEditor::updateBBTrack( trackContentObject * _tco )
-{
-	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
-	if( t != NULL )
-	{
-		t->getTrackContentWidget()->update();
-	}
-}
-
-
-
-
-void bbEditor::updateComboBox( void )
-{
-	const int cur_bb = currentBB();
-
-	m_bbComboBoxModel->clear();
-
-	for( int i = 0; i < numOfBBs(); ++i )
-	{
-		bbTrack * bbt = bbTrack::findBBTrack( i );
-		m_bbComboBoxModel->addItem( bbt->trackLabel()->text(),
-				new QPixmap( bbt->trackLabel()->pixmap() ) );
-	}
-	setCurrentBB( cur_bb );
+	//realignTracks();
+	emit positionChanged( m_currentPosition );
 }
 
 
@@ -282,7 +486,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
-		if( engine::getSongEditor()->playing() )
+		if( engine::getSong()->playing() )
 		{
 			stop();
 		}
@@ -293,16 +497,16 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if ( _ke->key() == Qt::Key_Plus )
 	{
-		if( currentBB()+ 1 < numOfBBs() )
+		if( m_bbtc->currentBB()+ 1 < m_bbtc->numOfBBs() )
 		{
-			setCurrentBB( currentBB() + 1 );
+			m_bbtc->setCurrentBB( m_bbtc->currentBB() + 1 );
 		}
 	}
 	else if ( _ke->key() == Qt::Key_Minus )
 	{
-		if( currentBB() > 0 )
+		if( m_bbtc->currentBB() > 0 )
 		{
-			setCurrentBB( currentBB() - 1 );
+			m_bbtc->setCurrentBB( m_bbtc->currentBB() - 1 );
 		}
 	}
 	else
@@ -313,116 +517,6 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 
 }
 
-
-
-
-void bbEditor::play( void )
-{
-	if( engine::getSongEditor()->playing() )
-	{
-		if( engine::getSongEditor()->playMode() != songEditor::PLAY_BB )
-		{
-			engine::getSongEditor()->stop();
-			engine::getSongEditor()->playBB();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-		}
-		else
-		{
-			engine::getSongEditor()->pause();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"play" ) );
-		}
-	}
-	else if( engine::getSongEditor()->paused() )
-	{
-		engine::getSongEditor()->resumeFromPause();
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-	}
-	else
-	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		engine::getSongEditor()->playBB();
-	}
-
-}
-
-
-
-
-void bbEditor::stop( void )
-{
-	engine::getSongEditor()->stop();
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	m_playButton->update();
-}
-
-
-
-
-
-
-void bbEditor::saveSettings( QDomDocument & _doc, QDomElement & _parent )
-{
-	trackContainer::saveSettings( _doc, _parent );
-}
-
-
-
-
-void bbEditor::loadSettings( const QDomElement & _this )
-{
-	trackContainer::loadSettings( _this );
-}
-
-
-
-
-void bbEditor::updateAfterTrackAdd( void )
-{
-	// make sure, new track(s) have TCOs for every beat/bassline
-	for( int i = 0; i < tMax<int>( 1, numOfBBs() ); ++i )
-	{
-		createTCOsForBB( i );
-	}
-}
-
-
-
-
-void bbEditor::createTCOsForBB( int _bb )
-{
-	if( numOfBBs() == 0 )
-	{
-		return;
-	}
-
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
-	{
-		while( tl[i]->numOfTCOs() < _bb + 1 )
-		{
-			midiTime position = midiTime( tl[i]->numOfTCOs(), 0 );
-			trackContentObject * tco = tl[i]->addTCO(
-						tl[i]->createTCO( position ) );
-			tco->movePosition( position );
-			tco->changeLength( midiTime( 1, 0 ) );
-		}
-	}
-}
-
-
-
-
-void bbEditor::swapBB( int _bb1, int _bb2 )
-{
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
-	{
-		tl[i]->swapPositionOfTCOs( _bb1, _bb2 );
-	}
-	updateComboBox();
-}
 
 
 

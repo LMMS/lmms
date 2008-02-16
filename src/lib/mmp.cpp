@@ -40,26 +40,26 @@
 
 
 multimediaProject::typeDescStruct
-		multimediaProject::s_types[multimediaProject::PROJ_TYPE_COUNT] =
+		multimediaProject::s_types[multimediaProject::NumProjectTypes] =
 {
-	{ multimediaProject::UNKNOWN, "unknown" },
-	{ multimediaProject::SONG_PROJECT, "song" },
-	{ multimediaProject::SONG_PROJECT_TEMPLATE, "songtemplate" },
+	{ multimediaProject::UnknownType, "unknown" },
+	{ multimediaProject::SongProject, "song" },
+	{ multimediaProject::SongProjectTemplate, "songtemplate" },
 #warning compat-code, use upgrade feature
-	{ multimediaProject::INSTRUMENT_TRACK_SETTINGS,
+	{ multimediaProject::InstrumentTrackSettings,
 				"instrumenttracksettings,channelsettings" },
-	{ multimediaProject::DRAG_N_DROP_DATA, "dnddata" },
-	{ multimediaProject::CLIPBOARD_DATA, "clipboard-data" },
-	{ multimediaProject::JOURNAL_DATA, "journaldata" },
-	{ multimediaProject::EFFECT_SETTINGS, "effectsettings" },
-	{ multimediaProject::VIDEO_PROJECT, "videoproject" },
-	{ multimediaProject::BURN_PROJECT, "burnproject" },
-	{ multimediaProject::PLAYLIST, "playlist" }
+	{ multimediaProject::DragNDropData, "dnddata" },
+	{ multimediaProject::ClipboardData, "clipboard-data" },
+	{ multimediaProject::JournalData, "journaldata" },
+	{ multimediaProject::EffectSettings, "effectsettings" },
+	{ multimediaProject::VideoProject, "videoproject" },
+	{ multimediaProject::BurnProject, "burnproject" },
+	{ multimediaProject::Playlist, "playlist" }
 } ;
 
 
 
-multimediaProject::multimediaProject( projectTypes _project_type ) :
+multimediaProject::multimediaProject( ProjectTypes _project_type ) :
 	QDomDocument( "multimedia-project" ),
 	m_content(),
 	m_head(),
@@ -193,7 +193,7 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 {
 	switch( type() )
 	{
-		case SONG_PROJECT:
+		case SongProject:
 			if( _fn.section( '.', -1 ) != "mmp" &&
 					_fn.section( '.', -1 ) != "mpt" &&
 					_fn.section( '.', -1 ) != "mmpz" )
@@ -206,13 +206,13 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 				return( _fn + ".mmp" );
 			}
 			break;
-		case SONG_PROJECT_TEMPLATE:
+		case SongProjectTemplate:
 			if( _fn.section( '.',-1 ) != "mpt" )
 			{
 				return( _fn + ".mpt" );
 			}
 			break;
-		case INSTRUMENT_TRACK_SETTINGS:
+		case InstrumentTrackSettings:
 			if( _fn.section( '.', -2, -1 ) != "cs.xml" )
 			{
 				return( _fn + ".cs.xml" );
@@ -228,8 +228,8 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 
 bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 {
-	if( type() == SONG_PROJECT || type() == SONG_PROJECT_TEMPLATE
-					|| type() == INSTRUMENT_TRACK_SETTINGS )
+	if( type() == SongProject || type() == SongProjectTemplate
+					|| type() == InstrumentTrackSettings )
 	{
 		cleanMetaNodes( documentElement() );
 	}
@@ -284,7 +284,7 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 
 
 
-multimediaProject::projectTypes multimediaProject::typeOfFile(
+multimediaProject::ProjectTypes multimediaProject::typeOfFile(
 							const QString & _fn )
 {
 	multimediaProject m( _fn, TRUE, FALSE );
@@ -294,10 +294,10 @@ multimediaProject::projectTypes multimediaProject::typeOfFile(
 
 
 
-multimediaProject::projectTypes multimediaProject::type(
+multimediaProject::ProjectTypes multimediaProject::type(
 						const QString & _type_name )
 {
-	for( int i = 0; i < PROJ_TYPE_COUNT; ++i )
+	for( int i = 0; i < NumProjectTypes; ++i )
 	{
 		if( s_types[i].m_name == _type_name || (
 			s_types[i].m_name.contains( "," ) && (
@@ -306,26 +306,26 @@ multimediaProject::projectTypes multimediaProject::type(
 							)
 
 		{
-			return( static_cast<multimediaProject::projectTypes>(
+			return( static_cast<multimediaProject::ProjectTypes>(
 									i ) );
 		}
 	}
-	return( UNKNOWN );
+	return( UnknownType );
 }
 
 
 
 
-QString multimediaProject::typeName( projectTypes _project_type )
+QString multimediaProject::typeName( ProjectTypes _project_type )
 {
-	if( _project_type >= UNKNOWN && _project_type < PROJ_TYPE_COUNT )
+	if( _project_type >= UnknownType && _project_type < NumProjectTypes )
 	{
 		return( s_types[_project_type].m_name
 #warning compat-code, use upgrade feature
 				.section( ',', 0, 0 )
 				);
 	}
-	return( s_types[UNKNOWN].m_name );
+	return( s_types[UnknownType].m_name );
 }
 
 
@@ -603,6 +603,20 @@ void multimediaProject::upgrade( void )
 			fxchain.setAttribute( "numofeffects",
 				rack.toElement().attribute( "numofeffects" ) );
 			fxchain.removeChild( rack );
+		}
+	}
+
+	if( version < "0.4.0-svn20080129" )
+	{
+		QDomNodeList list;
+		while( !( list =
+			elementsByTagName( "arpandchords" ) ).isEmpty() )
+		{
+			QDomElement aac = list.item( 0 ).toElement();
+			aac.setTagName( "arpeggiator" );
+			QDomNode cloned = aac.cloneNode();
+			cloned.toElement().setTagName( "chordcreator" );
+			aac.parentNode().appendChild( cloned );
 		}
 	}
 

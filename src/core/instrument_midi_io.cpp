@@ -1,10 +1,9 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * midi_tab_widget.cpp - tab-widget in channel-track-window for setting up
- *                       MIDI-related stuff
+ * instrument_midi_io.cpp - class instrumentMidiIO
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,123 +26,56 @@
 
 
 #include <Qt/QtXml>
-#include <QtGui/QMenu>
-#include <QtGui/QToolButton>
 
 
 #include "instrument_midi_io.h"
-#include "embed.h"
 #include "engine.h"
-#include "gui_templates.h"
 #include "instrument_track.h"
 #include "midi_client.h"
 #include "midi_port.h"
-#include "led_checkbox.h"
-#include "lcd_spinbox.h"
-#include "song_editor.h"
-#include "tab_widget.h"
-#include "tooltip.h"
+#include "song.h"
 #include "automatable_model_templates.h"
 
 
 
-midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
+instrumentMidiIO::instrumentMidiIO( instrumentTrack * _instrument_track,
 							midiPort * _port ) :
-	QWidget( _instrument_track->tabWidgetParent() ),
+	model( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_midiPort( _port ),
-        m_inputChannelModel(),
-        m_outputChannelModel(),
-        m_receiveEnabledModel( FALSE, FALSE, TRUE ),
-        m_sendEnabledModel( FALSE, FALSE, TRUE ),
-        m_defaultVelocityInEnabledModel( FALSE, FALSE, TRUE ),
-        m_defaultVelocityOutEnabledModel( FALSE, FALSE, TRUE ),
-	m_readablePorts( NULL ),
-	m_writeablePorts( NULL )
+        m_inputChannelModel( m_midiPort->inputChannel() + 1,
+				0, MIDI_CHANNEL_COUNT,
+				intModel::defaultRelStep(), this ),
+        m_outputChannelModel( m_midiPort->outputChannel() + 1,
+				1, MIDI_CHANNEL_COUNT,
+				intModel::defaultRelStep(), this ),
+        m_receiveEnabledModel( FALSE, this ),
+        m_sendEnabledModel( FALSE, this ),
+        m_defaultVelocityInEnabledModel( FALSE, this ),
+        m_defaultVelocityOutEnabledModel( FALSE, this )
 {
-	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
-									this );
-	m_setupTabWidget->setGeometry( 4, 5, 238, 200 );
-
 	m_inputChannelModel.setTrack( m_instrumentTrack );
-	m_inputChannelModel.setRange( 0, MIDI_CHANNEL_COUNT );
-	m_inputChannelModel.setValue( m_midiPort->inputChannel() + 1 );
+	m_outputChannelModel.setTrack( m_instrumentTrack );
+	m_receiveEnabledModel.setTrack( m_instrumentTrack );
+	m_defaultVelocityInEnabledModel.setTrack( m_instrumentTrack );
+	m_sendEnabledModel.setTrack( m_instrumentTrack );
+	m_defaultVelocityOutEnabledModel.setTrack( m_instrumentTrack );
+
 	connect( &m_inputChannelModel, SIGNAL( dataChanged() ),
 				this, SLOT( inputChannelChanged() ) );
-
-	m_inputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget,
-							tr( "Input channel" ) );
-	m_inputChannelSpinBox->setModel( &m_inputChannelModel );
-	m_inputChannelSpinBox->addTextForValue( 0, "---" );
-	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_inputChannelSpinBox->move( 28, 52 );
-	m_inputChannelSpinBox->setEnabled( FALSE );
-	inputChannelChanged();
-
-
-
-	m_outputChannelModel.setTrack( m_instrumentTrack );
-	m_outputChannelModel.setRange( 1, MIDI_CHANNEL_COUNT );
-	m_outputChannelModel.setValue( m_midiPort->outputChannel() + 1 );
 	connect( &m_outputChannelModel, SIGNAL( dataChanged() ),
 				this, SLOT( outputChannelChanged() ) );
-
-	m_outputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget,
-						tr( "Output channel" ) );
-	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->move( 28, 132 );
-	m_outputChannelSpinBox->setEnabled( FALSE );
-	outputChannelChanged();
-
-
-	m_receiveEnabledModel.setTrack( m_instrumentTrack );
-	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
-						m_setupTabWidget,
-						tr( "Receive MIDI-events" ) );
-	m_receiveCheckBox->setModel( &m_receiveEnabledModel );
-	m_receiveCheckBox->move( 10, 34 );
-	// enabling/disabling widgets is UI-stuff thus we do not use model here
-	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
-			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 	connect( &m_receiveEnabledModel, SIGNAL( dataChanged() ),
-					this, SLOT( midiPortModeChanged() ) );
-
-
-	m_defaultVelocityInEnabledModel.setTrack( m_instrumentTrack );
-	m_defaultVelocityInCheckBox = new ledCheckBox( tr( "Default velocity "
-						"for all input-events" ),
-						m_setupTabWidget,
-						tr( "Default input velocity" ) );
-	m_defaultVelocityInCheckBox->setModel(
-					&m_defaultVelocityInEnabledModel );
-	m_defaultVelocityInCheckBox->move( 28, 84 );
+				this, SLOT( midiPortModeChanged() ) );
 	connect( &m_defaultVelocityInEnabledModel, SIGNAL( dataChanged() ),
-					this, SLOT( defaultVelInChanged() ) );
-
-
-	m_sendEnabledModel.setTrack( m_instrumentTrack );
-	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
-						m_setupTabWidget,
-						tr( "Send MIDI-events" ) );
-	m_sendCheckBox->setModel( &m_sendEnabledModel );
-	m_sendCheckBox->move( 10, 114 );
-	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
-			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
+				this, SLOT( defaultVelInChanged() ) );
 	connect( &m_sendEnabledModel, SIGNAL( dataChanged() ),
-					this, SLOT( midiPortModeChanged() ) );
-
-
-	m_defaultVelocityOutEnabledModel.setTrack( m_instrumentTrack );
-	m_defaultVelocityOutCheckBox = new ledCheckBox( tr( "Default velocity "
-						"for all output-events" ),
-						m_setupTabWidget,
-						tr( "Default output velocity" ) );
-	m_defaultVelocityOutCheckBox->setModel(
-					&m_defaultVelocityOutEnabledModel );
-	m_defaultVelocityOutCheckBox->move( 28, 164 );
+				this, SLOT( midiPortModeChanged() ) );
 	connect( &m_defaultVelocityOutEnabledModel, SIGNAL( dataChanged() ),
 				this, SLOT( defaultVelOutChanged() ) );
 
+	inputChannelChanged();
+	outputChannelChanged();
 
 
 	const midiPort::modes m = m_midiPort->mode();
@@ -157,37 +89,8 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 	midiClient * mc = engine::getMixer()->getMIDIClient();
 	if( mc->isRaw() == FALSE )
 	{
-		m_readablePorts = new QMenu( m_setupTabWidget );
-		m_readablePorts->setFont( pointSize<9>(
-						m_readablePorts->font() ) );
-		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( activatedReadablePort( QAction * ) ) );
-
-		m_writeablePorts = new QMenu( m_setupTabWidget );
-		m_writeablePorts->setFont( pointSize<9>(
-						m_writeablePorts->font() ) );
-		connect( m_writeablePorts, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( activatedWriteablePort( QAction * ) ) );
-
-		// fill menus
 		readablePortsChanged();
 		writeablePortsChanged();
-
-		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
-		rp_btn->setText( tr( "MIDI-devices to receive "
-						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		rp_btn->setGeometry( 186, 34, 40, 40 );
-		rp_btn->setMenu( m_readablePorts );
-		rp_btn->setPopupMode( QToolButton::InstantPopup );
-
-		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
-		wp_btn->setText( tr( "MIDI-devices to send MIDI-events "
-								"to" ) );
-		wp_btn->setIcon( embed::getIconPixmap( "midi_out" ) );
-		wp_btn->setGeometry( 186, 114, 40, 40 );
-		wp_btn->setMenu( m_writeablePorts );
-		wp_btn->setPopupMode( QToolButton::InstantPopup );
 
 		// we want to get informed about port-changes!
 		mc->connectRPChanged( this, SLOT( readablePortsChanged() ) );
@@ -198,14 +101,14 @@ midiTabWidget::midiTabWidget( instrumentTrack * _instrument_track,
 
 
 
-midiTabWidget::~midiTabWidget()
+instrumentMidiIO::~instrumentMidiIO()
 {
 }
 
 
 
 
-void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void instrumentMidiIO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_inputChannelModel.saveSettings( _doc, _this, "inputchannel" );
 	m_outputChannelModel.saveSettings( _doc, _this, "outputchannel" );
@@ -214,17 +117,15 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_defaultVelocityInEnabledModel.saveSettings( _doc, _this, "defvelin" );
 	m_defaultVelocityOutEnabledModel.saveSettings( _doc, _this, "defvelout" );
 
-	if( m_readablePorts != NULL && m_receiveEnabledModel.value() == TRUE )
+	if( m_receiveEnabledModel.value() == TRUE )
 	{
-		// TODO: M/V-split!
 		QString rp;
-		QList<QAction *> actions = m_readablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_readablePorts.begin();
+					it != m_readablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() )
+			if( it->second )
 			{
-				rp += ( *it )->text() + ",";
+				rp += it->first + ",";
 			}
 		}
 		// cut off comma
@@ -235,17 +136,15 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "inports", rp );
 	}
 
-	if( m_writeablePorts != NULL && m_sendEnabledModel.value() == TRUE )
+	if( m_sendEnabledModel.value() == TRUE )
 	{
-		// TODO: M/V-split!
 		QString wp;
-		QList<QAction *> actions = m_writeablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_writeablePorts.begin();
+					it != m_writeablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() )
+			if( it->second )
 			{
-				wp += ( *it )->text() + ",";
+				wp += it->first + ",";
 			}
 		}
 		// cut off comma
@@ -260,7 +159,7 @@ void midiTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void midiTabWidget::loadSettings( const QDomElement & _this )
+void instrumentMidiIO::loadSettings( const QDomElement & _this )
 {
 	m_inputChannelModel.loadSettings( _this, "inputchannel" );
 	m_outputChannelModel.loadSettings( _this, "outputchannel" );
@@ -271,35 +170,29 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 
 	// restore connections
 
-	if( m_readablePorts != NULL && m_receiveEnabledModel.value() == TRUE )
+	if( m_receiveEnabledModel.value() == TRUE )
 	{
-		// TODO: M/V-split!
 		QStringList rp = _this.attribute( "inports" ).split( ',' );
-		QList<QAction *> actions = m_readablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_readablePorts.begin();
+					it != m_readablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() !=
-				( rp.indexOf( ( *it )->text() ) != -1 ) )
+			if( it->second != ( rp.indexOf( it->first ) != -1 ) )
 			{
-				( *it )->setChecked( TRUE );
+				it->second = TRUE;
 				activatedReadablePort( *it );
 			}
 		}
 	}
 
-	if( m_writeablePorts != NULL && m_sendEnabledModel.value() == TRUE )
+	if( m_sendEnabledModel.value() == TRUE )
 	{
-		// TODO: M/V-split!
 		QStringList wp = _this.attribute( "outports" ).split( ',' );
-		QList<QAction *> actions = m_writeablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_writeablePorts.begin();
+					it != m_writeablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() !=
-				( wp.indexOf( ( *it )->text() ) != -1 ) )
+			if( it->second != ( wp.indexOf( it->first ) != -1 ) )
 			{
-				( *it )->setChecked( TRUE );
+				it->second = TRUE;
 				activatedWriteablePort( *it );
 			}
 		}
@@ -309,25 +202,25 @@ void midiTabWidget::loadSettings( const QDomElement & _this )
 
 
 
-void midiTabWidget::inputChannelChanged( void )
+void instrumentMidiIO::inputChannelChanged( void )
 {
 	m_midiPort->setInputChannel( m_inputChannelModel.value() - 1 );
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
 
 
-void midiTabWidget::outputChannelChanged( void )
+void instrumentMidiIO::outputChannelChanged( void )
 {
 	m_midiPort->setOutputChannel( m_outputChannelModel.value() - 1 );
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
 
 
-void midiTabWidget::defaultVelInChanged( void )
+void instrumentMidiIO::defaultVelInChanged( void )
 {
 	m_midiPort->enableDefaultVelocityForInEvents(
 				m_defaultVelocityInEnabledModel.value() );
@@ -336,7 +229,7 @@ void midiTabWidget::defaultVelInChanged( void )
 
 
 
-void midiTabWidget::defaultVelOutChanged( void )
+void instrumentMidiIO::defaultVelOutChanged( void )
 {
 	m_midiPort->enableDefaultVelocityForOutEvents(
 				m_defaultVelocityOutEnabledModel.value() );
@@ -345,7 +238,7 @@ void midiTabWidget::defaultVelOutChanged( void )
 
 
 
-void midiTabWidget::midiPortModeChanged( void )
+void instrumentMidiIO::midiPortModeChanged( void )
 {
 	// this small lookup-table makes everything easier
 	static const midiPort::modes modeTable[2][2] =
@@ -357,130 +250,122 @@ void midiTabWidget::midiPortModeChanged( void )
 					[m_sendEnabledModel.value()] );
 
 	// check whether we have to dis-check items in connection-menu
-	if( m_readablePorts != NULL && m_receiveEnabledModel.value() == FALSE )
+	if( m_receiveEnabledModel.value() == FALSE )
 	{
-		QList<QAction *> actions = m_readablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_readablePorts.begin();
+					it != m_readablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() == TRUE )
+			if( it->second == TRUE )
 			{
-				( *it )->setChecked( FALSE );
+				it->second = FALSE;
 				activatedReadablePort( *it );
 			}
 		}
 	}
 
-	if( m_writeablePorts != NULL && m_sendEnabledModel.value() == FALSE )
+	if( m_sendEnabledModel.value() == FALSE )
 	{
-		QList<QAction *> actions = m_writeablePorts->actions();
-		for( QList<QAction *>::iterator it = actions.begin();
-						it != actions.end(); ++it )
+		for( midiPortMap::iterator it = m_writeablePorts.begin();
+					it != m_writeablePorts.end(); ++it )
 		{
-			if( ( *it )->isChecked() == TRUE )
+			if( it->second == TRUE )
 			{
-				( *it )->setChecked( FALSE );
+				it->second = FALSE;
 				activatedWriteablePort( *it );
 			}
 		}
 	}
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
 
 
-void midiTabWidget::readablePortsChanged( void )
+void instrumentMidiIO::readablePortsChanged( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
-	QList<QAction *> actions = m_readablePorts->actions();
-	for( QList<QAction *>::iterator it = actions.begin();
-					it != actions.end(); ++it )
+	for( midiPortMap::iterator it = m_readablePorts.begin();
+					it != m_readablePorts.end(); ++it )
 	{
-		if( ( *it )->isChecked() == TRUE )
+		if( it->second == TRUE )
 		{
-			selected_ports.push_back( ( *it )->text() );
+			selected_ports.push_back( it->first );
 		}
 	}
 
-	m_readablePorts->clear();
-	const QStringList & rp = engine::getMixer()->getMIDIClient()->
+	m_readablePorts.clear();
+	const QStringList & wp = engine::getMixer()->getMIDIClient()->
 								readablePorts();
 	// now insert new ports and restore selections
-	for( QStringList::const_iterator it = rp.begin(); it != rp.end(); ++it )
+	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
 	{
-		QAction * item = m_readablePorts->addAction( *it );
-		item->setCheckable( TRUE );
-		if( selected_ports.indexOf( *it ) != -1 )
-		{
-			item->setChecked( TRUE );
-		}
+		m_readablePorts.push_back( qMakePair( *it,
+					selected_ports.indexOf( *it ) != -1 ) );
 	}
+	emit dataChanged();
 }
 
 
 
 
-void midiTabWidget::writeablePortsChanged( void )
+void instrumentMidiIO::writeablePortsChanged( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
-	QList<QAction *> actions = m_writeablePorts->actions();
-	for( QList<QAction *>::iterator it = actions.begin();
-					it != actions.end(); ++it )
+	for( midiPortMap::iterator it = m_writeablePorts.begin();
+					it != m_writeablePorts.end(); ++it )
 	{
-		if( ( *it )->isChecked() == TRUE )
+		if( it->second == TRUE )
 		{
-			selected_ports.push_back( ( *it )->text() );
+			selected_ports.push_back( it->first );
 		}
 	}
 
-	m_writeablePorts->clear();
+	m_writeablePorts.clear();
 	const QStringList & wp = engine::getMixer()->getMIDIClient()->
 							writeablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
 	{
-		QAction * item = m_writeablePorts->addAction( *it );
-		item->setCheckable( TRUE );
-		if( selected_ports.indexOf( *it ) != -1 )
-		{
-			item->setChecked( TRUE );
-		}
+		m_writeablePorts.push_back( qMakePair( *it,
+					selected_ports.indexOf( *it ) != -1 ) );
 	}
+	emit dataChanged();
 }
 
 
 
 
-void midiTabWidget::activatedReadablePort( QAction * _item )
+void instrumentMidiIO::activatedReadablePort(
+					const descriptiveMidiPort & _port )
 {
 	// make sure, MIDI-port is configured for input
-	if( _item->isChecked() == TRUE &&
+	if( _port.second == TRUE &&
 		m_midiPort->mode() != midiPort::INPUT &&
 		m_midiPort->mode() != midiPort::DUPLEX )
 	{
 		m_receiveEnabledModel.setValue( TRUE );
 	}
 	engine::getMixer()->getMIDIClient()->subscribeReadablePort( m_midiPort,
-				_item->text(), !_item->isChecked() );
+						_port.first, !_port.second );
 }
 
 
 
 
-void midiTabWidget::activatedWriteablePort( QAction * _item )
+void instrumentMidiIO::activatedWriteablePort(
+					const descriptiveMidiPort & _port )
 {
 	// make sure, MIDI-port is configured for output
-	if( _item->isChecked() == TRUE &&
+	if( _port.second == TRUE &&
 		m_midiPort->mode() != midiPort::OUTPUT &&
 		m_midiPort->mode() != midiPort::DUPLEX )
 	{
 		m_sendEnabledModel.setValue( TRUE );
 	}
 	engine::getMixer()->getMIDIClient()->subscribeWriteablePort( m_midiPort,
-				_item->text(), !_item->isChecked() );
+						_port.first, !_port.second );
 }
 
 

@@ -173,13 +173,18 @@ public:
 								text( 0 ) );
 	}
 
-	enum fileTypes
+	enum FileTypes
 	{
-		PROJECT_FILE, PRESET_FILE, SAMPLE_FILE, MIDI_FILE, FLP_FILE,
-		UNKNOWN
+		ProjectFile,
+		PresetFile,
+		SampleFile,
+		MidiFile,
+		FlpFile,
+		UnknownFile,
+		NumFileTypes
 	} ;
 	
-	inline fileTypes type( void )
+	inline FileTypes type( void )
 	{
 		return( m_type );
 	}
@@ -200,7 +205,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 	
 	QString m_path;
-	fileTypes m_type;
+	FileTypes m_type;
 } ;
 
 

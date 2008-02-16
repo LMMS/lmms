@@ -1,7 +1,7 @@
 /*
- * mv_base.cpp - base for M/V-architecture of LMMS
+ * instrument_sound_shaping_view.h - view for instrumentSoundShaping-class
  *
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,43 +22,42 @@
  *
  */
 
-#include <assert.h>
+
+#ifndef _INSTRUMENT_SOUND_SHAPING_VIEW_H
+#define _INSTRUMENT_SOUND_SHAPING_VIEW_H
 
 #include <QtGui/QWidget>
 
+#include "instrument_sound_shaping.h"
 
-#include "mv_base.h"
+class envelopeAndLFOView;
+class comboBox;
+class groupBox;
+class knob;
+class tabWidget;
 
 
-void modelView::setModel( model * _model, bool _old_model_valid )
+class instrumentSoundShapingView : public QWidget, public modelView
 {
-	QWidget * w = dynamic_cast<QWidget *>( this );
-	assert( w != NULL );
-
-//printf("w: %x   m_model:%x  _model:%x\n", w, m_model, _model);
-	if( _old_model_valid && m_model != NULL )
-	{
-		if( m_model->defaultConstructed() )
-		{
-			delete m_model;
-		}
-		else
-		{
-			m_model->disconnect( w );
-		}
-	}
-	m_model = _model;
-	QObject::connect( _model, SIGNAL( dataChanged() ),
-						w, SLOT( update() ) );
-	QObject::connect( _model, SIGNAL( propertiesChanged() ),
-						w, SLOT( update() ) );
-
-	w->update();
-
-	modelChanged();
-}
+public:
+	instrumentSoundShapingView( QWidget * _parent );
+	virtual ~instrumentSoundShapingView();
 
 
+private:
+	virtual void modelChanged( void );
 
-#include "mv_base.moc"
 
+	instrumentSoundShaping * m_ss;
+	tabWidget * m_targetsTabWidget;
+	envelopeAndLFOView * m_envLFOViews[instrumentSoundShaping::NumTargets];
+
+	// filter-stuff
+	groupBox * m_filterGroupBox;
+	comboBox * m_filterComboBox;
+	knob * m_filterCutKnob;
+	knob * m_filterResKnob;
+
+} ;
+
+#endif

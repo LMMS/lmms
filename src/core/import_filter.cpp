@@ -31,6 +31,7 @@
 #include "engine.h"
 #include "track_container.h"
 #include "project_journal.h"
+#include "automatable_model_templates.h"
 
 
 

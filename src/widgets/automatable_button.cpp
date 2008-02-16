@@ -176,9 +176,10 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 automatableButtonGroup::~automatableButtonGroup()
 {
-	while( m_buttons.empty() == FALSE )
+	for( QList<automatableButton *>::iterator it = m_buttons.begin();
+					it != m_buttons.end(); ++it )
 	{
-		removeButton( m_buttons.front() );
+		( *it )->m_group = NULL;
 	}
 }
 

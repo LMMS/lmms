@@ -2,7 +2,7 @@
  * name_label.h - class nameLabel, a label which is renamable by
  *                double-clicking it
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,7 +58,6 @@ public slots:
 
 signals:
 	void clicked( void );
-	void nameChanged( void );
 	void nameChanged( const QString & _new_name );
 	void pixmapChanged( void );
 

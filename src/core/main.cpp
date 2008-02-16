@@ -41,7 +41,7 @@
 #include "engine.h"
 #include "config_mgr.h"
 #include "export_project_dialog.h"
-#include "song_editor.h"
+#include "song.h"
 #include "gui_templates.h"
 #include "automatable_model_templates.h"
 
@@ -200,11 +200,11 @@ int main( int argc, char * * argv )
 	// we try to load given file
 	if( file_to_load != "" )
 	{
-		engine::getSongEditor()->loadProject( file_to_load );
+		engine::getSong()->loadProject( file_to_load );
 	}
 	else
 	{
-		engine::getSongEditor()->createNewProject();
+		engine::getSong()->createNewProject();
 	}
 
 	// MDI-mode?

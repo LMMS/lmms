@@ -1,9 +1,7 @@
 /*
- * envelope_tab_widget.h - declaration of class envelopeTabWidget which
- *                         provides UI- and DSP-code for using envelopes, LFOs
- *                         and a filter
+ * instrument_sound_shaping.h - class instrumentSoundShaping
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,58 +23,44 @@
  */
 
 
-#ifndef _ENVELOPE_TAB_WIDGET_H
-#define _ENVELOPE_TAB_WIDGET_H
-
-#include <QtGui/QWidget>
+#ifndef _INSTRUMENT_SOUND_SHAPING_H
+#define _INSTRUMENT_SOUND_SHAPING_H
 
 #include "mixer.h"
 #include "automatable_model.h"
+#include "combobox.h"
 
 
-class QLabel;
-
-class comboBoxModel;
 class instrumentTrack;
-class comboBox;
-class envelopeAndLFOWidget;
-class groupBox;
-class knob;
+class envelopeAndLFOParameters;
 class notePlayHandle;
-class pixmapButton;
-class tabWidget;
 
 
-class envelopeTabWidget : public QWidget, public journallingObject
+class instrumentSoundShaping : public model, public journallingObject
 {
-	Q_OBJECT
 public:
-	envelopeTabWidget( instrumentTrack * _channel_track );
-	virtual ~envelopeTabWidget();
+	instrumentSoundShaping( instrumentTrack * _instrument_track );
+	virtual ~instrumentSoundShaping();
 
-	void FASTCALL processAudioBuffer( sampleFrame * _ab,
-							const fpp_t _frames,
+	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							notePlayHandle * _n );
 
-	enum targets
+	enum Targets
 	{
-		VOLUME,
-/*		PANNING,
-		PITCH,*/
-		CUT,
-		RES,
-		TARGET_COUNT
+		Volume,
+		Cut,
+		Resonance,
+		NumTargets
 	} ;
 
-	f_cnt_t envFrames( const bool _only_vol = FALSE );
-	f_cnt_t releaseFrames( const bool _only_vol = FALSE );
+	f_cnt_t envFrames( const bool _only_vol = FALSE ) const;
+	f_cnt_t releaseFrames( const bool _only_vol = FALSE ) const;
 
-	float FASTCALL volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
+	float volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "eldata" );
@@ -84,23 +68,21 @@ public:
 
 
 private:
-	tabWidget * m_targetsTabWidget;
-	envelopeAndLFOWidget * m_envLFOWidgets[TARGET_COUNT];
+	envelopeAndLFOParameters * m_envLFOParameters[NumTargets];
 	instrumentTrack * m_instrumentTrack;
 
-	// filter-stuff
-	groupBox * m_filterGroupBox;
-	comboBox * m_filterComboBox;
-	knob * m_filterCutKnob;
-	knob * m_filterResKnob;
+	boolModel m_filterEnabledModel;
+	comboBoxModel m_filterModel;
+	floatModel m_filterCutModel;
+	floatModel m_filterResModel;
 
-	boolModel * m_filterEnabledModel;
-	comboBoxModel * m_filterModel;
-	floatModel * m_filterCutModel;
-	floatModel * m_filterResModel;
 
-	friend class flpImport;
+	friend class instrumentSoundShapingView;
 
 } ;
+
+
+extern const QString __targetNames[instrumentSoundShaping::NumTargets][2];
+
 
 #endif

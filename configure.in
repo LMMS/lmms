@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080114-mv, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080114-mv)
+AC_INIT(lmms, 0.4.0-svn20080215-mv, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080215-mv)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -574,7 +574,7 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Wunsafe-loop-optimizations -Wdisabled-optimization"
+EXTRA_WARNINGS="-Wno-unused-parameter -Wunsafe-loop-optimizations -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
 	CXXFLAGS="-ansi -Wall $EXTRA_WARNINGS $CXXFLAGS -fno-exceptions"
 fi

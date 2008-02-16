@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,12 +56,13 @@ class pattern : public trackContentObject
 {
 	Q_OBJECT
 public:
-	enum patternTypes
+	enum PatternTypes
 	{
-		BEAT_PATTERN, MELODY_PATTERN/*, AUTOMATION_PATTERN*/
+		BeatPattern,
+		MelodyPattern
 	} ;
 
-	pattern( instrumentTrack * _channel_track );
+	pattern( instrumentTrack * _instrument_track );
 	pattern( const pattern & _pat_to_copy );
 	virtual ~pattern();
 
@@ -70,13 +71,12 @@ public:
 
 	virtual midiTime length( void ) const;
 
-	note * FASTCALL addNote( const note & _new_note,
-					const bool _quant_pos = TRUE );
+	note * addNote( const note & _new_note, const bool _quant_pos = TRUE );
 
-	void FASTCALL removeNote( const note * _note_to_del );
+	void removeNote( const note * _note_to_del );
 
-	note * FASTCALL rearrangeNote( const note * _note_to_proc,
-					const bool _quant_pos = TRUE );
+	note * rearrangeNote( const note * _note_to_proc,
+						const bool _quant_pos = TRUE );
 
 	void clearNotes( void );
 	
@@ -86,11 +86,11 @@ public:
 	}
 
 	// pattern-type stuff
-	inline patternTypes type( void ) const
+	inline PatternTypes type( void ) const
 	{
 		return( m_patternType );
 	}
-	void FASTCALL setType( patternTypes _new_pattern_type );
+	void setType( PatternTypes _new_pattern_type );
 	void checkType( void );
 
 
@@ -103,7 +103,7 @@ public:
 	inline void setName( const QString & _name )
 	{
 		m_name = _name;
-		update();
+		emit dataChanged();
 	}
 
 
@@ -124,9 +124,8 @@ public:
 	}
 
 	// settings-management
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "pattern" );
@@ -140,57 +139,32 @@ public:
 	bool empty( void );
 
 
-public slots:
-	virtual void update( void );
-
-
-protected slots:
-	void openInPianoRoll( bool _c );
-	void openInPianoRoll( void );
-
-	void clear( void );
-	void resetName( void );
-	void changeName( void );
-	void freeze( void );
-	void unfreeze( void );
-	void abortFreeze( void );
-
-	void addSteps( QAction * _item );
-	void removeSteps( QAction * _item );
 	void addSteps( int _n );
 	void removeSteps( int _n );
 
+	virtual trackContentObjectView * createView( trackView * _tv );
+
+
+	using model::dataChanged;
+
 
 protected:
-	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re )
-	{
-		m_needsUpdate = TRUE;
-		trackContentObject::resizeEvent( _re );
-	}
-	virtual void wheelEvent( QWheelEvent * _we );
-
 	void ensureBeatNotes( void );
 	void updateBBTrack( void );
 
+	void abortFreeze( void );
+
+
+protected slots:
+	void clear( void );
+	void freeze( void );
+	void unfreeze( void );
+
 
 private:
-	static QPixmap * s_stepBtnOn;
-	static QPixmap * s_stepBtnOverlay;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
-	static QPixmap * s_frozen;
-
-	QPixmap m_paintPixmap;
-	bool m_needsUpdate;
-
-	// general stuff
 	instrumentTrack * m_instrumentTrack;
 
-	patternTypes m_patternType;
+	PatternTypes m_patternType;
 	QString m_name;
 
 	// data-stuff
@@ -203,15 +177,67 @@ private:
 	volatile bool m_freezeAborted;
 
 
-	// as in Qt4 QThread is inherits from QObject and our base
-	// trackContentObject is a QWidget (=QObject), we cannot inherit from
-	// QThread. That's why we have to put pattern-freezing into separate
-	// thread-class -> patternFreezeThread
+	friend class patternView;
 	friend class patternFreezeThread;
 
 } ;
 
 
+
+class patternView : public trackContentObjectView
+{
+	Q_OBJECT
+public:
+	patternView( pattern * _pattern, trackView * _parent );
+	virtual ~patternView();
+
+
+public slots:
+	virtual void update( void );
+
+
+protected slots:
+	void openInPianoRoll( bool _c );
+	void openInPianoRoll( void );
+
+	void resetName( void );
+	void changeName( void );
+
+	void addSteps( QAction * _item );
+	void removeSteps( QAction * _item );
+
+
+protected:
+	virtual void constructContextMenu( QMenu * );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re )
+	{
+		m_needsUpdate = TRUE;
+		trackContentObjectView::resizeEvent( _re );
+	}
+	virtual void wheelEvent( QWheelEvent * _we );
+
+
+private:
+	static QPixmap * s_stepBtnOn;
+	static QPixmap * s_stepBtnOverlay;
+	static QPixmap * s_stepBtnOff;
+	static QPixmap * s_stepBtnOffLight;
+	static QPixmap * s_frozen;
+
+	pattern * m_pat;
+	QPixmap m_paintPixmap;
+	bool m_needsUpdate;
+
+} ;
+
+
+
+
+// TODO: move to own header-files
+//
 
 
 class patternFreezeStatusDialog : public QDialog
@@ -219,9 +245,9 @@ class patternFreezeStatusDialog : public QDialog
 	Q_OBJECT
 public:
 	patternFreezeStatusDialog( QThread * _thread );
-	~patternFreezeStatusDialog();
+	virtual ~patternFreezeStatusDialog();
 
-	void FASTCALL setProgress( int _p );
+	void setProgress( int _p );
 
 
 protected:

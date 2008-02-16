@@ -4,7 +4,7 @@
  * automation_pattern.cpp - implementation of class automationPattern which
  *                          holds dynamic values
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 
 #include "automation_pattern.h"
 #include "automation_editor.h"
+#include "automatable_model_templates.h"
 #include "engine.h"
 #include "level_object.h"
 #include "note.h"

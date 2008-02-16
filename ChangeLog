@@ -1,4 +1,93 @@
+2008-02-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/Makefile.am:
+	* include/mmp.h:
+	* include/instrument_midi_io_view.h:
+	* include/track.h:
+	* include/engine.h:
+	* include/name_label.h:
+	* include/instrument_track.h:
+	* include/instrument_functions.h:
+	* include/piano_widget.h:
+	* include/song.h:
+	* include/pattern.h:
+	* include/file_browser.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/envelope_and_lfo_view.h:
+	* include/instrument_sound_shaping.h:
+	* include/instrument_function_views.h:
+	* include/instrument_midi_io.h:
+	* include/bb_track.h:
+	* include/song_editor.h:
+	* include/dummy_instrument.h:
+	* include/journalling_object.h:
+	* include/sample_track.h:
+	* include/timeline.h:
+	* include/main_window.h:
+	* include/mv_base.h:
+	* include/bb_editor.h:
+	* include/arp_and_chords_tab_widget.h:
+	* include/automation_track.h:
+	* include/track_container.h:
+	* include/instrument_sound_shaping_view.h:
+	* configure.in:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/mmp.cpp:
+	* src/lib/journalling_object.cpp:
+	* src/widgets/instrument_sound_shaping_view.cpp:
+	* src/widgets/envelope_and_lfo_view.cpp:
+	* src/widgets/instrument_function_views.cpp:
+	* src/widgets/instrument_midi_io_view.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/effect_rack_view.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/song.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mixer.cpp:
+	* src/core/main.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/track.cpp:
+	* src/core/engine.cpp:
+	* src/core/timeline.cpp:
+	* src/core/instrument.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/mv_base.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/name_label.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* Makefile.am:
+	finally splitted rest of LMMS, i.e. tracks, track-containers,
+	track-content-objects, whole instrument-track/instrument-track-window
+	and so on - still a bit unstable but I'm sure we'll manage to get this
+	one very stable!
+
+	diffstat says:
+	    79 files changed, 8019 insertions(+), 6226 deletions(-)
+
 2008-02-01	Danny McRae <khjklujn/at/yahoo/dot/com>
+
 	* Makefile.am:
 	* src/tracks/instrument_track.cpp:
 	* src/core/note_play_handle.cpp:
@@ -209,6 +298,7 @@
 	Makefile.am in plugins/stk to get them to build.
 	
 2007-01-30	Paul Giblock <pgllama/at/gmail/dot/com>
+
 	* plugins/organic/organic.cpp:
 	* plugins/organic/organic.h:
 	Began split on Organic. But doesn't show in instrument list
@@ -217,6 +307,7 @@
 	Fixed comments
 
 2008-01-28	Paul Giblock <pgllama/at/gmail/dot/com>
+
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
 	finished LB302 M/V-split. however, more changes can be made to meet

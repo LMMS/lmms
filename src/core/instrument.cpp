@@ -82,7 +82,7 @@ f_cnt_t instrument::beatLen( notePlayHandle * ) const
 instrument * instrument::instantiate( const QString & _plugin_name,
 					instrumentTrack * _instrument_track )
 {
-	plugin * p = plugin::instantiate( _plugin_name, /*_instrument_track*/ NULL,
+	plugin * p = plugin::instantiate( _plugin_name, _instrument_track,
 							_instrument_track );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<instrument *>( p ) != NULL )
@@ -155,9 +155,10 @@ void instrumentView::setModel( ::model * _model, bool )
 	if( dynamic_cast<instrument *>( _model ) != NULL )
 	{
 		modelView::setModel( _model );
-		if( dynamic_cast<instrumentTrack *>( parentWidget() ) != NULL )
+		if( dynamic_cast<instrumentTrackView *>( parentWidget() ) !=
+									NULL )
 		{
-			dynamic_cast<instrumentTrack *>( parentWidget() )->
+			dynamic_cast<instrumentTrackView *>( parentWidget() )->
 				setWindowIcon( *( model()->
 						getDescriptor()->logo ) );
 		}

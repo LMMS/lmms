@@ -35,7 +35,7 @@
 
 
 #include "export_project_dialog.h"
-#include "song_editor.h"
+#include "song.h"
 #include "main_window.h"
 #include "combobox.h"
 #include "led_checkbox.h"
@@ -243,7 +243,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 {
 	if( _ke->key() == Qt::Key_Escape )
 	{
-		if( engine::getSongEditor()->exporting() == FALSE )
+		if( engine::getSong()->exporting() == FALSE )
 		{
 			accept();
 		}
@@ -259,7 +259,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( engine::getSongEditor()->exporting() == TRUE )
+	if( engine::getSong()->exporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
@@ -359,21 +359,20 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 	engine::getMixer()->setAudioDevice( dev, m_hqmCb->model()->value() );
-	engine::getSongEditor()->startExport();
+	engine::getSong()->startExport();
 
 	delete m_hqmCb;
 
-	songEditor::playPos & pp = engine::getSongEditor()->getPlayPos(
-							songEditor::PLAY_SONG );
+	song::playPos & pp = engine::getSong()->getPlayPos(
+							song::Mode_PlaySong );
 
-	while( engine::getSongEditor()->exportDone() == FALSE &&
-				engine::getSongEditor()->exporting() == TRUE
+	while( engine::getSong()->exportDone() == FALSE &&
+				engine::getSong()->exporting() == TRUE
 							&& !m_deleteFile )
 	{
 		dev->processNextBuffer();
 		int pval = pp * 100 /
-			( ( engine::getSongEditor()->lengthInTacts() + 1 )
-									* 64 );
+			( ( engine::getSong()->lengthInTacts() + 1 ) * 64 );
 		m_exportProgressBar->setValue( pval );
 		// update lmms-main-win-caption
 		engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
@@ -391,7 +390,7 @@ void exportProjectDialog::exportBtnClicked( void )
 void exportProjectDialog::cancelBtnClicked( void )
 {
 	// is song-export-thread active?
-	if( engine::getSongEditor()->exporting() == TRUE )
+	if( engine::getSong()->exporting() == TRUE )
 	{
 		// then dispose abort of export
 		abortProjectExport();
@@ -425,7 +424,7 @@ void exportProjectDialog::finishProjectExport( void )
 	// restore window-title
 	engine::getMainWindow()->resetWindowTitle(); 
 
-	engine::getSongEditor()->stopExport();
+	engine::getSong()->stopExport();
 
 	// if we rendered file from command line, quit after export
 	if( file_to_render != "" )

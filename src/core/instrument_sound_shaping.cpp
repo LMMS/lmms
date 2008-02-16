@@ -1,8 +1,7 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * envelope_tab_widget.cpp - widget for use in envelope/lfo/filter-tab of
- *                           instrument-track-window
+ * instrument_sound_shaping.cpp - class instrumentSoundShaping
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -30,28 +29,13 @@
 
 
 #include "instrument_sound_shaping.h"
-#include "combobox.h"
 #include "embed.h"
 #include "engine.h"
 #include "envelope_and_lfo_parameters.h"
-#include "group_box.h"
-#include "gui_templates.h"
 #include "instrument_track.h"
-#include "knob.h"
 #include "note_play_handle.h"
-#include "tab_widget.h"
 
 
-
-const int TARGETS_TABWIDGET_X = 4;
-const int TARGETS_TABWIDGET_Y = 5;
-const int TARGETS_TABWIDGET_WIDTH = 238;
-const int TARGETS_TABWIDGET_HEIGTH = 175;
-
-const int FILTER_GROUPBOX_X = TARGETS_TABWIDGET_X;
-const int FILTER_GROUPBOX_Y = TARGETS_TABWIDGET_Y+TARGETS_TABWIDGET_HEIGTH+5;
-const int FILTER_GROUPBOX_WIDTH = TARGETS_TABWIDGET_WIDTH;
-const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
 const float RES_MULTIPLIER = 2.0f;
@@ -60,149 +44,75 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-static const QString targetNames[envelopeTabWidget::TARGET_COUNT][2] =
+const QString __targetNames[instrumentSoundShaping::NumTargets][2] =
 {
-	{ envelopeTabWidget::tr( "VOLUME" ), "vol" },
-/*	envelopeTabWidget::tr( "Pan" ),
-	envelopeTabWidget::tr( "Pitch" ),*/
-	{ envelopeTabWidget::tr( "CUTOFF" ), "cut" },
-	{ envelopeTabWidget::tr( "Q/RESO" ), "res" }
+	{ instrumentSoundShaping::tr( "VOLUME" ), "vol" },
+/*	instrumentSoundShaping::tr( "Pan" ),
+	instrumentSoundShaping::tr( "Pitch" ),*/
+	{ instrumentSoundShaping::tr( "CUTOFF" ), "cut" },
+	{ instrumentSoundShaping::tr( "Q/RESO" ), "res" }
 } ;
  
 
 
-envelopeTabWidget::envelopeTabWidget( instrumentTrack * _instrument_track ) :
-	QWidget( _instrument_track->tabWidgetParent() ),
+instrumentSoundShaping::instrumentSoundShaping(
+					instrumentTrack * _instrument_track ) :
+	model( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_filterEnabledModel( new boolModel( FALSE /* this */ ) ),
-	m_filterModel( new comboBoxModel( /* this */ ) ),
-	m_filterCutModel( new floatModel( /* this */ ) ),
-	m_filterResModel( new floatModel( /* this */ ) )
+	m_filterEnabledModel( FALSE, this ),
+	m_filterModel( this ),
+	m_filterCutModel( 16000.0, 0.0, 14000.0, 1.0, this ),
+	m_filterResModel( 0.5, basicFilters<>::minQ(), 10.0, 0.01, this )
 {
-	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );
-	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
-	m_targetsTabWidget->setWhatsThis(
-		tr( "These tabs contain envelopes. They're very important for "
-			"modifying a sound, for not saying that they're almost "
-			"always neccessary for substractive synthesis. For "
-			"example if you have a volume-envelope, you can set "
-			"when the sound should have which volume-level. "
-			"Maybe you want to create some soft strings. Then your "
-			"sound has to fade in and out very softly. This can be "
-			"done by setting a large attack- and release-time. "
-			"It's the same for other envelope-targets like "
-			"panning, cutoff-frequency of used filter and so on. "
-			"Just monkey around with it! You can really make cool "
-			"sounds out of a saw-wave with just some "
-			"envelopes...!" ) );
-
-	for( int i = 0; i < TARGET_COUNT; ++i )
+	for( int i = 0; i < NumTargets; ++i )
 	{
 		float value_for_zero_amount = 0.0;
-		if( i == VOLUME )
+		if( i == Volume )
 		{
 			value_for_zero_amount = 1.0;
 		}
-		m_envLFOWidgets[i] = new envelopeAndLFOWidget(
-							value_for_zero_amount,
-							m_targetsTabWidget,
-							_instrument_track );
-		m_targetsTabWidget->addTab( m_envLFOWidgets[i],
-						tr( targetNames[i][0]
-						.toAscii().constData() ) );
+		m_envLFOParameters[i] = new envelopeAndLFOParameters(
+							value_for_zero_amount, 
+							_instrument_track,
+							this );
 	}
 
+	m_filterEnabledModel.setTrack( _instrument_track );
 
-	m_filterEnabledModel->setTrack( _instrument_track );
-	m_filterGroupBox = new groupBox( tr( "FILTER" ), this );
-	m_filterGroupBox->setModel( m_filterEnabledModel );
-	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
-						FILTER_GROUPBOX_WIDTH,
-						FILTER_GROUPBOX_HEIGHT );
-
-
-	m_filterModel->addItem( tr( "LowPass" ), new QPixmap(
+	m_filterModel.addItem( tr( "LowPass" ), new QPixmap(
 					embed::getIconPixmap( "filter_lp" ) ) );
-	m_filterModel->addItem( tr( "HiPass" ), new QPixmap(
+	m_filterModel.addItem( tr( "HiPass" ), new QPixmap(
 					embed::getIconPixmap( "filter_hp" ) ) );
-	m_filterModel->addItem( tr( "BandPass csg" ), new QPixmap(
+	m_filterModel.addItem( tr( "BandPass csg" ), new QPixmap(
 					embed::getIconPixmap( "filter_bp" ) ) );
-	m_filterModel->addItem( tr( "BandPass czpg" ), new QPixmap(
+	m_filterModel.addItem( tr( "BandPass czpg" ), new QPixmap(
 					embed::getIconPixmap( "filter_bp" ) ) );
-	m_filterModel->addItem( tr( "Notch" ), new QPixmap(
+	m_filterModel.addItem( tr( "Notch" ), new QPixmap(
 				embed::getIconPixmap( "filter_notch" ) ) );
-	m_filterModel->addItem( tr( "Allpass" ), new QPixmap(
+	m_filterModel.addItem( tr( "Allpass" ), new QPixmap(
 					embed::getIconPixmap( "filter_ap" ) ) );
-	m_filterModel->addItem( tr( "Moog" ), new QPixmap(
+	m_filterModel.addItem( tr( "Moog" ), new QPixmap(
 					embed::getIconPixmap( "filter_lp" ) ) );
-	m_filterModel->addItem( tr( "2x LowPass" ), new QPixmap(
+	m_filterModel.addItem( tr( "2x LowPass" ), new QPixmap(
 					embed::getIconPixmap( "filter_2lp" ) ) );
 
-	m_filterModel->setTrack( _instrument_track );
-	m_filterComboBox = new comboBox( m_filterGroupBox, tr( "Filter type" ) );
-	m_filterComboBox->setModel( m_filterModel );
-	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
-	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
-
-	m_filterComboBox->setWhatsThis(
-		tr( "Here you can select the built-in filter you want to use "
-			"for this instrument-track. Filters are very important "
-			"for changing the characteristics of a sound." ) );
-
-
-	m_filterCutModel->setTrack( _instrument_track );
-	m_filterCutModel->setRange( 0.0, 14000.0, 1.0 );
-	m_filterCutModel->setInitValue( 16000.0 );
-
-	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox,
-						tr( "cutoff-frequency" ) );
-	m_filterCutKnob->setModel( m_filterCutModel );
-	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
-	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
-								tr( "Hz" ) );
-	m_filterCutKnob->setWhatsThis(
-		tr( "Use this knob for setting the cutoff-frequency for the "
-			"selected filter. The cutoff-frequency specifies the "
-			"frequency for cutting the signal by a filter. For "
-			"example a lowpass-filter cuts all frequencies above "
-			"the cutoff-frequency. A highpass-filter cuts all "
-			"frequencies below cutoff-frequency and so on..." ) );
-
-
-
-	m_filterResModel->setTrack( _instrument_track );
-	m_filterResModel->setRange( basicFilters<>::minQ(), 10.0, 0.01 );
-	m_filterResModel->setInitValue( 0.5 );
-
-	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox,
-							tr( "Q/Resonance" ) );
-	m_filterResKnob->setModel( m_filterResModel );
-	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->move( 190, 18 );
-	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
-	m_filterResKnob->setWhatsThis(
-		tr( "Use this knob for setting Q/Resonance for the selected "
-			"filter. Q/Resonance tells the filter, how much it "
-			"should amplify frequencies near Cutoff-frequency." ) );
+	m_filterModel.setTrack( _instrument_track );
+	m_filterCutModel.setTrack( _instrument_track );
+	m_filterResModel.setTrack( _instrument_track );
 
 }
 
 
 
 
-envelopeTabWidget::~envelopeTabWidget()
+instrumentSoundShaping::~instrumentSoundShaping()
 {
-	delete m_targetsTabWidget;
 }
 
 
 
 
-float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
+float instrumentSoundShaping::volumeLevel( notePlayHandle * _n,
 							const f_cnt_t _frame )
 {
 	f_cnt_t release_begin = _frame - _n->releaseFramesDone() +
@@ -214,7 +124,7 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 	}
 
 	float volume_level;
-	m_envLFOWidgets[VOLUME]->fillLevel( &volume_level, _frame,
+	m_envLFOParameters[Volume]->fillLevel( &volume_level, _frame,
 							release_begin, 1 );
 
 	return( volume_level );
@@ -223,7 +133,7 @@ float FASTCALL envelopeTabWidget::volumeLevel( notePlayHandle * _n,
 
 
 
-void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
+void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 							const fpp_t _frames,
 							notePlayHandle * _n )
 {
@@ -244,7 +154,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 	// only use filter, if it is really needed
 
-	if( m_filterEnabledModel->value() )
+	if( m_filterEnabledModel.value() )
 	{
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
@@ -254,33 +164,34 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 			_n->m_filter = new basicFilters<>(
 					engine::getMixer()->sampleRate() );
 		}
-		_n->m_filter->setFilterType( m_filterComboBox->value() );
+		_n->m_filter->setFilterType( m_filterModel.value() );
 
 		float * cut_buf = NULL;
 		float * res_buf = NULL;
 
-		if( m_envLFOWidgets[CUT]->used() )
+		if( m_envLFOParameters[Cut]->used() )
 		{
 			cut_buf = new float[_frames];
-			m_envLFOWidgets[CUT]->fillLevel( cut_buf, total_frames,
+			m_envLFOParameters[Cut]->fillLevel( cut_buf, total_frames,
 						release_begin, _frames );
 		}
-		if( m_envLFOWidgets[RES]->used() )
+		if( m_envLFOParameters[Resonance]->used() )
 		{
 			res_buf = new float[_frames];
-			m_envLFOWidgets[RES]->fillLevel( res_buf, total_frames,
-						release_begin, _frames );
+			m_envLFOParameters[Resonance]->fillLevel( res_buf,
+						total_frames, release_begin,
+								_frames );
 		}
 
-		if( m_envLFOWidgets[CUT]->used() &&
-			m_envLFOWidgets[RES]->used() )
+		if( m_envLFOParameters[Cut]->used() &&
+			m_envLFOParameters[Resonance]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_cut_val = envelopeAndLFOWidget::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
-						m_filterCutKnob->value();
+				float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
+						m_filterCutModel.value();
 
-				float new_res_val = m_filterResKnob->value() + RES_MULTIPLIER *
+				float new_res_val = m_filterResModel.value() + RES_MULTIPLIER *
 							res_buf[frame];
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
@@ -297,16 +208,16 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 				}
 			}
 		}
-		else if( m_envLFOWidgets[CUT]->used() )
+		else if( m_envLFOParameters[Cut]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_cut_val = envelopeAndLFOWidget::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
-						m_filterCutKnob->value();
+				float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
+						m_filterCutModel.value();
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
 				{
-					_n->m_filter->calcFilterCoeffs( new_cut_val, m_filterResKnob->value() );
+					_n->m_filter->calcFilterCoeffs( new_cut_val, m_filterResModel.value() );
 					old_filter_cut = static_cast<int>( new_cut_val );
 				}
 
@@ -316,16 +227,16 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 				}
 			}
 		}
-		else if( m_envLFOWidgets[RES]->used() )
+		else if( m_envLFOParameters[Resonance]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_res_val = m_filterResKnob->value() + RES_MULTIPLIER *
+				float new_res_val = m_filterResModel.value() + RES_MULTIPLIER *
 							res_buf[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					_n->m_filter->calcFilterCoeffs( m_filterCutKnob->value(), new_res_val );
+					_n->m_filter->calcFilterCoeffs( m_filterCutModel.value(), new_res_val );
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
@@ -337,7 +248,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		}
 		else
 		{
-			_n->m_filter->calcFilterCoeffs( m_filterCutKnob->value(), m_filterResKnob->value() );
+			_n->m_filter->calcFilterCoeffs( m_filterCutModel.value(), m_filterResModel.value() );
 
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
@@ -352,10 +263,10 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		delete[] res_buf;
 	}
 
-	if( m_envLFOWidgets[VOLUME]->used() )
+	if( m_envLFOParameters[Volume]->used() )
 	{
 		float * vol_buf = new float[_frames];
-		m_envLFOWidgets[VOLUME]->fillLevel( vol_buf, total_frames,
+		m_envLFOParameters[Volume]->fillLevel( vol_buf, total_frames,
 						release_begin, _frames );
 
 		for( fpp_t frame = 0; frame < _frames; ++frame )
@@ -371,7 +282,7 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 		delete[] vol_buf;
 	}
 
-/*	else if( m_envLFOWidgets[VOLUME]->used() == FALSE && m_envLFOWidgets[PANNING]->used() )
+/*	else if( m_envLFOParameters[Volume]->used() == FALSE && m_envLFOParameters[PANNING]->used() )
 	{
 		// only use panning-envelope...
 		for( fpp_t frame = 0; frame < _frames; ++frame )
@@ -389,18 +300,18 @@ void envelopeTabWidget::processAudioBuffer( sampleFrame * _ab,
 
 
 
-f_cnt_t envelopeTabWidget::envFrames( const bool _only_vol )
+f_cnt_t instrumentSoundShaping::envFrames( const bool _only_vol ) const
 {
-	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->m_pahdFrames;
+	f_cnt_t ret_val = m_envLFOParameters[Volume]->PAHD_Frames();
 
 	if( _only_vol == FALSE )
 	{
-		for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
+		for( int i = Volume+1; i < NumTargets; ++i )
 		{
-			if( m_envLFOWidgets[i]->used() &&
-				m_envLFOWidgets[i]->m_pahdFrames > ret_val )
+			if( m_envLFOParameters[i]->used() &&
+				m_envLFOParameters[i]->PAHD_Frames() > ret_val )
 			{
-				ret_val = m_envLFOWidgets[i]->m_pahdFrames;
+				ret_val = m_envLFOParameters[i]->PAHD_Frames();
 			}
 		}
 	}
@@ -410,10 +321,10 @@ f_cnt_t envelopeTabWidget::envFrames( const bool _only_vol )
 
 
 
-f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
+f_cnt_t instrumentSoundShaping::releaseFrames( const bool _only_vol ) const
 {
-	f_cnt_t ret_val = m_envLFOWidgets[VOLUME]->used() ?
-					m_envLFOWidgets[VOLUME]->m_rFrames : 0;
+	f_cnt_t ret_val = m_envLFOParameters[Volume]->used() ?
+				m_envLFOParameters[Volume]->releaseFrames() : 0;
 	if( m_instrumentTrack->getInstrument()->desiredReleaseFrames() >
 								ret_val )
 	{
@@ -421,14 +332,15 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 							desiredReleaseFrames();
 	}
 
-	if( m_envLFOWidgets[VOLUME]->used() == FALSE )
+	if( m_envLFOParameters[Volume]->used() == FALSE )
 	{
-		for( int i = VOLUME+1; i < TARGET_COUNT; ++i )
+		for( int i = Volume+1; i < NumTargets; ++i )
 		{
-			if( m_envLFOWidgets[i]->used() &&
-				m_envLFOWidgets[i]->m_rFrames > ret_val )
+			if( m_envLFOParameters[i]->used() &&
+				m_envLFOParameters[i]->releaseFrames() >
+								ret_val )
 			{
-				ret_val = m_envLFOWidgets[i]->m_rFrames;
+				ret_val = m_envLFOParameters[i]->releaseFrames();
 			}
 		}
 	}
@@ -438,43 +350,44 @@ f_cnt_t envelopeTabWidget::releaseFrames( const bool _only_vol )
 
 
 
-void envelopeTabWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void instrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	m_filterModel->saveSettings( _doc, _this, "ftype" );
-	m_filterCutModel->saveSettings( _doc, _this, "fcut" );
-	m_filterResModel->saveSettings( _doc, _this, "fres" );
-	m_filterEnabledModel->saveSettings( _doc, _this, "fwet" );
+	m_filterModel.saveSettings( _doc, _this, "ftype" );
+	m_filterCutModel.saveSettings( _doc, _this, "fcut" );
+	m_filterResModel.saveSettings( _doc, _this, "fres" );
+	m_filterEnabledModel.saveSettings( _doc, _this, "fwet" );
 
-	for( int i = 0; i < TARGET_COUNT; ++i )
+	for( int i = 0; i < NumTargets; ++i )
 	{
-		m_envLFOWidgets[i]->saveState( _doc, _this ).setTagName(
-			m_envLFOWidgets[i]->nodeName() +
-				QString( targetNames[i][1] ).toLower() );
+		m_envLFOParameters[i]->saveState( _doc, _this ).setTagName(
+			m_envLFOParameters[i]->nodeName() +
+				QString( __targetNames[i][1] ).toLower() );
 	}
 }
 
 
 
 
-void envelopeTabWidget::loadSettings( const QDomElement & _this )
+void instrumentSoundShaping::loadSettings( const QDomElement & _this )
 {
-	m_filterModel->loadSettings( _this, "ftype" );
-	m_filterCutModel->loadSettings( _this, "fcut" );
-	m_filterResModel->loadSettings( _this, "fres" );
-	m_filterEnabledModel->loadSettings( _this, "fwet" );
+	m_filterModel.loadSettings( _this, "ftype" );
+	m_filterCutModel.loadSettings( _this, "fcut" );
+	m_filterResModel.loadSettings( _this, "fres" );
+	m_filterEnabledModel.loadSettings( _this, "fwet" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
 		{
-			for( int i = 0; i < TARGET_COUNT; ++i )
+			for( int i = 0; i < NumTargets; ++i )
 			{
 				if( node.nodeName() ==
-						m_envLFOWidgets[i]->nodeName() +
-					QString( targetNames[i][1] ).toLower() )
+					m_envLFOParameters[i]->nodeName() +
+					QString( __targetNames[i][1] ).
+								toLower() )
 				{
-					m_envLFOWidgets[i]->restoreState(
+					m_envLFOParameters[i]->restoreState(
 							node.toElement() );
 				}
 			}
@@ -486,9 +399,7 @@ void envelopeTabWidget::loadSettings( const QDomElement & _this )
 
 
 
-#include "instrument_sound_shaping.moc"
-
-
+//#include "instrument_sound_shaping.moc"
 
 /*
 

@@ -329,7 +329,7 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
-	track( _tc ),
+	track( SampleTrack, _tc ),
 	m_audioPort( tr( "Sample track" ), this ),
 	m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1/*, this*/ )
 {
@@ -372,14 +372,6 @@ sampleTrack::~sampleTrack()
 	}
 
 	engine::getMixer()->removePlayHandles( this );
-}
-
-
-
-
-track::trackTypes sampleTrack::type( void ) const
-{
-	return( SAMPLE_TRACK );
 }
 
 

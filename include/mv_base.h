@@ -54,7 +54,6 @@ public:
 private:
 	bool m_defaultConstructed;
 
-
 signals:
 	// emitted if actual data of the model (e.g. values) have changed
 	void dataChanged( void );

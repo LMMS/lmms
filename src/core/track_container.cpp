@@ -4,7 +4,7 @@
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,35 +50,16 @@
 #include "mmp.h"
 #include "project_journal.h"
 #include "rubberband.h"
-#include "song_editor.h"
+#include "song.h"
 #include "string_pair_drag.h"
 #include "track.h"
 
 
 trackContainer::trackContainer( void ) :
-	m_currentPosition( 0, 0 ),
-	m_scrollArea( new scrollArea( this ) ),
-	m_ppt( DEFAULT_PIXELS_PER_TACT ),
-	m_rubberBand( new rubberBand( m_scrollArea ) ),
-	m_origin()
+	model( NULL ),
+	journallingObject(),
+	m_tracks()
 {
-	QVBoxLayout * layout = new QVBoxLayout( this );
-	layout->setMargin( 0 );
-	layout->setSpacing( 0 );
-	layout->addWidget( m_scrollArea );
-
-	QWidget * scrollContent = new QWidget;
-	m_scrollLayout = new QVBoxLayout( scrollContent );
-	m_scrollLayout->setMargin( 0 );
-	m_scrollLayout->setSpacing( 0 );
-	m_scrollLayout->setSizeConstraint( QLayout::SetMinimumSize );
-
-	m_scrollArea->setWidget( scrollContent );
-
-	m_scrollArea->show();
-	m_rubberBand->hide();
-
-	setAcceptDrops( TRUE );
 }
 
 
@@ -99,7 +80,8 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
-	mainWindow::saveWidgetState( this, _this );
+// ### TODO
+	//mainWindow::saveWidgetState( this, _this );
 
 	// save settings of each track
 	for( int i = 0; i < m_tracks.size(); ++i )
@@ -150,9 +132,9 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 
-	mainWindow::restoreWidgetState( this, _this );
+// ### TODO
+//	mainWindow::restoreWidgetState( this, _this );
 
-	realignTracks();
 
 	pd->setValue( start_val + _this.childNodes().count() );
 
@@ -168,16 +150,11 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 void trackContainer::addTrack( track * _track )
 {
-	QMap<QString, QVariant> map;
-	map["id"] = _track->id();
-	addJournalEntry( journalEntry( ADD_TRACK, map ) );
-
-	m_tracks.push_back( _track );
-	m_scrollLayout->addWidget( _track->getTrackWidget() );
-	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
-				_track->getTrackWidget(),
-				SLOT( changePosition( const midiTime & ) ) );
-	realignTracks();
+	if( _track->type() != track::AutomationTrack )
+	{
+		m_tracks.push_back( _track );
+		emit trackAdded( _track );
+	}
 }
 
 
@@ -188,67 +165,15 @@ void trackContainer::removeTrack( track * _track )
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
-		QMap<QString, QVariant> map;
-		multimediaProject mmp( multimediaProject::JOURNAL_DATA );
-		_track->saveState( mmp, mmp.content() );
-		map["id"] = _track->id();
-		map["state"] = mmp.toString();
-		addJournalEntry( journalEntry( REMOVE_TRACK, map ) );
-
 		m_tracks.removeAt( index );
 
-		disconnect( _track->getTrackWidget() );
-		m_scrollLayout->removeWidget( _track->getTrackWidget() );
-
-		delete _track;
-
-		realignTracks();
-		if( engine::getSongEditor() )
+		if( engine::getSong() )
 		{
-			engine::getSongEditor()->setModified();
+			engine::getSong()->setModified();
 		}
 	}
 }
 
-
-
-
-void trackContainer::moveTrackUp( track * _track )
-{
-	for( int i = 1; i < m_tracks.size(); ++i )
-	{
-		if( m_tracks[i] == _track )
-		{
-			bbTrack::swapBBTracks( m_tracks[i], m_tracks[i - 1] );
-			QWidget * tw = m_tracks[i]->getTrackWidget();
-			m_scrollLayout->removeWidget( tw );
-			m_scrollLayout->insertWidget( i - 1, tw );
-			m_tracks.swap( i - 1, i );
-			realignTracks();
-			break;
-		}
-	}
-}
-
-
-
-
-void trackContainer::moveTrackDown( track * _track )
-{
-	for( int i = 0; i < m_tracks.size() - 1; ++i )
-	{
-		if( m_tracks[i] == _track )
-		{
-			bbTrack::swapBBTracks( m_tracks[i], m_tracks[i + 1] );
-			QWidget * tw = m_tracks[i]->getTrackWidget();
-			m_scrollLayout->removeWidget( tw );
-			m_scrollLayout->insertWidget( i + 1, tw );
-			m_tracks.swap( i, i + 1 );
-			realignTracks();
-			break;
-		}
-	}
-}
 
 
 
@@ -260,69 +185,24 @@ void trackContainer::updateAfterTrackAdd( void )
 
 
 
-void trackContainer::realignTracks( void )
-{
-	QWidget * content = m_scrollArea->widget();
-	content->setFixedWidth( width()
-				- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
-
-	for( int i = 0; i < m_tracks.size(); ++i )
-	{
-		trackWidget * tw = m_tracks[i]->getTrackWidget();
-		tw->show();
-		tw->update();
-	}
-}
-
-
-
 
 void trackContainer::clearAllTracks( void )
 {
 	while( !m_tracks.empty() )
 	{
-		removeTrack( m_tracks.last() );
+		delete m_tracks.takeLast();
 	}
 }
 
 
 
 
-const trackWidget * trackContainer::trackWidgetAt( const int _y ) const
+int trackContainer::countTracks( track::TrackTypes _tt ) const
 {
-	const int abs_y = _y + m_scrollArea->viewport()->y();
-	int y_cnt = 0;
+	int cnt = 0;
 	for( int i = 0; i < m_tracks.size(); ++i )
 	{
-		const int y_cnt1 = y_cnt;
-		y_cnt += m_tracks[i]->getTrackWidget()->height();
-		if( abs_y >= y_cnt1 && abs_y < y_cnt )
-		{
-			return( m_tracks[i]->getTrackWidget() );
-		}
-	}
-	return( NULL );
-}
-
-
-
-
-bool trackContainer::allowRubberband( void ) const
-{
-	return( FALSE );
-}
-
-
-
-
-Uint16 trackContainer::countTracks( track::trackTypes _tt ) const
-{
-	Uint16 cnt = 0;
-	for( int i = 0; i < m_tracks.size(); ++i )
-	{
-		if( m_tracks[i]->type() == _tt ||
-					_tt == track::TOTAL_TRACK_TYPES )
+		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
 		{
 			++cnt;
 		}
@@ -344,23 +224,208 @@ void trackContainer::setMutedOfAllTracks( bool _muted )
 
 
 
-const QList<track *> trackContainer::tracks( void ) const
+
+
+
+
+
+
+
+trackContainerView::trackContainerView( trackContainer * _tc ) :
+	QWidget(),
+	modelView( NULL ),
+	m_currentPosition( 0, 0 ),
+	m_tc( _tc ),
+	m_trackViews(),
+	m_scrollArea( new scrollArea( this ) ),
+	m_ppt( DEFAULT_PIXELS_PER_TACT ),
+	m_rubberBand( new rubberBand( m_scrollArea ) ),
+	m_origin()
 {
-	return( m_tracks );
+	QVBoxLayout * layout = new QVBoxLayout( this );
+	layout->setMargin( 0 );
+	layout->setSpacing( 0 );
+	layout->addWidget( m_scrollArea );
+
+	QWidget * scrollContent = new QWidget;
+	m_scrollLayout = new QVBoxLayout( scrollContent );
+	m_scrollLayout->setMargin( 0 );
+	m_scrollLayout->setSpacing( 0 );
+	m_scrollLayout->setSizeConstraint( QLayout::SetMinimumSize );
+
+	m_scrollArea->setWidget( scrollContent );
+
+	m_scrollArea->show();
+	m_rubberBand->hide();
+
+	setAcceptDrops( TRUE );
+
+	connect( m_tc, SIGNAL( trackAdded( track * ) ),
+			this, SLOT( createTrackView( track * ) ),
+			Qt::QueuedConnection );
 }
 
 
 
 
-QList<track *> trackContainer::tracks( void )
+trackContainerView::~trackContainerView()
 {
-	return( m_tracks );
+	while( !m_trackViews.empty() )
+	{
+		delete m_trackViews.takeLast();
+	}
 }
 
 
 
 
-void trackContainer::setPixelsPerTact( Uint16 _ppt )
+
+trackView * trackContainerView::addTrackView( trackView * _tv )
+{
+	QMap<QString, QVariant> map;
+	map["id"] = _tv->getTrack()->id();
+	addJournalEntry( journalEntry( AddTrack, map ) );
+
+	m_trackViews.push_back( _tv );
+	m_scrollLayout->addWidget( _tv );
+	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
+				_tv->getTrackContentWidget(),
+				SLOT( changePosition( const midiTime & ) ) );
+	realignTracks();
+	return( _tv );
+}
+
+
+
+
+void trackContainerView::removeTrackView( trackView * _tv )
+{
+	int index = m_trackViews.indexOf( _tv );
+	if( index != -1 )
+	{
+		QMap<QString, QVariant> map;
+		multimediaProject mmp( multimediaProject::JournalData );
+		_tv->getTrack()->saveState( mmp, mmp.content() );
+		map["id"] = _tv->getTrack()->id();
+		map["state"] = mmp.toString();
+		addJournalEntry( journalEntry( RemoveTrack, map ) );
+
+		m_trackViews.removeAt( index );
+
+		disconnect( _tv );
+		m_scrollLayout->removeWidget( _tv );
+
+		realignTracks();
+		if( engine::getSong() )
+		{
+			engine::getSong()->setModified();
+		}
+	}
+}
+
+
+
+
+void trackContainerView::moveTrackViewUp( trackView * _tv )
+{
+	for( int i = 1; i < m_trackViews.size(); ++i )
+	{
+		trackView * t = m_trackViews[i];
+		if( t == _tv )
+		{
+			bbTrack::swapBBTracks( t->getTrack(),
+					m_trackViews[i - 1]->getTrack() );
+			m_scrollLayout->removeWidget( t );
+			m_scrollLayout->insertWidget( i - 1, t );
+			m_tc->m_tracks.swap( i - 1, i );
+			m_trackViews.swap( i - 1, i );
+			realignTracks();
+			break;
+		}
+	}
+}
+
+
+
+
+void trackContainerView::moveTrackViewDown( trackView * _tv )
+{
+	for( int i = 0; i < m_trackViews.size()-1; ++i )
+	{
+		trackView * t = m_trackViews[i];
+		if( t == _tv )
+		{
+			bbTrack::swapBBTracks( t->getTrack(),
+					m_trackViews[i + 1]->getTrack() );
+			m_scrollLayout->removeWidget( t );
+			m_scrollLayout->insertWidget( i + 1, t );
+			m_tc->m_tracks.swap( i, i + 1 );
+			m_trackViews.swap( i, i + 1 );
+			realignTracks();
+			break;
+		}
+	}
+}
+
+
+
+
+
+void trackContainerView::realignTracks( void )
+{
+	QWidget * content = m_scrollArea->widget();
+	content->setFixedWidth( width()
+				- m_scrollArea->verticalScrollBar()->width() );
+	content->setFixedHeight( content->minimumSizeHint().height() );
+
+	for( trackViewList::iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		( *it )->show();
+		( *it )->update();
+	}
+}
+
+
+
+
+void trackContainerView::createTrackView( track * _t )
+{
+	_t->createView( this );
+}
+
+
+
+
+const trackView * trackContainerView::trackViewAt( const int _y ) const
+{
+	const int abs_y = _y + m_scrollArea->viewport()->y();
+	int y_cnt = 0;
+	for( trackViewList::const_iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		const int y_cnt1 = y_cnt;
+		y_cnt += ( *it )->height();
+		if( abs_y >= y_cnt1 && abs_y < y_cnt )
+		{
+			return( *it );
+		}
+	}
+	return( NULL );
+}
+
+
+
+
+bool trackContainerView::allowRubberband( void ) const
+{
+	return( FALSE );
+}
+
+
+
+
+void trackContainerView::setPixelsPerTact( int _ppt )
 {
 	m_ppt = _ppt;
 }
@@ -368,34 +433,47 @@ void trackContainer::setPixelsPerTact( Uint16 _ppt )
 
 
 
-void trackContainer::undoStep( journalEntry & _je )
+void trackContainerView::clearAllTracks( void )
+{
+	while( !m_trackViews.empty() )
+	{
+		trackView * tv = m_trackViews.takeLast();
+		track * t = tv->getTrack();
+		delete tv;
+		delete t;
+	}
+}
+
+
+
+
+void trackContainerView::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
 	switch( _je.actionID() )
 	{
-		case ADD_TRACK:
+		case AddTrack:
 		{
 			QMap<QString, QVariant> map = _je.data().toMap();
-			track * tr =
+			track * t =
 				dynamic_cast<track *>(
 			engine::getProjectJournal()->getJournallingObject(
 							map["id"].toInt() ) );
-			assert( tr != NULL );
-			multimediaProject mmp(
-					multimediaProject::JOURNAL_DATA );
-			tr->saveState( mmp, mmp.content() );
+			assert( t != NULL );
+			multimediaProject mmp( multimediaProject::JournalData );
+			t->saveState( mmp, mmp.content() );
 			map["state"] = mmp.toString();
 			_je.data() = map;
-			removeTrack( tr );
+			t->deleteLater();
 			break;
 		}
 
-		case REMOVE_TRACK:
+		case RemoveTrack:
 		{
 			multimediaProject mmp(
 				_je.data().toMap()["state"].toString(), FALSE );
 			track::create( mmp.content().firstChild().toElement(),
-									this );
+									m_tc );
 			break;
 		}
 	}
@@ -405,17 +483,17 @@ void trackContainer::undoStep( journalEntry & _je )
 
 
 
-void trackContainer::redoStep( journalEntry & _je )
+void trackContainerView::redoStep( journalEntry & _je )
 {
 	switch( _je.actionID() )
 	{
-		case ADD_TRACK:
-		case REMOVE_TRACK:
-			_je.actionID() = ( _je.actionID() == ADD_TRACK ) ?
-						REMOVE_TRACK : ADD_TRACK;
+		case AddTrack:
+		case RemoveTrack:
+			_je.actionID() = ( _je.actionID() == AddTrack ) ?
+						RemoveTrack : AddTrack;
 			undoStep( _je );
-			_je.actionID() = ( _je.actionID() == ADD_TRACK ) ?
-						REMOVE_TRACK : ADD_TRACK;
+			_je.actionID() = ( _je.actionID() == AddTrack ) ?
+						RemoveTrack : AddTrack;
 			break;
 	}
 }
@@ -423,19 +501,19 @@ void trackContainer::redoStep( journalEntry & _je )
 
 
 
-void trackContainer::dragEnterEvent( QDragEnterEvent * _dee )
+void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,sampledata,samplefile,instrument,midifile,"
 					"track_%1,track_%2" ).
-						arg( track::INSTRUMENT_TRACK ).
-						arg( track::SAMPLE_TRACK ) );
+						arg( track::InstrumentTrack ).
+						arg( track::SampleTrack ) );
 }
 
 
 
 
-void trackContainer::dropEvent( QDropEvent * _de )
+void trackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
@@ -443,45 +521,45 @@ void trackContainer::dropEvent( QDropEvent * _de )
 	if( type == "instrument" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::INSTRUMENT_TRACK,
-								this ) );
+				track::create( track::InstrumentTrack,
+								m_tc ) );
 		it->loadInstrument( value );
-		it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "sampledata" || type == "samplefile" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::INSTRUMENT_TRACK,
-								this ) );
+				track::create( track::InstrumentTrack,
+								m_tc ) );
 		QString iname = type == "sampledata" ? "audiofileprocessor" :
 			engine::sampleExtensions()[fileItem::extension(
 								value )];
 		instrument * i = it->loadInstrument( iname );
 		i->setParameter( type, value );
-		it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "presetfile" )
 	{
 		multimediaProject mmp( value );
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::INSTRUMENT_TRACK,
-								this ) );
+				track::create( track::InstrumentTrack,
+								m_tc ) );
 		it->loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );
-		it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
 	else if( type == "midifile" )
 	{
-		importFilter::import( value, this );
+		importFilter::import( value, m_tc );
 		_de->accept();
 	}
 	else if( type.left( 6 ) == "track_" )
 	{
 		multimediaProject mmp( value, FALSE );
-		track::create( mmp.content().firstChild().toElement(), this );
+		track::create( mmp.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
 	engine::getMixer()->unlock();
@@ -490,7 +568,7 @@ void trackContainer::dropEvent( QDropEvent * _de )
 
 
 
-void trackContainer::mousePressEvent( QMouseEvent * _me )
+void trackContainerView::mousePressEvent( QMouseEvent * _me )
 {
 	if( allowRubberband() == TRUE )
 	{
@@ -498,12 +576,13 @@ void trackContainer::mousePressEvent( QMouseEvent * _me )
 		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
 		m_rubberBand->show();
 	}
+	QWidget::mousePressEvent( _me );
 }
 
 
 
 
-void trackContainer::mouseMoveEvent( QMouseEvent * _me )
+void trackContainerView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( rubberBandActive() == TRUE )
 	{
@@ -511,31 +590,34 @@ void trackContainer::mouseMoveEvent( QMouseEvent * _me )
 				m_scrollArea->mapFromParent( _me->pos() ) ).
 								normalized() );
 	}
+	QWidget::mouseMoveEvent( _me );
 }
 
 
 
 
-void trackContainer::mouseReleaseEvent( QMouseEvent * _me )
+void trackContainerView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_rubberBand->hide();
+	QWidget::mouseReleaseEvent( _me );
 }
 
 
 
 
 
-void trackContainer::resizeEvent( QResizeEvent * )
+void trackContainerView::resizeEvent( QResizeEvent * _re )
 {
 	realignTracks();
+	QWidget::resizeEvent( _re );
 }
 
 
 
 
-trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
+trackContainerView::scrollArea::scrollArea( trackContainerView * _parent ) :
 	QScrollArea( _parent ),
-	m_trackContainer( _parent )
+	m_trackContainerView( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -545,25 +627,26 @@ trackContainer::scrollArea::scrollArea( trackContainer * _parent ) :
 
 
 
-trackContainer::scrollArea::~scrollArea()
+trackContainerView::scrollArea::~scrollArea()
 {
 }
 
 
 
 
-void trackContainer::scrollArea::wheelEvent( QWheelEvent * _we )
+void trackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 {
 	// always pass wheel-event to parent-widget (song-editor
 	// bb-editor etc.) because they might want to use it for zooming
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
-	m_trackContainer->wheelEvent( _we );
+	m_trackContainerView->wheelEvent( _we );
 	if( !_we->isAccepted() )
 	{
 		QScrollArea::wheelEvent( _we );
 	}
 }
+
 
 
 

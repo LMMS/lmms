@@ -3,7 +3,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -31,6 +31,7 @@
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 
@@ -46,27 +47,25 @@
 #include "rename_dialog.h"
 #include "sample_buffer.h"
 #include "audio_sample_recorder.h"
-#include "song_editor.h"
+#include "song.h"
 #include "tooltip.h"
 #include "bb_editor.h"
 #include "string_pair_drag.h"
 #include "main_window.h"
 
 
-QPixmap * pattern::s_stepBtnOn = NULL;
-QPixmap * pattern::s_stepBtnOverlay = NULL;
-QPixmap * pattern::s_stepBtnOff = NULL;
-QPixmap * pattern::s_stepBtnOffLight = NULL;
-QPixmap * pattern::s_frozen = NULL;
+QPixmap * patternView::s_stepBtnOn = NULL;
+QPixmap * patternView::s_stepBtnOverlay = NULL;
+QPixmap * patternView::s_stepBtnOff = NULL;
+QPixmap * patternView::s_stepBtnOffLight = NULL;
+QPixmap * patternView::s_frozen = NULL;
 
 
 
-pattern::pattern ( instrumentTrack * _instrument_track ) :
+pattern::pattern( instrumentTrack * _instrument_track ) :
 	trackContentObject( _instrument_track ),
-	m_paintPixmap(),
-	m_needsUpdate( TRUE ),
 	m_instrumentTrack( _instrument_track ),
-	m_patternType( BEAT_PATTERN ),
+	m_patternType( BeatPattern ),
 	m_name( _instrument_track->name() ),
 	m_steps( DEFAULT_STEPS_PER_TACT ),
 	m_frozenPattern( NULL ),
@@ -81,8 +80,6 @@ pattern::pattern ( instrumentTrack * _instrument_track ) :
 
 pattern::pattern( const pattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_instrumentTrack ),
-	m_paintPixmap(),
-	m_needsUpdate( TRUE ),
 	m_instrumentTrack( _pat_to_copy.m_instrumentTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_name( "" ),
@@ -104,19 +101,6 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 
 pattern::~pattern()
 {
-	if( engine::getPianoRoll()->currentPattern() == this )
-	{
-		engine::getPianoRoll()->setCurrentPattern( NULL );
-		// we have to have the song-editor to stop playing if it played
-		// us before
-		if( engine::getSongEditor()->playing() &&
-			engine::getSongEditor()->playMode() ==
-						songEditor::PLAY_PATTERN )
-		{
-			engine::getSongEditor()->playPattern( NULL );
-		}
-	}
-
 	for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
@@ -136,48 +120,12 @@ pattern::~pattern()
 
 void pattern::init( void )
 {
-	if( s_stepBtnOn == NULL )
-	{
-		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_100" ) );
-	}
-
-	if( s_stepBtnOverlay == NULL )
-	{
-		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
-						"step_btn_on_yellow" ) );
-	}
-
-	if( s_stepBtnOff == NULL )
-	{
-		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
-							"step_btn_off" ) );
-	}
-
-	if( s_stepBtnOffLight == NULL )
-	{
-		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
-						"step_btn_off_light" ) );
-	}
-
-	if( s_frozen == NULL )
-	{
-		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
-	}
-
 	saveJournallingState( FALSE );
 
 	ensureBeatNotes();
 
 	changeLength( length() );
 	restoreJournallingState();
-
-	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( FALSE );
-
-	toolTip::add( this,
-		tr( "double-click to open this pattern in piano-roll\n"
-			"use mouse wheel to set volume of a step" ) );
 }
 
 
@@ -185,7 +133,7 @@ void pattern::init( void )
 
 midiTime pattern::length( void ) const
 {
-	if( m_patternType == BEAT_PATTERN )
+	if( m_patternType == BeatPattern )
 	{
 		if( m_steps % DEFAULT_STEPS_PER_TACT == 0 )
 		{
@@ -217,7 +165,7 @@ midiTime pattern::length( void ) const
 note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
 	note * new_note = new note( _new_note );
-	if( _quant_pos )
+	if( _quant_pos && engine::getPianoRoll() )
 	{
 		new_note->quantizePos( engine::getPianoRoll()->quantization() );
 	}
@@ -248,8 +196,9 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 	engine::getMixer()->unlock();
 
 	checkType();
-	update();
 	changeLength( length() );
+
+	emit dataChanged();
 
 	updateBBTrack();
 
@@ -276,8 +225,9 @@ void pattern::removeNote( const note * _note_to_del )
 	engine::getMixer()->unlock();
 
 	checkType();
-	update();
 	changeLength( length() );
+
+	emit dataChanged();
 
 	updateBBTrack();
 }
@@ -311,20 +261,16 @@ void pattern::clearNotes( void )
 	engine::getMixer()->unlock();
 
 	checkType();
-	update();
-	if( engine::getPianoRoll()->currentPattern() == this )
-	{
-		engine::getPianoRoll()->update();
-	}
+	emit dataChanged();
 }
 
 
 
 
-void pattern::setType( patternTypes _new_pattern_type )
+void pattern::setType( PatternTypes _new_pattern_type )
 {
-	if( _new_pattern_type == BEAT_PATTERN ||
-				_new_pattern_type == MELODY_PATTERN )
+	if( _new_pattern_type == BeatPattern ||
+				_new_pattern_type == MelodyPattern )
 	{
 		m_patternType = _new_pattern_type;
 	}
@@ -340,12 +286,12 @@ void pattern::checkType( void )
 	{
 		if( ( *it )->length() > 0 )
 		{
-			setType( pattern::MELODY_PATTERN );
+			setType( pattern::MelodyPattern );
 			return;
 		}
 		++it;
 	}
-	setType( pattern::BEAT_PATTERN );
+	setType( pattern::BeatPattern );
 }
 
 
@@ -390,7 +336,7 @@ void pattern::loadSettings( const QDomElement & _this )
 {
 	unfreeze();
 
-	m_patternType = static_cast<patternTypes>( _this.attribute( "type"
+	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
 								).toInt() );
 	m_name = _this.attribute( "name" );
 	if( _this.attribute( "pos" ).toInt() >= 0 )
@@ -430,35 +376,10 @@ void pattern::loadSettings( const QDomElement & _this )
 	{
 		freeze();
 	}*/
-	update();
+
+	emit dataChanged();
+
 	updateBBTrack();
-}
-
-
-
-void pattern::update( void )
-{
-	m_needsUpdate = TRUE;
-	changeLength( length() );
-	trackContentObject::update();
-}
-
-
-
-
-void pattern::openInPianoRoll( void )
-{
-	openInPianoRoll( FALSE );
-}
-
-
-
-
-void pattern::openInPianoRoll( bool )
-{
-	engine::getPianoRoll()->setCurrentPattern( this );
-	engine::getPianoRoll()->parentWidget()->show();
-	engine::getPianoRoll()->setFocus();
 }
 
 
@@ -473,26 +394,9 @@ void pattern::clear( void )
 
 
 
-void pattern::resetName( void )
-{
-	m_name = m_instrumentTrack->name();
-}
-
-
-
-
-void pattern::changeName( void )
-{
-	renameDialog rename_dlg( m_name );
-	rename_dlg.exec();
-}
-
-
-
-
 void pattern::freeze( void )
 {
-	if( engine::getSongEditor()->playing() )
+	if( engine::getSong()->playing() )
 	{
 		QMessageBox::information( 0, tr( "Cannot freeze pattern" ),
 						tr( "The pattern currently "
@@ -524,7 +428,7 @@ void pattern::unfreeze( void )
 	{
 		sharedObject::unref( m_frozenPattern );
 		m_frozenPattern = NULL;
-		update();
+		emit dataChanged();
 	}
 }
 
@@ -539,28 +443,11 @@ void pattern::abortFreeze( void )
 
 
 
-void pattern::addSteps( QAction * _item )
-{
-	addSteps( _item->text().toInt() );
-}
-
-
-
-
-void pattern::removeSteps( QAction * _item )
-{
-	removeSteps( _item->text().toInt() );
-}
-
-
-
-
-
 void pattern::addSteps( int _n )
 {
 	m_steps += _n;
 	ensureBeatNotes();
-	update();
+	emit dataChanged();
 }
 
 
@@ -584,406 +471,18 @@ void pattern::removeSteps( int _n )
 			}
 		}
 		m_steps -= _n;
-		update();
+		emit dataChanged();
 	}
 }
 
 
 
 
-void pattern::constructContextMenu( QMenu * _cm )
+trackContentObjectView * pattern::createView( trackView * _tv )
 {
-	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
-					tr( "Open in piano-roll" ), _cm );
-	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ), this,
-					SLOT( openInPianoRoll( bool ) ) );
-	_cm->insertSeparator( _cm->actions()[1] );
-
-	_cm->addSeparator();
-
-	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear all notes" ), this, SLOT( clear() ) );
-	_cm->addSeparator();
-
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
-						this, SLOT( changeName() ) );
-	_cm->addSeparator();
-
-	bool freeze_separator = FALSE;
-	if( !( m_instrumentTrack->muted() || muted() ) )
-	{
-		_cm->addAction( embed::getIconPixmap( "freeze" ),
-			m_frozenPattern ? tr( "Refreeze" ) : tr( "Freeze" ),
-						this, SLOT( freeze() ) );
-		freeze_separator = TRUE;
-	}
-	if( m_frozenPattern )
-	{
-		_cm->addAction( embed::getIconPixmap( "unfreeze" ),
-				tr( "Unfreeze" ), this, SLOT( unfreeze() ) );
-		freeze_separator = TRUE;
-	}
-	if( freeze_separator )
-	{
-		_cm->addSeparator();
-	}
-
-	QMenu * add_step_menu = _cm->addMenu(
-					embed::getIconPixmap( "step_btn_add" ),
-							tr( "Add steps" ) );
-	QMenu * remove_step_menu = _cm->addMenu(
-				embed::getIconPixmap( "step_btn_remove" ),
-							tr( "Remove steps" ) );
-	connect( add_step_menu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( addSteps( QAction * ) ) );
-	connect( remove_step_menu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( removeSteps( QAction * ) ) );
-	for( int i = 1; i <= 16; i *= 2 )
-	{
-		const QString label = ( i == 1 ) ?
-					tr( "1 step" ) :
-					tr( "%1 steps" ).arg( i );
-		add_step_menu->addAction( label );
-		remove_step_menu->addAction( label );
-	}
+	return( new patternView( this, _tv ) );
 }
 
-
-
-
-void pattern::mouseDoubleClickEvent( QMouseEvent * _me )
-{
-	if( _me->button() != Qt::LeftButton )
-	{
-		_me->ignore();
-		return;
-	}
-	if( m_patternType == pattern::MELODY_PATTERN ||
-		!( m_patternType == pattern::BEAT_PATTERN &&
-		( pixelsPerTact() >= 192 ||
-		  			m_steps != DEFAULT_STEPS_PER_TACT ) &&
-		_me->y() > height() - s_stepBtnOff->height() ) )
-	{
-		openInPianoRoll();
-	} 
-}
-
-
-
-
-void pattern::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::LeftButton &&
-				m_patternType == pattern::BEAT_PATTERN &&
-				( fixedTCOs() || pixelsPerTact() >= 192 ||
-				m_steps != DEFAULT_STEPS_PER_TACT ) &&
-				_me->y() > height() - s_stepBtnOff->height() )
-	{
-		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
-				length() / BEATS_PER_TACT / width();
-		if( step >= m_steps )
-		{
-			return;
-		}
-		note * n = m_notes[step];
-		if( n->length() < 0 )
-		{
-			n->setLength( 0 );
-		}
-		else
-		{
-			n->setLength( -64 );
-		}
-		engine::getSongEditor()->setModified();
-		update();
-		if( engine::getPianoRoll()->currentPattern() == this )
-		{
-			engine::getPianoRoll()->update();
-		}
-	}
-	else if( m_frozenPattern != NULL && _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isShiftPressed() == TRUE )
-	{
-		QString s;
-		new stringPairDrag( "sampledata",
-					m_frozenPattern->toBase64( s ),
-					embed::getIconPixmap( "freeze" ),
-					this );
-	}
-	else
-	{
-		trackContentObject::mousePressEvent( _me );
-	}
-}
-
-
-
-
-void pattern::wheelEvent( QWheelEvent * _we )
-{
-	if( m_patternType == pattern::BEAT_PATTERN &&
-				( fixedTCOs() || pixelsPerTact() >= 192 ||
-				m_steps != DEFAULT_STEPS_PER_TACT ) &&
-				_we->y() > height() - s_stepBtnOff->height() )
-	{
-		int step = ( _we->x() - TCO_BORDER_WIDTH ) *
-				length() / BEATS_PER_TACT / width();
-		if( step >= m_steps )
-		{
-			return;
-		}
-		note * n = m_notes[step];
-		Uint8 vol = n->getVolume();
-		
-		if( n->length() == 0 && _we->delta() > 0 )
-		{
-			n->setLength( -64 );
-			n->setVolume( 5 );
-		}
-		else if( _we->delta() > 0 )
-		{
-			if( vol < 95 )
-			{
-				n->setVolume( vol + 5 );
-			}
-		}
-		else
-		{
-			if( vol > 5 )
-			{
-				n->setVolume( vol - 5 );
-			}
-			else
-			{
-				n->setLength( 0 );
-			}
-		}
-		engine::getSongEditor()->setModified();
-		update();
-		if( engine::getPianoRoll()->currentPattern() == this )
-		{
-			engine::getPianoRoll()->update();
-		}
-		_we->accept();
-	}
-	else
-	{
-		trackContentObject::wheelEvent( _we );
-	}
-}
-
-
-
-
-void pattern::paintEvent( QPaintEvent * )
-{
-	if( m_needsUpdate == FALSE )
-	{
-		QPainter p( this );
-		p.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
-
-	changeLength( length() );
-
-	m_needsUpdate = FALSE;
-
-	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
-	{
-		m_paintPixmap = QPixmap( size() );
-	}
-
-	QPainter p( &m_paintPixmap );
-
-	QLinearGradient lingrad( 0, 0, 0, height() );
-	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
-							QColor( 96, 96, 96 );
-	lingrad.setColorAt( 0, c );
-	lingrad.setColorAt( 0.5, Qt::black );
-	lingrad.setColorAt( 1, c );
-	p.fillRect( QRect( 1, 1, width() - 2, height() - 2 ), lingrad );
-
-	p.setPen( QColor( 57, 69, 74 ) );
-	p.drawLine( 0, 0, width(), 0 );
-	p.drawLine( 0, 0, 0, height() );
-	p.setPen( QColor( 120, 130, 140 ) );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
-	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
-
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 1, 1, width() - 2, height() - 2 );
-
-	const float ppt = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-						/ (float)length().getTact() :
-								pixelsPerTact();
-
-	if( m_patternType == pattern::MELODY_PATTERN )
-	{
-		Sint32 central_key = 0;
-		if( m_notes.size() > 0 )
-		{
-			// first determine the central tone so that we can 
-			// display the area where most of the m_notes are
-			Sint32 total_notes = 0;
-			for( noteVector::iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
-			{
-				if( ( *it )->length() > 0 )
-				{
-					central_key += ( *it )->key();
-					++total_notes;
-				}
-			}
-
-			if( total_notes > 0 )
-			{
-				central_key = central_key / total_notes;
-
-				Sint16 central_y = height() / 2;
-				Sint16 y_base = central_y + TCO_BORDER_WIDTH -1;
-
-				const Sint16 x_base = TCO_BORDER_WIDTH;
-
-				p.setPen( QColor( 0, 0, 0 ) );
-				for( tact tact_num = 1; tact_num <
-						length().getTact(); ++tact_num )
-				{
-					p.drawLine(
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						TCO_BORDER_WIDTH,
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						height() - 2 *
-							TCO_BORDER_WIDTH );
-				}
-				if( getTrack()->muted() || muted() )
-				{
-					p.setPen( QColor( 160, 160, 160 ) );
-				}
-				else if( m_frozenPattern != NULL )
-				{
-					p.setPen( QColor( 0x00, 0xE0, 0xFF ) );
-				}
-				else
-				{
-					p.setPen( QColor( 0xFF, 0xB0, 0x00 ) );
-				}
-
-				for( noteVector::iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
-				{
-					Sint8 y_pos = central_key -
-								( *it )->key();
-
-					if( ( *it )->length() > 0 &&
-							y_pos > -central_y &&
-							y_pos < central_y )
-					{
-						Sint16 x1 = 2 * x_base +
-		static_cast<int>( ( *it )->pos() * ppt / 64 );
-						Sint16 x2 = x1 +
-			static_cast<int>( ( *it )->length() * ppt / 64 );
-						p.drawLine( x1, y_base + y_pos,
-							x2, y_base + y_pos );
-
-					}
-				}
-			}
-		}
-	}
-	else if( m_patternType == pattern::BEAT_PATTERN &&
-				( fixedTCOs() || ppt >= 96
-					|| m_steps != DEFAULT_STEPS_PER_TACT ) )
-	{
-		QPixmap stepon;
-		QPixmap stepoverlay;
-		QPixmap stepoff;
-		QPixmap stepoffl;
-		const int steps = length() / BEATS_PER_TACT;
-		const int w = width() - 2 * TCO_BORDER_WIDTH;
-		stepon = s_stepBtnOn->scaled( w / steps,
-					      s_stepBtnOn->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoverlay = s_stepBtnOverlay->scaled( w / steps,
-					      s_stepBtnOn->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( w / steps,
-						s_stepBtnOff->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( w / steps,
-						s_stepBtnOffLight->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		for( noteVector::iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
-		{
-			Sint16 no = ( *it )->pos() / 4;
-			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
-								w / steps );
-			Sint16 y = height() - s_stepBtnOff->height() - 1;
-			
-			Uint8 vol = ( *it )->getVolume();
-			
-			if( ( *it )->length() < 0 )
-			{
-				p.drawPixmap( x, y, stepoff );
-				for( int i = 0; i < vol / 5 + 1; ++i )
-				{
-					p.drawPixmap( x, y, stepon );
-				}
-				for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
-									++i )
-				{
-					p.drawPixmap( x, y, stepoverlay );
-				}
-			}
-			else if( ( no / BEATS_PER_TACT ) % 2 )
-			{
-				p.drawPixmap( x, y, stepoff );
-			}
-			else
-			{
-				p.drawPixmap( x, y, stepoffl );
-			}
-		}
-	}
-
-	p.setFont( pointSize<7>( p.font() ) );
-	if( muted() || getTrack()->muted() )
-	{
-		p.setPen( QColor( 192, 192, 192 ) );
-	}
-	else
-	{
-		p.setPen( QColor( 32, 240, 32 ) );
-	}
-	p.drawText( 2, p.fontMetrics().height() - 1, m_name );
-	if( muted() )
-	{
-		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
-	}
-	else if( m_frozenPattern != NULL )
-	{
-		p.setPen( QColor( 0, 224, 255 ) );
-		p.drawRect( 0, 0, width(), height() - 1 );
-		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
-	}
-
-	p.end();
-
-	p.begin( this );
-	p.drawPixmap( 0, 0, m_paintPixmap );
-
-}
 
 
 
@@ -1017,9 +516,9 @@ void pattern::ensureBeatNotes( void )
 
 void pattern::updateBBTrack( void )
 {
-	if( getTrack()->getTrackContainer() == engine::getBBEditor() )
+	if( getTrack()->getTrackContainer() == engine::getBBTrackContainer() )
 	{
-		engine::getBBEditor()->updateBBTrack( this );
+		engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 }
 
@@ -1150,7 +649,6 @@ patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
 
 patternFreezeThread::~patternFreezeThread()
 {
-	m_pattern->update();
 }
 
 
@@ -1171,9 +669,9 @@ void patternFreezeThread::run( void )
 					engine::getMixer()->highQuality() );
 
 	// prepare stuff for playing correct things later
-	engine::getSongEditor()->playPattern( m_pattern, FALSE );
-	songEditor::playPos & ppp = engine::getSongEditor()->getPlayPos(
-						songEditor::PLAY_PATTERN );
+	engine::getSong()->playPattern( m_pattern, FALSE );
+	song::playPos & ppp = engine::getSong()->getPlayPos(
+						song::Mode_PlayPattern );
 	ppp.setTact( 0 );
 	ppp.setTact64th( 0 );
 	ppp.setCurrentFrame( 0 );
@@ -1202,7 +700,7 @@ void patternFreezeThread::run( void )
 	m_pattern->m_freezing = FALSE;
 
 	// reset song-editor settings
-	engine::getSongEditor()->stop();
+	engine::getSong()->stop();
 	ppp.m_timeLineUpdate = TRUE;
 
 	// create final sample-buffer if freezing was successful
@@ -1219,6 +717,539 @@ void patternFreezeThread::run( void )
 
 }
 
+
+
+
+
+patternView::patternView( pattern * _pattern, trackView * _parent ) :
+	trackContentObjectView( _pattern, _parent ),
+	m_pat( _pattern ),
+	m_paintPixmap(),
+	m_needsUpdate( TRUE )
+{
+	if( s_stepBtnOn == NULL )
+	{
+		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_100" ) );
+	}
+
+	if( s_stepBtnOverlay == NULL )
+	{
+		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
+						"step_btn_on_yellow" ) );
+	}
+
+	if( s_stepBtnOff == NULL )
+	{
+		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
+							"step_btn_off" ) );
+	}
+
+	if( s_stepBtnOffLight == NULL )
+	{
+		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
+						"step_btn_off_light" ) );
+	}
+
+	if( s_frozen == NULL )
+	{
+		s_frozen = new QPixmap( embed::getIconPixmap( "frozen" ) );
+	}
+
+	setFixedHeight( parentWidget()->height() - 2 );
+	setAutoResizeEnabled( FALSE );
+
+	toolTip::add( this,
+		tr( "double-click to open this pattern in piano-roll\n"
+			"use mouse wheel to set volume of a step" ) );
+}
+
+
+
+
+
+
+patternView::~patternView()
+{
+	if( engine::getPianoRoll()->currentPattern() == m_pat )
+	{
+		engine::getPianoRoll()->setCurrentPattern( NULL );
+		// we have to have the song-editor to stop playing if it played
+		// us before
+		if( engine::getSong()->playing() &&
+			engine::getSong()->playMode() ==
+							song::Mode_PlayPattern )
+		{
+			engine::getSong()->playPattern( NULL );
+		}
+	}
+}
+
+
+
+
+
+void patternView::update( void )
+{
+	m_needsUpdate = TRUE;
+	m_pat->changeLength( m_pat->length() );
+	trackContentObjectView::update();
+}
+
+
+
+
+void patternView::openInPianoRoll( void )
+{
+	openInPianoRoll( FALSE );
+}
+
+
+
+
+void patternView::openInPianoRoll( bool )
+{
+	engine::getPianoRoll()->setCurrentPattern( m_pat );
+	engine::getPianoRoll()->parentWidget()->show();
+	engine::getPianoRoll()->setFocus();
+}
+
+
+
+
+void patternView::resetName( void )
+{
+	m_pat->setName( m_pat->m_instrumentTrack->name() );
+}
+
+
+
+
+void patternView::changeName( void )
+{
+	QString s = m_pat->name();
+	renameDialog rename_dlg( s );
+	rename_dlg.exec();
+	m_pat->setName( s );
+}
+
+
+
+
+
+void patternView::addSteps( QAction * _item )
+{
+	m_pat->addSteps( _item->text().toInt() );
+}
+
+
+
+
+void patternView::removeSteps( QAction * _item )
+{
+	m_pat->removeSteps( _item->text().toInt() );
+}
+
+
+
+
+void patternView::constructContextMenu( QMenu * _cm )
+{
+	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
+					tr( "Open in piano-roll" ), _cm );
+	_cm->insertAction( _cm->actions()[0], a );
+	connect( a, SIGNAL( triggered( bool ) ), this,
+					SLOT( openInPianoRoll( bool ) ) );
+	_cm->insertSeparator( _cm->actions()[1] );
+
+	_cm->addSeparator();
+
+	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
+			tr( "Clear all notes" ), m_pat, SLOT( clear() ) );
+	_cm->addSeparator();
+
+	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+						this, SLOT( resetName() ) );
+	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
+						this, SLOT( changeName() ) );
+	_cm->addSeparator();
+
+	bool freeze_separator = FALSE;
+	if( !( m_pat->m_instrumentTrack->muted() || m_pat->muted() ) )
+	{
+		_cm->addAction( embed::getIconPixmap( "freeze" ),
+			m_pat->m_frozenPattern ? tr( "Refreeze" ) :
+								tr( "Freeze" ),
+						m_pat, SLOT( freeze() ) );
+		freeze_separator = TRUE;
+	}
+	if( m_pat->m_frozenPattern )
+	{
+		_cm->addAction( embed::getIconPixmap( "unfreeze" ),
+				tr( "Unfreeze" ), m_pat, SLOT( unfreeze() ) );
+		freeze_separator = TRUE;
+	}
+	if( freeze_separator )
+	{
+		_cm->addSeparator();
+	}
+
+	QMenu * add_step_menu = _cm->addMenu(
+					embed::getIconPixmap( "step_btn_add" ),
+							tr( "Add steps" ) );
+	QMenu * remove_step_menu = _cm->addMenu(
+				embed::getIconPixmap( "step_btn_remove" ),
+							tr( "Remove steps" ) );
+	connect( add_step_menu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( addSteps( QAction * ) ) );
+	connect( remove_step_menu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( removeSteps( QAction * ) ) );
+	for( int i = 1; i <= 16; i *= 2 )
+	{
+		const QString label = ( i == 1 ) ?
+					tr( "1 step" ) :
+					tr( "%1 steps" ).arg( i );
+		add_step_menu->addAction( label );
+		remove_step_menu->addAction( label );
+	}
+}
+
+
+
+
+void patternView::mouseDoubleClickEvent( QMouseEvent * _me )
+{
+	if( _me->button() != Qt::LeftButton )
+	{
+		_me->ignore();
+		return;
+	}
+	if( m_pat->type() == pattern::MelodyPattern ||
+		!( m_pat->type() == pattern::BeatPattern &&
+		( pixelsPerTact() >= 192 ||
+	  			m_pat->m_steps != DEFAULT_STEPS_PER_TACT ) &&
+		_me->y() > height() - s_stepBtnOff->height() ) )
+	{
+		openInPianoRoll();
+	} 
+}
+
+
+
+
+void patternView::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::LeftButton &&
+				m_pat->m_patternType == pattern::BeatPattern &&
+				( fixedTCOs() || pixelsPerTact() >= 192 ||
+				m_pat->m_steps != DEFAULT_STEPS_PER_TACT ) &&
+				_me->y() > height() - s_stepBtnOff->height() )
+	{
+		int step = ( _me->x() - TCO_BORDER_WIDTH ) *
+				m_pat->length() / BEATS_PER_TACT / width();
+		if( step >= m_pat->m_steps )
+		{
+			return;
+		}
+		note * n = m_pat->m_notes[step];
+		if( n->length() < 0 )
+		{
+			n->setLength( 0 );
+		}
+		else
+		{
+			n->setLength( -64 );
+		}
+		engine::getSong()->setModified();
+		update();
+		if( engine::getPianoRoll()->currentPattern() == m_pat )
+		{
+			engine::getPianoRoll()->update();
+		}
+	}
+	else if( m_pat->m_frozenPattern != NULL &&
+					_me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isShiftPressed() == TRUE )
+	{
+		QString s;
+		new stringPairDrag( "sampledata",
+					m_pat->m_frozenPattern->toBase64( s ),
+					embed::getIconPixmap( "freeze" ),
+					this );
+	}
+	else
+	{
+		trackContentObjectView::mousePressEvent( _me );
+	}
+}
+
+
+
+
+void patternView::wheelEvent( QWheelEvent * _we )
+{
+	if( m_pat->m_patternType == pattern::BeatPattern &&
+				( fixedTCOs() || pixelsPerTact() >= 192 ||
+				m_pat->m_steps != DEFAULT_STEPS_PER_TACT ) &&
+				_we->y() > height() - s_stepBtnOff->height() )
+	{
+		int step = ( _we->x() - TCO_BORDER_WIDTH ) *
+				m_pat->length() / BEATS_PER_TACT / width();
+		if( step >= m_pat->m_steps )
+		{
+			return;
+		}
+		note * n = m_pat->m_notes[step];
+		Uint8 vol = n->getVolume();
+		
+		if( n->length() == 0 && _we->delta() > 0 )
+		{
+			n->setLength( -64 );
+			n->setVolume( 5 );
+		}
+		else if( _we->delta() > 0 )
+		{
+			if( vol < 95 )
+			{
+				n->setVolume( vol + 5 );
+			}
+		}
+		else
+		{
+			if( vol > 5 )
+			{
+				n->setVolume( vol - 5 );
+			}
+			else
+			{
+				n->setLength( 0 );
+			}
+		}
+		engine::getSong()->setModified();
+		update();
+		if( engine::getPianoRoll()->currentPattern() == m_pat )
+		{
+			engine::getPianoRoll()->update();
+		}
+		_we->accept();
+	}
+	else
+	{
+		trackContentObjectView::wheelEvent( _we );
+	}
+}
+
+
+
+
+void patternView::paintEvent( QPaintEvent * )
+{
+	if( m_needsUpdate == FALSE )
+	{
+		QPainter p( this );
+		p.drawPixmap( 0, 0, m_paintPixmap );
+		return;
+	}
+
+	m_pat->changeLength( m_pat->length() );
+
+	m_needsUpdate = FALSE;
+
+	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
+	{
+		m_paintPixmap = QPixmap( size() );
+	}
+
+	QPainter p( &m_paintPixmap );
+
+	QLinearGradient lingrad( 0, 0, 0, height() );
+	const QColor c = isSelected() ? QColor( 0, 0, 224 ) :
+							QColor( 96, 96, 96 );
+	lingrad.setColorAt( 0, c );
+	lingrad.setColorAt( 0.5, Qt::black );
+	lingrad.setColorAt( 1, c );
+	p.fillRect( QRect( 1, 1, width() - 2, height() - 2 ), lingrad );
+
+	p.setPen( QColor( 57, 69, 74 ) );
+	p.drawLine( 0, 0, width(), 0 );
+	p.drawLine( 0, 0, 0, height() );
+	p.setPen( QColor( 120, 130, 140 ) );
+	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
+	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
+
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawRect( 1, 1, width() - 2, height() - 2 );
+
+	const float ppt = fixedTCOs() ?
+			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+					/ (float) m_pat->length().getTact() :
+								pixelsPerTact();
+
+	if( m_pat->m_patternType == pattern::MelodyPattern )
+	{
+		Sint32 central_key = 0;
+		if( m_pat->m_notes.size() > 0 )
+		{
+			// first determine the central tone so that we can 
+			// display the area where most of the m_notes are
+			Sint32 total_notes = 0;
+			for( noteVector::iterator it = m_pat->m_notes.begin();
+					it != m_pat->m_notes.end(); ++it )
+			{
+				if( ( *it )->length() > 0 )
+				{
+					central_key += ( *it )->key();
+					++total_notes;
+				}
+			}
+
+			if( total_notes > 0 )
+			{
+				central_key = central_key / total_notes;
+
+				Sint16 central_y = height() / 2;
+				Sint16 y_base = central_y + TCO_BORDER_WIDTH -1;
+
+				const Sint16 x_base = TCO_BORDER_WIDTH;
+
+				p.setPen( QColor( 0, 0, 0 ) );
+				for( tact tact_num = 1; tact_num <
+					m_pat->length().getTact(); ++tact_num )
+				{
+					p.drawLine(
+						x_base + static_cast<int>(
+							ppt * tact_num ) - 1,
+						TCO_BORDER_WIDTH,
+						x_base + static_cast<int>(
+							ppt * tact_num ) - 1,
+						height() - 2 *
+							TCO_BORDER_WIDTH );
+				}
+				if( m_pat->getTrack()->muted() ||
+								m_pat->muted() )
+				{
+					p.setPen( QColor( 160, 160, 160 ) );
+				}
+				else if( m_pat->m_frozenPattern != NULL )
+				{
+					p.setPen( QColor( 0x00, 0xE0, 0xFF ) );
+				}
+				else
+				{
+					p.setPen( QColor( 0xFF, 0xB0, 0x00 ) );
+				}
+
+				for( noteVector::iterator it =
+							m_pat->m_notes.begin();
+					it != m_pat->m_notes.end(); ++it )
+				{
+					Sint8 y_pos = central_key -
+								( *it )->key();
+
+					if( ( *it )->length() > 0 &&
+							y_pos > -central_y &&
+							y_pos < central_y )
+					{
+						Sint16 x1 = 2 * x_base +
+		static_cast<int>( ( *it )->pos() * ppt / 64 );
+						Sint16 x2 = x1 +
+			static_cast<int>( ( *it )->length() * ppt / 64 );
+						p.drawLine( x1, y_base + y_pos,
+							x2, y_base + y_pos );
+
+					}
+				}
+			}
+		}
+	}
+	else if( m_pat->m_patternType == pattern::BeatPattern &&
+			( fixedTCOs() || ppt >= 96
+				|| m_pat->m_steps != DEFAULT_STEPS_PER_TACT ) )
+	{
+		QPixmap stepon;
+		QPixmap stepoverlay;
+		QPixmap stepoff;
+		QPixmap stepoffl;
+		const int steps = m_pat->length() / BEATS_PER_TACT;
+		const int w = width() - 2 * TCO_BORDER_WIDTH;
+		stepon = s_stepBtnOn->scaled( w / steps,
+					      s_stepBtnOn->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepoverlay = s_stepBtnOverlay->scaled( w / steps,
+					      s_stepBtnOn->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepoff = s_stepBtnOff->scaled( w / steps,
+						s_stepBtnOff->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+		stepoffl = s_stepBtnOffLight->scaled( w / steps,
+						s_stepBtnOffLight->height(),
+						Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+		for( noteVector::iterator it = m_pat->m_notes.begin();
+					it != m_pat->m_notes.end(); ++it )
+		{
+			Sint16 no = ( *it )->pos() / 4;
+			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
+								w / steps );
+			Sint16 y = height() - s_stepBtnOff->height() - 1;
+			
+			Uint8 vol = ( *it )->getVolume();
+			
+			if( ( *it )->length() < 0 )
+			{
+				p.drawPixmap( x, y, stepoff );
+				for( int i = 0; i < vol / 5 + 1; ++i )
+				{
+					p.drawPixmap( x, y, stepon );
+				}
+				for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
+									++i )
+				{
+					p.drawPixmap( x, y, stepoverlay );
+				}
+			}
+			else if( ( no / BEATS_PER_TACT ) % 2 )
+			{
+				p.drawPixmap( x, y, stepoff );
+			}
+			else
+			{
+				p.drawPixmap( x, y, stepoffl );
+			}
+		}
+	}
+
+	p.setFont( pointSize<7>( p.font() ) );
+	if( m_pat->muted() || m_pat->getTrack()->muted() )
+	{
+		p.setPen( QColor( 192, 192, 192 ) );
+	}
+	else
+	{
+		p.setPen( QColor( 32, 240, 32 ) );
+	}
+	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
+	if( m_pat->muted() )
+	{
+		p.drawPixmap( 3, p.fontMetrics().height() + 1,
+				embed::getIconPixmap( "muted", 16, 16 ) );
+	}
+	else if( m_pat->m_frozenPattern != NULL )
+	{
+		p.setPen( QColor( 0, 224, 255 ) );
+		p.drawRect( 0, 0, width(), height() - 1 );
+		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
+	}
+
+	p.end();
+
+	p.begin( this );
+	p.drawPixmap( 0, 0, m_paintPixmap );
+
+}
 
 
 

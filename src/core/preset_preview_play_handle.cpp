@@ -53,10 +53,9 @@ public:
 	{
 		setJournalling( FALSE );
 		m_previewInstrumentTrack = dynamic_cast<instrumentTrack *>(
-					track::create( track::INSTRUMENT_TRACK,
+					track::create( track::InstrumentTrack,
 								this ) );
 		m_previewInstrumentTrack->setJournalling( FALSE );
-		hide();
 	}
 
 	virtual ~previewTrackContainer()
@@ -134,7 +133,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 				mmp.content().firstChild().toElement() );
 	// preset also contains information about window-states etc. that's why
 	// here we have to make sure that the instrument-track-window is hidden
-	s_previewTC->previewInstrumentTrack()->hide();
+//	s_previewTC->previewInstrumentTrack()->hide();
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all

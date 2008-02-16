@@ -33,7 +33,7 @@
 #include "audio_file_processor.h"
 #include "automatable_model_templates.h"
 #include "engine.h"
-#include "song_editor.h"
+#include "song.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
@@ -447,7 +447,7 @@ void audioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString txt = _dee->mimeData()->data(
 						stringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
-							track::SAMPLE_TRACK ) )
+							track::SampleTrack ) )
 		{
 			_dee->acceptProposedAction();
 		}
@@ -479,7 +479,7 @@ void audioFileProcessorView::dropEvent( QDropEvent * _de )
 		_de->accept();
 		return;
 	}
-	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
+	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
 		multimediaProject mmp( value, FALSE );
 		castModel<audioFileProcessor>()->setAudioFile( mmp.content().
@@ -572,7 +572,7 @@ void audioFileProcessorView::openAudioFile( void )
 	if( af != "" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 	}
 }
 

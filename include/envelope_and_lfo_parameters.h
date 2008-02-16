@@ -1,9 +1,7 @@
 /*
- * envelope_and_lfo_widget.h - declaration of class envelopeAndLFOWidget which
- *                             is used by envelope/lfo/filter-tab of
- *                              channel-window
+ * envelope_and_lfo_parameters.h - class envelopeAndLFOParameters
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,12 +23,10 @@
  */
 
 
-#ifndef _ENVELOPE_AND_LFO_WIDGET_H
-#define _ENVELOPE_AND_LFO_WIDGET_H
+#ifndef _ENVELOPE_AND_LFO_PARAMETERS_H
+#define _ENVELOPE_AND_LFO_PARAMETERS_H
 
 #include <QtCore/QVector>
-#include <QtGui/QWidget>
-
 
 #include "journalling_object.h"
 #include "automatable_model.h"
@@ -38,28 +34,18 @@
 #include "types.h"
 
 
-class QPaintEvent;
-class QPixmap;
-
-class automatableButtonGroup;
-class envelopeTabWidget;
-class knob;
-class ledCheckBox;
-class pixmapButton;
-class tempoSyncKnob;
 class track;
 
 
-class flpImport;
 
-
-class envelopeAndLFOWidget : public QWidget, public journallingObject
+class envelopeAndLFOParameters : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	envelopeAndLFOWidget( float _value_for_zero_amount, QWidget * _parent,
-							track * _track );
-	virtual ~envelopeAndLFOWidget();
+	envelopeAndLFOParameters( float _value_for_zero_amount,
+							track * _track,
+							model * _parent );
+	virtual ~envelopeAndLFOParameters();
 
 	static inline float expKnobVal( float _val )
 	{
@@ -69,7 +55,7 @@ public:
 	static void triggerLFO( void );
 	static void resetLFO( void );
 
-	void FASTCALL fillLevel( float * _buf, f_cnt_t _frame,
+	void fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
 				const fpp_t _frames );
 
@@ -79,12 +65,21 @@ public:
 	}
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+	virtual QString nodeName( void ) const
 	{
 		return( "el" );
+	}
+
+	inline f_cnt_t PAHD_Frames( void ) const
+	{
+		return( m_pahdFrames );
+	}
+
+	inline f_cnt_t releaseFrames( void ) const
+	{
+		return( m_rFrames );
 	}
 
 
@@ -93,38 +88,15 @@ public slots:
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-
-	void FASTCALL fillLFOLevel( float * _buf, f_cnt_t _frame,
-							const fpp_t _frames );
-
-
-protected slots:
-	void lfoUserWaveChanged( void );
+	void fillLFOLevel( float * _buf, f_cnt_t _frame, const fpp_t _frames );
 
 
 private:
-	static QPixmap * s_envGraph;
-	static QPixmap * s_lfoGraph;
+	static QVector<envelopeAndLFOParameters *> s_EaLParametersInstances;
 
-	static QVector<envelopeAndLFOWidget *> s_EaLWidgets;
-
-	bool   m_used;
+	bool m_used;
 
 
-	// envelope-stuff
-	knob * m_predelayKnob;
-	knob * m_attackKnob;
-	knob * m_holdKnob;
-	knob * m_decayKnob;
-	knob * m_sustainKnob;
-	knob * m_releaseKnob;
-	knob * m_amountKnob;
-
-	// models
 	floatModel m_predelayModel;
 	floatModel m_attackModel;
 	floatModel m_holdModel;
@@ -143,18 +115,6 @@ private:
 	sample_t * m_rEnv;
 
 
-	// LFO-stuff
-	knob * m_lfoPredelayKnob;
-	knob * m_lfoAttackKnob;
-	tempoSyncKnob * m_lfoSpeedKnob;
-	knob * m_lfoAmountKnob;
-	pixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_lfoWaveBtnGrp;
-
-	ledCheckBox * m_x100Cb;
-	ledCheckBox * m_controlEnvAmountCb;
-
-	// models
 	floatModel m_lfoPredelayModel;
 	floatModel m_lfoAttackModel;
 	floatModel m_lfoSpeedModel;
@@ -175,13 +135,14 @@ private:
 	bool m_bad_lfoShapeData;
 	sampleBuffer m_userWave;
 
-	enum lfoShapes
+	enum LfoShapes
 	{
-		SIN,
-		TRIANGLE,
-		SAW,
-		SQUARE,
-		USER
+		SineWave,
+		TriangleWave,
+		SawWave,
+		SquareWave,
+		UserDefinedWave,
+		NumLfoShapes
 	} ;
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
@@ -189,8 +150,8 @@ private:
 
 
 
-	friend class envelopeTabWidget;
-	friend class flpImport;
+	friend class envelopeAndLFOView;
+//	friend class flpImport;
 
 } ;
 

@@ -34,11 +34,13 @@
 
 class automationEditor;
 class bbEditor;
+class bbTrackContainer;
 class projectJournal;
 class mainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
+class song;
 class songEditor;
 class ladspa2LMMS;
 
@@ -54,11 +56,28 @@ public:
 		return( s_hasGUI );
 	}
 
+	// core
 	static mixer * getMixer( void )
 	{
 		return( s_mixer );
 	}
 
+	static song * getSong( void )
+	{
+		return( s_song );
+	}
+
+	static bbTrackContainer * getBBTrackContainer( void )
+	{
+		return( s_bbTrackContainer );
+	}
+
+	static projectJournal * getProjectJournal( void )
+	{
+		return( s_projectJournal );
+	}
+
+	// GUI
 	static mainWindow * getMainWindow( void )
 	{
 		return( s_mainWindow );
@@ -82,11 +101,6 @@ public:
 	static projectNotes * getProjectNotes( void )
 	{
 		return( s_projectNotes );
-	}
-
-	static projectJournal * getProjectJournal( void )
-	{
-		return( s_projectJournal );
 	}
 
 	static automationEditor * getAutomationEditor( void )
@@ -115,14 +129,19 @@ private:
 	static bool s_hasGUI;
 	static float s_framesPerTact64th;
 
+	// core
 	static mixer * s_mixer;
+	static song * s_song;
+	static bbTrackContainer * s_bbTrackContainer;
+	static projectJournal * s_projectJournal;
+
+	// GUI
 	static mainWindow * s_mainWindow;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;
 	static pianoRoll * s_pianoRoll;
 	static projectNotes * s_projectNotes;
-	static projectJournal * s_projectJournal;
 	static ladspa2LMMS * s_ladspaManager;
 
 	static QMap<QString, QString> s_sampleExtensions;

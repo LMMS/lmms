@@ -48,6 +48,7 @@
 
 #include "bb_editor.h"
 #include "song_editor.h"
+#include "song.h"
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
@@ -77,8 +78,7 @@ mainWindow::mainWindow( void ) :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_toolsMenu( NULL ),
-	m_modified( FALSE )
+	m_toolsMenu( NULL )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -514,24 +514,23 @@ void mainWindow::addSpacingToToolBar( int _size )
 
 
 
-void mainWindow::resetWindowTitle( bool _modified )
+void mainWindow::resetWindowTitle( void )
 {
 	QString title = "";
-	if( engine::getSongEditor()->projectFileName() != "" )
+	if( engine::getSong()->projectFileName() != "" )
 	{
-		title = QFileInfo( engine::getSongEditor()->projectFileName()
+		title = QFileInfo( engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
 	if( title == "" )
 	{
 		title = tr( "Untitled" );
 	}
-	if( _modified )
+	if( engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( VERSION ) );
-	m_modified = _modified;
 }
 
 
@@ -539,7 +538,7 @@ void mainWindow::resetWindowTitle( bool _modified )
 
 bool mainWindow::mayChangeProject( void )
 {
-	if( !m_modified )
+	if( !engine::getSong()->isModified() )
 	{
 		return( TRUE );
 	}
@@ -626,7 +625,7 @@ void mainWindow::createNewProject( void )
 {
 	if( mayChangeProject() )
 	{
-		engine::getSongEditor()->createNewProject();
+		engine::getSong()->createNewProject();
 	}
 }
 
@@ -641,7 +640,7 @@ void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 						>= m_custom_templates_count ?
 				configManager::inst()->factoryProjectsDir() :
 				configManager::inst()->userProjectsDir();
-		engine::getSongEditor()->createNewProjectFromTemplate(
+		engine::getSong()->createNewProjectFromTemplate(
 			dir_base + "templates/" + _idx->text() + ".mpt" );
 	}
 }
@@ -661,7 +660,7 @@ void mainWindow::openProject( void )
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-			engine::getSongEditor()->loadProject(
+			engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
 		}
 	}
@@ -686,7 +685,7 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 void mainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	const QString & f = _action->text();
-	engine::getSongEditor()->loadProject( f );
+	engine::getSong()->loadProject( f );
 	configManager::inst()->addRecentlyOpenedProject( f );
 }
 
@@ -695,13 +694,13 @@ void mainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool mainWindow::saveProject( void )
 {
-	if( engine::getSongEditor()->projectFileName() == "" )
+	if( engine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		engine::getSongEditor()->saveProject();
+		engine::getSong()->saveProject();
 	}
 	return( TRUE );
 }
@@ -716,7 +715,7 @@ bool mainWindow::saveProjectAs( void )
 				"MultiMedia Project Template (*.mpt)" ) );
 	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
-	QString f = engine::getSongEditor()->projectFileName();
+	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
 		sfd.selectFile( QFileInfo( f ).fileName() );
@@ -730,7 +729,7 @@ bool mainWindow::saveProjectAs( void )
 	if( sfd.exec () == QFileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		engine::getSongEditor()->saveProjectAs(
+		engine::getSong()->saveProjectAs(
 						sfd.selectedFiles()[0] );
 		return( TRUE );
 	}

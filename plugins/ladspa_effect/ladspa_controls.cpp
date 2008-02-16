@@ -34,8 +34,7 @@ ladspaControls::ladspaControls( ladspaEffect * _eff,
 	m_processors( _eff->getProcessorCount() ),
 	m_track( _track ),
 	m_noLink( FALSE ),
-	m_stereoLinkModel( TRUE, FALSE, TRUE, boolModel::defaultRelStep(),
-									this )
+	m_stereoLinkModel( TRUE, this )
 {
 	multi_proc_t controls = m_effect->getPortControls();
 	m_controlCount = controls.count();

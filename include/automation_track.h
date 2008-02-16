@@ -2,7 +2,7 @@
  * automation_track.h - declaration of class automationTrack, which handles
  *                      automation of objects without a track
  *
- * Copyright (c) 2006 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,34 +30,30 @@
 #include "track.h"
 
 
-class automationTrack : public QWidget, public track
+class automationTrack : public track
 {
-	Q_OBJECT
 public:
 	automationTrack( trackContainer * _tc );
 	virtual ~automationTrack();
 
-
-private:
-	inline QString nodeName( void ) const
-	{
-		return( "automation-track" );
-	}
-
-	virtual trackTypes type( void ) const;
-
-	virtual bool FASTCALL play( const midiTime & _start,
-						const fpp_t _frames,
+	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 
-	virtual trackContentObject * FASTCALL createTCO( const midiTime &
-									_pos );
+	virtual QString nodeName( void ) const
+	{
+		return( "automationtrack" );
+	}
 
-	virtual void FASTCALL saveTrackSpecificSettings( QDomDocument & _doc,
+	virtual trackView * createView( trackContainerView * )
+	{
+		return( NULL );
+	}
+	virtual trackContentObject * createTCO( const midiTime & _pos );
+
+	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
-									_this );
+	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 } ;
 
