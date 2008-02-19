@@ -1,7 +1,7 @@
 /*
  * patman.h - header for a GUS-compatible patch instrument plugin
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,7 +28,9 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "sample_buffer.h"
+#include "automatable_model.h"
 
 
 class pixmapButton;
@@ -44,14 +46,14 @@ class pixmapButton;
 #define MODES_CLAMPED	( 1 << 7 )
 
 
-class patmanSynth : public instrument
+class patmanInstrument : public instrument
 {
 	Q_OBJECT
 public:
 	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
 	{
 	public:
-		subPluginFeatures( plugin::pluginTypes _type );
+		subPluginFeatures( plugin::PluginTypes _type );
 
 		virtual const QStringList & supportedExtensions( void )
 		{
@@ -63,33 +65,28 @@ public:
 	} ;
 
 
-	patmanSynth( instrumentTrack * _track );
-	virtual ~patmanSynth();
+	patmanInstrument( instrumentTrack * _track );
+	virtual ~patmanInstrument();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
+	virtual void playNote( notePlayHandle * _n,
 						bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void FASTCALL setParameter( const QString & _param,
+	virtual void setParameter( const QString & _param,
 						const QString & _value );
 
 	virtual QString nodeName( void ) const;
 
+	virtual pluginView * instantiateView( QWidget * _parent );
+
 
 public slots:
-	void openFile( void );
 	void setFile( const QString & _patch_file, bool _rename = TRUE );
-
-
-protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
 
 
 private:
@@ -101,29 +98,66 @@ private:
 	} handle_data;
 
 	QString m_patchFile;
-	QVector<sampleBuffer *> m_patch_samples;
+	QVector<sampleBuffer *> m_patchSamples;
+	boolModel m_loopedModel;
+	boolModel m_tunedModel;
 
-	pixmapButton * m_openFileButton;
-	pixmapButton * m_loopButton;
-	pixmapButton * m_tuneButton;
-	QString m_display_filename;
 
-	enum load_error
+	enum LoadErrors
 	{
-		LOAD_OK,
-		LOAD_OPEN,
-		LOAD_NOT_GUS,
-		LOAD_INSTRUMENTS,
-		LOAD_LAYERS,
-		LOAD_IO
+		LoadOK,
+		LoadOpen,
+		LoadNotGUS,
+		LoadInstruments,
+		LoadLayers,
+		LoadIO
 	} ;
 
-	load_error load_patch( const QString & _filename );
-	void unload_current_patch( void );
+	LoadErrors loadPatch( const QString & _filename );
+	void unloadCurrentPatch( void );
 
-	void select_sample( notePlayHandle * _n );
+	void selectSample( notePlayHandle * _n );
+
+
+	friend class patmanView;
+
+signals:
+	void fileChanged( void );
 
 } ;
+
+
+
+class patmanView : public instrumentView
+{
+	Q_OBJECT
+public:
+	patmanView( instrument * _instrument, QWidget * _parent );
+	virtual ~patmanView();
+
+
+public slots:
+	void openFile( void );
+	void updateFilename( void );
+
+
+protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void paintEvent( QPaintEvent * );
+
+
+private:
+	virtual void modelChanged( void );
+
+	patmanInstrument * m_pi;
+	QString m_displayFilename;
+
+	pixmapButton * m_loopButton;
+	pixmapButton * m_tuneButton;
+
+} ;
+
 
 
 #endif

@@ -1,7 +1,7 @@
 /*
  * patman.cpp - a GUS-compatible patch instrument plugin
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,7 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QDragEnterEvent>
+#include <QtGui/QPainter>
 #include <QtXml/QDomElement>
 
 #include "endian_handling.h"
@@ -34,7 +35,7 @@
 #include "gui_templates.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
-#include "song_editor.h"
+#include "song.h"
 #include "string_pair_drag.h"
 #include "tooltip.h"
 
@@ -57,14 +58,14 @@ plugin::descriptor patman_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
-	new patmanSynth::subPluginFeatures( plugin::Instrument )
+	new patmanInstrument::subPluginFeatures( plugin::Instrument )
 } ;
 
 
 // necessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
-	return( new patmanSynth( static_cast<instrumentTrack *>( _data ) ) );
+	return( new patmanInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }
 
 }
@@ -72,94 +73,47 @@ plugin * lmms_plugin_main( void * _data )
 
 
 
-patmanSynth::patmanSynth( instrumentTrack * _track ) :
-	instrument( _track, &patman_plugin_descriptor )
+patmanInstrument::patmanInstrument( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &patman_plugin_descriptor ),
+	m_patchFile( QString::null ),
+	m_loopedModel( FALSE, this ),
+	m_tunedModel( TRUE, this )
 {
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-
-	m_openFileButton = new pixmapButton( this, NULL, NULL );
-	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_openFileButton->move( 200, 90 );
-	m_openFileButton->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
-	m_openFileButton->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
-	connect( m_openFileButton, SIGNAL( clicked() ), this,
-						SLOT( openFile() ) );
-	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
-
-	m_openFileButton->setWhatsThis(
-		tr( "Click here to open another patch-file. Loop and Tune "
-			"settings are not reset." ) );
-
-	m_loopButton = new pixmapButton( this, tr( "Loop" ), _track );
-	m_loopButton->setCheckable( TRUE );
-	m_loopButton->move( 160, 160 );
-	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_on" ) );
-	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_off" ) );
-	toolTip::add( m_loopButton, tr( "Loop mode" ) );
-	m_loopButton->setWhatsThis(
-		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
-			"will use the loop information available in the "
-			"file." ) );
-
-	m_tuneButton = new pixmapButton( this, tr( "Tune" ), _track );
-	m_tuneButton->setCheckable( TRUE );
-	m_tuneButton->setValue( TRUE );
-	m_tuneButton->move( 180, 160 );
-	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"tune_on" ) );
-	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"tune_off" ) );
-	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
-	m_tuneButton->setWhatsThis(
-		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
-			"will tune the sample to match the note's "
-			"frequency." ) );
-
-	m_display_filename = tr( "No file selected" );
-
-	setAcceptDrops( TRUE );
 }
 
 
 
 
-patmanSynth::~patmanSynth()
+patmanInstrument::~patmanInstrument()
 {
-	unload_current_patch();
+	unloadCurrentPatch();
 }
 
 
 
 
-void patmanSynth::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void patmanInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "src", m_patchFile );
-	m_loopButton->saveSettings( _doc, _this, "looped" );
-	m_tuneButton->saveSettings( _doc, _this, "tuned" );
+	m_loopedModel.saveSettings( _doc, _this, "looped" );
+	m_tunedModel.saveSettings( _doc, _this, "tuned" );
 }
 
 
 
 
-void patmanSynth::loadSettings( const QDomElement & _this )
+void patmanInstrument::loadSettings( const QDomElement & _this )
 {
 	setFile( _this.attribute( "src" ), FALSE );
-	m_loopButton->loadSettings( _this, "looped" );
-	m_tuneButton->loadSettings( _this, "tuned" );
+	m_loopedModel.loadSettings( _this, "looped" );
+	m_tunedModel.loadSettings( _this, "tuned" );
 }
 
 
 
 
-void patmanSynth::setParameter( const QString & _param, const QString & _value )
+void patmanInstrument::setParameter( const QString & _param,
+							const QString & _value )
 {
 	if( _param == "samplefile" )
 	{
@@ -170,7 +124,7 @@ void patmanSynth::setParameter( const QString & _param, const QString & _value )
 
 
 
-QString patmanSynth::nodeName( void ) const
+QString patmanInstrument::nodeName( void ) const
 {
 	return( patman_plugin_descriptor.name );
 }
@@ -178,14 +132,14 @@ QString patmanSynth::nodeName( void ) const
 
 
 
-void patmanSynth::playNote( notePlayHandle * _n, bool )
+void patmanInstrument::playNote( notePlayHandle * _n, bool )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
 	{
-		select_sample( _n );
+		selectSample( _n );
 	}
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 
@@ -193,7 +147,7 @@ void patmanSynth::playNote( notePlayHandle * _n, bool )
 						hdata->sample->frequency();
 
 	if( hdata->sample->play( buf, hdata->state, frames, play_freq,
-						m_loopButton->isChecked() ) )
+						m_loopedModel.value() ) )
 	{
 		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
 	}
@@ -203,7 +157,7 @@ void patmanSynth::playNote( notePlayHandle * _n, bool )
 
 
 
-void patmanSynth::deleteNotePluginData( notePlayHandle * _n )
+void patmanInstrument::deleteNotePluginData( notePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
 	sharedObject::unref( hdata->sample );
@@ -214,114 +168,9 @@ void patmanSynth::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-void patmanSynth::dragEnterEvent( QDragEnterEvent * _dee )
+void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == "samplefile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void patmanSynth::dropEvent( QDropEvent * _de )
-{
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
-	{
-		setFile( value );
-		_de->accept();
-		return;
-	}
-
-	_de->ignore();
-}
-
-
-
-
-void patmanSynth::paintEvent( QPaintEvent * )
-{
-	QPainter p( this );
-
-	p.setFont( pointSize<8>( font() ) );
-	p.setPen( QColor( 0x66, 0xFF, 0x66 ) );
-	p.drawText( 8, 140, m_display_filename );
-}
-
-
-
-
-void patmanSynth::openFile( void )
-{
-	QFileDialog ofd( NULL, tr( "Open patch file" ) );
-	ofd.setFileMode( QFileDialog::ExistingFiles );
-
-	QStringList types;
-	types << tr( "Patch-Files (*.pat)" );
-	ofd.setFilters( types );
-
-	if( m_patchFile == "" )
-	{
-		if( QDir( "/usr/share/midi/freepats" ).exists() )
-		{
-			ofd.setDirectory( "/usr/share/midi/freepats" );
-		}
-		else
-		{
-			ofd.setDirectory(
-				configManager::inst()->userSamplesDir() );
-		}
-	}
-	else if( QFileInfo( m_patchFile ).isRelative() )
-	{
-		QString f = configManager::inst()->userSamplesDir()
-								+ m_patchFile;
-		if( QFileInfo( f ).exists() == FALSE )
-		{
-			f = configManager::inst()->factorySamplesDir()
-								+ m_patchFile;
-		}
-
-		ofd.selectFile( f );
-	}
-	else
-	{
-		ofd.selectFile( m_patchFile );
-	}
-
-	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
-	{
-		QString f = ofd.selectedFiles()[0];
-		if( f != "" )
-		{
-			setFile( f );
-			engine::getSongEditor()->setModified();
-		}
-	}
-}
-
-
-
-
-void patmanSynth::setFile( const QString & _patch_file, bool _rename )
-{
-	// is current channel-name equal to previous-filename??
+	// is current instrument-track-name equal to previous-filename??
 	if( _rename &&
 		( getInstrumentTrack()->name() ==
 					QFileInfo( m_patchFile ).fileName() ||
@@ -331,49 +180,33 @@ void patmanSynth::setFile( const QString & _patch_file, bool _rename )
 		getInstrumentTrack()->setName( QFileInfo( _patch_file
 								).fileName() );
 	}
-	// else we don't touch the channel-name, because the user named it self
+	// else we don't touch the instrument-track-name, because the user
+	// named it self
 
 	m_patchFile = sampleBuffer::tryToMakeRelative( _patch_file );
-	load_error error = load_patch( sampleBuffer::tryToMakeAbsolute(
+	LoadErrors error = loadPatch( sampleBuffer::tryToMakeAbsolute(
 								_patch_file ) );
 	if( error )
 	{
 		printf("Load error\n");
 	}
 
- 	m_display_filename = "";
-	Uint16 idx = m_patchFile.length();
-
-	QFontMetrics fm( pointSize<8>( font() ) );
-
-	// simple algorithm for creating a text from the filename that
-	// matches in the white rectangle
-	while( idx > 0 && fm.size( Qt::TextSingleLine,
-				m_display_filename + "..." ).width() < 225 )
-	{
-		m_display_filename = m_patchFile[--idx] + m_display_filename;
-	}
-
-	if( idx > 0 )
-	{
-		m_display_filename = "..." + m_display_filename;
-	}
-
-	update();
+	emit fileChanged();
 }
 
 
 
 
-patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
+patmanInstrument::LoadErrors patmanInstrument::loadPatch(
+						const QString & _filename )
 {
-	unload_current_patch();
+	unloadCurrentPatch();
 
 	FILE * fd = fopen( _filename.toAscii().constData() , "rb" );
 	if( !fd )
 	{
 		perror( "fopen" );
-		return( LOAD_OPEN );
+		return( LoadOpen );
 	}
 
 	unsigned char header[239];
@@ -383,19 +216,19 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 			&& memcmp( header, "GF1PATCH100\0ID#000002", 22 ) ) )
 	{
 		fclose( fd );
-		return( LOAD_NOT_GUS );
+		return( LoadNotGUS );
 	}
 
 	if( header[82] != 1 && header[82] != 0 )
 	{
 		fclose( fd );
-		return( LOAD_INSTRUMENTS );
+		return( LoadInstruments );
 	}
 
 	if( header[151] != 1 && header[151] != 0 )
 	{
 		fclose( fd );
-		return( LOAD_LAYERS );
+		return( LoadLayers );
 	}
 
 	int sample_count = header[198];
@@ -407,14 +240,14 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 		if ( fseek( fd, x, SEEK_CUR ) == -1 ) \
 		{ \
 			fclose( fd ); \
-			return( LOAD_IO ); \
+			return( LoadIO ); \
 		}
 
 #define READ_SHORT( x ) \
 		if ( fread( &tmpshort, 2, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LOAD_IO ); \
+			return( LoadIO ); \
 		} \
 		x = (unsigned short)swap16IfBE( tmpshort );
 
@@ -422,7 +255,7 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 		if ( fread( &x, 4, 1, fd ) != 1 ) \
 		{ \
 			fclose( fd ); \
-			return( LOAD_IO ); \
+			return( LoadIO ); \
 		} \
 		x = (unsigned)swap32IfBE( x );
 
@@ -446,7 +279,7 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 		if ( fread( &modes, 1, 1, fd ) != 1 )
 		{
 			fclose( fd );
-			return( LOAD_IO );
+			return( LoadIO );
 		}
 		// skip scale frequency, scale factor, reserved space
 		SKIP_BYTES( 2 + 2 + 36 );
@@ -464,7 +297,7 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 				{
 					delete wave_samples;
 					fclose( fd );
-					return( LOAD_IO );
+					return( LoadIO );
 				}
 				sample = swap16IfBE( sample );
 				if( modes & MODES_UNSIGNED )
@@ -488,7 +321,7 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 				{
 					delete wave_samples;
 					fclose( fd );
-					return( LOAD_IO );
+					return( LoadIO );
 				}
 				if( modes & MODES_UNSIGNED )
 				{
@@ -519,39 +352,39 @@ patmanSynth::load_error patmanSynth::load_patch( const QString & _filename )
 			psample->setLoopEndFrame( loop_end );
 		}
 
-		m_patch_samples.push_back( psample );
+		m_patchSamples.push_back( psample );
 
 		delete[] wave_samples;
 		delete[] data;
 	}
 	fclose( fd );
-	return( LOAD_OK );
+	return( LoadOK );
 }
 
 
 
 
-void patmanSynth::unload_current_patch( void )
+void patmanInstrument::unloadCurrentPatch( void )
 {
-	while( !m_patch_samples.empty() )
+	while( !m_patchSamples.empty() )
 	{
-		sharedObject::unref( m_patch_samples.back() );
-		m_patch_samples.pop_back();
+		sharedObject::unref( m_patchSamples.back() );
+		m_patchSamples.pop_back();
 	}
 }
 
 
 
 
-void patmanSynth::select_sample( notePlayHandle * _n )
+void patmanInstrument::selectSample( notePlayHandle * _n )
 {
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
 	sampleBuffer * sample = NULL;
 
-	for( QVector<sampleBuffer *>::iterator it = m_patch_samples.begin();
-					it != m_patch_samples.end(); ++it )
+	for( QVector<sampleBuffer *>::iterator it = m_patchSamples.begin();
+					it != m_patchSamples.end(); ++it )
 	{
 		float patch_freq = ( *it )->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
@@ -565,7 +398,7 @@ void patmanSynth::select_sample( notePlayHandle * _n )
 	}
 
 	handle_data * hdata = new handle_data;
-	hdata->tuned = m_tuneButton->isChecked();
+	hdata->tuned = m_tunedModel.value();
 	if( sample )
 	{
 		hdata->sample = sharedObject::ref( sample );
@@ -582,11 +415,233 @@ void patmanSynth::select_sample( notePlayHandle * _n )
 
 
 
+pluginView * patmanInstrument::instantiateView( QWidget * _parent )
+{
+	return( new patmanView( this, _parent ) );
+}
 
 
 
 
-patmanSynth::subPluginFeatures::subPluginFeatures( plugin::pluginTypes _type ) :
+
+
+
+
+
+
+patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
+	instrumentView( _instrument, _parent ),
+	m_pi( NULL )
+{
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
+
+	pixmapButton * open_file_btn = new pixmapButton( this, NULL );
+	open_file_btn->setCursor( QCursor( Qt::PointingHandCursor ) );
+	open_file_btn->move( 200, 90 );
+	open_file_btn->setActiveGraphic( embed::getIconPixmap(
+							"project_open_down" ) );
+	open_file_btn->setInactiveGraphic( embed::getIconPixmap(
+							"project_open" ) );
+	connect( open_file_btn, SIGNAL( clicked() ),
+				this, SLOT( openFile() ) );
+	toolTip::add( open_file_btn, tr( "Open other patch" ) );
+
+	open_file_btn->setWhatsThis(
+		tr( "Click here to open another patch-file. Loop and Tune "
+			"settings are not reset." ) );
+
+	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton->setCheckable( TRUE );
+	m_loopButton->move( 160, 160 );
+	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"loop_on" ) );
+	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"loop_off" ) );
+	toolTip::add( m_loopButton, tr( "Loop mode" ) );
+	m_loopButton->setWhatsThis(
+		tr( "Here you can toggle the Loop mode. If enabled, PatMan "
+			"will use the loop information available in the "
+			"file." ) );
+
+	m_tuneButton = new pixmapButton( this, tr( "Tune" ) );
+	m_tuneButton->setCheckable( TRUE );
+	m_tuneButton->move( 180, 160 );
+	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"tune_on" ) );
+	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"tune_off" ) );
+	toolTip::add( m_tuneButton, tr( "Tune mode" ) );
+	m_tuneButton->setWhatsThis(
+		tr( "Here you can toggle the Tune mode. If enabled, PatMan "
+			"will tune the sample to match the note's "
+			"frequency." ) );
+
+	m_displayFilename = tr( "No file selected" );
+
+	setAcceptDrops( TRUE );
+}
+
+
+
+
+patmanView::~patmanView()
+{
+}
+
+
+
+
+void patmanView::openFile( void )
+{
+	QFileDialog ofd( NULL, tr( "Open patch file" ) );
+	ofd.setFileMode( QFileDialog::ExistingFiles );
+
+	QStringList types;
+	types << tr( "Patch-Files (*.pat)" );
+	ofd.setFilters( types );
+
+	if( m_pi->m_patchFile == "" )
+	{
+		if( QDir( "/usr/share/midi/freepats" ).exists() )
+		{
+			ofd.setDirectory( "/usr/share/midi/freepats" );
+		}
+		else
+		{
+			ofd.setDirectory(
+				configManager::inst()->userSamplesDir() );
+		}
+	}
+	else if( QFileInfo( m_pi->m_patchFile ).isRelative() )
+	{
+		QString f = configManager::inst()->userSamplesDir()
+							+ m_pi->m_patchFile;
+		if( QFileInfo( f ).exists() == FALSE )
+		{
+			f = configManager::inst()->factorySamplesDir()
+							+ m_pi->m_patchFile;
+		}
+
+		ofd.selectFile( f );
+	}
+	else
+	{
+		ofd.selectFile( m_pi->m_patchFile );
+	}
+
+	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+	{
+		QString f = ofd.selectedFiles()[0];
+		if( f != "" )
+		{
+			m_pi->setFile( f );
+			engine::getSong()->setModified();
+		}
+	}
+}
+
+
+
+
+void patmanView::updateFilename( void )
+{
+ 	m_displayFilename = "";
+	Uint16 idx = m_pi->m_patchFile.length();
+
+	QFontMetrics fm( pointSize<8>( font() ) );
+
+	// simple algorithm for creating a text from the filename that
+	// matches in the white rectangle
+	while( idx > 0 && fm.size( Qt::TextSingleLine,
+				m_displayFilename + "..." ).width() < 225 )
+	{
+		m_displayFilename = m_pi->m_patchFile[--idx] +
+							m_displayFilename;
+	}
+
+	if( idx > 0 )
+	{
+		m_displayFilename = "..." + m_displayFilename;
+	}
+
+	update();
+}
+
+
+
+
+void patmanView::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	{
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
+		if( txt.section( ':', 0, 0 ) == "samplefile" )
+		{
+			_dee->acceptProposedAction();
+		}
+		else
+		{
+			_dee->ignore();
+		}
+	}
+	else
+	{
+		_dee->ignore();
+	}
+}
+
+
+
+
+void patmanView::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "samplefile" )
+	{
+		m_pi->setFile( value );
+		_de->accept();
+		return;
+	}
+
+	_de->ignore();
+}
+
+
+
+
+void patmanView::paintEvent( QPaintEvent * )
+{
+	QPainter p( this );
+
+	p.setFont( pointSize<8>( font() ) );
+	p.setPen( QColor( 0x66, 0xFF, 0x66 ) );
+	p.drawText( 8, 140, m_displayFilename );
+}
+
+
+
+
+void patmanView::modelChanged( void )
+{
+	m_pi = castModel<patmanInstrument>();
+	m_loopButton->setModel( &m_pi->m_loopedModel );
+	m_tuneButton->setModel( &m_pi->m_tunedModel );
+	connect( m_pi, SIGNAL( fileChanged() ),
+			this, SLOT( updateFilename() ) );
+}
+
+
+
+
+
+patmanInstrument::subPluginFeatures::subPluginFeatures(
+						plugin::PluginTypes _type ) :
 	plugin::descriptor::subPluginFeatures( _type )
 {
 }
@@ -594,7 +649,8 @@ patmanSynth::subPluginFeatures::subPluginFeatures( plugin::pluginTypes _type ) :
 
 
 
-const QStringList & patmanSynth::subPluginFeatures::supported_extensions( void )
+const QStringList & patmanInstrument::subPluginFeatures::supported_extensions(
+									void )
 {
 	static QStringList extension( "pat" );
 	return( extension );
