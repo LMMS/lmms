@@ -242,7 +242,7 @@ void mainWindow::finalize( void )
 	toolButton * project_export = new toolButton( 
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					engine::getSongEditor(),
+					engine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
@@ -387,11 +387,11 @@ void mainWindow::finalize( void )
 	project_menu->addSeparator();
 	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
 					tr( "Import..." ),
-					engine::getSongEditor(),
+					engine::getSong(),
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					engine::getSongEditor(),
+					engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addSeparator();
