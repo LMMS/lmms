@@ -1,7 +1,7 @@
 /*
  * midi_import.h - support for importing MIDI-files
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,6 +43,11 @@ class midiImport : public importFilter
 public:
 	midiImport( const QString & _file );
 	virtual ~midiImport();
+
+	virtual pluginView * instantiateView( QWidget * )
+	{
+		return( NULL );
+	}
 
 
 private:

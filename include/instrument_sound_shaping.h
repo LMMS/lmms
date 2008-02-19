@@ -78,6 +78,7 @@ private:
 
 
 	friend class instrumentSoundShapingView;
+	friend class flpImport;
 
 } ;
 

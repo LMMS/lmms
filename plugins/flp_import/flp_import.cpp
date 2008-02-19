@@ -1,7 +1,7 @@
 /*
  * flp_import.cpp - support for importing FLP-files
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -30,7 +30,6 @@
 #include <QtCore/QBuffer>
 
 #include "flp_import.h"
-#include "arp_and_chords_tab_widget.h"
 #include "basic_filters.h"
 #include "bb_editor.h"
 #include "bb_track.h"
@@ -38,18 +37,17 @@
 #include "config_mgr.h"
 #include "debug.h"
 #include "engine.h"
-#include "envelope_tab_widget.h"
-#include "envelope_and_lfo_widget.h"
 #include "group_box.h"
 #include "instrument.h"
 #include "instrument_track.h"
+#include "envelope_and_lfo_parameters.h"
 #include "knob.h"
 #include "oscillator.h"
 #include "pattern.h"
 #include "piano_widget.h"
 #include "project_journal.h"
 #include "project_notes.h"
-#include "song_editor.h"
+#include "song.h"
 #include "tempo_sync_knob.h"
 #include "track_container.h"
 
@@ -232,7 +230,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 	int ev_cnt = 0;
 
-	engine::getSongEditor()->clearProject();
+	engine::getSong()->clearProject();
 	const bool is_journ = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( FALSE );
 
@@ -314,7 +312,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MainVol:
 				printf( "main-volume: %d\n", data );
-				engine::getSongEditor()->setMasterVolume(
+				engine::getSong()->setMasterVolume(
 					static_cast<volume>( data * 100 /
 									128 ) );
 				break;
@@ -345,12 +343,12 @@ bool flpImport::tryImport( trackContainer * _tc )
 				printf( "new channel\n" );
 
 				it = dynamic_cast<instrumentTrack *>(
-	track::create( track::INSTRUMENT_TRACK, engine::getBBEditor() ) );
+	track::create( track::InstrumentTrack, engine::getBBTrackContainer() ) );
 				assert( it != NULL );
 				i_tracks.push_back( it );
 				it_inst = it->loadInstrument(
 							"audiofileprocessor" );
-				it->toggledInstrumentTrackButton( FALSE );
+//				it->toggledInstrumentTrackButton( FALSE );
 
 				// reset some values
 				step_pattern = 0;
@@ -365,7 +363,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_Tempo:
 				printf( "tempo: %d\n", data );
-				engine::getSongEditor()->setTempo( data );
+				engine::getSong()->setTempo( data );
 				break;
 
 			case FLP_CurrentPatNum:
@@ -398,7 +396,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_MainPitch:
-				engine::getSongEditor()->setMasterPitch( data );
+				engine::getSong()->setMasterPitch( data );
 				break;
 
 			case FLP_Resonance:
@@ -460,8 +458,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_MiddleNote:
 				data += 8;
-				it->setBaseNote( data );
-				it->getPianoWidget()->update();
+				it->baseNoteModel()->setValue( data );
 				break;
 
 			case FLP_DelayReso:
@@ -602,27 +599,27 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_ChanParams:
 			{
-				const arpAndChordsTabWidget::arpDirections
+				const arpeggiator::ArpDirections
 					mappedArpDir[] =
 				{
-					arpAndChordsTabWidget::UP,
-					arpAndChordsTabWidget::UP,
-					arpAndChordsTabWidget::DOWN,
-					arpAndChordsTabWidget::UP_AND_DOWN,
-					arpAndChordsTabWidget::UP_AND_DOWN,
-					arpAndChordsTabWidget::RANDOM
+					arpeggiator::ArpDirUp,
+					arpeggiator::ArpDirUp,
+					arpeggiator::ArpDirDown,
+					arpeggiator::ArpDirUpAndDown,
+					arpeggiator::ArpDirUpAndDown,
+					arpeggiator::ArpDirRandom
 				} ;
 				const Uint32 * p = (const Uint32 *) text;
-				arpAndChordsTabWidget * actw = it->m_arpWidget;
-				actw->m_arpDirectionBtnGrp->setValue(
+				arpeggiator * arp = &it->m_arpeggiator;
+				arp->m_arpDirectionModel.setValue(
 							mappedArpDir[p[10]] );
-				actw->m_arpRangeKnob->setValue( p[11] );
-				actw->m_arpComboBox->setValue( p[12] );
-				actw->m_arpTimeKnob->setValue( p[13] / 8.0f );
+				arp->m_arpRangeModel.setValue( p[11] );
+				arp->m_arpModel.setValue( p[12] );
+				arp->m_arpTimeModel.setValue( p[13] / 8.0f );
 							////	100.0f );
-				actw->m_arpGateKnob->setValue( p[14] * 100.0f /
+				arp->m_arpGateModel.setValue( p[14] * 100.0f /
 									48.0f );
-				actw->m_arpGroupBox->setState( p[10] > 0 );
+				arp->m_arpEnabledModel.setValue( p[10] > 0 );
 				printf( "channel params: " );
 				dump_mem( text, text_len );
 				//printf( "channel params: arpdir: %d  range: %d  time: %d  gate: %d\n", p[10], p[11], p[13], p[14] );
@@ -634,36 +631,36 @@ bool flpImport::tryImport( trackContainer * _tc )
 				const Uint32 * p = (const Uint32 *) text;
 				printf( "envelope and lfo params: " );
 				dump_mem( text, text_len );
-				envelopeTabWidget * etw = it->m_envWidget;
-				envelopeAndLFOWidget * elw = NULL;
+				instrumentSoundShaping * iss = &it->m_soundShaping;
+				envelopeAndLFOParameters * elp = NULL;
 				switch( env_lfo_target )
 				{
 					case 1:
-			elw = etw->m_envLFOWidgets[envelopeTabWidget::VOLUME];
-			break;
+		elp = iss->m_envLFOParameters[instrumentSoundShaping::Volume];
+		break;
 					case 2:
-			elw = etw->m_envLFOWidgets[envelopeTabWidget::CUT];
-			break;
+		elp = iss->m_envLFOParameters[instrumentSoundShaping::Cut];
+		break;
 					case 3:
-			elw = etw->m_envLFOWidgets[envelopeTabWidget::RES];
-			break;
+		elp = iss->m_envLFOParameters[instrumentSoundShaping::Resonance];
+		break;
 					default:
 						break;
 				}
 				++env_lfo_target;
-				if( elw == NULL )
+				if( elp == NULL )
 				{
 					break;
 				}
 				const float scaling = 0.8f / 65536.0f;
-				elw->m_predelayKnob->setValue( p[2] * scaling );
-				elw->m_attackKnob->setValue( p[3] * scaling );
-				elw->m_holdKnob->setValue( p[4] * scaling );
-				elw->m_decayKnob->setValue( p[5] * scaling );
-				elw->m_sustainKnob->setValue( p[6] * scaling );
-				elw->m_releaseKnob->setValue( p[7] * scaling );
-				elw->m_amountKnob->setValue( p[1] ? 1 : 0 );
-				elw->updateSampleVars();
+				elp->m_predelayModel.setValue( p[2] * scaling );
+				elp->m_attackModel.setValue( p[3] * scaling );
+				elp->m_holdModel.setValue( p[4] * scaling );
+				elp->m_decayModel.setValue( p[5] * scaling );
+				elp->m_sustainModel.setValue( p[6] * scaling );
+				elp->m_releaseModel.setValue( p[7] * scaling );
+				elp->m_amountModel.setValue( p[1] ? 1 : 0 );
+				elp->updateSampleVars();
 				break;
 			}
 
@@ -684,24 +681,24 @@ bool flpImport::tryImport( trackContainer * _tc )
 					basicFilters<>::SIMPLE_FLT_CNT
 				} ;
 				Uint32 * p = (Uint32 *) text;
-				envelopeTabWidget * etw = it->m_envWidget;
+				instrumentSoundShaping * iss = &it->m_soundShaping;
 /*				printf( "filter values: " );
 				for( int i = 0; i < 6; ++i )
 				{
 					printf( "%d  ", ((Sint32*)text)[i] );
 				}
 				printf( "\n" );*/
-				etw->m_filterComboBox->setValue(
+				iss->m_filterModel.setValue(
 							mappedFilter[p[5]] );
-				etw->m_filterCutKnob->setValue( p[3] / 255.0f *
-					( etw->m_filterCutKnob->maxValue() -
-					etw->m_filterCutKnob->minValue() ) +
-					etw->m_filterCutKnob->minValue() );
-				etw->m_filterResKnob->setValue( p[4] / 1024.0f *
-					( etw->m_filterResKnob->maxValue() -
-					etw->m_filterResKnob->minValue() ) +
-					etw->m_filterResKnob->minValue() );
-				etw->m_filterGroupBox->setState( p[3] < 256 );
+				iss->m_filterCutModel.setValue( p[3] / 255.0f *
+					( iss->m_filterCutModel.maxValue() -
+					iss->m_filterCutModel.minValue() ) +
+					iss->m_filterCutModel.minValue() );
+				iss->m_filterResModel.setValue( p[4] / 1024.0f *
+					( iss->m_filterResModel.maxValue() -
+					iss->m_filterResModel.minValue() ) +
+					iss->m_filterResModel.minValue() );
+				iss->m_filterEnabledModel.setValue( p[3] < 256 );
 				break;
 			}
 
@@ -786,10 +783,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 		const int ch = ( *it ) >> 16;
 		const int pat = ( ( *it ) & 0xffff ) / 16;
 		const int pos = ( ( ( *it ) & 0xffff ) % 16 ) * 4;
-		while( engine::getBBEditor()->numOfBBs() <= pat )
+		while( engine::getBBTrackContainer()->numOfBBs() <= pat )
 		{
-			track::create( track::BB_TRACK,
-						engine::getSongEditor() );
+			track::create( track::BBTrack, engine::getSong() );
 		}
 		pattern * p = dynamic_cast<pattern *>(
 						i_tracks[ch]->getTCO( pat ) );
@@ -811,10 +807,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		while( engine::getBBEditor()->numOfBBs() <= pat )
+		while( engine::getBBTrackContainer()->numOfBBs() <= pat )
 		{
-			track::create( track::BB_TRACK,
-						engine::getSongEditor() );
+			track::create( track::BBTrack, engine::getSong() );
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
 		}
 		pattern * p = dynamic_cast<pattern *>(
@@ -834,10 +829,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		while( engine::getBBEditor()->numOfBBs() <= pat_num )
+		while( engine::getBBTrackContainer()->numOfBBs() <= pat_num )
 		{
-			track::create( track::BB_TRACK,
-						engine::getSongEditor() );
+			track::create( track::BBTrack, engine::getSong() );
 			qApp->processEvents( QEventLoop::AllEvents, 100 );
 		}
 		
@@ -846,9 +840,9 @@ bool flpImport::tryImport( trackContainer * _tc )
 		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
 	}
 
-	if( project_cur_pat < engine::getBBEditor()->numOfBBs() )
+	if( project_cur_pat < engine::getBBTrackContainer()->numOfBBs() )
 	{
-		engine::getBBEditor()->setCurrentBB( project_cur_pat );
+		engine::getBBTrackContainer()->setCurrentBB( project_cur_pat );
 	}
 
 	engine::getProjectJournal()->setJournalling( is_journ );
@@ -869,21 +863,21 @@ bool flpImport::processPluginParams( const flPlugins _plugin,
 	{
 		case FL_Plugin_3x_Osc:
 		{
-			const oscillator::waveShapes mapped_3xOsc_Shapes[] =
+			const oscillator::WaveShapes mapped_3xOsc_Shapes[] =
 			{
-				oscillator::SIN_WAVE,
-				oscillator::TRIANGLE_WAVE,
-				oscillator::SQUARE_WAVE,
-				oscillator::SAW_WAVE,
-				oscillator::SQUARE_WAVE,	// square-sin
-				oscillator::WHITE_NOISE_WAVE,
-				oscillator::USER_DEF_WAVE
+				oscillator::SineWave,
+				oscillator::TriangleWave,
+				oscillator::SquareWave,
+				oscillator::SawWave,
+				oscillator::SquareWave,	// square-sin
+				oscillator::WhiteNoise,
+				oscillator::UserDefinedWave
 			} ;
 
 			QDomDocument dd;
 			QDomElement de = dd.createElement( _i->nodeName() );
-			de.setAttribute( "modalgo1", oscillator::MIX );
-			de.setAttribute( "modalgo2", oscillator::MIX );
+			de.setAttribute( "modalgo1", oscillator::SignalMix );
+			de.setAttribute( "modalgo2", oscillator::SignalMix );
 			for( Uint8 i = 0; i < 3; ++i )
 			{
 				const Sint32 * d = (const Sint32 *)( _data +

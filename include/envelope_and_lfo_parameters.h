@@ -151,7 +151,7 @@ private:
 
 
 	friend class envelopeAndLFOView;
-//	friend class flpImport;
+	friend class flpImport;
 
 } ;
 

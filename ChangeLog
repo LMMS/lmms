@@ -1,3 +1,15 @@
+2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.h:
+	* plugins/midi_import/midi_import.cpp:
+	* include/instrument_functions.h:
+	* include/song.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/instrument_sound_shaping.h:
+	made MIDI- and FLP-import-filter work
+
 2008-02-15	Paul Giblock	<drfaygo/at/gmail/dot/net>
 	* plugins/plucked_string_synth/plucked_string_synth.cpp:
 	* plugins/plucked_string_synth/plucked_string_synth.h:

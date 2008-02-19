@@ -131,7 +131,7 @@ private:
 	comboBoxModel m_arpModeModel;
 
 
-//	friend class flpImport;
+	friend class flpImport;
 	friend class instrumentTrack;
 	friend class arpeggiatorView;
 

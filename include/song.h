@@ -45,6 +45,7 @@ const Uint16 MAX_SONG_LENGTH = 9999;
 class song : public trackContainer
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,getTempo,setTempo,m_tempoModel);
 	mapPropertyFromModel(int,masterPitch,setMasterPitch,m_masterPitchModel);
 	mapPropertyFromModel(int,masterVolume,setMasterVolume,
 							m_masterVolumeModel);
