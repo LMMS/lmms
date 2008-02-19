@@ -48,7 +48,7 @@ public:
 
 
 protected:
-	Sint32 FASTCALL writeData( const void * _data, Sint32 _len );
+	Sint32 writeData( const void * _data, Sint32 _len );
 	void seekToBegin( void );
 
 	inline bool useVBR( void ) const

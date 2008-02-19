@@ -954,7 +954,7 @@ void song::exportProject( void )
 
 	int idx = 0;
 	QStringList types;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		types << tr( fileEncodeDevices[idx].m_description );
 		++idx;

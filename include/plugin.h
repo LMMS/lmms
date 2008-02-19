@@ -49,7 +49,7 @@ class pluginView;
 class plugin : public journallingObject, public model
 {
 public:
-	enum pluginTypes
+	enum PluginTypes
 	{
 		Instrument,	// instrument being used in channel-track
 		Effect,		// effect-plugin for effect-board
@@ -72,7 +72,7 @@ public:
 		const char * description;
 		const char * author;
 		int version;
-		pluginTypes type;
+		PluginTypes type;
 		const QPixmap * logo;
 		class subPluginFeatures
 		{
@@ -120,7 +120,7 @@ public:
 			};
 			typedef QList<key> keyList;
 
-			subPluginFeatures( plugin::pluginTypes _type ) :
+			subPluginFeatures( plugin::PluginTypes _type ) :
 				m_type( _type )
 			{
 			}
@@ -146,7 +146,7 @@ public:
 
 
 		protected:
-			const plugin::pluginTypes m_type;
+			const plugin::PluginTypes m_type;
 		}
 			* sub_plugin_features;
 
@@ -163,7 +163,7 @@ public:
 	}
 
 	// return plugin-type
-	inline pluginTypes type( void ) const
+	inline PluginTypes type( void ) const
 	{
 		return( m_descriptor->type );
 	}

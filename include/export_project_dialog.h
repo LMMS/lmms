@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -69,7 +69,7 @@ private:
 	void finishProjectExport( void );
 	void abortProjectExport( void );
 
-	static fileTypes getFileTypeFromExtension( const QString & _ext );
+	static ExportFileTypes getFileTypeFromExtension( const QString & _ext );
 	static Sint16 s_availableBitrates[];
 
 
@@ -89,7 +89,7 @@ private:
 	QProgressBar * m_exportProgressBar;
 
 	QString m_fileName;
-	fileTypes m_fileType;
+	ExportFileTypes m_fileType;
 	bool m_deleteFile;
 
 } ;

@@ -311,7 +311,7 @@ void audioFileProcessor::endPointModelChanged( void )
 
 
 audioFileProcessor::subPluginFeatures::subPluginFeatures(
-						plugin::pluginTypes _type ) :
+						plugin::PluginTypes _type ) :
 	plugin::descriptor::subPluginFeatures( _type )
 {
 }

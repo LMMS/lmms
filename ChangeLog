@@ -1,5 +1,27 @@
 2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/vst_effect/vst_control_dialog.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* include/plugin.h:
+	* include/audio_file_device.h:
+	* include/export.h:
+	* include/export_project_dialog.h:
+	* src/core/song.cpp:
+	* src/core/export_project_dialog.cpp:
+	coding-style improvements
+
+	* src/core/main_window.cpp:
+	made song-export work again
+
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	M/V-split of Patman-instrument
+
+2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
 	* plugins/flp_import/flp_import.h:
 	* plugins/flp_import/flp_import.cpp:
 	* plugins/midi_import/midi_import.h:

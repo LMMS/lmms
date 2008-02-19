@@ -52,18 +52,18 @@ extern QString file_to_render;
 fileEncodeDevice fileEncodeDevices[] =
 {
 
-	{ WAVE_FILE, QT_TRANSLATE_NOOP( "exportProjectDialog",
+	{ WaveFile, QT_TRANSLATE_NOOP( "exportProjectDialog",
 					"Uncompressed Wave-File (*.wav)" ),
 					".wav", &audioFileWave::getInst },
 #ifdef HAVE_VORBIS_CODEC_H
-	{ OGG_FILE, QT_TRANSLATE_NOOP( "exportProjectDialog",
+	{ OggFile, QT_TRANSLATE_NOOP( "exportProjectDialog",
 					"Compressed OGG-File (*.ogg)" ),
 					".ogg", &audioFileOgg::getInst },
 #endif
 	// ... insert your own file-encoder-infos here... may be one day the
 	// user can add own encoders inside the program...
 
-	{ NULL_FILE, NULL, NULL, NULL }
+	{ NullFile, NULL, NULL, NULL }
 
 } ;
 
@@ -136,7 +136,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 								TYPE_HEIGHT );
 
 	Uint8 idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		m_typeModel->addItem(
 				tr( fileEncodeDevices[idx].m_description ) );
@@ -221,10 +221,11 @@ exportProjectDialog::~exportProjectDialog()
 
 // little help-function for getting file-type from a file-extension (only for
 // registered file-encoders)
-fileTypes exportProjectDialog::getFileTypeFromExtension( const QString & _ext )
+ExportFileTypes exportProjectDialog::getFileTypeFromExtension(
+							const QString & _ext )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
@@ -233,7 +234,7 @@ fileTypes exportProjectDialog::getFileTypeFromExtension( const QString & _ext )
 		++idx;
 	}
 
-	return( WAVE_FILE );	// default
+	return( WaveFile );	// default
 }
 
 
@@ -276,7 +277,7 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 void exportProjectDialog::changedType( const QString & _new_type )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( tr( fileEncodeDevices[idx].m_description ) == _new_type )
 		{
@@ -293,7 +294,7 @@ void exportProjectDialog::changedType( const QString & _new_type )
 void exportProjectDialog::exportBtnClicked( void )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( fileEncodeDevices[idx].m_fileType == m_fileType )
 		{
@@ -302,7 +303,7 @@ void exportProjectDialog::exportBtnClicked( void )
 		++idx;
 	}
 
-	if( fileEncodeDevices[idx].m_fileType == NULL_FILE )
+	if( fileEncodeDevices[idx].m_fileType == NullFile )
 	{
 		return;
 	}

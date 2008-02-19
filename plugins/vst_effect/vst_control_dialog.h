@@ -37,13 +37,13 @@ public:
 	vstControlDialog( QWidget * _parent, vstEffect * _eff );
 	virtual ~vstControlDialog();
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
+/*	virtual void saveSettings( QDomDocument & _doc, 
 						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "vstcontrols" );
-	}
+	}*/
 
 	virtual ch_cnt_t getControlCount( void )
 	{

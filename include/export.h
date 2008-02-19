@@ -1,7 +1,7 @@
 /*
  * export.h - header which is needed for song-export
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,18 +43,18 @@ typedef audioFileDevice * ( * getDeviceInst)( const sample_rate_t _sample_rate,
 						mixer * _mixer );
 
 
-enum fileTypes
+enum ExportFileTypes
 {
-	WAVE_FILE,
-	OGG_FILE,
-	NULL_FILE = 0xFF
+	WaveFile,
+	OggFile,
+	NullFile = 0xFF
 } ;
 
 
 
 struct fileEncodeDevice
 {
-	fileTypes m_fileType;
+	ExportFileTypes m_fileType;
 	const char * m_description;
 	const char * m_extension;
 	getDeviceInst m_getDevInst;

@@ -44,7 +44,7 @@ public:
 	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
 	{
 	public:
-		subPluginFeatures( plugin::pluginTypes _type );
+		subPluginFeatures( plugin::PluginTypes _type );
 
 		virtual const QStringList & supportedExtensions( void );
 
