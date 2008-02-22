@@ -1,3 +1,36 @@
+2008-02-22	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/vibed/vibed.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/string_container.cpp:
+	* plugins/vibed/string_container.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/Makefile.am:
+	M/V-split of Vibed-instrument.  Lacks user-specified wave, to be added on
+	my next commit. Also has an audio output bug, certain notes make weird
+	noises
+
+	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_controls.h:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h:
+	* plugins/stereo_enhancer/Makefile.am:
+	M/V-split of Stereo-enhancer effect.  
+
+	* src/core/piano_roll.cpp:
+	Changed quantization to change on the gridlines, instead of nearest-point
+	in the middle.  Made this change here, because MIDI events should still be
+	quantized to nearest-point (I think)
+
+	* src/widgets/graph.cpp:
+	* include/graph.h:
+	* Makefile.am:
+	Split graph and moved it to the shared widgets.  Supports variable ranges,
+	sample-lengths, smoothing, normalizing, and is antialiased
+
 2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_subplugin_features.h:

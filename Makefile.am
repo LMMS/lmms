@@ -67,6 +67,7 @@ lmms_MOC =						\
 		./export_project_dialog.moc		\
 		./fade_button.moc			\
 		./file_browser.moc			\
+		./graph.moc				\
 		./group_box.moc				\
 		./instrument_midi_io.moc		\
 		./instrument_midi_io_view.moc		\
@@ -223,6 +224,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/effect_rack_view.cpp		\
 		$(srcdir)/src/widgets/effect_view.cpp			\
 		$(srcdir)/src/widgets/fade_button.cpp			\
+		$(srcdir)/src/widgets/graph.cpp				\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/envelope_and_lfo_view.cpp		\
 		$(srcdir)/src/widgets/instrument_function_views.cpp	\
@@ -303,6 +305,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/mv_base.h				\
 		$(srcdir)/include/automatable_model.h			\
 		$(srcdir)/include/automatable_model_templates.h		\
+		$(srcdir)/include/graph.h				\
 		$(srcdir)/include/group_box.h				\
 		$(srcdir)/include/tab_widget.h				\
 		$(srcdir)/include/knob.h				\

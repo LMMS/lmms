@@ -2,6 +2,7 @@
  * graph.h - a QT widget for displaying and manipulating waveforms
  *
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ *               2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,21 +31,26 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QCursor>
 
+#include "mv_base.h"
+#include "types.h"
 
-class graph : public QWidget
+class graphModel;
+class track;
+
+class graph : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
 	graph( QWidget * _parent );
 	virtual ~graph();
 
-	void setSamplePointer( float * pointer, int length );
 	void setForeground( const QPixmap & _pixmap );
-	void loadSampleFromFile( const QString & _filename );
+//	void loadSampleFromFile( const QString & _filename );
 
-signals:
-	void sampleSizeChanged( float f );
-	void sampleChanged( void );
+	virtual inline graphModel * model( void ) {
+		return castModel<graphModel>();
+	}
+
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -54,19 +60,90 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
+protected slots:
+	void updateGraph(Uint32 _startPos, Uint32 _endPos);
+
 private:
+	virtual void modelChanged( void );
 
 	void changeSampleAt(int _x, int _y);
 
+
 	QPixmap m_foreground;
 	
+	graphModel * m_graphModel;
 	
-	float *samplePointer;
-	int sampleLength;
-
 	bool m_mouseDown;
 	int m_lastCursorX;
 
 } ;
+
+
+class graphModel : public model
+{
+	Q_OBJECT
+public:
+	graphModel( float _min,
+			float _max,
+			Uint32 _size,
+			:: model * _parent, track * _track = NULL,
+			bool _default_constructed = FALSE );
+
+	virtual ~graphModel();
+
+	// TODO: saveSettings, loadSettings?
+	
+	inline float minValue( void ) const
+	{
+		return( m_minValue );
+	}
+
+	inline float maxValue( void ) const
+	{
+		return( m_maxValue );
+	}
+
+	inline Uint32 length( void ) const
+	{
+		return( m_samples.count() );
+	}
+	
+	inline const float* samples( void ) const
+	{
+		return( m_samples.data() );
+	}
+
+public slots:
+	void setRange( float _min, float _max );
+
+	void setLength( Uint32 _size );
+
+	void setSampleAt( Uint32 _samplePos, float _value );
+	void setSamples( const float * _value );
+
+	void setWaveToSine( void );
+	void setWaveToTriangle( void );
+	void setWaveToSaw( void );
+	void setWaveToSquare( void );
+	void setWaveToNoise( void );
+	//void setWaveToUser( );
+	
+	void smooth( void );
+	void normalize( void );
+
+signals:
+	void lengthChanged( void );
+	void samplesChanged( Uint32 startPos, Uint32 endPos );
+	void rangeChanged( void );
+
+private:
+
+	QVector<float> m_samples;
+	float m_maxValue;
+	float m_minValue;
+
+	friend class graph;
+
+};
 
 #endif

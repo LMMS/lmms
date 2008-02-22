@@ -871,8 +871,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			x -= WHITE_KEY_WIDTH;
 
 			// get tact-64th in which the user clicked
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_tact_64th = (x-1) * 64 / m_ppt +
 							m_currentPosition;
+
 
 			// get note-vector of current pattern
 			const noteVector & notes = m_pattern->notes();
@@ -939,7 +940,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 						pattern::MelodyPattern );
 
 					// then set new note
-					midiTime note_pos( pos_tact_64th );
+					// +32 to quanitize the note correctly when placing notes with
+					// the mouse.  We do this here instead of in note.quantized
+					// because live notes should still be quantized at the half.
+					midiTime note_pos( pos_tact_64th - (quantization() / 2) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos,

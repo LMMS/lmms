@@ -23,68 +23,27 @@
  */
 
 
-#ifndef QT3
 
 #include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
 
-#else
-
-#include <qlayout.h>
-
-#endif
-
-#include "stereo_enhancer.h"
-#include "knob.h"
+#include "stereoenhancer_control_dialog.h"
+#include "stereoenhancer_controls.h"
 
 
 
-stereoEnhancerControlDialog::stereoEnhancerControlDialog( QMdiArea * _parent,
-						stereoEnhancerEffect * _eff ) :
-		effectControlDialog( _parent, _eff ),
-		m_effect( _eff )
+stereoEnhancerControlDialog::stereoEnhancerControlDialog(
+	stereoEnhancerControls * _controls ) :
+	effectControlDialog( _controls )
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 
-	m_widthKnob = new knob( knobBright_26, this, tr( "Width" ), NULL );
-	m_widthKnob->setRange( 0.0f, 180.0f, 1.0f );
-	m_widthKnob->setInitValue( 0.0f );
-	m_widthKnob->setLabel( tr( "WIDE" ) );
-	m_widthKnob->setHintText( tr( "Width:" ) + " ", "samples" );
-	connect( m_widthKnob, SIGNAL( valueChanged( float ) ),
-			this, SLOT( changeWideCoeff( void ) ) );
+	knob * widthKnob = new knob( knobBright_26, this, tr( "Width" ) );
+	widthKnob->setModel( &_controls->m_widthModel );
+	widthKnob->setLabel( tr( "WIDE" ) );
+	widthKnob->setHintText( tr( "Width:" ) + " ", "samples" );
 
-	l->addWidget( m_widthKnob );
+	l->addWidget( widthKnob );
 
-	changeWideCoeff();
+	this->setLayout(l);
 }
-
-
-
-
-void stereoEnhancerControlDialog::changeWideCoeff( void )
-{
-	m_effect->m_seFX.setWideCoeff( m_widthKnob->value() );
-}
-
-
-
-void FASTCALL stereoEnhancerControlDialog::loadSettings(
-						const QDomElement & _this )
-{
-	m_widthKnob->setValue( _this.attribute( "width" ).toFloat() );
-}
-
-
-
-
-void FASTCALL stereoEnhancerControlDialog::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
-{
-	_this.setAttribute( "width", m_widthKnob->value() );
-}
-
-
-
-#include "stereoenhancer_control_dialog.moc"
 

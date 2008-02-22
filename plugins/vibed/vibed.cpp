@@ -23,22 +23,22 @@
  */
 
 
-#include "vibed.h"
-
 #include <Qt/QtXml>
 #include <QtCore/QMap>
 #include <QtGui/QWhatsThis>
 
-#include "base64.h"
-#include "caption_menu.h"
+#include "vibed.h"
+#include "automatable_model_templates.h"
+
 #include "engine.h"
 #include "instrument_track.h"
-#include "knob.h"
 #include "note_play_handle.h"
+#include "tooltip.h"
+#include "base64.h"
+#include "caption_menu.h"
 #include "oscillator.h"
 #include "string_container.h"
 #include "templates.h"
-#include "tooltip.h"
 #include "volume.h"
 #include "volume_knob.h"
 
@@ -48,13 +48,13 @@
 
 extern "C"
 {
-	
+
 plugin::descriptor vibedstrings_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"Vibed",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Vibrating string modeler" ),
+					"Vibrating string modeler" ),
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,
 	plugin::Instrument,
@@ -66,258 +66,58 @@ plugin::descriptor vibedstrings_plugin_descriptor =
 
 
 vibed::vibed( instrumentTrack * instrument_track ) :
-		instrument( instrument_track, &vibedstrings_plugin_descriptor ),
-	m_sampleLength( 128 )
+	instrument( instrument_track, &vibedstrings_plugin_descriptor )
 {
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-			"artwork" ) );
-	setPalette( pal );
+
+	knobModel * knob;
+	boolModel * led;
+	nineButtonSelectorModel * harmonic;
+	graphModel * graphTmp;
 
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		m_editor = new impulseEditor( this, 76, 21, instrument_track );
-		m_editor->setAccessibleName( tr( "Impulse Editor" ) );
-		m_editor->setOn( FALSE );
-		m_editor->hide();
-		m_editors.append( m_editor );
-	m_editor->setWhatsThis( tr( 
-"The waveform editor provides control over the initial state or impulse "
-"that is used to start the string vibrating.  The buttons to the right of "
-"the graph will initialize the waveform to the selected type.  The '?' "
-"button will load a waveform from a file--only the first 128 samples "
-"will be loaded.\n\n"
+		knob = new knobModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1.0f, this );
+		m_volumeKnobs.append( knob );
 
-"The waveform can also be drawn in the graph.\n\n"
+		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this );
+		m_stiffnessKnobs.append( knob );
 
-"The 'S' button will smooth the waveform.\n\n"
+		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this );
+		m_stiffnessKnobs.append( knob );
 
-"The 'N' button will normalize the waveform.") );
+		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.005f, this );
+		m_pickKnobs.append( knob );
 
-		m_volumeKnob = new volumeKnob( knobBright_26, this,
-					tr( "Volume" ), instrument_track );
-		m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-		m_volumeKnob->setInitValue( DEFAULT_VOLUME );
-		m_volumeKnob->move( 103, 142 );
-		m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
-		m_volumeKnob->hide();
-		m_volumeKnobs.append( m_volumeKnob );
-		m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
-						"of the selected string." ) );
-	
-		m_stiffnessKnob = new knob( knobBright_26, this, 
-						tr( "String stiffness" ),
-							instrument_track );
-		m_stiffnessKnob->setRange( 0.0f, 0.05f, 0.001f );
-		m_stiffnessKnob->setInitValue( 0.0f );
-		m_stiffnessKnob->move( 129, 142 );
-		m_stiffnessKnob->setHintText( tr( "String stiffness:" ) + 
-						" ", "" );
-		m_stiffnessKnob->hide();
-		m_stiffnessKnobs.append( m_stiffnessKnob );
-		m_stiffnessKnob->setWhatsThis( tr( 
-"The 'S' knob sets the stiffness of the selected string.  The stiffness "
-"of the string affects how long the string will ring out.  The lower "
-"the setting, the longer the string will ring." ) );
-		
-		
-		m_pickKnob = new knob( knobBright_26, this, 
-							tr( "Pick position" ),
-							instrument_track );
-		m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
-		m_pickKnob->setInitValue( 0.0f );
-		m_pickKnob->move( 153, 142 );
-		m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
-		m_pickKnob->hide();
-		m_pickKnobs.append( m_pickKnob );
-		m_pickKnob->setWhatsThis( tr( 
-"The 'P' knob sets the position where the selected string will be 'picked'.  "
-"The lower the setting the closer the pick is to the bridge." ) );
-	
-		m_pickupKnob = new knob( knobBright_26, this, 
-							tr( "Pickup position" ),
-							instrument_track );
-		m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
-		m_pickupKnob->setInitValue( 0.05f );
-		m_pickupKnob->move( 177, 142 );
-		m_pickupKnob->setHintText( tr( "Pickup position:" ) + 
-					" ", "" );
-		m_pickupKnob->hide();
-		m_pickupKnobs.append( m_pickupKnob );
-		m_pickupKnob->setWhatsThis( tr( 
-"The 'PU' knob sets the position where the vibrations will be monitored "
-"for the selected string.  The lower the setting, the closer the "
-"pickup is to the bridge." ) );
+		knob = new knobModel( 0.05f, 0.0f, 0.05f, 0.005f, this );
+		m_pickupKnobs.append( knob );
 
- 		m_panKnob = new knob( knobBright_26, this, tr( "Pan" ),
-							instrument_track );
-	 	m_panKnob->setRange( -1.0f, 1.0f, 0.01f );
- 		m_panKnob->setInitValue( 0.0f );
-	 	m_panKnob->move( 105, 187 );
- 		m_panKnob->setHintText( tr( "Pan:" ) + " ", "" );
-		m_panKnob->hide();
-		m_panKnobs.append( m_panKnob );
-		m_panKnob->setWhatsThis( tr( 
-"The Pan knob determines the location of the selected string in the stereo "
-"field." ) );
-		
-	 	m_detuneKnob = new knob( knobBright_26, this, tr( "Detune" ),
-		 					instrument_track );
- 		m_detuneKnob->setRange( -0.1f, 0.1f, 0.001f );
- 		m_detuneKnob->setInitValue( 0.0f );
- 		m_detuneKnob->move( 150, 187 );
- 		m_detuneKnob->setHintText( tr( "Detune:" ) + " ", "" );
-		m_detuneKnob->hide();
-		m_detuneKnobs.append( m_detuneKnob );
-		m_detuneKnob->setWhatsThis( tr( 
-"The Detune knob modifies the pitch of the selected string.  Settings less "
-"than zero will cause the string to sound flat.  Settings greater than zero "
-"will cause the string to sound sharp." ) );
-	
-		m_randomKnob = new knob( knobBright_26, this, tr( "Fuzziness" ),
-							instrument_track );
-		m_randomKnob->setRange( 0.0f, 0.75f, 0.01f );
-		m_randomKnob->setInitValue( 0.0f );
-		m_randomKnob->move( 194, 187 );
-		m_randomKnob->setHintText( tr( "Fuzziness:" ) + 
-					" ", "" );
-		m_randomKnob->hide();
-		m_randomKnobs.append( m_randomKnob );
-		m_randomKnob->setWhatsThis( tr( 
-"The Slap knob adds a bit of fuzz to the selected string which is most "
-"apparent during the attack, though it can also be used to make the string "
-"sound more 'metallic'.") );
+		knob = new knobModel( 0.0f, -1.0f, 1.0f, 0.01f, this );
+		m_panKnobs.append( knob );
 
-		m_lengthKnob = new knob( knobBright_26, this, tr( "Length" ),
-							instrument_track );
-		m_lengthKnob->setRange( 1, 16, 1 );
-		m_lengthKnob->setInitValue( 1 );
-		m_lengthKnob->move( 23, 193 );
-		m_lengthKnob->setHintText( tr( "Length:" ) + 
-					" ", "" );
-		m_lengthKnob->hide();
-		m_lengthKnobs.append( m_lengthKnob );
-		m_lengthKnob->setWhatsThis( tr( 
-"The Length knob sets the length of the selected string.  Longer strings "
-"will both ring longer and sound brighter, however, they will also eat up "
-"more CPU cycles." ) );
+		knob = new knobModel( 0.0f, -0.1f, 0.1f, 0.001f, this );
+		m_detuneKnobs.append( knob );
 
-		m_impulse = new ledCheckBox( "", this, tr( "Impulse" ),
-							instrument_track );
-		m_impulse->move( 23, 94 );
-		m_impulse->setChecked( FALSE );
-		toolTip::add( m_impulse,
-			      tr( "Impulse or initial state" ) );
-		m_impulse->hide();
-		m_impulses.append( m_impulse );
-		m_impulse->setWhatsThis( tr( 
-"The 'Imp' selector determines whether the waveform in the graph is to be "
-"treated as an impulse imparted to the string by the pick or the initial "
-"state of the string." ) );
+		knob = new knobModel( 0.0f, 0.0f, 0.75f, 0.01f, this );
+		m_randomKnobs.append( knob );
 
-		m_harmonic = new nineButtonSelector(
-			PLUGIN_NAME::getIconPixmap( "button_-2_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_-2_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_-1_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_-1_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_f_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_f_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_off" ),
-			2,
-			21, 127,
-			this,
-			NULL );
-		m_harmonic->setAccessibleName( tr( "Octave" ) );
-		m_harmonic->hide();
-		m_harmonics.append( m_harmonic );
-		m_harmonic->setWhatsThis( tr( 
-"The Octave selector is used to choose which harmonic of the note the "
-"string will ring at.  For example, '-2' means the string will ring two "
-"octaves below the fundamental, 'F' means the string will ring at the "
-"fundamental, and '6' means the string will ring six octaves above the "
-"fundamental." ) );
+		knob = new knobModel( 1, 1, 16, 1, this );
+		m_lengthKnobs.append( knob );
+
+		led = new boolModel( FALSE, this );
+		m_impulses.append( led );
+
+		led = new boolModel( harm==0, this );
+		m_powerButtons.append( led );
+
+		harmonic = new nineButtonSelectorModel( 2, 0, 8, 1, this );
+		m_harmonics.append( harmonic );
+
+		graphTmp = new graphModel( -1.0, 1.0, m_sampleLength, this );
+		graphTmp->setWaveToSine();
+
+		m_graphs.append( graphTmp );
+
 	}
-	
-	m_stringSelector = new nineButtonSelector(
-			PLUGIN_NAME::getIconPixmap( "button_1_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_1_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_2_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_3_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_4_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_5_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_6_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_7_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_8_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_8_off" ),
-			PLUGIN_NAME::getIconPixmap( "button_9_on" ),
-			PLUGIN_NAME::getIconPixmap( "button_9_off" ),
-			0,
-			21, 39,
-			this,
-			NULL );
-	m_stringSelector->setAccessibleName( tr( "String" ) );
-	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
-			this, SLOT( showString( Uint8 ) ) );
-		m_stringSelector->setWhatsThis( tr( 
-"The String selector is used to choose which string the controls are "
-"editting.  A Vibed instrument can contain up to nine independently "
-"vibrating strings.  The LED in the lower right corner of the "
-"waveform editor indicates whether the selected string is active." ) );
-
-	m_pickKnob = m_pickKnobs[0];
-	m_pickupKnob = m_pickupKnobs[0];
-	m_stiffnessKnob = m_stiffnessKnobs[0];
-	m_volumeKnob = m_volumeKnobs[0];
-	m_panKnob = m_panKnobs[0];
-	m_detuneKnob = m_detuneKnobs[0];
-	m_randomKnob = m_randomKnobs[0];
-	m_lengthKnob = m_lengthKnobs[0];
-	m_editor = m_editors[0];
-	m_impulse = m_impulses[0];
-	m_harmonic = m_harmonics[0];
-	
-	m_editor->setOn( TRUE );
-	showString( 0 );
-
-	setWhatsThis( tr( 
-"Vibed models up to nine independently vibrating strings.  The 'String' "
-"selector allows you to choose which string is being edited.  The 'Imp' " "selector chooses whether the graph represents an impulse or the initial "
-"state of the string.  The 'Octave' selector chooses which harmonic the "
-"string should vibrate at.\n\n"
-
-"The graph allows you to control the initial state or impulse used to set the "
-"string in motion.\n\n"
-
-"The 'V' knob controls the volume.  The 'S' knob controls the string's "
-"stiffness.  The 'P' knob controls the pick position.  The 'PU' knob "
-"controls the pickup position.\n\n"
-
-"'Pan' and 'Detune' hopefully don't need explanation.  The 'Slap' knob "
-"adds a bit of fuzz to the sound of the string.\n\n"
-
-"The 'Length' knob controls the length of the string.\n\n"
-
-"The LED in the lower right corner of the waveform editor determines "
-"whether the string is active in the current instrument." ) );
-
 }
 
 
@@ -333,6 +133,7 @@ vibed::~vibed()
 void vibed::saveSettings( QDomDocument & _doc,
 				QDomElement & _this )
 {
+
 	QString name;
 	
 	// Save plugin version
@@ -341,9 +142,10 @@ void vibed::saveSettings( QDomDocument & _doc,
 	for( Uint8 i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
-		_this.setAttribute( name, QString::number( 
-					m_editors[i]->isOn() ) );
-		if( m_editors[i]->isOn() )
+		_this.setAttribute( name, QString::number(
+				m_powerButtons[i]->value() ) );
+
+		if( m_powerButtons[i]->value() )
 		{
 			name = "volume" + QString::number( i );
 			m_volumeKnobs[i]->saveSettings( _doc, _this, name );
@@ -358,8 +160,7 @@ void vibed::saveSettings( QDomDocument & _doc,
 			m_pickupKnobs[i]->saveSettings( _doc, _this, name );
 
 			name = "octave" + QString::number( i );
-			_this.setAttribute( name, QString::number( 
-					m_harmonics[i]->getSelected() ) );
+			m_harmonics[i]->saveSettings( _doc, _this, name );
 
 			name = "length" + QString::number( i );
 			m_lengthKnobs[i]->saveSettings( _doc, _this, name );
@@ -375,13 +176,14 @@ void vibed::saveSettings( QDomDocument & _doc,
 
 			name = "impulse" + QString::number( i );
 			m_impulses[i]->saveSettings( _doc, _this, name );
-		
+
 			QString sampleString;
-			base64::encode( 
-				(const char *)m_editors[i]->getValues(), 
-				 128 * sizeof(float), sampleString );
+			base64::encode(
+				(const char *)m_graphs[i]->samples(), 
+				m_sampleLength * sizeof(float), 
+				sampleString );
 			name = "graph" + QString::number( i );
-			_this.setAttribute( name, sampleString );
+			_this.setAttribute( name, sampleString ); 
 		}
 	}
 
@@ -389,17 +191,17 @@ void vibed::saveSettings( QDomDocument & _doc,
 
 
 
-
 void vibed::loadSettings( const QDomElement & _this )
 {
+
 	QString name;
-	
+
 	for( Uint8 i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
-		m_editors[i]->setOn( _this.attribute( name ).toInt() );
+		m_powerButtons[i]->setValue( _this.attribute( name ).toInt() );
 		
-		if( m_editors[i]->isOn() &&
+		if( m_powerButtons[i]->value() && 
 			_this.hasAttribute( "volume" + QString::number( i ) ) )
 		{
 			name = "volume" + QString::number( i );
@@ -415,8 +217,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			m_pickupKnobs[i]->loadSettings( _this, name );
 		
 			name = "octave" + QString::number( i );
-			m_harmonics[i]->setSelected( 
-					_this.attribute( name ).toInt() );
+			m_harmonics[i]->loadSettings( _this, name );
 			
 			name = "length" + QString::number( i );
 			m_lengthKnobs[i]->loadSettings( _this, name );
@@ -437,11 +238,13 @@ void vibed::loadSettings( const QDomElement & _this )
 			float * shp = 0;
 			base64::decode( _this.attribute( "graph" +
 						QString::number( i ) ),
-						(char * *) &shp, &size );
+						(char * *) &shp,
+						&size );
 			// TODO: check whether size == 128 * sizeof( float ),
 			// otherwise me might and up in a segfault
-			m_editors[i]->setValues( shp );
+			m_graphs[i]->setSamples( shp );
 			delete[] shp;
+			
 
 			// TODO: do one of the following to avoid
 			// "uninitialized" wave-shape-buttongroup
@@ -452,7 +255,7 @@ void vibed::loadSettings( const QDomElement & _this )
 		}
 	}
 	
-	update();
+//	update(); 
 }
 
 
@@ -471,25 +274,25 @@ void vibed::playNote( notePlayHandle * _n, bool )
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
-					engine::getMixer()->sampleRate(),
-					m_sampleLength );
+						engine::getMixer()->sampleRate(),
+						m_sampleLength );
 		
 		for( Uint8 i = 0; i < 9; ++i )
 		{
-			if( m_editors[i]->isOn() )
+			if( m_powerButtons[i]->value() )
 			{
 				static_cast<stringContainer*>(
 					_n->m_pluginData )->addString(
-				m_harmonics[i]->getSelected(),
+				m_harmonics[i]->value(),
 				m_pickKnobs[i]->value(),
 				m_pickupKnobs[i]->value(),
-				m_editors[i]->getValues(),
+				m_graphs[i]->samples(),
 				m_randomKnobs[i]->value(),
 				m_stiffnessKnobs[i]->value(),
 				m_detuneKnobs[i]->value(),
 				static_cast<int>(
 					m_lengthKnobs[i]->value() ),
-				m_impulses[i]->isChecked(),
+				m_impulses[i]->value(),
 				i );
 			}
 		}
@@ -497,8 +300,8 @@ void vibed::playNote( notePlayHandle * _n, bool )
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	stringContainer * ps = static_cast<stringContainer *>(
-			 				_n->m_pluginData );
-	
+							_n->m_pluginData );
+
 	sampleFrame * buf = new sampleFrame[frames];
 
 	for( fpp_t i = 0; i < frames; ++i )
@@ -538,75 +341,419 @@ void vibed::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
-
-
-void vibed::showString( Uint8 _string )
+pluginView * vibed::instantiateView( QWidget * _parent )
 {
-	m_pickKnob->hide();
-	m_pickupKnob->hide();
-	m_stiffnessKnob->hide();
-	m_volumeKnob->hide();
-	m_panKnob->hide();
-	m_detuneKnob->hide();
-	m_randomKnob->hide();
-	m_lengthKnob->hide();
-	m_editor->hide();
-	m_impulse->hide();
-	m_harmonic->hide();
-	
-	// TODO: first assign, then show - avoids that we have to index vector
-	// (or list or whatever) twice
-	// something like
-	// ( m_editor = m_editors[_string] )->show()
-	// would be even better ;-)
-	m_editors[_string]->show();
-	m_volumeKnobs[_string]->show();
-	m_stiffnessKnobs[_string]->show();
-	m_pickKnobs[_string]->show();
-	m_pickupKnobs[_string]->show();
-	m_panKnobs[_string]->show();
-	m_detuneKnobs[_string]->show();
-	m_randomKnobs[_string]->show();
-	m_lengthKnobs[_string]->show();
-	m_impulses[_string]->show();
-	m_impulses[_string]->update();
-	m_harmonics[_string]->show();
-	
-	m_pickKnob = m_pickKnobs[_string];
-	m_pickupKnob = m_pickupKnobs[_string];
-	m_stiffnessKnob = m_stiffnessKnobs[_string];
-	m_volumeKnob = m_volumeKnobs[_string];
-	m_panKnob = m_panKnobs[_string];
-	m_detuneKnob = m_detuneKnobs[_string];
-	m_randomKnob = m_randomKnobs[_string];
-	m_lengthKnob = m_lengthKnobs[_string];
-	m_editor = m_editors[_string];
-	m_impulse = m_impulses[_string];
-	m_harmonic = m_harmonics[_string];
+	return( new vibedView( this, _parent ) );
 }
 
 
 
 
 
-void vibed::contextMenuEvent( QContextMenuEvent * )
+vibedView::vibedView( instrument * _instrument,
+				QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
 {
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
+			"artwork" ) );
+	setPalette( pal );
+	
+	m_volumeKnob = new volumeKnob( knobBright_26, this, tr( "Volume" ) );
+	m_volumeKnob->move( 103, 142 );
+	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
+	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
+					"of the selected string." ) );
+
+	m_stiffnessKnob = new knob( knobBright_26, this, 
+					tr( "String stiffness" ) );
+	m_stiffnessKnob->move( 129, 142 );
+	m_stiffnessKnob->setHintText( tr( "String stiffness:" ) + 
+					" ", "" );
+	m_stiffnessKnob->setWhatsThis( tr( 
+"The 'S' knob sets the stiffness of the selected string.  The stiffness "
+"of the string affects how long the string will ring out.  The lower "
+"the setting, the longer the string will ring." ) );
+	
+	
+	m_pickKnob = new knob( knobBright_26, this, 
+						tr( "Pick position" ) );
+	m_pickKnob->move( 153, 142 );
+	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
+	m_pickKnob->setWhatsThis( tr( 
+"The 'P' knob sets the position where the selected string will be 'picked'.  "
+"The lower the setting the closer the pick is to the bridge." ) );
+
+	m_pickupKnob = new knob( knobBright_26, this, 
+						tr( "Pickup position" ) );
+	m_pickupKnob->move( 177, 142 );
+	m_pickupKnob->setHintText( tr( "Pickup position:" ) + 
+				" ", "" );
+	m_pickupKnob->setWhatsThis( tr( 
+"The 'PU' knob sets the position where the vibrations will be monitored "
+"for the selected string.  The lower the setting, the closer the "
+"pickup is to the bridge." ) );
+
+	m_panKnob = new knob( knobBright_26, this, tr( "Pan" ) );
+	m_panKnob->move( 105, 187 );
+	m_panKnob->setHintText( tr( "Pan:" ) + " ", "" );
+	m_panKnob->setWhatsThis( tr( 
+"The Pan knob determines the location of the selected string in the stereo "
+"field." ) );
+	
+	m_detuneKnob = new knob( knobBright_26, this, tr( "Detune" ) );
+	m_detuneKnob->move( 150, 187 );
+	m_detuneKnob->setHintText( tr( "Detune:" ) + " ", "" );
+	m_detuneKnob->setWhatsThis( tr( 
+"The Detune knob modifies the pitch of the selected string.  Settings less "
+"than zero will cause the string to sound flat.  Settings greater than zero "
+"will cause the string to sound sharp." ) );
+
+	m_randomKnob = new knob( knobBright_26, this, tr( "Fuzziness" ) );
+	m_randomKnob->move( 194, 187 );
+	m_randomKnob->setHintText( tr( "Fuzziness:" ) + 
+				" ", "" );
+	m_randomKnob->setWhatsThis( tr( 
+"The Slap knob adds a bit of fuzz to the selected string which is most "
+"apparent during the attack, though it can also be used to make the string "
+"sound more 'metallic'.") );
+
+	m_lengthKnob = new knob( knobBright_26, this, tr( "Length" ) );
+	m_lengthKnob->move( 23, 193 );
+	m_lengthKnob->setHintText( tr( "Length:" ) + 
+				" ", "" );
+	m_lengthKnob->setWhatsThis( tr( 
+"The Length knob sets the length of the selected string.  Longer strings "
+"will both ring longer and sound brighter, however, they will also eat up "
+"more CPU cycles." ) );
+
+	m_impulse = new ledCheckBox( "", this, tr( "Impulse" ) );
+	m_impulse->move( 23, 94 );
+	toolTip::add( m_impulse,
+		      tr( "Impulse or initial state" ) );
+	m_impulse->setWhatsThis( tr( 
+"The 'Imp' selector determines whether the waveform in the graph is to be "
+"treated as an impulse imparted to the string by the pick or the initial "
+"state of the string." ) );
+
+	m_harmonic = new nineButtonSelector(
+		PLUGIN_NAME::getIconPixmap( "button_-2_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_-2_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_-1_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_-1_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_f_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_f_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_2_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_2_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_3_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_3_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_4_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_4_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_5_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_5_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_6_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_6_off" ),
+		PLUGIN_NAME::getIconPixmap( "button_7_on" ),
+		PLUGIN_NAME::getIconPixmap( "button_7_off" ),
+		2,
+		21, 127,
+		this );
+
+	m_harmonic->setAccessibleName( tr( "Octave" ) );
+	m_harmonic->setWhatsThis( tr( 
+"The Octave selector is used to choose which harmonic of the note the "
+"string will ring at.  For example, '-2' means the string will ring two "
+"octaves below the fundamental, 'F' means the string will ring at the "
+"fundamental, and '6' means the string will ring six octaves above the "
+"fundamental." ) );
+	
+
+	m_stringSelector = new nineButtonSelector(
+			PLUGIN_NAME::getIconPixmap( "button_1_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_1_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_2_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_2_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_3_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_3_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_4_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_4_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_5_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_5_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_6_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_6_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_7_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_7_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_8_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_8_off" ),
+			PLUGIN_NAME::getIconPixmap( "button_9_on" ),
+			PLUGIN_NAME::getIconPixmap( "button_9_off" ),
+			0,
+			21, 39,
+			this);
+
+	m_graph = new graph( this );
+	m_graph->setAccessibleName( tr( "Impulse Editor" ) );
+	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );
+	m_graph->move( 76, 21 );
+	m_graph->resize(132, 104);
+
+	m_graph->setWhatsThis( tr( 
+"The waveform editor provides control over the initial state or impulse "
+"that is used to start the string vibrating.  The buttons to the right of "
+"the graph will initialize the waveform to the selected type.  The '?' "
+"button will load a waveform from a file--only the first 128 samples "
+"will be loaded.\n\n"
+
+"The waveform can also be drawn in the graph.\n\n"
+
+"The 'S' button will smooth the waveform.\n\n"
+
+"The 'N' button will normalize the waveform.") );
+	
+
+	setWhatsThis( tr( 
+"Vibed models up to nine independently vibrating strings.  The 'String' "
+"selector allows you to choose which string is being edited.  The 'Imp' " "selector chooses whether the graph represents an impulse or the initial "
+"state of the string.  The 'Octave' selector chooses which harmonic the "
+"string should vibrate at.\n\n"
+
+"The graph allows you to control the initial state or impulse used to set the "
+"string in motion.\n\n"
+
+"The 'V' knob controls the volume.  The 'S' knob controls the string's "
+"stiffness.  The 'P' knob controls the pick position.  The 'PU' knob "
+"controls the pickup position.\n\n"
+
+"'Pan' and 'Detune' hopefully don't need explanation.  The 'Slap' knob "
+"adds a bit of fuzz to the sound of the string.\n\n"
+
+"The 'Length' knob controls the length of the string.\n\n"
+
+"The LED in the lower right corner of the waveform editor determines "
+"whether the string is active in the current instrument." ) );
+
+
+	m_power = new ledCheckBox( "", this, tr( "Enable waveform" ) );
+	m_power->move( 212, 130 );
+	toolTip::add( m_power,
+			tr( "Click here to enable/disable waveform." ) );
+
+	
+	// String selector is not a part of the model
+	m_stringSelector->setAccessibleName( tr( "String" ) );
+	m_stringSelector->setWhatsThis( tr( 
+"The String selector is used to choose which string the controls are "
+"editting.  A Vibed instrument can contain up to nine independently "
+"vibrating strings.  The LED in the lower right corner of the "
+"waveform editor indicates whether the selected string is active." ) );
+
+	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
+			this, SLOT( showString( Uint8 ) ) );
+
+	showString( 0 );	
+	// Get current graph-model
+	graphModel * gModel = m_graph->model();
+
+	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ) );
+	m_sinWaveBtn->move( 212, 24 );
+	m_sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
+				"sin_wave_active" ) );
+	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+				"sin_wave_inactive" ) );
+	toolTip::add( m_sinWaveBtn,
+				tr( "Click here if you want a sine-wave for "
+				    "current oscillator." ) );
+	connect( m_sinWaveBtn, SIGNAL (clicked ( void ) ),
+			this, SLOT ( sinWaveClicked( void ) ) );
+
+	
+	m_triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ) );
+	m_triangleWaveBtn->move( 212, 41 );
+	m_triangleWaveBtn->setActiveGraphic(
+			embed::getIconPixmap( "triangle_wave_active" ) );
+	m_triangleWaveBtn->setInactiveGraphic(
+			embed::getIconPixmap( "triangle_wave_inactive" ) );
+	toolTip::add( m_triangleWaveBtn,
+			tr( "Click here if you want a triangle-wave "
+			    "for current oscillator." ) );
+	connect( m_triangleWaveBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( triangleWaveClicked( ) ) );
+
+	
+	m_sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ) );
+	m_sawWaveBtn->move( 212, 58 );
+	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
+				"saw_wave_active" ) );
+	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+				"saw_wave_inactive" ) );
+	toolTip::add( m_sawWaveBtn,
+				tr( "Click here if you want a saw-wave for "
+				    "current oscillator." ) );
+	connect( m_sawWaveBtn, SIGNAL (clicked ( void ) ),
+			this, SLOT ( sawWaveClicked( void ) ) );
+
+	
+	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ) );
+	m_sqrWaveBtn->move( 212, 75 );
+	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+				"square_wave_active" ) );
+	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+				"square_wave_inactive" ) );
+	toolTip::add( m_sqrWaveBtn,
+			tr( "Click here if you want a square-wave for "
+			    "current oscillator." ) );
+	connect( m_sqrWaveBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( sqrWaveClicked( void ) ) );
+
+	
+	m_whiteNoiseWaveBtn = new pixmapButton( this, tr( "White noise wave" ) );
+	m_whiteNoiseWaveBtn->move( 212, 92 );
+	m_whiteNoiseWaveBtn->setActiveGraphic(
+			embed::getIconPixmap( "white_noise_wave_active" ) );
+	m_whiteNoiseWaveBtn->setInactiveGraphic(
+			embed::getIconPixmap( "white_noise_wave_inactive" ) );
+	toolTip::add( m_whiteNoiseWaveBtn,
+			tr( "Click here if you want a white-noise for "
+			    "current oscillator." ) );
+	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( noiseWaveClicked( void ) ) );
+
+	
+	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn->move( 212, 109 );
+	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+				"usr_wave_active" ) );
+	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+				"usr_wave_inactive" ) );
+	toolTip::add( m_usrWaveBtn,
+			tr( "Click here if you want a user-defined "
+			    "wave-shape for current oscillator." ) );
+	connect( m_usrWaveBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( usrWaveClicked( void ) ) );
+
+
+	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn->move( 79, 129 );
+	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"smooth_active" ) );
+	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"smooth_inactive" ) );
+	m_smoothBtn->setChecked( FALSE );
+	toolTip::add( m_smoothBtn,
+			tr( "Click here to smooth waveform." ) );
+	connect( m_smoothBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( smoothClicked( void ) ) );
+	
+	m_normalizeBtn = new pixmapButton( this, tr( "Normalize" ) );
+	m_normalizeBtn->move( 96, 129 );
+	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"normalize_active" ) );
+	m_normalizeBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"normalize_inactive" ) );
+	m_normalizeBtn->setChecked( FALSE );
+	toolTip::add( m_normalizeBtn,
+			tr( "Click here to normalize waveform." ) );
+
+	connect( m_normalizeBtn, SIGNAL ( clicked ( void ) ),
+			this, SLOT ( normalizeClicked( void ) ) );
+
+}
+
+
+void vibedView::modelChanged( void )
+{
+	showString( 0 );
+}
+
+
+void vibedView::showString( Uint8 _string )
+{
+	vibed * v = castModel<vibed>();
+	
+	m_pickKnob->setModel( v->m_pickKnobs[_string] );
+	m_pickupKnob->setModel( v->m_pickupKnobs[_string] );
+	m_stiffnessKnob->setModel( v->m_stiffnessKnobs[_string] );
+	m_volumeKnob->setModel( v->m_volumeKnobs[_string] );
+	m_panKnob->setModel( v->m_panKnobs[_string] );
+	m_detuneKnob->setModel( v->m_detuneKnobs[_string] );
+	m_randomKnob->setModel( v->m_randomKnobs[_string] );
+	m_lengthKnob->setModel( v->m_lengthKnobs[_string] );
+	m_graph->setModel( v->m_graphs[_string] );
+	m_impulse->setModel( v->m_impulses[_string] );
+	m_harmonic->setModel( v->m_harmonics[_string] );
+	m_power->setModel( v->m_powerButtons[_string] );
+
+}
+
+
+void vibedView::sinWaveClicked( void )
+{
+	m_graph->model()->setWaveToSine();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::triangleWaveClicked( void )
+{
+	m_graph->model()->setWaveToTriangle();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::sawWaveClicked( void )
+{
+	m_graph->model()->setWaveToSaw();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::sqrWaveClicked( void )
+{
+	m_graph->model()->setWaveToSquare();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::noiseWaveClicked( void )
+{
+	m_graph->model()->setWaveToNoise();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::usrWaveClicked( void )
+{
+	// TODO: load file
+	//m_graph->model()->setWaveToUser();
+	//engine::getSongEditor()->setModified();
+}
+
+void vibedView::smoothClicked( void )
+{
+	m_graph->model()->smooth();
+	engine::getSongEditor()->setModified();
+}
+
+void vibedView::normalizeClicked( void )
+{
+	m_graph->model()->normalize();
+	engine::getSongEditor()->setModified();
+}
+
+
+
+void vibedView::contextMenuEvent( QContextMenuEvent * )
+{
+
 	captionMenu contextMenu( publicName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
+					this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );
+
 }
 
 
-
-
-void vibed::displayHelp( void )
+void vibedView::displayHelp( void )
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-							      whatsThis() );
+					whatsThis() );
 }
-
-
 
 
 extern "C"

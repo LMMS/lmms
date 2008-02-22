@@ -43,7 +43,7 @@ public:
 	void addString(	Uint8 _harm,
 			const float _pick,
 			const float _pickup,
-			float * _impluse,
+			const float * _impluse,
 			const float _randomize,
 			const float _string_loss,
 			const float _detune,

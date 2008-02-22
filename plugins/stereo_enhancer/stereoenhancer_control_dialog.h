@@ -27,42 +27,18 @@
 
 #include "effect_control_dialog.h"
 
-class knob;
-class stereoEnhancerEffect;
-class QMdiArea;
+class stereoEnhancerControls;
 
 
 class stereoEnhancerControlDialog : public effectControlDialog
 {
-	Q_OBJECT
 public:
-	stereoEnhancerControlDialog( QMdiArea * _parent, stereoEnhancerEffect * _eff );
+	stereoEnhancerControlDialog( stereoEnhancerControls * _controls );
 	virtual ~stereoEnhancerControlDialog()
 	{
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "stereoenhancercontrols" );
-	}
+};
 
-	virtual ch_cnt_t getControlCount( void )
-	{
-		return( 1 );
-	}
-
-
-private slots:
-	void changeWideCoeff( void );
-
-
-private:
-	stereoEnhancerEffect * m_effect;
-	knob * m_widthKnob;
-
-} ;
 
 #endif
