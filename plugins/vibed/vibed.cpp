@@ -41,6 +41,7 @@
 #include "templates.h"
 #include "volume.h"
 #include "volume_knob.h"
+#include "song.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -690,31 +691,31 @@ void vibedView::showString( Uint8 _string )
 void vibedView::sinWaveClicked( void )
 {
 	m_graph->model()->setWaveToSine();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::triangleWaveClicked( void )
 {
 	m_graph->model()->setWaveToTriangle();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::sawWaveClicked( void )
 {
 	m_graph->model()->setWaveToSaw();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::sqrWaveClicked( void )
 {
 	m_graph->model()->setWaveToSquare();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::noiseWaveClicked( void )
 {
 	m_graph->model()->setWaveToNoise();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::usrWaveClicked( void )
@@ -727,13 +728,13 @@ void vibedView::usrWaveClicked( void )
 void vibedView::smoothClicked( void )
 {
 	m_graph->model()->smooth();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 void vibedView::normalizeClicked( void )
 {
 	m_graph->model()->normalize();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -741,7 +742,7 @@ void vibedView::normalizeClicked( void )
 void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
-	captionMenu contextMenu( publicName() );
+	captionMenu contextMenu( model()->publicName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 					this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

@@ -30,8 +30,6 @@
 #include "knob.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
-#include "impulse_editor.h"
-#include "lcd_spinbox.h"
 #include "volume_knob.h"
 #include "nine_button_selector.h"
 

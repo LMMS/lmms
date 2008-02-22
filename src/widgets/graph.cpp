@@ -116,7 +116,7 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 	
 	if( diff >= 1 )
 	{
-		x = min( width() - 3, m_lastCursorX + 1);
+		x = min( width() - 2, m_lastCursorX + 1);
 	}
 	else if( diff <= 1 )
 	{
