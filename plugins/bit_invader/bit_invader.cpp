@@ -194,7 +194,7 @@ void bitInvader::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_interpolation.saveSettings( _doc, _this, "interpolation" );
 	
 	// save LED 
-	m_normalize->saveSettings( _doc, _this, "normalize" );
+	m_normalize.saveSettings( _doc, _this, "normalize" );
 }
 
 
@@ -219,7 +219,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	// Load LED normalize 
 	m_interpolation.loadSettings( _this, "interpolation" );
 	// Load LED 
-	m_normalizeToggle->loadSettings( _this, "normalize" );
+	m_normalize.loadSettings( _this, "normalize" );
 
 //	songEditor::inst()->setModified();
 
