@@ -1,3 +1,17 @@
+2008-02-24	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/Makefile.am:
+	M/V-split of Bit Invader instrument.
+
+	* plugins/vibed/nine_button_selector.cpp:
+	Removed debug output
+
+	* src/widgets/graph.cpp:
+	* include/graph.h:
+	Fixed some graph issues.  Still more left to do
+
 2008-02-22	Paul Giblock <pgllama/at/gmail/dot/com>
 
 	* plugins/vibed/vibed.cpp:

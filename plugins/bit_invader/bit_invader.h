@@ -29,15 +29,15 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "types.h"
+#include "graph.h"
+#include "knob.h"
+#include "pixmap_button.h"
+#include "led_checkbox.h"
 
-class QPixmap;
-
-class graph;
-class knob;
-class ledCheckBox;
 class oscillator;
-class pixmapButton;
+class bitInvaderView;
 
 class bSynth
 {
@@ -83,29 +83,59 @@ public:
 		return( 64 );
 	}
 
+	virtual pluginView * instantiateView( QWidget * _parent );
 
-public slots:
-        void sampleSizeChanged( float _new_sample_length );
-        void sampleChanged( void );
+protected slots:
+	void lengthChanged( void );
+	void samplesChanged( Uint32, Uint32 );
 
-        void interpolationToggle( bool value );
-        void normalizeToggle( bool value );
-        void smoothClicked( void  );
+	void normalize( void );
 
-        void sinWaveClicked( void );
-        void triangleWaveClicked( void );
-        void sqrWaveClicked( void );
-        void sawWaveClicked( void );
-        void noiseWaveClicked( void );
-        void usrWaveClicked( void );
-/*
-protected:
-	virtual void paintEvent( QPaintEvent * );
-*/
 
 private:
-	knob * m_sampleLengthKnob;
+	knobModel  m_sampleLength;
+	graphModel  m_graph;
+	
+	boolModel m_interpolation;
+	boolModel m_normalize;
+	
+	float normalizeFactor;
+	
+	oscillator * m_osc;
 
+	friend class bitInvaderView;
+} ;
+
+
+
+class bitInvaderView : public instrumentView
+{
+	Q_OBJECT
+public:
+	bitInvaderView( instrument * _instrument,
+					QWidget * _parent );
+
+	virtual ~bitInvaderView() {};
+
+protected slots:
+	//void sampleSizeChanged( float _new_sample_length );
+
+	void interpolationToggled( bool value );
+	void normalizeToggled( bool value );
+
+	void sinWaveClicked( void );
+	void triangleWaveClicked( void );
+	void sqrWaveClicked( void );
+	void sawWaveClicked( void );
+	void noiseWaveClicked( void );
+	void usrWaveClicked( void );
+	
+	void smoothClicked( void  );
+
+private:
+	virtual void modelChanged( void );
+
+	knob * m_sampleLengthKnob;
 	pixmapButton * sinWaveBtn;
 	pixmapButton * triangleWaveBtn;
 	pixmapButton * sqrWaveBtn;
@@ -120,16 +150,7 @@ private:
 	ledCheckBox * m_interpolationToggle;
 	ledCheckBox * m_normalizeToggle;
 
-	int sample_length;
-        float* sample_shape;
-
-	bool interpolation;	                
-	bool normalize;
-	float normalizeFactor;
-	
-	oscillator * m_osc;
 } ;
-
 
 
 

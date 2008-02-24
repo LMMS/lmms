@@ -51,8 +51,11 @@ graph::graph( QWidget * _parent ) :
 
 	graphModel * gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL( samplesChanged( Uint32, Uint32 ) ),
+			this, SLOT( updateGraph( Uint32, Uint32 ) ) );
+
+	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
+			this, SLOT( updateGraph( ) ) );
 }
 
 
@@ -214,7 +217,7 @@ void graph::paintEvent( QPaintEvent * )
 	int length = model()->length();
 	int maxVal = model()->maxValue();
 
-	float xscale = ( width()-4 ) / length;
+	float xscale = (float)( width()-4 ) / length;
 	float yscale = (float)( height()-4 ) / ( model()->minValue() - maxVal );
 
 	// Max index, more useful below
@@ -235,7 +238,7 @@ void graph::paintEvent( QPaintEvent * )
 	p.drawLine(2+static_cast<int>(length*xscale), 
 		2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
 		width()-2,
-		2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
+		2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
 
 	p.setRenderHints( QPainter::Antialiasing, FALSE );
 
@@ -282,8 +285,10 @@ void graph::modelChanged( void )
 
 	QObject::connect( gModel, SIGNAL( samplesChanged( Uint32, Uint32 ) ),
 			this, SLOT( updateGraph( Uint32, Uint32 ) ) );
-}
 
+	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
+			this, SLOT( updateGraph( ) ) );
+}
 
 
 void graph::updateGraph( Uint32 _startPos, Uint32 _endPos )
@@ -292,6 +297,11 @@ void graph::updateGraph( Uint32 _startPos, Uint32 _endPos )
 	update();
 }
 
+
+void graph::updateGraph( void )
+{
+    updateGraph( 0, model()->length() - 1 );
+}
 
 
 graphModel::graphModel( float _min, float _max, Uint32 _length,

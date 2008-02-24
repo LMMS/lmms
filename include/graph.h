@@ -61,7 +61,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 protected slots:
-	void updateGraph(Uint32 _startPos, Uint32 _endPos);
+	void updateGraph( Uint32 _startPos, Uint32 _endPos );
+    void updateGraph( void );
 
 private:
 	virtual void modelChanged( void );
