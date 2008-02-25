@@ -261,7 +261,7 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_waveShapeModel.saveSettings( _doc, _this,
 							"wavetype" + is );
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
-							"modalgo" + is );
+						"modalgo" + QString( i+1 ) );
 		_this.setAttribute( "userwavefile" + is,
 					m_osc[i]->m_sampleBuffer->audioFile() );
 	}
@@ -274,7 +274,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
-		QString is = QString::number( i );
+		const QString is = QString::number( i );
 		m_osc[i]->m_volumeModel.loadSettings( _this, "vol" + is );
 		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
 		m_osc[i]->m_coarseModel.loadSettings( _this, "coarse" + is );
@@ -287,7 +287,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 		m_osc[i]->m_waveShapeModel.loadSettings( _this, "wavetype" +
 									is );
 		m_osc[i]->m_modulationAlgoModel.loadSettings( _this,
-							"modalgo" + is );
+					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
 	}
