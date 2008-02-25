@@ -556,18 +556,18 @@ void multimediaProject::upgrade( void )
 
 	if( version < "0.3.0" )
 	{
-		QDomNodeList list = elementsByTagName( "pluckedstringsynth" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList list;
+		while( !( list = elementsByTagName(
+					"pluckedstringsynth" ) ).isEmpty() )
 		{
-			QDomElement el = list.item( i ).toElement();
+			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "vibedstrings" );
 			el.setAttribute( "active0", 1 );
 		}
 
-		list = elementsByTagName( "lb303" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		while( !( list = elementsByTagName( "lb303" ) ).isEmpty() )
 		{
-			QDomElement el = list.item( i ).toElement();
+			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "lb302" );
 		}
 	}
@@ -585,15 +585,14 @@ void multimediaProject::upgrade( void )
 			}
 		}
 	}
-
 	if( version < "0.4.0-svn20080118" )
 	{
-		QDomNodeList list = elementsByTagName( "fx" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList list;
+		while( !( list = elementsByTagName( "fx" ) ).isEmpty() )
 		{
-			QDomElement fxchain = list.item( i ).toElement();
+			QDomElement fxchain = list.item( 0 ).toElement();
 			fxchain.setTagName( "fxchain" );
-			QDomNode rack = list.item( i ).firstChild();
+			QDomNode rack = list.item( 0 ).firstChild();
 			QDomNodeList effects = rack.childNodes();
 			// move items one level up
 			while( effects.count() )
@@ -624,6 +623,7 @@ void multimediaProject::upgrade( void )
 	{
 		m_head.setAttribute( "mastervol", 100 );
 	}
+//printf("%s\n", toString( 2 ).toAscii().constData());
 }
 
 
