@@ -309,7 +309,7 @@ void automatableModel<T, EDIT_STEP_TYPE>::loadSettings(
 						const QString & _name )
 {
 	QDomNode node = _this.namedItem( automationPattern::classNodeName() );
-	if( node.isElement() )
+	if( node.isElement() && getAutomationPattern() )
 	{
 		node = node.namedItem( _name );
 		if( node.isElement() )
