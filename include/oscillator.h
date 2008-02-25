@@ -89,13 +89,6 @@ public:
 	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-/*#define	FLOAT_TO_INT(in,out)		\
-	register const float round_const = -0.5f;			\
-	__asm__ __volatile__ ("fadd %%st,%%st(0)\n"		\
-				"fadd	%2\n"			\
-				"fistpl	%0\n"			\
-				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;*/
-
 	// now follow the wave-shape-routines...
 
 	static inline sample_t sinSample( const float _sample )
