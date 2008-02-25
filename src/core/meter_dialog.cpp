@@ -34,10 +34,54 @@
 #include "automatable_model_templates.h"
 
 
-meterDialog::meterDialog( QWidget * _parent, track * _track ):
+meterModel::meterModel( ::model * _parent, track * _track ) :
+	model( _parent ),
+	m_numeratorModel( 4, 1, 32, 1, this ),
+	m_denominatorModel( 4, 1, 32, 1, this )
+{
+	m_numeratorModel.setTrack( _track );
+	m_denominatorModel.setTrack( _track );
+
+	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
+				this, SIGNAL( numeratorChanged() ) );
+	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
+				this, SIGNAL( denominatorChanged() ) );
+}
+
+
+
+
+meterModel::~meterModel()
+{
+}
+
+
+
+
+void meterModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
+							const QString & _name )
+{
+	m_numeratorModel.saveSettings( _doc, _this, _name + "_numerator" );
+	m_denominatorModel.saveSettings( _doc, _this, _name + "_denominator" );
+}
+
+
+
+
+void meterModel::loadSettings( const QDomElement & _this,
+							const QString & _name )
+{
+	m_numeratorModel.loadSettings( _this, _name + "_numerator" );
+	m_denominatorModel.loadSettings( _this, _name + "_denominator" );
+}
+
+
+
+
+
+meterDialog::meterDialog( QWidget * _parent ) :
 	QWidget( _parent ),
-	m_numeratorModel( new lcdSpinBoxModel( /* this */ ) ),
-	m_denominatorModel( new lcdSpinBoxModel( /* this */ ) )
+	modelView( NULL )
 {
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 5 );
@@ -46,17 +90,11 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 
 	QWidget * num = new QWidget( this );
 	QHBoxLayout * num_layout = new QHBoxLayout( num );
-	num_layout->setSpacing( 10 );
+	num_layout->setSpacing( 0 );
+	num_layout->setMargin( 0 );
 
-
-	m_numeratorModel->setTrack( _track );
-	m_numeratorModel->setRange( 1, 32 );
-	m_numeratorModel->setValue( 4 );
-	connect( m_numeratorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( numeratorChanged() ) );
 
 	m_numerator = new lcdSpinBox( 2, num, tr( "Meter Numerator" ) );
-	m_numerator->setModel( m_numeratorModel );
 
 	num_layout->addWidget( m_numerator );
 
@@ -66,19 +104,13 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	num_label->setFont( pointSize<7>( f ) );
 	num_layout->addWidget( num_label );
 
-	
+
 	QWidget * den = new QWidget( this );
 	QHBoxLayout * den_layout = new QHBoxLayout( den );
-	den_layout->setSpacing( 10 );
-
-	m_denominatorModel->setTrack( _track );
-	m_denominatorModel->setRange( 1, 32 );
-	m_denominatorModel->setValue( 4 );
-	connect( m_denominatorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( denominatorChanged() ) );
+	den_layout->setSpacing( 0 );
+	den_layout->setMargin( 0 );
 
 	m_denominator = new lcdSpinBox( 2, den, tr( "Meter Denominator" ) );
-	m_denominator->setModel( m_denominatorModel );
 
 	den_layout->addWidget( m_denominator );
 
@@ -91,7 +123,7 @@ meterDialog::meterDialog( QWidget * _parent, track * _track ):
 	vlayout->addWidget( num );
 	vlayout->addWidget( den );
 	
-	setFixedSize( den_label->width() + m_denominator->width() + 10,
+	resize( den_label->width() + m_denominator->width() + 10,
 			m_numerator->height() + m_denominator->height() + 15 );
 }
 
@@ -105,23 +137,12 @@ meterDialog::~meterDialog()
 
 
 
-void meterDialog::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
+void meterDialog::modelChanged( void )
 {
-	m_numeratorModel->saveSettings( _doc, _this, _name + "_numerator" );
-	m_denominatorModel->saveSettings( _doc, _this, _name + "_denominator" );
+	meterModel * mm = castModel<meterModel>();
+	m_numerator->setModel( &mm->m_numeratorModel );
+	m_denominator->setModel( &mm->m_denominatorModel );
 }
-
-
-
-
-void meterDialog::loadSettings( const QDomElement & _this,
-							const QString & _name )
-{
-	m_numeratorModel->loadSettings( _this, _name + "_numerator" );
-	m_denominatorModel->loadSettings( _this, _name + "_denominator" );
-}
-
 
 
 #include "meter_dialog.moc"

@@ -1,7 +1,7 @@
 /*
  * meter_dialog.h - dialog for entering meter settings
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,12 +30,12 @@
 #include "lcd_spinbox.h"
 
 
-class meterDialog : public QWidget
+class meterModel : public model
 {
 	Q_OBJECT
 public:
-	meterDialog( QWidget * _parent, track * _track );
-	~meterDialog();
+	meterModel( ::model * _parent, track * _track );
+	~meterModel();
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
 						const QString & _name );
@@ -44,25 +44,42 @@ public:
 
 	inline int getNumerator( void )
 	{
-		return( m_numeratorModel->value() );
+		return( m_numeratorModel.value() );
 	}
 
 	inline int getDenominator( void )
 	{
-		return( m_denominatorModel->value() );
+		return( m_denominatorModel.value() );
 	}
 
 
 private:
-	lcdSpinBox * m_numerator;
-	lcdSpinBox * m_denominator;
-	lcdSpinBoxModel * m_numeratorModel;
-	lcdSpinBoxModel * m_denominatorModel;
+	lcdSpinBoxModel m_numeratorModel;
+	lcdSpinBoxModel m_denominatorModel;
 
 
 signals:
 	void numeratorChanged( void );
 	void denominatorChanged( void );
+
+
+	friend class meterDialog;
+
+} ;
+
+
+class meterDialog : public QWidget, public modelView
+{
+public:
+	meterDialog( QWidget * _parent );
+	~meterDialog();
+
+	virtual void modelChanged( void );
+
+
+private:
+	lcdSpinBox * m_numerator;
+	lcdSpinBox * m_denominator;
 
 } ;
 
