@@ -326,6 +326,9 @@ private:
 	bbTrack * currentBBTrack( void );
 	bool inBBEditor( void );
 
+
+	friend class trackView;
+
 } ;
 
 

@@ -80,6 +80,7 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_length(),
 	m_mutedModel( FALSE, this )
 {
+	m_mutedModel.setTrack( _track );
 	setJournalling( FALSE );
 	movePosition( 0 );
 	changeLength( 0 );
@@ -1000,7 +1001,6 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 
 	m_muteBtn = new pixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->model()->setTrack( m_trackView->getTrack() );
 	m_muteBtn->setActiveGraphic( *s_muteOnEnabled );
 	m_muteBtn->setInactiveGraphic( *s_muteOffEnabled );
 	m_muteBtn->setCheckable( TRUE );
@@ -1254,6 +1254,7 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_trackContentObjects(),
 	m_automationPatterns()
 {
+	m_mutedModel.setTrack( this );
 	m_trackContainer->addTrack( this );
 }
 
@@ -1740,6 +1741,7 @@ void trackView::modelChanged( void )
 	assert( m_track != NULL );
 	connect( m_track, SIGNAL( destroyed( QObject * ) ),
 			this, SLOT( close() ), Qt::QueuedConnection );
+	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	modelView::modelChanged();
 }
 
@@ -1917,6 +1919,9 @@ void trackView::createTCOView( trackContentObject * _tco )
 {
 	_tco->createView( this );
 }
+
+
+
 
 
 #include "track.moc"
