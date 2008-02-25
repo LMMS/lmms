@@ -37,6 +37,7 @@
 #include "engine.h"
 #include "mixer.h"
 #include "automatable_model.h"
+#include "tempo_sync_knob.h"
 
 
 class effectChain;
@@ -185,7 +186,7 @@ private:
 	boolModel m_enabledModel;
 	floatModel m_wetDryModel;
 	floatModel m_gateModel;
-	floatModel m_autoQuitModel;
+	tempoSyncKnobModel m_autoQuitModel;
 
 
 	friend class effectView;

@@ -1,5 +1,25 @@
 2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	incorporated recent API-changes
+
+	* include/effect.h:
+	* include/instrument_functions.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/tempo_sync_knob.h:
+	* src/widgets/envelope_and_lfo_view.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/effect.cpp:
+	* src/core/instrument_functions.cpp:
+	splitted tempoSyncKnob into tempoSyncKnobModel and tempoSyncKnob
+
+	* include/meter_dialog.h:
+	* src/core/meter_dialog.cpp:
+	splitted into meterModel and meterDialog
+
+	* plugins/flp_import/flp_import.cpp:
 	* include/instrument_track.h:
 	* include/piano.h:
 	* src/tracks/instrument_track.cpp:

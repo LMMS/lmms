@@ -66,7 +66,7 @@ envelopeAndLFOParameters::envelopeAndLFOParameters(
 	m_rEnv( NULL ),
 	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this ),
 	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this ),
-	m_lfoSpeedModel( 0.1, 0.01, 1.0, 0.0001, this ),
+	m_lfoSpeedModel( 0.1, 0.01, 1.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this ),
 	m_lfoWaveModel( SineWave, 0, NumLfoShapes, 1, this ),
 	m_x100Model( FALSE, this ),

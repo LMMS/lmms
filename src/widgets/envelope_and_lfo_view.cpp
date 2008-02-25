@@ -208,7 +208,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 
 
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
-						tr( "LFO-speed" ), 20000.0 );
+							tr( "LFO-speed" ) );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );

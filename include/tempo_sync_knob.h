@@ -1,7 +1,7 @@
 /*
  * tempo_sync_knob.h - adds bpm to ms conversion for knob class
  *
- * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2005-2008 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,38 +29,41 @@
 #include <QtGui/QPixmap>
 
 #include "knob.h"
+#include "meter_dialog.h"
 
 
 class QAction;
 class meterDialog;
 
 
-class tempoSyncKnob : public knob
+
+class tempoSyncKnobModel : public knobModel
 {
 	Q_OBJECT
 public:
 	enum tempoSyncMode
 	{
-		NO_SYNC,
-		DOUBLE_WHOLE_NOTE,
-		WHOLE_NOTE,
-		HALF_NOTE,
-		QUARTER_NOTE,
-		EIGHTH_NOTE,
-		SIXTEENTH_NOTE,
-		THIRTYSECOND_NOTE,
-		CUSTOM
+		SyncNone,
+		SyncDoubleWholeNote,
+		SyncWholeNote,
+		SyncHalfNote,
+		SyncQuarterNote,
+		SyncEighthNote,
+		SyncSixteenthNote,
+		SyncThirtysecondNote,
+		SyncCustom
 	} ;
 
 
-	tempoSyncKnob( int _knob_num, QWidget * _parent, const QString & _name,
-							float _scale = 1.0f );
-	virtual ~tempoSyncKnob();
+	tempoSyncKnobModel( const float _val, const float _min,
+				const float _max, const float _step,
+				const float _scale, ::model * _parent );
+	virtual ~tempoSyncKnobModel();
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 						QDomElement & _this,
 						const QString & _name );
-	virtual void FASTCALL loadSettings( const QDomElement & _this,
+	virtual void loadSettings( const QDomElement & _this,
 						const QString & _name );
 
 	tempoSyncMode getSyncMode( void );
@@ -69,22 +72,60 @@ public:
 	float getScale( void );
 	void setScale( float _new_scale );
 
+signals:
+	void syncModeChanged( tempoSyncMode _new_mode );
+	void scaleChanged( float _new_scale );
+
+
+public slots:
+	void setTempoSync( int _note_type );
+	void setTempoSync( QAction * _item );
+
+
+protected slots:
+	void calculateTempoSyncTime( bpm_t _bpm );
+	void updateCustom( void );
+
+
+private:
+	tempoSyncMode m_tempoSyncMode;
+	tempoSyncMode m_tempoLastSyncMode;
+	float m_scale;
+
+	meterModel m_custom;
+
+
+	friend class tempoSyncKnob;
+
+} ;
+
+
+
+class tempoSyncKnob : public knob
+{
+	Q_OBJECT
+public:
+	tempoSyncKnob( int _knob_num, QWidget * _parent,
+						const QString & _name );
+	virtual ~tempoSyncKnob();
+
 	const QString & getSyncDescription( void );
 	void setSyncDescription( const QString & _new_description );
 
 	const QPixmap & getSyncIcon( void );
 	void setSyncIcon( const QPixmap & _new_pix );
 
+	tempoSyncKnobModel * model( void )
+	{
+		return( castModel<tempoSyncKnobModel>() );
+	}
+
+	virtual void modelChanged( void );
+
+
 signals:
-	void syncModeChanged( tempoSyncMode _new_mode );
-	void scaleChanged( float _new_scale );
 	void syncDescriptionChanged( const QString & _new_description );
 	void syncIconChanged( void );
-
-
-public slots:
-	void setTempoSync( int _note_type );
-	void setTempoSync( QAction * _item );
 
 
 protected:
@@ -94,20 +135,18 @@ protected:
 
 
 protected slots:
-	void calculateTempoSyncTime( bpm_t _bpm );
-	void updateCustom( void );
+	void updateDescAndIcon( void );
 	void showCustom( void );
 
+
 private:
-	tempoSyncMode m_tempoSyncMode;
-	float m_scale;
 	QPixmap m_tempoSyncIcon;
 	QString m_tempoSyncDescription;
 
-	tempoSyncMode m_tempoLastSyncMode;
 	QPointer<meterDialog> m_custom;
 
 } ;
+
 
 
 #endif

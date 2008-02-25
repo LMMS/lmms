@@ -31,6 +31,7 @@
 #include "journalling_object.h"
 #include "automatable_model.h"
 #include "sample_buffer.h"
+#include "tempo_sync_knob.h"
 #include "types.h"
 
 
@@ -117,7 +118,7 @@ private:
 
 	floatModel m_lfoPredelayModel;
 	floatModel m_lfoAttackModel;
-	floatModel m_lfoSpeedModel;
+	tempoSyncKnobModel m_lfoSpeedModel;
 	floatModel m_lfoAmountModel;
 	intModel m_lfoWaveModel;
 

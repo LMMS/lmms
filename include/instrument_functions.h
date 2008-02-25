@@ -29,6 +29,7 @@
 #include "journalling_object.h"
 #include "types.h"
 #include "automatable_model.h"
+#include "tempo_sync_knob.h"
 #include "combobox.h"
 
 
@@ -125,7 +126,7 @@ private:
 	boolModel m_arpEnabledModel;
 	comboBoxModel m_arpModel;
 	floatModel m_arpRangeModel;
-	floatModel m_arpTimeModel;
+	tempoSyncKnobModel m_arpTimeModel;
 	floatModel m_arpGateModel;
 	intModel m_arpDirectionModel;
 	comboBoxModel m_arpModeModel;

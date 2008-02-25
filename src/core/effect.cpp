@@ -46,7 +46,7 @@ effect::effect( const plugin::descriptor * _desc,
 	m_enabledModel( TRUE, this ),
 	m_wetDryModel( 1.0f, 0.0f, 1.0f, 0.01f, this ),
 	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this ),
-	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, this )
+	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this )
 {
 }
 
