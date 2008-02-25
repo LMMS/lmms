@@ -206,10 +206,7 @@ public:
 	instrumentTrackView( instrumentTrack * _it, trackContainerView * _tc );
 	virtual ~instrumentTrackView();
 
-	instrumentTrackWindow * getInstrumentTrackWindow( void )
-	{
-		return( m_window );
-	}
+	instrumentTrackWindow * getInstrumentTrackWindow( void );
 
 	instrumentTrack * model( void )
 	{
@@ -223,6 +220,7 @@ public:
 
 
 private slots:
+	void toggledInstrumentTrackButton( bool _on );
 	void activityIndicatorPressed( void );
 	void activityIndicatorReleased( void );
 

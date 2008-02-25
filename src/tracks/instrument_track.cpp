@@ -762,13 +762,14 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 				m_audioPort.getEffects()->restoreState(
 							node.toElement() );
 			}
-			else if( automationPattern::classNodeName()
-							!= node.nodeName() )
+			else if( automationPattern::classNodeName() !=
+							node.nodeName() )
 			{
 				// if node-name doesn't match any known one,
 				// we assume that it is an instrument-plugin
 				// which we'll try to load
 				delete m_instrument;
+				m_instrument = NULL;
 				m_instrument = instrument::instantiate(
 							node.nodeName(), this );
 				if( m_instrument->nodeName() ==
@@ -831,7 +832,8 @@ void instrumentTrack::invalidateAllMyNPH( void )
 
 instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 						trackContainerView * _tcv ) :
-	trackView( _it, _tcv )
+	trackView( _it, _tcv ),
+	m_window( NULL )
 {
 	setAcceptDrops( TRUE );
 	setFixedHeight( 32 );
@@ -910,9 +912,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 
 	setModel( _it );
 
-	m_window = new instrumentTrackWindow( this );
 	connect( m_tswInstrumentTrackButton, SIGNAL( toggled( bool ) ),
-		m_window, SLOT( toggledInstrumentTrackButton( bool ) ) );
+			this, SLOT( toggledInstrumentTrackButton( bool ) ) );
 
 }
 
@@ -922,6 +923,28 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 instrumentTrackView::~instrumentTrackView()
 {
 	delete m_window;
+}
+
+
+
+
+instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
+{
+	if( m_window == NULL )
+	{
+		m_window = new instrumentTrackWindow( this );
+		connect( m_tswInstrumentTrackButton, SIGNAL( toggled( bool ) ),
+			this, SLOT( toggledInstrumentTrackButton( bool ) ) );
+	}
+	return( m_window );
+}
+
+
+
+
+void instrumentTrackView::toggledInstrumentTrackButton( bool _on )
+{
+	getInstrumentTrackWindow()->toggledInstrumentTrackButton( _on );
 }
 
 
@@ -1418,7 +1441,8 @@ void instrumentTrackButton::paintEvent( QPaintEvent * _pe )
 
 void instrumentTrackButton::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	m_instrumentTrackView->m_window->dragEnterEvent( _dee );
+	m_instrumentTrackView->getInstrumentTrackWindow()->
+							dragEnterEvent( _dee );
 }
 
 
@@ -1426,7 +1450,7 @@ void instrumentTrackButton::dragEnterEvent( QDragEnterEvent * _dee )
 
 void instrumentTrackButton::dropEvent( QDropEvent * _de )
 {
-	m_instrumentTrackView->m_window->dropEvent( _de );
+	m_instrumentTrackView->getInstrumentTrackWindow()->dropEvent( _de );
 	setChecked( TRUE );
 }
 

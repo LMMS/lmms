@@ -1,5 +1,20 @@
 2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/oscillator.h:
+	cleanups
+
+	* src/lib/mmp.cpp:
+	fixed tag-renaming-loops
+
+	* include/automatable_model_templates.h:
+	instantiate automation-pattern before loading settings of it - fixes
+	crashes when loading projects with automation inside
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	track-window-creation on-demand - makes loading/unloading projects
+	ultra-fast!!
+
 	* plugins/triple_oscillator/triple_oscillator.cpp:
 	fixed wrong index for saving/restoring modulation-algo-settings -
 	now projects sound like they did in pre-MV
