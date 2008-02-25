@@ -97,8 +97,8 @@ QString ladspaBrowser::nodeName( void ) const
 
 
 
-ladspaBrowserView::ladspaBrowserView( tool * _tool, QWidget * _parent ) :
-	toolView( _tool, _parent  )
+ladspaBrowserView::ladspaBrowserView( tool * _tool ) :
+	toolView( _tool  )
 {
 	QHBoxLayout * hlayout = new QHBoxLayout( this );
 	hlayout->setSpacing( 0 );

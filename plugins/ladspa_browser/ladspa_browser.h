@@ -39,7 +39,7 @@ class ladspaBrowserView : public toolView
 {
 	Q_OBJECT
 public:
-	ladspaBrowserView( tool * _tool, QWidget * _parent );
+	ladspaBrowserView( tool * _tool );
 	virtual ~ladspaBrowserView();
 
 
@@ -63,9 +63,9 @@ public:
 	ladspaBrowser( void );
 	virtual ~ladspaBrowser();
 
-	virtual pluginView * instantiateView( QWidget * _parent )
+	virtual pluginView * instantiateView( QWidget * )
 	{
-		return( new ladspaBrowserView( this, _parent ) );
+		return( new ladspaBrowserView( this ) );
 	}
 
 	virtual QString nodeName( void ) const;
