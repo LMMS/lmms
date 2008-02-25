@@ -37,7 +37,7 @@
 #include <QtGui/QStyleOption>
 
 
-//#include "automation_pattern.h"
+#include "automation_pattern.h"
 #include "automation_track.h"
 #include "bb_editor.h"
 #include "bb_track.h"

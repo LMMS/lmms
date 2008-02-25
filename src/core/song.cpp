@@ -42,6 +42,8 @@
 
 
 #include "automation_track.h"
+#include "automatable_model_templates.h"
+#include "automation_editor.h"
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "config_mgr.h"

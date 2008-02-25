@@ -1,7 +1,7 @@
 /*
  * combobox.h - class comboBox, a very cool combo-box
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,7 +32,7 @@
 #include <QtCore/QPair>
 
 #include "automatable_model.h"
-#include "automatable_model_templates.h"
+#include "templates.h"
 
 
 class comboBoxModel : public intModel
@@ -137,11 +137,6 @@ private:
 private slots:
 	void deletePixmap( QPixmap * _pixmap );
 	void setItem( QAction * _item );
-
-/*
-signals:
-	void activated( const QString & );
-	void valueChanged( int );*/
 
 } ;
 

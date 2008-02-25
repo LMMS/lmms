@@ -75,6 +75,10 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 
 automationEditor::automationEditor( void ) :
+	QWidget(),
+	m_zoomingXModel(),
+	m_zoomingYModel(),
+	m_quantizeModel(),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -265,17 +269,16 @@ automationEditor::automationEditor( void ) :
 	m_zoomingXComboBox = new comboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 
-	comboBoxModel * zoom_x_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 6; ++i )
 	{
-		zoom_x_model->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingXModel.addItem( QString::number( 25 << i ) + "%" );
 	}
-	zoom_x_model->setValue( zoom_x_model->findText( "100%" ) );
+	m_zoomingXModel.setValue( m_zoomingXModel.findText( "100%" ) );
 
-	m_zoomingXComboBox->setModel( zoom_x_model );
+	m_zoomingXComboBox->setModel( &m_zoomingXModel );
 
-	connect( m_zoomingXComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingXChanged( const QString & ) ) );
+	connect( &m_zoomingXModel, SIGNAL( dataChanged() ),
+			this, SLOT( zoomingXChanged() ) );
 
 
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
@@ -284,18 +287,17 @@ automationEditor::automationEditor( void ) :
 	m_zoomingYComboBox = new comboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
-	comboBoxModel * zoom_y_model = new comboBoxModel( /* this */ );
-	zoom_y_model->addItem( "Auto" );
+	m_zoomingYModel.addItem( "Auto" );
 	for( int i = 0; i < 6; ++i )
 	{
-		zoom_y_model->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingYModel.addItem( QString::number( 25 << i ) + "%" );
 	}
-	zoom_y_model->setValue( zoom_y_model->findText( "Auto" ) );
+	m_zoomingYModel.setValue( m_zoomingYModel.findText( "Auto" ) );
 
-	m_zoomingYComboBox->setModel( zoom_y_model );
+	m_zoomingYComboBox->setModel( &m_zoomingYModel );
 
-	connect( m_zoomingYComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingYChanged( const QString & ) ) );
+	connect( &m_zoomingYModel, SIGNAL( dataChanged() ),
+			this, SLOT( zoomingYChanged() ) );
 
 
 	// setup quantize-stuff
@@ -1996,9 +1998,10 @@ void automationEditor::updatePosition( const midiTime & _t )
 
 
 
-void automationEditor::zoomingXChanged( const QString & _zfac )
+void automationEditor::zoomingXChanged( void )
 {
-	m_ppt = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
+	const QString & zfac = m_zoomingXModel.currentText();
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -2009,12 +2012,13 @@ void automationEditor::zoomingXChanged( const QString & _zfac )
 
 
 
-void automationEditor::zoomingYChanged( const QString & _zfac )
+void automationEditor::zoomingYChanged( void )
 {
-	m_y_auto = _zfac == "Auto";
+	const QString & zfac = m_zoomingYModel.currentText();
+	m_y_auto = zfac == "Auto";
 	if( !m_y_auto )
 	{
-		m_y_delta = _zfac.left( _zfac.length() - 1 ).toInt()
+		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
 							* DEFAULT_Y_DELTA / 100;
 	}
 #ifdef LMMS_DEBUG
