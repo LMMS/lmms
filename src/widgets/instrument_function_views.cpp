@@ -88,6 +88,7 @@ chordCreatorView::chordCreatorView( chordCreator * _cc, QWidget * _parent ) :
 
 chordCreatorView::~chordCreatorView()
 {
+	delete m_chordsGroupBox;
 }
 
 
@@ -231,6 +232,8 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 
 arpeggiatorView::~arpeggiatorView()
 {
+	delete m_arpDirectionBtnGrp;
+	delete m_arpGroupBox;
 }
 
 

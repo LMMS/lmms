@@ -318,6 +318,7 @@ private:
 	QAction * m_midiOutputAction;
 
 	friend class instrumentTrackButton;
+	friend class instrumentView;
 
 } ;
 

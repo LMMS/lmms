@@ -1,5 +1,15 @@
 2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/instrument_view.h:
+	* include/instrument_track.h:
+	* src/widgets/instrument_function_views.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/tracks/instrument_track.cpp:
+	fixed various crashes when removing instrument-track with visible
+	instrument-track-window or loading another instrument/preset
+
+	* src/core/instrument.cpp:
 	* include/oscillator.h:
 	cleanups
 

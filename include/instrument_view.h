@@ -29,6 +29,8 @@
 #include "instrument.h"
 #include "plugin_view.h"
 
+class instrumentTrackWindow;
+
 
 class instrumentView : public pluginView
 {
@@ -47,6 +49,8 @@ public:
 	}
 
 	virtual void setModel( ::model * _model, bool = FALSE );
+
+	instrumentTrackWindow * getInstrumentTrackWindow( void );
 
 } ;
 

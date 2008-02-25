@@ -207,8 +207,6 @@ void automatableButtonGroup::removeButton( automatableButton * _btn )
 {
 	m_buttons.erase( qFind( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = NULL;
-
-	model()->setRange( 0, m_buttons.size() - 1 );
 }
 
 
@@ -243,6 +241,7 @@ void automatableButtonGroup::modelChanged( void )
 
 void automatableButtonGroup::updateButtons( void )
 {
+	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
 	foreach( automatableButton * btn, m_buttons )
 	{

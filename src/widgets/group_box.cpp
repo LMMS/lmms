@@ -77,6 +77,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 
 groupBox::~groupBox()
 {
+	delete m_led;
 }
 
 

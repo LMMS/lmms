@@ -145,6 +145,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 instrumentTrack::~instrumentTrack()
 {
+	delete m_instrument;
 	engine::getMixer()->removePlayHandles( this );
 	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 }
@@ -778,6 +779,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					m_instrument->restoreState(
 							node.toElement() );
 				}
+				emit instrumentChanged();
 			}
 		}
 		node = node.nextSibling();
@@ -1146,6 +1148,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 instrumentTrackWindow::~instrumentTrackWindow()
 {
+	delete m_instrumentView;
 	if( engine::getMainWindow()->workspace() )
 	{
 		parentWidget()->hide();
@@ -1166,6 +1169,7 @@ void instrumentTrackWindow::modelChanged( void )
 	connect( m_track, SIGNAL( instrumentChanged() ),
 			this, SLOT( updateInstrumentView() ),
 			Qt::QueuedConnection );
+	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_surroundArea->setModel( &m_track->m_surroundAreaModel );
 	m_pianoView->setModel( &m_track->m_piano );

@@ -139,6 +139,7 @@ instrumentView::instrumentView( instrument * _instrument, QWidget * _parent ) :
 {
 	setModel( _instrument );
 	setFixedSize( 250, 250 );
+	setAttribute( Qt::WA_DeleteOnClose, TRUE );
 }
 
 
@@ -146,7 +147,12 @@ instrumentView::instrumentView( instrument * _instrument, QWidget * _parent ) :
 
 instrumentView::~instrumentView()
 {
+	if( getInstrumentTrackWindow() )
+	{
+		getInstrumentTrackWindow()->m_instrumentView = NULL;
+	}
 }
+
 
 
 
@@ -155,15 +161,20 @@ void instrumentView::setModel( ::model * _model, bool )
 	if( dynamic_cast<instrument *>( _model ) != NULL )
 	{
 		modelView::setModel( _model );
-		if( dynamic_cast<instrumentTrackView *>( parentWidget() ) !=
-									NULL )
-		{
-			dynamic_cast<instrumentTrackView *>( parentWidget() )->
-				setWindowIcon( *( model()->
+		getInstrumentTrackWindow()->setWindowIcon( *( model()->
 						getDescriptor()->logo ) );
-		}
+		connect( model(), SIGNAL( destroyed( QObject * ) ),
+					this, SLOT( close() ) );
 	}
 }
 
+
+
+
+instrumentTrackWindow * instrumentView::getInstrumentTrackWindow( void )
+{
+	return( dynamic_cast<instrumentTrackWindow *>(
+					parentWidget()->parentWidget() ) );
+}
 
 #endif
