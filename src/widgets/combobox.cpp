@@ -34,6 +34,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
+#include "automatable_model_templates.h"
+#include "automation_pattern.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
@@ -217,6 +219,7 @@ void comboBox::wheelEvent( QWheelEvent * _we )
 {
 	model()->setInitValue( model()->value() +
 					( ( _we->delta() < 0 ) ? 1 : -1 ) );
+	update();
 	_we->accept();
 }
 
