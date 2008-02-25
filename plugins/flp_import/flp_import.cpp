@@ -44,7 +44,7 @@
 #include "knob.h"
 #include "oscillator.h"
 #include "pattern.h"
-#include "piano_widget.h"
+#include "piano.h"
 #include "project_journal.h"
 #include "project_notes.h"
 #include "song.h"
