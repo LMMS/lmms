@@ -49,7 +49,7 @@ public:
 class toolView : public pluginView
 {
 public:
-	toolView( tool * _tool, QWidget * _parent );
+	toolView( tool * _tool );
 
 } ;
 

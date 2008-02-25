@@ -1,3 +1,16 @@
+2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/tool.h:
+	* src/core/tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	* plugins/live_tool/live_tool.cpp:
+	made live-tool work after M/V-split
+
+	* include/track.h:
+	* src/core/track.cpp:
+	- connect track's m_mutedModel to m_muteBtn of trackOperationsWidget
+	- set track for m_mutedModel
+
 2008-02-24	Paul Giblock <pgllama/at/gmail/dot/com>
 
 	* plugins/bit_invader/bit_invader.cpp:

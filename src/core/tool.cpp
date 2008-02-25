@@ -3,7 +3,7 @@
 /*
  * tool.cpp - base class for all tool plugins (graphs, extensions, etc)
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -70,8 +70,8 @@ tool * tool::instantiate( const QString & _plugin_name, model * _parent )
 
 
 
-toolView::toolView( tool * _tool, QWidget * _parent ) :
-	pluginView( _tool, _parent )
+toolView::toolView( tool * _tool ) :
+	pluginView( _tool, engine::getMainWindow()->workspace() )
 {
 	QWidget * window;
 	if( engine::getMainWindow()->workspace() )
