@@ -86,7 +86,7 @@ lmms_MOC =						\
 		./instrument_midi_io.moc		\
 		./pattern.moc				\
 		./piano_roll.moc			\
-		./piano_widget.moc			\
+		./piano.moc				\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
@@ -182,7 +182,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/note.cpp				\
 		$(srcdir)/src/core/note_play_handle.cpp			\
 		$(srcdir)/src/core/piano_roll.cpp			\
-		$(srcdir)/src/core/piano_widget.cpp			\
+		$(srcdir)/src/core/piano.cpp				\
 		$(srcdir)/src/core/plugin.cpp				\
 		$(srcdir)/src/core/plugin_browser.cpp			\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp	\
@@ -285,7 +285,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/instrument.h				\
 		$(srcdir)/include/instrument_view.h			\
 		$(srcdir)/include/bb_editor.h				\
-		$(srcdir)/include/piano_widget.h			\
+		$(srcdir)/include/piano.h				\
 		$(srcdir)/include/effect_board.h			\
 		$(srcdir)/include/pixmap_button.h			\
 		$(srcdir)/include/rename_dialog.h			\

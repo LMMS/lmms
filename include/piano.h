@@ -1,6 +1,5 @@
 /*
- * piano_widget.h - declaration of class pianoView, a widget which provides
- *                  an interactive piano/keyboard-widget
+ * piano.h - piano and pianoView, an interactive piano/keyboard-widget
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -24,8 +23,8 @@
  */
 
 
-#ifndef _PIANO_WIDGET_H
-#define _PIANO_WIDGET_H
+#ifndef _PIANO_H
+#define _PIANO_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>

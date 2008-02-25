@@ -1,5 +1,13 @@
 2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/instrument_track.h:
+	* include/piano.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano.cpp:
+	* Makefile.am:
+	renamed piano_widget.{h,cpp} to piano.{h,cpp}
+
 	* include/instrument_view.h:
 	* include/instrument_track.h:
 	* src/widgets/instrument_function_views.cpp:

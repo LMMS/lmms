@@ -68,7 +68,6 @@
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
-#include "piano_widget.h"
 #include "plugin_view.h"
 #include "sample_play_handle.h"
 #include "song.h"

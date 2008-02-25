@@ -37,7 +37,7 @@
 #include "lcd_spinbox.h"
 #include "midi_event_processor.h"
 #include "mixer.h"
-#include "piano_widget.h"
+#include "piano.h"
 #include "effect_chain.h"
 #include "surround_area.h"
 #include "tab_widget.h"

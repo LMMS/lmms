@@ -1,8 +1,8 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * piano_widget.cpp - implementation of piano-widget used in channel-window
- *                    for testing channel
+ * piano.cpp - implementation of piano-widget used in instrument-track-window
+ *             for testing
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -26,7 +26,7 @@
  */
 
 
-#include "piano_widget.h"
+#include "piano.h"
 
 
 #include <QtGui/QCursor>
@@ -709,7 +709,7 @@ bool pianoView::x11Event( XEvent * _xe )
 
 
 
-#include "piano_widget.moc"
+#include "piano.moc"
 
 
 #endif

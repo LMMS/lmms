@@ -60,7 +60,7 @@
 #include "midi.h"
 #include "mmp.h"
 #include "pattern.h"
-#include "piano_widget.h"
+#include "piano.h"
 #include "pixmap_button.h"
 #include "song.h"
 #include "song_editor.h"
