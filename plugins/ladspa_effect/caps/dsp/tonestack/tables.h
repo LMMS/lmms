@@ -1,11 +1,11 @@
 /*
-	Sin.h
+  ks_tab.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2006 David Yeh <dtyeh@ccrma.stanford.edu>
 	
 	http://quitte.de/dsp/
 
-	sin() generator.
+	Tone Stack emulation coefficient table for lattice filter.
 
 */
 /*
@@ -25,37 +25,14 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
-#ifndef _SIN_H_
-#define _SIN_H_
+#ifndef _TS_TABLES_H_
+#define _TS_TABLES_H_
 
-#include "dsp/Sine.h"
+namespace DSP {
 
-class Sin
-: public Plugin
-{
-	public:
-		d_sample f, gain;
+extern double ToneStackKS[];
+extern double ToneStackVS[];
 
-		DSP::Sine sin;
+} /* namespace DSP */
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
-
-	public:
-		static PortInfo port_info [];
-
-		void init();
-		void activate() {}
-
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
-};
-
-#endif /* _SIN_H_ */
+#endif /* _TS_TABLES_H_ */

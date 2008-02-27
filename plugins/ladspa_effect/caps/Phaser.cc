@@ -1,7 +1,7 @@
 /*
 	Phaser.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -41,18 +41,16 @@ PhaserI::one_cycle (int frames)
 
 	if (rate != *ports[1])
 	{
-		rate = *ports[1];
+		rate = getport(1);
 		lfo.set_f (max (.001, rate * (double) blocksize), fs, lfo.get_phase());
 	}
 
-	double depth = *ports[2];
-	double spread = 1 + *ports[3];
-	double fb = *ports[4];
+	double depth = getport(2);
+	double spread = 1 + getport(3);
+	double fb = getport(4);
 
 	d_sample * dst = ports[5];
 
-	normal = -normal;
-		
 	while (frames)
 	{
 		if (remain == 0) remain = 32;
@@ -126,9 +124,9 @@ Descriptor<PhaserI>::setup()
 	Label = "PhaserI";
 	Properties = HARD_RT;
 
-	Name = "CAPS: PhaserI - Mono phaser";
+	Name = CAPS "PhaserI - Mono phaser";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -142,16 +140,14 @@ PhaserII::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	lorenz.set_rate (*ports[1] * .08);
+	lorenz.set_rate (getport(1) * .08);
 
-	double depth = *ports[2];
-	double spread = 1 + *ports[3];
-	double fb = *ports[4];
+	double depth = getport(2);
+	double spread = 1 + getport(3);
+	double fb = getport(4);
 
 	d_sample * dst = ports[5];
 
-	normal = -normal;
-		
 	while (frames)
 	{
 		if (remain == 0) remain = 32;
@@ -225,9 +221,9 @@ Descriptor<PhaserII>::setup()
 	Label = "PhaserII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: PhaserII - Mono phaser modulated by a Lorenz fractal";
+	Name = CAPS "PhaserII - Mono phaser modulated by a Lorenz fractal";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();

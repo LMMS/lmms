@@ -1,7 +1,7 @@
 /*
 	Reverb.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -57,11 +57,8 @@ JVRev::default_length[9] = {
 };
 
 void
-JVRev::init (double _fs)
+JVRev::init()
 {
-	fs = _fs;
-	normal = NOISE_FLOOR;
-
 	memcpy (length, default_length, sizeof (length));
 
 	if (fs != 44100)
@@ -114,7 +111,7 @@ JVRev::activate()
 	left.reset();
 	right.reset();
 
-	set_t60 (*ports[1]);
+	set_t60 (getport(1));
 }
 
 template <sample_func_t F>
@@ -124,14 +121,12 @@ JVRev::one_cycle (int frames)
 	d_sample * s = ports[0];
 
 	if (t60 != *ports[1])
-		set_t60 (*ports[1]);
+		set_t60 (getport(1));
 
-	double wet = *ports[2], dry = 1 - wet;
+	double wet = getport(2), dry = 1 - wet;
 	
 	d_sample * dl = ports[3];
 	d_sample * dr = ports[4];
-
-	normal = -normal;
 
 	for (int i = 0; i < frames; ++i)
 	{
@@ -191,9 +186,9 @@ Descriptor<JVRev>::setup()
 	Label = "JVRev";
 	Properties = HARD_RT;
 
-	Name = "CAPS: JVRev - Stanford-style reverb from STK";
+	Name = CAPS "JVRev - Stanford-style reverb from STK";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -202,9 +197,8 @@ Descriptor<JVRev>::setup()
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-PlateStub::init (double _fs)
+PlateStub::init()
 {
-	fs = _fs;
 	f_lfo = -1; 
 	
 #	define L(i) ((int) (l[i] * fs))
@@ -257,8 +251,6 @@ PlateStub::init (double _fs)
 
 	dediff1 = .723;
 	dediff2 = .729;
-
-	normal = NOISE_FLOOR;
 }
 
 inline void
@@ -321,15 +313,15 @@ Plate::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	input.bandwidth.set (exp (-M_PI * (1. - *ports[1])));
+	input.bandwidth.set (exp (-M_PI * (1. - getport(1))));
 
-	d_sample decay = *ports[2];
+	d_sample decay = getport(2);
 
-	double damp = exp (-M_PI * *ports[3]);
+	double damp = exp (-M_PI * getport(3));
 	tank.damping[0].set (damp);
 	tank.damping[1].set (damp);
 
-	d_sample blend = *ports[4], dry = 1 - blend;
+	d_sample blend = getport(4), dry = 1 - blend;
 
 	d_sample * dl = ports[5];
 	d_sample * dr = ports[6];
@@ -339,8 +331,8 @@ Plate::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i] + normal;
 		normal = -normal;
+		d_sample x = s[i] + normal;
 
 		d_sample xl, xr;
 
@@ -396,9 +388,9 @@ Descriptor<Plate>::setup()
 	Label = "Plate";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Plate - Versatile plate reverb";
+	Name = CAPS "Plate - Versatile plate reverb";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -413,15 +405,15 @@ Plate2x2::one_cycle (int frames)
 	d_sample * sl = ports[0];
 	d_sample * sr = ports[1];
 
-	input.bandwidth.set (exp (-M_PI * (1. - *ports[2])));
+	input.bandwidth.set (exp (-M_PI * (1. - getport(2))));
 
-	d_sample decay = *ports[3];
+	d_sample decay = getport(3);
 
-	double damp = exp (-M_PI * *ports[4]);
+	double damp = exp (-M_PI * getport(4));
 	tank.damping[0].set (damp);
 	tank.damping[1].set (damp);
 
-	d_sample blend = *ports[5], dry = 1 - blend;
+	d_sample blend = getport(5), dry = 1 - blend;
 
 	d_sample * dl = ports[6];
 	d_sample * dr = ports[7];
@@ -432,7 +424,6 @@ Plate2x2::one_cycle (int frames)
 	for (int i = 0; i < frames; ++i)
 	{
 		normal = -normal;
-
 		d_sample x = (sl[i] + sr[i] + normal) * .5;
 
 		d_sample xl, xr;
@@ -493,9 +484,9 @@ Descriptor<Plate2x2>::setup()
 	Label = "Plate2x2";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Plate2x2 - Versatile plate reverb, stereo inputs";
+	Name = CAPS "Plate2x2 - Versatile plate reverb, stereo inputs";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

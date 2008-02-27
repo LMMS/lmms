@@ -5,7 +5,7 @@
 	
 	http://quitte.de/dsp/
 
-	common math utility functions.
+	Common math utility functions.
 
 */
 /*

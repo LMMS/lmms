@@ -38,11 +38,10 @@
 #include "dsp/RBJ.h"
 
 class ChorusStub
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample time, width, rate;
-		d_sample normal; /* denormal protection */
 };
 
 class ChorusI
@@ -54,20 +53,15 @@ class ChorusI
 		DSP::DelayTapA tap;
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 	public:
-		d_sample * ports [8];
-
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				rate = .15;
 				delay.init ((int) (.040 * fs));
-				normal = NOISE_FLOOR;
 			}
 
 		void activate()
@@ -98,7 +92,6 @@ class StereoChorusI
 : public ChorusStub
 {
 	public:
-		double fs;
 		d_sample rate;
 		d_sample phase;
 
@@ -110,22 +103,17 @@ class StereoChorusI
 		} left, right;
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 	public:
-		d_sample * ports [10];
-
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				rate = .15;
 				phase = .5; /* pi */
 
 				delay.init ((int) (.040 * fs));
-				normal = NOISE_FLOOR;
 			}
 
 		void activate()
@@ -200,7 +188,7 @@ class ChorusII
 		DSP::Delay delay;
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 		void set_rate (d_sample r)
 			{
@@ -213,15 +201,10 @@ class ChorusII
 			}
 
 	public:
-		d_sample * ports [8];
-
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
-				normal = NOISE_FLOOR;
 				delay.init ((int) (.040 * fs));
 				for (int i = 0; i < Taps; ++i)
 					taps[i].init (fs);
@@ -254,7 +237,6 @@ class StereoChorusII
 : public ChorusStub
 {
 	public:
-		double fs;
 		d_sample rate;
 		d_sample phase;
 
@@ -279,18 +261,14 @@ class StereoChorusII
 			}
 
 	public:
-		d_sample * ports [10];
-
 		static PortInfo port_info [];
 		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				phase = .5; /* pi */
 
 				delay.init ((int) (.040 * fs));
-				normal = NOISE_FLOOR;
 
 				left.fractal.init (.001, frandom());
 				right.fractal.init (.001, frandom());

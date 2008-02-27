@@ -1,7 +1,7 @@
 /*
 	HRTF.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -35,9 +35,8 @@
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-HRTF::init (double fs)
+HRTF::init()
 {
-	normal = NOISE_FLOOR;
 	h = 0;
 }
 
@@ -74,7 +73,7 @@ HRTF::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	int p = (int) *ports[1];
+	int p = (int) getport(1);
 	if (p != pan) set_pan (p);
 
 	d_sample * dl = ports[2];
@@ -106,8 +105,6 @@ HRTF::one_cycle (int frames)
 		F (dl, i, l, adding_gain);
 		F (dr, i, r, adding_gain);
 	}
-
-	normal = -normal;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -141,9 +138,9 @@ Descriptor<HRTF>::setup()
 	Label = "HRTF";
 	Properties = HARD_RT;
 
-	Name = "CAPS: HRTF - Head-related transfer function at elevation 0";
+	Name = CAPS "HRTF - Head-related transfer function at elevation 0";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

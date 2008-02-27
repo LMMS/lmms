@@ -1,7 +1,7 @@
 /*
 	Sin.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,9 +31,8 @@
 #include "Descriptor.h"
 
 void
-Sin::init (double _fs)
+Sin::init()
 {
-	fs = _fs;
 	sin.set_f (f = .005, fs, 0);
 	gain = 0;
 }
@@ -43,10 +42,10 @@ void
 Sin::one_cycle (int frames)
 {
 	if (f != *ports[0])
-		sin.set_f (f = *ports[0], fs, sin.get_phase());
+		sin.set_f (f = getport(0), fs, sin.get_phase());
 
 	double g = (gain == *ports[1]) ? 
-		1 : pow (*ports[1] / gain, 1. / (double) frames);
+		1 : pow (getport(1) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[2];
 
@@ -56,7 +55,7 @@ Sin::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[1];
+	gain = getport(1);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -67,7 +66,7 @@ Sin::port_info [] =
 	{
 		"f",
 		INPUT | CONTROL,
-		{BOUNDED | FS | LOG | DEFAULT_440, 0, .5}
+		{BOUNDED | LOG | DEFAULT_100, 0.0001, 20000}
 	}, {
 		"volume",
 		INPUT | CONTROL,
@@ -86,9 +85,9 @@ Descriptor<Sin>::setup()
 	Label = "Sin";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Sin - Sine wave generator";
+	Name = CAPS "Sin - Sine wave generator";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

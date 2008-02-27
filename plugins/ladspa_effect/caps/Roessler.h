@@ -31,9 +31,9 @@
 #include "dsp/Roessler.h"
 
 class Roessler
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample h, gain;
 
 		DSP::Roessler roessler;
@@ -43,14 +43,11 @@ class Roessler
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [6];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
-		void activate()
-			{ }
+		void init();
+		void activate() {}
 
 		void run (int n)
 			{

@@ -34,9 +34,9 @@
 #include "dsp/windows.h"
 
 class Clip
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample gain, gain_db;
 
 		d_sample threshold[2];
@@ -51,22 +51,19 @@ class Clip
 		DSP::FIR down;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 		inline d_sample clip (d_sample x);
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [4];
-
-		d_sample adding_gain;
 
 		Clip()
 			: up (FIR_SIZE, OVERSAMPLE), 
 				down (FIR_SIZE)
 			{ }
 
-		void init (double fs);
+		void init();
 
 		void activate()
 			{

@@ -32,10 +32,9 @@
 #include "dsp/util.h"
 
 class ClickStub
+: public Plugin
 {
 	public:
-		double fs;
-
 		d_sample bpm;
 
 		float * wave;
@@ -46,18 +45,13 @@ class ClickStub
 		int period; /* frames remaining in period */
 		int played; /* frames played from sample */
 
-		d_sample normal;
-
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [4];
 
-		d_sample adding_gain;
-
-		void init (double _fs, float * _wave, int _N);
+		void init (float * _wave, int _N);
 
 		void activate()
 			{ 
@@ -80,14 +74,14 @@ class Click
 : public ClickStub
 {
 	public:
-		void init (double fs);
+		void init();
 };
 
 class CEO
 : public ClickStub
 {
 	public:
-		void init (double fs);
+		void init();
 
 		static PortInfo port_info [];
 };
@@ -96,7 +90,7 @@ class Dirac
 : public ClickStub
 {
 	public:
-		void init (double fs);
+		void init();
 
 		static PortInfo port_info [];
 };

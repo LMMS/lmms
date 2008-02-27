@@ -38,12 +38,11 @@
 typedef DSP::SVF<1> SVF;
 
 class Scape
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample time, fb;
 		double period;
-		d_sample normal; /* denormal protection */
 
 		DSP::Lorenz lfo[2];
 		DSP::Delay delay;
@@ -51,28 +50,14 @@ class Scape
 		DSP::OnePoleHP hipass[4];
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 	public:
-		d_sample * ports [8];
-		/* 
-		 * in
-		 * bpm
-		 * div
-		 * feedback
-		 * dry
-		 * blend
-		 * out:l
-		 * out:r
-		 */
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				delay.init ((int) (2.01 * fs)); /* two seconds = 30 bpm + */
-				normal = NOISE_FLOOR;
 				for (int i = 0; i < 2; ++i)
 					lfo[i].init(),
 					lfo[i].set_rate (.00000001 * fs);

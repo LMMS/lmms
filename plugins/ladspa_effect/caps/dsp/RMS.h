@@ -49,14 +49,24 @@ class RMS
 				memset (buffer, 0, sizeof (buffer));
 			}
 
-		/* needs the squared sample value to be passed in */
-		d_sample process (d_sample x)
+		/* caution: pass in the *squared* sample value */
+		void store (d_sample x)
 			{
 				sum -= buffer[write];
-				sum += x;
+				sum += (buffer[write] = x);
 				write = (write + 1) & 63;
+			}
 
-				return sqrt (sum / 64);
+		d_sample process (d_sample x)
+			{
+				store (x);
+				return rms();
+			}
+
+		d_sample rms()
+			{
+				/* fabs it before sqrt, just in case ... */
+				return sqrt (fabs (sum) / 64);
 			}
 };
 

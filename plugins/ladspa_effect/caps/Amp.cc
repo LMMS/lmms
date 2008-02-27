@@ -1,11 +1,14 @@
 /*
 	Amp.cc
 	
-	Copyright 2003-6 Tim Goetze <tim@quitte.de>
+	Copyright 2003-7 
+		Tim Goetze <tim@quitte.de>
+		David Yeh <dtyeh@ccrma.stanford.edu> (Tone Stack in TS models)
 	
 	http://quitte.de/dsp/
 
-	tube amplifier models
+	Tube amplifier models
+
 */
 /*
 	This program is free software; you can redistribute it and/or
@@ -31,9 +34,8 @@
 #include "Descriptor.h"
 
 void
-AmpStub::init (double _fs, bool adjust_downsampler)
+AmpStub::init (bool adjust_downsampler)
 {
-	fs = _fs;
 	dc_blocker.set_f (10. / fs);
 
 	/* going a bit lower than nominal with fc */
@@ -62,22 +64,20 @@ AmpStub::init (double _fs, bool adjust_downsampler)
 	s *= OVERSAMPLE;
 	for (int i = 0; i < up.n; ++i)
 		up.c[i] *= s;
-
-	normal = NOISE_FLOOR;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-AmpIII::init (double _fs)
+AmpIII::init()
 {
-	this->AmpStub::init (_fs, false);
+	this->AmpStub::init (false);
 	
 	/* need to filter out dc before the power amp stage, which is running at
 	 * the oversampled rate */
 	dc_blocker.set_f (10. / (fs * OVERSAMPLE));
 	
-	DSP::RBJ::LoShelve (200 / (_fs), .2, -3, filter.a, filter.b);
+	DSP::RBJ::LoShelve (200 / fs, .2, -3, filter.a, filter.b);
 }
 
 template <sample_func_t F, int OVERSAMPLE>
@@ -86,10 +86,10 @@ AmpIII::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 	
-	d_sample gain = *ports[1];
-	d_sample temp = *ports[2] * tube.scale;
+	d_sample gain = getport(1);
+	d_sample temp = getport(2) * tube.scale;
 	
-	drive = *ports[3] * .5; 
+	drive = getport(3) * .5; 
 	i_drive = 1 / (1 - drive);
 	
 	d_sample * d = ports[4];
@@ -104,7 +104,7 @@ AmpIII::one_cycle (int frames)
 	/* recursive fade to prevent zipper noise from the 'gain' knob */
 	if (g == 0) g = current.g;
 	
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 	double gf = pow (current.g / g, one_over_n);
 
 	for (int i = 0; i < frames; ++i)
@@ -123,14 +123,13 @@ AmpIII::one_cycle (int frames)
 			down.store (
 					power_transfer (
 						dc_blocker.process (
-							tube.transfer_clip (up.pad (o)))));
+							normal + tube.transfer_clip (up.pad (o)))));
 
 		F (d, i, a, adding_gain);
 
 		g *= gf;
 	}
 
-	normal = -normal;
 	current.g = g;
 }
 
@@ -173,9 +172,9 @@ Descriptor<AmpIII>::setup()
 	Label = "AmpIII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: AmpIII - Tube amp emulation";
+	Name = CAPS "AmpIII - Tube amp";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -184,31 +183,31 @@ Descriptor<AmpIII>::setup()
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-AmpIV::init (double _fs)
+AmpIV::init()
 {
-	this->AmpStub::init (_fs, false);
+	this->AmpStub::init (false);
 	
 	/* need to filter out dc before the power amp stage, which is running at
 	 * the oversampled rate */
 	dc_blocker.set_f (10. / (fs * OVERSAMPLE));
 	
-	tone.init (_fs);
+	tone.init (fs);
 }
 
 template <sample_func_t F, int OVERSAMPLE>
 void
 AmpIV::one_cycle (int frames)
 {
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 
 	d_sample * s = ports[0];
 	
-	d_sample gain = *ports[1];
-	d_sample temp = *ports[2] * tube.scale;
-	
+	d_sample gain = getport(1);
+	d_sample temp = getport(2) * tube.scale;
+
 	tone.start_cycle (ports + 3, one_over_n);
 	
-	drive = *ports[7] * .5; 
+	drive = getport(7) * .5; 
 	i_drive = 1 / (1 - drive);
 	
 	d_sample * d = ports[8];
@@ -241,14 +240,13 @@ AmpIV::one_cycle (int frames)
 			down.store (
 					power_transfer (
 						dc_blocker.process (
-							tube.transfer_clip (up.pad (o)))));
+							normal + tube.transfer_clip (up.pad (o)))));
 
 		F (d, i, a, adding_gain);
 
 		g *= gf;
 	}
 
-	normal = -normal;
 	current.g = g;
 }
 
@@ -307,9 +305,9 @@ Descriptor<AmpIV>::setup()
 	Label = "AmpIV";
 	Properties = HARD_RT;
 
-	Name = "CAPS: AmpIV - Tube amp emulation + tone controls";
+	Name = CAPS "AmpIV - Tube amp + tone controls";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -318,24 +316,22 @@ Descriptor<AmpIV>::setup()
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-AmpV::init (double _fs)
+AmpV::init()
 {
-	this->AmpStub::init (_fs, false);
+	this->AmpStub::init (false);
 	
 	/* need to filter out dc before the power amp stage, which is running at
 	 * the oversampled rate */
-	dc_blocker.set_f (10. / (_fs * OVERSAMPLE));
+	dc_blocker.set_f (10. / (fs * OVERSAMPLE));
 	
-	DSP::RBJ::LoShelve (210. / _fs, .2, -1, filter[0].a, filter[0].b);
-	DSP::RBJ::LoShelve (4200. / _fs, 1.2, +6, filter[1].a, filter[1].b);
-	DSP::RBJ::LoShelve (420. / _fs, .2, +2, filter[2].a, filter[2].b);
+	DSP::RBJ::LoShelve (210. / fs, .2, -1, filter[0].a, filter[0].b);
+	DSP::RBJ::LoShelve (4200. / fs, 1.2, +6, filter[1].a, filter[1].b);
+	DSP::RBJ::LoShelve (420. / fs, .2, +2, filter[2].a, filter[2].b);
 
-	/* power supply capacitor */
+	/* power supply cap */
 	for (int i = 0; i < 2; ++i)
-		DSP::RBJ::LP (10. / _fs, .3, power_cap[i].a, power_cap[i].b);
+		DSP::RBJ::LP (10. / fs, .3, power_cap[i].a, power_cap[i].b);
 }
-
-static int _turn = 0;
 
 template <sample_func_t F, int OVERSAMPLE>
 void
@@ -343,27 +339,27 @@ AmpV::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 	
-	d_sample gain = *ports[1];
+	d_sample gain = getport(1);
 
 	if (*ports[2] != cut)
 	{
-		cut = *ports[2];
+		cut = getport(2);
 		DSP::RBJ::LoShelve (210. / fs, .2, cut, filter[0].a, filter[0].b);
 	}
 	if (*ports[3] != tone)
 	{
-		tone = *ports[3];
+		tone = getport(3);
 		double f = tone * tone * 8400 + 420;
 		double q = tone * .4 + .2;
 		double db = tone * 2 + 2;
 		DSP::RBJ::LoShelve (f / fs, q, db, filter[2].a, filter[2].b);
 	}
 
-	drive = *ports[4] * .5; 
+	drive = getport(4) * .5; 
 	i_drive = 1 / (1 - drive);
 	
 	#define MAX_WATTS port_info[5].range.UpperBound
-	d_sample sag = (MAX_WATTS - *ports[5]) / MAX_WATTS;
+	d_sample sag = (MAX_WATTS - getport(5)) / MAX_WATTS;
 	sag = .6 * sag * sag;
 		
 	d_sample * d = ports[6]; 
@@ -373,13 +369,15 @@ AmpV::one_cycle (int frames)
 	double g = current.g;
 
 	current.g = max (gain < 1 ? gain : pow (20, gain - 1), .000001);
-	if (0 && (++_turn & 127) == 0)
+	#if 0
+	if (++_turn & 127) == 0)
 		fprintf (stderr, "supply = %.3f sag = %.3f\n", supply, sag);
+	#endif
 
 	if (g == 0) g = current.g;
 
 	/* recursive fade to prevent zipper noise from the 'gain' knob */
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 	double gf = pow (current.g / g, one_over_n);
 
 	for (int i = 0; i < frames; ++i)
@@ -409,7 +407,7 @@ AmpV::one_cycle (int frames)
 				down.store (
 						power_transfer (
 							dc_blocker.process (
-								tube.transfer_clip (
+								normal + tube.transfer_clip (
 									up.pad (o)))));
 		}
 
@@ -418,8 +416,8 @@ AmpV::one_cycle (int frames)
 		/* integrate for an approximation of cumulative output power */
 		supply += sag * fabs (a) + normal;
 		/* filter integrated power consumption */
-		for (int i = 0; i < 2; ++i)
-			supply = 0.9 * (power_cap[i].process (supply));
+		for (int j = 0; j < 2; ++j)
+			supply = 0.9 * (power_cap[j].process (supply));
 
 		g *= gf;
 		normal = -normal;
@@ -475,12 +473,165 @@ Descriptor<AmpV>::setup()
 	Label = "AmpV";
 	Properties = HARD_RT;
 
-	Name = "CAPS: AmpV - Refined tube amp emulation";
+	Name = CAPS "AmpV - Tube amp";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
 }
 
+/* //////////////////////////////////////////////////////////////////////// */
 
+void
+AmpVTS::init()
+{
+	this->AmpStub::init (false);
+	
+	/* need to filter out dc before the power amp stage, which is running at
+	 * the oversampled rate */
+	dc_blocker.set_f (10. / (fs * OVERSAMPLE));
+	
+	/* power supply capacitance */
+	for (int i = 0; i < 2; ++i)
+		DSP::RBJ::LP (10. / fs, .3, power_cap[i].a, power_cap[i].b);
+
+	tonestack.init (fs);
+}
+
+template <sample_func_t F, int OVERSAMPLE>
+void
+AmpVTS::one_cycle (int frames)
+{
+	d_sample * s = ports[0];
+
+	tonestack.start_cycle (ports + 1, 2);
+	d_sample gain = getport(2);
+
+	drive = getport(6) * .5; 
+	i_drive = 1 / (1 - drive);
+	
+	d_sample sag = 1 - max (0.0001, min (1, getport(7)));
+	sag = .6 * sag * sag; /* map to log space makes slider better */
+		
+	d_sample * d = ports[8]; 
+	
+	*ports[9] = OVERSAMPLE;
+
+	double g = current.g;
+
+	if (gain < 1)
+		current.g = max (gain, .001);
+	else
+	{
+		gain -= 1;
+		gain *= gain;
+		current.g = pow (10, gain);
+	}
+
+	/* recursive fade to prevent zipper noise from the 'gain' knob */
+	double one_over_n = frames > 0 ? 1. / frames : 1;
+	double gf = pow (current.g / g, one_over_n);
+
+	for (int i = 0; i < frames; ++i)
+	{
+		register double a = s[i];
+		register double v = 3 - supply;
+		v = v * v * .06 + .46;
+
+		a = tube.transfer (a);
+		a = tonestack.process (a + normal);
+		
+		a = g * (a + supply * .001); 
+
+		a = v * tube.transfer_clip (up.upsample (a));
+		a = power_transfer (dc_blocker.process (a));
+		
+		a = down.process (a);
+
+		{
+			for (int o = 1; o < OVERSAMPLE; ++o)
+				down.store (
+						power_transfer (
+							dc_blocker.process (
+								normal + tube.transfer_clip (
+									up.pad (o)))));
+		}
+
+		F (d, i, a, adding_gain);
+		
+		/* integrate for an approximation of cumulative output power */
+		supply += sag * fabs (a) + normal;
+		/* filter integrated power consumption */
+		for (int j = 0; j < 2; ++j)
+			supply = 0.9 * (power_cap[j].process (supply + normal));
+
+		g *= gf;
+		normal = -normal;
+	}
+
+	current.g = g;
+}
+
+/* //////////////////////////////////////////////////////////////////////// */
+
+PortInfo
+AmpVTS::port_info [] = 
+{
+	{
+		"in",
+		INPUT | AUDIO,
+		{BOUNDED, -1, 1}
+	}, {
+		"model",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0 | INTEGER, 0, 5} /* no way to set dyn at compile t */
+	}, {
+		"gain",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_HIGH, 0, 3}
+	}, {
+		"bass",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_MID, 0, 1}
+	}, {
+		"mid",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_1, 0, 1}
+	}, {
+		"treble",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_HIGH, 0, 1}
+	}, {
+		"drive",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_LOW, 0.0001, 1} 
+	}, {
+		"watts",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_HIGH, 0.0001, 1}
+	}, {
+		"out",
+		OUTPUT | AUDIO,
+		{0}
+	}, {
+		"latency",
+		OUTPUT | CONTROL,
+		{0}
+	}
+};
+
+template <> void
+Descriptor<AmpVTS>::setup()
+{
+	UniqueID = 2592;
+	Label = "AmpVTS";
+	Properties = HARD_RT;
+
+	Name = CAPS "AmpVTS - Tube amp + Tone stack";
+	Maker = "David Yeh <dtyeh@ccrma.stanford.edu> & Tim Goetze <tim@quitte.de>";
+	Copyright = "GPL, 2002-7";
+
+	/* fill port info and vtable */
+	autogen();
+}

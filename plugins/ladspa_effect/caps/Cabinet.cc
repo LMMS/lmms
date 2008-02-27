@@ -1,7 +1,7 @@
 /*
 	Cabinet.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -73,11 +73,10 @@ CabinetI::models [] =
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-CabinetI::init (double fs)
+CabinetI::init()
 {
 	h = 0;
 	model = 0;
-	normal = NOISE_FLOOR;
 }
 
 void
@@ -92,7 +91,7 @@ CabinetI::switch_model (int m)
 	a = models[m].a;
 	b = models[m].b;
 
-	gain = models[m].gain * DSP::db2lin (*ports[2]);
+	gain = models[m].gain * DSP::db2lin (getport(2));
 
 	memset (x, 0, sizeof (x));
 	memset (y, 0, sizeof (y));
@@ -101,7 +100,7 @@ CabinetI::switch_model (int m)
 void
 CabinetI::activate()
 {
-	switch_model ((int) *ports[1]);
+	switch_model ((int) getport(1));
 }
 
 template <sample_func_t F>
@@ -110,10 +109,10 @@ CabinetI::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	int m = (int) *ports[1];
+	int m = (int) getport (1);
 	if (m != model) switch_model (m);
 
-	d_sample g = models[model].gain * DSP::db2lin (*ports[2]);
+	d_sample g = models[model].gain * DSP::db2lin (getport(2));
 	double gf = pow (g / gain, 1 / (double) frames);
 
 	d_sample * d = ports[3];
@@ -140,8 +139,6 @@ CabinetI::one_cycle (int frames)
 		F (d, i, gain * out, adding_gain);
 		gain *= gf;
 	}
-
-	normal = -normal;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -177,9 +174,9 @@ Descriptor<CabinetI>::setup()
 	Label = "CabinetI";
 	Properties = HARD_RT;
 
-	Name = "CAPS: CabinetI - Loudspeaker cabinet emulation";
+	Name = CAPS "CabinetI - Loudspeaker cabinet emulation";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -190,7 +187,7 @@ Descriptor<CabinetI>::setup()
 #include "Cabinet-Models32.h"
 
 void
-CabinetII::init (double fs)
+CabinetII::init()
 {
 	if (fs < 46000)
 		models = models44100;
@@ -203,7 +200,6 @@ CabinetII::init (double fs)
 
 	h = 0;
 	model = 0;
-	normal = NOISE_FLOOR;
 }
 
 void
@@ -218,7 +214,7 @@ CabinetII::switch_model (int m)
 	a = models[m].a;
 	b = models[m].b;
 
-	gain = models[m].gain * DSP::db2lin (*ports[2]);
+	gain = models[m].gain * DSP::db2lin (getport(2));
 
 	memset (x, 0, sizeof (x));
 	memset (y, 0, sizeof (y));
@@ -227,8 +223,7 @@ CabinetII::switch_model (int m)
 void
 CabinetII::activate()
 {
-	switch_model ((int) *ports[1]);
-	gain = models[model].gain * DSP::db2lin (*ports[2]);
+	switch_model ((int) getport(1));
 }
 
 template <sample_func_t F>
@@ -237,10 +232,10 @@ CabinetII::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	int m = (int) *ports[1];
+	int m = (int) getport (1);
 	if (m != model) switch_model (m);
 
-	d_sample g = models[model].gain * DSP::db2lin (*ports[2]);
+	d_sample g = models[model].gain * DSP::db2lin (getport(2));
 	double gf = pow (g / gain, 1 / (double) frames);
 
 	d_sample * d = ports[3];
@@ -267,8 +262,6 @@ CabinetII::one_cycle (int frames)
 		F (d, i, gain * out, adding_gain);
 		gain *= gf;
 	}
-
-	normal = -normal;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -304,9 +297,9 @@ Descriptor<CabinetII>::setup()
 	Label = "CabinetII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: CabinetII - Refined loudspeaker cabinet emulation";
+	Name = CAPS "CabinetII - Refined loudspeaker cabinet emulation";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();

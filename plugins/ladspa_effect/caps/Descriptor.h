@@ -1,24 +1,18 @@
 /*
 	Descriptor.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-6 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	creating a LADSPA_Descriptor for a caps plugin via a C++ template,
+	Creating a LADSPA_Descriptor for a CAPS plugin via a C++ template,
 	saves us a virtual function call compared to the usual method used
 	for C++ plugins in a C context.
 
 	Descriptor<P> expects P to declare some common methods, like init(),
 	activate() etc, plus a static port_info[] and LADSPA_Data * ports[]
-	and of course 'adding_gain'.
-	
-	maintaining both port_info[] and ports[] is a bit of a bitch, but,
-	hey, "you only do it once (tm)" .. and then you do it over and over
-	again. particularly bothersome is also the necessary unrolling of our
-	PortInfo array to fit into LADSPA_Descriptor's inconsequential way of 
-	port data structuring, which results in quite a bit of memory holding 
-	duplicated data. oh well.
+	and adding_gain.
+ 
 */
 /*
 	This program is free software; you can redistribute it and/or
@@ -40,6 +34,13 @@
 #ifndef _DESCRIPTOR_H_
 #define _DESCRIPTOR_H_
 
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE3__
+#include <pmmintrin.h>
+#endif
+
 /* common stub for Descriptor makes it possible to delete() without special-
  * casing for every plugin class.
  */
@@ -47,6 +48,8 @@ class DescriptorStub
 : public LADSPA_Descriptor
 {
 	public:
+		static int thishostsucks;
+
 		DescriptorStub()
 			{
 				PortCount = 0;
@@ -62,23 +65,34 @@ class DescriptorStub
 				}
 			}
 };
-				
+
+inline void
+processor_specific_denormal_measures()
+{
+	#ifdef __SSE3__
+	/* this one works reliably on a 6600 Core2 */
+	_MM_SET_DENORMALS_ZERO_MODE (_MM_DENORMALS_ZERO_ON);
+	#endif
+
+	#ifdef __SSE__
+	/* this one doesn't ... */
+	_MM_SET_FLUSH_ZERO_MODE (_MM_FLUSH_ZERO_ON);
+	#endif
+}
+
 template <class T>
 class Descriptor
 : public DescriptorStub
 {
 	public:
-		/* tom szilyagi reports that hosts exist which call activate() before
-		 * connect_port(). since caps' plugins expect ports to be valid we
+		/* Tom Szilyagi reports that hosts exist which call activate() before
+		 * connect_port(). Since CAPS' plugins expect ports to be valid we
 		 * need a safeguard: at instantiation, each port is connected to the
-		 * lower bound. When (If?) LADSPA default values are ever fixed, connecting
-		 * to the default will be preferred. */
+		 * lower bound. */
 		LADSPA_PortRangeHint * ranges;
 
 	public:
-		Descriptor()
-			{ setup(); }
-
+		Descriptor() { setup(); }
 		void setup();
 
 		void autogen() 
@@ -117,12 +131,20 @@ class Descriptor
 				const struct _LADSPA_Descriptor * d, ulong fs)
 			{ 
 				T * plugin = new T();
-				
-				/* see comment above at 'ranges' member */
-				for (int i = 0; i < (int) d->PortCount; ++i)
-					plugin->ports[i] = &((Descriptor *) d)->ranges[i].LowerBound;
+				int n = (int) d->PortCount;
 
-				plugin->init (fs);
+				LADSPA_PortRangeHint * ranges = ((Descriptor *) d)->ranges;
+				plugin->ranges = ranges;
+
+				plugin->ports = new d_sample * [n];
+
+				/* connect to lower bound as a safety measure */
+				for (int i = 0; i < n; ++i)
+					plugin->ports[i] = &(ranges[i].LowerBound);
+
+				plugin->fs = fs;
+				plugin->normal = NOISE_FLOOR;
+				plugin->init();
 
 				return plugin;
 			}
@@ -134,29 +156,72 @@ class Descriptor
 
 		static void _activate (LADSPA_Handle h)
 			{
-				((T *) h)->activate();
+				T * plugin = (T *) h;
+
+				plugin->first_run = 1;
+
+				/* since none of the plugins do any RT-critical work in 
+				 * activate(), it's safe to defer the actual call to the 
+				 * plugin's activate() method for the first run() after
+				 * the host called in here.
+				 * 
+				 * It's simplest way to prevent a parameter smoothing sweep
+				 * in the first audio block after activation.
+				plugin->activate();
+				 */
 			}
 
 		static void _run (LADSPA_Handle h, ulong n)
 			{
-				/* cannot call template here (g++ 2.95), sigh. */
-				((T *) h)->run (n);
+				T * plugin = (T *) h;
+
+				/* We don't reset the processor flags later, it's true. */
+				processor_specific_denormal_measures();
+
+				/* If this is the first audio block after activation, 
+				 * initialize the plugin from the current set of parameters. */
+				if (plugin->first_run)
+				{
+					plugin->activate();
+					plugin->first_run = 0;
+				}
+
+				plugin->run (n);
+				plugin->normal = -plugin->normal;
 			}
 		
 		static void _run_adding (LADSPA_Handle h, ulong n)
 			{
-				/* cannot call a template here (g++ 2.95), sigh. */
-				((T *) h)->run_adding (n);
+				T * plugin = (T *) h;
+
+				/* We don't reset the processor flags later, it's true. */
+				processor_specific_denormal_measures();
+
+				/* If this is the first audio block after activation, 
+				 * initialize the plugin from the current set of parameters. */
+				if (plugin->first_run)
+				{
+					plugin->activate();
+					plugin->first_run = 0;
+				}
+
+				plugin->run_adding (n);
+				plugin->normal = -plugin->normal;
 			}
 		
 		static void _set_run_adding_gain (LADSPA_Handle h, LADSPA_Data g)
 			{
-				((T *) h)->adding_gain = g;
+				T * plugin = (T *) h;
+
+				plugin->adding_gain = g;
 			}
 
 		static void _cleanup (LADSPA_Handle h)
 			{
-				delete (T *) h;
+				T * plugin = (T *) h;
+
+				delete [] plugin->ports;
+				delete plugin;
 			}
 };
 

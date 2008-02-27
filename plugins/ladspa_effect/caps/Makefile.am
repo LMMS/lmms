@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 
-AM_CXXFLAGS := $(AM_CXXFLAGS) -O6 -ffast-math -funroll-loops -ftracer -I../../../include
+AM_CXXFLAGS := $(AM_CXXFLAGS) -O2 -I../../../include
 
 DEST = $(DESTDIR)$(libdir)/$(PACKAGE)/ladspa
 SOURCES = $(wildcard *.cc)
@@ -15,7 +15,7 @@ clean:
 	rm -f *.o *.so *.s depend
 
 install: all
-	strip caps.so
+#	strip caps.so
 	install -d $(DEST)
 	install -m 644 caps.so $(DEST)
 

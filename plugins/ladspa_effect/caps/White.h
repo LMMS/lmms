@@ -31,6 +31,7 @@
 #include "dsp/White.h"
 
 class White
+: public Plugin
 {
 	public:
 		d_sample gain;
@@ -38,17 +39,12 @@ class White
 		DSP::White white;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [2];
 
-		d_sample adding_gain;
-
-		void init (double _fs)
-			{ }
-
+		void init() {}
 		void activate()
 			{ 
 				gain = .5;

@@ -1,7 +1,7 @@
 /*
 	Clip.cc
 	
-	Copyright 2003-5 Tim Goetze <tim@quitte.de>
+	Copyright 2003-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,9 +31,8 @@
 #include "Descriptor.h"
 
 void
-Clip::init (double _fs)
+Clip::init()
 {
-	fs = _fs;
 	gain = 1;
 
 	threshold[0] = -.9;
@@ -79,12 +78,13 @@ Clip::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
+	double g = getport (1);
 	double gf;
-	if (*ports[1] == gain_db)
+	if (g == gain_db)
 		gf = 1;
 	else
 	{
-		gain_db = *ports[1];
+		gain_db = g;
 		d_sample g = DSP::db2lin (gain_db);
 		gf = pow (g / gain, 1 / (double) frames);
 	}
@@ -138,9 +138,9 @@ Descriptor<Clip>::setup()
 	Label = "Clip";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Clip - Hard clipper, 8x oversampled";
+	Name = CAPS "Clip - Hard clipper, 8x oversampled";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2003-5";
+	Copyright = "GPL, 2003-7";
 
 	/* fill port info and vtable */
 	autogen();

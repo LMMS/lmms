@@ -1,12 +1,12 @@
 /*
 	Eq.h
 	
-	Copyright 2004 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	equalizer circuit using recursive filtering.
-	based on a motorola paper implementing a similar circuit on a DSP56001.
+	Equalizer circuit using recursive filtering.
+	Based on a motorola paper implementing a similar circuit on a DSP56001.
 
 */
 /*
@@ -31,86 +31,64 @@
 
 namespace DSP {
 
-/* a single bandpass as used by the Eq, expressed as a biquad. like all
- * band-pass filters i know, the filter works with a FIR coefficient of 0 
+/* A single bandpass as used by the Eq, expressed as a biquad. Like all
+ * band-pass filters I know of, the filter works with a FIR coefficient of 0 
  * for x[-1], so a generic biquad isn't the optimum implementation. 
+ *
+ * This routine isn't used anywhere, just here for testing purposes.
  */
-class BP
+template <class T>
+void
+_BP (double fc, double Q, T * ca, T * cb)
 {
-	public:
-		template <class T>
-		BP (double fc, double Q, T * ca, T * cb)
-			{
-				double theta = 2 * fc * M_PI;
+	double theta = 2 * fc * M_PI;
 
-				double 
-					b = (Q - theta * .5) / (2 * Q + theta),
-					a = (.5 - b) / 2,
-					c = (.5 + b) * cos (theta);
+	double 
+		b = (Q - theta * .5) / (2 * Q + theta),
+		a = (.5 - b) / 2,
+		c = (.5 + b) * cos (theta);
 
-				ca[0] = 2 * a;
-				ca[1] = 0;
-				ca[2] = -2 * a;
+	ca[0] = 2 * a;
+	ca[1] = 0;
+	ca[2] = -2 * a;
 
-				cb[0] = 0;
-				cb[1] = 2 * c;
-				cb[2] = -2 * b;
-			}
-};
+	cb[0] = 0;
+	cb[1] = 2 * c;
+	cb[2] = -2 * b;
+}
 
-/* BANDS must be a multiple of 4 to enable the use of SSE instructions.
- * however, the current SSE-enabled process() method fails to compile if
- * -funroll-loops is passed to gcc.
- */
-template <int USE_BANDS, int BANDS>
+template <int Bands, class eq_sample = float>
 class Eq
 {
 	public:
-		/* over-size state buffer to allow alignment */
-		float state [BANDS * 8 + 4 + 4];
 		/* recursion coefficients, 3 per band */
-		float * a, * b, * c;
+		eq_sample __attribute__ ((aligned)) a[Bands], b[Bands], c[Bands];
 		/* past outputs, 2 per band */
-		float * y;
+		eq_sample __attribute__ ((aligned)) y[2][Bands];
 		/* current gain and recursion factor, each 1 per band = 2 */
-		float * gain, * gf;
-		/* aligned storage for output summation */
-		float * temp;
-		/* aligned storage for constants */
-		float * two;
+		eq_sample __attribute__ ((aligned)) gain[Bands], gf[Bands];
 		/* input history */
-		float x[2];
+		eq_sample x[2];
 		/* history index */
 		int h;
 
+		eq_sample normal;
+
 		Eq()
 			{
-				/* take care of 128-bit alignment */
-				long s = (long) (char *) state;
-				s &= 0xF;
-				if (s)
-					s = 16 - s;
-				
-				/* assign coefficients */
-				a = (float *) (((char *) state) + s); 
-				b = a + BANDS; 
-				c = a + 2 * BANDS; 
-				
-				/* output history (input is common to all bands) */
-				y = a + 3 * BANDS; 
-				gain = a + 5 * BANDS; 
-				gf = a + 6 * BANDS; 
-				temp = a + 7 * BANDS;
-				two = temp + 4;
-				two[0] = two[1] = two[2] = two[3] = 2;
-
 				h = 0;
+				normal = NOISE_FLOOR;
 			}
 
 		void reset()
-			 {
-				 for (int i = 0; i < 2 * BANDS; ++i)
-					y[i] = 0;
+			{
+				for (int z = 0; z < 2; ++z)
+				{
+					// work-around for buggy optimizer in GCC 4.3
+					for (int i = 0; i < Bands-1; ++i)
+						y[z][i] = 0;
+					y[z][Bands-1] = 0;
+				}
 
 				for (int i = 0; i < 2; ++i)
 					x[i] = 0;
@@ -121,9 +99,10 @@ class Eq
 				double f = 31.25;
 				int i = 0;
 
-				for (i = 0; i < USE_BANDS && f < fs / 2; ++i, f *= 2)
+				for (i = 0; i < Bands && f < fs / 2; ++i, f *= 2)
 					init_band (i, 2 * f * M_PI / fs, Q);
-				for (  ; i < BANDS; ++i)
+				/* just in case, zero the remaining coefficients */
+				for (  ; i < Bands; ++i)
 					zero_band (i);
 
 				reset();
@@ -134,6 +113,7 @@ class Eq
 				b[i] = (Q - theta * .5) / (2 * Q + theta);
 				a[i] = (.5 - b[i]) / 2;
 				c[i] = (.5 + b[i]) * cos (theta);
+				/* fprintf (stderr, "%02d %f %f %f\n", i, a[i], b[i], c[i]); */
 				gain[i] = 1;
 				gf[i] = 1;
 			}
@@ -146,27 +126,35 @@ class Eq
 		/* per-band recursion:
 		 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2]) 
 		 */
-		d_sample process (d_sample s)
+		eq_sample process (eq_sample s)
 			{
 				int z1 = h, z2 = h ^ 1;
 
-				float * y1 = y + z1 * BANDS;
-				float * y2 = y + z2 * BANDS;
+				eq_sample * y1 = y[z1];
+				eq_sample * y2 = y[z2];
 
-				d_sample x_x2 = s - x[z2];
-				d_sample r = 0;
+				eq_sample x_x2 = s - x[z2];
+				eq_sample r = 0;
 
-				for (int i = 0; i < USE_BANDS; ++i)
+				for (int i = 0; i < Bands; ++i)
 				{
-					y2[i] = 2 * (a[i] * x_x2 + c[i] * y1[i] - b[i] * y2[i]);
+					y2[i] = normal + 2 * (a[i] * x_x2 + c[i] * y1[i] - b[i] * y2[i]);
 					r += gain[i] * y2[i];
 					gain[i] *= gf[i];
 				}
-				
+
 				x[z2] = s;
 				h = z2;
 
 				return r;
+			}
+
+		/* zap denormals in history */
+		void flush_0()
+			{
+				for (int i = 0; i < Bands; ++i)
+					if (is_denormal (y[0][i]))
+						y[0][i] = 0;
 			}
 };
 

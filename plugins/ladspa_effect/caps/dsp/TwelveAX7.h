@@ -31,6 +31,8 @@ namespace DSP {
 	
 #include "r12ax7.h"
 
+typedef d_sample tube_sample;
+
 /* this is the original tube model from caps < 0.1.9 or preamp.so, put
  * back into use in 0.1.11; the replacement (below) is too strong in 
  * odd-order harmonics at the expense of even-order. it has to sound
@@ -39,14 +41,14 @@ namespace DSP {
 class TwelveAX7
 {
 	public:
-		d_sample b, c, d;
+		tube_sample b, c, d;
 		
 		struct {
-			d_sample threshold, value;
+			tube_sample threshold, value;
 		} clip[2];
 
 		/* amplitude at which clipping starts */
-		d_sample scale;
+		tube_sample scale;
 
 	public:
 		TwelveAX7()
@@ -61,12 +63,12 @@ class TwelveAX7
 				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
 			}
 
-		inline d_sample transfer (d_sample a)
+		inline tube_sample transfer (tube_sample a)
 			{ 
 				return a * (b + a * (c + a * d)); 
 			}
 			
-		inline d_sample transfer_clip (d_sample a)
+		inline tube_sample transfer_clip (tube_sample a)
 			{
 				if (a <= clip[0].threshold)
 					return clip[0].value;
@@ -103,13 +105,13 @@ class TwelveAX7
 class TwelveAX7_2
 {
 	public:
-		d_sample b, c, d;
+		tube_sample b, c, d;
 
 		struct {
-			d_sample threshold, value;
+			tube_sample threshold, value;
 		} clip[2];
 
-		d_sample scale;
+		tube_sample scale;
 
 	public:
 		TwelveAX7_2()
@@ -128,12 +130,12 @@ class TwelveAX7_2
 				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
 			}
 
-		inline d_sample transfer (d_sample a)
+		inline tube_sample transfer (tube_sample a)
 			{ 
 				return a * (b + a * (c + a * d));
 			}
 			
-		inline d_sample transfer_clip (d_sample a)
+		inline tube_sample transfer_clip (tube_sample a)
 			{
 				if (a <= clip[0].threshold)
 					return clip[0].value;
@@ -149,22 +151,20 @@ class TwelveAX7_2
 class TwelveAX7_3
 {
 	public:
-		d_sample b, c, d;
+		tube_sample b, c, d;
 
 		struct {
-			d_sample threshold, value;
+			tube_sample threshold, value;
 		} clip[2];
 
-		d_sample scale;
+		tube_sample scale;
 
 	public:
 		TwelveAX7_3()
 			{ 
 				static double x[2] = 
 					{
-						/* adjust for a slightly earlier clipping threshold in the
-						 * lower lobe */
-						-0.96 * (double) r12AX7::Zero / 
+						(double) r12AX7::Zero / 
 								((double) r12AX7::Samples - (double) r12AX7::Zero),
 						1
 					};
@@ -176,7 +176,7 @@ class TwelveAX7_3
 				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
 			}
 
-		inline d_sample transfer (d_sample a)
+		inline tube_sample transfer (tube_sample a)
 			{ 
 				a = r12AX7::Zero + a * (r12AX7::Samples - r12AX7::Zero);
 				if (a <= 0)
@@ -191,7 +191,7 @@ class TwelveAX7_3
 				return (r12AX7::v2v [i] * (1.f - a) + r12AX7::v2v [i + 1] * a);
 			}
 			
-		inline d_sample transfer_clip (d_sample a)
+		inline tube_sample transfer_clip (tube_sample a)
 			{
 				return transfer (a);
 			}
@@ -202,11 +202,11 @@ class NoTwelveAX7
 {
 	public:
 		struct {
-			d_sample threshold, value;
+			tube_sample threshold, value;
 		} clip[2];
 
 		/* amplitude at which clipping starts */
-		d_sample scale;
+		tube_sample scale;
 
 	public:
 		NoTwelveAX7()
@@ -220,12 +220,12 @@ class NoTwelveAX7
 				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
 			}
 
-		inline d_sample transfer (d_sample a)
+		inline tube_sample transfer (tube_sample a)
 			{ 
 				return 0.5469181606780 * (pow (1 - a, 1.5) - 1);
 			}
 			
-		inline d_sample transfer_clip (d_sample a)
+		inline tube_sample transfer_clip (tube_sample a)
 			{
 				if (a <= clip[0].threshold)
 					return clip[0].value;

@@ -1,6 +1,10 @@
 /*
   interface.cc
 
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
+	
+	http://quitte.de/dsp/
+
 	LADSPA descriptor factory, host interface.
 
  */
@@ -43,10 +47,11 @@
 #include "HRTF.h"
 #include "Pan.h"
 #include "Scape.h"
+#include "ToneStack.h" 
 
 #include "Descriptor.h"
 
-#define N 33
+#define N 38 
 static DescriptorStub * descriptors [N];
 
 static inline void
@@ -55,24 +60,29 @@ seed()
 	static struct timeval tv;
   gettimeofday (&tv, 0);
 
-	srand (tv.tv_sec ^ tv.tv_usec);
+	srandom (tv.tv_sec ^ tv.tv_usec);
 }
 
 extern "C" {
 
+__attribute__ ((constructor)) 
 void _init()
 {
 	DescriptorStub ** d = descriptors;
 
 	*d++ = new Descriptor<Eq>();
+	*d++ = new Descriptor<Eq2x2>();
 	*d++ = new Descriptor<Compress>();
 	*d++ = new Descriptor<Pan>();
 
 	*d++ = new Descriptor<PreampIII>();
 	*d++ = new Descriptor<PreampIV>();
+	*d++ = new Descriptor<ToneStack>();  
+	*d++ = new Descriptor<ToneStackLT>();    
 	*d++ = new Descriptor<AmpIII>();
 	*d++ = new Descriptor<AmpIV>();
 	*d++ = new Descriptor<AmpV>();
+	*d++ = new Descriptor<AmpVTS>();     
 	*d++ = new Descriptor<CabinetI>();
 	*d++ = new Descriptor<CabinetII>();
 	*d++ = new Descriptor<Clip>();
@@ -85,6 +95,7 @@ void _init()
 	*d++ = new Descriptor<PhaserII>();
 	*d++ = new Descriptor<SweepVFI>();
 	*d++ = new Descriptor<SweepVFII>();
+	*d++ = new Descriptor<AutoWah>();
 	*d++ = new Descriptor<Scape>();
 
 	*d++ = new Descriptor<VCOs>();
@@ -103,9 +114,13 @@ void _init()
 	*d++ = new Descriptor<Dirac>();
 	*d++ = new Descriptor<HRTF>();
 
-	seed();
+	/* make sure N is correct */
+	assert (d - descriptors == N);
+
+	//seed();
 }
 
+__attribute__ ((destructor)) 
 void _fini()
 {
 	for (ulong i = 0; i < N; ++i)
@@ -119,7 +134,6 @@ ladspa_descriptor (unsigned long i)
 {
 	if (i < N)
 		return descriptors[i];
-
 	return 0;
 }
 

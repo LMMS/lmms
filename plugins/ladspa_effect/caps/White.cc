@@ -1,7 +1,7 @@
 /*
 	White.cc
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -35,7 +35,7 @@ void
 White::one_cycle (int frames)
 {
 	double g = (gain == *ports[0]) ? 
-		1 : pow (*ports[0] / gain, 1. / (double) frames);
+		1 : pow (getport(0) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[1];
 
@@ -45,7 +45,7 @@ White::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[0];
+	gain = getport(0);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -71,9 +71,9 @@ Descriptor<White>::setup()
 	Label = "White";
 	Properties = HARD_RT;
 
-	Name = "CAPS: White - White noise generator";
+	Name = CAPS "White - White noise generator";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

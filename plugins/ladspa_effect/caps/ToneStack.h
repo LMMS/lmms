@@ -1,11 +1,11 @@
 /*
-	Sin.h
+	ToneStack.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2006-7
+		David Yeh <dtyeh@ccrma.stanford.edu> 
+		Tim Goetze <tim@quitte.de> (cosmetics)
 	
-	http://quitte.de/dsp/
-
-	sin() generator.
+	Tone Stack emulation.
 
 */
 /*
@@ -25,18 +25,18 @@
 	02111-1307, USA or point your web browser to http://www.gnu.org.
 */
 
-#ifndef _SIN_H_
-#define _SIN_H_
+#ifndef _TONESTACK_H_
+#define _TONESTACK_H_
 
-#include "dsp/Sine.h"
+#include "dsp/util.h"
+#include "dsp/windows.h"
+#include "dsp/ToneStack.h"
 
-class Sin
+class ToneStack 
 : public Plugin
 {
-	public:
-		d_sample f, gain;
-
-		DSP::Sine sin;
+	private:
+		DSP::ToneStack tonestack;
 
 		template <sample_func_t F>
 			void one_cycle (int frames);
@@ -44,8 +44,12 @@ class Sin
 	public:
 		static PortInfo port_info [];
 
-		void init();
-		void activate() {}
+		void init()
+			{ 
+				tonestack.init (fs);
+			}
+
+		void activate();
 
 		void run (int n)
 			{
@@ -58,4 +62,37 @@ class Sin
 			}
 };
 
-#endif /* _SIN_H_ */
+/* /////////////////////////////////////////////////////////////////////// */
+
+class ToneStackLT
+: public Plugin
+{
+	private:
+		DSP::ToneStackLT tonestack;
+
+		template <sample_func_t F>
+			void one_cycle (int frames);
+
+	public:
+		static PortInfo port_info [];
+
+		void init()
+			{ 
+				tonestack.init (fs);
+			}
+
+		void activate()
+			{ tonestack.activate (ports + 1); }
+
+		void run (int n)
+			{
+				one_cycle<store_func> (n);
+			}
+		
+		void run_adding (int n)
+			{
+				one_cycle<adding_func> (n);
+			}
+};
+
+#endif /* _TONESTACK_H_ */

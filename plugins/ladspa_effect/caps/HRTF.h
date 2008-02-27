@@ -31,6 +31,7 @@
 #include "dsp/util.h"
 
 class HRTF
+: public Plugin
 {
 	public:
 		int pan;
@@ -45,19 +46,13 @@ class HRTF
 		
 		void set_pan (int p);
 
-		d_sample normal;
-
 		template <sample_func_t F>
 		void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [4];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				set_pan ((int) *ports[1]);

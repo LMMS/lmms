@@ -48,13 +48,11 @@ class BiQuad
 				reset();
 			}
 		
-		BiQuad (d_sample * _a, d_sample * _b)
+		void copy (BiQuad & bq)
 			{
 				for (int i = 0; i < 3; ++i)
-					a[i] = _a[i],
-					b[i] = _b[i];
-				
-				reset();
+					a[i] = bq.a[i],
+					b[i] = bq.b[i];
 			}
 
 		void reset()
@@ -63,6 +61,14 @@ class BiQuad
 
 				x[0] = x[1] = 
 				y[0] = y[1] = 0.;
+			}
+
+		/* denormal zapping */
+		void flush_0()
+			{
+				for (int i = 0; i < 2; ++i)
+					if (is_denormal (y[i]))
+						y[i] = 0;
 			}
 
 		inline d_sample process (d_sample s)
@@ -86,7 +92,8 @@ class BiQuad
 				return r;
 			}
 
-		/* additional methods for using the biquad to upsample */
+		/* additional methods for using the biquad to filter an
+		 * upsampled signal with 0 padding */
 		inline d_sample process_0_1()
 			{
 				register int z = h;

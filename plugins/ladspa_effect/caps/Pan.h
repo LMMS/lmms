@@ -50,30 +50,25 @@ class PanTap
 };
 
 class Pan
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample pan;
 
 		d_sample gain_l, gain_r;
-		d_sample normal;
 
 		DSP::Delay delay;
 		PanTap tap;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 		inline void set_pan (d_sample);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [7];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)

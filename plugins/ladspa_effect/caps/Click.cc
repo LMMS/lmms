@@ -1,7 +1,7 @@
 /*
 	Click.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -27,28 +27,26 @@
 
 #include "basics.h"
 
-#include "click.h"
-#include "money.h"
+#include "waves/click.h"
+#include "waves/money.h"
 
 #include "Click.h"
 #include "Descriptor.h"
 
 void
-ClickStub::init (double _fs, float * _wave, int _N)
+ClickStub::init (float * _wave, int _N)
 {
-	fs = _fs;
 	wave = _wave;
 	N = _N;
 	bpm = -1;
-	normal = NOISE_FLOOR;
 }
 
 template <sample_func_t F>
 void
 ClickStub::one_cycle (int frames)
 {
-	bpm = *ports[0];
-	d_sample gain = *ports[1] * *ports[1];
+	bpm = getport(0);
+	d_sample gain = getport(1) * *ports[1];
 	lp.set (1 - *ports[2]);
 	
 	d_sample * d = ports[3];
@@ -120,9 +118,9 @@ ClickStub::port_info [] =
 #define LENGTH(W) ((int) (sizeof (W) / sizeof (float)))
 
 void
-Click::init (double fs)
+Click::init()
 {
-	this->ClickStub::init (fs, click, LENGTH (click));
+	this->ClickStub::init (click, LENGTH (click));
 }
 
 template <> void
@@ -132,9 +130,9 @@ Descriptor<Click>::setup()
 	Label = "Click";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Click - Metronome";
+	Name = CAPS "Click - Metronome";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -165,9 +163,9 @@ CEO::port_info [] =
 };
 
 void
-CEO::init (double fs)
+CEO::init()
 { 
-	this->ClickStub::init (fs, money, LENGTH (money));
+	this->ClickStub::init (money, LENGTH (money));
 }
 
 template <> void
@@ -177,9 +175,9 @@ Descriptor<CEO>::setup()
 	Label = "CEO";
 	Properties = HARD_RT;
 
-	Name = "CAPS: CEO - Chief Executive Oscillator";
+	Name = CAPS "CEO - Chief Executive Oscillator";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -212,9 +210,9 @@ Dirac::port_info [] =
 };
 
 void
-Dirac::init (double fs)
+Dirac::init()
 { 
-	this->ClickStub::init (fs, dirac, LENGTH (dirac));
+	this->ClickStub::init (dirac, LENGTH (dirac));
 }
 
 template <> void
@@ -224,9 +222,9 @@ Descriptor<Dirac>::setup()
 	Label = "Dirac";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Dirac - One-sample impulse generator";
+	Name = CAPS "Dirac - One-sample impulse generator";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

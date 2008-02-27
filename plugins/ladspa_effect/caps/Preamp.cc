@@ -1,11 +1,11 @@
 /*
 	Preamp.cc
 	
-	Copyright 2003-5 Tim Goetze <tim@quitte.de>
+	Copyright 2003-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	loosely 12AX7-based tube preamp model, 8x oversampling.
+	Loosely 12AX7-based tube preamp model with 8x oversampling.
 */
 /*
 	This program is free software; you can redistribute it and/or
@@ -31,11 +31,11 @@
 #include "Descriptor.h"
 
 void
-PreampIII::init (double _fs)
+PreampIII::init()
 {
-	this->AmpStub::init (_fs);
+	this->AmpStub::init();
 
-	DSP::RBJ::LoShelve (200 / (_fs), .2, -6, filter.a, filter.b);
+	DSP::RBJ::LoShelve (200 / fs, .2, -6, filter.a, filter.b);
 }
 
 template <sample_func_t F, int OVERSAMPLE>
@@ -43,8 +43,8 @@ void
 PreampIII::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
-	d_sample gain = *ports[1];
-	d_sample temp = *ports[2] * tube.scale;
+	d_sample gain = getport(1);
+	d_sample temp = getport(2) * tube.scale;
 	d_sample * d = ports[3];
 	*ports[4] = OVERSAMPLE;
 
@@ -57,7 +57,7 @@ PreampIII::one_cycle (int frames)
 	if (g == 0) g = current.g;
 	
 	/* recursive fade to prevent zipper noise from the 'gain' knob */
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 	double gf = pow (current.g / g, one_over_n);
 
 	for (int i = 0; i < frames; ++i)
@@ -77,7 +77,6 @@ PreampIII::one_cycle (int frames)
 	}
 
 	current.g = g;
-	normal = -normal;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -115,9 +114,9 @@ Descriptor<PreampIII>::setup()
 	Label = "PreampIII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: PreampIII - Tube preamp emulation";
+	Name = CAPS "PreampIII - Tube preamp emulation";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -126,11 +125,10 @@ Descriptor<PreampIII>::setup()
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-PreampIV::init (double _fs)
+PreampIV::init()
 {
-	this->AmpStub::init (_fs);
-
-	tone.init (_fs);
+	this->AmpStub::init();
+	tone.init (fs);
 }
 
 void
@@ -145,11 +143,11 @@ template <sample_func_t F, int OVERSAMPLE>
 void
 PreampIV::one_cycle (int frames)
 {
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 
 	d_sample * s = ports[0];
-	d_sample gain = *ports[1];
-	d_sample temp = *ports[2] * tube.scale;
+	d_sample gain = getport(1);
+	d_sample temp = getport(2) * tube.scale;
 
 	tone.start_cycle (ports + 3, one_over_n);
 
@@ -183,7 +181,6 @@ PreampIV::one_cycle (int frames)
 	}
 
 	current.g = g;
-	normal = -normal;
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -237,9 +234,9 @@ Descriptor<PreampIV>::setup()
 	Label = "PreampIV";
 	Properties = HARD_RT;
 
-	Name = "CAPS: PreampIV - Tube preamp emulation + tone controls";
+	Name = CAPS "PreampIV - Tube preamp emulation + tone controls";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2002-5";
+	Copyright = "GPL, 2002-7";
 
 	/* fill port info and vtable */
 	autogen();

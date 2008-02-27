@@ -58,37 +58,30 @@ class PhaserAP
 };
 
 class PhaserI
+: public Plugin
 {
 	public:
-		double fs;
-
 		PhaserAP ap[6];
 		DSP::Sine lfo;
 
 		d_sample rate;
 		d_sample y0;
-		d_sample normal;
 
 		struct {
 			double bottom, range;
 		} delay;
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 		int blocksize, remain;
 
 	public:
-		d_sample * ports [6];
-
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				blocksize = 32;
-				normal = NOISE_FLOOR;
 			}
 
 		void activate()
@@ -116,6 +109,7 @@ class PhaserI
 /* same as above, but filter sweep is controlled by a Lorenz fractal */
 
 class PhaserII
+: public Plugin
 {
 	public:
 		double fs;
@@ -125,28 +119,22 @@ class PhaserII
 
 		d_sample rate;
 		d_sample y0;
-		d_sample normal;
 
 		struct {
 			double bottom, range;
 		} delay;
 
 		template <sample_func_t>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 	
 		int blocksize, remain;
 
 	public:
-		d_sample * ports [6];
-
 		static PortInfo port_info [];
-		d_sample adding_gain;
 
-		void init (double _fs)
+		void init()
 			{
-				fs = _fs;
 				blocksize = 32;
-				normal = NOISE_FLOOR;
 				lorenz.init();
 			}
 
