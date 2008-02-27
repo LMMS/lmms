@@ -691,14 +691,20 @@ void song::clearProject( void )
 	engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	engine::getAutomationEditor()->setCurrentPattern( NULL );
+	if( engine::getAutomationEditor() )
+	{
+		engine::getAutomationEditor()->setCurrentPattern( NULL );
+	}
 	m_tempoModel.getAutomationPattern()->clear();
 	m_masterVolumeModel.getAutomationPattern()->clear();
 	m_masterPitchModel.getAutomationPattern()->clear();
 
 	engine::getMixer()->unlock();
 
-	engine::getProjectNotes()->clear();
+	if( engine::getProjectNotes() )
+	{
+		engine::getProjectNotes()->clear();
+	}
 
 	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();
@@ -737,7 +743,10 @@ void song::createNewProject( void )
 
 	m_fileName = m_oldFileName = "";
 
-	engine::getMainWindow()->resetWindowTitle();
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->resetWindowTitle();
+	}
 
 	track * t;
 	t = track::create( track::InstrumentTrack, this );
@@ -795,15 +804,21 @@ void FASTCALL song::loadProject( const QString & _file_name )
 		return;
 	}
 
-	engine::getMainWindow()->resetWindowTitle();
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->resetWindowTitle();
+	}
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( mmp.head(), "bpm" );
 	m_masterVolumeModel.loadSettings( mmp.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( mmp.head(), "masterpitch" );
 
-	// reset loop-point-state
-	m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
+	if( m_playPos[Mode_PlaySong].m_timeLine )
+	{
+		// reset loop-point-state
+		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
+	}
 
 	QDomNode node = mmp.content().firstChild();
 	while( !node.isNull() )
@@ -815,30 +830,33 @@ void FASTCALL song::loadProject( const QString & _file_name )
 				( (journallingObject *)( this ) )->
 					restoreState( node.toElement() );
 			}
-			else if( node.nodeName() ==
-					engine::getPianoRoll()->nodeName() )
+			else if( engine::hasGUI() )
 			{
-				engine::getPianoRoll()->restoreState(
-							node.toElement() );
-			}
-			else if( node.nodeName() ==
-				engine::getAutomationEditor()->nodeName() )
-			{
-				engine::getAutomationEditor()->restoreState(
-							node.toElement() );
-			}
-			else if( node.nodeName() ==
-					engine::getProjectNotes()->nodeName() )
-			{
-				( (journallingObject *)( engine::
-							getProjectNotes() ) )->
-					restoreState( node.toElement() );
-			}
-			else if( node.nodeName() ==
-				m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
-			{
-				m_playPos[Mode_PlaySong].m_timeLine->restoreState(
-							node.toElement() );
+				if( node.nodeName() ==
+						engine::getPianoRoll()->nodeName() )
+				{
+					engine::getPianoRoll()->restoreState(
+								node.toElement() );
+				}
+				else if( node.nodeName() ==
+					engine::getAutomationEditor()->nodeName() )
+				{
+					engine::getAutomationEditor()->restoreState(
+								node.toElement() );
+				}
+				else if( node.nodeName() ==
+						engine::getProjectNotes()->nodeName() )
+				{
+					( (journallingObject *)( engine::
+								getProjectNotes() ) )->
+						restoreState( node.toElement() );
+				}
+				else if( node.nodeName() ==
+					m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
+				{
+					m_playPos[Mode_PlaySong].m_timeLine->restoreState(
+								node.toElement() );
+				}
 			}
 		}
 		node = node.nextSibling();
@@ -1008,7 +1026,10 @@ void song::setModified( void )
 	if( !m_loadingProject )
 	{
 		m_modified = TRUE;
-		engine::getMainWindow()->resetWindowTitle();
+		if( engine::getMainWindow() )
+		{
+			engine::getMainWindow()->resetWindowTitle();
+		}
 	}
 }
 

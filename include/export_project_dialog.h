@@ -31,14 +31,13 @@
 
 #include "export.h"
 #include "automatable_model.h"
+#include "combobox.h"
 
 
 class QLabel;
 class QPushButton;
 class QProgressBar;
 
-class comboBox;
-class comboBoxModel;
 class ledCheckBox;
 class pixmapButton;
 
@@ -73,16 +72,17 @@ private:
 	static Sint16 s_availableBitrates[];
 
 
+	comboBoxModel m_typeModel;
+	comboBoxModel m_kbpsModel;
+	boolModel m_vbrEnabledModel;
+	boolModel m_hqmEnabledModel;
+
 	QLabel * m_typeLbl;
 	comboBox * m_typeCombo;
-	comboBoxModel * m_typeModel;
 	QLabel * m_kbpsLbl;
 	comboBox * m_kbpsCombo;
-	comboBoxModel * m_kbpsModel;
 	ledCheckBox * m_vbrCb;
-	boolModel * m_vbrEnabledModel;
 	ledCheckBox * m_hqmCb;
-	boolModel * m_hqmEnabledModel;
 	QLabel * m_hourglassLbl;
 	QPushButton * m_exportBtn;
 	QPushButton * m_cancelBtn;

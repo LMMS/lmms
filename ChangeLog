@@ -1,5 +1,81 @@
 2008-02-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/caps/Compress.cc:
+	* plugins/ladspa_effect/caps/ToneStack.cc:
+	* plugins/ladspa_effect/caps/Compress.h:
+	* plugins/ladspa_effect/caps/ToneStack.h:
+	* plugins/ladspa_effect/caps/Roessler.h:
+	* plugins/ladspa_effect/caps/HRTF.cc:
+	* plugins/ladspa_effect/caps/HRTF.h:
+	* plugins/ladspa_effect/caps/basics.h:
+	* plugins/ladspa_effect/caps/Lorenz.cc:
+	* plugins/ladspa_effect/caps/Lorenz.h:
+	* plugins/ladspa_effect/caps/Amp.cc:
+	* plugins/ladspa_effect/caps/Amp.h:
+	* plugins/ladspa_effect/caps/Pan.h:
+	* plugins/ladspa_effect/caps/Phaser.cc:
+	* plugins/ladspa_effect/caps/White.h:
+	* plugins/ladspa_effect/caps/Preamp.cc:
+	* plugins/ladspa_effect/caps/Click.cc:
+	* plugins/ladspa_effect/caps/VCO.cc:
+	* plugins/ladspa_effect/caps/Clip.cc:
+	* plugins/ladspa_effect/caps/Click.h:
+	* plugins/ladspa_effect/caps/VCO.h:
+	* plugins/ladspa_effect/caps/ToneControls.cc:
+	* plugins/ladspa_effect/caps/Sin.cc:
+	* plugins/ladspa_effect/caps/Clip.h:
+	* plugins/ladspa_effect/caps/Sin.h:
+	* plugins/ladspa_effect/caps/Scape.cc:
+	* plugins/ladspa_effect/caps/Scape.h:
+	* plugins/ladspa_effect/caps/Roessler.cc:
+	* plugins/ladspa_effect/caps/interface.cc:
+	* plugins/ladspa_effect/caps/waves/click.h:
+	* plugins/ladspa_effect/caps/waves/money.h:
+	* plugins/ladspa_effect/caps/dsp/ToneStack.h:
+	* plugins/ladspa_effect/caps/dsp/LatFilt.h:
+	* plugins/ladspa_effect/caps/dsp/TDFII.h:
+	* plugins/ladspa_effect/caps/dsp/RMS.h:
+	* plugins/ladspa_effect/caps/dsp/OnePole.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/tables.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/vs_tab.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/ks_tab.h:
+	* plugins/ladspa_effect/caps/dsp/Eq.h:
+	* plugins/ladspa_effect/caps/dsp/BiQuad.h:
+	* plugins/ladspa_effect/caps/dsp/util.h:
+	* plugins/ladspa_effect/caps/dsp/FPTruncateMode.h:
+	* plugins/ladspa_effect/caps/dsp/TwelveAX7.h:
+	* plugins/ladspa_effect/caps/Chorus.cc:
+	* plugins/ladspa_effect/caps/Cabinet.cc:
+	* plugins/ladspa_effect/caps/Chorus.h:
+	* plugins/ladspa_effect/caps/Eq.cc:
+	* plugins/ladspa_effect/caps/Cabinet.h:
+	* plugins/ladspa_effect/caps/Eq.h:
+	* plugins/ladspa_effect/caps/README:
+	* plugins/ladspa_effect/caps/Pan.cc:
+	* plugins/ladspa_effect/caps/SweepVF.cc:
+	* plugins/ladspa_effect/caps/Descriptor.h:
+	* plugins/ladspa_effect/caps/White.cc:
+	* plugins/ladspa_effect/caps/SweepVF.h:
+	* plugins/ladspa_effect/caps/Phaser.h:
+	* plugins/ladspa_effect/caps/Reverb.cc:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	* plugins/ladspa_effect/caps/Reverb.h:
+	integrated new version of CAPS and fixed miscompilation with GCC 4.3
+
+	* include/audio_port.h:
+	* src/audio/audio_port.cpp:
+	* src/core/mixer.cpp:
+	lock audioPort-buffers before writing them
+
+	* include/export_project_dialog.h:
+	* src/core/song.cpp:
+	* src/core/main.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/engine.cpp:
+	* src/core/automation_pattern.cpp:
+	rendering from commandline is now done without creating main-window
+	and all the other UI-stuff
+
 	* include/mixer.h:
 	* src/core/mixer.cpp:
 	distribute whole job-queue instead of single jobs and re-assign

@@ -43,17 +43,17 @@
 
 bool engine::s_hasGUI = TRUE;
 float engine::s_framesPerTact64th;
-mixer * engine::s_mixer;
-mainWindow * engine::s_mainWindow;
-bbTrackContainer * engine::s_bbTrackContainer;
-song * engine::s_song;
-songEditor * engine::s_songEditor;
-automationEditor * engine::s_automationEditor;
-bbEditor * engine::s_bbEditor;
-pianoRoll * engine::s_pianoRoll;
-projectNotes * engine::s_projectNotes;
-projectJournal * engine::s_projectJournal;
-ladspa2LMMS * engine::s_ladspaManager;
+mixer * engine::s_mixer = NULL;
+mainWindow * engine::s_mainWindow = NULL;
+bbTrackContainer * engine::s_bbTrackContainer = NULL;
+song * engine::s_song = NULL;
+songEditor * engine::s_songEditor = NULL;
+automationEditor * engine::s_automationEditor = NULL;
+bbEditor * engine::s_bbEditor = NULL;
+pianoRoll * engine::s_pianoRoll = NULL;
+projectNotes * engine::s_projectNotes = NULL;
+projectJournal * engine::s_projectJournal = NULL;
+ladspa2LMMS * engine::s_ladspaManager = NULL;
 QMap<QString, QString> engine::s_sampleExtensions;
 
 
@@ -70,19 +70,25 @@ void engine::init( const bool _has_gui )
 	s_song = new song;
 	s_bbTrackContainer = new bbTrackContainer;
 
-	s_mainWindow = new mainWindow;
-	s_songEditor = new songEditor( s_song );
-	s_projectNotes = new projectNotes;
-	s_bbEditor = new bbEditor( s_bbTrackContainer );
-	s_pianoRoll = new pianoRoll;
-	s_automationEditor = new automationEditor;
+	if( s_hasGUI )
+	{
+		s_mainWindow = new mainWindow;
+		s_songEditor = new songEditor( s_song );
+		s_projectNotes = new projectNotes;
+		s_bbEditor = new bbEditor( s_bbTrackContainer );
+		s_pianoRoll = new pianoRoll;
+		s_automationEditor = new automationEditor;
+	}
 	s_ladspaManager = new ladspa2LMMS;
 
 	s_projectJournal->setJournalling( TRUE );
 
 	s_mixer->initDevices();
 
-	s_mainWindow->finalize();
+	if( s_hasGUI )
+	{
+		s_mainWindow->finalize();
+	}
 
 	presetPreviewPlayHandle::init();
 

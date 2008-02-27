@@ -117,10 +117,10 @@ Sint16 exportProjectDialog::s_availableBitrates[] =
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
 							QWidget * _parent ) :
 	QDialog( _parent ),
-	m_typeModel( new comboBoxModel( /* this */ ) ),
-	m_kbpsModel( new comboBoxModel( /* this */ ) ),
-	m_vbrEnabledModel( new boolModel( /* this */ ) ),
-	m_hqmEnabledModel( new boolModel( /* this */ ) ),
+	m_typeModel( NULL /* this */ ),
+	m_kbpsModel( NULL /* this */ ),
+	m_vbrEnabledModel( TRUE, NULL /* this */ ),
+	m_hqmEnabledModel( FALSE, NULL/* this */ ),
 	m_fileName( _file_name ),
 	m_deleteFile( FALSE )
 {
@@ -138,18 +138,18 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	Uint8 idx = 0;
 	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
-		m_typeModel->addItem(
+		m_typeModel.addItem(
 				tr( fileEncodeDevices[idx].m_description ) );
 		++idx;
 	}
-	m_typeModel->setValue( m_typeModel->findText( tr(
+	m_typeModel.setValue( m_typeModel.findText( tr(
 			fileEncodeDevices[m_fileType].m_description ) ) );
 
 	m_typeCombo = new comboBox( this );
 	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
 					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
 								TYPE_HEIGHT );
-	m_typeCombo->setModel( m_typeModel );
+	m_typeCombo->setModel( &m_typeModel );
 /*	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
 				SLOT( changedType( const QString & ) ) );*/
 
@@ -162,33 +162,31 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	idx = 0;
 	while( s_availableBitrates[idx] != -1 )
 	{
-		m_kbpsModel->addItem( QString::number(
+		m_kbpsModel.addItem( QString::number(
 						s_availableBitrates[idx] ) );
 		++idx;
 	}
-	m_kbpsModel->setValue( m_kbpsModel->findText(
+	m_kbpsModel.setValue( m_kbpsModel.findText(
 						QString::number( 128 ) ) );
 
 	m_kbpsCombo = new comboBox( this );
-	m_kbpsCombo->setModel( m_kbpsModel );
+	m_kbpsCombo->setModel( &m_kbpsModel );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
 
 
 	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this );
-	m_vbrCb->setModel( m_vbrEnabledModel );
+	m_vbrCb->setModel( &m_vbrEnabledModel );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
-	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
 									this );
-	m_hqmCb->setModel( m_hqmEnabledModel );
+	m_hqmCb->setModel( &m_hqmEnabledModel );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
-	m_hqmCb->setChecked( TRUE );
 
 
 	m_exportBtn = new QPushButton( embed::getIconPixmap( "apply" ),
@@ -315,9 +313,9 @@ void exportProjectDialog::exportBtnClicked( void )
 							success_ful,
 							m_fileName,
 						m_vbrCb->model()->value(),
-					m_kbpsModel->currentText().toInt(),
-					m_kbpsModel->currentText().toInt() - 64,
-					m_kbpsModel->currentText().toInt() + 64,
+					m_kbpsModel.currentText().toInt(),
+					m_kbpsModel.currentText().toInt() - 64,
+					m_kbpsModel.currentText().toInt() + 64,
 					engine::getMixer() );
 	if( success_ful == FALSE )
 	{
@@ -375,11 +373,14 @@ void exportProjectDialog::exportBtnClicked( void )
 		int pval = pp * 100 /
 			( ( engine::getSong()->lengthInTacts() + 1 ) * 64 );
 		m_exportProgressBar->setValue( pval );
-		// update lmms-main-win-caption
-		engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
+		if( engine::getMainWindow() )
+		{
+			// update lmms-main-win-caption
+			engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
 					+ " " + QString::number( pval ) + "%" );
+		}
 		// process paint-events etc.
-		qApp->processEvents();
+		QCoreApplication::processEvents();
 	}
 
 	finishProjectExport();
@@ -422,8 +423,11 @@ void exportProjectDialog::finishProjectExport( void )
 		QFile( m_fileName ).remove();
 	}
 
-	// restore window-title
-	engine::getMainWindow()->resetWindowTitle(); 
+	if( engine::getMainWindow() )
+	{
+		// restore window-title
+		engine::getMainWindow()->resetWindowTitle(); 
+	}
 
 	engine::getSong()->stopExport();
 

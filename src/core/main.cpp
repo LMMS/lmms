@@ -27,6 +27,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
+#include <QtCore/QTime>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
 #include <QtGui/QSplashScreen>
@@ -93,7 +94,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-v" )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n\n"
-	"Copyright (c) 2004-2007 Tobias Doerffel and others.\n\n"
+	"Copyright (c) 2004-2008 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
@@ -106,7 +107,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
-	"Copyright (c) 2004-2007 Tobias Doerffel and others.\n\n"
+	"Copyright (c) 2004-2008 LMMS developers.\n\n"
 	"usage: lmms [ -r <file_to_render> [ -o <format> ] [ -h ] "
 							"[ <file_to_load> ]\n"
 	"-r, --render			render given file.\n"
@@ -149,9 +150,11 @@ int main( int argc, char * * argv )
 		}
 	}
 
+	bool gui_startup = TRUE;
 	if( file_to_render != "" )
 	{
 		file_to_render += extension;
+		gui_startup = FALSE;
 	}
 
 
@@ -170,68 +173,75 @@ int main( int argc, char * * argv )
 		return( EXIT_FAILURE );
 	}
 
-	// set palette
-	QPalette pal = app.palette();
-	pal.setColor( QPalette::Background, QColor( 128, 128, 128 ) );
-	pal.setColor( QPalette::Foreground, QColor( 240, 240, 240 ) );
-	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
-	pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
-	pal.setColor( QPalette::Button, QColor( 160, 160, 160 ) );
-	pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
-	pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
-	pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
-	app.setPalette( pal );
-
-
-	// init splash screen
-	QPixmap splash = embed::getIconPixmap( "splash" );
-	mainWindow::s_splashScreen = new QSplashScreen( splash );
-	mainWindow::s_splashScreen->show();
-
-	mainWindow::s_splashScreen->showMessage( mainWindow::tr(
-							"Setting up main-"
-							"window and "
-							"workspace..." ),
-							splash_alignment_flags,
-							Qt::white );
-
-	engine::init();
-
-	// we try to load given file
-	if( file_to_load != "" )
+	if( gui_startup )
 	{
+		// set palette
+		QPalette pal = app.palette();
+		pal.setColor( QPalette::Background, QColor( 128, 128, 128 ) );
+		pal.setColor( QPalette::Foreground, QColor( 240, 240, 240 ) );
+		pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
+		pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
+		pal.setColor( QPalette::Button, QColor( 160, 160, 160 ) );
+		pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
+		pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
+		pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
+		app.setPalette( pal );
+
+
+		// init splash screen
+		QPixmap splash = embed::getIconPixmap( "splash" );
+		mainWindow::s_splashScreen = new QSplashScreen( splash );
+		mainWindow::s_splashScreen->show();
+
+		mainWindow::s_splashScreen->showMessage( mainWindow::tr(
+								"Setting up main-"
+								"window and "
+								"workspace..." ),
+								splash_alignment_flags,
+								Qt::white );
+
+		engine::init();
+
+		// we try to load given file
+		if( file_to_load != "" )
+		{
+			engine::getSong()->loadProject( file_to_load );
+		}
+		else
+		{
+			engine::getSong()->createNewProject();
+		}
+
+		// MDI-mode?
+		if( engine::getMainWindow()->workspace() != NULL )
+		{
+			// then maximize
+			engine::getMainWindow()->showMaximized();
+		}
+		else
+		{
+			// otherwise arrange at top-left edge of screen
+			engine::getMainWindow()->show();
+			engine::getMainWindow()->move( 0, 0 );
+			engine::getMainWindow()->resize( 200, 500 );
+		}
+
+
+		delete mainWindow::s_splashScreen;
+		mainWindow::s_splashScreen = NULL;
+	}
+	else
+	{
+		engine::init( FALSE );
 		engine::getSong()->loadProject( file_to_load );
-	}
-	else
-	{
-		engine::getSong()->createNewProject();
-	}
-
-	// MDI-mode?
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		// then maximize
-		engine::getMainWindow()->showMaximized();
-	}
-	else
-	{
-		// otherwise arrange at top-left edge of screen
-		engine::getMainWindow()->show();
-		engine::getMainWindow()->move( 0, 0 );
-		engine::getMainWindow()->resize( 200, 500 );
-	}
-
-
-	delete mainWindow::s_splashScreen;
-	mainWindow::s_splashScreen = NULL;
-
-	if( file_to_render != "" )
-	{
 		exportProjectDialog * e = new exportProjectDialog(
 						file_to_render,
 						engine::getMainWindow() );
 		e->show();
+		QTime t;
+		t.start();
 		e->exportBtnClicked();
+		printf("export took %d ms\n",t.elapsed());
 	}
 
 	return( app.exec() );

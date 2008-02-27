@@ -139,7 +139,7 @@ midiTime automationPattern::length( void ) const
 midiTime automationPattern::putValue( const midiTime & _time, const int _value,
 							const bool _quant_pos )
 {
-	midiTime new_time = _quant_pos ?
+	midiTime new_time = _quant_pos && engine::getAutomationEditor() ?
 		note::quantized( _time,
 			engine::getAutomationEditor()->quantization() ) :
 		_time;
@@ -185,7 +185,8 @@ void automationPattern::removeValue( const midiTime & _time )
 void automationPattern::clear( void )
 {
 	m_time_map.clear();
-	if( engine::getAutomationEditor()->currentPattern() == this )
+	if( engine::getAutomationEditor() &&
+		engine::getAutomationEditor()->currentPattern() == this )
 	{
 		engine::getAutomationEditor()->update();
 	}
