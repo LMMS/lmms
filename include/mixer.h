@@ -31,6 +31,7 @@
 #endif
 
 #include <QtCore/QMutex>
+#include <QtCore/QSemaphore>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 
@@ -90,6 +91,8 @@ const float BASE_FREQ = 440.0f;
 const tones BASE_TONE = A;
 const octaves BASE_OCTAVE = OCTAVE_4;
 
+
+class mixerWorkerThread;
 
 
 class mixer : public QObject
@@ -361,7 +364,10 @@ private:
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
 	Uint8 m_cpuLoad;
-	int m_parallelizingLevel;
+	bool m_multiThreaded;
+	QVector<mixerWorkerThread *> m_workers;
+	QSemaphore m_workerSem;
+
 
 	playHandleVector m_playHandles;
 	constPlayHandleVector m_playHandlesToRemove;
@@ -389,6 +395,7 @@ private:
 
 
 	friend class engine;
+	friend class mixerWorkerThread;
 
 } ;
 
