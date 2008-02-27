@@ -170,7 +170,7 @@ private:
 		{
 		audioPort * a = (audioPort *) it->job;
 		bool me = a->processEffects();
-		if( a->m_bufferUsage != audioPort::NONE || me )
+		if( a->m_bufferUsage != audioPort::NoUsage || me )
 		{
 			m_mixer->processBuffer(
 					a->firstBuffer(),
@@ -567,7 +567,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 						it != m_audioPorts.end(); ++it )
 			{
 				more_effects = ( *it )->processEffects();
-				if( ( *it )->m_bufferUsage != audioPort::NONE ||
+				if( ( *it )->m_bufferUsage != audioPort::NoUsage ||
 								more_effects )
 				{
 					processBuffer( ( *it )->firstBuffer(),
@@ -648,6 +648,7 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 	fpp_t end_frame = start_frame + _frames;
 	const fpp_t loop1_frame = tMin( end_frame, m_framesPerPeriod );
 
+	_port->lockFirstBuffer();
 	for( fpp_t frame = start_frame; frame < loop1_frame; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
@@ -658,7 +659,9 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 						_volume_vector.vol[chnl];
 		}
 	}
+	_port->unlockFirstBuffer();
 
+	_port->lockSecondBuffer();
 	if( end_frame > m_framesPerPeriod )
 	{
 		fpp_t frames_done = m_framesPerPeriod - start_frame;
@@ -676,14 +679,14 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 			}
 		}
 		// we used both buffers so set flags
-		_port->m_bufferUsage = audioPort::BOTH;
+		_port->m_bufferUsage = audioPort::BothBuffers;
 	}
-	else if( _port->m_bufferUsage == audioPort::NONE )
+	else if( _port->m_bufferUsage == audioPort::NoUsage )
 	{
 		// only first buffer touched
-		_port->m_bufferUsage = audioPort::FIRST;
+		_port->m_bufferUsage = audioPort::FirstBuffer;
 	}
-
+	_port->unlockSecondBuffer();
 }
 
 

@@ -35,7 +35,7 @@
 
 
 audioPort::audioPort( const QString & _name, track * _track ) :
-	m_bufferUsage( NONE ),
+	m_bufferUsage( NoUsage ),
 	m_firstBuffer( new surroundSampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
 	m_secondBuffer( new surroundSampleFrame[
@@ -70,12 +70,15 @@ audioPort::~audioPort()
 
 void audioPort::nextPeriod( void )
 {
+	m_firstBufferLock.lock();
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );
 	qSwap( m_firstBuffer, m_secondBuffer );
+	m_firstBufferLock.unlock();
 	// this is how we decrease state of buffer-usage ;-)
-	m_bufferUsage = ( m_bufferUsage != NONE ) ?
-		( ( m_bufferUsage == FIRST ) ? NONE : FIRST ) : NONE;
+	m_bufferUsage = ( m_bufferUsage != NoUsage ) ?
+		( ( m_bufferUsage == FirstBuffer ) ?
+					NoUsage : FirstBuffer ) : NoUsage;
 }
 
 

@@ -27,6 +27,8 @@
 #define _AUDIO_PORT_H
 
 #include <QtCore/QString>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include "effect_chain.h"
 
@@ -44,6 +46,26 @@ public:
 	inline surroundSampleFrame * secondBuffer( void )
 	{
 		return( m_secondBuffer );
+	}
+
+	inline void lockFirstBuffer( void )
+	{
+		m_firstBufferLock.lock();
+	}
+
+	inline void lockSecondBuffer( void )
+	{
+		m_secondBufferLock.lock();
+	}
+
+	inline void unlockFirstBuffer( void )
+	{
+		m_firstBufferLock.unlock();
+	}
+
+	inline void unlockSecondBuffer( void )
+	{
+		m_secondBufferLock.unlock();
 	}
 
 	void nextPeriod( void );
@@ -85,11 +107,14 @@ public:
 
 	enum bufferUsages
 	{
-		NONE, FIRST, BOTH
+		NoUsage,
+		FirstBuffer,
+		BothBuffers
 	} m_bufferUsage;
 	
 	inline bool processEffects( void )
 	{
+		QMutexLocker m( &m_firstBufferLock );
 		return( m_effects.processAudioBuffer( m_firstBuffer,
 								m_frames ) );
 	}
@@ -97,6 +122,9 @@ public:
 private:
 	surroundSampleFrame * m_firstBuffer;
 	surroundSampleFrame * m_secondBuffer;
+	QMutex m_firstBufferLock;
+	QMutex m_secondBufferLock;
+
 	bool m_extOutputEnabled;
 	fx_ch_t m_nextFxChannel;
 
