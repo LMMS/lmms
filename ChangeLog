@@ -1,3 +1,8 @@
+2008-02-28	Danny McRae <khjklujn/at/yahoo/dot/com>
+
+	* plugins/stk/Makefile.am:
+	removed voices from the default build
+
 2008-02-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:
