@@ -3,7 +3,7 @@
 /*
  * import_filter.cpp - base-class for all import-filters (MIDI, FLP etc)
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,12 +31,13 @@
 #include "engine.h"
 #include "track_container.h"
 #include "project_journal.h"
+#include "automatable_model_templates.h"
 
 
 
 importFilter::importFilter( const QString & _file_name,
 					const descriptor * _descriptor ) :
-	plugin( _descriptor ),
+	plugin( _descriptor, NULL ),
 	m_file( _file_name )
 {
 }
@@ -70,7 +71,7 @@ void importFilter::import( const QString & _file_to_import,
 	{
 		if( it->type == plugin::ImportFilter )
 		{
-			plugin * p = plugin::instantiate( it->name, s );
+			plugin * p = plugin::instantiate( it->name, NULL, s );
 			if( dynamic_cast<importFilter *>( p ) != NULL &&
 				dynamic_cast<importFilter *>( p )->tryImport(
 								_tc ) == TRUE )

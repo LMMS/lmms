@@ -3,7 +3,7 @@
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,7 @@
 
 #include "bb_editor.h"
 #include "song_editor.h"
+#include "song.h"
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
@@ -57,6 +58,7 @@
 #include "side_bar.h"
 #include "config_mgr.h"
 #include "mixer.h"
+#include "plugin_view.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
 #include "audio_dummy.h"
@@ -76,8 +78,7 @@ mainWindow::mainWindow( void ) :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_tools_menu( NULL ),
-	m_modified( FALSE )
+	m_toolsMenu( NULL )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -241,7 +242,7 @@ void mainWindow::finalize( void )
 	toolButton * project_export = new toolButton( 
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					engine::getSongEditor(),
+					engine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
@@ -386,11 +387,11 @@ void mainWindow::finalize( void )
 	project_menu->addSeparator();
 	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
 					tr( "Import..." ),
-					engine::getSongEditor(),
+					engine::getSong(),
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					engine::getSongEditor(),
+					engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addSeparator();
@@ -421,7 +422,7 @@ void mainWindow::finalize( void )
 					configManager::inst(), SLOT( exec() ) );
 
 
-	m_tools_menu = new QMenu( this );
+	m_toolsMenu = new QMenu( this );
 	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
 	for( QVector<plugin::descriptor>::iterator it =
@@ -430,14 +431,15 @@ void mainWindow::finalize( void )
 	{
 		if( it->type == plugin::Tool )
 		{
-			m_tools_menu->addAction( *it->logo, it->public_name );
-			m_tools.push_back( tool::instantiate( it->name ) );
+			m_toolsMenu->addAction( *it->logo, it->public_name );
+			m_tools.push_back( tool::instantiate( it->name,
+					/*this*/NULL )->createView( this ) );
 		}
 	}
-	if( !m_tools_menu->isEmpty() )
+	if( !m_toolsMenu->isEmpty() )
 	{
-		menuBar()->addMenu( m_tools_menu )->setText( tr( "&Tools" ) );
-		connect( m_tools_menu, SIGNAL( triggered( QAction * ) ),
+		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
+		connect( m_toolsMenu, SIGNAL( triggered( QAction * ) ),
 					this, SLOT( showTool( QAction * ) ) );
 	}
 
@@ -512,24 +514,23 @@ void mainWindow::addSpacingToToolBar( int _size )
 
 
 
-void mainWindow::resetWindowTitle( bool _modified )
+void mainWindow::resetWindowTitle( void )
 {
 	QString title = "";
-	if( engine::getSongEditor()->projectFileName() != "" )
+	if( engine::getSong()->projectFileName() != "" )
 	{
-		title = QFileInfo( engine::getSongEditor()->projectFileName()
+		title = QFileInfo( engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
 	if( title == "" )
 	{
 		title = tr( "Untitled" );
 	}
-	if( _modified )
+	if( engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( VERSION ) );
-	m_modified = _modified;
 }
 
 
@@ -537,7 +538,7 @@ void mainWindow::resetWindowTitle( bool _modified )
 
 bool mainWindow::mayChangeProject( void )
 {
-	if( !m_modified )
+	if( !engine::getSong()->isModified() )
 	{
 		return( TRUE );
 	}
@@ -624,7 +625,7 @@ void mainWindow::createNewProject( void )
 {
 	if( mayChangeProject() )
 	{
-		engine::getSongEditor()->createNewProject();
+		engine::getSong()->createNewProject();
 	}
 }
 
@@ -639,7 +640,7 @@ void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 						>= m_custom_templates_count ?
 				configManager::inst()->factoryProjectsDir() :
 				configManager::inst()->userProjectsDir();
-		engine::getSongEditor()->createNewProjectFromTemplate(
+		engine::getSong()->createNewProjectFromTemplate(
 			dir_base + "templates/" + _idx->text() + ".mpt" );
 	}
 }
@@ -659,7 +660,7 @@ void mainWindow::openProject( void )
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-			engine::getSongEditor()->loadProject(
+			engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
 		}
 	}
@@ -684,7 +685,7 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 void mainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	const QString & f = _action->text();
-	engine::getSongEditor()->loadProject( f );
+	engine::getSong()->loadProject( f );
 	configManager::inst()->addRecentlyOpenedProject( f );
 }
 
@@ -693,13 +694,13 @@ void mainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool mainWindow::saveProject( void )
 {
-	if( engine::getSongEditor()->projectFileName() == "" )
+	if( engine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		engine::getSongEditor()->saveProject();
+		engine::getSong()->saveProject();
 	}
 	return( TRUE );
 }
@@ -714,7 +715,7 @@ bool mainWindow::saveProjectAs( void )
 				"MultiMedia Project Template (*.mpt)" ) );
 	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
-	QString f = engine::getSongEditor()->projectFileName();
+	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
 		sfd.selectFile( QFileInfo( f ).fileName() );
@@ -728,7 +729,7 @@ bool mainWindow::saveProjectAs( void )
 	if( sfd.exec () == QFileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		engine::getSongEditor()->saveProjectAs(
+		engine::getSong()->saveProjectAs(
 						sfd.selectedFiles()[0] );
 		return( TRUE );
 	}
@@ -954,13 +955,13 @@ void mainWindow::fillTemplatesMenu( void )
 
 void mainWindow::showTool( QAction * _idx )
 {
-	tool * t = m_tools[m_tools_menu->actions().indexOf( _idx )];
-	t->show();
+	pluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
+	p->show();
 	if( m_workspace )
 	{
-		t->parentWidget()->show();
+		p->parentWidget()->show();
 	}
-	t->setFocus();
+	p->setFocus();
 }
 
 

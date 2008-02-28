@@ -3,7 +3,7 @@
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,6 +39,7 @@
 #include "mixer.h"
 #include "name_label.h"
 #include "rename_dialog.h"
+#include "song.h"
 #include "song_editor.h"
 #include "templates.h"
 
@@ -47,14 +48,15 @@
 bbTrack::infoMap bbTrack::s_infoMap;
 
 
-bbTCO::bbTCO( track * _track, const QColor & _c ) :
+bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
-	m_name( ( dynamic_cast<bbTrack *>( _track ) != NULL ) ?
+	m_name(/* ( dynamic_cast<bbTrack *>( _track ) != NULL ) ?
 		dynamic_cast<bbTrack *>( _track )->trackLabel()->text() :
-								QString( "" ) ),
-	m_color( _c.isValid() ? _c : QColor( 64, 128, 255 ) )
+								QString( "" )*/
+		"" ),
+	m_color( _color > 0 ? _color : qRgb( 64, 128, 255 ) )
 {
-	tact t = engine::getBBEditor()->lengthOfBB(
+	tact t = engine::getBBTrackContainer()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
@@ -74,86 +76,6 @@ bbTCO::~bbTCO()
 
 
 
-void bbTCO::constructContextMenu( QMenu * _cm )
-{
-	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Baseline-Editor" ),
-					_cm );
-	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ), this,
-					SLOT( openInBBEditor( bool ) ) );
-	_cm->insertSeparator( _cm->actions()[1] );
-	_cm->addSeparator();
-	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
-						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Change color" ), this, SLOT( changeColor() ) );
-}
-
-
-
-
-void bbTCO::mouseDoubleClickEvent( QMouseEvent * )
-{
-	openInBBEditor();
-}
-
-
-
-
-void bbTCO::paintEvent( QPaintEvent * )
-{
-	QColor col = m_color;
-	if( getTrack()->muted() || muted() )
-	{
-		col = QColor( 160, 160, 160 );
-	}
-	if( isSelected() == TRUE )
-	{
-		col = QColor( tMax( col.red() - 128, 0 ),
-					tMax( col.green() - 128, 0 ), 255 );
-	}
-	QPainter p( this );
-
-	QLinearGradient lingrad( 0, 0, 0, height() );
-	lingrad.setColorAt( 0, col.light( 130 ) );
-	lingrad.setColorAt( 1, col.light( 70 ) );
-	p.fillRect( rect(), lingrad );
-
-	tact t = engine::getBBEditor()->lengthOfBB( bbTrack::numOfBBTrack(
-								getTrack() ) );
-	if( length() > 64 && t > 0 )
-	{
-		for( int x = static_cast<int>( t * pixelsPerTact() );
-								x < width()-2;
-			x += static_cast<int>( t * pixelsPerTact() ) )
-		{
-			p.setPen( col.light( 80 ) );
-			p.drawLine( x, 1, x, 5 );
-			p.setPen( col.light( 120 ) );
-			p.drawLine( x, height() - 6, x, height() - 2 );
-		}
-	}
-
-	p.setPen( col.dark() );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-
-	p.setFont( pointSize<7>( p.font() ) );
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawText( 2, p.fontMetrics().height() - 1, m_name );
-
-	if( muted() )
-	{
-		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
-	}
-}
-
-
-
-
 void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "name", m_name );
@@ -167,7 +89,7 @@ void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", muted() );
-	_this.setAttribute( "color", m_color.rgb() );
+	_this.setAttribute( "color", m_color );
 }
 
 
@@ -188,17 +110,127 @@ void bbTCO::loadSettings( const QDomElement & _this )
 
 	if( _this.attribute( "color" ).toUInt() != 0 )
 	{
-		m_color.setRgb( _this.attribute( "color" ).toUInt() );
+		m_color = _this.attribute( "color" ).toUInt();
 	}
 }
 
 
 
 
-void bbTCO::openInBBEditor( bool )
+trackContentObjectView * bbTCO::createView( trackView * _tv )
 {
-	engine::getBBEditor()->setCurrentBB( bbTrack::numOfBBTrack(
-								getTrack() ) );
+	return( new bbTCOView( this, _tv ) );
+}
+
+
+
+
+
+
+
+
+
+
+bbTCOView::bbTCOView( trackContentObject * _tco, trackView * _tv ) :
+	trackContentObjectView( _tco, _tv ),
+	m_bbTCO( dynamic_cast<bbTCO *>( _tco ) )
+{
+}
+
+
+
+
+bbTCOView::~bbTCOView()
+{
+}
+
+
+
+
+void bbTCOView::constructContextMenu( QMenu * _cm )
+{
+	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
+					tr( "Open in Beat+Baseline-Editor" ),
+					_cm );
+	_cm->insertAction( _cm->actions()[0], a );
+	connect( a, SIGNAL( triggered( bool ) ),
+			this, SLOT( openInBBEditor() ) );
+	_cm->insertSeparator( _cm->actions()[1] );
+	_cm->addSeparator();
+	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
+						this, SLOT( resetName() ) );
+	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
+						this, SLOT( changeName() ) );
+	_cm->addAction( embed::getIconPixmap( "colorize" ),
+			tr( "Change color" ), this, SLOT( changeColor() ) );
+}
+
+
+
+
+void bbTCOView::mouseDoubleClickEvent( QMouseEvent * )
+{
+	openInBBEditor();
+}
+
+
+
+
+void bbTCOView::paintEvent( QPaintEvent * )
+{
+	QColor col( m_bbTCO->m_color );
+	if( m_bbTCO->getTrack()->muted() || m_bbTCO->muted() )
+	{
+		col = QColor( 160, 160, 160 );
+	}
+	if( isSelected() == TRUE )
+	{
+		col = QColor( tMax( col.red() - 128, 0 ),
+					tMax( col.green() - 128, 0 ), 255 );
+	}
+	QPainter p( this );
+
+	QLinearGradient lingrad( 0, 0, 0, height() );
+	lingrad.setColorAt( 0, col.light( 130 ) );
+	lingrad.setColorAt( 1, col.light( 70 ) );
+	p.fillRect( rect(), lingrad );
+
+	tact t = engine::getBBTrackContainer()->lengthOfBB(
+				bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
+	if( m_bbTCO->length() > 64 && t > 0 )
+	{
+		for( int x = static_cast<int>( t * pixelsPerTact() );
+								x < width()-2;
+			x += static_cast<int>( t * pixelsPerTact() ) )
+		{
+			p.setPen( col.light( 80 ) );
+			p.drawLine( x, 1, x, 5 );
+			p.setPen( col.light( 120 ) );
+			p.drawLine( x, height() - 6, x, height() - 2 );
+		}
+	}
+
+	p.setPen( col.dark() );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+
+	p.setFont( pointSize<7>( p.font() ) );
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->m_name );
+
+	if( m_bbTCO->muted() )
+	{
+		p.drawPixmap( 3, p.fontMetrics().height() + 1,
+				embed::getIconPixmap( "muted", 16, 16 ) );
+	}
+}
+
+
+
+
+void bbTCOView::openInBBEditor( void )
+{
+	engine::getBBTrackContainer()->setCurrentBB( bbTrack::numOfBBTrack(
+							m_bbTCO->getTrack() ) );
 	engine::getBBEditor()->show();
 	engine::getBBEditor()->setFocus();
 }
@@ -206,19 +238,12 @@ void bbTCO::openInBBEditor( bool )
 
 
 
-void bbTCO::openInBBEditor( void )
+void bbTCOView::resetName( void )
 {
-	openInBBEditor( FALSE );
-}
-
-
-
-
-void bbTCO::resetName( void )
-{
-	if( dynamic_cast<bbTrack *>( getTrack() ) != NULL )
+	if( dynamic_cast<bbTrackView *>( getTrackView() ) != NULL )
 	{
-		m_name = dynamic_cast<bbTrack *>( getTrack() )->
+		m_bbTCO->m_name =
+			dynamic_cast<bbTrackView *>( getTrackView() )->
 							trackLabel()->text();
 	}
 }
@@ -226,18 +251,18 @@ void bbTCO::resetName( void )
 
 
 
-void bbTCO::changeName( void )
+void bbTCOView::changeName( void )
 {
-	renameDialog rename_dlg( m_name );
+	renameDialog rename_dlg( m_bbTCO->m_name );
 	rename_dlg.exec();
 }
 
 
 
 
-void bbTCO::changeColor( void )
+void bbTCOView::changeColor( void )
 {
-	QColor _new_color = QColorDialog::getColor( m_color );
+	QColor _new_color = QColorDialog::getColor( m_bbTCO->m_color );
 	if( !_new_color.isValid() )
 	{
 		return;
@@ -250,10 +275,10 @@ void bbTCO::changeColor( void )
 							selected.begin();
 						it != selected.end(); ++it )
 		{
-			bbTCO * bb_tco = dynamic_cast<bbTCO *>( *it );
-			if( bb_tco )
+			bbTCOView * bb_tcov = dynamic_cast<bbTCOView *>( *it );
+			if( bb_tcov )
 			{
-				bb_tco->setColor( _new_color );
+				bb_tcov->setColor( _new_color );
 			}
 		}
 	}
@@ -266,12 +291,12 @@ void bbTCO::changeColor( void )
 
 
 
-void bbTCO::setColor( QColor _new_color )
+void bbTCOView::setColor( QColor _new_color )
 {
-	if( _new_color != m_color )
+	if( _new_color.rgb() != m_bbTCO->m_color )
 	{
-		m_color = _new_color;
-		engine::getSongEditor()->setModified();
+		m_bbTCO->m_color = _new_color.rgb();
+		engine::getSong()->setModified();
 		update();
 	}
 }
@@ -280,33 +305,17 @@ void bbTCO::setColor( QColor _new_color )
 
 
 
-bbTrack::bbTrack( trackContainer * _tc ) :
-	track( _tc )
-{
-	getTrackWidget()->setFixedHeight( 32 );
-	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
-	// too), so disable it
-	getTrackWidget()->setAcceptDrops( FALSE );
 
+
+bbTrack::bbTrack( trackContainer * _tc ) :
+	track( BBTrack, _tc )
+{
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
-	m_trackLabel = new nameLabel( tr( "Beat/Baseline %1" ).arg( bbNum ),
-						getTrackSettingsWidget() );
-	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
-	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
-									29 );
-	m_trackLabel->show();
-	connect( m_trackLabel, SIGNAL( clicked() ),
-			this, SLOT( clickedTrackLabel() ) );
-	connect( m_trackLabel, SIGNAL( nameChanged() ),
-			engine::getBBEditor(), SLOT( updateComboBox() ) );
-	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
-			engine::getBBEditor(), SLOT( updateComboBox() ) );
-
-
-	engine::getBBEditor()->setCurrentBB( bbNum );
-	engine::getBBEditor()->updateComboBox();
+	setName( tr( "Beat/Baseline %1" ).arg( bbNum ) );
+	engine::getBBTrackContainer()->setCurrentBB( bbNum );
+	engine::getBBTrackContainer()->updateComboBox();
 }
 
 
@@ -316,8 +325,8 @@ bbTrack::~bbTrack()
 {
 	engine::getMixer()->removePlayHandles( this );
 
-	int bb = s_infoMap[this];
-	engine::getBBEditor()->removeBB( bb );
+	const int bb = s_infoMap[this];
+	engine::getBBTrackContainer()->removeBB( bb );
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
@@ -327,30 +336,25 @@ bbTrack::~bbTrack()
 		}
 	}
 	s_infoMap.remove( this );
-	engine::getBBEditor()->updateComboBox();
+
+	// remove us from TC so bbTrackContainer::numOfBBs() returns a smaller
+	// value and thus combobox-updating in bbTrackContainer works well
+	getTrackContainer()->removeTrack( this );
+	engine::getBBTrackContainer()->updateComboBox();
 }
 
-
-
-
-track::trackTypes bbTrack::type( void ) const
-{
-	return( BB_TRACK );
-}
 
 
 
 // play _frames frames of given TCO within starting with _start
-bool FASTCALL bbTrack::play( const midiTime & _start,
-						const fpp_t _frames,
-						const f_cnt_t _offset,
-							Sint16 _tco_num )
+bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
+				const f_cnt_t _offset, Sint16 _tco_num )
 {
 	sendMidiTime( _start );
 
 	if( _tco_num >= 0 )
 	{
-		return( engine::getBBEditor()->play( _start, _frames,
+		return( engine::getBBTrackContainer()->play( _start, _frames,
 							_offset,
 							s_infoMap[this] ) );
 	}
@@ -378,12 +382,21 @@ bool FASTCALL bbTrack::play( const midiTime & _start,
 	}
 	if( _start - lastPosition < lastLen )
 	{
-		return( engine::getBBEditor()->play( _start - lastPosition,
+		return( engine::getBBTrackContainer()->play( _start -
+								lastPosition,
 							_frames,
 							_offset,
 							s_infoMap[this] ) );
 	}
 	return( FALSE );
+}
+
+
+
+
+trackView * bbTrack::createView( trackContainerView * _tcv )
+{
+	return( new bbTrackView( this, _tcv ) );
 }
 
 
@@ -413,20 +426,20 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "name", m_trackLabel->text() );
-	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
+	_this.setAttribute( "name", name() );
+//	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getBBEditor()->currentBB() );*/
 	if( s_infoMap[this] == 0 &&
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().nodeName() != "journaldata" )
 	{
-		( (journallingObject *)( engine::getBBEditor() ) )->saveState(
-								_doc, _this );
+		( (journallingObject *)( engine::getBBTrackContainer() ) )->
+						saveState( _doc, _this );
 	}
 
 	int track_num = 0;
-	QList<track *> tracks = engine::getBBEditor()->tracks();
+	QList<track *> tracks = engine::getBBTrackContainer()->tracks();
 	for( int i = 0; i < tracks.size(); ++i, ++track_num )
 	{
 		if( automationDisabled( tracks[i] ) )
@@ -444,18 +457,18 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
-	m_trackLabel->setText( _this.attribute( "name" ) );
-	if( _this.attribute( "icon" ) != "" )
+	setName( _this.attribute( "name" ) );
+/*	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
-	}
-	engine::getBBEditor()->updateComboBox();
+	}*/
+//	engine::getBBTrackContainer()->updateComboBox();
 
 	QDomNode node = _this.namedItem( trackContainer::classNodeName() );
 	if( node.isElement() )
 	{
-		( (journallingObject *)engine::getBBEditor() )->restoreState(
-							node.toElement() );
+		( (journallingObject *)engine::getBBTrackContainer() )->
+					restoreState( node.toElement() );
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if
 	bb-tracks are created after this function is called, this doesn't
@@ -465,7 +478,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		engine::getBBEditor()->setCurrentBB( s_infoMap[this] );
 	}*/
 
-	QList<track *> tracks = engine::getBBEditor()->tracks();
+	QList<track *> tracks = engine::getBBTrackContainer()->tracks();
 	node = _this.firstChild();
 	while( !node.isNull() )
 	{
@@ -518,17 +531,70 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 	if( t1 != NULL && t2 != NULL )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		engine::getBBEditor()->swapBB( s_infoMap[t1], s_infoMap[t2] );
-		engine::getBBEditor()->setCurrentBB( s_infoMap[t1] );
+		engine::getBBTrackContainer()->swapBB( s_infoMap[t1],
+								s_infoMap[t2] );
+		engine::getBBTrackContainer()->setCurrentBB( s_infoMap[t1] );
 	}
 }
 
 
 
 
-void bbTrack::clickedTrackLabel( void )
+
+
+
+
+
+bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
+	trackView( _bbt, _tcv ),
+	m_bbTrack( _bbt )
 {
-	engine::getBBEditor()->setCurrentBB( s_infoMap[this] );
+	setFixedHeight( 32 );
+	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
+	// too), so disable it
+	setAcceptDrops( FALSE );
+
+	m_trackLabel = new nameLabel( _bbt->name(),
+						getTrackSettingsWidget() );
+	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
+	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
+									29 );
+	m_trackLabel->show();
+	connect( m_trackLabel, SIGNAL( clicked() ),
+			this, SLOT( clickedTrackLabel() ) );
+	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
+			_bbt, SLOT( setName( const QString & ) ) );
+	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
+		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
+	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
+		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
+
+	setModel( _bbt );
+}
+
+
+
+
+bbTrackView::~bbTrackView()
+{
+}
+
+
+
+
+bool bbTrackView::close( void )
+{
+	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
+	trackView::close();
+}
+
+
+
+
+void bbTrackView::clickedTrackLabel( void )
+{
+	engine::getBBTrackContainer()->setCurrentBB(
+					bbTrack::numOfBBTrack( m_bbTrack ) );
 	engine::getBBEditor()->show();
 }
 

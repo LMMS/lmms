@@ -3,7 +3,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,6 +49,7 @@
 #include "tooltip.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
+#include "automatable_model_templates.h"
 
 
 // platform-specific audio-interface-classes
@@ -109,10 +110,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
-					"manualchannelpiano" ).toInt() ),
-	m_parLevel( configManager::inst()->value( "mixer",
-				"parallelizinglevel" ).toInt() )
-					
+					"manualchannelpiano" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -182,7 +180,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	enable_tooltips->move( 10, 18 );
 	enable_tooltips->setChecked( m_toolTips );
 	connect( enable_tooltips, SIGNAL( toggled( bool ) ),
@@ -192,8 +190,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	ledCheckBox * classical_knob_usability = new ledCheckBox(
 					tr( "Classical knob usability (move "
 						"cursor around knob to change "
-						"value)" ),
-							misc_tw, NULL, NULL );
+						"value)" ), misc_tw );
 	classical_knob_usability->move( 10, 36 );
 	classical_knob_usability->setChecked( m_classicalKnobUsability );
 	connect( classical_knob_usability, SIGNAL( toggled( bool ) ),
@@ -202,7 +199,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * mdi_windows = new ledCheckBox(
 					tr( "Multiple Document Interface" ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	mdi_windows->move( 10, 54 );
 	mdi_windows->setChecked( m_MDI );
 	connect( mdi_windows, SIGNAL( toggled( bool ) ),
@@ -211,7 +208,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * wizard = new ledCheckBox(
 					tr( "Show wizard after up-/downgrade" ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	wizard->move( 10, 72 );
 	wizard->setChecked( m_wizard );
 	connect( wizard, SIGNAL( toggled( bool ) ),
@@ -220,7 +217,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * restart_msg = new ledCheckBox(
 			tr( "Show restart warning after changing settings" ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	restart_msg->move( 10, 90 );
 	restart_msg->setChecked( m_warnAfterSetup );
 	connect( restart_msg, SIGNAL( toggled( bool ) ),
@@ -228,7 +225,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dBV " ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	dbv->move( 10, 108 );
 	dbv->setChecked( m_displaydBV );
 	connect( dbv, SIGNAL( toggled( bool ) ),
@@ -237,7 +234,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * mmpz = new ledCheckBox(
 				tr( "Compress project files per default" ),
-							misc_tw, NULL, NULL );
+								misc_tw );
 	mmpz->move( 10, 126 );
 	mmpz->setChecked( m_MMPZ );
 	connect( mmpz, SIGNAL( toggled( bool ) ),
@@ -411,7 +408,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
-							ui_fx_tw, NULL, NULL );
+								ui_fx_tw );
 	disable_ch_act_ind->move( 10, 20 );
 	disable_ch_act_ind->setChecked( m_disableChActInd );
 	connect( disable_ch_act_ind, SIGNAL( toggled( bool ) ),
@@ -420,7 +417,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 	ledCheckBox * manual_ch_piano = new ledCheckBox(
 			tr( "Only press keys on channel-piano manually" ),
-							ui_fx_tw, NULL, NULL );
+								ui_fx_tw );
 	manual_ch_piano->move( 10, 40 );
 	manual_ch_piano->setChecked( m_manualChPiano );
 	connect( manual_ch_piano, SIGNAL( toggled( bool ) ),
@@ -431,34 +428,6 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	tabWidget * smp_supp_tw = new tabWidget( tr( "SMP support" ).toUpper(),
 								performance );
 	smp_supp_tw->setFixedHeight( 200 );
-
-	QLabel * par_level_lbl = new QLabel( tr( "Parallelizing level" ),
-								smp_supp_tw );
-	par_level_lbl->move( 10, 15 );
-	par_level_lbl->setFixedSize( 120, 16 );
-	lcdSpinBox * par_level = new lcdSpinBox( 1, 16, 2, smp_supp_tw, NULL,
-									NULL );
-	par_level->setValue( m_parLevel );
-	connect( par_level, SIGNAL( valueChanged( int ) ),
-			this, SLOT( setParallelizingLevel( int ) ) );
-
-	par_level->move( 140, 20 );
-
-	QLabel * smp_help = new QLabel(
-		tr( "If you have a machine with more then one processor "
-			"(e.g. dual-core systems) you should use a "
-			"parallelizing-level above 1 which means that LMMS "
-			"will try to split up sound-processing into several "
-			"threads which should should be run on several cores "
-			"by the underlaying operating-system.\n"
-			"Please note that in some cases parallelizing won't "
-			"work with small buffer-sizes. If you experience "
-			"problems (i.e. lot of xruns), try to increase buffer-"
-			"size." ), smp_supp_tw );
-	smp_help->setFixedSize( performance->width() - 20, 140 );
-	smp_help->setWordWrap( TRUE );
-	smp_help->move( 10, 55 );
-
 
 	perf_layout->addWidget( ui_fx_tw );
 	perf_layout->addSpacing( 15 );
@@ -715,8 +684,6 @@ void setupDialog::accept( void )
 					QString::number( m_disableChActInd ) );
 	configManager::inst()->setValue( "ui", "manualchannelpiano",
 					QString::number( m_manualChPiano ) );
-	configManager::inst()->setValue( "mixer", "parallelizinglevel",
-						QString::number( m_parLevel ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -881,12 +848,6 @@ void setupDialog::toggleManualChPiano( bool _enabled )
 	m_manualChPiano = _enabled;
 }
 
-
-
-void setupDialog::setParallelizingLevel( int _level )
-{
-	m_parLevel = _level;
-}
 
 
 

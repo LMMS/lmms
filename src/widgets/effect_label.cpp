@@ -5,6 +5,7 @@
  *                    offers access to an effect rack
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,12 +30,13 @@
 #include "effect_label.h"
 
 #include <QtGui/QLabel>
+#include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPushButton>
 #include <QtXml/QDomElement>
 
-#include "effect_tab_widget.h"
+#include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
@@ -55,33 +57,33 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 	m_effectBtn->setGeometry( 6, 1, 28, 28 );
 	connect( m_effectBtn, SIGNAL( clicked() ), 
 					this, SLOT( showEffects() ) );
-	
+
 	m_label = new QLabel( this );
 	m_label->setText( _initial_name );
 	QFont f = m_label->font();
 	m_label->setFont( pointSize<8>( f ) );
 	m_label->setGeometry( 38, 1, 200, 28 );
-	
-	m_effWidget = new effectTabWidget( engine::getMainWindow()->workspace(),
-						m_track, 
-						m_track->getAudioPort() );
+
+	m_effectRack = new effectRackView(
+				m_track->getAudioPort()->getEffects(),
+				engine::getMainWindow()->workspace() );
 
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow(
-								m_effWidget );
-		m_effWindow = m_effWidget->parentWidget();
+								m_effectRack );
+		m_effWindow = m_effectRack->parentWidget();
 		m_effWindow->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 		m_effWindow->layout()->setSizeConstraint(
 							QLayout::SetFixedSize );
 	}
 	else
 	{
-		m_effWindow = m_effWidget;
+		m_effWindow = m_effectRack;
 	}
 
  	m_effWindow->setWindowTitle( _initial_name );
-	m_effWidget->setFixedSize( 240, 242 );
+	m_effectRack->setFixedSize( 240, 242 );
 	m_effWindow->hide();
 }
 
@@ -104,7 +106,7 @@ QString effectLabel::text( void ) const
 
 
 
-void FASTCALL effectLabel::setText( const QString & _text )
+void effectLabel::setText( const QString & _text )
 {
 	m_label->setText( _text );
 	m_effWindow->setWindowTitle( _text );
@@ -117,8 +119,8 @@ void effectLabel::showEffects( void )
 {
 	if( m_effWindow->isHidden() )
 	{
-		m_effWidget->show();
-		if( m_effWindow != m_effWidget )
+		m_effectRack->show();
+		if( m_effWindow != m_effectRack )
 		{
 			m_effWindow->show();
 		}
@@ -130,36 +132,6 @@ void effectLabel::showEffects( void )
 	}
 }
 
-
-
-
-void effectLabel::saveSettings( QDomDocument & _doc, QDomElement & _this )
-{
-//	_this.setAttribute( "name", m_label->text() );
-	m_effWidget->saveState( _doc, _this );
-
-}
-
-
-
-
-void effectLabel::loadSettings( const QDomElement & _this )
-{
-//	m_label->setText( _this.attribute( "name" ) );
-	
-	QDomNode node = _this.firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement() )
-		{
-			if( m_effWidget->nodeName() == node.nodeName() )
-			{
-				m_effWidget->restoreState( node.toElement() );
-			}
-		}
-		node = node.nextSibling();
-	}
-}
 
 
 

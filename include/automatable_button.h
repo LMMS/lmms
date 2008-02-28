@@ -28,37 +28,33 @@
 
 #include <QtGui/QPushButton>
 
-#include "automatable_object.h"
+#include "automatable_model.h"
 
 
 class automatableButtonGroup;
 
 
-class automatableButton : public QPushButton, public automatableObject<bool,
-			  					signed char>
+class automatableButton : public QPushButton, public boolModelView
 {
 	Q_OBJECT
 public:
-	automatableButton( QWidget * _parent, const QString & _name,
-							track * _track );
+	automatableButton( QWidget * _parent, const QString & _name );
 	virtual ~automatableButton();
-
-
-	virtual void setValue( const bool _on );
 
 	inline void setCheckable( bool _on )
 	{
 		QPushButton::setCheckable( _on );
-		setJournalling( _on );
+		model()->setJournalling( _on );
 	}
 
 
 public slots:
+	virtual void update( void );
 	virtual void toggle( void );
 	virtual void setChecked( bool _on )
 	{
-		// QPushButton::setChecked is called in setValue()
-		setValue( _on );
+		// QPushButton::setChecked is called in update-slot
+		model()->setValue( _on );
 	}
 
 
@@ -74,16 +70,17 @@ private:
 
 	friend class automatableButtonGroup;
 
+	using QPushButton::setChecked;
+	using QPushButton::isChecked;
 } ;
 
 
 
-class automatableButtonGroup : public QWidget, public automatableObject<int>
+class automatableButtonGroup : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:
-	automatableButtonGroup( QWidget * _parent, const QString & _name,
-							track * _track );
+	automatableButtonGroup( QWidget * _parent, const QString & _name );
 	virtual ~automatableButtonGroup();
 
 	void addButton( automatableButton * _btn );
@@ -91,15 +88,15 @@ public:
 
 	void activateButton( automatableButton * _btn );
 
-	virtual void setValue( const int _value );
+	virtual void modelChanged( void );
+
+
+private slots:
+	void updateButtons( void );
 
 
 private:
 	QList<automatableButton *> m_buttons;
-
-
-signals:
-	void valueChanged( int );
 
 } ;
 

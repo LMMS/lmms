@@ -1,7 +1,7 @@
 /*
 	Roessler.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -33,9 +33,8 @@
 #include "Descriptor.h"
 
 void
-Roessler::init (double _fs)
+Roessler::init()
 {
-	fs = _fs;
 	roessler.init (h = .001, frandom());
 	gain = 0;
 }
@@ -44,17 +43,17 @@ template <sample_func_t F>
 void
 Roessler::one_cycle (int frames)
 {
-	roessler.set_rate (*ports[0]);
+	roessler.set_rate (getport(0));
 
-	double g = (gain == *ports[4]) ? 
-		1 : pow (*ports[4] / gain, 1. / (double) frames);
+	double g = (gain == getport(4)) ? 
+		1 : pow (getport(4) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[5];
 
 	d_sample x,
-			sx = .043 * *ports[1], 
-			sy = .051 * *ports[2], 
-			sz = .018 * *ports[3];
+			sx = .043 * getport(1), 
+			sy = .051 * getport(2), 
+			sz = .018 * getport(3);
 	
 	for (int i = 0; i < frames; ++i)
 	{
@@ -69,7 +68,7 @@ Roessler::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[4];
+	gain = getport(4);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -111,9 +110,9 @@ Descriptor<Roessler>::setup()
 	Label = "Roessler";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Roessler - The sound of a Roessler attractor";
+	Name = CAPS "Roessler - The sound of a Roessler attractor";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

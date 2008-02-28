@@ -1,7 +1,7 @@
 /*
- * ladspa_control.h - widget for controlling a LADSPA port
+ * ladspa_control.h - model for controlling a LADSPA port
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,9 +25,6 @@
 #ifndef _LADSPA_CONTROL_H
 #define _LADSPA_CONTROL_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QLayout>
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -39,42 +36,41 @@
 #endif
 
 
-#include "journalling_object.h"
+#include "automatable_model.h"
+#include "knob.h"
 
 
-class knob;
-class ledCheckBox;
 class track;
 
 
 typedef struct portDescription port_desc_t;
 
 
-class ladspaControl : public QWidget, public journallingObject
+class ladspaControl : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	ladspaControl( QWidget * _parent, port_desc_t * _port, track * _track,
+	ladspaControl( model * _parent, port_desc_t * _port, track * _track,
 							bool _link = FALSE );
 	~ladspaControl();
-	
+
 	LADSPA_Data getValue( void );
 	void FASTCALL setValue( LADSPA_Data _value );
 	void FASTCALL setLink( bool _state );
-	
+
 	void FASTCALL linkControls( ladspaControl * _control );
 	void FASTCALL unlinkControls( ladspaControl * _control );
 
-	inline ledCheckBox * getToggle( void )
+	inline boolModel * getToggledModel( void )
 	{
-		return( m_toggle );
+		return( &m_toggledModel );
 	}
-	
-	inline knob * getKnob( void )
+
+	inline knobModel * getKnobModel( void )
 	{
-		return( m_knob );
+		return( &m_knobModel );
 	}
-	
+
 	inline port_desc_t * getPort( void )
 	{
 		return( m_port );
@@ -89,22 +85,29 @@ public:
 		return( "port" );
 	}
 
+
 signals:
 	void changed( Uint16 _port, LADSPA_Data _value );
 	void linkChanged( Uint16 _port, bool _state );
 
+
 protected slots:
-	void ledChange( bool _state );
-	void knobChange( float _value );
-	void portLink( bool _state );
-	
+	void ledChanged( void );
+	void knobChanged( void );
+	void linkStateChanged( void );
+
+
 private:
+	bool m_link;
 	port_desc_t * m_port;
-	track * m_track;
-	QHBoxLayout * m_layout;
-	ledCheckBox * m_link;
-	ledCheckBox * m_toggle;
-	knob * m_knob;
-};
+
+	boolModel m_linkEnabledModel;
+	boolModel m_toggledModel;
+	knobModel m_knobModel;
+
+
+	friend class ladspaControlView;
+
+} ;
 
 #endif

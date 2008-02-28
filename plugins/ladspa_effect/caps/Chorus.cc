@@ -1,7 +1,7 @@
 /*
 	Chorus.cc
 	
-	Copyright 2004, 2005 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -40,26 +40,23 @@ ChorusI::one_cycle (int frames)
 	double ms = .001 * fs;
 
 	double t = time;
-	time = *ports[1] * ms;
+	time = getport(1) * ms;
 	double dt = (time - t) * one_over_n;
 
 	double w = width;
-	width = *ports[2] * ms;
+	width = getport(2) * ms;
 	/* clamp, or we need future samples from the delay line */
 	if (width >= t - 3) width = t - 3;
 	double dw = (width - w) * one_over_n;
 
 	if (rate != *ports[3]) 
-		lfo.set_f (max (rate = *ports[3], .000001), fs, lfo.get_phase());
+		lfo.set_f (max (rate = getport(3), .000001), fs, lfo.get_phase());
 			
-	double blend = *ports[4];
-	double ff = *ports[5];
-	double fb = *ports[6];
+	double blend = getport(4);
+	double ff = getport(5);
+	double fb = getport(6);
 
 	d_sample * d = ports[7];
-
-	/* flip 'renormal' addition constant */
-	normal = -normal;
 
 	DSP::FPTruncateMode truncate;
 
@@ -142,9 +139,9 @@ Descriptor<ChorusI>::setup()
 	Label = "ChorusI";
 	Properties = HARD_RT;
 
-	Name = "CAPS: ChorusI - Mono chorus/flanger";
+	Name = CAPS "ChorusI - Mono chorus/flanger";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -162,33 +159,30 @@ StereoChorusI::one_cycle (int frames)
 	double ms = .001 * fs;
 
 	double t = time;
-	time = *ports[1] * ms;
+	time = getport(1) * ms;
 	double dt = (time - t) * one_over_n;
 
 	double w = width;
-	width = *ports[2] * ms;
+	width = getport(2) * ms;
 	/* clamp, or we need future samples from the delay line */
 	if (width >= t - 1) width = t - 1;
 	double dw = (width - w) * one_over_n;
 
 	if (rate != *ports[3] && phase != *ports[4]) 
 	{
-		rate = *ports[3];
-		phase = *ports[4];
+		rate = getport(3);
+		phase = getport(4);
 		double phi = left.lfo.get_phase();
 		left.lfo.set_f (max (rate, .000001), fs, phi);
 		right.lfo.set_f (max (rate, .000001), fs, phi + phase * M_PI);
 	}
 
-	double blend = *ports[5];
-	double ff = *ports[6];
-	double fb = *ports[7];
+	double blend = getport(5);
+	double ff = getport(6);
+	double fb = getport(7);
 
 	d_sample * dl = ports[8];
 	d_sample * dr = ports[9];
-
-	/* flip 'renormal' addition constant */
-	normal = -normal;
 
 	/* to go sure (on i386) that the fistp instruction does the right thing 
 	 * when looking up fractional sample indices */
@@ -273,9 +267,9 @@ Descriptor<StereoChorusI>::setup()
 	Label = "StereoChorusI";
 	Properties = HARD_RT;
 
-	Name = "CAPS: StereoChorusI - Stereo chorus/flanger";
+	Name = CAPS "StereoChorusI - Stereo chorus/flanger";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -293,11 +287,11 @@ ChorusII::one_cycle (int frames)
 	double ms = .001 * fs;
 
 	double t = time;
-	time = *ports[1] * ms;
+	time = getport(1) * ms;
 	double dt = (time - t) * one_over_n;
 
 	double w = width;
-	width = *ports[2] * ms;
+	width = getport(2) * ms;
 	/* clamp, or we need future samples from the delay line */
 	if (width >= t - 3) width = t - 3;
 	double dw = (width - w) * one_over_n;
@@ -305,14 +299,11 @@ ChorusII::one_cycle (int frames)
 	if (rate != *ports[3])
 		set_rate (*ports[3]);
 			
-	double blend = *ports[4];
-	double ff = *ports[5];
-	double fb = *ports[6];
+	double blend = getport(4);
+	double ff = getport(5);
+	double fb = getport(6);
 
 	d_sample * d = ports[7];
-
-	/* flip 'renormal' addition constant */
-	normal = -normal;
 
 	DSP::FPTruncateMode truncate;
 
@@ -384,9 +375,9 @@ Descriptor<ChorusII>::setup()
 	Label = "ChorusII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: ChorusII - Mono chorus/flanger modulated by a fractal";
+	Name = CAPS "ChorusII - Mono chorus/flanger modulated by a fractal";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -404,26 +395,23 @@ StereoChorusII::one_cycle (int frames)
 	double ms = .001 * fs;
 
 	double t = time;
-	time = *ports[1] * ms;
+	time = getport(1) * ms;
 	double dt = (time - t) * one_over_n;
 
 	double w = width;
-	width = *ports[2] * ms;
+	width = getport(2) * ms;
 	/* clamp, or we need future samples from the delay line */
 	if (width >= t - 1) width = t - 1;
 	double dw = (width - w) * one_over_n;
 
 	set_rate (*ports[3]);
 
-	double blend = *ports[4];
-	double ff = *ports[5];
-	double fb = *ports[6];
+	double blend = getport(4);
+	double ff = getport(5);
+	double fb = getport(6);
 
 	d_sample * dl = ports[7];
 	d_sample * dr = ports[8];
-
-	/* flip 'renormal' addition constant */
-	normal = -normal;
 
 	/* to go sure (on i386) that the fistp instruction does the right thing 
 	 * when looking up fractional sample indices */
@@ -507,9 +495,9 @@ Descriptor<StereoChorusII>::setup()
 	Label = "StereoChorusII";
 	Properties = HARD_RT;
 
-	Name = "CAPS: StereoChorusII - Stereo chorus/flanger modulated by a fractal";
+	Name = CAPS "StereoChorusII - Stereo chorus/flanger modulated by a fractal";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

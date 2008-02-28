@@ -1,11 +1,11 @@
 /*
 	Amp.h
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	oversampled tube amplifier emulation.
+	Oversampled tube amplifier emulation.
 
 */
 /*
@@ -41,14 +41,12 @@
 #include "dsp/RBJ.h"
 #include "dsp/Eq.h"
 
+#include "dsp/ToneStack.h"
+
 class AmpStub
+: public Plugin
 {
 	public:
-		double fs;
-
-		/* oscillating NOISE_FLOOR, added to prevent denormals in signal */
-		d_sample normal;
-		
 		DSP::TwelveAX7_3 tube;
 		
 		d_sample drive, i_drive;
@@ -78,7 +76,7 @@ class AmpStub
 				down (FIR_SIZE, up.c)
 			{ }
 		
-		void init (double _fs, bool adjust_downsampler = false);
+		void init (bool adjust_downsampler = false);
 
 		inline d_sample power_transfer (d_sample a)
 			{
@@ -93,18 +91,16 @@ class PreampIII
 {
 	public:
 		template <sample_func_t F, int OVERSAMPLE>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 		DSP::BiQuad filter;
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [5];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				current.g = 1;
@@ -133,18 +129,16 @@ class AmpIII
 {
 	public:
 		template <sample_func_t F, int OVERSAMPLE>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 		DSP::BiQuad filter;
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [6];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				current.g = 1;
@@ -176,9 +170,8 @@ class ToneControls
 {
 	public:
 		d_sample eq_gain[4];
-		DSP::Eq<4,4> eq;
+		DSP::Eq<4> eq;
 		static PreampBand bands[4];
-		d_sample normal;
 		
 	public:
 		void init (double _fs);
@@ -220,16 +213,14 @@ class PreampIV
 		ToneControls tone;
 
 		template <sample_func_t F, int OVERSAMPLE>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [9];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)
@@ -252,16 +243,14 @@ class AmpIV
 		ToneControls tone;
 
 		template <sample_func_t F, int OVERSAMPLE>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [10];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				current.g = 1;
@@ -291,7 +280,7 @@ class AmpV
 {
 	public:
 		template <sample_func_t F, int OVERSAMPLE>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 		DSP::BiQuad filter[3];
 		
@@ -303,18 +292,65 @@ class AmpV
 		
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [7];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				current.g = 1;
 
 				for (int i = 0; i < 2; ++i)
 					filter[i].reset(),
+					power_cap[i].reset();
+
+				up.reset();
+				down.reset();
+				dc_blocker.reset();
+
+				cut = 2;
+				supply = 0.;
+			}
+
+		void run (int n)
+			{
+				one_cycle<store_func, OVERSAMPLE> (n);
+			}
+		
+		void run_adding (int n)
+			{
+				one_cycle<adding_func, OVERSAMPLE> (n);
+			}
+};
+
+/* /////////////////////////////////////////////////////////////////////// */
+
+class AmpVTS
+: public AmpStub
+{
+	public:
+		DSP::ToneStack tonestack;
+
+		template <sample_func_t F, int OVERSAMPLE>
+			void one_cycle (int frames);
+
+		d_sample cut, tone;
+
+		/* supply voltage sag */
+		d_sample supply;
+		DSP::BiQuad power_cap[2];
+		
+	public:
+		static PortInfo port_info[];
+
+		d_sample adding_gain;
+
+		void init();
+		void activate()
+			{
+				current.g = 1;
+
+				for (int i = 0; i < 2; ++i)
 					power_cap[i].reset();
 
 				up.reset();

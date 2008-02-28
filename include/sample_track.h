@@ -2,7 +2,7 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,13 +29,13 @@
 
 #include <QtGui/QDialog>
 
+#include "audio_port.h"
 #include "track.h"
+#include "volume_knob.h"
 
 class QLabel;
-class audioPort;
 class effectLabel;
 class sampleBuffer;
-class volumeKnob;
 
 //class sampleTCOSettingsDialog;
 
@@ -47,12 +47,12 @@ public:
 	sampleTCO( track * _track );
 	virtual ~sampleTCO();
 
-	virtual void FASTCALL changeLength( const midiTime & _length );
+	virtual void changeLength( const midiTime & _length );
 	const QString & sampleFile( void ) const;
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "sampletco" );
@@ -110,30 +110,27 @@ private:
 
 
 
-class sampleTrack : public QObject, public track
+class sampleTrack : public track
 {
 	Q_OBJECT
 public:
 	sampleTrack( trackContainer * _tc );
 	virtual ~sampleTrack();
 
-	virtual trackTypes type( void ) const;
-	virtual bool FASTCALL play( const midiTime & _start,
-						const fpp_t _frames,
+	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
-	virtual trackContentObject * FASTCALL createTCO( const midiTime &
-									_pos );
+	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 
-	virtual void FASTCALL saveTrackSpecificSettings( QDomDocument & _doc,
+	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadTrackSpecificSettings( const QDomElement &
-									_this );
+	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	inline audioPort * getAudioPort( void )
 	{
-		return( m_audioPort );
+		return( &m_audioPort );
 	}
 
 	virtual QString nodeName( void ) const
@@ -143,12 +140,30 @@ public:
 
 
 private:
+	audioPort m_audioPort;
+	knobModel m_volumeModel;
+
+
+	friend class sampleTrackView;
+
+} ;
+
+
+
+class sampleTrackView : public track
+{
+public:
+	sampleTrackView( sampleTrack * _track, trackContainerView * _tcv );
+	virtual ~sampleTrackView();
+
+
+private:
 	effectLabel * m_trackLabel;
-	audioPort * m_audioPort;
-	
+
 	volumeKnob * m_volumeKnob;
 
 } ;
+
 
 
 #endif

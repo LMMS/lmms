@@ -3,7 +3,7 @@
 /*
  * tool.cpp - base class for all tool plugins (graphs, extensions, etc)
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,8 +36,42 @@
 
 
 
-tool::tool( const descriptor * _descriptor ) :
-	plugin( _descriptor )
+tool::tool( const descriptor * _descriptor, model * _parent ) :
+	plugin( _descriptor, _parent )
+{
+}
+
+
+
+
+tool::~tool()
+{
+}
+
+
+
+
+tool * tool::instantiate( const QString & _plugin_name, model * _parent )
+{
+	plugin * p = plugin::instantiate( _plugin_name, _parent, NULL );
+	// check whether instantiated plugin is a tool
+	if( p->type() == Tool )
+	{
+		// everything ok, so return pointer
+		return( dynamic_cast<tool *>( p ) );
+	}
+
+	// not quite... so delete plugin
+	delete p;
+	return( NULL );
+}
+
+
+
+
+
+toolView::toolView( tool * _tool ) :
+	pluginView( _tool, engine::getMainWindow()->workspace() )
 {
 	QWidget * window;
 	if( engine::getMainWindow()->workspace() )
@@ -51,36 +85,9 @@ tool::tool( const descriptor * _descriptor ) :
 		window = this;
 	}
 
-	window->setWindowTitle( _descriptor->public_name );
-	window->setWindowIcon( *_descriptor->logo );
+	window->setWindowTitle( _tool->publicName() );
+	window->setWindowIcon( *_tool->getDescriptor()->logo );
 }
-
-
-
-
-tool::~tool()
-{
-}
-
-
-
-
-tool * tool::instantiate( const QString & _plugin_name )
-{
-	plugin * p = plugin::instantiate( _plugin_name, NULL );
-	// check whether instantiated plugin is an instrument
-	if( dynamic_cast<tool *>( p ) != NULL )
-	{
-		// everything ok, so return pointer
-		return( dynamic_cast<tool *>( p ) );
-	}
-
-	// not quite... so delete plugin
-	delete p;
-	return( NULL );
-}
-
-
 
 
 #endif

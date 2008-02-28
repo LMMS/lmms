@@ -4,7 +4,7 @@
  * effect_control_dialog.cpp - base-class for effect-dialogs for displaying
  *                            and editing control port values
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,14 +30,17 @@
 #include <QtGui/QCloseEvent>
 
 #include "effect_control_dialog.h"
+#include "effect_controls.h"
 #include "effect.h"
+#include "automatable_model_templates.h"
 
 
-effectControlDialog::effectControlDialog( QWidget * _parent, effect * _eff ) :
-	QWidget( _parent ),
-	m_effect( _eff )
+effectControlDialog::effectControlDialog( effectControls * _controls ) :
+	QWidget( NULL ),
+	modelView( _controls ),
+	m_effectControls( _controls )
 {
-	setWindowTitle( m_effect->publicName() );
+	setWindowTitle( m_effectControls->getEffect()->publicName() );
 
 }
 

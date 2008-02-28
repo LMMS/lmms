@@ -2,7 +2,7 @@
  * ladspa_control_dialog.cpp - dialog for displaying and editing control port
  *                             values for LADSPA plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,120 +24,88 @@
  */
 
 
-#include <QtGui/QMessageBox>
+#include <QtGui/QGroupBox>
+#include <QtGui/QLayout>
 
 #include "ladspa_effect.h"
+#include "ladspa_control_dialog.h"
+#include "ladspa_control_view.h"
+#include "led_checkbox.h"
 
 
-ladspaControlDialog::ladspaControlDialog( QWidget * _parent, 
-						ladspaEffect * _eff, 
-						track * _track ) :
-	effectControlDialog( _parent, _eff ),
-	m_effect( _eff ),
-	m_processors( _eff->getProcessorCount() ),
-	m_track( _track ),
-	m_noLink( FALSE )
+
+ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
+	effectControlDialog( _ctl )
 {
-	m_mainLay = new QVBoxLayout( this );
-	m_effectLay = new QHBoxLayout();
-	m_mainLay->addLayout( m_effectLay );
+	QVBoxLayout * mainLay = new QVBoxLayout( this );
+	QHBoxLayout * effectLay = new QHBoxLayout();
+	mainLay->addLayout( effectLay );
 
-	multi_proc_t controls = m_effect->getControls();
-	m_controlCount = controls.count();
-	
-	int rows = static_cast<int>( sqrt( 
-		static_cast<double>( m_controlCount ) ) );
-	
-	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )
+	const int cols = static_cast<int>( sqrt( 
+		static_cast<double>( _ctl->m_controlCount /
+						_ctl->m_processors ) ) );
+	for( ch_cnt_t proc = 0; proc < _ctl->m_processors; proc++ )
 	{
-		control_list_t p;
-		
-		bool linked_control = FALSE;
-		int row_cnt = 0;
+		control_list_t & controls = _ctl->m_controls[proc];
+		int row = 0;
+		int col = 0;
 		buffer_data_t last_port = NONE;
-		
+
 		QGroupBox * grouper;
-		if( m_processors > 1 )
+		if( _ctl->m_processors > 1 )
 		{
 			grouper = new QGroupBox( tr( "Channel " ) +
 						QString::number( proc + 1 ),
 									this );
-			grouper->setAlignment( Qt::Vertical );
-			if( proc == 0 )
-			{
-				linked_control = TRUE;
-			}
 		}
 		else
 		{
 			grouper = new QGroupBox( this );
-			grouper->setAlignment( Qt::Vertical );
 		}
-		
-		for( multi_proc_t::iterator it = controls.begin(); 
+
+		QGridLayout * gl = new QGridLayout( grouper );
+		grouper->setLayout( gl );
+		grouper->setAlignment( Qt::Vertical );
+
+		for( control_list_t::iterator it = controls.begin(); 
 						it != controls.end(); it++ )
 		{
-			if( (*it)->proc == proc )
+			if( (*it)->getPort()->proc == proc )
 			{
-				if( last_port == NONE || 
-					(*it)->data_type != TOGGLED || 
-					( (*it)->data_type == TOGGLED && 
-					last_port == TOGGLED ) )
+				if( last_port != NONE &&
+					(*it)->getPort()->data_type ==
+								TOGGLED &&
+					!( (*it)->getPort()->data_type ==
+								TOGGLED && 
+							last_port == TOGGLED ) )
 				{
-					(*it)->control = 
-						new ladspaControl( grouper, *it,
-							m_track,
-							linked_control );
+					++row;
+					col = 0;
 				}
-				else
+				gl->addWidget( new ladspaControlView(
+							grouper, *it ),
+							row, col );
+				if( ++col == cols )
 				{
-					while( row_cnt < rows )
-					{
-						m_blanks.append( 
-						new QWidget( grouper ) );
-						row_cnt++;
-					}
-					(*it)->control = new ladspaControl(
-								grouper, (*it),
-								m_track,
-							linked_control );
-					row_cnt = 0;
+					++row;
+					col = 0;
 				}
-				
-				row_cnt++;
-				if( row_cnt == ( rows - 1 ) )
-				{
-					row_cnt = 0;
-				}
-				last_port = (*it)->data_type;
-				
-				p.append( (*it)->control );
-				
-				if( linked_control )
-				{
-					connect( (*it)->control, 
-					SIGNAL( linkChanged( Uint16, bool ) ),
-						this,
-					SLOT( linkPort( Uint16, bool ) ) );
-				}
+				last_port = (*it)->getPort()->data_type;
 			}
 		}
-		
-		m_controls.append( p );
 
-		m_effectLay->addWidget( grouper );
+		effectLay->addWidget( grouper );
 	}
-	if( m_processors > 1 )
+
+	if( _ctl->m_processors > 1 )
 	{
-		m_mainLay->addSpacing( 3 );
+		mainLay->addSpacing( 3 );
 		QHBoxLayout * center = new QHBoxLayout();
-		m_mainLay->addLayout( center );
-		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this,
-								NULL, NULL );
-		connect( m_stereoLink, SIGNAL( toggled( bool ) ), 
-					this, SLOT( link( bool ) ) );
-		m_stereoLink->setChecked( TRUE );
-		center->addWidget( m_stereoLink );
+		mainLay->addLayout( center );
+		ledCheckBox * stereoLink = new ledCheckBox(
+						tr( "Link Channels" ), this );
+		stereoLink->setModel( &_ctl->m_stereoLinkModel );
+		center->addWidget( stereoLink );
 	}
 }
 
@@ -146,107 +114,6 @@ ladspaControlDialog::ladspaControlDialog( QWidget * _parent,
 
 ladspaControlDialog::~ladspaControlDialog()
 {
-	for( ch_cnt_t proc = 0; proc < m_processors; proc++ )
-	{
-		m_controls[proc].clear();
-	}
-	m_controls.clear();
 }
 
-
-
-
-void FASTCALL ladspaControlDialog::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
-{
-	if( m_processors > 1 )
-	{
-		_this.setAttribute( "link", m_stereoLink->isChecked() );
-	}
-	
-	multi_proc_t controls = m_effect->getControls();
-	_this.setAttribute( "ports", controls.count() );
-	for( multi_proc_t::iterator it = controls.begin(); 
-						it != controls.end(); it++ )
-	{
-		QString n = "port" + QString::number( (*it)->proc ) + 
-					QString::number( (*it)->port_id );
-		(*it)->control->saveSettings( _doc, _this, n );
-	}
-}
-
-
-
-
-void FASTCALL ladspaControlDialog::loadSettings( const QDomElement & _this )
-{
-	if( m_processors > 1 )
-	{
-		m_stereoLink->setChecked( _this.attribute( "link" ).toInt() );
-	}
-	
-	multi_proc_t controls = m_effect->getControls();
-	for( multi_proc_t::iterator it = controls.begin(); 
-						it != controls.end(); it++ )
-	{
-		QString n = "port" + QString::number( (*it)->proc ) + 
-					QString::number( (*it)->port_id );
-		(*it)->control->loadSettings( _this, n );
-	}
-}
-
-
-
-
-void ladspaControlDialog::linkPort( Uint16 _port, bool _state )
-{
-	ladspaControl * first = m_controls[0][_port];
-	if( _state )
-	{
-		for( ch_cnt_t proc = 1; proc < m_processors; proc++ )
-		{
-			first->linkControls( m_controls[proc][_port] );
-		}
-	}
-	else
-	{
-		for( ch_cnt_t proc = 1; proc < m_processors; proc++ )
-		{
-			first->unlinkControls( m_controls[proc][_port] );
-		}
-		m_noLink = TRUE;
-		m_stereoLink->setChecked( FALSE );
-	}
-}
-
-
-
-void ladspaControlDialog::link( bool _state )
-{
-	if( _state )
-	{
-		for( Uint16 port = 0; 
-			port < m_controlCount / m_processors;
-			port++ )
-		{
-			m_controls[0][port]->setLink( TRUE );
-		}
-	}
-	else if( !m_noLink )
-	{
-		for( Uint16 port = 0; 
-			port < m_controlCount / m_processors;
-			port++ )
-		{
-			m_controls[0][port]->setLink( FALSE );
-		}
-	}
-	else
-	{
-		m_noLink = FALSE;
-	}
-}
-
-
-#include "ladspa_control_dialog.moc"
 

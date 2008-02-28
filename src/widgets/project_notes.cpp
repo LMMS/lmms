@@ -3,7 +3,7 @@
 /*
  * project_notes.cpp - implementation of project-notes-editor
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "main_window.h"
-#include "song_editor.h"
+#include "song.h"
 
 
 
@@ -63,7 +63,7 @@ projectNotes::projectNotes( void ) :
 //	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
 //			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
-			engine::getSongEditor(), SLOT( setModified() ) );
+			engine::getSong(), SLOT( setModified() ) );
 
 	setupActions();
 
@@ -258,7 +258,7 @@ void projectNotes::textBold()
 {
 	m_edit->setFontWeight( m_actionTextBold->isChecked() ? QFont::Bold :
 								QFont::Normal );
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -267,7 +267,7 @@ void projectNotes::textBold()
 void projectNotes::textUnderline()
 {
 	m_edit->setFontUnderline( m_actionTextUnderline->isChecked() );
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -276,7 +276,7 @@ void projectNotes::textUnderline()
 void projectNotes::textItalic()
 {
 	m_edit->setFontItalic( m_actionTextItalic->isChecked() );
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -286,7 +286,7 @@ void projectNotes::textFamily( const QString & _f )
 {
 	m_edit->setFontFamily( _f );
 	m_edit->viewport()->setFocus();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -296,7 +296,7 @@ void projectNotes::textSize( const QString & _p )
 {
 	m_edit->setFontPointSize( _p.toInt() );
 	m_edit->viewport()->setFocus();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -354,7 +354,7 @@ void projectNotes::formatChanged( const QTextCharFormat & _f )
 	pix.fill( _f.foreground().color() );
 	m_actionTextColor->setIcon( pix );
 
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 
@@ -378,7 +378,7 @@ void projectNotes::alignmentChanged( int _a )
 	{
 		m_actionAlignJustify->setChecked( TRUE );
 	}
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 

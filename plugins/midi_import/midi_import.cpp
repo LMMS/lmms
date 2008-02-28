@@ -264,14 +264,13 @@ invalid_format:
 		// now create new instrument-track for reading in track
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 						track::create(
-							track::INSTRUMENT_TRACK,
+							track::InstrumentTrack,
 							_tc ) );
 #ifdef LMMS_DEBUG
 		assert( it != NULL );
 #endif
 		// TODO: setup program, channel etc.
 		instrument * it_inst = it->loadInstrument( "patman" );
-		it->toggledInstrumentTrackButton( FALSE );
 		bool sample_loaded = FALSE;
 
 		// TODO: track_name.trimmed().isEmpty() (Qt4)

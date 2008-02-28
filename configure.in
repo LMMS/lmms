@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080105, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080105)
+AC_INIT(lmms, 0.4.0-svn20080227-mv, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080227-mv)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -453,33 +453,40 @@ else
 fi
 
 # check whether to disable single-source-compile
-AC_MSG_CHECKING([whether to enable single-source-compile])
+#AC_MSG_CHECKING([whether to enable single-source-compile])
 # AH_TEMPLATE(SINGLE_SOURCE_COMPILE, [Define if you want to enable single-source-compile.])
-AC_ARG_ENABLE([ssc],
-	AS_HELP_STRING([--enable-ssc],
-		[enable single-source-compile]), [ENABLE_SSC=$enableval])
-if test "x$ENABLE_SSC" = "xyes" ; then
-	AC_MSG_RESULT(yes)
-	# AC_DEFINE(SINGLE_SOURCE_COMPILE)
-	CXXFLAGS="$CXXFLAGS -DSINGLE_SOURCE_COMPILE"
-else
-	AC_MSG_RESULT(no)
-fi
+#AC_ARG_ENABLE([ssc],
+#	AS_HELP_STRING([--enable-ssc],
+#		[enable single-source-compile]), [ENABLE_SSC=$enableval])
+#if test "x$ENABLE_SSC" = "xyes" ; then
+#	AC_MSG_RESULT(yes)
+#	# AC_DEFINE(SINGLE_SOURCE_COMPILE)
+#	CXXFLAGS="$CXXFLAGS -DSINGLE_SOURCE_COMPILE"
+#else
+#	AC_MSG_RESULT(no)
+#fi
 
 
 
 # check whether compiler of current platform supports attribute regparm(x)
-AC_MSG_CHECKING([whether we can use function-attribute regparm(x) on current platform])
-AH_TEMPLATE(FASTCALL, [Define to any attribute, speeding up function-calls])
-AC_RUN_IFELSE([	int  __attribute__((regparm(3))) foo( int a, int b, int c )
-			{ return( a=b=c ); }
-		int __attribute__((regparm(3))) main( void )
-			{ return( foo(2,1,0) ); }],
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(FASTCALL, [__attribute__((regparm(3)))]),
-	AC_MSG_RESULT(no)
+AC_ARG_ENABLE([fastcall],
+	AS_HELP_STRING([--enable-fastcall],
+		[enable fastcall (regparm-attribute)]), [ENABLE_FASTCALL=$enableval])
+if test "x$ENABLE_FASTCALL" = "xyes" ; then
+	AC_MSG_CHECKING([whether we can use function-attribute regparm(x) on current platform])
+	AH_TEMPLATE(FASTCALL, [Define to any attribute, speeding up function-calls])
+	AC_RUN_IFELSE([	int  __attribute__((regparm(3))) foo( int a, int b, int c )
+				{ return( a=b=c ); }
+			int __attribute__((regparm(3))) main( void )
+				{ return( foo(2,1,0) ); }],
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(FASTCALL, [__attribute__((regparm(3)))]),
+		AC_MSG_RESULT(no)
+		AC_DEFINE_UNQUOTED(FASTCALL,[])
+			)
+else
 	AC_DEFINE_UNQUOTED(FASTCALL,[])
-		)
+fi
 
 
 AC_MSG_CHECKING([whether floorf is known by compiler])
@@ -567,9 +574,9 @@ lmmsdatadir="$datadir/$PACKAGE"
 AC_SUBST(lmmsdatadir)
 
 
-EXTRA_WARNINGS="-Wextra -Wno-unused-parameter -Wunsafe-loop-optimizations -Winline -Wdisabled-optimization"
+EXTRA_WARNINGS="-Wno-unused-parameter -Wunsafe-loop-optimizations -Wdisabled-optimization"
 if test "x$CXX" == "xg++" ; then
-	CXXFLAGS="$CXXFLAGS -ansi -Wall $EXTRA_WARNINGS -fno-exceptions"
+	CXXFLAGS="-ansi -Wall $EXTRA_WARNINGS $CXXFLAGS -fno-exceptions"
 fi
 
 LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -651,6 +658,23 @@ AC_CONFIG_FILES([Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
+		 plugins/stk/voices/Makefile
+		 plugins/stk/voices/b3/Makefile
+		 plugins/stk/voices/bandedwg/Makefile
+		 plugins/stk/voices/blow_bottle/Makefile
+		 plugins/stk/voices/blow_hole/Makefile
+		 plugins/stk/voices/bowed/Makefile
+		 plugins/stk/voices/brass/Makefile
+		 plugins/stk/voices/clarinet/Makefile
+		 plugins/stk/voices/flute/Makefile
+		 plugins/stk/voices/fmvoices/Makefile
+		 plugins/stk/voices/metal/Makefile
+		 plugins/stk/voices/moog/Makefile
+		 plugins/stk/voices/percflute/Makefile
+		 plugins/stk/voices/resonate/Makefile
+		 plugins/stk/voices/rhodey/Makefile
+		 plugins/stk/voices/tubebell/Makefile
+		 plugins/stk/voices/wurley/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
 		 plugins/vibed/Makefile

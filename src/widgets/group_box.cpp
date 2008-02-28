@@ -3,7 +3,7 @@
 /*
  * group_box.cpp - groupbox for LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,20 +42,17 @@
 
 #include "embed.h"
 #include "gui_templates.h"
+#include "automatable_model_templates.h"
 
 
 QPixmap * groupBox::s_ledBg = NULL;
 
 
-groupBox::groupBox( const QString & _caption, QWidget * _parent,
-							track * _track ) :
+groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	m_caption( _caption ),
-	m_origHeight( height() ),
-	m_animating( FALSE )
+	autoModelView( NULL ),
+	m_caption( _caption )
 {
-	setAutoFillBackground( TRUE );
-
 	if( s_ledBg == NULL )
 	{
 		s_ledBg = new QPixmap( embed::getIconPixmap(
@@ -64,13 +61,15 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 
 	updatePixmap();
 
-	m_led = new pixmapButton( this, _caption, _track );
+	m_led = new pixmapButton( this, _caption );
 	m_led->setCheckable( TRUE );
 	m_led->move( 2, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	connect( m_led, SIGNAL( toggled( bool ) ),
-					this, SLOT( setState( bool ) ) );
+
+	setModel( new autoModel( FALSE, FALSE, TRUE,
+				autoModel::defaultRelStep(), NULL, FALSE ) );
+	setAutoFillBackground( TRUE );
 }
 
 
@@ -78,18 +77,15 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent,
 
 groupBox::~groupBox()
 {
+	delete m_led;
 }
 
 
 
 
-void groupBox::resizeEvent( QResizeEvent * )
+void groupBox::modelChanged( void )
 {
-	updatePixmap();
-	if( m_animating == FALSE )
-	{
-		m_origHeight = height();
-	}
+	m_led->setModel( model(), FALSE );
 }
 
 
@@ -99,77 +95,18 @@ void groupBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->y() > 1 && _me->y() < 13 )
 	{
-		setState( !isActive(), TRUE );
+		model()->setValue( !model()->value() );
 	}
 }
 
 
 
 
-void groupBox::setState( bool _on, bool _anim )
+void groupBox::resizeEvent( QResizeEvent * _ev )
 {
-	m_led->setChecked( _on );
-	if( ( _anim == TRUE || ( _on == TRUE && height() < m_origHeight ) ) &&
-							m_animating == FALSE )
-	{
-		m_animating = TRUE;
-		animate();
-	}
-	emit( toggled( _on ) );
+	updatePixmap();
+	QWidget::resizeEvent( _ev );
 }
-
-
-
-
-void groupBox::animate( void )
-{
-	float state = (float)( m_origHeight - height() ) /
-						(float)( m_origHeight - 19 );
-	int dy = static_cast<int>( 3 - 2 * cosf( state * 2 * M_PI ) );
-	if( isActive() && height() < m_origHeight )
-	{
-	}
-	else if( !isActive() && height() > 19 )
-	{
-		dy = -dy;
-	}
-	else
-	{
-		m_animating = FALSE;
-		return;
-	}
-	resize( width(), height() + dy );
-	QTimer::singleShot( 10, this, SLOT( animate() ) );
-	QObjectList ch = parent()->children();
-	for( int i = 0; i < ch.count(); ++i )
-	{
-		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
-		if( w == NULL || w->y() < y() + height() )
-		{
-			continue;
-		}
-		w->move( w->x(), w->y() + dy );
-	}
-	ch = children();
-	for( int i = 0; i < ch.count(); ++i )
-	{
-		QWidget * w = dynamic_cast<QWidget *>( ch.at( i ) );
-		if( w == NULL || w == m_led )
-		{
-			continue;
-		}
-		w->move( w->x(), w->y() + dy );
-		if( w->y() < 14)
-		{
-			w->hide();
-		}
-		else if( w->isHidden() == TRUE )
-		{
-			w->show();
-		}
-	}
-}
-
 
 
 
@@ -214,23 +151,6 @@ void groupBox::updatePixmap( void )
 	QPalette pal = palette();
 	pal.setBrush( backgroundRole(), QBrush( pm ) );
 	setPalette( pal );
-}
-
-
-
-
-void groupBox::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
-{
-	m_led->saveSettings( _doc, _this, _name );
-}
-
-
-
-
-void groupBox::loadSettings( const QDomElement & _this, const QString & _name )
-{
-	m_led->loadSettings( _this, _name );
 }
 
 

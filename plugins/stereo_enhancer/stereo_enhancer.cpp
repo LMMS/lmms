@@ -51,11 +51,13 @@ plugin::descriptor stereoenhancer_plugin_descriptor =
 
 
 stereoEnhancerEffect::stereoEnhancerEffect(
+			model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &stereoenhancer_plugin_descriptor, _key ),
+	effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( effectLib::stereoEnhancer<>( 0.0f ) ),
 	m_delayBuffer( new surroundSampleFrame[DEFAULT_BUFFER_SIZE] ),
-	m_currFrame( 0 )
+	m_currFrame( 0 ),
+	m_bbControls( this )
 {
 	// TODO:  Make m_delayBuffer customizable?
 }
@@ -89,7 +91,7 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 	int frameIndex = 0;
 	
 	
-	if( isBypassed() || !isRunning () )
+	if( !isEnabled() || !isRunning() )
 	{
 		return( FALSE );
 	}
@@ -123,7 +125,7 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 			_buf[f][ch] = getDryLevel() * _buf[f][ch] +
 				getWetLevel() *
 					s[ch%DEFAULT_CHANNELS];
-			out_sum += _buf[f][ch]*_buf[f][ch];			
+			out_sum += _buf[f][ch]*_buf[f][ch];
 		}
 		
 		// Update currFrame
@@ -170,9 +172,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new stereoEnhancerEffect(
+	return( new stereoEnhancerEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

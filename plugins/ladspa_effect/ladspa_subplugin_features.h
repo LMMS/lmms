@@ -36,7 +36,7 @@
 class ladspaSubPluginFeatures : public plugin::descriptor::subPluginFeatures
 {
 public:
-	ladspaSubPluginFeatures( plugin::pluginTypes _type );
+	ladspaSubPluginFeatures( plugin::PluginTypes _type );
 
 	virtual void fillDescriptionWidget( QWidget * _parent,
 							const key * _key );

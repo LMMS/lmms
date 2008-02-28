@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 
 
-What is LMMS??
+What is LMMS?
 --------------
 
 LMMS aims to be a free alternative to popular (but commercial and closed-
@@ -47,8 +47,7 @@ least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 
 Required libraries:
 
-- multithreaded version of Qt 3.0 (at least 3.2 recommended) or higher with
-  devel-files
+- Qt >= 4.3.0 with devel-files
 
 Optional, but strongly recommended:
 - JACK with devel-files

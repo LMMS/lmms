@@ -1,7 +1,7 @@
 /*
  * bass_booster.cpp - bass-booster-effect-plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,6 +24,7 @@
 
 
 #include "bass_booster.h"
+#include "automatable_model_templates.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -51,10 +52,11 @@ plugin::descriptor bassbooster_plugin_descriptor =
 
 
 
-bassBoosterEffect::bassBoosterEffect(
+bassBoosterEffect::bassBoosterEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &bassbooster_plugin_descriptor, _key ),
-	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) )
+	effect( &bassbooster_plugin_descriptor, _parent, _key ),
+	m_bbFX( effectLib::fastBassBoost<>( 70.0f, 1.0f, 2.8f ) ),
+	m_bbControls( this )
 {
 }
 
@@ -71,7 +73,7 @@ bassBoosterEffect::~bassBoosterEffect()
 bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
 							const fpp_t _frames )
 {
-	if( isBypassed() || !isRunning () )
+	if( !isEnabled() || !isRunning () )
 	{
 		return( FALSE );
 	}
@@ -114,9 +116,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new bassBoosterEffect(
+	return( new bassBoosterEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

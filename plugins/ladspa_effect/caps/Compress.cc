@@ -1,7 +1,7 @@
 /*
 	Compress.cc
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,20 +31,14 @@
 #include "Compress.h"
 #include "Descriptor.h"
 
-void
-Compress::init (double _fs)
-{
-	fs = _fs;
-}
-
 template <sample_func_t F>
 void
 Compress::one_cycle (int frames)
 {
 	d_sample * s = ports[0];
 
-	d_sample range = DSP::db2lin (*ports[1]); 
-	d_sample ratio = (*ports[2] - 1) / *ports[2];
+	d_sample range = DSP::db2lin (getport(1)); 
+	d_sample ratio = (*ports[2] - 1) / getport(2);
 
 	/* sc1 has lookup tables here, and they're only 40 % used (400 ms/1 s). 
 	 * thus, sc1's attack/release controls are a bit coarse due to truncation 
@@ -57,11 +51,11 @@ Compress::one_cycle (int frames)
 	 *
 	 * TODO: check whether these parameters work like they should, try pow()
 	 */
-	double ga = exp (-1 / (fs * *ports[3])); 
-	double gr = exp (-1 / (fs * *ports[4]));
+	double ga = exp (-1 / (fs * getport(3))); 
+	double gr = exp (-1 / (fs * getport(4)));
 
-	d_sample threshold = *ports[5];
-	d_sample knee = *ports[6];
+	d_sample threshold = getport(5);
+	d_sample knee = getport(6);
 
 	d_sample * d = ports[7];
 
@@ -149,9 +143,9 @@ Descriptor<Compress>::setup()
 	Label = "Compress";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Compress - Mono compressor";
+	Name = CAPS "Compress - Mono compressor";
 	Maker = "Tim Goetze <tim@quitte.de>, Steve Harris <steve@plugin.org.uk>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

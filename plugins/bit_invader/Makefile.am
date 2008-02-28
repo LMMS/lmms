@@ -11,7 +11,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="bitinvader"
 	$(MOC) -o $@ $<
 
 
-MOC_FILES = ./bit_invader.moc ./graph.moc
+MOC_FILES = ./bit_invader.moc
 
 BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
 EMBEDDED_RESOURCES = $(wildcard *png)
@@ -28,6 +28,6 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 pkglib_LTLIBRARIES = libbitinvader.la
 
-libbitinvader_la_SOURCES = bit_invader.cpp bit_invader.h graph.cpp graph.h
+libbitinvader_la_SOURCES = bit_invader.cpp bit_invader.h
 
 $(libbitinvader_la_SOURCES): ./embedded_resources.h

@@ -47,7 +47,6 @@ man1_MANS = lmms.1
 
 lmms_MOC =						\
 		./about_dialog.moc			\
-		./arp_and_chords_tab_widget.moc		\
 		./automatable_button.moc		\
 		./automatable_slider.moc		\
 		./automation_editor.moc			\
@@ -63,13 +62,15 @@ lmms_MOC =						\
 		./effect_control_dialog.moc		\
 		./effect_label.moc			\
 		./effect_select_dialog.moc		\
-		./effect_tab_widget.moc			\
-		./envelope_and_lfo_widget.moc		\
-		./envelope_tab_widget.moc		\
+		./envelope_and_lfo_parameters.moc	\
+		./envelope_and_lfo_view.moc		\
 		./export_project_dialog.moc		\
 		./fade_button.moc			\
 		./file_browser.moc			\
+		./graph.moc				\
 		./group_box.moc				\
+		./instrument_midi_io.moc		\
+		./instrument_midi_io_view.moc		\
 		./kmultitabbar.moc			\
 		./knob.moc				\
  		./ladspa_control.moc			\
@@ -77,27 +78,28 @@ lmms_MOC =						\
 		./led_checkbox.moc			\
 		./main_window.moc			\
 		./mixer.moc				\
+		./mv_base.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
 		./meter_dialog.moc			\
 		./midi_alsa_seq.moc			\
-		./midi_tab_widget.moc			\
+		./instrument_midi_io.moc		\
 		./pattern.moc				\
 		./piano_roll.moc			\
-		./piano_widget.moc			\
+		./piano.moc				\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
-		./rack_plugin.moc			\
-		./rack_view.moc				\
+		./effect_view.moc			\
+		./effect_rack_view.moc			\
 		./rubberband.moc			\
 		./rename_dialog.moc			\
 		./sample_buffer.moc			\
-		./sample_play_handle.moc		\
 		./sample_track.moc			\
 		./setup_dialog.moc			\
 		./side_bar.moc				\
 		./side_bar_widget.moc			\
+		./song.moc				\
 		./song_editor.moc			\
 		./surround_area.moc			\
 		./tab_bar.moc				\
@@ -151,7 +153,6 @@ lmms_SOURCES =								\
 		$(srcdir)/src/audio/audio_sample_recorder.cpp		\
 		$(srcdir)/src/audio/audio_sdl.cpp			\
 		$(srcdir)/src/core/about_dialog.cpp			\
-		$(srcdir)/src/core/arp_and_chords_tab_widget.cpp	\
 		$(srcdir)/src/core/automation_editor.cpp		\
 		$(srcdir)/src/core/automation_pattern.cpp		\
 		$(srcdir)/src/core/bb_editor.cpp			\
@@ -159,34 +160,35 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/effect_chain.cpp			\
 		$(srcdir)/src/core/effect_control_dialog.cpp		\
 		$(srcdir)/src/core/effect_select_dialog.cpp		\
-		$(srcdir)/src/core/effect_tab_widget.cpp		\
 		$(srcdir)/src/core/effect.cpp				\
 		$(srcdir)/src/core/engine.cpp				\
-		$(srcdir)/src/core/envelope_and_lfo_widget.cpp		\
-		$(srcdir)/src/core/envelope_tab_widget.cpp		\
+		$(srcdir)/src/core/envelope_and_lfo_parameters.cpp	\
+		$(srcdir)/src/core/instrument_sound_shaping.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
 		$(srcdir)/src/core/file_browser.cpp			\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
+		$(srcdir)/src/core/instrument_functions.cpp		\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\
 		$(srcdir)/src/core/ladspa_control.cpp			\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\
-		$(srcdir)/src/core/midi_tab_widget.cpp			\
+		$(srcdir)/src/core/instrument_midi_io.cpp		\
 		$(srcdir)/src/core/mixer.cpp				\
+		$(srcdir)/src/core/mv_base.cpp				\
 		$(srcdir)/src/core/name_label.cpp			\
 		$(srcdir)/src/core/note.cpp				\
 		$(srcdir)/src/core/note_play_handle.cpp			\
 		$(srcdir)/src/core/piano_roll.cpp			\
-		$(srcdir)/src/core/piano_widget.cpp			\
+		$(srcdir)/src/core/piano.cpp				\
 		$(srcdir)/src/core/plugin.cpp				\
 		$(srcdir)/src/core/plugin_browser.cpp			\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp	\
 		$(srcdir)/src/core/sample_play_handle.cpp		\
 		$(srcdir)/src/core/setup_dialog.cpp			\
-		$(srcdir)/src/core/song_editor.cpp			\
+		$(srcdir)/src/core/song.cpp				\
 		$(srcdir)/src/core/tool.cpp				\
 		$(srcdir)/src/core/track.cpp				\
 		$(srcdir)/src/core/track_container.cpp			\
@@ -213,27 +215,33 @@ lmms_SOURCES =								\
 		$(srcdir)/src/tracks/bb_track.cpp			\
 		$(srcdir)/src/tracks/instrument_track.cpp		\
 		$(srcdir)/src/tracks/pattern.cpp			\
-		$(srcdir)/src/tracks/sample_track.cpp			\
 		$(srcdir)/src/widgets/automatable_button.cpp		\
 		$(srcdir)/src/widgets/automatable_slider.cpp		\
 		$(srcdir)/src/widgets/caption_menu.cpp			\
 		$(srcdir)/src/widgets/combobox.cpp			\
 		$(srcdir)/src/widgets/cpuload_widget.cpp		\
 		$(srcdir)/src/widgets/effect_label.cpp			\
+		$(srcdir)/src/widgets/effect_rack_view.cpp		\
+		$(srcdir)/src/widgets/effect_view.cpp			\
 		$(srcdir)/src/widgets/fade_button.cpp			\
+		$(srcdir)/src/widgets/graph.cpp				\
 		$(srcdir)/src/widgets/group_box.cpp			\
+		$(srcdir)/src/widgets/envelope_and_lfo_view.cpp		\
+		$(srcdir)/src/widgets/instrument_function_views.cpp	\
+		$(srcdir)/src/widgets/instrument_midi_io_view.cpp	\
+		$(srcdir)/src/widgets/instrument_sound_shaping_view.cpp	\
 		$(srcdir)/src/widgets/kmultitabbar.cpp			\
 		$(srcdir)/src/widgets/knob.cpp				\
+		$(srcdir)/src/widgets/ladspa_control_view.cpp		\
 		$(srcdir)/src/widgets/lcd_spinbox.cpp			\
 		$(srcdir)/src/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/widgets/nstate_button.cpp			\
 		$(srcdir)/src/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/widgets/project_notes.cpp			\
-		$(srcdir)/src/widgets/rack_plugin.cpp			\
-		$(srcdir)/src/widgets/rack_view.cpp			\
 		$(srcdir)/src/widgets/rubberband.cpp			\
 		$(srcdir)/src/widgets/rename_dialog.cpp			\
 		$(srcdir)/src/widgets/side_bar_widget.cpp		\
+		$(srcdir)/src/core/song_editor.cpp			\
 		$(srcdir)/src/widgets/tab_bar.cpp			\
 		$(srcdir)/src/widgets/tab_widget.cpp			\
 		$(srcdir)/src/widgets/text_float.cpp			\
@@ -270,11 +278,14 @@ lmms_SOURCES =								\
 		$(srcdir)/include/note.h				\
 		$(srcdir)/include/volume.h				\
 		$(srcdir)/include/panning.h				\
+		$(srcdir)/include/song.h				\
 		$(srcdir)/include/song_editor.h				\
 		$(srcdir)/include/plugin.h				\
+		$(srcdir)/include/plugin_view.h				\
 		$(srcdir)/include/instrument.h				\
+		$(srcdir)/include/instrument_view.h			\
 		$(srcdir)/include/bb_editor.h				\
-		$(srcdir)/include/piano_widget.h			\
+		$(srcdir)/include/piano.h				\
 		$(srcdir)/include/effect_board.h			\
 		$(srcdir)/include/pixmap_button.h			\
 		$(srcdir)/include/rename_dialog.h			\
@@ -282,12 +293,19 @@ lmms_SOURCES =								\
 		$(srcdir)/include/note_play_handle.h			\
 		$(srcdir)/include/piano_roll.h				\
 		$(srcdir)/include/basic_filters.h			\
-		$(srcdir)/include/envelope_tab_widget.h			\
-		$(srcdir)/include/envelope_and_lfo_widget.h		\
+		$(srcdir)/include/envelope_and_lfo_parameters.h		\
+		$(srcdir)/include/instrument_sound_shaping.h		\
+		$(srcdir)/include/envelope_and_lfo_parameters.h		\
 		$(srcdir)/include/about_dialog.h			\
 		$(srcdir)/include/oscillator.h				\
-		$(srcdir)/include/arp_and_chords_tab_widget.h		\
+		$(srcdir)/include/instrument_functions.h		\
+		$(srcdir)/include/instrument_function_views.h		\
+		$(srcdir)/include/instrument_sound_shaping_view.h	\
 		$(srcdir)/include/export.h				\
+		$(srcdir)/include/mv_base.h				\
+		$(srcdir)/include/automatable_model.h			\
+		$(srcdir)/include/automatable_model_templates.h		\
+		$(srcdir)/include/graph.h				\
 		$(srcdir)/include/group_box.h				\
 		$(srcdir)/include/tab_widget.h				\
 		$(srcdir)/include/knob.h				\
@@ -345,7 +363,8 @@ lmms_SOURCES =								\
 		$(srcdir)/include/dummy_instrument.h			\
 		$(srcdir)/include/instrument_play_handle.h		\
 		$(srcdir)/include/string_pair_drag.h			\
-		$(srcdir)/include/midi_tab_widget.h			\
+		$(srcdir)/include/instrument_midi_io.h			\
+		$(srcdir)/include/instrument_midi_io_view.h		\
 		$(srcdir)/include/audio_port.h				\
 		$(srcdir)/include/tool.h				\
 		$(srcdir)/include/tool_button.h				\
@@ -358,8 +377,6 @@ lmms_SOURCES =								\
 		$(srcdir)/include/combobox.h				\
 		$(srcdir)/include/rubberband.h				\
 		$(srcdir)/include/base64.h				\
-		$(srcdir)/include/automatable_object.h			\
-		$(srcdir)/include/automatable_object_templates.h	\
 		$(srcdir)/include/journalling_object.h			\
 		$(srcdir)/include/level_object.h			\
 		$(srcdir)/include/project_journal.h			\
@@ -368,12 +385,12 @@ lmms_SOURCES =								\
 		$(srcdir)/include/engine.h				\
 		$(srcdir)/include/effect.h				\
 		$(srcdir)/include/effect_chain.h			\
+		$(srcdir)/include/effect_controls.h			\
 		$(srcdir)/include/effect_control_dialog.h		\
 		$(srcdir)/include/effect_label.h			\
-		$(srcdir)/include/effect_tab_widget.h			\
-		$(srcdir)/include/rack_plugin.h				\
-		$(srcdir)/include/rack_view.h				\
+		$(srcdir)/include/effect_rack_view.h			\
 		$(srcdir)/include/effect_select_dialog.h		\
+		$(srcdir)/include/effect_view.h				\
 		$(srcdir)/include/dummy_effect.h			\
 		$(srcdir)/include/ladspa-1.1.h				\
 		$(srcdir)/include/sweep_oscillator.h			\
@@ -382,10 +399,12 @@ lmms_SOURCES =								\
 		$(srcdir)/include/ladspa_manager.h			\
 		$(srcdir)/include/ladspa_2_lmms.h			\
 		$(srcdir)/include/ladspa_control.h			\
+		$(srcdir)/include/ladspa_control_view.h			\
 		$(srcdir)/include/ladspa_base.h				\
 		$(THIRD_PARTY_CODE)
 
 
+#		$(srcdir)/src/tracks/sample_track.cpp
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) lmms.1
 

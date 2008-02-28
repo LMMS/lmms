@@ -3,7 +3,7 @@
 /*
  * audio_jack.cpp - support for JACK-transport
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,7 @@
 
 #include "debug.h"
 #include "templates.h"
+#include "automatable_model_templates.h"
 #include "gui_templates.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
@@ -424,12 +425,15 @@ audioJACK::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setFont( pointSize<6>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	m_channels = new lcdSpinBox( DEFAULT_CHANNELS, SURROUND_CHANNELS, 1,
-							this, NULL, NULL );
-	m_channels->setStep( 2 );
-	m_channels->setLabel( tr( "CHANNELS" ) );
-	m_channels->setValue( configManager::inst()->value( "audiojack",
+	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );	
+	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setStep( 2 );
+	m->setValue( configManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
+
+	m_channels = new lcdSpinBox( 1, this );
+	m_channels->setModel( m );
+	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );
 
 }

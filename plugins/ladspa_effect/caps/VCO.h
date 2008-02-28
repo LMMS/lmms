@@ -37,9 +37,9 @@
 #include "dsp/windows.h"
 
 class VCOs
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample f, gain;
 
 		/* ok to just change these as you please, 4/32 works ok, sortof. */
@@ -54,27 +54,21 @@ class VCOs
 		DSP::FIR down;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [6];
-
-		d_sample adding_gain;
 
 		VCOs()
 			: down (FIR_SIZE)
 			{ }
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				gain = *ports[3];
 				down.reset();
 				vco.reset();
-				/* latency */
-				*ports[5] = OVERSAMPLE;
 			}
 
 		void run (int n)
@@ -91,6 +85,7 @@ class VCOs
 /* //////////////////////////////////////////////////////////////////////// */
 
 class VCOd
+: public Plugin
 {
 	public:
 		double fs;
@@ -112,23 +107,17 @@ class VCOd
 
 	public:
 		static PortInfo port_info[];
-		d_sample * ports [11];
-
-		d_sample adding_gain;
 
 		VCOd()
 			: down (FIR_SIZE)
 			{ }
 
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{
 				gain = *ports[8];
 				down.reset();
 				vco.reset();
-				/* latency */
-				*ports[10] = OVERSAMPLE;
 			}
 
 		void run (int n)

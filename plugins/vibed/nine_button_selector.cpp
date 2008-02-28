@@ -51,10 +51,9 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					QPixmap _button8_off,
 					Uint8 _default,
 					Uint32 _x, Uint32 _y,
-					QWidget * _parent,
-					track * _track ):
+					QWidget * _parent ):
 	QWidget( _parent ),
-	m_selected( _default )
+	autoModelView( new nineButtonSelectorModel(0, 8, _default, 1, NULL, TRUE ) )
 {
 	setFixedSize( 50, 50 );
 	m_base = QPixmap::grabWidget( _parent, _x, _y );
@@ -65,7 +64,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 	pal.setBrush( backgroundRole(), m_base );
 	setPalette( pal );
 
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 1, 1 );
 	m_button->setActiveGraphic( _button0_on );
 	m_button->setInactiveGraphic( _button0_off );
@@ -74,7 +73,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button0Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 18, 1 );
 	m_button->setActiveGraphic( _button1_on );
 	m_button->setInactiveGraphic( _button1_off );
@@ -83,7 +82,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button1Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 35, 1 );
 	m_button->setActiveGraphic( _button2_on );
 	m_button->setInactiveGraphic( _button2_off );
@@ -92,7 +91,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button2Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 1, 18 );
 	m_button->setActiveGraphic( _button3_on );
 	m_button->setInactiveGraphic( _button3_off );
@@ -101,7 +100,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button3Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 18, 18 );
 	m_button->setActiveGraphic( _button4_on );
 	m_button->setInactiveGraphic( _button4_off );
@@ -110,7 +109,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button4Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 35, 18 );
 	m_button->setActiveGraphic( _button5_on );
 	m_button->setInactiveGraphic( _button5_off );
@@ -119,7 +118,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button5Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 1, 35 );
 	m_button->setActiveGraphic( _button6_on );
 	m_button->setInactiveGraphic( _button6_off );
@@ -128,7 +127,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button6Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 18, 35 );
 	m_button->setActiveGraphic( _button7_on );
 	m_button->setInactiveGraphic( _button7_off );
@@ -137,7 +136,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button7Clicked( void ) ) );
 	m_buttons.append( m_button );
 	
-	m_button = new pixmapButton( this, NULL, _track );
+	m_button = new pixmapButton( this, NULL );
 	m_button->move( 35, 35 );
 	m_button->setActiveGraphic( _button8_on );
 	m_button->setInactiveGraphic( _button8_off );
@@ -231,22 +230,29 @@ void nineButtonSelector::button8Clicked( void )
 	setSelected( 8 );
 }
 
-
-
+void nineButtonSelector::modelChanged( void )
+{
+	printf("Model Changed %d", model()->value());
+	updateButton( model()->value() );
+}
 
 void FASTCALL nineButtonSelector::setSelected( Uint8 _new_button )
 {
-	m_selected = _new_button;
-	
-	m_lastBtn->setChecked( FALSE );
-	m_lastBtn = m_buttons[m_selected];
-	m_lastBtn->setChecked( TRUE );
-	
-	emit nineButtonSelection( m_selected );
+	model()->setValue(_new_button);
+	updateButton( _new_button );
 }
 
+void FASTCALL nineButtonSelector::updateButton( Uint8 _new_button )
+{
+	m_lastBtn->setChecked( FALSE );
+	m_lastBtn->update();
 
-
+	m_lastBtn = m_buttons[_new_button];
+	m_lastBtn->setChecked( TRUE );
+	m_lastBtn->update();
+	
+	emit nineButtonSelection( _new_button );
+}
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {

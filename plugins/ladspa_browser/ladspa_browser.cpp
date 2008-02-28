@@ -2,7 +2,7 @@
  * ladspa_browser.cpp - dialog to display information about installed LADSPA
  *                      plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,7 +73,32 @@ plugin * lmms_plugin_main( void * _data )
 
 
 ladspaBrowser::ladspaBrowser( void ) :
-	tool( &ladspa_browser_plugin_descriptor )
+	tool( &ladspa_browser_plugin_descriptor, NULL )
+{
+}
+
+
+
+
+ladspaBrowser::~ladspaBrowser()
+{
+}
+
+
+
+
+QString ladspaBrowser::nodeName( void ) const
+{
+	return( ladspa_browser_plugin_descriptor.name );
+}
+
+
+
+
+
+
+ladspaBrowserView::ladspaBrowserView( tool * _tool ) :
+	toolView( _tool  )
 {
 	QHBoxLayout * hlayout = new QHBoxLayout( this );
 	hlayout->setSpacing( 0 );
@@ -160,22 +185,14 @@ ladspaBrowser::ladspaBrowser( void ) :
 
 
 
-ladspaBrowser::~ladspaBrowser()
+ladspaBrowserView::~ladspaBrowserView()
 {
 }
 
 
 
 
-QString ladspaBrowser::nodeName( void ) const
-{
-	return( ladspa_browser_plugin_descriptor.name );
-}
-
-
-
-
-QWidget * ladspaBrowser::createTab( QWidget * _parent, const QString & _txt,
+QWidget * ladspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 							ladspaPluginType _type )
 {
 	QWidget * tab = new QWidget( _parent );
@@ -205,7 +222,7 @@ QWidget * ladspaBrowser::createTab( QWidget * _parent, const QString & _txt,
 
 
 
-void ladspaBrowser::showPorts( const ladspa_key_t & _key )
+void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 {
 	ladspaPortDialog ports( _key );
 	ports.exec();

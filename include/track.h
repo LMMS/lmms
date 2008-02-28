@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> neccessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,6 +44,7 @@
 #include "midi_time.h"
 #include "rubberband.h"
 #include "journalling_object.h"
+#include "automatable_model.h"
 
 
 class QMenu;
@@ -54,26 +55,27 @@ class bbTrack;
 class pixmapButton;
 class textFloat;
 class track;
+class trackContentObjectView;
 class trackContainer;
+class trackContainerView;
 class trackContentWidget;
-class trackWidget;
+class trackView;
 
 typedef QWidget trackSettingsWidget;
 
 
 
-const Uint16 DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
-const Uint16 TRACK_OP_WIDTH = 70;
-const Uint16 TCO_BORDER_WIDTH = 1;
+const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
+const int TRACK_OP_WIDTH = 70;
+const int TCO_BORDER_WIDTH = 1;
 
 
-class trackContentObject : public selectableObject,
-			   public journallingObject
+class trackContentObject : public model, public journallingObject
 {
 	Q_OBJECT
 public:
 	trackContentObject( track * _track );
-	trackContentObject( const trackContentObject & _copy );
+//	trackContentObject( const trackContentObject & _copy );
 	virtual ~trackContentObject();
 	inline track * getTrack( void )
 	{
@@ -94,17 +96,71 @@ public:
 
 	bool muted( void ) const
 	{
-		return( m_muted );
+		return( m_mutedModel.value() );
 	}
+
+	virtual void movePosition( const midiTime & _pos );
+	virtual void changeLength( const midiTime & _length );
+
+	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
+
+
+
+protected:
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
+
+
+protected slots:
+	void cut( void );
+	void copy( void );
+	void paste( void );
+	void toggleMute( void );
+
+
+signals:
+	void lengthChanged( void );
+	void positionChanged( void );
+
+
+private:
+	enum Actions
+	{
+		NoAction,
+		Move,
+		Resize
+	} ;
+
+	track * m_track;
+	midiTime m_startPosition;
+	midiTime m_length;
+
+	boolModel m_mutedModel;
+
+
+	friend class trackContentObjectView;
+
+} ;
+
+
+
+class trackContentObjectView : public selectableObject, public modelView
+{
+	Q_OBJECT
+public:
+	trackContentObjectView( trackContentObject * _tco, trackView * _tv );
+	virtual ~trackContentObjectView();
 
 	bool fixedTCOs( void );
 
-	virtual void FASTCALL movePosition( const midiTime & _pos );
-	virtual void FASTCALL changeLength( const midiTime & _length );
+	inline trackContentObject * getTrackContentObject( void )
+	{
+		return( m_tco );
+	}
 
 
 public slots:
-	virtual void close( void );
+	virtual bool close( void );
 
 
 protected:
@@ -123,33 +179,33 @@ protected:
 	void setAutoResizeEnabled( bool _e = FALSE );
 	float pixelsPerTact( void );
 
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	inline trackView * getTrackView( void )
+	{
+		return( m_trackView );
+	}
 
 
 protected slots:
-	void cut( void );
-	void copy( void );
-	void paste( void );
-	void toggleMute( void );
+	void updateLength( void );
+	void updatePosition( void );
 
 
 private:
-	enum actions
+	enum Actions
 	{
-		NONE, MOVE, MOVE_SELECTION, RESIZE
+		NoAction,
+		Move,
+		MoveSelection,
+		Resize
 	} ;
 
 	static textFloat * s_textFloat;
 
-	track * m_track;
-	midiTime m_startPosition;
-	midiTime m_length;
-	actions m_action;
+	trackContentObject * m_tco;
+	trackView * m_trackView;
+	Actions m_action;
 	bool m_autoResize;
 	Sint16 m_initialMouseX;
-
-	bool m_muted;
 
 	textFloat * m_hint;
 
@@ -160,39 +216,30 @@ private:
 
 
 
+
 class trackContentWidget : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	trackContentWidget( trackWidget * _parent );
+	trackContentWidget( trackView * _parent );
 	virtual ~trackContentWidget();
 
-	trackContentObject * FASTCALL getTCO( int _tco_num );
-	int numOfTCOs( void );
-	trackContentObject * FASTCALL addTCO( trackContentObject * _tco );
-	void FASTCALL removeTCO( int _tco_num, bool _also_delete = TRUE );
-	void FASTCALL removeTCO( trackContentObject * _tco,
-						bool _also_delete = TRUE );
-	void removeAllTCOs( void );
-	void FASTCALL swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
-
-	inline Uint16 pixelsPerTact( void ) const
+	void addTCOView( trackContentObjectView * _tcov );
+	void removeTCOView( trackContentObjectView * _tcov );
+	void removeTCOView( int _tco_num )
 	{
-		return( m_pixelsPerTact );
+		if( _tco_num >= 0 && _tco_num < m_tcoViews.size() )
+		{
+			removeTCOView( m_tcoViews[_tco_num] );
+		}
 	}
 
-	inline void setPixelsPerTact( Uint16 _ppt )
-	{
-		m_pixelsPerTact = _ppt;
-	}
-
-	tact length( void ) const;
+	midiTime endPosition( const midiTime & _pos_start );
 
 
 public slots:
-	void insertTact( const midiTime & _pos );
-	void removeTact( const midiTime & _pos );
 	void update( void );
+	void changePosition( const midiTime & _new_pos = -1 );
 
 
 protected:
@@ -212,19 +259,21 @@ protected:
 
 
 private:
-	enum actions
+	enum Actions
 	{
-		ADD_TCO, REMOVE_TCO
+		AddTrackContentObject,
+		RemoveTrackContentObject
 	} ;
 
 	track * getTrack( void );
 	midiTime getPosition( int _mouse_x );
 
-	typedef QVector<trackContentObject *> tcoVector;
+	trackView * m_trackView;
 
-	tcoVector m_trackContentObjects;
-	trackWidget * m_trackWidget;
-	Uint16 m_pixelsPerTact;
+	typedef QVector<trackContentObjectView *> tcoViewVector;
+	tcoViewVector m_tcoViews;
+
+	int m_pixelsPerTact;
 
 } ;
 
@@ -236,7 +285,7 @@ class trackOperationsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	trackOperationsWidget( trackWidget * _parent );
+	trackOperationsWidget( trackView * _parent );
 	~trackOperationsWidget();
 
 	bool muted( void ) const;
@@ -267,7 +316,7 @@ private:
 	static QPixmap * s_muteOnDisabled;
 	static QPixmap * s_muteOnEnabled;
 
-	trackWidget * m_trackWidget;
+	trackView * m_trackView;
 
 	QPushButton * m_trackOps;
 	pixmapButton * m_muteBtn;
@@ -277,20 +326,146 @@ private:
 	bbTrack * currentBBTrack( void );
 	bool inBBEditor( void );
 
+
+	friend class trackView;
+
 } ;
 
 
 
 
 
+// base-class for all tracks
+class track : public model, public journallingObject
+{
+	Q_OBJECT
+	mapPropertyFromModel(bool,muted,setMuted,m_mutedModel);
+public:
+	enum TrackTypes
+	{
+		InstrumentTrack,
+		BBTrack,
+		SampleTrack,
+		EventTrack,
+		VideoTrack,
+		AutomationTrack,
+		NumTrackTypes
+	} ;
 
-// actual widget shown in trackContainer
-class trackWidget : public QWidget, public journallingObject
+	track( TrackTypes _type, trackContainer * _tc );
+	virtual ~track();
+
+	static track * create( TrackTypes _tt, trackContainer * _tc );
+	static track * create( const QDomElement & _this,
+							trackContainer * _tc );
+	void clone( void );
+
+
+	// pure virtual functions
+	TrackTypes type( void ) const
+	{
+		return( m_type );
+	}
+
+	virtual bool play( const midiTime & _start, const fpp_t _frames,
+				const f_cnt_t _frame_base,
+						Sint16 _tco_num = -1 ) = 0;
+
+
+	virtual trackView * createView( trackContainerView * _view ) = 0;
+	virtual trackContentObject * createTCO( const midiTime & _pos ) = 0;
+
+	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
+						QDomElement & _parent ) = 0;
+	virtual void loadTrackSpecificSettings( const QDomElement & _this ) = 0;
+
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
+
+
+	// -- for usage by trackContentObject only ---------------
+	trackContentObject * addTCO( trackContentObject * _tco );
+	void removeTCO( trackContentObject * _tco );
+	// -------------------------------------------------------
+
+	int numOfTCOs( void );
+	trackContentObject * getTCO( int _tco_num );
+	int getTCONum( trackContentObject * _tco );
+
+	void getTCOsInRange( QList<trackContentObject *> & _tco_v,
+							const midiTime & _start,
+							const midiTime & _end );
+	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
+
+	void insertTact( const midiTime & _pos );
+	void removeTact( const midiTime & _pos );
+
+	tact length( void ) const;
+
+	inline trackContainer * getTrackContainer( void ) const
+	{
+		return( m_trackContainer );
+	}
+
+	void addAutomationPattern( automationPattern * _pattern );
+	void removeAutomationPattern( automationPattern * _pattern );
+
+	// name-stuff
+	virtual const QString & name( void ) const
+	{
+		return( m_name );
+	}
+
+	inline const QPixmap * pixmap( void )
+	{
+		return( m_pixmap );
+	}
+
+	using model::dataChanged;
+
+
+public slots:
+	virtual void setName( const QString & _new_name )
+	{
+		m_name = _new_name;
+	}
+
+
+protected:
+	void sendMidiTime( const midiTime & _time );
+
+
+private:
+	trackContainer * m_trackContainer;
+	TrackTypes m_type;
+	QString m_name;
+	QPixmap * m_pixmap;
+	boolModel m_mutedModel;
+
+	typedef QVector<trackContentObject *> tcoVector;
+	tcoVector m_trackContentObjects;
+
+	QList<automationPattern *> m_automationPatterns;
+
+
+	friend class trackView;
+
+
+signals:
+	void trackContentObjectAdded( trackContentObject * );
+
+} ;
+
+
+
+
+class trackView : public QWidget, public modelView, public journallingObject
 {
 	Q_OBJECT
 public:
-	trackWidget( track * _track, QWidget * _parent );
-	virtual ~trackWidget();
+	trackView( track * _track, trackContainerView * _tcv );
+	virtual ~trackView();
 
 	inline const track * getTrack( void ) const
 	{
@@ -302,56 +477,46 @@ public:
 		return( m_track );
 	}
 
-	inline const trackOperationsWidget & getTrackOperationsWidget( void )
-									const
+	inline trackContainerView * getTrackContainerView( void )
 	{
-		return( m_trackOperationsWidget );
+		return( m_trackContainerView );
 	}
 
-	inline const trackSettingsWidget & getTrackSettingsWidget( void ) const
+	inline trackOperationsWidget * getTrackOperationsWidget( void )
 	{
-		return( m_trackSettingsWidget );
+		return( &m_trackOperationsWidget );
 	}
 
-	inline const trackContentWidget & getTrackContentWidget( void ) const
+	inline trackSettingsWidget * getTrackSettingsWidget( void )
 	{
-		return( m_trackContentWidget );
+		return( &m_trackSettingsWidget );
 	}
 
-	inline trackOperationsWidget & getTrackOperationsWidget( void )
+	inline trackContentWidget * getTrackContentWidget( void )
 	{
-		return( m_trackOperationsWidget );
-	}
-
-	inline trackSettingsWidget & getTrackSettingsWidget( void )
-	{
-		return( m_trackSettingsWidget );
-	}
-
-	inline trackContentWidget & getTrackContentWidget( void )
-	{
-		return( m_trackContentWidget );
+		return( &m_trackContentWidget );
 	}
 
 	bool isMovingTrack( void ) const
 	{
-		return( m_action == MOVE_TRACK );
+		return( m_action == MoveTrack );
 	}
-	
+
 	virtual void update( void );
 
 
 public slots:
-	void changePosition( const midiTime & _new_pos = -1 );
+	virtual bool close( void );
 
 
 protected:
+	virtual void modelChanged( void );
 	virtual void undoStep( journalEntry & _je );
 	virtual void redoStep( journalEntry & _je );
 
 	virtual QString nodeName( void ) const
 	{
-		return( "trackwidget" );
+		return( "trackview" );
 	}
 
 
@@ -363,152 +528,29 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
-	midiTime FASTCALL endPosition( const midiTime & _pos_start );
-
 
 private:
-	enum actions
+	enum Actions
 	{
-		NONE, MOVE_TRACK, RESIZE_TRACK
+		NoAction,
+		MoveTrack,
+		ResizeTrack
 	} ;
+
 	track * m_track;
+	trackContainerView * m_trackContainerView;
 
 	trackOperationsWidget m_trackOperationsWidget;
 	trackSettingsWidget m_trackSettingsWidget;
 	trackContentWidget m_trackContentWidget;
 
-	actions m_action;
+	Actions m_action;
+
+
+private slots:
+	void createTCOView( trackContentObject * _tco );
 
 } ;
-
-
-
-
-// base-class for all tracks
-class track : public journallingObject
-{
-public:
-	enum trackTypes
-	{
-		INSTRUMENT_TRACK,
-		BB_TRACK,
-		SAMPLE_TRACK,
-		EVENT_TRACK,
-		VIDEO_TRACK,
-		AUTOMATION_TRACK,
-		TOTAL_TRACK_TYPES
-	} ;
-
-	track( trackContainer * _tc, bool _create_widget = TRUE );
-	virtual ~track();
-
-	static track * FASTCALL create( trackTypes _tt, trackContainer * _tc );
-	static void FASTCALL create( const QDomElement & _this,
-							trackContainer * _tc );
-	void FASTCALL clone( void );
-
-	tact length( void ) const;
-
-	inline bool muted( void ) const
-	{
-		return( m_trackWidget->getTrackOperationsWidget().muted() );
-	}
-
-	inline void setMuted( bool _muted )
-	{
-		m_trackWidget->getTrackOperationsWidget().setMuted( _muted );
-	}
-
-
-	// pure virtual functions
-	virtual trackTypes type( void ) const = 0;
-
-	virtual bool FASTCALL play( const midiTime & _start,
-						const fpp_t _frames,
-						const f_cnt_t _frame_base,
-						Sint16 _tco_num = -1 ) = 0;
-
-
-	virtual trackContentObject * FASTCALL createTCO(
-						const midiTime & _pos ) = 0;
-
-	virtual void FASTCALL saveTrackSpecificSettings( QDomDocument & _doc,
-						QDomElement & _parent ) = 0;
-	virtual void FASTCALL loadTrackSpecificSettings(
-						const QDomElement & _this ) = 0;
-
-
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-
-
-	trackContentObject * FASTCALL addTCO( trackContentObject * _tco );
-	void FASTCALL removeTCO( int _tco_num );
-	int numOfTCOs( void );
-	trackContentObject * FASTCALL getTCO( int _tco_num );
-	int FASTCALL getTCONum( trackContentObject * _tco );
-	void FASTCALL getTCOsInRange( QList<trackContentObject *> & _tco_v,
-							const midiTime & _start,
-							const midiTime & _end );
-	void FASTCALL swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
-
-	inline trackWidget * getTrackWidget( void )
-	{
-		return( m_trackWidget );
-	}
-
-	inline trackContainer * getTrackContainer( void ) const
-	{
-		return( m_trackContainer );
-	}
-
-	inline const trackSettingsWidget * getTrackSettingsWidget( void ) const
-	{
-		return( &m_trackWidget->getTrackSettingsWidget() );
-	}
-
-	inline const trackContentWidget * getTrackContentWidget( void ) const
-	{
-		return( &m_trackWidget->getTrackContentWidget() );
-	}
-
-	inline trackSettingsWidget * getTrackSettingsWidget( void )
-	{
-		return( &m_trackWidget->getTrackSettingsWidget() );
-	}
-
-	inline trackContentWidget * getTrackContentWidget( void )
-	{
-		return( &m_trackWidget->getTrackContentWidget() );
-	}
-
-	void addAutomationPattern( automationPattern * _pattern );
-	void removeAutomationPattern( automationPattern * _pattern );
-
-	// name-stuff
-	inline virtual const QString & name( void ) const
-	{
-		return( m_name );
-	}
-	inline virtual void setName( const QString & _new_name )
-	{
-		m_name = _new_name;
-	}
-
-
-protected:
-	void sendMidiTime( const midiTime & _time );
-	QString m_name;
-
-
-private:
-	trackContainer * m_trackContainer;
-	trackWidget * m_trackWidget;
-	QList<automationPattern *> m_automation_patterns;
-
-} ;
-
 
 
 

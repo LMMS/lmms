@@ -32,7 +32,8 @@
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
 
-#include "automatable_object.h"
+#include "automatable_model.h"
+#include "templates.h"
 
 
 class QPixmap;
@@ -46,31 +47,19 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public automatableObject<float>
+class knob : public QWidget, public floatModelView
 {
 	Q_OBJECT
 public:
-	knob( int _knob_num, QWidget * _parent, const QString & _name,
-							track * _track );
+	knob( int _knob_num, QWidget * _parent, const QString & _name );
 	virtual ~knob();
 
-    
+
 	void setHintText( const QString & _txt_before,
 						const QString & _txt_after );
 	void setLabel( const QString & _txt );
 
 	void setTotalAngle( float _angle );
-
-	inline virtual void setInitValue( const float _val )
-	{
-		m_initValue = _val;
-		autoObj::setInitValue( _val );
-	}
-
-	virtual void setValue( const float _x );
-
-	virtual void setRange( const float _min, const float _max,
-						const float _step = 0.0 );
 
 
 public slots:
@@ -83,8 +72,8 @@ public slots:
 
 
 signals:
-	void valueChanged( float value );
-	void valueChanged( void );
+//	void valueChanged( float value );
+//	void valueChanged( void );
 	void sliderPressed( void );
 	void sliderReleased( void );
 	void sliderMoved( float value );
@@ -102,8 +91,6 @@ protected:
 	QString m_hintTextBeforeValue;
 	QString m_hintTextAfterValue;
 
-	float m_initValue;
-
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
@@ -112,7 +99,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _me );
-	virtual void resizeEvent( QResizeEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 
 	void drawKnob( QPainter * _p );
@@ -122,21 +108,24 @@ protected:
 
 
 private:
-	void layoutKnob( bool _update = TRUE );
-	void recalcAngle( void );
-    
-	void valueChange( void );
-	void rangeChange( void );
+	inline float pageSize( void ) const
+	{
+		return( tMax<float>( ( model()->maxValue() -
+					model()->minValue() ) / 100.0f,
+							model()->step() ) );
+	}
 
+	void valueChange( void );
 	void buttonReleased( void );
 
-	float m_pageSize;
-	float m_angle;
 	float m_totalAngle;
 
 	int m_knobNum;
 	QString m_label;
 
 } ;
+
+
+typedef knob::autoModel knobModel;
 
 #endif

@@ -1,7 +1,7 @@
 /*
  * timeline.h - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,7 +28,7 @@
 
 #include <QtGui/QWidget>
 
-#include "song_editor.h"
+#include "song.h"
 
 
 class QPixmap;
@@ -40,39 +40,43 @@ class timeLine : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	enum autoScrollStates
+	enum AutoScrollStates
 	{
-		AUTOSCROLL_ENABLED, AUTOSCROLL_DISABLED
+		AutoScrollEnabled,
+		AutoScrollDisabled
 	} ;
 
-	enum loopPointStates
+	enum LoopPointStates
 	{
-		LOOP_POINTS_DISABLED, LOOP_POINTS_ENABLED
+		LoopPointsDisabled,
+		LoopPointsEnabled
 	} ;
 
-	enum behaviourAtStopStates
+	enum BehaviourAtStopStates
 	{
-		BACK_TO_ZERO, BACK_TO_START, KEEP_STOP_POSITION
+		BackToZero,
+		BackToStart,
+		KeepStopPosition
 	} ;
 
 
-	timeLine( int _xoff, int _yoff, float _ppt, songEditor::playPos & _pos,
+	timeLine( int _xoff, int _yoff, float _ppt, song::playPos & _pos,
 				const midiTime & _begin, QWidget * _parent );
 	virtual ~timeLine();
 
-	inline songEditor::playPos & pos( void )
+	inline song::playPos & pos( void )
 	{
 		return( m_pos );
 	}
 
-	behaviourAtStopStates behaviourAtStop( void ) const
+	BehaviourAtStopStates behaviourAtStop( void ) const
 	{
 		return( m_behaviourAtStop );
 	}
 
 	bool loopPointsEnabled( void ) const
 	{
-		return( m_loopPoints == LOOP_POINTS_ENABLED );
+		return( m_loopPoints == LoopPointsEnabled );
 	}
 
 	inline const midiTime & loopBegin( void ) const
@@ -105,9 +109,8 @@ public:
 	void addToolButtons( QWidget * _tool_bar );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "timeline" );
@@ -145,16 +148,16 @@ private:
 	static QPixmap * s_loopPointPixmap;
 	static QPixmap * s_loopPointDisabledPixmap;
 
-	autoScrollStates m_autoScroll;
-	loopPointStates m_loopPoints;
-	behaviourAtStopStates m_behaviourAtStop;
+	AutoScrollStates m_autoScroll;
+	LoopPointStates m_loopPoints;
+	BehaviourAtStopStates m_behaviourAtStop;
 
 	bool m_changedPosition;
 
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppt;
-	songEditor::playPos & m_pos;
+	song::playPos & m_pos;
 	const midiTime & m_begin;
 	midiTime m_loopPos[2];
 
@@ -166,7 +169,10 @@ private:
 
 	enum actions
 	{
-		NONE, MOVE_POS_MARKER, MOVE_LOOP_BEGIN, MOVE_LOOP_END
+		NoAction,
+		MovePositionMarker,
+		MoveLoopBegin,
+		MoveLoopEnd
 	} m_action;
 
 	int m_moveXOff;

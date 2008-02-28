@@ -4,7 +4,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        play-engine
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,13 +27,13 @@
 
 
 #include "note_play_handle.h"
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "config_mgr.h"
 #include "detuning_helper.h"
-#include "envelope_tab_widget.h"
+#include "instrument_sound_shaping.h"
 #include "instrument_track.h"
 #include "midi_port.h"
-#include "song_editor.h"
+#include "song.h"
 
 
 inline notePlayHandle::baseDetuning::baseDetuning(
@@ -85,7 +85,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 #if SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
-	m_orig_bpm( engine::getSongEditor()->getTempo() )
+	m_orig_bpm( engine::getSong()->getTempo() )
 {
 	if( m_baseNote )
 	{
@@ -306,7 +306,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = tMax<f_cnt_t>( 0, // 10,
-			m_instrumentTrack->m_envWidget->releaseFrames() );
+			m_instrumentTrack->m_soundShaping.releaseFrames() );
 	// send MIDI-note-off-event
 	m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
 				m_instrumentTrack->m_midiPort->outputChannel(),
@@ -322,7 +322,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
-	return( m_instrumentTrack->m_envWidget->releaseFrames(
+	return( m_instrumentTrack->m_soundShaping.releaseFrames(
 							arpBaseNote() ) );
 }
 
@@ -344,7 +344,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 
 float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
-	return( m_instrumentTrack->m_envWidget->volumeLevel( this, _frame ) );
+	return( m_instrumentTrack->m_soundShaping.volumeLevel( this, _frame ) );
 }
 
 
@@ -436,10 +436,14 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 void notePlayHandle::updateFrequency( void )
 {
-	float pitch = (float)( tone() - m_instrumentTrack->baseTone() +
-			engine::getSongEditor()->masterPitch() ) / 12.0f +
-			(float)( octave() - m_instrumentTrack->baseOctave() )
-			+ m_base_detuning->value() / 12.0f;
+	const int base_tone = m_instrumentTrack->baseNoteModel()->value() %
+							NOTES_PER_OCTAVE;
+	const int base_octave = m_instrumentTrack->baseNoteModel()->value() /
+							NOTES_PER_OCTAVE;
+	const float pitch = (float)( tone() - base_tone +
+			engine::getSong()->masterPitch() ) / 12.0f +
+			(float)( octave() - base_octave ) +
+					 m_base_detuning->value() / 12.0f;
 	m_frequency = BASE_FREQ * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();

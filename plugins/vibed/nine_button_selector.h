@@ -29,12 +29,14 @@
 #include "pixmap_button.h"
 
 
-class nineButtonSelector: public QWidget
+class nineButtonSelector: public QWidget , public intModelView
 {
 	Q_OBJECT
 			
 public:
-	nineButtonSelector( 	QPixmap _button1_on,
+	nineButtonSelector( 	QPixmap _button0_on,
+				QPixmap _button0_off,
+				QPixmap _button1_on,
 				QPixmap _button1_off,
 				QPixmap _button2_on,
 				QPixmap _button2_off,
@@ -50,15 +52,16 @@ public:
 				QPixmap _button7_off,
 				QPixmap _button8_on,
 				QPixmap _button8_off,
-				QPixmap _button9_on,
-				QPixmap _button9_off,
 				Uint8 _default,
 				Uint32 _x, Uint32 _y,
-				QWidget * _parent,
-				track * _track );
+				QWidget * _parent);
 	~nineButtonSelector();
 	
-	inline Uint8 getSelected() { return( m_selected ); };
+//	inline Uint8 getSelected() { 
+//		return( castModel<nineButtonSelectorModel>()->value() );
+//	};
+
+protected:
 	void FASTCALL setSelected( Uint8 _new_button );
 	
 public slots:
@@ -78,11 +81,18 @@ signals:
 	void nineButtonSelection( Uint8 );
 	
 private:
+	virtual void modelChanged( void );
+	void updateButton( Uint8 );
+
 	QList<pixmapButton *> m_buttons;
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
 	QPixmap m_base;
-	
+
 	Uint8 m_selected;
+	
 };
+
+typedef nineButtonSelector::autoModel nineButtonSelectorModel;
+
 #endif

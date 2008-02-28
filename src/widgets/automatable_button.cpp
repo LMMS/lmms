@@ -4,7 +4,7 @@
  * automatable_button.cpp - implementation of class automatableButton and
  *                          automatableButtonGroup
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,24 +31,20 @@
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 
 
 
 
-automatableButton::automatableButton( QWidget * _parent, const QString & _name,
-							track * _track ) :
+automatableButton::automatableButton( QWidget * _parent,
+						const QString & _name ) :
 	QPushButton( _parent ),
-	autoObj( _track, FALSE, FALSE, TRUE ),
+	autoModelView( new autoModel( FALSE, FALSE, TRUE,
+				autoModel::defaultRelStep(), NULL, TRUE ) ),
 	m_group( NULL )
 {
-	if( _track != NULL )
-	{
-		getAutomationPattern();
-	}
-	setInitValue( FALSE );
 	setAccessibleName( _name );
 }
 
@@ -66,9 +62,22 @@ automatableButton::~automatableButton()
 
 
 
+void automatableButton::update( void )
+{
+	if( QPushButton::isChecked() != model()->value() )
+	{
+		QPushButton::setChecked( model()->value() );
+	}
+	QPushButton::update();
+}
+
+
+
+
 void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
-	if( nullTrack() && ( m_group == NULL || m_group->nullTrack() ) )
+	if( model()->nullTrack() &&
+			( m_group == NULL || m_group->model()->nullTrack() ) )
 	{
 		QPushButton::contextMenuEvent( _me );
 		return;
@@ -85,12 +94,12 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	if ( m_group != NULL )
 	{
 		target = m_group;
-		pattern = m_group->getAutomationPattern();
+		pattern = m_group->model()->getAutomationPattern();
 	}
 	else
 	{
 		target = this;
-		pattern = getAutomationPattern();
+		pattern = model()->getAutomationPattern();
 	}
 
 	captionMenu contextMenu( target->accessibleName() );
@@ -135,30 +144,14 @@ void automatableButton::toggle( void )
 {
 	if( isCheckable() && m_group != NULL )
 	{
-		if( value() == FALSE )
+		if( model()->value() == FALSE )
 		{
 			m_group->activateButton( this );
 		}
 	}
 	else
 	{
-		setValue( !value() );
-		update();
-	}
-}
-
-
-
-
-void automatableButton::setValue( const bool _on )
-{
-	if( _on != value() )
-	{
-		autoObj::setValue( _on );
-		setFirstValue();
-		QPushButton::setChecked( _on );
-		update();
-		emit( toggled( value() ) );
+		model()->setValue( !model()->value() );
 	}
 }
 
@@ -170,17 +163,11 @@ void automatableButton::setValue( const bool _on )
 
 
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
-							const QString & _name,
-							track * _track ) :
+						const QString & _name ) :
 	QWidget( _parent ),
-	automatableObject<int>( _track )
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) )
 {
 	hide();
-	if( _track != NULL )
-	{
-		getAutomationPattern();
-	}
-	setInitValue( 0 );
 	setAccessibleName( _name );
 }
 
@@ -189,9 +176,10 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 automatableButtonGroup::~automatableButtonGroup()
 {
-	while( m_buttons.empty() == FALSE )
+	for( QList<automatableButton *>::iterator it = m_buttons.begin();
+					it != m_buttons.end(); ++it )
 	{
-		removeButton( m_buttons.front() );
+		( *it )->m_group = NULL;
 	}
 }
 
@@ -202,13 +190,14 @@ void automatableButtonGroup::addButton( automatableButton * _btn )
 {
 	_btn->m_group = this;
 	_btn->setCheckable( TRUE );
-	_btn->setChecked( FALSE );
-	// disable step-recording as we're recording changes of states of 
+	_btn->model()->setValue( FALSE );
+	// disable journalling as we're recording changes of states of 
 	// button-group members on our own
-	_btn->setJournalling( FALSE );
+	_btn->model()->setJournalling( FALSE );
 
 	m_buttons.push_back( _btn );
-	setRange( 0, m_buttons.size() - 1 );
+	model()->setRange( 0, m_buttons.size() - 1 );
+	updateButtons();
 }
 
 
@@ -218,8 +207,6 @@ void automatableButtonGroup::removeButton( automatableButton * _btn )
 {
 	m_buttons.erase( qFind( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = NULL;
-
-	setRange( 0, m_buttons.size() - 1 );
 }
 
 
@@ -227,30 +214,40 @@ void automatableButtonGroup::removeButton( automatableButton * _btn )
 
 void automatableButtonGroup::activateButton( automatableButton * _btn )
 {
-	if( _btn != m_buttons[value()] && m_buttons.indexOf( _btn ) != -1 )
+	if( _btn != m_buttons[model()->value()] &&
+					m_buttons.indexOf( _btn ) != -1 )
 	{
-		setValue( m_buttons.indexOf( _btn ) );
+		model()->setValue( m_buttons.indexOf( _btn ) );
+		foreach( automatableButton * btn, m_buttons )
+		{
+			btn->update();
+		}
 	}
 }
 
 
 
 
-void automatableButtonGroup::setValue( const int _value )
+void automatableButtonGroup::modelChanged( void )
 {
-	if( m_buttons.empty() == FALSE )
-	{
-		// range not updated yet?
-		if( value() == fittedValue( value() ) )
-		{
-			m_buttons[value()]->setChecked( FALSE );
-		}
-		automatableObject<int>::setValue( _value );
-		setFirstValue();
-		m_buttons[value()]->setChecked( TRUE );
-	}
+	connect( model(), SIGNAL( dataChanged() ),
+			this, SLOT( updateButtons() ) );
+	autoModelView::modelChanged();
+	updateButtons();
+}
 
-	emit valueChanged( value() );
+
+
+
+void automatableButtonGroup::updateButtons( void )
+{
+	model()->setRange( 0, m_buttons.size() - 1 );
+	int i = 0;
+	foreach( automatableButton * btn, m_buttons )
+	{
+		btn->model()->setValue( i == model()->value() );
+		++i;
+	}
 }
 
 

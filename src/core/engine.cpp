@@ -3,7 +3,7 @@
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,20 +38,23 @@
 #include "project_journal.h"
 #include "project_notes.h"
 #include "song_editor.h"
+#include "song.h"
 
 
 bool engine::s_hasGUI = TRUE;
-float engine::s_frames_per_tact64th;
-mixer * engine::s_mixer;
-mainWindow * engine::s_mainWindow;
-songEditor * engine::s_songEditor;
-automationEditor * engine::s_automationEditor;
-bbEditor * engine::s_bbEditor;
-pianoRoll * engine::s_pianoRoll;
-projectNotes * engine::s_projectNotes;
-projectJournal * engine::s_projectJournal;
-ladspa2LMMS * engine::s_ladspaManager;
-QMap<QString, QString> engine::s_sample_extensions;
+float engine::s_framesPerTact64th;
+mixer * engine::s_mixer = NULL;
+mainWindow * engine::s_mainWindow = NULL;
+bbTrackContainer * engine::s_bbTrackContainer = NULL;
+song * engine::s_song = NULL;
+songEditor * engine::s_songEditor = NULL;
+automationEditor * engine::s_automationEditor = NULL;
+bbEditor * engine::s_bbEditor = NULL;
+pianoRoll * engine::s_pianoRoll = NULL;
+projectNotes * engine::s_projectNotes = NULL;
+projectJournal * engine::s_projectJournal = NULL;
+ladspa2LMMS * engine::s_ladspaManager = NULL;
+QMap<QString, QString> engine::s_sampleExtensions;
 
 
 
@@ -60,23 +63,32 @@ void engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
 
-	load_extensions();
+	loadExtensions();
 
 	s_projectJournal = new projectJournal;
-	s_mainWindow = new mainWindow;
 	s_mixer = new mixer;
-	s_songEditor = new songEditor;
-	s_projectNotes = new projectNotes;
-	s_bbEditor = new bbEditor;
-	s_pianoRoll = new pianoRoll;
-	s_automationEditor = new automationEditor;
+	s_song = new song;
+	s_bbTrackContainer = new bbTrackContainer;
+
+	if( s_hasGUI )
+	{
+		s_mainWindow = new mainWindow;
+		s_songEditor = new songEditor( s_song );
+		s_projectNotes = new projectNotes;
+		s_bbEditor = new bbEditor( s_bbTrackContainer );
+		s_pianoRoll = new pianoRoll;
+		s_automationEditor = new automationEditor;
+	}
 	s_ladspaManager = new ladspa2LMMS;
 
 	s_projectJournal->setJournalling( TRUE );
 
 	s_mixer->initDevices();
 
-	s_mainWindow->finalize();
+	if( s_hasGUI )
+	{
+		s_mainWindow->finalize();
+	}
 
 	presetPreviewPlayHandle::init();
 
@@ -119,14 +131,14 @@ void engine::destroy( void )
 
 void engine::updateFramesPerTact64th( void )
 {
-	s_frames_per_tact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
-					/ 64.0f / s_songEditor->getTempo();
+	s_framesPerTact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
+						/ 64.0f / s_song->getTempo();
 }
 
 
 
 
-void engine::load_extensions( void )
+void engine::loadExtensions( void )
 {
 	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
@@ -145,7 +157,7 @@ void engine::load_extensions( void )
 								ext.begin();
 						itExt != ext.end(); ++itExt )
 				{
-					s_sample_extensions[*itExt] = it->name;
+					s_sampleExtensions[*itExt] = it->name;
 				}
 			}
 		}

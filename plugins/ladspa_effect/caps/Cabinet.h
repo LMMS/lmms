@@ -54,6 +54,7 @@ typedef struct {
 } Model32;
 
 class CabinetI
+: public Plugin
 {
 	public:
 		d_sample gain;
@@ -66,18 +67,13 @@ class CabinetI
 		cabinet_float * a, * b;
 		cabinet_float x[16], y[16];
 		
-		d_sample normal;
-
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [4];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
+		void init();
 
 		void activate();
 
@@ -96,6 +92,7 @@ class CabinetI
  * 44.1 / 48 / 88.2 / 96 kHz sample rates */
 
 class CabinetII
+: public Plugin
 {
 	public:
 		d_sample gain;
@@ -113,19 +110,15 @@ class CabinetII
 		cabinet_float * a, * b;
 		cabinet_float x[32], y[32];
 		
-		d_sample normal;
-
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [4];
 
 		d_sample adding_gain;
 
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)

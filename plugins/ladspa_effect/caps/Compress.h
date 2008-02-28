@@ -32,6 +32,7 @@
 #include "dsp/util.h"
 
 class Compress
+: public Plugin
 {
 	public:
 		double fs;
@@ -43,16 +44,12 @@ class Compress
 		int count;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [8];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init() {}
 		void activate()
 			{ 
 				rms.reset();

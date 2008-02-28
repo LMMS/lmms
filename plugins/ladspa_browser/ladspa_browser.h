@@ -2,7 +2,7 @@
  * ladspa_browser.h - dialog to display information about installed LADSPA
  *                    plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,14 +35,12 @@
 class tabBar;
 
 
-class ladspaBrowser : public tool
+class ladspaBrowserView : public toolView
 {
 	Q_OBJECT
 public:
-	ladspaBrowser( void );
-	virtual ~ladspaBrowser();
-
-	virtual QString nodeName( void ) const;
+	ladspaBrowserView( tool * _tool );
+	virtual ~ladspaBrowserView();
 
 
 public slots:
@@ -55,6 +53,22 @@ private:
 
 	QWidget * createTab( QWidget * _parent, const QString & _txt,
 						ladspaPluginType _type );
+
+} ;
+
+
+class ladspaBrowser : public tool
+{
+public:
+	ladspaBrowser( void );
+	virtual ~ladspaBrowser();
+
+	virtual pluginView * instantiateView( QWidget * )
+	{
+		return( new ladspaBrowserView( this ) );
+	}
+
+	virtual QString nodeName( void ) const;
 
 } ;
 

@@ -31,15 +31,11 @@
 
 
 
-
-class liveTool : public tool
+class liveToolView : public toolView
 {
-	Q_OBJECT
 public:
-	liveTool( void );
-	virtual ~liveTool();
-
-	virtual QString nodeName( void ) const;
+	liveToolView( tool * _tool );
+	virtual ~liveToolView();
 
 
 protected:
@@ -52,6 +48,23 @@ protected:
 
 private:
 	void toggleInstrument( int _n );
+
+} ;
+
+
+
+
+class liveTool : public tool
+{
+public:
+	liveTool( model * _parent );
+	virtual ~liveTool();
+
+	virtual QString nodeName( void ) const;
+	virtual pluginView * instantiateView( QWidget * )
+	{
+		return( new liveToolView( this ) );
+	}
 
 } ;
 

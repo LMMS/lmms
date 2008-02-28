@@ -4,7 +4,7 @@
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,10 +34,9 @@
 #include <QtGui/QPainter>
 
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
-#include "knob.h"
 #include "templates.h"
 #include "tooltip.h"
 
@@ -49,26 +48,10 @@ QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
 
 
-surroundArea::surroundArea( QWidget * _parent, const QString & _name,
-							track * _track ) :
+surroundArea::surroundArea( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	m_sndSrcPos( QPoint() )
+	modelView( new surroundAreaModel( NULL, NULL, TRUE ) )
 {
-	m_position_x = new knob( knobDark_28, NULL, tr ( "Surround area X" ),
-								_track );
-	m_position_x->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
-	m_position_x->setInitValue( 0.0f );
-
-	m_position_y = new knob( knobDark_28, NULL, tr ( "Surround area Y" ),
-								_track );
-	m_position_y->setRange( -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1.0f );
-	m_position_y->setInitValue( 0.0f );
-
-	connect( m_position_x, SIGNAL( valueChanged( float ) ), this,
-					SLOT( updatePositionX( void ) ) );
-	connect( m_position_y, SIGNAL( valueChanged( float ) ), this,
-					SLOT( updatePositionY( void ) ) );
-
 	if( s_backgroundArtwork == NULL )
 	{
 		s_backgroundArtwork = new QPixmap( embed::getIconPixmap(
@@ -87,69 +70,9 @@ surroundArea::surroundArea( QWidget * _parent, const QString & _name,
 
 surroundArea::~surroundArea()
 {
-	delete m_position_x;
-	delete m_position_y;
 }
 
 
-
-
-volumeVector surroundArea::getVolumeVector( float _v_scale ) const
-{
-	volumeVector v = { { _v_scale, _v_scale
-#ifndef DISABLE_SURROUND
-					, _v_scale, _v_scale
-#endif
-			} } ;
-
-	if( m_sndSrcPos.x() >= 0 )
-	{
-		v.vol[0] *= 1.0f - m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
-#ifndef DISABLE_SURROUND
-		v.vol[2] *= 1.0f - m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
-#endif
-	}
-	else
-	{
-		v.vol[1] *= 1.0f + m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
-#ifndef DISABLE_SURROUND
-		v.vol[3] *= 1.0f + m_sndSrcPos.x() / (float)SURROUND_AREA_SIZE;
-#endif
-	}
-
-	if( m_sndSrcPos.y() >= 0 )
-	{
-		v.vol[0] *= 1.0f - m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
-		v.vol[1] *= 1.0f - m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
-	}
-#ifndef DISABLE_SURROUND
-	else
-	{
-		v.vol[2] *= 1.0f + m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
-		v.vol[3] *= 1.0f + m_sndSrcPos.y() / (float)SURROUND_AREA_SIZE;
-	}
-#endif
-
-	return( v );
-}
-
-
-
-
-void surroundArea::setValue( const QPoint & _p )
-{
-	if( tLimit( _p.x(), -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE ) !=
-								_p.x() ||
-	    tLimit( _p.y(), -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE ) != _p.y() )
-	{
-		m_sndSrcPos = QPoint( 0, 0 );
-	}
-	else
-	{
-		m_sndSrcPos = _p;
-	}
-	update();
-}
 
 
 
@@ -165,11 +88,11 @@ void surroundArea::contextMenuEvent( QContextMenuEvent * )
 	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &X in automation editor" ),
-					m_position_x->getAutomationPattern(),
+					model()->automationPatternX(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "Open &Y in automation editor" ),
-					m_position_y->getAutomationPattern(),
+					model()->automationPatternY(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -191,9 +114,9 @@ void surroundArea::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation ) );
 	}
-	const int x = ( width() + m_sndSrcPos.x() * ( width() - 4 ) /
+	const int x = ( width() + model()->x() * ( width() - 4 ) /
 						SURROUND_AREA_SIZE ) / 2;
-	const int y = ( height() + m_sndSrcPos.y() * ( height() - 4 ) /
+	const int y = ( height() + model()->y() * ( height() - 4 ) /
 						SURROUND_AREA_SIZE ) / 2;
 	p.setPen( QColor( 64, 255, 64 ) );
 	p.drawPoint( x, y - 1 );
@@ -213,15 +136,17 @@ void surroundArea::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
+	model()->prepareJournalEntryFromOldVal();
+
 	const int w = width();//s_backgroundArtwork->width();
 	const int h = height();//s_backgroundArtwork->height();
 	if( _me->x() > 1 && _me->x() < w-1 && _me->y() > 1 && _me->y() < h-1 )
 	{
-		m_sndSrcPos.setX( ( _me->x() * 2 - w ) * SURROUND_AREA_SIZE /
+		model()->setX( ( _me->x() * 2 - w ) * SURROUND_AREA_SIZE /
 								( w - 4 ) );
-		m_sndSrcPos.setY( ( _me->y() * 2 - h ) * SURROUND_AREA_SIZE /
+		model()->setY( ( _me->y() * 2 - h ) * SURROUND_AREA_SIZE /
 								( h - 4 ) );
-		update();
+		//update();
 		if( _me->button() != Qt::NoButton )
 		{
 			QApplication::setOverrideCursor( Qt::BlankCursor );
@@ -233,11 +158,6 @@ void surroundArea::mousePressEvent( QMouseEvent * _me )
 		int y = tLimit( _me->y(), 2, h - 2 );
 		QCursor::setPos( mapToGlobal( QPoint( x, y ) ) );
 	}
-
-	m_position_x->setValue( m_sndSrcPos.x() );
-	m_position_y->setValue( m_sndSrcPos.y() );
-
-	emit valueChanged( m_sndSrcPos );
 }
 
 
@@ -253,58 +173,104 @@ void surroundArea::mouseMoveEvent( QMouseEvent * _me )
 
 void surroundArea::mouseReleaseEvent( QMouseEvent * )
 {
+	model()->addJournalEntryFromOldToCurVal();
 	QApplication::restoreOverrideCursor();
 }
 
 
 
 
-void surroundArea::updatePositionX( void )
+
+
+
+
+surroundAreaModel::surroundAreaModel( ::model * _parent, track * _track,
+						bool _default_constructed ) :
+	model( _parent, _default_constructed ),
+	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1, _parent ),
+	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1, _parent )
 {
-	m_sndSrcPos.setX( (int)roundf( m_position_x->value() ) );
-	update();
+	m_posX.setTrack( _track );
+	m_posY.setTrack( _track );
+	connect( &m_posX, SIGNAL( dataChanged() ),
+					this, SIGNAL( dataChanged() ) );
+	connect( &m_posY, SIGNAL( dataChanged() ),
+					this, SIGNAL( dataChanged() ) );
 }
 
 
 
 
-void surroundArea::updatePositionY( void )
+volumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
 {
-	m_sndSrcPos.setY( (int)roundf( m_position_y->value() ) );
-	update();
+	volumeVector v = { { _v_scale, _v_scale
+#ifndef DISABLE_SURROUND
+					, _v_scale, _v_scale
+#endif
+			} } ;
+
+	if( x() >= 0 )
+	{
+		v.vol[0] *= 1.0f - x() / (float)SURROUND_AREA_SIZE;
+#ifndef DISABLE_SURROUND
+		v.vol[2] *= 1.0f - x() / (float)SURROUND_AREA_SIZE;
+#endif
+	}
+	else
+	{
+		v.vol[1] *= 1.0f + x() / (float)SURROUND_AREA_SIZE;
+#ifndef DISABLE_SURROUND
+		v.vol[3] *= 1.0f + x() / (float)SURROUND_AREA_SIZE;
+#endif
+	}
+
+	if( y() >= 0 )
+	{
+		v.vol[0] *= 1.0f - y() / (float)SURROUND_AREA_SIZE;
+		v.vol[1] *= 1.0f - y() / (float)SURROUND_AREA_SIZE;
+	}
+#ifndef DISABLE_SURROUND
+	else
+	{
+		v.vol[2] *= 1.0f + y() / (float)SURROUND_AREA_SIZE;
+		v.vol[3] *= 1.0f + y() / (float)SURROUND_AREA_SIZE;
+	}
+#endif
+
+	return( v );
 }
 
 
 
-
-void FASTCALL surroundArea::saveSettings( QDomDocument & _doc,
+void surroundAreaModel::saveSettings( QDomDocument & _doc,
 							QDomElement & _this,
 							const QString & _name )
 {
-	m_position_x->saveSettings( _doc, _this, _name + "-x" );
-	m_position_y->saveSettings( _doc, _this, _name + "-y" );
+	m_posX.saveSettings( _doc, _this, _name + "-x" );
+	m_posY.saveSettings( _doc, _this, _name + "-y" );
 }
 
 
 
 
-void FASTCALL surroundArea::loadSettings( const QDomElement & _this,
+void surroundAreaModel::loadSettings( const QDomElement & _this,
 							const QString & _name )
 {
 	if( _this.hasAttribute( _name ) )
 	{
-		int i = _this.attribute( _name ).toInt();
-		setValue( QPoint( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE,
-					( i >> 16 ) - 2 * SURROUND_AREA_SIZE) );
-		m_position_x->setValue( m_sndSrcPos.x() );
-		m_position_y->setValue( m_sndSrcPos.y() );
+		const int i = _this.attribute( _name ).toInt();
+		m_posX.setValue( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE );
+		m_posY.setValue( ( i >> 16 ) - 2 * SURROUND_AREA_SIZE );
 	}
 	else
 	{
-		m_position_x->loadSettings( _this, _name + "-x" );
-		m_position_y->loadSettings( _this, _name + "-y" );
+		m_posX.loadSettings( _this, _name + "-x" );
+		m_posY.loadSettings( _this, _name + "-y" );
 	}
 }
+
+
+
 
 
 

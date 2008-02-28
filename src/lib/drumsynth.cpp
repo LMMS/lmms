@@ -27,7 +27,8 @@
 #include "drumsynth.h"
 
 #include <fstream>
-#include <string>
+#include <cstring>
+#include <limits>
 
 #include <math.h>     //sin(), exp(), etc.
 #include <stdio.h>    //sscanf(), sprintf()

@@ -1,7 +1,7 @@
 /*
 	Lorenz.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -33,9 +33,8 @@
 #include "Descriptor.h"
 
 void
-Lorenz::init (double _fs)
+Lorenz::init()
 {
-	fs = _fs;
 	lorenz.init (h = .001, 0.1 * frandom());
 	gain = 0;
 }
@@ -47,11 +46,11 @@ Lorenz::one_cycle (int frames)
 	lorenz.set_rate (*ports[0]);
 
 	double g = (gain == *ports[4]) ? 
-		1 : pow (*ports[4] / gain, 1. / (double) frames);
+		1 : pow (getport(4) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[5];
 
-	d_sample x, sx = *ports[1], sy = *ports[2], sz = *ports[3];
+	d_sample x, sx = getport(1), sy = getport(2), sz = getport(3);
 	
 	for (int i = 0; i < frames; ++i)
 	{
@@ -63,7 +62,7 @@ Lorenz::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[4];
+	gain = getport(4);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -105,9 +104,9 @@ Descriptor<Lorenz>::setup()
 	Label = "Lorenz";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Lorenz - The sound of a Lorenz attractor";
+	Name = CAPS "Lorenz - The sound of a Lorenz attractor";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

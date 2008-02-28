@@ -30,7 +30,7 @@
 
 #include "bb_editor.h"
 #include "engine.h"
-#include "song_editor.h"
+#include "song.h"
 
 #ifdef Q_WS_X11
 
@@ -62,9 +62,9 @@ plugin::descriptor live_tool_plugin_descriptor =
 
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new liveTool );
+	return( new liveTool( _parent ) );
 }
 
 }
@@ -72,8 +72,34 @@ plugin * lmms_plugin_main( void * _data )
 
 
 
-liveTool::liveTool( void ) :
-	tool( &live_tool_plugin_descriptor )
+liveTool::liveTool( model * _parent ) :
+	tool( &live_tool_plugin_descriptor, _parent )
+{
+}
+
+
+
+
+liveTool::~liveTool()
+{
+}
+
+
+
+
+QString liveTool::nodeName( void ) const
+{
+	return( live_tool_plugin_descriptor.name );
+}
+
+
+
+
+
+
+
+liveToolView::liveToolView( tool * _tool ) :
+	toolView( _tool )
 {
 	const QPixmap background = PLUGIN_NAME::getIconPixmap( "artwork" );
 
@@ -103,39 +129,31 @@ liveTool::liveTool( void ) :
 
 
 
-liveTool::~liveTool()
+liveToolView::~liveToolView()
 {
 }
 
 
 
 
-QString liveTool::nodeName( void ) const
-{
-	return( live_tool_plugin_descriptor.name );
-}
-
-
-
-
-void liveTool::keyPressEvent( QKeyEvent * _ke )
+void liveToolView::keyPressEvent( QKeyEvent * _ke )
 {
 	switch( _ke->key() )
 	{
 		case Qt::Key_Space:
-			if( engine::getSongEditor()->playing() )
+			if( engine::getSong()->playing() )
 			{
-				engine::getSongEditor()->pause();
+				engine::getSong()->pause();
 			}
-			else if( engine::getSongEditor()->paused() &&
-				engine::getSongEditor()->playMode() ==
-							songEditor::PLAY_SONG )
+			else if( engine::getSong()->paused() &&
+				engine::getSong()->playMode() ==
+							song::Mode_PlaySong )
 			{
-				engine::getSongEditor()->resumeFromPause();
+				engine::getSong()->resumeFromPause();
 			}
 			else
 			{
-				engine::getSongEditor()->play();
+				engine::getSong()->play();
 			}
 			break;
 
@@ -148,7 +166,7 @@ void liveTool::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void liveTool::mousePressEvent( QMouseEvent * _me )
+void liveToolView::mousePressEvent( QMouseEvent * _me )
 {
 	// MDI window gets focus otherwise
 	setFocus();
@@ -159,7 +177,7 @@ void liveTool::mousePressEvent( QMouseEvent * _me )
 
 
 #ifdef Q_WS_X11
-bool liveTool::x11Event( XEvent * _xe )
+bool liveToolView::x11Event( XEvent * _xe )
 {
 	if( _xe->type == KeyPress )
 	{
@@ -178,14 +196,15 @@ bool liveTool::x11Event( XEvent * _xe )
 
 
 
-void liveTool::toggleInstrument( int _n )
+void liveToolView::toggleInstrument( int _n )
 {
-	if( _n < engine::getBBEditor()->tracks().count() )
+	if( _n < engine::getBBTrackContainer()->tracks().count() )
 	{
-		track * t = engine::getBBEditor()->tracks().at( _n );
+		track * t = engine::getBBTrackContainer()->tracks().at( _n );
 		t->setMuted( !t->muted() );
 	}
 }
+
 
 
 

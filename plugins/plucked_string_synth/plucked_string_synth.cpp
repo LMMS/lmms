@@ -59,30 +59,10 @@ plugin::descriptor pluckedstringsynth_plugin_descriptor =
 // add distortion
 
 pluckedStringSynth::pluckedStringSynth( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &pluckedstringsynth_plugin_descriptor )
+	instrument( _instrument_track, &pluckedstringsynth_plugin_descriptor ),
+	m_pickModel( 0.0f, 0.0f, 0.5f, 0.005f, this ),
+	m_pickupModel( 0.05f, 0.0f, 0.5f, 0.005f, this )
 {
-	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ),
-							_instrument_track );
-	m_pickKnob->setRange( 0.0f, 0.5f, 0.005f );
- 	m_pickKnob->setInitValue( 0.0f );
-	m_pickKnob->move( 86, 134 );
-	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
-
-	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ),
-							_instrument_track );
-	m_pickupKnob->setRange( 0.0f, 0.5f, 0.005f );
-	m_pickupKnob->setInitValue( 0.05f );
-	m_pickupKnob->move( 138, 134 );
-	m_pickupKnob->setHintText( tr( "Pickup position:" ) + " ", "" );
-#ifdef QT4
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	setPalette( pal );
-#else
-	setErasePixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
-#endif
 }
 
 
@@ -98,8 +78,8 @@ pluckedStringSynth::~pluckedStringSynth()
 void pluckedStringSynth::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	m_pickKnob->saveSettings( _doc, _this, "pick" );
-	m_pickupKnob->saveSettings( _doc, _this, "pickup" );
+	m_pickModel.saveSettings( _doc, _this, "pick" );
+	m_pickupModel.saveSettings( _doc, _this, "pickup" );
 }
 
 
@@ -107,8 +87,8 @@ void pluckedStringSynth::saveSettings( QDomDocument & _doc,
 
 void pluckedStringSynth::loadSettings( const QDomElement & _this )
 {
-	m_pickKnob->loadSettings( _this, "pick" );
-	m_pickupKnob->loadSettings( _this, "pickup" );
+	m_pickModel.loadSettings( _this, "pick" );
+	m_pickupModel.loadSettings( _this, "pickup" );
 }
 
 
@@ -127,8 +107,8 @@ void pluckedStringSynth::playNote( notePlayHandle * _n, bool )
 	if ( _n->totalFramesPlayed() == 0 )
 	{
 		_n->m_pluginData = new pluckSynth( _n->frequency(),
-					m_pickKnob->value(),
-					m_pickupKnob->value(),
+					m_pickModel.value(),
+					m_pickupModel.value(),
 					engine::getMixer()->sampleRate() );
 	}
 
@@ -159,7 +139,43 @@ void pluckedStringSynth::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
+pluginView * pluckedStringSynth::instantiateView( QWidget * _parent )
+{
+	return( new pluckedStringSynthView( this, _parent ) );
+}
 
+
+pluckedStringSynthView::pluckedStringSynthView( instrument * _instrument,
+							QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
+{
+	m_pickKnob = new knob( knobDark_28, this, tr( "Pick position" ) );
+	m_pickKnob->move( 86, 134 );
+	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
+
+	m_pickupKnob = new knob( knobDark_28, this, tr( "Pickup position" ) );
+	m_pickupKnob->move( 138, 134 );
+	m_pickupKnob->setHintText( tr( "Pickup position:" ) + " ", "" );
+	
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
+								"artwork" ) );
+	setPalette( pal );
+}
+
+
+pluckedStringSynthView::~pluckedStringSynthView()
+{
+}
+
+
+void pluckedStringSynthView::modelChanged( void )
+{
+	pluckedStringSynth * p = castModel<pluckedStringSynth>();
+	m_pickKnob->setModel( &p->m_pickModel );
+	m_pickupKnob->setModel( &p->m_pickupModel );
+}
 
 
 pluckSynth::delayLine * FASTCALL pluckSynth::initDelayLine( int _len )
@@ -250,7 +266,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new pluckedStringSynth(
 				static_cast<instrumentTrack *>( _data ) ) );

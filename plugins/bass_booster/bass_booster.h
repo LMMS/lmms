@@ -1,7 +1,7 @@
 /*
  * bass_booster.h - bass-booster-effect-plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,34 +33,32 @@
 #include "effect_lib.h"
 #include "engine.h"
 #include "main_window.h"
-#include "bassbooster_control_dialog.h"
+#include "bassbooster_controls.h"
 
 
 
 class bassBoosterEffect : public effect
 {
 public:
-	bassBoosterEffect( const descriptor::subPluginFeatures::key * _key );
+	bassBoosterEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key );
 	virtual ~bassBoosterEffect();
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
 							const fpp_t _frames );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "bassboostereffect" );
-	}
 
-	virtual inline effectControlDialog * createControlDialog( track * )
+	virtual effectControls * getControls( void )
 	{
-		return( new bassBoosterControlDialog(
-					NULL /*engine::getMainWindow()->workspace()*/,
-								this ) );
+		return( &m_bbControls );
 	}
 
 
 private:
 	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost<> > m_bbFX;
 
-	friend class bassBoosterControlDialog;
+	bassBoosterControls m_bbControls;
+
+	friend class bassBoosterControls;
+
 } ;
 
 

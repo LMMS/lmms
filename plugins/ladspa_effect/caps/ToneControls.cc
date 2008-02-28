@@ -1,7 +1,7 @@
 /*
 	ToneControls.cc
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 

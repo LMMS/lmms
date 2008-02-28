@@ -24,56 +24,89 @@
 #define _VIBED_STRINGS_H
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "sample_buffer.h"
 #include "graph.h"
+#include "knob.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
-#include "impulse_editor.h"
-#include "lcd_spinbox.h"
+#include "volume_knob.h"
 #include "nine_button_selector.h"
 
-class knob;
+class vibedView;
 class notePlayHandle;
-class volumeKnob;
-
 
 class vibed : public instrument
 {
 	Q_OBJECT
-			
+
 public:
 	vibed( instrumentTrack * _channel_track );
 	virtual ~vibed();
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
+					bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-				QDomElement & _parent );
+					QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
+
+	virtual pluginView * instantiateView( QWidget * _parent );
+
+
+private:
+	QList<knobModel*> m_pickKnobs;
+	QList<knobModel*> m_pickupKnobs;
+	QList<knobModel*> m_stiffnessKnobs;
+	QList<knobModel*> m_volumeKnobs;
+	QList<knobModel*> m_panKnobs;
+	QList<knobModel*> m_detuneKnobs;
+	QList<knobModel*> m_randomKnobs;
+	QList<knobModel*> m_lengthKnobs;
+	QList<boolModel*> m_powerButtons;
+	QList<graphModel*> m_graphs;
+	QList<boolModel*> m_impulses;
+	QList<nineButtonSelectorModel*> m_harmonics;
+	
+	static const int m_sampleLength = 128;
+
+	friend class vibedView;
+} ;
+
+
+
+class vibedView : public instrumentView
+{
+	Q_OBJECT
+public:
+	vibedView( instrument * _instrument,
+					QWidget * _parent );
+	virtual ~vibedView() {};
 
 public slots:
 	void showString( Uint8 _string );
 	void contextMenuEvent( QContextMenuEvent * );
 	void displayHelp( void );
-		
+
+protected slots:
+	void sinWaveClicked( void );
+	void triangleWaveClicked( void );
+	void sawWaveClicked( void );
+	void sqrWaveClicked( void );
+	void noiseWaveClicked( void );
+	void usrWaveClicked( void );
+	void smoothClicked( void );
+	void normalizeClicked( void );
+
 private:
-	QList<knob*> m_pickKnobs;
-	QList<knob*> m_pickupKnobs;
-	QList<knob*> m_stiffnessKnobs;
-	QList<volumeKnob*> m_volumeKnobs;
-	QList<knob*> m_panKnobs;
-	QList<knob*> m_detuneKnobs;
-	QList<knob*> m_randomKnobs;
-	QList<knob*> m_lengthKnobs;
-	QList<impulseEditor*> m_editors;
-	QList<ledCheckBox*> m_impulses;
-	QList<nineButtonSelector*> m_harmonics;
-	
+	virtual void modelChanged( void );
+
+
+	// String-related
 	knob * m_pickKnob;
 	knob * m_pickupKnob;
 	knob * m_stiffnessKnob;
@@ -82,15 +115,25 @@ private:
 	knob * m_detuneKnob;
 	knob * m_randomKnob;
 	knob * m_lengthKnob;
-	impulseEditor * m_editor;
-	
-	nineButtonSelector * m_stringSelector;
+	graph * m_graph;
 	nineButtonSelector * m_harmonic;
-	
 	ledCheckBox * m_impulse;
-	
-	int m_sampleLength;
-} ;
+	ledCheckBox * m_power;
 
+	// Not in model
+	nineButtonSelector * m_stringSelector;
+	pixmapButton * m_smoothBtn;
+	pixmapButton * m_normalizeBtn;
+
+	// From impulse editor
+	pixmapButton * m_sinWaveBtn;
+	pixmapButton * m_triangleWaveBtn;
+	pixmapButton * m_sqrWaveBtn;
+	pixmapButton * m_sawWaveBtn;
+	pixmapButton * m_whiteNoiseWaveBtn;
+	pixmapButton * m_usrWaveBtn;
+
+
+};
 
 #endif

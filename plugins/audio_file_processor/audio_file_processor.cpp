@@ -31,18 +31,16 @@
 
 
 #include "audio_file_processor.h"
+#include "automatable_model_templates.h"
 #include "engine.h"
-#include "song_editor.h"
+#include "song.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
 #include "gui_templates.h"
-#include "pixmap_button.h"
-#include "knob.h"
 #include "tooltip.h"
 #include "string_pair_drag.h"
 #include "mmp.h"
-#include "volume_knob.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -70,120 +68,31 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 }
 
 
-QPixmap * audioFileProcessor::s_artwork = NULL;
 
 
 
-audioFileProcessor::audioFileProcessor( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &audiofileprocessor_plugin_descriptor )
+audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
+	m_sampleBuffer(),
+	m_ampModel( 100, 0, 500, 1, this ),
+	m_startPointModel( 0, 0, 1, 0.0000001f, this ),
+	m_endPointModel( 1, 0, 1, 0.0000001f, this ),
+	m_reverseModel( FALSE, this ),
+	m_loopModel( FALSE, this )
 {
-	connect( &m_sampleBuffer, SIGNAL( sampleUpdated() ), this,
-						SLOT( sampleUpdated() ) );
-
-	if( s_artwork == NULL )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
-
-	m_openAudioFileButton = new pixmapButton( this, NULL, NULL );
-	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_openAudioFileButton->move( 200, 90 );
-	m_openAudioFileButton->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
-	m_openAudioFileButton->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
-	connect( m_openAudioFileButton, SIGNAL( clicked() ), this,
-						SLOT( openAudioFile() ) );
-	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
-
-	m_openAudioFileButton->setWhatsThis(
-		tr( "Click here, if you want to open another audio-file. After "
-			"clicking on this button, a file-open-dialog appears "
-			"and you can select your file. Settings like Looping-"
-			"Mode, start- and end-point, amplify-value and so on "
-			"are not reset, so please don't wonder if your sample "
-			"doesn't sound like the original one..." ) );
-
-	m_reverseButton = new pixmapButton( this, NULL, NULL );
-	m_reverseButton->setCheckable( TRUE );
-	m_reverseButton->move( 160, 124 );
-	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"reverse_on" ) );
-	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"reverse_off" ) );
-	connect( m_reverseButton, SIGNAL( toggled( bool ) ), this,
-					SLOT( reverseBtnToggled( bool ) ) );
-	toolTip::add( m_reverseButton, tr( "Reverse sample" ) );
-	m_reverseButton->setWhatsThis(
-		tr( "If you enable this button, the whole sample is reversed. "
-			"This is useful for cool effects, e.g. a reversed "
-			"crash." ) );
-
-	m_loopButton = new pixmapButton( this, tr( "Loop" ), _channel_track );
-	m_loopButton->setCheckable( TRUE );
-	m_loopButton->move( 180, 124 );
-	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_on" ) );
-	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-								"loop_off" ) );
-	toolTip::add( m_loopButton,
-				tr( "Loop sample at start- and end-point" ) );
-	m_loopButton->setWhatsThis(
-		tr( "Here you can set, whether Looping-Mode is enabled. If "
-			"enabled, AudioFileProcessor loops between start- and "
-			"end-point of a sample until the whole note is played. "
-			"This is useful for things like string- and choir-"
-			"samples." ) );
-
-	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ), NULL );
-	m_ampKnob->setRange( 0, 500, 1.0f );
-	m_ampKnob->move( 6, 114 );
-	m_ampKnob->setInitValue( 100.0f );
-	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
-	m_ampKnob->setLabel( tr( "AMP" ) );
-	connect( m_ampKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( ampKnobChanged( float ) ) );
-	m_ampKnob->setWhatsThis(
-		tr( "With this knob you can set the amplify-ratio. When you "
-			"set a value of 100% your sample isn't changed. "
-			"Otherwise it will be amplified up or down (your "
-			"actual sample-file isn't touched!)" ) );
-
-	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ),
-							_channel_track );
-	m_startKnob->setRange( 0.0f, 1.0f, 0.00001f );
-	m_startKnob->move( 46, 114 );
-	m_startKnob->setInitValue( 0.0f );
-	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
-	m_startKnob->setLabel( tr( "START" ) );
-	connect( m_startKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( startKnobChanged( float ) ) );
-	m_startKnob->setWhatsThis(
-		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should begin playing your sample. "
-			"If you enable Looping-Mode, this is the point to "
-			"which AudioFileProcessor returns if a note is longer "
-			"than the sample between start- and end-point." ) );
-
-	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ),
-							_channel_track );
-	m_endKnob->setRange( 0.0f, 1.0f, 0.00001f );
-	m_endKnob->move( 84, 114 );
-	m_endKnob->setInitValue( 1.0f );
-	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
-	m_endKnob->setLabel( tr( "END" ) );
-	connect( m_endKnob, SIGNAL( valueChanged( float ) ), this,
-					SLOT( endKnobChanged( float ) ) );
-	m_endKnob->setWhatsThis(
-		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should stop playing your sample. "
-			"If you enable Looping-Mode, this is the point where "
-			"AudioFileProcessor returns if a note is longer than "
-			"the sample between start- and end-point." ) );
-
-	setAcceptDrops( TRUE );
+	connect( &m_reverseModel, SIGNAL( dataChanged() ),
+				this, SLOT( reverseModelChanged() ) );
+	connect( &m_ampModel, SIGNAL( dataChanged() ),
+				this, SLOT( ampModelChanged() ) );
+	connect( &m_startPointModel, SIGNAL( dataChanged() ),
+				this, SLOT( startPointModelChanged() ) );
+	connect( &m_endPointModel, SIGNAL( dataChanged() ),
+				this, SLOT( endPointModelChanged() ) );
+	m_ampModel.setTrack( _instrument_track );
+	m_startPointModel.setTrack( _instrument_track );
+	m_endPointModel.setTrack( _instrument_track );
+	m_reverseModel.setTrack( _instrument_track );
+	m_loopModel.setTrack( _instrument_track );
 }
 
 
@@ -196,6 +105,37 @@ audioFileProcessor::~audioFileProcessor()
 
 
 
+void audioFileProcessor::playNote( notePlayHandle * _n, bool )
+{
+	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	sampleFrame * buf = new sampleFrame[frames];
+
+	if( !_n->m_pluginData )
+	{
+		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
+	}
+
+	if( m_sampleBuffer.play( buf, (handleState *)_n->m_pluginData,
+					frames, _n->frequency(),
+						m_loopModel.value() ) == TRUE )
+	{
+		applyRelease( buf, _n );
+		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
+	}
+	delete[] buf;
+}
+
+
+
+
+void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
+{
+	delete (handleState *)_n->m_pluginData;
+}
+
+
+
+
 void audioFileProcessor::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
@@ -203,13 +143,14 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	if( m_sampleBuffer.audioFile() == "" )
 	{
 		QString s;
-		_this.setAttribute( "sampledata", m_sampleBuffer.toBase64( s ) );
+		_this.setAttribute( "sampledata",
+						m_sampleBuffer.toBase64( s ) );
 	}
-	m_reverseButton->saveSettings( _doc, _this, "reversed" );
-	m_loopButton->saveSettings( _doc, _this, "looped" );
-	m_ampKnob->saveSettings( _doc, _this, "amp" );
-	m_startKnob->saveSettings( _doc, _this, "sframe" );
-	m_endKnob->saveSettings( _doc, _this, "eframe" );
+	m_reverseModel.saveSettings( _doc, _this, "reversed" );
+	m_loopModel.saveSettings( _doc, _this, "looped" );
+	m_ampModel.saveSettings( _doc, _this, "amp" );
+	m_startPointModel.saveSettings( _doc, _this, "sframe" );
+	m_endPointModel.saveSettings( _doc, _this, "eframe" );
 }
 
 
@@ -225,14 +166,14 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	{
 		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
 	}
-	m_reverseButton->loadSettings( _this, "reversed" );
-	m_loopButton->loadSettings( _this, "looped" );
-	m_ampKnob->loadSettings( _this, "amp" );
-	m_startKnob->loadSettings( _this, "sframe" );
-	m_endKnob->loadSettings( _this, "eframe" );
+	m_reverseModel.loadSettings( _this, "reversed" );
+	m_loopModel.loadSettings( _this, "looped" );
+	m_ampModel.loadSettings( _this, "amp" );
+	m_startPointModel.loadSettings( _this, "sframe" );
+	m_endPointModel.loadSettings( _this, "eframe" );
 
-	startKnobChanged( m_startKnob->value()  );
-	endKnobChanged( m_endKnob->value() );
+	startPointModelChanged();
+	endPointModelChanged();
 }
 
 
@@ -275,7 +216,16 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 
 
 
-void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename )
+pluginView * audioFileProcessor::instantiateView( QWidget * _parent )
+{
+	return( new audioFileProcessorView( this, _parent ) );
+}
+
+
+
+
+void audioFileProcessor::setAudioFile( const QString & _audio_file,
+								bool _rename )
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename && 
@@ -287,56 +237,217 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file, bool _rename
 		getInstrumentTrack()->setName( QFileInfo( _audio_file
 								).fileName() );
 	}
-	// else we don't touch the channel-name, because the user named it self
+	// else we don't touch the track-name, because the user named it self
 
 	m_sampleBuffer.setAudioFile( _audio_file );
-	startKnobChanged( m_startKnob->value()  );
-	endKnobChanged( m_endKnob->value() );
+	startPointModelChanged();
+	endPointModelChanged();
+}
+
+
+
+
+void audioFileProcessor::reverseModelChanged( void )
+{
+	m_sampleBuffer.setReversed( m_reverseModel.value() );
+}
+
+
+
+
+void audioFileProcessor::ampModelChanged( void )
+{
+	m_sampleBuffer.setAmplification( m_ampModel.value() / 100.0f );
+}
+
+
+
+
+void audioFileProcessor::startPointModelChanged( void )
+{
+	if( m_startPointModel.value() < m_endPointModel.value() )
+	{
+		m_sampleBuffer.setStartFrame( static_cast<Uint32>(
+					m_startPointModel.value() *
+						m_sampleBuffer.frames() ) );
+	}
+	else
+	{
+		m_startPointModel.setValue( m_endPointModel.value() - 0.01f );
+	}
+	emit dataChanged();
+}
+
+
+
+
+void audioFileProcessor::endPointModelChanged( void )
+{
+	if( m_endPointModel.value() > m_startPointModel.value() )
+	{
+		if( m_endPointModel.value() * m_sampleBuffer.frames() >= 1.0f )
+		{
+			m_sampleBuffer.setEndFrame( static_cast<Uint32>(
+					m_endPointModel.value() *
+						m_sampleBuffer.frames() ) - 1 );
+		}
+		else
+		{
+			m_sampleBuffer.setEndFrame( 0 );
+		}
+	}
+	else
+	{
+		m_endPointModel.setValue( m_startPointModel.value() + 0.01f );
+	}
+	emit dataChanged();
 }
 
 
 
 
 
-void audioFileProcessor::playNote( notePlayHandle * _n, bool )
-{
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
-	if( !_n->m_pluginData )
+
+
+audioFileProcessor::subPluginFeatures::subPluginFeatures(
+						plugin::PluginTypes _type ) :
+	plugin::descriptor::subPluginFeatures( _type )
+{
+}
+
+
+
+
+const QStringList & audioFileProcessor::subPluginFeatures::supportedExtensions(
+									void )
+{
+	static QStringList extensions = QStringList()
+				<< "wav" << "ogg" << "ds" << "spx" << "au"
+				<< "voc" << "aif" << "aiff" << "flac" << "raw";
+	return( extensions );
+}
+
+
+
+
+
+
+
+QPixmap * audioFileProcessorView::s_artwork = NULL;
+
+
+audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
+							QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
+{
+	if( s_artwork == NULL )
 	{
-		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
+		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
+								"artwork" ) );
 	}
 
-	if( m_sampleBuffer.play( buf, (handleState *)_n->m_pluginData,
-					frames, _n->frequency(),
-					m_loopButton->isChecked() ) == TRUE )
-	{
-		applyRelease( buf, _n );
-		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-	}
-	delete[] buf;
+	m_openAudioFileButton = new pixmapButton( this, NULL );
+	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_openAudioFileButton->move( 200, 90 );
+	m_openAudioFileButton->setActiveGraphic( embed::getIconPixmap(
+							"project_open_down" ) );
+	m_openAudioFileButton->setInactiveGraphic( embed::getIconPixmap(
+							"project_open" ) );
+	connect( m_openAudioFileButton, SIGNAL( clicked() ),
+					this, SLOT( openAudioFile() ) );
+	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
+
+	m_openAudioFileButton->setWhatsThis(
+		tr( "Click here, if you want to open another audio-file. After "
+			"clicking on this button, a file-open-dialog appears "
+			"and you can select your file. Settings like Looping-"
+			"Mode, start- and end-point, amplify-value and so on "
+			"are not reset, so please don't wonder if your sample "
+			"doesn't sound like the original one..." ) );
+
+	m_reverseButton = new pixmapButton( this, NULL );
+	m_reverseButton->setCheckable( TRUE );
+	m_reverseButton->move( 160, 124 );
+	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"reverse_on" ) );
+	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"reverse_off" ) );
+	toolTip::add( m_reverseButton, tr( "Reverse sample" ) );
+	m_reverseButton->setWhatsThis(
+		tr( "If you enable this button, the whole sample is reversed. "
+			"This is useful for cool effects, e.g. a reversed "
+			"crash." ) );
+
+	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton->setCheckable( TRUE );
+	m_loopButton->move( 180, 124 );
+	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"loop_on" ) );
+	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+								"loop_off" ) );
+	toolTip::add( m_loopButton,
+				tr( "Loop sample at start- and end-point" ) );
+	m_loopButton->setWhatsThis(
+		tr( "Here you can set, whether Looping-Mode is enabled. If "
+			"enabled, AudioFileProcessor loops between start- and "
+			"end-point of a sample until the whole note is played. "
+			"This is useful for things like string- and choir-"
+			"samples." ) );
+
+	m_ampKnob = new volumeKnob( knobDark_28, this, tr( "Amplify" ) );
+	m_ampKnob->move( 6, 114 );
+	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
+	m_ampKnob->setLabel( tr( "AMP" ) );
+	m_ampKnob->setWhatsThis(
+		tr( "With this knob you can set the amplify-ratio. When you "
+			"set a value of 100% your sample isn't changed. "
+			"Otherwise it will be amplified up or down (your "
+			"actual sample-file isn't touched!)" ) );
+
+	m_startKnob = new knob( knobDark_28, this, tr( "Start of sample" ) );
+	m_startKnob->move( 46, 114 );
+	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
+	m_startKnob->setLabel( tr( "START" ) );
+	m_startKnob->setWhatsThis(
+		tr( "With this knob you can set the point where "
+			"AudioFileProcessor should begin playing your sample. "
+			"If you enable Looping-Mode, this is the point to "
+			"which AudioFileProcessor returns if a note is longer "
+			"than the sample between start- and end-point." ) );
+
+	m_endKnob = new knob( knobDark_28, this, tr( "End of sample" ) );
+	m_endKnob->move( 84, 114 );
+	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
+	m_endKnob->setLabel( tr( "END" ) );
+	m_endKnob->setWhatsThis(
+		tr( "With this knob you can set the point where "
+			"AudioFileProcessor should stop playing your sample. "
+			"If you enable Looping-Mode, this is the point where "
+			"AudioFileProcessor returns if a note is longer than "
+			"the sample between start- and end-point." ) );
+
+	setAcceptDrops( TRUE );
 }
 
 
 
 
-void audioFileProcessor::deleteNotePluginData( notePlayHandle * _n )
+audioFileProcessorView::~audioFileProcessorView()
 {
-	delete (handleState *)_n->m_pluginData;
 }
 
 
 
 
-void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
+void audioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
 		QString txt = _dee->mimeData()->data(
 						stringPairDrag::mimeType() );
 		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
-							track::SAMPLE_TRACK ) )
+							track::SampleTrack ) )
 		{
 			_dee->acceptProposedAction();
 		}
@@ -358,21 +469,21 @@ void audioFileProcessor::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void audioFileProcessor::dropEvent( QDropEvent * _de )
+void audioFileProcessorView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		setAudioFile( value );
+		castModel<audioFileProcessor>()->setAudioFile( value );
 		_de->accept();
 		return;
 	}
-	else if( type == QString( "tco_%1" ).arg( track::SAMPLE_TRACK ) )
+	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
 		multimediaProject mmp( value, FALSE );
-		setAudioFile( mmp.content().firstChild().toElement().
-							attribute( "src" ) );
+		castModel<audioFileProcessor>()->setAudioFile( mmp.content().
+				firstChild().toElement().attribute( "src" ) );
 		_de->accept();
 		return;
 	}
@@ -383,15 +494,16 @@ void audioFileProcessor::dropEvent( QDropEvent * _de )
 
 
 
-void audioFileProcessor::paintEvent( QPaintEvent * )
+void audioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
+	audioFileProcessor * a = castModel<audioFileProcessor>();
 
  	QString file_name = "";
-	Uint16 idx = m_sampleBuffer.audioFile().length();
+	Uint16 idx = a->m_sampleBuffer.audioFile().length();
 
 	p.setFont( pointSize<8>( font() ) );
 
@@ -402,7 +514,7 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 	while( idx > 0 &&
 		fm.size( Qt::TextSingleLine, file_name + "..." ).width() < 210 )
 	{
-		file_name = m_sampleBuffer.audioFile()[--idx] + file_name;
+		file_name = a->m_sampleBuffer.audioFile()[--idx] + file_name;
 	}
 
 	if( idx > 0 )
@@ -418,11 +530,11 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 	const QRect graph_rect( 4, 174, 241, 70 );
-	const f_cnt_t frames = tMax( m_sampleBuffer.frames(),
+	const f_cnt_t frames = tMax( a->m_sampleBuffer.frames(),
 						static_cast<f_cnt_t>( 1 ) );
-	const Uint16 start_frame_x = m_sampleBuffer.startFrame() *
+	const Uint16 start_frame_x = a->m_sampleBuffer.startFrame() *
 						graph_rect.width() / frames;
-	const Uint16 end_frame_x = m_sampleBuffer.endFrame() *
+	const Uint16 end_frame_x = a->m_sampleBuffer.endFrame() *
 					( graph_rect.width() - 1 ) / frames;
 
 	p.drawLine( start_frame_x + graph_rect.x(), graph_rect.y(),
@@ -437,13 +549,14 @@ void audioFileProcessor::paintEvent( QPaintEvent * )
 
 
 
-void audioFileProcessor::sampleUpdated( void )
+void audioFileProcessorView::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
 	m_graph.fill( Qt::transparent );
 	QPainter p( &m_graph );
 	p.setPen( QColor( 64, 255, 160 ) );
-	m_sampleBuffer.visualize( p, QRect( 2, 2, m_graph.width() - 4,
+	castModel<audioFileProcessor>()->m_sampleBuffer.
+				visualize( p, QRect( 2, 2, m_graph.width() - 4,
 						m_graph.height() - 4 ) );
 	update();
 }
@@ -451,99 +564,34 @@ void audioFileProcessor::sampleUpdated( void )
 
 
 
-void audioFileProcessor::reverseBtnToggled( bool _on )
+
+void audioFileProcessorView::openAudioFile( void )
 {
-	m_sampleBuffer.setReversed( _on );
-	engine::getSongEditor()->setModified();
-}
-
-
-
-
-void audioFileProcessor::ampKnobChanged( float _val )
-{
-	m_sampleBuffer.setAmplification( _val / 100.0f );
-}
-
-
-
-
-void audioFileProcessor::startKnobChanged( float _new_value )
-{
-	if( _new_value < m_endKnob->value() )
-	{
-		m_sampleBuffer.setStartFrame( static_cast<Uint32>( _new_value *
-						m_sampleBuffer.frames() ) );
-	}
-	else
-	{
-		m_startKnob->setValue( m_endKnob->value() - 0.01f );
-	}
-	update();
-}
-
-
-
-
-void audioFileProcessor::endKnobChanged( float _new_value )
-{
-	if( _new_value > m_startKnob->value() )
-	{
-		if( _new_value * m_sampleBuffer.frames() >= 1.0f )
-		{
-			m_sampleBuffer.setEndFrame( static_cast<Uint32>(
-							_new_value *
-						m_sampleBuffer.frames() ) - 1 );
-		}
-		else
-		{
-			m_sampleBuffer.setEndFrame( 0 );
-		}
-	}
-	else
-	{
-		m_endKnob->setValue( m_startKnob->value() + 0.01f );
-	}
-	update();
-}
-
-
-
-
-void audioFileProcessor::openAudioFile( void )
-{
-	QString af = m_sampleBuffer.openAudioFile();
+	QString af = castModel<audioFileProcessor>()->m_sampleBuffer.
+							openAudioFile();
 	if( af != "" )
 	{
-		setAudioFile( af );
-		engine::getSongEditor()->setModified();
+		castModel<audioFileProcessor>()->setAudioFile( af );
+		engine::getSong()->setModified();
 	}
 }
 
 
 
 
-
-
-
-
-audioFileProcessor::subPluginFeatures::subPluginFeatures(
-						plugin::pluginTypes _type ) :
-	plugin::descriptor::subPluginFeatures( _type )
+void audioFileProcessorView::modelChanged( void )
 {
+	audioFileProcessor * a = castModel<audioFileProcessor>();
+	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),
+					this, SLOT( sampleUpdated() ) );
+	m_ampKnob->setModel( &a->m_ampModel );
+	m_startKnob->setModel( &a->m_startPointModel );
+	m_endKnob->setModel( &a->m_endPointModel );
+	m_reverseButton->setModel( &a->m_reverseModel );
+	m_loopButton->setModel( &a->m_loopModel );
+	sampleUpdated();
 }
 
-
-
-
-const QStringList & audioFileProcessor::subPluginFeatures::supported_extensions(
-									void )
-{
-	static QStringList extensions = QStringList()
-				<< "wav" << "ogg" << "ds" << "spx" << "au"
-				<< "voc" << "aif" << "aiff" << "flac" << "raw";
-	return( extensions );
-}
 
 
 
@@ -552,7 +600,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new audioFileProcessor(
 				static_cast<instrumentTrack *>( _data ) ) );

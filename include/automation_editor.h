@@ -33,13 +33,13 @@
 #include "journalling_object.h"
 #include "midi_time.h"
 #include "automation_pattern.h"
+#include "combobox.h"
 
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class comboBox;
 class notePlayHandle;
 class timeLine;
 class toolButton;
@@ -118,8 +118,8 @@ protected slots:
 
 	void updatePosition( const midiTime & _t );
 
-	void zoomingXChanged( const QString & _zfac );
-	void zoomingYChanged( const QString & _zfac );
+	void zoomingXChanged( void );
+	void zoomingYChanged( void );
 
 
 private:
@@ -182,6 +182,9 @@ private:
 	comboBox * m_zoomingYComboBox;
 	comboBox * m_quantizeComboBox;
 
+	comboBoxModel m_zoomingXModel;
+	comboBoxModel m_zoomingYModel;
+	comboBoxModel m_quantizeModel;
 
 	automationPattern * m_pattern;
 	int m_min_level;

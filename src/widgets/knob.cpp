@@ -6,7 +6,7 @@
  * This file is partly based on the knob-widget of the Qwt Widget Library by
  * Josef Wilgen.
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,7 @@
 #endif
 #include <math.h>
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "config_mgr.h"
 #include "embed.h"
@@ -63,16 +63,13 @@ textFloat * knob::s_textFloat = NULL;
 
 
 
-knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
-							track * _track ) :
+knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoObj( _track ),
+	autoModelView( new knobModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
-	m_initValue( 0.0f ),
-	m_angle( 0.0f ),
 	m_knobNum( _knob_num ),
 	m_label( "" )
 {
@@ -87,31 +84,16 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name,
 	m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
 		QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
 
-	if( _track != NULL )
-	{
-		getAutomationPattern();
-	}
-
-	setRange( 0.0f, 100.0f, 1.0f );
-
 	setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	setTotalAngle( 270.0f );
-	recalcAngle();
 }
 
 
 
 
-// Destructor
 knob::~knob()
 {
 	delete m_knobPixmap;
-/*	// make sure pointer to this knob isn't used anymore in active
-	// midi-device-class
-	if( engine::getMixer()->getMIDIClient()->pitchBendKnob() == this )
-	{
-		engine::getMixer()->getMIDIClient()->setPitchBendKnob( NULL );
-	}*/
 }
 
 
@@ -151,7 +133,7 @@ void knob::setTotalAngle( float _angle )
 		m_totalAngle = _angle;
 	}
 
-	layoutKnob();
+	update();
 }
 
 
@@ -159,11 +141,21 @@ void knob::setTotalAngle( float _angle )
 
 void knob::drawKnob( QPainter * _p )
 {
+	float angle = 0.0f;
+	if( model()->maxValue() != model()->minValue() )
+	{
+		angle = ( model()->value() - 0.5 * ( model()->minValue() +
+						model()->maxValue() ) ) /
+				( model()->maxValue() - model()->minValue() ) *
+								m_totalAngle;
+		angle = static_cast<int>( angle ) % 360;
+	}
+
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
 	const float xm = m_knobPixmap->width() / 2.0f;//radius + 1;
 	const float ym = m_knobPixmap->height() / 2.0f;//radius+1;
 
-	const float rarc = m_angle * M_PI / 180.0;
+	const float rarc = angle * M_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
@@ -214,17 +206,6 @@ void knob::drawKnob( QPainter * _p )
 
 
 
-void knob::valueChange( void )
-{
-	recalcAngle();
-	update();
-	emit valueChanged( value() );
-	emit valueChanged();
-}
-
-
-
-
 float knob::getValue( const QPoint & _p )
 {
 	if( configManager::inst()->value( "knobs", "classicalusability"
@@ -237,13 +218,16 @@ float knob::getValue( const QPoint & _p )
 
 		const float arc = atan2( -dx, dy ) * 180.0 / M_PI;
 
-		float new_value = 0.5 * ( minValue() + maxValue() ) +
-					arc * ( maxValue() - minValue() ) /
+		float new_value = 0.5 * ( model()->minValue() +
+							model()->maxValue() ) +
+					arc * ( model()->maxValue() -
+							model()->minValue() ) /
 								m_totalAngle;
 
-		const float oneTurn = tAbs<float>( maxValue() - minValue() ) *
+		const float oneTurn = tAbs<float>( model()->maxValue() -
+							model()->minValue() ) *
 							360.0 / m_totalAngle;
-		const float eqValue = value() + m_mouseOffset;
+		const float eqValue = model()->value() + m_mouseOffset;
 
 		if( tAbs<float>( new_value - eqValue ) > 0.5 * oneTurn )
 		{
@@ -260,52 +244,9 @@ float knob::getValue( const QPoint & _p )
 	}
 	if( engine::getMainWindow()->isShiftPressed() )
 	{
-		return( ( _p.y() - m_origMousePos.y() ) * step() );
+		return( ( _p.y() - m_origMousePos.y() ) * model()->step() );
 	}
-	return( ( _p.y() - m_origMousePos.y() ) * m_pageSize );
-}
-
-
-
-
-void knob::rangeChange()
-{
-	layoutKnob();
-	recalcAngle();
-}
-
-
-
-
-// Recalculate the slider's geometry and layout based on
-// the current rect and fonts.
-void knob::layoutKnob( bool _update_geometry )
-{
-	if( _update_geometry )
-	{
-		updateGeometry();
-		update();
-	}
-}
-
-
-
-
-void knob::recalcAngle( void )
-{
-	//
-	// calculate the angle corresponding to the value
-	//
-	if( maxValue() == minValue() )
-	{
-		m_angle = 0;
-	}
-	else
-	{
-		m_angle = ( value() - 0.5 * ( minValue() + maxValue() ) ) /
-				( maxValue() - minValue() ) * m_totalAngle;
-		m_angle = static_cast<int>( m_angle ) % 360;
-	}
+	return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
 }
 
 
@@ -321,13 +262,15 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 
 	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "reload" ),
-				tr( "&Reset (%1%2)" ).arg( m_initValue ).arg(
-							m_hintTextAfterValue ),
+				tr( "&Reset (%1%2)" ).
+						arg( model()->initValue() ).
+						arg( m_hintTextAfterValue ),
 							this, SLOT( reset() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-				tr( "&Copy value (%1%2)" ).arg( value() ).arg(
-							m_hintTextAfterValue ),
+				tr( "&Copy value (%1%2)" ).
+						arg( model()->value() ).
+						arg( m_hintTextAfterValue ),
 						this, SLOT( copyValue() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
 				tr( "&Paste value (%1%2)"
@@ -335,16 +278,16 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 							m_hintTextAfterValue ),
 				this, SLOT( pasteValue() ) );
 	contextMenu.addSeparator();
-	if( !nullTrack() )
+	if( !model()->nullTrack() )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
-					getAutomationPattern(),
+					model()->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
 		contextMenu.addSeparator();
 	}
-	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
-						SLOT( connectToMidiDevice() ) );
+/*	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
+						SLOT( connectToMidiDevice() ) );*/
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
@@ -369,30 +312,27 @@ void knob::dropEvent( QDropEvent * _de )
 	QString val = stringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		//printf("set val\n");
-		setValue( val.toFloat() );
+		model()->setValue( val.toFloat() );
 		_de->accept();
 	}
 	else if( type == "link_object" )
 	{
-		//printf("link!\n");
-		knob * obj = (knob *)( val.toULong() );
-		linkObjects( this, obj );
-		obj->setValue( value() );
+		knobModel * mod = (knobModel *)( val.toULong() );
+		autoModel::linkModels( model(), mod );
+		mod->setValue( model()->value() );
 	}
 }
 
 
 
 
-//! Mouse press event handler
 void knob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 			engine::getMainWindow()->isCtrlPressed() == FALSE &&
 			engine::getMainWindow()->isShiftPressed() == FALSE )
 	{
-		prepareJournalEntryFromOldVal();
+		model()->prepareJournalEntryFromOldVal();
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -400,7 +340,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		if( configManager::inst()->value( "knobs",
 						"classicalusability").toInt() )
 		{
-			m_mouseOffset = getValue( p ) - value();
+			m_mouseOffset = getValue( p ) - model()->value();
 		}
 		emit sliderPressed();
 
@@ -411,7 +351,8 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		}
 		s_textFloat->reparent( this );
 		s_textFloat->setText( m_hintTextBeforeValue +
-						QString::number( value() ) +
+						QString::number(
+							model()->value() ) +
 							m_hintTextAfterValue );
 		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
@@ -422,7 +363,8 @@ void knob::mousePressEvent( QMouseEvent * _me )
 			engine::getMainWindow()->isCtrlPressed() == TRUE/* &&
 			engine::getMainWindow()->isShiftPressed() == FALSE*/ )
 	{
-		new stringPairDrag( "float_value", QString::number( value() ),
+		new stringPairDrag( "float_value",
+					QString::number( model()->value() ),
 							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
@@ -432,7 +374,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
         /* this pointer was casted to uint, 
          * compile time error on 64 bit systems */
 		new stringPairDrag( "link_object",
-						QString::number( (ulong) this ),
+					QString::number( (ulong) model() ),
 							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
@@ -444,14 +386,13 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 
 
-//! Mouse Move Event handler
 void knob::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_buttonPressed == TRUE )
 	{
 		setPosition( _me->pos() );
-		emit sliderMoved( value() );
-		emit valueChanged();
+		emit sliderMoved( model()->value() );
+//		emit valueChanged();
 		if( !configManager::inst()->value( "knobs",
 						"classicalusability").toInt() )
 		{
@@ -460,17 +401,16 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 	}
 
 	s_textFloat->setText( m_hintTextBeforeValue +
-						QString::number( value() ) +
-							m_hintTextAfterValue );
+				QString::number( model()->value() ) +
+							 m_hintTextAfterValue );
 }
 
 
 
 
-//! Mouse Release Event handler
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	addJournalEntryFromOldToCurVal();
+	model()->addJournalEntryFromOldToCurVal();
 
 	if( m_buttonPressed )
 	{
@@ -509,7 +449,7 @@ void knob::paintEvent( QPaintEvent * _me )
 
 	p.translate( -ur.x(), -ur.y() );
 	drawKnob( &p );
-	if( m_label != "" )
+	if( !m_label.isEmpty() )
 	{
 		p.setFont( pointSize<6>( p.font() ) );
 		p.setPen( QColor( 64, 64, 64 ) );
@@ -526,32 +466,23 @@ void knob::paintEvent( QPaintEvent * _me )
 
 
 
-void knob::resizeEvent( QResizeEvent * )
-{
-	layoutKnob( FALSE );
-}
-
-
-
-
-//! Qt wheel event
 void knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
-	incValue( inc );
+	model()->incValue( inc );
 
 
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
-					QString::number( value() ) +
+					QString::number( model()->value() ) +
 						m_hintTextAfterValue );
 	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
-	emit sliderMoved( value() );
-	emit valueChanged();
+	emit sliderMoved( model()->value() );
+//	emit valueChanged();
 }
 
 
@@ -559,8 +490,8 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::buttonReleased( void )
 {
-	emit valueChanged( value() );
-	emit valueChanged();
+//	emit valueChanged( model()->value() );
+//	emit valueChanged();
 }
 
 
@@ -571,56 +502,27 @@ void knob::setPosition( const QPoint & _p )
 	if( configManager::inst()->value( "knobs", "classicalusability"
 								).toInt() )
 	{
-		setValue( getValue( _p ) - m_mouseOffset );
+		model()->setValue( getValue( _p ) - m_mouseOffset );
 	}
 	else
 	{
-		setValue( value() - getValue( _p ) );
+		model()->setValue( model()->value() - getValue( _p ) );
 	}
 }
 
 
 
-
-void knob::setValue( const float _x )
-{
-	const float prev_value = value();
-	autoObj::setValue( _x );
-	setFirstValue();
-	if( prev_value != value() )
-	{
-		valueChange();
-	}
-}
-
-
-
-
-void knob::setRange( const float _min, const float _max, const float _step )
-{
-	bool rchg = ( ( maxValue() != _max ) || ( minValue() != _min ) );
-	autoObj::setRange( _min, _max, _step );
-
-	m_pageSize = tMax<float>( ( maxValue() - minValue() ) / 100.0f,
-								step() );
-
-	// call notifier after the step width has been adjusted.
-	if( rchg )
-	{
-		rangeChange();
-	}
-}
 
 
 
 
 void knob::reset( void )
 {
-	setValue( m_initValue );
+	model()->setValue( model()->initValue() );
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
-					QString::number( value() ) +
-						m_hintTextAfterValue );
+					QString::number( model()->value() ) +
+							m_hintTextAfterValue );
 	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
@@ -631,7 +533,7 @@ void knob::reset( void )
 
 void knob::copyValue( void )
 {
-	s_copiedValue = value();
+	s_copiedValue = model()->value();
 }
 
 
@@ -639,11 +541,11 @@ void knob::copyValue( void )
 
 void knob::pasteValue( void )
 {
-	setValue( s_copiedValue );
+	model()->setValue( s_copiedValue );
 	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
-					QString::number( value() ) +
-						m_hintTextAfterValue );
+					QString::number( model()->value() ) +
+							m_hintTextAfterValue );
 	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
@@ -659,13 +561,16 @@ void knob::enterValue( void )
 					this,
 					accessibleName(),
 					tr( "Please enter a new value between "
-						"%1 and %2:" ).arg(
-						minValue() ).arg( maxValue() ),
-					value(), minValue(), maxValue(),
+						"%1 and %2:" ).
+						arg( model()->minValue() ).
+						arg( model()->maxValue() ),
+					model()->value(),
+					model()->minValue(),
+					model()->maxValue(),
 					4, &ok );
 	if( ok )
 	{
-		setValue( new_val );
+		model()->setValue( new_val );
 	}
 }
 

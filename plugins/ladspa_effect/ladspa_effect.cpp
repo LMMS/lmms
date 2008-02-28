@@ -1,7 +1,7 @@
 /*
  * ladspa_effect.cpp - class for processing LADSPA effects
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -59,12 +59,12 @@ plugin::descriptor ladspaeffect_plugin_descriptor =
 }
 
 
-ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
-	effect( &ladspaeffect_plugin_descriptor, _key ),
+ladspaEffect::ladspaEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key ) :
+	effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
+	m_controls( NULL ),
 	m_effName( "none" ),
-	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key )
-		/* ladspa_key_t( _cdata->settings.attribute( "label" ),
-				_cdata->settings.attribute( "lib" ) )*/ )
+	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
@@ -229,8 +229,8 @@ ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
 			if( p->rate == AUDIO_RATE_INPUT || 
 					p->rate == CONTROL_RATE_INPUT )
 			{
-				p->control_id = m_controls.count();
-				m_controls.append( p );
+				p->control_id = m_portControls.count();
+				m_portControls.append( p );
 			}
 		}
 		m_ports.append( ports );
@@ -292,6 +292,8 @@ ladspaEffect::ladspaEffect( const descriptor::subPluginFeatures::key * _key ) :
 	{
 		manager->activate( m_key, m_handles[proc] );
 	}
+
+	m_controls = new ladspaControls( this, NULL /* TODO!! */ );
 }
 
 
@@ -326,7 +328,7 @@ ladspaEffect::~ladspaEffect()
 bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpp_t _frames )
 {
-	if( !isOkay() || dontRun() || !isRunning() || isBypassed() )
+	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
 	{
 		return( FALSE );
 	}
@@ -460,19 +462,17 @@ void FASTCALL ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
 	{
 		return;
 	}
-	m_controls[_control]->value = _value;
+	m_portControls[_control]->value = _value;
 }
 
-
-#undef indexOf
 
 extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new ladspaEffect(
+	return( new ladspaEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

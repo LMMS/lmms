@@ -30,6 +30,7 @@
 #include <QtCore/QMutexLocker>
 
 #include "preset_preview_play_handle.h"
+#include "automatable_model_templates.h"
 #include "debug.h"
 #include "engine.h"
 #include "instrument_track.h"
@@ -52,10 +53,9 @@ public:
 	{
 		setJournalling( FALSE );
 		m_previewInstrumentTrack = dynamic_cast<instrumentTrack *>(
-					track::create( track::INSTRUMENT_TRACK,
+					track::create( track::InstrumentTrack,
 								this ) );
 		m_previewInstrumentTrack->setJournalling( FALSE );
-		hide();
 	}
 
 	virtual ~previewTrackContainer()
@@ -133,7 +133,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 				mmp.content().firstChild().toElement() );
 	// preset also contains information about window-states etc. that's why
 	// here we have to make sure that the instrument-track-window is hidden
-	s_previewTC->previewInstrumentTrack()->hide();
+//	s_previewTC->previewInstrumentTrack()->hide();
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
@@ -143,7 +143,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle(
 			s_previewTC->previewInstrumentTrack(), 0,
-			valueRanges<f_cnt_t>::max / 2,
+			valueRanges<f_cnt_t>::max() / 2,
 		note( 0, 0, static_cast<tones>( A ),
 			static_cast<octaves>( DEFAULT_OCTAVE - 1 ), 100 ) );
 

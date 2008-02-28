@@ -3,7 +3,7 @@
 /*
  * audio_port.cpp - base-class for objects providing sound at a port
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,10 +31,11 @@
 #include "audio_port.h"
 #include "audio_device.h"
 #include "engine.h"
+#include "automatable_model_templates.h"
 
 
-audioPort::audioPort( const QString & _name ) :
-	m_bufferUsage( NONE ),
+audioPort::audioPort( const QString & _name, track * _track ) :
+	m_bufferUsage( NoUsage ),
 	m_firstBuffer( new surroundSampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
 	m_secondBuffer( new surroundSampleFrame[
@@ -42,7 +43,7 @@ audioPort::audioPort( const QString & _name ) :
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( -1 ),
 	m_name( "unnamed port" ),
-	m_effects( new effectChain ),
+	m_effects( this, _track ),
 	m_frames( engine::getMixer()->framesPerPeriod() )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
@@ -62,7 +63,6 @@ audioPort::~audioPort()
 	engine::getMixer()->removeAudioPort( this );
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
-	delete m_effects;
 }
 
 
@@ -70,12 +70,15 @@ audioPort::~audioPort()
 
 void audioPort::nextPeriod( void )
 {
+	m_firstBufferLock.lock();
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );
 	qSwap( m_firstBuffer, m_secondBuffer );
+	m_firstBufferLock.unlock();
 	// this is how we decrease state of buffer-usage ;-)
-	m_bufferUsage = ( m_bufferUsage != NONE ) ?
-		( ( m_bufferUsage == FIRST ) ? NONE : FIRST ) : NONE;
+	m_bufferUsage = ( m_bufferUsage != NoUsage ) ?
+		( ( m_bufferUsage == FirstBuffer ) ?
+					NoUsage : FirstBuffer ) : NoUsage;
 }
 
 

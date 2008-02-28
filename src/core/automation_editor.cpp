@@ -4,7 +4,7 @@
  * automation_editor.cpp - implementation of automationEditor which is used for
  *                         actual setting of dynamic values
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,6 +49,7 @@
 
 
 #include "song_editor.h"
+#include "automatable_model_templates.h"
 #include "main_window.h"
 #include "embed.h"
 #include "engine.h"
@@ -74,6 +75,10 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 
 automationEditor::automationEditor( void ) :
+	QWidget(),
+	m_zoomingXModel(),
+	m_zoomingYModel(),
+	m_quantizeModel(),
 	m_pattern( NULL ),
 	m_min_level( 0 ),
 	m_max_level( 0 ),
@@ -114,8 +119,8 @@ automationEditor::automationEditor( void ) :
 
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
-				engine::getSongEditor()->getPlayPos(
-					songEditor::PLAY_AUTOMATION_PATTERN ),
+				engine::getSong()->getPlayPos(
+					song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
@@ -261,44 +266,56 @@ automationEditor::automationEditor( void ) :
 	QLabel * zoom_x_lbl = new QLabel( m_toolBar );
 	zoom_x_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_zoomingXComboBox = new comboBox( m_toolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
+
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingXComboBox->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingXModel.addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingXComboBox->setValue( m_zoomingXComboBox->findText( "100%" ) );
-	connect( m_zoomingXComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingXChanged( const QString & ) ) );
+	m_zoomingXModel.setValue( m_zoomingXModel.findText( "100%" ) );
+
+	m_zoomingXComboBox->setModel( &m_zoomingXModel );
+
+	connect( &m_zoomingXModel, SIGNAL( dataChanged() ),
+			this, SLOT( zoomingXChanged() ) );
 
 
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
 	zoom_y_lbl->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_zoomingYComboBox = new comboBox( m_toolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
-	m_zoomingYComboBox->addItem( "Auto" );
+
+	m_zoomingYModel.addItem( "Auto" );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingYComboBox->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingYModel.addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingYComboBox->setValue( m_zoomingYComboBox->findText( "Auto" ) );
-	connect( m_zoomingYComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingYChanged( const QString & ) ) );
+	m_zoomingYModel.setValue( m_zoomingYModel.findText( "Auto" ) );
+
+	m_zoomingYComboBox->setModel( &m_zoomingYModel );
+
+	connect( &m_zoomingYModel, SIGNAL( dataChanged() ),
+			this, SLOT( zoomingYChanged() ) );
 
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, NULL, NULL );
+	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
+
+	comboBoxModel * quantize_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeComboBox->addItem( "1/" + QString::number( 1 << i ) );
+		quantize_model->addItem( "1/" + QString::number( 1 << i ) );
 	}
-	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
-								"1/16" ) );
+	quantize_model->setValue( quantize_model->findText( "1/16" ) );
+
+	m_quantizeComboBox->setModel( quantize_model );
+
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
@@ -597,7 +614,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSongEditor()->playing() )
+			if( engine::getSong()->playing() )
 			{
 				stop();
 			}
@@ -713,7 +730,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				QCursor c( Qt::SizeAllCursor );
 				QApplication::setOverrideCursor( c );
 
-				engine::getSongEditor()->setModified();
+				engine::getSong()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -724,7 +741,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( -it.key() );
-					engine::getSongEditor()->setModified();
+					engine::getSong()->setModified();
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
@@ -758,7 +775,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				m_action = MOVE_SELECTION;
 
-				engine::getSongEditor()->setModified();
+				engine::getSong()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -834,7 +851,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 								level );
 			}
 
-			engine::getSongEditor()->setModified();
+			engine::getSong()->setModified();
 
 		}
 		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
@@ -1518,10 +1535,9 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 	m_topBottomScroll->setValue( m_scroll_level );
 
-	if( engine::getSongEditor() )
+	if( engine::getSong() )
 	{
-		engine::getSongEditor()->getPlayPos(
-					songEditor::PLAY_AUTOMATION_PATTERN
+		engine::getSong()->getPlayPos( song::Mode_PlayAutomationPattern
 					).m_timeLine->setFixedWidth( width() );
 	}
 	m_toolBar->setFixedWidth( width() );
@@ -1548,8 +1564,8 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingXComboBox->setValue(
-				m_zoomingXComboBox->findText( QString::number(
+		m_zoomingXComboBox->model()->setValue(
+			m_zoomingXComboBox->model()->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PPT ) ) +"%" ) );
 		// update timeline
@@ -1599,7 +1615,7 @@ int automationEditor::getLevel( int _y )
 inline bool automationEditor::inBBEditor( void )
 {
 	return( m_pattern->getTrack()->getTrackContainer()
-						== engine::getBBEditor() );
+					== engine::getBBTrackContainer() );
 }
 
 
@@ -1614,23 +1630,22 @@ void automationEditor::play( void )
 
 	if( !m_pattern->getTrack() )
 	{
-		if( engine::getSongEditor()->playMode() !=
-						songEditor::PLAY_PATTERN )
+		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 		{
-			engine::getSongEditor()->stop();
-			engine::getSongEditor()->playPattern( (pattern *)
+			engine::getSong()->stop();
+			engine::getSong()->playPattern( (pattern *)
 				engine::getPianoRoll()->currentPattern() );
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		else if( engine::getSongEditor()->playing() )
+		else if( engine::getSong()->playing() )
 		{
-			engine::getSongEditor()->pause();
+			engine::getSong()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( engine::getSongEditor()->paused() )
+		else if( engine::getSong()->paused() )
 		{
-			engine::getSongEditor()->resumeFromPause();
+			engine::getSong()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
@@ -1638,13 +1653,13 @@ void automationEditor::play( void )
 		{
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
-			engine::getSongEditor()->playPattern( (pattern *)
+			engine::getSong()->playPattern( (pattern *)
 				engine::getPianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		if( engine::getSongEditor()->playing() )
+		if( engine::getSong()->playing() )
 		{
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
@@ -1653,18 +1668,18 @@ void automationEditor::play( void )
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		engine::getBBEditor()->play();
+		engine::getBBTrackContainer()->play();
 	}
 	else
 	{
-		if( engine::getSongEditor()->playing() )
+		if( engine::getSong()->playing() )
 		{
-			engine::getSongEditor()->pause();
+			engine::getSong()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( engine::getSongEditor()->paused() )
+		else if( engine::getSong()->paused() )
 		{
-			engine::getSongEditor()->resumeFromPause();
+			engine::getSong()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
@@ -1672,7 +1687,7 @@ void automationEditor::play( void )
 		{
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
-			engine::getSongEditor()->play();
+			engine::getSong()->play();
 		}
 	}
 }
@@ -1688,11 +1703,11 @@ void automationEditor::stop( void )
 	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
-		engine::getBBEditor()->stop();
+		engine::getBBTrackContainer()->stop();
 	}
 	else
 	{
-		engine::getSongEditor()->stop();
+		engine::getSong()->stop();
 	}
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
@@ -1886,7 +1901,7 @@ void automationEditor::cutSelectedValues( void )
 
 	if( !selected_values.isEmpty() )
 	{
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
@@ -1921,7 +1936,7 @@ void automationEditor::pasteValues( void )
 
 		// we only have to do the following lines if we pasted at
 		// least one value...
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 		update();
 		engine::getSongEditor()->update();
 	}
@@ -1950,7 +1965,7 @@ void automationEditor::deleteSelectedValues( void )
 
 	if( update_after_delete == TRUE )
 	{
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 		update();
 		engine::getSongEditor()->update();
 	}
@@ -1961,9 +1976,9 @@ void automationEditor::deleteSelectedValues( void )
 
 void automationEditor::updatePosition( const midiTime & _t )
 {
-	if( ( engine::getSongEditor()->playing() &&
-			engine::getSongEditor()->playMode() ==
-					songEditor::PLAY_AUTOMATION_PATTERN ) ||
+	if( ( engine::getSong()->playing() &&
+			engine::getSong()->playMode() ==
+					song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - VALUES_WIDTH;
@@ -1983,9 +1998,10 @@ void automationEditor::updatePosition( const midiTime & _t )
 
 
 
-void automationEditor::zoomingXChanged( const QString & _zfac )
+void automationEditor::zoomingXChanged( void )
 {
-	m_ppt = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
+	const QString & zfac = m_zoomingXModel.currentText();
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -1996,12 +2012,13 @@ void automationEditor::zoomingXChanged( const QString & _zfac )
 
 
 
-void automationEditor::zoomingYChanged( const QString & _zfac )
+void automationEditor::zoomingYChanged( void )
 {
-	m_y_auto = _zfac == "Auto";
+	const QString & zfac = m_zoomingYModel.currentText();
+	m_y_auto = zfac == "Auto";
 	if( !m_y_auto )
 	{
-		m_y_delta = _zfac.left( _zfac.length() - 1 ).toInt()
+		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
 							* DEFAULT_Y_DELTA / 100;
 	}
 #ifdef LMMS_DEBUG
@@ -2015,8 +2032,8 @@ void automationEditor::zoomingYChanged( const QString & _zfac )
 
 int automationEditor::quantization( void ) const
 {
-	return( 64 / m_quantizeComboBox->currentText().right(
-				m_quantizeComboBox->currentText().length() -
+	return( 64 / m_quantizeComboBox->model()->currentText().right(
+			m_quantizeComboBox->model()->currentText().length() -
 								2 ).toInt() );
 }
 

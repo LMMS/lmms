@@ -67,25 +67,29 @@ class OnePoleLP
 				a0 *= d;
 				b1 = 1. - a0;
 			}
+
+		/* clear denormal numbers in history */
+		void flush_0()
+			{
+				if (is_denormal (y1))
+					y1 = 0;
+			}
 };
 
 class OnePoleHP
 {
 	public:
 		d_sample a0, a1, b1, x1, y1;
-		double fc;
 
 		OnePoleHP (double d = 1.)
 			{
-				fc = 0;
 				set (d);
 				x1 = y1 = 0.;
 			}
 
 		void set_f (double f)
 			{
-				fc = f;
-				set (exp (-2 * M_PI * fc));
+				set (exp (-2 * M_PI * f));
 			}
 
 		inline void set (double d)
@@ -105,6 +109,13 @@ class OnePoleHP
 		void reset()
 			{
 				x1 = y1 = 0;
+			}
+
+		/* clear denormal numbers in history */
+		void flush_0()
+			{
+				if (is_denormal (y1))
+					y1 = 0;
 			}
 };
 

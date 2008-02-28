@@ -1,18 +1,842 @@
+2008-02-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/caps/Compress.cc:
+	* plugins/ladspa_effect/caps/ToneStack.cc:
+	* plugins/ladspa_effect/caps/Compress.h:
+	* plugins/ladspa_effect/caps/ToneStack.h:
+	* plugins/ladspa_effect/caps/Roessler.h:
+	* plugins/ladspa_effect/caps/HRTF.cc:
+	* plugins/ladspa_effect/caps/HRTF.h:
+	* plugins/ladspa_effect/caps/basics.h:
+	* plugins/ladspa_effect/caps/Lorenz.cc:
+	* plugins/ladspa_effect/caps/Lorenz.h:
+	* plugins/ladspa_effect/caps/Amp.cc:
+	* plugins/ladspa_effect/caps/Amp.h:
+	* plugins/ladspa_effect/caps/Pan.h:
+	* plugins/ladspa_effect/caps/Phaser.cc:
+	* plugins/ladspa_effect/caps/White.h:
+	* plugins/ladspa_effect/caps/Preamp.cc:
+	* plugins/ladspa_effect/caps/Click.cc:
+	* plugins/ladspa_effect/caps/VCO.cc:
+	* plugins/ladspa_effect/caps/Clip.cc:
+	* plugins/ladspa_effect/caps/Click.h:
+	* plugins/ladspa_effect/caps/VCO.h:
+	* plugins/ladspa_effect/caps/ToneControls.cc:
+	* plugins/ladspa_effect/caps/Sin.cc:
+	* plugins/ladspa_effect/caps/Clip.h:
+	* plugins/ladspa_effect/caps/Sin.h:
+	* plugins/ladspa_effect/caps/Scape.cc:
+	* plugins/ladspa_effect/caps/Scape.h:
+	* plugins/ladspa_effect/caps/Roessler.cc:
+	* plugins/ladspa_effect/caps/interface.cc:
+	* plugins/ladspa_effect/caps/waves/click.h:
+	* plugins/ladspa_effect/caps/waves/money.h:
+	* plugins/ladspa_effect/caps/dsp/ToneStack.h:
+	* plugins/ladspa_effect/caps/dsp/LatFilt.h:
+	* plugins/ladspa_effect/caps/dsp/TDFII.h:
+	* plugins/ladspa_effect/caps/dsp/RMS.h:
+	* plugins/ladspa_effect/caps/dsp/OnePole.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/tables.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/vs_tab.h:
+	* plugins/ladspa_effect/caps/dsp/tonestack/ks_tab.h:
+	* plugins/ladspa_effect/caps/dsp/Eq.h:
+	* plugins/ladspa_effect/caps/dsp/BiQuad.h:
+	* plugins/ladspa_effect/caps/dsp/util.h:
+	* plugins/ladspa_effect/caps/dsp/FPTruncateMode.h:
+	* plugins/ladspa_effect/caps/dsp/TwelveAX7.h:
+	* plugins/ladspa_effect/caps/Chorus.cc:
+	* plugins/ladspa_effect/caps/Cabinet.cc:
+	* plugins/ladspa_effect/caps/Chorus.h:
+	* plugins/ladspa_effect/caps/Eq.cc:
+	* plugins/ladspa_effect/caps/Cabinet.h:
+	* plugins/ladspa_effect/caps/Eq.h:
+	* plugins/ladspa_effect/caps/README:
+	* plugins/ladspa_effect/caps/Pan.cc:
+	* plugins/ladspa_effect/caps/SweepVF.cc:
+	* plugins/ladspa_effect/caps/Descriptor.h:
+	* plugins/ladspa_effect/caps/White.cc:
+	* plugins/ladspa_effect/caps/SweepVF.h:
+	* plugins/ladspa_effect/caps/Phaser.h:
+	* plugins/ladspa_effect/caps/Reverb.cc:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	* plugins/ladspa_effect/caps/Reverb.h:
+	integrated new version of CAPS and fixed miscompilation with GCC 4.3
+
+	* include/audio_port.h:
+	* src/audio/audio_port.cpp:
+	* src/core/mixer.cpp:
+	lock audioPort-buffers before writing them
+
+	* include/export_project_dialog.h:
+	* src/core/song.cpp:
+	* src/core/main.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/engine.cpp:
+	* src/core/automation_pattern.cpp:
+	rendering from commandline is now done without creating main-window
+	and all the other UI-stuff
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	distribute whole job-queue instead of single jobs and re-assign
+	unprocessed jobs to idle worker-threads - improves multi-threading
+	behaviour a lot
+
+2008-02-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	initial support for parallel rendering via worker-threads - far from
+	being perfect (especially with small mixer-period-sizes) but seems to
+	help even on a DualCore machine
+
+2008-02-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	incorporated recent API-changes
+
+	* include/effect.h:
+	* include/instrument_functions.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/tempo_sync_knob.h:
+	* src/widgets/envelope_and_lfo_view.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/effect.cpp:
+	* src/core/instrument_functions.cpp:
+	splitted tempoSyncKnob into tempoSyncKnobModel and tempoSyncKnob
+
+	* include/meter_dialog.h:
+	* src/core/meter_dialog.cpp:
+	splitted into meterModel and meterDialog
+
+	* plugins/flp_import/flp_import.cpp:
+	* include/instrument_track.h:
+	* include/piano.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/piano.cpp:
+	* Makefile.am:
+	renamed piano_widget.{h,cpp} to piano.{h,cpp}
+
+	* include/instrument_view.h:
+	* include/instrument_track.h:
+	* src/widgets/instrument_function_views.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/tracks/instrument_track.cpp:
+	fixed various crashes when removing instrument-track with visible
+	instrument-track-window or loading another instrument/preset
+
+	* src/core/instrument.cpp:
+	* include/oscillator.h:
+	cleanups
+
+	* src/lib/mmp.cpp:
+	fixed tag-renaming-loops
+
+	* include/automatable_model_templates.h:
+	instantiate automation-pattern before loading settings of it - fixes
+	crashes when loading projects with automation inside
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	track-window-creation on-demand - makes loading/unloading projects
+	ultra-fast!!
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	fixed wrong index for saving/restoring modulation-algo-settings -
+	now projects sound like they did in pre-MV
+
+	* include/automation_editor.h:
+	* include/combobox.h:
+	* src/core/song.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/track.cpp:
+	* src/core/automation_editor.cpp:
+	fixed zooming-comboboxes in automation-editor and header-dependencies
+
+	* src/widgets/combobox.cpp:
+	update() after wheelEvent
+
+	* include/tool.h:
+	* src/core/tool.cpp:
+	* plugins/live_tool/live_tool.h:
+	* plugins/live_tool/live_tool.cpp:
+	made live-tool work after M/V-split
+
+	* include/track.h:
+	* src/core/track.cpp:
+	- connect track's m_mutedModel to m_muteBtn of trackOperationsWidget
+	- set track for m_mutedModel
+
+2008-02-24	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/bit_invader/Makefile.am:
+	M/V-split of Bit Invader instrument.
+
+	* plugins/vibed/nine_button_selector.cpp:
+	Removed debug output
+
+	* src/widgets/graph.cpp:
+	* include/graph.h:
+	Fixed some graph issues.  Still more left to do
+
+2008-02-22	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/vibed/vibed.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/string_container.cpp:
+	* plugins/vibed/string_container.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/Makefile.am:
+	M/V-split of Vibed-instrument.  Lacks user-specified wave, to be added on
+	my next commit. Also has an audio output bug, certain notes make weird
+	noises
+
+	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_controls.h:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h:
+	* plugins/stereo_enhancer/Makefile.am:
+	M/V-split of Stereo-enhancer effect.  
+
+	* src/core/piano_roll.cpp:
+	Changed quantization to change on the gridlines, instead of nearest-point
+	in the middle.  Made this change here, because MIDI events should still be
+	quantized to nearest-point (I think)
+
+	* src/widgets/graph.cpp:
+	* include/graph.h:
+	* Makefile.am:
+	Split graph and moved it to the shared widgets.  Supports variable ranges,
+	sample-lengths, smoothing, normalizing, and is antialiased
+
+2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.h:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/vst_effect/vst_control_dialog.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* include/plugin.h:
+	* include/audio_file_device.h:
+	* include/export.h:
+	* include/export_project_dialog.h:
+	* src/core/song.cpp:
+	* src/core/export_project_dialog.cpp:
+	coding-style improvements
+
+	* src/core/main_window.cpp:
+	made song-export work again
+
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	M/V-split of Patman-instrument
+
+2008-02-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.h:
+	* plugins/midi_import/midi_import.cpp:
+	* include/instrument_functions.h:
+	* include/song.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/instrument_sound_shaping.h:
+	made MIDI- and FLP-import-filter work
+
+2008-02-15	Paul Giblock	<drfaygo/at/gmail/dot/net>
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+
+	Updated some instruments for M/V. Unfortunately one is an old version
+	and the other is obsoleted
+
+2008-02-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/Makefile.am:
+	* include/mmp.h:
+	* include/instrument_midi_io_view.h:
+	* include/track.h:
+	* include/engine.h:
+	* include/name_label.h:
+	* include/instrument_track.h:
+	* include/instrument_functions.h:
+	* include/piano_widget.h:
+	* include/song.h:
+	* include/pattern.h:
+	* include/file_browser.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/envelope_and_lfo_view.h:
+	* include/instrument_sound_shaping.h:
+	* include/instrument_function_views.h:
+	* include/instrument_midi_io.h:
+	* include/bb_track.h:
+	* include/song_editor.h:
+	* include/dummy_instrument.h:
+	* include/journalling_object.h:
+	* include/sample_track.h:
+	* include/timeline.h:
+	* include/main_window.h:
+	* include/mv_base.h:
+	* include/bb_editor.h:
+	* include/arp_and_chords_tab_widget.h:
+	* include/automation_track.h:
+	* include/track_container.h:
+	* include/instrument_sound_shaping_view.h:
+	* configure.in:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/mmp.cpp:
+	* src/lib/journalling_object.cpp:
+	* src/widgets/instrument_sound_shaping_view.cpp:
+	* src/widgets/envelope_and_lfo_view.cpp:
+	* src/widgets/instrument_function_views.cpp:
+	* src/widgets/instrument_midi_io_view.cpp:
+	* src/widgets/project_notes.cpp:
+	* src/widgets/effect_rack_view.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/song.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mixer.cpp:
+	* src/core/main.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/track.cpp:
+	* src/core/engine.cpp:
+	* src/core/timeline.cpp:
+	* src/core/instrument.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/main_window.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/mv_base.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/name_label.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* Makefile.am:
+	finally splitted rest of LMMS, i.e. tracks, track-containers,
+	track-content-objects, whole instrument-track/instrument-track-window
+	and so on - still a bit unstable but I'm sure we'll manage to get this
+	one very stable!
+
+	diffstat says:
+	    79 files changed, 8019 insertions(+), 6226 deletions(-)
+
+2008-02-01	Danny McRae <khjklujn/at/yahoo/dot/com>
+
+	* Makefile.am:
+	* src/tracks/instrument_track.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mixer.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/song_editor.cpp:
+	Some of the files have been renamed, so I updated the
+	include references to get the build to work again.
+
+	* include/basic_filters.h:
+	Added the ability to clear the filter taps to support
+	a LPF where the threshold is set by the velocity of
+	the note.
+
+	* configure.in:
+	* plugins/stk/voices/resonate/resonate_processor.h:
+	* plugins/stk/voices/voices/resonate/resonate_instrument.h:
+	* plugins/stk/voices/voices/resonate/resonate_model.cpp:
+	* plugins/stk/voices/voices/resonate/resonate_instrument_view.cpp:
+	* plugins/stk/voices/voices/resonate/artwork.png:
+	* plugins/stk/voices/voices/resonate/resonate_processor.cpp:
+	* plugins/stk/voices/voices/resonate/resonate_instrument_view.h:
+	* plugins/stk/voices/voices/resonate/resonate_instrument.cpp:
+	* plugins/stk/voices/voices/resonate/logo.png:
+	* plugins/stk/voices/voices/resonate/resonate_model.h:
+	* plugins/stk/voices/voices/resonate/Makefile.am:
+	* plugins/stk/voices/voices/flute/artwork.png:
+	* plugins/stk/voices/voices/flute/flute_processor.cpp:
+	* plugins/stk/voices/voices/flute/flute_instrument_view.h:
+	* plugins/stk/voices/voices/flute/flute_model.h:
+	* plugins/stk/voices/voices/flute/flute_processor.h:
+	* plugins/stk/voices/voices/flute/flute_model.cpp:
+	* plugins/stk/voices/voices/flute/logo.png:
+	* plugins/stk/voices/voices/flute/flute_instrument.h:
+	* plugins/stk/voices/voices/flute/Makefile.am:
+	* plugins/stk/voices/voices/flute/flute_instrument_view.cpp:
+	* plugins/stk/voices/voices/flute/flute_instrument.cpp:
+	* plugins/stk/voices/voices/metal/metal_processor.h:
+	* plugins/stk/voices/voices/metal/metal_instrument.cpp:
+	* plugins/stk/voices/voices/metal/metal_processor.cpp:
+	* plugins/stk/voices/voices/metal/artwork.png:
+	* plugins/stk/voices/voices/metal/metal_instrument_view.cpp:
+	* plugins/stk/voices/voices/metal/metal_instrument.h:
+	* plugins/stk/voices/voices/metal/logo.png:
+	* plugins/stk/voices/voices/metal/metal_instrument_view.h:
+	* plugins/stk/voices/voices/metal/metal_model.cpp:
+	* plugins/stk/voices/voices/metal/Makefile.am:
+	* plugins/stk/voices/voices/metal/metal_model.h:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_instrument.cpp:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_processor.h:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_instrument.h:
+	* plugins/stk/voices/voices/fmvoices/artwork.png:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_instrument_view.h:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_instrument_view.cpp:
+	* plugins/stk/voices/voices/fmvoices/logo.png:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_processor.cpp:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_model.cpp:
+	* plugins/stk/voices/voices/fmvoices/fmvoices_model.h:
+	* plugins/stk/voices/voices/fmvoices/Makefile.am:
+	* plugins/stk/voices/voices/moog/moog_instrument_view.h:
+	* plugins/stk/voices/voices/moog/moog_instrument_view.cpp:
+	* plugins/stk/voices/voices/moog/moog_model.cpp:
+	* plugins/stk/voices/voices/moog/moog_processor.h:
+	* plugins/stk/voices/voices/moog/artwork.png:
+	* plugins/stk/voices/voices/moog/logo.png:
+	* plugins/stk/voices/voices/moog/moog_model.h:
+	* plugins/stk/voices/voices/moog/moog_instrument.h:
+	* plugins/stk/voices/voices/moog/moog_instrument.cpp:
+	* plugins/stk/voices/voices/moog/moog_processor.cpp:
+	* plugins/stk/voices/voices/moog/Makefile.am:
+	* plugins/stk/voices/voices/include/stk_instrument_view.h:
+	* plugins/stk/voices/voices/include/stk_voice.h:
+	* plugins/stk/voices/voices/include/stk_instrument.h:
+	* plugins/stk/voices/voices/include/stk_model.h:
+	* plugins/stk/voices/voices/include/stk_processor.h:
+	* plugins/stk/voices/voices/wurley/wurley_instrument.h:
+	* plugins/stk/voices/voices/wurley/wurley_instrument_view.cpp:
+	* plugins/stk/voices/voices/wurley/wurley_model.cpp:
+	* plugins/stk/voices/voices/wurley/wurley_instrument_view.h:
+	* plugins/stk/voices/voices/wurley/wurley_model.h:
+	* plugins/stk/voices/voices/wurley/artwork.png:
+	* plugins/stk/voices/voices/wurley/wurley_processor.h:
+	* plugins/stk/voices/voices/wurley/logo.png:
+	* plugins/stk/voices/voices/wurley/Makefile.am:
+	* plugins/stk/voices/voices/wurley/wurley_processor.cpp:
+	* plugins/stk/voices/voices/wurley/wurley_instrument.cpp:
+	* plugins/stk/voices/voices/bowed/bowed_instrument.cpp:
+	* plugins/stk/voices/voices/bowed/bowed_model.cpp:
+	* plugins/stk/voices/voices/bowed/bowed_instrument_view.cpp:
+	* plugins/stk/voices/voices/bowed/bowed_model.h:
+	* plugins/stk/voices/voices/bowed/bowed_processor.h:
+	* plugins/stk/voices/voices/bowed/artwork.png:
+	* plugins/stk/voices/voices/bowed/bowed_processor.cpp:
+	* plugins/stk/voices/voices/bowed/logo.png:
+	* plugins/stk/voices/voices/bowed/bowed_instrument_view.h:
+	* plugins/stk/voices/voices/bowed/Makefile.am:
+	* plugins/stk/voices/voices/bowed/bowed_instrument.h:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_instrument.cpp:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_instrument_view.cpp:
+	* plugins/stk/voices/voices/blow_hole/artwork.png:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_model.h:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_processor.h:
+	* plugins/stk/voices/voices/blow_hole/logo.png:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_processor.cpp:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_instrument_view.h:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_model.cpp:
+	* plugins/stk/voices/voices/blow_hole/Makefile.am:
+	* plugins/stk/voices/voices/blow_hole/blow_hole_instrument.h:
+	* plugins/stk/voices/voices/rhodey/rhodey_instrument_view.h:
+	* plugins/stk/voices/voices/rhodey/rhodey_processor.h:
+	* plugins/stk/voices/voices/rhodey/rhodey_processor.cpp:
+	* plugins/stk/voices/voices/rhodey/rhodey_instrument_view.cpp:
+	* plugins/stk/voices/voices/rhodey/artwork.png:
+	* plugins/stk/voices/voices/rhodey/rhodey_model.cpp:
+	* plugins/stk/voices/voices/rhodey/rhodey_model.h:
+	* plugins/stk/voices/voices/rhodey/rhodey_instrument.h:
+	* plugins/stk/voices/voices/rhodey/logo.png:
+	* plugins/stk/voices/voices/rhodey/rhodey_instrument.cpp:
+	* plugins/stk/voices/voices/rhodey/Makefile.am:
+	* plugins/stk/voices/voices/tubebell/tubebell_processor.cpp:
+	* plugins/stk/voices/voices/tubebell/tubebell_instrument_view.h:
+	* plugins/stk/voices/voices/tubebell/artwork.png:
+	* plugins/stk/voices/voices/tubebell/tubebell_instrument.h:
+	* plugins/stk/voices/voices/tubebell/tubebell_instrument.cpp:
+	* plugins/stk/voices/voices/tubebell/tubebell_model.h:
+	* plugins/stk/voices/voices/tubebell/logo.png:
+	* plugins/stk/voices/voices/tubebell/tubebell_model.cpp:
+	* plugins/stk/voices/voices/tubebell/tubebell_instrument_view.cpp:
+	* plugins/stk/voices/voices/tubebell/Makefile.am:
+	* plugins/stk/voices/voices/tubebell/tubebell_processor.h:
+	* plugins/stk/voices/voices/clarinet/clarinet_instrument.cpp:
+	* plugins/stk/voices/voices/clarinet/artwork.png:
+	* plugins/stk/voices/voices/clarinet/clarinet_processor.h:
+	* plugins/stk/voices/voices/clarinet/clarinet_processor.cpp:
+	* plugins/stk/voices/voices/clarinet/clarinet_instrument.h:
+	* plugins/stk/voices/voices/clarinet/clarinet_model.cpp:
+	* plugins/stk/voices/voices/clarinet/logo.png:
+	* plugins/stk/voices/voices/clarinet/clarinet_instrument_view.cpp:
+	* plugins/stk/voices/voices/clarinet/clarinet_model.h:
+	* plugins/stk/voices/voices/clarinet/Makefile.am:
+	* plugins/stk/voices/voices/clarinet/clarinet_instrument_view.h:
+	* plugins/stk/voices/voices/b3/b3_instrument.cpp:
+	* plugins/stk/voices/voices/b3/b3_model.h:
+	* plugins/stk/voices/voices/b3/b3_model.cpp:
+	* plugins/stk/voices/voices/b3/artwork.png:
+	* plugins/stk/voices/voices/b3/b3_instrument_view.h:
+	* plugins/stk/voices/voices/b3/logo.png:
+	* plugins/stk/voices/voices/b3/b3_processor.h:
+	* plugins/stk/voices/voices/b3/b3_instrument_view.cpp:
+	* plugins/stk/voices/voices/b3/b3_instrument.h:
+	* plugins/stk/voices/voices/b3/b3_processor.cpp:
+	* plugins/stk/voices/voices/b3/Makefile.am:
+	* plugins/stk/voices/voices/src/stk_model.cpp:
+	* plugins/stk/voices/voices/percflute/percflute_instrument.h:
+	* plugins/stk/voices/voices/percflute/percflute_model.h:
+	* plugins/stk/voices/voices/percflute/percflute_instrument_view.h:
+	* plugins/stk/voices/voices/percflute/percflute_processor.cpp:
+	* plugins/stk/voices/voices/percflute/percflute_processor.h:
+	* plugins/stk/voices/voices/percflute/artwork.png:
+	* plugins/stk/voices/voices/percflute/percflute_instrument_view.cpp:
+	* plugins/stk/voices/voices/percflute/percflute_instrument.cpp:
+	* plugins/stk/voices/voices/percflute/logo.png:
+	* plugins/stk/voices/voices/percflute/percflute_model.cpp:
+	* plugins/stk/voices/voices/percflute/Makefile.am:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_processor.cpp:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_model.h:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_model.cpp:
+	* plugins/stk/voices/voices/blow_bottle/artwork.png:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_processor.h:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_instrument.h:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_instrument_view.cpp:
+	* plugins/stk/voices/voices/blow_bottle/logo.png:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_instrument_view.h:
+	* plugins/stk/voices/voices/blow_bottle/blow_bottle_instrument.cpp:
+	* plugins/stk/voices/voices/blow_bottle/Makefile.am:
+	* plugins/stk/voices/voices/Makefile.am:
+	* plugins/stk/voices/voices/brass/brass_instrument_view.h:
+	* plugins/stk/voices/voices/brass/brass_instrument.cpp:
+	* plugins/stk/voices/voices/brass/brass_processor.h:
+	* plugins/stk/voices/voices/brass/brass_processor.cpp:
+	* plugins/stk/voices/voices/brass/brass_instrument_view.cpp:
+	* plugins/stk/voices/voices/brass/artwork.png:
+	* plugins/stk/voices/voices/brass/brass_instrument.h:
+	* plugins/stk/voices/voices/brass/logo.png:
+	* plugins/stk/voices/voices/brass/brass_model.cpp:
+	* plugins/stk/voices/voices/brass/brass_model.h:
+	* plugins/stk/voices/voices/brass/Makefile.am:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_processor.h:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_instrument_view.h:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_processor.cpp:
+	* plugins/stk/voices/voices/bandedwg/artwork.png:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_model.h:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_instrument.h:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_instrument.cpp:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_instrument_view.cpp:
+	* plugins/stk/voices/voices/bandedwg/logo.png:
+	* plugins/stk/voices/voices/bandedwg/bandedwg_model.cpp:
+	* plugins/stk/voices/voices/bandedwg/Makefile.am:
+	Started working on a multitimbral instrument that uses all of the
+	voices available in STK.  Need to work out the differences in
+	level among the voices and figure out what the controls actually
+	do.  Simplist way to do that was to build them as individual
+	instruments first.  The models, views, and processors should be
+	reusable for the larger instrument.  Except for bandedwg and
+	flute they all work, so if you're curious, add "voices" to the 
+	Makefile.am in plugins/stk to get them to build.
+	
+2007-01-30	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	Began split on Organic. But doesn't show in instrument list
+
+	* plugins/lb302/lb302.cpp:
+	Fixed comments
+
+2008-01-28	Paul Giblock <pgllama/at/gmail/dot/com>
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	finished LB302 M/V-split. however, more changes can be made to meet
+	the coding guidelines.  Let's save this job for LB303
+
+	* include/automatable_model.h:
+	cleaned up code for boolModel
+
+2008-01-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/automatable_button.cpp:
+	- call updateButtons() after model-change
+	- use model()->value() rather than value()
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	fixed upper boundaries for wave-shape- and modulation-algo-models
+
+2008-01-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	initial M/V-split - lots of debugging and cleanups pending, however
+	basically works :)
+
+	* include/transformable_auto_model.h:
+	added transformableAutoModel-class which is not used yet but might be
+	helpful in some cases in the future
+
+	* include/oscillator.h:
+	* src/lib/oscillator.cpp:
+	- changed coding-style for enum-constants
+	- use model for external wave-shape- and modulation-algo-parameter
+
+	* src/widgets/ladspa_control_view.cpp:
+	added missing header
+
+	* src/widgets/automatable_button.cpp:
+	update buttons after changing button-group's value
+
+2008-01-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/types.h:
+	replaced own buggy valueRanges-calculations by numeric_limits-class
+
+	* plugins/lb302/lb302.cpp:
+	fixed broken plugin-entry-point
+
+	* configure.in:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* include/automatable_model.h:
+	* include/journalling_object.h:
+	* src/audio/audio_file_device.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/mmp.cpp:
+	* src/lib/drumsynth.cpp:
+	* src/widgets/group_box.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/main.cpp:
+	* src/core/mixer.cpp:
+	* src/core/effect.cpp:
+	* src/core/timeline.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/meter_dialog.cpp:
+	various fixes for GCC 4.3
+
+	* README:
+	cleanups / fixes
+
+	* include/automatable_model.h:
+	cleanups / coding-style fixes
+
+2008-01-24	Paul Giblock <pgllama/at/gmail/dot/dotcom>
+
+	* include/automatable_model.h:
+	* src/widgets/knob.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/effect.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	add boolModel subclass in order to simplify the constructor
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	split lb302 for M/V.  However, lmms_plugin_main() receives null data,
+	which means the instrumentTrack cannot be set..
+
+2008-01-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/effect_chain.cpp:
+	* src/lib/mmp.cpp:
+	added upgrade-path in order to properly load projects not using the
+	new effect-data-structure
+
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/vst_effect/vst_effect.h:
+	removed nodeName()-function as effects must not overload it (they have
+	descriptors with they unique name in it)
+
+	* include/effect_rack_view.h:
+	* src/widgets/effect_rack_view.cpp:
+	renamed updateView() to update() in order to also track
+	dataChanged()-signals of model without an additional connection
+
+	* src/widgets/combobox.cpp:
+	fixed painting
+
+	* src/widgets/ladspa_control_view.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	made control-layouting work again (did not work at all after Qt4-port)
+
+	* src/core/ladspa_control.cpp:
+	added initialization for m_link-member-variable, optimized
+	linkEnabledModel-initialization
+
+	* src/widgets/knob.cpp:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	coding style fixes
+
+	* Makefile.am:
+	moved ladspa_control_view.cpp to src/widgets/
+
+2008-01-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_controls.h:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	made work again after all the changes in the last days...
+
+	* Makefile.am:
+	* include/ladspa_control.h:
+	* include/ladspa_control_view.h:
+	* src/core/ladspa_control.cpp:
+	* src/core/ladspa_control_view.cpp:
+	splitted ladspaControl-class into ladspaControl and ladspaControlView
+
 2008-01-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/bass_booster/bassbooster_controls.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/bass_booster/Makefile.am:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/bass_booster/bassbooster_control_dialog.h:
+	made work with M/V as well as rewritten effect-framework
+
+	* include/effect.h:
+	* include/effect_control_dialog.h:
+	* include/dummy_effect.h:
+	* include/effect_controls.h:
+	* src/widgets/effect_view.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect.cpp:
+	* Makefile.am:
+	split off effectControlDialog into effectControlDialog and
+	effectControls
+
+	* src/core/song_editor.cpp:
+	also connect to dataUnchanged()-signal of tempo-model in order to
+	setup everything correct by connected slot
+
+	* configure.in:
+	- removed single-source-compile-feature
+	- made FASTCALL-usage optional for the time being
 
 	* data/locale/de.ts:
 	* data/locale/de.qm:
 	updated German localization
 
-2008-01-09	Paul Giblock	<pgllama/at/gmail/dot/com>
-	
+2008-01-09	Paul Giblock <pgllama/at/gmail/dot/com>
+
 	* acinclude.m4:
 	use pkg-config for more accurate Qt directory detection
 
-2008-01-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-01-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
-	* src/widgets/rack_view.cpp:
-	added missing moveUp-call for effect-chain
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	changes for making effects work again with new effect-framework
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	* include/dummy_plugin.h:
+	* include/instrument.h:
+	* include/plugin.h:
+	* include/tool.h:
+	* include/main_window.h:
+	* include/mv_base.h:
+	* include/dummy_instrument.h:
+	* src/core/plugin.cpp:
+	* src/core/tool.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/instrument.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/main_window.cpp:
+	moved createView()-functionality from instrument- to plugin-class
+
+	* include/tab_widget.h:
+	code-formatting stuff
+
+	* include/audio_port.h:
+	* include/instrument_track.h:
+	* include/sample_track.h:
+	* src/audio/audio_port.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	integrated new effect-framework
+
+	* Makefile.am:
+	* include/dummy_effect.h:
+	* include/effect.h:
+	* include/effect_chain.h:
+	* include/effect_control_dialog.h:
+	* include/effect_label.h:
+	* include/effect_rack_view.h:
+	* include/effect_select_dialog.h:
+	* include/effect_tab_widget.h:
+	* include/effect_view.h:
+	* src/core/effect.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/widgets/effect_label.cpp:
+	* src/widgets/effect_view.cpp:
+	* src/widgets/effect_rack_view.cpp:
+	rewrote view-component of effect-framework and removed effectTabWidget
+
+	* include/automatable_model.h:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/automatable_button.cpp:
+	pass model-pointer to modelView-constructor
+
+2008-01-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/organic/organic.cpp:
 	* plugins/bit_invader/bit_invader.cpp:
@@ -24,6 +848,89 @@
 	* src/core/envelope_and_lfo_widget.cpp:
 	simple range-checking
 
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	minor fixes in order to compile again with lately changed effect-API
+
+	* src/core/effect_tab_widget.cpp:
+	* src/lib/mmp.cpp:
+	renabled XML-attribute "fxdisabled" to "fxenabled"
+
+	* src/core/effect_tab_widget.cpp:
+	* include/effect_tab_widget.h:
+	made effects working again by using effect-chain's m_enabledModel as
+	model for effect-groupbox
+
+	* include/effect_chain.h:
+	* src/core/effect_chain.cpp:
+	* src/core/effect_tab_widget.cpp:
+	removed bypassed-property and introduced m_enabledModel
+
+	* include/effect.h:
+	- made lot of methods const
+	- renamed enabled() to isEnabled()
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/bb_editor.cpp:
+	fix missing pattern in new projects by also tracking
+	dataUnchanged()-signals of bbComboBoxModel
+
+	* include/automatable_model_templates.h:
+	* include/mv_base.h:
+	added dataUnchanged()-signal which should be emitted in case new data
+	was not set for the model because it's been equal to old data
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/stk/mallets/mallets.h:
+	* plugins/stk/mallets/mallets.cpp:
+	fixed outstanding issues with LED-checkbox and its model
+
+2008-01-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/group_box.h:
+	* src/widgets/group_box.cpp:
+	removed animation-functionality as it's useless
+
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	fixed boolModel-initializations - makes filter, arpeggio and chords
+	work again
+
+2008-01-03	Danny McRae <khjklujn/at/yahoo/dot/com>
+
+	* plugins/stk/mallets/mallets.h:
+	* plugins/stk/mallets/mallets.cpp:
+	made plugin work with M/V-architecture
+
+2008-01-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	made plugin work with M/V-architecture
+
+	* include/engine.h:
+	* include/plugin.h:
+	* src/core/engine.cpp:
+	fixes regarding coding style guidelines
+
+2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	made plugin work with M/V-architecture
+
+	* include/instrument.h:
+	* include/dummy_instrument.h:
+	* include/mv_base.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/instrument.cpp:
+	M/V-split for instrument-tracks
+
 2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/dummy_effect.h:
@@ -31,6 +938,90 @@
 	make dummyEffect really work in case we need it
 
 2008-01-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/knob.h:
+	* include/effect.h:
+	* include/automatable_slider.h:
+	* include/lcd_spinbox.h:
+	* include/meter_dialog.h:
+	* include/midi_tab_widget.h:
+	* include/instrument_track.h:
+	* include/ladspa_control.h:
+	* include/piano_widget.h:
+	* include/detuning_helper.h:
+	* include/sample_play_handle.h:
+	* include/piano_roll.h:
+	* include/group_box.h:
+	* include/envelope_tab_widget.h:
+	* include/song_editor.h:
+	* include/automatable_button.h:
+	* include/tempo_sync_knob.h:
+	* include/journalling_object.h:
+	* include/setup_dialog.h:
+	* include/export_project_dialog.h:
+	* include/pixmap_button.h:
+	* include/sample_track.h:
+	* include/surround_area.h:
+	* include/volume_knob.h:
+	* include/bb_editor.h:
+	* include/rack_plugin.h:
+	* include/arp_and_chords_tab_widget.h:
+	* include/envelope_and_lfo_widget.h:
+	* include/combobox.h:
+	* include/led_checkbox.h:
+	* configure.in:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/widgets/rack_plugin.cpp:
+	* src/widgets/automatable_slider.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/combobox.cpp:
+	* src/widgets/led_checkbox.cpp:
+	* src/widgets/volume_knob.cpp:
+	* src/widgets/pixmap_button.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/arp_and_chords_tab_widget.cpp:
+	* src/core/envelope_and_lfo_widget.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/midi_tab_widget.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/export_project_dialog.cpp:
+	* src/core/effect.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/track.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/note.cpp:
+	* src/core/envelope_tab_widget.cpp:
+	* src/core/instrument.cpp:
+	* src/core/piano_widget.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/song_editor.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/effect_tab_widget.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/bb_editor.cpp:
+	* src/core/meter_dialog.cpp:
+	* Makefile.am:
+	adaption of M/V-architecture
+
+	* include/automatable_object_templates.h:
+	* include/automatable_object.h:
+	removed as replaced by automatable_model.h and
+	automatable_model_templates.h
+
+	* include/mv_base.h:
+	* src/core/mv_base.cpp:
+	* include/automatable_model.h:
+	* include/automatable_model_templates.h:
+	added base-files for new M/V-architecture
 
 	* src/widgets/rack_plugin.cpp:
 	fixed wrong signal-slot-connection which made gate-parameter of

@@ -4,7 +4,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@
 #include <math.h>
 
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "clipboard.h"
 #include "combobox.h"
 #include "debug.h"
@@ -60,8 +60,9 @@
 #include "midi.h"
 #include "mmp.h"
 #include "pattern.h"
-#include "piano_widget.h"
+#include "piano.h"
 #include "pixmap_button.h"
+#include "song.h"
 #include "song_editor.h"
 #include "templates.h"
 #include "text_float.h"
@@ -127,6 +128,9 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DEFAULT_STEPS_PER_TACT;
 
 
 pianoRoll::pianoRoll( void ) :
+	m_zoomingModel( new comboBoxModel( /* this */ ) ),
+	m_quantizeModel( new comboBoxModel( /* this */ ) ),
+	m_noteLenModel( new comboBoxModel( /* this */ ) ),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -187,8 +191,8 @@ pianoRoll::pianoRoll( void ) :
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
-					engine::getSongEditor()->getPlayPos(
-						songEditor::PLAY_PATTERN ),
+					engine::getSong()->getPlayPos(
+						song::Mode_PlayPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const midiTime & ) ) );
@@ -344,49 +348,51 @@ pianoRoll::pianoRoll( void ) :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// setup zooming-stuff
-	m_zoomingComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_zoomingComboBox->setFixedSize( 80, 22 );
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingComboBox->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingModel->addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingComboBox->setValue( m_zoomingComboBox->findText(
-								"100%" ) );
-	connect( m_zoomingComboBox, SIGNAL( activated( const QString & ) ),
-			this, SLOT( zoomingChanged( const QString & ) ) );
+	m_zoomingModel->setValue( m_zoomingModel->findText( "100%" ) );
+	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+					this, SLOT( zoomingChanged() ) );
+	m_zoomingComboBox = new comboBox( m_toolBar );
+	m_zoomingComboBox->setModel( m_zoomingModel );
+	m_zoomingComboBox->setFixedSize( 80, 22 );
 
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	m_quantizeComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeComboBox->addItem( "1/" + QString::number( 1 << i ) );
+		m_quantizeModel->addItem( "1/" + QString::number( 1 << i ) );
 	}
-	m_quantizeComboBox->setValue( m_quantizeComboBox->findText(
-								"1/16" ) );
+	m_quantizeModel->setValue( m_quantizeModel->findText( "1/16" ) );
+	m_quantizeComboBox = new comboBox( m_toolBar );
+	m_quantizeComboBox->setModel( m_quantizeModel );
+	m_quantizeComboBox->setFixedSize( 60, 22 );
+
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenComboBox = new comboBox( m_toolBar, NULL, NULL );
-	m_noteLenComboBox->setFixedSize( 120, 22 );
-	m_noteLenComboBox->addItem( tr( "Last note" ),
-					embed::getIconPixmap( "edit_draw" ) );
+	m_noteLenModel->addItem( tr( "Last note" ), new QPixmap(
+					embed::getIconPixmap( "edit_draw" ) ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond" } ;
 	for( int i = 0; i < 6; ++i )
 	{
-		m_noteLenComboBox->addItem( "1/" + QString::number( 1 << i ),
-				embed::getIconPixmap(
+		m_noteLenModel->addItem( "1/" + QString::number( 1 << i ),
+				new QPixmap( embed::getIconPixmap(
 					QString( "note_" + pixmaps[i] ).
-						toAscii().constData() ) );
+						toAscii().constData() ) ) );
 	}
-	m_noteLenComboBox->setValue( 0 );
+	m_noteLenModel->setValue( 0 );
+	m_noteLenComboBox = new comboBox( m_toolBar );
+	m_noteLenComboBox->setModel( m_noteLenModel );
+	m_noteLenComboBox->setFixedSize( 120, 22 );
 
 
 	tb_layout->addSpacing( 5 );
@@ -637,8 +643,9 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 {
 	if( validPattern() )
 	{
-		m_pattern->getInstrumentTrack()->getPianoWidget()
-							->keyPressEvent( _ke );
+		// TODO: move this to instrumentTrack-class
+/*		m_pattern->getInstrumentTrack()->getPianoWidget()
+							->keyPressEvent( _ke );*/
 	}
 	switch( _ke->key() )
 	{
@@ -764,7 +771,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSongEditor()->playing() )
+			if( engine::getSong()->playing() )
 			{
 				stop();
 			}
@@ -802,8 +809,8 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 {
 	if( validPattern() )
 	{
-		m_pattern->getInstrumentTrack()->getPianoWidget()
-						->keyReleaseEvent( _ke );
+/*		m_pattern->getInstrumentTrack()->getPianoWidget()
+						->keyReleaseEvent( _ke );*/
 	}
 	switch( _ke->key() )
 	{
@@ -865,8 +872,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			x -= WHITE_KEY_WIDTH;
 
 			// get tact-64th in which the user clicked
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_tact_64th = (x-1) * 64 / m_ppt +
 							m_currentPosition;
+
 
 			// get note-vector of current pattern
 			const noteVector & notes = m_pattern->notes();
@@ -930,10 +938,13 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				if( it == notes.end() )
 				{
 					m_pattern->setType(
-						pattern::MELODY_PATTERN );
+						pattern::MelodyPattern );
 
 					// then set new note
-					midiTime note_pos( pos_tact_64th );
+					// +32 to quanitize the note correctly when placing notes with
+					// the mouse.  We do this here instead of in note.quantized
+					// because live notes should still be quantized at the half.
+					midiTime note_pos( pos_tact_64th - (quantization() / 2) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos,
@@ -987,7 +998,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					QApplication::setOverrideCursor( c );
 				}
 
-				engine::getSongEditor()->setModified();
+				engine::getSong()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -1005,9 +1016,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					else
 					{
 						( *it )->setLength( 0 );
-						m_pattern->update();
+						m_pattern->dataChanged();
 					}
-					engine::getSongEditor()->setModified();
+					engine::getSong()->setModified();
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
@@ -1046,7 +1057,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_action = MOVE_SELECTION;
 
 				play_note = FALSE;
-				engine::getSongEditor()->setModified();
+				engine::getSong()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -1062,7 +1073,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 		// was there an action where should be played the note?
 		if( play_note == TRUE && m_recording == FALSE &&
-				engine::getSongEditor()->playing() == FALSE )
+					engine::getSong()->playing() == FALSE )
 		{
 			m_lastKey = key_num;
 			m_pattern->getInstrumentTrack()->processInEvent(
@@ -1140,7 +1151,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_action != SELECT_NOTES &&
 				m_action != MOVE_SELECTION &&
 				m_recording == FALSE &&
-				engine::getSongEditor()->playing() == FALSE )
+				engine::getSong()->playing() == FALSE )
 			{
 				m_lastKey = key_num;
 				m_pattern->getInstrumentTrack()->processInEvent(
@@ -1167,7 +1178,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								MIN_VOLUME,
 								MAX_VOLUME );
 				m_currentNote->setVolume( vol );
-				m_pattern->update();
+				m_pattern->dataChanged();
 				m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( KEY_PRESSURE, 0, key_num,
 							vol * 127 / 100 ),
@@ -1215,10 +1226,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							tact_64th_diff ) );
 				m_currentNote->quantizeLength( quantization() );
 				m_lenOfNewNotes = m_currentNote->length();
-				m_pattern->update();
+				m_pattern->dataChanged();
 			}
 
-			engine::getSongEditor()->setModified();
+			engine::getSong()->setModified();
 
 		}
 		else if( _me->buttons() == Qt::NoButton && m_editMode == DRAW )
@@ -1970,7 +1981,7 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 	}
 	m_topBottomScroll->setValue( m_totalKeysToScroll - m_startKey );
 
-	engine::getSongEditor()->getPlayPos( songEditor::PLAY_PATTERN
+	engine::getSong()->getPlayPos( song::Mode_PlayPattern
 					).m_timeLine->setFixedWidth( width() );
 	m_toolBar->setFixedWidth( width() );
 	update();
@@ -1994,8 +2005,8 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingComboBox->setValue(
-				m_zoomingComboBox->findText( QString::number(
+		m_zoomingModel->setValue(
+				m_zoomingModel->findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" ) );
 		// update timeline
@@ -2048,31 +2059,30 @@ void pianoRoll::play( void )
 		return;
 	}
 
-	if( engine::getSongEditor()->playing() )
+	if( engine::getSong()->playing() )
 	{
-		if( engine::getSongEditor()->playMode() !=
-						songEditor::PLAY_PATTERN )
+		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 		{
-			engine::getSongEditor()->stop();
-			engine::getSongEditor()->playPattern( m_pattern );
+			engine::getSong()->stop();
+			engine::getSong()->playPattern( m_pattern );
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
 		else
 		{
-			engine::getSongEditor()->pause();
+			engine::getSong()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
 	}
-	else if( engine::getSongEditor()->paused() )
+	else if( engine::getSong()->paused() )
 	{
-		engine::getSongEditor()->resumeFromPause();
+		engine::getSong()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
 	}
 	else
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		engine::getSongEditor()->playPattern( m_pattern );
+		engine::getSong()->playPattern( m_pattern );
 	}
 }
 
@@ -2081,7 +2091,7 @@ void pianoRoll::play( void )
 
 void pianoRoll::record( void )
 {
-	if( engine::getSongEditor()->playing() )
+	if( engine::getSong()->playing() )
 	{
 		stop();
 	}
@@ -2091,7 +2101,7 @@ void pianoRoll::record( void )
 	}
 
 	m_recording = TRUE;
-	engine::getSongEditor()->playPattern( m_pattern, FALSE );
+	engine::getSong()->playPattern( m_pattern, FALSE );
 }
 
 
@@ -2099,7 +2109,7 @@ void pianoRoll::record( void )
 
 void pianoRoll::stop( void )
 {
-	engine::getSongEditor()->stop();
+	engine::getSong()->stop();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
 	m_recording = FALSE;
@@ -2113,14 +2123,14 @@ void pianoRoll::recordNote( const note & _n )
 {
 	if( m_recording == TRUE && validPattern() == TRUE )
 	{
-		note n( _n.length(), engine::getSongEditor()->getPlayPos(
-				songEditor::PLAY_PATTERN ) - _n.length(),
+		note n( _n.length(), engine::getSong()->getPlayPos(
+				song::Mode_PlayPattern ) - _n.length(),
 				_n.tone(), _n.octave(),
 				_n.getVolume(), _n.getPanning() );
 		n.quantizeLength( quantization() );
 		m_pattern->addNote( n );
 		update();
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 	}
 }
 
@@ -2297,7 +2307,7 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 
 void pianoRoll::copy_to_clipboard( const noteVector & _notes ) const
 {
-	multimediaProject mmp( multimediaProject::CLIPBOARD_DATA );
+	multimediaProject mmp( multimediaProject::ClipboardData );
 	QDomElement note_list = mmp.createElement( "note-list" );
 	mmp.content().appendChild( note_list );
 
@@ -2352,7 +2362,7 @@ void pianoRoll::cutSelectedNotes( void )
 	{
 		copy_to_clipboard( selected_notes );
 
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 
 		for( noteVector::iterator it = selected_notes.begin();
 					it != selected_notes.end(); ++it )
@@ -2397,7 +2407,7 @@ void pianoRoll::pasteNotes( void )
 
 		// we only have to do the following lines if we pasted at
 		// least one note...
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 		update();
 		engine::getSongEditor()->update();
 	}
@@ -2426,7 +2436,7 @@ void pianoRoll::deleteSelectedNotes( void )
 
 	if( update_after_delete == TRUE )
 	{
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 		update();
 		engine::getSongEditor()->update();
 	}
@@ -2437,9 +2447,9 @@ void pianoRoll::deleteSelectedNotes( void )
 
 void pianoRoll::updatePosition( const midiTime & _t )
 {
-	if( ( engine::getSongEditor()->playing() &&
-			engine::getSongEditor()->playMode() ==
-					songEditor::PLAY_PATTERN ) ||
+	if( ( engine::getSong()->playing() &&
+			engine::getSong()->playMode() ==
+					song::Mode_PlayPattern ) ||
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - WHITE_KEY_WIDTH;
@@ -2459,9 +2469,10 @@ void pianoRoll::updatePosition( const midiTime & _t )
 
 
 
-void pianoRoll::zoomingChanged( const QString & _zfac )
+void pianoRoll::zoomingChanged( void )
 {
-	m_ppt = _zfac.left( _zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
+	const QString & zfac = m_zoomingModel->currentText();
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -2475,8 +2486,8 @@ void pianoRoll::zoomingChanged( const QString & _zfac )
 
 int pianoRoll::quantization( void ) const
 {
-	return( 64 / m_quantizeComboBox->currentText().right(
-				m_quantizeComboBox->currentText().length() -
+	return( 64 / m_quantizeModel->currentText().right(
+				m_quantizeModel->currentText().length() -
 								2 ).toInt() );
 }
 
@@ -2485,12 +2496,12 @@ int pianoRoll::quantization( void ) const
 
 midiTime pianoRoll::newNoteLen( void ) const
 {
-	if( m_noteLenComboBox->value() == 0 )
+	if( m_noteLenModel->value() == 0 )
 	{
 		return( m_lenOfNewNotes );
 	}
-	return( 64 / m_noteLenComboBox->currentText().right(
-				m_noteLenComboBox->currentText().length() -
+	return( 64 / m_noteLenModel->currentText().right(
+				m_noteLenModel->currentText().length() -
 								2 ).toInt() );
 }
 
@@ -2559,8 +2570,8 @@ bool pianoRoll::x11Event( XEvent * _xe )
 {
 	if( validPattern() )
 	{
-		return( m_pattern->getInstrumentTrack()->getPianoWidget()
-							->x11Event( _xe ) );
+/*		return( m_pattern->getInstrumentTrack()->getPianoWidget()
+							->x11Event( _xe ) );*/
 	}
 	return( FALSE );
 }

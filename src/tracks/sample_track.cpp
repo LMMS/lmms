@@ -4,7 +4,7 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -329,9 +329,12 @@ void sampleTCOSettingsDialog::setSampleFile( const QString & _f )
 
 
 sampleTrack::sampleTrack( trackContainer * _tc ) :
-	track( _tc ),
-	m_audioPort( new audioPort( tr( "Sample track" ) ) )
+	track( SampleTrack, _tc ),
+	m_audioPort( tr( "Sample track" ), this ),
+	m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1/*, this*/ )
 {
+	m_volumeModel.setTrack( this );
+
 	getTrackWidget()->setFixedHeight( 32 );
 
 	m_trackLabel = new effectLabel( tr( "Sample track" ),
@@ -345,9 +348,8 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 	m_trackLabel->show();
 
 	m_volumeKnob = new volumeKnob( knobSmall_17, getTrackSettingsWidget(),
-					    tr( "Channel volume" ), this );
-	m_volumeKnob->setRange( MIN_VOLUME, MAX_VOLUME, 1.0f );
-	m_volumeKnob->setInitValue( DEFAULT_VOLUME );
+					    tr( "Channel volume" ) );
+	m_volumeKnob->setModel( &m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
 	m_volumeKnob->move( 4, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
@@ -370,15 +372,6 @@ sampleTrack::~sampleTrack()
 	}
 
 	engine::getMixer()->removePlayHandles( this );
-	delete m_audioPort;
-}
-
-
-
-
-track::trackTypes sampleTrack::type( void ) const
-{
-	return( SAMPLE_TRACK );
 }
 
 
@@ -391,7 +384,7 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 {
 	sendMidiTime( _start );
 
-	m_audioPort->getEffects()->startRunning();
+	m_audioPort.getEffects()->startRunning();
 	bool played_a_note = FALSE;	// will be return variable
 
 	for( int i = 0; i < numOfTCOs(); ++i )
@@ -405,11 +398,9 @@ bool FASTCALL sampleTrack::play( const midiTime & _start,
 		if( !st->muted() )
 		{
 			samplePlayHandle * handle = new samplePlayHandle( st );
-			connect( m_volumeKnob, SIGNAL( valueChanged( float ) ),
-					handle, SLOT( setVolume( float ) ) );
-			handle->setVolume( m_volumeKnob->value() );
-//TODO: do we need sample tracks in BB editor?
-//			handle->setBBTrack( bb_track );
+			handle->setVolumeModel( &m_volumeModel );
+//TODO: check whether this works
+//			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
 			engine::getMixer()->addPlayHandle( handle );
@@ -436,11 +427,11 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "name", m_trackLabel->text() );
-	m_trackLabel->saveState( _doc, _this );
+	m_audioPort.getEffects()->saveState( _doc, _this );
 #if 0
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 #endif
-	m_volumeKnob->saveSettings( _doc, _this, "vol" );
+	m_volumeModel.saveSettings( _doc, _this, "vol" );
 }
 
 
@@ -454,9 +445,11 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		if( node.isElement() )
 		{
-			if( m_trackLabel->nodeName() == node.nodeName() )
+			if( m_audioPort.getEffects()->nodeName() ==
+							node.nodeName() )
 			{
-				m_trackLabel->restoreState( node.toElement() );
+				m_audioPort.getEffects()->restoreState(
+							node.toElement() );
 			}
 		}
 		node = node.nextSibling();
@@ -467,7 +460,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}
 #endif
-	m_volumeKnob->loadSettings( _this, "vol" );
+	m_volumeModel.loadSettings( _this, "vol" );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * ladspa_effect.h - class for handling LADSPA effect plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,8 +30,7 @@
 #include "effect.h"
 #include "engine.h"
 #include "ladspa_base.h"
-#include "ladspa_control.h"
-#include "ladspa_control_dialog.h"
+#include "ladspa_controls.h"
 #include "main_window.h"
 #include "mixer.h"
 
@@ -41,7 +40,8 @@ typedef QVector<port_desc_t *> multi_proc_t;
 class ladspaEffect : public effect
 {
 public:
-	ladspaEffect( const descriptor::subPluginFeatures::key * _key );
+	ladspaEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key );
 	virtual ~ladspaEffect();
 
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
@@ -49,9 +49,14 @@ public:
 	
 	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );
 
-	inline const multi_proc_t & getControls( void )
+	virtual effectControls * getControls( void )
 	{
 		return( m_controls );
+	}
+
+	inline const multi_proc_t & getPortControls( void )
+	{
+		return( m_portControls );
 	}
 
 	virtual inline QString publicName( void ) const
@@ -64,32 +69,21 @@ public:
 		m_effName = _name;
 	}
 
-	virtual inline effectControlDialog * createControlDialog(
-								track * _track )
-	{
-		return( new ladspaControlDialog(
-					NULL /*engine::getMainWindow()->workspace()*/,
-							this, _track ) );
-	}
-
-	inline virtual QString nodeName( void ) const
-	{
-		return( "ladspaeffect" );
-	}
-
 
 private:
+	ladspaControls * m_controls;
+
 	QString m_effName;
 	ladspa_key_t m_key;
 	Uint16 m_effectChannels;
 	Uint16 m_portCount;
 	fpp_t m_bufferSize;
-			
+
 	const LADSPA_Descriptor * m_descriptor;
 	QVector<LADSPA_Handle> m_handles;
 
 	QVector<multi_proc_t> m_ports;
-	multi_proc_t m_controls;
+	multi_proc_t m_portControls;
 } ;
 
 #endif

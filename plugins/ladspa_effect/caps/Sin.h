@@ -31,26 +31,21 @@
 #include "dsp/Sine.h"
 
 class Sin
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample f, gain;
 
 		DSP::Sine sin;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [3];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
-		void activate()
-			{ }
+		void init();
+		void activate() {}
 
 		void run (int n)
 			{

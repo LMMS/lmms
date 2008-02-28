@@ -30,14 +30,12 @@
 #include <QtGui/QPainter>
 
 #include "pixmap_button.h"
-#include "automatable_object_templates.h"
 #include "embed.h"
 
 
 
-pixmapButton::pixmapButton( QWidget * _parent, const QString & _name,
-							track * _track ) :
-	automatableButton( _parent, _name, _track ),
+pixmapButton::pixmapButton( QWidget * _parent, const QString & _name ) :
+	automatableButton( _parent, _name ),
 	m_activePixmap(),
 	m_inactivePixmap()
 {
@@ -59,7 +57,7 @@ void pixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	if( isChecked() )
+	if( model()->value() )
 	{
 		if( !m_activePixmap.isNull() )
 		{

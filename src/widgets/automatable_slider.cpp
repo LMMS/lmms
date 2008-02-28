@@ -4,6 +4,7 @@
  * automatable_slider.cpp - implementation of class automatableSlider
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +31,7 @@
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "knob.h"
@@ -38,21 +39,17 @@
 
 
 
-automatableSlider::automatableSlider( QWidget * _parent, const QString & _name,
-							class track * _track ) :
+automatableSlider::automatableSlider( QWidget * _parent, const QString & _name ) :
 	QSlider( _parent ),
-	m_show_status( FALSE )
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	m_showStatus( FALSE )
 {
-	m_knob = new knob( knobDark_28, NULL, _name, _track );
-
 	setAccessibleName( _name );
 
-	connect( m_knob, SIGNAL( valueChanged( float ) ), this,
-						SLOT( updateSlider( void ) ) );
-	connect( this, SIGNAL( valueChanged( int ) ), this,
-						SLOT( changeValue( int ) ) );
-	connect( this, SIGNAL( sliderMoved( int ) ), this,
-						SLOT( moveSlider( int ) ) );
+	connect( this, SIGNAL( valueChanged( int ) ),
+					this, SLOT( changeValue( int ) ) );
+	connect( this, SIGNAL( sliderMoved( int ) ),
+					this, SLOT( moveSlider( int ) ) );
 }
 
 
@@ -60,34 +57,6 @@ automatableSlider::automatableSlider( QWidget * _parent, const QString & _name,
 
 automatableSlider::~automatableSlider()
 {
-	delete m_knob;
-}
-
-
-
-
-void automatableSlider::setRange( int _min, int _max )
-{
-	QSlider::setRange( _min, _max );
-	m_knob->setRange( _min, _max, 1.0f );
-}
-
-
-
-
-void automatableSlider::setValue( int _value )
-{
-	QSlider::setValue( _value );
-	m_knob->setValue( _value );
-}
-
-
-
-
-void automatableSlider::setInitValue( int _value )
-{
-	m_knob->setInitValue( _value );
-	QSlider::setValue( _value );
 }
 
 
@@ -98,7 +67,7 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
-					m_knob->getAutomationPattern(),
+					model()->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -108,7 +77,7 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 
 void automatableSlider::mousePressEvent( QMouseEvent * _me )
 {
-	m_show_status = TRUE;
+	m_showStatus = TRUE;
 	QSlider::mousePressEvent( _me );
 }
 
@@ -117,7 +86,7 @@ void automatableSlider::mousePressEvent( QMouseEvent * _me )
 
 void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_show_status = FALSE;
+	m_showStatus = FALSE;
 	QSlider::mouseReleaseEvent( _me );
 }
 
@@ -126,10 +95,21 @@ void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 
 void automatableSlider::wheelEvent( QWheelEvent * _me )
 {
-	bool old_status = m_show_status;
-	m_show_status = TRUE;
+	bool old_status = m_showStatus;
+	m_showStatus = TRUE;
 	QSlider::wheelEvent( _me );
-	m_show_status = old_status;
+	m_showStatus = old_status;
+}
+
+
+
+
+void automatableSlider::modelChanged( void )
+{
+	QSlider::setRange( model()->minValue(), model()->maxValue() );
+	updateSlider();
+	connect( model(), SIGNAL( dataChanged() ),
+				this, SLOT( updateSlider() ) );
 }
 
 
@@ -137,8 +117,8 @@ void automatableSlider::wheelEvent( QWheelEvent * _me )
 
 void automatableSlider::changeValue( int _value )
 {
-	setValue( _value );
-	emit logicValueChanged( logicValue() );
+	model()->setValue( _value );
+	emit logicValueChanged( model()->value() );
 }
 
 
@@ -146,8 +126,8 @@ void automatableSlider::changeValue( int _value )
 
 void automatableSlider::moveSlider( int _value )
 {
-	setValue( _value );
-	emit logicSliderMoved( logicValue() );
+	model()->setValue( _value );
+	emit logicSliderMoved( model()->value() );
 }
 
 
@@ -155,41 +135,7 @@ void automatableSlider::moveSlider( int _value )
 
 void automatableSlider::updateSlider( void )
 {
-	QSlider::setValue( logicValue() );
-}
-
-
-
-
-void automatableSlider::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
-{
-	m_knob->saveSettings( _doc, _this, _name );
-}
-
-
-
-
-void automatableSlider::loadSettings( const QDomElement & _this,
-							const QString & _name )
-{
-	m_knob->loadSettings( _this, _name );
-}
-
-
-
-
-int automatableSlider::logicValue( void )
-{
-	return( (int)roundf( m_knob->value() ) );
-}
-
-
-
-
-void automatableSlider::clearAutomationValues( void )
-{
-	m_knob->getAutomationPattern()->clear();
+	QSlider::setValue( model()->value() );
 }
 
 

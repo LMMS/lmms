@@ -3,7 +3,7 @@
 /*
  * plugin.cpp - implementation of plugin-class including plugin-loader
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,7 +53,9 @@ static plugin::descriptor dummy_plugin_descriptor =
 
 
 
-plugin::plugin( const descriptor * _descriptor ) :
+plugin::plugin( const descriptor * _descriptor, model * _parent ) :
+	journallingObject(),
+	model( _parent ),
 	m_descriptor( _descriptor )
 {
 	if( dummy_plugin_descriptor.logo == NULL )
@@ -92,7 +94,8 @@ QString plugin::getParameter( const QString & )
 
 
 
-plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
+plugin * plugin::instantiate( const QString & _plugin_name, model * _parent,
+								void * _data )
 {
 	QLibrary plugin_lib( configManager::inst()->pluginDir() +
 								_plugin_name );
@@ -118,7 +121,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, void * _data )
 						QMessageBox::Default );
 		return( new dummyPlugin() );
 	}
-	plugin * inst = inst_hook( _data );
+	plugin * inst = inst_hook( _parent, _data );
 	return( inst );
 }
 
@@ -171,6 +174,18 @@ void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 		_plugin_descs.push_back( *plugin_desc );
 	}
 
+}
+
+
+
+pluginView * plugin::createView( QWidget * _parent )
+{
+	pluginView * pv = instantiateView( _parent );
+	if( pv != NULL )
+	{
+		pv->setModel( this );
+	}
+	return( pv );
 }
 
 

@@ -2,7 +2,7 @@
  * instrument.h - declaration of class instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,9 +27,7 @@
 #ifndef _INSTRUMENT_H
 #define _INSTRUMENT_H
 
-
 #include <QtGui/QWidget>
-#include <QtCore/QVector>
 
 #include "plugin.h"
 #include "mixer.h"
@@ -37,18 +35,23 @@
 
 // forward-declarations
 class instrumentTrack;
-class notePlayHandle;
+class instrumentView;
 class midiEvent;
 class midiTime;
+class notePlayHandle;
 class track;
 
 
-class instrument : public QWidget, public plugin
+class instrument : public plugin
 {
 public:
-	instrument( instrumentTrack * _channel_track,
+	instrument( instrumentTrack * _instrument_track,
 					const descriptor * _descriptor );
 	virtual ~instrument();
+
+	// --------------------------------------------------------------------
+	// functions that can/should be re-implemented:
+	// --------------------------------------------------------------------
 
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes it's
@@ -101,10 +104,15 @@ public:
 		return( FALSE );
 	}
 
+
+	// --------------------------------------------------------------------
+	// provided functions:
+	// --------------------------------------------------------------------
+
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
 	static instrument * FASTCALL instantiate( const QString & _plugin_name,
-					instrumentTrack * _channel_track );
+					instrumentTrack * _instrument_track );
 
 	virtual bool isFromTrack( const track * _track ) const;
 
@@ -119,7 +127,6 @@ protected:
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
-
 
 private:
 	instrumentTrack * m_instrumentTrack;

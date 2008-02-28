@@ -30,6 +30,7 @@
 
 #include <QtGui/QWidget>
 
+#include "automatable_model.h"
 #include "mixer.h"
 
 
@@ -41,24 +42,70 @@ class track;
 const int SURROUND_AREA_SIZE = 1024;
 
 
-class surroundArea : public QWidget
+class surroundAreaModel : public model
+{
+	Q_OBJECT
+	mapPropertyFromModel(int,x,setX,m_posX);
+	mapPropertyFromModel(int,y,setY,m_posY);
+public:
+	surroundAreaModel( ::model * _parent, track * _track = NULL,
+					bool _default_constructed = FALSE );
+
+	volumeVector getVolumeVector( float _v_scale ) const;
+
+	void saveSettings( QDomDocument & _doc, QDomElement & _this,
+					const QString & _name = "surpos" );
+	void loadSettings( const QDomElement & _this,
+					const QString & _name = "surpos" );
+
+	inline void prepareJournalEntryFromOldVal( void )
+	{
+		m_posX.prepareJournalEntryFromOldVal();
+		m_posY.prepareJournalEntryFromOldVal();
+	}
+
+	inline void addJournalEntryFromOldToCurVal( void )
+	{
+		m_posX.addJournalEntryFromOldToCurVal();
+		m_posY.addJournalEntryFromOldToCurVal();
+	}
+
+	automationPattern * automationPatternX( void )
+	{
+		return( m_posX.getAutomationPattern() );
+	}
+
+	automationPattern * automationPatternY( void )
+	{
+		return( m_posY.getAutomationPattern() );
+	}
+
+
+private:
+	intModel m_posX;
+	intModel m_posY;
+
+} ;
+
+
+
+class surroundArea : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	surroundArea( QWidget * _parent, const QString & _name,
-							track * _track );
+	surroundArea( QWidget * _parent, const QString & _name );
 	virtual ~surroundArea();
-	volumeVector getVolumeVector( float _v_scale ) const;
-	inline const QPoint & value( void ) const
-	{
-		return( m_sndSrcPos );
-	}
-	void FASTCALL setValue( const QPoint & _p );
 
-	void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _this,
-					const QString & _name = "surpos" );
-	void FASTCALL loadSettings( const QDomElement & _this,
-					const QString & _name = "surpos" );
+
+	surroundAreaModel * model( void )
+	{
+		return( castModel<surroundAreaModel>() );
+	}
+
+	const surroundAreaModel * model( void ) const
+	{
+		return( castModel<surroundAreaModel>() );
+	}
 
 
 protected:
@@ -69,22 +116,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 
-signals:
-	void valueChanged( const QPoint & _p );
-
-
 private:
-	QPoint m_sndSrcPos;
-
 	static QPixmap * s_backgroundArtwork;
-
-	knob * m_position_x;
-	knob * m_position_y;
-
-
-private slots:
-	void updatePositionX( void );
-	void updatePositionY( void );
 
 } ;
 

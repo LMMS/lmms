@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,13 +30,14 @@
 #include <QtGui/QDialog>
 
 #include "export.h"
+#include "automatable_model.h"
+#include "combobox.h"
 
 
 class QLabel;
 class QPushButton;
 class QProgressBar;
 
-class comboBox;
 class ledCheckBox;
 class pixmapButton;
 
@@ -67,11 +68,15 @@ private:
 	void finishProjectExport( void );
 	void abortProjectExport( void );
 
-	static fileTypes getFileTypeFromExtension( const QString & _ext );
+	static ExportFileTypes getFileTypeFromExtension( const QString & _ext );
 	static Sint16 s_availableBitrates[];
 
 
-	QString m_fileName;
+	comboBoxModel m_typeModel;
+	comboBoxModel m_kbpsModel;
+	boolModel m_vbrEnabledModel;
+	boolModel m_hqmEnabledModel;
+
 	QLabel * m_typeLbl;
 	comboBox * m_typeCombo;
 	QLabel * m_kbpsLbl;
@@ -83,7 +88,8 @@ private:
 	QPushButton * m_cancelBtn;
 	QProgressBar * m_exportProgressBar;
 
-	fileTypes m_fileType;
+	QString m_fileName;
+	ExportFileTypes m_fileType;
 	bool m_deleteFile;
 
 } ;

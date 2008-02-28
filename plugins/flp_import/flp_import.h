@@ -1,7 +1,7 @@
 /*
  * flp_import.h - support for importing FLP-files
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -168,6 +168,11 @@ class flpImport : public importFilter
 public:
 	flpImport( const QString & _file );
 	virtual ~flpImport();
+
+	virtual pluginView * instantiateView( QWidget * )
+	{
+		return( NULL );
+	}
 
 
 private:

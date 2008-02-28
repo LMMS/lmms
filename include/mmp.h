@@ -1,7 +1,7 @@
 /*
  * mmp.h - class for reading and writing multimedia-project-files
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,27 +34,27 @@
 class multimediaProject : public QDomDocument
 {
 public:
-	enum projectTypes
+	enum ProjectTypes
 	{
-		UNKNOWN,
-		SONG_PROJECT,
-		SONG_PROJECT_TEMPLATE,
-		INSTRUMENT_TRACK_SETTINGS,
-		DRAG_N_DROP_DATA,
-		CLIPBOARD_DATA,
-		JOURNAL_DATA,
-		EFFECT_SETTINGS,
-		VIDEO_PROJECT,		// might come later...
-		BURN_PROJECT,		// might come later...
-		PLAYLIST,		// might come later...
-		PROJ_TYPE_COUNT
+		UnknownType,
+		SongProject,
+		SongProjectTemplate,
+		InstrumentTrackSettings,
+		DragNDropData,
+		ClipboardData,
+		JournalData,
+		EffectSettings,
+		VideoProject,		// might come later...
+		BurnProject,		// might come later...
+		Playlist,		// might come later...
+		NumProjectTypes
 	} ;
 
 
 	multimediaProject( const QString & _in_file_name,
 						bool _is_filename = TRUE,
 						bool _upgrade = TRUE );
-	multimediaProject( projectTypes _project_type );
+	multimediaProject( ProjectTypes _project_type );
 	~multimediaProject();
 
 	QString nameWithExtension( const QString & _fn ) const;
@@ -70,17 +70,17 @@ public:
 		return( m_head );
 	}
 
-	inline projectTypes type( void ) const
+	inline ProjectTypes type( void ) const
 	{
 		return( m_type );
 	}
 
-	static projectTypes typeOfFile( const QString & _fn );
+	static ProjectTypes typeOfFile( const QString & _fn );
 
 
 private:
-	static projectTypes type( const QString & _type_name );
-	static QString typeName( projectTypes _project_type );
+	static ProjectTypes type( const QString & _type_name );
+	static QString typeName( ProjectTypes _project_type );
 
 	void cleanMetaNodes( QDomElement _de );
 
@@ -89,14 +89,14 @@ private:
 
 	struct typeDescStruct
 	{
-		projectTypes m_type;
+		ProjectTypes m_type;
 		QString m_name;
 	} ;
-	static typeDescStruct s_types[PROJ_TYPE_COUNT];
+	static typeDescStruct s_types[NumProjectTypes];
 
 	QDomElement m_content;
 	QDomElement m_head;
-	projectTypes m_type;
+	ProjectTypes m_type;
 
 } ;
 

@@ -2,7 +2,7 @@
  * effect_control_dialog.h - base-class for effect-dialogs for displaying and
  *                           editing control port values
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,21 +28,18 @@
 
 #include <QtGui/QWidget>
 
-#include "journalling_object.h"
+#include "mv_base.h"
 
 
-class effect;
-class track;
+class effectControls;
 
 
-class effectControlDialog : public QWidget, public journallingObject
+class effectControlDialog : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	effectControlDialog( QWidget * _parent, effect * _eff );
+	effectControlDialog( effectControls * _controls );
 	virtual ~effectControlDialog();
-
-	virtual ch_cnt_t getControlCount( void ) = 0;
 
 
 signals:
@@ -51,15 +48,10 @@ signals:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	template<class T>
-	T * getEffect( void )
-	{
-		return( dynamic_cast<T *>( m_effect ) );
-	}
 
 
 private:
-	effect * m_effect;
+	effectControls * m_effectControls;
 
 } ;
 

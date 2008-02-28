@@ -1,7 +1,7 @@
 /*
 	Eq.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,14 +31,8 @@
 #include "Eq.h"
 #include "Descriptor.h"
 
-void
-Eq::init (double _fs)
-{
-	fs = _fs;
-	eq.init (fs, 1.2);
-	normal = NOISE_FLOOR;
-}
-
+/* slight adjustments to gain to keep response optimally flat at
+ * 0 dB gain in all bands */
 inline static double 
 adjust_gain (int i, double g)
 {
@@ -53,13 +47,22 @@ adjust_gain (int i, double g)
 	return g * adjust[i];
 }
 
+#define Q 1.2
+
+void
+Eq::init()
+{
+	eq.init (fs, Q); 
+}
+
 void
 Eq::activate()
 {
 	for (int i = 0; i < 10; ++i)
 	{
-		gain[i] = *ports [1 + i];
+		gain[i] = getport (1 + i);
 		eq.gain[i] = adjust_gain (i, DSP::db2lin (gain[i]));
+		eq.gf[i] = 1;
 	}
 }
 
@@ -71,29 +74,34 @@ Eq::one_cycle (int frames)
 
 	/* evaluate band gain changes and compute recursion factor to prevent
 	 * zipper noise */
-	double one_over_n = 1. / frames;
+	double one_over_n = frames > 0 ? 1. / frames : 1;
 
 	for (int i = 0; i < 10; ++i)
 	{
-		if (*ports [1 + i] == gain[i])
+		d_sample g = getport (1 + i);
+		if (g == gain[i])
 		{
 			/* no gain factoring */
 			eq.gf[i] = 1;
 			continue;
 		}
+		gain[i] = g;
 
-		gain[i] = *ports [1 + i];
-
-		double want = adjust_gain (i, DSP::db2lin (gain[i]));
+		double want = adjust_gain (i, DSP::db2lin (g));
 		eq.gf[i] = pow (want / eq.gain[i], one_over_n);
 	}
 
 	d_sample * d = ports[11];
 
 	for (int i = 0; i < frames; ++i)
-		F (d, i, eq.process (s[i] + normal), adding_gain);
+	{
+		d_sample x = s[i];
+		x = eq.process (x);
+		F (d, i, x, adding_gain);
+	}
 
-	normal = -normal;
+	eq.normal = -normal;
+	eq.flush_0();
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -108,43 +116,43 @@ Eq::port_info [] =
 	}, {
 		"31 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_LOW, -48, 24}
 	}, {
 		"63 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"125 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"250 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"500 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"1 kHz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"2 kHz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"4 kHz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"8 kHz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"16 kHz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_0, -48, 30}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"out",
 		OUTPUT | AUDIO,
@@ -159,11 +167,164 @@ Descriptor<Eq>::setup()
 	Label = "Eq";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Eq - 10-band 'analogue' equalizer";
+	Name = CAPS "Eq - 10-band equalizer";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
 }
+
+/* //////////////////////////////////////////////////////////////////////// */
+
+void
+Eq2x2::init()
+{
+	for (int c = 0; c < 2; ++c)
+		eq[c].init (fs, Q);
+}
+
+void
+Eq2x2::activate()
+{
+	/* Fetch current parameter settings so we won't sweep band gains in the
+	 * first block to process.
+	 */
+	for (int i = 0; i < 10; ++i)
+	{
+		gain[i] = getport (2 + i);
+		double a = adjust_gain (i, DSP::db2lin (gain[i]));
+		for (int c = 0; c < 2; ++c)
+			eq[c].gf[i] = 1,
+			eq[c].gain[i] = a;
+	}
+}
+
+template <sample_func_t F>
+void
+Eq2x2::one_cycle (int frames)
+{
+	/* evaluate band gain changes and compute recursion factor to prevent
+	 * zipper noise */
+	double one_over_n = frames > 0 ? 1. / frames : 1;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		double a;
+
+		if (*ports [2 + i] == gain[i])
+			/* still same value, no gain fade */
+			a = 1;
+		else
+		{
+			gain[i] = getport (2 + i);
+			
+			/* prepare factor for logarithmic gain fade */
+			a = adjust_gain (i, DSP::db2lin (gain[i]));
+			a = pow (a / eq[0].gain[i], one_over_n);
+		}
+
+		for (int c = 0; c < 2; ++c)
+			eq[c].gf[i] = a;
+	}
+
+	for (int c = 0; c < 2; ++c)
+	{
+		d_sample 
+			* s = ports[c],
+			* d = ports[12 + c];
+
+		for (int i = 0; i < frames; ++i)
+		{
+			d_sample x = s[i];
+			x = eq[c].process (x);
+			F (d, i, x, adding_gain);
+		}
+	}
+
+	/* flip 'renormal' values */
+	for (int c = 0; c < 2; ++c)
+	{
+		eq[c].normal = normal;
+		eq[c].flush_0();
+	}
+}
+
+PortInfo
+Eq2x2::port_info [] =
+{
+	{
+		"in:l",
+		INPUT | AUDIO,
+		{0, -1, 1}
+	}, {
+		"in:r",
+		INPUT | AUDIO,
+		{0, -1, 1}
+	}, {
+		"31 Hz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"63 Hz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"125 Hz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"250 Hz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"500 Hz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"1 kHz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"2 kHz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"4 kHz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"8 kHz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"16 kHz",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_0, -48, 24}
+	}, {
+		"out:l",
+		OUTPUT | AUDIO,
+		{0}
+	}, {
+		"out:r",
+		OUTPUT | AUDIO,
+		{0}
+	}
+};
+
+template <> void
+Descriptor<Eq2x2>::setup()
+{
+	UniqueID = 2594;
+	Label = "Eq2x2";
+	Properties = HARD_RT;
+
+	Name = CAPS "Eq2x2 - stereo 10-band equalizer";
+	Maker = "Tim Goetze <tim@quitte.de>";
+	Copyright = "GPL, 2004-7";
+
+	/* fill port info and vtable */
+	autogen();
+}
+
 

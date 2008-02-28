@@ -33,7 +33,7 @@
 #include <math.h>
 
 #include "volume_knob.h"
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "main_window.h"
 #include "config_mgr.h"
 #include "engine.h"
@@ -42,9 +42,9 @@
 
 
 
-volumeKnob::volumeKnob( int _knob_num, QWidget * _parent, const QString & _name,
-							track * _track ) :
-	knob( _knob_num, _parent, _name, _track )
+volumeKnob::volumeKnob( int _knob_num, QWidget * _parent,
+						const QString & _name ) :
+	knob( _knob_num, _parent, _name )
 {
 }
 
@@ -64,7 +64,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			   engine::getMainWindow()->isCtrlPressed() == FALSE )
 	{
-		prepareJournalEntryFromOldVal();
+		model()->prepareJournalEntryFromOldVal();
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -116,14 +116,14 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 
 
 
-//! Mouse Move Event handler
 void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 {
+	// TODO: merge code with knob::mouseMoveEvent
 	if( m_buttonPressed == TRUE )
 	{
 		setPosition( _me->pos() );
-		emit sliderMoved( value() );
-		emit valueChanged();
+		emit sliderMoved( model()->value() );
+//		emit valueChanged();
 		if( !configManager::inst()->value( "knobs",
 		     "classicalusability").toInt() )
 		{
@@ -135,12 +135,12 @@ void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		val = QString( " %1 dBV" ).arg(
-				20.0 * log10( value() / 100.0 ),
+				20.0 * log10( model()->value() / 100.0 ),
 				3, 'f', 2 );
 	}
 	else
 	{
-		val = QString( " %1%" ).arg( value(), 3, 'f', 0 );
+		val = QString( " %1%" ).arg( model()->value(), 3, 'f', 0 );
 	}
 	s_textFloat->setText( m_hintTextBeforeValue + val );
 }
@@ -150,9 +150,10 @@ void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 
 void volumeKnob::wheelEvent( QWheelEvent * _we )
 {
+	// TODO: merge code with knob::mouseMoveEvent
 	_we->accept();
 	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
-	incValue( inc );
+	model()->incValue( inc );
 
 
 	s_textFloat->reparent( this );
@@ -161,12 +162,12 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		val = QString( " %1 dBV" ).arg(
-				20.0 * log10( value() / 100.0 ),
+				20.0 * log10( model()->value() / 100.0 ),
 				3, 'f', 2 );
 	}
 	else
 	{
-		val = QString( " %1%" ).arg( value(), 3, 'f', 0 );
+		val = QString( " %1%" ).arg( model()->value(), 3, 'f', 0 );
 	}
 	s_textFloat->setText( m_hintTextBeforeValue + val );
 	
@@ -174,8 +175,8 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 			QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
-	emit sliderMoved( value() );
-	emit valueChanged();
+	emit sliderMoved( model()->value() );
+//	emit valueChanged();
 }
 
 
@@ -191,7 +192,7 @@ void volumeKnob::enterValue( void )
 			this, accessibleName(),
 			tr( "Please enter a new value between "
 					"-96.0 dBV and 6.0 dBV:" ),
-					20.0 * log10( value() / 100.0 ), 
+				20.0 * log10( model()->value() / 100.0 ),
 							-96.0, 6.0, 4, &ok );
 		if( new_val <= -96.0 )
 		{
@@ -207,15 +208,17 @@ void volumeKnob::enterValue( void )
 		new_val = QInputDialog::getDouble(
 				this, accessibleName(),
 				tr( "Please enter a new value between "
-						"%1 and %2:" ).arg(
-					minValue() ).arg( maxValue() ),
-					value(), minValue(), maxValue(),
-								4, &ok );
+						"%1 and %2:" ).
+					arg( model()->minValue() ).
+					arg( model()->maxValue() ),
+					model()->value(),
+					model()->minValue(),
+					model()->maxValue(), 4, &ok );
 	}
-		
+
 	if( ok )
 	{
-		setValue( new_val );
+		model()->setValue( new_val );
 	}
 }
 

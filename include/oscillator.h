@@ -1,7 +1,7 @@
 /*
  * oscillator.h - header-file for oscillator.cpp, a powerful oscillator-class
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,39 +38,48 @@
 #include "sample_buffer.h"
 #include "lmms_constants.h"
 #include "lmms_math.h"
+#include "automatable_model.h"
 
 
 class oscillator
 {
 public:
-	enum waveShapes
+	enum WaveShapes
 	{
-		SIN_WAVE,
-		TRIANGLE_WAVE,
-		SAW_WAVE,
-		SQUARE_WAVE,
-		MOOG_SAW_WAVE,
-		EXP_WAVE,
-		WHITE_NOISE_WAVE,
-		USER_DEF_WAVE
+		SineWave,
+		TriangleWave,
+		SawWave,
+		SquareWave,
+		MoogSawWave,
+		ExponentialWave,
+		WhiteNoise,
+		UserDefinedWave,
+		NumWaveShapes
 	} ;
 
-	enum modulationAlgos
+	enum ModulationAlgos
 	{
-		PHASE_MODULATION, AMP_MODULATION, MIX, SYNC, FREQ_MODULATION
+		PhaseModulation,
+		AmplitudeModulation,
+		SignalMix,
+		SynchronizedBySubOsc,
+		FrequencyModulation,
+		NumModulationAlgos,
 	} ;
 
-	oscillator( const waveShapes & _wave_shape,
-			const modulationAlgos & _modulation_algo,
+
+	oscillator( const intModel & _wave_shape_model,
+			const intModel & _mod_algo_model,
 			const float & _freq,
 			const float & _detuning,
 			const float & _phase_offset,
 			const float & _volume,
-			oscillator * _m_subOsc = NULL ) FASTCALL;
+			oscillator * _m_subOsc = NULL );
 	virtual ~oscillator()
 	{
 		delete m_subOsc;
 	}
+
 
 	inline void setUserWave( const sampleBuffer * _wave )
 	{
@@ -79,13 +88,6 @@ public:
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-
-/*#define	FLOAT_TO_INT(in,out)		\
-	register const float round_const = -0.5f;			\
-	__asm__ __volatile__ ("fadd %%st,%%st(0)\n"		\
-				"fadd	%2\n"			\
-				"fistpl	%0\n"			\
-				"shrl	$1,%0" : "=m" (out) : "t" (in),"m"(round_const) : "st") ;*/
 
 	// now follow the wave-shape-routines...
 
@@ -154,8 +156,8 @@ public:
 
 
 private:
-	const waveShapes & m_waveShape;
-	const modulationAlgos & m_modulationAlgo;
+	const intModel & m_waveShapeModel;
+	const intModel & m_modulationAlgoModel;
 	const float & m_freq;
 	const float & m_detuning;
 	const float & m_volume;
@@ -183,26 +185,26 @@ private:
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<waveShapes W>
+	template<WaveShapes W>
 	void updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	template<waveShapes W>
+	template<WaveShapes W>
 	inline sample_t getSample( const float _sample );
 
 	inline void FASTCALL recalcPhase( void );

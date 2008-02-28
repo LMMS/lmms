@@ -4,7 +4,7 @@
  * automation_pattern.cpp - implementation of class automationPattern which
  *                          holds dynamic values
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 
 #include "automation_pattern.h"
 #include "automation_editor.h"
+#include "automatable_model_templates.h"
 #include "engine.h"
 #include "level_object.h"
 #include "note.h"
@@ -138,7 +139,7 @@ midiTime automationPattern::length( void ) const
 midiTime automationPattern::putValue( const midiTime & _time, const int _value,
 							const bool _quant_pos )
 {
-	midiTime new_time = _quant_pos ?
+	midiTime new_time = _quant_pos && engine::getAutomationEditor() ?
 		note::quantized( _time,
 			engine::getAutomationEditor()->quantization() ) :
 		_time;
@@ -184,7 +185,8 @@ void automationPattern::removeValue( const midiTime & _time )
 void automationPattern::clear( void )
 {
 	m_time_map.clear();
-	if( engine::getAutomationEditor()->currentPattern() == this )
+	if( engine::getAutomationEditor() &&
+		engine::getAutomationEditor()->currentPattern() == this )
 	{
 		engine::getAutomationEditor()->update();
 	}
@@ -261,8 +263,8 @@ const QString automationPattern::name( void )
 {
 	if( m_track )
 	{
-		QString widget_name = dynamic_cast<QWidget *>( m_object )
-							->accessibleName();
+		QString widget_name = m_object->displayName();
+/* dynamic_cast<QWidget *>( m_object )->accessibleName();*/
 		return( m_track->name() + " - " + widget_name );
 	}
 	else

@@ -37,7 +37,7 @@ class QMdiArea;
 class QSplashScreen;
 
 class configManager;
-class tool;
+class pluginView;
 class toolButton;
 
 
@@ -58,7 +58,7 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void resetWindowTitle( bool _modified = FALSE );
+	void resetWindowTitle( void );
 
 
 	// every function that replaces current file (e.g. creates new file,
@@ -155,10 +155,8 @@ private:
 		bool m_alt;
 	} m_keyMods;
 
-	QMenu * m_tools_menu;
-	QList<tool *> m_tools;
-
-	bool m_modified;
+	QMenu * m_toolsMenu;
+	QList<pluginView *> m_tools;
 
 
 	friend class engine;

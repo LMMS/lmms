@@ -1,7 +1,8 @@
 /*
  * effect_chain.h - class for processing and effects chain
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,37 +28,49 @@
 
 #include "effect.h"
 
-typedef QVector<effect *> effect_list_t;
 
-class effectChain
+class effectChain : public journallingObject, public model
 {
 public:
-	effectChain( void );
+	effectChain( audioPort * _port, track * _track );
 	virtual ~effectChain();
-	
-	void FASTCALL appendEffect( effect * _effect );
-	void FASTCALL removeEffect( effect * _effect );
-	void FASTCALL moveDown( effect * _effect );
-	void FASTCALL moveUp( effect * _effect );
-	bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf, 
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "fxchain" );
+	}
+
+	void appendEffect( effect * _effect );
+	void removeEffect( effect * _effect );
+	void moveDown( effect * _effect );
+	void moveUp( effect * _effect );
+	bool processAudioBuffer( surroundSampleFrame * _buf, 
 							const fpp_t _frames );
 	void startRunning( void );
 	bool isRunning( void );
-	
-	inline void setBypass( bool _mode )
-	{
-		m_bypassed = _mode;
-	}
-	
-	inline const effect_list_t & getEffects( void )
+
+/*	inline const effect_list_t & getEffects( void )
 	{
 		return( m_effects );
-	}
-	
+	}*/
+
+	void deleteAllPlugins( void );
+
+
 private:
-	effect_list_t m_effects;
-	
-	bool m_bypassed;
+	typedef QVector<effect *> effectList;
+	effectList m_effects;
+
+	audioPort * m_port;
+	track * m_track;
+
+	boolModel m_enabledModel;
+
+
+	friend class effectRackView;
 
 } ;
 

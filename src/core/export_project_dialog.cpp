@@ -35,7 +35,7 @@
 
 
 #include "export_project_dialog.h"
-#include "song_editor.h"
+#include "song.h"
 #include "main_window.h"
 #include "combobox.h"
 #include "led_checkbox.h"
@@ -52,18 +52,18 @@ extern QString file_to_render;
 fileEncodeDevice fileEncodeDevices[] =
 {
 
-	{ WAVE_FILE, QT_TRANSLATE_NOOP( "exportProjectDialog",
+	{ WaveFile, QT_TRANSLATE_NOOP( "exportProjectDialog",
 					"Uncompressed Wave-File (*.wav)" ),
 					".wav", &audioFileWave::getInst },
 #ifdef HAVE_VORBIS_CODEC_H
-	{ OGG_FILE, QT_TRANSLATE_NOOP( "exportProjectDialog",
+	{ OggFile, QT_TRANSLATE_NOOP( "exportProjectDialog",
 					"Compressed OGG-File (*.ogg)" ),
 					".ogg", &audioFileOgg::getInst },
 #endif
 	// ... insert your own file-encoder-infos here... may be one day the
 	// user can add own encoders inside the program...
 
-	{ NULL_FILE, NULL, NULL, NULL }
+	{ NullFile, NULL, NULL, NULL }
 
 } ;
 
@@ -117,8 +117,11 @@ Sint16 exportProjectDialog::s_availableBitrates[] =
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
 							QWidget * _parent ) :
 	QDialog( _parent ),
+	m_typeModel( NULL /* this */ ),
+	m_kbpsModel( NULL /* this */ ),
+	m_vbrEnabledModel( TRUE, NULL /* this */ ),
+	m_hqmEnabledModel( FALSE, NULL/* this */ ),
 	m_fileName( _file_name ),
-	m_hourglassLbl( NULL ),
 	m_deleteFile( FALSE )
 {
 	m_fileType = getFileTypeFromExtension( "." +
@@ -132,22 +135,23 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_typeLbl->setGeometry( LABEL_X, TYPE_STUFF_Y, LABEL_WIDTH,
 								TYPE_HEIGHT );
 
-	m_typeCombo = new comboBox( this, NULL, NULL );
-	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
-					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
-								TYPE_HEIGHT );
-	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
-				SLOT( changedType( const QString & ) ) );
-
 	Uint8 idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
-		m_typeCombo->addItem(
+		m_typeModel.addItem(
 				tr( fileEncodeDevices[idx].m_description ) );
 		++idx;
 	}
-	m_typeCombo->setValue( m_typeCombo->findText( tr(
+	m_typeModel.setValue( m_typeModel.findText( tr(
 			fileEncodeDevices[m_fileType].m_description ) ) );
+
+	m_typeCombo = new comboBox( this );
+	m_typeCombo->setGeometry( LABEL_X + LABEL_WIDTH+LABEL_MARGIN,
+					TYPE_STUFF_Y, TYPE_COMBO_WIDTH,
+								TYPE_HEIGHT );
+	m_typeCombo->setModel( &m_typeModel );
+/*	connect( m_typeCombo, SIGNAL( activated( const QString & ) ), this,
+				SLOT( changedType( const QString & ) ) );*/
 
 
 	// kbps-ui-stuff
@@ -155,33 +159,34 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	m_kbpsLbl->setGeometry( LABEL_X, KBPS_STUFF_Y, LABEL_WIDTH,
 								KBPS_HEIGHT );
 
-	m_kbpsCombo = new comboBox( this, NULL, NULL );
+	idx = 0;
+	while( s_availableBitrates[idx] != -1 )
+	{
+		m_kbpsModel.addItem( QString::number(
+						s_availableBitrates[idx] ) );
+		++idx;
+	}
+	m_kbpsModel.setValue( m_kbpsModel.findText(
+						QString::number( 128 ) ) );
+
+	m_kbpsCombo = new comboBox( this );
+	m_kbpsCombo->setModel( &m_kbpsModel );
 	m_kbpsCombo->setGeometry( LABEL_X + LABEL_WIDTH + LABEL_MARGIN,
 						KBPS_STUFF_Y, KBPS_COMBO_WIDTH,
 								KBPS_HEIGHT );
 
-	idx = 0;
-	while( s_availableBitrates[idx] != -1 )
-	{
-		m_kbpsCombo->addItem( QString::number(
-						s_availableBitrates[idx] ) );
-		++idx;
-	}
-	m_typeCombo->setValue( m_typeCombo->findText(
-						QString::number( 128 ) ) );
 
-
-	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this, NULL, NULL );
+	m_vbrCb = new ledCheckBox( tr( "variable bitrate" ), this );
+	m_vbrCb->setModel( &m_vbrEnabledModel );
 	m_vbrCb->setGeometry( LABEL_X + LABEL_WIDTH + 3 * LABEL_MARGIN +
 				KBPS_COMBO_WIDTH, KBPS_STUFF_Y + 3, 190, 20 );
-	m_vbrCb->setChecked( TRUE );
 
 
 	m_hqmCb = new ledCheckBox( tr( "use high-quality-mode (recommened)" ),
-							this, NULL, NULL );
+									this );
+	m_hqmCb->setModel( &m_hqmEnabledModel );
 	m_hqmCb->setGeometry( LABEL_X, HQ_MODE_CB_Y + 3, HQ_MODE_CB_WIDTH,
 							HQ_MODE_CB_HEIGHT );
-	m_hqmCb->setChecked( TRUE );
 
 
 	m_exportBtn = new QPushButton( embed::getIconPixmap( "apply" ),
@@ -214,10 +219,11 @@ exportProjectDialog::~exportProjectDialog()
 
 // little help-function for getting file-type from a file-extension (only for
 // registered file-encoders)
-fileTypes exportProjectDialog::getFileTypeFromExtension( const QString & _ext )
+ExportFileTypes exportProjectDialog::getFileTypeFromExtension(
+							const QString & _ext )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
@@ -226,7 +232,7 @@ fileTypes exportProjectDialog::getFileTypeFromExtension( const QString & _ext )
 		++idx;
 	}
 
-	return( WAVE_FILE );	// default
+	return( WaveFile );	// default
 }
 
 
@@ -236,7 +242,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 {
 	if( _ke->key() == Qt::Key_Escape )
 	{
-		if( engine::getSongEditor()->exporting() == FALSE )
+		if( engine::getSong()->exporting() == FALSE )
 		{
 			accept();
 		}
@@ -252,7 +258,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( engine::getSongEditor()->exporting() == TRUE )
+	if( engine::getSong()->exporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
@@ -269,7 +275,7 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 void exportProjectDialog::changedType( const QString & _new_type )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( tr( fileEncodeDevices[idx].m_description ) == _new_type )
 		{
@@ -286,7 +292,7 @@ void exportProjectDialog::changedType( const QString & _new_type )
 void exportProjectDialog::exportBtnClicked( void )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileType != NULL_FILE )
+	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		if( fileEncodeDevices[idx].m_fileType == m_fileType )
 		{
@@ -295,7 +301,7 @@ void exportProjectDialog::exportBtnClicked( void )
 		++idx;
 	}
 
-	if( fileEncodeDevices[idx].m_fileType == NULL_FILE )
+	if( fileEncodeDevices[idx].m_fileType == NullFile )
 	{
 		return;
 	}
@@ -306,10 +312,10 @@ void exportProjectDialog::exportBtnClicked( void )
 							DEFAULT_CHANNELS,
 							success_ful,
 							m_fileName,
-							m_vbrCb->isChecked(),
-					m_kbpsCombo->currentText().toInt(),
-					m_kbpsCombo->currentText().toInt() - 64,
-					m_kbpsCombo->currentText().toInt() + 64,
+						m_vbrCb->model()->value(),
+					m_kbpsModel.currentText().toInt(),
+					m_kbpsModel.currentText().toInt() - 64,
+					m_kbpsModel.currentText().toInt() + 64,
 					engine::getMixer() );
 	if( success_ful == FALSE )
 	{
@@ -351,28 +357,30 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 
-	engine::getMixer()->setAudioDevice( dev, m_hqmCb->isChecked() );
-	engine::getSongEditor()->startExport();
+	engine::getMixer()->setAudioDevice( dev, m_hqmCb->model()->value() );
+	engine::getSong()->startExport();
 
 	delete m_hqmCb;
 
-	songEditor::playPos & pp = engine::getSongEditor()->getPlayPos(
-							songEditor::PLAY_SONG );
+	song::playPos & pp = engine::getSong()->getPlayPos(
+							song::Mode_PlaySong );
 
-	while( engine::getSongEditor()->exportDone() == FALSE &&
-				engine::getSongEditor()->exporting() == TRUE
+	while( engine::getSong()->exportDone() == FALSE &&
+				engine::getSong()->exporting() == TRUE
 							&& !m_deleteFile )
 	{
 		dev->processNextBuffer();
 		int pval = pp * 100 /
-			( ( engine::getSongEditor()->lengthInTacts() + 1 )
-									* 64 );
+			( ( engine::getSong()->lengthInTacts() + 1 ) * 64 );
 		m_exportProgressBar->setValue( pval );
-		// update lmms-main-win-caption
-		engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
+		if( engine::getMainWindow() )
+		{
+			// update lmms-main-win-caption
+			engine::getMainWindow()->setWindowTitle( tr( "Rendering:" )
 					+ " " + QString::number( pval ) + "%" );
+		}
 		// process paint-events etc.
-		qApp->processEvents();
+		QCoreApplication::processEvents();
 	}
 
 	finishProjectExport();
@@ -384,7 +392,7 @@ void exportProjectDialog::exportBtnClicked( void )
 void exportProjectDialog::cancelBtnClicked( void )
 {
 	// is song-export-thread active?
-	if( engine::getSongEditor()->exporting() == TRUE )
+	if( engine::getSong()->exporting() == TRUE )
 	{
 		// then dispose abort of export
 		abortProjectExport();
@@ -415,10 +423,13 @@ void exportProjectDialog::finishProjectExport( void )
 		QFile( m_fileName ).remove();
 	}
 
-	// restore window-title
-	engine::getMainWindow()->resetWindowTitle(); 
+	if( engine::getMainWindow() )
+	{
+		// restore window-title
+		engine::getMainWindow()->resetWindowTitle(); 
+	}
 
-	engine::getSongEditor()->stopExport();
+	engine::getSong()->stopExport();
 
 	// if we rendered file from command line, quit after export
 	if( file_to_render != "" )

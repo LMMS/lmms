@@ -3,7 +3,7 @@
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,9 +33,10 @@
 #include "config_mgr.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "song_editor.h"
+#include "song.h"
 #include "midi_port.h"
 #include "note.h"
+#include "automatable_model_templates.h"
 
 
 #ifdef ALSA_SUPPORT
@@ -62,14 +63,14 @@ midiALSASeq::midiALSASeq( void ) :
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_malloc( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
-					engine::getSongEditor()->getTempo() );
+					engine::getSong()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 	snd_seq_queue_tempo_free( tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
-	changeQueueTempo( engine::getSongEditor()->getTempo() );
-	connect( engine::getSongEditor(), SIGNAL( tempoChanged( bpm_t ) ),
+	changeQueueTempo( engine::getSong()->getTempo() );
+	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( changeQueueTempo( bpm_t ) ) );
 
 	// initial list-update

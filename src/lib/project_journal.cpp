@@ -3,7 +3,7 @@
 /*
  * project_journal.cpp - implementation of project-journal
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,8 @@
 #include "project_journal.h"
 #include "engine.h"
 #include "journalling_object.h"
-#include "song_editor.h"
+#include "song.h"
+#include "automatable_model_templates.h"
 
 
 projectJournal::projectJournal( void ) :
@@ -64,7 +65,7 @@ void projectJournal::undo( void )
 		( jo = m_joIDs[*--m_currentJournalEntry] ) != NULL )
 	{
 		jo->undo();
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 	}
 }
 
@@ -85,7 +86,7 @@ void projectJournal::redo( void )
 		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
 	{
 		jo->redo();
-		engine::getSongEditor()->setModified();
+		engine::getSong()->setModified();
 	}
 }
 
@@ -97,7 +98,7 @@ void projectJournal::journalEntryAdded( const jo_id_t _id )
 	m_journalEntries.erase( m_currentJournalEntry, m_journalEntries.end() );
 	m_journalEntries.push_back( _id );
 	m_currentJournalEntry = m_journalEntries.end();
-	engine::getSongEditor()->setModified();
+	engine::getSong()->setModified();
 }
 
 

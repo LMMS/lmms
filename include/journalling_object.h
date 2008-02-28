@@ -1,7 +1,7 @@
 /*
  * journalling_object.h - declaration of class journallingObject
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,15 +37,15 @@
 #include <QtCore/QStack>
 
 
-
 class QDomDocument;
 class QDomElement;
 
 
-typedef Uint32 t_action_id;
+typedef uint32_t t_action_id;
 
 
 class journallingObject;
+class journallingObjectHook;
 
 
 class journalEntry
@@ -98,14 +98,13 @@ private:
 typedef QVector<journalEntry> journalEntryVector;
 
 
-
 class journallingObject
 {
 public:
 	journallingObject( void );
 	virtual ~journallingObject();
 
-	inline const jo_id_t id( void ) const
+	inline jo_id_t id( void ) const
 	{
 		return( m_id );
 	}
@@ -138,18 +137,14 @@ public:
 		m_journalling = m_journallingStateStack.pop();
 	}
 
-	virtual QDomElement FASTCALL saveState( QDomDocument & _doc,
+	virtual QDomElement saveState( QDomDocument & _doc,
 							QDomElement & _parent );
 
-	virtual void FASTCALL restoreState( const QDomElement & _this );
+	virtual void restoreState( const QDomElement & _this );
 
 
 	// to be implemented by actual object
 	virtual QString nodeName( void ) const = 0;
-
-
-protected:
-	void addJournalEntry( const journalEntry & _je );
 
 	inline bool isJournalling( void ) const
 	{
@@ -168,14 +163,23 @@ protected:
 		return( old_journalling );
 	}
 
+	void setHook( journallingObjectHook * _hook );
+
+	journallingObjectHook * getHook( void )
+	{
+		return( m_hook );
+	}
+
+
+protected:
+	void addJournalEntry( const journalEntry & _je );
 
 	// to be implemented by sub-objects
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-						QDomElement & _this )
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 	}
 
-	virtual void FASTCALL loadSettings( const QDomElement & _this )
+	virtual void loadSettings( const QDomElement & _this )
 	{
 	}
 
@@ -201,8 +205,35 @@ private:
 
 	QStack<bool> m_journallingStateStack;
 
+	journallingObjectHook * m_hook;
+
 } ;
 
+
+class journallingObjectHook
+{
+public:
+	journallingObjectHook() :
+		m_hookedIn( NULL )
+	{
+	}
+	virtual ~journallingObjectHook()
+	{
+		if( m_hookedIn != NULL )
+		{
+			m_hookedIn->setHook( NULL );
+		}
+	}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this ) = 0;
+	virtual void loadSettings( const QDomElement & _this ) = 0;
+
+private:
+	journallingObject * m_hookedIn;
+
+	friend class journallingObject;
+
+} ;
 
 
 #endif

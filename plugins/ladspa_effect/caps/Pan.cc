@@ -1,7 +1,7 @@
 /*
 	Pan.cc
 	
-	Copyright 2002-5 Tim Goetze <tim@quitte.de>
+	Copyright 2002-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,11 +31,9 @@
 #include "Descriptor.h"
 
 void
-Pan::init (double _fs)
+Pan::init()
 {
-	fs = _fs;
 	delay.init ((int) (.040 * fs));
-	normal = NOISE_FLOOR;
 }
 
 void
@@ -64,15 +62,16 @@ Pan::one_cycle (int frames)
 	d_sample * s = ports[0];
 
 	if (pan != *ports[1])
-		set_pan (*ports[1]);
+		set_pan (getport(1));
 
+	d_sample g = getport(2);
 	d_sample 
-		width_l = *ports[2] * gain_r,
-		width_r = *ports[2] * gain_l;
+		width_l = g * gain_r,
+		width_r = g * gain_l;
 
-	tap.t = (int) (*ports[3] * fs * .001);
+	tap.t = (int) (getport(3) * fs * .001);
 	
-	bool mono = *ports[4];
+	bool mono = getport(4);
 
 	d_sample * dl = ports[5];
 	d_sample * dr = ports[6];
@@ -152,9 +151,9 @@ Descriptor<Pan>::setup()
 	Label = "Pan";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Pan - Pan and width";
+	Name = CAPS "Pan - Pan and width";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

@@ -57,11 +57,6 @@ public:
 								this ) );
 	}
 
-	inline virtual QString nodeName( void ) const
-	{
-		return( "vsteffect" );
-	}
-
 
 private:
 	void openPlugin( const QString & _plugin );

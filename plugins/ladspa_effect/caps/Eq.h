@@ -28,29 +28,55 @@
 #ifndef _EQ_H_
 #define _EQ_H_
 
-#include "dsp/Eq.h"
 #include "dsp/util.h"
+#include "dsp/Eq.h"
+#include "dsp/BiQuad.h"
+#include "dsp/RBJ.h"
 
 class Eq
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample gain[10];
-		d_sample normal;
+		DSP::Eq<10> eq;
 
-		DSP::Eq<10,12> eq;
+		int block;
+			enum { BlockSize = 64 };
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [12];
 
-		d_sample adding_gain;
+		void init();
+		void activate();
 
-		void init (double _fs);
+		void run (int n)
+			{
+				one_cycle<store_func> (n);
+			}
+		
+		void run_adding (int n)
+			{
+				one_cycle<adding_func> (n);
+			}
+};
 
+class Eq2x2
+: public Plugin
+{
+	public:
+		d_sample gain[10];
+		DSP::Eq<10> eq[2];
+
+		template <sample_func_t F>
+			void one_cycle (int frames);
+
+	public:
+		static PortInfo port_info [];
+
+		void init();
 		void activate();
 
 		void run (int n)

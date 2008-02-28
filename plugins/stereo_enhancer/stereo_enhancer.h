@@ -32,42 +32,35 @@
 #include "effect_lib.h"
 #include "engine.h"
 #include "main_window.h"
-#include "stereoenhancer_control_dialog.h"
+#include "stereoenhancer_controls.h"
 
 class stereoEnhancerEffect : public effect
 {
 public:
-	stereoEnhancerEffect( const descriptor::subPluginFeatures::key * _key );
+	stereoEnhancerEffect( model * parent, 
+	                      const descriptor::subPluginFeatures::key * _key );
 	virtual ~stereoEnhancerEffect();
 	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-							const fpp_t _frames );
-	inline virtual QString nodeName( void ) const
+	                                          const fpp_t _frames );
+
+	virtual effectControls * getControls( void )
 	{
-		return( "stereoenhancereffect" );
+		return( &m_bbControls );
 	}
 
-	virtual inline effectControlDialog * createControlDialog( track * )
-	{
-		return( new stereoEnhancerControlDialog(
-					engine::getMainWindow()->workspace(),
-								this ) );
-	}
-	
 	void clearMyBuffer();
 
 
 private:
-	//effectLib::monoToStereoAdaptor<effectLib::stereoEnhancer<> > m_seFX;
 	effectLib::stereoEnhancer<> m_seFX;
 	
 	surroundSampleFrame * m_delayBuffer;
 	int m_currFrame;
 	
+	stereoEnhancerControls m_bbControls;
 
-	friend class stereoEnhancerControlDialog;
+	friend class stereoEnhancerControls;
 } ;
-
-
 
 
 

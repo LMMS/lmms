@@ -48,7 +48,7 @@
 #include "mmp.h"
 #include "preset_preview_play_handle.h"
 #include "sample_play_handle.h"
-#include "song_editor.h"
+#include "song.h"
 #include "string_pair_drag.h"
 #include "text_float.h"
 
@@ -261,14 +261,14 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 		return;
 	}
 
-	if( f->type() == fileItem::SAMPLE_FILE )
+	if( f->type() == fileItem::SampleFile )
 	{
 		// samples are per default opened in bb-editor because they're
 		// likely drum-samples etc.
 		engine::getMixer()->lock();
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::INSTRUMENT_TRACK,
-						engine::getBBEditor() ) );
+				track::create( track::InstrumentTrack,
+					engine::getBBTrackContainer() ) );
 #ifdef LMMS_DEBUG
 		assert( it != NULL );
 #endif
@@ -278,31 +278,31 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 		{
 			afp->setParameter( "samplefile", f->fullName() );
 		}
-		it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( TRUE );
 		engine::getMixer()->unlock();
 	}
-	else if( f->type() == fileItem::PRESET_FILE )
+	else if( f->type() == fileItem::PresetFile )
 	{
 		// presets are per default opened in bb-editor
 		multimediaProject mmp( f->fullName() );
 		engine::getMixer()->lock();
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::INSTRUMENT_TRACK,
-						engine::getBBEditor() ) );
+				track::create( track::InstrumentTrack,
+					engine::getBBTrackContainer() ) );
 		if( it != NULL )
 		{
 			it->loadTrackSpecificSettings( mmp.content().
 								firstChild().
 								toElement() );
-			it->toggledInstrumentTrackButton( TRUE );
+			//it->toggledInstrumentTrackButton( TRUE );
 		}
 		engine::getMixer()->unlock();
 	}
-	else if( f->type() == fileItem::PROJECT_FILE )
+	else if( f->type() == fileItem::ProjectFile )
 	{
 		if( engine::getMainWindow()->mayChangeProject() )
 		{
-			engine::getSongEditor()->loadProject( f->fullName() );
+			engine::getSong()->loadProject( f->fullName() );
 		}
 	}
 }
@@ -326,16 +326,16 @@ void listView::sendToActiveInstrumentTrack( void )
 	// instrument-track
 	while( w.hasPrevious() )
 	{
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
+		instrumentTrackView * itv = dynamic_cast<instrumentTrackView *>(
 								w.previous()->widget() );
-		if( ct != NULL && ct->isHidden() == FALSE )
+		if( itv != NULL && itv->isHidden() == FALSE )
 		{
 			// ok, it's an instrument-track, so we can apply the
 			// sample or the preset
 			engine::getMixer()->lock();
-			if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
+			if( m_contextMenuItem->type() == fileItem::SampleFile )
 			{
-				instrument * afp = ct->loadInstrument(
+				instrument * afp = itv->model()->loadInstrument(
 						engine::sampleExtensions()
 							[m_contextMenuItem
 							->extension()] );
@@ -346,15 +346,15 @@ void listView::sendToActiveInstrumentTrack( void )
 				}
 			}
 			else if( m_contextMenuItem->type() ==
-							fileItem::PRESET_FILE )
+							fileItem::PresetFile )
 			{
 				multimediaProject mmp(
 						m_contextMenuItem->fullName() );
-				ct->loadTrackSpecificSettings( mmp.content().
-								firstChild().
+				itv->model()->loadTrackSpecificSettings(
+						mmp.content().firstChild().
 								toElement() );
 			}
-			ct->toggledInstrumentTrackButton( TRUE );
+			//ct->toggledInstrumentTrackButton( TRUE );
 			engine::getMixer()->unlock();
 			break;
 		}
@@ -367,10 +367,10 @@ void listView::sendToActiveInstrumentTrack( void )
 void listView::openInNewInstrumentTrack( trackContainer * _tc )
 {
 	engine::getMixer()->lock();
-	if( m_contextMenuItem->type() == fileItem::SAMPLE_FILE )
+	if( m_contextMenuItem->type() == fileItem::SampleFile )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
-			track::create( track::INSTRUMENT_TRACK, _tc ) );
+			track::create( track::InstrumentTrack, _tc ) );
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
 #endif
@@ -383,19 +383,19 @@ void listView::openInNewInstrumentTrack( trackContainer * _tc )
 			afp->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
 		}
-		ct->toggledInstrumentTrackButton( TRUE );
+		//ct->toggledInstrumentTrackButton( TRUE );
 	}
-	else if( m_contextMenuItem->type() == fileItem::PRESET_FILE )
+	else if( m_contextMenuItem->type() == fileItem::PresetFile )
 	{
 		multimediaProject mmp( m_contextMenuItem->fullName() );
-		track * t = track::create( track::INSTRUMENT_TRACK, _tc );
+		track * t = track::create( track::InstrumentTrack, _tc );
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
 		if( ct != NULL )
 		{
 			ct->loadTrackSpecificSettings( mmp.content().
 							firstChild().
 							toElement() );
-			ct->toggledInstrumentTrackButton( TRUE );
+			//ct->toggledInstrumentTrackButton( TRUE );
 		}
 	}
 	engine::getMixer()->unlock();
@@ -406,7 +406,7 @@ void listView::openInNewInstrumentTrack( trackContainer * _tc )
 
 void listView::openInNewInstrumentTrackBBE( void )
 {
-	openInNewInstrumentTrack( engine::getBBEditor() );
+	openInNewInstrumentTrack( engine::getBBTrackContainer() );
 }
 
 
@@ -414,7 +414,7 @@ void listView::openInNewInstrumentTrackBBE( void )
 
 void listView::openInNewInstrumentTrackSE( void )
 {
-	openInNewInstrumentTrack( engine::getSongEditor() );
+	openInNewInstrumentTrack( engine::getSong() );
 }
 
 
@@ -435,8 +435,8 @@ void listView::updateDirectory( QTreeWidgetItem * _item )
 void listView::contextMenuEvent( QContextMenuEvent * _e )
 {
 	fileItem * f = dynamic_cast<fileItem *>( itemAt( _e->pos() ) );
-	if( f != NULL && ( f->type() == fileItem::SAMPLE_FILE ||
-				f->type() == fileItem::PRESET_FILE ) )
+	if( f != NULL && ( f->type() == fileItem::SampleFile ||
+				f->type() == fileItem::PresetFile ) )
 	{
 		m_contextMenuItem = f;
 		QMenu contextMenu( this );
@@ -495,7 +495,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
-		if( f->type() == fileItem::SAMPLE_FILE )
+		if( f->type() == fileItem::SampleFile )
 		{
 			textFloat * tf = textFloat::displayMessage(
 					tr( "Loading sample" ),
@@ -510,7 +510,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( f->type() == fileItem::PRESET_FILE )
+		else if( f->type() == fileItem::PresetFile )
 		{
 			m_previewPlayHandle = new presetPreviewPlayHandle(
 								f->fullName() );
@@ -539,7 +539,7 @@ void listView::mouseMoveEvent( QMouseEvent * _me )
 		{
 			switch( f->type() )
 			{
-				case fileItem::PRESET_FILE:
+				case fileItem::PresetFile:
 					new stringPairDrag( "presetfile",
 								f->fullName(),
 							embed::getIconPixmap(
@@ -547,7 +547,7 @@ void listView::mouseMoveEvent( QMouseEvent * _me )
 									this );
 					break;
 
-				case fileItem::SAMPLE_FILE:
+				case fileItem::SampleFile:
 					new stringPairDrag( "samplefile",
 								f->fullName(),
 							embed::getIconPixmap(
@@ -555,7 +555,7 @@ void listView::mouseMoveEvent( QMouseEvent * _me )
 									this );
 					break;
 
-				case fileItem::MIDI_FILE:
+				case fileItem::MidiFile:
 					new stringPairDrag( "midifile",
 								f->fullName(),
 							embed::getIconPixmap(
@@ -842,22 +842,22 @@ void fileItem::initPixmapStuff( void )
 
 	switch( m_type )
 	{
-		case PROJECT_FILE:
+		case ProjectFile:
 			setIcon( 0, *s_projectFilePixmap );
 			break;
-		case PRESET_FILE:
+		case PresetFile:
 			setIcon( 0, *s_presetFilePixmap );
 			break;
-		case SAMPLE_FILE:
+		case SampleFile:
 			setIcon( 0, *s_sampleFilePixmap );
 			break;
-		case MIDI_FILE:
+		case MidiFile:
 			setIcon( 0, *s_midiFilePixmap );
 			break;
-		case FLP_FILE:
+		case FlpFile:
 			setIcon( 0, *s_flpFilePixmap );
 			break;
-		case UNKNOWN:
+		case UnknownFile:
 		default:
 			setIcon( 0, *s_unknownFilePixmap );
 			break;
@@ -872,44 +872,44 @@ void fileItem::determineFileType( void )
 	QString ext = extension();
 	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
 	{
-		m_type = PROJECT_FILE;
+		m_type = ProjectFile;
 	}
 	else if( ext == "xml" )
 	{
-		multimediaProject::projectTypes t =
+		multimediaProject::ProjectTypes t =
 				multimediaProject::typeOfFile( fullName() );
-		if( t == multimediaProject::SONG_PROJECT )
+		if( t == multimediaProject::SongProject )
 		{
-			m_type = PROJECT_FILE;
+			m_type = ProjectFile;
 		}
-		else if( t == multimediaProject::INSTRUMENT_TRACK_SETTINGS )
+		else if( t == multimediaProject::InstrumentTrackSettings )
 		{
-			m_type = PRESET_FILE;
+			m_type = PresetFile;
 		}
 		else
 		{
-			m_type = UNKNOWN;
+			m_type = UnknownFile;
 		}
 	}
 	else if( ext == "csf" )
 	{
-		m_type = PRESET_FILE;
+		m_type = PresetFile;
 	}
 	else if( engine::sampleExtensions().contains( ext ) )
 	{
-		m_type = SAMPLE_FILE;
+		m_type = SampleFile;
 	}
 	else if( ext == "mid" )
 	{
-		m_type = MIDI_FILE;
+		m_type = MidiFile;
 	}
 	else if( ext == "flp" )
 	{
-		m_type = FLP_FILE;
+		m_type = FlpFile;
 	}
 	else
 	{
-		m_type = UNKNOWN;
+		m_type = UnknownFile;
 	}
 }
 

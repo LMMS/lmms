@@ -40,7 +40,7 @@
 #include "mixer.h"
 
 
-ladspaSubPluginFeatures::ladspaSubPluginFeatures( plugin::pluginTypes _type ) :
+ladspaSubPluginFeatures::ladspaSubPluginFeatures( plugin::PluginTypes _type ) :
 	subPluginFeatures( _type )
 {
 }

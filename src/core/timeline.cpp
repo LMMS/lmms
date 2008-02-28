@@ -3,7 +3,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,7 @@
 #include "nstate_button.h"
 #include "main_window.h"
 #include "text_float.h"
+#include "automatable_model_templates.h"
 
 
 
@@ -50,12 +51,12 @@ QPixmap * timeLine::s_loopPointDisabledPixmap = NULL;
 
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
-			songEditor::playPos & _pos, const midiTime & _begin,
+			song::playPos & _pos, const midiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_autoScroll( AUTOSCROLL_ENABLED ),
-	m_loopPoints( LOOP_POINTS_DISABLED ),
-	m_behaviourAtStop( BACK_TO_ZERO ),
+	m_autoScroll( AutoScrollEnabled ),
+	m_loopPoints( LoopPointsDisabled ),
+	m_behaviourAtStop( BackToZero ),
 	m_changedPosition( TRUE ),
 	m_xOffset( _xoff ),
 	m_posMarkerX( 0 ),
@@ -64,7 +65,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_begin( _begin ),
 	m_savedPos( -1 ),
 	m_hint( NULL ),
-	m_action( NONE ),
+	m_action( NoAction ),
 	m_moveXOff( 0 )
 {
 	m_loopPos[0] = 0;
@@ -174,7 +175,7 @@ void timeLine::loadSettings( const QDomElement & _this )
 {
 	m_loopPos[0] = _this.attribute( "lp0pos" ).toInt();
 	m_loopPos[1] = _this.attribute( "lp1pos" ).toInt();
-	m_loopPoints = static_cast<loopPointStates>(
+	m_loopPoints = static_cast<LoopPointStates>(
 					_this.attribute( "lpstate" ).toInt() );
 	update();
 	emit loopPointStateLoaded( m_loopPoints );
@@ -191,7 +192,7 @@ void timeLine::updatePosition( const midiTime & )
 	{
 		m_posMarkerX = new_x;
 		m_changedPosition = TRUE;
-		if( m_autoScroll == AUTOSCROLL_ENABLED )
+		if( m_autoScroll == AutoScrollEnabled )
 		{
 			emit positionChanged( m_pos );
 		}
@@ -204,7 +205,7 @@ void timeLine::updatePosition( const midiTime & )
 
 void timeLine::toggleAutoScroll( int _n )
 {
-	m_autoScroll = static_cast<autoScrollStates>( _n );
+	m_autoScroll = static_cast<AutoScrollStates>( _n );
 }
 
 
@@ -212,7 +213,7 @@ void timeLine::toggleAutoScroll( int _n )
 
 void timeLine::toggleLoopPoints( int _n )
 {
-	m_loopPoints = static_cast<loopPointStates>( _n );
+	m_loopPoints = static_cast<LoopPointStates>( _n );
 	update();
 }
 
@@ -221,7 +222,7 @@ void timeLine::toggleLoopPoints( int _n )
 
 void timeLine::toggleBehaviourAtStop( int _n )
 {
-	m_behaviourAtStop = static_cast<behaviourAtStopStates>( _n );
+	m_behaviourAtStop = static_cast<BehaviourAtStopStates>( _n );
 }
 
 
@@ -279,7 +280,7 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	}
 	if( _me->button() == Qt::LeftButton )
 	{
-		m_action = MOVE_POS_MARKER;
+		m_action = MovePositionMarker;
 		if( _me->x() - m_xOffset < s_posMarkerPixmap->width() )
 		{
 			m_moveXOff = _me->x() - m_xOffset;
@@ -293,18 +294,18 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	{
 		const midiTime t = m_begin +
 				static_cast<Sint32>( _me->x() * 64 / m_ppt );
-		m_action = MOVE_LOOP_BEGIN;
+		m_action = MoveLoopBegin;
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
 		if( _me->button() == Qt::RightButton )
 		{
-			m_action = MOVE_LOOP_END;
+			m_action = MoveLoopEnd;
 		}
-		m_loopPos[( m_action == MOVE_LOOP_BEGIN ) ? 0 : 1] = t;
+		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
-	if( m_action == MOVE_LOOP_BEGIN || m_action == MOVE_LOOP_END )
+	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = textFloat::displayMessage( tr( "Hint" ),
@@ -324,17 +325,17 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 				    m_xOffset - m_moveXOff, 0 ) * 64 / m_ppt );
 	switch( m_action )
 	{
-		case MOVE_POS_MARKER:
+		case MovePositionMarker:
 			m_pos.setTact( t.getTact() );
 			m_pos.setTact64th( t.getTact64th() );
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			break;
 
-		case MOVE_LOOP_BEGIN:
-		case MOVE_LOOP_END:
+		case MoveLoopBegin:
+		case MoveLoopEnd:
 		{
-			const Uint8 i = m_action - MOVE_LOOP_BEGIN;
+			const Uint8 i = m_action - MoveLoopBegin;
 			if( engine::getMainWindow()->isCtrlPressed() == TRUE )
 			{
 				// no ctrl-press-hint when having ctrl pressed
@@ -362,7 +363,7 @@ void timeLine::mouseReleaseEvent( QMouseEvent * _me )
 {
 	delete m_hint;
 	m_hint = NULL;
-	m_action = NONE;
+	m_action = NoAction;
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * engine.h - engine-system of LMMS
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,11 +34,13 @@
 
 class automationEditor;
 class bbEditor;
+class bbTrackContainer;
 class projectJournal;
 class mainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
+class song;
 class songEditor;
 class ladspa2LMMS;
 
@@ -54,11 +56,28 @@ public:
 		return( s_hasGUI );
 	}
 
+	// core
 	static mixer * getMixer( void )
 	{
 		return( s_mixer );
 	}
 
+	static song * getSong( void )
+	{
+		return( s_song );
+	}
+
+	static bbTrackContainer * getBBTrackContainer( void )
+	{
+		return( s_bbTrackContainer );
+	}
+
+	static projectJournal * getProjectJournal( void )
+	{
+		return( s_projectJournal );
+	}
+
+	// GUI
 	static mainWindow * getMainWindow( void )
 	{
 		return( s_mainWindow );
@@ -84,11 +103,6 @@ public:
 		return( s_projectNotes );
 	}
 
-	static projectJournal * getProjectJournal( void )
-	{
-		return( s_projectJournal );
-	}
-
 	static automationEditor * getAutomationEditor( void )
 	{
 		return( s_automationEditor );
@@ -101,33 +115,38 @@ public:
 
 	static float framesPerTact64th( void )
 	{
-		return( s_frames_per_tact64th );
+		return( s_framesPerTact64th );
 	}
 	static void updateFramesPerTact64th( void );
 
 	static const QMap<QString, QString> & sampleExtensions( void )
 	{
-		return( s_sample_extensions );
+		return( s_sampleExtensions );
 	}
 
 
 private:
 	static bool s_hasGUI;
-	static float s_frames_per_tact64th;
+	static float s_framesPerTact64th;
 
+	// core
 	static mixer * s_mixer;
+	static song * s_song;
+	static bbTrackContainer * s_bbTrackContainer;
+	static projectJournal * s_projectJournal;
+
+	// GUI
 	static mainWindow * s_mainWindow;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;
 	static pianoRoll * s_pianoRoll;
 	static projectNotes * s_projectNotes;
-	static projectJournal * s_projectJournal;
 	static ladspa2LMMS * s_ladspaManager;
 
-	static QMap<QString, QString> s_sample_extensions;
+	static QMap<QString, QString> s_sampleExtensions;
 
-	static void load_extensions( void );
+	static void loadExtensions( void );
 
 } ;
 

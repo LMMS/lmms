@@ -2,7 +2,7 @@
  * ladspa_control_dialog.h - dialog for displaying and editing control port
  *                           values for LADSPA plugins
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,59 +26,19 @@
 #ifndef _LADSPA_CONTROL_DIALOG_H
 #define _LADSPA_CONTROL_DIALOG_H
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QLayout>
-
 #include "effect_control_dialog.h"
-#include "ladspa_control.h"
-#include "led_checkbox.h"
 
 
-typedef QVector<ladspaControl *> control_list_t;
-
-class ladspaEffect;
+class ladspaControls;
 
 
 class ladspaControlDialog : public effectControlDialog
 {
-	Q_OBJECT
 public:
-	ladspaControlDialog( QWidget * _parent, ladspaEffect * _eff, 
-							track * _track );
-	virtual ~ladspaControlDialog();
-
-	inline ch_cnt_t getControlCount( void )
-	{
-		return( m_controlCount );
-	}
-	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "ladspacontrols" );
-	}
+	ladspaControlDialog( ladspaControls * _ctl );
+	~ladspaControlDialog();
 
 
-protected slots:
-	void link( bool _state );
-	void linkPort( Uint16 _port, bool _state );
-
-
-private:
-	ladspaEffect * m_effect;
-	ch_cnt_t m_processors;
-	ch_cnt_t m_controlCount;
-	track * m_track;
-	bool m_noLink;
-	audioPort * m_port;
-	ledCheckBox * m_stereoLink;
-	QVector<QWidget *> m_blanks;
-	QVector<control_list_t> m_controls;
-	
-	QVBoxLayout * m_mainLay;
-	QHBoxLayout * m_effectLay;
 
 } ;
 

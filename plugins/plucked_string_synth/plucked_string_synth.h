@@ -28,6 +28,8 @@
 #define _PLUCKED_STRING_SYNTH_H
 
 #include "instrument.h"
+#include "instrument_view.h"
+#include "knob.h"
 
 
 class knob;
@@ -208,8 +210,25 @@ public:
 
 	virtual QString nodeName( void ) const;
 
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 private:
+	knobModel m_pickModel;
+	knobModel m_pickupModel;
+
+	friend class pluckedStringSynthView;
+} ;
+
+class pluckedStringSynthView : public instrumentView
+{
+public:
+	pluckedStringSynthView( instrument * _instrument,
+					QWidget * _parent );
+	virtual ~pluckedStringSynthView();
+
+private:
+	virtual void modelChanged( void );
+
 	knob * m_pickKnob;
 	knob * m_pickupKnob;
 

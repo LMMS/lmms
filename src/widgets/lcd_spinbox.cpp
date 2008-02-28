@@ -3,7 +3,7 @@
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,22 +31,21 @@
 #include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_object_templates.h"
+#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
 
 
-lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
-							const QString & _name,
-							track * _track ) :
+lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
+						const QString & _name ) :
 	QWidget( _parent ),
-	autoObj( _track, 0, _min, _max ),
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	m_number( new QLCDNumber( _num_digits, this ) ),
 	m_label( NULL ),
 	m_origMousePos()
 {
-	m_number = new QLCDNumber( _num_digits, this );
 	m_number->setFrameShape( QFrame::Panel );
 	m_number->setFrameShadow( QFrame::Sunken );
 	m_number->setSegmentStyle( QLCDNumber::Flat );
@@ -60,14 +59,6 @@ lcdSpinBox::lcdSpinBox( int _min, int _max, int _num_digits, QWidget * _parent,
 	m_number->setAutoFillBackground( TRUE );
 
 	setEnabled( TRUE );
-
-	if( _track != NULL )
-	{
-		getAutomationPattern();
-	}
-
-	// value is automatically limited to given range
-	setInitValue( 0 );
 
 	setAccessibleName( _name );
 
@@ -85,33 +76,19 @@ lcdSpinBox::~lcdSpinBox()
 
 
 
-void lcdSpinBox::setStep( const int _step )
+void lcdSpinBox::update( void )
 {
-	autoObj::setStep( tMax( _step, 1 ) );
-}
-
-
-
-
-void lcdSpinBox::setValue( const int _value )
-{
-	const int prev_value = value();
-	autoObj::setValue( _value );
-	QString s = m_textForValue[value()];
+	QString s = m_textForValue[model()->value()];
 	if( s == "" )
 	{
-		s = QString::number( value() );
+		s = QString::number( model()->value() );
 		while( (int) s.length() < m_number->numDigits() )
 		{
 			s = "0" + s;
 		}
 	}
 	m_number->display( s );
-
-	if( prev_value != value() )
-	{
-		emit valueChanged( value() );
-	}
+	QWidget::update();
 }
 
 
@@ -159,7 +136,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 {
 	m_origMousePos = _me->globalPos();
 
-	if( nullTrack() )
+	if( model()->nullTrack() )
 	{
 		QWidget::contextMenuEvent( _me );
 		return;
@@ -174,7 +151,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 	captionMenu contextMenu( accessibleName() );
 	contextMenu.addAction( embed::getIconPixmap( "automation" ),
 					tr( "&Open in automation editor" ),
-					getAutomationPattern(),
+					model()->getAutomationPattern(),
 					SLOT( openInAutomationEditor() ) );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -188,7 +165,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 	{
 		m_origMousePos = _me->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
-		prepareJournalEntryFromOldVal();
+		model()->prepareJournalEntryFromOldVal();
 	}
 }
 
@@ -202,7 +179,8 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		int dy = _me->globalY() - m_origMousePos.y();
 		if( dy > 1 || dy < -1 )
 		{
-			setInitValue( value() - dy / 2 * step() );
+			model()->setInitValue( model()->value() -
+						dy / 2 * model()->step() );
 			emit manualChange();
 			QCursor::setPos( m_origMousePos );
 		}
@@ -214,7 +192,7 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 
 void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 {
-	addJournalEntryFromOldToCurVal();
+	model()->addJournalEntryFromOldToCurVal();
 
 	QCursor::setPos( m_origMousePos );
 	QApplication::restoreOverrideCursor();
@@ -226,7 +204,8 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	setInitValue( value() + ( ( _we->delta() > 0 ) ? 1 : -1 ) * step() );
+	model()->setInitValue( model()->value() +
+			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step() );
 	emit manualChange();
 }
 

@@ -86,10 +86,10 @@ class JVComb
 };
 
 class JVRev
+: public Plugin
 {
 	public:
 		static int default_length[9];
-		double fs;
 		d_sample t60;
 
 		Lattice allpass [3];
@@ -99,8 +99,6 @@ class JVRev
 		
 		double apc;
 		
-		d_sample normal;
-
 		template <sample_func_t F>
 		void one_cycle (int frames);
 
@@ -110,12 +108,8 @@ class JVRev
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [5];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)
@@ -165,9 +159,9 @@ class ModLattice
 };
 
 class PlateStub
+: public Plugin
 {
 	public:
-		double fs;
 		d_sample f_lfo;
 
 		d_sample indiff1, indiff2, dediff1, dediff2;
@@ -185,13 +179,8 @@ class PlateStub
 			int taps[12];
 		} tank;
 
-		d_sample normal;
-
 	public:
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate()
 			{ 
 				input.bandwidth.reset();
@@ -228,7 +217,6 @@ class Plate
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [7];
 
 		void run (int n)
 			{
@@ -252,7 +240,6 @@ class Plate2x2
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [8];
 
 		void run (int n)
 			{

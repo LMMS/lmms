@@ -1,7 +1,7 @@
 /*
 	SweepVF.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -9,6 +9,8 @@
 	state-variable (ladder) filter.
 
 	SweepVFII, the same with Q being modulated by a second fractal.
+
+	AutoWah, SVF being modulated by 'instant' amplitude (envelope).
 
 */
 /*
@@ -32,10 +34,16 @@
 #define _SWEEP_VF_H_
 
 #include "dsp/SVF.h"
+
 #include "dsp/Lorenz.h"
 #include "dsp/Roessler.h"
 
+#include "dsp/RMS.h"
+#include "dsp/BiQuad.h"
+#include "dsp/OnePole.h"
+
 class SweepVFI
+: public Plugin
 {
 	public:
 		double fs;
@@ -51,19 +59,13 @@ class SweepVFI
 		DSP::StackedSVF<1,2> svf;
 		DSP::Lorenz lorenz;
 
-		d_sample normal;
-
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [9];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)
@@ -78,6 +80,45 @@ class SweepVFI
 };
 
 class SweepVFII
+: public Plugin
+{
+	public:
+		/* svf parameters */
+		d_sample f, Q;
+
+		/* needs to be a power of two */
+		enum {
+			BLOCK_SIZE = 32
+		};
+
+		DSP::StackedSVF<1,2> svf;
+		DSP::Lorenz lorenz1;
+		DSP::Lorenz lorenz2;
+
+		template <sample_func_t F>
+			void one_cycle (int frames);
+
+	public:
+		static PortInfo port_info [];
+
+		void init();
+		void activate();
+
+		void run (int n)
+			{
+				one_cycle<store_func> (n);
+			}
+		
+		void run_adding (int n)
+			{
+				one_cycle<adding_func> (n);
+			}
+};
+
+/* //////////////////////////////////////////////////////////////////////// */
+
+class AutoWah
+: public Plugin
 {
 	public:
 		double fs;
@@ -91,22 +132,18 @@ class SweepVFII
 		};
 
 		DSP::StackedSVF<1,2> svf;
-		DSP::Lorenz lorenz1;
-		DSP::Lorenz lorenz2;
+		DSP::RMS rms;
 
-		d_sample normal;
+		DSP::BiQuad filter;
+		DSP::OnePoleHP hp;
 
 		template <sample_func_t F>
-		void one_cycle (int frames);
+			void one_cycle (int frames);
 
 	public:
 		static PortInfo port_info [];
-		d_sample * ports [13];
 
-		d_sample adding_gain;
-
-		void init (double _fs);
-
+		void init();
 		void activate();
 
 		void run (int n)

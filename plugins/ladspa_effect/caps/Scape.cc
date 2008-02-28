@@ -1,7 +1,7 @@
 /*
 	Scape.cc
 	
-	Copyright 2004-6 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -66,15 +66,15 @@ Scape::one_cycle (int frames)
 	// double one_over_n = 1 / (double) frames;
 
 	/* delay times */
-	double t1 = fs * 60. / *ports[1];
-	int div = (int) *ports[2];
+	double t1 = fs * 60. / getport(1);
+	int div = (int) getport(2);
 	double t2 = t1 * dividers[div];
 
-	fb = *ports[3];
+	fb = getport(3);
 
-	double dry = *ports[4];
+	double dry = getport(4);
 	dry = dry * dry;
-	double blend = *ports[5];
+	double blend = getport(5);
 
 	d_sample * dl = ports[6];
 	d_sample * dr = ports[7];
@@ -92,7 +92,6 @@ Scape::one_cycle (int frames)
 			period = t2 * .5;
 			float f, q;
 
-			//fprintf (stderr, "%.3f: %d\n", period, (int) period);
 			f = frandom2();
 			svf[0].set_f_Q (300 + 300 * f / fs, .3);
 			svf[3].set_f_Q (300 + 600 * 2 * f / fs, .6);
@@ -107,10 +106,13 @@ Scape::one_cycle (int frames)
 		int n = min ((int) period, frames);
 		if (n < 1)
 		{
+			/* not reached */
+			#ifdef DEBUG
 			fprintf (stderr, "Scape: %d - %d/%d frames, t2 = %.3f?!?\n", (int) period, n, frames, t2);
+			#endif
 			return;
 		}
-		
+
 		/* sample loop */
 		for (int i = 0; i < n; ++i)
 		{
@@ -193,9 +195,9 @@ Descriptor<Scape>::setup()
 	Label = "Scape";
 	Properties = HARD_RT;
 
-	Name = "CAPS: Scape - Stereo delay + Filters";
+	Name = CAPS "Scape - Stereo delay + Filters";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-6";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

@@ -1,7 +1,7 @@
 /*
  * bassbooster_control_dialog.h - control-dialog for bassbooster-effect
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,44 +27,17 @@
 
 #include "effect_control_dialog.h"
 
-class knob;
-class bassBoosterEffect;
+
+class bassBoosterControls;
 
 
 class bassBoosterControlDialog : public effectControlDialog
 {
-	Q_OBJECT
 public:
-	bassBoosterControlDialog( QWidget * _parent, bassBoosterEffect * _eff );
+	bassBoosterControlDialog( bassBoosterControls * _controls );
 	virtual ~bassBoosterControlDialog()
 	{
 	}
-
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "bassboostercontrols" );
-	}
-
-	virtual ch_cnt_t getControlCount( void )
-	{
-		return( 3 );
-	}
-
-
-private slots:
-	void changeFrequency( void );
-	void changeGain( void );
-	void changeRatio( void );
-
-
-private:
-	bassBoosterEffect * m_effect;
-	knob * m_freqKnob;
-	knob * m_gainKnob;
-	knob * m_ratioKnob;
 
 } ;
 

@@ -2,7 +2,7 @@
  * track_container.h - base-class for all track-containers like Song-Editor,
  *                     BB-Editor...
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,31 +36,78 @@
 #include "journalling_object.h"
 
 
+class trackContainerView;
 class QVBoxLayout;
 
 
-
-class trackContainer : public QWidget, public journallingObject
+class trackContainer : public model, public journallingObject
 {
 	Q_OBJECT
 public:
 	trackContainer( void );
 	virtual ~trackContainer();
 
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+
+	virtual void loadSettings( const QDomElement & _this );
+
+
+	virtual automationPattern * tempoAutomationPattern( void )
+	{
+		return( NULL );
+	}
+
+	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
+
+	void setMutedOfAllTracks( bool _muted );
+
+
+	virtual void updateAfterTrackAdd( void );
+	void addTrack( track * _track );
+	void removeTrack( track * _track );
+
+	void clearAllTracks( void );
+
+	const QList<track *> & tracks( void ) const
+	{
+		return( m_tracks );
+	}
+
+	static const QString classNodeName( void )
+	{
+		return( "trackcontainer" );
+	}
+
+
+	//const QList<track *> tracks( void ) const;
+
+
+signals:
+	void trackAdded( track * _track );
+
+
+private:
+	QList<track *> m_tracks;
+
+
+	friend class trackContainerView;
+
+
+} ;
+
+
+
+class trackContainerView : public QWidget, public modelView,
+						public journallingObject
+{
+	Q_OBJECT
+public:
+	trackContainerView( trackContainer * _tc );
+	virtual ~trackContainerView();
+
 	QWidget * contentWidget( void )
 	{
 		return( m_scrollArea );
-	}
-
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
-
-
-	inline float pixelsPerTact( void ) const
-	{
-		return( m_ppt );
 	}
 
 	inline const midiTime & currentPosition( void ) const
@@ -68,33 +115,19 @@ public:
 		return( m_currentPosition );
 	}
 
-	virtual automationPattern * tempoAutomationPattern( void )
-	{
-		return( NULL );
-	}
-
 	virtual bool fixedTCOs( void ) const
 	{
 		return( FALSE );
 	}
 
-	Uint16 FASTCALL countTracks( track::trackTypes _tt =
-					track::TOTAL_TRACK_TYPES ) const;
+	inline float pixelsPerTact( void ) const
+	{
+		return( m_ppt );
+	}
 
-	void FASTCALL setMutedOfAllTracks( bool _muted );
+	void setPixelsPerTact( int _ppt );
 
-
-	virtual void updateAfterTrackAdd( void );
-	void FASTCALL setPixelsPerTact( Uint16 _ppt );
-	void FASTCALL addTrack( track * _track );
-	void FASTCALL removeTrack( track * _track );
-	void FASTCALL moveTrackUp( track * _track );
-	void FASTCALL moveTrackDown( track * _track );
-
-	void FASTCALL realignTracks( void );
-	void clearAllTracks( void );
-
-	const trackWidget * trackWidgetAt( const int _y ) const;
+	const trackView * trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband( void ) const;
 
@@ -110,73 +143,101 @@ public:
 			return( m_rubberBand->selectedObjects() );
 		}
 		return( QVector<selectableObject *>() );
-/*		QVector<selectableObject *> foo;
-		return( foo );*/
 	}
 
-	QList<track *> tracks( void );
 
-	static const QString classNodeName( void )
+	trackContainer * model( void )
 	{
-		return( "trackcontainer" );
+		return( m_tc );
+	}
+
+	const trackContainer * model( void ) const
+	{
+		return( m_tc );
+	}
+
+	void moveTrackViewUp( trackView * _tv );
+	void moveTrackViewDown( trackView * _tv );
+
+	// -- for usage by trackView only ---------------
+	trackView * addTrackView( trackView * _tv );
+	void removeTrackView( trackView * _tv );
+	// -------------------------------------------------------
+
+	void clearAllTracks( void );
+
+	virtual QString nodeName( void ) const
+	{
+		return( "trackcontainerview" );
 	}
 
 
-signals:
-	void positionChanged( const midiTime & _pos );
+public slots:
+	void realignTracks( void );
+	void createTrackView( track * _t );
 
 
 protected:
-	static const Uint16 DEFAULT_PIXELS_PER_TACT = 16;
+	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	const QList<trackView *> & trackViews( void ) const
+	{
+		return( m_trackViews );
+	}
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
-	
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
-
 	virtual void resizeEvent( QResizeEvent * );
 
-	const QList<track *> tracks( void ) const;
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
 
 	midiTime m_currentPosition;
 
 
 private:
-	enum actions
+	enum Actions
 	{
-		ADD_TRACK, REMOVE_TRACK
+		AddTrack,
+		RemoveTrack
 	} ;
 
 	class scrollArea : public QScrollArea
 	{
 	public:
-		scrollArea( trackContainer * _parent );
+		scrollArea( trackContainerView * _parent );
 		virtual ~scrollArea();
 
 	protected:
 		virtual void wheelEvent( QWheelEvent * _we );
 
 	private:
-		trackContainer * m_trackContainer;
+		trackContainerView * m_trackContainerView;
 
 	} ;
 
+	trackContainer * m_tc;
+	typedef QList<trackView *> trackViewList;
+	trackViewList m_trackViews;
 
 	scrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollLayout;
 
-	QList<track *> m_tracks;
 	float m_ppt;
 
 	rubberBand * m_rubberBand;
 	QPoint m_origin;
 
+
+signals:
+	void positionChanged( const midiTime & _pos );
+
+
 } ;
+
 
 
 #endif

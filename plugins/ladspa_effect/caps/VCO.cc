@@ -1,7 +1,7 @@
 /*
 	VCO.cc
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -32,10 +32,8 @@
 #include "Descriptor.h"
 
 void
-VCOs::init (double _fs)
+VCOs::init()
 {
-	fs = _fs;
-
 	/* going a fair bit lower than nominal with fc because the filter
 	 * rolloff is not as steep as we might like it to be. */
 	double f = .5 * M_PI / OVERSAMPLE;
@@ -59,11 +57,11 @@ template <sample_func_t F>
 void
 VCOs::one_cycle (int frames)
 {
-	vco.set_f (*ports[0], OVERSAMPLE * fs);
-	vco.set_saw_square (*ports[1], *ports[2]);
+	vco.set_f (getport(0), OVERSAMPLE * fs);
+	vco.set_saw_square (getport(1), getport(2));
 
 	double g = (gain == *ports[3]) ? 
-		1 : pow (*ports[3] / gain, 1. / (double) frames);
+		1 : pow (getport(3) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[4];
 
@@ -77,7 +75,7 @@ VCOs::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[3];
+	gain = getport(3);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -88,7 +86,7 @@ VCOs::port_info [] =
 	{
 		"f",
 		INPUT | CONTROL,
-		{BOUNDED | FS | DEFAULT_440, 0, .1}
+		{BOUNDED | LOG | DEFAULT_100, 1, 5751}
 	}, {
 		"tri .. saw",
 		INPUT | CONTROL,
@@ -105,10 +103,6 @@ VCOs::port_info [] =
 		"out",
 		OUTPUT | AUDIO,
 		{0}
-	}, {
-		"latency",
-		OUTPUT | CONTROL,
-		{0}
 	}
 };
 
@@ -119,9 +113,9 @@ Descriptor<VCOs>::setup()
 	Label = "VCOs";
 	Properties = HARD_RT;
 
-	Name = "CAPS: VCOs - Virtual 'analogue' oscillator";
+	Name = CAPS "VCOs - Virtual 'analogue' oscillator";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();
@@ -130,10 +124,8 @@ Descriptor<VCOs>::setup()
 /* //////////////////////////////////////////////////////////////////////// */
 
 void
-VCOd::init (double _fs)
+VCOd::init()
 {
-	fs = _fs;
-
 	/* going a fair bit lower than nominal with fc because the filter
 	 * rolloff is not as steep as we might like it to be. */
 	double f = .5 * M_PI / OVERSAMPLE;
@@ -157,16 +149,16 @@ template <sample_func_t F>
 void
 VCOd::one_cycle (int frames)
 {
-	vco.set_f (*ports[0], OVERSAMPLE * fs, *ports[5]);
+	vco.set_f (getport(0), OVERSAMPLE * fs, getport(5));
 
-	vco.vco[0].set_saw_square (*ports[1], *ports[2]);
-	vco.vco[1].set_saw_square (*ports[3], *ports[4]);
+	vco.vco[0].set_saw_square (getport(1), getport(2));
+	vco.vco[1].set_saw_square (getport(3), getport(4));
 
-	vco.set_sync (*ports[6]);
-	vco.set_blend (*ports[7]);
+	vco.set_sync (getport(6));
+	vco.set_blend (getport(7));
 
 	double g = (gain == *ports[8]) ? 
-		1 : pow (*ports[8] / gain, 1. / (double) frames);
+		1 : pow (getport(8) / gain, 1. / (double) frames);
 
 	d_sample * d = ports[9];
 
@@ -180,7 +172,7 @@ VCOd::one_cycle (int frames)
 		gain *= g;
 	}
 
-	gain = *ports[8];
+	gain = getport(8);
 }
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -191,7 +183,7 @@ VCOd::port_info [] =
 	{
 		"f",
 		INPUT | CONTROL,
-		{BOUNDED | FS | DEFAULT_440, 0, .1}
+		{BOUNDED | LOG | DEFAULT_100, 1, 5751}
 	}, {
 		"1: tri .. saw",
 		INPUT | CONTROL,
@@ -228,10 +220,6 @@ VCOd::port_info [] =
 		"out",
 		OUTPUT | AUDIO,
 		{0}
-	}, {
-		"latency",
-		OUTPUT | CONTROL,
-		{0}
 	}
 };
 
@@ -242,9 +230,9 @@ Descriptor<VCOd>::setup()
 	Label = "VCOd";
 	Properties = HARD_RT;
 
-	Name = "CAPS: VCOd - Double VCO with detune and hard sync options";
+	Name = CAPS "VCOd - Double VCO with detune and hard sync options";
 	Maker = "Tim Goetze <tim@quitte.de>";
-	Copyright = "GPL, 2004-5";
+	Copyright = "GPL, 2004-7";
 
 	/* fill port info and vtable */
 	autogen();

@@ -3,7 +3,7 @@
 /*
  * effect_select_dialog.cpp - dialog to choose effect plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,6 +33,7 @@
 #include "effect_select_dialog.h"
 
 #include "gui_templates.h"
+#include "automatable_model_templates.h"
 #include "embed.h"
 
 
@@ -47,7 +48,7 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
 	vlayout->setSpacing( 10 );
 	vlayout->setMargin( 10 );
 
-	effectList * elist = new effectList( this );
+	effectListWidget * elist = new effectListWidget( this );
 	elist->setMinimumSize( 500, 400 );
 	connect( elist, SIGNAL( doubleClicked( const effectKey & ) ),
 				this, SLOT( selectPlugin() ) );
@@ -107,11 +108,12 @@ effectSelectDialog::~effectSelectDialog()
 
 
 
-effect * effectSelectDialog::instantiateSelectedPlugin( void )
+effect * effectSelectDialog::instantiateSelectedPlugin( effectChain * _parent )
 {
 	if( !m_currentSelection.name.isEmpty() && m_currentSelection.desc )
 	{
 		return( effect::instantiate( m_currentSelection.desc->name,
+							_parent,
 							&m_currentSelection ) );
 	}
 	return( NULL );
@@ -148,7 +150,7 @@ void effectSelectDialog::selectPlugin( void )
 
 
 
-effectList::effectList( QWidget * _parent ) :
+effectListWidget::effectListWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_descriptionWidget( NULL )
 {
@@ -226,14 +228,14 @@ effectList::effectList( QWidget * _parent ) :
 
 
 
-effectList::~effectList()
+effectListWidget::~effectListWidget()
 {
 }
 
 
 
 
-void effectList::rowChanged( int _pluginIndex )
+void effectListWidget::rowChanged( int _pluginIndex )
 {
 	delete m_descriptionWidget;
 	m_descriptionWidget = NULL;
@@ -268,7 +270,7 @@ void effectList::rowChanged( int _pluginIndex )
 
 
 
-void effectList::onDoubleClicked( QListWidgetItem * _item )
+void effectListWidget::onDoubleClicked( QListWidgetItem * _item )
 {
 	emit( doubleClicked( m_currentSelection ) );
 }
@@ -276,7 +278,7 @@ void effectList::onDoubleClicked( QListWidgetItem * _item )
 
 
 
-void effectList::onAddButtonReleased()
+void effectListWidget::onAddButtonReleased()
 {
 	emit( addPlugin( m_currentSelection ) );
 }
@@ -284,7 +286,7 @@ void effectList::onAddButtonReleased()
 
 
 
-void effectList::resizeEvent( QResizeEvent * )
+void effectListWidget::resizeEvent( QResizeEvent * )
 {
 	//m_descriptionWidget->setFixedWidth( width() - 40 );
 }
