@@ -49,7 +49,7 @@
 extern "C"
 {
 
-plugin::descriptor sf2_plugin_descriptor =
+plugin::descriptor sf2player_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"Sf2Player",
@@ -66,7 +66,7 @@ plugin::descriptor sf2_plugin_descriptor =
 
 
 sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &sf2_plugin_descriptor ),
+	instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_bankNum( -1, -1, 999, 1, this ),
 	m_patchNum( -1, -1, 127, 1, this ),
 	m_filename( "" ),
@@ -131,7 +131,7 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 QString sf2Instrument::nodeName( void ) const
 {
-	return( sf2_plugin_descriptor.name );
+	return( sf2player_plugin_descriptor.name );
 }
 
 
@@ -370,9 +370,6 @@ void sf2InstrumentView::showFileDialog( void )
 	{
 		ofd.selectFile( k->m_filename );
 	}
-
-// HACK
-	ofd.setDirectory("/home/llama");
 
 	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{

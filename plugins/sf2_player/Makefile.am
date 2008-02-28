@@ -10,8 +10,8 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="sf2player"
 %.moc: ./%.h
 	$(MOC) -o $@ $<
 
-%.ui: ./%.ui
-	$(UIC) -o ui_$@ $<
+ui_%h: ./%.ui
+	$(UIC) -o $@ $<
 
 
 MOC_FILES = ./sf2_player.moc ./patches_dialog.moc
