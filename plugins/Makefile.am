@@ -23,6 +23,7 @@ SUBDIRS =			\
 	midi_import		\
 	organic			\
 	patman			\
+	sf2_player		\
 	$(SINGERBOT_DIR)	\
 	$(STK_DIR)		\
 	triple_oscillator	\

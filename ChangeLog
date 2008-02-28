@@ -1,3 +1,18 @@
+2008-02-28	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player:
+	* plugins/sf2_player/patches_dialog.ui:
+	* plugins/sf2_player/logo.png:
+	* plugins/sf2_player/patches_dialog.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/Makefile.am:
+	* plugins/sf2_player/artwork.png:
+	* plugins/sf2_player/patches_dialog.h:
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/Makefile.am:
+	* configure.in:
+	added beta of SoundFont player
+
 2008-02-28	Danny McRae <khjklujn/at/yahoo/dot/com>
 
 	* plugins/stk/Makefile.am:

@@ -655,6 +655,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/patman/Makefile
+		 plugins/sf2_player/Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
