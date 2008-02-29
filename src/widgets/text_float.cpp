@@ -98,10 +98,6 @@ void textFloat::reparent( QWidget * _new_parent )
 		position += _new_parent->pos();
 	}
 
-	// Position this widget to the right of the parent
-	//
-	move( position + QPoint(_ new_parent->width() + 5, 5 ) );
-
 	QWidget::setParent( _new_parent, Qt::FramelessWindowHint |
 				Qt::WindowStaysOnTopHint | Qt::ToolTip );
 }
