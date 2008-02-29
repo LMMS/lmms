@@ -3,6 +3,7 @@
 	* include/lcd_spinbox.h:
 	* src/widgets/lcd_spinbox.cpp:
 	* data/themes/default/lcd_19red.png:
+	* data/themes/default/lcd_19green.png:
 	new non-QLcdSpinBox pixmap-based LCD spinbox 
 
 	* include/lmms_style.h:
