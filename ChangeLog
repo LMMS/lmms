@@ -15,6 +15,13 @@
 	* src/core/track.cpp:
 	playing with alternating colors per tact
 
+	* include/combobox.h:
+	* src/widgets/combobox.cpp:
+	* data/themes/default/combobox_bg.png:
+	* data/themes/default/combobox_arrow_selected.png:
+	- combobox now updates when incremented or decrementing.
+	- draw combo box with styled border, change arrow when pressed
+
 2008-02-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/plugin.cpp:

@@ -33,6 +33,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
+#include <QtGui/QStyleOptionFrame>
 
 #include "automatable_model_templates.h"
 #include "automation_pattern.h"
@@ -43,6 +44,7 @@
 
 QPixmap * comboBox::s_background = NULL;
 QPixmap * comboBox::s_arrow = NULL;
+QPixmap * comboBox::s_arrowSelected = NULL;
 
 const int CB_ARROW_BTN_WIDTH = 20;
 
@@ -56,13 +58,19 @@ comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	if( s_background == NULL )
 	{
 		s_background = new QPixmap( embed::getIconPixmap(
-							"combobox_bg" ) );
+				"combobox_bg" ) );
 	}
 
 	if( s_arrow == NULL )
 	{
 		s_arrow = new QPixmap( embed::getIconPixmap(
-							"combobox_arrow" ) );
+				"combobox_arrow" ) );
+	}
+
+	if( s_arrowSelected == NULL )
+	{
+		s_arrowSelected = new QPixmap( embed::getIconPixmap(
+				"combobox_arrow_selected" ) );
 	}
 
 	setFont( pointSize<9>( font() ) );
@@ -140,10 +148,12 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton )
 	{
 		model()->setInitValue( model()->value() + 1 );
+		update();
 	}
 	else if( _me->button() == Qt::RightButton )
 	{
 		model()->setInitValue( model()->value() - 1 );
+		update();
 	}
 }
 
@@ -154,36 +164,31 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	p.fillRect( rect(), QColor( 0, 0, 0 ) );
-
-	for( int x = 2; x < width() - 2; x += s_background->width() )
+	for( int x = 1; x < width() - 1; x += s_background->width() )
 	{
-		p.drawPixmap( x, 2, *s_background );
+		p.drawPixmap( x, 1, *s_background );
 	}
 
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawLine( width() - 2, 1, width() - 2, height() - 2 );
-
-	// outer rect
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( 0, 0, width(), height() );
-
 	// button-separator
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 0, width() -
-					CB_ARROW_BTN_WIDTH - 1, height() - 2 );
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 0, width() -
-					CB_ARROW_BTN_WIDTH, height() - 2 );
+	p.setPen( palette().color( QPalette::Normal, QPalette::Mid ) );
+	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 1, width() -
+					CB_ARROW_BTN_WIDTH - 1, height() - 3 );
 
-	// brighter line at bottom/right
-	p.setPen( QColor( 160, 160, 160 ) );
-	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
+	p.setPen( palette().color( QPalette::Normal, QPalette::Dark ) );
+	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 1, width() -
+					CB_ARROW_BTN_WIDTH, height() - 3 );
 
-	const int dxy = ( m_pressed == TRUE ) ? 1 : 0;
-	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 4 + dxy, 4 + dxy,
-								*s_arrow );
+	// Border
+	QStyleOptionFrame opt;
+	opt.initFrom( this );
+	opt.state = QStyle::State_Sunken;
+
+	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
+
+	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
+	
+	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4,
+						*arrow );
 
 	if( model()->size() > 0 )
 	{
@@ -204,10 +209,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			tx += pm.width() + 2;
 		}
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, p.fontMetrics().height()-3,
+		p.drawText( tx+1, p.fontMetrics().height()-1,
 						model()->currentText() );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, p.fontMetrics().height()-4,
+		p.drawText( tx, p.fontMetrics().height()-2,
 						model()->currentText() );
 	}
 }
