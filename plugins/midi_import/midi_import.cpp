@@ -624,7 +624,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new midiImport( static_cast<const char *>( _data ) ) );
 }
