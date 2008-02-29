@@ -853,8 +853,8 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 			p.fillRect( QRect(x, 0, 
 			(int) tcv->pixelsPerTact(), height()),
 				(flipper<4) ?
-				QColor( 23, 34, 37 ) :
-				QColor( 31, 45, 50 ));
+				QColor( 56, 80, 88 ) :
+				QColor( 49, 71, 77 ));
 			flipper = (flipper+1)%8;
 		}
 

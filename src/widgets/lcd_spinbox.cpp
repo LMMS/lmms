@@ -54,7 +54,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 
 	setAccessibleName( _name );
 
-	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19red" ) );
+	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) );
 
 	int margin = 1; //QStyle::PM_DefaultFrameWidth;
 

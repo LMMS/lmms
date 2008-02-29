@@ -170,11 +170,11 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	}
 
 	// button-separator
-	p.setPen( palette().color( QPalette::Normal, QPalette::Mid ) );
+	p.setPen( palette().color( QPalette::Normal, QPalette::Dark ) );
 	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 1, width() -
 					CB_ARROW_BTN_WIDTH - 1, height() - 3 );
 
-	p.setPen( palette().color( QPalette::Normal, QPalette::Dark ) );
+	p.setPen( palette().color( QPalette::Normal, QPalette::Mid ) );
 	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 1, width() -
 					CB_ARROW_BTN_WIDTH, height() - 3 );
 
