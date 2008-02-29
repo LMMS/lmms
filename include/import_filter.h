@@ -67,8 +67,8 @@ protected:
 
 	inline int readByte( void )
 	{
-		char c;
-		if( m_file.getChar( &c ) )
+		unsigned char c;
+		if( m_file.getChar( (char*) &c ) )
 		{
 			return( static_cast<int>( c ) );
 		}
