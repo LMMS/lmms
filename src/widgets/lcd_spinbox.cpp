@@ -30,6 +30,10 @@
 #include <QtGui/QApplication>
 #include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QStyleOptionFrameV2>
+
 
 #include "automatable_model_templates.h"
 #include "caption_menu.h"
@@ -42,28 +46,47 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
 	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
-	m_number( new QLCDNumber( _num_digits, this ) ),
-	m_label( NULL ),
+	m_label(),
+	m_numDigits( _num_digits ),
 	m_origMousePos()
-{
-	m_number->setFrameShape( QFrame::Panel );
-	m_number->setFrameShadow( QFrame::Sunken );
-	m_number->setSegmentStyle( QLCDNumber::Flat );
-
-	QPalette pal;
-	pal.setColor( QPalette::Light, Qt::gray );
-	pal.setColor( QPalette::Mid, Qt::darkGray );
-	pal.setColor( QPalette::Dark, Qt::black );
-	pal.setColor( m_number->backgroundRole(), Qt::black );
-	m_number->setPalette( pal );
-	m_number->setAutoFillBackground( TRUE );
-
+{	
 	setEnabled( TRUE );
 
 	setAccessibleName( _name );
 
-	m_number->setFixedSize( m_number->sizeHint() * 0.9 );
-	setFixedSize( m_number->size() );
+	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19red" ) );
+
+	int margin = 1; //QStyle::PM_DefaultFrameWidth;
+
+	m_cellWidth = m_lcdPixmap->size().width() / lcdSpinBox::charsPerPixmap;
+	m_cellHeight = m_lcdPixmap->size().height() / 2;
+
+	setFixedSize( m_cellWidth * (_num_digits+1)  + (2*margin),
+			m_cellHeight + (2*margin) );
+}
+
+lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style, 
+			QWidget * _parent, const QString & _name ) :
+	QWidget( _parent ),
+	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	m_label(),
+	m_numDigits( _num_digits ),
+	m_origMousePos()
+{
+	setEnabled( TRUE );
+
+	setAccessibleName( _name );
+
+	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" +
+			_lcd_style ).toAscii().constData() ) );
+
+	int margin = 1; //QStyle::PM_DefaultFrameWidth;
+
+	m_cellWidth = m_lcdPixmap->size().width() / lcdSpinBox::charsPerPixmap;
+	m_cellHeight = m_lcdPixmap->size().height() / 2;
+
+	setFixedSize( m_cellWidth * (_num_digits+1)  + (2*margin),
+			m_cellHeight + (2*margin) );
 }
 
 
@@ -74,6 +97,95 @@ lcdSpinBox::~lcdSpinBox()
 }
 
 
+void lcdSpinBox::paintEvent( QPaintEvent * _me )
+{
+	QRect ur = _me->rect();
+
+	QPainter p( this );
+	
+	QSize cellSize( m_cellWidth, m_cellHeight );
+
+	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
+	
+	int i;
+
+	int margin = 1;// QStyle::PM_DefaultFrameWidth;
+	int lcdWidth = m_cellWidth * (m_numDigits+1) + (margin*2);
+
+	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
+	p.save();
+	
+	p.translate( margin, margin );
+
+	// Left Margin
+	p.drawPixmap( cellRect, *m_lcdPixmap, 
+			QRect( QPoint( charsPerPixmap*m_cellWidth, 
+				isEnabled()?0:m_cellHeight ), 
+			cellSize ) );
+	
+	p.translate( (m_cellWidth+1) / 2, 0 );
+
+	// Padding
+	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
+	{
+		p.drawPixmap( cellRect, *m_lcdPixmap, 
+			QRect( QPoint( 10 * m_cellWidth, isEnabled()?0:m_cellHeight) , cellSize ) );
+		p.translate( m_cellWidth, 0 );
+	}
+
+	// Digits
+	for( int i=0; i < m_display.length(); i++ ) 
+	{
+		int val = m_display[i].digitValue();
+		if( val < 0 ) 
+		{
+			if( m_display[i] == '-' )
+				val = 11;
+			else
+				val = 10;
+		}
+		p.drawPixmap( cellRect, *m_lcdPixmap,
+				QRect( QPoint( val*m_cellWidth, 
+					isEnabled()?0:m_cellHeight ),
+				cellSize ) );
+		p.translate( m_cellWidth, 0 );
+	}
+
+	// Right Margin
+	p.drawPixmap( QRect( 0, 0, m_cellWidth / 2, m_cellHeight ), *m_lcdPixmap, 
+			QRect( charsPerPixmap*m_cellWidth, isEnabled()?0:m_cellHeight,
+				m_cellWidth / 2, m_cellHeight ) );
+
+
+	p.restore();
+
+	// Border
+	QStyleOptionFrame opt;
+	opt.initFrom( this );
+	opt.state = QStyle::State_Sunken;
+	opt.rect = QRect( 0, 0, m_cellWidth * (m_numDigits+1) + (margin*2), 
+			m_cellHeight + (margin*2) );
+
+	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
+
+	p.resetTransform();
+
+	// Label
+	if( !m_label.isEmpty() )
+	{
+		p.setFont( pointSize<6>( p.font() ) );
+		p.setPen( QColor( 64, 64, 64 ) );
+		p.drawText( width() / 2 -
+			p.fontMetrics().width( m_label ) / 2 + 1,
+				height() - 1, m_label );
+		p.setPen( QColor( 255, 255, 255 ) );
+		p.drawText( width() / 2 -
+				p.fontMetrics().width( m_label ) / 2,
+				height() - 2, m_label );
+	}
+
+}
+
 
 
 void lcdSpinBox::update( void )
@@ -82,12 +194,16 @@ void lcdSpinBox::update( void )
 	if( s == "" )
 	{
 		s = QString::number( model()->value() );
-		while( (int) s.length() < m_number->numDigits() )
+		// TODO: if pad == true
+		/*
+		while( (int) s.length() < m_numDigits )
 		{
 			s = "0" + s;
 		}
+		*/
 	}
-	m_number->display( s );
+	m_display = s;
+	
 	QWidget::update();
 }
 
@@ -96,19 +212,16 @@ void lcdSpinBox::update( void )
 
 void lcdSpinBox::setLabel( const QString & _txt )
 {
-	if( m_label == NULL )
-	{
-		m_label = new QLabel( _txt, this );
-		m_label->setFont( pointSize<6>( m_label->font() ) );
-		m_label->setGeometry( 0, y() + height(),
-			QFontMetrics( m_label->font() ).width( _txt ), 7 );
-		setFixedSize( tMax( width(), m_label->width() ),
-						height() + m_label->height() );
-	}
-	else
-	{
-		m_label->setText( _txt );
-	}
+	int margin = 1;
+	m_label = _txt;
+	
+	setFixedSize( m_cellWidth * (m_numDigits+1)  + (2*margin),
+			m_cellHeight + (2*margin) );
+
+	setFixedSize( tMax<int>( m_cellWidth*(m_numDigits+1) + (2*margin),
+				QFontMetrics( pointSize<6>( font() ) ).width( m_label ) ),
+			m_cellHeight + (2*margin) + 10 );
+	update();
 }
 
 
@@ -116,16 +229,6 @@ void lcdSpinBox::setLabel( const QString & _txt )
 
 void lcdSpinBox::setEnabled( bool _on )
 {
-	QColor fg( 255, 180, 0 );
-	if( _on == FALSE )
-	{
-		fg = QColor( 160, 160, 160 );
-	}
-	QPalette pal = m_number->palette();
-	pal.setColor( QPalette::Background, QColor( 32, 32, 32 ) );
-	pal.setColor( QPalette::Foreground, fg );
-	m_number->setPalette( pal );
-
 	QWidget::setEnabled( _on );
 }
 
@@ -161,7 +264,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton && _me->y() < m_number->height()  )
+	if( _me->button() == Qt::LeftButton && _me->y() < m_cellHeight + 2  )
 	{
 		m_origMousePos = _me->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );

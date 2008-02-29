@@ -40,7 +40,11 @@ class lcdSpinBox : public QWidget, public automatableModelView<int>
 	Q_OBJECT
 public:
 	lcdSpinBox( int _num_digits, QWidget * _parent, const QString & _name =
-								QString::null );
+			QString::null );
+
+	lcdSpinBox( int _num_digits, const QString & _lcd_style, 
+			QWidget * _parent, const QString & _name = QString::null );
+
 	virtual ~lcdSpinBox();
 
 	void setLabel( const QString & _txt );
@@ -69,13 +73,22 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
-
+	virtual void paintEvent( QPaintEvent * _me );
 
 private:
+	
+	static const int charsPerPixmap = 12;
+
 	QMap<int, QString> m_textForValue;
 
-	QLCDNumber * m_number;
-	QLabel * m_label;
+	QString m_display;
+
+	QString m_label;
+	QPixmap * m_lcdPixmap;
+
+	int m_cellWidth;
+	int m_cellHeight;
+	int m_numDigits;
 
 	QPoint m_origMousePos;
 

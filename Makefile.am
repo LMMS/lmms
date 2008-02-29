@@ -272,6 +272,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/interpolation.h			\
 		$(srcdir)/include/lmms_constants.h			\
 		$(srcdir)/include/lmms_math.h				\
+		$(srcdir)/include/lmms_style.h				\
 		$(srcdir)/include/mixer.h				\
 		$(srcdir)/include/pattern.h				\
 		$(srcdir)/include/instrument_track.h			\

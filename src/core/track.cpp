@@ -614,10 +614,10 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
 	m_trackView( _parent )
 {
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setColor( backgroundRole(), QColor( 96, 96, 96 ) );
-	setPalette( pal );
+	//setAutoFillBackground( TRUE );
+	//QPalette pal;
+	//pal.setColor( backgroundRole(), QColor( 96, 96, 96 ) );
+	//setPalette( pal );
 	setAcceptDrops( TRUE );
 
 	connect( _parent->getTrackContainerView(),
@@ -696,6 +696,7 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 {
 //	const int tcos = numOfTCOs();
 
+
 	if( m_trackView->getTrackContainerView() == engine::getBBEditor() )
 	{
 		const int cur_bb = engine::getBBTrackContainer()->currentBB();
@@ -759,6 +760,9 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 			tcov->hide();
 		}
 	}
+
+	// redraw backgroun
+	update();
 }
 
 
@@ -833,15 +837,29 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 96, 96, 96 ) );
+	//p.fillRect( rect(), QColor( 23, 34, 37 ) );
 
 	const trackContainerView * tcv = m_trackView->getTrackContainerView();
+	bool flip = TRUE;
 	if( !tcv->fixedTCOs() )
 	{
 		const int offset = (int)( ( tcv->currentPosition() % 4 ) *
 							tcv->pixelsPerTact() );
+
+		flip = tcv->currentPosition() % 256 < 128;
+		int flipper = (tcv->currentPosition()/64) % 8;
+
+		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
+			p.fillRect( QRect(x, 0, 
+			(int) tcv->pixelsPerTact(), height()),
+				(flipper<4) ?
+				QColor( 23, 34, 37 ) :
+				QColor( 31, 45, 50 ));
+			flipper = (flipper+1)%8;
+		}
+
 		// draw vertical lines
-		p.setPen( QColor( 128, 128, 128 ) );
+		p.setPen( QColor( 54, 65, 69 ) );
 		for( int x = -offset; x < width();
 					x += (int) tcv->pixelsPerTact() )
 		{

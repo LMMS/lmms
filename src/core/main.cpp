@@ -45,6 +45,7 @@
 #include "song.h"
 #include "gui_templates.h"
 #include "automatable_model_templates.h"
+#include "lmms_style.h"
 
 #warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
@@ -175,6 +176,8 @@ int main( int argc, char * * argv )
 
 	if( gui_startup )
 	{
+		QApplication::setStyle( new lmmsStyle() );
+
 		// set palette
 		QPalette pal = app.palette();
 		pal.setColor( QPalette::Background, QColor( 128, 128, 128 ) );
