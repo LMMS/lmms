@@ -91,7 +91,8 @@ void textFloat::reparent( QWidget * _new_parent )
 
 	// Get position and reparent to either top level or dialog
 	//
-	while( _new_parent->parentWidget() && !_new_parent->inherits("QMdiSubWindow"))
+	while( _new_parent->parentWidget() &&
+				!_new_parent->inherits( "QMdiSubWindow" ) )
 	{
 		_new_parent = _new_parent->parentWidget();
 		position += _new_parent->pos();
@@ -99,10 +100,10 @@ void textFloat::reparent( QWidget * _new_parent )
 
 	// Position this widget to the right of the parent
 	//
-	//move(pos + QPoint(parent->width() + 5, 5));
+	move( position + QPoint(_ new_parent->width() + 5, 5 ) );
 
 	QWidget::setParent( _new_parent, Qt::FramelessWindowHint |
-						Qt::WindowStaysOnTopHint );
+				Qt::WindowStaysOnTopHint | Qt::ToolTip );
 }
 
 
@@ -217,11 +218,11 @@ void textFloat::mousePressEvent( QMouseEvent * )
 
 void textFloat::updateSize( void )
 {
-	QFontMetrics metrics( font() );
+	QFontMetrics metrics( pointSize<8>( font() ) );
 	QRect textBound = metrics.boundingRect( m_text );
 	if( m_title != "" )
 	{
-		QFont f = font();
+		QFont f = pointSize<8>( font() );
 		f.setBold( TRUE );
 		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
 		if( title_w > textBound.width() )
