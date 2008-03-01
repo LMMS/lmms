@@ -170,6 +170,12 @@ void patmanInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 {
+	if( _patch_file.size() <= 0 )
+	{
+		m_patchFile = QString::null;
+		return;
+	}
+
 	// is current instrument-track-name equal to previous-filename??
 	if( _rename &&
 		( getInstrumentTrack()->name() ==

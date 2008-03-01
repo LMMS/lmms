@@ -1,5 +1,8 @@
 2008-03-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/patman/patman.cpp:
+	do not crash when loading settings where no file is set
+
 	* plugins/triple_oscillator/triple_oscillator.cpp:
 	in saveSettings() fixed wrong integer-to-string-conversion which made
 	LMMS save broken files
