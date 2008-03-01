@@ -122,9 +122,12 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
 	m_sample_fragment( NULL )
 {
-	m_origData = new sampleFrame[_frames];
-	memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
-	m_origFrames = _frames;
+	if( _frames > 0 )
+	{
+		m_origData = new sampleFrame[_frames];
+		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
+		m_origFrames = _frames;
+	}
 #ifdef SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
@@ -152,9 +155,12 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
 	m_sample_fragment( NULL )
 {
-	m_origData = new sampleFrame[_frames];
-	memset( m_origData, 0, _frames * BYTES_PER_FRAME );
-	m_origFrames = _frames;
+	if( _frames > 0 )
+	{
+		m_origData = new sampleFrame[_frames];
+		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
+		m_origFrames = _frames;
+	}
 #ifdef SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
@@ -180,9 +186,12 @@ sampleBuffer::~sampleBuffer()
 
 void sampleBuffer::update( bool _keep_settings )
 {
-	engine::getMixer()->lock();
-
-	delete[] m_data;
+	const bool lock = ( m_data == NULL );
+	if( lock )
+	{
+		engine::getMixer()->lock();
+		delete[] m_data;
+	}
 
 	if( m_audioFile == "" && m_origData != NULL && m_origFrames > 0 )
 	{
@@ -301,7 +310,10 @@ m_data[frame][chnl] = buf[idx] * fac;
 		m_loop_endFrame = m_endFrame = 1;
 	}
 
-	engine::getMixer()->unlock();
+	if( lock )
+	{
+		engine::getMixer()->unlock();
+	}
 
 	emit sampleUpdated();
 }
