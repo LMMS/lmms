@@ -1,3 +1,9 @@
+2008-03-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	in saveSettings() fixed wrong integer-to-string-conversion which made
+	LMMS save broken files
+
 2008-02-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/text_float.cpp:

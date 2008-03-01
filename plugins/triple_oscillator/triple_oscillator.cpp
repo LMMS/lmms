@@ -261,7 +261,7 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_osc[i]->m_waveShapeModel.saveSettings( _doc, _this,
 							"wavetype" + is );
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
-						"modalgo" + QString( i+1 ) );
+					"modalgo" + QString::number( i+1 ) );
 		_this.setAttribute( "userwavefile" + is,
 					m_osc[i]->m_sampleBuffer->audioFile() );
 	}
