@@ -134,6 +134,11 @@ QString patmanInstrument::nodeName( void ) const
 
 void patmanInstrument::playNote( notePlayHandle * _n, bool )
 {
+	if( m_patchFile == "" )
+	{
+		return;
+	}
+
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	sampleFrame * buf = new sampleFrame[frames];
 
