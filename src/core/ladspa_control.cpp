@@ -35,7 +35,8 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 	m_port( _port ),
         m_linkEnabledModel( _link, this ),
         m_toggledModel( FALSE, this ),
-        m_knobModel( 0, 0, 0, 1, this )
+        m_knobModel( 0, 0, 0, 1, this ),
+	m_tempoSyncKnobModel( 0, 0, 0, 1, 1.0, this )
 {
 	if( m_link )
 	{
@@ -82,13 +83,13 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 			break;
 
 		case TIME:
-			m_knobModel.setTrack( _track );
-			m_knobModel.setRange( m_port->min, m_port->max, 
+			m_tempoSyncKnobModel.setTrack( _track );
+			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max, 
 					  ( m_port->max - 
 						m_port->min ) / 400.0f );
-			m_knobModel.setInitValue( m_port->def );
-			connect( &m_knobModel, SIGNAL( dataChanged() ),
-						 this, SLOT( knobChanged() ) );
+			m_tempoSyncKnobModel.setInitValue( m_port->def );
+			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
+					 this, SLOT( tempoKnobChanged() ) );
 			break;
 
 		default:
@@ -118,10 +119,12 @@ LADSPA_Data ladspaControl::getValue( void )
 			break;
 		case INTEGER:
 		case FLOAT:
-		case TIME:
 			value = static_cast<LADSPA_Data>(
 							m_knobModel.value() );
 			break;		
+		case TIME:
+			value = static_cast<LADSPA_Data>(
+						m_tempoSyncKnobModel.value() );
 		default:
 			printf( "ladspaControl::getValue BAD BAD BAD\n" );
 			break;
@@ -144,8 +147,11 @@ void ladspaControl::setValue( LADSPA_Data _value )
 			m_knobModel.setValue( static_cast<int>( _value ) );
 			break;
 		case FLOAT:
-		case TIME:
 			m_knobModel.setValue( static_cast<float>( _value ) );
+			break;
+		case TIME:
+			m_tempoSyncKnobModel.setValue( static_cast<float>(
+								_value ) );
 			break;
 		default:
 			printf("ladspaControl::setValue BAD BAD BAD\n");
@@ -171,8 +177,10 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 			break;
 		case INTEGER:
 		case FLOAT:
-		case TIME:
 			m_knobModel.saveSettings( _doc, _this, _name );
+			break;
+		case TIME:
+			m_tempoSyncKnobModel.saveSettings( _doc, _this, _name );
 			break;
 		default:
 			printf("ladspaControl::saveSettings BAD BAD BAD\n");
@@ -196,8 +204,10 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 			break;
 		case INTEGER:
 		case FLOAT:
-		case TIME:
 			m_knobModel.loadSettings( _this, _name );
+			break;
+		case TIME:
+			m_tempoSyncKnobModel.loadSettings( _this, _name );
 			break;
 		default:
 			printf("ladspaControl::loadSettings BAD BAD BAD\n");
@@ -218,9 +228,12 @@ void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
 			break;
 		case INTEGER:
 		case FLOAT:
-		case TIME:
 			knobModel::linkModels( &m_knobModel,
 						_control->getKnobModel() );
+			break;
+		case TIME:
+			tempoSyncKnobModel::linkModels( &m_tempoSyncKnobModel,
+					_control->getTempoSyncKnobModel() );
 			break;
 		default:
 			break;
@@ -248,6 +261,15 @@ void ladspaControl::knobChanged( void )
 
 
 
+void ladspaControl::tempoKnobChanged( void )
+{
+	emit( changed( m_port->port_id, static_cast<LADSPA_Data>(
+					m_tempoSyncKnobModel.value() ) ) );
+}
+
+
+
+
 void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 {
 	switch( m_port->data_type )
@@ -258,9 +280,12 @@ void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
 			break;
 		case INTEGER:
 		case FLOAT:
-		case TIME:
 			knobModel::unlinkModels( &m_knobModel,
 						_control->getKnobModel() );
+			break;
+		case TIME:
+			tempoSyncKnobModel::unlinkModels( &m_tempoSyncKnobModel,
+					_control->getTempoSyncKnobModel() );
 			break;
 		default:
 			break;

@@ -38,6 +38,7 @@
 
 #include "automatable_model.h"
 #include "knob.h"
+#include "tempo_sync_knob.h"
 
 
 class track;
@@ -71,6 +72,11 @@ public:
 		return( &m_knobModel );
 	}
 
+	inline knobModel * getTempoSyncKnobModel( void )
+	{
+		return( &m_knobModel );
+	}
+
 	inline port_desc_t * getPort( void )
 	{
 		return( m_port );
@@ -94,6 +100,7 @@ signals:
 protected slots:
 	void ledChanged( void );
 	void knobChanged( void );
+	void tempoKnobChanged( void );
 	void linkStateChanged( void );
 
 
@@ -104,6 +111,7 @@ private:
 	boolModel m_linkEnabledModel;
 	boolModel m_toggledModel;
 	knobModel m_knobModel;
+	tempoSyncKnobModel m_tempoSyncKnobModel;
 
 
 	friend class ladspaControlView;
