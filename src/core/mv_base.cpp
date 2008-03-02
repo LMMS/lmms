@@ -49,9 +49,9 @@ void modelView::setModel( model * _model, bool _old_model_valid )
 	}
 	m_model = _model;
 	QObject::connect( _model, SIGNAL( dataChanged() ),
-						w, SLOT( update() ) );
+				w, SLOT( update() ), Qt::QueuedConnection );
 	QObject::connect( _model, SIGNAL( propertiesChanged() ),
-						w, SLOT( update() ) );
+				w, SLOT( update() ), Qt::QueuedConnection );
 
 	w->update();
 
