@@ -96,7 +96,14 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 
 	if( knb != NULL )
 	{
-		knb->setModel( m_ctl->getKnobModel() );
+		if( m_ctl->getPort()->data_type != TIME )
+		{
+			knb->setModel( m_ctl->getKnobModel() );
+		}
+		else
+		{
+			knb->setModel( m_ctl->getTempoSyncKnobModel() );
+		}
 		knb->setLabel( m_ctl->getPort()->name );
 		knb->setHintText( tr( "Value:" ) + " ", "" );
 		knb->setWhatsThis( tr( "Sorry, no help available." ) );

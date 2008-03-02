@@ -72,9 +72,9 @@ public:
 		return( &m_knobModel );
 	}
 
-	inline knobModel * getTempoSyncKnobModel( void )
+	inline tempoSyncKnobModel * getTempoSyncKnobModel( void )
 	{
-		return( &m_knobModel );
+		return( &m_tempoSyncKnobModel );
 	}
 
 	inline port_desc_t * getPort( void )

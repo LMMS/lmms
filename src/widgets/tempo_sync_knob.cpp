@@ -237,6 +237,10 @@ tempoSyncKnob::~tempoSyncKnob()
 
 void tempoSyncKnob::modelChanged( void )
 {
+	if( model() == NULL )
+	{
+		printf( "no tempoSyncKnobModel has been set!\n" );
+	}
 	m_custom->setModel( &model()->m_custom );
 	connect( model(), SIGNAL( syncModeChanged( tempoSyncMode ) ),
 			this, SLOT( updateDescAndIcon() ) );

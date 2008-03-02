@@ -1,3 +1,13 @@
+2008-03-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/ladspa_control.h:
+	* src/widgets/ladspa_control_view.cpp:
+	* src/widgets/tempo_sync_knob.cpp:
+	fixed wrong integration of tempoSyncKnobModel
+
+	* src/core/mv_base.cpp:
+	made dataChanged()->update() connection queued
+
 2008-03-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/patman/patman.cpp:
