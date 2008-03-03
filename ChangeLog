@@ -1,5 +1,13 @@
 2008-03-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/sf2_player.cpp:
+	- fixed open-file-dialog
+	- fixed order of member-variable-initialization
+
+	* src/lib/sample_buffer.cpp:
+	added MP3-files to file-dialog-filter as they theoretically should be
+	supported through SDL_sound-library
+
 	* src/core/mixer.cpp:
 	always process all note-play-handles of monophonic instruments by the
 	same thread serially - fixes problems with monophonic instruments

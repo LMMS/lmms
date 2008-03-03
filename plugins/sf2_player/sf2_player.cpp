@@ -67,10 +67,10 @@ plugin::descriptor sf2player_plugin_descriptor =
 
 sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &sf2player_plugin_descriptor ),
-	m_bankNum( -1, -1, 999, 1, this ),
-	m_patchNum( -1, -1, 127, 1, this ),
+	m_fontId( 0 ),
 	m_filename( "" ),
-	m_fontId( 0 )
+	m_bankNum( -1, -1, 999, 1, this ),
+	m_patchNum( -1, -1, 127, 1, this )
 {
  
     m_settings = new_fluid_settings();
@@ -349,26 +349,25 @@ void sf2InstrumentView::showFileDialog( void )
 	types << tr( "SoundFont2-Files (*.sf2)" );
 	ofd.setFilters( types );
 
-	if( k->m_filename == "" )
+	QString dir;
+	if( k->m_filename != "" )
 	{
-		ofd.setDirectory(
-				configManager::inst()->userSamplesDir() );
-	}
-	else if( QFileInfo( k->m_filename ).isRelative() )
-	{
-		QString f = configManager::inst()->userSamplesDir()
-							+ k->m_filename;
-		if( QFileInfo( f ).exists() == FALSE )
+		QString f = k->m_filename;
+		if( QFileInfo( f ).isRelative() )
 		{
-			f = configManager::inst()->factorySamplesDir()
-							+ k->m_filename;
+			f = configManager::inst()->userSamplesDir() + f;
+			if( QFileInfo( f ).exists() == FALSE )
+			{
+				f = configManager::inst()->factorySamplesDir() +
+								k->m_filename;
+			}
 		}
-
-		ofd.selectFile( f );
+		ofd.setDirectory( QFileInfo( f ).absolutePath() );
+		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
 	else
 	{
-		ofd.selectFile( k->m_filename );
+		ofd.setDirectory( configManager::inst()->userSamplesDir() );
 	}
 
 	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
