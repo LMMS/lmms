@@ -837,13 +837,13 @@ QString sampleBuffer::openAudioFile( void ) const
 	// set filters
 	QStringList types;
 	types << tr( "All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
-						"*.aif *.aiff *.au *.raw)" )
+					"*.aif *.aiff *.au *.raw *.mp3)" )
 		<< tr( "Wave-Files (*.wav)" )
 		<< tr( "OGG-Files (*.ogg)" )
 		<< tr( "DrumSynth-Files (*.ds)" )
 		<< tr( "FLAC-Files (*.flac)" )
 		<< tr( "SPEEX-Files (*.spx)" )
-		//<< tr( "MP3-Files (*.mp3)" )
+		<< tr( "MP3-Files (*.mp3)" )
 		//<< tr( "MIDI-Files (*.mid)" )
 		<< tr( "VOC-Files (*.voc)" )
 		<< tr( "AIFF-Files (*.aif *.aiff)" )
