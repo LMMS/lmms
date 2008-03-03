@@ -1,3 +1,43 @@
+2008-03-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/mixer.cpp:
+	always process all note-play-handles of monophonic instruments by the
+	same thread serially - fixes problems with monophonic instruments
+	which rely on notes being processed in correct order
+
+	* src/core/instrument_sound_shaping.cpp:
+	fixed out-of-range initial value of filter-frequency-model
+
+	* src/core/main_window.cpp:
+	set directory before selecting file in QFileDialog
+
+	* src/widgets/knob.cpp:
+	removed relative painting - fixes badly draw knobs in several cases
+
+	* src/core/song_editor.cpp:
+	* src/core/track.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/volume_knob.cpp:
+	made textFloat's work properly and displayed at correct position
+
+	* src/widgets/text_float.cpp:
+	* include/text_float.h:
+	always use main-window as parent and make sure to be moved relative to
+	it, i.e. do not show outside of moved main-window
+
+	* include/mmp.h:
+	* src/lib/mmp.cpp:
+	* src/core/song.cpp:
+	removed overwrite-check as in Qt4 QFileDialog does this on its own
+
+	* include/midi_event_processor.h:
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	do not lock mixer and call notePlayHandle::noteOff() in
+	instrumentTrack::processInEvent() when processing monophonic
+	instruments in playNote() - fixes lockups in LB302 in multithreaded
+	mode
+
 2008-03-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/ladspa_control.h:

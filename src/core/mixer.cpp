@@ -25,6 +25,7 @@
  */
 
 
+#include <QtCore/QHash>
 #include <QtCore/QWaitCondition>
 
 #include <math.h>
@@ -34,6 +35,8 @@
 #include "song.h"
 #include "templates.h"
 #include "envelope_and_lfo_parameters.h"
+#include "note_play_handle.h"
+#include "instrument_track.h"
 #include "debug.h"
 #include "engine.h"
 #include "config_mgr.h"
@@ -390,7 +393,7 @@ void mixer::setClipScaling( bool _state )
 		m_workers[i]->addJob( &_jq );				\
 	}
 
-#define WAIT_FOR_JOBS()							\
+#define WAIT_FOR_JOBS(_cond)						\
 	while( m_workerSem.available() < m_numWorkers )			\
 	{								\
 		m_workerSem.acquire( 1 );				\
@@ -413,7 +416,7 @@ for( mixerWorkerThread::jobQueueItems::iterator it = jq.items.end();	\
 {									\
 	--it;								\
 	jq.lock.lockForRead();						\
-	if( !it->done && it->workerID != i &&				\
+	if( _cond && !it->done && it->workerID != i &&			\
 				(++n) % m_numWorkers == 0 )		\
 	{								\
 		jq.lock.unlock();					\
@@ -515,13 +518,40 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 					mixerWorkerThread::PlayHandle,
 					!( *it )->done() &&
 					!( *it )->supportsParallelizing() );
+// we have to process all note-play-handles of a monophonic instrument by the
+// same thread serially as monophonic instruments rely on processing note-play-
+// handles in correct order
+			QHash<instrumentTrack *, int> h;
+			for( mixerWorkerThread::jobQueueItems::iterator it =
+				jq.items.begin(); it != jq.items.end(); ++it )
+			{
+#define COND_NPH static_cast<playHandle *>( it->job )->type() == playHandle::NotePlayHandle
+#define COND_MONOPHONIC static_cast<notePlayHandle *>( it->job )->	\
+				getInstrumentTrack()->			\
+				getInstrument()->isMonophonic()
+if( COND_NPH )
+{
+	if( COND_MONOPHONIC )
+	{
+		notePlayHandle * n = static_cast<notePlayHandle *>( it->job );
+		if( h.contains( n->getInstrumentTrack() ) )
+		{
+			it->workerID = h[n->getInstrumentTrack()];
+		}
+		else
+		{
+			h[n->getInstrumentTrack()] = it->workerID;
+		}
+	}
+}
+			}
 			DISTRIBUTE_JOB_QUEUE(jq);
 			for( playHandleVector::iterator it = par_hndls.begin();
 						it != par_hndls.end(); ++it )
 			{
 				( *it )->waitForWorkerThread();
 			}
-			WAIT_FOR_JOBS();
+			WAIT_FOR_JOBS( h.size() > 0 && ( COND_NPH ? !COND_MONOPHONIC : TRUE ) );
 		}
 		else
 		{
@@ -558,7 +588,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			FILL_JOB_QUEUE(jq,QVector<audioPort*>,m_audioPorts,
 					mixerWorkerThread::AudioPortEffects,1);
 			DISTRIBUTE_JOB_QUEUE(jq);
-			WAIT_FOR_JOBS();
+			WAIT_FOR_JOBS(TRUE);
 		}
 		else
 		{
