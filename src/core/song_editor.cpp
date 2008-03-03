@@ -176,7 +176,7 @@ songEditor::songEditor( song * _song ) :
 	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterVolumeReleased() ) );
 
-	m_mvsStatus = new textFloat( m_masterVolumeSlider );
+	m_mvsStatus = new textFloat;
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
@@ -208,7 +208,7 @@ songEditor::songEditor( song * _song ) :
 	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
 			SLOT( masterPitchReleased() ) );
 
-	m_mpsStatus = new textFloat( m_masterPitchSlider );
+	m_mpsStatus = new textFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
@@ -515,10 +515,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 	if( m_mvsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
 					&& m_masterVolumeSlider->showStatus() )
 	{
-		m_mvsStatus->reparent( m_masterVolumeSlider );
-		m_mvsStatus->move( m_masterVolumeSlider->mapTo(
-					m_masterVolumeSlider->topLevelWidget(),
-							QPoint( 0, 0 ) ) +
+		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
@@ -530,10 +527,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 
 void songEditor::masterVolumePressed( void )
 {
-	m_mvsStatus->reparent( m_masterVolumeSlider );
-	m_mvsStatus->move( m_masterVolumeSlider->mapTo(
-					m_masterVolumeSlider->topLevelWidget(),
-							QPoint( 0, 0 ) ) +
+	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 	m_mvsStatus->show();
 	masterVolumeMoved( m_s->m_masterVolumeModel.value() );
@@ -564,11 +558,8 @@ void songEditor::masterPitchChanged( int _new_val )
 	if( m_mpsStatus->isVisible() == FALSE && m_s->m_loadingProject == FALSE
 					&& m_masterPitchSlider->showStatus() )
 	{
-		m_mpsStatus->reparent( m_masterPitchSlider );
-		m_mpsStatus->move( m_masterPitchSlider->mapTo(
-					m_masterPitchSlider->topLevelWidget(),
-							QPoint( 0, 0 ) ) +
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+		m_mpsStatus->moveGlobal( m_masterPitchSlider,
+				QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 		m_mpsStatus->setVisibilityTimeOut( 1000 );
 	}
 }
@@ -578,11 +569,8 @@ void songEditor::masterPitchChanged( int _new_val )
 
 void songEditor::masterPitchPressed( void )
 {
-	m_mpsStatus->reparent( m_masterPitchSlider );
-	m_mpsStatus->move( m_masterPitchSlider->mapTo(
-					m_masterPitchSlider->topLevelWidget(),
-							QPoint( 0, 0 ) ) +
-			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+	m_mpsStatus->moveGlobal( m_masterPitchSlider,
+				QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
 	masterPitchMoved( m_s->m_masterPitchModel.value() );
 }

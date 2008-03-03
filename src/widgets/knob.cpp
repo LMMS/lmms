@@ -75,7 +75,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 {
 	if( s_textFloat == NULL )
 	{
-		s_textFloat = new textFloat( this );
+		s_textFloat = new textFloat;
 	}
 
 	setAcceptDrops( TRUE );
@@ -349,12 +349,12 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		{
 			QApplication::setOverrideCursor( Qt::BlankCursor );
 		}
-		s_textFloat->reparent( this );
+//		s_textFloat->reparent( this );
 		s_textFloat->setText( m_hintTextBeforeValue +
 						QString::number(
 							model()->value() ) +
 							m_hintTextAfterValue );
-		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
+		s_textFloat->moveGlobal( this,
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = TRUE;
@@ -443,11 +443,8 @@ void knob::mouseDoubleClickEvent( QMouseEvent * )
 
 void knob::paintEvent( QPaintEvent * _me )
 {
-	QRect ur = _me->rect();
-
 	QPainter p( this );
 
-	p.translate( -ur.x(), -ur.y() );
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
@@ -473,12 +470,10 @@ void knob::wheelEvent( QWheelEvent * _we )
 	model()->incValue( inc );
 
 
-	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 						m_hintTextAfterValue );
-	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-				QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( model()->value() );
@@ -519,12 +514,10 @@ void knob::setPosition( const QPoint & _p )
 void knob::reset( void )
 {
 	model()->setValue( model()->initValue() );
-	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 							m_hintTextAfterValue );
-	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-				QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 
@@ -542,12 +535,10 @@ void knob::copyValue( void )
 void knob::pasteValue( void )
 {
 	model()->setValue( s_copiedValue );
-	s_textFloat->reparent( this );
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 							m_hintTextAfterValue );
-	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-				QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 

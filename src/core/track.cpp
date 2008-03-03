@@ -204,7 +204,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 {
 	if( s_textFloat == NULL )
 	{
-		s_textFloat = new textFloat( this );
+		s_textFloat = new textFloat;
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
@@ -255,7 +255,7 @@ bool trackContentObjectView::fixedTCOs( void )
 bool trackContentObjectView::close( void )
 {
 	m_trackView->getTrackContentWidget()->removeTCOView( this );
-	QWidget::close();
+	return( QWidget::close() );
 }
 
 
@@ -412,7 +412,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 							"resizing." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-		s_textFloat->reparent( this );
+//		s_textFloat->reparent( this );
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( _me );
 		s_textFloat->show();
@@ -461,9 +461,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTact64th() ) );
-		s_textFloat->move( QPoint( 8,
-				s_textFloat->parentWidget()->height() -
-					s_textFloat->height() - 24 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -513,8 +511,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				arg( m_tco->startPosition().getTact64th() ).
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTact64th() ) );
-		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-						QPoint( width() + 2, 8 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
 	}
 	else
 	{
@@ -1747,7 +1744,7 @@ void trackView::update( void )
 bool trackView::close( void )
 {
 	m_trackContainerView->removeTrackView( this );
-	QWidget::close();
+	return( QWidget::close() );
 }
 
 

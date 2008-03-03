@@ -4,7 +4,7 @@
  * volume_knob.cpp - defines a knob that display it's value as either a
  *                   percentage or in dBV.
  *
- * Copyright (c) 2006-2007  Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008  Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -81,8 +81,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		{
 			QApplication::setOverrideCursor( Qt::BlankCursor );
 		}
-		s_textFloat->reparent( this );
-		
+
 		QString val;
 		if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 		{
@@ -96,7 +95,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		}
 		s_textFloat->setText( m_hintTextBeforeValue + val );
 		
-		s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
+		s_textFloat->moveGlobal( this,
 				QPoint( m_knobPixmap->width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = TRUE;
@@ -156,8 +155,6 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	model()->incValue( inc );
 
 
-	s_textFloat->reparent( this );
-	
 	QString val;
 	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
@@ -171,8 +168,7 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	}
 	s_textFloat->setText( m_hintTextBeforeValue + val );
 	
-	s_textFloat->move( mapTo( topLevelWidget(), QPoint( 0, 0 ) ) +
-			QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( model()->value() );
