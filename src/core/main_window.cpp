@@ -718,8 +718,8 @@ bool mainWindow::saveProjectAs( void )
 	QString f = engine::getSong()->projectFileName();
 	if( f != "" )
 	{
-		sfd.selectFile( QFileInfo( f ).fileName() );
 		sfd.setDirectory( QFileInfo( f ).absolutePath() );
+		sfd.selectFile( QFileInfo( f ).fileName() );
 	}
 	else
 	{
