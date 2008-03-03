@@ -1,7 +1,7 @@
 /*
  * text_float.h - class textFloat, a floating text-label
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 class textFloat : public QWidget
 {
 public:
-	textFloat( QWidget * _parent );
+	textFloat( void );
 	virtual ~textFloat()
 	{
 	}
@@ -41,8 +41,6 @@ public:
 	void setTitle( const QString & _title );
 	void setText( const QString & _text );
 	void setPixmap( const QPixmap & _pixmap );
-
-	void reparent( QWidget * _new_parent );
 
 	void setVisibilityTimeOut( int _msecs );
 
@@ -57,6 +55,11 @@ public:
 								QPixmap(),
 						int _timeout = 2000,
 						QWidget * _parent = NULL );
+
+	void moveGlobal( QWidget * _w, const QPoint & _offset )
+	{
+		move( _w->mapToGlobal( QPoint( 0, 0 ) )+_offset );
+	}
 
 
 protected:

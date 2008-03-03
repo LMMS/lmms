@@ -3,7 +3,7 @@
 /*
  * text_float.cpp - class textFloat, a floating text-label
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,20 +31,16 @@
 #include "text_float.h"
 #include "gui_templates.h"
 #include "main_window.h"
+#include "engine.h"
 
 
 
-textFloat::textFloat( QWidget * _parent ) :
-	QWidget( _parent
-#if 0
-	, "textFloat", WStyle_Customize  | WStyle_NoBorder | WStyle_StaysOnTop
-#endif
-		),
+textFloat::textFloat( void ) :
+	QWidget( engine::getMainWindow(), Qt::ToolTip ),
 	m_title( "" ),
 	m_text( "" ),
 	m_pixmap()
 {
-	reparent( parentWidget() );
 	resize( 20, 20 );
 	hide();
 
@@ -81,30 +77,6 @@ void textFloat::setPixmap( const QPixmap & _pixmap )
 
 
 
-void textFloat::reparent( QWidget * _new_parent )
-{
-	if( _new_parent == NULL )
-	{
-		return;
-	}
-	QPoint position = _new_parent->pos();
-
-	// Get position and reparent to either top level or dialog
-	//
-	while( _new_parent->parentWidget() &&
-				!_new_parent->inherits( "QMdiSubWindow" ) )
-	{
-		_new_parent = _new_parent->parentWidget();
-		position += _new_parent->pos();
-	}
-
-	QWidget::setParent( _new_parent, Qt::FramelessWindowHint |
-				Qt::WindowStaysOnTopHint | Qt::ToolTip );
-}
-
-
-
-
 void textFloat::setVisibilityTimeOut( int _msecs )
 {
 	QTimer::singleShot( _msecs, this, SLOT( hide() ) );
@@ -117,28 +89,15 @@ void textFloat::setVisibilityTimeOut( int _msecs )
 textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
-	QWidget * mw = QApplication::activeWindow();
-	if( mw == NULL )
-	{
-		foreach( QWidget * w, QApplication::topLevelWidgets() )
-		{
-			if( mw == NULL || dynamic_cast<mainWindow *>( w ) )
-			{
-				mw = w;
-			}
-		}
-	}
-
-	textFloat * tf = new textFloat( ( _parent == NULL ) ? mw : _parent );
+	QWidget * mw = engine::getMainWindow();
+	textFloat * tf = new textFloat;
 	if( _parent != NULL )
 	{
-		tf->move( _parent->mapTo( _parent->topLevelWidget(),
-							QPoint( 0, 0 ) ) +
-				QPoint( _parent->width() + 2, 0 ) );
+		tf->moveGlobal( _parent, QPoint( _parent->width() + 2, 0 ) );
 	}
 	else
 	{
-		tf->move( 32, mw->height() - 28 - _add_y_margin );
+		tf->moveGlobal( mw, QPoint( 32, mw->height() - tf->height() - 8 - _add_y_margin ) );
 	}
 	tf->setText( _msg );
 	tf->show();
@@ -231,7 +190,7 @@ void textFloat::updateSize( void )
 	{
 		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
 	}
-	resize( textBound.width() + 5, textBound.height() + 5 );
+	resize( textBound.width() + 5, textBound.height()*3/4+2 );
 	//move( QPoint( parentWidget()->width() + 5, 5 ) );
 	update();
 }
