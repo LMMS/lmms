@@ -204,7 +204,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 
 void instrumentTrack::processInEvent( const midiEvent & _me,
-							const midiTime & _time )
+					const midiTime & _time, bool _lock )
 {
 	switch( _me.m_type )
 	{
@@ -257,13 +257,16 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						engine::framesPerTact64th() ) ),
 					0, n->tone(), n->octave(),
 					n->getVolume(), n->getPanning() );
-				// lock our play-handle while calling noteOff()
-				// for not modifying it's member variables
-				// asynchronously (while rendering!)
-				// which can result in segfaults
-				engine::getMixer()->lock();
-				n->noteOff();
-				engine::getMixer()->unlock();
+				if( _lock )
+				{
+					// lock our play-handle while calling noteOff()
+					// for not modifying it's member variables
+					// asynchronously (while rendering!)
+					// which can result in segfaults
+					engine::getMixer()->lock();
+					n->noteOff();
+					engine::getMixer()->unlock();
+				}
 				m_notes[_me.key()] = NULL;
 				emit noteDone( done_note );
 			}
@@ -380,7 +383,8 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 					!_n->released() )
 				{
 					processInEvent( midiEvent( NOTE_OFF, 0,
-						_n->key(), 0 ), midiTime() );
+						_n->key(), 0 ), midiTime(),
+									FALSE );
 					if( ( *youngest_note )->offset() >
 								_n->offset() )
 					{
@@ -403,13 +407,6 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 					( *youngest_note )->offset() );
 						return;
 					}
-				}
-				// we do not play previously released notes
-				// anymore
-				else if( *youngest_note != _n &&
-							_n->released() )
-				{
-					//return;
 				}
 			}
 		}

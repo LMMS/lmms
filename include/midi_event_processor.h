@@ -1,7 +1,7 @@
 /*
  * midi_event_processor.h - base-class for midi-processing classes
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,7 +49,8 @@ public:
 
 	// to be implemented by inheriting classes
 	virtual void FASTCALL processInEvent( const midiEvent & _me,
-						const midiTime & _time ) = 0;
+						const midiTime & _time,
+							bool _lock = TRUE ) = 0;
 	virtual void FASTCALL processOutEvent( const midiEvent & _me,
 						const midiTime & _time ) = 0;
 
