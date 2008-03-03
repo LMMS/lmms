@@ -59,7 +59,7 @@ public:
 
 	QString nameWithExtension( const QString & _fn ) const;
 
-	bool writeFile( QString & _fn, bool _overwrite_check = TRUE );
+	bool writeFile( const QString & _fn );
 
 	inline QDomElement & content( void )
 	{

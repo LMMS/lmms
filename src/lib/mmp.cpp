@@ -226,7 +226,7 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 
 
 
-bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
+bool multimediaProject::writeFile( const QString & _fn )
 {
 	if( type() == SongProject || type() == SongProjectTemplate
 					|| type() == InstrumentTrackSettings )
@@ -237,21 +237,6 @@ bool multimediaProject::writeFile( QString & _fn, bool _overwrite_check )
 
 	QString fn = nameWithExtension( _fn );
 	QFile outfile( fn );
-	if( _overwrite_check == TRUE &&
-		outfile.exists() == TRUE &&
-		QMessageBox::question( NULL,
-					songEditor::tr( "File already exists" ),
-					songEditor::tr( "The file %1 already "
-							"exists.\nDo you want "
-							"to overwrite it?"
-						).arg( fn ),
-					QMessageBox::Yes, QMessageBox::No )
-			== QMessageBox::No )
-	{
-		return( FALSE );
-	}
-
-
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
 		QMessageBox::critical( NULL, songEditor::tr( "Could not write "

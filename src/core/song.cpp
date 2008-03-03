@@ -891,8 +891,7 @@ bool song::saveProject( void )
 	m_playPos[Mode_PlaySong].m_timeLine->saveState( mmp, mmp.content() );
 
 	m_fileName = mmp.nameWithExtension( m_fileName );
-	if( mmp.writeFile( m_fileName, m_oldFileName == "" ||
-					m_fileName != m_oldFileName ) == TRUE )
+	if( mmp.writeFile( m_fileName ) == TRUE )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
