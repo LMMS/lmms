@@ -27,7 +27,7 @@ EMBEDDED_RESOURCES = $(wildcard *png)
 EXTRA_DIST = $(EMBEDDED_RESOURCES)
 
 
-CLEANFILES = $(MOC_FILES) ./embedded_resources.h
+CLEANFILES = $(MOC_FILES) ${UIC_FILES} ./embedded_resources.h
 
 
 
