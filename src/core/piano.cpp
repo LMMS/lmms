@@ -113,43 +113,24 @@ void piano::setKeyState( int _key, bool _on )
 
 
 
-int piano::getKeyFromKeycode( int _k )
+void piano::handleKeyPress( int _key )
 {
-	switch( _k )
-	{
-		case 52: return( 0 ); // Y
-		case 39: return( 1 ); // S
-		case 53: return( 2 ); // X
-		case 40: return( 3 ); // D
-		case 54: return( 4 ); // C
-		case 55: return( 5 ); // V
-		case 42: return( 6 ); // G
-		case 56: return( 7 ); // B
-		case 43: return( 8 ); // H
-		case 57: return( 9 ); // N
-		case 44: return( 10 ); // J
-		case 58: return( 11 ); // M
-		case 24: return( 12 ); // Q
-		case 11: return( 13 ); // 2
-		case 25: return( 14 ); // W
-		case 12: return( 15 ); // 3
-		case 26: return( 16 ); // E
-		case 27: return( 17 ); // R
-		case 14: return( 18 ); // 5
-		case 28: return( 19 ); // T
-		case 15: return( 20 ); // 6
-		case 29: return( 21 ); // Z
-		case 16: return( 22 ); // 7
-		case 30: return( 23 ); // U
-		case 31: return( 24 ); // I
-		case 18: return( 25 ); // 9
-		case 32: return( 26 ); // O
-		case 19: return( 27 ); // 0
-		case 33: return( 28 ); // P
-	}
-
-	return( -100 );
+	m_instrumentTrack->processInEvent( midiEvent( NOTE_ON, 0, _key,
+						DEFAULT_VOLUME ), midiTime() );
+	m_pressedKeys[_key] = TRUE;
 }
+
+
+
+
+
+void piano::handleKeyRelease( int _key )
+{
+	m_instrumentTrack->processInEvent( midiEvent( NOTE_OFF, 0, _key, 0 ),
+								midiTime() );
+	m_pressedKeys[_key] = FALSE;
+}
+
 
 
 
@@ -162,8 +143,7 @@ pianoView::pianoView( QWidget * _parent ) :
 	m_piano( NULL ),
 	m_startTone( C ),
 	m_startOctave( OCTAVE_3 ),
-	m_lastKey( -1 ),
-	m_keyCode( 0 )
+	m_lastKey( -1 )
 {
 	if( s_whiteKeyPm == NULL )
 	{
@@ -207,6 +187,47 @@ pianoView::pianoView( QWidget * _parent ) :
 
 pianoView::~pianoView()
 {
+}
+
+
+
+
+int pianoView::getKeyFromScancode( int _k )
+{
+	switch( _k )
+	{
+		case 52: return( 0 ); // Y
+		case 39: return( 1 ); // S
+		case 53: return( 2 ); // X
+		case 40: return( 3 ); // D
+		case 54: return( 4 ); // C
+		case 55: return( 5 ); // V
+		case 42: return( 6 ); // G
+		case 56: return( 7 ); // B
+		case 43: return( 8 ); // H
+		case 57: return( 9 ); // N
+		case 44: return( 10 ); // J
+		case 58: return( 11 ); // M
+		case 24: return( 12 ); // Q
+		case 11: return( 13 ); // 2
+		case 25: return( 14 ); // W
+		case 12: return( 15 ); // 3
+		case 26: return( 16 ); // E
+		case 27: return( 17 ); // R
+		case 14: return( 18 ); // 5
+		case 28: return( 19 ); // T
+		case 15: return( 20 ); // 6
+		case 29: return( 21 ); // Z
+		case 16: return( 22 ); // 7
+		case 30: return( 23 ); // U
+		case 31: return( 24 ); // I
+		case 18: return( 25 ); // 9
+		case 32: return( 26 ); // O
+		case 19: return( 27 ); // 0
+		case 33: return( 28 ); // P
+	}
+
+	return( -100 );
 }
 
 
@@ -451,19 +472,16 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 
 void pianoView::keyPressEvent( QKeyEvent * _ke )
 {
-	int key_num = piano::getKeyFromKeycode( m_keyCode ) +
+	int key_num = getKeyFromScancode( _ke->nativeScanCode() ) +
 			( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
 
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->m_instrumentTrack->processInEvent(
-				midiEvent( NOTE_ON, 0, key_num,
-						DEFAULT_VOLUME ), midiTime() );
-			m_piano->m_pressedKeys[key_num] = TRUE;
+			m_piano->handleKeyPress( key_num );
+			update();
 		}
-		update();
 	}
 	else
 	{
@@ -476,18 +494,15 @@ void pianoView::keyPressEvent( QKeyEvent * _ke )
 
 void pianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
-	int key_num = piano::getKeyFromKeycode( m_keyCode ) +
+	int key_num = getKeyFromScancode( _ke->nativeScanCode() ) +
 				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
 	if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->m_instrumentTrack->processInEvent(
-					midiEvent( NOTE_OFF, 0, key_num, 0 ),
-								midiTime() );
-			m_piano->m_pressedKeys[key_num] = FALSE;
+			m_piano->handleKeyRelease( key_num );
+			update();
 		}
-		update();
 	}
 	else
 	{
@@ -692,20 +707,6 @@ void pianoView::paintEvent( QPaintEvent * )
 }
 
 
-
-
-#ifdef BUILD_LINUX
-bool pianoView::x11Event( XEvent * _xe )
-{
-	switch( _xe->type )
-	{
-		case KeyPress:
-		case KeyRelease:
-			m_keyCode = _xe->xkey.keycode;
-	}
-	return( FALSE );
-}
-#endif
 
 
 

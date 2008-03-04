@@ -54,7 +54,9 @@ public:
 	virtual ~piano();
 
 	void setKeyState( int _key, bool _on = FALSE );
-	static int getKeyFromKeycode( int _kc );
+
+	void handleKeyPress( int _key );
+	void handleKeyRelease( int _key );
 
 
 private:
@@ -75,14 +77,13 @@ public:
 	pianoView( QWidget * _parent );
 	virtual ~pianoView();
 
+	static int getKeyFromScancode( int _sc );
+
 
 protected:
 	virtual void modelChanged( void );
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
-#ifndef BUILD_WIN32
-	virtual bool x11Event( XEvent * _xe );
-#endif
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
@@ -107,7 +108,6 @@ private:
 	octaves m_startOctave;
 
 	int m_lastKey;
-	unsigned int m_keyCode;
 
 
 private slots:
