@@ -987,6 +987,12 @@ void pianoRoll::updatePaintPixmap( QPixmap & _p )
 						( *it )->getVolume() / 2,
 					x + WHITE_KEY_WIDTH + 1,
 					height() - PR_BOTTOM_MARGIN );
+			p.drawLine( x + WHITE_KEY_WIDTH-1,
+					height() - PR_BOTTOM_MARGIN -
+						( *it )->getVolume() / 2+2,
+					x + WHITE_KEY_WIDTH + 4,
+					height() - PR_BOTTOM_MARGIN -
+						( *it )->getVolume() / 2+2 );
 
 			if( ( *it )->hasDetuningInfo() )
 			{
@@ -1610,7 +1616,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_currentNote->setVolume( vol );
 				m_pattern->update();
 				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( KEY_PRESSURE, 0, key_num,
+					midiEvent( KEY_PRESSURE, 0, m_lastKey,
 							vol * 127 / 100 ),
 								midiTime() );
 			}
