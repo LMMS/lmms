@@ -425,6 +425,8 @@ pianoRoll::pianoRoll( void ) :
 	tb_layout->addStretch();
 
 	// setup our actual window
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
 	setCurrentPattern( NULL );
 
@@ -641,11 +643,17 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 
 void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 {
-	if( validPattern() )
+	if( validPattern() && _ke->modifiers() == Qt::NoModifier )
 	{
-		// TODO: move this to instrumentTrack-class
-/*		m_pattern->getInstrumentTrack()->getPianoWidget()
-							->keyPressEvent( _ke );*/
+		int key_num = pianoView::getKeyFromScancode(
+						_ke->nativeScanCode() ) +
+				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
+
+		if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
+		{
+			m_pattern->getInstrumentTrack()->
+					getPiano()->handleKeyPress( key_num );
+		}
 	}
 	switch( _ke->key() )
 	{
@@ -807,10 +815,17 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 
 void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 {
-	if( validPattern() )
+	if( validPattern() && _ke->modifiers() == Qt::NoModifier )
 	{
-/*		m_pattern->getInstrumentTrack()->getPianoWidget()
-						->keyReleaseEvent( _ke );*/
+		int key_num = pianoView::getKeyFromScancode(
+						_ke->nativeScanCode() ) +
+				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
+
+		if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
+		{
+			m_pattern->getInstrumentTrack()->
+					getPiano()->handleKeyRelease( key_num );
+		}
 	}
 	switch( _ke->key() )
 	{
@@ -847,7 +862,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if( m_editMode == OPEN )
+	if( m_editMode == OPEN && noteUnderMouse() )
 	{
 		noteUnderMouse()->editDetuningPattern();
 		return;
@@ -872,7 +887,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			x -= WHITE_KEY_WIDTH;
 
 			// get tact-64th in which the user clicked
-			int pos_tact_64th = (x-1) * 64 / m_ppt +
+			int pos_tact_64th = x * 64 / m_ppt +
 							m_currentPosition;
 
 
@@ -1180,7 +1195,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_currentNote->setVolume( vol );
 				m_pattern->dataChanged();
 				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( KEY_PRESSURE, 0, key_num,
+					midiEvent( KEY_PRESSURE, 0, m_lastKey,
 							vol * 127 / 100 ),
 								midiTime() );
 			}
@@ -1803,11 +1818,9 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int y_base = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
 	if( validPattern() == TRUE )
 	{
-		QPainter p_detuning( this );
-		p_detuning.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
+		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
 				width() - WHITE_KEY_WIDTH,
-				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN
-							- m_notesEditHeight );
+				height() - PR_TOP_MARGIN );
 
 		const noteVector & notes = m_pattern->notes();
 
@@ -1879,16 +1892,22 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 							( *it )->length() < 0 );
 			}
 			// draw volume-line of note
-			p.setPen( QPen( QColor( 0, 255, 0 ), NE_LINE_WIDTH ) );
-			p.drawLine( x + WHITE_KEY_WIDTH + 1,
+			p.setPen( QPen( QColor( 32, 255, 32, 160 ),
+							NE_LINE_WIDTH ) );
+			p.drawLine( x + WHITE_KEY_WIDTH,
 					height() - PR_BOTTOM_MARGIN -
 						( *it )->getVolume() / 2,
-					x + WHITE_KEY_WIDTH + 1,
+					x + WHITE_KEY_WIDTH,
 					height() - PR_BOTTOM_MARGIN );
-
+			p.drawLine( x + WHITE_KEY_WIDTH-1,
+					height() - PR_BOTTOM_MARGIN -
+						( *it )->getVolume() / 2+1,
+					x + WHITE_KEY_WIDTH + 1,
+					height()-PR_BOTTOM_MARGIN -
+						(*it)->getVolume() / 2 + 1 );
 			if( ( *it )->hasDetuningInfo() )
 			{
-				drawDetuningInfo( p_detuning, *it,
+				drawDetuningInfo( p, *it,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
 			}

@@ -1,5 +1,19 @@
 2008-03-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/piano_roll.cpp:
+	- fixed and improved painting of volume-lines
+	- fixed painting of note-detuning-dots
+	- fixed KEY_PRESSURE-events when changing volume of a note
+	- pass keyboard-events to piano-class if appropriate
+
+	* include/piano.h:
+	* src/core/piano.cpp:
+	moved MIDI-event-code to piano-class
+
+	* src/core/piano_roll.cpp:
+	* src/core/automation_editor.cpp:
+	set focus-policy in order to receive key-events
+
 	* plugins/sf2_player/sf2_player.cpp:
 	- fixed open-file-dialog
 	- fixed order of member-variable-initialization
