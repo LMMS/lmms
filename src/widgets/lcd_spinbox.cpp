@@ -107,8 +107,6 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 
 	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
 	
-	int i;
-
 	int margin = 1;// QStyle::PM_DefaultFrameWidth;
 	int lcdWidth = m_cellWidth * (m_numDigits+1) + (margin*2);
 

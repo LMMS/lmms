@@ -33,7 +33,6 @@
 #include "effect_select_dialog.h"
 
 #include "gui_templates.h"
-#include "automatable_model_templates.h"
 #include "embed.h"
 
 

@@ -31,7 +31,6 @@
 #include "engine.h"
 #include "journalling_object.h"
 #include "song.h"
-#include "automatable_model_templates.h"
 
 
 projectJournal::projectJournal( void ) :

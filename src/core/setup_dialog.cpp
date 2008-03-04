@@ -49,7 +49,6 @@
 #include "tooltip.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
-#include "automatable_model_templates.h"
 
 
 // platform-specific audio-interface-classes

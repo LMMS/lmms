@@ -40,7 +40,6 @@
 
 #include "debug.h"
 #include "templates.h"
-#include "automatable_model_templates.h"
 #include "gui_templates.h"
 #include "config_mgr.h"
 #include "lcd_spinbox.h"

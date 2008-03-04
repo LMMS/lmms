@@ -36,7 +36,6 @@
 #include <QtGui/QWheelEvent>
 
 
-#include "automatable_model_templates.h"
 #include "bb_track.h"
 #include "config_mgr.h"
 #include "debug.h"

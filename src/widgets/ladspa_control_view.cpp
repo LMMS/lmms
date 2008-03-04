@@ -31,7 +31,6 @@
 #include "led_checkbox.h"
 #include "tempo_sync_knob.h"
 #include "tooltip.h"
-#include "automatable_model_templates.h"
 
 
 ladspaControlView::ladspaControlView( QWidget * _parent,

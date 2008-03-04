@@ -36,7 +36,6 @@
 #include "song.h"
 #include "midi_port.h"
 #include "note.h"
-#include "automatable_model_templates.h"
 
 
 #ifdef ALSA_SUPPORT

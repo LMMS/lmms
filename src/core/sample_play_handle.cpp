@@ -26,7 +26,6 @@
 
 
 #include "sample_play_handle.h"
-#include "automatable_model_templates.h"
 #include "audio_port.h"
 #include "bb_track.h"
 #include "engine.h"

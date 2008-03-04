@@ -33,7 +33,6 @@
 #include <math.h>
 
 #include "volume_knob.h"
-#include "automatable_model_templates.h"
 #include "main_window.h"
 #include "config_mgr.h"
 #include "engine.h"

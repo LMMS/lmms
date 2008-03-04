@@ -44,7 +44,6 @@
 #include "export_project_dialog.h"
 #include "song.h"
 #include "gui_templates.h"
-#include "automatable_model_templates.h"
 #include "lmms_style.h"
 
 #warning TODO: move somewhere else

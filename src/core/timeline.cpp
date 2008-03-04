@@ -40,7 +40,6 @@
 #include "nstate_button.h"
 #include "main_window.h"
 #include "text_float.h"
-#include "automatable_model_templates.h"
 
 
 

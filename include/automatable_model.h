@@ -127,7 +127,7 @@ public:
 		return( m_curLevel );
 	}
 
-	inline T fittedValue( T _value ) const;
+	T fittedValue( T _value ) const;
 
 	inline T value( int _level ) const
 	{
@@ -215,11 +215,11 @@ private:
 
 	inline void unlinkModel( autoModel * _model );
 
-	inline static T attributeValue( QString _value );
+	static T attributeValue( QString _value );
 
 	inline void syncAutomationPattern( void );
 
-	inline void setLevel( int _level );
+	void setLevel( int _level );
 
 	inline int level( T _value ) const
 	{

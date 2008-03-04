@@ -49,7 +49,6 @@
 
 
 #include "song_editor.h"
-#include "automatable_model_templates.h"
 #include "main_window.h"
 #include "embed.h"
 #include "engine.h"

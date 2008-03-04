@@ -41,7 +41,6 @@
 #include "lcd_spinbox.h"
 #include "tab_widget.h"
 #include "tooltip.h"
-#include "automatable_model_templates.h"
 
 
 

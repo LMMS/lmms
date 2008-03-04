@@ -35,7 +35,6 @@
 #include <QtGui/QLineEdit>
 
 #include "endian_handling.h"
-#include "automatable_model_templates.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"

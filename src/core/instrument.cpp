@@ -27,7 +27,6 @@
 
 #include "instrument.h"
 #include "instrument_view.h"
-#include "automatable_model_templates.h"
 #include "instrument_track.h"
 #include "dummy_instrument.h"
 #include "note_play_handle.h"

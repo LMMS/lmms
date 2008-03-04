@@ -308,9 +308,9 @@ graphModel::graphModel( float _min, float _max, Uint32 _length,
 		::model * _parent, track * _track,
 		bool _default_constructed ) :
 	model( _parent, _default_constructed ),
+	m_samples( _length ),
 	m_minValue( _min ),
-	m_maxValue( _max ),
-	m_samples( _length )
+	m_maxValue( _max )
 {
 }
 
@@ -332,7 +332,7 @@ void graphModel::setRange( float _min, float _max )
 		if( !m_samples.isEmpty() )
 		{
 			// Trim existing values 
-			for( int i=0; i < length(); i++ )
+			for( Uint32 i=0; i < length(); i++ )
 			{
 				m_samples[i] = fmaxf( _min, fminf( m_samples[i], _max ) );
 			}

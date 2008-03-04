@@ -30,7 +30,6 @@
 
 #include "audio_file_device.h"
 #include "export_project_dialog.h"
-#include "automatable_model_templates.h"
 
 
 audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,

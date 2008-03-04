@@ -31,7 +31,6 @@
 #include "dummy_effect.h"
 #include "effect_chain.h"
 #include "effect_view.h"
-#include "automatable_model_templates.h"
 
 
 effect::effect( const plugin::descriptor * _desc,

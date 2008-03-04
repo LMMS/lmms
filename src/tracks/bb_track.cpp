@@ -585,7 +585,7 @@ bbTrackView::~bbTrackView()
 bool bbTrackView::close( void )
 {
 	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
-	trackView::close();
+	return( trackView::close() );
 }
 
 

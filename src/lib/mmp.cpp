@@ -36,7 +36,6 @@
 #include "config_mgr.h"
 #include "project_version.h"
 #include "song_editor.h"
-#include "automatable_model_templates.h"
 
 
 multimediaProject::typeDescStruct

@@ -44,7 +44,6 @@
 #include "sample_play_handle.h"
 #include "piano_roll.h"
 #include "micro_timer.h"
-#include "automatable_model_templates.h"
 
 #include "audio_device.h"
 #include "midi_client.h"

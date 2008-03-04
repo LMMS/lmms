@@ -140,8 +140,8 @@ signals:
 private:
 
 	QVector<float> m_samples;
-	float m_maxValue;
 	float m_minValue;
+	float m_maxValue;
 
 	friend class graph;
 

@@ -34,7 +34,6 @@
 #include "engine.h"
 #include "mmp.h"
 #include "oscillator.h"
-#include "automatable_model_templates.h"
 
 
 

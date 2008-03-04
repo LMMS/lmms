@@ -47,7 +47,6 @@
 #include "text_float.h"
 #include "tooltip.h"
 #include "track.h"
-#include "automatable_model_templates.h"
 
 
 

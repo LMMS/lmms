@@ -3,7 +3,7 @@
 /*
  * oscillator.cpp - implementation of powerful oscillator-class
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,6 @@
 
 
 #include "oscillator.h"
-#include "automatable_model_templates.h"
 
 
 

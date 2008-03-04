@@ -3,7 +3,7 @@
 /*
  * meter_dialog.cpp - dialog for entering meter settings
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo.com>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,6 @@
 #include "meter_dialog.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "automatable_model_templates.h"
 
 
 meterModel::meterModel( ::model * _parent, track * _track ) :

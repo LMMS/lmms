@@ -32,6 +32,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <Qt/QtXml>
 
 
 #include "automatable_model_templates.h"
@@ -270,6 +271,16 @@ void surroundAreaModel::loadSettings( const QDomElement & _this,
 }
 
 
+
+automationPattern * surroundAreaModel::automationPatternX( void )
+{
+	return( m_posX.getAutomationPattern() );
+}
+
+automationPattern * surroundAreaModel::automationPatternY( void )
+{
+	return( m_posY.getAutomationPattern() );
+}
 
 
 

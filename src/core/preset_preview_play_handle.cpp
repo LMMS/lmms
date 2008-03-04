@@ -4,7 +4,7 @@
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,6 @@
 #include <QtCore/QMutexLocker>
 
 #include "preset_preview_play_handle.h"
-#include "automatable_model_templates.h"
 #include "debug.h"
 #include "engine.h"
 #include "instrument_track.h"

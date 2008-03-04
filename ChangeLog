@@ -1,3 +1,53 @@
+2008-03-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/widgets/graph.cpp:
+	fixed compiler-warnings
+
+	* include/automatable_model.h:
+	* include/graph.h:
+	* include/surround_area.h:
+	* src/audio/audio_file_device.cpp:
+	* src/audio/audio_alsa.cpp:
+	* src/audio/audio_oss.cpp:
+	* src/audio/audio_port.cpp:
+	* src/audio/audio_jack.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/project_journal.cpp:
+	* src/lib/mmp.cpp:
+	* src/lib/oscillator.cpp:
+	* src/widgets/ladspa_control_view.cpp:
+	* src/widgets/envelope_and_lfo_view.cpp:
+	* src/widgets/instrument_midi_io_view.cpp:
+	* src/widgets/lcd_spinbox.cpp:
+	* src/widgets/group_box.cpp:
+	* src/widgets/volume_knob.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/effect_control_dialog.cpp:
+	* src/core/import_filter.cpp:
+	* src/core/setup_dialog.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/main.cpp:
+	* src/core/mixer.cpp:
+	* src/core/effect.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/track.cpp:
+	* src/core/timeline.cpp:
+	* src/core/instrument.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/effect_select_dialog.cpp:
+	* src/core/automation_editor.cpp:
+	* src/core/meter_dialog.cpp:
+	reduced dependencies from automatable_model_templates.h and fixed
+	according compiler-warnings
+
+	* include/shared_object.h:
+	added mutex to protect reference-counter
+
 2008-03-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano_roll.cpp:
@@ -2755,7 +2805,7 @@
 	* include/pattern.h:
 	* include/sample_buffer.h:
 	* include/shared_object.h:
-	* plugins/ladspa_bas:e/ladspa_control.cpp:
+	* plugins/ladspa_base/ladspa_control.cpp:
 	* plugins/ladspa_base/ladspa_control.h:
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* src/audio/audio_jack.cpp:
