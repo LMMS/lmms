@@ -346,6 +346,8 @@ automationEditor::automationEditor( void ) :
 	tb_layout->addStretch();
 
 	// setup our actual window
+	setFocusPolicy( Qt::StrongFocus );
+	setFocus();
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setCurrentPattern( NULL );
 
