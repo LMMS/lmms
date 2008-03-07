@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080303, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080303)
+AC_INIT(lmms, 0.4.0-svn20080307, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080307)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -53,15 +53,15 @@ AM_CONDITIONAL(BUILD_LINUX, test "$build_linux" = "true")
 
 # -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
 #DEFAULTFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
-DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
+#DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
 
 # Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
-if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
-	DEFAULTFLAGS="$DEFAULTFLAGS -ftree-vectorize -ftree-loop-linear"
+#if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then
+#	DEFAULTFLAGS="$DEFAULTFLAGS -ftree-vectorize -ftree-loop-linear"
 #	if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f2`" != "x0" ; then
 #		DEFAULTFLAGS="$DEFAULTFLAGS -funsafe-loop-optimizations"
 #	fi	
-fi
+#fi
 
 CFLAGS="$DEFAULTFLAGS $CFLAGS"
 CXXFLAGS="$DEFAULTFLAGS $CXXFLAGS"

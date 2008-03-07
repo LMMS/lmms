@@ -24,7 +24,6 @@
 - recording-functionality
 - do not hang when saving while loading VST-plugin (because then we call dispatcher while the load-process is still going on)
 - tempo-recogn. and sync of beat-samples
-- separate GUI and data/sound-processing-code
 - make color-scheme switchable: LMMS / user
 - autosave every 30s (configurable!) and offer recovery at startup after crash
 - make piano-roll use rubberband instead of implementing a simple one on it's own

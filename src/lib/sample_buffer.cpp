@@ -88,14 +88,12 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
-	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_sample_fragment( NULL )
+	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 #ifdef SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-	initResampling();
 	if( _is_base64_data == TRUE )
 	{
 		loadFromBase64( _audio_file );
@@ -119,8 +117,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
-	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_sample_fragment( NULL )
+	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 	if( _frames > 0 )
 	{
@@ -132,7 +129,6 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-	initResampling();
 	update();
 }
 
@@ -152,8 +148,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BASE_FREQ ),
-	m_sample_rate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] ),
-	m_sample_fragment( NULL )
+	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 	if( _frames > 0 )
 	{
@@ -165,7 +160,6 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
-	initResampling();
 	update();
 }
 
@@ -176,7 +170,6 @@ sampleBuffer::~sampleBuffer()
 {
 	delete[] m_origData;
 	delete[] m_data;
-	delete[] m_sample_fragment;
 }
 
 
@@ -583,19 +576,13 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 
 
 
-void sampleBuffer::initResampling( void )
-{
-	m_srcData.end_of_input = 0;
-}
-
-
-
-
 bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const fpp_t _frames,
 					const float _freq,
-					const bool _looped )
+					const bool _looped ) const
 {
+//	static QMutex m;
+//	QMutexLocker ml( &m );
 	engine::getMixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_endFrame == 0 || _frames == 0 )
@@ -604,7 +591,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	}
 
 	const double freq_factor = (double) _freq / (double) m_frequency
-			* m_sample_rate / engine::getMixer()->sampleRate();
+			* m_sampleRate / engine::getMixer()->sampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
@@ -616,7 +603,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	}
 
 	// this holds the number of the first frame to play
-	f_cnt_t play_frame = _state->m_frame_index;
+	f_cnt_t play_frame = _state->m_frameIndex;
 	if( play_frame < m_startFrame )
 	{
 		play_frame = m_startFrame;
@@ -646,33 +633,38 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
+	sampleFrame * tmp = NULL;
+
 	// check whether we have to change pitch...
-	if( freq_factor != 1.0 || _state->m_varying_pitch )
+	if( freq_factor != 1.0 || _state->m_varyingPitch )
 	{
+		SRC_DATA src_data;
 		// Generate output
 		const f_cnt_t margin = 64;
 		f_cnt_t fragment_size = (f_cnt_t)( _frames * freq_factor )
 								+ margin;
-		m_srcData.data_in = getSampleFragment( play_frame,
-						fragment_size, _looped )[0];
-		m_srcData.data_out = _ab[0];
-		m_srcData.input_frames = fragment_size;
-		m_srcData.output_frames = _frames;
-		m_srcData.src_ratio = 1.0 / freq_factor;
-		int error = src_process( _state->m_resampling_data,
-								&m_srcData );
+		src_data.data_in = getSampleFragment( play_frame,
+					fragment_size, _looped, &tmp )[0];
+		src_data.data_out = _ab[0];
+		src_data.input_frames = fragment_size;
+		src_data.output_frames = _frames;
+		src_data.src_ratio = 1.0 / freq_factor;
+		src_data.end_of_input = _state->m_eof;
+		int error = src_process( _state->m_resamplingData,
+								&src_data );
 		if( error )
 		{
 			printf( "sampleBuffer: error while resampling: %s\n",
 							src_strerror( error ) );
 		}
-		if( m_srcData.output_frames_gen != _frames )
+		if( src_data.output_frames_gen > _frames )
 		{
 			printf( "sampleBuffer: not enough frames: %ld / %d\n",
-					m_srcData.output_frames_gen, _frames );
+					src_data.output_frames_gen, _frames );
 		}
+		_state->m_eof = src_data.end_of_input;
 		// Advance
-		play_frame += m_srcData.input_frames_used;
+		play_frame += src_data.input_frames_used;
 		if( _looped )
 		{
 			play_frame = getLoopedIndex( play_frame );
@@ -684,7 +676,8 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		// as is into pitched-copy-buffer
 
 		// Generate output
-		memcpy( _ab, getSampleFragment( play_frame, _frames, _looped ),
+		memcpy( _ab,
+			getSampleFragment( play_frame, _frames, _looped, &tmp ),
 						_frames * BYTES_PER_FRAME );
 		// Advance
 		play_frame += _frames;
@@ -694,7 +687,9 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		}
 	}
 
-	_state->m_frame_index = play_frame;
+	delete[] tmp;
+
+	_state->m_frameIndex = play_frame;
 
 	return( TRUE );
 
@@ -704,7 +699,7 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 
 sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
-						f_cnt_t _frames, bool _looped )
+		f_cnt_t _frames, bool _looped, sampleFrame * * _tmp ) const
 {
 	if( _looped )
 	{
@@ -721,20 +716,17 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 		}
 	}
 
-	delete[] m_sample_fragment;
-	m_sample_fragment = new sampleFrame[_frames];
+	*_tmp = new sampleFrame[_frames];
 
 	if( _looped )
 	{
 		f_cnt_t copied = m_loop_endFrame - _start;
-		memcpy( m_sample_fragment, m_data + _start, copied
-							* BYTES_PER_FRAME );
+		memcpy( *_tmp, m_data + _start, copied * BYTES_PER_FRAME );
 		f_cnt_t loop_frames = m_loop_endFrame - m_loop_startFrame;
 		while( _frames - copied > 0 )
 		{
 			f_cnt_t todo = tMin( _frames - copied, loop_frames );
-			memcpy( m_sample_fragment + copied,
-						m_data + m_loop_startFrame,
+			memcpy( *_tmp + copied, m_data + m_loop_startFrame,
 						todo * BYTES_PER_FRAME );
 			copied += todo;
 		}
@@ -742,19 +734,18 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 	else
 	{
 		f_cnt_t available = m_endFrame - _start;
-		memcpy( m_sample_fragment, m_data + _start, available
-							* BYTES_PER_FRAME );
-		memset( m_sample_fragment + available, 0, ( _frames -
-						available ) * BYTES_PER_FRAME );
+		memcpy( *_tmp, m_data + _start, available * BYTES_PER_FRAME );
+		memset( *_tmp + available, 0, ( _frames - available ) *
+							BYTES_PER_FRAME );
 	}
 
-	return( m_sample_fragment );
+	return( *_tmp );
 }
 
 
 
 
-f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index )
+f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 {
 	if( _index < m_loop_endFrame )
 	{
@@ -1260,11 +1251,12 @@ QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
 
 
 sampleBuffer::handleState::handleState( bool _varying_pitch ) :
-	m_frame_index( 0 ),
-	m_varying_pitch( _varying_pitch )
+	m_frameIndex( 0 ),
+	m_varyingPitch( _varying_pitch ),
+	m_eof( 0 )
 {
 	int error;
-	if( ( m_resampling_data = src_new(/*
+	if( ( m_resamplingData = src_new(/*
 		( engine::getMixer()->highQuality() == TRUE ) ?
 					SRC_SINC_FASTEST :*/
 					SRC_LINEAR,
@@ -1279,7 +1271,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 
 sampleBuffer::handleState::~handleState()
 {
-	src_delete( m_resampling_data );
+	src_delete( m_resamplingData );
 }
 
 

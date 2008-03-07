@@ -61,9 +61,10 @@ public:
 
 
 	private:
-		f_cnt_t m_frame_index;
-		const bool m_varying_pitch;
-		SRC_STATE * m_resampling_data;
+		f_cnt_t m_frameIndex;
+		const bool m_varyingPitch;
+		SRC_STATE * m_resamplingData;
+		int m_eof;
 
 		friend class sampleBuffer;
 
@@ -82,7 +83,7 @@ public:
 	bool FASTCALL play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq = BASE_FREQ,
-				const bool _looped = FALSE );
+				const bool _looped = FALSE ) const;
 
 	void FASTCALL visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip );
@@ -143,7 +144,7 @@ public:
 
 	inline void setSampleRate( sample_rate_t _rate )
 	{
-		m_sample_rate = _rate;
+		m_sampleRate = _rate;
 	}
 
 	inline const sampleFrame * data( void ) const
@@ -247,16 +248,12 @@ private:
 	float m_amplification;
 	bool m_reversed;
 	float m_frequency;
-	sample_rate_t m_sample_rate;
+	sample_rate_t m_sampleRate;
 
-	void initResampling( void );
-
-	SRC_DATA m_srcData;
-
-	sampleFrame * m_sample_fragment;
 	sampleFrame * getSampleFragment( f_cnt_t _start, f_cnt_t _frames,
-								bool _looped );
-	f_cnt_t getLoopedIndex( f_cnt_t _index );
+						bool _looped,
+						sampleFrame * * _tmp ) const;
+	f_cnt_t getLoopedIndex( f_cnt_t _index ) const;
 
 
 signals:
