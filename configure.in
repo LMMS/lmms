@@ -53,7 +53,7 @@ AM_CONDITIONAL(BUILD_LINUX, test "$build_linux" = "true")
 
 # -fomit-frame-pointer crashes wine on Ubuntu Dapper--Danny 7/21/06
 #DEFAULTFLAGS="-floop-optimize2 -fomit-frame-pointer -fgcse-sm -fgcse-las"
-#DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
+DEFAULTFLAGS="-O2 -fPIC" #"-floop-optimize2 -fgcse-sm  -fgcse-las"
 
 # Tested with GCC 4.0--needs to be tested with 4.1--Danny 7/21/06
 #if test "x`$CC --version|head -1|cut -d\  -f3|cut -d. -f1`" = "x4" ; then

@@ -76,8 +76,7 @@ private:
 class kickerInstrumentView : public instrumentView
 {
 public:
-	kickerInstrumentView( instrument * _instrument,
-					QWidget * _parent );
+	kickerInstrumentView( instrument * _instrument, QWidget * _parent );
 	virtual ~kickerInstrumentView();
 
 private:
