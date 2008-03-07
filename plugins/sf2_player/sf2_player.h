@@ -26,6 +26,8 @@
 #ifndef _SF2_PLAYER_H
 #define _SF2_PLAYER_H
 
+#include <QtCore/QMutex>
+
 #include "instrument.h"
 #include "pixmap_button.h"
 #include "instrument_view.h"
@@ -75,10 +77,9 @@ public:
 		return( FALSE );
 	}
 
-	virtual void waitForWorkerThread( void );
-
 
 	virtual pluginView * instantiateView( QWidget * _parent );
+
 
 public slots:
 	void openFile( const QString & _sf2File );
@@ -93,7 +94,8 @@ private:
 	fluid_audio_driver_t* m_adriver;
 
 	int m_fontId;
-
+	QMutex m_notesRunningMutex;
+	int m_notesRunning[128];
 
 
 	QString m_filename;

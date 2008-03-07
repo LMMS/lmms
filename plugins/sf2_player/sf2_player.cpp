@@ -72,18 +72,21 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_bankNum( -1, -1, 999, 1, this ),
 	m_patchNum( -1, -1, 127, 1, this )
 {
- 
-    m_settings = new_fluid_settings();
+	for( int i = 0; i < 128; ++i )
+	{
+		m_notesRunning[i] = 0;
+	} 
+	m_settings = new_fluid_settings();
 
-    /* Set the synthesizer settings, if necessary */
+	/* Set the synthesizer settings, if necessary */
 
 
-    m_synth = new_fluid_synth( m_settings );
+	m_synth = new_fluid_synth( m_settings );
 
 
-    //fluid_settings_setstr(settings, "audio.driver", "jack");
+	//fluid_settings_setstr(settings, "audio.driver", "jack");
 
-    //adriver = new_fluid_audio_driver(settings, synth);
+	//adriver = new_fluid_audio_driver(settings, synth);
 
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
@@ -167,18 +170,24 @@ void sf2Instrument::updatePatch( void )
 
 void sf2Instrument::playNote( notePlayHandle * _n, bool )
 {
-    const float LOG440 = 2.64345267649f;
+	const float LOG440 = 2.64345267649f;
 
-	const int defaultVelocity = 80;
+	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-    const f_cnt_t tfp = _n->totalFramesPlayed();
-
-    int midiNote = (int)floor( ( log2( _n->frequency() ) - LOG440 ) * 12 +69-58)+0.5;
+	int midiNote = (int)floor( ( log2( _n->frequency() ) - LOG440 ) * 12+69-58)+0.5;
+	// out of range?
+	if( midiNote <= 0 || midiNote >= 128 )
+	{
+		return;
+	}
 
 	if ( tfp == 0 )
 	{
 		_n->m_pluginData = new int( midiNote );
-        fluid_synth_noteon( m_synth, 1, midiNote, defaultVelocity );
+		fluid_synth_noteon( m_synth, 1, midiNote, _n->getVolume() );
+		m_notesRunningMutex.lock();
+		++m_notesRunning[midiNote];
+		m_notesRunningMutex.unlock();
 	}
 	else if( _n->released() )
 	{
@@ -188,11 +197,6 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool )
 }
 
 
-void sf2Instrument::waitForWorkerThread( void )
-{
-    // No waiting required, at least not that I know of
-    return;
-}
 
 
 void sf2Instrument::play( bool _try_parallelizing )
@@ -201,31 +205,29 @@ void sf2Instrument::play( bool _try_parallelizing )
 
 	sampleFrame * buf = new sampleFrame[frames];
 
-    // Assumes stereo and float sample_t
+	// Assumes stereo and float sample_t
 
-    fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+	fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
 
 	delete[] buf;
-
-    if( !_try_parallelizing )
-	{
-		waitForWorkerThread();
-	}
 }
 
 
 
 void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 {
-    int * midiNote = static_cast<int *>( _n->m_pluginData );
-    
-    fluid_synth_noteoff( m_synth, 1, *midiNote );
+	int * midiNote = static_cast<int *>( _n->m_pluginData );
+	m_notesRunningMutex.lock();
+	const int n = --m_notesRunning[*midiNote];
+	m_notesRunningMutex.unlock();
+	if( n <= 0 )
+	{
+		fluid_synth_noteoff( m_synth, 1, *midiNote );
+	}
 
 	delete midiNote;
-
-    _n->noteOff();
 }
 
 

@@ -1,3 +1,10 @@
+2008-03-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/sf2_player/sf2_player.cpp:
+	added m_runningNotes-array to track overlapping or edge-to-edge notes
+	and act accordingly
+
 2008-03-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/graph.cpp:
