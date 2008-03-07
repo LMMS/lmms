@@ -1,7 +1,7 @@
 /*
  * lvsl_client.h - client for LVSL Server
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
+#include <QtGui/QWidget>
 #include <Qt/QtXml>
 
 #include "mixer.h"
@@ -95,7 +96,8 @@ public:
 
 	inline QWidget * pluginWidget( void )
 	{
-		return( m_pluginWidget );
+		return( m_pluginWidget != NULL ?
+					m_pluginWidget->parentWidget() : NULL );
 	}
 
 	inline bool failed( void ) const

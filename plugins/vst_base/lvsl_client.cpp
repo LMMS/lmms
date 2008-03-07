@@ -1,7 +1,7 @@
 /*
  * lvsl_client.cpp - client for LVSL Server
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +29,7 @@
 #include <QtCore/QTime>
 #include <QtCore/QDir>
 #include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 
@@ -183,8 +184,8 @@ remoteVSTPlugin::~remoteVSTPlugin()
 		}
 		if( m_pluginWidget != NULL )
 		{
-			m_pluginWidget->hide();
-			delete m_pluginWidget;
+			m_pluginWidget->parentWidget()->hide();
+			delete m_pluginWidget->parentWidget();
 		}
 		// timeout?
 /*		if( m_pluginPID != 0 )
@@ -209,7 +210,7 @@ void remoteVSTPlugin::showEditor( void )
 {
 	if( m_pluginWidget != NULL )
 	{
-		m_pluginWidget->show();
+		m_pluginWidget->parentWidget()->show();
 		return;
 	}
 
@@ -218,17 +219,17 @@ void remoteVSTPlugin::showEditor( void )
 		return;
 	}
 
-	m_pluginWidget = new QWidget( engine::getMainWindow()->workspace() );
+	m_pluginWidget = new QWidget;//( engine::getMainWindow()->workspace() );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
-	engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget );
-	m_pluginWidget->show();
+	engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget )->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
 	xe->embedClient( m_pluginXID );
 	xe->setFixedSize( m_pluginGeometry );
 	//xe->setAutoDelete( FALSE );
 	xe->show();
+	m_pluginWidget->show();
 
 	lock();
 	writeValueS<Sint16>( VST_SHOW_EDITOR );
@@ -242,7 +243,7 @@ void remoteVSTPlugin::hideEditor( void )
 {
 	if( m_pluginWidget != NULL )
 	{
-		m_pluginWidget->hide();
+		m_pluginWidget->parentWidget()->hide();
 	}
 }
 
