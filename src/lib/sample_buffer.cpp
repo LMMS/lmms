@@ -581,8 +581,6 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const bool _looped ) const
 {
-//	static QMutex m;
-//	QMutexLocker ml( &m );
 	engine::getMixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_endFrame == 0 || _frames == 0 )
