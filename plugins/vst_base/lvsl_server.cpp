@@ -1,7 +1,7 @@
 /*
  * lvsl_server.cpp - LMMS VST Support Layer Server
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1081,6 +1081,8 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
 	}
+	ShowWindow( _this->m_window, SW_SHOWMINIMIZED );
+	ShowWindow( _this->m_window, SW_HIDE );
 
 	_this->m_windowXID = (Sint32) GetPropA( _this->m_window,
 						"__wine_x11_whole_window" );

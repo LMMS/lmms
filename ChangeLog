@@ -1,5 +1,13 @@
 2008-03-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vst_base/lvsl_server.cpp:
+	show window before determining X-Window-ID as newer WINE-versions do
+	not create X-windows before actually showing window
+
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_client.h:
+	properly insert VST-editor-window into QMdiArea
+
 	* plugins/vestige/vestige.cpp:
 	* plugins/vestige/vestige.h:
 	M/V-split
