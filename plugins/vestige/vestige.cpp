@@ -27,6 +27,7 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+#include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 #include <QtXml/QDomElement>
 
@@ -37,7 +38,7 @@
 #include "lvsl_client.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
-#include "song_editor.h"
+#include "song.h"
 #include "text_float.h"
 #include "tooltip.h"
 
@@ -64,7 +65,7 @@ plugin::descriptor vestige_plugin_descriptor =
 }
 
 
-QPixmap * vestigeInstrument::s_artwork = NULL;
+QPixmap * vestigeInstrumentView::s_artwork = NULL;
 
 
 vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
@@ -72,50 +73,9 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex()
 {
-	if( s_artwork == NULL )
-	{
-		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
-	}
-
-	m_openPluginButton = new pixmapButton( this, NULL, NULL );
-	m_openPluginButton->setCheckable( FALSE );
-	m_openPluginButton->setCursor( Qt::PointingHandCursor );
-	m_openPluginButton->move( 200, 70 );
-	m_openPluginButton->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
-	m_openPluginButton->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
-	connect( m_openPluginButton, SIGNAL( clicked() ), this,
-						SLOT( openPlugin() ) );
-	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
-
-	m_openPluginButton->setWhatsThis(
-		tr( "Click here, if you want to open another VST-plugin. After "
-			"clicking on this button, a file-open-dialog appears "
-			"and you can select your file." ) );
-
-	m_toggleGUIButton = new QPushButton( tr( "Show/hide VST-GUI" ), this );
-	m_toggleGUIButton->setGeometry( 20, 120, 160, 24 );
-	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
-	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
-	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
-							SLOT( toggleGUI() ) );
-	m_toggleGUIButton->setWhatsThis(
-		tr( "Click here to show or hide the graphical user interface "
-			"(GUI) of your VST-plugin." ) );
-
-	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
-							"notes" ), this );
-	note_off_all_btn->setGeometry( 20, 150, 160, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
-	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
-	connect( note_off_all_btn, SIGNAL( clicked() ), this,
-							SLOT( noteOffAll() ) );
-
 	for( int i = 0; i < NOTES; ++i )
 	{
-		m_noteStates[i] = OFF;
+		m_runningNotes[i] = 0;
 	}
 
 	// now we need a play-handle which cares for calling play()
@@ -198,7 +158,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 			m_pluginMutex.unlock();
 			closePlugin();
 			delete tf;
-			QMessageBox::information( this,
+			QMessageBox::information( 0,
 					tr( "Failed loading VST-plugin" ),
 					tr( "The VST-plugin %1 could not "
 						"be loaded for some reason.\n"
@@ -222,10 +182,9 @@ void vestigeInstrument::setParameter( const QString & _param,
 			return;
 		}*/
 		m_plugin->showEditor();
-		connect( engine::getSongEditor(),
-					SIGNAL( tempoChanged( bpm_t ) ),
+		connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 				m_plugin, SLOT( setTempo( bpm_t ) ) );
-		m_plugin->setTempo( engine::getSongEditor()->getTempo() );
+		m_plugin->setTempo( engine::getSong()->getTempo() );
 		connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 					m_plugin, SLOT( updateSampleRate() ) );
 		if( set_ch_name == TRUE )
@@ -234,11 +193,12 @@ void vestigeInstrument::setParameter( const QString & _param,
 		}
 		if( m_plugin->pluginWidget() != NULL )
 		{
-			m_plugin->pluginWidget()->setWindowIcon(
-					getInstrumentTrack()->windowIcon() );
+/*			m_plugin->pluginWidget()->setWindowIcon(
+					getInstrumentTrack()->windowIcon() );*/
 		}
 		m_pluginMutex.unlock();
-		update();
+//		update();
+		emit dataChanged();
 		delete tf;
 	}
 }
@@ -300,16 +260,12 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool )
 	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )
 	{
 		const int k = getInstrumentTrack()->masterKey( _n );
-		if( m_noteStates[k] > OFF )
+		if( m_runningNotes[k] > 0 )
 		{
 			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
 								k, 0 ), 0 );
-			m_noteStates[k] = IGNORE_NEXT_NOTEOFF;
 		}
-		else
-		{
-			m_noteStates[k] = ON;
-		}
+		++m_runningNotes[k];
 		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0, k,
 					_n->getVolume() ), _n->offset() );
 		// notify when the handle stops, call to deleteNotePluginData
@@ -327,15 +283,10 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 	if( m_plugin != NULL )
 	{
 		const int k = getInstrumentTrack()->masterKey( _n );
-		if( m_noteStates[k] == ON )
+		if( --m_runningNotes[k] <= 0 )
 		{
 			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0, k,
 								0 ), 0 );
-			m_noteStates[k] = OFF;
-		}
-		else if( m_noteStates[k] == IGNORE_NEXT_NOTEOFF )
-		{
-			m_noteStates[k] = ON;
 		}
 	}
 	m_pluginMutex.unlock();
@@ -359,14 +310,116 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 
 
 
-void vestigeInstrument::openPlugin( void )
+/*
+void vestigeInstrument::changeTempo( bpm_t _new_tempo )
+{
+	m_pluginMutex.lock();
+	if( m_plugin != NULL )
+	{
+		m_plugin->setTempo( _new_tempo );
+	}
+	m_pluginMutex.unlock();
+}
+*/
+
+
+
+
+void vestigeInstrument::closePlugin( void )
+{
+	m_pluginMutex.lock();
+	delete m_plugin;
+	m_plugin = NULL;
+	m_pluginMutex.unlock();
+}
+
+
+
+pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
+{
+	return( new vestigeInstrumentView( this, _parent ) );
+}
+
+
+
+
+
+
+
+
+
+vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
+							QWidget * _parent ) :
+	instrumentView( _instrument, _parent )
+{
+	if( s_artwork == NULL )
+	{
+		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
+								"artwork" ) );
+	}
+
+	m_openPluginButton = new pixmapButton( this, "" );
+	m_openPluginButton->setCheckable( FALSE );
+	m_openPluginButton->setCursor( Qt::PointingHandCursor );
+	m_openPluginButton->move( 200, 70 );
+	m_openPluginButton->setActiveGraphic( embed::getIconPixmap(
+							"project_open_down" ) );
+	m_openPluginButton->setInactiveGraphic( embed::getIconPixmap(
+							"project_open" ) );
+	connect( m_openPluginButton, SIGNAL( clicked() ), this,
+						SLOT( openPlugin() ) );
+	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
+
+	m_openPluginButton->setWhatsThis(
+		tr( "Click here, if you want to open another VST-plugin. After "
+			"clicking on this button, a file-open-dialog appears "
+			"and you can select your file." ) );
+
+	m_toggleGUIButton = new QPushButton( tr( "Show/hide VST-GUI" ), this );
+	m_toggleGUIButton->setGeometry( 20, 120, 160, 24 );
+	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
+	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
+	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
+							SLOT( toggleGUI() ) );
+	m_toggleGUIButton->setWhatsThis(
+		tr( "Click here to show or hide the graphical user interface "
+			"(GUI) of your VST-plugin." ) );
+
+	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
+							"notes" ), this );
+	note_off_all_btn->setGeometry( 20, 150, 160, 24 );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
+	connect( note_off_all_btn, SIGNAL( clicked() ), this,
+							SLOT( noteOffAll() ) );
+}
+
+
+
+
+vestigeInstrumentView::~vestigeInstrumentView()
+{
+}
+
+
+
+
+void vestigeInstrumentView::modelChanged( void )
+{
+	m_vi = castModel<vestigeInstrument>();
+}
+
+
+
+
+void vestigeInstrumentView::openPlugin( void )
 {
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
 	QString dir;
-	if( m_pluginDLL != "" )
+	if( m_vi->m_pluginDLL != "" )
 	{
-		dir = QFileInfo( m_pluginDLL ).absolutePath();
+		dir = QFileInfo( m_vi->m_pluginDLL ).absolutePath();
 	}
 	else
 	{
@@ -382,10 +435,10 @@ void vestigeInstrument::openPlugin( void )
 		<< tr( "EXE-files (*.exe)" )
 		;
 	ofd.setFilters( types );
-	if( m_pluginDLL != "" )
+	if( m_vi->m_pluginDLL != "" )
 	{
 		// select previously opened file
-		ofd.selectFile( QFileInfo( m_pluginDLL ).fileName() );
+		ofd.selectFile( QFileInfo( m_vi->m_pluginDLL ).fileName() );
 	}
 
 	if ( ofd.exec () == QDialog::Accepted )
@@ -395,7 +448,7 @@ void vestigeInstrument::openPlugin( void )
 			return;
 		}
 		engine::getMixer()->lock();
-		setParameter( "plugin", ofd.selectedFiles()[0] );
+		m_vi->setParameter( "plugin", ofd.selectedFiles()[0] );
 		engine::getMixer()->unlock();
 	}
 }
@@ -403,14 +456,14 @@ void vestigeInstrument::openPlugin( void )
 
 
 
-void vestigeInstrument::toggleGUI( void )
+void vestigeInstrumentView::toggleGUI( void )
 {
-	QMutexLocker ml( &m_pluginMutex );
-	if( m_plugin == NULL )
+	QMutexLocker ml( &m_vi->m_pluginMutex );
+	if( m_vi->m_plugin == NULL )
 	{
 		return;
 	}
-	QWidget * w = m_plugin->pluginWidget();
+	QWidget * w = m_vi->m_plugin->pluginWidget();
 	if( w == NULL )
 	{
 		return;
@@ -428,44 +481,31 @@ void vestigeInstrument::toggleGUI( void )
 
 
 
-void vestigeInstrument::noteOffAll( void )
+void vestigeInstrumentView::noteOffAll( void )
 {
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
+	m_vi->m_pluginMutex.lock();
+	if( m_vi->m_plugin != NULL )
 	{
 		for( int key = 0; key < OCTAVES * NOTES_PER_OCTAVE; ++key )
 		{
-			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
+			m_vi->m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
 								key, 0 ), 0 );
 		}
 	}
-	m_pluginMutex.unlock();
+	m_vi->m_pluginMutex.unlock();
 }
 
 
 
-/*
-void vestigeInstrument::changeTempo( bpm_t _new_tempo )
-{
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
-	{
-		m_plugin->setTempo( _new_tempo );
-	}
-	m_pluginMutex.unlock();
-}
-*/
 
-
-
-void vestigeInstrument::paintEvent( QPaintEvent * )
+void vestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	QString plugin_name = ( m_plugin != NULL ) ? 
-				m_plugin->name()/* + QString::number(
+	QString plugin_name = ( m_vi->m_plugin != NULL ) ? 
+				m_vi->m_plugin->name()/* + QString::number(
 						m_plugin->version() )*/
 					:
 				tr( "No VST-plugin loaded" );
@@ -477,13 +517,13 @@ void vestigeInstrument::paintEvent( QPaintEvent * )
 	p.drawText( 20, 80, plugin_name );
 
 //	m_pluginMutex.lock();
-	if( m_plugin != NULL )
+	if( m_vi->m_plugin != NULL )
 	{
 		p.setPen( QColor( 64, 128, 64 ) );
 		f.setBold( FALSE );
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 20, 94, tr( "by" ) + " " +
-						m_plugin->vendorString() );
+					m_vi->m_plugin->vendorString() );
 	}
 //	m_pluginMutex.unlock();
 }
@@ -491,13 +531,7 @@ void vestigeInstrument::paintEvent( QPaintEvent * )
 
 
 
-void vestigeInstrument::closePlugin( void )
-{
-	m_pluginMutex.lock();
-	delete m_plugin;
-	m_plugin = NULL;
-	m_pluginMutex.unlock();
-}
+
 
 
 
@@ -505,7 +539,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new vestigeInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }

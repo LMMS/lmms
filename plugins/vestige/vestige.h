@@ -31,6 +31,7 @@
 
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "midi.h"
 #include "note.h"
 
@@ -80,11 +81,39 @@ public:
 	virtual bool handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time );
 
+	virtual pluginView * instantiateView( QWidget * _parent );
+
+
+private:
+	void closePlugin( void );
+
+	int m_runningNotes[NOTES];
+
+
+	remoteVSTPlugin * m_plugin;
+	QMutex m_pluginMutex;
+
+	QString m_pluginDLL;
+
+
+	friend class vestigeInstrumentView;
+
+} ;
+
+
+
+class vestigeInstrumentView : public instrumentView
+{
+	Q_OBJECT
+public:
+	vestigeInstrumentView( instrument * _instrument, QWidget * _parent );
+	virtual ~vestigeInstrumentView();
+
 
 protected slots:
 	void openPlugin( void );
-	void toggleGUI( void );
 	void noteOffAll( void );
+	void toggleGUI( void );
 
 
 protected:
@@ -92,30 +121,17 @@ protected:
 
 
 private:
-	void closePlugin( void );
+	virtual void modelChanged( void );
 
 	static QPixmap * s_artwork;
 
-	enum states
-	{
-		OFF,
-		ON,
-		IGNORE_NEXT_NOTEOFF
-	} ;
-	states m_noteStates[NOTES];
-
-
-	remoteVSTPlugin * m_plugin;
-	QMutex m_pluginMutex;
-
+	vestigeInstrument * m_vi;
 
 	pixmapButton * m_openPluginButton;
 	QPushButton * m_toggleGUIButton;
 
-	QString m_pluginDLL;
-
-
 } ;
+
 
 
 #endif

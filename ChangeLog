@@ -1,5 +1,15 @@
 2008-03-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	M/V-split
+
+	* plugins/kicker/kicker.h:
+	* include/sample_buffer.h:
+	* configure.in:
+	* src/lib/sample_buffer.cpp:
+	misc coding-style-fixes
+
 	* include/sample_buffer.h:
 	* src/lib/sample_buffer.cpp:
 	made sampleBuffer reentrant so that several threads can use
