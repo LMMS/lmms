@@ -61,20 +61,20 @@ instrumentMidiIO::instrumentMidiIO( instrumentTrack * _instrument_track,
 	m_defaultVelocityOutEnabledModel.setTrack( m_instrumentTrack );
 
 	connect( &m_inputChannelModel, SIGNAL( dataChanged() ),
-				this, SLOT( inputChannelChanged() ) );
+				this, SLOT( updateInputChannel() ) );
 	connect( &m_outputChannelModel, SIGNAL( dataChanged() ),
-				this, SLOT( outputChannelChanged() ) );
+				this, SLOT( updateOutputChannel() ) );
 	connect( &m_receiveEnabledModel, SIGNAL( dataChanged() ),
-				this, SLOT( midiPortModeChanged() ) );
+				this, SLOT( updateMidiPortMode() ) );
 	connect( &m_defaultVelocityInEnabledModel, SIGNAL( dataChanged() ),
-				this, SLOT( defaultVelInChanged() ) );
+				this, SLOT( updateDefaultVelIn() ) );
 	connect( &m_sendEnabledModel, SIGNAL( dataChanged() ),
-				this, SLOT( midiPortModeChanged() ) );
+				this, SLOT( updateMidiPortMode() ) );
 	connect( &m_defaultVelocityOutEnabledModel, SIGNAL( dataChanged() ),
-				this, SLOT( defaultVelOutChanged() ) );
+				this, SLOT( updateDefaultVelOut() ) );
 
-	inputChannelChanged();
-	outputChannelChanged();
+	updateInputChannel();
+	updateOutputChannel();
 
 
 	const midiPort::modes m = m_midiPort->mode();
@@ -88,12 +88,12 @@ instrumentMidiIO::instrumentMidiIO( instrumentTrack * _instrument_track,
 	midiClient * mc = engine::getMixer()->getMIDIClient();
 	if( mc->isRaw() == FALSE )
 	{
-		readablePortsChanged();
-		writeablePortsChanged();
+		updateReadablePorts();
+		updateWriteablePorts();
 
 		// we want to get informed about port-changes!
-		mc->connectRPChanged( this, SLOT( readablePortsChanged() ) );
-		mc->connectWPChanged( this, SLOT( writeablePortsChanged() ) );
+		mc->connectRPChanged( this, SLOT( updateReadablePorts() ) );
+		mc->connectWPChanged( this, SLOT( updateWriteablePorts() ) );
 	}
 }
 
@@ -201,7 +201,7 @@ void instrumentMidiIO::loadSettings( const QDomElement & _this )
 
 
 
-void instrumentMidiIO::inputChannelChanged( void )
+void instrumentMidiIO::updateInputChannel( void )
 {
 	m_midiPort->setInputChannel( m_inputChannelModel.value() - 1 );
 	engine::getSong()->setModified();
@@ -210,7 +210,7 @@ void instrumentMidiIO::inputChannelChanged( void )
 
 
 
-void instrumentMidiIO::outputChannelChanged( void )
+void instrumentMidiIO::updateOutputChannel( void )
 {
 	m_midiPort->setOutputChannel( m_outputChannelModel.value() - 1 );
 	engine::getSong()->setModified();
@@ -219,7 +219,7 @@ void instrumentMidiIO::outputChannelChanged( void )
 
 
 
-void instrumentMidiIO::defaultVelInChanged( void )
+void instrumentMidiIO::updateDefaultVelIn( void )
 {
 	m_midiPort->enableDefaultVelocityForInEvents(
 				m_defaultVelocityInEnabledModel.value() );
@@ -228,7 +228,7 @@ void instrumentMidiIO::defaultVelInChanged( void )
 
 
 
-void instrumentMidiIO::defaultVelOutChanged( void )
+void instrumentMidiIO::updateDefaultVelOut( void )
 {
 	m_midiPort->enableDefaultVelocityForOutEvents(
 				m_defaultVelocityOutEnabledModel.value() );
@@ -237,7 +237,7 @@ void instrumentMidiIO::defaultVelOutChanged( void )
 
 
 
-void instrumentMidiIO::midiPortModeChanged( void )
+void instrumentMidiIO::updateMidiPortMode( void )
 {
 	// this small lookup-table makes everything easier
 	static const midiPort::modes modeTable[2][2] =
@@ -280,7 +280,7 @@ void instrumentMidiIO::midiPortModeChanged( void )
 
 
 
-void instrumentMidiIO::readablePortsChanged( void )
+void instrumentMidiIO::updateReadablePorts( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
@@ -302,13 +302,13 @@ void instrumentMidiIO::readablePortsChanged( void )
 		m_readablePorts.push_back( qMakePair( *it,
 					selected_ports.indexOf( *it ) != -1 ) );
 	}
-	emit dataChanged();
+	emit readablePortsChanged();
 }
 
 
 
 
-void instrumentMidiIO::writeablePortsChanged( void )
+void instrumentMidiIO::updateWriteablePorts( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
@@ -330,7 +330,7 @@ void instrumentMidiIO::writeablePortsChanged( void )
 		m_writeablePorts.push_back( qMakePair( *it,
 					selected_ports.indexOf( *it ) != -1 ) );
 	}
-	emit dataChanged();
+	emit writeablePortsChanged();
 }
 
 

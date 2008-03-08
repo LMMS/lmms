@@ -261,6 +261,16 @@ public:
 		return( m_tabWidget );
 	}
 
+	instrumentTrack * model( void )
+	{
+		return( castModel<instrumentTrack>() );
+	}
+
+	const instrumentTrack * model( void ) const
+	{
+		return( castModel<instrumentTrack>() );
+	}
+
 
 public slots:
 	void textChanged( const QString & _new_name );

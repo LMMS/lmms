@@ -52,6 +52,9 @@ protected slots:
 	void activatedReadablePort( QAction * _item );
 	void activatedWriteablePort( QAction * _item );
 
+	void updateReadablePortsMenu( void );
+	void updateWriteablePortsMenu( void );
+
 
 private:
 	virtual void modelChanged( void );

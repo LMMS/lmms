@@ -55,17 +55,22 @@ public:
 	}
 
 
+signals:
+	void readablePortsChanged( void );
+	void writeablePortsChanged( void );
+
+
 public slots:
-	void midiPortModeChanged( void );
+	void updateMidiPortMode( void );
 
 
 protected slots:
-	void inputChannelChanged( void );
-	void outputChannelChanged( void );
-	void defaultVelInChanged( void );
-	void defaultVelOutChanged( void );
-	void readablePortsChanged( void );
-	void writeablePortsChanged( void );
+	void updateInputChannel( void );
+	void updateOutputChannel( void );
+	void updateDefaultVelIn( void );
+	void updateDefaultVelOut( void );
+	void updateReadablePorts( void );
+	void updateWriteablePorts( void );
 
 	void activatedReadablePort( const descriptiveMidiPort & _port );
 	void activatedWriteablePort( const descriptiveMidiPort & _port );
