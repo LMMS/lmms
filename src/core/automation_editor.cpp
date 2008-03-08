@@ -438,8 +438,8 @@ void automationEditor::loadSettings( const QDomElement & _this )
 
 
 inline void automationEditor::drawValueRect( QPainter & _p,
-						Uint16 _x, Uint16 _y,
-						Sint16 _width, Sint16 _height,
+						int _x, int _y,
+						int _width, int _height,
 						const bool _is_selected )
 {
 	QColor current_color( 0xFF, 0xB0, 0x00 );
@@ -452,7 +452,6 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 	_p.drawLine( _x - 1, _y, _x + 1, _y );
 	_p.drawLine( _x, _y - 1, _x, _y + 1 );
-
 //	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
 
 //	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
@@ -1440,6 +1439,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 							rect_width, rect_height,
 							is_selected );
 			}
+			else printf("not in range\n");
 		} while( it != time_map.begin() );
 	}
 	else

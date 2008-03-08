@@ -91,8 +91,8 @@ protected:
 	virtual void wheelEvent( QWheelEvent * _we );
 
 	int FASTCALL getLevel( int _y );
-	static inline void drawValueRect( QPainter & _p, Uint16 _x, Uint16 _y,
-						Sint16 _width, Sint16 _height,
+	static inline void drawValueRect( QPainter & _p, int _x, int _y,
+						int _width, int _height,
 						const bool _is_selected );
 	void removeSelection( void );
 	void selectAll( void );

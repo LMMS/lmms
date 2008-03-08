@@ -535,8 +535,8 @@ void pianoRoll::loadSettings( const QDomElement & _this )
 
 
 
-inline void pianoRoll::drawNoteRect( QPainter & _p, Uint16 _x, Uint16 _y,
-					Sint16 _width, const bool _is_selected,
+inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
+					int _width, const bool _is_selected,
 						const bool _is_step_note )
 {
 	++_x;
