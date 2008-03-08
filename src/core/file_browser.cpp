@@ -4,7 +4,7 @@
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -318,24 +318,25 @@ void listView::sendToActiveInstrumentTrack( void )
 	}
 
 	// get all windows opened in the workspace
-	QList<QMdiSubWindow*> pl = engine::getMainWindow()->workspace()->subWindowList(
-						QMdiArea::StackingOrder );
+	QList<QMdiSubWindow*> pl = engine::getMainWindow()->workspace()->
+				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
 	// now we travel through the window-list until we find an
 	// instrument-track
 	while( w.hasPrevious() )
 	{
-		instrumentTrackView * itv = dynamic_cast<instrumentTrackView *>(
-								w.previous()->widget() );
-		if( itv != NULL && itv->isHidden() == FALSE )
+		instrumentTrackWindow * itw =
+			dynamic_cast<instrumentTrackWindow *>( w.previous()->
+								widget() );
+		if( itw != NULL && itw->isHidden() == FALSE )
 		{
 			// ok, it's an instrument-track, so we can apply the
 			// sample or the preset
 			engine::getMixer()->lock();
 			if( m_contextMenuItem->type() == fileItem::SampleFile )
 			{
-				instrument * afp = itv->model()->loadInstrument(
+				instrument * afp = itw->model()->loadInstrument(
 						engine::sampleExtensions()
 							[m_contextMenuItem
 							->extension()] );
@@ -350,11 +351,10 @@ void listView::sendToActiveInstrumentTrack( void )
 			{
 				multimediaProject mmp(
 						m_contextMenuItem->fullName() );
-				itv->model()->loadTrackSpecificSettings(
+				itw->model()->loadTrackSpecificSettings(
 						mmp.content().firstChild().
 								toElement() );
 			}
-			//ct->toggledInstrumentTrackButton( TRUE );
 			engine::getMixer()->unlock();
 			break;
 		}
