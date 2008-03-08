@@ -161,6 +161,7 @@ public:
 
 public slots:
 	virtual bool close( void );
+	void remove( void );
 
 
 protected:

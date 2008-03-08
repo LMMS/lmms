@@ -262,6 +262,16 @@ bool trackContentObjectView::close( void )
 
 
 
+void trackContentObjectView::remove( void )
+{
+	// delete ourself
+	m_trackView->getTrackContentWidget()->removeTCOView( this );
+	m_tco->deleteLater();
+}
+
+
+
+
 void trackContentObjectView::updateLength( void )
 {
 	if( fixedTCOs() )
@@ -426,10 +436,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		}
 		else if( fixedTCOs() == FALSE )
 		{
-			// delete ourself
-			m_trackView->getTrackContentWidget()->
-							removeTCOView( this );
-			m_tco->deleteLater();
+			remove();
 		}
 	}
 }
@@ -567,7 +574,7 @@ void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
 					tr( "Delete (middle mousebutton)" ),
-						m_tco, SLOT( deleteLater() ) );
+						this, SLOT( remove() ) );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut" ), m_tco, SLOT( cut() ) );
