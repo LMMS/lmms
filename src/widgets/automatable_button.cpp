@@ -46,6 +46,7 @@ automatableButton::automatableButton( QWidget * _parent,
 	m_group( NULL )
 {
 	setAccessibleName( _name );
+	doConnections();
 }
 
 

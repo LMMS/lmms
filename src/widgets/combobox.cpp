@@ -80,6 +80,7 @@ comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 				this, SLOT( setItem( QAction * ) ) );
 
 	setAccessibleName( _name );
+	doConnections();
 }
 
 

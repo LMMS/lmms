@@ -1,7 +1,7 @@
 /*
  * mv_base.cpp - base for M/V-architecture of LMMS
  *
- * Copyright (c) 2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,12 +30,19 @@
 #include "mv_base.h"
 
 
+modelView::modelView( model * _model ) :
+	m_model( _model )
+{
+}
+
+
+
+
 void modelView::setModel( model * _model, bool _old_model_valid )
 {
 	QWidget * w = dynamic_cast<QWidget *>( this );
 	assert( w != NULL );
 
-//printf("w: %x   m_model:%x  _model:%x\n", w, m_model, _model);
 	if( _old_model_valid && m_model != NULL )
 	{
 		if( m_model->defaultConstructed() )
@@ -48,15 +55,29 @@ void modelView::setModel( model * _model, bool _old_model_valid )
 		}
 	}
 	m_model = _model;
-	QObject::connect( _model, SIGNAL( dataChanged() ),
-				w, SLOT( update() ), Qt::QueuedConnection );
-	QObject::connect( _model, SIGNAL( propertiesChanged() ),
-				w, SLOT( update() ), Qt::QueuedConnection );
+
+	doConnections();
 
 	w->update();
 
 	modelChanged();
 }
+
+
+
+
+void modelView::doConnections( void )
+{
+	if( m_model != NULL )
+	{
+		QWidget * w = dynamic_cast<QWidget *>( this );
+		QObject::connect( m_model, SIGNAL( dataChanged() ),
+				w, SLOT( update() ), Qt::QueuedConnection );
+		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
+				w, SLOT( update() ), Qt::QueuedConnection );
+	}
+}
+
 
 
 

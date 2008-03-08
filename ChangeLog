@@ -1,3 +1,14 @@
+2008-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mv_base.h:
+	* src/widgets/combobox.cpp:
+	* src/widgets/knob.cpp:
+	* src/widgets/automatable_button.cpp:
+	* src/core/mv_base.cpp:
+	also connect model-signals with view when using default-constructed
+	model - fixes missing updates on things like button-groups when using
+	automation
+
 2008-03-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/lvsl_server.cpp:

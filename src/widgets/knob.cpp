@@ -86,6 +86,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 	setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	setTotalAngle( 270.0f );
+	doConnections();
 }
 
 

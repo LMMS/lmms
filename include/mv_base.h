@@ -72,11 +72,7 @@ signals:
 class modelView
 {
 public:
-	modelView( model * _model ) :
-		m_model( _model )
-	{
-	}
-
+	modelView( model * _model );
 	virtual ~modelView()
 	{
 	}
@@ -101,6 +97,8 @@ protected:
 	virtual void modelChanged( void )
 	{
 	}
+
+	void doConnections( void );
 
 
 private:
