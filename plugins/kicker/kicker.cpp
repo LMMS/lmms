@@ -65,6 +65,11 @@ kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this ),
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this )
 {
+	m_startFreqModel.setTrack( _instrument_track );
+	m_endFreqModel.setTrack( _instrument_track );
+	m_decayModel.setTrack( _instrument_track );
+	m_distModel.setTrack( _instrument_track );
+	m_gainModel.setTrack( _instrument_track );
 }
 
 

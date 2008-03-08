@@ -1,5 +1,22 @@
 2008-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/kicker/kicker.cpp:
+	set track for knobs in order to make them automatable
+
+	* include/automatable_model_templates.h:
+	fixed missing automationPattern-initialization (i.e.
+	setFirstValue()-call) which made automation-editor not work properly
+	if no events were drawn so far
+
+	* include/piano_roll.h:
+	* include/automation_editor.h:
+	* src/core/piano_roll.cpp:
+	* src/core/automation_editor.cpp:
+	made micro-draw-operations use 32-bit-ints instead of 16-bit-integers
+	for performing better on 32-bit-platforms
+
+	* data/locale/de.qm:
+	* data/locale/de.ts:
 	* include/mv_base.h:
 	* src/widgets/combobox.cpp:
 	* src/widgets/knob.cpp:
