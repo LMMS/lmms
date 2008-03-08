@@ -1,5 +1,8 @@
 2008-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/logo.png:
+	replaced Kicker-logo with actual logo
+
 	* src/core/track.cpp:
 	* include/track.h:
 	fixed crash when removing TCO via context-menu
