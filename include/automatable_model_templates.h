@@ -333,6 +333,7 @@ automationPattern * automatableModel<T, EDIT_STEP_TYPE>::getAutomationPattern(
 	if( !m_automationPattern )
 	{
 		m_automationPattern = new automationPattern( m_track, this );
+		setFirstValue();
 		syncAutomationPattern();
 	}
 	return( m_automationPattern );
