@@ -47,7 +47,6 @@
 #include "automation_pattern.h"
 #include "config_mgr.h"
 #include "debug.h"
-#include "effect_board.h"
 #include "effect_chain.h"
 #include "effect_rack_view.h"
 #include "embed.h"
@@ -63,6 +62,7 @@
 #include "main_window.h"
 #include "midi_client.h"
 #include "midi_port.h"
+#include "fx_mixer.h"
 #include "instrument_midi_io.h"
 #include "mmp.h"
 #include "note_play_handle.h"
@@ -104,14 +104,11 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
-	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1/* this */ ),
+	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1, this ),
         m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
-							1.0f /* this */ ),
-        m_surroundAreaModel( NULL /* this */, this ),
-        m_effectChannelModel( DEFAULT_EFFECT_CHANNEL,
-					MIN_EFFECT_CHANNEL, MAX_EFFECT_CHANNEL
-								 /* this */ ),
-//	m_effects( /* this */ NULL ),
+							1.0f, this ),
+        m_surroundAreaModel( this, this ),
+        m_effectChannelModel( 1, 1, NUM_FX_CHANNELS, 1, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
