@@ -1,5 +1,9 @@
 2008-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/locale/de.ts:
+	* data/locale/de.qm:
+	updated German localization
+	
 	* include/effect_board.h:
 	removed
 
