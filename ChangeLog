@@ -1,3 +1,14 @@
+2008-03-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	* README:
+	made 0.3.2 release
+
+	* plugins/vst_base/lvsl_server.cpp:
+	made VST-GUI work with recent WINE-versions where no X-windows are
+	being created until a ShowWindow()-request is issued and thus we get a
+	XID for embedding GUI
+
 2008-03-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano_roll.cpp:
