@@ -42,6 +42,7 @@ const int MAX_CHORD_POLYPHONY = 10;
 
 class chordCreator : public model, public journallingObject
 {
+	Q_OBJECT
 public:
 	chordCreator( instrumentTrack * _instrument_track );
 	virtual ~chordCreator();
@@ -91,6 +92,7 @@ private:
 
 class arpeggiator : public model, public journallingObject
 {
+	Q_OBJECT
 public:
 	enum ArpDirections
 	{

@@ -42,6 +42,7 @@ class chordCreator;
 
 class chordCreatorView : public QWidget, public modelView
 {
+	Q_OBJECT
 public:
 	chordCreatorView( chordCreator * _cc, QWidget * _parent );
 	virtual ~chordCreatorView();
@@ -64,6 +65,7 @@ private:
 
 class arpeggiatorView : public QWidget, public modelView
 {
+	Q_OBJECT
 public:
 	arpeggiatorView( arpeggiator * _arp, QWidget * _parent );
 	virtual ~arpeggiatorView();

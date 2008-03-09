@@ -70,9 +70,10 @@ signals:
 
 class meterDialog : public QWidget, public modelView
 {
+	Q_OBJECT
 public:
 	meterDialog( QWidget * _parent );
-	~meterDialog();
+	virtual ~meterDialog();
 
 	virtual void modelChanged( void );
 

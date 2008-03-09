@@ -1,5 +1,30 @@
 2008-03-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/effect_board.h:
+	removed
+
+	* include/fx_mixer.h:
+	* src/tracks/instrument_track.cpp:
+	added definition for upcoming FX-mixer
+
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* include/meter_dialog.h:
+	* include/instrument_functions.h:
+	* include/instrument_sound_shaping.h:
+	* include/instrument_function_views.h:
+	* include/bb_track.h:
+	* include/ladspa_control_view.h:
+	* include/instrument_sound_shaping_view.h:
+	* src/midi/midi_client.cpp:
+	* src/widgets/ladspa_control_view.cpp:
+	* src/widgets/instrument_sound_shaping_view.cpp:
+	* src/widgets/instrument_function_views.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_functions.cpp:
+	* Makefile.am:
+	added missing Q_OBJECT-macros for views which made localizations not
+	work
+
 	* plugins/sf2_player/logo.png:
 	replaced Kicker-logo with actual logo
 

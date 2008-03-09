@@ -39,6 +39,7 @@ class tabWidget;
 
 class instrumentSoundShapingView : public QWidget, public modelView
 {
+	Q_OBJECT
 public:
 	instrumentSoundShapingView( QWidget * _parent );
 	virtual ~instrumentSoundShapingView();

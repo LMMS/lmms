@@ -35,6 +35,7 @@ class ladspaControl;
 
 class ladspaControlView : public QWidget, public modelView
 {
+	Q_OBJECT
 public:
 	ladspaControlView( QWidget * _parent, ladspaControl * _ctl );
 	virtual ~ladspaControlView();

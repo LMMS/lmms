@@ -144,6 +144,7 @@ private:
 
 class tripleOscillatorView : public instrumentView
 {
+	Q_OBJECT
 public:
 	tripleOscillatorView( instrument * _instrument, QWidget * _parent );
 	virtual ~tripleOscillatorView();

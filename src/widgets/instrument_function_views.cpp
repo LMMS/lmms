@@ -253,5 +253,6 @@ void arpeggiatorView::modelChanged( void )
 
 
 
+#include "instrument_function_views.moc"
 
 #endif

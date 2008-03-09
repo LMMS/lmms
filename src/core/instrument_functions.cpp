@@ -299,7 +299,8 @@ arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 	m_arpModel.setTrack( _instrument_track );
 	for( int i = 0; chordCreator::s_chordTable[i].interval[0] != -1; ++i )
 	{
-		m_arpModel.addItem( tr( chordCreator::s_chordTable[i].
+		m_arpModel.addItem( chordCreator::tr(
+					chordCreator::s_chordTable[i].
 						name.toAscii().constData() ) );
 	}
 
@@ -536,5 +537,7 @@ void arpeggiator::loadSettings( const QDomElement & _this )
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
 
+
+#include "instrument_functions.moc"
 
 #endif

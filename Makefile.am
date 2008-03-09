@@ -39,7 +39,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 	$(LUPDATE) $(lmms_SOURCES) `find plugins/ -type f -name "*.cpp"` -ts data/locale/$@
 
 %.qm: %.ts
-	$(LRELEASE) $<
+	$(LRELEASE) data/locale/$<
 
 
 man1_MANS = lmms.1
@@ -69,11 +69,16 @@ lmms_MOC =						\
 		./file_browser.moc			\
 		./graph.moc				\
 		./group_box.moc				\
+		./instrument_functions.moc		\
+		./instrument_function_views.moc		\
 		./instrument_midi_io.moc		\
 		./instrument_midi_io_view.moc		\
+		./instrument_sound_shaping.moc		\
+		./instrument_sound_shaping_view.moc	\
 		./kmultitabbar.moc			\
 		./knob.moc				\
  		./ladspa_control.moc			\
+ 		./ladspa_control_view.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
 		./main_window.moc			\
@@ -287,7 +292,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/instrument_view.h			\
 		$(srcdir)/include/bb_editor.h				\
 		$(srcdir)/include/piano.h				\
-		$(srcdir)/include/effect_board.h			\
+		$(srcdir)/include/fx_mixer.h				\
 		$(srcdir)/include/pixmap_button.h			\
 		$(srcdir)/include/rename_dialog.h			\
 		$(srcdir)/include/export_project_dialog.h		\

@@ -38,6 +38,7 @@ class notePlayHandle;
 
 class instrumentSoundShaping : public model, public journallingObject
 {
+	Q_OBJECT
 public:
 	instrumentSoundShaping( instrumentTrack * _instrument_track );
 	virtual ~instrumentSoundShaping();

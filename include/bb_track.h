@@ -105,6 +105,7 @@ private:
 
 class bbTrack : public track
 {
+	Q_OBJECT
 public:
 	bbTrack( trackContainer * _tc );
 	virtual ~bbTrack();
