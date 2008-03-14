@@ -29,6 +29,7 @@
 #include "automation_editor.h"
 #include "bb_editor.h"
 #include "config_mgr.h"
+#include "fx_mixer.h"
 #include "ladspa_2_lmms.h"
 #include "main_window.h"
 #include "mixer.h"
@@ -44,6 +45,8 @@
 bool engine::s_hasGUI = TRUE;
 float engine::s_framesPerTact64th;
 mixer * engine::s_mixer = NULL;
+fxMixer * engine::s_fxMixer = NULL;
+fxMixerView * engine::s_fxMixerView = NULL;
 mainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
@@ -67,12 +70,14 @@ void engine::init( const bool _has_gui )
 
 	s_projectJournal = new projectJournal;
 	s_mixer = new mixer;
+	s_fxMixer = new fxMixer;
 	s_song = new song;
 	s_bbTrackContainer = new bbTrackContainer;
 
 	if( s_hasGUI )
 	{
 		s_mainWindow = new mainWindow;
+		s_fxMixerView = new fxMixerView;
 		s_songEditor = new songEditor( s_song );
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );

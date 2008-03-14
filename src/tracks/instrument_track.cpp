@@ -108,7 +108,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
         m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
 							1.0f, this ),
         m_surroundAreaModel( this, this ),
-        m_effectChannelModel( 1, 1, NUM_FX_CHANNELS, 1, this ),
+        m_effectChannelModel( 0, 0, NUM_FX_CHANNELS, 1, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
@@ -189,6 +189,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 	volumeVector v = m_surroundAreaModel.getVolumeVector( v_scale );
 
+	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	engine::getMixer()->bufferToPort( _buf,
 		( _n != NULL ) ? tMin<f_cnt_t>(
 				_n->framesLeftForCurrentPeriod(), _frames ) :
@@ -1162,8 +1163,8 @@ void instrumentTrackWindow::modelChanged( void )
 			this, SLOT( updateInstrumentView() ),
 			Qt::QueuedConnection );
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
-	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_surroundArea->setModel( &m_track->m_surroundAreaModel );
+	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
 	m_ssView->setModel( &m_track->m_soundShaping );

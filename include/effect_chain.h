@@ -32,7 +32,7 @@
 class effectChain : public journallingObject, public model
 {
 public:
-	effectChain( audioPort * _port, track * _track );
+	effectChain( track * _track );
 	virtual ~effectChain();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -52,11 +52,6 @@ public:
 	void startRunning( void );
 	bool isRunning( void );
 
-/*	inline const effect_list_t & getEffects( void )
-	{
-		return( m_effects );
-	}*/
-
 	void deleteAllPlugins( void );
 
 
@@ -64,7 +59,6 @@ private:
 	typedef QVector<effect *> effectList;
 	effectList m_effects;
 
-	audioPort * m_port;
 	track * m_track;
 
 	boolModel m_enabledModel;

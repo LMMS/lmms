@@ -31,6 +31,7 @@
 #include <math.h>
 
 #include "mixer.h"
+#include "fx_mixer.h"
 #include "play_handle.h"
 #include "song.h"
 #include "templates.h"
@@ -495,6 +496,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 //printf("---------------------------next period\n");
 //	if( criticalXRuns() == FALSE )
 	{
+		engine::getFxMixer()->prepareMasterMix();
 		engine::getSong()->processNextBuffer();
 
 		lockPlayHandles();
@@ -605,6 +607,14 @@ if( COND_NPH )
 				}
 			}
 		}
+		for( int i = 1; i < NUM_FX_CHANNELS+1; ++i )
+		{
+			engine::getFxMixer()->processChannel( i );
+		}
+		const surroundSampleFrame * buf =
+					engine::getFxMixer()->masterMix();
+		memcpy( m_writeBuf, buf, m_framesPerPeriod *
+						sizeof( surroundSampleFrame ) );
 	}
 
 	unlock();
@@ -644,26 +654,6 @@ void mixer::clear( void )
 	unlockPlayHandlesToRemove();
 }
 
-
-
-
-void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
-							const f_cnt_t _frames,
-							const f_cnt_t _offset )
-{
-	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
-}
-
-
-
-#ifndef DISABLE_SURROUND
-void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
-							const f_cnt_t _frames,
-							const f_cnt_t _offset )
-{
-	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
-}
-#endif
 
 
 
@@ -716,6 +706,59 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 		_port->m_bufferUsage = audioPort::FirstBuffer;
 	}
 	_port->unlockSecondBuffer();
+}
+
+
+
+
+void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
+							const f_cnt_t _frames,
+							const f_cnt_t _offset )
+{
+	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
+}
+
+
+
+#ifndef DISABLE_SURROUND
+void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
+							const f_cnt_t _frames,
+							const f_cnt_t _offset )
+{
+	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
+}
+#endif
+
+
+
+
+float mixer::peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames )
+{
+	float p = 0.0f;
+	for( f_cnt_t f = 0; f < _frames; ++f )
+	{
+		if( _ab[f][0] > p )
+		{
+			p = _ab[f][0];
+		}
+	}
+	return( p );
+}
+
+
+
+
+float mixer::peakValueRight( surroundSampleFrame * _ab, const f_cnt_t _frames )
+{
+	float p = 0.0f;
+	for( f_cnt_t f = 0; f < _frames; ++f )
+	{
+		if( _ab[f][1] > p )
+		{
+			p = _ab[f][1];
+		}
+	}
+	return( p );
 }
 
 
@@ -954,8 +997,7 @@ midiClient * mixer::tryMIDIClients( void )
 
 
 
-void mixer::processBuffer( const surroundSampleFrame * _buf,
-						fx_ch_t/* _fx_chnl */ )
+void mixer::processBuffer( const surroundSampleFrame * _buf, fx_ch_t _fx_chnl )
 {
 	// TODO: process according effect-channel
 	
@@ -968,22 +1010,7 @@ void mixer::processBuffer( const surroundSampleFrame * _buf,
 			m_newBuffer[chnl] = TRUE;
 		}
 	}*/
-
-	static QMutex m;
-	m.lock();
-	for( fpp_t frame = 0; frame < m_framesPerPeriod; ++frame )
-	{
-		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
-		{
-			m_writeBuf[frame][chnl] += _buf[frame][chnl];
-/*
-			if( m_scaleClip )
-			{
-				scaleClip( frame, chnl );
-			}*/
-		}
-	}
-	m.unlock();
+	engine::getFxMixer()->mixToChannel( _buf, _fx_chnl );
 }
 
 

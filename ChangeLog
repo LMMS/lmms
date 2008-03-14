@@ -1,5 +1,24 @@
 2008-03-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/engine.h:
+	* include/mixer.h:
+	* include/fx_mixer.h:
+	* include/fader.h:
+	* include/effect_chain.h:
+	* src/audio/audio_port.cpp:
+	* src/widgets/fader.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/mixer.cpp:
+	* src/core/engine.cpp:
+	* src/core/fx_mixer.cpp:
+	* data/themes/default/fader_background.png:
+	* data/themes/default/fader_knob.png:
+	* data/themes/default/fader_leds.png:
+	* Makefile.am:
+	added initial FX-mixer implementation - not perfect and very usable
+	yet but the basics work so far :)
+
 	* src/widgets/instrument_midi_io_view.cpp:
 	fixed segfault when using raw MIDI-client
 

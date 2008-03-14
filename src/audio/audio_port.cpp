@@ -40,9 +40,9 @@ audioPort::audioPort( const QString & _name, track * _track ) :
 	m_secondBuffer( new surroundSampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
 	m_extOutputEnabled( FALSE ),
-	m_nextFxChannel( -1 ),
+	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( this, _track ),
+	m_effects( _track ),
 	m_frames( engine::getMixer()->framesPerPeriod() )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,

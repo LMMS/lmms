@@ -35,6 +35,8 @@
 class automationEditor;
 class bbEditor;
 class bbTrackContainer;
+class fxMixer;
+class fxMixerView;
 class projectJournal;
 class mainWindow;
 class mixer;
@@ -62,6 +64,11 @@ public:
 		return( s_mixer );
 	}
 
+	static fxMixer * getFxMixer( void )
+	{
+		return( s_fxMixer );
+	}
+
 	static song * getSong( void )
 	{
 		return( s_song );
@@ -81,6 +88,11 @@ public:
 	static mainWindow * getMainWindow( void )
 	{
 		return( s_mainWindow );
+	}
+
+	static fxMixerView * getFxMixerView( void )
+	{
+		return( s_fxMixerView );
 	}
 
 	static songEditor * getSongEditor( void )
@@ -131,12 +143,14 @@ private:
 
 	// core
 	static mixer * s_mixer;
+	static fxMixer * s_fxMixer;
 	static song * s_song;
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 
 	// GUI
 	static mainWindow * s_mainWindow;
+	static fxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;

@@ -66,7 +66,9 @@ lmms_MOC =						\
 		./envelope_and_lfo_view.moc		\
 		./export_project_dialog.moc		\
 		./fade_button.moc			\
+		./fader.moc				\
 		./file_browser.moc			\
+		./fx_mixer.moc				\
 		./graph.moc				\
 		./group_box.moc				\
 		./instrument_functions.moc		\
@@ -171,6 +173,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/instrument_sound_shaping.cpp		\
 		$(srcdir)/src/core/export_project_dialog.cpp		\
 		$(srcdir)/src/core/file_browser.cpp			\
+		$(srcdir)/src/core/fx_mixer.cpp				\
 		$(srcdir)/src/core/import_filter.cpp			\
 		$(srcdir)/src/core/instrument.cpp			\
 		$(srcdir)/src/core/instrument_functions.cpp		\
@@ -229,6 +232,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/widgets/effect_rack_view.cpp		\
 		$(srcdir)/src/widgets/effect_view.cpp			\
 		$(srcdir)/src/widgets/fade_button.cpp			\
+		$(srcdir)/src/widgets/fader.cpp				\
 		$(srcdir)/src/widgets/graph.cpp				\
 		$(srcdir)/src/widgets/group_box.cpp			\
 		$(srcdir)/src/widgets/envelope_and_lfo_view.cpp		\
@@ -308,6 +312,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/instrument_function_views.h		\
 		$(srcdir)/include/instrument_sound_shaping_view.h	\
 		$(srcdir)/include/export.h				\
+		$(srcdir)/include/fader.h				\
 		$(srcdir)/include/mv_base.h				\
 		$(srcdir)/include/automatable_model.h			\
 		$(srcdir)/include/automatable_model_templates.h		\

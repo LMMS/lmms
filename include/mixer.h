@@ -1,7 +1,7 @@
 /*
  * mixer.h - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -285,6 +285,10 @@ public:
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
 #endif
+
+	float peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames );
+	float peakValueRight( surroundSampleFrame * _ab, const f_cnt_t _frames );
+
 
 	bool criticalXRuns( void ) const;
 

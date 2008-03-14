@@ -33,9 +33,8 @@
 
 
 
-effectChain::effectChain( audioPort * _port, track * _track ) :
+effectChain::effectChain( track * _track ) :
 	model( /*_track*/ NULL ),
-	m_port( _port ),
 	m_track( _track ),
 	m_enabledModel( FALSE, FALSE, TRUE )
 {
