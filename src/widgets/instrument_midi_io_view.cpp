@@ -206,14 +206,17 @@ void instrumentMidiIOView::activatedWriteablePort( QAction * _item )
 void instrumentMidiIOView::updateReadablePortsMenu( void )
 {
 	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	m_readablePorts->clear();
-	for( instrumentMidiIO::midiPortMap::const_iterator it =
+	if( m_readablePorts )
+	{
+		m_readablePorts->clear();
+		for( instrumentMidiIO::midiPortMap::const_iterator it =
 					mio->m_readablePorts.begin();
 				it != mio->m_readablePorts.end(); ++it )
-	{
-		QAction * a = m_readablePorts->addAction( it->first );
-		a->setCheckable( TRUE );
-		a->setChecked( it->second );
+		{
+			QAction * a = m_readablePorts->addAction( it->first );
+			a->setCheckable( TRUE );
+			a->setChecked( it->second );
+		}
 	}
 }
 
@@ -223,14 +226,17 @@ void instrumentMidiIOView::updateReadablePortsMenu( void )
 void instrumentMidiIOView::updateWriteablePortsMenu( void )
 {
 	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	m_writeablePorts->clear();
-	for( instrumentMidiIO::midiPortMap::const_iterator it =
-					mio->m_writeablePorts.begin();
-				it != mio->m_writeablePorts.end(); ++it )
+	if( m_writeablePorts )
 	{
-		QAction * a = m_writeablePorts->addAction( it->first );
-		a->setCheckable( TRUE );
-		a->setChecked( it->second );
+		m_writeablePorts->clear();
+		for( instrumentMidiIO::midiPortMap::const_iterator it =
+						mio->m_writeablePorts.begin();
+				it != mio->m_writeablePorts.end(); ++it )
+		{
+			QAction * a = m_writeablePorts->addAction( it->first );
+			a->setCheckable( TRUE );
+			a->setChecked( it->second );
+		}
 	}
 }
 
