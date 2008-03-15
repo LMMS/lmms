@@ -60,6 +60,8 @@ public:
 	const surroundSampleFrame * masterMix( void );
 
 
+	void clear( void );
+
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
@@ -91,6 +93,8 @@ public:
 		return( m_currentFxLine );
 	}
 	void setCurrentFxLine( fxLine * _line );
+
+	void clear( void );
 
 
 private slots:

@@ -50,6 +50,7 @@
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
+#include "fx_mixer.h"
 #include "import_filter.h"
 #include "instrument_track.h"
 #include "main_window.h"
@@ -687,9 +688,15 @@ void song::clearProject( void )
 	{
 		engine::getSongEditor()->clearAllTracks();
 	}
+	if( engine::getFxMixerView() )
+	{
+		engine::getFxMixerView()->clear();
+	}
 	QCoreApplication::sendPostedEvents();
 	engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
+
+	engine::getFxMixer()->clear();
 
 	if( engine::getAutomationEditor() )
 	{
@@ -833,29 +840,39 @@ void FASTCALL song::loadProject( const QString & _file_name )
 			else if( engine::hasGUI() )
 			{
 				if( node.nodeName() ==
-						engine::getPianoRoll()->nodeName() )
+					engine::getFxMixer()->nodeName() )
+				{
+					engine::getFxMixer()->restoreState(
+							node.toElement() );
+				}
+				else if( node.nodeName() ==
+					engine::getPianoRoll()->nodeName() )
 				{
 					engine::getPianoRoll()->restoreState(
-								node.toElement() );
+							node.toElement() );
 				}
 				else if( node.nodeName() ==
-					engine::getAutomationEditor()->nodeName() )
+					engine::getAutomationEditor()->
+								nodeName() )
 				{
-					engine::getAutomationEditor()->restoreState(
-								node.toElement() );
-				}
-				else if( node.nodeName() ==
-						engine::getProjectNotes()->nodeName() )
-				{
-					( (journallingObject *)( engine::
-								getProjectNotes() ) )->
+					engine::getAutomationEditor()->
 						restoreState( node.toElement() );
 				}
 				else if( node.nodeName() ==
-					m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
+						engine::getProjectNotes()->
+								nodeName() )
 				{
-					m_playPos[Mode_PlaySong].m_timeLine->restoreState(
-								node.toElement() );
+					( (journallingObject *)( engine::
+							getProjectNotes() ) )->
+						restoreState( node.toElement() );
+				}
+				else if( node.nodeName() ==
+						m_playPos[Mode_PlaySong].
+							m_timeLine->nodeName() )
+				{
+					m_playPos[Mode_PlaySong].
+						m_timeLine->restoreState(
+							node.toElement() );
 				}
 			}
 		}
@@ -884,6 +901,7 @@ bool song::saveProject( void )
 
 	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );
 
+	engine::getFxMixer()->saveState( mmp, mmp.content() );
 	engine::getPianoRoll()->saveState( mmp, mmp.content() );
 	engine::getAutomationEditor()->saveState( mmp, mmp.content() );
 	( (journallingObject *)( engine::getProjectNotes() ) )->saveState( mmp,

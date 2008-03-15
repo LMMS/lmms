@@ -52,7 +52,7 @@ public:
 	void startRunning( void );
 	bool isRunning( void );
 
-	void deleteAllPlugins( void );
+	void clear( void );
 
 
 private:

@@ -727,7 +727,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_baseNoteModel.loadSettings( _this, "basenote" );
 	}
 
-	m_audioPort.getEffects()->deleteAllPlugins();
+	// clear effect-chain just in case we load an old preset without FX-data
+	m_audioPort.getEffects()->clear();
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )

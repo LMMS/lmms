@@ -1,3 +1,15 @@
+2008-03-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/fx_mixer.h:
+	* include/effect_rack_view.h:
+	* include/effect_chain.h:
+	* src/widgets/effect_rack_view.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/song.cpp:
+	* src/core/fx_mixer.cpp:
+	implemented save- and load-functionality for FX-mixer
+
 2008-03-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/engine.h:

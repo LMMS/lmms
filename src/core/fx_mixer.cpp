@@ -54,6 +54,7 @@ struct fxChannel
 		m_muteModel( FALSE, _parent ),
 		m_soloModel( FALSE, _parent ),
 		m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
+		m_name(),
 		m_lock()
 	{
 		engine::getMixer()->clearAudioBuffer( m_buffer,
@@ -68,6 +69,7 @@ struct fxChannel
 	boolModel m_muteModel;
 	boolModel m_soloModel;
 	floatModel m_volumeModel;
+	QString m_name;
 	QMutex m_lock;
 } ;
 
@@ -81,6 +83,8 @@ fxMixer::fxMixer() :
 	{
 		m_fxChannels[i] = new fxChannel( this );
 	}
+	// reset name etc.
+	clear();
 }
 
 
@@ -113,9 +117,15 @@ void fxMixer::processChannel( fx_ch_t _ch )
 		const fpp_t f = engine::getMixer()->framesPerPeriod();
 		m_fxChannels[_ch]->m_fxChain.startRunning();
 		m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
-						m_fxChannels[_ch]->m_buffer, f );
-		m_fxChannels[_ch]->m_peakLeft = engine::getMixer()->peakValueLeft( m_fxChannels[_ch]->m_buffer, f ) * m_fxChannels[_ch]->m_volumeModel.value();
-		m_fxChannels[_ch]->m_peakRight = engine::getMixer()->peakValueRight( m_fxChannels[_ch]->m_buffer, f ) * m_fxChannels[_ch]->m_volumeModel.value();
+					m_fxChannels[_ch]->m_buffer, f );
+		m_fxChannels[_ch]->m_peakLeft =
+			engine::getMixer()->peakValueLeft(
+					m_fxChannels[_ch]->m_buffer, f ) *
+				m_fxChannels[_ch]->m_volumeModel.value();
+		m_fxChannels[_ch]->m_peakRight =
+			engine::getMixer()->peakValueRight(
+					m_fxChannels[_ch]->m_buffer, f ) *
+				m_fxChannels[_ch]->m_volumeModel.value();
 	}
 	else
 	{
@@ -144,11 +154,12 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 		if( m_fxChannels[i]->m_used )
 		{
 			surroundSampleFrame * _buf = m_fxChannels[i]->m_buffer;
+			const float v = m_fxChannels[i]->m_volumeModel.value();
 			for( f_cnt_t f = 0; f <
 				engine::getMixer()->framesPerPeriod(); ++f )
 			{
-				buf[f][0] += _buf[f][0]*m_fxChannels[i]->m_volumeModel.value();
-				buf[f][1] += _buf[f][1]*m_fxChannels[i]->m_volumeModel.value();
+				buf[f][0] += _buf[f][0] * v;
+				buf[f][1] += _buf[f][1] * v;
 			}
 			engine::getMixer()->clearAudioBuffer( _buf,
 					engine::getMixer()->framesPerPeriod() );
@@ -156,10 +167,11 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 		}
 	}
 	processChannel( 0 );
+	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
-		buf[f][0] *= m_fxChannels[0]->m_volumeModel.value();
-		buf[f][1] *= m_fxChannels[0]->m_volumeModel.value();
+		buf[f][0] *= v;
+		buf[f][1] *= v;
 	}
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
@@ -169,11 +181,33 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 
 
 
+void fxMixer::clear()
+{
+	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	{
+		m_fxChannels[i]->m_fxChain.clear();
+		m_fxChannels[i]->m_volumeModel.setValue( 1.0f );
+		m_fxChannels[i]->m_name = ( i == 0 ) ?
+					tr( "Master" ) : tr( "FX %1" ).arg( i );
+
+	}
+}
+
+
+
+
 void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-/*	m_chordsEnabledModel.saveSettings( _doc, _this, "chord-enabled" );
-	m_chordsModel.saveSettings( _doc, _this, "chord" );
-	m_chordRangeModel.saveSettings( _doc, _this, "chordrange" );*/
+	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	{
+		QDomElement fxch = _doc.createElement(
+					QString( "fxchannel%1" ).arg( i ) );
+		_this.appendChild( fxch );
+		m_fxChannels[i]->m_fxChain.saveState( _doc, fxch );
+		m_fxChannels[i]->m_volumeModel.saveSettings( _doc, fxch,
+								"volume" );
+		fxch.setAttribute( "name", m_fxChannels[i]->m_name );
+	}
 }
 
 
@@ -181,27 +215,34 @@ void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void fxMixer::loadSettings( const QDomElement & _this )
 {
-/*	m_chordsEnabledModel.loadSettings( _this, "chord-enabled" );
-	m_chordsModel.loadSettings( _this, "chord" );
-	m_chordRangeModel.loadSettings( _this, "chordrange" );*/
+	clear();
+	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	{
+		QDomElement fxch = _this.firstChildElement(
+					QString( "fxchannel%1" ).arg( i ) );
+		m_fxChannels[i]->m_fxChain.restoreState(
+			fxch.firstChildElement(
+				m_fxChannels[i]->m_fxChain.nodeName() ) );
+		m_fxChannels[i]->m_volumeModel.loadSettings( fxch, "volume" );
+		m_fxChannels[i]->m_name = fxch.attribute( "name" );
+	}
+
+	emit dataChanged();
 }
 
 
 class fxLine : public QWidget
 {
 public:
-	fxLine( QWidget * _parent, fxMixerView * _mv ) :
+	fxLine( QWidget * _parent, fxMixerView * _mv, QString & _name ) :
 		QWidget( _parent ),
-		m_mv( _mv )
+		m_mv( _mv ),
+		m_name( _name )
 	{
 		setFixedSize( 32, 200 );
 		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 	}
 
-	virtual void setName( const QString & _name )
-	{
-		m_name = _name;
-	}
 	virtual void paintEvent( QPaintEvent * )
 	{
 		QPainter p( this );
@@ -244,12 +285,11 @@ public:
 			m_name = new_name;
 			update();
 		}
-				
 	}
 
 private:
 	fxMixerView * m_mv;
-	QString m_name;
+	QString & m_name;
 
 } ;
 
@@ -260,19 +300,22 @@ fxMixerView::fxMixerView() :
 	QWidget(),
 	modelView( NULL )
 {
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+
 	fxMixer * m = engine::getFxMixer();
 
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	setPalette( pal );
 	setAutoFillBackground( TRUE );
+	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Minimum );
 
 //	setFixedHeight( 250+216 );
 	setWindowTitle( tr( "FX-Mixer" ) );
 //	setWindowIcon( embed::getIconPixmap( "fxmixer" ) );
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	QVBoxLayout * ml = new QVBoxLayout( this );
+	QVBoxLayout * ml = new QVBoxLayout;
 	ml->setMargin( 0 );
 	ml->setSpacing( 0 );
 
@@ -282,11 +325,6 @@ fxMixerView::fxMixerView() :
 	a->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	a->setFixedHeight( 216 );
 	ml->addWidget( a );
-
-	m_fxRackArea = new QWidget( this );
-	m_fxRackArea->setFixedHeight( 250 );
-	ml->addWidget( m_fxRackArea );
-	ml->addStretch();
 
 	QWidget * base = new QWidget;
 	QHBoxLayout * bl = new QHBoxLayout( base );
@@ -300,22 +338,25 @@ fxMixerView::fxMixerView() :
 	base->setPalette( pal );
 	base->setAutoFillBackground( TRUE );
 
+
+	m_fxRackArea = new QWidget;
+	ml->addWidget( m_fxRackArea );
+	setLayout( ml );
+
+	QHBoxLayout * fxl = new QHBoxLayout;
+	fxl->setSpacing( 0 );
+	fxl->setMargin( 0 );
+
+
 	bl->addSpacing( 6 );
+
 	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
 	{
 		fxChannelView * cv = &m_fxChannelViews[i];
-		cv->m_fxLine = new fxLine( base, this );
+		cv->m_fxLine = new fxLine( base, this,
+						m->m_fxChannels[i]->m_name  );
 		bl->addWidget( cv->m_fxLine );
-		if( i == 0 )
-		{
-			bl->addSpacing( 10 );
-			cv->m_fxLine->setName( tr( "Master" ).arg( i ) );
-		}
-		else
-		{
-			bl->addSpacing( 1 );
-			cv->m_fxLine->setName( tr( "FX %1" ).arg( i ) );
-		}
+		bl->addSpacing( i == 0 ? 10 : 1 );
 		lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
 		l->model()->setRange( i, i );
 		l->model()->setValue( i );
@@ -324,16 +365,21 @@ fxMixerView::fxMixerView() :
 								cv->m_fxLine );
 		cv->m_fader->move( 15-cv->m_fader->width()/2, 80 );
 		cv->m_rackView = new effectRackView(
-				&m->m_fxChannels[i]->m_fxChain, m_fxRackArea );
-		cv->m_rackView->setFixedSize( 250, 250 );
+				&m->m_fxChannels[i]->m_fxChain, NULL );
+		fxl->addWidget( cv->m_rackView );
 	}
+	fxl->addStretch();
 
-	show();
+	m_fxRackArea->setLayout( fxl );
+
 	setCurrentFxLine( m_fxChannelViews[0].m_fxLine );
 
 	QTimer * t = new QTimer( this );
 	connect( t, SIGNAL( timeout() ), this, SLOT( updateFaders() ) );
 	t->start( 50 );
+
+	// we want to receive dataChanged-signals in order to update
+	setModel( m );
 }
 
 
@@ -360,6 +406,17 @@ void fxMixerView::setCurrentFxLine( fxLine * _line )
 			m_fxChannelViews[i].m_rackView->hide();
 		}
 		m_fxChannelViews[i].m_fxLine->update();
+	}
+}
+
+
+
+
+void fxMixerView::clear( void )
+{
+	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	{
+		m_fxChannelViews[i].m_rackView->clear();
 	}
 }
 

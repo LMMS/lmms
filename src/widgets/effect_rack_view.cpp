@@ -42,11 +42,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	modelView( NULL )
 {
-	setFixedSize( 230, 184 );
-
-/*	m_mainLayout = new QVBoxLayout( this );
-	m_mainLayout->setMargin( 0 );
-	m_mainLayout->setSpacing( 0 );*/
+	setFixedSize( 250, 250 );
 
 	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
 	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
@@ -63,12 +59,9 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	connect( m_addButton, SIGNAL( clicked( void ) ), 
 					this, SLOT( addEffect( void ) ) );
 
-	//m_mainLayout->addWidget( m_scrollArea );
-
 	QWidget * w = new QWidget;
 	m_scrollArea->setWidget( w );
-	w->show();
-	
+
 	m_lastY = 0;
 
 	setModel( _model );
@@ -78,14 +71,14 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 
 effectRackView::~effectRackView()
 {
-	//deleteAllPlugins();
+	clear();
 }
 
 
 
 
-/*
-void effectRackView::deleteAllPlugins( void )
+
+void effectRackView::clear( void )
 {
 	for( QVector<effectView *>::iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); ++it )
@@ -94,7 +87,7 @@ void effectRackView::deleteAllPlugins( void )
 	}
 	m_effectViews.clear();
 }
-*/
+
 
 
 
@@ -134,28 +127,6 @@ void effectRackView::moveDown( effectView * _view )
 		moveUp( *( qFind( m_effectViews.begin(), m_effectViews.end(),
 							_view ) + 1 ) );
 	}
-/*
-	fxChain()->moveDown( _view->getEffect() );
-	if( _view != m_effectViews.last() )
-	{
-		int i = 0;
-		for( QVector<effectView *>::iterator it = 
-						m_effectViews.begin(); 
-					it != m_effectViews.end(); it++, i++ )
-		{
-			if( *it == _view )
-			{
-				break;
-			}
-		}
-		
-		effectView * temp = m_effectViews.at( i + 1 );
-		
-		m_effectViews[i + 1] = _view;
-		m_effectViews[i] = temp;
-		
-		redraw();
-	}*/
 }
 
 

@@ -46,6 +46,8 @@ public:
 	effectRackView( effectChain * _model, QWidget * _parent );
 	virtual ~effectRackView();
 
+	void clear( void );
+
 
 public slots:
 	void moveUp( effectView * _view );

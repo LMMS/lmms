@@ -45,7 +45,7 @@ effectChain::effectChain( track * _track ) :
 
 effectChain::~effectChain()
 {
-	deleteAllPlugins();
+	clear();
 }
 
 
@@ -69,7 +69,7 @@ void effectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effectChain::loadSettings( const QDomElement & _this )
 {
-	deleteAllPlugins();
+	clear();
 
 	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
 
@@ -236,7 +236,7 @@ bool effectChain::isRunning( void )
 
 
 
-void effectChain::deleteAllPlugins( void )
+void effectChain::clear( void )
 {
 	for( int i = 0; i < m_effects.count(); ++i )
 	{
