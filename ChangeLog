@@ -1,5 +1,9 @@
 2008-03-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	fixed LADSPA-controls which internally were not linked per default
+	although they should be
+
 	* include/fx_mixer.h:
 	* include/effect_rack_view.h:
 	* include/effect_chain.h:
