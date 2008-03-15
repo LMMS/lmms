@@ -71,6 +71,19 @@ ladspaControls::ladspaControls( ladspaEffect * _eff,
 
 		m_controls.append( p );
 	}
+
+	// now link all controls
+	if( m_processors > 1 )
+	{
+		for( multi_proc_t::iterator it = controls.begin(); 
+						it != controls.end(); it++ )
+		{
+			if( (*it)->proc == 0 )
+			{
+				linkPort( ( *it )->control_id, TRUE );
+			}
+		}
+	}
 }
 
 
