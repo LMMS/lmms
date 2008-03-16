@@ -246,7 +246,10 @@ void effectView::paintEvent( QPaintEvent * )
 	f.setBold( TRUE );
 	p.setFont( f );
 
-	p.drawText( 5, 52, getEffect()->publicName() );
+	p.setPen( QColor( 64, 64, 64 ) );
+	p.drawText( 6, 55, getEffect()->publicName() );
+	p.setPen( Qt::white );
+	p.drawText( 5, 54, getEffect()->publicName() );
 }
 
 
