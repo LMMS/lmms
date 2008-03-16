@@ -73,7 +73,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 
 	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ) );
-	m_autoQuit->setLabel( tr( "Decay" ) );
+	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
 	m_autoQuit->setWhatsThis( tr( 
@@ -83,7 +83,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 
 	m_gate = new knob( knobBright_26, this, tr( "Gate" ) );
-	m_gate->setLabel( tr( "Gate" ) );
+	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
 	m_gate->setWhatsThis( tr( 
