@@ -1,5 +1,15 @@
 2008-03-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/widgets/visualization_widget.cpp:
+	improved signal-visualization and increased update-ratio from 20 to 40
+	fps
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	* src/core/song_editor.cpp:
+	* data/themes/default/auto_limit.png:
+	removed obsolete and broken auto-limit-feature
+
 	* src/core/engine.cpp:
 	* src/core/fx_mixer.cpp:
 	proper cleanup of fxMixer and its view at exit

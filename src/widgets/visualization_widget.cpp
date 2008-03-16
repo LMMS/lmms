@@ -3,7 +3,7 @@
 /*
  * visualization_widget.cpp - widget for visualization of sound-data
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,7 +37,7 @@
 #include "tooltip.h"
 
 
-const int UPDATE_TIME = 1000 / 20;	// 20 fps
+const int UPDATE_TIME = 1000 / 40;	// 40 fps
 
 
 
@@ -105,43 +105,26 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 	if( m_enabled == TRUE )
 	{
 		float master_output = engine::getMixer()->masterGain();
-		Uint16 w = width()-4;
+		int w = width()-4;
 		float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
-		Uint16 x_base = 2;
-		Uint16 y_base = height()/2 - 1;
-		Uint16 old_y[DEFAULT_CHANNELS] = { y_base + (int)(
-							m_buffer[0][0]*half_h ),
-							y_base + (int)(
-							m_buffer[0][1]*half_h )
-						} ;
+		int x_base = 2;
+		int y_base = height()/2 - 1;
 
-		p.setClipRect( 2, 2, w, height()-4 );
+//		p.setClipRect( 2, 2, w, height()-4 );
 
-		float max_level = 0.0;
 
 		const fpp_t frames =
 				engine::getMixer()->framesPerPeriod();
+		const float max_level = qMax<float>(
+				mixer::peakValueLeft( m_buffer, frames ),
+				mixer::peakValueRight( m_buffer, frames ) );
 
-		// analyse wave-stream for max-level
-		for( fpp_t frame = 0; frame < frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < SURROUND_CHANNELS;
-									++chnl )
-			{
-				if( tAbs<float>( m_buffer[frame][chnl] ) >
-								max_level )
-				{
-					max_level = tAbs<float>(
-							m_buffer[frame][chnl] );
-				}
-			}
-		}
 		// and set color according to that...
 		if( max_level * master_output < 0.9 )
 		{
 			p.setPen( QColor( 96, 255, 96 ) );
 		}
-		else if( max_level * master_output < 1.1 )
+		else if( max_level * master_output < 1.0 )
 		{
 			p.setPen( QColor( 255, 192, 64 ) );
 		}
@@ -151,17 +134,20 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		}
 
 		const int xd = w / frames;
+
 		// now draw all that stuff
-		for( fpp_t frame = 0; frame < frames; ++frame )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+			int old_y = y_base +
+				(int)( mixer::clip( m_buffer[0][ch] )*half_h );
+			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				Uint16 cur_y = y_base +
-					(Uint16)( m_buffer[frame][ch] *
+				int cur_y = y_base + (int)(
+					mixer::clip( m_buffer[frame][ch] ) *
 								half_h );
-				Uint16 xp = x_base + frame * w / frames;
-				p.drawLine( xp, old_y[ch], xp+xd, cur_y );
-				old_y[ch] = cur_y;
+				const int xp = x_base + frame * w / frames;
+				p.drawLine( xp, old_y, xp+xd, cur_y );
+				old_y = cur_y;
 			}
 		}
 
