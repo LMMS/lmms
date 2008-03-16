@@ -76,19 +76,17 @@ signals:
 
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void modelChanged( void );
 
 
 private:
+	QPixmap m_bg;
 	ledCheckBox * m_bypass;
 	knob * m_wetDry;
 	tempoSyncKnob * m_autoQuit;
 	knob * m_gate;
-	QGroupBox * m_grouper;
-	QGroupBox * m_controls;
-	QLabel * m_label;
-	QPushButton * m_editButton;
 	QMdiSubWindow * m_subWindow;
 	effectControlDialog * m_controlView;
 	bool m_show;

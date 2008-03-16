@@ -32,6 +32,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
+#include <QtGui/QPainter>
 
 #include "audio_port.h"
 #include "caption_menu.h"
@@ -49,17 +50,13 @@
 
 effectView::effectView( effect * _model, QWidget * _parent ) :
 	pluginView( _model, _parent ),
+	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_show( TRUE )
 {
 	setFixedSize( 210, 60 );
 
-	QPixmap bg = embed::getIconPixmap( "effect_plugin" );
+	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
-	setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), bg );
-	setPalette( pal );
-	
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ) );
 	m_bypass->move( 3, 3 );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
@@ -94,24 +91,16 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 "while deciding when to stop processing signals." ) );
 
 
-	m_editButton = new QPushButton( tr( "Controls" ), this );
-	QFont f = m_editButton->font();
-	m_editButton->setFont( pointSize<7>( f ) );
-	m_editButton->setGeometry( 140, 14, 50, 20 );
-	connect( m_editButton, SIGNAL( clicked() ), 
-				this, SLOT( editControls() ) );
-		
-	m_label = new QLabel( this );
-	m_label->setText( getEffect()->publicName() );
-	f = m_label->font();
-	f.setBold( TRUE );
-	m_label->setFont( pointSize<7>( f ) );
-	m_label->setGeometry( 5, 44, 195, 10 );
-	
-	m_label->setAutoFillBackground( TRUE );
-	pal.setBrush( backgroundRole(), QPixmap::fromImage(
-					bg.toImage().copy( 5, 44, 195, 10 ) ) );
-	m_label->setPalette( pal );
+	if( getEffect()->getControls()->getControlCount() > 0 )
+	{
+		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
+									this );
+		QFont f = ctls_btn->font();
+		ctls_btn->setFont( pointSize<7>( f ) );
+		ctls_btn->setGeometry( 140, 14, 50, 20 );
+		connect( ctls_btn, SIGNAL( clicked() ), 
+					this, SLOT( editControls() ) );
+	}
 
 	m_controlView = getEffect()->getControls()->createView();
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
@@ -121,10 +110,6 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 	m_subWindow->hide();
 
-	if( getEffect()->getControls()->getControlCount() == 0 )
-	{
-		m_editButton->hide();
-	}
 
 	setWhatsThis( tr( 
 "Effect plugins function as a chained series of effects where the signal will "
@@ -155,7 +140,6 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 "Right clicking will bring up a context menu where you can change the order "
 "in which the effects are processed or delete an effect altogether." ) );
 
-//	m_port->getEffects()->appendEffect( m_effect );
 	setModel( _model );
 }
 
@@ -164,9 +148,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 effectView::~effectView()
 {
-//	m_port->getEffects()->removeEffect( m_effect );
-//	delete m_effect;
-	m_controlView->deleteLater();
+	delete m_subWindow;
 }
 
 
@@ -185,31 +167,6 @@ void effectView::editControls( void )
 		m_subWindow->hide();
 		m_show = TRUE;
 	}
-}
-
-
-
-
-void effectView::contextMenuEvent( QContextMenuEvent * )
-{
-	QPointer<captionMenu> contextMenu = new captionMenu(
-						getEffect()->publicName() );
-	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
-						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
-						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
-	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
-						this, SLOT( deletePlugin() ) );
-	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
-	contextMenu->exec( QCursor::pos() );
-	delete contextMenu;
 }
 
 
@@ -252,6 +209,46 @@ void effectView::closeEffects( void )
 	m_subWindow->hide();
 	m_show = TRUE;
 }
+
+
+
+void effectView::contextMenuEvent( QContextMenuEvent * )
+{
+	QPointer<captionMenu> contextMenu = new captionMenu(
+						getEffect()->publicName() );
+	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
+						tr( "Move &up" ),
+						this, SLOT( moveUp() ) );
+	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
+						tr( "Move &down" ),
+						this, SLOT( moveDown() ) );
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
+						tr( "&Remove this plugin" ),
+						this, SLOT( deletePlugin() ) );
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "help" ),
+						tr( "&Help" ),
+						this, SLOT( displayHelp() ) );
+	contextMenu->exec( QCursor::pos() );
+	delete contextMenu;
+}
+
+
+
+
+void effectView::paintEvent( QPaintEvent * )
+{
+	QPainter p( this );
+	p.drawPixmap( 0, 0, m_bg );
+
+	QFont f = pointSizeF( font(), 7.5f );
+	f.setBold( TRUE );
+	p.setFont( f );
+
+	p.drawText( 5, 52, getEffect()->publicName() );
+}
+
 
 
 void effectView::modelChanged( void )

@@ -1,5 +1,10 @@
 2008-03-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/effect_view.h:
+	* src/widgets/effect_view.cpp:
+	- fixed random crashes when removing effect-views
+	- improved painting of effect-view
+
 	* plugins/ladspa_effect/ladspa_controls.cpp:
 	fixed LADSPA-controls which internally were not linked per default
 	although they should be
