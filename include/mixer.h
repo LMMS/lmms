@@ -47,7 +47,7 @@ class midiClient;
 class audioPort;
 
 
-const fpp_t DEFAULT_BUFFER_SIZE = 512;
+const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
 const ch_cnt_t DEFAULT_CHANNELS = 2;
 
@@ -286,8 +286,10 @@ public:
 						const f_cnt_t _offset = 0 );
 #endif
 
-	float peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames );
-	float peakValueRight( surroundSampleFrame * _ab, const f_cnt_t _frames );
+	static float peakValueLeft( surroundSampleFrame * _ab,
+							const f_cnt_t _frames );
+	static float peakValueRight( surroundSampleFrame * _ab,
+							const f_cnt_t _frames );
 
 
 	bool criticalXRuns( void ) const;
@@ -300,7 +302,6 @@ public:
 
 public slots:
 	void setHighQuality( bool _hq_on = FALSE );
-	void setClipScaling( bool _state );
 
 
 signals:
@@ -339,12 +340,10 @@ private:
 	audioDevice * tryAudioDevices( void );
 	midiClient * tryMIDIClients( void );
 
-	void processBuffer( const surroundSampleFrame * _buf,
-						const fx_ch_t _fx_chnl );
-
-	void FASTCALL scaleClip( fpp_t _frame, ch_cnt_t _chnl );
 
 	const surroundSampleFrame * renderNextBuffer( void );
+
+
 
 	QVector<audioPort *> m_audioPorts;
 
@@ -359,11 +358,9 @@ private:
 	Uint8 m_analBuffer;
 	Uint8 m_poolDepth;
 
-	bool m_scaleClip;
 	surroundSampleFrame m_maxClip;
 	surroundSampleFrame m_previousSample;
 	fpp_t m_halfStart[SURROUND_CHANNELS];
-	bool m_clipped[SURROUND_CHANNELS];
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
 	

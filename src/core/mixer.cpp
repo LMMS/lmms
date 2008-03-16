@@ -175,9 +175,8 @@ private:
 		bool me = a->processEffects();
 		if( a->m_bufferUsage != audioPort::NoUsage || me )
 		{
-			m_mixer->processBuffer(
-					a->firstBuffer(),
-					a->nextFxChannel() );
+			engine::getFxMixer()->mixToChannel( a->firstBuffer(),
+							a->nextFxChannel() );
 			a->nextPeriod();
 		}
 		}
@@ -260,7 +259,10 @@ mixer::mixer( void ) :
 		}
 	}
 
-	setClipScaling( FALSE );
+	m_poolDepth = 2;
+	m_readBuffer = 0;
+	m_writeBuffer = 1;
+	m_analBuffer = 1;
 }
 
 
@@ -326,49 +328,6 @@ bool mixer::criticalXRuns( void ) const
 				engine::getSong()->realTimeTask() == TRUE ) );
 }
 
-
-
-
-void mixer::setClipScaling( bool _state )
-{
-	lock();
-
-	m_scaleClip = _state;
-
-	if( _state )
-	{
-		m_poolDepth = 3;
-		m_readBuffer = 0;
-		m_analBuffer = m_readBuffer + 1;
-		m_writeBuffer = m_poolDepth - 1;
-
-		for( ch_cnt_t chnl=0; chnl < m_audioDev->channels(); ++chnl )
-		{
-			m_clipped[chnl] = FALSE;
-			m_halfStart[chnl] = m_framesPerPeriod;
-			m_maxClip[chnl] = 1.0f;
-			m_previousSample[chnl] = 0.0;
-			m_newBuffer[chnl] = FALSE;
-		}
-		// FIXME: why assign buffer-ptr to m_readBuf just for calling
-		//        another method?
-		//        clearAudioBuffer(m_bufferPool[i],...) would do as well
-		for( Uint8 i = 0; i < 3; i++ )
-		{
-			m_readBuf = m_bufferPool[i];
-			clearAudioBuffer( m_readBuf, m_framesPerPeriod );
-		}
-	}
-	else
-	{
-		m_poolDepth = 2;
-		m_readBuffer = 0;
-		m_writeBuffer = 1;
-		m_analBuffer = 1;
-	}
-
-	unlock();
-}
 
 
 
@@ -594,15 +553,18 @@ if( COND_NPH )
 		else
 		{
 			bool more_effects = FALSE;
-			for( QVector<audioPort *>::iterator it = m_audioPorts.begin();
+			for( QVector<audioPort *>::iterator it =
+							m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
 			{
 				more_effects = ( *it )->processEffects();
-				if( ( *it )->m_bufferUsage != audioPort::NoUsage ||
+				if( ( *it )->m_bufferUsage !=
+							audioPort::NoUsage ||
 								more_effects )
 				{
-					processBuffer( ( *it )->firstBuffer(),
-							( *it )->nextFxChannel() );
+					engine::getFxMixer()->mixToChannel(
+							( *it )->firstBuffer(),
+						( *it )->nextFxChannel() );
 					( *it )->nextPeriod();
 				}
 			}
@@ -1002,88 +964,6 @@ midiClient * mixer::tryMIDIClients( void )
 	return( new midiDummy );
 }
 
-
-
-
-void mixer::processBuffer( const surroundSampleFrame * _buf, fx_ch_t _fx_chnl )
-{
-	// TODO: process according effect-channel
-	
-/*	if( m_scaleClip )
-	{
-		for( ch_cnt_t chnl=0; 
-			chnl < m_audioDev->channels(); 
-			++chnl )
-		{
-			m_newBuffer[chnl] = TRUE;
-		}
-	}*/
-	engine::getFxMixer()->mixToChannel( _buf, _fx_chnl );
-}
-
-
-
-
-void FASTCALL mixer::scaleClip( fpp_t _frame, ch_cnt_t _chnl )
-{
-	// Check for zero crossing
-	if( ( m_writeBuf[_frame][_chnl] >=0 &&
-		     m_previousSample[_chnl] < 0 ) ||
-		     ( m_writeBuf[_frame][_chnl] <=0 &&
-		     m_previousSample[_chnl] > 0 ) )
-	{
-		// if a clip occurred between the zero
-		// crossings, scale the half-wave
-		if( m_clipped[_chnl] )
-		{
-			if( m_newBuffer[_chnl] )
-			{
-				for( fpp_t i = m_halfStart[_chnl];
-					i < m_framesPerPeriod;
-					i++ )
-				{
-					m_bufferPool[m_analBuffer][i][_chnl] /=
-							m_maxClip[_chnl];
-				}
-					
-				for( fpp_t i = 0;
-					i < _frame;
-					i++ )
-				{
-					m_writeBuf[i][_chnl] /= 
-							m_maxClip[_chnl];
-				}
-			}
-			else
-			{
-				for( fpp_t i = m_halfStart[_chnl];
-					 i < _frame;
-					 i++ )
-				{
-					m_writeBuf[i][_chnl] /= m_maxClip[_chnl];
-				}
-			}
-		}
-		m_halfStart[_chnl] = _frame;
-		m_clipped[_chnl] = FALSE;
-		m_newBuffer[_chnl] = FALSE;
-		m_maxClip[_chnl] = 1.0;
-	}
-			
-	// check for clip
-	if( fabsf( m_writeBuf[_frame][_chnl] ) > 1.0f )
-	{
-		m_clipped[_chnl] = TRUE;
-		if( fabs( m_writeBuf[_frame][_chnl] ) >
-				  m_maxClip[_chnl] )
-		{
-			m_maxClip[_chnl] = fabs( 
-					m_writeBuf[_frame][_chnl] );
-		}
-	}
-			
-	m_previousSample[_chnl] = m_writeBuf[_frame][_chnl];
-}
 
 
 

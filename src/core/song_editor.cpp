@@ -136,17 +136,6 @@ songEditor::songEditor( song * _song ) :
 	engine::getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 
 
-	toolButton * cp_btn = new toolButton(
-					embed::getIconPixmap( "auto_limit" ),
-					      tr( "Auto limiter" ),
-					      NULL, NULL, tb );
-	cp_btn->setCheckable( TRUE );
-	connect( cp_btn, SIGNAL( toggled( bool ) ), engine::getMixer(),
-		 SLOT( setClipScaling( bool ) ) );
-	cp_btn->setFixedWidth( 30 );
-	engine::getMainWindow()->addWidgetToToolBar( cp_btn, 1, col + 1 );
-
-
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
