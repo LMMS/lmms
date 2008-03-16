@@ -60,6 +60,10 @@ struct fxChannel
 		engine::getMixer()->clearAudioBuffer( m_buffer,
 				engine::getMixer()->framesPerPeriod() );
 	}
+	~fxChannel()
+	{
+		delete[] m_buffer;
+	}
 
 	effectChain m_fxChain;
 	bool m_used;
@@ -71,6 +75,7 @@ struct fxChannel
 	floatModel m_volumeModel;
 	QString m_name;
 	QMutex m_lock;
+
 } ;
 
 
@@ -92,6 +97,10 @@ fxMixer::fxMixer() :
 
 fxMixer::~fxMixer()
 {
+	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	{
+		delete m_fxChannels[i];
+	}
 }
 
 

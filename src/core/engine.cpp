@@ -117,6 +117,12 @@ void engine::destroy( void )
 	s_pianoRoll = NULL;
 	delete s_automationEditor;
 	s_automationEditor = NULL;
+
+	delete s_fxMixerView;
+	s_fxMixerView = NULL;
+	delete s_fxMixer;
+	s_fxMixer = NULL;
+
 	delete s_ladspaManager;
 
 	presetPreviewPlayHandle::cleanUp();

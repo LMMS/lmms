@@ -1,3 +1,13 @@
+2008-03-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/engine.cpp:
+	* src/core/fx_mixer.cpp:
+	proper cleanup of fxMixer and its view at exit
+
+	* src/widgets/effect_view.cpp:
+	* data/themes/default/effect_plugin.png:
+	improved effect-view-artwork
+
 2008-03-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:
