@@ -1,5 +1,8 @@
 2008-03-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mixer.cpp:
+	fixed peak-calculation for negative signal-values
+
 	* include/effect_view.h:
 	* src/widgets/effect_view.cpp:
 	- fixed random crashes when removing effect-views

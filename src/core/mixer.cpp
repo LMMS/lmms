@@ -741,6 +741,10 @@ float mixer::peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames )
 		{
 			p = _ab[f][0];
 		}
+		else if( -_ab[f][0] > p )
+		{
+			p = -_ab[f][0];
+		}
 	}
 	return( p );
 }
@@ -756,6 +760,10 @@ float mixer::peakValueRight( surroundSampleFrame * _ab, const f_cnt_t _frames )
 		if( _ab[f][1] > p )
 		{
 			p = _ab[f][1];
+		}
+		else if( -_ab[f][1] > p )
+		{
+			p = -_ab[f][1];
 		}
 	}
 	return( p );
