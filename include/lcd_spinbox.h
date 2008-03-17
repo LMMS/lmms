@@ -64,6 +64,7 @@ public:
 
 public slots:
 	virtual void setEnabled( bool _on );
+	virtual void setMarginWidth( int _width );
 	virtual void update( void );
 
 
@@ -74,9 +75,11 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
 	virtual void paintEvent( QPaintEvent * _me );
+	
+	virtual void updateSize();
 
 private:
-	
+
 	static const int charsPerPixmap = 12;
 
 	QMap<int, QString> m_textForValue;
@@ -89,6 +92,7 @@ private:
 	int m_cellWidth;
 	int m_cellHeight;
 	int m_numDigits;
+	int m_marginWidth;
 
 	QPoint m_origMousePos;
 

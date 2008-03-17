@@ -1,0 +1,6 @@
+Makefile.in
+*.moc
+.libs
+embedded_resources.h
+.deps
+Makefile

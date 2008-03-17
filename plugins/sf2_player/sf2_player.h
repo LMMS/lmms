@@ -36,6 +36,7 @@
 #include "fluidsynth.h"
 
 class sf2InstrumentView;
+class sf2Font;
 class notePlayHandle;
 
 class patchesDialog;
@@ -51,12 +52,12 @@ public:
 	virtual void play( bool _try_parallelizing );
 
 	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
+			bool _try_parallelizing );
 	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
 
 
 	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+			QDomElement & _parent );
 	virtual void FASTCALL loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
@@ -71,12 +72,10 @@ public:
 		return( FALSE );
 	}
 
-
 	virtual bool supportsParallelizing( void ) const
 	{
 		return( FALSE );
 	}
-
 
 	virtual pluginView * instantiateView( QWidget * _parent );
 
@@ -87,21 +86,33 @@ public slots:
 
 
 private:
-	fluid_settings_t* m_settings;
+	static QMap<QString, sf2Font*> s_fonts;
+    static int (* s_origFree)( fluid_sfont_t * );
 
+	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
-	fluid_audio_driver_t* m_adriver;
-
 	int m_fontId;
-	QMutex m_notesRunningMutex;
-	int m_notesRunning[128];
-
-
 	QString m_filename;
+
+	// Protect the array of active notes
+	QMutex m_notesRunningMutex;
+
+	// Protect synth when we are re-creating it.
+	QMutex m_synthMutex;
+	int m_notesRunning[128];
 
 	lcdSpinBoxModel m_bankNum;
 	lcdSpinBoxModel m_patchNum;
+
+private:
+	// Our special callback functions
+	static int sfloaderFree( fluid_sfloader_t * _loader );
+	static fluid_sfont_t * sfloaderLoad(
+			fluid_sfloader_t * _loader, const char * _filename );
+	
+	static int sfloaderFreeFont( fluid_sfont_t * _soundFont );
+
 
 	friend class sf2InstrumentView;
 
@@ -110,6 +121,21 @@ signals:
 	void patchChanged( void );
 
 } ;
+
+
+
+// A soundfont in our font-map
+class sf2Font
+{
+public:
+	sf2Font( fluid_sfont_t * f ) :
+		fluidFont( f ),
+		refCount( 1 )
+	{};
+
+	fluid_sfont_t * fluidFont;
+	int refCount;
+};
 
 
 

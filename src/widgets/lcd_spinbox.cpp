@@ -4,6 +4,7 @@
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *                         Paul Giblock    <pgllama/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +35,6 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QStyleOptionFrameV2>
 
-
 #include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
@@ -43,29 +43,29 @@
 
 
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
-						const QString & _name ) :
+			const QString & _name ) :
 	QWidget( _parent ),
 	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
-{	
+{
 	setEnabled( TRUE );
 
 	setAccessibleName( _name );
 
 	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) );
 
-	int margin = 1; //QStyle::PM_DefaultFrameWidth;
-
 	m_cellWidth = m_lcdPixmap->size().width() / lcdSpinBox::charsPerPixmap;
 	m_cellHeight = m_lcdPixmap->size().height() / 2;
 
-	setFixedSize( m_cellWidth * (_num_digits+1)  + (2*margin),
-			m_cellHeight + (2*margin) );
+	m_marginWidth =  m_cellWidth / 2;
+
+	updateSize();
 }
 
-lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style, 
+
+lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
@@ -77,23 +77,22 @@ lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 
 	setAccessibleName( _name );
 
+	// We should make a factory for these or something.
 	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" +
 			_lcd_style ).toAscii().constData() ) );
-
-	int margin = 1; //QStyle::PM_DefaultFrameWidth;
 
 	m_cellWidth = m_lcdPixmap->size().width() / lcdSpinBox::charsPerPixmap;
 	m_cellHeight = m_lcdPixmap->size().height() / 2;
 
-	setFixedSize( m_cellWidth * (_num_digits+1)  + (2*margin),
-			m_cellHeight + (2*margin) );
+	m_marginWidth =  m_cellWidth / 2;
+
+	updateSize();
 }
-
-
 
 
 lcdSpinBox::~lcdSpinBox()
 {
+	delete m_lcdPixmap;
 }
 
 
@@ -102,17 +101,17 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 	QRect ur = _me->rect();
 
 	QPainter p( this );
-	
+
 	QSize cellSize( m_cellWidth, m_cellHeight );
 
 	QRect cellRect( 0, 0, m_cellWidth, m_cellHeight );
-	
-	int margin = 1;// QStyle::PM_DefaultFrameWidth;
-	int lcdWidth = m_cellWidth * (m_numDigits+1) + (margin*2);
+
+	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
+	int lcdWidth = m_cellWidth * m_numDigits + (margin*m_marginWidth)*2;
 
 	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
 	p.save();
-	
+
 	p.translate( margin, margin );
 
 	// Left Margin
@@ -120,8 +119,8 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 			QRect( QPoint( charsPerPixmap*m_cellWidth, 
 				isEnabled()?0:m_cellHeight ), 
 			cellSize ) );
-	
-	p.translate( (m_cellWidth+1) / 2, 0 );
+
+	p.translate( m_marginWidth, 0 );
 
 	// Padding
 	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
@@ -150,7 +149,7 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 	}
 
 	// Right Margin
-	p.drawPixmap( QRect( 0, 0, m_cellWidth / 2, m_cellHeight ), *m_lcdPixmap, 
+	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap, 
 			QRect( charsPerPixmap*m_cellWidth, isEnabled()?0:m_cellHeight,
 				m_cellWidth / 2, m_cellHeight ) );
 
@@ -161,7 +160,7 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 	QStyleOptionFrame opt;
 	opt.initFrom( this );
 	opt.state = QStyle::State_Sunken;
-	opt.rect = QRect( 0, 0, m_cellWidth * (m_numDigits+1) + (margin*2), 
+	opt.rect = QRect( 0, 0, m_cellWidth * m_numDigits + (margin+m_marginWidth)*2 - 1,
 			m_cellHeight + (margin*2) );
 
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
@@ -185,7 +184,6 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 }
 
 
-
 void lcdSpinBox::update( void )
 {
 	QString s = m_textForValue[model()->value()];
@@ -201,28 +199,18 @@ void lcdSpinBox::update( void )
 		*/
 	}
 	m_display = s;
-	
+
 	QWidget::update();
 }
-
-
 
 
 void lcdSpinBox::setLabel( const QString & _txt )
 {
 	int margin = 1;
 	m_label = _txt;
-	
-	setFixedSize( m_cellWidth * (m_numDigits+1)  + (2*margin),
-			m_cellHeight + (2*margin) );
 
-	setFixedSize( tMax<int>( m_cellWidth*(m_numDigits+1) + (2*margin),
-				QFontMetrics( pointSize<6>( font() ) ).width( m_label ) ),
-			m_cellHeight + (2*margin) + 10 );
-	update();
+    updateSize();
 }
-
-
 
 
 void lcdSpinBox::setEnabled( bool _on )
@@ -231,6 +219,30 @@ void lcdSpinBox::setEnabled( bool _on )
 }
 
 
+void lcdSpinBox::setMarginWidth( int _width )
+{
+	m_marginWidth = _width;
+
+	updateSize();
+}
+
+
+void lcdSpinBox::updateSize()
+{
+	int margin = 1;
+	if (m_label.isEmpty()) {
+		setFixedSize( m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
+				m_cellHeight + (2*margin) );
+	}
+	else {
+		setFixedSize( tMax<int>(
+				m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
+				QFontMetrics( pointSize<6>( font() ) ).width( m_label ) ),
+				m_cellHeight + (2*margin) + 10 );
+	}
+
+	update();
+}
 
 
 void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
@@ -258,8 +270,6 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 }
 
 
-
-
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton && _me->y() < m_cellHeight + 2  )
@@ -269,8 +279,6 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 		model()->prepareJournalEntryFromOldVal();
 	}
 }
-
-
 
 
 void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
@@ -289,8 +297,6 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 }
 
 
-
-
 void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 {
 	model()->addJournalEntryFromOldToCurVal();
@@ -300,8 +306,6 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 }
 
 
-
-
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
@@ -309,7 +313,6 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step() );
 	emit manualChange();
 }
-
 
 
 

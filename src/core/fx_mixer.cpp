@@ -369,7 +369,9 @@ fxMixerView::fxMixerView() :
 		lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
 		l->model()->setRange( i, i );
 		l->model()->setValue( i );
-		l->update();
+		l->move( 2, 4 );
+		l->setMarginWidth( 1 );
+
 		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
 								cv->m_fxLine );
 		cv->m_fader->move( 15-cv->m_fader->width()/2, 80 );

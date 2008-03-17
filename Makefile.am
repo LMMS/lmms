@@ -180,6 +180,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp			\
 		$(srcdir)/src/core/ladspa_manager.cpp			\
 		$(srcdir)/src/core/ladspa_control.cpp			\
+		$(srcdir)/src/core/lmms_style.cpp			\
 		$(srcdir)/src/core/main_window.cpp			\
 		$(srcdir)/src/core/main.cpp				\
 		$(srcdir)/src/core/meter_dialog.cpp			\

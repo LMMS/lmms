@@ -22,6 +22,7 @@
  *
  */
 
+#include <QTextStream>
 
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
@@ -65,6 +66,14 @@ plugin::descriptor sf2player_plugin_descriptor =
 }
 
 
+// Static map of current sfonts
+QMap<QString, sf2Font*> sf2Instrument::s_fonts;
+
+// Static functor to fluid's built-in free function.  Used when we want
+// to really delete the soundfont, instead of just changing refCount
+int (* sf2Instrument::s_origFree)( fluid_sfont_t * );
+
+
 sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_fontId( 0 ),
@@ -75,50 +84,52 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	for( int i = 0; i < 128; ++i )
 	{
 		m_notesRunning[i] = 0;
-	} 
+	}
+
 	m_settings = new_fluid_settings();
 
-	/* Set the synthesizer settings, if necessary */
-
-
+	// This is just our starting instance of synth.  It is recreated
+	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
+	// Install our callbacks
+	fluid_sfloader_t * pLoader
+		= (fluid_sfloader_t *) malloc( sizeof( fluid_sfloader_t ) );
 
-	//fluid_settings_setstr(settings, "audio.driver", "jack");
-
-	//adriver = new_fluid_audio_driver(settings, synth);
+	pLoader->data = (void *) this;
+	pLoader->load = sf2Instrument::sfloaderLoad;
+	pLoader->free = sf2Instrument::sfloaderFree;
+	fluid_synth_add_sfloader( m_synth, pLoader );
 
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ),
-				this, SLOT( updatePatch() ) );
+			this, SLOT( updatePatch() ) );
 
 	connect( &m_patchNum, SIGNAL( dataChanged() ),
-				this, SLOT( updatePatch() ) );
-}
+			this, SLOT( updatePatch() ) );
 
+}
 
 
 
 sf2Instrument::~sf2Instrument()
 {
-    engine::getMixer()->removePlayHandles( getInstrumentTrack() );
-    delete_fluid_synth( m_synth );
-    delete_fluid_settings( m_settings );
+	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+	delete_fluid_synth( m_synth );
+	delete_fluid_settings( m_settings );
 }
 
 
 
-
 void sf2Instrument::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+			QDomElement & _this )
 {
 	_this.setAttribute( "src", m_filename );
 	m_patchNum.saveSettings( _doc, _this, "patch" );
 	m_bankNum.saveSettings( _doc, _this, "bank" );
 }
-
 
 
 
@@ -131,41 +142,68 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-
 QString sf2Instrument::nodeName( void ) const
 {
 	return( sf2player_plugin_descriptor.name );
 }
 
 
+
 void sf2Instrument::openFile( const QString & _sf2File )
 {
-	if( m_filename != "")
+	// Remove synth from this fluidSynth (but not necessarily memory)
+	if ( m_filename != "" )
 	{
-		fluid_synth_sfunload( m_synth, m_fontId, TRUE);
+		// Recreate synth
+		m_synthMutex.lock();
+		delete_fluid_synth( m_synth );
+		m_synth = new_fluid_synth( m_settings );
+		m_synthMutex.unlock();
+
+		// No need to explicitly delete font.  Deleting fluidSynth calls free
+		// on all fonts.  This, causes sfloaderFreeFont to run.
 	}
 
-	m_fontId = fluid_synth_sfload( m_synth, _sf2File.toLocal8Bit(), TRUE );
+	const char * sf2Ascii = qPrintable( _sf2File );
+	m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
 
-	if( m_fontId >= 0)
+	QString sf2Key = qPrintable( _sf2File );
+
+	// Add to map, if doesn't exist.  
+	// We can't do this in callback because fluid hasn't created the sfont yet
+	if( !s_fonts.contains( sf2Key ) && fluid_synth_sfcount( m_synth ) > 0 )
 	{
-		m_patchNum.setValue(0);
-		m_bankNum.setValue(0);
+		// Grab this sf from the top of the stack
+		fluid_sfont_t * sfont = fluid_synth_get_sfont( m_synth, 0 );
+
+		// Hold on to real free function for executing later.
+		s_origFree = sfont->free;
+		sfont->free = sf2Instrument::sfloaderFreeFont;
+
+		// Finally, add font
+		s_fonts.insert( sf2Key, new sf2Font( sfont ) );
+	}
+
+	if( m_fontId >= 0 )
+	{
+		m_patchNum.setValue( 0 );
+		m_bankNum.setValue( 0 );
 		m_filename = _sf2File;
 
 		emit fileChanged();
 	}
 }
 
+
+
 void sf2Instrument::updatePatch( void )
 {
-	printf("update patch\n");
 	if( m_bankNum.value() >= 0 && m_patchNum.value() >= 0 ) {
 		fluid_synth_program_select( m_synth, 1, m_fontId,
 				m_bankNum.value(), m_patchNum.value() );
 	}
 }
-	
+
 
 
 void sf2Instrument::playNote( notePlayHandle * _n, bool )
@@ -174,7 +212,8 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool )
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	int midiNote = (int)floor( ( log2( _n->frequency() ) - LOG440 ) * 12+69-58)+0.5;
+	int midiNote = (int)floor( 12 * ( log2( _n->frequency() ) - LOG440 ) - 4 );
+
 	// out of range?
 	if( midiNote <= 0 || midiNote >= 128 )
 	{
@@ -184,18 +223,21 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool )
 	if ( tfp == 0 )
 	{
 		_n->m_pluginData = new int( midiNote );
+
+		m_synthMutex.lock();
 		fluid_synth_noteon( m_synth, 1, midiNote, _n->getVolume() );
+		m_synthMutex.unlock();
+
 		m_notesRunningMutex.lock();
 		++m_notesRunning[midiNote];
 		m_notesRunningMutex.unlock();
 	}
 	else if( _n->released() )
 	{
-        // Doesn't happen with release frames = 0
+		// Doesn't happen with release frames = 0
 	}
 
 }
-
 
 
 
@@ -205,13 +247,78 @@ void sf2Instrument::play( bool _try_parallelizing )
 
 	sampleFrame * buf = new sampleFrame[frames];
 
-	// Assumes stereo and float sample_t
-
+	m_synthMutex.lock();
 	fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+	m_synthMutex.unlock();
 
 	getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
 
 	delete[] buf;
+}
+
+
+
+int sf2Instrument::sfloaderFree( fluid_sfloader_t * _loader )
+{
+	if( _loader != NULL )
+	{
+		free( _loader );
+	}
+	return 0;
+}
+
+
+
+int sf2Instrument::sfloaderFreeFont( fluid_sfont_t * _sfont )
+{
+	QString key = QString( _sfont->get_name(_sfont) );
+
+	sf2Font * f = sf2Instrument::s_fonts[key];
+
+	--(f->refCount);
+
+	// No more references
+	if( f->refCount <= 0 )
+	{
+		QTextStream cout( stdout, QIODevice::WriteOnly );
+		cout << "Really deleting " << key << endl;
+
+		sf2Instrument::s_fonts.remove( key );
+		delete f;
+
+		// Let fluidsynth free the font, as if we were not here
+		return s_origFree( _sfont );
+	}
+
+	// Make fluid think we freed the sfont
+	return 0;
+}
+
+
+
+fluid_sfont_t * sf2Instrument::sfloaderLoad(
+		fluid_sfloader_t * _loader, const char *_filename )
+{
+	if( _loader == NULL )
+	{
+		return NULL;
+	}
+
+	QString filename = _filename;
+
+	if( sf2Instrument::s_fonts.contains( filename ) )
+	{
+		QTextStream cout( stdout, QIODevice::WriteOnly );
+		cout << "Using existing reference to " << filename << endl;
+
+		sf2Font * font = sf2Instrument::s_fonts[ filename ];
+
+		font->refCount++;
+		return font->fluidFont;
+	}
+
+	// fluidsynth will call next (default) loader...
+	return NULL;
 }
 
 
@@ -224,7 +331,9 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 	m_notesRunningMutex.unlock();
 	if( n <= 0 )
 	{
+		m_synthMutex.lock();
 		fluid_synth_noteoff( m_synth, 1, *midiNote );
+		m_synthMutex.unlock();
 	}
 
 	delete midiNote;
@@ -238,9 +347,8 @@ pluginView * sf2Instrument::instantiateView( QWidget * _parent )
 
 
 
-
 sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
-							QWidget * _parent ) :
+			QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
 	QVBoxLayout * vl = new QVBoxLayout( this );
@@ -250,36 +358,36 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	m_fileDialogButton = new pixmapButton( this, NULL );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_fileDialogButton->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
+			"project_open_down" ) );
 	m_fileDialogButton->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
+			"project_open" ) );
 	connect( m_fileDialogButton, SIGNAL( clicked() ),
-				this, SLOT( showFileDialog() ) );
+			this, SLOT( showFileDialog() ) );
 	toolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
 
 	m_fileDialogButton->setWhatsThis(
-		tr( "Click here to open another SF2 file" ) );
+			tr( "Click here to open another SF2 file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new pixmapButton( this, NULL );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_patchDialogButton->setActiveGraphic( embed::getIconPixmap(
-							"track_op_menu" ) );
+			"track_op_menu" ) );
 	m_patchDialogButton->setInactiveGraphic( embed::getIconPixmap(
-							"track_op_menu" ) );
+			"track_op_menu" ) );
 	connect( m_patchDialogButton, SIGNAL( clicked() ),
-				this, SLOT( showPatchDialog() ) );
+			this, SLOT( showPatchDialog() ) );
 	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
 
 
 	// LCDs
 	m_bankNumLcd = new lcdSpinBox( 3, this, "Bank" );
-	m_bankNumLcd->setLabel( "Bank:" );
+	m_bankNumLcd->setLabel( "BANK" );
 	m_bankNumLcd->addTextForValue( -1, "---" );
 	m_bankNumLcd->setEnabled( FALSE );
 
 	m_patchNumLcd = new lcdSpinBox( 3, this, "Patch" );
-	m_patchNumLcd->setLabel( "Patch:" );
+	m_patchNumLcd->setLabel( "PATCH" );
 	m_patchNumLcd->addTextForValue( -1, "---" );
 	m_patchNumLcd->setEnabled( FALSE );
 
@@ -293,17 +401,16 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	// Next row
 
 	hl = new QHBoxLayout();
-	
-	m_filenameLabel = new QLabel( this );
-	
-	hl->addWidget( m_filenameLabel );
 
+	m_filenameLabel = new QLabel( this );
+
+	hl->addWidget( m_filenameLabel );
 	vl->addLayout( hl );
 
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-								"artwork" ) );
+			"artwork" ) );
 	setPalette( pal );
 
 	updateFilename();
@@ -311,10 +418,10 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 
 
 
-
 sf2InstrumentView::~sf2InstrumentView()
 {
 }
+
 
 
 void sf2InstrumentView::modelChanged( void )
@@ -324,20 +431,22 @@ void sf2InstrumentView::modelChanged( void )
 	m_patchNumLcd->setModel( &k->m_patchNum );
 
 	connect(k, SIGNAL( fileChanged( void ) ),
-		this, SLOT( updateFilename( void ) ) );
-	
+			this, SLOT( updateFilename( void ) ) );
+
 	updateFilename();
 
 }
 
 
+
 void sf2InstrumentView::updateFilename( void )
 {
-	m_filenameLabel->setText("File: " + 
+	m_filenameLabel->setText( "File: " +
 		castModel<sf2Instrument>()->m_filename +
-		"\nPatch: TODO");
+		"\nPatch: TODO" );
 	update();
 }
+
 
 
 void sf2InstrumentView::showFileDialog( void )
@@ -361,7 +470,7 @@ void sf2InstrumentView::showFileDialog( void )
 			if( QFileInfo( f ).exists() == FALSE )
 			{
 				f = configManager::inst()->factorySamplesDir() +
-								k->m_filename;
+						k->m_filename;
 			}
 		}
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -381,25 +490,28 @@ void sf2InstrumentView::showFileDialog( void )
 			engine::getSong()->setModified();
 		}
 	}
-
-
 }
 
+
+
+// Single instance of the patch dialog
 patchesDialog * sf2InstrumentView::s_patchDialog = NULL;
 
 void sf2InstrumentView::showPatchDialog( void ) {
 
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	if( s_patchDialog == NULL ) {
-		printf("Creating patchDialog\n");
-		s_patchDialog = new patchesDialog(this);
+	if( s_patchDialog == NULL )
+	{
+		s_patchDialog = new patchesDialog( this );
 	}
-    s_patchDialog->setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
+
+	s_patchDialog->setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
 		&k->m_bankNum, &k->m_patchNum );
-    
+
 	s_patchDialog->exec();
 }
+
 
 
 extern "C"
@@ -409,7 +521,7 @@ extern "C"
 plugin * lmms_plugin_main( model *, void * _data )
 {
 	return( new sf2Instrument(
-				static_cast<instrumentTrack *>( _data ) ) );
+			static_cast<instrumentTrack *>( _data ) ) );
 }
 
 

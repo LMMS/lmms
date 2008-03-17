@@ -39,6 +39,11 @@ public:
 	virtual ~lmmsStyle() 
 	{
 	}
+
+	virtual void drawPrimitive( PrimitiveElement element, const QStyleOption *option,
+			QPainter *painter, const QWidget *widget = 0 ) const;
+
+
 };
 
 #endif
