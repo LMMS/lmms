@@ -13,7 +13,7 @@
 	* src/core/lmms_style.cpp:
 	* include/lmms_style.h:
 	- Re-added lmmsStyle. I don't know why these files disappeared
-	- Getting ready to draw pretty borders
+	- Improve appearance of sunken borders
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
@@ -24,7 +24,7 @@
 	the synth due to a file load.
 
 	* src/widgets/combobox.cpp:
-	Draw styled border.  Don't worry, the style will be improved
+	Draw styled border.
 
 	* src/core/fx_mixer.cpp:
 	Improved drawing of LCD Channel numbers.

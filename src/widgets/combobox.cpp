@@ -165,17 +165,20 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	for( int x = 1; x < width() - 1; x += s_background->width() )
-	{
-		p.drawPixmap( x, 1, *s_background );
-	}
+	p.fillRect( 2, 2, width()-2, height()-4, *s_background );
+	
+	QColor shadow = palette().shadow().color();
+	QColor highlight = palette().highlight().color();
+
+	shadow.setAlpha(124);
+	highlight.setAlpha(124);
 
 	// button-separator
-	p.setPen( palette().color( QPalette::Normal, QPalette::Dark ) );
+	p.setPen( shadow );
 	p.drawLine( width() - CB_ARROW_BTN_WIDTH - 1, 1, width() -
 					CB_ARROW_BTN_WIDTH - 1, height() - 3 );
 
-	p.setPen( palette().color( QPalette::Normal, QPalette::Mid ) );
+	p.setPen( highlight );
 	p.drawLine( width() - CB_ARROW_BTN_WIDTH, 1, width() -
 					CB_ARROW_BTN_WIDTH, height() - 3 );
 
