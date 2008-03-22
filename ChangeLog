@@ -1,5 +1,15 @@
 2008-03-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/themes/default/main_toolbar_bg.png:
+	* data/themes/default/toolbar_bg.png:
+	made toolbar-backgrounds a bit more blue-ish
+
+	* src/core/main.cpp:
+	tuned colors a bit
+
+	* src/core/fx_mixer.cpp:
+	moved effect-chain to right side of window
+
 	* src/core/ladspa_control.cpp:
 	added missing break in switch which made a lot of messages appear in
 	console when time-based knobs were used by LADSPA-plugins
