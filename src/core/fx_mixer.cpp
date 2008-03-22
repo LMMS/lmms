@@ -248,7 +248,7 @@ public:
 		m_mv( _mv ),
 		m_name( _name )
 	{
-		setFixedSize( 32, 200 );
+		setFixedSize( 32, 232 );
 		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 	}
 
@@ -317,14 +317,12 @@ fxMixerView::fxMixerView() :
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	setPalette( pal );
 	setAutoFillBackground( TRUE );
-	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Minimum );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 
-//	setFixedHeight( 250+216 );
 	setWindowTitle( tr( "FX-Mixer" ) );
 //	setWindowIcon( embed::getIconPixmap( "fxmixer" ) );
 
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	QVBoxLayout * ml = new QVBoxLayout;
+	QHBoxLayout * ml = new QHBoxLayout;
 	ml->setMargin( 0 );
 	ml->setSpacing( 0 );
 
@@ -332,7 +330,7 @@ fxMixerView::fxMixerView() :
 	a->setFrameShape( QFrame::NoFrame );
 	a->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	a->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-	a->setFixedHeight( 216 );
+	a->setFixedHeight( 250 );
 	ml->addWidget( a );
 
 	QWidget * base = new QWidget;
@@ -341,7 +339,7 @@ fxMixerView::fxMixerView() :
 	bl->setMargin( 0 );
 	a->setWidget( base );
 
-	base->setFixedSize( (NumFxChannels+1)*33+6+10, 200 );
+	base->setFixedSize( (NumFxChannels+1)*33+6+10, 236 );
 	pal = base->palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	base->setPalette( pal );
@@ -349,6 +347,7 @@ fxMixerView::fxMixerView() :
 
 
 	m_fxRackArea = new QWidget;
+	ml->addSpacing( 10 );
 	ml->addWidget( m_fxRackArea );
 	setLayout( ml );
 
@@ -374,7 +373,8 @@ fxMixerView::fxMixerView() :
 
 		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
 								cv->m_fxLine );
-		cv->m_fader->move( 15-cv->m_fader->width()/2, 80 );
+		cv->m_fader->move( 15-cv->m_fader->width()/2,
+						cv->m_fxLine->height()-130 );
 		cv->m_rackView = new effectRackView(
 				&m->m_fxChannels[i]->m_fxChain, NULL );
 		fxl->addWidget( cv->m_rackView );
