@@ -249,7 +249,7 @@ void midiClientRaw::parseData( const Uint8 _c )
 		case PROGRAM_CHANGE:
 		case CHANNEL_PRESSURE:
 			m_midiParseData.m_midiEvent.m_data.m_param[0] =
-				m_midiParseData.m_buffer[0] - NOTES_PER_OCTAVE;
+				m_midiParseData.m_buffer[0] - KeysPerOctave;
 			m_midiParseData.m_midiEvent.m_data.m_param[1] =
 						m_midiParseData.m_buffer[1];
 			break;
@@ -300,7 +300,7 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 			{
 				sendByte( _me.m_type | _port->outputChannel() );
 				sendByte( _me.m_data.m_param[0] +
-							NOTES_PER_OCTAVE );
+							KeysPerOctave );
 				sendByte( tLimit( (int) _me.m_data.m_param[1],
 								0, 127 ) );
 			}
@@ -310,7 +310,7 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 				{
 					sendByte( _me.m_type | i );
 					sendByte( _me.m_data.m_param[0] +
-							NOTES_PER_OCTAVE );
+							KeysPerOctave );
 					sendByte( tLimit( (int)
 						_me.m_data.m_param[1],
 								0, 127 ) );

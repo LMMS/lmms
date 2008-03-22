@@ -2,7 +2,7 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,45 +37,45 @@
 class detuningHelper;
 
 
-enum tones
+enum Keys
 {
-	C = 0,
-	CIS = 1, DES = 1,
-	D = 2,
-	DIS = 3, ES = 3,
-	E = 4, FES = 4,
-	F = 5,
-	FIS = 6, GES = 6,
-	G = 7,
-	GIS = 8, AS = 8,
-	A = 9,
-	AIS = 10, B = 10,
-	H = 11 
+	Key_C = 0,
+	Key_CIS = 1, Key_DES = 1,
+	Key_D = 2,
+	Key_DIS = 3, Key_ES = 3,
+	Key_E = 4, Key_FES = 4,
+	Key_F = 5,
+	Key_FIS = 6, Key_GES = 6,
+	Key_G = 7,
+	Key_GIS = 8, Key_AS = 8,
+	Key_A = 9,
+	Key_AIS = 10, Key_B = 10,
+	Key_H = 11 
 } ;
 
 
-enum octaves
+enum Octaves
 {
-	OCTAVE_0,
-	OCTAVE_1,
-	OCTAVE_2,
-	OCTAVE_3,
-	OCTAVE_4,	// default
-	OCTAVE_5,
-	OCTAVE_6,
-	OCTAVE_7,
-	OCTAVE_8
+	Octave_0,
+	Octave_1,
+	Octave_2,
+	Octave_3,
+	Octave_4, DefaultOctave = Octave_4,
+	Octave_5,
+	Octave_6,
+	Octave_7,
+	Octave_8,
+	NumOctaves
 } ;
 
-const octaves DEFAULT_OCTAVE = OCTAVE_4;
-const octaves MIN_OCTAVE = OCTAVE_0;
-const octaves MAX_OCTAVE = OCTAVE_8;
 
-const int WHITE_KEYS_PER_OCTAVE	= 7;
-const int BLACK_KEYS_PER_OCTAVE	= 5;
-const int NOTES_PER_OCTAVE = WHITE_KEYS_PER_OCTAVE + BLACK_KEYS_PER_OCTAVE;
-const int OCTAVES = MAX_OCTAVE+1;
-const int NOTES = OCTAVES*NOTES_PER_OCTAVE;
+const int WhiteKeysPerOctave = 7;
+const int BlackKeysPerOctave = 5;
+const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
+const int NumKeys = NumOctaves * KeysPerOctave;
+const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
+
+const float MaxDetuning = 4 * 12.0f;
 
 
 
@@ -84,21 +84,18 @@ class note : public journallingObject
 public:
 	note( const midiTime & _length = 0,
 		const midiTime & _pos = 0,
-		tones _tone = A,
-		octaves _octave = DEFAULT_OCTAVE,
-		volume _volume = DEFAULT_VOLUME,
-		panning _panning = DEFAULT_PANNING,
+		int key = DefaultKey,
+		volume _volume = DefaultVolume,
+		panning _panning = DefaultPanning,
 		detuningHelper * _detuning = NULL ) FASTCALL;
 	note( const note & _note );
 	virtual ~note();
 
 	void FASTCALL setLength( const midiTime & _length );
 	void FASTCALL setPos( const midiTime & _pos );
-	void FASTCALL setTone( const tones _tone = C );
-	void FASTCALL setOctave( const octaves _octave = DEFAULT_OCTAVE );
 	void FASTCALL setKey( const int _key );
-	void FASTCALL setVolume( const volume _volume = DEFAULT_VOLUME );
-	void FASTCALL setPanning( const panning _panning = DEFAULT_PANNING );
+	void FASTCALL setVolume( const volume _volume = DefaultVolume );
+	void FASTCALL setPanning( const panning _panning = DefaultPanning );
 	void FASTCALL quantizeLength( const int _q_grid );
 	void FASTCALL quantizePos( const int _q_grid );
 
@@ -122,19 +119,9 @@ public:
 		return( m_pos - _base_pos );
 	}
 
-	inline tones tone( void ) const
-	{
-		return( m_tone );
-	}
-
-	inline octaves octave( void ) const
-	{
-		return( m_octave );
-	}
-
 	inline int key( void ) const
 	{
-		return( m_octave * NOTES_PER_OCTAVE + m_tone );
+		return( m_key );
 	}
 
 	inline volume getVolume( void ) const
@@ -180,17 +167,17 @@ protected:
 
 
 private:
-	enum actions
+	enum Actions
 	{
-		CHANGE_KEY, CHANGE_VOLUME, CHANGE_PANNING,
-		CHANGE_LENGTH, CHANGE_POSITION
+		ChangeKey,
+		ChangeVolume,
+		ChangePanning,
+		ChangeLength,
+		ChangePosition
 	} ;
 
-	static const float MAX_DETUNING;
 
-
-	tones m_tone;
-	octaves m_octave;
+	int m_key;
 	volume m_volume;
 	panning m_panning;
 	midiTime m_length;

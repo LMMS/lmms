@@ -569,7 +569,7 @@ if( COND_NPH )
 				}
 			}
 		}
-		for( int i = 1; i < NUM_FX_CHANNELS+1; ++i )
+		for( int i = 1; i < NumFxChannels+1; ++i )
 		{
 			engine::getFxMixer()->processChannel( i );
 		}

@@ -77,11 +77,11 @@ instrumentMidiIO::instrumentMidiIO( instrumentTrack * _instrument_track,
 	updateOutputChannel();
 
 
-	const midiPort::modes m = m_midiPort->mode();
-	m_receiveEnabledModel.setValue( m == midiPort::INPUT ||
-							m == midiPort::DUPLEX );
-	m_sendEnabledModel.setValue( m == midiPort::OUTPUT ||
-							m == midiPort::DUPLEX );
+	const midiPort::Modes m = m_midiPort->mode();
+	m_receiveEnabledModel.setValue( m == midiPort::Input ||
+							m == midiPort::Duplex );
+	m_sendEnabledModel.setValue( m == midiPort::Output ||
+							m == midiPort::Duplex );
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
@@ -240,10 +240,10 @@ void instrumentMidiIO::updateDefaultVelOut( void )
 void instrumentMidiIO::updateMidiPortMode( void )
 {
 	// this small lookup-table makes everything easier
-	static const midiPort::modes modeTable[2][2] =
+	static const midiPort::Modes modeTable[2][2] =
 	{
-		{ midiPort::DUMMY, midiPort::OUTPUT },
-		{ midiPort::INPUT, midiPort::DUPLEX }
+		{ midiPort::Disabled, midiPort::Output },
+		{ midiPort::Input, midiPort::Duplex }
 	} ;
 	m_midiPort->setMode( modeTable[m_receiveEnabledModel.value()]
 					[m_sendEnabledModel.value()] );
@@ -341,8 +341,8 @@ void instrumentMidiIO::activatedReadablePort(
 {
 	// make sure, MIDI-port is configured for input
 	if( _port.second == TRUE &&
-		m_midiPort->mode() != midiPort::INPUT &&
-		m_midiPort->mode() != midiPort::DUPLEX )
+		m_midiPort->mode() != midiPort::Input &&
+		m_midiPort->mode() != midiPort::Duplex )
 	{
 		m_receiveEnabledModel.setValue( TRUE );
 	}
@@ -358,8 +358,8 @@ void instrumentMidiIO::activatedWriteablePort(
 {
 	// make sure, MIDI-port is configured for output
 	if( _port.second == TRUE &&
-		m_midiPort->mode() != midiPort::OUTPUT &&
-		m_midiPort->mode() != midiPort::DUPLEX )
+		m_midiPort->mode() != midiPort::Output &&
+		m_midiPort->mode() != midiPort::Duplex )
 	{
 		m_sendEnabledModel.setValue( TRUE );
 	}

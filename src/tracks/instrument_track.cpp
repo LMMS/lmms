@@ -106,11 +106,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
-	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1, this ),
-			m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
-					1.0f, this ),
-			m_surroundAreaModel( this, this ),
-			m_effectChannelModel( 0, 0, NUM_FX_CHANNELS, 1, this ),
+	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, 1, this ),
+        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this ),
+        m_surroundAreaModel( this, this ),
+        m_effectChannelModel( 0, 0, NumFxChannels, 1, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
@@ -119,7 +118,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_piano( this )
 {
 	m_baseNoteModel.setTrack( this );
-	m_baseNoteModel.setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
+	m_baseNoteModel.setInitValue( DefaultKey );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
 
@@ -127,7 +126,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_effectChannelModel.setTrack( this );
 
 
-	for( int i = 0; i < NOTES; ++i )
+	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 	}
@@ -177,7 +176,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		return;
 	}
-	float v_scale = (float) getVolume() / DEFAULT_VOLUME;
+	float v_scale = (float) getVolume() / DefaultVolume;
 	
 	m_audioPort.getEffects()->startRunning();
 
@@ -187,7 +186,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	if( _n != NULL )
 	{
 		m_soundShaping.processAudioBuffer( _buf, _frames, _n );
-		v_scale *= ( (float) _n->getVolume() / DEFAULT_VOLUME );
+		v_scale *= ( (float) _n->getVolume() / DefaultVolume );
 	}
 	volumeVector v = m_surroundAreaModel.getVolumeVector( v_scale );
 
@@ -254,7 +253,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					midiTime( static_cast<f_cnt_t>(
 						n->totalFramesPlayed() /
 						engine::framesPerTact64th() ) ),
-					0, n->tone(), n->octave(),
+					0, n->key(),
 					n->getVolume(), n->getPanning() );
 				if( _lock )
 				{
@@ -284,19 +283,6 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 		case PITCH_BEND:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
-
-/*		case PITCH_BEND:
-			if( m_pitchBendKnob != NULL )
-			{
-				float range = tAbs(
-						m_pitchBendKnob->maxValue() -
-						m_pitchBendKnob->minValue() );
-				m_pitchBendKnob->setValue(
-						m_pitchBendKnob->minValue() +
-						_me.m_data.m_param[0] *
-								range / 16384 );
-			}
-			break;*/
 
 		default:
 			printf( "instrument-track: unhandled MIDI-event %d\n",
@@ -442,7 +428,7 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 		note done_note( midiTime( static_cast<f_cnt_t>(
 						_n->totalFramesPlayed() /
 						engine::framesPerTact64th() ) ),
-					0, _n->tone(), _n->octave(),
+					0, _n->key(),
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
 		m_notes[_n->key()] = NULL;
@@ -478,7 +464,7 @@ void instrumentTrack::setName( const QString & _new_name )
 
 
 
-void instrumentTrack::updateBaseNote( /* bool _modified*/ void )
+void instrumentTrack::updateBaseNote( void )
 {
 	engine::getMixer()->lock();
 	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
@@ -487,11 +473,6 @@ void instrumentTrack::updateBaseNote( /* bool _modified*/ void )
 		( *it )->updateFrequency();
 	}
 	engine::getMixer()->unlock();
-/*
-	if( _modified )
-	{
-		engine::getSongEditor()->setModified();
-	}*/
 }
 
 
@@ -501,7 +482,7 @@ int instrumentTrack::masterKey( notePlayHandle * _n ) const
 {
 	int key = m_baseNoteModel.value() + engine::getSong()->masterPitch();
 	return( tLimit<int>( _n->key() -
-		( key - A - DEFAULT_OCTAVE * NOTES_PER_OCTAVE ), 0, NOTES ) );
+		( key - Key_A - DefaultOctave * KeysPerOctave ), 0, NumKeys ) );
 }
 
 
@@ -721,7 +702,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		// TODO: move this compat code to mmp.cpp -> upgrade()
 		m_baseNoteModel.setInitValue( _this.
 			attribute( "baseoct" ).toInt()
-				* NOTES_PER_OCTAVE
+				* KeysPerOctave
 				+ _this.attribute( "basetone" ).toInt() );
 	}
 	else
@@ -811,7 +792,7 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 void instrumentTrack::invalidateAllMyNPH( void )
 {
 	engine::getMixer()->lock();
-	for( int i = 0; i < NOTES; ++i )
+	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 	}
@@ -993,9 +974,8 @@ void instrumentTrackView::toggledInstrumentTrackButton( bool _on )
 
 void instrumentTrackView::activityIndicatorPressed( void )
 {
-	model()->processInEvent( midiEvent( NOTE_ON, 0,
-					DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A,
-					127 ), midiTime() );
+	model()->processInEvent( midiEvent( NOTE_ON, 0, DefaultKey, 127 ),
+								midiTime() );
 }
 
 
@@ -1003,9 +983,8 @@ void instrumentTrackView::activityIndicatorPressed( void )
 
 void instrumentTrackView::activityIndicatorReleased( void )
 {
-	model()->processInEvent( midiEvent( NOTE_OFF, 0,
-					DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A,
-					0 ), midiTime() );
+	model()->processInEvent( midiEvent( NOTE_OFF, 0, DefaultKey, 0 ),
+								midiTime() );
 }
 
 
@@ -1062,7 +1041,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 						tr( "Channel volume" ) );
 	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
-	m_volumeKnob->setLabel( tr( "VOLUME" ) );
+	m_volumeKnob->setLabel( tr( "VOL" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 

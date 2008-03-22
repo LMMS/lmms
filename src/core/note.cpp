@@ -35,28 +35,20 @@
 #include "templates.h"
 
 
-const float note::MAX_DETUNING = 4 * 12.0f;
-
 
 
 
 note::note( const midiTime & _length, const midiTime & _pos,
-		tones _tone, octaves _octave, volume _volume,
-				panning _panning, detuningHelper * _detuning ) :
-	m_tone( C ),
-	m_octave( DEFAULT_OCTAVE ),
-	m_volume( DEFAULT_VOLUME ),
-	m_panning( DEFAULT_PANNING ),
+		int _key, volume _volume, panning _panning,
+						detuningHelper * _detuning ) :
+	m_key( tLimit( _key, 0, NumKeys ) ),
+	m_volume( tLimit( _volume, MinVolume, MaxVolume ) ),
+	m_panning( tLimit( _panning, PanningLeft, PanningRight ) ),
 	m_length( _length ),
 	m_pos( _pos )
 {
 	//saveJournallingState( FALSE );
 	setJournalling( FALSE );
-
-	setTone( _tone );
-	setOctave( _octave );
-	setVolume( _volume );
-	setPanning( _panning );
 
 	if( _detuning )
 	{
@@ -74,8 +66,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 
 note::note( const note & _note ) :
 	journallingObject( _note ),
-	m_tone( _note.m_tone ),
-	m_octave( _note.m_octave ),
+	m_key( _note.m_key),
 	m_volume( _note.m_volume ),
 	m_panning( _note.m_panning ),
 	m_length( _note.m_length ),
@@ -97,7 +88,7 @@ note::~note()
 
 void note::setLength( const midiTime & _length )
 {
-	addJournalEntry( journalEntry( CHANGE_LENGTH, m_length - _length ) );
+	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );
 	m_length = _length;
 }
 
@@ -106,29 +97,8 @@ void note::setLength( const midiTime & _length )
 
 void note::setPos( const midiTime & _pos )
 {
-	addJournalEntry( journalEntry( CHANGE_POSITION, m_pos - _pos ) );
+	addJournalEntry( journalEntry( ChangePosition, m_pos - _pos ) );
 	m_pos = _pos;
-}
-
-
-
-
-void note::setTone( const tones _tone )
-{
-	const tones t = tLimit( _tone, C, H );
-	addJournalEntry( journalEntry( CHANGE_KEY, (int) m_tone - t ) );
-	m_tone = t;
-}
-
-
-
-
-void note::setOctave( const octaves _octave )
-{
-	const octaves o = tLimit( _octave, MIN_OCTAVE, MAX_OCTAVE );
-	addJournalEntry( journalEntry( CHANGE_KEY, NOTES_PER_OCTAVE *
-						( (int) m_octave - o ) ) );
-	m_octave = o;
 }
 
 
@@ -136,12 +106,9 @@ void note::setOctave( const octaves _octave )
 
 void note::setKey( const int _key )
 {
-	const int k = key();
-	saveJournallingState( FALSE );
-	setTone( static_cast<tones>( _key % NOTES_PER_OCTAVE ) );
-	setOctave( static_cast<octaves>( _key / NOTES_PER_OCTAVE ) );
-	restoreJournallingState();
-	addJournalEntry( journalEntry( CHANGE_KEY, k - key() ) );
+	const int k = tLimit( _key, 0, NumKeys );
+	addJournalEntry( journalEntry( ChangeKey, m_key - k ) );
+	m_key = k;
 }
 
 
@@ -149,8 +116,8 @@ void note::setKey( const int _key )
 
 void note::setVolume( const volume _volume )
 {
-	const volume v = tMin( _volume, MAX_VOLUME );
-	addJournalEntry( journalEntry( CHANGE_VOLUME, (int) m_volume - v ) );
+	const volume v = tLimit( _volume, MinVolume, MaxVolume );
+	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
 	m_volume = v;
 }
 
@@ -159,8 +126,8 @@ void note::setVolume( const volume _volume )
 
 void note::setPanning( const panning _panning )
 {
-	const panning p = tLimit( _panning, PANNING_LEFT, PANNING_RIGHT );
-	addJournalEntry( journalEntry( CHANGE_PANNING, (int) m_panning - p ) );
+	const panning p = tLimit( _panning, PanningLeft, PanningRight );
+	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
 	m_panning = p;
 }
 
@@ -202,8 +169,7 @@ void note::quantizePos( const int _q_grid )
 
 void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "tone", m_tone );
-	_this.setAttribute( "oct", m_octave );
+	_this.setAttribute( "key", m_key );
 	_this.setAttribute( "vol", m_volume );
 	_this.setAttribute( "pan", m_panning );
 	_this.setAttribute( "len", m_length );
@@ -219,8 +185,9 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void note::loadSettings( const QDomElement & _this )
 {
-	m_tone = static_cast<tones>( _this.attribute( "tone" ).toInt() );
-	m_octave = static_cast<octaves>( _this.attribute( "oct" ).toInt() );
+	const int old_key = _this.attribute( "tone" ).toInt() +
+			_this.attribute( "oct" ).toInt() * KeysPerOctave;
+	m_key = qMax( old_key, _this.attribute( "key" ).toInt() );
 	m_volume = _this.attribute( "vol" ).toInt();
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
@@ -234,25 +201,25 @@ void note::loadSettings( const QDomElement & _this )
 void note::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
-	switch( static_cast<actions>( _je.actionID() ) )
+	switch( static_cast<Actions>( _je.actionID() ) )
 	{
-		case CHANGE_KEY:
+		case ChangeKey:
 			setKey( key() - _je.data().toInt() );
 			break;
 
-		case CHANGE_VOLUME:
+		case ChangeVolume:
 			setVolume( getVolume() - _je.data().toInt() );
 			break;
 
-		case CHANGE_PANNING:
+		case ChangePanning:
 			setVolume( getPanning() - _je.data().toInt() );
 			break;
 
-		case CHANGE_LENGTH:
+		case ChangeLength:
 			setLength( length() - _je.data().toInt() );
 			break;
 
-		case CHANGE_POSITION:
+		case ChangePosition:
 			setPos( pos() - _je.data().toInt() );
 			break;
 	}
@@ -283,7 +250,7 @@ void note::createDetuning( void )
 {
 	m_detuning = new detuningHelper;
 	m_detuning->initAutomationPattern();
-	m_detuning->setRange( -MAX_DETUNING, MAX_DETUNING, 0.1f );
+	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
 }
 
 

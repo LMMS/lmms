@@ -287,8 +287,8 @@ invalid_format:
 		it->addTCO( p );
 
 		// init keys
-		int keys[NOTES_PER_OCTAVE * OCTAVES][2];
-		for( int j = 0; j < NOTES_PER_OCTAVE * OCTAVES; ++j )
+		int keys[NumKeys][2];
+		for( int j = 0; j < NumKeys; ++j )
 		{
 			keys[j][0] = -1;
 		}
@@ -302,8 +302,7 @@ invalid_format:
 			switch( ev.m_type )
 			{
 				case NOTE_ON:
-					if( ev.key() >=
-						NOTES_PER_OCTAVE * OCTAVES )
+					if( ev.key() >= NumKeys )
 					{
 						continue;
 					}
@@ -316,15 +315,12 @@ invalid_format:
 					}
 
 				case NOTE_OFF:
-					if( ev.key() <
-						NOTES_PER_OCTAVE * OCTAVES &&
+					if( ev.key() < NumKeys &&
 							keys[ev.key()][0] >= 0 )
 					{
 			note n( midiTime( ( ( tick - keys[ev.key()][0] ) * multiplier ) / divisor ),
 				midiTime( ( keys[ev.key()][0] * multiplier ) / divisor ),
-				(tones)( ev.key() % NOTES_PER_OCTAVE ),
-				(octaves)( ev.key() / NOTES_PER_OCTAVE ),
-				keys[ev.key()][1] * 100 / 128 );
+				ev.key(), keys[ev.key()][1] * 100 / 128 );
 						p->addNote( n, FALSE );
 						keys[ev.key()][0] = -1;
 					}

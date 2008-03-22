@@ -169,7 +169,7 @@ private:
 	midiPort * m_midiPort;
 	audioPort m_audioPort;
 
-	notePlayHandle * m_notes[NOTES_PER_OCTAVE * OCTAVES];
+	notePlayHandle * m_notes[NumKeys];
 
 	intModel m_baseNoteModel;
 

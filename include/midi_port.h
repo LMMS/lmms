@@ -47,16 +47,16 @@ class midiTime;
 class midiPort
 {
 public:
-	enum modes
+	enum Modes
 	{
-		DUMMY,		// don't route any MIDI-events (default)
-		INPUT,		// from MIDI-client to MIDI-event-processor
-		OUTPUT,		// from MIDI-event-processor to MIDI-client
-		DUPLEX		// both directions
+		Disabled,	// don't route any MIDI-events (default)
+		Input,		// from MIDI-client to MIDI-event-processor
+		Output,		// from MIDI-event-processor to MIDI-client
+		Duplex		// both directions
 	} ;
 
 	midiPort( midiClient * _mc, midiEventProcessor * _mep,
-				const QString & _name, modes _mode = DUMMY );
+				const QString & _name, Modes _mode = Disabled );
 	~midiPort();
 
 	inline const QString & name( void ) const
@@ -66,12 +66,12 @@ public:
 
 	void FASTCALL setName( const QString & _name );
 
-	inline modes mode( void ) const
+	inline Modes mode( void ) const
 	{
 		return( m_mode );
 	}
 
-	void FASTCALL setMode( modes _mode );
+	void FASTCALL setMode( Modes _mode );
 
 	inline Sint8 inputChannel( void ) const
 	{
@@ -115,7 +115,7 @@ private:
 	midiClient * m_midiClient;
 	midiEventProcessor * m_midiEventProcessor;
 	QString m_name;
-	modes m_mode;
+	Modes m_mode;
 	Sint8 m_inputChannel;
 	Sint8 m_outputChannel;
 	bool m_defaultVelocityForInEventsEnabled;

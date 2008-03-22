@@ -73,7 +73,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex()
 {
-	for( int i = 0; i < NOTES; ++i )
+	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_runningNotes[i] = 0;
 	}
@@ -486,7 +486,7 @@ void vestigeInstrumentView::noteOffAll( void )
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
 	{
-		for( int key = 0; key < OCTAVES * NOTES_PER_OCTAVE; ++key )
+		for( int key = 0; key < NumKeys; ++key )
 		{
 			m_vi->m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
 								key, 0 ), 0 );

@@ -217,7 +217,7 @@ void chordCreator::processNote( notePlayHandle * _n )
 			octave_cnt < m_chordRangeModel.value(); ++octave_cnt )
 		{
 			const int sub_note_key_base = base_note_key +
-						octave_cnt * NOTES_PER_OCTAVE;
+						octave_cnt * KeysPerOctave;
 			// if octave_cnt == 1 we're in the first octave and
 			// the base-note is already done, so we don't have to
 			// create it in the following loop, then we loop until
@@ -232,16 +232,12 @@ void chordCreator::processNote( notePlayHandle * _n )
 						selected_chord].interval[i];
 				// maybe we're out of range -> let's get outta
 				// here!
-				if( sub_note_key > NOTES_PER_OCTAVE*OCTAVES )
+				if( sub_note_key > NumKeys )
 				{
 					break;
 				}
 				// create copy of base-note
-				note note_copy( _n->length(), 0,
-						(tones)( sub_note_key %
-							NOTES_PER_OCTAVE ),
-						(octaves)( sub_note_key /
-							NOTES_PER_OCTAVE ),
+				note note_copy( _n->length(), 0, sub_note_key,
 							_n->getVolume(),
 							_n->getPanning(),
 							_n->detuning() );
@@ -447,12 +443,12 @@ void arpeggiator::processNote( notePlayHandle * _n )
 		// now calculate final key for our arp-note
 		const int sub_note_key = base_note_key + (cur_arp_idx /
 							cur_chord_size ) *
-							NOTES_PER_OCTAVE +
+							KeysPerOctave +
 				chordCreator::s_chordTable[selected_arp].
 					interval[cur_arp_idx % cur_chord_size];
 
 		// range-checking
-		if( sub_note_key >= NOTES_PER_OCTAVE * OCTAVES ||
+		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
 					engine::getMixer()->criticalXRuns() )
 		{
@@ -467,10 +463,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 
 		// create new arp-note
 		note new_note( midiTime( 0 ), midiTime( 0 ),
-				static_cast<tones>( sub_note_key %
-							NOTES_PER_OCTAVE ),
-				static_cast<octaves>( sub_note_key /
-							NOTES_PER_OCTAVE ),
+				sub_note_key,
 				static_cast<volume>( _n->getVolume() *
 								vol_level ),
 				_n->getPanning(), _n->detuning() );

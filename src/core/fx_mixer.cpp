@@ -84,7 +84,7 @@ fxMixer::fxMixer() :
 	journallingObject(),
 	model( NULL )
 {
-	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		m_fxChannels[i] = new fxChannel( this );
 	}
@@ -97,7 +97,7 @@ fxMixer::fxMixer() :
 
 fxMixer::~fxMixer()
 {
-	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		delete m_fxChannels[i];
 	}
@@ -158,7 +158,7 @@ void fxMixer::prepareMasterMix( void )
 const surroundSampleFrame * fxMixer::masterMix( void )
 {
 	surroundSampleFrame * buf = m_fxChannels[0]->m_buffer;
-	for( int i = 1; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 1; i < NumFxChannels+1; ++i )
 	{
 		if( m_fxChannels[i]->m_used )
 		{
@@ -192,7 +192,7 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 
 void fxMixer::clear()
 {
-	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	for( int i = 0; i <= NumFxChannels; ++i )
 	{
 		m_fxChannels[i]->m_fxChain.clear();
 		m_fxChannels[i]->m_volumeModel.setValue( 1.0f );
@@ -207,14 +207,14 @@ void fxMixer::clear()
 
 void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	for( int i = 0; i <= NumFxChannels; ++i )
 	{
-		QDomElement fxch = _doc.createElement(
-					QString( "fxchannel%1" ).arg( i ) );
+		QDomElement fxch = _doc.createElement( QString( "fxchannel" ) );
 		_this.appendChild( fxch );
 		m_fxChannels[i]->m_fxChain.saveState( _doc, fxch );
 		m_fxChannels[i]->m_volumeModel.saveSettings( _doc, fxch,
 								"volume" );
+		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", m_fxChannels[i]->m_name );
 	}
 }
@@ -225,7 +225,7 @@ void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void fxMixer::loadSettings( const QDomElement & _this )
 {
 	clear();
-	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	for( int i = 0; i <= NumFxChannels; ++i )
 	{
 		QDomElement fxch = _this.firstChildElement(
 					QString( "fxchannel%1" ).arg( i ) );
@@ -341,7 +341,7 @@ fxMixerView::fxMixerView() :
 	bl->setMargin( 0 );
 	a->setWidget( base );
 
-	base->setFixedSize( (NUM_FX_CHANNELS+1)*33+6+10, 200 );
+	base->setFixedSize( (NumFxChannels+1)*33+6+10, 200 );
 	pal = base->palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	base->setPalette( pal );
@@ -359,7 +359,7 @@ fxMixerView::fxMixerView() :
 
 	bl->addSpacing( 6 );
 
-	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		fxChannelView * cv = &m_fxChannelViews[i];
 		cv->m_fxLine = new fxLine( base, this,
@@ -406,7 +406,7 @@ fxMixerView::~fxMixerView()
 void fxMixerView::setCurrentFxLine( fxLine * _line )
 {
 	m_currentFxLine = _line;
-	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		if( m_fxChannelViews[i].m_fxLine == _line )
 		{
@@ -425,7 +425,7 @@ void fxMixerView::setCurrentFxLine( fxLine * _line )
 
 void fxMixerView::clear( void )
 {
-	for( int i = 0; i <= NUM_FX_CHANNELS; ++i )
+	for( int i = 0; i <= NumFxChannels; ++i )
 	{
 		m_fxChannelViews[i].m_rackView->clear();
 	}
@@ -437,7 +437,7 @@ void fxMixerView::clear( void )
 void fxMixerView::updateFaders( void )
 {
 	fxMixer * m = engine::getFxMixer();
-	for( int i = 0; i < NUM_FX_CHANNELS+1; ++i )
+	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		const float opl = m_fxChannelViews[i].m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i].m_fader->getPeak_R();

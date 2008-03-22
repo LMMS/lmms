@@ -82,7 +82,7 @@ public:
 
 	bool FASTCALL play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
-				const float _freq = BASE_FREQ,
+				const float _freq = BaseFreq,
 				const bool _looped = FALSE ) const;
 
 	void FASTCALL visualize( QPainter & _p, const QRect & _dr,

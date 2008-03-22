@@ -1,3 +1,52 @@
+2008-03-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/ladspa_control.cpp:
+	added missing break in switch which made a lot of messages appear in
+	console when time-based knobs were used by LADSPA-plugins
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/sf2_player/artwork.png:
+	* plugins/midi_import/midi_import.cpp:
+	* include/note.h:
+	* include/mixer.h:
+	* include/instrument_track.h:
+	* include/sample_buffer.h:
+	* include/fx_mixer.h:
+	* include/piano.h:
+	* include/volume.h:
+	* include/midi_port.h:
+	* include/panning.h:
+	* src/midi/midi_client.cpp:
+	* src/midi/midi_port.cpp:
+	* src/midi/midi_alsa_seq.cpp:
+	* src/lib/sample_buffer.cpp:
+	* src/widgets/instrument_midi_io_view.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/mixer.cpp:
+	* src/core/piano_roll.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/note.cpp:
+	* src/core/piano.cpp:
+	* src/core/fx_mixer.cpp:
+	- merged note's tone and octave-property into one key-property which
+	  makes us save calculations in a lot of places and also shrinks
+	  sizes of XML-files
+	- renamed various note-related constants and enums to match current
+	  coding-style
+
+	* data/themes/default/effect_plugin.png:
+	improved effect-plugin-artwork made with Inkscape
+
 2008-03-22  Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* plugins/organic/organic.cpp:
@@ -13,7 +62,6 @@
 
 	* src/core/main.cpp:
 	Just playing around with palette colors.
-
 
 2008-03-16  Paul Giblock <drfaygo/at/gmail/dot/com>
 
@@ -178,7 +226,6 @@
 	Can change this file to ignore more stuff.  Reapply by running: 
 	svn -R propset svn:ignore -F .svnignore .
 		
-
 2008-03-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/widgets/visualization_widget.cpp:

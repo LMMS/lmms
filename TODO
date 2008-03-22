@@ -1,6 +1,5 @@
 - do not process effects when playing frozen patterns
 - select number of channels in export-project-dialog
-- MIDI over Ethernet support
 - try to make vestige-plugin-dlls relative
 - do song-editor-tempo-connection to vst-plugin inside remoteVSTPlugin
 - add/remove-steps button in bb-editor for adding/removing according number of steps to/from all patterns of visible beat/baseline

@@ -87,7 +87,7 @@ public:
 private:
 	void closePlugin( void );
 
-	int m_runningNotes[NOTES];
+	int m_runningNotes[NumKeys];
 
 
 	remoteVSTPlugin * m_plugin;

@@ -76,8 +76,8 @@ QPixmap * organicInstrumentView::s_artwork = NULL;
 organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &organic_plugin_descriptor ),
 	m_modulationAlgo( oscillator::SignalMix ),
-	m_fx1Knob( 0.0f, 0.0f, 0.99f, 0.01f , this ),
-	m_volKnob( 100.0f, 0.0f, 200.0f, 1.0f, this )
+	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this ),
+	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this )
 {
 	m_numOscillators = 8;
 
@@ -88,13 +88,13 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		m_osc[i]->m_numOscillators = m_numOscillators;
 
 		// Connect events 
-		connect( &m_osc[i]->m_oscKnob, SIGNAL( dataChanged() ),
+		connect( &m_osc[i]->m_oscModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT ( oscButtonChanged() ) );
-		connect( &m_osc[i]->m_volKnob, SIGNAL( dataChanged() ),
+		connect( &m_osc[i]->m_volModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateVolume() ) );
-		connect( &m_osc[i]->m_panKnob, SIGNAL( dataChanged() ),
+		connect( &m_osc[i]->m_panModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateVolume() ) );
-		connect( &m_osc[i]->m_detuneKnob, SIGNAL( dataChanged() ),
+		connect( &m_osc[i]->m_detuneModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateDetuning() ) );
 		
 		m_osc[i]->updateVolume();
@@ -135,19 +135,19 @@ organicInstrument::~organicInstrument()
 void organicInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "num_osc", QString::number( m_numOscillators ) );
-	m_fx1Knob.saveSettings( _doc, _this, "foldback" );
-	m_volKnob.saveSettings( _doc, _this, "vol" );
+	m_fx1Model.saveSettings( _doc, _this, "foldback" );
+	m_volModel.saveSettings( _doc, _this, "vol" );
 
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		QString is = QString::number( i );
-		m_osc[i]->m_volKnob.saveSettings( _doc, _this, "vol" + is );
-		m_osc[i]->m_panKnob.saveSettings( _doc, _this, "pan" + is );
+		m_osc[i]->m_volModel.saveSettings( _doc, _this, "vol" + is );
+		m_osc[i]->m_panModel.saveSettings( _doc, _this, "pan" + is );
 		_this.setAttribute( "harmonic" + is, QString::number(
 					powf( 2.0f, m_osc[i]->m_harmonic ) ) );
-		m_osc[i]->m_detuneKnob.saveSettings( _doc, _this, "detune"
+		m_osc[i]->m_detuneModel.saveSettings( _doc, _this, "detune"
 									+ is );
-		m_osc[i]->m_oscKnob.saveSettings( _doc, _this, "wavetype"
+		m_osc[i]->m_oscModel.saveSettings( _doc, _this, "wavetype"
 									+ is );
 	}
 }
@@ -163,14 +163,14 @@ void organicInstrument::loadSettings( const QDomElement & _this )
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		QString is = QString::number( i );
-		m_osc[i]->m_volKnob.loadSettings( _this, "vol" + is );
-		m_osc[i]->m_detuneKnob.loadSettings( _this, "detune" + is );
-		m_osc[i]->m_panKnob.loadSettings( _this, "pan" + is );
-		m_osc[i]->m_oscKnob.loadSettings( _this, "wavetype" + is );
+		m_osc[i]->m_volModel.loadSettings( _this, "vol" + is );
+		m_osc[i]->m_detuneModel.loadSettings( _this, "detune" + is );
+		m_osc[i]->m_panModel.loadSettings( _this, "pan" + is );
+		m_osc[i]->m_oscModel.loadSettings( _this, "wavetype" + is );
 	}
 	
-	m_volKnob.loadSettings( _this, "vol" );
-	m_fx1Knob.loadSettings( _this, "foldback" );
+	m_volModel.loadSettings( _this, "vol" );
+	m_fx1Model.loadSettings( _this, "foldback" );
 }
 
 
@@ -265,13 +265,13 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 	// -- fx section --
 	
 	// fxKnob is [0;1]
-	float t =  m_fx1Knob.value();
+	float t =  m_fx1Model.value();
 	
 	for (int i=0 ; i < frames ; i++)
 	{
-		buf[i][0] = waveshape( buf[i][0], t ) * m_volKnob.value()
+		buf[i][0] = waveshape( buf[i][0], t ) * m_volModel.value()
 								/ 100.0f;
-		buf[i][1] = waveshape( buf[i][1], t ) * m_volKnob.value()
+		buf[i][1] = waveshape( buf[i][1], t ) * m_volModel.value()
 								/ 100.0f;
 	}
 	
@@ -322,15 +322,13 @@ void organicInstrument::randomiseSettings( void )
 
 	for( int i = 0; i < m_numOscillators; i++ )
 	{
-		m_osc[i]->m_volKnob.setValue( intRand( 0, 100 ) );
+		m_osc[i]->m_volModel.setValue( intRand( 0, 100 ) );
 
-		m_osc[i]->m_detuneKnob.setValue( intRand( -5, 5 ) );
+		m_osc[i]->m_detuneModel.setValue( intRand( -5, 5 ) );
 
-		m_osc[i]->m_panKnob.setValue(
-			//(int)gaussRand(PANNING_LEFT, PANNING_RIGHT,1,0)
-			0 );
+		m_osc[i]->m_panModel.setValue( 0 );
 
-		m_osc[i]->m_oscKnob.setValue( intRand( 0, 5 ) );
+		m_osc[i]->m_oscModel.setValue( intRand( 0, 5 ) );
 	}
 
 }
@@ -421,8 +419,8 @@ void organicInstrumentView::modelChanged( void )
 
 	m_numOscillators = oi->m_numOscillators;
 	
-	m_fx1Knob->setModel( &oi->m_fx1Knob );
-	m_volKnob->setModel( &oi->m_volKnob );
+	m_fx1Knob->setModel( &oi->m_fx1Model );
+	m_volKnob->setModel( &oi->m_volModel );
 
 	// TODO: Delete existing oscKnobs if they exist
 	
@@ -465,30 +463,26 @@ void organicInstrumentView::modelChanged( void )
 
 		// Attach to models
 		m_oscKnobs[i].m_volKnob->setModel(
-					&oi->m_osc[i]->m_volKnob );
+					&oi->m_osc[i]->m_volModel );
 		m_oscKnobs[i].m_oscKnob->setModel(
-					&oi->m_osc[i]->m_oscKnob );
+					&oi->m_osc[i]->m_oscModel );
 		m_oscKnobs[i].m_panKnob->setModel(
-					&oi->m_osc[i]->m_panKnob );
+					&oi->m_osc[i]->m_panModel );
 		m_oscKnobs[i].m_detuneKnob->setModel(
-					&oi->m_osc[i]->m_detuneKnob );
-
-
-		/*connect( m_oscKnobs[i].m_userWaveButton,
-						SIGNAL( doubleClicked() ),
-				t->m_osc[i], SLOT( oscUserDefWaveDblClick() ) );
-				*/
+					&oi->m_osc[i]->m_detuneModel );
 	}
 }
+
+
 
 
 oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
 	model( _parent ),
 	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, 1, this ),
-	m_oscKnob( 0.0f, 0.0f, 5.0f, 1.0f, this ),
-	m_volKnob( 100.0f, 0.0f, 100.0f, 1.0f, this ),
-	m_panKnob( DEFAULT_PANNING, PANNING_LEFT, PANNING_RIGHT, 1.0f, this ),
-	m_detuneKnob( 0.0f, -100.0f, 100.0f, 1.0f, this ) 
+	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f, this ),
+	m_volModel( 100.0f, 0.0f, 100.0f, 1.0f, this ),
+	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
+	m_detuneModel( 0.0f, -100.0f, 100.0f, 1.0f, this ) 
 {
 }
 
@@ -515,7 +509,7 @@ void oscillatorObject::oscButtonChanged( void )
 		oscillator::ExponentialWave
 	} ;
 
-	m_waveShape.setValue( shapes[(int)roundf( m_oscKnob.value() )] );
+	m_waveShape.setValue( shapes[(int)roundf( m_oscModel.value() )] );
 
 }
 
@@ -524,10 +518,10 @@ void oscillatorObject::oscButtonChanged( void )
 
 void oscillatorObject::updateVolume( void )
 {
-	m_volumeLeft = ( 1.0f - m_panKnob.value() / (float)PANNING_RIGHT )
-			* m_volKnob.value() / m_numOscillators / 100.0f;
-	m_volumeRight = ( 1.0f + m_panKnob.value() / (float)PANNING_RIGHT )
-			* m_volKnob.value() / m_numOscillators / 100.0f;
+	m_volumeLeft = ( 1.0f - m_panModel.value() / (float)PanningRight )
+			* m_volModel.value() / m_numOscillators / 100.0f;
+	m_volumeRight = ( 1.0f + m_panModel.value() / (float)PanningRight )
+			* m_volModel.value() / m_numOscillators / 100.0f;
 }
 
 
@@ -536,10 +530,10 @@ void oscillatorObject::updateVolume( void )
 void oscillatorObject::updateDetuning( void )
 {
 	m_detuningLeft = powf( 2.0f, m_harmonic
-				+ (float)m_detuneKnob.value() / 100.0f )
+				+ (float)m_detuneModel.value() / 100.0f )
 					/ engine::getMixer()->sampleRate();
 	m_detuningRight = powf( 2.0f, m_harmonic
-				- (float)m_detuneKnob.value() / 100.0f )
+				- (float)m_detuneModel.value() / 100.0f )
 					/ engine::getMixer()->sampleRate();
 }
 
@@ -564,7 +558,7 @@ plugin * lmms_plugin_main( model *, void * _data )
  * - 32.692 Hz in the bass to 5919.85 Hz of treble in  a Hammond organ
  * => implement harmonic foldback
  * 
- m_osc[i].m_oscKnob->setInitValue( 0.0f );
+ m_osc[i].m_oscModel->setInitValue( 0.0f );
  * - randomize preset 
  */
 

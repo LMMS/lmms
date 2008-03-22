@@ -74,7 +74,7 @@
 typedef automationPattern::timeMap timeMap;
 
 
-extern tones whiteKeys[];	// defined in piano_widget.cpp
+extern Keys whiteKeys[];	// defined in piano_widget.cpp
 
 
 // some constants...
@@ -91,7 +91,7 @@ const int WHITE_KEY_BIG_HEIGHT = 24;
 const int BLACK_KEY_HEIGHT = 16;
 const int C_KEY_LABEL_X = WHITE_KEY_WIDTH - 19;
 const int KEY_LINE_HEIGHT = 12;
-const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * NOTES_PER_OCTAVE;	// = 12 * 12;
+const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;
 
 const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
 const int PR_TOP_MARGIN = 48;
@@ -103,7 +103,7 @@ const int RESIZE_AREA_WIDTH = 4;
 const int NE_LINE_WIDTH = 3;
 
 // key where to start
-const int INITIAL_START_KEY = C + OCTAVE_3 * NOTES_PER_OCTAVE;
+const int INITIAL_START_KEY = Key_C + Octave_3 * KeysPerOctave;
 
 
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
@@ -492,10 +492,10 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 		if( total_notes > 0 )
 		{
 			central_key = central_key / total_notes -
-					( NOTES_PER_OCTAVE * OCTAVES -
+					( KeysPerOctave * NumOctaves -
 						m_totalKeysToScroll ) / 2;
 			m_startKey = tLimit( central_key, 0,
-						OCTAVES * NOTES_PER_OCTAVE );
+						NumOctaves * KeysPerOctave );
 		}
 	}
 	// resizeEvent() does the rest for us (scrolling, range-checking
@@ -647,7 +647,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 	{
 		int key_num = pianoView::getKeyFromScancode(
 						_ke->nativeScanCode() ) +
-				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
+				( DefaultOctave - 1 ) * KeysPerOctave;
 
 		if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 		{
@@ -819,7 +819,7 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 	{
 		int key_num = pianoView::getKeyFromScancode(
 						_ke->nativeScanCode() ) +
-				( DEFAULT_OCTAVE - 1 ) * NOTES_PER_OCTAVE;
+				( DefaultOctave - 1 ) * KeysPerOctave;
 
 		if( _ke->isAutoRepeat() == FALSE && key_num > -1 )
 		{
@@ -871,7 +871,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 	if( _me->y() > PR_TOP_MARGIN )
 	{
 		bool play_note = TRUE;
-		volume vol = DEFAULT_VOLUME;
+		volume vol = DefaultVolume;
 
 		bool edit_note = ( _me->y() > height() -
 					PR_BOTTOM_MARGIN - m_notesEditHeight );
@@ -962,11 +962,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					midiTime note_pos( pos_tact_64th - (quantization() / 2) );
 					midiTime note_len( newNoteLen() );
 		
-					note new_note( note_len, note_pos,
-							(tones)( key_num %
-							NOTES_PER_OCTAVE ),
-							(octaves)( key_num /
-							NOTES_PER_OCTAVE) );
+					note new_note( note_len, note_pos, key_num );
 
 					note * created_new_note =
 						m_pattern->addNote( new_note );
@@ -1171,7 +1167,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_lastKey = key_num;
 				m_pattern->getInstrumentTrack()->processInEvent(
 					midiEvent( NOTE_ON, 0, key_num,
-						DEFAULT_VOLUME * 127 / 100 ),
+						DefaultVolume * 127 / 100 ),
 								midiTime() );
 			}
 		}
@@ -1190,8 +1186,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				volume vol = tLimit<int>( 2 * ( -_me->y() +
 								height() -
 							PR_BOTTOM_MARGIN ),
-								MIN_VOLUME,
-								MAX_VOLUME );
+								MinVolume,
+								MaxVolume );
 				m_currentNote->setVolume( vol );
 				m_pattern->dataChanged();
 				m_pattern->getInstrumentTrack()->processInEvent(
@@ -1443,10 +1439,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					key_diff = -m_selectStartKey - 1;
 				}
 				else if( m_selectStartKey + m_selectedKeys +
-						key_diff >= NOTES_PER_OCTAVE *
-								OCTAVES )
+						key_diff >= KeysPerOctave *
+								NumOctaves )
 				{
-					key_diff = NOTES_PER_OCTAVE * OCTAVES -
+					key_diff = KeysPerOctave * NumOctaves -
 							( m_selectStartKey +
 							m_selectedKeys ) - 1;
 				}
@@ -1460,9 +1456,9 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							m_selectedKeys ) - 1;
 				}
 				else if( m_selectStartKey + key_diff >=
-						NOTES_PER_OCTAVE * OCTAVES )
+						KeysPerOctave * NumOctaves )
 				{
-					key_diff = NOTES_PER_OCTAVE * OCTAVES -
+					key_diff = KeysPerOctave * NumOctaves -
 							m_selectStartKey - 1;
 				}
 			}
@@ -1602,13 +1598,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int y_offset = 0;
 
 	// calculate y_offset according to first key
-	switch( prKeyOrder[m_startKey % NOTES_PER_OCTAVE] )
+	switch( prKeyOrder[m_startKey % KeysPerOctave] )
 	{
 		case PR_BLACK_KEY: y_offset = KEY_LINE_HEIGHT/4; break;
 		case PR_WHITE_KEY_BIG: y_offset = KEY_LINE_HEIGHT/2; break;
 		case PR_WHITE_KEY_SMALL:
 			if( prKeyOrder[( ( m_startKey + 1 ) %
-					NOTES_PER_OCTAVE)] != PR_BLACK_KEY )
+					KeysPerOctave)] != PR_BLACK_KEY )
 			{
 				y_offset = KEY_LINE_HEIGHT / 2;
 			}
@@ -1632,7 +1628,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		// check for white key that is only half visible on the 
 		// bottom of piano-roll
 		if( keys_processed == 0 &&
-			prKeyOrder[m_startKey % NOTES_PER_OCTAVE] ==
+			prKeyOrder[m_startKey % KeysPerOctave] ==
 								PR_BLACK_KEY )
 		{
 			// draw it!
@@ -1648,7 +1644,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			first_white_key_height = WHITE_KEY_SMALL_HEIGHT / 2;
 		}
 		// check whether to draw a big or a small white key
-		if( prKeyOrder[key % NOTES_PER_OCTAVE] == PR_WHITE_KEY_SMALL )
+		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
 		{
 			// draw a small one...
 			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
@@ -1657,7 +1653,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			y -= WHITE_KEY_SMALL_HEIGHT;
 
 		}
-		else if( prKeyOrder[key % NOTES_PER_OCTAVE] ==
+		else if( prKeyOrder[key % KeysPerOctave] ==
 							PR_WHITE_KEY_BIG )
 		{
 			// draw a big one...
@@ -1673,16 +1669,16 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
 		// label C-keys...
-		if( static_cast<tones>( key % NOTES_PER_OCTAVE ) == C )
+		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 		{
 			p.setPen( QColor( 240, 240, 240 ) );
 			p.drawText( C_KEY_LABEL_X + 1, y+14, "C" +
 					QString::number( static_cast<int>( key /
-							NOTES_PER_OCTAVE ) ) );
+							KeysPerOctave ) ) );
 			p.setPen( QColor( 0, 0, 0 ) );
 			p.drawText( C_KEY_LABEL_X, y + 13, "C" +
 					QString::number( static_cast<int>( key /
-							NOTES_PER_OCTAVE ) ) );
+							KeysPerOctave ) ) );
 			p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
 		}
 		else
@@ -1707,17 +1703,17 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		// of piano-roll
 		if( keys_processed == 0
 		    // current key may not be a black one
-		    && prKeyOrder[key % NOTES_PER_OCTAVE] != PR_BLACK_KEY
+		    && prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
 		    // but the previous one must be black (we must check this
 		    // because there might be two white keys (E-F)
-		    && prKeyOrder[( key - 1 ) % NOTES_PER_OCTAVE] ==
+		    && prKeyOrder[( key - 1 ) % KeysPerOctave] ==
 								PR_BLACK_KEY )
 		{
 			// draw the black key!
 			p.drawPixmap( PIANO_X, y - BLACK_KEY_HEIGHT / 2,
 								*s_blackKeyPm );
 			// is the one after the start-note a black key??
-			if( prKeyOrder[( key + 1 ) % NOTES_PER_OCTAVE] !=
+			if( prKeyOrder[( key + 1 ) % KeysPerOctave] !=
 								PR_BLACK_KEY )
 			{
 				// no, then move it up!
@@ -1725,7 +1721,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 		}
 		// current key black?
-		if( prKeyOrder[key % NOTES_PER_OCTAVE] == PR_BLACK_KEY )
+		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY )
 		{
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
@@ -1987,10 +1983,10 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 						height() - PR_TOP_MARGIN -
 						SCROLLBAR_SIZE );
 
-	int total_pixels = OCTAVE_HEIGHT * OCTAVES - ( height() -
+	int total_pixels = OCTAVE_HEIGHT * NumOctaves - ( height() -
 					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
 							m_notesEditHeight );
-	m_totalKeysToScroll = total_pixels * NOTES_PER_OCTAVE / OCTAVE_HEIGHT;
+	m_totalKeysToScroll = total_pixels * KeysPerOctave / OCTAVE_HEIGHT;
 
 	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
 
@@ -2060,9 +2056,9 @@ int pianoRoll::getKey( int _y ) const
 		key_num = 0;
 	}
 
-	if( key_num >= NOTES_PER_OCTAVE * OCTAVES )
+	if( key_num >= KeysPerOctave * NumOctaves )
 	{
-		key_num = NOTES_PER_OCTAVE * OCTAVES - 1;
+		key_num = KeysPerOctave * NumOctaves - 1;
 	}
 
 	return( key_num );
@@ -2144,8 +2140,7 @@ void pianoRoll::recordNote( const note & _n )
 	{
 		note n( _n.length(), engine::getSong()->getPlayPos(
 				song::Mode_PlayPattern ) - _n.length(),
-				_n.tone(), _n.octave(),
-				_n.getVolume(), _n.getPanning() );
+				_n.key(), _n.getVolume(), _n.getPanning() );
 		n.quantizeLength( quantization() );
 		m_pattern->addNote( n );
 		update();

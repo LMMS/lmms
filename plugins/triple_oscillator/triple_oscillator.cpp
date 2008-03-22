@@ -69,10 +69,10 @@ plugin::descriptor tripleoscillator_plugin_descriptor =
 
 oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
 	model( _parent ),
-	m_volumeModel( DEFAULT_VOLUME / NUM_OF_OSCILLATORS,
-					MIN_VOLUME, MAX_VOLUME, 1.0f, this ),
-	m_panModel( DEFAULT_PANNING, PANNING_LEFT, PANNING_RIGHT, 1.0f, this ),
-	m_coarseModel( 0, -2 * NOTES_PER_OCTAVE, 2 * NOTES_PER_OCTAVE,
+	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS,
+					MinVolume, MaxVolume, 1.0f, this ),
+	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
+	m_coarseModel( 0, -2 * KeysPerOctave, 2 * KeysPerOctave,
 								1.0f, this ),
 	m_fineLeftModel( 0.0f, -100.0f, 100.0f, 1.0f, this ),
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this ),
@@ -159,7 +159,7 @@ void oscillatorObject::updateVolume( void )
 	if( m_panModel.value() >= 0.0f )
 	{
 		const float panningFactorLeft = 1.0f - m_panModel.value()
-							/ (float)PANNING_RIGHT;
+							/ (float)PanningRight;
 		m_volumeLeft = panningFactorLeft * m_volumeModel.value() /
 									100.0f;
 		m_volumeRight = m_volumeModel.value() / 100.0f;
@@ -168,7 +168,7 @@ void oscillatorObject::updateVolume( void )
 	{
 		m_volumeLeft = m_volumeModel.value() / 100.0f;
 		const float panningFactorRight = 1.0f + m_panModel.value()
-							/ (float)PANNING_RIGHT;
+							/ (float)PanningRight;
 		m_volumeRight = panningFactorRight * m_volumeModel.value() /
 									100.0f;
 	}
@@ -767,9 +767,6 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		wsbg->addButton( exp_wave_btn );
 		wsbg->addButton( white_noise_btn );
 		wsbg->addButton( uwb );
-
-/*		connect( m_osc[i].m_usrWaveBtn, SIGNAL( doubleClicked() ),
-				&m_osc[i], SLOT( oscUserDefWaveDblClick() ) );*/
 
 		m_oscKnobs[i] = oscillatorKnobs( vk, pk, ck, flk, frk, pok,
 							spdk, uwb, wsbg );

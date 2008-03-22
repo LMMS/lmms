@@ -67,7 +67,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						notePlayHandle * _parent,
 						const bool _arp_note ) :
 	playHandle( NotePlayHandle, _offset ),
-	note( _n.length(), _n.pos(), _n.tone(), _n.octave(),
+	note( _n.length(), _n.pos(), _n.key(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
@@ -437,14 +437,14 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 void notePlayHandle::updateFrequency( void )
 {
 	const int base_tone = m_instrumentTrack->baseNoteModel()->value() %
-							NOTES_PER_OCTAVE;
+								KeysPerOctave;
 	const int base_octave = m_instrumentTrack->baseNoteModel()->value() /
-							NOTES_PER_OCTAVE;
-	const float pitch = (float)( tone() - base_tone +
+								KeysPerOctave;
+	const float pitch = (float)( key() % KeysPerOctave - base_tone +
 			engine::getSong()->masterPitch() ) / 12.0f +
-			(float)( octave() - base_octave ) +
+			(float)( key() / KeysPerOctave - base_octave ) +
 					 m_base_detuning->value() / 12.0f;
-	m_frequency = BASE_FREQ * powf( 2.0f, pitch );
+	m_frequency = BaseFreq * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )

@@ -61,7 +61,7 @@ public:
 
 private:
 	instrumentTrack * m_instrumentTrack;
-	bool m_pressedKeys[NOTES_PER_OCTAVE * OCTAVES];
+	bool m_pressedKeys[NumKeys];
 
 
 	friend class pianoView;
@@ -104,9 +104,7 @@ private:
 	piano * m_piano;
 
 	QScrollBar * m_pianoScroll;
-	tones m_startTone;			// first key when drawing
-	octaves m_startOctave;
-
+	int m_startKey;			// first key when drawing
 	int m_lastKey;
 
 

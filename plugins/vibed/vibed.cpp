@@ -1,7 +1,7 @@
 /*
  * vibed.cpp - combination of PluckedStringSynth and BitInvader
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -77,7 +77,8 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
-		knob = new knobModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME, 1.0f, this );
+		knob = new knobModel( DefaultVolume, MinVolume, MaxVolume,
+								1.0f, this );
 		m_volumeKnobs.append( knob );
 
 		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this );

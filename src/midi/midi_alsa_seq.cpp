@@ -149,21 +149,21 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 		case NOTE_ON:
 			snd_seq_ev_set_noteon( &ev,
 						_port->outputChannel(),
-						_me.key() + NOTES_PER_OCTAVE,
+						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
 		case NOTE_OFF:
 			snd_seq_ev_set_noteoff( &ev,
 						_port->outputChannel(),
-						_me.key() + NOTES_PER_OCTAVE,
+						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
 		case KEY_PRESSURE:
 			snd_seq_ev_set_keypress( &ev,
 						_port->outputChannel(),
-						_me.key() + NOTES_PER_OCTAVE,
+						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
@@ -213,16 +213,16 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 
 	switch( _port->mode() )
 	{
-		case midiPort::DUPLEX:
+		case midiPort::Duplex:
 			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 
-		case midiPort::INPUT:
+		case midiPort::Input:
 			caps[0] |= SND_SEQ_PORT_CAP_WRITE |
 						SND_SEQ_PORT_CAP_SUBS_WRITE;
 			break;
 
-		case midiPort::OUTPUT:
+		case midiPort::Output:
 			caps[0] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 			break;
@@ -326,8 +326,8 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 						bool _unsubscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
-		( _port->mode() != midiPort::INPUT &&
-		  _port->mode() != midiPort::DUPLEX ) )
+		( _port->mode() != midiPort::Input &&
+		  _port->mode() != midiPort::Duplex ) )
 	{
 		return;
 	}
@@ -366,8 +366,8 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						bool _unsubscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
-		( _port->mode() != midiPort::OUTPUT &&
-		  _port->mode() != midiPort::DUPLEX ) )
+		( _port->mode() != midiPort::Output &&
+		  _port->mode() != midiPort::Duplex ) )
 	{
 		return;
 	}
@@ -456,7 +456,7 @@ void midiALSASeq::run( void )
 				dest->processInEvent( midiEvent( NOTE_ON,
 							ev->data.note.channel,
 							ev->data.note.note -
-							NOTES_PER_OCTAVE,
+							KeysPerOctave,
 							ev->data.note.velocity
 							),
 						midiTime( ev->time.tick ) );
@@ -466,7 +466,7 @@ void midiALSASeq::run( void )
 				dest->processInEvent( midiEvent( NOTE_OFF,
 							ev->data.note.channel,
 							ev->data.note.note -
-							NOTES_PER_OCTAVE,
+							KeysPerOctave,
 							ev->data.note.velocity
 							),
 						midiTime( ev->time.tick) );
@@ -476,7 +476,7 @@ void midiALSASeq::run( void )
 				dest->processInEvent( midiEvent( KEY_PRESSURE,
 							ev->data.note.channel,
 							ev->data.note.note -
-							NOTES_PER_OCTAVE,
+							KeysPerOctave,
 							ev->data.note.velocity
 							), midiTime() );
 				break;

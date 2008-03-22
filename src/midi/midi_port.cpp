@@ -4,7 +4,7 @@
  * midi_port.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                 sequencing system
  *
- * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 
 
 midiPort::midiPort( midiClient * _mc, midiEventProcessor * _mep,
-					const QString & _name, modes _mode ) :
+					const QString & _name, Modes _mode ) :
 	m_midiClient( _mc ),
 	m_midiEventProcessor( _mep ),
 	m_name( _name ),
@@ -64,7 +64,7 @@ void midiPort::setName( const QString & _name )
 
 
 
-void midiPort::setMode( modes _mode )
+void midiPort::setMode( Modes _mode )
 {
 	m_mode = _mode;
 	m_midiClient->applyPortMode( this );
@@ -76,14 +76,14 @@ void midiPort::setMode( modes _mode )
 void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( ( mode() == INPUT || mode() == DUPLEX ) &&
+	if( ( mode() == Input || mode() == Duplex ) &&
 		( inputChannel() == _me.m_channel || inputChannel() == -1 ) )
 	{
 		midiEvent ev = _me;
 		if( m_defaultVelocityForInEventsEnabled == TRUE &&
 							_me.velocity() > 0 )
 		{
-			ev.velocity() = DEFAULT_VOLUME;
+			ev.velocity() = DefaultVolume;
 		}
 		m_midiEventProcessor->processInEvent( ev, _time );
 	}
@@ -95,14 +95,14 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( ( mode() == OUTPUT || mode() == DUPLEX ) &&
+	if( ( mode() == Output || mode() == Duplex ) &&
 		( outputChannel() == _me.m_channel && outputChannel() != -1 ) )
 	{
 		midiEvent ev = _me;
 		if( m_defaultVelocityForOutEventsEnabled == TRUE &&
 							_me.velocity() > 0 )
 		{
-			ev.velocity() = DEFAULT_VOLUME;
+			ev.velocity() = DefaultVolume;
 		}
 		m_midiClient->processOutEvent( ev, _time, this );
 	}

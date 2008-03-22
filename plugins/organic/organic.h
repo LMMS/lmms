@@ -46,10 +46,10 @@ class oscillatorObject : public model
 private:
 	int m_numOscillators;
 	intModel m_waveShape;
-	floatModel m_oscKnob;
-	floatModel m_volKnob;
-	floatModel m_panKnob;
-	floatModel m_detuneKnob;
+	floatModel m_oscModel;
+	floatModel m_volModel;
+	floatModel m_panModel;
+	floatModel m_detuneModel;
 
 	float m_harmonic;
 	float m_volumeLeft;
@@ -123,8 +123,8 @@ private:
 
 	const intModel m_modulationAlgo;
 
-	floatModel  m_fx1Knob;
-	floatModel  m_volKnob;
+	floatModel  m_fx1Model;
+	floatModel  m_volModel;
 
 	virtual pluginView * instantiateView( QWidget * _parent );
 

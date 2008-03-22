@@ -38,7 +38,7 @@
 #include "journalling_object.h"
 
 
-const int NUM_FX_CHANNELS = 64;
+const int NumFxChannels = 64;
 
 class fader;
 class fxLine;
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	fxChannel * m_fxChannels[NUM_FX_CHANNELS+1];	// +1 = master
+	fxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
 
 
 	friend class mixerWorkerThread;
@@ -111,7 +111,7 @@ private:
 		fader * m_fader;
 	} ;
 
-	fxChannelView m_fxChannelViews[NUM_FX_CHANNELS+1];
+	fxChannelView m_fxChannelViews[NumFxChannels+1];
 
 	QWidget * m_fxRackArea;
 	fxLine * m_currentFxLine;

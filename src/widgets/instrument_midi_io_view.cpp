@@ -174,8 +174,8 @@ void instrumentMidiIOView::activatedReadablePort( QAction * _item )
 	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
 	// make sure, MIDI-port is configured for input
 	if( _item->isChecked() == TRUE &&
-		mio->m_midiPort->mode() != midiPort::INPUT &&
-		mio->m_midiPort->mode() != midiPort::DUPLEX )
+		mio->m_midiPort->mode() != midiPort::Input &&
+		mio->m_midiPort->mode() != midiPort::Duplex )
 	{
 		mio->m_receiveEnabledModel.setValue( TRUE );
 	}
@@ -191,8 +191,8 @@ void instrumentMidiIOView::activatedWriteablePort( QAction * _item )
 	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
 	// make sure, MIDI-port is configured for output
 	if( _item->isChecked() == TRUE &&
-		mio->m_midiPort->mode() != midiPort::OUTPUT &&
-		mio->m_midiPort->mode() != midiPort::DUPLEX )
+		mio->m_midiPort->mode() != midiPort::Output &&
+		mio->m_midiPort->mode() != midiPort::Duplex )
 	{
 		mio->m_sendEnabledModel.setValue( TRUE );
 	}

@@ -87,7 +87,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_loop_endFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
-	m_frequency( BASE_FREQ ),
+	m_frequency( BaseFreq ),
 	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 #ifdef SDL_SDL_SOUND_H
@@ -116,7 +116,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_loop_endFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
-	m_frequency( BASE_FREQ ),
+	m_frequency( BaseFreq ),
 	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 	if( _frames > 0 )
@@ -147,7 +147,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_loop_endFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
-	m_frequency( BASE_FREQ ),
+	m_frequency( BaseFreq ),
 	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
 {
 	if( _frames > 0 )
