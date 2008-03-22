@@ -125,6 +125,7 @@ LADSPA_Data ladspaControl::getValue( void )
 		case TIME:
 			value = static_cast<LADSPA_Data>(
 						m_tempoSyncKnobModel.value() );
+			break;
 		default:
 			printf( "ladspaControl::getValue BAD BAD BAD\n" );
 			break;
