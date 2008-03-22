@@ -31,6 +31,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QQueue>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QFileDialog>
@@ -94,6 +95,7 @@ const char * surroundarea_help = QT_TRANSLATE_NOOP( "instrumentTrack",
 const int INSTRUMENT_WIDTH	= 250;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 84;
+const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
 // #### IT:
@@ -105,10 +107,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, NOTES_PER_OCTAVE * OCTAVES - 1, 1, this ),
-        m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
-							1.0f, this ),
-        m_surroundAreaModel( this, this ),
-        m_effectChannelModel( 0, 0, NUM_FX_CHANNELS, 1, this ),
+			m_volumeModel( DEFAULT_VOLUME, MIN_VOLUME, MAX_VOLUME,
+					1.0f, this ),
+			m_surroundAreaModel( this, this ),
+			m_effectChannelModel( 0, 0, NUM_FX_CHANNELS, 1, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
@@ -119,7 +121,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_baseNoteModel.setTrack( this );
 	m_baseNoteModel.setInitValue( DEFAULT_OCTAVE * NOTES_PER_OCTAVE + A );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateBaseNote() ) );
+			this, SLOT( updateBaseNote() ) );
 
 	m_volumeModel.setTrack( this );
 	m_effectChannelModel.setTrack( this );
@@ -826,6 +828,11 @@ void instrumentTrack::invalidateAllMyNPH( void )
 
 // #### ITV:
 
+
+QQueue<instrumentTrackWindow *> instrumentTrackView::s_windows;
+
+
+
 instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 						trackContainerView * _tcv ) :
 	trackView( _it, _tcv ),
@@ -918,7 +925,30 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 
 instrumentTrackView::~instrumentTrackView()
 {
-	delete m_window;
+	freeInstrumentTrackWindow();
+}
+
+
+
+
+// TODO: Add windows to free list on freeInstrumentTrackWindow. 
+// But, don't NULL m_window or disconnect signals.  This will allow windows 
+// that are being show/hidden frequently to stay connected.
+void instrumentTrackView::freeInstrumentTrackWindow( void )
+{
+	if( m_window != NULL )
+	{
+		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
+		{
+			s_windows.enqueue( m_window );
+		}
+		else
+		{
+			delete m_window;
+		}
+		
+		m_window = NULL;
+	}
 }
 
 
@@ -926,12 +956,22 @@ instrumentTrackView::~instrumentTrackView()
 
 instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 {
-	if( m_window == NULL )
+	if( m_window != NULL )
+	{
+	}
+	else if( !s_windows.isEmpty() )
+	{
+		m_window = s_windows.dequeue();
+		
+		m_window->setInstrumentTrackView( this );
+		m_window->setModel( model() );
+		m_window->updateInstrumentView();
+	}
+	else
 	{
 		m_window = new instrumentTrackWindow( this );
-		connect( m_tswInstrumentTrackButton, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggledInstrumentTrackButton( bool ) ) );
 	}
+		
 	return( m_window );
 }
 
@@ -941,6 +981,11 @@ instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 void instrumentTrackView::toggledInstrumentTrackButton( bool _on )
 {
 	getInstrumentTrackWindow()->toggledInstrumentTrackButton( _on );
+	
+	if( !_on )
+	{
+		freeInstrumentTrackWindow();
+	}
 }
 
 
@@ -1158,11 +1203,16 @@ void instrumentTrackWindow::modelChanged( void )
 	m_track = m_itv->model();
 
 	m_instrumentNameLE->setText( m_track->name() );
+
+	disconnect( m_track, SIGNAL( nameChanged() ) );
+	disconnect( m_track, SIGNAL( instrumentChanged() ) );
+
 	connect( m_track, SIGNAL( nameChanged() ),
 			this, SLOT( updateName() ) );
 	connect( m_track, SIGNAL( instrumentChanged() ),
 			this, SLOT( updateInstrumentView() ),
 			Qt::QueuedConnection );
+	
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_surroundArea->setModel( &m_track->m_surroundAreaModel );
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
@@ -1255,10 +1305,7 @@ void instrumentTrackWindow::textChanged( const QString & _new_name )
 
 void instrumentTrackWindow::toggledInstrumentTrackButton( bool _on )
 {
-	if( m_itv->m_tswInstrumentTrackButton->isChecked() != _on )
-	{
-		m_itv->m_tswInstrumentTrackButton->setChecked( _on );
-	}
+
 	if( _on )
 	{
 		if( engine::getMainWindow()->workspace() )

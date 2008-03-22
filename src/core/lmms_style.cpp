@@ -11,7 +11,8 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		const QStyleOption *option, QPainter *painter, 
 		const QWidget *widget) const
 {
-	if( element == QStyle::PE_Frame )
+	if( element == QStyle::PE_Frame || element == QStyle::PE_FrameLineEdit ||
+			element == QStyle::PE_PanelLineEdit )
 	{
 		const QRect rect = option->rect;
 

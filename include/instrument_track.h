@@ -45,6 +45,7 @@
 
 
 class QLineEdit;
+template<class T> class QQueue;
 class arpeggiatorView;
 class chordCreatorView;
 class effectRackView;
@@ -220,6 +221,8 @@ public:
 	}
 
 
+	void freeInstrumentTrackWindow( void );
+
 private slots:
 	void toggledInstrumentTrackButton( bool _on );
 	void activityIndicatorPressed( void );
@@ -230,6 +233,8 @@ private slots:
 
 private:
 	instrumentTrackWindow * m_window;
+	
+	static QQueue<instrumentTrackWindow *> s_windows;
 
 	// widgets in track-settings-widget
 	volumeKnob * m_tswVolumeKnob;
@@ -269,6 +274,11 @@ public:
 	const instrumentTrack * model( void ) const
 	{
 		return( castModel<instrumentTrack>() );
+	}
+
+	void setInstrumentTrackView( instrumentTrackView * _tv )
+	{
+		m_itv = _tv;
 	}
 
 

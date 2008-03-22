@@ -1,3 +1,20 @@
+2008-03-22  Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* plugins/organic/organic.cpp:
+	Removed debug printf
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	- First version of cache for hidden instrumentTrackWindows
+	- Need to delete the cache and any remaining ITW's upon application close
+
+	* src/core/lmms_style.cpp:
+	Applied border to more primatives. Still some known issues..
+
+	* src/core/main.cpp:
+	Just playing around with palette colors.
+
+
 2008-03-16  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* Makefile.am:

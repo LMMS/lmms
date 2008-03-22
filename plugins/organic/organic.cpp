@@ -524,7 +524,6 @@ void oscillatorObject::oscButtonChanged( void )
 
 void oscillatorObject::updateVolume( void )
 {
-	printf("Updating VOL\n");
 	m_volumeLeft = ( 1.0f - m_panKnob.value() / (float)PANNING_RIGHT )
 			* m_volKnob.value() / m_numOscillators / 100.0f;
 	m_volumeRight = ( 1.0f + m_panKnob.value() / (float)PANNING_RIGHT )
