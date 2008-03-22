@@ -180,7 +180,7 @@ int main( int argc, char * * argv )
 		// set palette
 		QPalette pal = app.palette();
 		//pal.setColor( QPalette::Background, QColor( 72, 76 ,88 ) );
-		pal.setColor( QPalette::Background, QColor( 67, 75 ,97 ) );
+		pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 		//pal.setColor( QPalette::Background, QColor( 127, 134 ,154 ) );
 		//pal.setColor( QPalette::Background, QColor( 105, 110, 120 ) );
 		//pal.setColor( QPalette::Background, QColor( 89, 99, 128 ) );
@@ -193,7 +193,7 @@ int main( int argc, char * * argv )
 		
 		pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
 	
-		pal.setColor( QPalette::Button, QColor( 156, 160, 172 ) );
+		pal.setColor( QPalette::Button, QColor( 172, 176, 188 ) );
 		//pal.setColor( QPalette::Button, QColor( 172, 177, 191 ) );
 		
 		pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
