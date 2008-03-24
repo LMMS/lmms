@@ -225,15 +225,17 @@ void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void fxMixer::loadSettings( const QDomElement & _this )
 {
 	clear();
+	QDomNode node = _this.firstChild();
 	for( int i = 0; i <= NumFxChannels; ++i )
 	{
-		QDomElement fxch = _this.firstChildElement(
-					QString( "fxchannel%1" ).arg( i ) );
-		m_fxChannels[i]->m_fxChain.restoreState(
+		QDomElement fxch = node.toElement();
+		int num = fxch.attribute( "num" ).toInt();
+		m_fxChannels[num]->m_fxChain.restoreState(
 			fxch.firstChildElement(
-				m_fxChannels[i]->m_fxChain.nodeName() ) );
-		m_fxChannels[i]->m_volumeModel.loadSettings( fxch, "volume" );
-		m_fxChannels[i]->m_name = fxch.attribute( "name" );
+				m_fxChannels[num]->m_fxChain.nodeName() ) );
+		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
+		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+		node = node.nextSibling();
 	}
 
 	emit dataChanged();

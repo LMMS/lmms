@@ -1,3 +1,8 @@
+2008-03-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/fx_mixer.cpp:
+	completed recent changes to saveSettings() / loadSettings()
+
 2008-03-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/themes/default/main_toolbar_bg.png:
