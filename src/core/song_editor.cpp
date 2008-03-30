@@ -138,9 +138,6 @@ songEditor::songEditor( song * _song ) :
 
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
-					SLOT( updateFramesPerTact64th() ) );
-
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
