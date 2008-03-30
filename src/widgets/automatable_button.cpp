@@ -63,6 +63,17 @@ automatableButton::~automatableButton()
 
 
 
+void automatableButton::modelChanged( void )
+{
+	if( QPushButton::isChecked() != model()->value() )
+	{
+		QPushButton::setChecked( model()->value() );
+	}
+}
+
+
+
+
 void automatableButton::update( void )
 {
 	if( QPushButton::isChecked() != model()->value() )
