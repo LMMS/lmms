@@ -1,3 +1,10 @@
+2008-03-24      Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	Fix patch dialog error when viewing dialog before file has loaded -
+	all we had to do is diable the button while a file is loading
+
 2008-03-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/sf2_player.cpp:

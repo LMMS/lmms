@@ -100,6 +100,8 @@ private:
 
 	// Protect synth when we are re-creating it.
 	QMutex m_synthMutex;
+	QMutex m_loadMutex;
+
 	int m_notesRunning[128];
 
 	lcdSpinBoxModel m_bankNum;
@@ -117,6 +119,7 @@ private:
 	friend class sf2InstrumentView;
 
 signals:
+    void fileLoading( void );
 	void fileChanged( void );
 	void patchChanged( void );
 
@@ -161,6 +164,7 @@ private:
 	static patchesDialog * s_patchDialog;
 
 protected slots:
+	void invalidateFile( void );
 	void showFileDialog( void );
 	void showPatchDialog( void );
 	void updateFilename( void );

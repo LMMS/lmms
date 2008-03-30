@@ -151,6 +151,8 @@ QString sf2Instrument::nodeName( void ) const
 
 void sf2Instrument::openFile( const QString & _sf2File )
 {
+	emit fileLoading();
+
 	// Remove synth from this fluidSynth (but not necessarily memory)
 	if ( m_filename != "" )
 	{
@@ -377,6 +379,8 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 			"track_op_menu" ) );
 	m_patchDialogButton->setInactiveGraphic( embed::getIconPixmap(
 			"track_op_menu" ) );
+	m_patchDialogButton->setEnabled( FALSE );
+
 	connect( m_patchDialogButton, SIGNAL( clicked() ),
 			this, SLOT( showPatchDialog() ) );
 	toolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
@@ -435,6 +439,9 @@ void sf2InstrumentView::modelChanged( void )
 	connect(k, SIGNAL( fileChanged( void ) ),
 			this, SLOT( updateFilename( void ) ) );
 
+	connect(k, SIGNAL( fileLoading( void ) ),
+			this, SLOT( invalidateFile( void ) ) );
+
 	updateFilename();
 
 }
@@ -443,13 +450,20 @@ void sf2InstrumentView::modelChanged( void )
 
 void sf2InstrumentView::updateFilename( void )
 {
+	sf2Instrument * i = castModel<sf2Instrument>();
 	m_filenameLabel->setText( "File: " +
-		castModel<sf2Instrument>()->m_filename +
+		i->m_filename +
 		"\nPatch: TODO" );
+
+	m_patchDialogButton->setEnabled( !i->m_filename.isEmpty() );
+
 	update();
 }
 
-
+void sf2InstrumentView::invalidateFile( void )
+{
+	m_patchDialogButton->setEnabled( false );
+}
 
 void sf2InstrumentView::showFileDialog( void )
 {
@@ -483,6 +497,8 @@ void sf2InstrumentView::showFileDialog( void )
 		ofd.setDirectory( configManager::inst()->userSamplesDir() );
 	}
 
+	m_fileDialogButton->setEnabled( false );
+	
 	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
 		QString f = ofd.selectedFiles()[0];
@@ -492,6 +508,8 @@ void sf2InstrumentView::showFileDialog( void )
 			engine::getSong()->setModified();
 		}
 	}
+
+	m_fileDialogButton->setEnabled( true );
 }
 
 
