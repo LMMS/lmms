@@ -164,10 +164,10 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		// on all fonts.  This, causes sfloaderFreeFont to run.
 	}
 
-	const char * sf2Ascii = qPrintable( _sf2File );
+	char * sf2Ascii = qstrdup( qPrintable( _sf2File ) );
 	m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
 
-	QString sf2Key = qPrintable( _sf2File );
+	QString sf2Key( sf2Ascii );
 
 	// Add to map, if doesn't exist.  
 	// We can't do this in callback because fluid hasn't created the sfont yet
@@ -192,6 +192,8 @@ void sf2Instrument::openFile( const QString & _sf2File )
 
 		emit fileChanged();
 	}
+
+	delete[] sf2Ascii;
 }
 
 
