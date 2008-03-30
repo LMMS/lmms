@@ -1,4 +1,28 @@
-2008-03-24      Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-03-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/effect_chain.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	- made controls have a track to allow automation of LADSPA-controls
+	- compare out_sum against getGate()+0.0001f as getGate() might be 0
+	  while out_sum in many cases never will reach 0,0...0 again - fixes
+	  high CPU-usage even after stop playing
+
+	* include/automatable_button.h:
+	* src/widgets/automatable_button.cpp:
+	on model-change, ensure QPushButton's state is correct
+
+	* src/widgets/effect_rack_view.cpp:
+	properly handle changed models
+
+	* src/tracks/instrument_track.cpp:
+	when model has changed, also set new model for effect-view
+
+	* src/core/effect_chain.cpp:
+	- use track as parent
+	- correct initialization of m_enabledModel which fixes crashes on
+	  model-updates
+
+2008-03-30      Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:

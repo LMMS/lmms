@@ -54,6 +54,11 @@ public:
 
 	void clear( void );
 
+	track * getTrack( void )
+	{
+		return( m_track );
+	}
+
 
 private:
 	typedef QVector<effect *> effectList;

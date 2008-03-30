@@ -33,6 +33,7 @@
 #include "ladspa_control.h"
 #include "ladspa_subplugin_features.h"
 #include "mixer.h"
+#include "effect_chain.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -292,8 +293,10 @@ ladspaEffect::ladspaEffect( model * _parent,
 	{
 		manager->activate( m_key, m_handles[proc] );
 	}
-
-	m_controls = new ladspaControls( this, NULL /* TODO!! */ );
+	track * t = dynamic_cast<effectChain *>( _parent ) ?
+			dynamic_cast<effectChain *>( _parent )->getTrack() :
+									NULL;
+	m_controls = new ladspaControls( this, t );
 }
 
 
@@ -332,7 +335,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	{
 		return( FALSE );
 	}
-	
+
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
 	// the control ports.  Need to change this to handle non-in-place-broken
 	// plugins--would speed things up to use the same buffer for both
@@ -433,10 +436,10 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 			}
 		}
 	}
-	
+
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( out_sum <= getGate() )
+	if( out_sum <= getGate()+0.0001f )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )
@@ -449,7 +452,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	{
 		resetBufferCount();
 	}
-	
+
 	return( isRunning() );
 }
 
