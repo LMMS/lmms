@@ -29,14 +29,15 @@
 #include "effect_chain.h"
 #include "engine.h"
 #include "automatable_model_templates.h"
+#include "track.h"
 
 
 
 
 effectChain::effectChain( track * _track ) :
-	model( /*_track*/ NULL ),
+	model( _track ),
 	m_track( _track ),
-	m_enabledModel( FALSE, FALSE, TRUE )
+	m_enabledModel( FALSE )
 {
 }
 
