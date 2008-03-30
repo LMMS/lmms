@@ -3,13 +3,13 @@
 	* src/core/song_editor.cpp:
 	removed obsolete SIGNAL/SLOT-connection
 
-	* include/effect_chain.h:
 	* plugins/bass_booster/bass_booster.cpp:
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	compare out_sum against getGate()+0.0001f as getGate() might be 0
 	while out_sum in many cases never will reach 0,0...0 again - fixes
 	high CPU-usage even after stop playing
 
+	* include/effect_chain.h:
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	made controls have a track to allow automation of LADSPA-controls
 
