@@ -187,7 +187,8 @@ void effectRackView::update( void )
 	for( QVector<effectView *>::iterator it = m_effectViews.begin(); 
 					it != m_effectViews.end(); )
 	{
-		if( i < view_map.size() && view_map[i] == FALSE )
+		if( i < view_map.size() && i < m_effectViews.size() &&
+							view_map[i] == FALSE )
 		{
 			delete m_effectViews[i];
 			m_effectViews.erase( it );
@@ -227,6 +228,7 @@ void effectRackView::addEffect( void )
 
 void effectRackView::modelChanged( void )
 {
+	clear();
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	update();
 }
