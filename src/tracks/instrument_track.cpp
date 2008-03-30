@@ -1201,6 +1201,7 @@ void instrumentTrackWindow::modelChanged( void )
 	m_chordView->setModel( &m_track->m_chordCreator );
 	m_arpView->setModel( &m_track->m_arpeggiator );
 	m_midiView->setModel( &m_track->m_midiIO );
+	m_effectView->setModel( m_track->m_audioPort.getEffects() );
 	updateName();
 }
 
