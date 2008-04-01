@@ -309,6 +309,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/piano_roll.h					\
 		$(srcdir)/include/basic_filters.h				\
 		$(srcdir)/include/envelope_and_lfo_parameters.h			\
+		$(srcdir)/include/envelope_and_lfo_view.h			\
 		$(srcdir)/include/instrument_sound_shaping.h			\
 		$(srcdir)/include/envelope_and_lfo_parameters.h			\
 		$(srcdir)/include/about_dialog.h				\
