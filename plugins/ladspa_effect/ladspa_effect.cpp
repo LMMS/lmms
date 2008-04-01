@@ -439,7 +439,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( out_sum <= getGate()+0.0001f )
+	if( out_sum <= getGate()+0.00001f )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )
