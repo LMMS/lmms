@@ -25,6 +25,8 @@
 #ifndef _EXPORT_H
 #define _EXPORT_H
 
+#include <QtCore/QString>
+
 #include "types.h"
 
 

@@ -28,6 +28,7 @@
 #define _DUMMY_INSTRUMENT_H
 
 #include "instrument.h"
+#include "instrument_view.h"
 
 
 class dummyInstrument : public instrument

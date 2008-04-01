@@ -30,6 +30,7 @@
 #include <config.h>
 #endif
 
+#include <QtCore/Qt>
 
 class midiEvent;
 class midiTime;

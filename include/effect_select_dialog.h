@@ -31,6 +31,8 @@
 
 #include "effect_chain.h"
 
+class QScrollArea;
+
 
 class effectSelectDialog : public QDialog
 {

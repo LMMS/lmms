@@ -27,6 +27,7 @@
 #define _INSTRUMENT_MIDI_IO_H
 
 #include <QtCore/QList>
+#include <QtCore/QPair>
 
 #include "automatable_model.h"
 

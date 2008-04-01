@@ -28,6 +28,7 @@
 
 #include "automatable_model.h"
 #include "plugin_view.h"
+#include "effect.h"
 
 class QGroupBox;
 class QLabel;
@@ -35,7 +36,6 @@ class QPushButton;
 class QMdiSubWindow;
 
 class audioPort;
-class effect;
 class effectControlDialog;
 class knob;
 class ledCheckBox;

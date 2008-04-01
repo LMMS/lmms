@@ -1,7 +1,7 @@
 /*
  * level_object.h - declaration of class levelObject
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
 #ifndef _LEVEL_OBJECT_H
 #define _LEVEL_OBJECT_H
 
-
+#include <QtCore/QString>
 
 
 class levelObject
@@ -62,8 +62,6 @@ protected:
 	int m_maxLevel;
 
 } ;
-
-
 
 
 #endif

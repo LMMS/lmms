@@ -29,6 +29,10 @@
 
 #include <QtCore/QVector>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "volume.h"
 #include "panning.h"
 #include "midi_time.h"

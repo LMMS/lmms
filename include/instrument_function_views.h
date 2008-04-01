@@ -28,7 +28,9 @@
 
 #include "mv_base.h"
 
+#include <QtGui/QWidget>
 
+class QLabel;
 class automatableButtonGroup;
 class comboBox;
 class groupBox;

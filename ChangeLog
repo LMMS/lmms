@@ -1,3 +1,33 @@
+2008-04-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/caps/README.ardour:
+	* plugins/ladspa_effect/caps/README.dist:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	added README-files
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	decreased minimal gate from 0.0001f to 0.00001f as it turned out that
+	some effects were cut off with previous value
+
+	* include/endian_handling.h:
+	* include/note.h:
+	* include/effect_select_dialog.h:
+	* include/midi.h:
+	* include/effect_view.h:
+	* include/side_bar.h:
+	* include/micro_timer.h:
+	* include/midi_event_processor.h:
+	* include/instrument_function_views.h:
+	* include/instrument_midi_io.h:
+	* include/export.h:
+	* include/dummy_instrument.h:
+	* include/level_object.h:
+	added missing includes when compiling headers itself
+
+	* Makefile.am:
+	added single-binary-target for testing-purposes
+
 2008-03-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/song_editor.cpp:

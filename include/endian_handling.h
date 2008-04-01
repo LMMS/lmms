@@ -1,7 +1,7 @@
 /*
- * endian.h - handle endianess-problems
+ * endian_handling.h - handle endianess
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,16 +30,14 @@
 #include <config.h>
 #endif
 
+#include <QtCore/QSysInfo>
+
 #include "types.h"
 
 
 inline bool isLittleEndian( void )
 {
-#ifdef WORDS_BIGENDIAN
-	return( FALSE );
-#else
-	return( TRUE );
-#endif
+	return( QSysInfo::ByteOrder == QSysInfo::LittleEndian );
 }
 
 
