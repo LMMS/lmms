@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign 1.4
 
 
 INCLUDES = -I/usr/include/festival -I/usr/include/speech_tools	\
-	-I$(top_srcdir)/include -I$(top_srcdir)/src/lib -I.
+	-I$(top_srcdir)/include -I$(top_srcdir)/src/gui -I.
 
 
 CXXFLAGS += -Wno-non-template-friend

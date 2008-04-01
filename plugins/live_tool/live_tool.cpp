@@ -1,7 +1,7 @@
 /*
  * live_tool.cpp - tool for live performance
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,12 +23,11 @@
  */
 
 
-#include "live_tool.h"
-
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLayout>
 
-#include "bb_editor.h"
+#include "live_tool.h"
+#include "bb_track_container.h"
 #include "engine.h"
 #include "song.h"
 

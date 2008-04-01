@@ -31,8 +31,8 @@
 
 #include "flp_import.h"
 #include "basic_filters.h"
-#include "bb_editor.h"
 #include "bb_track.h"
+#include "bb_track_container.h"
 #include "combobox.h"
 #include "config_mgr.h"
 #include "debug.h"
