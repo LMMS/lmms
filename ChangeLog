@@ -1,5 +1,39 @@
 2008-04-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/patman/Makefile.am:
+	* plugins/lb302/Makefile.am:
+	* plugins/organic/Makefile.am:
+	* plugins/bass_booster/Makefile.am:
+	* plugins/bit_invader/Makefile.am:
+	* plugins/vst_effect/Makefile.am:
+	* plugins/vibed/Makefile.am:
+	* plugins/triple_oscillator/Makefile.am:
+	* plugins/live_tool/Makefile.am:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/singerbot/Makefile.am:
+	* plugins/audio_file_processor/Makefile.am:
+	* plugins/stk/mallets/Makefile.am:
+	* plugins/stereo_enhancer/Makefile.am:
+	* plugins/vestige/Makefile.am:
+	* plugins/sf2_player/Makefile.am:
+	* plugins/ladspa_browser/Makefile.am:
+	* plugins/kicker/Makefile.am:
+	* plugins/polyb302/Makefile.am:
+	* plugins/flp_import/flp_import.cpp:
+	corrected paths / includes
+
+	* include/engine.h:
+	* include/instrument_track.h:
+	* include/preset_preview_play_handle.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/engine.cpp:
+	added dummyTrackContainer with dummyInstrumentTrack in order to have a
+	default-model for cached inactive instrument-track-windows - fixes
+	regular crashes
+
 	* include/engine.h:
 	* include/bb_track_container.h:
 	* include/track_container_view.h:

@@ -223,6 +223,9 @@ public:
 
 	void freeInstrumentTrackWindow( void );
 
+	static void cleanupWindowPool( void );
+
+
 private slots:
 	void toggledInstrumentTrackButton( bool _on );
 	void activityIndicatorPressed( void );

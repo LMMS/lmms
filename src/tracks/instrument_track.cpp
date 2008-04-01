@@ -921,6 +921,10 @@ void instrumentTrackView::freeInstrumentTrackWindow( void )
 	{
 		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
+			m_window->setModel(
+				engine::getDummyTrackContainer()->
+						dummyInstrumentTrack() );
+			m_window->parentWidget()->hide();
 			s_windows.enqueue( m_window );
 		}
 		else
@@ -929,6 +933,17 @@ void instrumentTrackView::freeInstrumentTrackWindow( void )
 		}
 		
 		m_window = NULL;
+	}
+}
+
+
+
+
+void instrumentTrackView::cleanupWindowPool( void )
+{
+	while( s_windows.count() )
+	{
+		delete s_windows.dequeue();
 	}
 }
 
@@ -1179,7 +1194,7 @@ instrumentTrackWindow::~instrumentTrackWindow()
 
 void instrumentTrackWindow::modelChanged( void )
 {
-	m_track = m_itv->model();
+	m_track = castModel<instrumentTrack>();
 
 	m_instrumentNameLE->setText( m_track->name() );
 

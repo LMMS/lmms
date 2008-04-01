@@ -58,6 +58,7 @@ pianoRoll * engine::s_pianoRoll = NULL;
 projectNotes * engine::s_projectNotes = NULL;
 projectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
+dummyTrackContainer * engine::s_dummyTC = NULL;
 QMap<QString, QString> engine::s_sampleExtensions;
 
 
@@ -97,6 +98,7 @@ void engine::init( const bool _has_gui )
 	}
 
 	presetPreviewPlayHandle::init();
+	s_dummyTC = new dummyTrackContainer;
 
 	s_mixer->startProcessing();
 }
@@ -121,15 +123,21 @@ void engine::destroy( void )
 
 	delete s_fxMixerView;
 	s_fxMixerView = NULL;
-	delete s_fxMixer;
-	s_fxMixer = NULL;
+
+	presetPreviewPlayHandle::cleanup();
+	instrumentTrackView::cleanupWindowPool();
+
+	delete s_song;
+	delete s_bbTrackContainer;
+	delete s_dummyTC;
 
 	delete s_ladspaManager;
 
-	presetPreviewPlayHandle::cleanUp();
-
 	delete s_mixer;
 	s_mixer = NULL;
+	delete s_fxMixer;
+	s_fxMixer = NULL;
+
 	//delete configManager::inst();
 	delete s_projectJournal;
 	s_projectJournal = NULL;

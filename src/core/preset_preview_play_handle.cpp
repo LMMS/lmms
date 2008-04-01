@@ -196,7 +196,7 @@ void presetPreviewPlayHandle::init( void )
 
 
 
-void presetPreviewPlayHandle::cleanUp( void )
+void presetPreviewPlayHandle::cleanup( void )
 {
 	delete s_previewTC;
 	s_previewTC = NULL;

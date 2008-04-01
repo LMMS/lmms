@@ -126,6 +126,11 @@ public:
 		return( s_ladspaManager );
 	}
 
+	static dummyTrackContainer * getDummyTrackContainer( void )
+	{
+		return( s_dummyTC );
+	}
+
 	static float framesPerTact64th( void )
 	{
 		return( s_framesPerTact64th );

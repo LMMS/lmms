@@ -24,13 +24,11 @@
  */
 
 
-#include "track_container.h"
-
-
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
 
-
+#include "track_container.h"
+#include "instrument_track.h"
 #include "engine.h"
 #include "song.h"
 
@@ -200,6 +198,22 @@ void trackContainer::setMutedOfAllTracks( bool _muted )
 		m_tracks[i]->setMuted( _muted );
 	}
 }
+
+
+
+
+
+dummyTrackContainer::dummyTrackContainer( void ) :
+	trackContainer(),
+	m_dummyInstrumentTrack( NULL )
+{
+	setJournalling( FALSE );
+	m_dummyInstrumentTrack = dynamic_cast<instrumentTrack *>(
+				track::create( track::InstrumentTrack,
+							this ) );
+	m_dummyInstrumentTrack->setJournalling( FALSE );
+}
+
 
 
 
