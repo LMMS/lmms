@@ -456,5 +456,9 @@ lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) 
 if BUILD_LINUX
 lmms_LDFLAGS = -rdynamic
 endif
+
+single-binary:
+	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -combine -pipe -O2 -g $(INCLUDES) $(AM_CXXFLAGS) $(lmms_LDADD) $(lmms_LDFLAGS) $(lmms_SOURCES) -o lmms-single
+
 #-rpath $(pkglibdir)
 
