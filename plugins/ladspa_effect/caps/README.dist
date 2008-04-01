@@ -1,0 +1,18 @@
+
+Distribution Notice for the caps audio plugin suite
+===================================================
+
+If you intend to package caps for redistribution PLEASE include the html 
+and pdf documentation files, and make clear to your users that they exist 
+and where to find them. 
+
+caps 0.3 Notice and WARNING
+===========================
+
+The 0.3 release has relabelled the SweepVF, Cabinet, Chorus, StereoChorus
+and Phaser plugins (appending an 'I' to their label to be precise). 
+Unfortunately, this might break some hosts' session files. Sorry about that.
+
+Ardour users are well-advised to read the file 'README.ardour' in this
+directory before installing caps 0.3.0.
+

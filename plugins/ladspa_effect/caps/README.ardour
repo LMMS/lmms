@@ -1,0 +1,41 @@
+
+Ardour Users: Notice and WARNING
+================================
+
+ALL the plugins in caps have been renamed as of caps-0.3.0. While this is 
+clearly within the bounds of the LADSPA specification, ardour will fail to 
+load caps plugins from earlier releases referenced in your existing session 
+files should you install caps-0.3.0 over a previous release.
+
+As a quick workaround, you can install caps with 
+
+# make alt-install
+
+which will install the plugins as 'caps-ng.so', leaving your existing 
+installation of caps intact so you can manually update your sessions within
+ardour to use the latest versions of the caps plugins.
+
+The downside is you're now stuck with two implementations of identical 
+plugins, and some hosts will (quite sensibly) complain about this. So after
+you're done updating your ardour sessions, installing caps under its rightful
+name of 'caps.so' is a good idea.
+
+As an alternative, you can also run a search-and-replace on your ardour
+session files. I'll be happy to help you there should you require 
+assistance, just drop me a mail.
+
+
+RDF metadata
+============
+
+Pete Leigh has graciously provided a RDF file that refines the user interface
+of the Cabinet and SweepVF plugins within ardour (adding labels to the SweepVF
+filter modes and the Cabinet speaker models to be precise). I have dabbled
+with these files so if they fail to work for you, it's all my fault.
+
+You should be able install the file on your system with
+
+# make rdf-install
+
+but be warned that I have set this up blindly. Tell me if it works for you.
+

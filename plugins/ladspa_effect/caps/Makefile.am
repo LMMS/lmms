@@ -30,4 +30,4 @@ depend: $(SOURCES)
 
 all: caps.so
 
-EXTRA_DIST = $(SOURCES) $(HDRS)
+EXTRA_DIST = $(SOURCES) $(HDRS) $(wildcard README*)
