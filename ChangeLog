@@ -1,5 +1,31 @@
 2008-04-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/engine.h:
+	* include/bb_track_container.h:
+	* include/track_container_view.h:
+	* include/song_editor.h:
+	* include/bb_editor.h:
+	* include/track_container.h:
+	* src/gui/track_container_view.cpp:
+	* src/gui/bb_editor.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/core/song.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/file_browser.cpp:
+	* src/core/track.cpp:
+	* src/core/engine.cpp:
+	* src/core/automation_editor.cpp:
+	* Makefile.am:
+	- splitted track_container.h into track_container.h and
+	  track_container_view.h
+	- splitted bb_editor.h into bb_track_container.h and bb_editor.h
+	- moved view-component-implementations of trackContainer and
+	  bbTrackContainer to src/gui/
+	- added dummyInstrumentTrack-implementation
+
 	* plugins/ladspa_effect/caps/README.ardour:
 	* plugins/ladspa_effect/caps/README.dist:
 	* plugins/ladspa_effect/caps/Makefile.am:

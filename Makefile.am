@@ -53,6 +53,7 @@ lmms_MOC =						\
 		./automation_pattern.moc		\
 		./automation_track.moc			\
 		./bb_editor.moc				\
+		./bb_track_container.moc		\
 		./bb_track.moc				\
 		./caption_menu.moc			\
 		./instrument_track.moc			\
@@ -116,6 +117,7 @@ lmms_MOC =						\
 		./timeline.moc				\
 		./tool_button.moc			\
 		./track_container.moc			\
+		./track_container_view.moc		\
 		./track.moc				\
 		./visualization_widget.moc		\
 		./volume_knob.moc
@@ -162,7 +164,7 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/about_dialog.cpp			\
 		$(srcdir)/src/core/automation_editor.cpp		\
 		$(srcdir)/src/core/automation_pattern.cpp		\
-		$(srcdir)/src/core/bb_editor.cpp			\
+		$(srcdir)/src/core/bb_track_container.cpp		\
 		$(srcdir)/src/core/config_mgr.cpp			\
 		$(srcdir)/src/core/effect_chain.cpp			\
 		$(srcdir)/src/core/effect_control_dialog.cpp		\
@@ -203,6 +205,8 @@ lmms_SOURCES =								\
 		$(srcdir)/src/core/track_container.cpp			\
 		$(srcdir)/src/core/surround_area.cpp			\
 		$(srcdir)/src/core/timeline.cpp				\
+		$(srcdir)/src/gui/bb_editor.cpp				\
+		$(srcdir)/src/gui/track_container_view.cpp		\
 		$(srcdir)/src/lib/clipboard.cpp				\
 		$(srcdir)/src/lib/drumsynth.cpp				\
 		$(srcdir)/src/lib/journalling_object.cpp		\
@@ -296,6 +300,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/instrument.h				\
 		$(srcdir)/include/instrument_view.h			\
 		$(srcdir)/include/bb_editor.h				\
+		$(srcdir)/include/bb_track_container.h			\
 		$(srcdir)/include/piano.h				\
 		$(srcdir)/include/fx_mixer.h				\
 		$(srcdir)/include/pixmap_button.h			\
@@ -331,6 +336,7 @@ lmms_SOURCES =								\
 		$(srcdir)/include/side_bar_widget.h			\
 		$(srcdir)/include/track.h				\
 		$(srcdir)/include/track_container.h			\
+		$(srcdir)/include/track_container_view.h		\
 		$(srcdir)/include/bb_track.h				\
 		$(srcdir)/include/caption_menu.h			\
 		$(srcdir)/include/sample_track.h			\

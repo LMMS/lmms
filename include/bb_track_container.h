@@ -1,5 +1,5 @@
 /*
- * bb_editor.h - view-component of BB-Editor
+ * bb_track_container.h - model-component of BB-Editor
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,48 +23,59 @@
  */
 
 
-#ifndef _BB_EDITOR_H
-#define _BB_EDITOR_H
+#ifndef _BB_TRACK_CONTAINER_H
+#define _BB_TRACK_CONTAINER_H
 
-#include "track_container_view.h"
-
-
-class bbTrackContainer;
-class comboBox;
-class toolButton;
+#include "track_container.h"
+#include "combobox.h"
 
 
-class bbEditor : public trackContainerView
+class bbTrackContainer : public trackContainer
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
 public:
-	bbEditor( bbTrackContainer * _tc );
-	virtual ~bbEditor();
+	bbTrackContainer( void );
+	virtual ~bbTrackContainer();
 
-	virtual inline bool fixedTCOs( void ) const
+	virtual bool play( midiTime _start, const fpp_t _frames,
+						const f_cnt_t _frame_base,
+							Sint16 _tco_num = -1 );
+
+	virtual void updateAfterTrackAdd( void );
+
+	inline virtual QString nodeName( void ) const
 	{
-		return( TRUE );
+		return( "bbtrackcontainer" );
 	}
 
-	void removeBBView( int _bb );
+	tact lengthOfBB( int _bb );
+	inline tact lengthOfCurrentBB( void )
+	{
+		return( lengthOfBB( currentBB() ) );
+	}
+	int numOfBBs( void ) const;
+	void removeBB( int _bb );
+
+	void swapBB( int _bb1, int _bb2 );
+
+	void updateBBTrack( trackContentObject * _tco );
 
 
 public slots:
 	void play( void );
 	void stop( void );
-	void updatePosition( void );
+	void updateComboBox( void );
+	void currentBBChanged( void );
 
 
 private:
-	virtual void keyPressEvent( QKeyEvent * _ke );
+	void createTCOsForBB( int _bb );
 
-	bbTrackContainer * m_bbtc;
-	QWidget * m_toolBar;
+	comboBoxModel m_bbComboBoxModel;
 
-	toolButton * m_playButton;
-	toolButton * m_stopButton;
 
-	comboBox * m_bbComboBox;
+	friend class bbEditor;
 
 } ;
 

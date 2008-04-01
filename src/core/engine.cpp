@@ -28,6 +28,7 @@
 #include "engine.h"
 #include "automation_editor.h"
 #include "bb_editor.h"
+#include "bb_track_container.h"
 #include "config_mgr.h"
 #include "fx_mixer.h"
 #include "ladspa_2_lmms.h"

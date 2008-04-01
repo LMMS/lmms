@@ -61,16 +61,9 @@ public:
 	{
 	}
 
-
-	// implement pure-virtual functions...
-	virtual inline bool fixedTCOs( void ) const
+	virtual QString nodeName( void ) const
 	{
-		return( TRUE );
-	}
-
-	virtual inline QString nodeName( void ) const
-	{
-		return( "previewtc" );
+		return( "bbtrackcontainer" );
 	}
 
 	instrumentTrack * previewInstrumentTrack( void )

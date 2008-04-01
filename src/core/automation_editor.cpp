@@ -61,7 +61,7 @@
 #include "tool_button.h"
 #include "text_float.h"
 #include "combobox.h"
-#include "bb_editor.h"
+#include "bb_track_container.h"
 #include "piano_roll.h"
 #include "debug.h"
 

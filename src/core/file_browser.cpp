@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
@@ -26,17 +24,14 @@
  */
 
 
-#include "file_browser.h"
-
-
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QPushButton>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 
-
-#include "bb_editor.h"
+#include "file_browser.h"
+#include "bb_track_container.h"
 #include "config_mgr.h"
 #include "debug.h"
 #include "embed.h"
@@ -934,5 +929,3 @@ QString fileItem::extension( const QString & _file )
 
 #include "file_browser.moc"
 
-
-#endif

@@ -27,7 +27,7 @@
 #ifndef _SONG_EDITOR_H
 #define _SONG_EDITOR_H
 
-#include "track_container.h"
+#include "track_container_view.h"
 #include "lcd_spinbox.h"
 #include "automatable_slider.h"
 

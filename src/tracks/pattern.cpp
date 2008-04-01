@@ -49,7 +49,7 @@
 #include "audio_sample_recorder.h"
 #include "song.h"
 #include "tooltip.h"
-#include "bb_editor.h"
+#include "bb_track_container.h"
 #include "string_pair_drag.h"
 #include "main_window.h"
 

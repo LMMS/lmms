@@ -46,6 +46,7 @@
 #include "automation_editor.h"
 #include "bb_editor.h"
 #include "bb_track.h"
+#include "bb_track_container.h"
 #include "config_mgr.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"

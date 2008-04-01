@@ -35,6 +35,7 @@
 class automationEditor;
 class bbEditor;
 class bbTrackContainer;
+class dummyTrackContainer;
 class fxMixer;
 class fxMixerView;
 class projectJournal;
@@ -147,6 +148,7 @@ private:
 	static song * s_song;
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
+	static dummyTrackContainer * s_dummyTC;
 
 	// GUI
 	static mainWindow * s_mainWindow;

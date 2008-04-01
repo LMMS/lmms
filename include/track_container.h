@@ -27,17 +27,12 @@
 #ifndef _TRACK_CONTAINER_H
 #define _TRACK_CONTAINER_H
 
-#include <QtGui/QScrollArea>
-#include <QtCore/QVector>
-#include <QtGui/QWidget>
-
-
 #include "track.h"
 #include "journalling_object.h"
 
 
 class trackContainerView;
-class QVBoxLayout;
+class instrumentTrack;
 
 
 class trackContainer : public model, public journallingObject
@@ -79,9 +74,6 @@ public:
 	}
 
 
-	//const QList<track *> tracks( void ) const;
-
-
 signals:
 	void trackAdded( track * _track );
 
@@ -96,148 +88,30 @@ private:
 } ;
 
 
-
-class trackContainerView : public QWidget, public modelView,
-						public journallingObject
+class dummyTrackContainer : public trackContainer
 {
-	Q_OBJECT
 public:
-	trackContainerView( trackContainer * _tc );
-	virtual ~trackContainerView();
+	dummyTrackContainer( void );
 
-	QWidget * contentWidget( void )
+	virtual ~dummyTrackContainer()
 	{
-		return( m_scrollArea );
 	}
-
-	inline const midiTime & currentPosition( void ) const
-	{
-		return( m_currentPosition );
-	}
-
-	virtual bool fixedTCOs( void ) const
-	{
-		return( FALSE );
-	}
-
-	inline float pixelsPerTact( void ) const
-	{
-		return( m_ppt );
-	}
-
-	void setPixelsPerTact( int _ppt );
-
-	const trackView * trackViewAt( const int _y ) const;
-
-	virtual bool allowRubberband( void ) const;
-
-	inline bool rubberBandActive( void ) const
-	{
-		return( m_rubberBand->isVisible() );
-	}
-
-	inline QVector<selectableObject *> selectedObjects( void )
-	{
-		if( allowRubberband() == TRUE )
-		{
-			return( m_rubberBand->selectedObjects() );
-		}
-		return( QVector<selectableObject *>() );
-	}
-
-
-	trackContainer * model( void )
-	{
-		return( m_tc );
-	}
-
-	const trackContainer * model( void ) const
-	{
-		return( m_tc );
-	}
-
-	void moveTrackViewUp( trackView * _tv );
-	void moveTrackViewDown( trackView * _tv );
-
-	// -- for usage by trackView only ---------------
-	trackView * addTrackView( trackView * _tv );
-	void removeTrackView( trackView * _tv );
-	// -------------------------------------------------------
-
-	void clearAllTracks( void );
 
 	virtual QString nodeName( void ) const
 	{
-		return( "trackcontainerview" );
+		return( "dummytrackcontainer" );
 	}
 
-
-public slots:
-	void realignTracks( void );
-	void createTrackView( track * _t );
-
-
-protected:
-	static const int DEFAULT_PIXELS_PER_TACT = 16;
-
-	const QList<trackView *> & trackViews( void ) const
+	instrumentTrack * dummyInstrumentTrack( void )
 	{
-		return( m_trackViews );
+		return( m_dummyInstrumentTrack );
 	}
-
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void resizeEvent( QResizeEvent * );
-
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
-
-	midiTime m_currentPosition;
 
 
 private:
-	enum Actions
-	{
-		AddTrack,
-		RemoveTrack
-	} ;
-
-	class scrollArea : public QScrollArea
-	{
-	public:
-		scrollArea( trackContainerView * _parent );
-		virtual ~scrollArea();
-
-	protected:
-		virtual void wheelEvent( QWheelEvent * _we );
-
-	private:
-		trackContainerView * m_trackContainerView;
-
-	} ;
-
-	trackContainer * m_tc;
-	typedef QList<trackView *> trackViewList;
-	trackViewList m_trackViews;
-
-	scrollArea * m_scrollArea;
-	QVBoxLayout * m_scrollLayout;
-
-	float m_ppt;
-
-	rubberBand * m_rubberBand;
-	QPoint m_origin;
-
-
-signals:
-	void positionChanged( const midiTime & _pos );
-
+	instrumentTrack * m_dummyInstrumentTrack;
 
 } ;
-
 
 
 #endif

@@ -42,6 +42,7 @@
 #include "automatable_model_templates.h"
 #include "bb_editor.h"
 #include "bb_track.h"
+#include "bb_track_container.h"
 #include "clipboard.h"
 #include "embed.h"
 #include "engine.h"
