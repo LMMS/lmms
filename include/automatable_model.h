@@ -96,6 +96,11 @@ public:
 		return( 1 );
 	}
 
+	template<class V>
+	static inline T castValue( V _v )
+	{
+		return( static_cast<T>( _v ) );
+	}
 
 	inline virtual T value( void ) const
 	{
