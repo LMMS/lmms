@@ -696,7 +696,9 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	m_volumeModel.loadSettings( _this, "vol" );
 
 	// compat-hacks - move to mmp::upgrade
-	if( _this.hasAttribute( "surpos" ) )
+	if( _this.hasAttribute( "surpos" ) || _this.hasAttribute( "surpos-x" ) ||
+		!_this.firstChildElement( "automation-pattern" ).
+					firstChildElement( "surpos-x" ).isNull() )
 	{
 		surroundAreaModel m( this, this );
 		m.loadSettings( _this, "surpos" );
