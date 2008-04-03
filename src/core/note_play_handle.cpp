@@ -41,7 +41,7 @@ inline notePlayHandle::baseDetuning::baseDetuning(
 	m_detuning( _detuning )
 {
 	m_level = m_detuning->getAutomationPattern()->valueAt( 0 );
-	m_value = m_detuning->value( m_level );
+	m_value = m_detuning->levelToValue( m_level );
 }
 
 
@@ -50,7 +50,7 @@ inline notePlayHandle::baseDetuning::baseDetuning(
 inline void notePlayHandle::baseDetuning::setLevel( int _level )
 {
 	m_level = _level;
-	m_value = m_detuning->value( m_level );
+	m_value = m_detuning->levelToValue( m_level );
 }
 
 

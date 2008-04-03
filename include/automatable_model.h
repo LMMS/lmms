@@ -134,7 +134,7 @@ public:
 
 	T fittedValue( T _value ) const;
 
-	inline T value( int _level ) const
+	inline T levelToValue( int _level ) const
 	{
 		return( fittedValue( _level * m_step ) );
 	}
@@ -233,7 +233,7 @@ private:
 
 	QString levelToLabel( int _level ) const
 	{
-		return( QString::number( value( _level ) ) );
+		return( QString::number( levelToValue( _level ) ) );
 	}
 
 	int labelToLevel( QString _label )
