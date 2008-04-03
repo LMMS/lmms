@@ -202,9 +202,9 @@ surroundAreaModel::surroundAreaModel( ::model * _parent, track * _track,
 
 
 
-volumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
+surroundVolumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
 {
-	volumeVector v = { { _v_scale, _v_scale
+	surroundVolumeVector v = { { _v_scale, _v_scale
 #ifndef DISABLE_SURROUND
 					, _v_scale, _v_scale
 #endif

@@ -26,10 +26,30 @@
 #ifndef _VOLUME_H
 #define _VOLUME_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "types.h"
 
 const volume MinVolume = 0;
 const volume MaxVolume = 200;
 const volume DefaultVolume = 100;
+
+typedef struct
+{
+	float vol[2];
+} stereoVolumeVector;
+
+
+typedef struct
+{
+#ifndef DISABLE_SURROUND
+	float vol[4];
+#else
+	float vol[2];
+#endif
+} surroundVolumeVector;
+
 
 #endif

@@ -129,13 +129,8 @@ void samplePlayHandle::play( bool /* _try_parallelizing */ )
 				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
 		sampleFrame * buf = new sampleFrame[frames];
-		volumeVector v = { { m_volumeModel->value(),
-					m_volumeModel->value()
-#ifndef DISABLE_SURROUND
-					, m_volumeModel->value(),
-						m_volumeModel->value()
-#endif
-				} } ;
+		stereoVolumeVector v = { { m_volumeModel->value(),
+						m_volumeModel->value() } };
 		m_sampleBuffer->play( buf, &m_state, frames );
 		engine::getMixer()->bufferToPort( buf, frames, offset(), v,
 								m_audioPort );
