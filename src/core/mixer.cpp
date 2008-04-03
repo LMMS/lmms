@@ -33,6 +33,7 @@
 #include "mixer.h"
 #include "fx_mixer.h"
 #include "play_handle.h"
+#include "effect.h"
 #include "song.h"
 #include "templates.h"
 #include "envelope_and_lfo_parameters.h"
@@ -622,7 +623,7 @@ void mixer::clear( void )
 void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
-					const volumeVector & _volume_vector,
+					stereoVolumeVector _vv,
 						audioPort * _port )
 {
 	const fpp_t start_frame = _offset % m_framesPerPeriod;
@@ -632,12 +633,11 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 	_port->lockFirstBuffer();
 	for( fpp_t frame = start_frame; frame < loop1_frame; ++frame )
 	{
-		for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels(); ++chnl )
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
 			_port->firstBuffer()[frame][chnl] +=
-					_buf[frame - start_frame][chnl %
-							DEFAULT_CHANNELS] *
-						_volume_vector.vol[chnl];
+					_buf[frame - start_frame][chnl] *
+								_vv.vol[chnl];
 		}
 	}
 	_port->unlockFirstBuffer();
@@ -650,13 +650,12 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 						m_framesPerPeriod );
 		for( fpp_t frame = 0; frame < end_frame; ++frame )
 		{
-			for( ch_cnt_t chnl = 0; chnl < m_audioDev->channels();
+			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
 									++chnl )
 			{
 				_port->secondBuffer()[frame][chnl] +=
-					_buf[frames_done + frame][chnl %
-							DEFAULT_CHANNELS] *
-						_volume_vector.vol[chnl];
+					_buf[frames_done + frame][chnl] *
+								_vv.vol[chnl];
 			}
 		}
 		// we used both buffers so set flags
@@ -694,7 +693,7 @@ void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
 
 
 
-float mixer::peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames )
+float mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
 {
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
@@ -714,7 +713,7 @@ float mixer::peakValueLeft( surroundSampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-float mixer::peakValueRight( surroundSampleFrame * _ab, const f_cnt_t _frames )
+float mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 {
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )

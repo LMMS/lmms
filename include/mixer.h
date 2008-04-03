@@ -73,11 +73,6 @@ const sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 
-typedef struct
-{
-	float vol[SURROUND_CHANNELS];
-} volumeVector;
-
 
 const Uint8 BYTES_PER_SAMPLE = sizeof( sample_t );
 const Uint8 BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
@@ -274,8 +269,8 @@ public:
 	void FASTCALL bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
-					const volumeVector & _volumeVector,
-							audioPort * _port );
+					stereoVolumeVector _volume_vector,
+					audioPort * _port );
 
 	void FASTCALL clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
@@ -286,10 +281,8 @@ public:
 						const f_cnt_t _offset = 0 );
 #endif
 
-	static float peakValueLeft( surroundSampleFrame * _ab,
-							const f_cnt_t _frames );
-	static float peakValueRight( surroundSampleFrame * _ab,
-							const f_cnt_t _frames );
+	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
+	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
 
 
 	bool criticalXRuns( void ) const;
