@@ -30,6 +30,7 @@
 #include <QtGui/QListWidget>
 
 #include "effect_chain.h"
+#include "effect.h"
 
 class QScrollArea;
 

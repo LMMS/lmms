@@ -1,7 +1,7 @@
 /*
  * stereo_enhancer.h - stereo-enhancer-effect-plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,8 +40,8 @@ public:
 	stereoEnhancerEffect( model * parent, 
 	                      const descriptor::subPluginFeatures::key * _key );
 	virtual ~stereoEnhancerEffect();
-	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
-	                                          const fpp_t _frames );
+	virtual bool processAudioBuffer( sampleFrame * _buf,
+		                                          const fpp_t _frames );
 
 	virtual effectControls * getControls( void )
 	{

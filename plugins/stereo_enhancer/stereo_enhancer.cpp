@@ -1,7 +1,7 @@
 /*
  * stereo_enhancer.cpp - stereo-enhancer-effect-plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,7 +79,7 @@ stereoEnhancerEffect::~stereoEnhancerEffect()
 
 
 
-bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _buf,
+bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
 	
@@ -95,6 +95,9 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 	{
 		return( FALSE );
 	}
+
+	const float d = getDryLevel();
+	const float w = getWetLevel();
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
@@ -120,11 +123,9 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 		
 		m_seFX.nextSample( s[0], s[1] );
 
-		for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			_buf[f][ch] = getDryLevel() * _buf[f][ch] +
-				getWetLevel() *
-					s[ch%DEFAULT_CHANNELS];
+			_buf[f][ch] = d * _buf[f][ch] + w * s[ch];
 			out_sum += _buf[f][ch]*_buf[f][ch];
 		}
 		
@@ -133,7 +134,7 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	if( out_sum <= getGate() )
+	if( out_sum / _frames <= getGate()+0.00001 )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )
@@ -150,6 +151,8 @@ bool FASTCALL stereoEnhancerEffect::processAudioBuffer( surroundSampleFrame * _b
 	}
 	return( isRunning() );
 }
+
+
 
 
 void stereoEnhancerEffect::clearMyBuffer()

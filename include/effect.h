@@ -62,8 +62,8 @@ public:
 	}
 
 	
-	virtual bool processAudioBuffer( 
-			surroundSampleFrame * _buf, const fpp_t _frames );
+	virtual bool processAudioBuffer( sampleFrame * _buf,
+						const fpp_t _frames ) = 0;
 
 	inline ch_cnt_t getProcessorCount( void ) const
 	{

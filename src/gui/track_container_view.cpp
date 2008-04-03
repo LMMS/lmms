@@ -23,10 +23,6 @@
  */
 
 
-#include "track_container_view.h"
-#include "track_container.h"
-
-
 #include <QtGui/QApplication>
 #include <QtGui/QMdiArea>
 #include <QtGui/QProgressDialog>
@@ -34,9 +30,12 @@
 #include <QtGui/QWheelEvent>
 
 
+#include "track_container_view.h"
+#include "track_container.h"
 #include "bb_track.h"
 #include "config_mgr.h"
 #include "debug.h"
+#include "engine.h"
 #include "file_browser.h"
 #include "import_filter.h"
 #include "instrument.h"

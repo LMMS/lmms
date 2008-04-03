@@ -1,3 +1,61 @@
+2008-04-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	* include/effect.h:
+	- made effect::processAudioBuffer(...) process a sampleFrame- instead of
+	  surroundSampleFrame-array
+	- divide out_sum by number of frames processed to have a
+	  period-size-independent value
+
+	* src/core/note_play_handle.cpp:
+	* include/automatable_model.h:
+	renamed value( int ) to levelToValue( int ) as preparation for
+	controller-framework
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	- made mixer::buffertToPort accept a stereoVolumeVector as audio-buffers
+	  have stereo-audio-buffers now
+	- made peakValueLeft() and peakValueRight() take a sampleFrame-pointer
+	- process in stereo internally
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	replaced surroundArea with panning-knob
+
+	* include/audio_port.h:
+	* src/core/audio/audio_port.cpp:
+	use sampleFrame-array instead of surroundSampleFrame-array for
+	processing
+
+	* src/core/fx_mixer.cpp:
+	* include/fx_mixer.h:
+	made mixToChannel() take a sampleFrame-pointer
+
+	* include/volume.h:
+	* src/core/sample_play_handle.cpp:
+	* src/core/surround_area.cpp:
+	added stereoVolumeVector and surroundVolumeVector-declarations
+
+	* include/dummy_effect.h:
+	implement pure-virtual processAudioBuffer()-method
+
+	* include/panning.h:
+	new panningToVolumeVector()-inline-method
+
+	* include/effect_chain.h:
+	* src/core/effect_chain.cpp:
+	made processAudioBuffer() take a sampleFrame-pointer
+
+	* include/visualization_widget.h:
+	* src/gui/widgets/visualization_widget.cpp:
+	use sampleFrame-array instead of surroundSampleFrame-array internally
+
 2008-04-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/automatable_model.h:

@@ -96,15 +96,6 @@ void effect::loadSettings( const QDomElement & _this )
 
 
 
-bool effect::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpp_t _frames )
-{
-	return( FALSE );
-}
-
-
-
-
 effect * effect::instantiate( const QString & _plugin_name,
 				model * _parent,
 				descriptor::subPluginFeatures::key * _key )

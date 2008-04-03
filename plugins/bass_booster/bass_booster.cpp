@@ -70,7 +70,7 @@ bassBoosterEffect::~bassBoosterEffect()
 
 
 
-bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
+bool bassBoosterEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
@@ -79,20 +79,20 @@ bool FASTCALL bassBoosterEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	}
 
 	double out_sum = 0.0;
+	const float d = getDryLevel();
+	const float w = getWetLevel();
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
 		m_bbFX.nextSample( s[0], s[1] );
-		for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			_buf[f][ch] = getDryLevel() * _buf[f][ch] +
-				getWetLevel() *
-					s[ch%DEFAULT_CHANNELS];
+			_buf[f][ch] = d * _buf[f][ch] + w * s[ch];
 			out_sum += _buf[f][ch]*_buf[f][ch];
 		}
 	}
 
-	if( out_sum <= getGate()+0.00001f )
+	if( out_sum / _frames <= getGate()+0.000001 )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )

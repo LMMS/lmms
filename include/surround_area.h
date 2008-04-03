@@ -51,7 +51,7 @@ public:
 	surroundAreaModel( ::model * _parent, track * _track = NULL,
 					bool _default_constructed = FALSE );
 
-	volumeVector getVolumeVector( float _v_scale ) const;
+	surroundVolumeVector getVolumeVector( float _v_scale ) const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
 					const QString & _name = "surpos" );

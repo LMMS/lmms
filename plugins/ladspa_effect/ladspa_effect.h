@@ -44,7 +44,7 @@ public:
 			const descriptor::subPluginFeatures::key * _key );
 	virtual ~ladspaEffect();
 
-	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
+	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 	
 	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );

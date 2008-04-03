@@ -328,7 +328,7 @@ ladspaEffect::~ladspaEffect()
 
 
 
-bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf, 
+bool ladspaEffect::processAudioBuffer( sampleFrame * _buf, 
 							const fpp_t _frames )
 {
 	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
@@ -403,6 +403,8 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 	// Copy the LADSPA output buffers to the LMMS buffer.
 	double out_sum = 0.0;
 	channel = 0;
+	const float d = getDryLevel();
+	const float w = getWetLevel();
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++)
 	{
 		for( Uint16 port = 0; port < m_portCount; port++ )
@@ -418,15 +420,15 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 						frame < _frames; frame++ )
 					{
 						_buf[frame][channel] = 
-							getDryLevel() * 
+							d * 
 							_buf[frame][channel] +
-							getWetLevel() *
+							w *
 							m_ports[proc][port]->buffer[frame];
 						out_sum += 
 							_buf[frame][channel] *
 							_buf[frame][channel];
 					}
-					channel++;
+					++channel;
 					break;
 				case AUDIO_RATE_OUTPUT:
 				case CONTROL_RATE_OUTPUT:
@@ -439,7 +441,7 @@ bool FASTCALL ladspaEffect::processAudioBuffer( surroundSampleFrame * _buf,
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( out_sum <= getGate()+0.00001f )
+	if( out_sum / _frames <= getGate()+0.000001 )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )

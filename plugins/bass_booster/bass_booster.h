@@ -43,7 +43,7 @@ public:
 	bassBoosterEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key );
 	virtual ~bassBoosterEffect();
-	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
+	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
 	virtual effectControls * getControls( void )
