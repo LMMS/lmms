@@ -72,6 +72,7 @@
 #include "sample_play_handle.h"
 #include "song.h"
 #include "string_pair_drag.h"
+#include "surround_area.h"
 #include "tab_widget.h"
 #include "tooltip.h"
 #include "volume_knob.h"
@@ -108,7 +109,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_notes(),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, 1, this ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this ),
-        m_surroundAreaModel( this, this ),
+        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
         m_effectChannelModel( 0, 0, NumFxChannels, 1, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -177,7 +178,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		return;
 	}
 	float v_scale = (float) getVolume() / DefaultVolume;
-	
+
 	m_audioPort.getEffects()->startRunning();
 
 	// instruments using instrument-play-handles will call this method
@@ -188,14 +189,16 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		m_soundShaping.processAudioBuffer( _buf, _frames, _n );
 		v_scale *= ( (float) _n->getVolume() / DefaultVolume );
 	}
-	volumeVector v = m_surroundAreaModel.getVolumeVector( v_scale );
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	engine::getMixer()->bufferToPort( _buf,
 		( _n != NULL ) ? tMin<f_cnt_t>(
 				_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
-			( _n != NULL ) ? _n->offset() : 0, v, &m_audioPort );
+			( _n != NULL ) ? _n->offset() : 0,
+			panningToVolumeVector( m_panningModel.value(),
+								v_scale ),
+							 &m_audioPort );
 }
 
 
@@ -661,8 +664,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	_this.setAttribute( "name", name() );
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
-
-	m_surroundAreaModel.saveSettings( _doc, _this, "surpos" );
+	m_panningModel.saveSettings( _doc, _this, "pan" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
@@ -693,7 +695,17 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	setName( _this.attribute( "name" ) );
 	m_volumeModel.loadSettings( _this, "vol" );
 
-	m_surroundAreaModel.loadSettings( _this, "surpos" );
+	// compat-hacks - move to mmp::upgrade
+	if( _this.hasAttribute( "surpos" ) )
+	{
+		surroundAreaModel m( this, this );
+		m.loadSettings( _this, "surpos" );
+		m_panningModel.setValue( m.x() * 100 / SURROUND_AREA_SIZE );
+	}
+	else
+	{
+		m_panningModel.loadSettings( _this, "pan" );
+	}
 
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
@@ -1053,35 +1065,36 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 	// setup volume-knob
 	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
-						tr( "Channel volume" ) );
+						tr( "Instrument volume" ) );
 	m_volumeKnob->move( 10, 44 );
-	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
+	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 
 	// setup surround-area
-	m_surroundArea = new surroundArea( m_generalSettingsWidget,
-							tr( "Surround area" ) );
-	m_surroundArea->move( 20 + m_volumeKnob->width(), 38 );
-	m_surroundArea->show();
-	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
+	m_panningKnob = new knob( knobBright_26, m_generalSettingsWidget,
+							tr( "Panning" ) );
+	m_panningKnob->move( 20 + m_volumeKnob->width(), 44 );
+	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
+	m_panningKnob->setLabel( tr( "PAN" ) );
+////	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
 
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new lcdSpinBox( 2, m_generalSettingsWidget,
 						tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
-	m_effectChannelNumber->move( m_surroundArea->x() +
-					m_surroundArea->width() + 16, 40 );
+	m_effectChannelNumber->move( m_panningKnob->x() +
+					m_panningKnob->width() + 16, 44 );
 
 
 	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
 							"project_save" ), "",
 						m_generalSettingsWidget );
 	m_saveSettingsBtn->setGeometry( m_effectChannelNumber->x() +
-					m_effectChannelNumber->width() + 20, 40,
+					m_effectChannelNumber->width() + 20, 44,
 					32, 32 );
 	connect( m_saveSettingsBtn, SIGNAL( clicked() ), this,
 					SLOT( saveSettingsBtnClicked() ) );
@@ -1208,7 +1221,7 @@ void instrumentTrackWindow::modelChanged( void )
 			Qt::QueuedConnection );
 	
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
-	m_surroundArea->setModel( &m_track->m_surroundAreaModel );
+	m_panningKnob->setModel( &m_track->m_panningModel );
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 

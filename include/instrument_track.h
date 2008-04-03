@@ -39,7 +39,6 @@
 #include "mixer.h"
 #include "piano.h"
 #include "effect_chain.h"
-#include "surround_area.h"
 #include "tab_widget.h"
 #include "track.h"
 
@@ -177,7 +176,7 @@ private:
 
 
 	floatModel m_volumeModel;
-	surroundAreaModel m_surroundAreaModel;
+	floatModel m_panningModel;
 	lcdSpinBoxModel m_effectChannelModel;
 
 
@@ -321,7 +320,7 @@ private:
 	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_instrumentNameLE;
 	volumeKnob * m_volumeKnob;
-	surroundArea * m_surroundArea;
+	knob * m_panningKnob;
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 
