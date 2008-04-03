@@ -124,6 +124,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 			this, SLOT( updateBaseNote() ) );
 
 	m_volumeModel.setTrack( this );
+	m_panningModel.setTrack( this );
 	m_effectChannelModel.setTrack( this );
 
 
