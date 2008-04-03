@@ -26,7 +26,12 @@
 #ifndef _EFFECT_CHAIN_H
 #define _EFFECT_CHAIN_H
 
-#include "effect.h"
+#include "mv_base.h"
+#include "journalling_object.h"
+#include "mixer.h"
+#include "automatable_model.h"
+
+class effect;
 
 
 class effectChain : public journallingObject, public model
@@ -47,8 +52,7 @@ public:
 	void removeEffect( effect * _effect );
 	void moveDown( effect * _effect );
 	void moveUp( effect * _effect );
-	bool processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames );
 	void startRunning( void );
 	bool isRunning( void );
 

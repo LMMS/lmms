@@ -27,6 +27,7 @@
 
 
 #include "effect_chain.h"
+#include "effect.h"
 #include "engine.h"
 #include "automatable_model_templates.h"
 #include "track.h"
@@ -91,7 +92,7 @@ void effectChain::loadSettings( const QDomElement & _this )
 			effect * e = effect::instantiate( name, this, &key );
 			m_effects.push_back( e );
 			// TODO: somehow detect if effect is sub-plugin-capable
-			// but couldn't load sub-plugin with requsted key
+			// but couldn't load sub-plugin with requested key
 			if( node.isElement() )
 			{
 				if( e->nodeName() == node.nodeName() )
@@ -181,8 +182,7 @@ void effectChain::moveUp( effect * _effect )
 
 
 
-bool effectChain::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpp_t _frames )
+bool effectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 {
 	if( m_enabledModel.value() == FALSE )
 	{
