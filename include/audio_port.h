@@ -39,11 +39,11 @@ public:
 	audioPort( const QString & _name, track * _track );
 	~audioPort();
 
-	inline surroundSampleFrame * firstBuffer( void )
+	inline sampleFrame * firstBuffer( void )
 	{
 		return( m_firstBuffer );
 	}
-	inline surroundSampleFrame * secondBuffer( void )
+	inline sampleFrame * secondBuffer( void )
 	{
 		return( m_secondBuffer );
 	}
@@ -120,8 +120,8 @@ public:
 	}
 
 private:
-	surroundSampleFrame * m_firstBuffer;
-	surroundSampleFrame * m_secondBuffer;
+	sampleFrame * m_firstBuffer;
+	sampleFrame * m_secondBuffer;
 	QMutex m_firstBufferLock;
 	QMutex m_secondBufferLock;
 

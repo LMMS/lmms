@@ -35,9 +35,8 @@
 
 audioPort::audioPort( const QString & _name, track * _track ) :
 	m_bufferUsage( NoUsage ),
-	m_firstBuffer( new surroundSampleFrame[
-				engine::getMixer()->framesPerPeriod()] ),
-	m_secondBuffer( new surroundSampleFrame[
+	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
+	m_secondBuffer( new sampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( 0 ),
