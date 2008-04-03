@@ -34,6 +34,7 @@
 
 #include "fx_mixer.h"
 #include "fader.h"
+#include "effect.h"
 #include "effect_chain.h"
 #include "effect_rack_view.h"
 #include "embed.h"
@@ -49,7 +50,7 @@ struct fxChannel
 		m_used( FALSE ),
 		m_peakLeft( 0.0f ),
 		m_peakRight( 0.0f ),
-		m_buffer( new surroundSampleFrame[
+		m_buffer( new sampleFrame[
 			engine::getMixer()->framesPerPeriod()] ),
 		m_muteModel( FALSE, _parent ),
 		m_soloModel( FALSE, _parent ),
@@ -69,7 +70,7 @@ struct fxChannel
 	bool m_used;
 	float m_peakLeft;
 	float m_peakRight;
-	surroundSampleFrame * m_buffer;
+	sampleFrame * m_buffer;
 	boolModel m_muteModel;
 	boolModel m_soloModel;
 	floatModel m_volumeModel;
@@ -82,7 +83,9 @@ struct fxChannel
 
 fxMixer::fxMixer() :
 	journallingObject(),
-	model( NULL )
+	model( NULL ),
+	m_out( new surroundSampleFrame[
+				engine::getMixer()->framesPerPeriod()] )
 {
 	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
@@ -106,9 +109,9 @@ fxMixer::~fxMixer()
 
 
 
-void fxMixer::mixToChannel( const surroundSampleFrame * _buf, fx_ch_t _ch )
+void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	surroundSampleFrame * buf = m_fxChannels[_ch]->m_buffer;
+	sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
 		buf[f][0] += _buf[f][0];
@@ -157,20 +160,20 @@ void fxMixer::prepareMasterMix( void )
 
 const surroundSampleFrame * fxMixer::masterMix( void )
 {
-	surroundSampleFrame * buf = m_fxChannels[0]->m_buffer;
+	sampleFrame * buf = m_fxChannels[0]->m_buffer;
 	for( int i = 1; i < NumFxChannels+1; ++i )
 	{
 		if( m_fxChannels[i]->m_used )
 		{
-			surroundSampleFrame * _buf = m_fxChannels[i]->m_buffer;
+			sampleFrame * ch_buf = m_fxChannels[i]->m_buffer;
 			const float v = m_fxChannels[i]->m_volumeModel.value();
 			for( f_cnt_t f = 0; f <
 				engine::getMixer()->framesPerPeriod(); ++f )
 			{
-				buf[f][0] += _buf[f][0] * v;
-				buf[f][1] += _buf[f][1] * v;
+				buf[f][0] += ch_buf[f][0] * v;
+				buf[f][1] += ch_buf[f][1] * v;
 			}
-			engine::getMixer()->clearAudioBuffer( _buf,
+			engine::getMixer()->clearAudioBuffer( ch_buf,
 					engine::getMixer()->framesPerPeriod() );
 			m_fxChannels[i]->m_used = FALSE;
 		}
@@ -179,12 +182,14 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
-		buf[f][0] *= v;
-		buf[f][1] *= v;
+		for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
+		{
+			m_out[f][ch] = buf[f][ch%DEFAULT_CHANNELS] * v;
+		}
 	}
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
-	return( buf );
+	return( m_out );
 }
 
 
