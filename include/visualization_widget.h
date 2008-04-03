@@ -61,7 +61,7 @@ private:
 	QPixmap s_background;
 
 	bool m_enabled;
-	surroundSampleFrame * m_buffer;
+	sampleFrame * m_buffer;
 
 	QTimer * m_updateTimer;
 

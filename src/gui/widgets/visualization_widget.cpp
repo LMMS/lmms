@@ -51,7 +51,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	m_buffer = new surroundSampleFrame[frames];
+	m_buffer = new sampleFrame[frames];
 
 	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
 
@@ -86,9 +86,14 @@ void visualizationWidget::updateAudioBuffer( void )
 	if( m_enabled == TRUE )
 	{
 		engine::getMixer()->lock();
-		memcpy( m_buffer, engine::getMixer()->currentReadBuffer(),
-				engine::getMixer()->framesPerPeriod() *
-						BYTES_PER_SURROUND_FRAME );
+		const surroundSampleFrame * c = engine::getMixer()->
+							currentReadBuffer();
+		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
+									++f )
+		{
+			m_buffer[f][0] = c[f][0];
+			m_buffer[f][1] = c[f][1];
+		}
 		engine::getMixer()->unlock();
 	}
 }
