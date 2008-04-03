@@ -27,10 +27,20 @@
 #define _PANNING_H
 
 #include "types.h"
+#include "volume.h"
+#include "templates.h"
 
-const panning PanningRight = ( 0 + 100);
+const panning PanningRight = ( 0 + 100 );
 const panning PanningLeft = - PanningRight;
 const panning PanningCenter = 0;
 const panning DefaultPanning = PanningCenter;
+
+inline stereoVolumeVector panningToVolumeVector( panning _p,
+							float _scale = 1.0f )
+{
+	stereoVolumeVector v = { { _scale, _scale } };
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - tAbs<float>( _p / 100.0f );
+	return( v );
+}
 
 #endif
