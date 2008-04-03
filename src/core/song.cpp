@@ -538,15 +538,18 @@ void song::playPattern( pattern * _patternToPlay, bool _loop )
 
 
 
-tact song::lengthInTacts( void ) const
+void song::updateLength( void )
 {
-	tact len = 0;
+	m_length = 0;
 	const QList<track *> & ctl = tracks();
 	for( int i = 0; i < ctl.size(); ++i )
 	{
-		len = tMax( ctl[i]->length(), len );
+		const tact cur = ctl[i]->length();
+		if( cur > m_length )
+		{
+			m_length = cur;
+		}
 	}
-	return( len );
 }
 
 

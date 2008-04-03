@@ -112,8 +112,7 @@ public:
 	inline bool exportDone( void ) const
 	{
 		return( m_exporting == TRUE &&
-			m_playPos[Mode_PlaySong].getTact() >=
-							lengthInTacts() + 1 );
+			m_playPos[Mode_PlaySong].getTact() >= length() + 1 );
 	}
 
 	inline PlayModes playMode( void ) const
@@ -126,7 +125,11 @@ public:
 		return( m_playPos[_pm] );
 	}
 
-	tact lengthInTacts( void ) const;
+	void updateLength( void );
+	tact length( void ) const
+	{
+		return( m_length );
+	}
 
 
 	bpm_t getTempo( void );
@@ -211,7 +214,6 @@ private:
 		return( m_playPos[m_playMode].getTact() );
 	}
 
-	midiTime length( void ) const;
 	inline tact64th currentTact64th( void ) const
 	{
 		return( m_playPos[m_playMode].getTact64th() );
@@ -240,6 +242,7 @@ private:
 
 	PlayModes m_playMode;
 	playPos m_playPos[Mode_Count];
+	tact m_length;
 
 	track * m_trackToPlay;
 	pattern * m_patternToPlay;

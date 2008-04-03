@@ -1,5 +1,23 @@
 2008-04-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/song.h:
+	* src/core/song.cpp:
+	* src/gui/export_project_dialog.cpp:
+	* src/gui/song_editor.cpp:
+	made song-length being cached and only updated upon changed length or
+	position of TCOs
+
+	* src/core/track.cpp:
+	optimized track::length()-method
+
+	* src/core/mixer.cpp:
+	great improvements on multithreading - one global job-queue protected by
+	a simple mutex where threads pull their jobs from
+
+	* src/core/engine.cpp:
+	delete LADSPA-manager after mixer and FX-mixer as LADSPA-effects in
+	FX-mixer access LADSPA-manger at destruction
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* plugins/ladspa_effect/ladspa_effect.h:
 	* plugins/bass_booster/bass_booster.cpp:

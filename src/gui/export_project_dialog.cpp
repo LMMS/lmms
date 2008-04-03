@@ -370,8 +370,8 @@ void exportProjectDialog::exportBtnClicked( void )
 							&& !m_deleteFile )
 	{
 		dev->processNextBuffer();
-		int pval = pp * 100 /
-			( ( engine::getSong()->lengthInTacts() + 1 ) * 64 );
+		const int pval = pp * 100 /
+				( ( engine::getSong()->length() + 1 ) * 64 );
 		m_exportProgressBar->setValue( pval );
 		if( engine::getMainWindow() )
 		{

@@ -378,7 +378,7 @@ songEditor::~songEditor()
 
 void songEditor::paintEvent( QPaintEvent * _pe )
 {
-	m_leftRightScroll->setMaximum( m_s->lengthInTacts() );
+	m_leftRightScroll->setMaximum( m_s->length() );
 	trackContainerView::paintEvent( _pe );
 }
 
