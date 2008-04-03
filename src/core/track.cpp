@@ -106,6 +106,7 @@ void trackContentObject::movePosition( const midiTime & _pos )
 	{
 		addJournalEntry( journalEntry( Move, m_startPosition - _pos ) );
 		m_startPosition = _pos;
+		engine::getSong()->updateLength();
 	}
 	emit positionChanged();
 }
@@ -119,6 +120,7 @@ void trackContentObject::changeLength( const midiTime & _length )
 	{
 		addJournalEntry( journalEntry( Resize, m_length - _length ) );
 		m_length = _length;
+		engine::getSong()->updateLength();
 	}
 	emit lengthChanged();
 }
@@ -1615,13 +1617,17 @@ void track::removeTact( const midiTime & _pos )
 tact track::length( void ) const
 {
 	// find last end-position
-	midiTime last = 0;
+	Sint32 last = 0;
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
-		last = tMax( ( *it )->endPosition(), last );
+		const Sint32 cur = ( *it )->endPosition();
+		if( cur > last )
+		{
+			last = cur;
+		}
 	}
-	return( last.getTact() + ( ( last.getTact64th() != 0 ) ? 1 : 0 ) );
+	return( last/64 + 1 );
 }
 
 
