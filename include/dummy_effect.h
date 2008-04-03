@@ -98,6 +98,12 @@ public:
 		return( &m_controls );
 	}
 
+	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
+	{
+		return( FALSE );
+	}
+
+
 private:
 	dummyEffectControls m_controls;
 
