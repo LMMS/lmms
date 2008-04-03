@@ -131,12 +131,12 @@ void engine::destroy( void )
 	delete s_bbTrackContainer;
 	delete s_dummyTC;
 
-	delete s_ladspaManager;
-
 	delete s_mixer;
 	s_mixer = NULL;
 	delete s_fxMixer;
 	s_fxMixer = NULL;
+
+	delete s_ladspaManager;
 
 	//delete configManager::inst();
 	delete s_projectJournal;
