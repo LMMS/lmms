@@ -50,6 +50,7 @@ automatableModel<T, EDIT_STEP_TYPE>::automatableModel(
 	m_initValue( _val ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
+	m_range( _max-_min ),
 	m_step( _step ),
 	m_automationPattern( NULL ),
 	m_track( NULL ),
@@ -183,6 +184,7 @@ void automatableModel<T, EDIT_STEP_TYPE>::setRange( const T _min, const T _max,
 		{
 			qSwap<T>( m_minValue, m_maxValue );
 		}
+		m_range = m_maxValue - m_minValue;
 		setStep( _step );
 		// re-adjust value
 		autoModel::setInitValue( value() );

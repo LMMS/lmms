@@ -104,19 +104,12 @@ public:
 		return( static_cast<T>( _v ) );
 	}
 
-	inline virtual T value( void ) const
-	{
-		return value( 0 );
-	}
-
-
-	inline virtual T value( int _frameOffset ) const
+	inline virtual T value( int _frameOffset = 0 ) const
 	{
 		if( m_controller != NULL )
 		{
-			return minValue() +
-					( maxValue() - minValue() ) * 
-					castValue( m_controller->currentValue( _frameOffset ) );
+			return minValue() + castValue( m_range * 
+				 m_controller->currentValue( _frameOffset ) );
 		}
 
 		return m_value;
@@ -235,6 +228,7 @@ private:
 	T m_initValue;
 	T m_minValue;
 	T m_maxValue;
+	T m_range;
 	T m_step;
 	int m_curLevel;
 
