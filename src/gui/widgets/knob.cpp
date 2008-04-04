@@ -287,8 +287,8 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 					SLOT( openInAutomationEditor() ) );
 		contextMenu.addSeparator();
 	}
-/*	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
-						SLOT( connectToMidiDevice() ) );*/
+	contextMenu.addAction( tr( "Connect to controller..." ), this,
+						SLOT( connectToController() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
@@ -575,6 +575,15 @@ void knob::connectToMidiDevice( void )
 }
 
 
+void knob::connectToController( void )
+{
+    // TODO[pg]: Display a dialog with list of controllers currently in the song
+    // in addition to any system MIDI controllers
+
+    controller * c = new controller();
+
+    model()->setController( c );
+}
 
 
 void knob::displayHelp( void )

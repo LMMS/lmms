@@ -59,6 +59,7 @@ lmms_MOC =						\
 		./instrument_track.moc			\
 		./combobox.moc				\
 		./config_mgr.moc			\
+		./controller.moc			\
 		./cpuload_widget.moc			\
 		./effect_control_dialog.moc		\
 		./effect_label.moc			\
@@ -156,6 +157,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/bb_track_container.cpp			\
 		$(srcdir)/src/core/clipboard.cpp				\
 		$(srcdir)/src/core/config_mgr.cpp				\
+		$(srcdir)/src/core/controller.cpp				\
 		$(srcdir)/src/core/drumsynth.cpp				\
 		$(srcdir)/src/core/effect_chain.cpp				\
 		$(srcdir)/src/core/effect.cpp					\
@@ -419,6 +421,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/ladspa_control.h				\
 		$(srcdir)/include/ladspa_control_view.h				\
 		$(srcdir)/include/ladspa_base.h					\
+		$(srcdir)/include/controller.h					\
 		$(THIRD_PARTY_CODE)
 
 

@@ -31,8 +31,10 @@
 #include "journalling_object.h"
 #include "level_object.h"
 #include "mv_base.h"
+#include "controller.h"
 
 #include <QtCore/QPointer>
+#include <QtCore/QObject>
 
 
 
@@ -102,10 +104,53 @@ public:
 		return( static_cast<T>( _v ) );
 	}
 
-	inline virtual T value( void ) const
+    inline virtual T value( void ) const
+    {
+        return value( 0 );
+    }
+
+
+	inline virtual T value( int _frameOffset ) const
 	{
-		return( m_value );
+        T val;
+        if( m_controller != NULL )
+        {
+            val = minValue() +
+                    ( maxValue() - minValue() ) * 
+                    castValue( m_controller->currentValue( _frameOffset ) );
+            
+			// New framebuffer, emit signal for all the signal based users
+			if( _frameOffset == 0 && val != m_value )
+			{
+				// Sort of a hack, but this really is our intention
+				//
+				// Any model that wants sample-exactness must operate without relying
+				// on the dataChanged signal.  This is primarily for updating the GUI
+				
+				//autoModel * that = const_cast<autoModel *>( this );
+				//emit that->dataChanged();
+			}
+        }
+        else 
+        {
+            val = m_value;
+        }
+
+        return val;
 	}
+
+    inline controller * getController( void ) const
+    {
+        return m_controller;
+    }
+
+    inline void setController( controller * _c )
+    {
+        m_controller = _c;
+		QObject::connect( m_controller, SIGNAL( valueChanged() ),
+				this, SIGNAL( dataChanged() ) );
+    }
+
 
 	inline virtual T initValue( void ) const
 	{
@@ -200,12 +245,14 @@ protected:
 
 
 private:
+    controller * m_controller;
 	T m_value;
 	T m_initValue;
 	T m_minValue;
 	T m_maxValue;
 	T m_step;
 	int m_curLevel;
+
 	QPointer<automationPattern> m_automationPattern;
 	track * m_track;
 
@@ -240,6 +287,14 @@ private:
 	{
 		return( level( attributeValue( _label ) ) );
 	}
+/*
+public slots:
+
+	void changeData( void )
+	{
+		emit dataChanged();
+	}
+*/
 
 } ;
 

@@ -1152,8 +1152,8 @@ void patternView::paintEvent( QPaintEvent * )
 					{
 						Sint16 x1 = 2 * x_base +
 		static_cast<int>( ( *it )->pos() * ppt / 64 );
-						Sint16 x2 = x1 +
-			static_cast<int>( ( *it )->length() * ppt / 64 );
+						Sint16 x2 =
+			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ppt / 64 );
 						p.drawLine( x1, y_base + y_pos,
 							x2, y_base + y_pos );
 

@@ -68,6 +68,7 @@ public slots:
 	void pasteValue( void );
 	virtual void enterValue( void );
 	void connectToMidiDevice( void );
+	void connectToController( void );
 	void displayHelp( void );
 
 

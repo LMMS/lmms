@@ -540,6 +540,7 @@ if( COND_NPH )
 
 	// and trigger LFOs
 	envelopeAndLFOParameters::triggerLFO();
+	controller::triggerFrameCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
 							m_framesPerPeriod;
