@@ -147,8 +147,9 @@ private:
 			m_idle = FALSE;
 			m_sem->acquire();
 			m_jobAccepted.release();
-			for( jobQueueItems::iterator it = m_jobQueue->items.begin();
-						it != m_jobQueue->items.end(); ++it )
+			for( jobQueueItems::iterator it =
+						m_jobQueue->items.begin();
+					it != m_jobQueue->items.end(); ++it )
 			{
 				m_jobQueue->lock.lock();
 				if( !it->done )
@@ -161,7 +162,7 @@ private:
 		( (playHandle *) it->job )->play();
 							break;
 						case AudioPortEffects:
-		{
+							{
 		audioPort * a = (audioPort *) it->job;
 		bool me = a->processEffects();
 		if( a->m_bufferUsage != audioPort::NoUsage || me )
@@ -170,8 +171,11 @@ private:
 							a->nextFxChannel() );
 			a->nextPeriod();
 		}
-		}
+							}
 							break;
+						case EffectChannel:
+				engine::getFxMixer()->processChannel(
+						(fx_ch_t) (int) it->job );
 						default:
 							break;
 					}
@@ -333,7 +337,7 @@ bool mixer::criticalXRuns( void ) const
 		{							\
 			_jq.items.push_back(				\
 			mixerWorkerThread::jobQueueItem( _job_type,	\
-								*it ) );\
+							(void *)*it ) );\
 		}							\
 	}
 
@@ -504,6 +508,17 @@ if( COND_NPH )
 					mixerWorkerThread::AudioPortEffects,1);
 			DISTRIBUTE_JOB_QUEUE(jq);
 			WAIT_FOR_JOBS();
+
+			jq.items.clear();
+			QVector<fx_ch_t> fx_channels( NumFxChannels );
+			for( int i = 1; i < NumFxChannels+1; ++i )
+			{
+				fx_channels[i-1] = i;
+			}
+			FILL_JOB_QUEUE(jq,QVector<fx_ch_t>,fx_channels,
+					mixerWorkerThread::EffectChannel,1);
+			DISTRIBUTE_JOB_QUEUE(jq);
+			WAIT_FOR_JOBS();
 		}
 		else
 		{
@@ -523,10 +538,10 @@ if( COND_NPH )
 					( *it )->nextPeriod();
 				}
 			}
-		}
-		for( int i = 1; i < NumFxChannels+1; ++i )
-		{
-			engine::getFxMixer()->processChannel( i );
+			for( int i = 1; i < NumFxChannels+1; ++i )
+			{
+				engine::getFxMixer()->processChannel( i );
+			}
 		}
 		const surroundSampleFrame * buf =
 					engine::getFxMixer()->masterMix();

@@ -1,5 +1,8 @@
 2008-04-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mixer.cpp:
+	implemented parallelization of FX-channel-processing
+
 	* include/automatable_model.h:
 	* include/automatable_model_templates.h:
 	cleanups and optimizations in value( int )
