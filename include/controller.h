@@ -77,12 +77,12 @@ protected:
 	static unsigned int s_frames;
 
 	/*
-	 
 	QString publicName();
 slots:
 	void trigger();
 
 	*/
+
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged( void );

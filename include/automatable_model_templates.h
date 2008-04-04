@@ -45,7 +45,7 @@ automatableModel<T, EDIT_STEP_TYPE>::automatableModel(
 						::model * _parent,
 						bool _default_constructed ) :
 	model( _parent, _default_constructed ),
-    m_controller( NULL ),
+	m_controller( NULL ),
 	m_value( _val ),
 	m_initValue( _val ),
 	m_minValue( _min ),

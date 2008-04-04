@@ -577,12 +577,12 @@ void knob::connectToMidiDevice( void )
 
 void knob::connectToController( void )
 {
-    // TODO[pg]: Display a dialog with list of controllers currently in the song
-    // in addition to any system MIDI controllers
+	// TODO[pg]: Display a dialog with list of controllers currently in the song
+	// in addition to any system MIDI controllers
 
-    controller * c = new controller();
+	controller * c = new controller();
 
-    model()->setController( c );
+	model()->setController( c );
 }
 
 

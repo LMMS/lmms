@@ -104,52 +104,38 @@ public:
 		return( static_cast<T>( _v ) );
 	}
 
-    inline virtual T value( void ) const
-    {
-        return value( 0 );
-    }
+	inline virtual T value( void ) const
+	{
+		return value( 0 );
+	}
 
 
 	inline virtual T value( int _frameOffset ) const
 	{
-        T val;
-        if( m_controller != NULL )
-        {
-            val = minValue() +
-                    ( maxValue() - minValue() ) * 
-                    castValue( m_controller->currentValue( _frameOffset ) );
-            
-			// New framebuffer, emit signal for all the signal based users
-			if( _frameOffset == 0 && val != m_value )
-			{
-				// Sort of a hack, but this really is our intention
-				//
-				// Any model that wants sample-exactness must operate without relying
-				// on the dataChanged signal.  This is primarily for updating the GUI
-				
-				//autoModel * that = const_cast<autoModel *>( this );
-				//emit that->dataChanged();
-			}
-        }
-        else 
-        {
-            val = m_value;
-        }
+		if( m_controller != NULL )
+		{
+			return minValue() +
+					( maxValue() - minValue() ) * 
+					castValue( m_controller->currentValue( _frameOffset ) );
+		}
 
-        return val;
+		return m_value;
 	}
 
-    inline controller * getController( void ) const
-    {
-        return m_controller;
-    }
 
-    inline void setController( controller * _c )
-    {
-        m_controller = _c;
+	inline controller * getController( void ) const
+	{
+		return m_controller;
+	}
+
+
+	inline void setController( controller * _c )
+	{
+		m_controller = _c;
 		QObject::connect( m_controller, SIGNAL( valueChanged() ),
 				this, SIGNAL( dataChanged() ) );
-    }
+	}
+
 
 	inline virtual T initValue( void ) const
 	{
@@ -244,7 +230,7 @@ protected:
 
 
 private:
-    controller * m_controller;
+	controller * m_controller;
 	T m_value;
 	T m_initValue;
 	T m_minValue;
@@ -299,12 +285,12 @@ public slots:
 
 
 
-template<typename T, typename EDIT_STEP_TYPE, class WIDGET_BASE>
+template<typename T, typename EDIT_STEP_TYPE = T>
 class automatableModelView : public modelView
 {
 public:
 	typedef automatableModel<T, EDIT_STEP_TYPE> autoModel;
-	typedef automatableModelView<WIDGET_BASE, T, EDIT_STEP_TYPE> autoModelView;
+	typedef automatableModelView<T, EDIT_STEP_TYPE> autoModelView;
 
 	automatableModelView( ::model * _model ) :
 		modelView( _model )
@@ -341,15 +327,14 @@ public:
 
 #define generateModelPrimitive(type,type2)					\
 		typedef automatableModel<type,type2> type##Model;		\
-		typedef automatableModelView<type,type2,WIDGET_BASE> type##ModelView<WIDGET_BASE>;	\
+		typedef automatableModelView<type,type2> type##ModelView;	\
 
 // some model-primitives
 
 generateModelPrimitive(float,float);
 generateModelPrimitive(int,int);
 
-template<class WIDGET_TYPE>
-class boolModel : public automatableModel<bool, signed char, WIDGET_TYPE>
+class boolModel : public automatableModel<bool, signed char>
 {
 public:
 	boolModel(  const bool _val = FALSE,
@@ -362,7 +347,7 @@ public:
 
 } ;
 
-typedef automatableModelView<bool, signed char, WIDGET_TYPE> boolModelView<WIDGET_TYPE>;
+typedef automatableModelView<bool, signed char> boolModelView;
 
 
 #endif

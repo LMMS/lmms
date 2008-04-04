@@ -5,7 +5,7 @@
  * Josef Wilgen
  *
  * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public floatModelView<QWidget>
+class knob : public QWidget, public floatModelView
 {
 	Q_OBJECT
 public:
@@ -73,8 +73,6 @@ public slots:
 
 
 signals:
-//	void valueChanged( float value );
-//	void valueChanged( void );
 	void sliderPressed( void );
 	void sliderReleased( void );
 	void sliderMoved( float value );

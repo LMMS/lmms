@@ -70,14 +70,11 @@ void modelView::doConnections( void )
 {
 	if( m_model != NULL )
 	{
-        // Why queued connections? this causes a terrible stair effect when
-        // the GUI can't keep up. If anything should suffer, it should be
-        // GUI response.
 		QWidget * w = dynamic_cast<QWidget *>( this );
 		QObject::connect( m_model, SIGNAL( dataChanged() ),
-				w, SLOT( update() ) /*, Qt::QueuedConnection */ );
+				w, SLOT( update() ), Qt::QueuedConnection );
 		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
-				w, SLOT( update() ) /*, Qt::QueuedConnection */ );
+				w, SLOT( update() ), Qt::QueuedConnection );
 	}
 }
 

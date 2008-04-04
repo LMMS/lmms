@@ -16,7 +16,7 @@
 	- use controller in value() if set
 
 	* src/tracks/pattern.cpp:
-	Change brightness of note volume-lines according to volume
+	Fixed length of notes according to PaulWay
 	
 	* src/core/mixer.cpp:
 	trigger controller's frame counter
