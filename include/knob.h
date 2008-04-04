@@ -47,7 +47,7 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public floatModelView
+class knob : public QWidget, public floatModelView<QWidget>
 {
 	Q_OBJECT
 public:

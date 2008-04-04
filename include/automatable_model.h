@@ -151,7 +151,6 @@ public:
 				this, SIGNAL( dataChanged() ) );
     }
 
-
 	inline virtual T initValue( void ) const
 	{
 		return( m_initValue );
@@ -300,12 +299,12 @@ public slots:
 
 
 
-template<typename T, typename EDIT_STEP_TYPE = T>
+template<typename T, typename EDIT_STEP_TYPE, class WIDGET_BASE>
 class automatableModelView : public modelView
 {
 public:
 	typedef automatableModel<T, EDIT_STEP_TYPE> autoModel;
-	typedef automatableModelView<T, EDIT_STEP_TYPE> autoModelView;
+	typedef automatableModelView<WIDGET_BASE, T, EDIT_STEP_TYPE> autoModelView;
 
 	automatableModelView( ::model * _model ) :
 		modelView( _model )
@@ -342,14 +341,15 @@ public:
 
 #define generateModelPrimitive(type,type2)					\
 		typedef automatableModel<type,type2> type##Model;		\
-		typedef automatableModelView<type,type2> type##ModelView;	\
+		typedef automatableModelView<type,type2,WIDGET_BASE> type##ModelView<WIDGET_BASE>;	\
 
 // some model-primitives
 
 generateModelPrimitive(float,float);
 generateModelPrimitive(int,int);
 
-class boolModel : public automatableModel<bool, signed char>
+template<class WIDGET_TYPE>
+class boolModel : public automatableModel<bool, signed char, WIDGET_TYPE>
 {
 public:
 	boolModel(  const bool _val = FALSE,
@@ -362,7 +362,7 @@ public:
 
 } ;
 
-typedef automatableModelView<bool, signed char> boolModelView;
+typedef automatableModelView<bool, signed char, WIDGET_TYPE> boolModelView<WIDGET_TYPE>;
 
 
 #endif

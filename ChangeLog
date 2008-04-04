@@ -21,8 +21,8 @@
 	* src/core/mixer.cpp:
 	trigger controller's frame counter
 
-	* data/themes/llama/background_artwork.png:
 	* data/themes/llama:
+	* data/themes/llama/background_artwork.png:
 	* data/themes/Makefile.am:
 	start a theme with my preferences
 
