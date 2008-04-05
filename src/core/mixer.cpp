@@ -95,7 +95,15 @@ public:
 		{
 		}
 		JobTypes type;
-		void * job;
+		
+		union
+		{
+			playHandle * playHandleJob;
+			audioPort * audioPortJob;
+			int effectChannelJob;
+			void * job;
+		};
+		
 		volatile bool done;
 	} ;
 
@@ -159,11 +167,11 @@ private:
 					switch( it->type )
 					{
 						case PlayHandle:
-		( (playHandle *) it->job )->play();
+		it->playHandleJob->play();
 							break;
 						case AudioPortEffects:
 							{
-		audioPort * a = (audioPort *) it->job;
+		audioPort * a = it->audioPortJob;
 		bool me = a->processEffects();
 		if( a->m_bufferUsage != audioPort::NoUsage || me )
 		{
@@ -174,8 +182,8 @@ private:
 							}
 							break;
 						case EffectChannel:
-				engine::getFxMixer()->processChannel(
-						(fx_ch_t) (int) it->job );
+		engine::getFxMixer()->processChannel(
+				(fx_ch_t) it->effectChannelJob );
 						default:
 							break;
 					}

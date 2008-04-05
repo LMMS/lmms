@@ -70,6 +70,7 @@ public slots:
 	void connectToMidiDevice( void );
 	void connectToController( void );
 	void displayHelp( void );
+	void friendlyUpdate( void );
 
 
 signals:
@@ -113,6 +114,10 @@ private:
 					model()->minValue() ) / 100.0f,
 							model()->step() ) );
 	}
+
+	virtual void doConnections( void );
+
+
 
 	void valueChange( void );
 	void buttonReleased( void );

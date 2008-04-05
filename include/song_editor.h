@@ -96,6 +96,7 @@ private:
 
 	toolButton * m_addBBTrackButton;
 	toolButton * m_addSampleTrackButton;
+	toolButton * m_addControllerButton;
 
 	toolButton * m_drawModeButton;
 	toolButton * m_editModeButton;

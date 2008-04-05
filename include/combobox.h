@@ -97,25 +97,25 @@ public:
 	comboBox( QWidget * _parent, const QString & _name = QString::null );
 	virtual ~comboBox();
 
-        comboBoxModel * model( void )
-        {
-                return( castModel<comboBoxModel>() );
-        }
+	comboBoxModel * model( void )
+	{
+		return( castModel<comboBoxModel>() );
+	}
 
-        const comboBoxModel * model( void ) const
-        {
-                return( castModel<comboBoxModel>() );
-        }
+	const comboBoxModel * model( void ) const
+	{
+		return( castModel<comboBoxModel>() );
+	}
 
 
-        virtual void modelChanged( void )
-        {
-                if( model() != NULL )
-                {
-                        connect( model(), SIGNAL( itemPixmapRemoved( QPixmap * ) ),
-                                        this, SLOT( deletePixmap( QPixmap * ) ) );
-                }                       
-        }
+	virtual void modelChanged( void )
+	{
+		if( model() != NULL )
+		{
+			QWidget::connect( model(), SIGNAL( itemPixmapRemoved( QPixmap * ) ),
+					this, SLOT( deletePixmap( QPixmap * ) ) );
+		}                       
+	}
 
 
 protected:

@@ -72,13 +72,13 @@ void modelView::doConnections( void )
 	{
 		QWidget * w = dynamic_cast<QWidget *>( this );
 		QObject::connect( m_model, SIGNAL( dataChanged() ),
-				w, SLOT( update() ), Qt::QueuedConnection );
+				w, SLOT( update() ),
+				Qt::QueuedConnection );
+
 		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
 				w, SLOT( update() ), Qt::QueuedConnection );
 	}
 }
-
-
 
 
 #include "mv_base.moc"

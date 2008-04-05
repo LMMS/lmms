@@ -287,8 +287,9 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 					SLOT( openInAutomationEditor() ) );
 		contextMenu.addSeparator();
 	}
-	contextMenu.addAction( tr( "Connect to controller..." ), this,
-						SLOT( connectToController() ) );
+	contextMenu.addAction( embed::getIconPixmap( "controller" ),
+				tr( "Connect to controller..." ), this,
+				SLOT( connectToController() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
@@ -584,6 +585,30 @@ void knob::connectToController( void )
 
 	model()->setController( c );
 }
+
+
+void knob::friendlyUpdate( void )
+{
+	if( model()->getController() == NULL || controller::runningFrames() % (256*4) == 0 )
+	{
+		update();
+	}
+}
+
+
+void knob::doConnections( void )
+{
+	if( model() != NULL )
+	{
+		QObject::connect( model(), SIGNAL( dataChanged() ),
+				this, SLOT( friendlyUpdate() ),
+				Qt::QueuedConnection );
+
+		QObject::connect( model(), SIGNAL( propertiesChanged() ),
+				this, SLOT( update() ), Qt::QueuedConnection );
+	}
+}
+
 
 
 void knob::displayHelp( void )

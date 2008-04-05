@@ -257,6 +257,12 @@ songEditor::songEditor( song * _song ) :
 					m_s, SLOT( addSampleTrack() ),
 					m_toolBar );
 
+	m_addControllerButton = new toolButton( embed::getIconPixmap(
+					"add_controller" ),
+					tr( "Add controller" ),
+					m_s, SLOT( addSampleTrack() ),
+					m_toolBar );
+
 	m_drawModeButton = new toolButton( embed::getIconPixmap(
 								"edit_draw" ),
 							tr( "Draw mode" ),
@@ -322,6 +328,7 @@ songEditor::songEditor( song * _song ) :
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_addBBTrackButton );
 	tb_layout->addWidget( m_addSampleTrackButton );
+	tb_layout->addWidget( m_addControllerButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawModeButton );
 	tb_layout->addWidget( m_editModeButton );

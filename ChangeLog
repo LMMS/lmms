@@ -1,3 +1,28 @@
+2008-04-04	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/knob.h:
+	* src/gui/widgets/knob.cpp:
+	Add friendlyUpdates slot and override doConnections
+
+	* include/song_editor.h:
+	Add button for managing controller to songEditor
+
+	* include/mv_base.h:
+	* include/core/mv_base.cpp:
+	Make doConnections virtual
+
+	* include/combobox.h:
+	Fixed tabs
+
+	* src/core/mixer.cpp:
+	Couldn't easily convert from void* to int on a 64bit machine.  Instead, we
+	now use a union.  We should change any enqueueing code to use the union as
+	well
+	
+	* data/themes/add_controller.png:
+	* data/themes/controller.png:
+	Some new images for controllers
+
 2008-04-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:

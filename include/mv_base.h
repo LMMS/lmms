@@ -71,6 +71,7 @@ signals:
 
 class modelView
 {
+
 public:
 	modelView( model * _model );
 	virtual ~modelView()
@@ -98,7 +99,7 @@ protected:
 	{
 	}
 
-	void doConnections( void );
+	virtual void doConnections( void );
 
 
 private:
