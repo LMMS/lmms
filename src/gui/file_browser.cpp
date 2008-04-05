@@ -100,9 +100,7 @@ void fileBrowser::addItems( const QString & _path )
 						it != files.constEnd(); ++it )
 	{
 		QString cur_file = *it;
-		if( cur_file[0] != '.' &&
-			isDirWithContent( _path + QDir::separator() + cur_file,
-								m_filter ) )
+		if( cur_file[0] != '.' )
 		{
 			bool orphan = TRUE;
 			for( int i = 0; i < m_l->topLevelItemCount(); ++i )
@@ -137,14 +135,7 @@ void fileBrowser::addItems( const QString & _path )
 						it != files.constEnd(); ++it )
 	{
 		QString cur_file = *it;
-		if( cur_file[0] != '.'
-#warning TODO: add match here
-#ifdef QT4
-// TBD
-#else
-//			&& QDir::match( m_filter, cur_file.lower() )
-#endif
-	)
+		if( cur_file[0] != '.' )
 		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
@@ -157,41 +148,6 @@ void fileBrowser::addItems( const QString & _path )
 			(void) new fileItem( m_l, cur_file, _path );
 		}
 	}
-}
-
-
-
-
-bool fileBrowser::isDirWithContent( const QString & _path,
-						const QString & _filter )
-{
-	QDir cdir( _path );
-	QStringList files = cdir.entryList( QDir::Files, QDir::Unsorted );
-	for( QStringList::iterator it = files.begin(); it != files.end(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.'
-#warning TODO: add match here
-				&& QDir::match( _filter, cur_file.toLower() )
-	)
-		{
-			return( TRUE );
-		}
-	}
-
-	files = cdir.entryList( QDir::Dirs, QDir::Unsorted );
-	for( QStringList::iterator it = files.begin(); it != files.end(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' &&
-			isDirWithContent( _path + QDir::separator() + cur_file,
-								_filter ) )
-		{
-			return( TRUE );
-		}
-	}
-
-	return( FALSE );
 }
 
 
@@ -708,9 +664,7 @@ bool directory::addItems( const QString & _path )
 						it != files.constEnd(); ++it )
 	{
 		QString cur_file = *it;
-		if( cur_file[0] != '.' && fileBrowser::isDirWithContent(
-				thisDir.absolutePath() + QDir::separator() +
-							cur_file, m_filter ) )
+		if( cur_file[0] != '.' )
 		{
 			bool orphan = TRUE;
 			for( int i = 0; i < childCount(); ++i )

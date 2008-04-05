@@ -1,3 +1,10 @@
+2008-04-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/file_browser.h:
+	* src/gui/file_browser.cpp:
+	do not examine directories for being empty when adding them - speeds
+	up LMMS-startup a lot!
+
 2008-04-04	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/knob.h:

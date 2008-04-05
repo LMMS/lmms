@@ -53,9 +53,6 @@ public:
 							QWidget * _parent );
 	virtual ~fileBrowser();
 
-	static bool isDirWithContent( const QString & _path,
-						const QString & _filter );
-
 
 public slots:
 	void reloadTree( void );
