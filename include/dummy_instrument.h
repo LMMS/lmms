@@ -43,6 +43,9 @@ public:
 	{
 	}
 
+	virtual void playNote( notePlayHandle *, bool, sampleFrame * )
+	{
+	}
 
 	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{

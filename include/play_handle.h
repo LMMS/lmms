@@ -2,7 +2,7 @@
  * play_handle.h - base-class playHandle which is needed by
  *                 LMMS-Player-Engine
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -60,7 +60,8 @@ public:
 		return( m_type );
 	}
 
-	virtual void play( bool _try_parallelizing = FALSE ) = 0;
+	virtual void play( bool _try_parallelizing,
+					sampleFrame * _working_buffer ) = 0;
 	virtual bool done( void ) const = 0;
 
 	// returns how many frames this play-handle is aligned ahead, i.e.

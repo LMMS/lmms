@@ -49,16 +49,16 @@ public:
 	sf2Instrument( instrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
 
-	virtual void play( bool _try_parallelizing );
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
-			bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-			QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
 

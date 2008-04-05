@@ -38,7 +38,6 @@
 
 #include "types.h"
 #include "note.h"
-#include "play_handle.h"
 #include "fifo_buffer.h"
 
 
@@ -85,6 +84,9 @@ const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 const float BaseFreq = 440.0f;
 const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
+
+
+#include "play_handle.h"
 
 
 class mixerWorkerThread;
@@ -341,6 +343,8 @@ private:
 	QVector<audioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
+
+	sampleFrame * m_workingBuf;
 
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;

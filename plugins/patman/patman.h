@@ -68,13 +68,12 @@ public:
 	patmanInstrument( instrumentTrack * _track );
 	virtual ~patmanInstrument();
 
-	virtual void playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
 	virtual void setParameter( const QString & _param,

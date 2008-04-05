@@ -54,25 +54,26 @@ public:
 	// --------------------------------------------------------------------
 
 	// if the plugin doesn't play each note, it can create an instrument-
-	// play-handle and re-implement this method, so that it mixes it's
+	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per mixer-period
-	virtual void play( bool _try_parallelizing = FALSE );
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 
-	// to be overloaded by actual plugin
-	virtual void FASTCALL playNote( notePlayHandle * note_to_play,
-						bool _try_parallelizing );
+	// to be implemented by actual plugin
+	virtual void playNote( notePlayHandle * _note_to_play,
+					bool _try_parallelizing,
+					sampleFrame * _working_buf ) = 0;
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly
 	// (call of dtor if it's a class etc.)
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle *
-							_note_to_play );
+	virtual void deleteNotePluginData( notePlayHandle * _note_to_play );
 
 	// Get number of sample-frames that should be used when playing beat
 	// (note with unspecified length)
 	// Per default this function returns 0. In this case, channel is using
 	// the length of the longest envelope (if one active).
-	virtual f_cnt_t FASTCALL beatLen( notePlayHandle * _n ) const;
+	virtual f_cnt_t beatLen( notePlayHandle * _n ) const;
 
 
 	// some instruments need a certain number of release-frames even
@@ -91,6 +92,7 @@ public:
 		return( FALSE );
 	}
 
+	// instrument-play-handle-based instruments should return FALSE
 	inline virtual bool notePlayHandleBased( void ) const
 	{
 		return( TRUE );
@@ -111,7 +113,7 @@ public:
 
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
-	static instrument * FASTCALL instantiate( const QString & _plugin_name,
+	static instrument * instantiate( const QString & _plugin_name,
 					instrumentTrack * _instrument_track );
 
 	virtual bool isFromTrack( const track * _track ) const;

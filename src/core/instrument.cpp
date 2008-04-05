@@ -49,14 +49,7 @@ instrument::~instrument()
 
 
 
-void instrument::play( bool )
-{
-}
-
-
-
-
-void instrument::playNote( notePlayHandle *, bool )
+void instrument::play( bool, sampleFrame * )
 {
 }
 

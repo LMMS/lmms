@@ -157,7 +157,8 @@ notePlayHandle::~notePlayHandle()
 
 
 
-void notePlayHandle::play( bool _try_parallelizing )
+void notePlayHandle::play( bool _try_parallelizing,
+						sampleFrame * _working_buffer )
 {
 	if( m_muted == TRUE )
 	{
@@ -177,7 +178,8 @@ void notePlayHandle::play( bool _try_parallelizing )
 	if( framesLeft() > 0 )
 	{
 		// play note!
-		m_instrumentTrack->playNote( this, _try_parallelizing );
+		m_instrumentTrack->playNote( this, _try_parallelizing,
+							_working_buffer );
 	}
 
 	if( m_released == TRUE )
@@ -238,7 +240,7 @@ void notePlayHandle::play( bool _try_parallelizing )
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); )
 	{
-		( *it )->play( _try_parallelizing );
+		( *it )->play( _try_parallelizing, _working_buffer );
 		if( ( *it )->done() )
 		{
 			delete *it;

@@ -1,7 +1,7 @@
 /*
  * audio_file_processor.cpp - instrument for using audio-files
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -105,24 +105,24 @@ audioFileProcessor::~audioFileProcessor()
 
 
 
-void audioFileProcessor::playNote( notePlayHandle * _n, bool )
+void audioFileProcessor::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
 	{
 		_n->m_pluginData = new handleState( _n->hasDetuningInfo() );
 	}
 
-	if( m_sampleBuffer.play( buf, (handleState *)_n->m_pluginData,
+	if( m_sampleBuffer.play( _working_buffer,
+					(handleState *)_n->m_pluginData,
 					frames, _n->frequency(),
 						m_loopModel.value() ) == TRUE )
 	{
-		applyRelease( buf, _n );
-		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
+		applyRelease( _working_buffer, _n );
+		getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 	}
-	delete[] buf;
 }
 
 

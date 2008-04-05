@@ -119,7 +119,8 @@ typedef effectLib::distortion<> distFX;
 typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 
 
-void kickerInstrument::playNote( notePlayHandle * _n, bool )
+void kickerInstrument::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	const float decfr = m_decayModel.value() *
 				engine::getMixer()->sampleRate() / 1000.0f;
@@ -148,11 +149,10 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 	const float f1 = m_startFreqModel.value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqModel.value() + (frames+tfp-1)*fdiff/decfr;
 
-	sampleFrame * buf = new sampleFrame[frames];
-
 
 	sweepOsc * so = static_cast<sweepOsc *>( _n->m_pluginData );
-	so->update( buf, frames, f1, f2, engine::getMixer()->sampleRate() );
+	so->update( _working_buffer, frames, f1, f2,
+					engine::getMixer()->sampleRate() );
 
 	if( _n->released() )
 	{
@@ -163,15 +163,14 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool )
 							desiredReleaseFrames();
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
-				buf[f][ch] *= fac;
+				_working_buffer[f][ch] *= fac;
 			}
 		}
 	}
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
+
 
 
 
@@ -187,6 +186,8 @@ pluginView * kickerInstrument::instantiateView( QWidget * _parent )
 {
 	return( new kickerInstrumentView( this, _parent ) );
 }
+
+
 
 
 

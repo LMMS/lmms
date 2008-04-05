@@ -2,7 +2,7 @@
  * preset_preview_play_handle.h - play-handle for playing a short preview-sound
  *                                of a preset
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,8 @@ public:
 	presetPreviewPlayHandle( const QString & _preset_file );
 	virtual ~presetPreviewPlayHandle();
 
-	virtual void play( bool _try_parallelizing );
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 	virtual bool done( void ) const;
 
 	virtual bool isFromTrack( const track * _track ) const;

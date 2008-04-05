@@ -2,7 +2,7 @@
  * audio_file_processor.h - declaration of class audioFileProcessor
  *                          (instrument-plugin for using audio-files)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -54,20 +54,20 @@ public:
 	audioFileProcessor( instrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void FASTCALL setParameter( const QString & _param,
+	virtual void setParameter( const QString & _param,
 						const QString & _value );
 
 	virtual QString nodeName( void ) const;
 
-	virtual Uint32 FASTCALL getBeatLen( notePlayHandle * _n ) const;
+	virtual Uint32 getBeatLen( notePlayHandle * _n ) const;
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{

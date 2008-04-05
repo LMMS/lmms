@@ -68,6 +68,39 @@
 sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
 
 
+
+#define ALIGN_SIZE 64
+
+void aligned_free( void * _buf )
+{
+	if( _buf != NULL )
+	{
+		int *ptr2=(int *)_buf - 1;
+		_buf = (char *)_buf- *ptr2;
+		free(_buf);
+	}
+}
+
+void * aligned_malloc( int _bytes )
+{
+	char *ptr,*ptr2,*aligned_ptr;
+	int align_mask = ALIGN_SIZE- 1;
+	ptr=(char *)malloc(_bytes +ALIGN_SIZE+ sizeof(int));
+	if(ptr==NULL) return(NULL);
+
+	ptr2 = ptr + sizeof(int);
+	aligned_ptr = ptr2 + (ALIGN_SIZE- ((size_t)ptr2 & align_mask));
+
+
+	ptr2 = aligned_ptr - sizeof(int);
+	*((int *)ptr2)=(int)(aligned_ptr - ptr);
+
+	return(aligned_ptr);
+}
+
+
+
+
 class mixerWorkerThread : public QThread
 {
 public:
@@ -146,6 +179,9 @@ public:
 private:
 	virtual void run( void )
 	{
+		sampleFrame * working_buf = (sampleFrame *) aligned_malloc(
+						m_mixer->framesPerPeriod() *
+							sizeof( sampleFrame ) );
 		m_jobWait.acquire();
 		m_jobAccepted.acquire();
 		m_idle = TRUE;
@@ -167,7 +203,7 @@ private:
 					switch( it->type )
 					{
 						case PlayHandle:
-		it->playHandleJob->play();
+		it->playHandleJob->play( FALSE, working_buf );
 							break;
 						case AudioPortEffects:
 							{
@@ -196,6 +232,7 @@ private:
 			m_idle = TRUE;
 			m_sem->release();
 		}
+		aligned_free( working_buf );
 	}
 
 	mixer * m_mixer;
@@ -211,6 +248,7 @@ private:
 
 mixer::mixer( void ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_workingBuf( NULL ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
 	m_cpuLoad( 0 ),
@@ -249,10 +287,14 @@ mixer::mixer( void ) :
 		m_fifo = new fifo( 1 );
 	}
 
+	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
+							sizeof( sampleFrame ) );
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		m_readBuf = new surroundSampleFrame[m_framesPerPeriod];
-		
+		m_readBuf = (surroundSampleFrame*)
+			aligned_malloc( m_framesPerPeriod *
+						sizeof( surroundSampleFrame ) );
+
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
@@ -287,8 +329,10 @@ mixer::~mixer()
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		delete[] m_bufferPool[i];
+		aligned_free( m_bufferPool[i] );
 	}
+
+	aligned_free( m_workingBuf );
 }
 
 
@@ -435,7 +479,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				playHandle * n = m_playHandles[idx];
 				if( !n->done() && n->supportsParallelizing() )
 				{
-					n->play( TRUE );
+					n->play( TRUE, m_workingBuf );
 					par_hndls.push_back( n );
 				}
 				++idx;
@@ -489,7 +533,7 @@ if( COND_NPH )
 				if( !( *it )->done() )
 				{
 
-					( *it )->play();
+					( *it )->play( FALSE, m_workingBuf );
 				}
 			}
 		}

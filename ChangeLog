@@ -1,5 +1,45 @@
 2008-04-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	* include/instrument_play_handle.h:
+	* include/mixer.h:
+	* include/instrument_track.h:
+	* include/instrument.h:
+	* include/note_play_handle.h:
+	* include/sample_play_handle.h:
+	* include/dummy_instrument.h:
+	* include/preset_preview_play_handle.h:
+	* include/play_handle.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/mixer.cpp:
+	* src/core/instrument.cpp:
+	made rendering happen with one global working-buffer per thread -
+	hopefully improves L1/L2-cache-efficiency
+
 	* include/file_browser.h:
 	* src/gui/file_browser.cpp:
 	do not examine directories for being empty when adding them - speeds

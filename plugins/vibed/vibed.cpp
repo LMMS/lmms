@@ -271,7 +271,7 @@ QString vibed::nodeName( void ) const
 
 
 
-void vibed::playNote( notePlayHandle * _n, bool )
+void vibed::playNote( notePlayHandle * _n, bool, sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -304,12 +304,10 @@ void vibed::playNote( notePlayHandle * _n, bool )
 	stringContainer * ps = static_cast<stringContainer *>(
 							_n->m_pluginData );
 
-	sampleFrame * buf = new sampleFrame[frames];
-
 	for( fpp_t i = 0; i < frames; ++i )
 	{
-		buf[i][0] = 0.0f;
-		buf[i][1] = 0.0f;
+		_working_buffer[i][0] = 0.0f;
+		_working_buffer[i][1] = 0.0f;
 		Uint8 s = 0;
 		for( Uint8 string = 0; string < 9; ++string )
 		{
@@ -319,19 +317,17 @@ void vibed::playNote( notePlayHandle * _n, bool )
 				const float pan = ( 
 					m_panKnobs[string]->value() + 1 ) /
 									2.0f;
-				const sample_t sample = ps->getStringSample(
-									s ) *
+				const sample_t sample =
+						ps->getStringSample( s ) *
 					m_volumeKnobs[string]->value() / 100.0f;
-				buf[i][0] += ( 1.0f - pan ) * sample;
-				buf[i][1] += pan * sample;
+				_working_buffer[i][0] += ( 1.0f - pan ) * sample;
+				_working_buffer[i][1] += pan * sample;
 				s++;
 			}
 		}
 	}
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-	
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * sample_play_handle.h - play-handle for playing a sample
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,7 +28,7 @@
 
 #include <qobject.h>
 
-#include "play_handle.h"
+#include "mixer.h"
 #include "sample_buffer.h"
 #include "automatable_model.h"
 
@@ -48,7 +48,8 @@ public:
 	samplePlayHandle( pattern * _pattern );
 	virtual ~samplePlayHandle();
 
-	virtual void play( bool _try_parallelizing );
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 	virtual bool done( void ) const;
 
 	virtual bool isFromTrack( const track * _track ) const;

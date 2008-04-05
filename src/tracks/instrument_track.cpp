@@ -338,7 +338,8 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 
 
 
-void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
+void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer )
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
@@ -400,7 +401,8 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing )
 			}
 		}
 		// all is done, so now lets play the note!
-		m_instrument->playNote( _n, _try_parallelizing );
+		m_instrument->playNote( _n, _try_parallelizing,
+							_working_buffer );
 	}
 }
 

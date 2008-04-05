@@ -2,7 +2,7 @@
  * bit_invader.h - declaration of class bitInvader and bSynth which
  *                         are a wavetable synthesizer
  *
- * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -67,14 +67,14 @@ public:
 	bitInvader(instrumentTrack * _channel_track );
 	virtual ~bitInvader();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
 

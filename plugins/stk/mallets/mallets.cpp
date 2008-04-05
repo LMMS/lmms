@@ -126,8 +126,6 @@ malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 	m_scalers.append( 16.0 );
 	m_presetsModel.addItem( tr( "Tibetan Bowl" ) );
 	m_scalers.append( 7.0 );
-
-	m_buffer = new sampleFrame[engine::getMixer()->framesPerPeriod()];
 }
 
 
@@ -135,7 +133,6 @@ malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 
 malletsInstrument::~malletsInstrument()
 {
-	delete[] m_buffer;
 }
 
 
@@ -209,7 +206,8 @@ QString malletsInstrument::nodeName( void ) const
 
 
 
-void malletsInstrument::playNote( notePlayHandle * _n, bool )
+void malletsInstrument::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	if( m_filesMissing )
 	{
@@ -274,18 +272,13 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool )
 	}
 	for( fpp_t frame = 0; frame < frames; ++frame )
 	{
-		const sample_t left = ps->nextSampleLeft() * 
-					( m_scalers[m_presetsModel.value()] + add_scale );
-		const sample_t right = ps->nextSampleRight() * 
-					( m_scalers[m_presetsModel.value()] + add_scale );
-		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS / 2; ++chnl )
-		{
-			m_buffer[frame][chnl * DEFAULT_CHANNELS / 2] = left;
-			m_buffer[frame][( chnl + 1 ) * DEFAULT_CHANNELS / 2] = right;
-		}
+		_working_buffer[frame][0] = ps->nextSampleLeft() * 
+				( m_scalers[m_presetsModel.value()] + add_scale );
+		_working_buffer[frame][1] = ps->nextSampleRight() * 
+				( m_scalers[m_presetsModel.value()] + add_scale );
 	}
 	
-	getInstrumentTrack()->processAudioBuffer( m_buffer, frames, _n );
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 

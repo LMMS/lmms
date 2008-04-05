@@ -2,7 +2,7 @@
  * lb302.h - declaration of class lb302 which is a bass synth attempting to
  *           emulate the Roland TB303 bass synth
  *
- * Copyright (c) 2006-2007 Paul Giblock <pgib/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -191,14 +191,13 @@ public:
 	lb302Synth( instrumentTrack * _channel_track );
 	virtual ~lb302Synth();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
-	                                bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buffer );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-	                                    QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
 

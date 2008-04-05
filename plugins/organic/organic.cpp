@@ -1,7 +1,7 @@
 /*
  * organic.cpp - additive synthesizer for organ-like sounds
  *
- * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -182,7 +182,8 @@ QString organicInstrument::nodeName( void ) const
 
 
 
-void organicInstrument::playNote( notePlayHandle * _n, bool )
+void organicInstrument::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -256,10 +257,9 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 								)->oscRight;
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
-	
-	osc_l->update( buf, frames, 0 );
-	osc_r->update( buf, frames, 1 );
+
+	osc_l->update( _working_buffer, frames, 0 );
+	osc_r->update( _working_buffer, frames, 1 );
 
 
 	// -- fx section --
@@ -269,17 +269,15 @@ void organicInstrument::playNote( notePlayHandle * _n, bool )
 	
 	for (int i=0 ; i < frames ; i++)
 	{
-		buf[i][0] = waveshape( buf[i][0], t ) * m_volModel.value()
-								/ 100.0f;
-		buf[i][1] = waveshape( buf[i][1], t ) * m_volModel.value()
-								/ 100.0f;
+		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
+						m_volModel.value() / 100.0f;
+		_working_buffer[i][1] = waveshape( _working_buffer[i][1], t ) *
+						m_volModel.value() / 100.0f;
 	}
 	
 	// -- --
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 

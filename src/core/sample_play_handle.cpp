@@ -116,7 +116,8 @@ samplePlayHandle::~samplePlayHandle()
 
 
 
-void samplePlayHandle::play( bool /* _try_parallelizing */ )
+void samplePlayHandle::play( bool /* _try_parallelizing */,
+						sampleFrame * _working_buffer )
 {
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
@@ -128,14 +129,11 @@ void samplePlayHandle::play( bool /* _try_parallelizing */ )
 	if( !( m_track && m_track->muted() )
 				&& !( m_bbTrack && m_bbTrack->muted() ) )
 	{
-		sampleFrame * buf = new sampleFrame[frames];
 		stereoVolumeVector v = { { m_volumeModel->value(),
 						m_volumeModel->value() } };
-		m_sampleBuffer->play( buf, &m_state, frames );
-		engine::getMixer()->bufferToPort( buf, frames, offset(), v,
-								m_audioPort );
-
-		delete[] buf;
+		m_sampleBuffer->play( _working_buffer, &m_state, frames );
+		engine::getMixer()->bufferToPort( _working_buffer, frames,
+						offset(), v, m_audioPort );
 	}
 
 	m_frame += frames;

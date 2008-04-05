@@ -210,7 +210,7 @@ void sf2Instrument::updatePatch( void )
 
 
 
-void sf2Instrument::playNote( notePlayHandle * _n, bool )
+void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 {
 	const float LOG440 = 2.64345267649f;
 
@@ -245,19 +245,18 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool )
 
 
 
-void sf2Instrument::play( bool _try_parallelizing )
+void sf2Instrument::play( bool _try_parallelizing,
+						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
-	sampleFrame * buf = new sampleFrame[frames];
-
 	m_synthMutex.lock();
-	fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+	fluid_synth_write_float( m_synth, frames, _working_buffer, 0, 2,
+							_working_buffer, 1, 2 );
 	m_synthMutex.unlock();
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
-
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
+									NULL );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * bit_invader.cpp - instrument which uses a usereditable wavetable
  *
- * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -261,7 +261,8 @@ QString bitInvader::nodeName( void ) const
 }
 
 
-void bitInvader::playNote( notePlayHandle * _n, bool )
+void bitInvader::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -283,7 +284,6 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
 	bSynth * ps = static_cast<bSynth *>( _n->m_pluginData );
 	for( fpp_t frame = 0; frame < frames; ++frame )
@@ -291,15 +291,13 @@ void bitInvader::playNote( notePlayHandle * _n, bool )
 		const sample_t cur = ps->nextStringSample();
 		for( Uint8 chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
-			buf[frame][chnl] = cur;
+			_working_buffer[frame][chnl] = cur;
 		}
 	}
 
-	applyRelease( buf, _n );
+	applyRelease( _working_buffer, _n );
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 

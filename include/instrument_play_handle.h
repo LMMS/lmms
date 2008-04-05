@@ -44,9 +44,10 @@ public:
 	}
 
 
-	inline virtual void play( bool _try_parallelizing )
+	inline virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer )
 	{
-		m_instrument->play( _try_parallelizing );
+		m_instrument->play( _try_parallelizing, _working_buffer );
 	}
 
 	inline virtual bool done( void ) const

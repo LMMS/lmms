@@ -319,7 +319,8 @@ QString tripleOscillator::nodeName( void ) const
 
 
 
-void tripleOscillator::playNote( notePlayHandle * _n, bool )
+void tripleOscillator::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
@@ -383,16 +384,13 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool )
 								)->oscRight;
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
-	osc_l->update( buf, frames, 0 );
-	osc_r->update( buf, frames, 1 );
+	osc_l->update( _working_buffer, frames, 0 );
+	osc_r->update( _working_buffer, frames, 1 );
 
-	applyRelease( buf, _n );
+	applyRelease( _working_buffer, _n );
 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-
-	delete[] buf;
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 

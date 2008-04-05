@@ -132,7 +132,8 @@ QString patmanInstrument::nodeName( void ) const
 
 
 
-void patmanInstrument::playNote( notePlayHandle * _n, bool )
+void patmanInstrument::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	if( m_patchFile == "" )
 	{
@@ -140,7 +141,6 @@ void patmanInstrument::playNote( notePlayHandle * _n, bool )
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
 	if( !_n->m_pluginData )
 	{
@@ -151,12 +151,12 @@ void patmanInstrument::playNote( notePlayHandle * _n, bool )
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if( hdata->sample->play( buf, hdata->state, frames, play_freq,
-						m_loopedModel.value() ) )
+	if( hdata->sample->play( _working_buffer, hdata->state, frames,
+					play_freq, m_loopedModel.value() ) )
 	{
-		getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
+		getInstrumentTrack()->processAudioBuffer( _working_buffer,
+								frames, _n );
 	}
-	delete[] buf;
 }
 
 

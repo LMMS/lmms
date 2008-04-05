@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,7 @@
 #ifndef _NOTE_PLAY_HANDLE_H
 #define _NOTE_PLAY_HANDLE_H
 
-#include "play_handle.h"
+#include "mixer.h"
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "note.h"
@@ -63,7 +63,8 @@ public:
 
 	void updateFrequency( void );
 
-	virtual void play( bool _try_parallelizing );
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 
 	virtual inline bool done( void ) const
 	{

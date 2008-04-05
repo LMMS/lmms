@@ -231,7 +231,7 @@ void vestigeInstrument::waitForWorkerThread( void )
 
 
 
-void vestigeInstrument::play( bool _try_parallelizing )
+void vestigeInstrument::play( bool _try_parallelizing, sampleFrame * )
 {
 	m_pluginMutex.lock();
 	if( m_plugin == NULL )
@@ -254,7 +254,7 @@ void vestigeInstrument::play( bool _try_parallelizing )
 
 
 
-void vestigeInstrument::playNote( notePlayHandle * _n, bool )
+void vestigeInstrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 {
 	m_pluginMutex.lock();
 	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )

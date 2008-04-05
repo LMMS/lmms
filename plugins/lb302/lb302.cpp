@@ -2,7 +2,7 @@
  * lb302.cpp - implementation of class lb302 which is a bass synth attempting 
  *             to emulate the Roland TB303 bass synth
  *
- * Copyright (c) 2006-2007 Paul Giblock <pgib/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -785,7 +785,8 @@ void lb302Synth::initNote( lb302Note *n)
 }
 
 
-void lb302Synth::playNote( notePlayHandle * _n, bool )
+void lb302Synth::playNote( notePlayHandle * _n, bool,
+						sampleFrame * _working_buffer )
 {
 	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
@@ -947,12 +948,8 @@ void lb302Synth::playNote( notePlayHandle * _n, bool )
 
 	}
 
-	sampleFrame *buf = new sampleFrame[frames];
-
-	process(buf, frames); 
-	getInstrumentTrack()->processAudioBuffer( buf, frames, _n );
-
-	delete[] buf;
+	process( _working_buffer, frames); 
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 
 	lastFramesPlayed = frames; //_n->framesLeftForCurrentPeriod(); //_n->totalFramesPlayed();
 }
