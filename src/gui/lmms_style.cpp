@@ -107,3 +107,20 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 	}
 
 }
+
+
+int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option, const QWidget * _widget ) const
+{
+	switch( _metric )
+	{
+		case QStyle::PM_ButtonMargin:
+			return 3;
+
+		case QStyle::PM_ButtonIconSize:
+			return 24;
+
+		default:
+			return QPlastiqueStyle::pixelMetric( _metric, _option, _widget );
+	}
+}
+
