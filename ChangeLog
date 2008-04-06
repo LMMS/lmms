@@ -1,3 +1,10 @@
+2008-04-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/effect_select_dialog.h:
+	* src/gui/effect_select_dialog.cpp:
+	changed list-widget to be a list-view and added a line-edit for
+	filtering the list
+
 2008-04-06  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/lmms_style.h:
