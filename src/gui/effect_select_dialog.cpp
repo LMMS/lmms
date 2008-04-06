@@ -27,6 +27,8 @@
 
 #include <QtGui/QGroupBox>
 #include <QtGui/QLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QListView>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
 
@@ -48,7 +50,7 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
 	vlayout->setMargin( 10 );
 
 	effectListWidget * elist = new effectListWidget( this );
-	elist->setMinimumSize( 500, 400 );
+	elist->setMinimumSize( 540, 400 );
 	connect( elist, SIGNAL( doubleClicked( const effectKey & ) ),
 				this, SLOT( selectPlugin() ) );
 	connect( elist, SIGNAL( highlighted( const effectKey & ) ),
@@ -64,7 +66,7 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
 	QPushButton * select_btn = new QPushButton( 
 					embed::getIconPixmap( "add" ),
 					tr( "Add" ), buttons );
-	connect( select_btn, SIGNAL( clicked() ), 
+	connect( select_btn, SIGNAL( activated() ), 
 				this, SLOT( selectPlugin() ) );
 	
 /*	QPushButton * ports_btn = new QPushButton( 
@@ -151,6 +153,8 @@ void effectSelectDialog::selectPlugin( void )
 
 effectListWidget::effectListWidget( QWidget * _parent ) :
 	QWidget( _parent ),
+	m_sourceModel(),
+	m_model(),
 	m_descriptionWidget( NULL )
 {
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
@@ -192,12 +196,35 @@ effectListWidget::effectListWidget( QWidget * _parent ) :
 							"" );
 	}
 
-	m_pluginList = new QListWidget( this );
-	m_pluginList->insertItems( 0, plugin_names );
-	connect( m_pluginList, SIGNAL( currentRowChanged( int ) ),
-				SLOT( rowChanged( int ) ) );	
-	connect( m_pluginList, SIGNAL( itemDoubleClicked( QListWidgetItem * ) ),
-				SLOT( onDoubleClicked( QListWidgetItem * ) ) );
+
+	int row = 0;
+	for( QStringList::iterator it = plugin_names.begin();
+					it != plugin_names.end(); ++it )
+	{
+		m_sourceModel.setItem( row, 0, new QStandardItem( *it ) );
+		++row;
+	}
+
+	m_model.setSourceModel( &m_sourceModel );
+	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
+
+	m_filterEdit = new QLineEdit( this );
+	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
+		&m_model, SLOT( setFilterRegExp( const QString & ) ) );
+
+	m_pluginList = new QListView( this );
+	m_pluginList->setModel( &m_model );
+	QItemSelectionModel * sm = new QItemSelectionModel( &m_model );
+	m_pluginList->setSelectionModel( sm );
+	m_pluginList->setSelectionBehavior( QAbstractItemView::SelectRows );
+	m_pluginList->setSelectionMode( QAbstractItemView::SingleSelection );
+	m_pluginList->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	connect( sm, SIGNAL( currentRowChanged( const QModelIndex &,
+						const QModelIndex & ) ),
+			SLOT( rowChanged( const QModelIndex &,
+						const QModelIndex & ) ) );	
+	connect( m_pluginList, SIGNAL( doubleClicked( const QModelIndex & ) ),
+			SLOT( onDoubleClicked( const QModelIndex & ) ) );
 
 	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
 	groupbox->setFixedHeight( 200 );
@@ -214,13 +241,14 @@ effectListWidget::effectListWidget( QWidget * _parent ) :
 	QVBoxLayout * vboxl = new QVBoxLayout( this );
 	vboxl->setMargin( 0 );
 	vboxl->setSpacing( 10 );
+	vboxl->addWidget( m_filterEdit );
 	vboxl->addWidget( m_pluginList );
 	vboxl->addWidget( groupbox );
 
-	if( m_pluginList->count() > 0 )
+	if( m_sourceModel.rowCount() > 0 )
 	{
-		m_pluginList->setCurrentRow( 0 );
-		rowChanged( 0 );
+//		m_pluginList->setCurrentRow( 0 );
+		//rowChanged( 0 );
 	}
 }
 
@@ -234,12 +262,13 @@ effectListWidget::~effectListWidget()
 
 
 
-void effectListWidget::rowChanged( int _pluginIndex )
+void effectListWidget::rowChanged( const QModelIndex & _idx,
+							const QModelIndex & )
 {
 	delete m_descriptionWidget;
 	m_descriptionWidget = NULL;
 
-	m_currentSelection = m_effectKeys[_pluginIndex];
+	m_currentSelection = m_effectKeys[_idx.row()];
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
@@ -253,7 +282,8 @@ void effectListWidget::rowChanged( int _pluginIndex )
 		m_currentSelection.desc->sub_plugin_features->
 			fillDescriptionWidget( m_descriptionWidget,
 							&m_currentSelection );
-		foreach( QWidget * w, m_descriptionWidget->findChildren<QWidget *>() )
+		foreach( QWidget * w,
+				m_descriptionWidget->findChildren<QWidget *>() )
 		{
 			if( w->parent() == m_descriptionWidget )
 			{
@@ -268,8 +298,7 @@ void effectListWidget::rowChanged( int _pluginIndex )
 
 
 
-
-void effectListWidget::onDoubleClicked( QListWidgetItem * _item )
+void effectListWidget::onDoubleClicked( const QModelIndex & )
 {
 	emit( doubleClicked( m_currentSelection ) );
 }

@@ -1,7 +1,7 @@
 /*
  * effect_select_dialog.h - dialog to choose effect plugin
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,11 +27,15 @@
 #define _EFFECT_SELECT_DIALOG_H
 
 #include <QtGui/QDialog>
-#include <QtGui/QListWidget>
+#include <QtGui/QSortFilterProxyModel>
+#include <QtGui/QStandardItemModel>
 
 #include "effect_chain.h"
 #include "effect.h"
 
+
+class QLineEdit;
+class QListView;
 class QScrollArea;
 
 
@@ -81,17 +85,20 @@ protected:
 
 
 protected slots:
-	void rowChanged( int _plugin );
-	void onAddButtonReleased();
-	void onDoubleClicked( QListWidgetItem * _item );
+	void rowChanged( const QModelIndex &, const QModelIndex & );
+	void onAddButtonReleased( void );
+	void onDoubleClicked( const QModelIndex & );
 	
 
 private:
 	QVector<plugin::descriptor> m_pluginDescriptors;
 	effectKeyList m_effectKeys;
 	effectKey m_currentSelection;
-	
-	QListWidget * m_pluginList;
+
+	QLineEdit * m_filterEdit;
+	QListView * m_pluginList;
+	QStandardItemModel m_sourceModel;
+	QSortFilterProxyModel m_model;
 	QScrollArea * m_scrollArea;
 	QWidget * m_descriptionWidget;
 
