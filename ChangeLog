@@ -1,5 +1,8 @@
 2008-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/lmms_style.cpp:
+	decreased button-icon-size to 20px
+
 	* src/core/fx_mixer.cpp:
 	process FX-channels until effects signal that there's nothing more to
 	process - closes #1935872

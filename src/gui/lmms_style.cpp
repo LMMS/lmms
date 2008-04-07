@@ -117,7 +117,7 @@ int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option, c
 			return 3;
 
 		case QStyle::PM_ButtonIconSize:
-			return 24;
+			return 20;
 
 		default:
 			return QPlastiqueStyle::pixelMetric( _metric, _option, _widget );
