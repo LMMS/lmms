@@ -48,8 +48,8 @@ public:
 
 	effect * instantiateSelectedPlugin( effectChain * _parent );
 
+
 public slots:
-	void showPorts( void );
 	void setSelection( const effectKey & _selection );
 	void selectPlugin( void );
 	

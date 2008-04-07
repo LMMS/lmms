@@ -66,15 +66,9 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
 	QPushButton * select_btn = new QPushButton( 
 					embed::getIconPixmap( "add" ),
 					tr( "Add" ), buttons );
-	connect( select_btn, SIGNAL( activated() ), 
+	connect( select_btn, SIGNAL( clicked() ), 
 				this, SLOT( selectPlugin() ) );
 	
-/*	QPushButton * ports_btn = new QPushButton( 
-					embed::getIconPixmap("ports" ), 
-					tr( "Ports" ), buttons );
-	connect( ports_btn, SIGNAL( clicked() ),
-				this, SLOT( showPorts() ) );
-*/	
 	QPushButton * cancel_btn = new QPushButton( 
 					embed::getIconPixmap( "cancel" ),
 					tr( "Cancel" ), buttons );
@@ -84,8 +78,6 @@ effectSelectDialog::effectSelectDialog( QWidget * _parent ) :
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( select_btn );
-/*	btn_layout->addSpacing( 10 );
-	btn_layout->addWidget( ports_btn );*/
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
@@ -118,15 +110,6 @@ effect * effectSelectDialog::instantiateSelectedPlugin( effectChain * _parent )
 							&m_currentSelection ) );
 	}
 	return( NULL );
-}
-
-
-
-
-void effectSelectDialog::showPorts( void )
-{
-/*	ladspaPortDialog ports( m_currentSelection );
-	ports.exec();*/
 }
 
 
