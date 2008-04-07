@@ -1,3 +1,9 @@
+2008-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/widgets/combobox.cpp:
+	set correct value for model when selecting an item whose strings
+	occurs multiple times in the combobox
+
 2008-04-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/effect_select_dialog.h:

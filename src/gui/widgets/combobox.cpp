@@ -127,10 +127,12 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 		m_menu.clear();
 		for( int i = 0; i < model()->size(); ++i )
 		{
-			m_menu.addAction( model()->itemPixmap( i ) ?
+			QAction * a = m_menu.addAction(
+					model()->itemPixmap( i ) ?
 						*model()->itemPixmap( i ) :
 							QPixmap(),
 						model()->itemText( i ) );
+			a->setData( i );
 		}
 
 		QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
@@ -245,7 +247,7 @@ void comboBox::deletePixmap( QPixmap * _pixmap )
 
 void comboBox::setItem( QAction * _item )
 {
-	model()->setInitValue( model()->findText( _item->text() ) );
+	model()->setInitValue( _item->data().toInt() );
 }
 
 
