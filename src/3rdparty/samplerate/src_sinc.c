@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,12 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,31 +32,14 @@
 
 #define	SINC_MAGIC_MARKER	MAKE_MAGIC (' ', 's', 'i', 'n', 'c', ' ')
 
-#define	ARRAY_LEN(x)		((int) (sizeof (x) / sizeof ((x) [0])))
-
 /*========================================================================================
-**	Macros for handling the index into the array for the filter.
-**	Double precision floating point is not accurate enough so use a 64 bit
-**	fixed point value instead. SHIFT_BITS (current value of 48) is the number
-**	of bits to the right of the decimal point.
-**	The rest of the macros are for retrieving the fractional and integer parts
-**	and for converting floats and ints to the fixed point format or from the
-**	fixed point type back to integers and floats.
 */
 
 #define MAKE_INCREMENT_T(x) 	((increment_t) (x))
 
-#define	SHIFT_BITS				16
+#define	SHIFT_BITS				12
 #define	FP_ONE					((double) (((increment_t) 1) << SHIFT_BITS))
-
-#define	DOUBLE_TO_FP(x)			(lrint ((x) * FP_ONE))
-#define	INT_TO_FP(x)			(((increment_t) (x)) << SHIFT_BITS)
-
-#define	FP_FRACTION_PART(x)		((x) & ((((increment_t) 1) << SHIFT_BITS) - 1))
-#define	FP_INTEGER_PART(x)		((x) & (((increment_t) -1) << SHIFT_BITS))
-
-#define	FP_TO_INT(x)			(((x) >> SHIFT_BITS))
-#define	FP_TO_DOUBLE(x)			(FP_FRACTION_PART (x) / FP_ONE)
+#define	INV_FP_ONE				(1.0 / FP_ONE)
 
 /*========================================================================================
 */
@@ -58,13 +47,9 @@
 typedef int32_t increment_t ;
 typedef float	coeff_t ;
 
-enum
-{
-	STATE_BUFFER_START	= 101,
-	STATE_DATA_CONTINUE	= 102,
-	STATE_BUFFER_END	= 103,
-	STATE_FINISHED
-} ;
+#include "fastest_coeffs.h"
+#include "mid_qual_coeffs.h"
+#include "high_qual_coeffs.h"
 
 typedef struct
 {	int		sinc_magic_marker ;
@@ -74,18 +59,16 @@ typedef struct
 	long	out_count, out_gen ;
 
 	int		coeff_half_len, index_inc ;
-	int		has_diffs ;
 
 	double	src_ratio, input_index ;
 
-	int		coeff_len ;
 	coeff_t const	*coeffs ;
 
 	int		b_current, b_end, b_real_end, b_len ;
 	float	buffer [1] ;
 } SINC_FILTER ;
 
-static int sinc_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
+static int sinc_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
 
 static double calc_output (SINC_FILTER *filter, increment_t increment, increment_t start_filter_index, int ch) ;
 
@@ -93,20 +76,33 @@ static void prepare_data (SINC_FILTER *filter, SRC_DATA *data, int half_filter_c
 
 static void sinc_reset (SRC_PRIVATE *psrc) ;
 
-static coeff_t const high_qual_coeffs [] =
-{
-#include "high_qual_coeffs.h"
-} ; /* high_qual_coeffs */
+static inline increment_t
+double_to_fp (double x)
+{	if (sizeof (increment_t) == 8)
+		return (llrint ((x) * FP_ONE)) ;
+	return (lrint ((x) * FP_ONE)) ;
+} /* double_to_fp */
 
-static coeff_t const mid_qual_coeffs [] =
-{
-#include "mid_qual_coeffs.h"
-} ; /* mid_qual_coeffs */
+static inline increment_t
+int_to_fp (int x)
+{	return (((increment_t) (x)) << SHIFT_BITS) ;
+} /* int_to_fp */
 
-static coeff_t const fastest_coeffs [] =
-{
-#include "fastest_coeffs.h"
-} ; /* fastest_coeffs */
+static inline int
+fp_to_int (increment_t x)
+{	return (((x) >> SHIFT_BITS)) ;
+} /* fp_to_int */
+
+static inline increment_t
+fp_fraction_part (increment_t x)
+{	return ((x) & ((((increment_t) 1) << SHIFT_BITS) - 1)) ;
+} /* fp_fraction_part */
+
+static inline double
+fp_to_double (increment_t x)
+{	return fp_fraction_part (x) * INV_FP_ONE ;
+} /* fp_to_double */
+
 
 /*----------------------------------------------------------------------------------------
 */
@@ -123,6 +119,8 @@ sinc_get_name (int src_enum)
 
 		case SRC_SINC_FASTEST :
 			return "Fastest Sinc Interpolator" ;
+
+		default: break ;
 		} ;
 
 	return NULL ;
@@ -132,14 +130,17 @@ const char*
 sinc_get_description (int src_enum)
 {
 	switch (src_enum)
-	{	case SRC_SINC_BEST_QUALITY :
-			return "Band limited sinc interpolation, best quality, 97dB SNR, 96% BW." ;
+	{	case SRC_SINC_FASTEST :
+			return "Band limited sinc interpolation, fastest, 97dB SNR, 80% BW." ;
 
 		case SRC_SINC_MEDIUM_QUALITY :
-			return "Band limited sinc interpolation, medium quality, 97dB SNR, 90% BW." ;
+			return "Band limited sinc interpolation, medium quality, 121dB SNR, 90% BW." ;
 
-		case SRC_SINC_FASTEST :
-			return "Band limited sinc interpolation, fastest, 97dB SNR, 80% BW." ;
+		case SRC_SINC_BEST_QUALITY :
+			return "Band limited sinc interpolation, best quality, 145dB SNR, 96% BW." ;
+
+		default :
+			break ;
 		} ;
 
 	return NULL ;
@@ -148,7 +149,8 @@ sinc_get_description (int src_enum)
 int
 sinc_set_converter (SRC_PRIVATE *psrc, int src_enum)
 {	SINC_FILTER *filter, temp_filter ;
-	int count, bits ;
+	increment_t count ;
+	int bits ;
 
 	/* Quick sanity check. */
 	if (SHIFT_BITS >= sizeof (increment_t) * 8 - 1)
@@ -167,32 +169,27 @@ sinc_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	temp_filter.sinc_magic_marker = SINC_MAGIC_MARKER ;
 	temp_filter.channels = psrc->channels ;
 
-	psrc->process = sinc_process ;
+	psrc->const_process = sinc_vari_process ;
+	psrc->vari_process = sinc_vari_process ;
 	psrc->reset = sinc_reset ;
 
 	switch (src_enum)
-	{	case SRC_SINC_BEST_QUALITY :
-				temp_filter.coeffs = high_qual_coeffs ;
-				temp_filter.coeff_half_len = ARRAY_LEN (high_qual_coeffs) - 1 ;
-				temp_filter.index_inc = 128 ;
-				temp_filter.has_diffs = SRC_FALSE ;
-				temp_filter.coeff_len = ARRAY_LEN (high_qual_coeffs) ;
+	{	case SRC_SINC_FASTEST :
+				temp_filter.coeffs = fastest_coeffs.coeffs ;
+				temp_filter.coeff_half_len = ARRAY_LEN (fastest_coeffs.coeffs) - 1 ;
+				temp_filter.index_inc = fastest_coeffs.increment ;
 				break ;
 
 		case SRC_SINC_MEDIUM_QUALITY :
-				temp_filter.coeffs = mid_qual_coeffs ;
-				temp_filter.coeff_half_len = ARRAY_LEN (mid_qual_coeffs) - 1 ;
-				temp_filter.index_inc = 128 ;
-				temp_filter.has_diffs = SRC_FALSE ;
-				temp_filter.coeff_len = ARRAY_LEN (mid_qual_coeffs) ;
+				temp_filter.coeffs = slow_mid_qual_coeffs.coeffs ;
+				temp_filter.coeff_half_len = ARRAY_LEN (slow_mid_qual_coeffs.coeffs) - 1 ;
+				temp_filter.index_inc = slow_mid_qual_coeffs.increment ;
 				break ;
 
-		case SRC_SINC_FASTEST :
-				temp_filter.coeffs = fastest_coeffs ;
-				temp_filter.coeff_half_len = ARRAY_LEN (fastest_coeffs) - 1 ;
-				temp_filter.index_inc = 128 ;
-				temp_filter.has_diffs = SRC_FALSE ;
-				temp_filter.coeff_len = ARRAY_LEN (fastest_coeffs) ;
+		case SRC_SINC_BEST_QUALITY :
+				temp_filter.coeffs = slow_high_qual_coeffs.coeffs ;
+				temp_filter.coeff_half_len = ARRAY_LEN (slow_high_qual_coeffs.coeffs) - 1 ;
+				temp_filter.index_inc = slow_high_qual_coeffs.increment ;
 				break ;
 
 		default :
@@ -204,7 +201,8 @@ sinc_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	** a better way. Need to look at prepare_data () at the same time.
 	*/
 
-	temp_filter.b_len = 1000 + 2 * lrint (0.5 + temp_filter.coeff_len / (temp_filter.index_inc * 1.0) * SRC_MAX_RATIO) ;
+	temp_filter.b_len = 1000 + 2 * lrint (0.5 + 2 * temp_filter.coeff_half_len / (temp_filter.index_inc * 1.0) * SRC_MAX_RATIO) ;
+	temp_filter.b_len = MIN (temp_filter.b_len, 4096) ;
 	temp_filter.b_len *= temp_filter.channels ;
 
 	if ((filter = calloc (1, sizeof (SINC_FILTER) + sizeof (filter->buffer [0]) * (temp_filter.b_len + temp_filter.channels))) == NULL)
@@ -218,8 +216,8 @@ sinc_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	sinc_reset (psrc) ;
 
 	count = filter->coeff_half_len ;
-	for (bits = 0 ; (1 << bits) < count ; bits++)
-		count |= (1 << bits) ;
+	for (bits = 0 ; (MAKE_INCREMENT_T (1) << bits) < count ; bits++)
+		count |= (MAKE_INCREMENT_T (1) << bits) ;
 
 	if (bits + SHIFT_BITS - 1 >= (int) (sizeof (increment_t) * 8))
 		return SRC_ERR_FILTER_LEN ;
@@ -251,7 +249,7 @@ sinc_reset (SRC_PRIVATE *psrc)
 */
 
 static int
-sinc_process (SRC_PRIVATE *psrc, SRC_DATA *data)
+sinc_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 {	SINC_FILTER *filter ;
 	double		input_index, src_ratio, count, float_increment, terminate, rem ;
 	increment_t	increment, start_filter_index ;
@@ -283,7 +281,7 @@ sinc_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	input_index = psrc->last_position ;
 	float_increment = filter->index_inc ;
 
-	rem = fmod (input_index, 1.0) ;
+	rem = fmod_one (input_index) ;
 	filter->b_current = (filter->b_current + filter->channels * lrint (input_index - rem)) % filter->b_len ;
 	input_index = rem ;
 
@@ -309,26 +307,26 @@ sinc_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 				break ;
 			} ;
 
-		if (fabs (psrc->last_ratio - data->src_ratio) > 1e-10)
-			src_ratio = psrc->last_ratio + filter->out_gen * (data->src_ratio - psrc->last_ratio) / (filter->out_count - 1) ;
+		if (filter->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > 1e-10)
+			src_ratio = psrc->last_ratio + filter->out_gen * (data->src_ratio - psrc->last_ratio) / filter->out_count ;
 
 		float_increment = filter->index_inc * 1.0 ;
 		if (src_ratio < 1.0)
 			float_increment = filter->index_inc * src_ratio ;
 
-		increment = DOUBLE_TO_FP (float_increment) ;
+		increment = double_to_fp (float_increment) ;
 
-		start_filter_index = DOUBLE_TO_FP (input_index * float_increment) ;
+		start_filter_index = double_to_fp (input_index * float_increment) ;
 
 		for (ch = 0 ; ch < filter->channels ; ch++)
-		{	data->data_out [filter->out_gen] = (float_increment / filter->index_inc) *
-											calc_output (filter, increment, start_filter_index, ch) ;
+		{	data->data_out [filter->out_gen] = (float) ((float_increment / filter->index_inc) *
+											calc_output (filter, increment, start_filter_index, ch)) ;
 			filter->out_gen ++ ;
 			} ;
 
 		/* Figure out the next index. */
 		input_index += 1.0 / src_ratio ;
-		rem = fmod (input_index, 1.0) ;
+		rem = fmod_one (input_index) ;
 
 		filter->b_current = (filter->b_current + filter->channels * lrint (input_index - rem)) % filter->b_len ;
 		input_index = rem ;
@@ -343,7 +341,7 @@ sinc_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	data->output_frames_gen = filter->out_gen / filter->channels ;
 
 	return SRC_ERR_NO_ERROR ;
-} /* sinc_process */
+} /* sinc_vari_process */
 
 /*----------------------------------------------------------------------------------------
 */
@@ -423,22 +421,22 @@ calc_output (SINC_FILTER *filter, increment_t increment, increment_t start_filte
 	int			data_index, coeff_count, indx ;
 
 	/* Convert input parameters into fixed point. */
-	max_filter_index = INT_TO_FP (filter->coeff_half_len) ;
+	max_filter_index = int_to_fp (filter->coeff_half_len) ;
 
 	/* First apply the left half of the filter. */
 	filter_index = start_filter_index ;
 	coeff_count = (max_filter_index - filter_index) / increment ;
 	filter_index = filter_index + coeff_count * increment ;
-	data_index = filter->b_current - filter->channels * coeff_count ;
+	data_index = filter->b_current - filter->channels * coeff_count + ch ;
 
 	left = 0.0 ;
 	do
-	{	fraction = FP_TO_DOUBLE (filter_index) ;
-		indx = FP_TO_INT (filter_index) ;
+	{	fraction = fp_to_double (filter_index) ;
+		indx = fp_to_int (filter_index) ;
 
 		icoeff = filter->coeffs [indx] + fraction * (filter->coeffs [indx + 1] - filter->coeffs [indx]) ;
 
-		left += icoeff * filter->buffer [data_index + ch] ;
+		left += icoeff * filter->buffer [data_index] ;
 
 		filter_index -= increment ;
 		data_index = data_index + filter->channels ;
@@ -449,16 +447,16 @@ calc_output (SINC_FILTER *filter, increment_t increment, increment_t start_filte
 	filter_index = increment - start_filter_index ;
 	coeff_count = (max_filter_index - filter_index) / increment ;
 	filter_index = filter_index + coeff_count * increment ;
-	data_index = filter->b_current + filter->channels * (1 + coeff_count) ;
+	data_index = filter->b_current + filter->channels * (1 + coeff_count) + ch ;
 
 	right = 0.0 ;
 	do
-	{	fraction = FP_TO_DOUBLE (filter_index) ;
-		indx = FP_TO_INT (filter_index) ;
+	{	fraction = fp_to_double (filter_index) ;
+		indx = fp_to_int (filter_index) ;
 
 		icoeff = filter->coeffs [indx] + fraction * (filter->coeffs [indx + 1] - filter->coeffs [indx]) ;
 
-		right += icoeff * filter->buffer [data_index + ch] ;
+		right += icoeff * filter->buffer [data_index] ;
 
 		filter_index -= increment ;
 		data_index = data_index - filter->channels ;
@@ -467,12 +465,4 @@ calc_output (SINC_FILTER *filter, increment_t increment, increment_t start_filte
 
 	return (left + right) ;
 } /* calc_output */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: db8efe06-2fbd-487e-be8f-bfc01e68c19f
-*/
 

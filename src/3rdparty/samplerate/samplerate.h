@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -14,6 +14,12 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
 */
 
 /*
@@ -168,7 +174,7 @@ enum
 	SRC_SINC_MEDIUM_QUALITY		= 1,
 	SRC_SINC_FASTEST			= 2,
 	SRC_ZERO_ORDER_HOLD			= 3,
-	SRC_LINEAR					= 4
+	SRC_LINEAR					= 4,
 } ;
 
 /*
@@ -179,18 +185,13 @@ enum
 void src_short_to_float_array (const short *in, float *out, int len) ;
 void src_float_to_short_array (const float *in, short *out, int len) ;
 
+void src_int_to_float_array (const int *in, float *out, int len) ;
+void src_float_to_int_array (const float *in, int *out, int len) ;
+
 
 #ifdef __cplusplus
 }		/* extern "C" */
 #endif	/* __cplusplus */
 
 #endif	/* SAMPLERATE_H */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 5421ef3e-c898-4ec3-8671-ea03d943ee00
-*/
 

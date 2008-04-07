@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,12 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -23,11 +29,16 @@
 #include	"config.h"
 
 #include	"samplerate.h"
-#include	"common.h"
 #include	"float_cast.h"
+#include	"common.h"
 
 static int psrc_set_converter (SRC_PRIVATE	*psrc, int converter_type) ;
 
+
+static inline int
+is_bad_src_ratio (double ratio)
+{	return (ratio < (1.0 / SRC_MAX_RATIO) || ratio > (1.0 * SRC_MAX_RATIO)) ;
+} /* is_bad_src_ratio */
 
 SRC_STATE *
 src_new (int converter_type, int channels, int *error)
@@ -111,7 +122,7 @@ src_process (SRC_STATE *state, SRC_DATA *data)
 
 	if (psrc == NULL)
 		return SRC_ERR_BAD_STATE ;
-	if (psrc->process == NULL)
+	if (psrc->vari_process == NULL || psrc->const_process == NULL)
 		return SRC_ERR_BAD_PROC_PTR ;
 
 	if (psrc->mode != SRC_MODE_PROCESS)
@@ -122,7 +133,7 @@ src_process (SRC_STATE *state, SRC_DATA *data)
 		return SRC_ERR_BAD_DATA ;
 
 	/* Check src_ratio is in range. */
-	if (data->src_ratio < (1.0 / SRC_MAX_RATIO) || data->src_ratio > (1.0 * SRC_MAX_RATIO))
+	if (is_bad_src_ratio (data->src_ratio))
 		return SRC_ERR_BAD_SRC_RATIO ;
 
 	/* And that data_in and data_out are valid. */
@@ -161,7 +172,10 @@ src_process (SRC_STATE *state, SRC_DATA *data)
 		psrc->last_ratio = data->src_ratio ;
 
 	/* Now process. */
-	error = psrc->process (psrc, data) ;
+	if (fabs (psrc->last_ratio - data->src_ratio) < 1e-15)
+		error = psrc->const_process (psrc, data) ;
+	else
+		error = psrc->vari_process (psrc, data) ;
 
 	return error ;
 } /* src_process */
@@ -195,7 +209,7 @@ src_callback_read (SRC_STATE *state, double src_ratio, long frames, float *data)
 	memset (&src_data, 0, sizeof (src_data)) ;
 
 	/* Check src_ratio is in range. */
-	if (src_ratio < (1.0 / SRC_MAX_RATIO) || src_ratio > (1.0 * SRC_MAX_RATIO))
+	if (is_bad_src_ratio (src_ratio))
 	{	psrc->error = SRC_ERR_BAD_SRC_RATIO ;
 		return 0 ;
 		} ;
@@ -267,8 +281,11 @@ src_set_ratio (SRC_STATE *state, double new_ratio)
 
 	if (psrc == NULL)
 		return SRC_ERR_BAD_STATE ;
-	if (psrc->process == NULL)
+	if (psrc->vari_process == NULL || psrc->const_process == NULL)
 		return SRC_ERR_BAD_PROC_PTR ;
+
+	if (is_bad_src_ratio (new_ratio))
+		return SRC_ERR_BAD_SRC_RATIO ;
 
 	psrc->last_ratio = new_ratio ;
 
@@ -334,13 +351,13 @@ src_get_description (int converter_type)
 
 const char *
 src_get_version (void)
-{	return PACKAGE "-" VERSION ;
+{	return PACKAGE "-" VERSION " (c) 2002-2008 Erik de Castro Lopo" ;
 } /* src_get_version */
 
 int
 src_is_valid_ratio (double ratio)
 {
-	if (ratio < (1.0 / SRC_MAX_RATIO) || ratio > (1.0 * SRC_MAX_RATIO))
+	if (is_bad_src_ratio (ratio))
 		return SRC_FALSE ;
 
 	return SRC_TRUE ;
@@ -401,6 +418,8 @@ src_strerror (int error)
 				return "Calling mode differs from initialisation mode (ie process v callback)." ;
 		case SRC_ERR_NULL_CALLBACK :
 				return "Callback function pointer is NULL in src_callback_read ()." ;
+		case SRC_ERR_NO_VARIABLE_RATIO :
+				return "This converter only allows constant conversion ratios." ;
 
 		case SRC_ERR_MAX_ERROR :
 				return "Placeholder. No error defined for this error number." ;
@@ -438,7 +457,7 @@ src_short_to_float_array (const short *in, float *out, int len)
 {
 	while (len)
 	{	len -- ;
-		out [len] = in [len] / (1.0 * 0x8000) ;
+		out [len] = (float) (in [len] / (1.0 * 0x8000)) ;
 		} ;
 
 	return ;
@@ -446,7 +465,7 @@ src_short_to_float_array (const short *in, float *out, int len)
 
 void
 src_float_to_short_array (const float *in, short *out, int len)
-{	float scaled_value ;
+{	double scaled_value ;
 
 	while (len)
 	{	len -- ;
@@ -461,10 +480,43 @@ src_float_to_short_array (const float *in, short *out, int len)
 			continue ;
 			} ;
 
-		out [len] = (lrintf (scaled_value) >> 16) ;
+		out [len] = (short) (lrint (scaled_value) >> 16) ;
 		} ;
 
 } /* src_float_to_short_array */
+
+void
+src_int_to_float_array (const int *in, float *out, int len)
+{
+	while (len)
+	{	len -- ;
+		out [len] = (float) (in [len] / (8.0 * 0x10000000)) ;
+		} ;
+
+	return ;
+} /* src_int_to_float_array */
+
+void
+src_float_to_int_array (const float *in, int *out, int len)
+{	double scaled_value ;
+
+	while (len)
+	{	len -- ;
+
+		scaled_value = in [len] * (8.0 * 0x10000000) ;
+		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+		{	out [len] = 0x7fffffff ;
+			continue ;
+			} ;
+		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+		{	out [len] = -1 - 0x7fffffff ;
+			continue ;
+			} ;
+
+		out [len] = lrint (scaled_value) ;
+		} ;
+
+} /* src_float_to_int_array */
 
 /*==============================================================================
 **	Private functions.
@@ -484,12 +536,4 @@ psrc_set_converter (SRC_PRIVATE	*psrc, int converter_type)
 
 	return SRC_ERR_BAD_CONVERTER ;
 } /* psrc_set_converter */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: a5c5f514-a370-4210-a066-7f2035de67fb
-*/
 

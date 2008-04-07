@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,12 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +30,7 @@
 #include "float_cast.h"
 #include "common.h"
 
-static int zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
+static int zoh_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
 static void zoh_reset (SRC_PRIVATE *psrc) ;
 
 /*========================================================================================
@@ -35,6 +41,7 @@ static void zoh_reset (SRC_PRIVATE *psrc) ;
 typedef struct
 {	int		zoh_magic_marker ;
 	int		channels ;
+	int		reset ;
 	long	in_count, in_used ;
 	long	out_count, out_gen ;
 	float	last_value [1] ;
@@ -44,15 +51,22 @@ typedef struct
 */
 
 static int
-zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data)
+zoh_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 {	ZOH_DATA 	*zoh ;
-	double		src_ratio, input_index ;
+	double		src_ratio, input_index, rem ;
 	int			ch ;
 
 	if (psrc->private_data == NULL)
 		return SRC_ERR_NO_PRIVATE ;
 
 	zoh = (ZOH_DATA*) psrc->private_data ;
+
+	if (zoh->reset)
+	{	/* If we have just been reset, set the last_value data. */
+		for (ch = 0 ; ch < zoh->channels ; ch++)
+			zoh->last_value [ch] = data->data_in [ch] ;
+		zoh->reset = 0 ;
+		} ;
 
 	zoh->in_count = data->input_frames * zoh->channels ;
 	zoh->out_count = data->output_frames * zoh->channels ;
@@ -67,8 +81,8 @@ zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 		if (zoh->in_used + zoh->channels * input_index >= zoh->in_count)
 			break ;
 
-		if (fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / (zoh->out_count - 1) ;
+		if (zoh->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / zoh->out_count ;
 
 		for (ch = 0 ; ch < zoh->channels ; ch++)
 		{	data->data_out [zoh->out_gen] = zoh->last_value [ch] ;
@@ -79,14 +93,15 @@ zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 		input_index += 1.0 / src_ratio ;
 		} ;
 
-	zoh->in_used += zoh->channels * lrint (floor (input_index)) ;
-	input_index -= floor (input_index) ;
+	rem = fmod_one (input_index) ;
+	zoh->in_used += zoh->channels * lrint (input_index - rem) ;
+	input_index = rem ;
 
 	/* Main processing loop. */
 	while (zoh->out_gen < zoh->out_count && zoh->in_used + zoh->channels * input_index <= zoh->in_count)
 	{
-		if (fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / (zoh->out_count - 1) ;
+		if (zoh->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / zoh->out_count ;
 
 		for (ch = 0 ; ch < zoh->channels ; ch++)
 		{	data->data_out [zoh->out_gen] = data->data_in [zoh->in_used - zoh->channels + ch] ;
@@ -95,13 +110,14 @@ zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 
 		/* Figure out the next index. */
 		input_index += 1.0 / src_ratio ;
+		rem = fmod_one (input_index) ;
 
-		zoh->in_used += zoh->channels * lrint (floor (input_index)) ;
-		input_index -= floor (input_index) ;
+		zoh->in_used += zoh->channels * lrint (input_index - rem) ;
+		input_index = rem ;
 		} ;
 
 	if (zoh->in_used > zoh->in_count)
-	{	input_index += zoh->in_used - zoh->in_count ;
+	{	input_index += (zoh->in_used - zoh->in_count) / zoh->channels ;
 		zoh->in_used = zoh->in_count ;
 		} ;
 
@@ -118,7 +134,7 @@ zoh_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	data->output_frames_gen = zoh->out_gen / zoh->channels ;
 
 	return SRC_ERR_NO_ERROR ;
-} /* zoh_process */
+} /* zoh_vari_process */
 
 /*------------------------------------------------------------------------------
 */
@@ -166,7 +182,8 @@ zoh_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	zoh->zoh_magic_marker = ZOH_MAGIC_MARKER ;
 	zoh->channels = psrc->channels ;
 
-	psrc->process = zoh_process ;
+	psrc->const_process = zoh_vari_process ;
+	psrc->vari_process = zoh_vari_process ;
 	psrc->reset = zoh_reset ;
 
 	zoh_reset (psrc) ;
@@ -186,15 +203,9 @@ zoh_reset (SRC_PRIVATE *psrc)
 		return ;
 
 	zoh->channels = psrc->channels ;
+	zoh->reset = 1 ;
 	memset (zoh->last_value, 0, sizeof (zoh->last_value [0]) * zoh->channels) ;
 
 	return ;
 } /* zoh_reset */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 808e62f8-2e4a-44a6-840f-180a3e41af01
-*/
 

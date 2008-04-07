@@ -1,5 +1,18 @@
 2008-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/3rdparty/samplerate/common.h:
+	* src/3rdparty/samplerate/fastest_coeffs.h:
+	* src/3rdparty/samplerate/float_cast.h:
+	* src/3rdparty/samplerate/high_qual_coeffs.h:
+	* src/3rdparty/samplerate/mid_qual_coeffs.h:
+	* src/3rdparty/samplerate/samplerate.c:
+	* src/3rdparty/samplerate/samplerate.h:
+	* src/3rdparty/samplerate/src_linear.c:
+	* src/3rdparty/samplerate/src_sinc.c:
+	* src/3rdparty/samplerate/src_zoh.c:
+	integrated libsamplerate 0.1.3 source which has various improvements
+	over 4-year-old version 0.1.2
+
 	* src/gui/widgets/combobox.cpp:
 	set correct value for model when selecting an item whose strings
 	occurs multiple times in the combobox

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,11 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
 
 /*
 **  f = make_filter (8, 128, 100.3) ;
@@ -26,6 +31,12 @@
 **  increment        : 128
 */
 
+static const struct fastest_coeffs_s
+{	int increment ;
+	coeff_t coeffs [2464] ;
+} fastest_coeffs =
+{	128,
+{
  8.31472372954840555082e-01,
  8.31414005540308198583e-01,
  8.31238918266223869580e-01,
@@ -2489,13 +2500,6 @@
 -3.59691078491283933177e-07,
 -2.38952398011216803052e-07,
 -1.22889677382464548894e-07,
- 0			/* Need a final zero coefficient */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 82d149f9-28f4-4c47-b442-77a0a2d752b4
-*/
-
+ 0.0	/* Need a final zero coefficient */
+}
+} ; /* fastest_coeffs */

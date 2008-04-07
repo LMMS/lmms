@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,12 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +30,7 @@
 #include "float_cast.h"
 #include "common.h"
 
-static int linear_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
+static int linear_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data) ;
 static void linear_reset (SRC_PRIVATE *psrc) ;
 
 /*========================================================================================
@@ -37,6 +43,7 @@ static void linear_reset (SRC_PRIVATE *psrc) ;
 typedef struct
 {	int		linear_magic_marker ;
 	int		channels ;
+	int		reset ;
 	long	in_count, in_used ;
 	long	out_count, out_gen ;
 	float	last_value [1] ;
@@ -46,15 +53,22 @@ typedef struct
 */
 
 static int
-linear_process (SRC_PRIVATE *psrc, SRC_DATA *data)
+linear_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 {	LINEAR_DATA *linear ;
-	double		src_ratio, input_index ;
+	double		src_ratio, input_index, rem ;
 	int			ch ;
 
 	if (psrc->private_data == NULL)
 		return SRC_ERR_NO_PRIVATE ;
 
 	linear = (LINEAR_DATA*) psrc->private_data ;
+
+	if (linear->reset)
+	{	/* If we have just been reset, set the last_value data. */
+		for (ch = 0 ; ch < linear->channels ; ch++)
+			linear->last_value [ch] = data->data_in [ch] ;
+		linear->reset = 0 ;
+		} ;
 
 	linear->in_count = data->input_frames * linear->channels ;
 	linear->out_count = data->output_frames * linear->channels ;
@@ -69,12 +83,12 @@ linear_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 		if (linear->in_used + linear->channels * input_index > linear->in_count)
 			break ;
 
-		if (fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + linear->out_gen * (data->src_ratio - psrc->last_ratio) / (linear->out_count - 1) ;
+		if (linear->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + linear->out_gen * (data->src_ratio - psrc->last_ratio) / linear->out_count ;
 
 		for (ch = 0 ; ch < linear->channels ; ch++)
-		{	data->data_out [linear->out_gen] = linear->last_value [ch] + input_index *
-										(data->data_in [ch] - linear->last_value [ch]) ;
+		{	data->data_out [linear->out_gen] = (float) (linear->last_value [ch] + input_index *
+										(data->data_in [ch] - linear->last_value [ch])) ;
 			linear->out_gen ++ ;
 			} ;
 
@@ -82,14 +96,15 @@ linear_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 		input_index += 1.0 / src_ratio ;
 		} ;
 
-	linear->in_used += linear->channels * lrint (floor (input_index)) ;
-	input_index -= floor (input_index) ;
+	rem = fmod_one (input_index) ;
+	linear->in_used += linear->channels * lrint (input_index - rem) ;
+	input_index = rem ;
 
 	/* Main processing loop. */
 	while (linear->out_gen < linear->out_count && linear->in_used + linear->channels * input_index <= linear->in_count)
 	{
-		if (fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + linear->out_gen * (data->src_ratio - psrc->last_ratio) / (linear->out_count - 1) ;
+		if (linear->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + linear->out_gen * (data->src_ratio - psrc->last_ratio) / linear->out_count ;
 
 		if (SRC_DEBUG && linear->in_used < linear->channels && input_index < 1.0)
 		{	printf ("Whoops!!!!   in_used : %ld     channels : %d     input_index : %f\n", linear->in_used, linear->channels, input_index) ;
@@ -97,20 +112,21 @@ linear_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 			} ;
 
 		for (ch = 0 ; ch < linear->channels ; ch++)
-		{	data->data_out [linear->out_gen] = data->data_in [linear->in_used - linear->channels + ch] + input_index *
-						(data->data_in [linear->in_used + ch] - data->data_in [linear->in_used - linear->channels + ch]) ;
+		{	data->data_out [linear->out_gen] = (float) (data->data_in [linear->in_used - linear->channels + ch] + input_index *
+						(data->data_in [linear->in_used + ch] - data->data_in [linear->in_used - linear->channels + ch])) ;
 			linear->out_gen ++ ;
 			} ;
 
 		/* Figure out the next index. */
 		input_index += 1.0 / src_ratio ;
+		rem = fmod_one (input_index) ;
 
-		linear->in_used += linear->channels * lrint (floor (input_index)) ;
-		input_index -= floor (input_index) ;
+		linear->in_used += linear->channels * lrint (input_index - rem) ;
+		input_index = rem ;
 		} ;
 
 	if (linear->in_used > linear->in_count)
-	{	input_index += linear->in_used - linear->in_count ;
+	{	input_index += (linear->in_used - linear->in_count) / linear->channels ;
 		linear->in_used = linear->in_count ;
 		} ;
 
@@ -127,7 +143,7 @@ linear_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 	data->output_frames_gen = linear->out_gen / linear->channels ;
 
 	return SRC_ERR_NO_ERROR ;
-} /* linear_process */
+} /* linear_vari_process */
 
 /*------------------------------------------------------------------------------
 */
@@ -175,7 +191,8 @@ linear_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	linear->linear_magic_marker = LINEAR_MAGIC_MARKER ;
 	linear->channels = psrc->channels ;
 
-	psrc->process = linear_process ;
+	psrc->const_process = linear_vari_process ;
+	psrc->vari_process = linear_vari_process ;
 	psrc->reset = linear_reset ;
 
 	linear_reset (psrc) ;
@@ -194,13 +211,9 @@ linear_reset (SRC_PRIVATE *psrc)
 	if (linear == NULL)
 		return ;
 
+	linear->channels = psrc->channels ;
+	linear->reset = 1 ;
+
 	memset (linear->last_value, 0, sizeof (linear->last_value [0]) * linear->channels) ;
 } /* linear_reset */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 7eac3103-3d84-45d3-8bbd-f409c2b2d1a9
-*/
 
