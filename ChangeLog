@@ -1,5 +1,9 @@
 2008-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/fx_mixer.cpp:
+	process FX-channels until effects signal that there's nothing more to
+	process - closes #1935872
+
 	* configure.in:
 	integrated changes from libsamplerate-0.1.3/configure.ac
 

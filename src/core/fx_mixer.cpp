@@ -48,6 +48,7 @@ struct fxChannel
 	fxChannel( model * _parent ) :
 		m_fxChain( NULL ),
 		m_used( FALSE ),
+		m_stillRunning( FALSE ),
 		m_peakLeft( 0.0f ),
 		m_peakRight( 0.0f ),
 		m_buffer( new sampleFrame[
@@ -68,6 +69,7 @@ struct fxChannel
 
 	effectChain m_fxChain;
 	bool m_used;
+	bool m_stillRunning;
 	float m_peakLeft;
 	float m_peakRight;
 	sampleFrame * m_buffer;
@@ -124,11 +126,13 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void fxMixer::processChannel( fx_ch_t _ch )
 {
-	if( m_fxChannels[_ch]->m_used || _ch == 0 )
+	if( m_fxChannels[_ch]->m_used || m_fxChannels[_ch]->m_stillRunning ||
+								_ch == 0 )
 	{
 		const fpp_t f = engine::getMixer()->framesPerPeriod();
 		m_fxChannels[_ch]->m_fxChain.startRunning();
-		m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
+		m_fxChannels[_ch]->m_stillRunning =
+			m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
 					m_fxChannels[_ch]->m_buffer, f );
 		m_fxChannels[_ch]->m_peakLeft =
 			engine::getMixer()->peakValueLeft(
@@ -138,6 +142,7 @@ void fxMixer::processChannel( fx_ch_t _ch )
 			engine::getMixer()->peakValueRight(
 					m_fxChannels[_ch]->m_buffer, f ) *
 				m_fxChannels[_ch]->m_volumeModel.value();
+		m_fxChannels[_ch]->m_used = TRUE;
 	}
 	else
 	{
