@@ -251,7 +251,12 @@ void effectListWidget::rowChanged( const QModelIndex & _idx,
 	delete m_descriptionWidget;
 	m_descriptionWidget = NULL;
 
-	m_currentSelection = m_effectKeys[_idx.row()];
+	if( m_model.mapToSource( _idx ).row() < 0 )
+	{
+		return;
+	}
+
+	m_currentSelection = m_effectKeys[m_model.mapToSource( _idx ).row()];
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
