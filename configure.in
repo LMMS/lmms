@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080403, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080403)
+AC_INIT(lmms, 0.4.0-svn20080406, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080406)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -73,7 +73,7 @@ gw_CHECK_QT
 # checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h sched.h ctype.h])
+AC_CHECK_HEADERS([stdint.h sys/times.h fcntl.h memory.h string.h sys/ioctl.h unistd.h stdlib.h pthread.h sys/ipc.h sys/shm.h sys/time.h sys/select.h sys/types.h stdarg.h signal.h sched.h ctype.h])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -84,6 +84,7 @@ AC_STRUCT_TM
 AC_C_VOLATILE
 AC_C_BIGENDIAN
 AC_CHECK_TYPES([mode_t, off_t, pid_t, size_t, ssize_t, long long])
+
 
 # checks for library functions.
 AC_FUNC_ALLOCA
@@ -334,6 +335,16 @@ if test -z "$HAVE_SAMPLERATE_H" ; then
 
 	AC_CHECK_LIB([m],floor)
 	AC_CHECK_FUNCS(floor ceil fmod)
+	AC_CHECK_SIZEOF(int,0)
+	AC_CHECK_SIZEOF(long,0)
+	AC_CHECK_SIZEOF(float,4)
+	AC_CHECK_SIZEOF(double,8)
+	AC_C_FIND_ENDIAN
+
+	AC_DEFINE_UNQUOTED(CPU_IS_BIG_ENDIAN, ${ac_cv_c_big_endian},
+        	[Target processor is big endian.])
+	AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
+	        [Target processor is little endian.])
 
 	AC_C99_FUNC_LRINT
 	AC_C99_FUNC_LRINTF
@@ -357,6 +368,9 @@ if test -z "$HAVE_SAMPLERATE_H" ; then
 		[Target processor clips on positive float to int conversion.])
 	AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 		[Target processor clips on negative float to int conversion.])
+	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
+	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
+	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 
 fi
 
