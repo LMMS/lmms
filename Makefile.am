@@ -60,6 +60,10 @@ lmms_MOC =						\
 		./combobox.moc				\
 		./config_mgr.moc			\
 		./controller.moc			\
+		./controller_connection_dialog.moc		\
+		./controller_dialog.moc			\
+		./controller_rack_view.moc		\
+		./controller_view.moc			\
 		./cpuload_widget.moc			\
 		./effect_control_dialog.moc		\
 		./effect_label.moc			\
@@ -85,6 +89,7 @@ lmms_MOC =						\
  		./ladspa_control_view.moc		\
 		./lcd_spinbox.moc			\
 		./led_checkbox.moc			\
+		./lfo_controller.moc			\
 		./main_window.moc			\
 		./mixer.moc				\
 		./mv_base.moc				\
@@ -173,6 +178,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp				\
 		$(srcdir)/src/core/ladspa_manager.cpp				\
 		$(srcdir)/src/core/ladspa_control.cpp				\
+		$(srcdir)/src/core/lfo_controller.cpp				\
 		$(srcdir)/src/core/main.cpp					\
 		$(srcdir)/src/core/mixer.cpp					\
 		$(srcdir)/src/core/mmp.cpp					\
@@ -212,11 +218,13 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/about_dialog.cpp				\
 		$(srcdir)/src/gui/automation_editor.cpp				\
 		$(srcdir)/src/gui/bb_editor.cpp					\
+		$(srcdir)/src/gui/controller_connection_dialog.cpp \
 		$(srcdir)/src/gui/effect_control_dialog.cpp			\
 		$(srcdir)/src/gui/effect_select_dialog.cpp			\
 		$(srcdir)/src/gui/embed.cpp					\
 		$(srcdir)/src/gui/export_project_dialog.cpp			\
 		$(srcdir)/src/gui/file_browser.cpp				\
+		$(srcdir)/src/gui/lfo_controller_dialog.cpp			\
 		$(srcdir)/src/gui/lmms_style.cpp				\
 		$(srcdir)/src/gui/main_window.cpp				\
 		$(srcdir)/src/gui/piano_roll.cpp				\
@@ -229,6 +237,8 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/automatable_slider.cpp		\
 		$(srcdir)/src/gui/widgets/caption_menu.cpp			\
 		$(srcdir)/src/gui/widgets/combobox.cpp				\
+		$(srcdir)/src/gui/widgets/controller_rack_view.cpp		\
+		$(srcdir)/src/gui/widgets/controller_view.cpp			\
 		$(srcdir)/src/gui/widgets/cpuload_widget.cpp			\
 		$(srcdir)/src/gui/widgets/effect_label.cpp			\
 		$(srcdir)/src/gui/widgets/effect_rack_view.cpp			\
@@ -422,8 +432,12 @@ lmms_SOURCES =									\
 		$(srcdir)/include/ladspa_control_view.h				\
 		$(srcdir)/include/ladspa_base.h					\
 		$(srcdir)/include/controller.h					\
+		$(srcdir)/include/controller_rack_view.h			\
+		$(srcdir)/include/controller_view.h				\
+		$(srcdir)/include/controller_dialog.h				\
+		$(srcdir)/include/controller_connection_dialog.h		\
+		$(srcdir)/include/lfo_controller.h				\
 		$(THIRD_PARTY_CODE)
-
 
 #		$(srcdir)/src/tracks/sample_track.cpp
 

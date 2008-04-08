@@ -32,13 +32,18 @@
 
 #include "engine.h"
 #include "mixer.h"
+#include "mv_base.h"
 
+class controllerDialog;
+class controller; 
 
-class controller : public QObject
+typedef QVector<controller *> controllerVector;
+
+class controller : public model
 {
 	Q_OBJECT
 public:
-	controller( void );
+	controller( model * _parent );
 
 	virtual ~controller();
 
@@ -54,6 +59,10 @@ public:
 		m_sampleExact = _exact;
 	}
 
+	virtual QString publicName() const
+	{
+		return "Dummy Controller";
+	}
 
 	static int runningFrames();
 	static float runningTime();
@@ -61,7 +70,8 @@ public:
 	static void triggerFrameCounter( void );
 	static void resetFrameCounter( void );
 
-private:
+public slots:
+	virtual controllerDialog * createDialog( QWidget * _parent );
 
 protected:
 
@@ -72,12 +82,11 @@ protected:
 	bool  m_sampleExact;
 
 
-	static QVector<controller *> s_controllers;
+	static controllerVector s_controllers;
 
 	static unsigned int s_frames;
 
 	/*
-	QString publicName();
 slots:
 	void trigger();
 
@@ -90,6 +99,7 @@ signals:
 	// Allow all attached models to unlink
 	void destroying( void );
 
+	friend class controllerDialog;
 };
 
 #endif

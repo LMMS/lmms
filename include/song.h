@@ -26,10 +26,13 @@
 #ifndef _SONG_H
 #define _SONG_H
 
+#include <QtCore/QVector>
+
 #include "track_container.h"
 #include "automatable_model.h"
 #include "automatable_slider.h"
 #include "lcd_spinbox.h"
+#include "controller.h"
 
 
 class pattern;
@@ -165,6 +168,14 @@ public:
 		return( FALSE );
 	}
 
+	void addController( controller * _c );
+
+	// QT will implicitly share the Vector I believe..
+	controllerVector controllers( void ) const
+	{
+		return m_controllers;
+	}
+
 
 public slots:
 	void play( void );
@@ -229,6 +240,8 @@ private:
 	sliderModel m_masterVolumeModel;
 	sliderModel m_masterPitchModel;
 
+	controllerVector m_controllers;
+
 
 	QString m_fileName;
 	QString m_oldFileName;
@@ -264,6 +277,7 @@ private:
 
 	friend class engine;
 	friend class songEditor;
+	friend class controllerRackView;
 
 signals:
 	void tempoChanged( bpm_t _new_bpm );

@@ -30,6 +30,7 @@
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
+#include "controller_rack_view.h"
 #include "fx_mixer.h"
 #include "ladspa_2_lmms.h"
 #include "main_window.h"
@@ -59,6 +60,7 @@ projectNotes * engine::s_projectNotes = NULL;
 projectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
 dummyTrackContainer * engine::s_dummyTC = NULL;
+controllerRackView * engine::s_controllerRackView = NULL;
 QMap<QString, QString> engine::s_sampleExtensions;
 
 
@@ -81,6 +83,7 @@ void engine::init( const bool _has_gui )
 		s_mainWindow = new mainWindow;
 		s_fxMixerView = new fxMixerView;
 		s_songEditor = new songEditor( s_song );
+		s_controllerRackView = new controllerRackView;
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;

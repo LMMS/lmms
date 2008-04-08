@@ -35,11 +35,14 @@
 #include "engine.h"
 #include "mixer.h"
 #include "controller.h"
+#include "controller_dialog.h"
+
 
 unsigned int controller::s_frames = 0;
 QVector<controller *> controller::s_controllers;
 
-controller::controller( void )
+controller::controller( model * _parent ) :
+	model( _parent )
 {
 	s_controllers.append( this );
 }
@@ -102,6 +105,12 @@ void controller::resetFrameCounter( void )
 	s_frames = 0;
 }
 
+controllerDialog * controller::createDialog( QWidget * _parent )
+{
+	controllerDialog * d = new controllerDialog( this, _parent );
+
+	return d;
+}
 
 
 #include "controller.moc"

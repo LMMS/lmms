@@ -54,8 +54,8 @@
 #include "string_pair_drag.h"
 #include "templates.h"
 #include "text_float.h"
-
-
+#include "song.h"
+#include "controller_connection_dialog.h"
 
 
 float knob::s_copiedValue = 0.0f;
@@ -580,10 +580,18 @@ void knob::connectToController( void )
 {
 	// TODO[pg]: Display a dialog with list of controllers currently in the song
 	// in addition to any system MIDI controllers
+	
+	controllerConnectionDialog * d = new controllerConnectionDialog( engine::getMainWindow() );
 
-	controller * c = new controller();
+	d->exec();
 
-	model()->setController( c );
+	if (d->chosenController() != NULL )
+	{
+		model()->setController( d->chosenController() );
+	}
+
+	delete d;
+
 }
 
 

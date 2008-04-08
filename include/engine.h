@@ -46,6 +46,7 @@ class projectNotes;
 class song;
 class songEditor;
 class ladspa2LMMS;
+class controllerRackView;
 
 
 class engine
@@ -131,6 +132,11 @@ public:
 		return( s_dummyTC );
 	}
 
+	static controllerRackView * getControllerRackView( void )
+	{
+		return( s_controllerRackView );
+	}
+
 	static float framesPerTact64th( void )
 	{
 		return( s_framesPerTact64th );
@@ -154,6 +160,7 @@ private:
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;
+	static controllerRackView * s_controllerRackView;
 
 	// GUI
 	static mainWindow * s_mainWindow;

@@ -237,11 +237,11 @@ songEditor::songEditor( song * _song ) :
 
 
 	// fill own tool-bar
-	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
+	m_playButton = new toolButton( embed::getIconPixmap( "play", 24, 24 ),
 					tr( "Play song (Space)" ),
 					m_s, SLOT( play() ), m_toolBar );
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
+	m_stopButton = new toolButton( embed::getIconPixmap( "stop", 24, 24 ),
 					tr( "Stop song (Space)" ),
 					m_s, SLOT( stop() ), m_toolBar );
 
@@ -252,13 +252,13 @@ songEditor::songEditor( song * _song ) :
 						m_toolBar );
 
 	m_addSampleTrackButton = new toolButton( embed::getIconPixmap(
-					"add_sample_track" ),
+					"add_sample_track", 24, 24 ),
 					tr( "Add sample-track" ),
 					m_s, SLOT( addSampleTrack() ),
 					m_toolBar );
 
 	m_addControllerButton = new toolButton( embed::getIconPixmap(
-					"add_controller" ),
+					"add_controller", 24, 24 ),
 					tr( "Add controller" ),
 					m_s, SLOT( addSampleTrack() ),
 					m_toolBar );

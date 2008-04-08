@@ -37,7 +37,7 @@
 #include "tooltip.h"
 
 
-const int UPDATE_TIME = 1000 / 40;	// 40 fps
+const int UPDATE_TIME = 1000 / 25;	// 40 fps
 
 
 

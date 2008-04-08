@@ -1055,6 +1055,15 @@ void song::setModified( void )
 }
 
 
+void song::addController( controller * _c )
+{
+	if( _c != NULL && !m_controllers.contains( _c ) ) 
+	{
+		m_controllers.append( _c );
+		emit dataChanged();
+	}
+}
+
 
 
 #include "song.moc"

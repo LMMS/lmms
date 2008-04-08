@@ -1,3 +1,47 @@
+	* include/engine.h:
+	* src/core/engine.cpp:
+	add static accessor to the controller rack.  I'm sure this won't be it's
+	own MDISubWindow very long..
+
+	* include/controller.h:
+	* src/gui/widgets/knob.cpp:
+	* src/core/controller.cpp:
+	add gui accesssor and split off LFO
+
+	* include/song.h:
+	* src/core/song.cpp:
+	make song the model for user-created controllers
+
+	* src/gui/song_editor.cpp:
+	added icon.  Was going to add controller rack as a QSplitter but found
+	this would take too much time right now
+
+	* src/gui/widgets/visualization_widget.cpp:
+	drop back from 40 to an arbitrary 24fps
+
+	* include/lfo_controller_dialog.h:
+	* include/lfo_controller.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	- add beginnings of an LFO controller and dialog
+	- don't mind the unoptimized code, it will be fixed
+
+	* include/controller_view.h:
+	* include/controller_rack_view.h:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	* data/themes/default/controller_bg.png:
+	The beginning of the controller rack and controller items.  This is an
+	absolute bare minimum interface at the moment.  Also ulta-buggy.
+
+	* include/controller_connection_dialog.h:
+	* src/gui/controller_connection_dialog.cpp:
+	This is the connection dialog. Will allow users to create and modify
+	connections between a controller and model.  The lineEdit will be for
+	editing a mapping function to scale, offset, trig-ify, etc.
+
+	* Makefile.am:
+	add controller related files
+
 2008-04-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/effect_select_dialog.cpp:
