@@ -6,6 +6,7 @@
 	own MDISubWindow very long..
 
 	* include/controller.h:
+	* include/controller_dialog.h:
 	* src/gui/widgets/knob.cpp:
 	* src/core/controller.cpp:
 	add gui accesssor and split off LFO
