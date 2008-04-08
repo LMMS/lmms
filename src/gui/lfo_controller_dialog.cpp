@@ -1,7 +1,7 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * controller_dialog.cpp - per-controller-specific view for changing a
+ * lfo_controller_dialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>

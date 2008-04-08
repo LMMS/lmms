@@ -1,3 +1,5 @@
+2008-04-08	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
 	* include/engine.h:
 	* src/core/engine.cpp:
 	add static accessor to the controller rack.  I'm sure this won't be it's
@@ -19,8 +21,8 @@
 	* src/gui/widgets/visualization_widget.cpp:
 	drop back from 40 to an arbitrary 24fps
 
-	* include/lfo_controller_dialog.h:
 	* include/lfo_controller.h:
+	* src/gui/lfo_controller.cpp:
 	* src/gui/lfo_controller_dialog.cpp:
 	- add beginnings of an LFO controller and dialog
 	- don't mind the unoptimized code, it will be fixed

@@ -1,6 +1,5 @@
 /*
- * lfo_controller.h - A LFO-based controller
- * controller's settings
+ * lfo_controller.h - A LFO-based controller and dialog
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 

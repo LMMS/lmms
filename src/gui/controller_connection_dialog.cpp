@@ -1,7 +1,8 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * controller_connection_dialog.cpp - 
+ * controller_connection_dialog.cpp - dialog allowing the user to create and
+ *	modify links between controllers and models
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
  * 

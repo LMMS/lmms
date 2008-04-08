@@ -1,5 +1,6 @@
 /*
- * controller_connection_dialog.h - 
+ * controller_connection_dialog.h - dialog allowing the user to create and
+ *	modify links between controllers and models
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
  * 
