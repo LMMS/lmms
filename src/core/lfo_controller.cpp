@@ -42,10 +42,10 @@ const float TWO_PI = 6.28318531f;
 lfoController::lfoController( model * _parent ) :
 	controller( _parent ),
 	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this ),
-	m_lfoSpeedModel( 0.1, 0.01, 10.0, 0.0001, 20000.0, this ),
+	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
 	m_lfoWaveModel( SineWave, 0, NumLfoShapes, 1, this ),
-	m_duration( 0 ),
+	m_duration( 1000 ),
 	m_phaseCorrection( 0 )
 {
 }
