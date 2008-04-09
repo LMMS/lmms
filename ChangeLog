@@ -9,7 +9,6 @@
 	* src/core/lfo_controller.cpp:
 	add more parameters to LFO controller
 
-
 2008-04-08	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/engine.h:
@@ -171,9 +170,9 @@
 	Fixed tabs
 
 	* src/core/mixer.cpp:
-	Couldn't easily convert from void* to int on a 64bit machine.  Instead, we
-	now use a union.  We should change any enqueueing code to use the union as
-	well
+	Couldn't easily convert from void* to int on a 64bit machine.  Instead,
+	we now use a union.  We should change any enqueueing code to use the
+	union as well
 	
 	* data/themes/add_controller.png:
 	* data/themes/controller.png:
@@ -215,7 +214,6 @@
 	* data/themes/llama/background_artwork.png:
 	* data/themes/Makefile.am:
 	start a theme with my preferences
-
 
 2008-04-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
