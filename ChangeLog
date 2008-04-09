@@ -1,3 +1,15 @@
+2008-04-09	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* include/controller.h:
+	* src/core/controller.cpp:
+	fit values between 0.0 and 1.0
+
+	* include/lfo_controller.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/core/lfo_controller.cpp:
+	add more parameters to LFO controller
+
+
 2008-04-08	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/engine.h:

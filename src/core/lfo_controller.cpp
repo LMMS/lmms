@@ -41,36 +41,47 @@ const float TWO_PI = 6.28318531f;
 
 lfoController::lfoController( model * _parent ) :
 	controller( _parent ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this ),
+	m_lfoBaseModel( 0.5, 0.0, 1.0, 0.001, this ),
 	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
+	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this ),
 	m_lfoWaveModel( SineWave, 0, NumLfoShapes, 1, this ),
 	m_duration( 1000 ),
-	m_phaseCorrection( 0 )
+	m_phaseCorrection( 0 ),
+	m_phaseOffset( 0 )
 {
 }
 
 
 lfoController::~lfoController()
 {
-	m_lfoAttackModel.disconnect( this );
+	m_lfoBaseModel.disconnect( this );
 	m_lfoSpeedModel.disconnect( this );
 	m_lfoAmountModel.disconnect( this );
 	m_lfoWaveModel.disconnect( this );
+	m_lfoPhaseModel.disconnect( this );
 }
 
+
 // This code took forever to get right. It can
-// definately be optimized a bit.
+// definately be optimized.
+// The code should probably be integrated with the oscillator class. But I
+// don't know how to use oscillator because it is so confusing
+
 float lfoController::value( int _offset )
 {
 	int frame = runningFrames() + _offset + m_phaseCorrection;
 
 	// Recalculate speed each period
+	// Actually, _offset != only if HQ, and we may want to recalc in that case,
+	// so this statement may be unrequired
 	if (_offset == 0) {
 
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
 		int newDuration = engine::getMixer()->sampleRate() / m_lfoSpeedModel.value();
+		
+		m_phaseOffset = m_lfoPhaseModel.value() * newDuration / 360.0;
 
 		if (newDuration != m_duration) {
 			// frame offset
@@ -99,13 +110,15 @@ float lfoController::value( int _offset )
 			frame = runningFrames() + m_phaseCorrection;
 
 			m_duration = newDuration;
+			
 		}
 	}
 
 
 	// 44100 frames/sec
-	return 0.5 + (m_lfoAmountModel.value() * 
-			sinf( TWO_PI * float(frame * m_lfoSpeedModel.value()) / engine::getMixer()->sampleRate() ) / 2.0f);
+	return m_lfoBaseModel.value() + ( m_lfoAmountModel.value() * 
+			sinf( TWO_PI * float( ( frame+m_phaseOffset ) * m_lfoSpeedModel.value() ) /
+			engine::getMixer()->sampleRate() ) / 2.0f );
 }
 
 

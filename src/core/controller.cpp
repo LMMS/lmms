@@ -25,7 +25,6 @@
  *
  */
 
-#include <math.h>
 #include <Qt/QtXml>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
@@ -60,7 +59,7 @@ float controller::currentValue( int _offset )
 {
 	if( _offset == 0 || isSampleExact() )
 	{
-		m_currentValue = value( _offset );
+		m_currentValue = fittedValue( value( _offset ) );
 	}
 	
 	return m_currentValue;
@@ -69,8 +68,7 @@ float controller::currentValue( int _offset )
 
 float controller::value( int _offset )
 {
-	// 44100 frames/sec
-	return 0.5 + sinf((float)(runningFrames()) / 44100.0f) / 2;
+	return 0.5f;
 }
 	
 

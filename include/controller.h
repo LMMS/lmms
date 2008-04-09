@@ -33,6 +33,7 @@
 #include "engine.h"
 #include "mixer.h"
 #include "mv_base.h"
+#include "templates.h"
 
 class controllerDialog;
 class controller; 
@@ -62,6 +63,11 @@ public:
 	virtual QString publicName() const
 	{
 		return "Dummy Controller";
+	}
+
+	inline static float fittedValue( float _val )
+	{
+		return tLimit<float>( _val, 0.0f, 1.0f );
 	}
 
 	static int runningFrames();

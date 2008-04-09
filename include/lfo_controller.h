@@ -78,13 +78,15 @@ slots:
 
 	*/
 
-	floatModel m_lfoAttackModel;
+	floatModel m_lfoBaseModel;
 	tempoSyncKnobModel m_lfoSpeedModel;
 	floatModel m_lfoAmountModel;
+	floatModel m_lfoPhaseModel;
 	intModel m_lfoWaveModel;
 
 	int m_duration;
 	int m_phaseCorrection;
+	int m_phaseOffset;
 	
 
 	friend class lfoControllerDialog;
@@ -116,9 +118,11 @@ protected:
 
 	lfoController * m_lfo;
 
-	knob * m_lfoAttackKnob;
+	knob * m_lfoBaseKnob;
 	tempoSyncKnob * m_lfoSpeedKnob;
 	knob * m_lfoAmountKnob;
+	knob * m_lfoPhaseKnob;
+
 	pixmapButton * m_userLfoBtn;
 	automatableButtonGroup * m_lfoWaveBtnGrp;
 

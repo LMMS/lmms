@@ -54,10 +54,11 @@ const int KNOB_X_SPACING = 32;
 const int LFO_GRAPH_X = 6;
 const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
 const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
-const int LFO_PREDELAY_KNOB_X = LFO_GRAPH_X + 10;
-const int LFO_ATTACK_KNOB_X = LFO_PREDELAY_KNOB_X+KNOB_X_SPACING;
-const int LFO_SPEED_KNOB_X = LFO_ATTACK_KNOB_X+KNOB_X_SPACING;
+const int LFO_BASE_KNOB_X = LFO_GRAPH_X + 10;
+const int LFO_SPEED_KNOB_X = LFO_BASE_KNOB_X+KNOB_X_SPACING;
 const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
+const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
+
 const int LFO_SHAPES_X = LFO_GRAPH_X;//PREDELAY_KNOB_X;
 const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
@@ -66,19 +67,14 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 {
 	setFixedSize( 256, 64 );
 	
-	toolTip::add( this, tr( "Poor lonely controller" ) );
+	toolTip::add( this, tr( "LFO Controller" ) );
 
-	
-
-	m_lfoAttackKnob = new knob( knobBright_26, this,
-						tr( "LFO-attack-time" ) );
-	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
-	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
-	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
-	m_lfoAttackKnob->setWhatsThis(
-		tr( "Use this knob for setting attack-time of the current LFO. "
-			"The bigger this value the longer the LFO needs to "
-			"increase its amplitude to maximum." ) );
+	m_lfoBaseKnob = new knob( knobBright_26, this,
+						tr( "LFO base value" ) );
+	m_lfoBaseKnob->setLabel( tr( "BASE" ) );
+	m_lfoBaseKnob->move( LFO_BASE_KNOB_X, LFO_KNOB_Y );
+	m_lfoBaseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
+	m_lfoBaseKnob->setWhatsThis( tr("todo") );
 
 
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
@@ -87,9 +83,9 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
 	m_lfoSpeedKnob->setWhatsThis(
-		tr( "Use this knob for setting speed of the current LFO. The "
+		tr( "Use this knob for setting speed of the LFO. The "
 			"bigger this value the faster the LFO oscillates and "
-			"the faster will be your effect." ) );
+			"the faster the effect." ) );
 
 
 	m_lfoAmountKnob = new knob( knobBright_26, this,
@@ -102,6 +98,21 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 			"current LFO. The bigger this value the more the "
 			"selected size (e.g. volume or cutoff-frequency) will "
 			"be influenced by this LFO." ) );
+
+	m_lfoPhaseKnob = new knob( knobBright_26, this,
+						tr( "LFO phase" ) );
+	m_lfoPhaseKnob->setLabel( tr( "PHS" ) );
+	m_lfoPhaseKnob->move( LFO_PHASE_KNOB_X, LFO_KNOB_Y );
+	m_lfoPhaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
+	m_lfoPhaseKnob->setWhatsThis(
+			tr( "With this knob you can set the phase-offset of "
+				"the LFO. That means you can move the "
+				"point within an oscillation where the "
+				"oscillator begins to oscillate. For example "
+				"if you have a sine-wave and have a phase-"
+				"offset of 180 degrees the wave will first go "
+				"down. It's the same with a square-wave."
+				) );
 
 
 	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL );
@@ -261,9 +272,10 @@ void lfoControllerDialog::modelChanged( void )
 {
 	m_lfo = castModel<lfoController>();
 
-	m_lfoAttackKnob->setModel( &m_lfo->m_lfoAttackModel );
+	m_lfoBaseKnob->setModel( &m_lfo->m_lfoBaseModel );
 	m_lfoSpeedKnob->setModel( &m_lfo->m_lfoSpeedModel );
 	m_lfoAmountKnob->setModel( &m_lfo->m_lfoAmountModel );
+	m_lfoPhaseKnob->setModel( &m_lfo->m_lfoPhaseModel );
 	m_lfoWaveBtnGrp->setModel( &m_lfo->m_lfoWaveModel );
 }
 
