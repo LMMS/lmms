@@ -714,8 +714,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 					int key = *( text + i*bpn + 12 );
 					int len = *( (int*)( text + i*bpn +
 									8 ) );
-					pos /= 6;
-					len /= 6;
+					pos /= 384 / DefaultTicksPerTact;
+					len /= 384 / DefaultTicksPerTact;
 					note n( len, pos );
 					n.setKey( key );
 					m_notes.push_back( qMakePair(
@@ -742,8 +742,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 					int key = *( text + i*bpn + 12 );
 					int len = *( (int*)( text + i*bpn +
 									8 ) );
-					pos /= 6;
-					len /= 6;
+					pos /= 512 / DefaultTicksPerTact;
+					len /= 512 / DefaultTicksPerTact;
 					/*note n( NULL, len, pos );
 					n.setKey( key );
 					m_notes.push_back( qMakePair(
@@ -782,7 +782,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 	{
 		const int ch = ( *it ) >> 16;
 		const int pat = ( ( *it ) & 0xffff ) / 16;
-		const int pos = ( ( ( *it ) & 0xffff ) % 16 ) * 4;
+		const int pos = ( ( ( *it ) & 0xffff ) % 16 ) *
+						(DefaultTicksPerTact/16);
 		while( engine::getBBTrackContainer()->numOfBBs() <= pat )
 		{
 			track::create( track::BBTrack, engine::getSong() );
@@ -793,7 +794,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			continue;
 		}
-		p->addNote( note( -64, pos ), FALSE );
+		p->addNote( note( -DefaultTicksPerTact, pos ), FALSE );
 	}
 
 	// now process all notes
@@ -837,7 +838,8 @@ bool flpImport::tryImport( trackContainer * _tc )
 		
 		bbTrack * bbt = bbTrack::findBBTrack( pat_num );
 		trackContentObject * tco = bbt->addTCO( bbt->createTCO( 0 ) );
-		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) * 64 ) );
+		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) *
+							DefaultTicksPerTact ) );
 	}
 
 	if( project_cur_pat < engine::getBBTrackContainer()->numOfBBs() )

@@ -414,7 +414,8 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 						song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
 		engine::getPianoRoll()->isRecording() == TRUE &&
-		p != last_metro_pos && p.getTact64th() % 16 == 0 )
+		p != last_metro_pos && p.getTicks() %
+					(DefaultTicksPerTact / 4 ) == 0 )
 	{
 		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg" ) );
 		last_metro_pos = p;

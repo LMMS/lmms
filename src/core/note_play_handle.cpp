@@ -120,7 +120,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 				( m_instrumentTrack->getVolume() / 100.0f ) *
 							127 ), 0, 127 ) ),
 			midiTime::fromFrames( offset(),
-						engine::framesPerTact64th() ) );
+						engine::framesPerTick() ) );
 }
 
 
@@ -314,7 +314,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 				m_instrumentTrack->m_midiPort->outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
-						engine::framesPerTact64th() ) );
+						engine::framesPerTick() ) );
 
 	m_released = TRUE;
 }

@@ -139,7 +139,7 @@ private:
 	inline int markerX( const midiTime & _t ) const
 	{
 		return( m_xOffset + static_cast<int>( ( _t - m_begin ) *
-							m_ppt / 64.0f ) );
+						m_ppt / DefaultTicksPerTact ) );
 	}
 
 

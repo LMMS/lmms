@@ -87,7 +87,7 @@ automationEditor::automationEditor( void ) :
 	m_currentPosition(),
 	m_action( NONE ),
 	m_moveStartLevel( 0 ),
-	m_moveStartTact64th( 0 ),
+	m_moveStartTick( 0 ),
 	m_ppt( DEFAULT_PPT ),
 	m_y_delta( DEFAULT_Y_DELTA ),
 	m_y_auto( TRUE ),
@@ -462,8 +462,8 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 
 void automationEditor::removeSelection( void )
 {
-	m_selectStartTact64th = 0;
-	m_selectedTact64th = 0;
+	m_selectStartTick = 0;
+	m_selectedTick = 0;
 	m_selectStartLevel = 0;
 	m_selectedLevels = 0;
 }
@@ -507,7 +507,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( ( m_timeLine->pos() -= 16 ) < 0 )
 			{
 				m_timeLine->pos().setTact( 0 );
-				m_timeLine->pos().setTact64th( 0 );
+				m_timeLine->pos().setTicks( 0 );
 			}
 			m_timeLine->updatePosition();
 			break;
@@ -626,7 +626,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTact( 0 );
-			m_timeLine->pos().setTact64th( 0 );
+			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
 			break;
 
@@ -671,8 +671,8 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 			x -= VALUES_WIDTH;
 
-			// get tact-64th in which the user clicked
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the user clicked
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
 			// get time map of current pattern
@@ -688,9 +688,9 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				// and check whether the user clicked on an
 				// existing value
-				if( pos_tact_64th >= -it.key() &&
+				if( pos_ticks >= -it.key() &&
 					len > 0 &&
-					pos_tact_64th <= -it.key() + len &&
+					pos_ticks <= -it.key() + len &&
 					it.value() == level )
 				{
 					break;
@@ -707,7 +707,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				if( it == time_map.end() )
 				{
 					// then set new value
-					midiTime value_pos( pos_tact_64th );
+					midiTime value_pos( pos_ticks );
 		
 					midiTime new_time =
 						m_pattern->putValue( value_pos,
@@ -724,7 +724,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				int aligned_x = (int)( (float)( (
 						-it.key() -
 						m_currentPosition ) *
-						m_ppt ) / 64.0f );
+						m_ppt ) / DefaultTicksPerTact );
 				m_moveXOffset = x - aligned_x - 1;
 				// set move-cursor
 				QCursor c( Qt::SizeAllCursor );
@@ -750,8 +750,8 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				// select an area of values
 
-				m_selectStartTact64th = pos_tact_64th;
-				m_selectedTact64th = 0;
+				m_selectStartTick = pos_ticks;
+				m_selectedTick = 0;
 				m_selectStartLevel = level;
 				m_selectedLevels = 1;
 				m_action = SELECT_VALUES;
@@ -770,7 +770,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				// move selection (including selected values)
 
 				// save position where move-process began
-				m_moveStartTact64th = pos_tact_64th;
+				m_moveStartTick = pos_ticks;
 				m_moveStartLevel = level;
 
 				m_action = MOVE_SELECTION;
@@ -832,22 +832,22 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x -= m_moveXOffset;
 			}
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 			if( m_action == MOVE_VALUE )
 			{
 				// moving value
-				if( pos_tact_64th < 0 )
+				if( pos_ticks < 0 )
 				{
-					pos_tact_64th = 0;
+					pos_ticks = 0;
 				}
 
 				// we moved the value so the value has to be
 				// moved properly according to new starting-
 				// time in the time map of pattern
 				m_pattern->removeValue(
-						midiTime( pos_tact_64th ) );
-				m_pattern->putValue( midiTime( pos_tact_64th ),
+						midiTime( pos_ticks ) );
+				m_pattern->putValue( midiTime( pos_ticks ),
 								level );
 			}
 
@@ -858,8 +858,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 		{
 			// set move- or resize-cursor
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = ( x * 64 ) / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = ( x * DefaultTicksPerTact ) / m_ppt +
 							m_currentPosition;
 
 			// get time map of current pattern
@@ -873,8 +873,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				// and check whether the cursor is over an
 				// existing value
-				if( pos_tact_64th >= -it.key() &&
-			    		pos_tact_64th <= -it.key() +
+				if( pos_ticks >= -it.key() &&
+			    		pos_ticks <= -it.key() +
 							//TODO: Add constant
 						4 && it.value() == level )
 				{
@@ -948,17 +948,17 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 									4 );
 			}
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
-			m_selectedTact64th = pos_tact_64th -
-							m_selectStartTact64th;
-			if( (int) m_selectStartTact64th + m_selectedTact64th <
+			m_selectedTick = pos_ticks -
+							m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTact64th = -static_cast<int>(
-							m_selectStartTact64th );
+				m_selectedTick = -static_cast<int>(
+							m_selectStartTick );
 			}
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
@@ -973,33 +973,33 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			// move selection + selected values
 
 			// do horizontal move-stuff
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
-			int tact_64th_diff = pos_tact_64th -
-							m_moveStartTact64th;
-			if( m_selectedTact64th > 0 )
+			int ticks_diff = pos_ticks -
+							m_moveStartTick;
+			if( m_selectedTick > 0 )
 			{
-				if( (int) m_selectStartTact64th +
-							tact_64th_diff < 0 )
+				if( (int) m_selectStartTick +
+							ticks_diff < 0 )
 				{
-					tact_64th_diff = -m_selectStartTact64th;
+					ticks_diff = -m_selectStartTick;
 				}
 			}
 			else
 			{
-				if( (int) m_selectStartTact64th +
-					m_selectedTact64th + tact_64th_diff <
+				if( (int) m_selectStartTick +
+					m_selectedTick + ticks_diff <
 									0 )
 				{
-					tact_64th_diff = -(
-							m_selectStartTact64th +
-							m_selectedTact64th );
+					ticks_diff = -(
+							m_selectStartTick +
+							m_selectedTick );
 				}
 			}
-			m_selectStartTact64th += tact_64th_diff;
+			m_selectStartTick += ticks_diff;
 
-			int tact_diff = tact_64th_diff / 64;
-			tact_64th_diff = tact_64th_diff % 64;
+			int tact_diff = ticks_diff / DefaultTicksPerTact;
+			ticks_diff = ticks_diff % DefaultTicksPerTact;
 
 
 			// do vertical move-stuff
@@ -1049,18 +1049,18 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				{
 					int value_tact = ( -it.key() >> 6 )
 								+ tact_diff;
-					int value_tact_64th = ( -it.key() & 63 )
-							+ tact_64th_diff;
-					// ensure value_tact_64th range
-					if( value_tact_64th >> 6 )
+					int value_ticks = ( -it.key() & 63 )
+							+ ticks_diff;
+					// ensure value_ticks range
+					if( value_ticks >> 6 )
 					{
-						value_tact += value_tact_64th
+						value_tact += value_ticks
 									>> 6;
-						value_tact_64th &= 63;
+						value_ticks &= 63;
 					}
 					m_pattern->removeValue( -it.key() );
 					new_value_pos = midiTime( value_tact,
-							value_tact_64th );
+							value_ticks );
 				}
 				new_selValuesForMove[
 					-m_pattern->putValue( new_value_pos,
@@ -1070,7 +1070,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 			m_selValuesForMove = new_selValuesForMove;
 
-			m_moveStartTact64th = pos_tact_64th;
+			m_moveStartTick = pos_ticks;
 			m_moveStartLevel = level;
 		}
 	}
@@ -1106,17 +1106,17 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 									4 );
 			}
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
-			m_selectedTact64th = pos_tact_64th -
-							m_selectStartTact64th;
-			if( (int) m_selectStartTact64th + m_selectedTact64th <
+			m_selectedTick = pos_ticks -
+							m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTact64th = -static_cast<int>(
-							m_selectStartTact64th );
+				m_selectedTick = -static_cast<int>(
+							m_selectStartTick );
 			}
 
 			int level = getLevel( _me->y() );
@@ -1253,9 +1253,9 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 								grid_height  );
 
 	// draw vertical raster
-	int tact_16th = m_currentPosition / 4;
-	const int offset = ( m_currentPosition % 4 ) * m_ppt /
-						DEFAULT_STEPS_PER_TACT / 4;
+	int tact_16th = m_currentPosition / ( DefaultTicksPerTact / 16 );
+	const int offset = ( m_currentPosition % (DefaultTicksPerTact/16) ) *
+					m_ppt / DEFAULT_STEPS_PER_TACT / 8;
 
 	if( m_pattern )
 	{
@@ -1330,8 +1330,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	// following code draws all visible values
 
 	// setup selection-vars
-	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = m_selectStartTact64th + m_selectedTact64th;
+	int sel_pos_start = m_selectStartTick;
+	int sel_pos_end = m_selectStartTick + m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
 	{
 		qSwap<int>( sel_pos_start, sel_pos_end );
@@ -1351,14 +1351,14 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		do
 		{
 			--it;
-			Sint32 len_tact_64th = 4;
+			Sint32 len_ticks = 4;
 
 			const int level = it.value();
 
-			Sint32 pos_tact_64th = -it.key();
+			Sint32 pos_ticks = -it.key();
 
-			const int x = ( pos_tact_64th - m_currentPosition ) *
-								m_ppt / 64;
+			const int x = ( pos_ticks - m_currentPosition ) *
+						m_ppt / DefaultTicksPerTact;
 			if( x > width() - VALUES_WIDTH )
 			{
 				break;
@@ -1369,9 +1369,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			{
 				timeMap::iterator it_prev = it;
 				--it_prev;
-				Sint32 next_pos_tact_64th = -it_prev.key();
-				int next_x = ( next_pos_tact_64th
-					- m_currentPosition ) * m_ppt / 64;
+				Sint32 next_pos_ticks = -it_prev.key();
+				int next_x = ( next_pos_ticks
+					- m_currentPosition ) * m_ppt /
+							DefaultTicksPerTact;
 				// skip this value if not in visible area at all
 				if( next_x < 0 )
 				{
@@ -1405,8 +1406,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				}
 				else if( level >= sel_level_start &&
 					level <= sel_level_end &&
-					pos_tact_64th >= sel_pos_start &&
-					pos_tact_64th + len_tact_64th <=
+					pos_ticks >= sel_pos_start &&
+					pos_ticks + len_ticks <=
 								sel_pos_end )
 				{
 					is_selected = TRUE;
@@ -1456,8 +1457,9 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	}
 
 	// now draw selection-frame
-	int x = ( sel_pos_start - m_currentPosition ) * m_ppt / 64;
-	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / 64;
+	int x = ( sel_pos_start - m_currentPosition ) * m_ppt /
+							DefaultTicksPerTact;
+	int w = ( sel_pos_end - sel_pos_start ) * m_ppt / DefaultTicksPerTact;
 	int y, h;
 	if( m_y_auto )
 	{
@@ -1787,13 +1789,13 @@ void automationEditor::selectAll( void )
 	}
 
 	//TODO: Add constant
-	int len_tact_64th = 4;
+	int len_ticks = 4;
 
 	timeMap & time_map = m_pattern->getTimeMap();
 
 	timeMap::iterator it = time_map.begin();
-	m_selectStartTact64th = 0;
-	m_selectedTact64th = -it.key() + len_tact_64th;
+	m_selectStartTick = 0;
+	m_selectedTick = -it.key() + len_ticks;
 	m_selectStartLevel = it.value();
 	m_selectedLevels = 1;
 
@@ -1827,8 +1829,8 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		return;
 	}
 
-	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = sel_pos_start + m_selectedTact64th;
+	int sel_pos_start = m_selectStartTick;
+	int sel_pos_end = sel_pos_start + m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
 	{
 		qSwap<int>( sel_pos_start, sel_pos_end );
@@ -1847,14 +1849,14 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 									++it )
 	{
 		//TODO: Add constant
-		Sint32 len_tact_64th = 4;
+		Sint32 len_ticks = DefaultTicksPerTact / 16;
 
 		int level = it.value();
-		Sint32 pos_tact_64th = -it.key();
+		Sint32 pos_ticks = -it.key();
 
 		if( level >= sel_level_start && level <= sel_level_end &&
-				pos_tact_64th >= sel_pos_start &&
-				pos_tact_64th + len_tact_64th <= sel_pos_end )
+				pos_ticks >= sel_pos_start &&
+				pos_ticks + len_ticks <= sel_pos_end )
 		{
 			_selected_values[it.key()] = level;
 		}
@@ -1983,14 +1985,17 @@ void automationEditor::updatePosition( const midiTime & _t )
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - VALUES_WIDTH;
-		if( _t > m_currentPosition + w * 64 / m_ppt )
+		if( _t > m_currentPosition + w * DefaultTicksPerTact / m_ppt )
 		{
-			m_leftRightScroll->setValue( _t.getTact() * 64 );
+			m_leftRightScroll->setValue( _t.getTact() *
+							DefaultTicksPerTact );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( _t - w * 64 * 64 / m_ppt, 0 );
-			m_leftRightScroll->setValue( t.getTact() * 64 );
+			midiTime t = tMax( _t - w * DefaultTicksPerTact *
+					DefaultTicksPerTact / m_ppt, 0 );
+			m_leftRightScroll->setValue( t.getTact() *
+							DefaultTicksPerTact );
 		}
 		m_scrollBack = FALSE;
 	}
@@ -2033,7 +2038,8 @@ void automationEditor::zoomingYChanged( void )
 
 int automationEditor::quantization( void ) const
 {
-	return( 64 / m_quantizeComboBox->model()->currentText().right(
+	return( DefaultTicksPerTact /
+		m_quantizeComboBox->model()->currentText().right(
 			m_quantizeComboBox->model()->currentText().length() -
 								2 ).toInt() );
 }

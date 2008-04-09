@@ -210,7 +210,7 @@ private slots:
 
 	void doActions( void );
 
-	void updateFramesPerTact64th( void );
+	void updateFramesPerTick( void );
 
 
 
@@ -225,12 +225,11 @@ private:
 		return( m_playPos[m_playMode].getTact() );
 	}
 
-	inline tact64th currentTact64th( void ) const
+	inline tick currentTick( void ) const
 	{
-		return( m_playPos[m_playMode].getTact64th() );
+		return( m_playPos[m_playMode].getTicks() );
 	}
-	void setPlayPos( tact _tact_num, tact64th _t_64th, PlayModes
-								_play_mode );
+	void setPlayPos( tact _tact_num, tick _tick, PlayModes _play_mode );
 
 
 

@@ -1,3 +1,34 @@
+2008-04-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/engine.h:
+	* include/song.h:
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* include/midi_time.h:
+	* include/types.h:
+	* include/timeline.h:
+	* include/automation_editor.h:
+	* configure.in:
+	* src/gui/piano_roll.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/song.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/mixer.cpp:
+	* src/core/mmp.cpp:
+	* src/core/track.cpp:
+	* src/core/engine.cpp:
+	* src/core/timeline.cpp:
+	* src/core/automation_pattern.cpp:
+	changed internal MIDI-time-resolution from 64th to 192th resulting for
+	example in better MIDI-import and allowing to use triplet-notes in LMMS
+
 2008-04-09	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/controller.h:

@@ -137,10 +137,10 @@ pianoRoll::pianoRoll( void ) :
 	m_currentNote( NULL ),
 	m_action( NONE ),
 	m_moveStartKey( 0 ),
-	m_moveStartTact64th( 0 ),
+	m_moveStartTick( 0 ),
 	m_notesEditHeight( 100 ),
 	m_ppt( DEFAULT_PR_PPT ),
-	m_lenOfNewNotes( midiTime( 0, 16 ) ),
+	m_lenOfNewNotes( midiTime( 0, DefaultTicksPerTact/4 ) ),
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( DRAW ),
@@ -368,6 +368,7 @@ pianoRoll::pianoRoll( void ) :
 	{
 		m_quantizeModel->addItem( "1/" + QString::number( 1 << i ) );
 	}
+	m_quantizeModel->addItem( "1/192" );
 	m_quantizeModel->setValue( m_quantizeModel->findText( "1/16" ) );
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setModel( m_quantizeModel );
@@ -389,6 +390,7 @@ pianoRoll::pianoRoll( void ) :
 					QString( "note_" + pixmaps[i] ).
 						toAscii().constData() ) ) );
 	}
+	m_noteLenModel->addItem( "1/192" );
 	m_noteLenModel->setValue( 0 );
 	m_noteLenComboBox = new comboBox( m_toolBar );
 	m_noteLenComboBox->setModel( m_noteLenModel );
@@ -594,12 +596,12 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
 	do
 	{
 		--it;
-		Sint32 pos_tact_64th = -it.key();
-		if( pos_tact_64th > _n->length() )
+		Sint32 pos_ticks = -it.key();
+		if( pos_ticks > _n->length() )
 		{
 			break;
 		}
-		Uint16 pos_x = _x + pos_tact_64th * m_ppt / 64;
+		Uint16 pos_x = _x + pos_ticks * m_ppt / DefaultTicksPerTact;
 
 		const int level = it.value();
 
@@ -615,8 +617,8 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x,
 
 void pianoRoll::removeSelection( void )
 {
-	m_selectStartTact64th = 0;
-	m_selectedTact64th = 0;
+	m_selectStartTick = 0;
+	m_selectedTick = 0;
 	m_selectStartKey = 0;
 	m_selectedKeys = 0;
 }
@@ -672,7 +674,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			if( ( m_timeLine->pos() -= 16 ) < 0 )
 			{
 				m_timeLine->pos().setTact( 0 );
-				m_timeLine->pos().setTact64th( 0 );
+				m_timeLine->pos().setTicks( 0 );
 			}
 			m_timeLine->updatePosition();
 			break;
@@ -791,7 +793,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTact( 0 );
-			m_timeLine->pos().setTact64th( 0 );
+			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
 			break;
 
@@ -886,8 +888,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 			x -= WHITE_KEY_WIDTH;
 
-			// get tact-64th in which the user clicked
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the user clicked
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
 
@@ -907,16 +909,17 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				}
 				// and check whether the user clicked on an
 				// existing note or an edit-line
-				if( pos_tact_64th >= ( *it )->pos() &&
+				if( pos_ticks >= ( *it )->pos() &&
 						len > 0 &&
 					(
 					( edit_note == FALSE &&
-					pos_tact_64th <= ( *it )->pos() + len &&
+					pos_ticks <= ( *it )->pos() + len &&
 					( *it )->key() == key_num )
 					||
 					( edit_note == TRUE &&
-					pos_tact_64th <= ( *it )->pos() +
-							NE_LINE_WIDTH * 64 /
+					pos_ticks <= ( *it )->pos() +
+							NE_LINE_WIDTH *
+							DefaultTicksPerTact /
 								m_ppt )
 					)
 					)
@@ -959,7 +962,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// +32 to quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
-					midiTime note_pos( pos_tact_64th - (quantization() / 2) );
+					midiTime note_pos( pos_ticks - (quantization() / 2) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos, key_num );
@@ -981,9 +984,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_currentNote = *it;
 
 				// clicked at the "tail" of the note?
-				if( pos_tact_64th*m_ppt/64 >
+				if( pos_ticks*m_ppt/DefaultTicksPerTact >
 					( m_currentNote->pos() +
-					m_currentNote->length() )*m_ppt/64 -
+					m_currentNote->length() )*m_ppt/
+							DefaultTicksPerTact -
 							RESIZE_AREA_WIDTH &&
 						m_currentNote->length() > 0 )
 				{
@@ -1002,7 +1006,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					int aligned_x = (int)( (float)( (
 							m_currentNote->pos() -
 							m_currentPosition ) *
-							m_ppt ) / 64.0f );
+							m_ppt ) /
+							DefaultTicksPerTact );
 					m_moveXOffset = x - aligned_x - 1;
 					// set move-cursor
 					QCursor c( Qt::SizeAllCursor );
@@ -1038,8 +1043,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 				// select an area of notes
 
-				m_selectStartTact64th = pos_tact_64th;
-				m_selectedTact64th = 0;
+				m_selectStartTick = pos_ticks;
+				m_selectedTick = 0;
 				m_selectStartKey = key_num;
 				m_selectedKeys = 1;
 				m_action = SELECT_NOTES;
@@ -1062,7 +1067,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				// move selection (including selected notes)
 
 				// save position where move-process began
-				m_moveStartTact64th = pos_tact_64th;
+				m_moveStartTick = pos_ticks;
 				m_moveStartKey = key_num;
 
 				m_action = MOVE_SELECTION;
@@ -1205,17 +1210,17 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x -= m_moveXOffset;
 			}
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 			if( m_action == MOVE_NOTE )
 			{
 				// moving note
-				if( pos_tact_64th < 0 )
+				if( pos_ticks < 0 )
 				{
-					pos_tact_64th = 0;
+					pos_ticks = 0;
 				}
 				m_currentNote->setPos( midiTime(
-							pos_tact_64th ) );
+							pos_ticks ) );
 				m_currentNote->setKey( key_num );
 
 				// we moved the note so the note has to be
@@ -1227,14 +1232,14 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			else
 			{
 				// resizing note
-				int tact_64th_diff = pos_tact_64th -
+				int ticks_diff = pos_ticks -
 							m_currentNote->pos();
-				if( tact_64th_diff <= 0 )
+				if( ticks_diff <= 0 )
 				{
-					tact_64th_diff = 1;
+					ticks_diff = 1;
 				}
 				m_currentNote->setLength( midiTime(
-							tact_64th_diff ) );
+							ticks_diff ) );
 				m_currentNote->quantizeLength( quantization() );
 				m_lenOfNewNotes = m_currentNote->length();
 				m_pattern->dataChanged();
@@ -1247,8 +1252,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		{
 			// set move- or resize-cursor
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = ( x * 64 ) / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = ( x * DefaultTicksPerTact ) / m_ppt +
 							m_currentPosition;
 
 			// get note-vector of current pattern
@@ -1262,8 +1267,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				// and check whether the cursor is over an
 				// existing note
-				if( pos_tact_64th >= ( *it )->pos() &&
-			    		pos_tact_64th <= ( *it )->pos() +
+				if( pos_ticks >= ( *it )->pos() &&
+			    		pos_ticks <= ( *it )->pos() +
 							( *it )->length() &&
 					( *it )->key() == key_num &&
 					( *it )->length() > 0 )
@@ -1285,9 +1290,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				}
 				// cursor at the "tail" of the note?
 				else if( ( *it )->length() > 0 &&
-					pos_tact_64th*m_ppt/64 >
+					pos_ticks*m_ppt/DefaultTicksPerTact >
 						( ( *it )->pos() +
-						( *it )->length() )*m_ppt/64 -
+						( *it )->length() )*m_ppt/
+							DefaultTicksPerTact -
 							RESIZE_AREA_WIDTH )
 				{
 					if( QApplication::overrideCursor() )
@@ -1375,17 +1381,17 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 									4 );
 			}
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
-			m_selectedTact64th = pos_tact_64th -
-							m_selectStartTact64th;
-			if( (int) m_selectStartTact64th + m_selectedTact64th <
+			m_selectedTick = pos_ticks -
+							m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTact64th = -static_cast<int>(
-							m_selectStartTact64th );
+				m_selectedTick = -static_cast<int>(
+							m_selectStartTick );
 			}
 			m_selectedKeys = key_num - m_selectStartKey;
 			if( key_num <= m_selectStartKey )
@@ -1400,33 +1406,33 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// move selection + selected notes
 
 			// do horizontal move-stuff
-			int pos_tact_64th = x * 64 / m_ppt +
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
-			int tact_64th_diff = pos_tact_64th -
-							m_moveStartTact64th;
-			if( m_selectedTact64th > 0 )
+			int ticks_diff = pos_ticks -
+							m_moveStartTick;
+			if( m_selectedTick > 0 )
 			{
-				if( (int) m_selectStartTact64th +
-							tact_64th_diff < 0 )
+				if( (int) m_selectStartTick +
+							ticks_diff < 0 )
 				{
-					tact_64th_diff = -m_selectStartTact64th;
+					ticks_diff = -m_selectStartTick;
 				}
 			}
 			else
 			{
-				if( (int) m_selectStartTact64th +
-					m_selectedTact64th + tact_64th_diff <
+				if( (int) m_selectStartTick +
+					m_selectedTick + ticks_diff <
 									0 )
 				{
-					tact_64th_diff = -(
-							m_selectStartTact64th +
-							m_selectedTact64th );
+					ticks_diff = -(
+							m_selectStartTick +
+							m_selectedTick );
 				}
 			}
-			m_selectStartTact64th += tact_64th_diff;
+			m_selectStartTick += ticks_diff;
 
-			int tact_diff = tact_64th_diff / 64;
-			tact_64th_diff = tact_64th_diff % 64;
+			int tact_diff = ticks_diff / DefaultTicksPerTact;
+			ticks_diff = ticks_diff % DefaultTicksPerTact;
 
 
 			// do vertical move-stuff
@@ -1471,23 +1477,22 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				int note_tact = ( *it )->pos().getTact() +
 								tact_diff;
-				int note_tact_64th =
-						( *it )->pos().getTact64th() +
-								tact_64th_diff;
-				// ensure note_tact_64th range
-				if( note_tact_64th >> 6 )
+				int note_ticks = ( *it )->pos().getTicks() +
+								ticks_diff;
+				// ensure note_ticks range
+				if( note_ticks >> 6 )
 				{
-					note_tact += note_tact_64th >> 6;
-					note_tact_64th &= 63;
+					note_tact += note_ticks >> 6;
+					note_ticks &= 63;
 				}
 				midiTime new_note_pos( note_tact,
-							note_tact_64th );
+							note_ticks );
 				( *it )->setPos( new_note_pos );
 				( *it )->setKey( ( *it )->key() + key_diff );
 				*it = m_pattern->rearrangeNote( *it, FALSE );
 			}
 
-			m_moveStartTact64th = pos_tact_64th;
+			m_moveStartTick = pos_ticks;
 			m_moveStartKey = key_num;
 		}
 		else if( m_editMode == OPEN && !( mouseOverNote()
@@ -1529,17 +1534,17 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 									4 );
 			}
 
-			// get tact-64th in which the cursor is posated
-			int pos_tact_64th = x * 64 / m_ppt +
+			// get tick in which the cursor is posated
+			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
-			m_selectedTact64th = pos_tact_64th -
-							m_selectStartTact64th;
-			if( (int) m_selectStartTact64th + m_selectedTact64th <
+			m_selectedTick = pos_ticks -
+							m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTact64th = -static_cast<int>(
-							m_selectStartTact64th );
+				m_selectedTick = -static_cast<int>(
+							m_selectStartTick );
 			}
 
 
@@ -1764,9 +1769,9 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
 
 	// draw vertical raster
-	int tact_16th = m_currentPosition / 4;
-	const int offset = ( m_currentPosition % 4 ) * m_ppt /
-						DEFAULT_STEPS_PER_TACT / 4;
+	int tact_16th = m_currentPosition / ( DefaultTicksPerTact / 16 );
+	const int offset = ( m_currentPosition % (DefaultTicksPerTact/16) ) *
+					m_ppt / DEFAULT_STEPS_PER_TACT / 8;
 	for( int x = WHITE_KEY_WIDTH - offset; x < width();
 			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
 	{
@@ -1797,8 +1802,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// following code draws all notes in visible area + volume-lines
 
 	// setup selection-vars
-	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = m_selectStartTact64th+m_selectedTact64th;
+	int sel_pos_start = m_selectStartTick;
+	int sel_pos_end = m_selectStartTick+m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
 	{
 		qSwap<int>( sel_pos_start, sel_pos_end );
@@ -1827,24 +1832,25 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		for( noteVector::const_iterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
-			Sint32 len_tact_64th = ( *it )->length();
+			Sint32 len_ticks = ( *it )->length();
 
-			if( len_tact_64th == 0 )
+			if( len_ticks == 0 )
 			{
 				continue;
 			}
-			else if( len_tact_64th < 0 )
+			else if( len_ticks < 0 )
 			{
-				len_tact_64th = 4;
+				len_ticks = 4;
 			}
 
 			const int key = ( *it )->key() - m_startKey + 1;
 
-			Sint32 pos_tact_64th = ( *it )->pos();
+			Sint32 pos_ticks = ( *it )->pos();
 
-			int note_width = len_tact_64th * m_ppt / 64;
-			const int x = ( pos_tact_64th - m_currentPosition ) *
-								m_ppt / 64;
+			int note_width = len_ticks * m_ppt /
+							DefaultTicksPerTact;
+			const int x = ( pos_ticks - m_currentPosition ) *
+						m_ppt / DefaultTicksPerTact;
 			// skip this note if not in visible area at all
 			if( !( x + note_width >= 0 &&
 					x <= width() - WHITE_KEY_WIDTH ) )
@@ -1872,8 +1878,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				}
 				else if( key > sel_key_start &&
 					key <= sel_key_end &&
-					pos_tact_64th >= sel_pos_start &&
-					pos_tact_64th + len_tact_64th <=
+					pos_ticks >= sel_pos_start &&
+					pos_ticks + len_ticks <=
 								sel_pos_end )
 				{
 					is_selected = TRUE;
@@ -1925,9 +1931,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 					m_notesEditHeight - PR_BOTTOM_MARGIN );
 
 	// now draw selection-frame
-	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) / 64;
+	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) /
+							DefaultTicksPerTact;
 	int w = ( ( ( sel_pos_end - m_currentPosition ) * m_ppt ) /
-								64 ) - x;
+						DefaultTicksPerTact ) - x;
 	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
 	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
 	p.setPen( QColor( 0, 64, 192 ) );
@@ -2228,13 +2235,13 @@ void pianoRoll::selectAll( void )
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		Uint32 len_tact_64th = ( *it )->length();
+		Uint32 len_ticks = ( *it )->length();
 
-		if( len_tact_64th > 0 )
+		if( len_ticks > 0 )
 		{
 			const int key = ( *it )->key();
 
-			Uint32 pos_tact_64th = ( *it )->pos();
+			Uint32 pos_ticks = ( *it )->pos();
 			if( key <= m_selectStartKey || first_time )
 			{
 				// if we move start-key down, we have to add 
@@ -2250,18 +2257,18 @@ void pianoRoll::selectAll( void )
 			{
 				m_selectedKeys = key - m_selectStartKey;
 			}
-			if( pos_tact_64th < m_selectStartTact64th ||
+			if( pos_ticks < m_selectStartTick ||
 								first_time )
 			{
-				m_selectStartTact64th = pos_tact_64th;
+				m_selectStartTick = pos_ticks;
 			}
-			if( pos_tact_64th + len_tact_64th >
-				m_selectStartTact64th + m_selectedTact64th ||
+			if( pos_ticks + len_ticks >
+				m_selectStartTick + m_selectedTick ||
 								first_time )
 			{
-				m_selectedTact64th = pos_tact_64th +
-							len_tact_64th -
-							m_selectStartTact64th;
+				m_selectedTick = pos_ticks +
+							len_ticks -
+							m_selectStartTick;
 			}
 			first_time = FALSE;
 		}
@@ -2279,8 +2286,8 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 		return;
 	}
 
-	int sel_pos_start = m_selectStartTact64th;
-	int sel_pos_end = sel_pos_start + m_selectedTact64th;
+	int sel_pos_start = m_selectStartTick;
+	int sel_pos_end = sel_pos_start + m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
 	{
 		qSwap<int>( sel_pos_start, sel_pos_end );
@@ -2298,17 +2305,17 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		Sint32 len_tact_64th = ( *it )->length();
+		Sint32 len_ticks = ( *it )->length();
 
-		if( len_tact_64th > 0 )
+		if( len_ticks > 0 )
 		{
 			int key = ( *it )->key();
-			Sint32 pos_tact_64th = ( *it )->pos();
+			Sint32 pos_ticks = ( *it )->pos();
 
 			if( key > sel_key_start &&
 				key <= sel_key_end &&
-				pos_tact_64th >= sel_pos_start &&
-				pos_tact_64th+len_tact_64th <= sel_pos_end )
+				pos_ticks >= sel_pos_start &&
+				pos_ticks+len_ticks <= sel_pos_end )
 			{
 				_selected_notes.push_back( *it );
 			}
@@ -2467,14 +2474,17 @@ void pianoRoll::updatePosition( const midiTime & _t )
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - WHITE_KEY_WIDTH;
-		if( _t > m_currentPosition + w * 64 / m_ppt )
+		if( _t > m_currentPosition + w * DefaultTicksPerTact / m_ppt )
 		{
-			m_leftRightScroll->setValue( _t.getTact() * 64 );
+			m_leftRightScroll->setValue( _t.getTact() *
+							DefaultTicksPerTact );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( _t - w * 64 * 64 / m_ppt, 0 );
-			m_leftRightScroll->setValue( t.getTact() * 64 );
+			midiTime t = tMax( _t - w * DefaultTicksPerTact *
+					DefaultTicksPerTact / m_ppt, 0 );
+			m_leftRightScroll->setValue( t.getTact() *
+							DefaultTicksPerTact );
 		}
 		m_scrollBack = FALSE;
 	}
@@ -2500,7 +2510,7 @@ void pianoRoll::zoomingChanged( void )
 
 int pianoRoll::quantization( void ) const
 {
-	return( 64 / m_quantizeModel->currentText().right(
+	return( DefaultTicksPerTact / m_quantizeModel->currentText().right(
 				m_quantizeModel->currentText().length() -
 								2 ).toInt() );
 }
@@ -2514,7 +2524,7 @@ midiTime pianoRoll::newNoteLen( void ) const
 	{
 		return( m_lenOfNewNotes );
 	}
-	return( 64 / m_noteLenModel->currentText().right(
+	return( DefaultTicksPerTact / m_noteLenModel->currentText().right(
 				m_noteLenModel->currentText().length() -
 								2 ).toInt() );
 }
@@ -2554,8 +2564,8 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 	}
 
 	int key_num = getKey( pos.y() );
-	int pos_tact_64th = ( pos.x() - WHITE_KEY_WIDTH ) * 64 / m_ppt
-							+ m_currentPosition;
+	int pos_ticks = ( pos.x() - WHITE_KEY_WIDTH ) * DefaultTicksPerTact /
+						m_ppt + m_currentPosition;
 
 	// will be our iterator in the following loop
 	noteVector::const_iterator it = notes.begin();
@@ -2565,8 +2575,8 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 	{
 		// and check whether the cursor is over an
 		// existing note
-		if( pos_tact_64th >= ( *it )->pos() &&
-	    		pos_tact_64th <= ( *it )->pos() + ( *it )->length() &&
+		if( pos_ticks >= ( *it )->pos() &&
+	    		pos_ticks <= ( *it )->pos() + ( *it )->length() &&
 			( *it )->key() == key_num && ( *it )->length() > 0 )
 		{
 			break;

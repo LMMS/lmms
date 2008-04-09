@@ -230,7 +230,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					notePlayHandle * nph = new
 						notePlayHandle( this,
 							_time.frames(
-						engine::framesPerTact64th() ),
+						engine::framesPerTick() ),
 						valueRanges<f_cnt_t>::max() / 2,
 									n );
 					if( engine::getMixer()->addPlayHandle(
@@ -256,7 +256,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				note done_note(
 					midiTime( static_cast<f_cnt_t>(
 						n->totalFramesPlayed() /
-						engine::framesPerTact64th() ) ),
+						engine::framesPerTick() ) ),
 					0, n->key(),
 					n->getVolume(), n->getPanning() );
 				if( _lock )
@@ -433,7 +433,7 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 	{
 		note done_note( midiTime( static_cast<f_cnt_t>(
 						_n->totalFramesPlayed() /
-						engine::framesPerTact64th() ) ),
+						engine::framesPerTick() ) ),
 					0, _n->key(),
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
@@ -499,7 +499,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const f_cnt_t _offset,
 							Sint16 _tco_num )
 {
-	float frames_per_tact64th = engine::framesPerTact64th();
+	const float frames_per_tick = engine::framesPerTick();
 
 	QList<trackContentObject *> tcos;
 	bbTrack * bb_track;
@@ -517,7 +517,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
-					_frames / frames_per_tact64th ) );
+					_frames / frames_per_tick ) );
 		bb_track = NULL;
 		sendMidiTime( _start );
 	}
@@ -601,26 +601,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 			{
 				const f_cnt_t note_frames =
 					cur_note->length().frames(
-							frames_per_tact64th );
-
-/*				// generate according MIDI-events
-				processOutEvent( midiEvent( NOTE_ON,
-						m_midiPort->outputChannel(),
-							cur_note->key(),
-							cur_note->getVolume() *
-								128 / 100 ),
-						midiTime::fromFrames(
-							_offset,
-							frames_per_tact64th ) );
-
-				processOutEvent( midiEvent( NOTE_OFF,
-						m_midiPort->outputChannel(),
-							cur_note->key(), 0 ),
-						midiTime::fromFrames(
-							_offset+
-								note_frames,
-							frames_per_tact64th ) );
-*/
+							frames_per_tick );
 
 				notePlayHandle * note_play_handle =
 					new notePlayHandle( this, _offset,

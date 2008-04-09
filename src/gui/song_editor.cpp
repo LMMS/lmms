@@ -411,9 +411,8 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 		tact interesting_tact = m_s->currentTact();
 		if( interesting_tact > 0 )
 		{
-			m_s->setPlayPos( --interesting_tact,
-						m_s->currentTact64th(),
-						song::Mode_PlaySong );
+			m_s->setPlayPos( --interesting_tact, m_s->currentTick(),
+							song::Mode_PlaySong );
 		}
 	}
 	else if( _ke->key() == Qt::Key_Right )
@@ -421,9 +420,8 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 		tact interesting_tact = m_s->currentTact();
 		if( interesting_tact < MAX_SONG_LENGTH )
 		{
-			m_s->setPlayPos( ++interesting_tact,
-						m_s->currentTact64th(),
-						song::Mode_PlaySong );
+			m_s->setPlayPos( ++interesting_tact, m_s->currentTick(),
+							song::Mode_PlaySong );
 		}
 	}
 	else if( _ke->key() == Qt::Key_Space )
@@ -595,13 +593,15 @@ void songEditor::updatePosition( const midiTime & _t )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
 							- TRACK_OP_WIDTH;
-		if( _t > m_currentPosition + w * 64 / pixelsPerTact() )
+		if( _t > m_currentPosition + w * DefaultTicksPerTact /
+							pixelsPerTact() )
 		{
 			m_leftRightScroll->setValue( _t.getTact() );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( (int)( _t - w * 64 * 64 /
+			midiTime t = tMax( (int)( _t - w * DefaultTicksPerTact *
+						DefaultTicksPerTact /
 							pixelsPerTact() ),
 									0 );
 			m_leftRightScroll->setValue( t.getTact() );

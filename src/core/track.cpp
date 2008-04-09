@@ -285,7 +285,8 @@ void trackContentObjectView::updateLength( void )
 	{
 		setFixedWidth( static_cast<int>( m_tco->length() *
 						pixelsPerTact() /
-						64 ) + TCO_BORDER_WIDTH * 2 );
+						DefaultTicksPerTact ) +
+							TCO_BORDER_WIDTH * 2 );
 	}
 	m_trackView->getTrackContainerView()->update();
 }
@@ -461,7 +462,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
 		midiTime t = tMax( 0, (Sint32)
 			m_trackView->getTrackContainerView()->currentPosition()+
-					static_cast<int>( x * 64 / ppt ) );
+				static_cast<int>( x * DefaultTicksPerTact /
+									ppt ) );
 		if( engine::getMainWindow()->isCtrlPressed() ==
 					FALSE && _me->button() == Qt::NoButton )
 		{
@@ -471,7 +473,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( m_tco->startPosition().getTact() + 1 ).
-				arg( m_tco->startPosition().getTact64th() ) );
+				arg( m_tco->startPosition().getTicks() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
 	}
 	else if( m_action == MoveSelection )
@@ -495,20 +497,23 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 			tcos.push_back( tco );
 			smallest_pos = tMin<Sint32>( smallest_pos,
 					(Sint32)tco->startPosition() +
-					static_cast<int>( dx * 64 / ppt ) );
+					static_cast<int>( dx *
+						DefaultTicksPerTact / ppt ) );
 		}
 		for( QVector<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
 			( *it )->movePosition( ( *it )->startPosition() +
-					static_cast<int>( dx * 64 / ppt ) -
+					static_cast<int>( dx *
+						DefaultTicksPerTact / ppt ) -
 								smallest_pos );
 		}
 	}
 	else if( m_action == Resize )
 	{
-		midiTime t = tMax( 64,
-				static_cast<int>( _me->x() * 64 / ppt ) );
+		midiTime t = tMax( DefaultTicksPerTact,
+				static_cast<int>( _me->x() *
+						DefaultTicksPerTact / ppt ) );
 		if( engine::getMainWindow()->isCtrlPressed() ==
 					FALSE && _me->button() == Qt::NoButton )
 		{
@@ -517,11 +522,11 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		m_tco->changeLength( t );
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 				arg( m_tco->length().getTact() ).
-				arg( m_tco->length().getTact64th() ).
+				arg( m_tco->length().getTicks() ).
 				arg( m_tco->startPosition().getTact() + 1 ).
-				arg( m_tco->startPosition().getTact64th() ).
+				arg( m_tco->startPosition().getTicks() ).
 				arg( m_tco->endPosition().getTact() + 1 ).
-				arg( m_tco->endPosition().getTact64th() ) );
+				arg( m_tco->endPosition().getTicks() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
 	}
 	else
@@ -760,7 +765,8 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 			( ts <= begin && te >= end ) )
 		{
 			tcov->move( static_cast<int>( ( ts - begin ) * ppt /
-							64 ), tcov->y() );
+							DefaultTicksPerTact ),
+								tcov->y() );
 			tcov->show();
 		}
 		else
@@ -828,7 +834,8 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			!m_trackView->getTrackContainerView()->fixedTCOs() )
 	{
-		const midiTime pos = getPosition( _me->x() ).getTact() * 64;
+		const midiTime pos = getPosition( _me->x() ).getTact() *
+							DefaultTicksPerTact;
 		trackContentObject * tco = getTrack()->addTCO(
 						getTrack()->createTCO( pos ) );
 
@@ -855,7 +862,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 							tcv->pixelsPerTact() );
 
 		flip = tcv->currentPosition() % 256 < 128;
-		int flipper = (tcv->currentPosition()/64) % 8;
+		int flipper = (tcv->currentPosition()/DefaultTicksPerTact) % 8;
 
 		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
 			p.fillRect( QRect(x, 0, 
@@ -959,7 +966,8 @@ track * trackContentWidget::getTrack( void )
 midiTime trackContentWidget::getPosition( int _mouse_x )
 {
 	return( midiTime( m_trackView->getTrackContainerView()->
-					currentPosition() + _mouse_x * 64 /
+					currentPosition() + _mouse_x *
+							DefaultTicksPerTact /
 			static_cast<int>( m_trackView->
 				getTrackContainerView()->pixelsPerTact() ) ) );
 }
@@ -970,7 +978,8 @@ midiTime trackContentWidget::endPosition( const midiTime & _pos_start )
 {
 	const float ppt = m_trackView->getTrackContainerView()->pixelsPerTact();
 	const int w = width();
-	return( _pos_start + static_cast<int>( w * 64 / ppt ) );
+	return( _pos_start + static_cast<int>( w * DefaultTicksPerTact /
+									ppt ) );
 }
 
 
@@ -1496,7 +1505,7 @@ trackContentObject * track::getTCO( int _tco_num )
 	}
 	printf( "called track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
-	return( addTCO( createTCO( _tco_num * 64 ) ) );
+	return( addTCO( createTCO( _tco_num * DefaultTicksPerTact ) ) );
 	
 }
 
@@ -1588,7 +1597,8 @@ void track::insertTact( const midiTime & _pos )
 	{
 		if( ( *it )->startPosition() >= _pos )
 		{
-			( *it )->movePosition( (*it)->startPosition() + 64 );
+			( *it )->movePosition( (*it)->startPosition() +
+							DefaultTicksPerTact );
 		}
 	}
 }
@@ -1606,7 +1616,7 @@ void track::removeTact( const midiTime & _pos )
 		if( ( *it )->startPosition() >= _pos )
 		{
 			( *it )->movePosition( tMax( ( *it )->startPosition() -
-								    64, 0 ) );
+						DefaultTicksPerTact, 0 ) );
 		}
 	}
 }
@@ -1627,7 +1637,7 @@ tact track::length( void ) const
 			last = cur;
 		}
 	}
-	return( last/64 + 1 );
+	return( last/DefaultTicksPerTact + 1 );
 }
 
 

@@ -45,7 +45,7 @@
 
 
 bool engine::s_hasGUI = TRUE;
-float engine::s_framesPerTact64th;
+float engine::s_framesPerTick;
 mixer * engine::s_mixer = NULL;
 fxMixer * engine::s_fxMixer = NULL;
 fxMixerView * engine::s_fxMixerView = NULL;
@@ -152,10 +152,10 @@ void engine::destroy( void )
 
 
 
-void engine::updateFramesPerTact64th( void )
+void engine::updateFramesPerTick( void )
 {
-	s_framesPerTact64th = s_mixer->sampleRate() * 60.0f * BEATS_PER_TACT
-						/ 64.0f / s_song->getTempo();
+	s_framesPerTick = s_mixer->sampleRate() * 60.0f * 4 /
+				DefaultTicksPerTact / s_song->getTempo();
 }
 
 

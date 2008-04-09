@@ -48,7 +48,7 @@ class sampleBuffer;
 
 
 const int DEFAULT_STEPS_PER_TACT = 16;
-const int BEATS_PER_TACT = 4;
+const int BEATS_PER_TACT = DefaultTicksPerTact/DEFAULT_STEPS_PER_TACT;
 
 
 

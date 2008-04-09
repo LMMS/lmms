@@ -603,6 +603,34 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
+	if( version < "0.4.0-svn20080409" )
+	{
+		QStringList s;
+		s << "note" << "pattern" << "bbtco" << "sampletco" << "time";
+		for( QStringList::iterator it = s.begin(); it < s.end(); ++it )
+		{
+			QDomNodeList list = elementsByTagName( *it );
+			for( int i = 0; !list.item( i ).isNull(); ++i )
+			{
+				QDomElement el = list.item( i ).toElement();
+				el.setAttribute( "pos",
+					el.attribute( "pos" ).toInt()*3 );
+				el.setAttribute( "len",
+					el.attribute( "len" ).toInt()*3 );
+			}
+		}
+		QDomNodeList list = elementsByTagName( "timeline" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setAttribute( "lp0pos",
+				el.attribute( "lp0pos" ).toInt()*3 );
+			el.setAttribute( "lp1pos",
+				el.attribute( "lp1pos" ).toInt()*3 );
+		}
+		
+	}
+
 	if( !m_head.hasAttribute( "mastervol" ) )
 	{
 		m_head.setAttribute( "mastervol", 100 );

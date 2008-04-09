@@ -151,9 +151,10 @@ midiTime pattern::length( void ) const
 	{
 		max_length = tMax<Sint32>( max_length, ( *it )->endPos() );
 	}
-	if( max_length % 64 == 0 )
+	if( max_length % DefaultTicksPerTact == 0 )
 	{
-		return( midiTime( tMax<Sint32>( max_length, 64 ) ) );
+		return( midiTime( tMax<Sint32>( max_length,
+						DefaultTicksPerTact ) ) );
 	}
 	return( midiTime( tMax( midiTime( max_length ).getTact() + 1, 1 ),
 									0 ) );
@@ -673,7 +674,7 @@ void patternFreezeThread::run( void )
 	song::playPos & ppp = engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern );
 	ppp.setTact( 0 );
-	ppp.setTact64th( 0 );
+	ppp.setTicks( 0 );
 	ppp.setCurrentFrame( 0 );
 	ppp.m_timeLineUpdate = FALSE;
 
@@ -958,7 +959,7 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			n->setLength( -64 );
+			n->setLength( -DefaultTicksPerTact );
 		}
 		engine::getSong()->setModified();
 		update();
@@ -1004,7 +1005,7 @@ void patternView::wheelEvent( QWheelEvent * _we )
 		
 		if( n->length() == 0 && _we->delta() > 0 )
 		{
-			n->setLength( -64 );
+			n->setLength( -DefaultTicksPerTact );
 			n->setVolume( 5 );
 		}
 		else if( _we->delta() > 0 )
@@ -1151,9 +1152,9 @@ void patternView::paintEvent( QPaintEvent * )
 							y_pos < central_y )
 					{
 						Sint16 x1 = 2 * x_base +
-		static_cast<int>( ( *it )->pos() * ppt / 64 );
+		static_cast<int>( ( *it )->pos() * ppt / DefaultTicksPerTact );
 						Sint16 x2 =
-			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ppt / 64 );
+			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ppt / DefaultTicksPerTact );
 						p.drawLine( x1, y_base + y_pos,
 							x2, y_base + y_pos );
 
@@ -1191,7 +1192,7 @@ void patternView::paintEvent( QPaintEvent * )
 		for( noteVector::iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 		{
-			Sint16 no = ( *it )->pos() / 4;
+			Sint16 no = ( *it )->pos() / BEATS_PER_TACT;
 			Sint16 x = TCO_BORDER_WIDTH + static_cast<int>( no *
 								w / steps );
 			Sint16 y = height() - s_stepBtnOff->height() - 1;
@@ -1211,7 +1212,7 @@ void patternView::paintEvent( QPaintEvent * )
 					p.drawPixmap( x, y, stepoverlay );
 				}
 			}
-			else if( ( no / BEATS_PER_TACT ) % 2 )
+			else if( ( no / 4 ) % 2 )
 			{
 				p.drawPixmap( x, y, stepoff );
 			}

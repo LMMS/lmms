@@ -125,9 +125,10 @@ midiTime automationPattern::length( void ) const
 	{
 		max_length = tMax<Sint32>( max_length, -it.key() );
 	}
-	if( max_length % 64 == 0 )
+	if( max_length % DefaultTicksPerTact == 0 )
 	{
-		return( midiTime( tMax<Sint32>( max_length, 64 ) ) );
+		return( midiTime( tMax<Sint32>( max_length,
+						DefaultTicksPerTact ) ) );
 	}
 	return( midiTime( tMax( midiTime( max_length ).getTact() + 1, 1 ),
 									0 ) );

@@ -2,7 +2,7 @@
  * midi_time.h - declaration of class midiTime which provides data-type for
  *               position- and length-variables
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,19 +29,20 @@
 
 #include "types.h"
 
+const int DefaultTicksPerTact = 192;
 
 class midiTime
 {
 public:
-	inline midiTime( const tact _tact, const tact64th _tact_64th ) :
+	inline midiTime( const tact _tact, const tick _ticks ) :
 		m_tact( _tact ),
-		m_tact64th( _tact_64th )
+		m_ticks( _ticks )
 	{
 	}
 
-	inline midiTime( const Sint32 _abs = 0 ) :
-		m_tact( _abs / 64 ),
-		m_tact64th( _abs % 64 )
+	inline midiTime( const int _abs = 0 ) :
+		m_tact( _abs / DefaultTicksPerTact ),
+		m_ticks( _abs % DefaultTicksPerTact )
 	{
 	}
 
@@ -52,30 +53,31 @@ public:
 
 	inline midiTime toNearestTact( void ) const
 	{
-		if( m_tact64th >= 32 )
+		if( m_ticks >= DefaultTicksPerTact/2 )
 		{
-			return( m_tact * 64 + 64 );
+			return( m_tact * DefaultTicksPerTact +
+							DefaultTicksPerTact );
 		}
-		return( m_tact * 64 );
+		return( m_tact * DefaultTicksPerTact );
 	}
 
 	inline midiTime & operator=( const midiTime & _t )
 	{
 		m_tact = _t.m_tact;
-		m_tact64th = _t.m_tact64th;
+		m_ticks = _t.m_ticks;
 		return( *this );
 	}
 
 	inline midiTime & operator+=( const midiTime & _t )
 	{
-		return( *this = static_cast<Sint32>( *this ) +
-						static_cast<Sint32>( _t ) );
+		return( *this = static_cast<int>( *this ) +
+						static_cast<int>( _t ) );
 	}
 
 	inline midiTime & operator-=( const midiTime & _t )
 	{
-		return( *this = static_cast<Sint32>( *this ) -
-						static_cast<Sint32>( _t ) );
+		return( *this = static_cast<int>( *this ) -
+						static_cast<int>( _t ) );
 	}
 
 	inline void setTact( tact _t )
@@ -88,46 +90,47 @@ public:
 		return( m_tact );
 	}
 
-	inline void setTact64th( tact64th _t )
+	inline void setTicks( tick _t )
 	{
-		m_tact64th = _t;
+		m_ticks = _t;
 	}
 
-	inline tact64th getTact64th( void ) const
+	inline tick getTicks( void ) const
 	{
-		return( m_tact64th );
+		return( m_ticks );
 	}
 
 	// converts time-class in an absolute value, useful for calculations,
 	// comparisons and so on...
-	inline operator Sint32( void ) const
+	inline operator int( void ) const
 	{
-		return( static_cast<Sint32>( m_tact ) * 64 +
-					static_cast<Sint32>( m_tact64th ) );
+		return( static_cast<int>( m_tact ) * DefaultTicksPerTact +
+					static_cast<int>( m_ticks ) );
 	}
 
 	// calculate number of frame that are needed this time
-	inline f_cnt_t frames( const float _frames_per_tact64th ) const
+	inline f_cnt_t frames( const float _frames_per_tick ) const
 	{
 		if( m_tact >= 0 )
 		{
-			return( static_cast<f_cnt_t>( ( m_tact * 64
-				+ m_tact64th ) * _frames_per_tact64th ) );
+			return( static_cast<f_cnt_t>(
+				( m_tact * DefaultTicksPerTact + m_ticks ) *
+							_frames_per_tick ) );
 		}
 		return( 0 );
 	}
 
 	static inline midiTime fromFrames( const f_cnt_t _frames,
-					const float _frames_per_tact64th )
+					const float _frames_per_tick )
 	{
-		return( midiTime( static_cast<Sint32>( _frames /
-						_frames_per_tact64th ) ) );
+		return( midiTime( static_cast<int>( _frames /
+							_frames_per_tick ) ) );
 	}
 
 
 private:
 	tact m_tact;
-	tact64th m_tact64th;
+	tick m_ticks;
 
 } ;
 

@@ -137,11 +137,11 @@ public:
 		return( s_controllerRackView );
 	}
 
-	static float framesPerTact64th( void )
+	static float framesPerTick( void )
 	{
-		return( s_framesPerTact64th );
+		return( s_framesPerTick );
 	}
-	static void updateFramesPerTact64th( void );
+	static void updateFramesPerTick( void );
 
 	static const QMap<QString, QString> & sampleExtensions( void )
 	{
@@ -151,7 +151,7 @@ public:
 
 private:
 	static bool s_hasGUI;
-	static float s_framesPerTact64th;
+	static float s_framesPerTick;
 
 	// core
 	static mixer * s_mixer;

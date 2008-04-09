@@ -170,7 +170,7 @@ invalid_format:
 	pd.show();
 
 	// calculate some timing stuff
-	int crotchet_time = 16;
+	int crotchet_time = 16*3;
 	int divisor = m_timingDivision ? m_timingDivision : 96;
 	int multiplier = crotchet_time;
 	int g = gcd( crotchet_time, divisor );

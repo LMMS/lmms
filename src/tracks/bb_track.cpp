@@ -198,7 +198,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 	tact t = engine::getBBTrackContainer()->lengthOfBB(
 				bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
-	if( m_bbTCO->length() > 64 && t > 0 )
+	if( m_bbTCO->length() > DefaultTicksPerTact && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
 								x < width()-2;
@@ -362,7 +362,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 
 	QList<trackContentObject *> tcos;
 	getTCOsInRange( tcos, _start, _start + static_cast<Sint32>( _frames /
-						engine::framesPerTact64th() ) );
+						engine::framesPerTick() ) );
 
 	if ( tcos.size() == 0 )
 	{

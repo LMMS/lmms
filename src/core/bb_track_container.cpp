@@ -65,8 +65,9 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 		return( played_a_note );
 	}
 
-	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) * 64 +
-							_start.getTact64th();
+	_start = ( _start.getTact() % lengthOfBB( _tco_num ) ) *
+							DefaultTicksPerTact +
+							_start.getTicks();
 	QList<track *> tl = tracks();
 	for( int i = 0; i < tl.size(); ++i )
 	{
@@ -104,7 +105,7 @@ tact bbTrackContainer::lengthOfBB( int _bb )
 		trackContentObject * tco = tl[i]->getTCO( _bb );
 		max_length = tMax( max_length, tco->length() );
 	}
-	if( max_length.getTact64th() == 0 )
+	if( max_length.getTicks() == 0 )
 	{
 		return( max_length.getTact() );
 	}
@@ -129,7 +130,7 @@ void bbTrackContainer::removeBB( int _bb )
 	for( int i = 0; i < tl.size(); ++i )
 	{
 		delete tl[i]->getTCO( _bb );
-		tl[i]->removeTact( _bb * 64 );
+		tl[i]->removeTact( _bb * DefaultTicksPerTact );
 	}
 	if( _bb <= currentBB() )
 	{
@@ -155,7 +156,8 @@ void bbTrackContainer::swapBB( int _bb1, int _bb2 )
 
 void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 {
-	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() / 64 );
+	bbTrack * t = bbTrack::findBBTrack( _tco->startPosition() /
+							DefaultTicksPerTact );
 	if( t != NULL )
 	{
 		t->dataChanged();

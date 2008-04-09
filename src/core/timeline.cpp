@@ -68,7 +68,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_moveXOff( 0 )
 {
 	m_loopPos[0] = 0;
-	m_loopPos[1] = 64;
+	m_loopPos[1] = DefaultTicksPerTact;
 
 	if( s_timeLinePixmap == NULL )
 	{
@@ -247,14 +247,16 @@ void timeLine::paintEvent( QPaintEvent * )
 
 	tact tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-			( ( static_cast<Sint32>( m_begin * m_ppt ) / 64 ) %
+			( ( static_cast<Sint32>( m_begin * m_ppt ) /
+							DefaultTicksPerTact ) %
 						static_cast<int>( m_ppt ) );
 
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
 		++tact_num;
 		if( ( tact_num - 1 ) %
-			tMax( 1, static_cast<int>( 64.0f / m_ppt ) ) == 0 )
+			tMax( 1, static_cast<int>( (float) DefaultTicksPerTact /
+								m_ppt ) ) == 0 )
 		{
 			p.setPen( QColor( 224, 224, 224 ) );
 			p.drawText( x + static_cast<int>( i * m_ppt ) + 1, 15,
@@ -292,7 +294,8 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	else
 	{
 		const midiTime t = m_begin +
-				static_cast<Sint32>( _me->x() * 64 / m_ppt );
+				static_cast<Sint32>( _me->x() *
+						DefaultTicksPerTact / m_ppt );
 		m_action = MoveLoopBegin;
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
@@ -321,12 +324,13 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 void timeLine::mouseMoveEvent( QMouseEvent * _me )
 {
 	const midiTime t = m_begin + static_cast<Sint32>( tMax( _me->x() -
-				    m_xOffset - m_moveXOff, 0 ) * 64 / m_ppt );
+				    m_xOffset - m_moveXOff, 0 ) *
+						DefaultTicksPerTact / m_ppt );
 	switch( m_action )
 	{
 		case MovePositionMarker:
 			m_pos.setTact( t.getTact() );
-			m_pos.setTact64th( t.getTact64th() );
+			m_pos.setTicks( t.getTicks() );
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			break;

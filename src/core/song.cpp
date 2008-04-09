@@ -98,7 +98,7 @@ song::song( void ) :
 
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
-					SLOT( updateFramesPerTact64th() ) );
+						SLOT( updateFramesPerTick() ) );
 
 
 	m_masterVolumeModel.setTrack( m_automationTrack );
@@ -147,7 +147,7 @@ void song::setTempo( void )
 	}
 
 //	m_bpmSpinBox->setInitValue( _new_bpm );
-	engine::updateFramesPerTact64th();
+	engine::updateFramesPerTick();
 	emit tempoChanged( tempo );
 }
 
@@ -172,7 +172,7 @@ void song::doActions( void )
 		{
 			case timeLine::BackToZero:
 				m_playPos[m_playMode].setTact( 0 );
-				m_playPos[m_playMode].setTact64th( 0 );
+				m_playPos[m_playMode].setTicks( 0 );
 				break;
 
 			case timeLine::BackToStart:
@@ -180,8 +180,8 @@ void song::doActions( void )
 				{
 					m_playPos[m_playMode].setTact(
 						tl->savedPos().getTact() );
-					m_playPos[m_playMode].setTact64th(
-						tl->savedPos().getTact64th() );
+					m_playPos[m_playMode].setTicks(
+						tl->savedPos().getTicks() );
 					tl->savePos( -1 );
 				}
 				break;
@@ -195,7 +195,7 @@ void song::doActions( void )
 				else
 				{
 					m_playPos[m_playMode].setTact( 0 );
-					m_playPos[m_playMode].setTact64th( 0 );
+					m_playPos[m_playMode].setTicks( 0 );
 				}
 
 				m_playPos[m_playMode].setCurrentFrame( 0 );
@@ -340,13 +340,13 @@ void song::processNextBuffer( void )
 		{
 			m_playPos[m_playMode].setTact(
 						tl->loopBegin().getTact() );
-			m_playPos[m_playMode].setTact64th(
-						tl->loopBegin().getTact64th() );
+			m_playPos[m_playMode].setTicks(
+						tl->loopBegin().getTicks() );
 		}
 	}
 
 	f_cnt_t total_frames_played = 0;
-	float frames_per_tact64th = engine::framesPerTact64th();
+	float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
 				< engine::getMixer()->framesPerPeriod() )
@@ -355,13 +355,13 @@ void song::processNextBuffer( void )
 				->framesPerPeriod() - total_frames_played;
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
-		// did we play a 64th of a tact?
-		if( current_frame >= frames_per_tact64th )
+		// did we play a tick?
+		if( current_frame >= frames_per_tick )
 		{
-			int tact64th = m_playPos[m_playMode].getTact64th()
-				+ (int)( current_frame / frames_per_tact64th );
+			int ticks = m_playPos[m_playMode].getTicks()
+				+ (int)( current_frame / frames_per_tick );
 			// did we play a whole tact?
-			if( tact64th >= 64 )
+			if( ticks >= DefaultTicksPerTact )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
@@ -398,7 +398,8 @@ void song::processNextBuffer( void )
 					m_playPos[m_playMode].setTact( 0 );
 				}
 			}
-			m_playPos[m_playMode].setTact64th( tact64th % 64 );
+			m_playPos[m_playMode].setTicks( ticks %
+							DefaultTicksPerTact );
 
 			if( check_loop )
 			{
@@ -406,18 +407,17 @@ void song::processNextBuffer( void )
 				{
 					m_playPos[m_playMode].setTact(
 						tl->loopBegin().getTact() );
-					m_playPos[m_playMode].setTact64th(
-						tl->loopBegin().getTact64th() );
+					m_playPos[m_playMode].setTicks(
+						tl->loopBegin().getTicks() );
 				}
 			}
 
-			current_frame = fmodf( current_frame,
-							frames_per_tact64th );
+			current_frame = fmodf( current_frame, frames_per_tick );
 			m_playPos[m_playMode].setCurrentFrame( current_frame );
 		}
 
-		f_cnt_t last_frames = (f_cnt_t)frames_per_tact64th
-						- (f_cnt_t)current_frame;
+		f_cnt_t last_frames = (f_cnt_t)frames_per_tick -
+						(f_cnt_t) current_frame;
 		// skip last frame fraction
 		if( last_frames == 0 )
 		{
@@ -426,7 +426,7 @@ void song::processNextBuffer( void )
 								+ 1.0f );
 			continue;
 		}
-		// do we have some samples left in this tact64th but this are
+		// do we have some samples left in this tick but these are
 		// less then samples we have to play?
 		if( last_frames < played_frames )
 		{
@@ -435,7 +435,7 @@ void song::processNextBuffer( void )
 			played_frames = last_frames;
 		}
 
-		if( (f_cnt_t)current_frame == 0 )
+		if( (f_cnt_t) current_frame == 0 )
 		{
 			if( m_playMode == Mode_PlaySong )
 			{
@@ -555,10 +555,10 @@ void song::updateLength( void )
 
 
 
-void song::setPlayPos( tact _tact_num, tact64th _t_64th, PlayModes _play_mode )
+void song::setPlayPos( tact _tact_num, tick _tick, PlayModes _play_mode )
 {
 	m_playPos[_play_mode].setTact( _tact_num );
-	m_playPos[_play_mode].setTact64th( _t_64th );
+	m_playPos[_play_mode].setTicks( _tick );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 }
 
@@ -1034,9 +1034,9 @@ void song::exportProject( void )
 
 
 
-void song::updateFramesPerTact64th( void )
+void song::updateFramesPerTick( void )
 {
-	engine::updateFramesPerTact64th();
+	engine::updateFramesPerTick();
 }
 
 
