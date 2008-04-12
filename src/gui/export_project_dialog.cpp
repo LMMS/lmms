@@ -371,7 +371,7 @@ void exportProjectDialog::exportBtnClicked( void )
 	{
 		dev->processNextBuffer();
 		const int pval = pp * 100 /
-				( ( engine::getSong()->length() + 1 ) * 64 );
+				( ( engine::getSong()->length() + 1 ) * 192 );
 		m_exportProgressBar->setValue( pval );
 		if( engine::getMainWindow() )
 		{
