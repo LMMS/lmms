@@ -1,5 +1,9 @@
 2008-04-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/lb302/lb302.cpp:
+	replaced LB_HZ with engine::getMixer()->sampleRate()-calls in order to
+	have a correct pitch in HQ-mode
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
 	* plugins/ladspa_effect/ladspa_effect.h:
