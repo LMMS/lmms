@@ -55,6 +55,11 @@ oscillator::oscillator( const intModel & _wave_shape_model,
 void oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
+	if( m_freq >= engine::getMixer()->sampleRate()/2 )
+	{
+		mixer::clearAudioBuffer( _ab, _frames );
+		return;
+	}
 	if( m_subOsc != NULL )
 	{
 		switch( m_modulationAlgoModel.value() )
