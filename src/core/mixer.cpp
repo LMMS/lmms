@@ -65,7 +65,7 @@
 
 
 
-sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 88200 } ;
+sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 44100*2 } ;
 
 
 

@@ -274,11 +274,11 @@ public:
 					stereoVolumeVector _volume_vector,
 					audioPort * _port );
 
-	void FASTCALL clearAudioBuffer( sampleFrame * _ab,
+	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
 #ifndef DISABLE_SURROUND
-	void FASTCALL clearAudioBuffer( surroundSampleFrame * _ab,
+	static void clearAudioBuffer( surroundSampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
 #endif
