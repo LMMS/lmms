@@ -25,9 +25,9 @@
 #ifndef _LMMS_CONSTANTS_H
 #define _LMMS_CONSTANTS_H
 
-const float F_PI = 3.141593f;
-const float F_2PI = 6.283185f;
-const float F_PI_2 = 1.570796f;
+const float F_PI = 3.1415926535f;
+const float F_2PI = 2*F_PI;
+const float F_PI_2 = F_PI*0.5;
 
 #endif
 
