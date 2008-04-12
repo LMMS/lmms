@@ -35,11 +35,49 @@
 
 
 ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
-	effectControlDialog( _ctl )
+	effectControlDialog( _ctl ),
+	m_effectLayout( NULL ),
+	m_stereoLink( NULL )
 {
 	QVBoxLayout * mainLay = new QVBoxLayout( this );
-	QHBoxLayout * effectLay = new QHBoxLayout();
-	mainLay->addLayout( effectLay );
+
+	m_effectLayout = new QHBoxLayout();
+	mainLay->addLayout( m_effectLayout );
+
+	updateEffectView( _ctl );
+
+	if( _ctl->m_processors > 1 )
+	{
+		mainLay->addSpacing( 3 );
+		QHBoxLayout * center = new QHBoxLayout();
+		mainLay->addLayout( center );
+		m_stereoLink = new ledCheckBox( tr( "Link Channels" ), this );
+		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
+		center->addWidget( m_stereoLink );
+	}
+}
+
+
+
+
+ladspaControlDialog::~ladspaControlDialog()
+{
+}
+
+
+
+
+void ladspaControlDialog::updateEffectView( ladspaControls * _ctl )
+{
+	QList<QGroupBox *> list = findChildren<QGroupBox *>();
+	for( QList<QGroupBox *>::iterator it = list.begin(); it != list.end();
+									++it )
+	{
+		delete *it;
+	}
+
+	m_effectControls = _ctl;
+
 
 	const int cols = static_cast<int>( sqrt( 
 		static_cast<double>( _ctl->m_controlCount /
@@ -56,7 +94,7 @@ ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
 		{
 			grouper = new QGroupBox( tr( "Channel " ) +
 						QString::number( proc + 1 ),
-									this );
+								this );
 		}
 		else
 		{
@@ -94,26 +132,19 @@ ladspaControlDialog::ladspaControlDialog( ladspaControls * _ctl ) :
 			}
 		}
 
-		effectLay->addWidget( grouper );
+		m_effectLayout->addWidget( grouper );
 	}
 
-	if( _ctl->m_processors > 1 )
+	if( _ctl->m_processors > 1 && m_stereoLink != NULL )
 	{
-		mainLay->addSpacing( 3 );
-		QHBoxLayout * center = new QHBoxLayout();
-		mainLay->addLayout( center );
-		ledCheckBox * stereoLink = new ledCheckBox(
-						tr( "Link Channels" ), this );
-		stereoLink->setModel( &_ctl->m_stereoLinkModel );
-		center->addWidget( stereoLink );
+		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 	}
+
+	connect( _ctl, SIGNAL( effectModelChanged( ladspaControls * ) ),
+			this, SLOT( updateEffectView( ladspaControls * ) ),
+							Qt::DirectConnection );
 }
 
 
-
-
-ladspaControlDialog::~ladspaControlDialog()
-{
-}
-
+#include "ladspa_control_dialog.moc"
 

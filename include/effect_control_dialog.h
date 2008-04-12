@@ -49,8 +49,6 @@ signals:
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 
-
-private:
 	effectControls * m_effectControls;
 
 } ;

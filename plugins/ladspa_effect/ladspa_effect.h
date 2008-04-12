@@ -25,7 +25,7 @@
 #ifndef _LADSPA_EFFECT_H
 #define _LADSPA_EFFECT_H
 
-#include <QtGui/QWorkspace>
+#include <QtCore/QMutex>
 
 #include "effect.h"
 #include "engine.h"
@@ -39,6 +39,7 @@ typedef QVector<port_desc_t *> multi_proc_t;
 
 class ladspaEffect : public effect
 {
+	Q_OBJECT
 public:
 	ladspaEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key );
@@ -47,7 +48,7 @@ public:
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 	
-	void FASTCALL setControl( Uint16 _control, LADSPA_Data _data );
+	void setControl( Uint16 _control, LADSPA_Data _data );
 
 	virtual effectControls * getControls( void )
 	{
@@ -70,7 +71,16 @@ public:
 	}
 
 
+private slots:
+	void changeSampleRate( void );
+
+
 private:
+	void pluginInstantiation( void );
+	void pluginDestruction( void );
+
+
+	QMutex m_pluginMutex;
 	ladspaControls * m_controls;
 
 	QString m_effName;

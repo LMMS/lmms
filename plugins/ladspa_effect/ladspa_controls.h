@@ -47,9 +47,8 @@ public:
 		return( m_controlCount );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-						QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "ladspacontrols" );
@@ -77,6 +76,11 @@ private:
 
 
 	friend class ladspaControlDialog;
+	friend class ladspaEffect;
+
+
+signals:
+	void effectModelChanged( ladspaControls * );
 
 } ;
 

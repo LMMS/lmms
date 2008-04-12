@@ -23,10 +23,10 @@
  */
 
 
-#include "ladspa_effect.h"
-
 #include <QtGui/QMessageBox>
 
+#include "ladspa_effect.h"
+#include "mmp.h"
 #include "audio_device.h"
 #include "config_mgr.h"
 #include "ladspa_2_lmms.h"
@@ -78,7 +78,46 @@ ladspaEffect::ladspaEffect( model * _parent,
 	}
 	
 	setPublicName( manager->getShortName( m_key ) );
-	
+
+	pluginInstantiation();
+
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+					this, SLOT( changeSampleRate() ) );
+}
+
+
+
+
+ladspaEffect::~ladspaEffect()
+{
+	pluginDestruction();
+}
+
+
+
+
+void ladspaEffect::changeSampleRate( void )
+{
+	multimediaProject mmp( multimediaProject::EffectSettings );
+	m_controls->saveState( mmp, mmp.content() );
+	ladspaControls * controls = m_controls;
+	m_controls = NULL;
+	m_pluginMutex.lock();
+	pluginDestruction();
+	pluginInstantiation();
+	m_pluginMutex.unlock();
+	m_controls->restoreState( mmp.content().firstChild().toElement() );
+	controls->effectModelChanged( m_controls );
+	delete controls;
+}
+
+
+
+
+void ladspaEffect::pluginInstantiation( void )
+{
+	ladspa2LMMS * manager = engine::getLADSPAManager();
+
 	// Calculate how many processing units are needed.
 	const ch_cnt_t lmms_chnls = engine::getMixer()->audioDev()->channels();
 	m_effectChannels = manager->getDescription( m_key )->inputChannels;
@@ -293,8 +332,8 @@ ladspaEffect::ladspaEffect( model * _parent,
 	{
 		manager->activate( m_key, m_handles[proc] );
 	}
-	track * t = dynamic_cast<effectChain *>( _parent ) ?
-			dynamic_cast<effectChain *>( _parent )->getTrack() :
+	track * t = dynamic_cast<effectChain *>( parent() ) ?
+			dynamic_cast<effectChain *>( parent() )->getTrack() :
 									NULL;
 	m_controls = new ladspaControls( this, t );
 }
@@ -302,12 +341,14 @@ ladspaEffect::ladspaEffect( model * _parent,
 
 
 
-ladspaEffect::~ladspaEffect()
+void ladspaEffect::pluginDestruction( void )
 {
 	if( !isOkay() )
 	{
 		return;
 	}
+
+	delete m_controls;
 
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
@@ -323,6 +364,7 @@ ladspaEffect::~ladspaEffect()
 	}
 	m_ports.clear();
 	m_handles.clear();
+	m_portControls.clear();
 }
 
 
@@ -331,8 +373,10 @@ ladspaEffect::~ladspaEffect()
 bool ladspaEffect::processAudioBuffer( sampleFrame * _buf, 
 							const fpp_t _frames )
 {
+	m_pluginMutex.lock();
 	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
 	{
+		m_pluginMutex.unlock();
 		return( FALSE );
 	}
 
@@ -455,13 +499,15 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 		resetBufferCount();
 	}
 
-	return( isRunning() );
+	bool is_running = isRunning();
+	m_pluginMutex.unlock();
+	return( is_running );
 }
 
 
 
 
-void FASTCALL ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
+void ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
 {
 	if( !isOkay() )
 	{
@@ -483,4 +529,7 @@ plugin * lmms_plugin_main( model * _parent, void * _data )
 }
 
 }
+
+
+#include "ladspa_effect.moc"
 

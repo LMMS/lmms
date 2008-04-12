@@ -101,8 +101,7 @@ ladspaControls::~ladspaControls()
 
 
 
-void FASTCALL ladspaControls::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
+void ladspaControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( m_processors > 1 )
 	{
@@ -123,7 +122,7 @@ void FASTCALL ladspaControls::saveSettings( QDomDocument & _doc,
 
 
 
-void FASTCALL ladspaControls::loadSettings( const QDomElement & _this )
+void ladspaControls::loadSettings( const QDomElement & _this )
 {
 	if( m_processors > 1 )
 	{

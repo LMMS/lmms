@@ -15,7 +15,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspaeffect"
 	$(MOC) -o $@ $<
 
 
-MOC_FILES = ./ladspa_controls.moc
+MOC_FILES = ./ladspa_effect.moc ./ladspa_controls.moc ./ladspa_control_dialog.moc
 
 
 BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h

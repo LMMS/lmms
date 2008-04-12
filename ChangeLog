@@ -1,3 +1,33 @@
+2008-04-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_control_dialog.cpp:
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/ladspa_effect/ladspa_control_dialog.h:
+	* plugins/ladspa_effect/ladspa_controls.h:
+	* include/effect_control_dialog.h:
+	made LADSPA-effect-hoster handle samplerate-changes so that we've
+	proper effect-processing in HQ-mode
+
+	* include/lmms_constants.h:
+	more accurate constants
+
+	* src/gui/export_project_dialog.cpp:
+	fixed progress-bar after change of tick-resolution from 64 to 192
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	made clearAudioBuffer() static
+
+	* include/song.h:
+	* src/core/ladspa_manager.cpp:
+	coding-style-stuff
+
+	* src/core/oscillator.cpp:
+	do not synthesize anything if frequency is above half of samplerate
+
 2008-04-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/flp_import/flp_import.cpp:
