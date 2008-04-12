@@ -541,7 +541,7 @@ float FASTCALL ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
 
 
 
-float FASTCALL ladspaManager::getUpperBound( const ladspa_key_t & _plugin,										Uint32 _port )
+float FASTCALL ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )

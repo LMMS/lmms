@@ -67,7 +67,7 @@ public:
 	class playPos : public midiTime
 	{
 	public:
-		playPos( Sint32 _abs = 0 ) :
+		playPos( const int _abs = 0 ) :
 			midiTime( _abs ),
 			m_timeLine( NULL ),
 			m_timeLineUpdate( TRUE ),
