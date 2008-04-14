@@ -83,6 +83,7 @@ public:
 public slots:
 	void openFile( const QString & _sf2File );
 	void updatePatch( void );
+	void updateSampleRate( void );
 
 
 private:
@@ -103,6 +104,7 @@ private:
 	QMutex m_loadMutex;
 
 	int m_notesRunning[128];
+	sample_rate_t m_internalSampleRate;
 
 	lcdSpinBoxModel m_bankNum;
 	lcdSpinBoxModel m_patchNum;

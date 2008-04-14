@@ -88,6 +88,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
+	fluid_settings_setint( m_settings, "audio.period-size", engine::getMixer()->framesPerPeriod() );
+
 	// This is just our starting instance of synth.  It is recreated
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
@@ -104,11 +106,16 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
+	updateSampleRate();
+
 	connect( &m_bankNum, SIGNAL( dataChanged() ),
 			this, SLOT( updatePatch() ) );
 
 	connect( &m_patchNum, SIGNAL( dataChanged() ),
 			this, SLOT( updatePatch() ) );
+	
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+			this, SLOT( updateSampleRate() ) );
 
 }
 
@@ -209,6 +216,33 @@ void sf2Instrument::updatePatch( void )
 }
 
 
+void sf2Instrument::updateSampleRate( void )
+{	
+	double tempRate;
+
+	if( m_filename != "" ) {
+		// Set & get, returns the true sample rate
+		fluid_settings_setnum( m_settings, "synth.sample-rate", engine::getMixer()->sampleRate() );
+		fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
+		m_internalSampleRate = static_cast<int>( tempRate );
+
+		// New synth
+		fluid_synth_t * synth = new_fluid_synth( m_settings );
+		
+		// Load sfont, should be in memory and increment refCount
+		m_fontId = fluid_synth_sfload( synth, qPrintable( m_filename ), TRUE );
+
+		// Now, delete the old one and replace
+		m_synthMutex.lock();
+		delete_fluid_synth( m_synth );
+		m_synth = synth;
+		m_synthMutex.unlock();
+
+		// synth program change (set bank and patch)
+		updatePatch();
+	}
+}
+
 
 void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 {
@@ -251,6 +285,13 @@ void sf2Instrument::play( bool _try_parallelizing,
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	m_synthMutex.lock();
+
+	// TODO: Toby can correctly interpolate for HQ mode.
+	// m_internalSampleRate is fluid's true sampling rate (basically 44100, 88200, or 96000)
+	// also, it looks like we will need to only get a portion of the frames and need 
+	// to account properly for accumulated error (i.e: using frames*internalRate/mixerRate
+	// will not work unless the value is whole. Probably only a big deal for small period-sizes?
+
 	fluid_synth_write_float( m_synth, frames, _working_buffer, 0, 2,
 							_working_buffer, 1, 2 );
 	m_synthMutex.unlock();
