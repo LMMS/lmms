@@ -257,7 +257,6 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 	{
 		return;
 	}
-	printf("Note: %d\n", midiNote);
 
 	if ( tfp == 0 )
 	{
