@@ -34,6 +34,7 @@
 #include "knob.h"
 #include "lcd_spinbox.h"
 #include "fluidsynth.h"
+#include "sample_buffer.h"
 
 class sf2InstrumentView;
 class sf2Font;
@@ -88,7 +89,9 @@ public slots:
 
 private:
 	static QMap<QString, sf2Font*> s_fonts;
-    static int (* s_origFree)( fluid_sfont_t * );
+	static int (* s_origFree)( fluid_sfont_t * );
+
+	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;

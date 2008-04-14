@@ -76,6 +76,7 @@ int (* sf2Instrument::s_origFree)( fluid_sfont_t * );
 
 sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &sf2player_plugin_descriptor ),
+	m_srcState( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_bankNum( -1, -1, 999, 1, this ),
@@ -126,6 +127,10 @@ sf2Instrument::~sf2Instrument()
 	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
+	if( m_srcState != NULL )
+	{
+		src_delete( m_srcState );
+	}
 }
 
 
@@ -225,21 +230,43 @@ void sf2Instrument::updateSampleRate( void )
 	fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
-	if( m_filename != "" ) {
-		// New synth
-		fluid_synth_t * synth = new_fluid_synth( m_settings );
-		
-		// Load sfont, should be in memory and increment refCount
-		m_fontId = fluid_synth_sfload( synth, qPrintable( m_filename ), TRUE );
-
+	if( m_filename != "" )
+	{
 		// Now, delete the old one and replace
 		m_synthMutex.lock();
 		delete_fluid_synth( m_synth );
-		m_synth = synth;
+
+		// New synth
+		m_synth = new_fluid_synth( m_settings );
+		
+		// Load sfont, should be in memory and increment refCount
+		char * sf2Ascii = qstrdup( qPrintable( m_filename ) );
+		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
+		delete[] sf2Ascii;
+
+//		openFile( m_filename );
 		m_synthMutex.unlock();
 
 		// synth program change (set bank and patch)
 		updatePatch();
+	}
+	if( m_internalSampleRate < engine::getMixer()->sampleRate() )
+	{
+		m_synthMutex.lock();
+		if( m_srcState != NULL )
+		{
+			src_delete( m_srcState );
+		}
+		int error;
+		m_srcState = src_new( SRC_SINC_MEDIUM_QUALITY,
+					DEFAULT_CHANNELS, &error );
+		if( m_srcState == NULL || error )
+		{
+			printf( "error while creating SRC-data-"
+				"structure in sf2Instrument::"
+				"updateSampleRate()\n" );
+		}
+		m_synthMutex.unlock();
 	}
 }
 
@@ -292,8 +319,39 @@ void sf2Instrument::play( bool _try_parallelizing,
 	// to account properly for accumulated error (i.e: using frames*internalRate/mixerRate
 	// will not work unless the value is whole. Probably only a big deal for small period-sizes?
 
-	fluid_synth_write_float( m_synth, frames, _working_buffer, 0, 2,
+	if( m_internalSampleRate < engine::getMixer()->sampleRate() &&
+							m_srcState != NULL )
+	{
+		const fpp_t f = frames * m_internalSampleRate /
+					engine::getMixer()->sampleRate();
+		sampleFrame * tmp = new sampleFrame[f];
+		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
+
+		SRC_DATA src_data;
+		src_data.data_in = tmp[0];
+		src_data.data_out = _working_buffer[0];
+		src_data.input_frames = f;
+		src_data.output_frames = frames;
+		src_data.src_ratio = (float) frames / f;
+		src_data.end_of_input = 0;
+		int error = src_process( m_srcState, &src_data );
+		delete[] tmp;
+		if( error )
+		{
+			printf( "sf2Instrument: error while resampling: %s\n",
+							src_strerror( error ) );
+		}
+		if( src_data.output_frames_gen > frames )
+		{
+			printf( "sf2Instrument: not enough frames: %ld / %d\n",
+					src_data.output_frames_gen, frames );
+		}
+	}
+	else
+	{
+		fluid_synth_write_float( m_synth, frames, _working_buffer, 0, 2,
 							_working_buffer, 1, 2 );
+	}
 	m_synthMutex.unlock();
 
 	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
