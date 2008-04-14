@@ -219,13 +219,13 @@ void sf2Instrument::updatePatch( void )
 void sf2Instrument::updateSampleRate( void )
 {	
 	double tempRate;
+	
+	// Set & get, returns the true sample rate
+	fluid_settings_setnum( m_settings, "synth.sample-rate", engine::getMixer()->sampleRate() );
+	fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
+	m_internalSampleRate = static_cast<int>( tempRate );
 
 	if( m_filename != "" ) {
-		// Set & get, returns the true sample rate
-		fluid_settings_setnum( m_settings, "synth.sample-rate", engine::getMixer()->sampleRate() );
-		fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
-		m_internalSampleRate = static_cast<int>( tempRate );
-
 		// New synth
 		fluid_synth_t * synth = new_fluid_synth( m_settings );
 		
@@ -246,17 +246,18 @@ void sf2Instrument::updateSampleRate( void )
 
 void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 {
-	const float LOG440 = 2.64345267649f;
+	const double LOG440 = 2.643452676486187f;
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	int midiNote = (int)floor( 12 * ( log2( _n->frequency() ) - LOG440 ) - 4 );
+	int midiNote = (int)floor( 12.0 * ( log2( _n->frequency() ) - LOG440 ) - 4.0 );
 
 	// out of range?
 	if( midiNote <= 0 || midiNote >= 128 )
 	{
 		return;
 	}
+	printf("Note: %d\n", midiNote);
 
 	if ( tfp == 0 )
 	{
