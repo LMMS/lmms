@@ -219,6 +219,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/automation_editor.cpp				\
 		$(srcdir)/src/gui/bb_editor.cpp					\
 		$(srcdir)/src/gui/controller_connection_dialog.cpp \
+		$(srcdir)/src/gui/controller_dialog.cpp 	\
 		$(srcdir)/src/gui/effect_control_dialog.cpp			\
 		$(srcdir)/src/gui/effect_select_dialog.cpp			\
 		$(srcdir)/src/gui/embed.cpp					\

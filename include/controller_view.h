@@ -49,23 +49,23 @@ class controllerView : public QWidget, public modelView
 public:
 	controllerView( controller * _controller, QWidget * _parent );
 	virtual ~controllerView();
-/*	
-	inline effect * getEffect( void )
+	
+    inline controller * getController( void )
 	{
-		return( castModel<effect>() );
+		return( castModel<controller>() );
 	}
-	inline const effect * getEffect( void ) const
+
+	inline const controller * getController( void ) const
 	{
-		return( castModel<effect>() );
+		return( castModel<controller>() );
 	}
-*/
 
 
 public slots:
 	void editControls( void );
 	//void deletePlugin( void );
 	//void displayHelp( void );
-	//void closeEffects( void );
+	void closeControls( void );
 
 	
 signals:

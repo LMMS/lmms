@@ -62,15 +62,23 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 	
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-									this );
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<7>( f ) );
-		ctls_btn->setGeometry( 140, 2, 50, 14 );
-		connect( ctls_btn, SIGNAL( clicked() ), 
-					this, SLOT( editControls() ) );
+	            this );
+	
+    QFont f = ctls_btn->font();
+	ctls_btn->setFont( pointSize<7>( f ) );
+	ctls_btn->setGeometry( 140, 2, 50, 14 );
+	connect( ctls_btn, SIGNAL( clicked() ), 
+				this, SLOT( editControls() ) );
 
-	//m_subWindow = new QMdiSubWindow( getMainWindow()->workspace() );
-	//m_subWindow->hide();
+	m_controllerDlg = getController()->createDialog( NULL );
+
+	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( 
+                m_controllerDlg );
+
+    connect( m_controllerDlg, SIGNAL( closed() ),
+                this, SLOT( closeControls() ) );
+
+	m_subWindow->hide();
 
 /*
 	if( getEffect()->getControls()->getControlCount() > 0 )
@@ -98,7 +106,7 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 controllerView::~controllerView()
 {
-	//delete m_subWindow;
+	delete m_subWindow;
 }
 
 
@@ -106,7 +114,7 @@ controllerView::~controllerView()
 
 void controllerView::editControls( void )
 {
-	/*if( m_show )
+	if( m_show )
 	{
 		m_subWindow->show();
 		m_subWindow->raise();
@@ -116,7 +124,10 @@ void controllerView::editControls( void )
 	{
 		m_subWindow->hide();
 		m_show = TRUE;
-	}*/
+	}
+}
+
+/*
 		//engine::getMainWindow()->workspace()->addSubWindow( NULL );
 
 	controller * c = castModel<controller>();
@@ -130,7 +141,7 @@ void controllerView::editControls( void )
 	m_subWindow->raise();
 
 }
-
+*/
 
 /*
 void effectView::displayHelp( void )
@@ -139,15 +150,15 @@ void effectView::displayHelp( void )
 								whatsThis() );
 }
 
+*/
 
 
-
-void effectView::closeEffects( void )
+void controllerView::closeControls( void )
 {
 	m_subWindow->hide();
 	m_show = TRUE;
 }
-*/
+
 
 
 void controllerView::contextMenuEvent( QContextMenuEvent * )
