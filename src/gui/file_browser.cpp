@@ -536,10 +536,11 @@ void listView::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		// if there're samples shorter than 3 seconds, we don't
 		// stop them if the user releases mouse-button...
-		samplePlayHandle * s = dynamic_cast<samplePlayHandle *>(
-							m_previewPlayHandle );
-		if( s != NULL )
+		if( m_previewPlayHandle->type() ==
+						playHandle::SamplePlayHandle )
 		{
+			samplePlayHandle * s = dynamic_cast<samplePlayHandle *>(
+							m_previewPlayHandle );
 			if( s->totalFrames() - s->framesDone() <=
 				static_cast<f_cnt_t>(
 					engine::getMixer()->sampleRate() * 3 ) )

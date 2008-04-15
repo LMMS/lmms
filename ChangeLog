@@ -1,3 +1,19 @@
+2008-04-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/file_browser.cpp:
+	check type of preview-play-handle via type() instead of blindly using
+	dynamic_cast - probably fixes random crashes when previewing a lot of
+	samples and presets
+
+	* src/tracks/instrument_track.cpp:
+	delete instrument-instance *after* removing all play-handles from
+	mixer as several play-handle-methods rely on instrument - fixes crash
+	when removing track while playing
+
+	* src/core/track.cpp:
+	directly delete view before removing model - fixes crash when
+	removing instrument-track with instrument-track-window open
+
 2008-04-15	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
