@@ -1,3 +1,8 @@
+2008-04-15	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
+	Fix layout
+	
 2008-04-14	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix:

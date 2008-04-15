@@ -37,7 +37,7 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	effectControlDialog( _controls )
 {
 
-	setFixedSize( 64, 64 );
+	setFixedSize( 92, 92 );
 
 	QGridLayout * l = new QGridLayout( this );
 
