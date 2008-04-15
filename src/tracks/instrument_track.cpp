@@ -143,9 +143,9 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 instrumentTrack::~instrumentTrack()
 {
-	delete m_instrument;
 	engine::getMixer()->removePlayHandles( this );
 	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
+	delete m_instrument;
 }
 
 
