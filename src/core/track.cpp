@@ -1172,10 +1172,10 @@ void trackOperationsWidget::cloneTrack( void )
 void trackOperationsWidget::removeTrack( void )
 {
 	m_trackView->close();
+	delete m_trackView;
 	engine::getMixer()->lock();
 	delete m_trackView->getTrack();
 	engine::getMixer()->unlock();
-	m_trackView->deleteLater();
 }
 
 
