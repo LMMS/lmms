@@ -30,4 +30,5 @@ SUBDIRS =			\
 	$(VST_DIRS)		\
 	vibed			\
 	stereo_enhancer		\
+	stereo_matrix		\
 	$(EXTRA_PLUGINS)

@@ -1,3 +1,18 @@
+2008-04-14	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/stereo_matrix:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/stereo_matrix/stereo_matrix.h:
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	* plugins/stereo_matrix/stereomatrix_controls.h:
+	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
+	* plugins/stereo_matrix/stereomatrix_control_dialog.h:
+	* plugins/stereo_matrix/logo.png:
+	* plugins/stereo_matrix/Makefile.am:
+	* configure.in:
+	* plugins/Makefile.am:
+	Add stereo matrix plugin for real panning and stereo-swapping
+
 2008-04-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/sf2_player.cpp:
