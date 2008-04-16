@@ -77,6 +77,7 @@ int (* sf2Instrument::s_origFree)( fluid_sfont_t * );
 sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_srcState( NULL ),
+	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_bankNum( -1, -1, 999, 1, this ),
@@ -95,15 +96,6 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	// Install our callbacks
-	fluid_sfloader_t * pLoader
-		= (fluid_sfloader_t *) malloc( sizeof( fluid_sfloader_t ) );
-
-	pLoader->data = (void *) this;
-	pLoader->load = sf2Instrument::sfloaderLoad;
-	pLoader->free = sf2Instrument::sfloaderFree;
-	fluid_synth_add_sfloader( m_synth, pLoader );
-
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
@@ -117,7 +109,6 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateSampleRate() ) );
-
 }
 
 
@@ -125,12 +116,14 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 sf2Instrument::~sf2Instrument()
 {
 	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
 	if( m_srcState != NULL )
 	{
 		src_delete( m_srcState );
 	}
+
 }
 
 
@@ -161,42 +154,84 @@ QString sf2Instrument::nodeName( void ) const
 
 
 
+void sf2Instrument::freeFont( void )
+{
+	QTextStream cout( stdout, QIODevice::WriteOnly );
+
+	m_synthMutex.lock();
+	
+	if ( m_font != NULL )
+	{
+		--(m_font->refCount);
+	
+		// No more references
+		if( m_font->refCount <= 0 )
+		{
+			cout << "Really deleting " << m_filename << endl;
+
+			sf2Instrument::s_fonts.remove( m_filename );
+			fluid_synth_sfunload( m_synth, m_fontId, TRUE );
+
+			delete m_font;
+		}
+
+		// Just remove our reference
+		else
+		{
+			cout << "un-referencing " << m_filename << endl;
+
+			fluid_synth_remove_sfont( m_synth, m_font->fluidFont );
+		}
+
+		m_font = NULL;
+	}
+	m_synthMutex.unlock();
+}
+
+
+
 void sf2Instrument::openFile( const QString & _sf2File )
 {
 	emit fileLoading();
 
-	// Remove synth from this fluidSynth (but not necessarily memory)
-	if ( m_filename != "" )
-	{
-		// Recreate synth
-		m_synthMutex.lock();
-		delete_fluid_synth( m_synth );
-		m_synth = new_fluid_synth( m_settings );
-		m_synthMutex.unlock();
-
-		// No need to explicitly delete font.  Deleting fluidSynth calls free
-		// on all fonts.  This, causes sfloaderFreeFont to run.
-	}
-
 	char * sf2Ascii = qstrdup( qPrintable( _sf2File ) );
-	m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
 
-	QString sf2Key( sf2Ascii );
+	// free reference to soundfont if one is selected
+	freeFont();
+
+	m_synthMutex.lock();
+
+	// Increment Reference
+	if( s_fonts.contains( _sf2File ) )
+	{
+		QTextStream cout( stdout, QIODevice::WriteOnly );
+		cout << "Using existing reference to " << _sf2File << endl;
+
+		m_font = s_fonts[ _sf2File ];
+
+		m_font->refCount++;
+
+		m_fontId = fluid_synth_add_sfont( m_synth, m_font->fluidFont );		
+	}
 
 	// Add to map, if doesn't exist.  
-	// We can't do this in callback because fluid hasn't created the sfont yet
-	if( !s_fonts.contains( sf2Key ) && fluid_synth_sfcount( m_synth ) > 0 )
+	else
 	{
-		// Grab this sf from the top of the stack
-		fluid_sfont_t * sfont = fluid_synth_get_sfont( m_synth, 0 );
+		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
 
-		// Hold on to real free function for executing later.
-		s_origFree = sfont->free;
-		sfont->free = sf2Instrument::sfloaderFreeFont;
-
-		// Finally, add font
-		s_fonts.insert( sf2Key, new sf2Font( sfont ) );
+		if( fluid_synth_sfcount( m_synth ) > 0 )
+		{
+			// Grab this sf from the top of the stack and add to list
+			m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
+			s_fonts.insert( _sf2File, m_font );
+		}
+		else
+		{
+			// TODO: Couldn't load file!
+		}
 	}
+
+	m_synthMutex.unlock();
 
 	if( m_fontId >= 0 )
 	{
@@ -230,26 +265,30 @@ void sf2Instrument::updateSampleRate( void )
 	fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
-	if( m_filename != "" )
+	if( m_font )
 	{
 		// Now, delete the old one and replace
 		m_synthMutex.lock();
+		fluid_synth_remove_sfont( m_synth, m_font->fluidFont ); 
 		delete_fluid_synth( m_synth );
-
+		
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
-		
-		// Load sfont, should be in memory and increment refCount
-		char * sf2Ascii = qstrdup( qPrintable( m_filename ) );
-		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
-		delete[] sf2Ascii;
-
-//		openFile( m_filename );
+		m_fontId = fluid_synth_add_sfont( m_synth, m_font->fluidFont );		
 		m_synthMutex.unlock();
-
+		
 		// synth program change (set bank and patch)
 		updatePatch();
 	}
+	else
+	{
+		// Recreate synth with no soundfonts
+		m_synthMutex.lock();
+		delete_fluid_synth( m_synth );
+		m_synth = new_fluid_synth( m_settings );
+		m_synthMutex.unlock();
+	}
+
 	if( m_internalSampleRate < engine::getMixer()->sampleRate() )
 	{
 		m_synthMutex.lock();
@@ -313,12 +352,6 @@ void sf2Instrument::play( bool _try_parallelizing,
 
 	m_synthMutex.lock();
 
-	// TODO: Toby can correctly interpolate for HQ mode.
-	// m_internalSampleRate is fluid's true sampling rate (basically 44100, 88200, or 96000)
-	// also, it looks like we will need to only get a portion of the frames and need 
-	// to account properly for accumulated error (i.e: using frames*internalRate/mixerRate
-	// will not work unless the value is whole. Probably only a big deal for small period-sizes?
-
 	if( m_internalSampleRate < engine::getMixer()->sampleRate() &&
 							m_srcState != NULL )
 	{
@@ -357,72 +390,6 @@ void sf2Instrument::play( bool _try_parallelizing,
 	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
 									NULL );
 }
-
-
-
-int sf2Instrument::sfloaderFree( fluid_sfloader_t * _loader )
-{
-	if( _loader != NULL )
-	{
-		free( _loader );
-	}
-	return 0;
-}
-
-
-
-int sf2Instrument::sfloaderFreeFont( fluid_sfont_t * _sfont )
-{
-	QString key = QString( _sfont->get_name(_sfont) );
-
-	sf2Font * f = sf2Instrument::s_fonts[key];
-
-	--(f->refCount);
-
-	// No more references
-	if( f->refCount <= 0 )
-	{
-		QTextStream cout( stdout, QIODevice::WriteOnly );
-		cout << "Really deleting " << key << endl;
-
-		sf2Instrument::s_fonts.remove( key );
-		delete f;
-
-		// Let fluidsynth free the font, as if we were not here
-		return s_origFree( _sfont );
-	}
-
-	// Make fluid think we freed the sfont
-	return 0;
-}
-
-
-
-fluid_sfont_t * sf2Instrument::sfloaderLoad(
-		fluid_sfloader_t * _loader, const char *_filename )
-{
-	if( _loader == NULL )
-	{
-		return NULL;
-	}
-
-	QString filename = _filename;
-
-	if( sf2Instrument::s_fonts.contains( filename ) )
-	{
-		QTextStream cout( stdout, QIODevice::WriteOnly );
-		cout << "Using existing reference to " << filename << endl;
-
-		sf2Font * font = sf2Instrument::s_fonts[ filename ];
-
-		font->refCount++;
-		return font->fluidFont;
-	}
-
-	// fluidsynth will call next (default) loader...
-	return NULL;
-}
-
 
 
 void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )

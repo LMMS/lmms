@@ -96,6 +96,8 @@ private:
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
+	sf2Font* m_font;
+
 	int m_fontId;
 	QString m_filename;
 
@@ -113,13 +115,7 @@ private:
 	lcdSpinBoxModel m_patchNum;
 
 private:
-	// Our special callback functions
-	static int sfloaderFree( fluid_sfloader_t * _loader );
-	static fluid_sfont_t * sfloaderLoad(
-			fluid_sfloader_t * _loader, const char * _filename );
-	
-	static int sfloaderFreeFont( fluid_sfont_t * _soundFont );
-
+	void freeFont( void );
 
 	friend class sf2InstrumentView;
 
