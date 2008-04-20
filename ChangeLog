@@ -1,3 +1,8 @@
+2008-04-20	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	Fixed saveSettings
+
 2008-04-16	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
