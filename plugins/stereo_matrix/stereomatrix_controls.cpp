@@ -71,9 +71,9 @@ void FASTCALL stereoMatrixControls::saveSettings( QDomDocument & _doc,
 		QDomElement & _this )
 {
 	_this.setAttribute( "l-l", m_llModel.value() );
-	_this.setAttribute( "l-r", m_llModel.value() );
-	_this.setAttribute( "r-l", m_llModel.value() );
-	_this.setAttribute( "r-r", m_llModel.value() );
+	_this.setAttribute( "l-r", m_lrModel.value() );
+	_this.setAttribute( "r-l", m_rlModel.value() );
+	_this.setAttribute( "r-r", m_rrModel.value() );
 }
 
 
