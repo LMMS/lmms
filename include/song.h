@@ -138,6 +138,10 @@ public:
 	bpm_t getTempo( void );
 	virtual automationPattern * tempoAutomationPattern( void );
 
+	track * getAutomationTrack( void )
+	{
+		return( m_automationTrack );
+	}
 
 	// file management
 	void createNewProject( void );
