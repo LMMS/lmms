@@ -1,7 +1,7 @@
 /*
  * visualization_widget.h - widget for visualization of sound-data
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,25 +32,25 @@
 #include "mixer.h"
 
 
-class QTimer;
-
-
 class visualizationWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	enum visualizationTypes
 	{
-		SIMPLE		// add more here
+		Simple		// add more here
 	} ;
+
 	visualizationWidget( const QPixmap & _bg, QWidget * _parent,
-					visualizationTypes _vtype = SIMPLE );
+					visualizationTypes _vtype = Simple );
 	virtual ~visualizationWidget();
 
+	void setActive( bool _active );
 
-protected:	
-	void paintEvent( QPaintEvent * _pe );
-	void mousePressEvent( QMouseEvent * _me );
+
+protected:
+	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void mousePressEvent( QMouseEvent * _me );
 
 
 protected slots:
@@ -60,10 +60,8 @@ protected slots:
 private:
 	QPixmap s_background;
 
-	bool m_enabled;
 	sampleFrame * m_buffer;
-
-	QTimer * m_updateTimer;
+	bool m_active;
 
 } ;
 

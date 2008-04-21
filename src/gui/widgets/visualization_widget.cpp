@@ -35,9 +35,7 @@
 #include "engine.h"
 #include "templates.h"
 #include "tooltip.h"
-
-
-const int UPDATE_TIME = 1000 / 25;	// 40 fps
+#include "song_editor.h"
 
 
 
@@ -45,7 +43,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
-	m_enabled( TRUE )
+	m_active( FALSE )
 {
 	setFixedSize( s_background.width(), s_background.height() );
 
@@ -56,18 +54,11 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
 
 
-	m_updateTimer = new QTimer( this );
-	connect( m_updateTimer, SIGNAL( timeout() ), this, SLOT( update() ) );
-	if( m_enabled == TRUE )
-	{
-		m_updateTimer->start( UPDATE_TIME );
-	}
-
-	connect( engine::getMixer(), SIGNAL( nextAudioBuffer() ),
-					this, SLOT( updateAudioBuffer() ) );
-
 	toolTip::add( this, tr( "click to enable/disable visualization of "
 							"master-output" ) );
+
+	setActive( TRUE );
+
 }
 
 
@@ -83,18 +74,44 @@ visualizationWidget::~visualizationWidget()
 
 void visualizationWidget::updateAudioBuffer( void )
 {
-	if( m_enabled == TRUE )
+	engine::getMixer()->lock();
+	const surroundSampleFrame * c = engine::getMixer()->
+						currentReadBuffer();
+	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
+								++f )
 	{
-		engine::getMixer()->lock();
-		const surroundSampleFrame * c = engine::getMixer()->
-							currentReadBuffer();
-		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
-									++f )
-		{
-			m_buffer[f][0] = c[f][0];
-			m_buffer[f][1] = c[f][1];
-		}
-		engine::getMixer()->unlock();
+		m_buffer[f][0] = c[f][0];
+		m_buffer[f][1] = c[f][1];
+	}
+	engine::getMixer()->unlock();
+}
+
+
+
+
+void visualizationWidget::setActive( bool _active )
+{
+	m_active = _active;
+	if( m_active )
+	{
+		connect( engine::getSongEditor(),
+					SIGNAL( periodicUpdate() ),
+					this, SLOT( update() ) );
+		connect( engine::getMixer(),
+					SIGNAL( nextAudioBuffer() ),
+				this, SLOT( updateAudioBuffer() ) );
+	}
+	else
+	{
+		disconnect( engine::getSongEditor(),
+					SIGNAL( periodicUpdate() ),
+					this, SLOT( update() ) );
+		disconnect( engine::getMixer(),
+					SIGNAL( nextAudioBuffer() ),
+				this, SLOT( updateAudioBuffer() ) );
+		// we have to update (remove last waves),
+		// because timer doesn't do that anymore
+		update();
 	}
 }
 
@@ -107,7 +124,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_enabled == TRUE )
+	if( m_active )
 	{
 		float master_output = engine::getMixer()->masterGain();
 		int w = width()-4;
@@ -166,18 +183,7 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		m_enabled = !m_enabled;
-		if( m_enabled == TRUE )
-		{
-			m_updateTimer->start( UPDATE_TIME );
-		}
-		else
-		{
-			m_updateTimer->stop();
-			// we have to update (remove last waves),
-			// because timer doesn't do that anymore
-			update();
-		}
+		setActive( !m_active );
 	}
 }
 
