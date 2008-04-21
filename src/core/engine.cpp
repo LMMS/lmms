@@ -32,6 +32,7 @@
 #include "config_mgr.h"
 #include "controller_rack_view.h"
 #include "fx_mixer.h"
+#include "fx_mixer_view.h"
 #include "ladspa_2_lmms.h"
 #include "main_window.h"
 #include "mixer.h"
@@ -74,15 +75,15 @@ void engine::init( const bool _has_gui )
 
 	s_projectJournal = new projectJournal;
 	s_mixer = new mixer;
-	s_fxMixer = new fxMixer;
 	s_song = new song;
+	s_fxMixer = new fxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 
 	if( s_hasGUI )
 	{
 		s_mainWindow = new mainWindow;
+		s_songEditor = new songEditor( s_song, s_songEditor );
 		s_fxMixerView = new fxMixerView;
-		s_songEditor = new songEditor( s_song );
 		s_controllerRackView = new controllerRackView;
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );

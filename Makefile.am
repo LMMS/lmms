@@ -74,7 +74,7 @@ lmms_MOC =						\
 		./fade_button.moc			\
 		./fader.moc				\
 		./file_browser.moc			\
-		./fx_mixer.moc				\
+		./fx_mixer_view.moc			\
 		./graph.moc				\
 		./group_box.moc				\
 		./instrument_functions.moc		\
@@ -225,6 +225,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/embed.cpp					\
 		$(srcdir)/src/gui/export_project_dialog.cpp			\
 		$(srcdir)/src/gui/file_browser.cpp				\
+		$(srcdir)/src/gui/fx_mixer_view.cpp				\
 		$(srcdir)/src/gui/lfo_controller_dialog.cpp			\
 		$(srcdir)/src/gui/lmms_style.cpp				\
 		$(srcdir)/src/gui/main_window.cpp				\
@@ -315,6 +316,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/bb_track_container.h				\
 		$(srcdir)/include/piano.h					\
 		$(srcdir)/include/fx_mixer.h					\
+		$(srcdir)/include/fx_mixer_view.h				\
 		$(srcdir)/include/pixmap_button.h				\
 		$(srcdir)/include/rename_dialog.h				\
 		$(srcdir)/include/export_project_dialog.h			\

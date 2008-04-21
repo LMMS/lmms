@@ -52,6 +52,7 @@
 #include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
 #include "fx_mixer.h"
+#include "fx_mixer_view.h"
 #include "import_filter.h"
 #include "instrument_track.h"
 #include "main_window.h"

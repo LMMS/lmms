@@ -1,3 +1,43 @@
+2008-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/widgets/group_box.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	small cleanups
+
+	* data/themes/default/style.css:
+	* include/fx_mixer_view.h:
+	* src/gui/fx_mixer_view.cpp:
+	improved layouting and made FX-lines being organized in 4 banks
+	instead of one big scrollarea
+
+	* src/core/engine.cpp:
+	create FX-mixer after song
+
+	* Makefile.am:
+	* include/fx_mixer.h:
+	* include/fx_mixer_view.h:
+	* src/core/fx_mixer.cpp:
+	* src/core/song.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	splitted source-files for FX-mixer and its view
+
+	* include/fader.h:
+	* src/gui/widgets/fader.cpp:
+	made faders automatable
+
+	* include/song.h:
+	made automation-track public accessible
+
+	* include/visualization_widget.h:
+	* src/gui/widgets/visualization_widget.cpp:
+	use new timer-framework
+
+	* include/song_editor.h:
+	* src/gui/song_editor.cpp:
+	added fast and leightweight timer-framework - widgets requiring
+	periodic updates can simply connect their update-slots to
+	songEditor::periodicUpdate()
+
 2008-04-20	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:

@@ -30,21 +30,34 @@
 #include <config.h>
 #endif
 
-#include <QtGui/QWidget>
-
-#include "types.h"
 #include "mv_base.h"
 #include "mixer.h"
+#include "effect_chain.h"
 #include "journalling_object.h"
 
 
 const int NumFxChannels = 64;
 
-class fader;
-class fxLine;
-class effectRackView;
-class pixmapButton;
-struct fxChannel;
+
+struct fxChannel
+{
+	fxChannel( model * _parent );
+	~fxChannel();
+
+	effectChain m_fxChain;
+	bool m_used;
+	bool m_stillRunning;
+	float m_peakLeft;
+	float m_peakRight;
+	sampleFrame * m_buffer;
+	boolModel m_muteModel;
+	boolModel m_soloModel;
+	floatModel m_volumeModel;
+	QString m_name;
+	QMutex m_lock;
+
+} ;
+
 
 
 class fxMixer : public journallingObject, public model
@@ -81,42 +94,5 @@ private:
 
 } ;
 
-
-class fxMixerView : public QWidget, public modelView
-{
-	Q_OBJECT
-public:
-	fxMixerView();
-	virtual ~fxMixerView();
-
-	fxLine * currentFxLine( void )
-	{
-		return( m_currentFxLine );
-	}
-	void setCurrentFxLine( fxLine * _line );
-
-	void clear( void );
-
-
-private slots:
-	void updateFaders( void );
-
-
-private:
-	struct fxChannelView
-	{
-		fxLine * m_fxLine;
-		effectRackView * m_rackView;
-		pixmapButton * m_muteButton;
-		pixmapButton * m_soloButton;
-		fader * m_fader;
-	} ;
-
-	fxChannelView m_fxChannelViews[NumFxChannels+1];
-
-	QWidget * m_fxRackArea;
-	fxLine * m_currentFxLine;
-
-} ;
 
 #endif

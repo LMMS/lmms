@@ -25,61 +25,39 @@
  */
 
 
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
-#include <QtGui/QPainter>
-#include <QtGui/QScrollArea>
-#include <QtGui/QScrollBar>
-
 #include "fx_mixer.h"
-#include "fader.h"
 #include "effect.h"
-#include "effect_chain.h"
-#include "effect_rack_view.h"
-#include "embed.h"
-#include "main_window.h"
-#include "lcd_spinbox.h"
-#include "gui_templates.h"
+#include "song.h"
 
 
-struct fxChannel
+fxChannel::fxChannel( model * _parent ) :
+	m_fxChain( NULL ),
+	m_used( FALSE ),
+	m_stillRunning( FALSE ),
+	m_peakLeft( 0.0f ),
+	m_peakRight( 0.0f ),
+	m_buffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
+	m_muteModel( FALSE, _parent ),
+	m_soloModel( FALSE, _parent ),
+	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
+	m_name(),
+	m_lock()
 {
-	fxChannel( model * _parent ) :
-		m_fxChain( NULL ),
-		m_used( FALSE ),
-		m_stillRunning( FALSE ),
-		m_peakLeft( 0.0f ),
-		m_peakRight( 0.0f ),
-		m_buffer( new sampleFrame[
-			engine::getMixer()->framesPerPeriod()] ),
-		m_muteModel( FALSE, _parent ),
-		m_soloModel( FALSE, _parent ),
-		m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
-		m_name(),
-		m_lock()
-	{
-		engine::getMixer()->clearAudioBuffer( m_buffer,
-				engine::getMixer()->framesPerPeriod() );
-	}
-	~fxChannel()
-	{
-		delete[] m_buffer;
-	}
+	engine::getMixer()->clearAudioBuffer( m_buffer,
+					engine::getMixer()->framesPerPeriod() );
+	m_volumeModel.setTrack( engine::getSong()->getAutomationTrack() );
+}
 
-	effectChain m_fxChain;
-	bool m_used;
-	bool m_stillRunning;
-	float m_peakLeft;
-	float m_peakRight;
-	sampleFrame * m_buffer;
-	boolModel m_muteModel;
-	boolModel m_soloModel;
-	floatModel m_volumeModel;
-	QString m_name;
-	QMutex m_lock;
 
-} ;
+
+
+fxChannel::~fxChannel()
+{
+	delete[] m_buffer;
+}
+
+
+
 
 
 
@@ -121,6 +99,7 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	}
 	m_fxChannels[_ch]->m_used = TRUE;
 }
+
 
 
 
@@ -183,7 +162,9 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 			m_fxChannels[i]->m_used = FALSE;
 		}
 	}
+
 	processChannel( 0 );
+
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
@@ -192,8 +173,10 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 			m_out[f][ch] = buf[f][ch%DEFAULT_CHANNELS] * v;
 		}
 	}
+
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
+
 	return( m_out );
 }
 
@@ -251,232 +234,5 @@ void fxMixer::loadSettings( const QDomElement & _this )
 	emit dataChanged();
 }
 
-
-class fxLine : public QWidget
-{
-public:
-	fxLine( QWidget * _parent, fxMixerView * _mv, QString & _name ) :
-		QWidget( _parent ),
-		m_mv( _mv ),
-		m_name( _name )
-	{
-		setFixedSize( 32, 232 );
-		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
-	}
-
-	virtual void paintEvent( QPaintEvent * )
-	{
-		QPainter p( this );
-		p.fillRect( rect(), QColor( 72, 76, 88 ) );
-/*		p.setPen( QColor( 144, 152, 176 ) );
-		p.drawLine( 0, 0, width()-1, 0 );
-		p.drawLine( 0, 0, 0, height()-1 );
-		p.setPen( QColor( 36, 38, 44 ) );
-		p.drawLine( 0, height()-1, width()-1, height()-1 );
-		p.drawLine( width()-1, 0, width()-1, height()-1 );*/
-		p.setPen( QColor( 40, 42, 48 ) );
-		p.drawRect( 0, 0, width()-2, height()-2 );
-		p.setPen( QColor( 108, 114, 132 ) );
-		p.drawRect( 1, 1, width()-2, height()-2 );
-		p.setPen( QColor( 20, 24, 32 ) );
-		p.drawRect( 0, 0, width()-1, height()-1 );
-		
-		p.rotate( -90 );
-		p.setPen( m_mv->currentFxLine() == this ?
-					QColor( 0, 255, 0 ) : Qt::white );
-		p.setFont( pointSizeF( font(), 7.5f ) );
-		p.drawText( -70, 20, m_name );
-	}
-
-	virtual void mousePressEvent( QMouseEvent * )
-	{
-		m_mv->setCurrentFxLine( this );
-	}
-
-	virtual void mouseDoubleClickEvent( QMouseEvent * )
-	{
-		bool ok;
-		QString new_name = QInputDialog::getText( this,
-				fxMixerView::tr( "Rename FX channel" ),
-				fxMixerView::tr( "Enter the new name for this "
-							"FX channel" ),
-				QLineEdit::Normal, m_name, &ok );
-		if( ok && !new_name.isEmpty() )
-		{
-			m_name = new_name;
-			update();
-		}
-	}
-
-private:
-	fxMixerView * m_mv;
-	QString & m_name;
-
-} ;
-
-
-
-
-fxMixerView::fxMixerView() :
-	QWidget(),
-	modelView( NULL )
-{
-	engine::getMainWindow()->workspace()->addSubWindow( this );
-
-	fxMixer * m = engine::getFxMixer();
-
-	QPalette pal = palette();
-	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
-	setPalette( pal );
-	setAutoFillBackground( TRUE );
-	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
-
-	setWindowTitle( tr( "FX-Mixer" ) );
-//	setWindowIcon( embed::getIconPixmap( "fxmixer" ) );
-
-	QHBoxLayout * ml = new QHBoxLayout;
-	ml->setMargin( 0 );
-	ml->setSpacing( 0 );
-
-	QScrollArea * a = new QScrollArea( this );
-	a->setFrameShape( QFrame::NoFrame );
-	a->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	a->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-	a->setFixedHeight( 250 );
-	ml->addWidget( a );
-
-	QWidget * base = new QWidget;
-	QHBoxLayout * bl = new QHBoxLayout( base );
-	bl->setSpacing( 0 );
-	bl->setMargin( 0 );
-	a->setWidget( base );
-
-	base->setFixedSize( (NumFxChannels+1)*33+6+10, 236 );
-	pal = base->palette();
-	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
-	base->setPalette( pal );
-	base->setAutoFillBackground( TRUE );
-
-
-	m_fxRackArea = new QWidget;
-	ml->addSpacing( 10 );
-	ml->addWidget( m_fxRackArea );
-	setLayout( ml );
-
-	QHBoxLayout * fxl = new QHBoxLayout;
-	fxl->setSpacing( 0 );
-	fxl->setMargin( 0 );
-
-
-	bl->addSpacing( 6 );
-
-	for( int i = 0; i < NumFxChannels+1; ++i )
-	{
-		fxChannelView * cv = &m_fxChannelViews[i];
-		cv->m_fxLine = new fxLine( base, this,
-						m->m_fxChannels[i]->m_name  );
-		bl->addWidget( cv->m_fxLine );
-		bl->addSpacing( i == 0 ? 10 : 1 );
-		lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
-		l->model()->setRange( i, i );
-		l->model()->setValue( i );
-		l->move( 2, 4 );
-		l->setMarginWidth( 1 );
-
-		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
-								cv->m_fxLine );
-		cv->m_fader->move( 15-cv->m_fader->width()/2,
-						cv->m_fxLine->height()-130 );
-		cv->m_rackView = new effectRackView(
-				&m->m_fxChannels[i]->m_fxChain, NULL );
-		fxl->addWidget( cv->m_rackView );
-	}
-	fxl->addStretch();
-
-	m_fxRackArea->setLayout( fxl );
-
-	setCurrentFxLine( m_fxChannelViews[0].m_fxLine );
-
-	QTimer * t = new QTimer( this );
-	connect( t, SIGNAL( timeout() ), this, SLOT( updateFaders() ) );
-	t->start( 50 );
-
-	// we want to receive dataChanged-signals in order to update
-	setModel( m );
-}
-
-
-
-
-fxMixerView::~fxMixerView()
-{
-}
-
-
-
-
-void fxMixerView::setCurrentFxLine( fxLine * _line )
-{
-	m_currentFxLine = _line;
-	for( int i = 0; i < NumFxChannels+1; ++i )
-	{
-		if( m_fxChannelViews[i].m_fxLine == _line )
-		{
-			m_fxChannelViews[i].m_rackView->show();
-		}
-		else
-		{
-			m_fxChannelViews[i].m_rackView->hide();
-		}
-		m_fxChannelViews[i].m_fxLine->update();
-	}
-}
-
-
-
-
-void fxMixerView::clear( void )
-{
-	for( int i = 0; i <= NumFxChannels; ++i )
-	{
-		m_fxChannelViews[i].m_rackView->clear();
-	}
-}
-
-
-
-
-void fxMixerView::updateFaders( void )
-{
-	fxMixer * m = engine::getFxMixer();
-	for( int i = 0; i < NumFxChannels+1; ++i )
-	{
-		const float opl = m_fxChannelViews[i].m_fader->getPeak_L();
-		const float opr = m_fxChannelViews[i].m_fader->getPeak_R();
-		const float fall_off = 1.1;
-		if( m->m_fxChannels[i]->m_peakLeft > opl )
-		{
-			m_fxChannelViews[i].m_fader->setPeak_L(
-					m->m_fxChannels[i]->m_peakLeft );
-		}
-		else
-		{
-			m_fxChannelViews[i].m_fader->setPeak_L( opl/fall_off );
-		}
-		if( m->m_fxChannels[i]->m_peakRight > opr )
-		{
-			m_fxChannelViews[i].m_fader->setPeak_R(
-					m->m_fxChannels[i]->m_peakRight );
-		}
-		else
-		{
-			m_fxChannelViews[i].m_fader->setPeak_R( opr/fall_off );
-		}
-	}
-}
-
-
-
-#include "fx_mixer.moc"
 
 #endif

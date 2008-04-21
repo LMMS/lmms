@@ -41,3 +41,9 @@ trackWidget {
 QWidget#mainToolbar {
 	background-image: url(resources:main_toolbar_bg.png);
 }
+
+fxMixerView QPushButton {
+	font-size: 9px;
+}
+
+
