@@ -80,11 +80,13 @@
 
 
 
-songEditor::songEditor( song * _song ) :
+songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	trackContainerView( _song ),
 	m_s( _song ),
 	m_scrollBack( FALSE )
 {
+	_engine_ptr = this;
+
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
@@ -371,6 +373,7 @@ songEditor::songEditor( song * _song ) :
 
 	w->show();
 
+	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 }
 
 
@@ -383,10 +386,10 @@ songEditor::~songEditor()
 
 
 
-void songEditor::paintEvent( QPaintEvent * _pe )
+void songEditor::scrolled( int _new_pos )
 {
-	m_leftRightScroll->setMaximum( m_s->length() );
-	trackContainerView::paintEvent( _pe );
+	update();
+	emit positionChanged( m_currentPosition = midiTime( _new_pos, 0 ) );
 }
 
 
@@ -448,11 +451,18 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-
-void songEditor::scrolled( int _new_pos )
+void songEditor::paintEvent( QPaintEvent * _pe )
 {
-	update();
-	emit positionChanged( m_currentPosition = midiTime( _new_pos, 0 ) );
+	m_leftRightScroll->setMaximum( m_s->length() );
+	trackContainerView::paintEvent( _pe );
+}
+
+
+
+
+void songEditor::timerEvent( QTimerEvent * )
+{
+	emit periodicUpdate();
 }
 
 
