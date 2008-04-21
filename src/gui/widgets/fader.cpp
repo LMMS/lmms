@@ -51,6 +51,10 @@
 
 #include "fader.h"
 #include "embed.h"
+#include "caption_menu.h"
+#include "automation_pattern.h"
+#include "automatable_model_templates.h"
+
 
 
 fader::fader( floatModel * _model, QWidget * _parent ) :
@@ -80,6 +84,24 @@ fader::~fader()
 
 
 
+
+void fader::contextMenuEvent( QContextMenuEvent * _ev )
+{
+	if( !model()->nullTrack() )
+	{
+		captionMenu contextMenu( accessibleName() );
+		contextMenu.addAction( embed::getIconPixmap( "automation" ),
+					tr( "&Open in automation editor" ),
+					model()->getAutomationPattern(),
+					SLOT( openInAutomationEditor() ) );
+		contextMenu.exec( QCursor::pos() );
+		_ev->accept();
+	}
+}
+
+
+
+
 void fader::mouseMoveEvent( QMouseEvent *ev )
 {
 	float fVal = (float)( height() - ev->y() ) / (float)height();
@@ -94,7 +116,11 @@ void fader::mouseMoveEvent( QMouseEvent *ev )
 
 void fader::mousePressEvent(QMouseEvent *ev)
 {
-	mouseMoveEvent( ev );
+	if( ev->button() == Qt::LeftButton )
+	{
+		mouseMoveEvent( ev );
+		ev->accept();
+	}
 }
 
 
