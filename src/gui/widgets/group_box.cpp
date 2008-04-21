@@ -25,10 +25,6 @@
  */
 
 
-#include "group_box.h"
-
-
-#include <QtCore/QTimer>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
@@ -40,6 +36,7 @@
 #include <math.h>
 
 
+#include "group_box.h"
 #include "embed.h"
 #include "gui_templates.h"
 
