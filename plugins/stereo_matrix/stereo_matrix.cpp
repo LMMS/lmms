@@ -81,13 +81,24 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 	
 	for( fpp_t f = 0; f < _frames; ++f )
 	{	
+		const float d = getDryLevel();
+		const float w = getWetLevel();
+		
 		sample_t l = _buf[f][0];
 		sample_t r = _buf[f][1];
-		_buf[f][0] = m_smControls.m_llModel.value( f ) * l  +
-					m_smControls.m_rlModel.value( f ) * r;
 
-		_buf[f][1] = m_smControls.m_lrModel.value( f ) * l  +
-					m_smControls.m_rrModel.value( f ) * r;
+		// Init with dry-mix
+		_buf[f][0] = l * d;
+		_buf[f][1] = r * d;
+
+		// Add it wet
+		_buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
+					m_smControls.m_rlModel.value( f ) * r ) * w;
+
+		_buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
+					m_smControls.m_rrModel.value( f ) * r ) * w;
+
+
 	}
 
 	return( isRunning() );

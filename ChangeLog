@@ -13,6 +13,10 @@
 	- shade volume bars according to volume
 	- fixed drawing of background while scrolling
 
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	Made wet/dry knob do something. Acts as a nice panning knob when the
+	matrix has the channels swapped.
+
 2008-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/widgets/group_box.cpp:
