@@ -255,7 +255,7 @@ void fxMixerView::setCurrentFxLine( int _line )
 	{
 		setCurrentFxLine( m_fxChannelViews[_line].m_fxLine );
 		
-		m_bankButtons->button( _line / 16 )->click();
+		m_bankButtons->button( (_line-1) / 16 )->click();
 	}
 }
 
