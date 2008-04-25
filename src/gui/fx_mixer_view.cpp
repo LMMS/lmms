@@ -185,17 +185,18 @@ fxMixerView::fxMixerView() :
 			QVBoxLayout * l = new QVBoxLayout;
 			l->addSpacing( 10 );
 			QButtonGroup * g = new QButtonGroup( this );
+			m_bankButtons = g;
 			g->setExclusive( TRUE );
 			for( int j = 0; j < 4; ++j )
 			{
 				QToolButton * btn = new QToolButton;
 				btn->setText( QString( 'A'+j ) );
 				btn->setCheckable( TRUE );
+				btn->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
 				l->addWidget( btn );
 				g->addButton( btn, j );
 				btn->setChecked( j == 0);
 			}
-			l->addStretch( 1 );
 			ml->addLayout( l );
 			connect( g, SIGNAL( buttonClicked( int ) ),
 				m_fxLineBanks, SLOT( setCurrentIndex( int ) ) );
@@ -243,6 +244,18 @@ void fxMixerView::setCurrentFxLine( fxLine * _line )
 			m_fxRacksLayout->setCurrentIndex( i );
 		}
 		m_fxChannelViews[i].m_fxLine->update();
+	}
+}
+
+
+
+void fxMixerView::setCurrentFxLine( int _line )
+{
+	if ( _line >= 0 && _line < NumFxChannels+1 )
+	{
+		setCurrentFxLine( m_fxChannelViews[_line].m_fxLine );
+		
+		m_bankButtons->button( _line / 16 )->click();
 	}
 }
 

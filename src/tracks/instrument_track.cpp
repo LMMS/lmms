@@ -52,6 +52,7 @@
 #include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
+#include "fx_mixer_view.h"
 #include "instrument_sound_shaping.h"
 #include "instrument_sound_shaping_view.h"
 #include "fade_button.h"
@@ -1014,7 +1015,20 @@ void instrumentTrackView::updateName( void )
 
 
 
+class fxLineLcdSpinBox : public lcdSpinBox 
+{
+	public:
+		fxLineLcdSpinBox( int _num_digits, QWidget * _parent, 
+				const QString & _name ) :
+			lcdSpinBox( _num_digits, _parent, _name ) {}
 
+	protected:
+		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
+		{
+			engine::getFxMixerView()->setCurrentFxLine( value() );
+			//engine::getFxMixerView()->raise();
+		}
+};
 
 
 
@@ -1069,12 +1083,11 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new lcdSpinBox( 2, m_generalSettingsWidget,
+	m_effectChannelNumber = new fxLineLcdSpinBox( 2, m_generalSettingsWidget,
 						tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
 	m_effectChannelNumber->move( m_panningKnob->x() +
 					m_panningKnob->width() + 16, 44 );
-
 
 	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
 							"project_save" ), "",

@@ -32,6 +32,7 @@
 
 
 class QStackedLayout;
+class QButtonGroup;
 class fader;
 class fxLine;
 class effectRackView;
@@ -51,6 +52,7 @@ public:
 		return( m_currentFxLine );
 	}
 	void setCurrentFxLine( fxLine * _line );
+	void setCurrentFxLine( int _line );
 
 	void clear( void );
 
@@ -73,6 +75,7 @@ private:
 
 	QStackedLayout * m_fxRacksLayout;
 	QStackedLayout * m_fxLineBanks;
+	QButtonGroup * m_bankButtons;
 	fxLine * m_currentFxLine;
 
 } ;

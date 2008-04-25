@@ -1206,7 +1206,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				int tmp = abs( pos_ticks - (int)( (*it)->pos() ) );
 			
-				if( tmp < shortDistance && (*it)->length().getTicks() > 0 )
+				if( tmp <= shortDistance && (*it)->length().getTicks() > 0 )
 				{
 					shortDistance = tmp;
 					shortNote = *it ;
