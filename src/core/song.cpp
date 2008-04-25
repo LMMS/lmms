@@ -210,6 +210,7 @@ void song::doActions( void )
 			case ActionPlaySong:
 				m_playMode = Mode_PlaySong;
 				m_playing = TRUE;
+				controller::resetFrameCounter();
 				break;
 
 			case ActionPlayTrack:

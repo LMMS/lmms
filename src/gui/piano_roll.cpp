@@ -457,8 +457,6 @@ pianoRoll::~pianoRoll()
 }
 
 
-
-
 void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 {
 	m_pattern = _new_pattern;
@@ -1183,11 +1181,61 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		x -= WHITE_KEY_WIDTH;
 
-		if( edit_note == TRUE || m_action == CHANGE_NOTE_VOLUME )
+		// Volume Bars
+		if( ( edit_note == TRUE || m_action == CHANGE_NOTE_VOLUME ) &&
+				_me->buttons() & Qt::LeftButton )
 		{
-			if( m_action == CHANGE_NOTE_VOLUME &&
-							m_currentNote != NULL )
+			// Use nearest-note when changing volume so the bars can
+			// be "scribbled"
+			int pos_ticks = ( x * DefaultTicksPerTact ) / m_ppt +
+						m_currentPosition;
+
+			// get note-vector of current pattern
+			const noteVector & notes = m_pattern->notes();
+
+			// will be our iterator in the following loop
+			noteVector::const_iterator it = notes.begin();
+			
+			note * shortNote = NULL;
+			
+			// Max "snap length" 1/8 note on either side
+			int shortDistance = DefaultTicksPerTact/8;
+
+			// loop through vector to find nearest note
+			while( it != notes.end() )
 			{
+				int tmp = abs( pos_ticks - (int)( (*it)->pos() ) );
+			
+				if( tmp < shortDistance && (*it)->length().getTicks() > 0 )
+				{
+					shortDistance = tmp;
+					shortNote = *it ;
+
+				}
+				++it;
+
+			}
+
+			if( shortNote != m_currentNote && 
+					engine::getSong()->playing() == FALSE )
+			{
+				if( m_currentNote != NULL ) {
+					m_pattern->getInstrumentTrack()->processInEvent(
+						midiEvent( NOTE_OFF, 0,
+						m_currentNote->key(), 0 ), midiTime() );
+				}
+				
+				if( shortNote != NULL ) {
+					m_lastKey = shortNote->key();
+
+					m_pattern->getInstrumentTrack()->processInEvent(
+					midiEvent( NOTE_ON, 0,
+					shortNote->key(), shortNote->getVolume() ), midiTime() );
+				}
+			}
+			m_currentNote = shortNote;
+
+			if( m_currentNote != NULL ) {
 				volume vol = tLimit<int>( 2 * ( -_me->y() +
 								height() -
 							PR_BOTTOM_MARGIN ),
@@ -1894,7 +1942,9 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 							( *it )->length() < 0 );
 			}
 			// draw volume-line of note
-			p.setPen( QPen( QColor( 32, 255, 32, 160 ),
+			QColor color = QColor::fromHsv( 120, 221, 
+					tMin(255, 60 + ( *it )->getVolume() ) );
+			p.setPen( QPen( color,
 							NE_LINE_WIDTH ) );
 			p.drawLine( x + WHITE_KEY_WIDTH,
 					height() - PR_BOTTOM_MARGIN -

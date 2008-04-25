@@ -70,7 +70,7 @@ public:
 		return tLimit<float>( _val, 0.0f, 1.0f );
 	}
 
-	static int runningFrames();
+	static unsigned int runningFrames();
 	static float runningTime();
 
 	static void triggerFrameCounter( void );

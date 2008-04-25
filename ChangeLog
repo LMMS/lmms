@@ -1,3 +1,18 @@
+2008-04-24	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* src/core/song.cpp:
+	Reset LFO counter on song play
+
+	* src/core/controller.cpp:
+	* include/controller.h:
+	Change counter from signed int to unsigned
+
+	* src/gui/piano_roll.cpp:
+	- Allow volume bars to be modified by clicking one bar, then 
+	sweeping the mouse
+	- shade volume bars according to volume
+
+
 2008-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/widgets/group_box.cpp:

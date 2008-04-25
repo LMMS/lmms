@@ -74,7 +74,7 @@ float controller::value( int _offset )
 
 
 // Get position in frames
-int controller::runningFrames()
+unsigned int controller::runningFrames()
 {
 	return s_frames;
 }
@@ -91,6 +91,10 @@ void controller::triggerFrameCounter( void )
 {
 	for( int i = 0; i < s_controllers.size(); ++i ) 
 	{
+		// This signal is for updating values for both stubborn knobs and for
+		// painting.  If we ever get all the widgets to use or at least check
+		// currentValue() then we can throttle the signal and only use it for
+		// GUI.
 		emit s_controllers.at(i)->valueChanged();
 	}
 
