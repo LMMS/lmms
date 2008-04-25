@@ -1,3 +1,8 @@
+2008-04-25	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	Fixed samplelength loading
+
 2008-04-24	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/core/song.cpp:
