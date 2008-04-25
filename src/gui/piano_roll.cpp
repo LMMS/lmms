@@ -1819,7 +1819,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// draw vertical raster
 	int tact_16th = m_currentPosition / ( DefaultTicksPerTact / 16 );
 	const int offset = ( m_currentPosition % (DefaultTicksPerTact/16) ) *
-					m_ppt / DEFAULT_STEPS_PER_TACT / 8;
+					m_ppt / DefaultTicksPerTact;
+
 	for( int x = WHITE_KEY_WIDTH - offset; x < width();
 			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
 	{
