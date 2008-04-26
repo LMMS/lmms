@@ -1,3 +1,12 @@
+2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	- made delay-buffer a simple stereo-buffer instead of
+	  surround-frame-buffer
+	- added missing call in constructor to clear newly created
+	  delay-buffer - fixes bad distorted sound in various scenarios
+
 2008-04-25	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/bit_invader/bit_invader.cpp:
@@ -14,7 +23,7 @@
 
 	* src/gui/piano_roll.cpp:
 	- Allow volume bars to be modified by clicking one bar, then 
-	sweeping the mouse
+	  sweeping the mouse
 	- shade volume bars according to volume
 	- fixed drawing of background while scrolling
 
@@ -28,7 +37,7 @@
 	- Made bank-buttons easier to hit
 	- Double click on fx-channel LCD in ITW to warp to the proper FX-line
 
-2008-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-04-20	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/widgets/group_box.cpp:
 	* plugins/sf2_player/sf2_player.cpp:

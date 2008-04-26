@@ -55,11 +55,12 @@ stereoEnhancerEffect::stereoEnhancerEffect(
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( effectLib::stereoEnhancer<>( 0.0f ) ),
-	m_delayBuffer( new surroundSampleFrame[DEFAULT_BUFFER_SIZE] ),
+	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
 	m_bbControls( this )
 {
 	// TODO:  Make m_delayBuffer customizable?
+	clearMyBuffer();
 }
 
 

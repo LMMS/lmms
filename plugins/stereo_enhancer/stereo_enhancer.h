@@ -54,7 +54,7 @@ public:
 private:
 	effectLib::stereoEnhancer<> m_seFX;
 	
-	surroundSampleFrame * m_delayBuffer;
+	sampleFrame * m_delayBuffer;
 	int m_currFrame;
 	
 	stereoEnhancerControls m_bbControls;
