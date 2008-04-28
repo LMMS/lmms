@@ -287,7 +287,7 @@ arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this ),
 	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 1.0, this ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this ),
-	m_arpDirectionModel( 0, 0, 0, intModel::defaultRelStep(), this ),
+	m_arpDirectionModel( 0, 0, NumArpDirections, intModel::defaultRelStep(), this ),
 	m_arpModeModel( this )
 {
 	m_arpEnabledModel.setTrack( _instrument_track );

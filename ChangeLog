@@ -4,6 +4,10 @@
 	* plugins/sf2_player/sf2_player.h:
 	Add gain, chorus, and reverb controls
 
+	* include/instrument_functions.h:
+	* src/core/instrument_functions.cpp:
+	Fixed arpeggio direction loading
+
 2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.cpp:

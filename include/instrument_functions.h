@@ -99,7 +99,8 @@ public:
 		ArpDirUp,
 		ArpDirDown,
 		ArpDirUpAndDown,
-		ArpDirRandom
+		ArpDirRandom,
+		NumArpDirections
 	} ;
 
 	arpeggiator( instrumentTrack * _instrument_track );
