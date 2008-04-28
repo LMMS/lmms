@@ -78,7 +78,18 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_bankNum( -1, -1, 999, 1, this ),
-	m_patchNum( -1, -1, 127, 1, this )
+	m_patchNum( -1, -1, 127, 1, this ),
+	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this ),
+	m_reverbOn( 0, this ),
+	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this ),
+	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this ),
+	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this ),
+	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this ),
+	m_chorusOn( 0, this ),
+	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this ),
+	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this ),
+	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this ),
+	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this )
 {
 	for( int i = 0; i < 128; ++i )
 	{
@@ -97,7 +108,12 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	engine::getMixer()->addPlayHandle( iph );
 
 	updateSampleRate();
+	updateReverbOn();
+	updateReverb();
+	updateChorusOn();
+	updateChorus();
 
+	
 	connect( &m_bankNum, SIGNAL( dataChanged() ),
 			this, SLOT( updatePatch() ) );
 
@@ -106,6 +122,42 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateSampleRate() ) );
+
+	// Gain
+	connect( &m_gain, SIGNAL( dataChanged() ),
+			this, SLOT( updateGain() ) );
+
+	// Reverb
+	connect( &m_reverbOn, SIGNAL( dataChanged() ),
+			this, SLOT( updateReverbOn() ) );
+
+	connect( &m_reverbRoomSize, SIGNAL( dataChanged() ),
+			this, SLOT( updateReverb() ) );
+
+	connect( &m_reverbDamping, SIGNAL( dataChanged() ),
+			this, SLOT( updateReverb() ) );
+
+	connect( &m_reverbWidth, SIGNAL( dataChanged() ),
+			this, SLOT( updateReverb() ) );
+
+	connect( &m_reverbLevel, SIGNAL( dataChanged() ),
+			this, SLOT( updateReverb() ) );
+
+	// Chorus
+	connect( &m_chorusOn, SIGNAL( dataChanged() ),
+			this, SLOT( updateChorusOn() ) );
+
+	connect( &m_chorusNum, SIGNAL( dataChanged() ),
+			this, SLOT( updateChorus() ) );
+
+	connect( &m_chorusLevel, SIGNAL( dataChanged() ),
+			this, SLOT( updateChorus() ) );
+
+	connect( &m_chorusSpeed, SIGNAL( dataChanged() ),
+			this, SLOT( updateChorus() ) );
+
+	connect( &m_chorusDepth, SIGNAL( dataChanged() ),
+			this, SLOT( updateChorus() ) );
 }
 
 
@@ -130,7 +182,22 @@ void sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", m_filename );
 	m_patchNum.saveSettings( _doc, _this, "patch" );
 	m_bankNum.saveSettings( _doc, _this, "bank" );
+
+	m_gain.saveSettings( _doc, _this, "gain" );
+
+	m_reverbOn.saveSettings( _doc, _this, "reverbOn" );
+	m_reverbRoomSize.saveSettings( _doc, _this, "reverbRoomSize" );
+	m_reverbDamping.saveSettings( _doc, _this, "reverbDamping" );
+	m_reverbWidth.saveSettings( _doc, _this, "reverbWidth" );
+	m_reverbLevel.saveSettings( _doc, _this, "reverbLevel" );
+
+	m_chorusOn.saveSettings( _doc, _this, "chorusOn" );
+	m_chorusNum.saveSettings( _doc, _this, "chorusNum" );
+	m_chorusLevel.saveSettings( _doc, _this, "chorusLevel" );
+	m_chorusSpeed.saveSettings( _doc, _this, "chorusSpeed" );
+	m_chorusDepth.saveSettings( _doc, _this, "chorusDepth" );
 }
+
 
 
 
@@ -139,6 +206,20 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	openFile( _this.attribute( "src" ) );
 	m_patchNum.loadSettings( _this, "patch" );
 	m_bankNum.loadSettings( _this, "bank" );
+
+	m_gain.loadSettings( _this, "gain" );
+
+	m_reverbOn.loadSettings( _this, "reverbOn" );
+	m_reverbRoomSize.loadSettings( _this, "reverbRoomSize" );
+	m_reverbDamping.loadSettings( _this, "reverbDamping" );
+	m_reverbWidth.loadSettings( _this, "reverbWidth" );
+	m_reverbLevel.loadSettings( _this, "reverbLevel" );
+
+	m_chorusOn.loadSettings( _this, "chorusOn" );
+	m_chorusNum.loadSettings( _this, "chorusNum" );
+	m_chorusLevel.loadSettings( _this, "chorusLevel" );
+	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
+	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 }
 
 
@@ -257,6 +338,49 @@ void sf2Instrument::updatePatch( void )
 
 
 
+void sf2Instrument::updateGain( void )
+{
+	fluid_synth_set_gain( m_synth, m_gain.value() );
+}
+
+
+
+
+void sf2Instrument::updateReverbOn( void )
+{
+	fluid_synth_set_reverb_on( m_synth, m_chorusOn.value() );
+}
+
+
+
+
+void sf2Instrument::updateReverb( void )
+{
+	fluid_synth_set_reverb( m_synth, m_reverbRoomSize.value(),
+			m_reverbDamping.value(), m_reverbWidth.value(),
+			m_reverbLevel.value() );
+}
+
+
+
+
+void  sf2Instrument::updateChorusOn( void )
+{
+	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() );
+}
+
+
+
+
+void  sf2Instrument::updateChorus( void )
+{
+	fluid_synth_set_chorus( m_synth, static_cast<int>( m_chorusNum.value() ),
+			m_chorusLevel.value(), m_chorusSpeed.value(),
+			m_chorusDepth.value(), 0 );
+}
+
+
+
 void sf2Instrument::updateSampleRate( void )
 {	
 	double tempRate;
@@ -315,7 +439,7 @@ void sf2Instrument::updateSampleRate( void )
 
 void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 {
-	const double LOG440 = 2.643452676486187f;
+	const double LOG440 = 2.643452676486187424842455584439449012279510498046875f;
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
@@ -347,7 +471,8 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 }
 
 
-
+// Could we get iph-based instruments support sample-exact models by using a 
+// frame-length of 1 while rendering?
 void sf2Instrument::play( bool _try_parallelizing,
 						sampleFrame * _working_buffer )
 {
@@ -488,6 +613,81 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	hl->addWidget( m_filenameLabel );
 	vl->addLayout( hl );
 
+	// Gain
+	m_gainKnob = new knob( knobSmall_17, this,
+			tr( "Gain" ) );
+	m_gainKnob->setHintText( tr("Gain") + " ", "" );
+	m_gainKnob->setLabel( tr("GAIN") );
+	vl->addWidget( m_gainKnob );
+
+	// Reverb
+	hl = new QHBoxLayout();
+
+	m_reverbOnLed = new ledCheckBox( "REVERB", this, tr( "Reverb" ) );
+
+	m_reverbRoomSizeKnob = new knob( knobSmall_17, this,
+			tr( "Reverb Roomsize" ) );
+	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:") + " ", "" );
+	m_reverbRoomSizeKnob->setLabel( tr("SIZE") );
+
+	m_reverbDampingKnob = new knob( knobSmall_17, this,
+			tr( "Reverb Damping" ) );
+	m_reverbDampingKnob->setHintText( tr("Reverb Damping:") + " ", "" );
+	m_reverbDampingKnob->setLabel( tr("DAMP") );
+
+	m_reverbWidthKnob = new knob( knobSmall_17, this,
+			tr( "Reverb Width" ) );
+	m_reverbWidthKnob->setHintText( tr("Reverb Width:") + " ", "" );
+	m_reverbWidthKnob->setLabel( tr("WIDTH") );
+
+	m_reverbLevelKnob = new knob( knobSmall_17, this,
+			tr( "Reverb Level" ) );
+	m_reverbLevelKnob->setHintText( tr("Reverb Level:") + " ", "" );
+	m_reverbLevelKnob->setLabel( tr("LEVEL") );
+
+	hl->addWidget( m_reverbOnLed );
+	hl->addWidget( m_reverbRoomSizeKnob );
+	hl->addWidget( m_reverbDampingKnob );
+	hl->addWidget( m_reverbWidthKnob );
+	hl->addWidget( m_reverbLevelKnob );
+
+	vl->addLayout( hl );
+
+	// Chorus
+	hl = new QHBoxLayout();
+
+	m_chorusOnLed = new ledCheckBox( "CHORUS", this, tr( "Chorus" ) );
+
+	m_chorusNumKnob = new knob( knobSmall_17, this,
+			tr( "Chorus Lines" ) );
+	m_chorusNumKnob->setHintText( tr("Chorus Lines:") + " ", "" );
+	m_chorusNumKnob->setLabel( tr("NUM") );
+
+	m_chorusLevelKnob = new knob( knobSmall_17, this,
+			tr( "Chorus Level" ) );
+	m_chorusLevelKnob->setHintText( tr("Chorus Level:") + " ", "" );
+	m_chorusLevelKnob->setLabel( tr("LEVEL") );
+
+	m_chorusSpeedKnob = new knob( knobSmall_17, this,
+			tr( "Chorus Speed" ) );
+	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:") + " ", "" );
+	m_chorusSpeedKnob->setLabel( tr("SPD") );
+
+	m_chorusDepthKnob = new knob( knobSmall_17, this,
+			tr( "Chorus Depth" ) );
+	m_chorusDepthKnob->setHintText( tr("Chorus Depth:") + " ", "" );
+	m_chorusDepthKnob->setLabel( tr("DEPTH") );
+
+	hl->addWidget( m_chorusOnLed );
+	hl->addWidget( m_chorusNumKnob);
+	hl->addWidget( m_chorusLevelKnob);
+	hl->addWidget( m_chorusSpeedKnob);
+	hl->addWidget( m_chorusDepthKnob);
+
+	vl->addLayout( hl );
+
+
+
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
@@ -495,6 +695,7 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	setPalette( pal );
 
 	updateFilename();
+
 }
 
 
@@ -512,6 +713,21 @@ void sf2InstrumentView::modelChanged( void )
 	sf2Instrument * k = castModel<sf2Instrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
 	m_patchNumLcd->setModel( &k->m_patchNum );
+	
+	m_gainKnob->setModel( &k->m_gain );
+
+	m_reverbOnLed->setModel( &k->m_reverbOn );
+	m_reverbRoomSizeKnob->setModel( &k->m_reverbRoomSize );
+	m_reverbDampingKnob->setModel( &k->m_reverbDamping );
+	m_reverbWidthKnob->setModel( &k->m_reverbWidth );
+	m_reverbLevelKnob->setModel( &k->m_reverbLevel );
+
+	m_chorusOnLed->setModel( &k->m_chorusOn );
+	m_chorusNumKnob->setModel( &k->m_chorusNum );
+	m_chorusLevelKnob->setModel( &k->m_chorusLevel );
+	m_chorusSpeedKnob->setModel( &k->m_chorusSpeed );
+	m_chorusDepthKnob->setModel( &k->m_chorusDepth );
+
 
 	connect(k, SIGNAL( fileChanged( void ) ),
 			this, SLOT( updateFilename( void ) ) );

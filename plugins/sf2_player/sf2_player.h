@@ -33,6 +33,7 @@
 #include "instrument_view.h"
 #include "knob.h"
 #include "lcd_spinbox.h"
+#include "led_checkbox.h"
 #include "fluidsynth.h"
 #include "sample_buffer.h"
 
@@ -85,6 +86,14 @@ public slots:
 	void openFile( const QString & _sf2File );
 	void updatePatch( void );
 	void updateSampleRate( void );
+	
+	// We can't really support sample-exact with the way IPH and FS work.
+	// So, sig/slots work just fine for the synth settings right now.
+	void updateReverbOn( void );
+	void updateReverb( void );
+	void updateChorusOn( void );
+	void updateChorus( void );
+	void updateGain( void );
 
 
 private:
@@ -113,6 +122,21 @@ private:
 
 	lcdSpinBoxModel m_bankNum;
 	lcdSpinBoxModel m_patchNum;
+
+	knobModel m_gain;
+
+	boolModel m_reverbOn;
+	knobModel m_reverbRoomSize;
+	knobModel m_reverbDamping;
+	knobModel m_reverbWidth;
+	knobModel m_reverbLevel;
+
+	boolModel m_chorusOn;
+	knobModel m_chorusNum;
+	knobModel m_chorusLevel;
+	knobModel m_chorusSpeed;
+	knobModel m_chorusDepth;
+
 
 private:
 	void freeFont( void );
@@ -161,6 +185,20 @@ private:
 	lcdSpinBox * m_patchNumLcd;
 
 	QLabel * m_filenameLabel;
+
+	knob	* m_gainKnob;
+
+	ledCheckBox	* m_reverbOnLed;
+	knob	* m_reverbRoomSizeKnob;
+	knob	* m_reverbDampingKnob;
+	knob	* m_reverbWidthKnob;
+	knob	* m_reverbLevelKnob;
+
+	ledCheckBox * m_chorusOnLed;
+	knob * m_chorusNumKnob;
+	knob * m_chorusLevelKnob;
+	knob * m_chorusSpeedKnob;
+	knob * m_chorusDepthKnob;
 
 	static patchesDialog * s_patchDialog;
 

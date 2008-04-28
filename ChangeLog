@@ -1,3 +1,9 @@
+2008-04-28	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	Add gain, chorus, and reverb controls
+
 2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.cpp:
