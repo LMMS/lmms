@@ -14,7 +14,6 @@
 	* src/gui/widgets/effect_view.cpp:
 	Make effect controls window non-resizeable and remove maximize button
 
-
 2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.cpp:
