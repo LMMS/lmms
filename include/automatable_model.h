@@ -108,12 +108,26 @@ public:
 	{
 		if( m_controller != NULL )
 		{
+			/*return minValue() + castValue( m_range *
+				m_equation->evaluate();*/
+			
 			return minValue() + castValue( m_range * 
 				 m_controller->currentValue( _frameOffset ) );
 		}
 
 		return m_value;
 	}
+
+	// TODO: Combine factory and equation?
+	/*
+	setMappingEquation( string eq )
+	{
+		modelSymbolFactory 	factory( this );
+		equationCompiler	cmp( factory );
+		
+		m_equation = cmp.compile( eq );
+	}
+	*/
 
 
 	inline controller * getController( void ) const

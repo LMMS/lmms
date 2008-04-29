@@ -219,8 +219,26 @@ void effectRackView::addEffect( void )
 		return;
 	}
 
-	fxChain()->appendEffect( esd.instantiateSelectedPlugin( fxChain() ) );
+	effect * fx = esd.instantiateSelectedPlugin( fxChain() );
+
+	fxChain()->m_enabledModel.setValue( TRUE );
+	fxChain()->appendEffect( fx );
 	update();
+
+	// Find the effectView, and show the controls
+	for( QVector<effectView *>::iterator vit =
+						m_effectViews.begin();
+			vit != m_effectViews.end(); ++vit )
+	{
+		if( ( *vit )->getEffect() == fx )
+		{
+			( *vit )->editControls();
+
+			break;
+		}
+	}
+
+
 }
 
 

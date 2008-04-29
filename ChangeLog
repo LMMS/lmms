@@ -8,6 +8,13 @@
 	* src/core/instrument_functions.cpp:
 	Fixed arpeggio direction loading
 
+	* src/gui/widgets/effect_rack_view.cpp:
+	Display effect window and enable fx-chain when adding an effect
+
+	* src/gui/widgets/effect_view.cpp:
+	Make effect controls window non-resizeable and remove maximize button
+
+
 2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.cpp:
