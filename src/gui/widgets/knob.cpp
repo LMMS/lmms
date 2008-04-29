@@ -597,7 +597,6 @@ void knob::connectToController( void )
 
 void knob::friendlyUpdate( void )
 {
-	//printf("%d v\n", controller::runningFrames() );
 	if( model()->getController() == NULL || controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
