@@ -52,6 +52,7 @@
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
+#include "fx_mixer_view.h" 
 #include "about_dialog.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
@@ -315,21 +316,16 @@ void mainWindow::finalize( void )
 				"in an easy way."
 				) );
 
-//TODO: Relocate effect board button
-/*	toolButton * effect_board_window = new toolButton(
+	toolButton * fx_mixer_window = new toolButton(
 					embed::getIconPixmap( "effect_board" ),
-					tr( "Show/hide EffectBoard" ) + " (F9)",
-					this, SLOT( emptySlot() ), m_toolBar );
-	effect_board_window->setShortcut( Qt::Key_F9 );
-#ifdef QT4
-	effect_board_window->setWhatsThis( 
-#else
-	QWhatsThis::add( effect_board_window,
-#endif
+					tr( "Show/hide FX Mixer" ) + " (F11)",
+					this, SLOT( toggleFxMixerWin() ), m_toolBar );
+	fx_mixer_window->setShortcut( Qt::Key_F11 );
+	fx_mixer_window->setWhatsThis( 
 		tr( "By pressing this button, you can show or hide the "
-			"EffectBoard. The EffectBoard is a very powerful tool "
+			"FX Mixer. The FX Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
-			"effects into different effect-channels." ) );*/
+			"effects into different effect-channels." ) );
 
 	toolButton * project_notes_window = new toolButton(
 					embed::getIconPixmap( "project_notes" ),
@@ -347,9 +343,8 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 2 );
 	m_toolBarLayout->addWidget( song_editor_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-//TODO: Relocate effect board
-	//m_toolBarLayout->addWidget( effect_board_window, 1, 4 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 5 );
+	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
+	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
@@ -838,6 +833,14 @@ void mainWindow::togglePianoRollWin( void )
 void mainWindow::toggleAutomationEditorWin( void )
 {
 	toggleWindow( engine::getAutomationEditor() );
+}
+
+
+
+
+void mainWindow::toggleFxMixerWin( void )
+{
+	toggleWindow( engine::getFxMixerView() );
 }
 
 

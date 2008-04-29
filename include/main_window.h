@@ -110,6 +110,7 @@ public slots:
 	void toggleBBEditorWin( void );
 	void toggleSongEditorWin( void );
 	void toggleProjectNotesWin( void );
+	void toggleFxMixerWin( void );
 	void togglePianoRollWin( void );
 
 	void undo( void );
