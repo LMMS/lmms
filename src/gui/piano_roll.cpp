@@ -1456,11 +1456,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// do horizontal move-stuff
 			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
-            printf( "%d = %d * %d / %d + %d\n", pos_ticks, x,
-                    (int)DefaultTicksPerTact, m_ppt, (int)m_currentPosition );
 			int ticks_diff = pos_ticks -
 							m_moveStartTick;
-            printf( "diff %d ", ticks_diff );
 			if( m_selectedTick > 0 )
 			{
 				if( (int) m_selectStartTick +
@@ -1484,8 +1481,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 			int tact_diff = ticks_diff / DefaultTicksPerTact;
 			ticks_diff = ticks_diff % DefaultTicksPerTact;
-
-            printf( "adj.diff %d tacts %d\n", ticks_diff, tact_diff );
 
 			// do vertical move-stuff
 			int key_diff = key_num - m_moveStartKey;
