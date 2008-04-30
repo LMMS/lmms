@@ -1,3 +1,9 @@
+2008-04-30	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* src/gui/piano_roll.cpp:
+	- Fixed moving of selected notes.
+	- TODO: Quantanize the movement to selected "Q"
+
 2008-04-29	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/main_window.h:

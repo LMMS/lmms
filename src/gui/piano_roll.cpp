@@ -1456,8 +1456,11 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// do horizontal move-stuff
 			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
+            printf( "%d = %d * %d / %d + %d\n", pos_ticks, x,
+                    (int)DefaultTicksPerTact, m_ppt, (int)m_currentPosition );
 			int ticks_diff = pos_ticks -
 							m_moveStartTick;
+            printf( "diff %d ", ticks_diff );
 			if( m_selectedTick > 0 )
 			{
 				if( (int) m_selectStartTick +
@@ -1482,6 +1485,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			int tact_diff = ticks_diff / DefaultTicksPerTact;
 			ticks_diff = ticks_diff % DefaultTicksPerTact;
 
+            printf( "adj.diff %d tacts %d\n", ticks_diff, tact_diff );
 
 			// do vertical move-stuff
 			int key_diff = key_num - m_moveStartKey;
@@ -1527,12 +1531,20 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								tact_diff;
 				int note_ticks = ( *it )->pos().getTicks() +
 								ticks_diff;
-				// ensure note_ticks range
+				
+                // ensure note_ticks range
+                if( note_ticks > DefaultTicksPerTact )
+                {
+                    note_tact += (note_ticks/DefaultTicksPerTact);
+                    note_ticks %= DefaultTicksPerTact;
+                }
+                /* Old 1/64th code
 				if( note_ticks >> 6 )
 				{
 					note_tact += note_ticks >> 6;
 					note_ticks &= 63;
 				}
+                */
 				midiTime new_note_pos( note_tact,
 							note_ticks );
 				( *it )->setPos( new_note_pos );
