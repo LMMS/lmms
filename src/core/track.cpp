@@ -488,12 +488,13 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
-			trackContentObject * tco =
-				dynamic_cast<trackContentObject *>( *it );
-			if( tco == NULL )
+			trackContentObjectView * tcov =
+				dynamic_cast<trackContentObjectView *>( *it );
+			if( tcov == NULL )
 			{
 				continue;
 			}
+			trackContentObject * tco = tcov->m_tco;
 			tcos.push_back( tco );
 			smallest_pos = tMin<Sint32>( smallest_pos,
 					(Sint32)tco->startPosition() +

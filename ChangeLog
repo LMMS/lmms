@@ -1,3 +1,8 @@
+2008-05-03	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/track.cpp:
+	fixed move of TCO-selections
+
 2008-04-30	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
