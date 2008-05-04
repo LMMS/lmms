@@ -27,6 +27,7 @@
 
 
 #include <QtXml/QDomElement>
+#include <QtGui/QPainter>
 
 
 #include "engine.h"
@@ -360,6 +361,60 @@ pluginView * organicInstrument::instantiateView( QWidget * _parent )
 }
 
 
+
+
+class organicKnob : public knob
+{
+public:
+	organicKnob( QWidget * _parent, const QString & _name ) :
+			knob( 0, _parent, _name )
+	{
+		setFixedSize( 21, 21 );
+	}
+
+	static const QPointF m_midPoint;
+
+protected:
+	virtual void paintEvent( QPaintEvent * _me )
+	{
+		QPainter p( this );
+		p.setRenderHint( QPainter::Antialiasing );
+
+		QLineF ln = calculateLine( m_midPoint, 8.7, 2 );
+		
+		QRadialGradient gradient(m_midPoint, 11);
+		gradient.setColorAt(0.2, QColor( 227, 18, 240 ) );
+		gradient.setColorAt(1, QColor( 0, 0, 0 ) );
+		
+		p.setPen( QPen( gradient, 2 ) );
+		p.drawLine( ln );
+	}
+};
+
+
+const QPointF organicKnob::m_midPoint = QPointF( 10.5, 10.5 );
+
+
+class organicVolumeKnob : virtual private organicKnob, virtual public volumeKnob
+{
+public:
+	organicVolumeKnob( QWidget * _parent, const QString & _name ) :
+			volumeKnob( 0, _parent, _name ),
+			organicKnob( _parent, _name )
+	{
+		organicKnob::setFixedSize( 21, 21 );
+	}
+
+protected:
+	virtual void paintEvent( QPaintEvent * _me )
+	{
+		organicKnob::paintEvent( _me );
+	}
+};
+
+
+
+
 organicInstrumentView::organicInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
@@ -414,6 +469,10 @@ organicInstrumentView::~organicInstrumentView()
 void organicInstrumentView::modelChanged( void )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
+	const float y=91.3;
+	const float rowHeight = 26.52f;
+	const float x=53.4;
+	const float colWidth = 23.829f; // 54.4 77.2 220.2
 
 	m_numOscillators = oi->m_numOscillators;
 	
@@ -428,30 +487,30 @@ void organicInstrumentView::modelChanged( void )
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		// setup waveform-knob
-		knob * oscKnob = new knob( knobGreen_17, this, tr(
+		knob * oscKnob = new organicKnob( this, tr(
 					"Osc %1 waveform" ).arg( i + 1 ) );
-		oscKnob->move( 25 + i * 20, 90 );
+		oscKnob->move( x + i * colWidth, y );
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
 					i + 1 ) + " ", "%" );
 										
 		// setup volume-knob
-		volumeKnob * volKnob = new volumeKnob( knobGreen_17, this, tr(
+		volumeKnob * volKnob = new organicVolumeKnob( this, tr(
 						"Osc %1 volume" ).arg( i + 1 ) );
-		volKnob->move( 25 + i * 20, 110 );
+		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i + 1 ) + " ", "%" );
 							
 		// setup panning-knob
-		knob * panKnob = new knob( knobGreen_17, this,
+		knob * panKnob = new organicKnob( this,
 					tr( "Osc %1 panning" ).arg( i + 1 ) );
-		panKnob->move( 25 + i  * 20, 130 );
+		panKnob->move( x + i  * colWidth, y + rowHeight*2 );
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
 							i + 1 ) + " ", "" );
 							
 		// setup knob for left fine-detuning
-		knob * detuneKnob = new knob( knobGreen_17, this,
+		knob * detuneKnob = new organicKnob( this,
 				tr( "Osc %1 fine detuning left" ).arg( i + 1 ) );
-		detuneKnob->move( 25 + i * 20, 150 );
+		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
 		detuneKnob->setHintText( tr( "Osc %1 fine detuning "
 							"left:" ).arg( i + 1 )
 							+ " ", " " +
@@ -460,8 +519,8 @@ void organicInstrumentView::modelChanged( void )
 		m_oscKnobs[i] = oscillatorKnobs( volKnob, oscKnob, panKnob, detuneKnob );
 
 		// Attach to models
-		m_oscKnobs[i].m_volKnob->setModel(
-					&oi->m_osc[i]->m_volModel );
+		/*m_oscKnobs[i].m_volKnob->setModel(
+					&oi->m_osc[i]->m_volModel ); */
 		m_oscKnobs[i].m_oscKnob->setModel(
 					&oi->m_osc[i]->m_oscModel );
 		m_oscKnobs[i].m_panKnob->setModel(

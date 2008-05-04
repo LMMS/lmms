@@ -213,11 +213,6 @@ protected:
 		gradient.setColorAt(0.33, QColor( 240, 147, 14 ) );
 		gradient.setColorAt(1, QColor( 30, 35, 37 ) );
 		//gradient.setColorAt(1, QColor( 68, 77, 82 ) );
-		//p.setPen( QPen( QColor( 0, 91, 120 ), 2 ) );
-		//p.drawRect( QRect(QPoint(0,0), size()) );
-
-		//p.setPen( QPen( QColor( 146, 91, 12 ), 3 ) );
-		//p.drawLine( ln );
 		
 		p.setPen( QPen( gradient, 3 ) );
 		p.drawLine( ln );

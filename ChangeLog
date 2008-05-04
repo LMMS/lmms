@@ -2,7 +2,14 @@
 
 	* plugins/kicker/kicker.cpp:
 	* plugins/kicker/artwork.png:
-	Add new artwork
+	Add new kicker artwork
+
+	* plugins/organic/organic.cpp:
+	* plugins/organic/randomise.png:
+	* plugins/organic/randomise_pressed.png:
+	* plugins/organic/artwork.png:
+	* plugins/organic/logo.png:
+	Add new organic artwork
 
 	* include/knob.h:
 	* src/gui/widgets/knob.cpp:
