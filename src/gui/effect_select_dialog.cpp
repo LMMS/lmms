@@ -125,7 +125,10 @@ void effectSelectDialog::setSelection( const effectKey & _selection )
 
 void effectSelectDialog::selectPlugin( void )
 {
-	accept();
+	if( m_currentSelection.isValid() )
+	{
+		accept();
+	}
 }
 
 
@@ -194,6 +197,8 @@ effectListWidget::effectListWidget( QWidget * _parent ) :
 	m_filterEdit = new QLineEdit( this );
 	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
 		&m_model, SLOT( setFilterRegExp( const QString & ) ) );
+	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
+					this, SLOT( updateSelection() ) );
 
 	m_pluginList = new QListView( this );
 	m_pluginList->setModel( &m_model );
@@ -228,11 +233,7 @@ effectListWidget::effectListWidget( QWidget * _parent ) :
 	vboxl->addWidget( m_pluginList );
 	vboxl->addWidget( groupbox );
 
-	if( m_sourceModel.rowCount() > 0 )
-	{
-//		m_pluginList->setCurrentRow( 0 );
-		//rowChanged( 0 );
-	}
+	updateSelection();
 }
 
 
@@ -253,10 +254,15 @@ void effectListWidget::rowChanged( const QModelIndex & _idx,
 
 	if( m_model.mapToSource( _idx ).row() < 0 )
 	{
-		return;
+		// invalidate current selection
+		m_currentSelection =
+				plugin::descriptor::subPluginFeatures::key();
 	}
-
-	m_currentSelection = m_effectKeys[m_model.mapToSource( _idx ).row()];
+	else
+	{
+		m_currentSelection =
+				m_effectKeys[m_model.mapToSource( _idx ).row()];
+	}
 	if( m_currentSelection.desc &&
 				m_currentSelection.desc->sub_plugin_features )
 	{
@@ -286,6 +292,7 @@ void effectListWidget::rowChanged( const QModelIndex & _idx,
 
 
 
+
 void effectListWidget::onDoubleClicked( const QModelIndex & )
 {
 	emit( doubleClicked( m_currentSelection ) );
@@ -294,20 +301,17 @@ void effectListWidget::onDoubleClicked( const QModelIndex & )
 
 
 
-void effectListWidget::onAddButtonReleased()
+void effectListWidget::updateSelection( void )
 {
-	emit( addPlugin( m_currentSelection ) );
+	// no valid selection anymore due to changed filter?
+	if( m_pluginList->selectionModel()->selection().size() <= 0 )
+	{
+		// then select our first item
+		m_pluginList->selectionModel()->select( m_model.index( 0, 0 ),
+					QItemSelectionModel::ClearAndSelect );
+		rowChanged( m_model.index( 0, 0 ), QModelIndex() );
+	}
 }
-
-
-
-
-void effectListWidget::resizeEvent( QResizeEvent * )
-{
-	//m_descriptionWidget->setFixedWidth( width() - 40 );
-}
-
-
 
 
 #include "effect_select_dialog.moc"

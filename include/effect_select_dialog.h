@@ -76,19 +76,14 @@ public:
 
 signals:
 	void highlighted( const effectKey & _key );
-	void addPlugin( const effectKey & _key );
 	void doubleClicked( const effectKey & _key );
 	
 
-protected:
-	virtual void resizeEvent( QResizeEvent * );
-
-
 protected slots:
 	void rowChanged( const QModelIndex &, const QModelIndex & );
-	void onAddButtonReleased( void );
 	void onDoubleClicked( const QModelIndex & );
-	
+	void updateSelection( void );
+
 
 private:
 	QVector<plugin::descriptor> m_pluginDescriptors;

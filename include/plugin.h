@@ -108,17 +108,27 @@ public:
 						user = l[1];
 					}
 				}
+
 				inline QString dumpBase64( void ) const
 				{
 					return( base64::encode(
 						QList<QVariant>()
 							<< name << user ) );
 				}
+
+				inline bool isValid( void ) const
+				{
+					return( desc != NULL &&
+							name != QString::null );
+				}
+
 				plugin::descriptor * desc;
 				QString name;
 				QVariant user;
 			};
+
 			typedef QList<key> keyList;
+
 
 			subPluginFeatures( plugin::PluginTypes _type ) :
 				m_type( _type )
