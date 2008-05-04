@@ -192,11 +192,13 @@ fxMixerView::fxMixerView() :
 				QToolButton * btn = new QToolButton;
 				btn->setText( QString( 'A'+j ) );
 				btn->setCheckable( TRUE );
-				btn->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
+				btn->setSizePolicy( QSizePolicy::Preferred,
+						QSizePolicy::Expanding );
 				l->addWidget( btn );
 				g->addButton( btn, j );
 				btn->setChecked( j == 0);
 			}
+			l->addSpacing( 10 );
 			ml->addLayout( l );
 			connect( g, SIGNAL( buttonClicked( int ) ),
 				m_fxLineBanks, SLOT( setCurrentIndex( int ) ) );

@@ -1,5 +1,8 @@
 2008-05-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/fx_mixer_view.cpp:
+	added spacing below FX-bank-selector
+
 	* include/effect_select_dialog.h:
 	* include/plugin.h:
 	* src/gui/effect_select_dialog.cpp:
