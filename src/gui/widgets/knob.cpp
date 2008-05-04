@@ -138,9 +138,7 @@ void knob::setTotalAngle( float _angle )
 }
 
 
-
-
-void knob::drawKnob( QPainter * _p )
+QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
 	float angle = 0.0f;
 	if( model()->maxValue() != model()->minValue() )
@@ -152,16 +150,25 @@ void knob::drawKnob( QPainter * _p )
 		angle = static_cast<int>( angle ) % 360;
 	}
 
-	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	const float xm = m_knobPixmap->width() / 2.0f;//radius + 1;
-	const float ym = m_knobPixmap->height() / 2.0f;//radius+1;
-
 	const float rarc = angle * M_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
-	_p->drawPixmap( static_cast<int>( xm - m_knobPixmap->width() / 2 ), 0,
-								*m_knobPixmap );
+	return QLineF( _mid.x() - sa*_innerRadius, _mid.y() - ca*_innerRadius,
+					_mid.x() - sa*_radius, _mid.y() - ca*_radius );
+}
+
+
+
+void knob::drawKnob( QPainter * _p )
+{
+	const float radius = m_knobPixmap->width() / 2.0f - 1;
+	QPoint mid = QPoint( width() / 2.0,
+	                      m_knobPixmap->height() / 2.0f );
+
+	_p->drawPixmap( static_cast<int>( 
+				width() / 2 - m_knobPixmap->width() / 2 ), 0,
+				*m_knobPixmap );
 
 	_p->setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
 	_p->setRenderHint( QPainter::Antialiasing );
@@ -170,16 +177,12 @@ void knob::drawKnob( QPainter * _p )
 	{
 		case knobSmall_17:
 		{
-			_p->drawLine( QLineF( xm-sa, ym-ca,
-					xm - sa*radius,
-					ym - ca*radius ) );
+			_p->drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			_p->drawLine( QLineF( xm-sa, ym-ca,
-					xm - sa*( radius-5 ),
-					ym - ca*( radius-5 ) ) );
+			_p->drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
@@ -187,18 +190,15 @@ void knob::drawKnob( QPainter * _p )
 			const float rb = tMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = tMax<float>( ( radius - 4 ), 0.0 );
-			_p->drawLine( QLineF( xm-sa*rb + 1,
-					ym - ca*rb + 1,
-					xm - sa*re + 1,
-					ym - ca*re + 1 ) );
+			QLineF ln = calculateLine( mid, re, rb );
+			ln.translate( 1, 1 );
+			_p->drawLine( ln );
 			break;
 		}
 		case knobGreen_17:
 		{
 			_p->setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
-			_p->drawLine( QLineF( xm-sa, ym-ca,
-					xm - sa*radius,
-					ym - ca*radius ) );
+			_p->drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 	}

@@ -23,8 +23,8 @@
  */
 
 
-#include <QtGui/QLayout>
 #include <Qt/QtXml>
+#include <QtGui/QPainter>
 
 #include "kicker.h"
 #include "engine.h"
@@ -190,41 +190,67 @@ pluginView * kickerInstrument::instantiateView( QWidget * _parent )
 
 
 
+class kickerKnob : public knob
+{
+public:
+	kickerKnob( QWidget * _parent, const QString & _name ) :
+			knob( 0, _parent, _name )
+	{
+		setFixedSize( 37, 47 );
+	}
+
+	static const QPointF m_midPoint;
+
+protected:
+	virtual void paintEvent( QPaintEvent * _me )
+	{
+		QPainter p( this );
+		p.setRenderHint( QPainter::Antialiasing );
+
+		QLineF ln = calculateLine( m_midPoint, 11.2, 4 );
+		
+		QRadialGradient gradient(m_midPoint, 11);
+		gradient.setColorAt(0.33, QColor( 240, 147, 14 ) );
+		gradient.setColorAt(1, QColor( 30, 35, 37 ) );
+		//gradient.setColorAt(1, QColor( 68, 77, 82 ) );
+		//p.setPen( QPen( QColor( 0, 91, 120 ), 2 ) );
+		//p.drawRect( QRect(QPoint(0,0), size()) );
+
+		//p.setPen( QPen( QColor( 146, 91, 12 ), 3 ) );
+		//p.drawLine( ln );
+		
+		p.setPen( QPen( gradient, 3 ) );
+		p.drawLine( ln );
+	}
+};
+
+const QPointF kickerKnob::m_midPoint = QPointF( 18.5, 13.5 );
+
 
 
 kickerInstrumentView::kickerInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
-	QVBoxLayout * vl = new QVBoxLayout( this );
-	QHBoxLayout * hl = new QHBoxLayout;
-	m_startFreqKnob = new knob( knobDark_28, this, tr( "Start frequency" ) );
-	m_startFreqKnob->setLabel( tr( "START" ) );
+	m_startFreqKnob = new kickerKnob( this, tr( "Start frequency" ) );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
+	m_startFreqKnob->move( 12, 124 );
 
-	m_endFreqKnob = new knob( knobDark_28, this, tr( "End frequency" ) );
-	m_endFreqKnob->setLabel( tr( "END" ) );
+	m_endFreqKnob = new kickerKnob( this, tr( "End frequency" ) );
 	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
+	m_endFreqKnob->move( 59, 124 );
 
-	m_decayKnob = new knob( knobDark_28, this, tr( "Decay" ) );
-	m_decayKnob->setLabel( tr( "DECAY" ) );
+	m_decayKnob = new kickerKnob( this, tr( "Decay" ) );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
+	m_decayKnob->move( 107, 124 );
 
-	m_distKnob = new knob( knobDark_28, this, tr( "Distortion" ) );
-	m_distKnob->setLabel( tr( "DIST" ) );
+	m_distKnob = new kickerKnob( this, tr( "Distortion" ) );
 	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
+	m_distKnob->move( 155, 124 );
 
-	m_gainKnob = new knob( knobDark_28, this, tr( "Gain" ) );
-	m_gainKnob->setLabel( tr( "GAIN" ) );
+	m_gainKnob = new kickerKnob( this, tr( "Gain" ) );
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
-
-	hl->addWidget( m_startFreqKnob );
-	hl->addWidget( m_endFreqKnob );
-	hl->addWidget( m_decayKnob );
-	hl->addWidget( m_distKnob );
-	hl->addWidget( m_gainKnob );
-
-	vl->addLayout( hl );
+	m_gainKnob->move( 203, 124 );
 
 	setAutoFillBackground( TRUE );
 	QPalette pal;

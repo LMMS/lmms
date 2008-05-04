@@ -106,6 +106,7 @@ protected:
 
 	float getValue( const QPoint & _p );
 
+	QLineF calculateLine( const QPointF & _mid, float _radius, float _innerRadius = 1) const;
 
 private:
 	inline float pageSize( void ) const

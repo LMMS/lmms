@@ -94,7 +94,7 @@ const char * surroundarea_help = QT_TRANSLATE_NOOP( "instrumentTrack",
 						"feature." );
 
 
-const int INSTRUMENT_WIDTH	= 250;
+const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 84;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
@@ -1106,7 +1106,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 
 	m_tabWidget = new tabWidget( "", this );
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 12 );
+	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 10 );
 
 
 	// create tab-widgets

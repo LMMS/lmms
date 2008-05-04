@@ -1,3 +1,16 @@
+2008-05-04	Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/artwork.png:
+	Add new artwork
+
+	* include/knob.h:
+	* src/gui/widgets/knob.cpp:
+	Seperate some drawing functionality to simplify subclasses
+
+	* src/tracks/instrument_track.cpp:
+	Change plugin size from 246px back to 250px
+
 2008-05-03	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track.cpp:
