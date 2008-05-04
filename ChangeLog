@@ -1,3 +1,8 @@
+2008-05-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/organic/organic.cpp:
+	fixed knob-inheritance problems
+
 2008-05-04	Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/kicker/kicker.cpp:
@@ -18,7 +23,7 @@
 	* src/tracks/instrument_track.cpp:
 	Change plugin size from 246px back to 250px
 
-2008-05-03	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-05-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track.cpp:
 	fixed move of TCO-selections
@@ -51,7 +56,7 @@
 	* src/gui/widgets/effect_view.cpp:
 	Make effect controls window non-resizeable and remove maximize button
 
-2008-04-26	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-04-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stereo_enhancer/stereo_enhancer.cpp:
 	* plugins/stereo_enhancer/stereo_enhancer.h:
@@ -90,7 +95,7 @@
 	- Made bank-buttons easier to hit
 	- Double click on fx-channel LCD in ITW to warp to the proper FX-line
 
-2008-04-20	Tobias Dorffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-04-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/widgets/group_box.cpp:
 	* plugins/sf2_player/sf2_player.cpp:

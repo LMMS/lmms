@@ -363,16 +363,18 @@ pluginView * organicInstrument::instantiateView( QWidget * _parent )
 
 
 
-class organicKnob : public knob
+template<class BASE>
+class organicKnobTemplate : public BASE
 {
 public:
-	organicKnob( QWidget * _parent, const QString & _name ) :
-			knob( 0, _parent, _name )
+	organicKnobTemplate( QWidget * _parent, const QString & _name ) :
+		BASE( 0, _parent, _name ),
+		m_midPoint( QPointF( 10.5, 10.5 ) )
 	{
-		setFixedSize( 21, 21 );
+		BASE::setFixedSize( 21, 21 );
 	}
 
-	static const QPointF m_midPoint;
+	const QPointF m_midPoint;
 
 protected:
 	virtual void paintEvent( QPaintEvent * _me )
@@ -380,7 +382,7 @@ protected:
 		QPainter p( this );
 		p.setRenderHint( QPainter::Antialiasing );
 
-		QLineF ln = calculateLine( m_midPoint, 8.7, 2 );
+		QLineF ln = BASE::calculateLine( m_midPoint, 8.7, 2 );
 		
 		QRadialGradient gradient(m_midPoint, 11);
 		gradient.setColorAt(0.2, QColor( 227, 18, 240 ) );
@@ -392,25 +394,8 @@ protected:
 };
 
 
-const QPointF organicKnob::m_midPoint = QPointF( 10.5, 10.5 );
-
-
-class organicVolumeKnob : virtual private organicKnob, virtual public volumeKnob
-{
-public:
-	organicVolumeKnob( QWidget * _parent, const QString & _name ) :
-			volumeKnob( 0, _parent, _name ),
-			organicKnob( _parent, _name )
-	{
-		organicKnob::setFixedSize( 21, 21 );
-	}
-
-protected:
-	virtual void paintEvent( QPaintEvent * _me )
-	{
-		organicKnob::paintEvent( _me );
-	}
-};
+typedef organicKnobTemplate<knob> organicKnob;
+typedef organicKnobTemplate<volumeKnob> organicVolumeKnob;
 
 
 
@@ -519,8 +504,8 @@ void organicInstrumentView::modelChanged( void )
 		m_oscKnobs[i] = oscillatorKnobs( volKnob, oscKnob, panKnob, detuneKnob );
 
 		// Attach to models
-		/*m_oscKnobs[i].m_volKnob->setModel(
-					&oi->m_osc[i]->m_volModel ); */
+		m_oscKnobs[i].m_volKnob->setModel(
+					&oi->m_osc[i]->m_volModel );
 		m_oscKnobs[i].m_oscKnob->setModel(
 					&oi->m_osc[i]->m_oscModel );
 		m_oscKnobs[i].m_panKnob->setModel(
