@@ -380,7 +380,7 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 	engine::getMixer()->lock();
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-					engine::getMixer()->sampleRate();
+				engine::getMixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
@@ -464,7 +464,7 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 
 
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-					engine::getMixer()->sampleRate();
+				engine::getMixer()->processingSampleRate();
 	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayModel.value() ) );
 	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *

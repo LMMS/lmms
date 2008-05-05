@@ -364,7 +364,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 
 	// number of frames that every note should be played
 	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f *
-					engine::getMixer()->sampleRate() );
+				engine::getMixer()->processingSampleRate() );
 	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() *
 							arp_frames / 100.0f );
 

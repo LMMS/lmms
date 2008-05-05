@@ -43,9 +43,8 @@
 
 
 
-audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer ) :
-	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
+audioALSA::audioALSA( bool & _success_ful, mixer * _mixer ) :
+	audioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audioalsa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
@@ -70,7 +69,7 @@ audioALSA::audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
 	snd_pcm_hw_params_malloc( &m_hwParams );
 	snd_pcm_sw_params_malloc( &m_swParams );
 
-	if( ( err = setHWParams( _sample_rate, channels(),
+	if( ( err = setHWParams( channels(),
 					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
 	{
 		printf( "Setting of hwparams failed: %s\n",
@@ -267,9 +266,7 @@ void audioALSA::run( void )
 
 
 
-int audioALSA::setHWParams( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						snd_pcm_access_t _access )
+int audioALSA::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 {
 	int err, dir;
 
@@ -320,31 +317,19 @@ int audioALSA::setHWParams( const sample_rate_t _sample_rate,
 
 	// set the sample rate
 	if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-						_sample_rate, 0 ) ) < 0 )
+						sampleRate(), 0 ) ) < 0 )
 	{
-		int q = 0;
-		if( sampleRate() == SAMPLE_RATES[1] )
-		{
-			q = 1;
-		}
-		if( sampleRate() == 44100 || sampleRate() == 88200 )
-		{
-			SAMPLE_RATES[0] = 48000;
-			SAMPLE_RATES[1] = 96000;
-		}
-		else
-		{
-			SAMPLE_RATES[0] = 44100;
-			SAMPLE_RATES[1] = 88200;
-		}
-		setSampleRate( SAMPLE_RATES[q] );
 		if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-						SAMPLE_RATES[q], 0 ) ) < 0 )
+				getMixer()->baseSampleRate(), 0 ) ) < 0 )
 		{
 			printf( "Could not set sample rate: %s\n",
 							snd_strerror( err ) );
 			return( err );
 		}
+	}
+	else
+	{
+		setSampleRate( getMixer()->processingSampleRate() );
 	}
 
 	m_periodSize = getMixer()->framesPerPeriod();

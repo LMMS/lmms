@@ -123,7 +123,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool,
 						sampleFrame * _working_buffer )
 {
 	const float decfr = m_decayModel.value() *
-				engine::getMixer()->sampleRate() / 1000.0f;
+			engine::getMixer()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
@@ -152,7 +152,7 @@ void kickerInstrument::playNote( notePlayHandle * _n, bool,
 
 	sweepOsc * so = static_cast<sweepOsc *>( _n->m_pluginData );
 	so->update( _working_buffer, frames, f1, f2,
-					engine::getMixer()->sampleRate() );
+				engine::getMixer()->processingSampleRate() );
 
 	if( _n->released() )
 	{

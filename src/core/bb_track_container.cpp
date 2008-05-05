@@ -170,7 +170,7 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 
 void bbTrackContainer::play( void )
 {
-	if( engine::getSong()->playing() )
+	if( engine::getSong()->isPlaying() )
 	{
 		if( engine::getSong()->playMode() != song::Mode_PlayBB )
 		{
@@ -182,7 +182,7 @@ void bbTrackContainer::play( void )
 			engine::getSong()->pause();
 		}
 	}
-	else if( engine::getSong()->paused() )
+	else if( engine::getSong()->isPaused() )
 	{
 		engine::getSong()->resumeFromPause();
 	}

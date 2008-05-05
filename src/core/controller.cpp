@@ -1,8 +1,8 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * controller.cpp - implementation of class controller which handles remote-control
- *                  of automatableModels
+ * controller.cpp - implementation of class controller which handles
+ *                  remote-control of automatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -82,8 +82,7 @@ unsigned int controller::runningFrames()
 // Get position in seconds
 float controller::runningTime()
 {
-	return s_frames /
-			engine::getMixer()->sampleRate() ;
+	return s_frames / engine::getMixer()->processingSampleRate();
 }
 
 

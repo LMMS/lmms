@@ -48,9 +48,8 @@
 
 
 
-audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer ) :
-	audioDevice( _sample_rate, tLimit<int>( configManager::inst()->value(
+audioJACK::audioJACK( bool & _success_ful, mixer * _mixer ) :
+	audioDevice( tLimit<int>( configManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
@@ -114,9 +113,7 @@ audioJACK::audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
 
 	if( jack_get_sample_rate( m_client ) != sampleRate() )
 	{
-		SAMPLE_RATES[0] = jack_get_sample_rate( m_client );
-		SAMPLE_RATES[1] = 2 * SAMPLE_RATES[0];
-		setSampleRate( SAMPLE_RATES[0] );
+		setSampleRate( jack_get_sample_rate( m_client ) );
 	}
 
 	for( Uint8 ch = 0; ch < channels(); ++ch )

@@ -614,7 +614,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSong()->playing() )
+			if( engine::getSong()->isPlaying() )
 			{
 				stop();
 			}
@@ -1641,12 +1641,12 @@ void automationEditor::play( void )
 			m_playButton->setIcon( embed::getIconPixmap(
 								"pause" ) );
 		}
-		else if( engine::getSong()->playing() )
+		else if( engine::getSong()->isPlaying() )
 		{
 			engine::getSong()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( engine::getSong()->paused() )
+		else if( engine::getSong()->isPaused() )
 		{
 			engine::getSong()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
@@ -1662,7 +1662,7 @@ void automationEditor::play( void )
 	}
 	else if( inBBEditor() )
 	{
-		if( engine::getSong()->playing() )
+		if( engine::getSong()->isPlaying() )
 		{
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
@@ -1675,12 +1675,12 @@ void automationEditor::play( void )
 	}
 	else
 	{
-		if( engine::getSong()->playing() )
+		if( engine::getSong()->isPlaying() )
 		{
 			engine::getSong()->pause();
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
-		else if( engine::getSong()->paused() )
+		else if( engine::getSong()->isPaused() )
 		{
 			engine::getSong()->resumeFromPause();
 			m_playButton->setIcon( embed::getIconPixmap(
@@ -1979,7 +1979,7 @@ void automationEditor::deleteSelectedValues( void )
 
 void automationEditor::updatePosition( const midiTime & _t )
 {
-	if( ( engine::getSong()->playing() &&
+	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
 					song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == TRUE )

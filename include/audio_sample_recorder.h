@@ -3,7 +3,7 @@
  *                           surround-audio-buffers into RAM, maybe later
  *                           also harddisk
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,17 +41,16 @@ class sampleBuffer;
 class audioSampleRecorder : public audioDevice
 {
 public:
-	audioSampleRecorder( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, bool & _success_ful,
+	audioSampleRecorder( const ch_cnt_t _channels, bool & _success_ful,
 							mixer * _mixer );
 	virtual ~audioSampleRecorder();
 
 	f_cnt_t framesRecorded( void ) const;
-	void FASTCALL createSampleBuffer( sampleBuffer * * _sample_buf );
+	void createSampleBuffer( sampleBuffer * * _sample_buf );
 
 
 private:
-	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain );
 

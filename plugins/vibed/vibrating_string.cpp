@@ -1,7 +1,7 @@
 /*
  * vibrating_sring.h - model of a vibrating string lifted from pluckedSynth
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,8 @@
 #include "templates.h"
 #include "interpolation.h"
 #include "mixer.h"
+#include "engine.h"
+
 
 vibratingString::vibratingString(	float _pitch, 
 					float _pick,
@@ -39,7 +41,8 @@ vibratingString::vibratingString(	float _pitch,
 					float _string_loss,
 					float _detune,
 					bool _state ) :
-	m_oversample( 2 * _oversample / (int)( _sample_rate / SAMPLE_RATES[0] ) ),
+	m_oversample( 2 * _oversample / (int)( _sample_rate /
+				engine::getMixer()->baseSampleRate() ) ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )

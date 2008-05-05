@@ -1,7 +1,7 @@
 /*
  * audio_jack.h - support for JACK-transport
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,8 +52,7 @@ class lcdSpinBox;
 class audioJACK : public audioDevice
 {
 public:
-	audioJACK( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer );
+	audioJACK( bool & _success_ful, mixer * _mixer );
 	virtual ~audioJACK();
 
 	inline static QString name( void )

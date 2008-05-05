@@ -397,7 +397,7 @@ void pattern::clear( void )
 
 void pattern::freeze( void )
 {
-	if( engine::getSong()->playing() )
+	if( engine::getSong()->isPlaying() )
 	{
 		QMessageBox::information( 0, tr( "Cannot freeze pattern" ),
 						tr( "The pattern currently "
@@ -663,11 +663,9 @@ void patternFreezeThread::run( void )
 	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
 	// audioSampleRecorder would be destroyed two times...
 	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
-					engine::getMixer()->sampleRate(),
 							DEFAULT_CHANNELS, b,
 							engine::getMixer() );
-	engine::getMixer()->setAudioDevice( freeze_recorder,
-					engine::getMixer()->highQuality() );
+	engine::getMixer()->setAudioDevice( freeze_recorder );
 
 	// prepare stuff for playing correct things later
 	engine::getSong()->playPattern( m_pattern, FALSE );
@@ -777,7 +775,7 @@ patternView::~patternView()
 		engine::getPianoRoll()->setCurrentPattern( NULL );
 		// we have to have the song-editor to stop playing if it played
 		// us before
-		if( engine::getSong()->playing() &&
+		if( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
 							song::Mode_PlayPattern )
 		{

@@ -88,7 +88,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
 #ifdef SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
@@ -117,7 +117,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -148,7 +148,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -205,7 +205,7 @@ void sampleBuffer::update( bool _keep_settings )
 		char * f = qstrdup( file.toAscii().constData() );
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = SAMPLE_RATES[DEFAULT_QUALITY_LEVEL];
+		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
 
 		m_frames = 0;
 
@@ -279,7 +279,7 @@ m_data[frame][chnl] = buf[idx] * fac;
 
 			delete[] buf;
 
-			normalize_sample_rate( samplerate, _keep_settings );
+			normalizeSampleRate( samplerate, _keep_settings );
 		}
 		else
 		{
@@ -314,14 +314,14 @@ m_data[frame][chnl] = buf[idx] * fac;
 
 
 
-void sampleBuffer::normalize_sample_rate( const sample_rate_t _src_sr,
+void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] )
+	if( _src_sr != engine::getMixer()->baseSampleRate() )
 	{
 		sampleBuffer * resampled = resample( this, _src_sr,
-					SAMPLE_RATES[DEFAULT_QUALITY_LEVEL] );
+					engine::getMixer()->baseSampleRate() );
 		delete[] m_data;
 		m_frames = resampled->frames();
 		m_data = new sampleFrame[m_frames];
@@ -588,8 +588,8 @@ bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		return( FALSE );
 	}
 
-	const double freq_factor = (double) _freq / (double) m_frequency
-			* m_sampleRate / engine::getMixer()->sampleRate();
+	const double freq_factor = (double) _freq / (double) m_frequency *
+		m_sampleRate / engine::getMixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (

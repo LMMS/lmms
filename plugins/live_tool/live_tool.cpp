@@ -140,11 +140,11 @@ void liveToolView::keyPressEvent( QKeyEvent * _ke )
 	switch( _ke->key() )
 	{
 		case Qt::Key_Space:
-			if( engine::getSong()->playing() )
+			if( engine::getSong()->isPlaying() )
 			{
 				engine::getSong()->pause();
 			}
-			else if( engine::getSong()->paused() &&
+			else if( engine::getSong()->isPaused() &&
 				engine::getSong()->playMode() ==
 							song::Mode_PlaySong )
 			{

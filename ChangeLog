@@ -1,3 +1,67 @@
+2008-05-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vibed/vibrating_string.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/ladspa_browser/ladspa_port_dialog.cpp:
+	* plugins/kicker/kicker.cpp:
+	* include/effect.h:
+	* include/controller.h:
+	* include/mixer.h:
+	* include/sample_buffer.h:
+	* include/audio_dummy.h:
+	* include/audio_sdl.h:
+	* include/song.h:
+	* include/audio_file_device.h:
+	* include/audio_jack.h:
+	* include/audio_device.h:
+	* include/audio_oss.h:
+	* include/audio_sample_recorder.h:
+	* include/audio_alsa.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/setup_dialog.cpp:
+	* src/gui/file_browser.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/export_project_dialog.cpp:
+	* src/gui/bb_editor.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/song.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/audio/audio_file_device.cpp:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_sdl.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_sample_recorder.cpp:
+	* src/core/audio/audio_jack.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mixer.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/engine.cpp:
+	* src/core/sample_buffer.cpp:
+	* src/core/oscillator.cpp:
+	* src/core/controller.cpp:
+	* src/core/lfo_controller.cpp:
+	made quality-settings (internal processing samplerate, interpolation
+	and so on) independent of audio-devices (final output) and added new
+	qualitySettings-structure to mixer - might be still buggy and HQ-mode
+	is currently not working, this is going to be fixed tomorrow, anyways
+	important preparation for new project-export-dialog
+
 2008-05-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/fx_mixer_view.cpp:

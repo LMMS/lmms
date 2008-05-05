@@ -1,7 +1,7 @@
 /*
  * audio_device.h - base-class for audio-devices, used by LMMS-mixer
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,13 +34,6 @@
 #include <config.h>
 #endif
 
-#ifndef USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#include "src/3rdparty/samplerate/samplerate.h"
-#endif
-
-
 #include "mixer.h"
 #include "tab_widget.h"
 
@@ -53,8 +46,7 @@ class audioPort;
 class audioDevice
 {
 public:
-	audioDevice( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, mixer * _mixer );
+	audioDevice( const ch_cnt_t _channels, mixer * _mixer );
 	virtual ~audioDevice();
 
 	inline void lock( void )
@@ -128,29 +120,29 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 	{
 	}
 
 	// called by according driver for fetching new sound-data
-	fpp_t FASTCALL getNextBuffer( surroundSampleFrame * _ab );
+	fpp_t getNextBuffer( surroundSampleFrame * _ab );
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	Uint32 FASTCALL convertToS16( const surroundSampleFrame * _ab,
+	Uint32 convertToS16( const surroundSampleFrame * _ab,
 					const fpp_t _frames,
 					const float _master_gain,
 					int_sample_t * _output_buffer,
 					const bool _convert_endian = FALSE );
 
 	// clear given signed-int-16-buffer
-	void FASTCALL clearS16Buffer( int_sample_t * _outbuf,
+	void clearS16Buffer( int_sample_t * _outbuf,
 							const fpp_t _frames );
 
 	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	void FASTCALL resample( const surroundSampleFrame * _src,
+	void resample( const surroundSampleFrame * _src,
 					const fpp_t _frames,
 					surroundSampleFrame * _dst,
 					const sample_rate_t _src_sr,

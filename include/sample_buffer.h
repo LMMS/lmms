@@ -80,13 +80,12 @@ public:
 	
 	virtual ~sampleBuffer();
 
-	bool FASTCALL play( sampleFrame * _ab, handleState * _state,
+	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq = BaseFreq,
 				const bool _looped = FALSE ) const;
 
-	void FASTCALL visualize( QPainter & _p, const QRect & _dr,
-							const QRect & _clip );
+	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip );
 	inline void visualize( QPainter & _p, const QRect & _dr )
 	{
 		visualize( _p, _dr, _dr );
@@ -157,13 +156,12 @@ public:
 	QString & toBase64( QString & _dst ) const;
 
 
-	static sampleBuffer * FASTCALL resample( sampleFrame * _data,
+	static sampleBuffer * resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr );
 
-	static inline sampleBuffer * FASTCALL resample(
-						sampleBuffer * _buf,
+	static inline sampleBuffer * resample( sampleBuffer * _buf,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 	{
@@ -171,7 +169,7 @@ public:
 								_dst_sr ) );
 	}
 
-	void normalize_sample_rate( const sample_rate_t _src_sr,
+	void normalizeSampleRate( const sample_rate_t _src_sr,
 						bool _keep_settings = FALSE );
 
 	inline sample_t userWaveSample( const float _sample ) const
@@ -209,29 +207,25 @@ public slots:
 
 
 private:
-	void FASTCALL update( bool _keep_settings = FALSE );
+	void update( bool _keep_settings = FALSE );
 
 
 #ifdef SDL_SDL_SOUND_H
-	f_cnt_t FASTCALL decodeSampleSDL( const char * _f,
-						int_sample_t * & _buf,
+	f_cnt_t decodeSampleSDL( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t _channels,
 						sample_rate_t _sample_rate );
 #endif
 #ifdef HAVE_SNDFILE_H
-	f_cnt_t FASTCALL decodeSampleSF( const char * _f,
-						int_sample_t * & _buf,
+	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
 #ifdef HAVE_VORBIS_VORBISFILE_H
-	f_cnt_t FASTCALL decodeSampleOGGVorbis( const char * _f,
-						int_sample_t * & _buf,
+	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
-	f_cnt_t FASTCALL decodeSampleDS( const char * _f,
-						int_sample_t * & _buf,
+	f_cnt_t decodeSampleDS( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 

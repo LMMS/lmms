@@ -429,7 +429,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Space )
 	{
-		if( m_s->playing() )
+		if( m_s->isPlaying() )
 		{
 			m_s->stop();
 		}
@@ -598,7 +598,7 @@ void songEditor::masterPitchReleased( void )
 
 void songEditor::updatePosition( const midiTime & _t )
 {
-	if( ( m_s->m_playing && m_s->m_playMode == song::Mode_PlaySong ) ||
+	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong ) ||
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH

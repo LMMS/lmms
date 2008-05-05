@@ -3,7 +3,7 @@
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,20 +37,15 @@
 
 
 
-audioDevice::audioDevice( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, mixer * _mixer ) :
-	m_sampleRate( _sample_rate ),
+audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
+	m_sampleRate( _mixer->processingSampleRate() ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
 	m_buffer( new surroundSampleFrame[getMixer()->framesPerPeriod()] )
 {
 	int error;
 	if( ( m_srcState = src_new(
-#ifdef HQ_SINC
-					SRC_SINC_BEST_QUALITY,
-#else
-					SRC_SINC_FASTEST,
-#endif
+			getMixer()->qualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == NULL )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
@@ -102,11 +97,12 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	lock();
 
 	// now were safe to access the device
-	if( getMixer()->sampleRate() != m_sampleRate )
+	if( getMixer()->processingSampleRate() != m_sampleRate )
 	{
-		resample( b, frames, _ab, getMixer()->sampleRate(),
+		resample( b, frames, _ab, getMixer()->processingSampleRate(),
 								m_sampleRate );
-		frames = frames * m_sampleRate / getMixer()->sampleRate();
+		frames = frames * m_sampleRate /
+					getMixer()->processingSampleRate();
 	}
 	else
 	{
@@ -156,7 +152,7 @@ void audioDevice::renamePort( audioPort * )
 
 
 
-void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
+void audioDevice::resample( const surroundSampleFrame * _src,
 						const fpp_t _frames,
 						surroundSampleFrame * _dst,
 						const sample_rate_t _src_sr,
@@ -183,7 +179,7 @@ void FASTCALL audioDevice::resample( const surroundSampleFrame * _src,
 
 
 
-Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
+Uint32 audioDevice::convertToS16( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain,
 						int_sample_t * _output_buffer,
@@ -228,8 +224,7 @@ Uint32 FASTCALL audioDevice::convertToS16( const surroundSampleFrame * _ab,
 
 
 
-void FASTCALL audioDevice::clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames )
+void audioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 {
 #ifdef LMMS_DEBUG
 	assert( _outbuf != NULL );

@@ -386,7 +386,8 @@ void sf2Instrument::updateSampleRate( void )
 	double tempRate;
 	
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, "synth.sample-rate", engine::getMixer()->sampleRate() );
+	fluid_settings_setnum( m_settings, "synth.sample-rate",
+				engine::getMixer()->processingSampleRate() );
 	fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -414,7 +415,7 @@ void sf2Instrument::updateSampleRate( void )
 		m_synthMutex.unlock();
 	}
 
-	if( m_internalSampleRate < engine::getMixer()->sampleRate() )
+	if( m_internalSampleRate < engine::getMixer()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
 		if( m_srcState != NULL )
@@ -480,11 +481,11 @@ void sf2Instrument::play( bool _try_parallelizing,
 
 	m_synthMutex.lock();
 
-	if( m_internalSampleRate < engine::getMixer()->sampleRate() &&
+	if( m_internalSampleRate < engine::getMixer()->processingSampleRate() &&
 							m_srcState != NULL )
 	{
 		const fpp_t f = frames * m_internalSampleRate /
-					engine::getMixer()->sampleRate();
+				engine::getMixer()->processingSampleRate();
 		sampleFrame * tmp = new sampleFrame[f];
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 

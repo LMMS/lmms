@@ -1,7 +1,7 @@
 /*
  * audio_alsa.h - device-class that implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,8 +51,7 @@ class QLineEdit;
 class audioALSA : public audioDevice, public QThread
 {
 public:
-	audioALSA( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer );
+	audioALSA( bool & _success_ful, mixer * _mixer );
 	virtual ~audioALSA();
 
 	inline static QString name( void )
@@ -84,11 +83,9 @@ private:
 	virtual void stopProcessing( void );
 	virtual void run( void );
 
-	int FASTCALL setHWParams( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						snd_pcm_access_t _access );
+	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
 	int setSWParams( void );
-	int FASTCALL handleError( int _err );
+	int handleError( int _err );
 
 
 	snd_pcm_t * m_handle;

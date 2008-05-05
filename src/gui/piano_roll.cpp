@@ -779,7 +779,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Space:
-			if( engine::getSong()->playing() )
+			if( engine::getSong()->isPlaying() )
 			{
 				stop();
 			}
@@ -1087,7 +1087,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 		// was there an action where should be played the note?
 		if( play_note == TRUE && m_recording == FALSE &&
-					engine::getSong()->playing() == FALSE )
+					engine::getSong()->isPlaying() == FALSE )
 		{
 			m_lastKey = key_num;
 			m_pattern->getInstrumentTrack()->processInEvent(
@@ -1165,7 +1165,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_action != SELECT_NOTES &&
 				m_action != MOVE_SELECTION &&
 				m_recording == FALSE &&
-				engine::getSong()->playing() == FALSE )
+				engine::getSong()->isPlaying() == FALSE )
 			{
 				m_lastKey = key_num;
 				m_pattern->getInstrumentTrack()->processInEvent(
@@ -1217,7 +1217,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			}
 
 			if( shortNote != m_currentNote && 
-					engine::getSong()->playing() == FALSE )
+					engine::getSong()->isPlaying() == FALSE )
 			{
 				if( m_currentNote != NULL ) {
 					m_pattern->getInstrumentTrack()->processInEvent(
@@ -2139,7 +2139,7 @@ void pianoRoll::play( void )
 		return;
 	}
 
-	if( engine::getSong()->playing() )
+	if( engine::getSong()->isPlaying() )
 	{
 		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 		{
@@ -2154,7 +2154,7 @@ void pianoRoll::play( void )
 			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 		}
 	}
-	else if( engine::getSong()->paused() )
+	else if( engine::getSong()->isPaused() )
 	{
 		engine::getSong()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
@@ -2171,7 +2171,7 @@ void pianoRoll::play( void )
 
 void pianoRoll::record( void )
 {
-	if( engine::getSong()->playing() )
+	if( engine::getSong()->isPlaying() )
 	{
 		stop();
 	}
@@ -2526,7 +2526,7 @@ void pianoRoll::deleteSelectedNotes( void )
 
 void pianoRoll::updatePosition( const midiTime & _t )
 {
-	if( ( engine::getSong()->playing() &&
+	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
 					song::Mode_PlayPattern ) ||
 							m_scrollBack == TRUE )

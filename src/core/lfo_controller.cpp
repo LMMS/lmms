@@ -1,8 +1,8 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * lfo_controller.cpp - implementation of class controller which handles remote-control
- *                  of automatableModels
+ * lfo_controller.cpp - implementation of class controller which handles
+ *                      remote-control of automatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -79,7 +79,8 @@ float lfoController::value( int _offset )
 
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
-		int newDuration = engine::getMixer()->sampleRate() / m_lfoSpeedModel.value();
+		int newDuration = engine::getMixer()->processingSampleRate() /
+							m_lfoSpeedModel.value();
 		
 		m_phaseOffset = m_lfoPhaseModel.value() * newDuration / 360.0;
 
@@ -117,8 +118,9 @@ float lfoController::value( int _offset )
 
 	// 44100 frames/sec
 	return m_lfoBaseModel.value() + ( m_lfoAmountModel.value() * 
-			sinf( TWO_PI * float( ( frame+m_phaseOffset ) * m_lfoSpeedModel.value() ) /
-			engine::getMixer()->sampleRate() ) / 2.0f );
+			sinf( TWO_PI * float( ( frame+m_phaseOffset ) *
+						m_lfoSpeedModel.value() ) /
+			engine::getMixer()->processingSampleRate() ) / 2.0f );
 }
 
 

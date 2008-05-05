@@ -109,7 +109,8 @@ public:
 
 	inline f_cnt_t getTimeout( void ) const
 	{
-		const float samples = engine::getMixer()->sampleRate() *
+		const float samples =
+				engine::getMixer()->processingSampleRate() *
 					m_autoQuitModel.value() / 1000.0f;
 		return( 1 + ( static_cast<Uint32>( samples ) / 
 				engine::getMixer()->framesPerPeriod() ) );

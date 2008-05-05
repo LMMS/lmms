@@ -72,7 +72,7 @@
 //
 
 
-//#define engine::getMixer()->sampleRate() 44100.0f
+//#define engine::getMixer()->processingSampleRate() 44100.0f
 
 
 extern "C"
@@ -110,8 +110,8 @@ void lb302Filter::recalc()
 {
 	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
 	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
-	vcf_e0*=M_PI/engine::getMixer()->sampleRate();
-	vcf_e1*=M_PI/engine::getMixer()->sampleRate();
+	vcf_e0*=M_PI/engine::getMixer()->processingSampleRate();
+	vcf_e1*=M_PI/engine::getMixer()->processingSampleRate();
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
@@ -249,14 +249,14 @@ void lb302Filter3Pole::envRecalc()
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::getMixer()->sampleRate()/2.f-6000.f)) * 
+	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::getMixer()->processingSampleRate()/2.f-6000.f)) * 
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / engine::getMixer()->sampleRate();
+	kfcn = 2.0 * kfco / engine::getMixer()->processingSampleRate();
 #else
 	kfcn = w;
 #endif
@@ -490,7 +490,7 @@ void lb302Synth::filterChanged( void )
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
-	d *= engine::getMixer()->sampleRate();                                // d *= smpl rate
+	d *= engine::getMixer()->processingSampleRate();                                // d *= smpl rate
 	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
@@ -513,15 +513,15 @@ void lb302Synth::db24Toggled( void )
 
 void lb302Synth::detuneChanged( void )
 {
-	float freq = vco_inc*engine::getMixer()->sampleRate()/vco_detune;
+	float freq = vco_inc*engine::getMixer()->processingSampleRate()/vco_detune;
 	float slidebase_freq=0;
 
 	if(vco_slide) {
-		slidebase_freq = vco_slidebase*engine::getMixer()->sampleRate()/vco_detune;
+		slidebase_freq = vco_slidebase*engine::getMixer()->processingSampleRate()/vco_detune;
 	}
 
 	vco_detune = powf(2.0f, (float)vco_fine_detune_knob.value()/1200.0f);
-	vco_inc = freq*vco_detune/engine::getMixer()->sampleRate();
+	vco_inc = freq*vco_detune/engine::getMixer()->processingSampleRate();
 
 	// If a slide note is pending,
 	if(vco_slideinc)
@@ -530,7 +530,7 @@ void lb302Synth::detuneChanged( void )
 	// If currently sliding,
 	// May need to rescale vco_slide as well
 	if(vco_slide) 
-		vco_slidebase = slidebase_freq*vco_detune/engine::getMixer()->sampleRate();
+		vco_slidebase = slidebase_freq*vco_detune/engine::getMixer()->processingSampleRate();
 }
 
 
@@ -565,7 +565,7 @@ void lb302Synth::recalcFilter()
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
-	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::getMixer()->sampleRate();
+	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::getMixer()->processingSampleRate();
 	kp   = ((-2.7528*kfcn + 3.0429)*kfcn + 1.718)*kfcn - 0.9984;
 	kp1  = kp+1.0;
 	kp1h = 0.5*kp1;
@@ -708,7 +708,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		// Handle Envelope
 		if(vca_mode==0) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*engine::getMixer()->sampleRate()) 
+			if(sample_cnt>=0.5*engine::getMixer()->processingSampleRate()) 
 				vca_mode = 2;
 		}
 		else if(vca_mode == 1) {
@@ -925,14 +925,14 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 				// END NOT SURE OF
 
 				// Reserve this note for retrigger in process()
-				hold_note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->sampleRate();  // TODO: Use actual sampling rate.
+				hold_note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 				hold_note.dead = deadToggle->value();
 				use_hold_note = true;
 				catch_decay = 1;
 			}
 #else
 			lb302Note note;
-			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->sampleRate();  // TODO: Use actual sampling rate.
+			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 			note.dead = deadToggle.value();
 			initNote(&note);
 			vca_mode=0;
@@ -943,7 +943,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 		/// Start a new note.
 		else {
 			lb302Note note;
-			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->sampleRate();  // TODO: Use actual sampling rate.
+			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 			note.dead = deadToggle.value();
 			initNote(&note);
 			use_hold_note = false;

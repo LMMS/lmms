@@ -3,7 +3,7 @@
 /*
  * audio_sdl.cpp - device-class that performs PCM-output via SDL
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,9 +41,8 @@
 
 
 
-audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer ) :
-	audioDevice( _sample_rate, DEFAULT_CHANNELS, _mixer ),
+audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
+	audioDevice( DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
 	m_convertedBuf_pos( 0 ),
 	m_convertEndian( FALSE ),
@@ -62,7 +61,7 @@ audioSDL::audioSDL( const sample_rate_t _sample_rate, bool & _success_ful,
 		return;
 	}
 
-	m_audioHandle.freq = _sample_rate;
+	m_audioHandle.freq = sampleRate();
 	m_audioHandle.format = AUDIO_S16SYS;	// we want it in byte-order
 						// of system, so we don't have
 						// to convert the buffers

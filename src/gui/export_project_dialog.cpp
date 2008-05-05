@@ -242,7 +242,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 {
 	if( _ke->key() == Qt::Key_Escape )
 	{
-		if( engine::getSong()->exporting() == FALSE )
+		if( engine::getSong()->isExporting() == FALSE )
 		{
 			accept();
 		}
@@ -258,7 +258,7 @@ void exportProjectDialog::keyPressEvent( QKeyEvent * _ke )
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( engine::getSong()->exporting() == TRUE )
+	if( engine::getSong()->isExporting() == TRUE )
 	{
 		abortProjectExport();
 		_ce->ignore();
@@ -308,7 +308,7 @@ void exportProjectDialog::exportBtnClicked( void )
 
 	bool success_ful = FALSE;
 	audioFileDevice * dev = fileEncodeDevices[idx].m_getDevInst(
-							DEFAULT_SAMPLE_RATE,
+							44100,
 							DEFAULT_CHANNELS,
 							success_ful,
 							m_fileName,
@@ -357,7 +357,7 @@ void exportProjectDialog::exportBtnClicked( void )
 
 
 
-	engine::getMixer()->setAudioDevice( dev, m_hqmCb->model()->value() );
+	engine::getMixer()->setAudioDevice( dev );//, m_hqmCb->model()->value() );
 	engine::getSong()->startExport();
 
 	delete m_hqmCb;
@@ -365,8 +365,8 @@ void exportProjectDialog::exportBtnClicked( void )
 	song::playPos & pp = engine::getSong()->getPlayPos(
 							song::Mode_PlaySong );
 
-	while( engine::getSong()->exportDone() == FALSE &&
-				engine::getSong()->exporting() == TRUE
+	while( engine::getSong()->isExportDone() == FALSE &&
+				engine::getSong()->isExporting() == TRUE
 							&& !m_deleteFile )
 	{
 		dev->processNextBuffer();
@@ -392,7 +392,7 @@ void exportProjectDialog::exportBtnClicked( void )
 void exportProjectDialog::cancelBtnClicked( void )
 {
 	// is song-export-thread active?
-	if( engine::getSong()->exporting() == TRUE )
+	if( engine::getSong()->isExporting() == TRUE )
 	{
 		// then dispose abort of export
 		abortProjectExport();
@@ -429,7 +429,7 @@ void exportProjectDialog::finishProjectExport( void )
 		engine::getMainWindow()->resetWindowTitle(); 
 	}
 
-	engine::getSong()->stopExport();
+	engine::getSong()->cancelExport();
 
 	// if we rendered file from command line, quit after export
 	if( file_to_render != "" )

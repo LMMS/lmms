@@ -79,9 +79,8 @@
 
 
 
-audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
-							mixer * _mixer ) :
-	audioDevice( _sample_rate, tLimit<ch_cnt_t>(
+audioOSS::audioOSS( bool & _success_ful, mixer * _mixer ) :
+	audioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
@@ -180,31 +179,14 @@ audioOSS::audioOSS( const sample_rate_t _sample_rate, bool & _success_ful,
 	}
 	if( value != sampleRate() )
 	{
-		//printf( "Soundcard uses different sample-rate than LMMS "
-		//						"does!\n" );
-		int q = 0;
-		if( sampleRate() == SAMPLE_RATES[1] )
-		{
-			q = 1;
-		}
-		if( sampleRate() == 44100 || sampleRate() == 88200 )
-		{
-			SAMPLE_RATES[0] = 48000;
-			SAMPLE_RATES[1] = 96000;
-		}
-		else
-		{
-			SAMPLE_RATES[0] = 44100;
-			SAMPLE_RATES[1] = 88200;
-		}
-		setSampleRate( SAMPLE_RATES[q] );
-		value = sampleRate();
+		value = getMixer()->baseSampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
 			printf( "Couldn't set audio frequency\n" );
 			return;
 		}
+		setSampleRate( value );
 	}
 
 	_success_ful = TRUE;

@@ -227,7 +227,7 @@ void ladspaEffect::pluginInstantiation( void )
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->max *= engine::getMixer()->sampleRate();
+				p->max *= engine::getMixer()->processingSampleRate();
 			}
 
 			p->min = manager->getLowerBound( m_key, port );
@@ -239,7 +239,7 @@ void ladspaEffect::pluginInstantiation( void )
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->min *= engine::getMixer()->sampleRate();
+				p->min *= engine::getMixer()->processingSampleRate();
 			}
 
 			p->def = manager->getDefaultSetting( m_key, port );
@@ -296,7 +296,7 @@ void ladspaEffect::pluginInstantiation( void )
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
 		LADSPA_Handle effect = manager->instantiate( m_key,
-					engine::getMixer()->sampleRate() );
+				engine::getMixer()->processingSampleRate() );
 		if( effect == NULL )
 		{
 			QMessageBox::warning( 0, "Effect",

@@ -1,7 +1,7 @@
 /*
  * ladspa_port_dialog.cpp - dialog to test a LADSPA plugin
  *
- * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -95,11 +95,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= engine::getMixer()->sampleRate();
+				min *= engine::getMixer()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= engine::getMixer()->sampleRate();
+				max *= engine::getMixer()->processingSampleRate();
 			}
 		}
 

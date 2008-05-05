@@ -65,8 +65,6 @@
 
 
 
-sample_rate_t SAMPLE_RATES[QUALITY_LEVELS] = { 44100, 44100*2 } ;
-
 
 
 #define ALIGN_SIZE 64
@@ -255,8 +253,12 @@ mixer::mixer( void ) :
 	m_multiThreaded( QThread::idealThreadCount() > 1 ),
 	m_workers(),
 	m_numWorkers( m_multiThreaded ? QThread::idealThreadCount() : 0 ),
-	m_workerSem( m_numWorkers  ),
-	m_qualityLevel( DEFAULT_QUALITY_LEVEL ),
+	m_workerSem( m_numWorkers ),
+	m_qualitySettings( qualitySettings::Interpolation_Linear,
+				qualitySettings::Oversampling_None,
+				FALSE,	// sample-exact controllers
+				FALSE	// alias-free oscillators
+				),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
@@ -367,6 +369,37 @@ void mixer::stopProcessing( void )
 	m_fifo_writer->wait( 1000 );
 	m_fifo_writer->terminate();
 	delete m_fifo_writer;
+}
+
+
+
+
+sample_rate_t mixer::baseSampleRate( void ) const
+{
+	sample_rate_t sr =
+		configManager::inst()->value( "mixer", "samplerate" ).toInt();
+	if( sr < 44100 )
+	{
+		sr = 44100;
+	}
+	return( sr );
+}
+
+
+
+
+sample_rate_t mixer::outputSampleRate( void ) const
+{
+	return( m_audioDev != NULL ? m_audioDev->sampleRate() :
+							baseSampleRate() );
+}
+
+
+
+
+sample_rate_t mixer::processingSampleRate( void ) const
+{
+	return( outputSampleRate() * m_qualitySettings.sampleRateMultiplier() );
 }
 
 
@@ -610,8 +643,8 @@ if( COND_NPH )
 	envelopeAndLFOParameters::triggerLFO();
 	controller::triggerFrameCounter();
 
-	const float new_cpu_load = timer.elapsed() / 10000.0f * sampleRate() /
-							m_framesPerPeriod;
+	const float new_cpu_load = timer.elapsed() / 10000.0f *
+				processingSampleRate() / m_framesPerPeriod;
 	m_cpuLoad = tLimit( (int) ( new_cpu_load * 0.1f + m_cpuLoad * 0.9f ), 0,
 									100 );
 
@@ -643,7 +676,7 @@ void mixer::clear( void )
 
 
 
-void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
+void mixer::bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
 					stereoVolumeVector _vv,
@@ -695,8 +728,7 @@ void FASTCALL mixer::bufferToPort( const sampleFrame * _buf,
 
 
 
-void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
-							const f_cnt_t _frames,
+void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
 	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
@@ -705,8 +737,7 @@ void FASTCALL mixer::clearAudioBuffer( sampleFrame * _ab,
 
 
 #ifndef DISABLE_SURROUND
-void FASTCALL mixer::clearAudioBuffer( surroundSampleFrame * _ab,
-							const f_cnt_t _frames,
+void mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
 	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
@@ -756,25 +787,23 @@ float mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-void mixer::setHighQuality( bool _hq_on )
+void mixer::changeQuality( const struct qualitySettings & _qs )
 {
 	// don't delete the audio-device
 	stopProcessing();
 
-	// set new quality-level...
-	m_qualityLevel = ( _hq_on == TRUE ) ? HIGH_QUALITY_LEVEL :
-							DEFAULT_QUALITY_LEVEL;
+	m_qualitySettings = _qs;
 
 	startProcessing();
 
-	emit( sampleRateChanged() );
-
+	emit sampleRateChanged();
+	emit qualitySettingsChanged();
 }
 
 
 
 
-void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
+void mixer::setAudioDevice( audioDevice * _dev )
 {
 	stopProcessing();
 
@@ -791,7 +820,6 @@ void FASTCALL mixer::setAudioDevice( audioDevice * _dev, bool _hq )
 		m_audioDev = _dev;
 	}
 
-	m_qualityLevel = _hq ? HIGH_QUALITY_LEVEL : DEFAULT_QUALITY_LEVEL;
 	emit sampleRateChanged();
 
 	startProcessing();
@@ -808,17 +836,8 @@ void mixer::restoreAudioDevice( void )
 		delete m_audioDev;
 
 		m_audioDev = m_oldAudioDev;
-		for( Uint8 qli = DEFAULT_QUALITY_LEVEL;
-						qli < QUALITY_LEVELS; ++qli )
-		{
-			if( SAMPLE_RATES[qli] == m_audioDev->sampleRate() )
-			{
-				m_qualityLevel =
-					static_cast<qualityLevels>( qli );
-				emit sampleRateChanged();
-				break;
-			}
-		}
+		emit sampleRateChanged();
+
 		m_oldAudioDev = NULL;
 		startProcessing();
 	}
@@ -849,7 +868,6 @@ void mixer::removePlayHandles( track * _track )
 
 
 
-
 audioDevice * mixer::tryAudioDevices( void )
 {
 	bool success_ful = FALSE;
@@ -859,8 +877,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #ifdef ALSA_SUPPORT
 	if( dev_name == audioALSA::name() || dev_name == "" )
 	{
-		dev = new audioALSA( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-							success_ful, this );
+		dev = new audioALSA( success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioALSA::name();
@@ -874,8 +891,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #ifdef OSS_SUPPORT
 	if( dev_name == audioOSS::name() || dev_name == "" )
 	{
-		dev = new audioOSS( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-							success_ful, this );
+		dev = new audioOSS( success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioOSS::name();
@@ -889,8 +905,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #ifdef JACK_SUPPORT
 	if( dev_name == audioJACK::name() || dev_name == "" )
 	{
-		dev = new audioJACK( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-							success_ful, this );
+		dev = new audioJACK( success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioJACK::name();
@@ -904,8 +919,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #ifdef SDL_AUDIO_SUPPORT
 	if( dev_name == audioSDL::name() || dev_name == "" )
 	{
-		dev = new audioSDL( SAMPLE_RATES[DEFAULT_QUALITY_LEVEL],
-							success_ful, this );
+		dev = new audioSDL( success_ful, this );
 		if( success_ful )
 		{
 			m_audioDevName = audioSDL::name();
@@ -929,8 +943,7 @@ audioDevice * mixer::tryAudioDevices( void )
 
 	m_audioDevName = audioDummy::name();
 
-	return( new audioDummy( SAMPLE_RATES[m_qualityLevel], success_ful,
-								this ) );
+	return( new audioDummy( success_ful, this ) );
 }
 
 

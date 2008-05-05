@@ -95,24 +95,24 @@ public:
 	void processNextBuffer( void );
 
 
-	inline bool paused( void ) const
+	inline bool isPaused( void ) const
 	{
 		return( m_paused );
 	}
 
-	inline bool playing( void ) const
+	inline bool isPlaying( void ) const
 	{
 		return( m_playing && m_exporting == FALSE );
 	}
 
-	inline bool exporting( void ) const
+	inline bool isExporting( void ) const
 	{
 		return( m_exporting );
 	}
 
 	bool realTimeTask( void ) const;
 
-	inline bool exportDone( void ) const
+	inline bool isExportDone( void ) const
 	{
 		return( m_exporting == TRUE &&
 			m_playPos[Mode_PlaySong].getTact() >= length() + 1 );
@@ -194,7 +194,7 @@ public slots:
 	void exportProject( void );
 
 	void startExport( void );
-	void stopExport( void );
+	void cancelExport( void );
 
 
 	void setModified( void );

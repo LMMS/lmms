@@ -422,7 +422,8 @@ void remoteVSTPlugin::updateSampleRate( void )
 {
 	lock();
 	writeValueS<Sint16>( VST_SAMPLE_RATE );
-	writeValueS<sample_rate_t>( engine::getMixer()->sampleRate() );
+	writeValueS<sample_rate_t>(
+				engine::getMixer()->processingSampleRate() );
 	unlock();
 }
 
@@ -530,7 +531,7 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 			writeValueS<Sint16>( VST_SAMPLE_RATE );
 			// handle is the same
 			writeValueS<sample_rate_t>(
-					engine::getMixer()->sampleRate() );
+				engine::getMixer()->processingSampleRate() );
 			break;
 
 		case VST_GET_BUFFER_SIZE:

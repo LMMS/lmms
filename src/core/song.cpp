@@ -607,7 +607,7 @@ void song::startExport( void )
 
 
 
-void song::stopExport( void )
+void song::cancelExport( void )
 {
 	stop();
 	m_exporting = FALSE;

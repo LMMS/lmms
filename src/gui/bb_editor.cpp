@@ -162,7 +162,7 @@ void bbEditor::removeBBView( int _bb )
 
 void bbEditor::play( void )
 {
-	if( engine::getSong()->playing() )
+	if( engine::getSong()->isPlaying() )
 	{
 		if( engine::getSong()->playMode() != song::Mode_PlayBB )
 		{
@@ -178,7 +178,7 @@ void bbEditor::play( void )
 								"play" ) );
 		}
 	}
-	else if( engine::getSong()->paused() )
+	else if( engine::getSong()->isPaused() )
 	{
 		engine::getSong()->resumeFromPause();
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
@@ -217,7 +217,7 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if ( _ke->key() == Qt::Key_Space )
 	{
-		if( engine::getSong()->playing() )
+		if( engine::getSong()->isPlaying() )
 		{
 			stop();
 		}

@@ -246,7 +246,7 @@ void bitInvader::normalize( void )
 	// analyze
 	float max = 0;
 	const float* samples = m_graph.samples();
-	for (int i=0; i < m_graph.length(); i++)
+	for (unsigned int i=0; i < m_graph.length(); i++)
 	{
 		if (fabsf(samples[i]) > max) { max = fabs(samples[i]); }
 	}
@@ -277,10 +277,12 @@ void bitInvader::playNote( notePlayHandle * _n, bool,
 			factor = normalizeFactor;
 		}
 
-		_n->m_pluginData = new bSynth( const_cast<float*>( m_graph.samples() ),
+		_n->m_pluginData = new bSynth(
+					const_cast<float*>( m_graph.samples() ),
 					m_graph.length(),
-					_n->frequency(), m_interpolation.value(), factor,
-					engine::getMixer()->sampleRate() );
+					_n->frequency(),
+					m_interpolation.value(), factor,
+				engine::getMixer()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

@@ -5,7 +5,7 @@
  *                             surround-audio-buffers into RAM, maybe later
  *                             also harddisk
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,11 +34,10 @@
 
 
 
-audioSampleRecorder::audioSampleRecorder( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
+audioSampleRecorder::audioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
 							mixer * _mixer ) :
-	audioDevice( _sample_rate, _channels, _mixer ),
+	audioDevice( _channels, _mixer ),
 	m_buffers()
 {
 	_success_ful = TRUE;

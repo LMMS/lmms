@@ -181,7 +181,7 @@ void oscillatorObject::updateDetuningLeft( void )
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-					/ engine::getMixer()->sampleRate();
+				/ engine::getMixer()->processingSampleRate();
 }
 
 
@@ -191,7 +191,7 @@ void oscillatorObject::updateDetuningRight( void )
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-					/ engine::getMixer()->sampleRate();
+				/ engine::getMixer()->processingSampleRate();
 }
 
 

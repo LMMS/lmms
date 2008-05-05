@@ -572,11 +572,11 @@ void oscillatorObject::updateVolume( void )
 void oscillatorObject::updateDetuning( void )
 {
 	m_detuningLeft = powf( 2.0f, m_harmonic
-				+ (float)m_detuneModel.value() / 100.0f )
-					/ engine::getMixer()->sampleRate();
+				+ (float)m_detuneModel.value() / 100.0f ) /
+				engine::getMixer()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, m_harmonic
-				- (float)m_detuneModel.value() / 100.0f )
-					/ engine::getMixer()->sampleRate();
+				- (float)m_detuneModel.value() / 100.0f ) /
+				engine::getMixer()->processingSampleRate();
 }
 
 

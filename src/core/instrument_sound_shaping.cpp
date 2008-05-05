@@ -162,7 +162,7 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		if( _n->m_filter == NULL )
 		{
 			_n->m_filter = new basicFilters<>(
-					engine::getMixer()->sampleRate() );
+				engine::getMixer()->processingSampleRate() );
 		}
 		_n->m_filter->setFilterType( m_filterModel.value() );
 

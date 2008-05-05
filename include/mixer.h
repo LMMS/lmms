@@ -30,6 +30,13 @@
 #include <config.h>
 #endif
 
+#ifndef USE_3RDPARTY_LIBSRC
+#include <samplerate.h>
+#else
+#include "src/3rdparty/samplerate/samplerate.h"
+#endif
+
+
 #include <QtCore/QMutex>
 #include <QtCore/QSemaphore>
 #include <QtCore/QThread>
@@ -57,16 +64,6 @@ const ch_cnt_t SURROUND_CHANNELS =
 				2;
 #endif
 
-
-enum qualityLevels
-{
-	DEFAULT_QUALITY_LEVEL,
-	HIGH_QUALITY_LEVEL,
-	QUALITY_LEVELS
-} ;
-
-extern sample_rate_t SAMPLE_RATES[QUALITY_LEVELS];
-const sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
 
 
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
@@ -96,8 +93,103 @@ class mixer : public QObject
 {
 	Q_OBJECT
 public:
+	struct qualitySettings
+	{
+		enum Mode
+		{
+			Mode_Draft,
+			Mode_HighQuality,
+			Mode_FinalMix
+		} ;
+		enum Interpolation
+		{
+			Interpolation_Linear,
+			Interpolation_SincFastest,
+			Interpolation_SincMedium,
+			Interpolation_SincBest
+		} ; 
+
+		enum Oversampling
+		{
+			Oversampling_None,
+			Oversampling_2x,
+			Oversampling_4x,
+			Oversampling_8x,
+			Oversampling_16x
+		} ;
+
+		Interpolation interpolation;
+		Oversampling oversampling;
+		bool sampleExactControllers;
+		bool aliasFreeOscillators;
+
+		qualitySettings( Mode _m )
+		{
+			switch( _m )
+			{
+				case Mode_Draft:
+					interpolation = Interpolation_Linear;
+					oversampling = Oversampling_None;
+					sampleExactControllers = FALSE;
+					aliasFreeOscillators = FALSE;
+					break;
+				case Mode_HighQuality:
+					interpolation =
+						Interpolation_SincFastest;
+					oversampling = Oversampling_2x;
+					sampleExactControllers = TRUE;
+					aliasFreeOscillators = FALSE;
+					break;
+				case Mode_FinalMix:
+					interpolation = Interpolation_SincBest;
+					oversampling = Oversampling_8x;
+					sampleExactControllers = TRUE;
+					aliasFreeOscillators = TRUE;
+					break;
+			}
+		}
+
+		qualitySettings( Interpolation _i, Oversampling _o, bool _sec,
+								bool _afo ) :
+			interpolation( _i ),
+			oversampling( _o ),
+			sampleExactControllers( _sec ),
+			aliasFreeOscillators( _afo )
+		{
+		}
+
+		int sampleRateMultiplier( void ) const
+		{
+			switch( oversampling )
+			{
+				case Oversampling_None: return 1;
+				case Oversampling_2x: return 2;
+				case Oversampling_4x: return 4;
+				case Oversampling_8x: return 8;
+				case Oversampling_16x: return 16;
+			}
+			return( 1 );
+		}
+
+		int libsrcInterpolation( void ) const
+		{
+			switch( interpolation )
+			{
+				case Interpolation_Linear:
+					return( SRC_LINEAR );
+				case Interpolation_SincFastest:
+					return( SRC_SINC_FASTEST );
+				case Interpolation_SincMedium:
+					return( SRC_SINC_MEDIUM_QUALITY );
+				case Interpolation_SincBest:
+					return( SRC_SINC_BEST_QUALITY );
+			}
+			return( SRC_LINEAR );
+		}
+	} ;
+
 	void initDevices( void );
-	void FASTCALL clear( void );
+	void clear( void );
 
 
 	// audio-device-stuff
@@ -106,7 +198,7 @@ public:
 		return( m_audioDevName );
 	}
 
-	void FASTCALL setAudioDevice( audioDevice * _dev, bool _hq );
+	void setAudioDevice( audioDevice * _dev );
 	void restoreAudioDevice( void );
 	inline audioDevice * audioDev( void )
 	{
@@ -199,16 +291,15 @@ public:
 		return( m_cpuLoad );
 	}
 
-	inline bool highQuality( void ) const
+	const qualitySettings & qualitySettings( void ) const
 	{
-		return( m_qualityLevel > DEFAULT_QUALITY_LEVEL );
+		return( m_qualitySettings );
 	}
 
 
-	inline sample_rate_t sampleRate( void ) const
-	{
-		return( SAMPLE_RATES[m_qualityLevel] );
-	}
+	sample_rate_t baseSampleRate( void ) const;
+	sample_rate_t outputSampleRate( void ) const;
+	sample_rate_t processingSampleRate( void ) const;
 
 
 	inline float masterGain( void ) const
@@ -268,7 +359,7 @@ public:
 	}
 
 	// audio-buffer-mgm
-	void FASTCALL bufferToPort( const sampleFrame * _buf,
+	void bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
 					stereoVolumeVector _volume_vector,
@@ -295,11 +386,11 @@ public:
 	}
 
 
-public slots:
-	void setHighQuality( bool _hq_on = FALSE );
+	void changeQuality( const struct qualitySettings & _qs );
 
 
 signals:
+	void qualitySettingsChanged( void );
 	void sampleRateChanged( void );
 	void nextAudioBuffer( void );
 
@@ -371,7 +462,7 @@ private:
 	playHandleVector m_playHandles;
 	constPlayHandleVector m_playHandlesToRemove;
 
-	qualityLevels m_qualityLevel;
+	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 
