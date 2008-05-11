@@ -793,11 +793,12 @@ void mixer::changeQuality( const struct qualitySettings & _qs )
 	stopProcessing();
 
 	m_qualitySettings = _qs;
-
-	startProcessing();
+	m_audioDev->applyQualitySettings();
 
 	emit sampleRateChanged();
 	emit qualitySettingsChanged();
+
+	startProcessing();
 }
 
 
@@ -820,6 +821,35 @@ void mixer::setAudioDevice( audioDevice * _dev )
 		m_audioDev = _dev;
 	}
 
+	emit sampleRateChanged();
+
+	startProcessing();
+}
+
+
+
+
+void mixer::setAudioDevice( audioDevice * _dev,
+					const struct qualitySettings & _qs )
+{
+	// don't delete the audio-device
+	stopProcessing();
+
+	m_qualitySettings = _qs;
+	m_oldAudioDev = m_audioDev;
+
+	if( _dev == NULL )
+	{
+		printf( "param _dev == NULL in mixer::setAudioDevice(...). "
+					"Trying any working audio-device\n" );
+		m_audioDev = tryAudioDevices();
+	}
+	else
+	{
+		m_audioDev = _dev;
+	}
+
+	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
 	startProcessing();

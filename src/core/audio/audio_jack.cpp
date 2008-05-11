@@ -232,6 +232,19 @@ void audioJACK::stopProcessing( void )
 
 
 
+void audioJACK::applyQualitySettings( void )
+{
+	setSampleRate( engine::getMixer()->processingSampleRate() );
+
+	if( jack_get_sample_rate( m_client ) != sampleRate() )
+	{
+		setSampleRate( jack_get_sample_rate( m_client ) );
+	}
+}
+
+
+
+
 void audioJACK::registerPort( audioPort * _port )
 {
 #ifdef AUDIO_PORT_SUPPORT

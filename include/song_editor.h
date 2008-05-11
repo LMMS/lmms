@@ -57,6 +57,7 @@ signals:
 
 
 private slots:
+	void setHighQuality( bool );
 	void scrolled( int _new_pos );
 	void updateTimeLinePosition( void );
 

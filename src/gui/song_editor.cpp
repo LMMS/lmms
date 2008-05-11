@@ -57,7 +57,6 @@
 #include "cpuload_widget.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
-#include "export_project_dialog.h"
 #include "import_filter.h"
 #include "instrument_track.h"
 #include "lcd_spinbox.h"
@@ -132,8 +131,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
 	hq_btn->setCheckable( TRUE );
-	connect( hq_btn, SIGNAL( toggled( bool ) ), engine::getMixer(),
-					SLOT( setHighQuality( bool ) ) );
+	connect( hq_btn, SIGNAL( toggled( bool ) ),
+			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
 	engine::getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 
@@ -381,6 +380,16 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 songEditor::~songEditor()
 {
+}
+
+
+
+
+void songEditor::setHighQuality( bool _hq )
+{
+	engine::getMixer()->changeQuality( mixer::qualitySettings(
+			_hq ? mixer::qualitySettings::Mode_HighQuality :
+				mixer::qualitySettings::Mode_Draft ) );
 }
 
 

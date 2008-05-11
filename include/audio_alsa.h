@@ -81,6 +81,7 @@ public:
 private:
 	virtual void startProcessing( void );
 	virtual void stopProcessing( void );
+	virtual void applyQualitySettings( void );
 	virtual void run( void );
 
 	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );

@@ -268,6 +268,33 @@ void audioOSS::stopProcessing( void )
 
 
 
+void audioOSS::applyQualitySettings( void )
+{
+	setSampleRate( engine::getMixer()->processingSampleRate() );
+
+	unsigned int value = sampleRate();
+	if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
+	{
+		perror( "SNDCTL_DSP_SPEED" );
+		printf( "Couldn't set audio frequency\n" );
+		return;
+	}
+	if( value != sampleRate() )
+	{
+		value = getMixer()->baseSampleRate();
+		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
+		{
+			perror( "SNDCTL_DSP_SPEED" );
+			printf( "Couldn't set audio frequency\n" );
+			return;
+		}
+		setSampleRate( value );
+	}
+}
+
+
+
+
 void audioOSS::run( void )
 {
 	surroundSampleFrame * temp =

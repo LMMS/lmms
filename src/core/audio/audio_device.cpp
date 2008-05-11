@@ -45,7 +45,7 @@ audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
 {
 	int error;
 	if( ( m_srcState = src_new(
-			getMixer()->qualitySettings().libsrcInterpolation(),
+		getMixer()->currentQualitySettings().libsrcInterpolation(),
 				SURROUND_CHANNELS, &error ) ) == NULL )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
@@ -77,7 +77,7 @@ void audioDevice::processNextBuffer( void )
 	}
 	else
 	{
-		m_in_process = FALSE;
+		m_inProcess = FALSE;
 	}
 }
 
@@ -122,7 +122,7 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 
 void audioDevice::stopProcessing( void )
 {
-	while( m_in_process )
+	while( m_inProcess )
 	{
 		processNextBuffer();
 	}

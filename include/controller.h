@@ -53,7 +53,7 @@ public:
 	inline bool isSampleExact( void ) const
 	{
 		return m_sampleExact ||
-			engine::getMixer()->qualitySettings().
+			engine::getMixer()->currentQualitySettings().
 							sampleExactControllers;
 	}
 

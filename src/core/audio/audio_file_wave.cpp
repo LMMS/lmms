@@ -91,7 +91,7 @@ bool audioFileWave::startEncoding( void )
 
 
 
-void FASTCALL audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
+void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {

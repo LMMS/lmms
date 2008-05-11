@@ -80,6 +80,7 @@ public:
 private:
 	virtual void startProcessing( void );
 	virtual void stopProcessing( void );
+	virtual void applyQualitySettings( void );
 
 	virtual void registerPort( audioPort * _port );
 	virtual void unregisterPort( audioPort * _port );

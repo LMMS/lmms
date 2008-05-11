@@ -77,6 +77,7 @@ public:
 private:
 	virtual void startProcessing( void );
 	virtual void stopProcessing( void );
+	virtual void applyQualitySettings( void );
 
 	static void sdlAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlAudioCallback( Uint8 * _buf, int _len );

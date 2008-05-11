@@ -32,6 +32,9 @@ bin_PROGRAMS = lmms
 AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS)
 
 
+ui_%.uic: $(srcdir)/src/gui/dialogs/%.ui
+	$(UIC) -o $@ $<
+
 %.moc: $(srcdir)/include/%.h
 	$(MOC) -o $@ $<
 
@@ -60,7 +63,7 @@ lmms_MOC =						\
 		./combobox.moc				\
 		./config_mgr.moc			\
 		./controller.moc			\
-		./controller_connection_dialog.moc		\
+		./controller_connection_dialog.moc	\
 		./controller_dialog.moc			\
 		./controller_rack_view.moc		\
 		./controller_view.moc			\
@@ -104,6 +107,7 @@ lmms_MOC =						\
 		./pixmap_button.moc			\
 		./plugin_browser.moc			\
 		./project_notes.moc			\
+		./project_renderer.moc			\
 		./effect_view.moc			\
 		./effect_rack_view.moc			\
 		./rubberband.moc			\
@@ -128,8 +132,12 @@ lmms_MOC =						\
 		./visualization_widget.moc		\
 		./volume_knob.moc
 
+lmms_UIC =						\
+		ui_export_project.uic
 
-BUILT_SOURCES = $(lmms_MOC)
+
+BUILT_SOURCES = $(lmms_MOC) $(lmms_UIC)
+
 
 lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 
@@ -190,6 +198,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/plugin.cpp					\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp		\
 		$(srcdir)/src/core/project_journal.cpp				\
+		$(srcdir)/src/core/project_renderer.cpp				\
 		$(srcdir)/src/core/project_version.cpp				\
 		$(srcdir)/src/core/sample_buffer.cpp				\
 		$(srcdir)/src/core/sample_play_handle.cpp			\
@@ -218,8 +227,8 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/about_dialog.cpp				\
 		$(srcdir)/src/gui/automation_editor.cpp				\
 		$(srcdir)/src/gui/bb_editor.cpp					\
-		$(srcdir)/src/gui/controller_connection_dialog.cpp \
-		$(srcdir)/src/gui/controller_dialog.cpp 	\
+		$(srcdir)/src/gui/controller_connection_dialog.cpp		\
+		$(srcdir)/src/gui/controller_dialog.cpp				\
 		$(srcdir)/src/gui/effect_control_dialog.cpp			\
 		$(srcdir)/src/gui/effect_select_dialog.cpp			\
 		$(srcdir)/src/gui/embed.cpp					\
@@ -319,6 +328,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/fx_mixer_view.h				\
 		$(srcdir)/include/pixmap_button.h				\
 		$(srcdir)/include/rename_dialog.h				\
+		$(srcdir)/include/project_renderer.h				\
 		$(srcdir)/include/export_project_dialog.h			\
 		$(srcdir)/include/note_play_handle.h				\
 		$(srcdir)/include/piano_roll.h					\
@@ -332,7 +342,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/instrument_functions.h			\
 		$(srcdir)/include/instrument_function_views.h			\
 		$(srcdir)/include/instrument_sound_shaping_view.h		\
-		$(srcdir)/include/export.h					\
 		$(srcdir)/include/fader.h					\
 		$(srcdir)/include/mv_base.h					\
 		$(srcdir)/include/automatable_model.h				\

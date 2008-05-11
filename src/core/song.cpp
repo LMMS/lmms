@@ -348,7 +348,7 @@ void song::processNextBuffer( void )
 	}
 
 	f_cnt_t total_frames_played = 0;
-	float frames_per_tick = engine::framesPerTick();
+	const float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
 				< engine::getMixer()->framesPerPeriod() )
@@ -607,13 +607,11 @@ void song::startExport( void )
 
 
 
-void song::cancelExport( void )
+void song::stopExport( void )
 {
 	stop();
 	m_exporting = FALSE;
 }
-
-
 
 
 
@@ -990,19 +988,19 @@ void song::exportProject( void )
 	{
 		base_filename = tr( "untitled" );
 	}
- 	base_filename += fileEncodeDevices[0].m_extension;
+ 	base_filename += ".wav";//fileEncodeDevices[0].m_extension;
 
 	QFileDialog efd( engine::getMainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
 
-	int idx = 0;
+/*	int idx = 0;
 	QStringList types;
 	while( fileEncodeDevices[idx].m_fileType != NullFile )
 	{
 		types << tr( fileEncodeDevices[idx].m_description );
 		++idx;
 	}
-	efd.setFilters( types );
+	efd.setFilters( types );*/
 	efd.selectFile( base_filename );
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
@@ -1011,7 +1009,7 @@ void song::exportProject( void )
 		)
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
-		if( QFileInfo( export_file_name ).exists() == TRUE &&
+/*		if( QFileInfo( export_file_name ).exists() == TRUE &&
 			QMessageBox::warning( engine::getMainWindow(),
 						tr( "File already exists" ),
 						tr( "The file \"%1\" already "
@@ -1026,7 +1024,7 @@ void song::exportProject( void )
 			== QMessageBox::No )
 		{
 			return;
-		}
+		}*/
 		exportProjectDialog epd( export_file_name,
 						engine::getMainWindow() );
 		epd.exec();

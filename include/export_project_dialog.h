@@ -29,20 +29,12 @@
 
 #include <QtGui/QDialog>
 
-#include "export.h"
-#include "automatable_model.h"
-#include "combobox.h"
+#include "ui_export_project.uic"
+
+class projectRenderer;
 
 
-class QLabel;
-class QPushButton;
-class QProgressBar;
-
-class ledCheckBox;
-class pixmapButton;
-
-
-class exportProjectDialog : public QDialog
+class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
@@ -50,47 +42,18 @@ public:
 	virtual ~exportProjectDialog();
 
 
-public slots:
-	void exportBtnClicked( void );
-
-
 protected:
-	virtual void keyPressEvent( QKeyEvent * _ke );
+	virtual void reject( void );
 	virtual void closeEvent( QCloseEvent * _ce );
 
 
 private slots:
-	void changedType( const QString & );
-	void cancelBtnClicked( void );
+	void startBtnClicked( void );
 
 
 private:
-	void finishProjectExport( void );
-	void abortProjectExport( void );
-
-	static ExportFileTypes getFileTypeFromExtension( const QString & _ext );
-	static Sint16 s_availableBitrates[];
-
-
-	comboBoxModel m_typeModel;
-	comboBoxModel m_kbpsModel;
-	boolModel m_vbrEnabledModel;
-	boolModel m_hqmEnabledModel;
-
-	QLabel * m_typeLbl;
-	comboBox * m_typeCombo;
-	QLabel * m_kbpsLbl;
-	comboBox * m_kbpsCombo;
-	ledCheckBox * m_vbrCb;
-	ledCheckBox * m_hqmCb;
-	QLabel * m_hourglassLbl;
-	QPushButton * m_exportBtn;
-	QPushButton * m_cancelBtn;
-	QProgressBar * m_exportProgressBar;
-
 	QString m_fileName;
-	ExportFileTypes m_fileType;
-	bool m_deleteFile;
+	projectRenderer * m_renderer;
 
 } ;
 

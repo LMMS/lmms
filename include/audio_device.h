@@ -83,10 +83,14 @@ public:
 
 	virtual void startProcessing( void )
 	{
-		m_in_process = TRUE;
+		m_inProcess = TRUE;
 	}
 
 	virtual void stopProcessing( void );
+
+	virtual void applyQualitySettings( void )
+	{
+	}
 
 
 	class setupWidget : public tabWidget
@@ -163,7 +167,7 @@ private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 	mixer * m_mixer;
-	bool m_in_process;
+	bool m_inProcess;
 
 	QMutex m_devMutex;
 

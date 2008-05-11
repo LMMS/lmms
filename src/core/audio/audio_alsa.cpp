@@ -185,6 +185,43 @@ void audioALSA::stopProcessing( void )
 
 
 
+void audioALSA::applyQualitySettings( void )
+{
+	setSampleRate( engine::getMixer()->processingSampleRate() );
+
+	if( m_handle != NULL )
+	{
+		snd_pcm_close( m_handle );
+	}
+
+	int err;
+	if( ( err = snd_pcm_open( &m_handle,
+					probeDevice().toAscii().constData(),
+						SND_PCM_STREAM_PLAYBACK,
+						0 ) ) < 0 )
+	{
+		printf( "Playback open error: %s\n", snd_strerror( err ) );
+		return;
+	}
+
+	if( ( err = setHWParams( channels(),
+					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
+	{
+		printf( "Setting of hwparams failed: %s\n",
+							snd_strerror( err ) );
+		return;
+	}
+	if( ( err = setSWParams() ) < 0 )
+	{
+		printf( "Setting of swparams failed: %s\n",
+							snd_strerror( err ) );
+		return;
+	}
+}
+
+
+
+
 void audioALSA::run( void )
 {
 	surroundSampleFrame * temp =
@@ -326,10 +363,6 @@ int audioALSA::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 							snd_strerror( err ) );
 			return( err );
 		}
-	}
-	else
-	{
-		setSampleRate( getMixer()->processingSampleRate() );
 	}
 
 	m_periodSize = getMixer()->framesPerPeriod();

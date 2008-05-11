@@ -76,6 +76,7 @@ public:
 private:
 	virtual void startProcessing( void );
 	virtual void stopProcessing( void );
+	virtual void applyQualitySettings( void );
 	virtual void run( void );
 
 	int m_audioFD;

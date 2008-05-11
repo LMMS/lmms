@@ -45,6 +45,10 @@ public:
 				mixer * _mixer );
 	virtual ~audioFileDevice();
 
+	QString outputFile( void ) const
+	{
+		return( m_outputFile.fileName() );
+	}
 
 
 protected:
@@ -87,6 +91,18 @@ private:
 	bitrate_t m_maxBitrate;
 
 } ;
+
+
+typedef audioFileDevice * ( * audioFileDeviceInstantiaton )
+					( const sample_rate_t _sample_rate,
+						const ch_cnt_t _channels,
+						bool & _success_ful,
+						const QString & _file,
+						const bool _use_vbr,
+						const bitrate_t _nom_bitrate,
+						const bitrate_t _min_bitrate,
+						const bitrate_t _max_bitrate,
+						mixer * _mixer );
 
 
 #endif

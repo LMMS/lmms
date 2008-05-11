@@ -1,3 +1,39 @@
+2008-05-1	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/controller.h:
+	* include/song.h:
+	* include/audio_file_device.h:
+	* include/song_editor.h:
+	* include/export.h:
+	* include/export_project_dialog.h:
+	* src/gui/dialogs/export_project.ui:
+	* src/gui/song_editor.cpp:
+	* src/gui/export_project_dialog.cpp:
+	* src/core/song.cpp:
+	* src/core/main.cpp:
+	* Makefile.am:
+	introduced new project-export dialog
+
+	* include/project_renderer.h:
+	* src/core/project_renderer.cpp:
+	new class for easily rendering a project into a file
+
+	* include/mixer.h:
+	* include/audio_sdl.h:
+	* include/audio_jack.h:
+	* include/audio_device.h:
+	* include/audio_oss.h:
+	* include/audio_alsa.h:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_file_wave.cpp:
+	* src/core/audio/audio_jack.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_sdl.cpp:
+	* src/core/mixer.cpp:
+	when changing quality-settings tell audio-devices about it so that
+	they can adjust their output-samplerate
+
 2008-05-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_effect.cpp:

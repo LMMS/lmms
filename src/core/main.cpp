@@ -41,7 +41,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "config_mgr.h"
-#include "export_project_dialog.h"
+#include "project_renderer.h"
 #include "song.h"
 #include "gui_templates.h"
 #include "lmms_style.h"
@@ -52,8 +52,6 @@ static inline QString baseName( const QString & _file )
 	return( QFileInfo( _file ).absolutePath() + "/" +
 			QFileInfo( _file ).completeBaseName() );
 }
-
-QString file_to_render;
 
 
 int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
@@ -86,7 +84,7 @@ int main( int argc, char * * argv )
 	QApplication app( argc, argv );
 
 	QString extension = "wav";
-	QString file_to_load;
+	QString file_to_load, file_to_render;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -248,14 +246,14 @@ int main( int argc, char * * argv )
 	{
 		engine::init( FALSE );
 		engine::getSong()->loadProject( file_to_load );
-		exportProjectDialog * e = new exportProjectDialog(
+/*		exportProjectDialog * e = new exportProjectDialog(
 						file_to_render,
 						engine::getMainWindow() );
 		e->show();
 		QTime t;
 		t.start();
 		e->exportBtnClicked();
-		printf("export took %d ms\n",t.elapsed());
+		printf("export took %d ms\n",t.elapsed());*/
 	}
 
 	return( app.exec() );

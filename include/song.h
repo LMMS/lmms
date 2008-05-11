@@ -194,7 +194,7 @@ public slots:
 	void exportProject( void );
 
 	void startExport( void );
-	void cancelExport( void );
+	void stopExport( void );
 
 
 	void setModified( void );

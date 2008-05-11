@@ -101,6 +101,7 @@ public:
 			Mode_HighQuality,
 			Mode_FinalMix
 		} ;
+
 		enum Interpolation
 		{
 			Interpolation_Linear,
@@ -199,6 +200,8 @@ public:
 	}
 
 	void setAudioDevice( audioDevice * _dev );
+	void setAudioDevice( audioDevice * _dev,
+					const struct qualitySettings & _qs );
 	void restoreAudioDevice( void );
 	inline audioDevice * audioDev( void )
 	{
@@ -291,7 +294,7 @@ public:
 		return( m_cpuLoad );
 	}
 
-	const qualitySettings & qualitySettings( void ) const
+	const qualitySettings & currentQualitySettings( void ) const
 	{
 		return( m_qualitySettings );
 	}
