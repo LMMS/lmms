@@ -1,5 +1,34 @@
 2008-05-1	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/sf2_player.cpp:
+	retrieve resampling-interpolation from current mixer quality settings
+
+	* include/mixer.h:
+	made m_writing-variable in fifoWriter volatile
+
+	* include/project_renderer.h:
+	* src/core/project_renderer.cpp:
+	change audio-device to file-device from within GUI-thread in order to
+	make slots being connected to sampleRateChanged()-signal being called
+	immediately
+
+	* src/tracks/instrument_track.cpp:
+	cleanups
+
+	* src/core/mixer.cpp:
+	initialize quality with draft-preset
+
+	* include/setup_dialog.h:
+	* include/audio_device.h:
+	* src/gui/main_window.cpp:
+	* src/gui/setup_dialog.cpp:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_sdl.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_jack.cpp:
+	made HQ-mode for audio-devices optional
+
 	* include/controller.h:
 	* include/song.h:
 	* include/audio_file_device.h:

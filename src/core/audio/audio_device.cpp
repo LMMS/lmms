@@ -33,6 +33,7 @@
 
 
 #include "audio_device.h"
+#include "config_mgr.h"
 #include "debug.h"
 
 
@@ -166,7 +167,7 @@ void audioDevice::resample( const surroundSampleFrame * _src,
 	m_srcData.output_frames = _frames;
 	m_srcData.data_in = (float *) _src[0];
 	m_srcData.data_out = _dst[0];
-	m_srcData.src_ratio = (float) _dst_sr / _src_sr;
+	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
 
 	int error;
 	if( ( error = src_process( m_srcState, &m_srcData ) ) )
@@ -232,6 +233,13 @@ void audioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
+
+
+
+bool audioDevice::hqAudio( void ) const
+{
+	return( configManager::inst()->value( "mixer", "hqaudio" ).toInt() );
+}
 
 
 

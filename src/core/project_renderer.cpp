@@ -69,6 +69,7 @@ projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,
 					const QString & _out_file ) :
 	QThread( engine::getMixer() ),
 	m_qualitySettings( _qs ),
+	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
 	m_abort( FALSE )
 {
 	int idx = 0;
@@ -141,6 +142,11 @@ projectRenderer::ExportFileTypes projectRenderer::getFileTypeFromExtension(
 
 void projectRenderer::startProcessing( void )
 {
+	// have to do mixer stuff with GUI-thread-affinity in order to make
+	// slots connected to sampleRateChanged()-signals being called
+	// immediately
+	engine::getMixer()->setAudioDevice( m_fileDev, m_qualitySettings );
+
 	start( QThread::HighestPriority );
 }
 
@@ -149,15 +155,10 @@ void projectRenderer::startProcessing( void )
 
 void projectRenderer::run( void )
 {
-	const mixer::qualitySettings qs =
-				engine::getMixer()->currentQualitySettings();
-
-	engine::getMixer()->setAudioDevice( m_fileDev, m_qualitySettings );
 	engine::getSong()->startExport();
 
 	song::playPos & pp = engine::getSong()->getPlayPos(
 							song::Mode_PlaySong );
-
 	int progress = 0;
 	while( engine::getSong()->isExportDone() == FALSE &&
 				engine::getSong()->isExporting() == TRUE
@@ -178,7 +179,7 @@ void projectRenderer::run( void )
 	const QString f = m_fileDev->outputFile();
 
 	engine::getMixer()->restoreAudioDevice();  // also deletes audio-dev
-	engine::getMixer()->changeQuality( qs );
+	engine::getMixer()->changeQuality( m_oldQualitySettings );
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )

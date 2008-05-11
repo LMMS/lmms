@@ -181,6 +181,8 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 	float v_scale = (float) getVolume() / DefaultVolume;
 
+	// if effects "went to sleep" because there was no input, wake them up
+	// now
 	m_audioPort.getEffects()->startRunning();
 
 	// instruments using instrument-play-handles will call this method
@@ -517,7 +519,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	}
 	else
 	{
-		getTCOsInRange( tcos, _start, _start + static_cast<Sint32>(
+		getTCOsInRange( tcos, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
 		bb_track = NULL;
 		sendMidiTime( _start );

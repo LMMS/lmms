@@ -412,7 +412,7 @@ private:
 	private:
 		mixer * m_mixer;
 		fifo * m_fifo;
-		bool m_writing;
+		volatile bool m_writing;
 
 		virtual void run( void );
 

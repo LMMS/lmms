@@ -83,7 +83,7 @@ inline void labelWidget( QWidget * _w, const QString & _txt )
 
 
 
-setupDialog::setupDialog( configTabs _tab_to_open ) :
+setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_bufferSize( configManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt() ),
 	m_toolTips( !configManager::inst()->value( "tooltips",
@@ -98,6 +98,8 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	m_displaydBV( configManager::inst()->value( "app", 
 		      				"displaydbv" ).toInt() ),
 	m_MMPZ( !configManager::inst()->value( "app", "nommpz" ).toInt() ),
+	m_hqAudioDev( configManager::inst()->value( "mixer",
+							"hqaudio" ).toInt() ),
 	m_workingDir( configManager::inst()->workingDir() ),
 	m_vstDir( configManager::inst()->vstDir() ),
 	m_artworkDir( configManager::inst()->artworkDir() ),
@@ -175,7 +177,7 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 150 );
+	misc_tw->setFixedHeight( 164 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -238,6 +240,15 @@ setupDialog::setupDialog( configTabs _tab_to_open ) :
 	mmpz->setChecked( m_MMPZ );
 	connect( mmpz, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleMMPZ( bool ) ) );
+
+	ledCheckBox * hqaudio = new ledCheckBox(
+				tr( "HQ-mode for output audio-device" ),
+								misc_tw );
+	hqaudio->move( 10, 144 );
+	hqaudio->setChecked( m_hqAudioDev );
+	connect( hqaudio, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleHQAudioDev( bool ) ) );
+
 
 
 	gen_layout->addWidget( bufsize_tw );
@@ -678,6 +689,8 @@ void setupDialog::accept( void )
 					QString::number( m_displaydBV ) );
 	configManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
+	configManager::inst()->setValue( "mixer", "hqaudio",
+					QString::number( m_hqAudioDev ) );
 	configManager::inst()->setValue( "ui",
 					"disablechannelactivityindicators",
 					QString::number( m_disableChActInd ) );
@@ -829,6 +842,14 @@ void setupDialog::toggleDisplaydBV( bool _enabled )
 void setupDialog::toggleMMPZ( bool _enabled )
 {
 	m_MMPZ = _enabled;
+}
+
+
+
+
+void setupDialog::toggleHQAudioDev( bool _enabled )
+{
+	m_hqAudioDev = _enabled;
 }
 
 

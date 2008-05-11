@@ -125,8 +125,9 @@ public:
 			done( FALSE )
 		{
 		}
+
 		JobTypes type;
-		
+
 		union
 		{
 			playHandle * playHandleJob;
@@ -254,11 +255,7 @@ mixer::mixer( void ) :
 	m_workers(),
 	m_numWorkers( m_multiThreaded ? QThread::idealThreadCount() : 0 ),
 	m_workerSem( m_numWorkers ),
-	m_qualitySettings( qualitySettings::Interpolation_Linear,
-				qualitySettings::Oversampling_None,
-				FALSE,	// sample-exact controllers
-				FALSE	// alias-free oscillators
-				),
+	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
@@ -1057,9 +1054,9 @@ void mixer::fifoWriter::finish( void )
 
 void mixer::fifoWriter::run( void )
 {
+	const fpp_t frames = m_mixer->framesPerPeriod();
 	while( m_writing )
 	{
-		fpp_t frames = m_mixer->framesPerPeriod();
 		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );

@@ -187,35 +187,39 @@ void audioALSA::stopProcessing( void )
 
 void audioALSA::applyQualitySettings( void )
 {
-	setSampleRate( engine::getMixer()->processingSampleRate() );
-
-	if( m_handle != NULL )
+	if( hqAudio() )
 	{
-		snd_pcm_close( m_handle );
-	}
+		setSampleRate( engine::getMixer()->processingSampleRate() );
 
-	int err;
-	if( ( err = snd_pcm_open( &m_handle,
+		if( m_handle != NULL )
+		{
+			snd_pcm_close( m_handle );
+		}
+
+		int err;
+		if( ( err = snd_pcm_open( &m_handle,
 					probeDevice().toAscii().constData(),
 						SND_PCM_STREAM_PLAYBACK,
-						0 ) ) < 0 )
-	{
-		printf( "Playback open error: %s\n", snd_strerror( err ) );
-		return;
-	}
+								0 ) ) < 0 )
+		{
+			printf( "Playback open error: %s\n",
+							snd_strerror( err ) );
+			return;
+		}
 
-	if( ( err = setHWParams( channels(),
+		if( ( err = setHWParams( channels(),
 					SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
-	{
-		printf( "Setting of hwparams failed: %s\n",
+		{
+			printf( "Setting of hwparams failed: %s\n",
 							snd_strerror( err ) );
-		return;
-	}
-	if( ( err = setSWParams() ) < 0 )
-	{
-		printf( "Setting of swparams failed: %s\n",
+			return;
+		}
+		if( ( err = setSWParams() ) < 0 )
+		{
+			printf( "Setting of swparams failed: %s\n",
 							snd_strerror( err ) );
-		return;
+			return;
+		}
 	}
 }
 

@@ -234,11 +234,14 @@ void audioJACK::stopProcessing( void )
 
 void audioJACK::applyQualitySettings( void )
 {
-	setSampleRate( engine::getMixer()->processingSampleRate() );
-
-	if( jack_get_sample_rate( m_client ) != sampleRate() )
+	if( hqAudio() )
 	{
-		setSampleRate( jack_get_sample_rate( m_client ) );
+		setSampleRate( engine::getMixer()->processingSampleRate() );
+
+		if( jack_get_sample_rate( m_client ) != sampleRate() )
+		{
+			setSampleRate( jack_get_sample_rate( m_client ) );
+		}
 	}
 }
 

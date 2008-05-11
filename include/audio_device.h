@@ -162,6 +162,8 @@ protected:
 		return( m_mixer );
 	}
 
+	bool hqAudio( void ) const;
+
 
 private:
 	sample_rate_t m_sampleRate;

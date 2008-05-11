@@ -76,6 +76,7 @@ private:
 
 	audioFileDevice * m_fileDev;
 	mixer::qualitySettings m_qualitySettings;
+	mixer::qualitySettings m_oldQualitySettings;
 
 	volatile bool m_abort;
 

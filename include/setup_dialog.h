@@ -1,7 +1,7 @@
 /*
  * setup_dialog.h - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,13 +45,16 @@ class setupDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	enum configTabs
+	enum ConfigTabs
 	{
-		GENERAL_SETTINGS, DIRECTORY_SETTINGS, PERFORMANCE_SETTINGS,
-		AUDIO_SETTINGS, MIDI_SETTINGS
+		GeneralSettings,
+		DirectorySettings,
+		PerformanceSettings,
+		AudioSettings,
+		MidiSettings
 	} ;
 
-	setupDialog( configTabs _tab_to_open = GENERAL_SETTINGS );
+	setupDialog( ConfigTabs _tab_to_open = GeneralSettings );
 	virtual ~setupDialog();
 
 
@@ -89,6 +92,7 @@ private slots:
 	void toggleWarnAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
+	void toggleHQAudioDev( bool _enabled );
 
 	void openWorkingDir( void );
 	void openVSTDir( void );
@@ -115,6 +119,7 @@ private:
 	bool m_warnAfterSetup;
 	bool m_displaydBV;
 	bool m_MMPZ;
+	bool m_hqAudioDev;
 
 
 	QLineEdit * m_wdLineEdit;

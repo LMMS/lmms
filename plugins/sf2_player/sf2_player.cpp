@@ -423,7 +423,8 @@ void sf2Instrument::updateSampleRate( void )
 			src_delete( m_srcState );
 		}
 		int error;
-		m_srcState = src_new( SRC_SINC_MEDIUM_QUALITY,
+		m_srcState = src_new( engine::getMixer()->
+				currentQualitySettings().libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
@@ -452,7 +453,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		return;
 	}
 
-	if ( tfp == 0 )
+	if( tfp == 0 )
 	{
 		_n->m_pluginData = new int( midiNote );
 
@@ -464,11 +465,6 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		++m_notesRunning[midiNote];
 		m_notesRunningMutex.unlock();
 	}
-	else if( _n->released() )
-	{
-		// Doesn't happen with release frames = 0
-	}
-
 }
 
 

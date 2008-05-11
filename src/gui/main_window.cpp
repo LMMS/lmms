@@ -475,7 +475,7 @@ void mainWindow::finalize( void )
 	else if( engine::getMixer()->audioDevName() == audioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
-		setupDialog sd( setupDialog::AUDIO_SETTINGS );
+		setupDialog sd( setupDialog::AudioSettings );
 		sd.exec();
 	}
 }

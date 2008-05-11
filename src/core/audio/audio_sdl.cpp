@@ -131,18 +131,22 @@ void audioSDL::stopProcessing( void )
 
 void audioSDL::applyQualitySettings( void )
 {
-	SDL_CloseAudio();
-
-	setSampleRate( engine::getMixer()->processingSampleRate() );
-
-	m_audioHandle.freq = sampleRate();
-
-  	SDL_AudioSpec actual; 
-
-	// open the audio device, forcing the desired format
-	if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
+	if( hqAudio() )
 	{
-		printf( "Couldn't open SDL-audio: %s\n", SDL_GetError() );
+		SDL_CloseAudio();
+
+		setSampleRate( engine::getMixer()->processingSampleRate() );
+
+		m_audioHandle.freq = sampleRate();
+
+		SDL_AudioSpec actual; 
+
+		// open the audio device, forcing the desired format
+		if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
+		{
+			printf( "Couldn't open SDL-audio: %s\n",
+							SDL_GetError() );
+		}
 	}
 }
 
