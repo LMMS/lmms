@@ -168,15 +168,14 @@ void audioDevice::resample( const surroundSampleFrame * _src,
 	m_srcData.data_in = (float *) _src[0];
 	m_srcData.data_out = _dst[0];
 	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
-
 	int error;
 	if( ( error = src_process( m_srcState, &m_srcData ) ) )
 	{
 		printf( "audioDevice::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
+	m_srcData.end_of_input = 0;
 }
-
 
 
 

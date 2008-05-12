@@ -57,7 +57,8 @@ bassBoosterControls::bassBoosterControls( bassBoosterEffect * _eff ) :
 
 void bassBoosterControls::changeFrequency( void )
 {
-	const sample_t fac = engine::getMixer()->processingSampleRate() / 44100;
+	const sample_t fac = engine::getMixer()->processingSampleRate() /
+								44100.0f;
 	m_effect->m_bbFX.leftFX().setFrequency( m_freqModel.value() * fac );
 	m_effect->m_bbFX.rightFX().setFrequency( m_freqModel.value() * fac );
 }

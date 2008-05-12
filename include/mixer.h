@@ -177,7 +177,7 @@ public:
 			switch( interpolation )
 			{
 				case Interpolation_Linear:
-					return( SRC_LINEAR );
+					return( SRC_ZERO_ORDER_HOLD );
 				case Interpolation_SincFastest:
 					return( SRC_SINC_FASTEST );
 				case Interpolation_SincMedium:

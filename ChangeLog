@@ -1,6 +1,15 @@
 2008-05-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* src/core/audio/audio_device.cpp:
+	cleanups and the like
+
+	* include/mixer.h:
+	in draft-mode use zero-order-hold interpolation instead of linear
+	interpolation - fixes some issues with resampling
+
+	* plugins/bass_booster/bassbooster_controls.cpp:
 	made bass-booster HQ-mode-capable
 
 	* include/effect_lib.h:

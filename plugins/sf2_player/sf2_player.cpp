@@ -490,7 +490,7 @@ void sf2Instrument::play( bool _try_parallelizing,
 		src_data.data_out = _working_buffer[0];
 		src_data.input_frames = f;
 		src_data.output_frames = frames;
-		src_data.src_ratio = (float) frames / f;
+		src_data.src_ratio = (double) frames / f;
 		src_data.end_of_input = 0;
 		int error = src_process( m_srcState, &src_data );
 		delete[] tmp;
