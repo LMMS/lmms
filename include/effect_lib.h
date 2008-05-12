@@ -223,9 +223,9 @@ namespace effectLib
 	class fastBassBoost : public monoBase<SAMPLE>
 	{
 	public:
-		fastBassBoost( const float _frequency,
-				const float _gain,
-				const float _ratio,
+		fastBassBoost( const SAMPLE _frequency,
+				const SAMPLE _gain,
+				const SAMPLE _ratio,
 				const fastBassBoost<SAMPLE> & _orig =
 						fastBassBoost<SAMPLE>() ) :
 			m_frequency( tMax<SAMPLE>( _frequency, 10.0 ) ),
@@ -248,18 +248,18 @@ namespace effectLib
 								m_gain2/* )*/ );
 		}
 
-		void setFrequency( const float _frequency )
+		void setFrequency( const SAMPLE _frequency )
 		{
 			m_frequency = _frequency;
 			m_gain1 = 1.0 / ( m_frequency + 1.0 );
 		}
 
-		void setGain( const float _gain )
+		void setGain( const SAMPLE _gain )
 		{
 			m_gain2 = _gain;
 		}
 
-		void setRatio( const float _ratio )
+		void setRatio( const SAMPLE _ratio )
 		{
 			m_ratio = _ratio;
 		}
@@ -270,11 +270,11 @@ namespace effectLib
 		{
 		}
 
-		float m_frequency;
-		float m_gain1;
-		float m_gain2;
-		float m_ratio;
-		mutable float m_cap;
+		SAMPLE m_frequency;
+		SAMPLE m_gain1;
+		SAMPLE m_gain2;
+		SAMPLE m_ratio;
+		mutable SAMPLE m_cap;
 	} ;
 
 
