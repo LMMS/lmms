@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
-    <height>351</height>
+    <width>519</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -180,17 +180,38 @@
              </item>
              <item>
               <property name="text" >
-               <string>24 Bit Float</string>
-              </property>
-             </item>
-             <item>
-              <property name="text" >
                <string>32 Bit Float</string>
               </property>
              </item>
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>1</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_7" >
+          <property name="text" >
+           <string>Please note that not all of the parameters above apply for all file types.</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -224,9 +245,12 @@
         </item>
         <item>
          <widget class="QComboBox" name="interpolationCB" >
+          <property name="currentIndex" >
+           <number>1</number>
+          </property>
           <item>
            <property name="text" >
-            <string>Linear</string>
+            <string>Zero Order Hold</string>
            </property>
           </item>
           <item>
@@ -236,12 +260,12 @@
           </item>
           <item>
            <property name="text" >
-            <string>Sinc Medium</string>
+            <string>Sinc Medium (recommended)</string>
            </property>
           </item>
           <item>
            <property name="text" >
-            <string>Sinc Best</string>
+            <string>Sinc Best (very slow!)</string>
            </property>
           </item>
          </widget>
@@ -249,7 +273,7 @@
         <item>
          <widget class="QLabel" name="label_4" >
           <property name="text" >
-           <string>Oversampling:</string>
+           <string>Oversampling (use with care!):</string>
           </property>
          </widget>
         </item>
@@ -257,7 +281,7 @@
          <widget class="QComboBox" name="oversamplingCB" >
           <item>
            <property name="text" >
-            <string>None</string>
+            <string>1x (None)</string>
            </property>
           </item>
           <item>
@@ -273,11 +297,6 @@
           <item>
            <property name="text" >
             <string>8x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>16x (use with care!)</string>
            </property>
           </item>
          </widget>

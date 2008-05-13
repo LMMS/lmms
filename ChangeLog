@@ -1,3 +1,17 @@
+2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/dialogs/export_project.ui:
+	improved usability
+
+	* include/audio_device.h:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_sdl.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_jack.cpp:
+	after changed quality-settings also update interpolation for
+	samplerate-conversion
+
 2008-05-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/bass_booster/bassbooster_controls.cpp:
