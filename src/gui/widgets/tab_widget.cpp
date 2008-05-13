@@ -149,23 +149,25 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 	setFont( pointSize<7>( font() ) );
 	QPainter p( this );
 
-	p.fillRect( 0, 0, width() - 1, height() - 1, QColor( 96, 96, 96 ) );
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background );
+	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color.dark( 132 ) );
 
 	const int c = 0;
 	bool big_tab_captions = ( m_caption == "" );
 	int add = big_tab_captions ? 1 : 0;
 
-	p.setPen( QColor( 64, 64, 64 ) );
+	p.setPen( bg_color.dark( 200 ) );
 	p.drawRect( 0, 0, width() - 1 + c, height() - 1 + c );
 
-	p.setPen( QColor( 160, 160, 160 ) );
+	p.setPen( bg_color.light( 125 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 3 + c, height() - 3 + c );
 
-	p.fillRect( 2, 2, width() - 4, 9 + add, QColor( 30, 45, 60 ) );
+	p.fillRect( 2, 2, width() - 4, 9 + add, bg_color.dark( 300 ) );
 	p.drawLine( 2, 11 + add, width() - 3, 11 + add );
 
 	if( !big_tab_captions )

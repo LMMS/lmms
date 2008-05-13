@@ -317,7 +317,7 @@ void mainWindow::finalize( void )
 				) );
 
 	toolButton * fx_mixer_window = new toolButton(
-					embed::getIconPixmap( "effect_board" ),
+					embed::getIconPixmap( "fx_mixer" ),
 					tr( "Show/hide FX Mixer" ) + " (F11)",
 					this, SLOT( toggleFxMixerWin() ), m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F11 );

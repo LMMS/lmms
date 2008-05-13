@@ -306,7 +306,7 @@ private slots:
 	void disableAutomation( void );
 	void enableAutomation( void );
 	void removeTrack( void );
-	void muteBtnRightClicked( void );
+	void toggleSolo( void );
 	void updateMenu( void );
 
 

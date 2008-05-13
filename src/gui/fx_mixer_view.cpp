@@ -123,7 +123,7 @@ fxMixerView::fxMixerView() :
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 
 	setWindowTitle( tr( "FX-Mixer" ) );
-//	setWindowIcon( embed::getIconPixmap( "fxmixer" ) );
+	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
 
 	m_fxLineBanks = new QStackedLayout;
 	m_fxLineBanks->setSpacing( 0 );

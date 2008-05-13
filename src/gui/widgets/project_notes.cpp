@@ -76,7 +76,8 @@ projectNotes::projectNotes( void ) :
 		engine::getMainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 		parentWidget()->move( 700, 10 );
-		parentWidget()->resize( 300, 200 );
+		parentWidget()->resize( 400, 300 );
+		parentWidget()->hide();
 	}
 	else
 	{

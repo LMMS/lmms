@@ -44,7 +44,7 @@ public:
 
 signals:
 	void doubleClicked( void );
-	void clickedRight( void );
+	void ctrlClick( void );
 
 
 protected:

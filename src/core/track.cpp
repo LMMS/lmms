@@ -1037,15 +1037,15 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 
 	m_muteBtn = new pixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->setActiveGraphic( *s_muteOnEnabled );
-	m_muteBtn->setInactiveGraphic( *s_muteOffEnabled );
+	m_muteBtn->setActiveGraphic( *s_muteOffEnabled );
+	m_muteBtn->setInactiveGraphic( *s_muteOnEnabled );
 	m_muteBtn->setCheckable( TRUE );
 	m_muteBtn->move( 44, 4 );
 	m_muteBtn->show();
 	connect( m_muteBtn, SIGNAL( toggled( bool ) ), this,
 						SLOT( setMuted( bool ) ) );
-	connect( m_muteBtn, SIGNAL( clickedRight() ), this,
-					SLOT( muteBtnRightClicked() ) );
+	connect( m_muteBtn, SIGNAL( ctrlClick() ), this,
+					SLOT( toggleSolo() ) );
 	m_muteBtn->setWhatsThis(
 		tr( "With this switch you can either mute this track or mute "
 			"all other tracks.\nBy clicking left, this track is "
@@ -1128,9 +1128,9 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 					setObjectName( "automationDisabled" );
 					setStyle( NULL );
 					m_muteBtn->setActiveGraphic(
-							*s_muteOnDisabled );
+							*s_muteOffEnabled );
 					m_muteBtn->setInactiveGraphic(
-							*s_muteOffDisabled );
+							*s_muteOnEnabled );
 				}
 			}
 			else
@@ -1141,9 +1141,9 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 					setObjectName( "automationEnabled" );
 					setStyle( NULL );
 					m_muteBtn->setActiveGraphic(
-							*s_muteOnEnabled );
-					m_muteBtn->setInactiveGraphic(
 							*s_muteOffEnabled );
+					m_muteBtn->setInactiveGraphic(
+							*s_muteOnEnabled );
 				}
 			}
 		}
@@ -1191,7 +1191,7 @@ void trackOperationsWidget::setMuted( bool _muted )
 
 
 
-void trackOperationsWidget::muteBtnRightClicked( void )
+void trackOperationsWidget::toggleSolo( void )
 {
 	const bool m = muted();	// next function might modify our mute-state,
 				// so save it now

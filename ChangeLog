@@ -1,5 +1,68 @@
 2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track.h:
+	* include/pixmap_button.h:
+	* src/core/track.cpp:
+	* src/gui/widgets/pixmap_button.cpp:
+	toggle solo via Ctrl+left mouse button
+
+	* src/gui/fx_mixer_view.cpp:
+	set window-icon
+
+	* src/gui/widgets/tab_widget.cpp:
+	use colors from active palette
+
+	* src/gui/widgets/project_notes.cpp:
+	hide per default
+
+	* src/gui/main_window.cpp:
+	* src/core/timeline.cpp:
+	* data/themes/default/project_export.png:
+	* data/themes/default/hourglass.png:
+	* data/themes/default/hq_mode.png:
+	* data/themes/default/edit_paste.png:
+	* data/themes/default/text_bold.png:
+	* data/themes/default/project_save.png:
+	* data/themes/default/playpos_marker.png:
+	* data/themes/default/exit.png:
+	* data/themes/default/text_center.png:
+	* data/themes/default/error.png:
+	* data/themes/default/edit_cut.png:
+	* data/themes/default/mute_on.png:
+	* data/themes/default/project_saveas.png:
+	* data/themes/default/loop_point_disabled.png:
+	* data/themes/default/arp_random_on.png:
+	* data/themes/default/edit_copy.png:
+	* data/themes/default/edit_redo.png:
+	* data/themes/default/arp_down_on.png:
+	* data/themes/default/track_op_menu_disabled.png:
+	* data/themes/default/project_notes.png:
+	* data/themes/default/track_op_menu.png:
+	* data/themes/default/groupbox_led_bg.png:
+	* data/themes/default/arp_down_off.png:
+	* data/themes/default/mute_off.png:
+	* data/themes/default/text_italic.png:
+	* data/themes/default/arp_random_off.png:
+	* data/themes/default/root.png:
+	* data/themes/default/apply.png:
+	* data/themes/default/text_block.png:
+	* data/themes/default/text_left.png:
+	* data/themes/default/arp_up_off.png:
+	* data/themes/default/text_right.png:
+	* data/themes/default/project_open.png:
+	* data/themes/default/arp_up_and_down_off.png:
+	* data/themes/default/edit_undo.png:
+	* data/themes/default/loop_point.png:
+	* data/themes/default/cancel.png:
+	* data/themes/default/add.png:
+	* data/themes/default/arp_up_and_down_on.png:
+	* data/themes/default/project_open_down.png:
+	* data/themes/default/text_under.png:
+	* data/themes/default/fx_mixer.png:
+	* data/themes/default/arp_up_on.png:
+	* data/themes/default/home.png:
+	integrated improved artwork (more to come)
+
 	* src/core/track.cpp:
 	do not crash when removing TCOs
 

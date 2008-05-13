@@ -4,7 +4,7 @@
  * pixmap_button.cpp - implementation of pixmap-button (often used as "themed"
  *                     checkboxes/radiobuttons etc)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,6 +30,7 @@
 #include <QtGui/QPainter>
 
 #include "pixmap_button.h"
+#include "main_window.h"
 #include "embed.h"
 
 
@@ -76,9 +77,10 @@ void pixmapButton::paintEvent( QPaintEvent * )
 
 void pixmapButton::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::RightButton )
+	if( _me->button() == Qt::LeftButton &&
+				engine::getMainWindow()->isCtrlPressed() )
 	{
-		emit( clickedRight() );
+		emit( ctrlClick() );
 		_me->accept();
 	}
 	else

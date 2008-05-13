@@ -241,8 +241,8 @@ void timeLine::paintEvent( QPaintEvent * )
 	const QPixmap & lpoint = loopPointsEnabled() ?
 						*s_loopPointPixmap :
 						*s_loopPointDisabledPixmap;
-	p.drawPixmap( markerX( loopBegin() ), 7, lpoint );
-	p.drawPixmap( markerX( loopEnd() ), 7, lpoint );
+	p.drawPixmap( markerX( loopBegin() ), 4, lpoint );
+	p.drawPixmap( markerX( loopEnd() ), 4, lpoint );
 
 
 	tact tact_num = m_begin.getTact();
