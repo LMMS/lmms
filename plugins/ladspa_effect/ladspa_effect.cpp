@@ -380,6 +380,18 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 		return( FALSE );
 	}
 
+	sampleFrame * o_buf = NULL;
+	int frames = _frames;
+	if( publicName().contains( "C* AmpVTS" ) &&
+			engine::getMixer()->processingSampleRate() > 88200 )
+	{
+		o_buf = _buf;
+		_buf = new sampleFrame[_frames];
+		sampleDown( o_buf, _buf, 88200 );
+		frames = _frames * 88200 /
+				engine::getMixer()->processingSampleRate();
+	}
+
 	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
 	// the control ports.  Need to change this to handle non-in-place-broken
 	// plugins--would speed things up to use the same buffer for both
@@ -393,7 +405,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 			{
 				case CHANNEL_IN:
 					for( fpp_t frame = 0; 
-						frame < _frames; frame++ )
+						frame < frames; frame++ )
 					{
 						m_ports[proc][port]->buffer[frame] = 
 							_buf[frame][channel];
@@ -409,7 +421,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 					// treated as though they were control rate by setting the
 					// port buffer to all the same value.
 					for( fpp_t frame = 0; 
-						frame < _frames; frame++ )
+						frame < frames; frame++ )
 					{
 						m_ports[proc][port]->buffer[frame] = 
 							m_ports[proc][port]->value;
@@ -441,7 +453,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	// Process the buffers.
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
-		(m_descriptor->run)(m_handles[proc], _frames);
+		(m_descriptor->run)(m_handles[proc], frames);
 	}
 	
 	// Copy the LADSPA output buffers to the LMMS buffer.
@@ -461,7 +473,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 					break;
 				case CHANNEL_OUT:
 					for( fpp_t frame = 0; 
-						frame < _frames; frame++ )
+						frame < frames; frame++ )
 					{
 						_buf[frame][channel] = 
 							d * 
@@ -483,9 +495,15 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
+	if( o_buf != NULL )
+	{
+		sampleBack( _buf, o_buf, 88200 );
+		delete[] _buf;
+	}
+
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
-	if( out_sum / _frames <= getGate()+0.000001 )
+	if( out_sum / frames <= getGate()+0.000001 )
 	{
 		incrementBufferCount();
 		if( getBufferCount() > getTimeout() )

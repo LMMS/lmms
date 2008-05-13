@@ -1,5 +1,22 @@
 2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	use new resampling-methods in case we're processing plugins which are
+	known not to work at higher samplerates
+
+	* include/main_window.h:
+	made resetWindowTitle() a slot
+
+	* src/gui/widgets/effect_view.cpp:
+	coding-style stuff
+
+	* include/effect.h:
+	* src/core/effect.cpp:
+	added simple way for plugins to process at lower sample-rates
+
+	* src/core/ladspa_manager.cpp:
+	added hard-coded path in case LMMS is installed into /usr/local
+
 	* include/export_project_dialog.h:
 	* src/gui/export_project_dialog.cpp:
 	update main-window title-bar while rendering
