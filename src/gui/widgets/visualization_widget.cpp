@@ -35,6 +35,7 @@
 #include "engine.h"
 #include "templates.h"
 #include "tooltip.h"
+#include "song.h"
 #include "song_editor.h"
 
 
@@ -74,16 +75,19 @@ visualizationWidget::~visualizationWidget()
 
 void visualizationWidget::updateAudioBuffer( void )
 {
-	engine::getMixer()->lock();
-	const surroundSampleFrame * c = engine::getMixer()->
-						currentReadBuffer();
-	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
-								++f )
+	if( !engine::getSong()->isExporting() )
 	{
-		m_buffer[f][0] = c[f][0];
-		m_buffer[f][1] = c[f][1];
+		engine::getMixer()->lock();
+		const surroundSampleFrame * c = engine::getMixer()->
+							currentReadBuffer();
+		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
+									++f )
+		{
+			m_buffer[f][0] = c[f][0];
+			m_buffer[f][1] = c[f][1];
+		}
+		engine::getMixer()->unlock();
 	}
-	engine::getMixer()->unlock();
 }
 
 
@@ -124,7 +128,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_active )
+	if( m_active && !engine::getSong()->isExporting() )
 	{
 		float master_output = engine::getMixer()->masterGain();
 		int w = width()-4;
