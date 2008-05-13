@@ -1,7 +1,7 @@
 /*
  * main_window.h - declaration of class mainWindow, the main window of LMMS
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,8 +58,6 @@ public:
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
 
-	void resetWindowTitle( void );
-
 
 	// every function that replaces current file (e.g. creates new file,
 	// opens another file...) has to call this before and may only process
@@ -91,6 +89,8 @@ public:
 
 
 public slots:
+	void resetWindowTitle( void );
+
 	inline void emptySlot( void )
 	{
 	}
