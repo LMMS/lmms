@@ -1,5 +1,8 @@
 2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/track.cpp:
+	do not crash when removing TCOs
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	use new resampling-methods in case we're processing plugins which are
 	known not to work at higher samplerates

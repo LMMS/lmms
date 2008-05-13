@@ -268,7 +268,7 @@ bool trackContentObjectView::close( void )
 void trackContentObjectView::remove( void )
 {
 	// delete ourself
-	m_trackView->getTrackContentWidget()->removeTCOView( this );
+	close();
 	m_tco->deleteLater();
 }
 
