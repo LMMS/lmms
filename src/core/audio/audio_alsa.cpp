@@ -221,6 +221,8 @@ void audioALSA::applyQualitySettings( void )
 			return;
 		}
 	}
+
+	audioDevice::applyQualitySettings();
 }
 
 

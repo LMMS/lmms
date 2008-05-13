@@ -148,6 +148,8 @@ void audioSDL::applyQualitySettings( void )
 							SDL_GetError() );
 		}
 	}
+
+	audioDevice::applyQualitySettings();
 }
 
 

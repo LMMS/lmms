@@ -293,6 +293,8 @@ void audioOSS::applyQualitySettings( void )
 			setSampleRate( value );
 		}
 	}
+
+	audioDevice::applyQualitySettings();
 }
 
 

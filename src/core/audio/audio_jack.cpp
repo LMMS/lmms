@@ -243,6 +243,8 @@ void audioJACK::applyQualitySettings( void )
 			setSampleRate( jack_get_sample_rate( m_client ) );
 		}
 	}
+
+	audioDevice::applyQualitySettings();
 }
 
 

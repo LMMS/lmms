@@ -88,9 +88,8 @@ public:
 
 	virtual void stopProcessing( void );
 
-	virtual void applyQualitySettings( void )
-	{
-	}
+	virtual void applyQualitySettings( void );
+
 
 
 	class setupWidget : public tabWidget
