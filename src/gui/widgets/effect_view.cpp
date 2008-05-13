@@ -105,8 +105,8 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_controlView = getEffect()->getControls()->createView();
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
 							m_controlView,
-							Qt::SubWindow | Qt::CustomizeWindowHint  | Qt::WindowTitleHint |
-							Qt::WindowSystemMenuHint );
+		Qt::SubWindow | Qt::CustomizeWindowHint  |
+			Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
 	m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_subWindow->setFixedSize( m_subWindow->size() );
 
