@@ -1,5 +1,9 @@
 2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/export_project_dialog.h:
+	* src/gui/export_project_dialog.cpp:
+	update main-window title-bar while rendering
+
 	* src/gui/widgets/visualization_widget.cpp:
 	do not update while song-export
 

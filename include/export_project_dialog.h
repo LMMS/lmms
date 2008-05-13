@@ -49,6 +49,7 @@ protected:
 
 private slots:
 	void startBtnClicked( void );
+	void updateTitleBar( int );
 
 
 private:

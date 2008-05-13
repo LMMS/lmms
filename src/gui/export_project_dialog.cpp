@@ -29,6 +29,8 @@
 
 
 #include "export_project_dialog.h"
+#include "engine.h"
+#include "main_window.h"
 #include "project_renderer.h"
 
 
@@ -91,6 +93,8 @@ void exportProjectDialog::startBtnClicked( void )
 	startButton->setEnabled( FALSE );
 	progressBar->setEnabled( TRUE );
 
+	updateTitleBar( 0 );
+
 	mixer::qualitySettings qs = mixer::qualitySettings(
 		static_cast<mixer::qualitySettings::Interpolation>(
 					interpolationCB->currentIndex() ),
@@ -110,10 +114,23 @@ void exportProjectDialog::startBtnClicked( void )
 								m_fileName );
 	connect( m_renderer, SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );
+	connect( m_renderer, SIGNAL( progressChanged( int ) ),
+			this, SLOT( updateTitleBar( int ) ) );
 	connect( m_renderer, SIGNAL( finished() ),
 			this, SLOT( accept() ) );
+	connect( m_renderer, SIGNAL( finished() ),
+			engine::getMainWindow(), SLOT( resetWindowTitle() ) );
 
 	m_renderer->startProcessing();
+}
+
+
+
+
+void exportProjectDialog::updateTitleBar( int _prog )
+{
+	engine::getMainWindow()->setWindowTitle(
+					tr( "Rendering: %1%" ).arg( _prog ) );
 }
 
 
