@@ -173,8 +173,36 @@ public:
 protected:
 	virtual pluginView * instantiateView( QWidget * );
 
+	// some effects might not be capable of higher sample-rates so they can
+	// sample it down before processing and back after processing
+	inline void sampleDown( const sampleFrame * _src_buf,
+					sampleFrame * _dst_buf,
+					sample_rate_t _dst_sr )
+	{
+		resample( 0, _src_buf,
+				engine::getMixer()->processingSampleRate(),
+					_dst_buf, _dst_sr,
+					engine::getMixer()->framesPerPeriod() );
+	}
+
+	inline void sampleBack( const sampleFrame * _src_buf,
+					sampleFrame * _dst_buf,
+					sample_rate_t _src_sr )
+	{
+		resample( 1, _src_buf, _src_sr, _dst_buf,
+				engine::getMixer()->processingSampleRate(),
+			engine::getMixer()->framesPerPeriod() * _src_sr /
+				engine::getMixer()->processingSampleRate() );
+	}
+	void reinitSRC( void );
+
 
 private:
+	void resample( int _i, const sampleFrame * _src_buf,
+						sample_rate_t _src_sr,
+			sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+					const fpp_t _frames );
+
 	descriptor::subPluginFeatures::key m_key;
 
 	ch_cnt_t m_processors;
@@ -188,6 +216,9 @@ private:
 	floatModel m_wetDryModel;
 	floatModel m_gateModel;
 	tempoSyncKnobModel m_autoQuitModel;
+
+	SRC_DATA m_srcData[2];
+	SRC_STATE * m_srcState[2];
 
 
 	friend class effectView;
