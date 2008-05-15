@@ -115,8 +115,7 @@ public:
 			Oversampling_None,
 			Oversampling_2x,
 			Oversampling_4x,
-			Oversampling_8x,
-			Oversampling_16x
+			Oversampling_8x
 		} ;
 
 		Interpolation interpolation;
@@ -167,7 +166,6 @@ public:
 				case Oversampling_2x: return 2;
 				case Oversampling_4x: return 4;
 				case Oversampling_8x: return 8;
-				case Oversampling_16x: return 16;
 			}
 			return( 1 );
 		}
