@@ -70,6 +70,7 @@ projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,
 	QThread( engine::getMixer() ),
 	m_qualitySettings( _qs ),
 	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
+	m_progress( 0 ),
 	m_abort( FALSE )
 {
 	int idx = 0;
@@ -159,7 +160,7 @@ void projectRenderer::run( void )
 
 	song::playPos & pp = engine::getSong()->getPlayPos(
 							song::Mode_PlaySong );
-	int progress = 0;
+	m_progress = 0;
 	while( engine::getSong()->isExportDone() == FALSE &&
 				engine::getSong()->isExporting() == TRUE
 							&& !m_abort )
@@ -167,10 +168,10 @@ void projectRenderer::run( void )
 		m_fileDev->processNextBuffer();
 		const int nprog = pp * 100 /
 				( ( engine::getSong()->length() + 1 ) * 192 );
-		if( progress != nprog )
+		if( m_progress != nprog )
 		{
-			progress = nprog;
-			emit progressChanged( progress );
+			m_progress = nprog;
+			emit progressChanged( m_progress );
 		}
 	}
 
@@ -196,6 +197,28 @@ void projectRenderer::abortProcessing( void )
 	m_abort = TRUE;
 }
 
+
+
+void projectRenderer::updateConsoleProgress( void )
+{
+	const int cols = 50;
+	static int rot = 0;
+
+	printf("\r|");
+	for( int i = 0; i < cols; ++i )
+	{
+		printf( "%c",( i*100/cols <= m_progress ? '-' : ' ' ));
+	}
+	printf( "|    %3d%%   ", m_progress );
+	switch( rot )
+	{
+		case 3: putchar( '|' ); break;
+		case 2: putchar( '/' ); break;
+		case 1: putchar( '-' ); break;
+		case 0: putchar( '\\' ); break;
+	}
+	rot = ++rot % 4;
+}
 
 
 

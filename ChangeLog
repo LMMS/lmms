@@ -1,3 +1,14 @@
+2008-05-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/project_renderer.h:
+	* src/core/main.cpp:
+	* src/core/project_renderer.cpp:
+	added a lot of options for rendering via command-line and finally made
+	it working with new projectRenderer-class
+
+	* include/mixer.h:
+	removed 16x oversampling
+
 2008-05-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/track.h:

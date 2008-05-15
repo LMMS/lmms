@@ -66,6 +66,8 @@ public slots:
 	void startProcessing( void );
 	void abortProcessing( void );
 
+	void updateConsoleProgress( void );
+
 
 signals:
 	void progressChanged( int );
@@ -78,6 +80,7 @@ private:
 	mixer::qualitySettings m_qualitySettings;
 	mixer::qualitySettings m_oldQualitySettings;
 
+	volatile int m_progress;
 	volatile bool m_abort;
 
 } ;

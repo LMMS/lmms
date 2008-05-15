@@ -28,6 +28,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
+#include <QtCore/QTimer>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
 #include <QtGui/QSplashScreen>
@@ -83,8 +84,12 @@ int main( int argc, char * * argv )
 
 	QApplication app( argc, argv );
 
-	QString extension = "wav";
-	QString file_to_load, file_to_render;
+	QString file_to_load, render_out;
+
+	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
+	projectRenderer::outputSettings os( 44100, FALSE, 160 );
+	projectRenderer::ExportFileTypes eft = projectRenderer::WaveFile;
+
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -106,11 +111,28 @@ int main( int argc, char * * argv )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
 	"Copyright (c) 2004-2008 LMMS developers.\n\n"
-	"usage: lmms [ -r <file_to_render> [ -o <format> ] [ -h ] "
-							"[ <file_to_load> ]\n"
-	"-r, --render			render given file.\n"
-	"-o, --output-format <format>	specify format of render-output where\n"
+	"usage: lmms [ -r <project file> [ -f <format> ] [ -s <samplerate> ]\n"
+	"            [ -b <bitrate> ] [ -i <method> ] [ -x <value> ] [ -h ]\n"
+	"	     [ <file to load> ]\n\n"
+	"-r, --render <project file>	render given project file\n"
+	"-o, --output <file>		render into <file>\n"
+	"-f, --output-format <format>	specify format of render-output where\n"
 	"				format is either 'wav' or 'ogg'.\n"
+	"-s, --samplerate <samplerate>	specify output samplerate in Hz\n"
+	"				range: 44100 to 192000\n"
+	"				default: 44100.\n"
+	"-b, --bitrate <bitrate>	specify output bitrate in kHz\n"
+	"				default: 160.\n"
+	"-i, --interpolation <method>	specify interpolation method\n"
+	"				possible values:\n"
+	"				   - linear.\n"
+	"				   - sincfastest.\n"
+	"				   - sincmedium.\n"
+	"				   - sincbest.\n"
+	"				default: sincfastest.\n"
+	"-x, --oversampling <value>	specify oversampling\n"
+	"				possible values: 1, 2, 4, 8\n"
+	"				default: 2\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage message and exit.\n\n",
 							PACKAGE_VERSION );
@@ -120,17 +142,120 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-r" ) )
 		{
 			file_to_load = QString( argv[i + 1] );
-			file_to_render = baseName( file_to_load ) + ".";
+			render_out = baseName( file_to_load ) + ".";
+			++i;
+		}
+		else if( argc > i && ( QString( argv[i] ) == "--output" ||
+						QString( argv[i] ) == "-o" ) )
+		{
+			render_out = baseName( QString( argv[i + 1] ) ) + ".";
 			++i;
 		}
 		else if( argc > i &&
-				( QString( argv[i] ) == "--output-format" ||
-						QString( argv[i] ) == "-o" ) )
+				( QString( argv[i] ) == "--format" ||
+						QString( argv[i] ) == "-f" ) )
 		{
-			extension = QString( argv[i + 1] );
-			if( extension != "wav" && extension != "ogg" )
+			const QString ext = QString( argv[i + 1] );
+			if( ext == "wav" )
+			{
+				eft = projectRenderer::WaveFile;
+			}
+			else if( ext == "ogg" )
+			{
+				eft = projectRenderer::OggFile;
+			}
+			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+				return( EXIT_FAILURE );
+			}
+			++i;
+		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--samplerate" ||
+						QString( argv[i] ) == "-s" ) )
+		{
+			sample_rate_t sr = QString( argv[i + 1] ).toUInt();
+			if( sr >= 44100 && sr <= 192000 )
+			{
+				os.samplerate = sr;
+			}
+			else
+			{
+				printf( "\nInvalid samplerate %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+				return( EXIT_FAILURE );
+			}
+			++i;
+		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--bitrate" ||
+						QString( argv[i] ) == "-b" ) )
+		{
+			int br = QString( argv[i + 1] ).toUInt();
+			if( br >= 64 && br <= 384 )
+			{
+				os.bitrate = br;
+			}
+			else
+			{
+				printf( "\nInvalid bitrate %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+				return( EXIT_FAILURE );
+			}
+			++i;
+		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--interpolation" ||
+						QString( argv[i] ) == "-i" ) )
+		{
+			const QString ip = QString( argv[i + 1] );
+			if( ip == "linear" )
+			{
+		qs.interpolation = mixer::qualitySettings::Interpolation_Linear;
+			}
+			else if( ip == "sincfastest" )
+			{
+		qs.interpolation = mixer::qualitySettings::Interpolation_SincFastest;
+			}
+			else if( ip == "sincmedium" )
+			{
+		qs.interpolation = mixer::qualitySettings::Interpolation_SincMedium;
+			}
+			else if( ip == "sincbest" )
+			{
+		qs.interpolation = mixer::qualitySettings::Interpolation_SincBest;
+			}
+			else
+			{
+				printf( "\nInvalid interpolation method %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
+				return( EXIT_FAILURE );
+			}
+			++i;
+		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--oversampling" ||
+						QString( argv[i] ) == "-x" ) )
+		{
+			int os = QString( argv[i + 1] ).toUInt();
+			switch( os )
+			{
+				case 1:
+		qs.oversampling = mixer::qualitySettings::Oversampling_None;
+		break;
+				case 2:
+		qs.oversampling = mixer::qualitySettings::Oversampling_2x;
+		break;
+				case 4:
+		qs.oversampling = mixer::qualitySettings::Oversampling_4x;
+		break;
+				case 8:
+		qs.oversampling = mixer::qualitySettings::Oversampling_8x;
+		break;
+				default:
+				printf( "\nInvalid oversampling %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
 				return( EXIT_FAILURE );
 			}
@@ -146,13 +271,6 @@ int main( int argc, char * * argv )
 			}
 			file_to_load = argv[i];
 		}
-	}
-
-	bool gui_startup = TRUE;
-	if( file_to_render != "" )
-	{
-		file_to_render += extension;
-		gui_startup = FALSE;
 	}
 
 
@@ -171,7 +289,7 @@ int main( int argc, char * * argv )
 		return( EXIT_FAILURE );
 	}
 
-	if( gui_startup )
+	if( render_out == "" )
 	{
 		QApplication::setStyle( new lmmsStyle() );
 
@@ -244,16 +362,25 @@ int main( int argc, char * * argv )
 	}
 	else
 	{
+		// we're going to render our song
 		engine::init( FALSE );
 		engine::getSong()->loadProject( file_to_load );
-/*		exportProjectDialog * e = new exportProjectDialog(
-						file_to_render,
-						engine::getMainWindow() );
-		e->show();
-		QTime t;
-		t.start();
-		e->exportBtnClicked();
-		printf("export took %d ms\n",t.elapsed());*/
+
+		// create renderer
+		projectRenderer * r = new projectRenderer( qs, os, eft,
+			render_out + QString( ( eft == projectRenderer::WaveFile ) ?
+								"wav" : "ogg" ) );
+		QCoreApplication::instance()->connect( r, SIGNAL( finished() ),
+								SLOT( quit() ) );
+
+		// timer for progress-updates
+		QTimer * t = new QTimer( r );
+		r->connect( t, SIGNAL( timeout() ),
+				SLOT( updateConsoleProgress() ) );
+		t->start( 50 );
+
+		// start now!
+		r->startProcessing();
 	}
 
 	return( app.exec() );
