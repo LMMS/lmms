@@ -22,6 +22,11 @@
 	* src/gui/widgets/automatable_button.cpp:
 	Noted bug in automatable button
 
+	* src/gui/piano_roll.cpp:
+	Fix bug when trying to select note on first beat. However, still breaks if
+	the cursor moves quickly from right to left (i.e: if it skips the
+	pixel position)
+
 2008-05-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/project_renderer.h:

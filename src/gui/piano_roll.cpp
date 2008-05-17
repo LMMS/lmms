@@ -1174,7 +1174,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								midiTime() );
 			}
 		}
-		if( _me->x() <= WHITE_KEY_WIDTH )
+		if( _me->x() < WHITE_KEY_WIDTH )
 		{
 			update();
 			return;
