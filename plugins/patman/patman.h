@@ -152,6 +152,7 @@ private:
 	patmanInstrument * m_pi;
 	QString m_displayFilename;
 
+	pixmapButton * m_openFileButton;
 	pixmapButton * m_loopButton;
 	pixmapButton * m_tuneButton;
 

@@ -3,6 +3,18 @@
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:
 	Allow knobs to invert phase as well
 
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/patman/artwork.png:
+	* plugins/patman/loop_off.png:
+	* plugins/patman/loop_on.png:
+	* plugins/patman/tune_off.png:
+	* plugins/patman/tune_on.png:
+	* plugins/patman/select_file_on.png:
+	* plugins/patman/select_file.png:
+	- Integrate new patman artwork.
+	- Make file selection button highlight when clicked.
+
 	* include/pixmap_button.h:
 	* src/gui/widgets/pixmap_button.cpp:
 	Make button pixmap "activate" on click

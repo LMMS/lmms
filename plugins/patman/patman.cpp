@@ -450,24 +450,27 @@ patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 
-	pixmapButton * open_file_btn = new pixmapButton( this, NULL );
-	open_file_btn->setCursor( QCursor( Qt::PointingHandCursor ) );
-	open_file_btn->move( 200, 90 );
-	open_file_btn->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
-	open_file_btn->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
-	connect( open_file_btn, SIGNAL( clicked() ),
-				this, SLOT( openFile() ) );
-	toolTip::add( open_file_btn, tr( "Open other patch" ) );
 
-	open_file_btn->setWhatsThis(
+	m_openFileButton = new pixmapButton( this, NULL );
+	m_openFileButton->setObjectName( "openFileButton" );
+	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_openFileButton->move( 227, 86 );
+	m_openFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"select_file_on" ) );
+	m_openFileButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"select_file" ) );
+	connect( m_openFileButton, SIGNAL( clicked() ),
+				this, SLOT( openFile() ) );
+	toolTip::add( m_openFileButton, tr( "Open other patch" ) );
+
+	m_openFileButton->setWhatsThis(
 		tr( "Click here to open another patch-file. Loop and Tune "
 			"settings are not reset." ) );
 
 	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton->setObjectName("loopButton");
 	m_loopButton->setCheckable( TRUE );
-	m_loopButton->move( 160, 160 );
+	m_loopButton->move( 195, 138 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -479,8 +482,9 @@ patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
 			"file." ) );
 
 	m_tuneButton = new pixmapButton( this, tr( "Tune" ) );
+	m_tuneButton->setObjectName("tuneButton");
 	m_tuneButton->setCheckable( TRUE );
-	m_tuneButton->move( 180, 160 );
+	m_tuneButton->move( 223, 138 );
 	m_tuneButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_on" ) );
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -631,8 +635,9 @@ void patmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.setPen( QColor( 0x66, 0xFF, 0x66 ) );
-	p.drawText( 8, 140, m_displayFilename );
+	p.drawText( 8, 116, 235, 16, 
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+			m_displayFilename );
 }
 
 
