@@ -3,6 +3,13 @@
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:
 	Allow knobs to invert phase as well
 
+	* include/pixmap_button.h:
+	* src/gui/widgets/pixmap_button.cpp:
+	Make button pixmap "activate" on click
+
+	* src/gui/widgets/automatable_button.cpp:
+	Noted bug in automatable button
+
 2008-05-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/project_renderer.h:

@@ -38,7 +38,8 @@
 pixmapButton::pixmapButton( QWidget * _parent, const QString & _name ) :
 	automatableButton( _parent, _name ),
 	m_activePixmap(),
-	m_inactivePixmap()
+	m_inactivePixmap(),
+	m_pressed( FALSE )
 {
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
 	setInactiveGraphic( embed::getIconPixmap( "led_off" ), FALSE );
@@ -58,7 +59,7 @@ void pixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	if( model()->value() )
+	if( model()->value() || m_pressed )
 	{
 		if( !m_activePixmap.isNull() )
 		{
@@ -85,12 +86,27 @@ void pixmapButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
+		// Show pressing graphics if this isn't checkable
+		if( !isCheckable() )
+		{
+			m_pressed = TRUE;
+			update();
+		}
+
 		automatableButton::mousePressEvent( _me );
 	}
 }
 
+void pixmapButton::mouseReleaseEvent( QMouseEvent * _me )
+{
+	automatableButton::mouseReleaseEvent( _me );
 
-
+	if( !isCheckable() )
+	{
+		m_pressed = FALSE;
+		update();
+	}
+}
 
 void pixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {

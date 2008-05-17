@@ -50,12 +50,14 @@ signals:
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 
 
 private:
 	QPixmap m_activePixmap;
 	QPixmap m_inactivePixmap;
+	bool	m_pressed;
 
 } ;
 

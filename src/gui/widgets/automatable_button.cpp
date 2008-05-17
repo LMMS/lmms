@@ -146,6 +146,8 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 
 void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
+	// TODO: Fix this. for example: LeftDown, RightDown, Both Released causes two events
+	//   or - pressing down then releasing outside of the bbox causes click event.
 	emit clicked();
 }
 
