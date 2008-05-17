@@ -152,8 +152,7 @@ public:
 		m_sem( &m_mixer->m_workerSem ),
 		m_jobWait( 1 ),
 		m_jobAccepted( 1 ),
-		m_jobQueue( NULL ),
-		m_idle( FALSE )
+		m_jobQueue( NULL )
 	{
 		start( QThread::TimeCriticalPriority );
 	}
@@ -169,11 +168,6 @@ public:
 		m_jobAccepted.acquire();
 	}
 
-	inline bool idle( void )
-	{
-		return( m_idle );
-		
-	}
 
 private:
 	virtual void run( void )
@@ -183,11 +177,9 @@ private:
 							sizeof( sampleFrame ) );
 		m_jobWait.acquire();
 		m_jobAccepted.acquire();
-		m_idle = TRUE;
 		while( 1 )
 		{
 			m_jobWait.acquire();
-			m_idle = FALSE;
 			m_sem->acquire();
 			m_jobAccepted.release();
 			for( jobQueueItems::iterator it =
@@ -207,8 +199,8 @@ private:
 						case AudioPortEffects:
 							{
 		audioPort * a = it->audioPortJob;
-		bool me = a->processEffects();
-		if( a->m_bufferUsage != audioPort::NoUsage || me )
+		const bool me = a->processEffects();
+		if( me || a->m_bufferUsage != audioPort::NoUsage )
 		{
 			engine::getFxMixer()->mixToChannel( a->firstBuffer(),
 							a->nextFxChannel() );
@@ -228,7 +220,6 @@ private:
 					m_jobQueue->lock.unlock();
 				}
 			}
-			m_idle = TRUE;
 			m_sem->release();
 		}
 		aligned_free( working_buf );
@@ -239,7 +230,6 @@ private:
 	QSemaphore m_jobWait;
 	QSemaphore m_jobAccepted;
 	jobQueue * m_jobQueue;
-	volatile bool m_idle;
 
 } ;
 

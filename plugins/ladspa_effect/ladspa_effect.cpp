@@ -64,7 +64,8 @@ ladspaEffect::ladspaEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
 	m_controls( NULL ),
-	m_effName( "none" ),
+	m_publicName( "none" ),
+	m_maxSampleRate( 0 ),
 	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
 	ladspa2LMMS * manager = engine::getLADSPAManager();
@@ -76,7 +77,7 @@ ladspaEffect::ladspaEffect( model * _parent,
 		setOkay( FALSE );
 		return;
 	}
-	
+
 	setPublicName( manager->getShortName( m_key ) );
 
 	pluginInstantiation();
@@ -114,30 +115,200 @@ void ladspaEffect::changeSampleRate( void )
 
 
 
+bool ladspaEffect::processAudioBuffer( sampleFrame * _buf, 
+							const fpp_t _frames )
+{
+	m_pluginMutex.lock();
+	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
+	{
+		m_pluginMutex.unlock();
+		return( FALSE );
+	}
+
+	int frames = _frames;
+	sampleFrame * o_buf = NULL;
+
+	int sr = m_maxSampleRate;
+	if( sr < engine::getMixer()->processingSampleRate() )
+	{
+		o_buf = _buf;
+		_buf = new sampleFrame[_frames];
+		sampleDown( o_buf, _buf, sr );
+		frames = _frames * sr /
+				engine::getMixer()->processingSampleRate();
+	}
+
+	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
+	// the control ports.  Need to change this to handle non-in-place-broken
+	// plugins--would speed things up to use the same buffer for both
+	// LMMS and LADSPA.
+	ch_cnt_t channel = 0;
+	for( ch_cnt_t proc = 0; proc < getProcessorCount(); ++proc )
+	{
+		for( int port = 0; port < m_portCount; ++port )
+		{
+			switch( m_ports[proc][port]->rate )
+			{
+				case CHANNEL_IN:
+					for( fpp_t frame = 0; 
+						frame < frames; ++frame )
+					{
+						m_ports[proc][port]->buffer[frame] = 
+							_buf[frame][channel];
+					}
+					++channel;
+					break;
+				case AUDIO_RATE_INPUT:
+					m_ports[proc][port]->value = 
+						static_cast<LADSPA_Data>( 
+							m_ports[proc][port]->control->getValue() /
+								m_ports[proc][port]->scale );
+					// This only supports control rate ports, so the audio rates are
+					// treated as though they were control rate by setting the
+					// port buffer to all the same value.
+					for( fpp_t frame = 0; 
+						frame < frames; ++frame )
+					{
+						m_ports[proc][port]->buffer[frame] = 
+							m_ports[proc][port]->value;
+					}
+					break;
+				case CONTROL_RATE_INPUT:
+					if( m_ports[proc][port]->control ==
+									NULL )
+					{
+						break;
+					}
+					m_ports[proc][port]->value = 
+						static_cast<LADSPA_Data>( 
+							m_ports[proc][port]->control->getValue() /
+								m_ports[proc][port]->scale );
+					m_ports[proc][port]->buffer[0] = 
+						m_ports[proc][port]->value;
+					break;
+				case CHANNEL_OUT:
+				case AUDIO_RATE_OUTPUT:
+				case CONTROL_RATE_OUTPUT:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	// Process the buffers.
+	for( ch_cnt_t proc = 0; proc < getProcessorCount(); ++proc )
+	{
+		(m_descriptor->run)( m_handles[proc], frames );
+	}
+
+	// Copy the LADSPA output buffers to the LMMS buffer.
+	double out_sum = 0.0;
+	channel = 0;
+	const float d = getDryLevel();
+	const float w = getWetLevel();
+	for( ch_cnt_t proc = 0; proc < getProcessorCount(); ++proc )
+	{
+		for( int port = 0; port < m_portCount; ++port )
+		{
+			switch( m_ports[proc][port]->rate )
+			{
+				case CHANNEL_IN:
+				case AUDIO_RATE_INPUT:
+				case CONTROL_RATE_INPUT:
+					break;
+				case CHANNEL_OUT:
+					for( fpp_t frame = 0; 
+						frame < frames; ++frame )
+					{
+						_buf[frame][channel] = 
+							d * 
+							_buf[frame][channel] +
+							w *
+							m_ports[proc][port]->buffer[frame];
+						out_sum += 
+							_buf[frame][channel] *
+							_buf[frame][channel];
+					}
+					++channel;
+					break;
+				case AUDIO_RATE_OUTPUT:
+				case CONTROL_RATE_OUTPUT:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	if( o_buf != NULL )
+	{
+		sampleBack( _buf, o_buf, sr );
+		delete[] _buf;
+	}
+
+	// Check whether we need to continue processing input.  Restart the
+	// counter if the threshold has been exceeded.
+	if( out_sum / frames <= getGate()+0.000001 )
+	{
+		incrementBufferCount();
+		if( getBufferCount() > getTimeout() )
+		{
+			stopRunning();
+			resetBufferCount();
+		}
+	}
+	else
+	{
+		resetBufferCount();
+	}
+
+	bool is_running = isRunning();
+	m_pluginMutex.unlock();
+	return( is_running );
+}
+
+
+
+
+void ladspaEffect::setControl( int _control, LADSPA_Data _value )
+{
+	if( !isOkay() )
+	{
+		return;
+	}
+	m_portControls[_control]->value = _value;
+}
+
+
+
+
 void ladspaEffect::pluginInstantiation( void )
 {
+	m_maxSampleRate = maxSamplerate( publicName() );
+
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
 	const ch_cnt_t lmms_chnls = engine::getMixer()->audioDev()->channels();
-	m_effectChannels = manager->getDescription( m_key )->inputChannels;
-	setProcessorCount( lmms_chnls / m_effectChannels );
-	
+	int effect_channels = manager->getDescription( m_key )->inputChannels;
+	setProcessorCount( lmms_chnls / effect_channels );
+
 	// Categorize the ports, and create the buffers.
 	m_portCount = manager->getPortCount( m_key );
-	
+
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
 		multi_proc_t ports;
-		for( Uint16 port = 0; port < m_portCount; port++ )
+		for( int port = 0; port < m_portCount; port++ )
 		{
 			port_desc_t * p = new portDescription;
-			
+
 			p->name = manager->getPortName( m_key, port );
 			p->proc = proc;
 			p->port_id = port;
 			p->control = NULL;
-			
+
 			// Determine the port's category.
 			if( manager->isPortAudio( m_key, port ) )
 			{
@@ -227,7 +398,7 @@ void ladspaEffect::pluginInstantiation( void )
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->max *= engine::getMixer()->processingSampleRate();
+				p->max *= m_maxSampleRate;
 			}
 
 			p->min = manager->getLowerBound( m_key, port );
@@ -239,7 +410,7 @@ void ladspaEffect::pluginInstantiation( void )
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->min *= engine::getMixer()->processingSampleRate();
+				p->min *= m_maxSampleRate;
 			}
 
 			p->def = manager->getDefaultSetting( m_key, port );
@@ -296,7 +467,7 @@ void ladspaEffect::pluginInstantiation( void )
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
 		LADSPA_Handle effect = manager->instantiate( m_key,
-				engine::getMixer()->processingSampleRate() );
+							m_maxSampleRate );
 		if( effect == NULL )
 		{
 			QMessageBox::warning( 0, "Effect",
@@ -311,7 +482,7 @@ void ladspaEffect::pluginInstantiation( void )
 	// Connect the ports.
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
-		for( Uint16 port = 0; port < m_portCount; port++ )
+		for( int port = 0; port < m_portCount; port++ )
 		{
 			if( !manager->connectPort( m_key,
 			     			m_handles[proc],
@@ -355,7 +526,7 @@ void ladspaEffect::pluginDestruction( void )
 		ladspa2LMMS * manager = engine::getLADSPAManager();
 		manager->deactivate( m_key, m_handles[proc] );
 		manager->cleanup( m_key, m_handles[proc] );
-		for( Uint16 port = 0; port < m_portCount; port++ )
+		for( int port = 0; port < m_portCount; port++ )
 		{
 			free( m_ports[proc][port]->buffer );
 			free( m_ports[proc][port] );
@@ -370,169 +541,25 @@ void ladspaEffect::pluginDestruction( void )
 
 
 
-bool ladspaEffect::processAudioBuffer( sampleFrame * _buf, 
-							const fpp_t _frames )
+
+
+static QMap<QString, int> __buggy_plugins;
+
+int ladspaEffect::maxSamplerate( const QString & _name )
 {
-	m_pluginMutex.lock();
-	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
+	if( __buggy_plugins.isEmpty() )
 	{
-		m_pluginMutex.unlock();
-		return( FALSE );
+		__buggy_plugins["C * AmpVTS"] = 88200;
+		__buggy_plugins["Chorus2"] = 44100;
 	}
-
-	sampleFrame * o_buf = NULL;
-	int frames = _frames;
-	if( publicName().contains( "C* AmpVTS" ) &&
-			engine::getMixer()->processingSampleRate() > 88200 )
+	if( __buggy_plugins.contains( _name ) )
 	{
-		o_buf = _buf;
-		_buf = new sampleFrame[_frames];
-		sampleDown( o_buf, _buf, 88200 );
-		frames = _frames * 88200 /
-				engine::getMixer()->processingSampleRate();
+		return( __buggy_plugins[_name] );
 	}
-
-	// Copy the LMMS audio buffer to the LADSPA input buffer and initialize
-	// the control ports.  Need to change this to handle non-in-place-broken
-	// plugins--would speed things up to use the same buffer for both
-	// LMMS and LADSPA.
-	ch_cnt_t channel = 0;
-	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++)
-	{
-		for( Uint16 port = 0; port < m_portCount; port++ )
-		{
-			switch( m_ports[proc][port]->rate )
-			{
-				case CHANNEL_IN:
-					for( fpp_t frame = 0; 
-						frame < frames; frame++ )
-					{
-						m_ports[proc][port]->buffer[frame] = 
-							_buf[frame][channel];
-					}
-					channel++;
-					break;
-				case AUDIO_RATE_INPUT:
-					m_ports[proc][port]->value = 
-						static_cast<LADSPA_Data>( 
-							m_ports[proc][port]->control->getValue() /
-								m_ports[proc][port]->scale );
-					// This only supports control rate ports, so the audio rates are
-					// treated as though they were control rate by setting the
-					// port buffer to all the same value.
-					for( fpp_t frame = 0; 
-						frame < frames; frame++ )
-					{
-						m_ports[proc][port]->buffer[frame] = 
-							m_ports[proc][port]->value;
-					}
-					break;
-				case CONTROL_RATE_INPUT:
-					if( m_ports[proc][port]->control ==
-									NULL )
-					{
-						break;
-					}
-					m_ports[proc][port]->value = 
-						static_cast<LADSPA_Data>( 
-							m_ports[proc][port]->control->getValue() /
-								m_ports[proc][port]->scale );
-					m_ports[proc][port]->buffer[0] = 
-						m_ports[proc][port]->value;
-					break;
-				case CHANNEL_OUT:
-				case AUDIO_RATE_OUTPUT:
-				case CONTROL_RATE_OUTPUT:
-					break;
-				default:
-					break;
-			}
-		}
-	}
-	
-	// Process the buffers.
-	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
-	{
-		(m_descriptor->run)(m_handles[proc], frames);
-	}
-	
-	// Copy the LADSPA output buffers to the LMMS buffer.
-	double out_sum = 0.0;
-	channel = 0;
-	const float d = getDryLevel();
-	const float w = getWetLevel();
-	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++)
-	{
-		for( Uint16 port = 0; port < m_portCount; port++ )
-		{
-			switch( m_ports[proc][port]->rate )
-			{
-				case CHANNEL_IN:
-				case AUDIO_RATE_INPUT:
-				case CONTROL_RATE_INPUT:
-					break;
-				case CHANNEL_OUT:
-					for( fpp_t frame = 0; 
-						frame < frames; frame++ )
-					{
-						_buf[frame][channel] = 
-							d * 
-							_buf[frame][channel] +
-							w *
-							m_ports[proc][port]->buffer[frame];
-						out_sum += 
-							_buf[frame][channel] *
-							_buf[frame][channel];
-					}
-					++channel;
-					break;
-				case AUDIO_RATE_OUTPUT:
-				case CONTROL_RATE_OUTPUT:
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	if( o_buf != NULL )
-	{
-		sampleBack( _buf, o_buf, 88200 );
-		delete[] _buf;
-	}
-
-	// Check whether we need to continue processing input.  Restart the
-	// counter if the threshold has been exceeded.
-	if( out_sum / frames <= getGate()+0.000001 )
-	{
-		incrementBufferCount();
-		if( getBufferCount() > getTimeout() )
-		{
-			stopRunning();
-			resetBufferCount();
-		}
-	}
-	else
-	{
-		resetBufferCount();
-	}
-
-	bool is_running = isRunning();
-	m_pluginMutex.unlock();
-	return( is_running );
+	return( engine::getMixer()->processingSampleRate() );
 }
 
 
-
-
-void ladspaEffect::setControl( Uint16 _control, LADSPA_Data _value )
-{
-	if( !isOkay() )
-	{
-		return;
-	}
-	m_portControls[_control]->value = _value;
-}
 
 
 extern "C"

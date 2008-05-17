@@ -41,8 +41,7 @@ audioPort::audioPort( const QString & _name, track * _track ) :
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _track ),
-	m_frames( engine::getMixer()->framesPerPeriod() )
+	m_effects( _track )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );
@@ -72,11 +71,13 @@ void audioPort::nextPeriod( void )
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );
 	qSwap( m_firstBuffer, m_secondBuffer );
-	m_firstBufferLock.unlock();
+
 	// this is how we decrease state of buffer-usage ;-)
 	m_bufferUsage = ( m_bufferUsage != NoUsage ) ?
 		( ( m_bufferUsage == FirstBuffer ) ?
 					NoUsage : FirstBuffer ) : NoUsage;
+
+	m_firstBufferLock.unlock();
 }
 
 
@@ -106,6 +107,19 @@ void audioPort::setName( const QString & _name )
 	m_name = _name;
 	engine::getMixer()->audioDev()->renamePort( this );
 }
+
+
+
+
+bool audioPort::processEffects( void )
+{
+	lockFirstBuffer();
+	bool more = m_effects.processAudioBuffer( m_firstBuffer,
+					engine::getMixer()->framesPerPeriod() );
+	unlockFirstBuffer();
+	return( more );
+}
+
 
 
 #endif

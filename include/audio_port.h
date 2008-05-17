@@ -43,6 +43,7 @@ public:
 	{
 		return( m_firstBuffer );
 	}
+
 	inline sampleFrame * secondBuffer( void )
 	{
 		return( m_secondBuffer );
@@ -76,7 +77,8 @@ public:
 	{
 		return( m_extOutputEnabled );
 	}
-	void FASTCALL setExtOutputEnabled( bool _enabled );
+
+	void setExtOutputEnabled( bool _enabled );
 
 
 	// next effect-channel after this audio-port
@@ -105,21 +107,20 @@ public:
 	void setName( const QString & _new_name );
 
 
+	bool processEffects( void );
+
+
 	enum bufferUsages
 	{
 		NoUsage,
 		FirstBuffer,
 		BothBuffers
-	} m_bufferUsage;
-	
-	inline bool processEffects( void )
-	{
-		QMutexLocker m( &m_firstBufferLock );
-		return( m_effects.processAudioBuffer( m_firstBuffer,
-								m_frames ) );
-	}
+	} ;
+
 
 private:
+	volatile bufferUsages m_bufferUsage;
+
 	sampleFrame * m_firstBuffer;
 	sampleFrame * m_secondBuffer;
 	QMutex m_firstBufferLock;
@@ -131,7 +132,10 @@ private:
 	QString m_name;
 	
 	effectChain m_effects;
-	fpp_t m_frames;
+
+
+	friend class mixer;
+	friend class mixerWorkerThread;
 
 } ;
 

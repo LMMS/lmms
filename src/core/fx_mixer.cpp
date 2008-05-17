@@ -91,6 +91,7 @@ fxMixer::~fxMixer()
 
 void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
+	m_fxChannels[_ch]->m_lock.lock();
 	sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
@@ -98,6 +99,7 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 		buf[f][1] += _buf[f][1];
 	}
 	m_fxChannels[_ch]->m_used = TRUE;
+	m_fxChannels[_ch]->m_lock.unlock();
 }
 
 

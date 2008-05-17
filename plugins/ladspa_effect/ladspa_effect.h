@@ -48,7 +48,7 @@ public:
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 	
-	void setControl( Uint16 _control, LADSPA_Data _data );
+	void setControl( int _control, LADSPA_Data _data );
 
 	virtual effectControls * getControls( void )
 	{
@@ -62,12 +62,12 @@ public:
 
 	virtual inline QString publicName( void ) const
 	{
-		return( m_effName );
+		return( m_publicName );
 	}
 	
 	inline void setPublicName( const QString & _name )
 	{
-		m_effName = _name;
+		m_publicName = _name;
 	}
 
 
@@ -79,15 +79,16 @@ private:
 	void pluginInstantiation( void );
 	void pluginDestruction( void );
 
+	static int maxSamplerate( const QString & _name );
+
 
 	QMutex m_pluginMutex;
 	ladspaControls * m_controls;
 
-	QString m_effName;
+	QString m_publicName;
+	int m_maxSampleRate;
 	ladspa_key_t m_key;
-	Uint16 m_effectChannels;
-	Uint16 m_portCount;
-	fpp_t m_bufferSize;
+	int m_portCount;
 
 	const LADSPA_Descriptor * m_descriptor;
 	QVector<LADSPA_Handle> m_handles;
