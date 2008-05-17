@@ -30,10 +30,10 @@
 stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
 		effectControls( _eff ),
 		m_effect( _eff ),
-		m_llModel( 1.0f, 0.0f, 1.0f, 0.01f ),
-		m_lrModel( 0.0f, 0.0f, 1.0f, 0.01f ),
-		m_rlModel( 0.0f, 0.0f, 1.0f, 0.01f ),
-		m_rrModel( 1.0f, 0.0f, 1.0f, 0.01f )
+		m_llModel( 1.0f, -1.0f, 1.0f, 0.01f ),
+		m_lrModel( 0.0f, -1.0f, 1.0f, 0.01f ),
+		m_rlModel( 0.0f, -1.0f, 1.0f, 0.01f ),
+		m_rrModel( 1.0f, -1.0f, 1.0f, 0.01f )
 {
 	connect( &m_llModel, SIGNAL( dataChanged( void ) ),
 			this, SLOT( changeMatrix( void ) ) );

@@ -1,3 +1,8 @@
+2008-05-17  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	Allow knobs to invert phase as well
+
 2008-05-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/project_renderer.h:
