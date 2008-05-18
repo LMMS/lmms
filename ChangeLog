@@ -1,5 +1,9 @@
 2008-05-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/stk/mallets/mallets.cpp:
+	added missing initialization of member-variables which made Mallets
+	play nothing until GUI has been opened
+
 	* include/bb_track.h:
 	* src/gui/widgets/combobox.cpp:
 	* src/gui/widgets/name_label.cpp:
