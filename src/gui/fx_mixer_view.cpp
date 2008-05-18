@@ -221,6 +221,7 @@ fxMixerView::fxMixerView() :
 
 	// add ourself to workspace
 	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 
 	// we want to receive dataChanged-signals in order to update
 	setModel( m );
