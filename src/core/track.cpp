@@ -897,29 +897,12 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		last_ppt = ppt;
 	}
 		
-
-	p.drawTiledPixmap( rect(), backgrnd, QPoint( 
-			tcv->currentPosition().getTact() * ppt, 0 ) );
-
-/*
-	if( !tcv->fixedTCOs() )
+	// Don't draw background on BB-Editor
+	if( m_trackView->getTrackContainerView() != engine::getBBEditor() )
 	{
-		const int offset = (int)( ( tcv->currentPosition() % 4 ) *
-							tcv->pixelsPerTact() );
-
-		int flipper = (tcv->currentPosition()/DefaultTicksPerTact) % 8;
-
-		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
-			if( flipper >= 4 )
-			{
-				p.fillRect( QRect(x, 0, 
-					(int) tcv->pixelsPerTact(), height() ),
-							QColor( 64, 68, 80 ) );
-			}
-			flipper = (flipper+1)%8;
-		}
+		p.drawTiledPixmap( rect(), backgrnd, QPoint( 
+				tcv->currentPosition().getTact() * ppt, 0 ) );
 	}
-*/
 
 }
 
