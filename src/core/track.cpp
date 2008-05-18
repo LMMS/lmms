@@ -620,7 +620,6 @@ void trackContentObjectView::setAutoResizeEnabled( bool _e )
 
 
 
-
 // ===========================================================================
 // trackContentWidget
 // ===========================================================================
@@ -633,6 +632,9 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 	connect( _parent->getTrackContainerView(),
 			SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( changePosition( const midiTime & ) ) );
+
+	setAutoFillBackground(false);
+	setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
 
@@ -708,6 +710,8 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 	{
 		const int cur_bb = engine::getBBTrackContainer()->currentBB();
 		int i = 0;
+		setUpdatesEnabled( false );
+
 		// first show TCO for current BB...
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
 					it != m_tcoViews.end(); ++it, ++i )
@@ -733,6 +737,7 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 				( *it )->hide();
 			}
 		}
+		setUpdatesEnabled( true );
 		return;
 	}
 
@@ -746,6 +751,7 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 	const int end = endPosition( pos );
 	const float ppt = m_trackView->getTrackContainerView()->pixelsPerTact();
 
+	setUpdatesEnabled( false );
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
 						it != m_tcoViews.end(); ++it )
 	{
@@ -773,6 +779,7 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 			tcov->move( -tcov->width()-10, tcov->y() );
 		}
 	}
+	setUpdatesEnabled( true );
 
 	// redraw background
 //	update();
@@ -850,10 +857,50 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
-	QPainter p( this );
-	p.fillRect( rect(), QColor( 72, 76, 88 ) );
+	static QPixmap backgrnd;
+	static int last_ppt = 0;
 
+	QPainter p( this );
+	const int tactsPerBar = 4;
 	const trackContainerView * tcv = m_trackView->getTrackContainerView();
+	int ppt = tcv->pixelsPerTact();
+
+	// Update background if needed
+	if( ppt != last_ppt )
+	{
+		int w = ppt * tactsPerBar;
+		int h = height();
+		backgrnd = QPixmap( w * 2, height() );
+		QPainter pmp( &backgrnd );
+		
+		QLinearGradient grad( 0,0, 0,h );
+		grad.setColorAt( 0, QColor( 96, 96, 96 ) );
+		grad.setColorAt( 1, QColor( 192, 192, 192 ) );
+		pmp.fillRect( 0, 0, w, h, grad );
+
+		QLinearGradient grad2( 0,0, 0,h );
+		grad2.setColorAt( 0, QColor( 64, 64, 64 ) );
+		grad2.setColorAt( 1, QColor( 128, 128, 128 ) );
+		pmp.fillRect( w, 0, w , h, grad2 );
+		
+		// draw vertical lines
+		pmp.setPen( QColor( 80, 84, 96 ) );
+		for( int x = 0; x < w * 2; x += ppt )
+		{
+			pmp.drawLine( x, 0, x, h );
+		}
+
+		pmp.end();
+
+		last_ppt = ppt;
+	}
+		
+
+	p.drawTiledPixmap( rect(), backgrnd, QPoint( 
+			tcv->currentPosition().getTact()
+			* tcv->pixelsPerTact(), 0 ) );
+
+/*
 	if( !tcv->fixedTCOs() )
 	{
 		const int offset = (int)( ( tcv->currentPosition() % 4 ) *
@@ -861,7 +908,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 
 		int flipper = (tcv->currentPosition()/DefaultTicksPerTact) % 8;
 
-/*		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
+		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
 			if( flipper >= 4 )
 			{
 				p.fillRect( QRect(x, 0, 
@@ -869,16 +916,10 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 							QColor( 64, 68, 80 ) );
 			}
 			flipper = (flipper+1)%8;
-		}*/
-
-		// draw vertical lines
-		p.setPen( QColor( 80, 84, 96 ) );
-		for( int x = -offset; x < width();
-					x += (int) tcv->pixelsPerTact() )
-		{
-			p.drawLine( x, 0, x, height() );
 		}
 	}
+*/
+
 }
 
 
