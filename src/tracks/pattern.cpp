@@ -940,7 +940,7 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 				m_pat->m_patternType == pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 192 ||
+				( fixedTCOs() || pixelsPerTact() >= 96 ||
 				m_pat->m_steps != DEFAULT_STEPS_PER_TACT ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
 	{
@@ -1067,17 +1067,11 @@ void patternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c );
 	lingrad.setColorAt( 0.5, Qt::black );
 	lingrad.setColorAt( 1, c );
-	p.fillRect( QRect( 1, 1, width() - 2, height() - 2 ), lingrad );
-
-	p.setPen( QColor( 57, 69, 74 ) );
-	p.drawLine( 0, 0, width(), 0 );
-	p.drawLine( 0, 0, 0, height() );
-	p.setPen( QColor( 120, 130, 140 ) );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
-	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
-
+	p.setBrush( lingrad );
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 1, 1, width() - 2, height() - 2 );
+	//p.drawRect( 0, 0, width() - 1, height() - 1 );
+	p.drawRect( QRect( 0, 0, width() - 1, height() - 1 ) );
+
 
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
@@ -1230,7 +1224,12 @@ void patternView::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 32, 240, 32 ) );
 	}
-	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
+
+	if( m_pat->name() != m_pat->getInstrumentTrack()->name() )
+	{
+		p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
+	}
+
 	if( m_pat->muted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,

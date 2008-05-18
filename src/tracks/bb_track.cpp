@@ -597,6 +597,12 @@ void bbTrackView::clickedTrackLabel( void )
 	engine::getBBTrackContainer()->setCurrentBB(
 					bbTrack::numOfBBTrack( m_bbTrack ) );
 	engine::getBBEditor()->show();
+	foreach( bbTrackView * tv,
+			getTrackContainerView()->findChildren<bbTrackView *>() )
+	{
+		tv->m_trackLabel->update();
+	}
+	
 }
 
 

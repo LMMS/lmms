@@ -172,8 +172,8 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
 
-	shadow.setAlpha(124);
-	highlight.setAlpha(124);
+	shadow.setAlpha( 124 );
+	highlight.setAlpha( 124 );
 
 	// button-separator
 	p.setPen( shadow );
@@ -215,10 +215,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			tx += pm.width() + 2;
 		}
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, p.fontMetrics().height()-1,
+		p.drawText( tx+1, p.fontMetrics().height()-2,
 						model()->currentText() );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, p.fontMetrics().height()-2,
+		p.drawText( tx, p.fontMetrics().height()-3,
 						model()->currentText() );
 	}
 }

@@ -173,6 +173,11 @@ public:
 
 	virtual bool close( void );
 
+	const bbTrack * getBBTrack( void ) const
+	{
+		return( m_bbTrack );
+	}
+
 
 public slots:
 	void clickedTrackLabel( void );

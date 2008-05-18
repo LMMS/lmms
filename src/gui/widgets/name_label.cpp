@@ -33,7 +33,7 @@
 
 #include "name_label.h"
 #include "rename_dialog.h"
-#include "bb_editor.h"
+#include "bb_track_container.h"
 #include "bb_track.h"
 #include "gui_templates.h"
 #include "config_mgr.h"
@@ -173,7 +173,6 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 	else
 	{
 		emit clicked();
-		QLabel::mousePressEvent( _me );
 	}
 }
 
@@ -200,8 +199,9 @@ void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 void nameLabel::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-	p.fillRect( rect(), palette().color( backgroundRole() ) );
-	p.setFont( pointSize<8>( p.font() ) );
+	p.fillRect( rect(),
+			parentWidget()->palette().color( backgroundRole() ) );
+	p.setFont( pointSize<9>( p.font() ) );
 
 	int x = 4;
 	if( m_pixmap.isNull() == FALSE )
@@ -216,19 +216,18 @@ void nameLabel::paintEvent( QPaintEvent * )
 		x += 4 + pm.width();
 	}
 
-	p.setPen( QColor( 16, 16, 16 ) );
-	p.drawText( x+1, height() / 2 + p.fontMetrics().height() / 2 - 3,
-								text() );
-
-	p.setPen( QColor( 0, 224, 0 ) );
-#warning: TODO
-/*	bbTrack * bbt = bbTrack::findBBTrack(
+	p.setPen( QColor( 160, 160, 160 ) );
+	bbTrack * bbt = bbTrack::findBBTrack(
 				engine::getBBTrackContainer()->currentBB() );
-	if( bbt != NULL && bbt->getTrackSettingsWidget() ==
-			dynamic_cast<trackSettingsWidget *>( parentWidget() ) )
+	trackSettingsWidget * w = dynamic_cast<trackSettingsWidget *>( parentWidget() );
+	if( bbt != NULL && w != NULL )
 	{
-		p.setPen( QColor( 255, 255, 255 ) );
-	}*/
+		bbTrackView * bbtv = dynamic_cast<bbTrackView *>( w->parentWidget() );
+		if( bbtv != NULL && bbtv->getBBTrack() == bbt )
+		{
+			p.setPen( QColor( 255, 255, 255 ) );
+		}
+	}
 	p.drawText( x, height() / 2 + p.fontMetrics().height() / 2 - 4,
 								text() );
 
