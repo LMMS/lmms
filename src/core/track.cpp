@@ -863,7 +863,9 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 	const int tactsPerBar = 4;
 	const trackContainerView * tcv = m_trackView->getTrackContainerView();
-	int ppt = tcv->pixelsPerTact();
+
+	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
+	int ppt = static_cast<int>( tcv->pixelsPerTact() );
 
 	// Update background if needed
 	if( ppt != last_ppt )
@@ -897,8 +899,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		
 
 	p.drawTiledPixmap( rect(), backgrnd, QPoint( 
-			tcv->currentPosition().getTact()
-			* tcv->pixelsPerTact(), 0 ) );
+			tcv->currentPosition().getTact() * ppt, 0 ) );
 
 /*
 	if( !tcv->fixedTCOs() )
