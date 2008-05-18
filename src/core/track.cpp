@@ -283,10 +283,10 @@ void trackContentObjectView::updateLength( void )
 	}
 	else
 	{
-		setFixedWidth( static_cast<int>( m_tco->length() *
-						pixelsPerTact() /
-						DefaultTicksPerTact ) +
-							TCO_BORDER_WIDTH * 2 );
+		setFixedWidth(
+		static_cast<int>( m_tco->length() * pixelsPerTact() /
+							DefaultTicksPerTact ) +
+						TCO_BORDER_WIDTH * 2-1 );
 	}
 	m_trackView->getTrackContainerView()->update();
 }
@@ -460,7 +460,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	if( m_action == Move )
 	{
 		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
-		midiTime t = tMax( 0, (Sint32)
+		midiTime t = tMax( 0, (int)
 			m_trackView->getTrackContainerView()->currentPosition()+
 				static_cast<int>( x * DefaultTicksPerTact /
 									ppt ) );
@@ -496,8 +496,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 			}
 			trackContentObject * tco = tcov->m_tco;
 			tcos.push_back( tco );
-			smallest_pos = tMin<Sint32>( smallest_pos,
-					(Sint32)tco->startPosition() +
+			smallest_pos = tMin<int>( smallest_pos,
+					(int)tco->startPosition() +
 					static_cast<int>( dx *
 						DefaultTicksPerTact / ppt ) );
 		}
@@ -628,10 +628,6 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
 	m_trackView( _parent )
 {
-	//setAutoFillBackground( TRUE );
-	//QPalette pal;
-	//pal.setColor( backgroundRole(), QColor( 96, 96, 96 ) );
-	//setPalette( pal );
 	setAcceptDrops( TRUE );
 
 	connect( _parent->getTrackContainerView(),
@@ -708,9 +704,6 @@ void trackContentWidget::update( void )
 // change of visible viewport
 void trackContentWidget::changePosition( const midiTime & _new_pos )
 {
-//	const int tcos = numOfTCOs();
-
-
 	if( m_trackView->getTrackContainerView() == engine::getBBEditor() )
 	{
 		const int cur_bb = engine::getBBTrackContainer()->currentBB();
@@ -749,8 +742,8 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 		pos = m_trackView->getTrackContainerView()->currentPosition();
 	}
 
-	const Sint32 begin = pos;
-	const Sint32 end = endPosition( pos );
+	const int begin = pos;
+	const int end = endPosition( pos );
 	const float ppt = m_trackView->getTrackContainerView()->pixelsPerTact();
 
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
@@ -758,9 +751,11 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 	{
 		trackContentObjectView * tcov = *it;
 		trackContentObject * tco = tcov->getTrackContentObject();
+
 		tco->changeLength( tco->length() );
-		Sint32 ts = tco->startPosition();
-		Sint32 te = tco->endPosition();
+
+		const int ts = tco->startPosition();
+		const int te = tco->endPosition()-3;
 		if( ( ts >= begin && ts <= end ) ||
 			( te >= begin && te <= end ) ||
 			( ts <= begin && te >= end ) )
@@ -768,16 +763,19 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 			tcov->move( static_cast<int>( ( ts - begin ) * ppt /
 							DefaultTicksPerTact ),
 								tcov->y() );
-			tcov->show();
+			if( !tcov->isVisible() )
+			{
+				tcov->show();
+			}
 		}
 		else
 		{
-			tcov->hide();
+			tcov->move( -tcov->width()-10, tcov->y() );
 		}
 	}
 
-	// redraw backgroun
-	update();
+	// redraw background
+//	update();
 }
 
 
@@ -853,29 +851,28 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	//p.fillRect( rect(), QColor( 23, 34, 37 ) );
+	p.fillRect( rect(), QColor( 72, 76, 88 ) );
 
 	const trackContainerView * tcv = m_trackView->getTrackContainerView();
-	bool flip = TRUE;
 	if( !tcv->fixedTCOs() )
 	{
 		const int offset = (int)( ( tcv->currentPosition() % 4 ) *
 							tcv->pixelsPerTact() );
 
-		flip = tcv->currentPosition() % 256 < 128;
 		int flipper = (tcv->currentPosition()/DefaultTicksPerTact) % 8;
 
-		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
-			p.fillRect( QRect(x, 0, 
-			(int) tcv->pixelsPerTact(), height()),
-				(flipper<4) ?
-				QColor( 56, 80, 88 ) :
-				QColor( 49, 71, 77 ));
+/*		for( int x = 0; x < width(); x+= (int) tcv->pixelsPerTact() ) {
+			if( flipper >= 4 )
+			{
+				p.fillRect( QRect(x, 0, 
+					(int) tcv->pixelsPerTact(), height() ),
+							QColor( 64, 68, 80 ) );
+			}
 			flipper = (flipper+1)%8;
-		}
+		}*/
 
 		// draw vertical lines
-		p.setPen( QColor( 54, 65, 69 ) );
+		p.setPen( QColor( 80, 84, 96 ) );
 		for( int x = -offset; x < width();
 					x += (int) tcv->pixelsPerTact() )
 		{
@@ -1112,7 +1109,8 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 128, 128, 128 ) );
+	p.fillRect( rect(), QColor( 56, 60, 72 ) );
+
 	if( m_trackView->isMovingTrack() == FALSE )
 	{
 		p.drawPixmap( 2, 2, *s_grip );
@@ -1541,9 +1539,9 @@ void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
 	for( tcoVector::iterator it_o = m_trackContentObjects.begin();
 				it_o != m_trackContentObjects.end(); ++it_o )
 	{
-		trackContentObject * tco = ( *it_o );//getTCO( i );
-		Sint32 s = tco->startPosition();
-		Sint32 e = tco->endPosition();
+		trackContentObject * tco = ( *it_o );
+		int s = tco->startPosition();
+		int e = tco->endPosition();
 		if( ( s <= _end ) && ( e >= _start ) )
 		{
 			// ok, TCO is posated within given range
@@ -1628,11 +1626,11 @@ void track::removeTact( const midiTime & _pos )
 tact track::length( void ) const
 {
 	// find last end-position
-	Sint32 last = 0;
+	int last = 0;
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
-		const Sint32 cur = ( *it )->endPosition();
+		const int cur = ( *it )->endPosition();
 		if( cur > last )
 		{
 			last = cur;
@@ -1689,16 +1687,15 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	m_trackContentWidget( this ),
 	m_action( NoAction )
 {
-	m_trackOperationsWidget.setAutoFillBackground( TRUE );
+	setAutoFillBackground( TRUE );
 	QPalette pal;
-	pal.setColor( m_trackOperationsWidget.backgroundRole(),
-						QColor( 128, 128, 128 ) );
-	m_trackOperationsWidget.setPalette( pal );
+	pal.setColor( backgroundRole(), QColor( 32, 36, 40 ) );
+	setPalette( pal );
 
 
 	m_trackSettingsWidget.setAutoFillBackground( TRUE );
 	pal.setColor( m_trackSettingsWidget.backgroundRole(),
-							QColor( 64, 64, 64 ) );
+							QColor( 56, 60, 72 ) );
 	m_trackSettingsWidget.setPalette( pal );
 
 	QHBoxLayout * layout = new QHBoxLayout( this );
