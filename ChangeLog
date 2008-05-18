@@ -1,3 +1,10 @@
+2008-05-18  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/knob.cpp:
+	* include/knob.h:
+	First version of stylable knobs. Perhaps can be overlayed with current
+	knobs to add line coloring/width in other places around the GUI.
+
 2008-05-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stk/mallets/mallets.cpp:
@@ -58,6 +65,7 @@
 	protect individual buffers of FX-channels from being processed by more
 	than one thread
 
+>>>>>>> .r985
 2008-05-17  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:

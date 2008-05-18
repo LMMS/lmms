@@ -38,11 +38,11 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPalette>
 
-
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
 #include <math.h>
+
 
 #include "automatable_model_templates.h"
 #include "caption_menu.h"
@@ -71,6 +71,8 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
 	m_knobNum( _knob_num ),
+	m_knobPixmap( NULL ),
+	m_outerColor( NULL ),
 	m_label( "" )
 {
 	if( s_textFloat == NULL )
@@ -81,11 +83,16 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	setAcceptDrops( TRUE );
 
 	setAccessibleName( _name );
-	m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
-		QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
+	
+	if( m_knobNum != knobStyled ) {
+		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
+			QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
 
-	setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
+		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
+	}
 	setTotalAngle( 270.0f );
+	setInnerRadius( 1.0f );
+	setOuterRadius( 10.0f );
 	doConnections();
 }
 
@@ -94,7 +101,10 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 knob::~knob()
 {
-	delete m_knobPixmap;
+	if( m_knobPixmap )
+	{
+		delete m_knobPixmap;
+	}
 }
 
 
@@ -113,10 +123,13 @@ void knob::setHintText( const QString & _txt_before,
 void knob::setLabel( const QString & _txt )
 {
 	m_label = _txt;
-	setFixedSize( tMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSize<6>( font()
-							) ).width( m_label ) ),
-						m_knobPixmap->height() + 10 );
+	if( m_knobPixmap )
+	{
+		setFixedSize( tMax<int>( m_knobPixmap->width(),
+						QFontMetrics( pointSize<6>( font()
+								) ).width( m_label ) ),
+							m_knobPixmap->height() + 10 );
+	}
 	update();
 }
 
@@ -136,6 +149,114 @@ void knob::setTotalAngle( float _angle )
 
 	update();
 }
+
+
+
+
+float knob::innerRadius( void ) const
+{
+	return m_innerRadius;
+}
+
+
+
+void knob::setInnerRadius( float _r )
+{
+	m_innerRadius = _r;
+}
+
+
+
+float knob::outerRadius( void ) const
+{
+	return m_outerRadius;
+}
+
+
+
+void knob::setOuterRadius( float _r )
+{
+	m_outerRadius = _r;
+}
+
+
+
+QPointF knob::centerPoint( void ) const
+{
+	return m_centerPoint;
+}
+
+
+
+float knob::centerPointX( void ) const
+{
+	return m_centerPoint.x();
+}
+
+
+
+void knob::setCenterPointX( float _c )
+{
+	m_centerPoint.setX( _c );
+}
+
+
+
+float knob::centerPointY( void ) const
+{
+	return m_centerPoint.y();
+}
+
+
+
+void knob::setCenterPointY( float _c )
+{
+	m_centerPoint.setY( _c );
+}
+
+
+
+float knob::lineWidth( void ) const
+{
+	return m_lineWidth;
+}
+
+
+
+void knob::setLineWidth( float _w )
+{
+	m_lineWidth = _w;
+}
+
+
+
+QColor knob::outerColor( void ) const
+{
+	if( m_outerColor )
+	{
+		return *m_outerColor;
+	}
+	else
+	{
+		return QColor();
+	}
+}
+
+
+
+void knob::setOuterColor( const QColor & _c )
+{
+	if( m_outerColor )
+	{
+		*m_outerColor = _c;
+	}
+	else
+	{
+		m_outerColor = new QColor( _c );
+	}
+}
+
+
 
 
 QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
@@ -162,8 +283,37 @@ QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRad
 
 void knob::drawKnob( QPainter * _p )
 {
+	QPoint mid;
+
+	if( m_knobNum == knobStyled )
+	{
+		_p->setRenderHint( QPainter::Antialiasing );
+
+		// Perhaps this can move to setOuterRadius()
+		if( m_outerColor )
+		{
+			QRadialGradient gradient( centerPoint(), outerRadius() );
+			gradient.setColorAt(0.33, _p->pen().brush().color() );
+			gradient.setColorAt(1, *m_outerColor );
+
+			_p->setPen( QPen( gradient, lineWidth(), Qt::SolidLine, Qt::RoundCap ) );
+		}
+		else {
+			QPen pen = _p->pen();
+			pen.setWidth( lineWidth() );
+			pen.setCapStyle( Qt::RoundCap );
+			
+			_p->setPen( pen );
+		}
+
+		_p->drawLine( calculateLine( centerPoint(), outerRadius(), innerRadius() ) );
+		return;
+	}
+
+
+	// Old-skool knobs
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	QPoint mid = QPoint( width() / 2.0,
+	mid = QPoint( width() / 2.0,
 	                      m_knobPixmap->height() / 2.0f );
 
 	_p->drawPixmap( static_cast<int>( 
@@ -357,7 +507,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 							model()->value() ) +
 							m_hintTextAfterValue );
 		s_textFloat->moveGlobal( this,
-				QPoint( m_knobPixmap->width() + 2, 0 ) );
+				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = TRUE;
 	}
@@ -475,7 +625,7 @@ void knob::wheelEvent( QWheelEvent * _we )
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 						m_hintTextAfterValue );
-	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( model()->value() );
@@ -519,7 +669,7 @@ void knob::reset( void )
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 							m_hintTextAfterValue );
-	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 
@@ -540,7 +690,7 @@ void knob::pasteValue( void )
 	s_textFloat->setText( m_hintTextBeforeValue +
 					QString::number( model()->value() ) +
 							m_hintTextAfterValue );
-	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 

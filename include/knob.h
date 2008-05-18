@@ -42,7 +42,7 @@ class textFloat;
 
 enum knobTypes
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17
+	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17, knobStyled
 } ;
 
 
@@ -50,6 +50,18 @@ enum knobTypes
 class knob : public QWidget, public floatModelView
 {
 	Q_OBJECT
+	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
+	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
+
+	Q_PROPERTY(float centerPointX READ centerPointX WRITE setCenterPointX)
+	Q_PROPERTY(float centerPointY READ centerPointY WRITE setCenterPointY)
+
+	Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth)
+	
+	// Unfortunately, the gradient syntax doesn't create our gradient correctly
+	// so we need to do this:
+	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
+
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name );
 	virtual ~knob();
@@ -61,6 +73,24 @@ public:
 
 	void setTotalAngle( float _angle );
 
+	// Begin styled knob accessors
+	float innerRadius( void ) const;
+	void setInnerRadius( float _r );
+
+	float outerRadius( void ) const;
+	void setOuterRadius( float _r );
+
+	QPointF centerPoint( void ) const;
+	float centerPointX( void ) const;
+	void setCenterPointX( float _c );
+	float centerPointY( void ) const;
+	void setCenterPointY( float _c );
+
+	float lineWidth( void ) const;
+	void setLineWidth( float _w );
+	
+	QColor outerColor( void ) const; 
+	void setOuterColor( const QColor & _c );
 
 public slots:
 	void reset( void );
@@ -90,6 +120,13 @@ protected:
 	QPixmap * m_knobPixmap;
 	QString m_hintTextBeforeValue;
 	QString m_hintTextAfterValue;
+
+	// Styled knob stuff, could break out
+	QPointF m_centerPoint;
+	float m_innerRadius;
+	float m_outerRadius;
+	float m_lineWidth;
+	QColor * m_outerColor;
 
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
