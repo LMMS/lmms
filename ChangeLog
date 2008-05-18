@@ -1,3 +1,27 @@
+2008-05-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	added "Notch Filter" to blacklist
+
+	* plugins/ladspa_effect/ladspa_effect.h:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	- replaced old code with effect::checkGate() call
+	- various cleanups and minor optimizations
+
+	* src/core/effect_chain.cpp:
+	added debugging-code for determining buggy effect-plugins at higher
+	samplerates
+
+	* include/plugin.h:
+	introduced changable publicName-property
+
+	* include/effect.h:
+	* src/core/effect.cpp:
+	added checkGate()-function for reducing redundant code in effect-plugins
+
 2008-05-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_effect.cpp:

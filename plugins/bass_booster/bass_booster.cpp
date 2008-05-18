@@ -85,26 +85,14 @@ bool bassBoosterEffect::processAudioBuffer( sampleFrame * _buf,
 	{
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
 		m_bbFX.nextSample( s[0], s[1] );
-		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-		{
-			_buf[f][ch] = d * _buf[f][ch] + w * s[ch];
-			out_sum += _buf[f][ch]*_buf[f][ch];
-		}
+
+		_buf[f][0] = d * _buf[f][0] + w * s[0];
+		_buf[f][1] = d * _buf[f][1] + w * s[1];
+
+		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 	}
 
-	if( out_sum / _frames <= getGate()+0.000001 )
-	{
-		incrementBufferCount();
-		if( getBufferCount() > getTimeout() )
-		{
-			stopRunning();
-			resetBufferCount();
-		}
-	}
-	else
-	{
-		resetBufferCount();
-	}
+	checkGate( out_sum / _frames );
 
 	return( isRunning() );
 }

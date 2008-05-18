@@ -60,16 +60,6 @@ public:
 		return( m_portControls );
 	}
 
-	virtual inline QString publicName( void ) const
-	{
-		return( m_publicName );
-	}
-	
-	inline void setPublicName( const QString & _name )
-	{
-		m_publicName = _name;
-	}
-
 
 private slots:
 	void changeSampleRate( void );
@@ -79,14 +69,13 @@ private:
 	void pluginInstantiation( void );
 	void pluginDestruction( void );
 
-	static int maxSamplerate( const QString & _name );
+	static sample_rate_t maxSamplerate( const QString & _name );
 
 
 	QMutex m_pluginMutex;
 	ladspaControls * m_controls;
 
-	QString m_publicName;
-	int m_maxSampleRate;
+	sample_rate_t m_maxSampleRate;
 	ladspa_key_t m_key;
 	int m_portCount;
 

@@ -124,32 +124,21 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		
 		m_seFX.nextSample( s[0], s[1] );
 
-		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-		{
-			_buf[f][ch] = d * _buf[f][ch] + w * s[ch];
-			out_sum += _buf[f][ch]*_buf[f][ch];
-		}
-		
+		_buf[f][0] = d * _buf[f][0] + w * s[0];
+		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
+
 		// Update currFrame
 		m_currFrame += 1;
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	if( out_sum / _frames <= getGate()+0.00001 )
+	checkGate( out_sum / _frames );
+	if( !isRunning() )
 	{
-		incrementBufferCount();
-		if( getBufferCount() > getTimeout() )
-		{
-			stopRunning();
-			resetBufferCount();
-			clearMyBuffer();
-		}
+		clearMyBuffer();
 	}
-	else
-	{
-		resetBufferCount();
-		//clearMyBuffer();
-	}
+
 	return( isRunning() );
 }
 

@@ -118,6 +118,28 @@ effect * effect::instantiate( const QString & _plugin_name,
 
 
 
+void effect::checkGate( double _out_sum )
+{
+	// Check whether we need to continue processing input.  Restart the
+	// counter if the threshold has been exceeded.
+	if( _out_sum <= getGate()+0.000001 )
+	{
+		incrementBufferCount();
+		if( getBufferCount() > getTimeout() )
+		{
+			stopRunning();
+			resetBufferCount();
+		}
+	}
+	else
+	{
+		resetBufferCount();
+	}
+}
+
+
+
+
 pluginView * effect::instantiateView( QWidget * _parent )
 {
 	return( new effectView( this, _parent ) );

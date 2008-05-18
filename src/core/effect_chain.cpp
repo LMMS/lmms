@@ -31,6 +31,7 @@
 #include "engine.h"
 #include "automatable_model_templates.h"
 #include "track.h"
+#include "debug.h"
 
 
 
@@ -190,9 +191,22 @@ bool effectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 	}
 	bool more_effects = FALSE;
 	for( effectList::iterator it = m_effects.begin(); 
-						it != m_effects.end(); it++ )
+						it != m_effects.end(); ++it )
 	{
 		more_effects |= ( *it )->processAudioBuffer( _buf, _frames );
+#ifdef LMMS_DEBUG
+		for( int f = 0; f < _frames; ++f )
+		{
+			if( fabs( _buf[f][0] ) > 5 || fabs( _buf[f][1] ) > 5 )
+			{
+				it = m_effects.end()-1;
+				printf( "numerical overflow after processing "
+					"plugin \"%s\"\n", ( *it )->
+					publicName().toAscii().constData() );
+				break;
+			}
+		}
+#endif
 	}
 	return( more_effects );
 }

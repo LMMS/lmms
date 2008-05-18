@@ -171,6 +171,8 @@ public:
 
 
 protected:
+	void checkGate( double _out_sum );
+
 	virtual pluginView * instantiateView( QWidget * );
 
 	// some effects might not be capable of higher sample-rates so they can

@@ -64,7 +64,6 @@ ladspaEffect::ladspaEffect( model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
 	m_controls( NULL ),
-	m_publicName( "none" ),
 	m_maxSampleRate( 0 ),
 	m_key( ladspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
 {
@@ -128,13 +127,12 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	int frames = _frames;
 	sampleFrame * o_buf = NULL;
 
-	int sr = m_maxSampleRate;
-	if( sr < engine::getMixer()->processingSampleRate() )
+	if( m_maxSampleRate < engine::getMixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
 		_buf = new sampleFrame[_frames];
-		sampleDown( o_buf, _buf, sr );
-		frames = _frames * sr /
+		sampleDown( o_buf, _buf, m_maxSampleRate );
+		frames = _frames * m_maxSampleRate /
 				engine::getMixer()->processingSampleRate();
 	}
 
@@ -243,25 +241,12 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( o_buf != NULL )
 	{
-		sampleBack( _buf, o_buf, sr );
+		sampleBack( _buf, o_buf, m_maxSampleRate );
 		delete[] _buf;
 	}
 
-	// Check whether we need to continue processing input.  Restart the
-	// counter if the threshold has been exceeded.
-	if( out_sum / frames <= getGate()+0.000001 )
-	{
-		incrementBufferCount();
-		if( getBufferCount() > getTimeout() )
-		{
-			stopRunning();
-			resetBufferCount();
-		}
-	}
-	else
-	{
-		resetBufferCount();
-	}
+	checkGate( out_sum / frames );
+
 
 	bool is_running = isRunning();
 	m_pluginMutex.unlock();
@@ -543,14 +528,15 @@ void ladspaEffect::pluginDestruction( void )
 
 
 
-static QMap<QString, int> __buggy_plugins;
+static QMap<QString, sample_rate_t> __buggy_plugins;
 
-int ladspaEffect::maxSamplerate( const QString & _name )
+sample_rate_t ladspaEffect::maxSamplerate( const QString & _name )
 {
 	if( __buggy_plugins.isEmpty() )
 	{
 		__buggy_plugins["C * AmpVTS"] = 88200;
 		__buggy_plugins["Chorus2"] = 44100;
+		__buggy_plugins["Notch Filter"] = 96000;
 	}
 	if( __buggy_plugins.contains( _name ) )
 	{

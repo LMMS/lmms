@@ -169,7 +169,13 @@ public:
 	// returns public-name out of descriptor
 	virtual inline QString publicName( void ) const
 	{
-		return( m_descriptor->public_name );
+		return( m_publicName != QString::null ?
+				m_publicName : m_descriptor->public_name );
+	}
+
+	virtual void setPublicName( const QString & _public_name )
+	{
+		m_publicName = _public_name;
 	}
 
 	// return plugin-type
@@ -228,6 +234,7 @@ protected:
 
 private:
 	const descriptor * m_descriptor;
+	QString m_publicName;
 
 	// pointer to instantiation-function in plugin
 	typedef plugin * ( * instantiationHook )( model *, void * );
