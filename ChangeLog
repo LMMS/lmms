@@ -5,15 +5,19 @@
 	First version of stylable knobs. Perhaps can be overlayed with current
 	knobs to add line coloring/width in other places around the GUI.
 
-	* plugins/patman/artwork.png:
-	Fixed artwork again
-
 	* src/core/track.cpp:
 	- Re-enabled alternating background, better appearance AND performance
 	- Fixed more of the flickering by disabling updates when moving
 	- Toby will probably want to change background colors, I just used
 	something simple since it will end up changing probably.  It do like the
 	gradient dark on top, looks like a "channel" or "groove".
+
+	* plugins/patman/artwork.png:
+	Fixed artwork again
+
+	* plugins/singerbot/artwork.png:
+	* plugins/singerbot/logo.png:
+	Updated SingerBot artwork
 
 2008-05-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
