@@ -1,3 +1,36 @@
+2008-05-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	* plugins/vst_base/lvsl_client.cpp:
+	call waitpid(...) when closing plugin - fixes zombie processes
+
+	* plugins/vst_effect/vst_effect_controls.h:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* plugins/vst_effect/vst_subplugin_features.h:
+	* plugins/vst_effect/vst_effect_control_dialog.cpp:
+	* plugins/vst_effect/Makefile.am:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_effect_controls.cpp:
+	* plugins/vst_effect/vst_effect_control_dialog.h:
+	* plugins/vst_effect/vst_effect.h:
+	* plugins/vst_base/lvsl_client.h:
+	* plugins/vst_base/lvsl_client.cpp:
+	finally made VST-effect plugin work
+
+	* src/core/track_container.cpp:
+	* src/core/main.cpp:
+	when rendering from command-line, only create a QCoreApplication - needs
+	further work
+
+	* include/config_mgr.h:
+	* src/gui/widgets/effect_rack_view.cpp:
+	minor coding-style stuff
+
+	* plugins/singerbot/singerbot.h:
+	* plugins/singerbot/singerbot.cpp:
+	integrated patches from William Steidtmann <billstei/at/hbci/dot/com>
+	which makes Singerbot at least compile - doesn't seem to work yet though
+
 2008-05-19  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* triple_oscillator.cpp:

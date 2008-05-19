@@ -63,6 +63,10 @@
 #include <sys/time.h>
 #endif
 
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
+
 
 #include "config_mgr.h"
 #include "engine.h"
@@ -110,7 +114,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 								"lvsl_server";
 		execlp( lvsl_server_exec.toAscii().constData(),
 					lvsl_server_exec.toAscii().constData(),
-								"", NULL );
+									NULL );
 		return;
 	}
 	m_serverInFD = m_pipes[1][0];
@@ -182,16 +186,21 @@ remoteVSTPlugin::~remoteVSTPlugin()
 				break;
 			}
 		}
-		if( m_pluginWidget != NULL )
+		if( m_pluginWidget != NULL &&
+			m_pluginWidget->parentWidget() != NULL &&
+			dynamic_cast<QMdiSubWindow *>(
+				m_pluginWidget->parentWidget() ) != NULL )
 		{
-			m_pluginWidget->parentWidget()->hide();
 			delete m_pluginWidget->parentWidget();
 		}
 		// timeout?
 /*		if( m_pluginPID != 0 )
 		{*/
 			kill( m_pluginPID, SIGTERM );
+			kill( m_pluginPID, SIGKILL );
 		//}
+		// remove process from PCB
+		waitpid( m_pluginPID, NULL, 0 );
 
 		// close all sides of our pipes
 		close( m_pipes[0][0] );
@@ -206,23 +215,30 @@ remoteVSTPlugin::~remoteVSTPlugin()
 
 
 
-void remoteVSTPlugin::showEditor( void )
+QWidget * remoteVSTPlugin::showEditor( QWidget * _parent )
 {
 	if( m_pluginWidget != NULL )
 	{
-		m_pluginWidget->parentWidget()->show();
-		return;
+		if( m_pluginWidget->parentWidget() )
+		{
+			m_pluginWidget->parentWidget()->show();
+		}
+		return( m_pluginWidget );
 	}
 
 	if( m_pluginXID == 0 )
 	{
-		return;
+		return( NULL );
 	}
 
-	m_pluginWidget = new QWidget;//( engine::getMainWindow()->workspace() );
+	m_pluginWidget = new QWidget( _parent );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
-	engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget )->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	if( _parent == NULL )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget )
+				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	}
 
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
 	xe->embedClient( m_pluginXID );
@@ -234,6 +250,8 @@ void remoteVSTPlugin::showEditor( void )
 	lock();
 	writeValueS<Sint16>( VST_SHOW_EDITOR );
 	unlock();
+
+	return( m_pluginWidget );
 }
 
 
@@ -241,7 +259,7 @@ void remoteVSTPlugin::showEditor( void )
 
 void remoteVSTPlugin::hideEditor( void )
 {
-	if( m_pluginWidget != NULL )
+	if( m_pluginWidget != NULL && m_pluginWidget->parentWidget() )
 	{
 		m_pluginWidget->parentWidget()->hide();
 	}

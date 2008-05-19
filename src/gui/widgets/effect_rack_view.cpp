@@ -226,9 +226,8 @@ void effectRackView::addEffect( void )
 	update();
 
 	// Find the effectView, and show the controls
-	for( QVector<effectView *>::iterator vit =
-						m_effectViews.begin();
-			vit != m_effectViews.end(); ++vit )
+	for( QVector<effectView *>::iterator vit = m_effectViews.begin();
+					vit != m_effectViews.end(); ++vit )
 	{
 		if( ( *vit )->getEffect() == fx )
 		{

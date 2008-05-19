@@ -2,7 +2,7 @@
  * singerbot.h - declaration of class singerBot, a singing bot instrument plugin
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -39,36 +39,37 @@
 #include <semaphore.h>
 
 #include "instrument.h"
+#include "instrument_view.h"
 #include "mixer.h"
 
 
 class File;
 class QTextEdit;
 class sampleBuffer;
-
+class singerBotView;
 
 class singerBot : public instrument
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
 	singerBot( instrumentTrack * _track );
 	virtual ~singerBot();
 
-	virtual void FASTCALL playNote( notePlayHandle * _n,
-						bool _try_parallelizing );
-	virtual void FASTCALL deleteNotePluginData( notePlayHandle * _n );
+	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+						sampleFrame * _working_buf );
+	virtual void deleteNotePluginData( notePlayHandle * _n );
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc,
+							QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 
 	virtual QString nodeName( void ) const;
 
+	virtual pluginView * instantiateView( QWidget * _parent );
 
-public slots:
-	void lyricsChanged( void );
-
+	void setPlainText( const QString & _plain_text, bool _emitDataChanged = TRUE );
+    const QString & getPlainText();
 
 private:
 	typedef struct
@@ -91,26 +92,43 @@ private:
 	sem_t * m_handle_semaphore;
 	sem_t * m_synth_semaphore;
 
-	QTextEdit * m_lyrics;
+	// m_plain_text is the model, and m_words is parsed list of the words in m_plain_text
+	QString m_plain_text;
 	QStringList m_words;
 	bool m_words_dirty;
 
 	void createWave( notePlayHandle * _n );
 	void play( sampleFrame * _ab, handle_data * _hdata,
 							const fpp_t _frames );
-	void updateWords( void );
-
-	void synth_init( void );
-	void synth_destroy( void );
 
 	void synth_send( handle_data * _hdata );
 	void synth_read( handle_data * _hdata );
 
 	const char * addSuffix( const char * _s );
+    void showHandleData( handle_data * _hdata );
+
+    friend class singerBotView;
 
 } ;
 
 
+
+
+class singerBotView : public instrumentView
+{
+	Q_OBJECT
+public:
+	singerBotView( instrument * _instrument, QWidget * _parent );
+	virtual ~singerBotView();
+
+public slots:
+	void viewTextChanged( void );
+    void modelTextChanged( void );
+
+private:
+    QTextEdit * m_lyrics;
+
+} ;
 
 
 #endif

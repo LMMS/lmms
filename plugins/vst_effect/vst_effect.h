@@ -1,7 +1,7 @@
 /*
  * vst_effect.h - class for handling VST effect plugins
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,34 +27,33 @@
 #define _VST_EFFECT_H
 
 #include <QtCore/QMutex>
-#include <QtGui/QMdiArea>
 
 #include "effect.h"
-#include "engine.h"
-#include "main_window.h"
 #include "lvsl_client.h"
-#include "vst_control_dialog.h"
+#include "vst_effect_control_dialog.h"
+#include "vst_effect_controls.h"
+
 
 
 class vstEffect : public effect
 {
 public:
-	vstEffect( const descriptor::subPluginFeatures::key * _key );
+	vstEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key );
 	virtual ~vstEffect();
 
-	virtual bool FASTCALL processAudioBuffer( surroundSampleFrame * _buf,
+	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
+
+	virtual effectControls * getControls( void )
+	{
+		return( &m_vstControls );
+	}
+
 
 	virtual inline QString publicName( void ) const
 	{
 		return( m_plugin->name() );
-	}
-
-	virtual inline effectControlDialog * createControlDialog( track * )
-	{
-		return( new vstControlDialog(
-					engine::getMainWindow()->workspace(),
-								this ) );
 	}
 
 
@@ -66,9 +65,14 @@ private:
 	QMutex m_pluginMutex;
 	effectKey m_key;
 
-	friend class vstControlDialog;
+	vstEffectControls m_vstControls;
+
+
+	friend class vstEffectControls;
+	friend class vstEffectControlDialog;
 
 } ;
+
 
 
 #endif

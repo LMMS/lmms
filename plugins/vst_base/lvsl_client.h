@@ -45,7 +45,7 @@ public:
 	remoteVSTPlugin( const QString & _plugin );
 	virtual ~remoteVSTPlugin();
 
-	void showEditor( void );
+	QWidget * showEditor( QWidget * _parent = NULL );
 	void hideEditor( void );
 
 	inline const QString & name( void ) const
@@ -71,13 +71,12 @@ public:
 	// if _wait == TRUE, process() calls waitForProcessingFinished()
 	// immediately, otherwise, _out_buf can be zero and you've to call
 	// waitForProcessingFinished() on your own
-	bool FASTCALL process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf,
-					bool _wait );
-	bool FASTCALL waitForProcessingFinished( sampleFrame * _out_buf );
+	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf,
+								bool _wait );
+	bool waitForProcessingFinished( sampleFrame * _out_buf );
 
 
-	void FASTCALL enqueueMidiEvent( const midiEvent & _event,
+	void enqueueMidiEvent( const midiEvent & _event,
 						const f_cnt_t _frames_ahead );
 
 	const QMap<QString, QString> & parameterDump( void );
@@ -155,7 +154,7 @@ private:
 	bool messagesLeft( void ) const;
 	Sint16 processNextMessage( void );
 
-	void FASTCALL setShmKeyAndSize( const Uint16 _key, const size_t _size );
+	void setShmKeyAndSize( const Uint16 _key, const size_t _size );
 
 
 	bool m_failed;

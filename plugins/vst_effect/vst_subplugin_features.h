@@ -3,7 +3,7 @@
  *                            plugin::descriptor::subPluginFeatures for
  *                            hosting VST-plugins
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,7 @@
 class vstSubPluginFeatures : public plugin::descriptor::subPluginFeatures
 {
 public:
-	vstSubPluginFeatures( plugin::pluginTypes _type );
+	vstSubPluginFeatures( plugin::PluginTypes _type );
 
 	virtual void fillDescriptionWidget( QWidget * _parent,
 							const key * _key );

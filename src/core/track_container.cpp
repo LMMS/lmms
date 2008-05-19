@@ -76,30 +76,36 @@ void trackContainer::loadSettings( const QDomElement & _this )
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( pd == NULL )
+	if( engine::hasGUI() )
 	{
-		pd = new QProgressDialog( tr( "Loading project..." ),
+		if( pd == NULL )
+		{
+			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count() );
-		pd->setWindowModality( Qt::ApplicationModal );
-		pd->setWindowTitle( tr( "Please wait..." ) );
-		pd->show();
-	}
-	else
-	{
-		start_val = pd->value();
-		pd->setMaximum( pd->maximum() + _this.childNodes().count() );
+			pd->setWindowModality( Qt::ApplicationModal );
+			pd->setWindowTitle( tr( "Please wait..." ) );
+			pd->show();
+		}
+		else
+		{
+			start_val = pd->value();
+			pd->setMaximum( pd->maximum() + _this.childNodes().count() );
+		}
 	}
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		pd->setValue( pd->value() + 1 );
-		qApp->processEvents( QEventLoop::AllEvents, 100 );
-
-		if( pd->wasCanceled() )
+		if( pd != NULL )
 		{
-			break;
+			pd->setValue( pd->value() + 1 );
+			QCoreApplication::instance()->processEvents(
+						QEventLoop::AllEvents, 100 );
+			if( pd->wasCanceled() )
+			{
+				break;
+			}
 		}
 
 		if( node.isElement() &&
@@ -114,12 +120,14 @@ void trackContainer::loadSettings( const QDomElement & _this )
 //	mainWindow::restoreWidgetState( this, _this );
 
 
-	pd->setValue( start_val + _this.childNodes().count() );
-
-	if( was_null )
+	if( pd != NULL )
 	{
-		delete pd;
-		pd = NULL;
+		pd->setValue( start_val + _this.childNodes().count() );
+		if( was_null )
+		{
+			delete pd;
+			pd = NULL;
+		}
 	}
 }
 

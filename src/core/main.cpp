@@ -65,7 +65,7 @@ inline void loadTranslation( const QString & _tname,
 
 	t->load( name, _dir );
 
-	qApp->installTranslator( t );
+	QCoreApplication::instance()->installTranslator( t );
 }
 
 
@@ -82,7 +82,21 @@ int main( int argc, char * * argv )
 	}
 #endif
 
-	QApplication app( argc, argv );
+	bool core_only = FALSE;
+
+	for( int i = 1; i < argc; ++i )
+	{
+		if( argc > i && ( QString( argv[i] ) == "--render" ||
+						QString( argv[i] ) == "-r" ) )
+		{
+			core_only = TRUE;
+			break;
+		}
+	}
+
+	QCoreApplication * app = core_only ?
+			new QCoreApplication( argc, argv ) :
+					new QApplication( argc, argv ) ;
 
 	QString file_to_load, render_out;
 
@@ -294,7 +308,7 @@ int main( int argc, char * * argv )
 		QApplication::setStyle( new lmmsStyle() );
 
 		// set palette
-		QPalette pal = app.palette();
+		QPalette pal = qApp->palette();
 		//pal.setColor( QPalette::Background, QColor( 72, 76 ,88 ) );
 		pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 		//pal.setColor( QPalette::Background, QColor( 127, 134 ,154 ) );
@@ -315,7 +329,7 @@ int main( int argc, char * * argv )
 		pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
 		pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
 		pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
-		app.setPalette( pal );
+		qApp->setPalette( pal );
 
 
 		// init splash screen
@@ -383,7 +397,7 @@ int main( int argc, char * * argv )
 		r->startProcessing();
 	}
 
-	return( app.exec() );
+	return( app->exec() );
 }
 
 

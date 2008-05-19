@@ -11,7 +11,7 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="vsteffect"
 	$(MOC) -o $@ $<
 
 
-#MOC_FILES = ./vst_control_dialog.moc
+MOC_FILES = ./vst_effect_controls.moc
 
 
 BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
@@ -27,14 +27,16 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 
 
-pkglib_LTLIBRARIES= libvsteffect.la
+pkglib_LTLIBRARIES = libvsteffect.la
 
 libvsteffect_la_SOURCES =	vst_effect.cpp 			\
-				vst_control_dialog.cpp		\
+				vst_effect_controls.cpp		\
+				vst_effect_control_dialog.cpp	\
 				vst_subplugin_features.cpp	\
 				vst_subplugin_features.h	\
 				vst_effect.h			\
-				vst_control_dialog.h
+				vst_effect_controls.h		\
+				vst_effect_control_dialog.h
 libvsteffect_la_LIBADD = -L../vst_base -lvstbase
 
 $(libvsteffect_la_SOURCES): ./embedded_resources.h

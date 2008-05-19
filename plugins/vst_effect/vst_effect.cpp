@@ -1,7 +1,7 @@
 /*
  * vst_effect.cpp - class for handling VST effect plugins
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,7 @@
 
 #include <QtGui/QMessageBox>
 
-#include "song_editor.h"
+#include "song.h"
 #include "text_float.h"
 #include "vst_subplugin_features.h"
 
@@ -47,7 +47,7 @@ plugin::descriptor vsteffect_plugin_descriptor =
 				"plugin for using arbitrary VST-effects "
 				"inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
-	0x0100,
+	0x0200,
 	plugin::Effect,
 	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
 	new vstSubPluginFeatures( plugin::Effect )
@@ -56,11 +56,13 @@ plugin::descriptor vsteffect_plugin_descriptor =
 }
 
 
-vstEffect::vstEffect( const descriptor::subPluginFeatures::key * _key ) :
-	effect( &vsteffect_plugin_descriptor, _key ),
+vstEffect::vstEffect( model * _parent,
+			const descriptor::subPluginFeatures::key * _key ) :
+	effect( &vsteffect_plugin_descriptor, _parent, _key ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
-	m_key( *_key )
+	m_key( *_key ),
+	m_vstControls( this )
 {
 	if( !m_key.user.toString().isEmpty() )
 	{
@@ -79,8 +81,7 @@ vstEffect::~vstEffect()
 
 
 
-bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf, 
-							const fpp_t _frames )
+bool vstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
@@ -100,31 +101,19 @@ bool FASTCALL vstEffect::processAudioBuffer( surroundSampleFrame * _buf,
 		m_pluginMutex.lock();
 		m_plugin->process( buf, buf, TRUE );
 		m_pluginMutex.unlock();
+
 		double out_sum = 0.0;
+		const float d = getDryLevel();
+		const float w = getWetLevel();
 		for( fpp_t f = 0; f < _frames; ++f )
 		{
-			for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
-			{
-				_buf[f][ch] = getDryLevel() * _buf[f][ch] +
-					getWetLevel() *
-						buf[f][ch%DEFAULT_CHANNELS];
-				out_sum += _buf[f][ch]*_buf[f][ch];
-			}
+			_buf[f][0] = d * _buf[f][0] + w * buf[f][0];
+			_buf[f][1] = d * _buf[f][1] + w * buf[f][1];
+			out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 		}
 		delete[] buf;
-		if( out_sum <= getGate() )
-		{
-			incrementBufferCount();
-			if( getBufferCount() > getTimeout() )
-			{
-				stopRunning();
-				resetBufferCount();
-			}
-		}
-		else
-		{
-			resetBufferCount();
-		}
+
+		checkGate( out_sum / _frames );
 	}
 	return( isRunning() );
 }
@@ -157,15 +146,10 @@ void vstEffect::openPlugin( const QString & _plugin )
 						QMessageBox::Ok );
 		return;
 	}
-	m_plugin->showEditor();
-	remoteVSTPlugin::connect( engine::getSongEditor(),
+	remoteVSTPlugin::connect( engine::getSong(),
 				SIGNAL( tempoChanged( bpm_t ) ),
 			 m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( engine::getSongEditor()->getTempo() );
-	if( m_plugin->pluginWidget() != NULL )
-	{
-		m_plugin->hideEditor();
-	}
+	m_plugin->setTempo( engine::getSong()->getTempo() );
 	m_pluginMutex.unlock();
 	delete tf;
 }
@@ -182,13 +166,15 @@ void vstEffect::closePlugin( void )
 
 
 
+
+
 extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new vstEffect(
+	return( new vstEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
 								_data ) ) );
 }

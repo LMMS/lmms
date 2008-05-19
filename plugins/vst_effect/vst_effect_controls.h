@@ -1,7 +1,7 @@
 /*
- * vst_effect_control_dialog.cpp - dialog for displaying VST-effect GUI
+ * vst_effect_controls.h - controls for VST effect plugins
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,32 +22,51 @@
  *
  */
 
-#include <QtGui/QLayout>
-#include <QtGui/QMdiArea>
 
+#ifndef _VST_EFFECT_CONTROLS_H
+#define _VST_EFFECT_CONTROLS_H
+
+#include "effect_controls.h"
 #include "vst_effect_control_dialog.h"
-#include "vst_effect.h"
-#include "main_window.h"
 
 
+class vstEffect;
 
-vstEffectControlDialog::vstEffectControlDialog( vstEffectControls * _ctl ) :
-	effectControlDialog( _ctl )
+
+class vstEffectControls : public effectControls
 {
-	QVBoxLayout * l = new QVBoxLayout( this );
-	QWidget * w = _ctl->m_effect->m_plugin->showEditor( this );
-	if( w )
+	Q_OBJECT
+public:
+	vstEffectControls( vstEffect * _eff );
+	virtual ~vstEffectControls()
 	{
-		w->show();
-		l->addWidget( w );
 	}
-}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+	inline virtual QString nodeName( void ) const
+	{
+		return( "vsteffectcontrols" );
+	}
+
+	virtual ch_cnt_t getControlCount( void )
+	{
+		return( 1 );
+	}
+
+	virtual effectControlDialog * createView( void )
+	{
+		return( new vstEffectControlDialog( this ) );
+	}
 
 
+private:
+	vstEffect * m_effect;
 
 
-vstEffectControlDialog::~vstEffectControlDialog()
-{
-}
+	friend class vstEffectControlDialog;
+
+} ;
 
 
+#endif

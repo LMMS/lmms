@@ -1,7 +1,7 @@
 /*
- * vst_control_dialog.h - dialog for displaying GUI of VST-effect-plugin
+ * vst_effect_control_dialog.h - dialog for displaying GUI of VST-effect-plugin
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,37 +22,20 @@
  *
  */
 
-#ifndef _VST_CONTROL_DIALOG_H
-#define _VST_CONTROL_DIALOG_H
+#ifndef _VST_EFFECT_CONTROL_DIALOG_H
+#define _VST_EFFECT_CONTROL_DIALOG_H
 
 #include "effect_control_dialog.h"
 
 
-class vstEffect;
+class vstEffectControls;
 
 
-class vstControlDialog : public effectControlDialog
+class vstEffectControlDialog : public effectControlDialog
 {
 public:
-	vstControlDialog( QWidget * _parent, vstEffect * _eff );
-	virtual ~vstControlDialog();
-
-/*	virtual void saveSettings( QDomDocument & _doc, 
-						QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
-	{
-		return( "vstcontrols" );
-	}*/
-
-	virtual ch_cnt_t getControlCount( void )
-	{
-		return( 1 );
-	}
-
-
-private:
-	vstEffect * m_effect;
+	vstEffectControlDialog( vstEffectControls * _controls );
+	virtual ~vstEffectControlDialog();
 
 } ;
 
