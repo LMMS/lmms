@@ -26,6 +26,7 @@
 #ifndef _KICKER_H
 #define _KICKER_H
 
+#include <QObject>
 #include "instrument.h"
 #include "instrument_view.h"
 #include "knob.h"
@@ -74,6 +75,7 @@ private:
 
 class kickerInstrumentView : public instrumentView
 {
+	Q_OBJECT
 public:
 	kickerInstrumentView( instrument * _instrument, QWidget * _parent );
 	virtual ~kickerInstrumentView();

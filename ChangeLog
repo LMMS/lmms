@@ -39,6 +39,11 @@
 	* src/gui/widgets/controller_view.cpp:
 	Remove stray line
 
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	* data/themes/default/style.css:
+	Including stylesheet changes I forgot to commit, fixes knobs in 3xOsc
+
 2008-05-18  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/knob.cpp:

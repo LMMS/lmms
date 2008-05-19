@@ -194,32 +194,12 @@ class kickerKnob : public knob
 {
 public:
 	kickerKnob( QWidget * _parent, const QString & _name ) :
-			knob( 0, _parent, _name )
+			knob( knobStyled, _parent, _name )
 	{
 		setFixedSize( 37, 47 );
 	}
-
-	static const QPointF m_midPoint;
-
-protected:
-	virtual void paintEvent( QPaintEvent * _me )
-	{
-		QPainter p( this );
-		p.setRenderHint( QPainter::Antialiasing );
-
-		QLineF ln = calculateLine( m_midPoint, 11.2, 4 );
-		
-		QRadialGradient gradient(m_midPoint, 11);
-		gradient.setColorAt(0.33, QColor( 240, 147, 14 ) );
-		gradient.setColorAt(1, QColor( 30, 35, 37 ) );
-		//gradient.setColorAt(1, QColor( 68, 77, 82 ) );
-		
-		p.setPen( QPen( gradient, 3 ) );
-		p.drawLine( ln );
-	}
 };
 
-const QPointF kickerKnob::m_midPoint = QPointF( 18.5, 13.5 );
 
 
 
@@ -291,4 +271,6 @@ plugin * lmms_plugin_main( model *, void * _data )
 
 }
 
+
+#include "kicker.moc"
 

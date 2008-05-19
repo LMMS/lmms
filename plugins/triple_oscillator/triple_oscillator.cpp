@@ -212,12 +212,8 @@ void oscillatorObject::updatePhaseOffsetRight( void )
 }
 
 
-
-
-
-
-
  
+
 tripleOscillator::tripleOscillator( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
 {
