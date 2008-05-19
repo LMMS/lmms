@@ -46,4 +46,23 @@ fxMixerView QPushButton {
 	font-size: 9px;
 }
 
+tripleOscillatorView knob {
+	color: rgb(1, 114, 216);
+	qproperty-outerColor: rgb(0, 0, 0);
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 6.5;
+	qproperty-centerPointX: 13.5;
+	qproperty-centerPointY: 13.5;
+	qproperty-lineWidth: 2;
+}
 
+
+kickerInstrumentView knob {
+	color: rgb(240, 147, 14);
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.5;
+	qproperty-lineWidth: 3;
+}
