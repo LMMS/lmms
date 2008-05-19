@@ -1,3 +1,37 @@
+2008-05-19  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* triple_oscillator.cpp:
+	* am_active.png:
+	* am_inactive.png:
+	* artwork.png:
+	* btn_mask.png:
+	* exp_shape_active.png:
+	* exp_shape_inactive.png:
+	* fm_active.png:
+	* fm_inactive.png:
+	* logo.png:
+	* mix_active.png:
+	* mix_inactive.png:
+	* moog_saw_shape_active.png:
+	* moog_saw_shape_inactive.png:
+	* pm_active.png:
+	* pm_inactive.png:
+	* saw_shape_active.png:
+	* saw_shape_inactive.png:
+	* sin_shape_active.png:
+	* sin_shape_inactive.png:
+	* square_shape_active.png:
+	* square_shape_inactive.png:
+	* sync_active.png:
+	* sync_inactive.png:
+	* triangle_shape_active.png:
+	* triangle_shape_inactive.png:
+	* usr_shape_active.png:
+	* usr_shape_inactive.png:
+	* white_noise_shape_active.png:
+	* white_noise_shape_inactive.png:
+	Updated Triple-oscillator artwork
+
 2008-05-18  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/knob.cpp:
