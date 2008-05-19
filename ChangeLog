@@ -32,6 +32,13 @@
 	* white_noise_shape_inactive.png:
 	Updated Triple-oscillator artwork
 
+	* src/core/track.cpp:
+	Darkened the tracks so it doesn't hurt to look at
+
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	Remove stray line
+
 2008-05-18  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/knob.cpp:

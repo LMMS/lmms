@@ -876,18 +876,22 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		QPainter pmp( &backgrnd );
 		
 		QLinearGradient grad( 0,0, 0,h );
-		grad.setColorAt( 0, QColor( 96, 96, 96 ) );
-		grad.setColorAt( 1, QColor( 192, 192, 192 ) );
+		grad.setColorAt( 0.05, QColor( 64, 64, 64 ) );
+		grad.setColorAt( 0.7, QColor( 128, 128, 128 ) );
+		grad.setColorAt( 0.9, QColor( 160, 160, 160 ) );
+		grad.setColorAt( 1.0, QColor( 64, 64, 64) );
 		pmp.fillRect( 0, 0, w, h, grad );
 
 		QLinearGradient grad2( 0,0, 0,h );
-		grad2.setColorAt( 0, QColor( 64, 64, 64 ) );
-		grad2.setColorAt( 1, QColor( 128, 128, 128 ) );
+		grad2.setColorAt( 0.05, QColor( 48, 48, 48 ) );
+		grad2.setColorAt( 0.7, QColor( 96, 96, 96 ) );
+		grad2.setColorAt( 0.9, QColor( 120, 120, 120 ) );
+		grad2.setColorAt( 1.0, QColor( 48, 48, 48 ) );
 		pmp.fillRect( w, 0, w , h, grad2 );
 		
 		// draw vertical lines
-		pmp.setPen( QColor( 80, 84, 96 ) );
-		for( int x = 0; x < w * 2; x += ppt )
+		pmp.setPen( QPen( QColor( 80, 84, 96, 192 ), 1 ) );
+		for( int x = 0; x <= w * 2; x += ppt )
 		{
 			pmp.drawLine( x, 0, x, h );
 		}

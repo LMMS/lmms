@@ -197,8 +197,6 @@ void controllerView::paintEvent( QPaintEvent * )
 	f.setBold( TRUE );
 	p.setFont( f );
 
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawLine(0,0,20,20);
 	p.drawText( 6, 55, castModel<controller>()->publicName() );
 	p.setPen( Qt::white );
 	p.drawText( 5, 54, castModel<controller>()->publicName() );

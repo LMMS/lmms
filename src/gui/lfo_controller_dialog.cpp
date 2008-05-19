@@ -261,9 +261,6 @@ void lfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 void lfoControllerDialog::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-
-	p.setPen( QColor( 128, 64, 0 ) );
-	p.drawLine(0,0,40,40);
 }
 
 
