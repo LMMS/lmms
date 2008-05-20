@@ -32,6 +32,7 @@
 
 
 #include "plugin.h"
+#include "embed.h"
 #include "mixer.h"
 #include "config_mgr.h"
 #include "dummy_plugin.h"
@@ -60,7 +61,7 @@ plugin::plugin( const descriptor * _descriptor, model * _parent ) :
 {
 	if( dummy_plugin_descriptor.logo == NULL )
 	{
-		dummy_plugin_descriptor.logo = new QPixmap();
+		dummy_plugin_descriptor.logo = new pixmapLoader;
 	}
 
 	if( m_descriptor == NULL )

@@ -53,6 +53,7 @@ class QPushButton;
 class automationPattern;
 class bbTrack;
 class pixmapButton;
+class pixmapLoader;
 class textFloat;
 class track;
 class trackContentObjectView;
@@ -418,9 +419,9 @@ public:
 		return( m_name );
 	}
 
-	inline const QPixmap * pixmap( void )
+	inline const pixmapLoader * icon( void ) const
 	{
-		return( m_pixmap );
+		return( m_pixmapLoader );
 	}
 
 	using model::dataChanged;
@@ -441,7 +442,7 @@ private:
 	trackContainer * m_trackContainer;
 	TrackTypes m_type;
 	QString m_name;
-	QPixmap * m_pixmap;
+	pixmapLoader * m_pixmapLoader;
 	boolModel m_mutedModel;
 
 	typedef QVector<trackContentObject *> tcoVector;

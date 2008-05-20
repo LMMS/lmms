@@ -59,7 +59,7 @@ plugin::descriptor vibedstrings_plugin_descriptor =
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 };
 

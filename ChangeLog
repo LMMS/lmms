@@ -1,3 +1,67 @@
+2008-05-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/singerbot/singerbot.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/vst_base.cpp:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/Makefile.am:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/track.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/plugin_browser.cpp:
+	* src/gui/main_window.cpp:
+	* src/core/plugin.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/tool.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/track.cpp:
+	* src/core/instrument.cpp:
+	use new pluginPixmapLoader
+
+	* include/lmms_style.h:
+	* src/gui/lmms_style.cpp:
+	load stylesheet here
+
+	* include/combobox.h:
+	* src/gui/widgets/combobox.cpp:
+	use pixmapLoader-pointers rather than QPixmap-pointers in comboBoxModel
+
+	* include/plugin.h:
+	in plugin-descriptor, hold a pointer to pixmapLoader instead of
+	QPixmap itself
+
+	* include/embed.h:
+	* src/gui/embed.cpp:
+	introduced pixmapLoader and pluginPixmapLoader-classes for abstracting
+	QPixmap-instantiation - models can hold pixmapLoaders without actually
+	instantiating a QPixmap-object and views can access the pixmap
+
+	* src/gui/main_window.cpp:
+	removed settings-menu and moved setup-dialog to edit-menu
+
+	* Makefile.am:
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	removed all the obsolete first-startup-wizard-code
+
 2008-05-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* configure.in:

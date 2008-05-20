@@ -42,7 +42,7 @@ plugin::descriptor stereoenhancer_plugin_descriptor =
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
 	plugin::Effect,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

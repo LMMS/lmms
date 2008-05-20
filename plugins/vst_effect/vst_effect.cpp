@@ -49,7 +49,7 @@ plugin::descriptor vsteffect_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	plugin::Effect,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	new vstSubPluginFeatures( plugin::Effect )
 } ;
 

@@ -50,6 +50,7 @@
 #include "song.h"
 #include "tempo_sync_knob.h"
 #include "track_container.h"
+#include "embed.h"
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -75,7 +76,7 @@ plugin::descriptor flpimport_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	plugin::ImportFilter,
-	new QPixmap(),
+	NULL,
 	NULL
 } ;
 

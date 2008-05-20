@@ -59,7 +59,7 @@ plugin::descriptor sf2player_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

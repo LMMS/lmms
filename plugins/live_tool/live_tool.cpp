@@ -55,7 +55,7 @@ plugin::descriptor live_tool_plugin_descriptor =
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
 	plugin::Tool,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

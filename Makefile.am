@@ -61,7 +61,6 @@ lmms_MOC =						\
 		./caption_menu.moc			\
 		./instrument_track.moc			\
 		./combobox.moc				\
-		./config_mgr.moc			\
 		./controller.moc			\
 		./controller_connection_dialog.moc	\
 		./controller_dialog.moc			\

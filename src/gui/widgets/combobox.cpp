@@ -128,8 +128,8 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 		for( int i = 0; i < model()->size(); ++i )
 		{
 			QAction * a = m_menu.addAction(
-					model()->itemPixmap( i ) ?
-						*model()->itemPixmap( i ) :
+				model()->itemPixmap( i ) ?
+					model()->itemPixmap( i )->pixmap() :
 							QPixmap(),
 						model()->itemText( i ) );
 			a->setData( i );
@@ -201,11 +201,11 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 		p.setFont( font() );
 		p.setClipRect( QRect( 5, 2, width() - CB_ARROW_BTN_WIDTH - 8,
 							height() - 2 ) );
-		const QPixmap * item_pm = model()->currentData();
+		QPixmap pm = model()->currentData() ?
+				model()->currentData()->pixmap() : QPixmap();
 		int tx = 4;
-		if( item_pm != NULL )
+		if( !pm.isNull() )
 		{
-			QPixmap pm = *item_pm;
 			if( pm.height() > 16 )
 			{
 				pm = pm.scaledToHeight( 16,
@@ -237,14 +237,6 @@ void comboBox::wheelEvent( QWheelEvent * _we )
 
 
 
-void comboBox::deletePixmap( QPixmap * _pixmap )
-{
-	delete _pixmap;
-}
-
-
-
-
 void comboBox::setItem( QAction * _item )
 {
 	model()->setInitValue( _item->data().toInt() );
@@ -258,9 +250,9 @@ void comboBox::setItem( QAction * _item )
 
 
 
-void comboBoxModel::addItem( const QString & _item, QPixmap * _pixmap )
+void comboBoxModel::addItem( const QString & _item, pixmapLoader * _pl )
 {
-	m_items.push_back( qMakePair( _item, _pixmap ) );
+	m_items.push_back( qMakePair( _item, _pl ) );
 	setRange( 0, m_items.size() - 1 );
 }
 
@@ -272,7 +264,7 @@ void comboBoxModel::clear( void )
 	setRange( 0, 0 );
 	foreach( const item & _i, m_items )
 	{
-		emit itemPixmapRemoved( _i.second );
+		delete _i.second;
 	}
 	m_items.clear();
 	emit propertiesChanged();

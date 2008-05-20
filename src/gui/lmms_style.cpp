@@ -1,17 +1,57 @@
+/*
+ * lmms_style.cpp - the graphical style used by LMMS to create a consistent
+ *                  interface
+ *
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * 
+ * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+
+#include <QtCore/QFile>
+#include <QtGui/QApplication>
+#include <QtGui/QFrame>
+#include <QtGui/QPainter>
 #include <QtGui/QPlastiqueStyle>
 #include <QtGui/QStyleOption>
-#include <QtGui/QPainter>
-#include <QtGui/QWidget>
-#include <QtGui/QFrame>
 
 #include "lmms_style.h"
+
+
+
+lmmsStyle::lmmsStyle() : 
+	QPlastiqueStyle()	
+{
+	QFile file( "resources:style.css" );
+	file.open( QIODevice::ReadOnly );
+	qApp->setStyleSheet( file.readAll() );
+}
+
+
 
 
 void lmmsStyle::drawPrimitive( PrimitiveElement element, 
 		const QStyleOption *option, QPainter *painter, 
 		const QWidget *widget) const
 {
-	if( element == QStyle::PE_Frame || element == QStyle::PE_FrameLineEdit ||
+	if( element == QStyle::PE_Frame ||
+			element == QStyle::PE_FrameLineEdit ||
 			element == QStyle::PE_PanelLineEdit )
 	{
 		const QRect rect = option->rect;
@@ -32,10 +72,14 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		// 50%
 		black.setAlpha(a100);
 		painter->setPen(QPen(black, 0));
-		lines[0] = QLine(rect.left() + 2, rect.top() + 1, rect.right() - 2, rect.top() + 1);
-		lines[1] = QLine(rect.left() + 2, rect.bottom() - 1, rect.right() - 2, rect.bottom() - 1);
-		lines[2] = QLine(rect.left() + 1, rect.top() + 2, rect.left() + 1, rect.bottom() - 2);
-		lines[3] = QLine(rect.right() - 1, rect.top() + 2, rect.right() - 1, rect.bottom() - 2);
+		lines[0] = QLine(rect.left() + 2, rect.top() + 1,
+					rect.right() - 2, rect.top() + 1);
+		lines[1] = QLine(rect.left() + 2, rect.bottom() - 1,
+					rect.right() - 2, rect.bottom() - 1);
+		lines[2] = QLine(rect.left() + 1, rect.top() + 2,
+					rect.left() + 1, rect.bottom() - 2);
+		lines[3] = QLine(rect.right() - 1, rect.top() + 2,
+					rect.right() - 1, rect.bottom() - 2);
 		painter->drawLines(lines, 4);
 
 		// black inside dots
@@ -52,8 +96,10 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		// 100%
 		shadow.setAlpha(a75);
 		painter->setPen(QPen(shadow, 0));
-		lines[0] = QLine(rect.left() + 2, rect.top(), rect.right() - 2, rect.top());
-		lines[1] = QLine(rect.left(), rect.top() + 2, rect.left(), rect.bottom() - 2);
+		lines[0] = QLine(rect.left() + 2, rect.top(),
+						rect.right() - 2, rect.top());
+		lines[1] = QLine(rect.left(), rect.top() + 2,
+						rect.left(), rect.bottom() - 2);
 		painter->drawLines(lines, 2);
 		
 		// outside corner dots - shadow
@@ -79,8 +125,10 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		// 100%
 		highlight.setAlpha(a75);
 		painter->setPen(QPen(highlight, 0));
-		lines[0] = QLine(rect.left() + 2, rect.bottom(), rect.right() - 2, rect.bottom());
-		lines[1] = QLine(rect.right(), rect.top() + 2, rect.right(), rect.bottom() - 2);
+		lines[0] = QLine(rect.left() + 2, rect.bottom(),
+					rect.right() - 2, rect.bottom());
+		lines[1] = QLine(rect.right(), rect.top() + 2,
+					rect.right(), rect.bottom() - 2);
 		painter->drawLines(lines, 2);
 		
 		// outside corner dots - highlight
@@ -103,13 +151,15 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 	}
 	else 
 	{
-		QPlastiqueStyle::drawPrimitive( element, option, painter, widget );
+		QPlastiqueStyle::drawPrimitive( element, option, painter,
+								widget );
 	}
 
 }
 
 
-int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option, const QWidget * _widget ) const
+int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
+						const QWidget * _widget ) const
 {
 	switch( _metric )
 	{
@@ -120,7 +170,8 @@ int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option, c
 			return 20;
 
 		default:
-			return QPlastiqueStyle::pixelMetric( _metric, _option, _widget );
+			return QPlastiqueStyle::pixelMetric( _metric, _option,
+								_widget );
 	}
 }
 

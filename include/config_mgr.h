@@ -31,18 +31,10 @@
 #endif
 
 
-#include <QtGui/QDialog>
 #include <QtCore/QMap>
 #include <QtCore/QVector>
 #include <QtCore/QPair>
 
-
-class QLineEdit;
-class QLabel;
-class QRadioButton;
-class QHBoxLayout;
-class QVBoxLayout;
-class QFrame;
 
 class engine;
 
@@ -55,9 +47,8 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class configManager : public QDialog 
+class configManager
 {
-	Q_OBJECT
 public:
 	static inline configManager * inst( void )
 	{
@@ -171,7 +162,6 @@ public:
 	void saveConfigFile( void );
 
 
-public slots:
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
@@ -180,30 +170,12 @@ public slots:
 	void setSTKDir( const QString & _fd );
 
 
-protected slots:
-	void openWorkingDir( void );
-
-	virtual void accept( void );
-
-        void backButtonClicked( void );
-        void nextButtonClicked( void );
-	void switchPage( int _pg );
-	void switchPage( QWidget * _pg );
-
-
 private:
 	static configManager * s_instanceOfMe;
 
 	configManager( void );
 	configManager( const configManager & _c );
 	~configManager();
-
-	void createWidgets( void );
-
-
-	void addPage( QWidget * _w, const QString & _title );
-
-	void loadStyleSheet( void );
 
 
 	const QString m_lmmsRcFile;
@@ -223,31 +195,6 @@ private:
 	typedef QVector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;
 	settingsMap m_settings;
-
-
-	QWidget * m_pageIntro;
-	QWidget * m_pageWorkingDir;
-	QWidget * m_pageFiles;
-
-	QRadioButton * m_samplesCopyRB;
-	QRadioButton * m_presetsCopyRB;
-	QRadioButton * m_projectsCopyRB;
-
-	QLineEdit * m_wdLineEdit;
-
-	// wizard stuff
-	QList<QPair<QWidget *, QString> > m_pages;
-	int m_currentPage;
-	QFrame * m_hbar;
-	QWidget * m_contentWidget;
-	QLabel * m_title;
-	QPushButton * m_cancelButton;
-	QPushButton * m_backButton;
-	QPushButton * m_nextButton;
-	QPushButton * m_finishButton;
-	QHBoxLayout * m_buttonLayout;
-	QHBoxLayout * m_mainLayout;
-	QVBoxLayout * m_contentLayout;
 
 
 	friend class engine;

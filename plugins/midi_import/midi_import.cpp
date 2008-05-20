@@ -36,6 +36,7 @@
 #include "level_object.h"
 #include "instrument.h"
 #include "debug.h"
+#include "embed.h"
 
 
 #define makeID(_c0, _c1, _c2, _c3) \
@@ -55,7 +56,7 @@ plugin::descriptor midiimport_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	plugin::ImportFilter,
-	new QPixmap(),
+	NULL,
 	NULL
 } ;
 

@@ -25,10 +25,10 @@ SUBDIRS =			\
 	patman			\
 	sf2_player		\
 	$(SINGERBOT_DIR)	\
-	$(STK_DIR)		\
-	triple_oscillator	\
-	$(VST_DIRS)		\
-	vibed			\
 	stereo_enhancer		\
 	stereo_matrix		\
+	$(STK_DIR)		\
+	triple_oscillator	\
+	vibed			\
+	$(VST_DIRS)		\
 	$(EXTRA_PLUGINS)

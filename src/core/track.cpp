@@ -1312,7 +1312,7 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_trackContainer( _tc ),
 	m_type( _type ),
 	m_name(),
-	m_pixmap( NULL ),
+	m_pixmapLoader( NULL ),
 	m_mutedModel( FALSE, this ),
 	m_trackContentObjects(),
 	m_automationPatterns()

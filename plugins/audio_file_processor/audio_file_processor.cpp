@@ -61,7 +61,7 @@ plugin::descriptor audiofileprocessor_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	new audioFileProcessor::subPluginFeatures( plugin::Instrument )
 } ;
 

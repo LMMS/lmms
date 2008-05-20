@@ -405,16 +405,9 @@ void mainWindow::finalize( void )
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
-
-
-	QMenu * settings_menu = new QMenu( this );
-	menuBar()->addMenu( settings_menu )->setText( tr( "&Settings" ) );
-	settings_menu->addAction( embed::getIconPixmap( "setup_general" ),
-					tr( "Show settings dialog" ),
+	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
-	settings_menu->addAction( embed::getIconPixmap( "wizard" ),
-					tr( "Show setup wizard" ),
-					configManager::inst(), SLOT( exec() ) );
 
 
 	m_toolsMenu = new QMenu( this );
@@ -426,7 +419,8 @@ void mainWindow::finalize( void )
 	{
 		if( it->type == plugin::Tool )
 		{
-			m_toolsMenu->addAction( *it->logo, it->public_name );
+			m_toolsMenu->addAction( it->logo->pixmap(),
+							it->public_name );
 			m_tools.push_back( tool::instantiate( it->name,
 					/*this*/NULL )->createView( this ) );
 		}

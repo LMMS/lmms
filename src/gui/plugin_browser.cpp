@@ -101,7 +101,7 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 	QWidget( _parent ),
 	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
-	m_logo( *_pd.logo ),
+	m_logo( _pd.logo->pixmap() ),
 	m_mouseOver( FALSE ),
 	m_targetHeight( 24 )
 {

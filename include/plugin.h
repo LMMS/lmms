@@ -36,13 +36,10 @@
 #include "base64.h"
 
 
-#define STRINGIFY_PLUGIN_NAME(s) STR(s)
-#define STR(PN)	#PN
 
-
-class QPixmap;
 class QWidget;
 
+class pixmapLoader;
 class pluginView;
 
 
@@ -57,7 +54,7 @@ public:
 		ExportFilter,	// filter for exporting a file
 		Tool,		// additional tool (level-meter etc)
 		Library,	// simple library holding a code-base for
-				// several other plugins (e.g. LADSPA-support)
+				// several other plugins (e.g. VST-support)
 		Other,
 		Undefined = 255
 	} ;
@@ -73,7 +70,7 @@ public:
 		const char * author;
 		int version;
 		PluginTypes type;
-		const QPixmap * logo;
+		const pixmapLoader * logo;
 		class subPluginFeatures
 		{
 		public:

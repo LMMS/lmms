@@ -26,6 +26,7 @@
 #include "bb_track_container.h"
 #include "bb_track.h"
 #include "combobox.h"
+#include "embed.h"
 #include "engine.h"
 #include "song.h"
 
@@ -214,8 +215,7 @@ void bbTrackContainer::updateComboBox( void )
 	{
 		bbTrack * bbt = bbTrack::findBBTrack( i );
 		m_bbComboBoxModel.addItem( bbt->name(),
-				bbt->pixmap() ? new QPixmap( *bbt->pixmap() )
-								: NULL );
+					new pixmapLoader( bbt->icon() ) );
 	}
 	setCurrentBB( cur_bb );
 }

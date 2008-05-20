@@ -1,7 +1,8 @@
 /*
- * lmms_style.h - the graphical style used my LMMS to create a consistent interface
+ * lmms_style.h - the graphical style used by LMMS to create a consistent
+ *                interface
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,24 +29,24 @@
 
 #include <QtGui/QPlastiqueStyle>
 
+
 class lmmsStyle : public QPlastiqueStyle
 {
 public:
-	lmmsStyle() : 
-		QPlastiqueStyle ()	
-	{
-	}
-
+	lmmsStyle();
 	virtual ~lmmsStyle() 
 	{
 	}
 
-	virtual void drawPrimitive( PrimitiveElement element, const QStyleOption *option,
-			QPainter *painter, const QWidget *widget = 0 ) const;
+	virtual void drawPrimitive( PrimitiveElement element,
+					const QStyleOption *option,
+					QPainter *painter,
+					const QWidget *widget = 0 ) const;
 
-	virtual int pixelMetric ( PixelMetric metric, const QStyleOption * option = 0, 
-			const QWidget * widget = 0 ) const;
+	virtual int pixelMetric( PixelMetric metric,
+					const QStyleOption * option = 0, 
+					const QWidget * widget = 0 ) const;
 
-};
+} ;
 
 #endif

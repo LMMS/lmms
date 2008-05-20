@@ -57,7 +57,7 @@ plugin::descriptor patman_plugin_descriptor =
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	new patmanInstrument::subPluginFeatures( plugin::Instrument )
 } ;
 

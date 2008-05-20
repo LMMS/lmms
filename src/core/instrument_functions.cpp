@@ -310,12 +310,9 @@ arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
 	m_arpModeModel.setTrack( _instrument_track );
-	m_arpModeModel.addItem( tr( "Free" ), new QPixmap(
-					embed::getIconPixmap( "arp_free" ) ) );
-	m_arpModeModel.addItem( tr( "Sort" ), new QPixmap(
-					embed::getIconPixmap( "arp_sort" ) ) );
-	m_arpModeModel.addItem( tr( "Sync" ), new QPixmap(
-					embed::getIconPixmap( "arp_sync" ) ) );
+	m_arpModeModel.addItem( tr( "Free" ), new pixmapLoader( "arp_free" ) );
+	m_arpModeModel.addItem( tr( "Sort" ), new pixmapLoader( "arp_sort" ) );
+	m_arpModeModel.addItem( tr( "Sync" ), new pixmapLoader( "arp_sync" ) );
 }
 
 

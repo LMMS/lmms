@@ -27,9 +27,9 @@
 
 #include "tool.h"
 
-#include <QtGui/QIcon>
 #include <QtGui/QMdiArea>
 
+#include "embed.h"
 #include "engine.h"
 #include "main_window.h"
 
@@ -86,7 +86,7 @@ toolView::toolView( tool * _tool ) :
 	}
 
 	window->setWindowTitle( _tool->publicName() );
-	window->setWindowIcon( *_tool->getDescriptor()->logo );
+	window->setWindowIcon( _tool->getDescriptor()->logo->pixmap() );
 }
 
 

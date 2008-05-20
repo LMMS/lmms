@@ -56,7 +56,7 @@ plugin::descriptor organic_plugin_descriptor =
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

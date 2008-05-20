@@ -42,7 +42,7 @@ plugin::descriptor stereomatrix_plugin_descriptor =
 	"Paul Giblock <lherard/at/gmail.com>",
 	0x0100,
 	plugin::Effect,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

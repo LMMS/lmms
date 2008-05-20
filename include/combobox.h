@@ -34,6 +34,8 @@
 #include "automatable_model.h"
 #include "templates.h"
 
+class pixmapLoader;
+
 
 class comboBoxModel : public intModel
 {
@@ -44,7 +46,7 @@ public:
 	{
 	}
 
-	void addItem( const QString & _item, QPixmap * _data = NULL );
+	void addItem( const QString & _item, pixmapLoader * _loader = NULL );
 
 	void clear( void );
 
@@ -55,7 +57,7 @@ public:
 		return( m_items[value()].first );
 	}
 
-	inline const QPixmap * currentData( void ) const
+	inline const pixmapLoader * currentData( void ) const
 	{
 		return( m_items[value()].second );
 	}
@@ -66,10 +68,10 @@ public:
 									first );
 	}
 
-	inline const QPixmap * itemPixmap( int _i ) const
+	inline const pixmapLoader * itemPixmap( int _i ) const
 	{
 		return( m_items[tLimit<int>( _i, minValue(), maxValue() )].
-									second );
+								second );
 	}
 
 	inline int size( void ) const
@@ -78,14 +80,10 @@ public:
 	}
 
 private:
-	typedef QPair<QString, QPixmap *> item;
+	typedef QPair<QString, pixmapLoader *> item;
 
 	QVector<item> m_items;
 
-
-signals:
-	void itemPixmapRemoved( QPixmap * _item );
-	
 } ;
 
 
@@ -108,16 +106,6 @@ public:
 	}
 
 
-	virtual void modelChanged( void )
-	{
-		if( model() != NULL )
-		{
-			QWidget::connect( model(), SIGNAL( itemPixmapRemoved( QPixmap * ) ),
-					this, SLOT( deletePixmap( QPixmap * ) ) );
-		}                       
-	}
-
-
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -136,7 +124,6 @@ private:
 
 
 private slots:
-	void deletePixmap( QPixmap * _pixmap );
 	void setItem( QAction * _item );
 
 } ;

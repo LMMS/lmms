@@ -79,22 +79,22 @@ instrumentSoundShaping::instrumentSoundShaping(
 
 	m_filterEnabledModel.setTrack( _instrument_track );
 
-	m_filterModel.addItem( tr( "LowPass" ), new QPixmap(
-					embed::getIconPixmap( "filter_lp" ) ) );
-	m_filterModel.addItem( tr( "HiPass" ), new QPixmap(
-					embed::getIconPixmap( "filter_hp" ) ) );
-	m_filterModel.addItem( tr( "BandPass csg" ), new QPixmap(
-					embed::getIconPixmap( "filter_bp" ) ) );
-	m_filterModel.addItem( tr( "BandPass czpg" ), new QPixmap(
-					embed::getIconPixmap( "filter_bp" ) ) );
-	m_filterModel.addItem( tr( "Notch" ), new QPixmap(
-				embed::getIconPixmap( "filter_notch" ) ) );
-	m_filterModel.addItem( tr( "Allpass" ), new QPixmap(
-					embed::getIconPixmap( "filter_ap" ) ) );
-	m_filterModel.addItem( tr( "Moog" ), new QPixmap(
-					embed::getIconPixmap( "filter_lp" ) ) );
-	m_filterModel.addItem( tr( "2x LowPass" ), new QPixmap(
-					embed::getIconPixmap( "filter_2lp" ) ) );
+	m_filterModel.addItem( tr( "LowPass" ),
+					new pixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "HiPass" ),
+					new pixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "BandPass csg" ),
+					new pixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "BandPass czpg" ),
+					new pixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Notch" ),
+					new pixmapLoader( "filter_notch" ) );
+	m_filterModel.addItem( tr( "Allpass" ),
+					new pixmapLoader( "filter_ap" ) );
+	m_filterModel.addItem( tr( "Moog" ),
+					new pixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "2x LowPass" ),
+					new pixmapLoader( "filter_2lp" ) );
 
 	m_filterModel.setTrack( _instrument_track );
 	m_filterCutModel.setTrack( _instrument_track );

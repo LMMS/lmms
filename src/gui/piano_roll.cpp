@@ -379,16 +379,14 @@ pianoRoll::pianoRoll( void ) :
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenModel->addItem( tr( "Last note" ), new QPixmap(
-					embed::getIconPixmap( "edit_draw" ) ) );
+	m_noteLenModel->addItem( tr( "Last note" ),
+					new pixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond" } ;
 	for( int i = 0; i < 6; ++i )
 	{
 		m_noteLenModel->addItem( "1/" + QString::number( 1 << i ),
-				new QPixmap( embed::getIconPixmap(
-					QString( "note_" + pixmaps[i] ).
-						toAscii().constData() ) ) );
+				new pixmapLoader( "note_" + pixmaps[i] ) );
 	}
 	m_noteLenModel->addItem( "1/192" );
 	m_noteLenModel->setValue( 0 );

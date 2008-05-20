@@ -53,7 +53,7 @@ plugin::descriptor ladspaeffect_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	plugin::Effect,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	new ladspaSubPluginFeatures( plugin::Effect )
 } ;
 

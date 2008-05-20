@@ -30,6 +30,7 @@
 #include "instrument_track.h"
 #include "dummy_instrument.h"
 #include "note_play_handle.h"
+#include "embed.h"
 
 
 instrument::instrument( instrumentTrack * _instrument_track,
@@ -153,8 +154,8 @@ void instrumentView::setModel( ::model * _model, bool )
 	if( dynamic_cast<instrument *>( _model ) != NULL )
 	{
 		modelView::setModel( _model );
-		getInstrumentTrackWindow()->setWindowIcon( *( model()->
-						getDescriptor()->logo ) );
+		getInstrumentTrackWindow()->setWindowIcon(
+				model()->getDescriptor()->logo->pixmap() );
 		connect( model(), SIGNAL( destroyed( QObject * ) ),
 					this, SLOT( close() ) );
 	}

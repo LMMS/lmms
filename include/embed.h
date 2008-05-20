@@ -1,7 +1,7 @@
 /*
  * embed.h - misc. stuff for using embedded data (resources linked into binary)
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,6 +30,10 @@
 #include <QtCore/QString>
 
 
+#define STRINGIFY_PLUGIN_NAME(s) STR(s)
+#define STR(PN)	#PN
+
+
 namespace embed
 {
 
@@ -56,6 +60,58 @@ QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
 
 }
 #endif
+
+
+
+class pixmapLoader
+{
+public:
+	pixmapLoader( const pixmapLoader * _ref ) :
+		m_name( _ref != NULL ? _ref->m_name : QString::null )
+	{
+	}
+
+	pixmapLoader( const QString & _name = QString::null ) :
+		m_name( _name )
+	{
+	}
+
+	virtual QPixmap pixmap( void ) const
+	{
+		if( !m_name.isEmpty() )
+		{
+			return( embed::getIconPixmap(
+					m_name.toAscii().constData() ) );
+		}
+		return( QPixmap() );
+	}
+
+protected:
+	QString m_name;
+} ;
+
+
+#ifdef PLUGIN_NAME
+class pluginPixmapLoader : public pixmapLoader
+{
+public:
+	pluginPixmapLoader( const QString & _name = QString::null ) :
+		pixmapLoader( _name )
+	{
+	}
+
+	virtual QPixmap pixmap( void ) const
+	{
+		if( !m_name.isEmpty() )
+		{
+			return( PLUGIN_NAME::getIconPixmap(
+					m_name.toAscii().constData() ) );
+		}
+		return( QPixmap() );
+	}
+} ;
+#endif
+
 
 
 #endif
