@@ -66,3 +66,35 @@ kickerInstrumentView knob {
 	qproperty-centerPointY: 13.5;
 	qproperty-lineWidth: 3;
 }
+
+
+audioFileProcessorView knob {
+	color: rgb(240, 147, 14);
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 16.5;
+	qproperty-lineWidth: 3;
+}
+
+organicInstrumentView knob {
+	color: rgb(205, 16, 216);
+	qproperty-outerColor: rgb(23, 9, 24);
+	/*qproperty-outerColor: rgb(64, 21, 67);*/
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 8.7;
+	qproperty-centerPointX: 10.5;
+	qproperty-centerPointY: 10.5;
+	qproperty-lineWidth: 2;
+}
+
+
+organicInstrumentView knob#fx1Knob,
+organicInstrumentView knob#volKnob {
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.8;
+	qproperty-lineWidth: 3;
+}

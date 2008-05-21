@@ -136,6 +136,7 @@ private slots:
 
 class organicInstrumentView : public instrumentView
 {
+	Q_OBJECT
 public:
 	organicInstrumentView( instrument * _instrument, QWidget * _parent );
 	virtual ~organicInstrumentView();

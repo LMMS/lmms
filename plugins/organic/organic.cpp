@@ -97,6 +97,11 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 				m_osc[i], SLOT( updateVolume() ) );
 		connect( &m_osc[i]->m_detuneModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateDetuning() ) );
+
+		m_osc[i]->m_oscModel.setTrack( _channel_track );
+		m_osc[i]->m_volModel.setTrack( _channel_track );
+		m_osc[i]->m_panModel.setTrack( _channel_track );
+		m_osc[i]->m_detuneModel.setTrack( _channel_track );
 		
 		m_osc[i]->updateVolume();
 
@@ -194,7 +199,6 @@ void organicInstrument::playNote( notePlayHandle * _n, bool,
 		for( Sint8 i = m_numOscillators - 1; i >= 0; --i )
 		{
 			
-			// randomize the phaseOffset [0,1)
 			m_osc[i]->m_phaseOffsetLeft = rand()
 							/ ( RAND_MAX + 1.0f );
 			m_osc[i]->m_phaseOffsetRight = rand()
@@ -363,39 +367,15 @@ pluginView * organicInstrument::instantiateView( QWidget * _parent )
 
 
 
-template<class BASE>
-class organicKnobTemplate : public BASE
+class organicKnob : public knob
 {
 public:
-	organicKnobTemplate( QWidget * _parent, const QString & _name ) :
-		BASE( 0, _parent, _name ),
-		m_midPoint( QPointF( 10.5, 10.5 ) )
+	organicKnob( QWidget * _parent, const QString & _name ) :
+		knob( knobStyled, _parent, _name )
 	{
-		BASE::setFixedSize( 21, 21 );
-	}
-
-	const QPointF m_midPoint;
-
-protected:
-	virtual void paintEvent( QPaintEvent * _me )
-	{
-		QPainter p( this );
-		p.setRenderHint( QPainter::Antialiasing );
-
-		QLineF ln = BASE::calculateLine( m_midPoint, 8.7, 2 );
-		
-		QRadialGradient gradient(m_midPoint, 11);
-		gradient.setColorAt(0.2, QColor( 227, 18, 240 ) );
-		gradient.setColorAt(1, QColor( 0, 0, 0 ) );
-		
-		p.setPen( QPen( gradient, 2 ) );
-		p.drawLine( ln );
+		setFixedSize( 21, 21 );
 	}
 };
-
-
-typedef organicKnobTemplate<knob> organicKnob;
-typedef organicKnobTemplate<volumeKnob> organicVolumeKnob;
 
 
 
@@ -413,24 +393,26 @@ organicInstrumentView::organicInstrumentView( instrument * _instrument,
 	setPalette( pal );
 
 	// setup knob for FX1
-	m_fx1Knob = new knob( knobGreen_17, this, tr( "FX1" ) );
-	m_fx1Knob->move( 20, 200 );
+	m_fx1Knob = new organicKnob( this, tr( "FX1" ) );
+	m_fx1Knob->move( 15, 201 );
+	m_fx1Knob->setFixedSize( 37, 47 );
+	m_fx1Knob->setObjectName( "fx1Knob" );
 
 	// setup volume-knob
-	m_volKnob = new knob( knobGreen_17, this, tr( "Osc %1 volume" ).arg(
+	m_volKnob = new organicKnob( this, tr( "Osc %1 volume" ).arg(
 							1 ) );
-	m_volKnob->move( 50, 200 );
+	m_volKnob->move( 60, 201 );
+	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Osc %1 volume:" ).arg( 1 ) + " ", "%" );
+	m_volKnob->setObjectName( "volKnob" );
 
 	// randomise
 	m_randBtn = new pixmapButton( this, tr( "Randomise" ) );
-	m_randBtn->move( 100, 200 );
+	m_randBtn->move( 148, 224 );
 	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-	//m_randBtn->setMask( QBitmap( PLUGIN_NAME::getIconPixmap( "btn_mask" ).
-	//				createHeuristicMask() ) );
 
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );
@@ -479,9 +461,10 @@ void organicInstrumentView::modelChanged( void )
 					i + 1 ) + " ", "%" );
 										
 		// setup volume-knob
-		volumeKnob * volKnob = new organicVolumeKnob( this, tr(
+		volumeKnob * volKnob = new volumeKnob( knobStyled, this, tr(
 						"Osc %1 volume" ).arg( i + 1 ) );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
+		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i + 1 ) + " ", "%" );
 							

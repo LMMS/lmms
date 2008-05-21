@@ -17,7 +17,6 @@
 	* plugins/audio_file_processor/reverse_off.png:
 	* plugins/audio_file_processor/reverse_on.png:
 	* plugins/audio_file_processor/artwork.png:
-	* data/themes/default/style.css:
 	Integrate new audio file processor artwork
 
 	* src/gui/widgets/volume_knob.cpp:
@@ -26,7 +25,21 @@
 	* src/gui/widgets/knob.cpp:
 	Minor graphical enhacement for styled knobs
 
+	* src/gui/piano_roll.cpp:
+	* include/piano_roll.h:
+	* data/themes/default/record_accompany.png:
+	- Fix annoying but where changing patterns would scroll to bar 2 instead
+	of bar 1
+	- Add record-with-accompaniment feature because it was easier to just add
+	a toolbutton then to strip out the code.  At least now there is some
+	starting point for this feature should we ever decide to release it.
 
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	Complete organic gui
+
+	* data/themes/default/style.css:
+	AFP and organic knob styles
 
 2008-05-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
