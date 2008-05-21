@@ -95,7 +95,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		s_textFloat->setText( m_hintTextBeforeValue + val );
 		
 		s_textFloat->moveGlobal( this,
-				QPoint( m_knobPixmap->width() + 2, 0 ) );
+				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = TRUE;
 	}
@@ -167,7 +167,7 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	}
 	s_textFloat->setText( m_hintTextBeforeValue + val );
 	
-	s_textFloat->moveGlobal( this, QPoint( m_knobPixmap->width() + 2, 0 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( model()->value() );

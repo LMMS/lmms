@@ -293,7 +293,7 @@ void knob::drawKnob( QPainter * _p )
 		if( m_outerColor )
 		{
 			QRadialGradient gradient( centerPoint(), outerRadius() );
-			gradient.setColorAt(0.33, _p->pen().brush().color() );
+			gradient.setColorAt(0.4, _p->pen().brush().color() );
 			gradient.setColorAt(1, *m_outerColor );
 
 			_p->setPen( QPen( gradient, lineWidth(), Qt::SolidLine, Qt::RoundCap ) );

@@ -11,6 +11,7 @@
 
 	* plugins/audio_file_processor/audio_file_processor.cpp:
 	* plugins/audio_file_processor/select_file.png:
+	* plugins/audio_file_processor/logo.png:
 	* plugins/audio_file_processor/loop_off.png:
 	* plugins/audio_file_processor/loop_on.png:
 	* plugins/audio_file_processor/reverse_off.png:
@@ -18,6 +19,14 @@
 	* plugins/audio_file_processor/artwork.png:
 	* data/themes/default/style.css:
 	Integrate new audio file processor artwork
+
+	* src/gui/widgets/volume_knob.cpp:
+	Fix placement of tooltop in styled knobs
+
+	* src/gui/widgets/knob.cpp:
+	Minor graphical enhacement for styled knobs
+
+
 
 2008-05-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
