@@ -27,6 +27,7 @@
 
 #include "tool.h"
 
+#include <QtGui/QIcon>
 #include <QtGui/QMdiArea>
 
 #include "embed.h"
