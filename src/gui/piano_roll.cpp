@@ -223,6 +223,10 @@ pianoRoll::pianoRoll( void ) :
 	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
 			tr( "Record notes from MIDI-device/channel-piano" ),
 					this, SLOT( record() ), m_toolBar );
+	m_recordAccompanyButton = new toolButton( 
+			embed::getIconPixmap( "record_accompany" ),
+			tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ),
+					this, SLOT( recordAccompany() ), m_toolBar );
 
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 				tr( "Stop playing of current pattern (Space)" ),
@@ -238,6 +242,12 @@ pianoRoll::pianoRoll( void ) :
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you can play and edit them afterwards." ) );
+	m_recordAccompanyButton->setWhatsThis(
+		tr( "Click here, if you want to record notes from a MIDI-"
+			"device or the virtual test-piano of the according "
+			"channel-window to the current pattern. When recording "
+			"all notes you play will be written to this pattern "
+			"and you will hear the song or BB track in the background." ) );
 	m_stopButton->setWhatsThis(
 		tr( "Click here, if you want to stop playing of current "
 			"pattern." ) );
@@ -398,6 +408,7 @@ pianoRoll::pianoRoll( void ) :
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
 	tb_layout->addWidget( m_recordButton );
+	tb_layout->addWidget( m_recordAccompanyButton );
 	tb_layout->addWidget( m_stopButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawButton );
@@ -459,6 +470,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 {
 	m_pattern = _new_pattern;
 	m_currentPosition = 0;
+	m_currentNote = NULL;
 	m_startKey = INITIAL_START_KEY;
 
 	if( validPattern() == FALSE )
@@ -470,6 +482,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 		return;
 	}
 
+	m_leftRightScroll->setValue( 0 );
 
 	const noteVector & notes = m_pattern->notes();
 	int central_key = 0;
@@ -2179,8 +2192,36 @@ void pianoRoll::record( void )
 	}
 
 	m_recording = TRUE;
+
 	engine::getSong()->playPattern( m_pattern, FALSE );
 }
+
+
+
+
+void pianoRoll::recordAccompany( void )
+{
+	if( engine::getSong()->isPlaying() )
+	{
+		stop();
+	}
+	if( m_recording == TRUE || validPattern() == FALSE )
+	{
+		return;
+	}
+
+	m_recording = TRUE;
+	
+	if( m_pattern->getTrack()->getTrackContainer() == engine::getSong() )
+	{
+		engine::getSong()->play();
+	}
+	else
+	{
+		engine::getSong()->playBB();
+	}
+}
+
 
 
 
@@ -2202,8 +2243,13 @@ void pianoRoll::recordNote( const note & _n )
 	if( m_recording == TRUE && validPattern() == TRUE )
 	{
 		note n( _n.length(), engine::getSong()->getPlayPos(
+				engine::getSong()->playMode() ) - _n.length(),
+				_n.key(), _n.getVolume(), _n.getPanning() );
+		/*
+		note n( _n.length(), engine::getSong()->getPlayPos(
 				song::Mode_PlayPattern ) - _n.length(),
 				_n.key(), _n.getVolume(), _n.getPanning() );
+		*/
 		n.quantizeLength( quantization() );
 		m_pattern->addNote( n );
 		update();
