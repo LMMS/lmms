@@ -361,11 +361,11 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 	m_openPluginButton = new pixmapButton( this, "" );
 	m_openPluginButton->setCheckable( FALSE );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
-	m_openPluginButton->move( 200, 70 );
-	m_openPluginButton->setActiveGraphic( embed::getIconPixmap(
-							"project_open_down" ) );
-	m_openPluginButton->setInactiveGraphic( embed::getIconPixmap(
-							"project_open" ) );
+	m_openPluginButton->move( 218, 79 );
+	m_openPluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"select_file" ) );
+	m_openPluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"select_file" ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
 	toolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
@@ -376,7 +376,7 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 			"and you can select your file." ) );
 
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide VST-GUI" ), this );
-	m_toggleGUIButton->setGeometry( 20, 120, 160, 24 );
+	m_toggleGUIButton->setGeometry( 45, 150, 160, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
@@ -387,7 +387,7 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
-	note_off_all_btn->setGeometry( 20, 150, 160, 24 );
+	note_off_all_btn->setGeometry( 45, 180, 160, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
@@ -512,17 +512,17 @@ void vestigeInstrumentView::paintEvent( QPaintEvent * )
 	QFont f = p.font();
 	f.setBold( TRUE );
 	p.setFont( pointSize<10>( f ) );
-	p.setPen( QColor( 0, 0, 0 ) );
+	p.setPen( QColor( 32, 160, 54 ) );
 
-	p.drawText( 20, 80, plugin_name );
+	p.drawText( 10, 100, plugin_name );
 
 //	m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
 	{
-		p.setPen( QColor( 64, 128, 64 ) );
+		p.setPen( QColor( 251, 41, 8 ) );
 		f.setBold( FALSE );
 		p.setFont( pointSize<8>( f ) );
-		p.drawText( 20, 94, tr( "by" ) + " " +
+		p.drawText( 10, 114, tr( "by" ) + " " +
 					m_vi->m_plugin->vendorString() );
 	}
 //	m_pluginMutex.unlock();
