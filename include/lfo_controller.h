@@ -32,6 +32,7 @@
 #include "controller.h"
 #include "controller_dialog.h"
 #include "tempo_sync_knob.h"
+#include "oscillator.h"
 
 
 class automatableButtonGroup;
@@ -52,16 +53,6 @@ public:
 	{
 		return "LFO Controller";
 	}
-
-	enum LfoShapes
-	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		UserDefinedWave,
-		NumLfoShapes
-	} ;
 
 
 public slots:
@@ -88,6 +79,10 @@ slots:
 	int m_phaseCorrection;
 	int m_phaseOffset;
 	
+	sample_t (*m_sampleFunction)( const float );
+
+protected slots:
+	void updateSampleFunction( void );
 
 	friend class lfoControllerDialog;
 };

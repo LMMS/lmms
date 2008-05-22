@@ -51,16 +51,16 @@
 const int ENV_KNOBS_LBL_Y = 0;
 const int KNOB_X_SPACING = 32;
 
+const int LFO_SHAPES_X = 6;
+const int LFO_SHAPES_Y = 16;
+
 const int LFO_GRAPH_X = 6;
 const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
 const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
-const int LFO_BASE_KNOB_X = LFO_GRAPH_X + 10;
+const int LFO_BASE_KNOB_X = LFO_SHAPES_X + 64;
 const int LFO_SPEED_KNOB_X = LFO_BASE_KNOB_X+KNOB_X_SPACING;
 const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
 const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
-
-const int LFO_SHAPES_X = LFO_GRAPH_X;//PREDELAY_KNOB_X;
-const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
 lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
 	controllerDialog( _model, _parent )
@@ -114,68 +114,98 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 				"down. It's the same with a square-wave."
 				) );
 
+	pixmapButton * sin_wave_btn = new pixmapButton( this, NULL );
+	sin_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
+	sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
+						"sin_wave_active" ) );
+	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
+						"sin_wave_inactive" ) );
+	toolTip::add( sin_wave_btn,
+			tr( "Click here if you want a sine-wave for "
+					"current oscillator." ) );
 
-	pixmapButton * sin_lfo_btn = new pixmapButton( this, NULL );
-	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
-	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-							"sin_wave_active" ) );
-	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-							"sin_wave_inactive" ) );
-	sin_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a sine-wave for current "
-							"oscillator." ) );
+	pixmapButton * triangle_wave_btn =
+					new pixmapButton( this, NULL );
+	triangle_wave_btn->move( LFO_SHAPES_X + 14, LFO_SHAPES_Y );
+	triangle_wave_btn->setActiveGraphic(
+		embed::getIconPixmap( "triangle_wave_active" ) );
+	triangle_wave_btn->setInactiveGraphic(
+		embed::getIconPixmap( "triangle_wave_inactive" ) );
+	toolTip::add( triangle_wave_btn,
+			tr( "Click here if you want a triangle-wave "
+					"for current oscillator." ) );
 
-	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL );
-	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
-	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"triangle_wave_active" ) );
-	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"triangle_wave_inactive" ) );
-	triangle_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a triangle-wave for current "
-							"oscillator." ) );
+	pixmapButton * saw_wave_btn = new pixmapButton( this, NULL );
+	saw_wave_btn->move( LFO_SHAPES_X + 28, LFO_SHAPES_Y );
+	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
+						"saw_wave_active" ) );
+	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
+						"saw_wave_inactive" ) );
+	toolTip::add( saw_wave_btn,
+			tr( "Click here if you want a saw-wave for "
+					"current oscillator." ) );
 
-	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL );
-	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
-	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-							"saw_wave_active" ) );
-	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-							"saw_wave_inactive" ) );
-	saw_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a saw-wave for current "
-							"oscillator." ) );
+	pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL );
+	sqr_wave_btn->move( LFO_SHAPES_X + 42, LFO_SHAPES_Y );
+	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
+					"square_wave_active" ) );
+	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
+					"square_wave_inactive" ) );
+	toolTip::add( sqr_wave_btn,
+			tr( "Click here if you want a square-wave for "
+					"current oscillator." ) );
 
-	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL );
-	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
-	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
-						"square_wave_active" ) );
-	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
-						"square_wave_inactive" ) );
-	sqr_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a square-wave for current "
-							"oscillator." ) );
+	pixmapButton * moog_saw_wave_btn =
+					new pixmapButton( this, NULL );
+	moog_saw_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y + 14 );
+	moog_saw_wave_btn->setActiveGraphic(
+		embed::getIconPixmap( "moog_saw_wave_active" ) );
+	moog_saw_wave_btn->setInactiveGraphic(
+		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
+	toolTip::add( moog_saw_wave_btn,
+			tr( "Click here if you want a moog-saw-wave "
+					"for current oscillator." ) );
 
-	m_userLfoBtn = new pixmapButton( this, NULL );
-	m_userLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
-	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
-							"usr_wave_active" ) );
-	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
-							"usr_wave_inactive" ) );
-	m_userLfoBtn->setWhatsThis(
-		tr( "Click here if you want a user-defined wave for current "
-			"oscillator. Afterwards drag an according sample-"
-			"file into LFO-graph." ) );
+	pixmapButton * exp_wave_btn = new pixmapButton( this, NULL );
+	exp_wave_btn->move( LFO_SHAPES_X + 14, LFO_SHAPES_Y + 14 );
+	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
+						"exp_wave_active" ) );
+	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
+						"exp_wave_inactive" ) );
+	toolTip::add( exp_wave_btn,
+			tr( "Click here if you want an exponential "
+				"wave for current oscillator." ) );
 
-	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
-				this, SLOT( lfoUserWaveChanged() ) );
+	pixmapButton * white_noise_btn = new pixmapButton( this, NULL );
+	white_noise_btn->move( LFO_SHAPES_X + 28, LFO_SHAPES_Y + 14 );
+	white_noise_btn->setActiveGraphic(
+		embed::getIconPixmap( "white_noise_wave_active" ) );
+	white_noise_btn->setInactiveGraphic(
+		embed::getIconPixmap( "white_noise_wave_inactive" ) );
+	toolTip::add( white_noise_btn,
+			tr( "Click here if you want a white-noise for "
+					"current oscillator." ) );
 
+	pixmapButton * uwb = new pixmapButton( this, NULL );
+	uwb->move( LFO_SHAPES_X + 42, LFO_SHAPES_Y + 14 );
+	uwb->setActiveGraphic( embed::getIconPixmap(
+						"usr_shape_active" ) );
+	uwb->setInactiveGraphic( embed::getIconPixmap(
+						"usr_shape_inactive" ) );
+	toolTip::add( uwb, tr( "Click here if you want a user-defined "
+			"wave-shape for current oscillator." ) );
+
+	
 	m_lfoWaveBtnGrp = new automatableButtonGroup( this,
 						tr( "LFO wave shape" ) );
-	m_lfoWaveBtnGrp->addButton( sin_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( triangle_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( saw_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( sqr_lfo_btn );
-	m_lfoWaveBtnGrp->addButton( m_userLfoBtn );
+	m_lfoWaveBtnGrp->addButton( sin_wave_btn );
+	m_lfoWaveBtnGrp->addButton( triangle_wave_btn );
+	m_lfoWaveBtnGrp->addButton( saw_wave_btn );
+	m_lfoWaveBtnGrp->addButton( sqr_wave_btn );
+	m_lfoWaveBtnGrp->addButton( moog_saw_wave_btn );
+	m_lfoWaveBtnGrp->addButton( exp_wave_btn );
+	m_lfoWaveBtnGrp->addButton( white_noise_btn );
+	m_lfoWaveBtnGrp->addButton( uwb );
 
 
 /*

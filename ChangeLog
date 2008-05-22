@@ -1,3 +1,10 @@
+2008-05-22  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* include/lfo_controller.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/core/lfo_controller.cpp:
+	Add more wave shapes to LFO controller
+
 2008-05-21  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/Makefile.am:

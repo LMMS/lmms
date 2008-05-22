@@ -45,12 +45,18 @@ lfoController::lfoController( model * _parent ) :
 	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
 	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, 1, this ),
+	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, 1, this ),
+	m_sampleFunction( &oscillator::sinSample ),
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 )
 {
+
+	connect( &m_lfoWaveModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleFunction() ) );
 }
+
+
 
 
 lfoController::~lfoController()
@@ -61,6 +67,8 @@ lfoController::~lfoController()
 	m_lfoWaveModel.disconnect( this );
 	m_lfoPhaseModel.disconnect( this );
 }
+
+
 
 
 // This code took forever to get right. It can
@@ -115,21 +123,53 @@ float lfoController::value( int _offset )
 		}
 	}
 
+	float sampleFrame = float( ( frame+m_phaseOffset ) *
+			m_lfoSpeedModel.value() ) /
+			engine::getMixer()->processingSampleRate();
 
 	// 44100 frames/sec
 	return m_lfoBaseModel.value() + ( m_lfoAmountModel.value() * 
-			sinf( TWO_PI * float( ( frame+m_phaseOffset ) *
-						m_lfoSpeedModel.value() ) /
-			engine::getMixer()->processingSampleRate() ) / 2.0f );
+			m_sampleFunction(sampleFrame) 
+			/ 2.0f );
 }
+
+
+
+
+void lfoController::updateSampleFunction( void )
+{
+	switch( m_lfoWaveModel.value() )
+	{
+		case oscillator::SineWave:
+			m_sampleFunction = &oscillator::sinSample;
+			break;
+		case oscillator::TriangleWave:
+			m_sampleFunction = &oscillator::triangleSample;
+			break;
+		case oscillator::SawWave:
+			m_sampleFunction = &oscillator::sawSample;
+			break;
+		case oscillator::SquareWave:
+			m_sampleFunction = &oscillator::squareSample;
+			break;
+		case oscillator::MoogSawWave:
+			m_sampleFunction = &oscillator::moogSawSample;
+			break;
+		case oscillator::ExponentialWave:
+			m_sampleFunction = &oscillator::expSample;
+			break;
+		case oscillator::WhiteNoise:
+			m_sampleFunction = &oscillator::noiseSample;
+			break;
+	}
+}
+
+
 
 
 controllerDialog * lfoController::createDialog( QWidget * _parent )
 {
 	controllerDialog * d = new lfoControllerDialog( this, _parent );
-
-	
-
 	return d;
 }
 
@@ -138,3 +178,4 @@ controllerDialog * lfoController::createDialog( QWidget * _parent )
 
 
 #endif
+
