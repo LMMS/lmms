@@ -1,3 +1,10 @@
+2008-05-21  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/Makefile.am:
+	* plugins/Makefile.am:
+	* configure.in:
+	Add fluidsynth detection to configure
+
 2008-05-20  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/vestige/select_file.png:
@@ -23,12 +30,12 @@
 	Fix placement of tooltop in styled knobs
 
 	* src/gui/widgets/knob.cpp:
-	Minor graphical enhacement for styled knobs
+	Minor graphical enhancement for styled knobs
 
 	* src/gui/piano_roll.cpp:
 	* include/piano_roll.h:
 	* data/themes/default/record_accompany.png:
-	- Fix annoying but where changing patterns would scroll to bar 2 instead
+	- Fix annoying bug where changing patterns would scroll to bar 2 instead
 	of bar 1
 	- Add record-with-accompaniment feature because it was easier to just add
 	a toolbutton then to strip out the code.  At least now there is some

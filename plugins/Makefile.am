@@ -10,6 +10,10 @@ if SINGERBOT_SUPPORT
 SINGERBOT_DIR=singerbot
 endif
 
+if FLUIDSYNTH_SUPPORT
+SF2PLAYER_DIR=sf2_player
+endif
+
 SUBDIRS =			\
 	audio_file_processor	\
 	bass_booster		\
@@ -23,7 +27,7 @@ SUBDIRS =			\
 	midi_import		\
 	organic			\
 	patman			\
-	sf2_player		\
+	$(SF2PLAYER_DIR)    \
 	$(SINGERBOT_DIR)	\
 	stereo_enhancer		\
 	stereo_matrix		\

@@ -396,6 +396,24 @@ AC_LANG_POP(C++)
 AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
 
 
+# Check for fluidsynth
+AC_ARG_WITH(fluidsynth,
+	AS_HELP_STRING([--without-fluidsynth], [disable support for Soundfont plugins]), ,
+	[ with_fluidsynth=yes ])
+AH_TEMPLATE(HAVE_FLUIDSYNTH_H, [Define to 1 if you have the <fluidsynth.h> header file.])
+if test "x$with_fluidsynth" = "xyes" ; then
+	FLUIDSYNTH_SUPPORT="true"
+	AC_CHECK_HEADER([fluidsynth.h], HAVE_FLUIDSYNTH_H="true", FLUIDSYNTH_SUPPORT="")
+	AC_CHECK_LIB([fluidsynth], [new_fluid_synth], HAVE_FLUIDSYNTH="true", FLUIDSYNTH_SUPPORT="")
+fi
+if test ! -z "$FLUIDSYNTH_SUPPORT" ; then
+	AC_DEFINE(HAVE_FLUIDSYNTH_H)
+	AC_SUBST(fluidsynth_includes, [/usr/include])
+	AC_SUBST(fluidsynth_lib, [/usr/lib])
+fi
+AM_CONDITIONAL(FLUIDSYNTH_SUPPORT, test ! -z "$FLUIDSYNTH_SUPPORT")
+
+
 # libsndfile-stuff
 AC_ARG_WITH(libsf,
  	AS_HELP_STRING([--without-libsf],
@@ -905,6 +923,28 @@ if test -z "$FESTIVAL_SUPPORT" ; then
 else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SingerBot instrument plugin"
 fi
+
+
+if test -z "$FLUIDSYNTH_SUPPORT" ; then
+	if test "x$with_fluidsynth" = "xyes" ; then
+		echo " ========================"
+		echo " ===  LMMS - WARNING  ======================================================="
+		echo " ========================"
+		echo " ="
+		echo " = You don't seem to have Fluidsynth development files."
+		echo " = The SoundFont2 Player plugin will be ignored."
+		echo " = Consider installing fluidsynth for the full power of LMMS."
+		echo " ="
+		echo " = To remove this warning, please pass"
+		echo " = "
+		echo " = --without-fluidsynth"
+		echo " ="
+		with_warnings="true"
+	fi
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SoundFont2 Player plugin"
+fi
+
 
 
 if test ! -z "$WINECXX" ; then
