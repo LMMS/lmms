@@ -33,7 +33,7 @@
 #include <QtGui/QMdiArea>
 
 #include "song.h"
-//#include "effect_view.h"
+#include "embed.h"
 #include "main_window.h"
 #include "group_box.h"
 #include "controller_rack_view.h"
@@ -46,6 +46,8 @@ controllerRackView::controllerRackView( ) :
 	modelView( NULL )
 {
 	setFixedSize( 250, 250 );
+	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setFixedSize( 230, 184 );

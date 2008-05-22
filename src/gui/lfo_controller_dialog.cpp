@@ -55,7 +55,7 @@ const int LFO_SHAPES_X = 6;
 const int LFO_SHAPES_Y = 16;
 
 const int LFO_GRAPH_X = 6;
-const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
+const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+15;
 const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
 const int LFO_BASE_KNOB_X = LFO_SHAPES_X + 64;
 const int LFO_SPEED_KNOB_X = LFO_BASE_KNOB_X+KNOB_X_SPACING;
@@ -65,6 +65,8 @@ const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
 lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
 	controllerDialog( _model, _parent )
 {
+	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	setWindowTitle( tr( "LFO (name)" ) );
 	setFixedSize( 256, 64 );
 	
 	toolTip::add( this, tr( "LFO Controller" ) );
@@ -126,7 +128,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	pixmapButton * triangle_wave_btn =
 					new pixmapButton( this, NULL );
-	triangle_wave_btn->move( LFO_SHAPES_X + 14, LFO_SHAPES_Y );
+	triangle_wave_btn->move( LFO_SHAPES_X + 15, LFO_SHAPES_Y );
 	triangle_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	triangle_wave_btn->setInactiveGraphic(
@@ -136,7 +138,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"for current oscillator." ) );
 
 	pixmapButton * saw_wave_btn = new pixmapButton( this, NULL );
-	saw_wave_btn->move( LFO_SHAPES_X + 28, LFO_SHAPES_Y );
+	saw_wave_btn->move( LFO_SHAPES_X + 30, LFO_SHAPES_Y );
 	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
 	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -146,7 +148,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"current oscillator." ) );
 
 	pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL );
-	sqr_wave_btn->move( LFO_SHAPES_X + 42, LFO_SHAPES_Y );
+	sqr_wave_btn->move( LFO_SHAPES_X + 45, LFO_SHAPES_Y );
 	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
 	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -157,7 +159,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	pixmapButton * moog_saw_wave_btn =
 					new pixmapButton( this, NULL );
-	moog_saw_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y + 14 );
+	moog_saw_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y + 15 );
 	moog_saw_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	moog_saw_wave_btn->setInactiveGraphic(
@@ -167,7 +169,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"for current oscillator." ) );
 
 	pixmapButton * exp_wave_btn = new pixmapButton( this, NULL );
-	exp_wave_btn->move( LFO_SHAPES_X + 14, LFO_SHAPES_Y + 14 );
+	exp_wave_btn->move( LFO_SHAPES_X + 15, LFO_SHAPES_Y + 15 );
 	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"exp_wave_active" ) );
 	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -177,7 +179,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 				"wave for current oscillator." ) );
 
 	pixmapButton * white_noise_btn = new pixmapButton( this, NULL );
-	white_noise_btn->move( LFO_SHAPES_X + 28, LFO_SHAPES_Y + 14 );
+	white_noise_btn->move( LFO_SHAPES_X + 30, LFO_SHAPES_Y + 15 );
 	white_noise_btn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	white_noise_btn->setInactiveGraphic(
@@ -187,11 +189,12 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"current oscillator." ) );
 
 	pixmapButton * uwb = new pixmapButton( this, NULL );
-	uwb->move( LFO_SHAPES_X + 42, LFO_SHAPES_Y + 14 );
+	uwb->move( LFO_SHAPES_X + 45, LFO_SHAPES_Y + 15 );
 	uwb->setActiveGraphic( embed::getIconPixmap(
-						"usr_shape_active" ) );
+						"usr_wave_active" ) );
 	uwb->setInactiveGraphic( embed::getIconPixmap(
-						"usr_shape_inactive" ) );
+						"usr_wave_inactive" ) );
+	uwb->setEnabled( false );
 	toolTip::add( uwb, tr( "Click here if you want a user-defined "
 			"wave-shape for current oscillator." ) );
 

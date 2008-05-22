@@ -70,10 +70,12 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 	connect( ctls_btn, SIGNAL( clicked() ), 
 				this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( NULL );
+	m_controllerDlg = getController()->createDialog( engine::getMainWindow()->workspace() );
 
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( 
                 m_controllerDlg );
+
+	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
 
     connect( m_controllerDlg, SIGNAL( closed() ),
                 this, SLOT( closeControls() ) );

@@ -5,6 +5,12 @@
 	* src/core/lfo_controller.cpp:
 	Add more wave shapes to LFO controller
 
+	* src/gui/widgets/controller_view.cpp:
+	Set sub-window's icon to the icon of the controllerDialog
+
+	* src/gui/widgets/controller_rack_view.cpp:
+	Add icon to window
+
 2008-05-21  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/Makefile.am:
