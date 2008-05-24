@@ -33,6 +33,7 @@
 #include "automatable_slider.h"
 #include "lcd_spinbox.h"
 #include "controller.h"
+#include "meter_model.h"
 
 
 class pattern;
@@ -138,6 +139,11 @@ public:
 	bpm_t getTempo( void );
 	virtual automationPattern * tempoAutomationPattern( void );
 
+	const meterModel & getTimeSig( void ) const
+	{
+		return( m_timeSigModel );
+	}
+
 	track * getAutomationTrack( void )
 	{
 		return( m_automationTrack );
@@ -175,7 +181,7 @@ public:
 	void addController( controller * _c );
 
 	// QT will implicitly share the Vector I believe..
-	controllerVector controllers( void ) const
+	const controllerVector & controllers( void ) const
 	{
 		return m_controllers;
 	}
@@ -209,6 +215,7 @@ private slots:
 	void addSampleTrack( void );
 
 	void setTempo( void );
+	void setTimeSignature( void );
 
 	void masterVolumeChanged( void );
 
@@ -240,6 +247,7 @@ private:
 	track * m_automationTrack;
 
 	lcdSpinBoxModel m_tempoModel;
+	meterModel m_timeSigModel;
 	sliderModel m_masterVolumeModel;
 	sliderModel m_masterPitchModel;
 
@@ -284,6 +292,7 @@ private:
 
 signals:
 	void tempoChanged( bpm_t _new_bpm );
+	void timeSignatureChanged( int _num, int _den );
 
 } ;
 

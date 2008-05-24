@@ -30,14 +30,15 @@
 #include <QtCore/QBasicTimer>
 
 #include "track_container_view.h"
-#include "lcd_spinbox.h"
-#include "automatable_slider.h"
 
 
 class QLabel;
 class QScrollBar;
 
+class automatableSlider;
 class comboBox;
+class lcdSpinBox;
+class meterDialog;
 class song;
 class textFloat;
 class toolButton;
@@ -83,7 +84,6 @@ private:
 
 	virtual bool allowRubberband( void ) const;
 
-//	virtual void modelChanged( void );
 
 
 	song * m_s;
@@ -99,6 +99,7 @@ private:
 	toolButton * m_stopButton;
 	lcdSpinBox * m_tempoSpinBox;
 
+	meterDialog * m_timeSigDisplay;
 	automatableSlider * m_masterVolumeSlider;
 	automatableSlider * m_masterPitchSlider;
 

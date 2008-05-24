@@ -77,6 +77,7 @@ song::song( void ) :
 	m_automationTrack( track::create( track::AutomationTrack, this ) ),
 	m_tempoModel( DEFAULT_BPM, MIN_BPM, MAX_BPM, intModel::defaultRelStep(),
 									this ),
+	m_timeSigModel( this, m_automationTrack ),
 	m_masterVolumeModel( 100, 0, 200, 1, this ),
 	m_masterPitchModel( 0, -12, 12, 1, this ),
 	m_fileName(),
@@ -96,6 +97,8 @@ song::song( void ) :
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
 						this, SLOT( setTempo() ) );
+	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
+					this, SLOT( setTimeSignature() ) );
 
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
@@ -150,6 +153,15 @@ void song::setTempo( void )
 //	m_bpmSpinBox->setInitValue( _new_bpm );
 	engine::updateFramesPerTick();
 	emit tempoChanged( tempo );
+}
+
+
+
+
+void song::setTimeSignature( void )
+{
+	emit timeSignatureChanged( m_timeSigModel.getNumerator(),
+					m_timeSigModel.getDenominator() );
 }
 
 

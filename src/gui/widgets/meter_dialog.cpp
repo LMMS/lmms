@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * meter_dialog.cpp - dialog for entering meter settings
  *
@@ -29,63 +27,18 @@
 #include <QtGui/QLabel>
 
 #include "meter_dialog.h"
+#include "meter_model.h"
 #include "embed.h"
 #include "gui_templates.h"
 
 
-meterModel::meterModel( ::model * _parent, track * _track ) :
-	model( _parent ),
-	m_numeratorModel( 4, 1, 32, 1, this ),
-	m_denominatorModel( 4, 1, 32, 1, this )
-{
-	m_numeratorModel.setTrack( _track );
-	m_denominatorModel.setTrack( _track );
-
-	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( numeratorChanged() ) );
-	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( denominatorChanged() ) );
-}
-
-
-
-
-meterModel::~meterModel()
-{
-}
-
-
-
-
-void meterModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name )
-{
-	m_numeratorModel.saveSettings( _doc, _this, _name + "_numerator" );
-	m_denominatorModel.saveSettings( _doc, _this, _name + "_denominator" );
-}
-
-
-
-
-void meterModel::loadSettings( const QDomElement & _this,
-							const QString & _name )
-{
-	m_numeratorModel.loadSettings( _this, _name + "_numerator" );
-	m_denominatorModel.loadSettings( _this, _name + "_denominator" );
-}
-
-
-
-
-
-meterDialog::meterDialog( QWidget * _parent ) :
+meterDialog::meterDialog( QWidget * _parent, bool _simple ) :
 	QWidget( _parent ),
 	modelView( NULL )
 {
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
-	vlayout->setSpacing( 5 );
-	vlayout->setMargin( 5 );
-
+	vlayout->setSpacing( 0 );
+	vlayout->setMargin( 0 );
 
 	QWidget * num = new QWidget( this );
 	QHBoxLayout * num_layout = new QHBoxLayout( num );
@@ -97,11 +50,15 @@ meterDialog::meterDialog( QWidget * _parent ) :
 
 	num_layout->addWidget( m_numerator );
 
-	QLabel * num_label = new QLabel( num );
-	num_label->setText( tr( "Meter Numerator" ) );
-	QFont f = num_label->font();
-	num_label->setFont( pointSize<7>( f ) );
-	num_layout->addWidget( num_label );
+	if( !_simple )
+	{
+		QLabel * num_label = new QLabel( tr( "Meter Numerator" ), num );
+		QFont f = num_label->font();
+		num_label->setFont( pointSize<7>( f ) );
+		num_layout->addSpacing( 5 );
+		num_layout->addWidget( num_label );
+	}
+	num_layout->addStretch();
 
 
 	QWidget * den = new QWidget( this );
@@ -110,20 +67,30 @@ meterDialog::meterDialog( QWidget * _parent ) :
 	den_layout->setMargin( 0 );
 
 	m_denominator = new lcdSpinBox( 2, den, tr( "Meter Denominator" ) );
+	if( _simple )
+	{
+		m_denominator->setLabel( tr( "TIME SIG" ) );
+	}
 
 	den_layout->addWidget( m_denominator );
 
-	QLabel * den_label = new QLabel( den );
-	f = den_label->font();
-	den_label->setFont( pointSize<7>( f ) );
-	den_label->setText( tr( "Meter Denominator" ) );
-	den_layout->addWidget( den_label );
-	
+	if( !_simple )
+	{
+		QLabel * den_label = new QLabel( tr( "Meter Denominator" ),
+									den );
+		QFont f = den_label->font();
+		den_label->setFont( pointSize<7>( f ) );
+		den_layout->addSpacing( 5 );
+		den_layout->addWidget( den_label );
+	}
+	den_layout->addStretch();
+
+
+	vlayout->addSpacing( _simple ? 1 : 3 );
 	vlayout->addWidget( num );
+	vlayout->addSpacing( 2 );
 	vlayout->addWidget( den );
-	
-	resize( den_label->width() + m_denominator->width() + 10,
-			m_numerator->height() + m_denominator->height() + 15 );
+	vlayout->addStretch();
 }
 
 
@@ -144,6 +111,3 @@ void meterDialog::modelChanged( void )
 }
 
 
-#include "meter_dialog.moc"
-
-#endif

@@ -29,7 +29,7 @@
 #include <QtGui/QPixmap>
 
 #include "knob.h"
-#include "meter_dialog.h"
+#include "meter_model.h"
 
 
 class QAction;

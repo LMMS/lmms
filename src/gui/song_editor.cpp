@@ -61,6 +61,7 @@
 #include "instrument_track.h"
 #include "lcd_spinbox.h"
 #include "main_window.h"
+#include "meter_dialog.h"
 #include "midi_client.h"
 #include "mmp.h"
 #include "note_play_handle.h"
@@ -140,6 +141,12 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
 
+	m_timeSigDisplay = new meterDialog( this, TRUE );
+	m_timeSigDisplay->setModel( &m_s->m_timeSigModel );
+	engine::getMainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+
+	engine::getMainWindow()->addSpacingToToolBar( 10 );
+	
 
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );

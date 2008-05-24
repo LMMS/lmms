@@ -1,3 +1,24 @@
+2008-05-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/song.h:
+	* include/song_editor.h:
+	* src/core/song.cpp:
+	* src/gui/song_editor.cpp:
+	added meterModel and meterDialog (which actually is just a widget) as
+	preparation for time-signature-support - it doesn't actually work yet!
+
+	* data/themes/default/style.css:
+	improved appearence of menu in general
+
+	* Makefile.am:
+	* include/tempo_sync_knob.h:
+	* include/meter_model.h:
+	* include/meter_dialog.h:
+	* src/core/meter_model.cpp:
+	* src/gui/widgets/meter_dialog.cpp:
+	splitted source-files for meterModel and meterDialog and added
+	"simple"-mode for meterDialog
+
 2008-05-22  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/lfo_controller.h:

@@ -97,7 +97,7 @@ lmms_MOC =						\
 		./mv_base.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
-		./meter_dialog.moc			\
+		./meter_model.moc			\
 		./midi_alsa_seq.moc			\
 		./instrument_midi_io.moc		\
 		./pattern.moc				\
@@ -187,6 +187,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/ladspa_control.cpp				\
 		$(srcdir)/src/core/lfo_controller.cpp				\
 		$(srcdir)/src/core/main.cpp					\
+		$(srcdir)/src/core/meter_model.cpp				\
 		$(srcdir)/src/core/mixer.cpp					\
 		$(srcdir)/src/core/mmp.cpp					\
 		$(srcdir)/src/core/mv_base.cpp					\
@@ -436,6 +437,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/ladspa-1.1.h					\
 		$(srcdir)/include/sweep_oscillator.h				\
 		$(srcdir)/include/meter_dialog.h				\
+		$(srcdir)/include/meter_model.h					\
 		$(srcdir)/include/effect_lib.h					\
 		$(srcdir)/include/ladspa_manager.h				\
 		$(srcdir)/include/ladspa_2_lmms.h				\
