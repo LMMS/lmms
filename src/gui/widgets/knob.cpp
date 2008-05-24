@@ -68,11 +68,11 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	autoModelView( new knobModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
+	m_knobPixmap( NULL ),
 	m_hintTextBeforeValue( "" ),
 	m_hintTextAfterValue( "" ),
-	m_knobNum( _knob_num ),
-	m_knobPixmap( NULL ),
 	m_outerColor( NULL ),
+	m_knobNum( _knob_num ),
 	m_label( "" )
 {
 	if( s_textFloat == NULL )
