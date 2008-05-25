@@ -729,6 +729,13 @@ void song::clearProject( void )
 		engine::getProjectNotes()->clear();
 	}
 
+	/*
+	while( !m_controllers.empty() )
+	{
+		delete m_controllers.last();
+	}
+	*/
+
 	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();
 
@@ -853,6 +860,10 @@ void FASTCALL song::loadProject( const QString & _file_name )
 				( (journallingObject *)( this ) )->
 					restoreState( node.toElement() );
 			}
+			else if( node.nodeName() == "controllers" )
+			{
+				restoreControllerStates( node.toElement() );
+			}
 			else if( engine::hasGUI() )
 			{
 				if( node.nodeName() ==
@@ -924,6 +935,8 @@ bool song::saveProject( void )
 								mmp.content() );
 	m_playPos[Mode_PlaySong].m_timeLine->saveState( mmp, mmp.content() );
 
+	saveControllerStates( mmp, mmp.content() );
+
 	m_fileName = mmp.nameWithExtension( m_fileName );
 	if( mmp.writeFile( m_fileName ) == TRUE )
 	{
@@ -978,6 +991,35 @@ void song::importProject( void )
 		importFilter::import( ofd.selectedFiles()[0], this );
 	}
 }
+
+
+
+
+void song::saveControllerStates( QDomDocument & _doc, QDomElement & _this )
+{
+	// save settings of controllers
+	QDomElement controllersNode =_doc.createElement( "controllers" );
+	_this.appendChild( controllersNode );
+	for( int i = 0; i < m_controllers.size(); ++i )
+	{
+		m_controllers[i]->saveState( _doc, controllersNode );
+	}
+}
+
+
+
+
+void song::restoreControllerStates( const QDomElement & _this )
+{
+	QDomNode node = _this.firstChild();
+	while( !node.isNull() ) {
+		addController( controller::create( node.toElement(), this ) );
+
+		node = node.nextSibling();
+	}
+}
+
+
 
 
 #warning TODO: move somewhere else
@@ -1076,6 +1118,20 @@ void song::addController( controller * _c )
 	}
 }
 
+
+void song::removeController( controller * _controller )
+{
+	int index = m_controllers.indexOf( _controller );
+	if( index != -1 )
+	{
+		m_controllers.remove( index );
+
+		if( engine::getSong() )
+		{
+			engine::getSong()->setModified();
+		}
+	}
+}
 
 
 #include "song.moc"
