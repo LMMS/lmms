@@ -31,6 +31,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
+#include <QtGui/QBitmap>
+#include <QtGui/QPainter>
 #include <QtGui/QSplashScreen>
 
 #ifdef HAVE_SCHED_H
@@ -54,8 +56,6 @@ static inline QString baseName( const QString & _file )
 			QFileInfo( _file ).completeBaseName() );
 }
 
-
-int splash_alignment_flags = Qt::AlignTop | Qt::AlignLeft;
 
 inline void loadTranslation( const QString & _tname,
 	const QString & _dir = configManager::inst()->localeDir() )
@@ -334,18 +334,29 @@ int main( int argc, char * * argv )
 		qApp->setPalette( pal );
 
 
-		// init splash screen
-		QPixmap splash = embed::getIconPixmap( "splash" );
-		mainWindow::s_splashScreen = new QSplashScreen( splash );
-		mainWindow::s_splashScreen->show();
+		// init splash screen - this is a bit difficult as we have a
+		// semi-transparent splash-image therefore we first need to grab
+		// the screen, paint the splash onto it and then set a mask
+		// which covers all pixels which are not fully transparent in
+		// splash-image - otherwise we get nasty edges etc.
+		const QPixmap splash = embed::getIconPixmap( "splash" );
+    		const QPoint pt = QApplication::desktop()->
+			availableGeometry().center() - splash.rect().center();
+		QPixmap pm = QPixmap::grabWindow(
+					QApplication::desktop()->winId(),
+					pt.x(), pt.y(),
+					splash.width(), splash.height() );
+		QPainter p( &pm );
+		p.drawPixmap( 0, 0, splash );
+		p.end();
 
-		mainWindow::s_splashScreen->showMessage( mainWindow::tr(
-								"Setting up main-"
-								"window and "
-								"workspace..." ),
-								splash_alignment_flags,
-								Qt::white );
+		QSplashScreen * ss = new QSplashScreen( pm );
+		ss->setWindowOpacity( 0.85 );
+		ss->setMask( splash.alphaChannel().createMaskFromColor( QColor( 0, 0, 0 ) ) );
+		ss->show();
+		qApp->processEvents();
 
+		// init central engine which handles all components of LMMS
 		engine::init();
 
 		// we try to load given file
@@ -372,9 +383,7 @@ int main( int argc, char * * argv )
 			engine::getMainWindow()->resize( 200, 500 );
 		}
 
-
-		delete mainWindow::s_splashScreen;
-		mainWindow::s_splashScreen = NULL;
+		delete ss;
 	}
 	else
 	{

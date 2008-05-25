@@ -34,7 +34,6 @@ class QAction;
 class QDomElement;
 class QGridLayout;
 class QMdiArea;
-class QSplashScreen;
 
 class configManager;
 class pluginView;
@@ -81,8 +80,6 @@ public:
 	{
 		return( m_keyMods.m_alt );
 	}
-
-	static QSplashScreen * s_splashScreen;
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );

@@ -37,7 +37,6 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMenuBar>
 #include <QtGui/QMessageBox>
-#include <QtGui/QSplashScreen>
 #include <QtGui/QSplitter>
 
 
@@ -69,9 +68,6 @@
 #include "automation_editor.h"
 #include "templates.h"
 
-
-QSplashScreen * mainWindow::s_splashScreen = NULL;
-extern int splash_alignment_flags;
 
 
 
@@ -190,23 +186,6 @@ mainWindow::~mainWindow()
 
 void mainWindow::finalize( void )
 {
-	if( qApp->argc() > 1 )
-	{
-		s_splashScreen->showMessage( tr( "Loading song..." ),
-							splash_alignment_flags,
-								Qt::white );
-	}
-	else
-	{
-		s_splashScreen->showMessage( tr( "Creating new song..." ),
-							splash_alignment_flags,
-								Qt::white );
-	}
-
-
-	s_splashScreen->showMessage( tr( "Creating GUI..." ),
-							splash_alignment_flags,
-								Qt::white );
 	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
 

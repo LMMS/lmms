@@ -1,3 +1,11 @@
+2008-05-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/main_window.h:
+	* src/gui/main_window.cpp:
+	* src/core/main.cpp:
+	* data/themes/default/splash.png:
+	new transparent splash-screen without obsolete text-messages
+
 2008-05-25  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/embed.h:
