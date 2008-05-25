@@ -54,7 +54,6 @@ controller::controller( ControllerTypes _type, model * _parent ) :
 
 controller::~controller()
 {
-	printf("controller dtor\n");
 	s_controllers.remove( s_controllers.indexOf( this ) );
 
 	if( engine::getSong() )

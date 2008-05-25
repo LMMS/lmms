@@ -48,6 +48,7 @@
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
+#include "controller_rack_view.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
@@ -729,12 +730,17 @@ void song::clearProject( void )
 		engine::getProjectNotes()->clear();
 	}
 
-	/*
+	// Move to function
 	while( !m_controllers.empty() )
 	{
 		delete m_controllers.last();
 	}
-	*/
+/*	if( engine::getControllerRackView() )
+	{
+		engine::getControllerRackView()->update();
+	}*/
+
+	emit dataChanged();
 
 	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();

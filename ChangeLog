@@ -6,11 +6,13 @@
 	* include/controller.h:
 	* include/song.h:
 	* include/lfo_controller.h:
-	* src/core/song.cpp:
 	* src/core/controller.cpp:
 	* src/core/lfo_controller.cpp:
-	Save and load controllers to project files.  Doesn't clear them on
-	load/new yet though
+	Save and load controllers to project files.
+
+	* src/core/song.cpp:
+	- Save and load controllers to project files.
+	- emit dataChanged() on clearProject() do we need this anywhere else?
 
 2008-05-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

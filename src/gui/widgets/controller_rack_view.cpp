@@ -168,7 +168,6 @@ void controllerRackView::update( void )
 	song * s = engine::getSong();
 //	QVector<bool> view_map( fxChain()->m_effects.size(), FALSE );
 
-	printf("rack view update %d\n", s->m_controllers.size());
 	setUpdatesEnabled( false );
 
 	int i = 0;
