@@ -283,7 +283,7 @@ void singerBot::createWave( notePlayHandle * _n )
 
 	hdata->frequency = _n->frequency();
 	hdata->duration = _n->length() > 0 ?
-		_n->length() * 60.0f * BEATS_PER_TACT
+		_n->length() * 60.0f * DefaultBeatsPerTact
 				/ 64.0f / engine::getSong()->getTempo() :
 		0;
 	int word_index = _n->patternIndex() % m_words.size();

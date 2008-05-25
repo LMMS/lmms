@@ -1,5 +1,6 @@
 2008-05-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/singerbot/singerbot.cpp:
 	* include/meter_model.h:
 	* include/song.h:
 	* include/pattern.h:
