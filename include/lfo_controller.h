@@ -54,6 +54,9 @@ public:
 		return "LFO Controller";
 	}
 
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
+	virtual QString nodeName( void ) const;
 
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );

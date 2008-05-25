@@ -179,6 +179,8 @@ public:
 	}
 
 	void addController( controller * _c );
+	void removeController( controller * _c );
+	
 
 	// QT will implicitly share the Vector I believe..
 	const controllerVector & controllers( void ) const
@@ -242,6 +244,8 @@ private:
 	}
 	void setPlayPos( tact _tact_num, tick _tick, PlayModes _play_mode );
 
+	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
+	void restoreControllerStates( const QDomElement & _this );
 
 
 	track * m_automationTrack;

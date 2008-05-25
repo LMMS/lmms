@@ -35,23 +35,34 @@
 #include "mixer.h"
 #include "controller.h"
 #include "controller_dialog.h"
+#include "lfo_controller.h"
 
 
 unsigned int controller::s_frames = 0;
 QVector<controller *> controller::s_controllers;
 
-controller::controller( model * _parent ) :
-	model( _parent )
+
+
+controller::controller( ControllerTypes _type, model * _parent ) :
+	model( _parent ),
+	m_type( _type )
 {
 	s_controllers.append( this );
 }
 
 
+
 controller::~controller()
 {
+	printf("controller dtor\n");
 	s_controllers.remove( s_controllers.indexOf( this ) );
 
+	if( engine::getSong() )
+	{
+		engine::getSong()->removeController( this );
+	}
 }
+
 
 
 // Get current value, with an offset into the current buffer for sample exactness
@@ -64,6 +75,7 @@ float controller::currentValue( int _offset )
 	
 	return m_currentValue;
 }
+
 
 
 float controller::value( int _offset )
@@ -79,11 +91,14 @@ unsigned int controller::runningFrames()
 	return s_frames;
 }
 
+
+
 // Get position in seconds
 float controller::runningTime()
 {
 	return s_frames / engine::getMixer()->processingSampleRate();
 }
+
 
 
 void controller::triggerFrameCounter( void )
@@ -101,10 +116,71 @@ void controller::triggerFrameCounter( void )
 	//emit s_signaler.triggerValueChanged();
 }
 
+
+
 void controller::resetFrameCounter( void )
 {
 	s_frames = 0;
 }
+
+
+
+controller * controller::create( ControllerTypes _ct, model * _parent )
+{
+	controller * c = NULL;
+
+	switch( _ct )
+	{
+		case LfoController: c = new lfoController( _parent ); break;
+		default: break;
+	}
+
+	return( c );
+}
+
+
+
+controller * controller::create( const QDomElement & _this, model * _parent )
+{
+	controller * c = create(
+		static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
+									_parent );
+	if( c != NULL )
+	{
+		c->restoreState( _this );
+	}
+
+	return( c );
+}
+
+
+
+void controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	_this.setAttribute( "type", type() );
+	_this.setAttribute( "name", name() );
+}
+
+
+
+void controller::loadSettings( const QDomElement & _this )
+{
+	if( _this.attribute( "type" ).toInt() != type() )
+	{
+		qWarning( "controller-type does not match controller-type of "
+							"settings-node!\n" );
+	}
+
+	setName( _this.attribute( "muted" ) );
+}
+
+
+QString controller::nodeName( void ) const
+{
+	return( "controller" );
+}
+
+
 
 controllerDialog * controller::createDialog( QWidget * _parent )
 {

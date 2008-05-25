@@ -86,6 +86,10 @@ public:
 		return( QPixmap() );
 	}
 
+	virtual ~pixmapLoader()
+	{
+	}
+
 protected:
 	QString m_name;
 } ;

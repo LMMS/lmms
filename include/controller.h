@@ -34,17 +34,29 @@
 #include "mixer.h"
 #include "mv_base.h"
 #include "templates.h"
+#include "journalling_object.h"
 
 class controllerDialog;
 class controller; 
 
 typedef QVector<controller *> controllerVector;
 
-class controller : public model
+class controller : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	controller( model * _parent );
+	enum ControllerTypes
+	{
+		LfoController,
+		/*
+        MidiController,
+        XYController,
+		PeakController,
+		*/
+        NumControllerTypes
+	} ;
+
+	controller( ControllerTypes _type, model * _parent );
 
 	virtual ~controller();
 
@@ -67,6 +79,26 @@ public:
 		return "Dummy Controller";
 	}
 
+	ControllerTypes type( void ) const
+	{
+		return( m_type );
+	}
+
+
+	virtual const QString & name( void ) const
+	{
+		return( m_name );
+	}
+
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
+	virtual QString nodeName( void ) const;
+
+	static controller * create( ControllerTypes _tt, model * _parent );
+	static controller * create( const QDomElement & _this,
+							model * _parent );
+
 	inline static float fittedValue( float _val )
 	{
 		return tLimit<float>( _val, 0.0f, 1.0f );
@@ -81,6 +113,11 @@ public:
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
 
+	virtual void setName( const QString & _new_name )
+	{
+		m_name = _new_name;
+	}
+
 protected:
 
 	// The internal per-controller get-value function
@@ -89,6 +126,8 @@ protected:
 	float m_currentValue;
 	bool  m_sampleExact;
 
+	QString m_name;
+	ControllerTypes m_type;
 
 	static controllerVector s_controllers;
 

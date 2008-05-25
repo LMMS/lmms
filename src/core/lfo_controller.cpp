@@ -40,7 +40,7 @@
 const float TWO_PI = 6.28318531f;
 
 lfoController::lfoController( model * _parent ) :
-	controller( _parent ),
+	controller( LfoController, _parent ),
 	m_lfoBaseModel( 0.5, 0.0, 1.0, 0.001, this ),
 	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
@@ -64,8 +64,8 @@ lfoController::~lfoController()
 	m_lfoBaseModel.disconnect( this );
 	m_lfoSpeedModel.disconnect( this );
 	m_lfoAmountModel.disconnect( this );
-	m_lfoWaveModel.disconnect( this );
 	m_lfoPhaseModel.disconnect( this );
+	m_lfoWaveModel.disconnect( this );
 }
 
 
@@ -164,6 +164,40 @@ void lfoController::updateSampleFunction( void )
 	}
 }
 
+
+
+void lfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	controller::saveSettings( _doc, _this );
+
+	m_lfoBaseModel.saveSettings( _doc, _this, "base" );
+	m_lfoSpeedModel.saveSettings( _doc, _this, "speed" );
+	m_lfoAmountModel.saveSettings( _doc, _this, "amount" );
+	m_lfoPhaseModel.saveSettings( _doc, _this, "phase" );
+	m_lfoWaveModel.saveSettings( _doc, _this, "wave" );
+}
+
+
+
+void lfoController::loadSettings( const QDomElement & _this )
+{
+	controller::loadSettings( _this );
+
+	m_lfoBaseModel.loadSettings( _this, "base" );
+	m_lfoSpeedModel.loadSettings( _this, "speed" );
+	m_lfoAmountModel.loadSettings( _this, "amount" );
+	m_lfoPhaseModel.loadSettings( _this, "phase" );
+	m_lfoWaveModel.loadSettings( _this, "wave" );
+
+	updateSampleFunction();
+}
+
+
+
+QString lfoController::nodeName( void ) const
+{
+	return( "lfocontroller" );
+}
 
 
 
