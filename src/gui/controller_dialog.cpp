@@ -25,32 +25,33 @@
  *
  */
 
-#include <QtGui/QWidget>
 #include <QtGui/QCloseEvent>
 
 #include "controller_dialog.h"
 #include "controller.h"
 
 
-controllerDialog::controllerDialog( controller * _controller, QWidget * _parent ) :
-    modelView( _controller ),
-    QWidget( _parent )
+controllerDialog::controllerDialog( controller * _controller,
+							QWidget * _parent ) :
+	QWidget( _parent ),
+	modelView( _controller )
 {
-};
+}
 
 
 
 controllerDialog::~controllerDialog()
 {
-};
+}
 
 
 
 void controllerDialog::closeEvent( QCloseEvent * _ce )
 {
-    _ce->ignore();
-    emit( closed() );
-};
+	_ce->ignore();
+	emit closed();
+}
+
 
 #include "controller_dialog.moc"
 

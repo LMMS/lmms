@@ -28,9 +28,10 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model.h"
-#include "controller.h"
 #include "mv_base.h"
+
+class controller;
+
 
 class controllerDialog : public QWidget, public modelView
 {
@@ -41,13 +42,13 @@ public:
 	virtual ~controllerDialog();
 
 signals:
-    void closed();
+	void closed();
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me ) {};
+/*	virtual void contextMenuEvent( QContextMenuEvent * _me ) {};
 	virtual void paintEvent( QPaintEvent * _pe ) {};
-	virtual void modelChanged( void ) {};
+	virtual void modelChanged( void ) {};*/
 	virtual void closeEvent( QCloseEvent * _ce );
 
 } ;

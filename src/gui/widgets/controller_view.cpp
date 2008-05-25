@@ -45,12 +45,12 @@
 
 
 controllerView::controllerView( controller * _model, QWidget * _parent ) :
-	modelView( _model ),
 	QWidget( _parent ),
+	modelView( _model ),
 	m_bg( embed::getIconPixmap( "controller_bg" ) ),
-	m_show( TRUE ),
 	m_subWindow( NULL ),
-	m_controllerDlg( NULL )
+	m_controllerDlg( NULL ),
+	m_show( TRUE )
 {
 	setFixedSize( 210, 20 );
 
