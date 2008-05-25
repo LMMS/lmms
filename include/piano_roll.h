@@ -244,7 +244,7 @@ private:
 
 	void copy_to_clipboard( const noteVector & _notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, note * _n, Uint16 _x, Uint16 _y );
+	void drawDetuningInfo( QPainter & _p, note * _n, int _x, int _y );
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
 	noteVector::const_iterator noteIteratorUnderMouse( void );

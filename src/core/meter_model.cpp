@@ -35,9 +35,9 @@ meterModel::meterModel( ::model * _parent, track * _track ) :
 	m_denominatorModel.setTrack( _track );
 
 	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( numeratorChanged() ) );
+				this, SIGNAL( dataChanged() ) );
 	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( denominatorChanged() ) );
+				this, SIGNAL( dataChanged() ) );
 }
 
 
@@ -45,6 +45,15 @@ meterModel::meterModel( ::model * _parent, track * _track ) :
 
 meterModel::~meterModel()
 {
+}
+
+
+
+
+void meterModel::reset( void )
+{
+	m_numeratorModel.setValue( 4 );
+	m_denominatorModel.setValue( 4 );
 }
 
 

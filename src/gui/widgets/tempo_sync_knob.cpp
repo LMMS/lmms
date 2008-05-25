@@ -168,9 +168,7 @@ void tempoSyncKnobModel::setSyncMode( tempoSyncMode _new_mode )
 		m_tempoSyncMode = _new_mode;
 		if( _new_mode == SyncCustom )
 		{
-			connect( &m_custom, SIGNAL( numeratorChanged() ),
-					this, SLOT( updateCustom() ) );
-			connect( &m_custom, SIGNAL( denominatorChanged() ),
+			connect( &m_custom, SIGNAL( dataChanged() ),
 					this, SLOT( updateCustom() ) );
 		}
 	}

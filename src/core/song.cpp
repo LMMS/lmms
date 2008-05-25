@@ -71,14 +71,17 @@
 #include "timeline.h"
 
 
+tick midiTime::s_ticksPerTact = DefaultTicksPerTact;
+
 
 
 song::song( void ) :
 	trackContainer(),
 	m_automationTrack( track::create( track::AutomationTrack, this ) ),
-	m_tempoModel( DEFAULT_BPM, MIN_BPM, MAX_BPM, intModel::defaultRelStep(),
-									this ),
+	m_tempoModel( DefaultTempo, MinTempo, MaxTempo,
+					intModel::defaultRelStep(), this ),
 	m_timeSigModel( this, m_automationTrack ),
+	m_oldTicksPerTact( DefaultTicksPerTact ),
 	m_masterVolumeModel( 100, 0, 200, 1, this ),
 	m_masterPitchModel( 0, -12, 12, 1, this ),
 	m_fileName(),
@@ -151,8 +154,8 @@ void song::setTempo( void )
 		}
 	}
 
-//	m_bpmSpinBox->setInitValue( _new_bpm );
 	engine::updateFramesPerTick();
+
 	emit tempoChanged( tempo );
 }
 
@@ -161,8 +164,10 @@ void song::setTempo( void )
 
 void song::setTimeSignature( void )
 {
-	emit timeSignatureChanged( m_timeSigModel.getNumerator(),
-					m_timeSigModel.getDenominator() );
+	midiTime::setTicksPerTact( ticksPerTact() );
+	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
+	emit dataChanged();
+	m_oldTicksPerTact = ticksPerTact();
 }
 
 
@@ -185,15 +190,12 @@ void song::doActions( void )
 		switch( tl->behaviourAtStop() )
 		{
 			case timeLine::BackToZero:
-				m_playPos[m_playMode].setTact( 0 );
 				m_playPos[m_playMode].setTicks( 0 );
 				break;
 
 			case timeLine::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
-					m_playPos[m_playMode].setTact(
-						tl->savedPos().getTact() );
 					m_playPos[m_playMode].setTicks(
 						tl->savedPos().getTicks() );
 					tl->savePos( -1 );
@@ -208,7 +210,6 @@ void song::doActions( void )
 				}
 				else
 				{
-					m_playPos[m_playMode].setTact( 0 );
 					m_playPos[m_playMode].setTicks( 0 );
 				}
 
@@ -353,8 +354,6 @@ void song::processNextBuffer( void )
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_playPos[m_playMode].setTact(
-						tl->loopBegin().getTact() );
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 		}
@@ -376,7 +375,7 @@ void song::processNextBuffer( void )
 			int ticks = m_playPos[m_playMode].getTicks()
 				+ (int)( current_frame / frames_per_tick );
 			// did we play a whole tact?
-			if( ticks >= DefaultTicksPerTact )
+			if( ticks >= midiTime::ticksPerTact() )
 			{
 				// per default we just continue playing even if
 				// there's no more stuff to play
@@ -399,29 +398,23 @@ void song::processNextBuffer( void )
 					max_tact = m_patternToPlay->length()
 								.getTact();
 				}
+
+				// end of played object reached?
 				if( m_playPos[m_playMode].getTact() + 1
-								< max_tact )
+								>= max_tact )
 				{
-					// next tact
-					m_playPos[m_playMode].setTact(
-						m_playPos[m_playMode].getTact()
-									+ 1 );
-				}
-				else
-				{
-					// first tact
-					m_playPos[m_playMode].setTact( 0 );
+					// then start from beginning and keep
+					// offset
+					ticks = ticks % ( max_tact *
+						midiTime::ticksPerTact() );
 				}
 			}
-			m_playPos[m_playMode].setTicks( ticks %
-							DefaultTicksPerTact );
+			m_playPos[m_playMode].setTicks( ticks );
 
 			if( check_loop )
 			{
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
-					m_playPos[m_playMode].setTact(
-						tl->loopBegin().getTact() );
 					m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 				}
@@ -570,10 +563,9 @@ void song::updateLength( void )
 
 
 
-void song::setPlayPos( tact _tact_num, tick _tick, PlayModes _play_mode )
+void song::setPlayPos( tick _ticks, PlayModes _play_mode )
 {
-	m_playPos[_play_mode].setTact( _tact_num );
-	m_playPos[_play_mode].setTicks( _tick );
+	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 }
 
@@ -795,7 +787,8 @@ void song::createNewProject( void )
 						"tripleoscillator" );
 	track::create( track::BBTrack, this );
 
-	m_tempoModel.setInitValue( DEFAULT_BPM );
+	m_tempoModel.setInitValue( DefaultTempo );
+	m_timeSigModel.reset();
 	m_masterVolumeModel.setInitValue( 100 );
 	m_masterPitchModel.setInitValue( 0 );
 
@@ -847,6 +840,7 @@ void FASTCALL song::loadProject( const QString & _file_name )
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( mmp.head(), "bpm" );
+	m_timeSigModel.loadSettings( mmp.head(), "timesig" );
 	m_masterVolumeModel.loadSettings( mmp.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( mmp.head(), "masterpitch" );
 
@@ -928,6 +922,7 @@ bool song::saveProject( void )
 	multimediaProject mmp( multimediaProject::SongProject );
 
 	m_tempoModel.saveSettings( mmp, mmp.head(), "bpm" );
+	m_timeSigModel.saveSettings( mmp, mmp.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( mmp, mmp.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
 
@@ -1028,21 +1023,14 @@ void song::restoreControllerStates( const QDomElement & _this )
 
 
 
-#warning TODO: move somewhere else
-static inline QString baseName( const QString & _file )
-{
-	return( QFileInfo( _file ).absolutePath() + "/" +
-			QFileInfo( _file ).completeBaseName() );
-}
-
-
 void song::exportProject( void )
 {
 	QString base_filename;
 
 	if( m_fileName != "" )
 	{
-		base_filename = baseName( m_fileName );
+		base_filename = QFileInfo( m_fileName ).absolutePath() + "/" +
+				QFileInfo( m_fileName ).completeBaseName();
 	}
 	else
 	{
@@ -1115,6 +1103,8 @@ void song::setModified( void )
 }
 
 
+
+
 void song::addController( controller * _c )
 {
 	if( _c != NULL && !m_controllers.contains( _c ) ) 
@@ -1123,6 +1113,8 @@ void song::addController( controller * _c )
 		emit dataChanged();
 	}
 }
+
+
 
 
 void song::removeController( controller * _controller )

@@ -30,40 +30,39 @@
 #include "types.h"
 
 const int DefaultTicksPerTact = 192;
+const int DefaultStepsPerTact = 16;
+const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
+
 
 class midiTime
 {
 public:
 	inline midiTime( const tact _tact, const tick _ticks ) :
-		m_tact( _tact ),
+		m_ticks( _tact * s_ticksPerTact + _ticks )
+	{
+	}
+
+	inline midiTime( const tick _ticks = 0 ) :
 		m_ticks( _ticks )
 	{
 	}
 
-	inline midiTime( const int _abs = 0 ) :
-		m_tact( _abs / DefaultTicksPerTact ),
-		m_ticks( _abs % DefaultTicksPerTact )
+	inline midiTime( const midiTime & _t ) :
+		m_ticks( _t.m_ticks )
 	{
-	}
-
-	inline midiTime( const midiTime & _t )
-	{
-		*this = _t;
 	}
 
 	inline midiTime toNearestTact( void ) const
 	{
-		if( m_ticks >= DefaultTicksPerTact/2 )
+		if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
 		{
-			return( m_tact * DefaultTicksPerTact +
-							DefaultTicksPerTact );
+			return( ( getTact() + 1 ) * s_ticksPerTact );
 		}
-		return( m_tact * DefaultTicksPerTact );
+		return( getTact() * s_ticksPerTact );
 	}
 
 	inline midiTime & operator=( const midiTime & _t )
 	{
-		m_tact = _t.m_tact;
 		m_ticks = _t.m_ticks;
 		return( *this );
 	}
@@ -80,14 +79,18 @@ public:
 						static_cast<int>( _t ) );
 	}
 
-	inline void setTact( tact _t )
-	{
-		m_tact = _t;
-	}
-
 	inline tact getTact( void ) const
 	{
-		return( m_tact );
+		return( m_ticks / s_ticksPerTact );
+	}
+
+	inline tact nextFullTact( void ) const
+	{
+		if( m_ticks % s_ticksPerTact == 0 )
+		{
+			return( m_ticks / s_ticksPerTact );
+		}
+		return( m_ticks / s_ticksPerTact + 1 );
 	}
 
 	inline void setTicks( tick _t )
@@ -100,21 +103,17 @@ public:
 		return( m_ticks );
 	}
 
-	// converts time-class in an absolute value, useful for calculations,
-	// comparisons and so on...
 	inline operator int( void ) const
 	{
-		return( static_cast<int>( m_tact ) * DefaultTicksPerTact +
-					static_cast<int>( m_ticks ) );
+		return( m_ticks );
 	}
 
 	// calculate number of frame that are needed this time
 	inline f_cnt_t frames( const float _frames_per_tick ) const
 	{
-		if( m_tact >= 0 )
+		if( m_ticks >= 0 )
 		{
-			return( static_cast<f_cnt_t>(
-				( m_tact * DefaultTicksPerTact + m_ticks ) *
+			return( static_cast<f_cnt_t>( m_ticks *
 							_frames_per_tick ) );
 		}
 		return( 0 );
@@ -128,9 +127,25 @@ public:
 	}
 
 
+	static tick ticksPerTact( void )
+	{
+		return( s_ticksPerTact );
+	}
+
+	static int stepsPerTact( void )
+	{
+		return( ticksPerTact() / DefaultBeatsPerTact );
+	}
+
+	static void setTicksPerTact( tick _tpt )
+	{
+		s_ticksPerTact = _tpt;
+	}
+
 private:
-	tact m_tact;
 	tick m_ticks;
+
+	static tick s_ticksPerTact;
 
 } ;
 

@@ -40,12 +40,14 @@ public:
 	void loadSettings( const QDomElement & _this,
 						const QString & _name );
 
-	inline int getNumerator( void )
+	void reset( void );
+
+	inline int getNumerator( void ) const
 	{
 		return( m_numeratorModel.value() );
 	}
 
-	inline int getDenominator( void )
+	inline int getDenominator( void ) const
 	{
 		return( m_denominatorModel.value() );
 	}
@@ -54,11 +56,6 @@ public:
 private:
 	lcdSpinBoxModel m_numeratorModel;
 	lcdSpinBoxModel m_denominatorModel;
-
-
-signals:
-	void numeratorChanged( void );
-	void denominatorChanged( void );
 
 
 	friend class meterDialog;

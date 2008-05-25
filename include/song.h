@@ -40,10 +40,10 @@ class pattern;
 class timeLine;
 
 
-const bpm_t MIN_BPM = 10;
-const bpm_t DEFAULT_BPM = 140;
-const bpm_t MAX_BPM = 999;
-const Uint16 MAX_SONG_LENGTH = 9999;
+const bpm_t MinTempo = 10;
+const bpm_t DefaultTempo = 140;
+const bpm_t MaxTempo = 999;
+const tick MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
 class song : public trackContainer
@@ -139,11 +139,6 @@ public:
 	bpm_t getTempo( void );
 	virtual automationPattern * tempoAutomationPattern( void );
 
-	const meterModel & getTimeSig( void ) const
-	{
-		return( m_timeSigModel );
-	}
-
 	track * getAutomationTrack( void )
 	{
 		return( m_automationTrack );
@@ -233,6 +228,13 @@ private:
 	virtual ~song();
 
 
+	inline int ticksPerTact( void ) const
+	{
+		return( DefaultTicksPerTact *
+				m_timeSigModel.getNumerator() /
+					 m_timeSigModel.getDenominator() );
+	}
+
 	inline tact currentTact( void ) const
 	{
 		return( m_playPos[m_playMode].getTact() );
@@ -242,7 +244,7 @@ private:
 	{
 		return( m_playPos[m_playMode].getTicks() );
 	}
-	void setPlayPos( tact _tact_num, tick _tick, PlayModes _play_mode );
+	void setPlayPos( tick _ticks, PlayModes _play_mode );
 
 	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
 	void restoreControllerStates( const QDomElement & _this );
@@ -252,6 +254,7 @@ private:
 
 	lcdSpinBoxModel m_tempoModel;
 	meterModel m_timeSigModel;
+	int m_oldTicksPerTact;
 	sliderModel m_masterVolumeModel;
 	sliderModel m_masterPitchModel;
 
@@ -296,7 +299,8 @@ private:
 
 signals:
 	void tempoChanged( bpm_t _new_bpm );
-	void timeSignatureChanged( int _num, int _den );
+	void timeSignatureChanged( int _old_ticks_per_tact,
+							int _ticks_per_tact );
 
 } ;
 

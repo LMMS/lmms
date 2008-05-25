@@ -506,7 +506,6 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		{
 			if( ( m_timeLine->pos() -= 16 ) < 0 )
 			{
-				m_timeLine->pos().setTact( 0 );
 				m_timeLine->pos().setTicks( 0 );
 			}
 			m_timeLine->updatePosition();
@@ -625,7 +624,6 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTact( 0 );
 			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
 			break;

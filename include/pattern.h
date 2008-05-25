@@ -47,8 +47,6 @@ class patternFreezeThread;
 class sampleBuffer;
 
 
-const int DEFAULT_STEPS_PER_TACT = 16;
-const int BEATS_PER_TACT = DefaultTicksPerTact/DEFAULT_STEPS_PER_TACT;
 
 
 
@@ -70,6 +68,7 @@ public:
 
 
 	virtual midiTime length( void ) const;
+	midiTime beatPatternLength( void ) const;
 
 	note * addNote( const note & _new_note, const bool _quant_pos = TRUE );
 
@@ -159,6 +158,7 @@ protected slots:
 	void clear( void );
 	void freeze( void );
 	void unfreeze( void );
+	void changeTimeSignature( void );
 
 
 private:

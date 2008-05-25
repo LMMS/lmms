@@ -77,6 +77,8 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 
 	setAcceptDrops( TRUE );
 
+	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+						this, SLOT( realignTracks() ) );
 	connect( m_tc, SIGNAL( trackAdded( track * ) ),
 			this, SLOT( createTrackView( track * ) ),
 			Qt::QueuedConnection );

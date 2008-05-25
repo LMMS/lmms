@@ -1,5 +1,35 @@
 2008-05-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/meter_model.h:
+	* include/song.h:
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* include/song_editor.h:
+	* include/midi_time.h:
+	* include/types.h:
+	* include/timeline.h:
+	* src/core/bb_track_container.cpp:
+	* src/core/meter_model.cpp:
+	* src/core/song.cpp:
+	* src/core/timeline.cpp:
+	* src/core/track.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/track_container_view.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/pattern.cpp:
+	implemented support for time-signatures other than 4/4 - still
+	incomplete and experimental!
+
+	* include/controller_dialog.h:
+	* src/core/lfo_controller.cpp:
+	* src/gui/controller_dialog.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	fixed order of member-initialization and miscellanous coding-style
+	corrections
+
 	* plugins/patman/select_file.png:
 	* plugins/patman/logo.png:
 	* plugins/patman/artwork.png:

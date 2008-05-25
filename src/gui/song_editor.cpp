@@ -427,20 +427,18 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Left )
 	{
-		tact interesting_tact = m_s->currentTact();
-		if( interesting_tact > 0 )
+		tick t = m_s->currentTick() - midiTime::ticksPerTact();
+		if( t >= 0 )
 		{
-			m_s->setPlayPos( --interesting_tact, m_s->currentTick(),
-							song::Mode_PlaySong );
+			m_s->setPlayPos( t, song::Mode_PlaySong );
 		}
 	}
 	else if( _ke->key() == Qt::Key_Right )
 	{
-		tact interesting_tact = m_s->currentTact();
-		if( interesting_tact < MAX_SONG_LENGTH )
+		tick t = m_s->currentTick() + midiTime::ticksPerTact();
+		if( t < MaxSongLength )
 		{
-			m_s->setPlayPos( ++interesting_tact, m_s->currentTick(),
-							song::Mode_PlaySong );
+			m_s->setPlayPos( t, song::Mode_PlaySong );
 		}
 	}
 	else if( _ke->key() == Qt::Key_Space )
@@ -456,7 +454,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Home )
 	{
-		m_s->setPlayPos( 0, 0, song::Mode_PlaySong );
+		m_s->setPlayPos( 0, song::Mode_PlaySong );
 	}
 	else
 	{
@@ -576,7 +574,7 @@ void songEditor::masterPitchChanged( int _new_val )
 					&& m_masterPitchSlider->showStatus() )
 	{
 		m_mpsStatus->moveGlobal( m_masterPitchSlider,
-				QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 		m_mpsStatus->setVisibilityTimeOut( 1000 );
 	}
 }
@@ -587,7 +585,7 @@ void songEditor::masterPitchChanged( int _new_val )
 void songEditor::masterPitchPressed( void )
 {
 	m_mpsStatus->moveGlobal( m_masterPitchSlider,
-				QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
 	m_mpsStatus->show();
 	masterPitchMoved( m_s->m_masterPitchModel.value() );
 }
@@ -619,15 +617,15 @@ void songEditor::updatePosition( const midiTime & _t )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
 							- TRACK_OP_WIDTH;
-		if( _t > m_currentPosition + w * DefaultTicksPerTact /
+		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
 			m_leftRightScroll->setValue( _t.getTact() );
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( (int)( _t - w * DefaultTicksPerTact *
-						DefaultTicksPerTact /
+			midiTime t = tMax(
+				(int)( _t - w * midiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );
 			m_leftRightScroll->setValue( t.getTact() );
@@ -648,21 +646,6 @@ void songEditor::zoomingChanged( void )
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
 }
-
-
-
-
-void songEditor::updateTimeLinePosition( void )
-{
-	if( m_s->m_playPos[m_s->m_playMode].m_timeLine != NULL &&
-		m_s->m_playPos[m_s->m_playMode].m_timeLineUpdate == TRUE )
-	{
-/*		QTimer::singleShot( 1, m_playPos[m_playMode].m_timeLine,
-						SLOT( updatePosition() ) );*/
-		//m_playPos[m_playMode].m_timeLine->updatePosition();
-	}
-}
-
 
 
 

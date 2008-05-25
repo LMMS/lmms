@@ -39,7 +39,7 @@ typedef signed int	Sint32;
 typedef Uint32 minute;
 typedef Sint8 second;
 typedef Sint32 tact;
-typedef Sint16 tick;
+typedef Sint32 tick;
 typedef Uint8 volume;
 typedef Sint8 panning;
 
