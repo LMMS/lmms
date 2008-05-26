@@ -37,21 +37,27 @@
 
 
 controllerConnectionVector controllerConnection::s_connections;
-controller * controllerConnection::s_dummyController = NULL;
 
 
 
 controllerConnection::controllerConnection( controller * _controller ) :
     m_controllerId( -1 )
 {
-    setController( _controller );
+    if( _controller != NULL )
+    {
+        setController( _controller );
+    }
+    else
+    {
+        m_controller = controller::create( controller::DummyController, NULL );
+    }
 	s_connections.append( this );
 }
 
 
 
 controllerConnection::controllerConnection( int _controllerId ) :
-	m_controller( dummyController() ),
+	m_controller( controller::create( controller::DummyController, NULL ) ),
     m_controllerId( _controllerId )
 {
 	s_connections.append( this );
@@ -85,6 +91,13 @@ void controllerConnection::setController( controller * _controller )
 
 
 
+/*
+ * A connection may not be finalized.  This means, the connection should exist,
+ * but the controller does not yet exist.  This happens when loading.  Even
+ * loading connections last won't help, since there can be connections BETWEEN 
+ * controllers. So, we remember the controller-ID and use a dummyController 
+ * instead.  Once the song is loaded, finalizeConnections() connects to the proper controllers
+ */
 void controllerConnection::finalizeConnections( void )
 {
 	for( int i = 0; i < s_connections.size(); ++i )
@@ -114,26 +127,14 @@ void controllerConnection::loadSettings( const QDomElement & _this )
 	if( _this.attribute( "id" ).toInt() >= 0 )
 	{
         m_controllerId = _this.attribute( "id" ).toInt();
-        m_controller = dummyController();
 	}
     else
     {
 		qWarning( "controller index invalid\n" );
         m_controllerId = -1;
-        m_controller = dummyController();
     }
+    m_controller = controller::create( controller::DummyController, NULL );
 
-}
-
-
-
-controller * controllerConnection::dummyController()
-{
-    if( s_dummyController == NULL )
-    {
-        s_dummyController = new controller( controller::DummyController, NULL );
-    }
-    return s_dummyController;
 }
 
 

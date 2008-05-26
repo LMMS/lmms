@@ -84,10 +84,6 @@ protected:
 
     static controllerConnectionVector s_connections;
 
-    static controller * dummyController();
-    static controller * s_dummyController;
-
-
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged( void );

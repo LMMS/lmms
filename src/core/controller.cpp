@@ -130,12 +130,24 @@ void controller::resetFrameCounter( void )
 
 controller * controller::create( ControllerTypes _ct, model * _parent )
 {
+	static controller * dummy = NULL;
 	controller * c = NULL;
 
 	switch( _ct )
 	{
-		case LfoController: c = new lfoController( _parent ); break;
-		default: break;
+		case DummyController: 
+			if( dummy )
+				c = dummy;
+			else
+				c = new controller( DummyController, NULL );
+			break;
+
+		case LfoController: 
+			c = new lfoController( _parent ); 
+			break;
+
+		default: 
+			break;
 	}
 
 	return( c );

@@ -100,8 +100,6 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( select_btn );
-/*	btn_layout->addSpacing( 10 );
-	btn_layout->addWidget( ports_btn );*/
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
