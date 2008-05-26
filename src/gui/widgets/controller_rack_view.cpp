@@ -182,11 +182,11 @@ void controllerRackView::update( void )
 	{
 		controllerView * v = new controllerView( s->m_controllers[i], w );
 		m_controllerViews.append( v );
-		v->move( 0, i*20 );
+		v->move( 0, i*32 );
 		v->show();
 	}
 
-	w->setFixedSize( 210, i*20 );
+	w->setFixedSize( 210, i*32 );
 
 	/*
 	for( QVector<effect *>::iterator it = fxChain()->m_effects.begin();

@@ -49,7 +49,11 @@ controller::controller( ControllerTypes _type, model * _parent ) :
 	m_type( _type )
 {
 	if( _type != DummyController )
+	{
 		s_controllers.append( this );
+		m_name = QString( tr( "Controller %1" ) )
+				.arg( s_controllers.size() );
+	}
 }
 
 
@@ -186,7 +190,7 @@ void controller::loadSettings( const QDomElement & _this )
 							"settings-node!\n" );
 	}
 
-	setName( _this.attribute( "muted" ) );
+	setName( _this.attribute( "name" ) );
 }
 
 

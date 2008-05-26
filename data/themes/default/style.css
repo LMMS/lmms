@@ -38,7 +38,7 @@ QMenu::item {
 QMenu::item:selected {
 	color: white;
 	font-weight:bold;
-	background-color: rgba(0, 0, 0, 160);
+	background-color: rgb(54,57,66);
 	margin:3px;
 }
 

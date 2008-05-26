@@ -65,8 +65,12 @@ const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
 lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
 	controllerDialog( _model, _parent )
 {
-	setWindowIcon( embed::getIconPixmap( "controller" ) );
+	QString title = tr( "LFO" );
+	title.append( " (" );
+	title.append( _model->name() );
+	title.append( ")" );
 	setWindowTitle( tr( "LFO (name)" ) );
+	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 256, 64 );
 	
 	toolTip::add( this, tr( "LFO Controller" ) );
