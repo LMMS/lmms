@@ -15,7 +15,19 @@
 	- add dummyController for unfinalized or missing controllers.  Faster than
 	adding a branch to value() or currentValue()
 	- save controller links to project
-	- incomplete, experimental, most likely buggy!
+	- incomplete, experimental!
+
+	* include/controller_view.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	* data/themes/default/controller_bg.png:
+	Show name in controller view and make it renamable
+
+	* data/themes/default/style.css:
+	A hint of blue in menu highlight
+
+	* src/core/song.cpp:
+	Add data-changed event so lfo-rack can update
 
 2008-05-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -729,6 +729,8 @@ void song::clearProject( void )
 		delete m_controllers.last();
 	}
 
+	emit dataChanged();
+
 	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();
 
