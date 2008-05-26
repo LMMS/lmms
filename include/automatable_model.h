@@ -31,7 +31,7 @@
 #include "journalling_object.h"
 #include "level_object.h"
 #include "mv_base.h"
-#include "controller.h"
+#include "controller_connection.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QObject>
@@ -106,26 +106,26 @@ public:
 
 	inline virtual T value( int _frameOffset = 0 ) const
 	{
-		if( m_controller != NULL )
+		if( m_controllerConnection != NULL )
 		{
 			return minValue() + castValue( m_range * 
-				 m_controller->currentValue( _frameOffset ) );
+				 m_controllerConnection->currentValue( _frameOffset ) );
 		}
 
 		return m_value;
 	}
 
 
-	inline controller * getController( void ) const
+	inline controllerConnection * getControllerConnection( void ) const
 	{
-		return m_controller;
+		return m_controllerConnection;
 	}
 
 
-	inline void setController( controller * _c )
+	inline void setControllerConnection( controllerConnection * _c )
 	{
-		m_controller = _c;
-		QObject::connect( m_controller, SIGNAL( valueChanged() ),
+		m_controllerConnection = _c;
+		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ),
 				this, SIGNAL( dataChanged() ) );
 	}
 
@@ -223,7 +223,7 @@ protected:
 
 
 private:
-	controller * m_controller;
+	controllerConnection * m_controllerConnection;
 	T m_value;
 	T m_initValue;
 	T m_minValue;

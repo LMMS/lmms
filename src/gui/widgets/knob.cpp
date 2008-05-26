@@ -56,6 +56,7 @@
 #include "text_float.h"
 #include "song.h"
 #include "controller_connection_dialog.h"
+#include "controller_connection.h"
 
 
 float knob::s_copiedValue = 0.0f;
@@ -737,7 +738,8 @@ void knob::connectToController( void )
 
 	if (d->chosenController() != NULL )
 	{
-		model()->setController( d->chosenController() );
+		model()->setControllerConnection( 
+                new controllerConnection( d->chosenController() ) );
 	}
 
 	delete d;
@@ -747,7 +749,7 @@ void knob::connectToController( void )
 
 void knob::friendlyUpdate( void )
 {
-	if( model()->getController() == NULL || controller::runningFrames() % (256*4) == 0 )
+	if( model()->getControllerConnection() == NULL || controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
 	}

@@ -45,9 +45,11 @@ QVector<controller *> controller::s_controllers;
 
 controller::controller( ControllerTypes _type, model * _parent ) :
 	model( _parent ),
+	journallingObject(),
 	m_type( _type )
 {
-	s_controllers.append( this );
+	if( _type != DummyController )
+		s_controllers.append( this );
 }
 
 
@@ -60,6 +62,8 @@ controller::~controller()
 	{
 		engine::getSong()->removeController( this );
 	}
+
+	// TODO: Remove connections
 }
 
 

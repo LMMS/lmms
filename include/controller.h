@@ -47,6 +47,7 @@ class controller : public model, public journallingObject
 public:
 	enum ControllerTypes
 	{
+        DummyController,
 		LfoController,
 		/*
         MidiController,

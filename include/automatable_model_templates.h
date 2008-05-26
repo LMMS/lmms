@@ -45,7 +45,7 @@ automatableModel<T, EDIT_STEP_TYPE>::automatableModel(
 						::model * _parent,
 						bool _default_constructed ) :
 	model( _parent, _default_constructed ),
-	m_controller( NULL ),
+	m_controllerConnection( NULL ),
 	m_value( _val ),
 	m_initValue( _val ),
 	m_minValue( _min ),
@@ -301,6 +301,24 @@ void automatableModel<T, EDIT_STEP_TYPE>::saveSettings( QDomDocument & _doc,
 	{
 		_this.setAttribute( _name, value() );
 	}
+
+    if( m_controllerConnection )
+    {
+        QDomElement controller_element;
+		QDomNode node = _this.namedItem( "connection" );
+		if( node.isElement() )
+        {
+            controller_element = node.toElement();
+        }
+        else
+        {
+            controller_element = _doc.createElement( "connection" );
+            _this.appendChild( controller_element );
+        }
+		QDomElement element = _doc.createElement( _name );
+        m_controllerConnection->saveSettings( _doc, element );
+		controller_element.appendChild( element );
+    }
 }
 
 
@@ -322,6 +340,17 @@ void automatableModel<T, EDIT_STEP_TYPE>::loadSettings(
 			return;
 		}
 	}
+
+    node = _this.namedItem( "connection" );
+    if( node.isElement() )
+    {
+		node = node.namedItem( _name );
+		if( node.isElement() ) {
+            //m_controllerConnection = new controllerConnection( (controller*)NULL );
+            setControllerConnection( new controllerConnection( (controller*)NULL ) );
+            m_controllerConnection->loadSettings( node.toElement() );
+        }
+    }
 
 	setInitValue( attributeValue( _this.attribute( _name ) ) );
 }

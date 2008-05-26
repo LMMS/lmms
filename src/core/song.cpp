@@ -49,6 +49,7 @@
 #include "bb_track_container.h"
 #include "config_mgr.h"
 #include "controller_rack_view.h"
+#include "controller_connection.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
@@ -727,12 +728,6 @@ void song::clearProject( void )
 	{
 		delete m_controllers.last();
 	}
-/*	if( engine::getControllerRackView() )
-	{
-		engine::getControllerRackView()->update();
-	}*/
-
-	emit dataChanged();
 
 	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();
@@ -905,6 +900,10 @@ void FASTCALL song::loadProject( const QString & _file_name )
 		}
 		node = node.nextSibling();
 	}
+
+	// Connect controller links to their controllers 
+	// now that everything is loaded
+	controllerConnection::finalizeConnections();
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
