@@ -1,5 +1,11 @@
 2008-05-26  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
+	* include/controller_view.h:
+	* src/gui/widgets/controller_view.cpp:
+	made LMMS compile + cleanups
+
+2008-05-26  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
 	* include/automatable_model.h:
 	* include/automatable_model_templates.h:
 	* include/controller.h:
