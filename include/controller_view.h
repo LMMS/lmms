@@ -78,6 +78,7 @@ protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void modelChanged( void );
+	virtual void mouseDoubleClickEvent( QMouseEvent * event );
 
 
 private:

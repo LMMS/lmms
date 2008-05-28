@@ -32,6 +32,7 @@
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
+#include <QtGui/QInputDialog>
 
 #include "caption_menu.h"
 #include "controller_dialog.h"
@@ -52,12 +53,12 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 	m_controllerDlg( NULL ),
 	m_show( TRUE )
 {
-	setFixedSize( 210, 20 );
+	setFixedSize( 210, 32 );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
 	m_bypass = new ledCheckBox( "", this, tr( "Turn the controller off" ) );
-	m_bypass->move( 3, 3 );
+	m_bypass->move( 3, 2 );
 	m_bypass->setWhatsThis( tr( "Toggles the controller on or off." ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 	
@@ -140,11 +141,34 @@ void controllerView::paintEvent( QPaintEvent * )
 	f.setBold( TRUE );
 	p.setFont( f );
 
-	p.drawText( 6, 55, castModel<controller>()->publicName() );
+	controller * c = castModel<controller>();
+
+	p.setPen( QColor( 64, 64, 64 ) );
+	p.drawText( 21, 13, c->publicName() );
 	p.setPen( Qt::white );
-	p.drawText( 5, 54, castModel<controller>()->publicName() );
+	p.drawText( 20, 12, c->publicName() );
+
+    f.setBold( FALSE );
+    p.setFont( f );
+	p.drawText( 6, 26, c->name() );
 }
 
+
+
+void controllerView::mouseDoubleClickEvent( QMouseEvent * event )
+{
+	bool ok;
+	controller * c = castModel<controller>();
+	QString new_name = QInputDialog::getText( this,
+			tr( "Rename controller" ),
+			tr( "Enter the new name for this controller" ),
+			QLineEdit::Normal, c->name() , &ok );
+	if( ok && !new_name.isEmpty() )
+	{
+		c->setName( new_name );
+		update();
+	}
+}
 
 
 
