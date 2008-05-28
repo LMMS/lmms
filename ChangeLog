@@ -1,12 +1,15 @@
 2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
-	Restore gain setting when loading a project and keep gain setting when
+	restore gain setting when loading a project and keep gain setting when
 	changing sample rate
 
 	* include/controller_view.h:
 	* src/gui/widgets/controller_view.cpp:
 	reverted toby's controllerView changes.
+
+	* src/core/mmp.cpp:
+	add compat-code for time-signature support
 
 2008-05-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

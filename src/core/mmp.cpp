@@ -631,6 +631,13 @@ void multimediaProject::upgrade( void )
 		
 	}
 
+	// Time-signature
+	if ( !m_head.hasAttribute( "timesig_numerator" ) )
+	{
+		m_head.setAttribute( "timesig_numerator", 4 );
+		m_head.setAttribute( "timesig_denominator", 4 );
+	}
+
 	if( !m_head.hasAttribute( "mastervol" ) )
 	{
 		m_head.setAttribute( "mastervol", 100 );
