@@ -1,3 +1,9 @@
+2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	Restore gain setting when loading a project and keep gain setting when
+	changing sample rate
+
 2008-05-26  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/controller_view.h:

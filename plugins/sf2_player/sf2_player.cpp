@@ -220,6 +220,8 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusLevel.loadSettings( _this, "chorusLevel" );
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
+
+	updateGain();
 }
 
 
@@ -405,6 +407,7 @@ void sf2Instrument::updateSampleRate( void )
 		
 		// synth program change (set bank and patch)
 		updatePatch();
+		updateGain();
 	}
 	else
 	{
