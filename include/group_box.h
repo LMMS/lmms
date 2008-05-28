@@ -28,7 +28,7 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model.h"
+#include "automatable_model_view.h"
 #include "pixmap_button.h"
 
 
@@ -61,7 +61,7 @@ private:
 } ;
 
 
-typedef groupBox::autoModel groupBoxModel;
+typedef boolModel groupBoxModel;
 
 
 #endif

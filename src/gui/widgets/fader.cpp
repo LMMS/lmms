@@ -53,7 +53,6 @@
 #include "embed.h"
 #include "caption_menu.h"
 #include "automation_pattern.h"
-#include "automatable_model_templates.h"
 
 
 

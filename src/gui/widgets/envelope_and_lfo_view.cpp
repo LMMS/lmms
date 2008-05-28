@@ -361,7 +361,7 @@ void envelopeAndLFOView::mousePressEvent( QMouseEvent * _me )
 	if( QRect( ENV_GRAPH_X, ENV_GRAPH_Y, s_envGraph->width(),
 			s_envGraph->height() ).contains( _me->pos() ) == TRUE )
 	{
-		if( m_amountKnob->value() < 1.0f )
+		if( m_amountKnob->value<float>() < 1.0f )
 		{
 			m_amountKnob->setValue( 1.0f );
 		}
@@ -373,7 +373,7 @@ void envelopeAndLFOView::mousePressEvent( QMouseEvent * _me )
 	else if( QRect( LFO_GRAPH_X, LFO_GRAPH_Y, s_lfoGraph->width(),
 			s_lfoGraph->height() ).contains( _me->pos() ) == TRUE )
 	{
-		if( m_lfoAmountKnob->value() < 1.0f )
+		if( m_lfoAmountKnob->value<float>() < 1.0f )
 		{
 			m_lfoAmountKnob->setValue( 1.0f );
 		}
@@ -438,7 +438,7 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 
 	p.setFont( pointSize<8>( p.font() ) );
 
-	const float gray_amount = 1.0f - fabsf( m_amountKnob->value() );
+	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
 
 	p.setPen( QPen( QColor( static_cast<int>( 96 * gray_amount ),
 				static_cast<int>( 255 - 159 * gray_amount ),
@@ -451,44 +451,44 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 	const int y_base = ENV_GRAPH_Y + s_envGraph->height() - 3;
 	const int avail_height = s_envGraph->height() - 6;
 	
-	int x1 = ENV_GRAPH_X + 2 + static_cast<int>( m_predelayKnob->value() *
+	int x1 = ENV_GRAPH_X + 2 + static_cast<int>( m_predelayKnob->value<float>() *
 							TIME_UNIT_WIDTH );
-	int x2 = x1 + static_cast<int>( m_attackKnob->value() *
+	int x2 = x1 + static_cast<int>( m_attackKnob->value<float>() *
 							TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base, x2, y_base - avail_height );
 	p.fillRect( x1 - 1, y_base - 2, 4, 4, end_points_bg_color );
 	p.fillRect( x1, y_base - 1, 2, 2, end_points_color );
 	x1 = x2;
-	x2 = x1 + static_cast<int>( m_holdKnob->value() * TIME_UNIT_WIDTH );
+	x2 = x1 + static_cast<int>( m_holdKnob->value<float>() * TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base - avail_height, x2, y_base - avail_height );
 	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x1, y_base-1-avail_height, 2, 2, end_points_color );
 	x1 = x2;
-	x2 = x1 + static_cast<int>( ( m_decayKnob->value() *
-						m_sustainKnob->value() ) *
+	x2 = x1 + static_cast<int>( ( m_decayKnob->value<float>() *
+						m_sustainKnob->value<float>() ) *
 							TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, y_base-avail_height, x2, static_cast<int>( y_base -
 								avail_height +
-				m_sustainKnob->value() * avail_height ) );
+				m_sustainKnob->value<float>() * avail_height ) );
 	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
 	x1 = x2;
-	x2 = x1 + static_cast<int>( m_releaseKnob->value() * TIME_UNIT_WIDTH );
+	x2 = x1 + static_cast<int>( m_releaseKnob->value<float>() * TIME_UNIT_WIDTH );
 
 	p.drawLine( x1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value() *
+						m_sustainKnob->value<float>() *
 						avail_height ), x2, y_base );
 	p.fillRect( x1-1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value() *
+						m_sustainKnob->value<float>() *
 						avail_height ) - 2, 4, 4,
 							end_points_bg_color );
 	p.fillRect( x1, static_cast<int>( y_base - avail_height +
-						m_sustainKnob->value() *
+						m_sustainKnob->value<float>() *
 						avail_height ) - 1, 2, 2,
 							end_points_color );
 	p.fillRect( x2 - 1, y_base - 2, 4, 4, end_points_bg_color );
@@ -503,7 +503,7 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
 				engine::getMixer()->baseSampleRate() / 10;
 
-	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value() );
+	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
 	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),
 				static_cast<int>( 255 - 159 * lfo_gray_amount ),
 				static_cast<int>( 128 - 32 *
@@ -563,7 +563,7 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 255, 192, 0 ) );
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
-						m_lfoSpeedKnob->value() *
+						m_lfoSpeedKnob->value<float>() *
 								1000.0f );
 	p.drawText( LFO_GRAPH_X + 4, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 							tr( "ms/LFO:" ) );

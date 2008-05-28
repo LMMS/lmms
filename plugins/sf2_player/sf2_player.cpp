@@ -36,7 +36,6 @@
 #include "note_play_handle.h"
 #include "knob.h"
 #include "song.h"
-#include "automatable_model_templates.h"
 
 #include "main_window.h"
 #include "patches_dialog.h"
@@ -77,8 +76,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
-	m_bankNum( -1, -1, 999, 1, this ),
-	m_patchNum( -1, -1, 127, 1, this ),
+	m_bankNum( -1, -1, 999, this ),
+	m_patchNum( -1, -1, 127, this ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this ),
 	m_reverbOn( 0, this ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this ),

@@ -46,7 +46,7 @@ QPixmap * groupBox::s_ledBg = NULL;
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	autoModelView( NULL ),
+	boolModelView( NULL ),
 	m_caption( _caption )
 {
 	if( s_ledBg == NULL )
@@ -63,8 +63,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new autoModel( FALSE, FALSE, TRUE,
-				autoModel::defaultRelStep(), NULL, FALSE ) );
+	setModel( new boolModel( FALSE, NULL, FALSE ) );
 	setAutoFillBackground( TRUE );
 }
 

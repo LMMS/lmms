@@ -270,23 +270,20 @@ private:
 	public:
 		baseDetuning( detuningHelper * _detuning );
 
-		int level( void )
+		void setValue( float _val )
 		{
-			return( m_level );
+			m_value = _val;
 		}
 
-		void setLevel( int _level );
-
-		float value( void )
+		float value( void ) const
 		{
 			return( m_value );
 		}
 
 
 	private:
-		int m_level;
-		float m_value;
 		detuningHelper * m_detuning;
+		float m_value;
 
 	} ;
 

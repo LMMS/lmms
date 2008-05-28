@@ -28,7 +28,7 @@
 
 #include <QtGui/QPushButton>
 
-#include "automatable_model.h"
+#include "automatable_model_view.h"
 
 
 class automatableButtonGroup;

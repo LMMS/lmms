@@ -518,7 +518,7 @@ void audioALSA::setupWidget::saveSettings( void )
 	configManager::inst()->setValue( "audioalsa", "device",
 							m_device->text() );
 	configManager::inst()->setValue( "audioalsa", "channels",
-				QString::number( m_channels->value() ) );
+				QString::number( m_channels->value<int>() ) );
 }
 
 

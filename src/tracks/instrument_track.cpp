@@ -108,10 +108,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 						tr( "unnamed_channel" ) ) ),
 	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
-	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, 1, this ),
+	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this ),
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
-        m_effectChannelModel( 0, 0, NumFxChannels, 1, this ),
+        m_effectChannelModel( 0, 0, NumFxChannels, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
@@ -1027,7 +1027,7 @@ class fxLineLcdSpinBox : public lcdSpinBox
 	protected:
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
-			engine::getFxMixerView()->setCurrentFxLine( value() );
+			engine::getFxMixerView()->setCurrentFxLine( model()->value() );
 			//engine::getFxMixerView()->raise();
 		}
 };

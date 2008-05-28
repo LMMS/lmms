@@ -1,3 +1,74 @@
+2008-05-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/organic/organic.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/knob.h:
+	* include/automatable_slider.h:
+	* include/lcd_spinbox.h:
+	* include/automatable_model.h:
+	* include/combobox_model.h:
+	* include/automation_pattern.h:
+	* include/note_play_handle.h:
+	* include/detuning_helper.h:
+	* include/group_box.h:
+	* include/automatable_button.h:
+	* include/automatable_model_templates.h:
+	* include/level_object.h:
+	* include/automatable_model_view.h:
+	* include/fader.h:
+	* include/combobox.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/volume_knob.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/song.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_jack.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/combobox_model.cpp:
+	* src/core/meter_model.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument_midi_io.cpp:
+	* src/core/track.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/note.cpp:
+	* src/core/piano.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/lfo_controller.cpp:
+	* Makefile.am:
+	reworked automatableModel (not template-based anymore), removed
+	levelObject, splitted comboBox/comboBoxModel-source-files, began to
+	unify context-menu-creation for controls
+
+	diffstat:  63 files changed, 1145 insertions(+), 1170 deletions(-)
+
 2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:

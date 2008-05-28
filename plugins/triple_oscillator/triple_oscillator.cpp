@@ -39,7 +39,6 @@
 #include "song_editor.h"
 #include "tooltip.h"
 #include "volume_knob.h"
-#include "automatable_model_templates.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -79,9 +78,9 @@ oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
 	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this ),
 	m_waveShapeModel( oscillator::SineWave, 0, oscillator::NumWaveShapes-1,
-								1, this ),
+									this ),
 	m_modulationAlgoModel( oscillator::SignalMix, 0,
-				oscillator::NumModulationAlgos-1, 1, this ),
+				oscillator::NumModulationAlgos-1, this ),
 	m_sampleBuffer( new sampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),

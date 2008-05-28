@@ -24,7 +24,6 @@
 
 
 #include "ladspa_control.h"
-#include "automatable_model_templates.h"
 #include "ladspa_base.h"
 
 

@@ -33,7 +33,6 @@
 #include "instrument_track.h"
 #include "pattern.h"
 #include "automation_pattern.h"
-#include "level_object.h"
 #include "instrument.h"
 #include "debug.h"
 #include "embed.h"
@@ -182,7 +181,7 @@ invalid_format:
 	automationPattern * tap = _tc->tempoAutomationPattern();
 	if( tap != NULL )
 	{
-		tap->object()->setLevel( 120 );
+		tap->object()->setValue( 120 );
 		tap->putValue( 0, 120 );
 	}
 

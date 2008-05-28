@@ -29,17 +29,16 @@
 #include <math.h>
 
 #include "journalling_object.h"
-#include "level_object.h"
 #include "mv_base.h"
 #include "controller_connection.h"
+#include "automation_pattern.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QObject>
 
 
-
-class automationPattern;
 class track;
+
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
@@ -67,132 +66,35 @@ class track;
 			}
 
 
-template<typename T, typename EDIT_STEP_TYPE = T>
-class automatableModel : public model, public journallingObject,
-							public levelObject
-{
-public:
-	typedef automatableModel<T, EDIT_STEP_TYPE> autoModel;
 
-	automatableModel( const T _val = 0,
-				const T _min = 0,
-				const T _max = 0,
-				const T _step = defaultRelStep(),
+class automatableModel : public model, public journallingObject
+{
+	Q_OBJECT
+public:
+	enum DataType
+	{
+		Float,
+		Integer,
+		Bool
+	} ;
+
+	automatableModel( DataType _type,
+				const float _val = 0,
+				const float _min = 0,
+				const float _max = 0,
+				const float _step = 0,
 				::model * _parent = NULL,
 				bool _default_constructed = FALSE );
 
 	virtual ~automatableModel();
 
-	static inline T minRelStep( void )
+
+	static inline float copiedValue( void )
 	{
-		return( 1 );
+		return( __copiedValue );
 	}
 
-	static inline T defaultRelStep( void )
-	{
-		return( 1 );
-	}
-
-	static inline T minEps( void )
-	{
-		return( 1 );
-	}
-
-	template<class V>
-	static inline T castValue( V _v )
-	{
-		return( static_cast<T>( _v ) );
-	}
-
-	inline virtual T value( int _frameOffset = 0 ) const
-	{
-		if( m_controllerConnection != NULL )
-		{
-			return minValue() + castValue( m_range * 
-				 m_controllerConnection->currentValue( _frameOffset ) );
-		}
-
-		return m_value;
-	}
-
-
-	inline controllerConnection * getControllerConnection( void ) const
-	{
-		return m_controllerConnection;
-	}
-
-
-	inline void setControllerConnection( controllerConnection * _c )
-	{
-		m_controllerConnection = _c;
-		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ),
-				this, SIGNAL( dataChanged() ) );
-	}
-
-
-	inline virtual T initValue( void ) const
-	{
-		return( m_initValue );
-	}
-
-	inline virtual T minValue( void ) const
-	{
-		return( m_minValue );
-	}
-
-	inline virtual T maxValue( void ) const
-	{
-		return( m_maxValue );
-	}
-
-	inline virtual T step( void ) const
-	{
-		return( m_step );
-	}
-
-	inline int curLevel( void ) const
-	{
-		return( m_curLevel );
-	}
-
-	T fittedValue( T _value ) const;
-
-	inline T levelToValue( int _level ) const
-	{
-		return( fittedValue( _level * m_step ) );
-	}
-
-	virtual void setInitValue( const T _value );
-
-	virtual void setValue( const T _value );
-
-	inline virtual void incValue( int _steps )
-	{
-		setValue( m_value + _steps * m_step );
-	}
-
-	virtual void setRange( const T _min, const T _max,
-					const T _step = defaultRelStep() );
-
-	virtual void setStep( const T _step );
-
-	static void linkModels( autoModel * _model1, autoModel * _model2 );
-
-	static void unlinkModels( autoModel * _model1, autoModel * _model2 );
-
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-					QDomElement & _this,
-					const QString & _name = "value" );
-
-	virtual void FASTCALL loadSettings( const QDomElement & _this,
-					const QString & _name = "value" );
-
-	virtual QString nodeName( void ) const
-	{
-		return( "automatablemodel" );
-	}
-
-	inline automationPattern * getAutomationPattern( void );
+	automationPattern * getAutomationPattern( void );
 
 	inline void setTrack( track * _track )
 	{
@@ -204,144 +106,263 @@ public:
 		return( m_track == NULL );
 	}
 
-	void initAutomationPattern( void )
+	void initAutomationPattern( void );
+
+	inline controllerConnection * getControllerConnection( void ) const
 	{
-		m_automationPattern = new automationPattern( NULL, this );
+		return m_controllerConnection;
+	}
+
+
+	inline void setControllerConnection( controllerConnection * _c )
+	{
+		m_controllerConnection = _c;
+		QObject::connect( m_controllerConnection,
+						SIGNAL( valueChanged() ),
+					this, SIGNAL( dataChanged() ) );
+	}
+
+
+	template<class T>
+	static inline T minEps( void )
+	{
+		return( 1 );
+	}
+
+	template<class T>
+	static inline T castValue( const float _v )
+	{
+		return( static_cast<T>( _v ) );
+	}
+
+	template<class T>
+	inline T value( int _frameOffset = 0 ) const
+	{
+		if( m_controllerConnection != NULL )
+		{
+			return minValue<T>() +
+				castValue<T>( m_range * 
+					 m_controllerConnection->currentValue(
+							_frameOffset ) );
+		}
+
+		return castValue<T>( m_value );
+	}
+
+
+	template<class T>
+	inline T initValue( void ) const
+	{
+		return castValue<T>( m_initValue );
+	}
+
+	template<class T>
+	inline T minValue( void ) const
+	{
+		return castValue<T>( m_minValue );
+	}
+
+	template<class T>
+	inline T maxValue( void ) const
+	{
+		return castValue<T>( m_maxValue );
+	}
+
+	template<class T>
+	inline T step( void ) const
+	{
+		return castValue<T>( m_step );
+	}
+
+
+//	template<class T>
+	void setInitValue( const float _value );
+
+//	template<class T>
+	void setValue( const float _value );
+
+	inline void incValue( int _steps )
+	{
+		setValue( m_value + _steps * m_step );
+	}
+
+//	template<class T>
+	void setRange( const float _min, const float _max,
+							const float _step = 1 );
+
+//	template<class T>
+	void setStep( const float _step );
+
+	static void linkModels( automatableModel * _m1,
+						automatableModel * _m2 );
+	static void unlinkModels( automatableModel * _m1,
+						automatableModel * _m2 );
+
+	virtual void saveSettings( QDomDocument & _doc,
+					QDomElement & _this,
+					const QString & _name = "value" );
+
+	virtual void loadSettings( const QDomElement & _this,
+					const QString & _name = "value" );
+
+	virtual QString nodeName( void ) const
+	{
+		return( "automatablemodel" );
 	}
 
 	void prepareJournalEntryFromOldVal( void );
 
 	void addJournalEntryFromOldToCurVal( void );
 
+	void syncAutomationPattern( void );
+
+
+	QString displayValue( const float _val ) const
+	{
+		switch( m_dataType )
+		{
+			case Float: return( QString::number(
+					castValue<float>( _val ) ) );
+			case Integer: return( QString::number(
+					castValue<int>( _val ) ) );
+			case Bool: return( QString::number(
+					castValue<bool>( _val ) ) );
+		}
+		return( "0" );
+	}
+
+/*	int labelToLevel( QString _label ) const
+	{
+		switch( m_dataType )
+		{
+			case Float: return( level<float>(
+					stringToValue<float>( _label ) ) );
+			case Integer: return( level<int>(
+					stringToValue<int>( _label ) ) );
+			case Bool: return( level<bool>(
+					stringToValue<bool>( _label ) ) );
+		}
+		return( 0 );
+	}*/
+
+	virtual QString displayName( void ) const
+	{
+		return( QString::null );
+	}
+
+
+public slots:
+	virtual void reset( void );
+	virtual void copyValue( void );
+	virtual void pasteValue( void );
+
 
 protected:
+	void setFirstValue( void );
 	virtual void redoStep( journalEntry & _je );
-
 	virtual void undoStep( journalEntry & _je );
 
-	inline void setFirstValue( void );
+	float fittedValue( float _value ) const;
 
 
 private:
-	controllerConnection * m_controllerConnection;
-	T m_value;
-	T m_initValue;
-	T m_minValue;
-	T m_maxValue;
-	T m_range;
-	T m_step;
-	int m_curLevel;
+	DataType m_dataType;
+	float m_value;
+	float m_initValue;
+	float m_minValue;
+	float m_maxValue;
+	float m_step;
+	float m_range;
 
+	// most objects will need this temporarily
+	float m_oldValue;
+	bool m_journalEntryReady;
+
+	typedef QVector<automatableModel *> autoModelVector;
+	autoModelVector m_linkedModels;
+
+	void linkModel( automatableModel * _model );
+
+	void unlinkModel( automatableModel * _model );
+
+
+
+
+	controllerConnection * m_controllerConnection;
 	QPointer<automationPattern> m_automationPattern;
 	track * m_track;
 
-	// most objects will need this temporarily
-	T m_oldValue;
-	bool m_journalEntryReady;
 
-	typedef QVector<autoModel *> autoModelVector;
-	autoModelVector m_linkedModels;
-
-	inline void linkModel( autoModel * _model );
-
-	inline void unlinkModel( autoModel * _model );
-
-	static T attributeValue( QString _value );
-
-	inline void syncAutomationPattern( void );
-
-	void setLevel( int _level );
-
-	inline int level( T _value ) const
-	{
-		return( (int)roundf( _value / (float)m_step ) );
-	}
-
-	QString levelToLabel( int _level ) const
-	{
-		return( QString::number( levelToValue( _level ) ) );
-	}
-
-	int labelToLevel( QString _label )
-	{
-		return( level( attributeValue( _label ) ) );
-	}
-/*
-public slots:
-
-	void changeData( void )
-	{
-		emit dataChanged();
-	}
-*/
+	static float __copiedValue;
 
 } ;
 
 
+#define defaultTypedMethods(type)					\
+	inline type value( int _frameOffset = 0 ) const			\
+	{								\
+		return( automatableModel::value<type>( _frameOffset ) );\
+	}								\
+									\
+	inline type minValue( void ) const				\
+	{								\
+		return( automatableModel::minValue<type>() );		\
+	}								\
+									\
+	inline type maxValue( void ) const				\
+	{								\
+		return( automatableModel::maxValue<type>() );		\
+	}								\
 
-template<typename T, typename EDIT_STEP_TYPE = T>
-class automatableModelView : public modelView
+
+// some typed automatableModel-definitions
+
+class floatModel : public automatableModel
 {
 public:
-	typedef automatableModel<T, EDIT_STEP_TYPE> autoModel;
-	typedef automatableModelView<T, EDIT_STEP_TYPE> autoModelView;
-
-	automatableModelView( ::model * _model ) :
-		modelView( _model )
+	floatModel( float _val = 0, float _min = 0, float _max = 0,
+			float _step = 0, ::model * _parent = NULL,
+			bool _default_constructed = FALSE ) :
+		automatableModel( Float, _val, _min, _max, _step,
+					_parent, _default_constructed )
 	{
 	}
 
-	// some basic functions for convenience
-	autoModel * model( void )
-	{
-		return( castModel<autoModel>() );
-	}
-
-	const autoModel * model( void ) const
-	{
-		return( castModel<autoModel>() );
-	}
-
-	inline virtual T value( void ) const
-	{
-		return( model() ? model()->value() : 0 );
-	}
-
-	inline virtual void setValue( const T _value )
-	{
-		if( model() )
-		{
-			model()->setValue( _value );
-		}
-	}
+	defaultTypedMethods(float);
 
 } ;
 
 
+class intModel : public automatableModel
+{
+public:
+	intModel( int _val = 0, int _min = 0, int _max = 0,
+			::model * _parent = NULL,
+			bool _default_constructed = FALSE ) :
+		automatableModel( Integer, _val, _min, _max, 1,
+					_parent, _default_constructed )
+	{
+	}
 
-#define generateModelPrimitive(type,type2)					\
-		typedef automatableModel<type,type2> type##Model;		\
-		typedef automatableModelView<type,type2> type##ModelView;	\
+	defaultTypedMethods(int);
 
-// some model-primitives
+} ;
 
-generateModelPrimitive(float,float);
-generateModelPrimitive(int,int);
 
-class boolModel : public automatableModel<bool, signed char>
+class boolModel : public automatableModel
 {
 public:
 	boolModel(  const bool _val = FALSE,
 				::model * _parent = NULL,
 				bool _default_constructed = FALSE ) : 
-	autoModel( _val, FALSE, TRUE, defaultRelStep(), _parent,
-							_default_constructed )
+		automatableModel( Bool, _val, FALSE, TRUE, 1,
+						_parent, _default_constructed )
 	{
 	}
 
-} ;
+	defaultTypedMethods(bool);
 
-typedef automatableModelView<bool, signed char> boolModelView;
+} ;
 
 
 #endif

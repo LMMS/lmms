@@ -503,7 +503,7 @@ void organicInstrumentView::modelChanged( void )
 
 oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
 	model( _parent ),
-	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, 1, this ),
+	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f, this ),
 	m_volModel( 100.0f, 0.0f, 100.0f, 1.0f, this ),
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),

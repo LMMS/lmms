@@ -28,8 +28,8 @@
 
 meterModel::meterModel( ::model * _parent, track * _track ) :
 	model( _parent ),
-	m_numeratorModel( 4, 1, 32, 1, this ),
-	m_denominatorModel( 4, 1, 32, 1, this )
+	m_numeratorModel( 4, 1, 32, this ),
+	m_denominatorModel( 4, 1, 32, this )
 {
 	m_numeratorModel.setTrack( _track );
 	m_denominatorModel.setTrack( _track );

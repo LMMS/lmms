@@ -24,7 +24,6 @@
 
 #include "stereoenhancer_controls.h"
 #include "stereo_enhancer.h"
-#include "automatable_model_templates.h"
 
 
 stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :

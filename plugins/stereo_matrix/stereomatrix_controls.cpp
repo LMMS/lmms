@@ -24,7 +24,6 @@
 
 #include "stereomatrix_controls.h"
 #include "stereo_matrix.h"
-#include "automatable_model_templates.h"
 
 
 stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :

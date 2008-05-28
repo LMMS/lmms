@@ -27,7 +27,6 @@
 
 
 #include "note_play_handle.h"
-#include "automatable_model_templates.h"
 #include "config_mgr.h"
 #include "detuning_helper.h"
 #include "instrument_sound_shaping.h"
@@ -38,20 +37,13 @@
 
 inline notePlayHandle::baseDetuning::baseDetuning(
 						detuningHelper * _detuning ) :
-	m_detuning( _detuning )
+	m_detuning( _detuning ),
+	m_value( m_detuning->getAutomationPattern()->valueAt( 0 ) )
 {
-	m_level = m_detuning->getAutomationPattern()->valueAt( 0 );
-	m_value = m_detuning->levelToValue( m_level );
 }
 
 
 
-
-inline void notePlayHandle::baseDetuning::setLevel( int _level )
-{
-	m_level = _level;
-	m_value = m_detuning->levelToValue( m_level );
-}
 
 
 
@@ -462,11 +454,11 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	if( _time >= pos() )
 	{
-		int level = detuning()->getAutomationPattern()->valueAt( _time -
+		float v = detuning()->getAutomationPattern()->valueAt( _time -
 									pos() );
-		if( level != m_base_detuning->level() )
+		if( v != m_base_detuning->value() )
 		{
-			m_base_detuning->setLevel( level );
+			m_base_detuning->setValue( v );
 			updateFrequency();
 		}
 	}

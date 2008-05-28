@@ -31,7 +31,6 @@
 
 
 #include "audio_file_processor.h"
-#include "automatable_model_templates.h"
 #include "engine.h"
 #include "song.h"
 #include "instrument_track.h"

@@ -389,8 +389,8 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 		return;
 	}
 
-	m_min_level = m_pattern->object()->minLevel();
-	m_max_level = m_pattern->object()->maxLevel();
+	m_min_level = m_pattern->object()->minValue<float>();
+	m_max_level = m_pattern->object()->maxValue<float>();
 	m_scroll_level = ( m_min_level + m_max_level ) / 2;
 
 	timeMap & time_map = m_pattern->getTimeMap();
@@ -1203,7 +1203,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_pattern->object()
-						->levelToLabel( level[i] );
+						->displayValue( level[i] );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y[i] - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,
@@ -1232,7 +1232,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				y -= printable * m_y_delta, level += printable )
 			{
 				const QString & label = m_pattern->object()
-							->levelToLabel( level );
+							->displayValue( level );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y - font_height + 1,
 					VALUES_WIDTH - 10, 2 * font_height,

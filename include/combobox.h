@@ -26,65 +26,11 @@
 #ifndef _COMBOBOX_H
 #define _COMBOBOX_H
 
-#include <QtGui/QWidget>
-#include <QtCore/QVector>
 #include <QtGui/QMenu>
-#include <QtCore/QPair>
+#include <QtGui/QWidget>
 
-#include "automatable_model.h"
-#include "templates.h"
-
-class pixmapLoader;
-
-
-class comboBoxModel : public intModel
-{
-	Q_OBJECT
-public:
-	comboBoxModel( ::model * _parent = NULL ) :
-		automatableModel<int>( 0, 0, 0, defaultRelStep(), _parent )
-	{
-	}
-
-	void addItem( const QString & _item, pixmapLoader * _loader = NULL );
-
-	void clear( void );
-
-	int findText( const QString & _txt ) const;
-
-	inline const QString & currentText( void ) const
-	{
-		return( m_items[value()].first );
-	}
-
-	inline const pixmapLoader * currentData( void ) const
-	{
-		return( m_items[value()].second );
-	}
-
-	inline const QString & itemText( int _i ) const
-	{
-		return( m_items[tLimit<int>( _i, minValue(), maxValue() )].
-									first );
-	}
-
-	inline const pixmapLoader * itemPixmap( int _i ) const
-	{
-		return( m_items[tLimit<int>( _i, minValue(), maxValue() )].
-								second );
-	}
-
-	inline int size( void ) const
-	{
-		return( m_items.size() );
-	}
-
-private:
-	typedef QPair<QString, pixmapLoader *> item;
-
-	QVector<item> m_items;
-
-} ;
+#include "combobox_model.h"
+#include "automatable_model_view.h"
 
 
 

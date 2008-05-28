@@ -51,7 +51,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
-#include "automatable_model.h"
+#include "automatable_model_view.h"
 
 
 class fader : public QWidget, public floatModelView

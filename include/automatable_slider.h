@@ -1,7 +1,7 @@
 /*
  * automatable_slider.h - class automatableSlider, a QSlider with automation
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,29 +29,16 @@
 #include <QtGui/QSlider>
 #include <QtXml/QDomElement>
 
-
-#include "automatable_model.h"
-
+#include "automatable_model_view.h"
 
 
-class automatableSlider : public QSlider, public automatableModelView<int>
+
+class automatableSlider : public QSlider, public intModelView
 {
 	Q_OBJECT
 public:
 	automatableSlider( QWidget * _parent, const QString & _name );
 	virtual ~automatableSlider();
-
-/*	virtual void setRange( int _min, int _max );
-	virtual void setValue( int _value );
-	virtual void setInitValue( int _value );
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this,
-							const QString & _name );
-	virtual void loadSettings( const QDomElement & _this,
-							const QString & _name );
-
-	int logicValue( void );
-	void clearAutomationValues( void );*/
 
 	bool showStatus( void )
 	{
@@ -85,7 +72,7 @@ private slots:
 } ;
 
 
-typedef automatableSlider::autoModel sliderModel;
+typedef intModel sliderModel;
 
 
 #endif

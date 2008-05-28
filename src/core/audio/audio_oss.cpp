@@ -368,7 +368,7 @@ void audioOSS::setupWidget::saveSettings( void )
 	configManager::inst()->setValue( "audiooss", "device",
 							m_device->text() );
 	configManager::inst()->setValue( "audiooss", "channels",
-				QString::number( m_channels->value() ) );
+				QString::number( m_channels->value<int>() ) );
 }
 
 

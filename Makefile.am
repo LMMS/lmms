@@ -50,6 +50,7 @@ man1_MANS = lmms.1
 
 lmms_MOC =						\
 		./about_dialog.moc			\
+		./automatable_model.moc			\
 		./automatable_button.moc		\
 		./automatable_slider.moc		\
 		./automation_editor.moc			\
@@ -61,8 +62,9 @@ lmms_MOC =						\
 		./caption_menu.moc			\
 		./instrument_track.moc			\
 		./combobox.moc				\
+		./combobox_model.moc			\
 		./controller.moc			\
-		./controller_connection.moc			\
+		./controller_connection.moc		\
 		./controller_connection_dialog.moc	\
 		./controller_dialog.moc			\
 		./controller_rack_view.moc		\
@@ -165,13 +167,15 @@ THIRD_PARTY_CODE=$(LIBSAMPLERATE_SOURCES)
 
 
 lmms_SOURCES =									\
+		$(srcdir)/src/core/automatable_model.cpp			\
 		$(srcdir)/src/core/automation_pattern.cpp			\
 		$(srcdir)/src/core/base64.cpp					\
 		$(srcdir)/src/core/bb_track_container.cpp			\
 		$(srcdir)/src/core/clipboard.cpp				\
+		$(srcdir)/src/core/combobox_model.cpp				\
 		$(srcdir)/src/core/config_mgr.cpp				\
 		$(srcdir)/src/core/controller.cpp				\
-		$(srcdir)/src/core/controller_connection.cpp				\
+		$(srcdir)/src/core/controller_connection.cpp			\
 		$(srcdir)/src/core/drumsynth.cpp				\
 		$(srcdir)/src/core/effect_chain.cpp				\
 		$(srcdir)/src/core/effect.cpp					\
@@ -227,6 +231,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/midi/midi_oss.cpp				\
 		$(srcdir)/src/core/midi/midi_port.cpp				\
 		$(srcdir)/src/gui/about_dialog.cpp				\
+		$(srcdir)/src/gui/automatable_model_view.cpp			\
 		$(srcdir)/src/gui/automation_editor.cpp				\
 		$(srcdir)/src/gui/bb_editor.cpp					\
 		$(srcdir)/src/gui/controller_connection_dialog.cpp		\
@@ -419,6 +424,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/fade_button.h					\
 		$(srcdir)/include/fifo_buffer.h					\
 		$(srcdir)/include/combobox.h					\
+		$(srcdir)/include/combobox_model.h				\
 		$(srcdir)/include/rubberband.h					\
 		$(srcdir)/include/base64.h					\
 		$(srcdir)/include/journalling_object.h				\

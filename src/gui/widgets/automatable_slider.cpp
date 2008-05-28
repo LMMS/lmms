@@ -31,7 +31,6 @@
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "knob.h"
@@ -41,7 +40,7 @@
 
 automatableSlider::automatableSlider( QWidget * _parent, const QString & _name ) :
 	QSlider( _parent ),
-	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
 	m_showStatus( FALSE )
 {
 	setAccessibleName( _name );

@@ -2,7 +2,7 @@
  * automation_pattern.h - declaration of class automationPattern, which contains
  *                        all information about an automation pattern
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,10 +32,9 @@
 #include "journalling_object.h"
 
 
-class levelObject;
+class automatableModel;
 class midiTime;
 class track;
-
 
 
 
@@ -43,35 +42,34 @@ class automationPattern : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
-	typedef QMap<int, int> timeMap;
+	typedef QMap<int, float> timeMap;
 
-	automationPattern( track * _track, levelObject * _object );
+	automationPattern( track * _track, automatableModel * _object );
 	automationPattern( const automationPattern & _pat_to_copy );
 	automationPattern( const automationPattern & _pat_to_copy,
-							levelObject * _object );
+						automatableModel * _object );
 	virtual ~automationPattern();
 
 
 	virtual midiTime length( void ) const;
 
-	midiTime FASTCALL putValue( const midiTime & _time, const int _value,
+	midiTime putValue( const midiTime & _time, const float _value,
 					const bool _quant_pos = TRUE );
 
-	void FASTCALL removeValue( const midiTime & _time );
+	void removeValue( const midiTime & _time );
 
 	inline timeMap & getTimeMap( void )
 	{
 		return( m_time_map );
 	}
 
-	int FASTCALL valueAt( const midiTime & _time );
+	float valueAt( const midiTime & _time );
 
 	const QString name( void );
 
 	// settings-management
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 
 	static inline const QString classNodeName( void )
 	{
@@ -88,12 +86,12 @@ public:
 		return( m_track );
 	}
 
-	inline const levelObject * object( void ) const
+	inline const automatableModel * object( void ) const
 	{
 		return( m_object );
 	}
 
-	inline levelObject * object( void )
+	inline automatableModel * object( void )
 	{
 		return( m_object );
 	}
@@ -123,7 +121,7 @@ public slots:
 
 private:
 	track * m_track;
-	levelObject * m_object;
+	automatableModel * m_object;
 	timeMap m_time_map;
 	bool m_update_first;
 	bool m_dynamic;

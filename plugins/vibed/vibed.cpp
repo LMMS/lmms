@@ -28,8 +28,6 @@
 #include <QtGui/QWhatsThis>
 
 #include "vibed.h"
-#include "automatable_model_templates.h"
-
 #include "engine.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
@@ -111,7 +109,7 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 		led = new boolModel( harm==0, this );
 		m_powerButtons.append( led );
 
-		harmonic = new nineButtonSelectorModel( 2, 0, 8, 1, this );
+		harmonic = new nineButtonSelectorModel( 2, 0, 8, this );
 		m_harmonics.append( harmonic );
 
 		graphTmp = new graphModel( -1.0, 1.0, m_sampleLength, this );

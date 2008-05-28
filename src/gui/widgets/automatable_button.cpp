@@ -31,7 +31,6 @@
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
 
-#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 
@@ -41,8 +40,7 @@
 automatableButton::automatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
-	autoModelView( new autoModel( FALSE, FALSE, TRUE,
-				autoModel::defaultRelStep(), NULL, TRUE ) ),
+	boolModelView( new boolModel( FALSE, NULL, TRUE ) ),
 	m_group( NULL )
 {
 	setAccessibleName( _name );
@@ -179,7 +177,7 @@ void automatableButton::toggle( void )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) )
+	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) )
 {
 	hide();
 	setAccessibleName( _name );
@@ -246,7 +244,7 @@ void automatableButtonGroup::modelChanged( void )
 {
 	connect( model(), SIGNAL( dataChanged() ),
 			this, SLOT( updateButtons() ) );
-	autoModelView::modelChanged();
+	intModelView::modelChanged();
 	updateButtons();
 }
 

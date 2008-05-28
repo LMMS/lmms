@@ -36,7 +36,8 @@ class detuningHelper : public floatModel, public sharedObject
 {
 public:
 	detuningHelper( void ) :
-		autoModel( NULL )
+		floatModel(),
+		sharedObject()
 	{
 	}
 

@@ -467,7 +467,7 @@ void audioJACK::setupWidget::saveSettings( void )
 	configManager::inst()->setValue( "audiojack", "clientname",
 							m_clientName->text() );
 	configManager::inst()->setValue( "audiojack", "channels",
-				QString::number( m_channels->value() ) );
+				QString::number( m_channels->value<int>() ) );
 }
 
 

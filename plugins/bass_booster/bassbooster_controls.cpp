@@ -25,7 +25,6 @@
 
 #include "bassbooster_controls.h"
 #include "bass_booster.h"
-#include "automatable_model_templates.h"
 
 
 

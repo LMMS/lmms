@@ -32,7 +32,6 @@
 #include "knob.h"
 #include "note_play_handle.h"
 #include "sweep_oscillator.h"
-#include "automatable_model_templates.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"

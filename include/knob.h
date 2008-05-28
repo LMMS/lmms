@@ -4,7 +4,7 @@
  * This file is based on the knob-widget of the Qwt Widget Library by
  * Josef Wilgen
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,7 +32,7 @@
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
 
-#include "automatable_model.h"
+#include "automatable_model_view.h"
 #include "templates.h"
 
 
@@ -58,17 +58,21 @@ class knob : public QWidget, public floatModelView
 
 	Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth)
 	
-	// Unfortunately, the gradient syntax doesn't create our gradient correctly
-	// so we need to do this:
+	// Unfortunately, the gradient syntax doesn't create our gradient
+	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
 
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name );
 	virtual ~knob();
 
-
-	void setHintText( const QString & _txt_before,
-						const QString & _txt_after );
+	// TODO: remove
+	inline void setHintText( const QString & _txt_before,
+						const QString & _txt_after )
+	{
+		setDescription( _txt_before );
+		setUnit( _txt_after );
+	}
 	void setLabel( const QString & _txt );
 
 	void setTotalAngle( float _angle );
@@ -92,10 +96,8 @@ public:
 	QColor outerColor( void ) const; 
 	void setOuterColor( const QColor & _c );
 
+
 public slots:
-	void reset( void );
-	void copyValue( void );
-	void pasteValue( void );
 	virtual void enterValue( void );
 	void connectToMidiDevice( void );
 	void connectToController( void );
@@ -110,7 +112,6 @@ signals:
 
 
 protected:
-	static float s_copiedValue;
 	static textFloat * s_textFloat;
 
 	float m_mouseOffset;
@@ -118,8 +119,6 @@ protected:
 	bool m_buttonPressed;
 
 	QPixmap * m_knobPixmap;
-	QString m_hintTextBeforeValue;
-	QString m_hintTextAfterValue;
 
 	// Styled knob stuff, could break out
 	QPointF m_centerPoint;
@@ -143,14 +142,15 @@ protected:
 
 	float getValue( const QPoint & _p );
 
-	QLineF calculateLine( const QPointF & _mid, float _radius, float _innerRadius = 1) const;
+	QLineF calculateLine( const QPointF & _mid, float _radius,
+						float _innerRadius = 1) const;
 
 private:
 	inline float pageSize( void ) const
 	{
 		return( tMax<float>( ( model()->maxValue() -
 					model()->minValue() ) / 100.0f,
-							model()->step() ) );
+					modelUntyped()->step<float>() ) );
 	}
 
 	virtual void doConnections( void );
@@ -168,6 +168,6 @@ private:
 } ;
 
 
-typedef knob::autoModel knobModel;
+typedef floatModel knobModel;
 
 #endif

@@ -31,9 +31,7 @@
 
 #include "automation_pattern.h"
 #include "automation_editor.h"
-#include "automatable_model_templates.h"
 #include "engine.h"
-#include "level_object.h"
 #include "note.h"
 #include "templates.h"
 #include "track.h"
@@ -41,7 +39,8 @@
 
 
 
-automationPattern::automationPattern( track * _track, levelObject * _object ) :
+automationPattern::automationPattern( track * _track,
+						automatableModel * _object ) :
 	m_track( _track ),
 	m_object( _object ),
 	m_update_first( TRUE ),
@@ -76,7 +75,7 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 
 automationPattern::automationPattern( const automationPattern & _pat_to_copy,
-						levelObject * _object ) :
+						automatableModel * _object ) :
 	m_track( _pat_to_copy.m_track ),
 	m_object( _object ),
 	m_update_first( _pat_to_copy.m_update_first ),
@@ -117,17 +116,17 @@ automationPattern::~automationPattern()
 //TODO: Improve this
 midiTime automationPattern::length( void ) const
 {
-	Sint32 max_length = 0;
+	tick max_length = 0;
 
 	for( timeMap::const_iterator it = m_time_map.begin();
 							it != m_time_map.end();
 									++it )
 	{
-		max_length = tMax<Sint32>( max_length, -it.key() );
+		max_length = tMax<tick>( max_length, -it.key() );
 	}
 	if( max_length % DefaultTicksPerTact == 0 )
 	{
-		return( midiTime( tMax<Sint32>( max_length,
+		return( midiTime( tMax<tick>( max_length,
 						DefaultTicksPerTact ) ) );
 	}
 	return( midiTime( tMax( midiTime( max_length ).getTact() + 1, 1 ),
@@ -137,7 +136,7 @@ midiTime automationPattern::length( void ) const
 
 
 
-midiTime automationPattern::putValue( const midiTime & _time, const int _value,
+midiTime automationPattern::putValue( const midiTime & _time, const float _value,
 							const bool _quant_pos )
 {
 	midiTime new_time = _quant_pos && engine::getAutomationEditor() ?
@@ -171,7 +170,7 @@ void automationPattern::removeValue( const midiTime & _time )
 		if( m_time_map.size() == 1 )
 		{
 			m_dynamic = FALSE;
-			m_object->setLevel( m_time_map[0] );
+			m_object->setValue( m_time_map[0] );
 			if( m_track )
 			{
 				m_track->removeAutomationPattern( this );
@@ -196,7 +195,7 @@ void automationPattern::clear( void )
 
 
 
-int automationPattern::valueAt( const midiTime & _time )
+float automationPattern::valueAt( const midiTime & _time )
 {
 	return( m_time_map.lowerBound( -_time ).value() );
 }
@@ -211,8 +210,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement element = _doc.createElement( "time" );
 		element.setAttribute( "pos", -it.key() );
-		element.setAttribute( "value", m_object->levelToLabel(
-								it.value() ) );
+		element.setAttribute( "value", it.value() );
 		_this.appendChild( element );
 	}
 }
@@ -233,8 +231,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 			continue;
 		}
 		m_time_map[-element.attribute( "pos" ).toInt()]
-				= m_object->labelToLevel(
-						element.attribute( "value" ) );
+				= element.attribute( "value" ).toFloat();
 	}
 
 	if( !m_dynamic )
@@ -281,7 +278,7 @@ void automationPattern::processMidiTime( const midiTime & _time )
 {
 	if( _time >= 0 )
 	{
-		m_object->setLevel( m_time_map.lowerBound( -_time ).value() );
+		m_object->setValue( m_time_map.lowerBound( -_time ).value() );
 	}
 }
 

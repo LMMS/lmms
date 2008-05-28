@@ -71,7 +71,7 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		if( configManager::inst()->value( "knobs",
 		    "classicalusability").toInt() )
 		{
-			m_mouseOffset = getValue( p ) - value();
+			m_mouseOffset = getValue( p ) - model()->value();
 		}
 		emit sliderPressed();
 
@@ -85,14 +85,14 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 		if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
 		{
 			val = QString( " %1 dBV" ).arg(
-					20.0 * log10( value() / 100.0 ),
+					20.0 * log10( model()->value() / 100.0 ),
 					3, 'f', 2 );
 		}
 		else
 		{
-			val = QString( " %1%" ).arg( value(), 3, 'f', 0 );
+			val = QString( " %1%" ).arg( model()->value(), 3, 'f', 0 );
 		}
-		s_textFloat->setText( m_hintTextBeforeValue + val );
+		s_textFloat->setText( m_description + val );
 		
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
@@ -102,12 +102,12 @@ void volumeKnob::mousePressEvent( QMouseEvent * _me )
 	else if( _me->button() == Qt::LeftButton &&
 			engine::getMainWindow()->isCtrlPressed() == TRUE )
 	{
-		new stringPairDrag( "float_value", QString::number( value() ),
+		new stringPairDrag( "float_value", QString::number( model()->value() ),
 				    			QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
-		reset();
+		model()->reset();
 	}
 }
 
@@ -140,7 +140,7 @@ void volumeKnob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		val = QString( " %1%" ).arg( model()->value(), 3, 'f', 0 );
 	}
-	s_textFloat->setText( m_hintTextBeforeValue + val );
+	s_textFloat->setText( m_description + val );
 }
 
 
@@ -165,7 +165,7 @@ void volumeKnob::wheelEvent( QWheelEvent * _we )
 	{
 		val = QString( " %1%" ).arg( model()->value(), 3, 'f', 0 );
 	}
-	s_textFloat->setText( m_hintTextBeforeValue + val );
+	s_textFloat->setText( m_description + val );
 	
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );

@@ -42,7 +42,6 @@
 
 
 #include "automation_track.h"
-#include "automatable_model_templates.h"
 #include "automation_editor.h"
 #include "bb_editor.h"
 #include "bb_track.h"
@@ -79,12 +78,11 @@ tick midiTime::s_ticksPerTact = DefaultTicksPerTact;
 song::song( void ) :
 	trackContainer(),
 	m_automationTrack( track::create( track::AutomationTrack, this ) ),
-	m_tempoModel( DefaultTempo, MinTempo, MaxTempo,
-					intModel::defaultRelStep(), this ),
+	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this ),
 	m_timeSigModel( this, m_automationTrack ),
 	m_oldTicksPerTact( DefaultTicksPerTact ),
-	m_masterVolumeModel( 100, 0, 200, 1, this ),
-	m_masterPitchModel( 0, -12, 12, 1, this ),
+	m_masterVolumeModel( 100, 0, 200, this ),
+	m_masterPitchModel( 0, -12, 12, this ),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( FALSE ),

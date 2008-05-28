@@ -31,7 +31,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QMdiArea>
 
-#include "automatable_model_templates.h"
 #include "engine.h"
 #include "caption_menu.h"
 #include "embed.h"
@@ -250,23 +249,10 @@ void tempoSyncKnob::modelChanged( void )
 
 void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
+	mouseReleaseEvent( NULL );
+
 	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "reload" ),
-				tr( "&Reset (%1%2)" ).
-						arg( model()->initValue() ).
-						arg( m_hintTextAfterValue ),
-					this, SLOT( reset() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-				tr( "&Copy value (%1%2)" ).
-						arg( value() ).
-						arg( m_hintTextAfterValue ),
-					this, SLOT( copyValue() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-				tr( "&Paste value (%1%2)" ).
-						arg( s_copiedValue ).
-						arg( m_hintTextAfterValue ),
-					this, SLOT( pasteValue() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	
 	float limit = 60000.0f / ( engine::getSong()->getTempo() *
@@ -329,13 +315,6 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	}
 
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					model()->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( tr( "Connect to MIDI-device" ), this,
-					SLOT( connectToMidiDevice() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );

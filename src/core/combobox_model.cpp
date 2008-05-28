@@ -1,7 +1,7 @@
 /*
- * level_object.h - declaration of class levelObject
+ * combobox_model.cpp - implementation of comboBoxModel
  *
- * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,48 +21,51 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
+
+#include "combobox_model.h"
+#include "embed.h"
 
 
-#ifndef _LEVEL_OBJECT_H
-#define _LEVEL_OBJECT_H
 
-#include <QtCore/QString>
-
-
-class levelObject
+void comboBoxModel::addItem( const QString & _item, pixmapLoader * _pl )
 {
-public:
-	virtual ~levelObject()
+	m_items.push_back( qMakePair( _item, _pl ) );
+	setRange( 0, m_items.size() - 1 );
+}
+
+
+
+
+void comboBoxModel::clear( void )
+{
+	setRange( 0, 0 );
+	foreach( const item & _i, m_items )
 	{
+		delete _i.second;
 	}
+	m_items.clear();
+	emit propertiesChanged();
+}
 
-	inline int minLevel( void ) const
+
+
+
+int comboBoxModel::findText( const QString & _txt ) const
+{
+	for( QVector<item>::const_iterator it = m_items.begin();
+						it != m_items.end(); ++it )
 	{
-		return( m_minLevel );
+		if( ( *it ).first == _txt )
+		{
+			return( it - m_items.begin() );
+		}
 	}
-
-	inline int maxLevel( void ) const
-	{
-		return( m_maxLevel );
-	}
-
-	virtual void setLevel( int _level ) = 0;
-
-	virtual QString levelToLabel( int _level ) const = 0;
-	virtual int labelToLevel( QString _label ) = 0;
-
-	virtual QString displayName( void ) const
-	{
-		return( NULL );
-	}
+	return( -1 ); 
+}
 
 
-protected:
-	int m_minLevel;
-	int m_maxLevel;
-
-} ;
 
 
-#endif
+#include "combobox_model.moc"
 

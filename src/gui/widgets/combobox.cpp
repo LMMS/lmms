@@ -35,7 +35,6 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QStyleOptionFrame>
 
-#include "automatable_model_templates.h"
 #include "automation_pattern.h"
 #include "caption_menu.h"
 #include "embed.h"
@@ -51,7 +50,7 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView( new comboBoxModel ),
+	intModelView( new comboBoxModel ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {
@@ -102,10 +101,7 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					model()->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -241,51 +237,6 @@ void comboBox::setItem( QAction * _item )
 {
 	model()->setInitValue( _item->data().toInt() );
 }
-
-
-
-
-
-
-
-
-
-void comboBoxModel::addItem( const QString & _item, pixmapLoader * _pl )
-{
-	m_items.push_back( qMakePair( _item, _pl ) );
-	setRange( 0, m_items.size() - 1 );
-}
-
-
-
-
-void comboBoxModel::clear( void )
-{
-	setRange( 0, 0 );
-	foreach( const item & _i, m_items )
-	{
-		delete _i.second;
-	}
-	m_items.clear();
-	emit propertiesChanged();
-}
-
-
-
-
-int comboBoxModel::findText( const QString & _txt ) const
-{
-	for( QVector<item>::const_iterator it = m_items.begin();
-						it != m_items.end(); ++it )
-	{
-		if( ( *it ).first == _txt )
-		{
-			return( it - m_items.begin() );
-		}
-	}
-	return( -1 ); 
-}
-
 
 
 

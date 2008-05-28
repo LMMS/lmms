@@ -62,7 +62,7 @@ public:
 //	};
 
 protected:
-	void FASTCALL setSelected( Uint8 _new_button );
+	void setSelected( Uint8 _new_button );
 	
 public slots:
 	void button0Clicked( void );
@@ -93,6 +93,6 @@ private:
 	
 };
 
-typedef nineButtonSelector::autoModel nineButtonSelectorModel;
+typedef intModel nineButtonSelectorModel;
 
 #endif

@@ -35,7 +35,6 @@
 #include <Qt/QtXml>
 
 
-#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "templates.h"
@@ -188,8 +187,8 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 surroundAreaModel::surroundAreaModel( ::model * _parent, track * _track,
 						bool _default_constructed ) :
 	model( _parent, _default_constructed ),
-	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1, _parent ),
-	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, 1, _parent )
+	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent ),
+	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent )
 {
 	m_posX.setTrack( _track );
 	m_posY.setTrack( _track );

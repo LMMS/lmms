@@ -45,7 +45,7 @@ lfoController::lfoController( model * _parent ) :
 	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
 	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
 	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this ),
-	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, 1, this ),
+	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, this ),
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 ),

@@ -29,7 +29,6 @@
 #include "effect_chain.h"
 #include "effect.h"
 #include "engine.h"
-#include "automatable_model_templates.h"
 #include "track.h"
 #include "debug.h"
 

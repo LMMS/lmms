@@ -44,7 +44,6 @@
 #include <math.h>
 
 
-#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "config_mgr.h"
 #include "embed.h"
@@ -59,19 +58,16 @@
 #include "controller_connection.h"
 
 
-float knob::s_copiedValue = 0.0f;
 textFloat * knob::s_textFloat = NULL;
 
 
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView( new knobModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	floatModelView( new knobModel( 0, 0, 0, 1, NULL, TRUE ) ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_knobPixmap( NULL ),
-	m_hintTextBeforeValue( "" ),
-	m_hintTextAfterValue( "" ),
 	m_outerColor( NULL ),
 	m_knobNum( _knob_num ),
 	m_label( "" )
@@ -106,16 +102,6 @@ knob::~knob()
 	{
 		delete m_knobPixmap;
 	}
-}
-
-
-
-
-void knob::setHintText( const QString & _txt_before,
-						const QString & _txt_after )
-{
-	m_hintTextBeforeValue = _txt_before;
-	m_hintTextAfterValue = _txt_after;
 }
 
 
@@ -396,7 +382,7 @@ float knob::getValue( const QPoint & _p )
 	}
 	if( engine::getMainWindow()->isShiftPressed() )
 	{
-		return( ( _p.y() - m_origMousePos.y() ) * model()->step() );
+		return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
 	}
 	return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
 }
@@ -413,34 +399,7 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	mouseReleaseEvent( NULL );
 
 	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "reload" ),
-				tr( "&Reset (%1%2)" ).
-						arg( model()->initValue() ).
-						arg( m_hintTextAfterValue ),
-							this, SLOT( reset() ) );
-	contextMenu.addSeparator();
-	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-				tr( "&Copy value (%1%2)" ).
-						arg( model()->value() ).
-						arg( m_hintTextAfterValue ),
-						this, SLOT( copyValue() ) );
-	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-				tr( "&Paste value (%1%2)"
-						).arg( s_copiedValue ).arg(
-							m_hintTextAfterValue ),
-				this, SLOT( pasteValue() ) );
-	contextMenu.addSeparator();
-	if( !model()->nullTrack() )
-	{
-		contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					model()->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
-		contextMenu.addSeparator();
-	}
-	contextMenu.addAction( embed::getIconPixmap( "controller" ),
-				tr( "Connect to controller..." ), this,
-				SLOT( connectToController() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 						this, SLOT( displayHelp() ) );
@@ -471,7 +430,7 @@ void knob::dropEvent( QDropEvent * _de )
 	else if( type == "link_object" )
 	{
 		knobModel * mod = (knobModel *)( val.toULong() );
-		autoModel::linkModels( model(), mod );
+		automatableModel::linkModels( model(), mod );
 		mod->setValue( model()->value() );
 	}
 }
@@ -503,10 +462,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 			QApplication::setOverrideCursor( Qt::BlankCursor );
 		}
 //		s_textFloat->reparent( this );
-		s_textFloat->setText( m_hintTextBeforeValue +
+		s_textFloat->setText( m_description +
 						QString::number(
 							model()->value() ) +
-							m_hintTextAfterValue );
+							m_unit );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
@@ -532,7 +491,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
-		reset();
+		model()->reset();
 	}
 }
 
@@ -553,9 +512,9 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 		}
 	}
 
-	s_textFloat->setText( m_hintTextBeforeValue +
+	s_textFloat->setText( m_description +
 				QString::number( model()->value() ) +
-							 m_hintTextAfterValue );
+							 m_unit );
 }
 
 
@@ -623,9 +582,9 @@ void knob::wheelEvent( QWheelEvent * _we )
 	model()->incValue( inc );
 
 
-	s_textFloat->setText( m_hintTextBeforeValue +
+	s_textFloat->setText( m_description +
 					QString::number( model()->value() ) +
-						m_hintTextAfterValue );
+						m_unit );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
@@ -664,12 +623,12 @@ void knob::setPosition( const QPoint & _p )
 
 
 
-void knob::reset( void )
+/*void knob::reset( void )
 {
 	model()->setValue( model()->initValue() );
-	s_textFloat->setText( m_hintTextBeforeValue +
+	s_textFloat->setText( m_description +
 					QString::number( model()->value() ) +
-							m_hintTextAfterValue );
+							m_unit );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }
@@ -688,12 +647,12 @@ void knob::copyValue( void )
 void knob::pasteValue( void )
 {
 	model()->setValue( s_copiedValue );
-	s_textFloat->setText( m_hintTextBeforeValue +
+	s_textFloat->setText( m_description +
 					QString::number( model()->value() ) +
-							m_hintTextAfterValue );
+							m_unit );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
-}
+}*/
 
 
 

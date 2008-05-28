@@ -35,7 +35,6 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QStyleOptionFrameV2>
 
-#include "automatable_model_templates.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
@@ -45,7 +44,7 @@
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 			const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -68,7 +67,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	autoModelView( new autoModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -206,10 +205,8 @@ void lcdSpinBox::update( void )
 
 void lcdSpinBox::setLabel( const QString & _txt )
 {
-	int margin = 1;
 	m_label = _txt;
-
-    updateSize();
+	updateSize();
 }
 
 
@@ -289,7 +286,7 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 		if( dy > 1 || dy < -1 )
 		{
 			model()->setInitValue( model()->value() -
-						dy / 2 * model()->step() );
+						dy / 2 * model()->step<int>() );
 			emit manualChange();
 			QCursor::setPos( m_origMousePos );
 		}
@@ -310,7 +307,7 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	model()->setInitValue( model()->value() +
-			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step() );
+			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
 	emit manualChange();
 }
 

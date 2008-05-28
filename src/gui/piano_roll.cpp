@@ -48,7 +48,6 @@
 #include <math.h>
 
 
-#include "automatable_model_templates.h"
 #include "clipboard.h"
 #include "combobox.h"
 #include "debug.h"

@@ -39,7 +39,6 @@
 #include "note_play_handle.h"
 #include "templates.h"
 #include "audio_port.h"
-#include "automatable_model_templates.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"

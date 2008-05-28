@@ -36,7 +36,6 @@
 
 
 #include "caption_menu.h"
-#include "automatable_model_templates.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
