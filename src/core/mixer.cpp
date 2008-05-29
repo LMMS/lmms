@@ -135,15 +135,21 @@ public:
 			int effectChannelJob;
 			void * job;
 		};
-		
+
+#if QT_VERSION >= 0x040400
+		QAtomicInt done;
+#else
 		volatile bool done;
+#endif
 	} ;
 
 	typedef QVector<jobQueueItem> jobQueueItems;
 	struct jobQueue
 	{
 		jobQueueItems items;
+#if QT_VERSION < 0x040400
 		QMutex lock;
+#endif
 	} ;
 
 	mixerWorkerThread( mixer * _mixer ) :
@@ -186,11 +192,16 @@ private:
 						m_jobQueue->items.begin();
 					it != m_jobQueue->items.end(); ++it )
 			{
+#if QT_VERSION >= 0x040400
+				if( it->done.fetchAndStoreRelaxed( 1 ) == 0 )
+				{
+#else
 				m_jobQueue->lock.lock();
 				if( !it->done )
 				{
 					it->done = TRUE;
 					m_jobQueue->lock.unlock();
+#endif
 					switch( it->type )
 					{
 						case PlayHandle:
@@ -215,10 +226,12 @@ private:
 							break;
 					}
 				}
+#if QT_VERSION < 0x040400
 				else
 				{
 					m_jobQueue->lock.unlock();
 				}
+#endif
 			}
 			m_sem->release();
 		}
