@@ -98,7 +98,6 @@ void * aligned_malloc( int _bytes )
 
 
 
-
 class mixerWorkerThread : public QThread
 {
 public:
@@ -155,9 +154,8 @@ public:
 	mixerWorkerThread( mixer * _mixer ) :
 		QThread( _mixer ),
 		m_mixer( _mixer ),
-		m_sem( &m_mixer->m_workerSem ),
-		m_jobWait( 1 ),
-		m_jobAccepted( 1 ),
+		m_queueReadySem( &m_mixer->m_queueReadySem ),
+		m_workersDoneSem( &m_mixer->m_workersDoneSem ),
 		m_jobQueue( NULL )
 	{
 		start( QThread::TimeCriticalPriority );
@@ -167,11 +165,9 @@ public:
 	{
 	}
 
-	void addJob( jobQueue * _q )
+	void setJobQueue( jobQueue * _q )
 	{
 		m_jobQueue = _q;
-		m_jobWait.release();
-		m_jobAccepted.acquire();
 	}
 
 
@@ -181,13 +177,9 @@ private:
 		sampleFrame * working_buf = (sampleFrame *) aligned_malloc(
 						m_mixer->framesPerPeriod() *
 							sizeof( sampleFrame ) );
-		m_jobWait.acquire();
-		m_jobAccepted.acquire();
 		while( 1 )
 		{
-			m_jobWait.acquire();
-			m_sem->acquire();
-			m_jobAccepted.release();
+			m_queueReadySem->acquire();
 			for( jobQueueItems::iterator it =
 						m_jobQueue->items.begin();
 					it != m_jobQueue->items.end(); ++it )
@@ -233,15 +225,14 @@ private:
 				}
 #endif
 			}
-			m_sem->release();
+			m_workersDoneSem->release();
 		}
 		aligned_free( working_buf );
 	}
 
 	mixer * m_mixer;
-	QSemaphore * m_sem;
-	QSemaphore m_jobWait;
-	QSemaphore m_jobAccepted;
+	QSemaphore * m_queueReadySem;
+	QSemaphore * m_workersDoneSem;
 	jobQueue * m_jobQueue;
 
 } ;
@@ -257,7 +248,8 @@ mixer::mixer( void ) :
 	m_multiThreaded( QThread::idealThreadCount() > 1 ),
 	m_workers(),
 	m_numWorkers( m_multiThreaded ? QThread::idealThreadCount() : 0 ),
-	m_workerSem( m_numWorkers ),
+	m_queueReadySem( m_numWorkers ),
+	m_workersDoneSem( m_numWorkers ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
@@ -303,6 +295,8 @@ mixer::mixer( void ) :
 
 	if( m_multiThreaded )
 	{
+		m_queueReadySem.acquire( m_numWorkers );
+		m_workersDoneSem.acquire( m_numWorkers );
 		for( int i = 0; i < m_numWorkers; ++i )
 		{
 			m_workers.push_back( new mixerWorkerThread( this ) );
@@ -429,12 +423,12 @@ bool mixer::criticalXRuns( void ) const
 #define DISTRIBUTE_JOB_QUEUE(_jq)					\
 	for( int i = 0; i < m_numWorkers; ++i )				\
 	{								\
-		m_workers[i]->addJob( &_jq );				\
-	}
+		m_workers[i]->setJobQueue( &_jq );			\
+	}								\
+	m_queueReadySem.release( m_numWorkers );			\
 
 #define WAIT_FOR_JOBS()							\
-	m_workerSem.acquire( m_numWorkers );				\
-	m_workerSem.release( m_numWorkers );
+	m_workersDoneSem.acquire( m_numWorkers );
 
 
 

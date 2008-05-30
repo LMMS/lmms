@@ -457,7 +457,8 @@ private:
 	bool m_multiThreaded;
 	QVector<mixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QSemaphore m_workerSem;
+	QSemaphore m_queueReadySem;
+	QSemaphore m_workersDoneSem;
 
 
 	playHandleVector m_playHandles;
