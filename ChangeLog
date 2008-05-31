@@ -1,3 +1,14 @@
+2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* src/gui/piano_roll.cpp:
+	- Improve selection of volume-bars on a chord.  Select closest note
+	instead of whichever one was created first. 
+	- Display volume-change handles on top of the bars instead of possibly
+	underneith other bars when dealing with chords
+	
+	* AUTHORS:
+	Add Juan (Fabi) to authors, organize names more alphabetically
+
 2008-05-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_effect.cpp:

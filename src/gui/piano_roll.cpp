@@ -946,6 +946,24 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				{
 					vol = 2 * ( -_me->y() + height() -
 							PR_BOTTOM_MARGIN );
+
+					int shortVolumeDiff = MaxVolume - MinVolume;
+					noteVector::const_iterator jt = notes.begin();
+					while( jt != notes.end() )
+					{
+						if( (*jt)->pos() == (*it)->pos() && (*jt)->length().getTicks() > 0 )
+						{
+
+							int volDiff = abs( vol - (*jt)->getVolume() );
+							if( volDiff <= shortVolumeDiff )
+							{
+								shortVolumeDiff = volDiff;
+								it = jt;
+							}
+						}
+						++jt;
+					}
+
 					( *it )->setVolume( vol );
 					m_currentNote = *it;
 					m_action = CHANGE_NOTE_VOLUME;
@@ -971,7 +989,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// +32 to quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
-					midiTime note_pos( pos_ticks - (quantization() / 2) );
+					midiTime note_pos( pos_ticks - ( quantization() / 2 ) );
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos, key_num );
@@ -1202,15 +1220,13 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// get note-vector of current pattern
 			const noteVector & notes = m_pattern->notes();
 
-			// will be our iterator in the following loop
-			noteVector::const_iterator it = notes.begin();
-
 			note * shortNote = NULL;
 
 			// Max "snap length" 1/8 note on either side
 			int shortDistance = DefaultTicksPerTact/8;
 
 			// loop through vector to find nearest note
+			noteVector::const_iterator it = notes.begin();
 			while( it != notes.end() )
 			{
 				int tmp = abs( pos_ticks - (int)( (*it)->pos() ) );
@@ -1223,6 +1239,41 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				}
 				++it;
 
+			}
+
+			volume vol = tLimit<int>( 2 * ( -_me->y() +
+							height() -
+						PR_BOTTOM_MARGIN ),
+							MinVolume,
+							MaxVolume );
+
+			if( shortNote ) 
+			{
+				// have short length - now check for volume difference and currentNote
+				it = notes.begin();
+
+				int shortNotePos = shortNote->pos();
+				int shortVolumeDiff = MaxVolume-MinVolume;
+
+				while( it != notes.end() )
+				{
+					if( (*it)->pos() == shortNotePos && (*it)->length().getTicks() > 0 )
+					{
+						if( *it == m_currentNote ) 
+						{
+							shortNote = m_currentNote;
+							break;
+						}
+
+						int volDiff = abs( vol - (*it)->getVolume() );
+						if( volDiff <= shortVolumeDiff )
+						{
+							shortVolumeDiff = volDiff;
+							shortNote = *it;
+						}
+					}
+					++it;
+				}	
 			}
 
 			if( shortNote != m_currentNote && 
@@ -1245,11 +1296,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			m_currentNote = shortNote;
 
 			if( m_currentNote != NULL ) {
-				volume vol = tLimit<int>( 2 * ( -_me->y() +
-								height() -
-							PR_BOTTOM_MARGIN ),
-								MinVolume,
-								MaxVolume );
 				m_currentNote->setVolume( vol );
 				m_pattern->dataChanged();
 				m_pattern->getInstrumentTrack()->processInEvent(
@@ -1896,6 +1942,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		const int visible_keys = ( height() - PR_TOP_MARGIN -
 					PR_BOTTOM_MARGIN - m_notesEditHeight ) /
 							KEY_LINE_HEIGHT + 2;
+	
+		QPolygon volumeHandles;
 
 		for( noteVector::const_iterator it = notes.begin();
 						it != notes.end(); ++it )
@@ -1971,12 +2019,12 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 						( *it )->getVolume() / 2,
 					x + WHITE_KEY_WIDTH,
 					height() - PR_BOTTOM_MARGIN );
-			p.drawLine( x + WHITE_KEY_WIDTH-1,
+
+
+			volumeHandles << QPoint( x + WHITE_KEY_WIDTH + 1,
 					height() - PR_BOTTOM_MARGIN -
-						( *it )->getVolume() / 2+1,
-					x + WHITE_KEY_WIDTH + 1,
-					height()-PR_BOTTOM_MARGIN -
-						(*it)->getVolume() / 2 + 1 );
+						( *it )->getVolume() / 2+1 );
+
 			if( ( *it )->hasDetuningInfo() )
 			{
 				drawDetuningInfo( p, *it,
@@ -1984,6 +2032,11 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 					y_base - key * KEY_LINE_HEIGHT );
 			}
 		}
+
+		p.setPen( QPen( QColor( 0xEA, 0xA1, 0x00 ),
+				NE_LINE_WIDTH*2 ) );
+		p.drawPoints( volumeHandles );
+		
 	}
 	else
 	{
