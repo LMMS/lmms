@@ -1,3 +1,15 @@
+2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
+	
+	* src/tracks/pattern.cpp:
+	Improve drawing of tact lines, so it is more obvious where a pattern ends
+
+	* src/core/track.cpp:
+	Display floating text underneith the current track so you can actually see
+	what you are doing
+
+	* src/core/config_mgr.cpp:
+	Gracefully handle default lmmsrc.xml creation instead of aborting
+	
 2008-06-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/caps/basics.h:
@@ -78,15 +90,6 @@
 	* src/gui/setup_dialog.cpp:
 	added PulseAudio-support
 
-2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
-	
-	* src/tracks/pattern.cpp:
-	Improve drawing of tact lines, so it is more obvious where a pattern ends
-
-	* src/core/track.cpp:
-	Display floating text underneith the current track so you can actually see
-	what you are doing
-	
 2008-05-30  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:

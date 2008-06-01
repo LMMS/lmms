@@ -239,31 +239,16 @@ bool configManager::loadConfigFile( void )
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
-	if( !cfg_file.open( QIODevice::ReadOnly ) )
-	{
-		return( FALSE );
-	}
 	QDomDocument dom_tree;
-	if( !dom_tree.setContent( &cfg_file ) )
-	{
-/*		QMessageBox::critical( 0, tr( "Error in configuration-file" ),
-					tr( "Error while parsing "
-						"configuration-file %1.\n"
-						"The setup-wizard will be "
-						"shown for reconfiguring LMMS."
-						).arg( m_lmmsRcFile ) );
-		cfg_file.close();
-		if( exec() )
-		{
-			return( loadConfigFile() );
-		}
-		else
-		{*/
-			return( FALSE );
-		//}
-	}
-	cfg_file.close();
 
+	if( cfg_file.open( QIODevice::ReadOnly ) )
+	{
+		if( !dom_tree.setContent( &cfg_file ) )
+		{
+			return( FALSE );
+		}
+		cfg_file.close();
+	}
 
 	// get the head information from the DOM
 	QDomElement root = dom_tree.documentElement();
