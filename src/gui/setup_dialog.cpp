@@ -55,6 +55,7 @@
 #include "audio_alsa.h"
 #include "audio_jack.h"
 #include "audio_oss.h"
+#include "audio_pulseaudio.h"
 #include "audio_sdl.h"
 #include "audio_dummy.h"
 
@@ -485,6 +486,11 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 #ifdef ALSA_SUPPORT
 	m_audioIfaceSetupWidgets[audioALSA::name()] =
 					new audioALSA::setupWidget( asw );
+#endif
+
+#ifdef PULSEAUDIO_SUPPORT
+	m_audioIfaceSetupWidgets[audioPulseAudio::name()] =
+					new audioPulseAudio::setupWidget( asw );
 #endif
 
 #ifdef SDL_AUDIO_SUPPORT

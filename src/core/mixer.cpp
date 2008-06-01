@@ -54,6 +54,7 @@
 #include "audio_alsa.h"
 #include "audio_jack.h"
 #include "audio_oss.h"
+#include "audio_pulseaudio.h"
 #include "audio_sdl.h"
 #include "audio_dummy.h"
 
@@ -905,6 +906,20 @@ audioDevice * mixer::tryAudioDevices( void )
 		if( success_ful )
 		{
 			m_audioDevName = audioALSA::name();
+			return( dev );
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef PULSEAUDIO_SUPPORT
+	if( dev_name == audioPulseAudio::name() || dev_name == "" )
+	{
+		dev = new audioPulseAudio( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = audioPulseAudio::name();
 			return( dev );
 		}
 		delete dev;
