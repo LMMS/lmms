@@ -474,7 +474,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
 						midiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -531,7 +531,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
 						midiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, 8 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2,
+					height() + 2) );
 	}
 	else
 	{

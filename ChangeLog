@@ -1,3 +1,12 @@
+2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
+	
+	* src/tracks/pattern.cpp:
+	Improve drawing of tact lines, so it is more obvious where a pattern ends
+
+	* src/core/track.cpp:
+	Display floating text underneith the current track so you can actually see
+	what you are doing
+	
 2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
