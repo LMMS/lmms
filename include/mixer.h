@@ -89,7 +89,7 @@ const Octaves BaseOctave = DefaultOctave;
 class mixerWorkerThread;
 
 
-class mixer : public QObject
+class EXPORT mixer : public QObject
 {
 	Q_OBJECT
 public:

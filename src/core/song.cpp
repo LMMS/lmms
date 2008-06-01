@@ -91,6 +91,7 @@ song::song( void ) :
 	m_paused( FALSE ),
 	m_loadingProject( FALSE ),
 	m_playMode( Mode_PlaySong ),
+	m_length( 0 ),
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE )

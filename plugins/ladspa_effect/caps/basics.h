@@ -45,8 +45,17 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdint.h>
 
-#include "ladspa.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h> 	 
+#endif 	 
+
+#ifdef HAVE_LADSPA_H 	 
+#include <ladspa.h> 	 
+#else 	 
+#include "ladspa-1.1.h" 	 
+#endif
 
 #define BOUNDED (LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE)
 #define INTEGER LADSPA_HINT_INTEGER
@@ -76,14 +85,14 @@
 #define MIN_GAIN .000001 /* -120 dB */
 #define NOISE_FLOOR .00000000000005 /* -266 dB */
 
-typedef __int8_t			int8;
-typedef __uint8_t			uint8;
-typedef __int16_t			int16;
-typedef __uint16_t		uint16;
-typedef __int32_t			int32;
-typedef __uint32_t		uint32;
-typedef __int64_t			int64;
-typedef __uint64_t		uint64;
+typedef int8_t			int8;
+typedef uint8_t			uint8;
+typedef int16_t			int16;
+typedef uint16_t		uint16;
+typedef int32_t			int32;
+typedef uint32_t		uint32;
+typedef int64_t			int64;
+typedef uint64_t		uint64;
 
 typedef struct {
 	char * name;
@@ -137,7 +146,7 @@ T clamp (T value, T lower, T upper)
 static inline float
 frandom()
 {
-	return (float) random() / (float) RAND_MAX;
+	return (float) rand() / (float) RAND_MAX;
 }
 
 /* for testing only. */

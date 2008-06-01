@@ -2,7 +2,7 @@
  * volume_knob.h - defines a knob that display it's value as either a
  *                 percentage or in dBV.
  *
- * Copyright (c) 2006-2007  Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008  Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,7 @@
 #include "knob.h"
 
 
-class volumeKnob : public knob
+class EXPORT volumeKnob : public knob
 {
 	Q_OBJECT
 public:

@@ -42,7 +42,7 @@ typedef QVector<notePlayHandle *> notePlayHandleVector;
 typedef QVector<const notePlayHandle *> constNotePlayHandleVector;
 
 
-class notePlayHandle : public playHandle, public note
+class EXPORT notePlayHandle : public playHandle, public note
 {
 public:
 	void * m_pluginData;

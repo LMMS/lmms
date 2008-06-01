@@ -30,6 +30,9 @@
 #include <QtCore/QString>
 
 
+#include "types.h"
+
+
 #define STRINGIFY_PLUGIN_NAME(s) STR(s)
 #define STR(PN)	#PN
 
@@ -45,8 +48,8 @@ struct descriptor
 } ;
 
 
-QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
-QString getText( const char * _name );
+QPixmap EXPORT getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
+QString EXPORT getText( const char * _name );
 
 }
 

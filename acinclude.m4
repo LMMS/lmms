@@ -4,7 +4,13 @@ AC_DEFUN([gw_CHECK_QT],
 AC_REQUIRE([AC_PROG_CXX])
 AC_REQUIRE([AC_PATH_X])
 
-AC_PATH_PROG([PKGCONFIG], [pkg-config])
+case "${prefix}" in
+	/opt/mingw*)
+		;;
+	*)
+		AC_PATH_PROG([PKGCONFIG], [pkg-config])
+		;;
+esac
 
 # Only search manually if no pkgconfig
 if test -z "$PKGCONFIG" ; then
@@ -13,7 +19,7 @@ if test -z "$PKGCONFIG" ; then
 	# Check that QTDIR is defined or that --with-qtdir given
 	if test x"$QTDIR" = x ; then
 		# some usual Qt-locations
-		QT_SEARCH="/usr /usr/lib/qt4 /usr/share/qt4 /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.3.2 /usr/local/Trolltech/Qt-4.1.0"
+		QT_SEARCH="/usr /usr/lib/qt4 /usr/share/qt4 /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1 /usr/local/Trolltech/Qt-4.3.2 /usr/local/Trolltech/Qt-4.3.3 /usr/local/Trolltech/Qt-4.3.4"
 	else
 		QT_SEARCH=$QTDIR
 		QTDIR=""
@@ -155,7 +161,7 @@ if test -z "$QT_LIB" ; then
 		if test "x$QT_LIBS" = x;  then
 		    AC_MSG_ERROR([*** Couldn't find any Qt4 libraries])
 		fi
-		QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4 -lws2_32"
+		QT_LIB="-L$QTDIR/bin -lQtCore4 -lQtXml4 -lQtNetwork4 -lQtGui4"
 		# Check that windres is in path
 		AC_PATH_PROGS([WINDRES],[i586-mingw32-windres windres],,[${prefix}/bin:$PATH])
 		if test x$WINDRES = x ; then

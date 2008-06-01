@@ -47,7 +47,7 @@ enum knobTypes
 
 
 
-class knob : public QWidget, public floatModelView
+class EXPORT knob : public QWidget, public floatModelView
 {
 	Q_OBJECT
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)

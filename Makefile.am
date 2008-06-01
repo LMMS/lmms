@@ -138,7 +138,9 @@ lmms_UIC =						\
 		ui_export_project.uic
 
 
+
 BUILT_SOURCES = $(lmms_MOC) $(lmms_UIC)
+
 
 
 lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
@@ -222,6 +224,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/audio/audio_jack.cpp				\
 		$(srcdir)/src/core/audio/audio_oss.cpp				\
 		$(srcdir)/src/core/audio/audio_port.cpp				\
+		$(srcdir)/src/core/audio/audio_pulseaudio.cpp			\
 		$(srcdir)/src/core/audio/audio_sample_recorder.cpp		\
 		$(srcdir)/src/core/audio/audio_sdl.cpp				\
 		$(srcdir)/src/core/midi/midi_alsa_raw.cpp			\
@@ -307,6 +310,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/audio_file_wave.h				\
 		$(srcdir)/include/audio_jack.h					\
 		$(srcdir)/include/audio_oss.h					\
+		$(srcdir)/include/audio_pulseaudio.h				\
 		$(srcdir)/include/audio_sample_recorder.h			\
 		$(srcdir)/include/audio_sdl.h					\
 		$(srcdir)/include/automation_editor.h				\
@@ -466,7 +470,7 @@ lmms_SOURCES =									\
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) lmms.1
 
 
-CLEANFILES = $(lmms_MOC) ./embedded_resources.h
+CLEANFILES = $(lmms_MOC) ./embedded_resources.h liblmms-imp.a
 
 if HAVE_LIBSDL
 LIB_SDL_LDADD = -lSDL
@@ -497,9 +501,18 @@ if HAVE_LIBSF
 LIB_SF_LDADD = -lsndfile
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD)
+if HAVE_LIBPULSE
+LIB_PA_LDADD = -lpulse
+endif
+
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_PA_LDADD)
+
 if BUILD_LINUX
 lmms_LDFLAGS = -rdynamic
+endif
+
+if BUILD_WIN32
+lmms_LDFLAGS = -Wl,-out-implib=liblmms-imp.a
 endif
 
 single-binary:

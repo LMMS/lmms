@@ -31,7 +31,7 @@
 #include "automatable_button.h"
 
 
-class pixmapButton : public automatableButton
+class EXPORT pixmapButton : public automatableButton
 {
 	Q_OBJECT
 public:

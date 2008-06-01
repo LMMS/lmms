@@ -3,7 +3,7 @@
 /*
  * plugin_browser.cpp - implementation of the plugin-browser
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -141,8 +141,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	QFont f = pointSize<8>( p.font() );
 	f.setBold( TRUE );
 	p.setFont( f );
-	p.drawText( 10 + logo_size.width(), 15,
-					m_pluginDescriptor.public_name );
+	p.drawText( 10 + logo_size.width(), 15, m_pluginDescriptor.publicName );
 
 	if( height() > 24 || m_mouseOver )
 	{

@@ -60,7 +60,7 @@ seed()
 	static struct timeval tv;
   gettimeofday (&tv, 0);
 
-	srandom (tv.tv_sec ^ tv.tv_usec);
+	srand (tv.tv_sec ^ tv.tv_usec);
 }
 
 extern "C" {

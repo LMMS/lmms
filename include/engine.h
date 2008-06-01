@@ -32,6 +32,8 @@
 
 #include <QtCore/QMap>
 
+#include "types.h"
+
 class automationEditor;
 class bbEditor;
 class bbTrackContainer;
@@ -49,7 +51,7 @@ class ladspa2LMMS;
 class controllerRackView;
 
 
-class engine
+class EXPORT engine
 {
 public:
 	static void init( const bool _has_gui = true );

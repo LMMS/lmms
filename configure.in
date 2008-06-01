@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080530, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080530)
+AC_INIT(lmms, 0.4.0-svn20080601, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080601)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -206,6 +206,22 @@ if test ! -z "$HAVE_JACK_JACK_H" ; then
 	AC_DEFINE(HAVE_JACK_JACK_H)
 fi
 AM_CONDITIONAL(HAVE_LIBJACK, test ! -z "$HAVE_JACK_JACK_H")
+
+
+# check for PulseAudio
+AC_ARG_WITH(pulseaudio,
+	AS_HELP_STRING([--without-pulseaudio],
+			[disable support for PulseAudio-sound-output]), ,
+ 	[ with_pulseaudio=yes ])
+AH_TEMPLATE(HAVE_PULSE_PULSEAUDIO_H, [Define to 1 if you have the <pulse/pulseaudio.h> header file.])
+if test "x$with_pulseaudio" = "xyes" ; then
+	AC_CHECK_HEADER(pulse/pulseaudio.h, HAVE_PULSE_PULSEAUDIO_H="true")
+	AC_CHECK_LIB([pulse], [pa_mainloop_new], HAVE_LIBPULSE="true", HAVE_PULSE_PULSEAUDIO_H="")
+fi
+if test ! -z "$HAVE_PULSE_PULSEAUDIO_H" ; then
+	AC_DEFINE(HAVE_PULSE_PULSEAUDIO_H)
+fi
+AM_CONDITIONAL(HAVE_LIBPULSE, test ! -z "$HAVE_PULSE_PULSEAUDIO_H")
 
 
 # check for proper WINE-installation and existing Steinberg headers
@@ -691,23 +707,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
-		 plugins/stk/voices/Makefile
-		 plugins/stk/voices/b3/Makefile
-		 plugins/stk/voices/bandedwg/Makefile
-		 plugins/stk/voices/blow_bottle/Makefile
-		 plugins/stk/voices/blow_hole/Makefile
-		 plugins/stk/voices/bowed/Makefile
-		 plugins/stk/voices/brass/Makefile
-		 plugins/stk/voices/clarinet/Makefile
-		 plugins/stk/voices/flute/Makefile
-		 plugins/stk/voices/fmvoices/Makefile
-		 plugins/stk/voices/metal/Makefile
-		 plugins/stk/voices/moog/Makefile
-		 plugins/stk/voices/percflute/Makefile
-		 plugins/stk/voices/resonate/Makefile
-		 plugins/stk/voices/rhodey/Makefile
-		 plugins/stk/voices/tubebell/Makefile
-		 plugins/stk/voices/wurley/Makefile
 		 plugins/triple_oscillator/Makefile
 		 plugins/vestige/Makefile
 		 plugins/vibed/Makefile

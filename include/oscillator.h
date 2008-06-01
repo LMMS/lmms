@@ -41,7 +41,7 @@
 #include "automatable_model.h"
 
 
-class oscillator
+class EXPORT oscillator
 {
 public:
 	enum WaveShapes

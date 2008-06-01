@@ -48,7 +48,7 @@
 extern "C"
 {
 
-plugin::descriptor tripleoscillator_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"TripleOscillator",
@@ -819,7 +819,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new tripleOscillator(
 				static_cast<instrumentTrack *>( _data ) ) );

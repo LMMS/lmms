@@ -35,6 +35,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QPair>
 
+#include "types.h"
+
 
 class engine;
 
@@ -47,7 +49,7 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class configManager
+class EXPORT configManager
 {
 public:
 	static inline configManager * inst( void )

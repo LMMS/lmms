@@ -47,11 +47,19 @@ configManager * configManager::s_instanceOfMe = NULL;
 configManager::configManager( void ) :
 	m_lmmsRcFile( QDir::home().absolutePath() + "/.lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + "/lmms" ),
-	m_dataDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
-							"/share/lmms/" ),
+	m_dataDir( qApp->applicationDirPath()
+#ifndef BUILD_WIN32
+					.section( '/', 0, -2 )
+#endif
+							+ "/share/lmms/" ),
 	m_artworkDir( defaultArtworkDir() ),
-	m_pluginDir( qApp->applicationDirPath().section( '/', 0, -2 ) +
-							"/lib/lmms/" ),
+	m_pluginDir( qApp->applicationDirPath()
+#ifdef BUILD_WIN32
+					+ QDir::separator()
+#else
+				.section( '/', 0, -2 ) + "/lib/lmms/"
+#endif
+									),
 	m_vstDir( QDir::home().absolutePath() ),
 	m_flDir( QDir::home().absolutePath() )
 {

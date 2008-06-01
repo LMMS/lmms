@@ -1,7 +1,7 @@
 /*
  * tooltip.h - namespace toolTip, a tooltip-wrapper for LMMS
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,14 +28,14 @@
 
 #include <qstring.h>
 
+#include "types.h"
+
 class QWidget;
 
 
-namespace toolTip
+struct toolTip
 {
-
-	void add( QWidget * _w, const QString & _txt );
-
+	static void EXPORT add( QWidget * _w, const QString & _txt );
 } ;
 
 

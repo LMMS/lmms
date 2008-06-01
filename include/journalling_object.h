@@ -98,7 +98,7 @@ private:
 typedef QVector<journalEntry> journalEntryVector;
 
 
-class journallingObject
+class EXPORT journallingObject
 {
 public:
 	journallingObject( void );

@@ -34,7 +34,7 @@ class QMenu;
 
 
 
-class automatableModelView : public modelView
+class EXPORT automatableModelView : public modelView
 {
 public:
 	automatableModelView( ::model * _model ) :
@@ -94,7 +94,7 @@ protected:
 
 
 #define generateTypedModelView(type)					\
-class type##ModelView : public automatableModelView			\
+class EXPORT type##ModelView : public automatableModelView			\
 {\
 public:\
 	type##ModelView( ::model * _model ) :\

@@ -61,7 +61,7 @@ class presetPreviewPlayHandle;
 class volumeKnob;
 
 
-class instrumentTrack : public track, public midiEventProcessor
+class EXPORT instrumentTrack : public track, public midiEventProcessor
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);

@@ -67,7 +67,7 @@ class track;
 
 
 
-class automatableModel : public model, public journallingObject
+class EXPORT automatableModel : public model, public journallingObject
 {
 	Q_OBJECT
 public:

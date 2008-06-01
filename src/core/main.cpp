@@ -351,7 +351,6 @@ int main( int argc, char * * argv )
 		p.end();
 
 		QSplashScreen * ss = new QSplashScreen( pm );
-		ss->setWindowOpacity( 0.85 );
 		ss->setMask( splash.alphaChannel().createMaskFromColor( QColor( 0, 0, 0 ) ) );
 		ss->show();
 		qApp->processEvents();

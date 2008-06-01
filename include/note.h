@@ -83,7 +83,7 @@ const float MaxDetuning = 4 * 12.0f;
 
 
 
-class note : public journallingObject
+class EXPORT note : public journallingObject
 {
 public:
 	note( const midiTime & _length = 0,

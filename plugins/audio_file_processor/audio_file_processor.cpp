@@ -49,7 +49,7 @@
 extern "C"
 {
 
-plugin::descriptor audiofileprocessor_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"AudioFileProcessor",
@@ -608,7 +608,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new audioFileProcessor(
 				static_cast<instrumentTrack *>( _data ) ) );

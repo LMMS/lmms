@@ -338,7 +338,7 @@ private:
 
 
 // base-class for all tracks
-class track : public model, public journallingObject
+class EXPORT track : public model, public journallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,muted,setMuted,m_mutedModel);

@@ -28,10 +28,13 @@
 
 #include <QtCore/QObject>
 
+#include "types.h"
+
+
 class modelView;
 
 
-class model : public QObject
+class EXPORT model : public QObject
 {
 	Q_OBJECT
 public:
@@ -69,9 +72,8 @@ signals:
 
 
 
-class modelView
+class EXPORT modelView
 {
-
 public:
 	modelView( model * _model );
 	virtual ~modelView()

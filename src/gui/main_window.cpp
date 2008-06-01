@@ -399,7 +399,7 @@ void mainWindow::finalize( void )
 		if( it->type == plugin::Tool )
 		{
 			m_toolsMenu->addAction( it->logo->pixmap(),
-							it->public_name );
+							it->publicName );
 			m_tools.push_back( tool::instantiate( it->name,
 					/*this*/NULL )->createView( this ) );
 		}

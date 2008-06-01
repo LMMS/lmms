@@ -43,7 +43,7 @@ class pixmapLoader;
 class pluginView;
 
 
-class plugin : public journallingObject, public model
+class EXPORT plugin : public journallingObject, public model
 {
 public:
 	enum PluginTypes
@@ -65,13 +65,13 @@ public:
 	struct descriptor
 	{
 		const char * name;
-		const char * public_name;
+		const char * publicName;
 		const char * description;
 		const char * author;
 		int version;
 		PluginTypes type;
 		const pixmapLoader * logo;
-		class subPluginFeatures
+		class EXPORT subPluginFeatures
 		{
 		public:
 			struct key
@@ -167,7 +167,7 @@ public:
 	virtual inline QString publicName( void ) const
 	{
 		return( m_publicName != QString::null ?
-				m_publicName : m_descriptor->public_name );
+				m_publicName : m_descriptor->publicName );
 	}
 
 	virtual void setPublicName( const QString & _public_name )
@@ -189,17 +189,17 @@ public:
 
 	// plugins can overload this for making other classes able to change
 	// settings of the plugin without knowing the actual class
-	virtual void FASTCALL setParameter( const QString & _param,
+	virtual void setParameter( const QString & _param,
 						const QString & _value );
 
 	// plugins can overload this for making other classes able to query
 	// settings of the plugin without knowing the actual class
-	virtual QString FASTCALL getParameter( const QString & _param );
+	virtual QString getParameter( const QString & _param );
 
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static plugin * FASTCALL instantiate( const QString & _plugin_name,
+	static plugin * instantiate( const QString & _plugin_name,
 							model * _parent,
 							void * _data );
 
@@ -217,7 +217,7 @@ public:
 	virtual void waitForWorkerThread( void );
 
 	// fills given vector with descriptors of all available plugins
-	static void FASTCALL getDescriptorsOfAvailPlugins(
+	static void getDescriptorsOfAvailPlugins(
 					QVector<descriptor> & _plugin_descs );
 
 	// create a view for the model 

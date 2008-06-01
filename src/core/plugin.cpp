@@ -147,8 +147,13 @@ void plugin::waitForWorkerThread( void )
 void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
+#ifdef BUILD_WIN32
+	QFileInfoList list = directory.entryInfoList(
+						QStringList( "*.dll" ) );
+#else
 	QFileInfoList list = directory.entryInfoList(
 						QStringList( "lib*.so" ) );
+#endif
 	for( QFileInfoList::iterator file = list.begin();
 						file != list.end(); ++file )
 	{

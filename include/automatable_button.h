@@ -34,7 +34,7 @@
 class automatableButtonGroup;
 
 
-class automatableButton : public QPushButton, public boolModelView
+class EXPORT automatableButton : public QPushButton, public boolModelView
 {
 	Q_OBJECT
 public:
@@ -78,7 +78,7 @@ private:
 
 
 
-class automatableButtonGroup : public QWidget, public intModelView
+class EXPORT automatableButtonGroup : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:

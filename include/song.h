@@ -46,7 +46,7 @@ const bpm_t MaxTempo = 999;
 const tick MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class song : public trackContainer
+class EXPORT song : public trackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getTempo,setTempo,m_tempoModel);

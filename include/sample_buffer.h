@@ -49,11 +49,11 @@
 class QPainter;
 
 
-class sampleBuffer : public QObject, public sharedObject
+class EXPORT sampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
-	class handleState
+	class EXPORT handleState
 	{
 	public:
 		handleState( bool _varying_pitch = FALSE );

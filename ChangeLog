@@ -1,3 +1,83 @@
+2008-06-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/caps/basics.h:
+	* plugins/ladspa_effect/caps/interface.cc:
+	win32-build fixes
+
+	* plugins/triple_oscillator/Makefile.am:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/Makefile.am:
+	made ready for building plugins as DLLs
+
+	* plugins/kicker/kicker.h:
+	include QtCore/QObject rather than QObject
+
+	* include/mmp.h:
+	* include/knob.h:
+	* include/track.h:
+	* include/engine.h:
+	* include/note.h:
+	* include/embed.h:
+	* include/instrument_view.h:
+	* include/config_mgr.h:
+	* include/automatable_model.h:
+	* include/mixer.h:
+	* include/instrument_track.h:
+	* include/instrument.h:
+	* include/sample_buffer.h:
+	* include/plugin.h:
+	* include/note_play_handle.h:
+	* include/song.h:
+	* include/string_pair_drag.h:
+	* include/oscillator.h:
+	* include/automatable_button.h:
+	* include/tooltip.h:
+	* include/journalling_object.h:
+	* include/pixmap_button.h:
+	* include/automatable_model_view.h:
+	* include/mv_base.h:
+	* include/volume_knob.h:
+	* include/plugin_view.h:
+	export according classes for making them accessibly by plugins
+
+	* src/core/main.cpp:
+	dont set opacity for splashscreen
+
+	* src/core/config_mgr.cpp:
+	customized paths for win32 (plugins in same directory as executable)
+
+	* src/core/song.cpp:
+	initialize m_length member to 0
+
+	* src/core/plugin.cpp:
+	under win32 filter for DLL-files
+
+	* include/types.h:
+	added macros for export-declaration
+
+	* src/gui/plugin_browser.cpp:
+	* src/gui/effect_select_dialog.cpp:
+	* src/gui/main_window.cpp:
+	* src/core/track.cpp:
+	minor coding style issues
+
+	* build_mingw32:
+	* acinclude.m4:
+	* Makefile.am:
+	better support for win32-builds
+
+	* buildtools/bin2res.cpp:
+	open files in binary mode - fixes win32-build
+
+	* configure.in:
+	* Makefile.am:
+	* include/audio_pulseaudio.h:
+	* src/core/audio/audio_pulseaudio.cpp:
+	* src/core/mixer.cpp:
+	* src/gui/setup_dialog.cpp:
+	added PulseAudio-support
+
 2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
 	
 	* src/tracks/pattern.cpp:
@@ -7,7 +87,7 @@
 	Display floating text underneith the current track so you can actually see
 	what you are doing
 	
-2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-30  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
 	- Improve selection of volume-bars on a chord.  Select closest note

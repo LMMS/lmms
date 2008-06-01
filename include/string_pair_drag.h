@@ -30,11 +30,12 @@
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDropEvent>
 
+#include "types.h"
 
 class QPixmap;
 
 
-class stringPairDrag : public QDrag
+class EXPORT stringPairDrag : public QDrag
 {
 public:
 	stringPairDrag( const QString & _key, const QString & _value,

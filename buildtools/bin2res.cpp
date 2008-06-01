@@ -65,7 +65,7 @@ int main( int argc, char * * argv )
 	}
 	for( stringlist::iterator it = files.begin(); it != files.end(); ++it )
 	{
-		std::ifstream f( it->c_str() );
+		std::ifstream f( it->c_str(), std::ios::binary );
 		if( f.fail() )
 		{
 			std::cerr << "Cannot open file " << *it <<

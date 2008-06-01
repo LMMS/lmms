@@ -42,7 +42,7 @@ class notePlayHandle;
 class track;
 
 
-class instrument : public plugin
+class EXPORT instrument : public plugin
 {
 public:
 	instrument( instrumentTrack * _instrument_track,

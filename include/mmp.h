@@ -31,7 +31,7 @@
 #include "types.h"
 
 
-class multimediaProject : public QDomDocument
+class EXPORT multimediaProject : public QDomDocument
 {
 public:
 	enum ProjectTypes
@@ -87,7 +87,7 @@ private:
 	void upgrade( void );
 
 
-	struct typeDescStruct
+	struct EXPORT typeDescStruct
 	{
 		ProjectTypes m_type;
 		QString m_name;
