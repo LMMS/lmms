@@ -4,11 +4,13 @@ if SHIP_CAPS
 SUBDIRS = caps
 endif
 
+PLUGIN_NAME = ladspaeffect
+
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/gui -I.
 
 
-AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspaeffect"
+AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="$(PLUGIN_NAME)"
 
 
 %.moc: ./%.h
@@ -17,8 +19,20 @@ AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspaeffect"
 
 MOC_FILES = ./ladspa_effect.moc ./ladspa_controls.moc ./ladspa_control_dialog.moc
 
+if BUILD_WIN32
+DLL=$(PLUGIN_NAME).dll
 
-BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
+$(DLL): lib$(PLUGIN_NAME).la
+	$(CXX) *.o -L$(top_srcdir) -llmms-imp -shared -Wl,-no-undefined -o $@ $(QT_LDADD) && $(STRIP) $@
+
+install-exec-hook: $(DLL)
+	cp $< $(pkglibdir)
+	rm $(pkglibdir)/lib$(PLUGIN_NAME).a $(pkglibdir)/lib$(PLUGIN_NAME).la
+else
+DLL=
+endif
+
+BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h $(DLL)
 EMBEDDED_RESOURCES = $(wildcard *png)
 
 ./embedded_resources.h: $(EMBEDDED_RESOURCES)

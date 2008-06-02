@@ -1,10 +1,12 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
+PLUGIN_NAME = ladspabrowser
+
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/gui -I.
 
 
-AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="ladspa_browser"
+AM_CXXFLAGS := $(AM_CXXFLAGS) $(QT_CXXFLAGS) -DPLUGIN_NAME="$(PLUGIN_NAME)"
 
 
 %.moc: ./%.h
@@ -15,7 +17,20 @@ MOC_FILES =	./ladspa_browser.moc		\
 		./ladspa_description.moc	\
 		./ladspa_port_dialog.moc
 
-BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h
+if BUILD_WIN32
+DLL=$(PLUGIN_NAME).dll
+
+$(DLL): lib$(PLUGIN_NAME).la
+	$(CXX) *.o -L$(top_srcdir) -llmms-imp -shared -Wl,-no-undefined -o $@ $(QT_LDADD) && $(STRIP) $@
+
+install-exec-hook: $(DLL)
+	cp $< $(pkglibdir)
+	rm $(pkglibdir)/lib$(PLUGIN_NAME).a $(pkglibdir)/lib$(PLUGIN_NAME).la
+else
+DLL=
+endif
+
+BUILT_SOURCES = $(MOC_FILES) ./embedded_resources.h $(DLL)
 EMBEDDED_RESOURCES = $(wildcard *png)
 
 ./embedded_resources.h: $(EMBEDDED_RESOURCES)
@@ -28,13 +43,13 @@ CLEANFILES = $(MOC_FILES) ./embedded_resources.h
 
 
 
-pkglib_LTLIBRARIES = libladspa_browser.la
+pkglib_LTLIBRARIES = libladspabrowser.la
 
-libladspa_browser_la_SOURCES =	ladspa_browser.cpp	\
+libladspabrowser_la_SOURCES =	ladspa_browser.cpp	\
 				ladspa_browser.h	\
 				ladspa_description.cpp	\
 				ladspa_description.h	\
 				ladspa_port_dialog.cpp	\
 				ladspa_port_dialog.h
 
-$(libladspa_browser_la_SOURCES): ./embedded_resources.h
+$(libladspabrowser_la_SOURCES): ./embedded_resources.h

@@ -22,8 +22,7 @@
  *
  */
 
-#include <QTextStream>
-
+#include <QtCore/QTextStream>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QFileDialog>

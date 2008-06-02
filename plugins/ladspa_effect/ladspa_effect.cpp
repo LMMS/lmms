@@ -43,7 +43,7 @@
 extern "C"
 {
 
-plugin::descriptor ladspaeffect_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"LADSPA Effect",
@@ -552,7 +552,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model * _parent, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 {
 	return( new ladspaEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(

@@ -48,7 +48,7 @@
 extern "C"
 {
 
-plugin::descriptor patman_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"PatMan",
@@ -63,7 +63,7 @@ plugin::descriptor patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new patmanInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }

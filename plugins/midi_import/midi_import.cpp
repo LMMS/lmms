@@ -1,7 +1,7 @@
 /*
  * midi_import.cpp - support for importing MIDI-files
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -46,7 +46,7 @@
 extern "C"
 {
 
-plugin::descriptor midiimport_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"MIDI Import",
@@ -620,7 +620,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new midiImport( static_cast<const char *>( _data ) ) );
 }

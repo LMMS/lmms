@@ -25,7 +25,7 @@
 
 #include "patches_dialog.h"
 
-#include <QHeaderView>
+#include <QtGui/QHeaderView>
 //#include <QFileInfo>
 
 

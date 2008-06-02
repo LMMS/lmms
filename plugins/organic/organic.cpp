@@ -47,7 +47,7 @@
 extern "C"
 {
 
-plugin::descriptor organic_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"Organic",
@@ -569,7 +569,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new organicInstrument( static_cast<instrumentTrack *>( _data ) ) );
 }

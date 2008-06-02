@@ -40,7 +40,7 @@
 extern "C"
 {
 
-plugin::descriptor kicker_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"Kicker",
@@ -261,7 +261,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new kickerInstrument(
 				static_cast<instrumentTrack *>( _data ) ) );

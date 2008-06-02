@@ -30,7 +30,7 @@
 #include "lcd_spinbox.h"
 
 #include <fluidsynth.h>
-#include <QWidget>
+#include <QtGui/QWidget>
 
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.

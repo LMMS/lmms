@@ -67,7 +67,7 @@
 extern "C"
 {
 
-plugin::descriptor flpimport_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT flpimport_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"FLP Import",
@@ -929,7 +929,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new flpImport( static_cast<const char *>( _data ) ) );
 }

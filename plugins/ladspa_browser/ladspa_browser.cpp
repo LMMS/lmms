@@ -47,7 +47,7 @@
 extern "C"
 {
 
-plugin::descriptor ladspa_browser_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
@@ -62,7 +62,7 @@ plugin::descriptor ladspa_browser_plugin_descriptor =
 
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 {
 	return( new ladspaBrowser );
 }
@@ -73,7 +73,7 @@ plugin * lmms_plugin_main( void * _data )
 
 
 ladspaBrowser::ladspaBrowser( void ) :
-	tool( &ladspa_browser_plugin_descriptor, NULL )
+	tool( &ladspabrowser_plugin_descriptor, NULL )
 {
 }
 
@@ -89,7 +89,7 @@ ladspaBrowser::~ladspaBrowser()
 
 QString ladspaBrowser::nodeName( void ) const
 {
-	return( ladspa_browser_plugin_descriptor.name );
+	return( ladspabrowser_plugin_descriptor.name );
 }
 
 

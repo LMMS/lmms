@@ -46,7 +46,7 @@
 extern "C"
 {
 
-plugin::descriptor live_tool_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT livetool_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"LiveTool",
@@ -61,7 +61,7 @@ plugin::descriptor live_tool_plugin_descriptor =
 
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model * _parent, void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 {
 	return( new liveTool( _parent ) );
 }
@@ -72,7 +72,7 @@ plugin * lmms_plugin_main( model * _parent, void * _data )
 
 
 liveTool::liveTool( model * _parent ) :
-	tool( &live_tool_plugin_descriptor, _parent )
+	tool( &livetool_plugin_descriptor, _parent )
 {
 }
 
@@ -88,7 +88,7 @@ liveTool::~liveTool()
 
 QString liveTool::nodeName( void ) const
 {
-	return( live_tool_plugin_descriptor.name );
+	return( livetool_plugin_descriptor.name );
 }
 
 
