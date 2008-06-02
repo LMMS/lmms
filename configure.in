@@ -420,7 +420,11 @@ AH_TEMPLATE(HAVE_FLUIDSYNTH_H, [Define to 1 if you have the <fluidsynth.h> heade
 if test "x$with_fluidsynth" = "xyes" ; then
 	FLUIDSYNTH_SUPPORT="true"
 	AC_CHECK_HEADER([fluidsynth.h], HAVE_FLUIDSYNTH_H="true", FLUIDSYNTH_SUPPORT="")
-	AC_CHECK_LIB([fluidsynth], [new_fluid_synth], HAVE_FLUIDSYNTH="true", FLUIDSYNTH_SUPPORT="")
+	if [ "$build_win32" = "true" ] ; then
+		AC_CHECK_LIB([fluidsynth-1], [new_fluid_synth], HAVE_FLUIDSYNTH="true", FLUIDSYNTH_SUPPORT="")
+	else
+		AC_CHECK_LIB([fluidsynth], [new_fluid_synth], HAVE_FLUIDSYNTH="true", FLUIDSYNTH_SUPPORT="")
+	fi
 fi
 if test ! -z "$FLUIDSYNTH_SUPPORT" ; then
 	AC_DEFINE(HAVE_FLUIDSYNTH_H)
