@@ -442,36 +442,35 @@ AC_ARG_WITH(libsf,
 AH_TEMPLATE(HAVE_SNDFILE_H, [Define to 1 if you have the <sndfile.h> header file.])
 if test "x$with_libsf" = "xyes" ; then
 	AC_CHECK_HEADER(sndfile.h, HAVE_SNDFILE_H="true")
-	AC_CHECK_LIB([sndfile], [sf_command], HAVE_LIBSF="true", HAVE_SNDFILE_H="")
-	AC_MSG_CHECKING([version of libsndfile])
-	AH_TEMPLATE(OLD_SNDFILE, [Define to 1 if libsndfile < 1.0.11])
-	OLD_LIBS="$LIBS"
-	LIBS="$LIBS -lsndfile"
-	AC_RUN_IFELSE([	#include <sndfile.h>
+	if [ "$build_win32" = "true" ] ; then
+		AC_CHECK_LIB([sndfile-1], [sf_open], HAVE_LIBSF="true", HAVE_SNDFILE_H="")
+	else
+		AC_CHECK_LIB([sndfile], [sf_open], HAVE_LIBSF="true", HAVE_SNDFILE_H="")
+		AC_MSG_CHECKING([version of libsndfile])
+		AH_TEMPLATE(OLD_SNDFILE, [Define to 1 if libsndfile < 1.0.11])
+		OLD_LIBS="$LIBS"
+		LIBS="$LIBS -lsndfile"
+		AC_RUN_IFELSE([	#include <sndfile.h>
 			int main( void )
 			{
 				SF_INFO si;
 				( void )sf_open( "", SFM_READ, &si );
 				return 0;
 			}],
-	AC_MSG_RESULT([>= 1.0.11]),
-	AC_MSG_RESULT([< 1.0.11])
-	AC_DEFINE(OLD_SNDFILE)
-		)
-	LIBS="$OLD_LIBS"
+		AC_MSG_RESULT([>= 1.0.11]),
+		AC_MSG_RESULT([< 1.0.11])
+		AC_DEFINE(OLD_SNDFILE)
+						)
+		LIBS="$OLD_LIBS"
+	fi
 fi
 if test ! -z "$HAVE_SNDFILE_H" ; then
 	AC_DEFINE(HAVE_SNDFILE_H)
 fi
 AM_CONDITIONAL(HAVE_LIBSF, test ! -z "$HAVE_SNDFILE_H")
 
-AC_ARG_WITH(nosmpdecs,
-	AS_HELP_STRING([--without-sample-decoders],
-			[force compiling LMMS even if no usable libraries for sample-decoding were found]),
- 	[ with_smpdecs=yes ])
-
-if test -z "$HAVE_SND_FILE" -a -z "$HAVE_SDL_SDL_SOUND_H" -a -z "$OGG_SUPPORT" -a ! -z "$with_smpdecs"; then
-	AC_MSG_ERROR([*** neither libsndfile nor SDL_sound nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples so please install at least one of the packages and try again! Use --without-sample-decoders to force compiling without any sample-decoding-libraries.])
+if test -z "$HAVE_SNDFILE_H" -a -z "$HAVE_SDL_SDL_SOUND_H" -a -z "$OGG_SUPPORT" ; then
+	AC_MSG_ERROR([*** neither libsndfile nor SDL_sound nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples so please install at least one of the packages and try again!])
 fi
 
 

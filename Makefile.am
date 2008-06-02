@@ -501,7 +501,11 @@ LIB_SRC_LDADD = -lsamplerate
 endif
 
 if HAVE_LIBSF
+if BUILD_LINUX
 LIB_SF_LDADD = -lsndfile
+else
+LIB_SF_LDADD = -lsndfile-1
+endif
 endif
 
 if HAVE_LIBPULSE
