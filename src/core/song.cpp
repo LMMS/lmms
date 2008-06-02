@@ -1013,7 +1013,8 @@ void song::saveControllerStates( QDomDocument & _doc, QDomElement & _this )
 void song::restoreControllerStates( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
-	while( !node.isNull() ) {
+	while( !node.isNull() )
+	{
 		addController( controller::create( node.toElement(), this ) );
 
 		node = node.nextSibling();

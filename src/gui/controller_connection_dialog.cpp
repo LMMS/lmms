@@ -146,7 +146,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	m_midiControllerSpinBox->move( 72, 24 );
 	
 
-	ledCheckBox * m_midiAutoDetectCheckBox =
+	m_midiAutoDetectCheckBox =
 			new ledCheckBox( tr("Auto Detect"),
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
@@ -236,6 +236,9 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 			}
 		}
 	}
+	else {
+		m_midiGroupBox->model()->setValue( TRUE );
+	}
 
 
 	show();
@@ -303,7 +306,7 @@ void controllerConnectionDialog::midiToggled( void )
 
 	m_midiChannelSpinBox->setEnabled( enabled );
 	m_midiControllerSpinBox->setEnabled( enabled );
-	//m_midiAutoDetect->setEnabled( enabled );
+	m_midiAutoDetectCheckBox->setEnabled( enabled );
 }
 
 
