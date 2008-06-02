@@ -1,3 +1,90 @@
+2008-06-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/patman/patman.cpp:
+	* plugins/patman/Makefile.am:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	* plugins/ladspa_effect/Makefile.am:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/Makefile.am:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/Makefile.am:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/Makefile.am:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/stereo_matrix/Makefile.am:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/Makefile.am:
+	* plugins/vibed/Makefile.am:
+	* plugins/vibed/vibed.cpp:
+	* plugins/live_tool/Makefile.am:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/Makefile.am:
+	* plugins/sf2_player/patches_dialog.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/Makefile.am:
+	* plugins/sf2_player/patches_dialog.h:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/ladspa_browser/Makefile.am:
+	* plugins/ladspa_browser/ladspa_browser.h:
+	* plugins/kicker/Makefile.am:
+	* plugins/kicker/kicker.cpp:
+	* plugins/flp_import/Makefile.am:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/Makefile.am:
+	* plugins/midi_import/midi_import.cpp:
+	build win32-DLLs properly
+
+	* include/mmp.h:
+	* include/effect.h:
+	* include/lcd_spinbox.h:
+	* include/engine.h:
+	* include/embed.h:
+	* include/bb_track_container.h:
+	* include/config_mgr.h:
+	* include/import_filter.h:
+	* include/ladspa_manager.h:
+	* include/ladspa_control.h:
+	* include/automation_pattern.h:
+	* include/graph.h:
+	* include/effect_control_dialog.h:
+	* include/pattern.h:
+	* include/string_pair_drag.h:
+	* include/caption_menu.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/bb_track.h:
+	* include/project_notes.h:
+	* include/export.h:
+	* include/tooltip.h:
+	* include/ladspa_control_view.h:
+	* include/journalling_object.h:
+	* include/tool.h:
+	* include/tab_bar.h:
+	* include/types.h:
+	* include/mv_base.h:
+	* include/track_container.h:
+	* include/led_checkbox.h:
+	* include/ladspa_2_lmms.h:
+	* src/3rdparty/samplerate/samplerate.h:
+	export more symbols in order to build all plugins
+
+	* configure.in:
+	added code for detecting fluidsynth-DLL
+
+	* src/core/config_mgr.cpp:
+	customized path to LADSPA-plugins under win32
+
+	* src/core/midi/midi_alsa_seq.cpp:
+	do not free port_info-structure before actually (un)subscribing -
+	fixes non-working automatic port-subscription
+
+	* src/core/ladspa_manager.cpp:
+	win32-compat
+
+	* src/core/instrument_midi_io.cpp:
+	coding style
+
 2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/automatable_model.h:
@@ -37,11 +124,12 @@
 2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
 	
 	* src/tracks/pattern.cpp:
-	Improve drawing of tact lines, so it is more obvious where a pattern ends
+	Improve drawing of tact lines, so it is more obvious where a pattern
+	ends
 
 	* src/core/track.cpp:
-	Display floating text underneith the current track so you can actually see
-	what you are doing
+	Display floating text underneith the current track so you can actually
+	see what you are doing
 
 	* src/core/config_mgr.cpp:
 	Gracefully handle default lmmsrc.xml creation instead of aborting

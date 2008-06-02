@@ -41,13 +41,15 @@ ladspaManager::ladspaManager( void )
 								split( ':' );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
 
+#ifndef BUILD_WIN32
 	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/ladspa" );
+#endif
 
 	for( QStringList::iterator it = ladspaDirectories.begin(); 
-		    it != ladspaDirectories.end(); ++it )
+			 		   it != ladspaDirectories.end(); ++it )
 	{
 		QDir directory( ( *it ) );
 		QFileInfoList list = directory.entryInfoList();
@@ -55,7 +57,13 @@ ladspaManager::ladspaManager( void )
 						file != list.end(); ++file )
 		{
 			const QFileInfo & f = *file;
-			if( !f.isFile() || f.fileName().right(2) != "so" )
+			if( !f.isFile() ||
+#ifdef BUILD_WIN32
+				 f.fileName().right(3) != "dll"
+#else
+				 f.fileName().right(2) != "so"
+#endif
+								)
 			{
 				continue;
 			}
