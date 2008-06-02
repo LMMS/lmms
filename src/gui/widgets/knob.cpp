@@ -691,7 +691,9 @@ void knob::connectToController( void )
 	// TODO[pg]: Display a dialog with list of controllers currently in the song
 	// in addition to any system MIDI controllers
 	
-	controllerConnectionDialog * d = new controllerConnectionDialog( engine::getMainWindow() );
+	controllerConnectionDialog * d = new controllerConnectionDialog( 
+			engine::getMainWindow(), 
+			model()->getControllerConnection() );
 
 	d->exec();
 

@@ -32,6 +32,7 @@
 #include <QtGui/QScrollArea>
 
 #include "controller_connection_dialog.h"
+#include "controller_connection.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "combobox.h"
@@ -109,7 +110,8 @@ public slots:
 
 
 
-controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
+controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent, 
+		controllerConnection * _connection
 	) :
 	QDialog( _parent ),
 	m_controller( NULL ),
@@ -123,6 +125,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 10 );
 	vlayout->setMargin( 10 );
+
 
 	// Midi stuff
 	m_midiGroupBox = new groupBox( tr( "MIDI CONTROLLER" ), this );
@@ -158,6 +161,9 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
+	m_userController = new comboBox( m_userGroupBox, "Controller" );
+	m_userController->setGeometry( 10, 20, 200, 22 );
+
 	m_mappingFunction = new QLineEdit( this );
 	m_mappingFunction->setGeometry( 2, 140, 240, 16 );
 	m_mappingFunction->setText( "input" );
@@ -166,9 +172,6 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	buttons->setGeometry( 2, 160, 240, 32 );
 
 	resize( 256, 196 );
-
-	m_userController = new comboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 20, 200, 22 );
 
 	for( int i = 0; i < engine::getSong()->controllers().size(); ++i )
 	{
@@ -201,6 +204,38 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
+
+	
+	// TODO, handle by making this a model for the Dialog "view"
+	if( _connection && _connection->getController()->type() != 
+			controller::DummyController && engine::getSong() )
+	{
+		if ( _connection->getController()->type() == 
+				controller::MidiController )
+		{
+			m_midiGroupBox->model()->setValue( TRUE );
+			// ensure controller is created
+			midiToggled();
+		
+			midiController * cont = 
+				(midiController*)( _connection->getController() );
+			m_midiChannelSpinBox->model()->setValue(
+					cont->midiChannelModel()->value() );
+			m_midiControllerSpinBox->model()->setValue(
+					cont->midiControllerModel()->value() );
+		}
+		else
+		{
+			int idx = engine::getSong()->controllers().indexOf(
+					_connection->getController() );
+
+			if( idx >= 0 )
+			{
+				m_userGroupBox->model()->setValue( TRUE );
+				m_userController->model()->setValue( idx );
+			}
+		}
+	}
 
 
 	show();

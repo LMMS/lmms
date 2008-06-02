@@ -50,7 +50,8 @@ class controllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	controllerConnectionDialog( QWidget * _parent);
+	controllerConnectionDialog( QWidget * _parent,
+			controllerConnection * _connection = NULL );
 	virtual ~controllerConnectionDialog();
 
 	controller * chosenController( void )

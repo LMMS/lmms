@@ -8,11 +8,13 @@
 	* include/controller.h:
 	* include/midi_controller.h:
 	* include/controller_connection_dialog.h:
+	* src/gui/widgets/knob.cpp:
 	* src/gui/controller_connection_dialog.cpp:
 	* src/core/midi/midi_controller.cpp:
 	* src/core/controller.cpp:
 	* Makefile.am:
 	- Add midi-controller support
+	- Allow editing of connection through context menu
 	- Code clean-up
 
 	* include/midi.h:
