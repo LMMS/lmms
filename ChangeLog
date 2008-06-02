@@ -5,6 +5,22 @@
 	* src/gui/main_window.cpp:
 	Support loading of sf2 files from the sidebar sample browser
 
+	* include/knob.h:
+	* include/automatable_model_view.h:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	* Makefile.am:
+	- move context menu stuff to automatableModelView
+	- add automatableModelViewSlots for slots we may wish to call from AMV
+
+	* include/midi_controller.h:
+	code style
+
+	* src/core/midi/midi_controller.cpp:
+	name midiControllers after their channel/controller
+
+
+
 2008-06-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mixer.cpp:

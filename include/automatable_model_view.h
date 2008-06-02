@@ -81,16 +81,35 @@ public:
 	}
 
 
-
 protected:
 	void addDefaultActions( QMenu * _menu );
-
 
 	QString m_description;
 	QString m_unit;
 
+} ;
+
+
+
+
+class automatableModelViewSlots : public QObject
+{
+	Q_OBJECT
+public:
+	automatableModelViewSlots( 
+			automatableModelView * _amv,
+			QObject * _parent );
+
+public slots:
+	void execConnectionDialog( void );
+	void removeConnection( void );
+
+protected:
+	automatableModelView * amv;
 
 } ;
+
+
 
 
 #define generateTypedModelView(type)					\

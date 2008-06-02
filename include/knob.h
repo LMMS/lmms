@@ -100,7 +100,6 @@ public:
 public slots:
 	virtual void enterValue( void );
 	void connectToMidiDevice( void );
-	void connectToController( void );
 	void displayHelp( void );
 	void friendlyUpdate( void );
 

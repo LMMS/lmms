@@ -54,8 +54,6 @@
 #include "templates.h"
 #include "text_float.h"
 #include "song.h"
-#include "controller_connection_dialog.h"
-#include "controller_connection.h"
 
 
 textFloat * knob::s_textFloat = NULL;
@@ -686,39 +684,6 @@ void knob::connectToMidiDevice( void )
 }
 
 
-void knob::connectToController( void )
-{
-	// TODO[pg]: Display a dialog with list of controllers currently in the song
-	// in addition to any system MIDI controllers
-	
-	controllerConnectionDialog * d = new controllerConnectionDialog( 
-			engine::getMainWindow(), 
-			model()->getControllerConnection() );
-
-	d->exec();
-
-	if (d->chosenController() != NULL )
-	{
-		if( model()->getControllerConnection() )
-		{
-			model()->getControllerConnection()->
-				setController( d->chosenController() );
-		}
-		else
-		{
-			model()->setControllerConnection( 
-					new controllerConnection( d->chosenController() ) );
-		}
-	}
-	else if( model()->getControllerConnection() )
-	{
-		delete model()->getControllerConnection();
-		model()->setControllerConnection( NULL );
-	}
-
-	delete d;
-
-}
 
 
 void knob::friendlyUpdate( void )
@@ -728,6 +693,8 @@ void knob::friendlyUpdate( void )
 		update();
 	}
 }
+
+
 
 
 void knob::doConnections( void )

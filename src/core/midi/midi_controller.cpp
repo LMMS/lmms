@@ -79,6 +79,9 @@ float midiController::value( int _offset )
 void midiController::updateMidiPort( void )
 {
 	m_midiPort->setInputChannel( m_midiChannel.value() - 1 );
+	setName( QString("MIDI ch%1 ctrl%2").
+			arg( m_midiChannel.value() ).
+			arg( m_midiController.value() ) );
 }
 
 
@@ -95,7 +98,7 @@ void midiController::processInEvent( const midiEvent & _me,
 			bytes = _me.m_data.m_bytes;
 			controllerNum = _me.m_data.m_bytes[0] & 0x7F;
 
-			if( m_midiController.value() == controllerNum + 1 && 
+			if( m_midiController.value() == controllerNum + 1 &&
 					( m_midiChannel.value() == _me.m_channel + 1 ||
 					  m_midiChannel.value() == 0 ) )
 			{

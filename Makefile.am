@@ -51,6 +51,7 @@ man1_MANS = lmms.1
 lmms_MOC =						\
 		./about_dialog.moc			\
 		./automatable_model.moc			\
+		./automatable_model_view.moc			\
 		./automatable_button.moc		\
 		./automatable_slider.moc		\
 		./automation_editor.moc			\

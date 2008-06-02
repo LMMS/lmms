@@ -49,6 +49,8 @@ public:
 		return "MIDI Controller";
 	}
 
+
+
 	virtual void processInEvent( const midiEvent & _me,
 					const midiTime & _time,
 					bool _lock = TRUE );
