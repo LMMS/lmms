@@ -95,7 +95,14 @@ void controllerConnection::setController( controller * _controller )
 		delete m_controller;
 	}
 
-    m_controller = _controller;
+	if( !_controller )
+	{
+        m_controller = controller::create( controller::DummyController, NULL );
+	}
+	else
+	{
+		m_controller = _controller;
+	}
     m_controllerId = -1;
 
     if( _controller->type() != controller::DummyController )

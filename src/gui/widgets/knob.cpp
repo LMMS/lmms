@@ -699,8 +699,21 @@ void knob::connectToController( void )
 
 	if (d->chosenController() != NULL )
 	{
-		model()->setControllerConnection( 
-                new controllerConnection( d->chosenController() ) );
+		if( model()->getControllerConnection() )
+		{
+			model()->getControllerConnection()->
+				setController( d->chosenController() );
+		}
+		else
+		{
+			model()->setControllerConnection( 
+					new controllerConnection( d->chosenController() ) );
+		}
+	}
+	else if( model()->getControllerConnection() )
+	{
+		delete model()->getControllerConnection();
+		model()->setControllerConnection( NULL );
 	}
 
 	delete d;

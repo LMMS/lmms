@@ -117,9 +117,12 @@ public:
 	inline void setControllerConnection( controllerConnection * _c )
 	{
 		m_controllerConnection = _c;
-		QObject::connect( m_controllerConnection,
-						SIGNAL( valueChanged() ),
-					this, SIGNAL( dataChanged() ) );
+		if( _c )
+		{
+			QObject::connect( m_controllerConnection,
+							SIGNAL( valueChanged() ),
+						this, SIGNAL( dataChanged() ) );
+		}
 	}
 
 

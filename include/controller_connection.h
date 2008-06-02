@@ -56,7 +56,7 @@ public:
 		return m_controller;
 	}
 
-	inline void setController( controller * _controller );
+	void setController( controller * _controller );
 
 	inline void setController( int _controllerId );
 

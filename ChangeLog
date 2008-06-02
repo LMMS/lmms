@@ -1,5 +1,6 @@
 2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
+	* include/automatable_model.h:
 	* include/controller_connection.h:
 	* src/core/automatable_model.cpp:
 	* src/core/controller_connection.cpp:
