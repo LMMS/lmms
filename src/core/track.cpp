@@ -409,8 +409,8 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 			s_textFloat->setTitle( tr( "Current position" ) );
 			delete m_hint;
 			m_hint = textFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> for free "
-							"positioning." ),
+					tr( "Press <Ctrl> and drag to make "
+							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 		else if( m_autoResize == FALSE )

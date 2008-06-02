@@ -47,14 +47,14 @@ class controller : public model, public journallingObject
 public:
 	enum ControllerTypes
 	{
-        DummyController,
+		DummyController,
 		LfoController,
+		MidiController,
 		/*
-        MidiController,
-        XYController,
+		XYController,
 		PeakController,
 		*/
-        NumControllerTypes
+		NumControllerTypes
 	} ;
 
 	controller( ControllerTypes _type, model * _parent );

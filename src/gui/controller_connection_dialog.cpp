@@ -33,18 +33,88 @@
 
 #include "controller_connection_dialog.h"
 #include "lcd_spinbox.h"
+#include "led_checkbox.h"
 #include "combobox.h"
 #include "group_box.h"
+#include "midi_controller.h"
+#include "midi.h"
 #include "song.h"
 
 #include "gui_templates.h"
 #include "embed.h"
 
+class autoDetectMidiController : public midiController
+{
+public:
+	autoDetectMidiController( model * _parent ) :
+		midiController( _parent ),
+		m_detectedMidiChannel( 0 ),
+		m_detectedMidiController( 0 )
+	{
+		updateMidiPort();
+	}
+
+
+	virtual ~autoDetectMidiController()
+	{
+	}
+
+
+	virtual void processInEvent( const midiEvent & _me,
+					const midiTime & _time, bool _lock )
+	{
+		if( _me.m_type == CONTROL_CHANGE &&
+				( m_midiChannel.value() == _me.m_channel + 1 ||
+				m_midiChannel.value() == 0 ) )
+		{
+			m_detectedMidiChannel = _me.m_channel + 1;
+			m_detectedMidiController = ( _me.m_data.m_bytes[0] & 0x7F ) + 1;
+
+			emit valueChanged();
+		}
+	}
+
+
+	int m_detectedMidiChannel;
+	int m_detectedMidiController;
+
+	// Would be a nice copy ctor, but too hard to add copy ctor because
+	// model has none.
+	midiController * copyToMidiController( model * _parent )
+	{
+		midiController * c = new midiController( _parent );
+		c->midiChannelModel()->setValue( m_midiChannel.value() );
+		c->midiControllerModel()->setValue( m_midiController.value() );
+
+		return c;
+	}
+
+
+	void useDetected( void )
+	{
+		m_midiChannel.setValue( m_detectedMidiChannel );
+		m_midiController.setValue( m_detectedMidiController );
+	}
+
+
+public slots:
+	void reset( void )
+	{
+		m_midiChannel.setValue( 0 );
+		m_midiController.setValue( 0 );
+	}
+
+};
+
+
+
 
 controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	) :
 	QDialog( _parent ),
-	m_controller( NULL )
+	m_controller( NULL ),
+	m_midiController( NULL ),
+	m_midiAutoDetect( FALSE )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Connection Settings" ) );
@@ -54,11 +124,39 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 	vlayout->setSpacing( 10 );
 	vlayout->setMargin( 10 );
 
+	// Midi stuff
 	m_midiGroupBox = new groupBox( tr( "MIDI CONTROLLER" ), this );
 	m_midiGroupBox->setGeometry( 2, 2, 240, 64 );
+	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
+			this, SLOT( midiToggled() ) );
+	
+	m_midiChannelSpinBox = new lcdSpinBox( 2, m_midiGroupBox,
+			tr( "Input channel" ) );
+	m_midiChannelSpinBox->addTextForValue( 0, "--" );
+	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
+	m_midiChannelSpinBox->move( 8, 16 );
 
+	m_midiControllerSpinBox = new lcdSpinBox( 3, m_midiGroupBox,
+			tr( "Input controller" ) );
+	m_midiControllerSpinBox->addTextForValue( 0, "---" );
+	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
+	m_midiControllerSpinBox->move( 72, 16 );
+	
+
+	ledCheckBox * m_midiAutoDetectCheckBox =
+			new ledCheckBox( tr("Auto Detect"),
+				m_midiGroupBox, tr("Auto Detect") );
+	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
+	m_midiAutoDetectCheckBox->move( 136, 20 );
+	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
+			this, SLOT( autoDetectToggled() ) );
+
+
+	// User stuff
 	m_userGroupBox = new groupBox( tr( "USER CONTROLLER" ), this );
 	m_userGroupBox->setGeometry( 2, 70, 240, 64 );
+	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
+			this, SLOT( userToggled() ) );
 
 	m_mappingFunction = new QLineEdit( this );
 	m_mappingFunction->setGeometry( 2, 140, 240, 16 );
@@ -66,7 +164,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 
 	QWidget * buttons = new QWidget( this );
 	buttons->setGeometry( 2, 160, 240, 32 );
-	
+
 	resize( 256, 196 );
 
 	m_userController = new comboBox( m_userGroupBox, "Controller" );
@@ -113,199 +211,104 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 
 controllerConnectionDialog::~controllerConnectionDialog()
 {
+	if( m_midiController )
+		delete m_midiController;
 }
 
 
-/*
-void effectSelectDialog::setSelection( const effectKey & _selection )
-{
-	m_currentSelection = _selection;
-}
-*/
+
 
 void controllerConnectionDialog::selectController( void )
 {
-	if( m_userController->model()->value() >= 0 ) {
-		m_controller = engine::getSong()->controllers().at( 
-				m_userController->model()->value() );
+	if( m_midiGroupBox->model()->value() >= 0 )
+	{
+		m_controller = m_midiController->copyToMidiController(
+				engine::getSong() );
+	}
+	else 
+	{
+		if( m_userController->model()->value() >= 0 )
+		{
+			m_controller = engine::getSong()->controllers().at( 
+					m_userController->model()->value() );
+		}
 	}
 	accept();
 }
 
 
-/*
 
 
-
-effectListWidget::effectListWidget( QWidget * _parent ) :
-	QWidget( _parent ),
-	m_sourceModel(),
-	m_model(),
-	m_descriptionWidget( NULL )
+void controllerConnectionDialog::midiToggled( void )
 {
-	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
-
-	for( QVector<plugin::descriptor>::iterator it =
-						m_pluginDescriptors.begin();
-					it != m_pluginDescriptors.end(); ++it )
+	int enabled = m_midiGroupBox->model()->value();
+	if( enabled != 0 )
 	{
-		if( it->type != plugin::Effect )
+		if( m_userGroupBox->model()->value() != 0 )
 		{
-			continue;
+			m_userGroupBox->model()->setValue( 0 );
 		}
-		if( it->sub_plugin_features )
-		{
-			it->sub_plugin_features->listSubPluginKeys(
-				// as iterators are always stated to be not
-				// equal with pointers, we dereference the
-				// iterator and take the address of the item,
-				// so we're on the safe side and the compiler
-				// likely will reduce that to just "it"
-							&( *it ),
-							m_effectKeys );
-		}
-		else
-		{
-			m_effectKeys << effectKey( &( *it ), it->name );
 
+		if( !m_midiController )
+		{
+			m_midiController = new autoDetectMidiController( engine::getSong() );
+			m_midiChannelSpinBox->setModel( 
+					m_midiController->midiChannelModel() );
+			m_midiControllerSpinBox->setModel( 
+					m_midiController->midiControllerModel() );
+
+			connect( m_midiController, SIGNAL( valueChanged() ), 
+				this, SLOT( midiValueChanged() ) );
 		}
 	}
-
-	QStringList plugin_names;
-	for( effectKeyList::const_iterator it = m_effectKeys.begin();
-						it != m_effectKeys.end(); ++it )
+	else
 	{
-		plugin_names += QString( ( *it ).desc->public_name ) +
-			( ( ( *it ).desc->sub_plugin_features != NULL ) ?
-							": " + ( *it ).name
-						:
-							"" );
+		m_midiAutoDetect.setValue( FALSE );
 	}
 
+	m_midiChannelSpinBox->setEnabled( enabled );
+	m_midiControllerSpinBox->setEnabled( enabled );
+	//m_midiAutoDetect->setEnabled( enabled );
+}
 
-	int row = 0;
-	for( QStringList::iterator it = plugin_names.begin();
-					it != plugin_names.end(); ++it )
+
+
+
+void controllerConnectionDialog::userToggled( void )
+{
+	int enabled = m_userGroupBox->model()->value();
+	if( enabled != 0 && m_midiGroupBox->model()->value() != 0 )
 	{
-		m_sourceModel.setItem( row, 0, new QStandardItem( *it ) );
-		++row;
+		m_midiGroupBox->model()->setValue( 0 );
 	}
 
-	m_model.setSourceModel( &m_sourceModel );
-	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
+	m_userController->setEnabled( enabled );
+}
 
-	m_filterEdit = new QLineEdit( this );
-	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
-		&m_model, SLOT( setFilterRegExp( const QString & ) ) );
 
-	m_pluginList = new QListView( this );
-	m_pluginList->setModel( &m_model );
-	QItemSelectionModel * sm = new QItemSelectionModel( &m_model );
-	m_pluginList->setSelectionModel( sm );
-	m_pluginList->setSelectionBehavior( QAbstractItemView::SelectRows );
-	m_pluginList->setSelectionMode( QAbstractItemView::SingleSelection );
-	m_pluginList->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	connect( sm, SIGNAL( currentRowChanged( const QModelIndex &,
-						const QModelIndex & ) ),
-			SLOT( rowChanged( const QModelIndex &,
-						const QModelIndex & ) ) );	
-	connect( m_pluginList, SIGNAL( doubleClicked( const QModelIndex & ) ),
-			SLOT( onDoubleClicked( const QModelIndex & ) ) );
 
-	QGroupBox * groupbox = new QGroupBox( tr( "Description" ), this );
-	groupbox->setFixedHeight( 200 );
 
-	QVBoxLayout * gbl = new QVBoxLayout( groupbox );
-	gbl->setMargin( 0 );
-	gbl->setSpacing( 10 );
-
-	m_scrollArea = new QScrollArea( groupbox );
-	m_scrollArea->setFrameStyle( 0 );
-
-	gbl->addWidget( m_scrollArea );
-
-	QVBoxLayout * vboxl = new QVBoxLayout( this );
-	vboxl->setMargin( 0 );
-	vboxl->setSpacing( 10 );
-	vboxl->addWidget( m_filterEdit );
-	vboxl->addWidget( m_pluginList );
-	vboxl->addWidget( groupbox );
-
-	if( m_sourceModel.rowCount() > 0 )
+void controllerConnectionDialog::autoDetectToggled( void )
+{
+	if( m_midiAutoDetect.value() )
 	{
-//		m_pluginList->setCurrentRow( 0 );
-		//rowChanged( 0 );
+		m_midiController->reset();
 	}
 }
 
 
 
 
-effectListWidget::~effectListWidget()
+void controllerConnectionDialog::midiValueChanged( void )
 {
-}
-
-
-
-
-void effectListWidget::rowChanged( const QModelIndex & _idx,
-							const QModelIndex & )
-{
-	delete m_descriptionWidget;
-	m_descriptionWidget = NULL;
-
-	m_currentSelection = m_effectKeys[_idx.row()];
-	if( m_currentSelection.desc &&
-				m_currentSelection.desc->sub_plugin_features )
+	if( m_midiAutoDetect.value() )
 	{
-		m_descriptionWidget = new QWidget;
-		QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
-		l->setMargin( 4 );
-		l->setSpacing( 0 );
+		m_midiController->useDetected();
 
-		m_scrollArea->setWidget( m_descriptionWidget );
-
-		m_currentSelection.desc->sub_plugin_features->
-			fillDescriptionWidget( m_descriptionWidget,
-							&m_currentSelection );
-		foreach( QWidget * w,
-				m_descriptionWidget->findChildren<QWidget *>() )
-		{
-			if( w->parent() == m_descriptionWidget )
-			{
-				l->addWidget( w );
-			}
-		}
-		l->setSizeConstraint( QLayout::SetFixedSize );
-		m_descriptionWidget->show();
+		m_midiAutoDetect.setValue( FALSE );
 	}
-	emit( highlighted( m_currentSelection ) );
 }
 
-
-
-void effectListWidget::onDoubleClicked( const QModelIndex & )
-{
-	emit( doubleClicked( m_currentSelection ) );
-}
-
-
-
-
-void effectListWidget::onAddButtonReleased()
-{
-	emit( addPlugin( m_currentSelection ) );
-}
-
-
-
-
-void effectListWidget::resizeEvent( QResizeEvent * )
-{
-	//m_descriptionWidget->setFixedWidth( width() - 40 );
-}
-
-*/
 
 
 #include "controller_connection_dialog.moc"

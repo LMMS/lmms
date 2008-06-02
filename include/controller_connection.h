@@ -1,5 +1,5 @@
 /*
- * controller_connection.h - declaration of a controller connect, which 
+ * controller_connection.h - declaration of a controller connect, which
  *              provides a definition of the link between a controller and
  *              model, also handles deferred creation of links while
  *              loading project
@@ -37,7 +37,7 @@
 #include "mv_base.h"
 #include "journalling_object.h"
 
-class controllerConnection; 
+class controllerConnection;
 
 typedef QVector<controllerConnection *> controllerConnectionVector;
 
@@ -51,26 +51,26 @@ public:
 
 	virtual ~controllerConnection();
 
-    inline controller * getController( void )
-    {
-        return m_controller;
-    }
+	inline controller * getController( void )
+	{
+		return m_controller;
+	}
 
-    inline void setController( controller * _controller );
+	inline void setController( controller * _controller );
 
-    inline void setController( int _controllerId );
+	inline void setController( int _controllerId );
 
-    float currentValue( int _offset )
-    {
-        return m_controller->currentValue( _offset );
-    }
+	float currentValue( int _offset )
+	{
+		return m_controller->currentValue( _offset );
+	}
 
-    inline bool isFinalized( void )
-    {
-        return m_controllerId < 0;
-    }
+	inline bool isFinalized( void )
+	{
+		return m_controllerId < 0;
+	}
 
-    static void finalizeConnections( void );
+	static void finalizeConnections( void );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -80,9 +80,10 @@ protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
 
 	controller * m_controller;
-    int m_controllerId;
+	int m_controllerId;
+	bool m_ownsController;
 
-    static controllerConnectionVector s_connections;
+	static controllerConnectionVector s_connections;
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)

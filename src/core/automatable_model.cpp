@@ -77,6 +77,11 @@ automatableModel::~automatableModel()
 		m_linkedModels.last()->unlinkModel( this );
 		m_linkedModels.erase( m_linkedModels.end() - 1 );
 	}
+
+	if( m_controllerConnection )
+	{
+		delete m_controllerConnection;
+	}
 }
 
 

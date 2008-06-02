@@ -291,6 +291,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
 
+		case CONTROL_CHANGE:
+			// Ignore control changes
+			break;
+
 		default:
 			printf( "instrument-track: unhandled MIDI-event %d\n",
 								_me.m_type );

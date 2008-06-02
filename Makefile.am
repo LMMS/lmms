@@ -102,6 +102,7 @@ lmms_MOC =						\
 		./nstate_button.moc			\
 		./meter_model.moc			\
 		./midi_alsa_seq.moc			\
+		./midi_controller.moc			\
 		./instrument_midi_io.moc		\
 		./pattern.moc				\
 		./piano_roll.moc			\
@@ -230,6 +231,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/midi/midi_alsa_raw.cpp			\
 		$(srcdir)/src/core/midi/midi_alsa_seq.cpp			\
 		$(srcdir)/src/core/midi/midi_client.cpp				\
+		$(srcdir)/src/core/midi/midi_controller.cpp				\
 		$(srcdir)/src/core/midi/midi_mapper.cpp				\
 		$(srcdir)/src/core/midi/midi_oss.cpp				\
 		$(srcdir)/src/core/midi/midi_port.cpp				\
@@ -382,6 +384,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/midi.h					\
 		$(srcdir)/include/midi_alsa_raw.h				\
 		$(srcdir)/include/midi_client.h					\
+		$(srcdir)/include/midi_controller.h					\
 		$(srcdir)/include/midi_event_processor.h			\
 		$(srcdir)/include/midi_oss.h					\
 		$(srcdir)/include/midi_port.h					\

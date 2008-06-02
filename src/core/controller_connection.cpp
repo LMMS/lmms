@@ -41,7 +41,8 @@ controllerConnectionVector controllerConnection::s_connections;
 
 
 controllerConnection::controllerConnection( controller * _controller ) :
-    m_controllerId( -1 )
+    m_controllerId( -1 ),
+	m_ownsController( FALSE )
 {
     if( _controller != NULL )
     {
@@ -58,7 +59,8 @@ controllerConnection::controllerConnection( controller * _controller ) :
 
 controllerConnection::controllerConnection( int _controllerId ) :
 	m_controller( controller::create( controller::DummyController, NULL ) ),
-    m_controllerId( _controllerId )
+    m_controllerId( _controllerId ),
+	m_ownsController( FALSE )
 {
 	s_connections.append( this );
 }
@@ -68,6 +70,10 @@ controllerConnection::controllerConnection( int _controllerId ) :
 controllerConnection::~controllerConnection()
 {
 	s_connections.remove( s_connections.indexOf( this ) );
+	if( m_ownsController )
+	{
+		delete m_controller;
+	}
 }
 	
 
@@ -80,13 +86,22 @@ void controllerConnection::setController( int _controllerId )
 
 void controllerConnection::setController( controller * _controller )
 {
+	if( m_ownsController && m_controller )
+	{
+		delete m_controller;
+	}
+
     m_controller = _controller;
     m_controllerId = -1;
 
-    if( _controller->type() != controller::DummyController ) {
+    if( _controller->type() != controller::DummyController )
+	{
         QObject::connect( _controller, SIGNAL( valueChanged() ),
                 this, SIGNAL( valueChanged() ) );
     }
+
+	m_ownsController = 
+			( _controller->type() == controller::MidiController );
 }
 
 

@@ -245,9 +245,13 @@ void midiClientRaw::parseData( const Uint8 _c )
 		case NOTE_OFF:
 		case NOTE_ON:
 		case KEY_PRESSURE:
-		case CONTROL_CHANGE:
 		case PROGRAM_CHANGE:
 		case CHANNEL_PRESSURE:
+			m_midiParseData.m_midiEvent.m_data.m_param[0] =
+				m_midiParseData.m_buffer[0] - KeysPerOctave;
+			m_midiParseData.m_midiEvent.m_data.m_param[1] =
+						m_midiParseData.m_buffer[1];
+		case CONTROL_CHANGE:
 			m_midiParseData.m_midiEvent.m_data.m_param[0] =
 				m_midiParseData.m_buffer[0] - KeysPerOctave;
 			m_midiParseData.m_midiEvent.m_data.m_param[1] =

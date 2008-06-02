@@ -40,7 +40,9 @@ class QListView;
 class QScrollArea;
 class groupBox;
 class lcdSpinBox;
+class ledCheckBox;
 class comboBox;
+class autoDetectMidiController;
 
 
 
@@ -59,13 +61,19 @@ public:
 public slots:
 //	void setSelection( const effectKey & _selection );
 	void selectController( void );
-	
+	void midiToggled( void );
+	void userToggled( void );
+	void autoDetectToggled( void );
+
+	void midiValueChanged( void );
+
 private:
-//	effectKey m_currentSelection;
-//	
+
 	groupBox * m_midiGroupBox;
-	lcdSpinBox * m_midiChannel;
-	lcdSpinBox * m_midiController;
+	lcdSpinBox * m_midiChannelSpinBox;
+	lcdSpinBox * m_midiControllerSpinBox;
+	ledCheckBox * m_midiAutoDetectCheckBox;
+	boolModel m_midiAutoDetect;
 
 	groupBox * m_userGroupBox;
 	comboBox * m_userController;
@@ -74,53 +82,8 @@ private:
 
 	controller * m_controller;
 
+	// Temporary midiController 
+	autoDetectMidiController * m_midiController;
 } ;
-
-
-/*
-class effectListWidget : public QWidget
-{
-	Q_OBJECT
-public:
-	effectListWidget( QWidget * _parent );
-
-	virtual ~effectListWidget();
-	
-	inline effectKey getSelected( void )
-	{
-		return( m_currentSelection );
-	}
-	
-
-signals:
-	void highlighted( const effectKey & _key );
-	void addPlugin( const effectKey & _key );
-	void doubleClicked( const effectKey & _key );
-	
-
-protected:
-	virtual void resizeEvent( QResizeEvent * );
-
-
-protected slots:
-	void rowChanged( const QModelIndex &, const QModelIndex & );
-	void onAddButtonReleased( void );
-	void onDoubleClicked( const QModelIndex & );
-	
-
-private:
-	QVector<plugin::descriptor> m_pluginDescriptors;
-	effectKeyList m_effectKeys;
-	effectKey m_currentSelection;
-
-	QLineEdit * m_filterEdit;
-	QListView * m_pluginList;
-	QStandardItemModel m_sourceModel;
-	QSortFilterProxyModel m_model;
-	QScrollArea * m_scrollArea;
-	QWidget * m_descriptionWidget;
-
-} ;
-*/
 
 #endif

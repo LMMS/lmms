@@ -1,3 +1,37 @@
+2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* include/controller_connection.h:
+	* src/core/automatable_model.cpp:
+	* src/core/controller_connection.cpp:
+	Support for automatic deletion of controller if owned by connection
+
+	* include/controller.h:
+	* include/midi_controller.h:
+	* include/controller_connection_dialog.h:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/controller.cpp:
+	* Makefile.am:
+
+	- Add midi-controller support
+	- Code clean-up
+
+	* include/midi.h:
+	add const for max controller ID and add bytes array to the midiEvent
+	m_data union
+
+	* src/core/midi/midi_client.cpp:
+	Don't subtract octave from control change events
+
+	* src/tracks/instrument_track.cpp:
+	Ignore unhandled control change events
+
+	* src/tracks/pattern.cpp:
+	Minor pixel adjustment to TCO drawing
+
+	* src/core/track.cpp:
+	Correct misleading textFloat
+
 2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
 	
 	* src/tracks/pattern.cpp:

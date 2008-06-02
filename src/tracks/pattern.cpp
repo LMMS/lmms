@@ -1151,7 +1151,7 @@ void patternView::paintEvent( QPaintEvent * )
 					p.drawLine(
 						x_base + static_cast<int>(
 							ppt * tact_num ) - 1,
-						height() - ( 5 + 2 *
+						height() - ( 4 + 2 *
 							TCO_BORDER_WIDTH ),
 						x_base + static_cast<int>(
 							ppt * tact_num ) - 1,

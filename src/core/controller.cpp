@@ -48,7 +48,7 @@ controller::controller( ControllerTypes _type, model * _parent ) :
 	journallingObject(),
 	m_type( _type )
 {
-	if( _type != DummyController )
+	if( _type != DummyController && _type != MidiController )
 	{
 		s_controllers.append( this );
 		m_name = QString( tr( "Controller %1" ) )
@@ -60,7 +60,11 @@ controller::controller( ControllerTypes _type, model * _parent ) :
 
 controller::~controller()
 {
-	s_controllers.remove( s_controllers.indexOf( this ) );
+	int idx = s_controllers.indexOf( this );
+	if( idx >= 0 )
+	{
+		s_controllers.remove( idx );
+	}
 
 	if( engine::getSong() )
 	{

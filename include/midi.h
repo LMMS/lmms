@@ -79,7 +79,8 @@ enum midiMetaEvents
 } ;
 
 
-const Sint8 MIDI_CHANNEL_COUNT = 16;
+const Uint8 MIDI_CHANNEL_COUNT = 16;
+const Uint8 MIDI_CONTROLLER_COUNT = 128;
 
 
 struct midiEvent
@@ -129,6 +130,7 @@ struct midiEvent
 	union
 	{
 		Uint16 m_param[2];	// first/second parameter (key/velocity)
+		Uint8  m_bytes[4];		// raw bytes
 		Uint32 m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
