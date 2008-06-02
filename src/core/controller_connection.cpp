@@ -57,6 +57,7 @@ controllerConnection::controllerConnection( controller * _controller ) :
 
 
 
+
 controllerConnection::controllerConnection( int _controllerId ) :
 	m_controller( controller::create( controller::DummyController, NULL ) ),
     m_controllerId( _controllerId ),
@@ -64,6 +65,7 @@ controllerConnection::controllerConnection( int _controllerId ) :
 {
 	s_connections.append( this );
 }
+
 
 
 
@@ -75,12 +77,14 @@ controllerConnection::~controllerConnection()
 		delete m_controller;
 	}
 }
-	
+
+
 
 
 void controllerConnection::setController( int _controllerId )
 {
 }
+
 
 
 
@@ -106,6 +110,7 @@ void controllerConnection::setController( controller * _controller )
 
 
 
+
 /*
  * A connection may not be finalized.  This means, the connection should exist,
  * but the controller does not yet exist.  This happens when loading.  Even
@@ -127,30 +132,50 @@ void controllerConnection::finalizeConnections( void )
 
 
 
+
 void controllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
     if( engine::getSong() ) {
-        int id = engine::getSong()->controllers().indexOf( m_controller );
-        _this.setAttribute( "id", id );
+		if( m_ownsController )
+		{
+			m_controller->saveState( _doc, _this );
+		}
+		else
+		{
+			int id = engine::getSong()->controllers().indexOf( m_controller );
+			if(id >= 0 )
+			{
+				_this.setAttribute( "id", id );
+			}
+		}
     }
 }
+
 
 
 
 void controllerConnection::loadSettings( const QDomElement & _this )
 {
-	if( _this.attribute( "id" ).toInt() >= 0 )
+	QDomNode node = _this.firstChild();
+	if( !node.isNull() )
 	{
-        m_controllerId = _this.attribute( "id" ).toInt();
+		setController( controller::create( node.toElement(), engine::getSong() ) );
 	}
-    else
-    {
-		qWarning( "controller index invalid\n" );
-        m_controllerId = -1;
-    }
-    m_controller = controller::create( controller::DummyController, NULL );
-
+	else
+	{
+		if( _this.attribute( "id" ).toInt() >= 0 )
+		{
+			m_controllerId = _this.attribute( "id" ).toInt();
+		}
+		else
+		{
+			qWarning( "controller index invalid\n" );
+			m_controllerId = -1;
+		}
+		m_controller = controller::create( controller::DummyController, NULL );
+	}
 }
+
 
 
 

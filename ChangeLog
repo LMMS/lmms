@@ -12,7 +12,6 @@
 	* src/core/midi/midi_controller.cpp:
 	* src/core/controller.cpp:
 	* Makefile.am:
-
 	- Add midi-controller support
 	- Code clean-up
 

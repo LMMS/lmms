@@ -36,6 +36,7 @@
 #include "controller.h"
 #include "controller_dialog.h"
 #include "lfo_controller.h"
+#include "midi_controller.h"
 
 
 unsigned int controller::s_frames = 0;
@@ -152,6 +153,10 @@ controller * controller::create( ControllerTypes _ct, model * _parent )
 
 		case LfoController: 
 			c = new lfoController( _parent ); 
+			break;
+
+		case MidiController:
+			c = new midiController( _parent );
 			break;
 
 		default: 
