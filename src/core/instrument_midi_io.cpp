@@ -112,7 +112,8 @@ void instrumentMidiIO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_receiveEnabledModel.saveSettings( _doc, _this, "receive" );
 	m_sendEnabledModel.saveSettings( _doc, _this, "send" );
 	m_defaultVelocityInEnabledModel.saveSettings( _doc, _this, "defvelin" );
-	m_defaultVelocityOutEnabledModel.saveSettings( _doc, _this, "defvelout" );
+	m_defaultVelocityOutEnabledModel.saveSettings( _doc, _this,
+								"defvelout" );
 
 	if( m_receiveEnabledModel.value() == TRUE )
 	{
