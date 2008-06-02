@@ -571,8 +571,7 @@ sf2Instrument::subPluginFeatures::subPluginFeatures(
 const QStringList & sf2Instrument::subPluginFeatures::supportedExtensions(
 									void )
 {
-	static QStringList extensions = QStringList()
-				<< "sf2"; 
+	static QStringList extensions = QStringList() << "sf2"; 
 	return( extensions );
 }
 
