@@ -7,6 +7,13 @@
 
 2008-06-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mixer.cpp:
+	try all audio-drivers at startup even if dummy-driver is selected
+
+	* configure.in:
+	* Makefile.am:
+	properly link against win32-libsndfile
+
 	* plugins/patman/patman.cpp:
 	* plugins/patman/Makefile.am:
 	* plugins/ladspa_effect/ladspa_effect.cpp:

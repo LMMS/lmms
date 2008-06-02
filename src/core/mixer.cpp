@@ -899,6 +899,11 @@ audioDevice * mixer::tryAudioDevices( void )
 	audioDevice * dev = NULL;
 	QString dev_name = configManager::inst()->value( "mixer", "audiodev" );
 
+	if( dev_name == audioDummy::name() )
+	{
+		dev_name = "";
+	}
+
 #ifdef ALSA_SUPPORT
 	if( dev_name == audioALSA::name() || dev_name == "" )
 	{
