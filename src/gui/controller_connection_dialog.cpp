@@ -260,12 +260,16 @@ void controllerConnectionDialog::selectController( void )
 {
 	if( m_midiGroupBox->model()->value() > 0 )
 	{
-		m_controller = m_midiController->copyToMidiController(
-				engine::getSong() );
+		if( m_midiControllerSpinBox->model()->value() > 0 )
+		{
+			m_controller = m_midiController->copyToMidiController(
+					engine::getSong() );
+		}
 	}
 	else 
 	{
-		if( m_userGroupBox->model()->value() > 0 )
+		if( m_userGroupBox->model()->value() > 0 && 
+				engine::getSong()->controllers().size() )
 		{
 			m_controller = engine::getSong()->controllers().at( 
 					m_userController->model()->value() );
