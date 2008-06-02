@@ -58,7 +58,7 @@ plugin::descriptor sf2player_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	NULL
+	new sf2Instrument::subPluginFeatures( plugin::Instrument )
 } ;
 
 }
@@ -220,6 +220,18 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
 	updateGain();
+}
+
+
+
+
+void sf2Instrument::setParameter( const QString & _param,
+							const QString & _value )
+{
+	if( _param == "samplefile" )
+	{
+		openFile( _value );
+	}
 }
 
 
@@ -545,6 +557,24 @@ pluginView * sf2Instrument::instantiateView( QWidget * _parent )
 }
 
 
+
+
+sf2Instrument::subPluginFeatures::subPluginFeatures(
+						plugin::PluginTypes _type ) :
+	plugin::descriptor::subPluginFeatures( _type )
+{
+}
+
+
+
+
+const QStringList & sf2Instrument::subPluginFeatures::supportedExtensions(
+									void )
+{
+	static QStringList extensions = QStringList()
+				<< "sf2"; 
+	return( extensions );
+}
 
 
 

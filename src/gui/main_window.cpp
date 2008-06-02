@@ -108,6 +108,10 @@ mainWindow::mainWindow( void ) :
 		sample_filter += " *." + *it;
 	}
 
+#ifdef FLUIDSYNTH_SUPPORT
+	sample_filer += " *.sf2";
+#endif
+
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter ), ++id );

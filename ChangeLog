@@ -1,3 +1,10 @@
+2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* src/gui/main_window.cpp:
+	Support loading of sf2 files from the sidebar sample browser
+
 2008-06-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/patman/patman.cpp:
@@ -120,6 +127,9 @@
 
 	* src/core/track.cpp:
 	Correct misleading textFloat
+
+	* src/core/song.cpp:
+	Code style
 
 2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
 	

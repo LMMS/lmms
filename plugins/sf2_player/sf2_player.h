@@ -48,6 +48,14 @@ class sf2Instrument : public instrument
 {
 	Q_OBJECT
 public:
+	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
+	{
+	public:
+		subPluginFeatures( plugin::PluginTypes _type );
+
+		virtual const QStringList & supportedExtensions( void );
+	} ;
+
 	sf2Instrument( instrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
 
@@ -61,6 +69,9 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
+
+	virtual void setParameter( const QString & _param,
+						const QString & _value );
 
 	virtual QString nodeName( void ) const;
 
