@@ -326,7 +326,11 @@ bool configManager::loadConfigFile( void )
 
 	if( m_ladDir == "" )
 	{
+#ifdef BUILD_WIN32
+		m_ladDir = m_pluginDir + "ladspa/";
+#else
 		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
+#endif
 	}
 
 #ifdef HAVE_STK_H
