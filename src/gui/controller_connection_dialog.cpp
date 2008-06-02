@@ -134,20 +134,20 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent
 			tr( "Input channel" ) );
 	m_midiChannelSpinBox->addTextForValue( 0, "--" );
 	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_midiChannelSpinBox->move( 8, 16 );
+	m_midiChannelSpinBox->move( 8, 24 );
 
 	m_midiControllerSpinBox = new lcdSpinBox( 3, m_midiGroupBox,
 			tr( "Input controller" ) );
 	m_midiControllerSpinBox->addTextForValue( 0, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
-	m_midiControllerSpinBox->move( 72, 16 );
+	m_midiControllerSpinBox->move( 72, 24 );
 	
 
 	ledCheckBox * m_midiAutoDetectCheckBox =
 			new ledCheckBox( tr("Auto Detect"),
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
-	m_midiAutoDetectCheckBox->move( 136, 20 );
+	m_midiAutoDetectCheckBox->move( 136, 30 );
 	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
 			this, SLOT( autoDetectToggled() ) );
 
@@ -220,14 +220,14 @@ controllerConnectionDialog::~controllerConnectionDialog()
 
 void controllerConnectionDialog::selectController( void )
 {
-	if( m_midiGroupBox->model()->value() >= 0 )
+	if( m_midiGroupBox->model()->value() > 0 )
 	{
 		m_controller = m_midiController->copyToMidiController(
 				engine::getSong() );
 	}
 	else 
 	{
-		if( m_userController->model()->value() >= 0 )
+		if( m_userGroupBox->model()->value() > 0 )
 		{
 			m_controller = engine::getSong()->controllers().at( 
 					m_userController->model()->value() );
