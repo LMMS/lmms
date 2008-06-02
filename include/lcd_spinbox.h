@@ -35,7 +35,7 @@
 class QLabel;
 
 
-class lcdSpinBox : public QWidget, public intModelView
+class EXPORT lcdSpinBox : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:

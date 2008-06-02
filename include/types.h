@@ -74,25 +74,4 @@ struct valueRanges
 } ;
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
-#ifdef BUILD_WIN32
-
-#ifdef PLUGIN_NAME
-#define EXPORT __declspec(dllimport)
-#define PLUGIN_EXPORT __declspec(dllexport)
-#else
-#define EXPORT __declspec(dllexport)
-#endif
-
-#else
-
-#define EXPORT
-#define PLUGIN_EXPORT
-
-#endif
-
 #endif

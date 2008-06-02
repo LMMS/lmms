@@ -31,6 +31,7 @@
 #endif
 
 #include "types.h"
+#include "export.h"
 
 #include <QtCore/QVariant>
 #include <QtCore/QVector>

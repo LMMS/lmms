@@ -31,7 +31,7 @@
 #include "plugin_view.h"
 
 
-class tool : public plugin
+class EXPORT tool : public plugin
 {
 public:
 	tool( const descriptor * _descriptor, model * _parent );
@@ -46,7 +46,7 @@ public:
 
 
 
-class toolView : public pluginView
+class EXPORT toolView : public pluginView
 {
 public:
 	toolView( tool * _tool );

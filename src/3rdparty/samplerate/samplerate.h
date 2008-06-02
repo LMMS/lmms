@@ -30,6 +30,8 @@
 #ifndef SAMPLERATE_H
 #define SAMPLERATE_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif	/* __cplusplus */
@@ -73,7 +75,7 @@ typedef long (*src_callback_t) (void *cb_data, float **data) ;
 **	Error returned in *error.
 */
 
-SRC_STATE* src_new (int converter_type, int channels, int *error) ;
+SRC_STATE* EXPORT src_new (int converter_type, int channels, int *error) ;
 
 /*
 **	Initilisation for callback based API : return an anonymous pointer to the
@@ -91,14 +93,14 @@ SRC_STATE* src_callback_new (src_callback_t func, int converter_type, int channe
 **	Always returns NULL.
 */
 
-SRC_STATE* src_delete (SRC_STATE *state) ;
+SRC_STATE* EXPORT src_delete (SRC_STATE *state) ;
 
 /*
 **	Standard processing function.
 **	Returns non zero on error.
 */
 
-int src_process (SRC_STATE *state, SRC_DATA *data) ;
+int EXPORT src_process (SRC_STATE *state, SRC_DATA *data) ;
 
 /*
 **	Callback based processing function. Read up to frames worth of data from
@@ -161,7 +163,7 @@ int src_error (SRC_STATE *state) ;
 /*
 **	Convert the error number into a string.
 */
-const char* src_strerror (int error) ;
+const char* EXPORT src_strerror (int error) ;
 
 /*
 ** The following enums can be used to set the interpolator type

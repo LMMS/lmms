@@ -39,7 +39,7 @@ class track;
 
 
 
-class envelopeAndLFOParameters : public model, public journallingObject
+class EXPORT envelopeAndLFOParameters : public model, public journallingObject
 {
 	Q_OBJECT
 public:

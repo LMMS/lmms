@@ -28,7 +28,7 @@
 
 #include <QtCore/QObject>
 
-#include "types.h"
+#include "export.h"
 
 
 class modelView;

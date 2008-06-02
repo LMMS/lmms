@@ -35,7 +35,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QPair>
 
-#include "types.h"
+#include "export.h"
 
 
 class engine;

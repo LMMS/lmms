@@ -103,7 +103,7 @@ private:
 
 
 
-class bbTrack : public track
+class EXPORT bbTrack : public track
 {
 	Q_OBJECT
 public:

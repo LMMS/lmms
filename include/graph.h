@@ -37,7 +37,7 @@
 class graphModel;
 class track;
 
-class graph : public QWidget, public modelView
+class EXPORT graph : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
@@ -45,9 +45,9 @@ public:
 	virtual ~graph();
 
 	void setForeground( const QPixmap & _pixmap );
-//	void loadSampleFromFile( const QString & _filename );
 
-	virtual inline graphModel * model( void ) {
+	inline graphModel * model( void )
+	{
 		return castModel<graphModel>();
 	}
 
@@ -62,7 +62,7 @@ protected:
 
 protected slots:
 	void updateGraph( Uint32 _startPos, Uint32 _endPos );
-    void updateGraph( void );
+	void updateGraph( void );
 
 private:
 	virtual void modelChanged( void );
@@ -80,7 +80,7 @@ private:
 } ;
 
 
-class graphModel : public model
+class EXPORT graphModel : public model
 {
 	Q_OBJECT
 public:

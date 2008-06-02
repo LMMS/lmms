@@ -28,7 +28,7 @@
 
 #include <qstring.h>
 
-#include "types.h"
+#include "export.h"
 
 class QWidget;
 

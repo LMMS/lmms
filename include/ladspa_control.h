@@ -47,7 +47,7 @@ class track;
 typedef struct portDescription port_desc_t;
 
 
-class ladspaControl : public model, public journallingObject
+class EXPORT ladspaControl : public model, public journallingObject
 {
 	Q_OBJECT
 public:

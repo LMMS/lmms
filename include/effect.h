@@ -45,7 +45,7 @@ class effectControls;
 class track;
 
 
-class effect : public plugin
+class EXPORT effect : public plugin
 {
 public:
 	effect( const plugin::descriptor * _desc,

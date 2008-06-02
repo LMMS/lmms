@@ -30,7 +30,7 @@
 #include <QtCore/QString>
 
 
-#include "types.h"
+#include "export.h"
 
 
 #define STRINGIFY_PLUGIN_NAME(s) STR(s)

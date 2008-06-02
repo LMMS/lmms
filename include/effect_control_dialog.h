@@ -34,7 +34,7 @@
 class effectControls;
 
 
-class effectControlDialog : public QWidget, public modelView
+class EXPORT effectControlDialog : public QWidget, public modelView
 {
 	Q_OBJECT
 public:

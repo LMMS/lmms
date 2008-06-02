@@ -2,7 +2,7 @@
  * import_filter.h - declaration of class importFilter, the base-class for all
  *                   file import filters
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,7 +36,7 @@
 class trackContainer;
 
 
-class importFilter : public plugin
+class EXPORT importFilter : public plugin
 {
 public:
 	importFilter( const QString & _file_name,

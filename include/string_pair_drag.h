@@ -30,7 +30,7 @@
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDropEvent>
 
-#include "types.h"
+#include "export.h"
 
 class QPixmap;
 

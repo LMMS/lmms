@@ -28,6 +28,7 @@
 
 #include <Qt/QtXml>
 
+#include "export.h"
 #include "types.h"
 
 

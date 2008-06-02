@@ -2,7 +2,7 @@
  * ladspa_2_lmms.h - class that identifies and instantiates LADSPA effects
  *                   for use with LMMS
  *
- * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -30,7 +30,7 @@
 #include "ladspa_manager.h"
 
 
-class ladspa2LMMS: public ladspaManager
+class EXPORT ladspa2LMMS: public ladspaManager
 {
 public:
 	

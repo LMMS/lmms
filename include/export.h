@@ -1,7 +1,7 @@
 /*
- * ladspa_control_view.h - widget for controlling a LADSPA port
+ * export.h - macros for export-declarations
  *
- * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,27 +22,29 @@
  *
  */
 
-#ifndef _LADSPA_CONTROL_VIEW_H
-#define _LADSPA_CONTROL_VIEW_H
 
-#include <QtGui/QWidget>
+#ifndef _EXPORT_H
+#define _EXPORT_H
 
-#include "mv_base.h"
-
-
-class ladspaControl;
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 
-class EXPORT ladspaControlView : public QWidget, public modelView
-{
-	Q_OBJECT
-public:
-	ladspaControlView( QWidget * _parent, ladspaControl * _ctl );
-	virtual ~ladspaControlView();
-	
-private:
-	ladspaControl * m_ctl;
+#ifdef BUILD_WIN32
 
-} ;
+#ifdef PLUGIN_NAME
+#define EXPORT __declspec(dllimport)
+#define PLUGIN_EXPORT __declspec(dllexport)
+#else
+#define EXPORT __declspec(dllexport)
+#endif
+
+#else
+
+#define EXPORT
+#define PLUGIN_EXPORT
+
+#endif
 
 #endif

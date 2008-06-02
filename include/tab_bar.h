@@ -1,7 +1,7 @@
 /*
  * tab_bar.h - class tabBar
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,6 +30,8 @@
 #include <config.h>
 #endif
 
+#include "export.h"
+
 #include <QtCore/QMap>
 #include <QtGui/QLayout>
 #include <QtGui/QWidget>
@@ -38,7 +40,7 @@
 class tabButton;
 
 
-class tabBar : public QWidget
+class EXPORT tabBar : public QWidget
 {
 	Q_OBJECT
 public:

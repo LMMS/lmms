@@ -38,7 +38,7 @@ class track;
 
 
 
-class automationPattern : public QObject, public journallingObject
+class EXPORT automationPattern : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:

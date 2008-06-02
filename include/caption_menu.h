@@ -1,7 +1,7 @@
 /*
  * caption_menu.h - context menu with a caption
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,11 +26,12 @@
 #ifndef _CAPTION_MENU_H
 #define _CAPTION_MENU_H
 
-
 #include <QtGui/QMenu>
 
+#include "export.h"
 
-class captionMenu : public QMenu
+
+class EXPORT captionMenu : public QMenu
 {
 	Q_OBJECT
 public:

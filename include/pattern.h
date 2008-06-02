@@ -50,7 +50,7 @@ class sampleBuffer;
 
 
 
-class pattern : public trackContentObject
+class EXPORT pattern : public trackContentObject
 {
 	Q_OBJECT
 public:

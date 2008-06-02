@@ -32,7 +32,7 @@
 
 #include <QtCore/QMap>
 
-#include "types.h"
+#include "export.h"
 
 class automationEditor;
 class bbEditor;
