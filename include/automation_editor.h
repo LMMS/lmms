@@ -2,7 +2,7 @@
  * automation_editor.h - declaration of class automationEditor which is a window
  *                       where you can edit dynamic values in an easy way
  *
- * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,7 +49,7 @@ class automationEditor : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	void FASTCALL setCurrentPattern( automationPattern * _new_pattern );
+	void setCurrentPattern( automationPattern * _new_pattern );
 
 	inline const automationPattern * currentPattern( void ) const
 	{
@@ -64,9 +64,8 @@ public:
 	int quantization( void ) const;
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "automation-editor" );
@@ -90,13 +89,13 @@ protected:
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
 
-	int FASTCALL getLevel( int _y );
+	float getLevel( int _y );
 	static inline void drawValueRect( QPainter & _p, int _x, int _y,
 						int _width, int _height,
 						const bool _is_selected );
 	void removeSelection( void );
 	void selectAll( void );
-	void FASTCALL getSelectedValues( timeMap & _selected_values );
+	void getSelectedValues( timeMap & _selected_values );
 
 
 protected slots:
@@ -187,11 +186,12 @@ private:
 	comboBoxModel m_quantizeModel;
 
 	automationPattern * m_pattern;
-	int m_min_level;
-	int m_max_level;
-	int m_scroll_level;
-	int m_bottom_level;
-	int m_top_level;
+	float m_minLevel;
+	float m_maxLevel;
+	float m_step;
+	float m_scrollLevel;
+	float m_bottomLevel;
+	float m_topLevel;
 
 	void updateTopBottomLevels( void );
 

@@ -79,11 +79,12 @@ automationEditor::automationEditor( void ) :
 	m_zoomingYModel(),
 	m_quantizeModel(),
 	m_pattern( NULL ),
-	m_min_level( 0 ),
-	m_max_level( 0 ),
-	m_scroll_level( 0 ),
-	m_bottom_level( 0 ),
-	m_top_level( 0 ),
+	m_minLevel( 0 ),
+	m_maxLevel( 0 ),
+	m_step( 1 ),
+	m_scrollLevel( 0 ),
+	m_bottomLevel( 0 ),
+	m_topLevel( 0 ),
 	m_currentPosition(),
 	m_action( NONE ),
 	m_moveStartLevel( 0 ),
@@ -384,14 +385,16 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	if( validPattern() == FALSE )
 	{
 		setWindowTitle( tr( "Automation Editor - no pattern" ) );
-		m_min_level = m_max_level = m_scroll_level = 0;
+		m_minLevel = m_maxLevel = m_scrollLevel = 0;
+		m_step = 1;
 		resizeEvent( NULL );
 		return;
 	}
 
-	m_min_level = m_pattern->object()->minValue<float>();
-	m_max_level = m_pattern->object()->maxValue<float>();
-	m_scroll_level = ( m_min_level + m_max_level ) / 2;
+	m_minLevel = m_pattern->object()->minValue<float>();
+	m_maxLevel = m_pattern->object()->maxValue<float>();
+	m_step = m_pattern->object()->step<float>();
+	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
 	timeMap & time_map = m_pattern->getTimeMap();
 	//TODO: This is currently unused
@@ -659,7 +662,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 	if( _me->y() > TOP_MARGIN )
 	{
-		int level = getLevel( _me->y() );
+		float level = getLevel( _me->y() );
 
 		int x = _me->x();
 
@@ -814,7 +817,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 	if( _me->y() > TOP_MARGIN )
 	{
-		int level = getLevel( _me->y() );
+		float level = getLevel( _me->y() );
 		int x = _me->x();
 
 		if( _me->x() <= VALUES_WIDTH )
@@ -1006,15 +1009,15 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			if( m_selectedLevels > 0 )
 			{
 				if( m_selectStartLevel + level_diff
-								< m_min_level )
+								< m_minLevel )
 				{
-					level_diff = m_min_level -
+					level_diff = m_minLevel -
 							m_selectStartLevel;
 				}
 				else if( m_selectStartLevel + m_selectedLevels +
-						level_diff > m_max_level )
+						level_diff > m_maxLevel )
 				{
-					level_diff = m_max_level -
+					level_diff = m_maxLevel -
 							m_selectStartLevel -
 							m_selectedLevels;
 				}
@@ -1022,16 +1025,16 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			else
 			{
 				if( m_selectStartLevel + m_selectedLevels +
-						level_diff < m_min_level )
+						level_diff < m_minLevel )
 				{
-					level_diff = m_min_level -
+					level_diff = m_minLevel -
 							m_selectStartLevel -
 							m_selectedLevels;
 				}
 				else if( m_selectStartLevel + level_diff >
-								m_max_level )
+								m_maxLevel )
 				{
-					level_diff = m_max_level -
+					level_diff = m_maxLevel -
 							m_selectStartLevel;
 				}
 			}
@@ -1117,24 +1120,24 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 							m_selectStartTick );
 			}
 
-			int level = getLevel( _me->y() );
+			float level = getLevel( _me->y() );
 
-			if( level <= m_bottom_level )
+			if( level <= m_bottomLevel )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							height() -
 							SCROLLBAR_SIZE ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
-				level = m_bottom_level;
+				level = m_bottomLevel;
 			}
-			else if( level >= m_top_level )
+			else if( level >= m_topLevel )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							TOP_MARGIN ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
-				level = m_top_level;
+				level = m_topLevel;
 			}
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
@@ -1154,13 +1157,13 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 inline void automationEditor::drawCross( QPainter & _p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
-	int level = getLevel( mouse_pos.y() );
+	float level = getLevel( mouse_pos.y() );
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
-	int cross_y = m_y_auto ?
-		grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( level - m_min_level )
-				/ (float)( m_max_level - m_min_level ) ) :
-		grid_bottom - ( level - m_bottom_level ) * m_y_delta;
+	float cross_y = m_y_auto ?
+		grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+				* ( level - m_minLevel )
+				/ (float)( m_maxLevel - m_minLevel ) ) :
+		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
 	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
 	_p.drawLine( VALUES_WIDTH, cross_y, width(), cross_y );
@@ -1199,7 +1202,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		if( m_y_auto )
 		{
 			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
-			int level[] = { m_min_level, m_max_level };
+			float level[] = { m_minLevel, m_maxLevel };
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_pattern->object()
@@ -1217,7 +1220,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		else
 		{
 			int y = grid_bottom;
-			int level = m_bottom_level;
+			int level = m_bottomLevel;
 			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
 			int module = level % printable;
@@ -1228,7 +1231,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				y -= inv_module * m_y_delta;
 				level += inv_module;
 			}
-			for( ; y >= TOP_MARGIN && level <= m_top_level;
+			for( ; y >= TOP_MARGIN && level <= m_topLevel;
 				y -= printable * m_y_delta, level += printable )
 			{
 				const QString & label = m_pattern->object()
@@ -1257,9 +1260,9 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 
 	if( m_pattern )
 	{
-		int x_line_end = m_y_auto || m_top_level < m_max_level ?
+		int x_line_end = m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
-			grid_bottom - ( m_top_level - m_bottom_level )
+			grid_bottom - ( m_topLevel - m_bottomLevel )
 								* m_y_delta;
 
 		for( int x = VALUES_WIDTH - offset; x < width();
@@ -1304,8 +1307,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		else
 		{
-			for( int y = grid_bottom, level = m_bottom_level;
-					y >= TOP_MARGIN && level <= m_top_level;
+			for( int y = grid_bottom, level = m_bottomLevel;
+					y >= TOP_MARGIN && level <= m_topLevel;
 					y -= m_y_delta, ++level )
 			{
 				if( level % 5 == 0 )
@@ -1335,11 +1338,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int sel_level_start = m_selectStartLevel;
-	int sel_level_end = sel_level_start + m_selectedLevels;
-	if( sel_level_start > sel_level_end )
+	int selLevel_start = m_selectStartLevel;
+	int selLevel_end = selLevel_start + m_selectedLevels;
+	if( selLevel_start > selLevel_end )
 	{
-		qSwap<int>( sel_level_start, sel_level_end );
+		qSwap<int>( selLevel_start, selLevel_end );
 	}
 
 	if( validPattern() == TRUE )
@@ -1351,7 +1354,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			--it;
 			Sint32 len_ticks = 4;
 
-			const int level = it.value();
+			const float level = it.value();
 
 			Sint32 pos_ticks = -it.key();
 
@@ -1384,10 +1387,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			}
 
 			// is the value in visible area?
-			if( ( level >= m_bottom_level && level <= m_top_level )
-				|| ( level > m_top_level && m_top_level >= 0 )
-				|| ( level < m_bottom_level
-						&& m_bottom_level <= 0 ) )
+			if( ( level >= m_bottomLevel && level <= m_topLevel )
+				|| ( level > m_topLevel && m_topLevel >= 0 )
+				|| ( level < m_bottomLevel
+						&& m_bottomLevel <= 0 ) )
 			{
 				bool is_selected = FALSE;
 				// if we're in move-mode, we may only draw
@@ -1402,8 +1405,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 						is_selected = TRUE;
 					}
 				}
-				else if( level >= sel_level_start &&
-					level <= sel_level_end &&
+				else if( level >= selLevel_start &&
+					level <= selLevel_end &&
 					pos_ticks >= sel_pos_start &&
 					pos_ticks + len_ticks <=
 								sel_pos_end )
@@ -1419,18 +1422,18 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				{
 					y_start = grid_bottom
 						- ( grid_bottom - TOP_MARGIN )
-						* ( level - m_min_level )
-						/ ( m_max_level - m_min_level );
+						* ( level - m_minLevel )
+						/ ( m_maxLevel - m_minLevel );
 					int y_end = grid_bottom
 						+ ( grid_bottom - TOP_MARGIN )
-						* m_min_level
-						/ ( m_max_level - m_min_level );
+						* m_minLevel
+						/ ( m_maxLevel - m_minLevel );
 					rect_height = y_end - y_start;
 				}
 				else
 				{
 					y_start = grid_bottom - ( level
-							- m_bottom_level )
+							- m_bottomLevel )
 							* m_y_delta;
 					rect_height = level * m_y_delta;
 				}
@@ -1461,18 +1464,18 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	int y, h;
 	if( m_y_auto )
 	{
-		y = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( sel_level_start - m_min_level )
-				/ (float)( m_max_level - m_min_level ) );
-		h = grid_bottom - (int)roundf( ( grid_bottom - TOP_MARGIN )
-				* ( sel_level_end - m_min_level )
-				/ (float)( m_max_level - m_min_level ) ) - y;
+		y = grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+				* ( selLevel_start - m_minLevel )
+				/ (float)( m_maxLevel - m_minLevel ) );
+		h = grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+				* ( selLevel_end - m_minLevel )
+				/ (float)( m_maxLevel - m_minLevel ) ) - y;
 	}
 	else
 	{
-		y = grid_bottom - ( sel_level_start - m_bottom_level )
+		y = grid_bottom - ( selLevel_start - m_bottomLevel )
 								* m_y_delta;
-		h = ( sel_level_start - sel_level_end ) * m_y_delta;
+		h = ( selLevel_start - selLevel_end ) * m_y_delta;
 	}
 	p.setPen( QColor( 0, 64, 192 ) );
 	p.drawRect( x + VALUES_WIDTH, y, w, h );
@@ -1520,21 +1523,21 @@ void automationEditor::resizeEvent( QResizeEvent * )
 						SCROLLBAR_SIZE, grid_height );
 
 	int half_grid = grid_height / 2;
-	int total_pixels = ( m_max_level - m_min_level ) * m_y_delta + 1;
+	int total_pixels = ( m_maxLevel - m_minLevel ) * m_y_delta + 1;
 	if( !m_y_auto && grid_height < total_pixels )
 	{
-		int min_scroll = m_min_level + (int)floorf( half_grid
+		int min_scroll = m_minLevel + (int)floorf( half_grid
 							/ (float)m_y_delta );
-		int max_scroll = m_max_level - (int)floorf( ( grid_height
+		int max_scroll = m_maxLevel - (int)floorf( ( grid_height
 					- half_grid ) / (float)m_y_delta );
 		m_topBottomScroll->setRange( min_scroll, max_scroll );
 	}
 	else
 	{
-		m_topBottomScroll->setRange( m_scroll_level, m_scroll_level );
+		m_topBottomScroll->setRange( m_scrollLevel, m_scrollLevel );
 	}
 
-	m_topBottomScroll->setValue( m_scroll_level );
+	m_topBottomScroll->setValue( m_scrollLevel );
 
 	if( engine::getSong() )
 	{
@@ -1588,23 +1591,22 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 
 
 
-int automationEditor::getLevel( int _y )
+float automationEditor::getLevel( int _y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	int level = m_bottom_level + (int)roundf( m_y_auto ?
-			( m_max_level - m_min_level ) * ( level_line_y - _y )
+	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
+			( m_maxLevel - m_minLevel ) * ( level_line_y - _y )
 					/ (float)( level_line_y - TOP_MARGIN ) :
-			( level_line_y - _y ) / (float)m_y_delta );
-
+			( level_line_y - _y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
-	if( level < m_bottom_level )
+	if( level < m_bottomLevel )
 	{
-		level = m_bottom_level;
+		level = m_bottomLevel;
 	}
-	else if( level > m_top_level )
+	else if( level > m_topLevel )
 	{
-		level = m_top_level;
+		level = m_topLevel;
 	}
 
 	return( level );
@@ -1730,7 +1732,7 @@ void automationEditor::horScrolled( int _new_pos )
 
 void automationEditor::verScrolled( int _new_pos )
 {
-	m_scroll_level = _new_pos;
+	m_scrollLevel = _new_pos;
 	updateTopBottomLevels();
 	update();
 }
@@ -1834,11 +1836,11 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int sel_level_start = m_selectStartLevel;
-	int sel_level_end = sel_level_start + m_selectedLevels;
-	if( sel_level_start > sel_level_end )
+	int selLevel_start = m_selectStartLevel;
+	int selLevel_end = selLevel_start + m_selectedLevels;
+	if( selLevel_start > selLevel_end )
 	{
-		qSwap<int>( sel_level_start, sel_level_end );
+		qSwap<int>( selLevel_start, selLevel_end );
 	}
 
 	timeMap & time_map = m_pattern->getTimeMap();
@@ -1852,7 +1854,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		int level = it.value();
 		Sint32 pos_ticks = -it.key();
 
-		if( level >= sel_level_start && level <= sel_level_end &&
+		if( level >= selLevel_start && level <= selLevel_end &&
 				pos_ticks >= sel_pos_start &&
 				pos_ticks + len_ticks <= sel_pos_end )
 		{
@@ -2049,43 +2051,43 @@ void automationEditor::updateTopBottomLevels( void )
 {
 	if( m_y_auto )
 	{
-		m_bottom_level = m_min_level;
-		m_top_level = m_max_level;
+		m_bottomLevel = m_minLevel;
+		m_topLevel = m_maxLevel;
 		return;
 	}
 
-	int total_pixels = ( m_max_level - m_min_level ) * m_y_delta + 1;
+	int total_pixels = ( m_maxLevel - m_minLevel ) * m_y_delta + 1;
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 	int half_grid = grid_height / 2;
 
 	if( total_pixels > grid_height )
 	{
-		int central_level = m_min_level + m_max_level - m_scroll_level;
+		int centralLevel = m_minLevel + m_maxLevel - m_scrollLevel;
 
-		m_bottom_level = central_level - (int)roundf( half_grid
+		m_bottomLevel = centralLevel - ( half_grid
 							/ (float)m_y_delta );
-		if( m_bottom_level < m_min_level )
+		if( m_bottomLevel < m_minLevel )
 		{
-			m_bottom_level = m_min_level;
-			m_top_level = m_min_level + (int)floorf( grid_height
+			m_bottomLevel = m_minLevel;
+			m_topLevel = m_minLevel + (int)floorf( grid_height
 							/ (float)m_y_delta );
 		}
 		else
 		{
-			m_top_level = m_bottom_level + (int)floorf( grid_height
+			m_topLevel = m_bottomLevel + (int)floorf( grid_height
 							/ (float)m_y_delta );
-			if( m_top_level > m_max_level )
+			if( m_topLevel > m_maxLevel )
 			{
-				m_top_level = m_max_level;
-				m_bottom_level = m_max_level - (int)floorf(
+				m_topLevel = m_maxLevel;
+				m_bottomLevel = m_maxLevel - (int)floorf(
 					grid_height / (float)m_y_delta );
 			}
 		}
 	}
 	else
 	{
-		m_bottom_level = m_min_level;
-		m_top_level = m_max_level;
+		m_bottomLevel = m_minLevel;
+		m_topLevel = m_maxLevel;
 	}
 }
 
