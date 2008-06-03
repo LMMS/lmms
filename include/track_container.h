@@ -39,6 +39,8 @@ class EXPORT trackContainer : public model, public journallingObject
 {
 	Q_OBJECT
 public:
+	typedef QList<track *> trackList;
+
 	trackContainer( void );
 	virtual ~trackContainer();
 
@@ -63,7 +65,7 @@ public:
 
 	void clearAllTracks( void );
 
-	const QList<track *> & tracks( void ) const
+	const trackList & tracks( void ) const
 	{
 		return( m_tracks );
 	}
@@ -79,11 +81,11 @@ signals:
 
 
 private:
-	QList<track *> m_tracks;
+	trackList m_tracks;
 
 
 	friend class trackContainerView;
-
+	friend class track;
 
 } ;
 

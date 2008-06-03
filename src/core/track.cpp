@@ -1057,14 +1057,14 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	{
 		s_grip = new QPixmap( embed::getIconPixmap(
 							"track_op_grip" ) );
-		s_muteOffDisabled = new QPixmap( embed::getIconPixmap(
+/*		s_muteOffDisabled = new QPixmap( embed::getIconPixmap(
 							"mute_off_disabled" ) );
 		s_muteOffEnabled = new QPixmap( embed::getIconPixmap(
 							"mute_off" ) );
 		s_muteOnDisabled = new QPixmap( embed::getIconPixmap(
 							"mute_on_disabled" ) );
 		s_muteOnEnabled = new QPixmap( embed::getIconPixmap(
-							"mute_on" ) );
+							"mute_on" ) );*/
 	}
 
 	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
@@ -1085,15 +1085,11 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 
 	m_muteBtn = new pixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->setActiveGraphic( *s_muteOffEnabled );
-	m_muteBtn->setInactiveGraphic( *s_muteOnEnabled );
+	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( TRUE );
-	m_muteBtn->move( 44, 4 );
+	m_muteBtn->move( 44, 2 );
 	m_muteBtn->show();
-	connect( m_muteBtn, SIGNAL( toggled( bool ) ), this,
-						SLOT( setMuted( bool ) ) );
-	connect( m_muteBtn, SIGNAL( ctrlClick() ), this,
-					SLOT( toggleSolo() ) );
 	m_muteBtn->setWhatsThis(
 		tr( "With this switch you can either mute this track or mute "
 			"all other tracks.\nBy clicking left, this track is "
@@ -1103,8 +1099,15 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 			"this switch, all other tracks will be "
 			"muted. This is useful, if you only want to listen to "
 			"this track." ) );
-	toolTip::add( m_muteBtn, tr( "left click = mute this track\n"
-			"right click = mute all other tracks (solo)" ) );
+	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
+
+	m_soloBtn = new pixmapButton( this, tr( "Mute" ) );
+	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
+	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
+	m_soloBtn->setCheckable( TRUE );
+	m_soloBtn->move( 44, 18 );
+	m_soloBtn->show();
+	toolTip::add( m_soloBtn, tr( "Solo" ) );
 
 	if( inBBEditor() )
 	{
@@ -1119,14 +1122,6 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 trackOperationsWidget::~trackOperationsWidget()
 {
-}
-
-
-
-
-bool trackOperationsWidget::muted( void ) const
-{
-	return( m_muteBtn->model()->value() );
 }
 
 
@@ -1176,10 +1171,10 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 					m_automationDisabled = TRUE;
 					setObjectName( "automationDisabled" );
 					setStyle( NULL );
-					m_muteBtn->setActiveGraphic(
+/*					m_muteBtn->setActiveGraphic(
 							*s_muteOffEnabled );
 					m_muteBtn->setInactiveGraphic(
-							*s_muteOnEnabled );
+							*s_muteOnEnabled );*/
 				}
 			}
 			else
@@ -1189,10 +1184,10 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 					m_automationDisabled = FALSE;
 					setObjectName( "automationEnabled" );
 					setStyle( NULL );
-					m_muteBtn->setActiveGraphic(
+/*					m_muteBtn->setActiveGraphic(
 							*s_muteOffEnabled );
 					m_muteBtn->setInactiveGraphic(
-							*s_muteOnEnabled );
+							*s_muteOnEnabled );*/
 				}
 			}
 		}
@@ -1226,27 +1221,6 @@ void trackOperationsWidget::removeTrack( void )
 	engine::getMixer()->lock();
 	delete m_trackView->getTrack();
 	engine::getMixer()->unlock();
-}
-
-
-
-
-void trackOperationsWidget::setMuted( bool _muted )
-{
-	m_muteBtn->setChecked( _muted );
-	m_trackView->getTrackContentWidget()->update();
-}
-
-
-
-
-void trackOperationsWidget::toggleSolo( void )
-{
-	const bool m = muted();	// next function might modify our mute-state,
-				// so save it now
-	m_trackView->getTrack()->getTrackContainer()->
-						setMutedOfAllTracks( m );
-	setMuted( !m );
 }
 
 
@@ -1336,10 +1310,12 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_name(),
 	m_pixmapLoader( NULL ),
 	m_mutedModel( FALSE, this ),
+	m_soloModel( FALSE, this ),
 	m_trackContentObjects(),
 	m_automationPatterns()
 {
 	m_mutedModel.setTrack( this );
+	m_soloModel.setTrack( this );
 	m_trackContainer->addTrack( this );
 }
 
@@ -1440,7 +1416,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( "track" );
 	_this.setAttribute( "type", type() );
-	_this.setAttribute( "muted", muted() );
+	_this.setAttribute( "muted", isMuted() );
 // ### TODO
 //	_this.setAttribute( "height", m_trackView->height() );
 
@@ -1709,6 +1685,51 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 
 
+void track::toggleSolo( void )
+{
+	trackContainer::trackList & tl = m_trackContainer->m_tracks;
+
+	bool solo_before = FALSE;
+	for( trackContainer::trackList::iterator it = tl.begin();
+							it != tl.end(); ++it )
+	{
+		if( *it != this )
+		{
+			if( ( *it )->m_soloModel.value() )
+			{
+				solo_before = TRUE;
+				break;
+			}
+		}
+	}
+
+	const bool solo = m_soloModel.value();
+	for( trackContainer::trackList::iterator it = tl.begin();
+							it != tl.end(); ++it )
+	{
+		if( solo )
+		{
+			// save mute-state in case no track was solo before
+			if( !solo_before )
+			{
+				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
+			}
+			( *it )->setMuted( *it == this ? FALSE : TRUE );
+			if( *it != this )
+			{
+				( *it )->m_soloModel.setValue( FALSE );
+			}
+		}
+		else if( !solo_before )
+		{
+			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+		}
+	}
+}
+
+
+
+
 void track::sendMidiTime( const midiTime & _time )
 {
 	for( QList<automationPattern *>::iterator it =
@@ -1770,6 +1791,11 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 			this, SLOT( createTCOView( trackContentObject * ) ),
 			Qt::QueuedConnection );
 
+	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
+			&m_trackContentWidget, SLOT( update() ) );
+
+	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
+			m_track, SLOT( toggleSolo() ) );
 	// create views for already existing TCOs
 	for( track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();
@@ -1777,7 +1803,6 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	{
 		createTCOView( *it );
 	}
-//	setModel( m_track );
 
 	m_trackContainerView->addTrackView( this );
 }
@@ -1832,6 +1857,7 @@ void trackView::modelChanged( void )
 	connect( m_track, SIGNAL( destroyed( QObject * ) ),
 			this, SLOT( close() ), Qt::QueuedConnection );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
+	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	modelView::modelChanged();
 }
 

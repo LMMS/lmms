@@ -95,7 +95,7 @@ public:
 		return( m_length );
 	}
 
-	bool muted( void ) const
+	bool isMuted( void ) const
 	{
 		return( m_mutedModel.value() );
 	}
@@ -290,12 +290,6 @@ public:
 	trackOperationsWidget( trackView * _parent );
 	~trackOperationsWidget();
 
-	bool muted( void ) const;
-
-
-public slots:
-	void setMuted( bool _muted );
-
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
@@ -307,11 +301,14 @@ private slots:
 	void disableAutomation( void );
 	void enableAutomation( void );
 	void removeTrack( void );
-	void toggleSolo( void );
 	void updateMenu( void );
 
 
 private:
+	bbTrack * currentBBTrack( void );
+	bool inBBEditor( void );
+
+
 	static QPixmap * s_grip;
 	static QPixmap * s_muteOffDisabled;
 	static QPixmap * s_muteOffEnabled;
@@ -322,11 +319,10 @@ private:
 
 	QPushButton * m_trackOps;
 	pixmapButton * m_muteBtn;
+	pixmapButton * m_soloBtn;
 
 	bool m_automationDisabled;
 
-	bbTrack * currentBBTrack( void );
-	bool inBBEditor( void );
 
 
 	friend class trackView;
@@ -341,7 +337,7 @@ private:
 class EXPORT track : public model, public journallingObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(bool,muted,setMuted,m_mutedModel);
+	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 public:
 	enum TrackTypes
 	{
@@ -433,6 +429,8 @@ public slots:
 		m_name = _new_name;
 	}
 
+	void toggleSolo( void );
+
 
 protected:
 	void sendMidiTime( const midiTime & _time );
@@ -443,7 +441,11 @@ private:
 	TrackTypes m_type;
 	QString m_name;
 	pixmapLoader * m_pixmapLoader;
+
 	boolModel m_mutedModel;
+	boolModel m_soloModel;
+	bool m_mutedBeforeSolo;
+
 
 	typedef QVector<trackContentObject *> tcoVector;
 	tcoVector m_trackContentObjects;
