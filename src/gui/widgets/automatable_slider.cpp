@@ -64,10 +64,7 @@ automatableSlider::~automatableSlider()
 void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 {
 	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					model()->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
 

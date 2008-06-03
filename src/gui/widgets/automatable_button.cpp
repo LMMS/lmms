@@ -113,10 +113,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	captionMenu contextMenu( target->accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					pattern,
-					SLOT( openInAutomationEditor() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
 

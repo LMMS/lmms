@@ -64,6 +64,8 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 }
 
 
+
+
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
@@ -89,10 +91,14 @@ lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 }
 
 
+
+
 lcdSpinBox::~lcdSpinBox()
 {
 	delete m_lcdPixmap;
 }
+
+
 
 
 void lcdSpinBox::paintEvent( QPaintEvent * _me )
@@ -183,6 +189,8 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 }
 
 
+
+
 void lcdSpinBox::update( void )
 {
 	QString s = m_textForValue[model()->value()];
@@ -203,11 +211,15 @@ void lcdSpinBox::update( void )
 }
 
 
+
+
 void lcdSpinBox::setLabel( const QString & _txt )
 {
 	m_label = _txt;
 	updateSize();
 }
+
+
 
 
 void lcdSpinBox::setEnabled( bool _on )
@@ -216,12 +228,16 @@ void lcdSpinBox::setEnabled( bool _on )
 }
 
 
+
+
 void lcdSpinBox::setMarginWidth( int _width )
 {
 	m_marginWidth = _width;
 
 	updateSize();
 }
+
+
 
 
 void lcdSpinBox::updateSize()
@@ -242,6 +258,8 @@ void lcdSpinBox::updateSize()
 }
 
 
+
+
 void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 {
 	m_origMousePos = _me->globalPos();
@@ -259,12 +277,11 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 	mouseReleaseEvent( NULL );
 
 	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-					model()->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
+	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
+
+
 
 
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
@@ -276,6 +293,8 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 		model()->prepareJournalEntryFromOldVal();
 	}
 }
+
+
 
 
 void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
@@ -294,6 +313,8 @@ void lcdSpinBox::mouseMoveEvent( QMouseEvent * _me )
 }
 
 
+
+
 void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 {
 	model()->addJournalEntryFromOldToCurVal();
@@ -301,6 +322,8 @@ void lcdSpinBox::mouseReleaseEvent( QMouseEvent * _me )
 	QCursor::setPos( m_origMousePos );
 	QApplication::restoreOverrideCursor();
 }
+
+
 
 
 void lcdSpinBox::wheelEvent( QWheelEvent * _we )
