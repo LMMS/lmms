@@ -1227,7 +1227,7 @@ QString sampleBuffer::tryToMakeRelative( const QString & _file )
 
 QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
 {
-	if( _file[0] == '/' )
+	if( QFileInfo( _file ).isAbsolute() )
 	{
 		return( _file );
 	}
