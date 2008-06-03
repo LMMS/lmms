@@ -384,6 +384,7 @@ void mainWindow::finalize( void )
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
+	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
