@@ -1,5 +1,31 @@
 2008-06-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* include/note_play_handle.h:
+	* include/track_container.h:
+	* include/track.h:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/track.cpp:
+	renamed muted() to isMuted() and other coding-style fixes
+
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	use automatableModelView::addDefaultActions()
+
+	* src/gui/widgets/tooltip.cpp:
+	re-enabled tooltips
+
+	* include/track.h:
+	* include/track_container.h:
+	* src/core/track.cpp:
+	* data/themes/default/led_red.png:
+	added fully-functional solo-button
+
 	* include/automation_editor.h:
 	* src/gui/automation_editor.cpp:
 	fixed broken automation-drawing for floatModels

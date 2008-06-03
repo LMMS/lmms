@@ -221,7 +221,7 @@ public:
 
 	bool bbTrackMuted( void )
 	{
-		return( m_bbTrack && m_bbTrack->muted() );
+		return( m_bbTrack && m_bbTrack->isMuted() );
 	}
 	void setBBTrack( bbTrack * _bb_track )
 	{

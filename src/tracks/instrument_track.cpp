@@ -175,7 +175,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 							notePlayHandle * _n )
 {
 	// we must not play the sound if this instrumentTrack is muted...
-	if( muted() || ( _n && _n->bbTrackMuted() ) )
+	if( isMuted() || ( _n && _n->bbTrackMuted() ) )
 	{
 		return;
 	}
@@ -548,7 +548,7 @@ bool FASTCALL instrumentTrack::play( const midiTime & _start,
 	{
 		pattern * p = dynamic_cast<pattern *>( *it );
 		// everything which is not a pattern or muted won't be played
-		if( p == NULL || ( *it )->muted() )
+		if( p == NULL || ( *it )->isMuted() )
 		{
 			continue;
 		}

@@ -338,7 +338,7 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
-	_this.setAttribute( "muted", muted() );
+	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
 	_this.setAttribute( "frozen", m_frozenPattern != NULL );
 
@@ -368,7 +368,7 @@ void pattern::loadSettings( const QDomElement & _this )
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
 	changeLength( midiTime( _this.attribute( "len" ).toInt() ) );
-	if( _this.attribute( "muted" ).toInt() != muted() )
+	if( _this.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
 	}
@@ -932,7 +932,7 @@ void patternView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 
 	bool freeze_separator = FALSE;
-	if( !( m_pat->m_instrumentTrack->muted() || m_pat->muted() ) )
+	if( !( m_pat->m_instrumentTrack->isMuted() || m_pat->isMuted() ) )
 	{
 		_cm->addAction( embed::getIconPixmap( "freeze" ),
 			m_pat->m_frozenPattern ? tr( "Refreeze" ) :
@@ -1195,8 +1195,8 @@ void patternView::paintEvent( QPaintEvent * )
 						height() - 2 *
 							TCO_BORDER_WIDTH );
 				}*/
-				if( m_pat->getTrack()->muted() ||
-								m_pat->muted() )
+				if( m_pat->getTrack()->isMuted() ||
+								m_pat->isMuted() )
 				{
 					p.setPen( QColor( 160, 160, 160 ) );
 				}
@@ -1294,7 +1294,7 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 
 	p.setFont( pointSize<7>( p.font() ) );
-	if( m_pat->muted() || m_pat->getTrack()->muted() )
+	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
 	}
@@ -1308,7 +1308,7 @@ void patternView::paintEvent( QPaintEvent * )
 		p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
 	}
 
-	if( m_pat->muted() )
+	if( m_pat->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
 				embed::getIconPixmap( "muted", 16, 16 ) );

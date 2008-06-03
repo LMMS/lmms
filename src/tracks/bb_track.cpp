@@ -89,7 +89,7 @@ void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
-	_this.setAttribute( "muted", muted() );
+	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "color", m_color );
 }
 
@@ -104,7 +104,7 @@ void bbTCO::loadSettings( const QDomElement & _this )
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
-	if( _this.attribute( "muted" ).toInt() != muted() )
+	if( _this.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
 	}
@@ -180,7 +180,7 @@ void bbTCOView::mouseDoubleClickEvent( QMouseEvent * )
 void bbTCOView::paintEvent( QPaintEvent * )
 {
 	QColor col( m_bbTCO->m_color );
-	if( m_bbTCO->getTrack()->muted() || m_bbTCO->muted() )
+	if( m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted() )
 	{
 		col = QColor( 160, 160, 160 );
 	}
@@ -218,7 +218,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->m_name );
 
-	if( m_bbTCO->muted() )
+	if( m_bbTCO->isMuted() )
 	{
 		p.drawPixmap( 3, p.fontMetrics().height() + 1,
 				embed::getIconPixmap( "muted", 16, 16 ) );
@@ -374,7 +374,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 	for( QList<trackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 	{
-		if( !( *it )->muted() &&
+		if( !( *it )->isMuted() &&
 				( *it )->startPosition() >= lastPosition )
 		{
 			lastPosition = ( *it )->startPosition();

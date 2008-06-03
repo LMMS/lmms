@@ -232,7 +232,6 @@ void nineButtonSelector::button8Clicked( void )
 
 void nineButtonSelector::modelChanged( void )
 {
-	printf("Model Changed %d", model()->value());
 	updateButton( model()->value() );
 }
 

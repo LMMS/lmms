@@ -126,8 +126,8 @@ void samplePlayHandle::play( bool /* _try_parallelizing */,
 	}
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	if( !( m_track && m_track->muted() )
-				&& !( m_bbTrack && m_bbTrack->muted() ) )
+	if( !( m_track && m_track->isMuted() )
+				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
 		stereoVolumeVector v = { { m_volumeModel->value(),
 						m_volumeModel->value() } };

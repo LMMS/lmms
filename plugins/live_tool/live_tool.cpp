@@ -200,7 +200,7 @@ void liveToolView::toggleInstrument( int _n )
 	if( _n < engine::getBBTrackContainer()->tracks().count() )
 	{
 		track * t = engine::getBBTrackContainer()->tracks().at( _n );
-		t->setMuted( !t->muted() );
+		t->setMuted( !t->isMuted() );
 	}
 }
 
