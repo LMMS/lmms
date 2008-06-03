@@ -3,7 +3,7 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,17 +45,21 @@ configManager * configManager::s_instanceOfMe = NULL;
 
 
 configManager::configManager( void ) :
-	m_lmmsRcFile( QDir::home().absolutePath() + "/.lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + "/lmms" ),
+	m_lmmsRcFile( QDir::home().absolutePath() + QDir::separator() +
+								".lmmsrc.xml" ),
+	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
+								"lmms" ),
 	m_dataDir( qApp->applicationDirPath()
-#ifndef BUILD_WIN32
-					.section( '/', 0, -2 )
+#ifdef BUILD_WIN32
+			+ QDir::separator() + "data" + QDir::separator()
+#else
+				.section( '/', 0, -2 ) + "/share/lmms/"
 #endif
-							+ "/share/lmms/" ),
+									),
 	m_artworkDir( defaultArtworkDir() ),
 	m_pluginDir( qApp->applicationDirPath()
 #ifdef BUILD_WIN32
-					+ QDir::separator()
+			+ QDir::separator() + "plugins" + QDir::separator()
 #else
 				.section( '/', 0, -2 ) + "/lib/lmms/"
 #endif
@@ -301,9 +305,9 @@ bool configManager::loadConfigFile( void )
 		{
 			m_artworkDir = defaultArtworkDir();
 		}
-		if( m_artworkDir.right( 1 ) != "/" )
+		if( m_artworkDir.right( 1 ) != QDir::separator() )
 		{
-			m_artworkDir += "/";
+			m_artworkDir += QDir::separator();
 		}
 	}
 	m_workingDir = value( "paths", "workingdir" );
@@ -327,7 +331,7 @@ bool configManager::loadConfigFile( void )
 	if( m_ladDir == "" )
 	{
 #ifdef BUILD_WIN32
-		m_ladDir = m_pluginDir + "ladspa/";
+		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
 		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
 #endif

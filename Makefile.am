@@ -19,6 +19,33 @@ rpm: $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE).spec
 	rpmbuild -ba $(PACKAGE).spec
 endif
 
+if BUILD_WIN32
+win32-pkg: all
+	mkdir -p tmp/lmms/data
+	mkdir -p tmp/lmms/plugins/ladspa/
+	cp lmms.exe tmp/lmms
+	find plugins/ -name "*.dll" -maxdepth 2 -exec cp '{}' tmp/lmms/plugins/ ';'
+	cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
+	PWD=`pwd`
+	cd data && make DESTDIR=$(PWD)/tmp/lmms/ install
+	mv tmp/lmms/usr/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/usr
+	cp /opt/mingw/bin/QtCore4.dll tmp/lmms
+	cp /opt/mingw/bin/QtGui4.dll tmp/lmms
+	cp /opt/mingw/bin/QtXml4.dll tmp/lmms
+	cp /opt/mingw/bin/libz.dll tmp/lmms
+	cp /opt/mingw/bin/libsndfile-1.dll tmp/lmms
+	cp /opt/mingw/bin/libvorbis*.dll tmp/lmms
+	cp /opt/mingw/bin/libogg-0.dll tmp/lmms
+	cp /opt/mingw/bin/libfluidsynth-1.dll tmp/lmms
+	cp /opt/mingw/bin/SDL.dll tmp/lmms
+	cp /opt/mingw/i586-mingw32/bin/mingwm10.dll tmp/lmms
+	cp -L COPYING tmp/lmms/LICENSE.TXT
+	cp -L README tmp/lmms/README.TXT
+	/opt/mingw/bin/i586-mingw32-strip tmp/lmms/lmms.exe
+	mv tmp/lmms tmp/lmms-$(VERSION)
+	cd tmp && zip -r -9 ../$(PACKAGE)-$(VERSION)-bin-win32.zip lmms-$(VERSION)/*
+	rm -rf tmp
+endif
 
 
 SUBDIRS = buildtools data plugins
@@ -493,7 +520,11 @@ LIB_JACK_LDADD = -ljack
 endif
 
 if HAVE_LIBVORBIS
+if BUILD_WIN32
+LIB_VORBIS_LDADD = -lvorbis-0 -lvorbisenc-2 -lvorbisfile-3 -logg-0
+else
 LIB_VORBIS_LDADD = -lvorbis -lvorbisenc -lvorbisfile
+endif
 endif
 
 if USE_3RDPARTY_LIBSRC
@@ -513,18 +544,19 @@ if HAVE_LIBPULSE
 LIB_PA_LDADD = -lpulse
 endif
 
-lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_PA_LDADD)
-
 if BUILD_LINUX
 lmms_LDFLAGS = -rdynamic
 endif
 
 if BUILD_WIN32
 lmms_LDFLAGS = -Wl,-out-implib=liblmms-imp.a
+
+lmms_win_resources.o: lmms.rc
+	$(WINDRES) -o $@ $<
+WIN32_RES_LDADD = lmms_win_resources.o
 endif
 
-single-binary:
-	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -combine -pipe -O2 -g $(INCLUDES) $(AM_CXXFLAGS) $(lmms_LDADD) $(lmms_LDFLAGS) $(lmms_SOURCES) -o lmms-single
+lmms_LDADD = $(QT_LDADD) $(LIB_SDL_LDADD) $(LIB_ASOUND_LDADD) $(LIB_JACK_LDADD) $(LIB_SDL_SOUND_LDADD) $(LIB_VORBIS_LDADD) $(LIB_SRC_LDADD) $(LIB_SF_LDADD) $(LIB_PA_LDADD) $(WIN32_RES_LDADD)
 
 #-rpath $(pkglibdir)
 

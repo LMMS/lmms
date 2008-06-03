@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080601, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080601)
+AC_INIT(lmms, 0.4.0-svn20080603, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080603)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -301,7 +301,7 @@ AC_LANG_POP(C++)
 # check for vorbis-lib
 AC_ARG_WITH(vorbis,
  	AS_HELP_STRING([--without-vorbis],
-		[disable support for exporting song to OGG-files]), ,
+		[disable support for exporting project to OGG-files and loading OGG-samples]), ,
  	[ with_vorbis=yes ])
 AH_TEMPLATE(HAVE_VORBIS_CODEC_H, [Define to 1 if you have the <vorbis/codec.h> header file.])
 AH_TEMPLATE(HAVE_VORBIS_VORBISENC_H, [Define to 1 if you have the <vorbis/vorbisenc.h> header file.])
@@ -311,7 +311,11 @@ if test "x$with_vorbis" = "xyes" ; then
 	AC_CHECK_HEADER(vorbis/codec.h, HAVE_VORBIS_CODEC_H="true",OGG_SUPPORT="")
 	AC_CHECK_HEADER(vorbis/vorbisenc.h, HAVE_VORBIS_VORBISENC_H="true",OGG_SUPPORT="")
 	AC_CHECK_HEADER(vorbis/vorbisfile.h, HAVE_VORBIS_VORBISFILE_H="true",OGG_SUPPORT="")
-	AC_CHECK_LIB([vorbis], [vorbis_analysis], HAVE_LIBVORBIS="true", OGG_SUPPORT="")
+	if [ "$build_win32" = "true" ] ; then
+		AC_CHECK_LIB([vorbis-0], [vorbis_analysis], HAVE_LIBVORBIS="true", OGG_SUPPORT="")
+	else
+		AC_CHECK_LIB([vorbis], [vorbis_analysis], HAVE_LIBVORBIS="true", OGG_SUPPORT="")
+	fi
 fi
 if test ! -z "$OGG_SUPPORT" ; then
 	AC_DEFINE(HAVE_VORBIS_CODEC_H)
@@ -634,6 +638,7 @@ LDFLAGS="$LDFLAGS -L/usr/local/lib"
 CXXFLAGS="$CXXFLAGS -I/usr/local/include"
 
 AC_CONFIG_FILES([Makefile
+		 lmms.rc
 		 buildtools/Makefile
 		 data/Makefile
 		 data/locale/Makefile
