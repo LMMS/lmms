@@ -169,9 +169,19 @@ int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 		case QStyle::PM_ButtonIconSize:
 			return 20;
 
+		case QStyle::PM_ToolBarItemMargin:
+			return 1;
+
+		case QStyle::PM_ToolBarItemSpacing:
+			return 2;
+
+		case QStyle::PM_TitleBarHeight:
+			return 24;
+
 		default:
 			return QPlastiqueStyle::pixelMetric( _metric, _option,
 								_widget );
 	}
 }
 
+// QStyle::SH_TitleBar_NoBorder
