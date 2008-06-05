@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080603, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080603)
+AC_INIT(lmms, 0.4.0-svn20080604, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080604)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -592,7 +592,7 @@ else
 fi
 
 
-AC_MSG_CHECKING([whether to ship caps])
+AC_MSG_CHECKING([whether to ship CAPS])
 AC_ARG_WITH([caps],
 	AS_HELP_STRING([--without-caps],
 		[do not ship C* Audio Plugin Suite]), ,
@@ -603,6 +603,19 @@ else
 	AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(SHIP_CAPS, test "x$with_caps" = "xyes")
+
+
+AC_MSG_CHECKING([whether to ship TAP plugins])
+AC_ARG_WITH([tap],
+	AS_HELP_STRING([--without-tap],
+		[do not ship TAP plugins]), ,
+	[ with_tap=yes ])
+if test "x$with_tap" = "xyes" ; then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(SHIP_TAP, test "x$with_tap" = "xyes")
 
 
 if [ "$build_win32" = "true" ] ; then
@@ -706,6 +719,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/ladspa_browser/Makefile
 		 plugins/ladspa_effect/Makefile
 		 plugins/ladspa_effect/caps/Makefile
+		 plugins/ladspa_effect/tap/Makefile
 		 plugins/lb302/Makefile
 		 plugins/live_tool/Makefile
 		 plugins/midi_import/Makefile

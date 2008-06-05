@@ -4,6 +4,10 @@ if SHIP_CAPS
 SUBDIRS = caps
 endif
 
+if SHIP_TAP
+SUBDIRS = tap
+endif
+
 PLUGIN_NAME = ladspaeffect
 
 

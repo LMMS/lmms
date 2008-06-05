@@ -1,3 +1,42 @@
+2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/track.h:
+	* src/core/track.cpp:
+	re-arranged mute- and solo-buttons
+
+	* plugins/ladspa_effect/tap/tap_deesser.c:
+	* plugins/ladspa_effect/tap/tap_reverb.h:
+	* plugins/ladspa_effect/tap/tap_sigmoid.c:
+	* plugins/ladspa_effect/tap/tap_doubler.c:
+	* plugins/ladspa_effect/tap/tap_eqbw.c:
+	* plugins/ladspa_effect/tap/tap_pinknoise.c:
+	* plugins/ladspa_effect/tap/tap_reverb_presets.h:
+	* plugins/ladspa_effect/tap/tap_chorusflanger.c:
+	* plugins/ladspa_effect/tap/ladspa.h:
+	* plugins/ladspa_effect/tap/tap_limiter.c:
+	* plugins/ladspa_effect/tap/tap_utils.h:
+	* plugins/ladspa_effect/tap/tap_eq.c:
+	* plugins/ladspa_effect/tap/tap_vibrato.c:
+	* plugins/ladspa_effect/tap/tap_autopan.c:
+	* plugins/ladspa_effect/tap/tap_pitch.c:
+	* plugins/ladspa_effect/tap/CREDITS:
+	* plugins/ladspa_effect/tap/README:
+	* plugins/ladspa_effect/tap/tap_dynamics_st.c:
+	* plugins/ladspa_effect/tap/tap_echo.c:
+	* plugins/ladspa_effect/tap/tap_tremolo.c:
+	* plugins/ladspa_effect/tap/tap_dynamics_presets.h:
+	* plugins/ladspa_effect/tap/tap_tubewarmth.c:
+	* plugins/ladspa_effect/tap/COPYING:
+	* plugins/ladspa_effect/tap/tap_dynamics_m.c:
+	* plugins/ladspa_effect/tap/Makefile.am:
+	* plugins/ladspa_effect/tap/tap_reflector.c:
+	* plugins/ladspa_effect/tap/tap_reverb.c:
+	* plugins/ladspa_effect/tap/tap_rotspeak.c:
+	* plugins/ladspa_effect/Makefile.am:
+	* configure.in:
+	* Makefile.am:
+	integrated TAP-plugins to be shipped with LMMS
+
 2008-06-04  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/lmms_style.cpp:

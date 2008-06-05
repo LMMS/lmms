@@ -26,6 +26,7 @@ win32-pkg: all
 	cp lmms.exe tmp/lmms
 	find plugins/ -name "*.dll" -maxdepth 2 -exec cp '{}' tmp/lmms/plugins/ ';'
 	cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
+	cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
 	PWD=`pwd`
 	cd data && make DESTDIR=$(PWD)/tmp/lmms/ install
 	mv tmp/lmms/usr/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/usr
