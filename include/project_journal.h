@@ -1,7 +1,7 @@
 /*
  * project_journal.h - declaration of class projectJournal
  *
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -78,13 +78,7 @@ public:
 	// journalling information about the ID get's lost
 	void forgetAboutID( const jo_id_t _id );
 
-	void clearJournal( void )
-	{
-		m_journalEntries.clear();
-		m_currentJournalEntry = m_journalEntries.end();
-	}
-
-	void clearInvalidJournallingObjects( void );
+	void clearJournal( void );
 
 	journallingObject * getJournallingObject( const jo_id_t _id )
 	{

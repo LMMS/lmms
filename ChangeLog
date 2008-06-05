@@ -1,3 +1,15 @@
+2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/note.h:
+	* include/note_play_handle.h:
+	removed obsolete FASTCALL-attributes
+
+	* include/project_journal.h:
+	* src/core/project_journal.cpp:
+	* src/core/song.cpp:
+	heavily optimized journal-cleanup - project unloading is now
+	unbelievable fast!
+
 2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* data/themes/default/style.css:

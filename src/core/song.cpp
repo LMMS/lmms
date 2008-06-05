@@ -730,7 +730,6 @@ void song::clearProject( void )
 
 	emit dataChanged();
 
-	engine::getProjectJournal()->clearInvalidJournallingObjects();
 	engine::getProjectJournal()->clearJournal();
 
 	engine::getProjectJournal()->setJournalling( TRUE );

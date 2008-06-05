@@ -105,8 +105,7 @@ void projectJournal::journalEntryAdded( const jo_id_t _id )
 
 jo_id_t projectJournal::allocID( journallingObject * _obj )
 {
-	const jo_id_t EO_ID_MAX = 1 << 20;
-
+	const jo_id_t EO_ID_MAX = 1 << 24;
 	jo_id_t id;
 	while( m_joIDs.contains( id = static_cast<jo_id_t>( (float) rand() /
 						RAND_MAX * EO_ID_MAX ) ) )
@@ -151,21 +150,21 @@ void projectJournal::forgetAboutID( const jo_id_t _id )
 
 
 
-void projectJournal::clearInvalidJournallingObjects( void )
+void projectJournal::clearJournal( void )
 {
+	m_journalEntries.clear();
+	m_currentJournalEntry = m_journalEntries.end();
 	for( joIDMap::iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
 		if( it.value() == NULL )
 		{
-			forgetAboutID( it.key() );
-			it = m_joIDs.begin();
+			it = m_joIDs.erase( it );
 		}
 		else
 		{
 			++it;
 		}
 	}
-	//clearJournal();
 }
 
 
