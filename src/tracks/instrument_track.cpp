@@ -200,7 +200,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 				_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
-			panningToVolumeVector( m_panningModel.value(),
+			panningToVolumeVector( (int) m_panningModel.value(),
 								v_scale ),
 							 &m_audioPort );
 }
@@ -926,10 +926,11 @@ void instrumentTrackView::freeInstrumentTrackWindow( void )
 	{
 		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
+			m_window->parentWidget()->hide();
 			m_window->setModel(
 				engine::getDummyTrackContainer()->
 						dummyInstrumentTrack() );
-			m_window->parentWidget()->hide();
+			m_window->updateInstrumentView();
 			s_windows.enqueue( m_window );
 		}
 		else
