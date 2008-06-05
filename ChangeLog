@@ -1,3 +1,8 @@
+2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* data/themes/default/style.css:
+	fix check-marks on menus.  They used to all appear checked no matter what
+
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/track.h:

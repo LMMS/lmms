@@ -51,6 +51,21 @@ QMenu::item:disabled {
 	padding: 4px 32px 4px 20px;
 }
 
+QMenu::indicator {
+	width: 16;
+	height: 16;
+	opacity: 0;
+	background-color: rgb( 192, 192, 192 );
+}
+
+QMenu::indicator:checked {
+	image: url("resources:apply.png");
+}
+
+QMenu::indicator:selected {
+	background-color: rgb(54,57,66);
+}
+
 pianoRoll {
 	background-color: rgb(0, 0, 0);
 }
@@ -134,4 +149,8 @@ organicInstrumentView knob#volKnob {
 	qproperty-centerPointX: 18.5;
 	qproperty-centerPointY: 13.8;
 	qproperty-lineWidth: 3;
+}
+
+QToolButton {
+	padding: 1;
 }
