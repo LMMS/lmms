@@ -327,6 +327,10 @@ private:
 
 	friend class trackView;
 
+
+signals:
+	void trackRemovalScheduled( trackView * _t );
+
 } ;
 
 

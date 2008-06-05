@@ -216,6 +216,19 @@ void trackContainerView::createTrackView( track * _t )
 
 
 
+void trackContainerView::deleteTrackView( trackView * _tv )
+{
+	removeTrackView( _tv );
+	delete _tv;
+
+	engine::getMixer()->lock();
+	delete _tv->getTrack();
+	engine::getMixer()->unlock();
+}
+
+
+
+
 const trackView * trackContainerView::trackViewAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->viewport()->y();

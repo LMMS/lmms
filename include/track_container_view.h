@@ -117,6 +117,7 @@ public:
 public slots:
 	void realignTracks( void );
 	void createTrackView( track * _t );
+	void deleteTrackView( trackView * _tv );
 
 
 protected:

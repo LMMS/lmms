@@ -1115,6 +1115,12 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 				SIGNAL( positionChanged( const midiTime & ) ),
 				this, SLOT( update() ) );
 	}
+
+	connect( this, SIGNAL( trackRemovalScheduled( trackView * ) ),
+			m_trackView->getTrackContainerView(),
+				SLOT( deleteTrackView( trackView * ) ),
+							Qt::QueuedConnection );
+			
 }
 
 
@@ -1216,11 +1222,7 @@ void trackOperationsWidget::cloneTrack( void )
 
 void trackOperationsWidget::removeTrack( void )
 {
-	m_trackView->close();
-	delete m_trackView;
-	engine::getMixer()->lock();
-	delete m_trackView->getTrack();
-	engine::getMixer()->unlock();
+	emit trackRemovalScheduled( m_trackView );
 }
 
 
