@@ -38,10 +38,11 @@
 void automatableModelView::addDefaultActions( QMenu * _menu )
 {
 	automatableModel * _model = modelUntyped();
+	printf( "addDefaultActions for %s\n", qPrintable(_model->displayName()) );
 
 	automatableModelViewSlots * amvSlots = 
 		new automatableModelViewSlots( this, _menu );
-
+	
 	_menu->addAction( embed::getIconPixmap( "reload" ),
 			automatableModel::tr( "&Reset (%1%2)" ).
 				arg( _model->displayValue(
@@ -129,10 +130,12 @@ void automatableModelViewSlots::execConnectionDialog( void )
 {
 	// TODO[pg]: Display a dialog with list of controllers currently in the song
 	// in addition to any system MIDI controllers
-	automatableModel * m = amv->modelUntyped();
-	
+	automatableModel * m = amv->modelUntyped();	
+
+	m->displayName();
 	controllerConnectionDialog * d = new controllerConnectionDialog( 
 			(QWidget*)engine::getMainWindow(), 
+		/*	m->displayName(), */
 			m->getControllerConnection() );
 
 	d->exec();
@@ -149,8 +152,11 @@ void automatableModelViewSlots::execConnectionDialog( void )
 		// New
 		else
 		{
-			m->setControllerConnection( 
-					new controllerConnection( d->chosenController() ) );
+			controllerConnection * cc =
+					new controllerConnection( d->chosenController() );
+			m->setControllerConnection( cc );
+			//cc->setTargetName( m->displayName() );
+			
 		}
 	}
 	// no controller, so delete existing connection

@@ -78,6 +78,9 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	setAcceptDrops( TRUE );
 
 	setAccessibleName( _name );
+	printf("knob's Display name: %s\n", qPrintable(_name));
+	model()->setDisplayName( _name );
+	printf("knob-model's Display name: %s\n", qPrintable( model()->displayName() ));
 	
 	if( m_knobNum != knobStyled ) {
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +

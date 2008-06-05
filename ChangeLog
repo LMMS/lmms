@@ -1,3 +1,11 @@
+2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* include/automatable_model.h:
+	* include/mv_base.h:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	add setDisplayName to model, but doesn't work right for some reason
+
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/note.h:

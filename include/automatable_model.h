@@ -248,11 +248,6 @@ public:
 		return( 0 );
 	}*/
 
-	virtual QString displayName( void ) const
-	{
-		return( QString::null );
-	}
-
 
 public slots:
 	virtual void reset( void );
