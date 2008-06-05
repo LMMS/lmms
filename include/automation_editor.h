@@ -202,13 +202,13 @@ private:
 
 	actions m_action;
 
-	Uint32 m_selectStartTick;
-	int m_selectedTick;
-	int m_selectStartLevel;
-	int m_selectedLevels;
+	tick m_selectStartTick;
+	tick m_selectedTick;
+	float m_selectStartLevel;
+	float m_selectedLevels;
 
-	int m_moveStartLevel;
-	int m_moveStartTick;
+	float m_moveStartLevel;
+	tick m_moveStartTick;
 	int m_moveXOffset;
 
 	int m_ppt;

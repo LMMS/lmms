@@ -41,28 +41,28 @@ class track;
 
 
 // simple way to map a property of a view to a model
-#define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
-		public:						\
-			inline type getfunc( void ) const	\
-			{					\
-				return( modelname->value() );	\
-			}					\
-		public slots:					\
-			inline void setfunc( const type _val )	\
-			{					\
-				modelname->setValue( _val );	\
+#define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)		\
+		public:							\
+			inline type getfunc( void ) const		\
+			{						\
+				return( (type) modelname->value() );	\
+			}						\
+		public slots:						\
+			inline void setfunc( const type _val )		\
+			{						\
+				modelname->setValue( _val );		\
 			}
 
-#define mapPropertyFromModel(type,getfunc,setfunc,modelname)	\
-		public:						\
-			inline type getfunc( void ) const	\
-			{					\
-				return( modelname.value() );	\
-			}					\
-		public slots:					\
-			inline void setfunc( const type _val )	\
-			{					\
-				modelname.setValue( _val );	\
+#define mapPropertyFromModel(type,getfunc,setfunc,modelname)		\
+		public:							\
+			inline type getfunc( void ) const		\
+			{						\
+				return( (type) modelname.value() );	\
+			}						\
+		public slots:						\
+			inline void setfunc( const type _val )		\
+			{						\
+				modelname.setValue( _val );		\
 			}
 
 

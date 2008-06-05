@@ -397,20 +397,6 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
 	timeMap & time_map = m_pattern->getTimeMap();
-	//TODO: This is currently unused
-	int central_key = 0;
-	if( !time_map.isEmpty() )
-	{
-		// determine the central key so that we can scroll to it
-		int total_values = 0;
-		for( timeMap::iterator it = time_map.begin();
-						it != time_map.end(); ++it )
-		{
-			central_key += it.value();
-			++total_values;
-		}
-
-	}
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
 	resizeEvent( NULL );
@@ -1004,7 +990,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 
 			// do vertical move-stuff
-			int level_diff = level - m_moveStartLevel;
+			float level_diff = level - m_moveStartLevel;
 
 			if( m_selectedLevels > 0 )
 			{
@@ -1166,7 +1152,7 @@ inline void automationEditor::drawCross( QPainter & _p )
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
 	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
-	_p.drawLine( VALUES_WIDTH, cross_y, width(), cross_y );
+	_p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );
 }
@@ -1220,7 +1206,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		else
 		{
 			int y = grid_bottom;
-			int level = m_bottomLevel;
+			int level = (int) m_bottomLevel;
 			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
 			int module = level % printable;
@@ -1260,10 +1246,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 
 	if( m_pattern )
 	{
-		int x_line_end = m_y_auto || m_topLevel < m_maxLevel ?
+		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel )
-								* m_y_delta;
+								* m_y_delta );
 
 		for( int x = VALUES_WIDTH - offset; x < width();
 			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
@@ -1307,11 +1293,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		}
 		else
 		{
-			for( int y = grid_bottom, level = m_bottomLevel;
+			for( float y = grid_bottom, level = m_bottomLevel;
 					y >= TOP_MARGIN && level <= m_topLevel;
 					y -= m_y_delta, ++level )
 			{
-				if( level % 5 == 0 )
+				if( (int)level % 5 == 0 )
 				{
 					p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
 				}
@@ -1321,7 +1307,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				}
 
 				// draw level line
-				p.drawLine( VALUES_WIDTH, y, width(), y );
+				p.drawLine( VALUES_WIDTH, (int) y, width(),
+								(int) y );
 			}
 		}
 	}
@@ -1338,11 +1325,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int selLevel_start = m_selectStartLevel;
-	int selLevel_end = selLevel_start + m_selectedLevels;
+	float selLevel_start = m_selectStartLevel;
+	float selLevel_end = selLevel_start + m_selectedLevels;
 	if( selLevel_start > selLevel_end )
 	{
-		qSwap<int>( selLevel_start, selLevel_end );
+		qSwap<float>( selLevel_start, selLevel_end );
 	}
 
 	if( validPattern() == TRUE )
@@ -1420,22 +1407,22 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				int rect_height;
 				if( m_y_auto )
 				{
-					y_start = grid_bottom
+					y_start = (int)( grid_bottom
 						- ( grid_bottom - TOP_MARGIN )
 						* ( level - m_minLevel )
-						/ ( m_maxLevel - m_minLevel );
-					int y_end = grid_bottom
+						/ ( m_maxLevel - m_minLevel ) );
+					int y_end = (int)( grid_bottom
 						+ ( grid_bottom - TOP_MARGIN )
 						* m_minLevel
-						/ ( m_maxLevel - m_minLevel );
+						/ ( m_maxLevel - m_minLevel ) );
 					rect_height = y_end - y_start;
 				}
 				else
 				{
-					y_start = grid_bottom - ( level
+					y_start = (int)( grid_bottom - ( level
 							- m_bottomLevel )
-							* m_y_delta;
-					rect_height = level * m_y_delta;
+							* m_y_delta );
+					rect_height = (int)( level * m_y_delta );
 				}
 				drawValueRect( p, x + VALUES_WIDTH, y_start,
 							rect_width, rect_height,
@@ -1464,18 +1451,18 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	int y, h;
 	if( m_y_auto )
 	{
-		y = grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+		y = (int)( grid_bottom - ( ( grid_bottom - TOP_MARGIN )
 				* ( selLevel_start - m_minLevel )
-				/ (float)( m_maxLevel - m_minLevel ) );
-		h = grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+				/ (float)( m_maxLevel - m_minLevel ) ) );
+		h = (int)( grid_bottom - ( ( grid_bottom - TOP_MARGIN )
 				* ( selLevel_end - m_minLevel )
-				/ (float)( m_maxLevel - m_minLevel ) ) - y;
+				/ (float)( m_maxLevel - m_minLevel ) ) - y );
 	}
 	else
 	{
-		y = grid_bottom - ( selLevel_start - m_bottomLevel )
-								* m_y_delta;
-		h = ( selLevel_start - selLevel_end ) * m_y_delta;
+		y = (int)( grid_bottom - ( selLevel_start - m_bottomLevel )
+								* m_y_delta );
+		h = (int)( ( selLevel_start - selLevel_end ) * m_y_delta );
 	}
 	p.setPen( QColor( 0, 64, 192 ) );
 	p.drawRect( x + VALUES_WIDTH, y, w, h );
@@ -1523,21 +1510,22 @@ void automationEditor::resizeEvent( QResizeEvent * )
 						SCROLLBAR_SIZE, grid_height );
 
 	int half_grid = grid_height / 2;
-	int total_pixels = ( m_maxLevel - m_minLevel ) * m_y_delta + 1;
+	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
 	if( !m_y_auto && grid_height < total_pixels )
 	{
-		int min_scroll = m_minLevel + (int)floorf( half_grid
-							/ (float)m_y_delta );
-		int max_scroll = m_maxLevel - (int)floorf( ( grid_height
-					- half_grid ) / (float)m_y_delta );
+		int min_scroll = (int)( m_minLevel + floorf( half_grid
+							/ (float)m_y_delta ) );
+		int max_scroll = (int)( m_maxLevel - (int)floorf( ( grid_height
+					- half_grid ) / (float)m_y_delta ) );
 		m_topBottomScroll->setRange( min_scroll, max_scroll );
 	}
 	else
 	{
-		m_topBottomScroll->setRange( m_scrollLevel, m_scrollLevel );
+		m_topBottomScroll->setRange( (int) m_scrollLevel,
+							(int) m_scrollLevel );
 	}
 
-	m_topBottomScroll->setValue( m_scrollLevel );
+	m_topBottomScroll->setValue( (int) m_scrollLevel );
 
 	if( engine::getSong() )
 	{
@@ -1801,7 +1789,7 @@ void automationEditor::selectAll( void )
 
 	while( ++it != time_map.end() )
 	{
-		const int level = it.value();
+		const float level = it.value();
 		if( level < m_selectStartLevel )
 		{
 			// if we move start-level down, we have to add 
@@ -1836,11 +1824,11 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		qSwap<int>( sel_pos_start, sel_pos_end );
 	}
 
-	int selLevel_start = m_selectStartLevel;
-	int selLevel_end = selLevel_start + m_selectedLevels;
+	float selLevel_start = m_selectStartLevel;
+	float selLevel_end = selLevel_start + m_selectedLevels;
 	if( selLevel_start > selLevel_end )
 	{
-		qSwap<int>( selLevel_start, selLevel_end );
+		qSwap<float>( selLevel_start, selLevel_end );
 	}
 
 	timeMap & time_map = m_pattern->getTimeMap();
@@ -1849,10 +1837,10 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 									++it )
 	{
 		//TODO: Add constant
-		Sint32 len_ticks = DefaultTicksPerTact / 16;
+		tick len_ticks = DefaultTicksPerTact / 16;
 
-		int level = it.value();
-		Sint32 pos_ticks = -it.key();
+		float level = it.value();
+		tick pos_ticks = -it.key();
 
 		if( level >= selLevel_start && level <= selLevel_end &&
 				pos_ticks >= sel_pos_start &&
@@ -2056,13 +2044,13 @@ void automationEditor::updateTopBottomLevels( void )
 		return;
 	}
 
-	int total_pixels = ( m_maxLevel - m_minLevel ) * m_y_delta + 1;
+	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
 	int half_grid = grid_height / 2;
 
 	if( total_pixels > grid_height )
 	{
-		int centralLevel = m_minLevel + m_maxLevel - m_scrollLevel;
+		int centralLevel = (int)( m_minLevel + m_maxLevel - m_scrollLevel );
 
 		m_bottomLevel = centralLevel - ( half_grid
 							/ (float)m_y_delta );

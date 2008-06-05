@@ -189,7 +189,7 @@ void graph::changeSampleAt(int _x, int _y)
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-4 ) ) + maxVal;
 
-	model()->setSampleAt( _x*xscale, val );
+	model()->setSampleAt( (int)( _x*xscale ), (int) val );
 }
 
 
@@ -215,7 +215,7 @@ void graph::paintEvent( QPaintEvent * )
 
 	QVector<float> * samps = &(model()->m_samples);
 	int length = model()->length();
-	int maxVal = model()->maxValue();
+	const float maxVal = model()->maxValue();
 
 	float xscale = (float)( width()-4 ) / length;
 	float yscale = (float)( height()-4 ) / ( model()->minValue() - maxVal );

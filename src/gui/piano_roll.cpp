@@ -614,9 +614,9 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 		}
 		int pos_x = _x + pos_ticks * m_ppt / midiTime::ticksPerTact();
 
-		const int level = it.value();
+		const float level = it.value();
 
-		int pos_y = middle_y - level * KEY_LINE_HEIGHT / 10;
+		int pos_y = (int)( middle_y - level * KEY_LINE_HEIGHT / 10 );
 
 		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
 		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );

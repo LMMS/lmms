@@ -192,7 +192,8 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	float realPeak_L = m_fPeakValue_L - m_fMinPeak;
 	//int peak_L = 116 - ( realPeak_L / fRange ) * 116.0;
-	int peak_L = 116 - ( realPeak_L / ( m_fMaxPeak - m_fMinPeak ) ) * 116.0;
+	int peak_L = (int)( 116 - ( realPeak_L / ( m_fMaxPeak - m_fMinPeak ) ) *
+									116.0 );
 
 	if ( peak_L > 116 ) {
 		peak_L = 116;
@@ -201,7 +202,8 @@ void fader::paintEvent( QPaintEvent * ev)
 
 
 	float realPeak_R = m_fPeakValue_R - m_fMinPeak;
-	int peak_R = 116 - ( realPeak_R / ( m_fMaxPeak - m_fMinPeak ) ) * 116.0;
+	int peak_R = (int)( 116 - ( realPeak_R / ( m_fMaxPeak - m_fMinPeak ) ) *
+									116.0 );
 	if ( peak_R > 116 ) {
 		peak_R = 116;
 	}

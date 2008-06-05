@@ -1,3 +1,26 @@
+2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/track.h:
+	* include/track_container_view.h:
+	* src/core/track.cpp:
+	* src/gui/track_container_view.cpp:
+	remove track from within slot in trackContainerView for not deleting
+	object inside its own method - fixes Qt-warning
+
+	* src/tracks/instrument_track.cpp:
+	when freeing instrument-window, also free view immediately - fixes
+	crash when removing instrument-track while instrument-track window was
+	open
+
+	* include/automatable_model.h:
+	* include/automation_editor.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/widgets/graph.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/automation_editor.cpp:
+	fixed various GCC-warnings
+
 2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/automatable_model.h:

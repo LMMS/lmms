@@ -284,25 +284,26 @@ void knob::drawKnob( QPainter * _p )
 			gradient.setColorAt(0.4, _p->pen().brush().color() );
 			gradient.setColorAt(1, *m_outerColor );
 
-			_p->setPen( QPen( gradient, lineWidth(), Qt::SolidLine, Qt::RoundCap ) );
+			_p->setPen( QPen( gradient, lineWidth(),
+						Qt::SolidLine, Qt::RoundCap ) );
 		}
 		else {
 			QPen pen = _p->pen();
-			pen.setWidth( lineWidth() );
+			pen.setWidth( (int) lineWidth() );
 			pen.setCapStyle( Qt::RoundCap );
 			
 			_p->setPen( pen );
 		}
 
-		_p->drawLine( calculateLine( centerPoint(), outerRadius(), innerRadius() ) );
+		_p->drawLine( calculateLine( centerPoint(), outerRadius(),
+							innerRadius() ) );
 		return;
 	}
 
 
 	// Old-skool knobs
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
-	mid = QPoint( width() / 2.0,
-	                      m_knobPixmap->height() / 2.0f );
+	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
 
 	_p->drawPixmap( static_cast<int>( 
 				width() / 2 - m_knobPixmap->width() / 2 ), 0,
@@ -691,7 +692,8 @@ void knob::connectToMidiDevice( void )
 
 void knob::friendlyUpdate( void )
 {
-	if( model()->getControllerConnection() == NULL || controller::runningFrames() % (256*4) == 0 )
+	if( model()->getControllerConnection() == NULL ||
+				controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
 	}
@@ -712,6 +714,7 @@ void knob::doConnections( void )
 				this, SLOT( update() ), Qt::QueuedConnection );
 	}
 }
+
 
 
 
