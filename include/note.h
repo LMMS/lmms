@@ -91,17 +91,17 @@ public:
 		int key = DefaultKey,
 		volume _volume = DefaultVolume,
 		panning _panning = DefaultPanning,
-		detuningHelper * _detuning = NULL ) FASTCALL;
+		detuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
 
-	void FASTCALL setLength( const midiTime & _length );
-	void FASTCALL setPos( const midiTime & _pos );
-	void FASTCALL setKey( const int _key );
-	void FASTCALL setVolume( const volume _volume = DefaultVolume );
-	void FASTCALL setPanning( const panning _panning = DefaultPanning );
-	void FASTCALL quantizeLength( const int _q_grid );
-	void FASTCALL quantizePos( const int _q_grid );
+	void setLength( const midiTime & _length );
+	void setPos( const midiTime & _pos );
+	void setKey( const int _key );
+	void setVolume( const volume _volume = DefaultVolume );
+	void setPanning( const panning _panning = DefaultPanning );
+	void quantizeLength( const int _q_grid );
+	void quantizePos( const int _q_grid );
 
 	inline midiTime endPos( void ) const
 	{
@@ -148,8 +148,7 @@ public:
 		return( classNodeName() );
 	}
 
-	static midiTime FASTCALL quantized( const midiTime & _m,
-							const int _q_grid );
+	static midiTime quantized( const midiTime & _m, const int _q_grid );
 
 	detuningHelper * detuning( void ) const
 	{
@@ -162,9 +161,9 @@ public:
 
 
 protected:
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
+	virtual void saveSettings( QDomDocument & _doc,
 							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 	virtual void undoStep( journalEntry & _je );
 	virtual void redoStep( journalEntry & _je );

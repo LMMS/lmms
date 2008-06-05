@@ -132,7 +132,7 @@ public:
 	virtual bool isFromTrack( const track * _track ) const;
 
 
-	void FASTCALL noteOff( const f_cnt_t _s = 0 );
+	void noteOff( const f_cnt_t _s = 0 );
 
 	inline f_cnt_t framesBeforeRelease( void ) const
 	{
@@ -168,7 +168,7 @@ public:
 	}
 
 	// returns volume-level at frame _frame (envelope/LFO)
-	float FASTCALL volumeLevel( const f_cnt_t _frame );
+	float volumeLevel( const f_cnt_t _frame );
 
 	// returns instrument-track this note-play-handle plays
 	inline instrumentTrack * getInstrumentTrack( void )
