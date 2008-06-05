@@ -67,7 +67,7 @@ typedef QWidget trackSettingsWidget;
 
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
-const int TRACK_OP_WIDTH = 70;
+const int TRACK_OP_WIDTH = 78;
 const int TCO_BORDER_WIDTH = 1;
 
 

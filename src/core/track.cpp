@@ -1088,7 +1088,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( TRUE );
-	m_muteBtn->move( 44, 2 );
+	m_muteBtn->move( 46, 8 );
 	m_muteBtn->show();
 	m_muteBtn->setWhatsThis(
 		tr( "With this switch you can either mute this track or mute "
@@ -1105,7 +1105,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( TRUE );
-	m_soloBtn->move( 44, 18 );
+	m_soloBtn->move( 62, 8 );
 	m_soloBtn->show();
 	toolTip::add( m_soloBtn, tr( "Solo" ) );
 
