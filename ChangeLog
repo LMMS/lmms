@@ -37,20 +37,16 @@
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/vibed.cpp:
 	* plugins/audio_file_processor/audio_file_processor.cpp:
 	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
 	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/kicker/kicker.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
 	Update plugins to use displayName for children
-
-
-M      plugins/vibed/vibed.cpp
-M      plugins/triple_oscillator/triple_oscillator.h
-M      plugins/triple_oscillator/triple_oscillator.cpp
-M      data/themes/default/add.png
-M      Makefile.am
-
 	
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
