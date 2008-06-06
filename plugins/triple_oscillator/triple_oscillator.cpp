@@ -87,7 +87,7 @@ oscillatorObject::oscillatorObject( model * _parent, track * _track, int _idx ) 
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
 	m_modulationAlgoModel( oscillator::SignalMix, 0,
 				oscillator::NumModulationAlgos-1, this,
-				tr( "Modulation type " ).arg( _idx+1 ) ),
+				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 
 	m_sampleBuffer( new sampleBuffer ),
 	m_volumeLeft( 0.0f ),

@@ -87,8 +87,9 @@ float lfoController::value( int _offset )
 
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
-		int newDuration = engine::getMixer()->processingSampleRate() /
-							m_lfoSpeedModel.value();
+		int newDuration = static_cast<int>( 
+				engine::getMixer()->processingSampleRate() /
+				m_lfoSpeedModel.value() );
 		
 		m_phaseOffset = m_lfoPhaseModel.value() * newDuration / 360.0;
 
@@ -103,7 +104,7 @@ float lfoController::value( int _offset )
 
 			// where we SHOULD be according to new frequency
 			// (factor*Samples) = Samples
-			int newFrameOffset = phase * newDuration;
+			int newFrameOffset = static_cast<int>( phase * newDuration );
 
 			// recalc
 			// (Samples - (Samples-Samples)) = Samples

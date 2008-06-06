@@ -285,10 +285,10 @@ private:
 	float m_step;
 	float m_range;
 
-	// most objects will need this temporarily
+	// most objects will need this temporarily (until sampleExact is standard)
 	float m_oldValue;
-	bool m_journalEntryReady;
 	QString m_displayName;
+	bool m_journalEntryReady;
 
 	typedef QVector<automatableModel *> autoModelVector;
 	autoModelVector m_linkedModels;

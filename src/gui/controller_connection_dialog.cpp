@@ -118,11 +118,11 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 		const automatableModel * _target_model
 	) :
 	QDialog( _parent ),
-	m_controller( NULL ),
-	m_midiController( NULL ),
 	m_readablePorts( NULL ),
 	m_midiAutoDetect( FALSE ),
+	m_controller( NULL ),
 	m_targetModel( _target_model )
+	m_midiController( NULL ),
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Connection Settings" ) );

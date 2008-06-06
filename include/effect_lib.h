@@ -448,7 +448,7 @@ namespace effectLib
 		// Lou's Hack
 		void setWideCoeff( const float _wideCoeff )
 		{
-			m_wideCoeff = _wideCoeff;
+			m_wideCoeff = static_cast<int>( _wideCoeff );
 		}
 		
 		int getWideCoeff()
