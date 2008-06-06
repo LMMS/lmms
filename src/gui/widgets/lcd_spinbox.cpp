@@ -44,7 +44,7 @@
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 			const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -69,7 +69,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -276,7 +276,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }

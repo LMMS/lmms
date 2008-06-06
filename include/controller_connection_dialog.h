@@ -51,7 +51,7 @@ class controllerConnectionDialog : public QDialog
 	Q_OBJECT
 public:
 	controllerConnectionDialog( QWidget * _parent,
-			controllerConnection * _connection = NULL );
+			const automatableModel * _target_model );
 	virtual ~controllerConnectionDialog();
 
 	controller * chosenController( void )
@@ -66,7 +66,11 @@ public slots:
 	void userToggled( void );
 	void autoDetectToggled( void );
 
+protected slots:
 	void midiValueChanged( void );
+
+	void activatedReadablePort( QAction * _item );
+	void updateReadablePortsMenu( void );
 
 private:
 
@@ -75,6 +79,7 @@ private:
 	lcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
 	boolModel m_midiAutoDetect;
+	QMenu * m_readablePorts;
 
 	groupBox * m_userGroupBox;
 	comboBox * m_userController;
@@ -82,6 +87,7 @@ private:
 	QLineEdit * m_mappingFunction;
 
 	controller * m_controller;
+	const automatableModel * m_targetModel;
 
 	// Temporary midiController 
 	autoDetectMidiController * m_midiController;

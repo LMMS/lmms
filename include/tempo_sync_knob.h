@@ -57,7 +57,8 @@ public:
 
 	tempoSyncKnobModel( const float _val, const float _min,
 				const float _max, const float _step,
-				const float _scale, ::model * _parent );
+				const float _scale, ::model * _parent,
+				const QString & _display_name = QString::null );
 	virtual ~tempoSyncKnobModel();
 
 	virtual void saveSettings( QDomDocument & _doc,
@@ -106,7 +107,7 @@ class tempoSyncKnob : public knob
 	Q_OBJECT
 public:
 	tempoSyncKnob( int _knob_num, QWidget * _parent,
-						const QString & _name );
+						const QString & _name = QString::null );
 	virtual ~tempoSyncKnob();
 
 	const QString & getSyncDescription( void );

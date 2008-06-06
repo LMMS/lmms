@@ -38,6 +38,7 @@
 #include "journalling_object.h"
 
 class controllerConnection;
+class QString;
 
 typedef QVector<controllerConnection *> controllerConnectionVector;
 
@@ -65,6 +66,13 @@ public:
 		return m_controller->currentValue( _offset );
 	}
 
+	inline void setTargetName( const QString & _name );
+
+	inline QString targetName( void ) const
+	{
+		return m_targetName;
+	}
+
 	inline bool isFinalized( void )
 	{
 		return m_controllerId < 0;
@@ -78,9 +86,10 @@ public:
 
 protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
-
 	controller * m_controller;
-	int m_controllerId;
+	QString m_targetName;
+	int m_controllerId;	
+	
 	bool m_ownsController;
 
 	static controllerConnectionVector s_connections;

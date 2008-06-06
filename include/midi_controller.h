@@ -26,6 +26,7 @@
 #define _MIDI_CONTROLLER_H
 
 #include <QtGui/QWidget>
+#include <QtCore/QMap>
 
 #include "mv_base.h"
 #include "automatable_model.h"
@@ -41,6 +42,8 @@ class midiController : public controller, public midiEventProcessor
 {
 	Q_OBJECT
 public:
+	typedef QMap<QString, bool> midiPortMap;
+
 	midiController( model * _parent );
 	virtual ~midiController();
 
@@ -76,10 +79,18 @@ public:
 		return &m_midiController;
 	}
 
+	virtual midiPort * getMidiPort( void )
+	{
+		return m_midiPort;
+	}
+
+	// Used by controllerConnectionDialog to copy
+	virtual void setReadablePorts( const midiPortMap & _map );
 
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
-	void updateMidiPort();
+	void updateMidiPort( void );
+	void updateReadablePorts( void );
 
 protected:
 
@@ -90,9 +101,11 @@ protected:
 	intModel m_midiController;
 
 	midiPort * m_midiPort;
+	midiPortMap m_readablePorts;
 
 	float m_lastValue;
 
+	friend class controllerConnectionDialog;
 };
 
 

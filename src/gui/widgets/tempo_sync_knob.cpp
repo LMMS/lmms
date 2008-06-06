@@ -41,8 +41,9 @@
 
 tempoSyncKnobModel::tempoSyncKnobModel( const float _val, const float _min,
 				const float _max, const float _step,
-				const float _scale, ::model * _parent ) :
-	knobModel( _val, _min, _max, _step, _parent ),
+				const float _scale, ::model * _parent,
+				const QString & _display_name = QString::null ) :
+	knobModel( _val, _min, _max, _step, _parent, _display_name ),
 	m_tempoSyncMode( SyncNone ),
 	m_tempoLastSyncMode( SyncNone ),
 	m_scale( _scale ),

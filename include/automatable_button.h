@@ -38,7 +38,8 @@ class EXPORT automatableButton : public QPushButton, public boolModelView
 {
 	Q_OBJECT
 public:
-	automatableButton( QWidget * _parent, const QString & _name );
+	automatableButton( QWidget * _parent, const QString & _name 
+			= QString::null );
 	virtual ~automatableButton();
 
 	inline void setCheckable( bool _on )
@@ -82,7 +83,8 @@ class EXPORT automatableButtonGroup : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:
-	automatableButtonGroup( QWidget * _parent, const QString & _name );
+	automatableButtonGroup( QWidget * _parent, const QString & _name
+			= QString::null );
 	virtual ~automatableButtonGroup();
 
 	void addButton( automatableButton * _btn );

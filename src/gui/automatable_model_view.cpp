@@ -38,7 +38,6 @@
 void automatableModelView::addDefaultActions( QMenu * _menu )
 {
 	automatableModel * _model = modelUntyped();
-	printf( "addDefaultActions for %s\n", qPrintable(_model->displayName()) );
 
 	automatableModelViewSlots * amvSlots = 
 		new automatableModelViewSlots( this, _menu );
@@ -112,6 +111,15 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 
 
 
+void automatableModelView::setModel( model * _model, bool _old_model_valid )
+{
+	modelView::setModel( _model, _old_model_valid );
+	//setAccessibleName( _model->displayName();
+}
+
+
+
+
 automatableModelViewSlots::automatableModelViewSlots( 
 		automatableModelView * _amv,
 		QObject * _parent ) :
@@ -134,9 +142,7 @@ void automatableModelViewSlots::execConnectionDialog( void )
 
 	m->displayName();
 	controllerConnectionDialog * d = new controllerConnectionDialog( 
-			(QWidget*)engine::getMainWindow(), 
-		/*	m->displayName(), */
-			m->getControllerConnection() );
+			(QWidget*)engine::getMainWindow(), m );
 
 	d->exec();
 

@@ -62,7 +62,7 @@ textFloat * knob::s_textFloat = NULL;
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	floatModelView( new knobModel( 0, 0, 0, 1, NULL, TRUE ) ),
+	floatModelView( new knobModel( 0, 0, 0, 1, NULL, _name, TRUE ) ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
 	m_knobPixmap( NULL ),
@@ -78,9 +78,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	setAcceptDrops( TRUE );
 
 	setAccessibleName( _name );
-	printf("knob's Display name: %s\n", qPrintable(_name));
-	model()->setDisplayName( _name );
-	printf("knob-model's Display name: %s\n", qPrintable( model()->displayName() ));
 	
 	if( m_knobNum != knobStyled ) {
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
@@ -400,7 +397,7 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),

@@ -34,7 +34,7 @@ class EXPORT volumeKnob : public knob
 {
 	Q_OBJECT
 public:
-	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name );
+	volumeKnob( int _knob_num, QWidget * _parent, const QString & _name = QString::null );
 	virtual ~volumeKnob();
 
 

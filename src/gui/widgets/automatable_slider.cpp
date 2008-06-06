@@ -40,7 +40,7 @@
 
 automatableSlider::automatableSlider( QWidget * _parent, const QString & _name ) :
 	QSlider( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
 	m_showStatus( FALSE )
 {
 	setAccessibleName( _name );
@@ -63,7 +63,7 @@ automatableSlider::~automatableSlider()
 
 void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 {
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }

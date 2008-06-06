@@ -117,6 +117,16 @@ void controllerConnection::setController( controller * _controller )
 
 
 
+inline void controllerConnection::setTargetName( const QString & _name )
+{
+	m_targetName = _name;
+	if( m_controller )
+	{
+	//	m_controller->getMidiPort()->setName( _name );
+	}
+}
+
+
 
 /*
  * A connection may not be finalized.  This means, the connection should exist,

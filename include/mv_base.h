@@ -55,21 +55,16 @@ public:
 
 	virtual QString displayName( void ) const
 	{
-		printf("displayName() Returned: %s\n", qPrintable(m_displayName) );
-		return m_displayName;
+		return QString();
 	}
 
 	void setDisplayName( const QString & _displayName )
 	{
-		printf("setDisplayName() 1: %s  ", qPrintable(_displayName));
-		m_displayName = _displayName;
-		printf("setDisplayName() 2: %s\n", qPrintable(m_displayName));
 	}
 
 
 private:
 	bool m_defaultConstructed;
-	QString m_displayName;
 
 signals:
 	// emitted if actual data of the model (e.g. values) have changed

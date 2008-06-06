@@ -1,3 +1,32 @@
+2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* include/knob.h:
+	* include/automatable_slider.h:
+	* include/controller_connection.h:
+	* include/midi_controller.h:
+	* include/automatable_model.h:
+	* include/automatable_button.h:
+	* include/tempo_sync_knob.h:
+	* include/controller_connection_dialog.h:
+	* include/pixmap_button.h:
+	* include/automatable_model_view.h:
+	* include/mv_base.h:
+	* include/volume_knob.h:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/controller_connection.cpp:
+	- add support for sequenced midi in midi-controllers
+	- add displayName field to model / autoModel for descriptive model trees
+	- use displayName for midiController and contextMenus
+	
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/track.h:

@@ -37,7 +37,7 @@ class automatableSlider : public QSlider, public intModelView
 {
 	Q_OBJECT
 public:
-	automatableSlider( QWidget * _parent, const QString & _name );
+	automatableSlider( QWidget * _parent, const QString & _name = QString::null );
 	virtual ~automatableSlider();
 
 	bool showStatus( void )

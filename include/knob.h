@@ -63,7 +63,7 @@ class EXPORT knob : public QWidget, public floatModelView
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
 
 public:
-	knob( int _knob_num, QWidget * _parent, const QString & _name );
+	knob( int _knob_num, QWidget * _parent, const QString & _name = QString::null );
 	virtual ~knob();
 
 	// TODO: remove

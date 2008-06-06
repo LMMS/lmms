@@ -40,7 +40,7 @@
 automatableButton::automatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
-	boolModelView( new boolModel( FALSE, NULL, TRUE ) ),
+	boolModelView( new boolModel( FALSE, NULL, _name, TRUE ) ),
 	m_group( NULL )
 {
 	setAccessibleName( _name );
@@ -100,19 +100,22 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	mouseReleaseEvent( NULL );
 
 	QWidget * target;
+	QString targetName;
 	automationPattern * pattern;
 	if ( m_group != NULL )
 	{
 		target = m_group;
+		targetName = target->accessibleName();
 		pattern = m_group->model()->getAutomationPattern();
 	}
 	else
 	{
 		target = this;
+		targetName = model()->displayName();
 		pattern = model()->getAutomationPattern();
 	}
 
-	captionMenu contextMenu( target->accessibleName() );
+	captionMenu contextMenu( targetName );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -174,7 +177,7 @@ void automatableButton::toggle( void )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, TRUE ) )
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) )
 {
 	hide();
 	setAccessibleName( _name );

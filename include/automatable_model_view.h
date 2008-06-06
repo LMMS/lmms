@@ -55,6 +55,8 @@ public:
 		return( castModel<automatableModel>() );
 	}
 
+	virtual void setModel( model * _model, bool _old_model_valid = TRUE );
+
 	template<typename T>
 	inline T value( void ) const
 	{

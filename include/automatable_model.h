@@ -35,6 +35,7 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 
 class track;
@@ -84,6 +85,7 @@ public:
 				const float _max = 0,
 				const float _step = 0,
 				::model * _parent = NULL,
+				const QString & _display_name = QString::null,
 				bool _default_constructed = FALSE );
 
 	virtual ~automatableModel();
@@ -248,6 +250,17 @@ public:
 		return( 0 );
 	}*/
 
+	virtual QString displayName( void ) const
+	{
+		return m_displayName;
+	}
+
+	virtual void setDisplayName( const QString & _display_name )
+	{
+		m_displayName = _display_name;
+	}
+
+
 
 public slots:
 	virtual void reset( void );
@@ -275,6 +288,7 @@ private:
 	// most objects will need this temporarily
 	float m_oldValue;
 	bool m_journalEntryReady;
+	QString m_displayName;
 
 	typedef QVector<automatableModel *> autoModelVector;
 	autoModelVector m_linkedModels;
@@ -320,9 +334,10 @@ class floatModel : public automatableModel
 public:
 	floatModel( float _val = 0, float _min = 0, float _max = 0,
 			float _step = 0, ::model * _parent = NULL,
+			const QString & _display_name  = QString::null,
 			bool _default_constructed = FALSE ) :
 		automatableModel( Float, _val, _min, _max, _step,
-					_parent, _default_constructed )
+					_parent, _display_name, _default_constructed )
 	{
 	}
 
@@ -336,9 +351,10 @@ class intModel : public automatableModel
 public:
 	intModel( int _val = 0, int _min = 0, int _max = 0,
 			::model * _parent = NULL,
+			const QString & _display_name  = QString::null,
 			bool _default_constructed = FALSE ) :
 		automatableModel( Integer, _val, _min, _max, 1,
-					_parent, _default_constructed )
+					_parent, _display_name, _default_constructed )
 	{
 	}
 
@@ -352,9 +368,10 @@ class boolModel : public automatableModel
 public:
 	boolModel(  const bool _val = FALSE,
 				::model * _parent = NULL,
+				const QString & _display_name  = QString::null,
 				bool _default_constructed = FALSE ) : 
 		automatableModel( Bool, _val, FALSE, TRUE, 1,
-						_parent, _default_constructed )
+						_parent, _display_name, _default_constructed )
 	{
 	}
 

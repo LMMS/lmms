@@ -50,6 +50,7 @@ automatableModel::automatableModel( DataType _type,
 						const float _max,
 						const float _step,
 						::model * _parent,
+						const QString & _display_name,
 						bool _default_constructed ) :
 	model( _parent, _default_constructed ),
 	m_dataType( _type ),
@@ -59,6 +60,7 @@ automatableModel::automatableModel( DataType _type,
 	m_maxValue( _max ),
 	m_step( _step ),
 	m_range( _max - _min ),
+	m_displayName( _display_name ),
 	m_journalEntryReady( FALSE ),
 	m_controllerConnection( NULL ),
 	m_automationPattern( NULL ),
@@ -157,9 +159,9 @@ void automatableModel::loadSettings( const QDomElement & _this,
 		node = node.namedItem( _name );
 		if( node.isElement() )
 		{
-			//m_controllerConnection = new controllerConnection( (controller*)NULL );
 			setControllerConnection( new controllerConnection( (controller*)NULL ) );
 			m_controllerConnection->loadSettings( node.toElement() );
+			//m_controllerConnection->setTargetName( displayName() );
 		}
 	}
 

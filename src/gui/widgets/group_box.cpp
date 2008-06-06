@@ -63,7 +63,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new boolModel( FALSE, NULL, FALSE ) );
+	setModel( new boolModel( FALSE, NULL, _caption, FALSE ) );
 	setAutoFillBackground( TRUE );
 }
 
