@@ -43,6 +43,14 @@
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/kicker/kicker.cpp:
 	Update plugins to use displayName for children
+
+
+M      plugins/vibed/vibed.cpp
+M      plugins/triple_oscillator/triple_oscillator.h
+M      plugins/triple_oscillator/triple_oscillator.cpp
+M      data/themes/default/add.png
+M      Makefile.am
+
 	
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -76,37 +76,43 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 	for( Uint8 harm = 0; harm < 9; harm++ )
 	{
 		knob = new knobModel( DefaultVolume, MinVolume, MaxVolume,
-								1.0f, this );
+				1.0f, this, tr( "String %1 volume" ).arg( harm+1 ) );
 		m_volumeKnobs.append( knob );
 
-		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this );
+		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this, 
+				tr( "String %1 stiffness" ).arg( harm+1 ) );
 		m_stiffnessKnobs.append( knob );
 
-		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.001f, this );
-		m_stiffnessKnobs.append( knob );
-
-		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.005f, this );
+		knob = new knobModel( 0.0f, 0.0f, 0.05f, 0.005f, this, 
+				tr( "Pick %1 position" ).arg( harm+1 )  );
 		m_pickKnobs.append( knob );
 
-		knob = new knobModel( 0.05f, 0.0f, 0.05f, 0.005f, this );
+		knob = new knobModel( 0.05f, 0.0f, 0.05f, 0.005f, this, 
+				tr( "Pickup %1 position" ).arg( harm+1 ) );
 		m_pickupKnobs.append( knob );
 
-		knob = new knobModel( 0.0f, -1.0f, 1.0f, 0.01f, this );
+		knob = new knobModel( 0.0f, -1.0f, 1.0f, 0.01f, this,
+				tr( "Pan %1" ).arg( harm+1 )  );
 		m_panKnobs.append( knob );
 
-		knob = new knobModel( 0.0f, -0.1f, 0.1f, 0.001f, this );
+		knob = new knobModel( 0.0f, -0.1f, 0.1f, 0.001f, this,
+				tr( "Detune %1" ).arg( harm+1 ) );
 		m_detuneKnobs.append( knob );
 
-		knob = new knobModel( 0.0f, 0.0f, 0.75f, 0.01f, this );
+		knob = new knobModel( 0.0f, 0.0f, 0.75f, 0.01f, this,
+				tr( "Fuzziness %1 " ).arg( harm+1 ) );
 		m_randomKnobs.append( knob );
 
-		knob = new knobModel( 1, 1, 16, 1, this );
+		knob = new knobModel( 1, 1, 16, 1, this,
+				tr( "Length %1" ).arg( harm+1 ) );
 		m_lengthKnobs.append( knob );
 
-		led = new boolModel( FALSE, this );
+		led = new boolModel( FALSE, this,
+				tr( "Impulse %1" ).arg( harm+1 ) );
 		m_impulses.append( led );
 
-		led = new boolModel( harm==0, this );
+		led = new boolModel( harm==0, this,
+				tr( "Octave %1" ).arg( harm+1 )  );
 		m_powerButtons.append( led );
 
 		harmonic = new nineButtonSelectorModel( 2, 0, 8, this );
@@ -356,14 +362,13 @@ vibedView::vibedView( instrument * _instrument,
 			"artwork" ) );
 	setPalette( pal );
 	
-	m_volumeKnob = new volumeKnob( knobBright_26, this, tr( "Volume" ) );
+	m_volumeKnob = new volumeKnob( knobBright_26, this );
 	m_volumeKnob->move( 103, 142 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
 	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
 					"of the selected string." ) );
 
-	m_stiffnessKnob = new knob( knobBright_26, this, 
-					tr( "String stiffness" ) );
+	m_stiffnessKnob = new knob( knobBright_26, this );
 	m_stiffnessKnob->move( 129, 142 );
 	m_stiffnessKnob->setHintText( tr( "String stiffness:" ) + 
 					" ", "" );
@@ -373,16 +378,14 @@ vibedView::vibedView( instrument * _instrument,
 "the setting, the longer the string will ring." ) );
 	
 	
-	m_pickKnob = new knob( knobBright_26, this, 
-						tr( "Pick position" ) );
+	m_pickKnob = new knob( knobBright_26, this );
 	m_pickKnob->move( 153, 142 );
 	m_pickKnob->setHintText( tr( "Pick position:" ) + " ", "" );
 	m_pickKnob->setWhatsThis( tr( 
 "The 'P' knob sets the position where the selected string will be 'picked'.  "
 "The lower the setting the closer the pick is to the bridge." ) );
 
-	m_pickupKnob = new knob( knobBright_26, this, 
-						tr( "Pickup position" ) );
+	m_pickupKnob = new knob( knobBright_26, this );
 	m_pickupKnob->move( 177, 142 );
 	m_pickupKnob->setHintText( tr( "Pickup position:" ) + 
 				" ", "" );
@@ -391,14 +394,14 @@ vibedView::vibedView( instrument * _instrument,
 "for the selected string.  The lower the setting, the closer the "
 "pickup is to the bridge." ) );
 
-	m_panKnob = new knob( knobBright_26, this, tr( "Pan" ) );
+	m_panKnob = new knob( knobBright_26, this );
 	m_panKnob->move( 105, 187 );
 	m_panKnob->setHintText( tr( "Pan:" ) + " ", "" );
 	m_panKnob->setWhatsThis( tr( 
 "The Pan knob determines the location of the selected string in the stereo "
 "field." ) );
 	
-	m_detuneKnob = new knob( knobBright_26, this, tr( "Detune" ) );
+	m_detuneKnob = new knob( knobBright_26, this );
 	m_detuneKnob->move( 150, 187 );
 	m_detuneKnob->setHintText( tr( "Detune:" ) + " ", "" );
 	m_detuneKnob->setWhatsThis( tr( 
@@ -406,7 +409,7 @@ vibedView::vibedView( instrument * _instrument,
 "than zero will cause the string to sound flat.  Settings greater than zero "
 "will cause the string to sound sharp." ) );
 
-	m_randomKnob = new knob( knobBright_26, this, tr( "Fuzziness" ) );
+	m_randomKnob = new knob( knobBright_26, this );
 	m_randomKnob->move( 194, 187 );
 	m_randomKnob->setHintText( tr( "Fuzziness:" ) + 
 				" ", "" );
@@ -415,7 +418,7 @@ vibedView::vibedView( instrument * _instrument,
 "apparent during the attack, though it can also be used to make the string "
 "sound more 'metallic'.") );
 
-	m_lengthKnob = new knob( knobBright_26, this, tr( "Length" ) );
+	m_lengthKnob = new knob( knobBright_26, this );
 	m_lengthKnob->move( 23, 193 );
 	m_lengthKnob->setHintText( tr( "Length:" ) + 
 				" ", "" );
@@ -424,7 +427,7 @@ vibedView::vibedView( instrument * _instrument,
 "will both ring longer and sound brighter, however, they will also eat up "
 "more CPU cycles." ) );
 
-	m_impulse = new ledCheckBox( "", this, tr( "Impulse" ) );
+	m_impulse = new ledCheckBox( "", this );
 	m_impulse->move( 23, 94 );
 	toolTip::add( m_impulse,
 		      tr( "Impulse or initial state" ) );

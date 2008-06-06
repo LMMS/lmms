@@ -66,21 +66,29 @@ plugin::descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 
 
 
-oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
+oscillatorObject::oscillatorObject( model * _parent, track * _track, int _idx ) :
 	model( _parent ),
-	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS,
-					MinVolume, MaxVolume, 1.0f, this ),
-	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
-	m_coarseModel( 0, -2 * KeysPerOctave, 2 * KeysPerOctave,
-								1.0f, this ),
-	m_fineLeftModel( 0.0f, -100.0f, 100.0f, 1.0f, this ),
-	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this ),
-	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this ),
-	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this ),
-	m_waveShapeModel( oscillator::SineWave, 0, oscillator::NumWaveShapes-1,
-									this ),
+	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS, MinVolume,
+			MaxVolume, 1.0f, this, tr( "Osc %1 volume" ).arg( _idx+1 ) ),
+	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this,
+			tr( "Osc %1 panning" ).arg( _idx+1 ) ),
+	m_coarseModel( 0, -2 * KeysPerOctave, 2 * KeysPerOctave, 1.0f, this,
+			tr( "Osc %1 coarse detuning" ).arg( _idx+1 ) ),
+	m_fineLeftModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
+			tr( "Osc %1 fine detuning left" ).arg( _idx+1 ) ),
+	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
+			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
+	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
+			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ), 
+	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
+			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
+	m_waveShapeModel( oscillator::SineWave, 0, 
+			oscillator::NumWaveShapes-1, this,
+			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
 	m_modulationAlgoModel( oscillator::SignalMix, 0,
-				oscillator::NumModulationAlgos-1, this ),
+				oscillator::NumModulationAlgos-1, this,
+				tr( "Modulation type " ).arg( _idx+1 ) ),
+
 	m_sampleBuffer( new sampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
@@ -218,7 +226,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _instrument_track ) :
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
-		m_osc[i] = new oscillatorObject( this, _instrument_track );
+		m_osc[i] = new oscillatorObject( this, _instrument_track, i );
 
 	}
 
@@ -426,8 +434,8 @@ void tripleOscillator::updateAllDetuning( void )
 class tripleOscKnob : public knob
 {
 public:
-	tripleOscKnob( QWidget * _parent, const QString & _name ) :
-			knob( knobStyled, _parent, _name )
+	tripleOscKnob( QWidget * _parent ) :
+			knob( knobStyled, _parent )
 	{
 		setFixedSize( 28, 35 );
 	}
@@ -500,8 +508,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 					"modulating oscillator 2 with "
 					"oscillator 1" ) );
 
-	m_mod1BtnGrp = new automatableButtonGroup( this,
-						tr( "Modulation type 1" ) );
+	m_mod1BtnGrp = new automatableButtonGroup( this );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
@@ -557,8 +564,8 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 					"modulating oscillator 3 with "
 					"oscillator 2" ) );
 
-	m_mod2BtnGrp = new automatableButtonGroup( this,
-						tr( "Modulation type 2" ) );
+	m_mod2BtnGrp = new automatableButtonGroup( this );
+
 	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
 	m_mod2BtnGrp->addButton( mix_osc2_btn );
@@ -571,8 +578,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		int knob_y = osc_y + i * osc_h;
 
 		// setup volume-knob
-		volumeKnob * vk = new volumeKnob( knobStyled, this, tr(
-						"Osc %1 volume" ).arg( i+1 ) );
+		volumeKnob * vk = new volumeKnob( knobStyled, this );
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(
@@ -585,8 +591,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				"here.").arg( i+1 ) );
 
 		// setup panning-knob
-		knob * pk = new tripleOscKnob( this,
-					tr( "Osc %1 panning" ).arg( i + 1 ) );
+		knob * pk = new tripleOscKnob( this );
 		pk->move( 35, knob_y );
 		pk->setHintText( tr("Osc %1 panning:").arg( i + 1 ) + " ", "" );
 		pk->setWhatsThis(
@@ -596,8 +601,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				"output right.").arg( i+1 ) );
 
 		// setup coarse-knob
-		knob * ck = new tripleOscKnob( this,
-				tr( "Osc %1 coarse detuning" ).arg( i + 1 ) );
+		knob * ck = new tripleOscKnob( this );
 		ck->move( 82, knob_y );
 		ck->setHintText( tr( "Osc %1 coarse detuning:" ).arg( i + 1 ) +
 						" ", " " + tr( "semitones" ) );
@@ -610,8 +614,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		
 		// setup knob for left fine-detuning
-		knob * flk = new tripleOscKnob( this,
-				tr( "Osc %1 fine detuning left" ).arg( i+1 ) );
+		knob * flk = new tripleOscKnob( this );
 		flk->move( 111, knob_y );
 		flk->setHintText( tr( "Osc %1 fine detuning left:" ).
 						arg( i + 1 ) + " ",
@@ -624,8 +627,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				"\"fat\" sounds." ).arg( i + 1 ) );
 
 		// setup knob for right fine-detuning
-		knob * frk = new tripleOscKnob( this,
-			tr( "Osc %1 fine detuning right" ).arg( i + 1 ) );
+		knob * frk = new tripleOscKnob( this );
 		frk->move( 140, knob_y );
 		frk->setHintText( tr( "Osc %1 fine detuning right:" ).
 						arg( i + 1 ) + " ",
@@ -639,8 +641,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 
 		// setup phase-offset-knob
-		knob * pok = new tripleOscKnob( this,
-				tr( "Osc %1 phase-offset" ).arg( i+1 ) );
+		knob * pok = new tripleOscKnob( this );
 		pok->move( 188, knob_y );
 		pok->setHintText( tr( "Osc %1 phase-offset:" ).
 						arg( i + 1 ) + " ",
@@ -656,8 +657,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				).arg( i+1 ) );
 
 		// setup stereo-phase-detuning-knob
-		knob * spdk = new tripleOscKnob( this,
-			tr( "Osc %1 stereo phase-detuning" ).arg( i+1 ) );
+		knob * spdk = new tripleOscKnob( this );
 		spdk->move( 217, knob_y );
 		spdk->setHintText( tr("Osc %1 stereo phase-detuning:" ).
 					arg( i + 1 ) + " ",
@@ -755,8 +755,8 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				"wave-shape for current oscillator." ) );
 
 		automatableButtonGroup * wsbg =
-			new automatableButtonGroup( this,
-				tr( "Osc %1 wave shape" ).arg( i + 1 ) );
+			new automatableButtonGroup( this );
+
 		wsbg->addButton( sin_wave_btn );
 		wsbg->addButton( triangle_wave_btn );
 		wsbg->addButton( saw_wave_btn );

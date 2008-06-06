@@ -60,22 +60,22 @@ plugin::descriptor malletsstk_plugin_descriptor =
 
 malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 	instrument( _instrument_track, &malletsstk_plugin_descriptor ),
-	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_positionModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_vibratoGainModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_vibratoFreqModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_stickModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_modulatorModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_crossfadeModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_adsrModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_pressureModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_velocityModel(64.0f, 0.0f, 128.0f, 0.1f, this),
-	m_strikeModel( FALSE, this ),
+	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
+	m_positionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Position" )),
+	m_vibratoGainModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Gain" )),
+	m_vibratoFreqModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Freq" )),
+	m_stickModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick Mix" )),
+	m_modulatorModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Modulator" )),
+	m_crossfadeModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Crossfade" )),
+	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Speed" )),
+	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Depth" )),
+	m_adsrModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "ADSR" )),
+	m_pressureModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Pressure" )),
+	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Motion" )),
+	m_velocityModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Speed" )),
+	m_strikeModel( FALSE, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
-	m_spreadModel(0, 0, 255, 1, this),
+	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_filesMissing( FALSE )
 {
 	m_hardnessModel.setTrack( _instrument_track );
@@ -338,7 +338,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
 	
-	m_spreadKnob = new knob( knobBright_26, this, tr( "Spread" ) );
+	m_spreadKnob = new knob( knobBright_26, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 178, 173 );
 	m_spreadKnob->setHintText( tr( "Spread:" ) + " ", "" );
@@ -370,27 +370,27 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 		
-	m_hardnessKnob = new knob( knobBright_26, widget, tr( "Hardness" ) );
+	m_hardnessKnob = new knob( knobBright_26, widget );
 	m_hardnessKnob->setLabel( tr( "Hardness" ) );
 	m_hardnessKnob->move( 145, 24 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ) + " ", "" );
 
-	m_positionKnob = new knob( knobBright_26, widget, tr( "Position" ) );
+	m_positionKnob = new knob( knobBright_26, widget );
 	m_positionKnob->setLabel( tr( "Position" ) );
 	m_positionKnob->move( 195, 24 );
 	m_positionKnob->setHintText( tr( "Position:" ) + " ", "" );
 
-	m_vibratoGainKnob = new knob( knobBright_26, widget, tr( "Vibrato Gain" ) );
+	m_vibratoGainKnob = new knob( knobBright_26, widget );
 	m_vibratoGainKnob->setLabel( tr( "Vib Gain" ) );
 	m_vibratoGainKnob->move( 56, 86 );
 	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ) + " ", "" );
 
-	m_vibratoFreqKnob = new knob( knobBright_26, widget, tr( "Vibrato Freq" ) );
+	m_vibratoFreqKnob = new knob( knobBright_26, widget );
 	m_vibratoFreqKnob->setLabel( tr( "Vib Freq" ) );
 	m_vibratoFreqKnob->move( 117, 86 );
 	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ) + " ", "" );
 
-	m_stickKnob = new knob( knobBright_26, widget, tr( "Stick Mix" ) );
+	m_stickKnob = new knob( knobBright_26, widget );
 	m_stickKnob->setLabel( tr( "Stick Mix" ) );
 	m_stickKnob->move( 178, 86 );
 	m_stickKnob->setHintText( tr( "Stick Mix:" ) + " ", "" );
@@ -406,27 +406,27 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
-	m_modulatorKnob = new knob( knobBright_26, widget, tr( "Modulator" ) );
+	m_modulatorKnob = new knob( knobBright_26, widget );
 	m_modulatorKnob->setLabel( tr( "Modulator" ) );
 	m_modulatorKnob->move( 145, 24 );
 	m_modulatorKnob->setHintText( tr( "Modulator:" ) + " ", "" );
 
-	m_crossfadeKnob = new knob( knobBright_26, widget, tr( "Crossfade" ) );
+	m_crossfadeKnob = new knob( knobBright_26, widget );
 	m_crossfadeKnob->setLabel( tr( "Crossfade" ) );
 	m_crossfadeKnob->move( 195, 24 );
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ) + " ", "" );
 	
-	m_lfoSpeedKnob = new knob( knobBright_26, widget, tr( "LFO Speed" ) );
+	m_lfoSpeedKnob = new knob( knobBright_26, widget );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
 	m_lfoSpeedKnob->move( 56, 86 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ) + " ", "" );
 	
-	m_lfoDepthKnob = new knob( knobBright_26, widget, tr( "LFO Depth" ) );
+	m_lfoDepthKnob = new knob( knobBright_26, widget );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
 	m_lfoDepthKnob->move( 117, 86 );
 	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ) + " ", "" );
 	
-	m_adsrKnob = new knob( knobBright_26, widget, tr( "ADSR" ) );
+	m_adsrKnob = new knob( knobBright_26, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
 	m_adsrKnob->move( 178, 86 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ) + " ", "" );
@@ -443,20 +443,20 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
-	m_strikeLED = new ledCheckBox( tr( "Bowed" ), widget, tr( "Bowed" ) );
+	m_strikeLED = new ledCheckBox( tr( "Bowed" ), widget );
 	m_strikeLED->move( 165, 30 );
 
-	m_pressureKnob = new knob( knobBright_26, widget, tr( "Pressure" ) );
+	m_pressureKnob = new knob( knobBright_26, widget );
 	m_pressureKnob->setLabel( tr( "Pressure" ) );
 	m_pressureKnob->move( 56, 86 );
 	m_pressureKnob->setHintText( tr( "Pressure:" ) + " ", "" );
 
-	m_motionKnob = new knob( knobBright_26, widget, tr( "Motion" ) );
+	m_motionKnob = new knob( knobBright_26, widget );
 	m_motionKnob->setLabel( tr( "Motion" ) );
 	m_motionKnob->move( 117, 86 );
 	m_motionKnob->setHintText( tr( "Motion:" ) + " ", "" );
 	
-	m_velocityKnob = new knob( knobBright_26, widget, tr( "Speed" ) );
+	m_velocityKnob = new knob( knobBright_26, widget );
 	m_velocityKnob->setLabel( tr( "Speed" ) );
 	m_velocityKnob->move( 178, 86 );
 	m_velocityKnob->setHintText( tr( "Speed:" ) + " ", "" );
