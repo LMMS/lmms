@@ -109,8 +109,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_audioPort( tr( "unnamed_channel" ), this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this ),
-        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this ),
-        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
+        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr( "Volume" ) ),
+        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this, tr( "Panning" ) ),
         m_effectChannelModel( 0, 0, NumFxChannels, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -501,6 +501,14 @@ int instrumentTrack::masterKey( notePlayHandle * _n ) const
 
 
 
+QString instrumentTrack::displayName( void ) const
+{
+	return instrumentName() + ":" + name();
+}
+
+
+
+
 bool FASTCALL instrumentTrack::play( const midiTime & _start,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
@@ -829,8 +837,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 
 	// creation of widgets for track-settings-widget
 	m_tswVolumeKnob = new volumeKnob( knobSmall_17,
-						getTrackSettingsWidget(),
-						tr( "Volume" ) );
+						getTrackSettingsWidget() );
 	m_tswVolumeKnob->setModel( &_it->m_volumeModel );
 	m_tswVolumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_tswVolumeKnob->move( 4, 4 );

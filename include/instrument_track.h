@@ -144,6 +144,7 @@ public:
 		return( m_arpeggiator.m_arpEnabledModel.value() );
 	}
 
+	virtual QString displayName( void ) const;
 
 signals:
 	void instrumentChanged( void );

@@ -121,8 +121,8 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	m_readablePorts( NULL ),
 	m_midiAutoDetect( FALSE ),
 	m_controller( NULL ),
-	m_targetModel( _target_model )
-	m_midiController( NULL ),
+	m_targetModel( _target_model ),
+	m_midiController( NULL )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Connection Settings" ) );
@@ -295,6 +295,7 @@ controllerConnectionDialog::~controllerConnectionDialog()
 
 void controllerConnectionDialog::selectController( void )
 {
+	// Midi
 	if( m_midiGroupBox->model()->value() > 0 )
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
@@ -302,10 +303,22 @@ void controllerConnectionDialog::selectController( void )
 			midiController * mc;
 			mc = m_midiController->copyToMidiController(
 					engine::getSong() );
-			mc->getMidiPort()->setName( m_targetModel->displayName() );
+	
+			if( m_targetModel->getTrack() && 
+					!m_targetModel->getTrack()->displayName().isEmpty() )
+			{
+				mc->getMidiPort()->setName( QString( "%1 (%2)" ).
+						arg( m_targetModel->getTrack()->displayName() ).
+						arg( m_targetModel->displayName() ) );
+			}
+			else
+			{
+				mc->getMidiPort()->setName( m_targetModel->displayName() );
+			}
 			m_controller = mc;
 		}
 	}
+	// User
 	else 
 	{
 		if( m_userGroupBox->model()->value() > 0 && 

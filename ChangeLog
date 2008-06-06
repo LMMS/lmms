@@ -52,6 +52,14 @@
 	* include/effect_lib.h:
 	* src/core/lfo_controller.cpp:
 	Fix compile time warnings
+
+	* include/automatable_model.h:
+	* include/instrument_track.h:
+	* include/controller_connection_dialog.h:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	Test to see if we can now generate reasonable midi-port names. We can,
+	the feature is very beta right now (no screenupdating, loading, etc..)
 	
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -103,9 +103,14 @@ public:
 		m_track = _track;
 	}
 
-	inline bool nullTrack( void )
+	inline bool nullTrack( void ) const
 	{
 		return( m_track == NULL );
+	}
+
+	inline track * getTrack( void ) const
+	{
+		return( m_track );
 	}
 
 	void initAutomationPattern( void );

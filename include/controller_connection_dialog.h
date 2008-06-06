@@ -78,8 +78,8 @@ private:
 	lcdSpinBox * m_midiChannelSpinBox;
 	lcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
-	boolModel m_midiAutoDetect;
 	QMenu * m_readablePorts;
+	boolModel m_midiAutoDetect;
 
 	groupBox * m_userGroupBox;
 	comboBox * m_userController;
