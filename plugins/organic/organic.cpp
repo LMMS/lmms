@@ -77,15 +77,15 @@ QPixmap * organicInstrumentView::s_artwork = NULL;
 organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &organic_plugin_descriptor ),
 	m_modulationAlgo( oscillator::SignalMix ),
-	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this ),
-	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this )
+	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
+	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
 {
 	m_numOscillators = 8;
 
 	m_osc = new oscillatorObject*[ m_numOscillators ];
 	for (int i=0; i < m_numOscillators; i++)
 	{
-		m_osc[i] = new oscillatorObject( this, _channel_track );
+		m_osc[i] = new oscillatorObject( this, _channel_track, i );
 		m_osc[i]->m_numOscillators = m_numOscillators;
 
 		// Connect events 
@@ -370,8 +370,8 @@ pluginView * organicInstrument::instantiateView( QWidget * _parent )
 class organicKnob : public knob
 {
 public:
-	organicKnob( QWidget * _parent, const QString & _name ) :
-		knob( knobStyled, _parent, _name )
+	organicKnob( QWidget * _parent ) :
+		knob( knobStyled, _parent )
 	{
 		setFixedSize( 21, 21 );
 	}
@@ -393,17 +393,17 @@ organicInstrumentView::organicInstrumentView( instrument * _instrument,
 	setPalette( pal );
 
 	// setup knob for FX1
-	m_fx1Knob = new organicKnob( this, tr( "FX1" ) );
+	m_fx1Knob = new organicKnob( this );
 	m_fx1Knob->move( 15, 201 );
 	m_fx1Knob->setFixedSize( 37, 47 );
+	m_fx1Knob->setHintText( tr( "Distortion:" ) + " ", "%" );
 	m_fx1Knob->setObjectName( "fx1Knob" );
 
 	// setup volume-knob
-	m_volKnob = new organicKnob( this, tr( "Osc %1 volume" ).arg(
-							1 ) );
+	m_volKnob = new organicKnob( this );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
-	m_volKnob->setHintText( tr( "Osc %1 volume:" ).arg( 1 ) + " ", "%" );
+	m_volKnob->setHintText( tr( "Volume:" ).arg( 1 ) + " ", "%" );
 	m_volKnob->setObjectName( "volKnob" );
 
 	// randomise
@@ -454,30 +454,26 @@ void organicInstrumentView::modelChanged( void )
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		// setup waveform-knob
-		knob * oscKnob = new organicKnob( this, tr(
-					"Osc %1 waveform" ).arg( i + 1 ) );
+		knob * oscKnob = new organicKnob( this );
 		oscKnob->move( x + i * colWidth, y );
 		oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg(
 					i + 1 ) + " ", "%" );
 										
 		// setup volume-knob
-		volumeKnob * volKnob = new volumeKnob( knobStyled, this, tr(
-						"Osc %1 volume" ).arg( i + 1 ) );
+		volumeKnob * volKnob = new volumeKnob( knobStyled, this );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
 							i + 1 ) + " ", "%" );
 							
 		// setup panning-knob
-		knob * panKnob = new organicKnob( this,
-					tr( "Osc %1 panning" ).arg( i + 1 ) );
+		knob * panKnob = new organicKnob( this );
 		panKnob->move( x + i  * colWidth, y + rowHeight*2 );
 		panKnob->setHintText( tr("Osc %1 panning:").arg(
 							i + 1 ) + " ", "" );
 							
 		// setup knob for left fine-detuning
-		knob * detuneKnob = new organicKnob( this,
-				tr( "Osc %1 fine detuning left" ).arg( i + 1 ) );
+		knob * detuneKnob = new organicKnob( this );
 		detuneKnob->move( x + i * colWidth, y + rowHeight*3 );
 		detuneKnob->setHintText( tr( "Osc %1 fine detuning "
 							"left:" ).arg( i + 1 )
@@ -501,13 +497,17 @@ void organicInstrumentView::modelChanged( void )
 
 
 
-oscillatorObject::oscillatorObject( model * _parent, track * _track ) :
+oscillatorObject::oscillatorObject( model * _parent, track * _track, int _index ) :
 	model( _parent ),
 	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, this ),
-	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f, this ),
-	m_volModel( 100.0f, 0.0f, 100.0f, 1.0f, this ),
-	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this ),
-	m_detuneModel( 0.0f, -100.0f, 100.0f, 1.0f, this ) 
+	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,
+			this, tr( "Osc %1 waveform" ).arg( _index + 1 ) ),
+	m_volModel( 100.0f, 0.0f, 100.0f, 1.0f,
+			this, tr( "Osc %1 volume" ).arg( _index + 1 ) ),
+	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
+			this, tr( "Osc %1 panning" ).arg( _index + 1 ) ),
+	m_detuneModel( 0.0f, -100.0f, 100.0f, 1.0f, 
+			this, tr( "Osc %1 fine detuning left" ).arg( _index + 1 ) )
 {
 }
 

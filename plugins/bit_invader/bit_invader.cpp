@@ -149,7 +149,7 @@ sample_t bSynth::nextStringSample( void )
 
 bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	instrument( _channel_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 8, 128, 1, this ),
+	m_sampleLength( 128, 8, 128, 1, this, tr( "Samplelength" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( FALSE, this ),
 	m_normalize( FALSE, this)
@@ -326,7 +326,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 								"artwork" ) );
 	setPalette( pal );
 	
-	m_sampleLengthKnob = new knob( knobDark_28, this, tr( "Samplelength" ) );
+	m_sampleLengthKnob = new knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 10, 120 );
 	m_sampleLengthKnob->setHintText( tr( "Sample Length" ) + " ", "" );
 

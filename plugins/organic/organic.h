@@ -61,7 +61,7 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	oscillatorObject( model * _parent, track * _track );
+	oscillatorObject( model * _parent, track * _track, int _index );
 	virtual ~oscillatorObject();
 
 	friend class organicInstrument;

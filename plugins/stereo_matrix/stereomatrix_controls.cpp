@@ -29,10 +29,10 @@
 stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
 		effectControls( _eff ),
 		m_effect( _eff ),
-		m_llModel( 1.0f, -1.0f, 1.0f, 0.01f ),
-		m_lrModel( 0.0f, -1.0f, 1.0f, 0.01f ),
-		m_rlModel( 0.0f, -1.0f, 1.0f, 0.01f ),
-		m_rrModel( 1.0f, -1.0f, 1.0f, 0.01f )
+		m_llModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Left to Left" ) ),
+		m_lrModel( 0.0f, -1.0f, 1.0f, 0.01f, this, tr( "Left to Right" ) ),
+		m_rlModel( 0.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Left" ) ),
+		m_rrModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Right" ) )
 {
 	connect( &m_llModel, SIGNAL( dataChanged( void ) ),
 			this, SLOT( changeMatrix( void ) ) );

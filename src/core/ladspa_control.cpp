@@ -32,9 +32,9 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 	model( _parent ),
 	m_link( _link ),
 	m_port( _port ),
-        m_linkEnabledModel( _link, this ),
-        m_toggledModel( FALSE, this ),
-        m_knobModel( 0, 0, 0, 1, this ),
+        m_linkEnabledModel( _link, this, tr( "Link channels" ) ),
+        m_toggledModel( FALSE, this, m_port->name ),
+        m_knobModel( 0, 0, 0, 1, this, m_port->name ),
 	m_tempoSyncKnobModel( 0, 0, 0, 1, 1.0, this )
 {
 	if( m_link )

@@ -26,6 +26,23 @@
 	- add support for sequenced midi in midi-controllers
 	- add displayName field to model / autoModel for descriptive model trees
 	- use displayName for midiController and contextMenus
+
+	* src/core/ladspa_control.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/kicker/kicker.cpp:
+	Update plugins to use displayName for children
 	
 2008-06-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -75,19 +75,27 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
-	m_bankNum( -1, -1, 999, this ),
-	m_patchNum( -1, -1, 127, this ),
-	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this ),
-	m_reverbOn( 0, this ),
-	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this ),
-	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this ),
-	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this ),
-	m_chorusOn( 0, this ),
-	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this )
+	m_bankNum( -1, -1, 999, this, tr("Bank") ),
+	m_patchNum( -1, -1, 127, this, tr("Patch") ),
+	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
+	m_reverbOn( 0, this, tr( "Reverb" ) ),
+	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, 
+			this, tr( "Reverb Roomsize" ) ),
+	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, 
+			this, tr( "Reverb Damping" ) ),
+	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, 
+			this, tr( "Reverb Width" ) ),
+	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, 
+			this, tr( "Reverb Level" ) ),
+	m_chorusOn( 0, this, tr( "Chorus" ) ),
+	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, 
+			this, tr( "Chorus Lines" ) ),
+	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, 
+			this, tr( "Chorus Level" ) ),
+	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, 
+			this, tr( "Chorus Speed" ) ),
+	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, 
+			this, tr( "Chorus Depth" ) )
 {
 	for( int i = 0; i < 128; ++i )
 	{
@@ -614,12 +622,12 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 
 
 	// LCDs
-	m_bankNumLcd = new lcdSpinBox( 3, this, "Bank" );
+	m_bankNumLcd = new lcdSpinBox( 3, this );
 	m_bankNumLcd->setLabel( "BANK" );
 	m_bankNumLcd->addTextForValue( -1, "---" );
 	m_bankNumLcd->setEnabled( FALSE );
 
-	m_patchNumLcd = new lcdSpinBox( 3, this, "Patch" );
+	m_patchNumLcd = new lcdSpinBox( 3, this );
 	m_patchNumLcd->setLabel( "PATCH" );
 	m_patchNumLcd->addTextForValue( -1, "---" );
 	m_patchNumLcd->setEnabled( FALSE );
@@ -641,8 +649,7 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	vl->addLayout( hl );
 
 	// Gain
-	m_gainKnob = new knob( knobSmall_17, this,
-			tr( "Gain" ) );
+	m_gainKnob = new knob( knobSmall_17, this );
 	m_gainKnob->setHintText( tr("Gain") + " ", "" );
 	m_gainKnob->setLabel( tr("GAIN") );
 	vl->addWidget( m_gainKnob );
@@ -650,25 +657,21 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	// Reverb
 	hl = new QHBoxLayout();
 
-	m_reverbOnLed = new ledCheckBox( "REVERB", this, tr( "Reverb" ) );
+	m_reverbOnLed = new ledCheckBox( "REVERB", this );
 
-	m_reverbRoomSizeKnob = new knob( knobSmall_17, this,
-			tr( "Reverb Roomsize" ) );
+	m_reverbRoomSizeKnob = new knob( knobSmall_17, this );
 	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:") + " ", "" );
 	m_reverbRoomSizeKnob->setLabel( tr("SIZE") );
 
-	m_reverbDampingKnob = new knob( knobSmall_17, this,
-			tr( "Reverb Damping" ) );
+	m_reverbDampingKnob = new knob( knobSmall_17, this );
 	m_reverbDampingKnob->setHintText( tr("Reverb Damping:") + " ", "" );
 	m_reverbDampingKnob->setLabel( tr("DAMP") );
 
-	m_reverbWidthKnob = new knob( knobSmall_17, this,
-			tr( "Reverb Width" ) );
+	m_reverbWidthKnob = new knob( knobSmall_17, this );
 	m_reverbWidthKnob->setHintText( tr("Reverb Width:") + " ", "" );
 	m_reverbWidthKnob->setLabel( tr("WIDTH") );
 
-	m_reverbLevelKnob = new knob( knobSmall_17, this,
-			tr( "Reverb Level" ) );
+	m_reverbLevelKnob = new knob( knobSmall_17, this );
 	m_reverbLevelKnob->setHintText( tr("Reverb Level:") + " ", "" );
 	m_reverbLevelKnob->setLabel( tr("LEVEL") );
 
@@ -683,25 +686,21 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	// Chorus
 	hl = new QHBoxLayout();
 
-	m_chorusOnLed = new ledCheckBox( "CHORUS", this, tr( "Chorus" ) );
+	m_chorusOnLed = new ledCheckBox( "CHORUS", this );
 
-	m_chorusNumKnob = new knob( knobSmall_17, this,
-			tr( "Chorus Lines" ) );
+	m_chorusNumKnob = new knob( knobSmall_17, this );
 	m_chorusNumKnob->setHintText( tr("Chorus Lines:") + " ", "" );
 	m_chorusNumKnob->setLabel( tr("NUM") );
 
-	m_chorusLevelKnob = new knob( knobSmall_17, this,
-			tr( "Chorus Level" ) );
+	m_chorusLevelKnob = new knob( knobSmall_17, this );
 	m_chorusLevelKnob->setHintText( tr("Chorus Level:") + " ", "" );
 	m_chorusLevelKnob->setLabel( tr("LEVEL") );
 
-	m_chorusSpeedKnob = new knob( knobSmall_17, this,
-			tr( "Chorus Speed" ) );
+	m_chorusSpeedKnob = new knob( knobSmall_17, this );
 	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:") + " ", "" );
 	m_chorusSpeedKnob->setLabel( tr("SPD") );
 
-	m_chorusDepthKnob = new knob( knobSmall_17, this,
-			tr( "Chorus Depth" ) );
+	m_chorusDepthKnob = new knob( knobSmall_17, this );
 	m_chorusDepthKnob->setHintText( tr("Chorus Depth:") + " ", "" );
 	m_chorusDepthKnob->setLabel( tr("DEPTH") );
 

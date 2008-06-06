@@ -36,17 +36,17 @@ bassBoosterControlDialog::bassBoosterControlDialog(
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 
-	knob * freqKnob = new knob( knobBright_26, this, tr( "Frequency" ) );
+	knob * freqKnob = new knob( knobBright_26, this);
 	freqKnob->setModel( &_controls->m_freqModel );
 	freqKnob->setLabel( tr( "FREQ" ) );
 	freqKnob->setHintText( tr( "Frequency:" ) + " ", "Hz" );
 
-	knob * gainKnob = new knob( knobBright_26, this, tr( "Gain" ) );
+	knob * gainKnob = new knob( knobBright_26, this );
 	gainKnob->setModel( &_controls->m_gainModel );
 	gainKnob->setLabel( tr( "GAIN" ) );
 	gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 
-	knob * ratioKnob = new knob( knobBright_26, this, tr( "Ratio" ) );
+	knob * ratioKnob = new knob( knobBright_26, this );
 	ratioKnob->setModel( &_controls->m_ratioModel );
 	ratioKnob->setLabel( tr( "RATIO" ) );
 	ratioKnob->setHintText( tr( "Ratio:" ) + " ", "" );

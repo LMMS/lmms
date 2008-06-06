@@ -320,18 +320,18 @@ void lb302Filter3Pole::setState(const lb302FilterState* fs)
 
 lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	instrument( _instrumentTrack, &lb302_plugin_descriptor ),
-	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this ),
-	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this ),
-	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this ),
-	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this ),
-	vco_fine_detune_knob( 0.0f, -100.0f, 100.0f, 1.0f, this ),
-	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this ),
-	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this ),
-	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this ),
-	slideToggle( FALSE, this ),
-	accentToggle( FALSE, this ),
-	deadToggle( FALSE, this ),
-	db24Toggle( FALSE, this )	
+	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
+	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
+	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
+	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
+	vco_fine_detune_knob( 0.0f, -100.0f, 100.0f, 1.0f, this, tr( "VCO Fine Detuning:") ),
+	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
+	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Waveform" ) ),
+	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
+	slideToggle( FALSE, this, tr( "Slide" ) ),
+	accentToggle( FALSE, this, tr( "Accent" ) ),
+	deadToggle( FALSE, this, tr( "Dead" ) ),
+	db24Toggle( FALSE, this, tr( "24dB/oct Filter" ) )	
 
 {
 
@@ -972,59 +972,59 @@ lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
 	// GUI
-	m_vcfCutKnob = new knob( knobBright_26, this, tr( "VCF Cutoff Frequency" ) );
+	m_vcfCutKnob = new knob( knobBright_26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ) + " ", "" );
 	m_vcfCutKnob->setLabel( tr("CUT") );
 
-	m_vcfResKnob = new knob( knobBright_26, this, tr( "VCF Resonance" ) );
+	m_vcfResKnob = new knob( knobBright_26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
 	m_vcfResKnob->setLabel( tr("RES") );
 
-	m_vcfModKnob = new knob( knobBright_26, this, tr( "VCF Envelope Mod" ) );
+	m_vcfModKnob = new knob( knobBright_26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ) + " ", "" );
 	m_vcfModKnob->setLabel( tr("ENV MOD") );
 
-	m_vcfDecKnob = new knob( knobBright_26, this, tr( "VCF Envelope Decay" ) );
+	m_vcfDecKnob = new knob( knobBright_26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ) + " ", "" );
 	m_vcfDecKnob->setLabel( tr("DEC") );
 
-	m_slideToggle = new ledCheckBox( "Slide", this, tr( "Slide" ) );
+	m_slideToggle = new ledCheckBox( "Slide", this );
 	m_slideToggle->move( 10, 180 );
 
-	m_accentToggle = new ledCheckBox( "Accent", this, tr( "Accent" ) );
+	m_accentToggle = new ledCheckBox( "Accent", this );
 	m_accentToggle->move( 10, 200 );
 	m_accentToggle->setDisabled(true);
 
-	m_deadToggle = new ledCheckBox( "Dead", this, tr( "Dead" ) );
+	m_deadToggle = new ledCheckBox( "Dead", this );
 	m_deadToggle->move( 10, 220 );
 
-	m_db24Toggle = new ledCheckBox( "24dB/oct", this,
+	m_db24Toggle = new ledCheckBox( "24dB/oct", this );
+	m_db24Toggle->setWhatsThis( 
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
 
 
-	m_slideDecKnob = new knob( knobBright_26, this, tr( "Slide Decay" ) );
+	m_slideDecKnob = new knob( knobBright_26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
 	m_slideDecKnob->setLabel( tr( "SLIDE"));
 
-	m_vcoFineDetuneKnob = new knob( knobBright_26, this, 
-			tr("Fine detuning of the VCO. Ranged between -100 and 100 centes.") );
+	m_vcoFineDetuneKnob = new knob( knobBright_26, this );
 	m_vcoFineDetuneKnob->move(165, 75);
 	m_vcoFineDetuneKnob->setHintText( tr( "VCO Fine Detuning:") + " ", "cents");
 	m_vcoFineDetuneKnob->setLabel( tr( "DETUNE"));
 
-	m_distKnob = new knob( knobBright_26, this, tr( "Distortion" ) );
+	m_distKnob = new knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
 	m_distKnob->setLabel( tr( "DIST"));
 
 
-	m_waveKnob = new knob( knobBright_26, this, tr( "Waveform" ) );
+	m_waveKnob = new knob( knobBright_26, this );
 	m_waveKnob->move( 120, 75 );
 	m_waveKnob->setHintText( tr( "WAVE:" ) + " ", "" );
 	m_waveKnob->setLabel( tr( "WAVE"));

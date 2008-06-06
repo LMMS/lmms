@@ -69,15 +69,14 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 
 
 
-
 audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
 	m_sampleBuffer(),
-	m_ampModel( 100, 0, 500, 1, this ),
-	m_startPointModel( 0, 0, 1, 0.0000001f, this ),
-	m_endPointModel( 1, 0, 1, 0.0000001f, this ),
-	m_reverseModel( FALSE, this ),
-	m_loopModel( FALSE, this )
+	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
+	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
+	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
+	m_reverseModel( FALSE, this, tr( "Reverse sample" ) ),
+	m_loopModel( FALSE, this, tr( "Loop") )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
 				this, SLOT( reverseModelChanged() ) );
@@ -334,8 +333,8 @@ const QStringList & audioFileProcessor::subPluginFeatures::supportedExtensions(
 class audioFileKnob : public knob
 {
 public:
-	audioFileKnob( QWidget * _parent, const QString & _name ) :
-			knob( knobStyled, _parent, _name )
+	audioFileKnob( QWidget * _parent ) :
+			knob( knobStyled, _parent )
 	{
 		setFixedSize( 37, 47 );
 	}
@@ -357,7 +356,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 								"artwork" ) );
 	}
 
-	m_openAudioFileButton = new pixmapButton( this, NULL );
+	m_openAudioFileButton = new pixmapButton( this );
 	m_openAudioFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openAudioFileButton->move( 227, 72 );
 	m_openAudioFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -376,7 +375,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"are not reset, so please don't wonder if your sample "
 			"doesn't sound like the original one..." ) );
 
-	m_reverseButton = new pixmapButton( this, NULL );
+	m_reverseButton = new pixmapButton( this );
 	m_reverseButton->setCheckable( TRUE );
 	m_reverseButton->move( 184, 124 );
 	m_reverseButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -389,7 +388,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"This is useful for cool effects, e.g. a reversed "
 			"crash." ) );
 
-	m_loopButton = new pixmapButton( this, tr( "Loop" ) );
+	m_loopButton = new pixmapButton( this );
 	m_loopButton->setCheckable( TRUE );
 	m_loopButton->move( 220, 124 );
 	m_loopButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -405,7 +404,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new volumeKnob( knobStyled, this, tr( "Amplify" ) );
+	m_ampKnob = new volumeKnob( knobStyled, this );
 	m_ampKnob->move( 17, 108 );
 	m_ampKnob->setFixedSize( 37, 47 );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
@@ -415,7 +414,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"Otherwise it will be amplified up or down (your "
 			"actual sample-file isn't touched!)" ) );
 
-	m_startKnob = new audioFileKnob( this, tr( "Start of sample" ) );
+	m_startKnob = new audioFileKnob( this );
 	m_startKnob->move( 68, 108 );
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setWhatsThis(
@@ -425,7 +424,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"which AudioFileProcessor returns if a note is longer "
 			"than the sample between start- and end-point." ) );
 
-	m_endKnob = new audioFileKnob( this, tr( "End of sample" ) );
+	m_endKnob = new audioFileKnob( this );
 	m_endKnob->move( 119, 108 );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setWhatsThis(

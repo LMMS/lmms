@@ -31,9 +31,9 @@
 bassBoosterControls::bassBoosterControls( bassBoosterEffect * _eff ) :
 	effectControls( _eff ),
 	m_effect( _eff ),
-	m_freqModel( 100.0f, 50.0f, 200.0f, 1.0f, this ),
-	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this ),
-	m_ratioModel( 2.0f, 0.1f, 10.0f, 0.1f, this )
+	m_freqModel( 100.0f, 50.0f, 200.0f, 1.0f, this, tr( "Frequency" ) ),
+	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
+	m_ratioModel( 2.0f, 0.1f, 10.0f, 0.1f, this, tr( "Ratio" ) )
 {
 	connect( &m_freqModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeFrequency() ) );

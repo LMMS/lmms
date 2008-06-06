@@ -58,11 +58,11 @@ plugin::descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 
 kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &kicker_plugin_descriptor ),
-	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this ),
-	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this ),
-	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this ),
-	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this ),
-	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this )
+	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
+	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
+	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Decay" ) ),
+	m_distModel( 0.8f, 0.0f, 100.0f, 0.1f, this, tr( "Distortion" ) ),
+	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) )
 {
 	m_startFreqModel.setTrack( _instrument_track );
 	m_endFreqModel.setTrack( _instrument_track );
@@ -192,8 +192,8 @@ pluginView * kickerInstrument::instantiateView( QWidget * _parent )
 class kickerKnob : public knob
 {
 public:
-	kickerKnob( QWidget * _parent, const QString & _name ) :
-			knob( knobStyled, _parent, _name )
+	kickerKnob( QWidget * _parent ) :
+			knob( knobStyled, _parent )
 	{
 		setFixedSize( 37, 47 );
 	}
@@ -206,23 +206,23 @@ kickerInstrumentView::kickerInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
-	m_startFreqKnob = new kickerKnob( this, tr( "Start frequency" ) );
+	m_startFreqKnob = new kickerKnob( this );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );
 	m_startFreqKnob->move( 12, 124 );
 
-	m_endFreqKnob = new kickerKnob( this, tr( "End frequency" ) );
+	m_endFreqKnob = new kickerKnob( this );
 	m_endFreqKnob->setHintText( tr( "End frequency:" ) + " ", "Hz" );
 	m_endFreqKnob->move( 59, 124 );
 
-	m_decayKnob = new kickerKnob( this, tr( "Decay" ) );
+	m_decayKnob = new kickerKnob( this );
 	m_decayKnob->setHintText( tr( "Decay:" ) + " ", "ms" );
 	m_decayKnob->move( 107, 124 );
 
-	m_distKnob = new kickerKnob( this, tr( "Distortion" ) );
+	m_distKnob = new kickerKnob( this );
 	m_distKnob->setHintText( tr( "Distortion:" ) + " ", "" );
 	m_distKnob->move( 155, 124 );
 
-	m_gainKnob = new kickerKnob( this, tr( "Gain" ) );
+	m_gainKnob = new kickerKnob( this );
 	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 203, 124 );
 

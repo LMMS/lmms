@@ -41,21 +41,21 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 
 	QGridLayout * l = new QGridLayout( this );
 
-	knob * llKnob = new knob( knobBright_26, this, tr( "Left to Left" ) );
+	knob * llKnob = new knob( knobBright_26, this );
 	llKnob->setModel( &_controls->m_llModel );
-	llKnob->setHintText( tr( "Volume:" ) + " ", "" );
+	llKnob->setHintText( tr( "Left to Left Vol:" ) + " ", "" );
 
-	knob * lrKnob = new knob( knobBright_26, this, tr( "Left to Right" ) );
+	knob * lrKnob = new knob( knobBright_26, this );
 	lrKnob->setModel( &_controls->m_lrModel );
-	lrKnob->setHintText( tr( "Volume:" ) + " ", "" );
+	lrKnob->setHintText( tr( "Left to Right Vol:" ) + " ", "" );
 
-	knob * rlKnob = new knob( knobBright_26, this, tr( "Right to Left" ) );
+	knob * rlKnob = new knob( knobBright_26, this );
 	rlKnob->setModel( &_controls->m_rlModel );
-	rlKnob->setHintText( tr( "Volume:" ) + " ", "" );
+	rlKnob->setHintText( tr( "Right to Left Vol:" ) + " ", "" );
 
-	knob * rrKnob = new knob( knobBright_26, this, tr( "Right to Right" ) );
+	knob * rrKnob = new knob( knobBright_26, this );
 	rrKnob->setModel( &_controls->m_rrModel );
-	rrKnob->setHintText( tr( "Volume:" ) + " ", "" );
+	rrKnob->setHintText( tr( "Right to Right Vol:" ) + " ", "" );
 
 	l->addWidget( new QLabel( "L", this ), 1, 0);
 	l->addWidget( new QLabel( "R", this ), 2, 0);
