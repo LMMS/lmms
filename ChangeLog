@@ -1,3 +1,19 @@
+2008-06-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/note.h:
+	* include/serializing_object.h:
+	* include/instrument_track.h:
+	* include/sample_buffer.h:
+	* include/journalling_object.h:
+	* src/gui/automation_editor.cpp:
+	* src/core/serializing_object.cpp:
+	* src/core/journalling_object.cpp:
+	* src/core/note.cpp:
+	* Makefile.am:
+	splitted basic functionality of journallingObject into
+	serializingObject so that creating note objects, notePlayHandles etc.
+	does not have all the journalling-overhead (assigning/freeing ID etc.)
+
 2008-06-06  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* include/knob.h:

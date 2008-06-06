@@ -27,6 +27,7 @@
 #define _SAMPLE_BUFFER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QRect>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

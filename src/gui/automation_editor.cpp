@@ -396,7 +396,6 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	m_step = m_pattern->object()->step<float>();
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
-	timeMap & time_map = m_pattern->getTimeMap();
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
 	resizeEvent( NULL );

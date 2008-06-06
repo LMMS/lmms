@@ -240,6 +240,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/project_version.cpp				\
 		$(srcdir)/src/core/sample_buffer.cpp				\
 		$(srcdir)/src/core/sample_play_handle.cpp			\
+		$(srcdir)/src/core/serializing_object.cpp			\
 		$(srcdir)/src/core/song.cpp					\
 		$(srcdir)/src/core/surround_area.cpp				\
 		$(srcdir)/src/core/timeline.cpp					\
@@ -464,6 +465,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/rubberband.h					\
 		$(srcdir)/include/base64.h					\
 		$(srcdir)/include/journalling_object.h				\
+		$(srcdir)/include/serializing_object.h				\
 		$(srcdir)/include/level_object.h				\
 		$(srcdir)/include/project_journal.h				\
 		$(srcdir)/include/shared_object.h				\

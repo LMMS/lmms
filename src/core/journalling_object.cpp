@@ -39,8 +39,7 @@ journallingObject::journallingObject( void ) :
 	m_journalEntries(),
 	m_currentJournalEntry( m_journalEntries.end() ),
 	m_journalling( TRUE ),
-	m_journallingStateStack(),
-	m_hook( NULL )
+	m_journallingStateStack()
 {
 }
 
@@ -49,10 +48,6 @@ journallingObject::journallingObject( void ) :
 
 journallingObject::~journallingObject()
 {
-	if( m_hook )
-	{
-		m_hook->m_hookedIn = NULL;
-	}
 	if( engine::getProjectJournal() )
 	{
 		engine::getProjectJournal()->freeID( id() );
@@ -97,9 +92,7 @@ void journallingObject::redo( void )
 QDomElement journallingObject::saveState( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	QDomElement _this = _doc.createElement( nodeName() );
-	_parent.appendChild( _this );
-	saveSettings( _doc, _this );
+	QDomElement _this = serializingObject::saveState( _doc, _parent );
 	saveJournal( _doc, _this );
 	return( _this );
 }
@@ -109,10 +102,9 @@ QDomElement journallingObject::saveState( QDomDocument & _doc,
 
 void journallingObject::restoreState( const QDomElement & _this )
 {
-	saveJournallingState( FALSE );
+	serializingObject::restoreState( _this );
 
-	// load actual settings
-	loadSettings( _this );
+	saveJournallingState( FALSE );
 
 	// search for journal-node
 	QDomNode node = _this.firstChild();
@@ -126,15 +118,6 @@ void journallingObject::restoreState( const QDomElement & _this )
         }
 
 	restoreJournallingState();
-}
-
-
-
-
-void journallingObject::setHook( journallingObjectHook * _hook )
-{
-	m_hook = _hook;
-	m_hook->m_hookedIn = this;
 }
 
 

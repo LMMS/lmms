@@ -26,27 +26,16 @@
 #ifndef _JOURNALLING_OBJECT_H
 #define _JOURNALLING_OBJECT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "types.h"
 #include "export.h"
+#include "serializing_object.h"
 
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 #include <QtCore/QStack>
 
 
-class QDomDocument;
-class QDomElement;
-
-
 typedef uint32_t t_action_id;
-
-
-class journallingObject;
-class journallingObjectHook;
 
 
 class journalEntry
@@ -99,7 +88,7 @@ private:
 typedef QVector<journalEntry> journalEntryVector;
 
 
-class EXPORT journallingObject
+class EXPORT journallingObject : public serializingObject
 {
 public:
 	journallingObject( void );
@@ -144,9 +133,6 @@ public:
 	virtual void restoreState( const QDomElement & _this );
 
 
-	// to be implemented by actual object
-	virtual QString nodeName( void ) const = 0;
-
 	inline bool isJournalling( void ) const
 	{
 		return( m_journalling );
@@ -164,26 +150,11 @@ public:
 		return( old_journalling );
 	}
 
-	void setHook( journallingObjectHook * _hook );
-
-	journallingObjectHook * getHook( void )
-	{
-		return( m_hook );
-	}
-
 
 protected:
 	void addJournalEntry( const journalEntry & _je );
 
 	// to be implemented by sub-objects
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this )
-	{
-	}
-
-	virtual void loadSettings( const QDomElement & _this )
-	{
-	}
-
 	virtual void undoStep( journalEntry & _je )
 	{
 	}
@@ -205,34 +176,6 @@ private:
 	bool m_journalling;
 
 	QStack<bool> m_journallingStateStack;
-
-	journallingObjectHook * m_hook;
-
-} ;
-
-
-class journallingObjectHook
-{
-public:
-	journallingObjectHook() :
-		m_hookedIn( NULL )
-	{
-	}
-	virtual ~journallingObjectHook()
-	{
-		if( m_hookedIn != NULL )
-		{
-			m_hookedIn->setHook( NULL );
-		}
-	}
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this ) = 0;
-	virtual void loadSettings( const QDomElement & _this ) = 0;
-
-private:
-	journallingObject * m_hookedIn;
-
-	friend class journallingObject;
 
 } ;
 

@@ -36,7 +36,7 @@
 #include "volume.h"
 #include "panning.h"
 #include "midi_time.h"
-#include "journalling_object.h"
+#include "serializing_object.h"
 
 class detuningHelper;
 
@@ -83,7 +83,7 @@ const float MaxDetuning = 4 * 12.0f;
 
 
 
-class EXPORT note : public journallingObject
+class EXPORT note : public serializingObject
 {
 public:
 	note( const midiTime & _length = 0,
@@ -165,19 +165,19 @@ protected:
 							QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+/*	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );*/
 
 
 private:
-	enum Actions
+/*	enum Actions
 	{
 		ChangeKey,
 		ChangeVolume,
 		ChangePanning,
 		ChangeLength,
 		ChangePosition
-	} ;
+	} ;*/
 
 
 	int m_key;

@@ -47,7 +47,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 	m_pos( _pos )
 {
 	//saveJournallingState( FALSE );
-	setJournalling( FALSE );
+//	setJournalling( FALSE );
 
 	if( _detuning )
 	{
@@ -64,7 +64,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 
 
 note::note( const note & _note ) :
-	journallingObject( _note ),
+	serializingObject( _note ),
 	m_key( _note.m_key),
 	m_volume( _note.m_volume ),
 	m_panning( _note.m_panning ),
@@ -87,7 +87,7 @@ note::~note()
 
 void note::setLength( const midiTime & _length )
 {
-	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );
+//	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );
 	m_length = _length;
 }
 
@@ -96,7 +96,7 @@ void note::setLength( const midiTime & _length )
 
 void note::setPos( const midiTime & _pos )
 {
-	addJournalEntry( journalEntry( ChangePosition, m_pos - _pos ) );
+//	addJournalEntry( journalEntry( ChangePosition, m_pos - _pos ) );
 	m_pos = _pos;
 }
 
@@ -106,7 +106,7 @@ void note::setPos( const midiTime & _pos )
 void note::setKey( const int _key )
 {
 	const int k = tLimit( _key, 0, NumKeys );
-	addJournalEntry( journalEntry( ChangeKey, m_key - k ) );
+//	addJournalEntry( journalEntry( ChangeKey, m_key - k ) );
 	m_key = k;
 }
 
@@ -116,7 +116,7 @@ void note::setKey( const int _key )
 void note::setVolume( const volume _volume )
 {
 	const volume v = tLimit( _volume, MinVolume, MaxVolume );
-	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
+//	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
 	m_volume = v;
 }
 
@@ -126,7 +126,7 @@ void note::setVolume( const volume _volume )
 void note::setPanning( const panning _panning )
 {
 	const panning p = tLimit( _panning, PanningLeft, PanningRight );
-	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
+//	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
 	m_panning = p;
 }
 
@@ -197,7 +197,7 @@ void note::loadSettings( const QDomElement & _this )
 
 
 
-void note::undoStep( journalEntry & _je )
+/*void note::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
 	switch( static_cast<Actions>( _je.actionID() ) )
@@ -232,7 +232,7 @@ void note::redoStep( journalEntry & _je )
 {
 	journalEntry je( _je.actionID(), -_je.data().toInt() );
 	undoStep( je );
-}
+}*/
 
 
 

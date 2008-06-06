@@ -257,7 +257,7 @@ private:
 
 
 class instrumentTrackWindow : public QWidget, public modelView,
-						public journallingObjectHook
+						public serializingObjectHook
 {
 	Q_OBJECT
 public:
