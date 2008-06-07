@@ -84,7 +84,7 @@ void midiController::processInEvent( const midiEvent & _me,
 	const Uint8 * bytes;
 	switch( _me.m_type )
 	{
-		case CONTROL_CHANGE:
+		case MidiControlChange:
 			bytes = _me.m_data.m_bytes;
 			controllerNum = _me.m_data.m_bytes[0] & 0x7F;
 

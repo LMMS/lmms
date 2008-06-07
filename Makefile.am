@@ -260,7 +260,6 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/midi/midi_alsa_seq.cpp			\
 		$(srcdir)/src/core/midi/midi_client.cpp				\
 		$(srcdir)/src/core/midi/midi_controller.cpp			\
-		$(srcdir)/src/core/midi/midi_mapper.cpp				\
 		$(srcdir)/src/core/midi/midi_oss.cpp				\
 		$(srcdir)/src/core/midi/midi_port.cpp				\
 		$(srcdir)/src/gui/about_dialog.cpp				\
@@ -435,7 +434,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/sample_play_handle.h				\
 		$(srcdir)/include/nstate_button.h				\
 		$(srcdir)/include/midi_dummy.h					\
-		$(srcdir)/include/midi_mapper.h					\
 		$(srcdir)/include/lcd_spinbox.h					\
 		$(srcdir)/include/tooltip.h					\
 		$(srcdir)/include/automatable_button.h				\

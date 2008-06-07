@@ -365,7 +365,7 @@ void remoteVSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 	lock();
 	writeValueS<Sint16>( VST_ENQUEUE_MIDI_EVENT );
 
-	writeValueS<midiEventTypes>( _event.m_type );
+	writeValueS<MidiEventTypes>( _event.m_type );
 	writeValueS<Sint8>( _event.m_channel );
 	writeValueS<Uint16>( _event.m_data.m_param[0] );
 	writeValueS<Uint16>( _event.m_data.m_param[1] );

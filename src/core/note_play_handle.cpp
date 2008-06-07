@@ -47,11 +47,6 @@ inline notePlayHandle::baseDetuning::baseDetuning(
 
 
 
-
-
-
-
-
 notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						const f_cnt_t _offset,
 						const f_cnt_t _frames,
@@ -104,7 +99,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 
 	setFrames( _frames );
 	// send MIDI-note-on-event
-	m_instrumentTrack->processOutEvent( midiEvent( NOTE_ON,
+	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
 				m_instrumentTrack->m_midiPort.outputChannel(),
 					key(),
 				tLimit<Uint16>(
@@ -302,7 +297,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_releaseFramesToDo = tMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 	// send MIDI-note-off-event
-	m_instrumentTrack->processOutEvent( midiEvent( NOTE_OFF,
+	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
 				m_instrumentTrack->m_midiPort.outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,

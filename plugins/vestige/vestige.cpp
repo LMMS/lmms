@@ -262,11 +262,11 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		const int k = getInstrumentTrack()->masterKey( _n );
 		if( m_runningNotes[k] > 0 )
 		{
-			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
+			m_plugin->enqueueMidiEvent( midiEvent( MidiNoteOff, 0,
 								k, 0 ), 0 );
 		}
 		++m_runningNotes[k];
-		m_plugin->enqueueMidiEvent( midiEvent( NOTE_ON, 0, k,
+		m_plugin->enqueueMidiEvent( midiEvent( MidiNoteOn, 0, k,
 					_n->getVolume() ), _n->offset() );
 		// notify when the handle stops, call to deleteNotePluginData
 		_n->m_pluginData = _n;
@@ -285,8 +285,8 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 		const int k = getInstrumentTrack()->masterKey( _n );
 		if( --m_runningNotes[k] <= 0 )
 		{
-			m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0, k,
-								0 ), 0 );
+			m_plugin->enqueueMidiEvent(
+					midiEvent( MidiNoteOff, 0, k, 0 ), 0 );
 		}
 	}
 	m_pluginMutex.unlock();
@@ -488,8 +488,8 @@ void vestigeInstrumentView::noteOffAll( void )
 	{
 		for( int key = 0; key < NumKeys; ++key )
 		{
-			m_vi->m_plugin->enqueueMidiEvent( midiEvent( NOTE_OFF, 0,
-								key, 0 ), 0 );
+			m_vi->m_plugin->enqueueMidiEvent(
+				midiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
 	}
 	m_vi->m_pluginMutex.unlock();

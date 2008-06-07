@@ -31,6 +31,8 @@
 class meterModel : public model
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,getNumerator,setNumerator,m_numeratorModel);
+	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
 	meterModel( ::model * _parent, track * _track );
 	~meterModel();
@@ -41,16 +43,6 @@ public:
 						const QString & _name );
 
 	void reset( void );
-
-	inline int getNumerator( void ) const
-	{
-		return( m_numeratorModel.value() );
-	}
-
-	inline int getDenominator( void ) const
-	{
-		return( m_denominatorModel.value() );
-	}
 
 
 private:

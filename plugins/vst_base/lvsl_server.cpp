@@ -515,7 +515,7 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 	event.midiData[0] = _event.m_type + _event.m_channel;
 	switch( _event.m_type )
 	{
-		case PITCH_BEND:
+		case MidiPitchBend:
 			event.midiData[1] = _event.m_data.m_param[0] & 0x7f;
 			event.midiData[2] = _event.m_data.m_param[0] >> 7;
 			break;
@@ -1208,8 +1208,8 @@ int main( void )
 
 			case VST_ENQUEUE_MIDI_EVENT:
 			{
-				midiEventTypes type =
-						readValue<midiEventTypes>();
+				MidiEventTypes type =
+						readValue<MidiEventTypes>();
 				Sint8 channel = readValue<Sint8>();
 				Uint16 param1 = readValue<Uint16>();
 				Uint16 param2 = readValue<Uint16>();

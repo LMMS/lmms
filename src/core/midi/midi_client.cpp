@@ -147,9 +147,9 @@ void midiClientRaw::parseData( const Uint8 _c )
 	 */  
 	if( _c >= 0xF8 )
 	{
-		if( _c == MIDI_SYSTEM_RESET )
+		if( _c == MidiSystemReset )
 		{
-			m_midiParseData.m_midiEvent.m_type = MIDI_SYSTEM_RESET;
+			m_midiParseData.m_midiEvent.m_type = MidiSystemReset;
 			m_midiParseData.m_status = 0;
 			processParsedEvent();
 		}
@@ -232,29 +232,29 @@ void midiClientRaw::parseData( const Uint8 _c )
 	 * We simply keep the status as it is, just reset the parameter counter.
 	 * If another status byte comes in, it will overwrite the status. 
 	 */
-	m_midiParseData.m_midiEvent.m_type = static_cast<midiEventTypes>(
+	m_midiParseData.m_midiEvent.m_type = static_cast<MidiEventTypes>(
 						m_midiParseData.m_status );
 	m_midiParseData.m_midiEvent.m_channel = m_midiParseData.m_channel;
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
 	switch( m_midiParseData.m_midiEvent.m_type )
 	{
-		case NOTE_OFF:
-		case NOTE_ON:
-		case KEY_PRESSURE:
-		case PROGRAM_CHANGE:
-		case CHANNEL_PRESSURE:
+		case MidiNoteOff:
+		case MidiNoteOn:
+		case MidiKeyPressure:
+		case MidiProgramChange:
+		case MidiChannelPressure:
 			m_midiParseData.m_midiEvent.m_data.m_param[0] =
 				m_midiParseData.m_buffer[0] - KeysPerOctave;
 			m_midiParseData.m_midiEvent.m_data.m_param[1] =
 						m_midiParseData.m_buffer[1];
-		case CONTROL_CHANGE:
+		case MidiControlChange:
 			m_midiParseData.m_midiEvent.m_data.m_param[0] =
 				m_midiParseData.m_buffer[0] - KeysPerOctave;
 			m_midiParseData.m_midiEvent.m_data.m_param[1] =
 						m_midiParseData.m_buffer[1];
 			break;
 
-		case PITCH_BEND:
+		case MidiPitchBend:
 			// Pitch-bend is transmitted with 14-bit precision.
 			// Note: '|' does here the same as '+' (no common bits),
 			// but might be faster
@@ -293,9 +293,9 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 	// TODO: also evaluate _time and queue event if neccessary
 	switch( _me.m_type )
 	{
-		case NOTE_ON:
-		case NOTE_OFF:
-		case KEY_PRESSURE:
+		case MidiNoteOn:
+		case MidiNoteOff:
+		case MidiKeyPressure:
 			if( _port->outputChannel() >= 0 )
 			{
 				sendByte( _me.m_type | _port->outputChannel() );
@@ -306,7 +306,7 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 			}
 			else
 			{
-				for( Sint8 i = 0; i < MIDI_CHANNEL_COUNT; ++i )
+				for( Sint8 i = 0; i < MidiChannelCount; ++i )
 				{
 					sendByte( _me.m_type | i );
 					sendByte( _me.m_data.m_param[0] +

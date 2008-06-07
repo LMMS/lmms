@@ -67,7 +67,7 @@ public:
 	virtual void processInEvent( const midiEvent & _me,
 					const midiTime & _time, bool _lock )
 	{
-		if( _me.m_type == CONTROL_CHANGE &&
+		if( _me.m_type == MidiControlChange &&
 			( m_midiPort.inputChannel() == _me.m_channel + 1 ||
 				m_midiPort.inputChannel() == 0 ) )
 		{

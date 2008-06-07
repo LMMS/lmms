@@ -146,47 +146,47 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 	ev.queue =  m_queueID;
 	switch( _me.m_type )
 	{
-		case NOTE_ON:
+		case MidiNoteOn:
 			snd_seq_ev_set_noteon( &ev,
 						_port->outputChannel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
-		case NOTE_OFF:
+		case MidiNoteOff:
 			snd_seq_ev_set_noteoff( &ev,
 						_port->outputChannel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
-		case KEY_PRESSURE:
+		case MidiKeyPressure:
 			snd_seq_ev_set_keypress( &ev,
 						_port->outputChannel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
-		case CONTROL_CHANGE:
+		case MidiControlChange:
 			snd_seq_ev_set_controller( &ev,
 						_port->outputChannel(),
 						_me.m_data.m_param[0],
 						_me.m_data.m_param[1] );
 			break;
 
-		case PROGRAM_CHANGE:
+		case MidiProgramChange:
 			snd_seq_ev_set_pgmchange( &ev,
 						_port->outputChannel(),
 						_me.m_data.m_param[0] );
 			break;
 
-		case CHANNEL_PRESSURE:
+		case MidiChannelPressure:
 			snd_seq_ev_set_chanpress( &ev,
 						_port->outputChannel(),
 						_me.m_data.m_param[0] );
 			break;
 
-		case PITCH_BEND:
+		case MidiPitchBend:
 			snd_seq_ev_set_pitchbend( &ev,
 						_port->outputChannel(),
 						_me.m_data.m_param[0] - 8192 );
@@ -453,7 +453,7 @@ void midiALSASeq::run( void )
 		switch( ev->type )
 		{
 			case SND_SEQ_EVENT_NOTEON:
-				dest->processInEvent( midiEvent( NOTE_ON,
+				dest->processInEvent( midiEvent( MidiNoteOn,
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
@@ -463,7 +463,7 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_NOTEOFF:
-				dest->processInEvent( midiEvent( NOTE_OFF,
+				dest->processInEvent( midiEvent( MidiNoteOff,
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
@@ -473,7 +473,8 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_KEYPRESS:
-				dest->processInEvent( midiEvent( KEY_PRESSURE,
+				dest->processInEvent( midiEvent(
+								MidiKeyPressure,
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
@@ -482,7 +483,7 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_CONTROLLER:
-				dest->processInEvent( midiEvent( CONTROL_CHANGE,
+				dest->processInEvent( midiEvent( MidiControlChange,
 						ev->data.control.channel,
 						ev->data.control.param,
 						ev->data.control.value ),
@@ -490,7 +491,8 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_PGMCHANGE:
-				dest->processInEvent( midiEvent( PROGRAM_CHANGE,
+				dest->processInEvent( midiEvent(
+							MidiProgramChange,
 						ev->data.control.channel,
 						ev->data.control.param,
 						ev->data.control.value ),
@@ -499,7 +501,7 @@ void midiALSASeq::run( void )
 
 			case SND_SEQ_EVENT_CHANPRESS:
 				dest->processInEvent( midiEvent(
-							CHANNEL_PRESSURE,
+							MidiChannelPressure,
 						ev->data.control.channel,
 						ev->data.control.param,
 						ev->data.control.value ),
@@ -507,7 +509,7 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_PITCHBEND:
-				dest->processInEvent( midiEvent( PITCH_BEND,
+				dest->processInEvent( midiEvent( MidiPitchBend,
 						ev->data.control.channel,
 						ev->data.control.value + 8192,
 							0 ), midiTime() );

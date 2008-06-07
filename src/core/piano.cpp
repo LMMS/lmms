@@ -114,7 +114,7 @@ void piano::setKeyState( int _key, bool _on )
 
 void piano::handleKeyPress( int _key )
 {
-	m_instrumentTrack->processInEvent( midiEvent( NOTE_ON, 0, _key,
+	m_instrumentTrack->processInEvent( midiEvent( MidiNoteOn, 0, _key,
 						DefaultVolume ), midiTime() );
 	m_pressedKeys[_key] = TRUE;
 }
@@ -125,7 +125,7 @@ void piano::handleKeyPress( int _key )
 
 void piano::handleKeyRelease( int _key )
 {
-	m_instrumentTrack->processInEvent( midiEvent( NOTE_OFF, 0, _key, 0 ),
+	m_instrumentTrack->processInEvent( midiEvent( MidiNoteOff, 0, _key, 0 ),
 								midiTime() );
 	m_pressedKeys[_key] = FALSE;
 }
@@ -351,7 +351,7 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
 			}
 			// set note on
 			m_piano->m_instrumentTrack->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num,
+					midiEvent( MidiNoteOn, 0, key_num,
 							vol * 127 / 100 ),
 								midiTime() );
 			m_piano->m_pressedKeys[key_num] = TRUE;
@@ -379,7 +379,7 @@ void pianoView::mouseReleaseEvent( QMouseEvent * _me )
 		if( m_piano != NULL )
 		{
 			m_piano->m_instrumentTrack->processInEvent(
-				midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
+				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
 			m_piano->m_pressedKeys[m_lastKey] = FALSE;
 		}
@@ -429,7 +429,7 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 		if( m_lastKey != -1 )
 		{
 			m_piano->m_instrumentTrack->processInEvent(
-				midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
+				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
 			m_piano->m_pressedKeys[m_lastKey] = FALSE;
 			m_lastKey = -1;
@@ -439,7 +439,7 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 			if( _me->pos().y() > PIANO_BASE )
 			{
 				m_piano->m_instrumentTrack->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num, vol ),
+					midiEvent( MidiNoteOn, 0, key_num, vol ),
 								midiTime() );
 				m_piano->m_pressedKeys[key_num] = TRUE;
 				m_lastKey = key_num;
@@ -456,7 +456,7 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 	else if( m_piano->m_pressedKeys[key_num] == TRUE )
 	{
 		m_piano->m_instrumentTrack->processInEvent(
-				midiEvent( KEY_PRESSURE, 0, key_num, vol ),
+				midiEvent( MidiKeyPressure, 0, key_num, vol ),
 								midiTime() );
 	}
 
@@ -522,7 +522,7 @@ void pianoView::focusOutEvent( QFocusEvent * )
 		if( m_piano->m_pressedKeys[i] == TRUE )
 		{
 			m_piano->m_instrumentTrack->processInEvent(
-						midiEvent( NOTE_OFF, 0, i, 0 ),
+					midiEvent( MidiNoteOff, 0, i, 0 ),
 								midiTime() );
 			m_piano->m_pressedKeys[i] = FALSE;
 		}

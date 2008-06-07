@@ -31,61 +31,61 @@
 #include <cstdlib>
 
 
-enum midiEventTypes
+enum MidiEventTypes
 {
 	// messages
-	NOTE_OFF = 0x80,
-	NOTE_ON = 0x90,
-	KEY_PRESSURE = 0xA0,
-	CONTROL_CHANGE = 0xB0,
-	PROGRAM_CHANGE = 0xC0,
-	CHANNEL_PRESSURE = 0xD0,
-	PITCH_BEND = 0xE0,
+	MidiNoteOff = 0x80,
+	MidiNoteOn = 0x90,
+	MidiKeyPressure = 0xA0,
+	MidiControlChange = 0xB0,
+	MidiProgramChange = 0xC0,
+	MidiChannelPressure = 0xD0,
+	MidiPitchBend = 0xE0,
 	// system exclusive
-	MIDI_SYSEX = 0xF0,
+	MidiSysEx= 0xF0,
 	// system common - never in midi files
-	MIDI_TIME_CODE = 0xF1,
-	MIDI_SONG_POSITION = 0xF2,
-	MIDI_SONG_SELECT = 0xF3,
-	MIDI_TUNE_REQUEST = 0xF6,
-	MIDI_EOX = 0xF7,
+	MidiTimeCode= 0xF1,
+	MidiSongPosition = 0xF2,
+	MidiSongSelect = 0xF3,
+	MidiTuneRequest = 0xF6,
+	MidiEOX= 0xF7,
 	// system real-time - never in midi files
-	MIDI_SYNC = 0xF8,
-	MIDI_TICK = 0xF9,
-	MIDI_START = 0xFA,
-	MIDI_CONTINUE = 0xFB,
-	MIDI_STOP = 0xFC,
-	MIDI_ACTIVE_SENSING = 0xFE,
-	MIDI_SYSTEM_RESET = 0xFF,
+	MidiSync = 0xF8,
+	MidiTick = 0xF9,
+	MidiStart = 0xFA,
+	MidiContinue = 0xFB,
+	MidiStop = 0xFC,
+	MidiActiveSensing = 0xFE,
+	MidiSystemReset = 0xFF,
 	// meta event - for midi files only
-	MIDI_META_EVENT = 0xFF,
+	MidiMetaEvent = 0xFF,
 } ;
 
-enum midiMetaEvents
+enum MidiMetaEvents
 {
-	MIDI_COPYRIGHT = 0x02,
-	MIDI_TRACK_NAME = 0x03,
-	MIDI_INST_NAME = 0x04,
-	MIDI_LYRIC = 0x05,
-	MIDI_MARKER = 0x06,
-	MIDI_CUE_POINT = 0x07,
-	MIDI_PORT_NUMBER = 0x21,
-	MIDI_EOT = 0x2f,
-	MIDI_SET_TEMPO = 0x51,
-	MIDI_SMPTE_OFFSET = 0x54,
-	MIDI_TIME_SIGNATURE = 0x58,
-	MIDI_KEY_SIGNATURE = 0x59,
-	MIDI_SEQUENCER_EVENT = 0x7f
+	MidiCopyright = 0x02,
+	MidiTrackName = 0x03,
+	MidiInstName = 0x04,
+	MidiLyric = 0x05,
+	MidiMarker = 0x06,
+	MidiCuePoint = 0x07,
+	MidiPortNumber = 0x21,
+	MidiEOT = 0x2f,
+	MidiSetTempo = 0x51,
+	MidiSMPTEOffset = 0x54,
+	MidiTimeSignature = 0x58,
+	MidiKeySignature = 0x59,
+	MidiSequencerEvent = 0x7f
 } ;
 
 
-const Uint8 MIDI_CHANNEL_COUNT = 16;
-const Uint8 MIDI_CONTROLLER_COUNT = 128;
+const int MidiChannelCount = 16;
+const int MidiControllerCount = 128;
 
 
 struct midiEvent
 {
-	midiEvent( midiEventTypes _type = MIDI_ACTIVE_SENSING,
+	midiEvent( MidiEventTypes _type = MidiActiveSensing,
 			Sint8 _channel = 0,
 			Uint16 _param1 = 0,
 			Uint16 _param2 = 0 ) :
@@ -96,7 +96,7 @@ struct midiEvent
 		m_data.m_param[0] = _param1;
 		m_data.m_param[1] = _param2;
 	}
-	midiEvent( midiEventTypes _type, const char * _sysex_data,
+	midiEvent( MidiEventTypes _type, const char * _sysex_data,
 							int _data_len ) :
 		m_type( _type ),
 		m_channel( 0 ),
@@ -125,7 +125,7 @@ struct midiEvent
 		return( m_data.m_param[1] );
 	}
 
-	midiEventTypes m_type;		// MIDI event type
+	MidiEventTypes m_type;		// MIDI event type
 	Sint8 m_channel;		// MIDI channel
 	union
 	{

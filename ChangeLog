@@ -1,5 +1,31 @@
 2008-06-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/tracks/instrument_track.cpp:
+	fixed MIDI-IO when using raw MIDI client
+
+	* plugins/midi_import/midi_import.cpp:
+	* include/song.h:
+	added support for importing time-signature settings
+
+	* Makefile.am:
+	* plugins/midi_import/midi_import.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_server.cpp:
+	* include/meter_model.h:
+	* include/midi.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/piano.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	* src/core/midi/midi_client.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/gui/piano_roll.cpp:
+	made MidiEventTypes-enum conform coding-style, i.e. MidiNoteOn instead
+	of NOTE_ON etc.
+
 	* include/controller_connection_dialog.h:
 	* include/instrument_midi_io_view.h:
 	* include/instrument_track.h:

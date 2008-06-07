@@ -1118,7 +1118,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		{
 			m_lastKey = key_num;
 			m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num,
+					midiEvent( MidiNoteOn, 0, key_num,
 							vol * 127 / 100 ),
 								midiTime() );
 		}
@@ -1135,13 +1135,13 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		if( m_action == CHANGE_NOTE_VOLUME && m_currentNote != NULL )
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( NOTE_OFF, 0,
+				midiEvent( MidiNoteOff, 0,
 					m_currentNote->key(), 0 ), midiTime() );
 		}
 		else
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
+				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
 		}
 	}
@@ -1185,7 +1185,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			_me->buttons() & Qt::LeftButton )
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( NOTE_OFF, 0, m_lastKey, 0 ),
+				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
 			if( _me->buttons() & Qt::LeftButton &&
 				m_action != RESIZE_NOTE &&
@@ -1196,7 +1196,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_lastKey = key_num;
 				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( NOTE_ON, 0, key_num,
+					midiEvent( MidiNoteOn, 0, key_num,
 						DefaultVolume * 127 / 100 ),
 								midiTime() );
 			}
@@ -1281,7 +1281,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				if( m_currentNote != NULL ) {
 					m_pattern->getInstrumentTrack()->processInEvent(
-						midiEvent( NOTE_OFF, 0,
+						midiEvent( MidiNoteOff, 0,
 						m_currentNote->key(), 0 ), midiTime() );
 				}
 				
@@ -1289,7 +1289,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					m_lastKey = shortNote->key();
 
 					m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( NOTE_ON, 0,
+					midiEvent( MidiNoteOn, 0,
 					shortNote->key(), shortNote->getVolume() ), midiTime() );
 				}
 			}
@@ -1299,7 +1299,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				m_currentNote->setVolume( vol );
 				m_pattern->dataChanged();
 				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( KEY_PRESSURE, 0, m_lastKey,
+					midiEvent( MidiKeyPressure, 0, m_lastKey,
 							vol * 127 / 100 ),
 								midiTime() );
 			}
