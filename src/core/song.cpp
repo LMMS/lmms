@@ -797,8 +797,7 @@ void song::createNewProject( void )
 
 
 
-void FASTCALL song::createNewProjectFromTemplate( const QString &
-								_template )
+void song::createNewProjectFromTemplate( const QString & _template )
 {
 	loadProject( _template );
 	// clear file-name so that user doesn't overwrite template when
@@ -810,7 +809,7 @@ void FASTCALL song::createNewProjectFromTemplate( const QString &
 
 
 // load given song
-void FASTCALL song::loadProject( const QString & _file_name )
+void song::loadProject( const QString & _file_name )
 {
 	m_loadingProject = TRUE;
 
@@ -965,7 +964,7 @@ bool song::saveProject( void )
 
 
 // save current song in given filename
-bool FASTCALL song::saveProjectAs( const QString & _file_name )
+bool song::saveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
@@ -1097,7 +1096,9 @@ void song::setModified( void )
 	if( !m_loadingProject )
 	{
 		m_modified = TRUE;
-		if( engine::getMainWindow() )
+		if( engine::getMainWindow() &&
+			QThread::currentThread() ==
+					engine::getMainWindow()->thread() )
 		{
 			engine::getMainWindow()->resetWindowTitle();
 		}
