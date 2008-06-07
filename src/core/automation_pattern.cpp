@@ -278,7 +278,8 @@ void automationPattern::processMidiTime( const midiTime & _time )
 {
 	if( _time >= 0 )
 	{
-		m_object->setValue( m_time_map.lowerBound( -_time ).value() );
+		m_object->setAutomatedValue(
+				m_time_map.lowerBound( -_time ).value() );
 	}
 }
 

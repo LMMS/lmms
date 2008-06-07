@@ -185,10 +185,9 @@ public:
 	}
 
 
-//	template<class T>
 	void setInitValue( const float _value );
 
-//	template<class T>
+	void setAutomatedValue( const float _value );
 	void setValue( const float _value );
 
 	inline void incValue( int _steps )
@@ -196,11 +195,9 @@ public:
 		setValue( m_value + _steps * m_step );
 	}
 
-//	template<class T>
 	void setRange( const float _min, const float _max,
 							const float _step = 1 );
 
-//	template<class T>
 	void setStep( const float _step );
 
 	static void linkModels( automatableModel * _m1,
@@ -241,19 +238,6 @@ public:
 		return( "0" );
 	}
 
-/*	int labelToLevel( QString _label ) const
-	{
-		switch( m_dataType )
-		{
-			case Float: return( level<float>(
-					stringToValue<float>( _label ) ) );
-			case Integer: return( level<int>(
-					stringToValue<int>( _label ) ) );
-			case Bool: return( level<bool>(
-					stringToValue<bool>( _label ) ) );
-		}
-		return( 0 );
-	}*/
 
 	virtual QString displayName( void ) const
 	{

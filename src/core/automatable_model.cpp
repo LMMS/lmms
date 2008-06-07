@@ -182,8 +182,6 @@ void automatableModel::setValue( const float _value )
 		addJournalEntry( journalEntry( 0, m_value - old_val ) );
 
 		// notify linked models
-
-		// doesn't work because of implicit typename T
 		for( autoModelVector::iterator it =
 		 			m_linkedModels.begin();
 				it != m_linkedModels.end(); ++it )
@@ -204,6 +202,32 @@ void automatableModel::setValue( const float _value )
 	else
 	{
 		emit dataUnchanged();
+	}
+}
+
+
+
+
+void automatableModel::setAutomatedValue( const float _value )
+{
+	const float old_val = m_value;
+
+	m_value = fittedValue( _value );
+	if( old_val != m_value )
+	{
+		// notify linked models
+		for( autoModelVector::iterator it =
+		 			m_linkedModels.begin();
+				it != m_linkedModels.end(); ++it )
+		{
+			if( value<float>() != (*it)->value<float>() &&
+				(*it)->fittedValue( value<float>() )
+						!= (*it)->value<float>() )
+			{
+				(*it)->setAutomatedValue( value<float>() );
+			}
+		}
+		emit dataChanged();
 	}
 }
 
