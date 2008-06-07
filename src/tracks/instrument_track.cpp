@@ -212,7 +212,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 {
 	switch( _me.m_type )
 	{
-		case NOTE_ON: 
+		case MidiNoteOn: 
 			if( _me.velocity() > 0 )
 			{
 				if( m_notes[_me.key()] == NULL )
@@ -245,7 +245,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				break;
 			}
 
-		case NOTE_OFF:
+		case MidiNoteOff:
 		{
 			notePlayHandle * n = m_notes[_me.key()];
 			if( n != NULL )
@@ -277,7 +277,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 		}
 
-		case KEY_PRESSURE:
+		case MidiKeyPressure:
 			if( !m_instrument->handleMidiEvent( _me, _time ) &&
 						m_notes[_me.key()] != NULL )
 			{
@@ -286,12 +286,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			}
 			break;
 
-		case PITCH_BEND:
+		case MidiControlChange:
+		case MidiProgramChange:
+		case MidiPitchBend:
 			m_instrument->handleMidiEvent( _me, _time );
-			break;
-
-		case CONTROL_CHANGE:
-			// Ignore control changes
 			break;
 
 		default:
@@ -309,7 +307,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 {
 	switch( _me.m_type )
 	{
-		case NOTE_ON:
+		case MidiNoteOn:
 			if( !configManager::inst()->value( "ui",
 						"manualchannelpiano" ).toInt() )
 			{
@@ -326,7 +324,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 			}
 			break;
 
-		case NOTE_OFF:
+		case MidiNoteOff:
 			if( !configManager::inst()->value( "ui",
 						"manualchannelpiano" ).toInt() )
 			{
@@ -378,7 +376,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 					!( *youngest_note )->arpBaseNote() &&
 					!_n->released() )
 				{
-					processInEvent( midiEvent( NOTE_OFF, 0,
+					processInEvent( midiEvent( MidiNoteOff, 0,
 						_n->key(), 0 ), midiTime(),
 									FALSE );
 					if( ( *youngest_note )->offset() >
@@ -870,9 +868,11 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	else
 	{
 		m_midiInputAction = m_tswMidiMenu->addAction( "" );
+		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
+		m_midiInputAction->setCheckable( TRUE );
+		m_midiOutputAction->setCheckable( TRUE );
 		connect( m_midiInputAction, SIGNAL( changed() ), this,
 						SLOT( midiInSelected() ) );
-		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
 		connect( m_midiOutputAction, SIGNAL( changed() ), this,
 					SLOT( midiOutSelected() ) );
 		connect( &_it->m_midiPort, SIGNAL( modeChanged() ),
@@ -994,7 +994,7 @@ void instrumentTrackView::toggledInstrumentTrackButton( bool _on )
 
 void instrumentTrackView::activityIndicatorPressed( void )
 {
-	model()->processInEvent( midiEvent( NOTE_ON, 0, DefaultKey, 127 ),
+	model()->processInEvent( midiEvent( MidiNoteOn, 0, DefaultKey, 127 ),
 								midiTime() );
 }
 
@@ -1003,7 +1003,7 @@ void instrumentTrackView::activityIndicatorPressed( void )
 
 void instrumentTrackView::activityIndicatorReleased( void )
 {
-	model()->processInEvent( midiEvent( NOTE_OFF, 0, DefaultKey, 0 ),
+	model()->processInEvent( midiEvent( MidiNoteOff, 0, DefaultKey, 0 ),
 								midiTime() );
 }
 
@@ -1024,8 +1024,11 @@ void instrumentTrackView::updateName( void )
 
 void instrumentTrackView::midiInSelected( void )
 {
-	m_midiInputAction->setChecked( !m_midiInputAction->isChecked() );
-	model()->m_midiPort.setReadable( m_midiInputAction->isChecked() );
+	if( model() )
+	{
+		model()->m_midiPort.setReadable(
+					m_midiInputAction->isChecked() );
+	}
 }
 
 
@@ -1033,8 +1036,11 @@ void instrumentTrackView::midiInSelected( void )
 
 void instrumentTrackView::midiOutSelected( void )
 {
-	m_midiOutputAction->setChecked( !m_midiOutputAction->isChecked() );
-	model()->m_midiPort.setWritable( m_midiOutputAction->isChecked() );
+	if( model() )
+	{
+		model()->m_midiPort.setWritable(
+					m_midiOutputAction->isChecked() );
+	}
 }
 
 
