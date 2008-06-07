@@ -177,10 +177,15 @@ public:
 	void removeController( controller * _c );
 	
 
-	// QT will implicitly share the Vector I believe..
 	const controllerVector & controllers( void ) const
 	{
 		return m_controllers;
+	}
+
+
+	meterModel & getTimeSigModel( void )
+	{
+		return( m_timeSigModel );
 	}
 
 

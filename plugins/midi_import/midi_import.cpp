@@ -36,6 +36,7 @@
 #include "instrument.h"
 #include "debug.h"
 #include "embed.h"
+#include "song.h"
 
 
 #define makeID(_c0, _c1, _c2, _c3) \
@@ -243,11 +244,11 @@ invalid_format:
 			{
 				const int tick = it->first;
 				const midiEvent & ev = it->second;
-				if( ev.m_type == MIDI_META_EVENT )
+				if( ev.m_type == MidiMetaEvent )
 				{
 					switch( ev.m_data.m_param[0] )
 					{
-						case MIDI_SET_TEMPO:
+						case MidiSetTempo:
 						{
 	tap->putValue( midiTime( ( tick * multiplier ) / divisor ),
 						ev.m_data.m_param[1], FALSE );
@@ -301,7 +302,7 @@ invalid_format:
 			const midiEvent & ev = it->second;
 			switch( ev.m_type )
 			{
-				case NOTE_ON:
+				case MidiNoteOn:
 					if( ev.key() >= NumKeys )
 					{
 						continue;
@@ -314,7 +315,7 @@ invalid_format:
 						break;
 					}
 
-				case NOTE_OFF:
+				case MidiNoteOff:
 					if( ev.key() < NumKeys &&
 							keys[ev.key()][0] >= 0 )
 					{
@@ -326,7 +327,7 @@ invalid_format:
 					}
 					break;
 
-				case PROGRAM_CHANGE:
+				case MidiProgramChange:
 				{
 					const QString num = QString::number( ev.key() );
 					const QString filter = QString().fill( '0', 3 - num.length() ) + num + "*.pat";
@@ -450,16 +451,16 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
                 switch( cmd & 0xF0 )
 		{
 			// channel msg with 2 parameter bytes
-			case NOTE_OFF:
-			case NOTE_ON:
-			case KEY_PRESSURE:
-			case CONTROL_CHANGE:
-			case PITCH_BEND:
+			case MidiNoteOff:
+			case MidiNoteOn:
+			case MidiKeyPressure:
+			case MidiControlChange:
+			case MidiPitchBend:
 			{
 				int data1 = readByte() & 0x7F;
 				int data2 = readByte() & 0x7F;
 				m_events.push_back( qMakePair( tick,
-					midiEvent( static_cast<midiEventTypes>(
+					midiEvent( static_cast<MidiEventTypes>(
 								cmd & 0xF0 ),
 							cmd & 0x0F,
 							data1,
@@ -467,20 +468,20 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 				break;
 			}
 			// channel msg with 1 parameter byte
-			case PROGRAM_CHANGE:
-			case CHANNEL_PRESSURE:
+			case MidiProgramChange:
+			case MidiChannelPressure:
 				m_events.push_back( qMakePair( tick,
-					midiEvent( static_cast<midiEventTypes>(
+					midiEvent( static_cast<MidiEventTypes>(
 								cmd & 0xF0 ),
 							cmd & 0x0F,
 							readByte() & 0x7F ) ) );
 				break;
 
-			case MIDI_SYSEX:
+			case MidiSysEx:
 				switch( cmd )
 				{
-					case MIDI_SYSEX:
-					case MIDI_EOX:
+					case MidiSysEx:
+					case MidiEOX:
 					{
 						len = readVar();
 						if( len < 0 )
@@ -488,14 +489,14 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 							error();
 							return( FALSE );
 						}
-						if( cmd == MIDI_SYSEX )
+						if( cmd == MidiSysEx )
 						{
 							++len;
 						}
 						char * data = new char[len];
-						if( cmd == MIDI_SYSEX )
+						if( cmd == MidiSysEx )
 						{
-							data[0] = MIDI_SYSEX;
+							data[0] = MidiSysEx;
 						}
 						for( ; c < len; ++c )
 						{
@@ -503,11 +504,11 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 						}
 						m_events.push_back(
 							qMakePair( tick,
-				midiEvent( MIDI_SYSEX, data, len ) ) );
+				midiEvent( MidiSysEx, data, len ) ) );
 						break;
 					}
 
-					case MIDI_META_EVENT:
+					case MidiMetaEvent:
 						c = readByte();
 						len = readVar();
 /*						if( len < 0 )
@@ -517,7 +518,7 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 						}*/
 						switch( c )
 						{
-						case MIDI_TRACK_NAME:
+						case MidiTrackName:
 							if( len > 0 )
 							{
 								char * n = new char[len+1];
@@ -527,7 +528,7 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 								delete[] n;
 							}
 							break;
-						case MIDI_PORT_NUMBER:
+						case MidiPortNumber:
 							if( len < 1 )
 							{
 								error();
@@ -539,13 +540,13 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 							skip( len );
 							break;
 
-						case MIDI_EOT:
+						case MidiEOT:
 						//track->end_tick = tick;
 							skip( _track_end -
 								file().pos() );
 							return( TRUE );
 
-						case MIDI_SET_TEMPO: // tempo
+						case MidiSetTempo: // tempo
 						{
 							if( len < 3 )
 							{
@@ -556,10 +557,10 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 							tempo |= readByte() << 8;
 							tempo |= readByte();
 							tempo = ( 60*1000*1000 ) / tempo;
-	m_events.push_back( qMakePair( tick, midiEvent( MIDI_META_EVENT, 0, MIDI_SET_TEMPO, tempo ) ) );
+	m_events.push_back( qMakePair( tick, midiEvent( MidiMetaEvent, 0, MidiSetTempo, tempo ) ) );
 							break;
 						}
-						case MIDI_TIME_SIGNATURE:
+						case MidiTimeSignature:
 						{
 							int nominator = readByte();
 							int denominator = 1 << (int) readByte();
@@ -575,6 +576,8 @@ bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
 							{
 								denominator = 4;
 							}
+							engine::getSong()->getTimeSigModel().setNumerator( nominator );
+							engine::getSong()->getTimeSigModel().setDenominator( denominator );
 #ifdef LMMS_DEBUG
 							printf("nom:%d  denom:%d\n",nominator,denominator);
 #endif
