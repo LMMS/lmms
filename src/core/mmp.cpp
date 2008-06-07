@@ -631,6 +631,17 @@ void multimediaProject::upgrade( void )
 		
 	}
 
+	if( version < "0.4.0-svn20080607" )
+	{
+		QDomNodeList list = elementsByTagName( "midi" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setTagName( "midiport" );
+		}
+	}
+
+
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
 	{

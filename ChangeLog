@@ -1,5 +1,8 @@
 2008-06-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mmp.cpp:
+	handle renamed midi-node ("midi" -> "midiport")
+
 	* src/tracks/instrument_track.cpp:
 	fixed MIDI-IO when using raw MIDI client
 
