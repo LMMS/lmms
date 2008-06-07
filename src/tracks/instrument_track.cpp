@@ -63,9 +63,8 @@
 #include "led_checkbox.h"
 #include "main_window.h"
 #include "midi_client.h"
-#include "midi_port.h"
+#include "midi_port_menu.h"
 #include "fx_mixer.h"
-#include "instrument_midi_io.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -104,19 +103,20 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
 	midiEventProcessor(),
-	m_midiPort( engine::getMixer()->getMIDIClient()->addPort( this,
-						tr( "unnamed_channel" ) ) ),
-	m_audioPort( tr( "unnamed_channel" ), this ),
+	m_audioPort( tr( "unnamed_track" ), this ),
+	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMIDIClient(),
+							this, this, this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this ),
-        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this, tr( "Volume" ) ),
-        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this, tr( "Panning" ) ),
+        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this,
+							tr( "Volume" ) ),
+        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
+							this, tr( "Panning" ) ),
         m_effectChannelModel( 0, 0, NumFxChannels, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
 	m_chordCreator( this ),
-	m_midiIO( this, m_midiPort ),
 	m_piano( this )
 {
 	m_baseNoteModel.setTrack( this );
@@ -145,7 +145,6 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 instrumentTrack::~instrumentTrack()
 {
 	engine::getMixer()->removePlayHandles( this );
-	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 	delete m_instrument;
 }
 
@@ -339,7 +338,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 			break;
 	}
 	// if appropriate, midi-port does futher routing
-	m_midiPort->processOutEvent( _me, _time );
+	m_midiPort.processOutEvent( _me, _time );
 }
 
 
@@ -466,7 +465,7 @@ void instrumentTrack::setName( const QString & _new_name )
 	}
 
 	track::setName( _new_name );
-	m_midiPort->setName( name() );
+	m_midiPort.setName( name() );
 	m_audioPort.setName( name() );
 
 	emit nameChanged();
@@ -675,7 +674,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_soundShaping.saveState( _doc, _this );
 	m_chordCreator.saveState( _doc, _this );
 	m_arpeggiator.saveState( _doc, _this );
-	m_midiIO.saveState( _doc, _this );
+	m_midiPort.saveState( _doc, _this );
 	m_audioPort.getEffects()->saveState( _doc, _this );
 	if( getHook() )
 	{
@@ -743,9 +742,9 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			{
 				m_arpeggiator.restoreState( node.toElement() );
 			}
-			else if( m_midiIO.nodeName() == node.nodeName() )
+			else if( m_midiPort.nodeName() == node.nodeName() )
 			{
-				m_midiIO.restoreState( node.toElement() );
+				m_midiPort.restoreState( node.toElement() );
 			}
 			else if( m_audioPort.getEffects()->nodeName() ==
 							node.nodeName() )
@@ -830,7 +829,9 @@ QQueue<instrumentTrackWindow *> instrumentTrackView::s_windows;
 instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 						trackContainerView * _tcv ) :
 	trackView( _it, _tcv ),
-	m_window( NULL )
+	m_window( NULL ),
+	m_readablePortsMenu( NULL ),
+	m_writablePortsMenu( NULL )
 {
 	setAcceptDrops( TRUE );
 	setFixedHeight( 32 );
@@ -854,6 +855,32 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_tswMidiMenu = new QMenu( tsw_midi );
 	tsw_midi->setMenu( m_tswMidiMenu );
 
+	// sequenced MIDI?
+	if( !engine::getMixer()->getMIDIClient()->isRaw() )
+	{
+		m_readablePortsMenu = new midiPortMenu( midiPort::Input );
+		m_writablePortsMenu = new midiPortMenu( midiPort::Output );
+		m_readablePortsMenu->setModel( &_it->m_midiPort );
+		m_writablePortsMenu->setModel( &_it->m_midiPort );
+		m_midiInputAction = m_tswMidiMenu->addMenu(
+							m_readablePortsMenu );
+		m_midiOutputAction = m_tswMidiMenu->addMenu(
+							m_writablePortsMenu );
+	}
+	else
+	{
+		m_midiInputAction = m_tswMidiMenu->addAction( "" );
+		connect( m_midiInputAction, SIGNAL( changed() ), this,
+						SLOT( midiInSelected() ) );
+		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
+		connect( m_midiOutputAction, SIGNAL( changed() ), this,
+					SLOT( midiOutSelected() ) );
+		connect( &_it->m_midiPort, SIGNAL( modeChanged() ),
+				this, SLOT( midiConfigChanged() ) );
+	}
+
+	m_midiInputAction->setText( tr( "MIDI input" ) );
+	m_midiOutputAction->setText( tr( "MIDI output" ) );
 
 	m_tswActivityIndicator = new fadeButton( QColor( 96, 96, 96 ),
 						QColor( 255, 204, 0 ),
@@ -870,41 +897,6 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_tswInstrumentTrackButton->setCheckable( TRUE );
 	m_tswInstrumentTrackButton->setGeometry( 64, 2, 144, 28 );
 	m_tswInstrumentTrackButton->show();
-
-/*	if( m_midiWidget->m_readablePorts )
-	{
-		m_midiInputAction = m_tswMidiMenu->addMenu(
-					m_midiWidget->m_readablePorts );
-	}
-	else
-	{
-		m_midiInputAction = m_tswMidiMenu->addAction( "" );
-		connect( m_midiInputAction, SIGNAL( changed() ), this,
-						SLOT( midiInSelected() ) );
-	}
-	if( m_midiWidget->m_writeablePorts )
-	{
-		m_midiOutputAction = m_tswMidiMenu->addMenu(
-					m_midiWidget->m_writeablePorts );
-	}
-	else
-	{
-		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
-		connect( m_midiOutputAction, SIGNAL( changed() ), this,
-					SLOT( midiOutSelected() ) );
-	}
-	m_midiInputAction->setText( tr( "MIDI input" ) );
-	m_midiOutputAction->setText( tr( "MIDI output" ) );
-	if( m_midiWidget->m_readablePorts == NULL ||
-					m_midiWidget->m_writeablePorts == NULL )
-	{
-		connect( m_midiWidget->m_sendCheckBox,
-						SIGNAL( toggled( bool ) ),
-				this, SLOT( midiConfigChanged( bool ) ) );
-		connect( m_midiWidget->m_receiveCheckBox,
-						SIGNAL( toggled( bool ) ),
-				this, SLOT( midiConfigChanged( bool ) ) );
-	}*/
 
 	setModel( _it );
 
@@ -1029,6 +1021,36 @@ void instrumentTrackView::updateName( void )
 
 
 
+
+void instrumentTrackView::midiInSelected( void )
+{
+	m_midiInputAction->setChecked( !m_midiInputAction->isChecked() );
+	model()->m_midiPort.setReadable( m_midiInputAction->isChecked() );
+}
+
+
+
+
+void instrumentTrackView::midiOutSelected( void )
+{
+	m_midiOutputAction->setChecked( !m_midiOutputAction->isChecked() );
+	model()->m_midiPort.setWritable( m_midiOutputAction->isChecked() );
+}
+
+
+
+
+void instrumentTrackView::midiConfigChanged( void )
+{
+	m_midiInputAction->setChecked( model()->m_midiPort.isReadable() );
+	m_midiOutputAction->setChecked( model()->m_midiPort.isWritable() );
+}
+
+
+
+
+
+
 class fxLineLcdSpinBox : public lcdSpinBox 
 {
 	public:
@@ -1052,9 +1074,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	modelView( NULL ),
 	m_track( _itv->model() ),
 	m_itv( _itv ),
-	m_instrumentView( NULL ),
-	m_midiInputAction( NULL ),
-	m_midiOutputAction( NULL )
+	m_instrumentView( NULL )
 {
 	setAcceptDrops( TRUE );
 
@@ -1130,7 +1150,9 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 							instrument_functions );
 	m_arpView= new arpeggiatorView( &m_track->m_arpeggiator,
 							instrument_functions );
-	m_midiView = new instrumentMidiIOView( m_tabWidget );
+	m_midiView = new instrumentMidiIOView( m_itv->m_readablePortsMenu,
+						m_itv->m_writablePortsMenu,
+								m_tabWidget );
 	m_effectView = new effectRackView( m_track->m_audioPort.getEffects(),
 								m_tabWidget );
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
@@ -1146,40 +1168,6 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	vlayout->addWidget( m_tabWidget );
 	vlayout->addWidget( m_pianoView );
 
-	if( m_midiView->m_readablePorts )
-	{
-		m_midiInputAction = m_itv->m_tswMidiMenu->addMenu(
-						m_midiView->m_readablePorts );
-	}
-	else
-	{
-		m_midiInputAction = m_itv->m_tswMidiMenu->addAction( "" );
-		connect( m_midiInputAction, SIGNAL( changed() ), this,
-						SLOT( midiInSelected() ) );
-	}
-	if( m_midiView->m_writeablePorts )
-	{
-		m_midiOutputAction = m_itv->m_tswMidiMenu->addMenu(
-						m_midiView->m_writeablePorts );
-	}
-	else
-	{
-		m_midiOutputAction = m_itv->m_tswMidiMenu->addAction( "" );
-		connect( m_midiOutputAction, SIGNAL( changed() ), this,
-					SLOT( midiOutSelected() ) );
-	}
-	m_midiInputAction->setText( tr( "MIDI input" ) );
-	m_midiOutputAction->setText( tr( "MIDI output" ) );
-	if( m_midiView->m_readablePorts == NULL ||
-					m_midiView->m_writeablePorts == NULL )
-	{
-		connect( m_midiView->m_sendCheckBox,
-						SIGNAL( toggled( bool ) ),
-				this, SLOT( midiConfigChanged( bool ) ) );
-		connect( m_midiView->m_receiveCheckBox,
-						SIGNAL( toggled( bool ) ),
-				this, SLOT( midiConfigChanged( bool ) ) );
-	}
 
 	setModel( _itv->model() );
 
@@ -1241,9 +1229,18 @@ void instrumentTrackWindow::modelChanged( void )
 	m_ssView->setModel( &m_track->m_soundShaping );
 	m_chordView->setModel( &m_track->m_chordCreator );
 	m_arpView->setModel( &m_track->m_arpeggiator );
-	m_midiView->setModel( &m_track->m_midiIO );
+	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.getEffects() );
 	updateName();
+
+	if( m_itv->m_readablePortsMenu != NULL )
+	{
+		m_itv->m_readablePortsMenu->setModel( &m_track->m_midiPort );
+	}
+	if( m_itv->m_writablePortsMenu != NULL )
+	{
+		m_itv->m_writablePortsMenu->setModel( &m_track->m_midiPort );
+	}
 }
 
 
@@ -1435,32 +1432,6 @@ void instrumentTrackWindow::loadSettings( const QDomElement & _this )
 
 
 
-void instrumentTrackWindow::midiInSelected( void )
-{
-	m_midiInputAction->setChecked( !m_midiInputAction->isChecked() );
-	m_midiView->m_receiveCheckBox->setChecked(
-					m_midiInputAction->isChecked() );
-}
-
-
-
-void instrumentTrackWindow::midiOutSelected( void )
-{
-	m_midiOutputAction->setChecked( !m_midiOutputAction->isChecked() );
-	m_midiView->m_sendCheckBox->setChecked(
-					m_midiOutputAction->isChecked() );
-}
-
-
-
-
-void instrumentTrackWindow::midiConfigChanged( bool )
-{
-	m_midiInputAction->setChecked(
-			m_midiView->m_receiveCheckBox->model()->value() );
-	m_midiOutputAction->setChecked(
-			m_midiView->m_sendCheckBox->model()->value() );
-}
 
 
 

@@ -64,12 +64,9 @@ void midiClient::applyPortName( midiPort * )
 
 
 
-midiPort * midiClient::addPort( midiEventProcessor * _mep,
-							const QString & _name )
+void midiClient::addPort( midiPort * _port )
 {
-	midiPort * port = new midiPort( this, _mep, _name );
-	m_midiPorts.push_back( port );
-	return( port );
+	m_midiPorts.push_back( _port );
 }
 
 
@@ -82,7 +79,6 @@ void midiClient::removePort( midiPort * _port )
 							_port );
 	if( it != m_midiPorts.end() )
 	{
-		delete *it;
 		m_midiPorts.erase( it );
 	}
 }

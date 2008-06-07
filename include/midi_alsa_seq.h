@@ -70,14 +70,14 @@ public:
 
 
 
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port );
 
-	virtual void FASTCALL applyPortMode( midiPort * _port );
-	virtual void FASTCALL applyPortName( midiPort * _port );
+	virtual void applyPortMode( midiPort * _port );
+	virtual void applyPortName( midiPort * _port );
 
-	virtual void FASTCALL removePort( midiPort * _port );
+	virtual void removePort( midiPort * _port );
 
 
 	// list seq-ports from ALSA 
@@ -94,10 +94,10 @@ public:
 	// (un)subscribe given midiPort to/from destination-port 
 	virtual void subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe = FALSE );
+						bool _subscribe = TRUE );
 	virtual void subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe = FALSE );
+						bool _subscribe = TRUE );
 	virtual void connectRPChanged( QObject * _receiver,
 							const char * _member )
 	{

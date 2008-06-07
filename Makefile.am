@@ -113,8 +113,6 @@ lmms_MOC =						\
 		./group_box.moc				\
 		./instrument_functions.moc		\
 		./instrument_function_views.moc		\
-		./instrument_midi_io.moc		\
-		./instrument_midi_io_view.moc		\
 		./instrument_sound_shaping.moc		\
 		./instrument_sound_shaping_view.moc	\
 		./kmultitabbar.moc			\
@@ -125,14 +123,15 @@ lmms_MOC =						\
 		./led_checkbox.moc			\
 		./lfo_controller.moc			\
 		./main_window.moc			\
+		./meter_model.moc			\
+		./midi_alsa_seq.moc			\
+		./midi_controller.moc			\
+		./midi_port.moc				\
+		./midi_port_menu.moc			\
 		./mixer.moc				\
 		./mv_base.moc				\
 		./name_label.moc			\
 		./nstate_button.moc			\
-		./meter_model.moc			\
-		./midi_alsa_seq.moc			\
-		./midi_controller.moc			\
-		./instrument_midi_io.moc		\
 		./pattern.moc				\
 		./piano_roll.moc			\
 		./piano.moc				\
@@ -218,7 +217,6 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/import_filter.cpp				\
 		$(srcdir)/src/core/instrument.cpp				\
 		$(srcdir)/src/core/instrument_functions.cpp			\
-		$(srcdir)/src/core/instrument_midi_io.cpp			\
 		$(srcdir)/src/core/journalling_object.cpp			\
 		$(srcdir)/src/core/ladspa_2_lmms.cpp				\
 		$(srcdir)/src/core/ladspa_manager.cpp				\
@@ -261,7 +259,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/midi/midi_alsa_raw.cpp			\
 		$(srcdir)/src/core/midi/midi_alsa_seq.cpp			\
 		$(srcdir)/src/core/midi/midi_client.cpp				\
-		$(srcdir)/src/core/midi/midi_controller.cpp				\
+		$(srcdir)/src/core/midi/midi_controller.cpp			\
 		$(srcdir)/src/core/midi/midi_mapper.cpp				\
 		$(srcdir)/src/core/midi/midi_oss.cpp				\
 		$(srcdir)/src/core/midi/midi_port.cpp				\
@@ -310,6 +308,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/lcd_spinbox.cpp			\
 		$(srcdir)/src/gui/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/gui/widgets/meter_dialog.cpp			\
+		$(srcdir)/src/gui/widgets/midi_port_menu.cpp			\
 		$(srcdir)/src/gui/widgets/name_label.cpp			\
 		$(srcdir)/src/gui/widgets/nstate_button.cpp			\
 		$(srcdir)/src/gui/widgets/pixmap_button.cpp			\
@@ -414,10 +413,11 @@ lmms_SOURCES =									\
 		$(srcdir)/include/midi.h					\
 		$(srcdir)/include/midi_alsa_raw.h				\
 		$(srcdir)/include/midi_client.h					\
-		$(srcdir)/include/midi_controller.h					\
+		$(srcdir)/include/midi_controller.h				\
 		$(srcdir)/include/midi_event_processor.h			\
 		$(srcdir)/include/midi_oss.h					\
 		$(srcdir)/include/midi_port.h					\
+		$(srcdir)/include/midi_port_menu.h				\
 		$(srcdir)/include/midi_time.h					\
 		$(srcdir)/include/clipboard.h					\
 		$(srcdir)/include/types.h					\
@@ -449,7 +449,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/dummy_instrument.h				\
 		$(srcdir)/include/instrument_play_handle.h			\
 		$(srcdir)/include/string_pair_drag.h				\
-		$(srcdir)/include/instrument_midi_io.h				\
 		$(srcdir)/include/instrument_midi_io_view.h			\
 		$(srcdir)/include/audio_port.h					\
 		$(srcdir)/include/tool.h					\
@@ -491,7 +490,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/ladspa_control_view.h				\
 		$(srcdir)/include/ladspa_base.h					\
 		$(srcdir)/include/controller.h					\
-		$(srcdir)/include/controller_connection.h					\
+		$(srcdir)/include/controller_connection.h			\
 		$(srcdir)/include/controller_rack_view.h			\
 		$(srcdir)/include/controller_view.h				\
 		$(srcdir)/include/controller_dialog.h				\

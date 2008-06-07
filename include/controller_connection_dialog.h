@@ -38,11 +38,12 @@
 class QLineEdit;
 class QListView;
 class QScrollArea;
+class autoDetectMidiController;
+class comboBox;
 class groupBox;
 class lcdSpinBox;
 class ledCheckBox;
-class comboBox;
-class autoDetectMidiController;
+class midiPortMenu;
 
 
 
@@ -69,16 +70,13 @@ public slots:
 protected slots:
 	void midiValueChanged( void );
 
-	void activatedReadablePort( QAction * _item );
-	void updateReadablePortsMenu( void );
 
 private:
-
 	groupBox * m_midiGroupBox;
 	lcdSpinBox * m_midiChannelSpinBox;
 	lcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
-	QMenu * m_readablePorts;
+	midiPortMenu * m_readablePorts;
 	boolModel m_midiAutoDetect;
 
 	groupBox * m_userGroupBox;

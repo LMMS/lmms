@@ -126,7 +126,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
-	s_previewTC->previewInstrumentTrack()->m_midiPort->setMode(
+	s_previewTC->previewInstrumentTrack()->m_midiPort.setMode(
 							midiPort::Disabled );
 
 	// create note-play-handle for it

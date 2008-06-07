@@ -1,7 +1,7 @@
 /*
  * midi_client.h - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,24 +46,19 @@ public:
 	virtual ~midiClient();
 
 	// to be implemented by sub-classes
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port ) = 0;
 
 	// inheriting classes can re-implement this for being able to update
 	// their internal port-structures etc.
-	virtual void FASTCALL applyPortMode( midiPort * _port );
-	virtual void FASTCALL applyPortName( midiPort * _port );
+	virtual void applyPortMode( midiPort * _port );
+	virtual void applyPortName( midiPort * _port );
 
-	// inheriting classes can re-implement this although it's actually not
-	// neccessary, because they can catch port-mode-changes and do their
-	// stuff as soon as port-mode changes from DUMMY to something else
-	// re-implemented methods HAVE to call addPort() of base-class!!
-	virtual midiPort * FASTCALL addPort( midiEventProcessor * _mep,
-						const QString & _name );
+	virtual void addPort( midiPort * _port );
 
 	// re-implemented methods HAVE to call removePort() of base-class!!
-	virtual void FASTCALL removePort( midiPort * _port );
+	virtual void removePort( midiPort * _port );
 
 
 	// returns whether client works with raw-MIDI, only needs to be
@@ -80,10 +75,10 @@ public:
 	// (un)subscribe given midiPort to/from destination-port 
 	virtual void subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe = FALSE );
+						bool _subscribe = TRUE );
 	virtual void subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe = FALSE );
+						bool _subscribe = TRUE );
 
 	// qobject-derived classes can use this for make a slot being
 	// connected to signal of non-raw-MIDI-client if port-lists change
@@ -152,22 +147,22 @@ public:
 
 protected:
 	// generic raw-MIDI-parser which generates appropriate MIDI-events
-	void FASTCALL parseData( const Uint8 _c );
+	void parseData( const Uint8 _c );
 
 	// to be implemented by actual client-implementation
-	virtual void FASTCALL sendByte( const Uint8 _c ) = 0;
+	virtual void sendByte( const Uint8 _c ) = 0;
 
 
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port );
 
 	// small helper function returning length of a certain event - this
 	// is neccessary for parsing raw-MIDI-data
-	static Uint8 FASTCALL eventLength( const Uint8 _event );
+	static Uint8 eventLength( const Uint8 _event );
 
 
 	// data being used for parsing

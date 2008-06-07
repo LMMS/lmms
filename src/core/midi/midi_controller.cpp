@@ -34,7 +34,6 @@
 #include "engine.h"
 #include "mixer.h"
 #include "midi_client.h"
-#include "midi_port.h"
 #include "midi_controller.h"
 
 
@@ -42,34 +41,19 @@
 midiController::midiController( model * _parent ) :
 	controller( MidiController, _parent ),
 	midiEventProcessor(),
-	m_midiChannel( 0, 0, MIDI_CHANNEL_COUNT, this ),
-	m_midiController( 0, 0, MIDI_CONTROLLER_COUNT, this ),
-	m_midiPort( engine::getMixer()->getMIDIClient()->addPort(
-			this, tr( "unnamed_midi_controller" ) ) ),
+	m_midiPort( tr( "unnamed_midi_controller" ),
+			engine::getMixer()->getMIDIClient(), this,
+					this, NULL, midiPort::Input ),
 	m_lastValue( 0.0f )
 {
-	m_midiPort->setMode( midiPort::Input );
-
-	midiClient * mc = engine::getMixer()->getMIDIClient();
-	if( mc->isRaw() == FALSE )
-	{
-		updateReadablePorts();
-	}
-
-	connect( &m_midiChannel, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPort() ) );
-	connect( &m_midiController, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPort() ) );
+	connect( &m_midiPort, SIGNAL( modeChanged() ),
+			this, SLOT( updateName() ) );
 }
 
 
 
 midiController::~midiController()
 {
-	m_midiChannel.disconnect( this );
-	m_midiController.disconnect( this );
-
-	engine::getMixer()->getMIDIClient()->removePort( m_midiPort );
 }
 
 
@@ -83,12 +67,11 @@ float midiController::value( int _offset )
 
 
 
-void midiController::updateMidiPort( void )
+void midiController::updateName( void )
 {
-	m_midiPort->setInputChannel( m_midiChannel.value() - 1 );
 	setName( QString("MIDI ch%1 ctrl%2").
-			arg( m_midiChannel.value() ).
-			arg( m_midiController.value() ) );
+			arg( m_midiPort.inputChannel() ).
+			arg( m_midiPort.inputController() ) );
 }
 
 
@@ -105,9 +88,9 @@ void midiController::processInEvent( const midiEvent & _me,
 			bytes = _me.m_data.m_bytes;
 			controllerNum = _me.m_data.m_bytes[0] & 0x7F;
 
-			if( m_midiController.value() == controllerNum + 1 &&
-					( m_midiChannel.value() == _me.m_channel + 1 ||
-					  m_midiChannel.value() == 0 ) )
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == _me.m_channel + 1 ||
+					  m_midiPort.inputChannel() == 0 ) )
 			{
 				Uint8 val = _me.m_data.m_bytes[2] & 0x7F;
 				m_lastValue = (float)( val ) / 127.0f;
@@ -124,43 +107,13 @@ void midiController::processInEvent( const midiEvent & _me,
 
 
 
-void midiController::setReadablePorts( const midiPortMap & _map )
+void midiController::subscribeReadablePorts( const midiPort::map & _map )
 {
-	m_readablePorts.clear();
-
-	for( midiPortMap::const_iterator it = _map.constBegin();
-				it != _map.constEnd(); ++it )
+	for( midiPort::map::const_iterator it = _map.constBegin();
+						it != _map.constEnd(); ++it )
 	{
-		engine::getMixer()->getMIDIClient()->subscribeReadablePort(
-				m_midiPort, it.key(), !( *it ) );
+		m_midiPort.subscribeReadablePort( it.key(), *it );
 	}
-
-	m_readablePorts = _map;
-}
-
-
-void midiController::updateReadablePorts( void )
-{
-	// first save all selected ports
-	QStringList selected_ports;
-
-	for( midiPortMap::const_iterator i = m_readablePorts.constBegin();
-    	i != m_readablePorts.constEnd(); ++i )
-	{
-		selected_ports.push_back( i.key() );
-        ++i;
-    }
-
-	m_readablePorts.clear();
-	const QStringList & wp = engine::getMixer()->getMIDIClient()->
-								readablePorts();
-	
-	// now insert new ports and restore selections
-	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
-	{
-		m_readablePorts[ *it ] = ( selected_ports.indexOf( *it ) != -1 );
-	}
-	//emit readablePortsChanged();
 }
 
 
@@ -169,28 +122,8 @@ void midiController::updateReadablePorts( void )
 void midiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	controller::saveSettings( _doc, _this );
+	m_midiPort.saveSettings( _doc, _this );
 
-	m_midiChannel.saveSettings( _doc, _this, "channel" );
-	m_midiController.saveSettings( _doc, _this, "controller" );
-
-	if( m_readablePorts.size() )
-	{
-		QString rp;
-		for( midiPortMap::const_iterator it = m_readablePorts.constBegin();
-					it != m_readablePorts.constEnd(); ++it )
-		{
-			if( *it )
-			{
-				rp += it.key() + ",";
-			}
-		}
-		// cut off comma
-		if( rp.length() > 0 )
-		{
-			rp.truncate( rp.length() - 1 );
-		}
-		_this.setAttribute( "inports", rp );
-	}
 }
 
 
@@ -200,28 +133,9 @@ void midiController::loadSettings( const QDomElement & _this )
 {
 	controller::loadSettings( _this );
 
-	m_midiChannel.loadSettings( _this, "channel" );
-	m_midiController.loadSettings( _this, "controller" );
+	m_midiPort.loadSettings( _this );
 
-	midiClient * mc = engine::getMixer()->getMIDIClient();
-	if( mc->isRaw() == FALSE )
-	{
-		//updateReadablePorts();
-
-		QStringList rp = _this.attribute( "inports" ).split( ',' );
-		for( midiPortMap::iterator it = m_readablePorts.begin();
-					it != m_readablePorts.end(); ++it )
-		{
-			if( rp.indexOf( it.key() ) != -1 )
-			{
-				*it = TRUE;
-				
-				engine::getMixer()->getMIDIClient()->subscribeReadablePort(
-						m_midiPort, it.key(), !( *it ) );
-			}
-		}
-	}
-	updateMidiPort();
+	updateName();
 }
 
 

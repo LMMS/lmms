@@ -71,7 +71,7 @@ public:
 
 
 protected:
-	virtual void FASTCALL sendByte( const Uint8 _c );
+	virtual void sendByte( const Uint8 _c );
 	virtual void run( void );
 
 

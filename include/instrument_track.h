@@ -32,10 +32,10 @@
 #include "audio_port.h"
 #include "automatable_model.h"
 #include "instrument_functions.h"
-#include "instrument_midi_io.h"
 #include "instrument_sound_shaping.h"
 #include "lcd_spinbox.h"
 #include "midi_event_processor.h"
+#include "midi_port.h"
 #include "mixer.h"
 #include "piano.h"
 #include "effect_chain.h"
@@ -51,10 +51,10 @@ class effectRackView;
 class instrumentSoundShapingView;
 class fadeButton;
 class instrument;
-class instrumentMidiIOView;
 class instrumentTrackButton;
 class instrumentTrackWindow;
-class midiPort;
+class instrumentMidiIOView;
+class midiPortMenu;
 class notePlayHandle;
 class pluginView;
 class presetPreviewPlayHandle;
@@ -167,8 +167,8 @@ protected slots:
 
 
 private:
-	midiPort * m_midiPort;
 	audioPort m_audioPort;
+	midiPort m_midiPort;
 
 	notePlayHandle * m_notes[NumKeys];
 
@@ -186,7 +186,6 @@ private:
 	instrumentSoundShaping m_soundShaping;
 	arpeggiator m_arpeggiator;
 	chordCreator m_chordCreator;
-	instrumentMidiIO m_midiIO;
 
 	piano m_piano;
 
@@ -234,6 +233,10 @@ private slots:
 
 	void updateName( void );
 
+	void midiInSelected( void );
+	void midiOutSelected( void );
+	void midiConfigChanged( void );
+
 
 private:
 	instrumentTrackWindow * m_window;
@@ -246,6 +249,11 @@ private:
 	instrumentTrackButton * m_tswInstrumentTrackButton;
 
 	QMenu * m_tswMidiMenu;
+	midiPortMenu * m_readablePortsMenu;
+	midiPortMenu * m_writablePortsMenu;
+
+	QAction * m_midiInputAction;
+	QAction * m_midiOutputAction;
 
 
 	friend class instrumentTrackButton;
@@ -292,10 +300,6 @@ public slots:
 	void updateName( void );
 	void updateInstrumentView( void );
 
-	void midiInSelected( void );
-	void midiOutSelected( void );
-	void midiConfigChanged( bool );
-
 
 protected:
 	// capture close-events for toggling instrument-track-button
@@ -338,9 +342,6 @@ private:
 
 	// test-piano at the bottom of every instrument-settings-window
 	pianoView * m_pianoView;
-
-	QAction * m_midiInputAction;
-	QAction * m_midiOutputAction;
 
 	friend class instrumentTrackButton;
 	friend class instrumentView;

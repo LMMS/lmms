@@ -1,3 +1,32 @@
+2008-06-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/controller_connection_dialog.h:
+	* include/instrument_midi_io_view.h:
+	* include/instrument_track.h:
+	* include/midi_alsa_raw.h:
+	* include/midi_alsa_seq.h:
+	* include/midi_client.h:
+	* include/midi_controller.h:
+	* include/midi_io_model.h:
+	* include/midi_oss.h:
+	* include/midi_port.h:
+	* include/midi_port_menu.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/song.cpp:
+	* src/core/midi/midi_client.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/midi/midi_io_model.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* src/tracks/instrument_track.cpp:
+	* Makefile.am:
+	rewrote management of MIDI-ports and MIDI-port subscriptions - now
+	it's central and easy to use
+
 2008-06-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/note.h:

@@ -30,13 +30,9 @@
 
 
 #include "instrument_midi_io_view.h"
-#include "instrument_midi_io.h"
+#include "midi_port_menu.h"
 #include "embed.h"
-#include "engine.h"
 #include "gui_templates.h"
-#include "midi_client.h"
-#include "midi_port.h"
-#include "mixer.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
 #include "tab_widget.h"
@@ -44,11 +40,12 @@
 
 
 
-instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
+instrumentMidiIOView::instrumentMidiIOView(
+					midiPortMenu * _readable_ports_menu,
+					midiPortMenu * _writable_ports_menu,
+							 QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
-	m_readablePorts( NULL ),
-	m_writeablePorts( NULL )
+	modelView( NULL )
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
@@ -101,38 +98,24 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	m_defaultVelocityOutCheckBox->move( 28, 164 );
 
 
-
-	// when using with non-raw-clients we can provide buttons showing
-	// our port-menus when being clicked
-	midiClient * mc = engine::getMixer()->getMIDIClient();
-	if( mc->isRaw() == FALSE )
+	if( _readable_ports_menu != NULL )
 	{
-		m_readablePorts = new QMenu( m_setupTabWidget );
-		m_readablePorts->setFont( pointSize<9>(
-						m_readablePorts->font() ) );
-		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( activatedReadablePort( QAction * ) ) );
-
-		m_writeablePorts = new QMenu( m_setupTabWidget );
-		m_writeablePorts->setFont( pointSize<9>(
-						m_writeablePorts->font() ) );
-		connect( m_writeablePorts, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( activatedWriteablePort( QAction * ) ) );
-
 		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
 		rp_btn->setGeometry( 186, 34, 40, 40 );
-		rp_btn->setMenu( m_readablePorts );
+		rp_btn->setMenu( _readable_ports_menu );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
-
+	}
+	if( _writable_ports_menu != NULL )
+	{
 		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
 		wp_btn->setText( tr( "MIDI-devices to send MIDI-events "
 								"to" ) );
 		wp_btn->setIcon( embed::getIconPixmap( "midi_out" ) );
 		wp_btn->setGeometry( 186, 114, 40, 40 );
-		wp_btn->setMenu( m_writeablePorts );
+		wp_btn->setMenu( _writable_ports_menu );
 		wp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
 }
@@ -149,101 +132,16 @@ instrumentMidiIOView::~instrumentMidiIOView()
 
 void instrumentMidiIOView::modelChanged( void )
 {
-	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	m_inputChannelSpinBox->setModel( &mio->m_inputChannelModel );
-	m_outputChannelSpinBox->setModel( &mio->m_outputChannelModel );
-	m_receiveCheckBox->setModel( &mio->m_receiveEnabledModel );
+	midiPort * mp = castModel<midiPort>();
+	m_inputChannelSpinBox->setModel( &mp->m_inputChannelModel );
+	m_outputChannelSpinBox->setModel( &mp->m_outputChannelModel );
+	m_receiveCheckBox->setModel( &mp->m_readableModel );
 	m_defaultVelocityInCheckBox->setModel(
-				&mio->m_defaultVelocityInEnabledModel );
-	m_sendCheckBox->setModel( &mio->m_sendEnabledModel );
+				&mp->m_defaultVelocityInEnabledModel );
+	m_sendCheckBox->setModel( &mp->m_writableModel );
 	m_defaultVelocityOutCheckBox->setModel(
-				&mio->m_defaultVelocityOutEnabledModel );
-	connect( mio, SIGNAL( readablePortsChanged() ),
-			this, SLOT( updateReadablePortsMenu() ) );
-	connect( mio, SIGNAL( writeablePortsChanged() ),
-			this, SLOT( updateWriteablePortsMenu() ) );
-	updateReadablePortsMenu();
-	updateWriteablePortsMenu();
+				&mp->m_defaultVelocityOutEnabledModel );
 }
-
-
-
-
-void instrumentMidiIOView::activatedReadablePort( QAction * _item )
-{
-	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	// make sure, MIDI-port is configured for input
-	if( _item->isChecked() == TRUE &&
-		mio->m_midiPort->mode() != midiPort::Input &&
-		mio->m_midiPort->mode() != midiPort::Duplex )
-	{
-		mio->m_receiveEnabledModel.setValue( TRUE );
-	}
-	engine::getMixer()->getMIDIClient()->subscribeReadablePort(
-			mio->m_midiPort, _item->text(), !_item->isChecked() );
-}
-
-
-
-
-void instrumentMidiIOView::activatedWriteablePort( QAction * _item )
-{
-	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	// make sure, MIDI-port is configured for output
-	if( _item->isChecked() == TRUE &&
-		mio->m_midiPort->mode() != midiPort::Output &&
-		mio->m_midiPort->mode() != midiPort::Duplex )
-	{
-		mio->m_sendEnabledModel.setValue( TRUE );
-	}
-	engine::getMixer()->getMIDIClient()->subscribeWriteablePort(
-			mio->m_midiPort, _item->text(), !_item->isChecked() );
-}
-
-
-
-
-void instrumentMidiIOView::updateReadablePortsMenu( void )
-{
-	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	if( m_readablePorts )
-	{
-		m_readablePorts->clear();
-		for( instrumentMidiIO::midiPortMap::const_iterator it =
-					mio->m_readablePorts.begin();
-				it != mio->m_readablePorts.end(); ++it )
-		{
-			QAction * a = m_readablePorts->addAction( it->first );
-			a->setCheckable( TRUE );
-			a->setChecked( it->second );
-		}
-	}
-}
-
-
-
-
-void instrumentMidiIOView::updateWriteablePortsMenu( void )
-{
-	instrumentMidiIO * mio = castModel<instrumentMidiIO>();
-	if( m_writeablePorts )
-	{
-		m_writeablePorts->clear();
-		for( instrumentMidiIO::midiPortMap::const_iterator it =
-						mio->m_writeablePorts.begin();
-				it != mio->m_writeablePorts.end(); ++it )
-		{
-			QAction * a = m_writeablePorts->addAction( it->first );
-			a->setCheckable( TRUE );
-			a->setChecked( it->second );
-		}
-	}
-}
-
-
-
-
-#include "instrument_midi_io_view.moc"
 
 
 #endif

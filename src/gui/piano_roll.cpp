@@ -515,7 +515,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// of start-notes and so on...)
 	resizeEvent( NULL );
 
-	// remove all connections to other channel-tracks
+	// remove all connections to other instrument-tracks
 	disconnect( this, SLOT( recordNote( const note & ) ) );
 
 	// and now connect to noteDone()-signal of channel so that

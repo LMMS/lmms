@@ -1,8 +1,8 @@
 /*
- * instrument_midi_io_view.h - tab-widget in instrument-track-window for setting
- *                             up MIDI-related stuff
+ * midi_port_menu.h - a menu for subscribing a midiPort to several external
+ *                    MIDI ports
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,39 +24,35 @@
  */
 
 
-#ifndef _INSTRUMENT_MIDI_IO_VIEW_H
-#define _INSTRUMENT_MIDI_IO_VIEW_H
+#ifndef _MIDI_PORT_MENU_H
+#define _MIDI_PORT_MENU_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QMenu>
 
 #include "mv_base.h"
+#include "midi_port.h"
 
 
-class tabWidget;
-class ledCheckBox;
-class lcdSpinBox;
-class midiPortMenu;
+class QAction;
 
 
-class instrumentMidiIOView : public QWidget, public modelView
+class midiPortMenu : public QMenu, public modelView
 {
+	Q_OBJECT
 public:
-	instrumentMidiIOView( midiPortMenu * _readable_ports_menu,
-				midiPortMenu * _writable_ports_menu,
-							QWidget * _parent );
-	virtual ~instrumentMidiIOView();
+	midiPortMenu( midiPort::Modes _mode );
+	virtual ~midiPortMenu();
+
+
+protected slots:
+	void activatedPort( QAction * _item );
+	void updatePorts( void );
 
 
 private:
 	virtual void modelChanged( void );
 
-	tabWidget * m_setupTabWidget;
-	lcdSpinBox * m_inputChannelSpinBox;
-	lcdSpinBox * m_outputChannelSpinBox;
-	ledCheckBox * m_receiveCheckBox;
-	ledCheckBox * m_sendCheckBox;
-	ledCheckBox * m_defaultVelocityInCheckBox;
-	ledCheckBox * m_defaultVelocityOutCheckBox;
+	midiPort::Modes m_mode;
 
 } ;
 

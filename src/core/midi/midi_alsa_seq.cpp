@@ -323,7 +323,7 @@ void midiALSASeq::removePort( midiPort * _port )
 
 void midiALSASeq::subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe )
+						bool _subscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
 		( _port->mode() != midiPort::Input &&
@@ -346,13 +346,13 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, &sender );
 	snd_seq_port_subscribe_set_dest( subs, dest );
-	if( _unsubscribe )
+	if( _subscribe )
 	{
-		snd_seq_unsubscribe_port( m_seqHandle, subs );
+		snd_seq_subscribe_port( m_seqHandle, subs );
 	}
 	else
 	{
-		snd_seq_subscribe_port( m_seqHandle, subs );
+		snd_seq_unsubscribe_port( m_seqHandle, subs );
 	}
 	snd_seq_port_subscribe_free( subs );
 	snd_seq_port_info_free( port_info );
@@ -363,7 +363,7 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 
 void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
-						bool _unsubscribe )
+						bool _subscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
 		( _port->mode() != midiPort::Output &&
@@ -389,13 +389,13 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	snd_seq_port_subscribe_malloc( &subs );
 	snd_seq_port_subscribe_set_sender( subs, sender );
 	snd_seq_port_subscribe_set_dest( subs, &dest );
-	if( _unsubscribe )
+	if( _subscribe )
 	{
-		snd_seq_unsubscribe_port( m_seqHandle, subs );
+		snd_seq_subscribe_port( m_seqHandle, subs );
 	}
 	else
 	{
-		snd_seq_subscribe_port( m_seqHandle, subs );
+		snd_seq_unsubscribe_port( m_seqHandle, subs );
 	}
 	snd_seq_port_subscribe_free( subs );
 	snd_seq_port_info_free( port_info );
