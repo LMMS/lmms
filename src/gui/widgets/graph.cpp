@@ -255,7 +255,6 @@ void graph::paintEvent( QPaintEvent * )
 
 
 		case graph::NearestStyle:
-			printf("GAY MODE\n");
 			for( int i=0; i < length; i++ )
 			{
 				p.drawLine(2+static_cast<int>(i*xscale), 
