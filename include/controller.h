@@ -50,9 +50,10 @@ public:
 		DummyController,
 		LfoController,
 		MidiController,
+		PeakController,
 		/*
 		XYController,
-		PeakController,
+		EquationController
 		*/
 		NumControllerTypes
 	} ;

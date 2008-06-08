@@ -726,6 +726,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/midi_import/Makefile
 		 plugins/organic/Makefile
 		 plugins/patman/Makefile
+		 plugins/peak_controller_effect/Makefile
 		 plugins/sf2_player/Makefile
 		 plugins/singerbot/Makefile
 		 plugins/stk/Makefile

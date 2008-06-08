@@ -39,6 +39,29 @@
 	* plugins/bit_invader/bit_invader.cpp:
 	change graph style mode when toggling interpolation
 
+	* plugins/peak_controller_effect:
+	* plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect.cpp:
+	* plugins/peak_controller_effect/logo.png:
+	* plugins/peak_controller_effect/peak_controller_effect_controls.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect_control_dialog.h:
+	* plugins/peak_controller_effect/peak_controller_effect.h:
+	* plugins/peak_controller_effect/peak_controller_effect_controls.h:
+	* plugins/peak_controller_effect/Makefile.am:
+	* plugins/Makefile.am:
+	* include/peak_controller.h:
+	* include/controller.h:
+	* include/automatable_model.h:
+	* src/gui/peak_controller_dialog.cpp:
+	* src/core/peak_controller.cpp:
+	* src/core/controller.cpp:
+	* configure.in:
+	* Makefile.am:
+	- Very first implementation of peak-controller
+	- Create one by adding it in the effect-chain, then connecting a widget to
+	the controller
+	- There is no sample-exactness, smoothing, or anything like that yet
+
 2008-06-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/tap/tap_deesser.c:

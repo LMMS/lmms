@@ -27,6 +27,7 @@ SUBDIRS =			\
 	midi_import		\
 	organic			\
 	patman			\
+	peak_controller_effect	\
 	$(SF2PLAYER_DIR)    \
 	$(SINGERBOT_DIR)	\
 	stereo_enhancer		\

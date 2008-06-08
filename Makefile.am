@@ -133,6 +133,7 @@ lmms_MOC =						\
 		./name_label.moc			\
 		./nstate_button.moc			\
 		./pattern.moc				\
+		./peak_controller.moc		\
 		./piano_roll.moc			\
 		./piano.moc				\
 		./pixmap_button.moc			\
@@ -230,6 +231,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/note.cpp					\
 		$(srcdir)/src/core/note_play_handle.cpp				\
 		$(srcdir)/src/core/oscillator.cpp				\
+		$(srcdir)/src/core/peak_controller.cpp					\
 		$(srcdir)/src/core/piano.cpp					\
 		$(srcdir)/src/core/plugin.cpp					\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp		\
@@ -310,6 +312,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/midi_port_menu.cpp			\
 		$(srcdir)/src/gui/widgets/name_label.cpp			\
 		$(srcdir)/src/gui/widgets/nstate_button.cpp			\
+		$(srcdir)/src/gui/peak_controller_dialog.cpp			\
 		$(srcdir)/src/gui/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/gui/widgets/project_notes.cpp			\
 		$(srcdir)/src/gui/widgets/rubberband.cpp			\
@@ -494,6 +497,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/controller_dialog.h				\
 		$(srcdir)/include/controller_connection_dialog.h		\
 		$(srcdir)/include/lfo_controller.h				\
+		$(srcdir)/include/peak_controller.h				\
 		$(THIRD_PARTY_CODE)
 
 lmms_includedir = $(pkgincludedir)

@@ -129,6 +129,7 @@ public:
 			QObject::connect( m_controllerConnection,
 							SIGNAL( valueChanged() ),
 						this, SIGNAL( dataChanged() ) );
+			emit dataChanged();
 		}
 	}
 
