@@ -39,8 +39,8 @@ class comboBoxModel : public intModel
 {
 	Q_OBJECT
 public:
-	comboBoxModel( ::model * _parent = NULL ) :
-		intModel( 0, 0, 0, _parent )
+	comboBoxModel( ::model * _parent = NULL, const QString & _display_name = QString::null ) :
+		intModel( 0, 0, 0, _parent, _display_name )
 	{
 	}
 

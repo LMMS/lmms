@@ -3,6 +3,37 @@
 	* src/gui/widgets/graph.cpp:
 	Fix graph widget
 
+	* include/mv_base.h:
+	* src/core/mv_base.cpp:
+	Add recursive fullDisplayName function
+
+	* include/combobox_model.h:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/gui/widgets/effect_view.cpp:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/fx_mixer.cpp:
+	* src/core/lfo_controller.cpp:
+	* src/core/effect.cpp:
+	extend more models and views for displayName
+
+	* include/instrument.h:
+	* src/gui/widgets/instrument_sound_shaping_view.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument.cpp:
+	extend instrument stuff for displayName
+
+	* include/controller_connection_dialog.h:
+	* src/gui/controller_connection_dialog.cpp:
+	improve interface slightly
+
 2008-06-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/tap/tap_deesser.c:

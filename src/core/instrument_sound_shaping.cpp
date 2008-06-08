@@ -60,9 +60,11 @@ instrumentSoundShaping::instrumentSoundShaping(
 	model( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_filterEnabledModel( FALSE, this ),
-	m_filterModel( this ),
-	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this ),
-	m_filterResModel( 0.5, basicFilters<>::minQ(), 10.0, 0.01, this )
+	m_filterModel( this, tr( "Filter type" ) ),
+	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this,
+					tr( "cutoff-frequency" ) ),
+	m_filterResModel( 0.5, basicFilters<>::minQ(), 10.0, 0.01, this,
+					tr( "Q/Resonance" ) )
 {
 	for( int i = 0; i < NumTargets; ++i )
 	{

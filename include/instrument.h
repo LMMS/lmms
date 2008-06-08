@@ -106,6 +106,7 @@ public:
 		return( FALSE );
 	}
 
+	virtual QString fullDisplayName( void ) const;
 
 	// --------------------------------------------------------------------
 	// provided functions:

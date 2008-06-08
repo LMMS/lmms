@@ -51,8 +51,7 @@ instrumentMidiIOView::instrumentMidiIOView(
 									this );
 	m_setupTabWidget->setGeometry( 4, 5, 238, 200 );
 
-	m_inputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget,
-							tr( "Input channel" ) );
+	m_inputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_inputChannelSpinBox->move( 28, 52 );
@@ -60,16 +59,14 @@ instrumentMidiIOView::instrumentMidiIOView(
 
 
 
-	m_outputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget,
-						tr( "Output channel" ) );
+	m_outputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->move( 28, 132 );
 	m_outputChannelSpinBox->setEnabled( FALSE );
 
 
 	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
-						m_setupTabWidget,
-						tr( "Receive MIDI-events" ) );
+				m_setupTabWidget );
 	m_receiveCheckBox->move( 10, 34 );
 	// enabling/disabling widgets is UI-stuff thus we do not use model here
 	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
@@ -77,15 +74,13 @@ instrumentMidiIOView::instrumentMidiIOView(
 
 
 	m_defaultVelocityInCheckBox = new ledCheckBox(
-				tr( "Default velocity for all input-events" ),
-					m_setupTabWidget,
-					tr( "Default input velocity" ) );
+			tr( "Default velocity for all input-events" ),
+			m_setupTabWidget );
 	m_defaultVelocityInCheckBox->move( 28, 84 );
 
 
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
-						m_setupTabWidget,
-						tr( "Send MIDI-events" ) );
+						m_setupTabWidget );
 	m_sendCheckBox->move( 10, 114 );
 	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
@@ -93,8 +88,7 @@ instrumentMidiIOView::instrumentMidiIOView(
 
 	m_defaultVelocityOutCheckBox = new ledCheckBox(
 				tr( "Default velocity for all output-events" ),
-					m_setupTabWidget,
-					tr( "Default output velocity" ) );
+					m_setupTabWidget );
 	m_defaultVelocityOutCheckBox->move( 28, 164 );
 
 

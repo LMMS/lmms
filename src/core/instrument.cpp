@@ -123,6 +123,13 @@ void instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 
 
 
+QString instrument::fullDisplayName( void ) const
+{
+	return getInstrumentTrack()->displayName();
+}
+
+
+
 
 
 

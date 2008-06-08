@@ -100,7 +100,7 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 		return;
 	}
 
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }

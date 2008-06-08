@@ -170,8 +170,8 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 chordCreator::chordCreator( instrumentTrack * _instrument_track ) :
 	model( _instrument_track ),
 	m_chordsEnabledModel( FALSE, this ),
-	m_chordsModel( this ),
-	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this )
+	m_chordsModel( this, tr( "Chord type" ) ),
+	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
 	m_chordsEnabledModel.setTrack( _instrument_track );
 
@@ -283,12 +283,12 @@ void chordCreator::loadSettings( const QDomElement & _this )
 arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 	model( _instrument_track ),
 	m_arpEnabledModel( FALSE ),
-	m_arpModel( this ),
-	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this ),
-	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 1.0, this ),
-	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this ),
-	m_arpDirectionModel( 0, 0, NumArpDirections, this ),
-	m_arpModeModel( this )
+	m_arpModel( this, tr( "Arpeggio type" ) ),
+	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 1.0, this, tr( "Arpeggio time" ) ),
+	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
+	m_arpDirectionModel( 0, 0, NumArpDirections, this, tr( "Arpeggio direction" ) ),
+	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	m_arpEnabledModel.setTrack( _instrument_track );
 

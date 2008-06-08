@@ -30,6 +30,30 @@
 #include "mv_base.h"
 
 
+
+QString model::fullDisplayName( void ) const
+{
+	const QString & n = displayName();
+	if( parentModel() ) 
+	{
+		if( !n.isEmpty() )
+		{
+			return parentModel()->fullDisplayName() + ": " + n;
+		}
+		else
+		{
+			return parentModel()->fullDisplayName();
+		}
+	}
+	else
+	{
+		return n;
+	}
+}
+
+
+
+
 modelView::modelView( model * _model ) :
 	m_model( _model )
 {

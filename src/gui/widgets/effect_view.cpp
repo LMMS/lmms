@@ -57,13 +57,13 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
-	m_bypass = new ledCheckBox( "", this, tr( "Turn the effect off" ) );
+	m_bypass = new ledCheckBox( "", this );
 	m_bypass->move( 3, 3 );
 	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
 	toolTip::add( m_bypass, tr( "On/Off" ) );
 
 
-	m_wetDry = new knob( knobBright_26, this, tr( "Wet/Dry mix" ) );
+	m_wetDry = new knob( knobBright_26, this );
 	m_wetDry->setLabel( tr( "W/D" ) );
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
@@ -72,7 +72,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 					"shows up in the output." ) );
 
 
-	m_autoQuit = new tempoSyncKnob( knobBright_26, this, tr( "Decay" ) );
+	m_autoQuit = new tempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
@@ -82,7 +82,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 "run the risk of clipping the tail on delay effects." ) );
 
 
-	m_gate = new knob( knobBright_26, this, tr( "Gate" ) );
+	m_gate = new knob( knobBright_26, this );
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );

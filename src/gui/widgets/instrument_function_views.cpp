@@ -58,10 +58,8 @@ chordCreatorView::chordCreatorView( chordCreator * _cc, QWidget * _parent ) :
 	modelView( NULL ),
 	m_cc( _cc ),
 	m_chordsGroupBox( new groupBox( tr( "CHORDS" ), this ) ),
-	m_chordsComboBox( new comboBox( m_chordsGroupBox,
-							tr( "Chord type" ) ) ),
-	m_chordRangeKnob( new knob( knobBright_26, m_chordsGroupBox,
-							tr( "Chord range" ) ) )
+	m_chordsComboBox( new comboBox( m_chordsGroupBox ) ),
+	m_chordRangeKnob( new knob( knobBright_26, m_chordsGroupBox ) )
 {
 	move( CHORDS_GROUPBOX_X, CHORDS_GROUPBOX_Y );
 	setFixedSize( 250, CHORDS_GROUPBOX_HEIGHT );
@@ -113,15 +111,11 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 	modelView( NULL ),
 	m_a( _arp ),
 	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ), this ) ),
-	m_arpComboBox( new comboBox( m_arpGroupBox, tr( "Arpeggio type" ) ) ),
-	m_arpRangeKnob( new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio range" ) ) ),
-	m_arpTimeKnob( new tempoSyncKnob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio time" ) ) ),
-	m_arpGateKnob( new knob( knobBright_26, m_arpGroupBox,
-						tr( "Arpeggio gate" ) ) ),
-	m_arpModeComboBox( new comboBox( m_arpGroupBox,
-						tr( "Arpeggio mode" ) ) )
+	m_arpComboBox( new comboBox( m_arpGroupBox) ),
+	m_arpRangeKnob( new knob( knobBright_26, m_arpGroupBox ) ),
+	m_arpTimeKnob( new tempoSyncKnob( knobBright_26, m_arpGroupBox ) ),
+	m_arpGateKnob( new knob( knobBright_26, m_arpGroupBox ) ),
+	m_arpModeComboBox( new comboBox( m_arpGroupBox ) )
 {
 	move( ARP_GROUPBOX_X, ARP_GROUPBOX_Y );
 	setFixedSize( 250, ARP_GROUPBOX_HEIGHT );
@@ -211,8 +205,7 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 							"arp_random_off" ) );
 	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
 
-	m_arpDirectionBtnGrp = new automatableButtonGroup( this,
-						tr( "Arpeggio direction" ) );
+	m_arpDirectionBtnGrp = new automatableButtonGroup( this );
 	m_arpDirectionBtnGrp->addButton( arp_up_btn );
 	m_arpDirectionBtnGrp->addButton( arp_down_btn );
 	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );

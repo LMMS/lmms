@@ -41,6 +41,7 @@ class QScrollArea;
 class autoDetectMidiController;
 class comboBox;
 class groupBox;
+class tabWidget;
 class lcdSpinBox;
 class ledCheckBox;
 class midiPortMenu;
@@ -72,6 +73,7 @@ protected slots:
 
 
 private:
+	// Midi
 	groupBox * m_midiGroupBox;
 	lcdSpinBox * m_midiChannelSpinBox;
 	lcdSpinBox * m_midiControllerSpinBox;
@@ -79,9 +81,12 @@ private:
 	midiPortMenu * m_readablePorts;
 	boolModel m_midiAutoDetect;
 
+	// User
 	groupBox * m_userGroupBox;
 	comboBox * m_userController;
 
+	// Mapping
+	tabWidget * m_mappingBox;
 	QLineEdit * m_mappingFunction;
 
 	controller * m_controller;

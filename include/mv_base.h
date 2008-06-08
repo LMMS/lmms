@@ -53,6 +53,11 @@ public:
 		return( m_defaultConstructed );
 	}
 
+	inline model * parentModel( void ) const
+	{
+		return static_cast<model *>( parent() );
+	}
+
 	virtual QString displayName( void ) const
 	{
 		return QString();
@@ -62,6 +67,7 @@ public:
 	{
 	}
 
+	virtual QString fullDisplayName( void ) const;
 
 private:
 	bool m_defaultConstructed;

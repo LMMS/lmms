@@ -105,7 +105,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	if ( m_group != NULL )
 	{
 		target = m_group;
-		targetName = target->accessibleName();
+		targetName = m_group->model()->displayName();
 		pattern = m_group->model()->getAutomationPattern();
 	}
 	else

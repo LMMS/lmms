@@ -252,7 +252,7 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 {
 	mouseReleaseEvent( NULL );
 
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 	

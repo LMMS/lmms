@@ -42,14 +42,20 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 	m_midiEventProcessor( _mep ),
 	m_name( _name ),
 	m_mode( _mode ),
-        m_inputChannelModel( 0, 0, MidiChannelCount, this ),
-        m_outputChannelModel( 1, 1, MidiChannelCount, this ),
-	m_inputControllerModel( 0, 0, MidiControllerCount, this ),
-	m_outputControllerModel( 0, 0, MidiControllerCount, this ),
-        m_readableModel( FALSE, this ),
-        m_writableModel( FALSE, this ),
-        m_defaultVelocityInEnabledModel( FALSE, this ),
-        m_defaultVelocityOutEnabledModel( FALSE, this )
+	m_inputChannelModel( 0, 0, MidiChannelCount, this,
+			tr( "Input channel" ) ),
+    m_outputChannelModel( 1, 1, MidiChannelCount, this,
+			tr( "Output channel" ) ),
+	m_inputControllerModel( 0, 0, MidiControllerCount, this,
+			tr( "Input controller" )  ),
+	m_outputControllerModel( 0, 0, MidiControllerCount, this,
+			tr( "Output controller" )  ),
+	m_readableModel( FALSE, this, tr( "Receive MIDI-events" ) ),
+	m_writableModel( FALSE, this, tr( "Send MIDI-events" ) ),
+	m_defaultVelocityInEnabledModel( FALSE, this,
+			tr( "Default input velocity" ) ),
+	m_defaultVelocityOutEnabledModel( FALSE, this,
+			tr( "Default output velocity" ) )
 {
 	m_midiClient->addPort( this );
 

@@ -36,6 +36,7 @@
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "combobox.h"
+#include "tab_widget.h"
 #include "group_box.h"
 #include "midi_controller.h"
 #include "midi_client.h"
@@ -135,7 +136,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// Midi stuff
 	m_midiGroupBox = new groupBox( tr( "MIDI CONTROLLER" ), this );
-	m_midiGroupBox->setGeometry( 2, 2, 240, 64 );
+	m_midiGroupBox->setGeometry( 8, 2, 240, 64 );
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
 	
@@ -149,14 +150,14 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 			tr( "Input controller" ) );
 	m_midiControllerSpinBox->addTextForValue( 0, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
-	m_midiControllerSpinBox->move( 72, 24 );
+	m_midiControllerSpinBox->move( 68, 24 );
 	
 
 	m_midiAutoDetectCheckBox =
 			new ledCheckBox( tr("Auto Detect"),
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
-	m_midiAutoDetectCheckBox->move( 136, 30 );
+	m_midiAutoDetectCheckBox->move( 132, 30 );
 	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
 			this, SLOT( autoDetectToggled() ) );
 
@@ -170,7 +171,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		rp_btn->setGeometry( 200, 24, 40, 40 );
+		rp_btn->setGeometry( 206, 30, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
@@ -178,21 +179,12 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// User stuff
 	m_userGroupBox = new groupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 2, 70, 240, 64 );
+	m_userGroupBox->setGeometry( 8, 70, 240, 64 );
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
 	m_userController = new comboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 20, 200, 22 );
-
-	m_mappingFunction = new QLineEdit( this );
-	m_mappingFunction->setGeometry( 2, 140, 240, 16 );
-	m_mappingFunction->setText( "input" );
-
-	QWidget * buttons = new QWidget( this );
-	buttons->setGeometry( 2, 160, 240, 32 );
-
-	resize( 256, 196 );
+	m_userController->setGeometry( 10, 24, 200, 22 );
 
 	for( int i = 0; i < engine::getSong()->controllers().size(); ++i )
 	{
@@ -201,11 +193,21 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	}
 	
 
+	// Mapping functions
+	m_mappingBox = new tabWidget( tr( "MAPPING FUNCTION" ), this );
+	m_mappingBox->setGeometry( 8, 138, 240, 64 );
+	m_mappingFunction = new QLineEdit( m_mappingBox );
+	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
+	m_mappingFunction->setText( "input" );
+
+
+	// Buttons
+	QWidget * buttons = new QWidget( this );
+	buttons->setGeometry( 8, 210, 240, 32 );
+
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
-
-
 	
 	QPushButton * select_btn = new QPushButton( 
 					embed::getIconPixmap( "add" ),
@@ -219,6 +221,8 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	//connect( cancel_btn, SIGNAL( clicked() ),
 	//			this, SLOT( reject() ) );
 
+	resize( 256, 246 );
+
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( select_btn );
@@ -226,6 +230,8 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
 
+
+	// Crazy MIDI View stuff
 	
 	// TODO, handle by making this a model for the Dialog "view"
 	controllerConnection * cc = NULL;
@@ -297,6 +303,7 @@ void controllerConnectionDialog::selectController( void )
 			mc = m_midiController->copyToMidiController(
 					engine::getSong() );
 	
+			/*
 			if( m_targetModel->getTrack() && 
 					!m_targetModel->getTrack()->displayName().isEmpty() )
 			{
@@ -308,6 +315,8 @@ void controllerConnectionDialog::selectController( void )
 			{
 				mc->m_midiPort.setName( m_targetModel->displayName() );
 			}
+			*/
+			mc->m_midiPort.setName( m_targetModel->fullDisplayName() );
 			m_controller = mc;
 		}
 	}

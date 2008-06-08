@@ -41,11 +41,11 @@ const float TWO_PI = 6.28318531f;
 
 lfoController::lfoController( model * _parent ) :
 	controller( LfoController, _parent ),
-	m_lfoBaseModel( 0.5, 0.0, 1.0, 0.001, this ),
-	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this ),
-	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this ),
-	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this ),
-	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, this ),
+	m_lfoBaseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
+	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
+	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
+	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
+	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, this, tr( "Oscillator waveform" ) ),
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 ),

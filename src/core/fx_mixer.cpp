@@ -192,7 +192,9 @@ void fxMixer::clear()
 		m_fxChannels[i]->m_fxChain.clear();
 		m_fxChannels[i]->m_volumeModel.setValue( 1.0f );
 		m_fxChannels[i]->m_name = ( i == 0 ) ?
-					tr( "Master" ) : tr( "FX %1" ).arg( i );
+				tr( "Master" ) : tr( "FX %1" ).arg( i );
+		m_fxChannels[i]->m_volumeModel.setDisplayName( 
+				m_fxChannels[i]->m_name );
 
 	}
 }

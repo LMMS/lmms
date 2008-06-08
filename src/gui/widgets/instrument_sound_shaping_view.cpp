@@ -86,8 +86,7 @@ instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 						FILTER_GROUPBOX_HEIGHT );
 
 
-	m_filterComboBox = new comboBox( m_filterGroupBox,
-							tr( "Filter type" ) );
+	m_filterComboBox = new comboBox( m_filterGroupBox );
 	m_filterComboBox->setGeometry( 14, 22, 120, 22 );
 	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
 
@@ -97,8 +96,7 @@ instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 			"for changing the characteristics of a sound." ) );
 
 
-	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox,
-						tr( "cutoff-frequency" ) );
+	m_filterCutKnob = new knob( knobBright_26, m_filterGroupBox );
 	m_filterCutKnob->setLabel( tr( "CUTOFF" ) );
 	m_filterCutKnob->move( 140, 18 );
 	m_filterCutKnob->setHintText( tr( "cutoff-frequency:" ) + " ", " " +
@@ -112,8 +110,7 @@ instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 			"frequencies below cutoff-frequency and so on..." ) );
 
 
-	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox,
-							tr( "Q/Resonance" ) );
+	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox );
 	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
 	m_filterResKnob->move( 190, 18 );
 	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );

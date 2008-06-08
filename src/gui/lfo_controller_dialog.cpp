@@ -75,16 +75,14 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	
 	toolTip::add( this, tr( "LFO Controller" ) );
 
-	m_lfoBaseKnob = new knob( knobBright_26, this,
-						tr( "LFO base value" ) );
+	m_lfoBaseKnob = new knob( knobBright_26, this );
 	m_lfoBaseKnob->setLabel( tr( "BASE" ) );
 	m_lfoBaseKnob->move( LFO_BASE_KNOB_X, LFO_KNOB_Y );
 	m_lfoBaseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
 	m_lfoBaseKnob->setWhatsThis( tr("todo") );
 
 
-	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this,
-							tr( "LFO-speed" ) );
+	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
 	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
@@ -94,8 +92,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 			"the faster the effect." ) );
 
 
-	m_lfoAmountKnob = new knob( knobBright_26, this,
-						tr( "LFO-modulation-amount" ) );
+	m_lfoAmountKnob = new knob( knobBright_26, this );
 	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
 	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
@@ -105,8 +102,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 			"selected size (e.g. volume or cutoff-frequency) will "
 			"be influenced by this LFO." ) );
 
-	m_lfoPhaseKnob = new knob( knobBright_26, this,
-						tr( "LFO phase" ) );
+	m_lfoPhaseKnob = new knob( knobBright_26, this );
 	m_lfoPhaseKnob->setLabel( tr( "PHS" ) );
 	m_lfoPhaseKnob->move( LFO_PHASE_KNOB_X, LFO_KNOB_Y );
 	m_lfoPhaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
@@ -203,8 +199,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 			"wave-shape for current oscillator." ) );
 
 	
-	m_lfoWaveBtnGrp = new automatableButtonGroup( this,
-						tr( "LFO wave shape" ) );
+	m_lfoWaveBtnGrp = new automatableButtonGroup( this );
 	m_lfoWaveBtnGrp->addButton( sin_wave_btn );
 	m_lfoWaveBtnGrp->addButton( triangle_wave_btn );
 	m_lfoWaveBtnGrp->addButton( saw_wave_btn );
