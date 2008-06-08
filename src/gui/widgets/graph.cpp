@@ -116,7 +116,7 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 
 	// avoid mouse leaps
 	int diff = x - m_lastCursorX;
-	
+
 	if( diff >= 1 )
 	{
 		x = min( width() - 2, m_lastCursorX + 1);
@@ -130,18 +130,19 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 		x = m_lastCursorX;
 	}
 
-	printf("%d %d %d %d\n", height(), skip, x, y);
-
 	y = max( 2, min( y, height()-3 ) );
 
 	changeSampleAt( x, y );
 
 	// update mouse
-	m_lastCursorX = x;
+	if( diff != 0 )
+	{
+		m_lastCursorX = x;
 
-	QPoint pt = mapToGlobal( QPoint( x, y ) );
+		QPoint pt = mapToGlobal( QPoint( x, y ) );
 
-	QCursor::setPos( pt.x(), pt.y() );
+		QCursor::setPos( pt.x(), pt.y() );
+	}
 
 	skip = true;
 }
@@ -191,8 +192,6 @@ void graph::changeSampleAt(int _x, int _y)
 	// subtract max from min because Qt's Y-axis is backwards
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-4 ) ) + maxVal;
-
-	printf("%d, (%d*%f/( %d-4 ) ) + %f \n", _x, _y, range, height(), maxVal );
 
 	model()->setSampleAt( (int)( _x*xscale ), val );
 }
