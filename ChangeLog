@@ -1,3 +1,8 @@
+2008-06-08  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/graph.cpp:
+	Fix graph widget
+
 2008-06-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/tap/tap_deesser.c:

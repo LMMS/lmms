@@ -130,6 +130,8 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 		x = m_lastCursorX;
 	}
 
+	printf("%d %d %d %d\n", height(), skip, x, y);
+
 	y = max( 2, min( y, height()-3 ) );
 
 	changeSampleAt( x, y );
@@ -181,6 +183,7 @@ void graph::changeSampleAt(int _x, int _y)
 	float xscale = static_cast<float>( model()->length() ) /
 					( width()-4 );
 
+
 	// consider border of background image
 	_x -= 2;
 	_y -= 2;
@@ -189,7 +192,12 @@ void graph::changeSampleAt(int _x, int _y)
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-4 ) ) + maxVal;
 
-	model()->setSampleAt( (int)( _x*xscale ), (int) val );
+	printf("%d, (%d*%f/( %d-4 ) ) + %f \n", _x, _y, range, height(), maxVal );
+
+	float tmp =  _y*range
+	printf("%d, %d\n", _x, tmp );
+
+	model()->setSampleAt( (int)( _x*xscale ), val );
 }
 
 
