@@ -789,9 +789,14 @@ void song::createNewProject( void )
 	m_masterVolumeModel.setInitValue( 100 );
 	m_masterPitchModel.setInitValue( 0 );
 
+	QCoreApplication::instance()->processEvents();
+
 	engine::getProjectJournal()->setJournalling( TRUE );
 
 	m_loadingProject = FALSE;
+	m_modified = FALSE;
+
+	engine::getMainWindow()->resetWindowTitle();
 }
 
 
@@ -908,9 +913,14 @@ void song::loadProject( const QString & _file_name )
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
+	QCoreApplication::instance()->processEvents();
+
 	engine::getProjectJournal()->setJournalling( TRUE );
 
 	m_loadingProject = FALSE;
+	m_modified = FALSE;
+
+	engine::getMainWindow()->resetWindowTitle();
 }
 
 
@@ -927,7 +937,7 @@ bool song::saveProject( void )
 	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
 
 
-	( (journallingObject *)( this ) )->saveState( mmp, mmp.content() );
+	saveState( mmp, mmp.content() );
 
 	engine::getFxMixer()->saveState( mmp, mmp.content() );
 	engine::getPianoRoll()->saveState( mmp, mmp.content() );
@@ -947,6 +957,7 @@ bool song::saveProject( void )
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
 		configManager::inst()->addRecentlyOpenedProject( m_fileName );
+		m_modified = FALSE;
 		engine::getMainWindow()->resetWindowTitle();
 	}
 	else
@@ -957,6 +968,7 @@ bool song::saveProject( void )
 				embed::getIconPixmap( "error" ), 4000 );
 		return( FALSE );
 	}
+
 	return( TRUE );
 }
 
