@@ -125,7 +125,7 @@ static inline unsigned long gcd( unsigned long a, unsigned long b )
 
 
 
-bool FASTCALL midiImport::readSMF( trackContainer * _tc )
+bool midiImport::readSMF( trackContainer * _tc )
 {
 	// the curren position is immediately after the "MThd" id
 	int header_len = readInt( 4 );
