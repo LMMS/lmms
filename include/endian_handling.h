@@ -26,10 +26,6 @@
 #ifndef _ENDIAN_HANDLING_H
 #define _ENDIAN_HANDLING_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <QtCore/QSysInfo>
 
 #include "types.h"

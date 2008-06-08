@@ -25,11 +25,9 @@
 #ifndef _LADSPA_CONTROL_H
 #define _LADSPA_CONTROL_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_LADSPA_H
+#ifdef LMMS_HAVE_LADSPA_H
 #include <ladspa.h>
 #else
 #include "ladspa-1.1.h"
@@ -56,11 +54,11 @@ public:
 	~ladspaControl();
 
 	LADSPA_Data getValue( void );
-	void FASTCALL setValue( LADSPA_Data _value );
-	void FASTCALL setLink( bool _state );
+	void setValue( LADSPA_Data _value );
+	void setLink( bool _state );
 
-	void FASTCALL linkControls( ladspaControl * _control );
-	void FASTCALL unlinkControls( ladspaControl * _control );
+	void linkControls( ladspaControl * _control );
+	void unlinkControls( ladspaControl * _control );
 
 	inline boolModel * getToggledModel( void )
 	{
@@ -82,9 +80,9 @@ public:
 		return( m_port );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, 
-				QDomElement & _parent, const QString & _name );
-	virtual void FASTCALL loadSettings( const QDomElement & _this, 
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent,
+							const QString & _name );
+	virtual void loadSettings( const QDomElement & _this, 
 						const QString & _name );
 	inline virtual QString nodeName( void ) const
 	{

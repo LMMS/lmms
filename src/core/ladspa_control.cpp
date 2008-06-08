@@ -162,7 +162,7 @@ void ladspaControl::setValue( LADSPA_Data _value )
 
 
 
-void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc, 
+void ladspaControl::saveSettings( QDomDocument & _doc, 
 					   QDomElement & _this, 
 					   const QString & _name )
 {
@@ -190,7 +190,7 @@ void FASTCALL ladspaControl::saveSettings( QDomDocument & _doc,
 
 
 
-void FASTCALL ladspaControl::loadSettings( const QDomElement & _this, 
+void ladspaControl::loadSettings( const QDomElement & _this, 
 					   const QString & _name )
 {
 	if( m_link )
@@ -218,7 +218,7 @@ void FASTCALL ladspaControl::loadSettings( const QDomElement & _this,
 
 
 
-void FASTCALL ladspaControl::linkControls( ladspaControl * _control )
+void ladspaControl::linkControls( ladspaControl * _control )
 {
 	switch( m_port->data_type )
 	{
@@ -270,7 +270,7 @@ void ladspaControl::tempoKnobChanged( void )
 
 
 
-void FASTCALL ladspaControl::unlinkControls( ladspaControl * _control )
+void ladspaControl::unlinkControls( ladspaControl * _control )
 {
 	switch( m_port->data_type )
 	{
@@ -303,7 +303,7 @@ void ladspaControl::linkStateChanged( void )
 
 
 
-void FASTCALL ladspaControl::setLink( bool _state )
+void ladspaControl::setLink( bool _state )
 {
 	m_linkEnabledModel.setValue( _state );
 }

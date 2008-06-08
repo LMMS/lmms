@@ -26,12 +26,9 @@
 #ifndef _EXPORT_H
 #define _EXPORT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 
 #ifdef PLUGIN_NAME
 #define EXPORT __declspec(dllimport)

@@ -41,7 +41,7 @@ ladspaManager::ladspaManager( void )
 								split( ':' );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
 
-#ifndef BUILD_WIN32
+#ifndef LMMS_BUILD_WIN32
 	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
@@ -58,7 +58,7 @@ ladspaManager::ladspaManager( void )
 		{
 			const QFileInfo & f = *file;
 			if( !f.isFile() ||
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 				 f.fileName().right(3) != "dll"
 #else
 				 f.fileName().right(2) != "so"
@@ -124,7 +124,7 @@ ladspaManagerDescription * ladspaManager::getDescription(
 
 
 
-void FASTCALL ladspaManager::addPlugins(
+void ladspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
 						const QString & _file )
 {
@@ -173,7 +173,7 @@ void FASTCALL ladspaManager::addPlugins(
 
 
 
-Uint16 FASTCALL ladspaManager::getPluginInputs( 
+Uint16 ladspaManager::getPluginInputs( 
 		const LADSPA_Descriptor * _descriptor )
 {
 	Uint16 inputs = 0;
@@ -199,7 +199,7 @@ Uint16 FASTCALL ladspaManager::getPluginInputs(
 
 
 
-Uint16 FASTCALL ladspaManager::getPluginOutputs( 
+Uint16 ladspaManager::getPluginOutputs( 
 		const LADSPA_Descriptor * _descriptor )
 {
 	Uint16 outputs = 0;
@@ -233,7 +233,7 @@ l_sortable_plugin_t ladspaManager::getSortedPlugins()
 
 
 
-QString FASTCALL ladspaManager::getLabel( const ladspa_key_t & _plugin )
+QString ladspaManager::getLabel( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -253,7 +253,7 @@ QString FASTCALL ladspaManager::getLabel( const ladspa_key_t & _plugin )
 
 
 
-bool FASTCALL ladspaManager::hasRealTimeDependency( 
+bool ladspaManager::hasRealTimeDependency( 
 					const ladspa_key_t &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -274,7 +274,7 @@ bool FASTCALL ladspaManager::hasRealTimeDependency(
 
 
 
-bool FASTCALL ladspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
+bool ladspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -294,7 +294,7 @@ bool FASTCALL ladspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 
 
 
-bool FASTCALL ladspaManager::isRealTimeCapable( 
+bool ladspaManager::isRealTimeCapable( 
 					const ladspa_key_t &  _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -315,7 +315,7 @@ bool FASTCALL ladspaManager::isRealTimeCapable(
 
 
 
-QString FASTCALL ladspaManager::getName( const ladspa_key_t & _plugin )
+QString ladspaManager::getName( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -335,7 +335,7 @@ QString FASTCALL ladspaManager::getName( const ladspa_key_t & _plugin )
 
 
 
-QString FASTCALL ladspaManager::getMaker( const ladspa_key_t & _plugin )
+QString ladspaManager::getMaker( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -355,7 +355,7 @@ QString FASTCALL ladspaManager::getMaker( const ladspa_key_t & _plugin )
 
 
 
-QString FASTCALL ladspaManager::getCopyright( const ladspa_key_t & _plugin )
+QString ladspaManager::getCopyright( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -375,7 +375,7 @@ QString FASTCALL ladspaManager::getCopyright( const ladspa_key_t & _plugin )
 
 
 
-Uint32 FASTCALL ladspaManager::getPortCount( const ladspa_key_t & _plugin )
+Uint32 ladspaManager::getPortCount( const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
 	{
@@ -395,7 +395,7 @@ Uint32 FASTCALL ladspaManager::getPortCount( const ladspa_key_t & _plugin )
 
 
 
-bool FASTCALL ladspaManager::isPortInput( const ladspa_key_t & _plugin, 
+bool ladspaManager::isPortInput( const ladspa_key_t & _plugin, 
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -419,7 +419,7 @@ bool FASTCALL ladspaManager::isPortInput( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isPortOutput( const ladspa_key_t & _plugin, 
+bool ladspaManager::isPortOutput( const ladspa_key_t & _plugin, 
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -443,7 +443,7 @@ bool FASTCALL ladspaManager::isPortOutput( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
+bool ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -467,7 +467,7 @@ bool FASTCALL ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isPortControl( const ladspa_key_t & _plugin, 
+bool ladspaManager::isPortControl( const ladspa_key_t & _plugin, 
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -491,7 +491,7 @@ bool FASTCALL ladspaManager::isPortControl( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::areHintsSampleRateDependent(
+bool ladspaManager::areHintsSampleRateDependent(
 						const ladspa_key_t & _plugin, 
 								Uint32 _port )
 {
@@ -516,7 +516,7 @@ bool FASTCALL ladspaManager::areHintsSampleRateDependent(
 
 
 
-float FASTCALL ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
+float ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -547,7 +547,7 @@ float FASTCALL ladspaManager::getLowerBound( const ladspa_key_t & _plugin,
 
 
 
-float FASTCALL ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									Uint32 _port )
+float ladspaManager::getUpperBound( const ladspa_key_t & _plugin,									Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
 		   && _port < getPortCount( _plugin ) )
@@ -577,7 +577,7 @@ float FASTCALL ladspaManager::getUpperBound( const ladspa_key_t & _plugin,						
 
 
 
-bool FASTCALL ladspaManager::isPortToggled( const ladspa_key_t & _plugin, 
+bool ladspaManager::isPortToggled( const ladspa_key_t & _plugin, 
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -601,7 +601,7 @@ bool FASTCALL ladspaManager::isPortToggled( const ladspa_key_t & _plugin,
 
 
 
-float FASTCALL ladspaManager::getDefaultSetting( const ladspa_key_t & _plugin, 
+float ladspaManager::getDefaultSetting( const ladspa_key_t & _plugin, 
 							Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -688,7 +688,7 @@ float FASTCALL ladspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
+bool ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -712,7 +712,7 @@ bool FASTCALL ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::isInteger( const ladspa_key_t & _plugin,
+bool ladspaManager::isInteger( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -736,7 +736,7 @@ bool FASTCALL ladspaManager::isInteger( const ladspa_key_t & _plugin,
 
 
 
-QString FASTCALL ladspaManager::getPortName( const ladspa_key_t & _plugin,
+QString ladspaManager::getPortName( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) 
@@ -759,7 +759,7 @@ QString FASTCALL ladspaManager::getPortName( const ladspa_key_t & _plugin,
 
 
 
-const void * FASTCALL ladspaManager::getImplementationData(
+const void * ladspaManager::getImplementationData(
 						const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -780,7 +780,7 @@ const void * FASTCALL ladspaManager::getImplementationData(
 
 
 
-const LADSPA_Descriptor * FASTCALL ladspaManager::getDescriptor( 
+const LADSPA_Descriptor * ladspaManager::getDescriptor( 
 						const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -801,7 +801,7 @@ const LADSPA_Descriptor * FASTCALL ladspaManager::getDescriptor(
 
 
 
-LADSPA_Handle FASTCALL ladspaManager::instantiate( 
+LADSPA_Handle ladspaManager::instantiate( 
 					const ladspa_key_t & _plugin, 
 							Uint32 _sample_rate )
 {
@@ -824,7 +824,7 @@ LADSPA_Handle FASTCALL ladspaManager::instantiate(
 
 
 
-bool FASTCALL ladspaManager::connectPort( const ladspa_key_t & _plugin, 
+bool ladspaManager::connectPort( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance, 
 						Uint32 _port,
 						LADSPA_Data * _data_location )
@@ -850,7 +850,7 @@ bool FASTCALL ladspaManager::connectPort( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::activate( const ladspa_key_t & _plugin, 
+bool ladspaManager::activate( const ladspa_key_t & _plugin, 
 					LADSPA_Handle _instance )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -872,7 +872,7 @@ bool FASTCALL ladspaManager::activate( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::run( const ladspa_key_t & _plugin,
+bool ladspaManager::run( const ladspa_key_t & _plugin,
 							LADSPA_Handle _instance,
 							Uint32 _sample_count )
 {
@@ -895,7 +895,7 @@ bool FASTCALL ladspaManager::run( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::runAdding( const ladspa_key_t & _plugin, 
+bool ladspaManager::runAdding( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance,
 						Uint32 _sample_count )
 {
@@ -919,7 +919,7 @@ bool FASTCALL ladspaManager::runAdding( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::setRunAddingGain( const ladspa_key_t & _plugin, 
+bool ladspaManager::setRunAddingGain( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance,
 						LADSPA_Data _gain )
 {
@@ -944,7 +944,7 @@ bool FASTCALL ladspaManager::setRunAddingGain( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::deactivate( const ladspa_key_t & _plugin, 
+bool ladspaManager::deactivate( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -966,7 +966,7 @@ bool FASTCALL ladspaManager::deactivate( const ladspa_key_t & _plugin,
 
 
 
-bool FASTCALL ladspaManager::cleanup( const ladspa_key_t & _plugin, 
+bool ladspaManager::cleanup( const ladspa_key_t & _plugin, 
 						LADSPA_Handle _instance )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )

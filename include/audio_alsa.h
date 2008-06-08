@@ -26,11 +26,9 @@
 #ifndef _AUDIO_ALSA_H
 #define _AUDIO_ALSA_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_ALSA_ASOUNDLIB_H
+#ifdef LMMS_HAVE_ALSA_ASOUNDLIB_H
 
 #ifndef ALSA_SUPPORT
 #define ALSA_SUPPORT

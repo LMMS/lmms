@@ -106,7 +106,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_flDir( configManager::inst()->flDir() ),
 	m_ladDir( configManager::inst()->ladspaDir() ),
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
 	m_disableChActInd( configManager::inst()->value( "ui",
@@ -133,7 +133,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	ws->setFixedSize( 360, 422 );
 #else
 	ws->setFixedSize( 360, 366 );
@@ -260,7 +260,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * directories = new QWidget( ws );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	directories->setFixedSize( 360, 372 );
 #else
 	directories->setFixedSize( 360, 326 );
@@ -364,7 +364,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
 
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	// STK-dir
 	tabWidget * stk_tw = new tabWidget( tr(
 			"STK rawwave directory" ).toUpper(),
@@ -394,7 +394,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addWidget( fl_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( lad_tw );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( stk_tw );
 #endif	
@@ -708,7 +708,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setArtworkDir( m_artworkDir );
 	configManager::inst()->setFLDir( m_flDir );
 	configManager::inst()->setLADSPADir( m_ladDir );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
 
@@ -982,7 +982,7 @@ void setupDialog::openLADSPADir( void )
 
 void setupDialog::openSTKDir( void )
 {
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose STK rawwave directory" ),
 							m_ladDir );
@@ -1014,7 +1014,7 @@ void setupDialog::setLADSPADir( const QString & _fd )
 
 void setupDialog::setSTKDir( const QString & _fd )
 {
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	m_stkDir = _fd;
 #endif
 }

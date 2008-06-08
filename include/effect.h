@@ -27,10 +27,6 @@
 #ifndef _EFFECT_H
 #define _EFFECT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <Qt/QtXml>
 
 #include "plugin.h"

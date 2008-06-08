@@ -26,10 +26,6 @@
 #ifndef _FX_MIXER_H
 #define _FX_MIXER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "mv_base.h"
 #include "mixer.h"
 #include "effect_chain.h"

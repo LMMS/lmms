@@ -496,6 +496,9 @@ lmms_SOURCES =									\
 		$(srcdir)/include/lfo_controller.h				\
 		$(THIRD_PARTY_CODE)
 
+lmms_includedir = $(pkgincludedir)
+lmms_include_HEADERS = $(wildcard include/*.h include/lmmsconfig.h)
+
 #		$(srcdir)/src/tracks/sample_track.cpp
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) lmms.1

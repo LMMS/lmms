@@ -2,7 +2,7 @@
  * communication.h - header file defining stuff concerning communication between
  *                   LVSL-server and -client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,11 +27,9 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_UNISTD_H
+#ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 

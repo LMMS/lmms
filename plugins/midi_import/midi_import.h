@@ -26,10 +26,6 @@
 #ifndef _MIDI_IMPORT_H
 #define _MIDI_IMPORT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <QtCore/QString>
 #include <QtCore/QPair>
 #include <QtCore/QVector>
@@ -53,9 +49,9 @@ public:
 private:
 	virtual bool tryImport( trackContainer * _tc );
 
-	bool FASTCALL readSMF( trackContainer * _tc );
-	bool FASTCALL readRIFF( trackContainer * _tc );
-	bool FASTCALL readTrack( int _track_end, QString & _track_name );
+	bool readSMF( trackContainer * _tc );
+	bool readRIFF( trackContainer * _tc );
+	bool readTrack( int _track_end, QString & _track_name );
 
 	void error( void );
 

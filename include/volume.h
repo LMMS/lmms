@@ -26,9 +26,7 @@
 #ifndef _VOLUME_H
 #define _VOLUME_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
 #include "types.h"
 
@@ -44,7 +42,7 @@ typedef struct
 
 typedef struct
 {
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 	float vol[4];
 #else
 	float vol[2];

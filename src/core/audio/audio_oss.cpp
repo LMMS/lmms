@@ -40,27 +40,27 @@
 #include "templates.h"
 
 
-#ifdef HAVE_CONFIG_H
+#ifdef LMMS_HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
+#ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#ifdef HAVE_FCNTL_H
+#ifdef LMMS_HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_SYS_IOCTL_H
+#ifdef LMMS_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
-#ifdef HAVE_SYS_SOUNDCARD_H
+#ifdef LMMS_HAVE_SYS_SOUNDCARD_H
 // This is recommended by OSS
 #include <sys/soundcard.h>
-#elif HAVE_SOUNDCARD_H
+#elif LMMS_HAVE_SOUNDCARD_H
 // This is installed on some systems
 #include <soundcard.h>
 #endif

@@ -46,7 +46,7 @@ public:
 
 	// tries to import given file to given track-container by having all
 	// available import-filters to try to import the file
-	static void FASTCALL import( const QString & _file_to_import,
+	static void import( const QString & _file_to_import,
 						trackContainer * _tc );
 
 
@@ -85,12 +85,11 @@ protected:
 		m_file.ungetChar( _ch );
 	}
 
-	virtual void FASTCALL saveSettings( QDomDocument &,
-						QDomElement & )
+	virtual void saveSettings( QDomDocument &, QDomElement & )
 	{
 	}
 
-	virtual void FASTCALL loadSettings( const QDomElement & )
+	virtual void loadSettings( const QDomElement & )
 	{
 	}
 

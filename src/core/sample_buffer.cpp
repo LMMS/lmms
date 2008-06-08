@@ -28,10 +28,6 @@
 #include "sample_buffer.h"
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -42,23 +38,23 @@
 
 #include <cstring>
 
-#ifdef SDL_SDL_SOUND_H
-#include SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
+#include LMMS_SDL_SDL_SOUND_H
 #endif
 
-#ifdef HAVE_SNDFILE_H
+#ifdef LMMS_HAVE_SNDFILE_H
 #include <sndfile.h>
 #endif
 
-#ifdef HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
 #include <vorbis/vorbisfile.h>
 #endif
 
-#ifdef HAVE_FLAC_STREAM_ENCODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 #include <FLAC/stream_encoder.h>
 #endif
 
-#ifdef HAVE_FLAC_STREAM_DECODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
 #include <FLAC/stream_decoder.h>
 #endif
 
@@ -90,7 +86,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_frequency( BaseFreq ),
 	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
@@ -125,7 +121,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
@@ -156,7 +152,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 	// init sound-file-system of SDL
 	Sound_Init();
 #endif
@@ -209,21 +205,21 @@ void sampleBuffer::update( bool _keep_settings )
 
 		m_frames = 0;
 
-#ifdef HAVE_SNDFILE_H
+#ifdef LMMS_HAVE_SNDFILE_H
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleSF( f, buf, channels,
 								samplerate );
 		}
 #endif
-#ifdef HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleOGGVorbis( f, buf, channels,
 								samplerate );
 		}
 #endif
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleSDL( f, buf, channels,
@@ -341,7 +337,7 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 
 
 
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 f_cnt_t sampleBuffer::decodeSampleSDL( const char * _f,
 					int_sample_t * & _buf,
 					ch_cnt_t _channels,
@@ -376,7 +372,7 @@ f_cnt_t sampleBuffer::decodeSampleSDL( const char * _f,
 
 
 
-#ifdef HAVE_SNDFILE_H
+#ifdef LMMS_HAVE_SNDFILE_H
 f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 					int_sample_t * & _buf,
 					ch_cnt_t & _channels,
@@ -422,7 +418,7 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 
 
 
-#ifdef HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
 
 // callback-functions for reading ogg-file
 
@@ -576,7 +572,7 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 
 
 
-bool FASTCALL sampleBuffer::play( sampleFrame * _ab, handleState * _state,
+bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const fpp_t _frames,
 					const float _freq,
 					const bool _looped ) const
@@ -860,10 +856,10 @@ QString sampleBuffer::openAudioFile( void ) const
 }
 
 
-#undef HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
-#undef HAVE_FLAC_STREAM_DECODER_H
+#undef LMMS_HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
+#undef LMMS_HAVE_FLAC_STREAM_DECODER_H
 
-#ifdef HAVE_FLAC_STREAM_ENCODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 					const FLAC__StreamEncoder *
 								/*_encoder*/,
@@ -900,7 +896,7 @@ void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
 
 QString & sampleBuffer::toBase64( QString & _dst ) const
 {
-#ifdef HAVE_FLAC_STREAM_ENCODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 	const f_cnt_t FRAMES_PER_BUF = 1152;
 
 	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
@@ -950,12 +946,12 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 									_dst );
 
 
-#else	/* HAVE_FLAC_STREAM_ENCODER_H */
+#else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
 	base64::encode( (const char *) m_data,
 					m_frames * sizeof( sampleFrame ), _dst );
 
-#endif	/* HAVE_FLAC_STREAM_ENCODER_H */
+#endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
 	return( _dst );
 }
@@ -1013,7 +1009,7 @@ void sampleBuffer::setAudioFile( const QString & _audio_file )
 
 
 
-#ifdef HAVE_FLAC_STREAM_DECODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 struct flacStreamDecoderClientData
 {
@@ -1112,7 +1108,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	int dsize = 0;
 	base64::decode( _data, &dst, &dsize );
 
-#ifdef HAVE_FLAC_STREAM_DECODER_H
+#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 	QByteArray orig_data = QByteArray::fromRawData( dst, dsize );
 	QBuffer ba_reader( &orig_data );
@@ -1152,7 +1148,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
 
-#else /* HAVE_FLAC_STREAM_DECODER_H */
+#else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof( sampleFrame ); 
 	delete[] m_origData;

@@ -26,11 +26,9 @@
 #ifndef _MICRO_TIMER
 #define _MICRO_TIMER
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_SYS_TIME_H
+#ifdef LMMS_HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 

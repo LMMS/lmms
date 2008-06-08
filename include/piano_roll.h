@@ -2,7 +2,7 @@
  * piano_roll.h - declaration of class pianoRoll which is a window where you
  *                can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,7 +50,7 @@ class pianoRoll : public QWidget, public journallingObject
 {
 	Q_OBJECT
 public:
-	void FASTCALL setCurrentPattern( pattern * _new_pattern );
+	void setCurrentPattern( pattern * _new_pattern );
 
 	inline bool isRecording( void ) const
 	{
@@ -70,9 +70,8 @@ public:
 	int quantization( void ) const;
 
 
-	virtual void FASTCALL saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
 		return( "pianoroll" );
@@ -90,18 +89,18 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
-#ifdef BUILD_LINUX
+#ifdef LMMS_BUILD_LINUX
 	virtual bool x11Event( XEvent * _xe );
 #endif
 
-	int FASTCALL getKey( int _y ) const;
+	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
 					int  _width,
 					const bool _is_selected,
 					const bool _is_step_note );
 	void removeSelection( void );
 	void selectAll( void );
-	void FASTCALL getSelectedNotes( noteVector & _selected_notes );
+	void getSelectedNotes( noteVector & _selected_notes );
 
 
 protected slots:

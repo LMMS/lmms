@@ -238,7 +238,7 @@ void envelopeAndLFOParameters::resetLFO( void )
 
 
 
-inline void FASTCALL envelopeAndLFOParameters::fillLFOLevel( float * _buf,
+inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 							f_cnt_t _frame,
 							const fpp_t _frames )
 {
@@ -272,9 +272,9 @@ inline void FASTCALL envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 
 
 
-void FASTCALL envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
-					const f_cnt_t _release_begin,
-					const fpp_t _frames )
+void envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
+						const f_cnt_t _release_begin,
+						const fpp_t _frames )
 {
 	if( _frame < 0 || _release_begin < 0 )
 	{

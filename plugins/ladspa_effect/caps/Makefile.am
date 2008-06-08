@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 
-AM_CXXFLAGS := $(AM_CXXFLAGS) -O2 -I../../../include
+AM_CXXFLAGS := $(AM_CXXFLAGS) -O3 -I../../../include
 
 DEST = $(DESTDIR)$(libdir)/$(PACKAGE)/ladspa
 SOURCES = $(wildcard *.cc)

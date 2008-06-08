@@ -26,11 +26,9 @@
 #ifndef _AUDIO_JACK_H
 #define _AUDIO_JACK_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_JACK_JACK_H
+#ifdef LMMS_HAVE_JACK_JACK_H
 
 #define JACK_SUPPORT
 

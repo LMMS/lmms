@@ -26,15 +26,11 @@
 #ifndef _TAB_BAR_H
 #define _TAB_BAR_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "export.h"
-
 #include <QtCore/QMap>
 #include <QtGui/QLayout>
 #include <QtGui/QWidget>
+
+#include "export.h"
 
 
 class tabButton;
@@ -48,10 +44,10 @@ public:
 			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
 	virtual ~tabBar();
 
-	tabButton * FASTCALL addTab( QWidget * _w, const QString & _text,
+	tabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = FALSE,
 					bool _text_is_tooltip = FALSE );
-	void FASTCALL removeTab( int _id );
+	void removeTab( int _id );
 
 	inline void setExclusive( bool _on )
 	{
@@ -66,8 +62,8 @@ public slots:
 
 
 protected:
-	bool FASTCALL tabState( int _id );
-	void FASTCALL setTabState( int _id, bool _checked );
+	bool tabState( int _id );
+	void setTabState( int _id, bool _checked );
 	bool allHidden( void );
 
 

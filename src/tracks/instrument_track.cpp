@@ -506,7 +506,7 @@ QString instrumentTrack::displayName( void ) const
 
 
 
-bool FASTCALL instrumentTrack::play( const midiTime & _start,
+bool instrumentTrack::play( const midiTime & _start,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
 							Sint16 _tco_num )

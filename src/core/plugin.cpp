@@ -147,7 +147,7 @@ void plugin::waitForWorkerThread( void )
 void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 	QFileInfoList list = directory.entryInfoList(
 						QStringList( "*.dll" ) );
 #else

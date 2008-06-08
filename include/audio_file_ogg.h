@@ -2,7 +2,7 @@
  * audio_file_ogg.h - Audio-device which encodes wave-stream and writes it
  *                    into an OGG-file. This is used for song-export.
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,11 +27,9 @@
 #ifndef _AUDIO_FILE_OGG_H
 #define _AUDIO_FILE_OGG_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_VORBIS_CODEC_H
+#ifdef LMMS_HAVE_VORBIS_CODEC_H
 
 #include <vorbis/codec.h>
 
@@ -71,7 +69,7 @@ public:
 
 
 private:
-	virtual void FASTCALL writeBuffer( const surroundSampleFrame * _ab,
+	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain );
 

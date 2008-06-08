@@ -32,11 +32,7 @@
 #include <QtGui/QTextEdit>
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
+#include "lmmsconfig.h"
 #include "about_dialog.h"
 #include "embed.h"
 
@@ -53,7 +49,7 @@ aboutDialog::aboutDialog() :
 	m_iconLbl->setGeometry( 10, 10, 64, 64 );
 
 	m_appNameLbl = new QLabel( tr( "Linux MultiMedia Studio %1"
-						).arg( VERSION ), this );
+						).arg( LMMS_VERSION ), this );
 	m_appNameLbl->setGeometry( 80, 30, 280, 20 );
 
 	m_aboutTabs = new QTabWidget( this );

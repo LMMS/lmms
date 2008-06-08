@@ -1,7 +1,7 @@
 /*
  * debug.h - header file to be included for debugging purposes
  *
- * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,9 +26,7 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
 // set whether debug-stuff (like messages on the console, asserts and other
 // additional range-checkings) should be compiled

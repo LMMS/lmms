@@ -29,17 +29,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#ifndef USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#include "src/3rdparty/samplerate/samplerate.h"
-#endif
-
-
 #include "mixer.h"
 #include "interpolation.h"
 #include "types.h"
@@ -211,17 +200,17 @@ private:
 	void update( bool _keep_settings = FALSE );
 
 
-#ifdef SDL_SDL_SOUND_H
+#ifdef LMMS_SDL_SDL_SOUND_H
 	f_cnt_t decodeSampleSDL( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t _channels,
 						sample_rate_t _sample_rate );
 #endif
-#ifdef HAVE_SNDFILE_H
+#ifdef LMMS_HAVE_SNDFILE_H
 	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 #endif
-#ifdef HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
 	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );

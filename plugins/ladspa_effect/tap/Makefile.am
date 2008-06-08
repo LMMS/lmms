@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 
-AM_CFLAGS := $(AM_CFLAGS) -I../../../include -I. -O3 -Wall -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math -c -fPIC -DPIC
+AM_CFLAGS := $(AM_CFLAGS) $(CFLAGS) -I../../../include -I. -O3 -Wall -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math -c -fPIC -DPIC
 
 DEST = $(DESTDIR)$(libdir)/$(PACKAGE)/ladspa
 
@@ -55,4 +55,4 @@ uninstall:
 
 all: $(PLUGINS)
 
-EXTRA_DIST = README COPYING CREDITS $(wildcard tap_*.c) $(wildcard tap_*.h) ladspa.h
+EXTRA_DIST = README COPYING CREDITS $(wildcard tap_*.c) $(wildcard tap_*.h) ladspa-local.h

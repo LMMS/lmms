@@ -1,3 +1,92 @@
+2008-06-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/tap/tap_deesser.c:
+	* plugins/ladspa_effect/tap/tap_sigmoid.c:
+	* plugins/ladspa_effect/tap/tap_doubler.c:
+	* plugins/ladspa_effect/tap/ladspa-local.h:
+	* plugins/ladspa_effect/tap/tap_eqbw.c:
+	* plugins/ladspa_effect/tap/tap_pinknoise.c:
+	* plugins/ladspa_effect/tap/tap_chorusflanger.c:
+	* plugins/ladspa_effect/tap/tap_eq.c:
+	* plugins/ladspa_effect/tap/tap_limiter.c:
+	* plugins/ladspa_effect/tap/ladspa.h:
+	* plugins/ladspa_effect/tap/tap_vibrato.c:
+	* plugins/ladspa_effect/tap/tap_autopan.c:
+	* plugins/ladspa_effect/tap/tap_pitch.c:
+	* plugins/ladspa_effect/tap/tap_dynamics_st.c:
+	* plugins/ladspa_effect/tap/tap_echo.c:
+	* plugins/ladspa_effect/tap/tap_tremolo.c:
+	* plugins/ladspa_effect/tap/tap_tubewarmth.c:
+	* plugins/ladspa_effect/tap/tap_dynamics_m.c:
+	* plugins/ladspa_effect/tap/Makefile.am:
+	* plugins/ladspa_effect/tap/tap_reflector.c:
+	* plugins/ladspa_effect/tap/tap_reverb.c:
+	* plugins/ladspa_effect/tap/tap_rotspeak.c:
+	* plugins/ladspa_effect/caps/basics.h:
+	* plugins/ladspa_effect/caps/Makefile.am:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_server.cpp:
+	* plugins/vst_base/communication.h:
+	* plugins/midi_import/midi_import.h:
+	* include/effect.h:
+	* include/midi_dummy.h:
+	* include/endian_handling.h:
+	* include/track.h:
+	* include/note.h:
+	* include/engine.h:
+	* include/sweep_oscillator.h:
+	* include/debug.h:
+	* include/midi_alsa_raw.h:
+	* include/config_mgr.h:
+	* include/import_filter.h:
+	* include/audio_file_wave.h:
+	* include/mixer.h:
+	* include/audio_file_ogg.h:
+	* include/ladspa_manager.h:
+	* include/ladspa_control.h:
+	* include/sample_buffer.h:
+	* include/fx_mixer.h:
+	* include/nstate_button.h:
+	* include/audio_pulseaudio.h:
+	* include/clipboard.h:
+	* include/audio_sdl.h:
+	* include/micro_timer.h:
+	* include/midi_event_processor.h:
+	* include/audio_jack.h:
+	* include/piano_roll.h:
+	* include/volume.h:
+	* include/oscillator.h:
+	* include/export.h:
+	* include/midi_alsa_seq.h:
+	* include/tool.h:
+	* include/setup_dialog.h:
+	* include/tab_bar.h:
+	* include/audio_device.h:
+	* include/audio_oss.h:
+	* include/audio_alsa.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/setup_dialog.cpp:
+	* src/gui/about_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/core/plugin.cpp:
+	* src/core/song.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/main.cpp:
+	* src/core/mmp.cpp:
+	* src/core/ladspa_manager.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/sample_buffer.cpp:
+	* Makefile.am:
+	use lmmsconfig.h rather than config.h and use prefixed macro-names
+
+	* acinclude.m4:
+	* configure.in:
+	create include/lmmsconfig.h which contains prefixed config.h defines
+
 2008-06-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/song.cpp:

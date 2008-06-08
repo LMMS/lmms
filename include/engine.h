@@ -26,9 +26,7 @@
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
 #include <QtCore/QMap>
 

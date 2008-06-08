@@ -27,18 +27,9 @@
 #ifndef _TRACK_H
 #define _TRACK_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtGui/QWidget>
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 
 #include "types.h"
 #include "midi_time.h"

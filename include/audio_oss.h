@@ -26,11 +26,9 @@
 #ifndef _AUDIO_OSS_H
 #define _AUDIO_OSS_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#if defined HAVE_SYS_SOUNDCARD_H || defined HAVE_SOUNDCARD_H
+#if defined LMMS_HAVE_SYS_SOUNDCARD_H || defined LMMS_HAVE_SOUNDCARD_H
 
 #define OSS_SUPPORT
 

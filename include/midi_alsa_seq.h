@@ -1,7 +1,7 @@
 /*
  * midi_alsa_seq.h - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,11 +26,9 @@
 #ifndef _MIDI_ALSA_SEQ_H
 #define _MIDI_ALSA_SEQ_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_ALSA_ASOUNDLIB_H
+#ifdef LMMS_HAVE_ALSA_ASOUNDLIB_H
 
 #ifndef ALSA_SUPPORT
 #define ALSA_SUPPORT

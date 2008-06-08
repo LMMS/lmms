@@ -1,7 +1,7 @@
 /*
  * sweep_oscillator.h - sweep-oscillator
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,10 +25,6 @@
 
 #ifndef _SWEEP_OSCILLATOR_H
 #define _SWEEP_OSCILLATOR_H
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include "oscillator.h"
 #include "effect_lib.h"
@@ -72,7 +68,7 @@ private:
 	FX m_FX;
 
 	inline sample_t getSample( const float _sample );
-	inline void FASTCALL recalcPhase( void );
+	inline void recalcPhase( void );
 
 } ;
 

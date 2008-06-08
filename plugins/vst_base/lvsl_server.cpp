@@ -28,35 +28,33 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_PTHREAD_H
+#ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 
-#ifdef HAVE_SYS_TYPES_H
+#ifdef LMMS_HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 
-#ifdef HAVE_SYS_IPC_H
+#ifdef LMMS_HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
 
-#ifdef HAVE_SYS_SHM_H
+#ifdef LMMS_HAVE_SYS_SHM_H
 #include <sys/shm.h>
 #endif
 
-#ifdef HAVE_STDARG_H
+#ifdef LMMS_HAVE_STDARG_H
 #include <stdarg.h>
 #endif
 
-#ifdef HAVE_SIGNAL_H
+#ifdef LMMS_HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 
-#ifdef HAVE_SCHED_H
+#ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
 #endif
 
@@ -94,7 +92,7 @@ struct ERect
 #include "communication.h"
 
 
-#ifdef HAVE_TLS
+#ifdef LMMS_HAVE_TLS
 static __thread int ejmpbuf_valid = false;
 static __thread jmp_buf ejmpbuf;
 #else
@@ -1027,7 +1025,7 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 	_this->m_guiThreadID = GetCurrentThreadId();
 
 	// "guard point" to trap errors that occur during plugin loading
-#ifdef HAVE_TLS
+#ifdef LMMS_HAVE_TLS
 	if( sigsetjmp( ejmpbuf, 1 ) )
 	{
 		lvsMessage( "creating the editor for %s failed",
@@ -1105,7 +1103,7 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 			SWP_NOOWNERZORDER | SWP_NOZORDER
 #endif
 			);
-#ifdef HAVE_TLS
+#ifdef LMMS_HAVE_TLS
 	ejmpbuf_valid = false;
 #else
 	*ejmpbuf_valid = false;
@@ -1177,7 +1175,7 @@ int main( void )
 		return( -1 );
 	}
 
-#ifdef HAVE_SCHED_H
+#ifdef LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +

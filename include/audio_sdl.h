@@ -26,19 +26,17 @@
 #ifndef _AUDIO_SDL_H
 #define _AUDIO_SDL_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_SDL_SDL_AUDIO_H
+#ifdef LMMS_HAVE_SDL_SDL_AUDIO_H
 
 #ifndef SDL_AUDIO_SUPPORT
 #define SDL_AUDIO_SUPPORT
 #endif
 
 
-#include SDL_SDL_H
-#include SDL_SDL_AUDIO_H
+#include LMMS_SDL_SDL_H
+#include LMMS_SDL_SDL_AUDIO_H
 
 
 #include "audio_device.h"

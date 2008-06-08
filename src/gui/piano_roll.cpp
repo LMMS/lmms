@@ -2746,7 +2746,7 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 
 
 
-#ifdef BUILD_LINUX
+#ifdef LMMS_BUILD_LINUX
 bool pianoRoll::x11Event( XEvent * _xe )
 {
 	if( validPattern() )

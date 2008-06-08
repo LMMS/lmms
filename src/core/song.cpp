@@ -25,22 +25,14 @@
  */
 
 
-#include "song.h"
-
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <math.h>
-
-
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
+#include <math.h>
 
+#include "song.h"
 #include "automation_track.h"
 #include "automation_editor.h"
 #include "bb_editor.h"

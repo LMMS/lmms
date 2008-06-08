@@ -25,10 +25,6 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <Qt/QtXml>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -50,7 +46,7 @@ configManager::configManager( void ) :
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
 								"lmms" ),
 	m_dataDir( qApp->applicationDirPath()
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 			+ QDir::separator() + "data" + QDir::separator()
 #else
 				.section( '/', 0, -2 ) + "/share/lmms/"
@@ -58,7 +54,7 @@ configManager::configManager( void ) :
 									),
 	m_artworkDir( defaultArtworkDir() ),
 	m_pluginDir( qApp->applicationDirPath()
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 			+ QDir::separator() + "plugins" + QDir::separator()
 #else
 				.section( '/', 0, -2 ) + "/lib/lmms/"
@@ -136,7 +132,7 @@ void configManager::setLADSPADir( const QString & _fd )
 
 void configManager::setSTKDir( const QString & _fd )
 {
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	m_stkDir = _fd;
 #endif
 }
@@ -314,7 +310,7 @@ bool configManager::loadConfigFile( void )
 	m_vstDir = value( "paths", "vstdir" );
 	m_flDir = value( "paths", "fldir" );
 	m_ladDir = value( "paths", "laddir" );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	m_stkDir = value( "paths", "stkdir" );
 #endif
 
@@ -330,14 +326,14 @@ bool configManager::loadConfigFile( void )
 
 	if( m_ladDir == "" )
 	{
-#ifdef BUILD_WIN32
+#ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
 		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
 #endif
 	}
 
-#ifdef HAVE_STK_H
+#ifdef LMMS_LMMS_HAVE_STK_H
 	if( m_stkDir == "" )
 {
 	m_stkDir = "/usr/share/stk/rawwaves/";
@@ -360,14 +356,14 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "laddir", m_ladDir );
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	setValue( "paths", "stkdir", m_stkDir );
 #endif
 
 	QDomDocument doc( "lmms-config-file" );
 
 	QDomElement lmms_config = doc.createElement( "lmms" );
-	lmms_config.setAttribute( "version", VERSION );
+	lmms_config.setAttribute( "version", LMMS_VERSION );
 	doc.appendChild( lmms_config );
 
 	for( settingsMap::iterator it = m_settings.begin();

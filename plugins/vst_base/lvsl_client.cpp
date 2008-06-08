@@ -24,6 +24,7 @@
 
 
 #include "lvsl_client.h"
+#include "lmmsconfig.h"
 
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
@@ -33,37 +34,33 @@
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
+#ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_SIGNAL_H
+#ifdef LMMS_HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 
 #include <cstdio>
 
-#ifdef HAVE_SYS_IPC_H
+#ifdef LMMS_HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
 
-#ifdef HAVE_SYS_SHM_H
+#ifdef LMMS_HAVE_SYS_SHM_H
 #include <sys/shm.h>
 #endif
 
-#ifdef HAVE_SYS_SELECT_H
+#ifdef LMMS_HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
 
-#ifdef HAVE_SYS_TIME_H
+#ifdef LMMS_HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 
-#ifdef HAVE_SYS_WAIT_H
+#ifdef LMMS_HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
 

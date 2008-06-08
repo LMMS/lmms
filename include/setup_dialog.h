@@ -29,6 +29,7 @@
 #include <QtGui/QDialog>
 #include <QtCore/QMap>
 
+#include "lmmsconfig.h"
 #include "audio_device.h"
 #include "midi_client.h"
 
@@ -127,7 +128,7 @@ private:
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	QLineEdit * m_stkLineEdit;
 #endif
 
@@ -136,7 +137,7 @@ private:
 	QString m_artworkDir;
 	QString m_flDir;
 	QString m_ladDir;
-#ifdef HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	QString m_stkDir;
 #endif
 

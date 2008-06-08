@@ -26,14 +26,16 @@
 #ifndef _MIXER_H
 #define _MIXER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifndef USE_3RDPARTY_LIBSRC
+#ifndef LMMS_USE_3RDPARTY_LIBSRC
 #include <samplerate.h>
 #else
+#ifndef OUT_OF_TREE_BUILD
 #include "src/3rdparty/samplerate/samplerate.h"
+#else
+#include <samplerate.h>
+#endif
 #endif
 
 
@@ -58,7 +60,7 @@ const fpp_t DEFAULT_BUFFER_SIZE = 256;
 const ch_cnt_t DEFAULT_CHANNELS = 2;
 
 const ch_cnt_t SURROUND_CHANNELS =
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 				4;
 #else
 				2;
@@ -369,7 +371,7 @@ public:
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 	static void clearAudioBuffer( surroundSampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );

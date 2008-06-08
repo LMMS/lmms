@@ -68,7 +68,7 @@ multimediaProject::multimediaProject( ProjectTypes _project_type ) :
 	root.setAttribute( "version", MMP_VERSION_STRING );
 	root.setAttribute( "type", typeName( _project_type ) );
 	root.setAttribute( "creator", "Linux MultiMedia Studio (LMMS)" );
-	root.setAttribute( "creatorversion", VERSION );
+	root.setAttribute( "creatorversion", LMMS_VERSION );
 	appendChild( root );
 
 	m_head = createElement( "head" );
@@ -172,7 +172,7 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 	}
 
 	if( _upgrade && root.hasAttribute( "creatorversion" )
-			&& root.attribute( "creatorversion" ) != VERSION )
+			&& root.attribute( "creatorversion" ) != LMMS_VERSION )
 	{
 		upgrade();
 	}

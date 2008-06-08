@@ -25,16 +25,6 @@
  */
 
 
-#include "song_editor.h"
-
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <math.h>
-
-
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QAction>
@@ -48,7 +38,9 @@
 #include <QtGui/QScrollBar>
 #include <QtGui/QStatusBar>
 
+#include <math.h>
 
+#include "song_editor.h"
 #include "automatable_slider.h"
 #include "bb_editor.h"
 #include "bb_track.h"

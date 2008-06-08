@@ -25,9 +25,6 @@
  */
 
 
-#include "main_window.h"
-
-
 #include <Qt/QtXml>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
@@ -39,12 +36,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplitter>
 
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
+#include "main_window.h"
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "song.h"
@@ -499,7 +491,7 @@ void mainWindow::resetWindowTitle( void )
 	{
 		title += '*';
 	}
-	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( VERSION ) );
+	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
 

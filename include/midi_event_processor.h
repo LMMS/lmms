@@ -26,12 +26,6 @@
 #ifndef _MIDI_EVENT_PROCESSOR_H
 #define _MIDI_EVENT_PROCESSOR_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <QtCore/Qt>
-
 class midiEvent;
 class midiTime;
 
@@ -49,10 +43,10 @@ public:
 	}
 
 	// to be implemented by inheriting classes
-	virtual void FASTCALL processInEvent( const midiEvent & _me,
+	virtual void processInEvent( const midiEvent & _me,
 						const midiTime & _time,
 							bool _lock = TRUE ) = 0;
-	virtual void FASTCALL processOutEvent( const midiEvent & _me,
+	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time ) = 0;
 
 } ;

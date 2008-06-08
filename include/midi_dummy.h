@@ -75,7 +75,7 @@ public:
 
 
 protected:
-	virtual void FASTCALL sendByte( const Uint8 )
+	virtual void sendByte( const Uint8 )
 	{
 	}
 

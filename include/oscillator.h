@@ -26,11 +26,9 @@
 #ifndef _OSCILLATOR_H
 #define _OSCILLATOR_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
@@ -207,7 +205,7 @@ private:
 	template<WaveShapes W>
 	inline sample_t getSample( const float _sample );
 
-	inline void FASTCALL recalcPhase( void );
+	inline void recalcPhase( void );
 
 } ;
 

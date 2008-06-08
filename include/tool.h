@@ -39,7 +39,7 @@ public:
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
-	static tool * FASTCALL instantiate( const QString & _plugin_name,
+	static tool * instantiate( const QString & _plugin_name,
 							model * _parent );
 
 } ;

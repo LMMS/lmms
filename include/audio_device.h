@@ -30,13 +30,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "mixer.h"
 #include "tab_widget.h"
-
 
 
 class audioPort;

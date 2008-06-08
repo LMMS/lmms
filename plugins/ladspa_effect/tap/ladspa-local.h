@@ -1,5 +1,5 @@
 /*
- * ladspa.h - include correct LADSPA-header
+ * ladspa-local.h - include correct LADSPA-header
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,11 +23,9 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h> 	 
-#endif 	 
+#include "lmmsconfig.h"
 
-#ifdef HAVE_LADSPA_H 	 
+#ifdef LMMS_HAVE_LADSPA_H 	 
 #include <ladspa.h> 	 
 #else 	 
 #include "ladspa-1.1.h" 	 

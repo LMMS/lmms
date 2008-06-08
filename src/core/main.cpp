@@ -35,7 +35,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QSplashScreen>
 
-#ifdef HAVE_SCHED_H
+#ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
 #endif
 
@@ -72,7 +72,7 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
-#ifdef HAVE_SCHED_H
+#ifdef LMMS_HAVE_SCHED_H
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
@@ -118,7 +118,7 @@ int main( int argc, char * * argv )
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
 	"version 2 of the License, or (at your option) any later version.\n\n"
-	"Try \"%s --help\" for more information.\n\n", PACKAGE_VERSION,
+	"Try \"%s --help\" for more information.\n\n", LMMS_PACKAGE_VERSION,
 								argv[0] );
 			return( EXIT_SUCCESS );
 		}
@@ -151,7 +151,7 @@ int main( int argc, char * * argv )
 	"				default: 2\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage message and exit.\n\n",
-							PACKAGE_VERSION );
+							LMMS_PACKAGE_VERSION );
 			return( EXIT_SUCCESS );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
@@ -293,7 +293,7 @@ int main( int argc, char * * argv )
 	QString pos = QLocale::system().name().left( 2 );
 	// load translation for Qt-widgets/-dialogs
 	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
+					QString( LMMS_QT_TRANSLATIONS_DIR ) );
 	// load actual translation for LMMS
 	loadTranslation( pos );
 

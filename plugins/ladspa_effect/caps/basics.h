@@ -47,11 +47,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h> 	 
-#endif 	 
+#include "lmmsconfig.h"
 
-#ifdef HAVE_LADSPA_H 	 
+#ifdef LMMS_HAVE_LADSPA_H 	 
 #include <ladspa.h> 	 
 #else 	 
 #include "ladspa-1.1.h" 	 
