@@ -41,6 +41,9 @@ peakControllerEffectControls( peakControllerEffect * _eff ) :
 
 void peakControllerEffectControls::loadSettings( const QDomElement & _this )
 {
+	m_baseModel.setValue( _this.attribute( "base" ).toFloat() );
+	m_amountModel.setValue( _this.attribute( "amount" ).toFloat() );
+	m_muteModel.setValue( _this.attribute( "mute" ).toFloat() );
 }
 
 
@@ -49,6 +52,9 @@ void peakControllerEffectControls::loadSettings( const QDomElement & _this )
 void peakControllerEffectControls::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
+	_this.setAttribute( "base", m_baseModel.value() );
+	_this.setAttribute( "amount", m_amountModel.value() );
+	_this.setAttribute( "mute", m_muteModel.value() );
 }
 
 
