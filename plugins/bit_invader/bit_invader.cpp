@@ -330,7 +330,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	m_sampleLengthKnob->move( 10, 120 );
 	m_sampleLengthKnob->setHintText( tr( "Sample Length" ) + " ", "" );
 
-	m_graph = new graph( this );
+	m_graph = new graph( this, graph::NearestStyle );
 	m_graph->move(53,118);	// 55,120 - 2px border
 	m_graph->setAutoFillBackground( TRUE );
 
@@ -536,6 +536,7 @@ void bitInvaderView::smoothClicked( void )
 
 void bitInvaderView::interpolationToggled( bool value )
 {
+	m_graph->setGraphStyle( value ? graph::LinearStyle : graph::NearestStyle);
 	engine::getSong()->setModified();
 }
 

@@ -1,7 +1,9 @@
 2008-06-08  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
+	* src/gui/widgets/graph.h:
 	* src/gui/widgets/graph.cpp:
-	Fix graph widget
+	- Fix graph widget "scrolling"
+	- Add styles so it can be drawn un-interpolated
 
 	* include/mv_base.h:
 	* src/core/mv_base.cpp:
@@ -33,6 +35,9 @@
 	* include/controller_connection_dialog.h:
 	* src/gui/controller_connection_dialog.cpp:
 	improve interface slightly
+
+	* plugins/bit_invader/bit_invader.cpp:
+	change graph style mode when toggling interpolation
 
 2008-06-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

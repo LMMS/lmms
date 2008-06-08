@@ -39,10 +39,11 @@ using namespace std;
 
 
 
-graph::graph( QWidget * _parent ) :
+graph::graph( QWidget * _parent, graphStyle _style ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */ 
-	modelView( new graphModel( -1.0, 1.0, 128, NULL, NULL, TRUE ) )
+	modelView( new graphModel( -1.0, 1.0, 128, NULL, NULL, TRUE ) ),
+	m_graphStyle( _style )
 {
 	m_mouseDown = false;
 
@@ -227,30 +228,64 @@ void graph::paintEvent( QPaintEvent * )
 	// Max index, more useful below
 	length--;
 
-	p.setRenderHints( QPainter::Antialiasing, TRUE );
-	for( int i=0; i < length; i++ )
+
+	switch( m_graphStyle )
 	{
-		// Needs to be rewritten
-		p.drawLine(2+static_cast<int>(i*xscale), 
-			2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-			2+static_cast<int>((i+1)*xscale), 
-			2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
-			);
+		case graph::LinearStyle:
+			p.setRenderHints( QPainter::Antialiasing, TRUE );
+
+			for( int i=0; i < length; i++ )
+			{
+				// Needs to be rewritten
+				p.drawLine(2+static_cast<int>(i*xscale), 
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
+					);
+			}
+
+			// Draw last segment flat
+			p.drawLine(2+static_cast<int>(length*xscale), 
+				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
+				width()-2,
+				2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
+
+			p.setRenderHints( QPainter::Antialiasing, FALSE );
+			break;
+
+
+		case graph::NearestStyle:
+			printf("GAY MODE\n");
+			for( int i=0; i < length; i++ )
+			{
+				p.drawLine(2+static_cast<int>(i*xscale), 
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale )
+					);
+				p.drawLine(2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
+					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
+					);
+			}
+
+			p.drawLine(2+static_cast<int>(length*xscale), 
+				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
+				width()-2,
+				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
+			break;
+
+		default:
+			break;
 	}
 
-	// Draw last segment flat
-	p.drawLine(2+static_cast<int>(length*xscale), 
-		2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
-		width()-2,
-		2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
-
-	p.setRenderHints( QPainter::Antialiasing, FALSE );
 
 	// draw Pointer
 	if( m_mouseDown ) 
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0xAA, 0xFF, 0x00 ) );
+		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}

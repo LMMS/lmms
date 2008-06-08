@@ -41,7 +41,14 @@ class EXPORT graph : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	graph( QWidget * _parent );
+	enum graphStyle
+	{
+		NearestStyle,
+		LinearStyle,
+		NumGraphStyles
+	};
+
+	graph( QWidget * _parent, graphStyle _style = graph::LinearStyle );
 	virtual ~graph();
 
 	void setForeground( const QPixmap & _pixmap );
@@ -49,6 +56,17 @@ public:
 	inline graphModel * model( void )
 	{
 		return castModel<graphModel>();
+	}
+
+	inline graphStyle getGraphStyle( void )
+	{
+		return m_graphStyle;
+	}
+
+	inline void setGraphStyle( graphStyle _s )
+	{
+		m_graphStyle = _s;
+		update();
 	}
 
 
@@ -73,6 +91,7 @@ private:
 	QPixmap m_foreground;
 	
 	graphModel * m_graphModel;
+	graphStyle m_graphStyle;
 	
 	bool m_mouseDown;
 	int m_lastCursorX;
