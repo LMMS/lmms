@@ -194,9 +194,6 @@ void graph::changeSampleAt(int _x, int _y)
 
 	printf("%d, (%d*%f/( %d-4 ) ) + %f \n", _x, _y, range, height(), maxVal );
 
-	float tmp =  _y*range
-	printf("%d, %d\n", _x, tmp );
-
 	model()->setSampleAt( (int)( _x*xscale ), val );
 }
 
