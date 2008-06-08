@@ -46,8 +46,7 @@ void stereoEnhancerControls::changeWideCoeff( void )
 
 
 
-void FASTCALL stereoEnhancerControls::loadSettings(
-						const QDomElement & _this )
+void stereoEnhancerControls::loadSettings( const QDomElement & _this )
 {
 	m_widthModel.setValue( _this.attribute( "width" ).toFloat() );
 }
@@ -55,7 +54,7 @@ void FASTCALL stereoEnhancerControls::loadSettings(
 
 
 
-void FASTCALL stereoEnhancerControls::saveSettings( QDomDocument & _doc, 
+void stereoEnhancerControls::saveSettings( QDomDocument & _doc, 
 							QDomElement & _this )
 {
 	_this.setAttribute( "width", m_widthModel.value() );

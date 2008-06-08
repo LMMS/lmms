@@ -358,7 +358,7 @@ invalid_format:
 
 
 
-bool FASTCALL midiImport::readRIFF( trackContainer * _tc )
+bool midiImport::readRIFF( trackContainer * _tc )
 {
         // skip file length
 	skip( 4 );
@@ -403,7 +403,7 @@ data_not_found:
 
 
 
-bool FASTCALL midiImport::readTrack( int _track_end, QString & _track_name )
+bool midiImport::readTrack( int _track_end, QString & _track_name )
 {
         int tick = 0;
         unsigned char last_cmd = 0;

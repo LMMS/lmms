@@ -54,8 +54,7 @@ void stereoMatrixControls::changeMatrix( void )
 
 
 
-void FASTCALL stereoMatrixControls::loadSettings(
-		const QDomElement & _this )
+void stereoMatrixControls::loadSettings( const QDomElement & _this )
 {
 	m_llModel.setValue( _this.attribute( "l-l" ).toFloat() );
 	m_lrModel.setValue( _this.attribute( "l-r" ).toFloat() );
@@ -66,8 +65,8 @@ void FASTCALL stereoMatrixControls::loadSettings(
 
 
 
-void FASTCALL stereoMatrixControls::saveSettings( QDomDocument & _doc, 
-		QDomElement & _this )
+void stereoMatrixControls::saveSettings( QDomDocument & _doc, 
+							QDomElement & _this )
 {
 	_this.setAttribute( "l-l", m_llModel.value() );
 	_this.setAttribute( "l-r", m_lrModel.value() );
