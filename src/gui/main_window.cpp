@@ -119,7 +119,7 @@ mainWindow::mainWindow( void ) :
 	side_bar->appendTab( new fileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +
 				configManager::inst()->factoryPresetsDir(),
-						"*.cs.xml", tr( "My presets" ),
+					"*.cs.xml *.xiz", tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
 							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser( QDir::homePath(), "*",
