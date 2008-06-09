@@ -182,7 +182,7 @@ lmms_EMBEDDED_RESOURCES = $(srcdir)/AUTHORS $(srcdir)/COPYING
 
 
 if USE_3RDPARTY_LIBSRC
-LIBSAMPLERATE_SOURCES=	$(srcdir)/src/3rdparty/samplerate/samplerate.c		\
+LIBSAMPLERATE_SOURCES =	$(srcdir)/src/3rdparty/samplerate/samplerate.c		\
 			$(srcdir)/src/3rdparty/samplerate/samplerate.h		\
 			$(srcdir)/src/3rdparty/samplerate/src_sinc.c		\
 			$(srcdir)/src/3rdparty/samplerate/high_qual_coeffs.h	\
@@ -192,6 +192,8 @@ LIBSAMPLERATE_SOURCES=	$(srcdir)/src/3rdparty/samplerate/samplerate.c		\
 			$(srcdir)/src/3rdparty/samplerate/float_cast.h		\
 			$(srcdir)/src/3rdparty/samplerate/src_zoh.c		\
 			$(srcdir)/src/3rdparty/samplerate/src_linear.c
+
+SAMPLERATE_HEADER = $(srcdir)/src/3rdparty/samplerate/samplerate.h
 endif
 
 THIRD_PARTY_CODE=$(LIBSAMPLERATE_SOURCES)
@@ -501,7 +503,8 @@ lmms_SOURCES =									\
 		$(THIRD_PARTY_CODE)
 
 lmms_includedir = $(pkgincludedir)
-lmms_include_HEADERS = $(wildcard include/*.h include/lmmsconfig.h)
+lmms_include_HEADERS = $(wildcard include/*.h include/lmmsconfig.h) $(SAMPLERATE_HEADER) $(srcdir)/src/gui/embed.cpp
+
 
 #		$(srcdir)/src/tracks/sample_track.cpp
 

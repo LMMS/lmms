@@ -1,3 +1,8 @@
+2008-06-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.am:
+	added a few files to LMMS-headers
+
 2008-06-08  Paul Giblock	<drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/graph.h:
