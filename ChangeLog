@@ -1,5 +1,12 @@
 2008-06-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/main_window.cpp:
+	also show *.xiz files in preset-browser
+
+	* src/gui/file_browser.cpp:
+	classify .xml-files always as presets and do not examine them more
+	detailed - also improves LMMS-startup-times
+
 	* Makefile.am:
 	added a few files to LMMS-headers
 

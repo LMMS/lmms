@@ -223,13 +223,12 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 #ifdef LMMS_DEBUG
 		assert( it != NULL );
 #endif
-		instrument * afp = it->loadInstrument(
+		instrument * inst = it->loadInstrument(
 				engine::sampleExtensions()[f->extension()] );
-		if( afp != NULL )
+		if( inst != NULL )
 		{
-			afp->setParameter( "samplefile", f->fullName() );
+			inst->setParameter( "samplefile", f->fullName() );
 		}
-		//it->toggledInstrumentTrackButton( TRUE );
 		engine::getMixer()->unlock();
 	}
 	else if( f->type() == fileItem::PresetFile )
@@ -826,20 +825,20 @@ void fileItem::determineFileType( void )
 	}
 	else if( ext == "xml" )
 	{
-		multimediaProject::ProjectTypes t =
+/*		multimediaProject::ProjectTypes t =
 				multimediaProject::typeOfFile( fullName() );
 		if( t == multimediaProject::SongProject )
 		{
 			m_type = ProjectFile;
 		}
 		else if( t == multimediaProject::InstrumentTrackSettings )
-		{
+		{*/
 			m_type = PresetFile;
-		}
+/*		}
 		else
 		{
 			m_type = UnknownFile;
-		}
+		}*/
 	}
 	else if( ext == "csf" )
 	{
