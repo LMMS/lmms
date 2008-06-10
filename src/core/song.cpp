@@ -788,7 +788,10 @@ void song::createNewProject( void )
 	m_loadingProject = FALSE;
 	m_modified = FALSE;
 
-	engine::getMainWindow()->resetWindowTitle();
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->resetWindowTitle();
+	}
 }
 
 
@@ -912,7 +915,10 @@ void song::loadProject( const QString & _file_name )
 	m_loadingProject = FALSE;
 	m_modified = FALSE;
 
-	engine::getMainWindow()->resetWindowTitle();
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->resetWindowTitle();
+	}
 }
 
 
