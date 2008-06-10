@@ -636,12 +636,12 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	m_bankNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move(131, 62);
 	m_bankNumLcd->addTextForValue( -1, "---" );
-	m_bankNumLcd->setEnabled( FALSE );
+//	m_bankNumLcd->setEnabled( FALSE );
 
 	m_patchNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move(190, 62);
 	m_patchNumLcd->addTextForValue( -1, "---" );
-	m_patchNumLcd->setEnabled( FALSE );
+//	m_patchNumLcd->setEnabled( FALSE );
 
 	/*hl->addWidget( m_fileDialogButton );
 	hl->addWidget( m_bankNumLcd );
