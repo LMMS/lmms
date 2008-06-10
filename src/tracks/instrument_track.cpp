@@ -903,6 +903,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	connect( m_tswInstrumentTrackButton, SIGNAL( toggled( bool ) ),
 			this, SLOT( toggledInstrumentTrackButton( bool ) ) );
 
+	connect( _it, SIGNAL( nameChanged() ),
+			m_tswInstrumentTrackButton, SLOT( update() ) );
 }
 
 
@@ -1007,17 +1009,6 @@ void instrumentTrackView::activityIndicatorReleased( void )
 								midiTime() );
 }
 
-
-
-
-
-void instrumentTrackView::updateName( void )
-{
-#ifdef LMMS_DEBUG
-	assert( m_tswInstrumentTrackButton != NULL );
-#endif
-	m_tswInstrumentTrackButton->setText( model()->name() );
-}
 
 
 

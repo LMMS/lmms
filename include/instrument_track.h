@@ -231,8 +231,6 @@ private slots:
 	void activityIndicatorPressed( void );
 	void activityIndicatorReleased( void );
 
-	void updateName( void );
-
 	void midiInSelected( void );
 	void midiOutSelected( void );
 	void midiConfigChanged( void );
