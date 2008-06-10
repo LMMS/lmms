@@ -344,10 +344,17 @@ void mixer::initDevices( void )
 
 
 
-void mixer::startProcessing( void )
+void mixer::startProcessing( bool _needs_fifo )
 {
-	m_fifo_writer = new fifoWriter( this, m_fifo );
-	m_fifo_writer->start();
+	if( _needs_fifo )
+	{
+		m_fifoWriter = new fifoWriter( this, m_fifo );
+		m_fifoWriter->start();
+	}
+	else
+	{
+		m_fifoWriter = NULL;
+	}
 
 	m_audioDev->startProcessing();
 }
@@ -357,13 +364,19 @@ void mixer::startProcessing( void )
 
 void mixer::stopProcessing( void )
 {
-	m_fifo_writer->finish();
-
-	m_audioDev->stopProcessing();
-
-	m_fifo_writer->wait( 1000 );
-	m_fifo_writer->terminate();
-	delete m_fifo_writer;
+	if( m_fifoWriter != NULL )
+	{
+		m_fifoWriter->finish();
+		m_audioDev->stopProcessing();
+		m_fifoWriter->wait( 1000 );
+		m_fifoWriter->terminate();
+		delete m_fifoWriter;
+		m_fifoWriter = NULL;
+	}
+	else
+	{
+		m_audioDev->stopProcessing();
+	}
 }
 
 
@@ -825,7 +838,8 @@ void mixer::setAudioDevice( audioDevice * _dev )
 
 
 void mixer::setAudioDevice( audioDevice * _dev,
-					const struct qualitySettings & _qs )
+				const struct qualitySettings & _qs,
+				bool _needs_fifo )
 {
 	// don't delete the audio-device
 	stopProcessing();
@@ -847,7 +861,7 @@ void mixer::setAudioDevice( audioDevice * _dev,
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	startProcessing();
+	startProcessing( _needs_fifo );
 }
 
 

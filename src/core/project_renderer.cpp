@@ -146,7 +146,8 @@ void projectRenderer::startProcessing( void )
 	// have to do mixer stuff with GUI-thread-affinity in order to make
 	// slots connected to sampleRateChanged()-signals being called
 	// immediately
-	engine::getMixer()->setAudioDevice( m_fileDev, m_qualitySettings );
+	engine::getMixer()->setAudioDevice( m_fileDev, m_qualitySettings,
+									FALSE );
 
 	start( QThread::HighestPriority );
 }

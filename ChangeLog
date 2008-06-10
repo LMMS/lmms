@@ -1,5 +1,15 @@
 2008-06-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/song.cpp:
+	fixed loading files in no-GUI mode
+
+	* include/mixer.h:
+	* src/core/audio/audio_device.cpp:
+	* src/core/mixer.cpp:
+	* src/core/project_renderer.cpp:
+	don't use fifoWriter when rendering as we do not have realtime issues
+	here - fixes lockups on various systems when exporting project
+
 	* plugins/sf2_player/sf2_player.cpp:
 	enabled LCD-Spinboxes for easily switching banks/patches - I know that
 	this way you can select banks/patches that do not exist but opening

@@ -201,7 +201,8 @@ public:
 
 	void setAudioDevice( audioDevice * _dev );
 	void setAudioDevice( audioDevice * _dev,
-					const struct qualitySettings & _qs );
+				const struct qualitySettings & _qs,
+							bool _needs_fifo );
 	void restoreAudioDevice( void );
 	inline audioDevice * audioDev( void )
 	{
@@ -383,11 +384,15 @@ public:
 
 	bool criticalXRuns( void ) const;
 
-	const surroundSampleFrame * nextBuffer( void )
+	inline bool hasFifoWriter( void ) const
 	{
-		return( m_fifo->read() );
+		return( m_fifoWriter != NULL );
 	}
 
+	inline const surroundSampleFrame * nextBuffer( void )
+	{
+		return( hasFifoWriter() ? m_fifo->read() : renderNextBuffer() );
+	}
 
 	void changeQuality( const struct qualitySettings & _qs );
 
@@ -422,7 +427,7 @@ private:
 	mixer( void );
 	virtual ~mixer();
 
-	void startProcessing( void );
+	void startProcessing( bool _needs_fifo = TRUE );
 	void stopProcessing( void );
 
 
@@ -485,7 +490,7 @@ private:
 
 
 	fifo * m_fifo;
-	fifoWriter * m_fifo_writer;
+	fifoWriter * m_fifoWriter;
 
 
 	friend class engine;

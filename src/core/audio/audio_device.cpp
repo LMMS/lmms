@@ -96,7 +96,7 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// make sure, no other thread is accessing device
 	lock();
 
-	// now were safe to access the device
+	// resample if neccessary
 	if( getMixer()->processingSampleRate() != m_sampleRate )
 	{
 		resample( b, frames, _ab, getMixer()->processingSampleRate(),
@@ -112,7 +112,10 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// release lock
 	unlock();
 
-	delete[] b;
+	if( getMixer()->hasFifoWriter() )
+	{
+		delete[] b;
+	}
 
 	return( frames );
 }
@@ -122,9 +125,12 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 
 void audioDevice::stopProcessing( void )
 {
-	while( m_inProcess )
+	if( getMixer()->hasFifoWriter() )
 	{
-		processNextBuffer();
+		while( m_inProcess )
+		{
+			processNextBuffer();
+		}
 	}
 }
 
