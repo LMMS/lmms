@@ -151,6 +151,16 @@ organicInstrumentView knob#volKnob {
 	qproperty-lineWidth: 3;
 }
 
+sf2InstrumentView knob {
+	color: #ff0066;
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 9.2;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.42;
+	qproperty-lineWidth: 2;
+}
+
 QToolButton {
 	padding: 1;
 }

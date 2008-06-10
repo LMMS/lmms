@@ -583,6 +583,15 @@ const QStringList & sf2Instrument::subPluginFeatures::supportedExtensions(
 	return( extensions );
 }
 
+class sf2Knob : public knob
+{
+public:
+	sf2Knob( QWidget * _parent ) :
+			knob( knobStyled, _parent )
+	{
+		setFixedSize( 31, 38 );
+	}
+};
 
 
 
@@ -590,16 +599,17 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 			QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
-	QVBoxLayout * vl = new QVBoxLayout( this );
-	QHBoxLayout * hl = new QHBoxLayout();
+//	QVBoxLayout * vl = new QVBoxLayout( this );
+//	QHBoxLayout * hl = new QHBoxLayout();
 	
 	// File Button
-	m_fileDialogButton = new pixmapButton( this, NULL );
+	m_fileDialogButton = new pixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_fileDialogButton->setActiveGraphic( embed::getIconPixmap(
-			"project_open_down" ) );
-	m_fileDialogButton->setInactiveGraphic( embed::getIconPixmap(
-			"project_open" ) );
+	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"fileselect_on" ) );
+	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+			"fileselect_off" ) );
+	m_fileDialogButton->move( 217, 107 );
 	connect( m_fileDialogButton, SIGNAL( clicked() ),
 			this, SLOT( showFileDialog() ) );
 	toolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
@@ -608,13 +618,14 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 			tr( "Click here to open another SF2 file" ) );
 
 	// Patch Button
-	m_patchDialogButton = new pixmapButton( this, NULL );
+	m_patchDialogButton = new pixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_patchDialogButton->setActiveGraphic( embed::getIconPixmap(
-							"track_op_menu" ) );
-	m_patchDialogButton->setInactiveGraphic( embed::getIconPixmap(
-							"track_op_menu" ) );
+	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"patches_on" ) );
+	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"patches_off" ) );
 	m_patchDialogButton->setEnabled( FALSE );
+	m_patchDialogButton->move( 217, 125 );
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ),
 			this, SLOT( showPatchDialog() ) );
@@ -622,88 +633,114 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 
 
 	// LCDs
-	m_bankNumLcd = new lcdSpinBox( 3, this );
-	m_bankNumLcd->setLabel( "BANK" );
+	m_bankNumLcd = new lcdSpinBox( 3, "21pink", this );
+	m_bankNumLcd->move(131, 62);
 	m_bankNumLcd->addTextForValue( -1, "---" );
 	m_bankNumLcd->setEnabled( FALSE );
 
-	m_patchNumLcd = new lcdSpinBox( 3, this );
-	m_patchNumLcd->setLabel( "PATCH" );
+	m_patchNumLcd = new lcdSpinBox( 3, "21pink", this );
+	m_patchNumLcd->move(190, 62);
 	m_patchNumLcd->addTextForValue( -1, "---" );
 	m_patchNumLcd->setEnabled( FALSE );
 
-	hl->addWidget( m_fileDialogButton );
+	/*hl->addWidget( m_fileDialogButton );
 	hl->addWidget( m_bankNumLcd );
 	hl->addWidget( m_patchNumLcd );
 	hl->addWidget( m_patchDialogButton );
 
-	vl->addLayout( hl );
+	vl->addLayout( hl );*/
 
 	// Next row
 
-	hl = new QHBoxLayout();
+	//hl = new QHBoxLayout();
 
 	m_filenameLabel = new QLabel( this );
+	m_filenameLabel->setGeometry( 56, 109, 156, 11 );
 
-	hl->addWidget( m_filenameLabel );
-	vl->addLayout( hl );
+	//hl->addWidget( m_filenameLabel );
+//	vl->addLayout( hl );
 
 	// Gain
-	m_gainKnob = new knob( knobSmall_17, this );
+	m_gainKnob = new sf2Knob( this );
 	m_gainKnob->setHintText( tr("Gain") + " ", "" );
-	m_gainKnob->setLabel( tr("GAIN") );
-	vl->addWidget( m_gainKnob );
+	m_gainKnob->move( 86, 55 );
+//	vl->addWidget( m_gainKnob );
 
 	// Reverb
-	hl = new QHBoxLayout();
+//	hl = new QHBoxLayout();
 
-	m_reverbOnLed = new ledCheckBox( "REVERB", this );
+	
+	m_reverbButton = new pixmapButton( this );
+	m_reverbButton->setCheckable( TRUE );
+	m_reverbButton->move( 24, 176 );
+	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"reverb_on" ) );
+	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"reverb_off" ) );
+	toolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
+	m_reverbButton->setWhatsThis(
+		tr( "This button enables the reverb effect. "
+			"This is useful for cool effects, but only works on "
+			"files that support it." ) );
 
-	m_reverbRoomSizeKnob = new knob( knobSmall_17, this );
+
+	m_reverbRoomSizeKnob = new sf2Knob( this );
 	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:") + " ", "" );
-	m_reverbRoomSizeKnob->setLabel( tr("SIZE") );
+	m_reverbRoomSizeKnob->move( 93, 160 );
 
-	m_reverbDampingKnob = new knob( knobSmall_17, this );
+	m_reverbDampingKnob = new sf2Knob( this );
 	m_reverbDampingKnob->setHintText( tr("Reverb Damping:") + " ", "" );
-	m_reverbDampingKnob->setLabel( tr("DAMP") );
+	m_reverbDampingKnob->move( 130, 160 );
 
-	m_reverbWidthKnob = new knob( knobSmall_17, this );
+	m_reverbWidthKnob = new sf2Knob( this );
 	m_reverbWidthKnob->setHintText( tr("Reverb Width:") + " ", "" );
-	m_reverbWidthKnob->setLabel( tr("WIDTH") );
+	m_reverbWidthKnob->move( 167, 160 );
 
-	m_reverbLevelKnob = new knob( knobSmall_17, this );
+	m_reverbLevelKnob = new sf2Knob( this );
 	m_reverbLevelKnob->setHintText( tr("Reverb Level:") + " ", "" );
-	m_reverbLevelKnob->setLabel( tr("LEVEL") );
+	m_reverbLevelKnob->move( 204, 160 );
 
-	hl->addWidget( m_reverbOnLed );
+/*	hl->addWidget( m_reverbOnLed );
 	hl->addWidget( m_reverbRoomSizeKnob );
 	hl->addWidget( m_reverbDampingKnob );
 	hl->addWidget( m_reverbWidthKnob );
 	hl->addWidget( m_reverbLevelKnob );
 
 	vl->addLayout( hl );
+*/
 
 	// Chorus
-	hl = new QHBoxLayout();
+//	hl = new QHBoxLayout();
 
-	m_chorusOnLed = new ledCheckBox( "CHORUS", this );
+	m_chorusButton = new pixmapButton( this );
+	m_chorusButton->setCheckable( TRUE );
+	m_chorusButton->move( 24, 222 );
+	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"chorus_on" ) );
+	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"chorus_off" ) );
+	toolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
+	m_chorusButton->setWhatsThis(
+		tr( "This button enables the chorus effect. "
+			"This is useful for cool echo effects, but only works on "
+			"files that support it." ) );
 
-	m_chorusNumKnob = new knob( knobSmall_17, this );
+	m_chorusNumKnob = new sf2Knob( this );
 	m_chorusNumKnob->setHintText( tr("Chorus Lines:") + " ", "" );
-	m_chorusNumKnob->setLabel( tr("NUM") );
+	m_chorusNumKnob->move( 93, 206 );
 
-	m_chorusLevelKnob = new knob( knobSmall_17, this );
+	m_chorusLevelKnob = new sf2Knob( this );
 	m_chorusLevelKnob->setHintText( tr("Chorus Level:") + " ", "" );
-	m_chorusLevelKnob->setLabel( tr("LEVEL") );
+	m_chorusLevelKnob->move( 130 , 206 );
 
-	m_chorusSpeedKnob = new knob( knobSmall_17, this );
+	m_chorusSpeedKnob = new sf2Knob( this );
 	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:") + " ", "" );
-	m_chorusSpeedKnob->setLabel( tr("SPD") );
+	m_chorusSpeedKnob->move( 167 , 206 );
 
-	m_chorusDepthKnob = new knob( knobSmall_17, this );
+	m_chorusDepthKnob = new sf2Knob( this );
 	m_chorusDepthKnob->setHintText( tr("Chorus Depth:") + " ", "" );
-	m_chorusDepthKnob->setLabel( tr("DEPTH") );
-
+	m_chorusDepthKnob->move( 204 , 206 );
+/*
 	hl->addWidget( m_chorusOnLed );
 	hl->addWidget( m_chorusNumKnob);
 	hl->addWidget( m_chorusLevelKnob);
@@ -711,9 +748,7 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	hl->addWidget( m_chorusDepthKnob);
 
 	vl->addLayout( hl );
-
-
-
+*/
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
@@ -742,13 +777,13 @@ void sf2InstrumentView::modelChanged( void )
 	
 	m_gainKnob->setModel( &k->m_gain );
 
-	m_reverbOnLed->setModel( &k->m_reverbOn );
+	m_reverbButton->setModel( &k->m_reverbOn );
 	m_reverbRoomSizeKnob->setModel( &k->m_reverbRoomSize );
 	m_reverbDampingKnob->setModel( &k->m_reverbDamping );
 	m_reverbWidthKnob->setModel( &k->m_reverbWidth );
 	m_reverbLevelKnob->setModel( &k->m_reverbLevel );
 
-	m_chorusOnLed->setModel( &k->m_chorusOn );
+	m_chorusButton->setModel( &k->m_chorusOn );
 	m_chorusNumKnob->setModel( &k->m_chorusNum );
 	m_chorusLevelKnob->setModel( &k->m_chorusLevel );
 	m_chorusSpeedKnob->setModel( &k->m_chorusSpeed );
@@ -771,8 +806,14 @@ void sf2InstrumentView::modelChanged( void )
 void sf2InstrumentView::updateFilename( void )
 {
 	sf2Instrument * i = castModel<sf2Instrument>();
-	m_filenameLabel->setText( "File: " +
-					i->m_filename + "\nPatch: TODO" );
+	QFontMetrics fm( font() );
+	QString file = i->m_filename.endsWith( ".sf2", Qt::CaseInsensitive ) ?
+			i->m_filename.left( i->m_filename.length() - 4 ) :
+			i->m_filename;
+	m_filenameLabel->setText(
+			fm.elidedText( file, Qt::ElideLeft, 
+			m_filenameLabel->width() ) );
+			//		i->m_filename + "\nPatch: TODO" );
 
 	m_patchDialogButton->setEnabled( !i->m_filename.isEmpty() );
 
@@ -792,6 +833,7 @@ void sf2InstrumentView::invalidateFile( void )
 
 void sf2InstrumentView::showFileDialog( void )
 {
+	printf("CLICKED\n");
 	sf2Instrument * k = castModel<sf2Instrument>();
 
 	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );

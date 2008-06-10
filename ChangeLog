@@ -1,3 +1,20 @@
+2008-06-10  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/artwork.png:
+	* plugins/sf2_player/chorus_off.png:
+	* plugins/sf2_player/chorus_on.png:
+	* plugins/sf2_player/fileselect_off.png:
+	* plugins/sf2_player/fileselect_on.png:
+	* plugins/sf2_player/patches_on.png:
+	* plugins/sf2_player/patches_off.png:
+	* plugins/sf2_player/reverb_off.png:
+	* plugins/sf2_player/reverb_on.png:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* data/themes/default/style.css:
+	* data/themes/default/lcd_21pink.png:
+	integrate new sf2 artwork, for the most part at least
+
 2008-06-09	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/main_window.cpp:

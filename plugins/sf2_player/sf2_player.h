@@ -199,13 +199,13 @@ private:
 
 	knob	* m_gainKnob;
 
-	ledCheckBox	* m_reverbOnLed;
+	pixmapButton * m_reverbButton;
 	knob	* m_reverbRoomSizeKnob;
 	knob	* m_reverbDampingKnob;
 	knob	* m_reverbWidthKnob;
 	knob	* m_reverbLevelKnob;
 
-	ledCheckBox * m_chorusOnLed;
+	pixmapButton * m_chorusButton;
 	knob * m_chorusNumKnob;
 	knob * m_chorusLevelKnob;
 	knob * m_chorusSpeedKnob;
