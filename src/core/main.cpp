@@ -104,7 +104,7 @@ int main( int argc, char * * argv )
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
 	projectRenderer::outputSettings os( 44100, FALSE, 160 );
-	projectRenderer::ExportFileTypes eft = projectRenderer::WaveFile;
+	projectRenderer::ExportFileFormats eff = projectRenderer::WaveFile;
 
 
 	for( int i = 1; i < argc; ++i )
@@ -174,11 +174,11 @@ int main( int argc, char * * argv )
 			const QString ext = QString( argv[i + 1] );
 			if( ext == "wav" )
 			{
-				eft = projectRenderer::WaveFile;
+				eff = projectRenderer::WaveFile;
 			}
 			else if( ext == "ogg" )
 			{
-				eft = projectRenderer::OggFile;
+				eff = projectRenderer::OggFile;
 			}
 			else
 			{
@@ -391,8 +391,8 @@ int main( int argc, char * * argv )
 		engine::getSong()->loadProject( file_to_load );
 
 		// create renderer
-		projectRenderer * r = new projectRenderer( qs, os, eft,
-			render_out + QString( ( eft == projectRenderer::WaveFile ) ?
+		projectRenderer * r = new projectRenderer( qs, os, eff,
+			render_out + QString( ( eff == projectRenderer::WaveFile ) ?
 								"wav" : "ogg" ) );
 		QCoreApplication::instance()->connect( r, SIGNAL( finished() ),
 								SLOT( quit() ) );

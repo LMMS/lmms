@@ -34,7 +34,7 @@
 
 #include "audio_file_ogg.h"
 
-#ifdef HAVE_VORBIS_CODEC_H
+#ifdef LMMS_HAVE_VORBIS_CODEC_H
 
 
 #include <vorbis/vorbisenc.h>
@@ -180,7 +180,7 @@ bool audioFileOgg::startEncoding( void )
 
 
 
-void FASTCALL audioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
+void audioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {

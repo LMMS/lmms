@@ -26,6 +26,7 @@
 
 
 #include <QtCore/QFileInfo>
+#include <QtGui/QMessageBox>
 
 
 #include "export_project_dialog.h"
@@ -44,6 +45,15 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	setupUi( this );
 	setWindowTitle( tr( "Export project to %1" ).arg( 
 					QFileInfo( _file_name ).fileName() ) );
+
+	for( int i = 0; i < projectRenderer::NumFileFormats; ++i )
+	{
+		if( __fileEncodeDevices[i].m_getDevInst != NULL )
+		{
+			fileFormatCB->addItem( projectRenderer::tr(
+				__fileEncodeDevices[i].m_description ) );
+		}
+	}
 
 	connect( startButton, SIGNAL( clicked() ),
 			this, SLOT( startBtnClicked() ) );
@@ -90,6 +100,29 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 void exportProjectDialog::startBtnClicked( void )
 {
+	projectRenderer::ExportFileFormats ft = projectRenderer::NumFileFormats;
+
+	for( int i = 0; i < projectRenderer::NumFileFormats; ++i )
+	{
+		if( fileFormatCB->currentText() ==
+			projectRenderer::tr(
+				__fileEncodeDevices[i].m_description ) )
+		{
+			ft = __fileEncodeDevices[i].m_fileFormat;
+			break;
+		}
+	}
+
+	if( ft == projectRenderer::NumFileFormats )
+	{
+		QMessageBox::information( this, tr( "Error" ),
+			tr( "Error while determining file-encoder device. "
+				"Please try to choose a different output "
+							"format." ) );
+		reject();
+		return;
+	}
+
 	startButton->setEnabled( FALSE );
 	progressBar->setEnabled( TRUE );
 
@@ -108,10 +141,7 @@ void exportProjectDialog::startBtnClicked( void )
 			FALSE,
 			bitrateCB->currentText().section( " ", 0, 0 ).toUInt() );
 
-	m_renderer = new projectRenderer( qs, os,
-		static_cast<projectRenderer::ExportFileTypes>(
-						fileTypeCB->currentIndex() ),
-								m_fileName );
+	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
 	connect( m_renderer, SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );
 	connect( m_renderer, SIGNAL( progressChanged( int ) ),

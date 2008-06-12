@@ -33,30 +33,25 @@
 #include "audio_file_ogg.h"
 
 
-struct fileEncodeDevice
-{
-	projectRenderer::ExportFileTypes m_fileType;
-//		const char * m_description;
-	const char * m_extension;
-	audioFileDeviceInstantiaton m_getDevInst;
-} ;
-
-
-static fileEncodeDevice __fileEncodeDevices[] =
+fileEncodeDevice __fileEncodeDevices[] =
 {
 
-	{ projectRenderer::WaveFile,/* QT_TRANSLATE_NOOP( "exportProjectDialog",
-					"Uncompressed Wave-File (*.wav)" ),*/
+	{ projectRenderer::WaveFile,
+		QT_TRANSLATE_NOOP( "projectRenderer", "WAV-File" ),
 					".wav", &audioFileWave::getInst },
-#ifdef HAVE_VORBIS_CODEC_H
-	{ projectRenderer::OggFile, /*QT_TRANSLATE_NOOP( "exportProjectDialog",
-					"Compressed OGG-File (*.ogg)" ),*/
-					".ogg", &audioFileOgg::getInst },
+	{ projectRenderer::OggFile,
+		QT_TRANSLATE_NOOP( "projectRenderer", "Compressed OGG-File" ),
+					".ogg",
+#ifdef LMMS_HAVE_VORBIS_CODEC_H
+					&audioFileOgg::getInst
+#else
+					NULL
 #endif
+									},
 	// ... insert your own file-encoder-infos here... may be one day the
 	// user can add own encoders inside the program...
 
-	{ projectRenderer::NullFile, NULL, NULL }
+	{ projectRenderer::NumFileFormats, NULL, NULL, NULL }
 
 } ;
 
@@ -65,47 +60,30 @@ static fileEncodeDevice __fileEncodeDevices[] =
 
 projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,
 					const outputSettings & _os,
-					ExportFileTypes _file_type,
+					ExportFileFormats _file_format,
 					const QString & _out_file ) :
 	QThread( engine::getMixer() ),
+	m_fileDev( NULL ),
 	m_qualitySettings( _qs ),
 	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( FALSE )
 {
-	int idx = 0;
-	while( __fileEncodeDevices[idx].m_fileType != NullFile )
-	{
-		if( __fileEncodeDevices[idx].m_fileType == _file_type )
-		{
-			break;
-		}
-		++idx;
-	}
-
-	if( __fileEncodeDevices[idx].m_fileType == NullFile )
+	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
 	{
 		return;
 	}
 
 	bool success_ful = FALSE;
-	m_fileDev = __fileEncodeDevices[idx].m_getDevInst(
+	m_fileDev = __fileEncodeDevices[_file_format].m_getDevInst(
 				_os.samplerate, DEFAULT_CHANNELS, success_ful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
 							engine::getMixer() );
 	if( success_ful == FALSE )
 	{
-/*		QMessageBox::information( this,
-					tr( "Export failed" ),
-					tr( "The project-export failed, "
-						"because the output-file/-"
-						"device could not be opened.\n"
-						"Make sure, you have write "
-						"access to the selected "
-						"file/device!" ),
-							QMessageBox::Ok );
-		return;*/
+		delete m_fileDev;
+		m_fileDev = NULL;
 	}
 
 }
@@ -120,17 +98,17 @@ projectRenderer::~projectRenderer()
 
 
 
-// little help-function for getting file-type from a file-extension (only for
+// little help-function for getting file-format from a file-extension (only for
 // registered file-encoders)
-projectRenderer::ExportFileTypes projectRenderer::getFileTypeFromExtension(
+projectRenderer::ExportFileFormats projectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
 	int idx = 0;
-	while( __fileEncodeDevices[idx].m_fileType != NullFile )
+	while( __fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
 	{
 		if( QString( __fileEncodeDevices[idx].m_extension ) == _ext )
 		{
-			return( __fileEncodeDevices[idx].m_fileType );
+			return( __fileEncodeDevices[idx].m_fileFormat );
 		}
 		++idx;
 	}
@@ -143,13 +121,16 @@ projectRenderer::ExportFileTypes projectRenderer::getFileTypeFromExtension(
 
 void projectRenderer::startProcessing( void )
 {
-	// have to do mixer stuff with GUI-thread-affinity in order to make
-	// slots connected to sampleRateChanged()-signals being called
-	// immediately
-	engine::getMixer()->setAudioDevice( m_fileDev, m_qualitySettings,
-									FALSE );
+	if( isReady() )
+	{
+		// have to do mixer stuff with GUI-thread-affinity in order to
+		// make slots connected to sampleRateChanged()-signals being
+		// called immediately
+		engine::getMixer()->setAudioDevice( m_fileDev,
+						m_qualitySettings, FALSE );
 
-	start( QThread::HighestPriority );
+		start( QThread::HighestPriority );
+	}
 }
 
 

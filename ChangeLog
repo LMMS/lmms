@@ -1,3 +1,14 @@
+2008-06-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/project_renderer.h:
+	* src/gui/dialogs/export_project.ui:
+	* src/gui/export_project_dialog.cpp:
+	* src/core/audio/audio_file_ogg.cpp:
+	* src/core/main.cpp:
+	* src/core/project_renderer.cpp:
+	improved support for different file-formats when exporting and fixed
+	bug which made LMMS crash when exporting to OGG-file
+
 2008-06-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/song.cpp:

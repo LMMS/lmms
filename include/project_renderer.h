@@ -26,17 +26,20 @@
 #define _PROJECT_RENDERER_H
 
 #include "audio_file_device.h"
+#include "lmmsconfig.h"
 
 
 class projectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileTypes
+	enum ExportFileFormats
 	{
 		WaveFile,
+#ifdef LMMS_HAVE_VORBIS_CODEC_H
 		OggFile,
-		NullFile = 0xFF
+#endif
+		NumFileFormats
 	} ;
 
 	struct outputSettings
@@ -55,11 +58,17 @@ public:
 
 	projectRenderer( const mixer::qualitySettings & _qs,
 				const outputSettings & _os,
-				ExportFileTypes _file_type,
+				ExportFileFormats _file_format,
 				const QString & _out_file );
 	virtual ~projectRenderer();
 
-	static ExportFileTypes getFileTypeFromExtension( const QString & _ext );
+	bool isReady( void ) const
+	{
+		return m_fileDev != NULL;
+	}
+
+	static ExportFileFormats getFileFormatFromExtension(
+							const QString & _ext );
 
 
 public slots:
@@ -84,5 +93,17 @@ private:
 	volatile bool m_abort;
 
 } ;
+
+
+struct fileEncodeDevice
+{
+	projectRenderer::ExportFileFormats m_fileFormat;
+	const char * m_description;
+	const char * m_extension;
+	audioFileDeviceInstantiaton m_getDevInst;
+} ;
+
+
+extern fileEncodeDevice __fileEncodeDevices[];
 
 #endif
