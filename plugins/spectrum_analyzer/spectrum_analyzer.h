@@ -32,7 +32,7 @@
 #include "spectrumanalyzer_controls.h"
 
 
-const int MAX_BANDS = 400;
+const int MAX_BANDS = 249;
 const int BUFFER_SIZE = 2048;
 
 
