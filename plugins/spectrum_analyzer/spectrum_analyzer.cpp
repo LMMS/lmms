@@ -349,7 +349,7 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 	}
 
 
-	hanming( m_buffer, BUFFER_SIZE, HAMMING );
+//	hanming( m_buffer, BUFFER_SIZE, HAMMING );
 
 	const sample_rate_t sr = engine::getMixer()->processingSampleRate();
 	const int LOWEST_FREQ = 0;
