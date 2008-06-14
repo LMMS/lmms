@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	virtual ch_cnt_t getControlCount( void ) = 0;
+	virtual int getControlCount( void ) = 0;
 	virtual effectControlDialog * createView( void ) = 0;
 
 

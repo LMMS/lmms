@@ -38,8 +38,7 @@ plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"BassBooster Effect",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"plugin for using arbitrary VST-effects "
-				"inside LMMS." ),
+				"plugin for boosting bass" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::Effect,

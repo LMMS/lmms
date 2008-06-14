@@ -49,7 +49,7 @@ public:
 		return( "vsteffectcontrols" );
 	}
 
-	virtual ch_cnt_t getControlCount( void )
+	virtual int getControlCount( void )
 	{
 		return( 1 );
 	}

@@ -42,7 +42,7 @@ public:
 	ladspaControls( ladspaEffect * _eff, track * _track );
 	virtual ~ladspaControls();
 
-	inline ch_cnt_t getControlCount( void )
+	inline int getControlCount( void )
 	{
 		return( m_controlCount );
 	}
