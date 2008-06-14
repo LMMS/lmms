@@ -1,3 +1,29 @@
+2008-06-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	* plugins/Makefile.am:
+	* plugins/spectrum_analyzer/Makefile.am:
+	* plugins/spectrum_analyzer/logo.png:
+	* plugins/spectrum_analyzer/spectrum_analyzer.h:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* plugins/spectrum_analyzer/spectrumanalyzer_controls.h:
+	* plugins/spectrum_analyzer/spectrumanalyzer_controls.cpp:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.h:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
+	added initial version of spectrum analyzer - very basic at the moment!
+
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/bass_booster/bassbooster_controls.h:
+	* plugins/ladspa_effect/ladspa_controls.h:
+	* plugins/peak_controller_effect/peak_controller_effect_controls.h:
+	* plugins/stereo_enhancer/stereoenhancer_controls.h:
+	* plugins/stereo_matrix/stereomatrix_controls.h:
+	* plugins/vst_effect/vst_effect_controls.h:
+	* include/dummy_effect.h:
+	* include/effect_controls.h:
+	changed return-type of effectControls::getControlCount()
+
 2008-06-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/project_renderer.h:

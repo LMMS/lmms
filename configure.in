@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080607, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080607)
+AC_INIT(lmms, 0.4.0-svn20080613, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080613)
 AX_PREFIX_CONFIG_H([include/lmmsconfig.h])
 
 AM_CONFIG_HEADER(config.h)
@@ -729,6 +729,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/peak_controller_effect/Makefile
 		 plugins/sf2_player/Makefile
 		 plugins/singerbot/Makefile
+		 plugins/spectrum_analyzer/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
 		 plugins/triple_oscillator/Makefile

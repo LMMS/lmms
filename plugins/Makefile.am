@@ -28,8 +28,9 @@ SUBDIRS =			\
 	organic			\
 	patman			\
 	peak_controller_effect	\
-	$(SF2PLAYER_DIR)    \
+	$(SF2PLAYER_DIR)	\
 	$(SINGERBOT_DIR)	\
+	spectrum_analyzer	\
 	stereo_enhancer		\
 	stereo_matrix		\
 	$(STK_DIR)		\
