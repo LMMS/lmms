@@ -39,6 +39,14 @@ public:
 	{
 	}
 
+private:
+	virtual void paintEvent( QPaintEvent * _pe );
+
+	spectrumAnalyzerControls * m_controls;
+
+	QPixmap m_logXAxis;
+	QPixmap m_logYAxis;
+
 } ;
 
 #endif

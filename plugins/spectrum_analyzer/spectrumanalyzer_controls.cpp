@@ -31,7 +31,7 @@ spectrumAnalyzerControls::spectrumAnalyzerControls( spectrumAnalyzer * _eff ) :
 	effectControls( _eff ),
 	m_effect( _eff ),
 	m_linearSpec( FALSE, this, tr( "Linear spectrum" ) ),
-	m_linearYAxis( TRUE, this, tr( "Linear Y-axis" ) ),
+	m_linearYAxis( FALSE, this, tr( "Linear Y-axis" ) ),
 	m_channelMode( spectrumAnalyzer::MergeChannels, spectrumAnalyzer::MergeChannels, spectrumAnalyzer::RightChannel, this, tr( "Channel mode" ) )
 {
 }

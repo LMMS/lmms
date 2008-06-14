@@ -1,5 +1,16 @@
 2008-06-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/spectrum_analyzer/log_x_axis.png:
+	* plugins/spectrum_analyzer/log_y_axis.png:
+	* plugins/spectrum_analyzer/background.png:
+	* plugins/spectrum_analyzer/spectrum_background.png:
+	* plugins/spectrum_analyzer/spectrum_background_plain.png:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* plugins/spectrum_analyzer/spectrumanalyzer_controls.cpp:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.h:
+	labeled axes and correct logarithmic view
+
 	* plugins/spectrum_analyzer/background.png:
 	* plugins/spectrum_analyzer/spectrum_background.png:
 	* plugins/spectrum_analyzer/spectrum_background_plain.png:

@@ -363,12 +363,12 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 			MAX_BANDS,
 			LOWEST_FREQ*(BUFFER_SIZE+1)/(double)(sr/2),
 			HIGHEST_FREQ*(BUFFER_SIZE+1)/(double)(sr/2) );
-		m_energy = maximum( m_bands, MAX_BANDS );
+		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, BUFFER_SIZE );
 	}
 	else
 	{
 		calc13octaveband31( m_absSpecBuf, m_bands, BUFFER_SIZE+1, sr/2.0);
-		m_energy = signalpower( m_buffer, BUFFER_SIZE );
+		m_energy = signalpower( m_buffer, BUFFER_SIZE ) / maximum( m_buffer, BUFFER_SIZE );
 	}
 
 

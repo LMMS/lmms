@@ -93,11 +93,11 @@ public:
 			{
 				if( lin_y )
 				{
-					h = height() * (*b / e );
+					h = height() * 2.0 / 3.0 * (*b / e );
 				}
 				else
 				{
-					h = (int)( height() * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+					h = (int)( height() * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
 				}
 				if( h < 0 )
 				{
@@ -116,11 +116,11 @@ public:
 			{
 				if( lin_y )
 				{
-					h = height() * (*b / e );
+					h = height() * 2.0 / 3.0 * ( 1.2 * *b / e );
 				}
 				else
 				{
-					h = (int)( height() * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+					h = (int)( height() * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
 				}
 				if( h < 0 )
 				{
@@ -149,9 +149,14 @@ private:
 } ;
 
 
+
+
 spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 					spectrumAnalyzerControls * _controls ) :
-	effectControlDialog( _controls )
+	effectControlDialog( _controls ),
+	m_controls( _controls ),
+	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
+	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )
 {
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -161,7 +166,7 @@ spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 	setPalette( pal );
 /*	QVBoxLayout * l = new QVBoxLayout( this );*/
 	spectrumView * v = new spectrumView( _controls->m_effect, this );
-	v->move( 24, 30 );
+	v->move( 27, 30 );
 
 	ledCheckBox * lin_spec = new ledCheckBox( tr( "Linear spectrum" ), this );
 	lin_spec->move( 24, 204 );
@@ -170,10 +175,31 @@ spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 	ledCheckBox * lin_y = new ledCheckBox( tr( "Linear Y axis" ), this );
 	lin_y->move( 24, 220 );
 	lin_y->setModel( &_controls->m_linearYAxis );
+
+	connect( &_controls->m_linearSpec, SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
+	connect( &_controls->m_linearYAxis, SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
 /*	l->addWidget( v );
 	l->addWidget( lin_spec );
 	l->addWidget( lin_y );*/
 
 }
+
+
+void spectrumAnalyzerControlDialog::paintEvent( QPaintEvent * )
+{
+	QPainter p( this );
+	if( !m_controls->m_linearSpec.value() )
+	{
+		p.drawPixmap( 25, 183, m_logXAxis );
+	}
+	if( !m_controls->m_linearYAxis.value() )
+	{
+		p.drawPixmap( 3, 47, m_logYAxis);
+	}
+
+}
+
 
 
