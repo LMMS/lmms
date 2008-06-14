@@ -353,7 +353,7 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 
 	const sample_rate_t sr = engine::getMixer()->processingSampleRate();
 	const int LOWEST_FREQ = 0;
-	const int HIGHEST_FREQ = 10000;//sr / 2;
+	const int HIGHEST_FREQ = sr / 2;
 
 	fftw_execute( m_fftPlan );
 	absspec( m_specBuf, m_absSpecBuf, BUFFER_SIZE+1 );
