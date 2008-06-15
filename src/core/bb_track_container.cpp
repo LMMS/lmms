@@ -68,10 +68,10 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 
 	_start = _start % ( lengthOfBB( _tco_num ) * midiTime::ticksPerTact() );
 
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	trackList tl = tracks();
+	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		if( tl[i]->play( _start, _frames, _offset, _tco_num ) == TRUE )
+		if( ( *it )->play( _start, _frames, _offset, _tco_num ) )
 		{
 			played_a_note = TRUE;
 		}
@@ -99,11 +99,11 @@ tact bbTrackContainer::lengthOfBB( int _bb )
 {
 	midiTime max_length = midiTime::ticksPerTact();
 
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	const trackList & tl = tracks();
+	for( trackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		trackContentObject * tco = tl[i]->getTCO( _bb );
-		max_length = tMax( max_length, tco->length() );
+		max_length = tMax( max_length,
+					( *it )->getTCO( _bb )->length() );
 	}
 
 	return( max_length.nextFullTact() );
@@ -122,11 +122,11 @@ int bbTrackContainer::numOfBBs( void ) const
 
 void bbTrackContainer::removeBB( int _bb )
 {
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	trackList tl = tracks();
+	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		delete tl[i]->getTCO( _bb );
-		tl[i]->removeTact( _bb * DefaultTicksPerTact );
+		delete ( *it )->getTCO( _bb );
+		( *it )->removeTact( _bb * DefaultTicksPerTact );
 	}
 	if( _bb <= currentBB() )
 	{
@@ -139,10 +139,10 @@ void bbTrackContainer::removeBB( int _bb )
 
 void bbTrackContainer::swapBB( int _bb1, int _bb2 )
 {
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	trackList tl = tracks();
+	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		tl[i]->swapPositionOfTCOs( _bb1, _bb2 );
+		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
 	}
 	updateComboBox();
 }
@@ -157,7 +157,6 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 	if( t != NULL )
 	{
 		t->dataChanged();
-		//t->getTrackContentWidget()->update();
 	}
 }
 
@@ -224,15 +223,15 @@ void bbTrackContainer::currentBBChanged( void )
 	createTCOsForBB( currentBB() );
 
 	// now update all track-labels (the current one has to become white,
-	// the others green)
-	for( int i = 0; i < numOfBBs(); ++i )
+	// the others gray)
+	trackList tl = engine::getSong()->tracks();
+	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		bbTrack::findBBTrack( i )->dataChanged();
-//trackLabel()->update();
+		if( ( *it )->type() == track::BBTrack )
+		{
+			( *it )->dataChanged();
+		}
 	}
-
-	//emit dataChanged();
-	//emit positionChanged( NULL );
 }
 
 
