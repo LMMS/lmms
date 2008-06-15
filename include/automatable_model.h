@@ -196,6 +196,11 @@ public:
 		setValue( m_value + _steps * m_step );
 	}
 
+	inline float range( void ) const
+	{
+		return( m_range );
+	}
+
 	void setRange( const float _min, const float _max,
 							const float _step = 1 );
 

@@ -290,9 +290,17 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			}
 			break;
 
+		case MidiPitchBend:
+			if( !m_instrument->handleMidiEvent( _me, _time ) )
+			{
+				m_pitchModel.setValue( m_pitchModel.minValue() +
+					_me.m_data.m_param[0] *
+						m_pitchModel.range() / 16384 );
+			}
+			break;
+
 		case MidiControlChange:
 		case MidiProgramChange:
-		case MidiPitchBend:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
 
@@ -665,6 +673,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	_this.setAttribute( "name", name() );
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
+	m_pitchModel.saveSettings( _doc, _this, "pitch" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
@@ -709,6 +718,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_panningModel.loadSettings( _this, "pan" );
 	}
 
+	m_pitchModel.loadSettings( _this, "pitch" );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
 	if( _this.hasAttribute( "baseoct" ) )

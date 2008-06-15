@@ -1,9 +1,18 @@
 2008-06-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/file_browser.cpp:
+	do not load MIDI-settings when loading preset as this might break
+	existing instrument tracks
+
+	* include/automatable_model.h:
+	* src/tracks/instrument_track.cpp:
+	directly handle MIDI-pitch-bend events
+
 	* include/instrument_track.h:
 	* src/core/note_play_handle.cpp:
 	* src/tracks/instrument_track.cpp:
-	added pitch-knob to instrument-track
+	- added pitch-knob to instrument-track
+	- fixed activity indicator
 
 	* plugins/stk/voices/flute/flute_model.cpp:
 	* plugins/stk/voices/flute/flute_model.h:
