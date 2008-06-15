@@ -78,24 +78,18 @@ void pixmapButton::paintEvent( QPaintEvent * )
 
 void pixmapButton::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton &&
-				engine::getMainWindow()->isCtrlPressed() )
+	// Show pressing graphics if this isn't checkable
+	if( !isCheckable() )
 	{
-		emit( ctrlClick() );
-		_me->accept();
+		m_pressed = TRUE;
+		update();
 	}
-	else
-	{
-		// Show pressing graphics if this isn't checkable
-		if( !isCheckable() )
-		{
-			m_pressed = TRUE;
-			update();
-		}
 
-		automatableButton::mousePressEvent( _me );
-	}
+	automatableButton::mousePressEvent( _me );
 }
+
+
+
 
 void pixmapButton::mouseReleaseEvent( QMouseEvent * _me )
 {
@@ -107,6 +101,9 @@ void pixmapButton::mouseReleaseEvent( QMouseEvent * _me )
 		update();
 	}
 }
+
+
+
 
 void pixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {

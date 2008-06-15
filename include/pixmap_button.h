@@ -1,7 +1,7 @@
 /*
  * pixmap_button.h - declaration of class pixmapButton
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,8 @@ class EXPORT pixmapButton : public automatableButton
 {
 	Q_OBJECT
 public:
-	pixmapButton( QWidget * _parent, const QString & _name = QString::null );
+	pixmapButton( QWidget * _parent,
+					const QString & _name = QString::null );
 	virtual ~pixmapButton();
 
 	void setActiveGraphic( const QPixmap & _pm );
@@ -44,7 +45,6 @@ public:
 
 signals:
 	void doubleClicked( void );
-	void ctrlClick( void );
 
 
 protected:
