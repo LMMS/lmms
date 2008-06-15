@@ -63,7 +63,7 @@ blowHoleModel::~blowHoleModel()
 
 
 
-void FASTCALL blowHoleModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void blowHoleModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_reedStiffness->saveSettings( _doc, _parent, "reedstiffness" );
@@ -76,7 +76,7 @@ void FASTCALL blowHoleModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL blowHoleModel::loadSettings( const QDomElement & _this )
+void blowHoleModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_reedStiffness->loadSettings( _this, "reedstiffness" );

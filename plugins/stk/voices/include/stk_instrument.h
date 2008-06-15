@@ -39,7 +39,7 @@ public:
 			Uint8 _polyphony = 64 );
 	virtual ~stkInstrument();
 	
-	void playNote( notePlayHandle * _n, bool _try_parallelizing );
+	void playNote( notePlayHandle * _n, bool _try_parallelizing, sampleFrame * _buf );
 
 	void deleteNotePluginData( notePlayHandle * _n );
 
@@ -97,7 +97,6 @@ stkInstrument<PROCESSOR, MODEL>::~stkInstrument()
 {
 	delete m_voice;
 	delete m_model;
-	delete[] m_buffer;
 }
 
 
@@ -106,12 +105,13 @@ stkInstrument<PROCESSOR, MODEL>::~stkInstrument()
 template <class PROCESSOR, class MODEL>
 inline void stkInstrument<PROCESSOR, MODEL>::playNote( 
 						notePlayHandle * _n,
-						bool _try_parallelizing )
+						bool _try_parallelizing,
+						sampleFrame * _buf )
 {
 	m_frames = _n->framesLeftForCurrentPeriod();
 		
-	m_buffer = m_voice->playNote( _n, m_model, m_buffer, m_frames );
-	getInstrumentTrack()->processAudioBuffer( m_buffer, m_frames, _n );
+	m_voice->playNote( _n, m_model, _buf, m_frames );
+	getInstrumentTrack()->processAudioBuffer( _buf, m_frames, _n );
 }
 
 

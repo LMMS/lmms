@@ -63,7 +63,7 @@ fluteModel::~fluteModel()
 
 
 
-void FASTCALL fluteModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void fluteModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_jetDelay->saveSettings( _doc, _parent, "reedstiffness" );
@@ -76,7 +76,7 @@ void FASTCALL fluteModel::saveSettings( QDomDocument & _doc, QDomElement & _pare
 	
 	
 	
-void FASTCALL fluteModel::loadSettings( const QDomElement & _this )
+void fluteModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_jetDelay->loadSettings( _this, "reedstiffness" );

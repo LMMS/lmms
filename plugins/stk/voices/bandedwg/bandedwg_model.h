@@ -83,9 +83,9 @@ public:
 		return( m_sound );
 	}
 	
-	void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	
-	void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 private:
 	floatModel * m_bowPressure;

@@ -63,7 +63,7 @@ b3Model::~b3Model()
 
 
 
-void FASTCALL b3Model::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void b3Model::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_operator4->saveSettings( _doc, _parent, "operator4" );
@@ -76,7 +76,7 @@ void FASTCALL b3Model::saveSettings( QDomDocument & _doc, QDomElement & _parent 
 	
 	
 	
-void FASTCALL b3Model::loadSettings( const QDomElement & _this )
+void b3Model::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_operator4->loadSettings( _this, "operator4" );

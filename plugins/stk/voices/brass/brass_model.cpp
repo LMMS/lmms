@@ -60,7 +60,7 @@ brassModel::~brassModel()
 
 
 
-void FASTCALL brassModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void brassModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_lipTension->saveSettings( _doc, _parent, "liptension" );
@@ -72,7 +72,7 @@ void FASTCALL brassModel::saveSettings( QDomDocument & _doc, QDomElement & _pare
 	
 	
 	
-void FASTCALL brassModel::loadSettings( const QDomElement & _this )
+void brassModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_lipTension->loadSettings( _this, "liptension" );

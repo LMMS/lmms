@@ -60,7 +60,7 @@ resonateModel::~resonateModel()
 
 
 
-void FASTCALL resonateModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void resonateModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_resonanceFrequency->saveSettings( _doc, _parent, "resonancefrequency" );
@@ -72,7 +72,7 @@ void FASTCALL resonateModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL resonateModel::loadSettings( const QDomElement & _this )
+void resonateModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_resonanceFrequency->loadSettings( _this, "resonancefrequency" );

@@ -58,7 +58,7 @@ blowBottleModel::~blowBottleModel()
 
 
 
-void FASTCALL blowBottleModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void blowBottleModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_noiseGain->saveSettings( _doc, _parent, "noisegain" );
@@ -69,7 +69,7 @@ void FASTCALL blowBottleModel::saveSettings( QDomDocument & _doc, QDomElement & 
 	
 	
 	
-void FASTCALL blowBottleModel::loadSettings( const QDomElement & _this )
+void blowBottleModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_noiseGain->loadSettings( _this, "noisegain" );

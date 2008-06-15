@@ -65,9 +65,9 @@ public:
 		return( m_zeroRadii );
 	}
 	
-	void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	
-	void FASTCALL loadSettings( const QDomElement & _this );
+	void loadSettings( const QDomElement & _this );
 
 private:
 	floatModel * m_resonanceFrequency;

@@ -63,7 +63,7 @@ percfluteModel::~percfluteModel()
 
 
 
-void FASTCALL percfluteModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void percfluteModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_index->saveSettings( _doc, _parent, "index" );
@@ -76,7 +76,7 @@ void FASTCALL percfluteModel::saveSettings( QDomDocument & _doc, QDomElement & _
 	
 	
 	
-void FASTCALL percfluteModel::loadSettings( const QDomElement & _this )
+void percfluteModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_index->loadSettings( _this, "index" );

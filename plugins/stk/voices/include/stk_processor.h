@@ -109,7 +109,7 @@ template <class MODEL, class STKVOICE>
 	setActive( FALSE );
 		
 	m_velocitySensitiveLPF = 
-			new basicFilters<>( engine::getMixer()->sampleRate() );
+		new basicFilters<>( engine::getMixer()->processingSampleRate() );
 	
 	m_velocitySensitiveLPF->setFilterType( basicFilters<>::LOWPASS );
 }	
@@ -140,7 +140,7 @@ template <class MODEL, class STKVOICE>
 	setActive( FALSE );
 		
 	m_velocitySensitiveLPF = 
-			new basicFilters<>( engine::getMixer()->sampleRate() );
+		new basicFilters<>( engine::getMixer()->processingSampleRate() );
 	
 	m_velocitySensitiveLPF->setFilterType( basicFilters<>::LOWPASS );
 }	

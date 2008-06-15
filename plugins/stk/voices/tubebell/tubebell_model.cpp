@@ -63,7 +63,7 @@ tubebellModel::~tubebellModel()
 
 
 
-void FASTCALL tubebellModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void tubebellModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_index->saveSettings( _doc, _parent, "index" );
@@ -76,7 +76,7 @@ void FASTCALL tubebellModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL tubebellModel::loadSettings( const QDomElement & _this )
+void tubebellModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_index->loadSettings( _this, "index" );

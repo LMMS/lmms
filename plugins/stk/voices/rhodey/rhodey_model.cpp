@@ -63,7 +63,7 @@ rhodeyModel::~rhodeyModel()
 
 
 
-void FASTCALL rhodeyModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void rhodeyModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_index->saveSettings( _doc, _parent, "index" );
@@ -76,7 +76,7 @@ void FASTCALL rhodeyModel::saveSettings( QDomDocument & _doc, QDomElement & _par
 	
 	
 	
-void FASTCALL rhodeyModel::loadSettings( const QDomElement & _this )
+void rhodeyModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_index->loadSettings( _this, "index" );

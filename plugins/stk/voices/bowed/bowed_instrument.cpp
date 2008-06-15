@@ -45,7 +45,7 @@ plugin::descriptor bowed_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
 	plugin::Instrument,
-	new QPixmap( PLUGIN_NAME::getIconPixmap( "logo" ) ),
+	new pluginPixmapLoader( "logo" ),
 	NULL
 } ;
 

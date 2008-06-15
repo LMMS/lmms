@@ -69,7 +69,7 @@ bandedWGModel::~bandedWGModel()
 
 
 
-void FASTCALL bandedWGModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void bandedWGModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_bowPressure->saveSettings( _doc, _parent, "bowpressure" );
@@ -84,7 +84,7 @@ void FASTCALL bandedWGModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL bandedWGModel::loadSettings( const QDomElement & _this )
+void bandedWGModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_bowPressure->loadSettings( _this, "bowpressure" );

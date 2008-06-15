@@ -63,7 +63,7 @@ fmvoicesModel::~fmvoicesModel()
 
 
 
-void FASTCALL fmvoicesModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void fmvoicesModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_vowel->saveSettings( _doc, _parent, "vowel" );
@@ -76,7 +76,7 @@ void FASTCALL fmvoicesModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL fmvoicesModel::loadSettings( const QDomElement & _this )
+void fmvoicesModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_vowel->loadSettings( _this, "vowel" );

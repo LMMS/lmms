@@ -60,7 +60,7 @@ bowedModel::~bowedModel()
 
 
 
-void FASTCALL bowedModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void bowedModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_bowPressure->saveSettings( _doc, _parent, "bowpressure" );
@@ -72,7 +72,7 @@ void FASTCALL bowedModel::saveSettings( QDomDocument & _doc, QDomElement & _pare
 	
 	
 	
-void FASTCALL bowedModel::loadSettings( const QDomElement & _this )
+void bowedModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_bowPressure->loadSettings( _this, "bowpressure" );

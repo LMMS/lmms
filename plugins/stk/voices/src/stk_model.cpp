@@ -80,7 +80,7 @@ stkModel::~stkModel()
 
 
 
-void FASTCALL stkModel::saveSettings( QDomDocument & _doc, QDomElement & _parent ) 
+void stkModel::saveSettings( QDomDocument & _doc, QDomElement & _parent ) 
 {
 	m_monophonic->saveSettings( _doc, _parent, "monophonic" );
 	m_portamento->saveSettings( _doc, _parent, "portamento" );
@@ -101,7 +101,7 @@ void FASTCALL stkModel::saveSettings( QDomDocument & _doc, QDomElement & _parent
 
 
 
-void FASTCALL stkModel::loadSettings( const QDomElement & _this ) 
+void stkModel::loadSettings( const QDomElement & _this ) 
 {
 	m_monophonic->loadSettings( _this, "monophonic" );
 	m_portamento->loadSettings( _this, "portamento" );

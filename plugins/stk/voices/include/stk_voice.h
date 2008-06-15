@@ -35,10 +35,8 @@ public:
 	stkVoice( Uint8 _polyphony = 64 );
 	virtual ~stkVoice();
 	
-	sampleFrame * FASTCALL playNote( notePlayHandle * _n,
-						MODEL * _model,
-						sampleFrame * _buffer,
-						const fpp_t _frames );
+	void playNote( notePlayHandle * _n, MODEL * _model,
+				sampleFrame * _buffer, const fpp_t _frames );
 
 	void setMissingFile( bool _state );
 
@@ -76,7 +74,7 @@ template <class PROCESSOR, class MODEL>
 stkVoice<PROCESSOR, MODEL>::stkVoice( Uint8 _polyphony ):
 	m_lastFrequency( 440.0f ),
 	m_polyphony( _polyphony ),
-	m_sampleRate( engine::getMixer()->sampleRate() ),
+	m_sampleRate( engine::getMixer()->processingSampleRate() ),
 	m_portamentoFrames( 0 )
 {
 	for( m_voiceIndex = 0; m_voiceIndex < m_polyphony; m_voiceIndex++ )
@@ -100,8 +98,7 @@ stkVoice<PROCESSOR, MODEL>::~stkVoice()
 
 
 template <class PROCESSOR, class MODEL>
-sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote( 
-							notePlayHandle * _n,
+void stkVoice<PROCESSOR, MODEL>::playNote( notePlayHandle * _n,
 							MODEL * _model,
 							sampleFrame * _buffer,
 							const fpp_t _frames )
@@ -109,14 +106,14 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 	// Don't do anything if STK isn't installed properly.
 	if( m_filesMissing )
 	{
-		return _buffer;
+		return;
 	}
 	
 	// Don't do anything if the instrument is release triggered and we 
 	// haven't released yet.
 	if( _model->releaseTriggered()->value() && !_n->released() )
 	{
-		return _buffer;
+		return;
 	}
 	
 	// If it's a new note, we need to get a voice.
@@ -149,7 +146,7 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 			// Don't do anything if no voices are available.
 			if( m_processor == NULL )
 			{
-				return( _buffer );
+				return;
 			}
 		}
 		
@@ -167,7 +164,7 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 		// Initialize the number of frames for the portamento
 		// transition.
 		m_portamentoFrames = static_cast<int>( 
-				engine::getMixer()->sampleRate() * 
+				engine::getMixer()->processingSampleRate() * 
 				_model->portamento()->value() / 
 					1000.0f );
 		
@@ -177,7 +174,7 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 		if( _model->randomizeAttack()->value() )
 		{
 			m_totalAttackFrames = static_cast<int>( 
-					engine::getMixer()->sampleRate() *
+					engine::getMixer()->processingSampleRate() *
 					_model->randomizeLength()->value() /
 						1000.0f );
 			
@@ -218,7 +215,7 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 			m_processor->velocitySensitiveLPF()->calcFilterCoeffs( 
 					pow( 10.0f, m_processor->velocity() +
 						m_processor->deltaVelocity() ) *
-					engine::getMixer()->sampleRate() / 20.0f,
+					engine::getMixer()->processingSampleRate() / 20.0f,
 					_model->velocitySensitiveQ()->value() );
 			m_processor->velocitySensitiveLPF()->clearHistory();
 		}
@@ -352,8 +349,6 @@ sampleFrame * FASTCALL stkVoice<PROCESSOR, MODEL>::playNote(
 	{
 		m_portamentoFrames -= _frames;
 	}
-	
-	return( _buffer );
 }
 
 

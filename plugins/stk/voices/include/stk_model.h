@@ -27,7 +27,7 @@
 
 #include "Instrmnt.h"
 
-#include "automatable_model_templates.h"
+#include "automatable_model.h"
 #include "basic_filters.h"
 
 
@@ -159,8 +159,8 @@ public:
 				static_cast<float>( RAND_MAX ) - 0.5f ) );
 	}
 	
-	virtual void FASTCALL saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void FASTCALL loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
  
 private:
 	boolModel * m_monophonic;		// multiple voice indicator

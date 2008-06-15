@@ -60,7 +60,7 @@ moogModel::~moogModel()
 
 
 
-void FASTCALL moogModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void moogModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_filterQ->saveSettings( _doc, _parent, "filterq" );
@@ -72,7 +72,7 @@ void FASTCALL moogModel::saveSettings( QDomDocument & _doc, QDomElement & _paren
 	
 	
 	
-void FASTCALL moogModel::loadSettings( const QDomElement & _this )
+void moogModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_filterQ->loadSettings( _this, "filterq" );

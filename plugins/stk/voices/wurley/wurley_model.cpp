@@ -63,7 +63,7 @@ wurleyModel::~wurleyModel()
 
 
 
-void FASTCALL wurleyModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void wurleyModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_index->saveSettings( _doc, _parent, "index" );
@@ -76,7 +76,7 @@ void FASTCALL wurleyModel::saveSettings( QDomDocument & _doc, QDomElement & _par
 	
 	
 	
-void FASTCALL wurleyModel::loadSettings( const QDomElement & _this )
+void wurleyModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_index->loadSettings( _this, "index" );

@@ -63,7 +63,7 @@ clarinetModel::~clarinetModel()
 
 
 
-void FASTCALL clarinetModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
+void clarinetModel::saveSettings( QDomDocument & _doc, QDomElement & _parent )
 {
 	stkModel::saveSettings( _doc, _parent );
 	m_reedStiffness->saveSettings( _doc, _parent, "reedstiffness" );
@@ -76,7 +76,7 @@ void FASTCALL clarinetModel::saveSettings( QDomDocument & _doc, QDomElement & _p
 	
 	
 	
-void FASTCALL clarinetModel::loadSettings( const QDomElement & _this )
+void clarinetModel::loadSettings( const QDomElement & _this )
 {
 	stkModel::loadSettings( _this );
 	m_reedStiffness->loadSettings( _this, "reedstiffness" );
