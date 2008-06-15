@@ -285,6 +285,8 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 controllerConnectionDialog::~controllerConnectionDialog()
 {
+	delete m_readablePorts;
+
 	if( m_midiController )
 		delete m_midiController;
 }
