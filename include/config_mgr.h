@@ -1,7 +1,7 @@
 /*
  * config_mgr.h - class configManager, a class for managing LMMS-configuration
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,8 +29,9 @@
 #include "lmmsconfig.h"
 
 #include <QtCore/QMap>
-#include <QtCore/QVector>
 #include <QtCore/QPair>
+#include <QtCore/QStringList>
+#include <QtCore/QVector>
 
 #include "export.h"
 
