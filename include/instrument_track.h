@@ -146,6 +146,7 @@ public:
 
 	virtual QString displayName( void ) const;
 
+
 signals:
 	void instrumentChanged( void );
 	void newNote( void );
@@ -179,6 +180,7 @@ private:
 
 	floatModel m_volumeModel;
 	floatModel m_panningModel;
+	floatModel m_pitchModel;
 	lcdSpinBoxModel m_effectChannelModel;
 
 
@@ -325,6 +327,7 @@ private:
 	QLineEdit * m_instrumentNameLE;
 	volumeKnob * m_volumeKnob;
 	knob * m_panningKnob;
+	knob * m_pitchKnob;
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 

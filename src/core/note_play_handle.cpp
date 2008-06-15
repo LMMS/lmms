@@ -432,7 +432,8 @@ void notePlayHandle::updateFrequency( void )
 	const float pitch = (float)( key() % KeysPerOctave - base_tone +
 			engine::getSong()->masterPitch() ) / 12.0f +
 			(float)( key() / KeysPerOctave - base_octave ) +
-					 m_base_detuning->value() / 12.0f;
+					 m_base_detuning->value() / 12.0f +
+		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0 );
 	m_frequency = BaseFreq * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();

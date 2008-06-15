@@ -112,6 +112,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 							tr( "Volume" ) ),
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
 							this, tr( "Panning" ) ),
+	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
         m_effectChannelModel( 0, 0, NumFxChannels, this ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -123,9 +124,12 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_baseNoteModel.setInitValue( DefaultKey );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
+	connect( &m_pitchModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateBaseNote() ) );
 
 	m_volumeModel.setTrack( this );
 	m_panningModel.setTrack( this );
+	m_pitchModel.setTrack( this );
 	m_effectChannelModel.setTrack( this );
 
 
@@ -883,7 +887,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_midiOutputAction->setText( tr( "MIDI output" ) );
 
 	m_tswActivityIndicator = new fadeButton( QColor( 96, 96, 96 ),
-						QColor( 255, 204, 0 ),
+						QColor( 0, 255, 0 ),
 						getTrackSettingsWidget() );
 	m_tswActivityIndicator->setGeometry( 212, 2, 8, 28 );
 	m_tswActivityIndicator->show();
@@ -891,6 +895,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 				this, SLOT( activityIndicatorPressed() ) );
 	connect( m_tswActivityIndicator, SIGNAL( released( void ) ),
 				this, SLOT( activityIndicatorReleased() ) );
+	connect( _it, SIGNAL( newNote() ),
+				m_tswActivityIndicator, SLOT( activate() ) );
 
 
 	m_tswInstrumentTrackButton = new instrumentTrackButton( this );
@@ -1104,21 +1110,30 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 
-	// setup surround-area
+	// setup panning-knob
 	m_panningKnob = new knob( knobBright_26, m_generalSettingsWidget,
 							tr( "Panning" ) );
-	m_panningKnob->move( 20 + m_volumeKnob->width(), 44 );
+	m_panningKnob->move( m_volumeKnob->x() +
+					m_volumeKnob->width() + 16, 44 );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 ////	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
+
+
+	m_pitchKnob = new knob( knobBright_26, m_generalSettingsWidget,
+							tr( "Pitch" ) );
+	m_pitchKnob->move( m_panningKnob->x() +
+					m_panningKnob->width() + 16, 44 );
+	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", "" );
+	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, m_generalSettingsWidget,
 						tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
-	m_effectChannelNumber->move( m_panningKnob->x() +
-					m_panningKnob->width() + 16, 44 );
+	m_effectChannelNumber->move( m_pitchKnob->x() +
+					m_pitchKnob->width() + 16, 44 );
 
 	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
 							"project_save" ), "",
@@ -1220,6 +1235,7 @@ void instrumentTrackWindow::modelChanged( void )
 	
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
+	m_pitchKnob->setModel( &m_track->m_pitchModel );
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
