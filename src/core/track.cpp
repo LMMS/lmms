@@ -93,6 +93,8 @@ trackContentObject::trackContentObject( track * _track ) :
 
 trackContentObject::~trackContentObject()
 {
+	emit destroyed();
+
 	m_track->removeTCO( this );
 }
 
@@ -224,8 +226,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 			this, SLOT( updateLength() ) );
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
-	connect( m_tco, SIGNAL( destroyed( QObject * ) ),
-			this, SLOT( close() ), Qt::QueuedConnection );
+	connect( m_tco, SIGNAL( destroyed() ), this, SLOT( close() ) );
 	setModel( m_tco );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
@@ -474,7 +475,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
 						midiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2,
+							height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -713,14 +715,14 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 	if( m_trackView->getTrackContainerView() == engine::getBBEditor() )
 	{
 		const int cur_bb = engine::getBBTrackContainer()->currentBB();
-		int i = 0;
 		setUpdatesEnabled( false );
 
 		// first show TCO for current BB...
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
-					it != m_tcoViews.end(); ++it, ++i )
+						it != m_tcoViews.end(); ++it )
 		{
-			if( i == cur_bb )
+			if( ( *it )->getTrackContentObject()->
+					startPosition().getTact() == cur_bb )
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -732,11 +734,11 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 			}
 		}
 		// ...then hide others to avoid flickering
-		i = 0;
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
-					it != m_tcoViews.end(); ++it, ++i )
+						it != m_tcoViews.end(); ++it )
 		{
-			if( i != cur_bb )
+			if( ( *it )->getTrackContentObject()->
+					startPosition().getTact() != cur_bb )
 			{
 				( *it )->hide();
 			}
@@ -1786,8 +1788,7 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	setAttribute( Qt::WA_DeleteOnClose );
 
 
-	connect( m_track, SIGNAL( destroyed( QObject * ) ),
-			this, SLOT( close() ), Qt::QueuedConnection );
+	connect( m_track, SIGNAL( destroyed() ), this, SLOT( close() ) );
 	connect( m_track,
 		SIGNAL( trackContentObjectAdded( trackContentObject * ) ),
 			this, SLOT( createTCOView( trackContentObject * ) ),
@@ -1856,8 +1857,7 @@ void trackView::modelChanged( void )
 {
 	m_track = castModel<track>();
 	assert( m_track != NULL );
-	connect( m_track, SIGNAL( destroyed( QObject * ) ),
-			this, SLOT( close() ), Qt::QueuedConnection );
+	connect( m_track, SIGNAL( destroyed() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	modelView::modelChanged();

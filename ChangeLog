@@ -1,3 +1,92 @@
+2008-06-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/stk/voices/flute/flute_model.cpp:
+	* plugins/stk/voices/flute/flute_model.h:
+	* plugins/stk/voices/flute/flute_instrument.cpp:
+	* plugins/stk/voices/resonate/resonate_model.cpp:
+	* plugins/stk/voices/resonate/resonate_model.h:
+	* plugins/stk/voices/resonate/resonate_instrument.cpp:
+	* plugins/stk/voices/include/stk_instrument.h:
+	* plugins/stk/voices/include/stk_processor.h:
+	* plugins/stk/voices/include/stk_model.h:
+	* plugins/stk/voices/include/stk_voice.h:
+	* plugins/stk/voices/wurley/wurley_instrument.cpp:
+	* plugins/stk/voices/wurley/wurley_model.cpp:
+	* plugins/stk/voices/wurley/wurley_model.h:
+	* plugins/stk/voices/src/stk_model.cpp:
+	* plugins/stk/voices/percflute/percflute_model.h:
+	* plugins/stk/voices/percflute/percflute_instrument.cpp:
+	* plugins/stk/voices/percflute/percflute_model.cpp:
+	* plugins/stk/voices/rhodey/rhodey_model.h:
+	* plugins/stk/voices/rhodey/rhodey_instrument.cpp:
+	* plugins/stk/voices/rhodey/rhodey_model.cpp:
+	* plugins/stk/voices/tubebell/tubebell_model.cpp:
+	* plugins/stk/voices/tubebell/tubebell_model.h:
+	* plugins/stk/voices/tubebell/tubebell_instrument.cpp:
+	* plugins/stk/voices/bowed/bowed_model.cpp:
+	* plugins/stk/voices/bowed/bowed_model.h:
+	* plugins/stk/voices/bowed/bowed_instrument.cpp:
+	* plugins/stk/voices/clarinet/clarinet_model.cpp:
+	* plugins/stk/voices/clarinet/clarinet_model.h:
+	* plugins/stk/voices/clarinet/clarinet_instrument.cpp:
+	* plugins/stk/voices/moog/moog_model.cpp:
+	* plugins/stk/voices/moog/moog_model.h:
+	* plugins/stk/voices/moog/moog_instrument.cpp:
+	* plugins/stk/voices/metal/metal_model.cpp:
+	* plugins/stk/voices/metal/metal_model.h:
+	* plugins/stk/voices/metal/metal_instrument.cpp:
+	* plugins/stk/voices/b3/b3_model.cpp:
+	* plugins/stk/voices/b3/b3_model.h:
+	* plugins/stk/voices/b3/b3_instrument.cpp:
+	* plugins/stk/voices/blow_hole/blow_hole_model.h:
+	* plugins/stk/voices/blow_hole/blow_hole_instrument.cpp:
+	* plugins/stk/voices/blow_hole/blow_hole_model.cpp:
+	* plugins/stk/voices/brass/brass_model.h:
+	* plugins/stk/voices/brass/brass_instrument.cpp:
+	* plugins/stk/voices/brass/brass_model.cpp:
+	* plugins/stk/voices/fmvoices/fmvoices_model.h:
+	* plugins/stk/voices/fmvoices/fmvoices_instrument.cpp:
+	* plugins/stk/voices/fmvoices/fmvoices_model.cpp:
+	* plugins/stk/voices/bandedwg/bandedwg_model.h:
+	* plugins/stk/voices/bandedwg/bandedwg_instrument.cpp:
+	* plugins/stk/voices/bandedwg/bandedwg_model.cpp:
+	* plugins/stk/voices/blow_bottle/blow_bottle_model.h:
+	* plugins/stk/voices/blow_bottle/blow_bottle_instrument.cpp:
+	* plugins/stk/voices/blow_bottle/blow_bottle_model.cpp:
+	made STK-voices-plugins compile after they've not been maintained for
+	a while
+
+	* include/pixmap_button.h:
+	* src/gui/widgets/pixmap_button.cpp:
+	removed removed obsolete ctrlClick() signal
+
+	* include/track_container.h:
+	* src/core/track_container.cpp:
+	removed obsolete setMutedOfAllTracks() method
+
+	* src/core/song.cpp:
+	- lock mixer while loading project - fixes crashes when loading projects
+	  with FX-mixer settings
+	- update BB-track-container after creating a new project - fixes
+	  non-existing TCOs (i.e. patterns) in BB-Editor in new projects
+
+	* include/config_mgr.h:
+	added missing include
+
+	* src/tracks/bb_track.cpp:
+	unregister BB-track-view from BB-editor at destruction - fixes crash
+	when removing BB-tracks
+
+	* src/core/bb_track_container.cpp:
+	cleanups and more optimized loops
+
+	* include/track.h:
+	* src/core/track.cpp:
+	- fixed issue when moving BB-tracks up/down where actual BB-TCOs were
+	  not moved
+	- in trackContentObjectView and trackView, handle deletion of models
+	  more gracefully
+
 2008-06-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:

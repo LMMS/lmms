@@ -113,6 +113,7 @@ protected slots:
 signals:
 	void lengthChanged( void );
 	void positionChanged( void );
+	void destroyed( void );
 
 
 private:
@@ -453,6 +454,7 @@ private:
 
 signals:
 	void trackContentObjectAdded( trackContentObject * );
+	void destroyed( void );
 
 } ;
 
