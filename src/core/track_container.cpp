@@ -90,7 +90,8 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		else
 		{
 			start_val = pd->value();
-			pd->setMaximum( pd->maximum() + _this.childNodes().count() );
+			pd->setMaximum( pd->maximum() +
+						_this.childNodes().count() );
 		}
 	}
 
@@ -196,16 +197,6 @@ int trackContainer::countTracks( track::TrackTypes _tt ) const
 	return( cnt );
 }
 
-
-
-
-void trackContainer::setMutedOfAllTracks( bool _muted )
-{
-	for( int i = 0; i < m_tracks.size(); ++i )
-	{
-		m_tracks[i]->setMuted( _muted );
-	}
-}
 
 
 

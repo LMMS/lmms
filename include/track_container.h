@@ -56,8 +56,6 @@ public:
 
 	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
 
-	void setMutedOfAllTracks( bool _muted );
-
 
 	virtual void updateAfterTrackAdd( void );
 	void addTrack( track * _track );
