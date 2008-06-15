@@ -48,6 +48,14 @@
 #include "text_float.h"
 
 
+static inline void removeMidiPortNode( multimediaProject & _mmp )
+{
+	QDomNodeList n = _mmp.elementsByTagName( "midiport" );
+	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
+}
+
+
+
 
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
@@ -235,6 +243,8 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 	{
 		// presets are per default opened in bb-editor
 		multimediaProject mmp( f->fullName() );
+		removeMidiPortNode( mmp );
+
 		engine::getMixer()->lock();
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
@@ -301,6 +311,7 @@ void listView::sendToActiveInstrumentTrack( void )
 			{
 				multimediaProject mmp(
 						m_contextMenuItem->fullName() );
+				removeMidiPortNode( mmp );
 				itw->model()->loadTrackSpecificSettings(
 						mmp.content().firstChild().
 								toElement() );
@@ -338,6 +349,7 @@ void listView::openInNewInstrumentTrack( trackContainer * _tc )
 	else if( m_contextMenuItem->type() == fileItem::PresetFile )
 	{
 		multimediaProject mmp( m_contextMenuItem->fullName() );
+		removeMidiPortNode( mmp );
 		track * t = track::create( track::InstrumentTrack, _tc );
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
 		if( ct != NULL )
