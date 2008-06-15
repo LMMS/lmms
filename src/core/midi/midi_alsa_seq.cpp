@@ -265,7 +265,7 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 		else if( m_portIDs[_port][i] != -1 )
 		{
 			// then remove this port
-			snd_seq_delete_port( m_seqHandle, m_portIDs[_port][i] );
+			snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][i] );
 			m_portIDs[_port][i] = -1;
 		}
 	}
@@ -311,8 +311,8 @@ void midiALSASeq::removePort( midiPort * _port )
 {
 	if( m_portIDs.contains( _port ) )
 	{
-		snd_seq_delete_port( m_seqHandle, m_portIDs[_port][0] );
-		snd_seq_delete_port( m_seqHandle, m_portIDs[_port][1] );
+		snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][0] );
+		snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][1] );
 		m_portIDs.remove( _port );
 	}
 	midiClient::removePort( _port );
@@ -436,10 +436,9 @@ void midiALSASeq::run( void )
 		snd_seq_event_input( m_seqHandle, &ev );
 
 		midiPort * dest = NULL;
-		for( int i = 0; i < m_portIDs.values().size(); ++i )
+		for( int i = 0; i < m_portIDs.size(); ++i )
 		{
-			if( m_portIDs.values()[i][0] == ev->dest.port ||
-				m_portIDs.values()[i][0] == ev->dest.port )
+			if( m_portIDs.values()[i][0] == ev->dest.port )
 			{
 				dest = m_portIDs.keys()[i];
 			}
