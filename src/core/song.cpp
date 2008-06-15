@@ -783,9 +783,12 @@ void song::createNewProject( void )
 
 	QCoreApplication::instance()->processEvents();
 
+	m_loadingProject = FALSE;
+
+	engine::getBBTrackContainer()->updateAfterTrackAdd();
+
 	engine::getProjectJournal()->setJournalling( TRUE );
 
-	m_loadingProject = FALSE;
 	m_modified = FALSE;
 
 	if( engine::getMainWindow() )
@@ -833,6 +836,8 @@ void song::loadProject( const QString & _file_name )
 	{
 		engine::getMainWindow()->resetWindowTitle();
 	}
+
+	engine::getMixer()->lock();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( mmp.head(), "bpm" );
@@ -901,6 +906,8 @@ void song::loadProject( const QString & _file_name )
 		}
 		node = node.nextSibling();
 	}
+
+	engine::getMixer()->unlock();
 
 	// Connect controller links to their controllers 
 	// now that everything is loaded
