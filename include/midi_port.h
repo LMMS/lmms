@@ -37,6 +37,7 @@
 
 class midiClient;
 class midiEventProcessor;
+class midiPortMenu;
 class midiTime;
 
 
@@ -124,6 +125,9 @@ public:
 	{
 		return( m_writablePorts );
 	}
+
+	midiPortMenu * m_readablePortsMenu;
+	midiPortMenu * m_writablePortsMenu;
 
 
 signals:

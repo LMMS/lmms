@@ -35,17 +35,17 @@
 #include "gui_templates.h"
 #include "led_checkbox.h"
 #include "lcd_spinbox.h"
+#include "midi_client.h"
 #include "tab_widget.h"
 #include "tooltip.h"
 
 
 
-instrumentMidiIOView::instrumentMidiIOView(
-					midiPortMenu * _readable_ports_menu,
-					midiPortMenu * _writable_ports_menu,
-							 QWidget * _parent ) :
+instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL )
+	modelView( NULL ),
+	m_rpBtn( NULL ),
+	m_wpBtn( NULL )
 {
 	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
 									this );
@@ -92,25 +92,21 @@ instrumentMidiIOView::instrumentMidiIOView(
 	m_defaultVelocityOutCheckBox->move( 28, 164 );
 
 
-	if( _readable_ports_menu != NULL )
+	if( !engine::getMixer()->getMIDIClient()->isRaw() )
 	{
-		QToolButton * rp_btn = new QToolButton( m_setupTabWidget );
-		rp_btn->setText( tr( "MIDI-devices to receive "
+		m_rpBtn = new QToolButton( m_setupTabWidget );
+		m_rpBtn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		rp_btn->setGeometry( 186, 34, 40, 40 );
-		rp_btn->setMenu( _readable_ports_menu );
-		rp_btn->setPopupMode( QToolButton::InstantPopup );
-	}
-	if( _writable_ports_menu != NULL )
-	{
-		QToolButton * wp_btn = new QToolButton( m_setupTabWidget );
-		wp_btn->setText( tr( "MIDI-devices to send MIDI-events "
+		m_rpBtn->setIcon( embed::getIconPixmap( "midi_in" ) );
+		m_rpBtn->setGeometry( 186, 34, 40, 40 );
+		m_rpBtn->setPopupMode( QToolButton::InstantPopup );
+
+		m_wpBtn = new QToolButton( m_setupTabWidget );
+		m_wpBtn->setText( tr( "MIDI-devices to send MIDI-events "
 								"to" ) );
-		wp_btn->setIcon( embed::getIconPixmap( "midi_out" ) );
-		wp_btn->setGeometry( 186, 114, 40, 40 );
-		wp_btn->setMenu( _writable_ports_menu );
-		wp_btn->setPopupMode( QToolButton::InstantPopup );
+		m_wpBtn->setIcon( embed::getIconPixmap( "midi_out" ) );
+		m_wpBtn->setGeometry( 186, 114, 40, 40 );
+		m_wpBtn->setPopupMode( QToolButton::InstantPopup );
 	}
 }
 
@@ -135,6 +131,14 @@ void instrumentMidiIOView::modelChanged( void )
 	m_sendCheckBox->setModel( &mp->m_writableModel );
 	m_defaultVelocityOutCheckBox->setModel(
 				&mp->m_defaultVelocityOutEnabledModel );
+	if( m_rpBtn )
+	{
+		m_rpBtn->setMenu( mp->m_readablePortsMenu );
+	}
+	if( m_wpBtn )
+	{
+		m_wpBtn->setMenu( mp->m_writablePortsMenu );
+	}
 }
 
 

@@ -1,5 +1,24 @@
 2008-06-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/knob.h:
+	* src/gui/widgets/knob.cpp:
+	- cache pixmap
+	- only redraw if angle has changed by more than 3 degrees
+	- cleanups
+
+	* src/core/midi/midi_alsa_seq.cpp:
+	cleanups and small optimizations
+
+	* include/instrument_midi_io_view.h:
+	* include/instrument_track.h:
+	* include/midi_port.h:
+	* src/core/midi/midi_port.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	refactored midiPortMenu-creation and -management - fixes crash when
+	removing track which had MIDI-in enabled and enabled MIDI-in for
+	another track afterwards
+
 	* src/gui/file_browser.cpp:
 	do not load MIDI-settings when loading preset as this might break
 	existing instrument tracks

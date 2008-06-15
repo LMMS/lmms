@@ -841,9 +841,7 @@ QQueue<instrumentTrackWindow *> instrumentTrackView::s_windows;
 instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 						trackContainerView * _tcv ) :
 	trackView( _it, _tcv ),
-	m_window( NULL ),
-	m_readablePortsMenu( NULL ),
-	m_writablePortsMenu( NULL )
+	m_window( NULL )
 {
 	setAcceptDrops( TRUE );
 	setFixedHeight( 32 );
@@ -870,14 +868,14 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	// sequenced MIDI?
 	if( !engine::getMixer()->getMIDIClient()->isRaw() )
 	{
-		m_readablePortsMenu = new midiPortMenu( midiPort::Input );
-		m_writablePortsMenu = new midiPortMenu( midiPort::Output );
-		m_readablePortsMenu->setModel( &_it->m_midiPort );
-		m_writablePortsMenu->setModel( &_it->m_midiPort );
+		_it->m_midiPort.m_readablePortsMenu = new midiPortMenu( midiPort::Input );
+		_it->m_midiPort.m_writablePortsMenu = new midiPortMenu( midiPort::Output );
+		_it->m_midiPort.m_readablePortsMenu->setModel( &_it->m_midiPort );
+		_it->m_midiPort.m_writablePortsMenu->setModel( &_it->m_midiPort );
 		m_midiInputAction = m_tswMidiMenu->addMenu(
-							m_readablePortsMenu );
+							_it->m_midiPort.m_readablePortsMenu );
 		m_midiOutputAction = m_tswMidiMenu->addMenu(
-							m_writablePortsMenu );
+							_it->m_midiPort.m_writablePortsMenu );
 	}
 	else
 	{
@@ -929,6 +927,9 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 instrumentTrackView::~instrumentTrackView()
 {
 	freeInstrumentTrackWindow();
+
+	delete model()->m_midiPort.m_readablePortsMenu;
+	delete model()->m_midiPort.m_writablePortsMenu;
 }
 
 
@@ -1172,9 +1173,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 							instrument_functions );
 	m_arpView= new arpeggiatorView( &m_track->m_arpeggiator,
 							instrument_functions );
-	m_midiView = new instrumentMidiIOView( m_itv->m_readablePortsMenu,
-						m_itv->m_writablePortsMenu,
-								m_tabWidget );
+	m_midiView = new instrumentMidiIOView( m_tabWidget );
 	m_effectView = new effectRackView( m_track->m_audioPort.getEffects(),
 								m_tabWidget );
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
@@ -1255,15 +1254,6 @@ void instrumentTrackWindow::modelChanged( void )
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.getEffects() );
 	updateName();
-
-	if( m_itv->m_readablePortsMenu != NULL )
-	{
-		m_itv->m_readablePortsMenu->setModel( &m_track->m_midiPort );
-	}
-	if( m_itv->m_writablePortsMenu != NULL )
-	{
-		m_itv->m_writablePortsMenu->setModel( &m_track->m_midiPort );
-	}
 }
 
 

@@ -36,14 +36,13 @@ class tabWidget;
 class ledCheckBox;
 class lcdSpinBox;
 class midiPortMenu;
+class QToolButton;
 
 
 class instrumentMidiIOView : public QWidget, public modelView
 {
 public:
-	instrumentMidiIOView( midiPortMenu * _readable_ports_menu,
-				midiPortMenu * _writable_ports_menu,
-							QWidget * _parent );
+	instrumentMidiIOView( QWidget * _parent );
 	virtual ~instrumentMidiIOView();
 
 
@@ -57,6 +56,8 @@ private:
 	ledCheckBox * m_sendCheckBox;
 	ledCheckBox * m_defaultVelocityInCheckBox;
 	ledCheckBox * m_defaultVelocityOutCheckBox;
+	QToolButton * m_rpBtn;
+	QToolButton * m_wpBtn;
 
 } ;
 

@@ -249,8 +249,6 @@ private:
 	instrumentTrackButton * m_tswInstrumentTrackButton;
 
 	QMenu * m_tswMidiMenu;
-	midiPortMenu * m_readablePortsMenu;
-	midiPortMenu * m_writablePortsMenu;
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
