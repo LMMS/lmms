@@ -570,7 +570,8 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
 		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
-
+	connect( _bbt, SIGNAL( dataChanged() ),
+			m_trackLabel, SLOT( update() ) );
 	setModel( _bbt );
 }
 
@@ -579,6 +580,7 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 
 bbTrackView::~bbTrackView()
 {
+	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
 }
 
 
