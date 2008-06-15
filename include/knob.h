@@ -99,7 +99,6 @@ public:
 
 public slots:
 	virtual void enterValue( void );
-	void connectToMidiDevice( void );
 	void displayHelp( void );
 	void friendlyUpdate( void );
 
@@ -145,6 +144,8 @@ protected:
 						float _innerRadius = 1) const;
 
 private:
+	bool updateAngle( void );
+
 	inline float pageSize( void ) const
 	{
 		return( tMax<float>( ( model()->maxValue() -
@@ -160,6 +161,8 @@ private:
 	void buttonReleased( void );
 
 	float m_totalAngle;
+	int m_angle;
+	QImage m_cache;
 
 	int m_knobNum;
 	QString m_label;

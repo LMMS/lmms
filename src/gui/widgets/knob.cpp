@@ -67,6 +67,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_buttonPressed( FALSE ),
 	m_knobPixmap( NULL ),
 	m_outerColor( NULL ),
+	m_angle( -10 ),
 	m_knobNum( _knob_num ),
 	m_label( "" )
 {
@@ -246,17 +247,7 @@ void knob::setOuterColor( const QColor & _c )
 
 QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	float angle = 0.0f;
-	if( model()->maxValue() != model()->minValue() )
-	{
-		angle = ( model()->value() - 0.5 * ( model()->minValue() +
-						model()->maxValue() ) ) /
-				( model()->maxValue() - model()->minValue() ) *
-								m_totalAngle;
-		angle = static_cast<int>( angle ) % 360;
-	}
-
-	const float rarc = angle * M_PI / 180.0;
+	const float rarc = m_angle * M_PI / 180.0;
 	const float ca = cos( rarc );
 	const float sa = -sin( rarc );
 
@@ -266,13 +257,46 @@ QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRad
 
 
 
+bool knob::updateAngle( void )
+{
+	int angle = 0;
+	if( model() && model()->maxValue() != model()->minValue() )
+	{
+		float a = ( model()->value() - 0.5 * ( model()->minValue() +
+						model()->maxValue() ) ) /
+				( model()->maxValue() - model()->minValue() ) *
+								m_totalAngle;
+		angle = static_cast<int>( a ) % 360;
+	}
+	if( tAbs( angle - m_angle ) > 3 )
+	{
+		m_angle = angle;
+		return( TRUE );
+	}
+	return( FALSE );
+}
+
+
+
+
 void knob::drawKnob( QPainter * _p )
 {
+	if( updateAngle() == FALSE )
+	{
+		_p->drawImage( 0, 0, m_cache );
+		return;
+	}
+
+	m_cache = QImage( size(), QImage::Format_ARGB32 );
+	m_cache.fill( qRgba( 0, 0, 0, 0 ) );
+
+	QPainter p( &m_cache );
+
 	QPoint mid;
 
 	if( m_knobNum == knobStyled )
 	{
-		_p->setRenderHint( QPainter::Antialiasing );
+		p.setRenderHint( QPainter::Antialiasing );
 
 		// Perhaps this can move to setOuterRadius()
 		if( m_outerColor )
@@ -281,19 +305,21 @@ void knob::drawKnob( QPainter * _p )
 			gradient.setColorAt(0.4, _p->pen().brush().color() );
 			gradient.setColorAt(1, *m_outerColor );
 
-			_p->setPen( QPen( gradient, lineWidth(),
+			p.setPen( QPen( gradient, lineWidth(),
 						Qt::SolidLine, Qt::RoundCap ) );
 		}
 		else {
-			QPen pen = _p->pen();
+			QPen pen = p.pen();
 			pen.setWidth( (int) lineWidth() );
 			pen.setCapStyle( Qt::RoundCap );
 			
-			_p->setPen( pen );
+			p.setPen( pen );
 		}
 
-		_p->drawLine( calculateLine( centerPoint(), outerRadius(),
+		p.drawLine( calculateLine( centerPoint(), outerRadius(),
 							innerRadius() ) );
+		p.end();
+		_p->drawImage( 0, 0, m_cache );
 		return;
 	}
 
@@ -302,23 +328,23 @@ void knob::drawKnob( QPainter * _p )
 	const float radius = m_knobPixmap->width() / 2.0f - 1;
 	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
 
-	_p->drawPixmap( static_cast<int>( 
+	p.drawPixmap( static_cast<int>( 
 				width() / 2 - m_knobPixmap->width() / 2 ), 0,
 				*m_knobPixmap );
 
-	_p->setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
-	_p->setRenderHint( QPainter::Antialiasing );
+	p.setPen( QPen( QColor( 200, 0, 0 ), 2 ) );
+	p.setRenderHint( QPainter::Antialiasing );
 
 	switch( m_knobNum )
 	{
 		case knobSmall_17:
 		{
-			_p->drawLine( calculateLine( mid, radius ) );
+			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			_p->drawLine( calculateLine( mid, radius-5 ) );
+			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
@@ -328,16 +354,18 @@ void knob::drawKnob( QPainter * _p )
 			const float re = tMax<float>( ( radius - 4 ), 0.0 );
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
-			_p->drawLine( ln );
+			p.drawLine( ln );
 			break;
 		}
 		case knobGreen_17:
 		{
-			_p->setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
-			_p->drawLine( calculateLine( mid, radius ) );
+			p.setPen( QPen( QColor( 0, 200, 0 ), 2 ) );
+			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 	}
+	p.end();
+	_p->drawImage( 0, 0, m_cache );
 }
 
 
@@ -560,10 +588,10 @@ void knob::paintEvent( QPaintEvent * _me )
 	if( !m_label.isEmpty() )
 	{
 		p.setFont( pointSize<6>( p.font() ) );
-		p.setPen( QColor( 64, 64, 64 ) );
+/*		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,
-				height() - 1, m_label );
+				height() - 1, m_label );*/
 		p.setPen( QColor( 255, 255, 255 ) );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
@@ -674,14 +702,6 @@ void knob::enterValue( void )
 	{
 		model()->setValue( new_val );
 	}
-}
-
-
-
-
-void knob::connectToMidiDevice( void )
-{
-	//engine::getMixer()->getMIDIDevice()->setPitchBendKnob( this );
 }
 
 
