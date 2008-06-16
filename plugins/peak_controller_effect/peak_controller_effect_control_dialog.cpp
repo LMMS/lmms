@@ -32,35 +32,51 @@
 #include "knob.h"
 #include "tempo_sync_knob.h"
 #include "led_checkbox.h"
+#include "embed.h"
+
 
 peakControllerEffectControlDialog::peakControllerEffectControlDialog(
-	peakControllerEffectControls * _controls ) :
+				peakControllerEffectControls * _controls ) :
 	effectControlDialog( _controls )
 {
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
+	setFixedSize( 120, 104 );
 
-	setFixedSize( 120, 90 );
+	QVBoxLayout * tl = new QVBoxLayout( this );
+	tl->addSpacing( 25 );
 
-	const int knobY = 10;
+	QHBoxLayout * l = new QHBoxLayout;
+
 	m_baseKnob = new knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
-	m_baseKnob->move( 10, knobY );
 	m_baseKnob->setModel( &_controls->m_baseModel );
 	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
 
 	m_amountKnob = new knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
-	m_amountKnob->move( 45, knobY );
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
 	m_decayKnob = new tempoSyncKnob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DECAY" ) );
-	m_decayKnob->move( 80, knobY );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release decay (not implemented):" ) + " ", "" );
 
+	l->addWidget( m_baseKnob );
+	l->addWidget( m_amountKnob );
+	l->addWidget( m_decayKnob );
+	tl->addLayout( l );
+
 	m_muteLed = new ledCheckBox( "Mute", this );
-	m_muteLed->move( 10, 60);
 	m_muteLed->setModel( &_controls->m_muteModel );
+
+	tl->addSpacing( 5 );
+	tl->addWidget( m_muteLed );
+
+	setLayout( tl );
 }
 

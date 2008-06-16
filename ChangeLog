@@ -1,4 +1,15 @@
-2008-06-16  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
+	* plugins/bass_booster/artwork.png:
+	* plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp:
+	* plugins/peak_controller_effect/artwork.png:
+	added metal-brushed background-artwork
+
+	* src/tracks/instrument_track.cpp:
+	added unit to pitch-knob
+
+2008-06-15  Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereo_matrix.cpp:
 	update author email address

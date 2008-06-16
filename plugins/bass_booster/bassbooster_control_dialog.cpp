@@ -27,6 +27,7 @@
 
 #include "bassbooster_control_dialog.h"
 #include "bassbooster_controls.h"
+#include "embed.h"
 
 
 
@@ -34,7 +35,17 @@ bassBoosterControlDialog::bassBoosterControlDialog(
 					bassBoosterControls * _controls ) :
 	effectControlDialog( _controls )
 {
-	QHBoxLayout * l = new QHBoxLayout( this );
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
+	setFixedSize( 120, 104 );
+
+	QVBoxLayout * tl = new QVBoxLayout( this );
+	tl->addSpacing( 30 );
+
+	QHBoxLayout * l = new QHBoxLayout;
 
 	knob * freqKnob = new knob( knobBright_26, this);
 	freqKnob->setModel( &_controls->m_freqModel );
@@ -54,6 +65,9 @@ bassBoosterControlDialog::bassBoosterControlDialog(
 	l->addWidget( freqKnob );
 	l->addWidget( gainKnob );
 	l->addWidget( ratioKnob );
+
+	tl->addLayout( l );
+	setLayout( tl );
 }
 
 
