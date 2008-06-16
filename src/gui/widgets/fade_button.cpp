@@ -98,10 +98,18 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 		m_state -= 0.1f;
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
+
 	QPainter p( this );
 	p.fillRect( rect(), col );
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+
+	int w = rect().right();
+	int h = rect().bottom();
+	p.setPen( QColor( 37, 39, 46 ) );
+	p.drawLine( w, 1, w, h );
+	p.drawLine( 1, h, w, h );
+	p.setPen( QColor( 145, 147, 154 ) );
+	p.drawLine( 0, 0, 0, h-1 );
+	p.drawLine( 0, 0, w, 0 );
 }
 
 

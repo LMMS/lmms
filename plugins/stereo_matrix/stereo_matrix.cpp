@@ -39,7 +39,7 @@ plugin::descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	"Stereophonic Matrix",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
-	"Paul Giblock <lherard/at/gmail.com>",
+	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	plugin::Effect,
 	new pluginPixmapLoader( "logo" ),

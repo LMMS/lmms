@@ -210,28 +210,6 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	m_lfoWaveBtnGrp->addButton( uwb );
 
 
-/*
-	if( getEffect()->getControls()->getControlCount() > 0 )
-	{
-		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-									this );
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<7>( f ) );
-		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ), 
-					this, SLOT( editControls() ) );
-	}
-
-
-	m_controlView = getEffect()->getControls()->createView();
-	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
-								m_controlView );
-	connect( m_controlView, SIGNAL( closed() ),
-				this, SLOT( closeEffects() ) );
-
-	m_subWindow->hide();
-*/
-
 	setModel( _model );
 }
 

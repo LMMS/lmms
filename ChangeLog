@@ -1,3 +1,35 @@
+2008-06-16  Paul Giblock	<drfaygo/at/gmail/dot/com>
+
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	update author email address
+	
+	* src/gui/widgets/graph.cpp:
+	* src/gui/lfo_controller_dialog.cpp:
+	code cleanup
+
+	* src/gui/widgets/fade_button.cpp:
+	* src/tracks/instrument_track.cpp:
+	improve appearance of fade buttons
+
+	* include/tool_button.h:
+	* src/gui/widgets/tool_button.cpp:
+	* src/gui/lmms_style.cpp:
+	* data/themes/default/style.css:
+	remove styling, rely on QStyle and stylesheets now
+
+	* include/song_editor.h:
+	* include/main_window.h:
+	* include/timeline.h:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/nstate_button.cpp:
+	* src/core/timeline.cpp:
+
+	* data/themes/default/main_toolbar_bg.png:
+	* data/themes/default/toolbar_bg.png:
+	Enlarge images for resizable toolbars - quick fix. Could just clamp the
+	texture at the bottom
+	
 2008-06-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/knob.h:

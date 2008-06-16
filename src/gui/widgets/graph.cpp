@@ -244,7 +244,7 @@ void graph::paintEvent( QPaintEvent * )
 					);
 			}
 
-			// Draw last segment flat
+			// Draw last segment wrapped around
 			p.drawLine(2+static_cast<int>(length*xscale), 
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
 				width()-2,

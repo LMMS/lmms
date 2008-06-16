@@ -894,8 +894,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_midiInputAction->setText( tr( "MIDI input" ) );
 	m_midiOutputAction->setText( tr( "MIDI output" ) );
 
-	m_tswActivityIndicator = new fadeButton( QColor( 96, 96, 96 ),
-						QColor( 0, 255, 0 ),
+	m_tswActivityIndicator = new fadeButton( QColor( 37, 57, 42 ),
+						QColor( 64, 255, 16 ),
 						getTrackSettingsWidget() );
 	m_tswActivityIndicator->setGeometry( 212, 2, 8, 28 );
 	m_tswActivityIndicator->show();
