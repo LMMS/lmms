@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080613, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080613)
+AC_INIT(lmms, 0.4.0-svn20080616, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080616)
 AX_PREFIX_CONFIG_H([include/lmmsconfig.h])
 
 AM_CONFIG_HEADER(config.h)
@@ -480,6 +480,24 @@ fi
 
 
 
+# check for fftw3-lib
+AC_ARG_WITH(fftw3,
+	AS_HELP_STRING([--without-fftw3],
+			[disable support for FFTW3]), ,
+ 	[ with_fftw3=yes ])
+AH_TEMPLATE(HAVE_FFTW3_H, [Define to 1 if you have the <fftw3.h> header file.])
+if test "x$with_fftw3" = "xyes" ; then
+	AC_CHECK_HEADER(fftw3.h, HAVE_FFTW3_H="true")
+	AC_CHECK_LIB([fftw3], [fftw_execute], HAVE_LIBFFTW3="true", HAVE_FFTW3_H="")
+fi
+if test ! -z "$HAVE_FFTW3_H" ; then
+	AC_DEFINE(HAVE_FFTW3_H)
+fi
+AM_CONDITIONAL(HAVE_LIBFFTW3, test ! -z "$HAVE_FFTW3_H")
+
+
+
+
 # check whether to disable surround-support
 AC_MSG_CHECKING([whether to disable surround-support])
 AH_TEMPLATE(DISABLE_SURROUND, [Define if you want to disable surround-support in LMMS.])
@@ -494,19 +512,6 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-
-# check whether to enable high-quality sinc-resampling
-AC_MSG_CHECKING([whether to enable high quality sinc-resampling])
-AH_TEMPLATE(HQ_SINC, [Define if you want to enable high quality sinc-resampling.])
-AC_ARG_ENABLE([hqsinc],
-	AS_HELP_STRING([--enable-hqsinc],
-		[enable high quality sinc-resampling]), [HQ_SINC=$enableval])
-if test "x$HQ_SINC" = "xyes" ; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HQ_SINC)
-else
-	AC_MSG_RESULT(no)
-fi
 
 # check whether to disable single-source-compile
 #AC_MSG_CHECKING([whether to enable single-source-compile])
@@ -967,6 +972,23 @@ if test -z "$FLUIDSYNTH_SUPPORT" ; then
 	fi
 else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SoundFont2 Player plugin"
+fi
+
+
+
+if test -z "$HAVE_FFTW3_H" ; then
+	echo " ========================"
+	echo " ===  LMMS - WARNING  ======================================================="
+	echo " ========================"
+	echo " ="
+	echo " = You don't seem to have FFTW3-library installed and/or FFTW3-development-"
+	echo " = package (Debian/Ubuntu: libfftw3-dev) is missing. Without this package, the"
+	echo " = Spectrum Analyzer plugin won't be built."
+	echo " = Consider installing the missing packages for using the full power of LMMS."
+	echo " ="
+	with_warnings="true"
+else
+	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* Spectrum Analyzer plugin"
 fi
 
 
