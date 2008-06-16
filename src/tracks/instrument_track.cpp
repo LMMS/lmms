@@ -1135,7 +1135,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 							tr( "Pitch" ) );
 	m_pitchKnob->move( m_panningKnob->x() +
 					m_panningKnob->width() + 16, 44 );
-	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", "" );
+	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
 
