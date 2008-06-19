@@ -25,6 +25,17 @@
  *
  */
 
+/** \file track.cpp
+ *  \brief All classes concerning tracks and track-like objects
+ */
+
+/*
+ * \mainpage Track classes
+ *
+ * \section introduction Introduction
+ * 
+ * \todo fill this out
+ */
 
 #include "track.h"
 
@@ -60,20 +71,41 @@
 #include "track_container.h"
 
 
+/*! The width of the resize grip in pixels
+ */
 const Sint16 RESIZE_GRIP_WIDTH = 4;
 
+/*! The size of the track buttons in pixels
+ */
 const Uint16 TRACK_OP_BTN_WIDTH = 20;
 const Uint16 TRACK_OP_BTN_HEIGHT = 14;
 
+/*! The minimum track height in pixels
+ *
+ * Tracks can be resized by shift-dragging anywhere inside the track
+ * display.  This sets the minimum size in pixels for a track.
+ */
 const Uint16 MINIMAL_TRACK_HEIGHT = 32;
 
 
+/*! A pointer for that text bubble used when moving segments, etc.
+ *
+ * In a number of situations, LMMS displays a floating text bubble
+ * beside the cursor as you move or resize elements of a track about.
+ * This pointer keeps track of it, as you only ever need one at a time.
+ */
 textFloat * trackContentObjectView::s_textFloat = NULL;
 
 
 // ===========================================================================
 // trackContentObject
 // ===========================================================================
+/*! \brief Create a new trackContentObject
+ *
+ *  Creates a new track content object for the given track.
+ *
+ * \param _track The track that will contain the new object
+ */
 trackContentObject::trackContentObject( track * _track ) :
 	model( _track ),
 	m_track( _track ),
@@ -91,8 +123,17 @@ trackContentObject::trackContentObject( track * _track ) :
 
 
 
+/*! \brief Destroy a trackContentObject
+ *
+ *  Destroys the given track content object.
+ *
+ */
 trackContentObject::~trackContentObject()
 {
+/*! \brief Start a drag event on this track View.
+ *
+ *  \param _dee the DragEnterEvent to start.
+ */
 	emit destroyed();
 
 	m_track->removeTCO( this );
@@ -101,6 +142,13 @@ trackContentObject::~trackContentObject()
 
 
 
+/*! \brief Move this trackContentObject's position in time
+ *
+ *  If the track content object has moved, update its position.  We
+ *  also add a journal entry for undo and update the display.
+ *
+ * \param _pos The new position of the track content object.
+ */
 void trackContentObject::movePosition( const midiTime & _pos )
 {
 	if( m_startPosition != _pos )
@@ -115,6 +163,13 @@ void trackContentObject::movePosition( const midiTime & _pos )
 
 
 
+/*! \brief Change the length of this trackContentObject
+ *
+ *  If the track content object's length has chaanged, update it.  We
+ *  also add a journal entry for undo and update the display.
+ *
+ * \param _length The new length of the track content object.
+ */
 void trackContentObject::changeLength( const midiTime & _length )
 {
 	if( m_length != _length )
@@ -129,6 +184,14 @@ void trackContentObject::changeLength( const midiTime & _length )
 
 
 
+/*! \brief Undo one journal entry of this trackContentObject
+ *
+ *  Restore the previous state of this track content object.  This will
+ *  restore the position or the length of the track content object
+ *  depending on what was changed.
+ *
+ * \param _je The journal entry to undo
+ */
 void trackContentObject::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
@@ -147,6 +210,12 @@ void trackContentObject::undoStep( journalEntry & _je )
 
 
 
+/*! \brief Redo one journal entry of this trackContentObject
+ *
+ *  Undoes one 'undo' of this track content object.
+ *
+ * \param _je The journal entry to redo
+ */
 void trackContentObject::redoStep( journalEntry & _je )
 {
 	journalEntry je( _je.actionID(), -_je.data().toInt() );
@@ -156,6 +225,11 @@ void trackContentObject::redoStep( journalEntry & _je )
 
 
 
+/*! \brief Cut this trackContentObject from its track to the clipboard.
+ *
+ *  Perform the 'cut' action of the clipboard - copies the track content
+ *  object to the clipboard and then removes it from the track.
+ */
 void trackContentObject::cut( void )
 {
 	copy();
@@ -165,6 +239,10 @@ void trackContentObject::cut( void )
 
 
 
+/*! \brief Copy this trackContentObject to the clipboard.
+ *
+ *  Copies this track content object to the clipboard.
+ */
 void trackContentObject::copy( void )
 {
 	clipboard::copy( this );
@@ -173,6 +251,12 @@ void trackContentObject::copy( void )
 
 
 
+/*! \brief Pastes this trackContentObject into a track.
+ *
+ *  Pastes this track content object into a track.
+ *
+ * \param _je The journal entry to undo
+ */
 void trackContentObject::paste( void )
 {
 	if( clipboard::getContent( nodeName() ) != NULL )
@@ -184,6 +268,14 @@ void trackContentObject::paste( void )
 
 
 
+/*! \brief Mutes this trackContentObject
+ *
+ *  Restore the previous state of this track content object.  This will
+ *  restore the position or the length of the track content object
+ *  depending on what was changed.
+ *
+ * \param _je The journal entry to undo
+ */
 void trackContentObject::toggleMute( void )
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
@@ -196,6 +288,17 @@ void trackContentObject::toggleMute( void )
 
 
 
+// ===========================================================================
+// trackContentObjectView
+// ===========================================================================
+/*! \brief Create a new trackContentObjectView
+ *
+ *  Creates a new track content object view for the given
+ *  track content object in the given track view.
+ *
+ * \param _tco The track content object to be displayed
+ * \param _tv  The track view that will contain the new object
+ */
 trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 							trackView * _tv ) :
 	selectableObject( _tv->getTrackContentWidget() ),
@@ -235,6 +338,11 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 
 
 
+/*! \brief Destroy a trackContentObjectView
+ *
+ *  Destroys the given track content object view.
+ *
+ */
 trackContentObjectView::~trackContentObjectView()
 {
 	delete m_hint;
@@ -248,6 +356,14 @@ trackContentObjectView::~trackContentObjectView()
 
 
 
+/*! \brief Does this trackContentObjectView have a fixed TCO?
+ *
+ *  Returns whether the containing trackView has fixed
+ *  TCOs.
+ *
+ * \todo What the hell is a TCO here - track content object?  And in
+ *  what circumstance are they fixed?
+ */
 bool trackContentObjectView::fixedTCOs( void )
 {
 	return( m_trackView->getTrackContainerView()->fixedTCOs() );
@@ -256,6 +372,13 @@ bool trackContentObjectView::fixedTCOs( void )
 
 
 
+/*! \brief Close a trackContentObjectView
+ *
+ *  Closes a track content object view by asking the track
+ *  view to remove us and then asking the QWidget to close us.
+ *
+ * \return Boolean state of whether the QWidget was able to close.
+ */
 bool trackContentObjectView::close( void )
 {
 	m_trackView->getTrackContentWidget()->removeTCOView( this );
@@ -265,6 +388,13 @@ bool trackContentObjectView::close( void )
 
 
 
+/*! \brief Removes a trackContentObjectView from its track view.
+ *
+ *  Like the close() method, this asks the track view to remove this
+ *  track content object view.  However, the track content object is
+ *  scheduled for later deletion rather than closed immediately.
+ *
+ */
 void trackContentObjectView::remove( void )
 {
 	// delete ourself
@@ -275,6 +405,13 @@ void trackContentObjectView::remove( void )
 
 
 
+/*! \brief Updates a trackContentObjectView's length
+ *
+ *  If this track content object view has a fixed TCO, then we must
+ *  keep the width of our parent.  Otherwise, calculate our width from
+ *  the track content object's length in pixels adding in the border.
+ *
+ */
 void trackContentObjectView::updateLength( void )
 {
 	if( fixedTCOs() )
@@ -294,6 +431,13 @@ void trackContentObjectView::updateLength( void )
 
 
 
+/*! \brief Updates a trackContentObjectView's position.
+ *
+ *  Ask our track view to change our position.  Then make sure that the
+ *  track view is updated in case this position has changed the track
+ *  view's length.
+ *
+ */
 void trackContentObjectView::updatePosition( void )
 {
 	m_trackView->getTrackContentWidget()->changePosition();
@@ -304,6 +448,14 @@ void trackContentObjectView::updatePosition( void )
 
 
 
+/*! \brief Change the trackContentObjectView's display when something
+ *  being dragged enters it.
+ *
+ *  We need to notify Qt to change our display if something being
+ *  dragged has entered our 'airspace'.
+ *
+ * \param _dee The QDragEnterEvent to watch.
+ */
 void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "tco_" +
@@ -313,6 +465,15 @@ void trackContentObjectView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
+/*! \brief Handle something being dropped on this trackContentObjectView.
+ *
+ *  When something has been dropped on this trackContentObjectView, and
+ *  it's a track content object, then use an instance of our mmp reader
+ *  to take the xml of the track content object and turn it into something
+ *  we can write over our current state.
+ *
+ * \param _de The QDropEvent to handle.
+ */
 void trackContentObjectView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
@@ -334,6 +495,10 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 
 
 
+/*! \brief Handle a dragged selection leaving our 'airspace'.
+ *
+ * \param _e The QEvent to watch.
+ */
 void trackContentObjectView::leaveEvent( QEvent * _e )
 {
 	while( QApplication::overrideCursor() != NULL )
@@ -349,6 +514,21 @@ void trackContentObjectView::leaveEvent( QEvent * _e )
 
 
 
+/*! \brief Handle a mouse press on this trackContentObjectView.
+ *
+ *  Handles the various ways in which a trackContentObjectView can be
+ *  used with a click of a mouse button.
+ *
+ *  * If our container supports rubber band selection then handle
+ *    selection events.
+ *  * or if shift-left button, add this object to the selection
+ *  * or if ctrl-left button, start a drag-copy event
+ *  * or if just plain left button, resize if we're resizeable
+ *  * or if ctrl-middle button, mute the track content object
+ *  * or if middle button, maybe delete the track content object.
+ *
+ * \param _me The QMouseEvent to handle.
+ */
 void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 {
 	if( m_trackView->getTrackContainerView()->allowRubberband() == TRUE &&
@@ -448,6 +628,19 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Handle a mouse movement (drag) on this trackContentObjectView.
+ *
+ *  Handles the various ways in which a trackContentObjectView can be
+ *  used with a mouse drag.
+ *
+ *  * If in move mode, move ourselves in the track,
+ *  * or if in move-selection mode, move the entire selection,
+ *  * or if in resize mode, resize ourselves,
+ *  * otherwise ??? 
+ *
+ * \param _me The QMouseEvent to handle.
+ * \todo what does the final else case do here?
+ */
 void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
@@ -476,7 +669,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				arg( m_tco->startPosition().getTicks() %
 						midiTime::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-							height() + 2 ) );
+		                                        height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -562,6 +755,13 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Handle a mouse release on this trackContentObjectView.
+ *
+ *  If we're in move or resize mode, journal the change as appropriate.
+ *  Then tidy up.
+ *
+ * \param _me The QMouseEvent to handle.
+ */
 void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( m_action == Move || m_action == Resize )
@@ -582,6 +782,13 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Set up the context menu for this trackContentObjectView.
+ *
+ *  Set up the various context menu events that can apply to a
+ *  track content object view.
+ *
+ * \param _cme The QContextMenuEvent to add the actions to.
+ */
 void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 {
 	QMenu contextMenu( this );
@@ -610,6 +817,11 @@ void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 
 
 
+
+/*! \brief How many pixels a tact (bar) takes for this trackContentObjectView.
+ *
+ * \return the number of pixels per tact (bar).
+ */
 float trackContentObjectView::pixelsPerTact( void )
 {
 	return( m_trackView->getTrackContainerView()->pixelsPerTact() );
@@ -618,6 +830,11 @@ float trackContentObjectView::pixelsPerTact( void )
 
 
 
+/*! \brief Set whether this trackContentObjectView can resize.
+ *
+ * \param _e The boolean state of whether this track content object view
+ *  is allowed to resize.
+ */
 void trackContentObjectView::setAutoResizeEnabled( bool _e )
 {
 	m_autoResize = _e;
@@ -629,6 +846,14 @@ void trackContentObjectView::setAutoResizeEnabled( bool _e )
 // ===========================================================================
 // trackContentWidget
 // ===========================================================================
+/*! \brief Create a new trackContentWidget
+ *
+ *  Creates a new track content widget for the given track.
+ *  The content widget comprises the 'grip bar' and the 'tools' button
+ *  for the track's context menu.
+ *
+ * \param _track The parent track.
+ */
 trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
 	m_trackView( _parent )
@@ -646,6 +871,10 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 
 
 
+/*! \brief Destroy this trackContentWidget
+ *
+ *  Destroys the trackContentWidget.
+ */
 trackContentWidget::~trackContentWidget()
 {
 }
@@ -653,6 +882,13 @@ trackContentWidget::~trackContentWidget()
 
 
 
+/*! \brief Adds a trackContentObjectView to this widget.
+ *
+ *  Adds a(nother) trackContentObjectView to our list of views.  We also
+ *  check that our position is up-to-date.
+ *
+ * \param _tcov The trackContentObjectView to add.
+ */
 void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 {
 	trackContentObject * tco = _tcov->getTrackContentObject();
@@ -671,6 +907,12 @@ void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 
 
 
+/*! \brief Removes the given trackContentObjectView to this widget.
+ *
+ *  Removes the given trackContentObjectView from our list of views.
+ *
+ * \param _tcov The trackContentObjectView to add.
+ */
 void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 {
 	tcoViewVector::iterator it = qFind( m_tcoViews.begin(),
@@ -694,6 +936,9 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 
 
 
+/*! \brief Update ourselves by updating all the tCOViews attached.
+ *
+ */
 void trackContentWidget::update( void )
 {
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
@@ -710,6 +955,10 @@ void trackContentWidget::update( void )
 
 // resposible for moving track-content-widgets to appropriate position after
 // change of visible viewport
+/*! \brief Move the trackContentWidget to a new place in time
+ *
+ * \param _new_pos The MIDI time to move to.
+ */
 void trackContentWidget::changePosition( const midiTime & _new_pos )
 {
 	if( m_trackView->getTrackContainerView() == engine::getBBEditor() )
@@ -719,10 +968,10 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 
 		// first show TCO for current BB...
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
-						it != m_tcoViews.end(); ++it )
+                    					it != m_tcoViews.end(); ++it )
 		{
-			if( ( *it )->getTrackContentObject()->
-					startPosition().getTact() == cur_bb )
+            if( ( *it )->getTrackContentObject()->
+                            startPosition().getTact() == cur_bb )
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -735,10 +984,10 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 		}
 		// ...then hide others to avoid flickering
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
-						it != m_tcoViews.end(); ++it )
+					it != m_tcoViews.end(); ++it )
 		{
-			if( ( *it )->getTrackContentObject()->
-					startPosition().getTact() != cur_bb )
+            if( ( *it )->getTrackContentObject()->
+                            startPosition().getTact() != cur_bb )
 			{
 				( *it )->hide();
 			}
@@ -794,6 +1043,10 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 
 
 
+/*! \brief Respond to a drag enter event on the trackContentWidget
+ *
+ * \param _dee the Drag Enter Event to respond to
+ */
 void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "tco_" +
@@ -803,6 +1056,10 @@ void trackContentWidget::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
+/*! \brief Respond to a drop event on the trackContentWidget
+ *
+ * \param _de the Drop Event to respond to
+ */
 void trackContentWidget::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
@@ -833,6 +1090,10 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 
 
 
+/*! \brief Respond to a mouse press on the trackContentWidget
+ *
+ * \param _me the mouse press event to respond to
+ */
 void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( m_trackView->getTrackContainerView()->allowRubberband() == TRUE )
@@ -861,6 +1122,10 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Repaint the trackContentWidget on command
+ *
+ * \param _pe the Paint Event to respond to
+ */
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
 	static QPixmap backgrnd;
@@ -937,6 +1202,10 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 
 
 
+/*! \brief Resize the trackContentWidget
+ *
+ * \param _re the resize event to respond to
+ */
 void trackContentWidget::resizeEvent( QResizeEvent * _re )
 {
 	update();
@@ -945,6 +1214,10 @@ void trackContentWidget::resizeEvent( QResizeEvent * _re )
 
 
 
+/*! \brief Undo an action on the trackContentWidget
+ *
+ * \param _je the details of the edit journal
+ */
 void trackContentWidget::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
@@ -984,6 +1257,10 @@ void trackContentWidget::undoStep( journalEntry & _je )
 
 
 
+/*! \brief Redo an action of the trackContentWidget
+ *
+ * \param _je the entry in the edit journal to redo.
+ */
 void trackContentWidget::redoStep( journalEntry & _je )
 {
 	switch( _je.actionID() )
@@ -1006,6 +1283,9 @@ void trackContentWidget::redoStep( journalEntry & _je )
 
 
 
+/*! \brief Return the track shown by the trackContentWidget
+ *
+ */
 track * trackContentWidget::getTrack( void )
 {
 	return( m_trackView->getTrack() );
@@ -1014,6 +1294,10 @@ track * trackContentWidget::getTrack( void )
 
 
 
+/*! \brief Return the position of the trackContentWidget in Tacts.
+ *
+ * \param _mouse_x the mouse's current X position in pixels.
+ */
 midiTime trackContentWidget::getPosition( int _mouse_x )
 {
 	return( midiTime( m_trackView->getTrackContainerView()->
@@ -1025,6 +1309,10 @@ midiTime trackContentWidget::getPosition( int _mouse_x )
 
 
 
+/*! \brief Return the end position of the trackContentWidget in Tacts.
+ *
+ * \param _pos_start the starting position of the Widget (from getPosition())
+ */
 midiTime trackContentWidget::endPosition( const midiTime & _pos_start )
 {
 	const float ppt = m_trackView->getTrackContainerView()->pixelsPerTact();
@@ -1043,17 +1331,23 @@ midiTime trackContentWidget::endPosition( const midiTime & _pos_start )
 // ===========================================================================
 
 
-QPixmap * trackOperationsWidget::s_grip = NULL;
-QPixmap * trackOperationsWidget::s_muteOffDisabled;
-QPixmap * trackOperationsWidget::s_muteOffEnabled;
-QPixmap * trackOperationsWidget::s_muteOnDisabled;
-QPixmap * trackOperationsWidget::s_muteOnEnabled;
+QPixmap * trackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
+QPixmap * trackOperationsWidget::s_muteOffDisabled; /*!< Mute off and disabled pixmap */
+QPixmap * trackOperationsWidget::s_muteOffEnabled;  /*!< Mute off but enabled pixmap */
+QPixmap * trackOperationsWidget::s_muteOnDisabled;  /*!< Mute on but disabled pixmap */
+QPixmap * trackOperationsWidget::s_muteOnEnabled;   /*!< Mute on and enabled pixmap */
 
 
+/*! \brief Create a new trackOperationsWidget
+ *
+ * The trackOperationsWidget is the grip and the mute button of a track.
+ *
+ * \param _parent the trackView to contain this widget
+ */
 trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
-	QWidget( _parent ),
-	m_trackView( _parent ),
-	m_automationDisabled( FALSE )
+	QWidget( _parent ),             /*!< The parent widget */
+	m_trackView( _parent ),         /*!< The parent track view */
+	m_automationDisabled( FALSE )   /*!< Automation enabled flag */
 {
 	if( s_grip == NULL )
 	{
@@ -1128,6 +1422,9 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 
 
+/*! \brief Destroy an existing trackOperationsWidget
+ *
+ */
 trackOperationsWidget::~trackOperationsWidget()
 {
 }
@@ -1135,6 +1432,16 @@ trackOperationsWidget::~trackOperationsWidget()
 
 
 
+/*! \brief Respond to trackOperationsWidget mouse events
+ *
+ *  If it's the left mouse button, and Ctrl is held down, and we're
+ *  not a Beat+Bassline Editor track, then start a new drag event to
+ *  copy this track.
+ *
+ *  Otherwise, ignore all other events.
+ *
+ *  \param _me The mouse event to respond to.
+ */
 void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
@@ -1160,6 +1467,17 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Repaint the trackOperationsWidget
+ *
+ *  If we're not moving, and in the Beat+Bassline Editor, then turn
+ *  automation on or off depending on its previous state and show
+ *  ourselves.
+ *
+ *  Otherwise, hide ourselves.
+ *
+ *  \todo Flesh this out a bit - is it correct?
+ *  \param _pe The paint event to respond to
+ */
 void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
@@ -1212,6 +1530,10 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 
 
 
+
+/*! \brief Clone this track
+ *
+ */
 void trackOperationsWidget::cloneTrack( void )
 {
 	engine::getMixer()->lock();
@@ -1222,6 +1544,9 @@ void trackOperationsWidget::cloneTrack( void )
 
 
 
+/*! \brief Remove this track from the track list
+ *
+ */
 void trackOperationsWidget::removeTrack( void )
 {
 	emit trackRemovalScheduled( m_trackView );
@@ -1230,6 +1555,12 @@ void trackOperationsWidget::removeTrack( void )
 
 
 
+/*! \brief Update the trackOperationsWidget context menu
+ *
+ *  If we're in the Beat+Bassline Editor, we can supply the enable or
+ *  disable automation options.  For all track types, we have the Clone
+ *  and Remove options as well.
+ */
 void trackOperationsWidget::updateMenu( void )
 {
 	QMenu * to_menu = m_trackOps->menu();
@@ -1267,6 +1598,9 @@ void trackOperationsWidget::updateMenu( void )
 
 
 
+/*! \brief Enable automation on this track
+ *
+ */
 void trackOperationsWidget::enableAutomation( void )
 {
 	currentBBTrack()->enableAutomation( m_trackView->getTrack() );
@@ -1275,6 +1609,9 @@ void trackOperationsWidget::enableAutomation( void )
 
 
 
+/*! \brief Disable automation on this track
+ *
+ */
 void trackOperationsWidget::disableAutomation( void )
 {
 	currentBBTrack()->disableAutomation( m_trackView->getTrack() );
@@ -1283,6 +1620,9 @@ void trackOperationsWidget::disableAutomation( void )
 
 
 
+/*! \brief Return the current Beat+Bassline track
+ *
+ */
 bbTrack * trackOperationsWidget::currentBBTrack( void )
 {
 	return( bbTrack::findBBTrack(
@@ -1292,6 +1632,9 @@ bbTrack * trackOperationsWidget::currentBBTrack( void )
 
 
 
+/*! \brief Are we in the Beat+Bassline Editor?
+ *
+ */
 bool trackOperationsWidget::inBBEditor( void )
 {
 	return( m_trackView->getTrackContainerView()
@@ -1307,16 +1650,26 @@ bool trackOperationsWidget::inBBEditor( void )
 // track
 // ===========================================================================
 
+/*! \brief Create a new (empty) track object
+ *
+ *  The track object is the whole track, linking its contents, its
+ *  automation, name, type, and so forth.
+ *
+ * \param _type The type of track (Song Editor or Beat+Bassline Editor)
+ * \param _tc The track Container object to encapsulate in this track.
+ *
+ * \todo check the definitions of all the properties - are they OK?
+ */
 track::track( TrackTypes _type, trackContainer * _tc ) :
-	model( _tc ),
-	m_trackContainer( _tc ),
-	m_type( _type ),
-	m_name(),
-	m_pixmapLoader( NULL ),
-	m_mutedModel( FALSE, this ),
-	m_soloModel( FALSE, this ),
-	m_trackContentObjects(),
-	m_automationPatterns()
+	model( _tc ),                   /*!< The track model */
+	m_trackContainer( _tc ),        /*!< The track container object */
+	m_type( _type ),                /*!< The track type */
+	m_name(),                       /*!< The track's name */
+	m_pixmapLoader( NULL ),         /*!< For loading the track's pixmaps */
+	m_mutedModel( FALSE, this ),    /*!< For controlling track muting */
+	m_soloModel( FALSE, this ),     /*!< For controlling track soloing */
+	m_trackContentObjects(),        /*!< The track content objects (segments) */
+	m_automationPatterns()          /*!< The automation patterns applying */
 {
 	m_mutedModel.setTrack( this );
 	m_soloModel.setTrack( this );
@@ -1326,6 +1679,16 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 
 
 
+/*! \brief Destroy this track
+ *
+ *  If the track container is a Beat+Bassline container, step through
+ *  its list of tracks and remove us.
+ *
+ *  Then delete the trackContentObject's contents, remove this track from
+ *  the track container.
+ *
+ *  Finally step through this track's automation and forget all of them.
+ */
 track::~track()
 {
 	if( m_trackContainer == engine::getBBTrackContainer()
@@ -1365,6 +1728,11 @@ track::~track()
 
 
 
+/*! \brief Create a track based on the given track type and container.
+ *
+ *  \param _tt The type of track to create
+ *  \param _tc The track container to attach to
+ */
 track * track::create( TrackTypes _tt, trackContainer * _tc )
 {
 	track * t = NULL;
@@ -1388,6 +1756,11 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 
 
 
+/*! \brief Create a track from track type in a QDomElement and a container object.
+ *
+ *  \param _this The QDomElement containing the type of track to create
+ *  \param _tc The track container to attach to
+ */
 track * track::create( const QDomElement & _this, trackContainer * _tc )
 {
 	track * t = create(
@@ -1403,6 +1776,9 @@ track * track::create( const QDomElement & _this, trackContainer * _tc )
 
 
 
+/*! \brief Clone a track from this track
+ *
+ */
 void track::clone( void )
 {
 	QDomDocument doc;
@@ -1416,6 +1792,17 @@ void track::clone( void )
 
 
 
+/*! \brief Save this track's settings to file
+ *
+ *  We save the track type and its muted state, then append the track-
+ *  specific settings.  Then we iterate through the trackContentObjects
+ *  and save all their states in turn.
+ *
+ *  \param _doc The QDomDocument to use to save
+ *  \param _this The The QDomElement to save into
+ *  \todo Does this accurately describe the parameters?  I think not!?
+ *  \todo Save the track height
+ */
 void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( "track" );
@@ -1441,6 +1828,18 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
+/*! \brief Load the settings from a file
+ *
+ *  We load the track's type and muted state, then clear out our
+ *  current trackContentObject.
+ *
+ *  Then we step through the QDomElement's children and load the
+ *  track-specific settings and trackContentObjects states from it
+ *  one at a time.
+ *
+ *  \param _this the QDomElement to load track settings from
+ *  \todo Load the track height.
+ */
 void track::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "type" ).toInt() != type() )
@@ -1490,6 +1889,10 @@ void track::loadSettings( const QDomElement & _this )
 
 
 
+/*! \brief Add another trackContentObject into this track
+ *
+ *  \param _tco The trackContentObject to attach to this track.
+ */
 trackContentObject * track::addTCO( trackContentObject * _tco )
 {
 	m_trackContentObjects.push_back( _tco );
@@ -1504,6 +1907,10 @@ trackContentObject * track::addTCO( trackContentObject * _tco )
 
 
 
+/*! \brief Remove a given trackContentObject from this track
+ *
+ *  \param _tco The trackContentObject to remove from this track.
+ */
 void track::removeTCO( trackContentObject * _tco )
 {
 	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
@@ -1519,6 +1926,10 @@ void track::removeTCO( trackContentObject * _tco )
 
 
 
+/*! \brief Return the number of trackContentObjects we contain
+ *
+ *  \return the number of trackContentObjects we currently contain.
+ */
 int track::numOfTCOs( void )
 {
 	return( m_trackContentObjects.size() );
@@ -1527,6 +1938,18 @@ int track::numOfTCOs( void )
 
 
 
+/*! \brief Get a trackContentObject by number
+ *
+ *  If the TCO number is less than our TCO array size then fetch that
+ *  numbered object from the array.  Otherwise we warn the user that
+ *  we've somehow requested a TCO that is too large, and create a new
+ *  TCO for them.
+ *  \param _tco_number The number of the trackContentObject to fetch.
+ *  \return the given trackContentObject or a new one if out of range.
+ *  \todo reject TCO numbers less than zero.
+ *  \todo if we create a TCO here, should we somehow attach it to the
+ *     track?
+ */
 trackContentObject * track::getTCO( int _tco_num )
 {
 	if( _tco_num < m_trackContentObjects.size() )
@@ -1542,6 +1965,11 @@ trackContentObject * track::getTCO( int _tco_num )
 
 
 
+/*! \brief Determine the given trackContentObject's number in our array.
+ *
+ *  \param _tco The trackContentObject to search for.
+ *  \return its number in our array.
+ */
 int track::getTCONum( trackContentObject * _tco )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
@@ -1563,6 +1991,19 @@ int track::getTCONum( trackContentObject * _tco )
 
 
 
+/*! \brief Retrieve a list of trackContentObjects that fall within a period.
+ *
+ *  Here we're interested in a range of trackContentObjects that fall
+ *  completely within a given time period - their start must be no earlier
+ *  than the given start time and their end must be no later than the given
+ *  end time.
+ *
+ *  We return the TCOs we find in order by time, earliest TCOs first.
+ *
+ *  \param _tco_c The list to contain the found trackContentObjects.
+ *  \param _start The MIDI start time of the range.
+ *  \param _end   The MIDI endi time of the range.
+ */
 void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
 							const midiTime & _start,
 							const midiTime & _end )
@@ -1602,6 +2043,14 @@ void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
 
 
 
+/*! \brief Swap the position of two trackContentObjects.
+ *
+ *  First, we arrange to swap the positions of the two TCOs in the
+ *  trackContentObjects list.  Then we swap their start times as well.
+ *
+ *  \param _tco_num1 The first trackContentObject to swap.
+ *  \param _tco_num2 The second trackContentObject to swap.
+ */
 void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 {
 	// TODO: range-checking
@@ -1618,9 +2067,16 @@ void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 
 
 
+/*! \brief Move all the trackContentObjects after a certain time later by one bar.
+ *
+ *  \param _pos The time at which we want to insert the bar.
+ *  \todo if we stepped through this list last to first, and the list was
+ *    in ascending order by TCO time, once we hit a TCO that was earlier
+ *    than the insert time, we could fall out of the loop early.
+ */
 void track::insertTact( const midiTime & _pos )
 {
-	// we'll increase the position of every TCO, posated behind _pos, by
+	// we'll increase the position of every TCO, positioned behind _pos, by
 	// one tact
 	for( tcoVector::iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
@@ -1636,9 +2092,13 @@ void track::insertTact( const midiTime & _pos )
 
 
 
+/*! \brief Move all the trackContentObjects after a certain time earlier by one bar.
+ *
+ *  \param _pos The time at which we want to remove the bar.
+ */
 void track::removeTact( const midiTime & _pos )
 {
-	// we'll decrease the position of every TCO, posated behind _pos, by
+	// we'll decrease the position of every TCO, positioned behind _pos, by
 	// one tact
 	for( tcoVector::iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
@@ -1654,6 +2114,12 @@ void track::removeTact( const midiTime & _pos )
 
 
 
+/*! \brief Return the length of the entire track in bars
+ *
+ *  We step through our list of TCOs and determine their end position,
+ *  keeping track of the latest time found in ticks.  Then we return
+ *  that in bars by dividing by the number of ticks per bar.
+ */
 tact track::length( void ) const
 {
 	// find last end-position
@@ -1673,6 +2139,10 @@ tact track::length( void ) const
 
 
 
+/*! \brief Add an automation pattern to this track
+ *
+ *  \param _pattern the automation pattern to add.
+ */
 void track::addAutomationPattern( automationPattern * _pattern )
 {
 	m_automationPatterns.append( _pattern );
@@ -1681,6 +2151,10 @@ void track::addAutomationPattern( automationPattern * _pattern )
 
 
 
+/*! \brief Remove an automation pattern from this track
+ *
+ *  \param _pattern the automation pattern to remove.
+ */
 void track::removeAutomationPattern( automationPattern * _pattern )
 {
 	m_automationPatterns.removeAll( _pattern );
@@ -1689,6 +2163,12 @@ void track::removeAutomationPattern( automationPattern * _pattern )
 
 
 
+/*! \brief Invert the track's solo state.
+ *
+ *  We have to go through all the tracks determining if any other track
+ *  is already soloed.  Then we have to save the mute state of all tracks,
+ *  and set our mute state to on and all the others to off.
+ */
 void track::toggleSolo( void )
 {
 	trackContainer::trackList & tl = m_trackContainer->m_tracks;
@@ -1734,6 +2214,10 @@ void track::toggleSolo( void )
 
 
 
+/*! \brief Send a time code to all tracks to process.
+ *
+ *  \param _time the MIDI time to send.
+ */
 void track::sendMidiTime( const midiTime & _time )
 {
 	for( QList<automationPattern *>::iterator it =
@@ -1754,15 +2238,24 @@ void track::sendMidiTime( const midiTime & _time )
 // trackView
 // ===========================================================================
 
+/*! \brief Create a new track View.
+ *
+ *  The track View is handles the actual display of the track, including
+ *  displaying its various widgets and the track segments.
+ *
+ *  \param _track The track to display.
+ *  \param _tcv The track Container View for us to be displayed in.
+ *  \todo Is my description of these properties correct?
+ */
 trackView::trackView( track * _track, trackContainerView * _tcv ) :
-	QWidget( _tcv->contentWidget() ),
-	modelView( NULL/*_track*/ ),
-	m_track( _track ),
-	m_trackContainerView( _tcv ),
-	m_trackOperationsWidget( this ),
-	m_trackSettingsWidget( this ),
-	m_trackContentWidget( this ),
-	m_action( NoAction )
+	QWidget( _tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
+	modelView( NULL/*_track*/ ),        /*!< The model view of this track */
+	m_track( _track ),                  /*!< The track we're displaying */
+	m_trackContainerView( _tcv ),       /*!< The track Container View we're displayed in */
+	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
+	m_trackSettingsWidget( this ),      /*!< Our trackSettingsWidget */
+	m_trackContentWidget( this ),       /*!< Our trackContentWidget */
+	m_action( NoAction )                /*!< The action we're currently performing */
 {
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -1813,6 +2306,9 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 
 
 
+/*! \brief Destroy this track View.
+ *
+ */
 trackView::~trackView()
 {
 }
@@ -1820,6 +2316,10 @@ trackView::~trackView()
 
 
 
+/*! \brief Resize this track View.
+ *
+ *  \param _re the Resize Event to handle.
+ */
 void trackView::resizeEvent( QResizeEvent * _re )
 {
 	m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
@@ -1831,6 +2331,9 @@ void trackView::resizeEvent( QResizeEvent * _re )
 
 
 
+/*! \brief Update this track View and all its content objects.
+ *
+ */
 void trackView::update( void )
 {
 	m_trackContentWidget.update();
@@ -1844,6 +2347,9 @@ void trackView::update( void )
 
 
 
+/*! \brief Close this track View.
+ *
+ */
 bool trackView::close( void )
 {
 	m_trackContainerView->removeTrackView( this );
@@ -1853,6 +2359,9 @@ bool trackView::close( void )
 
 
 
+/*! \brief Register that the model of this track View has changed.
+ *
+ */
 void trackView::modelChanged( void )
 {
 	m_track = castModel<track>();
@@ -1866,6 +2375,10 @@ void trackView::modelChanged( void )
 
 
 
+/*! \brief Undo a change to this track View.
+ *
+ *  \param _je the Journal Entry to undo.
+ */
 void trackView::undoStep( journalEntry & _je )
 {
 	saveJournallingState( FALSE );
@@ -1894,6 +2407,10 @@ void trackView::undoStep( journalEntry & _je )
 
 
 
+/*! \brief Redo a change to this track View.
+ *
+ *  \param _je the Journal Event to redo.
+ */
 void trackView::redoStep( journalEntry & _je )
 {
 	journalEntry je( _je.actionID(), -_je.data().toInt() );
@@ -1903,6 +2420,10 @@ void trackView::redoStep( journalEntry & _je )
 
 
 
+/*! \brief Start a drag event on this track View.
+ *
+ *  \param _dee the DragEnterEvent to start.
+ */
 void trackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "track_" +
@@ -1912,6 +2433,14 @@ void trackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
+/*! \brief Accept a drop event on this track View.
+ *
+ *  We only accept drop events that are of the same type as this track.
+ *  If so, we decode the data from the drop event by just feeding it
+ *  back into the engine as a state.
+ *
+ *  \param _de the DropEvent to handle.
+ */
 void trackView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
@@ -1931,6 +2460,19 @@ void trackView::dropEvent( QDropEvent * _de )
 
 
 
+/*! \brief Handle a mouse press event on this track View.
+ *
+ *  If this track container supports rubber band selection, let the
+ *  widget handle that and don't bother with any other handling.
+ *
+ *  If the left mouse button is pressed, we handle two things.  If
+ *  SHIFT is pressed, then we resize vertically.  Otherwise we start
+ *  the process of moving this track to a new position.
+ *
+ *  Otherwise we let the widget handle the mouse event as normal.
+ *
+ *  \param _me the MouseEvent to handle.
+ */
 void trackView::mousePressEvent( QMouseEvent * _me )
 {
 	if( m_trackContainerView->allowRubberband() == TRUE )
@@ -1969,6 +2511,22 @@ void trackView::mousePressEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Handle a mouse move event on this track View.
+ *
+ *  If this track container supports rubber band selection, let the
+ *  widget handle that and don't bother with any other handling.
+ *
+ *  Otherwise if we've started the move process (from mousePressEvent())
+ *  then move ourselves into that position, reordering the track list
+ *  with moveTrackViewUp() and moveTrackViewDown() to suit.  We make a
+ *  note of this in the undo journal in case the user wants to undo this
+ *  move.
+ *
+ *  Likewise if we've started a resize process, handle this too, making
+ *  sure that we never go below the minimum track height.
+ *
+ *  \param _me the MouseEvent to handle.
+ */
 void trackView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_trackContainerView->allowRubberband() == TRUE )
@@ -2007,6 +2565,10 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Handle a mouse release event on this track View.
+ *
+ *  \param _me the MouseEvent to handle.
+ */
 void trackView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_action = NoAction;
@@ -2022,6 +2584,10 @@ void trackView::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
+/*! \brief Repaint this track View.
+ *
+ *  \param _pe the PaintEvent to start.
+ */
 void trackView::paintEvent( QPaintEvent * _pe )
 {
 	QStyleOption opt;
@@ -2033,6 +2599,11 @@ void trackView::paintEvent( QPaintEvent * _pe )
 
 
 
+/*! \brief Create a trackContentObject View in this track View.
+ *
+ *  \param _tco the trackContentObject to create the view for.
+ *  \todo is this a good description for what this method does?
+ */
 void trackView::createTCOView( trackContentObject * _tco )
 {
 	_tco->createView( this );

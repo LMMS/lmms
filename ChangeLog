@@ -1,3 +1,8 @@
+2008-06-19	Paul Wayper <paulway/at/mabula/dot/net>
+
+	* src/core/track.cpp:
+	added Doxygen documentation.
+
 2008-06-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:
