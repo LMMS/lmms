@@ -27,6 +27,7 @@
 #define _TEMPO_SYNC_KNOB_H
 
 #include <QtGui/QPixmap>
+#include <QtCore/QPointer>
 
 #include "knob.h"
 #include "meter_model.h"
@@ -146,7 +147,7 @@ private:
 	QPixmap m_tempoSyncIcon;
 	QString m_tempoSyncDescription;
 
-	meterDialog * m_custom;
+	QPointer<meterDialog> m_custom;
 
 } ;
 

@@ -210,12 +210,9 @@ tempoSyncKnob::tempoSyncKnob( int _knob_num, QWidget * _parent,
 						const QString & _name ) :
 	knob( _knob_num, _parent, _name ),
 	m_tempoSyncIcon( embed::getIconPixmap( "tempo_sync" ) ),
-	m_tempoSyncDescription( tr( "Tempo Sync" ) )
+	m_tempoSyncDescription( tr( "Tempo Sync" ) ),
+	m_custom( NULL )
 {
-	m_custom = new meterDialog( engine::getMainWindow()->workspace() );
-	engine::getMainWindow()->workspace()->addSubWindow( m_custom );
-	m_custom->parentWidget()->hide();
-	m_custom->setWindowTitle( "Meter" );
 }
 
 
@@ -238,7 +235,10 @@ void tempoSyncKnob::modelChanged( void )
 	{
 		printf( "no tempoSyncKnobModel has been set!\n" );
 	}
-	m_custom->setModel( &model()->m_custom );
+	if( m_custom != NULL )
+	{
+		m_custom->setModel( &model()->m_custom );
+	}
 	connect( model(), SIGNAL( syncModeChanged( tempoSyncMode ) ),
 			this, SLOT( updateDescAndIcon() ) );
 	connect( this, SIGNAL( sliderMoved( float ) ),
@@ -377,7 +377,8 @@ void tempoSyncKnob::updateDescAndIcon( void )
 	{
 		m_tempoSyncDescription = tr( "Tempo Sync" );
 	}
-	if( model()->m_tempoSyncMode != tempoSyncKnobModel::SyncCustom )
+	if( m_custom != NULL &&
+		model()->m_tempoSyncMode != tempoSyncKnobModel::SyncCustom )
 	{
 		m_custom->parentWidget()->hide();
 	}
@@ -469,6 +470,14 @@ void tempoSyncKnob::setSyncIcon( const QPixmap & _new_icon )
 
 void tempoSyncKnob::showCustom( void )
 {
+	if( m_custom == NULL )
+	{
+	 	m_custom = new meterDialog(
+					engine::getMainWindow()->workspace() );
+		engine::getMainWindow()->workspace()->addSubWindow( m_custom );
+		m_custom->setWindowTitle( "Meter" );
+		m_custom->setModel( &model()->m_custom );
+	}
 	m_custom->parentWidget()->show();
 	model()->setTempoSync( tempoSyncKnobModel::SyncCustom );
 }
