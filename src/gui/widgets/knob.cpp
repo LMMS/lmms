@@ -47,10 +47,11 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "main_window.h"
+#include "project_journal.h"
+#include "song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
 #include "text_float.h"
-#include "song.h"
 
 
 textFloat * knob::s_textFloat = NULL;
@@ -420,9 +421,14 @@ void knob::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "link_object" )
 	{
-		knobModel * mod = (knobModel *)( val.toULong() );
-		automatableModel::linkModels( model(), mod );
-		mod->setValue( model()->value() );
+		automatableModel * mod = dynamic_cast<automatableModel *>(
+				engine::getProjectJournal()->
+					getJournallingObject( val.toInt() ) );
+		if( mod != NULL )
+		{
+			automatableModel::linkModels( model(), mod );
+			mod->setValue( model()->value() );
+		}
 	}
 }
 
@@ -458,13 +464,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-/*			engine::getMainWindow()->isCtrlPressed() == TRUE &&*/
 			engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
-        /* this pointer was casted to uint, 
-         * compile time error on 64 bit systems */
 		new stringPairDrag( "link_object",
-					QString::number( (ulong) model() ),
+					QString::number( model()->id() ),
 							QPixmap(), this );
 	}
 	else if( _me->button() == Qt::MidButton )
@@ -631,8 +634,8 @@ QString knob::displayValue( void ) const
 				20.0 * log10( model()->value() / 100.0 ),
 				3, 'f', 2 ) );
 	}
-	return( m_description + QString( " %1%" ).arg(
-				model()->value(), 3, 'f', 0 ) + m_unit );
+	return( m_description + QString( " %1" ).
+					arg( model()->value() ) + m_unit );
 }
 
 
