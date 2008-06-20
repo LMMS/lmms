@@ -82,10 +82,10 @@ public:
 		m_unit = _unit;
 	}
 
-
-protected:
 	void addDefaultActions( QMenu * _menu );
 
+
+protected:
 	QString m_description;
 	QString m_unit;
 

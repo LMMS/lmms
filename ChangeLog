@@ -1,5 +1,16 @@
 2008-06-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/automatable_model_view.h:
+	* src/core/piano.cpp:
+	full context-menu for piano-basenote so it can be automated as well as
+	controlled via controller
+
+	* src/gui/widgets/knob.cpp:
+	- when linking knobs via Shift+Drag do not use pointer to model as
+	  drag-data rather than model-ID which can be resolved via
+	  project-journal
+	- fixed displayValue()
+
 	* Makefile.am:
 	* include/knob.h:
 	* include/volume_knob.h:
@@ -39,8 +50,10 @@
 
 	* include/tempo_sync_knob.h:
 	* src/gui/widgets/tempo_sync_knob.cpp:
-	do not re-implement private event-handlers and use knob's signals
-	instead
+	- do not re-implement private event-handlers and use knob's signals
+	  instead
+	- fixed crash when closing meterDialog and choosing custom-sync
+	  afterwards
 
 	* src/gui/fx_mixer_view.cpp:
 	better initial position of FX-mixer view

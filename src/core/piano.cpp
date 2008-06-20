@@ -209,7 +209,7 @@ pianoView::pianoView( QWidget * _parent ) :
 
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
 	m_pianoScroll->setRange( 0, WhiteKeysPerOctave * ( NumOctaves - 3 ) -
-									4 );
+									5 );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
 	m_pianoScroll->setValue( Octave_3 * WhiteKeysPerOctave );
@@ -400,11 +400,8 @@ void pianoView::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	captionMenu contextMenu( tr( "Base note" ) );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "&Open in automation editor" ),
-		m_piano->m_instrumentTrack->baseNoteModel()->
-							getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
+	automatableModelView amv( m_piano->m_instrumentTrack->baseNoteModel() );
+	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
 
