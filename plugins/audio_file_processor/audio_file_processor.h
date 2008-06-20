@@ -32,7 +32,7 @@
 #include "instrument.h"
 #include "instrument_view.h"
 #include "sample_buffer.h"
-#include "volume_knob.h"
+#include "knob.h"
 #include "pixmap_button.h"
 
 
@@ -131,7 +131,7 @@ private:
 	static QPixmap * s_artwork;
 
 	QPixmap m_graph;
-	volumeKnob * m_ampKnob;
+	knob * m_ampKnob;
 	knob * m_startKnob;
 	knob * m_endKnob;
 	pixmapButton * m_openAudioFileButton;

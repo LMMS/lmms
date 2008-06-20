@@ -42,7 +42,7 @@
 
 
 
-
+/*
 QPixmap * surroundArea::s_backgroundArtwork = NULL;
 
 
@@ -176,7 +176,7 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 	model()->addJournalEntryFromOldToCurVal();
 	QApplication::restoreOverrideCursor();
 }
-
+*/
 
 
 

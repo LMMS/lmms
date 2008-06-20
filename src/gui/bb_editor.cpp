@@ -24,21 +24,16 @@
 
 
 #include <QtGui/QKeyEvent>
+#include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
 
 #include "bb_editor.h"
 #include "bb_track_container.h"
-#include "bb_track.h"
-#include "combobox.h"
 #include "embed.h"
-#include "engine.h"
 #include "main_window.h"
-#include "name_label.h"
 #include "song.h"
-#include "templates.h"
 #include "tool_button.h"
-#include "tooltip.h"
 
 
 
@@ -109,27 +104,12 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-		parentWidget()->layout()->setSizeConstraint(
-						QLayout::SetMinimumSize );
-	}
-
-	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		w->resize( minimumWidth(), 300 );
-		w->move( 10, 340 );
-	}
-	else
-	{
-		resize( minimumWidth(), 300 );
-		w->move( 210, 340 );
-	}
-
-	w->show();
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
+	parentWidget()->resize( minimumWidth(), 300 );
+	parentWidget()->move( 10, 340 );
+	parentWidget()->show();
 
 
 	setModel( _tc );

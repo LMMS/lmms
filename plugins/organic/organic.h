@@ -37,7 +37,6 @@ class QPixmap;
 class knob;
 class notePlayHandle;
 class pixmapButton;
-class volumeKnob;
 
 
 class oscillatorObject : public model
@@ -146,7 +145,7 @@ private:
 
 	struct oscillatorKnobs
 	{
-		oscillatorKnobs( volumeKnob * v,
+		oscillatorKnobs( knob * v,
 					knob * o,
 					knob * p,
 					knob * dt ) :
@@ -160,7 +159,7 @@ private:
 		{
 		}
 		
-		volumeKnob * m_volKnob;
+		knob * m_volKnob;
 		knob * m_oscKnob;
 		knob * m_panKnob;
 		knob * m_detuneKnob;

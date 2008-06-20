@@ -42,7 +42,7 @@
 
 //const int MOOG_VOLTAGE = 40000;
 
-template<ch_cnt_t CHANNELS = DEFAULT_CHANNELS>
+template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
 {
 public:

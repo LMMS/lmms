@@ -71,9 +71,6 @@ mainWindow::mainWindow( void ) :
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
-	bool no_mdi = configManager::inst()->value( "app", "gimplikewindows"
-								).toInt();
-
 	QWidget * main_widget = new QWidget( this );
 	QVBoxLayout * vbox = new QVBoxLayout( main_widget );
 	vbox->setSpacing( 0 );
@@ -131,15 +128,10 @@ mainWindow::mainWindow( void ) :
 					embed::getIconPixmap( "root" ),
 							splitter ), ++id );
 
-	if( no_mdi == FALSE )
-	{
-		m_workspace = new QMdiArea( splitter );
-		m_workspace->setBackground( Qt::NoBrush );
-		m_workspace->setHorizontalScrollBarPolicy(
-							Qt::ScrollBarAsNeeded );
-		m_workspace->setVerticalScrollBarPolicy(
-							Qt::ScrollBarAsNeeded );
-	}
+	m_workspace = new QMdiArea( splitter );
+	m_workspace->setBackground( Qt::NoBrush );
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
 	hbox->addWidget( side_bar );
 	hbox->addWidget( splitter );
@@ -733,31 +725,16 @@ void mainWindow::help( void )
 
 void mainWindow::toggleWindow( QWidget * _w )
 {
-	if( m_workspace )
+	if( m_workspace->activeSubWindow() != _w->parentWidget()
+				|| _w->parentWidget()->isHidden() )
 	{
-		if( m_workspace->activeSubWindow() != _w->parentWidget()
-					|| _w->parentWidget()->isHidden() )
-		{
-			_w->parentWidget()->show();
-			_w->show();
-			_w->setFocus();
-		}
-		else
-		{
-			_w->parentWidget()->hide();
-		}
+		_w->parentWidget()->show();
+		_w->show();
+		_w->setFocus();
 	}
 	else
 	{
-		if( _w->isHidden() )
-		{
-			_w->show();
-			_w->setFocus();
-		}
-		else
-		{
-			_w->hide();
-		}
+		_w->parentWidget()->hide();
 	}
 }
 
@@ -926,10 +903,7 @@ void mainWindow::showTool( QAction * _idx )
 {
 	pluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
 	p->show();
-	if( m_workspace )
-	{
-		p->parentWidget()->show();
-	}
+	p->parentWidget()->show();
 	p->setFocus();
 }
 

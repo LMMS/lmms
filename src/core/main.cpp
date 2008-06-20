@@ -27,11 +27,11 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
-#include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
 #include <QtGui/QBitmap>
+#include <QtGui/QDesktopWidget>
 #include <QtGui/QPainter>
 #include <QtGui/QSplashScreen>
 
@@ -46,7 +46,6 @@
 #include "config_mgr.h"
 #include "project_renderer.h"
 #include "song.h"
-#include "gui_templates.h"
 #include "lmms_style.h"
 
 #warning TODO: move somewhere else
@@ -351,7 +350,8 @@ int main( int argc, char * * argv )
 		p.end();
 
 		QSplashScreen * ss = new QSplashScreen( pm );
-		ss->setMask( splash.alphaChannel().createMaskFromColor( QColor( 0, 0, 0 ) ) );
+		ss->setMask( splash.alphaChannel().createMaskFromColor(
+							QColor( 0, 0, 0 ) ) );
 		ss->show();
 		qApp->processEvents();
 
@@ -368,19 +368,7 @@ int main( int argc, char * * argv )
 			engine::getSong()->createNewProject();
 		}
 
-		// MDI-mode?
-		if( engine::getMainWindow()->workspace() != NULL )
-		{
-			// then maximize
-			engine::getMainWindow()->showMaximized();
-		}
-		else
-		{
-			// otherwise arrange at top-left edge of screen
-			engine::getMainWindow()->show();
-			engine::getMainWindow()->move( 0, 0 );
-			engine::getMainWindow()->resize( 200, 500 );
-		}
+		engine::getMainWindow()->showMaximized();
 
 		delete ss;
 	}
@@ -392,10 +380,11 @@ int main( int argc, char * * argv )
 
 		// create renderer
 		projectRenderer * r = new projectRenderer( qs, os, eff,
-			render_out + QString( ( eff == projectRenderer::WaveFile ) ?
-								"wav" : "ogg" ) );
+			render_out +
+				QString( ( eff == projectRenderer::WaveFile ) ?
+							"wav" : "ogg" ) );
 		QCoreApplication::instance()->connect( r, SIGNAL( finished() ),
-								SLOT( quit() ) );
+							SLOT( quit() ) );
 
 		// timer for progress-updates
 		QTimer * t = new QTimer( r );

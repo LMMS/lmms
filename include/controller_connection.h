@@ -32,15 +32,13 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-#include "engine.h"
 #include "controller.h"
-#include "mv_base.h"
 #include "journalling_object.h"
 
 class controllerConnection;
-class QString;
 
 typedef QVector<controllerConnection *> controllerConnectionVector;
+
 
 class controllerConnection : public QObject, public journallingObject
 {

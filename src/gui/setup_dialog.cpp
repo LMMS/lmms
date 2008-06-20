@@ -89,11 +89,6 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 					"framesperaudiobuffer" ).toInt() ),
 	m_toolTips( !configManager::inst()->value( "tooltips",
 							"disabled" ).toInt() ),
-	m_classicalKnobUsability( configManager::inst()->value( "knobs",
-					"classicalusability" ).toInt() ),
-	m_MDI( !configManager::inst()->value( "app",
-						"gimplikewindows" ).toInt() ),
-	m_wizard( !configManager::inst()->value( "app", "nowizard" ).toInt() ),
 	m_warnAfterSetup( !configManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
 	m_displaydBV( configManager::inst()->value( "app", 
@@ -178,7 +173,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 164 );
+	misc_tw->setFixedHeight( 120 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -189,38 +184,10 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 					this, SLOT( toggleToolTips( bool ) ) );
 
 
-	ledCheckBox * classical_knob_usability = new ledCheckBox(
-					tr( "Classical knob usability (move "
-						"cursor around knob to change "
-						"value)" ), misc_tw );
-	classical_knob_usability->move( 10, 36 );
-	classical_knob_usability->setChecked( m_classicalKnobUsability );
-	connect( classical_knob_usability, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleKnobUsability( bool ) ) );
-
-
-	ledCheckBox * mdi_windows = new ledCheckBox(
-					tr( "Multiple Document Interface" ),
-								misc_tw );
-	mdi_windows->move( 10, 54 );
-	mdi_windows->setChecked( m_MDI );
-	connect( mdi_windows, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleMdiWindows( bool ) ) );
-
-
-	ledCheckBox * wizard = new ledCheckBox(
-					tr( "Show wizard after up-/downgrade" ),
-								misc_tw );
-	wizard->move( 10, 72 );
-	wizard->setChecked( m_wizard );
-	connect( wizard, SIGNAL( toggled( bool ) ),
-					this, SLOT( toggleWizard( bool ) ) );
-
-
 	ledCheckBox * restart_msg = new ledCheckBox(
 			tr( "Show restart warning after changing settings" ),
 								misc_tw );
-	restart_msg->move( 10, 90 );
+	restart_msg->move( 10, 36 );
 	restart_msg->setChecked( m_warnAfterSetup );
 	connect( restart_msg, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleWarnAfterSetup( bool ) ) );
@@ -228,7 +195,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dBV " ),
 								misc_tw );
-	dbv->move( 10, 108 );
+	dbv->move( 10, 54 );
 	dbv->setChecked( m_displaydBV );
 	connect( dbv, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisplaydBV( bool ) ) );
@@ -237,7 +204,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * mmpz = new ledCheckBox(
 				tr( "Compress project files per default" ),
 								misc_tw );
-	mmpz->move( 10, 126 );
+	mmpz->move( 10, 72 );
 	mmpz->setChecked( m_MMPZ );
 	connect( mmpz, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleMMPZ( bool ) ) );
@@ -245,7 +212,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * hqaudio = new ledCheckBox(
 				tr( "HQ-mode for output audio-device" ),
 								misc_tw );
-	hqaudio->move( 10, 144 );
+	hqaudio->move( 10, 90 );
 	hqaudio->setChecked( m_hqAudioDev );
 	connect( hqaudio, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleHQAudioDev( bool ) ) );
@@ -436,13 +403,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 
-	tabWidget * smp_supp_tw = new tabWidget( tr( "SMP support" ).toUpper(),
-								performance );
-	smp_supp_tw->setFixedHeight( 200 );
-
 	perf_layout->addWidget( ui_fx_tw );
-	perf_layout->addSpacing( 15 );
-	perf_layout->addWidget( smp_supp_tw );
 	perf_layout->addStretch();
 
 
@@ -683,12 +644,6 @@ void setupDialog::accept( void )
 			m_midiIfaceNames[m_midiInterfaces->currentText()] );
 	configManager::inst()->setValue( "tooltips", "disabled",
 					QString::number( !m_toolTips ) );
-	configManager::inst()->setValue( "knobs", "classicalusability",
-				QString::number( m_classicalKnobUsability ) );
-	configManager::inst()->setValue( "app", "gimplikewindows",
-						QString::number( !m_MDI ) );
-	configManager::inst()->setValue( "app", "nowizard",
-						QString::number( !m_wizard ) );
 	configManager::inst()->setValue( "app", "nomsgaftersetup",
 					QString::number( !m_warnAfterSetup ) );
 	configManager::inst()->setValue( "app", "displaydbv",
@@ -800,30 +755,6 @@ void setupDialog::displayBufSizeHelp( void )
 void setupDialog::toggleToolTips( bool _enabled )
 {
 	m_toolTips = _enabled;
-}
-
-
-
-
-void setupDialog::toggleKnobUsability( bool _classical )
-{
-	m_classicalKnobUsability = _classical;
-}
-
-
-
-
-void setupDialog::toggleMdiWindows( bool _enabled )
-{
-	m_MDI = _enabled;
-}
-
-
-
-
-void setupDialog::toggleWizard( bool _enabled )
-{
-	m_wizard = _enabled;
 }
 
 

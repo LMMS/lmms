@@ -27,19 +27,16 @@
 #ifndef _CONTROLLER_H
 #define _CONTROLLER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QVector>
-
 #include "engine.h"
 #include "mixer.h"
 #include "mv_base.h"
-#include "templates.h"
 #include "journalling_object.h"
 
 class controllerDialog;
 class controller; 
 
 typedef QVector<controller *> controllerVector;
+
 
 class controller : public model, public journallingObject
 {

@@ -120,7 +120,7 @@ void tempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
 		setJournalling( journalling );
 	}
-	
+
 	if( m_tempoSyncMode != m_tempoLastSyncMode )
 	{
 		emit syncModeChanged( m_tempoSyncMode );
@@ -225,7 +225,6 @@ tempoSyncKnob::~tempoSyncKnob()
 {
 	if( m_custom )
 	{
-//		m_custom->deleteLater();
 		delete m_custom->parentWidget();
 	}
 }
@@ -242,6 +241,8 @@ void tempoSyncKnob::modelChanged( void )
 	m_custom->setModel( &model()->m_custom );
 	connect( model(), SIGNAL( syncModeChanged( tempoSyncMode ) ),
 			this, SLOT( updateDescAndIcon() ) );
+	connect( this, SIGNAL( sliderMoved( float ) ),
+			model(), SLOT( disableSync() ) );
 	updateDescAndIcon();
 }
 
@@ -322,24 +323,6 @@ void tempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	contextMenu.exec( QCursor::pos() );
 	
 	delete syncMenu;
-}
-
-
-
-
-void tempoSyncKnob::mouseMoveEvent( QMouseEvent * _me )
-{
-	knob::mouseMoveEvent( _me );
-	model()->setSyncMode( tempoSyncKnobModel::SyncNone );
-}
-
-
-
-
-void tempoSyncKnob::wheelEvent( QWheelEvent * _we )
-{
-	knob::wheelEvent( _we );
-	model()->setSyncMode( tempoSyncKnobModel::SyncNone );
 }
 
 

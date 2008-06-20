@@ -30,16 +30,11 @@
 #include <QtGui/QPushButton>
 
 #include "audio_port.h"
-#include "automatable_model.h"
 #include "instrument_functions.h"
 #include "instrument_sound_shaping.h"
-#include "lcd_spinbox.h"
 #include "midi_event_processor.h"
 #include "midi_port.h"
-#include "mixer.h"
 #include "piano.h"
-#include "effect_chain.h"
-#include "tab_widget.h"
 #include "track.h"
 
 
@@ -54,11 +49,12 @@ class instrument;
 class instrumentTrackButton;
 class instrumentTrackWindow;
 class instrumentMidiIOView;
+class lcdSpinBox;
 class midiPortMenu;
 class notePlayHandle;
 class pluginView;
 class presetPreviewPlayHandle;
-class volumeKnob;
+class tabWidget;
 
 
 class EXPORT instrumentTrack : public track, public midiEventProcessor
@@ -181,7 +177,7 @@ private:
 	floatModel m_volumeModel;
 	floatModel m_panningModel;
 	floatModel m_pitchModel;
-	lcdSpinBoxModel m_effectChannelModel;
+	intModel m_effectChannelModel;
 
 
 	instrument * m_instrument;
@@ -244,7 +240,7 @@ private:
 	static QQueue<instrumentTrackWindow *> s_windows;
 
 	// widgets in track-settings-widget
-	volumeKnob * m_tswVolumeKnob;
+	knob * m_tswVolumeKnob;
 	fadeButton * m_tswActivityIndicator;
 	instrumentTrackButton * m_tswInstrumentTrackButton;
 
@@ -271,7 +267,7 @@ public:
 	virtual ~instrumentTrackWindow();
 
 	// parent for all internal tab-widgets
-	QWidget * tabWidgetParent( void )
+	tabWidget * tabWidgetParent( void )
 	{
 		return( m_tabWidget );
 	}
@@ -323,7 +319,7 @@ private:
 	// widgets on the top of an instrument-track-window
 	tabWidget * m_generalSettingsWidget;
 	QLineEdit * m_instrumentNameLE;
-	volumeKnob * m_volumeKnob;
+	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
 	lcdSpinBox * m_effectChannelNumber;

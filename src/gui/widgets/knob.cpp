@@ -3,9 +3,6 @@
 /*
  * knob.cpp - powerful knob-widget
  *
- * This file is partly based on the knob-widget of the Qwt Widget Library by
- * Josef Wilgen.
- *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -63,13 +60,14 @@ textFloat * knob::s_textFloat = NULL;
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	floatModelView( new knobModel( 0, 0, 0, 1, NULL, _name, TRUE ) ),
+	m_knobNum( _knob_num ),
+	m_label( "" ),
+	m_knobPixmap( NULL ),
+	m_volumeKnob( FALSE ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( FALSE ),
-	m_knobPixmap( NULL ),
-	m_outerColor( NULL ),
 	m_angle( -10 ),
-	m_knobNum( _knob_num ),
-	m_label( "" )
+	m_outerColor( NULL )
 {
 	if( s_textFloat == NULL )
 	{
@@ -373,40 +371,6 @@ void knob::drawKnob( QPainter * _p )
 
 float knob::getValue( const QPoint & _p )
 {
-	if( configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-	{
-		const float dx = float( ( rect().x() + rect().width() / 2 ) -
-								_p.x() );
-		const float dy = float( ( rect().y() + rect().height() / 2 ) -
-								_p.y() );
-
-		const float arc = atan2( -dx, dy ) * 180.0 / M_PI;
-
-		float new_value = 0.5 * ( model()->minValue() +
-							model()->maxValue() ) +
-					arc * ( model()->maxValue() -
-							model()->minValue() ) /
-								m_totalAngle;
-
-		const float oneTurn = tAbs<float>( model()->maxValue() -
-							model()->minValue() ) *
-							360.0 / m_totalAngle;
-		const float eqValue = model()->value() + m_mouseOffset;
-
-		if( tAbs<float>( new_value - eqValue ) > 0.5 * oneTurn )
-		{
-			if( new_value < eqValue )
-			{
-				new_value += oneTurn;
-			}
-			else
-			{
-				new_value -= oneTurn;
-			}
-		}
-		return( new_value );
-	}
 	if( engine::getMainWindow()->isShiftPressed() )
 	{
 		return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
@@ -476,23 +440,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
 
-		if( configManager::inst()->value( "knobs",
-						"classicalusability").toInt() )
-		{
-			m_mouseOffset = getValue( p ) - model()->value();
-		}
 		emit sliderPressed();
 
-		if( !configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-		{
-			QApplication::setOverrideCursor( Qt::BlankCursor );
-		}
-//		s_textFloat->reparent( this );
-		s_textFloat->setText( m_description +
-						QString::number(
-							model()->value() ) +
-							m_unit );
+		QApplication::setOverrideCursor( Qt::BlankCursor );
+		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
@@ -531,17 +482,10 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( model()->value() );
-//		emit valueChanged();
-		if( !configManager::inst()->value( "knobs",
-						"classicalusability").toInt() )
-		{
-			QCursor::setPos( mapToGlobal( m_origMousePos ) );
-		}
+		QCursor::setPos( mapToGlobal( m_origMousePos ) );
 	}
 
-	s_textFloat->setText( m_description +
-				QString::number( model()->value() ) +
-							 m_unit );
+	s_textFloat->setText( displayValue() );
 }
 
 
@@ -554,17 +498,12 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 	if( m_buttonPressed )
 	{
 		m_buttonPressed = TRUE;
-		buttonReleased();
 	}
 
 	m_mouseOffset = 0;
 	emit sliderReleased();
 
-	if( !configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-	{
-		QApplication::restoreOverrideCursor();
-	}
+	QApplication::restoreOverrideCursor();
 
 	s_textFloat->hide();
 }
@@ -609,23 +548,11 @@ void knob::wheelEvent( QWheelEvent * _we )
 	model()->incValue( inc );
 
 
-	s_textFloat->setText( m_description +
-					QString::number( model()->value() ) +
-						m_unit );
+	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
 	s_textFloat->setVisibilityTimeOut( 1000 );
 
 	emit sliderMoved( model()->value() );
-//	emit valueChanged();
-}
-
-
-
-
-void knob::buttonReleased( void )
-{
-//	emit valueChanged( model()->value() );
-//	emit valueChanged();
 }
 
 
@@ -633,53 +560,8 @@ void knob::buttonReleased( void )
 
 void knob::setPosition( const QPoint & _p )
 {
-	if( configManager::inst()->value( "knobs", "classicalusability"
-								).toInt() )
-	{
-		model()->setValue( getValue( _p ) - m_mouseOffset );
-	}
-	else
-	{
-		model()->setValue( model()->value() - getValue( _p ) );
-	}
+	model()->setValue( model()->value() - getValue( _p ) );
 }
-
-
-
-
-
-
-
-/*void knob::reset( void )
-{
-	model()->setValue( model()->initValue() );
-	s_textFloat->setText( m_description +
-					QString::number( model()->value() ) +
-							m_unit );
-	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
-	s_textFloat->setVisibilityTimeOut( 1000 );
-}
-
-
-
-
-void knob::copyValue( void )
-{
-	s_copiedValue = model()->value();
-}
-
-
-
-
-void knob::pasteValue( void )
-{
-	model()->setValue( s_copiedValue );
-	s_textFloat->setText( m_description +
-					QString::number( model()->value() ) +
-							m_unit );
-	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );
-	s_textFloat->setVisibilityTimeOut( 1000 );
-}*/
 
 
 
@@ -687,17 +569,38 @@ void knob::pasteValue( void )
 void knob::enterValue( void )
 {
 	bool ok;
-	float new_val = QInputDialog::getDouble(
-					this,
-					accessibleName(),
-					tr( "Please enter a new value between "
+	float new_val;
+	if( isVolumeKnob() &&
+		configManager::inst()->value( "app", "displaydbv" ).toInt() )
+	{
+		new_val = QInputDialog::getDouble(
+			this, accessibleName(),
+			tr( "Please enter a new value between "
+					"-96.0 dBV and 6.0 dBV:" ),
+				20.0 * log10( model()->value() / 100.0 ),
+							-96.0, 6.0, 4, &ok );
+		if( new_val <= -96.0 )
+		{
+			new_val = 0.0f;
+		}
+		else
+		{
+			new_val = pow( 10.0, ( new_val / 20.0 ) ) * 100.0;
+		}
+	}
+	else
+	{
+		new_val = QInputDialog::getDouble(
+				this, accessibleName(),
+				tr( "Please enter a new value between "
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
 						arg( model()->maxValue() ),
 					model()->value(),
 					model()->minValue(),
-					model()->maxValue(),
-					4, &ok );
+					model()->maxValue(), 4, &ok );
+	}
+
 	if( ok )
 	{
 		model()->setValue( new_val );
@@ -714,6 +617,22 @@ void knob::friendlyUpdate( void )
 	{
 		update();
 	}
+}
+
+
+
+
+QString knob::displayValue( void ) const
+{
+	if( isVolumeKnob() &&
+		configManager::inst()->value( "app", "displaydbv" ).toInt() )
+	{
+		return( m_description + QString( " %1 dBV" ).arg(
+				20.0 * log10( model()->value() / 100.0 ),
+				3, 'f', 2 ) );
+	}
+	return( m_description + QString( " %1%" ).arg(
+				model()->value(), 3, 'f', 0 ) + m_unit );
 }
 
 

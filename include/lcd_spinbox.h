@@ -27,12 +27,9 @@
 #define _LCD_SPINBOX_H
 
 #include <QtCore/QMap>
-#include <QtGui/QLCDNumber>
+#include <QtGui/QWidget>
 
 #include "automatable_model_view.h"
-
-
-class QLabel;
 
 
 class EXPORT lcdSpinBox : public QWidget, public intModelView

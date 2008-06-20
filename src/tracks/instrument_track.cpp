@@ -46,6 +46,7 @@
 
 #include "audio_port.h"
 #include "automation_pattern.h"
+#include "bb_track.h"
 #include "config_mgr.h"
 #include "debug.h"
 #include "effect_chain.h"
@@ -75,7 +76,6 @@
 #include "surround_area.h"
 #include "tab_widget.h"
 #include "tooltip.h"
-#include "volume_knob.h"
 
 
 
@@ -847,8 +847,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	setFixedHeight( 32 );
 
 	// creation of widgets for track-settings-widget
-	m_tswVolumeKnob = new volumeKnob( knobSmall_17,
-						getTrackSettingsWidget() );
+	m_tswVolumeKnob = new knob( knobSmall_17, getTrackSettingsWidget() );
+	m_tswVolumeKnob->setVolumeKnob( TRUE );
 	m_tswVolumeKnob->setModel( &_it->m_volumeModel );
 	m_tswVolumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_tswVolumeKnob->move( 4, 4 );
@@ -1112,8 +1112,9 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 
 	// setup volume-knob
-	m_volumeKnob = new volumeKnob( knobBright_26, m_generalSettingsWidget,
+	m_volumeKnob = new knob( knobBright_26, m_generalSettingsWidget,
 						tr( "Instrument volume" ) );
+	m_volumeKnob->setVolumeKnob( TRUE );
 	m_volumeKnob->move( 10, 44 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );

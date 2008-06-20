@@ -31,11 +31,11 @@
 
 #include "audio_port.h"
 #include "track.h"
-#include "volume_knob.h"
 
 class QLabel;
 class effectLabel;
 class sampleBuffer;
+class knob;
 
 //class sampleTCOSettingsDialog;
 
@@ -141,7 +141,7 @@ public:
 
 private:
 	audioPort m_audioPort;
-	knobModel m_volumeModel;
+	floatModel m_volumeModel;
 
 
 	friend class sampleTrackView;
@@ -160,7 +160,7 @@ public:
 private:
 	effectLabel * m_trackLabel;
 
-	volumeKnob * m_volumeKnob;
+	knob * m_volumeKnob;
 
 } ;
 

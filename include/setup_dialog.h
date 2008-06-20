@@ -87,9 +87,6 @@ private slots:
 
 
 	void toggleToolTips( bool _enabled );
-	void toggleKnobUsability( bool _classical );
-	void toggleMdiWindows( bool _enabled );
-	void toggleWizard( bool _enabled );
 	void toggleWarnAfterSetup( bool _enabled );
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
@@ -114,9 +111,6 @@ private:
 	int m_bufferSize;
 
 	bool m_toolTips;
-	bool m_classicalKnobUsability;
-	bool m_MDI;
-	bool m_wizard;
 	bool m_warnAfterSetup;
 	bool m_displaydBV;
 	bool m_MMPZ;

@@ -29,6 +29,7 @@
 
 
 #include "instrument_sound_shaping.h"
+#include "basic_filters.h"
 #include "embed.h"
 #include "engine.h"
 #include "envelope_and_lfo_parameters.h"

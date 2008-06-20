@@ -31,13 +31,8 @@
 #include "journalling_object.h"
 #include "mv_base.h"
 #include "controller_connection.h"
-#include "automation_pattern.h"
 
-#include <QtCore/QPointer>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-
-
+class automationPattern;
 class track;
 
 
@@ -121,17 +116,7 @@ public:
 	}
 
 
-	inline void setControllerConnection( controllerConnection * _c )
-	{
-		m_controllerConnection = _c;
-		if( _c )
-		{
-			QObject::connect( m_controllerConnection,
-							SIGNAL( valueChanged() ),
-						this, SIGNAL( dataChanged() ) );
-			emit dataChanged();
-		}
-	}
+	void setControllerConnection( controllerConnection * _c );
 
 
 	template<class T>
@@ -296,7 +281,7 @@ private:
 
 
 	controllerConnection * m_controllerConnection;
-	QPointer<automationPattern> m_automationPattern;
+	automationPattern * m_automationPattern;
 	track * m_track;
 
 

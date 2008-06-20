@@ -31,7 +31,6 @@
 #include "knob.h"
 #include "pixmap_button.h"
 #include "led_checkbox.h"
-#include "volume_knob.h"
 #include "nine_button_selector.h"
 
 class vibedView;
@@ -110,7 +109,7 @@ private:
 	knob * m_pickKnob;
 	knob * m_pickupKnob;
 	knob * m_stiffnessKnob;
-	volumeKnob * m_volumeKnob;
+	knob * m_volumeKnob;
 	knob * m_panKnob;
 	knob * m_detuneKnob;
 	knob * m_randomKnob;

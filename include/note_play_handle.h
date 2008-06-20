@@ -28,8 +28,6 @@
 #define _NOTE_PLAY_HANDLE_H
 
 #include "mixer.h"
-#include "basic_filters.h"
-#include "bb_track.h"
 #include "note.h"
 #include "instrument.h"
 #include "instrument_track.h"
@@ -38,6 +36,7 @@
 
 class notePlayHandle;
 
+template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
 typedef QVector<notePlayHandle *> notePlayHandleVector;
 typedef QVector<const notePlayHandle *> constNotePlayHandleVector;
 
@@ -223,7 +222,7 @@ public:
 	{
 		return( m_bbTrack && m_bbTrack->isMuted() );
 	}
-	void setBBTrack( bbTrack * _bb_track )
+	void setBBTrack( track * _bb_track )
 	{
 		m_bbTrack = _bb_track;
 	}
@@ -308,7 +307,7 @@ private:
 					// an arpeggio (either base-note or
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
-	bbTrack * m_bbTrack;		// related BB track
+	track * m_bbTrack;		// related BB track
 #if SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif

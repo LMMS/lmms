@@ -38,7 +38,6 @@
 #include "pixmap_button.h"
 #include "templates.h"
 #include "tooltip.h"
-#include "volume_knob.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -401,6 +400,7 @@ organicInstrumentView::organicInstrumentView( instrument * _instrument,
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
+	m_volKnob->setVolumeKnob( TRUE );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ).arg( 1 ) + " ", "%" );
@@ -460,7 +460,8 @@ void organicInstrumentView::modelChanged( void )
 					i + 1 ) + " ", "%" );
 										
 		// setup volume-knob
-		volumeKnob * volKnob = new volumeKnob( knobStyled, this );
+		knob * volKnob = new knob( knobStyled, this );
+		volKnob->setVolumeKnob( TRUE );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(

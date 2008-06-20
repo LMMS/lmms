@@ -29,6 +29,7 @@
 #include "automatable_model.h"
 #include "automation_pattern.h"
 #include "automation_editor.h"
+#include "controller_connection.h"
 
 
 float automatableModel::__copiedValue = 0;
@@ -410,11 +411,28 @@ void automatableModel::unlinkModels( automatableModel * _model1,
 
 
 
-
 void automatableModel::initAutomationPattern( void )
+{
+	m_automationPattern = new automationPattern( NULL, this );
+}
+
+
+
+
+void automatableModel::setControllerConnection( controllerConnection * _c )
+{
+	m_controllerConnection = _c;
+	if( _c )
 	{
-		m_automationPattern = new automationPattern( NULL, this );
+		QObject::connect( m_controllerConnection,
+						SIGNAL( valueChanged() ),
+					this, SIGNAL( dataChanged() ) );
+		emit dataChanged();
 	}
+}
+
+
+
 
 automationPattern * automatableModel::getAutomationPattern( void )
 {

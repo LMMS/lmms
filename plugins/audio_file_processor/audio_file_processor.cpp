@@ -404,7 +404,8 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 			"This is useful for things like string- and choir-"
 			"samples." ) );
 
-	m_ampKnob = new volumeKnob( knobStyled, this );
+	m_ampKnob = new knob( knobStyled, this );
+	m_ampKnob->setVolumeKnob( TRUE );
 	m_ampKnob->move( 17, 108 );
 	m_ampKnob->setFixedSize( 37, 47 );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );

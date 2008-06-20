@@ -47,6 +47,7 @@
 #include <QtGui/QPainter>
 
 
+#include "automation_pattern.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"

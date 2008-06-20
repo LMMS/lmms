@@ -1,9 +1,6 @@
 /*
  * knob.h - powerful knob-widget
  *
- * This file is based on the knob-widget of the Qwt Widget Library by
- * Josef Wilgen
- *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -61,7 +58,7 @@ class EXPORT knob : public QWidget, public floatModelView
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-
+	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 public:
 	knob( int _knob_num, QWidget * _parent, const QString & _name = QString::null );
 	virtual ~knob();
@@ -97,12 +94,6 @@ public:
 	void setOuterColor( const QColor & _c );
 
 
-public slots:
-	virtual void enterValue( void );
-	void displayHelp( void );
-	void friendlyUpdate( void );
-
-
 signals:
 	void sliderPressed( void );
 	void sliderReleased( void );
@@ -110,21 +101,6 @@ signals:
 
 
 protected:
-	static textFloat * s_textFloat;
-
-	float m_mouseOffset;
-	QPoint m_origMousePos;
-	bool m_buttonPressed;
-
-	QPixmap * m_knobPixmap;
-
-	// Styled knob stuff, could break out
-	QPointF m_centerPoint;
-	float m_innerRadius;
-	float m_outerRadius;
-	float m_lineWidth;
-	QColor * m_outerColor;
-
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
@@ -135,15 +111,23 @@ protected:
 	virtual void paintEvent( QPaintEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 
-	void drawKnob( QPainter * _p );
-	void setPosition( const QPoint & _p );
+private slots:
+	virtual void enterValue( void );
+	void displayHelp( void );
+	void friendlyUpdate( void );
 
-	float getValue( const QPoint & _p );
+
+private:
+	QString displayValue( void ) const;
+
+	virtual void doConnections( void );
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
 
-private:
+	void drawKnob( QPainter * _p );
+	void setPosition( const QPoint & _p );
+	float getValue( const QPoint & _p );
 	bool updateAngle( void );
 
 	inline float pageSize( void ) const
@@ -153,19 +137,29 @@ private:
 					modelUntyped()->step<float>() ) );
 	}
 
-	virtual void doConnections( void );
 
+	static textFloat * s_textFloat;
 
+	int m_knobNum;
+	QString m_label;
 
-	void valueChange( void );
-	void buttonReleased( void );
+	QPixmap * m_knobPixmap;
+	boolModel m_volumeKnob;
+
+	float m_mouseOffset;
+	QPoint m_origMousePos;
+	bool m_buttonPressed;
 
 	float m_totalAngle;
 	int m_angle;
 	QImage m_cache;
 
-	int m_knobNum;
-	QString m_label;
+	// Styled knob stuff, could break out
+	QPointF m_centerPoint;
+	float m_innerRadius;
+	float m_outerRadius;
+	float m_lineWidth;
+	QColor * m_outerColor;
 
 } ;
 

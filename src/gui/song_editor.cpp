@@ -25,44 +25,23 @@
  */
 
 
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
 #include <QtGui/QAction>
 #include <QtGui/QButtonGroup>
-#include <QtGui/QFileDialog>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
-#include <QtGui/QMessageBox>
 #include <QtGui/QScrollBar>
-#include <QtGui/QStatusBar>
 
 #include <math.h>
 
 #include "song_editor.h"
-#include "automatable_slider.h"
-#include "bb_editor.h"
-#include "bb_track.h"
-#include "combobox.h"
-#include "config_mgr.h"
 #include "cpuload_widget.h"
 #include "embed.h"
-#include "envelope_and_lfo_parameters.h"
-#include "import_filter.h"
-#include "instrument_track.h"
-#include "lcd_spinbox.h"
+#include "combobox.h"
 #include "main_window.h"
 #include "meter_dialog.h"
-#include "midi_client.h"
 #include "mmp.h"
-#include "note_play_handle.h"
-#include "pattern.h"
-#include "piano_roll.h"
-#include "project_journal.h"
-#include "project_notes.h"
-#include "rename_dialog.h"
-#include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
 #include "tool_button.h"
@@ -351,25 +330,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					this, SLOT( scrolled( int ) ) );
 
 
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	}
-
-	QWidget * w = ( parentWidget() != NULL ) ? parentWidget() : this;
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		w->resize( 680, 300 );
-		w->move( 10, 10 );
-	}
-	else
-	{
-		resize( 580, 300 );
-		w->move( 210, 10 );
-	}
-
-	w->show();
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->resize( 680, 300 );
+	parentWidget()->move( 10, 10 );
+	parentWidget()->show();
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 }

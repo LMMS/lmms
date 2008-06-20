@@ -38,7 +38,6 @@
 #include "string_container.h"
 #include "templates.h"
 #include "volume.h"
-#include "volume_knob.h"
 #include "song.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -362,7 +361,8 @@ vibedView::vibedView( instrument * _instrument,
 			"artwork" ) );
 	setPalette( pal );
 	
-	m_volumeKnob = new volumeKnob( knobBright_26, this );
+	m_volumeKnob = new knob( knobBright_26, this );
+	m_volumeKnob->setVolumeKnob( TRUE );
 	m_volumeKnob->move( 103, 142 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
 	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "

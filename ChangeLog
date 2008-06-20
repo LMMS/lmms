@@ -1,4 +1,66 @@
-2008-06-20  Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-06-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.am:
+	* include/knob.h:
+	* include/volume_knob.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* src/tracks/instrument_track.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/volume_knob.cpp:
+	removed volumeKnob-class and added volumeKnob-property to knob-class
+	instead
+
+	* plugins/flp_import/flp_import.cpp:
+	* include/controller_connection.h:
+	* include/lcd_spinbox.h:
+	* include/controller.h:
+	* include/automatable_model.h:
+	* include/instrument_track.h:
+	* include/instrument_functions.h:
+	* include/note_play_handle.h:
+	* include/instrument_sound_shaping.h:
+	* include/basic_filters.h:
+	* include/sample_track.h:
+	* include/surround_area.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/main.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/piano.cpp:
+	* src/core/surround_area.cpp:
+	reduced header-dependencies and various cleanups
+
+	* include/tempo_sync_knob.h:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	do not re-implement private event-handlers and use knob's signals
+	instead
+
+	* src/gui/fx_mixer_view.cpp:
+	better initial position of FX-mixer view
+
+	* src/gui/song_editor.cpp:
+	removed obsolete headers
+
+	* include/setup_dialog.h:
+	* src/gui/bb_editor.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/setup_dialog.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	- removed obsolete non-MDI-mode
+	- removed classical knob-usability
+	- removed show-wizard-after-upgrade setting
+	- other cleanups
+
+2008-06-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/core/piano.cpp:
 	make SVN compile again
@@ -28,7 +90,7 @@
 	* src/tracks/instrument_track.cpp:
 	added unit to pitch-knob
 
-2008-06-15  Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-06-15	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereo_matrix.cpp:
 	update author email address
@@ -265,7 +327,7 @@
 	removed obsolete instrumentTrackView::updateName() and made
 	track-button update on name-changes
 
-2008-06-10  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-10	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/artwork.png:
 	* plugins/sf2_player/chorus_off.png:
@@ -294,7 +356,7 @@
 	* Makefile.am:
 	added a few files to LMMS-headers
 
-2008-06-08  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/graph.h:
 	* src/gui/widgets/graph.cpp:
@@ -535,7 +597,7 @@
 	serializingObject so that creating note objects, notePlayHandles etc.
 	does not have all the journalling-overhead (assigning/freeing ID etc.)
 
-2008-06-06  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-06	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/knob.h:
 	* include/automatable_slider.h:
@@ -621,7 +683,7 @@
 	* src/gui/automation_editor.cpp:
 	fixed various GCC-warnings
 
-2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-05	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/automatable_model.h:
 	* include/mv_base.h:
@@ -641,7 +703,7 @@
 	heavily optimized journal-cleanup - project unloading is now
 	unbelievable fast!
 
-2008-06-05  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-05	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* data/themes/default/style.css:
 	fix check-marks on menus.  They used to all appear checked no matter what
@@ -685,7 +747,7 @@
 	* Makefile.am:
 	integrated TAP-plugins to be shipped with LMMS
 
-2008-06-04  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-04	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/lmms_style.cpp:
 	Shrink the titlebars
@@ -743,7 +805,7 @@
 	* Makefile.am:
 	added win32-pkg target
 
-2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-02	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
@@ -864,7 +926,7 @@
 	* src/core/instrument_midi_io.cpp:
 	coding style
 
-2008-06-02  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-02	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/automatable_model.h:
 	* include/controller_connection.h:
@@ -903,7 +965,7 @@
 	* src/core/song.cpp:
 	Code style
 
-2008-06-01  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-06-01	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* src/tracks/pattern.cpp:
 	Improve drawing of tact lines, so it is more obvious where a pattern
@@ -996,7 +1058,7 @@
 	* src/gui/setup_dialog.cpp:
 	added PulseAudio-support
 
-2008-05-30  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-30	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
 	- Improve selection of volume-bars on a chord.  Select closest note
@@ -1093,7 +1155,7 @@
 
 	diffstat:  63 files changed, 1145 insertions(+), 1170 deletions(-)
 
-2008-05-27  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-27	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	restore gain setting when loading a project and keep gain setting when
@@ -1112,7 +1174,7 @@
 	* src/gui/widgets/controller_view.cpp:
 	made LMMS compile + cleanups
 
-2008-05-26  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/automatable_model.h:
 	* include/automatable_model_templates.h:
@@ -1583,7 +1645,7 @@
 	* data/themes/default/splash.png:
 	new transparent splash-screen without obsolete text-messages
 
-2008-05-25  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-25	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/embed.h:
 	Fix missing distructor warning
@@ -1620,7 +1682,7 @@
 	splitted source-files for meterModel and meterDialog and added
 	"simple"-mode for meterDialog
 
-2008-05-22  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-22	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/lfo_controller.h:
 	* src/gui/lfo_controller_dialog.cpp:
@@ -1633,14 +1695,14 @@
 	* src/gui/widgets/controller_rack_view.cpp:
 	Add icon to window
 
-2008-05-21  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-21	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/Makefile.am:
 	* plugins/Makefile.am:
 	* configure.in:
 	Add fluidsynth detection to configure
 
-2008-05-21  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-21	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/vestige/select_file.png:
 	* plugins/vestige/logo.png:
@@ -1786,7 +1848,7 @@
 	integrated patches from William Steidtmann <billstei/at/hbci/dot/com>
 	which makes Singerbot at least compile - doesn't seem to work yet though
 
-2008-05-19  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-19	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* triple_oscillator.cpp:
 	* am_active.png:
@@ -1832,7 +1894,7 @@
 	* data/themes/default/style.css:
 	Including stylesheet changes I forgot to commit, fixes knobs in 3xOsc
 
-2008-05-18  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-18	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/knob.cpp:
 	* include/knob.h:
@@ -1913,7 +1975,7 @@
 	protect individual buffers of FX-channels from being processed by more
 	than one thread
 
-2008-05-17  Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-17	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:
 	Allow knobs to invert phase as well
@@ -1938,8 +2000,8 @@
 	Noted bug in automatable button
 
 	* src/gui/piano_roll.cpp:
-	Fix bug when trying to select note on first beat. However, still breaks if
-	the cursor moves quickly from right to left (i.e: if it skips the
+	Fix bug when trying to select note on first beat. However, still breaks
+	if the cursor moves quickly from right to left (i.e: if it skips the
 	pixel position)
 
 2008-05-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
@@ -2217,7 +2279,7 @@
 	* plugins/organic/organic.cpp:
 	fixed knob-inheritance problems
 
-2008-05-04	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-05-04	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/kicker/kicker.cpp:
 	* plugins/kicker/artwork.png:
@@ -2242,19 +2304,19 @@
 	* src/core/track.cpp:
 	fixed move of TCO-selections
 
-2008-04-30	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-30	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
 	- Fixed moving of selected notes.
 	- TODO: Quantanize the movement to selected "Q"
 
-2008-04-29	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-29	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/main_window.h:
 	* src/gui/main_window.cpp:
 	Add button for toggling FX Window.  Can use a better icon.
 
-2008-04-28	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-28	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
@@ -2279,12 +2341,12 @@
 	- added missing call in constructor to clear newly created
 	  delay-buffer - fixes bad distorted sound in various scenarios
 
-2008-04-25	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-25	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/bit_invader/bit_invader.cpp:
 	Fixed samplelength loading
 
-2008-04-24	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-24	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/core/song.cpp:
 	Reset LFO counter on song play
@@ -2349,12 +2411,12 @@
 	periodic updates can simply connect their update-slots to
 	songEditor::periodicUpdate()
 
-2008-04-20	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_controls.cpp:
 	Fixed saveSettings
 
-2008-04-16	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-16	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
@@ -2378,12 +2440,12 @@
 	directly delete view before removing model - fixes crash when
 	removing instrument-track with instrument-track-window open
 
-2008-04-15	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-15	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
 	Fix layout
 	
-2008-04-14	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-14	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/stereo_matrix:
 	* plugins/stereo_matrix/stereo_matrix.cpp:
@@ -2405,7 +2467,7 @@
 	added resampling with Sinc-interpolation in case LMMS processes with
 	higher sample-rate than 96 KHz
 
-2008-04-14	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-14	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
@@ -2483,7 +2545,7 @@
 	changed internal MIDI-time-resolution from 64th to 192th resulting for
 	example in better MIDI-import and allowing to use triplet-notes in LMMS
 
-2008-04-09	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-09	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/controller.h:
 	* src/core/controller.cpp:
@@ -2494,7 +2556,7 @@
 	* src/core/lfo_controller.cpp:
 	add more parameters to LFO controller
 
-2008-04-08	Paul Giblock	<drfaygo/at/gmail/dot/com>
+2008-04-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/engine.h:
 	* src/core/engine.cpp:
@@ -3798,7 +3860,7 @@
 	* include/instrument_sound_shaping.h:
 	made MIDI- and FLP-import-filter work
 
-2008-02-15	Paul Giblock	<drfaygo/at/gmail/dot/net>
+2008-02-15	Paul Giblock <drfaygo/at/gmail/dot/net>
 	* plugins/plucked_string_synth/plucked_string_synth.cpp:
 	* plugins/plucked_string_synth/plucked_string_synth.h:
 	* plugins/organic/organic.cpp:

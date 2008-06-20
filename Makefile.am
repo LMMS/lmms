@@ -133,7 +133,7 @@ lmms_MOC =						\
 		./name_label.moc			\
 		./nstate_button.moc			\
 		./pattern.moc				\
-		./peak_controller.moc		\
+		./peak_controller.moc			\
 		./piano_roll.moc			\
 		./piano.moc				\
 		./pixmap_button.moc			\
@@ -161,8 +161,7 @@ lmms_MOC =						\
 		./track_container.moc			\
 		./track_container_view.moc		\
 		./track.moc				\
-		./visualization_widget.moc		\
-		./volume_knob.moc
+		./visualization_widget.moc
 
 lmms_UIC =						\
 		ui_export_project.uic
@@ -233,7 +232,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/note.cpp					\
 		$(srcdir)/src/core/note_play_handle.cpp				\
 		$(srcdir)/src/core/oscillator.cpp				\
-		$(srcdir)/src/core/peak_controller.cpp					\
+		$(srcdir)/src/core/peak_controller.cpp				\
 		$(srcdir)/src/core/piano.cpp					\
 		$(srcdir)/src/core/plugin.cpp					\
 		$(srcdir)/src/core/preset_preview_play_handle.cpp		\
@@ -327,7 +326,6 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/tool_button.cpp			\
 		$(srcdir)/src/gui/widgets/tooltip.cpp				\
 		$(srcdir)/src/gui/widgets/visualization_widget.cpp		\
-		$(srcdir)/src/gui/widgets/volume_knob.cpp			\
 		$(srcdir)/src/tracks/automation_track.cpp			\
 		$(srcdir)/src/tracks/bb_track.cpp				\
 		$(srcdir)/src/tracks/instrument_track.cpp			\
@@ -446,7 +444,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/led_checkbox.h				\
 		$(srcdir)/include/text_float.h					\
 		$(srcdir)/include/tempo_sync_knob.h				\
-		$(srcdir)/include/volume_knob.h					\
 		$(srcdir)/include/setup_dialog.h				\
 		$(srcdir)/include/dummy_plugin.h				\
 		$(srcdir)/include/dummy_instrument.h				\

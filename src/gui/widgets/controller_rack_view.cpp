@@ -71,13 +71,10 @@ controllerRackView::controllerRackView( ) :
 
 	setModel( engine::getSong() );
 
-	if( engine::getMainWindow()->workspace() != NULL )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	}
-
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 }
+
 
 
 

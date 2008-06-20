@@ -38,7 +38,6 @@
 #include "sample_buffer.h"
 #include "song_editor.h"
 #include "tooltip.h"
-#include "volume_knob.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -578,7 +577,8 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		int knob_y = osc_y + i * osc_h;
 
 		// setup volume-knob
-		volumeKnob * vk = new volumeKnob( knobStyled, this );
+		knob * vk = new knob( knobStyled, this );
+		vk->setVolumeKnob( TRUE );
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(

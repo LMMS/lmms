@@ -30,6 +30,7 @@
 #include <QtCore/QBuffer>
 
 #include "flp_import.h"
+#include "note_play_handle.h"
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "bb_track_container.h"

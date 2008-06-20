@@ -27,8 +27,7 @@
 #define _INSTRUMENT_SOUND_SHAPING_H
 
 #include "mixer.h"
-#include "automatable_model.h"
-#include "combobox.h"
+#include "combobox_model.h"
 
 
 class instrumentTrack;

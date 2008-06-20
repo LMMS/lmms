@@ -61,12 +61,6 @@ public:
 	{
 		QPainter p( this );
 		p.fillRect( rect(), QColor( 72, 76, 88 ) );
-/*		p.setPen( QColor( 144, 152, 176 ) );
-		p.drawLine( 0, 0, width()-1, 0 );
-		p.drawLine( 0, 0, 0, height()-1 );
-		p.setPen( QColor( 36, 38, 44 ) );
-		p.drawLine( 0, height()-1, width()-1, height()-1 );
-		p.drawLine( width()-1, 0, width()-1, height()-1 );*/
 		p.setPen( QColor( 40, 42, 48 ) );
 		p.drawRect( 0, 0, width()-2, height()-2 );
 		p.setPen( QColor( 108, 114, 132 ) );
@@ -222,6 +216,7 @@ fxMixerView::fxMixerView() :
 	// add ourself to workspace
 	engine::getMainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->move( 10, 200 );
 
 	// we want to receive dataChanged-signals in order to update
 	setModel( m );

@@ -81,7 +81,7 @@ private:
 } ;
 
 
-
+/*
 class surroundArea : public QWidget, public modelView
 {
 	Q_OBJECT
@@ -113,7 +113,7 @@ private:
 	static QPixmap * s_backgroundArtwork;
 
 } ;
-
+*/
 
 #endif
 

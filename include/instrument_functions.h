@@ -30,7 +30,7 @@
 #include "types.h"
 #include "automatable_model.h"
 #include "tempo_sync_knob.h"
-#include "combobox.h"
+#include "combobox_model.h"
 
 
 class instrumentTrack;

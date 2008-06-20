@@ -79,6 +79,10 @@ signals:
 
 
 public slots:
+	inline void disableSync( void )
+	{
+		setTempoSync( SyncNone );
+	}
 	void setTempoSync( int _note_type );
 	void setTempoSync( QAction * _item );
 
@@ -130,9 +134,7 @@ signals:
 
 
 protected:
-	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _me );
 
 
 protected slots:
@@ -144,7 +146,7 @@ private:
 	QPixmap m_tempoSyncIcon;
 	QString m_tempoSyncDescription;
 
-	QPointer<meterDialog> m_custom;
+	meterDialog * m_custom;
 
 } ;
 
