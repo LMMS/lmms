@@ -1,3 +1,8 @@
+2008-06-20  Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/core/piano.cpp:
+	make SVN compile again
+
 2008-06-20	Paul Wayper <paulway/at/mabula/dot/net>
 
 	* src/core/piano.cpp:

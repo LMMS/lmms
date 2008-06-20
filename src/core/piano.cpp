@@ -277,9 +277,6 @@ int pianoView::getKeyFromScancode( int _k )
 		case 32: return( 26 ); // O = d'
 		case 19: return( 27 ); // 0 = d'#
 		case 33: return( 28 ); // P = e'
-		case 34: return( 29 ); // [ = f'
-		case 21: return( 30 ); // - = f'#
-		case 21: return( 31 ); // ] = g'
 	}
 
 	return( -100 );
