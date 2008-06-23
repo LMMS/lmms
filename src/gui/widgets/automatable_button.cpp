@@ -33,6 +33,7 @@
 
 #include "caption_menu.h"
 #include "embed.h"
+#include "main_window.h"
 
 
 
@@ -40,7 +41,7 @@
 automatableButton::automatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
-	boolModelView( new boolModel( FALSE, NULL, _name, TRUE ) ),
+	boolModelView( new boolModel( FALSE, NULL, _name, TRUE ), this ),
 	m_group( NULL )
 {
 	setAccessibleName( _name );
@@ -86,8 +87,9 @@ void automatableButton::update( void )
 
 void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
-	if( model()->nullTrack() &&
-			( m_group == NULL || m_group->model()->nullTrack() ) )
+/*	if( model()->nullTrack() &&
+			( m_group == NULL || m_group->model()->nullTrack() ) )*/
+	if( m_group != NULL && !m_group->model()->isAutomated() )
 	{
 		QPushButton::contextMenuEvent( _me );
 		return;
@@ -99,20 +101,14 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	QWidget * target;
 	QString targetName;
-	automationPattern * pattern;
 	if ( m_group != NULL )
 	{
-		target = m_group;
 		targetName = m_group->model()->displayName();
-		pattern = m_group->model()->getAutomationPattern();
 	}
 	else
 	{
-		target = this;
 		targetName = model()->displayName();
-		pattern = model()->getAutomationPattern();
 	}
 
 	captionMenu contextMenu( targetName );
@@ -125,7 +121,8 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 
 void automatableButton::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton )
+	if( _me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isCtrlPressed() == FALSE )
 	{
 		if( isCheckable() )
 		{
@@ -135,6 +132,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
+		automatableModelView::mousePressEvent( _me );
 		QPushButton::mousePressEvent( _me );
 	}
 }
@@ -177,7 +175,7 @@ void automatableButton::toggle( void )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) )
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this )
 {
 	hide();
 	setAccessibleName( _name );

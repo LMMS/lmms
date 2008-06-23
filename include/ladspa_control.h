@@ -1,6 +1,7 @@
 /*
  * ladspa_control.h - model for controlling a LADSPA port
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -39,8 +40,6 @@
 #include "tempo_sync_knob.h"
 
 
-class track;
-
 
 typedef struct portDescription port_desc_t;
 
@@ -49,7 +48,7 @@ class EXPORT ladspaControl : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	ladspaControl( model * _parent, port_desc_t * _port, track * _track,
+	ladspaControl( model * _parent, port_desc_t * _port,
 							bool _link = FALSE );
 	~ladspaControl();
 

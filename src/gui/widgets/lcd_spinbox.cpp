@@ -4,7 +4,7 @@
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *                         Paul Giblock    <pgllama/at/gmail.com>
+ * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,6 @@
  */
 
 
-#include "lcd_spinbox.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QLabel>
@@ -35,16 +34,19 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QStyleOptionFrameV2>
 
+#include "lcd_spinbox.h"
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "main_window.h"
+
 
 
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 			const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -69,7 +71,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -264,12 +266,6 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 {
 	m_origMousePos = _me->globalPos();
 
-	if( model()->nullTrack() )
-	{
-		QWidget::contextMenuEvent( _me );
-		return;
-	}
-
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
@@ -286,11 +282,17 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->button() == Qt::LeftButton && _me->y() < m_cellHeight + 2  )
+	if( _me->button() == Qt::LeftButton &&
+		engine::getMainWindow()->isCtrlPressed() == FALSE &&
+						_me->y() < m_cellHeight + 2  )
 	{
 		m_origMousePos = _me->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
 		model()->prepareJournalEntryFromOldVal();
+	}
+	else
+	{
+		automatableModelView::mousePressEvent( _me );
 	}
 }
 

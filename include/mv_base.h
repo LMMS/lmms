@@ -90,7 +90,7 @@ signals:
 class EXPORT modelView
 {
 public:
-	modelView( model * _model );
+	modelView( model * _model, QWidget * _this );
 	virtual ~modelView()
 	{
 	}
@@ -116,10 +116,16 @@ protected:
 	{
 	}
 
+	QWidget * widget( void )
+	{
+		return( m_widget );
+	}
+
 	virtual void doConnections( void );
 
 
 private:
+	QWidget * m_widget;
 	model * m_model;
 
 } ;

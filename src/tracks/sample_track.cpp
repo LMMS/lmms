@@ -218,8 +218,7 @@ midiTime sampleTCO::getSampleLength( void ) const
 
 
 
-void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void sampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( _this.parentNode().nodeName() == "clipboard" )
 	{
@@ -243,7 +242,7 @@ void FASTCALL sampleTCO::saveSettings( QDomDocument & _doc,
 
 
 
-void FASTCALL sampleTCO::loadSettings( const QDomElement & _this )
+void sampleTCO::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
@@ -377,8 +376,7 @@ sampleTrack::~sampleTrack()
 
 
 
-bool FASTCALL sampleTrack::play( const midiTime & _start,
-						const fpp_t _frames,
+bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _offset,
 							Sint16 /*_tco_num*/ )
 {

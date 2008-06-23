@@ -4,6 +4,7 @@
  * automation_track.cpp - automationTrack handles automation of objects without
  *                        a track
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -27,12 +28,15 @@
 
 
 #include "automation_track.h"
+#include "automation_pattern.h"
+#include "embed.h"
+#include "name_label.h"
 
 
 
 
-automationTrack::automationTrack( trackContainer * _tc ) :
-	track( AutomationTrack, _tc )
+automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :
+	track( _hidden ? HiddenAutomationTrack : AutomationTrack, _tc )
 {
 }
 
@@ -49,8 +53,28 @@ automationTrack::~automationTrack()
 bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 				const f_cnt_t _frame_base, Sint16 _tco_num )
 {
-	sendMidiTime( _start );
+	tcoVector tcos;
+	getTCOsInRange( tcos, _start, _start + static_cast<int>(
+					_frames / engine::framesPerTick() ) );
+	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	{
+		automationPattern * p =
+				dynamic_cast<automationPattern *>( *it );
+		if( p == NULL || ( *it )->isMuted() )
+		{
+			continue;
+		}
+		p->processMidiTime( _start - p->startPosition() );
+	}
 	return( FALSE );
+}
+
+
+
+
+trackView * automationTrack::createView( trackContainerView * _tcv )
+{
+	return( new automationTrackView( this, _tcv ) );
 }
 
 
@@ -58,7 +82,7 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 
 trackContentObject * automationTrack::createTCO( const midiTime & )
 {
-	return( NULL );
+	return( new automationPattern( this ) );
 }
 
 
@@ -75,6 +99,33 @@ void automationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 }
+
+
+
+
+
+automationTrackView::automationTrackView( automationTrack * _at,
+						trackContainerView * _tcv ) :
+	trackView( _at, _tcv )
+{
+	setFixedHeight( 32 );
+	m_trackLabel = new nameLabel( _at->name(), getTrackSettingsWidget() );
+	m_trackLabel->setPixmap( embed::getIconPixmap( "automation" ) );
+	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
+									29 );
+	m_trackLabel->show();
+	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
+			_at, SLOT( setName( const QString & ) ) );
+	setModel( _at );
+}
+
+
+
+
+automationTrackView::~automationTrackView()
+{
+}
+
 
 
 

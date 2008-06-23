@@ -78,22 +78,6 @@ malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_filesMissing( FALSE )
 {
-	m_hardnessModel.setTrack( _instrument_track );
-	m_positionModel.setTrack( _instrument_track );
-	m_vibratoGainModel.setTrack( _instrument_track );
-	m_vibratoFreqModel.setTrack( _instrument_track );
-	m_stickModel.setTrack( _instrument_track );
-	m_modulatorModel.setTrack( _instrument_track );
-	m_crossfadeModel.setTrack( _instrument_track );
-	m_lfoSpeedModel.setTrack( _instrument_track );
-	m_lfoDepthModel.setTrack( _instrument_track );
-	m_adsrModel.setTrack( _instrument_track );
-	m_pressureModel.setTrack( _instrument_track );
-	m_motionModel.setTrack( _instrument_track );
-	m_velocityModel.setTrack( _instrument_track );
-	m_strikeModel.setTrack( _instrument_track );
-	m_spreadModel.setTrack( _instrument_track );
-	
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
 	m_scalers.append( 4.0 );

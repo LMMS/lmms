@@ -27,12 +27,10 @@
 #include "ladspa_effect.h"
 
 
-ladspaControls::ladspaControls( ladspaEffect * _eff, 
-						track * _track ) :
+ladspaControls::ladspaControls( ladspaEffect * _eff ) :
 	effectControls( _eff ),
 	m_effect( _eff ),
 	m_processors( _eff->getProcessorCount() ),
-	m_track( _track ),
 	m_noLink( FALSE ),
 	m_stereoLinkModel( TRUE, this )
 {
@@ -52,7 +50,6 @@ ladspaControls::ladspaControls( ladspaEffect * _eff,
 			if( (*it)->proc == proc )
 			{
 				(*it)->control = new ladspaControl( this, *it,
-							m_track,
 							linked_control );
 
 				last_port = (*it)->data_type;

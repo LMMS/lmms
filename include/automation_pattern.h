@@ -2,6 +2,7 @@
  * automation_pattern.h - declaration of class automationPattern, which contains
  *                        all information about an automation pattern
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -27,29 +28,29 @@
 #ifndef _AUTOMATION_PATTERN_H
 #define _AUTOMATION_PATTERN_H
 
-#include <QtCore/QObject>
+#include <QtCore/QPointer>
 
-#include "journalling_object.h"
+#include "track.h"
 
 
-class automatableModel;
+class automationTrack;
 class midiTime;
-class track;
 
 
 
-class EXPORT automationPattern : public QObject, public journallingObject
+class EXPORT automationPattern : public trackContentObject
 {
 	Q_OBJECT
 public:
 	typedef QMap<int, float> timeMap;
+	typedef QVector<QPointer<automatableModel> > objectVector;
 
-	automationPattern( track * _track, automatableModel * _object );
+	automationPattern( automationTrack * _auto_track );
 	automationPattern( const automationPattern & _pat_to_copy );
-	automationPattern( const automationPattern & _pat_to_copy,
-						automatableModel * _object );
 	virtual ~automationPattern();
 
+
+	const automatableModel * firstObject( void );
 
 	virtual midiTime length( void ) const;
 
@@ -60,7 +61,7 @@ public:
 
 	inline timeMap & getTimeMap( void )
 	{
-		return( m_time_map );
+		return( m_timeMap );
 	}
 
 	float valueAt( const midiTime & _time );
@@ -73,7 +74,7 @@ public:
 
 	static inline const QString classNodeName( void )
 	{
-		return( "automation-pattern" );
+		return( "automationpattern" );
 	}
 
 	inline virtual QString nodeName( void ) const
@@ -81,37 +82,25 @@ public:
 		return( classNodeName() );
 	}
 
-	inline const track * getTrack( void ) const
-	{
-		return( m_track );
-	}
-
-	inline const automatableModel * object( void ) const
-	{
-		return( m_object );
-	}
-
-	inline automatableModel * object( void )
-	{
-		return( m_object );
-	}
-
 	void processMidiTime( const midiTime & _time );
 
 	inline bool updateFirst( void ) const
 	{
-		return( m_update_first );
+		return( m_updateFirst );
 	}
 
 	inline void setUpdateFirst( bool _update )
 	{
-		m_update_first = _update;
+		m_updateFirst = _update;
 	}
 
-	void forgetTrack( void )
-	{
-		m_track = NULL;
-	}
+	virtual trackContentObjectView * createView( trackView * _tv );
+
+
+	static bool isAutomated( const automatableModel * _m );
+	static automationPattern * globalAutomationPattern(
+							automatableModel * _m );
+	static void resolveAllIDs( void );
 
 
 public slots:
@@ -120,14 +109,56 @@ public slots:
 
 
 private:
-	track * m_track;
-	automatableModel * m_object;
-	timeMap m_time_map;
-	bool m_update_first;
-	bool m_dynamic;
+	automationTrack * m_autoTrack;
+	QVector<jo_id_t> m_idsToResolve;
+	objectVector m_objects;
+	timeMap m_timeMap;	// actual values
+	bool m_updateFirst;	// init-value set?
+	bool m_dynamic;		// more than 1 value?
+
+
+	friend class automationPatternView;
 
 } ;
 
+
+
+class automationPatternView : public trackContentObjectView
+{
+	Q_OBJECT
+public:
+	automationPatternView( automationPattern * _pat, trackView * _parent );
+	virtual ~automationPatternView();
+
+
+public slots:
+	virtual void update( void );
+
+
+protected slots:
+	void resetName( void );
+	void changeName( void );
+
+
+protected:
+	virtual void constructContextMenu( QMenu * );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re )
+	{
+		m_needsUpdate = TRUE;
+		trackContentObjectView::resizeEvent( _re );
+	}
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+
+
+private:
+	automationPattern * m_pat;
+	QPixmap m_paintPixmap;
+	bool m_needsUpdate;
+
+} ;
 
 
 

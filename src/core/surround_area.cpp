@@ -184,14 +184,12 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 
 
 
-surroundAreaModel::surroundAreaModel( ::model * _parent, track * _track,
+surroundAreaModel::surroundAreaModel( ::model * _parent,
 						bool _default_constructed ) :
 	model( _parent, _default_constructed ),
 	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent ),
 	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent )
 {
-	m_posX.setTrack( _track );
-	m_posY.setTrack( _track );
 	connect( &m_posX, SIGNAL( dataChanged() ),
 					this, SIGNAL( dataChanged() ) );
 	connect( &m_posY, SIGNAL( dataChanged() ),
@@ -271,6 +269,7 @@ void surroundAreaModel::loadSettings( const QDomElement & _this,
 
 
 
+/*
 automationPattern * surroundAreaModel::automationPatternX( void )
 {
 	return( m_posX.getAutomationPattern() );
@@ -280,9 +279,7 @@ automationPattern * surroundAreaModel::automationPatternY( void )
 {
 	return( m_posY.getAutomationPattern() );
 }
-
-
-
+*/
 
 
 #include "surround_area.moc"

@@ -38,7 +38,6 @@
 
 class effectChain;
 class effectControls;
-class track;
 
 
 class EXPORT effect : public plugin

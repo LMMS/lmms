@@ -858,14 +858,6 @@ void patternView::update( void )
 
 void patternView::openInPianoRoll( void )
 {
-	openInPianoRoll( FALSE );
-}
-
-
-
-
-void patternView::openInPianoRoll( bool )
-{
 	engine::getPianoRoll()->setCurrentPattern( m_pat );
 	engine::getPianoRoll()->parentWidget()->show();
 	engine::getPianoRoll()->setFocus();
@@ -915,8 +907,8 @@ void patternView::constructContextMenu( QMenu * _cm )
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ), this,
-					SLOT( openInPianoRoll( bool ) ) );
+	connect( a, SIGNAL( triggered( bool ) ),
+					this, SLOT( openInPianoRoll() ) );
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();
@@ -988,7 +980,7 @@ void patternView::mouseDoubleClickEvent( QMouseEvent * _me )
 		_me->y() > height() - s_stepBtnOff->height() ) )
 	{
 		openInPianoRoll();
-	} 
+	}
 }
 
 
@@ -1136,28 +1128,20 @@ void patternView::paintEvent( QPaintEvent * )
 					/ (float) m_pat->length().getTact() :
 								pixelsPerTact();
 
-				const int x_base = TCO_BORDER_WIDTH;
-				p.setPen( QColor( 0, 0, 0 ) );
-				for( tact tact_num = 1; tact_num <
-					m_pat->length().getTact(); ++tact_num )
-				{
-					p.drawLine(
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						TCO_BORDER_WIDTH,
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						5 );
-					p.drawLine(
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						height() - ( 4 + 2 *
-							TCO_BORDER_WIDTH ),
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						height() - 2 *
-							TCO_BORDER_WIDTH );
-				}
+	const int x_base = TCO_BORDER_WIDTH;
+	p.setPen( QColor( 0, 0, 0 ) );
+
+	for( tact t = 1; t < m_pat->length().getTact(); ++t )
+	{
+		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+				TCO_BORDER_WIDTH, x_base + static_cast<int>(
+						ppt * t ) - 1, 5 );
+		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+				height() - ( 4 + 2 * TCO_BORDER_WIDTH ),
+				x_base + static_cast<int>( ppt * t ) - 1,
+				height() - 2 * TCO_BORDER_WIDTH );
+	}
+
 	if( m_pat->m_patternType == pattern::MelodyPattern )
 	{
 		int central_key = 0;
@@ -1183,20 +1167,8 @@ void patternView::paintEvent( QPaintEvent * )
 				int central_y = height() / 2;
 				int y_base = central_y + TCO_BORDER_WIDTH -1;
 
-/*				for( tact tact_num = 1; tact_num <
-					m_pat->length().getTact(); ++tact_num )
-				{
-					p.drawLine(
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						TCO_BORDER_WIDTH,
-						x_base + static_cast<int>(
-							ppt * tact_num ) - 1,
-						height() - 2 *
-							TCO_BORDER_WIDTH );
-				}*/
 				if( m_pat->getTrack()->isMuted() ||
-								m_pat->isMuted() )
+							m_pat->isMuted() )
 				{
 					p.setPen( QColor( 160, 160, 160 ) );
 				}

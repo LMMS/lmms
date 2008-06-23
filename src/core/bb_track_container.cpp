@@ -244,14 +244,13 @@ void bbTrackContainer::createTCOsForBB( int _bb )
 		return;
 	}
 
-	QList<track *> tl = tracks();
+	trackList tl = tracks();
 	for( int i = 0; i < tl.size(); ++i )
 	{
 		while( tl[i]->numOfTCOs() < _bb + 1 )
 		{
 			midiTime position = midiTime( tl[i]->numOfTCOs(), 0 );
-			trackContentObject * tco = tl[i]->addTCO(
-						tl[i]->createTCO( position ) );
+			trackContentObject * tco = tl[i]->createTCO( position );
 			tco->movePosition( position );
 			tco->changeLength( midiTime( 1, 0 ) );
 		}

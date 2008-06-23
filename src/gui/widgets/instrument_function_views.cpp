@@ -55,7 +55,7 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 chordCreatorView::chordCreatorView( chordCreator * _cc, QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_cc( _cc ),
 	m_chordsGroupBox( new groupBox( tr( "CHORDS" ), this ) ),
 	m_chordsComboBox( new comboBox( m_chordsGroupBox ) ),
@@ -108,7 +108,7 @@ void chordCreatorView::modelChanged( void )
 
 arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_a( _arp ),
 	m_arpGroupBox( new groupBox( tr( "ARPEGGIO" ), this ) ),
 	m_arpComboBox( new comboBox( m_arpGroupBox) ),

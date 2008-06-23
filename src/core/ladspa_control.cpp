@@ -1,6 +1,7 @@
 /*
  * ladspa_control.cpp - model for controlling a LADSPA port
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -28,7 +29,7 @@
 
 
 ladspaControl::ladspaControl( model * _parent, port_desc_t * _port, 
-					track * _track, bool _link ) :
+								bool _link ) :
 	model( _parent ),
 	m_link( _link ),
 	m_port( _port ),
@@ -39,7 +40,6 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 {
 	if( m_link )
 	{
-		m_linkEnabledModel.setTrack( _track );
 		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( linkStateChanged() ) );
 
@@ -48,7 +48,6 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
-			m_toggledModel.setTrack( _track );
 			connect( &m_toggledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( ledChanged() ) );
 			if( m_port->def == 1.0f )
@@ -58,7 +57,6 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 			break;
 
 		case INTEGER:
-			m_knobModel.setTrack( _track );
 			m_knobModel.setRange( static_cast<int>( m_port->max ), 
 					  static_cast<int>( m_port->min ), 
 					  1 + static_cast<int>( m_port->max - 
@@ -70,7 +68,6 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 			break;
 
 		case FLOAT:
-			m_knobModel.setTrack( _track );
 			m_knobModel.setRange( m_port->min, m_port->max,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
@@ -82,7 +79,6 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 			break;
 
 		case TIME:
-			m_tempoSyncKnobModel.setTrack( _track );
 			m_tempoSyncKnobModel.setRange( m_port->min, m_port->max, 
 					  ( m_port->max - 
 						m_port->min ) / 400.0f );

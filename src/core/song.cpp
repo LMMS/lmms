@@ -69,9 +69,11 @@ tick midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 song::song( void ) :
 	trackContainer(),
-	m_automationTrack( track::create( track::AutomationTrack, this ) ),
+	m_globalAutomationTrack( dynamic_cast<automationTrack *>(
+				track::create( track::HiddenAutomationTrack,
+								this ) ) ),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this ),
-	m_timeSigModel( this, m_automationTrack ),
+	m_timeSigModel( this ),
 	m_oldTicksPerTact( DefaultTicksPerTact ),
 	m_masterVolumeModel( 100, 0, 200, this ),
 	m_masterPitchModel( 0, -12, 12, this ),
@@ -88,7 +90,6 @@ song::song( void ) :
 	m_patternToPlay( NULL ),
 	m_loopPattern( FALSE )
 {
-	m_tempoModel.setTrack( m_automationTrack );
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
@@ -100,9 +101,6 @@ song::song( void ) :
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
-
-	m_masterVolumeModel.setTrack( m_automationTrack );
-	m_masterPitchModel.setTrack( m_automationTrack );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterVolumeChanged() ) );
@@ -119,7 +117,7 @@ song::song( void ) :
 song::~song()
 {
 	m_playing = FALSE;
-	delete m_automationTrack;
+	delete m_globalAutomationTrack;
 }
 
 
@@ -289,13 +287,13 @@ void song::processNextBuffer( void )
 		return;
 	}
 
-	QList<track *> trackList;
+	trackList track_list;
 	Sint16 tco_num = -1;
 
 	switch( m_playMode )
 	{
 		case Mode_PlaySong:
-			trackList = tracks();
+			track_list = tracks();
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
@@ -304,7 +302,7 @@ void song::processNextBuffer( void )
 			break;
 
 		case Mode_PlayTrack:
-			trackList.push_back( m_trackToPlay );
+			track_list.push_back( m_trackToPlay );
 			break;
 
 		case Mode_PlayBB:
@@ -312,7 +310,7 @@ void song::processNextBuffer( void )
 			{
 				tco_num = engine::getBBTrackContainer()->
 								currentBB();
-				trackList.push_back( bbTrack::findBBTrack(
+				track_list.push_back( bbTrack::findBBTrack(
 								tco_num ) );
 			}
 			break;
@@ -322,7 +320,7 @@ void song::processNextBuffer( void )
 			{
 				tco_num = m_patternToPlay->getTrack()->
 						getTCONum( m_patternToPlay );
-				trackList.push_back(
+				track_list.push_back(
 						m_patternToPlay->getTrack() );
 			}
 			break;
@@ -332,7 +330,7 @@ void song::processNextBuffer( void )
 
 	}
 
-	if( trackList.empty() == TRUE )
+	if( track_list.empty() == TRUE )
 	{
 		return;
 	}
@@ -441,15 +439,16 @@ void song::processNextBuffer( void )
 		{
 			if( m_playMode == Mode_PlaySong )
 			{
-				m_automationTrack->play( m_playPos[m_playMode],
+				m_globalAutomationTrack->play(
+						m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}
 
 			// loop through all tracks and play them
-			for( int i = 0; i < trackList.size(); ++i )
+			for( int i = 0; i < track_list.size(); ++i )
 			{
-				trackList[i]->play( m_playPos[m_playMode],
+				track_list[i]->play( m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}
@@ -543,10 +542,10 @@ void song::playPattern( pattern * _patternToPlay, bool _loop )
 void song::updateLength( void )
 {
 	m_length = 0;
-	const QList<track *> & ctl = tracks();
-	for( int i = 0; i < ctl.size(); ++i )
+	for( trackList::const_iterator it = tracks().begin();
+						it != tracks().end(); ++it )
 	{
-		const tact cur = ctl[i]->length();
+		const tact cur = ( *it )->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -617,10 +616,10 @@ void song::stopExport( void )
 
 void song::insertBar( void )
 {
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	for( trackList::iterator it = tracks().begin();
+					it != tracks().end(); ++it )
 	{
-		tl[i]->insertTact( m_playPos[Mode_PlaySong] );
+		( *it )->insertTact( m_playPos[Mode_PlaySong] );
 	}
 }
 
@@ -629,10 +628,10 @@ void song::insertBar( void )
 
 void song::removeBar( void )
 {
-	QList<track *> tl = tracks();
-	for( int i = 0; i < tl.size(); ++i )
+	for( trackList::iterator it = tracks().begin();
+					it != tracks().end(); ++it )
 	{
-		tl[i]->removeTact( m_playPos[Mode_PlaySong] );
+		( *it )->removeTact( m_playPos[Mode_PlaySong] );
 	}
 }
 
@@ -657,6 +656,14 @@ void song::addSampleTrack( void )
 
 
 
+void song::addAutomationTrack( void )
+{
+	(void) track::create( track::AutomationTrack, this );
+}
+
+
+
+
 bpm_t song::getTempo( void )
 {
 	return( m_tempoModel.value() );
@@ -667,7 +674,7 @@ bpm_t song::getTempo( void )
 
 automationPattern * song::tempoAutomationPattern( void )
 {
-	return( m_tempoModel.getAutomationPattern() );
+	return( automationPattern::globalAutomationPattern( &m_tempoModel ) );
 }
 
 
@@ -705,9 +712,11 @@ void song::clearProject( void )
 	{
 		engine::getAutomationEditor()->setCurrentPattern( NULL );
 	}
-	m_tempoModel.getAutomationPattern()->clear();
-	m_masterVolumeModel.getAutomationPattern()->clear();
-	m_masterPitchModel.getAutomationPattern()->clear();
+	automationPattern::globalAutomationPattern( &m_tempoModel )->clear();
+	automationPattern::globalAutomationPattern( &m_masterVolumeModel )->
+									clear();
+	automationPattern::globalAutomationPattern( &m_masterPitchModel )->
+									clear();
 
 	engine::getMixer()->unlock();
 
@@ -907,15 +916,17 @@ void song::loadProject( const QString & _file_name )
 		node = node.nextSibling();
 	}
 
-	engine::getMixer()->unlock();
-
 	// Connect controller links to their controllers 
 	// now that everything is loaded
 	controllerConnection::finalizeConnections();
 
-	configManager::inst()->addRecentlyOpenedProject( _file_name );
+	// resolve all IDs so that autoModels are automated
+	automationPattern::resolveAllIDs();
 
-	QCoreApplication::instance()->processEvents();
+
+	engine::getMixer()->unlock();
+
+	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
 	engine::getProjectJournal()->setJournalling( TRUE );
 

@@ -36,7 +36,7 @@
 
 midiPort::midiPort( const QString & _name, midiClient * _mc,
 			midiEventProcessor * _mep, model * _parent,
-					track * _track, Modes _mode ) :
+							Modes _mode ) :
 	model( _parent ),
 	m_readablePortsMenu( NULL ),
 	m_writablePortsMenu( NULL ),
@@ -60,11 +60,6 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 					tr( "Default output velocity" ) )
 {
 	m_midiClient->addPort( this );
-
-	m_inputChannelModel.setTrack( _track );
-	m_outputChannelModel.setTrack( _track );
-	m_defaultVelocityInEnabledModel.setTrack( _track );
-	m_defaultVelocityOutEnabledModel.setTrack( _track );
 
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
 	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );

@@ -42,13 +42,14 @@ midiController::midiController( model * _parent ) :
 	controller( MidiController, _parent ),
 	midiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			engine::getMixer()->getMIDIClient(), this,
-					this, NULL, midiPort::Input ),
+			engine::getMixer()->getMIDIClient(), this, this,
+							midiPort::Input ),
 	m_lastValue( 0.0f )
 {
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
 			this, SLOT( updateName() ) );
 }
+
 
 
 

@@ -40,7 +40,6 @@ class effectControlDialog;
 class knob;
 class ledCheckBox;
 class tempoSyncKnob;
-class track;
 
 
 class effectView : public pluginView

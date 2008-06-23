@@ -42,7 +42,7 @@ using namespace std;
 graph::graph( QWidget * _parent, graphStyle _style ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */ 
-	modelView( new graphModel( -1.0, 1.0, 128, NULL, NULL, TRUE ) ),
+	modelView( new graphModel( -1.0, 1.0, 128, NULL, TRUE ), this ),
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;
@@ -343,8 +343,7 @@ void graph::updateGraph( void )
 
 
 graphModel::graphModel( float _min, float _max, Uint32 _length,
-		::model * _parent, track * _track,
-		bool _default_constructed ) :
+			::model * _parent, bool _default_constructed ) :
 	model( _parent, _default_constructed ),
 	m_samples( _length ),
 	m_minValue( _min ),

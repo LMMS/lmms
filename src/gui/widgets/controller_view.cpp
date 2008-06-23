@@ -47,7 +47,7 @@
 
 controllerView::controllerView( controller * _model, QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( _model ),
+	modelView( _model, this ),
 	m_bg( embed::getIconPixmap( "controller_bg" ) ),
 	m_subWindow( NULL ),
 	m_controllerDlg( NULL ),

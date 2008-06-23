@@ -351,8 +351,6 @@ bbTrack::~bbTrack()
 bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 				const f_cnt_t _offset, Sint16 _tco_num )
 {
-	sendMidiTime( _start );
-
 	if( _tco_num >= 0 )
 	{
 		return( engine::getBBTrackContainer()->play( _start, _frames,
@@ -360,7 +358,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 							s_infoMap[this] ) );
 	}
 
-	QList<trackContentObject *> tcos;
+	tcoVector tcos;
 	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames /
 						engine::framesPerTick() ) );
 
@@ -371,8 +369,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 
 	midiTime lastPosition;
 	midiTime lastLen;
-	for( QList<trackContentObject *>::iterator it = tcos.begin();
-							it != tcos.end(); ++it )
+	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
 				( *it )->startPosition() >= lastPosition )
@@ -409,7 +406,7 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 	// if we're creating a new bbTCO, we colorize it according to the
 	// previous bbTCO, so we have to get all TCOs from 0 to _pos and
 	// pickup the last and take the color if it
-	QList<trackContentObject *> tcos;
+	tcoVector tcos;
 	getTCOsInRange( tcos, 0, _pos );
 	if( tcos.size() > 0 && dynamic_cast<bbTCO *>( tcos.back() ) != NULL )
 	{
@@ -439,19 +436,6 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 		( (journallingObject *)( engine::getBBTrackContainer() ) )->
 						saveState( _doc, _this );
 	}
-
-	int track_num = 0;
-	QList<track *> tracks = engine::getBBTrackContainer()->tracks();
-	for( int i = 0; i < tracks.size(); ++i, ++track_num )
-	{
-		if( automationDisabled( tracks[i] ) )
-		{
-			QDomElement disabled = _doc.createElement(
-							"automation-disabled" );
-			disabled.setAttribute( "track", track_num );
-			_this.appendChild( disabled );
-		}
-	}
 }
 
 
@@ -479,19 +463,6 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		engine::getBBEditor()->setCurrentBB( s_infoMap[this] );
 	}*/
-
-	QList<track *> tracks = engine::getBBTrackContainer()->tracks();
-	node = _this.firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement()
-				&& node.nodeName() == "automation-disabled" )
-		{
-			disableAutomation( tracks[node.toElement().attribute(
-							"track" ).toInt()] );
-		}
-		node = node.nextSibling();
-	}
 }
 
 

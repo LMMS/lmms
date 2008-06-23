@@ -36,11 +36,7 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
-//class controllerControlDialog;
-//class knob;
 class ledCheckBox;
-//class tempoSyncKnob;
-//class track;
 
 
 class controllerView : public QWidget, public modelView
@@ -50,7 +46,7 @@ public:
 	controllerView( controller * _controller, QWidget * _parent );
 	virtual ~controllerView();
 	
-    inline controller * getController( void )
+	inline controller * getController( void )
 	{
 		return( castModel<controller>() );
 	}

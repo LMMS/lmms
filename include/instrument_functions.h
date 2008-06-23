@@ -44,7 +44,7 @@ class chordCreator : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	chordCreator( instrumentTrack * _instrument_track );
+	chordCreator( model * _parent );
 	virtual ~chordCreator();
 
 	void processNote( notePlayHandle * _n );
@@ -103,7 +103,7 @@ public:
 		NumArpDirections
 	} ;
 
-	arpeggiator( instrumentTrack * _instrument_track );
+	arpeggiator( model * _parent );
 	virtual ~arpeggiator();
 
 	void processNote( notePlayHandle * _n );

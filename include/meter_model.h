@@ -34,7 +34,7 @@ class meterModel : public model
 	mapPropertyFromModel(int,getNumerator,setNumerator,m_numeratorModel);
 	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
-	meterModel( ::model * _parent, track * _track );
+	meterModel( ::model * _parent );
 	~meterModel();
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,

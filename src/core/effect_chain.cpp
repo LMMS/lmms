@@ -29,15 +29,13 @@
 #include "effect_chain.h"
 #include "effect.h"
 #include "engine.h"
-#include "track.h"
 #include "debug.h"
 
 
 
 
-effectChain::effectChain( track * _track ) :
-	model( _track ),
-	m_track( _track ),
+effectChain::effectChain( model * _parent ) :
+	model( _parent ),
 	m_enabledModel( FALSE )
 {
 }
@@ -111,18 +109,15 @@ void effectChain::loadSettings( const QDomElement & _this )
 
 
 
-
 void effectChain::appendEffect( effect * _effect )
 {
 	engine::getMixer()->lock();
-	_effect->m_enabledModel.setTrack( m_track );
-	_effect->m_wetDryModel.setTrack( m_track );
-	_effect->m_gateModel.setTrack( m_track );
-	_effect->m_autoQuitModel.setTrack( m_track );
 	m_effects.append( _effect );
 	engine::getMixer()->unlock();
+
 	emit dataChanged();
 }
+
 
 
 

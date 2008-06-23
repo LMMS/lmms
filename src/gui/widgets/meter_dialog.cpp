@@ -34,7 +34,7 @@
 
 meterDialog::meterDialog( QWidget * _parent, bool _simple ) :
 	QWidget( _parent ),
-	modelView( NULL )
+	modelView( NULL, this )
 {
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );

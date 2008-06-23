@@ -152,6 +152,8 @@ public:
 
 
 protected:
+	void changeID( jo_id_t _id );
+
 	void addJournalEntry( const journalEntry & _je );
 
 	// to be implemented by sub-objects

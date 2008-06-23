@@ -30,7 +30,6 @@
 #include "effect.h"
 
 
-class track;
 class effectControlDialog;
 
 

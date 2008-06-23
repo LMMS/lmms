@@ -65,7 +65,7 @@ plugin::descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 
 
 
-oscillatorObject::oscillatorObject( model * _parent, track * _track, int _idx ) :
+oscillatorObject::oscillatorObject( model * _parent, int _idx ) :
 	model( _parent ),
 	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS, MinVolume,
 			MaxVolume, 1.0f, this, tr( "Osc %1 volume" ).arg( _idx+1 ) ),
@@ -96,16 +96,6 @@ oscillatorObject::oscillatorObject( model * _parent, track * _track, int _idx ) 
 	m_phaseOffsetLeft( 0.0f ),
 	m_phaseOffsetRight( 0.0f )
 {
-	m_volumeModel.setTrack( _track );
-	m_panModel.setTrack( _track );
-	m_coarseModel.setTrack( _track );
-	m_fineLeftModel.setTrack( _track );
-	m_fineRightModel.setTrack( _track );
-	m_phaseOffsetModel.setTrack( _track );
-	m_stereoPhaseDetuningModel.setTrack( _track );
-	m_waveShapeModel.setTrack( _track );
-	m_modulationAlgoModel.setTrack( _track );
-
 	// Connect knobs with oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
 					this, SLOT( updateVolume() ) );
@@ -225,7 +215,7 @@ tripleOscillator::tripleOscillator( instrumentTrack * _instrument_track ) :
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
-		m_osc[i] = new oscillatorObject( this, _instrument_track, i );
+		m_osc[i] = new oscillatorObject( this, i );
 
 	}
 

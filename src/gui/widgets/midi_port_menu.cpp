@@ -30,7 +30,7 @@
 
 
 midiPortMenu::midiPortMenu( midiPort::Modes _mode ) :
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_mode( _mode )
 {
 	setFont( pointSize<9>( font() ) );

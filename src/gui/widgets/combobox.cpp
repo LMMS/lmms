@@ -39,6 +39,7 @@
 #include "caption_menu.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "main_window.h"
 
 
 QPixmap * comboBox::s_background = NULL;
@@ -50,7 +51,7 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new comboBoxModel ),
+	intModelView( new comboBoxModel, this ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {
@@ -94,7 +95,7 @@ comboBox::~comboBox()
 
 void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 {
-	if( model()->nullTrack() || _me->x() <= width() - CB_ARROW_BTN_WIDTH )
+	if( _me->x() <= width() - CB_ARROW_BTN_WIDTH )
 	{
 		QWidget::contextMenuEvent( _me );
 		return;
@@ -110,49 +111,54 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 
 void comboBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
+	if( _me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isCtrlPressed() == FALSE )
 	{
-		if( _me->button() == Qt::RightButton )
+		if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
 		{
-			return;
-		}
+			m_pressed = TRUE;
+			update();
 
-		m_pressed = TRUE;
-		update();
-
-		m_menu.clear();
-		for( int i = 0; i < model()->size(); ++i )
-		{
-			QAction * a = m_menu.addAction(
-				model()->itemPixmap( i ) ?
-					model()->itemPixmap( i )->pixmap() :
-							QPixmap(),
+			m_menu.clear();
+			for( int i = 0; i < model()->size(); ++i )
+			{
+				QAction * a = m_menu.addAction(
+					model()->itemPixmap( i ) ?
+						model()->itemPixmap( i )->
+							pixmap() :
+								QPixmap(),
 						model()->itemText( i ) );
-			a->setData( i );
-		}
+				a->setData( i );
+			}
 
-		QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
-		if( gpos.y() + m_menu.sizeHint().height() <
+			QPoint gpos = mapToGlobal( QPoint( 0, height() ) );
+			if( gpos.y() + m_menu.sizeHint().height() <
 						qApp->desktop()->height() )
-		{
-			m_menu.exec( gpos );
+			{
+				m_menu.exec( gpos );
+			}
+			else
+			{
+				m_menu.exec( mapToGlobal(
+						QPoint( width(), 0 ) ) );
+			}
+			m_pressed = FALSE;
+			update();
 		}
-		else
+		else if( _me->button() == Qt::LeftButton )
 		{
-			m_menu.exec( mapToGlobal( QPoint( width(), 0 ) ) );
+			model()->setInitValue( model()->value() + 1 );
+			update();
 		}
-		m_pressed = FALSE;
-		update();
-	}
-	else if( _me->button() == Qt::LeftButton )
-	{
-		model()->setInitValue( model()->value() + 1 );
-		update();
 	}
 	else if( _me->button() == Qt::RightButton )
 	{
 		model()->setInitValue( model()->value() - 1 );
 		update();
+	}
+	else
+	{
+		automatableModelView::mousePressEvent( _me );
 	}
 }
 

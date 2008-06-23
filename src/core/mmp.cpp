@@ -641,6 +641,16 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
+	if( version < "0.4.0-svn20080622" )
+	{
+		QDomNodeList list = elementsByTagName( "automation-pattern" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			el.setTagName( "automationpattern" );
+		}
+	}
+
 
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )

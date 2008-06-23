@@ -48,7 +48,7 @@ const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
 
 instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_ss( NULL )
 {
 	m_targetsTabWidget = new tabWidget( tr( "TARGET" ), this );

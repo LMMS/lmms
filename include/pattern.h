@@ -48,8 +48,6 @@ class sampleBuffer;
 
 
 
-
-
 class EXPORT pattern : public trackContentObject
 {
 	Q_OBJECT
@@ -78,7 +76,7 @@ public:
 						const bool _quant_pos = TRUE );
 
 	void clearNotes( void );
-	
+
 	inline const noteVector & notes( void )
 	{
 		return( m_notes );
@@ -111,7 +109,7 @@ public:
 	{
 		return( m_freezing );
 	}
-	
+
 	inline bool frozen( void ) const
 	{
 		return( m_frozenPattern != NULL );
@@ -197,7 +195,6 @@ public slots:
 
 
 protected slots:
-	void openInPianoRoll( bool _c );
 	void openInPianoRoll( void );
 
 	void resetName( void );

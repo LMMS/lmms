@@ -60,7 +60,7 @@ textFloat * knob::s_textFloat = NULL;
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	floatModelView( new knobModel( 0, 0, 0, 1, NULL, _name, TRUE ) ),
+	floatModelView( new knobModel( 0, 0, 0, 1, NULL, _name, TRUE ), this ),
 	m_knobNum( _knob_num ),
 	m_label( "" ),
 	m_knobPixmap( NULL ),
@@ -74,8 +74,6 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	{
 		s_textFloat = new textFloat;
 	}
-
-	setAcceptDrops( TRUE );
 
 	setAccessibleName( _name );
 	
@@ -404,7 +402,7 @@ void knob::contextMenuEvent( QContextMenuEvent * )
 void knob::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "float_value,"
-								"link_object" );
+							"automatable_model" );
 }
 
 
@@ -419,7 +417,7 @@ void knob::dropEvent( QDropEvent * _de )
 		model()->setValue( val.toFloat() );
 		_de->accept();
 	}
-	else if( type == "link_object" )
+	else if( type == "automatable_model" )
 	{
 		automatableModel * mod = dynamic_cast<automatableModel *>(
 				engine::getProjectJournal()->
@@ -456,23 +454,15 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == TRUE/* &&
-			engine::getMainWindow()->isShiftPressed() == FALSE*/ )
+			engine::getMainWindow()->isShiftPressed() == TRUE )
 	{
 		new stringPairDrag( "float_value",
 					QString::number( model()->value() ),
 							QPixmap(), this );
 	}
-	else if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isShiftPressed() == TRUE )
+	else
 	{
-		new stringPairDrag( "link_object",
-					QString::number( model()->id() ),
-							QPixmap(), this );
-	}
-	else if( _me->button() == Qt::MidButton )
-	{
-		model()->reset();
+		automatableModelView::mousePressEvent( _me );
 	}
 }
 
@@ -498,10 +488,7 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
 	model()->addJournalEntryFromOldToCurVal();
 
-	if( m_buttonPressed )
-	{
-		m_buttonPressed = TRUE;
-	}
+	m_buttonPressed = FALSE;
 
 	m_mouseOffset = 0;
 	emit sliderReleased();

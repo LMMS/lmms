@@ -70,7 +70,6 @@ public:
 			midiClient * _mc,
 			midiEventProcessor * _mep,
 			model * _parent = NULL,
-			track * _track = NULL,
 			Modes _mode = Disabled );
 	virtual ~midiPort();
 

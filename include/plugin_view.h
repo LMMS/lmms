@@ -36,7 +36,7 @@ class EXPORT pluginView  : public QWidget, public modelView
 public:
 	pluginView( plugin * _plugin, QWidget * _parent ) :
 		QWidget( _parent ),
-		modelView( _plugin )
+		modelView( _plugin, this )
 	{
 	}
 

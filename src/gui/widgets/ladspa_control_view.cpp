@@ -36,7 +36,7 @@
 ladspaControlView::ladspaControlView( QWidget * _parent,
 						ladspaControl * _ctl ) :
 	QWidget( _parent ),
-	modelView( _ctl ),
+	modelView( _ctl, this ),
 	m_ctl( _ctl )
 {
 	QHBoxLayout * layout = new QHBoxLayout( this );

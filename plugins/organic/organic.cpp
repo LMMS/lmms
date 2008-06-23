@@ -73,8 +73,8 @@ QPixmap * organicInstrumentView::s_artwork = NULL;
 ***********************************************************************/
 
 
-organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &organic_plugin_descriptor ),
+organicInstrument::organicInstrument( instrumentTrack * _instrument_track ) :
+	instrument( _instrument_track, &organic_plugin_descriptor ),
 	m_modulationAlgo( oscillator::SignalMix ),
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
@@ -84,7 +84,7 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 	m_osc = new oscillatorObject*[ m_numOscillators ];
 	for (int i=0; i < m_numOscillators; i++)
 	{
-		m_osc[i] = new oscillatorObject( this, _channel_track, i );
+		m_osc[i] = new oscillatorObject( this, i );
 		m_osc[i]->m_numOscillators = m_numOscillators;
 
 		// Connect events 
@@ -97,11 +97,6 @@ organicInstrument::organicInstrument( instrumentTrack * _channel_track ) :
 		connect( &m_osc[i]->m_detuneModel, SIGNAL( dataChanged() ),
 				m_osc[i], SLOT( updateDetuning() ) );
 
-		m_osc[i]->m_oscModel.setTrack( _channel_track );
-		m_osc[i]->m_volModel.setTrack( _channel_track );
-		m_osc[i]->m_panModel.setTrack( _channel_track );
-		m_osc[i]->m_detuneModel.setTrack( _channel_track );
-		
 		m_osc[i]->updateVolume();
 
 	}
@@ -498,7 +493,7 @@ void organicInstrumentView::modelChanged( void )
 
 
 
-oscillatorObject::oscillatorObject( model * _parent, track * _track, int _index ) :
+oscillatorObject::oscillatorObject( model * _parent, int _index ) :
 	model( _parent ),
 	m_waveShape( oscillator::SineWave, 0, oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,

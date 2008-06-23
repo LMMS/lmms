@@ -36,7 +36,7 @@
 class audioPort
 {
 public:
-	audioPort( const QString & _name, track * _track );
+	audioPort( const QString & _name );
 	~audioPort();
 
 	inline sampleFrame * firstBuffer( void )

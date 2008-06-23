@@ -43,7 +43,7 @@
 
 instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_rpBtn( NULL ),
 	m_wpBtn( NULL )
 {

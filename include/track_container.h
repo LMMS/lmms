@@ -31,15 +31,16 @@
 #include "journalling_object.h"
 
 
-class trackContainerView;
+class automationPattern;
 class instrumentTrack;
+class trackContainerView;
 
 
 class EXPORT trackContainer : public model, public journallingObject
 {
 	Q_OBJECT
 public:
-	typedef QList<track *> trackList;
+	typedef QVector<track *> trackList;
 
 	trackContainer( void );
 	virtual ~trackContainer();
@@ -62,6 +63,11 @@ public:
 	void removeTrack( track * _track );
 
 	void clearAllTracks( void );
+
+	trackList & tracks( void )
+	{
+		return( m_tracks );
+	}
 
 	const trackList & tracks( void ) const
 	{

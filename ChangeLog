@@ -1,3 +1,113 @@
+2008-06-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/ladspa_effect/ladspa_controls.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/lb302/lb302.cpp:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/effect.h:
+	* include/meter_model.h:
+	* include/track.h:
+	* include/automatable_model.h:
+	* include/instrument_functions.h:
+	* include/ladspa_control.h:
+	* include/audio_port.h:
+	* include/automation_pattern.h:
+	* include/effect_view.h:
+	* include/graph.h:
+	* include/song.h:
+	* include/pattern.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/song_editor.h:
+	* include/journalling_object.h:
+	* include/automatable_model_view.h:
+	* include/surround_area.h:
+	* include/mv_base.h:
+	* include/controller_view.h:
+	* include/effect_controls.h:
+	* include/midi_port.h:
+	* include/automation_editor.h:
+	* include/effect_chain.h:
+	* include/automation_track.h:
+	* include/track_container.h:
+	* include/plugin_view.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/track_container_view.cpp:
+	* src/gui/controller_dialog.cpp:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/effect_control_dialog.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/ladspa_control_view.cpp:
+	* src/gui/widgets/graph.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/midi_port_menu.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	* src/gui/widgets/instrument_sound_shaping_view.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/gui/widgets/meter_dialog.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/project_journal.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/song.cpp:
+	* src/core/track_container.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/journalling_object.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/audio/audio_port.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mmp.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/meter_model.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/track.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/note.cpp:
+	* src/core/piano.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/mv_base.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/fx_mixer.cpp:
+	* data/themes/default/add_automation.png:
+	- completely new automation-system with automation-tracks and
+	  automation-patterns as well as song-global automation
+	- made modelView take a QWidget-pointer argument
+	- trackContentObject-ctor now calls track::addTCO() directly
+	- optimize various loops to use iterators/const_iterators instead of
+	  a running index variable
+	- drag'n'drop doesn't fool around with pointers anymore - instead use
+	  unique journalling-IDs
+	- moved drag'n'drop handling code from knob to automatableModelView so
+	  that all controls can benefit from that
+
 2008-06-23	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/lfo_controller.h:
@@ -10,7 +120,8 @@
 	* data/themes/default/lfo_x1_active.png:
 	* data/themes/default/lfo_x1_inactive.png:
 	Add multiplier to lfo-controller and fix tempo-sync knob.  Breaks old
-	projects that use LFO, but shouldn't matter since 0.4 hasn't been released
+	projects that use LFO, but shouldn't matter since 0.4 hasn't been
+	released
 
 	* src/gui/widgets/tempo_sync_knob.cpp:
 	Allow tempo-sync knob to work with ranges other than [0..1]

@@ -43,7 +43,7 @@
 
 controllerRackView::controllerRackView( ) :
 	QWidget(),
-	modelView( NULL )
+	modelView( NULL, this )
 {
 	setFixedSize( 250, 250 );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );

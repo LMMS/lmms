@@ -122,7 +122,7 @@ jo_id_t projectJournal::allocID( journallingObject * _obj )
 void projectJournal::reallocID( const jo_id_t _id, journallingObject * _obj )
 {
 	//printf("realloc %d %d\n", _id, _obj );
-	if( m_joIDs.contains( _id ) )
+//	if( m_joIDs.contains( _id ) )
 	{
 		m_joIDs[_id] = _obj;
 	}

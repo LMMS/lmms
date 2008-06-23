@@ -3,7 +3,7 @@
 /*
  * note.cpp - implementation of class note
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -239,7 +239,8 @@ void note::redoStep( journalEntry & _je )
 
 void note::editDetuningPattern( void )
 {
-	m_detuning->getAutomationPattern()->openInAutomationEditor();
+#warning: TODO
+//	m_detuning->getAutomationPattern()->openInAutomationEditor();
 }
 
 
@@ -247,8 +248,9 @@ void note::editDetuningPattern( void )
 
 void note::createDetuning( void )
 {
+#warning: TODO
 	m_detuning = new detuningHelper;
-	m_detuning->initAutomationPattern();
+//	m_detuning->initAutomationPattern();
 	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
 }
 
@@ -257,9 +259,11 @@ void note::createDetuning( void )
 
 bool note::hasDetuningInfo( void )
 {
-	automationPattern::timeMap map =
+#warning: TODO
+/*	automationPattern::timeMap map =
 			m_detuning->getAutomationPattern()->getTimeMap();
-	return( map.size() > 1 || map[0] != 0 );
+	return( map.size() > 1 || map[0] != 0 );*/
+	return( FALSE );
 }
 
 

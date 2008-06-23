@@ -106,7 +106,7 @@ private:
 
 fxMixerView::fxMixerView() :
 	QWidget(),
-	modelView( NULL )
+	modelView( NULL, this )
 {
 	fxMixer * m = engine::getFxMixer();
 

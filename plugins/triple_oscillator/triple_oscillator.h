@@ -46,7 +46,7 @@ class oscillatorObject : public model
 {
 	Q_OBJECT
 public:
-	oscillatorObject( model * _parent, track * _track, int _idx );
+	oscillatorObject( model * _parent, int _idx );
 	virtual ~oscillatorObject();
 
 

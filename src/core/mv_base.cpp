@@ -36,25 +36,25 @@ QString model::fullDisplayName( void ) const
 	const QString & n = displayName();
 	if( parentModel() ) 
 	{
-		if( !n.isEmpty() )
+		const QString p = parentModel()->fullDisplayName();
+		if( n.isEmpty() && p.isEmpty() )
 		{
-			return parentModel()->fullDisplayName() + ": " + n;
+			return QString::null;
 		}
-		else
+		else if( p.isEmpty() )
 		{
-			return parentModel()->fullDisplayName();
+			return( n );
 		}
+		return p  + ">" + n;
 	}
-	else
-	{
-		return n;
-	}
+	return n;
 }
 
 
 
 
-modelView::modelView( model * _model ) :
+modelView::modelView( model * _model, QWidget * _this ) :
+	m_widget( _this ),
 	m_model( _model )
 {
 }
@@ -64,9 +64,6 @@ modelView::modelView( model * _model ) :
 
 void modelView::setModel( model * _model, bool _old_model_valid )
 {
-	QWidget * w = dynamic_cast<QWidget *>( this );
-	assert( w != NULL );
-
 	if( _old_model_valid && m_model != NULL )
 	{
 		if( m_model->defaultConstructed() )
@@ -75,14 +72,14 @@ void modelView::setModel( model * _model, bool _old_model_valid )
 		}
 		else
 		{
-			m_model->disconnect( w );
+			m_model->disconnect( widget() );
 		}
 	}
 	m_model = _model;
 
 	doConnections();
 
-	w->update();
+	widget()->update();
 
 	modelChanged();
 }
@@ -94,13 +91,13 @@ void modelView::doConnections( void )
 {
 	if( m_model != NULL )
 	{
-		QWidget * w = dynamic_cast<QWidget *>( this );
 		QObject::connect( m_model, SIGNAL( dataChanged() ),
-				w, SLOT( update() ),
-				Qt::QueuedConnection );
+					widget(), SLOT( update() ),
+						Qt::QueuedConnection );
 
 		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
-				w, SLOT( update() ), Qt::QueuedConnection );
+					widget(), SLOT( update() ),
+						Qt::QueuedConnection );
 	}
 }
 

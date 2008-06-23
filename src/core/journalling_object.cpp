@@ -138,6 +138,26 @@ void journallingObject::addJournalEntry( const journalEntry & _je )
 
 
 
+void journallingObject::changeID( jo_id_t _id )
+{
+	if( id() != _id )
+	{
+		if( engine::getProjectJournal()->getJournallingObject( _id )
+								!= NULL )
+		{
+			printf( "JO-ID %d already in use by another "
+							"object!\n", _id );
+			return;
+		}
+		engine::getProjectJournal()->forgetAboutID( id() );
+		engine::getProjectJournal()->reallocID( _id, this );
+		m_id = _id;
+	}
+}
+
+
+
+
 void journallingObject::saveJournal( QDomDocument & _doc,
 							QDomElement & _parent )
 {
@@ -181,12 +201,7 @@ void journallingObject::loadJournal( const QDomElement & _this )
 		return;
 	}
 
-	if( id() != new_id )
-	{
-		engine::getProjectJournal()->forgetAboutID( id() );
-		engine::getProjectJournal()->reallocID( new_id, this );
-		m_id = new_id;
-	}
+	changeID( new_id );
 
 	m_journalEntries.resize( _this.attribute( "entries" ).toInt() );
 

@@ -182,7 +182,8 @@ invalid_format:
 	automationPattern * tap = _tc->tempoAutomationPattern();
 	if( tap != NULL )
 	{
-		tap->object()->setValue( 120 );
+#warning BLAH
+//		tap->firstObject()->setValue( 120 );
 		tap->putValue( 0, 120 );
 	}
 

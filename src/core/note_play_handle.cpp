@@ -39,7 +39,7 @@
 inline notePlayHandle::baseDetuning::baseDetuning(
 						detuningHelper * _detuning ) :
 	m_detuning( _detuning ),
-	m_value( m_detuning->getAutomationPattern()->valueAt( 0 ) )
+	m_value( /*m_detuning->getAutomationPattern()->valueAt( 0 )*/ 0 )
 {
 }
 
@@ -451,13 +451,14 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	if( _time >= pos() )
 	{
-		float v = detuning()->getAutomationPattern()->valueAt( _time -
+#warning: TODO
+/*		float v = detuning()->getAutomationPattern()->valueAt( _time -
 									pos() );
 		if( v != m_base_detuning->value() )
 		{
 			m_base_detuning->setValue( v );
 			updateFrequency();
-		}
+		}*/
 	}
 }
 

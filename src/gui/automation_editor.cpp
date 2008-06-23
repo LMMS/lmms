@@ -4,6 +4,7 @@
  * automation_editor.cpp - implementation of automationEditor which is used for
  *                         actual setting of dynamic values
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -391,9 +392,9 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 		return;
 	}
 
-	m_minLevel = m_pattern->object()->minValue<float>();
-	m_maxLevel = m_pattern->object()->maxValue<float>();
-	m_step = m_pattern->object()->step<float>();
+	m_minLevel = m_pattern->firstObject()->minValue<float>();
+	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
+	m_step = m_pattern->firstObject()->step<float>();
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
@@ -674,9 +675,9 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				// and check whether the user clicked on an
 				// existing value
-				if( pos_ticks >= -it.key() &&
+				if( pos_ticks >= it.key() &&
 					len > 0 &&
-					pos_ticks <= -it.key() + len &&
+					pos_ticks <= it.key() + len &&
 					it.value() == level )
 				{
 					break;
@@ -702,13 +703,13 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 					// reset it so that it can be used for
 					// ops (move, resize) after this
 					// code-block
-					it = time_map.find( -new_time );
+					it = time_map.find( new_time );
 				}
 
 				// move it
 				m_action = MOVE_VALUE;
 				int aligned_x = (int)( (float)( (
-						-it.key() -
+						it.key() -
 						m_currentPosition ) *
 						m_ppt ) / DefaultTicksPerTact );
 				m_moveXOffset = x - aligned_x - 1;
@@ -726,7 +727,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 				if( it != time_map.end() )
 				{
-					m_pattern->removeValue( -it.key() );
+					m_pattern->removeValue( it.key() );
 					engine::getSong()->setModified();
 				}
 			}
@@ -859,8 +860,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				// and check whether the cursor is over an
 				// existing value
-				if( pos_ticks >= -it.key() &&
-			    		pos_ticks <= -it.key() +
+				if( pos_ticks >= it.key() &&
+			    		pos_ticks <= it.key() +
 							//TODO: Add constant
 						4 && it.value() == level )
 				{
@@ -938,10 +939,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 
-			m_selectedTick = pos_ticks -
-							m_selectStartTick;
-			if( (int) m_selectStartTick + m_selectedTick <
-									0 )
+			m_selectedTick = pos_ticks - m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick < 0 )
 			{
 				m_selectedTick = -static_cast<int>(
 							m_selectStartTick );
@@ -1031,11 +1030,12 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					it != m_selValuesForMove.end(); ++it )
 			{
 				midiTime new_value_pos;
-				if( -it.key() )
+				if( it.key() )
 				{
-					int value_tact = ( -it.key() >> 6 )
+#warning broken time-sigs
+					int value_tact = ( it.key() >> 6 )
 								+ tact_diff;
-					int value_ticks = ( -it.key() & 63 )
+					int value_ticks = ( it.key() & 63 )
 							+ ticks_diff;
 					// ensure value_ticks range
 					if( value_ticks >> 6 )
@@ -1044,12 +1044,12 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 									>> 6;
 						value_ticks &= 63;
 					}
-					m_pattern->removeValue( -it.key() );
+					m_pattern->removeValue( it.key() );
 					new_value_pos = midiTime( value_tact,
 							value_ticks );
 				}
 				new_selValuesForMove[
-					-m_pattern->putValue( new_value_pos,
+					m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
 									FALSE )]
 						= it.value() + level_diff;
@@ -1190,7 +1190,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			float level[] = { m_minLevel, m_maxLevel };
 			for( int i = 0; i < 2; ++i )
 			{
-				const QString & label = m_pattern->object()
+				const QString & label = m_pattern->firstObject()
 						->displayValue( level[i] );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y[i] - font_height + 1,
@@ -1219,7 +1219,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			for( ; y >= TOP_MARGIN && level <= m_topLevel;
 				y -= printable * m_y_delta, level += printable )
 			{
-				const QString & label = m_pattern->object()
+				const QString & label = m_pattern->firstObject()
 							->displayValue( level );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y - font_height + 1,
@@ -1334,15 +1334,14 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	if( validPattern() == TRUE )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
-		timeMap::iterator it = time_map.end();
+		timeMap::iterator it = time_map.begin();
 		do
 		{
-			--it;
 			Sint32 len_ticks = 4;
 
 			const float level = it.value();
 
-			Sint32 pos_ticks = -it.key();
+			Sint32 pos_ticks = it.key();
 
 			const int x = ( pos_ticks - m_currentPosition ) *
 						m_ppt / DefaultTicksPerTact;
@@ -1352,18 +1351,17 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 			}
 
 			int rect_width;
-			if( it != time_map.begin() )
+			if( it+1 != time_map.end() )
 			{
-				timeMap::iterator it_prev = it;
-				--it_prev;
-				Sint32 next_pos_ticks = -it_prev.key();
+				timeMap::iterator it_prev = it+1;
+				Sint32 next_pos_ticks = it_prev.key();
 				int next_x = ( next_pos_ticks
 					- m_currentPosition ) * m_ppt /
 							DefaultTicksPerTact;
 				// skip this value if not in visible area at all
-				if( next_x < 0 )
+				if( next_x > width() )
 				{
-					continue;
+					break;
 				}
 				rect_width = next_x - x;
 			}
@@ -1428,7 +1426,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 							is_selected );
 			}
 			else printf("not in range\n");
-		} while( it != time_map.begin() );
+			++it;
+		} while( it != time_map.end() );
 	}
 	else
 	{
@@ -1782,7 +1781,7 @@ void automationEditor::selectAll( void )
 
 	timeMap::iterator it = time_map.begin();
 	m_selectStartTick = 0;
-	m_selectedTick = -it.key() + len_ticks;
+	m_selectedTick = it.key() + len_ticks;
 	m_selectStartLevel = it.value();
 	m_selectedLevels = 1;
 
@@ -1839,7 +1838,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 		tick len_ticks = DefaultTicksPerTact / 16;
 
 		float level = it.value();
-		tick pos_ticks = -it.key();
+		tick pos_ticks = it.key();
 
 		if( level >= selLevel_start && level <= selLevel_end &&
 				pos_ticks >= sel_pos_start &&
@@ -1897,7 +1896,7 @@ void automationEditor::cutSelectedValues( void )
 					it != selected_values.end(); ++it )
 		{
 			m_valuesToCopy[it.key()] = it.value();
-			m_pattern->removeValue( -it.key() );
+			m_pattern->removeValue( it.key() );
 		}
 	}
 
@@ -1920,7 +1919,7 @@ void automationEditor::pasteValues( void )
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
 		{
-			m_pattern->putValue( -it.key() + m_currentPosition,
+			m_pattern->putValue( it.key() + m_currentPosition,
 								it.value() );
 		}
 
@@ -1950,7 +1949,7 @@ void automationEditor::deleteSelectedValues( void )
 	for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
 	{
-		m_pattern->removeValue( -it.key() );
+		m_pattern->removeValue( it.key() );
 	}
 
 	if( update_after_delete == TRUE )

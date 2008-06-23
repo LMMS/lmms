@@ -32,9 +32,6 @@
 #include "mv_base.h"
 #include "controller_connection.h"
 
-class automationPattern;
-class track;
-
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)		\
@@ -67,6 +64,8 @@ class EXPORT automatableModel : public model, public journallingObject
 {
 	Q_OBJECT
 public:
+	typedef QVector<automatableModel *> autoModelVector;
+
 	enum DataType
 	{
 		Float,
@@ -91,24 +90,7 @@ public:
 		return( __copiedValue );
 	}
 
-	automationPattern * getAutomationPattern( void );
-
-	inline void setTrack( track * _track )
-	{
-		m_track = _track;
-	}
-
-	inline bool nullTrack( void ) const
-	{
-		return( m_track == NULL );
-	}
-
-	inline track * getTrack( void ) const
-	{
-		return( m_track );
-	}
-
-	void initAutomationPattern( void );
+	bool isAutomated( void ) const;
 
 	inline controllerConnection * getControllerConnection( void ) const
 	{
@@ -212,8 +194,6 @@ public:
 
 	void addJournalEntryFromOldToCurVal( void );
 
-	void syncAutomationPattern( void );
-
 
 	QString displayValue( const float _val ) const
 	{
@@ -249,7 +229,6 @@ public slots:
 
 
 protected:
-	void setFirstValue( void );
 	virtual void redoStep( journalEntry & _je );
 	virtual void undoStep( journalEntry & _je );
 
@@ -257,6 +236,10 @@ protected:
 
 
 private:
+	void linkModel( automatableModel * _model );
+	void unlinkModel( automatableModel * _model );
+
+
 	DataType m_dataType;
 	float m_value;
 	float m_initValue;
@@ -270,22 +253,17 @@ private:
 	QString m_displayName;
 	bool m_journalEntryReady;
 
-	typedef QVector<automatableModel *> autoModelVector;
 	autoModelVector m_linkedModels;
-
-	void linkModel( automatableModel * _model );
-
-	void unlinkModel( automatableModel * _model );
-
-
 
 
 	controllerConnection * m_controllerConnection;
-	automationPattern * m_automationPattern;
-	track * m_track;
 
 
 	static float __copiedValue;
+
+
+signals:
+	void initValueChanged( float _val );
 
 } ;
 

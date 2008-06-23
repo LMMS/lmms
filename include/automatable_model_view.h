@@ -37,12 +37,8 @@ class QMenu;
 class EXPORT automatableModelView : public modelView
 {
 public:
-	automatableModelView( ::model * _model ) :
-		modelView( _model ),
-		m_description( QString::null ),
-		m_unit( QString::null )
-	{
-	}
+	automatableModelView( ::model * _model, QWidget * _this );
+	virtual ~automatableModelView();
 
 	// some basic functions for convenience
 	automatableModel * modelUntyped( void )
@@ -86,6 +82,8 @@ public:
 
 
 protected:
+	virtual void mousePressEvent( QMouseEvent * _ev );
+
 	QString m_description;
 	QString m_unit;
 
@@ -105,6 +103,8 @@ public:
 public slots:
 	void execConnectionDialog( void );
 	void removeConnection( void );
+	void editSongGlobalAutomation( void );
+
 
 protected:
 	automatableModelView * amv;
@@ -115,23 +115,23 @@ protected:
 
 
 #define generateTypedModelView(type)					\
-class EXPORT type##ModelView : public automatableModelView			\
-{\
-public:\
-	type##ModelView( ::model * _model ) :\
-		automatableModelView( _model )\
-	{\
-	}\
-\
-	type##Model * model( void )\
-	{\
-		return( castModel<type##Model>() );\
-	}\
-\
-	const type##Model * model( void ) const\
-	{\
-		return( castModel<type##Model>() );\
-	}\
+class EXPORT type##ModelView : public automatableModelView		\
+{									\
+public:									\
+	type##ModelView( ::model * _model, QWidget * _this ) :		\
+		automatableModelView( _model, _this )			\
+	{								\
+	}								\
+									\
+	type##Model * model( void )					\
+	{								\
+		return( castModel<type##Model>() );			\
+	}								\
+									\
+	const type##Model * model( void ) const				\
+	{								\
+		return( castModel<type##Model>() );			\
+	}								\
 } ;
 
 

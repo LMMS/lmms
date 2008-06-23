@@ -26,14 +26,11 @@
 #include "meter_model.h"
 
 
-meterModel::meterModel( ::model * _parent, track * _track ) :
+meterModel::meterModel( ::model * _parent ) :
 	model( _parent ),
 	m_numeratorModel( 4, 1, 32, this ),
 	m_denominatorModel( 4, 1, 32, this )
 {
-	m_numeratorModel.setTrack( _track );
-	m_denominatorModel.setTrack( _track );
-
 	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
 				this, SIGNAL( dataChanged() ) );
 	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 

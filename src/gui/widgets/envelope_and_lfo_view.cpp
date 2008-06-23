@@ -91,7 +91,7 @@ QPixmap * envelopeAndLFOView::s_lfoGraph = NULL;
 
 envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_params( NULL )
 {
 	if( s_envGraph == NULL )

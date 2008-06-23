@@ -60,7 +60,7 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	oscillatorObject( model * _parent, track * _track, int _index );
+	oscillatorObject( model * _parent, int _index );
 	virtual ~oscillatorObject();
 
 	friend class organicInstrument;
@@ -79,7 +79,7 @@ class organicInstrument : public instrument
 {
 	Q_OBJECT
 public:
-	organicInstrument( instrumentTrack * _channel_track );
+	organicInstrument( instrumentTrack * _instrument_track );
 	virtual ~organicInstrument();
 
 	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,

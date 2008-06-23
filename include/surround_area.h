@@ -36,7 +36,6 @@
 
 class QPixmap;
 class knob;
-class track;
 
 
 const int SURROUND_AREA_SIZE = 1024;
@@ -48,7 +47,7 @@ class surroundAreaModel : public model
 	mapPropertyFromModel(int,x,setX,m_posX);
 	mapPropertyFromModel(int,y,setY,m_posY);
 public:
-	surroundAreaModel( ::model * _parent, track * _track = NULL,
+	surroundAreaModel( ::model * _parent,
 					bool _default_constructed = FALSE );
 
 	surroundVolumeVector getVolumeVector( float _v_scale ) const;
@@ -70,8 +69,8 @@ public:
 		m_posY.addJournalEntryFromOldToCurVal();
 	}
 
-	automationPattern * automationPatternX( void );
-	automationPattern * automationPatternY( void );
+//	automationPattern * automationPatternX( void );
+//	automationPattern * automationPatternY( void );
 
 
 private:

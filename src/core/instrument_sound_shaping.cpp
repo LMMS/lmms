@@ -76,11 +76,8 @@ instrumentSoundShaping::instrumentSoundShaping(
 		}
 		m_envLFOParameters[i] = new envelopeAndLFOParameters(
 							value_for_zero_amount, 
-							_instrument_track,
 							this );
 	}
-
-	m_filterEnabledModel.setTrack( _instrument_track );
 
 	m_filterModel.addItem( tr( "LowPass" ),
 					new pixmapLoader( "filter_lp" ) );
@@ -98,11 +95,6 @@ instrumentSoundShaping::instrumentSoundShaping(
 					new pixmapLoader( "filter_lp" ) );
 	m_filterModel.addItem( tr( "2x LowPass" ),
 					new pixmapLoader( "filter_2lp" ) );
-
-	m_filterModel.setTrack( _instrument_track );
-	m_filterCutModel.setTrack( _instrument_track );
-	m_filterResModel.setTrack( _instrument_track );
-
 }
 
 

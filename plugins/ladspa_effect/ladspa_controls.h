@@ -39,7 +39,7 @@ class ladspaControls : public effectControls
 {
 	Q_OBJECT
 public:
-	ladspaControls( ladspaEffect * _eff, track * _track );
+	ladspaControls( ladspaEffect * _eff );
 	virtual ~ladspaControls();
 
 	inline int getControlCount( void )
@@ -69,7 +69,6 @@ private:
 	ladspaEffect * m_effect;
 	ch_cnt_t m_processors;
 	ch_cnt_t m_controlCount;
-	track * m_track;
 	bool m_noLink;
 	boolModel m_stereoLinkModel;
 	QVector<control_list_t> m_controls;

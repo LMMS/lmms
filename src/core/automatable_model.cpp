@@ -28,7 +28,6 @@
 
 #include "automatable_model.h"
 #include "automation_pattern.h"
-#include "automation_editor.h"
 #include "controller_connection.h"
 
 
@@ -63,9 +62,7 @@ automatableModel::automatableModel( DataType _type,
 	m_range( _max - _min ),
 	m_displayName( _display_name ),
 	m_journalEntryReady( FALSE ),
-	m_controllerConnection( NULL ),
-	m_automationPattern( NULL ),
-	m_track( NULL )
+	m_controllerConnection( NULL )
 {
 }
 
@@ -74,7 +71,6 @@ automatableModel::automatableModel( DataType _type,
 
 automatableModel::~automatableModel()
 {
-	delete m_automationPattern;
 	while( m_linkedModels.empty() == FALSE )
 	{
 		m_linkedModels.last()->unlinkModel( this );
@@ -89,28 +85,24 @@ automatableModel::~automatableModel()
 
 
 
+
+bool automatableModel::isAutomated( void ) const
+{
+	return( automationPattern::isAutomated( this ) );
+}
+
+
+
+
 void automatableModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 							const QString & _name )
 {
-	if( m_automationPattern && m_automationPattern->getTimeMap().size()
-									> 1 )
+	if( isAutomated() )
 	{
-		QDomElement pattern_element;
-		QDomNode node = _this.namedItem(
-					automationPattern::classNodeName() );
-		if( node.isElement() )
-		{
-			pattern_element = node.toElement();
-		}
-		else
-		{
-			pattern_element = _doc.createElement(
-					automationPattern::classNodeName() );
-			_this.appendChild( pattern_element );
-		}
-		QDomElement element = _doc.createElement( _name );
-		m_automationPattern->saveSettings( _doc, element );
-		pattern_element.appendChild( element );
+		QDomElement me = _doc.createElement( _name );
+		me.setAttribute( "id", id() );
+		me.setAttribute( "value", m_value );
+		_this.appendChild( me );
 	}
 	else
 	{
@@ -142,16 +134,27 @@ void automatableModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 void automatableModel::loadSettings( const QDomElement & _this,
 						const QString & _name )
 {
+	// compat code
 	QDomNode node = _this.namedItem( automationPattern::classNodeName() );
-	if( node.isElement() && getAutomationPattern() )
+	if( node.isElement() )
 	{
 		node = node.namedItem( _name );
 		if( node.isElement() )
 		{
-			m_automationPattern->loadSettings( node.toElement() );
-			setValue( m_automationPattern->valueAt( 0 ) );
+			automationPattern * p = automationPattern::
+						globalAutomationPattern( this );
+			p->loadSettings( node.toElement() );
+			setValue( p->valueAt( 0 ) );
 			return;
 		}
+	}
+
+	node = _this.namedItem( _name );
+	if( node.isElement() )
+	{
+		changeID( node.toElement().attribute( "id" ).toInt() );
+		setValue( node.toElement().attribute( "value" ).toFloat() );
+		return;
 	}
 
 	node = _this.namedItem( "connection" );
@@ -197,7 +200,6 @@ void automatableModel::setValue( const float _value )
 				(*it)->setJournalling( journalling );
 			}
 		}
-		setFirstValue();
 		emit dataChanged();
 	}
 	else
@@ -384,11 +386,11 @@ void automatableModel::linkModels( automatableModel * _model1,
 	_model1->linkModel( _model2 );
 	_model2->linkModel( _model1 );
 
-	if( _model1->m_automationPattern != _model2->m_automationPattern )
+/*	if( _model1->m_automationPattern != _model2->m_automationPattern )
 	{
 		delete _model2->m_automationPattern;
 		_model2->m_automationPattern = _model1->m_automationPattern;
-	}
+	}*/
 }
 
 
@@ -399,21 +401,13 @@ void automatableModel::unlinkModels( automatableModel * _model1,
 {
 	_model1->unlinkModel( _model2 );
 	_model2->unlinkModel( _model1 );
-
+/*
 	if( _model1->m_automationPattern && _model1->m_automationPattern
 					== _model2->m_automationPattern )
 	{
 		_model2->m_automationPattern = new automationPattern(
 				*_model1->m_automationPattern, _model2 );
-	}
-}
-
-
-
-
-void automatableModel::initAutomationPattern( void )
-{
-	m_automationPattern = new automationPattern( NULL, this );
+	}*/
 }
 
 
@@ -434,46 +428,15 @@ void automatableModel::setControllerConnection( controllerConnection * _c )
 
 
 
-automationPattern * automatableModel::getAutomationPattern( void )
-{
-	if( !m_automationPattern )
-	{
-		m_automationPattern = new automationPattern( m_track, this );
-		setFirstValue();
-//		syncAutomationPattern();
-	}
-	return( m_automationPattern );
-}
-
-
-void automatableModel::setFirstValue( void )
-{
-	if( m_automationPattern && m_automationPattern->updateFirst() )
-	{
-		m_automationPattern->putValue( 0, m_value, FALSE );
-		if( engine::getAutomationEditor() &&
-				engine::getAutomationEditor()->currentPattern()
-						== m_automationPattern )
-		{
-			engine::getAutomationEditor()->update();
-		}
-	}
-}
-
-
-
-
 void automatableModel::setInitValue( const float _value )
 {
 	m_initValue = _value;
 	bool journalling = testAndSetJournalling( FALSE );
 	setValue( _value );
-	if( m_automationPattern )
-	{
-		setFirstValue();
-	}
 	setJournalling( journalling );
+	emit initValueChanged( _value );
 }
+
 
 
 

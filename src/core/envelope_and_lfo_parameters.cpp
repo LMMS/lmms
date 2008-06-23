@@ -49,7 +49,6 @@ QVector<envelopeAndLFOParameters *> envelopeAndLFOParameters::s_EaLParametersIns
 
 envelopeAndLFOParameters::envelopeAndLFOParameters(
 					float _value_for_zero_amount,
-							track * _track,
 							model * _parent ) :
 	model( _parent ),
 	m_used( FALSE ),
@@ -79,24 +78,6 @@ envelopeAndLFOParameters::envelopeAndLFOParameters(
 	m_lfoShapeData( NULL )
 {
 	s_EaLParametersInstances.push_back( this );
-
-
-	m_predelayModel.setTrack( _track );
-	m_attackModel.setTrack( _track );
-	m_holdModel.setTrack( _track );
-	m_decayModel.setTrack( _track );
-	m_sustainModel.setTrack( _track );
-	m_releaseModel.setTrack( _track );
-	m_amountModel.setTrack( _track );
-
-	m_lfoPredelayModel.setTrack( _track );
-	m_lfoAttackModel.setTrack( _track );
-	m_lfoSpeedModel.setTrack( _track );
-	m_lfoAmountModel.setTrack( _track );
-	m_lfoWaveModel.setTrack( _track );
-	m_x100Model.setTrack( _track );
-	m_controlEnvAmountModel.setTrack( _track );
-
 
 	connect( &m_predelayModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ) );

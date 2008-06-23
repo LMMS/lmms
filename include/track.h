@@ -41,7 +41,6 @@
 class QMenu;
 class QPushButton;
 
-class automationPattern;
 class bbTrack;
 class pixmapButton;
 class pixmapLoader;
@@ -290,17 +289,11 @@ protected:
 
 private slots:
 	void cloneTrack( void );
-	void disableAutomation( void );
-	void enableAutomation( void );
 	void removeTrack( void );
 	void updateMenu( void );
 
 
 private:
-	bbTrack * currentBBTrack( void );
-	bool inBBEditor( void );
-
-
 	static QPixmap * s_grip;
 	static QPixmap * s_muteOffDisabled;
 	static QPixmap * s_muteOffEnabled;
@@ -313,12 +306,8 @@ private:
 	pixmapButton * m_muteBtn;
 	pixmapButton * m_soloBtn;
 
-	bool m_automationDisabled;
-
-
 
 	friend class trackView;
-
 
 signals:
 	void trackRemovalScheduled( trackView * _t );
@@ -335,6 +324,8 @@ class EXPORT track : public model, public journallingObject
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 public:
+	typedef QVector<trackContentObject *> tcoVector;
+
 	enum TrackTypes
 	{
 		InstrumentTrack,
@@ -343,6 +334,7 @@ public:
 		EventTrack,
 		VideoTrack,
 		AutomationTrack,
+		HiddenAutomationTrack,
 		NumTrackTypes
 	} ;
 
@@ -387,23 +379,25 @@ public:
 	trackContentObject * getTCO( int _tco_num );
 	int getTCONum( trackContentObject * _tco );
 
-	void getTCOsInRange( QList<trackContentObject *> & _tco_v,
-							const midiTime & _start,
+	const tcoVector & getTCOs( void ) const
+	{
+		return( m_trackContentObjects );
+	}
+	void getTCOsInRange( tcoVector & _tco_v, const midiTime & _start,
 							const midiTime & _end );
 	void swapPositionOfTCOs( int _tco_num1, int _tco_num2 );
+
 
 	void insertTact( const midiTime & _pos );
 	void removeTact( const midiTime & _pos );
 
 	tact length( void ) const;
 
+
 	inline trackContainer * getTrackContainer( void ) const
 	{
 		return( m_trackContainer );
 	}
-
-	void addAutomationPattern( automationPattern * _pattern );
-	void removeAutomationPattern( automationPattern * _pattern );
 
 	// name-stuff
 	virtual const QString & name( void ) const
@@ -428,10 +422,6 @@ public slots:
 	void toggleSolo( void );
 
 
-protected:
-	void sendMidiTime( const midiTime & _time );
-
-
 private:
 	trackContainer * m_trackContainer;
 	TrackTypes m_type;
@@ -443,10 +433,7 @@ private:
 	bool m_mutedBeforeSolo;
 
 
-	typedef QVector<trackContentObject *> tcoVector;
 	tcoVector m_trackContentObjects;
-
-	QList<automationPattern *> m_automationPatterns;
 
 
 	friend class trackView;

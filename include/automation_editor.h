@@ -33,13 +33,14 @@
 #include "journalling_object.h"
 #include "midi_time.h"
 #include "automation_pattern.h"
-#include "combobox.h"
+#include "combobox_model.h"
 
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
+class comboBox;
 class notePlayHandle;
 class timeLine;
 class toolButton;

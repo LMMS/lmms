@@ -36,6 +36,7 @@
 #include "meter_model.h"
 
 
+class automationTrack;
 class pattern;
 class timeLine;
 
@@ -139,9 +140,9 @@ public:
 	bpm_t getTempo( void );
 	virtual automationPattern * tempoAutomationPattern( void );
 
-	track * getAutomationTrack( void )
+	automationTrack * globalAutomationTrack( void )
 	{
-		return( m_automationTrack );
+		return( m_globalAutomationTrack );
 	}
 
 	// file management
@@ -215,6 +216,7 @@ private slots:
 	void removeBar( void );
 	void addBBTrack( void );
 	void addSampleTrack( void );
+	void addAutomationTrack( void );
 
 	void setTempo( void );
 	void setTimeSignature( void );
@@ -255,7 +257,7 @@ private:
 	void restoreControllerStates( const QDomElement & _this );
 
 
-	track * m_automationTrack;
+	automationTrack * m_globalAutomationTrack;
 
 	lcdSpinBoxModel m_tempoModel;
 	meterModel m_timeSigModel;

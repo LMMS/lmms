@@ -488,10 +488,7 @@ void ladspaEffect::pluginInstantiation( void )
 	{
 		manager->activate( m_key, m_handles[proc] );
 	}
-	track * t = dynamic_cast<effectChain *>( parent() ) ?
-			dynamic_cast<effectChain *>( parent() )->getTrack() :
-									NULL;
-	m_controls = new ladspaControls( this, t );
+	m_controls = new ladspaControls( this );
 }
 
 

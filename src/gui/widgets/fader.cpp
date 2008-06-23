@@ -52,13 +52,13 @@
 #include "fader.h"
 #include "embed.h"
 #include "caption_menu.h"
-#include "automation_pattern.h"
+#include "main_window.h"
 
 
 
 fader::fader( floatModel * _model, QWidget * _parent ) :
 	QWidget( _parent ),
-	floatModelView( _model ),
+	floatModelView( _model, this ),
 	m_model( _model ),
 	m_fPeakValue_L( 0.0 ),
 	m_fPeakValue_R( 0.0 ),
@@ -86,13 +86,10 @@ fader::~fader()
 
 void fader::contextMenuEvent( QContextMenuEvent * _ev )
 {
-	if( !model()->nullTrack() )
-	{
-		captionMenu contextMenu( accessibleName() );
-		addDefaultActions( &contextMenu );
-		contextMenu.exec( QCursor::pos() );
-		_ev->accept();
-	}
+	captionMenu contextMenu( accessibleName() );
+	addDefaultActions( &contextMenu );
+	contextMenu.exec( QCursor::pos() );
+	_ev->accept();
 }
 
 
@@ -110,14 +107,21 @@ void fader::mouseMoveEvent( QMouseEvent *ev )
 
 
 
-void fader::mousePressEvent(QMouseEvent *ev)
+
+void fader::mousePressEvent( QMouseEvent * _me )
 {
-	if( ev->button() == Qt::LeftButton )
+	if( _me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isCtrlPressed() == FALSE )
 	{
-		mouseMoveEvent( ev );
-		ev->accept();
+		mouseMoveEvent( _me );
+		_me->accept();
+	}
+	else
+	{
+		automatableModelView::mousePressEvent( _me );
 	}
 }
+
 
 
 
@@ -178,6 +182,7 @@ void fader::setPeak_R( float fPeak )
 
 
 
+
 void fader::paintEvent( QPaintEvent * ev)
 {
 	QPainter painter(this);
@@ -226,10 +231,12 @@ void fader::paintEvent( QPaintEvent * ev)
 
 
 
+
 void fader::setMaxPeak( float fMax )
 {
 	m_fMaxPeak = fMax;
 }
+
 
 
 

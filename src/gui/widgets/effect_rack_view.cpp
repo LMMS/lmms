@@ -40,7 +40,7 @@
 
 effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( NULL )
+	modelView( NULL, this )
 {
 	setFixedSize( 250, 250 );
 

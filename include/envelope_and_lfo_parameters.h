@@ -35,16 +35,12 @@
 #include "types.h"
 
 
-class track;
-
-
 
 class EXPORT envelopeAndLFOParameters : public model, public journallingObject
 {
 	Q_OBJECT
 public:
 	envelopeAndLFOParameters( float _value_for_zero_amount,
-							track * _track,
 							model * _parent );
 	virtual ~envelopeAndLFOParameters();
 

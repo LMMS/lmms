@@ -47,7 +47,7 @@ tempoSyncKnobModel::tempoSyncKnobModel( const float _val, const float _min,
 	m_tempoSyncMode( SyncNone ),
 	m_tempoLastSyncMode( SyncNone ),
 	m_scale( _scale ),
-	m_custom( _parent, NULL )
+	m_custom( _parent )
 {
 	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );

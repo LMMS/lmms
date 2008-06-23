@@ -113,7 +113,7 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_length(),
 	m_mutedModel( FALSE, this )
 {
-	m_mutedModel.setTrack( _track );
+	m_track->addTCO( this );
 	setJournalling( FALSE );
 	movePosition( 0 );
 	changeLength( 0 );
@@ -302,7 +302,7 @@ void trackContentObject::toggleMute( void )
 trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 							trackView * _tv ) :
 	selectableObject( _tv->getTrackContentWidget() ),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_tco( _tco ),
 	m_trackView( _tv ),
 	m_action( NoAction ),
@@ -1069,8 +1069,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 	{
 		const midiTime pos = getPosition( _de->pos().x()
 							).toNearestTact();
-		trackContentObject * tco = getTrack()->addTCO(
-						getTrack()->createTCO( pos ) );
+		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
@@ -1109,8 +1108,7 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		const midiTime pos = getPosition( _me->x() ).getTact() *
 						midiTime::ticksPerTact();
-		trackContentObject * tco = getTrack()->addTCO(
-						getTrack()->createTCO( pos ) );
+		trackContentObject * tco = getTrack()->createTCO( pos );
 
 		tco->saveJournallingState( FALSE );
 		tco->movePosition( pos );
@@ -1241,9 +1239,8 @@ void trackContentWidget::undoStep( journalEntry & _je )
 
 		case RemoveTrackContentObject:
 		{
-			trackContentObject * tco =
-				getTrack()->addTCO( getTrack()->createTCO(
-							midiTime( 0 ) ) );
+			trackContentObject * tco = getTrack()->createTCO(
+								midiTime( 0 ) );
 			multimediaProject mmp(
 				_je.data().toMap()["state"].toString(), FALSE );
 			tco->restoreState(
@@ -1346,8 +1343,7 @@ QPixmap * trackOperationsWidget::s_muteOnEnabled;   /*!< Mute on and enabled pix
  */
 trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	QWidget( _parent ),             /*!< The parent widget */
-	m_trackView( _parent ),         /*!< The parent track view */
-	m_automationDisabled( FALSE )   /*!< Automation enabled flag */
+	m_trackView( _parent )          /*!< The parent track view */
 {
 	if( s_grip == NULL )
 	{
@@ -1404,13 +1400,6 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_soloBtn->move( 62, 8 );
 	m_soloBtn->show();
 	toolTip::add( m_soloBtn, tr( "Solo" ) );
-
-	if( inBBEditor() )
-	{
-		connect( engine::getBBEditor(),
-				SIGNAL( positionChanged( const midiTime & ) ),
-				this, SLOT( update() ) );
-	}
 
 	connect( this, SIGNAL( trackRemovalScheduled( trackView * ) ),
 			m_trackView->getTrackContainerView(),
@@ -1486,37 +1475,6 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 	if( m_trackView->isMovingTrack() == FALSE )
 	{
 		p.drawPixmap( 2, 2, *s_grip );
-		if( inBBEditor() )
-		{
-			bbTrack * bb_track = currentBBTrack();
-			if( !bb_track || bb_track->automationDisabled(
-						m_trackView->getTrack() ) )
-			{
-				if( !m_automationDisabled )
-				{
-					m_automationDisabled = TRUE;
-					setObjectName( "automationDisabled" );
-					setStyle( NULL );
-/*					m_muteBtn->setActiveGraphic(
-							*s_muteOffEnabled );
-					m_muteBtn->setInactiveGraphic(
-							*s_muteOnEnabled );*/
-				}
-			}
-			else
-			{
-				if( m_automationDisabled )
-				{
-					m_automationDisabled = FALSE;
-					setObjectName( "automationEnabled" );
-					setStyle( NULL );
-/*					m_muteBtn->setActiveGraphic(
-							*s_muteOffEnabled );
-					m_muteBtn->setInactiveGraphic(
-							*s_muteOnEnabled );*/
-				}
-			}
-		}
 		m_trackOps->show();
 		m_muteBtn->show();
 	}
@@ -1565,28 +1523,6 @@ void trackOperationsWidget::updateMenu( void )
 {
 	QMenu * to_menu = m_trackOps->menu();
 	to_menu->clear();
-	if( inBBEditor() )
-	{
-		bbTrack * bb_track = currentBBTrack();
-		if( bb_track )
-		{
-			if( bb_track->automationDisabled(
-						m_trackView->getTrack() ) )
-			{
-				to_menu->addAction( embed::getIconPixmap(
-							"led_off", 16, 16 ),
-					tr( "Enable automation" ),
-					this, SLOT( enableAutomation() ) );
-			}
-			else
-			{
-				to_menu->addAction( embed::getIconPixmap(
-							"led_green", 16, 16 ),
-					tr( "Disable automation" ),
-					this, SLOT( disableAutomation() ) );
-			}
-		}
-	}
 	to_menu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
 						tr( "Clone this track" ),
 						this, SLOT( cloneTrack() ) );
@@ -1594,53 +1530,6 @@ void trackOperationsWidget::updateMenu( void )
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
 }
-
-
-
-
-/*! \brief Enable automation on this track
- *
- */
-void trackOperationsWidget::enableAutomation( void )
-{
-	currentBBTrack()->enableAutomation( m_trackView->getTrack() );
-}
-
-
-
-
-/*! \brief Disable automation on this track
- *
- */
-void trackOperationsWidget::disableAutomation( void )
-{
-	currentBBTrack()->disableAutomation( m_trackView->getTrack() );
-}
-
-
-
-
-/*! \brief Return the current Beat+Bassline track
- *
- */
-bbTrack * trackOperationsWidget::currentBBTrack( void )
-{
-	return( bbTrack::findBBTrack(
-				engine::getBBTrackContainer()->currentBB() ) );
-}
-
-
-
-
-/*! \brief Are we in the Beat+Bassline Editor?
- *
- */
-bool trackOperationsWidget::inBBEditor( void )
-{
-	return( m_trackView->getTrackContainerView()
-						== engine::getBBEditor() );
-}
-
 
 
 
@@ -1668,11 +1557,8 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_pixmapLoader( NULL ),         /*!< For loading the track's pixmaps */
 	m_mutedModel( FALSE, this ),    /*!< For controlling track muting */
 	m_soloModel( FALSE, this ),     /*!< For controlling track soloing */
-	m_trackContentObjects(),        /*!< The track content objects (segments) */
-	m_automationPatterns()          /*!< The automation patterns applying */
+	m_trackContentObjects()         /*!< The track content objects (segments) */
 {
-	m_mutedModel.setTrack( this );
-	m_soloModel.setTrack( this );
 	m_trackContainer->addTrack( this );
 }
 
@@ -1691,38 +1577,12 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
  */
 track::~track()
 {
-	if( m_trackContainer == engine::getBBTrackContainer()
-						&& engine::getSong() )
-	{
-		QList<track *> tracks = engine::getSong()->tracks();
-		for( int i = 0; i < tracks.size(); ++i )
-		{
-			if( tracks[i]->type() == BBTrack )
-			{
-				bbTrack * bb_track = (bbTrack *)tracks[i];
-				if( bb_track->automationDisabled( this ) )
-				{
-					// Remove reference from bbTrack
-					bb_track->enableAutomation( this );
-				}
-			}
-		}
-	}
-
 	while( !m_trackContentObjects.isEmpty() )
 	{
 		delete m_trackContentObjects.last();
 	}
 
 	m_trackContainer->removeTrack( this );
-
-	for( QList<automationPattern *>::iterator it =
-						m_automationPatterns.begin();
-					it != m_automationPatterns.end();
-					++it )
-	{
-		( *it )->forgetTrack();
-	}
 }
 
 
@@ -1745,6 +1605,8 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
 		case AutomationTrack: t = new automationTrack( _tc ); break;
+		case HiddenAutomationTrack:
+				t = new automationTrack( _tc, TRUE ); break;
 		default: break;
 	}
 
@@ -1872,7 +1734,7 @@ void track::loadSettings( const QDomElement & _this )
 								midiTime( 0 ) );
 				tco->restoreState( node.toElement() );
 				saveJournallingState( FALSE );
-				addTCO( tco );
+//				addTCO( tco );
 				restoreJournallingState();
 			}
 		}
@@ -1958,7 +1820,7 @@ trackContentObject * track::getTCO( int _tco_num )
 	}
 	printf( "called track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
-	return( addTCO( createTCO( _tco_num * midiTime::ticksPerTact() ) ) );
+	return( createTCO( _tco_num * midiTime::ticksPerTact() ) );
 	
 }
 
@@ -2004,8 +1866,7 @@ int track::getTCONum( trackContentObject * _tco )
  *  \param _start The MIDI start time of the range.
  *  \param _end   The MIDI endi time of the range.
  */
-void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
-							const midiTime & _start,
+void track::getTCOsInRange( tcoVector & _tco_v, const midiTime & _start,
 							const midiTime & _end )
 {
 	for( tcoVector::iterator it_o = m_trackContentObjects.begin();
@@ -2020,8 +1881,7 @@ void track::getTCOsInRange( QList<trackContentObject *> & _tco_v,
 			// now let's search according position for TCO in list
 			// 	-> list is ordered by TCO's position afterwards
 			bool inserted = FALSE;
-			for( QList<trackContentObject *>::iterator it =
-								_tco_v.begin();
+			for( tcoVector::iterator it = _tco_v.begin();
 						it != _tco_v.end(); ++it )
 			{
 				if( ( *it )->startPosition() >= s )
@@ -2139,30 +1999,6 @@ tact track::length( void ) const
 
 
 
-/*! \brief Add an automation pattern to this track
- *
- *  \param _pattern the automation pattern to add.
- */
-void track::addAutomationPattern( automationPattern * _pattern )
-{
-	m_automationPatterns.append( _pattern );
-}
-
-
-
-
-/*! \brief Remove an automation pattern from this track
- *
- *  \param _pattern the automation pattern to remove.
- */
-void track::removeAutomationPattern( automationPattern * _pattern )
-{
-	m_automationPatterns.removeAll( _pattern );
-}
-
-
-
-
 /*! \brief Invert the track's solo state.
  *
  *  We have to go through all the tracks determining if any other track
@@ -2171,7 +2007,7 @@ void track::removeAutomationPattern( automationPattern * _pattern )
  */
 void track::toggleSolo( void )
 {
-	trackContainer::trackList & tl = m_trackContainer->m_tracks;
+	trackContainer::trackList & tl = m_trackContainer->tracks();
 
 	bool solo_before = FALSE;
 	for( trackContainer::trackList::iterator it = tl.begin();
@@ -2214,24 +2050,6 @@ void track::toggleSolo( void )
 
 
 
-/*! \brief Send a time code to all tracks to process.
- *
- *  \param _time the MIDI time to send.
- */
-void track::sendMidiTime( const midiTime & _time )
-{
-	for( QList<automationPattern *>::iterator it =
-						m_automationPatterns.begin();
-					it != m_automationPatterns.end();
-					++it )
-	{
-		( *it )->processMidiTime( _time );
-	}
-}
-
-
-
-
 
 
 // ===========================================================================
@@ -2249,7 +2067,7 @@ void track::sendMidiTime( const midiTime & _time )
  */
 trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	QWidget( _tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	modelView( NULL/*_track*/ ),        /*!< The model view of this track */
+	modelView( NULL, this ),            /*!< The model view of this track */
 	m_track( _track ),                  /*!< The track we're displaying */
 	m_trackContainerView( _tcv ),       /*!< The track Container View we're displayed in */
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */

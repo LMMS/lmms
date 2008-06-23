@@ -35,7 +35,7 @@
 #include "types.h"
 
 class graphModel;
-class track;
+
 
 class EXPORT graph : public QWidget, public modelView
 {
@@ -106,7 +106,7 @@ public:
 	graphModel( float _min,
 			float _max,
 			Uint32 _size,
-			:: model * _parent, track * _track = NULL,
+			:: model * _parent,
 			bool _default_constructed = FALSE );
 
 	virtual ~graphModel();

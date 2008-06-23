@@ -179,7 +179,7 @@ void piano::handleKeyRelease( int _key )
  */
 pianoView::pianoView( QWidget * _parent ) :
 	QWidget( _parent ),             /*!< Our parent */
-	modelView( NULL ),              /*!< Our view model */
+	modelView( NULL, this ),        /*!< Our view model */
 	m_piano( NULL ),                /*!< Our piano model */
 	m_startKey( Key_C + Octave_3*KeysPerOctave ), /*!< The first key displayed? */
 	m_lastKey( -1 )                 /*!< The last key displayed? */
@@ -400,7 +400,8 @@ void pianoView::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	captionMenu contextMenu( tr( "Base note" ) );
-	automatableModelView amv( m_piano->m_instrumentTrack->baseNoteModel() );
+	automatableModelView amv( m_piano->m_instrumentTrack->baseNoteModel(),
+								&contextMenu );
 	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }

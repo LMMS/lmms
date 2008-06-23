@@ -167,23 +167,17 @@ const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
 
 
 
-chordCreator::chordCreator( instrumentTrack * _instrument_track ) :
-	model( _instrument_track ),
+chordCreator::chordCreator( model * _parent ) :
+	model( _parent ),
 	m_chordsEnabledModel( FALSE, this ),
 	m_chordsModel( this, tr( "Chord type" ) ),
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
-	m_chordsEnabledModel.setTrack( _instrument_track );
-
-	m_chordsModel.setTrack( _instrument_track );
 	for( int i = 0; s_chordTable[i].interval[0] != -1; ++i )
 	{
 		m_chordsModel.addItem( tr( s_chordTable[i].name.toAscii().
 								constData() ) );
 	}
-
-	m_chordRangeModel.setTrack( _instrument_track );
-
 }
 
 
@@ -280,8 +274,8 @@ void chordCreator::loadSettings( const QDomElement & _this )
 
 
 
-arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
-	model( _instrument_track ),
+arpeggiator::arpeggiator( model * _parent ) :
+	model( _parent ),
 	m_arpEnabledModel( FALSE ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
@@ -290,9 +284,6 @@ arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 	m_arpDirectionModel( 0, 0, NumArpDirections, this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
-	m_arpEnabledModel.setTrack( _instrument_track );
-
-	m_arpModel.setTrack( _instrument_track );
 	for( int i = 0; chordCreator::s_chordTable[i].interval[0] != -1; ++i )
 	{
 		m_arpModel.addItem( chordCreator::tr(
@@ -300,16 +291,8 @@ arpeggiator::arpeggiator( instrumentTrack * _instrument_track ) :
 						name.toAscii().constData() ) );
 	}
 
-	m_arpRangeModel.setTrack( _instrument_track );
-
-	m_arpTimeModel.setTrack( _instrument_track );
-
-	m_arpGateModel.setTrack( _instrument_track );
-
-	m_arpDirectionModel.setTrack( _instrument_track );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
-	m_arpModeModel.setTrack( _instrument_track );
 	m_arpModeModel.addItem( tr( "Free" ), new pixmapLoader( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), new pixmapLoader( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), new pixmapLoader( "arp_sync" ) );

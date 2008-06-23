@@ -236,10 +236,10 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					m_s, SLOT( addSampleTrack() ),
 					m_toolBar );
 
-	m_addControllerButton = new toolButton( embed::getIconPixmap(
-					"add_controller", 24, 24 ),
-					tr( "Add controller" ),
-					m_s, SLOT( addSampleTrack() ),
+	m_addAutomationTrackButton = new toolButton( embed::getIconPixmap(
+					"add_automation", 24, 24 ),
+					tr( "Add automation-track" ),
+					m_s, SLOT( addAutomationTrack() ),
 					m_toolBar );
 
 	m_drawModeButton = new toolButton( embed::getIconPixmap(
@@ -307,7 +307,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_addBBTrackButton );
 	tb_layout->addWidget( m_addSampleTrackButton );
-	tb_layout->addWidget( m_addControllerButton );
+	tb_layout->addWidget( m_addAutomationTrackButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_drawModeButton );
 	tb_layout->addWidget( m_editModeButton );

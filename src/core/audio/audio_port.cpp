@@ -33,7 +33,7 @@
 #include "engine.h"
 
 
-audioPort::audioPort( const QString & _name, track * _track ) :
+audioPort::audioPort( const QString & _name ) :
 	m_bufferUsage( NoUsage ),
 	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
 	m_secondBuffer( new sampleFrame[
@@ -41,7 +41,7 @@ audioPort::audioPort( const QString & _name, track * _track ) :
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _track )
+	m_effects( NULL )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );

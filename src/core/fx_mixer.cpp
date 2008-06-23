@@ -45,7 +45,6 @@ fxChannel::fxChannel( model * _parent ) :
 {
 	engine::getMixer()->clearAudioBuffer( m_buffer,
 					engine::getMixer()->framesPerPeriod() );
-	m_volumeModel.setTrack( engine::getSong()->getAutomationTrack() );
 }
 
 

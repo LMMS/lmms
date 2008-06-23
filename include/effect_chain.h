@@ -37,7 +37,7 @@ class effect;
 class effectChain : public journallingObject, public model
 {
 public:
-	effectChain( track * _track );
+	effectChain( model * _parent );
 	virtual ~effectChain();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -58,17 +58,10 @@ public:
 
 	void clear( void );
 
-	track * getTrack( void )
-	{
-		return( m_track );
-	}
-
 
 private:
 	typedef QVector<effect *> effectList;
 	effectList m_effects;
-
-	track * m_track;
 
 	boolModel m_enabledModel;
 

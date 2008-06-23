@@ -86,11 +86,6 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
 				this, SLOT( startPointModelChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( endPointModelChanged() ) );
-	m_ampModel.setTrack( _instrument_track );
-	m_startPointModel.setTrack( _instrument_track );
-	m_endPointModel.setTrack( _instrument_track );
-	m_reverseModel.setTrack( _instrument_track );
-	m_loopModel.setTrack( _instrument_track );
 }
 
 

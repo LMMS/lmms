@@ -34,7 +34,7 @@
 controllerDialog::controllerDialog( controller * _controller,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( _controller )
+	modelView( _controller, this )
 {
 }
 

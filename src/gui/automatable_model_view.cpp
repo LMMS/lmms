@@ -24,13 +24,33 @@
 
 
 #include <QtGui/QMenu>
-
+#include <QtGui/QMouseEvent>
 
 #include "automatable_model_view.h"
 #include "automation_pattern.h"
 #include "controller_connection_dialog.h"
 #include "controller_connection.h"
 #include "embed.h"
+#include "main_window.h"
+#include "string_pair_drag.h"
+
+
+
+automatableModelView::automatableModelView( ::model * _model,
+							QWidget * _this ) :
+	modelView( _model, _this ),
+	m_description( QString::null ),
+	m_unit( QString::null )
+{
+	widget()->setAcceptDrops( TRUE );
+}
+
+
+
+
+automatableModelView::~automatableModelView()
+{
+}
 
 
 
@@ -64,14 +84,11 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 
 	_menu->addSeparator();
 
-	if( !_model->nullTrack() )
-	{
-		_menu->addAction( embed::getIconPixmap( "automation" ),
-			automatableModel::tr( "&Open in automation editor" ),
-					_model->getAutomationPattern(),
-					SLOT( openInAutomationEditor() ) );
-		_menu->addSeparator();
-	}
+	_menu->addAction( embed::getIconPixmap( "automation" ),
+			automatableModel::tr( "Edit song-global automation" ),
+					amvSlots,
+					SLOT( editSongGlobalAutomation() ) );
+	_menu->addSeparator();
 
 	QString controllerTxt;
 	if( _model->getControllerConnection() )
@@ -120,9 +137,30 @@ void automatableModelView::setModel( model * _model, bool _old_model_valid )
 
 
 
+void automatableModelView::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isCtrlPressed() == TRUE )
+	{
+		new stringPairDrag( "automatable_model",
+					QString::number( modelUntyped()->id() ),
+							QPixmap(), widget() );
+		_me->accept();
+	}
+	else if( _me->button() == Qt::MidButton )
+	{
+		modelUntyped()->reset();
+	}
+}
+
+
+
+
+
+
 automatableModelViewSlots::automatableModelViewSlots( 
-		automatableModelView * _amv,
-		QObject * _parent ) :
+						automatableModelView * _amv,
+							QObject * _parent ) :
 	QObject(),
 	amv( _amv )
 {
@@ -187,6 +225,17 @@ void automatableModelViewSlots::removeConnection( void )
 		m->setControllerConnection( NULL );
 	}
 }
+
+
+
+
+void automatableModelViewSlots::editSongGlobalAutomation( void )
+{
+	automationPattern::globalAutomationPattern( amv->modelUntyped() )->
+						openInAutomationEditor();
+}
+
+
 
 
 #include "automatable_model_view.moc"

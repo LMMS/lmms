@@ -50,7 +50,7 @@
 
 trackContainerView::trackContainerView( trackContainer * _tc ) :
 	QWidget(),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_currentPosition( 0, 0 ),
 	m_tc( _tc ),
 	m_trackViews(),
@@ -156,7 +156,7 @@ void trackContainerView::moveTrackViewUp( trackView * _tv )
 					m_trackViews[i - 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i - 1, t );
-			m_tc->m_tracks.swap( i - 1, i );
+			qSwap( m_tc->m_tracks[i-1], m_tc->m_tracks[i] );
 			m_trackViews.swap( i - 1, i );
 			realignTracks();
 			break;
@@ -178,7 +178,7 @@ void trackContainerView::moveTrackViewDown( trackView * _tv )
 					m_trackViews[i + 1]->getTrack() );
 			m_scrollLayout->removeWidget( t );
 			m_scrollLayout->insertWidget( i + 1, t );
-			m_tc->m_tracks.swap( i, i + 1 );
+			qSwap( m_tc->m_tracks[i], m_tc->m_tracks[i+1] );
 			m_trackViews.swap( i, i + 1 );
 			realignTracks();
 			break;

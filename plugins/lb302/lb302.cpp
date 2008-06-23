@@ -362,22 +362,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	connect( &wave_knob, SIGNAL( dataChanged( ) ),
 	         this, SLOT ( waveChanged( )));
 
-	vcf_cut_knob.setTrack( _instrumentTrack );
-	vcf_res_knob.setTrack( _instrumentTrack );
-	vcf_mod_knob.setTrack( _instrumentTrack );
-	vcf_dec_knob.setTrack( _instrumentTrack );
-
-	vco_fine_detune_knob.setTrack( _instrumentTrack );
-
-	dist_knob.setTrack( _instrumentTrack );
-	wave_knob.setTrack( _instrumentTrack );
-	slide_dec_knob.setTrack( _instrumentTrack );
-
-	slideToggle.setTrack( _instrumentTrack );
-	accentToggle.setTrack( _instrumentTrack );
-	deadToggle.setTrack( _instrumentTrack );
-	db24Toggle.setTrack( _instrumentTrack );
-
 
 	// SYNTH
 

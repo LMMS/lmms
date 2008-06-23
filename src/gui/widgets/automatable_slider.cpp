@@ -33,14 +33,15 @@
 
 #include "caption_menu.h"
 #include "embed.h"
-#include "knob.h"
+#include "main_window.h"
 
 
 
 
-automatableSlider::automatableSlider( QWidget * _parent, const QString & _name ) :
+automatableSlider::automatableSlider( QWidget * _parent,
+						const QString & _name ) :
 	QSlider( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ) ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
 	m_showStatus( FALSE )
 {
 	setAccessibleName( _name );
@@ -73,8 +74,16 @@ void automatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 
 void automatableSlider::mousePressEvent( QMouseEvent * _me )
 {
-	m_showStatus = TRUE;
-	QSlider::mousePressEvent( _me );
+	if( _me->button() == Qt::LeftButton &&
+			engine::getMainWindow()->isCtrlPressed() == FALSE )
+	{
+		m_showStatus = TRUE;
+		QSlider::mousePressEvent( _me );
+	}
+	else
+	{
+		automatableModelView::mousePressEvent( _me );
+	}
 }
 
 

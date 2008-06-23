@@ -2,6 +2,7 @@
  * automation_track.h - declaration of class automationTrack, which handles
  *                      automation of objects without a track
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -30,10 +31,13 @@
 #include "track.h"
 
 
+class nameLabel;
+
+
 class automationTrack : public track
 {
 public:
-	automationTrack( trackContainer * _tc );
+	automationTrack( trackContainer * _tc, bool _hidden = FALSE );
 	virtual ~automationTrack();
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
@@ -45,17 +49,35 @@ public:
 		return( "automationtrack" );
 	}
 
-	virtual trackView * createView( trackContainerView * )
-	{
-		return( NULL );
-	}
+	virtual trackView * createView( trackContainerView * );
 	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
+private:
+	friend class automationTrackView;
+
 } ;
+
+
+
+class automationTrackView : public trackView
+{
+public:
+	automationTrackView( automationTrack * _at, trackContainerView * _tcv );
+	virtual ~automationTrackView();
+
+
+private:
+	bbTrack * m_bbTrack;
+	nameLabel * m_trackLabel;
+
+} ;
+
+
+
 
 
 #endif

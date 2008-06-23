@@ -45,10 +45,7 @@ trackContainer::trackContainer( void ) :
 
 trackContainer::~trackContainer()
 {
-	while( !m_tracks.empty() )
-	{
-		delete m_tracks.takeLast();
-	}
+	clearAllTracks();
 }
 
 
@@ -137,7 +134,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 void trackContainer::addTrack( track * _track )
 {
-	if( _track->type() != track::AutomationTrack )
+	if( _track->type() != track::HiddenAutomationTrack )
 	{
 		m_tracks.push_back( _track );
 		emit trackAdded( _track );
@@ -152,7 +149,7 @@ void trackContainer::removeTrack( track * _track )
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
-		m_tracks.removeAt( index );
+		m_tracks.remove( index );
 
 		if( engine::getSong() )
 		{
@@ -175,10 +172,12 @@ void trackContainer::updateAfterTrackAdd( void )
 
 void trackContainer::clearAllTracks( void )
 {
-	while( !m_tracks.empty() )
+	for( trackList::iterator it = m_tracks.begin();
+						it != m_tracks.end(); ++it )
 	{
-		delete m_tracks.takeLast();
+		delete *it;
 	}
+	m_tracks.clear();
 }
 
 

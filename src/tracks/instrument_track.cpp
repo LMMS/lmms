@@ -103,9 +103,9 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
 	midiEventProcessor(),
-	m_audioPort( tr( "unnamed_track" ), this ),
+	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMIDIClient(),
-							this, this, this ),
+								this, this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0f, this,
@@ -120,17 +120,11 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_chordCreator( this ),
 	m_piano( this )
 {
-	m_baseNoteModel.setTrack( this );
 	m_baseNoteModel.setInitValue( DefaultKey );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
-
-	m_volumeModel.setTrack( this );
-	m_panningModel.setTrack( this );
-	m_pitchModel.setTrack( this );
-	m_effectChannelModel.setTrack( this );
 
 
 	for( int i = 0; i < NumKeys; ++i )
@@ -525,25 +519,18 @@ bool instrumentTrack::play( const midiTime & _start,
 {
 	const float frames_per_tick = engine::framesPerTick();
 
-	QList<trackContentObject *> tcos;
+	tcoVector tcos;
 	bbTrack * bb_track;
 	if( _tco_num >= 0 )
 	{
 		trackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = bbTrack::findBBTrack( _tco_num );
-		if( !( ( bb_track && bb_track->automationDisabled( this ) )
-				|| dynamic_cast<pattern *>( tco )->empty() ) )
-		{
-			sendMidiTime( _start );
-		}
 	}
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
 		bb_track = NULL;
-		sendMidiTime( _start );
 	}
 
 	// Handle automation: detuning
@@ -560,8 +547,7 @@ bool instrumentTrack::play( const midiTime & _start,
 
 	bool played_a_note = FALSE;	// will be return variable
 
-	for( QList<trackContentObject *>::iterator it = tcos.begin();
-							it != tcos.end(); ++it )
+	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		pattern * p = dynamic_cast<pattern *>( *it );
 		// everything which is not a pattern or muted won't be played
@@ -705,9 +691,9 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	m_volumeModel.loadSettings( _this, "vol" );
 
 	// compat-hacks - move to mmp::upgrade
-	if( _this.hasAttribute( "surpos" ) || _this.hasAttribute( "surpos-x" ) ||
-		!_this.firstChildElement( "automation-pattern" ).
-					firstChildElement( "surpos-x" ).isNull() )
+	if( _this.hasAttribute( "surpos" ) || _this.hasAttribute( "surpos-x" )
+		|| !_this.firstChildElement( "automationpattern" ).
+				firstChildElement( "surpos-x" ).isNull() )
 	{
 		surroundAreaModel m( this, this );
 		m.loadSettings( _this, "surpos" );
@@ -765,7 +751,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 							node.toElement() );
 			}
 			else if( automationPattern::classNodeName() !=
-							node.nodeName() )
+							node.nodeName() &&
+					!node.toElement().hasAttribute( "id" ) )
 			{
 				// if node-name doesn't match any known one,
 				// we assume that it is an instrument-plugin
@@ -1085,7 +1072,7 @@ class fxLineLcdSpinBox : public lcdSpinBox
 // #### ITW:
 instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	QWidget(),
-	modelView( NULL ),
+	modelView( NULL, this ),
 	m_track( _itv->model() ),
 	m_itv( _itv ),
 	m_instrumentView( NULL )
