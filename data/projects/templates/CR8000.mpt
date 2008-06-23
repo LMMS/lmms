@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-svn20080616" type="song" >
+ <head timesig_numerator="4" mastervol="100" timesig_denominator="4" bpm="140" masterpitch="0" />
+ <song>
+  <trackcontainer type="song" >
+   <track muted="0" type="0" >
+    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" name="Default" vol="100" >
+     <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33" />
+     <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+      <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+      <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+      <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+     </eldata>
+     <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+     <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+     <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+     <fxchain numofeffects="0" enabled="0" />
+    </instrumenttrack>
+   </track>
+   <track muted="0" type="1" >
+    <bbtrack name="Beat/Baseline 0" >
+     <trackcontainer type="bbtrackcontainer" >
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Clap.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Clap.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Clap.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Clave.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Clave.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Clave.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Conga_l.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Conga_l.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Conga_l.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Conga_m.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Conga_m.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Conga_m.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Cowbell.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Cowbell.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Cowbell.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Cymbal.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Cymbal.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Cymbal.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Hat_c.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Hat_c.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Hat_c.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Hat_o.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Hat_o.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Hat_o.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Kick.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Kick.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Kick.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Rim.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Rim.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Rim.ds" pos="0" len="192" frozen="0" />
+      </track>
+      <track muted="0" type="0" >
+       <instrumenttrack pan="0" fxch="1" pitch="0" basenote="57" name="Snare.ds" vol="100" >
+        <audiofileprocessor reversed="0" looped="0" eframe="1" sframe="0" src="drumsynth/cr8000/Snare.ds" amp="100" />
+        <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+         <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+         <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        </eldata>
+        <chordcreator chord="0" chordrange="1" chord-enabled="0" />
+        <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100" />
+        <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+        <fxchain numofeffects="0" enabled="0" />
+       </instrumenttrack>
+       <pattern steps="16" muted="0" type="0" name="Snare.ds" pos="0" len="192" frozen="0" />
+      </track>
+     </trackcontainer>
+    </bbtrack>
+   </track>
+  </trackcontainer>
+  <fxmixer>
+   <fxchannel num="0" volume="1" name="Master" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="1" volume="0.4" name="cr8000" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="2" volume="1" name="FX 2" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="3" volume="1" name="FX 3" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="4" volume="1" name="FX 4" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="5" volume="1" name="FX 5" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="6" volume="1" name="FX 6" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="7" volume="1" name="FX 7" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="8" volume="1" name="FX 8" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="9" volume="1" name="FX 9" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="10" volume="1" name="FX 10" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="11" volume="1" name="FX 11" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="12" volume="1" name="FX 12" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="13" volume="1" name="FX 13" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="14" volume="1" name="FX 14" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="15" volume="1" name="FX 15" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="16" volume="1" name="FX 16" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="17" volume="1" name="FX 17" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="18" volume="1" name="FX 18" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="19" volume="1" name="FX 19" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="20" volume="1" name="FX 20" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="21" volume="1" name="FX 21" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="22" volume="1" name="FX 22" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="23" volume="1" name="FX 23" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="24" volume="1" name="FX 24" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="25" volume="1" name="FX 25" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="26" volume="1" name="FX 26" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="27" volume="1" name="FX 27" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="28" volume="1" name="FX 28" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="29" volume="1" name="FX 29" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="30" volume="1" name="FX 30" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="31" volume="1" name="FX 31" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="32" volume="1" name="FX 32" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="33" volume="1" name="FX 33" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="34" volume="1" name="FX 34" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="35" volume="1" name="FX 35" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="36" volume="1" name="FX 36" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="37" volume="1" name="FX 37" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="38" volume="1" name="FX 38" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="39" volume="1" name="FX 39" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="40" volume="1" name="FX 40" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="41" volume="1" name="FX 41" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="42" volume="1" name="FX 42" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="43" volume="1" name="FX 43" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="44" volume="1" name="FX 44" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="45" volume="1" name="FX 45" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="46" volume="1" name="FX 46" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="47" volume="1" name="FX 47" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="48" volume="1" name="FX 48" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="49" volume="1" name="FX 49" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="50" volume="1" name="FX 50" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="51" volume="1" name="FX 51" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="52" volume="1" name="FX 52" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="53" volume="1" name="FX 53" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="54" volume="1" name="FX 54" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="55" volume="1" name="FX 55" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="56" volume="1" name="FX 56" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="57" volume="1" name="FX 57" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="58" volume="1" name="FX 58" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="59" volume="1" name="FX 59" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="60" volume="1" name="FX 60" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="61" volume="1" name="FX 61" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="62" volume="1" name="FX 62" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="63" volume="1" name="FX 63" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+   <fxchannel num="64" volume="1" name="FX 64" >
+    <fxchain numofeffects="0" enabled="0" />
+   </fxchannel>
+  </fxmixer>
+  <pianoroll width="640" x="0" y="200" height="480" visible="0" />
+  <automation-editor width="640" x="611" y="200" height="480" visible="0" />
+  <projectnotes width="300" x="683" y="0" height="200" visible="0" ><![CDATA[<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" color:#e0e0e0;">Put down your project notes here.</span></p></body></html>]]></projectnotes>
+  <timeline lp1pos="192" lp0pos="0" lpstate="0" />
+  <controllers/>
+ </song>
+</multimedia-project>
