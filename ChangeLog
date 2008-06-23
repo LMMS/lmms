@@ -1,3 +1,23 @@
+2008-06-23	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/lfo_controller.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/core/lfo_controller.cpp:
+	* data/themes/default/lfo_d100_active.png:
+	* data/themes/default/lfo_d100_inactive.png:
+	* data/themes/default/lfo_x100_active.png:
+	* data/themes/default/lfo_x100_inactive.png:
+	* data/themes/default/lfo_x1_active.png:
+	* data/themes/default/lfo_x1_inactive.png:
+	Add multiplier to lfo-controller and fix tempo-sync knob.  Breaks old
+	projects that use LFO, but shouldn't matter since 0.4 hasn't been released
+
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	Allow tempo-sync knob to work with ranges other than [0..1]
+
+	* src/core/envelope_and_lfo_parameters.cpp:
+	Remove hardcoded literal, use already defined const int instead
+
 2008-06-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/automatable_model_view.h:

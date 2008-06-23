@@ -61,6 +61,7 @@ const int LFO_BASE_KNOB_X = LFO_SHAPES_X + 64;
 const int LFO_SPEED_KNOB_X = LFO_BASE_KNOB_X+KNOB_X_SPACING;
 const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
 const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
+const int LFO_MULTIPLIER_X = LFO_PHASE_KNOB_X+KNOB_X_SPACING;
 
 lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
 	controllerDialog( _model, _parent )
@@ -75,38 +76,38 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	
 	toolTip::add( this, tr( "LFO Controller" ) );
 
-	m_lfoBaseKnob = new knob( knobBright_26, this );
-	m_lfoBaseKnob->setLabel( tr( "BASE" ) );
-	m_lfoBaseKnob->move( LFO_BASE_KNOB_X, LFO_KNOB_Y );
-	m_lfoBaseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
-	m_lfoBaseKnob->setWhatsThis( tr("todo") );
+	m_baseKnob = new knob( knobBright_26, this );
+	m_baseKnob->setLabel( tr( "BASE" ) );
+	m_baseKnob->move( LFO_BASE_KNOB_X, LFO_KNOB_Y );
+	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
+	m_baseKnob->setWhatsThis( tr("todo") );
 
 
-	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this );
-	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
-	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
-	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
-	m_lfoSpeedKnob->setWhatsThis(
+	m_speedKnob = new tempoSyncKnob( knobBright_26, this );
+	m_speedKnob->setLabel( tr( "SPD" ) );
+	m_speedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
+	m_speedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
+	m_speedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the LFO. The "
 			"bigger this value the faster the LFO oscillates and "
 			"the faster the effect." ) );
 
 
-	m_lfoAmountKnob = new knob( knobBright_26, this );
-	m_lfoAmountKnob->setLabel( tr( "AMT" ) );
-	m_lfoAmountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
-	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
-	m_lfoAmountKnob->setWhatsThis(
+	m_amountKnob = new knob( knobBright_26, this );
+	m_amountKnob->setLabel( tr( "AMT" ) );
+	m_amountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
+	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
+	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
 			"current LFO. The bigger this value the more the "
 			"selected size (e.g. volume or cutoff-frequency) will "
 			"be influenced by this LFO." ) );
 
-	m_lfoPhaseKnob = new knob( knobBright_26, this );
-	m_lfoPhaseKnob->setLabel( tr( "PHS" ) );
-	m_lfoPhaseKnob->move( LFO_PHASE_KNOB_X, LFO_KNOB_Y );
-	m_lfoPhaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
-	m_lfoPhaseKnob->setWhatsThis(
+	m_phaseKnob = new knob( knobBright_26, this );
+	m_phaseKnob->setLabel( tr( "PHS" ) );
+	m_phaseKnob->move( LFO_PHASE_KNOB_X, LFO_KNOB_Y );
+	m_phaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
+	m_phaseKnob->setWhatsThis(
 			tr( "With this knob you can set the phase-offset of "
 				"the LFO. That means you can move the "
 				"point within an oscillation where the "
@@ -197,17 +198,53 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	uwb->setEnabled( false );
 	toolTip::add( uwb, tr( "Click here if you want a user-defined "
 			"wave-shape for current oscillator." ) );
-
 	
-	m_lfoWaveBtnGrp = new automatableButtonGroup( this );
-	m_lfoWaveBtnGrp->addButton( sin_wave_btn );
-	m_lfoWaveBtnGrp->addButton( triangle_wave_btn );
-	m_lfoWaveBtnGrp->addButton( saw_wave_btn );
-	m_lfoWaveBtnGrp->addButton( sqr_wave_btn );
-	m_lfoWaveBtnGrp->addButton( moog_saw_wave_btn );
-	m_lfoWaveBtnGrp->addButton( exp_wave_btn );
-	m_lfoWaveBtnGrp->addButton( white_noise_btn );
-	m_lfoWaveBtnGrp->addButton( uwb );
+	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp->addButton( sin_wave_btn );
+	m_waveBtnGrp->addButton( triangle_wave_btn );
+	m_waveBtnGrp->addButton( saw_wave_btn );
+	m_waveBtnGrp->addButton( sqr_wave_btn );
+	m_waveBtnGrp->addButton( moog_saw_wave_btn );
+	m_waveBtnGrp->addButton( exp_wave_btn );
+	m_waveBtnGrp->addButton( white_noise_btn );
+	m_waveBtnGrp->addButton( uwb );
+
+
+	pixmapButton * x1 = new pixmapButton( this, NULL );
+	x1->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 15 );
+	x1->setActiveGraphic( embed::getIconPixmap(
+						"lfo_x1_active" ) );
+	x1->setInactiveGraphic( embed::getIconPixmap(
+						"lfo_x1_inactive" ) );
+
+	pixmapButton * x100 = new pixmapButton( this, NULL );
+	x100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y );
+	x100->setActiveGraphic( embed::getIconPixmap(
+						"lfo_x100_active" ) );
+	x100->setInactiveGraphic( embed::getIconPixmap(
+						"lfo_x100_inactive" ) );
+
+	pixmapButton * d100 = new pixmapButton( this, NULL );
+	d100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 30 );
+	d100->setActiveGraphic( embed::getIconPixmap(
+						"lfo_d100_active" ) );
+	d100->setInactiveGraphic( embed::getIconPixmap(
+						"lfo_d100_inactive" ) );
+
+	/*
+	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
+	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
+	m_x100Cb->move( LFO_BASE_KNOB_X, LFO_KNOB_Y + 36 );
+	m_x100Cb->setWhatsThis(
+		tr( "Click here if the frequency of this LFO should be "
+						"multiplied with 100." ) );
+	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
+	*/
+
+	m_multiplierBtnGrp = new automatableButtonGroup( this );
+	m_multiplierBtnGrp->addButton( x1 );
+	m_multiplierBtnGrp->addButton( x100 );
+	m_multiplierBtnGrp->addButton( d100 );
 
 
 	setModel( _model );
@@ -279,11 +316,12 @@ void lfoControllerDialog::modelChanged( void )
 {
 	m_lfo = castModel<lfoController>();
 
-	m_lfoBaseKnob->setModel( &m_lfo->m_lfoBaseModel );
-	m_lfoSpeedKnob->setModel( &m_lfo->m_lfoSpeedModel );
-	m_lfoAmountKnob->setModel( &m_lfo->m_lfoAmountModel );
-	m_lfoPhaseKnob->setModel( &m_lfo->m_lfoPhaseModel );
-	m_lfoWaveBtnGrp->setModel( &m_lfo->m_lfoWaveModel );
+	m_baseKnob->setModel( &m_lfo->m_baseModel );
+	m_speedKnob->setModel( &m_lfo->m_speedModel );
+	m_amountKnob->setModel( &m_lfo->m_amountModel );
+	m_phaseKnob->setModel( &m_lfo->m_phaseModel );
+	m_waveBtnGrp->setModel( &m_lfo->m_waveModel );
+	m_multiplierBtnGrp->setModel( &m_lfo->m_multiplierModel );
 }
 
 

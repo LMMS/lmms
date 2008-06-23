@@ -117,7 +117,8 @@ void tempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 			default: ;
 		}
 		bool journalling = testAndSetJournalling( FALSE );
-		setValue( 60000.0 / ( _bpm * conversionFactor * m_scale ) );
+		float oneUnit = 60000.0 / ( _bpm * conversionFactor * m_scale );
+		setValue( oneUnit*( maxValue() - minValue() ) + minValue() );
 		setJournalling( journalling );
 	}
 

@@ -41,18 +41,20 @@ const float TWO_PI = 6.28318531f;
 
 lfoController::lfoController( model * _parent ) :
 	controller( LfoController, _parent ),
-	m_lfoBaseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
-	m_lfoSpeedModel( 0.1, 0.01, 5.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
-	m_lfoAmountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
-	m_lfoPhaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
-	m_lfoWaveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes, this, tr( "Oscillator waveform" ) ),
+	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
+	m_speedModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
+	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
+	m_phaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
+	m_waveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes,
+			this, tr( "Oscillator waveform" ) ),
+	m_multiplierModel( 0, 0, 2, this, tr( "Frequency Multiplier" ) ),
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 ),
 	m_sampleFunction( &oscillator::sinSample )
 {
 
-	connect( &m_lfoWaveModel, SIGNAL( dataChanged() ),
+	connect( &m_waveModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleFunction() ) );
 }
 
@@ -61,11 +63,12 @@ lfoController::lfoController( model * _parent ) :
 
 lfoController::~lfoController()
 {
-	m_lfoBaseModel.disconnect( this );
-	m_lfoSpeedModel.disconnect( this );
-	m_lfoAmountModel.disconnect( this );
-	m_lfoPhaseModel.disconnect( this );
-	m_lfoWaveModel.disconnect( this );
+	m_baseModel.disconnect( this );
+	m_speedModel.disconnect( this );
+	m_amountModel.disconnect( this );
+	m_phaseModel.disconnect( this );
+	m_waveModel.disconnect( this );
+	m_multiplierModel.disconnect( this );
 }
 
 
@@ -87,11 +90,25 @@ float lfoController::value( int _offset )
 
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
-		int newDuration = static_cast<int>( 
-				engine::getMixer()->processingSampleRate() /
-				m_lfoSpeedModel.value() );
+		int newDuration = static_cast<int>(
+				(engine::getMixer()->processingSampleRate()) *
+				m_speedModel.value() );
+
+		switch(m_multiplierModel.value() )
+		{
+			case 1:
+				newDuration /= 100.0;
+				break;
+
+			case 2:
+				newDuration *= 100.0;
+				break;
+
+			default:
+				break;
+		}
 		
-		m_phaseOffset = m_lfoPhaseModel.value() * newDuration / 360.0;
+		m_phaseOffset = m_phaseModel.value() * newDuration / (360.0);
 
 		if (newDuration != m_duration) {
 			// frame offset
@@ -114,7 +131,6 @@ float lfoController::value( int _offset )
 
 			// newFrameOffset has old phaseCorrection built-in
 			m_phaseCorrection += newFrameOffset;
-			
 
 			// re-run the first calculation again
 			frame = runningFrames() + m_phaseCorrection;
@@ -124,12 +140,30 @@ float lfoController::value( int _offset )
 		}
 	}
 
-	float sampleFrame = float( ( frame+m_phaseOffset ) *
-			m_lfoSpeedModel.value() ) /
-			engine::getMixer()->processingSampleRate();
+	// speedModel  0..1   fast..slow  0ms..20000ms
+	// duration m_duration
+	//
+
+	//  frames / (20seconds of frames)
+	float sampleFrame = float( frame+m_phaseOffset ) / 
+		(engine::getMixer()->processingSampleRate() *  m_speedModel.value() );
+
+	switch(m_multiplierModel.value() )
+	{
+		case 1:
+			sampleFrame *= 100.0;
+			break;
+
+		case 2:
+			sampleFrame /= 100.0;
+			break;
+
+		default:
+			break;
+	}
 
 	// 44100 frames/sec
-	return m_lfoBaseModel.value() + ( m_lfoAmountModel.value() * 
+	return m_baseModel.value() + ( m_amountModel.value() * 
 			m_sampleFunction(sampleFrame) 
 			/ 2.0f );
 }
@@ -139,7 +173,7 @@ float lfoController::value( int _offset )
 
 void lfoController::updateSampleFunction( void )
 {
-	switch( m_lfoWaveModel.value() )
+	switch( m_waveModel.value() )
 	{
 		case oscillator::SineWave:
 			m_sampleFunction = &oscillator::sinSample;
@@ -171,11 +205,12 @@ void lfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	controller::saveSettings( _doc, _this );
 
-	m_lfoBaseModel.saveSettings( _doc, _this, "base" );
-	m_lfoSpeedModel.saveSettings( _doc, _this, "speed" );
-	m_lfoAmountModel.saveSettings( _doc, _this, "amount" );
-	m_lfoPhaseModel.saveSettings( _doc, _this, "phase" );
-	m_lfoWaveModel.saveSettings( _doc, _this, "wave" );
+	m_baseModel.saveSettings( _doc, _this, "base" );
+	m_speedModel.saveSettings( _doc, _this, "speed" );
+	m_amountModel.saveSettings( _doc, _this, "amount" );
+	m_phaseModel.saveSettings( _doc, _this, "phase" );
+	m_waveModel.saveSettings( _doc, _this, "wave" );
+	m_multiplierModel.saveSettings( _doc, _this, "multiplier" );
 }
 
 
@@ -184,11 +219,12 @@ void lfoController::loadSettings( const QDomElement & _this )
 {
 	controller::loadSettings( _this );
 
-	m_lfoBaseModel.loadSettings( _this, "base" );
-	m_lfoSpeedModel.loadSettings( _this, "speed" );
-	m_lfoAmountModel.loadSettings( _this, "amount" );
-	m_lfoPhaseModel.loadSettings( _this, "phase" );
-	m_lfoWaveModel.loadSettings( _this, "wave" );
+	m_baseModel.loadSettings( _this, "base" );
+	m_speedModel.loadSettings( _this, "speed" );
+	m_amountModel.loadSettings( _this, "amount" );
+	m_phaseModel.loadSettings( _this, "phase" );
+	m_waveModel.loadSettings( _this, "wave" );
+	m_multiplierModel.loadSettings( _this, "multiplier" );
 
 	updateSampleFunction();
 }

@@ -66,7 +66,7 @@ envelopeAndLFOParameters::envelopeAndLFOParameters(
 	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this,
 			tr( "LFO-predelay-time" ) ),
 	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO-attack-time" ) ),
-	m_lfoSpeedModel( 0.1, 0.01, 1.0, 0.0001, 20000.0, this,
+	m_lfoSpeedModel( 0.1, 0.01, 1.0, 0.0001, SECS_PER_LFO_OSCILLATION * 1000.0, this,
 			tr( "LFO-speed" ) ),
 	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this,
 			tr( "LFO-modulation-amount" ) ),

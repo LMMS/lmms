@@ -37,6 +37,7 @@
 
 class automatableButtonGroup;
 class knob;
+class ledCheckBox;
 class tempoSyncKnob;
 class pixmapButton;
 class oscillator;
@@ -72,11 +73,12 @@ slots:
 
 	*/
 
-	floatModel m_lfoBaseModel;
-	tempoSyncKnobModel m_lfoSpeedModel;
-	floatModel m_lfoAmountModel;
-	floatModel m_lfoPhaseModel;
-	intModel m_lfoWaveModel;
+	floatModel m_baseModel;
+	tempoSyncKnobModel m_speedModel;
+	floatModel m_amountModel;
+	floatModel m_phaseModel;
+	intModel m_waveModel;
+	intModel m_multiplierModel;
 
 	int m_duration;
 	int m_phaseCorrection;
@@ -116,13 +118,13 @@ protected:
 
 	lfoController * m_lfo;
 
-	knob * m_lfoBaseKnob;
-	tempoSyncKnob * m_lfoSpeedKnob;
-	knob * m_lfoAmountKnob;
-	knob * m_lfoPhaseKnob;
-
+	knob * m_baseKnob;
+	tempoSyncKnob * m_speedKnob;
+	knob * m_amountKnob;
+	knob * m_phaseKnob;
 	pixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_lfoWaveBtnGrp;
+	automatableButtonGroup * m_waveBtnGrp;
+	automatableButtonGroup * m_multiplierBtnGrp;
 
 } ;
 
