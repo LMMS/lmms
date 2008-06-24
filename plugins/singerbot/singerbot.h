@@ -2,6 +2,8 @@
  * singerbot.h - declaration of class singerBot, a singing bot instrument plugin
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,9 +28,7 @@
 #ifndef _SINGERBOT_H
 #define _SINGERBOT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "lmmsconfig.h"
 
 #ifndef USE_3RDPARTY_LIBSRC
 #include <samplerate.h>
@@ -50,7 +50,7 @@ class singerBotView;
 
 class singerBot : public instrument
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	singerBot( instrumentTrack * _track );
 	virtual ~singerBot();
@@ -69,7 +69,7 @@ public:
 	virtual pluginView * instantiateView( QWidget * _parent );
 
 	void setPlainText( const QString & _plain_text, bool _emitDataChanged = TRUE );
-    const QString & getPlainText();
+	const QString & getPlainText();
 
 private:
 	typedef struct
@@ -105,9 +105,9 @@ private:
 	void synth_read( handle_data * _hdata );
 
 	const char * addSuffix( const char * _s );
-    void showHandleData( handle_data * _hdata );
+	void showHandleData( handle_data * _hdata );
 
-    friend class singerBotView;
+	friend class singerBotView;
 
 } ;
 
@@ -123,10 +123,10 @@ public:
 
 public slots:
 	void viewTextChanged( void );
-    void modelTextChanged( void );
+	void modelTextChanged( void );
 
 private:
-    QTextEdit * m_lyrics;
+	QTextEdit * m_lyrics;
 
 } ;
 

@@ -580,7 +580,7 @@ bool instrumentTrack::play( const midiTime & _start,
 		const noteVector & notes = p->notes();
 		// ...and set our index to zero
 		noteVector::const_iterator it = notes.begin();
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 		int note_idx = 0;
 #endif
 
@@ -593,7 +593,7 @@ bool instrumentTrack::play( const midiTime & _start,
 			// skip notes which are posated before start-tact
 			while( it != notes.end() && ( *it )->pos() < cur_start )
 			{
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 				if( ( *it )->length() != 0 )
 				{
 					++note_idx;
@@ -618,13 +618,13 @@ bool instrumentTrack::play( const midiTime & _start,
 								note_frames,
 								*cur_note );
 				note_play_handle->setBBTrack( bb_track );
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 				note_play_handle->setPatternIndex( note_idx );
 #endif
 				engine::getMixer()->addPlayHandle(
 							note_play_handle );
 				played_a_note = TRUE;
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 				++note_idx;
 #endif
 			}
@@ -881,7 +881,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_midiInputAction->setText( tr( "MIDI input" ) );
 	m_midiOutputAction->setText( tr( "MIDI output" ) );
 
-	m_tswActivityIndicator = new fadeButton( QColor( 37, 57, 42 ),
+	m_tswActivityIndicator = new fadeButton( QColor( 56, 60, 72 ),
 						QColor( 64, 255, 16 ),
 						getTrackSettingsWidget() );
 	m_tswActivityIndicator->setGeometry( 212, 2, 8, 28 );

@@ -52,12 +52,9 @@
 #include "tempo_sync_knob.h"
 #include "track_container.h"
 #include "embed.h"
+#include "lmmsconfig.h"
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#ifdef HAVE_CTYPE_H
+#ifdef LMMS_HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 

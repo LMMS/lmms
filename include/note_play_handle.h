@@ -27,6 +27,7 @@
 #ifndef _NOTE_PLAY_HANDLE_H
 #define _NOTE_PLAY_HANDLE_H
 
+#include "lmmsconfig.h"
 #include "mixer.h"
 #include "note.h"
 #include "instrument.h"
@@ -55,7 +56,7 @@ public:
 	virtual ~notePlayHandle();
 
 
-	const float & frequency( void )
+	const float & frequency( void ) const
 	{
 		return( m_frequency );
 	}
@@ -250,7 +251,7 @@ public:
 	void processMidiTime( const midiTime & _time );
 	void resize( const bpm_t _new_bpm );
 
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 	int patternIndex( void )
 	{
 		return( m_patternIndex );
@@ -308,7 +309,7 @@ private:
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
 	track * m_bbTrack;		// related BB track
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif
 

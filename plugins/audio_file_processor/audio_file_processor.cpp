@@ -114,7 +114,8 @@ void audioFileProcessor::playNote( notePlayHandle * _n, bool,
 						m_loopModel.value() ) == TRUE )
 	{
 		applyRelease( _working_buffer, _n );
-		getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+		getInstrumentTrack()->processAudioBuffer( _working_buffer,
+								frames,_n );
 	}
 }
 

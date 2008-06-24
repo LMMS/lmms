@@ -52,8 +52,8 @@ graph::graph( QWidget * _parent, graphStyle _style ) :
 
 	graphModel * gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( Uint32, Uint32 ) ),
-			this, SLOT( updateGraph( Uint32, Uint32 ) ) );
+	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
+			this, SLOT( updateGraph( int, int ) ) );
 
 	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
 			this, SLOT( updateGraph( ) ) );
@@ -321,15 +321,15 @@ void graph::modelChanged( void )
 {
 	graphModel * gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( Uint32, Uint32 ) ),
-			this, SLOT( updateGraph( Uint32, Uint32 ) ) );
+	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
+			this, SLOT( updateGraph( int, int ) ) );
 
 	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
 			this, SLOT( updateGraph( ) ) );
 }
 
 
-void graph::updateGraph( Uint32 _startPos, Uint32 _endPos )
+void graph::updateGraph( int _startPos, int _endPos )
 {
 	// Can optimize by only drawing changed position
 	update();
@@ -342,7 +342,7 @@ void graph::updateGraph( void )
 }
 
 
-graphModel::graphModel( float _min, float _max, Uint32 _length,
+graphModel::graphModel( float _min, float _max, int _length,
 			::model * _parent, bool _default_constructed ) :
 	model( _parent, _default_constructed ),
 	m_samples( _length ),
@@ -369,7 +369,7 @@ void graphModel::setRange( float _min, float _max )
 		if( !m_samples.isEmpty() )
 		{
 			// Trim existing values 
-			for( Uint32 i=0; i < length(); i++ )
+			for( int i=0; i < length(); i++ )
 			{
 				m_samples[i] = fmaxf( _min, fminf( m_samples[i], _max ) );
 			}
@@ -381,7 +381,7 @@ void graphModel::setRange( float _min, float _max )
 
 
 
-void graphModel::setLength( Uint32 _length )
+void graphModel::setLength( int _length )
 {
 	if( _length != length() )
 	{
@@ -392,7 +392,7 @@ void graphModel::setLength( Uint32 _length )
 
 
 
-void graphModel::setSampleAt( Uint32 _x, float _val )
+void graphModel::setSampleAt( int _x, float _val )
 {
 	// boundary check
 	if ( _x >= 0 && _x < length() &&
@@ -418,7 +418,7 @@ void graphModel::setSamples( const float * _samples )
 
 void graphModel::setWaveToSine( void )
 {
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] = oscillator::sinSample(
 				i / static_cast<float>( length() ) );
@@ -431,7 +431,7 @@ void graphModel::setWaveToSine( void )
 
 void graphModel::setWaveToTriangle( void )
 {
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] = oscillator::triangleSample(
 				i / static_cast<float>( length() ) );
@@ -444,7 +444,7 @@ void graphModel::setWaveToTriangle( void )
 
 void graphModel::setWaveToSaw( void )
 {
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] = oscillator::sawSample(
 				i / static_cast<float>( length() ) );
@@ -457,7 +457,7 @@ void graphModel::setWaveToSaw( void )
 
 void graphModel::setWaveToSquare( void )
 {
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] = oscillator::squareSample(
 				i / static_cast<float>( length() ) );
@@ -470,7 +470,7 @@ void graphModel::setWaveToSquare( void )
 
 void graphModel::setWaveToNoise( void )
 {
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] = oscillator::noiseSample(
 				i / static_cast<float>( length() ) );
@@ -488,7 +488,7 @@ void graphModel::smooth( void )
 
 	// Smoothing
 	m_samples[0] = ( temp[0] + temp[length()-1] ) * 0.5f;
-	for ( Uint32 i=1; i < length(); i++ )
+	for ( int i=1; i < length(); i++ )
 	{
 		m_samples[i] = ( temp[i-1] + temp[i] ) * 0.5f; 	
 	}
@@ -501,7 +501,7 @@ void graphModel::smooth( void )
 void graphModel::normalize( void )
 {
 	float max = 0.0001f;
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		if( fabsf(m_samples[i]) > max && m_samples[i] != 0.0f )
 		{
@@ -509,7 +509,7 @@ void graphModel::normalize( void )
 		}
 	}
 
-	for( Uint32 i = 0; i < length(); i++ )
+	for( int i = 0; i < length(); i++ )
 	{
 		m_samples[i] /= max;
 	}

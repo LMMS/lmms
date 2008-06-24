@@ -1,5 +1,37 @@
 2008-06-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vibed/vibrating_string.h:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibrating_string.cpp:
+	* plugins/vibed/string_container.h:
+	* plugins/vibed/nine_button_selector.cpp:
+	* plugins/vibed/Makefile.am:
+	* plugins/vibed/vibed.cpp:
+	* plugins/singerbot/singerbot.h:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* include/note_play_handle.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_oss.cpp:
+	- fixed wrong config.h-inclusion and deprecated macro-names from
+	  config.h/lmmsconfig.h - makes Vibed plugin work again
+	- various coding-style fixes
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vibed/vibed.cpp:
+	fixed plugin-instantiation
+
+	* include/graph.h:
+	* src/gui/widgets/graph.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	use int instead of Uint32
+
 	* plugins/plucked_string_synth/logo.png:
 	* plugins/plucked_string_synth/plucked_string_synth.cpp:
 	* plugins/plucked_string_synth/plucked_string_synth.h:

@@ -70,7 +70,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_arpNote( _arp_note ),
 	m_muted( FALSE ),
 	m_bbTrack( NULL ),
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
 	m_orig_bpm( engine::getSong()->getTempo() )
@@ -91,7 +91,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 		_parent->m_arpNote = arpNote() && _parent->baseNote();
 
 		m_bbTrack = _parent->m_bbTrack;
-#if SINGERBOT_SUPPORT
+#if LMMS_SINGERBOT_SUPPORT
 		m_patternIndex = _parent->m_patternIndex;
 #endif
 	}

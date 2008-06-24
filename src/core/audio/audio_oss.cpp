@@ -39,11 +39,6 @@
 #include "gui_templates.h"
 #include "templates.h"
 
-
-#ifdef LMMS_HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif

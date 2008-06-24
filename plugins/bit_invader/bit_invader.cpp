@@ -161,8 +161,8 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 			this, SLOT( lengthChanged( ) )
 			);
 
-	connect( &m_graph, SIGNAL( samplesChanged( Uint32, Uint32 ) ),
-			this, SLOT( samplesChanged( Uint32, Uint32 ) ) );
+	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
+			this, SLOT( samplesChanged( int, int ) ) );
 
 }
 
@@ -234,7 +234,7 @@ void bitInvader::lengthChanged( void )
 }
 
 
-void bitInvader::samplesChanged( Uint32 _begin, Uint32 _end )
+void bitInvader::samplesChanged( int _begin, int _end )
 {
 	normalize();
 	//engine::getSongEditor()->setModified();
@@ -551,7 +551,7 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( void * _data )
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 	return( new bitInvader( static_cast<instrumentTrack *>( _data ) ) );
 }

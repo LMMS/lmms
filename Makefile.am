@@ -25,6 +25,8 @@ win32-pkg: all
 	mkdir -p tmp/lmms/plugins/ladspa/
 	cp lmms.exe tmp/lmms
 	find plugins/ -name "*.dll" -maxdepth 2 -exec cp '{}' tmp/lmms/plugins/ ';'
+	rm tmp/lmms/plugins/caps.dll
+	rm tmp/lmms/plugins/tap*.dll
 	cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
 	cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
 	PWD=`pwd`

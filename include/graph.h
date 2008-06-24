@@ -79,7 +79,7 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 protected slots:
-	void updateGraph( Uint32 _startPos, Uint32 _endPos );
+	void updateGraph( int _startPos, int _endPos );
 	void updateGraph( void );
 
 private:
@@ -105,7 +105,7 @@ class EXPORT graphModel : public model
 public:
 	graphModel( float _min,
 			float _max,
-			Uint32 _size,
+			int _size,
 			:: model * _parent,
 			bool _default_constructed = FALSE );
 
@@ -123,12 +123,12 @@ public:
 		return( m_maxValue );
 	}
 
-	inline Uint32 length( void ) const
+	inline int length( void ) const
 	{
 		return( m_samples.count() );
 	}
 	
-	inline const float* samples( void ) const
+	inline const float * samples( void ) const
 	{
 		return( m_samples.data() );
 	}
@@ -136,9 +136,9 @@ public:
 public slots:
 	void setRange( float _min, float _max );
 
-	void setLength( Uint32 _size );
+	void setLength( int _size );
 
-	void setSampleAt( Uint32 _samplePos, float _value );
+	void setSampleAt( int _samplePos, float _value );
 	void setSamples( const float * _value );
 
 	void setWaveToSine( void );
@@ -153,7 +153,7 @@ public slots:
 
 signals:
 	void lengthChanged( void );
-	void samplesChanged( Uint32 startPos, Uint32 endPos );
+	void samplesChanged( int startPos, int endPos );
 	void rangeChanged( void );
 
 private:

@@ -87,7 +87,7 @@ public:
 
 protected slots:
 	void lengthChanged( void );
-	void samplesChanged( Uint32, Uint32 );
+	void samplesChanged( int, int );
 
 	void normalize( void );
 
