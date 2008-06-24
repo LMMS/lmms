@@ -38,6 +38,7 @@ win32-pkg: all
 	cp /opt/mingw/bin/libvorbis*.dll tmp/lmms
 	cp /opt/mingw/bin/libogg-0.dll tmp/lmms
 	cp /opt/mingw/bin/libfluidsynth-1.dll tmp/lmms
+	cp /opt/mingw/bin/libfftw3f-3.dll tmp/lmms
 	cp /opt/mingw/bin/SDL.dll tmp/lmms
 	cp /opt/mingw/i586-mingw32/bin/mingwm10.dll tmp/lmms
 	cp -L COPYING tmp/lmms/LICENSE.TXT

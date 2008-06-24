@@ -7,6 +7,7 @@
 	* configure.in:
 	use float-based FFTW-library
 
+	* Makefile.am:
 	* include/peak_controller.h:
 	* include/tempo_sync_knob.h:
 	fixes for win32-build
