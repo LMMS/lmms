@@ -236,13 +236,13 @@ void nineButtonSelector::modelChanged( void )
 	updateButton( model()->value() );
 }
 
-void FASTCALL nineButtonSelector::setSelected( Uint8 _new_button )
+void nineButtonSelector::setSelected( Uint8 _new_button )
 {
 	model()->setValue(_new_button);
 	updateButton( _new_button );
 }
 
-void FASTCALL nineButtonSelector::updateButton( Uint8 _new_button )
+void nineButtonSelector::updateButton( Uint8 _new_button )
 {
 	m_lastBtn->setChecked( FALSE );
 	m_lastBtn->update();

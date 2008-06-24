@@ -24,7 +24,6 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include "config.h"
 #include "types.h"
 #include "pixmap_button.h"
 
@@ -55,7 +54,7 @@ public:
 				Uint8 _default,
 				Uint32 _x, Uint32 _y,
 				QWidget * _parent);
-	~nineButtonSelector();
+	virtual ~nineButtonSelector();
 	
 //	inline Uint8 getSelected() { 
 //		return( castModel<nineButtonSelectorModel>()->value() );

@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
 #include "types.h"
 
 class vibratingString
@@ -105,11 +104,9 @@ private:
 	
 	sample_t * m_outsamp;
 
-	delayLine * FASTCALL initDelayLine( int _len, int _pick );
-	static void FASTCALL freeDelayLine( delayLine * _dl );
-	void FASTCALL resample( float *_src,
-			f_cnt_t _src_frames,
-			f_cnt_t _dst_frames );
+	delayLine * initDelayLine( int _len, int _pick );
+	static void freeDelayLine( delayLine * _dl );
+	void resample( float *_src, f_cnt_t _src_frames, f_cnt_t _dst_frames );
 	
 	/* setDelayLine initializes the string with an impulse at the pick
 	 * position unless the impulse is longer than the string, in which

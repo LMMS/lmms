@@ -117,7 +117,7 @@ vibed::vibed( instrumentTrack * instrument_track ) :
 		harmonic = new nineButtonSelectorModel( 2, 0, 8, this );
 		m_harmonics.append( harmonic );
 
-		graphTmp = new graphModel( -1.0, 1.0, m_sampleLength, this );
+		graphTmp = new graphModel( -1.0, 1.0, __sampleLength, this );
 		graphTmp->setWaveToSine();
 
 		m_graphs.append( graphTmp );
@@ -135,8 +135,7 @@ vibed::~vibed()
 
 
 
-void vibed::saveSettings( QDomDocument & _doc,
-				QDomElement & _this )
+void vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 
 	QString name;
@@ -185,7 +184,7 @@ void vibed::saveSettings( QDomDocument & _doc,
 			QString sampleString;
 			base64::encode(
 				(const char *)m_graphs[i]->samples(), 
-				m_sampleLength * sizeof(float), 
+				__sampleLength * sizeof(float), 
 				sampleString );
 			name = "graph" + QString::number( i );
 			_this.setAttribute( name, sampleString ); 
@@ -280,7 +279,7 @@ void vibed::playNote( notePlayHandle * _n, bool, sampleFrame * _working_buffer )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
 				engine::getMixer()->processingSampleRate(),
-						m_sampleLength );
+						__sampleLength );
 		
 		for( Uint8 i = 0; i < 9; ++i )
 		{
@@ -342,6 +341,8 @@ void vibed::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
+
+
 pluginView * vibed::instantiateView( QWidget * _parent )
 {
 	return( new vibedView( this, _parent ) );
@@ -358,7 +359,7 @@ vibedView::vibedView( instrument * _instrument,
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
-			"artwork" ) );
+								"artwork" ) );
 	setPalette( pal );
 	
 	m_volumeKnob = new knob( knobBright_26, this );
@@ -550,7 +551,7 @@ vibedView::vibedView( instrument * _instrument,
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( Uint8 ) ),
 			this, SLOT( showString( Uint8 ) ) );
 
-	showString( 0 );	
+	showString( 0 );
 	// Get current graph-model
 	graphModel * gModel = m_graph->model();
 
@@ -660,10 +661,14 @@ vibedView::vibedView( instrument * _instrument,
 }
 
 
+
+
 void vibedView::modelChanged( void )
 {
 	showString( 0 );
 }
+
+
 
 
 void vibedView::showString( Uint8 _string )
@@ -686,11 +691,15 @@ void vibedView::showString( Uint8 _string )
 }
 
 
+
+
 void vibedView::sinWaveClicked( void )
 {
 	m_graph->model()->setWaveToSine();
 	engine::getSong()->setModified();
 }
+
+
 
 void vibedView::triangleWaveClicked( void )
 {
@@ -698,11 +707,15 @@ void vibedView::triangleWaveClicked( void )
 	engine::getSong()->setModified();
 }
 
+
+
 void vibedView::sawWaveClicked( void )
 {
 	m_graph->model()->setWaveToSaw();
 	engine::getSong()->setModified();
 }
+
+
 
 void vibedView::sqrWaveClicked( void )
 {
@@ -710,11 +723,15 @@ void vibedView::sqrWaveClicked( void )
 	engine::getSong()->setModified();
 }
 
+
+
 void vibedView::noiseWaveClicked( void )
 {
 	m_graph->model()->setWaveToNoise();
 	engine::getSong()->setModified();
 }
+
+
 
 void vibedView::usrWaveClicked( void )
 {
@@ -723,17 +740,22 @@ void vibedView::usrWaveClicked( void )
 	//engine::getSongEditor()->setModified();
 }
 
+
+
 void vibedView::smoothClicked( void )
 {
 	m_graph->model()->smooth();
 	engine::getSong()->setModified();
 }
 
+
+
 void vibedView::normalizeClicked( void )
 {
 	m_graph->model()->normalize();
 	engine::getSong()->setModified();
 }
+
 
 
 
@@ -748,6 +770,8 @@ void vibedView::contextMenuEvent( QContextMenuEvent * )
 }
 
 
+
+
 void vibedView::displayHelp( void )
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
@@ -759,10 +783,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-	plugin * PLUGIN_EXPORT lmms_plugin_main( void * _data )
-	{
-		return( new vibed( static_cast<instrumentTrack *>( _data ) ) );
-	}
+plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+{
+	return( new vibed( static_cast<instrumentTrack *>( _data ) ) );
+}
 
 
 }

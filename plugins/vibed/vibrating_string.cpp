@@ -90,8 +90,7 @@ vibratingString::vibratingString(	float _pitch,
 
 
 
-vibratingString::delayLine * FASTCALL vibratingString::initDelayLine( 
-								int _len,
+vibratingString::delayLine * vibratingString::initDelayLine( int _len,
 								int _pick )
 {
 	delayLine * dl = new vibratingString::delayLine[_len];
@@ -124,7 +123,7 @@ vibratingString::delayLine * FASTCALL vibratingString::initDelayLine(
 
 
 
-void FASTCALL vibratingString::freeDelayLine( delayLine * _dl )
+void vibratingString::freeDelayLine( delayLine * _dl )
 {
 	if( _dl )
 	{
@@ -136,9 +135,8 @@ void FASTCALL vibratingString::freeDelayLine( delayLine * _dl )
 
 
 
-void FASTCALL vibratingString::resample( float *_src,
-					 f_cnt_t _src_frames,
-					 f_cnt_t _dst_frames )
+void vibratingString::resample( float *_src, f_cnt_t _src_frames,
+							 f_cnt_t _dst_frames )
 {
 	for( f_cnt_t frame = 0; frame < _dst_frames; ++frame )
 	{

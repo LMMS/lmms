@@ -39,9 +39,8 @@ class notePlayHandle;
 class vibed : public instrument
 {
 	Q_OBJECT
-
 public:
-	vibed( instrumentTrack * _channel_track );
+	vibed( instrumentTrack * _instrument_track );
 	virtual ~vibed();
 
 	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
@@ -70,8 +69,8 @@ private:
 	QList<graphModel*> m_graphs;
 	QList<boolModel*> m_impulses;
 	QList<nineButtonSelectorModel*> m_harmonics;
-	
-	static const int m_sampleLength = 128;
+
+	static const int __sampleLength = 128;
 
 	friend class vibedView;
 } ;
