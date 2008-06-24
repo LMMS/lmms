@@ -1,5 +1,17 @@
 2008-06-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/plucked_string_synth/logo.png:
+	* plugins/plucked_string_synth/plucked_string_synth.cpp:
+	* plugins/plucked_string_synth/plucked_string_synth.h:
+	* plugins/plucked_string_synth/Makefile.am:
+	* plugins/plucked_string_synth/artwork.png:
+	* plugins/polyb302/polyb302.h:
+	* plugins/polyb302/logo.png:
+	* plugins/polyb302/Makefile.am:
+	* plugins/polyb302/polyb302.cpp:
+	* plugins/polyb302/artwork.png:
+	removed obsolete plugins
+
 	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
 	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
 	* plugins/spectrum_analyzer/Makefile.am:
