@@ -1,3 +1,16 @@
+2008-06-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* plugins/spectrum_analyzer/Makefile.am:
+	* plugins/spectrum_analyzer/spectrum_analyzer.h:
+	* configure.in:
+	use float-based FFTW-library
+
+	* include/peak_controller.h:
+	* include/tempo_sync_knob.h:
+	fixes for win32-build
+
 2008-06-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_effect.cpp:

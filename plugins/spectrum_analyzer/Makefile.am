@@ -19,7 +19,7 @@ if BUILD_WIN32
 DLL=$(PLUGIN_NAME).dll
 
 $(DLL): lib$(PLUGIN_NAME).la
-	$(CXX) *.o -L$(top_srcdir) -llmms-imp -shared -Wl,-no-undefined -o $@ $(QT_LDADD) && $(STRIP) $@
+	$(CXX) *.o -L$(top_srcdir) -llmms-imp -shared -Wl,-no-undefined -o $@ $(QT_LDADD) -lfftw3f-3 && $(STRIP) $@
 
 install-exec-hook: $(DLL)
 	cp $< $(pkglibdir)
@@ -49,6 +49,10 @@ libspectrumanalyzer_la_SOURCES =	spectrum_analyzer.cpp			\
 					spectrumanalyzer_controls.h		\
 					spectrumanalyzer_control_dialog.cpp	\
 					spectrumanalyzer_control_dialog.h
-libspectrumanalyzer_la_LDFLAGS = -lfftw3
+if BUILD_WIN32
+libspectrumanalyzer_la_LDFLAGS = -lfftw3f-3
+else
+libspectrumanalyzer_la_LDFLAGS = -lfftw3f
+endif
 
 $(libspectrumanalyzer_la_SOURCES): ./embedded_resources.h

@@ -61,15 +61,15 @@ public:
 private:
 	spectrumAnalyzerControls m_saControls;
 
-	fftw_plan m_fftPlan;
+	fftwf_plan m_fftPlan;
 
-	fftw_complex * m_specBuf;
-	double m_absSpecBuf[BUFFER_SIZE+1];
-	double m_buffer[BUFFER_SIZE*2];
+	fftwf_complex * m_specBuf;
+	float m_absSpecBuf[BUFFER_SIZE+1];
+	float m_buffer[BUFFER_SIZE*2];
 	int m_framesFilledUp;
 
-	double m_bands[MAX_BANDS];
-	double m_energy;
+	float m_bands[MAX_BANDS];
+	float m_energy;
 
 	friend class spectrumAnalyzerControls;
 	friend class spectrumView;

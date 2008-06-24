@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(lmms, 0.4.0-svn20080616, lmms-devel/at/lists/dot/sf/dot/net)
-AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080616)
+AC_INIT(lmms, 0.4.0-svn20080624, lmms-devel/at/lists/dot/sf/dot/net)
+AM_INIT_AUTOMAKE(lmms, 0.4.0-svn20080624)
 AX_PREFIX_CONFIG_H([include/lmmsconfig.h])
 
 AM_CONFIG_HEADER(config.h)
@@ -488,7 +488,11 @@ AC_ARG_WITH(fftw3,
 AH_TEMPLATE(HAVE_FFTW3_H, [Define to 1 if you have the <fftw3.h> header file.])
 if test "x$with_fftw3" = "xyes" ; then
 	AC_CHECK_HEADER(fftw3.h, HAVE_FFTW3_H="true")
-	AC_CHECK_LIB([fftw3], [fftw_execute], HAVE_LIBFFTW3="true", HAVE_FFTW3_H="")
+	if [ "$build_win32" = "true" ] ; then
+		AC_CHECK_LIB([fftw3f-3], [fftwf_execute], HAVE_LIBFFTW3="true", HAVE_FFTW3_H="")
+	else
+		AC_CHECK_LIB([fftw3f], [fftwf_execute], HAVE_LIBFFTW3="true", HAVE_FFTW3_H="")
+	fi
 fi
 if test ! -z "$HAVE_FFTW3_H" ; then
 	AC_DEFINE(HAVE_FFTW3_H)

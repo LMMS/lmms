@@ -58,9 +58,9 @@ spectrumAnalyzer::spectrumAnalyzer( model * _parent,
 	m_framesFilledUp( 0 ),
 	m_energy( 0 )
 {
-	m_specBuf = (fftw_complex *) fftw_malloc( ( BUFFER_SIZE + 1 ) *
-						sizeof( fftw_complex ) );
-	m_fftPlan = fftw_plan_dft_r2c_1d( BUFFER_SIZE*2, m_buffer,
+	m_specBuf = (fftwf_complex *) fftwf_malloc( ( BUFFER_SIZE + 1 ) *
+						sizeof( fftwf_complex ) );
+	m_fftPlan = fftwf_plan_dft_r2c_1d( BUFFER_SIZE*2, m_buffer,
 						m_specBuf, FFTW_MEASURE );
 }
 
@@ -69,8 +69,8 @@ spectrumAnalyzer::spectrumAnalyzer( model * _parent,
 
 spectrumAnalyzer::~spectrumAnalyzer()
 {
-	fftw_destroy_plan( m_fftPlan );
-	fftw_free( m_specBuf );
+	fftwf_destroy_plan( m_fftPlan );
+	fftwf_free( m_specBuf );
 }
 
 
@@ -88,9 +88,9 @@ enum WINDOWS
 
    returns -1 on error
 */
-double maximum(double *abs_spectrum, unsigned int spec_size)
+float maximum(float *abs_spectrum, unsigned int spec_size)
 {
-	double maxi=0;
+	float maxi=0;
 	unsigned int i;
 	
 	if ( abs_spectrum==NULL )
@@ -112,10 +112,10 @@ double maximum(double *abs_spectrum, unsigned int spec_size)
 /* apply hanning or hamming window to channel
 
 	returns -1 on error */
-int hanming(double *timebuffer, int length, int type)
+int hanming(float *timebuffer, int length, int type)
 {
 	int i;
-	double alpha;
+	float alpha;
 	
 	if ( (timebuffer==NULL)||(length<=0) )
 		return -1;
@@ -129,7 +129,7 @@ int hanming(double *timebuffer, int length, int type)
 	
 	for ( i=0; i<length; i++ )
 	{
-		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*M_PI*i/((double)length-1.0)));
+		timebuffer[i]=timebuffer[i]*(alpha+(1-alpha)*cos(2*M_PI*i/((float)length-1.0)));
 	}	
 
 	return 0;
@@ -141,7 +141,7 @@ int hanming(double *timebuffer, int length, int type)
                   - absspec buffer is big enough!
 
       returns 0 on success, else -1          */
-int absspec(fftw_complex *complex_buffer, double *absspec_buffer, int compl_length)
+int absspec(fftwf_complex *complex_buffer, float *absspec_buffer, int compl_length)
 {
 	int i;
 	
@@ -152,7 +152,7 @@ int absspec(fftw_complex *complex_buffer, double *absspec_buffer, int compl_leng
 
 	for (i=0; i<compl_length; i++)
 	{
-		absspec_buffer[i]=(double)sqrt(complex_buffer[i][0]*complex_buffer[i][0] + complex_buffer[i][1]*complex_buffer[i][1]);
+		absspec_buffer[i]=(float )sqrt(complex_buffer[i][0]*complex_buffer[i][0] + complex_buffer[i][1]*complex_buffer[i][1]);
 	}
 		
 	return 0;
@@ -164,12 +164,12 @@ int absspec(fftw_complex *complex_buffer, double *absspec_buffer, int compl_leng
                   - num_old > num_new
  
      returns 0 on success, else -1          */
-int compressbands(double *absspec_buffer, double *compressedband, int num_old, int num_new, int bottom, int top)
+int compressbands(float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top)
 {
-	double ratio;
+	float ratio;
 	int i, usefromold;
-	double j;
-	double j_min, j_max;
+	float j;
+	float j_min, j_max;
 	
 	if ( (absspec_buffer==NULL)||(compressedband==NULL) )
 		return -1;
@@ -188,7 +188,7 @@ int compressbands(double *absspec_buffer, double *compressedband, int num_old, i
 
 	usefromold=num_old-(num_old-top)-bottom;
 
-	ratio=(double)usefromold/(double)num_new;
+	ratio=(float)usefromold/(float)num_new;
 
 	// foreach new subband
 	for ( i=0; i<num_new; i++ )
@@ -212,13 +212,13 @@ int compressbands(double *absspec_buffer, double *compressedband, int num_old, i
 }
 
 
-int calc13octaveband31(double *absspec_buffer, double *subbands, int num_spec, double max_frequency)
+int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, float max_frequency)
 {
 static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000};
 	int i, j;
-	double f_min, f_max, frequency, bandwith;
+	float f_min, f_max, frequency, bandwith;
 	int j_min, j_max=0;
-	double fpower;
+	float fpower;
 
 
 	if ( (absspec_buffer==NULL)||(subbands==NULL) )
@@ -253,9 +253,9 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 		f_min=frequency-bandwith/2.0;
 		f_max=frequency+bandwith/2.0;
 
-		j_min=(int)(f_min/max_frequency*(double)num_spec);		
+		j_min=(int)(f_min/max_frequency*(float)num_spec);		
 
-		j_max=(int)(f_max/max_frequency*(double)num_spec);
+		j_max=(int)(f_max/max_frequency*(float)num_spec);
 
 
 		if ( (j_min<0)||(j_max<0) )
@@ -280,9 +280,9 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
    take care num_values is length of timesignal[]
 
       returns power on success, else -1          */
-double signalpower(double *timesignal, int num_values)
+float signalpower(float *timesignal, int num_values)
 {
-	double power=0;
+	float power=0;
 	unsigned int i;
 	
 	if ( num_values<=0 )
@@ -355,14 +355,14 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 	const int LOWEST_FREQ = 0;
 	const int HIGHEST_FREQ = sr / 2;
 
-	fftw_execute( m_fftPlan );
+	fftwf_execute( m_fftPlan );
 	absspec( m_specBuf, m_absSpecBuf, BUFFER_SIZE+1 );
 	if( m_saControls.m_linearSpec.value() )
 	{
 		compressbands( m_absSpecBuf, m_bands, BUFFER_SIZE+1,
 			MAX_BANDS,
-			LOWEST_FREQ*(BUFFER_SIZE+1)/(double)(sr/2),
-			HIGHEST_FREQ*(BUFFER_SIZE+1)/(double)(sr/2) );
+			LOWEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2),
+			HIGHEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2) );
 		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, BUFFER_SIZE );
 	}
 	else

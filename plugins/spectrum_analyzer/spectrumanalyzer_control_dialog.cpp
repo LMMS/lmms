@@ -75,7 +75,7 @@ public:
 		QPainter p( this );
 		QImage i = m_sa->m_saControls.m_linearSpec.value() ?
 					m_backgroundPlain : m_background;
-		const double e = m_sa->m_energy;
+		const float e = m_sa->m_energy;
 		if( e <= 0 )
 		{
 			darken( i, 0, 0, i.width(), i.height() );
@@ -84,7 +84,7 @@ public:
 		}
 
 		const bool lin_y = m_sa->m_saControls.m_linearYAxis.value();
-		double * b = m_sa->m_bands;
+		float * b = m_sa->m_bands;
 		const int LOWER_Y = -60;	// dB
 		int h;
 		if( m_sa->m_saControls.m_linearSpec.value() )
