@@ -1,5 +1,5 @@
 /*
- * lfo_controller.h - A LFO-based controller and dialog
+ * peak_controller.h - peak-controller class
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
@@ -38,7 +38,7 @@ class peakControllerEffect;
 
 
 
-class peakController : public controller
+class EXPORT peakController : public controller
 {
 	Q_OBJECT
 public:

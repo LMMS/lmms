@@ -38,7 +38,7 @@ class meterDialog;
 
 
 
-class tempoSyncKnobModel : public knobModel
+class EXPORT tempoSyncKnobModel : public knobModel
 {
 	Q_OBJECT
 public:
@@ -107,7 +107,7 @@ private:
 
 
 
-class tempoSyncKnob : public knob
+class EXPORT tempoSyncKnob : public knob
 {
 	Q_OBJECT
 public:
