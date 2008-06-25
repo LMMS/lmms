@@ -66,7 +66,7 @@ public:
 
 	float valueAt( const midiTime & _time );
 
-	const QString name( void );
+	const QString name( void ) const;
 
 	// settings-management
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -138,6 +138,7 @@ public slots:
 protected slots:
 	void resetName( void );
 	void changeName( void );
+	void disconnectObject( QAction * _a );
 
 
 protected:

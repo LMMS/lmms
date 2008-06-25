@@ -279,8 +279,12 @@ void automationPattern::loadSettings( const QDomElement & _this )
 
 
 
-const QString automationPattern::name( void )
+const QString automationPattern::name( void ) const
 {
+	if( !trackContentObject::name().isEmpty() )
+	{
+		return( trackContentObject::name() );
+	}
 	if( !m_objects.isEmpty() )
 	{
 		return( m_objects.first()->fullDisplayName() );
@@ -475,7 +479,7 @@ void automationPatternView::update( void )
 
 void automationPatternView::resetName( void )
 {
-	//m_pat->setName( m_pat->m_autoTrack->name() );
+	m_pat->setName( QString::null );
 }
 
 
@@ -486,9 +490,25 @@ void automationPatternView::changeName( void )
 	QString s = m_pat->name();
 	renameDialog rename_dlg( s );
 	rename_dlg.exec();
-//	m_pat->setName( s );
+	m_pat->setName( s );
+	update();
 }
 
+
+
+
+void automationPatternView::disconnectObject( QAction * _a )
+{
+	journallingObject * j = engine::getProjectJournal()->
+				getJournallingObject( _a->data().toInt() );
+	if( j && dynamic_cast<automatableModel *>( j ) )
+	{
+		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
+					m_pat->m_objects.end(),
+				dynamic_cast<automatableModel *>( j ) ) );
+		update();
+	}
+}
 
 
 
@@ -512,6 +532,27 @@ void automationPatternView::constructContextMenu( QMenu * _cm )
 						this, SLOT( resetName() ) );
 	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
 						this, SLOT( changeName() ) );
+	if( !m_pat->m_objects.isEmpty() )
+	{
+		_cm->addSeparator();
+		QMenu * m = new QMenu( tr( "Connections" ), _cm );
+		for( automationPattern::objectVector::iterator it =
+						m_pat->m_objects.begin();
+					it != m_pat->m_objects.end(); ++it )
+		{
+			if( *it )
+			{
+				a = new QAction( tr( "Disconnect \"%1\"" ).
+					arg( ( *it )->fullDisplayName() ), m );
+				a->setData( ( *it )->id() );
+				m->addAction( a );
+			}
+		}
+		connect( m, SIGNAL( triggered( QAction * ) ),
+				this, SLOT( disconnectObject( QAction * ) ) );
+		_cm->addMenu( m );
+	}
+	
 	_cm->addSeparator();
 }
 
@@ -611,10 +652,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 		p.setPen( QColor( 32, 240, 32 ) );
 	}
 
-	if( m_pat->name() != m_pat->m_autoTrack->name() )
-	{
-		p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
-	}
+	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
 
 	if( m_pat->isMuted() )
 	{
