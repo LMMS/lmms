@@ -250,7 +250,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 {
 	clear();
 
-	m_objects.clear();
+//	m_objects.clear();
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
