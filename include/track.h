@@ -66,20 +66,35 @@ class trackContentObject : public model, public journallingObject
 	Q_OBJECT
 public:
 	trackContentObject( track * _track );
-//	trackContentObject( const trackContentObject & _copy );
 	virtual ~trackContentObject();
+
 	inline track * getTrack( void )
 	{
 		return( m_track );
 	}
+
+	inline const QString & name( void ) const
+	{
+		return( m_name );
+	}
+
+	inline void setName( const QString & _name )
+	{
+		m_name = _name;
+		emit dataChanged();
+	}
+
+
 	inline const midiTime & startPosition( void ) const
 	{
 		return( m_startPosition );
 	}
+
 	inline midiTime endPosition( void ) const
 	{
 		return( m_startPosition + m_length );
 	}
+
 	inline const midiTime & length( void ) const
 	{
 		return( m_length );
@@ -94,7 +109,6 @@ public:
 	virtual void changeLength( const midiTime & _length );
 
 	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
-
 
 
 protected:
@@ -124,6 +138,8 @@ private:
 	} ;
 
 	track * m_track;
+	QString m_name;
+
 	midiTime m_startPosition;
 	midiTime m_length;
 

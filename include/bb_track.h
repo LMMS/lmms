@@ -58,7 +58,6 @@ public:
 
 
 private:
-	QString m_name;
 	unsigned int m_color;
 
 

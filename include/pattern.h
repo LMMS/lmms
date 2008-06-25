@@ -91,19 +91,6 @@ public:
 	void checkType( void );
 
 
-	// pattern-name functions
-	inline const QString & name( void ) const
-	{
-		return( m_name );
-	}
-
-	inline void setName( const QString & _name )
-	{
-		m_name = _name;
-		emit dataChanged();
-	}
-
-
 	// functions which are part of freezing-feature
 	inline bool freezing( void ) const
 	{
@@ -163,7 +150,6 @@ private:
 	instrumentTrack * m_instrumentTrack;
 
 	PatternTypes m_patternType;
-	QString m_name;
 
 	// data-stuff
 	noteVector m_notes;

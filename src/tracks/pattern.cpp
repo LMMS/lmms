@@ -66,12 +66,12 @@ pattern::pattern( instrumentTrack * _instrument_track ) :
 	trackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
-	m_name( _instrument_track->name() ),
 	m_steps( midiTime::stepsPerTact() ),
 	m_frozenPattern( NULL ),
 	m_freezing( FALSE ),
 	m_freezeAborted( FALSE )
 {
+	setName( _instrument_track->name() );
 	init();
 }
 
@@ -82,7 +82,6 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_instrumentTrack ),
 	m_instrumentTrack( _pat_to_copy.m_instrumentTrack ),
 	m_patternType( _pat_to_copy.m_patternType ),
-	m_name( "" ),
 	m_steps( _pat_to_copy.m_steps ),
 	m_frozenPattern( NULL ),
 	m_freezeAborted( FALSE )
@@ -324,7 +323,7 @@ void pattern::checkType( void )
 void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", m_patternType );
-	_this.setAttribute( "name", m_name );
+	_this.setAttribute( "name", name() );
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
@@ -362,7 +361,7 @@ void pattern::loadSettings( const QDomElement & _this )
 
 	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
 								).toInt() );
-	m_name = _this.attribute( "name" );
+	setName( _this.attribute( "name" ) );
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );

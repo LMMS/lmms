@@ -109,6 +109,7 @@ textFloat * trackContentObjectView::s_textFloat = NULL;
 trackContentObject::trackContentObject( track * _track ) :
 	model( _track ),
 	m_track( _track ),
+	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( FALSE, this )
@@ -968,9 +969,9 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 
 		// first show TCO for current BB...
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
-                    					it != m_tcoViews.end(); ++it )
+						it != m_tcoViews.end(); ++it )
 		{
-            if( ( *it )->getTrackContentObject()->
+		if( ( *it )->getTrackContentObject()->
                             startPosition().getTact() == cur_bb )
 			{
 				( *it )->move( 0, ( *it )->y() );
@@ -986,8 +987,8 @@ void trackContentWidget::changePosition( const midiTime & _new_pos )
 		for( tcoViewVector::iterator it = m_tcoViews.begin();
 					it != m_tcoViews.end(); ++it )
 		{
-            if( ( *it )->getTrackContentObject()->
-                            startPosition().getTact() != cur_bb )
+			if( ( *it )->getTrackContentObject()->
+	                            startPosition().getTact() != cur_bb )
 			{
 				( *it )->hide();
 			}

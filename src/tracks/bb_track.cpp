@@ -51,10 +51,6 @@ bbTrack::infoMap bbTrack::s_infoMap;
 
 bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
-	m_name(/* ( dynamic_cast<bbTrack *>( _track ) != NULL ) ?
-		dynamic_cast<bbTrack *>( _track )->trackLabel()->text() :
-								QString( "" )*/
-		"" ),
 	m_color( _color > 0 ? _color : qRgb( 64, 128, 255 ) )
 {
 	tact t = engine::getBBTrackContainer()->lengthOfBB(
@@ -79,7 +75,7 @@ bbTCO::~bbTCO()
 
 void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "name", m_name );
+	_this.setAttribute( "name", name() );
 	if( _this.parentNode().nodeName() == "clipboard" )
 	{
 		_this.setAttribute( "pos", -1 );
@@ -98,7 +94,7 @@ void bbTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void bbTCO::loadSettings( const QDomElement & _this )
 {
-	m_name = _this.attribute( "name" );
+	setName( _this.attribute( "name" ) );
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
@@ -216,7 +212,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 	p.setFont( pointSize<7>( p.font() ) );
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->m_name );
+	p.drawText( 2, p.fontMetrics().height() - 1, m_bbTCO->name() );
 
 	if( m_bbTCO->isMuted() )
 	{
@@ -243,9 +239,9 @@ void bbTCOView::resetName( void )
 {
 	if( dynamic_cast<bbTrackView *>( getTrackView() ) != NULL )
 	{
-		m_bbTCO->m_name =
+		m_bbTCO->setName(
 			dynamic_cast<bbTrackView *>( getTrackView() )->
-							trackLabel()->text();
+							trackLabel()->text() );
 	}
 }
 
@@ -254,8 +250,10 @@ void bbTCOView::resetName( void )
 
 void bbTCOView::changeName( void )
 {
-	renameDialog rename_dlg( m_bbTCO->m_name );
+	QString s = m_bbTCO->name();
+	renameDialog rename_dlg( s );
 	rename_dlg.exec();
+	m_bbTCO->setName( s );
 }
 
 

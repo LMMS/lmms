@@ -1,5 +1,18 @@
 2008-06-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track.h:
+	* include/pattern.h:
+	* include/bb_track.h:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/track.cpp:
+	name-property in trackContentObject-class
+
+	* include/automation_pattern.h:
+	* src/core/automation_pattern.cpp:
+	- added submenu for removing connections
+	- made automation-pattern rename working
+
 	* src/core/automation_pattern.cpp:
 	fixed loading song-global automation
 
