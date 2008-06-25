@@ -874,15 +874,15 @@ void song::loadProject( const QString & _file_name )
 			{
 				restoreControllerStates( node.toElement() );
 			}
+			else if( node.nodeName() ==
+					engine::getFxMixer()->nodeName() )
+			{
+				engine::getFxMixer()->restoreState(
+							node.toElement() );
+			}
 			else if( engine::hasGUI() )
 			{
 				if( node.nodeName() ==
-					engine::getFxMixer()->nodeName() )
-				{
-					engine::getFxMixer()->restoreState(
-							node.toElement() );
-				}
-				else if( node.nodeName() ==
 					engine::getPianoRoll()->nodeName() )
 				{
 					engine::getPianoRoll()->restoreState(
