@@ -1262,6 +1262,7 @@ void instrumentTrackWindow::saveSettingsBtnClicked( void )
 		QDir( preset_root ).mkdir( m_track->instrumentName() );
 	}
 
+	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setDirectory( preset_root + m_track->instrumentName() );
 	sfd.setFileMode( QFileDialog::AnyFile );
 	if( sfd.exec () == QDialog::Accepted &&
