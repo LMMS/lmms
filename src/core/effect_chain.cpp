@@ -247,6 +247,7 @@ bool effectChain::isRunning( void )
 
 void effectChain::clear( void )
 {
+	m_enabledModel.setValue( FALSE );
 	for( int i = 0; i < m_effects.count(); ++i )
 	{
 		delete m_effects[i];

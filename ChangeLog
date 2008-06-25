@@ -1,5 +1,14 @@
 2008-06-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/effect_chain.cpp:
+	when clear()ing, also disable FX-chain (closes #1994482)
+
+	* src/core/song.cpp:
+	always load FX-mixer-settings even if there's no GUI
+
+	* src/core/track_container.cpp:
+	fixed broken clearAllTracks()
+
 	* include/track.h:
 	* include/pattern.h:
 	* include/bb_track.h:
@@ -35,7 +44,7 @@
 	* src/core/audio/audio_device.cpp:
 	* src/core/audio/audio_oss.cpp:
 	- fixed wrong config.h-inclusion and deprecated macro-names from
-	  config.h/lmmsconfig.h - makes Vibed plugin work again
+	  config.h - makes Vibed plugin work again (closes #2000590)
 	- various coding-style fixes
 
 	* plugins/bit_invader/bit_invader.cpp:
@@ -464,7 +473,7 @@
 	* include/track.h:
 	* src/core/track.cpp:
 	- fixed issue when moving BB-tracks up/down where actual BB-TCOs were
-	  not moved
+	  not moved (closes #1994468)
 	- in trackContentObjectView and trackView, handle deletion of models
 	  more gracefully
 
@@ -891,7 +900,7 @@
 	* src/core/track.cpp:
 	* src/gui/track_container_view.cpp:
 	remove track from within slot in trackContainerView for not deleting
-	object inside its own method - fixes Qt-warning
+	object inside its own method - fixes Qt-warning and closes #1981812
 
 	* src/tracks/instrument_track.cpp:
 	when freeing instrument-window, also free view immediately - fixes
