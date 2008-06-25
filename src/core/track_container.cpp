@@ -172,12 +172,10 @@ void trackContainer::updateAfterTrackAdd( void )
 
 void trackContainer::clearAllTracks( void )
 {
-	for( trackList::iterator it = m_tracks.begin();
-						it != m_tracks.end(); ++it )
+	while( !m_tracks.isEmpty() )
 	{
-		delete *it;
+		delete m_tracks.first();
 	}
-	m_tracks.clear();
 }
 
 
