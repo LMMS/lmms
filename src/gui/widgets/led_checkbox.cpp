@@ -3,7 +3,7 @@
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,33 +25,31 @@
  */
 
 
-#include "led_checkbox.h"
-
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
-#include <QtGui/QPaintEvent>
 
+#include "led_checkbox.h"
 #include "embed.h"
 #include "gui_templates.h"
 
 
-static const QString names[ledCheckBox::TOTAL_COLORS] =
+static const QString names[ledCheckBox::NumColors] =
 {
-	"led_yellow", "led_green"
+	"led_yellow", "led_green", "led_red"
 } ;
 
 
 
 ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
-				const QString & _name, ledColors _color ) :
+				const QString & _name, LedColors _color ) :
 	automatableButton( _parent, _name ),
 	m_text( _text )
 {
 	setCheckable( TRUE );
 
-	if( _color >= TOTAL_COLORS || _color < YELLOW )
+	if( _color >= NumColors || _color < Yellow )
 	{
-		_color = YELLOW;
+		_color = Yellow;
 	}
 	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
 					names[_color].toAscii().constData() ) );

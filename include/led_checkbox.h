@@ -36,14 +36,17 @@ class EXPORT ledCheckBox : public automatableButton
 {
 	Q_OBJECT
 public:
-	enum ledColors
+	enum LedColors
 	{
-		YELLOW, GREEN, TOTAL_COLORS
+		Yellow,
+		Green,
+		Red,
+		NumColors
 	} ;
 
 	ledCheckBox( const QString & _txt, QWidget * _parent,
 				const QString & _name = QString::null,
-						ledColors _color = YELLOW );
+						LedColors _color = Yellow );
 	virtual ~ledCheckBox();
 
 

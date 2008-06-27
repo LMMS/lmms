@@ -62,7 +62,7 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 			ledCheckBox * toggle = new ledCheckBox(
 						m_ctl->getPort()->name, this,
 							QString::null,
-							ledCheckBox::GREEN );
+							ledCheckBox::Green );
 			toggle->setModel( m_ctl->getToggledModel() );
 			layout->addWidget( toggle );
 			if( link != NULL )

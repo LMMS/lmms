@@ -35,7 +35,6 @@
 #include "group_box.h"
 #include "gui_templates.h"
 #include "knob.h"
-#include "led_checkbox.h"
 #include "pixmap_button.h"
 #include "tempo_sync_knob.h"
 #include "tooltip.h"
