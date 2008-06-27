@@ -38,8 +38,6 @@
 #include "dummy_plugin.h"
 
 
-//static embed::descriptor dummy_embed = { 0, NULL, "" } ;
-
 static plugin::descriptor dummy_plugin_descriptor =
 {
 	"dummy",
@@ -177,7 +175,7 @@ void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 		{
 			printf( "LMMS-plugin %s does not have a "
 				"plugin-descriptor named %s!\n",
-					f.absoluteFilePath().toAscii().constData(),
+				f.absoluteFilePath().toAscii().constData(),
 					desc_name.toAscii().constData() );
 			continue;
 		}
@@ -185,6 +183,7 @@ void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 	}
 
 }
+
 
 
 

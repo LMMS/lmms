@@ -1383,23 +1383,13 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_muteBtn->setCheckable( TRUE );
 	m_muteBtn->move( 46, 8 );
 	m_muteBtn->show();
-	m_muteBtn->setWhatsThis(
-		tr( "With this switch you can either mute this track or mute "
-			"all other tracks.\nBy clicking left, this track is "
-			"muted. This is useful, if you only want to listen to "
-			"the other tracks without changing this track "
-			"and loosing information.\nWhen you click right on "
-			"this switch, all other tracks will be "
-			"muted. This is useful, if you only want to listen to "
-			"this track." ) );
 	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
 
-	m_soloBtn = new pixmapButton( this, tr( "Mute" ) );
+	m_soloBtn = new pixmapButton( this, tr( "Solo" ) );
 	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( TRUE );
 	m_soloBtn->move( 62, 8 );
-	m_soloBtn->show();
 	toolTip::add( m_soloBtn, tr( "Solo" ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( trackView * ) ),

@@ -283,12 +283,14 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/lfo_controller_dialog.cpp			\
 		$(srcdir)/src/gui/lmms_style.cpp				\
 		$(srcdir)/src/gui/main_window.cpp				\
+		$(srcdir)/src/gui/peak_controller_dialog.cpp			\
 		$(srcdir)/src/gui/piano_roll.cpp				\
 		$(srcdir)/src/gui/plugin_browser.cpp				\
 		$(srcdir)/src/gui/setup_dialog.cpp				\
 		$(srcdir)/src/gui/song_editor.cpp				\
 		$(srcdir)/src/gui/string_pair_drag.cpp				\
 		$(srcdir)/src/gui/track_container_view.cpp			\
+		$(srcdir)/src/gui/dialogs/export_project.ui			\
 		$(srcdir)/src/gui/widgets/automatable_button.cpp		\
 		$(srcdir)/src/gui/widgets/automatable_slider.cpp		\
 		$(srcdir)/src/gui/widgets/caption_menu.cpp			\
@@ -316,7 +318,6 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/midi_port_menu.cpp			\
 		$(srcdir)/src/gui/widgets/name_label.cpp			\
 		$(srcdir)/src/gui/widgets/nstate_button.cpp			\
-		$(srcdir)/src/gui/peak_controller_dialog.cpp			\
 		$(srcdir)/src/gui/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/gui/widgets/project_notes.cpp			\
 		$(srcdir)/src/gui/widgets/rubberband.cpp			\
@@ -392,7 +393,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/fader.h					\
 		$(srcdir)/include/mv_base.h					\
 		$(srcdir)/include/automatable_model.h				\
-		$(srcdir)/include/automatable_model_templates.h			\
 		$(srcdir)/include/graph.h					\
 		$(srcdir)/include/group_box.h					\
 		$(srcdir)/include/tab_widget.h					\
@@ -468,7 +468,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/base64.h					\
 		$(srcdir)/include/journalling_object.h				\
 		$(srcdir)/include/serializing_object.h				\
-		$(srcdir)/include/level_object.h				\
 		$(srcdir)/include/project_journal.h				\
 		$(srcdir)/include/shared_object.h				\
 		$(srcdir)/include/import_filter.h				\
