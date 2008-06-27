@@ -1,3 +1,27 @@
+2008-06-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	added panning-knob to track-settings-widget
+
+	* include/fx_mixer.h:
+	* include/fx_mixer_view.h:
+	* src/core/fx_mixer.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	added mute-button for each FX-line
+
+	* include/led_checkbox.h:
+	* src/gui/peak_controller_dialog.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* src/gui/widgets/ladspa_control_view.cpp:
+	* src/gui/widgets/led_checkbox.cpp:
+	made enumeration match current coding style
+
+	* src/core/track.cpp:
+	* src/core/plugin.cpp:
+	* Makefile.am:
+	cleanups
+
 2008-06-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/instrument_track.cpp:

@@ -834,7 +834,8 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	setFixedHeight( 32 );
 
 	// creation of widgets for track-settings-widget
-	m_tswVolumeKnob = new knob( knobSmall_17, getTrackSettingsWidget() );
+	m_tswVolumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+							tr( "Volume" ) );
 	m_tswVolumeKnob->setVolumeKnob( TRUE );
 	m_tswVolumeKnob->setModel( &_it->m_volumeModel );
 	m_tswVolumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
@@ -843,10 +844,19 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_tswVolumeKnob->show();
 	m_tswVolumeKnob->setWhatsThis( tr( volume_help ) );
 
+	m_tswPanningKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+							tr( "Panning" ) );
+	m_tswPanningKnob->setModel( &_it->m_panningModel );
+	m_tswPanningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
+	m_tswPanningKnob->move( 24, 4 );
+	m_tswPanningKnob->setLabel( tr( "PAN" ) );
+	m_tswPanningKnob->show();
+
+
 	QPushButton * tsw_midi = new QPushButton(
 				embed::getIconPixmap( "piano" ), QString::null,
 						getTrackSettingsWidget() );
-	tsw_midi->setGeometry( 32, 2, 28, 28 );
+	tsw_midi->setGeometry( 50, 2, 28, 28 );
 	tsw_midi->show();
 	toolTip::add( tsw_midi, tr( "MIDI input/output" ) );
 	m_tswMidiMenu = new QMenu( tsw_midi );
@@ -855,14 +865,18 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	// sequenced MIDI?
 	if( !engine::getMixer()->getMIDIClient()->isRaw() )
 	{
-		_it->m_midiPort.m_readablePortsMenu = new midiPortMenu( midiPort::Input );
-		_it->m_midiPort.m_writablePortsMenu = new midiPortMenu( midiPort::Output );
-		_it->m_midiPort.m_readablePortsMenu->setModel( &_it->m_midiPort );
-		_it->m_midiPort.m_writablePortsMenu->setModel( &_it->m_midiPort );
+		_it->m_midiPort.m_readablePortsMenu = new midiPortMenu(
+							midiPort::Input );
+		_it->m_midiPort.m_writablePortsMenu = new midiPortMenu(
+							midiPort::Output );
+		_it->m_midiPort.m_readablePortsMenu->setModel(
+							&_it->m_midiPort );
+		_it->m_midiPort.m_writablePortsMenu->setModel(
+							&_it->m_midiPort );
 		m_midiInputAction = m_tswMidiMenu->addMenu(
-							_it->m_midiPort.m_readablePortsMenu );
+					_it->m_midiPort.m_readablePortsMenu );
 		m_midiOutputAction = m_tswMidiMenu->addMenu(
-							_it->m_midiPort.m_writablePortsMenu );
+					_it->m_midiPort.m_writablePortsMenu );
 	}
 	else
 	{
@@ -896,7 +910,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 
 	m_tswInstrumentTrackButton = new instrumentTrackButton( this );
 	m_tswInstrumentTrackButton->setCheckable( TRUE );
-	m_tswInstrumentTrackButton->setGeometry( 64, 2, 144, 28 );
+	m_tswInstrumentTrackButton->setGeometry( 82, 2, 126, 28 );
 	m_tswInstrumentTrackButton->show();
 
 	setModel( _it );

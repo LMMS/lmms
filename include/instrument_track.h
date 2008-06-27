@@ -241,6 +241,7 @@ private:
 
 	// widgets in track-settings-widget
 	knob * m_tswVolumeKnob;
+	knob * m_tswPanningKnob;
 	fadeButton * m_tswActivityIndicator;
 	instrumentTrackButton * m_tswInstrumentTrackButton;
 
