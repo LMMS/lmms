@@ -30,7 +30,7 @@
 
 #include "lmmsconfig.h"
 
-#ifndef USE_3RDPARTY_LIBSRC
+#ifndef LMMS_USE_3RDPARTY_LIBSRC
 #include <samplerate.h>
 #else
 #include "src/3rdparty/samplerate/samplerate.h"
@@ -68,7 +68,8 @@ public:
 
 	virtual pluginView * instantiateView( QWidget * _parent );
 
-	void setPlainText( const QString & _plain_text, bool _emitDataChanged = TRUE );
+	void setPlainText( const QString & _plain_text,
+						bool _emitDataChanged = TRUE );
 	const QString & getPlainText();
 
 private:
