@@ -47,7 +47,6 @@ struct fxChannel
 	float m_peakRight;
 	sampleFrame * m_buffer;
 	boolModel m_muteModel;
-	boolModel m_soloModel;
 	floatModel m_volumeModel;
 	QString m_name;
 	QMutex m_lock;

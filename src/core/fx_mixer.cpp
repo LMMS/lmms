@@ -38,7 +38,6 @@ fxChannel::fxChannel( model * _parent ) :
 	m_peakRight( 0.0f ),
 	m_buffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
 	m_muteModel( FALSE, _parent ),
-	m_soloModel( FALSE, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
 	m_lock()
@@ -90,15 +89,19 @@ fxMixer::~fxMixer()
 
 void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	m_fxChannels[_ch]->m_lock.lock();
-	sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
-	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
+	if( m_fxChannels[_ch]->m_muteModel.value() == FALSE )
 	{
-		buf[f][0] += _buf[f][0];
-		buf[f][1] += _buf[f][1];
+		m_fxChannels[_ch]->m_lock.lock();
+		sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
+		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
+									++f )
+		{
+			buf[f][0] += _buf[f][0];
+			buf[f][1] += _buf[f][1];
+		}
+		m_fxChannels[_ch]->m_used = TRUE;
+		m_fxChannels[_ch]->m_lock.unlock();
 	}
-	m_fxChannels[_ch]->m_used = TRUE;
-	m_fxChannels[_ch]->m_lock.unlock();
 }
 
 
@@ -106,8 +109,10 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void fxMixer::processChannel( fx_ch_t _ch )
 {
-	if( m_fxChannels[_ch]->m_used || m_fxChannels[_ch]->m_stillRunning ||
-								_ch == 0 )
+	if( m_fxChannels[_ch]->m_muteModel.value() == FALSE &&
+		( m_fxChannels[_ch]->m_used ||
+				m_fxChannels[_ch]->m_stillRunning ||
+								_ch == 0 ) )
 	{
 		const fpp_t f = engine::getMixer()->framesPerPeriod();
 		m_fxChannels[_ch]->m_fxChain.startRunning();
@@ -165,6 +170,13 @@ const surroundSampleFrame * fxMixer::masterMix( void )
 	}
 
 	processChannel( 0 );
+
+	if( m_fxChannels[0]->m_muteModel.value() )
+	{
+		engine::getMixer()->clearAudioBuffer( m_out,
+					engine::getMixer()->framesPerPeriod() );
+		return( m_out );
+	}
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )

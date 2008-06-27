@@ -42,6 +42,8 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "song_editor.h"
+#include "tooltip.h"
+#include "pixmap_button.h"
 
 
 
@@ -72,7 +74,7 @@ public:
 		p.setPen( m_mv->currentFxLine() == this ?
 					QColor( 0, 255, 0 ) : Qt::white );
 		p.setFont( pointSizeF( font(), 7.5f ) );
-		p.drawText( -70, 20, m_name );
+		p.drawText( -90, 20, m_name );
 	}
 
 	virtual void mousePressEvent( QMouseEvent * )
@@ -167,10 +169,23 @@ fxMixerView::fxMixerView() :
 		l->move( 2, 4 );
 		l->setMarginWidth( 1 );
 
+
 		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
 								cv->m_fxLine );
 		cv->m_fader->move( 15-cv->m_fader->width()/2,
-						cv->m_fxLine->height()-130 );
+						cv->m_fxLine->height()-
+						cv->m_fader->height()-5 );
+
+		cv->m_muteBtn = new pixmapButton( cv->m_fxLine, tr( "Mute" ) );
+		cv->m_muteBtn->setModel( &m->m_fxChannels[i]->m_muteModel );
+		cv->m_muteBtn->setActiveGraphic(
+					embed::getIconPixmap( "led_off" ) );
+		cv->m_muteBtn->setInactiveGraphic(
+					embed::getIconPixmap( "led_green" ) );
+		cv->m_muteBtn->setCheckable( TRUE );
+		cv->m_muteBtn->move( 9,  cv->m_fader->y()-16);
+		toolTip::add( cv->m_muteBtn, tr( "Mute this track" ) );
+
 		cv->m_rackView = new effectRackView(
 				&m->m_fxChannels[i]->m_fxChain, this );
 		m_fxRacksLayout->addWidget( cv->m_rackView );

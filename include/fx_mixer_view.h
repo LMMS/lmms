@@ -66,8 +66,7 @@ private:
 	{
 		fxLine * m_fxLine;
 		effectRackView * m_rackView;
-		pixmapButton * m_muteButton;
-		pixmapButton * m_soloButton;
+		pixmapButton * m_muteBtn;
 		fader * m_fader;
 	} ;
 
