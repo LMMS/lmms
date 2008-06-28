@@ -69,7 +69,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "automation-editor" );
+		return( "automationeditor" );
 	}
 
 
