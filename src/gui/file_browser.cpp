@@ -552,7 +552,7 @@ void listView::mouseReleaseEvent( QMouseEvent * _me )
 		{
 			samplePlayHandle * s = dynamic_cast<samplePlayHandle *>(
 							m_previewPlayHandle );
-			if( s->totalFrames() - s->framesDone() <=
+			if( s && s->totalFrames() - s->framesDone() <=
 				static_cast<f_cnt_t>( engine::getMixer()->
 						processingSampleRate() * 3 ) )
 			{
