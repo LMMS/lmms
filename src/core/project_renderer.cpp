@@ -79,6 +79,7 @@ projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,
 				_os.samplerate, DEFAULT_CHANNELS, success_ful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
+				_os.depth == Depth_32Bit ? 32 : 16,
 							engine::getMixer() );
 	if( success_ful == FALSE )
 	{

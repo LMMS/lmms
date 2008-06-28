@@ -39,13 +39,15 @@ audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,
 					const bitrate_t _nom_bitrate,
 					const bitrate_t _min_bitrate,
 					const bitrate_t _max_bitrate,
+					const int _depth,
 					mixer * _mixer ) :
 	audioDevice( _channels, _mixer ),
 	m_outputFile( _file ),
 	m_useVbr( _use_vbr ),
 	m_nomBitrate( _nom_bitrate ),
 	m_minBitrate( _min_bitrate ),
-	m_maxBitrate( _max_bitrate )
+	m_maxBitrate( _max_bitrate ),
+	m_depth( _depth )
 {
 	setSampleRate( _sample_rate );
 

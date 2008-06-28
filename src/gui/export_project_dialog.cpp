@@ -137,9 +137,11 @@ void exportProjectDialog::startBtnClicked( void )
 					aliasFreeOscillatorsCB->isChecked() );
 
 	projectRenderer::outputSettings os = projectRenderer::outputSettings(
-			samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
-			FALSE,
-			bitrateCB->currentText().section( " ", 0, 0 ).toUInt() );
+		samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
+		FALSE,
+		bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
+		static_cast<projectRenderer::Depths>(
+						depthCB->currentIndex() ) );
 
 	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
 	connect( m_renderer, SIGNAL( progressChanged( int ) ),

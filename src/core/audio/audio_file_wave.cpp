@@ -40,9 +40,11 @@ audioFileWave::audioFileWave( const sample_rate_t _sample_rate,
 				const bitrate_t _nom_bitrate,
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
+				const int _depth,
 				mixer * _mixer ) :
 	audioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-			_nom_bitrate, _min_bitrate, _max_bitrate, _mixer )
+			_nom_bitrate, _min_bitrate, _max_bitrate,
+								_depth, _mixer )
 {
 	_success_ful = startEncoding();
 }
@@ -60,6 +62,21 @@ audioFileWave::~audioFileWave()
 
 bool audioFileWave::startEncoding( void )
 {
+#if LMMS_HAVE_SNDFILE_H
+	m_si.samplerate = sampleRate();
+	m_si.channels = channels();
+	m_si.frames = getMixer()->framesPerPeriod();
+	m_si.sections = 1;
+	m_si.seekable = 0;
+
+	switch( depth() )
+	{
+		case 32: m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT; break;
+		case 16:
+		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
+	}
+	m_sf = sf_open( outputFile().toUtf8().constData(), SFM_WRITE, &m_si );
+#else
 	if( outputFileOpened() == FALSE )
 	{
 		return( FALSE );
@@ -68,11 +85,10 @@ bool audioFileWave::startEncoding( void )
 	m_bytesWritten = 0;
 
 	memcpy( m_waveFileHeader.riff_id, "RIFF", 4 );
-	m_waveFileHeader.total_bytes = swap32IfBE( 0 );
+	m_waveFileHeader.total_bytes = 0;
 	memcpy( m_waveFileHeader.wave_fmt_str, "WAVEfmt ", 8 );
-	m_waveFileHeader.bitrate_1 =
-		m_waveFileHeader.bitrate_2 =
-			swap16IfBE( BYTES_PER_INT_SAMPLE * 8 );
+	m_waveFileHeader.bitrate_1 = m_waveFileHeader.bitrate_2 =
+						BYTES_PER_INT_SAMPLE * 8;
 	m_waveFileHeader.uncompressed = swap16IfBE( 1 );
 	m_waveFileHeader.channels = swap16IfBE( channels() );
 	m_waveFileHeader.sample_rate = swap32IfBE( sampleRate() );
@@ -81,10 +97,10 @@ bool audioFileWave::startEncoding( void )
 	m_waveFileHeader.block_alignment = swap16IfBE( BYTES_PER_INT_SAMPLE *
 								channels() );
 	memcpy ( m_waveFileHeader.data_chunk_id, "data", 4 );
-	m_waveFileHeader.data_bytes = swap32IfBE( 0 );
+	m_waveFileHeader.data_bytes = 0;
 
 	writeData( &m_waveFileHeader, sizeof( m_waveFileHeader ) );
-
+#endif
 	return( TRUE );
 }
 
@@ -95,14 +111,40 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {
+#if LMMS_HAVE_SNDFILE_H
+	if( depth() == 32 )
+	{
+		float *  buf = new float[_frames*channels()];
+		for( fpp_t frame = 0; frame < _frames; ++frame )
+		{
+			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			{
+				buf[frame*channels()+chnl] = _ab[frame][chnl] *
+								_master_gain;
+			}
+		}
+		sf_writef_float( m_sf, buf, _frames );
+		delete[] buf;
+	}
+	else
+	{
+		int_sample_t * buf = new int_sample_t[_frames * channels()];
+		convertToS16( _ab, _frames, _master_gain, buf,
+							!isLittleEndian() );
+
+		sf_writef_short( m_sf, buf, _frames );
+		delete[] buf;
+	}
+#else
+	int bytes = 0;
 	int_sample_t * outbuf = new int_sample_t[_frames * channels()];
 	Uint32 bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
 							!isLittleEndian() );
 	writeData( outbuf, bytes );
-
 	delete[] outbuf;
 
 	m_bytesWritten += bytes;
+#endif
 }
 
 
@@ -110,14 +152,18 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 
 void audioFileWave::finishEncoding( void )
 {
+#if LMMS_HAVE_SNDFILE_H
+	sf_close( m_sf );
+#else
 	seekToBegin();
 
-	m_waveFileHeader.total_bytes = m_bytesWritten+36;
-	m_waveFileHeader.data_bytes = m_bytesWritten;
+	m_waveFileHeader.total_bytes = swap32IfBE( m_bytesWritten+36 );
+	m_waveFileHeader.data_bytes = swap32IfBE( m_bytesWritten );
 
 	// write header again, because total-bytes-field and data-bytes-field
 	// have to be updated...
 	writeData( &m_waveFileHeader, sizeof( m_waveFileHeader ) );
+#endif
 }
 
 

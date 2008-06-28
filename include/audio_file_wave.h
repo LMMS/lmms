@@ -2,7 +2,7 @@
  * audio_file_wave.h - Audio-device which encodes wave-stream and writes it
  *                     into an WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,8 +28,12 @@
 #define _AUDIO_FILE_WAVE_H
 
 
+#include "lmmsconfig.h"
 #include "audio_file_device.h"
 
+#ifdef LMMS_HAVE_SNDFILE_H
+#include <sndfile.h>
+#endif
 
 
 class audioFileWave : public audioFileDevice
@@ -43,6 +47,7 @@ public:
 			const bitrate_t _nom_bitrate,
 			const bitrate_t _min_bitrate,
 			const bitrate_t _max_bitrate,
+			const int _depth,
 			mixer * _mixer );
 	virtual ~audioFileWave();
 
@@ -54,12 +59,13 @@ public:
 						const bitrate_t _nom_bitrate,
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
+						const int _depth,
 						mixer * _mixer )
 	{
 		return( new audioFileWave( _sample_rate, _channels,
 						_success_ful, _file, _use_vbr,
 						_nom_bitrate, _min_bitrate,
-							_max_bitrate,
+							_max_bitrate, _depth,
 							_mixer ) );
 	}
 
@@ -73,6 +79,10 @@ private:
 	void finishEncoding( void );
 
 
+#if LMMS_HAVE_SNDFILE_H
+	SF_INFO m_si;
+	SNDFILE * m_sf;
+#else
 	int m_bytesWritten;
 
 	struct waveFileHeader
@@ -91,6 +101,7 @@ private:
 		char data_chunk_id[4];		// "data"
 		Uint32 data_bytes;		// total size of sample-data
 	} m_waveFileHeader;
+#endif
 
 } ;
 

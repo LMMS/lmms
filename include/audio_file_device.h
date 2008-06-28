@@ -42,6 +42,7 @@ public:
 				const bitrate_t _nom_bitrate,
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
+				const int _depth,
 				mixer * _mixer );
 	virtual ~audioFileDevice();
 
@@ -75,6 +76,11 @@ protected:
 		return( m_maxBitrate );
 	}
 
+	inline int depth( void ) const
+	{
+		return( m_depth );
+	}
+
 	inline bool outputFileOpened( void ) const
 	{
 		return( m_outputFile.isOpen() );
@@ -90,6 +96,8 @@ private:
 	bitrate_t m_minBitrate;
 	bitrate_t m_maxBitrate;
 
+	int m_depth;
+
 } ;
 
 
@@ -102,6 +110,7 @@ typedef audioFileDevice * ( * audioFileDeviceInstantiaton )
 						const bitrate_t _nom_bitrate,
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
+						const int _depth,
 						mixer * _mixer );
 
 

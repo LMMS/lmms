@@ -1,5 +1,17 @@
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/audio_file_device.h:
+	* include/audio_file_ogg.h:
+	* include/audio_file_wave.h:
+	* include/project_renderer.h:
+	* src/core/audio/audio_file_device.cpp:
+	* src/core/audio/audio_file_ogg.cpp:
+	* src/core/audio/audio_file_wave.cpp:
+	* src/core/main.cpp:
+	* src/core/project_renderer.cpp:
+	* src/gui/export_project_dialog.cpp:
+	added support for exporting WAVE-files with 32-bit-float format
+
 	* include/automation_editor.h:
 	fixed node-name
 

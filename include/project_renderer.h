@@ -42,15 +42,26 @@ public:
 		NumFileFormats
 	} ;
 
+	enum Depths
+	{
+		Depth_16Bit,
+		Depth_32Bit,
+		NumDepths
+	} ;
+
 	struct outputSettings
 	{
 		sample_rate_t samplerate;
 		bool vbr;
 		int bitrate;
-		outputSettings( sample_rate_t _sr, bool _vbr, int _bitrate ) :
+		Depths depth;
+
+		outputSettings( sample_rate_t _sr, bool _vbr, int _bitrate,
+								Depths _d ) :
 			samplerate( _sr ),
 			vbr( _vbr ),
-			bitrate( _bitrate )
+			bitrate( _bitrate ),
+			depth( _d )
 		{
 		}
 	} ;

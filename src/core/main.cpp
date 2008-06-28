@@ -102,7 +102,8 @@ int main( int argc, char * * argv )
 	QString file_to_load, render_out;
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
-	projectRenderer::outputSettings os( 44100, FALSE, 160 );
+	projectRenderer::outputSettings os( 44100, FALSE, 160,
+						projectRenderer::Depth_16Bit );
 	projectRenderer::ExportFileFormats eff = projectRenderer::WaveFile;
 
 

@@ -49,9 +49,11 @@ audioFileOgg::audioFileOgg( const sample_rate_t _sample_rate,
 				const bitrate_t _nom_bitrate,
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
+				const int _depth,
 				mixer * _mixer ) :
 	audioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-			_nom_bitrate, _min_bitrate, _max_bitrate, _mixer )
+				_nom_bitrate, _min_bitrate, _max_bitrate,
+								_depth, _mixer )
 {
 	_success_ful = startEncoding();
 }
@@ -95,13 +97,13 @@ bool audioFileOgg::startEncoding( void )
 	// vbr enabled?
 	if( useVBR() == 0 )
 	{
-		m_minBitrate 	= nominalBitrate();	// min for vbr
-		m_maxBitrate 	= nominalBitrate();	// max for vbr
+		m_minBitrate = nominalBitrate();	// min for vbr
+		m_maxBitrate = nominalBitrate();	// max for vbr
 	}
 	else
 	{
-		m_minBitrate 	= minBitrate();	// min for vbr
-		m_maxBitrate 	= maxBitrate();	// max for vbr
+		m_minBitrate = minBitrate();		// min for vbr
+		m_maxBitrate = maxBitrate();		// max for vbr
 	}
 
 	m_rate 		= sampleRate();		// default-samplerate
