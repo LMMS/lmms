@@ -174,6 +174,115 @@ void mainWindow::finalize( void )
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
 
 
+	// project-popup-menu
+	QMenu * project_menu = new QMenu( this );
+	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
+	project_menu->addAction( embed::getIconPixmap( "project_new" ),
+					tr( "&New" ),
+					this, SLOT( createNewProject() ),
+					Qt::CTRL + Qt::Key_N );
+
+	project_menu->addAction( embed::getIconPixmap( "project_open" ),
+					tr( "&Open..." ),
+					this, SLOT( openProject() ),
+					Qt::CTRL + Qt::Key_O );	
+
+	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
+				embed::getIconPixmap( "project_open_recent" ),
+					tr( "Recently opened projects" ) );
+	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
+			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
+	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
+
+	project_menu->addAction( embed::getIconPixmap( "project_save" ),
+					tr( "&Save" ),
+					this, SLOT( saveProject() ),
+					Qt::CTRL + Qt::Key_S );
+
+	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
+					tr( "Save &As..." ),
+					this, SLOT( saveProjectAs() ),
+					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
+	project_menu->addSeparator();
+	project_menu->addAction( embed::getIconPixmap( "project_import" ),
+					tr( "Import..." ),
+					engine::getSong(),
+					SLOT( importProject() ) );
+	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+					tr( "E&xport..." ),
+					engine::getSong(),
+					SLOT( exportProject() ),
+					Qt::CTRL + Qt::Key_E );
+	project_menu->addSeparator();
+	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
+					qApp, SLOT( closeAllWindows() ),
+					Qt::CTRL + Qt::Key_Q );
+
+
+	QMenu * edit_menu = new QMenu( this );
+	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
+	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
+					tr( "Undo" ),
+					this, SLOT( undo() ),
+					Qt::CTRL + Qt::Key_Z );
+	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
+					tr( "Redo" ),
+					this, SLOT( redo() ),
+					Qt::CTRL + Qt::Key_R );
+	edit_menu->addSeparator();
+	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+					tr( "Settings" ),
+					this, SLOT( showSettingsDialog() ) );
+
+
+	m_toolsMenu = new QMenu( this );
+	QVector<plugin::descriptor> pluginDescriptors;
+	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
+	for( QVector<plugin::descriptor>::iterator it =
+						pluginDescriptors.begin();
+					it != pluginDescriptors.end(); ++it )
+	{
+		if( it->type == plugin::Tool )
+		{
+			m_toolsMenu->addAction( it->logo->pixmap(),
+							it->publicName );
+			m_tools.push_back( tool::instantiate( it->name,
+					/*this*/NULL )->createView( this ) );
+		}
+	}
+	if( !m_toolsMenu->isEmpty() )
+	{
+		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
+		connect( m_toolsMenu, SIGNAL( triggered( QAction * ) ),
+					this, SLOT( showTool( QAction * ) ) );
+	}
+
+
+	// help-popup-menu
+	QMenu * help_menu = new QMenu( this );
+	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
+	// May use offline help
+	if( TRUE )
+	{
+		help_menu->addAction( embed::getIconPixmap( "help" ),
+						tr( "Online help" ),
+						this, SLOT( browseHelp() ) );
+	}
+	else
+	{
+		help_menu->addAction( embed::getIconPixmap( "help" ),
+							tr( "Help" ),
+							this, SLOT( help() ) );
+	}
+	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
+					tr( "What's this?" ),
+					this, SLOT( enterWhatsThisMode() ) );
+
+	help_menu->addSeparator();
+	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+			      this, SLOT( aboutLMMS() ) );
+
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
 					embed::getIconPixmap( "project_new" ),
@@ -181,13 +290,19 @@ void mainWindow::finalize( void )
 					this, SLOT( createNewProject() ),
 							m_toolBar );
 
-	m_templatesMenu = new QMenu( project_new );
+	toolButton * project_new_from_template = new toolButton(
+			embed::getIconPixmap( "project_new_from_template" ),
+				tr( "Create new project from template" ),
+					this, SLOT( emptySlot() ),
+							m_toolBar );
+
+	m_templatesMenu = new QMenu( project_new_from_template );
 	connect( m_templatesMenu, SIGNAL( aboutToShow() ),
 					this, SLOT( fillTemplatesMenu() ) );
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
-	project_new->setMenu( m_templatesMenu );
-	project_new->setPopupMode( toolButton::MenuButtonPopup );
+	project_new_from_template->setMenu( m_templatesMenu );
+	project_new_from_template->setPopupMode( toolButton::InstantPopup );
 
 	toolButton * project_open = new toolButton( 
 					embed::getIconPixmap( "project_open" ),
@@ -195,6 +310,13 @@ void mainWindow::finalize( void )
 					this, SLOT( openProject() ),
 								m_toolBar );
 
+
+	toolButton * project_open_recent = new toolButton( 
+				embed::getIconPixmap( "project_open_recent" ),
+					tr( "Recently opened project" ),
+					this, SLOT( emptySlot() ), m_toolBar );
+	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
+	project_open_recent->setPopupMode( toolButton::InstantPopup );
 
 	toolButton * project_save = new toolButton( 
 					embed::getIconPixmap( "project_save" ),
@@ -213,9 +335,11 @@ void mainWindow::finalize( void )
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
-	m_toolBarLayout->addWidget( project_open, 0, 2 );
-	m_toolBarLayout->addWidget( project_save, 0, 3 );
-	m_toolBarLayout->addWidget( project_export, 0, 4 );
+	m_toolBarLayout->addWidget( project_new_from_template, 0, 2 );
+	m_toolBarLayout->addWidget( project_open, 0, 3 );
+	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
+	m_toolBarLayout->addWidget( project_save, 0, 5 );
+	m_toolBarLayout->addWidget( project_export, 0, 6 );
 
 
 
@@ -312,115 +436,6 @@ void mainWindow::finalize( void )
 
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
-
-	// project-popup-menu
-	QMenu * project_menu = new QMenu( this );
-	menuBar()->addMenu( project_menu )->setText( tr( "&Project" ) );
-	project_menu->addAction( embed::getIconPixmap( "project_new" ),
-					tr( "&New" ),
-					this, SLOT( createNewProject() ),
-					Qt::CTRL + Qt::Key_N );
-
-	project_menu->addAction( embed::getIconPixmap( "project_open" ),
-					tr( "&Open..." ),
-					this, SLOT( openProject() ),
-					Qt::CTRL + Qt::Key_O );	
-
-	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
-					embed::getIconPixmap( "project_open" ),
-					tr( "Recently opened projects" ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( aboutToShow() ),
-			this, SLOT( updateRecentlyOpenedProjectsMenu() ) );
-	connect( m_recentlyOpenedProjectsMenu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( openRecentlyOpenedProject( QAction * ) ) );
-
-	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "&Save" ),
-					this, SLOT( saveProject() ),
-					Qt::CTRL + Qt::Key_S );
-
-	project_menu->addAction( embed::getIconPixmap( "project_saveas" ),
-					tr( "Save &As..." ),
-					this, SLOT( saveProjectAs() ),
-					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
-	project_menu->addSeparator();
-	project_menu->addAction( /*embed::getIconPixmap( "project_import" ),*/
-					tr( "Import..." ),
-					engine::getSong(),
-					SLOT( importProject() ) );
-	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "E&xport..." ),
-					engine::getSong(),
-					SLOT( exportProject() ),
-					Qt::CTRL + Qt::Key_E );
-	project_menu->addSeparator();
-	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
-					qApp, SLOT( closeAllWindows() ),
-					Qt::CTRL + Qt::Key_Q );
-
-
-	QMenu * edit_menu = new QMenu( this );
-	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
-					tr( "Undo" ),
-					this, SLOT( undo() ),
-					Qt::CTRL + Qt::Key_Z );
-	edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
-					tr( "Redo" ),
-					this, SLOT( redo() ),
-					Qt::CTRL + Qt::Key_R );
-	edit_menu->addSeparator();
-	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
-					tr( "Settings" ),
-					this, SLOT( showSettingsDialog() ) );
-
-
-	m_toolsMenu = new QMenu( this );
-	QVector<plugin::descriptor> pluginDescriptors;
-	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( QVector<plugin::descriptor>::iterator it =
-						pluginDescriptors.begin();
-					it != pluginDescriptors.end(); ++it )
-	{
-		if( it->type == plugin::Tool )
-		{
-			m_toolsMenu->addAction( it->logo->pixmap(),
-							it->publicName );
-			m_tools.push_back( tool::instantiate( it->name,
-					/*this*/NULL )->createView( this ) );
-		}
-	}
-	if( !m_toolsMenu->isEmpty() )
-	{
-		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
-		connect( m_toolsMenu, SIGNAL( triggered( QAction * ) ),
-					this, SLOT( showTool( QAction * ) ) );
-	}
-
-
-	// help-popup-menu
-	QMenu * help_menu = new QMenu( this );
-	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
-	// May use offline help
-	if( TRUE )
-	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
-						tr( "Online help" ),
-						this, SLOT( browseHelp() ) );
-	}
-	else
-	{
-		help_menu->addAction( embed::getIconPixmap( "help" ),
-							tr( "Help" ),
-							this, SLOT( help() ) );
-	}
-	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
-					tr( "What's this?" ),
-					this, SLOT( enterWhatsThisMode() ) );
-
-	help_menu->addSeparator();
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
-			      this, SLOT( aboutLMMS() ) );
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
@@ -629,7 +644,8 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 	QStringList rup = configManager::inst()->recentlyOpenedProjects();
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
-		m_recentlyOpenedProjectsMenu->addAction( *it );
+		m_recentlyOpenedProjectsMenu->addAction(
+				embed::getIconPixmap( "project_file" ), *it );
 	}
 }
 

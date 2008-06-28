@@ -531,7 +531,8 @@ void automationPatternView::constructContextMenu( QMenu * _cm )
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
+	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 	if( !m_pat->m_objects.isEmpty() )
 	{

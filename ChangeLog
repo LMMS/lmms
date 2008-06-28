@@ -1,6 +1,19 @@
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/main_window.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/automation_pattern.cpp:
+	* data/themes/default/project_new_from_template.png:
+	* data/themes/default/project_new.png:
+	* data/themes/default/project_import.png:
+	* data/themes/default/project_open_recent.png:
+	* data/themes/default/edit_rename.png:
+	* data/themes/default/rename.png:
+	splitted "new project"-button and added "recently opened
+	project"-button
+
+	* src/gui/main_window.cpp:
 	* src/gui/song_editor.cpp:
 	* src/tracks/instrument_track.cpp:
 	* data/themes/default/edit_draw.png:

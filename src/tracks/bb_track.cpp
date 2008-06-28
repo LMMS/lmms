@@ -156,7 +156,8 @@ void bbTCOView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
 						this, SLOT( resetName() ) );
-	_cm->addAction( embed::getIconPixmap( "rename" ), tr( "Change name" ),
+	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
+						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 	_cm->addAction( embed::getIconPixmap( "colorize" ),
 			tr( "Change color" ), this, SLOT( changeColor() ) );
