@@ -53,13 +53,12 @@ configManager::configManager( void ) :
 #endif
 									),
 	m_artworkDir( defaultArtworkDir() ),
-	m_pluginDir( qApp->applicationDirPath()
 #ifdef LMMS_BUILD_WIN32
-			+ QDir::separator() + "plugins" + QDir::separator()
+	m_pluginDir( qApp->applicationDirPath()
+			+ QDir::separator() + "plugins" + QDir::separator() ),
 #else
-				.section( '/', 0, -2 ) + "/lib/lmms/"
+	m_pluginDir( QString( LIBDIR ) + "/lmms/" ),
 #endif
-									),
 	m_vstDir( QDir::home().absolutePath() ),
 	m_flDir( QDir::home().absolutePath() )
 {
@@ -329,7 +328,7 @@ bool configManager::loadConfigFile( void )
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
-		m_ladDir = "/usr/lib/ladspa/:/usr/local/lib/ladspa/";
+		m_ladDir = QString(LIBDIR) + "/ladspa/:/usr/lib/ladspa/:/usr/local/lib/ladspa/";
 #endif
 	}
 

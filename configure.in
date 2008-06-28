@@ -18,7 +18,7 @@ AM_PROG_LIBTOOL
 
 if ! test -z "${prefix}" -o "${prefix}" = "NONE" ; then
 	CFLAGS="$CFLAGS -I${prefix}/include"
-	CPPFLAGS="$CPPFLAGS -I${prefix}/include"
+	CPPFLAGS="$CPPFLAGS -I${prefix}/include -DLIBDIR='\"${libdir}\"'"
 	LDFLAGS="$LDFLAGS -L${prefix}/bin"
 fi
 

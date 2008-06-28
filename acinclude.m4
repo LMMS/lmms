@@ -55,7 +55,7 @@ fi
 # Search for available Qt translations
 AH_TEMPLATE(QT_TRANSLATIONS_DIR, [Define to Qt translations directory])
 AC_MSG_CHECKING([Qt translations])
-QT_TRANSLATIONS_SEARCH="/usr/share/qt4 /usr/local/qt /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1"
+QT_TRANSLATIONS_SEARCH="$QTDIR /usr/share/qt4 /usr/local/qt /usr/local/Trolltech/Qt-4.3.0 /usr/local/Trolltech/Qt-4.3.1"
 for i in $QT_TRANSLATIONS_SEARCH ; do
     if test -d $i/translations -a x$QT_TRANSLATIONS = x ; then
         QT_TRANSLATIONS=$i/translations
