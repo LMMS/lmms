@@ -220,6 +220,21 @@ void mainWindow::finalize( void )
 
 
 	// window-toolbar
+	toolButton * song_editor_window = new toolButton(
+					embed::getIconPixmap( "songeditor" ),
+					tr( "Show/hide Song-Editor" ) + " (F5)",
+					this, SLOT( toggleSongEditorWin() ),
+								m_toolBar );
+	song_editor_window->setShortcut( Qt::Key_F5 );
+	song_editor_window->setWhatsThis(
+		tr( "By pressing this button, you can show or hide the "
+			"Song-Editor. With the help of the Song-Editor you can "
+			"edit song-playlist and specify when which track "
+			"should be played. "
+			"You can also insert and move samples (e.g. "
+			"rap-samples) directly into the playlist." ) );
+
+
 	toolButton * bb_editor_window = new toolButton(
 					embed::getIconPixmap( "bb_track" ),
 					tr( "Show/hide Beat+Baseline Editor" ) +
@@ -249,29 +264,14 @@ void mainWindow::finalize( void )
 				"you can edit melody-patterns in an easy way."
 				) );
 
-	toolButton * song_editor_window = new toolButton(
-					embed::getIconPixmap( "songeditor" ),
-					tr( "Show/hide Song-Editor" ) + " (F8)",
-					this, SLOT( toggleSongEditorWin() ),
-								m_toolBar );
-	song_editor_window->setShortcut( Qt::Key_F8 );
-	song_editor_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
-			"Song-Editor. With the help of the Song-Editor you can "
-			"edit song-playlist and specify when which track "
-			"should be played. "
-			"You can also insert and move samples (e.g. "
-			"rap-samples) directly into the playlist." ) );
-
-
 	toolButton * automation_editor_window = new toolButton(
 					embed::getIconPixmap( "automation" ),
 					tr( "Show/hide Automation Editor" ) +
-									" (F9)",
+									" (F8)",
 					this,
 					SLOT( toggleAutomationEditorWin() ),
 					m_toolBar );
-	automation_editor_window->setShortcut( Qt::Key_F9 );
+	automation_editor_window->setShortcut( Qt::Key_F8 );
 	automation_editor_window->setWhatsThis(
 			tr( "By pressing this button, you can show or hide the "
 				"Automation Editor. With the help of the "
@@ -281,9 +281,10 @@ void mainWindow::finalize( void )
 
 	toolButton * fx_mixer_window = new toolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "Show/hide FX Mixer" ) + " (F11)",
-					this, SLOT( toggleFxMixerWin() ), m_toolBar );
-	fx_mixer_window->setShortcut( Qt::Key_F11 );
+					tr( "Show/hide FX Mixer" ) + " (F9)",
+					this, SLOT( toggleFxMixerWin() ),
+					m_toolBar );
+	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis( 
 		tr( "By pressing this button, you can show or hide the "
 			"FX Mixer. The FX Mixer is a very powerful tool "
@@ -302,9 +303,9 @@ void mainWindow::finalize( void )
 			"project notes window. In this window you can put "
 			"down your project notes.") );
 
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( piano_roll_window, 1, 2 );
-	m_toolBarLayout->addWidget( song_editor_window, 1, 3 );
+	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
+	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
+	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );

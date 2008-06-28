@@ -250,7 +250,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_drawModeButton->setChecked( TRUE );
 
 	m_editModeButton = new toolButton( embed::getIconPixmap(
-								"edit_arrow" ),
+								"edit_select" ),
 					tr( "Edit mode (select and move)" ),
 							NULL, NULL, m_toolBar );
 	m_editModeButton->setCheckable( TRUE );

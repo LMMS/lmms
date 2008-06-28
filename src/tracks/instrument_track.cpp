@@ -1485,7 +1485,7 @@ void instrumentTrackButton::paintEvent( QPaintEvent * _pe )
 					extra, height() / 2 + extra, in );
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawText( ( width() - QFontMetrics( p.font() ).width( n ) ) /
-				2 + extra, height() / 2 +
+				2 + extra, height() / 2 - 2 +
 				QFontMetrics( p.font() ).height() + extra, n );
 }
 

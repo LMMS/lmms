@@ -93,13 +93,13 @@ QToolBar {
 QToolButton, toolButton {
 	padding: 2px 1px 1px 2px;
 	border-radius: 2px;
-	border: none;
+	border: 1px solid rgba(0,0,0,64);
 }
 
 QToolButton:hover {
-	background: rgba(255,255,255,96);
+	background: rgba(255,255,255,128);
 	border-radius: 3px;
-	border: 1px solid rgba(255,255,255,64);
+	border: 1px solid rgba(0,0,0,128);
 }
 
 QToolButton:pressed {
