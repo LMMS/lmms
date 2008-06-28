@@ -82,7 +82,7 @@ man1_MANS = lmms.1
 lmms_MOC =						\
 		./about_dialog.moc			\
 		./automatable_model.moc			\
-		./automatable_model_view.moc			\
+		./automatable_model_view.moc		\
 		./automatable_button.moc		\
 		./automatable_slider.moc		\
 		./automation_editor.moc			\
@@ -220,6 +220,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/core/instrument_sound_shaping.cpp			\
 		$(srcdir)/src/core/fx_mixer.cpp					\
 		$(srcdir)/src/core/import_filter.cpp				\
+		$(srcdir)/src/core/inline_automation.cpp			\
 		$(srcdir)/src/core/instrument.cpp				\
 		$(srcdir)/src/core/instrument_functions.cpp			\
 		$(srcdir)/src/core/journalling_object.cpp			\
@@ -359,6 +360,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/lmms_style.h					\
 		$(srcdir)/include/mixer.h					\
 		$(srcdir)/include/pattern.h					\
+		$(srcdir)/include/inline_automation.h				\
 		$(srcdir)/include/instrument_track.h				\
 		$(srcdir)/include/note.h					\
 		$(srcdir)/include/volume.h					\

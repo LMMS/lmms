@@ -114,7 +114,10 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_length(),
 	m_mutedModel( FALSE, this )
 {
-	m_track->addTCO( this );
+	if( getTrack() )
+	{
+		getTrack()->addTCO( this );
+	}
 	setJournalling( FALSE );
 	movePosition( 0 );
 	changeLength( 0 );
@@ -137,7 +140,10 @@ trackContentObject::~trackContentObject()
  */
 	emit destroyed();
 
-	m_track->removeTCO( this );
+	if( getTrack() )
+	{
+		getTrack()->removeTCO( this );
+	}
 }
 
 
@@ -1904,7 +1910,6 @@ void track::getTCOsInRange( tcoVector & _tco_v, const midiTime & _start,
  */
 void track::swapPositionOfTCOs( int _tco_num1, int _tco_num2 )
 {
-	// TODO: range-checking
 	qSwap( m_trackContentObjects[_tco_num1],
 					m_trackContentObjects[_tco_num2] );
 

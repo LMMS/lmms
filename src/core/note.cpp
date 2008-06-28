@@ -175,7 +175,7 @@ void note::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "pos", m_pos );
 	if( m_length > 0 )
 	{
-		m_detuning->saveSettings( _doc, _this, "detuning" );
+		m_detuning->saveSettings( _doc, _this );
 	}
 }
 
@@ -191,7 +191,10 @@ void note::loadSettings( const QDomElement & _this )
 	m_panning = _this.attribute( "pan" ).toInt();
 	m_length = _this.attribute( "len" ).toInt();
 	m_pos = _this.attribute( "pos" ).toInt();
-	m_detuning->loadSettings( _this, "detuning" );
+	if( _this.hasChildNodes() )
+	{
+		m_detuning->loadSettings( _this );
+	}
 }
 
 
@@ -239,8 +242,7 @@ void note::redoStep( journalEntry & _je )
 
 void note::editDetuningPattern( void )
 {
-#warning: TODO
-//	m_detuning->getAutomationPattern()->openInAutomationEditor();
+	m_detuning->getAutomationPattern()->openInAutomationEditor();
 }
 
 
@@ -248,9 +250,8 @@ void note::editDetuningPattern( void )
 
 void note::createDetuning( void )
 {
-#warning: TODO
 	m_detuning = new detuningHelper;
-//	m_detuning->initAutomationPattern();
+	(void) m_detuning->getAutomationPattern();
 	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
 }
 
@@ -259,10 +260,12 @@ void note::createDetuning( void )
 
 bool note::hasDetuningInfo( void )
 {
-#warning: TODO
-/*	automationPattern::timeMap map =
+	if( m_detuning->hasAutomationPattern() )
+	{
+		const automationPattern::timeMap & map =
 			m_detuning->getAutomationPattern()->getTimeMap();
-	return( map.size() > 1 || map[0] != 0 );*/
+		return( map.size() > 1 || map[0] != 0 );
+	}
 	return( FALSE );
 }
 

@@ -1,3 +1,26 @@
+2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/automation_editor.h:
+	fixed node-name
+
+	* Makefile.am:
+	* include/automation_pattern.h:
+	* include/detuning_helper.h:
+	* include/inline_automation.h:
+	* include/note_play_handle.h:
+	* src/core/automation_pattern.cpp:
+	* src/core/inline_automation.cpp:
+	* src/core/note.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/track.cpp:
+	* src/gui/piano_roll.cpp:
+	made note-detuning-automation work by making automationPatterns also
+	work without a parent-track and writing a generic inlineAutomation-class
+
+	* src/gui/file_browser.cpp:
+	fixed crash when encountering invalid samplePlayHandle while
+	previewing (closes #2004875)
+
 2008-06-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/instrument_track.h:

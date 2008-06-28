@@ -602,13 +602,10 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
-#warning BLAH
-/*	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
-	timeMap::iterator it = map.end();
-	do
+	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
+	for( timeMap::const_iterator it = map.begin(); it != map.end(); ++it )
 	{
-		--it;
-		Sint32 pos_ticks = -it.key();
+		Sint32 pos_ticks = it.key();
 		if( pos_ticks > _n->length() )
 		{
 			break;
@@ -621,7 +618,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 
 		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
 		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
-	} while( it != map.begin() );*/
+	}
 }
 
 

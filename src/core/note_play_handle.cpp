@@ -39,7 +39,7 @@
 inline notePlayHandle::baseDetuning::baseDetuning(
 						detuningHelper * _detuning ) :
 	m_detuning( _detuning ),
-	m_value( /*m_detuning->getAutomationPattern()->valueAt( 0 )*/ 0 )
+	m_value( m_detuning->getAutomationPattern()->valueAt( 0 ) )
 {
 }
 
@@ -77,12 +77,12 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 {
 	if( m_baseNote )
 	{
-		m_base_detuning = new baseDetuning( detuning() );
+		m_baseDetuning = new baseDetuning( detuning() );
 		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else
 	{
-		m_base_detuning = _parent->m_base_detuning;
+		m_baseDetuning = _parent->m_baseDetuning;
 
 		_parent->m_subNotes.push_back( this );
 		// if there was an arp-note added and parent is a base-note
@@ -123,7 +123,7 @@ notePlayHandle::~notePlayHandle()
 
 	if( m_baseNote )
 	{
-		delete m_base_detuning;
+		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
 	}
 
@@ -268,7 +268,8 @@ f_cnt_t notePlayHandle::framesLeft( void ) const
 	}
 	else if( m_released && actualReleaseFramesToDo() >= m_releaseFramesDone )
 	{
-		return( m_framesBeforeRelease + actualReleaseFramesToDo() - m_releaseFramesDone );
+		return( m_framesBeforeRelease + actualReleaseFramesToDo() -
+							m_releaseFramesDone );
 	}
 	return( m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed );
 }
@@ -433,7 +434,7 @@ void notePlayHandle::updateFrequency( void )
 	const float pitch = (float)( key() % KeysPerOctave - base_tone +
 			engine::getSong()->masterPitch() ) / 12.0f +
 			(float)( key() / KeysPerOctave - base_octave ) +
-					 m_base_detuning->value() / 12.0f +
+					 m_baseDetuning->value() / 12.0f +
 		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0 );
 	m_frequency = BaseFreq * powf( 2.0f, pitch );
 
@@ -451,14 +452,13 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	if( _time >= pos() )
 	{
-#warning: TODO
-/*		float v = detuning()->getAutomationPattern()->valueAt( _time -
+		float v = detuning()->getAutomationPattern()->valueAt( _time -
 									pos() );
-		if( v != m_base_detuning->value() )
+		if( v != m_baseDetuning->value() )
 		{
-			m_base_detuning->setValue( v );
+			m_baseDetuning->setValue( v );
 			updateFrequency();
-		}*/
+		}
 	}
 }
 

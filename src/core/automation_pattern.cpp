@@ -141,7 +141,7 @@ midiTime automationPattern::putValue( const midiTime & _time,
 		m_dynamic = TRUE;
 	}
 
-	if( getTrack()->type() == track::HiddenAutomationTrack )
+	if( getTrack() && getTrack()->type() == track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
 	}
@@ -177,7 +177,8 @@ void automationPattern::removeValue( const midiTime & _time )
 			}
 		}
 
-		if( getTrack()->type() == track::HiddenAutomationTrack )
+		if( getTrack() &&
+			getTrack()->type() == track::HiddenAutomationTrack )
 		{
 			changeLength( length() );
 		}

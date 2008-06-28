@@ -1,7 +1,6 @@
 /*
- * detuning_helper.h - detuning automation helper
+ * inline_automation.cpp - class for automating something "inline"
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -24,35 +23,39 @@
  */
 
 
-#ifndef _DETUNING_HELPER_H
-#define _DETUNING_HELPER_H
+#include <Qt/QtXml>
 
 #include "inline_automation.h"
 
 
-class detuningHelper : public inlineAutomation
+void inlineAutomation::saveSettings( QDomDocument & _doc,
+							QDomElement & _parent )
 {
-public:
-	detuningHelper( void ) :
-		inlineAutomation()
+	if( hasAutomationPattern() )
 	{
+		QDomElement ap = _doc.createElement(
+					automationPattern::classNodeName() );
+		QDomElement v = _doc.createElement( nodeName() );
+		getAutomationPattern()->saveSettings( _doc, v );
+		ap.appendChild( v );
+		_parent.appendChild( ap );
 	}
+}
 
-	virtual ~detuningHelper()
+
+
+
+void inlineAutomation::loadSettings( const QDomElement & _this )
+{
+	QDomNode node = _this.namedItem( automationPattern::classNodeName() );
+	if( node.isElement() )
 	{
+		node = node.namedItem( nodeName() );
+		if( node.isElement() )
+		{
+			getAutomationPattern()->loadSettings(
+							node.toElement() );
+		}
 	}
+}
 
-	virtual QString displayName( void ) const
-	{
-		return( tr( "Note detuning" ) );
-	}
-
-	inline virtual QString nodeName( void ) const
-	{
-		return( "detuning" );
-	}
-
-} ;
-
-
-#endif

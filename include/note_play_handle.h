@@ -319,7 +319,7 @@ private:
 
 	float m_frequency;
 
-	baseDetuning * m_base_detuning;
+	baseDetuning * m_baseDetuning;
 
 } ;
 

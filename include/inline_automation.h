@@ -1,7 +1,6 @@
 /*
- * detuning_helper.h - detuning automation helper
+ * inline_automation.h - class for automating something "inline"
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -24,33 +23,49 @@
  */
 
 
-#ifndef _DETUNING_HELPER_H
-#define _DETUNING_HELPER_H
+#ifndef _INLINE_AUTOMATION_H
+#define _INLINE_AUTOMATION_H
 
-#include "inline_automation.h"
+#include "automation_pattern.h"
+#include "shared_object.h"
 
 
-class detuningHelper : public inlineAutomation
+class inlineAutomation : public floatModel, public sharedObject
 {
 public:
-	detuningHelper( void ) :
-		inlineAutomation()
+	inlineAutomation( void ) :
+		floatModel(),
+		sharedObject(),
+		m_autoPattern( NULL )
 	{
 	}
 
-	virtual ~detuningHelper()
+	virtual ~inlineAutomation()
 	{
+		delete m_autoPattern;
 	}
 
-	virtual QString displayName( void ) const
+	inline bool hasAutomationPattern( void ) const
 	{
-		return( tr( "Note detuning" ) );
+		return( m_autoPattern != NULL );
 	}
 
-	inline virtual QString nodeName( void ) const
+	automationPattern * getAutomationPattern( void )
 	{
-		return( "detuning" );
+		if( m_autoPattern == NULL )
+		{
+			m_autoPattern = new automationPattern( NULL );
+			m_autoPattern->addObject( this );
+		}
+		return( m_autoPattern );
 	}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+
+private:
+	automationPattern * m_autoPattern;
 
 } ;
 

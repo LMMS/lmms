@@ -49,6 +49,10 @@ public:
 	automationPattern( const automationPattern & _pat_to_copy );
 	virtual ~automationPattern();
 
+	inline void addObject( automatableModel * _obj )
+	{
+		m_objects += _obj;
+	}
 
 	const automatableModel * firstObject( void );
 
