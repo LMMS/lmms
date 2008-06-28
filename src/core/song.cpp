@@ -56,6 +56,7 @@
 #include "piano_roll.h"
 #include "project_journal.h"
 #include "project_notes.h"
+#include "project_renderer.h"
 #include "rename_dialog.h"
 #include "song_editor.h"
 #include "templates.h"
@@ -1065,43 +1066,27 @@ void song::exportProject( void )
 	{
 		base_filename = tr( "untitled" );
 	}
- 	base_filename += ".wav";//fileEncodeDevices[0].m_extension;
+ 	base_filename += __fileEncodeDevices[0].m_extension;
 
 	QFileDialog efd( engine::getMainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
-
-/*	int idx = 0;
+	efd.setAcceptMode( QFileDialog::AcceptSave );
+	int idx = 0;
 	QStringList types;
-	while( fileEncodeDevices[idx].m_fileType != NullFile )
+	while( __fileEncodeDevices[idx].m_fileFormat !=
+					projectRenderer::NumFileFormats )
 	{
-		types << tr( fileEncodeDevices[idx].m_description );
+		types << tr( __fileEncodeDevices[idx].m_description );
 		++idx;
 	}
-	efd.setFilters( types );*/
+	efd.setFilters( types );
 	efd.selectFile( base_filename );
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	if( efd.exec() == QDialog::Accepted &&
-		!efd.selectedFiles().isEmpty() && efd.selectedFiles()[0] != ""
-		)
+		!efd.selectedFiles().isEmpty() && efd.selectedFiles()[0] != "" )
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
-/*		if( QFileInfo( export_file_name ).exists() == TRUE &&
-			QMessageBox::warning( engine::getMainWindow(),
-						tr( "File already exists" ),
-						tr( "The file \"%1\" already "
-							"exists. Do you want "
-							"to overwrite it?"
-						).arg( QFileInfo(
-						export_file_name ).fileName() ),
-						QMessageBox::Yes,
-							QMessageBox::No |
-							QMessageBox::Escape |
-							QMessageBox::Default )
-			== QMessageBox::No )
-		{
-			return;
-		}*/
 		exportProjectDialog epd( export_file_name,
 						engine::getMainWindow() );
 		epd.exec();

@@ -37,10 +37,10 @@ fileEncodeDevice __fileEncodeDevices[] =
 {
 
 	{ projectRenderer::WaveFile,
-		QT_TRANSLATE_NOOP( "projectRenderer", "WAV-File" ),
+		QT_TRANSLATE_NOOP( "projectRenderer", "WAV-File (*.wav)" ),
 					".wav", &audioFileWave::getInst },
 	{ projectRenderer::OggFile,
-		QT_TRANSLATE_NOOP( "projectRenderer", "Compressed OGG-File" ),
+		QT_TRANSLATE_NOOP( "projectRenderer", "Compressed OGG-File (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_VORBIS_CODEC_H
 					&audioFileOgg::getInst

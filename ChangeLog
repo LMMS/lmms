@@ -1,5 +1,10 @@
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/song.cpp:
+	* src/core/project_renderer.cpp:
+	- confirm overwrite when exporting file
+	- set filter when selecting output-file for export
+
 	* include/audio_file_device.h:
 	* include/audio_file_ogg.h:
 	* include/audio_file_wave.h:
