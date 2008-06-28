@@ -395,28 +395,6 @@ if test -z "$HAVE_SAMPLERATE_H" ; then
 
 fi
 
-# check for Festival
-AC_LANG_PUSH(C++)
-AC_ARG_WITH(singerbot,
-	AS_HELP_STRING([--without-singerbot],
-		[disable support for SingerBot plugin]), ,
-	[ with_singerbot=yes ])
-AH_TEMPLATE(SINGERBOT_SUPPORT,
-	[Define to 1 to enable SingerBot plugin support.])
-if test "x$with_singerbot" = "xyes" ; then
-	ORIG_CPPFLAGS=$CPPFLAGS
-	CPPFLAGS="$CPPFLAGS -I/usr/include/festival -I/usr/include/speech_tools -Wno-non-template-friend"
-	AC_CHECK_HEADER([festival.h], FESTIVAL_SUPPORT="true")
-	AC_CHECK_LIB([Festival], [main], true, FESTIVAL_SUPPORT="")
-	CPPFLAGS=$ORIG_CPPFLAGS
-fi
-if test ! -z "$FESTIVAL_SUPPORT" ; then
-	AC_DEFINE(SINGERBOT_SUPPORT)
-fi
-AC_LANG_POP(C++)
-AM_CONDITIONAL(SINGERBOT_SUPPORT, test ! -z "$FESTIVAL_SUPPORT" )
-
-
 # Check for fluidsynth
 AC_ARG_WITH(fluidsynth,
 	AS_HELP_STRING([--without-fluidsynth], [disable support for Soundfont plugins]), ,
@@ -737,7 +715,6 @@ AC_CONFIG_FILES([Makefile
 		 plugins/patman/Makefile
 		 plugins/peak_controller_effect/Makefile
 		 plugins/sf2_player/Makefile
-		 plugins/singerbot/Makefile
 		 plugins/spectrum_analyzer/Makefile
 		 plugins/stk/Makefile
 		 plugins/stk/mallets/Makefile
@@ -935,27 +912,6 @@ else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* STK instrument plugins"
 fi
 
-
-
-if test -z "$FESTIVAL_SUPPORT" ; then
-	if test "x$with_singerbot" = "xyes" ; then
-		echo " ========================"
-		echo " ===  LMMS - WARNING  ======================================================="
-		echo " ========================"
-		echo " ="
-		echo " = You don't seem to have Festival development files."
-		echo " = The SingerBot instrument plugin will be ignored."
-		echo " = Before enabling this plugin, bear in mind that it is still experimental."
-		echo " ="
-		echo " = To remove this warning, please pass"
-		echo " = "
-		echo " = --without-singerbot"
-		echo " ="
-		with_warnings="true"
-	fi
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SingerBot instrument plugin"
-fi
 
 
 if test -z "$FLUIDSYNTH_SUPPORT" ; then

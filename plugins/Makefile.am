@@ -6,10 +6,6 @@ if STK_SUPPORT
 STK_DIR=stk
 endif
 
-if SINGERBOT_SUPPORT
-SINGERBOT_DIR=singerbot
-endif
-
 if FLUIDSYNTH_SUPPORT
 SF2PLAYER_DIR=sf2_player
 endif
