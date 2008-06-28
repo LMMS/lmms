@@ -8,6 +8,9 @@
 	* acinclude.m4:
 	Search $QTDIR before any other directories
 
+	* data/themes/default/style.css:
+	Update CSS for new QToolBar support
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/song.cpp:
