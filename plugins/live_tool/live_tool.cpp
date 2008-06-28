@@ -116,13 +116,8 @@ liveToolView::liveToolView( tool * _tool ) :
 		"F1-F10 keys mute the first 10 instruments in the "
 		"Beat+Baseline Editor." ) );
 
-	hide();
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-		parentWidget()->layout()->setSizeConstraint(
-							QLayout::SetFixedSize );
-	}
+	parentWidget()->hide();
+	parentWidget()->layout()->setSizeConstraint( QLayout::SetFixedSize );
 }
 
 

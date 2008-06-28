@@ -72,22 +72,13 @@ tool * tool::instantiate( const QString & _plugin_name, model * _parent )
 
 
 toolView::toolView( tool * _tool ) :
-	pluginView( _tool, engine::getMainWindow()->workspace() )
+	pluginView( _tool, NULL )
 {
-	QWidget * window;
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		window = parentWidget();
-		window->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	}
-	else
-	{
-		window = this;
-	}
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 
-	window->setWindowTitle( _tool->publicName() );
-	window->setWindowIcon( _tool->getDescriptor()->logo->pixmap() );
+	setWindowTitle( _tool->publicName() );
+	setWindowIcon( _tool->getDescriptor()->logo->pixmap() );
 }
 
 
