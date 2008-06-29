@@ -18,8 +18,12 @@ AM_PROG_LIBTOOL
 
 if ! test -z "${prefix}" -o "${prefix}" = "NONE" ; then
 	CFLAGS="$CFLAGS -I${prefix}/include"
-	CPPFLAGS="$CPPFLAGS -I${prefix}/include -DLIBDIR='\"${libdir}\"'"
+	CPPFLAGS="$CPPFLAGS -I${prefix}/include"
 	LDFLAGS="$LDFLAGS -L${prefix}/bin"
+fi
+
+if ! test -z "${libdir}" ; then
+	CPPFLAGS="$CPPFLAGS -DLIBDIR='\"${libdir}\"'"
 fi
 
 AH_TEMPLATE(BUILD_LINUX, [Build LMMS for Linux])

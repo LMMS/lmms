@@ -46,6 +46,9 @@
 	* src/tracks/automation_track.cpp:
 	Allow dragging automatable views directly onto an automation-track
 
+	* configure.in:
+	Fix LIBDIR for when people do not use --prefix
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:
