@@ -29,6 +29,7 @@
 
 #include "stereomatrix_control_dialog.h"
 #include "stereomatrix_controls.h"
+#include "embed.h"
 
 
 
@@ -37,36 +38,33 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	effectControlDialog( _controls )
 {
 
-	setFixedSize( 92, 92 );
+	setFixedSize( 105, 115);
 
-	QGridLayout * l = new QGridLayout( this );
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	setPalette( pal );
 
-	knob * llKnob = new knob( knobBright_26, this );
+
+	knob * llKnob = new knob( knobSmall_17, this );
 	llKnob->setModel( &_controls->m_llModel );
 	llKnob->setHintText( tr( "Left to Left Vol:" ) + " ", "" );
+	llKnob->move( 40, 60 );
 
-	knob * lrKnob = new knob( knobBright_26, this );
+	knob * lrKnob = new knob( knobSmall_17, this );
 	lrKnob->setModel( &_controls->m_lrModel );
 	lrKnob->setHintText( tr( "Left to Right Vol:" ) + " ", "" );
+	lrKnob->move( 40, 60+28 );
 
-	knob * rlKnob = new knob( knobBright_26, this );
+	knob * rlKnob = new knob( knobSmall_17, this );
 	rlKnob->setModel( &_controls->m_rlModel );
 	rlKnob->setHintText( tr( "Right to Left Vol:" ) + " ", "" );
+	rlKnob->move( 40+28, 60 );
 
-	knob * rrKnob = new knob( knobBright_26, this );
+	knob * rrKnob = new knob( knobSmall_17, this );
 	rrKnob->setModel( &_controls->m_rrModel );
 	rrKnob->setHintText( tr( "Right to Right Vol:" ) + " ", "" );
-
-	l->addWidget( new QLabel( "L", this ), 1, 0);
-	l->addWidget( new QLabel( "R", this ), 2, 0);
-	l->addWidget( new QLabel( "L", this ), 0, 1);
-	l->addWidget( new QLabel( "R", this ), 0, 2);
-
-	l->addWidget( llKnob, 1, 1 );
-	l->addWidget( lrKnob, 1, 2 );
-	l->addWidget( rlKnob, 2, 1 );
-	l->addWidget( rrKnob, 2, 2 );
-
-	this->setLayout(l);
+	rrKnob->move( 40+28, 60+28 );
 }
 

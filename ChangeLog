@@ -66,7 +66,11 @@
 	* include/lfo_controller.h:
 	* src/gui/lfo_controller_dialog.cpp:
 	* data/themes/default/lfo_controller_artwork.png:
-	Add LFO artwork (almost)
+	Add LFO artwork (except it doesn't work for some odd reason)
+
+	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
+	* plugins/stereo_matrix/artwork.png:
+	Add StereoMatrix artwork
 
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

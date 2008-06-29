@@ -70,7 +70,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	title.append( " (" );
 	title.append( _model->name() );
 	title.append( ")" );
-	setWindowTitle( tr( "LFO (name)" ) );
+	setWindowTitle( title );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 80 );
 	
