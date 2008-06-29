@@ -98,6 +98,7 @@ protected:
 	void selectAll( void );
 	void getSelectedValues( timeMap & _selected_values );
 
+	void drawLine( int x0, float y0, int x1, float y1 );
 
 protected slots:
 	void play( void );
@@ -211,6 +212,9 @@ private:
 	float m_moveStartLevel;
 	tick m_moveStartTick;
 	int m_moveXOffset;
+
+	float m_drawLastLevel;
+	tick m_drawLastTick;
 
 	int m_ppt;
 	int m_y_delta;

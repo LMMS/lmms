@@ -637,6 +637,52 @@ void automationEditor::leaveEvent( QEvent * _e )
 }
 
 
+void automationEditor::drawLine( int x0, float y0, int x1, float y1 )
+{
+	int deltax = tAbs<float>(x1 - x0);
+	float deltay = tAbs<float>(y1 - y0);
+	int x = x0;
+	float y = y0;
+	int xstep;
+	int ystep;
+
+	if( deltax == 0 )
+	{
+		return;
+	}
+
+	float yscale = deltay / deltax;
+
+	if( x0 < x1) 
+	{
+		xstep = quantization();
+	}
+	else 
+	{
+		xstep = -( quantization() );
+	}
+
+	if( y0 < y1 )
+	{
+		ystep = 1; 
+	}
+	else 
+	{
+		ystep = -1;
+	}
+
+	int i = 0;
+	while( i < deltax )
+	{
+		y = y0 + ( ystep * yscale * i );
+
+		x += xstep;
+		i += quantization();
+		m_pattern->removeValue( midiTime( x ) );
+		m_pattern->putValue( midiTime( x ), y );
+	}
+};
+
 
 
 void automationEditor::mousePressEvent( QMouseEvent * _me )
@@ -690,6 +736,14 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 			if( _me->button() == Qt::LeftButton &&
 							m_editMode == DRAW )
 			{
+				// Connect the dots
+				if( engine::getMainWindow()->isShiftPressed() == TRUE )
+				{
+					drawLine( m_drawLastTick, m_drawLastLevel, pos_ticks, level );
+				}
+				m_drawLastTick = pos_ticks;
+				m_drawLastLevel = level;
+
 				// did it reach end of map because
 				// there's no value??
 				if( it == time_map.end() )
@@ -829,6 +883,10 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				{
 					pos_ticks = 0;
 				}
+
+				drawLine( m_drawLastTick, m_drawLastLevel, pos_ticks, level );
+				m_drawLastTick = pos_ticks;
+				m_drawLastLevel = level;
 
 				// we moved the value so the value has to be
 				// moved properly according to new starting-
