@@ -621,14 +621,30 @@ void automationPatternView::paintEvent( QPaintEvent * )
 				height() - 2 * TCO_BORDER_WIDTH );
 	}
 
-	const float y_scale = m_pat->firstObject()->maxValue<float>() -
-			m_pat->firstObject()->minValue<float>();
+	const float min = m_pat->firstObject()->minValue<float>();
+	const float max = m_pat->firstObject()->maxValue<float>();
+
+	const float y_scale = max - min;
 	const float h = ( height()-2*TCO_BORDER_WIDTH ) /
 							y_scale;
 
-	p.translate( 0.0f, m_pat->firstObject()->maxValue<float>() * 
-			height() / y_scale );
+	p.translate( 0.0f, max * height() / y_scale );
 	p.scale( 1.0f, -h );
+
+	//QLinearGradient lin2grad( 0, min, 0, max );
+	QLinearGradient lin2grad( 0, min, 0, max );
+	const QColor cl = QColor( 255, 224, 0 );
+	const QColor cd = QColor( 229, 158, 0 );
+	//lingrad.setColorAt( min, c );
+	lin2grad.setColorAt( 1, cl );
+
+/*	if( min < 0 ) {
+		lin2grad.setColorAt( -min/y_scale, Qt::black );
+		lin2grad.setColorAt( 0, k );
+	}
+	else {*/
+		lin2grad.setColorAt( 0, cd );
+//	}
 
 	for( automationPattern::timeMap::const_iterator it =
 				m_pat->getTimeMap().begin();
@@ -646,7 +662,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 			x2 = width() - TCO_BORDER_WIDTH + 1;
 		}
 		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
-							QColor( 255, 224, 0 ) );
+							lin2grad /*QColor( 255, 224, 0 )*/ );
 	}
 
 	p.resetMatrix();
