@@ -1,4 +1,4 @@
-2008-06-28	Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-06-29	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	Initialize gain at 1.0
@@ -13,6 +13,16 @@
 
 	* src/gui/widgets/tempo_sync_knob.cpp:
 	Make tempoSyncKnob really sync to tempo again
+
+	* plugins/peak_controller_effect/peak_controller_effect.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect_controls.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect.h:
+	* include/peak_controller.h:
+	* src/core/peak_controller.cpp:
+	Fix loading/saving for peak controller
+
+	* src/core/effect.cpp:
+	Correct comments
 
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

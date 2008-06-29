@@ -1144,6 +1144,7 @@ void song::removeController( controller * _controller )
 		{
 			engine::getSong()->setModified();
 		}
+		emit dataChanged();
 	}
 }
 

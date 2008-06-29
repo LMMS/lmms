@@ -38,6 +38,9 @@
 #include "controller_dialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
+int peakController::s_lastEffectId = 0;
+peakControllerEffectVector peakController::s_effects;
+
 
 peakController::peakController( model * _parent, 
 		peakControllerEffect * _peak_effect ) :
@@ -69,15 +72,29 @@ float peakController::value( int _offset )
 
 void peakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	// Probably not the best idea..
-//	controller::saveSettings( _doc, _this );
+	controller::saveSettings( _doc, _this );
+
+	_this.setAttribute( "effectId", m_peakEffect->m_effectId );
 }
 
 
 
 void peakController::loadSettings( const QDomElement & _this )
 {
-//	controller::loadSettings( _this );
+	printf("peakController loadSettings\n");
+	int effectId = _this.attribute( "effectId" ).toInt();
+
+	peakControllerEffectVector::iterator i;
+	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	{
+		printf( "%d  %d\n", (*i)->m_effectId , effectId );
+		if( (*i)->m_effectId == effectId )
+		{
+			if( (*i)->m_effectId == effectId )
+			m_peakEffect = *i;
+			return;
+		}
+	}
 }
 
 

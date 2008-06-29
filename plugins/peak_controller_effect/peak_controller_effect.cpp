@@ -51,15 +51,23 @@ plugin::descriptor PLUGIN_EXPORT peakcontroller_effect_plugin_descriptor =
 
 }
 
+// We have to keep a list of all the peakController effects so that we can save
+// an peakEffect-ID to the project.  This ID is referenced in the peakController
+// settings and is used to set the peakControllerEffect pointer upon load
 
+//QVector<peakControllerEffect *> peakControllerEffect::s_effects;
 
 peakControllerEffect::peakControllerEffect(
 			model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &peakcontroller_effect_plugin_descriptor, _parent, _key ),
-	m_peakControls( this )
+	m_effectId( ++peakController::s_lastEffectId ),
+	m_peakControls( this ),
+	m_autoController( NULL )
 {
-	engine::getSong()->addController( new peakController( engine::getSong(), this ) );
+	m_autoController = new peakController( engine::getSong(), this );
+	engine::getSong()->addController( m_autoController );
+	peakController::s_effects.append( this );
 }
 
 
@@ -67,6 +75,11 @@ peakControllerEffect::peakControllerEffect(
 
 peakControllerEffect::~peakControllerEffect()
 {
+	int idx = peakController::s_effects.indexOf( this );
+	if( idx >= 0 )
+	{
+		peakController::s_effects.remove( idx );
+	}
 }
 
 

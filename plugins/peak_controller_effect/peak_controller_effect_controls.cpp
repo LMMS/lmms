@@ -22,6 +22,7 @@
  *
  */
 
+#include "peak_controller.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 
@@ -41,9 +42,23 @@ peakControllerEffectControls( peakControllerEffect * _eff ) :
 
 void peakControllerEffectControls::loadSettings( const QDomElement & _this )
 {
+	printf("peakControllerEffect loadSettings\n");
 	m_baseModel.setValue( _this.attribute( "base" ).toFloat() );
 	m_amountModel.setValue( _this.attribute( "amount" ).toFloat() );
 	m_muteModel.setValue( _this.attribute( "mute" ).toFloat() );
+	
+	int effectId = _this.attribute( "effectId" ).toInt();
+	if( effectId > peakController::s_lastEffectId )
+	{
+		peakController::s_lastEffectId = effectId;
+	}
+	m_effect->m_effectId = effectId;
+
+	if( m_effect->m_autoController )
+	{
+		delete m_effect->m_autoController;
+		m_effect->m_autoController = 0;
+	}
 }
 
 
@@ -55,6 +70,7 @@ void peakControllerEffectControls::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "base", m_baseModel.value() );
 	_this.setAttribute( "amount", m_amountModel.value() );
 	_this.setAttribute( "mute", m_muteModel.value() );
+	_this.setAttribute( "effectId", m_effect->m_effectId );
 }
 
 

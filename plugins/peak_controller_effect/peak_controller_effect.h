@@ -53,6 +53,7 @@ public:
 		return m_lastSample;
 	}
 
+	int m_effectId;
 
 private:
 	peakControllerEffectControls m_peakControls;
@@ -60,6 +61,8 @@ private:
 	friend class peakControllerEffectControls;
 
 	float m_lastSample;
+
+	controller * m_autoController;
 } ;
 
 

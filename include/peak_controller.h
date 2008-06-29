@@ -36,6 +36,7 @@ class automatableButtonGroup;
 class knob;
 class peakControllerEffect;
 
+typedef QVector<peakControllerEffect *> peakControllerEffectVector;
 
 
 class EXPORT peakController : public controller
@@ -56,6 +57,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
+
+	static peakControllerEffectVector s_effects;
+	static int s_lastEffectId;
 
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );

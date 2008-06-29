@@ -103,14 +103,14 @@ effect * effect::instantiate( const QString & _plugin_name,
 				descriptor::subPluginFeatures::key * _key )
 {
 	plugin * p = plugin::instantiate( _plugin_name, _parent, _key );
-	// check whether instantiated plugin is an instrument
+	// check whether instantiated plugin is an effect
 	if( dynamic_cast<effect *>( p ) != NULL )
 	{
 		// everything ok, so return pointer
 		return( dynamic_cast<effect *>( p ) );
 	}
 
-	// not quite... so delete plugin and return dummy instrument
+	// not quite... so delete plugin and return dummy effect
 	delete p;
 	return( new dummyEffect( _parent ) );
 }
