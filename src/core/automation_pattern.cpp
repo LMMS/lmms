@@ -628,7 +628,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	const float h = ( height()-2*TCO_BORDER_WIDTH ) /
 							y_scale;
 
-	p.translate( 0.0f, max * height() / y_scale );
+	p.translate( 0.0f, max * height() / y_scale-1 );
 	p.scale( 1.0f, -h );
 
 	//QLinearGradient lin2grad( 0, min, 0, max );
@@ -659,7 +659,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			x2 = width() - TCO_BORDER_WIDTH + 1;
+			x2 = width() - TCO_BORDER_WIDTH;
 		}
 		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 							lin2grad /*QColor( 255, 224, 0 )*/ );
