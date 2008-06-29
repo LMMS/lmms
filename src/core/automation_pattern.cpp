@@ -625,8 +625,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	const float max = m_pat->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
-	const float h = ( height()-2*TCO_BORDER_WIDTH ) /
-							y_scale;
+	const float h = ( height()-2*TCO_BORDER_WIDTH ) / y_scale;
 
 	p.translate( 0.0f, max * height() / y_scale-1 );
 	p.scale( 1.0f, -h );
@@ -673,7 +672,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.setPen( QColor( 32, 240, 32 ) );
+		p.setPen( QColor( 0, 64, 255 ) );
 	}
 
 	p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
