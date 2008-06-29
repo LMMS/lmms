@@ -150,6 +150,11 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 				static_cast<int>( getTrackContainerView()->pixelsPerTact() ) )
 				.toNearestTact();
 
+			if( pos.getTicks() < 0 )
+			{
+				pos.setTicks( 0 );
+			}
+
 			trackContentObject * tco = getTrack()->createTCO( pos );
 			automationPattern * pat = dynamic_cast< automationPattern *>( tco );
 			pat->addObject( mod );
