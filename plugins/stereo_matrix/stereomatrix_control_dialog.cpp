@@ -55,12 +55,12 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	knob * lrKnob = new knob( knobSmall_17, this );
 	lrKnob->setModel( &_controls->m_lrModel );
 	lrKnob->setHintText( tr( "Left to Right Vol:" ) + " ", "" );
-	lrKnob->move( 40, 60+28 );
+	lrKnob->move( 40+28, 60);
 
 	knob * rlKnob = new knob( knobSmall_17, this );
 	rlKnob->setModel( &_controls->m_rlModel );
 	rlKnob->setHintText( tr( "Right to Left Vol:" ) + " ", "" );
-	rlKnob->move( 40+28, 60 );
+	rlKnob->move( 40, 60+28 );
 
 	knob * rrKnob = new knob( knobSmall_17, this );
 	rrKnob->setModel( &_controls->m_rrModel );
