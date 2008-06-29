@@ -143,6 +143,7 @@ void effectLabel::rename( void )
 	rename_dlg.exec();
 	if( txt != text() )
 	{
+		m_track->setName( txt );
 		setText( txt );
 		emit nameChanged( txt );
 		emit nameChanged();

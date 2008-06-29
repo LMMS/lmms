@@ -43,7 +43,7 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle" ) ),
 	m_ownAudioPort( TRUE ),
-	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
@@ -60,7 +60,7 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	m_frame( 0 ),
 	m_audioPort( new audioPort( "samplePlayHandle" ) ),
 	m_ownAudioPort( TRUE ),
-	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
@@ -77,7 +77,7 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 	m_frame( 0 ),
 	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
 	m_ownAudioPort( FALSE ),
-	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _tco->getTrack() ),
 	m_bbTrack( NULL )
@@ -94,7 +94,7 @@ samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 	m_frame( 0 ),
 	m_audioPort( _pattern->getInstrumentTrack()->getAudioPort() ),
 	m_ownAudioPort( FALSE ),
-	m_defaultVolumeModel( 1.0f, 0.0f, 4.0f, 0.001f/* this*/ ),
+	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _pattern->getInstrumentTrack() ),
 	m_bbTrack( NULL )
@@ -129,8 +129,9 @@ void samplePlayHandle::play( bool /* _try_parallelizing */,
 	if( !( m_track && m_track->isMuted() )
 				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
-		stereoVolumeVector v = { { m_volumeModel->value(),
-						m_volumeModel->value() } };
+		stereoVolumeVector v =
+			{ { m_volumeModel->value() / DefaultVolume,
+				m_volumeModel->value() / DefaultVolume } };
 		m_sampleBuffer->play( _working_buffer, &m_state, frames );
 		engine::getMixer()->bufferToPort( _working_buffer, frames,
 						offset(), v, m_audioPort );

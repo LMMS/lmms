@@ -64,6 +64,7 @@ const int TCO_BORDER_WIDTH = 1;
 class trackContentObject : public model, public journallingObject
 {
 	Q_OBJECT
+	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
@@ -98,11 +99,6 @@ public:
 	inline const midiTime & length( void ) const
 	{
 		return( m_length );
-	}
-
-	bool isMuted( void ) const
-	{
-		return( m_mutedModel.value() );
 	}
 
 	virtual void movePosition( const midiTime & _pos );

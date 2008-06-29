@@ -1,5 +1,14 @@
 2008-06-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track.h:
+	* include/sample_track.h:
+	* src/gui/widgets/effect_label.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/track.cpp:
+	* Makefile.am:
+	finally resurrected sample-tracks
+
 	* src/gui/automation_editor.cpp:
 	- improved drawing/erasing values
 	- fixed moving selected values

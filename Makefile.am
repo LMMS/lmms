@@ -335,6 +335,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/tracks/bb_track.cpp				\
 		$(srcdir)/src/tracks/instrument_track.cpp			\
 		$(srcdir)/src/tracks/pattern.cpp				\
+		$(srcdir)/src/tracks/sample_track.cpp				\
 		$(srcdir)/include/aeffectx.h					\
 		$(srcdir)/include/debug.h					\
 		$(srcdir)/include/detuning_helper.h				\
@@ -507,7 +508,6 @@ lmms_includedir = $(pkgincludedir)
 lmms_include_HEADERS = $(wildcard include/*.h include/lmmsconfig.h) $(SAMPLERATE_HEADER) $(srcdir)/src/gui/embed.cpp
 
 
-#		$(srcdir)/src/tracks/sample_track.cpp
 
 EXTRA_DIST = $(lmms_EMBEDDED_RESOURCES) lmms.1
 

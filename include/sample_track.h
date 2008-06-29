@@ -32,12 +32,9 @@
 #include "audio_port.h"
 #include "track.h"
 
-class QLabel;
 class effectLabel;
 class sampleBuffer;
 class knob;
-
-//class sampleTCOSettingsDialog;
 
 
 class sampleTCO : public trackContentObject
@@ -50,8 +47,7 @@ public:
 	virtual void changeLength( const midiTime & _length );
 	const QString & sampleFile( void ) const;
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
@@ -63,10 +59,41 @@ public:
 		return( m_sampleBuffer );
 	}
 
+	midiTime sampleLength( void ) const;
+
+	virtual trackContentObjectView * createView( trackView * _tv );
+
 
 public slots:
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
+
+
+private:
+	sampleBuffer * m_sampleBuffer;
+
+
+	friend class sampleTCOView;
+
+
+signals:
+	void sampleChanged( void );
+
+} ;
+
+
+
+class sampleTCOView : public trackContentObjectView
+{
+	Q_OBJECT
+public:
+	sampleTCOView( sampleTCO * _tco, trackView * _tv );
+	virtual ~sampleTCOView();
+
+
+public slots:
+	void updateSample( void );
+
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
@@ -74,39 +101,12 @@ protected:
 	virtual void mouseDoubleClickEvent( QMouseEvent * );
 	virtual void paintEvent( QPaintEvent * );
 
-	midiTime getSampleLength( void ) const;
-
 
 private:
-	sampleBuffer * m_sampleBuffer;
-
-
-	//friend class sampleTCOSettingsDialog;
+	sampleTCO * m_tco;
 
 } ;
 
-
-
-/*
-class sampleTCOSettingsDialog : public QDialog
-{
-	Q_OBJECT
-public:
-	sampleTCOSettingsDialog( sampleTCO * _stco );
-	~sampleTCOSettingsDialog();
-
-
-protected slots:
-	void openSampleFile( void );
-	void setSampleFile( const QString & _f );
-
-
-private:
-	sampleTCO * m_sampleTCO;
-	QLabel * m_fileLbl;
-
-} ;
-*/
 
 
 
@@ -150,7 +150,7 @@ private:
 
 
 
-class sampleTrackView : public track
+class sampleTrackView : public trackView
 {
 public:
 	sampleTrackView( sampleTrack * _track, trackContainerView * _tcv );
@@ -163,7 +163,6 @@ private:
 	knob * m_volumeKnob;
 
 } ;
-
 
 
 #endif

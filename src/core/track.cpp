@@ -1598,7 +1598,7 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 	{
 		case InstrumentTrack: t = new instrumentTrack( _tc ); break;
 		case BBTrack: t = new bbTrack( _tc ); break;
-//		case SampleTrack: t = new sampleTrack( _tc ); break;
+		case SampleTrack: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
 		case AutomationTrack: t = new automationTrack( _tc ); break;
