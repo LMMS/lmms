@@ -199,6 +199,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	m_mappingFunction = new QLineEdit( m_mappingBox );
 	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
 	m_mappingFunction->setText( "input" );
+	m_mappingFunction->setReadOnly( TRUE );
 
 
 	// Buttons
@@ -218,8 +219,8 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	QPushButton * cancel_btn = new QPushButton( 
 					embed::getIconPixmap( "cancel" ),
 					tr( "Cancel" ), buttons );
-	//connect( cancel_btn, SIGNAL( clicked() ),
-	//			this, SLOT( reject() ) );
+	connect( cancel_btn, SIGNAL( clicked() ),
+				this, SLOT( reject() ) );
 
 	resize( 256, 246 );
 

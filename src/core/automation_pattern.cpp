@@ -621,7 +621,14 @@ void automationPatternView::paintEvent( QPaintEvent * )
 				height() - 2 * TCO_BORDER_WIDTH );
 	}
 
-	const float y_scale = m_pat->firstObject()->maxValue<float>();
+	const float y_scale = m_pat->firstObject()->maxValue<float>() -
+			m_pat->firstObject()->minValue<float>();
+	const float h = ( height()-2*TCO_BORDER_WIDTH ) /
+							y_scale;
+
+	p.translate( 0.0f, m_pat->firstObject()->maxValue<float>() * 
+			height() / y_scale );
+	p.scale( 1.0f, -h );
 
 	for( automationPattern::timeMap::const_iterator it =
 				m_pat->getTimeMap().begin();
@@ -638,12 +645,11 @@ void automationPatternView::paintEvent( QPaintEvent * )
 		{
 			x2 = width() - TCO_BORDER_WIDTH + 1;
 		}
-		const float h = ( height()-2*TCO_BORDER_WIDTH ) * it.value() /
-								y_scale;
-		p.fillRect( QRectF( x1, height()-TCO_BORDER_WIDTH-h, x2-x1, h ),
+		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 							QColor( 255, 224, 0 ) );
 	}
 
+	p.resetMatrix();
 	p.setFont( pointSize<7>( p.font() ) );
 	if( m_pat->isMuted() || m_pat->getTrack()->isMuted() )
 	{
