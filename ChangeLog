@@ -35,6 +35,13 @@
 	* data/themes/default/style.css:
 	Make toolbar colors a little more clear
 
+	* src/core/automation_pattern.cpp:
+	Save and load pattern position from project
+
+	* include/automation_track.h:
+	* src/tracks/automation_track.cpp:
+	Allow dragging automatable views directly onto an automation-track
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:

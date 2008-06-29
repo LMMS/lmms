@@ -81,13 +81,11 @@ void peakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void peakController::loadSettings( const QDomElement & _this )
 {
-	printf("peakController loadSettings\n");
 	int effectId = _this.attribute( "effectId" ).toInt();
 
 	peakControllerEffectVector::iterator i;
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
 	{
-		printf( "%d  %d\n", (*i)->m_effectId , effectId );
 		if( (*i)->m_effectId == effectId )
 		{
 			if( (*i)->m_effectId == effectId )

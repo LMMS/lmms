@@ -42,7 +42,6 @@ peakControllerEffectControls( peakControllerEffect * _eff ) :
 
 void peakControllerEffectControls::loadSettings( const QDomElement & _this )
 {
-	printf("peakControllerEffect loadSettings\n");
 	m_baseModel.setValue( _this.attribute( "base" ).toFloat() );
 	m_amountModel.setValue( _this.attribute( "amount" ).toFloat() );
 	m_muteModel.setValue( _this.attribute( "mute" ).toFloat() );

@@ -69,6 +69,8 @@ public:
 	automationTrackView( automationTrack * _at, trackContainerView * _tcv );
 	virtual ~automationTrackView();
 
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 
 private:
 	bbTrack * m_bbTrack;

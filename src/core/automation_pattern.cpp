@@ -227,6 +227,8 @@ float automationPattern::valueAt( const midiTime & _time )
 
 void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	_this.setAttribute( "pos", startPosition() );
+	
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
@@ -251,7 +253,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 {
 	clear();
 
-//	m_objects.clear();
+	movePosition( _this.attribute( "pos" ).toInt() );
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
@@ -630,20 +632,12 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	p.translate( 0.0f, max * height() / y_scale-1 );
 	p.scale( 1.0f, -h );
 
-	//QLinearGradient lin2grad( 0, min, 0, max );
 	QLinearGradient lin2grad( 0, min, 0, max );
 	const QColor cl = QColor( 255, 224, 0 );
 	const QColor cd = QColor( 229, 158, 0 );
-	//lingrad.setColorAt( min, c );
+	
 	lin2grad.setColorAt( 1, cl );
-
-/*	if( min < 0 ) {
-		lin2grad.setColorAt( -min/y_scale, Qt::black );
-		lin2grad.setColorAt( 0, k );
-	}
-	else {*/
-		lin2grad.setColorAt( 0, cd );
-//	}
+	lin2grad.setColorAt( 0, cd );
 
 	for( automationPattern::timeMap::const_iterator it =
 				m_pat->getTimeMap().begin();
@@ -661,7 +655,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 			x2 = width() - TCO_BORDER_WIDTH;
 		}
 		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
-							lin2grad /*QColor( 255, 224, 0 )*/ );
+							lin2grad );
 	}
 
 	p.resetMatrix();

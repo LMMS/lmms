@@ -31,9 +31,9 @@
 #include "automation_pattern.h"
 #include "embed.h"
 #include "name_label.h"
-
-
-
+#include "string_pair_drag.h"
+#include "project_journal.h"
+#include "track_container_view.h"
 
 automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :
 	track( _hidden ? HiddenAutomationTrack : AutomationTrack, _tc )
@@ -126,6 +126,39 @@ automationTrackView::~automationTrackView()
 {
 }
 
+void automationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+}
+
+
+
+
+void automationTrackView::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString val = stringPairDrag::decodeValue( _de );
+	if( type == "automatable_model" )
+	{
+		automatableModel * mod = dynamic_cast<automatableModel *>(
+				engine::getProjectJournal()->
+					getJournallingObject( val.toInt() ) );
+		if( mod != NULL )
+		{
+			midiTime pos = midiTime( getTrackContainerView()->currentPosition()
+				+ ( _de->pos().x() - getTrackContentWidget()->x() ) * midiTime::ticksPerTact() /
+				static_cast<int>( getTrackContainerView()->pixelsPerTact() ) )
+				.toNearestTact();
+
+			trackContentObject * tco = getTrack()->createTCO( pos );
+			automationPattern * pat = dynamic_cast< automationPattern *>( tco );
+			pat->addObject( mod );
+			pat->movePosition( pos );
+		}
+	}
+
+	update();
+}
 
 
 
