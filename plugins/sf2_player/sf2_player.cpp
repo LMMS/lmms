@@ -118,6 +118,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	updateReverb();
 	updateChorusOn();
 	updateChorus();
+	updateGain();
 
 	
 	connect( &m_bankNum, SIGNAL( dataChanged() ),
@@ -164,6 +165,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ),
 			this, SLOT( updateChorus() ) );
+
 }
 
 
