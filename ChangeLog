@@ -36,6 +36,7 @@
 	* src/gui/controller_connection_dialog.cpp:
 	- Connect cancel button
 	- Make mapping function read-only for alpha release
+	- Initialize MIDI Controller name when adding a MIDI Controller
 
 	* src/gui/widgets/tempo_sync_knob.cpp:
 	Make tempoSyncKnob really sync to tempo again
@@ -76,6 +77,10 @@
 	* plugins/stereo_matrix/stereomatrix_control_dialog.cpp:
 	* plugins/stereo_matrix/artwork.png:
 	Add StereoMatrix artwork
+
+	* plugins/bit_invader/artwork.png:
+	Remove author name from artwork.  No other artwork has author names.  The
+	name on the main GUI makes LMMS looks less professional.  AUTHORS.
 
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

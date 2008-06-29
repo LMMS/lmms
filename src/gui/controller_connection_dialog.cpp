@@ -91,6 +91,7 @@ public:
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
+		c->updateName();
 
 		return c;
 	}
