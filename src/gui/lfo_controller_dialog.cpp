@@ -72,7 +72,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	title.append( ")" );
 	setWindowTitle( tr( "LFO (name)" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
-	setFixedSize( 256, 64 );
+	setFixedSize( 240, 80 );
 	
 	toolTip::add( this, tr( "LFO Controller" ) );
 
@@ -211,35 +211,25 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 
 	pixmapButton * x1 = new pixmapButton( this, NULL );
-	x1->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 15 );
+	x1->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y );
 	x1->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x1_active" ) );
 	x1->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x1_inactive" ) );
 
 	pixmapButton * x100 = new pixmapButton( this, NULL );
-	x100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y );
+	x100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y - 15 );
 	x100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x100_active" ) );
 	x100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x100_inactive" ) );
 
 	pixmapButton * d100 = new pixmapButton( this, NULL );
-	d100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 30 );
+	d100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 15 );
 	d100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_d100_active" ) );
 	d100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_d100_inactive" ) );
-
-	/*
-	m_x100Cb = new ledCheckBox( tr( "FREQ x 100" ), this );
-	m_x100Cb->setFont( pointSize<6>( m_x100Cb->font() ) );
-	m_x100Cb->move( LFO_BASE_KNOB_X, LFO_KNOB_Y + 36 );
-	m_x100Cb->setWhatsThis(
-		tr( "Click here if the frequency of this LFO should be "
-						"multiplied with 100." ) );
-	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
-	*/
 
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );
@@ -248,8 +238,14 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 
 	setModel( _model );
-}
 
+	setAutoFillBackground( TRUE );
+	QPalette pal;
+	pal.setBrush( backgroundRole(),
+				QColor( 255 ,0 ,0, 255 ) );
+	setPalette( pal );
+
+}
 
 
 
@@ -303,13 +299,12 @@ void lfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 }
 
 
-
-
-void lfoControllerDialog::paintEvent( QPaintEvent * )
+/*
+void lfoControllerDialog::paintEvent( QPaintEvent * _pe )
 {
-	QPainter p( this );
+	QWidget::paintEvent( _pe );
 }
-
+*/
 
 
 void lfoControllerDialog::modelChanged( void )

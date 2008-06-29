@@ -63,6 +63,11 @@
 	- Don't miss points when scribbling quickly
 	- Shift-Click to draw a line
 
+	* include/lfo_controller.h:
+	* src/gui/lfo_controller_dialog.cpp:
+	* data/themes/default/lfo_controller_artwork.png:
+	Add LFO artwork (almost)
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:

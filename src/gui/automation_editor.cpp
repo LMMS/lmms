@@ -637,23 +637,25 @@ void automationEditor::leaveEvent( QEvent * _e )
 }
 
 
-void automationEditor::drawLine( int x0, float y0, int x1, float y1 )
+void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 {
-	int deltax = tAbs<float>(x1 - x0);
-	float deltay = tAbs<float>(y1 - y0);
-	int x = x0;
-	float y = y0;
+	int deltax = tAbs<float>( _x1 - _x0 );
+	float deltay = tAbs<float>( _y1 - _y0 );
+	int x = _x0;
+	float y = _y0;
 	int xstep;
 	int ystep;
 
-	if( deltax == 0 )
+	if( deltax < quantization() )
 	{
 		return;
 	}
 
-	float yscale = deltay / deltax;
+	deltax /= quantization();
 
-	if( x0 < x1) 
+	float yscale = deltay / ( deltax );
+
+	if( _x0 < _x1) 
 	{
 		xstep = quantization();
 	}
@@ -662,7 +664,7 @@ void automationEditor::drawLine( int x0, float y0, int x1, float y1 )
 		xstep = -( quantization() );
 	}
 
-	if( y0 < y1 )
+	if( _y0 < _y1 )
 	{
 		ystep = 1; 
 	}
@@ -674,10 +676,10 @@ void automationEditor::drawLine( int x0, float y0, int x1, float y1 )
 	int i = 0;
 	while( i < deltax )
 	{
-		y = y0 + ( ystep * yscale * i );
+		y = _y0 + ( ystep * yscale * i );
 
 		x += xstep;
-		i += quantization();
+		i += 1;
 		m_pattern->removeValue( midiTime( x ) );
 		m_pattern->putValue( midiTime( x ), y );
 	}
