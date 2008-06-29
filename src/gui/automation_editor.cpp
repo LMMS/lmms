@@ -677,8 +677,9 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				// existing value
 				if( pos_ticks >= it.key() &&
 					len > 0 &&
-					pos_ticks <= it.key() + len &&
-					it.value() == level )
+					( it+1==time_map.end() ||
+						pos_ticks <= (it+1).key() ) &&
+					level <= it.value() )
 				{
 					break;
 				}
@@ -724,7 +725,6 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 					m_editMode == ERASE )
 			{
 				// erase single value
-
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( it.key() );
@@ -734,7 +734,6 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == SELECT )
 			{
-
 				// select an area of values
 
 				m_selectStartTick = pos_ticks;
@@ -813,14 +812,16 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 		}
 		x -= VALUES_WIDTH;
 
-		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
-		{
 			if( m_action == MOVE_VALUE )
 			{
 				x -= m_moveXOffset;
 			}
-			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
+		int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
+		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
+		{
+/*			pos_ticks = x * DefaultTicksPerTact / m_ppt +
+							m_currentPosition;*/
 			if( m_action == MOVE_VALUE )
 			{
 				// moving value
@@ -841,33 +842,32 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			engine::getSong()->setModified();
 
 		}
+		else if( ( _me->buttons() & Qt::RightButton &&
+				m_editMode == DRAW ) || m_editMode == ERASE )
+		{
+			m_pattern->removeValue( midiTime( pos_ticks ) );
+		}
 		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
 			// set move- or resize-cursor
-
-			// get tick in which the cursor is posated
-			int pos_ticks = ( x * DefaultTicksPerTact ) / m_ppt +
-							m_currentPosition;
 
 			// get time map of current pattern
 			timeMap & time_map = m_pattern->getTimeMap();
 
 			// will be our iterator in the following loop
 			timeMap::iterator it = time_map.begin();
-
 			// loop through whole time map...
-			while( it != time_map.end() )
+			for( ; it != time_map.end(); ++it )
 			{
 				// and check whether the cursor is over an
 				// existing value
 				if( pos_ticks >= it.key() &&
-			    		pos_ticks <= it.key() +
-							//TODO: Add constant
-						4 && it.value() == level )
+					( it+1==time_map.end() ||
+						pos_ticks <= (it+1).key() ) &&
+							level <= it.value() )
 				{
 					break;
 				}
-				++it;
 			}
 
 			// did it reach end of map because there's
@@ -1032,17 +1032,21 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				midiTime new_value_pos;
 				if( it.key() )
 				{
-#warning broken time-sigs
-					int value_tact = ( it.key() >> 6 )
+					int value_tact =
+						( it.key() /
+							DefaultTicksPerTact )
 								+ tact_diff;
-					int value_ticks = ( it.key() & 63 )
-							+ ticks_diff;
+					int value_ticks =
+						( it.key() %
+							DefaultTicksPerTact )
+								+ ticks_diff;
 					// ensure value_ticks range
-					if( value_ticks >> 6 )
+					if( value_ticks / DefaultTicksPerTact )
 					{
 						value_tact += value_ticks
-									>> 6;
-						value_ticks &= 63;
+							/ DefaultTicksPerTact;
+						value_ticks %=
+							DefaultTicksPerTact;
 					}
 					m_pattern->removeValue( it.key() );
 					new_value_pos = midiTime( value_tact,
