@@ -48,11 +48,11 @@
 #include "tempo_sync_knob.h"
 #include "pixmap_button.h"
 
-const int ENV_KNOBS_LBL_Y = 0;
+const int ENV_KNOBS_LBL_Y = 20;
 const int KNOB_X_SPACING = 32;
 
 const int LFO_SHAPES_X = 6;
-const int LFO_SHAPES_Y = 16;
+const int LFO_SHAPES_Y = 36;
 
 const int LFO_GRAPH_X = 6;
 const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+15;
