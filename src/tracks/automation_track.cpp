@@ -35,9 +35,11 @@
 #include "project_journal.h"
 #include "track_container_view.h"
 
+
 automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :
 	track( _hidden ? HiddenAutomationTrack : AutomationTrack, _tc )
 {
+	setName( tr( "Automation track" ) );
 }
 
 
@@ -126,6 +128,9 @@ automationTrackView::~automationTrackView()
 {
 }
 
+
+
+
 void automationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
@@ -145,9 +150,12 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 					getJournallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			midiTime pos = midiTime( getTrackContainerView()->currentPosition()
-				+ ( _de->pos().x() - getTrackContentWidget()->x() ) * midiTime::ticksPerTact() /
-				static_cast<int>( getTrackContainerView()->pixelsPerTact() ) )
+			midiTime pos = midiTime( getTrackContainerView()->
+							currentPosition() +
+				( _de->pos().x() -
+					getTrackContentWidget()->x() ) *
+						midiTime::ticksPerTact() /
+		static_cast<int>( getTrackContainerView()->pixelsPerTact() ) )
 				.toNearestTact();
 
 			if( pos.getTicks() < 0 )
@@ -156,7 +164,8 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 			}
 
 			trackContentObject * tco = getTrack()->createTCO( pos );
-			automationPattern * pat = dynamic_cast< automationPattern *>( tco );
+			automationPattern * pat =
+				dynamic_cast<automationPattern *>( tco );
 			pat->addObject( mod );
 			pat->movePosition( pos );
 		}
