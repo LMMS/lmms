@@ -80,7 +80,7 @@ groupBox::~groupBox()
 
 void groupBox::modelChanged( void )
 {
-	m_led->setModel( model(), FALSE );
+	m_led->setModel( model() );
 }
 
 
