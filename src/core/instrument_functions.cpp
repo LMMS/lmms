@@ -156,17 +156,6 @@ chordCreator::chord chordCreator::s_chordTable[] =
 } ;
 
 
-const int CHORDS_GROUPBOX_X = 4;
-const int CHORDS_GROUPBOX_Y = 5;
-const int CHORDS_GROUPBOX_WIDTH = 238;
-const int CHORDS_GROUPBOX_HEIGHT = 65;
-const int ARP_GROUPBOX_X = CHORDS_GROUPBOX_X;
-const int ARP_GROUPBOX_Y = 10 + CHORDS_GROUPBOX_Y + CHORDS_GROUPBOX_HEIGHT;
-const int ARP_GROUPBOX_WIDTH = CHORDS_GROUPBOX_WIDTH;
-const int ARP_GROUPBOX_HEIGHT = 240 - ARP_GROUPBOX_Y;
-
-
-
 chordCreator::chordCreator( model * _parent ) :
 	model( _parent ),
 	m_chordsEnabledModel( FALSE, this ),
