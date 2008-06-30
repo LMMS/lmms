@@ -50,10 +50,8 @@
 
 
 
-// how long should be each envelope-segment maximal (e.g. attack)?
-const float SECS_PER_ENV_SEGMENT = 5.0f;
-// how long should be one LFO-oscillation maximal?
-const float SECS_PER_LFO_OSCILLATION = 20.0f;
+extern const float SECS_PER_ENV_SEGMENT;
+extern const float SECS_PER_LFO_OSCILLATION;
 
 
 const int ENV_GRAPH_X = 6;
