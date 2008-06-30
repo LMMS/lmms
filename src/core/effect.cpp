@@ -38,6 +38,7 @@ effect::effect( const plugin::descriptor * _desc,
 			const descriptor::subPluginFeatures::key * _key ) :
 	plugin( _desc, _parent ),
 	m_key( _key ? *_key : descriptor::subPluginFeatures::key()  ),
+	m_processors( 1 ),
 	m_okay( TRUE ),
 	m_noRun( FALSE ),
 	m_running( FALSE ),
