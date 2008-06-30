@@ -114,7 +114,6 @@ done
 
 AH_TEMPLATE(SDL_SDL_H, [Define to location of SDL.h])
 AH_TEMPLATE(SDL_SDL_AUDIO_H, [Define to location of SDL_audio.h])
-AH_TEMPLATE(SDL_SDL_SOUND_H, [Define to location of SDL_sound.h])
 
 OLD_LIBS="$LIBS"
 #LIBS="$LIBS -lpthread"
@@ -136,23 +135,6 @@ if test ! -z "$HAVE_SDL_SDL_AUDIO_H" ; then
 fi
 AM_CONDITIONAL(HAVE_LIBSDL, test ! -z "$HAVE_SDL_SDL_AUDIO_H")
 
-
-# check for SDL_sound-lib
-AC_ARG_WITH(sdlsound,
-	AS_HELP_STRING([--without-sdlsound],
-			[disable support for reading samples via SDL_sound]), ,
- 	[ with_sdlsound=yes ])
-AH_TEMPLATE(HAVE_SDL_SDL_SOUND_H, [Define to 1 if you have the <$SDL_INC_PATH/SDL_sound.h> header file.])
-if test "x$with_sdlsound" = "xyes" -a ! -z "$SDL_INC_PATH"; then
-	AC_CHECK_HEADER($SDL_INC_PATH/SDL_sound.h, HAVE_SDL_SDL_SOUND_H="true")
-	AC_CHECK_LIB([SDL_sound], [Sound_Init], HAVE_LIBSDL_SOUND="true", HAVE_SDL_SDL_SOUND_H="")
-fi
-if test ! -z "$HAVE_SDL_SDL_SOUND_H" ; then
-	AC_DEFINE_UNQUOTED(SDL_SDL_SOUND_H, <$SDL_INC_PATH/SDL_sound.h>)
-	AC_DEFINE(HAVE_SDL_SDL_SOUND_H)
-fi
-
-AM_CONDITIONAL(HAVE_LIBSDL_SOUND, test ! -z "$HAVE_LIBSDL_SOUND")
 
 LIBS="$OLD_LIBS"
 
@@ -456,8 +438,8 @@ if test ! -z "$HAVE_SNDFILE_H" ; then
 fi
 AM_CONDITIONAL(HAVE_LIBSF, test ! -z "$HAVE_SNDFILE_H")
 
-if test -z "$HAVE_SNDFILE_H" -a -z "$HAVE_SDL_SDL_SOUND_H" -a -z "$OGG_SUPPORT" ; then
-	AC_MSG_ERROR([*** neither libsndfile nor SDL_sound nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples so please install at least one of the packages and try again!])
+if test -z "$HAVE_SNDFILE_H" -a -z "$OGG_SUPPORT" ; then
+	AC_MSG_ERROR([*** neither libsndfile nor libvorbis (or according devel-files) were found which would make LMMS unable to load any samples so please install at least one of the packages and try again!])
 fi
 
 
@@ -821,32 +803,14 @@ if test -z "$OGG_SUPPORT" ; then
 	echo " ="
 	echo " = You don't seem to have libvorbis installed and/or libvorbis-development-"
 	echo " = package is missing. This will disable support for exporting songs to"
-	echo " = OGG-files! If SDL_sound is missing too, you'll not be able to use the "
-	echo " = samples coming with LMMS since libsndfile currently has no OGG-support!"
+	echo " = OGG-files! You'll not be able to use the samples coming with LMMS since "
+	ecoh " = libsndfile currently has no OGG-support!"
 	echo " = Consider installing the missing packages for using the full power of LMMS."
 	echo " ="
 	with_warnings="true"
 else
 	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* libvorbis for encoding/decoding OGG-files"
 fi
-
-
-
-if test -z "$HAVE_SDL_SDL_SOUND_H" ; then
-	echo " ========================"
-	echo " ===  LMMS - WARNING  ======================================================="
-	echo " ========================"
-	echo " ="
-	echo " = You don't seem to have SDL_sound-library installed and/or SDL_sound-"
-	echo " = development-package is missing. This means that you can only load samples"
-	echo " = within LMMS if you have libsndfile and libvorbis installed!"
-	echo " = Consider installing the missing packages for using the full power of LMMS."
-	echo " ="
-	with_warnings="true"
-else
-	PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD\n\t\* SDL_sound for sample-decoding"
-fi
-
 
 
 

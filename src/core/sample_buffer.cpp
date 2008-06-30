@@ -38,10 +38,6 @@
 
 #include <cstring>
 
-#ifdef LMMS_SDL_SDL_SOUND_H
-#include LMMS_SDL_SDL_SOUND_H
-#endif
-
 #ifdef LMMS_HAVE_SNDFILE_H
 #include <sndfile.h>
 #endif
@@ -86,10 +82,6 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_frequency( BaseFreq ),
 	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
-#ifdef LMMS_SDL_SDL_SOUND_H
-	// init sound-file-system of SDL
-	Sound_Init();
-#endif
 	if( _is_base64_data == TRUE )
 	{
 		loadFromBase64( _audio_file );
@@ -121,10 +113,6 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-#ifdef LMMS_SDL_SDL_SOUND_H
-	// init sound-file-system of SDL
-	Sound_Init();
-#endif
 	update();
 }
 
@@ -152,10 +140,6 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
 		m_origFrames = _frames;
 	}
-#ifdef LMMS_SDL_SDL_SOUND_H
-	// init sound-file-system of SDL
-	Sound_Init();
-#endif
 	update();
 }
 
@@ -216,13 +200,6 @@ void sampleBuffer::update( bool _keep_settings )
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleOGGVorbis( f, buf, channels,
-								samplerate );
-		}
-#endif
-#ifdef LMMS_SDL_SDL_SOUND_H
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleSDL( f, buf, channels,
 								samplerate );
 		}
 #endif
@@ -333,41 +310,6 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 		m_loop_endFrame = m_endFrame = m_frames;
 	}
 }
-
-
-
-
-#ifdef LMMS_SDL_SDL_SOUND_H
-f_cnt_t sampleBuffer::decodeSampleSDL( const char * _f,
-					int_sample_t * & _buf,
-					ch_cnt_t _channels,
-					sample_rate_t _samplerate )
-{
-	Sound_AudioInfo STD_AUDIO_INFO =
-	{
-		AUDIO_S16SYS,
-		_channels,
-		_samplerate
-	} ;
-	f_cnt_t frames = 0;
-
-	Sound_Sample * snd_sample = Sound_NewSampleFromFile( _f,
-						&STD_AUDIO_INFO, 16384 );
-	// file found?
-	if( snd_sample != NULL )
-	{
-		// let SDL_sound decode our file to requested format
-		( void )Sound_DecodeAll( snd_sample );
-		frames = snd_sample->buffer_size / ( BYTES_PER_INT_SAMPLE *
-								_channels );
-		_buf = new int_sample_t[frames * _channels];
-		memcpy( _buf, snd_sample->buffer, snd_sample->buffer_size );
-
-		Sound_FreeSample( snd_sample );
-	}
-	return( frames );
-}
-#endif
 
 
 

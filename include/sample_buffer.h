@@ -200,11 +200,6 @@ private:
 	void update( bool _keep_settings = FALSE );
 
 
-#ifdef LMMS_SDL_SDL_SOUND_H
-	f_cnt_t decodeSampleSDL( const char * _f, int_sample_t * & _buf,
-						ch_cnt_t _channels,
-						sample_rate_t _sample_rate );
-#endif
 #ifdef LMMS_HAVE_SNDFILE_H
 	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
