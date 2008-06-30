@@ -27,6 +27,7 @@
 #define _MV_BASE_H
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include "export.h"
 
@@ -97,19 +98,24 @@ public:
 
 	inline model * getModel( void )
 	{
-		return( m_model );
+		return( m_model.data() );
+	}
+
+	inline const model * getModel( void ) const
+	{
+		return( m_model.data() );
 	}
 
 	template<class T>
 	T * castModel( void )
 	{
-		return( dynamic_cast<T *>( m_model ) );
+		return( dynamic_cast<T *>( getModel() ) );
 	}
 
 	template<class T>
 	const T * castModel( void ) const
 	{
-		return( dynamic_cast<T *>( m_model ) );
+		return( dynamic_cast<const T *>( getModel() ) );
 	}
 
 
@@ -129,7 +135,7 @@ protected:
 
 private:
 	QWidget * m_widget;
-	model * m_model;
+	QPointer<model> m_model;
 
 } ;
 

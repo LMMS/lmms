@@ -56,6 +56,13 @@ effect::effect( const plugin::descriptor * _desc,
 
 effect::~effect()
 {
+	for( int i = 0; i < 2; ++i )
+	{
+		if( m_srcState[i] != NULL )
+		{
+			src_delete( m_srcState[i] );
+		}
+	}
 }
 
 

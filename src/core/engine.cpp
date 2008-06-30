@@ -131,9 +131,11 @@ void engine::destroy( void )
 	presetPreviewPlayHandle::cleanup();
 	instrumentTrackView::cleanupWindowPool();
 
-	delete s_song;
+	s_song->clearAllTracks();
 	delete s_bbTrackContainer;
+	s_bbTrackContainer = NULL;
 	delete s_dummyTC;
+	s_dummyTC = NULL;
 
 	delete s_mixer;
 	s_mixer = NULL;
@@ -146,6 +148,9 @@ void engine::destroy( void )
 	delete s_projectJournal;
 	s_projectJournal = NULL;
 	s_mainWindow = NULL;
+
+	delete s_song;
+	s_song = NULL;
 
 	delete configManager::inst();
 }

@@ -325,7 +325,7 @@ void ladspaEffect::pluginInstantiation( void )
 			}
 			else
 			{
-				p->buffer = new LADSPA_Data;
+				p->buffer = new LADSPA_Data[1];
 
 				if( manager->isPortInput( m_key, port ) )
 				{
@@ -510,8 +510,8 @@ void ladspaEffect::pluginDestruction( void )
 		manager->cleanup( m_key, m_handles[proc] );
 		for( int port = 0; port < m_portCount; port++ )
 		{
-			free( m_ports[proc][port]->buffer );
-			free( m_ports[proc][port] );
+			delete[] m_ports[proc][port]->buffer;
+			delete m_ports[proc][port];
 		}
 		m_ports[proc].clear();
 	}

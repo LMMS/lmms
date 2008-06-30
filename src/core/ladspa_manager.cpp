@@ -741,8 +741,8 @@ bool ladspaManager::isInteger( const ladspa_key_t & _plugin,
 QString ladspaManager::getPortName( const ladspa_key_t & _plugin,
 								Uint32 _port )
 {
-	if( m_ladspaManagerMap.contains( _plugin ) 
-		   && _port < getPortCount( _plugin ) )
+	if( m_ladspaManagerMap.contains( _plugin ) &&
+					_port < getPortCount( _plugin ) )
 	{
 		LADSPA_Descriptor_Function descriptorFunction =
 			m_ladspaManagerMap[_plugin]->descriptorFunction;

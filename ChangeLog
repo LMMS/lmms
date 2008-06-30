@@ -2,16 +2,21 @@
 
 	* include/automatable_model.h:
 	* include/combobox_model.h:
-	* include/piano_roll.h:
 	* include/mv_base.h:
-	* src/gui/piano_roll.cpp:
+	* include/piano_roll.h:
+	* src/core/base64.cpp:
+	* src/core/effect.cpp:
+	* src/core/engine.cpp:
+	* src/core/fx_mixer.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/ladspa_manager.cpp:
+	* src/core/mv_base.cpp:
+	* src/gui/automation_editor.cpp:
 	* src/gui/main_window.cpp:
+	* src/gui/piano_roll.cpp:
 	* src/gui/widgets/combobox.cpp:
 	* src/gui/widgets/group_box.cpp:
-	* src/gui/automation_editor.cpp:
-	* src/core/instrument_functions.cpp:
-	* src/core/mv_base.cpp:
-	* src/core/fx_mixer.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
 	fixed various leaks I found using Valgrind
 
 2008-06-30	Paul Giblock <drfaygo/at/gmail/dot/com>

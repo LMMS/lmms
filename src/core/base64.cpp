@@ -69,6 +69,7 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 		in.setVersion( QDataStream::Qt_3_3 );
 		in >> ret;
 	}
+	delete[] dst;
 	return( ret );
 }
 
