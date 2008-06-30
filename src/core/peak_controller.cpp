@@ -65,6 +65,7 @@ float peakController::value( int _offset )
 	{
 		return m_peakEffect->lastSample();
 	}
+	return( 0 );
 }
 
 
