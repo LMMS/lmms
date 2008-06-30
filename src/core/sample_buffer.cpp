@@ -159,7 +159,7 @@ sampleBuffer::~sampleBuffer()
 
 void sampleBuffer::update( bool _keep_settings )
 {
-	const bool lock = ( m_data == NULL );
+	const bool lock = ( m_data != NULL );
 	if( lock )
 	{
 		engine::getMixer()->lock();
