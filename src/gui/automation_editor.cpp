@@ -308,6 +308,7 @@ automationEditor::automationEditor( void ) :
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
+	// TODO: leak
 	comboBoxModel * quantize_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{

@@ -161,6 +161,13 @@ mainWindow::mainWindow( void ) :
 
 mainWindow::~mainWindow()
 {
+	for( QList<pluginView *>::iterator it = m_tools.begin();
+						it != m_tools.end(); ++it )
+	{
+		model * m = ( *it )->getModel();
+		delete *it;
+		delete m;
+	}
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
 	engine::destroy();

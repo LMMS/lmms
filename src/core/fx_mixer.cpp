@@ -78,6 +78,7 @@ fxMixer::fxMixer() :
 
 fxMixer::~fxMixer()
 {
+	delete[] m_out;
 	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		delete m_fxChannels[i];

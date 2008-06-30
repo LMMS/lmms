@@ -295,7 +295,7 @@ public:
 			const QString & _display_name  = QString::null,
 			bool _default_constructed = FALSE ) :
 		automatableModel( Float, _val, _min, _max, _step,
-					_parent, _display_name, _default_constructed )
+				_parent, _display_name, _default_constructed )
 	{
 	}
 
@@ -312,7 +312,7 @@ public:
 			const QString & _display_name  = QString::null,
 			bool _default_constructed = FALSE ) :
 		automatableModel( Integer, _val, _min, _max, 1,
-					_parent, _display_name, _default_constructed )
+				_parent, _display_name, _default_constructed )
 	{
 	}
 
@@ -329,7 +329,7 @@ public:
 				const QString & _display_name  = QString::null,
 				bool _default_constructed = FALSE ) : 
 		automatableModel( Bool, _val, FALSE, TRUE, 1,
-						_parent, _display_name, _default_constructed )
+				_parent, _display_name, _default_constructed )
 	{
 	}
 

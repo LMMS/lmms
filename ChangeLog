@@ -1,3 +1,19 @@
+2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/automatable_model.h:
+	* include/combobox_model.h:
+	* include/piano_roll.h:
+	* include/mv_base.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/mv_base.cpp:
+	* src/core/fx_mixer.cpp:
+	fixed various leaks I found using Valgrind
+
 2008-06-30	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/ladspa_browser/ladspa_browser.cpp:

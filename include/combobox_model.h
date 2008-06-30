@@ -39,9 +39,16 @@ class comboBoxModel : public intModel
 {
 	Q_OBJECT
 public:
-	comboBoxModel( ::model * _parent = NULL, const QString & _display_name = QString::null ) :
+	comboBoxModel( ::model * _parent = NULL,
+			const QString & _display_name = QString::null,
+				bool _default_constructed = FALSE ) :
 		intModel( 0, 0, 0, _parent, _display_name )
 	{
+	}
+
+	virtual ~comboBoxModel()
+	{
+		clear();
 	}
 
 	void addItem( const QString & _item, pixmapLoader * _loader = NULL );

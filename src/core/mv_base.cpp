@@ -53,10 +53,22 @@ QString model::fullDisplayName( void ) const
 
 
 
+
 modelView::modelView( model * _model, QWidget * _this ) :
 	m_widget( _this ),
 	m_model( _model )
 {
+}
+
+
+
+
+modelView::~modelView()
+{
+	if( m_model != NULL && m_model->defaultConstructed() )
+	{
+		delete m_model;
+	}
 }
 
 

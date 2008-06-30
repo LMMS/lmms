@@ -51,7 +51,7 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new comboBoxModel, this ),
+	intModelView( new comboBoxModel( NULL, QString::null, TRUE ), this ),
 	m_menu( this ),
 	m_pressed( FALSE )
 {

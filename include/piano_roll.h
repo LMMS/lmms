@@ -29,9 +29,10 @@
 
 #include <QtGui/QWidget>
 
-#include "types.h"
-#include "note.h"
+#include "combobox_model.h"
 #include "journalling_object.h"
+#include "note.h"
+#include "types.h"
 
 
 class QPainter;
@@ -39,7 +40,6 @@ class QPixmap;
 class QScrollBar;
 
 class comboBox;
-class comboBoxModel;
 class notePlayHandle;
 class pattern;
 class timeLine;
@@ -198,9 +198,9 @@ private:
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
 
-	comboBoxModel * m_zoomingModel;
-	comboBoxModel * m_quantizeModel;
-	comboBoxModel * m_noteLenModel;
+	comboBoxModel m_zoomingModel;
+	comboBoxModel m_quantizeModel;
+	comboBoxModel m_noteLenModel;
 
 
 

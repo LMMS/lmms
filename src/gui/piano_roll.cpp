@@ -127,9 +127,9 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 
 pianoRoll::pianoRoll( void ) :
-	m_zoomingModel( new comboBoxModel( /* this */ ) ),
-	m_quantizeModel( new comboBoxModel( /* this */ ) ),
-	m_noteLenModel( new comboBoxModel( /* this */ ) ),
+	m_zoomingModel(),
+	m_quantizeModel(),
+	m_noteLenModel(),
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( FALSE ),
@@ -359,13 +359,13 @@ pianoRoll::pianoRoll( void ) :
 	// setup zooming-stuff
 	for( int i = 0; i < 6; ++i )
 	{
-		m_zoomingModel->addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingModel.addItem( QString::number( 25 << i ) + "%" );
 	}
-	m_zoomingModel->setValue( m_zoomingModel->findText( "100%" ) );
-	connect( m_zoomingModel, SIGNAL( dataChanged() ),
+	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
+	connect( &m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
 	m_zoomingComboBox = new comboBox( m_toolBar );
-	m_zoomingComboBox->setModel( m_zoomingModel );
+	m_zoomingComboBox->setModel( &m_zoomingModel );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 
 
@@ -375,12 +375,12 @@ pianoRoll::pianoRoll( void ) :
 
 	for( int i = 0; i < 7; ++i )
 	{
-		m_quantizeModel->addItem( "1/" + QString::number( 1 << i ) );
+		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
-	m_quantizeModel->addItem( "1/192" );
-	m_quantizeModel->setValue( m_quantizeModel->findText( "1/16" ) );
+	m_quantizeModel.addItem( "1/192" );
+	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 	m_quantizeComboBox = new comboBox( m_toolBar );
-	m_quantizeComboBox->setModel( m_quantizeModel );
+	m_quantizeComboBox->setModel( &m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
 
@@ -388,19 +388,19 @@ pianoRoll::pianoRoll( void ) :
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
-	m_noteLenModel->addItem( tr( "Last note" ),
+	m_noteLenModel.addItem( tr( "Last note" ),
 					new pixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond" } ;
 	for( int i = 0; i < 6; ++i )
 	{
-		m_noteLenModel->addItem( "1/" + QString::number( 1 << i ),
+		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ),
 				new pixmapLoader( "note_" + pixmaps[i] ) );
 	}
-	m_noteLenModel->addItem( "1/192" );
-	m_noteLenModel->setValue( 0 );
+	m_noteLenModel.addItem( "1/192" );
+	m_noteLenModel.setValue( 0 );
 	m_noteLenComboBox = new comboBox( m_toolBar );
-	m_noteLenComboBox->setModel( m_noteLenModel );
+	m_noteLenComboBox->setModel( &m_noteLenModel );
 	m_noteLenComboBox->setFixedSize( 120, 22 );
 
 
@@ -2150,8 +2150,8 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 			m_ppt /= 2;
 		}
 		// update combobox with zooming-factor
-		m_zoomingModel->setValue(
-				m_zoomingModel->findText( QString::number(
+		m_zoomingModel.setValue(
+				m_zoomingModel.findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
 						DEFAULT_PR_PPT ) ) +"%" ) );
 		// update timeline
@@ -2652,7 +2652,7 @@ void pianoRoll::updatePosition( const midiTime & _t )
 
 void pianoRoll::zoomingChanged( void )
 {
-	const QString & zfac = m_zoomingModel->currentText();
+	const QString & zfac = m_zoomingModel.currentText();
 	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
@@ -2667,8 +2667,8 @@ void pianoRoll::zoomingChanged( void )
 
 int pianoRoll::quantization( void ) const
 {
-	return( DefaultTicksPerTact / m_quantizeModel->currentText().right(
-				m_quantizeModel->currentText().length() -
+	return( DefaultTicksPerTact / m_quantizeModel.currentText().right(
+				m_quantizeModel.currentText().length() -
 								2 ).toInt() );
 }
 
@@ -2677,12 +2677,12 @@ int pianoRoll::quantization( void ) const
 
 midiTime pianoRoll::newNoteLen( void ) const
 {
-	if( m_noteLenModel->value() == 0 )
+	if( m_noteLenModel.value() == 0 )
 	{
 		return( m_lenOfNewNotes );
 	}
-	return( midiTime::ticksPerTact() / m_noteLenModel->currentText().right(
-				m_noteLenModel->currentText().length() -
+	return( midiTime::ticksPerTact() / m_noteLenModel.currentText().right(
+				m_noteLenModel.currentText().length() -
 								2 ).toInt() );
 }
 

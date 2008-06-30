@@ -91,11 +91,14 @@ class EXPORT modelView
 {
 public:
 	modelView( model * _model, QWidget * _this );
-	virtual ~modelView()
-	{
-	}
+	virtual ~modelView();
 
 	virtual void setModel( model * _model, bool _old_model_valid = TRUE );
+
+	inline model * getModel( void )
+	{
+		return( m_model );
+	}
 
 	template<class T>
 	T * castModel( void )
