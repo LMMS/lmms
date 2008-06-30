@@ -53,7 +53,7 @@ public slots:
 	void play( void );
 	void stop( void );
 	void updatePosition( void );
-
+	void addAutomationTrack( void );
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );

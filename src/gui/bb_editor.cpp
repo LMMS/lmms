@@ -53,6 +53,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
+	tb_layout->setSpacing( 0 );
 	tb_layout->setMargin( 0 );
 
 
@@ -77,6 +78,12 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 				engine::getSong(), SLOT( addBBTrack() ),
 								m_toolBar );
 
+	toolButton * add_automation_track = new toolButton(
+				embed::getIconPixmap( "add_automation" ),
+						tr( "Add automation-track" ),
+				this, SLOT( addAutomationTrack() ), m_toolBar );
+
+
 
 	m_playButton->setWhatsThis(
 		tr( "Click here, if you want to play the current "
@@ -100,6 +107,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	tb_layout->addWidget( m_bbComboBox );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( add_bb_track );
+	tb_layout->addWidget( add_automation_track );
 	tb_layout->addStretch();
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
@@ -114,8 +122,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 	setModel( _tc );
 	connect( &_tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePosition() ),
-			Qt::QueuedConnection );
+			this, SLOT( updatePosition() ), Qt::QueuedConnection );
 }
 
 
@@ -188,6 +195,14 @@ void bbEditor::updatePosition( void )
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
+}
+
+
+
+
+void bbEditor::addAutomationTrack( void )
+{
+	(void) track::create( track::AutomationTrack, model() );
 }
 
 
