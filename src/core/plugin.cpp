@@ -38,6 +38,8 @@
 #include "dummy_plugin.h"
 
 
+static pixmapLoader __dummy_loader;
+
 static plugin::descriptor dummy_plugin_descriptor =
 {
 	"dummy",
@@ -46,9 +48,10 @@ static plugin::descriptor dummy_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	plugin::Undefined,
-	NULL,
+	&__dummy_loader,
 	NULL
 } ;
+
 
 
 
@@ -57,11 +60,6 @@ plugin::plugin( const descriptor * _descriptor, model * _parent ) :
 	model( _parent ),
 	m_descriptor( _descriptor )
 {
-	if( dummy_plugin_descriptor.logo == NULL )
-	{
-		dummy_plugin_descriptor.logo = new pixmapLoader;
-	}
-
 	if( m_descriptor == NULL )
 	{
 		m_descriptor = &dummy_plugin_descriptor;
