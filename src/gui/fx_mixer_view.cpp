@@ -29,6 +29,7 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 #include <QtGui/QToolButton>
@@ -44,8 +45,6 @@
 #include "song_editor.h"
 #include "tooltip.h"
 #include "pixmap_button.h"
-
-
 
 class fxLine : public QWidget
 {
@@ -229,7 +228,14 @@ fxMixerView::fxMixerView() :
 
 
 	// add ourself to workspace
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = 
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	Qt::WindowFlags flags = subWin->windowFlags();
+	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	subWin->setWindowFlags( flags );
+	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->move( 10, 200 );
 

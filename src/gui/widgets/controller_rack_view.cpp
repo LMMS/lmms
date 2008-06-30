@@ -27,6 +27,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
@@ -71,7 +72,15 @@ controllerRackView::controllerRackView( ) :
 
 	setModel( engine::getSong() );
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = 
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+	Qt::WindowFlags flags = subWin->windowFlags();
+	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	subWin->setWindowFlags( flags );
+	setWindowFlags( flags );
+	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 }
 

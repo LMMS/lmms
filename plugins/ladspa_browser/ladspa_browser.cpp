@@ -179,6 +179,11 @@ ladspaBrowserView::ladspaBrowserView( tool * _tool ) :
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(
 							QLayout::SetFixedSize );
+		
+		Qt::WindowFlags flags = parentWidget()->windowFlags();
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		flags &= ~Qt::WindowMaximizeButtonHint;
+		parentWidget()->setWindowFlags( flags );
 	}
 }
 

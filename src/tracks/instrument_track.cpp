@@ -41,6 +41,7 @@
 #include <QtGui/QMdiArea>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 
 
@@ -1204,7 +1205,14 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 	if( engine::getMainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+		QMdiSubWindow * subWin = 
+			engine::getMainWindow()->workspace()->addSubWindow( this );
+		Qt::WindowFlags flags = subWin->windowFlags();
+		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		flags &= ~Qt::WindowMaximizeButtonHint;
+		subWin->setWindowFlags( flags );
+		subWin->setFixedSize( subWin->size() );
+
 		parentWidget()->hide();
 	}
 	else

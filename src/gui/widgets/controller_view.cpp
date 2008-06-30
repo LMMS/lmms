@@ -75,6 +75,12 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( 
                 m_controllerDlg );
+	
+	Qt::WindowFlags flags = m_subWindow->windowFlags();
+	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	m_subWindow->setWindowFlags( flags );
+	m_subWindow->setFixedSize( m_subWindow->size() );
 
 	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
 

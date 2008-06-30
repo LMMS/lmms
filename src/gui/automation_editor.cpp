@@ -354,6 +354,8 @@ automationEditor::automationEditor( void ) :
 
 	setMouseTracking( TRUE );
 
+	setMinimumSize( tb_layout->minimumSize().width(), 128 );
+
 	// add us to workspace
 	if( engine::getMainWindow()->workspace() )
 	{
@@ -677,14 +679,12 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 	while( i < deltax )
 	{
 		y = _y0 + ( ystep * yscale * i );
-		m_pattern->removeValue( midiTime( x ) );
-		m_pattern->putValue( midiTime( x ), y );
 
 		x += xstep;
 		i += 1;
+		m_pattern->removeValue( midiTime( x ) );
+		m_pattern->putValue( midiTime( x ), y );
 	}
-	m_pattern->removeValue( midiTime( _x1 ) );
-	m_pattern->putValue( midiTime( _x1 ), _y1 );
 };
 
 

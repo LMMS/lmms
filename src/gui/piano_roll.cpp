@@ -77,7 +77,7 @@ extern Keys whiteKeys[];	// defined in piano_widget.cpp
 
 
 // some constants...
-const int INITIAL_PIANOROLL_WIDTH = 640;
+const int INITIAL_PIANOROLL_WIDTH = 840;
 const int INITIAL_PIANOROLL_HEIGHT = 480;
 
 const int SCROLLBAR_SIZE = 16;
@@ -441,6 +441,8 @@ pianoRoll::pianoRoll( void ) :
 	setCurrentPattern( NULL );
 
 	setMouseTracking( TRUE );
+
+	setMinimumSize( tb_layout->minimumSize().width(), 160 );
 
 	// add us to workspace
 	if( engine::getMainWindow()->workspace() )

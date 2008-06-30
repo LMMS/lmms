@@ -1,3 +1,16 @@
+2008-06-30	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* include/automation_editor.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/instrument_track.cpp:
+	Remove maximize and resize capability from many windows and set proper
+	minimum and intial sizes
+
 2008-06-29	Javier Serrano Polo <jasp00/at/terra/dot/es>
 
 	* data/locale/ca.ts:

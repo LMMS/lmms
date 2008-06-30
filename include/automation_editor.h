@@ -142,7 +142,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 640;
+	static const int INITIAL_WIDTH = 740;
 	static const int INITIAL_HEIGHT = 480;
 
 	static const int SCROLLBAR_SIZE = 16;
