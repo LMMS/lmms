@@ -154,6 +154,7 @@ public:
 
 	mixerWorkerThread( mixer * _mixer ) :
 		QThread( _mixer ),
+		m_quit( FALSE ),
 		m_mixer( _mixer ),
 		m_queueReadySem( &m_mixer->m_queueReadySem ),
 		m_workersDoneSem( &m_mixer->m_workersDoneSem ),
