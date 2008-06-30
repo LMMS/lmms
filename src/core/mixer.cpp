@@ -354,11 +354,11 @@ mixer::~mixer()
 		for( int w = 0; w < m_numWorkers; ++w )
 		{
 			m_workers[w]->quit();
-			while( m_workers[w]->isRunning() )
-			{
-				DISTRIBUTE_JOB_QUEUE(jq);
-				m_workers[w]->wait( 50 );
-			}
+		}
+		DISTRIBUTE_JOB_QUEUE(jq);
+		for( int w = 0; w < m_numWorkers; ++w )
+		{
+			m_workers[w]->wait( 500 );
 		}
 	}
 
