@@ -134,7 +134,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	}
 
 
-	setName( tr( "Default" ) );
+	setName( tr( "Default preset" ) );
 
 }
 
@@ -657,7 +657,6 @@ trackView * instrumentTrack::createView( trackContainerView * _tcv )
 void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "name", name() );
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_pitchModel.saveSettings( _doc, _this, "pitch" );
@@ -688,7 +687,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	invalidateAllMyNPH();
 
 	engine::getMixer()->lock();
-	setName( _this.attribute( "name" ) );
+
 	m_volumeModel.loadSettings( _this, "vol" );
 
 	// compat-hacks - move to mmp::upgrade

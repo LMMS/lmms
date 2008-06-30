@@ -1654,6 +1654,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( "track" );
 	_this.setAttribute( "type", type() );
+	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
 // ### TODO
 //	_this.setAttribute( "height", m_trackView->height() );
@@ -1695,6 +1696,9 @@ void track::loadSettings( const QDomElement & _this )
 							"settings-node!\n" );
 	}
 
+	setName( _this.hasAttribute( "name" ) ? _this.attribute( "name" ) :
+			_this.firstChild().toElement().attribute( "name" ) );
+
 	setMuted( _this.attribute( "muted" ).toInt() );
 
 	while( !m_trackContentObjects.empty() )
@@ -1719,7 +1723,6 @@ void track::loadSettings( const QDomElement & _this )
 								midiTime( 0 ) );
 				tco->restoreState( node.toElement() );
 				saveJournallingState( FALSE );
-//				addTCO( tco );
 				restoreJournallingState();
 			}
 		}

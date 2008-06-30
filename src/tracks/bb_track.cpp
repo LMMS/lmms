@@ -424,7 +424,6 @@ trackContentObject * bbTrack::createTCO( const midiTime & _pos )
 void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "name", name() );
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getBBEditor()->currentBB() );*/
@@ -442,7 +441,6 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
-	setName( _this.attribute( "name" ) );
 /*	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );

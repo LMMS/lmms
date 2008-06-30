@@ -374,7 +374,6 @@ trackContentObject * sampleTrack::createTCO( const midiTime & )
 void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "name", name() );//m_trackLabel->text() );
 	m_audioPort.getEffects()->saveState( _doc, _this );
 #if 0
 	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
@@ -387,7 +386,6 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
-	setName( _this.attribute( "name" ) );
 	QDomNode node = _this.firstChild();
 	m_audioPort.getEffects()->clear();
 	while( !node.isNull() )
