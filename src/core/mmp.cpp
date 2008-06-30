@@ -44,9 +44,8 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::UnknownType, "unknown" },
 	{ multimediaProject::SongProject, "song" },
 	{ multimediaProject::SongProjectTemplate, "songtemplate" },
-#warning compat-code, use upgrade feature
 	{ multimediaProject::InstrumentTrackSettings,
-				"instrumenttracksettings,channelsettings" },
+						"instrumenttracksettings" },
 	{ multimediaProject::DragNDropData, "dnddata" },
 	{ multimediaProject::ClipboardData, "clipboard-data" },
 	{ multimediaProject::JournalData, "journaldata" },
@@ -161,9 +160,7 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 			{
 				m_head = node.toElement();
 			}
-			else if( node.nodeName() == typeName( m_type ) ||
-#warning compat-code, use upgrade feature
-					node.nodeName() == "channelsettings" )
+			else if( node.nodeName() == typeName( m_type ) )
 			{
 				m_content = node.toElement();
 			}
@@ -238,8 +235,8 @@ bool multimediaProject::writeFile( const QString & _fn )
 	QFile outfile( fn );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL, songEditor::tr( "Could not write "
-								"file" ),
+		QMessageBox::critical( NULL,
+				songEditor::tr( "Could not write file" ),
 					songEditor::tr( "Could not write file "
 							"%1. You probably are "
 							"not permitted to "
@@ -304,10 +301,7 @@ QString multimediaProject::typeName( ProjectTypes _project_type )
 {
 	if( _project_type >= UnknownType && _project_type < NumProjectTypes )
 	{
-		return( s_types[_project_type].m_name
-#warning compat-code, use upgrade feature
-				.section( ',', 0, 0 )
-				);
+		return( s_types[_project_type].m_name );
 	}
 	return( s_types[UnknownType].m_name );
 }
@@ -554,6 +548,12 @@ void multimediaProject::upgrade( void )
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "lb302" );
 		}
+
+		while( !( list = elementsByTagName( "channelsettings" ) ).isEmpty() )
+		{
+			QDomElement el = list.item( 0 ).toElement();
+			el.setTagName( "instrumenttracksettings" );
+		}
 	}
 
 	if( version < "0.4.0-svn20080104" )
@@ -569,6 +569,7 @@ void multimediaProject::upgrade( void )
 			}
 		}
 	}
+
 	if( version < "0.4.0-svn20080118" )
 	{
 		QDomNodeList list;
@@ -655,7 +656,8 @@ void multimediaProject::upgrade( void )
 		{
 			QDomElement el = list.item( i ).toElement();
 			QString s = el.attribute( "name" );
-			s.replace( QRegExp("^Beat/Baseline "), "Beat/Bassline " );
+			s.replace( QRegExp( "^Beat/Baseline " ),
+							"Beat/Bassline " );
 			el.setAttribute( "name", s );
 		}
 	}
